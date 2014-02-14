@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Project O</title>
+        <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
+        <link rel="stylesheet" href="css/main.css" />
+        <script src="../js/jquery.js"></script>
+        <script src="../js/jquery.mobile-1.3.2.min.js"></script>
+    </head>
+    <body>
+        <div data-role="page" id="page-login">
+            <div data-role="popup" class="popup3" data-transition="pop">
+                  <p><br/>密碼輸入不正確<br/><br/></p>
+                </div>
+                <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
+        </div>
+                
+                
+        <script type="text/javascript">
+            $(function(){
+            	var base_url = "http://apserver01.cloud.mitake.com.tw:8090/apiv1/";
+            	$("#pw-send").click(function(){
+            		var api_name = "me/password";
+                    var headers = {
+                        "ui":"5817e4a2-fab3-4ac3-a153-e43a8b9eb210", 
+                        "at":"19d4a98b-585e-4913-a627-2e2e3ddd9d60", 
+                        "up":"123456",
+                        "pn":"0980922917", 
+                        "gm":"", 
+                        "op":"435537"
+                    };
+                    var method = "put";
+                    var result = ajaxDo(api_name,headers,method,false);
+                    console.log(result);
+                    console.log(result.readyState);
+                    console.log(result.state);
+                    if(!result.responseText){
+                        console.log("ee");
+                        $('.popup3').popup('open');
+                        return false;
+                    }else{
+                        console.log("eedd");
+                        $('.popup3 p').html("<br/>密碼變更完成。<br/><br/>");
+                        $('.popup3').popup('open');
+                    }
+                });
+            	
+            	
+            	function ajaxDo(api_name,headers,method,async){
+                    //console.log(api_url);
+                    var api_url = base_url + api_name;
+                    var myRand = Math.floor((Math.random()*1000)+1);
+                    
+                    if(async){
+                        var result = $.ajax ({
+                            url: api_url,
+                            type: method,
+                            headers:headers,
+                        });/* ajax結束 */
+                    }else{
+                        var result = $.ajax ({
+                            url: api_url,
+                            type: method,
+                            headers:headers,
+                            async:false,
+                        });/* ajax結束 */
+                    }
+                    
+                    return result;
+                }
+                
+            });
+        </script>
+    </body>
+</html>
