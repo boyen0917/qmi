@@ -16,7 +16,7 @@ var params_arr = {
 		"gd":"團體說明	Group Description",
 		"gl":"團體列表	Group List",
 		"gi":"團體 ID	Group Id",
-		"gm":"團體登入識別碼	Group Identify mark",
+		"ns":"團體登入識別碼	Group Namespace",
 		"gp":"團體權限定義	Group permission define",
 		"gt":"團體內組織定義	Group Arch. item define.",
 		"pt":"推撥ID	Push Token",
@@ -30,10 +30,14 @@ var params_arr = {
 		"et":"授權終止時間	Expire Time",
 		"er":"錯誤訊息	Error Message",
 		"li":"i18n 語系代碼	Lang Id",
-		"ug":"更版旗標	APP Upgrade",
+		"ug":"更版旗標 APP Upgrade",
 		"lng":"經度	Longitude",
-		"lat":"緯度	Latitude"
+		"lat":"緯度	Latitude",
+		"sg":"部門代號 ＥＸ：C11111",
+		"sp":"上層組織代號,若為最底層部門為空,EX: A0001B0001",
+		"sn":"部門名稱",
+		"pi":"權限代號",
+		"gu":"GroupUser",
+		"":"",
+		"":""
 }
-    
-
-
