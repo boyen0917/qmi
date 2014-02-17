@@ -10,67 +10,95 @@
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
     </head>
     <body>
-        <div data-role="page" id="page-login">
-            <div data-role="popup" class="popup3" data-transition="pop">
-                  <p><br/>密碼輸入不正確<br/><br/></p>
+    
+        <div data-role="page" id="page-test">
+            <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
+                <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true">立即加入團體</a>
+                <button class="show-page-loading-msg" data-theme="d" data-textonly="false" data-textvisible="false" data-msgtext="" data-inline="true">Icon (default)</button>
+                <button class="show-page-loading-msg" data-theme="a" data-textonly="false" data-textvisible="true" data-msgtext="Loading theme a" data-inline="true">A</button>
+        </div> 
+        
+        <div data-role="page" id="page-group-menu">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
+                <h3>團體列表</h3>
+                <div id="group-nav-area" data-role="navbar">
+                    <ul>        
+                        <li><a href="#" data-group-act="gl">團體列表</a></li>
+                        <li><a href="#" data-group-act="gc">創建團體</a></li>
+                        <li><a href="#" data-group-act="gj">加入團體</a></li>
+                        <li><a href="#" data-group-act="gi">團體邀請</a></li>
+                    </ul>
                 </div>
-                <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
-        </div>
-                
-                
+            </div>
+            
+            <div class="group-nav-chk" data-group-act="gl">
+                團體列表
+            </div>
+            <div class="group-nav-chk" data-group-act="gc">
+                <img class="gm-create-head" src="images/head.png"/>
+                <div class="gm-create-content-area">
+                    團體名稱
+                    <input type="text" id="group-name" placeholder="請輸入您的團體名稱">
+                    團體介紹
+                    <textarea name="textarea-8" id="group-desc"></textarea>
+                    <a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>
+                </div>
+                <div data-role="popup" class="popup4" data-transition="pop">
+                   <p>團體名稱必填喔！</p>
+                 </div>
+            </div>
+            <div class="group-nav-chk" data-group-act="gj">
+            加入團體
+            </div>
+            <div class="group-nav-chk" data-group-act="gi">
+            團體邀請
+            </div>
+            
+        </div>  
+        
+        <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
         <script type="text/javascript">
-            $(function(){
-            	var base_url = "http://apserver01.cloud.mitake.com.tw:8090/apiv1/";
-            	$("#pw-send").click(function(){
-            		var api_name = "me/password";
-                    var headers = {
-                        "ui":"5817e4a2-fab3-4ac3-a153-e43a8b9eb210", 
-                        "at":"19d4a98b-585e-4913-a627-2e2e3ddd9d60", 
-                        "up":"123456",
-                        "pn":"0980922917", 
-                        "gm":"", 
-                        "op":"435537"
-                    };
-                    var method = "put";
-                    var result = ajaxDo(api_name,headers,method,false);
-                    console.log(result);
-                    console.log(result.readyState);
-                    console.log(result.state);
-                    if(!result.responseText){
-                        console.log("ee");
-                        $('.popup3').popup('open');
-                        return false;
-                    }else{
-                        console.log("eedd");
-                        $('.popup3 p').html("<br/>密碼變更完成。<br/><br/>");
-                        $('.popup3').popup('open');
-                    }
+            $(function(){ 
+                $("#group-nav-area li a").click(function(){
+                    var act = $(this).data("group-act");
+                    $(".group-nav-chk").each(function(i,val){
+                        if($(this).data("group-act") == act){
+                            $(this).show();
+                        }else{
+                            $(this).hide();
+                        }
+                    });
                 });
-            	
-            	
-            	function ajaxDo(api_name,headers,method,async){
+                
+                $(".hg-create").click(function(){
+                    var result = ajaxDo();
+                    console.log(result);
+                    return false;
+                    $("#group-nav-area li a[data-group-act=gc]").trigger("click");
+                });
+                $(".hg-join").click(function(){
+                    $("#group-nav-area li a[data-group-act=gj]").trigger("click");
+                });
+                
+                function ajaxDo(){
                     //console.log(api_url);
-                    var api_url = base_url + api_name;
+                    var api_url = "api.php";
                     var myRand = Math.floor((Math.random()*1000)+1);
                     
-                    if(async){
-                        var result = $.ajax ({
+                    var result = $.ajax ({
                             url: api_url,
-                            type: method,
-                            headers:headers,
-                        });/* ajax結束 */
-                    }else{
-                        var result = $.ajax ({
-                            url: api_url,
-                            type: method,
-                            headers:headers,
-                            async:false,
-                        });/* ajax結束 */
-                    }
+                            data:{
+                                para: myRand
+                            },
+                            beforeSend:function(){
+                                $('.ui-loader').show();
+                            },
+                        });
                     
                     return result;
                 }
-                
+                        
             });
         </script>
     </body>

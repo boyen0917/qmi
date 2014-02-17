@@ -1,3 +1,7 @@
+.ui-body-c, .ui-body-c input, .ui-body-c select, .ui-body-c textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d{
+    font-family: -webkit-body;
+}
+
 .main{
 	height:1136px;
     width:640px;
@@ -48,13 +52,11 @@
 }
 
 .ui-body-c input, .ui-body-c a {
-    font-family: serif;
 }
 
 .login-text,.login-text-l,.login-text-r{
     color: #f6f6f6;
     text-shadow: 0 0 0 #fff;
-    font-family: serif;
     text-decoration:none;
 }
 
@@ -233,5 +235,9 @@
 }
 
 .group-create-area{
+}
+
+/* =======================團體選單 切換=================================*/
+.group-nav-chk{
 	display:none;
 }

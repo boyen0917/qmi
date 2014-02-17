@@ -16,7 +16,10 @@
 	             <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號">
 	             <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼">
 	             <div data-role="popup" class="popup-login" data-transition="pop">
-                    <p><br/>帳號或密碼錯誤<br/><br/></p>
+                    <p>
+                        <br/>帳號或密碼錯誤<br/><br/>
+                        <button class="popup-close" data-theme="c">確定</button>
+                    </p>
                  </div>
 	             <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span>
 	             <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a>
@@ -95,8 +98,8 @@
 			</div>
 			<div class="helper-title">小幫手</div>
 			<div data-role="collapsible-set" class="helper-collapsible-area ui-icon-alt" data-inset="false" data-iconpos="right" data-collapsed-icon="arrow-d">
-                <div data-role="collapsible"><h3>如何創建團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"創建團體"後,設定您的團體照片,輸入團體名稱,團體介紹,並選取""預定使用人數".</li><li>完成輸入後,點擊"建立",即完成團體之建立.</li></ol></p><a class="hg-create inline-btn" href="#" data-role="button" data-theme="d" data-inline="true">立即創建團體</a><br/></div> 
-                <div data-role="collapsible"><h3>如何加入團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"加入團體"後,輸入您來自"簡訊"或"邀請訊息"內的組織代碼及OTP</li><li>完成輸入後,點擊"加入",即加入該團體.</li></ol></p><a class="hg-join inline-btn" href="#" data-role="button" data-theme="d" data-inline="true">立即加入團體</a><br/></div> 
+                <div data-role="collapsible"><h3>如何創建團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"創建團體"後,設定您的團體照片,輸入團體名稱,團體介紹,並選取""預定使用人數".</li><li>完成輸入後,點擊"建立",即完成團體之建立.</li></ol></p><a class="hg-create inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即創建團體</a><br/></div> 
+                <div data-role="collapsible"><h3>如何加入團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"加入團體"後,輸入您來自"簡訊"或"邀請訊息"內的組織代碼及OTP</li><li>完成輸入後,點擊"加入",即加入該團體.</li></ol></p><a class="hg-join inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即加入團體</a><br/></div> 
                 <div data-role="collapsible"><h3>建立事件提醒重要事項</h3><p>建立事件提醒重要事項</p></div> 
                 <div data-role="collapsible"><h3>舉辦投票不漏聽任何人的心聲</h3><p>舉辦投票不漏聽任何人的心聲</p></div> 
                 <div data-role="collapsible"><h3>多人群聊加快訊息傳遞</h3><p>多人群聊加快訊息傳遞</p></div> 
@@ -117,10 +120,9 @@
 			    </div>
             </div>
             
-            <div class="group-list-area">
-                
+            <div class="group-nav-chk" data-group-act="gl">
             </div>
-            <div class="group-create-area">
+            <div class="group-nav-chk" data-group-act="gc">
                 <img class="gm-create-head" src="images/head.png"/>
                 <div class="gm-create-content-area">
                     團體名稱
@@ -133,9 +135,11 @@
                    <p>團體名稱必填喔！</p>
                  </div>
             </div>
-            <div class="group-join-area">
+            <div class="group-nav-chk" data-group-act="gj">
+            加入團體
             </div>
-            <div class="group-invite-area">
+            <div class="group-nav-chk" data-group-act="gi">
+            團體邀請
             </div>
         </div>
 <!---------------------------------- page-group-main ------------------------------------>
@@ -147,7 +151,11 @@
             <div class="group-list-main-area">
                 <img width="100%" height="100%" src="images/test.png"/>
             </div>
-        </div>       
+        </div>   
+        
+            
+<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
+
         
         <script type="text/javascript">
             $(function(){
@@ -156,7 +164,6 @@
                 var device_token;
                 //全域
                 var ui,at,gi,gn,gd,ga,gm;
-                
                 //計算螢幕長寬以維持比例
             	var proportion = 1.7;
             	$(".main").css("width",$(window).width());
@@ -165,6 +172,21 @@
                 	$(".main").css("width",$(window).width());
                 	$(".main").css("height",$(window).width()*proportion);
                 });
+                
+                $(".popup-close").click(function(){
+                	$("div[data-role=popup]").popup("close");
+                });
+                
+                $(document).ajaxSend(function(r, s) {
+                	$('.ui-loader').css("display","block");
+                	console.log($('.ui-loader').css("display"));
+                });
+                $(document).ajaxComplete(function(r, s) {
+                	$('.ui-loader').hide();
+                	//setTimeout(function(){$('.ui-loader').hide();},500);
+                    
+                });
+                
 //----------------------------------- 登入 ---------------------------------------------
                 //login打勾
                 $(".login-radio").click(function(){
@@ -200,8 +222,9 @@
                         if(result.responseText){
                         	$(".group-list-area").html("");
 		                    $.each($.parseJSON(result.responseText).gl,function(i,val){
-		                        $(".group-list-area").append("<div data-gi=\"" + val.gi + "\" class=\"group-list-box\">no pic<div>" + val.gn + "</div></div>");
+		                        $("div[data-group-act=gl]").append("<div data-gi=\"" + val.gi + "\" class=\"group-list-box\">no pic<div>" + val.gn + "</div></div>");
 		                    });
+		                    $("#group-nav-area li a[data-group-act=gl]").trigger("click");
                         	$.mobile.changePage("#page-group-menu");
                         }else{
                         	$.mobile.changePage("#page-helper");
@@ -343,29 +366,28 @@
                 
                 //團體選單 點選nav
                 $("#group-nav-area li a").click(function(){
-                	var act = $(this).data("group-act");
-                	switch (act) {
-	                    case "gl": 
-	                    	$(".group-list-area").show();
-	                    	$(".group-create-area").hide();
-	                    	groupMenuListArea(ui,at);
-	                      break;
-	                    case "gc": 
-	                    	$(".group-create-area").find("input").val("");
-	                    	$(".group-create-area").find("textarea").val("");
-	                    	$(".group-create-area").show();
-	                    	$(".group-list-area").hide();
-	                      break;
-	                    case "gj":
-	                    	$(".group-create-area").hide();
-                            $(".group-list-area").hide();
-	                      break;
-	                    case "gi":
-	                    	$(".group-create-area").hide();
-                            $(".group-list-area").hide();
-	                      break;
-	                    default: console.log(0);
-	                }
+                    var act = $(this).data("group-act");
+                    $(".group-nav-chk").each(function(i,val){
+                        if($(this).data("group-act") == act){
+                            $(this).show();
+                            //個別的動作
+                            switch (act) {
+	                            case "gl": 
+	                                groupMenuListArea(ui,at);
+	                              break;
+	                            case "gc": 
+	                                $(".group-create-area").find("input").val("");
+	                                $(".group-create-area").find("textarea").val("");
+	                              break;
+	                            case "gj":
+	                              break;
+	                            case "gi":
+	                              break;
+	                        }
+                        }else{
+                            $(this).hide();
+                        }
+                    });
                 });
                 
                 //創建團體 建立
@@ -406,23 +428,11 @@
 //----------------------------------- 小幫手 ---------------------------------------------
                 //小幫手 創建團體
                 $(".hg-create").click(function(){
-                	$("#group-nav-area li a[data-group-act=gc]").addClass("ui-btn-active");
-                	$("#group-nav-area li a[data-group-act=gl]").removeClass("ui-btn-active");
-                	$("#group-nav-area li a[data-group-act=gj]").removeClass("ui-btn-active");
-                	$("#group-nav-area li a[data-group-act=gi]").removeClass("ui-btn-active");
-                	$(".group-create-area").show();
-                	$(".group-create-area").find("input").val("");
-                	$(".group-create-area").find("textarea").val("");
-                    $(".group-list-area").hide();
+                	$("#group-nav-area li a[data-group-act=gc]").trigger("click");
                 });
                 //小幫手 加入團體
                 $(".hg-join").click(function(){
-                	$("#group-nav-area li a[data-group-act=gj]").addClass("ui-btn-active");
-                    $("#group-nav-area li a[data-group-act=gc]").removeClass("ui-btn-active");
-                    $("#group-nav-area li a[data-group-act=gl]").removeClass("ui-btn-active");
-                    $("#group-nav-area li a[data-group-act=gi]").removeClass("ui-btn-active");
-                    $(".group-create-area").hide();
-                    $(".group-list-area").hide();
+                	$("#group-nav-area li a[data-group-act=gj]").trigger("click");
                 });
                 
                 
@@ -452,7 +462,7 @@
                 }
                 
                 function groupMenuListArea(ui,at){
-                    $(".group-list-area").html("");
+                	$("div[data-group-act=gl]").html("");
                 	var api_name = "me/groups";
                     var headers = {
                         "ui":ui,
@@ -460,28 +470,14 @@
                     };
                     var method = "get";
                     result = ajaxDo(api_name,headers,method);
-                    console.log(result);
                     if(result.responseText){
                     	console.log("test1");
                         $.each($.parseJSON(result.responseText).gl,function(i,val){
-                            $(".group-list-area").append("<div data-gi=\"" + val.gi + "\" class=\"group-list-box\">no pic<div>" + val.gn + "</div></div>");
+                        	$("div[data-group-act=gl]").append("<div data-gi=\"" + val.gi + "\" class=\"group-list-box\">no pic<div>" + val.gn + "</div></div>");
                         });
                     }else{
                     	
                     }
-                }
-                
-                function groupMenuCreateArea(){
-                	/* $(".group-list-area").html(
-                    '<img class="gm-create-head" src="images/head.png"/>' +
-                    '<div class="gm-create-content-area">' +
-                        '團體名稱' +
-                        '<input type="text" id="group-name" placeholder="請輸入您的團體名稱">' +
-                        '團體介紹' +
-                        '<textarea name="textarea-8" id="group-desc"></textarea>' +
-                        '<a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>' +
-                    '</div>'
-                ); */
                 }
 		                
             });
