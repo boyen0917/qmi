@@ -10,12 +10,6 @@
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
     </head>
     <body>
-    
-        <div data-role="page" id="page-test">
-            <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
-                <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true">立即加入團體</a>
-                 </div> 
-        
         <div data-role="page" id="page-group-menu">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
@@ -29,9 +23,10 @@
                     </ul>
                 </div>
             </div>
-            
+            <div class="p" style="border:solid;margin:auto">
+                 adfasodifjaosidg jaosidgjoi
+                 </div>
             <div class="group-nav-chk" data-group-act="gl">
-                團體列表
             </div>
             <div class="group-nav-chk" data-group-act="gc">
                 <img class="gm-create-head" src="images/head.png"/>
@@ -42,64 +37,106 @@
                     <textarea name="textarea-8" id="group-desc"></textarea>
                     <a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>
                 </div>
-                <div data-role="popup" class="popup4" data-transition="pop">
-                   <p>團體名稱必填喔！</p>
-                 </div>
             </div>
             <div class="group-nav-chk" data-group-act="gj">
-            加入團體
+                <input type="text" id="gm-group-num" placeholder="團體編號">
+                <input type="text" id="gm-group-pw" placeholder="團體密碼"/>
+                
+                <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
             </div>
             <div class="group-nav-chk" data-group-act="gi">
             團體邀請
             </div>
             
-        </div>  
+            <div data-role="popup" class="popup-gm" data-transition="pop">
+              <p>
+              <div class="popup-gm-text"></div>
+              <button class="popup-close" data-theme="c">確定</button>
+              </p>
+            </div>
+        </div>
+<!---------------------------------- page-password ------------------------------------>
+        <div data-role="page" id="page-password">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
+                <h3>密碼設定</h3>
+            </div>
+            <div data-role="content">
+                <input type="password" id="pw-setting" maxlength=20 placeholder="請輸入6-20半形英數字" onkeyup="value=value.replace(/[^-_A-Z0-9a-z]/g,'')">
+                <input type="password" id="pw-setting-c" maxlength=20 placeholder="請重複輸入密碼"/>
+                <div data-role="popup" class="popup3" data-transition="pop">
+                  <p><br/>密碼輸入不正確<br/><br/></p>
+                </div>
+                <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
+            </div>
+        </div> 
         
-        <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
+!---------------------------------- page-register-auth ------------------------------------>
+        <div data-role="page" id="page-register-auth">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">back</a>
+                <h3>行動電話號碼認證</h3>
+            </div>
+            <div data-role="content">
+                 <div class="register-desc-area">
+                     我們已經將驗證碼傳送至下列電話號碼，請輸入驗證碼已完成您的手機號碼認證。<br/>
+                     <h1></h1>
+                     <input type="text" id="otp" maxlength=6 placeholder="驗證碼" onkeyup="value=value.replace(/[^-_0-9]/g,'')"/>
+                 </div>
+                 <div data-role="popup" class="popup2" data-transition="pop">
+                   <p></p>
+                 </div>
+                 <div class="resend-otp-close">重送驗證碼</div>
+                 <a href="#" id="resend-otp" data-role="button" data-theme="b" >重送驗證碼</a>
+                 <a href="#page-password" id="register-auth-next" data-role="button" data-theme="b" >下一步</a>
+                 
+                 
+            </div>
+        </div>           
+<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
+
+        
         <script type="text/javascript">
-            $(function(){ 
-            	var result;
-                $("#group-nav-area li a").click(function(){
-                	var act = $(this).data("group-act");
-                    $(".group-nav-chk").each(function(i,val){
-                    	if($(this).data("group-act") == act){
-                    		$(this).show();
-                    	}else{
-                    		$(this).hide();
-                    	}
-                    });
+            $(function(){
+            	$(".p").css("margin-left",($(document).width() - $(".p").width())/2);
+            	
+            	
+            	
+                $(".popup-close").click(function(){
+                    $("div[data-role=popup]").popup("close");
                 });
                 
-				$(".hg-create").click(function(){
-					$(document).ajaxSend(function(r, s) {
-				        $('.ui-loader').show();
-				    });
-					$(document).ajaxStop(function(r, s) {
-                        $('.ui-loader').hide();
+                //創建團體 建立
+                $("#gm-create-submit").click(function(){
+                	$('.popup-gm .popup-gm-text').html('<br/>團體名稱不可空白<br/><br/>');
+                    $('div[data-role=popup]').popup('open');
+                });
+                
+              //團體選單 點選nav
+                $("#group-nav-area li a").click(function(){
+                    var act = $(this).data("group-act");
+                    $(".group-nav-chk").each(function(i,val){
+                        if($(this).data("group-act") == act){
+                            $(this).fadeIn();
+                            //個別的動作
+                            switch (act) {
+                                case "gl": 
+                                    groupMenuListArea(ui,at);
+                                  break;
+                                case "gc": 
+                                    $(".group-create-area").find("input").val("");
+                                    $(".group-create-area").find("textarea").val("");
+                                  break;
+                                case "gj":
+                                  break;
+                                case "gi":
+                                  break;
+                            }
+                        }else{
+                            $(this).hide();
+                        }
                     });
-					result = ajaxDo();
-					console.log(result.responseText);
-					return false;
-					$("#group-nav-area li a[data-group-act=gc]").trigger("click");
-				});
-				$(".hg-join").click(function(){
-					$("#group-nav-area li a[data-group-act=gj]").trigger("click");
-				});
-				
-				function ajaxDo(){
-                    //console.log(api_url);
-                    var api_url = "api.php";
-                    var myRand = Math.floor((Math.random()*1000)+1);
-                    
-                    var result = $.ajax ({
-	                        url: api_url,
-	                        data:{
-	                            para: myRand
-	                        }
-                        });
-                    
-                    return result;
-                }
+                });
                         
             });
         </script>

@@ -15,18 +15,14 @@
 	            <div class="login-area">
 	             <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號">
 	             <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼">
-	             <div data-role="popup" class="popup-login" data-transition="pop">
-                    <p>
-                        <br/>帳號或密碼錯誤<br/><br/>
-                        <button class="popup-close" data-theme="c">確定</button>
-                    </p>
-                 </div>
+	             
 	             <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span>
 	             <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a>
 	             <a class="login-text-l" href="#">忘記密碼?</a>
 	             <a class="login-text-r" href="#page-register">註冊帳號</a>
 	            </div>
 	        </div>
+	        
         </div>
 <!---------------------------------- page-register ------------------------------------>
         <div data-role="page" id="page-register">
@@ -45,10 +41,8 @@
                         <a href="#">隱私政策</a>
                     </span>
                  </div>
-                 <div data-role="popup" class="popup" data-transition="pop">
-		           <p></p>
-		         </div>
-                 <a href="#page-register-auth" id="register-next" data-role="button" data-theme="b" >下一步</a>
+                 
+                 <a href="#" id="register-next" data-role="button" data-theme="b" >下一步</a>
             </div>
         </div>
 <!---------------------------------- page-register-auth ------------------------------------>
@@ -63,9 +57,7 @@
                      <h1></h1>
                      <input type="text" id="otp" maxlength=6 placeholder="驗證碼" onkeyup="value=value.replace(/[^-_0-9]/g,'')"/>
                  </div>
-                 <div data-role="popup" class="popup2" data-transition="pop">
-		           <p></p>
-		         </div>
+                
                  <div class="resend-otp-close">重送驗證碼</div>
                  <a href="#" id="resend-otp" data-role="button" data-theme="b" >重送驗證碼</a>
                  <a href="#page-password" id="register-auth-next" data-role="button" data-theme="b" >下一步</a>
@@ -80,9 +72,7 @@
             <div data-role="content">
                 <input type="password" id="pw-setting" maxlength=20 placeholder="請輸入6-20半形英數字" onkeyup="value=value.replace(/[^-_A-Z0-9a-z]/g,'')">
                 <input type="password" id="pw-setting-c" maxlength=20 placeholder="請重複輸入密碼"/>
-                <div data-role="popup" class="popup3" data-transition="pop">
-                  <p><br/>密碼輸入不正確<br/><br/></p>
-                </div>
+                
                 <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
             </div>
         </div>
@@ -131,12 +121,13 @@
                     <textarea name="textarea-8" id="group-desc"></textarea>
                     <a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>
                 </div>
-                <div data-role="popup" class="popup4" data-transition="pop">
-                   <p>團體名稱必填喔！</p>
-                 </div>
             </div>
             <div class="group-nav-chk" data-group-act="gj">
-            加入團體
+	            <div class="gm-join-area">
+	                <input type="text" id="gm-group-num" placeholder="團體編號">
+	                <input type="text" id="gm-group-pw" placeholder="團體密碼"/>
+	                <a href="#" id="gm-join-submit" data-role="button" data-theme="b" >確認</a>
+	            </div>
             </div>
             <div class="group-nav-chk" data-group-act="gi">
             團體邀請
@@ -153,7 +144,14 @@
             </div>
         </div>   
         
-            
+<div class="popup">
+  <div class="popup-frame">
+  <div class="popup-text"></div>
+  <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
+  </div>
+  <div class="popup-screen"></div>
+</div>
+
 <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
 
         
@@ -161,9 +159,11 @@
             $(function(){
             	//api 網址
                 var base_url = "https://apserver.mitake.com.tw/apiv1/";
-                var device_token;
+            	//ajax用
+                var myRand = Math.floor((Math.random()*1000)+1);
+                
                 //全域
-                var ui,at,gi,gn,gd,ga,gm;
+                var ui,at,gi,gn,gd,ga,gm,device_token;
                 //計算螢幕長寬以維持比例
             	var proportion = 1.7;
             	$(".main").css("width",$(window).width());
@@ -173,9 +173,23 @@
                 	$(".main").css("height",$(window).width()*proportion);
                 });
                 
-                $(".popup-close").click(function(){
-                	$("div[data-role=popup]").popup("close");
+                //計算彈出對話框置中
+                $(document).on("click",function(){
+                	if($(".popup").is(":visible")){
+                		$(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
+                	}
                 });
+                
+                $(".popup-screen").click(function(){
+                    $(".popup").hide();
+                    $(".popup-screen").hide();
+                });
+                
+                $(".popup-close").click(function(){
+                	$(".popup-screen").trigger("click");
+                	$(".popup-close").trigger("pageChange");
+                });
+                
                 
                 $(document).ajaxSend(function(r, s) {
                 	$('.ui-loader').css("display","block");
@@ -183,9 +197,9 @@
                 });
                 $(document).ajaxComplete(function(r, s) {
                 	$('.ui-loader').hide();
-                	//setTimeout(function(){$('.ui-loader').hide();},500);
-                    
                 });
+                
+                
                 
 //----------------------------------- 登入 ---------------------------------------------
                 //login打勾
@@ -205,7 +219,8 @@
                     var method = "post";
                     var result = ajaxDo(api_name,headers,method);
                     if(result.status != 200){
-                        $('.popup-login').popup('open');
+                    	$(".popup-text").html("帳號或密碼不對");
+                    	$(".popup").show();
                     }else{
                     	ui = $.parseJSON(result.responseText).ui;
                         at = $.parseJSON(result.responseText).at;
@@ -220,12 +235,8 @@
                         result = ajaxDo(api_name,headers,method);
                         console.log(result);
                         if(result.responseText){
-                        	$(".group-list-area").html("");
-		                    $.each($.parseJSON(result.responseText).gl,function(i,val){
-		                        $("div[data-group-act=gl]").append("<div data-gi=\"" + val.gi + "\" class=\"group-list-box\">no pic<div>" + val.gn + "</div></div>");
-		                    });
 		                    $("#group-nav-area li a[data-group-act=gl]").trigger("click");
-                        	$.mobile.changePage("#page-group-menu");
+                        	$.mobile.changePage("#page-group-menu", {transition: "pop"});
                         }else{
                         	$.mobile.changePage("#page-helper");
                         }
@@ -240,12 +251,12 @@
                 //註冊頁面點選下一步 送出驗證碼
                 $("#register-next").click(function(){
                 	if(!$("#r-phone").val()){
-                		$('.popup p').html("<br/>請輸入電話號碼<br/><br/>");
-                		$('.popup').popup('open');
+                		$('.popup-text').html("請輸入電話號碼");
+                		$('.popup').show();  
                 		return false;
                     }else if($(".register-radio img").css("display") == "none"){
-                        $('.popup p').html("<br/>請勾選\"看過並同意使用條款及隱私政策\"<br/><br/>");
-                        $('.popup').popup('open');
+                        $('.popup-text').html("請勾選\"看過並同意使用條款及隱私政策\"");
+                        $('.popup').show();      
                         return false;
                     }else{
                     	
@@ -269,7 +280,15 @@
 							"ug":"1"
                     	};
                     	var method = "get";
-                    	ajaxDo(api_name,headers,method,true);
+                    	var result = ajaxDo(api_name,headers,method,true);
+                    	result.complete(function(data){
+                    		if(data.status != 200){
+                    			$('.popup-text').html("電話號碼錯誤");
+                                $('.popup').show(); 
+                    		}else{
+                    			$.mobile.changePage("#page-register-auth");
+                    		}
+                    	});
                     	
                     }
                 });
@@ -277,8 +296,8 @@
                 //認證頁面點選下一步
                 $("#register-auth-next").click(function(){
                     if(!$("#otp").val()){
-                        $('.popup2 p').html("<br/>驗證碼輸入錯誤，請輸入正確的驗證碼。<br/><br/>");
-                        $('.popup2').popup('open');
+                        $('.popup-text').html("驗證碼輸入錯誤，請輸入正確的驗證碼。");
+                        $('.popup').show();                        
                         $(".resend-otp-close").hide();
                         $("#resend-otp").css("display","block");
                         return false;
@@ -296,8 +315,8 @@
                         var result = ajaxDo(api_name,headers,method);
 
                         if(!result.responseText){
-                        	$('.popup2 p').html("<br/>驗證碼輸入錯誤，請輸入正確的驗證碼。<br/><br/>");
-                            $('.popup2').popup('open');
+                            $('.popup-text').html("驗證碼輸入錯誤，請輸入正確的驗證碼。");
+                            $('.popup').show();
                             $(".resend-otp-close").hide();
                             $("#resend-otp").css("display","block");
                             return false;
@@ -329,7 +348,7 @@
                 //密碼設定
                 $("#pw-send").click(function(){
                     if(($("#pw-setting").val() != $("#pw-setting-c").val()) || $("#pw-setting").val().length < 6){
-                    	$('.popup3').popup('open');
+                        $('.popup').show();
                         return false;
                     }else{
                     	var api_name = "me/password";
@@ -345,15 +364,12 @@
                         //非同步 才能取值
                         var result = ajaxDo(api_name,headers,method);
                         if(!result.responseText){
-                        	$('.popup3').popup('open');
+                        	$('.popup-text').html("<br/>密碼輸入錯誤。<br/><br/>");
+                            $('.popup').show();
                         }else{
-                        	$('.popup3 p').html("<br/>密碼變更完成。<br/><br/>");
-                            $('.popup3').popup('open');
-                            $( ".popup3" ).bind({
-                                popupafterclose: function(event, ui) {
-                                    $.mobile.changePage("#page-helper");
-                                }
-                            });
+                        	$('.popup-text').html("<br/>密碼變更完成。<br/><br/>");
+                        	$('.popup').show();
+                        	popupAfterChangePage("#page-helper");
                         }
                     }
                 });
@@ -369,7 +385,7 @@
                     var act = $(this).data("group-act");
                     $(".group-nav-chk").each(function(i,val){
                         if($(this).data("group-act") == act){
-                            $(this).show();
+                            $(this).fadeIn();
                             //個別的動作
                             switch (act) {
 	                            case "gl": 
@@ -393,15 +409,17 @@
                 //創建團體 建立
                 $("#gm-create-submit").click(function(){
                 	if(!$("#group-name").val()){
-                		$('.popup3').popup('open');
+                		console.log("ddd");
+                		$('.popup-text').html('<br/>團體名稱不可空白<br/><br/>');
+                		$('.popup').show();
                 		return false;
                 	}else{
                 		var api_name = "groups/new";
                         var headers = {
                             "ui":ui,
                             "at":at,
-                            "gn":$("#group-name").val(),
-                            "gd":$("#group-desc").val()
+                            "gn":encodeURI($("#group-name").val()),
+                            "gd":encodeURI($("#group-desc").val())
                         };
                         var method = "post";
                         console.log(ui);
@@ -411,16 +429,12 @@
                         console.log(headers);
                         console.log(method);
                         if(result.status == 200){
-                        	$('.popup4 p').html("<br/>創建成功。<br/><br/>");
-                            $('.popup4').popup('open');
-                            $( ".popup4" ).bind({
-                                popupafterclose: function(event, ui) {
-                                	$("#group-nav-area li a[data-group-act=gl]").trigger("click");
-                                }
-                            });
+                        	
+                        	$('.popup-text').html("<br/>創建成功。<br/><br/>");
+                            $('.popup').show();
                         }else{
-                        	$('.popup4').html("<br/>未知錯誤<br/><br/>");
-                        	$('.popup4').popup('open');
+                        	$('.popup-text').html('<br/>未知錯誤<br/><br/>');
+                        	$('.popup').show();
                             return false;
                         }
                 	}
@@ -429,10 +443,12 @@
                 //小幫手 創建團體
                 $(".hg-create").click(function(){
                 	$("#group-nav-area li a[data-group-act=gc]").trigger("click");
+                	$("#group-nav-area li a[data-group-act=gc]").addClass("ui-btn-active");
                 });
                 //小幫手 加入團體
                 $(".hg-join").click(function(){
                 	$("#group-nav-area li a[data-group-act=gj]").trigger("click");
+                	$("#group-nav-area li a[data-group-act=gj]").addClass("ui-btn-active");
                 });
                 
                 
@@ -473,13 +489,19 @@
                     if(result.responseText){
                     	console.log("test1");
                         $.each($.parseJSON(result.responseText).gl,function(i,val){
-                        	$("div[data-group-act=gl]").append("<div data-gi=\"" + val.gi + "\" class=\"group-list-box\">no pic<div>" + val.gn + "</div></div>");
+                        	$("div[data-group-act=gl]").append("<div data-gi=\"" + decodeURI(val.gi) + "\" class=\"group-list-box\">no pic<div>" + decodeURI(val.gn) + "</div></div>");
                         });
                     }else{
                     	
                     }
                 }
-		                
+		        
+                function popupAfterChangePage(dest){
+                	$(".popup-close").bind("pageChange",function(){
+                		$.mobile.changePage(dest);
+                		$(".popup-close").unbind("pageChange");
+                	});
+                }
             });
         </script>
     </body>
