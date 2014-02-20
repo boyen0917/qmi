@@ -163,6 +163,14 @@
                 <div class="sm-group-list-area">
                     
                 </div>
+                <div class="sm-group-list-area-add">
+                    
+                </div>
+                <div class="sm-group-switch"><img src="images/side_menu/sidemenu_slidedown_icon_none.png"/></div>
+                <div class="sm-group-cj">
+	                <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">新增團體</a>
+	                <a href="#page-group-menu" class="hg-invited" data-role="button" data-inline="true">團體邀請</a>
+	            </div>
                 <div class="sm-hr">系統</div>
             </div>
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -460,19 +468,19 @@
                         var method = "post";
                         console.log(ui);
                         
-                        var result = ajaxDo(api_name,headers,method);
-                        console.log(api_name);
-                        console.log(headers);
-                        console.log(method);
-                        if(result.status == 200){
-                        	
-                        	$('.popup-text').html("<br/>創建成功。<br/><br/>");
-                            $('.popup').show();
-                        }else{
-                        	$('.popup-text').html('<br/>未知錯誤<br/><br/>');
-                        	$('.popup').show();
-                            return false;
-                        }
+                        var result = ajaxDo(api_name,headers,method,true);
+                        result.complete(function(data){
+                            if(data.status = 200){
+                            	$('.popup-text').html("<br/>創建成功。<br/><br/>");
+                            	$(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-56);
+                                $('.popup').show();
+                                popupAfterChangePage("#page-group-main");
+                            }else{
+                            	$('.popup-text').html('<br/>未知錯誤<br/><br/>');
+                                $('.popup').show();
+                                return false;;
+                            }
+                        });
                 	}
                 });
 //----------------------------------- 小幫手 ---------------------------------------------
@@ -486,12 +494,17 @@
                 	$("#group-nav-area li a[data-group-act=gj]").trigger("click");
                 	$("#group-nav-area li a[data-group-act=gj]").addClass("ui-btn-active");
                 });
+              //小幫手 邀請團體  側邊選單
+                $(".hg-invited").click(function(){
+                    $("#group-nav-area li a[data-group-act=gi]").trigger("click");
+                    $("#group-nav-area li a[data-group-act=gi]").addClass("ui-btn-active");
+                });
 
 //----------------------------------- 左側選單 ---------------------------------------------
+				
                 //用戶區
                 //detect page changing
-		        $(document).bind( "pagechange", function( e, data ) {
-		            if($.mobile.activePage.attr('id') == 'page-group-main'){
+		        $("#side-menu").on("panelbeforeopen",function(){
 		                //取得個人圖像
 		                $(".sm-user-area-l").html("<img class=\"sm-user-pic\" src=\"images/user_pic.png\"/>");
 		                //計數
@@ -514,10 +527,11 @@
                         
                         //團體列表
                         groupMenuListArea(ui,at);
-		            }
 		        });
 
-                
+                $(".sm-group-switch").click(function(){
+                	$(".sm-group-list-area-add").slideToggle();
+                })
 //----------------------------------- function ---------------------------------------------                
                 //ajax
                 function ajaxDo(api_name,headers,method,async){
@@ -553,9 +567,19 @@
                     var method = "get";
                     result = ajaxDo(api_name,headers,method);
                     if(result.responseText){
+                    	console.log(result.responseText);
                     	$(".sm-group-list-area").html("");
-                        $.each($.parseJSON(result.responseText).gl,function(i,val){
-                            $(".sm-group-list-area").prepend(
+                    	$(".sm-group-list-area-add").html("");
+                    	var tmp_selector,count;
+                    	var group_list = $.parseJSON(result.responseText).gl;
+                    	
+                        $.each(group_list,function(i,val){
+                        	if(i < 2){
+                        		tmp_selector = ".sm-group-list-area";
+                        	}else{
+                        		tmp_selector = ".sm-group-list-area-add";
+                        	}
+                            $(tmp_selector).append(
                            		'<div class="sm-group-area">' +
                            	        '<div data-gi="' + decodeURI(val.gi) + '" class="sm-group-area-l">' +
                            	            '<img src="images/no_pic_g.png">' +
@@ -565,6 +589,9 @@
                            	    '</div>'
                      	    );
                         });
+                        if(group_list.length > 2){
+                        	$(".sm-group-switch").show();
+                        }
                     }
                 }
                 

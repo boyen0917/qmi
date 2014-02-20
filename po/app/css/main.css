@@ -408,3 +408,28 @@
 .sm-group-area .sm-count {
     margin: 19px 13px 0px 0px;
 }
+
+.sm-group-list-area-add {
+    display:none;
+}
+.sm-group-switch{
+	display:none;
+    height:30px;
+    line-height:30px;	
+    cursor:pointer;
+}
+
+.sm-group-switch img {
+	margin: auto;
+	display: block;
+	height: 25px;
+}
+
+.sm-group-cj .ui-btn-inner {
+    text-overflow: initial;
+}
+.sm-group-cj {
+	display: flex;
+	letter-spacing: 0px;
+	padding: 0px;
+}
