@@ -239,7 +239,6 @@
                 
                 $(document).ajaxSend(function(r, s) {
                 	$('.ui-loader').css("display","block");
-                	console.log($('.ui-loader').css("display"));
                 });
                 $(document).ajaxComplete(function(r, s) {
                 	$('.ui-loader').hide();
@@ -420,7 +419,6 @@
 //----------------------------------- 團體選單 ---------------------------------------------                
                 //團體選單 點選團體
                 $(document).on('click','.group-list-box',function(e){
-		            console.log($(this).data("gi"));
 		            $.mobile.changePage("#page-group-main");
 		        });
                 
@@ -453,7 +451,6 @@
                 //創建團體 建立
                 $("#gm-create-submit").click(function(){
                 	if(!$("#group-name").val()){
-                		console.log("ddd");
                 		$('.popup-text').html('<br/>團體名稱不可空白<br/><br/>');
                 		$('.popup').show();
                 		return false;
@@ -466,7 +463,6 @@
                             "gd":encodeURI($("#group-desc").val())
                         };
                         var method = "post";
-                        console.log(ui);
                         
                         var result = ajaxDo(api_name,headers,method,true);
                         result.complete(function(data){
@@ -567,7 +563,6 @@
                     var method = "get";
                     result = ajaxDo(api_name,headers,method);
                     if(result.responseText){
-                    	console.log(result.responseText);
                     	$(".sm-group-list-area").html("");
                     	$(".sm-group-list-area-add").html("");
                     	var tmp_selector,count;

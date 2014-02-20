@@ -100,7 +100,7 @@
 }
 
 .register-desc-area{
-    padding-left:5%
+    padding-left:5%;
 }
 .register-radio{
 	float:left;
@@ -134,6 +134,7 @@
     position: relative;
     top: 2px;
     left: 10px;
+    letter-spacing:0px;
 }
 
 #register-next,#pw-send {
