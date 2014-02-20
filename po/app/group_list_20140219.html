@@ -11,18 +11,18 @@
     </head>
     <body>
         <div data-role="page" id="page-login">
-	        <div class="main launch_kv">
-	            <div class="login-area">
-	             <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號" value="0980922917">
-	             <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼" value="123456">
-	             
-	             <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span>
-	             <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a>
-	             <a class="login-text-l" href="#">忘記密碼?</a>
-	             <a class="login-text-r" href="#page-register">註冊帳號</a>
-	            </div>
-	        </div>
-	        
+            <div class="main launch_kv">
+                <div class="login-area">
+                 <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號">
+                 <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼">
+                 
+                 <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span>
+                 <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a>
+                 <a class="login-text-l" href="#">忘記密碼?</a>
+                 <a class="login-text-r" href="#page-register">註冊帳號</a>
+                </div>
+            </div>
+            
         </div>
 <!---------------------------------- page-register ------------------------------------>
         <div data-role="page" id="page-register">
@@ -83,11 +83,11 @@
                 <h3>團體建立/加入</h3>
             </div>
             <div class="helper-top-area">
-			    <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
-			    <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true">立即加入團體</a>
-			</div>
-			<div class="helper-title">小幫手</div>
-			<div data-role="collapsible-set" class="helper-collapsible-area ui-icon-alt" data-inset="false" data-iconpos="right" data-collapsed-icon="arrow-d">
+                <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
+                <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true">立即加入團體</a>
+            </div>
+            <div class="helper-title">小幫手</div>
+            <div data-role="collapsible-set" class="helper-collapsible-area ui-icon-alt" data-inset="false" data-iconpos="right" data-collapsed-icon="arrow-d">
                 <div data-role="collapsible"><h3>如何創建團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"創建團體"後,設定您的團體照片,輸入團體名稱,團體介紹,並選取""預定使用人數".</li><li>完成輸入後,點擊"建立",即完成團體之建立.</li></ol></p><a class="hg-create inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即創建團體</a><br/></div> 
                 <div data-role="collapsible"><h3>如何加入團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"加入團體"後,輸入您來自"簡訊"或"邀請訊息"內的組織代碼及OTP</li><li>完成輸入後,點擊"加入",即加入該團體.</li></ol></p><a class="hg-join inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即加入團體</a><br/></div> 
                 <div data-role="collapsible"><h3>建立事件提醒重要事項</h3><p>建立事件提醒重要事項</p></div> 
@@ -101,12 +101,13 @@
                 <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
                 <h3>團體列表</h3>
                 <div id="group-nav-area" data-role="navbar">
-			        <ul>        
+                    <ul>        
+                        <li><a href="#" data-group-act="gl">團體列表</a></li>
                         <li><a href="#" data-group-act="gc">創建團體</a></li>
                         <li><a href="#" data-group-act="gj">加入團體</a></li>
                         <li><a href="#" data-group-act="gi">團體邀請</a></li>
                     </ul>
-			    </div>
+                </div>
             </div>
             
             <div class="group-nav-chk" data-group-act="gl">
@@ -122,11 +123,11 @@
                 </div>
             </div>
             <div class="group-nav-chk" data-group-act="gj">
-	            <div class="gm-join-area">
-	                <input type="text" id="gm-group-num" placeholder="團體編號">
-	                <input type="text" id="gm-group-pw" placeholder="團體密碼"/>
-	                <a href="#" id="gm-join-submit" data-role="button" data-theme="b" >確認</a>
-	            </div>
+                <div class="gm-join-area">
+                    <input type="text" id="gm-group-num" placeholder="團體編號">
+                    <input type="text" id="gm-group-pw" placeholder="團體密碼"/>
+                    <a href="#" id="gm-join-submit" data-role="button" data-theme="b" >確認</a>
+                </div>
             </div>
             <div class="group-nav-chk" data-group-act="gi">
             團體邀請
@@ -134,46 +135,12 @@
         </div>
 <!---------------------------------- page-group-main ------------------------------------>
         <div data-role="page" id="page-group-main">
-            <div data-role="panel" id="side-menu" data-display="push">
-	            <div class="sm-user-area">
-	               <div class="sm-user-area-l"></div>
-                   <div class="sm-user-area-r"></div>
-	            </div>
-	            <div data-sm-act="feed" class="sm-small-area">
-                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_feed.png"/></div>
-                   <div class="sm-small-area-r">動態消息</div>
-                   <div class="sm-count">315</div>
-                </div>
-	            <div class="sm-small-area">
-                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_contact.png"/></div>
-                   <div class="sm-small-area-r">聯絡人</div>
-                   <div class="sm-count"></div>
-                </div>
-                <div class="sm-small-area">
-                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_chat.png"/></div>
-                   <div class="sm-small-area-r">聊天</div>
-                   <div class="sm-count"></div>
-                </div>
-                <div class="sm-small-area">
-                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_calendar.png"/></div>
-                   <div class="sm-small-area-r">行事曆</div>
-                   <div class="sm-count"></div>
-                </div>
-                <div class="sm-hr">團體</div>
-                <div class="sm-group-list-area">
-                    
-                </div>
-                <div class="sm-hr">系統</div>
-            </div>
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-                <img class="side-menu-btn" src="images/side_menu_btn.png"/>
+            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
                 <h3>成員</h3>
             </div>
-            <div data-role="content">
-	            <div class="group-list-main-area">
-	                <img style="width:100%;height:80%;margin-top: -75px;" src="images/test.png"/>
-	            </div>
-	            <div class="side-menu-btn"></div>
+            <div class="group-list-main-area">
+                <img width="100%" height="100%" src="images/test.png"/>
             </div>
         </div>   
         
@@ -190,32 +157,27 @@
         
         <script type="text/javascript">
             $(function(){
-            	
-            	$(".side-menu-btn").click(function(){
-            		$( "#side-menu" ).panel( "open");
-            	});
-            	
-            	//api 網址
+                //api 網址
                 var base_url = "https://apserver.mitake.com.tw/apiv1/";
-            	//ajax用
+                //ajax用
                 var myRand = Math.floor((Math.random()*1000)+1);
                 
                 //全域
                 var ui,at,gi,gn,gd,ga,gm,device_token;
                 //計算螢幕長寬以維持比例
-            	var proportion = 1.7;
-            	$(".main").css("width",$(window).width());
-            	$(".main").css("height",$(window).width()*proportion);
+                var proportion = 1.7;
+                $(".main").css("width",$(window).width());
+                $(".main").css("height",$(window).width()*proportion);
                 $(window).resize(function(){ 
-                	$(".main").css("width",$(window).width());
-                	$(".main").css("height",$(window).width()*proportion);
+                    $(".main").css("width",$(window).width());
+                    $(".main").css("height",$(window).width()*proportion);
                 });
                 
                 //計算彈出對話框置中
                 $(document).on("click",function(){
-                	if($(".popup").is(":visible")){
-                		$(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
-                	}
+                    if($(".popup").is(":visible")){
+                        $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
+                    }
                 });
                 
                 $(".popup-screen").click(function(){
@@ -224,17 +186,17 @@
                 });
                 
                 $(".popup-close").click(function(){
-                	$(".popup-screen").trigger("click");
-                	$(".popup-close").trigger("pageChange");
+                    $(".popup-screen").trigger("click");
+                    $(".popup-close").trigger("pageChange");
                 });
                 
                 
                 $(document).ajaxSend(function(r, s) {
-                	$('.ui-loader').css("display","block");
-                	console.log($('.ui-loader').css("display"));
+                    $('.ui-loader').css("display","block");
+                    console.log($('.ui-loader').css("display"));
                 });
                 $(document).ajaxComplete(function(r, s) {
-                	$('.ui-loader').hide();
+                    $('.ui-loader').hide();
                 });
                 
                 
@@ -257,11 +219,12 @@
                     var method = "post";
                     var result = ajaxDo(api_name,headers,method);
                     if(result.status != 200){
-                    	$(".popup-text").html("帳號或密碼不對");
-                    	$(".popup").show();
+                        $(".popup-text").html("帳號或密碼不對");
+                        $(".popup").show();
                     }else{
-                    	ui = $.parseJSON(result.responseText).ui;
+                        ui = $.parseJSON(result.responseText).ui;
                         at = $.parseJSON(result.responseText).at;
+                        console.log(ui + " && " + at);
                         //取得團體列表
                         var api_name = "me/groups";
                         var headers = {
@@ -270,11 +233,12 @@
                         };
                         var method = "get";
                         result = ajaxDo(api_name,headers,method);
+                        console.log(result);
                         if(result.responseText){
-		                    $("#group-nav-area li a[data-group-act=gl]").trigger("click");
-                        	$.mobile.changePage("#page-group-main", {transition: "pop"});
+                            $("#group-nav-area li a[data-group-act=gl]").trigger("click");
+                            $.mobile.changePage("#page-group-menu", {transition: "pop"});
                         }else{
-                        	$.mobile.changePage("#page-helper");
+                            $.mobile.changePage("#page-helper");
                         }
                     }
                 });
@@ -286,46 +250,46 @@
 
                 //註冊頁面點選下一步 送出驗證碼
                 $("#register-next").click(function(){
-                	if(!$("#r-phone").val()){
-                		$('.popup-text').html("請輸入電話號碼");
-                		$('.popup').show();  
-                		return false;
+                    if(!$("#r-phone").val()){
+                        $('.popup-text').html("請輸入電話號碼");
+                        $('.popup').show();  
+                        return false;
                     }else if($(".register-radio img").css("display") == "none"){
                         $('.popup-text').html("請勾選\"看過並同意使用條款及隱私政策\"");
                         $('.popup').show();      
                         return false;
                     }else{
-                    	
-                    	$(".register-desc-area h1").html($("#r-phone").val());
-                    	
-                    	//亂數device token
-                    	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-					    var string_length = 8;
-					    var randomstring = '';
-					    for (var i=0; i<string_length; i++) {
-					        var rnum = Math.floor(Math.random() * chars.length);
-					        randomstring += chars.substring(rnum,rnum+1);
-					    }
-					    device_token = "web-" + randomstring;
-					  //取得otp驗證碼
-                    	var api_name = "register/otp";
-                    	var headers = {
-                    		"cc":"886",
-							"pn":$("#r-phone").val(), 
-							"di":device_token,
-							"ug":"1"
-                    	};
-                    	var method = "get";
-                    	var result = ajaxDo(api_name,headers,method,true);
-                    	result.complete(function(data){
-                    		if(data.status != 200){
-                    			$('.popup-text').html("電話號碼錯誤");
+                        
+                        $(".register-desc-area h1").html($("#r-phone").val());
+                        
+                        //亂數device token
+                        var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+                        var string_length = 8;
+                        var randomstring = '';
+                        for (var i=0; i<string_length; i++) {
+                            var rnum = Math.floor(Math.random() * chars.length);
+                            randomstring += chars.substring(rnum,rnum+1);
+                        }
+                        device_token = "web-" + randomstring;
+                      //取得otp驗證碼
+                        var api_name = "register/otp";
+                        var headers = {
+                            "cc":"886",
+                            "pn":$("#r-phone").val(), 
+                            "di":device_token,
+                            "ug":"1"
+                        };
+                        var method = "get";
+                        var result = ajaxDo(api_name,headers,method,true);
+                        result.complete(function(data){
+                            if(data.status != 200){
+                                $('.popup-text').html("電話號碼錯誤");
                                 $('.popup').show(); 
-                    		}else{
-                    			$.mobile.changePage("#page-register-auth");
-                    		}
-                    	});
-                    	
+                            }else{
+                                $.mobile.changePage("#page-register-auth");
+                            }
+                        });
+                        
                     }
                 });
                 
@@ -357,15 +321,15 @@
                             $("#resend-otp").css("display","block");
                             return false;
                         }else{
-                        	ui = $.parseJSON(result.responseText).ui;
-                        	at = $.parseJSON(result.responseText).at;
+                            ui = $.parseJSON(result.responseText).ui;
+                            at = $.parseJSON(result.responseText).at;
                         }
                     }
                 });
                 
               //重送驗證碼
                 $("#resend-otp").click(function(){
-                	//取得otp驗證碼
+                    //取得otp驗證碼
                     var api_name = "register/otp";
                     var headers = {
                         "cc":"886",
@@ -377,7 +341,7 @@
                     ajaxDo(api_name,headers,method,true);
                     $('.popup2 p').html("<br/>驗證碼已送出。<br/><br/>");
                     $('.popup2').popup('open');
-                	$(".resend-otp-close").show();
+                    $(".resend-otp-close").show();
                     $("#resend-otp").css("display","none");
                 });
 
@@ -387,34 +351,34 @@
                         $('.popup').show();
                         return false;
                     }else{
-                    	var api_name = "me/password";
+                        var api_name = "me/password";
                         var headers = {
                             "ui":ui, 
-							"at":at, 
-							"up":$("#pw-setting").val(),
-							"pn":$("#r-phone").val(), 
-							"gm":"", 
-							"op":$("#otp").val()
+                            "at":at, 
+                            "up":$("#pw-setting").val(),
+                            "pn":$("#r-phone").val(), 
+                            "gm":"", 
+                            "op":$("#otp").val()
                         };
                         var method = "put";
                         //非同步 才能取值
                         var result = ajaxDo(api_name,headers,method);
                         if(!result.responseText){
-                        	$('.popup-text').html("<br/>密碼輸入錯誤。<br/><br/>");
+                            $('.popup-text').html("<br/>密碼輸入錯誤。<br/><br/>");
                             $('.popup').show();
                         }else{
-                        	$('.popup-text').html("<br/>密碼變更完成。<br/><br/>");
-                        	$('.popup').show();
-                        	popupAfterChangePage("#page-helper");
+                            $('.popup-text').html("<br/>密碼變更完成。<br/><br/>");
+                            $('.popup').show();
+                            popupAfterChangePage("#page-helper");
                         }
                     }
                 });
 //----------------------------------- 團體選單 ---------------------------------------------                
                 //團體選單 點選團體
                 $(document).on('click','.group-list-box',function(e){
-		            console.log($(this).data("gi"));
-		            $.mobile.changePage("#page-group-main");
-		        });
+                    console.log($(this).data("gi"));
+                    $.mobile.changePage("#page-group-main");
+                });
                 
                 //團體選單 點選nav
                 $("#group-nav-area li a").click(function(){
@@ -424,18 +388,18 @@
                             $(this).fadeIn();
                             //個別的動作
                             switch (act) {
-	                            case "gl": 
-	                                groupMenuListArea(ui,at);
-	                              break;
-	                            case "gc": 
-	                                $(".group-create-area").find("input").val("");
-	                                $(".group-create-area").find("textarea").val("");
-	                              break;
-	                            case "gj":
-	                              break;
-	                            case "gi":
-	                              break;
-	                        }
+                                case "gl": 
+                                    groupMenuListArea(ui,at);
+                                  break;
+                                case "gc": 
+                                    $(".group-create-area").find("input").val("");
+                                    $(".group-create-area").find("textarea").val("");
+                                  break;
+                                case "gj":
+                                  break;
+                                case "gi":
+                                  break;
+                            }
                         }else{
                             $(this).hide();
                         }
@@ -444,13 +408,13 @@
                 
                 //創建團體 建立
                 $("#gm-create-submit").click(function(){
-                	if(!$("#group-name").val()){
-                		console.log("ddd");
-                		$('.popup-text').html('<br/>團體名稱不可空白<br/><br/>');
-                		$('.popup').show();
-                		return false;
-                	}else{
-                		var api_name = "groups/new";
+                    if(!$("#group-name").val()){
+                        console.log("ddd");
+                        $('.popup-text').html('<br/>團體名稱不可空白<br/><br/>');
+                        $('.popup').show();
+                        return false;
+                    }else{
+                        var api_name = "groups/new";
                         var headers = {
                             "ui":ui,
                             "at":at,
@@ -465,58 +429,28 @@
                         console.log(headers);
                         console.log(method);
                         if(result.status == 200){
-                        	
-                        	$('.popup-text').html("<br/>創建成功。<br/><br/>");
+                            
+                            $('.popup-text').html("<br/>創建成功。<br/><br/>");
                             $('.popup').show();
                         }else{
-                        	$('.popup-text').html('<br/>未知錯誤<br/><br/>');
-                        	$('.popup').show();
+                            $('.popup-text').html('<br/>未知錯誤<br/><br/>');
+                            $('.popup').show();
                             return false;
                         }
-                	}
+                    }
                 });
 //----------------------------------- 小幫手 ---------------------------------------------
                 //小幫手 創建團體
                 $(".hg-create").click(function(){
-                	$("#group-nav-area li a[data-group-act=gc]").trigger("click");
-                	$("#group-nav-area li a[data-group-act=gc]").addClass("ui-btn-active");
+                    $("#group-nav-area li a[data-group-act=gc]").trigger("click");
+                    $("#group-nav-area li a[data-group-act=gc]").addClass("ui-btn-active");
                 });
                 //小幫手 加入團體
                 $(".hg-join").click(function(){
-                	$("#group-nav-area li a[data-group-act=gj]").trigger("click");
-                	$("#group-nav-area li a[data-group-act=gj]").addClass("ui-btn-active");
+                    $("#group-nav-area li a[data-group-act=gj]").trigger("click");
+                    $("#group-nav-area li a[data-group-act=gj]").addClass("ui-btn-active");
                 });
-
-//----------------------------------- 左側選單 ---------------------------------------------
-                //用戶區
-                //detect page changing
-		        $(document).bind( "pagechange", function( e, data ) {
-		            if($.mobile.activePage.attr('id') == 'page-group-main'){
-		                //取得個人圖像
-		                $(".sm-user-area-l").html("<img class=\"sm-user-pic\" src=\"images/user_pic.png\"/>");
-		                //計數
-		                $("div[data-sm-act=feed] .sm-count").show();
-		                
-		                //取得個人資料
-		            	var api_name = "auth";
-                        var headers = {
-                            "ui":ui,
-                            "at":at
-                        };
-                        var method = "put";
-                        ajaxDo(api_name,headers,method,true).complete(function(data){
-                        	var nk = $.parseJSON(data.responseText).nk;
-                            var sl = $.parseJSON(data.responseText).sl;
-                            
-                            $(".sm-user-area-r").html(nk + "<br/>" + sl);
-                            $(".sm-group-area .sm-count").show();
-                        });
-                        
-                        //團體列表
-                        groupMenuListArea(ui,at);
-		            }
-		        });
-
+                
                 
 //----------------------------------- function ---------------------------------------------                
                 //ajax
@@ -526,13 +460,13 @@
                     var myRand = Math.floor((Math.random()*1000)+1);
                     
                     if(async){
-                    	var result = $.ajax ({
+                        var result = $.ajax ({
                             url: api_url,
                             type: method,
                             headers:headers,
                         });/* ajax結束 */
                     }else{
-                    	var result = $.ajax ({
+                        var result = $.ajax ({
                             url: api_url,
                             type: method,
                             headers:headers,
@@ -544,31 +478,6 @@
                 }
                 
                 function groupMenuListArea(ui,at){
-                    
-                    var api_name = "me/groups";
-                    var headers = {
-                        "ui":ui,
-                        "at":at
-                    };
-                    var method = "get";
-                    result = ajaxDo(api_name,headers,method);
-                    if(result.responseText){
-                    	$(".sm-group-list-area").html("");
-                        $.each($.parseJSON(result.responseText).gl,function(i,val){
-                            $(".sm-group-list-area").prepend(
-                           		'<div class="sm-group-area">' +
-                           	        '<div data-gi="' + decodeURI(val.gi) + '" class="sm-group-area-l">' +
-                           	            '<img src="images/no_pic_g.png">' +
-                           	        '</div>' +
-                           	        '<div class="sm-group-area-r">' + decodeURI(val.gn) + '</div>' +
-                           	        '<div class="sm-count">20</div>' +
-                           	    '</div>'
-                     	    );
-                        });
-                    }
-                }
-                
-                /* function groupMenuListArea(ui,at){
                     $("div[data-group-act=gl]").html("");
                     var api_name = "me/groups";
                     var headers = {
@@ -585,13 +494,13 @@
                     }else{
                         
                     }
-                } */
-		        
+                }
+                
                 function popupAfterChangePage(dest){
-                	$(".popup-close").bind("pageChange",function(){
-                		$.mobile.changePage(dest);
-                		$(".popup-close").unbind("pageChange");
-                	});
+                    $(".popup-close").bind("pageChange",function(){
+                        $.mobile.changePage(dest);
+                        $(".popup-close").unbind("pageChange");
+                    });
                 }
             });
         </script>
