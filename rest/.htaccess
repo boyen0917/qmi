@@ -1,0 +1,20 @@
+RewriteEngine on
+
+order deny,allow
+allow from 220.128.150.66
+allow from 118.163.25.228
+deny from all
+
+RewriteRule ^download download.html
+RewriteRule ^/upload/. index.html
+RewriteRule ^/line_clone/. index.html
+RewriteRule ^/rest/. index.html
+RewriteRule ^/schema. index.html
+# prevent httpd from serving dotfiles (.htaccess, .svn, .git, etc.)
+# RedirectMatch 403 /\..*$
+# if a directory or a file exists, use it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# otherwise forward it to index.php
+RewriteRule . index.php
+

@@ -1,2 +1,4 @@
 po/upload/file_list.json
-po/upload/files/
+po/upload/files/android.apk
+po/upload/files/ios.ipa
+po/upload/files/ios.plist
