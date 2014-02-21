@@ -362,6 +362,7 @@
 }
 .sm-count {
 	display:none;
+	background:rgb(44,46,50);
     float: right;
 	font-size: 15px;
 	border: solid;
@@ -369,7 +370,7 @@
 	line-height: 21px;
 	height: 20px;
 	padding: 0px 6px 1px 5px;
-	border-color: #abbabf;
+	border-color: #cfdef3;
 	border-radius: 7px;
 	margin-top: 5px;
 	letter-spacing: -2px;
@@ -415,8 +416,10 @@
 }
 .sm-group-switch{
 	display:none;
+	background:url(../images/side_menu/sidemenu_slidedown_bg.png);
     height:30px;
-    line-height:30px;	
+    line-height:30px;
+    padding-top: 6px;
     cursor:pointer;
 }
 
@@ -433,4 +436,12 @@
 	display: flex;
 	letter-spacing: 0px;
 	padding: 0px;
+}
+
+.ui-panel {
+    min-height: initial;
+}
+
+.ui-panel-display-push.ui-panel-open.ui-panel-position-left {
+    border-right-width: 0px;
 }

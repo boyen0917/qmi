@@ -29,6 +29,7 @@ if(isset($_GET['files']))
   }
   elseif($ext == 'plist')
   {
+   $file_path='/var/www/localhost/htdocs/project-o-web/po/iosplist/';
    $new_filename = 'ios.plist';
 //    $log_file_type = 'plist';
   }

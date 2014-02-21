@@ -168,8 +168,8 @@
                 </div>
                 <div class="sm-group-switch"><img src="images/side_menu/sidemenu_slidedown_icon_none.png"/></div>
                 <div class="sm-group-cj">
-	                <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">新增團體</a>
-	                <a href="#page-group-menu" class="hg-invited" data-role="button" data-inline="true">團體邀請</a>
+	                <div class="hg-create sm-group-cj-btn">新增團體</div>
+	                <div class="hg-invited sm-group-cj-btn" >團體邀請</div>
 	            </div>
                 <div class="sm-hr">系統</div>
             </div>
@@ -202,7 +202,7 @@
             	$(".side-menu-btn").click(function(){
             		$( "#side-menu" ).panel( "open");
             	});
-            	
+            	console.log("ddc");
             	//api 網址
                 var base_url = "https://apserver.mitake.com.tw/apiv1/";
             	//ajax用
@@ -214,16 +214,21 @@
             	var proportion = 1.7;
             	$(".main").css("width",$(window).width());
             	$(".main").css("height",$(window).width()*proportion);
+            	$("#side-menu").css("height",$(window).width()*proportion);
                 $(window).resize(function(){ 
                 	$(".main").css("width",$(window).width());
                 	$(".main").css("height",$(window).width()*proportion);
+                	$("#side-menu").css("height",$(window).width()*proportion);
                 });
                 
-                //計算彈出對話框置中
+                
                 $(document).on("click",function(){
-                	if($(".popup").is(":visible")){
-                		$(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
-                	}
+                	setTimeout(function(){
+                		if($(".popup").is(":visible")){
+                            $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
+                        }	
+                	}, 10);
+                		
                 });
                 
                 $(".popup-screen").click(function(){
@@ -236,12 +241,12 @@
                 	$(".popup-close").trigger("pageChange");
                 });
                 
-                
-                $(document).ajaxSend(function(r, s) {
+                $(document).ajaxSend(function() {
                 	$('.ui-loader').css("display","block");
                 });
-                $(document).ajaxComplete(function(r, s) {
+                $(document).ajaxComplete(function() {
                 	$('.ui-loader').hide();
+                	$(document).trigger("click");
                 });
                 
                 
@@ -264,8 +269,7 @@
                     var method = "post";
                     var result = ajaxDo(api_name,headers,method);
                     if(result.status != 200){
-                    	$(".popup-text").html("帳號或密碼不對");
-                    	$(".popup").show();
+                    	popupShowAdjust("帳號或密碼不對");
                     }else{
                     	ui = $.parseJSON(result.responseText).ui;
                         at = $.parseJSON(result.responseText).at;
@@ -294,15 +298,12 @@
                 //註冊頁面點選下一步 送出驗證碼
                 $("#register-next").click(function(){
                 	if(!$("#r-phone").val()){
-                		$('.popup-text').html("請輸入電話號碼");
-                		$('.popup').show();  
+                		popupShowAdjust("請輸入電話號碼");
                 		return false;
                     }else if($(".register-radio img").css("display") == "none"){
-                        $('.popup-text').html("請勾選\"看過並同意使用條款及隱私政策\"");
-                        $('.popup').show();      
+                        popupShowAdjust("請勾選\"看過並同意使用條款及隱私政策\"");  
                         return false;
                     }else{
-                    	
                     	$(".register-desc-area h1").html($("#r-phone").val());
                     	
                     	//亂數device token
@@ -326,8 +327,7 @@
                     	var result = ajaxDo(api_name,headers,method,true);
                     	result.complete(function(data){
                     		if(data.status != 200){
-                    			$('.popup-text').html("電話號碼錯誤");
-                                $('.popup').show(); 
+                    			popupShowAdjust("電話號碼錯誤");
                     		}else{
                     			$.mobile.changePage("#page-register-auth");
                     		}
@@ -339,8 +339,7 @@
                 //認證頁面點選下一步
                 $("#register-auth-next").click(function(){
                     if(!$("#otp").val()){
-                        $('.popup-text').html("驗證碼輸入錯誤，請輸入正確的驗證碼。");
-                        $('.popup').show();                        
+                        popupShowAdjust("驗證碼輸入錯誤，請輸入正確的驗證碼。");                        
                         $(".resend-otp-close").hide();
                         $("#resend-otp").css("display","block");
                         return false;
@@ -358,8 +357,7 @@
                         var result = ajaxDo(api_name,headers,method);
 
                         if(!result.responseText){
-                            $('.popup-text').html("驗證碼輸入錯誤，請輸入正確的驗證碼。");
-                            $('.popup').show();
+                        	popupShowAdjust("驗證碼輸入錯誤，請輸入正確的驗證碼。");
                             $(".resend-otp-close").hide();
                             $("#resend-otp").css("display","block");
                             return false;
@@ -382,16 +380,14 @@
                     };
                     var method = "get";
                     ajaxDo(api_name,headers,method,true);
-                    $('.popup2 p').html("<br/>驗證碼已送出。<br/><br/>");
-                    $('.popup2').popup('open');
-                	$(".resend-otp-close").show();
+                    popupShowAdjust("驗證碼已送出。");
                     $("#resend-otp").css("display","none");
                 });
 
                 //密碼設定
                 $("#pw-send").click(function(){
                     if(($("#pw-setting").val() != $("#pw-setting-c").val()) || $("#pw-setting").val().length < 6){
-                        $('.popup').show();
+                    	popupShowAdjust();
                         return false;
                     }else{
                     	var api_name = "me/password";
@@ -407,11 +403,9 @@
                         //非同步 才能取值
                         var result = ajaxDo(api_name,headers,method);
                         if(!result.responseText){
-                        	$('.popup-text').html("<br/>密碼輸入錯誤。<br/><br/>");
-                            $('.popup').show();
+                        	popupShowAdjust("密碼輸入錯誤。");
                         }else{
-                        	$('.popup-text').html("<br/>密碼變更完成。<br/><br/>");
-                        	$('.popup').show();
+                        	popupShowAdjust("密碼變更完成。");
                         	popupAfterChangePage("#page-helper");
                         }
                     }
@@ -451,9 +445,8 @@
                 //創建團體 建立
                 $("#gm-create-submit").click(function(){
                 	if(!$("#group-name").val()){
-                		$('.popup-text').html('<br/>團體名稱不可空白<br/><br/>');
-                		$('.popup').show();
-                		return false;
+                        popupShowAdjust("團體名稱不可空白");
+                        return false;
                 	}else{
                 		var api_name = "groups/new";
                         var headers = {
@@ -463,17 +456,15 @@
                             "gd":encodeURI($("#group-desc").val())
                         };
                         var method = "post";
-                        
                         var result = ajaxDo(api_name,headers,method,true);
                         result.complete(function(data){
                             if(data.status = 200){
-                            	$('.popup-text').html("<br/>創建成功。<br/><br/>");
-                            	$(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-56);
-                                $('.popup').show();
+                            	console.log("a");
+                            	console.log($(".popup-frame").width());
+                            	popupShowAdjust("創建成功。");
                                 popupAfterChangePage("#page-group-main");
                             }else{
-                            	$('.popup-text').html('<br/>未知錯誤<br/><br/>');
-                                $('.popup').show();
+                            	popupShowAdjust("未知錯誤。");
                                 return false;;
                             }
                         });
@@ -590,24 +581,16 @@
                     }
                 }
                 
-                /* function groupMenuListArea(ui,at){
-                    $("div[data-group-act=gl]").html("");
-                    var api_name = "me/groups";
-                    var headers = {
-                        "ui":ui,
-                        "at":at
-                    };
-                    var method = "get";
-                    result = ajaxDo(api_name,headers,method);
-                    if(result.responseText){
-                        console.log("test1");
-                        $.each($.parseJSON(result.responseText).gl,function(i,val){
-                            $("div[data-group-act=gl]").append("<div data-gi=\"" + decodeURI(val.gi) + "\" class=\"group-list-box\">no pic<div>" + decodeURI(val.gn) + "</div></div>");
-                        });
-                    }else{
-                        
+              //計算彈出對話框置中
+                function popupShowAdjust(desc){
+                	$(".popup-frame").css("margin-left",0);
+                    if(desc){
+                        $('.popup-text').html(desc);
                     }
-                } */
+                    $(".popup-screen").show();
+                    $(".popup").show();
+                    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
+                }
 		        
                 function popupAfterChangePage(dest){
                 	$(".popup-close").bind("pageChange",function(){

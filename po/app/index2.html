@@ -27,8 +27,7 @@
                     </ul>
                 </div>
             </div>
-            <a href="#side-menu">open</div>
-            
+            <a href="#" id="fff" data-role="button" data-theme="b" >建立</a>
             
             <div class="p" style="border:solid;margin:auto">
                  adfasodifjaosidg jaosidgjoi
@@ -96,23 +95,54 @@
                  <div class="resend-otp-close">重送驗證碼</div>
                  <a href="#" id="resend-otp" data-role="button" data-theme="b" >重送驗證碼</a>
                  <a href="#page-password" id="register-auth-next" data-role="button" data-theme="b" >下一步</a>
-                 
-                 
             </div>
-        </div>           
+        </div>    
+        
+<div class="popup">
+  <div class="popup-frame">
+  <div class="popup-text"></div>
+  <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
+  </div>
+  <div class="popup-screen"></div>
+</div>
+       
 <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
 
         
         <script type="text/javascript">
             $(function(){
-            	$(".p").css("margin-left",($(document).width() - $(".p").width())/2);
+            	/* $(document).on("click",function(){
+            		console.log("d");
+                        if($(".popup").is(":visible")){
+                        	console.log("xx");
+                            $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
+                        }   
+                }); */
             	
-            	
-            	
-                $(".popup-close").click(function(){
-                    $("div[data-role=popup]").popup("close");
-                });
+                function popupShowAdjust(desc){
+                	if(desc){
+                		$('.popup-gm .popup-gm-text').html(desc);
+                	}
+                	$(".popup").show();
+                	$(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
+                }
                 
+            	$("#fff").click(function(){
+            		$('.popup-text').html("電話號碼錯誤");
+            		popupShowAdjust();
+            	});
+            	
+            	
+            	$(".popup-screen").click(function(){
+            		console.log("dd");
+                    $(".popup").hide();
+                    $(".popup-screen").hide();
+                });
+            	
+            	$(".popup-close").click(function(){
+                    $(".popup-screen").trigger("click");
+                })
+            	
                 //創建團體 建立
                 $("#gm-create-submit").click(function(){
                 	$('.popup-gm .popup-gm-text').html('<br/>團體名稱不可空白<br/><br/>');
