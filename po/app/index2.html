@@ -2,180 +2,54 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Project O</title>
-        <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
-        <link rel="stylesheet" href="css/main.css" />
-        <script src="../js/jquery.js"></script>
-        <script src="../js/jquery.mobile-1.3.2.min.js"></script>
     </head>
-    <body>
-        <div data-role="page" id="page-group-menu">
-            <div data-role="panel" id="side-menu" data-display="push">
-            <!-- panel content goes here -->
-            dfasdfsdfsd
-            </div>
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
-                <h3>團體列表</h3>
-                <div id="group-nav-area" data-role="navbar">
-                    <ul>        
-                        <li><a href="#" data-group-act="gl">團體列表</a></li>
-                        <li><a href="#" data-group-act="gc">創建團體</a></li>
-                        <li><a href="#" data-group-act="gj">加入團體</a></li>
-                        <li><a href="#" data-group-act="gi">團體邀請</a></li>
-                    </ul>
-                </div>
-            </div>
-            <a href="#" id="fff" data-role="button" data-theme="b" >建立</a>
-            
-            <div class="p" style="border:solid;margin:auto">
-                 adfasodifjaosidg jaosidgjoi
-                 </div>
-            <div class="group-nav-chk" data-group-act="gl">
-            </div>
-            <div class="group-nav-chk" data-group-act="gc">
-                <img class="gm-create-head" src="images/head.png"/>
-                <div class="gm-create-content-area">
-                    團體名稱
-                    <input type="text" id="group-name" placeholder="請輸入您的團體名稱">
-                    團體介紹
-                    <textarea name="textarea-8" id="group-desc"></textarea>
-                    <a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>
-                </div>
-            </div>
-            <div class="group-nav-chk" data-group-act="gj">
-                <input type="text" id="gm-group-num" placeholder="團體編號">
-                <input type="text" id="gm-group-pw" placeholder="團體密碼"/>
-                
-                <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
-            </div>
-            <div class="group-nav-chk" data-group-act="gi">
-            團體邀請
-            </div>
-            
-            <div data-role="popup" class="popup-gm" data-transition="pop">
-              <p>
-              <div class="popup-gm-text"></div>
-              <button class="popup-close" data-theme="c">確定</button>
-              </p>
-            </div>
-        </div>
-<!---------------------------------- page-password ------------------------------------>
-        <div data-role="page" id="page-password">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
-                <h3>密碼設定</h3>
-            </div>
-            <div data-role="content">
-                <input type="password" id="pw-setting" maxlength=20 placeholder="請輸入6-20半形英數字" onkeyup="value=value.replace(/[^-_A-Z0-9a-z]/g,'')">
-                <input type="password" id="pw-setting-c" maxlength=20 placeholder="請重複輸入密碼"/>
-                <div data-role="popup" class="popup3" data-transition="pop">
-                  <p><br/>密碼輸入不正確<br/><br/></p>
-                </div>
-                <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
-            </div>
-        </div> 
-        
-!---------------------------------- page-register-auth ------------------------------------>
-        <div data-role="page" id="page-register-auth">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">back</a>
-                <h3>行動電話號碼認證</h3>
-            </div>
-            <div data-role="content">
-                 <div class="register-desc-area">
-                     我們已經將驗證碼傳送至下列電話號碼，請輸入驗證碼已完成您的手機號碼認證。<br/>
-                     <h1></h1>
-                     <input type="text" id="otp" maxlength=6 placeholder="驗證碼" onkeyup="value=value.replace(/[^-_0-9]/g,'')"/>
-                 </div>
-                 <div data-role="popup" class="popup2" data-transition="pop">
-                   <p></p>
-                 </div>
-                 <div class="resend-otp-close">重送驗證碼</div>
-                 <a href="#" id="resend-otp" data-role="button" data-theme="b" >重送驗證碼</a>
-                 <a href="#page-password" id="register-auth-next" data-role="button" data-theme="b" >下一步</a>
-            </div>
-        </div>    
-        
-<div class="popup">
-  <div class="popup-frame">
-  <div class="popup-text"></div>
-  <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
-  </div>
-  <div class="popup-screen"></div>
-</div>
-       
-<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
+    <style>
+    
+    a{
+        color:white;
+        font-decaration:none;
+    }
+    
+    .main{
+    height:592px;
+    width:374px;
+    margin:auto;
+    margin-top:-20px;
+}
 
-        
-        <script type="text/javascript">
-            $(function(){
-            	/* $(document).on("click",function(){
-            		console.log("d");
-                        if($(".popup").is(":visible")){
-                        	console.log("xx");
-                            $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
-                        }   
-                }); */
-            	
-                function popupShowAdjust(desc){
-                	if(desc){
-                		$('.popup-gm .popup-gm-text').html(desc);
-                	}
-                	$(".popup").show();
-                	$(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
-                }
-                
-            	$("#fff").click(function(){
-            		$('.popup-text').html("電話號碼錯誤");
-            		popupShowAdjust();
-            	});
-            	
-            	
-            	$(".popup-screen").click(function(){
-            		console.log("dd");
-                    $(".popup").hide();
-                    $(".popup-screen").hide();
-                });
-            	
-            	$(".popup-close").click(function(){
-                    $(".popup-screen").trigger("click");
-                })
-            	
-                //創建團體 建立
-                $("#gm-create-submit").click(function(){
-                	$('.popup-gm .popup-gm-text').html('<br/>團體名稱不可空白<br/><br/>');
-                    $('div[data-role=popup]').popup('open');
-                });
-                
-              //團體選單 點選nav
-                $("#group-nav-area li a").click(function(){
-                    var act = $(this).data("group-act");
-                    $(".group-nav-chk").each(function(i,val){
-                        if($(this).data("group-act") == act){
-                            $(this).fadeIn();
-                            //個別的動作
-                            switch (act) {
-                                case "gl": 
-                                    groupMenuListArea(ui,at);
-                                  break;
-                                case "gc": 
-                                    $(".group-create-area").find("input").val("");
-                                    $(".group-create-area").find("textarea").val("");
-                                  break;
-                                case "gj":
-                                  break;
-                                case "gi":
-                                  break;
-                            }
-                        }else{
-                            $(this).hide();
-                        }
-                    });
-                });
-                        
-            });
-        </script>
+.launch_kv{
+    background:url(images/launch_kv.png) center top no-repeat; 
+    background-size: 100%;
+    background-position: 10%;
+    
+}
+
+.login-area{
+    position: relative;
+    top: 57%;
+    margin: auto;
+    width: 80%;
+}
+
+.login-text,.login-text-l,.login-text-r{
+    color: #f6f6f6;
+    text-shadow: 0 0 0 #fff;
+    text-decoration:none;
+}
+
+
+    </style>
+    <body>
+        <div class="main launch_kv">
+          <div class="login-area">
+                 <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號" value="0980922917"><br/>
+                 <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼" value="123456"><br/>
+                 
+                 <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span><br/>
+                 <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a><br/><br/><br/><br/>
+                 <a class="login-text-l" href="#">忘記密碼?</a>
+                 <a class="login-text-r" href="#page-register">註冊帳號</a>
+                </div>
+       </div>
     </body>
 </html>

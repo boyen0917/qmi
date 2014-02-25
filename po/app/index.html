@@ -18,7 +18,8 @@
 	             
 	             <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span>
 	             <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a>
-	             <a class="login-text-l" href="#">忘記密碼?</a>
+	             
+	             <div class="login-text-l" href="#">忘記密碼?</div>
 	             <a class="login-text-r" href="#page-register">註冊帳號</a>
 	            </div>
 	        </div>
@@ -27,7 +28,7 @@
 <!---------------------------------- page-register ------------------------------------>
         <div data-role="page" id="page-register">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">back</a>
+            <div class="page-back"></div>
                 <h3>行動電話號碼註冊</h3>
             </div>
             <div data-role="content">
@@ -48,7 +49,7 @@
 <!---------------------------------- page-register-auth ------------------------------------>
         <div data-role="page" id="page-register-auth">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">back</a>
+            <div class="page-back"></div>
                 <h3>行動電話號碼認證</h3>
             </div>
             <div data-role="content">
@@ -66,7 +67,7 @@
 <!---------------------------------- page-password ------------------------------------>
         <div data-role="page" id="page-password">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
+            <div class="page-back"></div>
                 <h3>密碼設定</h3>
             </div>
             <div data-role="content">
@@ -79,7 +80,7 @@
 <!---------------------------------- page-helper ------------------------------------>
         <div data-role="page" id="page-helper">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
+            <div class="page-back"></div>
                 <h3>團體建立/加入</h3>
             </div>
             <div class="helper-top-area">
@@ -98,7 +99,7 @@
 <!---------------------------------- page-group-menu ------------------------------------>
         <div data-role="page" id="page-group-menu">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
+                <div class="page-back"></div>
                 <h3>團體列表</h3>
                 <div id="group-nav-area" data-role="navbar">
 			        <ul>        
@@ -144,17 +145,17 @@
                    <div class="sm-small-area-r">動態消息</div>
                    <div class="sm-count">315</div>
                 </div>
-	            <div class="sm-small-area">
+	            <div data-sm-act="contact" class="sm-small-area">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_contact.png"/></div>
                    <div class="sm-small-area-r">聯絡人</div>
                    <div class="sm-count"></div>
                 </div>
-                <div class="sm-small-area">
+                <div data-sm-act="chat" class="sm-small-area">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_chat.png"/></div>
                    <div class="sm-small-area-r">聊天</div>
                    <div class="sm-count"></div>
                 </div>
-                <div class="sm-small-area">
+                <div data-sm-act="calendar" class="sm-small-area">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_calendar.png"/></div>
                    <div class="sm-small-area-r">行事曆</div>
                    <div class="sm-count"></div>
@@ -166,12 +167,24 @@
                 <div class="sm-group-list-area-add">
                     
                 </div>
-                <div class="sm-group-switch"><img src="images/side_menu/sidemenu_slidedown_icon_none.png"/></div>
+                <div class="sm-group-switch"><div class="sm-switch-ui-adj"></div><img src="images/side_menu/sidemenu_slidedown_icon_none.png"/></div>
                 <div class="sm-group-cj">
 	                <div class="hg-create sm-group-cj-btn">新增團體</div>
 	                <div class="hg-invited sm-group-cj-btn" >團體邀請</div>
 	            </div>
                 <div class="sm-hr">系統</div>
+                <div data-sm-act="help" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_help.png"/></div>
+                   <div class="sm-small-area-r">幫助</div>
+                </div>
+                <div data-sm-act="news" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_news.png"/></div>
+                   <div class="sm-small-area-r">最新消息</div>
+                </div>
+                <div data-sm-act="setting" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_setting.png"/></div>
+                   <div class="sm-small-area-r">系統設定</div>
+                </div>
             </div>
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <img class="side-menu-btn" src="images/side_menu_btn.png"/>
@@ -185,16 +198,18 @@
             </div>
         </div>   
         
-<div class="popup">
-  <div class="popup-frame">
-  <div class="popup-text"></div>
-  <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
-  </div>
-  <div class="popup-screen"></div>
-</div>
+		<div class="popup">
+		  <div class="popup-frame">
+		  <div class="popup-text"></div>
+		  <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
+		  </div>
+		  <div class="popup-screen"></div>
+		</div>
 
-<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
-
+        <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
+        
+        <div id="page-back-chk"></div>
+        <div id="page-back-chk-pre"></div>
         
         <script type="text/javascript">
             $(function(){
@@ -221,16 +236,6 @@
                 	$("#side-menu").css("height",$(window).width()*proportion);
                 });
                 
-                
-                $(document).on("click",function(){
-                	setTimeout(function(){
-                		if($(".popup").is(":visible")){
-                            $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
-                        }	
-                	}, 10);
-                		
-                });
-                
                 $(".popup-screen").click(function(){
                     $(".popup").hide();
                     $(".popup-screen").hide();
@@ -249,7 +254,16 @@
                 	$(document).trigger("click");
                 });
                 
+              //上一頁機制
+                $("#page-back-chk").html(window.location.hash);
+                $(document).on("pagebeforeshow",function(){
+                    $("#page-back-chk-pre").html($("#page-back-chk").html());
+                    $("#page-back-chk").html(window.location.hash);
+                });
                 
+                $(".page-back").click(function(){
+                	$.mobile.changePage($("#page-back-chk-pre").html(), {transition: "slide",reverse: true});
+                });
                 
 //----------------------------------- 登入 ---------------------------------------------
                 //login打勾
@@ -475,6 +489,7 @@
                 $(".hg-create").click(function(){
                 	$("#group-nav-area li a[data-group-act=gc]").trigger("click");
                 	$("#group-nav-area li a[data-group-act=gc]").addClass("ui-btn-active");
+                	$.mobile.changePage("#page-group-menu");
                 });
                 //小幫手 加入團體
                 $(".hg-join").click(function(){
@@ -485,6 +500,7 @@
                 $(".hg-invited").click(function(){
                     $("#group-nav-area li a[data-group-act=gi]").trigger("click");
                     $("#group-nav-area li a[data-group-act=gi]").addClass("ui-btn-active");
+                    $.mobile.changePage("#page-group-menu");
                 });
 
 //----------------------------------- 左側選單 ---------------------------------------------
@@ -516,9 +532,81 @@
                         groupMenuListArea(ui,at);
 		        });
 
+		        //開關團體列表
                 $(".sm-group-switch").click(function(){
-                	$(".sm-group-list-area-add").slideToggle();
-                })
+                	$(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+                	$(".sm-group-list-area-add").slideToggle(
+               			function(){
+               				if($(".sm-group-list-area-add").is(":visible")){
+               					$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_click.png");
+               				}else{
+               					$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_none.png");	
+               				}
+               		});
+                });
+		        
+                
+                $(document).on("mousedown",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
+		        	var icon_default = "images/side_menu/sidemenu_icon_";
+		        	var target = $(this);
+		        	
+		        	//開關按鈕ui變化
+		        	if($(".sm-group-list-area-add").is(":visible") ){
+		        		if(target.data("switch-chk") == "check2"){
+		        			$(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
+		        		}
+                    }else{
+                    	if(target.data("switch-chk") == "check"){
+                            $(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
+                        }
+                    }
+		        	
+		        	target.addClass("sm-click-bg");
+		        	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_click.png");
+		        	/* console.log(target.data("sm-act"));
+		        	switch (target.data("sm-act")) {
+	                    case "feed":
+	                    	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_click.png");
+	                      break;
+	                    case "contact": 
+	                      break;
+	                    case "chat":
+	                      break;
+	                    case "calendar":
+	                      break;
+	                    case "help":
+                          break;
+                        case "news":
+                          break;
+                        case "setting":
+                          break;
+	                } */
+		        });
+                
+                $(document).on("mouseup",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
+		        	var icon_default = "images/side_menu/sidemenu_icon_";
+		        	var target = $(this);
+                    setTimeout(function(){
+                    	//開關按鈕ui變化
+                    	if($(".sm-group-list-area-add").is(":visible") ){
+                            if(target.data("switch-chk") == "check2"){
+                                $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+                            }
+                        }else{
+                            if(target.data("switch-chk") == "check"){
+                                $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+                            }
+                        }
+                    	target.removeClass("sm-click-bg");
+                    	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
+                    	},1000);
+                    
+                    
+                });
+                
+                //團體新增邀請按鈕
+                $(".sm-group-cj hg_create")
+                
 //----------------------------------- function ---------------------------------------------                
                 //ajax
                 function ajaxDo(api_name,headers,method,async){
@@ -556,8 +644,10 @@
                     if(result.responseText){
                     	$(".sm-group-list-area").html("");
                     	$(".sm-group-list-area-add").html("");
-                    	var tmp_selector,count;
+                    	//chk是開關按鈕ui變化的檢查
+                    	var tmp_selector,count,chk;
                     	var group_list = $.parseJSON(result.responseText).gl;
+                    	var total = group_list.length;
                     	
                         $.each(group_list,function(i,val){
                         	if(i < 2){
@@ -565,8 +655,17 @@
                         	}else{
                         		tmp_selector = ".sm-group-list-area-add";
                         	}
+                        	
+                        	//開關按鈕ui變化
+                            if(i == 1 || total == 1){
+                                chk = "data-switch-chk=\"check\"";
+                            }
+                            if(i == total-1 ){
+                                chk = "data-switch-chk=\"check2\"";
+                            }
+                        	
                             $(tmp_selector).append(
-                           		'<div class="sm-group-area">' +
+                           		'<div class="sm-group-area" ' + chk + '>' +
                            	        '<div data-gi="' + decodeURI(val.gi) + '" class="sm-group-area-l">' +
                            	            '<img src="images/no_pic_g.png">' +
                            	        '</div>' +
@@ -598,6 +697,7 @@
                 		$(".popup-close").unbind("pageChange");
                 	});
                 }
+                
             });
         </script>
     </body>
