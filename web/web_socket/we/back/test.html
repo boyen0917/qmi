@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='UTF-8' />
+
+</head>
+
+<body>  
+
+<script src="../../js/jquery.js"></script>
+<script type="text/javascript">
+$(function(){
+	var wsUri = "ws://localhost:9000/demo/server.php"; 
+	
+	websocket = new WebSocket(wsUri);
+    websocket.onopen = function()
+    {
+    };
+    websocket.onmessage = function(e) {
+    	var colour = $.parseJSON(e.data).message;
+    	$("body").css("background",colour);
+    }
+    websocket.onclose = function(){
+    }
+    
+    
+});
+
+
+
+</script>
+
+</body>
+</html>

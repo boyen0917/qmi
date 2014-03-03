@@ -8,6 +8,8 @@
         <link rel="stylesheet" href="css/main.css" />
         <script src="../js/jquery.js"></script>
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
+        <script src="js/sha/sha1.js"></script>
+        <script src="js/sha/enc-base64-min.js"></script>
     </head>
     <body>
         <div data-role="page" id="page-login">
@@ -19,7 +21,7 @@
 	             <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span>
 	             <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a>
 	             
-	             <div class="login-text-l" href="#">忘記密碼?</div>
+	             <a class="login-text-l" href="#">忘記密碼?</a>
 	             <a class="login-text-r" href="#page-register">註冊帳號</a>
 	            </div>
 	        </div>
@@ -61,7 +63,7 @@
                 
                  <div class="resend-otp-close">重送驗證碼</div>
                  <a href="#" id="resend-otp" data-role="button" data-theme="b" >重送驗證碼</a>
-                 <a href="#page-password" id="register-auth-next" data-role="button" data-theme="b" >下一步</a>
+                 <a href="#" id="register-auth-next" data-role="button" data-theme="b" >下一步</a>
             </div>
         </div>
 <!---------------------------------- page-password ------------------------------------>
@@ -162,7 +164,7 @@
                 </div>
                 <div class="sm-hr">團體</div>
                 <div class="sm-group-list-area">
-                    
+                  
                 </div>
                 <div class="sm-group-list-area-add">
                     
@@ -187,16 +189,89 @@
                 </div>
             </div>
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="side-menu-btn"></div>
                 <img class="side-menu-btn" src="images/side_menu_btn.png"/>
                 <h3>成員</h3>
             </div>
             <div data-role="content">
-	            <div class="group-list-main-area">
-	                <img style="width:100%;height:80%;margin-top: -75px;" src="images/test.png"/>
+	            <div class="main-user-area">
+	               <div class="main-user-area-l"><img class="sm-user-pic" src="images/user_pic.png"/></div>
+                   <div class="main-user-area-r"></div>
 	            </div>
-	            <div class="side-menu-btn"></div>
+	            <div class="main-contact-l">
+	               <div class="main-contact-l-row">全部聯絡人<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	               <div class="main-contact-l-row">我的最愛<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	               <div class="main-contact-l-row">總經理室<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	               <div class="main-contact-l-row">管理部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	               <div class="main-contact-l-row">財會部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	               <!--  <div class="main-contact-l-row"><div>全部聯絡人</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+                   <div class="main-contact-l-row"><div>我的最愛</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+                   <div class="main-contact-l-row"><div>總經理室</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+                   <div class="main-contact-l-row"><div>管理部</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+                   <div class="main-contact-l-row"><div>財會部</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div> -->
+	            </div>
+	            <div class="main-contact-r">
+	               <div class="main-contact-r-bar">
+	                   <div class="main-contact-r-bar-l">群組</div>
+	                   <div class="main-contact-r-bar-r">(可拖拉複製、移動群組)</div>
+	                   <div class="main-count">0</div>
+	               </div>
+	               <div class="main-contact-r-group">
+	                   <div class="main-contact-r-group-l"><img src="images/contact/contact_group_default_list_apt.png"></div>
+	                   <div class="main-contact-r-group-r">策略行銷部</div>
+	               </div>
+	               <div class="main-contact-r-bar">
+                       <div class="main-contact-r-bar-l">成員</div>
+                       <div class="main-contact-r-bar-r">(可拖拉複製、移動群組)</div>
+                       <div class="main-count">3</div>
+                   </div>
+                   <div class="main-contact-r-block">
+                        <div class="main-contact-r-block-l"><img src="images/1.jpg"></div>
+                        <div class="main-contact-r-block-r">
+                            <div class="main-contact-r-block-r-1">孫協志</div>
+                            <div class="main-contact-r-block-r-2">放假中，有事請手機聯絡</div>
+                        </div>
+                   </div>
+                   <div class="main-contact-r-block">
+                        <div class="main-contact-r-block-l"><img src="images/2.jpg"></div>
+                        <div class="main-contact-r-block-r">
+                            <div class="main-contact-r-block-r-1">王仁甫</div>
+                            <div class="main-contact-r-block-r-2">放假中，有事請手機聯絡</div>
+                        </div>
+                   </div>
+                   <div class="main-contact-r-block">
+                        <div class="main-contact-r-block-l"><img src="images/3.jpg"></div>
+                        <div class="main-contact-r-block-r">
+                            <div class="main-contact-r-block-r-1">王紹偉</div>
+                            <div class="main-contact-r-block-r-2">放假中，有事請手機聯絡</div>
+                        </div>
+                   </div>
+                   <div class="main-contact-r-block">
+                        <div class="main-contact-r-block-l"><img src="images/4.jpg"></div>
+                        <div class="main-contact-r-block-r">
+                            <div class="main-contact-r-block-r-1">許孟哲</div>
+                            <div class="main-contact-r-block-r-2">放假中，有事請手機聯絡</div>
+                        </div>
+                   </div>
+	            </div>
+	            <div class="main-footer-add">
+                    <div data-main-act="noti" class="main-footer-item"><img src="images/contact/toolbar_icon_notification.png"/><div class="main-footer-desc">通報專區</div></div>
+                    <div data-main-act="command" class="main-footer-item"><img src="images/contact/toolbar_icon_command.png"/><div class="main-footer-desc">命令</div></div>
+                    <div data-main-act="calendar" class="main-footer-item"><img src="images/contact/toolbar_icon_calendar.png"/><div class="main-footer-desc">行事曆</div></div>
+                    <div data-main-act="file" class="main-footer-item"><img src="images/contact/toolbar_icon_file.png"/><div class="main-footer-desc">檔案</div></div>
+                    <div data-main-act="setting" class="main-footer-item"><img src="images/contact/toolbar_icon_setting.png"/><div class="main-footer-desc">團體設定</div></div>
+                </div>
+	            <div class="main-footer">
+	                <div data-main-act="event" class="main-footer-item"><img src="images/contact/toolbar_icon_event.png"/><div class="main-footer-desc">近期活動</div></div>
+	                <div data-main-act="contact" class="main-footer-item"><img src="images/contact/toolbar_icon_contact.png"/><div class="main-footer-desc">聯絡人</div></div>
+	                <div data-main-act="chat" class="main-footer-item"><img src="images/contact/toolbar_icon_chat.png"/><div class="main-footer-desc">聊天</div></div>
+	                <div data-main-act="post" class="main-footer-item"><img src="images/contact/toolbar_icon_post.png"/><div class="main-footer-desc">公告</div></div>
+	                <div class="main-footer-more"><img src="images/contact/toolbar_icon_more.png"/></div>
+	            </div><!-- /footer -->
+	            
             </div>
-        </div>   
+            <div class="clear"></div>
+        </div><!-- /page-group-main -->
         
 		<div class="popup">
 		  <div class="popup-frame">
@@ -213,7 +288,6 @@
         
         <script type="text/javascript">
             $(function(){
-            	
             	$(".side-menu-btn").click(function(){
             		$( "#side-menu" ).panel( "open");
             	});
@@ -225,15 +299,16 @@
                 
                 //全域
                 var ui,at,gi,gn,gd,ga,gm,device_token;
+                
                 //計算螢幕長寬以維持比例
+                console.log($(".main-footer").height());
             	var proportion = 1.7;
             	$(".main").css("width",$(window).width());
             	$(".main").css("height",$(window).width()*proportion);
-            	$("#side-menu").css("height",$(window).width()*proportion);
+            	$(".main-contact-l").css("height",$(window).height()-187);
                 $(window).resize(function(){ 
                 	$(".main").css("width",$(window).width());
                 	$(".main").css("height",$(window).width()*proportion);
-                	$("#side-menu").css("height",$(window).width()*proportion);
                 });
                 
                 $(".popup-screen").click(function(){
@@ -277,31 +352,37 @@
                     var api_name = "login";
                     var headers = {
                         "pn":$("#phone").val(),
-                        "up":$("#code").val(), 
+                        "up":toSha1Encode($("#code").val()), 
                         "gm":""
                     };
                     var method = "post";
-                    var result = ajaxDo(api_name,headers,method);
-                    if(result.status != 200){
-                    	popupShowAdjust("帳號或密碼不對");
-                    }else{
-                    	ui = $.parseJSON(result.responseText).ui;
-                        at = $.parseJSON(result.responseText).at;
-                        //取得團體列表
-                        var api_name = "me/groups";
-                        var headers = {
-                            "ui":ui,
-                            "at":at
-                        };
-                        var method = "get";
-                        result = ajaxDo(api_name,headers,method);
-                        if(result.responseText){
-		                    $("#group-nav-area li a[data-group-act=gl]").trigger("click");
-                        	$.mobile.changePage("#page-group-main", {transition: "pop"});
+                    var result = ajaxDo(api_name,headers,method,true);
+                    result.complete(function(data){
+                        if(data.status != 200){
+                        	popupShowAdjust("帳號或密碼不對");
                         }else{
-                        	$.mobile.changePage("#page-helper");
+                        	ui = $.parseJSON(data.responseText).ui;
+                            at = $.parseJSON(data.responseText).at;
+                            //取得團體列表
+                            console.log(ui);
+                            console.log(at);
+                            var api_name = "groups";
+                            var headers = {
+                                "ui":ui,
+                                "at":at
+                            };
+                            var method = "get";
+                            var result = ajaxDo(api_name,headers,method,true);
+                            result.complete(function(data){
+                                if(data.status != 200){
+                                	$.mobile.changePage("#page-helper");
+                                }else{
+                                    $("#group-nav-area li a[data-group-act=gl]").trigger("click");
+                                    $.mobile.changePage("#page-group-main", {transition: "pop"});
+                                }
+                            });
                         }
-                    }
+                    });
                 });
 //----------------------------------- 註冊 --------------------------------------------- 
                 //register打勾
@@ -329,7 +410,7 @@
 					        randomstring += chars.substring(rnum,rnum+1);
 					    }
 					    device_token = "web-" + randomstring;
-					  //取得otp驗證碼
+					    //取得otp驗證碼
                     	var api_name = "register/otp";
                     	var headers = {
                     		"cc":"886",
@@ -358,27 +439,28 @@
                         $("#resend-otp").css("display","block");
                         return false;
                     }else{
-                      //取得otp驗證碼
+                   	    //驗證otp
                         var api_name = "register/otp";
                         var headers = {
                             "cc":"886",
                             "pn":$("#r-phone").val(), 
                             "di":device_token,
-                            "op":$("#otp").val()
+                            "op":toSha1Encode($("#otp").val())
                         };
                         var method = "post";
                         //非同步
-                        var result = ajaxDo(api_name,headers,method);
-
-                        if(!result.responseText){
-                        	popupShowAdjust("驗證碼輸入錯誤，請輸入正確的驗證碼。");
-                            $(".resend-otp-close").hide();
-                            $("#resend-otp").css("display","block");
-                            return false;
-                        }else{
-                        	ui = $.parseJSON(result.responseText).ui;
-                        	at = $.parseJSON(result.responseText).at;
-                        }
+                        var result = ajaxDo(api_name,headers,method,true);
+                        result.complete(function(data){
+                            if(data.status != 200){
+                            	$(".resend-otp-close").hide();
+                                $("#resend-otp").css("display","block");
+                                popupShowAdjust("驗證碼錯誤");
+                            }else{
+                            	ui = $.parseJSON(data.responseText).ui;
+                                at = $.parseJSON(data.responseText).at;
+                                $.mobile.changePage("#page-password");
+                            }
+                        });
                     }
                 });
                 
@@ -408,20 +490,22 @@
                         var headers = {
                             "ui":ui, 
 							"at":at, 
-							"up":$("#pw-setting").val(),
+							"up":toSha1Encode($("#pw-setting").val()),
 							"pn":$("#r-phone").val(), 
 							"gm":"", 
-							"op":$("#otp").val()
+							"op":toSha1Encode($("#otp").val())
                         };
                         var method = "put";
                         //非同步 才能取值
-                        var result = ajaxDo(api_name,headers,method);
-                        if(!result.responseText){
-                        	popupShowAdjust("密碼輸入錯誤。");
-                        }else{
-                        	popupShowAdjust("密碼變更完成。");
-                        	popupAfterChangePage("#page-helper");
-                        }
+                        var result = ajaxDo(api_name,headers,method,true);
+                        result.complete(function(data){
+                            if(data.status != 200){
+                                popupShowAdjust("密碼輸入錯誤。");
+                            }else{
+                            	popupShowAdjust("密碼變更完成。");
+                                popupAfterChangePage("#page-helper");
+                            }
+                        });
                     }
                 });
 //----------------------------------- 團體選單 ---------------------------------------------                
@@ -462,10 +546,11 @@
                         popupShowAdjust("團體名稱不可空白");
                         return false;
                 	}else{
-                		var api_name = "groups/new";
+                		var api_name = "groups";
                         var headers = {
                             "ui":ui,
                             "at":at,
+                            "li":"zh_TW",
                             "gn":encodeURI($("#group-name").val()),
                             "gd":encodeURI($("#group-desc").val())
                         };
@@ -634,13 +719,14 @@
                 
                 function groupMenuListArea(ui,at){
                     
-                    var api_name = "me/groups";
+                    var api_name = "groups";
                     var headers = {
                         "ui":ui,
                         "at":at
                     };
                     var method = "get";
                     result = ajaxDo(api_name,headers,method);
+                    console.log(result);
                     if(result.responseText){
                     	$(".sm-group-list-area").html("");
                     	$(".sm-group-list-area-add").html("");
@@ -648,7 +734,6 @@
                     	var tmp_selector,count,chk;
                     	var group_list = $.parseJSON(result.responseText).gl;
                     	var total = group_list.length;
-                    	
                         $.each(group_list,function(i,val){
                         	if(i < 2){
                         		tmp_selector = ".sm-group-list-area";
@@ -679,7 +764,6 @@
                         }
                     }
                 }
-                
               //計算彈出對話框置中
                 function popupShowAdjust(desc){
                 	$(".popup-frame").css("margin-left",0);
@@ -698,6 +782,12 @@
                 	});
                 }
                 
+                //sha1 and base64 encode
+                function toSha1Encode(string){
+                	var hash = CryptoJS.SHA1(string);
+                    var toBase64 = hash.toString(CryptoJS.enc.Base64);
+                    return toBase64;
+                }
             });
         </script>
     </body>

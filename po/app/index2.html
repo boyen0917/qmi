@@ -2,54 +2,174 @@
 <html>
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Project O</title>
+        <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
+        <link rel="stylesheet" href="css/main.css" />
+        <script src="../js/jquery.js"></script>
+        <script src="../js/jquery.mobile-1.3.2.min.js"></script>
+        <script src="js/sha.js"></script>
     </head>
-    <style>
-    
-    a{
-        color:white;
-        font-decaration:none;
-    }
-    
-    .main{
-    height:592px;
-    width:374px;
-    margin:auto;
-    margin-top:-20px;
-}
-
-.launch_kv{
-    background:url(images/launch_kv.png) center top no-repeat; 
-    background-size: 100%;
-    background-position: 10%;
-    
-}
-
-.login-area{
-    position: relative;
-    top: 57%;
-    margin: auto;
-    width: 80%;
-}
-
-.login-text,.login-text-l,.login-text-r{
-    color: #f6f6f6;
-    text-shadow: 0 0 0 #fff;
-    text-decoration:none;
-}
-
-
-    </style>
     <body>
-        <div class="main launch_kv">
-          <div class="login-area">
-                 <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號" value="0980922917"><br/>
-                 <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼" value="123456"><br/>
-                 
-                 <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span><br/>
-                 <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a><br/><br/><br/><br/>
-                 <a class="login-text-l" href="#">忘記密碼?</a>
-                 <a class="login-text-r" href="#page-register">註冊帳號</a>
-                </div>
-       </div>
+        <div class="popup">
+          <div class="popup-frame">
+          <div class="popup-text"></div>
+          <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
+          </div>
+          <div class="popup-screen"></div>
+        </div>
+
+        <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
+        
+        <script src="js/sha/sha1.js"></script>
+        <script src="js/sha/enc-base64-min.js"></script>
+        <script type="text/javascript">
+            $(function(){
+            	var base_url = "https://apserver.mitake.com.tw/apiv1/";
+            	//ajax用
+                var myRand = Math.floor((Math.random()*1000)+1);
+                //=========================================
+                
+               /*  var api_name = "register/otp";
+                var headers = {
+                    "cc":"886",
+                    "pn":"0980922917", 
+                    "di":"qwer",
+                    "ug":"1"
+                };
+                
+                var method = "get"; */
+                
+                //=========================================
+                var api_name = "groups";
+                var headers = {
+                    "ui":"11249442-866d-4d0e-af2b-27014d8fe18c",
+                    "at":"9768fc35-a4b9-46a6-83ec-f163fd4fbbb2",
+                    "li":"zh_TW"
+                };
+                var method = "get";
+                //=========================================
+                console.log(headers);
+                var result = ajaxDo(api_name,headers,method,true);
+                result.complete(function(data){
+                    if(data.status != 200){
+                    	console.log(data);
+                        popupShowAdjust("錯誤");
+                    }else{
+                    	popupShowAdjust("成功");
+                    	console.log(data);
+                    }
+                });
+                
+                $(document).ajaxSend(function() {
+                    $('.ui-loader').css("display","block");
+                });
+                $(document).ajaxComplete(function() {
+                    $('.ui-loader').hide();
+                    $(document).trigger("click");
+                });
+                
+                $(".popup-screen").click(function(){
+                    $(".popup").hide();
+                    $(".popup-screen").hide();
+                });
+                
+                $(".popup-close").click(function(){
+                    $(".popup-screen").trigger("click");
+                    $(".popup-close").trigger("pageChange");
+                });
+//----------------------------------- function ---------------------------------------------                
+                //ajax
+                function ajaxDo(api_name,headers,method,async){
+                    //console.log(api_url);
+                    var api_url = base_url + api_name;
+                    var myRand = Math.floor((Math.random()*1000)+1);
+                    
+                    if(async){
+                        var result = $.ajax ({
+                            url: api_url,
+                            type: method,
+                            headers:headers,
+                        });/* ajax結束 */
+                    }else{
+                        var result = $.ajax ({
+                            url: api_url,
+                            type: method,
+                            headers:headers,
+                            async:false,
+                        });/* ajax結束 */
+                    }
+                    
+                    return result;
+                }
+                
+                function groupMenuListArea(ui,at){
+                    
+                    var api_name = "me/groups";
+                    var headers = {
+                        "ui":ui,
+                        "at":at
+                    };
+                    var method = "get";
+                    result = ajaxDo(api_name,headers,method);
+                    if(result.responseText){
+                        $(".sm-group-list-area").html("");
+                        $(".sm-group-list-area-add").html("");
+                        //chk是開關按鈕ui變化的檢查
+                        var tmp_selector,count,chk;
+                        var group_list = $.parseJSON(result.responseText).gl;
+                        var total = group_list.length;
+                        
+                        $.each(group_list,function(i,val){
+                            if(i < 2){
+                                tmp_selector = ".sm-group-list-area";
+                            }else{
+                                tmp_selector = ".sm-group-list-area-add";
+                            }
+                            
+                            //開關按鈕ui變化
+                            if(i == 1 || total == 1){
+                                chk = "data-switch-chk=\"check\"";
+                            }
+                            if(i == total-1 ){
+                                chk = "data-switch-chk=\"check2\"";
+                            }
+                            
+                            $(tmp_selector).append(
+                                '<div class="sm-group-area" ' + chk + '>' +
+                                    '<div data-gi="' + decodeURI(val.gi) + '" class="sm-group-area-l">' +
+                                        '<img src="images/no_pic_g.png">' +
+                                    '</div>' +
+                                    '<div class="sm-group-area-r">' + decodeURI(val.gn) + '</div>' +
+                                    '<div class="sm-count">20</div>' +
+                                '</div>'
+                            );
+                        });
+                        if(group_list.length > 2){
+                            $(".sm-group-switch").show();
+                        }
+                    }
+                }
+                $(".sm-group-switch").show();
+              //計算彈出對話框置中
+                function popupShowAdjust(desc){
+                    $(".popup-frame").css("margin-left",0);
+                    if(desc){
+                        $('.popup-text').html(desc);
+                    }
+                    $(".popup-screen").show();
+                    $(".popup").show();
+                    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
+                }
+                
+                function popupAfterChangePage(dest){
+                    $(".popup-close").bind("pageChange",function(){
+                        $.mobile.changePage(dest);
+                        $(".popup-close").unbind("pageChange");
+                    });
+                }
+                
+            });
+        </script>
     </body>
 </html>
