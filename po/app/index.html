@@ -199,16 +199,13 @@
                    <div class="main-user-area-r"></div>
 	            </div>
 	            <div class="main-contact-l">
-	               <div class="main-contact-l-row">全部聯絡人<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-	               <div class="main-contact-l-row">我的最愛<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-	               <div class="main-contact-l-row">總經理室<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-	               <div class="main-contact-l-row">管理部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-	               <div class="main-contact-l-row">財會部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-	               <!--  <div class="main-contact-l-row"><div>全部聯絡人</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-                   <div class="main-contact-l-row"><div>我的最愛</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-                   <div class="main-contact-l-row"><div>總經理室</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-                   <div class="main-contact-l-row"><div>管理部</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-                   <div class="main-contact-l-row"><div>財會部</div><img src="images/contact/contact_sidemenu_icon_arrow.png"/></div> -->
+	               <div class="main-contact-l-content-area">
+		               <div class="main-contact-l-row">全部聯絡人<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+		               <div class="main-contact-l-row">我的最愛<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+		               <div class="main-contact-l-row">總經理室<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+		               <div class="main-contact-l-row">管理部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+		               <div class="main-contact-l-row">財會部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	               </div>
 	            </div>
 	            <div class="main-contact-r">
 	               <div class="main-contact-r-bar">
@@ -254,6 +251,15 @@
                         </div>
                    </div>
 	            </div>
+	            
+	            <div class="main-footer">
+	                <div data-main-act="event" class="main-footer-item"><img src="images/contact/toolbar_icon_event.png"/><div class="main-footer-desc">近期活動</div></div>
+	                <div data-main-act="contact" class="main-footer-item"><img src="images/contact/toolbar_icon_contact.png"/><div class="main-footer-desc">聯絡人</div></div>
+	                <div data-main-act="chat" class="main-footer-item"><img src="images/contact/toolbar_icon_chat.png"/><div class="main-footer-desc">聊天</div></div>
+	                <div data-main-act="post" class="main-footer-item"><img src="images/contact/toolbar_icon_post.png"/><div class="main-footer-desc">公告</div></div>
+	                <div class="main-footer-more"><img src="images/contact/toolbar_icon_more.png"/></div>
+	                <div class="main-more-btn"></div>
+	            </div><!-- /footer -->
 	            <div class="main-footer-add">
                     <div data-main-act="noti" class="main-footer-item"><img src="images/contact/toolbar_icon_notification.png"/><div class="main-footer-desc">通報專區</div></div>
                     <div data-main-act="command" class="main-footer-item"><img src="images/contact/toolbar_icon_command.png"/><div class="main-footer-desc">命令</div></div>
@@ -261,14 +267,6 @@
                     <div data-main-act="file" class="main-footer-item"><img src="images/contact/toolbar_icon_file.png"/><div class="main-footer-desc">檔案</div></div>
                     <div data-main-act="setting" class="main-footer-item"><img src="images/contact/toolbar_icon_setting.png"/><div class="main-footer-desc">團體設定</div></div>
                 </div>
-	            <div class="main-footer">
-	                <div data-main-act="event" class="main-footer-item"><img src="images/contact/toolbar_icon_event.png"/><div class="main-footer-desc">近期活動</div></div>
-	                <div data-main-act="contact" class="main-footer-item"><img src="images/contact/toolbar_icon_contact.png"/><div class="main-footer-desc">聯絡人</div></div>
-	                <div data-main-act="chat" class="main-footer-item"><img src="images/contact/toolbar_icon_chat.png"/><div class="main-footer-desc">聊天</div></div>
-	                <div data-main-act="post" class="main-footer-item"><img src="images/contact/toolbar_icon_post.png"/><div class="main-footer-desc">公告</div></div>
-	                <div class="main-footer-more"><img src="images/contact/toolbar_icon_more.png"/></div>
-	            </div><!-- /footer -->
-	            
             </div>
             <div class="clear"></div>
         </div><!-- /page-group-main -->
@@ -288,10 +286,6 @@
         
         <script type="text/javascript">
             $(function(){
-            	$(".side-menu-btn").click(function(){
-            		$( "#side-menu" ).panel( "open");
-            	});
-            	console.log("ddc");
             	//api 網址
                 var base_url = "https://apserver.mitake.com.tw/apiv1/";
             	//ajax用
@@ -301,14 +295,14 @@
                 var ui,at,gi,gn,gd,ga,gm,device_token;
                 
                 //計算螢幕長寬以維持比例
-                console.log($(".main-footer").height());
             	var proportion = 1.7;
             	$(".main").css("width",$(window).width());
             	$(".main").css("height",$(window).width()*proportion);
-            	$(".main-contact-l").css("height",$(window).height()-187);
+            	$(".main-contact-l").css("height",$(window).height()-186);
                 $(window).resize(function(){ 
                 	$(".main").css("width",$(window).width());
                 	$(".main").css("height",$(window).width()*proportion);
+                	$(".main-contact-l").css("height",$(window).height()-186);
                 });
                 
                 $(".popup-screen").click(function(){
@@ -329,7 +323,7 @@
                 	$(document).trigger("click");
                 });
                 
-              //上一頁機制
+                //上一頁機制
                 $("#page-back-chk").html(window.location.hash);
                 $(document).on("pagebeforeshow",function(){
                     $("#page-back-chk-pre").html($("#page-back-chk").html());
@@ -589,7 +583,10 @@
                 });
 
 //----------------------------------- 左側選單 ---------------------------------------------
-				
+				$(".side-menu-btn").click(function(){
+                    $( "#side-menu" ).panel( "open");
+                });
+                
                 //用戶區
                 //detect page changing
 		        $("#side-menu").on("panelbeforeopen",function(){
@@ -627,10 +624,11 @@
                				}else{
                					$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_none.png");	
                				}
-               		});
+               			}
+               		);
                 });
 		        
-                
+                //按鈕效果
                 $(document).on("mousedown",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
 		        	var icon_default = "images/side_menu/sidemenu_icon_";
 		        	var target = $(this);
@@ -667,7 +665,7 @@
                           break;
 	                } */
 		        });
-                
+                //按鈕效果
                 $(document).on("mouseup",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
 		        	var icon_default = "images/side_menu/sidemenu_icon_";
 		        	var target = $(this);
@@ -689,8 +687,20 @@
                     
                 });
                 
-                //團體新增邀請按鈕
-                $(".sm-group-cj hg_create")
+                //功能選單
+                $(".main-more-btn").click(function(){
+                	var target = $(".main-footer-add");
+                	if(target.css("bottom") == "125px"){
+                		$(".main-footer-add").animate({bottom:"194px"},function(){
+                			$(".main-footer").css("z-index","0");
+                		});	
+                	}else{
+                		$(".main-footer").css("z-index","100");
+                		$(".main-footer-add").animate({bottom:"125px"});
+                	}
+                });
+                
+                
                 
 //----------------------------------- function ---------------------------------------------                
                 //ajax

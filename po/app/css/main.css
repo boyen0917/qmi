@@ -612,10 +612,16 @@
 	text-align: center;
 }
 
+.main-footer{
+    z-index: 100;
+    position: relative;
+}
+
 .main-footer-add{
-	position: absolute;
 	width: 100%;
 	padding-left: 9px;
+	position: relative;
+    bottom: 125px;
 }
 
 .main-footer-item{
@@ -636,9 +642,19 @@
 	position: relative;
 	left: 3px;
 	bottom: 5px;
+    -webkit-user-select: none;
 }
 
 .main-footer-more img {
     width: 33px;
 }
 
+.main-more-btn {
+	width: 75px;
+	height: 70px;
+	float: right;
+	position: relative;
+	bottom: 60px;
+	cursor:pointer;
+	-webkit-user-select: none;
+}
