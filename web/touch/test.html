@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>jQuery UI Touch Punch - Mobile Device Touch Event Support for jQuery UI</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.2/jquery.ui.touch-punch.min.js"></script>
+  </head>
+  <body>
+
+    <div class="container">
+      
+
+        <style>
+        #draggable { width: 150px; height: 150px; padding: 0.5em; }
+        </style>
+        <script>
+        $(function() {
+          $( "#draggable" ).draggable();
+        });
+        </script>
+
+
+
+      <div class="demo">
+
+      <div id="draggable" class="ui-widget-content">
+        <p>Drag me around</p>
+      </div>
+
+      </div><!-- End demo -->
+
+
+
+      <div class="demo-description">
+      <p>Delay the start of dragging for a number of milliseconds with the <code>delay</code> option; prevent dragging until the cursor is held down and dragged a specifed number of pixels with the <code>distance</code> option. </p>
+      </div><!-- End demo-description -->
+
+
+      
+    </div>
+
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-29418466-1']);
+  _gaq.push(['_setDomainName', 'furf.com']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+    </body>
+</html>

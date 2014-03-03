@@ -8,173 +8,167 @@
         <link rel="stylesheet" href="css/main.css" />
         <script src="../js/jquery.js"></script>
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
+        <script src="js/sha.js"></script>
     </head>
     <body>
-        <div data-role="page" id="page-group-menu">
-            <div data-role="panel" id="side-menu" data-display="push">
-            <!-- panel content goes here -->
-            dfasdfsdfsd
-            </div>
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-                <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
-                <h3>團體列表</h3>
-                <div id="group-nav-area" data-role="navbar">
-                    <ul>        
-                        <li><a href="#" data-group-act="gl">團體列表</a></li>
-                        <li><a href="#" data-group-act="gc">創建團體</a></li>
-                        <li><a href="#" data-group-act="gj">加入團體</a></li>
-                        <li><a href="#" data-group-act="gi">團體邀請</a></li>
-                    </ul>
-                </div>
-            </div>
-            <a href="#" id="fff" data-role="button" data-theme="b" >建立</a>
-            
-            <div class="p" style="border:solid;margin:auto">
-                 adfasodifjaosidg jaosidgjoi
-                 </div>
-            <div class="group-nav-chk" data-group-act="gl">
-            </div>
-            <div class="group-nav-chk" data-group-act="gc">
-                <img class="gm-create-head" src="images/head.png"/>
-                <div class="gm-create-content-area">
-                    團體名稱
-                    <input type="text" id="group-name" placeholder="請輸入您的團體名稱">
-                    團體介紹
-                    <textarea name="textarea-8" id="group-desc"></textarea>
-                    <a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>
-                </div>
-            </div>
-            <div class="group-nav-chk" data-group-act="gj">
-                <input type="text" id="gm-group-num" placeholder="團體編號">
-                <input type="text" id="gm-group-pw" placeholder="團體密碼"/>
-                
-                <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
-            </div>
-            <div class="group-nav-chk" data-group-act="gi">
-            團體邀請
-            </div>
-            
-            <div data-role="popup" class="popup-gm" data-transition="pop">
-              <p>
-              <div class="popup-gm-text"></div>
-              <button class="popup-close" data-theme="c">確定</button>
-              </p>
-            </div>
+        <div class="popup">
+          <div class="popup-frame">
+          <div class="popup-text"></div>
+          <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
+          </div>
+          <div class="popup-screen"></div>
         </div>
-<!---------------------------------- page-password ------------------------------------>
-        <div data-role="page" id="page-password">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">返回</a>
-                <h3>密碼設定</h3>
-            </div>
-            <div data-role="content">
-                <input type="password" id="pw-setting" maxlength=20 placeholder="請輸入6-20半形英數字" onkeyup="value=value.replace(/[^-_A-Z0-9a-z]/g,'')">
-                <input type="password" id="pw-setting-c" maxlength=20 placeholder="請重複輸入密碼"/>
-                <div data-role="popup" class="popup3" data-transition="pop">
-                  <p><br/>密碼輸入不正確<br/><br/></p>
-                </div>
-                <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
-            </div>
-        </div> 
-        
-!---------------------------------- page-register-auth ------------------------------------>
-        <div data-role="page" id="page-register-auth">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a data-role="button" data-rel="back" data-icon="back" data-iconpos="left" class="ui-btn-left">back</a>
-                <h3>行動電話號碼認證</h3>
-            </div>
-            <div data-role="content">
-                 <div class="register-desc-area">
-                     我們已經將驗證碼傳送至下列電話號碼，請輸入驗證碼已完成您的手機號碼認證。<br/>
-                     <h1></h1>
-                     <input type="text" id="otp" maxlength=6 placeholder="驗證碼" onkeyup="value=value.replace(/[^-_0-9]/g,'')"/>
-                 </div>
-                 <div data-role="popup" class="popup2" data-transition="pop">
-                   <p></p>
-                 </div>
-                 <div class="resend-otp-close">重送驗證碼</div>
-                 <a href="#" id="resend-otp" data-role="button" data-theme="b" >重送驗證碼</a>
-                 <a href="#page-password" id="register-auth-next" data-role="button" data-theme="b" >下一步</a>
-            </div>
-        </div>    
-        
-<div class="popup">
-  <div class="popup-frame">
-  <div class="popup-text"></div>
-  <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
-  </div>
-  <div class="popup-screen"></div>
-</div>
-       
-<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
 
+        <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
         
+        <script src="js/sha/sha1.js"></script>
+        <script src="js/sha/enc-base64-min.js"></script>
         <script type="text/javascript">
             $(function(){
-            	/* $(document).on("click",function(){
-            		console.log("d");
-                        if($(".popup").is(":visible")){
-                        	console.log("xx");
-                            $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
-                        }   
-                }); */
-            	
-                function popupShowAdjust(desc){
-                	if(desc){
-                		$('.popup-gm .popup-gm-text').html(desc);
-                	}
-                	$(".popup").show();
-                	$(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
-                }
+            	var base_url = "https://apserver.mitake.com.tw/apiv1/";
+            	//ajax用
+                var myRand = Math.floor((Math.random()*1000)+1);
+                //=========================================
                 
-            	$("#fff").click(function(){
-            		$('.popup-text').html("電話號碼錯誤");
-            		popupShowAdjust();
-            	});
-            	
-            	
-            	$(".popup-screen").click(function(){
-            		console.log("dd");
+               /*  var api_name = "register/otp";
+                var headers = {
+                    "cc":"886",
+                    "pn":"0980922917", 
+                    "di":"qwer",
+                    "ug":"1"
+                };
+                
+                var method = "get"; */
+                
+                //=========================================
+                var api_name = "groups";
+                var headers = {
+                    "ui":"11249442-866d-4d0e-af2b-27014d8fe18c",
+                    "at":"9768fc35-a4b9-46a6-83ec-f163fd4fbbb2",
+                    "li":"zh_TW"
+                };
+                var method = "get";
+                //=========================================
+                console.log(headers);
+                var result = ajaxDo(api_name,headers,method,true);
+                result.complete(function(data){
+                    if(data.status != 200){
+                    	console.log(data);
+                        popupShowAdjust("錯誤");
+                    }else{
+                    	popupShowAdjust("成功");
+                    	console.log(data);
+                    }
+                });
+                
+                $(document).ajaxSend(function() {
+                    $('.ui-loader').css("display","block");
+                });
+                $(document).ajaxComplete(function() {
+                    $('.ui-loader').hide();
+                    $(document).trigger("click");
+                });
+                
+                $(".popup-screen").click(function(){
                     $(".popup").hide();
                     $(".popup-screen").hide();
                 });
-            	
-            	$(".popup-close").click(function(){
-                    $(".popup-screen").trigger("click");
-                })
-            	
-                //創建團體 建立
-                $("#gm-create-submit").click(function(){
-                	$('.popup-gm .popup-gm-text').html('<br/>團體名稱不可空白<br/><br/>');
-                    $('div[data-role=popup]').popup('open');
-                });
                 
-              //團體選單 點選nav
-                $("#group-nav-area li a").click(function(){
-                    var act = $(this).data("group-act");
-                    $(".group-nav-chk").each(function(i,val){
-                        if($(this).data("group-act") == act){
-                            $(this).fadeIn();
-                            //個別的動作
-                            switch (act) {
-                                case "gl": 
-                                    groupMenuListArea(ui,at);
-                                  break;
-                                case "gc": 
-                                    $(".group-create-area").find("input").val("");
-                                    $(".group-create-area").find("textarea").val("");
-                                  break;
-                                case "gj":
-                                  break;
-                                case "gi":
-                                  break;
-                            }
-                        }else{
-                            $(this).hide();
-                        }
-                    });
+                $(".popup-close").click(function(){
+                    $(".popup-screen").trigger("click");
+                    $(".popup-close").trigger("pageChange");
                 });
+//----------------------------------- function ---------------------------------------------                
+                //ajax
+                function ajaxDo(api_name,headers,method,async){
+                    //console.log(api_url);
+                    var api_url = base_url + api_name;
+                    var myRand = Math.floor((Math.random()*1000)+1);
+                    
+                    if(async){
+                        var result = $.ajax ({
+                            url: api_url,
+                            type: method,
+                            headers:headers,
+                        });/* ajax結束 */
+                    }else{
+                        var result = $.ajax ({
+                            url: api_url,
+                            type: method,
+                            headers:headers,
+                            async:false,
+                        });/* ajax結束 */
+                    }
+                    
+                    return result;
+                }
+                
+                function groupMenuListArea(ui,at){
+                    
+                    var api_name = "me/groups";
+                    var headers = {
+                        "ui":ui,
+                        "at":at
+                    };
+                    var method = "get";
+                    result = ajaxDo(api_name,headers,method);
+                    if(result.responseText){
+                        $(".sm-group-list-area").html("");
+                        $(".sm-group-list-area-add").html("");
+                        //chk是開關按鈕ui變化的檢查
+                        var tmp_selector,count,chk;
+                        var group_list = $.parseJSON(result.responseText).gl;
+                        var total = group_list.length;
                         
+                        $.each(group_list,function(i,val){
+                            if(i < 2){
+                                tmp_selector = ".sm-group-list-area";
+                            }else{
+                                tmp_selector = ".sm-group-list-area-add";
+                            }
+                            
+                            //開關按鈕ui變化
+                            if(i == 1 || total == 1){
+                                chk = "data-switch-chk=\"check\"";
+                            }
+                            if(i == total-1 ){
+                                chk = "data-switch-chk=\"check2\"";
+                            }
+                            
+                            $(tmp_selector).append(
+                                '<div class="sm-group-area" ' + chk + '>' +
+                                    '<div data-gi="' + decodeURI(val.gi) + '" class="sm-group-area-l">' +
+                                        '<img src="images/no_pic_g.png">' +
+                                    '</div>' +
+                                    '<div class="sm-group-area-r">' + decodeURI(val.gn) + '</div>' +
+                                    '<div class="sm-count">20</div>' +
+                                '</div>'
+                            );
+                        });
+                        if(group_list.length > 2){
+                            $(".sm-group-switch").show();
+                        }
+                    }
+                }
+                $(".sm-group-switch").show();
+              //計算彈出對話框置中
+                function popupShowAdjust(desc){
+                    $(".popup-frame").css("margin-left",0);
+                    if(desc){
+                        $('.popup-text').html(desc);
+                    }
+                    $(".popup-screen").show();
+                    $(".popup").show();
+                    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
+                }
+                
+                function popupAfterChangePage(dest){
+                    $(".popup-close").bind("pageChange",function(){
+                        $.mobile.changePage(dest);
+                        $(".popup-close").unbind("pageChange");
+                    });
+                }
+                
             });
         </script>
     </body>

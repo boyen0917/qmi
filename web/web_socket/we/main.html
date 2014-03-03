@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='UTF-8' />
+
+</head>
+
+<body>  
+
+<img id="crosshair" src="image/Crosshair.png">
+
+<img id="t1" src="image/target.png">
+<img id="t2" src="image/target.png">
+<img id="t3" src="image/target.png">
+<img id="t4" src="image/target.png">
+<img id="t5" src="image/target.png">
+
+
+<script src="../../js/jquery.js"></script>
+<script type="text/javascript">
+$(function(){
+	var wsUri = "ws://localhost:9000/demo/server.php"; 
+	
+	websocket = new WebSocket(wsUri);
+    websocket.onopen = function()
+    {
+    	console.log("ya");
+    };
+    websocket.onmessage = function(e) {
+    	
+    	
+        
+    	var obj = $.parseJSON(e.data);
+    	if(obj.click){
+    		console.log($("#crosshair").offset());
+    		if(isOverlap("crosshair","t1")){
+                console.log("1");
+                $("#t1").hide();
+            }else if(isOverlap("crosshair","t2")){
+                console.log("2");
+                $("#t2").hide();
+            }else if(isOverlap("crosshair","t3")){
+                console.log("3");
+                $("#t3").hide();
+            }else if(isOverlap("crosshair","t4")){
+                console.log("4");
+                $("#t4").hide();
+            }else if(isOverlap("crosshair","t5")){
+                console.log("5");
+                $("#t5").hide();
+            }
+    	}else if(obj.reset){
+            console.log("ya");
+            $("img").show();
+        }else{
+    		$("#crosshair").css("left",$("#crosshair").offset().left*1 + obj.pos_x*1);
+            $("#crosshair").css("top",$("#crosshair").offset().top*1 + obj.pos_y*1);
+    	}
+    	
+    	
+    	
+    	/* if(isOverlap("crosshair","t1")){
+    		console.log("ya");
+    	} */
+    	//$("#crosshair").html("x:" + obj.pos_x + "<br/>y:" + obj.pos_y);
+    	
+    }
+    websocket.onclose = function(){
+    }
+    
+    
+});
+
+function isOverlap(idOne,idTwo){ 
+	var objOne=$("#"+idOne), 
+	objTwo=$("#"+idTwo), 
+	offsetOne = objOne.offset(), 
+	offsetTwo = objTwo.offset(), 
+	topOne=offsetOne.top, 
+	topTwo=offsetTwo.top, 
+	leftOne=offsetOne.left, 
+	leftTwo=offsetTwo.left, 
+	widthOne = objOne.width(), 
+	widthTwo = objTwo.width(), 
+	heightOne = objOne.height(), 
+	heightTwo = objTwo.height(); 
+	var leftTop = leftTwo > leftOne && leftTwo < leftOne+widthOne 
+	&& topTwo > topOne && topTwo < topOne+heightOne, 
+	rightTop = leftTwo+widthTwo > leftOne && leftTwo+widthTwo < leftOne+widthOne 
+	&& topTwo > topOne && topTwo < topOne+heightOne, 
+	leftBottom = leftTwo > leftOne && leftTwo < leftOne+widthOne 
+	&& topTwo+heightTwo > topOne && topTwo+heightTwo < topOne+heightOne, 
+	rightBottom = leftTwo+widthTwo > leftOne && leftTwo+widthTwo < leftOne+widthOne 
+	&& topTwo+heightTwo > topOne && topTwo+heightTwo < topOne+heightOne; 
+	return leftTop || rightTop || leftBottom || rightBottom; 
+	} 
+
+
+</script>
+<style>
+
+body{
+    background:url(image/bg.png) repeat-y center;
+    background-size:100%;
+}
+
+#crosshair{
+    width:100px;
+    position:absolute;
+    z-index:100;
+}
+
+#t1{
+    position:absolute;
+    top:380px;
+    left:20px;
+}
+
+#t2{
+    position:absolute;
+    top:338px;
+    left:235px;
+}
+
+#t3{
+    position:absolute;
+    top:300px;
+    left:850px;
+}
+
+#t4{
+    position:absolute;
+    top:222px;
+    left:450px;
+}
+
+#t5{
+    position:absolute;
+    top:20px;
+    left:700px;
+}
+
+</style>
+</body>
+</html>

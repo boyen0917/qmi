@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>WebSocket Test</title>
+    <script src="../js/jquery.js"></script>
+    <script type="text/javascript">
+    $(function(){
+        var wsUri = "ws://echo.websocket.org/";
+        var output;
+if(location.hash){
+	console.log("i can make it");
+}else{
+	console.log("i'd better go home");
+}
+        return;
+        $("#submit").click(function(){
+            console.log("click:"+$("#input").val());
+            websocket.send($("#input").val());
+        })
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function()
+        {
+            $("#input").attr("readonly",false);
+        };
+        websocket.onmessage = function(e) {
+            console.log("websocket:");
+            console.log(e);
+        }
+        websocket.onclose = function(){
+            console.log("connect close");
+        }
+    });
+      
+     
+    </script>
+  </head>
+  
+  <body>
+    <h2>WebSocket Test</h2>
+    <input type="text" id="input1" readonly/>
+    <button id="submit">send</button>
+    
+  </body>
+</html> 
