@@ -1,6 +1,6 @@
 <?php 
 
-print sha1("1234");exit;
+print sha1("1234",true);exit;
 
  $_POST['api_url'] = 'http://54.238.141.68:8090/apiv1/register/otp';
  $_POST['headers'] = 'cc: 

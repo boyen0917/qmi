@@ -196,15 +196,31 @@
             <div data-role="content">
 	            <div class="main-user-area">
 	               <div class="main-user-area-l"><img class="sm-user-pic" src="images/user_pic.png"/></div>
-                   <div class="main-user-area-r"></div>
+                   <div class="main-user-area-r color-white"></div>
 	            </div>
 	            <div class="main-contact-l">
 	               <div class="main-contact-l-content-area">
 		               <div class="main-contact-l-row">全部聯絡人<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-		               <div class="main-contact-l-row">我的最愛<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-		               <div class="main-contact-l-row">總經理室<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-		               <div class="main-contact-l-row">管理部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
-		               <div class="main-contact-l-row">財會部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+		               <div data-main-sub-chk="y" class="main-contact-l-row">我的最愛<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+		               <div class="main-contact-l-row-subarea">
+                          <div class="main-contact-l-subarea-row">科技部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+                       </div>
+		               <div data-main-sub-chk="y" class="main-contact-l-row">總經理室<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+		               <div class="main-contact-l-row-subarea">
+		                  <div class="main-contact-l-subarea-row">策略行銷部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+		                  <div class="main-contact-l-subarea-row">科技部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+		               </div>
+		               <div data-main-sub-chk="y" class="main-contact-l-row">管理部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+		               <div class="main-contact-l-row-subarea">
+                          <div class="main-contact-l-subarea-row">廉政部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+                          <div class="main-contact-l-subarea-row">行政部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+                       </div>
+		               <div data-main-sub-chk="y" class="main-contact-l-row">財會部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+		               <div class="main-contact-l-row-subarea">
+                          <div class="main-contact-l-subarea-row">聚餐部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+                          <div class="main-contact-l-subarea-row">查帳部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+                       </div>
+                       
 	               </div>
 	            </div>
 	            <div class="main-contact-r">
@@ -261,7 +277,7 @@
 	                <div class="main-more-btn"></div>
 	            </div><!-- /footer -->
 	            <div class="main-footer-add">
-                    <div data-main-act="noti" class="main-footer-item"><img src="images/contact/toolbar_icon_notification.png"/><div class="main-footer-desc">通報專區</div></div>
+                    <div data-main-act="notification" class="main-footer-item"><img src="images/contact/toolbar_icon_notification.png"/><div class="main-footer-desc">通報專區</div></div>
                     <div data-main-act="command" class="main-footer-item"><img src="images/contact/toolbar_icon_command.png"/><div class="main-footer-desc">命令</div></div>
                     <div data-main-act="calendar" class="main-footer-item"><img src="images/contact/toolbar_icon_calendar.png"/><div class="main-footer-desc">行事曆</div></div>
                     <div data-main-act="file" class="main-footer-item"><img src="images/contact/toolbar_icon_file.png"/><div class="main-footer-desc">檔案</div></div>
@@ -288,6 +304,7 @@
             $(function(){
             	//api 網址
                 var base_url = "https://apserver.mitake.com.tw/apiv1/";
+            	//var base_url = "http://10.1.17.116:8090/apiv1/";
             	//ajax用
                 var myRand = Math.floor((Math.random()*1000)+1);
                 
@@ -347,7 +364,8 @@
                     var headers = {
                         "pn":$("#phone").val(),
                         "up":toSha1Encode($("#code").val()), 
-                        "gm":""
+                        "ns":"",
+                        "li":"zh_TW"
                     };
                     var method = "post";
                     var result = ajaxDo(api_name,headers,method,true);
@@ -357,13 +375,29 @@
                         }else{
                         	ui = $.parseJSON(data.responseText).ui;
                             at = $.parseJSON(data.responseText).at;
-                            //取得團體列表
                             console.log(ui);
                             console.log(at);
+                        	
+                        	//取得個人資料 左側選單 聯絡人
+                            var api_name = "auth";
+                            var headers = {
+                                "ui":ui,
+                                "at":at,
+                                "li":"zh_TW"
+                            };
+                            var method = "put";
+                            ajaxDo(api_name,headers,method,true).complete(function(data){
+                                var nk = $.parseJSON(data.responseText).nk;
+                                var sl = $.parseJSON(data.responseText).sl;
+                                $(".sm-user-area-r, .main-user-area-r").html(nk + "<br/>" + sl);
+                            });
+                        	
+                            //取得團體列表
                             var api_name = "groups";
                             var headers = {
                                 "ui":ui,
-                                "at":at
+                                "at":at,
+                                "li":"zh_TW"
                             };
                             var method = "get";
                             var result = ajaxDo(api_name,headers,method,true);
@@ -410,7 +444,7 @@
                     		"cc":"886",
 							"pn":$("#r-phone").val(), 
 							"di":device_token,
-							"ug":"1"
+							"li":""
                     	};
                     	var method = "get";
                     	var result = ajaxDo(api_name,headers,method,true);
@@ -552,8 +586,6 @@
                         var result = ajaxDo(api_name,headers,method,true);
                         result.complete(function(data){
                             if(data.status = 200){
-                            	console.log("a");
-                            	console.log($(".popup-frame").width());
                             	popupShowAdjust("創建成功。");
                                 popupAfterChangePage("#page-group-main");
                             }else{
@@ -594,21 +626,7 @@
 		                $(".sm-user-area-l").html("<img class=\"sm-user-pic\" src=\"images/user_pic.png\"/>");
 		                //計數
 		                $("div[data-sm-act=feed] .sm-count").show();
-		                
-		                //取得個人資料
-		            	var api_name = "auth";
-                        var headers = {
-                            "ui":ui,
-                            "at":at
-                        };
-                        var method = "put";
-                        ajaxDo(api_name,headers,method,true).complete(function(data){
-                        	var nk = $.parseJSON(data.responseText).nk;
-                            var sl = $.parseJSON(data.responseText).sl;
-                            
-                            $(".sm-user-area-r").html(nk + "<br/>" + sl);
-                            $(".sm-group-area .sm-count").show();
-                        });
+                        $(".sm-group-area .sm-count").show();
                         
                         //團體列表
                         groupMenuListArea(ui,at);
@@ -686,7 +704,7 @@
                     
                     
                 });
-                
+//----------------------------------- 聯絡人 ---------------------------------------------  
                 //功能選單
                 $(".main-more-btn").click(function(){
                 	var target = $(".main-footer-add");
@@ -700,7 +718,59 @@
                 	}
                 });
                 
+                //功能選單 按鈕效果
+                $(".main-footer-item").click(function(){
+                	var img_url = "images/contact/toolbar_icon_";
+                	$(".main-footer-item").each(function(i,val){
+                		$(this).children().attr("src",img_url + $(this).data("main-act") + ".png");
+                		$(this).find("div").removeClass("color-white");
+                	});
+                	$(this).children().attr("src",img_url + $(this).data("main-act") + "_active.png");
+                	$(this).find("div").addClass("color-white");
+                });
                 
+                //團體群組 按鈕效果
+                $(".main-contact-l-row").click(function(){
+                	var ori_target = $(this);
+                    var img_url = "images/contact/contact_sidemenu_";
+                    //將聯絡人群組全部換成關閉狀態
+                    $(".main-contact-l-row").css("background","url(" + img_url + "rowbg.png)");
+                    $(".main-contact-l-row img").attr("src",img_url + "icon_arrow.png");
+                    $(".main-contact-l-row").removeClass("color-white");
+                    
+                    //目標群組換成按下效果
+                    ori_target.css("background","url(" + img_url + "rowbg_unfold.png)");
+                    ori_target.addClass("color-white");
+                    
+                    //關閉所有子群組使用動畫效果
+                    $(".main-contact-l-row-subarea").each(function(i,val){
+                    	//不是現在按下的子群組同時高度不為零 表示除了現在按下的以外 全部用動畫效果來關閉
+                    	if(!$(this).is(ori_target.next()) && $(this).css("height") != "0px"){
+                    		$(this).animate({height:"0px"},function(){
+                    			$(this).hide();	
+                    		});
+                        }
+                    });
+                    
+                    //判斷開啓子群組
+                    if(ori_target.data("main-sub-chk")){
+                    	//動畫呈現部門子群組
+                    	var subarea = ori_target.next();
+                        subarea.show();
+                        var subrow = subarea.find(".main-contact-l-subarea-row");
+                        if(subarea.css("height") == "0px"){
+                            subarea.animate({height:subrow.length*43}); 
+                        }else{
+                        	subarea.animate({height:"0px"},function(){
+                        		subarea.hide(); 
+                            });
+                        }
+                        ori_target.children().attr("src",img_url + "icon_arrow_white_below.png");
+                    }else{
+                    	ori_target.children().attr("src",img_url + "icon_arrow_white.png");	
+                    	$(".main-contact-l-subarea-row").height("opx");
+                    }
+                });
                 
 //----------------------------------- function ---------------------------------------------                
                 //ajax
@@ -728,15 +798,14 @@
                 }
                 
                 function groupMenuListArea(ui,at){
-                    
                     var api_name = "groups";
                     var headers = {
                         "ui":ui,
-                        "at":at
+                        "at":at,
+                        "li":"zh_TW"
                     };
                     var method = "get";
                     result = ajaxDo(api_name,headers,method);
-                    console.log(result);
                     if(result.responseText){
                     	$(".sm-group-list-area").html("");
                     	$(".sm-group-list-area-add").html("");
@@ -797,6 +866,10 @@
                 	var hash = CryptoJS.SHA1(string);
                     var toBase64 = hash.toString(CryptoJS.enc.Base64);
                     return toBase64;
+                }
+                
+                function changeImg(target,group){
+                	
                 }
             });
         </script>
