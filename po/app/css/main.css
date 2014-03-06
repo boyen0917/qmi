@@ -642,6 +642,7 @@
 .main-footer{
     z-index: 100;
     position: relative;
+    height: 50px;
 }
 
 .main-footer-add{
