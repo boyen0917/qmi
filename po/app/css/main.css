@@ -322,6 +322,10 @@
 
 /* ======================= 左側選單 =================================*/
 
+#page-group-main {
+    background: #3a3d41;
+}
+
 #side-menu{
 	background:#3a3d41;
 	color: #f5f5f5;
@@ -374,12 +378,12 @@
 }
 
 .sm-small-area {
-    clear: both;
-	height: 30px;
-	line-height: 25px;
-	padding: 10px;
+	clear: both;
+	height: 40px;
+	line-height: 28px;
 	padding-left: 20px;
-	cursor:pointer;
+	cursor: pointer;
+	background: url(../images/side_menu/sidebar_group_bg01.png)repeat-x;
 }
 
 .sm-small-area-l {
@@ -419,6 +423,7 @@
 
 .sm-group-area {
     height: 71px;
+    background: url(../images/side_menu/sidemenu_slidedown_bg.png);
 }
 
 .sm-group-area-l {
@@ -490,6 +495,7 @@
 	line-height: 40px;
 	text-align: center;
 	margin: 2px 0px 10px 6px;
+	cursor:pointer;
 }
 
 ::-webkit-scrollbar { 
@@ -684,3 +690,137 @@
 .color-white{
 	color:white;
 }
+
+/* =============================== page chatroom ==================================== */
+
+#page-chatroom {
+    background: #dce1eb;
+}
+
+.chatroom-addstate-top-btn {
+	background: url(../images/chatroom/ss_chat_arrow_below.png) no-repeat center;
+	width: 33px;
+	height: 25px;
+	position: absolute;
+	right: 5px;
+	top: 10px;
+	cursor:pointer;
+}
+
+.chatroom-footer img, .char-bar-input {
+    float: left;
+}
+
+.char-bar-input:focus{ outline:none } 
+
+/* .chatroom-footer {
+	background: rgb(239,239,239);
+	border: double 7px;
+    height: 30px;
+	border-image: url("../images/chatroom/chat_textbar_bgimg.png") 12 round stretch;
+	display: inline-block;
+	width: 100%;
+} */
+
+.chatroom-footer {
+    height: 44px;
+    background: url("../images/chatroom/textbar_bg46.png") repeat-x;
+    display: inline-block;
+    width: 100%;
+    border-bottom: 1px solid rgb(218,218,218);
+    position:fixed;
+    bottom:0px;
+}
+
+.chat-bar-input {
+	margin: 8px 0 0 5%;
+	width: 70%;
+	height: 28px;
+	border-radius: 7px;
+	border: 1px solid rgb(194,194,194);
+	padding-left: 10px;
+	font-size: 14px;
+}
+
+.chat-bar-input:focus{
+	outline:none;
+}
+
+.chatroom-footer img {
+    margin: 11px 0 0 4%;
+    cursor:pointer;
+}
+
+.chat-bar-send {
+	background: rgb(13,63,106);
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	float: right;
+	border: 1px solid rgb(22,55,110);
+	width: 50px;
+	height: 30px;
+	line-height: 30px;
+	color: white;
+	font-size: 15px;
+	border-radius: 0 7px 7px 0;
+	text-align: center;
+	cursor:pointer;
+}
+
+.chatroom-addstate-area {
+	position: fixed;
+	bottom: -166px;
+	text-align:center;
+    background: rgb(231,231,231);
+    width:100%;
+}
+
+.chatroom-addstate-bg {
+    background: url(../images/chatroom/chat_addstate_bg.png) repeat-x;
+	width: 100%;
+	height: 3px;
+	position: relative;
+	top: 1px;
+}
+
+.chatroom-addstate-box {
+	width: 32.83%;
+	border:1px solid rgb(240,240,240);
+	border-right-color:rgb(227,227,227);
+	border-bottom-color:rgb(227,227,227);
+}
+
+.chatroom-addstate-box-click{
+	background:#d2d2d2;
+}
+
+.chatroom-addstate-top-box-click{
+    background:#19253c;
+}
+
+.chatroom-addstate-box, .chatroom-addstate-top-box{
+	float: left;
+    height: 50px;
+    padding: 15px 0;
+    cursor:pointer;
+}
+
+.chatroom-addstate-top-area{
+	position: fixed;
+    top: -200px;
+    text-align:center;
+    background: rgb(45,52,65);
+    color:#b0b9ca;
+    font-size: 14px;
+    width:100%;
+}
+
+.chatroom-addstate-top-box{
+    width: 24.5%;
+    border:1px solid rgb(44,53,65);
+    border-right-color:rgb(36,45,57);
+    border-bottom-color:rgb(36,45,57);
+}	
+	
+	

@@ -1,7 +1,7 @@
 .gitignore
 po/upload/file_list.json
 po/upload/files/
-po/app/images/
+po/app/images/*
 po/upload/files/.htaccess
 *.htaccess
 *DS_Store

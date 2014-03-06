@@ -169,7 +169,7 @@
                 <div class="sm-group-list-area-add">
                     
                 </div>
-                <div class="sm-group-switch"><div class="sm-switch-ui-adj"></div><img src="images/side_menu/sidemenu_slidedown_icon_none.png"/></div>
+                <div class="sm-group-switch"><div class="sm-switch-ui-adj"></div><img src="images/side_menu/sidemenu_slidedown_icon_click.png"/></div>
                 <div class="sm-group-cj">
 	                <div class="hg-create sm-group-cj-btn">新增團體</div>
 	                <div class="hg-invited sm-group-cj-btn" >團體邀請</div>
@@ -286,7 +286,49 @@
             </div>
             <div class="clear"></div>
         </div><!-- /page-group-main -->
-        
+<!---------------------------------- page-chatroom ------------------------------------>
+        <div data-role="page" id="page-chatroom">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"></div>
+                <h3>老大</h3>
+                <div class="chatroom-addstate-top-btn"></div>
+            </div>
+            <div class="chatroom-addstate-top-area">
+                <div data-chat-b-act="editgup" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_editgup.png"><div>編輯群組</div></div>
+                <div data-chat-b-act="invit" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_invit.png"><div>邀請</div></div>
+                <div data-chat-b-act="nonotice" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_nonotice.png"><div>關閉通知</div></div>
+                <div data-chat-b-act="leave" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_leave.png"><div>離開聊天室</div></div>
+                <div data-chat-b-act="calendar" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_calendar.png"><div>事件</div></div>
+                <div data-chat-b-act="file" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_file.png"><div>檔案</div></div>
+                <div data-chat-b-act="backup" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_backup.png"><div>備份聊天記錄</div></div>
+                <div data-chat-b-act="search" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_search.png"><div>查詢聊天訊息</div></div>
+                <div data-chat-b-act="work" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_work.png"><div>工作</div></div>
+                <div data-chat-b-act="questionnaire" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_questionnaire.png"><div>問卷</div></div>
+                <div data-chat-b-act="vote" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_vote.png"><div>投票</div></div>
+                <div data-chat-b-act="direction" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_direction.png"><div>定點回報</div></div>
+            </div>
+            <div data-role="content">
+            </div>
+            <div class="chatroom-footer">
+                <img class="chat-bar-add" src="images/chatroom/chat_textbar_icon_add.png"/>
+                <img class="chat-bar-emoticon" src="images/chatroom/chat_textbar_icon_emoticon.png"/>
+                <input class="chat-bar-input" type="text" placeholder="輸入訊息" data-role="none" />
+                <div class="chat-bar-send">傳送</div>
+            </div>
+            <div class="chatroom-addstate-area">
+                <div class="chatroom-addstate-bg"></div>
+                <div data-chat-b-act="pic" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_pic.png"><div>選擇照片</div></div>
+                <div data-chat-b-act="takepic" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_takepic.png"><div>拍攝照片</div></div>
+                <div data-chat-b-act="voice" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_voice.png"><div>傳送聲音訊息</div></div>
+                <div data-chat-b-act="direction" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_direction.png"><div>傳送位置訊息</div></div>
+                <div data-chat-b-act="file" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_file.png"><div>傳送檔案</div></div>
+                <div  class="chatroom-addstate-box"></div>
+            </div>
+        </div>
+
+
+
+<!---------------------------------- 全域 ------------------------------------>        
 		<div class="popup">
 		  <div class="popup-frame">
 		  <div class="popup-text"></div>
@@ -638,9 +680,9 @@
                 	$(".sm-group-list-area-add").slideToggle(
                			function(){
                				if($(".sm-group-list-area-add").is(":visible")){
-               					$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_click.png");
+               					$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_none.png");
                				}else{
-               					$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_none.png");	
+               					$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_click.png");	
                				}
                			}
                		);
@@ -700,7 +742,7 @@
                         }
                     	target.removeClass("sm-click-bg");
                     	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
-                    	},1000);
+                    	},500);
                     
                     
                 });
@@ -712,7 +754,7 @@
                 		$(".main-footer-add").animate({bottom:"194px"},function(){
                 			$(".main-footer").css("z-index","0");
                 		});	
-                	}else{
+                	}else if($(".main-footer").css("z-index") == "0"){
                 		$(".main-footer").css("z-index","100");
                 		$(".main-footer-add").animate({bottom:"125px"});
                 	}
@@ -720,6 +762,7 @@
                 
                 //功能選單 按鈕效果
                 $(".main-footer-item").click(function(){
+                	var main_act = $(this).data("main-act");
                 	var img_url = "images/contact/toolbar_icon_";
                 	$(".main-footer-item").each(function(i,val){
                 		$(this).children().attr("src",img_url + $(this).data("main-act") + ".png");
@@ -727,6 +770,12 @@
                 	});
                 	$(this).children().attr("src",img_url + $(this).data("main-act") + "_active.png");
                 	$(this).find("div").addClass("color-white");
+
+                    switch (main_act) {
+	                    case "chat":
+	                        $.mobile.changePage("#page-chatroom");
+	                      break;
+	                }
                 });
                 
                 //團體群組 按鈕效果
@@ -762,6 +811,7 @@
                             subarea.animate({height:subrow.length*43}); 
                         }else{
                         	subarea.animate({height:"0px"},function(){
+                        		ori_target.children().attr("src",img_url + "icon_arrow_white.png");
                         		subarea.hide(); 
                             });
                         }
@@ -771,7 +821,46 @@
                     	$(".main-contact-l-subarea-row").height("opx");
                     }
                 });
+//----------------------------------- chatroom ---------------------------------------------
+                $(".chatroom-addstate-top-btn").click(function(){
+                    if($(".chatroom-addstate-top-area").css("top") == "-200px"){
+                        $(".chatroom-addstate-top-area").animate({top:"40px"}); 
+                    }else{
+                        $(".chatroom-addstate-top-area").animate({top:"-200px"}); 
+                    }
+                });
                 
+                $(".chat-bar-add").click(function(){
+                	if($(".chatroom-footer").css("bottom") == "0px"){
+                		$(".chatroom-footer").animate({bottom:"165px"},function(){
+                            $(".chat-bar-send").css("bottom","4px");
+                        }); 
+                        $(".chatroom-addstate-area").animate({bottom:"0px"}); 
+                	}else{
+                		$(".chatroom-footer").animate({bottom:"0px"},function(){
+                            $(".chat-bar-send").css("bottom","5px");
+                        }); 
+                        $(".chatroom-addstate-area").animate({bottom:"-166px"}); 
+                	}
+                });
+                
+                // 聊天功能上方 按鈕效果
+                $(".chatroom-addstate-top-box").click(function(){
+                	var target = $(this);
+                	target.addClass("chatroom-addstate-top-box-click");
+                    setTimeout(function(){
+                    	target.removeClass("chatroom-addstate-top-box-click");
+                        },500);
+                });
+                
+                // 聊天功能下方 按鈕效果
+                $(".chatroom-addstate-box").click(function(){
+                    var target = $(this);
+                    target.addClass("chatroom-addstate-box-click");
+                    setTimeout(function(){
+                        target.removeClass("chatroom-addstate-box-click");
+                        },500);
+                });
 //----------------------------------- function ---------------------------------------------                
                 //ajax
                 function ajaxDo(api_name,headers,method,async){
@@ -866,10 +955,6 @@
                 	var hash = CryptoJS.SHA1(string);
                     var toBase64 = hash.toString(CryptoJS.enc.Base64);
                     return toBase64;
-                }
-                
-                function changeImg(target,group){
-                	
                 }
             });
         </script>
