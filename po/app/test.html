@@ -6,12 +6,33 @@
         <script src="../js/jquery.js"></script>
     </head>
     <body>
-        <a href="index.html" onclick="window.open(this.href, 'mywin',
-'left=20,top=20,width=400,height=667,toolbar=1,resizable=0'); return false;" >Share this</a>
+        <div class="speech">asdfasdfsdfasdf</div>
 
+        <style>
+        .speech {
+            position:relative;
+            margin:auto;
+            height:200px;
+            width:200px;
+            background:#d2d2d2;
+        } 
         
+        .speech:before {
+			content: "";
+			position: absolute;
+			z-index: -1;
+			
+        }
+        .speech:after {
+			content: "";
+			position: absolute;
+			z-index: -1;
+			
+		}
+        </style>
         <script type="text/javascript">
             $(function(){
+                
             });
         </script>
     </body>

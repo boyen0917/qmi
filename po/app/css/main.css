@@ -696,6 +696,8 @@
 
 #page-chatroom {
     background: #dce1eb;
+    position:relative;
+    z-index:-2;
 }
 
 .chatroom-addstate-top-btn {
@@ -823,5 +825,67 @@
     border-right-color:rgb(36,45,57);
     border-bottom-color:rgb(36,45,57);
 }	
+
+.chat-other {
+	height: 80px;
+}
+
+.chat-other-subarea {
+    padding-top: 6px;
+    color:#aeb3bd;
+}
+
+.chat-other img {
+	float:left;
+	width: 40px;
+	height: 40px;
+	border: solid;
+	border-color: rgb(178,185,188);
+	border-width: 1px;
+	border-radius: 5px;
+	margin: 10px 6px 0 10px;
+}
 	
-	
+.chat-other-text {
+	float: left;
+	position: relative;
+	background: #fff;
+	padding: 8px;
+	left: 20px;
+	top: 8px;
+	border-radius: 15px;
+	color:#000;
+	max-width:60%;
+}
+
+.chat-other-text:before{
+	content: "";
+	position: absolute;
+	z-index: -1;
+	width: 18px;
+	height: 14px;
+	left: -11px;
+	top: 3px;
+	background: #fff;
+	border-bottom-left-radius: 11px 14px;
+}
+
+.chat-other-text:after{
+    content: "";
+	position: absolute;
+	z-index: -1;
+	width: 15px;
+	height: 10px;
+	top: -2px;
+	left: -11px;
+	background: #dce1eb;
+	border-bottom-left-radius: 9px 8px;
+}
+
+.chat-other-time {
+	display:flex;
+	position: relative;
+	top: 25px;
+	left: 25px;
+	font-size: 12px;
+}

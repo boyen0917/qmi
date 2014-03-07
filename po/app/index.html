@@ -290,7 +290,7 @@
         <div data-role="page" id="page-chatroom">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"></div>
-                <h3>老大</h3>
+                <h3>三竹資訊</h3>
                 <div class="chatroom-addstate-top-btn"></div>
             </div>
             <div class="chatroom-addstate-top-area">
@@ -308,6 +308,29 @@
                 <div data-chat-b-act="direction" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_direction.png"><div>定點回報</div></div>
             </div>
             <div data-role="content">
+            
+            <div class="chat-other">
+                <img src="images/2.jpg">
+                <div class="chat-other-subarea">
+                    <div>仁甫</div>
+                    <div class="chat-other-text">
+                        大家對新產品有什麼看法
+                    </div>
+                    <div class="chat-other-time">10:12</div>
+                </div>
+            </div>
+            
+            <div class="chat-other">
+                <img src="images/2.jpg">
+                <div class="chat-other-subarea">
+                    <div>仁甫</div>
+                    <div class="chat-other-text">
+                        季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正
+                    </div>
+                    <div class="chat-other-time">10:12</div>
+                </div>
+            </div>
+            
             </div>
             <div class="chatroom-footer">
                 <img class="chat-bar-add" src="images/chatroom/chat_textbar_icon_add.png"/>
@@ -410,6 +433,11 @@
                         "li":"zh_TW"
                     };
                     var method = "post";
+                    
+                    console.log(base_url + api_name);
+                    console.log(method);
+                    console.log(headers);
+                    
                     var result = ajaxDo(api_name,headers,method,true);
                     result.complete(function(data){
                         if(data.status != 200){
