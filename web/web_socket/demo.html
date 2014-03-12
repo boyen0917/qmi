@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -9,19 +8,13 @@
     $(function(){
         var wsUri = "ws://echo.websocket.org/";
         var output;
-if(location.hash){
-	console.log("i can make it");
-}else{
-	console.log("i'd better go home");
-}
-        return;
         $("#submit").click(function(){
-            console.log("click:"+$("#input").val());
             websocket.send($("#input").val());
         })
         websocket = new WebSocket(wsUri);
         websocket.onopen = function()
         {
+        	console.log(11);
             $("#input").attr("readonly",false);
         };
         websocket.onmessage = function(e) {
@@ -31,6 +24,9 @@ if(location.hash){
         websocket.onclose = function(){
             console.log("connect close");
         }
+        websocket.onerror = function(){
+            console.log(",,,,");
+        }
     });
       
      
@@ -39,7 +35,7 @@ if(location.hash){
   
   <body>
     <h2>WebSocket Test</h2>
-    <input type="text" id="input1" readonly/>
+    <input type="text" id="input" readonly/>
     <button id="submit">send</button>
     
   </body>

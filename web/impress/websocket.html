@@ -1,0 +1,287 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1024" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>impress.js | presentation tool based on the power of CSS3 transforms and transitions in modern browsers | by Bartek Szopka @bartaz</title>
+    <link href="css/impress-demo.css" rel="stylesheet" />
+    <link href="css/main.css" rel="stylesheet" />
+    
+    <link rel="shortcut icon" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <script src="js/jquery.js"></script>
+</head>
+
+<body class="impress-not-supported">
+
+<div id="impress">
+
+	<div id="p1" class="step slide" data-x="0" data-y="0">
+	        <div class="title-ws center-ws">WebSocket 實作分享</div>
+	        <!-- <img src="images/html5_icon.png"/> -->
+	</div>
+	
+	<div id="p2" class="step slide" data-x="1000" data-y="0">
+	    <div class="title-ws">什麼是websocket?</div>
+	    <br/>
+	    <div class="popup"><img src="images/handshake.png"/></div>
+	    <div class="later">Web Socket 是 HTML5 開始提供的一種瀏覽器與伺服器間進行全雙工通訊的網路技術。</div>
+	    <div class="later">WebSocket 通訊協定於 2011 年被 IETF 定為標準 <div class="rfc red">RFC 6455</div>WebSocketAPI 被 W3C 定為標準。</div>
+        <div class="later">在 WebSocket API 中，瀏覽器和伺服器需要做一個握手(handshake)的動作</div>
+        <div class="later dopopup"></div>
+        <div class="later">根據 websocket.org的說明:<br/>HTML5 Web Sockets 不僅僅只是進步 更是革命性的前進 提供更 即時的、事件導向的 web app </div>
+	</div>
+    
+    <div id="" class="step slide" data-x="2000" data-y="0">
+        <div class="title-ws">web server 交互過程</div>
+        <div class="later">
+            <div>Http Request:</div>
+            <ul style="list-style-type:circle;margin-left:10px;">
+	            <li style="margin:10px;">AJAX</li>
+	            <li class="later" style="margin:10px;">Polling</li>
+		        <li class="later" style="margin:10px;">Comet</li>
+		        <li class="later" style="margin:10px;">Long Polling</li>
+            </ul>
+            <ul class="later">
+            <li style="margin:10% 0 0 10%; font-size:80px;">WebSocket</li>
+            </ul>
+        </div>
+    </div>
+	
+	<div class="step slide" data-x="3000" data-y="0" data-rotate="90">
+	   
+        <div><img style="width:40%; margin:20% 0 0 30%" src="images/kewang.jpg"/></div>
+        <marquee class="later">感謝Ｋ旺大大～～</marquee>
+    </div>
+	
+	<div id="polling" class="step slide" data-x="3000" data-y="1000" data-rotate="90">
+        <div class="title-ws">polling</div>
+        <div class="replace"><img width="100%" src="images/chart_adv.png"/></div>
+        <div class="replace"><img width="100%" src="images/chart_compare.png"/></div>
+        <div class="replace code-area fixed" style="font-size:20px;"></div>
+    </div>
+	
+	<div id="comet" class="step slide" data-x="3000" data-y="2000" data-rotate="90">
+        <div class="title-ws">Comet</div>
+        <div class="replace"><img width="70%" src="images/comet.png"/></div>
+        <div class="replace code-area fixed"></div>
+        <div class="replace">
+            server.php:<br/>
+            <div class="code-area">
+	            &lt;script type="text/javascript"&gt;<br/>
+	                &nbsp;&nbsp;&nbsp;&nbsp;doWrite(1394443917);<br/>
+	            &lt;/script&gt;
+            </div>
+            <br/><br/>
+            client.html:<br/>
+            <div class="code-area">
+	            var doWrite = function(text){<br/>
+				&nbsp;&nbsp;&nbsp;&nbsp;target.innerHTML = target.innerHTML + text;<br/>
+				}
+			</div>
+        </div>
+    </div>
+    
+    <div id="long-polling" class="step slide" data-x="3000" data-y="3000" data-rotate="90">
+        <div class="title-ws">long-polling</div>
+        <img width="100%" src="images/long_polling.png"/>
+    </div>
+    
+    <div id="websocket-example" class="step slide" data-x="3000" data-y="4000" data-rotate="90">
+        <div class="title-ws">WebSocket</div>
+        <div class="later code-area">
+        </div>
+    </div>
+    
+	<div id="" class="step slide" data-x="2000" data-y="2000" data-rotate="90">
+        <div class="title-ws">Web Socket 協議 </div>
+        <div class="later">以下是引自 IETF RFC 6455 的範例:</div>
+        <div class="replace">
+                用戶端必需在 HTTP header加入:
+                <div class="code-area">
+					GET /chat HTTP/1.1<br/>
+					Host: server.example.com<br/>
+					Upgrade: websocket<br/>
+					Connection: Upgrade<br/>
+					Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==<br/>
+					Origin: http://example.com<br/>
+					Sec-WebSocket-Protocol: chat, superchat<br/>
+					Sec-WebSocket-Version: 13<br/>
+				</div>
+        </div>
+        <div class="replace">
+            WebSocket 伺服器端回應請求:
+            <div class="code-area">
+                HTTP/1.1 101 Switching Protocols<br/>
+				Upgrade: websocket<br/>
+				Connection: Upgrade<br/>
+				Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=<br/>
+				Sec-WebSocket-Protocol: chat<br/>
+            </div>
+            
+        </div>
+    </div>
+    
+    <div id="" class="step slide" data-x="2000" data-y="3000" data-rotate="90">
+        <div class="title-ws">從伺服器端傳送數據</div>
+        <div class="later">RFC 6455 的 frame header</div>
+        <div class="later"><img width="100%" src="images/frame_header.png"/></div>
+    </div>
+    
+    <div id="" class="step slide" data-x="2000" data-y="4000" data-rotate="90">
+        <div class="title-ws">Web Socket 實現 - Server 端</div>
+        <div class="later">
+            <br/><br/>
+			*&nbsp;&nbsp;Kaazing WebSocket Gateway<br/><br/>
+			
+			*&nbsp;&nbsp;mod_pywebsocket<br/><br/>
+			
+			*&nbsp;&nbsp;node.js：socket.io<br/><br/>
+        </div>
+    </div>
+    
+    <div id="" class="step slide" data-x="2000" data-y="5000">
+        <div class="title-ws">Web Socket 實現 - Client 端</div>
+        <div class="replace">
+           <img src="images/websocket.png"/>
+        </div>
+        <div class="replace code-area">
+            <img class="pic-sml" src="images/client_code.png"/>    
+        </div>
+    </div>
+    
+    <div id="" class="step slide" data-x="2000" data-y="6000">
+        <div class="title-ws">用 JSON 傳輸物件</div>
+        <div class="replace code-area">
+            <img class="pic-sml" src="images/client_code2.png"/>    
+        </div>
+    </div>
+    
+    <div id="websocket-chatroom" class="step slide" data-x="3000" data-y="6000">
+        <div class="title-ws">聊天室</div>
+        <div class="later">
+        </div>
+    </div>
+    
+    <div id="websocket-game" class="step slide" data-x="4000" data-y="6000" >
+        <div class="title-ws">html5 遊戲 SebSocket相關</div>
+        <div class="replace"></div>
+        <div class="replace">
+        <a href="http://chrome.com/supersyncsports/"><img src="images/google.png"</a>
+        </div>
+    </div>
+    
+   
+</div>
+
+<div class="hint">
+    <p>Getting Started!!</p>
+</div>
+<div class="popup-cover"></div>
+<script>
+
+$(document).ready(function(){
+	var count = 0;
+	$(".step.slide").dblclick(function(){
+		
+		if($(this).find(".later:eq(" + count + ").dopopup").length){
+			$(".popup-cover").fadeIn('4000');
+			$(this).find(".popup").fadeIn();
+            
+        }else{
+        	$(".popup-cover").hide();
+        	$(this).find(".popup").hide();
+        }
+		
+		if($(this).find(".later").length && $(this).find(".later").length > count){
+			$(this).find(".later:eq(" + count + ")").fadeIn();
+		}
+		
+		if($(this).find(".replace").length){
+			if($(this).find(".replace").length <= count){
+				count = 0;
+			}
+            $(this).find(".replace").hide();
+            $(this).find(".replace:eq(" + count + ")").fadeIn();
+        }
+		count += 1;
+	});
+	
+	$("#polling").dblclick(function(){
+		if($("#polling .replace:eq(2)").is(":visible")){
+			var timer = setInterval(function(){
+	                $.ajax ({
+	                    url: "server/polling.php",
+	                    success:function(data){
+	                    	$("#polling .replace").append(data + "<br/>");
+	                    }
+	                });
+	        },600);
+	        setTimeout(function(){
+	            clearInterval(timer);
+	            $("#polling .replace").append("Server said GoodBye");
+	        },6000);
+		}        
+	});
+	
+	$("#comet").dblclick(function(){
+		if($("#comet .replace:eq(1)").is(":visible")){
+			$("#comet .replace:eq(1)").html('<iframe height="100%" src="comet.html"></iframe>');	
+		}
+    });
+	
+	$("#websocket-example").dblclick(function(){
+		if($("#websocket-example .later").is(":visible")){
+            $("#websocket-example .later").html('<iframe width="100%" height="450px" src="ws_ex.html"></iframe>');    
+        }
+    });
+	
+	$("#websocket-chatroom").dblclick(function(){
+        if($("#websocket-chatroom .later").is(":visible")){
+            $("#websocket-chatroom .later").html(
+            	'<iframe src="../web_socket/we/back/index.php?name=曉明&message=愛你"></iframe>'+
+                '<iframe src="../web_socket/we/back/index.php?name=baby&message=討厭"></iframe>'
+            );    
+        }
+    });
+	
+	$("#websocket-game").dblclick(function(){
+		if($("#websocket-game .replace").is(":visible")){
+			$("#websocket-game .replace").html('<iframe width="80%" height="60%" src="//www.youtube.com/embed/yTa-8JwFO30#t=840" frameborder="0" allowfullscreen></iframe>');
+		}
+	});
+	
+	function locationHashChanged() {
+		count = 0;
+		var this_hash = location.hash;
+		switch (this_hash) {
+			case "":
+	            
+	          break;
+	        case "#/p2":
+	        	
+	          break;
+	    }
+	    if (location.hash === "#somecoolfeature") {
+	    }
+	}
+
+	window.onhashchange = locationHashChanged;
+	
+	/* setTimeout(function(){
+        
+        },500); */
+	
+	
+});
+
+</script>
+
+<script src="js/impress.js"></script>
+<script>impress().init();</script>
+
+</body>
+</html>
+

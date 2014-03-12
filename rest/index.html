@@ -14,6 +14,8 @@
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/bootstrap-select.min.js"></script>
+    <script src="js/sha/sha1.js"></script>
+    <script src="js/sha/enc-base64-min.js"></script>
     
     <!-- setting -->
     <script src="js/setting.js"></script>
@@ -187,11 +189,17 @@
                 var remove_space = $.trim($(".textarea-control:eq(0)").val()).replace(/\ /g,"");
                 var split_return = remove_space.split("\n");
                 var headers ={};
+                console.log(apiObj.sha1nth);
                 $.each(split_return,function(i,val){
                 	var temp = val.split(":");
                 	headers[temp[0]] = temp[1];
+                	if(apiObj.sha1nth && $.inArray(i,apiObj.sha1nth) != -1){
+                		console.log(i);
+                		headers[temp[0]] = toSha1Encode($("#code").val());
+                	}
+                	
                 });
-                console.log(apiObj);
+                console.log(headers);
                 return;
                 $.ajax ({
                     url: $('#input-url').val(),
@@ -375,6 +383,14 @@
                      return result;
                  }
             });
+            
+            //sha1 and base64 encode
+            function toSha1Encode(string){
+                var hash = CryptoJS.SHA1(string);
+                var toBase64 = hash.toString(CryptoJS.enc.Base64);
+                return toBase64;
+            }
+          
         });
     </script>
     

@@ -4,6 +4,10 @@
 <meta charset='UTF-8' />
 <style type="text/css">
 <!--
+html body{
+ font-size:20px;
+}
+
 .chat_wrapper {
 	width: 500px;
 	margin-right: auto;
@@ -11,7 +15,7 @@
 	background: #CCCCCC;
 	border: 1px solid #999999;
 	padding: 10px;
-	font: 12px 'lucida grande',tahoma,verdana,arial,sans-serif;
+	font: 20px 'lucida grande',tahoma,verdana,arial,sans-serif;
 }
 .chat_wrapper .message_box {
 	background: #FFFFFF;
@@ -43,14 +47,14 @@ $(document).ready(function(){
 	
 	//if(location.hash){
 	if(1){
-		var wsUri = "ws://localhost:9000/demo/server.php"; 	
+		var wsUri = "ws://localhost:9123/demo/server.php"; 	
 	}else{
 		var wsUri = "ws://172.20.10.6:9000/demo/server.php"; 	
 	}
 	websocket = new WebSocket(wsUri); 
 	
 	websocket.onopen = function(ev) { // connection is open 
-		$('#message_box').append("<div class=\"system_msg\">Connected!</div>"); //notify user
+		$('#message_box').append("<div class=\"system_msg\">連線成功！！</div>"); //notify user
 	}
 
 	$('#send-btn').click(function(){ //use clicks message send button	
@@ -93,7 +97,6 @@ $(document).ready(function(){
 			$('#message_box').append("<div class=\"system_msg\">"+umsg+"</div>");
 		}
 		
-		$('#message').val(''); //reset text
 	};
 	
 	websocket.onerror	= function(ev){$('#message_box').append("<div class=\"system_error\">Error Occurred - "+ev.data+"</div>");}; 
@@ -103,8 +106,8 @@ $(document).ready(function(){
 <div class="chat_wrapper">
 <div class="message_box" id="message_box"></div>
 <div class="panel">
-<input type="text" name="name" id="name" placeholder="Your Name" maxlength="10" style="width:20%"  />
-<input type="text" name="message" id="message" placeholder="Message" maxlength="80" style="width:60%" />
+<input type="text" name="name" id="name" value="<?php print $_GET["name"]?>" maxlength="10" style="width:20%"  />
+<input type="text" name="message" id="message" value="<?php print $_GET["message"]?>" maxlength="80" style="width:60%" />
 <button id="send-btn">Send</button>
 </div>
 </div>
