@@ -1,4 +1,5 @@
 .gitignore
+web/
 po/upload/file_list.json
 po/upload/files/
 po/upload/files/.htaccess
