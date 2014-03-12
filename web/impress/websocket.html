@@ -20,6 +20,7 @@
 
 	<div id="p1" class="step slide" data-x="0" data-y="0">
 	        <div class="title-ws center-ws">WebSocket 實作分享</div>
+	        <div class="later"><h1>impress.js<sup>*</sup></h1></div>
 	        <!-- <img src="images/html5_icon.png"/> -->
 	</div>
 	
@@ -52,7 +53,7 @@
 	
 	<div class="step slide" data-x="3000" data-y="0" data-rotate="90">
 	   
-        <div><img style="width:40%; margin:20% 0 0 30%" src="images/kewang.jpg"/></div>
+        <div><img style="width:40%; margin:15% 0 0 30%" src="images/kewang.jpg"/></div>
         <marquee class="later">感謝Ｋ旺大大～～</marquee>
     </div>
 	
@@ -142,36 +143,37 @@
         </div>
     </div>
     
-    <div id="" class="step slide" data-x="2000" data-y="5000">
+    <div id="" class="step slide" data-x="2000" data-y="5600">
         <div class="title-ws">Web Socket 實現 - Client 端</div>
         <div class="replace">
-           <img src="images/websocket.png"/>
+           <img width="100%" src="images/websocket.png"/>
         </div>
         <div class="replace code-area">
             <img class="pic-sml" src="images/client_code.png"/>    
         </div>
     </div>
     
-    <div id="" class="step slide" data-x="2000" data-y="6000">
+    <div id="" class="step slide" data-x="2000" data-y="6600">
         <div class="title-ws">用 JSON 傳輸物件</div>
         <div class="replace code-area">
             <img class="pic-sml" src="images/client_code2.png"/>    
         </div>
     </div>
     
-    <div id="websocket-chatroom" class="step slide" data-x="3000" data-y="6000">
+    <div id="websocket-chatroom" class="step slide" data-x="3500" data-y="6600">
         <div class="title-ws">聊天室</div>
         <div class="later">
         </div>
     </div>
     
-    <div id="websocket-game" class="step slide" data-x="4000" data-y="6000" >
+    <div id="websocket-game" class="step slide" data-x="4500" data-y="6600" >
         <div class="title-ws">html5 遊戲 SebSocket相關</div>
         <div class="replace"></div>
         <div class="replace">
         <a href="http://chrome.com/supersyncsports/"><img src="images/google.png"</a>
         </div>
     </div>
+    
     
    
 </div>
@@ -210,12 +212,14 @@ $(document).ready(function(){
 	});
 	
 	$("#polling").dblclick(function(){
+		$("#polling .replace:eq(2)").html('');
 		if($("#polling .replace:eq(2)").is(":visible")){
+			console.log(11);
 			var timer = setInterval(function(){
 	                $.ajax ({
 	                    url: "server/polling.php",
 	                    success:function(data){
-	                    	$("#polling .replace").append(data + "<br/>");
+	                    	$("#polling .replace:eq(2)").append(data + "<br/>");
 	                    }
 	                });
 	        },600);
@@ -248,8 +252,8 @@ $(document).ready(function(){
     });
 	
 	$("#websocket-game").dblclick(function(){
-		if($("#websocket-game .replace").is(":visible")){
-			$("#websocket-game .replace").html('<iframe width="80%" height="60%" src="//www.youtube.com/embed/yTa-8JwFO30#t=840" frameborder="0" allowfullscreen></iframe>');
+		if($("#websocket-game .replace:eq(0)").is(":visible")){
+			$("#websocket-game .replace:eq(0)").html('<iframe width="80%" height="60%" src="//www.youtube.com/embed/yTa-8JwFO30#t=835" frameborder="0" allowfullscreen></iframe>');
 		}
 	});
 	
