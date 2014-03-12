@@ -49,8 +49,8 @@ while (true) {
 		{
 			$received_text = unmask($buf); //unmask data
 			$position = json_decode($received_text); //json decode 
-			$pos_x = $position->x*5; //sender name
-			$pos_y = $position->y*5; //message text
+			$pos_x = $position->x; //sender name
+			$pos_y = $position->y; //message text
 			$click = $position->click;
 			$reset = $position->reset;
 			//prepare data to be sent to client

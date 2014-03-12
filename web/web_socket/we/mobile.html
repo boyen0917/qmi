@@ -8,10 +8,8 @@
 <script src="js/jquery.ui.touch-punch.min.js"></script>
 <script type="text/javascript">
 $(function(){
-    var wsUri = "ws://172.20.10.6:9000/demo/server.php"; 
-    var temp_x,temp_y;
-    if(!temp_x)temp_x=0;
-    if(!temp_y)temp_y=0;
+    var wsUri = "ws://172.20.10.4:9000/demo/server.php"; 
+    var x,y;
     websocket = new WebSocket(wsUri);
     websocket.onopen = function()
     {
@@ -32,20 +30,18 @@ $(function(){
 	
     $( "#test" ).draggable({
         drag: function() {
-            var x = $("#test").offset().left-temp_x;
-            var y = $("#test").offset().top-temp_y;
-            temp_x = $("#test").offset().left;
-            temp_y = $("#test").offset().top;
-            doSend(x,y,false);
+            x = $("#test").offset().left;
+            y = $("#test").offset().top;
+            doSend(((x/$(window).width()) * 100).toFixed(2),((y/$(window).height()) * 100).toFixed(2),false);
           }
     });
     
     $( "#test" ).click(function(){
-    	doSend(temp_x,temp_y,true,false);
+    	doSend(x,y,true,false);
     });
     
     $( "#reset" ).click(function(){
-        doSend(temp_x,temp_y,false,true);
+        doSend(x,y,false,true);
     });
     
 });
