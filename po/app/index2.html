@@ -8,9 +8,76 @@
         <link rel="stylesheet" href="css/main.css" />
         <script src="../js/jquery.js"></script>
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
-        <script src="js/sha.js"></script>
+        <script src="js/sha/sha1.js"></script>
+        <script src="js/sha/enc-base64-min.js"></script>
     </head>
     <body>
+<!---------------------------------- page-group-main ------------------------------------>
+        <div data-role="page" id="page-group-main">
+            <div data-role="panel" id="side-menu" data-display="push">
+                <div class="sm-user-area">
+                   <div class="sm-user-area-l"></div>
+                   <div class="sm-user-area-r"></div>
+                </div>
+                <div data-sm-act="feed" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_feed.png"/></div>
+                   <div class="sm-small-area-r">動態消息</div>
+                   <div class="sm-count">315</div>
+                </div>
+                <div data-sm-act="contact" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_contact.png"/></div>
+                   <div class="sm-small-area-r">聯絡人</div>
+                   <div class="sm-count"></div>
+                </div>
+                <div data-sm-act="chat" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_chat.png"/></div>
+                   <div class="sm-small-area-r">聊天</div>
+                   <div class="sm-count"></div>
+                </div>
+                <div data-sm-act="calendar" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_calendar.png"/></div>
+                   <div class="sm-small-area-r">行事曆</div>
+                   <div class="sm-count"></div>
+                </div>
+                <div class="sm-hr">團體</div>
+                <div class="sm-group-list-area">
+                  
+                </div>
+                <div class="sm-group-list-area-add">
+                    
+                </div>
+                <div class="sm-group-switch"><div class="sm-switch-ui-adj"></div><img src="images/side_menu/sidemenu_slidedown_icon_click.png"/></div>
+                <div class="sm-group-cj">
+                    <div class="hg-create sm-group-cj-btn">新增團體</div>
+                    <div class="hg-invited sm-group-cj-btn" >團體邀請</div>
+                </div>
+                <div class="sm-hr">系統</div>
+                <div data-sm-act="help" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_help.png"/></div>
+                   <div class="sm-small-area-r">幫助</div>
+                </div>
+                <div data-sm-act="news" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_news.png"/></div>
+                   <div class="sm-small-area-r">最新消息</div>
+                </div>
+                <div data-sm-act="setting" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_setting.png"/></div>
+                   <div class="sm-small-area-r">系統設定</div>
+                </div>
+            </div>
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="side-menu-btn"></div>
+                <img class="side-menu-btn" src="images/side_menu_btn.png"/>
+                <h3>成員</h3>
+            </div>
+            <div data-role="content">
+                <div class="gm-subpage-main">
+                
+                </div>
+        </div><!-- /page-group-main -->
+
+
+<!---------------------------------- 全域 ------------------------------------>        
         <div class="popup">
           <div class="popup-frame">
           <div class="popup-text"></div>
@@ -21,154 +88,197 @@
 
         <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
         
-        <script src="js/sha/sha1.js"></script>
-        <script src="js/sha/enc-base64-min.js"></script>
+        <div id="page-back-chk"></div>
+        <div id="page-back-chk-pre"></div>
+        
         <script type="text/javascript">
             $(function(){
-            	var base_url = "https://apserver.mitake.com.tw/apiv1/";
-            	//ajax用
+            	//api 網址
+                var base_url = "https://apserver.mitake.com.tw/apiv1/";
+                //var base_url = "http://10.1.17.116:8090/apiv1/";
+                //ajax用
                 var myRand = Math.floor((Math.random()*1000)+1);
-                //=========================================
                 
-               /*  var api_name = "register/otp";
-                var headers = {
-                    "cc":"886",
-                    "pn":"0980922917", 
-                    "di":"qwer",
-                    "ug":"1"
-                };
+                //全域
+                var ui,at,gi,gn,gd,ga,gm,device_token;
                 
-                var method = "get"; */
-                
-                //=========================================
-                var api_name = "groups";
-                var headers = {
-                    "ui":"11249442-866d-4d0e-af2b-27014d8fe18c",
-                    "at":"9768fc35-a4b9-46a6-83ec-f163fd4fbbb2",
-                    "li":"zh_TW"
-                };
-                var method = "get";
-                //=========================================
-                console.log(headers);
-                var result = ajaxDo(api_name,headers,method,true);
-                result.complete(function(data){
-                    if(data.status != 200){
-                    	console.log(data);
-                        popupShowAdjust("錯誤");
-                    }else{
-                    	popupShowAdjust("成功");
-                    	console.log(data);
-                    }
+                //計算螢幕長寬以維持比例
+                var proportion = 1.7;
+                $(".main").css("width",$(window).width());
+                $(".main").css("height",$(window).width()*proportion);
+                $(".main-contact-l").css("height",$(window).height()-186);
+                $(window).resize(function(){ 
+                    $(".main").css("width",$(window).width());
+                    $(".main").css("height",$(window).width()*proportion);
+                    $(".main-contact-l").css("height",$(window).height()-186);
                 });
                 
-                $(document).ajaxSend(function() {
-                    $('.ui-loader').css("display","block");
-                });
-                $(document).ajaxComplete(function() {
-                    $('.ui-loader').hide();
-                    $(document).trigger("click");
+            	//----------------------------------- 左側選單 ---------------------------------------------
+                $(".side-menu-btn").click(function(){
+                    $( "#side-menu" ).panel( "open");
                 });
                 
-                $(".popup-screen").click(function(){
-                    $(".popup").hide();
-                    $(".popup-screen").hide();
-                });
-                
-                $(".popup-close").click(function(){
-                    $(".popup-screen").trigger("click");
-                    $(".popup-close").trigger("pageChange");
-                });
-//----------------------------------- function ---------------------------------------------                
-                //ajax
-                function ajaxDo(api_name,headers,method,async){
-                    //console.log(api_url);
-                    var api_url = base_url + api_name;
-                    var myRand = Math.floor((Math.random()*1000)+1);
-                    
-                    if(async){
-                        var result = $.ajax ({
-                            url: api_url,
-                            type: method,
-                            headers:headers,
-                        });/* ajax結束 */
-                    }else{
-                        var result = $.ajax ({
-                            url: api_url,
-                            type: method,
-                            headers:headers,
-                            async:false,
-                        });/* ajax結束 */
-                    }
-                    
-                    return result;
-                }
-                
-                function groupMenuListArea(ui,at){
-                    
-                    var api_name = "me/groups";
-                    var headers = {
-                        "ui":ui,
-                        "at":at
-                    };
-                    var method = "get";
-                    result = ajaxDo(api_name,headers,method);
-                    if(result.responseText){
-                        $(".sm-group-list-area").html("");
-                        $(".sm-group-list-area-add").html("");
-                        //chk是開關按鈕ui變化的檢查
-                        var tmp_selector,count,chk;
-                        var group_list = $.parseJSON(result.responseText).gl;
-                        var total = group_list.length;
+                //用戶區
+                //detect page changing
+                $("#side-menu").on("panelbeforeopen",function(){
+                        //取得個人圖像
+                        $(".sm-user-area-l").html("<img class=\"sm-user-pic\" src=\"images/user_pic.png\"/>");
+                        //計數
+                        $("div[data-sm-act=feed] .sm-count").show();
+                        $(".sm-group-area .sm-count").show();
                         
-                        $.each(group_list,function(i,val){
-                            if(i < 2){
-                                tmp_selector = ".sm-group-list-area";
+                });
+
+                //開關團體列表
+                $(".sm-group-switch").click(function(){
+                    $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+                    $(".sm-group-list-area-add").slideToggle(
+                        function(){
+                            if($(".sm-group-list-area-add").is(":visible")){
+                                $(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_none.png");
                             }else{
-                                tmp_selector = ".sm-group-list-area-add";
+                                $(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_click.png"); 
                             }
-                            
-                            //開關按鈕ui變化
-                            if(i == 1 || total == 1){
-                                chk = "data-switch-chk=\"check\"";
-                            }
-                            if(i == total-1 ){
-                                chk = "data-switch-chk=\"check2\"";
-                            }
-                            
-                            $(tmp_selector).append(
-                                '<div class="sm-group-area" ' + chk + '>' +
-                                    '<div data-gi="' + decodeURI(val.gi) + '" class="sm-group-area-l">' +
-                                        '<img src="images/no_pic_g.png">' +
-                                    '</div>' +
-                                    '<div class="sm-group-area-r">' + decodeURI(val.gn) + '</div>' +
-                                    '<div class="sm-count">20</div>' +
-                                '</div>'
-                            );
-                        });
-                        if(group_list.length > 2){
-                            $(".sm-group-switch").show();
+                        }
+                    );
+                });
+                
+                //按鈕效果
+                $(document).on("mousedown",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
+                    var icon_default = "images/side_menu/sidemenu_icon_";
+                    var target = $(this);
+                    
+                    //開關按鈕ui變化
+                    if($(".sm-group-list-area-add").is(":visible") ){
+                        if(target.data("switch-chk") == "check2"){
+                            $(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
+                        }
+                    }else{
+                        if(target.data("switch-chk") == "check"){
+                            $(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
                         }
                     }
-                }
-                $(".sm-group-switch").show();
-              //計算彈出對話框置中
-                function popupShowAdjust(desc){
-                    $(".popup-frame").css("margin-left",0);
-                    if(desc){
-                        $('.popup-text').html(desc);
+                    
+                    target.addClass("sm-click-bg");
+                    target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_click.png");
+                    switch (target.data("sm-act")) {
+                        case "feed":
+                        	$(".gm-subpage-main").load("gm_subpage_timeline.html");
+                        	$(".gm-subpage-main").trigger("click");
+                          break;
+                        case "contact": 
+                        	$(".gm-subpage-main").load("gm_subpage_main.html");
+                        	$(".gm-subpage-main").trigger("click");
+                          break;
+                        case "chat":
+                          break;
+                        case "calendar":
+                          break;
+                        case "help":
+                          break;
+                        case "news":
+                          break;
+                        case "setting":
+                          break;
                     }
-                    $(".popup-screen").show();
-                    $(".popup").show();
-                    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
-                }
+                });
+                //按鈕效果
+                $(document).on("mouseup",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
+                    var icon_default = "images/side_menu/sidemenu_icon_";
+                    var target = $(this);
+                    setTimeout(function(){
+                        //開關按鈕ui變化
+                        if($(".sm-group-list-area-add").is(":visible") ){
+                            if(target.data("switch-chk") == "check2"){
+                                $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+                            }
+                        }else{
+                            if(target.data("switch-chk") == "check"){
+                                $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+                            }
+                        }
+                        target.removeClass("sm-click-bg");
+                        target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
+                        },500);
+                });
+//----------------------------------- 聯絡人 ---------------------------------------------  
+                $(".gm-subpage-main").load("gm_subpage_main.html");
+
+
+                //功能選單
+                $(".main-more-btn").click(function(){
+                    var target = $(".main-footer-add");
+                    if(target.css("bottom") == "125px"){
+                        $(".main-footer-add").animate({bottom:"194px"},function(){
+                            $(".main-footer").css("z-index","0");
+                        }); 
+                    }else if($(".main-footer").css("z-index") == "0"){
+                        $(".main-footer").css("z-index","100");
+                        $(".main-footer-add").animate({bottom:"125px"});
+                    }
+                });
                 
-                function popupAfterChangePage(dest){
-                    $(".popup-close").bind("pageChange",function(){
-                        $.mobile.changePage(dest);
-                        $(".popup-close").unbind("pageChange");
+                //功能選單 按鈕效果
+                $(".main-footer-item").click(function(){
+                    var main_act = $(this).data("main-act");
+                    var img_url = "images/contact/toolbar_icon_";
+                    $(".main-footer-item").each(function(i,val){
+                        $(this).children().attr("src",img_url + $(this).data("main-act") + ".png");
+                        $(this).find("div").removeClass("color-white");
                     });
-                }
+                    $(this).children().attr("src",img_url + $(this).data("main-act") + "_active.png");
+                    $(this).find("div").addClass("color-white");
+
+                    switch (main_act) {
+                        case "chat":
+                            $.mobile.changePage("#page-chatroom");
+                          break;
+                    }
+                });
                 
+                //團體群組 按鈕效果
+                $(".main-contact-l-row").click(function(){
+                    var ori_target = $(this);
+                    var img_url = "images/contact/contact_sidemenu_";
+                    //將聯絡人群組全部換成關閉狀態
+                    $(".main-contact-l-row").css("background","url(" + img_url + "rowbg.png)");
+                    $(".main-contact-l-row img").attr("src",img_url + "icon_arrow.png");
+                    $(".main-contact-l-row").removeClass("color-white");
+                    
+                    //目標群組換成按下效果
+                    ori_target.css("background","url(" + img_url + "rowbg_unfold.png)");
+                    ori_target.addClass("color-white");
+                    
+                    //關閉所有子群組使用動畫效果
+                    $(".main-contact-l-row-subarea").each(function(i,val){
+                        //不是現在按下的子群組同時高度不為零 表示除了現在按下的以外 全部用動畫效果來關閉
+                        if(!$(this).is(ori_target.next()) && $(this).css("height") != "0px"){
+                            $(this).animate({height:"0px"},function(){
+                                $(this).hide(); 
+                            });
+                        }
+                    });
+                    
+                    //判斷開啓子群組
+                    if(ori_target.data("main-sub-chk")){
+                        //動畫呈現部門子群組
+                        var subarea = ori_target.next();
+                        subarea.show();
+                        var subrow = subarea.find(".main-contact-l-subarea-row");
+                        if(subarea.css("height") == "0px"){
+                            subarea.animate({height:subrow.length*43}); 
+                        }else{
+                            subarea.animate({height:"0px"},function(){
+                                ori_target.children().attr("src",img_url + "icon_arrow_white.png");
+                                subarea.hide(); 
+                            });
+                        }
+                        ori_target.children().attr("src",img_url + "icon_arrow_white_below.png");
+                    }else{
+                        ori_target.children().attr("src",img_url + "icon_arrow_white.png"); 
+                        $(".main-contact-l-subarea-row").height("opx");
+                    }
+                });
             });
         </script>
     </body>
