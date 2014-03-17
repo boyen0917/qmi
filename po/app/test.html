@@ -3,12 +3,12 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="../js/jquery.js"></script>
-        <script src="js/sha/sha1.js"></script>
-        <script src="js/sha/enc-base64-min.js"></script>
+        <script src="webdev.cloud.mitake.com.tw/po/js/jquery.js"></script>
+        <script src="webdev.cloud.mitake.com.tw/po/app/js/sha/sha1.js"></script>
+        <script src="webdev.cloud.mitake.com.tw/po/app/js/sha/enc-base64-min.js"></script>
     </head>
     <body>
-        <input id="phone" value="0980922917"/><br/>
+        <input id="phone" value="+886980922917"/><br/>
         <input id="code" value="123456"/><br/>
         <button>登入</button>
 <br/>
@@ -25,13 +25,13 @@
                     
                     var api_name = "login";
                     var headers = {
-                        "pn":$("#phone").val(),
+                        "id":$("#phone").val(),
                         "up":toSha1Encode($("#code").val()), 
                         "ns":"",
                         "li":"zh_TW"
                     };
                     var method = "post";
-                    
+                    console.log(headers);
                     var result = ajaxDo(api_name,headers,method,true);
                     result.complete(function(data){
                     	$("textarea").html(data);

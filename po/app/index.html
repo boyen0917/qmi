@@ -224,6 +224,7 @@
                         
                     </div>
                     <div class="st-cover-bar-area">
+                        <div class="st-cover-bar-selector"></div>
                         <div class="st-cover-bar-case">
                             <span style="background:#fff;border-radius:7px 0 0 7px;"></span>
                             <span style="background:#ededed;"></span>
@@ -514,10 +515,11 @@
                 
                 //login
                 $("#login").click(function(){
+                	var id = "+886" + $("#phone").val().substring(1);
                     //登入認證
                     var api_name = "login";
                     var headers = {
-                        "pn":$("#phone").val(),
+                        "id":id,
                         "up":toSha1Encode($("#code").val()), 
                         "ns":"",
                         "li":"zh_TW"
@@ -601,12 +603,14 @@
 					    //取得otp驗證碼
                     	var api_name = "register/otp";
                     	var headers = {
-                    		"cc":"886",
-							"pn":$("#r-phone").val(), 
+                    		"cc":"+886",
+							"pn":$("#r-phone").val().substring(1), 
 							"di":device_token,
-							"li":""
+							"li":"zh_TW"
                     	};
                     	var method = "get";
+                    	
+                    	console.log(headers);
                     	var result = ajaxDo(api_name,headers,method,true);
                     	result.complete(function(data){
                     		if(data.status != 200){
@@ -630,10 +634,11 @@
                    	    //驗證otp
                         var api_name = "register/otp";
                         var headers = {
-                            "cc":"886",
-                            "pn":$("#r-phone").val(), 
+                            "cc":"+886",
+                            "pn":$("#r-phone").val().substring(1), 
                             "di":device_token,
-                            "op":toSha1Encode($("#otp").val())
+                            "op":toSha1Encode($("#otp").val()),
+                            "li":"zh_TW"
                         };
                         var method = "post";
                         //非同步
@@ -657,10 +662,11 @@
                 	//取得otp驗證碼
                     var api_name = "register/otp";
                     var headers = {
-                        "cc":"886",
-                        "pn":$("#r-phone").val(), 
+                		"cc":"+886",
+                        "pn":$("#r-phone").val().substring(1), 
                         "di":device_token,
-                        "ug":"1"
+                        "op":toSha1Encode($("#otp").val()),
+                        "li":"zh_TW"
                     };
                     var method = "get";
                     ajaxDo(api_name,headers,method,true);
@@ -677,10 +683,11 @@
                     	var api_name = "me/password";
                         var headers = {
                             "ui":ui, 
-							"at":at, 
+							"at":at,
+							"li":"zh_TW",
 							"up":toSha1Encode($("#pw-setting").val()),
-							"pn":$("#r-phone").val(), 
-							"gm":"", 
+							"id":"+886" + $("#r-phone").val().substring(1), 
+							"ns":"", 
 							"op":toSha1Encode($("#otp").val())
                         };
                         var method = "put";
@@ -906,10 +913,9 @@
                 	}
                 });
                 
-                var top_msg_num = 9;
+                //置頂公告的數量
+                var top_msg_num = $(".st-cover-bar-case span").length;
                 var img_cover_dir = "images/timeline/timeline_cover_bgimg_0";
-                
-                
                 
                 for (var i = 0; i < top_msg_num; i++) {
                 	$(".st-cover-main").append(
@@ -919,7 +925,7 @@
                                 '<div>公告</div>'+
                             '</div>'+
                             '<div class="st-cover-mp-r">'+
-                                '<div class="st-cover-mp-r-ttl">員工旅遊討論</div>'+
+                                '<div class="st-cover-mp-r-ttl">員工旅遊討論 - ' + (i+1) + '</div>'+
                                 '<div class="st-cover-mp-r-content">希望大家可以在明天下班前回復，謝謝！</div>'+
                                 '<div class="st-cover-mp-r-footer">林千里<img src="images/icon/icon_time_lightwhite.png"/>09:20</div>'+
                             '</div>'+
@@ -930,9 +936,36 @@
                 
                 //st-cover-bar-case 幾個就是幾十趴
                 $(".st-cover-bar-case").css("width",top_msg_num*10 + "%")
-                //st-cover-bar-area span 比例加起來是畫面的90%
+                //st-cover-bar-area span 平均寬度在case中
                 $(".st-cover-bar-area span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
                 $(".st-cover-bar-area span:eq("+ (top_msg_num-1) +")").addClass("st-r-radius");
+                
+                //起始位置
+                var selector_pos = (10-top_msg_num)/2*10;
+                var movement = 10;
+                var movement_pos = 1;
+                console.log(selector_pos);
+                /* 游標位置和移動 */
+                $(".st-cover-bar-selector").css("left",(selector_pos-1) + "%");
+                
+                $(".st-cover-bar-area").click(function(event){
+                	//游標起始位置 實際
+                    var left_pos = $(window).width() * (selector_pos+5)/100;
+                    //滑鼠位置在游標最左邊的左邊還是右邊 判斷移動
+                	if(event.clientX > left_pos*1 + ($(window).width() * movement*(movement_pos-1)/100)){
+                		if(movement_pos < top_msg_num){
+                			$(".st-cover-bar-selector").animate({left: ((selector_pos-1) + movement*movement_pos) + "%"});
+                			$(".st-cover-main-page").animate({'left':'-=100%'});
+                            movement_pos++;
+                		}
+                	}else{
+                		if(movement_pos > 1){
+                            $(".st-cover-bar-selector").animate({left: ((selector_pos-1) + movement*(movement_pos-2)) + "%"});
+                            $(".st-cover-main-page").animate({'left':'+=100%'});
+                            movement_pos--;
+                        }
+                	}
+                });
                 
 //----------------------------------- 聯絡人 ---------------------------------------------  
                 //功能選單
