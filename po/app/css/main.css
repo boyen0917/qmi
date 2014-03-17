@@ -760,10 +760,18 @@
 	font-size:14px;
 }
 
+.st-cover-main {
+	max-height: 124px;
+	display: -webkit-box;
+	overflow: hidden;
+}
+
 .st-cover-main-page{
+	position:relative;
 	height: 100px;
 	padding: 12px 0;
 	color: white;
+	width: 100%;
 }
 
 .st-bg1{
@@ -821,9 +829,12 @@
 }
 
 .st-cover-bar-area {
+	position: relative;
 	width: 100%;
 	height: 26px;
 	text-align: center;
+	-webkit-user-select: none;
+	cursor:pointer;
 }
 
 .st-cover-bar-case {
@@ -844,7 +855,19 @@
 }
 
 /* 游標 */
-.st-cover-bar-case:before {
+
+.st-cover-bar-selector {
+	width: 13.11%;
+	height: 11px;
+	background: #4185e1;
+	position: absolute;
+	top: 8px;
+	z-index: 10;
+	border-radius: 10px;
+	box-shadow: 0 0 5px rgb(83,129,190);
+}
+
+/* .st-cover-bar-case:before {
 	content: "";
 	position: absolute;
 	bottom: -2px;
@@ -854,7 +877,7 @@
 	background: #4185e1;
 	border-radius: 10px;
 	box-shadow: 0 0 5px rgb(83,129,190);
-}
+} */
 /* =============================== page chatroom ==================================== */
 
 #page-chatroom {
