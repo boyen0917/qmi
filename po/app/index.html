@@ -190,10 +190,55 @@
             </div>
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="side-menu-btn"></div>
-                <img class="side-menu-btn" src="images/side_menu_btn.png"/>
+                <img class="side-menu-btn" src="images/navi/navi_icon_sidemenu.png"/>
                 <h3>成員</h3>
             </div>
             <div data-role="content">
+        <!------------------------------------- 動態消息 --------------------------------------->
+            <div class="subpage-timeline">
+                <div class="st-navi-area">
+                    <div class="st-navi-subarea-main" data-st-navi-group="navi" data-st-navi="home">
+                        <img src="images/timeline/timeline_tab_icon_home_white.png"/>
+                        <div class="color-white">全部</div>
+                    </div>
+                    <img class="st-navi-tridiv-l" src="images/timeline/timeline_tab_arrow_left.png" style="width:15px;display:none;">
+                    <img class="st-navi-tridiv-r" src="images/timeline/timeline_tab_arrow_right.png" style="width:15px">
+                    <div class="st-navi-subarea-other" data-st-navi-group="navi" data-st-navi="announcement">
+                        <img src="images/timeline/timeline_tab_icon_announcement.png"/>
+                        <div>公告</div>
+                    </div>
+                    <div class="st-navi-divider"></div>
+                    <div class="st-navi-subarea-other" data-st-navi-group="navi" data-st-navi="feedback">
+                        <img src="images/timeline/timeline_tab_icon_feedback.png"/>
+                        <div>通報</div>
+                        <div class="st-navi-count">99+</div>
+                    </div>
+                    <div class="st-navi-divider"></div>
+                    <div class="st-navi-subarea-other" data-st-navi-group="navi" data-st-navi="task">
+                        <img src="images/timeline/timeline_tab_icon_task.png"/>
+                        <div>任務</div>
+                    </div>
+                </div>
+                <div class="st-cover-area">
+                    <div class="st-cover-main">
+                        
+                    </div>
+                    <div class="st-cover-bar-area">
+                        <div class="st-cover-bar-case">
+                            <span style="background:#fff;border-radius:7px 0 0 7px;"></span>
+                            <span style="background:#ededed;"></span>
+                            <span style="background:#dddddd;"></span>
+                            <span style="background:#d1d0d0;"></span>
+                            <span style="background:#b7b7b7;"></span>
+                            <span style="background:#9d9d9d;"></span>
+                            <span style="background:#878787;"></span>
+                            <span style="background:#6b6b6b;"></span>
+                            <span style="background:#474747;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!------------------------------------- 聯絡人 --------------------------------------->
                 <div class="subpage-contact">
 	                <div class="main-user-area">
 	                   <div class="main-user-area-l"><img class="sm-user-pic" src="images/user_pic.png"/></div>
@@ -288,7 +333,6 @@
 	            </div>
 	            
                 <div class="subpage-timeline">
-                   <img src="images/timeline.png"/>
                 </div>
             </div>
 	            
@@ -823,6 +867,73 @@
                     	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
                     	},500);
                 });
+                
+//----------------------------------- timeline ---------------------------------------------  
+                $(".st-navi-area [data-st-navi-group=navi]").click(function(){
+                	var img_dir = "images/timeline/timeline_tab_icon_";
+                	var subarea = $(".st-navi-area [data-st-navi-group=navi]");
+                	var subarea_this = $(this);
+                	subarea.find("div").removeClass("color-white");
+                	$(".st-navi-area [data-st-navi-group=navi]").each(function(i,val){
+                        //全關 switch開
+                		$(this).find("img").attr("src",img_dir + $(this).data("st-navi") + ".png");
+                    });
+                	switch($(this).data("st-navi")){
+	                	case "home":
+	                		 $(".st-navi-tridiv-r").show();
+	                		 $(".st-navi-tridiv-l").hide();
+	                		 subarea_this.find("img").attr("src",img_dir + "home_white.png");
+	                		 subarea_this.find("div:eq(0)").addClass("color-white");
+	                      break;
+	                	case "announcement":
+	                		$(".st-navi-tridiv-l").show();
+	                		$(".st-navi-tridiv-r").hide();
+	                		subarea_this.find("img").attr("src",img_dir + "announcement_white.png");
+	                		subarea_this.find("div:eq(0)").addClass("color-white");
+	                      break;
+	                	case "feedback":
+	                		$(".st-navi-tridiv-l").show();
+	                		$(".st-navi-tridiv-r").hide();
+	                		subarea_this.find("img").attr("src",img_dir + "feedback_white.png");
+	                		subarea_this.find("div:eq(0)").addClass("color-white");
+	                      break;
+	                	case "task":
+	                		$(".st-navi-tridiv-l").show();
+	                		$(".st-navi-tridiv-r").hide();
+	                		subarea_this.find("img").attr("src",img_dir + "task_white.png");
+	                		subarea_this.find("div:eq(0)").addClass("color-white");
+	                      break;
+                	}
+                });
+                
+                var top_msg_num = 9;
+                var img_cover_dir = "images/timeline/timeline_cover_bgimg_0";
+                
+                
+                
+                for (var i = 0; i < top_msg_num; i++) {
+                	$(".st-cover-main").append(
+                		'<div data-st-order="'+i+'" class="st-cover-main-page">'+
+                            '<div class="st-cover-mp-l">'+
+                                '<img src="images/timeline/timeline_cover_icon_announcement.png"/>'+
+                                '<div>公告</div>'+
+                            '</div>'+
+                            '<div class="st-cover-mp-r">'+
+                                '<div class="st-cover-mp-r-ttl">員工旅遊討論</div>'+
+                                '<div class="st-cover-mp-r-content">希望大家可以在明天下班前回復，謝謝！</div>'+
+                                '<div class="st-cover-mp-r-footer">林千里<img src="images/icon/icon_time_lightwhite.png"/>09:20</div>'+
+                            '</div>'+
+                        '</div>'
+                	);
+                }
+                $(".st-cover-main-page").addClass("st-bg1");
+                
+                //st-cover-bar-case 幾個就是幾十趴
+                $(".st-cover-bar-case").css("width",top_msg_num*10 + "%")
+                //st-cover-bar-area span 比例加起來是畫面的90%
+                $(".st-cover-bar-area span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
+                $(".st-cover-bar-area span:eq("+ (top_msg_num-1) +")").addClass("st-r-radius");
+                
 //----------------------------------- 聯絡人 ---------------------------------------------  
                 //功能選單
                 $(".main-more-btn").click(function(){
