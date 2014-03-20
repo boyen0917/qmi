@@ -42,12 +42,13 @@
 
 //--------------註冊------------------------------------------------------------------------
                 //取得otp驗證碼
-                var api_name = "register/otp";
+                var api_name = "groups";
                 var headers = {
-                    "cc":"+886",
-                    "pn":"980922917", 
-                    "di":"qwer",
-                    "li":"zh_TW"
+                    "ui":ui,
+                    "at":at,
+                    "li":"zh_TW",
+                    "gn":encodeURI($("#group-name").val()),
+                    "gd":encodeURI($("#group-desc").val())
                 };
                 var method = "get";
                 
