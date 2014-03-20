@@ -263,6 +263,65 @@
                         </div>
                         <div class="st-sub-box-1">
                             <div class="st-sub-box-1-main">
+                               <div class="st-user-pic"><img src="images/5.png"/></div>
+                               <div class="st-sub-name">為廷</div>
+                               <div class="st-sub-time"><img src="images/icon/icon_time_gray.png"/>3/20 星期四 10:30</div>
+                            </div>
+                            <div class="st-sub-box-1-footer">
+                               <img src="images/icon/icon_object.png"/>
+                               <div class="st-sub-oval">反服貿</div> 飛帆 雞排妹...<div class="st-sub-else">與其他10個群組及個人</div> 
+                            </div>
+                        </div>
+                        <div class="st-sub-box-2">
+                            接下來開始實質的罷課行動，將會把學生帶到街頭！！
+                            <div class="st-post-area">
+                                <link rel="stylesheet" type="text/css" href="effect/css/style6.css" />
+                                <script type="text/javascript" src="effect/js/modernizr.custom.70748.js"></script>
+                                <script type="text/javascript" src="effect/js/jquery.transitions.js"></script>
+                                <select id="type">
+                                    <option value="te-example4">Example 4</option>
+                                </select>
+                                <a id="te-next" href="#" class="te-next">next</a>
+                                <div id="te-wrapper" class="te-wrapper">
+                                    <div class="te-images">
+                                        <img src="effect/images/test1.png"/>
+                                        <img src="effect/images/test2.png"/>
+                                        <img src="effect/images/test3.png"/>
+                                        <img src="effect/images/test4.png"/>
+                                    </div>
+                                    <div class="te-cover">
+                                        <img src="effect/images/test1.png"/>
+                                    </div>
+                                    <div class="te-transition">
+                                        <div class="te-front"></div>
+                                        <div class="te-back"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="st-sub-box-3">
+                            <img src="images/timeline/timeline_feedbox_icon_like.png"/><div>199</div>
+                            <img src="images/timeline/timeline_feedbox_icon_chat.png"/><div>12</div>
+                            <img src="images/timeline/timeline_feedbox_icon_read.png"/><div>28</div>
+                        </div>
+                        <div class="st-sub-box-4">
+                            <div class="st-like-btn">讚</div>
+                            <div class="st-message">留言</div>
+                        </div>
+                    </div>
+                    <div class="st-sub-box">
+                        <img class="st-sub-box-more-btn" src="images/timeline/timeline_feedbox_icon_list.png"/>
+                        <div class="st-sub-box-more">
+                           <div class="st-more-close"></div>
+                           <div data-st-more="top" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_top.png"/><div>置頂</div></div>
+                           <div data-st-more="subscribe" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_subscribe.png"/><div>訂閱</div></div>
+                           <div data-st-more="copy" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copy.png"/><div>複製</div></div>
+                           <div data-st-more="copyword" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copyword.png"/><div>複製內容</div></div>
+                           <div data-st-more="calendar" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_calendar.png"/><div>加入行事曆</div></div>
+                           <div data-st-more="del" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_del.png"/><div>刪除</div></div>
+                        </div>
+                        <div class="st-sub-box-1">
+                            <div class="st-sub-box-1-main">
                                <div class="st-user-pic"><img src="images/1.jpg"/></div>
                                <div class="st-sub-name">協志</div>
                                <div class="st-sub-time"><img src="images/icon/icon_time_gray.png"/>2/25 星期二 20:30</div>
@@ -605,6 +664,7 @@
                 });
                 
                 $(document).ajaxSend(function() {
+                    if(!$('.ui-loader').is(":visible"))
                 	$('.ui-loader').css("display","block");
                 });
                 $(document).ajaxComplete(function() {
@@ -1174,6 +1234,10 @@
                         target.removeClass("st-sub-box-more-box-click");
                         target.find("img").attr("src",more_img_url + target.data("st-more") + ".png");
                         },500);
+                });
+                
+                $(".te-wrapper").click(function(){
+                	$("#te-next").trigger("click");
                 });
                 
 //----------------------------------- 聯絡人 ---------------------------------------------  
