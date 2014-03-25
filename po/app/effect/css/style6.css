@@ -6,7 +6,7 @@
 
 .te-cover.te-hide,
 .te-transition,
-.te-images{ display: none; }
+.te-images,.te-wrapper .current,.te-wrapper .last{ display: none; }
 .te-transition.te-show { display: block; }
 .te-back,
 .te-front{

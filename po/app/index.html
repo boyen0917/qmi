@@ -10,6 +10,11 @@
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
         <script src="js/sha/sha1.js"></script>
         <script src="js/sha/enc-base64-min.js"></script>
+        
+        <link rel="stylesheet" type="text/css" href="effect/css/style6.css" />
+        <script type="text/javascript" src="effect/js/modernizr.custom.70748.js"></script>
+        <script type="text/javascript" src="effect/js/jquery.transitions.js"></script>
+        
     </head>
     <body>
         <div data-role="page" id="page-login">
@@ -189,9 +194,19 @@
                 </div>
             </div>
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-                <div class="side-menu-btn"></div>
                 <img class="side-menu-btn" src="images/navi/navi_icon_sidemenu.png"/>
-                <h3>成員</h3>
+                <h3>動態消息</h3>
+                <div class="feed-compose"></div>
+                <div class="navi-alert"></div>
+                <div class="feed-compose-area">
+                    <div data-fc-box="post" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_post.png"/><div>貼文</div></div>
+                    <div data-fc-box="announcement" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_announcement.png"/><div>公告</div></div>
+                    <div data-fc-box="feedback" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_feedback.png"/><div>通報</div></div>
+                    <div data-fc-box="work" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_work.png"/><div>任務-工作</div></div>
+                    <div data-fc-box="vote" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_vote.png"/><div>任務-投票</div></div>
+                    <div data-fc-box="check" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_check.png"/><div>任務-定點回報</div></div>
+                </div>
+                <div class="feed-compose-area-cover"></div>
             </div>
             <div data-role="content">
         <!------------------------------------- 動態消息 --------------------------------------->
@@ -241,15 +256,18 @@
                 <div class="st-filter-area">
                     <div data-st-filter="all" class="st-filter-list st-filter-main"><span>全部</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
                     <div class="st-filter-other">
-	                    <div data-st-filter="unread" class="st-filter-list"><span>未讀</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
-	                    <div data-st-filter="list-1" class="st-filter-list"><span>總經理室</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
-	                    <div data-st-filter="list-2" class="st-filter-list"><span>管理室</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
-	                    <div data-st-filter="list-3" class="st-filter-list"><span>雲端事業群</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
-	                    <div data-st-filter="list-4" class="st-filter-list"><span>ＡＰＰ事業群</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
+	                    <div data-st-filter="unread" class="st-filter-list"><span>未讀</span></div>
+	                    <div data-st-filter="list-1" class="st-filter-list"><span>總經理室</span></div>
+	                    <div data-st-filter="list-2" class="st-filter-list"><span>管理室</span></div>
+	                    <div data-st-filter="list-3" class="st-filter-list"><span>雲端事業群</span></div>
+	                    <div data-st-filter="list-4" class="st-filter-list"><span>ＡＰＰ事業群</span></div>
 	                    <div class="st-filter-list-btn"><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
                     </div>
                 </div>
                 <div class="st-feedbox-area ">
+                    <select id="type-trans">
+                        <option value="te-example4"></option>
+                    </select>
                     <div class="st-sub-box">
                         <img class="st-sub-box-more-btn" src="images/timeline/timeline_feedbox_icon_list.png"/>
                         <div class="st-sub-box-more">
@@ -263,8 +281,8 @@
                         </div>
                         <div class="st-sub-box-1">
                             <div class="st-sub-box-1-main">
-                               <div class="st-user-pic"><img src="images/5.png"/></div>
-                               <div class="st-sub-name">為廷</div>
+                               <div class="st-user-pic"><img src="images/lin.png"/></div>
+                               <div class="st-sub-name">林智勝</div>
                                <div class="st-sub-time"><img src="images/icon/icon_time_gray.png"/>3/20 星期四 10:30</div>
                             </div>
                             <div class="st-sub-box-1-footer">
@@ -272,29 +290,28 @@
                                <div class="st-sub-oval">反服貿</div> 飛帆 雞排妹...<div class="st-sub-else">與其他10個群組及個人</div> 
                             </div>
                         </div>
+                        
                         <div class="st-sub-box-2">
-                            接下來開始實質的罷課行動，將會把學生帶到街頭！！
+                            中華職棒開打囉！請大家進場幫我們加油喲！！
                             <div class="st-post-area">
-                                <link rel="stylesheet" type="text/css" href="effect/css/style6.css" />
-                                <script type="text/javascript" src="effect/js/modernizr.custom.70748.js"></script>
-                                <script type="text/javascript" src="effect/js/jquery.transitions.js"></script>
-                                <select id="type">
-                                    <option value="te-example4">Example 4</option>
-                                </select>
-                                <a id="te-next" href="#" class="te-next">next</a>
-                                <div id="te-wrapper" class="te-wrapper">
-                                    <div class="te-images">
-                                        <img src="effect/images/test1.png"/>
-                                        <img src="effect/images/test2.png"/>
-                                        <img src="effect/images/test3.png"/>
-                                        <img src="effect/images/test4.png"/>
-                                    </div>
-                                    <div class="te-cover">
-                                        <img src="effect/images/test1.png"/>
-                                    </div>
-                                    <div class="te-transition">
-                                        <div class="te-front"></div>
-                                        <div class="te-back"></div>
+                                <div class="st-post-area-multi-pic">
+                                    <a data-index="id1" href="#" class="te-next">next</a>
+                                    <div id="te-wrapper" class="te-wrapper">
+                                        <div class="te-images">
+                                            <img src="images/cpbl1.png"/>
+                                            <img src="images/cpbl2.png"/>
+                                            <img src="images/cpbl3.png"/>
+                                            <img src="images/cpbl4.png"/>
+                                        </div>
+                                        <div class="te-cover">
+                                            <img src="images/cpbl1.png"/>
+                                        </div>
+                                        <div class="te-transition">
+                                            <div class="te-front"></div>
+                                            <div class="te-back"></div>
+                                        </div>
+                                        <div class="current">0</div>
+                                        <div class="last">0</div>
                                     </div>
                                 </div>
                             </div>
@@ -309,6 +326,7 @@
                             <div class="st-message">留言</div>
                         </div>
                     </div>
+                    
                     <div class="st-sub-box">
                         <img class="st-sub-box-more-btn" src="images/timeline/timeline_feedbox_icon_list.png"/>
                         <div class="st-sub-box-more">
@@ -333,6 +351,9 @@
                         </div>
                         <div class="st-sub-box-2">
                             聚餐、品嚐美食、談心、聊工作、講八掛..56不能亡！感謝仁甫請的帝王蟹鍋！好 大 隻 啊 ～！！
+                            <div class="st-post-area">
+                                <img src="images/crab.png"/>
+                            </div>
                         </div>
                         <div class="st-sub-box-3">
                             <img src="images/timeline/timeline_feedbox_icon_like.png"/><div>199</div>
@@ -513,6 +534,41 @@
             </div>
 	            
         </div><!-- /page-group-main -->
+<!---------------------------------- page-announcement-post ------------------------------------>
+        <div data-role="page" id="page-announcement-post">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3>公告<div>三竹資訊</div></h3>
+                <div class="ap-post"><img src="images/navi/navi_icon_post.png"/>發佈</div>
+            </div>
+            <div class="ap-content">
+            <div data-sp-box="title" class="ap-content-box">
+                    <img src="images/compose/compose_form_icon_title.png"/>
+                    <textarea class="ap-textarea-title" placeholder="標題" data-role="none"></textarea>
+            </div>
+            <div data-sp-box="apt" class="ap-content-box">
+                    <img src="images/compose/compose_form_icon_apt.png"/>
+                    所屬部門
+                    <div class="ap-apt-btn-area">以個人身份發佈<img src="images/ap_box_arrow.png"/></div>
+                </div>
+                <div data-sp-box="object" class="ap-content-box">
+                    <img src="images/compose/compose_form_icon_object.png"/>
+                    發佈對象
+                    <img class="ap-object-btn" src="images/ap_box_arrow.png"/>
+                </div>
+                <div data-sp-box="top" class="ap-content-box">
+                    <img src="images/compose/compose_form_icon_top.png"/>
+                    共同置頂
+                    <img class="ap-top-btn" src="images/compose/compose_form_icon_check_none.png"/>
+                </div>
+                <div class="ap-content-textarea">
+                    <img src="images/compose/compose_form_icon_description.png"/>
+                    <textarea class="ap-textarea-desc" placeholder="內容描述" data-role="none" style="height: 24px;"></textarea>
+                </div>
+            </div>
+            <div class="chatroom-footer">
+            </div>
+        </div>
 <!---------------------------------- page-chatroom ------------------------------------>
         <div data-role="page" id="page-chatroom">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -536,66 +592,66 @@
             </div>
             <div data-role="content">
                 <div class="chat-area">
-		            <div class="chat-other">
-		                <img src="images/2.jpg">
-		                <div class="chat-other-subarea">
-		                    <div>仁甫</div>
-		                    <div class="chat-other-text">
-		                        大家對新產品有什麼看法
-		                        <div class="chat-other-time">10:12</div>
-		                    </div>
-		                </div>
-		            </div>
-		            
-		            <div class="chat-other">
-		                <img src="images/2.jpg">
-		                <div class="chat-other-subarea">
-		                    <div>仁甫</div>
-		                    <div class="chat-other-text">
-		                        季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正
-		                        <div class="chat-other-time">10:12</div>
-		                    </div>
-		                    
-		                </div>
-		            </div>
-		            
-		             <div class="chat-me">
-			            <div class="chat-me-text">
-			                師兄贏了好多錢 我要買雙
-			                <div class="chat-me-time">10:12</div>
-			            </div>
-		            </div>
-		            
-		            <div class="chat-me">
-		                <div class="chat-me-text">
-		                    新球鞋～
-		                    <div class="chat-me-time">10:12</div>
-		                </div>
-		            </div>
-		            
-		            <div class="chat-other">
-		                <img src="images/2.jpg">
-		                <div class="chat-other-subarea">
-		                    <div>仁甫</div>
-		                    <div class="chat-other-text">
-		                        .......
-		                        <div class="chat-other-time">10:12</div>
-		                    </div>
-		                </div>
-		            </div>
-		            
-		            <div class="chat-other">
-		                <img src="images/2.jpg">
-		                <div class="chat-other-subarea">
-		                    <div>仁甫</div>
-		                    <div class="chat-other-text">
-		                        .......
-		                        <div class="chat-other-time">10:12</div>
-		                    </div>
-		                </div>
-		            </div>
-		        </div>
-	            
+                    <div class="chat-other">
+                        <img src="images/2.jpg">
+                        <div class="chat-other-subarea">
+                            <div>仁甫</div>
+                            <div class="chat-other-text">
+                                大家對新產品有什麼看法
+                                <div class="chat-other-time">10:12</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-other">
+                        <img src="images/2.jpg">
+                        <div class="chat-other-subarea">
+                            <div>仁甫</div>
+                            <div class="chat-other-text">
+                                季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正
+                                <div class="chat-other-time">10:12</div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                     <div class="chat-me">
+                        <div class="chat-me-text">
+                            師兄贏了好多錢 我要買雙
+                            <div class="chat-me-time">10:12</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-me">
+                        <div class="chat-me-text">
+                            新球鞋～
+                            <div class="chat-me-time">10:12</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-other">
+                        <img src="images/2.jpg">
+                        <div class="chat-other-subarea">
+                            <div>仁甫</div>
+                            <div class="chat-other-text">
+                                .......
+                                <div class="chat-other-time">10:12</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-other">
+                        <img src="images/2.jpg">
+                        <div class="chat-other-subarea">
+                            <div>仁甫</div>
+                            <div class="chat-other-text">
+                                .......
+                                <div class="chat-other-time">10:12</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
             <br/><br/><br/>
             <div class="chatroom-footer">
@@ -615,8 +671,6 @@
             </div>
         </div>
 
-
-
 <!---------------------------------- 全域 ------------------------------------>        
 		<div class="popup">
 		  <div class="popup-frame">
@@ -630,6 +684,7 @@
         
         <div id="page-back-chk"></div>
         <div id="page-back-chk-pre"></div>
+        <div id="page-back-pre-title"></div>
         
         <script type="text/javascript">
             $(function(){
@@ -677,10 +732,12 @@
                 $(document).on("pagebeforeshow",function(){
                     $("#page-back-chk-pre").html($("#page-back-chk").html());
                     $("#page-back-chk").html(window.location.hash);
+                    $("#page-back-pre-title").html($($("#page-back-chk-pre").html() + " div[data-role=header] h3").html());
                 });
                 
                 $(".page-back").click(function(){
                 	$.mobile.changePage($("#page-back-chk-pre").html(), {transition: "slide",reverse: true});
+                	$($("#page-back-chk-pre").html() + " div[data-role=header] h3").html($("#page-back-pre-title").html());
                 });
                 
 //----------------------------------- 登入 ---------------------------------------------
@@ -1020,14 +1077,17 @@
 	                    	$(".subpage-contact").hide();
 	                    	$(".subpage-timeline").show();
 	                    	$( "#side-menu" ).panel( "close");
+	                    	$("#page-group-main").find("div[data-role=header] h3").html("動態消息");
 	                      break;
 	                    case "contact": 
 	                    	$(".subpage-contact").show();
                             $(".subpage-timeline").hide();
                             $( "#side-menu" ).panel( "close");
+                            $("#page-group-main").find("div[data-role=header] h3").html("聯絡人");
 	                      break;
 	                    case "chat":
 	                    	$.mobile.changePage("#page-chatroom");
+	                    	$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
 	                      break;
 	                    case "calendar":
 	                      break;
@@ -1150,12 +1210,14 @@
                         }
                 	}
                 });
-                
+
                 //主要filter
                 $(".st-filter-main").click(function(){
+                	console.log(11);
                 	if($(".st-filter-other").is(":visible")){
-                		$(".st-filter-other").trigger("click");	
+                		$(".st-filter-other").slideUp();	
                 	}else{
+                		$(".st-filter-main img").attr("src","images/timeline/timeline_filter_icon_arrow_click.png");
                 		$(".st-filter-main span").html("全部");
                 		$(".st-filter-other").slideDown();
                 	}
@@ -1165,18 +1227,16 @@
                 	filter_name = $(this).find("span").html();
                 	//關閉的css樣式
                 	$(".st-filter-list").removeClass("st-filter-list-active");
-                	$(".st-filter-list img").attr("src","images/timeline/timeline_filter_icon_arrow.png");
                 	 
                 	//開起的css樣式
                 	$(this).addClass("st-filter-list-active");
-                	$(this).children().attr("src","images/timeline/timeline_filter_icon_arrow_click.png");
                 });
                 
                 $(".st-filter-other").click(function(){
                 	$(".st-filter-main span").fadeOut();
                 	$(".st-filter-other").slideUp(function(){
                 		$(".st-filter-main").addClass("st-filter-list-active");
-                		$(".st-filter-main img").attr("src","images/timeline/timeline_filter_icon_arrow_click.png");
+                		$(".st-filter-main img").attr("src","images/timeline/timeline_filter_icon_arrow.png");
                 		$(".st-filter-main span").html(filter_name);
                 		$(".st-filter-main span").fadeIn();
                 	});
@@ -1236,9 +1296,69 @@
                         },500);
                 });
                 
-                $(".te-wrapper").click(function(){
-                	$("#te-next").trigger("click");
+                $(".feed-compose").click(function(){
+                	console.log(44);
+                	if($(".feed-compose-area").is(":visible")){
+                		$(".feed-compose").removeClass("feed-compose-visit");
+                		$(".feed-compose-area-cover").hide();
+                		setTimeout(function(){
+                            $(".feed-compose").removeClass("feed-compose-click");
+                            $(".feed-compose-area").slideUp();
+                        },100);
+                		return;
+                	}
+                	//var edit_pic = "image"
+                	$(".feed-compose").addClass("feed-compose-click");
+                	$(".feed-compose-area").slideDown();
+                	$(".feed-compose-area-cover").show();
+                	setTimeout(function(){
+                		$(".feed-compose").addClass("feed-compose-visit");
+                    },100);
                 });
+                
+                //貼文選單
+                $(".fc-area-subbox").click(function(){
+                	var target = $(this);
+                	switch (target.data("fc-box")) {
+	                    case "post":
+	                      break;
+	                    case "announcement": 
+	                    	$.mobile.changePage("#page-announcement-post");
+	                      break;
+	                    case "feedback":
+	                        
+	                      break;
+	                    case "work":
+	                      break;
+	                    case "vote":
+	                      break;
+	                    case "check":
+	                      break;
+	                 }
+                	$(".feed-compose").trigger("click");
+                });
+
+                $(".feed-compose-area-cover").click(function(){
+                	$(".feed-compose").trigger("click");
+                });
+
+//----------------------------------- timeline-公告 ---------------------------------------------
+                $(".ap-content").height($(window).height()-80);
+                
+                $('.ap-textarea-desc').bind("keyup", function () {
+                	$(this).css('height','0px').height(($(this).prop("scrollHeight"))+"px");
+                	var position = (($(this).outerHeight()+40)/2-40);
+                	if(position < 0)position = 0;
+                	$(".ap-content-textarea img").css("bottom",position + "px");
+                	$('html, body').animate({scrollTop: $(document).height()}, 0); 
+                	console.log(($(this).prop("scrollHeight")));
+                });
+                
+                $(".ap-post").click(function(){
+                	var html = $(".ap-textarea-desc").val();
+                	$(".ap-textarea-desc").focus().val("").val(html);
+                });
+
                 
 //----------------------------------- 聯絡人 ---------------------------------------------  
                 //功能選單
@@ -1317,13 +1437,10 @@
                 });
 //----------------------------------- chatroom ---------------------------------------------
                 $(".chatroom-addstate-top-btn").click(function(){
-                    if($(".chatroom-addstate-top-area").css("top") == "-200px"){
-                        $(".chatroom-addstate-top-area").animate({top:"40px"}); 
-                    }else{
-                        $(".chatroom-addstate-top-area").animate({top:"-200px"}); 
-                    }
+                	$(".chatroom-addstate-top-area").slideToggle();
                 });
                 
+                //聊天功能下方 按了彈出
                 $(".chat-bar-add").click(function(){
                 	if($(".chatroom-footer").css("bottom") == "0px"){
                 		$(".chatroom-footer").animate({bottom:"165px"},function(){
@@ -1413,6 +1530,7 @@
                     var method = "get";
                     result = ajaxDo(api_name,headers,method);
                     if(result.responseText){
+                    	console.log(result.responseText);
                     	$(".sm-group-list-area").html("");
                     	$(".sm-group-list-area-add").html("");
                     	//chk是開關按鈕ui變化的檢查

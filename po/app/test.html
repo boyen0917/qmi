@@ -1,67 +1,104 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="webdev.cloud.mitake.com.tw/po/js/jquery.js"></script>
-        <script src="webdev.cloud.mitake.com.tw/po/app/js/sha/sha1.js"></script>
-        <script src="webdev.cloud.mitake.com.tw/po/app/js/sha/enc-base64-min.js"></script>
-    </head>
-    <body>
-        <input id="phone" value="+886980922917"/><br/>
-        <input id="code" value="123456"/><br/>
-        <button>登入</button>
-<br/>
-<textarea rows="10" cols="50"></textarea>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">  
+<html>  
+<head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+    <title>文字區塊自動高度</title>  
+    <script src="../js/jquery.js"></script>  
+    <script src="js/sha/sha1.js"></script>
+    <script src="js/sha/enc-base64-min.js"></script>
+    <script type="text/javascript">   
+    $(function(){  
+        //api 網址
+        var base_url = "https://apserver.mitake.com.tw/apiv1/";
+        //var base_url = "http://10.1.17.116:8090/apiv1/";
         
-        <script type="text/javascript">
-            $(function(){
-                //api 網址
-                var base_url = "https://apserver.mitake.com.tw/apiv1/";
-                //var base_url = "http://10.1.17.116:8090/apiv1/";
-                //ajax用
-                var myRand = Math.floor((Math.random()*1000)+1);
-            	$("button").click(function(){
-                    
-                    var api_name = "login";
-                    var headers = {
-                        "id":$("#phone").val(),
-                        "up":toSha1Encode($("#code").val()), 
-                        "ns":"",
-                        "li":"zh_TW"
-                    };
-                    var method = "post";
-                    console.log(headers);
-                    var result = ajaxDo(api_name,headers,method,true);
-                    result.complete(function(data){
-                    	$("textarea").html(data);
-                    });
-            	});
-            	
-                
-                function ajaxDo(api_name,headers,method,async){
-                    //console.log(api_url);
-                    var api_url = base_url + api_name;
-                    var myRand = Math.floor((Math.random()*1000)+1);
-                    
-                    if(async){
-                        var result = $.ajax ({
-                            url: api_url,
-                            type: method,
-                            headers:headers,
-                        });/* ajax結束 */
-                    }                    
-                    return result;
-                }
-                
-                //sha1 and base64 encode
-                function toSha1Encode(string){
-                    var hash = CryptoJS.SHA1(string);
-                    var toBase64 = hash.toString(CryptoJS.enc.Base64);
-                    return toBase64;
-                }
-                
-            });
-        </script>
-    </body>
-</html>
+        var ui,at,gi,gn,gd,ga,gm,device_token,zoom_out_cnt,zoom_in_cnt,group_list;
+        
+        //ajax用
+        var myRand = Math.floor((Math.random()*1000)+1);
+     
+        var id = "+886980922917";
+        //登入認證
+        var api_name = "login";
+        var headers = {
+        	    "id":id,
+        	    "up":toSha1Encode("123456"), 
+        	    "ns":"",
+        	    "li":"zh_TW"
+        	        };
+        var method = "post";
+        
+        var result = ajaxDo(api_name,headers,method,true);
+        result.complete(function(data){
+        	ui = $.parseJSON(data.responseText).ui;
+            at = $.parseJSON(data.responseText).at;
+            console.log(ui);
+            /* 
+            var api_name = "groups/4fbb9ffe-24b7-4a92-be86-508ea73e6d94/timelines/2ef79528-ab8a-47fa-9b64-bba5e890eada/events";
+            var headers = {
+                    "ui":ui,
+                    "at":at, 
+                    "li":"zh_TW"
+                        };
+            var method = "get";
+            
+            var result = ajaxDo(api_name,headers,method,true);
+            result.complete(function(data){
+                console.log(data);
+            }); */
+            
+            /* var api_name = "groups/4fbb9ffe-24b7-4a92-be86-508ea73e6d94/timelines/2ef79528-ab8a-47fa-9b64-bba5e890eada/events";
+            var headers = {
+                    "ui":ui,
+                    "at":at, 
+                    "li":"zh_TW"
+                        };
+            var method = "get";
+            
+            var result = ajaxDo(api_name,headers,method,true);
+            result.complete(function(data){
+            	console.log(data);
+            }); */
+            
+            
+            
+        });
+  
+        
+//ajax
+     function ajaxDo(api_name,headers,method,async,body){
+         //console.log(api_url);
+         var api_url = base_url + api_name;
+         
+         if(async){
+             var result = $.ajax ({
+                 url: api_url,
+                 type: method,
+                 body:body,
+                 headers:headers,
+             });/* ajax結束 */
+         }else{
+             var result = $.ajax ({
+                 url: api_url,
+                 type: method,
+                 headers:headers,
+                 async:false,
+             });/* ajax結束 */
+         }
+         
+         return result;
+     } 
+     
+     //sha1 and base64 encode
+     function toSha1Encode(string){
+         var hash = CryptoJS.SHA1(string);
+         var toBase64 = hash.toString(CryptoJS.enc.Base64);
+         return toBase64;
+     }
+ });  
+   </script>   
+</head>  
+<body>  
+   
+</body>  
+</html>  

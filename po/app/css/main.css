@@ -11,15 +11,15 @@
     margin-top:-20px;
 }
 
-#page-back-chk,#page-back-chk-pre{
+#page-back-chk,#page-back-chk-pre,#page-back-pre-title{
 	display:none;
 }
 
 .page-back {
-	height: 35px;
-	width: 35px;
+	height: 25px;
+	width: 25px;
 	float: left;
-    margin: 7px 0 0 5px;
+    margin: 9px 0 0 5px;
 	cursor:pointer;
 }
 
@@ -89,12 +89,7 @@
     border-radius: 10px;
     top: 1px;
     position: relative;
-    -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: moz-none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 .login-radio img {
@@ -124,12 +119,7 @@
     border-radius: 10px;
     top: 1px;
     position: relative;
-    -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: moz-none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 .register-radio img {
@@ -309,6 +299,7 @@
 }
 
 .side-menu-btn{
+	/* flex: 4; */
 	float: left;
 	cursor:pointer;
 	width: 40px;
@@ -703,6 +694,99 @@
 
 /* =============================== page timeline ==================================== */
 
+#page-group-main .ui-title {
+	/* margin: 15px auto 11px;
+	flex: 25; */
+}
+
+#page-group-main > div[data-role=header] {
+    /* display: flex; */
+}
+
+.feed-compose,.navi-alert {
+	position:absolute;
+	width:35px;
+	height: 35px;
+	cursor:pointer;
+}
+
+.feed-compose {
+	background: url(../images/navi/navi_icon_edit.png);
+	background-size: cover;
+	right: 55px;
+	top: 5px;
+	z-index: 10;
+}
+
+.feed-compose-click {
+    background: url(../images/navi/navi_icon_edit_click.png);
+    background-size: cover;
+}
+
+.feed-compose-visit {
+    background: url(../images/navi/navi_icon_edit_visit.png);
+    background-size: cover;
+}
+
+.navi-alert {
+	background: url(../images/navi/navi_icon_alert.png);
+	background-size: cover;
+	right: 8px;
+	top: 5px;
+}
+
+.feed-compose-area {
+	position: absolute;
+	z-index: 10;
+	right: 1px;
+	background: #f2f2f2;
+	color: #444648;
+	width: 180px;
+	border: solid #9e9e9e;
+	border-width:0 1px 1px;
+	border-radius: 7px;
+	cursor:pointer;
+	display:none;
+}
+
+.feed-compose-area:before {
+	content: "";
+	position: absolute;
+	top: -1px;
+	left: 98px;
+	z-index: 10;
+	height: 10px;
+	border: 9px solid;
+	border-color: rgb(1,102,161) transparent transparent;
+}
+
+.feed-compose-area-cover {
+	position: fixed;
+	top: -50px;
+	width: 100%;
+	height: 1000px;
+	background: transparent;
+	display:none;
+}
+
+.fc-area-subbox {
+	height: 50px;
+	line-height: 50px;
+	display: -webkit-box;
+}
+
+.fc-area-subbox:active {
+    background:#dfecf4;
+}
+
+.fc-area-subbox:nth-child(-n+5) {
+    border-bottom: 1px solid #c3c3c3;
+}
+
+.fc-area-subbox img {
+    margin: 12px 10px 0;
+}
+
 .subpage-timeline {
 	background: #d0d0d0;
 	min-height: 615px;
@@ -860,11 +944,11 @@
 /* 游標 */
 
 .st-cover-bar-selector {
-	width: 13.11%;
-	height: 7px;
+	width: 11.11%;
+	height: 3px;
 	background: #4185e1;
 	position: absolute;
-	top: 7px;
+	top: 9px;
 	z-index: 10;
 	border-radius: 10px;
 	box-shadow: 0 0 5px rgb(83,129,190);
@@ -941,6 +1025,7 @@
 	opacity: 0.9;
 	border-radius: 2px;
 	display:none;
+	z-index: 10;
 }
 
 .st-sub-box-more-box {
@@ -1082,6 +1167,7 @@
 	line-height: 42px;
 	color: #1e649d;
 	cursor: pointer;
+	-webkit-user-select: none;
 }
 
 .st-like-btn:active, .st-message:active {
@@ -1090,7 +1176,7 @@
 }
 .st-like-btn, .st-message {
 	float:left;
-	width:48%;
+	width: 49.73%;
 	height:100%;
 }
 
@@ -1103,15 +1189,176 @@
 }
 
 .st-post-area{
-	margin-top:10px;
+	margin-top:20px;
 	width:100%;
-	height: 310px;
+	cursor:pointer;
+	text-align:center;
+}
+
+.st-post-area > img {
+	width: 350px;
+	height: 100%;
+	margin-left: -6%;
+	border: 1px solid #a6a6a6;
+	box-shadow: 0 0 5px #a1a1a1;
+}
+
+.st-post-area-multi-pic{
+	position:relative;
+	z-index:1;
+	width:310px;
+	height:310px;
+	display: -webkit-inline-box;
+	box-shadow: 0 0 8px #a1a1a1;
+}
+
+.st-post-area-multi-pic:before {
+	content: "";
+	position: absolute;
+	width: 310px;
+	height: 303px;
+	background: white;
+    box-shadow: 0 0 7px #a1a1a1;
+	z-index: -1;
+	-webkit-transform: rotate(-4deg);
+}
+
+.st-post-area-multi-pic:after {
+	content: "";
+	position: absolute;
+	left: 0;
+	width: 310px;
+	height: 303px;
+	background: white;
+	box-shadow: 0 0 7px #a1a1a1;
+	z-index: -1;
+	-webkit-transform: rotate(3deg);
+}
+
+.st-feedbox-area .ui-select, .te-next{
+	display:none;
+}
+
+/* =============================== page announcement post ==================================== */
+
+#page-announcement-post .ui-title {
+    margin: 2px 30% 4px;
+}
+
+#page-announcement-post div[data-role=header] h3 > div {
+    font-size: 12px;
+}
+
+.ap-post {
+	position: absolute;
+	right: 0;
+	top: 0px;
+	cursor: pointer;
+	width: 100px;
+	height: 100%;
+	text-align: center;
+}
+
+.ap-post:active {
+    background:rgb(0,86,138);
+}
+
+.ap-post img {
+	position: relative;
+	top: 8px;
+	right: 10px;
+}
+
+.ap-content{
+	background: rgb(208,208,208);
+    width: 100%;
+    display:table;
+}
+
+.ap-content-box,.ap-content-textarea{
+    background: white;
+	width: 95%;
+	margin: 13px auto;
+	border-radius: 4px;
+	box-shadow: 0 1px 10px #bbb;
+}
+
+.ap-content-box > img:nth-child(1){
+    margin: 0 15px;
+    position: relative;
+    top: 2px;
+}
+
+.ap-content-box{
+    height: 40px;
+    line-height: 40px;
+    display: block;
+}
+
+.ap-content-textarea{
+    min-height: 80px;
+    line-height:80px;
+}
+
+.ap-content-textarea{
+    margin-bottom:80px;
+}
+
+.ap-textarea-title{
+	width: 80%;
+	border: 0;
+	font-size: 15px;
+	resize:none;
+	height: 15px;
+}
+
+.ap-textarea-title:focus{ outline:none } 
+
+.ap-apt-btn-area {
+	float: right;
+	width: 125px;
+	font-size: 14px;
+	color: #d43e37;
 	cursor:pointer;
 }
 
-.st-post-area .ui-select,.te-next{
-	display:none;
+.ap-apt-btn-area img{
+    width: 20px;
+    position: relative;
+    top: 5px;
 }
+
+.ap-object-btn{
+	width: 20px;
+	float: right;
+	position: relative;
+	top: 9px;
+	right: 9px;
+}
+
+.ap-top-btn {
+	float: right;
+	position: relative;
+	top: 5px;
+	right: 10px;
+}
+
+.ap-textarea-desc {
+    width: 75%;
+	border: 0;
+	font-size: 15px;
+	resize: none;
+	margin-top: 15px;
+	position: relative;
+    top: 6px;
+}
+
+.ap-content-textarea img{
+    margin: auto 15px;
+    position:relative;
+}
+
+.ap-textarea-desc:focus{ outline:none } 
 
 /* =============================== page chatroom ==================================== */
 
@@ -1230,9 +1477,9 @@
 }
 
 .chatroom-addstate-top-area{
-	position: absolute;
+	display:none;
     z-index: 1;
-    top: -200px;
+    /* top: -200px; */
     text-align:center;
     background: rgb(45,52,65);
     color:#b0b9ca;
