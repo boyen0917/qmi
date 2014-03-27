@@ -1,0 +1,14 @@
+.ui-body-c textarea{
+    font-family: "微軟正黑體","Microsoft JhengHei";
+    -webkit-font-smoothing: antialiased;
+    font-weight: normal;
+}
+
+
+.ap-textarea-desc {
+    border: 2px solid #ccc;
+    padding: 10px;
+    vertical-align: top;
+    width: 25%;
+}
+

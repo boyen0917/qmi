@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>  
+<html>  
+<head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+    <title>文字區塊自動高度</title>  
+    <script src="../js/jquery.js"></script>  
+    <script src="js/sha/sha1.js"></script>
+    <script src="js/sha/enc-base64-min.js"></script>
+    <script type="text/javascript">   
+    $(function(){  
+        //api 網址
+        var base_url = "https://apserver.mitake.com.tw/apiv1/";
+        //var base_url = "http://10.1.17.116:8090/apiv1/";
+        
+        var ui,at,gi,gn,gd,ga,gm,device_token,zoom_out_cnt,zoom_in_cnt,group_list;
+        
+        //ajax用
+        var myRand = Math.floor((Math.random()*1000)+1);
+     
+        var id = "+886980922917";
+        //登入認證
+        var api_name = "login";
+        var headers = {
+        	    "id":id,
+        	    "up":toSha1Encode("123456"), 
+        	    "ns":"",
+        	    "li":"zh_TW"
+        	        };
+        var method = "post";
+        
+        var result = ajaxDo(api_name,headers,method,true);
+        result.complete(function(data){
+        	ui = $.parseJSON(data.responseText).ui;
+            at = $.parseJSON(data.responseText).at;
+
+            /* 
+            var api_name = "groups";
+            var headers = {
+                "ui":ui,
+                "at":at,
+                "li":"zh_TW",
+                "gn":encodeURI("test"),
+                "gd":encodeURI("test")
+            };
+            var method = "get";
+            var result = ajaxDo(api_name,headers,method,true);
+            result.complete(function(data){
+                console.log(data);return;
+            }); 
+            return; */
+            var api_name = "groups/4fbb9ffe-24b7-4a92-be86-508ea73e6d94/timelines/2ef79528-ab8a-47fa-9b64-bba5e890eada/events";
+            var headers = {
+                    "ui":ui,
+                    "at":at, 
+                    "li":"zh_TW"
+                        };
+            var method = "post";
+            
+            var body = {
+            		  "meta":
+            		  {
+            		    "lv": 1,
+            		    "tp": "00"
+            		  },
+            		  "ml":
+            		  [
+            		    {
+            		      "tp": 0,
+            		      "c": "晚上唱歌！"
+            		    }
+            		  ]
+            		};
+            body = JSON.stringify(body);
+            
+            var result = ajaxDo(api_name,headers,method,true,body);
+            result.complete(function(data){
+                console.log($.parseJSON(data.responseText));
+            });
+            
+            /* var api_name = "groups/4fbb9ffe-24b7-4a92-be86-508ea73e6d94/timelines/2ef79528-ab8a-47fa-9b64-bba5e890eada/events";
+            var headers = {
+                    "ui":ui,
+                    "at":at, 
+                    "li":"zh_TW"
+                        };
+            var method = "get";
+            
+            var result = ajaxDo(api_name,headers,method,true);
+            result.complete(function(data){
+            	console.log(data);
+            }); */
+            
+            
+            
+        });
+  
+        
+//ajax
+     function ajaxDo(api_name,headers,method,async,body){
+         //console.log(api_url);
+         var api_url = base_url + api_name;
+         
+         if(async){
+             var result = $.ajax ({
+                 url: api_url,
+                 type: method,
+                 headers:headers,
+                 data:body
+             });/* ajax結束 */
+         }else{
+             var result = $.ajax ({
+                 url: api_url,
+                 type: method,
+                 headers:headers,
+                 async:false,
+             });/* ajax結束 */
+         }
+         
+         return result;
+     } 
+     
+     //sha1 and base64 encode
+     function toSha1Encode(string){
+         var hash = CryptoJS.SHA1(string);
+         var toBase64 = hash.toString(CryptoJS.enc.Base64);
+         return toBase64;
+     }
+ });  
+   </script>   
+</head>  
+<body>  
+   
+</body>  
+</html>  

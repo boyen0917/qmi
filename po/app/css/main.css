@@ -1,4 +1,4 @@
-.ui-body-c, .ui-body-c input, .ui-body-c select, .ui-body-c textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c{
+.ui-body-c, .ui-body-c input, .ui-body-c select,textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c{
     font-family: "微軟正黑體","Microsoft JhengHei";
     -webkit-font-smoothing: antialiased;
     font-weight: normal;
@@ -340,6 +340,7 @@
 .subpage-contact {
 	position: fixed;
 	width: 100%;
+	display:none;
 }
 
 .ui-panel-animate.ui-panel-content-fixed-toolbar-position-left.ui-panel-content-fixed-toolbar-open.ui-panel-content-fixed-toolbar-display-push{
@@ -686,10 +687,6 @@
 
 .color-white{
 	color:white;
-}
-
-.subpage-contact{
-    display:none;
 }
 
 /* =============================== page timeline ==================================== */
@@ -1235,7 +1232,7 @@
 	-webkit-transform: rotate(3deg);
 }
 
-.st-feedbox-area .ui-select, .te-next{
+.subpage-timeline .ui-select, .te-next{
 	display:none;
 }
 
@@ -1341,24 +1338,33 @@
 	position: relative;
 	top: 5px;
 	right: 10px;
+	cursor:pointer;
 }
 
 .ap-textarea-desc {
     width: 75%;
 	border: 0;
 	font-size: 15px;
-	resize: none;
-	margin-top: 15px;
+	resize:none;
 	position: relative;
-    top: 6px;
+	top: 23px;
+	left: 4px;
 }
 
 .ap-content-textarea img{
     margin: auto 15px;
-    position:relative;
+	position: relative;
+	float: left;
+	top: 30px;
 }
 
 .ap-textarea-desc:focus{ outline:none } 
+
+.textarea-animated {
+    -webkit-transition: height 0.2s;
+    -moz-transition: height 0.2s;
+    transition: height 0.2s;
+}
 
 /* =============================== page chatroom ==================================== */
 

@@ -14,6 +14,7 @@
         <link rel="stylesheet" type="text/css" href="effect/css/style6.css" />
         <script type="text/javascript" src="effect/js/modernizr.custom.70748.js"></script>
         <script type="text/javascript" src="effect/js/jquery.transitions.js"></script>
+        <script type="text/javascript" src="js/jquery.autosize.min.js"></script>
         
     </head>
     <body>
@@ -257,17 +258,16 @@
                     <div data-st-filter="all" class="st-filter-list st-filter-main"><span>全部</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
                     <div class="st-filter-other">
 	                    <div data-st-filter="unread" class="st-filter-list"><span>未讀</span></div>
-	                    <div data-st-filter="list-1" class="st-filter-list"><span>總經理室</span></div>
-	                    <div data-st-filter="list-2" class="st-filter-list"><span>管理室</span></div>
-	                    <div data-st-filter="list-3" class="st-filter-list"><span>雲端事業群</span></div>
-	                    <div data-st-filter="list-4" class="st-filter-list"><span>ＡＰＰ事業群</span></div>
+	                    <div data-st-filter="list-1" class="st-filter-list"><span>已收藏</span></div>
 	                    <div class="st-filter-list-btn"><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
                     </div>
                 </div>
-                <div class="st-feedbox-area ">
-                    <select id="type-trans">
-                        <option value="te-example4"></option>
-                    </select>
+                <select id="type-trans">
+                    <option value="te-example4"></option>
+                </select>
+                <div class="st-feedbox-area">
+                    <div class="st-feedbox-area2">
+                    </div>
                     <div class="st-sub-box">
                         <img class="st-sub-box-more-btn" src="images/timeline/timeline_feedbox_icon_list.png"/>
                         <div class="st-sub-box-more">
@@ -559,11 +559,11 @@
                 <div data-sp-box="top" class="ap-content-box">
                     <img src="images/compose/compose_form_icon_top.png"/>
                     共同置頂
-                    <img class="ap-top-btn" src="images/compose/compose_form_icon_check_none.png"/>
+                    <img class="ap-top-btn" data-ap-top="0" src="images/compose/compose_form_icon_check_none.png"/>
                 </div>
                 <div class="ap-content-textarea">
                     <img src="images/compose/compose_form_icon_description.png"/>
-                    <textarea class="ap-textarea-desc" placeholder="內容描述" data-role="none" style="height: 24px;"></textarea>
+                    <textarea class="ap-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
                 </div>
             </div>
             <div class="chatroom-footer">
@@ -688,6 +688,7 @@
         
         <script type="text/javascript">
             $(function(){
+            	
             	//api 網址
                 var base_url = "https://apserver.mitake.com.tw/apiv1/";
             	//var base_url = "http://10.1.17.116:8090/apiv1/";
@@ -695,7 +696,8 @@
                 var myRand = Math.floor((Math.random()*1000)+1);
                 
                 //全域
-                var ui,at,gi,gn,gd,ga,gm,device_token,zoom_out_cnt,zoom_in_cnt,filter_name;
+                var ui,at,gi,gn,gd,ga,gm,device_token,zoom_out_cnt,zoom_in_cnt,filter_name,
+                default_group,group_id,group_name,timeline_id;
                 
                 //計算螢幕長寬以維持比例
             	var proportion = 1.7;
@@ -784,7 +786,7 @@
                             ajaxDo(api_name,headers,method,true).complete(function(data){
                                 var nk = $.parseJSON(data.responseText).nk;
                                 var sl = $.parseJSON(data.responseText).sl;
-                                $(".sm-user-area-r, .main-user-area-r").html(nk + "<br/>" + sl);
+                                $(".sm-user-area-r, .main-user-area-r").html("秀賢<br/>大家好");
                             });
                         	
                             //取得團體列表
@@ -800,8 +802,17 @@
                                 if(data.status != 200){
                                 	$.mobile.changePage("#page-helper");
                                 }else{
-                                    $("#group-nav-area li a[data-group-act=gl]").trigger("click");
-                                    $.mobile.changePage("#page-group-main", {transition: "pop"});
+                                	//製作timeline
+                                	
+                                	//預設團體暫定為第一個團體
+                                	default_group = $.parseJSON(data.responseText).gl[0];
+                                	group_id = default_group.gi
+                                	group_name = default_group.gn;
+                                	timeline_id = default_group.tl[0].ti;
+                                	
+                                	//製作timeline
+                                	timelineListWrite();
+                                	$.mobile.changePage("#page-group-main", {transition: "pop"});
                                 }
                             });
                         }
@@ -1036,7 +1047,6 @@
 		        });
 
 		        $("#side-menu").on( "panelbeforeclose", function() {
-		        	console.log(11);
 		        	//timeline固定右邊頁面
                     $("#page-group-main .ui-panel-content-wrap").removeClass("page-fixed");
 		        });
@@ -1074,6 +1084,7 @@
 		        	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_click.png");
 		        	switch (target.data("sm-act")) {
 	                    case "feed":
+	                    	timelineListWrite();
 	                    	$(".subpage-contact").hide();
 	                    	$(".subpage-timeline").show();
 	                    	$( "#side-menu" ).panel( "close");
@@ -1242,7 +1253,7 @@
                 	});
                 });
                 
-                $(".st-like-btn").click(function(){
+                $(document).on('click','.st-like-btn',function(){
                 	var like_count = parseInt($(this).parent().parent().find(".st-sub-box-3 div:eq(0)").html());
                 	if($(this).html().length == 1){
                 		$(this).parent().parent().find(".st-sub-box-3 img:eq(0)").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
@@ -1256,7 +1267,7 @@
                 });
                 
                 //文章區塊 編輯按鈕
-                $(".st-sub-box-more-btn").click(function(){
+                $(document).on('click','.st-sub-box-more-btn',function(){
                 	//按下效果
                 	$(this).attr("src","images/timeline/timeline_feedbox_icon_list_click.png");
                 	setTimeout(function(){
@@ -1279,13 +1290,13 @@
                     zoomOut($(this).next());
                 });
                 
-                $(".st-more-close").click(function(){
+                $(document).on('click','.st-more-close',function(){
                 	zoom_in_cnt = 100;
                 	zoomIn($(this).parent());
                 });
                 
                 //編輯區塊按鈕效果
-                $(".st-sub-box-more-box").click(function(){
+                $(document).on('click','.st-sub-box-more-box',function(){
                     var target = $(this);
                     var more_img_url = "images/timeline/timeline_hiddenmenu_icon_";
                     target.addClass("st-sub-box-more-box-click");
@@ -1297,7 +1308,6 @@
                 });
                 
                 $(".feed-compose").click(function(){
-                	console.log(44);
                 	if($(".feed-compose-area").is(":visible")){
                 		$(".feed-compose").removeClass("feed-compose-visit");
                 		$(".feed-compose-area-cover").hide();
@@ -1345,20 +1355,62 @@
 //----------------------------------- timeline-公告 ---------------------------------------------
                 $(".ap-content").height($(window).height()-80);
                 
-                $('.ap-textarea-desc').bind("keyup", function () {
-                	$(this).css('height','0px').height(($(this).prop("scrollHeight"))+"px");
-                	var position = (($(this).outerHeight()+40)/2-40);
-                	if(position < 0)position = 0;
-                	$(".ap-content-textarea img").css("bottom",position + "px");
-                	$('html, body').animate({scrollTop: $(document).height()}, 0); 
-                	console.log(($(this).prop("scrollHeight")));
+                $('.ap-textarea-desc').autosize({append: "\n"});
+                
+                $(".ap-top-btn").click(function(){
+                	if($(".ap-top-btn").data("ap-top") == 0){
+                		$(".ap-top-btn").attr("src","images/compose/compose_form_icon_check.png");
+                		$(".ap-top-btn").data("ap-top",1);
+                	}else{
+                		$(".ap-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
+                		$(".ap-top-btn").data("ap-top",0);
+                	}
                 });
                 
-                $(".ap-post").click(function(){
-                	var html = $(".ap-textarea-desc").val();
-                	$(".ap-textarea-desc").focus().val("").val(html);
-                });
 
+                $(".ap-post").click(function(){
+                	var ap_title = $(".ap-textarea-title").val(),
+                	    ap_content = $('.ap-textarea-desc').val();
+                	
+                   if(!ap_title){
+                	   popupShowAdjust("標題沒填");
+                   }else if(!ap_content){
+                	   popupShowAdjust("內容沒填");
+                   }else{
+                	   
+                	   var api_name = "groups/"+ group_id +"/timelines/"+ timeline_id +"/events";
+                       var headers = {
+                               "ui":ui,
+                               "at":at, 
+                               "li":"zh_TW"
+                                   };
+                       var method = "post";
+                       
+                       var body = {
+                                 "meta":
+                                 {
+                                   "lv": 1,
+                                   "tp": "00"
+                                 },
+                                 "ml":
+                                 [
+                                   {
+                                     "tp": 0,
+                                     "c": ap_content
+                                   }
+                                 ]
+                               };
+                       body = JSON.stringify(body);
+                       
+                       var result = ajaxDo(api_name,headers,method,true,body);
+                       result.complete(function(data){
+                    	   popupShowAdjust("我錯了...");
+                    	   //製作timeline
+                           timelineListWrite();
+                    	   popupAfterChangePage("#page-group-main");
+                       });
+                   }
+                });
                 
 //----------------------------------- 聯絡人 ---------------------------------------------  
                 //功能選單
@@ -1479,7 +1531,7 @@
                 
                 $(".chat-bar-send").click(function(){
                 	var now = new Date();
-                	var outStr = (now.getHours()<10?"0" + now.getHours():now.getHours()) +':'+ (now.getMinutes()<10?"0" + now.getMinutes():now.getMinutes())
+                	var outStr = (now.getHours()<10?"0" + now.getHours():now.getHours()) +':'+ (now.getMinutes()<10?"0" + now.getMinutes():now.getMinutes());
                 	if($(".chat-bar-input").val()){
                 		$(".chat-area").append(
                 			'<div class="chat-me">'+
@@ -1497,7 +1549,7 @@
                 });
 //----------------------------------- function ---------------------------------------------                
                 //ajax
-                function ajaxDo(api_name,headers,method,async){
+                function ajaxDo(api_name,headers,method,async,body){
                     //console.log(api_url);
                     var api_url = base_url + api_name;
                     var myRand = Math.floor((Math.random()*1000)+1);
@@ -1507,6 +1559,7 @@
                             url: api_url,
                             type: method,
                             headers:headers,
+                            data:body
                         });/* ajax結束 */
                     }else{
                     	var result = $.ajax ({
@@ -1530,7 +1583,6 @@
                     var method = "get";
                     result = ajaxDo(api_name,headers,method);
                     if(result.responseText){
-                    	console.log(result.responseText);
                     	$(".sm-group-list-area").html("");
                     	$(".sm-group-list-area-add").html("");
                     	//chk是開關按鈕ui變化的檢查
@@ -1567,6 +1619,67 @@
                         }
                     }
                 }
+                
+                //動態消息列表
+                function timelineListWrite(){
+                    //製作timeline
+                    var api_name = "groups/"+ group_id +"/timelines/"+ timeline_id +"/events";
+                    var headers = {
+                            "ui":ui,
+                            "at":at, 
+                            "li":"zh_TW"
+                                };
+                    var method = "get";
+                    var result = ajaxDo(api_name,headers,method,true);
+                    result.complete(function(data){
+                        var timeline_list = $.parseJSON(data.responseText).el;
+                        var content;
+                        $(".st-feedbox-area2").html('');
+                        $.each(timeline_list,function(i,val){
+                            content = 
+                                '<div class="st-sub-box">' +
+                                    '<img class="st-sub-box-more-btn" src="images/timeline/timeline_feedbox_icon_list.png"/>' +
+                                    '<div class="st-sub-box-more">' +
+                                       '<div class="st-more-close"></div>' +
+                                       '<div data-st-more="top" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_top.png"/><div>置頂</div></div>' +
+                                       '<div data-st-more="subscribe" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_subscribe.png"/><div>訂閱</div></div>' +
+                                       '<div data-st-more="copy" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copy.png"/><div>複製</div></div>' +
+                                       '<div data-st-more="copyword" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copyword.png"/><div>複製內容</div></div>' +
+                                       '<div data-st-more="calendar" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_calendar.png"/><div>加入行事曆</div></div>' +
+                                       '<div data-st-more="del" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_del.png"/><div>刪除</div></div>' +
+                                    '</div>' +
+                                    '<div class="st-sub-box-1">' +
+                                        '<div class="st-sub-box-1-main">' +
+                                           '<div class="st-user-pic"><img src="images/user_pic.png"/></div>' +
+                                           '<div class="st-sub-name">秀賢</div>' +
+                                           '<div class="st-sub-time"><img src="images/icon/icon_time_gray.png"/>3/26 星期四 10:20</div>' +
+                                        '</div>' +
+                                        '<div class="st-sub-box-1-footer">' +
+                                           '<img src="images/icon/icon_object.png"/>' +
+                                           '所有人 ' +
+                                        '</div>' +
+                                    '</div>' +
+                                    '<div class="st-sub-box-2">' +
+                                        val.ml[0].c +
+                                    '</div>' +
+                                    '<div class="st-sub-box-3">' +
+                                        '<img src="images/timeline/timeline_feedbox_icon_like.png"/><div>0</div>' +
+                                        '<img src="images/timeline/timeline_feedbox_icon_chat.png"/><div>0</div>' +
+                                        '<img src="images/timeline/timeline_feedbox_icon_read.png"/><div>0</div>' +
+                                    '</div>' +
+                                    '<div class="st-sub-box-4">' +
+                                        '<div class="st-like-btn">讚</div>' +
+                                        '<div class="st-message">留言</div>' +
+                                    '</div>' +
+                                '</div>';
+                            $(".st-feedbox-area2").append(content);
+                            
+                        });
+                    });
+                    
+                    
+                }
+                
               //計算彈出對話框置中
                 function popupShowAdjust(desc){
                 	$(".popup-frame").css("margin-left",0);
