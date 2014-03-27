@@ -1366,6 +1366,14 @@
     transition: height 0.2s;
 }
 
+.ap-addfile {
+	float: left;
+	width: 20%;
+	text-align: center;
+	padding-top: 10px;
+	cursor: pointer;
+}
+
 /* =============================== page chatroom ==================================== */
 
 #page-chatroom {
@@ -1389,16 +1397,7 @@
 
 .char-bar-input:focus{ outline:none } 
 
-/* .chatroom-footer {
-	background: rgb(239,239,239);
-	border: double 7px;
-    height: 30px;
-	border-image: url("../images/chatroom/chat_textbar_bgimg.png") 12 round stretch;
-	display: inline-block;
-	width: 100%;
-} */
-
-.chatroom-footer {
+.chatroom-footer, .announcement-footer{
     height: 44px;
     background: url("../images/chatroom/textbar_bg46.png") repeat-x;
     display: inline-block;
