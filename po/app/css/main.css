@@ -15,6 +15,10 @@
 	display:none;
 }
 
+.center-style{
+    text-align:center;
+}
+
 .page-back {
 	height: 25px;
 	width: 25px;
@@ -169,10 +173,6 @@
 	border-radius: 3px;
 	text-shadow: 0 0;
 	color: gainsboro;
-}
-
-.helper-top-area{
-    text-align:center;
 }
 
 .helper-title{
@@ -770,6 +770,7 @@
 	height: 50px;
 	line-height: 50px;
 	display: -webkit-box;
+    border-radius: 10px 10px 0 0;
 }
 
 .fc-area-subbox:active {
@@ -834,6 +835,7 @@
 .st-navi-count {
 	float: right;
 	position: relative;
+	right: 2px;
 	bottom: 53px;
 	border: 2px solid #91bbf0;
 	border-radius: 11px;
@@ -942,10 +944,10 @@
 
 .st-cover-bar-selector {
 	width: 11.11%;
-	height: 3px;
+	height: 4px;
 	background: #4185e1;
 	position: absolute;
-	top: 9px;
+	top: 8px;
 	z-index: 10;
 	border-radius: 10px;
 	box-shadow: 0 0 5px rgb(83,129,190);
@@ -1116,6 +1118,7 @@
 	border-bottom: 1px solid rgb(211,211,211);
 	padding: 15px;
     min-height: 70px;
+    word-wrap: break-word;
 }
 
 .st-sub-box-3 {
@@ -1193,9 +1196,8 @@
 }
 
 .st-post-area > img {
-	width: 350px;
+	width: 345px;
 	height: 100%;
-	margin-left: -6%;
 	border: 1px solid #a6a6a6;
 	box-shadow: 0 0 5px #a1a1a1;
 }
@@ -1234,6 +1236,34 @@
 
 .subpage-timeline .ui-select, .te-next{
 	display:none;
+}
+
+.st-prelink {
+	width: 100%;
+	text-align: center;
+}
+
+.st-prelink-pic {
+    margin: 15px;
+}
+
+.st-prelink-title, .st-prelink-desc{
+	text-align:left;
+}
+
+.st-prelink-pic > img {
+    width: 300px;
+}
+
+.st-prelink-title {
+    margin-bottom: 10px;
+}
+
+.st-prelink-div {
+	border-bottom: 1px solid #e2e2e2;
+	width: 110%;
+	margin-left: -5%;
+	margin-top: 10px;
 }
 
 /* =============================== page announcement post ==================================== */
@@ -1372,6 +1402,36 @@
 	text-align: center;
 	padding-top: 10px;
 	cursor: pointer;
+}
+
+.ap-ta-yql{
+	display:none;
+	width: 100%;
+	text-align: center;
+	background: aliceblue;
+	line-height: 20px;
+	padding: 15px 0px;
+}
+
+.ap-yql-title {
+    padding: 0 20px;
+}
+
+.ap-yql-img {
+	display: inline-block;
+	margin: 10px;
+}
+
+.ap-yql-img img {
+    width: 200px;
+    position: initial;
+}
+
+.ap-yql-desc {
+	line-height: 20px;
+	width: 90%;
+	display: inline-block;
+	text-align: left;
 }
 
 /* =============================== page chatroom ==================================== */
