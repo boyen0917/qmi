@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<script src="jquery.js"></script>
+<script>
+$(function(){
+var arr = [{"a":1,"b":2},{"a":11,"b":22},{"a":111,"b":222}];
+var brr = [1,2,3,4,5];
+
+
+arr.slice(0,1);
+
+
+console.log(arr);
+
+function test(brr,arr){
+	
+	brr.push(arr);
+	brr.push(arr);
+	brr.push(arr);
+	brr = brr.slice(0,1);
+	console.log(brr);
+}
+
+	
+
+})
+</script>
+</body>
+</html>

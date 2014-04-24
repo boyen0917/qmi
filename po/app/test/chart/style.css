@@ -1,0 +1,144 @@
+html {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 100%;
+  background: #333;
+}
+
+#page-wrapper {
+  width: 600px;
+  background: #FFF;
+  padding: 1em;
+  margin: 1em auto;
+  min-height: 300px;
+  border-top: 5px solid #69c773;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+h1 {
+	margin-top: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+#fileDisplayArea {
+  margin-top: 2em;
+  width: 100%;
+  overflow-x: auto;
+}
+
+    .node {
+    cursor: pointer;
+  }
+
+  .overlay{
+      background-color:#EEE;
+  }
+   
+  .node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+  }
+   
+  .node text {
+    font-size:10px; 
+    font-family:sans-serif;
+  }
+   
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
+
+  .templink {
+    fill: none;
+    stroke: red;
+    stroke-width: 3px;
+  }
+
+  .ghostCircle.show{
+      display:block;
+  }
+
+  .ghostCircle, .activeDrag .ghostCircle{
+       display: none;
+  }
+
+.edit-branch-member {
+    width: 200px;
+    height: 400px;
+    background: white;
+    box-shadow: 0 0 15px;
+    position: absolute;
+    border-radius:10px;
+    display:none;
+    overflow-y: scroll;
+ }
+ 
+.edit-bm-branch {
+    display: flex;
+    background: #e1e1e1;
+    height: 50px;
+    border-bottom: 1px solid;
+}
+
+.edit-bm-branch-img {
+    flex: 3;
+}
+
+.edit-bm-branch-img div,.edit-bm-list-img div {
+    width: 85%;
+    height: 40px;
+    background: gray;
+    margin: 5px;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 10px;
+    color: white;
+    font-size: 15px;
+}
+
+.edit-bm-branch-name {
+    flex: 10;
+}
+
+.edit-bm-branch-name div {
+    width: 80%;
+    height: 35px;
+    background: white;
+    border: 1px solid #d2d2d2;
+    margin: 7px;
+    border-radius: 8px;
+    line-height: 35px;
+    overflow: scroll;
+}
+
+.edit-bm-list {
+    display: flex;
+    border-bottom: 1px solid;
+}
+
+.edit-bm-list-chk {
+    flex: 4;
+}
+
+.edit-bm-list-chk div {
+    width: 25px;
+    height: 25px;
+    border: 1px solid #a1a1a1;
+    background: white;
+    border-radius: 30px;
+    margin: 12px 6px;
+}
+
+.edit-bm-list-img {
+    flex: 5;
+}
+
+.edit-bm-list-content {
+    flex: 12;
+    padding: 5px;
+}

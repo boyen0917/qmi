@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Droppable - Default functionality</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+  <style>
+  .select-area{
+    width:100%;
+    height:100px;
+    background:#d2d2d2;
+    border-bottom:1px solid #a1a1a1;
+    display:flex;
+  }
+  .show-area{
+    background:#f1f1f1;
+    widht:100%;
+    height:500px;
+    text-align:center;
+    display:flex;
+  }
+  
+  .select-element{
+    margin: 10px 30px;
+	width: 70px;
+	height: 70px;
+	border-radius: 70px;
+	background: white;
+	font-size: 15px;
+	text-align: center;
+	line-height: 70px;
+	box-shadow:0 0 5px #a2a2a2;
+  }
+  
+    .pos-top{
+        position:relative;
+        z-index:100;
+    }
+    
+    .drop-hover{
+        box-shadow:0 0 10px red;
+    }
+  
+  .slant{
+    position:absolute;
+    display:none;
+  }
+  
+  #draggable { width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px 10px 10px 0; }
+  #droppable { width: 150px; height: 150px; padding: 0.5em; float: left; margin: 10px; }
+  </style>
+  <script>
+  $(function() {
+    $( ".select-element" ).draggable({
+    		start: function( event, ui ) {
+                    $(this).addClass("pos-top");
+    		},	
+		    stop: function( event, ui ) {
+		    	$(this).droppable({
+		    		hoverClass: "drop-hover",
+		    	      drop: function( event, ui ) {
+		    	    	  var from = event.toElement.id;
+		    	    	  /* var s_name = $("#" + from).html();
+		    	    	  $("#" + from).remove(); */
+		    	    	  var top = $(this).offset().top;
+		    	    	  var left = $(this).offset().left;
+		    	    	  $("#" + from).css({left:left-30,top:top-10,position:"absolute"});
+		    	    	  $("#" + from).animate({top:top-100,left:left+100},function(){
+		    	    		  $(".slant").css({left:(left+60),top:(top-60)});
+		    	    		  $(".slant").show();
+		    	    	  });
+		    	      }
+	    	    });
+		    }   
+    });
+    $( ".show-area" ).droppable({
+      drop: function( event, ui ) {
+    	  
+    	  console.log(1111);
+    	  
+      }
+    });
+    
+    function createNewElement(target){
+    	target.clone().appendTo( ".show-area" );
+    }
+  });
+  </script>
+</head>
+<body>
+ 
+<div class="select-area">
+    
+    <div id="e1" data-gid="e1" class="select-element">雲端事業</div>
+    <div id="e2" data-gid="e2" class="select-element">平台應用</div>
+    <div id="e3" data-gid="e3" class="select-element">核心技術</div>
+    <div id="e4" data-gid="e4" class="select-element">系統研發</div>
+
+</div>
+ 
+<div class="show-area">
+<svg class="slant" version="1.1" width="80" height="80"><line x1="0" y1="80" x2="80" y2="0" stroke="black" stroke-width="1"></line></svg>
+</div>
+ 
+ 
+</body>
+</html>
