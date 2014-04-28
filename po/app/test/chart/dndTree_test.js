@@ -345,9 +345,6 @@ function treeMake(treeData,queue,undo_cnt) {
         centerNode(d);
     }
     
-    function clickCenter(d) {
-        centerNode(d);
-    }
     var count = 0;
     function update(source) {
     	
@@ -401,6 +398,9 @@ function treeMake(treeData,queue,undo_cnt) {
 
         nodeEnter.append("rect")
             .attr('class', 'nodeCircle')
+            .attr('data-bid', function(d){
+            	return d.id;
+            })
             .attr("width", 80)
             .attr("height", 80)
             .attr("x", "-80")
@@ -419,29 +419,29 @@ function treeMake(treeData,queue,undo_cnt) {
             .on('click', click);
 
 
-        
         nodeEnter.append("circle")
             .attr('class', 'add')
+            .attr('hid', function(d){
+            	return d.hid;
+            })
             .attr("r", 0)
 	        .attr("cy", -35)
         	.attr("cx", -5);
         
         nodeEnter.append("circle")
 	        .attr('class', 'delete')
+	        .attr('hid', function(d){
+            	return d.hid;
+            })
 	        .attr("r", 0)
 	        .attr("cy", 35)
-	    	.attr("cx", -5)
-	    	.on("click",clickCenter);
+	    	.attr("cx", -5);
         
 
         nodeEnter.append("text")
             .attr("dx", -80)
             .attr("dy", "0.35em")
             .attr('class', 'nodeText')
-            .attr("text-anchor", "start")
-            .text(function(d) {
-                return d.name + "          ";
-            })
             .style("fill-opacity", 0);
 
         // phantom node to give us mouseover in a radius around it
@@ -467,7 +467,7 @@ function treeMake(treeData,queue,undo_cnt) {
                 return d.children || d._children ? "end" : "start";
             })
             .text(function(d) {
-                return d.name;
+            	return d.name;
             });
         
         node.select("circle.add")
@@ -579,8 +579,8 @@ function treeMake(treeData,queue,undo_cnt) {
         }
         
         zoomListener.scale(0.3);
-        
     }
+    
 
     function structuredClone(obj) {
 	    var oldState = history.state;
@@ -599,6 +599,7 @@ function treeMake(treeData,queue,undo_cnt) {
     // Layout the tree initially and center on the root node.
     update(root);
     centerNode(root);
+    
     
     
 }
