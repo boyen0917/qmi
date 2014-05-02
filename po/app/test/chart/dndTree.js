@@ -345,9 +345,6 @@ function treeMake(treeData,queue,undo_cnt) {
         centerNode(d);
     }
     
-    function clickCenter(d) {
-        centerNode(d);
-    }
     var count = 0;
     function update(source) {
     	
@@ -393,6 +390,9 @@ function treeMake(treeData,queue,undo_cnt) {
         var nodeEnter = node.enter().append("g")
             .call(dragListener)
             .attr("class", "node")
+            .attr('hid', function(d){
+            	return d.hid;
+            })
             .attr("transform", function(d) {
                 return "translate(" + source.y0 + "," + source.x0 + ")";
             })
@@ -410,32 +410,40 @@ function treeMake(treeData,queue,undo_cnt) {
             .attr("y", "-40")
             .attr("rx",20)
             .attr("ry",20)
-            .style("stroke", "gray")
-            .on('click', click);
-        
-        nodeEnter.append("svg:image")
-	        .attr("xlink:href", "http://www.e-pint.com/epint.jpg")
-	        .attr("width", 70)
-	        .attr("height", 70)
-	        .attr("x", "-75")
-            .attr("y", "-35")
-            .on('click', click);
-
-
+            .style("stroke", "gray");
         
         nodeEnter.append("circle")
-            .attr('class', 'add')
+            .attr('hid', function(d){
+            	return d.hid;
+            })
             .attr("r", 0)
 	        .attr("cy", -35)
         	.attr("cx", -5);
         
         nodeEnter.append("circle")
-	        .attr('class', 'delete')
+	        .attr('hid', function(d){
+            	return d.hid;
+            })
 	        .attr("r", 0)
 	        .attr("cy", 35)
-	    	.attr("cx", -5)
-	    	.on("click",clickCenter);
+	    	.attr("cx", -5);
         
+        nodeEnter.append("svg:image")
+	        .attr("xlink:href", "add.png")
+	        .attr("class","svg-edit-add")
+	        .attr("width", 30)
+	        .attr("height", 30)
+	        .attr("x", "-20")
+	        .attr("y", "-50");
+
+        nodeEnter.append("svg:image")
+	        .attr("xlink:href", "del.png")
+	        .attr("class","svg-edit-delete")
+	        .attr("width", 30)
+	        .attr("height", 30)
+	        .attr("x", "-20")
+	        .attr("y", "20");
+
 
         nodeEnter.append("text")
             .attr("dx", -80)
@@ -466,7 +474,7 @@ function treeMake(treeData,queue,undo_cnt) {
                 return d.children || d._children ? "end" : "start";
             })
             .text(function(d) {
-            	return d.name + " : " + d.hid;
+            	return d.name;
             });
         
         node.select("circle.add")
@@ -578,8 +586,8 @@ function treeMake(treeData,queue,undo_cnt) {
         }
         
         zoomListener.scale(0.3);
-        
     }
+    
 
     function structuredClone(obj) {
 	    var oldState = history.state;
@@ -598,6 +606,7 @@ function treeMake(treeData,queue,undo_cnt) {
     // Layout the tree initially and center on the root node.
     update(root);
     centerNode(root);
+    
     
     
 }

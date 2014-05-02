@@ -1,6 +1,5 @@
 
-function treeMake(treeData) {
-	
+function treeMake(treeData,queue,undo_cnt) {
     // Calculate total nodes, max label length
     var totalNodes = 0;
     var maxLabelLength = 0;
@@ -14,13 +13,14 @@ function treeMake(treeData) {
     var i = 0;
     var duration = 750;
     var root;
+    var undo_chk = false;
 
     // size of the diagram
-//    var viewerWidth = $(document).width();
-//    var viewerHeight = $(document).height();
+    var viewerWidth = $(document).width();
+    var viewerHeight = $(document).height();
     
-    var viewerWidth = 630;
-    var viewerHeight = 500;
+//    var viewerWidth = 600;
+//    var viewerHeight = 500;
 
     var tree = d3.layout.tree()
         .size([viewerHeight, viewerWidth]);
@@ -98,6 +98,10 @@ function treeMake(treeData) {
 
     function zoom() {
         svgGroup.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+        
+//        if($("div.edit").is(":visible")){
+//        	$("div.edit").hide();
+//        }
     }
 
 
@@ -224,6 +228,7 @@ function treeMake(treeData) {
                     selectedNode.children.push(draggingNode);
                 }
                 // Make sure that the node being added to is expanded so user can see added node is correctly moved
+                undo_chk = true;
                 expand(selectedNode);
                 sortTree();
                 endDrag();
@@ -240,6 +245,7 @@ function treeMake(treeData) {
         d3.select(domNode).select('.ghostCircle').attr('pointer-events', '');
         updateTempConnector();
         if (draggingNode !== null) {
+        	
             update(root);
             centerNode(draggingNode);
             draggingNode = null;
@@ -314,6 +320,7 @@ function treeMake(treeData) {
             .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");
         zoomListener.scale(scale);
         zoomListener.translate([x, y]);
+        
     }
 
     // Toggle children function
@@ -337,8 +344,10 @@ function treeMake(treeData) {
         update(d);
         centerNode(d);
     }
-
+    
+    var count = 0;
     function update(source) {
+    	
         // Compute the new height, function counts total children of root node and sets tree height accordingly.
         // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
         // This makes the layout more consistent.
@@ -355,11 +364,10 @@ function treeMake(treeData) {
             }
         };
         childCount(0, root);
-        
         //改變節點間間距
         var newHeight = d3.max(levelWidth) * 200; // 25 pixels per line  
         tree = tree.size([newHeight, viewerWidth]);
-
+        
         // Compute the new tree layout.
         var nodes = tree.nodes(root).reverse(),
             links = tree.links(nodes);
@@ -382,6 +390,9 @@ function treeMake(treeData) {
         var nodeEnter = node.enter().append("g")
             .call(dragListener)
             .attr("class", "node")
+            .attr('hid', function(d){
+            	return d.hid;
+            })
             .attr("transform", function(d) {
                 return "translate(" + source.y0 + "," + source.x0 + ")";
             })
@@ -390,38 +401,55 @@ function treeMake(treeData) {
 
         nodeEnter.append("rect")
             .attr('class', 'nodeCircle')
+            .attr('data-bid', function(d){
+            	return d.id;
+            })
             .attr("width", 80)
             .attr("height", 80)
             .attr("x", "-80")
             .attr("y", "-40")
             .attr("rx",20)
             .attr("ry",20)
-            .style("stroke", "gray")
-            .on('click', click);
+            .style("stroke", "gray");
         
         nodeEnter.append("circle")
-            .attr('class', 'add')
+            .attr('hid', function(d){
+            	return d.hid;
+            })
             .attr("r", 0)
 	        .attr("cy", -35)
         	.attr("cx", -5);
         
         nodeEnter.append("circle")
-	        .attr('class', 'delete')
+	        .attr('hid', function(d){
+            	return d.hid;
+            })
 	        .attr("r", 0)
 	        .attr("cy", 35)
 	    	.attr("cx", -5);
         
+        nodeEnter.append("svg:image")
+	        .attr("xlink:href", "add.png")
+	        .attr("class","svg-edit-add")
+	        .attr("width", 30)
+	        .attr("height", 30)
+	        .attr("x", "-20")
+	        .attr("y", "-50");
+
+        nodeEnter.append("svg:image")
+	        .attr("xlink:href", "del.png")
+	        .attr("class","svg-edit-delete")
+	        .attr("width", 30)
+	        .attr("height", 30)
+	        .attr("x", "-20")
+	        .attr("y", "20");
+
 
         nodeEnter.append("text")
-            .attr("dx", -20)
-            .attr("dy", ".35em")
+            .attr("dx", -80)
+            .attr("dy", "0.35em")
             .attr('class', 'nodeText')
-            .attr("text-anchor", "start")
-            .text(function(d) {
-                return d.name;
-            })
-            .style("fill-opacity", 0)
-            .on('click', click);
+            .style("fill-opacity", 0);
 
         // phantom node to give us mouseover in a radius around it
         nodeEnter.append("circle")
@@ -440,28 +468,22 @@ function treeMake(treeData) {
         // Update the text to reflect whether node has children or not.
         node.select('text')
             .attr("x", function(d) {
-                return -60;
+                return d.children || d._children ? -10 : 90;
             })
             .attr("text-anchor", function(d) {
-                return "start";
+                return d.children || d._children ? "end" : "start";
             })
             .text(function(d) {
-                return d.name;
+            	return d.name;
             });
         
         node.select("circle.add")
         .attr("r", 15)
-        .style("fill", "#d2d2d2")
-        .on("click",function(d){
-        	console.log("add");
-        });
+        .style("fill", "#d2d2d2");
         
         node.select("circle.delete")
         .attr("r", 15)
-        .style("fill", "#d2d2d2")
-        .on("click",function(d){
-        	console.log("vvv");
-        });
+        .style("fill", "#d2d2d2");
         
 
         // Change the circle fill depending on whether it has children and is collapsed
@@ -501,6 +523,10 @@ function treeMake(treeData) {
         
         nodeExit.select("circle.delete")
         .attr("r", 0);
+        
+        nodeExit.select("image")
+        .attr("width", 0)
+        .attr("height", 0);
         
         // Update the links…
         var link = svgGroup.selectAll("path.link")
@@ -547,12 +573,32 @@ function treeMake(treeData) {
             d.x0 = d.x;
             d.y0 = d.y;
         });
+        
+        if(undo_chk || queue.length == 0){
+        	undo_chk = false;
+        	$("#undo-cnt").val($("#undo-cnt").val()*1+1);
+        	
+        	queue.splice($("#undo-cnt").val(),queue.length);
+        	
+        	var obj= structuredClone(root);
+        	queue.push(obj);
+            console.log(queue);
+        }
+        
+        zoomListener.scale(0.3);
     }
+    
 
+    function structuredClone(obj) {
+	    var oldState = history.state;
+	    history.replaceState(obj);
+	    var clonedObj = history.state;
+	    history.replaceState(oldState);
+	    return clonedObj;
+	}
+    
     // Append a group which holds all nodes and which the zoom Listener can act upon.
     var svgGroup = baseSvg.append("g");
-    
-    
 	// Define the root
     root = treeData;
     root.x0 = viewerHeight / 2;
@@ -560,6 +606,9 @@ function treeMake(treeData) {
     // Layout the tree initially and center on the root node.
     update(root);
     centerNode(root);
+    
+    
+    
 }
     
 

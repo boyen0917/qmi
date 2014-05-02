@@ -14,6 +14,8 @@
    
   .node circle {
     fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
   }
    
   .node text {
@@ -43,7 +45,7 @@
   
 .edit-branch-member {
     width: 250px;
-    height: 480px;
+    height: 450px;
     background: white;
     box-shadow: 0 0 15px;
     position: absolute;
@@ -51,31 +53,6 @@
     display:none;
  }
  
-.edit-bm-search {
-	display: flex;
-	margin: 8px auto;
-	width: 90%;
-	height: 30px;
-	border: 1px solid #d2d2d2;
-	border-radius: 7px;
-}
-
-.edit-bm-search img {
-	width: 20px;
-	height: 20px;
-	margin: 5px 5px;
-}
-
-.edit-bm-search input {
-	border: 0;
-	font-size: 12px;
-	width: 100%;
-}
-
-.edit-bm-search input:focus {
-    outline:none;
-}
-
 .edit-bm-branch {
     display: flex;
     background: #e1e1e1;
@@ -165,7 +142,7 @@
 
 .edit-bm-list-area,.edit-bm-list-area-all {
     overflow: scroll;
-    height: 280px;
+    height: 300px;
 }
 
 .edit-bm-list-area-all {
@@ -202,7 +179,6 @@
 .edit-bm-classify {
     display: flex;
     border-bottom: 1px solid;
-    border-top: 1px solid;
     height: 50px;
 }
 
@@ -306,7 +282,7 @@
 <script src="jquery.js"></script>
 <script src="jquery-ui.js"></script>
 <script src="d3.v3.min.js"></script>
-<script src="dndTree.js"></script>
+<script src="dndTree_test.js"></script>
 <script>
 $(function() {
 	
@@ -314,6 +290,8 @@ $(function() {
     var hierachy_arr = {"name":"三竹資訊","hid":0,"children":[{"name":"金融服務事業群","children":[{"name":"系統維運部","children":[{"name":"MIS群組"},{"name":"機房群組"}]},{"name":"金融產規部","children":[{"name":"客服群組"},{"name":"QC群組"}]},{"name":"金融軟體部"},{"name":"金融研發一部"},{"name":"金融研發三部"},{"name":"金融研發二部"},{"name":"金融研發本部"},{"name":"金融業務部"}]},{"name":"管理部"},{"name":"企業簡訊事業群","children":[{"name":"簡訊研發部"},{"name":"簡訊業務部"}]},{"name":"財會部"},{"name":"策略行銷部"},{"name":"雲端服務事業群","children":[{"name":"雲端核心技術研發部"},{"name":"雲端平台應用開發部"},{"name":"雲端產品發展部"},{"name":"雲端系統服務技術部"}]},{"name":"APP應用事業群","children":[{"name":"APP技術部"},{"name":"APP專案部"},{"name":"APP業務部"},{"name":"APP產品部"}]},{"name":"離職員工"},{"name":"副總經理室"},{"name":"總經理室"}]};
     
     visitEachToAddId(hierachy_arr.children);
+    
+    
     function visitEachToAddId(arr,hid,branch_path){
         this_hid = hid;
         $.each(arr,function(i,val){
@@ -331,7 +309,7 @@ $(function() {
                 	if(!mem_val["hid"]){
                 		mem_val["hid"] = [];
                 	}
-                    mem_val["hid"].push(val.hid.toString());
+                    mem_val["hid"].push(val.hid);
                     mem_val["id"] = mem_i+1;
                 }
             });
@@ -349,9 +327,9 @@ $(function() {
     
     
 
-    /* $(document).on("click",".edit-branch-member",function(e){
+    $(document).on("click",".edit-branch-member",function(e){
         e.stopPropagation();
-    }); */
+    });
     
     
     $("#undo").click(function(){
@@ -380,133 +358,86 @@ $(function() {
     	$(".edit-bm-bottom-cancel").trigger("click");
     });
     
-    $(document).on("click","svg rect",function(e){
+    $(document).on("click","circle",function(e){
     	//判斷是否開啟popup視窗
         edit_chk = false;
     	
-        $(".edit-bm-search input").val("");
         branch_name = $(this).parent().find("text").html();
-        hid = $(this).parent()[0].attributes.hid.value;
-
-        e.stopPropagation();
-        //成員視窗的左右位置調整
-        x = memberListAdj($(this).offset().left+30);
-        $(".edit-branch-member").css("top",($(document).height() - $(".edit-branch-member").height())/2);
-        $(".edit-branch-member").css("left",x);
-        $(".edit-branch-member").show();
-        
-        scaleIn($(".edit-branch-member"),8);
-        
-        //現在按下的群組成員陣列
-        branch_member = [];
-        $.each(member_arr,function(i,val){
-        	if($.inArray(hid, val["hid"]) >= 0){
-                branch_member.push(val);
-            }
-        });
-        //成員名單 編輯
-        branch_member_ori = branch_member.slice();
-        
-        $(".edit-branch-id").val(hid);
-        
-        $(".edit-bm-classify-box[data-bm-class=all]").removeClass("edit-bm-classify-box-blue");
-        $(".edit-bm-classify-box[data-bm-class=this]").addClass("edit-bm-classify-box-blue");
-        
-        $(".edit-bm-branch-name input").val(branch_name);
-        $(".edit-bm-list-area").html("");
-        
-        memberListMake(branch_member,$(".edit-bm-list-area"));
-        memberListMake(member_arr,$(".edit-bm-list-area-all"));
-        $(".edit-bm-list-area-all").find(".edit-bm-list-chk div").removeClass("edit-chk-pic");
-        $(".edit-bm-list-area-all").hide();
-        
-        $(".edit-bm-classify-box[data-bm-class=this] span").html(branch_member.length);
-        $(".edit-bm-classify-box[data-bm-class=all] span").html(member_arr.length);
-        
-        $(".edit-bm-bottom-save").attr("data-branch-add","0");
-            
-    });
-    
-    
-    $(document).on("click","svg image",function(e){
-    	e.stopPropagation();
-    	if($(this).attr("class") == "svg-edit-add"){
-    		//判斷是否開啟popup視窗
-            edit_chk = false;
-            
-            $(".edit-bm-search input").val("");
-            hid = $(this).parent()[0].attributes.hid.value;
-            
-            $(".edit-bm-branch-name input").val("");
-            
+        hid = $(this)[0].attributes.hid.value;
+        //編輯成員的圓圈圈
+        if($(this)[0].attributes[0].value == "add"){
+            e.stopPropagation();
             //成員視窗的左右位置調整
-            x = memberListAdj($(this).offset().left+30);
+            x = memberListAdj($(this).offset().left);
             $(".edit-branch-member").css("top",($(document).height() - $(".edit-branch-member").height())/2);
             $(".edit-branch-member").css("left",x);
             $(".edit-branch-member").show();
             
             scaleIn($(".edit-branch-member"),8);
             
+            //現在按下的群組成員陣列
+            branch_member = [];
+            $.each(member_arr,function(i,val){
+            	if($.inArray(hid, val["hid"]) >= 0){
+                    branch_member.push(val);
+                }
+            });
+            //成員名單 編輯
+            branch_member_ori = branch_member.slice();
+            
             $(".edit-branch-id").val(hid);
             
-            $(".edit-bm-classify-box[data-bm-class=this]").removeClass("edit-bm-classify-box-blue");
-            $(".edit-bm-classify-box[data-bm-class=all]").addClass("edit-bm-classify-box-blue");
+            $(".edit-bm-classify-box[data-bm-class=all]").removeClass("edit-bm-classify-box-blue");
+            $(".edit-bm-classify-box[data-bm-class=this]").addClass("edit-bm-classify-box-blue");
             
+            $(".edit-bm-branch-name input").val(branch_name);
             $(".edit-bm-list-area").html("");
             
+            memberListMake(branch_member,$(".edit-bm-list-area"));
             memberListMake(member_arr,$(".edit-bm-list-area-all"));
-            
-            branch_member = [];
-            branch_member_ori = []
+            $(".edit-bm-list-area-all").find(".edit-bm-list-chk div").removeClass("edit-chk-pic");
+            $(".edit-bm-list-area-all").hide();
             
             $(".edit-bm-classify-box[data-bm-class=this] span").html(branch_member.length);
             $(".edit-bm-classify-box[data-bm-class=all] span").html(member_arr.length);
             
-            $(".edit-bm-list-area-all").find(".edit-bm-list-chk div").removeClass("edit-chk-pic");
-            
-            $(".edit-bm-list-area").hide();
-            $(".edit-bm-list-area-all").show();
-            
-            $(".edit-bm-bottom-save").attr("data-branch-add","1");
-            
-            
-    	}else{
-    		var hid = $(this).parent().attr("hid");
-            popupShowAdjust("確定刪除","取消");
+        }else{
+            popupShowAdjust("確定刪除",true);
             popupConfirmDel(hierachy_arr,hid);
-    	}
+        }
     });
     
+    
     //勾選、取消勾選成員
-    $(document).on("click",".edit-bm-list",function(){
+    $(document).on("click",".edit-bm-list-chk",function(){
         edit_chk = true;
         //群組成員 點選刪除
-        var this_memid = $(this).data("member-id");
+        var this_memid = $(this).parent().data("member-id");
         
         //有打勾的
         if($(this).find("div").hasClass("edit-chk-pic")){
             //判斷是群組成員 取消打勾就刪除
-            if($(this).parent().hasClass("edit-bm-list-area")){
-                $(this).remove();
+            if($(this).parent().parent().hasClass("edit-bm-list-area")){
+                $(this).parent().remove();
             }
-            
+        	
             //取消打勾就是 從群組成員陣列剔除
-            $.each(branch_member,function(i,val){
+        	$.each(branch_member,function(i,val){
                 if(val["id"] == this_memid){
                     branch_member.splice(i,1);
                     return false;
                 }
             });
-            $(this).find(".edit-bm-list-chk div").removeClass("edit-chk-pic");
+            $(this).find("div").removeClass("edit-chk-pic");
         }else{
-            //進行打勾動作只在所有成員中會發生 將此成員加入 群組成員陣列
-            $.each(member_arr,function(i,val){
+        	//進行打勾動作只在所有成員中會發生 將此成員加入 群組成員陣列
+        	$.each(member_arr,function(i,val){
                 if(val["id"] == this_memid){
                     branch_member.push(val);
                     return false;
                 }
             });
-            $(this).find(".edit-bm-list-chk div").addClass("edit-chk-pic");
+            $(this).find("div").addClass("edit-chk-pic");
         }
         
         //計算總數
@@ -515,21 +446,10 @@ $(function() {
     
     //成員編輯 確定
     $(".edit-bm-bottom-save").click(function(){
-    	
-    	if(!$(".edit-bm-branch-name input").val()){
-    		popupShowAdjust("群組名稱未填","確定",true);
-    		return false;
-    	}
-    	
-    	if($(".edit-bm-bottom-save").data("branch-add") == 1){
-            console.log(1);
-            return false;
-        }
-    	
     	//判斷刪除 原本的群組成員陣列id  有無在新的群組成員陣列id中
     	var this_hid = $(".edit-branch-id").val();
     	$.each(branch_member_ori,function(ori_i,ori_val){
-    		var chk = false;
+    		var chk = false
     		//判斷群組成員有沒有減少 即刪除
             $.each(branch_member,function(bran_i,bran_val){
                 if(ori_val["id"] == bran_val["id"]){
@@ -565,25 +485,13 @@ $(function() {
             });
         });
     	
-    	
-    	//更改階層json 群組名稱
-    	var new_name = $(".edit-bm-branch-name input").val();
-    	branchNameChange(hierachy_arr.children,this_hid,new_name);
-
-        //更改g tag 群組名稱
-        $.each($("svg g g"),function(i,val){
-        	if($(this).attr("hid") == this_hid){
-        		$(this).find("text").html(new_name);
-        	}
-        });
-        console.log(hierachy_arr);
         popupShowAdjust("編輯完成");
     });
     
     //成員編輯 取消
     $(".edit-bm-bottom-cancel").click(function(){
     	if(edit_chk){
-    		popupShowAdjust("確定放棄編輯","取消");	
+    		popupShowAdjust("確定放棄編輯",true);	
     	}else{
     		$(".edit-branch-member").hide();
     	}
@@ -615,112 +523,7 @@ $(function() {
             memberListMake(branch_member,$(".edit-bm-list-area"));
             $(".edit-bm-list-area").show();
         }
-        
-        $(".edit-bm-search input").trigger("input");
     });
-    
-    $(".edit-bm-search input").bind('input',function(){
-    	var this_bm = $(this).parent().parent();
-    	var input_content = $(this).val();
-    	var this_search = this_bm.find(".edit-bm-list-area .edit-bm-list");
-    	if($(".edit-bm-classify-box[data-bm-class=all]").hasClass("edit-bm-classify-box-blue")){
-    		this_search = this_bm.find(".edit-bm-list-area-all .edit-bm-list");
-    	}
-    	
-    	//搜尋成員
-        branchSearch(this_search,input_content);	
-    });
-    
-    
-    $("#upload").click(function(){
-    	// modified_arr 記錄已被更改過的g tag 、 member index
-        g_modified_arr = [];
-        member_modified_arr = [];
-    	visitEachToUpdateId(hierachy_arr.children);
-    	
-    	console.log(member_arr);
-    	console.log(hierachy_arr);
-    });
-    
-    function branchNameChange(arr,hid,new_name){
-        $.each(arr,function(i,val){
-            if(val.hid == hid){
-                val.name = new_name;
-                return false;
-            }
-            
-            if(val.children){
-                branchNameChange(val.children,hid,new_name);
-            }
-        });
-    }
-    
-    function branchSearch(this_search,input_content){
-        $.each(this_search,function(i,val){
-            if(!$(this).find(".edit-bm-list-content div").html().match(input_content)){
-                $(this).hide();
-            }else{
-                $(this).show();
-            }
-        });
-    }
-    
-    function visitEachToUpdateId(arr,hid,branch_path){
-        $.each(arr,function(i,val){
-        	var ori_val_hid = val.hid;
-        	
-            if(hid && branch_path){
-                val.hid = hid+"-"+(i+1);
-                val.branch_path = branch_path+"/"+val.name;
-            }else{
-                val.hid = i+1;
-                val.branch_path = val.name;
-            }
-            
-           //找出member_arr裡面舊的群組hid 換成新的
-            $.each(member_arr,function(mem_i,mem_val){
-                if(!member_modified_arr[mem_i]){
-                	member_modified_arr[mem_i]=[];
-                }
-                
-                
-                
-                $.each(mem_val["hid"],function(h_i,h_val){
-                	
-                    if($.inArray(h_i,member_modified_arr[mem_i])  < 0){
-                    	if(ori_val_hid == h_val){
-                    		if(mem_val["id"] == 1){
-                    			console.log(mem_i);
-                    			console.log(mem_val);
-                    			console.log(member_modified_arr[mem_i]);
-                    			console.log(h_i);
-                    			console.log(mem_val["hid"]);
-                    		}
-                    		
-                    		//更新
-                            mem_val["hid"][h_i] = val.hid.toString(); 
-                            member_modified_arr[mem_i].push(h_i);
-                    	}
-	                        
-                    }
-                });
-            });
-            
-            //更新circle的hid
-            $.each($("svg g g"),function(c_i,c_val){
-            	if($(this).attr("hid") == ori_val_hid && $.inArray(c_i, g_modified_arr) < 0){
-            		g_modified_arr.push(c_i);
-            		$(this).attr("hid",val.hid);
-            		return false;
-            	}
-            });
-            
-            if(val.children){
-            	visitEachToUpdateId(val.children,val.hid,val.branch_path);
-            }
-        });
-        
-    }
     
     function memberListMake(arr,target){
         target.html("");
@@ -770,22 +573,14 @@ $(function() {
     });
     
     //計算彈出對話框置中
-    function popupShowAdjust(desc,cancel,opt){
-        if(cancel){
-            $(".popup-close-cancel").html(cancel);
-        }else{
-        	$(".popup-close-cancel").hide();
+    function popupShowAdjust(desc,cancel){
+        if(!cancel){
+            $(".popup-close-cancel").hide();
         }
-        
+        $(".popup-frame").css("margin-left",0);
         if(desc){
             $('.popup-text').html(desc);
         }
-        
-        if(opt){
-        	$(".popup-close").hide();
-        }
-        
-        $(".popup-frame").css("margin-left",0);
         $(".popup-screen").show();
         $(".popup").show();
         $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
@@ -812,6 +607,8 @@ $(function() {
                     deleteNode(val,hid);   
                 }
             }            
+                
+            
         });
     }
     
@@ -834,18 +631,13 @@ $(function() {
 <body>
     <button id="undo">上一步</button>
     <button id="redo">下一步</button>
-    <button id="upload">完成</button>
     <div id="tree-container" style=""></div>
     <div class="edit-branch-member">
         <input class="edit-branch-id" type="hidden">
         <div class="edit-bm-branch">
             <div class="edit-bm-branch-img"><div>照片</div></div>
-            <div class="edit-bm-branch-name"><input type="text" data-role="none" placeholder="請輸入群組名稱"/></div>
+            <div class="edit-bm-branch-name"><input type="text" data-role="none"/></div>
             <img class="edit-bm-branch-cancel" src="x.png"/>
-        </div>
-        <div class="edit-bm-search">
-                <img src="srch.png"/>
-                <input type="text" placeholder="search"/>
         </div>
         <div class="edit-bm-classify">
             <div data-bm-class="this" class="edit-bm-classify-box edit-bm-classify-box-blue">群組成員(<span></span>)</div>
@@ -853,10 +645,9 @@ $(function() {
         </div>
         <div class="edit-bm-list-area"></div>
         <div class="edit-bm-list-area-all"></div>
-        <div class="edit-bm-list-area-search"></div>
         <div class="edit-bm-bottom">
             <div class="edit-bm-bottom-cancel">取消</div>
-            <div class="edit-bm-bottom-save" data-branch-add="0">儲存</div>
+            <div class="edit-bm-bottom-save">儲存</div>
         </div>
     </div>
     <input id="undo-cnt" type="hidden" value="-1"/>
@@ -865,7 +656,7 @@ $(function() {
       <div class="popup-frame">
       <div class="popup-text"></div>
       <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
-      <a href="#" class="popup-close-cancel" data-role="button" data-inline="true"></a>
+      <a href="#" class="popup-close-cancel" data-role="button" data-inline="true">取消</a>
       </div>
       <div class="popup-screen"></div>
     </div>

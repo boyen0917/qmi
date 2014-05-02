@@ -6,6 +6,7 @@
 
 	<link rel="stylesheet" href="style.css">
 	<script src="jquery.js"></script>
+	<script src="jquery-ui.js"></script>
 	<script src="d3.v3.min.js"></script>
 	<script src="text.js"></script>
 	<script src="dndTree.js"></script>
@@ -13,28 +14,55 @@
 <body>
 	<div id="page-wrapper">
 
-		<h1>編輯成員名單</h1>
-		<div>
-			選擇檔案: 
-			<input type="file" id="fileInput">
-		</div>
-		<pre id="fileDisplayArea"></pre>
-		
-        <button id="undo" style="display:none">上一步</button>
-        <button id="redo" style="display:none">下一步</button>
+        <h1>編輯成員名單</h1>
+        <div>
+            選擇檔案: 
+            <input type="file" id="fileInput">
+        </div>
+        <pre id="fileDisplayArea"></pre>
         
-		<div id="tree-container" style=""></div>
-        
-        <div class="edit-branch-member">
-	        <div class="edit-bm-branch">
-	            <div class="edit-bm-branch-img"><div>照片</div></div>
-	            <div class="edit-bm-branch-name"><div></div></div>
-	        </div>
-	        <div class="edit-bm-list-area"></div>
-	    </div>
-	    <input id="undo-cnt" type="hidden" value="-1"/>
+        <div class="edit-outside-area" style="display:none">
+            <button id="undo">上一步</button>
+            <button id="redo" >下一步</button>
+            <button id="upload">完成</button>
+        </div>
+	        
+	    <div id="tree-container" style=""></div>
+	    
+	    <div class="edit-branch-member">
+            <input class="edit-branch-id" type="hidden">
+            <div class="edit-bm-branch">
+                <div class="edit-bm-branch-img"><div>照片</div></div>
+                <div class="edit-bm-branch-name"><input type="text" data-role="none" placeholder="請輸入群組名稱"/></div>
+                <img class="edit-bm-branch-cancel" src="x.png"/>
+            </div>
+            <div class="edit-bm-search">
+                    <img src="srch.png"/>
+                    <input type="text" placeholder="search"/>
+            </div>
+            <div class="edit-bm-classify">
+                <div data-bm-class="this" class="edit-bm-classify-box edit-bm-classify-box-blue">群組成員(<span></span>)</div>
+                <div data-bm-class="all" class="edit-bm-classify-box">所有成員(<span></span>)</div>
+            </div>
+            <div class="edit-bm-list-area"></div>
+            <div class="edit-bm-list-area-all"></div>
+            <div class="edit-bm-list-area-search"></div>
+            <div class="edit-bm-bottom">
+                <div class="edit-bm-bottom-cancel">取消</div>
+                <div class="edit-bm-bottom-save" data-branch-add="0">儲存</div>
+            </div>
+        </div>
+        <input id="undo-cnt" type="hidden" value="-1"/>
 	</div>
-
+	
+	    <div class="popup">
+          <div class="popup-frame">
+          <div class="popup-text"></div>
+          <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
+          <a href="#" class="popup-close-cancel" data-role="button" data-inline="true"></a>
+          </div>
+          <div class="popup-screen"></div>
+        </div>
 
 </body>
 </html>
