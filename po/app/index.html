@@ -6,21 +6,25 @@
         <title>Project O</title>
         <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
         <link rel="stylesheet" href="css/main.css" />
+        
         <script src="../js/jquery.js"></script>
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
         
+        <script src="js/jquery.plugin.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        
+        
         <script src="js/sha/sha1.js"></script>
         <script src="js/sha/enc-base64-min.js"></script>
-        
         <link rel="stylesheet" type="text/css" href="effect/css/style6.css" />
         <script type="text/javascript" src="effect/js/modernizr.custom.70748.js"></script>
         <script type="text/javascript" src="effect/js/jquery.transitions.js"></script>
         <script type="text/javascript" src="js/jquery.autosize.min.js"></script>
         
         
-        
     </head>
     <body>
+    
         <div data-role="page" id="page-login">
 	        <div class="main launch_kv">
 	            <div class="login-area">
@@ -149,7 +153,10 @@
             <div data-role="panel" id="side-menu" data-display="push">
 	            <div class="sm-user-area">
 	               <div class="sm-user-area-l"></div>
-                   <div class="sm-user-area-r"></div>
+                   <div class="sm-user-area-r">
+                   <div></div>
+                   <div></div>
+                   </div>
 	            </div>
 	            <div data-sm-act="feed" class="sm-small-area">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_feed.png"/></div>
@@ -269,8 +276,8 @@
                     <option value="te-example4"></option>
                 </select>
                 <div class="st-feedbox-area">
-                    <div class="st-feedbox-area2">
-                    </div>
+                </div>
+                <div class="st-feedbox-area2" style="display:none">
                     <div class="st-sub-box">
                         <img class="st-sub-box-more-btn" src="images/timeline/timeline_feedbox_icon_list.png"/>
                         <div class="st-sub-box-more">
@@ -537,6 +544,87 @@
             </div>
 	            
         </div><!-- /page-group-main -->
+<!---------------------------------- page-timeline-detail ------------------------------------>
+        <div data-role="page" id="page-timeline-detail">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3>內容<div>三竹資訊</div></h3>
+            </div>
+            <div class="timeline-detail-area">
+                <div class="st-sub-box">
+			    <img class="st-sub-box-more-btn" src="images/timeline/timeline_feedbox_icon_list.png"/>
+			    <div class="st-sub-box-more">
+			       <div class="st-more-close"></div>
+			       <div data-st-more="top" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_top.png"/><div>置頂</div></div>
+			       <div data-st-more="subscribe" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_subscribe.png"/><div>訂閱</div></div>
+			       <div data-st-more="copy" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copy.png"/><div>複製</div></div>
+			       <div data-st-more="copyword" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copyword.png"/><div>複製內容</div></div>
+			       <div data-st-more="calendar" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_calendar.png"/><div>加入行事曆</div></div>
+			       <div data-st-more="del" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_del.png"/><div>刪除</div></div>
+			    </div>
+			    <div class="st-sub-box-1">
+			        <div class="st-sub-box-1-main">
+			           <div class="st-user-pic"><img src="images/user_pic.png"/></div>
+			           <div class="st-sub-name">秀賢</div>
+			           <div class="st-sub-time"><img src="images/icon/icon_time_gray.png"/>3/26 星期四 10:20</div>
+			        </div>
+			        <div class="st-sub-box-1-footer">
+			           <img src="images/icon/icon_object.png"/>
+			           所有人
+			        </div>
+			    </div>
+			    <div class="st-sub-box-2" data-st-cnt="">
+			        <div class="st-sub-box-2-more">
+			            <div class="st-box2-more-category"></div>
+			            <div class="st-box2-more-title"></div>
+			            <div class="st-box2-more-desc" style="display:none;"></div>
+			        </div>
+			        <div class="st-box2-feedback-area">
+			           <div class="st-feedback-box" data-fb-tick="0">
+			               <div class="st-feedback-box-content">
+			                   <img src="images/common/icon_check_red.png"/>
+			                   處理中
+			               </div>
+			           </div>
+			           <div class="st-feedback-hide">
+			               <div class="st-feedback-box" data-fb-type="2" data-fb-tick="0">
+			                   <div class="st-feedback-box-content">
+			                       <img src="images/common/icon_check_red.png"/>
+			                       已完成
+			                   </div>
+			               </div>
+			               <div class="st-feedback-send">送出</div>
+			           </div>
+			        </div>
+			        <div class="st-sub-box-2-attach-area" style="display:none;">
+			            <div class="st-attach-audio" style="display:none;">
+			                <div class="audio-play">
+			                    <img src="images/timeline/timeline_format_player_icon_play.png"/>
+			                    <img src="images/timeline/timeline_format_player_icon_play_click.png" style="display:none;"/>
+			                    <img src="images/timeline/timeline_format_player_icon_stop.png" style="display:none;"/>
+			                    <img src="images/timeline/timeline_format_player_icon_stop_click.png" style="display:none;"/>
+			                </div>
+			                <div class="audio-progress">
+			                    <div></div>
+			                    <input type="range" min="0" max="100" value="0" data-role="none">
+			                    <div></div>
+			                </div>
+			                <!-- <audio src="http://a.tumblr.com/tumblr_lntqmdVjSt1qzprvyo1.mp3" controls style="display:none;"></audio> -->
+			            </div>
+			        </div>
+			    </div>
+			    <div class="st-sub-box-3">
+			        <img src="images/timeline/timeline_feedbox_icon_like.png"/><div>0</div>
+			        <img src="images/timeline/timeline_feedbox_icon_chat.png"/><div>0</div>
+			        <img src="images/timeline/timeline_feedbox_icon_read.png"/><div>0</div>
+			    </div>
+			    <div class="st-sub-box-4">
+			        <div class="st-like-btn">讚</div>
+			        <div class="st-message">留言</div>
+			    </div>
+			</div>
+            </div>
+        </div>
 <!---------------------------------- page-announcement-post ------------------------------------>
         <div data-role="page" id="page-announcement-post">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -575,11 +663,39 @@
                 </div>
             </div>
             <div class="announcement-footer">
-	            <div data-ap-addfile="sticker" class="ap-addfile"><img src="images/compose/compose_form_addfile_sticker.png"/></div>
-	            <div data-ap-addfile="img" class="ap-addfile"><img src="images/compose/compose_form_addfile_img.png"/></div>
-	            <div data-ap-addfile="video" class="ap-addfile"><img src="images/compose/compose_form_addfile_video.png"/></div>
-	            <div data-ap-addfile="voice" class="ap-addfile"><img src="images/compose/compose_form_addfile_voice.png"/></div>
-	            <div data-ap-addfile="map" class="ap-addfile"><img src="images/compose/compose_form_addfile_map.png"/></div>
+                <div data-ap-addfile="sticker" class="ap-addfile"><img src="images/compose/compose_form_addfile_sticker.png"/></div>
+                <div data-ap-addfile="img" class="ap-addfile"><img src="images/compose/compose_form_addfile_img.png"/></div>
+                <div data-ap-addfile="video" class="ap-addfile"><img src="images/compose/compose_form_addfile_video.png"/></div>
+                <div data-ap-addfile="voice" class="ap-addfile"><img src="images/compose/compose_form_addfile_voice.png"/></div>
+                <div data-ap-addfile="map" class="ap-addfile"><img src="images/compose/compose_form_addfile_map.png"/></div>
+            </div>
+        </div>
+<!---------------------------------- page-vote-post ------------------------------------>
+        <div data-role="page" id="page-vote-post">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3>建立新投票</h3>
+            </div>
+            <div class="vp-content">
+	            <div data-vp-box="title" class="vp-content-box">
+	                    <textarea class="vp-textarea-title" placeholder="標題" data-role="none"></textarea>
+	            </div>
+                <div data-vp-box="object" class="vp-content-box">
+                    發佈對象
+                    <img class="vp-object-btn" src="images/ap_box_arrow.png"/>
+                </div>
+                <div class="vp-content-textarea">
+                    <textarea class="vp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
+                    <div class="vp-addfile">
+                        <div data-vp-addfile="sticker" class="vp-addfile"><img src="images/compose/compose_form_addfile_sticker.png"/></div>
+		                <div data-vp-addfile="img" class="vp-addfile"><img src="images/compose/compose_form_addfile_img.png"/></div>
+		                <div data-vp-addfile="video" class="vp-addfile"><img src="images/compose/compose_form_addfile_video.png"/></div>
+		                <div data-vp-addfile="voice" class="vp-addfile"><img src="images/compose/compose_form_addfile_voice.png"/></div>
+		                <div data-vp-addfile="map" class="vp-addfile"><img src="images/compose/compose_form_addfile_map.png"/></div>
+                    </div>
+                </div>
+            </div>
+            <div class="vp-addfile">
             </div>
         </div>
 <!---------------------------------- page-chatroom ------------------------------------>
@@ -689,6 +805,7 @@
 		  <div class="popup-frame">
 		  <div class="popup-text"></div>
 		  <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
+		  <a href="#" class="popup-close-cancel" data-role="button" data-inline="true">取消</a>
 		  </div>
 		  <div class="popup-screen"></div>
 		</div>
@@ -698,6 +815,5 @@
         <div id="page-back-chk"></div>
         <div id="page-back-chk-pre"></div>
         <div id="page-back-pre-title"></div>
-        <script type="text/javascript" src="js/main.js"></script>
     </body>
 </html>
