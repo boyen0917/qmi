@@ -6,7 +6,7 @@ $(function(){
 	var myRand = Math.floor((Math.random()*1000)+1);
 	
 	var ui,at,gi,gu,gn,gd,ga,gm,ti_cal,ti_feed,ti_chat,device_token,zoom_out_cnt,zoom_in_cnt,filter_name,
-	default_group,group_name,post_tmp_url,activityTimeout,
+	group_list,default_group,group_name,post_tmp_url,activityTimeout,
 	timeline_type,data_group_user;
 	
 	//計算螢幕長寬以維持比例
@@ -32,6 +32,11 @@ $(function(){
 	
 	$(".popup-close-cancel").click(function(){
 	    $(".popup-screen").trigger("click");
+	});
+	
+	$.ajaxSetup ({
+	    // Disable caching of AJAX responses
+	    cache: false
 	});
 	
 	$(document).ajaxSend(function() {
@@ -217,7 +222,7 @@ $(function(){
 	    });
 	});
 	
-	function getUserName(gi,gu){
+	function getUserName(gi,gu,target){
 		var api_name = "groups/"+ gi +"/users";
 	    var headers = {
 	        "ui":ui,
@@ -230,7 +235,8 @@ $(function(){
 	    	data_group_user = $.parseJSON(data.responseText).ul;
 	    	$.each(data_group_user,function(i,val){
 	    		if(val.gu == gu){
-	    			return val.n;
+	    			target.html(val.n);
+	    			return false;
 	    		}
 	    	});
 	    });
@@ -487,7 +493,7 @@ $(function(){
 	$(document).on("mousedown",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
 		var icon_default = "images/side_menu/sidemenu_icon_";
 		var target = $(this);
-		
+		console.log(target);
 		//開關按鈕ui變化
 		if($(".sm-group-list-area-add").is(":visible") ){
 			if(target.data("switch-chk") == "check2"){
@@ -501,7 +507,12 @@ $(function(){
 		
 		target.addClass("sm-click-bg");
 		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_click.png");
-		switch (target.data("sm-act")) {
+		mainActionSwitch(target.data("sm-act"));
+			
+	});
+	
+	function mainActionSwitch(act){
+		switch (act) {
 	        case "feed":
 	        	timelineListWrite();
 	        	$(".subpage-contact").hide();
@@ -528,7 +539,8 @@ $(function(){
 	        case "setting":
 	          break;
 	    }
-	});
+	}
+	
 	//按鈕效果
 	$(document).on("mouseup",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
 		var icon_default = "images/side_menu/sidemenu_icon_";
@@ -556,21 +568,20 @@ $(function(){
 		gu = $(this).attr("data-gu");
 		gn = $(this).find(".sm-group-area-r").html();
 		
-		$.each(group_list,function(gi,gval){
-			if(gval.gi == gi){
-				$.each(gval.tl,function(ti,tval){
-					if(tval.tp == 1){
-            			ti_cal = tval.ti;
-            		}else if(tval.tp == 2){
-            			ti_feed = tval.ti;
+		$.each(group_list,function(g_i,g_val){
+			if(g_val.gi == gi){
+				$.each(g_val.tl,function(t_i,t_val){
+					if(t_val.tp == 1){
+            			ti_cal = t_val.ti;
+            		}else if(t_val.tp == 2){
+            			ti_feed = t_val.ti;
             		}else{
-            			ti_chat = tval.ti;
+            			ti_chat = t_val.ti;
             		}
 				});
 			}
 		});
 		
-	
 		//點選團體 記錄在localstorage 以便下次登入預設
 		var currentGroup = $.lStorage("currentGroup");
 		currentGroup.gi = gi;
@@ -582,9 +593,7 @@ $(function(){
 		$.lStorage("currentGroup",currentGroup)
 		
 		setSmUserData(gi,gu,gn);
-		$(".sm-small-area[data-sm-act=contact]").trigger("click");
-		//$( "#side-menu" ).panel( "close");
-		
+		mainActionSwitch("feed");
 	});
 	
 	function getTlByGroup(gi){
@@ -598,7 +607,7 @@ $(function(){
 	function setSmUserData(gi,gu,gn){
 		$(".sm-user-area-r div:eq(0)").html(gn);
 		$(".sm-user-area-r div:eq(1)").html("");
-		$(".sm-user-area-r div:eq(1)").html(getUserName(gi,gu));
+		getUserName(gi,gu,$(".sm-user-area-r div:eq(1)"));
 	}
 	
 	//----------------------------------- timeline ---------------------------------------------  
@@ -670,27 +679,67 @@ $(function(){
 	var selector_pos = (10-top_msg_num)/2*10;
 	var movement = 10;
 	var movement_pos = 1;
+	//流程控制 不能連按
+	var mfinish = 0;
 	/* 游標位置和移動 */
 	$(".st-cover-bar-selector").css("left",(selector_pos-1) + "%");
 	
-	$(".st-cover-bar-area").click(function(event){
+	$(".st-cover-bar-area").click(function(event,default_mouse_pos){
+		//流程控制 不能連按
+		if(mfinish){
+			return;
+		}
+		mfinish = 1;
+		
+		//從箭頭trigger來的 用以判斷左移右移
+		var mouse_pos = event.clientX;
+		
+		if(default_mouse_pos){
+			mouse_pos = default_mouse_pos;
+		}
 		//游標起始位置 實際
 	    var left_pos = $(window).width() * (selector_pos+5)/100;
-	    //滑鼠位置在游標最左邊的左邊還是右邊 判斷移動
-		if(event.clientX > left_pos*1 + ($(window).width() * movement*(movement_pos-1)/100)){
+	    //滑鼠位置在游標起始位置的左邊還是右邊 判斷移動
+		if(mouse_pos > left_pos*1 + ($(window).width() * movement*(movement_pos-1)/100)){
 			if(movement_pos < top_msg_num){
 				$(".st-cover-bar-selector").animate({left: ((selector_pos-1) + movement*movement_pos) + "%"});
-				$(".st-cover-main-page").animate({'left':'-=100%'});
+				$(".st-cover-main-page").animate({'left':'-=100%'},function(){
+	            	mfinish = 0;
+	            });
 	            movement_pos++;
+			}else{
+				mfinish = 0;
 			}
 		}else{
 			if(movement_pos > 1){
 	            $(".st-cover-bar-selector").animate({left: ((selector_pos-1) + movement*(movement_pos-2)) + "%"});
-	            $(".st-cover-main-page").animate({'left':'+=100%'});
+	            $(".st-cover-main-page").animate({'left':'+=100%'},function(){
+	            	mfinish = 0;
+	            });
 	            movement_pos--;
-	        }
+	        }else{
+				mfinish = 0;
+			}
 		}
 	});
+	
+	//置頂公告 左右換頁
+	$(".st-cover-area-la,.st-cover-area-ra").mouseover(function(){
+		$(".st-cover-area-la,.st-cover-area-ra").css("opacity",1);
+	});
+	
+	$(".st-cover-area-la,.st-cover-area-ra").mouseout(function(){
+		$(".st-cover-area-la,.st-cover-area-ra").css("opacity",0);
+	});
+	//置頂公告 設定左右的最大最小值 以方便換頁
+	$(".st-cover-area-la,.st-cover-area-ra").click(function(e){
+		var mouse_pos = 0;
+		if(e.clientX > 100){
+			mouse_pos = 1000;
+		}
+		$(".st-cover-bar-area").trigger("click",mouse_pos);
+	});
+	
 	
 	//主要filter
 	$(".st-filter-main").click(function(){
@@ -1142,7 +1191,7 @@ $(function(){
 	    	$(".sm-group-list-area-add").html("");
 	    	//chk是開關按鈕ui變化的檢查
 	    	var tmp_selector,count,chk;
-	    	var group_list = $.parseJSON(result.responseText).gl;
+	    	group_list = $.parseJSON(result.responseText).gl;
 	    	var total = group_list.length;
 	    	console.log(group_list);
 	        $.each(group_list,function(i,val){
@@ -1195,34 +1244,51 @@ $(function(){
 	        $.each(timeline_list,function(i,val){
 	        	
 	        	console.log(JSON.stringify(val, null, 2));
-	        	var is_reply = timeline_type = val.meta.tp.substring(0,1);
-	        	var timeline_type = val.meta.tp.substring(1,2);
-
+	        	var is_reply = val.meta.tp.substring(0,1);
+	        	var tp = val.meta.tp.substring(1,2)*1;
 	        	$('.st-feedbox-area').append($('<div>').load('layout/timeline_box.html .st-sub-box',function(){
-
 	        		var this_box = $(this);
+	        		
 	        		//為了排除複製 滑鼠按下少於0.1秒 判斷為click 用document是因為 其他子元素有些按鈕動作是document 父元素用click會比子元素的document早執行 所以無法阻止事件冒泡 
 	        		$(document).on("mousedown",".st-sub-box",function(e){
 	        		});
 	        		
-	        		//判斷是否存在副檔
 	        		
-	        		switch(timeline_type){
+	        		
+	        		//時間 名字
+	        		getUserName(gi,val.meta.gu,this_box.find(".st-sub-name"));
+	        		var time = new Date(val.meta.ct);
+	        		var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
+	        		$(this).find(".st-sub-time").html(time_format);
+	        		
+	        		//發佈對象
+	        		this_box.find(".st-sub-box-1-footer").html(val.ei + "  " + val.meta.tp);
+	        		
+	        		//讚留言閱讀
+	        		this_box.find(".st-sub-box-1-footer").html(val.ei + "  " + val.meta.tp);
+	        		this_box.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
+	        		this_box.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
+	        		this_box.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
+	        		
+	        		console.log("ei : " + val.ei);
+	        		console.log("tp : " + tp);
+	        		
+	        		switch(tp){
 	        			//貼文
-	        			case "0":
-	        				
-	        				$(this).find(".st-sub-box-2").html(box_content);
-	        	    		$(this).find(".st-sub-box-2").attr("data-st-cnt",i);
-	        				$(".st-sub-box-2-more").hide();
+	        			case 0:
+	        				//$(this).find(".st-sub-box-2").html(box_content);
+	        	    		//不知道要幹嘛
+	        				//$(this).find(".st-sub-box-2").attr("data-st-cnt",i);
+	        				this_box.find(".st-sub-box-2-more").hide();
+	        				//timeline內容
+	        				timelineContentMake(this_box,val.ml,tp);
 	        				break;
 	        			//公告
-	        			case "1":
-	        				$(".st-box2-more-desc").show();
-	        				$(".st-sub-box-2-attach-area").show();
+	        			case 1:
 	        				this_box.find(".st-box2-more-category").html("公告");
 	        				this_box.find(".st-box2-more-title").html(val.meta.tt);
 	        				//timeline內容
-	        				timelineContentMake(this_box,val.ml);
+	        				timelineContentMake(this_box,val.ml,tp);
 	        				
 //	        				this_box.find(".st-attach-audio").show();
 //	        				
@@ -1240,9 +1306,9 @@ $(function(){
 	        				
 	        				break;
 	        			//通報
-	        			case "2":
+	        			case 2:
 	        				this_box.find(".st-box2-more-category").addClass("st-box2-more-category-fb");
-	        				$(".st-box2-more-desc").show();
+	        				this_box.find(".st-box2-more-desc").show();
 	        				this_box.find(".st-box2-more-category").html("通報");
 	        				this_box.find(".st-box2-more-title").html("請回報業務人員目前位置請回報業務人員目前位置");
 	        				this_box.find(".st-box2-more-desc").html("你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶");
@@ -1257,14 +1323,23 @@ $(function(){
 	        	//			});
 	        				
 	        				break;
-	        			case "3":
+	        			case 3:
 	        				break;
-	        			case "4":
+	        			case 4:
 	        				break;
-	        			case "5":
-	        				this_box.find(".st-box2-more-category").html("頭票");
+	        			case 5:
+	        				this_box.find(".st-box2-more-category").html("定點回報");
 	        				break;
 	        		};
+	        		
+	        		var timer = 600;
+	        		if(i == 0){
+	        			timer = 300;
+	        		}
+	        		setTimeout(function(){
+	        			this_box.find(".st-sub-box").css("opacity",1);
+	        		},timer);
+	        		
 	        		
 	        	}));
 	        });
@@ -1273,23 +1348,73 @@ $(function(){
 	    
 	}
 	
-	function timelineContentMake(target,ml){
+	//目前是先做url判斷
+	function timelineContentFormat(c){
+		if(!c){
+			return false;
+		}
+		var url_chk = c.split(" ");
+    	$.each(url_chk,function(i,val){
+    		if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
+    			url_chk.splice(i,1,"<a href=\"" + val + "\" target=\"_blank\">" + val + "</a>");    
+            }
+    	});
+    	return url_chk.join(" ");
+	}
+	
+	function timelineContentMake(target,ml,tp){
+		//tp = 0 是普通貼文 在content區填內容 其餘都在more desc填
+		var content = ".st-box2-more-desc";
+		if(tp == "0"){
+			content = ".st-sub-box-2-content";
+		}
 		$.each(ml,function(i,val){
+			//有附檔 開啟附檔區域
+			if(val.tp != 0 && !target.find(".st-sub-box-2-attach-area").is(":visible")){
+				target.find(".st-sub-box-2-attach-area").show();
+			}
+			
+			//更改網址成連結
+			var c = timelineContentFormat(val.c);
+			
 			//內容格式
 			switch(val.tp){
-				//貼文
-				case 0:
-					target.find(".st-box2-more-desc").append(val.c);
+				case 0://文字
+					target.find(content).show();
+					target.find(content).append(c);
 					break;
-				//公告
-				case 1:
+				case 1://網址 寫在附檔中
+					target.find(".st-attach-url").show();
+					target.find(".st-attach-url-img img").attr("src",val.i);
+					target.find(".st-attach-url-title").html(val.t);
+					target.find(".st-attach-url-desc").html(val.d);
 					break;
-				//通報
 				case 2:
+					console.log(val.d);
+					target.find(".st-attach-url").show();
+					target.find(".st-attach-url-img img").attr("src",val.i);
+					target.find(".st-attach-url-img img").css("width","100%");
+					target.find(".st-attach-url-title").html(val.t);
+					target.find(".st-attach-url-desc").html(val.d);
 					break;
 				case 3:
 					break;
 				case 4:
+					break;
+				case 9:
+					target.find(".st-attach-map").show();
+					
+					target.find(".st-attach-map").tinyMap({
+			    		 center: {x: val.lat, y: val.lng},
+			    		 zoomControl: 0,
+			    		 mapTypeControl: 0,
+			    		 scaleControl: 0,
+			    		 scrollwheel: 0,
+			    		 zoom: 16,
+			    		 marker: [
+	    		             {addr: [val.lat, val.lng], text: val.a}
+			    		 ]
+			    	});
 					break;
 			};
 		});

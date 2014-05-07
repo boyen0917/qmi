@@ -3,22 +3,35 @@
 <head>  
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
     <script src="../js/jquery.js"></script>  
-    <script src="plugin.js"></script>  
-    <script src="js/sha/sha1.js"></script>
-    <script src="js/sha/enc-base64-min.js"></script>
+    <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script src="test/map/jquery.tinyMap.js"></script>
     <script type="text/javascript">  
     
     $(function(){  
-    	var aa = "1234567890";
-    	console.log(aa.substring(1,1));
+    	 /* $('#map').tinyMap({
+             center: {x: '25.067880470370152', y: '121.52657680213451'},
+             zoomControl: 0,
+             mapTypeControl: 0,
+             zoom: 16,
+             marker: [
+                 {addr: ['25.067880470370152', '121.52657680213451']}
+             ]
+        }); */
+    	 lat = '25.067880470370152';
+    	 lng = '121.52657680213451';
+    	 $('body').find("div").tinyMap({
+             marker: [
+                 {addr: [lat, lng],text:'dfasdfasdf'}
+             ]
+        });
     	
-    	var tt = {"a":1,"b":2};
-    	var ss = "aa";
-    	//$.lStorage(ss);
- });  
-   </script>   
+    });  
+   </script>  
 </head>  
 <body>  
+   <div id="map" style="width:100%;height:150px">
+   </div>
    
+   <span></span>
 </body>  
 </html>  
