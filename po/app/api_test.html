@@ -2,13 +2,35 @@
 <html>  
 <head>  
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
-    <title>文字區塊自動高度</title>  
     <script src="../js/jquery.js"></script>  
     <script src="js/sha/sha1.js"></script>
     <script src="js/sha/enc-base64-min.js"></script>
-    <script type="text/javascript">   
+    <script type="text/javascript">  
     $(function(){  
-        //api 網址
+    	
+    	
+    	
+    
+    	$.extend({
+    		  getUrlVars: function(){
+    		    var vars = [], hash;
+    		    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    		    for(var i = 0; i < hashes.length; i++)
+    		    {
+    		      hash = hashes[i].split('=');
+    		      vars.push(hash[0]);
+    		      vars[hash[0]] = hash[1];
+    		    }
+    		    return vars;
+    		  },
+    		  getUrlVar: function(name){
+    		    return $.getUrlVars()[name];
+    		  }
+    		});
+    	
+    	// Getting URL var by its nam
+    	api_type = $.getUrlVar('api_type');
+    	//api 網址
         var base_url = "https://apserver.mitake.com.tw/apiv1/";
         //var base_url = "http://10.1.17.116:8090/apiv1/";
         
@@ -32,50 +54,66 @@
         result.complete(function(data){
         	ui = $.parseJSON(data.responseText).ui;
             at = $.parseJSON(data.responseText).at;
-
-            /* 
-            var api_name = "groups";
-            var headers = {
-                "ui":ui,
-                "at":at,
-                "li":"zh_TW",
-                "gn":encodeURI("test"),
-                "gd":encodeURI("test")
-            };
-            var method = "get";
-            var result = ajaxDo(api_name,headers,method,true);
-            result.complete(function(data){
-                console.log(data);return;
-            }); 
-            return; */
-            var api_name = "groups/4fbb9ffe-24b7-4a92-be86-508ea73e6d94/timelines/2ef79528-ab8a-47fa-9b64-bba5e890eada/events";
-            var headers = {
-                    "ui":ui,
-                    "at":at, 
-                    "li":"zh_TW"
-                        };
-            var method = "post";
             
-            var body = {
-            		  "meta":
-            		  {
-            		    "lv": 1,
-            		    "tp": "00"
-            		  },
-            		  "ml":
-            		  [
-            		    {
-            		      "tp": 0,
-            		      "c": "晚上唱歌！"
-            		    }
-            		  ]
-            		};
-            body = JSON.stringify(body);
+            switch(api_type){
+                case "timeline"://動態消息
+                	 var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events";
+                     var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW"
+                                 };
+                     var method = "get";
+                     
+                     
+                     var result = ajaxDo(api_name,headers,method,true);
+                     result.complete(function(data){
+                         console.log($.parseJSON(data.responseText));
+                     });
+                     
+                	break;
+                	
+                case "groups"://所有團體
+                    var api_name = "groups";
+                    var headers = {
+                        "ui":ui,
+                        "at":at,
+                        "li":"zh_TW",
+                    };
+                    var method = "get";
+                    var result = ajaxDo(api_name,headers,method,true);
+                    result.complete(function(data){
+                    	//tl 有3個 行事曆 tp=1 ; 動態 2 ; 聊天室 3 
+                    	
+                    	//"{"gl":[{"gi":"83c7be55-5b09-459f-aea6-b345b49b6cab","gn":"三豬雲","ga":"","ad":2,"cnt":11,"tl":[{"ti":"12a6807c-acee-4b1e-8da0-0f84bcb573ac","tp":3},{"ti":"92c954b5-e343-44d5-bf95-70a6ef53ef4e","tp":1},{"ti":"e874c0da-845c-4635-970f-ed4764047960","tp":2}],"me":"85820d46-18a2-4bed-9641-513f74a5e875"}],"rsp_code":0,"rsp_msg":"取得完成"}"
+                        console.log(data);return;
+                    }); 
+                    break;
+                    
+                case "group/user"://單一團體
+                	var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/users";
+                    var headers = {
+                        "ui":ui,
+                        "at":at,
+                        "li":"zh_TW",
+                    };
+                    var method = "get";
+                    var result = ajaxDo(api_name,headers,method,true);
+                    result.complete(function(data){
+                    	//"{"ul":[{"gu":"0af897e1-b3d8-4d71-bade-e26dafa2ebb4","n":"David","bl":"","st":1},{"gu":"1","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/4739cfc7-1363-4a7e-aee3-c2bd821d18a1/4739cfc7-1363-4a7e-aee3-c2bd821d18a1_tn?Expires=1714225225&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=Dv%2F8EMGDkDvEbeLtseDWffUnd%2BY%3D"},{"gu":"13cc1ba5-6cb4-4707-b931-bf3636aa36dc","n":"Winnie","bl":"","st":0},{"gu":"44594357-a18b-4447-b59c-89899bc72559","n":"Kewang","bl":"","st":1},{"gu":"4ec6484e-68a3-4ce5-98d9-1baa8b0b32ce","n":"Skyler","bl":"","st":0},{"gu":"67b57734-4638-4df1-ba34-bb7541fb5593","n":"Joseph","bl":"","st":0},{"gu":"69c044e1-1c6d-4494-9ade-ce05f3d6dd21","n":"Jesse","bl":"","st":0},{"gu":"85820d46-18a2-4bed-9641-513f74a5e875","n":"Brian","bl":"","st":1},{"gu":"8741151f-75c7-4c2c-865c-a70c11398cdc","n":"Ellison","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/96f3d4dd-bace-4433-9cc3-e37c0ef5365d/96f3d4dd-bace-4433-9cc3-e37c0ef5365d_tn?Expires=1714374948&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=nclA5yGQ%2B0NOHfMknIU7O%2F9t%2FeE%3D"},{"gu":"991d2fa6-7536-4975-930d-574654a2bce1","n":"Vince","bl":"","st":1},{"gu":"9bed8b81-8834-42f5-831e-be163132e6f0","n":"Redscor","bl":"","st":1},{"gu":"a254f277-3e1d-489a-82df-d9bd85e5d36c","n":"Rex","bl":"","st":1},{"gu":"ad8c224b-51d0-4ac0-b4dc-b4946ff7e43f","n":"WeiDe","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/31a7769c-53f0-4656-8987-f96639ea530e/31a7769c-53f0-4656-8987-f96639ea530e_tn?Expires=1714374619&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=nIuFNKa75adHBR5FtV6%2Ff%2FbpUNc%3D"},{"gu":"cd0e58b4-bfe0-4c4e-8708-4eef3693866a","n":"Rick","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/534e0c4a-d76f-4e3f-8baf-1441ed981cfc/534e0c4a-d76f-4e3f-8baf-1441ed981cfc_tn?Expires=1714373640&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=lMVaE1CE7muL6wmBoYNar0UMO4A%3D"},{"gu":"cf413e08-55ee-40c1-990d-d6e28a844996","n":"Jog","bl":"","st":0},{"gu":"e35e7cf5-a6ce-48a2-b1b3-36f5ee5f1ec1","n":"Henry","bl":"","st":1}],"rsp_code":0,"rsp_msg":"回傳成功"}"
+                        console.log(data);return;
+                    }); 
+                    break;
+            }
             
-            var result = ajaxDo(api_name,headers,method,true,body);
-            result.complete(function(data){
-                console.log($.parseJSON(data.responseText));
-            });
+            
+            
+            
+            return false;
+            
+            
+            
+           
             
             /* var api_name = "groups/4fbb9ffe-24b7-4a92-be86-508ea73e6d94/timelines/2ef79528-ab8a-47fa-9b64-bba5e890eada/events";
             var headers = {

@@ -1,46 +1,37 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Project O</title>
-        <link rel="stylesheet" href="css/test.css" />
-        <script src="../js/jquery.js"></script>
-        
-    </head>
-    <body>
-<form id="preview">
-  <div class="row">
-    <label for="url">URL</label>
-  </div>
-</form>       
-<section id="results"></section>
-        <script type="text/javascript">
-            $(function(){
-            	var url = "https://www.youtube.com/watch?v=SkS7LTdtlwk&list=RDCyVuYAHiZb8";
-            	//var url = 'http://youtu.be/po0jY4WvCIc';
-            	var strpos;
-            	if(url.match(/youtube.com/)){
-                    strpos = url.indexOf("?v=")+3;
-            	}else{
-            		strpos = url.indexOf("youtu.be")+9;
-            	}
-            	var youtube_code = url.substring(strpos,strpos+11);
-            	
-            	
-            	$.ajax({
-                    type: 'GET',
-                    url: "http://gdata.youtube.com/feeds/api/videos/" + youtube_code +"?v=2&prettyprint=true&alt=jsonc", 
-                    success: function(data) {
-                        console.log(data.data);
-                      }
-                  });
-            	
-            	
-            	return;
-            	
-            	    
-            });
-        </script>
-    </body>
-</html>
+<!DOCTYPE HTML>  
+<html>  
+<head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+    <script src="../js/jquery.js"></script>  
+    <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script src="test/map/jquery.tinyMap.js"></script>
+    <script type="text/javascript">  
+    
+    $(function(){  
+    	 /* $('#map').tinyMap({
+             center: {x: '25.067880470370152', y: '121.52657680213451'},
+             zoomControl: 0,
+             mapTypeControl: 0,
+             zoom: 16,
+             marker: [
+                 {addr: ['25.067880470370152', '121.52657680213451']}
+             ]
+        }); */
+    	 lat = '25.067880470370152';
+    	 lng = '121.52657680213451';
+    	 $('body').find("div").tinyMap({
+             marker: [
+                 {addr: [lat, lng],text:'dfasdfasdf'}
+             ]
+        });
+    	
+    });  
+   </script>  
+</head>  
+<body>  
+   <div id="map" style="width:100%;height:150px">
+   </div>
+   
+   <span></span>
+</body>  
+</html>  
