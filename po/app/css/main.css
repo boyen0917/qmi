@@ -1047,7 +1047,7 @@
 	opacity: 0.9;
 	border-radius: 2px;
 	display:none;
-	z-index: 10;
+	z-index: 100;
 }
 
 .st-sub-box-more-box {
@@ -1145,12 +1145,12 @@
     word-wrap: break-word;
 }
 
-.st-sub-box-2-content ,.st-box2-more-desc  {
+/* .st-sub-box-2-content ,.st-box2-more-desc  {
 	overflow: hidden;
 	display: -webkit-box;
 	-webkit-line-clamp: 6;
 	-webkit-box-orient: vertical;
-}
+} */
 
 
 .st-sub-box-3 {
@@ -1340,7 +1340,7 @@
     cursor: default;
 }
 
-.st-box2-more-desc {
+.st-box2-more-desc,.st-box2-more-desc-complete {
     position: relative;
     top: -30px;
     left: -15px;

@@ -52,7 +52,7 @@ $(function() {
 						
 						hierachy_arr = {"name": "root","children": [{"name": file_name,"children": []}]};
 					    max_group_cnt=0,group_str_arr=[],relation_arr=[],member_arr = [];
-					    var split_arr = data.split('\n');
+					    var split_arr = data.split('\r');
 					    //先做第一次的篩選
 					    $.each(split_arr,function(i,val){
 					        if(val.split(',')[3]){
