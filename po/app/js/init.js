@@ -15,4 +15,7 @@ $(function(){
 	//計算螢幕長寬以維持比例
 	proportion = 1.7;
 	
+	//timeline裏面點擊不做展開收合的區域
+	timeline_detail_exception = ".st-sub-box-2-content-complete a,.st-sub-box-2-more-desc-complete a";
+	
 });

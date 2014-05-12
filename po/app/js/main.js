@@ -220,14 +220,23 @@ $(function(){
 	    });
 	});
 	
-	function getUserName(gi,gu,target,polling){
+	function getUserName(gi,gu,target,set_img,polling){
         //先檢查localStorage[gi].guAll是否存在
         var _groupList = $.lStorage("_groupList");
         if(_groupList[gi].guAll && !polling){
+        	//設定圖片
+        	if(set_img){
+        		set_img.attr("src",_groupList[gi].guAll[gu].au);
+        		//調整圖片位置
+        		if(_groupList[gi].guAll[gu].au){
+        			avatarPos(set_img,60);
+        		}
+        	}
+        	
             target.html(_groupList[gi].guAll[gu].n);
             return;
         }
-        console.log("no return");
+        
         //沒有才call api
         var api_name = "groups/"+ gi +"/users";
         var headers = {
@@ -245,6 +254,12 @@ $(function(){
                 //將gu設成key 方便選取
                 new_group_user[val.gu] = val;
             });
+            //設定圖片
+            if(set_img){
+        		set_img.attr("src",new_group_user[gu].au);
+        		//調整圖片位置
+        		avatarPos(set_img,60);
+        	}
             //成員姓名寫入目標
             target.html(new_group_user[gu].n);
             //成員列表存入local storage
@@ -252,6 +267,28 @@ $(function(){
             $.lStorage("_groupList",_groupList);
         });
     }
+	
+	//調整個人頭像
+	function avatarPos(img,x){
+		img.load(function() {
+            var w = img.width();
+            var h = img.height();
+            
+            if(w == 0) return false;
+            
+            img.removeAttr( 'style' );
+            
+            if(w < h){
+            	img.attr("width",x);
+                var p = ((h/(w/x))-x)/2*(-1);
+                img.css("margin-top",p +"px");
+            }else{
+            	img.attr("height",x);
+            	var p = ((w/(h/x))-x)/2*(-1);
+            	img.css("margin-left",p +"px");
+            }
+        });
+	}
 	
 	
 	//----------------------------------- 註冊 --------------------------------------------- 
@@ -472,11 +509,28 @@ $(function(){
 	    //timeline固定右邊頁面
 	    $("#page-group-main .ui-panel-content-wrap").addClass("page-fixed");
 	    
-		//取得個人資料
-		$(".sm-user-area-l").html("<img class=\"sm-user-pic\" src=\"images/contact/contact_personal_default_list_nophoto.png\"/>");
 		//計數
 		$("div[data-sm-act=feed] .sm-count").show();
 		$(".sm-group-area .sm-count").show();
+		
+		//console.log($(".sm-user-pic img").width());
+		
+//		var w = img.width();
+//        var h = img.height();
+//        
+//        if(w == 0) return false;
+//        
+//        img.removeAttr( 'style' );
+//        
+//        if(w < h){
+//        	img.attr("width",x);
+//            var p = ((h/(w/x))-x)/2*(-1);
+//            img.css("margin-top",p +"px");
+//        }else{
+//        	img.attr("height",x);
+//        	var p = ((w/(h/x))-x)/2*(-1);
+//        	img.css("margin-left",p +"px");
+//        }
 		
 		//團體列表
 		groupMenuListArea(ui,at);
@@ -621,7 +675,7 @@ $(function(){
 	function setSmUserData(gi,gu,gn){
 		$(".sm-user-area-r div:eq(0)").html(gn);
 		$(".sm-user-area-r div:eq(1)").html("");
-		getUserName(gi,gu,$(".sm-user-area-r div:eq(1)"));
+		getUserName(gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-area-l img"));
 	}
 	
 	//----------------------------------- timeline ---------------------------------------------  
@@ -894,25 +948,27 @@ $(function(){
 	
 	//為了排除複製 滑鼠按下少於0.1秒 判斷為click  暫時不做 
 	//detail view
-	$(document).on("click",".st-sub-box",function(e){
-		console.log("propagation");
+	$(document).on("click",".st-sub-box-1, .st-sub-box-2",function(e){
+		console.log(2222);
 		var conten_div = ".st-sub-box-2-content";
-		if($(this).find(".st-box2-more-desc").html()){
+		if($(this).parent().find(".st-box2-more-desc").html()){
 			conten_div = ".st-box2-more-desc";
 		}
 		
-		if($(this).find(conten_div).is(":visible")){
-			$(this).find(conten_div).hide();
-			$(this).find(conten_div + "-complete").show();
+		if($(this).parent().find(conten_div).is(":visible")){
+			$(this).parent().find(conten_div).hide();
+			$(this).parent().find(conten_div + "-complete").show();
 		}else{
-			$(this).find(conten_div + "-complete").hide();
-			$(this).find(conten_div).show();
+			$(this).parent().find(conten_div + "-complete").hide();
+			$(this).parent().find(conten_div).show();
 		}
 	});
 	
-//	$(document).on("mousedown","a",function(){
-//		$(this).trigger("click");
-//	});
+	//timeline裏面點擊不做展開收合的區域 設定在init.js
+	$(document).on("click",".st-sub-box-2-content-complete a,.st-sub-box-2-more-desc-complete a",function(e){
+		console.log(555);
+		e.stopPropagation();
+	});
 	
 	
 	//----------------------------------- timeline-公告 ---------------------------------------------
@@ -1288,7 +1344,7 @@ $(function(){
 	        		var this_box = $(this);
 	        		
 	        		//時間 名字
-	        		getUserName(gi,val.meta.gu,this_box.find(".st-sub-name"));
+	        		getUserName(gi,val.meta.gu,this_box.find(".st-sub-name"),this_box.find(".st-user-pic img"));
 	        		var time = new Date(val.meta.ct);
 	        		var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
 	        		$(this).find(".st-sub-time").html(time_format);
@@ -1302,6 +1358,9 @@ $(function(){
 	        		this_box.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
 	        		this_box.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
 	        		
+	        		
+	        		var category;
+	        		
 	        		switch(tp){
 	        			//貼文
 	        			case 0:
@@ -1314,8 +1373,8 @@ $(function(){
 	        				break;
 	        			//公告
 	        			case 1:
-	        				this_box.find(".st-box2-more-category").html("公告");
-	        				this_box.find(".st-box2-more-title").html(val.meta.tt);
+	        				category = "公告";
+	        				//this_box.find(".st-box2-more-title").html(val.meta.tt);
 	        				
 //	        				this_box.find(".st-attach-audio").show();
 //	        				
@@ -1335,11 +1394,7 @@ $(function(){
 	        			//通報
 	        			case 2:
 	        				this_box.find(".st-box2-more-category").addClass("st-box2-more-category-fb");
-	        				this_box.find(".st-box2-more-desc").show();
-	        				this_box.find(".st-box2-more-category").html("通報");
-	        				this_box.find(".st-box2-more-title").html("請回報業務人員目前位置請回報業務人員目前位置");
-	        				this_box.find(".st-box2-more-desc").html("你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶你們到底去哪裡了不要偷懶");
-	        				
+	        				category = "通報";
 	        	//			this_box.find(".st-feedback-box").click(function(){
 	        	//				$(".st-feedback-box").data("fb-tick",0);
 	        	//				$(".st-feedback-box-content img").hide();
@@ -1351,13 +1406,25 @@ $(function(){
 	        				
 	        				break;
 	        			case 3:
+	        				this_box.find(".st-box2-more-category").addClass("st-box2-more-category-task");
+	        				category = "任務<img src=\"images/task/timeline_task_icon_task_work.png\"> <span>工作</span>";
 	        				break;
 	        			case 4:
+	        				this_box.find(".st-box2-more-category").addClass("st-box2-more-category-task");
+	        				category = "任務<img src=\"images/task/timeline_task_icon_task_vote.png\"> <span>投票</span>";
 	        				break;
 	        			case 5:
-	        				this_box.find(".st-box2-more-category").html("定點回報");
+	        				this_box.find(".st-box2-more-category").addClass("st-box2-more-category-task");
+	        				category = "任務<img src=\"images/task/timeline_task_icon_task_checkin.png\"> <span>定點回報</span>";
 	        				break;
 	        		};
+	        		
+	        		//0:普通貼文 共用區
+	        		if(tp != 0){
+	        			this_box.find(".st-box2-more-category").html(category);
+		        		this_box.find(".st-box2-more-title").html(val.meta.tt);
+	        		}
+	        		
 	        		
 	        		//timeline內容
     				timelineContentMake(this_box,val.ml,tp);
@@ -1420,7 +1487,6 @@ $(function(){
 			
 			//更改網址成連結 
 			var c = timelineContentFormat(val.c,content_limit);
-			
 			//內容格式
 			switch(val.tp){
 				case 0://文字
@@ -1435,7 +1501,6 @@ $(function(){
 					target.find(".st-attach-url-desc").html(val.d);
 					break;
 				case 2:
-					console.log(val.d);
 					target.find(".st-attach-url").show();
 					target.find(".st-attach-url-img img").attr("src",val.i);
 					target.find(".st-attach-url-img img").css("width","100%");
@@ -1443,8 +1508,11 @@ $(function(){
 					target.find(".st-attach-url-desc").html(val.d);
 					break;
 				case 3:
+					target.find(".st-box2-more-time span").html(val.e);
 					break;
 				case 4:
+					break;
+				case 5:
 					break;
 				case 9:
 					target.find(".st-attach-map").show();
@@ -1462,6 +1530,13 @@ $(function(){
 			    	});
 					break;
 			};
+			
+			//結束時間存在 就填入
+			if(val.e){
+    			var time = new Date(val.e);
+        		var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
+				target.find(".st-box2-more-time span").html(time_format);
+    		}
 		});
 	}
 	
