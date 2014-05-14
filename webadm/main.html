@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Corp+ - Administrator</title>
+
+    <!-- Core CSS - Include with every page -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+
+    <!-- Page-Level Plugin CSS - Dashboard -->
+    <link href="css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet">
+    <link href="css/plugins/timeline/timeline.css" rel="stylesheet">
+
+    <!-- SB Admin CSS - Include with every page -->
+    <link href="css/sb-admin.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+        <!-- Core Scripts - Include with every page -->
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/jquery-ui.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/plugins/metisMenu/jquery.metisMenu.js"></script>
+
+    <!-- SB Admin Scripts - Include with every page -->
+    <script src="js/sb-admin.js"></script>
+
+    <!-- Page-Level Demo Scripts - Dashboard - Use for reference -->
+    <script src="js/jstorage.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/d3.v3.min.js"></script>
+    <script src="js/readFile.js"></script>
+    <script src="js/dndTree.js"></script>
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">Corp+ Administrator</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right">
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                        </li>
+                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li id="logout"><a ><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div class="navbar-default navbar-static-side" role="navigation">
+                <div class="sidebar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li class="sidebar-search">
+                            <div class="input-group custom-search-form">
+                                帳號：<lebel id="account" class="text-primary"></label>
+                            </div>
+                            <!-- /input-group -->
+                        </li>
+                        <li>
+                            <a href="main.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-edit fa-fw"></i> 新增團體</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-sitemap fa-fw"></i> 團體列表<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level" id="groupList">
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-files-o fa-fw"></i> 檔案工具下載</a>
+                        </li>
+                    </ul>
+                    <!-- /#side-menu -->
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header" id="mainTitle">Corp+</h1>
+                </div>
+                <div class="col-lg-12" id="memberEditor" hidden>
+                    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" id="openImportBtn">
+                                匯入成員名單
+                            </button>
+
+                     <div id="tree-container" style="" height="500"></div>
+                </div>
+                <div class="edit-branch-member" hidden>
+                    <input class="edit-branch-id" type="hidden">
+                    <div class="edit-bm-branch">
+                        <div class="edit-bm-branch-img"><div>照片</div></div>
+                        <div class="edit-bm-branch-name"><input type="text" data-role="none" placeholder="請輸入群組名稱"/></div>
+                        <img class="edit-bm-branch-cancel" src="images/x.png"/>
+                    </div>
+                    <div class="edit-bm-search">
+                            <img src="images/srch.png"/>
+                            <input type="text" placeholder="search"/>
+                    </div>
+                    <div class="edit-bm-classify">
+                        <div data-bm-class="this" class="edit-bm-classify-box edit-bm-classify-box-blue">群組成員(<span></span>)</div>
+                        <div data-bm-class="all" class="edit-bm-classify-box">所有成員(<span></span>)</div>
+                    </div>
+                    <div class="edit-bm-list-area"></div>
+                    <div class="edit-bm-list-area-all"></div>
+                    <div class="edit-bm-list-area-search"></div>
+                    <div class="edit-bm-bottom">
+                        <div class="edit-bm-bottom-cancel">取消</div>
+                        <div class="edit-bm-bottom-save" data-branch-add="0">儲存</div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h4 class="modal-title" id="myModalLabel">匯入成員名單</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            您可以匯入Exchange Server檔案..轉檔在匯入.... <input type="file" id="fileInput" value="選擇檔案" >
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" id="importBtn">確認匯入</button>
+                                        </div>
+                                    </div>
+                                    <!-- /.modal-content -->
+                                </div>
+                                <!-- /.modal-dialog -->
+                            </div>
+
+
+                <!-- /.col-lg-12 -->
+            </div>
+            
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+
+    <script>
+        $(document).ready(function(){
+
+            var phoneNumber=$.jStorage.get("phoneNumber");
+            var userId=$.jStorage.get("userId");
+            var accessToken=$.jStorage.get("accessToken");
+
+            if(phoneNumber==null || 
+                userId==null ||
+                accessToken==null){
+                self.location="index.html";
+            }
+            else{
+                $("#account").text($.jStorage.get("phoneNumber"));
+                loadGroupList(userId,accessToken);
+
+            }
+
+            
+
+            $("#logout").click(function(){
+                $.jStorage.deleteKey("phoneNumber");
+                $.jStorage.deleteKey("userId");
+                $.jStorage.deleteKey("accessToken");
+                self.location="index.html";
+            });
+            
+        });
+        function loadGroupList(userId, accessToken){
+
+            //取得團體列表
+            var api_name = "groups";
+            var headers = {
+                "ui":userId,
+                "at":accessToken,
+                "li":"zh_TW"
+            };
+            var method = "get";
+            var result = ajaxDo(api_name,headers,method,true);
+            result.complete(function(data){
+                if(data.status != 200){
+                    //$.mobile.changePage("#page-helper");三個人
+                }else{
+                    var groupList=$.parseJSON(data.responseText);
+                    
+
+                    if(groupList.gl.length==0){
+                        $("#groupList").append('<li><a>目前尚無群組</a></li>');
+                    }else{
+                        for(i=0;i<groupList.gl.length;i++){
+                            $("#groupList").append("<li id='"+i+"'><a>"+groupList.gl[i].gn+"</a></li>");
+                        }
+                    }
+                    $('#groupList').on('click', 'li', function(event){
+                        $("#mainTitle").text("聯絡人編輯 - "+groupList.gl[this.id].gn);
+                        $("#memberEditor").show();
+
+                        $.jStorage.set("currnetGroupName",groupList.gl[this.id].gn);
+                        $.jStorage.set("currnetGroupId",groupList.gl[this.id].gi);
+                    });
+
+                    //製作timeline
+                    
+                    //預設團體暫定為第一個團體
+                    /*default_group = $.parseJSON(data.responseText).gl[0];
+                    group_id = default_group.gi
+                    group_name = default_group.gn;
+                    timeline_id = default_group.tl[0].ti;
+                    */
+                    //製作timeline
+                    //timelineListWrite();
+                    //$.mobile.changePage("#page-group-main", {transition: "pop"});
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>
