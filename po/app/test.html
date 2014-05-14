@@ -1,37 +1,147 @@
-<!DOCTYPE HTML>  
-<html>  
-<head>  
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
-    <script src="../js/jquery.js"></script>  
-    <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
-    <script src="test/map/jquery.tinyMap.js"></script>
-    <script type="text/javascript">  
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+
+
+
+    </style>
+    <script src="../js/jquery.js"></script>
+    <script src="js/linq.js"></script>
+    <script src="js/jquery.plugin.js"></script>
     
-    $(function(){  
-    	 /* $('#map').tinyMap({
-             center: {x: '25.067880470370152', y: '121.52657680213451'},
-             zoomControl: 0,
-             mapTypeControl: 0,
-             zoom: 16,
-             marker: [
-                 {addr: ['25.067880470370152', '121.52657680213451']}
-             ]
-        }); */
-    	 lat = '25.067880470370152';
-    	 lng = '121.52657680213451';
-    	 $('body').find("div").tinyMap({
-             marker: [
-                 {addr: [lat, lng],text:'dfasdfasdf'}
-             ]
-        });
+    <script type="text/javascript">
+    $(function(){
     	
-    });  
-   </script>  
-</head>  
-<body>  
-   <div id="map" style="width:100%;height:150px">
-   </div>
-   
-   <span></span>
-</body>  
-</html>  
+    	//localStorage.clear();return false;
+    	console.log(JSON.stringify($.lStorage("_groupList"),null,2));return false;
+    	
+    	obj = $.lStorage("_groupList");
+    	
+    	gi = "83c7be55-5b09-459f-aea6-b345b49b6cab";
+    	gu = "991d2fa6-7536-4975-930d-574654a2bce1";
+    	
+    	group_list = Enumerable.From(obj)
+        .Where(function (x) { console.log(gi);return x[gi].gi == gi })
+        //.Select(function (x) { var set = new Array(x.UserId,x.DisplayName); return set; })
+        .ToArray();
+    	
+    	console.log(JSON.stringify(group_list,null,2));
+    	
+    	return false;
+    	test(true);
+    	test();
+    	function test(eee){
+    		console.log(555);
+    		if(eee){
+    			console.log(22);	
+    		}else{
+    			console.log(33);	
+    		}
+    		
+    	}
+    	
+    	
+    	return false;
+    	gi = 22222222;
+    	var currentGroup = {"default_gi":gi};
+        currentGroup[gi] = {"gu":1234,"gn":1234,"ti_cal":2134,"ti_feed":4343,"ti_chat":2342323};
+        
+        var aa = {};
+        aa[gi] = {"gu":1234444,"gn":1234777,"ti_cal":2134888,"ti_chat":2342323000};
+        
+        $.extend(currentGroup,aa);
+        
+        console.log(JSON.stringify(currentGroup));
+        key =64564564;
+        if(!localStorage[key]){
+        	console.log(3333);
+            return ;
+        }
+        
+    	return false;
+    	var str = "\nhttp://techcrunch.com/2014/05/07/and-the-winner-of-techcrunch-disrupt-ny-2014-is-vurb/".replace(/\n|\r/,"<br/>");
+    	console.log(str);
+    	return false;
+    	limit = 60;
+        var c = "\nhttp://techcrunch.com/2014/05/07/and-the-winner-of-techcrunch-disrupt-ny-2014-is-vurb/";
+        		c = c.replace(/\\/g,'\\\\');
+        console.log(c);
+        var result_str = [];
+        result_str[0] = c.substring(0,limit).split(" ");
+        result_str[1] = c.split(" ");
+        console.log(result_str);
+        for(n=0;n<2;n++){
+            $.each(result_str[n],function(i,val){
+                if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
+                    result_str[n].splice(i,1,"<a href=\"" + val + "\" target=\"_blank\">" + val + "</a>");    
+                }
+            });
+            result_str[n] = result_str[n].join(" ");
+        }
+        
+        if(c.length > limit){
+        	console.log(result_str[0]);
+        	console.log(c.length);
+        	console.log(result_str[0].length);
+        	console.log(limit);
+            result_str[0] += "...";
+        }
+        $("span:eq(0)").html(result_str[0]);
+        $("span:eq(1)").html(result_str[0]);
+        
+        function htmlEntities(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        
+        
+        //5-9 group user list 不將gu存成obj key 方便linq
+        function getUserName(gi,gu,target,polling){
+            //先檢查localStorage[gi].guAll是否存在
+            var _groupList = $.lStorage("_groupList");
+            
+            if(_groupList[gi].guAll && !polling){
+                $.each(_groupList[gi].guAll,function(i,val){
+                    if(val.gu == gu){
+                        target.html(val.n);
+                        return false;
+                    }
+                });
+            }
+            
+            //沒有才call api
+            var api_name = "groups/"+ gi +"/users";
+            var headers = {
+                "ui":ui,
+                "at":at,
+                "li":"zh_TW",
+            };
+            var method = "get";
+            var result = ajaxDo(api_name,headers,method,true);
+            result.complete(function(data){
+                data_group_user = $.parseJSON(data.responseText).ul;
+                //成員列表存入
+                _groupList[gi].guAll = data_group_user;
+                $.lStorage("_groupList",_groupList)
+                
+                $.each(data_group_user,function(i,val){
+                    if(val.gu == gu){
+                        target.html(val.n);
+                        return false;
+                    }
+                });
+            });
+        }
+        
+    });
+    </script>
+    <script type="text/javascript" src="js/func.js"></script>
+  </head>
+  <body>
+        <span></span>
+        <img src="https://project-o.s3.amazonaws.com/users/31a7769c-53f0-4656-8987-f96639ea530e/31a7769c-53f0-4656-8987-f96639ea530e_tn?Expires=1714374619&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=nIuFNKa75adHBR5FtV6%2Ff%2FbpUNc%3D"/>
+        <br/><br/><br/>
+        <span></span>
+  </body>
+</html>

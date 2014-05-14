@@ -41,12 +41,16 @@ function ajaxDo(api_name,headers,method,async,body){
             type: method,
             headers:headers,
             async:false,
+<<<<<<< HEAD
             dataType: "JSON",
             data:body
+=======
+>>>>>>> b7b927bccd2647e9202a1ddf7f804dfaef342b0b
         });/* ajax結束 */
     }
     
     return result;
+<<<<<<< HEAD
 }
 
 
@@ -352,3 +356,6 @@ function createMemberApi(parendId,branchName){
     });
     return branchId;
 }
+=======
+}
+>>>>>>> b7b927bccd2647e9202a1ddf7f804dfaef342b0b

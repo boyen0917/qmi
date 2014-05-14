@@ -354,13 +354,12 @@
 
 .sm-user-pic {
 	float: left;
-	width: 60px;
-	height:60px;
-	/* border-radius: 5px;
-	border: solid;
-	border-width: 1px;
-	border-color: #abbabf; */
-	margin: 5px 10px 0 10px;
+	width:60px;
+	height: 60px;
+	overflow-y: hidden;
+	margin: 6px 10px 0 10px;
+	border-radius: 6px;
+	border: 1px solid #abbabf;
 }
 
 .sm-user-area, .main-user-area {
@@ -1047,7 +1046,7 @@
 	opacity: 0.9;
 	border-radius: 2px;
 	display:none;
-	z-index: 10;
+	z-index: 100;
 }
 
 .st-sub-box-more-box {
@@ -1080,14 +1079,18 @@
     border-bottom: 1px solid rgb(231,231,231);
 }
 
-.st-user-pic img{
-    width:60px;
-    height:60px;
-/*     border-radius: 8px;
-    border: solid;
-    border-color: #abbabf;
-    border-width: 1px; */
-    margin: 12px 15px 7px 15px;
+.st-sub-box-1-main {
+	width: 100%;
+	height: 80px;
+}
+
+.st-user-pic{
+	height: 60px;
+	overflow-y: hidden;
+	margin: 10px;
+	width: 60px;
+	border-radius: 8px;
+    border:1px solid #abbabf;
 }
 
 .st-user-pic, .st-sub-name, .st-sub-time {
@@ -1145,12 +1148,12 @@
     word-wrap: break-word;
 }
 
-.st-sub-box-2-content ,.st-box2-more-desc  {
+/* .st-sub-box-2-content ,.st-box2-more-desc  {
 	overflow: hidden;
 	display: -webkit-box;
 	-webkit-line-clamp: 6;
 	-webkit-box-orient: vertical;
-}
+} */
 
 
 .st-sub-box-3 {
@@ -1327,8 +1330,26 @@
     cursor: default;
 }
 
+.st-box2-more-category img {
+	width: 18px;
+	position: relative;
+	top: 2px;
+	margin: -2px -1px -1px 5px;
+}
+
+.st-box2-more-category span {
+	font-size: 13px;
+	color: #444648;
+}
+
 .st-box2-more-category-fb {
     background: url(../images/timeline/timeline_feedback_icon_feedback.png) no-repeat;
+    background-size: 32px;
+    cursor: default;
+}
+
+.st-box2-more-category-task {
+    background: url(../images/task/timeline_task_icon_task.png) no-repeat;
     background-size: 32px;
     cursor: default;
 }
@@ -1340,7 +1361,7 @@
     cursor: default;
 }
 
-.st-box2-more-desc {
+.st-box2-more-desc,.st-box2-more-desc-complete {
     position: relative;
     top: -30px;
     left: -15px;
@@ -1350,6 +1371,34 @@
     border: 1px solid rgb(228,236,242);
     padding: 10px;
     cursor: default;
+}
+
+.st-box2-more-time {
+	position: relative;
+    top: -30px;
+    left: -15px;
+    margin: 10px 0;
+	width: 107%;
+	height: 20px;
+	padding: 1px 10px;
+	border: 1px solid rgb(202,218,224);
+	border-radius: 15px;
+	background: white;
+	font-size: 13px;
+    color: #666;
+}
+
+.st-box2-more-time span {
+	margin-left: 5px;
+	color: #000;
+}
+
+.st-box2-more-time img {
+	width: 23px;
+	position: relative;
+	top: 7px;
+	left: -8px;
+	margin: -8px -7px 0 0;
 }
 
 .st-attach-url-img,.st-attach-map {

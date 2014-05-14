@@ -7,6 +7,9 @@
 	    	}
 			localStorage[key] = value;
 		}else{
+			if(!localStorage[key]){
+				return;
+			}
 			return $.parseJSON(localStorage[key])
 		}
     };
