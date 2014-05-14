@@ -429,7 +429,7 @@ function treeMake(treeData,queue,undo_cnt) {
 	    	.attr("cx", -5);
         
         nodeEnter.append("svg:image")
-	        .attr("xlink:href", "add.png")
+	        .attr("xlink:href", "images/add.png")
 	        .attr("class","svg-edit-add")
 	        .attr("width", 30)
 	        .attr("height", 30)
