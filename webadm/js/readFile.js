@@ -9,7 +9,7 @@ $(function() {
 				var reader = new FileReader();
 
 				reader.onload = function(e) {
-<<<<<<< HEAD
+
 					var file_name = fileInput.files[0].name.slice(0,-4);
 					hierachy_arr = treeJsonMake(reader.result,file_name);
 					
@@ -17,23 +17,19 @@ $(function() {
 
 					visitEachToAddId(hierachy_arr.children);
 					createBranchTree(hierachy_arr.children,member_arr);
-=======
+
 					console.log(reader.result);
 					var file_name = fileInput.files[0].name.slice(0,-4);
 					hierachy_arr = treeJsonMake(reader.result,file_name);
 					
 					visitEachToAddId(hierachy_arr.children);
->>>>>>> b7b927bccd2647e9202a1ddf7f804dfaef342b0b
+
 					$(".edit-outside-area").show();
 					$("h1").next().hide();
 					
 					var queue = [];
 					treeMake(hierachy_arr,queue);
-<<<<<<< HEAD
 
-=======
-					
->>>>>>> b7b927bccd2647e9202a1ddf7f804dfaef342b0b
 					function visitEachToAddId(arr,hid,branch_path){
 				        this_hid = hid;
 				        $.each(arr,function(i,val){
@@ -63,7 +59,6 @@ $(function() {
 				    }
 				    
 					function treeJsonMake(data,file_name){
-<<<<<<< HEAD
 						file_name = $.jStorage.get("currnetGroupName");
 						
 						hierachy_arr = {"name": "root","children": [{"name": file_name,"children": []}]};
@@ -85,17 +80,18 @@ $(function() {
 						    	temp_arr["phone"] = row[4];
 						    	temp_arr["mobile"] = row[5];
 						    	temp_arr["mail"] = row[6];
+						    }
+						 });
 						    	
 
-
+/*
 					            if($.inArray(row[3], group_str_arr) < 0){
 					                group_str_arr.push(row[3]);
-=======
 						file_name = "三竹資訊";
 						
 						hierachy_arr = {"name": "root","children": [{"name": file_name,"children": []}]};
 					    max_group_cnt=0,group_str_arr=[],relation_arr=[],member_arr = [];
-					    var split_arr = data.split('\n');
+					    var split_arr = data.split('\n');*/
 					    //先做第一次的篩選
 					    $.each(split_arr,function(i,val){
 					        if(val.split(',')[3]){
@@ -107,7 +103,6 @@ $(function() {
 					    		temp_arr[2] = val.split(',')[3];
 					            if($.inArray(val.split(',')[3], group_str_arr) < 0){
 					                group_str_arr.push(val.split(',')[3]);
->>>>>>> b7b927bccd2647e9202a1ddf7f804dfaef342b0b
 					            }
 					            member_arr.push(temp_arr);
 					        }
@@ -144,11 +139,7 @@ $(function() {
 					        doEach(hierachy_arr.children,val);
 					        
 					    });
-<<<<<<< HEAD
-					    
-=======
 
->>>>>>> b7b927bccd2647e9202a1ddf7f804dfaef342b0b
 					    return hierachy_arr.children[0];
 					}
 					
@@ -663,8 +654,9 @@ $(function() {
 					
 				}
 
-				 reader.readAsText(file, 'BIG5');	
-			} else {
+				reader.readAsText(file, 'BIG5');	
+			}
+			else{
 				fileDisplayArea.innerText = "File not supported!";
 			}
 		});
