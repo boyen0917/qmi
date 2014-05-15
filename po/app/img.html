@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
-div{
+.cc {
     margin:100px;
     border:1px solid ;
     width:60px;
@@ -21,27 +21,31 @@ div{
     
     <script type="text/javascript">
     $(function(){
-    	$.each($("div"),function(i,val){
-    		var x =60;
-    		
-    		$("div").html("<img src=\"https://project-o.s3.amazonaws.com/users/a05a7d4c-83bd-464f-9395-d7a0f73b9c44/a05a7d4c-83bd-464f-9395-d7a0f73b9c44_tn?Expires=1714725808&amp;AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&amp;Signature=n1YKUSLarmzKjWpfB5IXCwlCGNo%3D\">")
-    		img = $(this).find("img");
-    		img.load(function() {
-    			var w = img.width();
-                var h = img.height();
-                
-                if(w < h){
-                    img.attr("width",x);
-                    var p = ((h/(w/x))-x)/2*(-1);
-                    img.css("margin-top",p +"px");
-                }else{
-                    img.attr("height",x);
-                    var p = ((w/(h/x))-x)/2*(-1);
-                    img.css("margin-left",p +"px");
-                }
-            });
+    	t=[0,1,2,3,4,5,6,14,44];
+    	
+    	a = t.reverse();
+    	
+    	$.each(a,function(i,val){
+    		console.log(i);
+    		console.log(val);
     	});
     	
+    	return false;
+    	
+    	
+    	
+    	tp = 2;
+    	switch (true) {
+    	    case tp == 1 ||tp == 2 || tp == 3:
+    	    	console.log(5);
+    	    
+    	    case tp==1:
+    	    	console.log(2);
+    	        break;
+    	    case tp==2:
+    	    	console.log(3);
+    	        break;                  
+    	}
     	
     	
     	
@@ -52,14 +56,21 @@ div{
     <script type="text/javascript" src="js/func.js"></script>
   </head>
   <body>
+        <div class="st-feedbox-area">
         
-        <div>
+        
+        
+        </div>
+        
+        
+        
+        <div class="cc">
         <img src="">
         </div>
-        <div>
+        <div class="cc">
         <img src="https://project-o.s3.amazonaws.com/users/3c931942-1044-42f6-994e-3a6cb0277f7b/3c931942-1044-42f6-994e-3a6cb0277f7b_tn?Expires=1714918426&amp;AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&amp;Signature=fQRDGPktKN4MLlduU7zHqcXpoTQ%3D">
         </div>
-        <div>
+        <div class="cc">
         <img src="https://project-o.s3.amazonaws.com/users/96f3d4dd-bace-4433-9cc3-e37c0ef5365d/96f3d4dd-bace-4433-9cc3-e37c0ef5365d_tn?Expires=1714374948&amp;AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&amp;Signature=nclA5yGQ%2B0NOHfMknIU7O%2F9t%2FeE%3D">
         </div>
   </body>

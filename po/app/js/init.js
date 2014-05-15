@@ -18,4 +18,9 @@ $(function(){
 	//timeline裏面點擊不做展開收合的區域
 	timeline_detail_exception = ".st-sub-box-2-content-complete a,.st-sub-box-2-more-desc-complete a";
 	
+	//timeline內容 判斷不開啓附檔區域的type
+	not_attach_type_arr = [0,14,15];
+	
+	//顯示loading 圖示 的參數
+	load_show = false;
 });

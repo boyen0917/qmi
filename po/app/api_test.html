@@ -56,9 +56,10 @@
             at = $.parseJSON(data.responseText).at;
             
             switch(api_type){
-                case "timeline"://動態消息
-                	 var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events";
-                     var headers = {
+                case "timeline_participants"://理解是 自己對於這則timeline event 的各種狀態 is read is like is reply etc...
+                	 //var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events/Event-1077/participants?tp=2";
+                	 var api_name = "/groups/8761e107-295c-4f01-8e10-7b3e703b8961/timelines/c5af44a6-8050-42e6-bbc1-22c7283b57d6/events/Event-872/participants?tp=1";
+                	 var headers = {
                              "ui":ui,
                              "at":at, 
                              "li":"zh_TW"
@@ -67,12 +68,52 @@
                      
                      
                      var result = ajaxDo(api_name,headers,method,true);
-                     result.complete(function(data){
-                         console.log($.parseJSON(data.responseText));
-                     });
                      
                 	break;
-                	
+                case "timeline_status"://理解是 自己對於這則timeline event 的各種狀態 is read is like is reply etc...
+                    //var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events";
+                    var api_name = "/groups/8761e107-295c-4f01-8e10-7b3e703b8961/timelines/c5af44a6-8050-42e6-bbc1-22c7283b57d6/events_status";
+                    var headers = {
+                            "ui":ui,
+                            "at":at, 
+                            "li":"zh_TW"
+                                };
+                    var method = "get";
+                    
+                    
+                    var result = ajaxDo(api_name,headers,method,true);
+                    
+                   break;
+                case "timeline_list"://動態消息
+                    //var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events";
+                    var api_name = "groups/8761e107-295c-4f01-8e10-7b3e703b8961/timelines/c5af44a6-8050-42e6-bbc1-22c7283b57d6/events";
+                    var headers = {
+                            "ui":ui,
+                            "at":at, 
+                            "li":"zh_TW"
+                                };
+                    var method = "get";
+                    
+                    
+                    var result = ajaxDo(api_name,headers,method,true);
+                    
+                   break;
+                case "timeline_vote"://單一動態消息
+                    //var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events/Event-729";
+                    var api_name = "groups/8761e107-295c-4f01-8e10-7b3e703b8961/timelines/c5af44a6-8050-42e6-bbc1-22c7283b57d6/events/Event-872";
+                    var headers = {
+                            "ui":ui,
+                            "at":at, 
+                            "li":"zh_TW"
+                                };
+                    var method = "get";
+                    
+                    
+                    var result = ajaxDo(api_name,headers,method,true);
+                    
+                    
+                   break;
+                   
                 case "groups"://所有團體
                     var api_name = "groups";
                     var headers = {
@@ -82,16 +123,14 @@
                     };
                     var method = "get";
                     var result = ajaxDo(api_name,headers,method,true);
-                    result.complete(function(data){
                     	//tl 有3個 行事曆 tp=1 ; 動態 2 ; 聊天室 3 
-                    	
                     	//"{"gl":[{"gi":"83c7be55-5b09-459f-aea6-b345b49b6cab","gn":"三豬雲","ga":"","ad":2,"cnt":11,"tl":[{"ti":"12a6807c-acee-4b1e-8da0-0f84bcb573ac","tp":3},{"ti":"92c954b5-e343-44d5-bf95-70a6ef53ef4e","tp":1},{"ti":"e874c0da-845c-4635-970f-ed4764047960","tp":2}],"me":"85820d46-18a2-4bed-9641-513f74a5e875"}],"rsp_code":0,"rsp_msg":"取得完成"}"
-                        console.log(data);return;
-                    }); 
-                    break;
+                    
+                    	break;
                     
                 case "group/user"://單一團體
                 	var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/users";
+                	//var api_name = "groups/37ca8930-2ba5-49bc-a3ea-91321350c42f/users";
                     var headers = {
                         "ui":ui,
                         "at":at,
@@ -99,15 +138,32 @@
                     };
                     var method = "get";
                     var result = ajaxDo(api_name,headers,method,true);
-                    result.complete(function(data){
                     	//"{"ul":[{"gu":"0af897e1-b3d8-4d71-bade-e26dafa2ebb4","n":"David","bl":"","st":1},{"gu":"1","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/4739cfc7-1363-4a7e-aee3-c2bd821d18a1/4739cfc7-1363-4a7e-aee3-c2bd821d18a1_tn?Expires=1714225225&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=Dv%2F8EMGDkDvEbeLtseDWffUnd%2BY%3D"},{"gu":"13cc1ba5-6cb4-4707-b931-bf3636aa36dc","n":"Winnie","bl":"","st":0},{"gu":"44594357-a18b-4447-b59c-89899bc72559","n":"Kewang","bl":"","st":1},{"gu":"4ec6484e-68a3-4ce5-98d9-1baa8b0b32ce","n":"Skyler","bl":"","st":0},{"gu":"67b57734-4638-4df1-ba34-bb7541fb5593","n":"Joseph","bl":"","st":0},{"gu":"69c044e1-1c6d-4494-9ade-ce05f3d6dd21","n":"Jesse","bl":"","st":0},{"gu":"85820d46-18a2-4bed-9641-513f74a5e875","n":"Brian","bl":"","st":1},{"gu":"8741151f-75c7-4c2c-865c-a70c11398cdc","n":"Ellison","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/96f3d4dd-bace-4433-9cc3-e37c0ef5365d/96f3d4dd-bace-4433-9cc3-e37c0ef5365d_tn?Expires=1714374948&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=nclA5yGQ%2B0NOHfMknIU7O%2F9t%2FeE%3D"},{"gu":"991d2fa6-7536-4975-930d-574654a2bce1","n":"Vince","bl":"","st":1},{"gu":"9bed8b81-8834-42f5-831e-be163132e6f0","n":"Redscor","bl":"","st":1},{"gu":"a254f277-3e1d-489a-82df-d9bd85e5d36c","n":"Rex","bl":"","st":1},{"gu":"ad8c224b-51d0-4ac0-b4dc-b4946ff7e43f","n":"WeiDe","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/31a7769c-53f0-4656-8987-f96639ea530e/31a7769c-53f0-4656-8987-f96639ea530e_tn?Expires=1714374619&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=nIuFNKa75adHBR5FtV6%2Ff%2FbpUNc%3D"},{"gu":"cd0e58b4-bfe0-4c4e-8708-4eef3693866a","n":"Rick","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/534e0c4a-d76f-4e3f-8baf-1441ed981cfc/534e0c4a-d76f-4e3f-8baf-1441ed981cfc_tn?Expires=1714373640&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=lMVaE1CE7muL6wmBoYNar0UMO4A%3D"},{"gu":"cf413e08-55ee-40c1-990d-d6e28a844996","n":"Jog","bl":"","st":0},{"gu":"e35e7cf5-a6ce-48a2-b1b3-36f5ee5f1ec1","n":"Henry","bl":"","st":1}],"rsp_code":0,"rsp_msg":"回傳成功"}"
-                        console.log(data);return;
-                    }); 
+                    break;
+                case "group/create"://建團    
+                    var api_name = "groups";
+                    var headers = {
+                        "ui":ui,
+                        "at":at,
+                        "li":"zh_TW",
+                    };
+                    var body = {
+                   		"gn":"六張犁與我的快樂夥伴",
+                        "gd":"哈囉"
+                    }
+                    body = JSON.stringify(body);
+                    var method = "post";
+                    var result = ajaxDo(api_name,headers,method,true,body);
                     break;
             }
             
             
-            
+            result.complete(function(data){
+                //console.log($.parseJSON(data.responseText));
+                var t =$.parseJSON(data.responseText);
+                console.log(t);
+                console.log(JSON.stringify(t,null,2));
+            });
             
             return false;
             

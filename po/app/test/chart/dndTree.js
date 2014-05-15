@@ -16,11 +16,11 @@ function treeMake(treeData,queue,undo_cnt) {
     var undo_chk = false;
 
     // size of the diagram
-    var viewerWidth = $(document).width();
-    var viewerHeight = $(document).height();
+    //var viewerWidth = $(document).width();
+    //var viewerHeight = $(document).height();
     
-//    var viewerWidth = 600;
-//    var viewerHeight = 500;
+    var viewerWidth = 600;
+    var viewerHeight = 500;
 
     var tree = d3.layout.tree()
         .size([viewerHeight, viewerWidth]);
