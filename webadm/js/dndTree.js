@@ -21,7 +21,8 @@ function treeMake(treeData,queue,undo_cnt) {
     var viewerHeight = 600;//$(document).height() - bottom -50;
     //alert($('#tree-container').position().top);
     //alert(bottom);
-    alert($(document).height());
+//    alert($(document).height());
+
  //   alert($("#tree-container").height()+ "  "+ $("#tree-container").top());
     
 //    var viewerWidth = 600;

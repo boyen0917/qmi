@@ -233,6 +233,9 @@
                     $('#groupList').on('click', 'li', function(event){
                         $("#mainTitle").text("聯絡人編輯 - "+groupList.gl[this.id].gn);
                         $("#memberEditor").show();
+
+                        $.jStorage.set("currnetGroupName",groupList.gl[this.id].gn);
+                        $.jStorage.set("currnetGroupId",groupList.gl[this.id].gi);
                     });
 
                     //製作timeline
