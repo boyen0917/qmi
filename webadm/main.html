@@ -86,7 +86,7 @@
                         <li>
                             <a href="main.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
-                        <li>
+                        <li  id="addGroup">
                             <a href="#"><i class="fa fa-edit fa-fw"></i> 新增團體</a>
                         </li>
                         <li>
@@ -110,6 +110,8 @@
             <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header" id="mainTitle">Corp+</h1>
+                </div>
+                <div class="col-lg-12" id="content">
                 </div>
                 <div class="col-lg-12" id="memberEditor" hidden>
                     <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" id="openImportBtn">
@@ -191,7 +193,9 @@
             }
             else{
                 $("#account").text($.jStorage.get("phoneNumber"));
+                
                 loadGroupList(userId,accessToken);
+                
 
             }
 
@@ -203,55 +207,15 @@
                 $.jStorage.deleteKey("accessToken");
                 self.location="index.html";
             });
+
+            $("#addGroup").click(function(){
+                $("#content").html("");
+                $("#memberEditor").hide();
+                addGroupFun();
+            });
             
         });
-        function loadGroupList(userId, accessToken){
-
-            //取得團體列表
-            var api_name = "groups";
-            var headers = {
-                "ui":userId,
-                "at":accessToken,
-                "li":"zh_TW"
-            };
-            var method = "get";
-            var result = ajaxDo(api_name,headers,method,true);
-            result.complete(function(data){
-                if(data.status != 200){
-                    //$.mobile.changePage("#page-helper");三個人
-                }else{
-                    var groupList=$.parseJSON(data.responseText);
-                    
-
-                    if(groupList.gl.length==0){
-                        $("#groupList").append('<li><a>目前尚無群組</a></li>');
-                    }else{
-                        for(i=0;i<groupList.gl.length;i++){
-                            $("#groupList").append("<li id='"+i+"'><a>"+groupList.gl[i].gn+"</a></li>");
-                        }
-                    }
-                    $('#groupList').on('click', 'li', function(event){
-                        $("#mainTitle").text("聯絡人編輯 - "+groupList.gl[this.id].gn);
-                        $("#memberEditor").show();
-
-                        $.jStorage.set("currnetGroupName",groupList.gl[this.id].gn);
-                        $.jStorage.set("currnetGroupId",groupList.gl[this.id].gi);
-                    });
-
-                    //製作timeline
-                    
-                    //預設團體暫定為第一個團體
-                    /*default_group = $.parseJSON(data.responseText).gl[0];
-                    group_id = default_group.gi
-                    group_name = default_group.gn;
-                    timeline_id = default_group.tl[0].ti;
-                    */
-                    //製作timeline
-                    //timelineListWrite();
-                    //$.mobile.changePage("#page-group-main", {transition: "pop"});
-                }
-            });
-        }
+        
     </script>
 
 </body>
