@@ -1048,6 +1048,7 @@
     box-shadow: 0 0 5px #a2a2a2;
     cursor:pointer;
     opacity:0;
+    -webkit-user-select: none;
 }
 
 .st-sub-box-more-btn {
@@ -1215,13 +1216,14 @@
 }
 
 .st-sub-box-4 {
-	background: #e3eef5;
+	background: linear-gradient(rgb(245,247,250),#e3eef5);
 	height: 42px;
 	text-align: center;
 	line-height: 42px;
 	color: #1e649d;
 	cursor: pointer;
 	-webkit-user-select: none;
+	border-bottom: 1px solid #ddd;
 }
 
 .st-like-btn:active, .st-message:active {
@@ -1435,10 +1437,16 @@
     border: 1px solid rgb(207,221,227);
 }
 
-.st-vote-detail-option span {
+.st-vote-detail-option span:nth-child(2) {
 	width: 90%;
     display: block;
     padding-top: 3px;
+}
+
+.st-vote-detail-option span:nth-child(3) {
+	position: relative;
+	top: 2px;
+	right: 5px;
 }
 
 .st-vote-send,.st-vote-send-gray {
@@ -1664,7 +1672,7 @@
     width:25px;
 }
 
-.st-feddback-next{
+.st-feedback-next{
 	background: url(../images/common/icon_arrow_next_blue.png) no-repeat;
 	background-size: cover;
 	height: 23px;
@@ -1673,6 +1681,48 @@
 	margin-right: 5px;
 }
 
+.st-reply-area {
+    background: white;
+}
+
+.st-reply-like-area {
+	height: 50px;
+	border-bottom: 1px solid rgb(204,204,204);
+	line-height: 50px;
+	padding-left: 15px;
+}
+
+.st-reply-content-area {
+	min-height: 81px;
+	border-bottom: 1px solid rgb(236,236,236);
+}
+
+.st-reply-content-subarea {
+	display: table;
+	padding: 10px 0;
+}
+
+.st-reply-content {
+	font-size: 15px;
+	color: #444;
+	margin: 2px 0;
+	min-height: 20px;
+}
+
+.st-reply-footer {
+	color: #777;
+	font-size: 14px;
+}
+
+.st-reply-like-area img:nth-child(1) {
+    margin: -1px 5px;
+}
+
+.st-reply-like-area img:nth-child(3) {
+	float: right;
+	margin: 16px 15px;
+	width: 18px;
+}
 
 /* =============================== page timeline detail ==================================== */
 

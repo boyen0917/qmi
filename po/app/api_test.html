@@ -39,12 +39,12 @@
         //ajax用
         var myRand = Math.floor((Math.random()*1000)+1);
      
-        var id = "+886980922917";
+        var id = "+886928858828";
         //登入認證
         var api_name = "login";
         var headers = {
         	    "id":id,
-        	    "up":toSha1Encode("123456"), 
+        	    "up":toSha1Encode("1qw23e"), 
         	    "ns":"",
         	    "li":"zh_TW"
         	        };
@@ -56,23 +56,25 @@
             at = $.parseJSON(data.responseText).at;
             
             switch(api_type){
-                case "timeline_participants"://理解是 自己對於這則timeline event 的各種狀態 is read is like is reply etc...
-                	 //var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events/Event-1077/participants?tp=2";
-                	 var api_name = "/groups/8761e107-295c-4f01-8e10-7b3e703b8961/timelines/c5af44a6-8050-42e6-bbc1-22c7283b57d6/events/Event-872/participants?tp=1";
+                case "timeline_participants"://這則單一事件的各種回復狀態 Type(0=讀取,1=按讚,2=按X,3=按訂閱,4=按置頂,7=按任務)
+                	 var api_name = "groups/3564cbb8-81a3-47a3-b0f3-89822762029f/timelines/0efb2a90-fb99-4ce8-b80e-646bba745ea6/events/Event-148.Event-165/participants?tp=1";
+                	              //"groups/3564cbb8-81a3-47a3-b0f3-89822762029f/timelines/0efb2a90-fb99-4ce8-b80e-646bba745ea6/events/Event-148.Event-164/participants?tp=1"	 
+                //var api_name = "/groups/e2b777c8-68a7-468e-b9e4-b2434ccb86fb/timelines/3f191b19-d532-43b7-a696-ddd40e020670/events/Event-10/participants?tp=1";
                 	 var headers = {
                              "ui":ui,
                              "at":at, 
                              "li":"zh_TW"
                                  };
                      var method = "get";
-                     
+                                     
+                     //{"tp":0,"rsp_code":999,"rsp_msg":"無群組權限"} 
                      
                      var result = ajaxDo(api_name,headers,method,true);
                      
                 	break;
                 case "timeline_status"://理解是 自己對於這則timeline event 的各種狀態 is read is like is reply etc...
                     //var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events";
-                    var api_name = "/groups/8761e107-295c-4f01-8e10-7b3e703b8961/timelines/c5af44a6-8050-42e6-bbc1-22c7283b57d6/events_status";
+                    var api_name = "groups/3564cbb8-81a3-47a3-b0f3-89822762029f/timelines/0efb2a90-fb99-4ce8-b80e-646bba745ea6/events_status?ep=Event-148";
                     var headers = {
                             "ui":ui,
                             "at":at, 
@@ -129,8 +131,7 @@
                     	break;
                     
                 case "group/user"://單一團體
-                	var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/users";
-                	//var api_name = "groups/37ca8930-2ba5-49bc-a3ea-91321350c42f/users";
+                	var api_name = "groups/e2b777c8-68a7-468e-b9e4-b2434ccb86fb/users";
                     var headers = {
                         "ui":ui,
                         "at":at,
@@ -163,28 +164,12 @@
                 var t =$.parseJSON(data.responseText);
                 console.log(t);
                 console.log(JSON.stringify(t,null,2));
+                
+                $("textarea").html(JSON.stringify(t,null,2));
+                
             });
             
             return false;
-            
-            
-            
-           
-            
-            /* var api_name = "groups/4fbb9ffe-24b7-4a92-be86-508ea73e6d94/timelines/2ef79528-ab8a-47fa-9b64-bba5e890eada/events";
-            var headers = {
-                    "ui":ui,
-                    "at":at, 
-                    "li":"zh_TW"
-                        };
-            var method = "get";
-            
-            var result = ajaxDo(api_name,headers,method,true);
-            result.complete(function(data){
-            	console.log(data);
-            }); */
-            
-            
             
         });
   
@@ -223,6 +208,6 @@
    </script>   
 </head>  
 <body>  
-   
+   <textarea style="font-size:15px;width:80%;height:1000px"></textarea>
 </body>  
 </html>  
