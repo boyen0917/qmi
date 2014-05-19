@@ -353,3 +353,99 @@ function createMemberApi(parendId,branchName){
     return branchId;
 }
 
+function addGroupFun(){
+    $("#mainTitle").text("新增團體");
+    html="<div class='col-lg-6'> ";
+    html+="<label>請輸入團體名稱</label>";                          
+    html+="<input id='groupName' type='text' class='form-control' placeholder='Please input group name'>";
+    html+="<label>請輸入團體簡介</label>"; 
+    html+="<input id='groupDesc' type='text' class='form-control' placeholder='Please input group description'></input><BR>";
+    html+="<button id='addGroupButton' type='button' class='btn btn-primary'>建立</button>";
+    html+="</div>";
+    $("#content").html(html);
+
+    $("#addGroupButton").click(function(){
+
+        var groupName=$("#groupName").val();
+        var groupDesc=$("#groupDesc").val();
+        
+    
+        var api_name = "groups";
+        var userId=$.jStorage.get("userId");
+        var accessToken=$.jStorage.get("accessToken");
+        var headers = {
+            "ui":userId,
+            "at":accessToken,
+            "li":"zh_TW"
+            };
+        var method = "post";
+        var body={};
+        body.gn=groupName;
+        body.gd=groupDesc;
+        var result = ajaxDo(api_name,headers,method,false,JSON.stringify(body));
+        
+        result.complete(function(data){
+            if(data.status != 200){
+                        //$.mobile.changePage("#page-helper");三個人
+            }else{
+                alert("["+groupName+"] 建立成功");
+                loadGroupList(userId,accessToken);
+            }
+        });
+    });
+
+
+}
+
+function loadGroupList(userId, accessToken){
+
+            //取得團體列表
+            var api_name = "groups";
+            var headers = {
+                "ui":userId,
+                "at":accessToken,
+                "li":"zh_TW"
+            };
+            var method = "get";
+            var result = ajaxDo(api_name,headers,method,true);
+            result.complete(function(data){
+                if(data.status != 200){
+                    //$.mobile.changePage("#page-helper");三個人
+                }else{
+
+                    var groupList=$.parseJSON(data.responseText);
+                    $("#groupList").empty(); 
+
+                    if(groupList.gl.length==0){
+                        $("#groupList").append('<li><a>目前尚無群組</a></li>');
+                    }else{
+                        for(i=0;i<groupList.gl.length;i++){
+                            $("#groupList").append("<li id='"+i+"'><a>"+groupList.gl[i].gn+"</a></li>");
+                        }
+                    }
+                    $('#groupList').on('click', 'li', function(event){
+                        $("#mainTitle").text("聯絡人編輯 - "+groupList.gl[this.id].gn);
+                        $("#memberEditor").show();
+                        $("#content").html("");
+                        $.jStorage.set("currnetGroupName",groupList.gl[this.id].gn);
+                        $.jStorage.set("currnetGroupId",groupList.gl[this.id].gi);
+                    });
+
+                    //製作timeline
+                    
+                    //預設團體暫定為第一個團體
+                    /*default_group = $.parseJSON(data.responseText).gl[0];
+                    group_id = default_group.gi
+                    group_name = default_group.gn;
+                    timeline_id = default_group.tl[0].ti;
+                    */
+                    //製作timeline
+                    //timelineListWrite();
+                    //$.mobile.changePage("#page-group-main", {transition: "pop"});
+                }
+            });
+        }
+
+
+
+
