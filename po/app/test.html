@@ -13,15 +13,10 @@
     
     <script type="text/javascript">
     $(function(){
-        obj = {
-            a:"a",
-            b:"b",
-            c:"c"
-        }
+        // Getting URL var by its nam
+        clear = $.getUrlVar('clear');
 
-        $.each(obj,function(i,val){
-            console.log(i +" : "+ val);    
-        });
+        console.log(clear);
         
             
         

@@ -5,3 +5,5 @@ po/upload/files/
 po/upload/files/.htaccess
 *.htaccess
 *DS_Store
+po/app/test.html
+po/app/api_test.html

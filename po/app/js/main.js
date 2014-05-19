@@ -1,4 +1,11 @@
 $(function(){  
+
+	// url參數 clear 存在 就清 local storage
+    clear = $.getUrlVar('clear');
+    if(clear == 123456) localStorage.clear();
+
+
+
 	var ui,at,gi,gu,gn,gd,ga,gm,ti_cal,ti_feed,ti_chat,device_token,zoom_out_cnt,zoom_in_cnt,filter_name,
 	group_list,default_group,group_name,post_tmp_url,activityTimeout,
 	timeline_type,data_group_user;
