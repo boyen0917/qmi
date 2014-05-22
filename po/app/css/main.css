@@ -23,7 +23,7 @@
 	height: 25px;
 	width: 25px;
 	float: left;
-    margin: 9px 0 0 5px;
+    margin: 13px 0 0 5px;
 	cursor:pointer;
 }
 
@@ -1695,6 +1695,7 @@
 .st-reply-content-area {
 	min-height: 81px;
 	border-bottom: 1px solid rgb(236,236,236);
+	cursor: default;
 }
 
 .st-reply-content-subarea {
@@ -1712,6 +1713,15 @@
 .st-reply-footer {
 	color: #777;
 	font-size: 14px;
+}
+
+.st-reply-footer span:nth-child(2){
+	cursor: pointer;
+}
+
+.st-reply-footer img {
+	width: 15px;
+	margin: 0 8px -1px 0;
 }
 
 .st-reply-like-area img:nth-child(1) {
@@ -1742,7 +1752,7 @@
     font-size: 12px;
 }
 
-.ap-post {
+.cp-post {
 	position: absolute;
 	right: 0;
 	top: 0px;
@@ -1750,25 +1760,33 @@
 	width: 100px;
 	height: 100%;
 	text-align: center;
+	background: #237bd7;
+	font-size: 18px;
+	border-left: 1px solid #000;
 }
 
-.ap-post:active {
+.cp-post:active {
     background:rgb(0,86,138);
 }
 
-.ap-post img {
+.cp-post img {
 	position: relative;
-	top: 8px;
-	right: 10px;
+	top: 12px;
+	right: 2px;
 }
 
-.ap-content{
+.cp-post span {
+	position: relative;
+	top: 3px;
+}
+
+.cp-content{
 	background: rgb(208,208,208);
     width: 100%;
     display:table;
 }
 
-.ap-content-box,.ap-content-textarea{
+.cp-content-box,.cp-content-textarea,.cp-attach-area{
     background: white;
 	width: 95%;
 	margin: 13px auto;
@@ -1776,28 +1794,29 @@
 	box-shadow: 0 1px 10px #bbb;
 }
 
-.ap-content-box > img:nth-child(1){
+.cp-content-box > img:nth-child(1){
     margin: 0 15px;
     position: relative;
     top: 2px;
 }
 
-.ap-content-box{
+.cp-content-box{
     height: 40px;
     line-height: 40px;
     display: block;
 }
 
-.ap-content-textarea{
+.cp-content-textarea{
     min-height: 80px;
     line-height:80px;
+    margin-bottom: 20px;
 }
 
-.ap-content-textarea{
-    margin-bottom:80px;
+.cp-attach-area {
+	padding: 20px 0;
 }
 
-.ap-textarea-title{
+.cp-textarea-title{
 	width: 80%;
 	border: 0;
 	font-size: 15px;
@@ -1805,9 +1824,13 @@
 	height: 15px;
 }
 
-.ap-textarea-title:focus{ outline:none } 
+/*.cp-content-textarea textarea.cp-textarea-desc::-webkit-scrollbar {
+	display: block;
+}*/
 
-.ap-apt-btn-area {
+.cp-textarea-title:focus{ outline:none } 
+
+.cp-apt-btn-area {
 	float: right;
 	width: 125px;
 	font-size: 14px;
@@ -1815,13 +1838,13 @@
 	cursor:pointer;
 }
 
-.ap-apt-btn-area img{
+.cp-apt-btn-area img{
     width: 20px;
     position: relative;
     top: 5px;
 }
 
-.ap-object-btn{
+.cp-object-btn{
 	width: 20px;
 	float: right;
 	position: relative;
@@ -1829,7 +1852,7 @@
 	right: 9px;
 }
 
-.ap-top-btn {
+.cp-top-btn {
 	float: right;
 	position: relative;
 	top: 5px;
@@ -1837,7 +1860,7 @@
 	cursor:pointer;
 }
 
-.ap-textarea-desc {
+.cp-textarea-desc {
     width: 75%;
 	border: 0;
 	font-size: 15px;
@@ -1845,16 +1868,17 @@
 	position: relative;
 	top: 23px;
 	left: 4px;
+	max-height: 200px;
 }
 
-.ap-content-textarea img{
+.cp-content-textarea img{
     margin: auto 15px;
 	position: relative;
 	float: left;
 	top: 30px;
 }
 
-.ap-textarea-desc:focus{ outline:none } 
+.cp-textarea-desc:focus{ outline:none } 
 
 .textarea-animated {
     -webkit-transition: height 0.2s;
@@ -1862,7 +1886,7 @@
     transition: height 0.2s;
 }
 
-.ap-addfile {
+.cp-addfile {
 	float: left;
 	width: 20%;
 	text-align: center;
@@ -1870,30 +1894,30 @@
 	cursor: pointer;
 }
 
-.ap-ta-yql{
+.cp-ta-yql{
 	display:none;
-	width: 100%;
+	width: 90%;
 	text-align: center;
 	background: aliceblue;
 	line-height: 20px;
 	padding: 15px 0px;
+	margin:auto;
 }
 
-.ap-yql-title {
+.cp-yql-title {
     padding: 0 20px;
 }
 
-.ap-yql-img {
+.cp-yql-img {
 	display: inline-block;
 	margin: 10px;
 }
 
-.ap-yql-img img {
+.cp-yql-img img {
     width: 200px;
-    position: initial;
 }
 
-.ap-yql-desc {
+.cp-yql-desc {
 	line-height: 20px;
 	width: 90%;
 	display: inline-block;

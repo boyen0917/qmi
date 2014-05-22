@@ -20,11 +20,13 @@
     		localStorage.clear();return false;
     	}
     	
-    	//偉德
-    	ui = "f2e7be83-9d8b-4a06-aac3-13c0b24da359";
-    	console.log(localStorage);
-    	
-        $("textarea").html(JSON.stringify($.lStorage(ui),null,2));
+        $.each(localStorage,function(i,val){
+            var t = $.parseJSON(val);
+            console.log(t);
+            $("textarea").append(i +" : "+ JSON.stringify(t,null,2));
+        });
+
+        //$("textarea").html(JSON.stringify(localStorage,null,2));
         
         
       

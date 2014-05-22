@@ -39,13 +39,13 @@
         //ajax用
         var myRand = Math.floor((Math.random()*1000)+1);
      
-        var id = "+886928858828";
+        var id = "+886980922917";
         //登入認證
         var api_name = "login";
         var headers = {
-        	    "id":id,
-        	    "up":toSha1Encode("1qw23e"), 
-        	    "ns":"",
+                "id":id,
+                "up":toSha1Encode("111111"), 
+                "ns":"",
         	    "li":"zh_TW"
         	        };
         var method = "post";
@@ -54,12 +54,57 @@
         result.complete(function(data){
         	ui = $.parseJSON(data.responseText).ui;
             at = $.parseJSON(data.responseText).at;
-            
-            switch(api_type){
+
+            switch(api_type){ // /groups/{gi}/timelines/{ti}/events(?ep={ep})
+                case "timeline_post":
+                    var api_name = "groups/b1c77966-6037-4244-82fc-a37d4d0504a8/timelines/177bb2ec-0f7d-4dba-8d2d-6af8c8b225d7/events";
+
+                    var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW",
+                                 };
+                    var method = "post";
+
+                    var body = {
+                          "meta":
+                          {
+                            //"lv": 0(使用者)、1(團體)、2(團體使用者)、3(群組),
+                            //"tp": [0](0=樓主,1=回覆訊息)、[1](0=訊息,1=公告,2=通報專區,3=任務-工作,4=任務-投票,5=任務-定點回報,6=行事曆)
+                            "lv":"1",
+                            "tp":"01"
+                          },
+                          "ml":
+                          [
+                            {
+                              "tp": 0,
+                              "c": "哈囉，這是測試貼文"
+                            }
+                          ]
+                        }
+                                     
+                    var result = ajaxDo(api_name,headers,method,true,body);
+                     
+                    break;
+                case "timeline_status_update":
+                    var api_name = "groups/62cd6a3a-77b9-4f84-8f2d-854020665134/timelines/92a940f7-02bd-4413-88fc-57c4f7836ee4/events/Event-115.Event-116";
+
+                    // etp: 0(讀取),1(按讚),2(按X),3(按訂閱),4(按置頂),6(是否有行事曆)
+                    // est: 0(取消),1(執行)
+                    var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW",
+                             "etp":0,
+                             "est":1
+                                 };
+                     var method = "put";
+                                     
+                    var result = ajaxDo(api_name,headers,method,true);
+                     
+                    break;
                 case "timeline_participants"://這則單一事件的各種回復狀態 Type(0=讀取,1=按讚,2=按X,3=按訂閱,4=按置頂,7=按任務)
                 	 var api_name = "groups/3564cbb8-81a3-47a3-b0f3-89822762029f/timelines/0efb2a90-fb99-4ce8-b80e-646bba745ea6/events/Event-148.Event-165/participants?tp=1";
-                	              //"groups/3564cbb8-81a3-47a3-b0f3-89822762029f/timelines/0efb2a90-fb99-4ce8-b80e-646bba745ea6/events/Event-148.Event-164/participants?tp=1"	 
-                //var api_name = "/groups/e2b777c8-68a7-468e-b9e4-b2434ccb86fb/timelines/3f191b19-d532-43b7-a696-ddd40e020670/events/Event-10/participants?tp=1";
                 	 var headers = {
                              "ui":ui,
                              "at":at, 
@@ -69,12 +114,12 @@
                                      
                      //{"tp":0,"rsp_code":999,"rsp_msg":"無群組權限"} 
                      
-                     var result = ajaxDo(api_name,headers,method,true);
+                    var result = ajaxDo(api_name,headers,method,true);
                      
                 	break;
                 case "timeline_status"://理解是 自己對於這則timeline event 的各種狀態 is read is like is reply etc...
-                    //var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events";
-                    var api_name = "groups/3564cbb8-81a3-47a3-b0f3-89822762029f/timelines/0efb2a90-fb99-4ce8-b80e-646bba745ea6/events_status?ep=Event-148";
+                    var api_name = "groups/62cd6a3a-77b9-4f84-8f2d-854020665134/timelines/92a940f7-02bd-4413-88fc-57c4f7836ee4/events_status?ep=Event-116";
+                    console.log(api_name);
                     var headers = {
                             "ui":ui,
                             "at":at, 
@@ -87,8 +132,7 @@
                     
                    break;
                 case "timeline_list"://動態消息
-                    //var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events";
-                    var api_name = "groups/8761e107-295c-4f01-8e10-7b3e703b8961/timelines/c5af44a6-8050-42e6-bbc1-22c7283b57d6/events";
+                    var api_name = "groups/3564cbb8-81a3-47a3-b0f3-89822762029f/timelines/0efb2a90-fb99-4ce8-b80e-646bba745ea6/events";
                     var headers = {
                             "ui":ui,
                             "at":at, 
@@ -100,9 +144,9 @@
                     var result = ajaxDo(api_name,headers,method,true);
                     
                    break;
-                case "timeline_vote"://單一動態消息
-                    //var api_name = "groups/83c7be55-5b09-459f-aea6-b345b49b6cab/timelines/e874c0da-845c-4635-970f-ed4764047960/events/Event-729";
-                    var api_name = "groups/8761e107-295c-4f01-8e10-7b3e703b8961/timelines/c5af44a6-8050-42e6-bbc1-22c7283b57d6/events/Event-872";
+                case "timeline_one"://單一動態消息
+                    //var api_name = "groups/e2b777c8-68a7-468e-b9e4-b2434ccb86fb/timelines/3f191b19-d532-43b7-a696-ddd40e020670/events/Event-148";
+                    var api_name = "groups/3564cbb8-81a3-47a3-b0f3-89822762029f/timelines/0efb2a90-fb99-4ce8-b80e-646bba745ea6/events/Event-369";
                     var headers = {
                             "ui":ui,
                             "at":at, 
@@ -139,7 +183,6 @@
                     };
                     var method = "get";
                     var result = ajaxDo(api_name,headers,method,true);
-                    	//"{"ul":[{"gu":"0af897e1-b3d8-4d71-bade-e26dafa2ebb4","n":"David","bl":"","st":1},{"gu":"1","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/4739cfc7-1363-4a7e-aee3-c2bd821d18a1/4739cfc7-1363-4a7e-aee3-c2bd821d18a1_tn?Expires=1714225225&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=Dv%2F8EMGDkDvEbeLtseDWffUnd%2BY%3D"},{"gu":"13cc1ba5-6cb4-4707-b931-bf3636aa36dc","n":"Winnie","bl":"","st":0},{"gu":"44594357-a18b-4447-b59c-89899bc72559","n":"Kewang","bl":"","st":1},{"gu":"4ec6484e-68a3-4ce5-98d9-1baa8b0b32ce","n":"Skyler","bl":"","st":0},{"gu":"67b57734-4638-4df1-ba34-bb7541fb5593","n":"Joseph","bl":"","st":0},{"gu":"69c044e1-1c6d-4494-9ade-ce05f3d6dd21","n":"Jesse","bl":"","st":0},{"gu":"85820d46-18a2-4bed-9641-513f74a5e875","n":"Brian","bl":"","st":1},{"gu":"8741151f-75c7-4c2c-865c-a70c11398cdc","n":"Ellison","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/96f3d4dd-bace-4433-9cc3-e37c0ef5365d/96f3d4dd-bace-4433-9cc3-e37c0ef5365d_tn?Expires=1714374948&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=nclA5yGQ%2B0NOHfMknIU7O%2F9t%2FeE%3D"},{"gu":"991d2fa6-7536-4975-930d-574654a2bce1","n":"Vince","bl":"","st":1},{"gu":"9bed8b81-8834-42f5-831e-be163132e6f0","n":"Redscor","bl":"","st":1},{"gu":"a254f277-3e1d-489a-82df-d9bd85e5d36c","n":"Rex","bl":"","st":1},{"gu":"ad8c224b-51d0-4ac0-b4dc-b4946ff7e43f","n":"WeiDe","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/31a7769c-53f0-4656-8987-f96639ea530e/31a7769c-53f0-4656-8987-f96639ea530e_tn?Expires=1714374619&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=nIuFNKa75adHBR5FtV6%2Ff%2FbpUNc%3D"},{"gu":"cd0e58b4-bfe0-4c4e-8708-4eef3693866a","n":"Rick","bl":"","st":1,"au":"https://project-o.s3.amazonaws.com/users/534e0c4a-d76f-4e3f-8baf-1441ed981cfc/534e0c4a-d76f-4e3f-8baf-1441ed981cfc_tn?Expires=1714373640&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=lMVaE1CE7muL6wmBoYNar0UMO4A%3D"},{"gu":"cf413e08-55ee-40c1-990d-d6e28a844996","n":"Jog","bl":"","st":0},{"gu":"e35e7cf5-a6ce-48a2-b1b3-36f5ee5f1ec1","n":"Henry","bl":"","st":1}],"rsp_code":0,"rsp_msg":"回傳成功"}"
                     break;
                 case "group/create"://建團    
                     var api_name = "groups";
@@ -149,11 +192,17 @@
                         "li":"zh_TW",
                     };
                     var body = {
-                   		"gn":"六張犁與我的快樂夥伴",
+                   		"gn":"brian test",
                         "gd":"哈囉"
                     }
-                    body = JSON.stringify(body);
+                    
+
                     var method = "post";
+
+                    console.log(api_name);
+                    console.log(headers);
+                    console.log(method);
+                    console.log(body);
                     var result = ajaxDo(api_name,headers,method,true,body);
                     break;
             }
@@ -162,7 +211,7 @@
             result.complete(function(data){
                 //console.log($.parseJSON(data.responseText));
                 var t =$.parseJSON(data.responseText);
-                console.log(t);
+                console.log(t.rsp_code);
                 console.log(JSON.stringify(t,null,2));
                 
                 $("textarea").html(JSON.stringify(t,null,2));
@@ -175,7 +224,30 @@
   
         
 //ajax
-     function ajaxDo(api_name,headers,method,async,body){
+
+        //ajax
+        function ajaxDo(api_name,headers,method,load_show_chk,body){
+            //設定是否顯示 loading 圖示
+            load_show = load_show_chk;
+
+            //console.log(api_url);
+            var api_url = base_url + api_name;
+            var myRand = Math.floor((Math.random()*1000)+1);
+
+            if(body){
+                body = JSON.stringify(body);
+            }
+
+            var result = $.ajax ({
+                url: api_url,
+                type: method,
+                headers:headers,
+                data:body
+            });
+
+            return result;
+        }
+     function ajaxDos(api_name,headers,method,async,body){
          //console.log(api_url);
          var api_url = base_url + api_name;
          

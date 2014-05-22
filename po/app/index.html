@@ -30,13 +30,15 @@
 <!--         
 
 
-                                                     ##        #######   ######   #### ##    ## 
-                                                     ##       ##     ## ##    ##   ##  ###   ## 
-                                                     ##       ##     ## ##         ##  ####  ## 
-                                                     ##       ##     ## ##   ####  ##  ## ## ## 
-                                                     ##       ##     ## ##    ##   ##  ##  #### 
-                                                     ##       ##     ## ##    ##   ##  ##   ### 
-                                                     ########  #######   ######   #### ##    ## 
+     ##        #######   ######   #### ##    ## 
+     ##       ##     ## ##    ##   ##  ###   ## 
+     ##       ##     ## ##         ##  ####  ## 
+     ##       ##     ## ##   ####  ##  ## ## ## 
+     ##       ##     ## ##    ##   ##  ##  #### 
+     ##       ##     ## ##    ##   ##  ##   ### 
+     ########  #######   ######   #### ##    ## 
+
+     
  -->
     </head>
     <body>
@@ -44,11 +46,11 @@
         <div data-role="page" id="page-login">
 	        <div class="main launch_kv">
 	            <div class="login-area">
-	             <!-- <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號" value="0980922917">
-	             <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼" value="123456"> -->
+	             <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號" value="0980922917">
+	             <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼" value="111111">
 	             
-	             <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號" value="0928858828">
-                 <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼" value="1qw23e">
+	             <!-- <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號" value="0928858828">
+                 <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼" value="1qw23e"> -->
 	             
 	             <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span>
 	             <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a>
@@ -231,7 +233,7 @@
                 <img class="side-menu-btn" src="images/navi/navi_icon_sidemenu.png"/>
                 <div class="header-group-name">
                     <div>動態消息</div>
-                    <div>三竹資訊與快樂員工</div>
+                    <div></div>
                 </div>
                 <div class="feed-compose"></div>
                 <div class="navi-alert"></div>
@@ -653,51 +655,81 @@
 			</div>
             </div>
         </div>
-<!---------------------------------- page-announcement-post ------------------------------------>
-        <div data-role="page" id="page-announcement-post">
+
+
+<!-- 
+
+ ######   #######  ##     ## ########   #######   ######  ########       ##     ## #### ######## ##      ## 
+##    ## ##     ## ###   ### ##     ## ##     ## ##    ## ##             ##     ##  ##  ##       ##  ##  ## 
+##       ##     ## #### #### ##     ## ##     ## ##       ##             ##     ##  ##  ##       ##  ##  ## 
+##       ##     ## ## ### ## ########  ##     ##  ######  ######         ##     ##  ##  ######   ##  ##  ## 
+##       ##     ## ##     ## ##        ##     ##       ## ##              ##   ##   ##  ##       ##  ##  ## 
+##    ## ##     ## ##     ## ##        ##     ## ##    ## ##               ## ##    ##  ##       ##  ##  ## 
+ ######   #######  ##     ## ##         #######   ######  ########          ###    #### ########  ###  ###  
+
+
+ -->
+
+
+
+<!---------------------------------- page-compose ------------------------------------>
+        <div data-role="page" id="page-compose">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3>公告<div>三竹資訊</div></h3>
-                <div class="ap-post"><img src="images/navi/navi_icon_post.png"/>發佈</div>
+                <div class="header-group-name">
+                    <div></div>
+                    <div></div>
+                </div>
+                <div class="cp-post">
+                    <img src="images/navi/navi_icon_post.png"/>
+                    <span>發佈</span>
+                </div>
             </div>
-            <div class="ap-content">
-            <div data-sp-box="title" class="ap-content-box">
-                    <img src="images/compose/compose_form_icon_title.png"/>
-                    <textarea class="ap-textarea-title" placeholder="標題" data-role="none"></textarea>
-            </div>
-            <div data-sp-box="apt" class="ap-content-box">
+            <div class="cp-content">
+                <div data-sp-box="title" class="cp-content-box" style="display:none">
+                        <img src="images/compose/compose_form_icon_title.png"/>
+                        <textarea class="cp-textarea-title" placeholder="標題" data-role="none"></textarea>
+                </div>
+                <div data-sp-box="apt" class="cp-content-box" style="display:none">
                     <img src="images/compose/compose_form_icon_apt.png"/>
                     所屬部門
-                    <div class="ap-apt-btn-area">以個人身份發佈<img src="images/ap_box_arrow.png"/></div>
+                    <div class="cp-apt-btn-area">以個人身份發佈<img src="images/ap_box_arrow.png"/></div>
                 </div>
-                <div data-sp-box="object" class="ap-content-box">
+                <div data-sp-box="object" class="cp-content-box">
                     <img src="images/compose/compose_form_icon_object.png"/>
                     發佈對象
-                    <img class="ap-object-btn" src="images/ap_box_arrow.png"/>
+                    <img class="cp-object-btn" src="images/ap_box_arrow.png"/>
                 </div>
-                <div data-sp-box="top" class="ap-content-box">
+                <div data-sp-box="top" class="cp-content-box" style="display:none">
                     <img src="images/compose/compose_form_icon_top.png"/>
                     共同置頂
-                    <img class="ap-top-btn" data-ap-top="0" src="images/compose/compose_form_icon_check_none.png"/>
+                    <img class="cp-top-btn" data-ap-top="0" src="images/compose/compose_form_icon_check_none.png"/>
                 </div>
-                <div class="ap-content-textarea">
+                <div class="cp-content-textarea">
                     <img src="images/compose/compose_form_icon_description.png"/>
-                    <textarea class="ap-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
-                    <div class="ap-ta-yql">
-                        <div class="ap-yql-title"></div>
-                        <div class="ap-yql-img"></div>
-                        <div class="ap-yql-desc"></div>
+                    <textarea class="cp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
+                    
+                </div>
+                <div class="cp-attach-area" style="display:none">
+                    <div class="cp-ta-yql">
+                        <div class="cp-yql-title"></div>
+                        <div class="cp-yql-img"></div>
+                        <div class="cp-yql-desc"></div>
                     </div>
                 </div>
+
             </div>
             <div class="announcement-footer">
-                <div data-ap-addfile="sticker" class="ap-addfile"><img src="images/compose/compose_form_addfile_sticker.png"/></div>
-                <div data-ap-addfile="img" class="ap-addfile"><img src="images/compose/compose_form_addfile_img.png"/></div>
-                <div data-ap-addfile="video" class="ap-addfile"><img src="images/compose/compose_form_addfile_video.png"/></div>
-                <div data-ap-addfile="voice" class="ap-addfile"><img src="images/compose/compose_form_addfile_voice.png"/></div>
-                <div data-ap-addfile="map" class="ap-addfile"><img src="images/compose/compose_form_addfile_map.png"/></div>
+                <div data-ap-addfile="sticker" class="cp-addfile"><img src="images/compose/compose_form_addfile_sticker.png"/></div>
+                <div data-ap-addfile="img" class="cp-addfile"><img src="images/compose/compose_form_addfile_img.png"/></div>
+                <div data-ap-addfile="video" class="cp-addfile"><img src="images/compose/compose_form_addfile_video.png"/></div>
+                <div data-ap-addfile="voice" class="cp-addfile"><img src="images/compose/compose_form_addfile_voice.png"/></div>
+                <div data-ap-addfile="map" class="cp-addfile"><img src="images/compose/compose_form_addfile_map.png"/></div>
             </div>
         </div>
+
+
+
 <!---------------------------------- page-vote-post ------------------------------------>
         <div data-role="page" id="page-vote-post">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">

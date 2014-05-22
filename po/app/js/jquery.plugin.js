@@ -1,4 +1,5 @@
 (function($) {
+
 	//localstorage for object
     $.lStorage = function(key,value) {
 		if(value){

@@ -13,23 +13,57 @@
     
     <script type="text/javascript">
     $(function(){
-        // Getting URL var by its nam
-        clear = $.getUrlVar('clear');
+        $("div").data("a",1);
+        $("div").data("b",2);
+        $("div").data("c",3);
+        $("div").data({"z":4});
+        $("div").removeData();
+        console.log($("div").data());
 
-        console.log(clear);
-        
-            
-        
-        //$("textarea").append(JSON.stringify(name_arr,null,2) +"\n\n" + a);
+        // requestCrossDomain('http://www.cnn.com', function(results) {
+        //    console.log(results);
+        // });
+
+
+        // function requestCrossDomain( site, callback ) {
+        //     // If no url was passed, exit.
+        //     if ( !site ) {
+        //         alert('No site was passed.');
+        //         return false;
+        //     }
+             
+        //     // Take the provided url, and add it to a YQL query. Make sure you encode it!
+        //     var yql = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + site + '"') + '&format=xml&callback=cbFunc';
+             
+        //     // Request that YSQL string, and run a callback function.
+        //     // Pass a defined function to prevent cache-busting.
+        //     $.getJSON( yql, cbFunc );
+             
+        //     function cbFunc(data) {
+        //         console.log("??");
+        //     // If we have something to work with...
+        //     if ( data.results[0] ) {
+        //         // Strip out all script tags, for security reasons.
+        //         // BE VERY CAREFUL. This helps, but we should do more. 
+        //         data = data.results[0].replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+                 
+        //         // If the user passed a callback, and it
+        //         // is a function, call it, and send through the data var.
+        //         if ( typeof callback === 'function') {
+        //             callback(data);
+        //         }
+        //     }
+        //     // Else, Maybe we requested a site that doesn't exist, and nothing returned.
+        //     else throw new Error('Nothing returned from getJSON.');
+        //     }
+        // }
+
     });
     </script>
     <script type="text/javascript" src="js/func.js"></script>
   </head>
-  <body>
-        <textarea style="font-size:15px;width:80%;height:1000px"></textarea>
-        <span></span>
-        <img src="https://project-o.s3.amazonaws.com/users/31a7769c-53f0-4656-8987-f96639ea530e/31a7769c-53f0-4656-8987-f96639ea530e_tn?Expires=1714374619&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=nIuFNKa75adHBR5FtV6%2Ff%2FbpUNc%3D"/>
-        <br/><br/><br/>
-        <span></span>
+  <body>    
+        <div></div>
+        <button>按鈕</button>
   </body>
 </html>
