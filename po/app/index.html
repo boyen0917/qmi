@@ -239,7 +239,7 @@
                 <div class="navi-alert"></div>
                 <div class="feed-compose-area">
                     <div data-fc-box="post" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_post.png"/><div>貼文</div></div>
-                    <div data-fc-box="announcement" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_announcement.png"/><div>公告</div></div>
+                    <div data-fc-box="announcement" class="fc-area-subbox" style="display:none"><img src="images/compose/compose_box_bticon_announcement.png"/><div>公告</div></div>
                     <div data-fc-box="feedback" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_feedback.png"/><div>通報</div></div>
                     <div data-fc-box="work" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_work.png"/><div>任務-工作</div></div>
                     <div data-fc-box="vote" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_vote.png"/><div>任務-投票</div></div>
@@ -686,28 +686,28 @@
                 </div>
             </div>
             <div class="cp-content">
-                <div data-sp-box="title" class="cp-content-box" style="display:none">
+                <div data-sp-box="title" class="cp-content-box cp-content-title" style="display:none">
                         <img src="images/compose/compose_form_icon_title.png"/>
-                        <textarea class="cp-textarea-title" placeholder="標題" data-role="none"></textarea>
+                        <textarea data-cp-name="標題" class="cp-textarea-title" placeholder="標題" data-role="none"></textarea>
                 </div>
-                <div data-sp-box="apt" class="cp-content-box" style="display:none">
+                <div data-sp-box="apt" class="cp-content-box cp-content-apt" style="display:none">
                     <img src="images/compose/compose_form_icon_apt.png"/>
                     所屬部門
                     <div class="cp-apt-btn-area">以個人身份發佈<img src="images/ap_box_arrow.png"/></div>
                 </div>
-                <div data-sp-box="object" class="cp-content-box">
+                <div data-sp-box="object" class="cp-content-box cp-content-object">
                     <img src="images/compose/compose_form_icon_object.png"/>
                     發佈對象
                     <img class="cp-object-btn" src="images/ap_box_arrow.png"/>
                 </div>
-                <div data-sp-box="top" class="cp-content-box" style="display:none">
+                <div data-sp-box="top" class="cp-content-box cp-content-top" style="display:none">
                     <img src="images/compose/compose_form_icon_top.png"/>
                     共同置頂
                     <img class="cp-top-btn" data-ap-top="0" src="images/compose/compose_form_icon_check_none.png"/>
                 </div>
                 <div class="cp-content-textarea">
                     <img src="images/compose/compose_form_icon_description.png"/>
-                    <textarea class="cp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
+                    <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
                     
                 </div>
                 <div class="cp-attach-area" style="display:none">

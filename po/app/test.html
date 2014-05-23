@@ -13,12 +13,14 @@
     
     <script type="text/javascript">
     $(function(){
-        $("div").data("a",1);
-        $("div").data("b",2);
-        $("div").data("c",3);
-        $("div").data({"z":4});
-        $("div").removeData();
-        console.log($("div").data());
+        val = 123;
+        
+        if(typeof post_tmp_url == 'undefined' || (post_tmp_url && post_tmp_url != val)){
+            console.log(555);
+        }
+
+
+
 
         // requestCrossDomain('http://www.cnn.com', function(results) {
         //    console.log(results);

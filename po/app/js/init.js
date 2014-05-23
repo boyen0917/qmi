@@ -47,4 +47,7 @@ $(function(){
 
 	//ajax 使用次數
 	ajax_count = 0;
+
+
+	
 });
