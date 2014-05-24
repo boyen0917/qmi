@@ -13,59 +13,19 @@
     
     <script type="text/javascript">
     $(function(){
-        val = 123;
-        
-        if(typeof post_tmp_url == 'undefined' || (post_tmp_url && post_tmp_url != val)){
-            console.log(555);
-        }
+        val = 12222;
+        console.log("image:"+val);
+        console.debug("image:",val);
 
-
-
-
-        // requestCrossDomain('http://www.cnn.com', function(results) {
-        //    console.log(results);
-        // });
-
-
-        // function requestCrossDomain( site, callback ) {
-        //     // If no url was passed, exit.
-        //     if ( !site ) {
-        //         alert('No site was passed.');
-        //         return false;
-        //     }
-             
-        //     // Take the provided url, and add it to a YQL query. Make sure you encode it!
-        //     var yql = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + site + '"') + '&format=xml&callback=cbFunc';
-             
-        //     // Request that YSQL string, and run a callback function.
-        //     // Pass a defined function to prevent cache-busting.
-        //     $.getJSON( yql, cbFunc );
-             
-        //     function cbFunc(data) {
-        //         console.log("??");
-        //     // If we have something to work with...
-        //     if ( data.results[0] ) {
-        //         // Strip out all script tags, for security reasons.
-        //         // BE VERY CAREFUL. This helps, but we should do more. 
-        //         data = data.results[0].replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
-                 
-        //         // If the user passed a callback, and it
-        //         // is a function, call it, and send through the data var.
-        //         if ( typeof callback === 'function') {
-        //             callback(data);
-        //         }
-        //     }
-        //     // Else, Maybe we requested a site that doesn't exist, and nothing returned.
-        //     else throw new Error('Nothing returned from getJSON.');
-        //     }
-        // }
+  
 
     });
     </script>
     <script type="text/javascript" src="js/func.js"></script>
-  </head>
-  <body>    
-        <div></div>
-        <button>按鈕</button>
-  </body>
+
+</head>
+<body>
+<div id="myDIV">Hello jQuery Plugin</div>
+<img src="http://static.ettoday.net/images/618/d618027.jpg?dafsdf"/>
+</body>
 </html>

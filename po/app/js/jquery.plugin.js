@@ -9,11 +9,13 @@
 			localStorage[key] = value;
 		}else{
 			if(!localStorage[key]){
-				return;
+				return false;
 			}
 			return $.parseJSON(localStorage[key])
 		}
     };
+
+    
     
     //get url query string
     $.extend({

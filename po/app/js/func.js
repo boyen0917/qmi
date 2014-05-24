@@ -670,21 +670,20 @@ $(function(){
 			var this_ques = $(this).parent();
 			var this_opt = $(this);
 
-			//該選項的總計數
+			//該選項的總計數 單選復選都適用
 			var opt_cnt = this_opt.find("span:eq(1)").html()*1;
 			//複選
 			if(this_ques.data("vote-multi") > 1){
 
 				//復選的已選計數
 				var cnt = this_ques.data("multi-count");
-				console.log("按前計數");
-				console.log(cnt);
 				//復選的情況就要判斷該選項是否已選擇
 				if(this_opt.data("vote-chk")){
 					this_opt.data("vote-chk",false);
 					this_opt.find("img").attr("src","images/common/icon_check_round_white.png");
 
 					//該項總計減一
+					
 					opt_cnt -= 1;
 
 					//減一 統計複選票數 才能計算是否達複選上限
@@ -703,12 +702,8 @@ $(function(){
 					opt_cnt += 1;
 				}
 
-				console.log("按後計數");
-				console.log(cnt);
-
 			//單選
 			}else{
-
 				//找出點選的那一項要減一
 				$.each(this_ques.find(".st-vote-detail-option"),function(i,val){
 					if($(this).data("vote-chk")){
@@ -718,7 +713,9 @@ $(function(){
 						$(this).find("img").attr("src","images/common/icon_check_round_white.png");
 
 						//該項總計減一
-						opt_cnt -= 1;
+						var this_cnt = $(this).find("span:eq(1)").html()*1;
+						//更改票數
+						$(this).find("span:eq(1)").html(this_cnt-1);
 					}
 				});
 
@@ -730,7 +727,7 @@ $(function(){
 				opt_cnt += 1;
 			}
 
-			//寫進dom中
+			//單選復選都加一 更改票數
 			this_opt.find("span:eq(1)").html(opt_cnt);
 		})
 	}
@@ -1554,11 +1551,8 @@ $(function(){
 	        	}
 
 	        }
-
-	        
         });
         
-
 	}
 
 	
@@ -1567,105 +1561,91 @@ $(function(){
 
 		// clearTimeout(activityTimeout);
 		// activityTimeout = setTimeout(function(){
-			var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//head/meta|//title"') + '&format=json&callback=?';
+			var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
 			$.ajax({
 		        type: 'GET',
 		        url: q, 
 		        dataType: 'jsonp',
 		        success: function(data, textStatus) {
 		            var result = {};
-		            console.log(data.query.results);
-		            //標題
-		            if(data && data.query.results.title){
+		            var tmp_img,tmp_desc;
+
+		            //預設標題
+		            if(data.query.results && data.query.results.title){
 		            	result.title = data.query.results.title;
 		            }
 		            
-		            //從meta取網址大綱和圖片
-		            $.each(data.query.results.meta, function(key, val){
-	                    if (val.content && (!result.description || !result.img || !result.title)) {
-	                    	console.log(123);
-	                    	// title
-	                    	if (!result.title && val.name && val.name.match(/title/i)) {
-	                    		console.log(223);
-	                            result.title = val.content;
-	                        }
-	                    	
-	                        // description
-	                        if (!result.description && val.name && val.name.match(/description/i)) {
-	                        	console.log(323);
-	                            result.description = val.content;
-	                        }
-	                        
-	                        // 取圖片
-	                        if (!result.img && (val.content.substring(0, 7) == 'http://'||val.content.substring(0, 2) == '//') && val.content.match(/\.jpg|\.png/)) {
-	                        	console.log(423);
-	                            if (val.content != 'undefined') {
-	                            	if(val.content.substring(0, 2) == '//'){
-	                            		val.content = "http://" + val.content.substring(2);
-	                            	}
-	                            	result.img = val.content;
-	                            }
-	                        }
-	                    }
-	                });
-		            
-		            //如果沒描述 就和title相同
-		            if(!result.description && result.title){
-			  			result.description = result.title;
+		            //從meta取網址標題 大綱和圖片
+		            if(data.query.results && data.query.results.meta){
+		            	$.each(data.query.results.meta, function(key, val){
+		                    if (val.content) {
+
+		                    	// title
+		                    	if (val.property.match(/og:title/i)) {
+		                            result.title = val.content;
+		                        }
+		                    	
+		                        // description
+		                        if (val.property.match(/og:description/i)) {
+		                            result.description = val.content;
+		                        }
+
+		                        if (val.name && val.name.match(/description/i)) {
+		                            tmp_desc = val.content;
+		                        }
+
+		                        // img
+		                        if (val.property.match(/og:image/i)) {
+		                            result.img = val.content;
+		                        }
+
+		                        // 取圖片
+		                        // if ((val.content.substring(0, 7) == 'http://'||val.content.substring(0, 2) == '//') && val.content.match(/\.jpg|\.png/)) {
+		                        //     if (val.content != 'undefined') {
+		                        //     	if(val.content.substring(0, 2) == '//'){
+		                        //     		val.content = "http://" + val.content.substring(2);
+		                        //     	}
+		                        //     	result.img = val.content;
+		                        //     }
+		                        // }
+		                    }
+		                });
 		            }
-		            
+			            
+
+					if (!result.description) {
+                        result.description = tmp_desc;
+                    }
+
 		            //如果meta圖片存在 並檢查是否圖太小 太小或沒圖的話就從網頁裡的img tag裡面隨便找一張
-		            console.log("result : ");
-		            console.log(result);
+					if(!result.img){
+						//預設圖片 隨便找一張img tag
+			            if(data.query.results && data.query.results.img){
+		            		$.each(data.query.results.img,function(i,val){
+		                        if (val.src && val.src.substring(0, 4) == 'http' && val.src.match(/\.jpg|\.png/)) {
 
-
-		            if(result.img){
-		            	console.log(523);
-			            var img = new Image();
-			            //因為有時差 所以要寫兩遍
-		            	img.onload = function() {
-		            		console.log(322);
-							if((this.width*this.height) < 10000 && data.query.results.img){
-								console.log(623);
-								$.each(data.query.results.img,function(i,val){
-			                        if (val.src && val.src.substring(0, 4) == 'http' && val.src.match(/\.jpg|\.png/)) {
-			                            result.img = val.src;
-			                            return false;
-			                        }
-			                    });
-							}
-							
-							if(result.title){
-								console.log(723);
-								$(".cp-attach-area").show();
-								$(".cp-yql-title").html(result.title);
-								$(".cp-yql-desc").html(result.description);
-								$(".cp-yql-img").html("<img src='" + result.img + "'/>");  
-								$(".cp-ta-yql").fadeIn();
-							}
+		                            var img = new Image();
+									img.onload = function() {
+										if((this.width*this.height) > 10000){
+											console.log(val.src);
+											result.img = val.src;
+											$(".cp-yql-img").html("<img src='" + result.img + "'/>"); 
+											//return false; 
+										}
+									}
+									img.src = val.src;
+		                        }
+		                    });
 		            	}
-		            	img.src = result.img;
-	            	}
+					}
 
-	            	if(data.query.results.img){
-	            		console.log(823);
-	            		$.each(data.query.results.img,function(i,val){
-	            			console.log(923);
-	                        if (val.src && val.src.substring(0, 4) == 'http' && val.src.match(/\.jpg|\.png/)) {
-	                        	console.log(1023);
-	                            result.img = val.src;
-	                            return false;
-	                        }
-	                    });
-	            		
-	            		if(result.img && result.title){
-	            			$(".cp-attach-area").show();
-							$(".cp-yql-title").html(result.title);
-							$(".cp-yql-desc").html(result.description);
-							$(".cp-yql-img").html("<img src='" + result.img + "'/>");  
-							$(".cp-ta-yql").fadeIn();
-						}
-	            	}
+	            	if(result.title){
+	        			$(".cp-attach-area").show();
+						$(".cp-yql-title").html(result.title);
+						$(".cp-yql-desc").html(result.description);
+						if(result.img) $(".cp-yql-img").html("<img src='" + result.img + "'/>");  
+						$(".cp-ta-yql").fadeIn();
+					}
 
 	            	this_event.data("message-list").push(1);
 

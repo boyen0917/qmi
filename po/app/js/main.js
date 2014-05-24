@@ -89,10 +89,22 @@ $(function(){
 	//----------------------------------- 登入 ---------------------------------------------
 
 	
+	//若local storage 有記錄密碼 就顯示
+	if($.lStorage("_loginInfo")){
+		console.log(12313);
+		console.log($.lStorage("_loginInfo"));
+		$("#phone").val($.lStorage("_loginInfo").phone);
+		$("#code").val($.lStorage("_loginInfo").code);
+
+		//順便幫他打個勾
+		$(".login-radio img").show();
+	}else{
+		$(".login-radio img").hide();
+	}
 
 
 	//login打勾
-	$(".login-radio").click(function(e){
+	$(".login-remember").click(function(e){
 	    $(".login-radio img").toggle();
 	});
 	//login
@@ -114,6 +126,19 @@ $(function(){
 	        if(data.status != 200){
 	        	popupShowAdjust("帳號或密碼不對");
 	        }else{
+
+	        	//登入成功 若有勾選記錄帳號 就記在local storage裏
+	        	if($(".login-radio img").is(":visible")){
+	        		var _loginInfo = {};
+	        		_loginInfo.phone = $("#phone").val();
+	        		_loginInfo.code = $("#code").val();
+	        		$.lStorage("_loginInfo",_loginInfo);
+	        	}else{
+	        		//沒打勾的話就清除local storage
+	        		localStorage.removeItem("_loginInfo");
+	        	}
+
+
 	        	ui = $.parseJSON(data.responseText).ui;
 	            at = $.parseJSON(data.responseText).at;
 	            console.log(ui);
@@ -927,18 +952,18 @@ $(function(){
 	          	break;
 	    }
 
-	    //打開區域
+	    //貼文狀態打開區域
 	    if(show_area) $(show_area).show();	
 
-	    //關閉區域
+	    //貼文狀態關閉區域
 	    if(close_area) $(close_area).hide();
-	    $(".cp-ta-yql")
 
-	    //清空
+
+	    //內容重置 區域重置
 	    $(".cp-content").removeData();
-	    $('.cp-textarea-desc').val("");
-		$('.cp-textarea-title').val("");
-
+	    $(".cp-reset").html("");
+	    $(".cp-reset").val("");
+	    $(".cp-attach-area,.cp-ta-yql").hide();
 
 
 		//狀態編號

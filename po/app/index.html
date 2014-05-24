@@ -52,8 +52,10 @@
 	             <!-- <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號" value="0928858828">
                  <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼" value="1qw23e"> -->
 	             
-	             <span class="login-radio"><img src="images/radio.png"/></span><span class="login-text">記住帳號</span>
-	             <a href="#" id="login" data-role="button" data-theme="d" >登&nbsp;&nbsp;入</a>
+                <div class="login-remember">
+	                <span class="login-radio"><img src="images/bt.png"/></span><span class="login-text">記住帳號</span>
+                </div>
+	             <a href="#" id="login" data-role="button" data-theme="d" style="-webkit-user-select: none;">登&nbsp;&nbsp;入</a>
 	             
 	             <a class="login-text-l" href="#">忘記密碼?</a>
 	             <a class="login-text-r" href="#page-register">註冊帳號</a>
@@ -607,7 +609,7 @@
             <div class="cp-content">
                 <div data-sp-box="title" class="cp-content-box cp-content-title" style="display:none">
                         <img src="images/compose/compose_form_icon_title.png"/>
-                        <textarea data-cp-name="標題" class="cp-textarea-title" placeholder="標題" data-role="none"></textarea>
+                        <textarea data-cp-name="標題" class="cp-textarea-title cp-reset" placeholder="標題" data-role="none"></textarea>
                 </div>
                 <div data-sp-box="apt" class="cp-content-box cp-content-apt" style="display:none">
                     <img src="images/compose/compose_form_icon_apt.png"/>
@@ -626,14 +628,14 @@
                 </div>
                 <div class="cp-content-textarea">
                     <img src="images/compose/compose_form_icon_description.png"/>
-                    <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
+                    <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated cp-reset" placeholder="內容描述" data-role="none" ></textarea>
                     
                 </div>
                 <div class="cp-attach-area" style="display:none">
                     <div class="cp-ta-yql">
-                        <div class="cp-yql-title"></div>
-                        <div class="cp-yql-img"></div>
-                        <div class="cp-yql-desc"></div>
+                        <div class="cp-yql-title cp-reset"></div>
+                        <div class="cp-yql-img cp-reset"></div>
+                        <div class="cp-yql-desc cp-reset"></div>
                     </div>
                 </div>
 

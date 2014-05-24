@@ -9,7 +9,7 @@ $(function(){
 	country_code = "+886";
 	
 	//動態消息的字數限制
-	content_limit = 20;
+	content_limit = 400;
 	
 	//計算螢幕長寬以維持比例
 	proportion = 1.7;
