@@ -1,0 +1,799 @@
+
+
+
+
+body {
+    font-family: "Lato";
+    font-weight: 300;
+    font-size: 16px;
+    color: #555;
+    padding-top: 50px;
+
+    -webkit-font-smoothing: antialiased;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Titles */
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Raleway";
+    font-weight: 300;
+    color: #333;
+}
+
+
+/* Paragraph & Typographic */
+p {
+    line-height: 28px;
+    margin-bottom: 25px;
+}
+
+.centered {
+    text-align: center;
+}
+
+/* Links */
+a {
+    color: #3bc492;
+    word-wrap: break-word;
+
+    -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
+    -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
+    -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
+    -o-transition: color 0.1s ease-in, background 0.1s ease-in;
+    transition: color 0.1s ease-in, background 0.1s ease-in;
+}
+
+a:hover,
+a:focus {
+    color: #c0392b;
+    text-decoration: none;
+    outline: 0;
+}
+
+a:before,
+a:after {
+    -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
+    -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
+    -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
+    -o-transition: color 0.1s ease-in, background 0.1s ease-in;
+    transition: color 0.1s ease-in, background 0.1s ease-in;
+}
+
+ hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+hr {
+    position: relative;
+    border: none;
+}
+
+hr:before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 25%;
+    width: 50%;
+    height: 2px;
+    background: #ccc;
+}
+
+
+/* ==========================================================================
+   Carousel Sections
+   ========================================================================== */
+
+
+.carousel-control.left {
+  top: 250px;
+  left: -115px;
+}
+
+
+
+.carousel-control.right {
+  top: 250px;
+  right: 0;
+  left: 357px;
+}
+
+
+#slide1 {
+    position:relative; 
+    margin-left: auto;
+    margin-right: auto;
+    width:400px; 
+    height:800px;
+    background-image:url('iphone.png');
+    left: 0px;
+    top: 20px;
+}
+
+
+#slide2 {
+    position:relative; 
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 70px;
+    width:363px; 
+    height:740px;
+    background-image:url('one.png');
+    left: 0px;
+    top: 20px;
+}
+
+
+#slide3 {
+    position:relative; 
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 70px;
+    width:350px; 
+    height:681px;
+    background-image:url('s4.png');
+    left: 0px;
+    top: 20px;
+}
+
+
+
+#tour1 {
+    position:absolute;
+    width: 320px; 
+    height: 568px;
+    left: 40px;
+    top: 116px;
+    background-color: #000;
+    border: 1px solid #eaeaea
+}
+
+#tour2 {
+    position:absolute;
+    width: 320px; 
+    height: 568px;
+    left: 22px;
+    top: 70px;
+    background-color: #000;
+    border: 1px solid #eaeaea
+}
+
+#tour3 {
+    position:absolute;
+    width: 320px; 
+    height: 568px;
+    left: 15px;
+    top: 52px;
+    background-color: #000;
+    border: 1px solid #eaeaea
+}
+
+
+
+/* ==========================================================================
+   Framer Sections
+   ========================================================================== */
+
+#phone {
+    position:relative; 
+    margin-left: auto;
+    margin-right: auto;
+    width:400px; 
+    height:800px;
+    background-image:url('iphone.png');
+    left: 0px;
+    top: 20px;
+}
+
+#demoscreen {
+    position:absolute;
+    width: 320px; 
+    height: 568px;
+    left: 40px;
+    top: 116px;
+    background-color: #000;
+    border: 1px solid #eaeaea
+}
+
+
+
+
+
+/* ==========================================================================
+   Parallax Sections
+   ========================================================================== */
+
+
+
+
+.content-23.23_container {
+  position: relative;
+  z-index: 2;
+}
+
+.content-23 {
+  position: relative;
+  height: 600px;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  color: white;
+}
+.content-23.v-center,
+.content-23 .v-center {
+  display: table;
+  width: 100%;
+}
+.content-23.v-center > div,
+.content-23 .v-center > div {
+  display: table-cell;
+  vertical-align: middle;
+  margin-top: 0;
+  margin-bottom: 0;
+  float: none;
+}
+@media (min-width: 768px) {
+  .content-23.v-center.row:before,
+  .content-23 .v-center.row:before,
+  .content-23.v-center.row:after,
+  .content-23 .v-center.row:after {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  .content-23.v-center,
+  .content-23 .v-center {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .content-23.v-center.row,
+  .content-23 .v-center.row {
+    display: block;
+    width: auto;
+  }
+  .content-23.v-center.row:before,
+  .content-23 .v-center.row:before,
+  .content-23.v-center.row:after,
+  .content-23 .v-center.row:after {
+    display: none;
+  }
+  .content-23.v-center.row > *,
+  .content-23 .v-center.row > * {
+    display: block;
+    vertical-align: baseline;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .content-23 .control-btn {
+    bottom: 30px;
+  }
+}
+
+
+
+@media (max-width: 480px) {
+  .content-23 .hero-unit h1 {
+    font-size: 36px;
+    font-weight: normal;
+    color: #ffffff;
+    font-weight: 600;
+    line-height: 33px;
+  }
+}
+
+@media (max-width: 767px) {
+  .content-23 .hero-unit.hero-unit-bordered h1 {
+    font-size: 28px;
+    font-weight: normal;
+    color: #ffffff;
+    font-weight: 600;
+  }
+}
+
+
+
+
+
+.content-23 .hero-unit {
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+}
+.content-23 .hero-unit h1 {
+  margin: 0 0 30px;
+  font-size: 48px;
+  font-weight: normal;
+  color: #ffffff;
+  opacity: 0.7;
+  font-weight: 600;
+  line-height: 56px;
+}
+
+.content-23 .hero-unit.hero-unit-bordered h1 {
+  font-size: 46px;
+  font-weight: normal;
+  color: #ffffff;
+  font-weight: 500;
+  border: 8px solid white;
+  display: inline-block;
+  margin: 0;
+  padding: 30px 40px;
+}
+
+
+
+
+
+
+.content-23 {
+  overflow: hidden;
+  background-color: #1B1F23;
+}
+
+
+
+.content-23.custom-bg1 {
+  background-image: url('feeds.png');
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: 2;
+}
+
+.content-23.custom-bg2 {
+  background-image: url('discussion.png');
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: 2;
+}
+
+.content-23.custom-bg3 {
+  background-image: url('schedule.png');
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: 2;
+}
+
+.content-23.custom-bg4 {
+  background-image: url('workspace.png');
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: 2;
+}
+
+
+
+
+
+
+/* ==========================================================================
+   Img Sections
+   ========================================================================== */
+
+    .bg{    
+    }
+
+    .bg {
+    position:absolute;
+    z-index:0;
+    margin-left: auto;
+    height:auto;
+    overflow:hidden;
+    width:100%
+    }
+
+    .bg li{
+    position:absolute;top:0;
+    left:0;
+    width:100%;
+    height:440px;
+    background-repeat:no-repeat;
+    background-position:center 0;
+    text-indent:-9999px
+    }
+
+
+@media screen and (min-width: 1200px) {
+
+    #headerwrap h1 {
+    padding-top: 130px;
+    text-align: left;
+    text-shadow: 1px 1px 2px #a4a4a4;
+    margin-top: 20px;
+    color: white;
+    font-size: 60px;
+    }
+
+
+    .over{
+    position: absolute;
+    top: 70px;
+    left: 120px;
+    height: auto;
+    max-width: 70%;
+    }
+
+    .download{
+    position: absolute;
+    top: 310px;
+    left: 20px;
+    height: auto;
+    max-width: 70%;
+    }
+
+    //如果使用者之視窗寬度 >= 1200px，將會再載入這裡的 CSS。
+}
+
+@media screen and (min-width: 768px) and (max-width: 1199px) {
+
+    #headerwrap h1 {
+    padding-top: 10px;
+    text-align: center;
+    text-shadow: 1px 1px 2px #a4a4a4;
+    margin-left: 0px;
+    margin-top: 20px;
+    color: white;
+    font-size: 40px;
+    }
+
+
+
+    .over{
+    position: absolute;
+    top: 200px;
+    left: 300px;
+    height: 400px;
+    max-width: auto;
+    }
+
+    .download{
+    position: relative;
+    top: 10px;
+    left: 0px;
+    height: 50px;
+    max-width: auto;
+    }
+
+
+
+    // 如果使用者之視窗寬度介於 768px ~ 979px，將會再載入這裡的 CSS。    
+}
+
+@media screen and (max-width: 767px) {
+
+
+    #headerwrap h1 {
+    padding-top: 10px;
+    text-align: center;
+    text-shadow: 1px 1px 2px #a4a4a4;
+    margin-left: 0px;
+    margin-top: 20px;
+    color: white;
+    font-size: 40px;
+    }
+
+
+
+    .over{
+    position: absolute;
+    top: 200px;
+    left: 40px;
+    height: 400px;
+    max-width: auto;
+    }
+
+    .download{
+    position: relative;
+    top: 10px;
+    left: 0px;
+    height: 50px;
+    max-width: auto;
+    }
+
+}
+
+
+
+
+
+/* ==========================================================================
+   Wrap Sections
+   ========================================================================== */
+
+#headerwrap {
+	background-color: #F2F2F2;
+	padding-top: 0px;
+}
+
+
+
+#headerwrap h3 {
+	color: white;
+	font-size: 30px;
+}
+
+#headerwrap h5 {
+	color: white;
+	font-weight: 700;
+	text-align: left;
+}
+
+#headerwrap p {
+	text-align: left;
+	color: white
+}
+
+
+
+
+/* intro Wrap */
+
+#intro {
+	padding-top: 400px;
+	border-top: #bdc3c7 solid 5px;
+}
+
+#intro h1{
+    font-size: 60px;
+    color: #525252;
+    margin-bottom: 20px;
+}
+
+#intro h3{
+    font-size: 40px;
+    color: #525252;
+    margin-bottom: 20px;
+}
+
+
+#intro p{
+    font-size: 18px;
+}
+
+
+
+
+/* feeds Wrap */
+
+#feeds {
+  background-color: #0094C8;
+  padding-top: 20px;
+  padding-bottom: 50px;
+  border: 5px;
+  border-color: #ffffff;
+}
+
+
+#feeds h1{
+    font-size: 60px;
+    color: #ffffff;
+    padding-top: 80px;
+}
+
+#feeds h2{
+    font-size: 50px;
+    color: #ffffff;
+}
+
+
+#feeds h3{
+    font-size: 30px;
+    color: #ffffff;
+}
+
+#feeds p{
+    font-size: 26px;
+    color: #ffffff;
+}
+
+#feeds li{
+    font-size: 26px;
+    color: #ffffff;
+}
+
+
+#feeds .ac a{
+  font-size: 20px;
+}
+
+
+
+
+
+/* chat Wrap */
+
+#chat {
+  background-color: #14C5A2;
+  padding-top: 20px;
+  padding-bottom: 50px;
+}
+
+
+#chat h1{
+    font-size: 60px;
+    color: #ffffff;
+    padding-top: 80px;
+}
+
+#chat h2{
+    font-size: 50px;
+    color: #ffffff;
+}
+
+
+#chat h3{
+    font-size: 30px;
+    color: #ffffff;
+}
+
+#chat p{
+    font-size: 26px;
+    color: #ffffff;
+}
+
+#chat li{
+    font-size: 26px;
+    color: #ffffff;
+}
+
+
+#chat .ac a{
+  font-size: 20px;
+}
+
+
+
+
+
+/* calendar Wrap */
+
+#calendar {
+  background-color: #E2B543;
+  padding-top: 20px;
+  padding-bottom: 50px;
+}
+
+
+#calendar h1{
+    font-size: 60px;
+    color: #ffffff;
+    padding-top: 80px;
+}
+
+#calendar h2{
+    font-size: 50px;
+    color: #ffffff;
+}
+
+
+#calendar h3{
+    font-size: 30px;
+    color: #ffffff;
+}
+
+#calendar p{
+    font-size: 26px;
+    color: #ffffff;
+}
+
+#calendar li{
+    font-size: 26px;
+    color: #ffffff;
+}
+
+
+#calendar .ac a{
+  font-size: 20px;
+}
+
+
+
+
+
+
+/* features Wrap */
+
+#features {
+	padding-top: 20px;
+	padding-bottom: 50px;
+}
+
+
+#features h1{
+    font-size: 60px;
+    color: #525252;
+    padding-top: 80px;
+}
+
+#features h2{
+    font-size: 50px;
+    color: #525252;
+}
+
+
+#features h3{
+    font-size: 30px;
+    color: #525252;
+}
+
+#features p{
+    font-size: 26px;
+    color: #525252;
+}
+
+#features li{
+    font-size: 26px;
+    color: #525252;
+}
+
+
+
+#features .ac a{
+	font-size: 20px;
+}
+
+
+
+
+
+/* Showcase Wrap */
+
+#showcase {
+	display: block;
+	background-color: #34495e;
+	padding-top: 20px;
+	padding-bottom: 20px;
+    z-index: 100;
+}
+
+#showcase h1 {
+    font-size: 60px;
+    text-align: center;
+	color: white;
+    z-index: 100;
+}
+
+#footerwrap {
+	background-color: #2f2f2f;
+	color: white;
+	padding-top: 40px;
+	padding-bottom: 60px;
+	text-align: left;
+}
+
+#footerwrap h3 {
+	font-size: 28px;
+	color: white;
+}
+
+#footerwrap p {
+	color: white;
+	font-size: 18px;
+}
+
+/* Copyright Wrap */
+
+#c {
+	background: #222222;
+	padding-top: 15px;
+	text-align: right;
+}
+
+#c p {
+	color: white
+}
+
