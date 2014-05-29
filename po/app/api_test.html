@@ -56,6 +56,55 @@
             at = $.parseJSON(data.responseText).at;
 
             switch(api_type){ // /groups/{gi}/timelines/{ti}/events(?ep={ep})
+                case "compose_vote":
+                    var api_name = "groups/b1c77966-6037-4244-82fc-a37d4d0504a8/timelines/177bb2ec-0f7d-4dba-8d2d-6af8c8b225d7/events?ep=Event-665";
+
+                    var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW",
+                                 };
+                    var method = "post";
+
+                    var body = {
+                          "meta":
+                          {
+                            //"lv": 0(使用者)、1(團體)、2(團體使用者)、3(群組),
+                            //"tp": [0](0=樓主,1=回覆訊息)、[1](0=訊息,1=公告,2=通報專區,3=任務-工作,4=任務-投票,5=任務-定點回報,6=行事曆)
+                            "lv":"1",
+                            "tp":"14"
+                          },
+                          "ml":[
+                          {
+                            "li": [
+                                {
+                                  "k": 0,
+                                  "i": [
+                                    {
+                                      "k": 2
+                                    }
+                                  ]
+                                },
+                                {
+                                  "k": 1,
+                                  "i": [
+                                    {
+                                      "k": 2
+                                    },
+                                    {
+                                      "k": 3
+                                    }
+                                  ]
+                                }
+                              ],
+                              "tp": 15
+                          }
+                          ]
+                        }
+                                     
+                    var result = ajaxDo(api_name,headers,method,true,body);
+                     
+                    break;
                 case "timeline_post":
                     var api_name = "groups/b1c77966-6037-4244-82fc-a37d4d0504a8/timelines/177bb2ec-0f7d-4dba-8d2d-6af8c8b225d7/events";
 

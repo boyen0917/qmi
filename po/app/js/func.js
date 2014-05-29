@@ -366,13 +366,18 @@ $(function(){
 				console.log("========================");
 				console.log(JSON.stringify(val,null,2));
 				
+				//所有狀態的c 都做format?(url、entities)
+				if(val.c){
+					reply_content = htmlFormat(val.c);
+				}
+
 				//event種類 不同 讀取不同layout
 				switch(val.tp){
 					case 0:
-						//更改網址成連結
-						if(val.c){
-							reply_content = urlFormat(val.c);
-						}
+						//更改網址成連結 只設定狀態是貼文的才做format?
+						// if(val.c){
+						// 	reply_content = urlFormat(val.c);
+						// }
 						break;
 					case 1:
 						break;
@@ -534,10 +539,10 @@ $(function(){
 
 
 			this_event.find(".st-vote-send").before($('<div>').load('layout/layout.html .st-vote-ques-area',function(){
-				var this_ques = $(this);
+				var this_ques = $(this).find(".st-vote-ques-area");
 				
 				//設定題目的編號
-				this_ques.find(".st-vote-ques-area").data("ques-index",v_val.k);
+				this_ques.data("ques-index",v_val.k);
 
 
 
@@ -548,8 +553,8 @@ $(function(){
 	        		tick_img = "images/common/icon_check_red.png";
 				}
 				//
-				this_ques.find(".st-vote-ques-area").data("vote-multi",v_val.v);
-				this_ques.find(".st-vote-ques-area").data("tick-img",tick_img);
+				this_ques.data("vote-multi",v_val.v);
+				this_ques.data("tick-img",tick_img);
 
 				this_ques.find(".st-vote-detail-top span:eq(0)").html(v_i+1);
 				this_ques.find(".st-vote-detail-top span:eq(1)").html("每個人限選取"+ v_val.v +"項");
@@ -560,14 +565,18 @@ $(function(){
 				}
 
 				$.each(v_val.i,function(i_i,i_val){
-					this_ques.find(".st-vote-ques-area").append(
+					this_ques.append(
 						'<div class="st-vote-detail-option" data-item-index="' + i_val.k + '">' +
 					        '<img src="images/common/icon_check_round_white.png"/>' +
 					        '<span>' + i_val.o + '</span>' +
 					        '<span>' + 0 + '</span>' +
 					    '</div>'
 					);
-					
+
+					//設定複選投票數為 0
+		        	this_ques.data("multi-count",0);
+
+					//調整圈圈高度
 					setTimeout(function(){
 						var center_pos = mathAlignCenter(this_ques.find(".st-vote-detail-option").height(),this_ques.find(".st-vote-detail-option img").height());
 						this_ques.find(".st-vote-detail-option img").css("top",center_pos + "px");
@@ -628,9 +637,6 @@ $(function(){
 		        $.each(all_ques,function(ques_i,ques_val){
 		        	var this_ques = $(this);
 
-		        	//設定複選投票數為 0
-		        	this_ques.data("multi-count",0);
-
             		//題目的編號 和 答案的編號相同 而且 有投票的內容(可能 "i": [])
             		if(k_val.k == this_ques.data("ques-index") && k_val.i){
             			//答案的多個投票
@@ -638,15 +644,18 @@ $(function(){
 
 	            			//最後一個 每個選項的k
 	            			$.each(this_ques.find(".st-vote-detail-option"),function(opt_i,opt_val){
-	            				var this_option = $(this);
-	    						if($(this).data("item-index") == i_val.k){
-	    							var count = $(this).find("span:eq(1)").html();
-	    							$(this).find("span:eq(1)").html(count*1+1);
+	            				var this_opt = $(this);
+	    						if(this_opt.data("item-index") == i_val.k){
+	    							var count = this_opt.find("span:eq(1)").html();
+	    							this_opt.find("span:eq(1)").html(count*1+1);
 	    							
 	    							//自己投的 要打勾
 					            	if(ans_gu == gu){
-					            		$(this).data("vote-chk",true);
-					            		$(this).find("img").attr("src",this_ques.data("tick-img"));
+					            		//已投過票數加一
+					            		var n = this_ques.data("multi-count")*1;
+					            		this_ques.data("multi-count",n+1)
+					            		this_opt.data("vote-chk",true);
+					            		this_opt.find("img").attr("src",this_ques.data("tick-img"));
 					            	}
 	    						}
 
@@ -667,16 +676,23 @@ $(function(){
 	bindVoteEvent = function (this_event){
 		this_event.find(".st-vote-detail-option").click(function(){
 
+			//時間到 不給點
+			if(this_event.data("task-over")){
+				return false;
+			}
+
 			var this_ques = $(this).parent();
 			var this_opt = $(this);
 
 			//該選項的總計數 單選復選都適用
 			var opt_cnt = this_opt.find("span:eq(1)").html()*1;
+
+			//復選的已選計數 單選也用來判斷有無投票
+			var vote_cnt = this_ques.data("multi-count");
+			var vote_chk = false;
+
 			//複選
 			if(this_ques.data("vote-multi") > 1){
-
-				//復選的已選計數
-				var cnt = this_ques.data("multi-count");
 				//復選的情況就要判斷該選項是否已選擇
 				if(this_opt.data("vote-chk")){
 					this_opt.data("vote-chk",false);
@@ -687,16 +703,16 @@ $(function(){
 					opt_cnt -= 1;
 
 					//減一 統計複選票數 才能計算是否達複選上限
-					this_ques.data("multi-count",cnt-1);
+					this_ques.data("multi-count",vote_cnt-1);
 
 				//沒選變已選 投票數未達上限
-				}else if(cnt <  this_ques.data("vote-multi")){
+				}else if(vote_cnt <  this_ques.data("vote-multi")){
 
 					this_opt.data("vote-chk",true);
 					this_opt.find("img").attr("src",this_ques.data("tick-img"));
 
 					//加一 統計複選票數 才能計算是否達複選上限
-					this_ques.data("multi-count",cnt+1);
+					this_ques.data("multi-count",vote_cnt+1);
 
 					//該項總計加一
 					opt_cnt += 1;
@@ -725,14 +741,412 @@ $(function(){
 
 				//該項總計加一
 				opt_cnt += 1;
+
+				//加一 計算是否有投票
+				if(vote_cnt == 0)
+					this_ques.data("multi-count",vote_cnt+1);
 			}
 
 			//單選復選都加一 更改票數
 			this_opt.find("span:eq(1)").html(opt_cnt);
-		})
+
+			//選了之後變更送出顏色
+			if(!this_event.find(".st-vote-send").hasClass("st-vote-send-blue")){
+				this_event.find(".st-vote-send").addClass("st-vote-send-blue");
+				this_event.find(".st-vote-send").html("送出");
+			}
+
+		});
+
+		//送出
+		this_event.find(".st-vote-send").click(function(){
+
+			//沒藍色表示不給送出
+			if(!$(this).hasClass("st-vote-send-blue")){
+				return false;
+			}
+
+			var reply_obj = {};
+			reply_obj.li = [];
+			reply_obj.tp = 15;
+
+			//檢查是否每一題有投票 預設他都有投 人性本善
+			var vote_chk = false;
+			var vote_chk_index;
+
+			$.each(this_event.find(".st-vote-ques-area"),function(i,val){
+				var this_ques = $(this);
+
+				//有一題沒投 就不玩啦
+				if(this_ques.data("multi-count") == 0){
+					vote_chk = true;
+					vote_chk_index = this_ques.find(".st-vote-detail-top span:eq(0)").html();
+					return false;
+				}
+
+				var ques_obj = {};
+				ques_obj.k = this_ques.data("ques-index");
+				ques_obj.i = [];
+
+				$.each($(this).find(".st-vote-detail-option"),function(i,val){
+					var this_opt = $(this);
+
+					if(this_opt.data("vote-chk")){
+						var item_obj = {};
+						item_obj.k = this_opt.data("item-index");
+
+						ques_obj.i.push(item_obj);
+					}
+
+				});
+
+				reply_obj.li.push(ques_obj);
+
+
+			});
+			
+
+			if(vote_chk){
+				popupShowAdjust("第" + vote_chk_index +" 題尚未完成投票");
+				return false;
+			}
+
+
+			var body = {
+				"meta" : {
+					"lv" : 1,
+					"tp" : "14"
+				},
+				"ml" : [reply_obj]
+			};
+
+			var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
+
+	        var headers = {
+	                 "ui":ui,
+	                 "at":at, 
+	                 "li":"zh_TW",
+	                     };
+
+
+	        var method = "post";
+	        var result = ajaxDo(api_name,headers,method,true,body);
+	        result.success(function(data){
+	        	//重新讀取detail
+	        	popupShowAdjust("回覆成功");
+	        	this_event.find(".st-vote-send").removeClass("st-vote-send-blue");
+	        	//客製化 按了確定之後再重讀取
+	        	$(".popup-close").bind("reload",function(){
+	        		//重設任務完成狀態
+	        		setEventStatus(this_event);
+
+	        		//重設完整的detail
+					this_event.data("detail-content",false);
+		    		this_event.find(".st-vote-ques-area").parent().remove();
+		      		this_event.find(".st-sub-box-1").trigger("click");
+					$(".popup-close").unbind("reload");
+				});
+
+				$(".popup-close").click(function(){
+					$(".popup-close").trigger("reload");
+				});
+	      		
+	        });
+		});
 	}
 
 
+	composeContentMake = function (compose_title){
+
+		//開始讀取
+		$('.cp-content-load').html($('<div>').load('layout/compose.html .cp-content',function(){
+
+			var this_compose = $(this).find(".cp-content");
+			this_compose.css("min-height",$(window).height()+800);
+
+			this_compose.data("message-list",[0]);
+
+			// this_compose.find('.cp-textarea-desc, .cp-vote-area textarea').autosize({append: "\n"});
+
+
+			var show_area,title;
+
+			switch (compose_title) {
+		        case "post":
+		        	ctp = 0;
+		        	//close_area = ".cp-content-title , .cp-content-apt , .cp-content-top";
+		        	break;
+		        case "announcement": 
+		        	ctp = 1;
+		        	show_area = ".cp-content-title , .cp-content-apt , .cp-content-top";
+		        	break;
+		        case "feedback":
+		            ctp = 2;
+		        	break;
+		        case "work":
+		        	ctp = 3;
+		          	break;
+		        case "vote":
+		        	ctp = 4;
+		        	show_area = ".cp-content-title ";
+
+		        	//預設題目數為0
+		        	this_compose.data("ques-total",0);
+
+		        	composeVoteQuesMake(this_compose);
+		        	composeVoteEvent(this_compose);
+		          	break;
+		        case "check":
+		        	ctp = 5;
+		          	break;
+		    }
+
+
+			//狀態編號
+			this_compose.data("compose-tp",ctp);
+			//message list 宣告為空陣列
+
+			this_compose.find(show_area).show();
+
+
+			//共同綁定事件
+			//打勾
+			this_compose.find(".cp-top-btn").click(function(){
+				if($(this).data("cp-top")){
+					$(this).attr("src","images/compose/compose_form_icon_check_none.png");
+					$(this).data("cp-top",false);
+				}else{
+					$(this).attr("src","images/compose/compose_form_icon_check.png");
+					$(this).data("cp-top",true);
+				}
+			});
+
+			//url parse
+			this_compose.find('.cp-textarea-desc').bind('input',function(){
+				//有東西就不作了
+				if(this_compose.find(".cp-ta-yql").is(":visible")) return false;
+
+				//先將換行符號換成<br/>加空格 再以空格切出陣列
+				var url_chk = this_compose.find('.cp-textarea-desc').val().replace(/\n|\r/g," <br/> ").split(' ');
+				
+				console.debug("url chk:",url_chk);
+				$.each(url_chk,function(i,val){
+					if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
+						if(val.match(/youtube.com|youtu.be/)){
+							getLinkYoutube(this_compose,val);
+						}else{
+							console.debug("getLinkMeta");
+							getLinkMeta(this_compose,val);
+						}
+						return false;
+					}else{
+			            //暫時
+			            this_compose.find(".cp-attach-area").hide();
+						this_compose.find(".cp-ta-yql").hide();
+					}
+				});
+			});
+		}));
+	}
+
+
+	composeVoteQuesMake = function(this_compose){
+		
+		//讀取投票題目
+		this_compose.find('.cp-vote-area').append($('<div>').load('layout/compose.html .cp-vote-ques-area',function(){
+			var this_ques = $(this).find('.cp-vote-ques-area');
+			
+			//設定
+			//投票題目數加一
+			var ques_total = this_compose.data("ques-total");
+			ques_total += 1;
+			this_compose.data("ques-total",ques_total);
+
+			//投票題目超過1 就增加刪除符號
+			if(ques_total > 1){
+				this_compose.find(".cp-vote-ques-title img:eq(0)").show();
+				this_ques.find(".cp-vote-ques-title img:eq(0)").show();
+			}
+
+			//題目編號
+			this_ques.find(".cp-vote-ques-title span").html(ques_total);
+
+			//初始值是2個投票項目
+			this_ques.data("opt-total",2);
+
+			//可投票數
+			this_ques.data("vote-count",1);
+
+			//做投票項目的刪除圖案的記號
+			this_ques.data("opts-delete",false);
+			
+			//主題的筆消失
+			this_ques.find(".cp-vq-textarea-title").bind("input",function(){
+				if($(this).val()){
+					this_ques.find(".cp-vote-ques-title img:eq(1)").css("opacity",0);
+				}else{
+					this_ques.find(".cp-vote-ques-title img:eq(1)").css("opacity",1);
+				}
+			});
+			
+			this_ques.find('textarea').autosize({append: "\n"});
+
+
+
+			//新增一個投票項目
+			this_ques.find(".cp-vote-add-opt").click(function(){
+
+				var opt_total = this_ques.data("opt-total");
+
+				console.debug("opt total:",this_ques.data("opt-total"));
+
+				//等於2表示回到最低值 關閉刪除選項
+				// if(opt_total == 2){
+				// 	console.debug("opt total = 2");
+				// 	this_ques.find(".cp-vote-opt img").hide();
+
+				// 	this_ques.data("opts-delete",false);
+
+				// }
+
+				opt_total += 1;
+				//存回
+				this_ques.data("opt-total",opt_total);
+				$(this).before(
+					'<div class="cp-vote-opt cp-new-opt-' + opt_total + ' ">' +
+		                '<img src="images/common/icon/icon_compose_close.png" style="display:block"/>' +
+		                '<span>' + opt_total + '</span>' +
+		                '<textarea class="cp-opt-textarea textarea-animated" placeholder="投票項目" data-role="none"></textarea>' +
+		            '</div>'
+				);
+
+				if(!this_ques.data("opts-delete")){
+					console.debug("圖示關閉");
+					this_ques.find(".cp-vote-opt img").show();
+					this_ques.data("opts-delete",true);
+				}
+
+				this_ques.find('.cp-new-opt-' + opt_total + ' textarea').autosize({append: "\n"});
+			});
+
+			
+
+			//刪除題目
+			this_ques.find(".cp-vote-ques-title img:eq(0)").click(function(){
+
+				//投票題目數減一
+				var ques_total = this_compose.data("ques-total");
+
+				//最低限度是1 基本上不會用到這個 因為1 的話會沒有圖給user按
+				if(ques_total == 1) return false;
+
+				ques_total -= 1;
+
+				//存回
+				this_compose.data("ques-total",ques_total);
+
+				//刪除題目
+				this_ques.remove();
+
+				//刪除後等於1 關閉按鈕
+				if(ques_total == 1){
+
+					this_compose.find(".cp-vote-ques-title img:eq(0)").hide()
+				}
+
+				//重新編號
+				this_compose.find(".cp-vote-ques-area").each(function(i,val){
+					$(this).find(".cp-vote-ques-title span").html(i+1);
+				});
+			});
+
+		}));
+	}
+
+	composeVoteEvent = function(this_compose){
+		//刪除一個投票項目
+		$(document).on("click",".cp-vote-opt img",function(){
+			var this_ques = $(this).parents(".cp-vote-ques-area");
+			var this_opt = $(this).parent();
+
+			var opt_total = this_ques.data("opt-total");
+			opt_total -= 1;
+
+			//存回
+			this_ques.data("opt-total",opt_total);
+
+			this_opt.remove();
+
+			for(i=0;i<opt_total;i++){
+				this_ques.find(".cp-vote-opt:eq(" + i + ") span").html(i+1);
+			}
+
+
+			//連動影響最高可投票數
+			var vote_count = this_ques.data("vote-count");
+			if(vote_count >= opt_total ){
+				vote_count = opt_total-1;
+
+				this_ques.find(".cp-vote-count div:eq(0)").html(vote_count);
+				//存回
+				this_ques.data("vote-count",vote_count);
+			}
+
+			//等於2表示回到最低值 關閉刪除選項
+			if(opt_total == 2){
+				this_ques.find(".cp-vote-opt img").hide();
+				this_ques.data("opts-delete",false);
+				return false;
+			}
+			
+		});
+
+		//可投票數加減1
+		$(document).on("click",".cp-vote-pm",function(){
+
+			var this_ques = $(this).parents(".cp-vote-ques-area");
+			var vote_count = this_ques.data("vote-count");
+			var this_btn = $(this);
+
+			if(this_btn.hasClass("cp-vote-minus")){
+				//最小數為1
+				if(vote_count == 1) return false;
+
+				vote_count -= 1;
+
+				var pm_str = "minus";
+			}else{
+				//最大數是選項數-1
+				var opt_total = this_ques.data("opt-total");
+				opt_total -= 1;
+
+				if(vote_count == opt_total) return false;
+
+				vote_count += 1;
+
+				var pm_str = "plus";
+			}
+				
+			var img_clk = "images/compose/vote/compose_post_vote_bt_" + pm_str;
+
+			this_btn.find("img").attr("src",img_clk + "_click.png");
+			setTimeout(function(){
+				this_btn.find("img").attr("src",img_clk + ".png");
+			},100);
+
+			//存回
+			this_ques.data("vote-count",vote_count);
+			this_ques.find(".cp-vote-count div:eq(0)").html(vote_count);
+
+		});
+
+
+		//新增題目
+		this_compose.find(".cp-vote-add-ques").click(function(){
+			composeVoteQuesMake(this_compose);
+		});
+
+	}
 
 /*
 
@@ -1098,7 +1512,7 @@ $(function(){
 	        		this_event.data("timeline-id",ti_feed);
 	        		this_event.data("event-id",val.ei);
 					this_event.data("parti-list",[]);
-	        		
+
 	        		//時間 名字
 	        		getUserName(gi , val.meta.gu , this_event.find(".st-sub-name") , this_event.find(".st-sub-box-1 .st-user-pic img"));
 	        		var time = new Date(val.meta.ct);
@@ -1109,7 +1523,6 @@ $(function(){
 	        		this_event.find(".st-sub-box-1-footer").html(val.ei + "  " + val.meta.tp);
 	        		
 	        		//讚留言閱讀
-	        		this_event.find(".st-sub-box-1-footer").html(val.ei + "  " + val.meta.tp);
 	        		this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
 	        		this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
 	        		this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
@@ -1129,49 +1542,10 @@ $(function(){
 
 
 */
-
+					setEventStatus(this_event);
 					
 
-		        	//這邊是timeline list 要call這個api判斷 自己有沒有讚過這一串系列文 
-					var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events_status?ep=" + val.ei;
-			        var headers = {
-			                "ui":ui,
-			                "at":at, 
-			                "li":"zh_TW"
-			                    };
-			        var method = "get";
-			        
-			        var result = ajaxDo(api_name,headers,method,true);
-		        	result.complete(function(data){
-		        		var s_data = $.parseJSON(data.responseText).el;
-		        		//將此則動態的按讚狀態寫入data中
-						//轉換array 成json object 減少回圈使用
-						var s_obj = {};
-						if(s_data.length > 0){
-							
-							$.each(s_data,function(i,val){
-								s_obj[val.ei] = val;
-							});
-
-			        		//判斷自己有無 : 
-			        		//按讚
-			        		if(s_obj[val.ei].il){
-		        				this_event.find(".st-sub-box-3 img:eq(0)").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
-								this_event.find(".st-sub-box-4 .st-like-btn").html("收回讚");
-				    		}
-			    			//回覆
-				    		if(s_obj[val.ei].ip)
-				    				this_event.find(".st-sub-box-3 img:eq(1)").attr("src","images/timeline/timeline_feedbox_icon_chat_blue.png");
-				    				
-			    			//閱讀
-				    		if(s_obj[val.ei].ir)
-				    				this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/timeline/timeline_feedbox_icon_read_blue.png");
-		    				
-						}
-
-						//存回
-						this_event.data("event-status",s_obj);
-			    	});
+		        	
 	        		
 	        		
 	        		var category;
@@ -1230,6 +1604,9 @@ $(function(){
 	        				//任務狀態
 	        				this_event.find(".st-box2-more-task-area").show();
 	        				this_event.find(".st-box2-more-time").show();
+
+	        				//任務預設的文字
+	        				this_event.find(".st-task-status").html("未完成");
 	        				
 	        				break;
 	        			case 4://投票
@@ -1243,6 +1620,9 @@ $(function(){
 
 	        				//投票結果obj
 	        				this_event.data("vote-result",{});
+
+	        				//任務預設的文字
+	        				this_event.find(".st-task-status").html("未投票");
 	        				break;
 	        			case 5:
 	        				this_event.find(".st-box2-more-category").addClass("st-box2-more-category-task");
@@ -1251,6 +1631,9 @@ $(function(){
 	        				//任務狀態
 	        				this_event.find(".st-box2-more-task-area").show();
 	        				this_event.find(".st-box2-more-time").show();
+
+	        				//任務預設的文字
+	        				this_event.find(".st-task-status").html("未回報");
 	        				break;
 	        		};
 	        		
@@ -1282,22 +1665,85 @@ $(function(){
 	        });
 	    });
 	}
+
+	setEventStatus = function(this_event){
+		//這邊是timeline list 要call這個api判斷 自己有沒有讚過這一串系列文 
+		var this_ei = this_event.data("event-id");
+
+		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events_status?ep=" + this_ei;
+        var headers = {
+                "ui":ui,
+                "at":at, 
+                "li":"zh_TW"
+                    };
+        var method = "get";
+        
+        var result = ajaxDo(api_name,headers,method,true);
+    	result.complete(function(data){
+    		var s_data = $.parseJSON(data.responseText).el;
+    		//將此則動態的按讚狀態寫入data中
+			//轉換array 成json object 減少回圈使用
+			var s_obj = {};
+			if(s_data.length > 0){
+				
+				$.each(s_data,function(i,val){
+					s_obj[val.ei] = val;
+				});
+
+        		//判斷自己有無 : 
+        		//按讚
+        		if(s_obj[this_ei].il){
+    				this_event.find(".st-sub-box-3 img:eq(0)").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
+					this_event.find(".st-sub-box-4 .st-like-btn").html("收回讚");
+	    		}
+    			//回覆
+	    		if(s_obj[this_ei].ip)
+	    				this_event.find(".st-sub-box-3 img:eq(1)").attr("src","images/timeline/timeline_feedbox_icon_chat_blue.png");
+	    				
+    			//閱讀
+	    		if(s_obj[this_ei].ir)
+	    				this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/timeline/timeline_feedbox_icon_read_blue.png");
+				
+	    		//任務完成
+	    		if(s_obj[this_ei].ik){
+	    			var tp = this_event.data("timeline-tp");
+	    			var task_str;
+	    			console.debug("投票id",this_event.data("timeline-tp"));
+	    			switch(tp){
+    					case 3:
+    						task_str = "已完成";
+	    					break;
+	    				case 4:
+	    					task_str = "已投票";
+	    					break;
+    					case 5:
+    						task_str = "已回報";
+	    					break;
+	    			}
+	    			
+	    			this_event.find(".st-task-vote img").attr("src","images/common/icon_check_red_l.png");
+					this_event.find(".st-task-status").html(task_str);
+	    		}
+
+			}
+
+			//存回
+			this_event.data("event-status",s_obj);
+    	});
+	}
 	
 	mathAlignCenter = function (outer,inner){
 		return (outer-inner)/2;
 	}
 	
-	//目前是先做url判斷
+	//拆成detail及timeline list版 並做 html entities 和 url a tag
 	timelineContentFormat = function (c,limit,ei){
-
+		console.log("~~~~~~~~~~~~~~~~~~~~~~~~~");
 		if(!c){
 			return false;
 		}
-		
-		
+
 		var result_str = [];
-		result_str[0] = c.substring(0,limit).split(" ");
-		result_str[1] = c
 		
 		for(n=0;n<2;n++){
 			if(n == 0){
@@ -1306,27 +1752,42 @@ $(function(){
 				result_str[n] = c;
 			}
 
-			result_str[n] = urlFormat(result_str[n]);
+			result_str[n] = htmlFormat(result_str[n]);
 	    	
 		}
 		
 		if(c.length > limit){
 			result_str[0] += "...";
 		}
-
     	return result_str;
 	}
 
-	urlFormat = function (str){
-		str = str.replace(/\n|\r/g," <br/> ").split(" ");
-		$.each(str,function(i,val){
-    		if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
-    			str.splice(i,1,"<a href=\"" + val + "\" target=\"_blank\">" + val + "</a>");
+	htmlFormat = function (str){
+        str = str.replace(/\n/g," \n ").split(" ");
+        $.each(str,function(i,val){
+            if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
+                encode_val = "<a href=\"" + encodeHtmlEntity(val) + "\" target=\"_blank\">" + encodeHtmlEntity(val) + "</a>";
+            }else{
+                encode_val = encodeHtmlEntity(val);
             }
-    	});
+            if(encode_val) str.splice(i,1,encode_val);
+        });
+
+        return str.join(" ");
+
+    }
+
+	urlFormat2 = function (str){
+        str = str.replace(/\n|\r/g," <br/> ").split(" ");
+        $.each(str,function(i,val){
+        	if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
+                str.splice(i,1,"<a href=\"" + val + "\" target=\"_blank\">" + val + "</a>");
+            }
+        });
+
     	return str.join(" ");
 
-	}
+    }
 
 
 /*
@@ -1436,6 +1897,8 @@ $(function(){
 			    		 ]
 			    	});
 					break;
+				case 14:
+					break;
 			};
 			
 			//結束時間存在 就填入
@@ -1443,6 +1906,15 @@ $(function(){
 				
     			var time = new Date(val.e);
         		var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
+
+
+        		var d = new Date();
+        		if(val.e < d.getTime()){
+        			this_event.find(".st-task-status").html("已結束");
+        			this_event.find(".st-vote-send").html("已結束");
+        			this_event.data("task-over",true);
+        		}
+
     		}else{
     			var time_format = "無結束時間";
     		}
@@ -1516,16 +1988,6 @@ $(function(){
 			        this_event.data("event-status",event_status);
 
 	        	}else{
-	        		console.log(": reply :");
-	        		console.log("est : " + est);
-	        		console.log("this_event : ");
-	        		console.log(this_event);
-	        		if(this_event.find(".st-reply-footer img").is(":visible")){
-	        			console.log("has img : yes");
-	        		}else{
-	        			console.log("has img : nope");
-	        		}
-	        		console.log("ori count : " + this_event.find(".st-reply-footer span:eq(2)").html());
 	        		//回覆按讚
 	        		if(est){
 						this_event.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
@@ -1554,14 +2016,13 @@ $(function(){
         });
         
 	}
-
-	
 	//parse 網址
 	getLinkMeta = function (this_event,url) {
 
 		// clearTimeout(activityTimeout);
 		// activityTimeout = setTimeout(function(){
 			var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
+			console.debug("url:",q);
 			$.ajax({
 		        type: 'GET',
 		        url: q, 
@@ -1574,11 +2035,12 @@ $(function(){
 		            if(data.query.results && data.query.results.title){
 		            	result.title = data.query.results.title;
 		            }
-		            
+		            console.debug("data:",data.query);
 		            //從meta取網址標題 大綱和圖片
 		            if(data.query.results && data.query.results.meta){
+		            	console.debug("meta:",data.query.results.meta);
 		            	$.each(data.query.results.meta, function(key, val){
-		                    if (val.content) {
+		                    if (val.property) {
 
 		                    	// title
 		                    	if (val.property.match(/og:title/i)) {
@@ -1588,10 +2050,6 @@ $(function(){
 		                        // description
 		                        if (val.property.match(/og:description/i)) {
 		                            result.description = val.content;
-		                        }
-
-		                        if (val.name && val.name.match(/description/i)) {
-		                            tmp_desc = val.content;
 		                        }
 
 		                        // img
@@ -1609,6 +2067,10 @@ $(function(){
 		                        //     }
 		                        // }
 		                    }
+
+		                    if (val.name && val.name.match(/description/i)) {
+	                            tmp_desc = val.content;
+	                        }
 		                });
 		            }
 			            
@@ -1760,5 +2222,28 @@ $(function(){
 	    var s_seconds = Math.ceil(divisor_for_seconds);
 	    return s_minutes + ":" + ((s_seconds < 10)?("0" + s_seconds):(s_seconds));
 	}
+
+	//轉換html符號
+	var encodeHtmlEntity = function(str) {
+        if(!str) return false;
+
+        var escape_list = {"10":"<br/>"};
+        var buf = [];
+        for (var i=str.length-1;i>=0;i--) {
+            var char_code = str[i].charCodeAt();
+            if(escape_list[char_code]){
+                buf.unshift(escape_list[char_code]);
+            }else{
+                buf.unshift(['&#', char_code, ';'].join(''));
+            }
+         }
+      return buf.join('');
+    };
+
+    function decodeHTMLEntities(str) {
+		return str.replace(/&#(d+);/g, function(match, dec) {
+			return String.fromCharCode(dec);
+		});
+	};
 	
 });

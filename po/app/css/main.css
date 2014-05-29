@@ -796,6 +796,10 @@
 	display:none;
 }
 
+.fc-icon-size {
+	width: 35px;
+}
+
 .fc-area-subbox {
 	height: 50px;
 	line-height: 50px;
@@ -812,7 +816,7 @@
 }
 
 .fc-area-subbox img {
-    margin: 12px 10px 0;
+    margin: 8px 10px 0;
 }
 
 .subpage-timeline {
@@ -1460,19 +1464,21 @@
 	right: 5px;
 }
 
-.st-vote-send,.st-vote-send-gray {
+.st-vote-send,.st-vote-send-blue {
 	color: white;
 	text-align: center;
 	font-size: 20px;
 }
 
+
+
 .st-vote-send {
-    background: rgb(76,157,193);
-    border: 1px solid rgb(83,175,217);
+    background: rgb(179,192,199);
+    border: 1px solid rgb(177,188,199);
 }
 
-.st-vote-send-gray {
-    background: rgb(179,192,199);
+.st-vote-send-blue {
+    background: rgb(76,157,193);
     border: 1px solid rgb(83,175,217);
 }
 
@@ -1798,7 +1804,7 @@
     display:table;
 }
 
-.cp-content-box,.cp-content-textarea,.cp-attach-area{
+.cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-vote-area-test,.cp-time-area{
     background: white;
 	width: 95%;
 	margin: 13px auto;
@@ -1809,12 +1815,12 @@
 .cp-content-box > img:nth-child(1){
     margin: 0 15px;
     position: relative;
-    top: 2px;
+    top: 6px;
 }
 
 .cp-content-box{
-    height: 40px;
-    line-height: 40px;
+    height: 45px;
+    line-height: 45px;
     display: block;
 }
 
@@ -1836,9 +1842,9 @@
 	height: 15px;
 }
 
-/*.cp-content-textarea textarea.cp-textarea-desc::-webkit-scrollbar {
-	display: block;
-}*/
+.cp-icon-size {
+	width: 25px;
+}
 
 .cp-textarea-title:focus{ outline:none } 
 
@@ -1867,8 +1873,8 @@
 .cp-top-btn {
 	float: right;
 	position: relative;
-	top: 5px;
-	right: 10px;
+	top: 10px;
+	right: 15px;
 	cursor:pointer;
 }
 
@@ -1887,7 +1893,7 @@
     margin: auto 15px;
 	position: relative;
 	float: left;
-	top: 30px;
+	top: 25px;
 }
 
 .cp-textarea-desc:focus{ outline:none } 
@@ -1905,6 +1911,329 @@
 	padding-top: 10px;
 	cursor: pointer;
 }
+
+
+
+
+/*
+
+ ######   #######  ##     ## ########   #######   ######  ########       ##     ##  #######  ######## ######## 
+##    ## ##     ## ###   ### ##     ## ##     ## ##    ## ##             ##     ## ##     ##    ##    ##       
+##       ##     ## #### #### ##     ## ##     ## ##       ##             ##     ## ##     ##    ##    ##       
+##       ##     ## ## ### ## ########  ##     ##  ######  ######         ##     ## ##     ##    ##    ######   
+##       ##     ## ##     ## ##        ##     ##       ## ##              ##   ##  ##     ##    ##    ##       
+##    ## ##     ## ##     ## ##        ##     ## ##    ## ##               ## ##   ##     ##    ##    ##       
+ ######   #######  ##     ## ##         #######   ######  ########          ###     #######     ##    ######## 
+
+*/
+
+
+
+.cp-vote-area {
+	overflow: hidden;
+	position: relative;
+	padding-bottom: 55px;
+}
+
+
+.cp-vote-area img{
+	cursor:pointer;
+}
+
+.cp-vote-ques-title {
+	background: rgb(216,228,235);
+	padding: 0 10px;
+	min-height: 60px;
+	line-height: 60px;
+}
+
+.cp-vote-area textarea{
+	position: relative;
+	top: 23px;
+}
+
+
+.cp-vote-area textarea {
+	width: 75%;
+	border: 0;
+	font-size: 15px;
+	height: 15px;
+	background: transparent;
+	margin: -2px 10px;
+}
+
+.cp-vote-area textarea:focus{ outline:none } 
+
+
+.cp-vote-ques-title img:nth-child(1) {
+	position: relative;
+	top: 18px;
+	width: 30px;
+	left:5px;
+}
+
+.cp-vote-ques-title span {
+	position: relative;
+	top: 3px;
+	left: 10px;
+	margin: 0 -10px 0 5px;
+}
+
+.cp-vote-ques-title img:nth-child(3) {
+	position: relative;
+	left: 65px;
+	top: 23px;
+	cursor: default;
+	width: 20px;
+}
+
+
+
+.cp-vote-ques-title img:nth-child(1), .cp-vote-opt img {
+	display:none;
+}
+
+.cp-vote-opt {
+	min-height: 60px;
+	line-height: 60px;
+	padding-left: 20px;
+	border-bottom: 1px solid rgb(245,245,245);
+}
+
+.cp-vote-opt img, .cp-vote-opt span, .cp-vote-ques-title img, .cp-vote-ques-title span {
+	float: left;
+}
+
+.cp-vote-opt img {
+	width: 25px;
+	position: relative;
+	top: 21px;
+	left: 10px;
+}
+
+.cp-vote-opt span {
+	margin: 0 10px;
+	position: relative;
+	top: 3px;
+	left: 10px;
+
+}
+
+
+
+
+
+
+.cp-vote-add-opt {
+	background: rgb(244,244,244);
+	height: 60px;
+	text-align: center;
+	color: rgb(150,150,150);
+	cursor:pointer;
+}
+
+.cp-vote-add-opt:active {
+	background: rgb(237,246,254);
+}
+
+
+.cp-vote-add-opt img {
+	position: relative;
+	top: 10px;
+	right: 5px;
+}
+
+.cp-vote-count-area {
+	display: flex;
+	height: 60px;
+}
+
+.cp-vote-minus {
+	flex: 1;
+	text-align: left;
+}
+
+.cp-vote-count {
+	flex: 4;
+	text-align: center;
+	padding-top: 5px;
+	cursor: pointer;
+}
+
+.cp-vote-count div:nth-child(1) {
+	font-size: 20px;
+}
+
+.cp-vote-count div:nth-child(2) {
+	font-size: 14px;
+	color: rgb(150,150,150);
+}
+
+.cp-vote-plus {
+	flex: 1;
+	text-align: right;
+}
+
+.cp-vote-minus img, .cp-vote-plus img {
+	width: 60px;
+}
+
+.cp-vote-add-ques {
+	background: #7bbbec;
+	height: 60px;
+	width:100%;
+	font-size: 18px;
+	text-align: center;
+	color: white;
+	position: absolute;
+	bottom: 0px;
+	cursor: pointer;
+}
+
+.cp-vote-add-ques:active {
+	background: #72c5eb;
+}
+
+.cp-vote-add-ques img {
+	position: relative;
+	top: 10px;
+	right: 0px;
+}
+
+
+.cp-vote-div {
+	width:100%;
+	height:5px;
+	background: #c7d3dc;
+}
+
+
+.cp-setdate-chk {
+	padding: 10px 20px 5px;
+}
+
+.cp-setdate-chk img {
+	width: 30px;
+}
+
+.cp-setdate-chk span {
+	position: relative;
+	bottom: 7px;
+	left: 5px;
+	font-size: 18px;
+	color: #a3a3a3;
+}
+
+.cp-setdate-area {
+	width:100%;
+	height: 70px;
+	font-size: 14px;
+}
+
+.cp-setdate-l {
+	float: left;
+	width: 95%;
+	position: absolute;
+	height: 85px;
+	display: -webkit-box;
+}
+
+.cp-setdate-r {
+	float: right;
+	width:60%;
+	display: -webkit-box;
+}
+
+.cp-setdate-l-1 {
+	width: 10px;
+	background: url(../images/compose/vote/compose_post_vote_setdate_box_bottombg_1l.png);
+	background-size: cover;
+}
+
+.cp-setdate-l-2 {
+	width: 43%;
+	background: url(../images/compose/vote/compose_setdate_1l_m.png);
+	background-size: 85px 85px;
+	position: relative;
+	z-index: 10;
+}
+
+.cp-setdate-l-3 {
+	width: 60px;
+	background: url(../images/compose/vote/compose_post_vote_setdate_box_bottombg_1l.png) no-repeat;
+	background-size: 100px 85px;
+	background-position: -46px 0;
+	position: relative;
+	z-index: 10;
+}
+
+.cp-setdate-r-1 {
+	width: 100%;
+	height: 85px;
+	background: url(../images/compose/vote/compose_setdate_1r_l.png) repeat-x;
+	background-size: 85px 85px;
+	position: relative;
+	right: 10px;
+}
+
+.cp-setdate-l-2 .cp-setdate-ttl, .cp-setdate-l-2 .cp-setdate-content {
+	margin-left: 20px;
+}
+
+.cp-setdate-r-1 .cp-setdate-ttl, .cp-setdate-r-1 .cp-setdate-content {
+	margin-left: 5%;
+	padding-left: 80px;
+}
+
+.cp-setdate-time {
+	position: relative;
+	top: 5px;
+	left: 10%;
+	font-size: 25px;
+}
+
+.cp-setdate-ttl, .cp-setdate-date {
+	position: relative;
+	top: 14px;
+}
+
+.cp-setdate-date, .cp-setdate-week {
+	float: left;
+}
+
+
+.cp-setdate-r-2 {
+	width: 10px;
+	position: relative;
+	right: 10px;
+	background: url(../images/compose/vote/compose_post_vote_setdate_box_bottombg_1r.png);
+	background-size: 85px 85px;
+	background-position-x: 10px;
+}
+
+.cp-setdate-div {
+	width: 100%;
+	height: 1px;
+	background: rgb(200,200,200);
+	position: absolute;
+	z-index: 20;
+}
+
+.cp-setdate-start-text {
+	font-size: 25px;
+	position: relative;
+	top: 13px;
+	left: 18px;
+}
+
+
+
+
+
+
+
+
+
 
 .cp-ta-yql{
 	display:none;
@@ -1959,7 +2288,7 @@
 
 .char-bar-input:focus{ outline:none } 
 
-.chatroom-footer, .announcement-footer{
+.chatroom-footer, .cp-footer{
     height: 44px;
     background: url("../images/chatroom/textbar_bg46.png") repeat-x;
     display: inline-block;
@@ -1967,6 +2296,7 @@
     border-bottom: 1px solid rgb(218,218,218);
     position:fixed;
     bottom:0px;
+    z-index: 1000;
 }
 
 .chat-bar-input {

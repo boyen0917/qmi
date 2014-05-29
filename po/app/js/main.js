@@ -921,59 +921,18 @@ $(function(){
 	
 	//貼文選單
 	$(".fc-area-subbox").click(function(){
-		var target = $(this);
-		var title,ctp,show_area,close_area;
-		switch (target.data("fc-box")) {
-	        case "post":
-	        	title = "貼文";
-	        	ctp = 0;
-	        	close_area = ".cp-content-title , .cp-content-apt , .cp-content-top";
-	        	break;
-	        case "announcement": 
-	        	title = "公告";
-	        	ctp = 1;
-	        	show_area = ".cp-content-title , .cp-content-apt , .cp-content-top";
-	        	break;
-	        case "feedback":
-	            title = "通報";
-	            ctp = 2;
-	        	break;
-	        case "work":
-	        	title = "工作";
-	        	ctp = 3;
-	          	break;
-	        case "vote":
-	        	title = "投票";
-	        	ctp = 4;
-	          	break;
-	        case "check":
-	        	title = "定點回報";
-	        	ctp = 5;
-	          	break;
-	    }
-
-	    //貼文狀態打開區域
-	    if(show_area) $(show_area).show();	
-
-	    //貼文狀態關閉區域
-	    if(close_area) $(close_area).hide();
-
-
-	    //內容重置 區域重置
-	    $(".cp-content").removeData();
-	    $(".cp-reset").html("");
-	    $(".cp-reset").val("");
-	    $(".cp-attach-area,.cp-ta-yql").hide();
-
-
-		//狀態編號
-		$(".cp-content").data("compose-tp",ctp);
-		//message list 宣告為空陣列
-		$(".cp-content").data("message-list",[0]);
+//<div data-fc-box="post" class="fc-area-subbox">
+// 	<img class="fc-icon-size" src="images/compose/compose_box_bticon_post.png"/>
+// 	<div>貼文</div>
+// </div>
+	    var title = $(this).find("div").html();
 
 	    $("#page-compose .header-group-name div:eq(0)").html(title);
 		$("#page-compose .header-group-name div:eq(1)").html(gn);
+
 		$.mobile.changePage("#page-compose");
+
+		composeContentMake($(this).data("fc-box"));
 
 		$(".feed-compose").trigger("click");
 	});
@@ -1014,15 +973,15 @@ $(function(){
 		//此則timeline種類
 		var tp = this_event.data("timeline-tp");
 		
-		console.log(this_event.data("event-status"));
-		console.log("~~~~~~~~~~~~~~~");
-		
+		console.debug("this event:",this_event.data());
+
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp);
 		if(!detail_chk){
 			return false;
 		}
 		
+
 		
 		//此則動態的按贊狀況
 		getThisTimelinePart(this_event,this_event.find(".st-reply-like-area img:eq(0)"),1);
@@ -1059,6 +1018,15 @@ $(function(){
 	    			case 4:
 	    				this_event.find(".st-box2-more-task-area").hide();
 	    				this_event.find(".st-box2-more-task-area-detail").show();
+
+	    				if(this_event.data("task-over")) break;
+	    				//判斷有無投票過 顯示送出 已送出 已結束等等
+	    				var event_status = this_event.data("event-status");
+	    				console.debug("event data:",this_event.data());
+	    				if(event_status[this_ei] && event_status[this_ei].ik){
+	    					this_event.find(".st-vote-send").html("完成");
+	    					this_event.find(".st-vote-send").removeClass(".st-vote-send-blue");
+	    				}
 	    				
 	    				break;
 	    			case 5:
@@ -1088,52 +1056,9 @@ $(function(){
 
 	
 	//----------------------------------- timeline-貼文 ---------------------------------------------
-	$(".cp-content").height($(window).height()-80);
-	
-	$('.cp-textarea-desc').autosize({append: "\n"});
-	
-
-
-	//url parse
-	$('.cp-textarea-desc').bind('input',function(){
-		//有東西就不作了
-		if($(".cp-ta-yql").is(":visible")) return false;
-
-		var this_event = $(".cp-content");
-
-		var url_chk = $('.cp-textarea-desc').val().split(' ');
-		
-		$.each(url_chk,function(i,val){
-			if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
-				if(val.match(/youtube.com|youtu.be/)){
-					getLinkYoutube(this_event,val);
-				}else{
-					getLinkMeta(this_event,val);
-				}
-				return false;
-			}else{
-	            //暫時
-	            $(".cp-attach-area").hide();
-
-				$(".cp-ta-yql").hide();
-			}
-		});
-	});
-	
-	
-	$(".cp-top-btn").click(function(){
-		if($(".cp-top-btn").data("cp-top") == 0){
-			$(".cp-top-btn").attr("src","images/compose/compose_form_icon_check.png");
-			$(".cp-top-btn").data("cp-top",1);
-		}else{
-			$(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
-			$(".cp-top-btn").data("cp-top",0);
-		}
-	});
-	
 	
 	$(".cp-post").click(function(){
-		var this_event = $(".cp-content");
+		var this_event = $(document).find(".cp-content");
 		this_event.data("compose-content",$('.cp-textarea-desc').val());
 		this_event.data("compose-title",$('.cp-textarea-title').val());
 

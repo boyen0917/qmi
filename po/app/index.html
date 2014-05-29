@@ -240,12 +240,12 @@
                 <div class="feed-compose"></div>
                 <div class="navi-alert"></div>
                 <div class="feed-compose-area">
-                    <div data-fc-box="post" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_post.png"/><div>貼文</div></div>
-                    <div data-fc-box="announcement" class="fc-area-subbox" style="display:none"><img src="images/compose/compose_box_bticon_announcement.png"/><div>公告</div></div>
-                    <div data-fc-box="feedback" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_feedback.png"/><div>通報</div></div>
-                    <div data-fc-box="work" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_work.png"/><div>任務-工作</div></div>
-                    <div data-fc-box="vote" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_vote.png"/><div>任務-投票</div></div>
-                    <div data-fc-box="check" class="fc-area-subbox"><img src="images/compose/compose_box_bticon_check.png"/><div>任務-定點回報</div></div>
+                    <div data-fc-box="post" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_post.png"/><div>貼文</div></div>
+                    <div data-fc-box="announcement" class="fc-area-subbox" style="display:none"><img class="fc-icon-size" src="images/compose/compose_box_bticon_announcement.png"/><div>公告</div></div>
+                    <div data-fc-box="feedback" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_feedback.png"/><div>通報</div></div>
+                    <div data-fc-box="work" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_work.png"/><div>任務-工作</div></div>
+                    <div data-fc-box="vote" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_vote.png"/><div>任務-投票</div></div>
+                    <div data-fc-box="check" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_check.png"/><div>任務-定點回報</div></div>
                 </div>
                 <div class="feed-compose-area-cover"></div>
             </div>
@@ -606,10 +606,10 @@
                     <span>發佈</span>
                 </div>
             </div>
-            <div class="cp-content">
+            <div class="cp-content-load">
                 <div data-sp-box="title" class="cp-content-box cp-content-title" style="display:none">
                         <img src="images/compose/compose_form_icon_title.png"/>
-                        <textarea data-cp-name="標題" class="cp-textarea-title cp-reset" placeholder="標題" data-role="none"></textarea>
+                        <textarea data-cp-name="標題" class="cp-textarea-title" placeholder="標題" data-role="none"></textarea>
                 </div>
                 <div data-sp-box="apt" class="cp-content-box cp-content-apt" style="display:none">
                     <img src="images/compose/compose_form_icon_apt.png"/>
@@ -628,57 +628,28 @@
                 </div>
                 <div class="cp-content-textarea">
                     <img src="images/compose/compose_form_icon_description.png"/>
-                    <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated cp-reset" placeholder="內容描述" data-role="none" ></textarea>
+                    <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
                     
                 </div>
                 <div class="cp-attach-area" style="display:none">
                     <div class="cp-ta-yql">
-                        <div class="cp-yql-title cp-reset"></div>
-                        <div class="cp-yql-img cp-reset"></div>
-                        <div class="cp-yql-desc cp-reset"></div>
+                        <div class="cp-yql-title"></div>
+                        <div class="cp-yql-img"></div>
+                        <div class="cp-yql-desc"></div>
                     </div>
                 </div>
 
             </div>
-            <div class="announcement-footer">
-                <div data-ap-addfile="sticker" class="cp-addfile"><img src="images/compose/compose_form_addfile_sticker.png"/></div>
-                <div data-ap-addfile="img" class="cp-addfile"><img src="images/compose/compose_form_addfile_img.png"/></div>
-                <div data-ap-addfile="video" class="cp-addfile"><img src="images/compose/compose_form_addfile_video.png"/></div>
-                <div data-ap-addfile="voice" class="cp-addfile"><img src="images/compose/compose_form_addfile_voice.png"/></div>
-                <div data-ap-addfile="map" class="cp-addfile"><img src="images/compose/compose_form_addfile_map.png"/></div>
+            <div class="cp-footer">
+                <div data-cp-addfile="sticker" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_sticker.png"/></div>
+                <div data-cp-addfile="img" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_img.png"/></div>
+                <div data-cp-addfile="video" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_video.png"/></div>
+                <div data-cp-addfile="voice" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_voice.png"/></div>
+                <div data-cp-addfile="map" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_map.png"/></div>
             </div>
         </div>
 
 
-
-<!---------------------------------- page-vote-post ------------------------------------>
-        <div data-role="page" id="page-vote-post">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3>建立新投票</h3>
-            </div>
-            <div class="vp-content">
-	            <div data-vp-box="title" class="vp-content-box">
-	                    <textarea class="vp-textarea-title" placeholder="標題" data-role="none"></textarea>
-	            </div>
-                <div data-vp-box="object" class="vp-content-box">
-                    發佈對象
-                    <img class="vp-object-btn" src="images/ap_box_arrow.png"/>
-                </div>
-                <div class="vp-content-textarea">
-                    <textarea class="vp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
-                    <div class="vp-addfile">
-                        <div data-vp-addfile="sticker" class="vp-addfile"><img src="images/compose/compose_form_addfile_sticker.png"/></div>
-		                <div data-vp-addfile="img" class="vp-addfile"><img src="images/compose/compose_form_addfile_img.png"/></div>
-		                <div data-vp-addfile="video" class="vp-addfile"><img src="images/compose/compose_form_addfile_video.png"/></div>
-		                <div data-vp-addfile="voice" class="vp-addfile"><img src="images/compose/compose_form_addfile_voice.png"/></div>
-		                <div data-vp-addfile="map" class="vp-addfile"><img src="images/compose/compose_form_addfile_map.png"/></div>
-                    </div>
-                </div>
-            </div>
-            <div class="vp-addfile">
-            </div>
-        </div>
 <!---------------------------------- page-chatroom ------------------------------------>
         <div data-role="page" id="page-chatroom">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">

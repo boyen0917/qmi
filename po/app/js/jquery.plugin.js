@@ -1,5 +1,31 @@
 (function($) {
 
+
+    $.fn.htmlEntities = function(str) {
+    	
+
+    	var encodeHtmlEntity = function(str) {
+    		var escape_list = {"10":"\n"};
+		  	var buf = [];
+		  	for (var i=str.length-1;i>=0;i--) {
+			  	var char_code = str[i].charCodeAt();
+			  	if(escape_list.char_code){
+				    buf.unshift(escape_list.char_code);
+				}else{
+					buf.unshift(['&#', char_code, ';'].join(''));
+				}
+			 }
+		  return buf.join('');
+		};
+
+		var html_entities = encodeHtmlEntity(str);
+
+	    return this.each(function() {
+	    	$(this).html(html_entities);
+	    });
+	};
+    
+
 	//localstorage for object
     $.lStorage = function(key,value) {
 		if(value){
@@ -14,8 +40,6 @@
 			return $.parseJSON(localStorage[key])
 		}
     };
-
-    
     
     //get url query string
     $.extend({
