@@ -219,7 +219,7 @@ function setMemberBranch(branchId,groupUserId){
 
     ul[0]=user;
     body.ul=ul;
-
+    console.log(JSON.stringify(body));
     var result = ajaxDo(api_name,headers,method,false,JSON.stringify(body));
     
     result.complete(function(data){

@@ -4,8 +4,9 @@ $(function() {
 		//fileInput.addEventListener('change', function(e) {
 		$("#importBtn").click(function(){	
 			var file = fileInput.files[0];
-			var textType = /text.*/;
-			if (file.type.match(textType)) {
+			//var textType = /text.*/;
+			//if (file.type.match(textType)) 
+			{
 				var reader = new FileReader();
 
 				reader.onload = function(e) {
