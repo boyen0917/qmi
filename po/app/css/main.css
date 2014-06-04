@@ -1536,6 +1536,7 @@
 .st-vote-detail-option img {
 	margin-right: 10px;
 	position: relative;
+	top: 4px;
 }
 
 .st-attach-url-img,.st-attach-map {
@@ -1573,6 +1574,57 @@
 
 .st-attach-map{
     height:150px;	
+}
+
+
+.st-attach-img {
+	height: 300px;
+	width: 99%;
+	overflow-y: hidden;
+	position: relative;
+	left: -4%;
+	margin: auto;
+	padding-left: 7.5%;
+}
+
+.st-attach-img-area {
+	display: -webkit-inline-box;
+}
+
+.st-slide-img {
+	position: relative;
+	height: 298px;
+	border: 1px solid #d8d8d8;
+	overflow: hidden;
+}
+
+.st-slide-img img {
+	width: 350px;
+}
+.st-img-gap {
+	width: 10px;
+	display: block;
+}
+
+.st-attach-img-arrow-l,.st-attach-img-arrow-r {
+	position: absolute;
+	top: 110px;
+	opacity:0;
+}
+
+.st-attach-img-arrow-l:active,.st-attach-img-arrow-r:active {
+	top:112px;
+}
+
+.st-attach-img-arrow-r {
+	right:0px;
+	-webkit-transform: rotate(180deg);
+}
+
+
+
+.st-attach-img-arrow-l img, .st-attach-img-arrow-r img {
+	width: 70px;
 }
 
 .st-box2-bottom-block {
@@ -1802,6 +1854,10 @@
 	background: rgb(208,208,208);
     width: 100%;
     display:table;
+}
+
+.cp-content-height-adj {
+	height: 200px;
 }
 
 .cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-vote-area-test,.cp-time-area{
@@ -2108,6 +2164,10 @@
 }
 
 
+.cp-time-area {
+	-webkit-user-select: none;
+}
+
 .cp-setdate-chk {
 	padding: 10px 20px 5px;
 }
@@ -2122,6 +2182,10 @@
 	left: 5px;
 	font-size: 18px;
 	color: #a3a3a3;
+}
+
+.cp-setdate-chk .cp-start-time-text {
+	color: #414445;
 }
 
 .cp-setdate-area {
@@ -2185,6 +2249,21 @@
 	padding-left: 80px;
 }
 
+.cp-datetimepicker-start , .cp-datetimepicker-end {
+	opacity: 0;
+}
+
+input.cp-datetimepicker-start {
+	position: absolute;
+	left: 30px;
+}
+
+input.cp-datetimepicker-end {
+	position: absolute;
+	left: 90px;
+}
+
+
 .cp-setdate-time {
 	position: relative;
 	top: 5px;
@@ -2225,6 +2304,7 @@
 	top: 13px;
 	left: 18px;
 }
+
 
 
 

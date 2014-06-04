@@ -23,7 +23,8 @@ $(function(){
 		".st-sub-box-more-btn",
 		".st-more-close",
 		".st-user-pic",
-		".st-sub-box-more"
+		".st-sub-box-more",
+		".st-sub-box-2-attach-area"
 	];
 	
 	//timeline內容 判斷不開啓附檔區域的type

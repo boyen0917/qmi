@@ -182,7 +182,7 @@ $(function(){
 	//取得單一timeline 回覆讚好等狀態
 	getThisTimelinePart = function (this_event,target_div,tp){
 		var ei = this_event.data("event-id");
-		
+		console.debug("有吧!!!!!!!!!!!2");
 		var api_name = "/groups/" + gi + "/timelines/" + ti_feed + "/events/" + ei + "/participants?tp=" + tp;
 		var headers = {
             "ui":ui,
@@ -197,7 +197,7 @@ $(function(){
 					epl = epl.split(",");
 					//存回 陣列
 					this_event.data("parti-list",epl);
-					
+					console.debug("有吧!!!!!!!!!!!3");
 					//編輯讚好區域
 					detailLikeStringMake(this_event);
 				}
@@ -216,6 +216,7 @@ $(function(){
 		var like_str;
 
         this_event.find(".st-reply-like-area").show();
+
         switch(true){
         	//陣列空的 隱藏 區域
         	case (epl.length == 0) :
@@ -253,52 +254,6 @@ $(function(){
         
         this_event.find(".st-reply-like-area span").html(like_str);
 	}
-
-
-	// function detailLikeStringMake(this_event){
-	// 	var epl = this_event.data("parti-list");
-
-	// 	//gu gi 是全域
-	// 	var me_pos = $.inArray(gu,epl);
-		
-	// 	var guAll = $.lStorage(ui)[gi].guAll;
- //        var me_gu = guAll[epl[me_pos]];
-	// 	var like_str;
-
- //        this_event.find(".st-reply-like-area").show();
- //        switch(true){
- //        	//陣列空的 隱藏 區域
- //        	case (epl.length == 0) :
- //                this_event.find(".st-reply-like-area").hide();
- //                break;
- //            //你 按讚
- //            case ( typeof me_gu != "undefined" && epl.length == 1 ) :
- //                like_str = "你" + " 按讚";
- //                break;
- //            //林小花 按讚
- //            case ( !me_gu && epl.length == 1 ) :
- //                like_str = guAll[epl[0]].n + " 按讚";
- //                break;
- //            //你、林小花 按讚
- //            case ( typeof me_gu != "undefined" && epl.length == 2 ) :
- //                like_str = "你、 " + (me_pos ? guAll[epl[0]].n : guAll[epl[1]].n) + " 按讚";
- //                break;
- //            //林小花、陳小鳥 按讚
- //            case ( !me_gu && epl.length == 2 ) :
- //                like_str = guAll[epl[0]].n + "、 " + guAll[epl[1]].n + " 按讚";
- //                break;
- //            //你、林小花 及其他？個人按讚
- //            case ( typeof me_gu != "undefined" && epl.length > 2 ) :
- //                like_str =  "你、 " + (me_pos ? guAll[epl[0]].n : guAll[epl[1]].n) + " 及其他 " + (epl.length-2) + " 人按讚";
- //                break;
- //            //林小花、陳小鳥 及其他？個人按讚
- //            case ( !me_gu && epl.length > 2 ) :
- //            	like_str =  guAll[epl[0]].n + "、 " + guAll[epl[1]].n + " 及其他" + (epl.length-2) + "人按讚";
- //                break;
- //        }
-        
- //        this_event.find(".st-reply-like-area span").html(like_str);
-	// }
 
 	
 /*
@@ -469,6 +424,7 @@ $(function(){
 
 	//動態消息 判斷關閉區域
 	timelineDetailClose = function (this_event,tp){
+
 		var detail_data;
 		//公告通報任務的detail 線要隱藏 
 		var bottom_block = false;
@@ -494,7 +450,7 @@ $(function(){
 			case 6:
 				break;
 		}
-		
+
 		//判斷detail區塊開啟或關閉 以及 若曾經開啟過 就不做後續的api
 		//一般的開關區域
 		var conten_div = ".st-sub-box-2-content";
@@ -518,8 +474,6 @@ $(function(){
 		//開啟留言區域
 		this_event.find(".st-reply-area").toggle();
 		
-		
-		
 		//設定動態消息detail開關
 		if(!this_event.data("detail-content")){
 			//表示沒填入過detail內容 即設定為有資料 下次就不重複做資料
@@ -529,6 +483,8 @@ $(function(){
 			//表示有detail內容了 不動作
 			return false;
 		}
+		
+		
 	}
 	
 
@@ -538,7 +494,7 @@ $(function(){
 		$.each(li,function(v_i,v_val){
 
 
-			this_event.find(".st-vote-send").before($('<div>').load('layout/layout.html .st-vote-ques-area',function(){
+			this_event.find(".st-vote-send").before($('<div class="st-vote-ques-area-div">').load('layout/layout.html .st-vote-ques-area',function(){
 				var this_ques = $(this).find(".st-vote-ques-area");
 				
 				//設定題目的編號
@@ -577,10 +533,10 @@ $(function(){
 		        	this_ques.data("multi-count",0);
 
 					//調整圈圈高度
-					setTimeout(function(){
-						var center_pos = mathAlignCenter(this_ques.find(".st-vote-detail-option").height(),this_ques.find(".st-vote-detail-option img").height());
-						this_ques.find(".st-vote-detail-option img").css("top",center_pos + "px");
-					},100);
+					// setTimeout(function(){
+					// 	var center_pos = mathAlignCenter(this_ques.find(".st-vote-detail-option").height(),this_ques.find(".st-vote-detail-option img").height());
+					// 	this_ques.find(".st-vote-detail-option img").css("top",center_pos + "px");
+					// },100);
 					
 					
 				});
@@ -618,7 +574,8 @@ $(function(){
 		var vote_obj = this_event.data("vote-result");
 		var all_ques = this_event.find(".st-vote-ques-area");
 		console.log("votevotevotevote");
-		console.log(vote_obj);
+		console.log(JSON.stringify(vote_obj,null,2));
+
 		//設定投票人數
 	    this_event.find(".st-task-vote-detail-count span").html(Object.keys(vote_obj).length + "人已投票");
 
@@ -636,7 +593,6 @@ $(function(){
         		//每個題目
 		        $.each(all_ques,function(ques_i,ques_val){
 		        	var this_ques = $(this);
-
             		//題目的編號 和 答案的編號相同 而且 有投票的內容(可能 "i": [])
             		if(k_val.k == this_ques.data("ques-index") && k_val.i){
             			//答案的多個投票
@@ -674,10 +630,13 @@ $(function(){
 	}
 
 	bindVoteEvent = function (this_event){
-		this_event.find(".st-vote-detail-option").click(function(){
+		
 
+		this_event.find(".st-vote-detail-option").click(function(){
+			console.debug("進來");
 			//時間到 不給點
 			if(this_event.data("task-over")){
+				console.debug("時間到");
 				return false;
 			}
 
@@ -693,6 +652,7 @@ $(function(){
 
 			//複選
 			if(this_ques.data("vote-multi") > 1){
+				console.debug("復選");
 				//復選的情況就要判斷該選項是否已選擇
 				if(this_opt.data("vote-chk")){
 					this_opt.data("vote-chk",false);
@@ -720,6 +680,7 @@ $(function(){
 
 			//單選
 			}else{
+				console.debug("單選");
 				//找出點選的那一項要減一
 				$.each(this_ques.find(".st-vote-detail-option"),function(i,val){
 					if($(this).data("vote-chk")){
@@ -755,12 +716,18 @@ $(function(){
 				this_event.find(".st-vote-send").addClass("st-vote-send-blue");
 				this_event.find(".st-vote-send").html("送出");
 			}
-
 		});
+		
+		//綁過不要再綁 會重複執行
+		if(this_event.data("vote-bind-chk")) return false;
 
 		//送出
 		this_event.find(".st-vote-send").click(function(){
 
+			//綁過不要再綁 會重複執行
+			this_event.data("vote-bind-chk",true);
+
+			console.debug("st-vote-send");
 			//沒藍色表示不給送出
 			if(!$(this).hasClass("st-vote-send-blue")){
 				return false;
@@ -819,7 +786,7 @@ $(function(){
 				},
 				"ml" : [reply_obj]
 			};
-
+			console.debug("reply body:",body);
 			var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
 
 	        var headers = {
@@ -832,6 +799,7 @@ $(function(){
 	        var method = "post";
 	        var result = ajaxDo(api_name,headers,method,true,body);
 	        result.success(function(data){
+
 	        	//重新讀取detail
 	        	popupShowAdjust("回覆成功");
 	        	this_event.find(".st-vote-send").removeClass("st-vote-send-blue");
@@ -842,13 +810,13 @@ $(function(){
 
 	        		//重設完整的detail
 					this_event.data("detail-content",false);
-		    		this_event.find(".st-vote-ques-area").parent().remove();
+		    		this_event.find(".st-vote-ques-area-div").remove();
+		    		// timelineDetailClose toggle負負得正
+		    		this_event.find(".st-reply-area").hide();
+
+
 		      		this_event.find(".st-sub-box-1").trigger("click");
 					$(".popup-close").unbind("reload");
-				});
-
-				$(".popup-close").click(function(){
-					$(".popup-close").trigger("reload");
 				});
 	      		
 	        });
@@ -862,14 +830,15 @@ $(function(){
 		$('.cp-content-load').html($('<div>').load('layout/compose.html .cp-content',function(){
 
 			var this_compose = $(this).find(".cp-content");
-			this_compose.css("min-height",$(window).height()+800);
-
+			this_compose.css("min-height",$(window).height());
+			//this_compose.find(".cp-content-height-adj").css("min-height",$(window).height()+800);
+			console.debug("pos:",this_compose.find(".cp-content-height-adj").offset());
 			this_compose.data("message-list",[0]);
 
 			// this_compose.find('.cp-textarea-desc, .cp-vote-area textarea').autosize({append: "\n"});
 
 
-			var show_area,title;
+			var show_area,title,show_date;
 
 			switch (compose_title) {
 		        case "post":
@@ -888,10 +857,12 @@ $(function(){
 		          	break;
 		        case "vote":
 		        	ctp = 4;
-		        	show_area = ".cp-content-title ";
+		        	show_area = ".cp-content-title,.cp-vote-area,.cp-content-addcal,.cp-content-first,.cp-time-area";
 
 		        	//預設題目數為0
 		        	this_compose.data("ques-total",0);
+
+		        	show_date = true;
 
 		        	composeVoteQuesMake(this_compose);
 		        	composeVoteEvent(this_compose);
@@ -929,13 +900,11 @@ $(function(){
 				//先將換行符號換成<br/>加空格 再以空格切出陣列
 				var url_chk = this_compose.find('.cp-textarea-desc').val().replace(/\n|\r/g," <br/> ").split(' ');
 				
-				console.debug("url chk:",url_chk);
 				$.each(url_chk,function(i,val){
 					if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
 						if(val.match(/youtube.com|youtu.be/)){
 							getLinkYoutube(this_compose,val);
 						}else{
-							console.debug("getLinkMeta");
 							getLinkMeta(this_compose,val);
 						}
 						return false;
@@ -946,7 +915,182 @@ $(function(){
 					}
 				});
 			});
+
+			if(show_date){
+				//設定現在時間
+				var time = new Date();
+				var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
+		        var time_format_arr = time_format.split(",");
+				this_compose.find(".cp-setdate-l .cp-setdate-date").html(time_format_arr[0]);
+		        this_compose.find(".cp-setdate-l .cp-setdate-week").html(time_format_arr[1]);
+		        this_compose.find(".cp-setdate-l .cp-setdate-time").html(time_format_arr[2]);
+
+		        //設定明天時間new Date().getTime() + 24 * 60 * 60 * 1000;
+		        var tomorrow_time = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+				var tomorrow_time_format = tomorrow_time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
+		        var tomorrow_time_format_arr = tomorrow_time_format.split(",");
+				this_compose.find(".cp-setdate-r .cp-setdate-date").html(tomorrow_time_format_arr[0]);
+		        this_compose.find(".cp-setdate-r .cp-setdate-week").html(tomorrow_time_format_arr[1]);
+		        this_compose.find(".cp-setdate-r .cp-setdate-time").html(tomorrow_time_format_arr[2]);
+
+		        //現在時間預設為今天的unixtime * 1000
+		        var milliseconds = (new Date).getTime();
+        		var unixtime = Math.round(milliseconds/1000);		
+
+        		this_compose.data("start-timestamp",unixtime * 1000);
+
+        		//結束時間預設為明天的unixtime * 1000
+		        var tomorrow_milliseconds = (new Date).getTime() + 24 * 60 * 60 * 1000;
+        		var tomorrow_unixtime = Math.round(tomorrow_milliseconds/1000);		
+
+        		this_compose.data("end-timestamp",tomorrow_unixtime * 1000);
+
+		        //指定開始時間
+				this_compose.find(".cp-setdate-chk").click(function(){
+					var start_time_chk = this_compose.data("start-time-chk");
+
+					//若是關閉開始時間 則將開始日期改為今天 以及 將結束時間的minDate設定為今天
+					if(start_time_chk){
+						$(this).find("img").attr("src","images/common/icon/icon_check_gray.png");
+						$(this).find("span").removeClass("cp-start-time-text");
+
+						this_compose.data("start-time-chk",false);
+
+						//關閉開始時間 同時將開始日期改為今天
+
+						//設定現在時間
+						var time = new Date();
+						var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
+				        var time_format_arr = time_format.split(",");
+						this_compose.find(".cp-setdate-l .cp-setdate-date").html(time_format_arr[0]);
+				        this_compose.find(".cp-setdate-l .cp-setdate-week").html(time_format_arr[1]);
+				        this_compose.find(".cp-setdate-l .cp-setdate-time").html(time_format_arr[2]);
+
+				        var start_input = this_compose.find("input.cp-datetimepicker-start");
+				        var end_input = this_compose.find("input.cp-datetimepicker-end");
+
+				        //現在時間的unixtime
+						var milliseconds = (new Date).getTime();
+        				var unixtime = Math.round(milliseconds/1000);
+                		
+                		//設定 datetimepicker
+						start_input.datetimepicker({
+				            minDate: 0,
+		                    format:'unixtime',
+		                    value: unixtime
+				        });
+
+						//開始日期改為今天 記錄在this compose data
+				        this_compose.data("start-timestamp",unixtime * 1000);
+
+						//設定 datetimepicker 前 先destroy 才不會錯亂
+						var end_input_val = end_input.val()*1;
+
+				        end_input.datetimepicker("destroy");
+
+				        //初始化 datetimepicker
+				        this_compose.find("input.cp-datetimepicker-end").datetimepicker({
+				            minDate: 0  ,
+				            format:'unixtime',
+				            value:end_input_val,
+				            onChangeDateTime: function() {
+				            	composeDatetimepickerFormat(this_compose,"end");
+				            }
+				        });
+					}else{
+						//開啟開始時間
+						$(this).find("img").attr("src","images/common/icon/icon_check_gray_check.png");
+						$(this).find("span").addClass("cp-start-time-text");
+
+						this_compose.data("start-time-chk",true);
+					}
+
+					this_compose.find(".cp-setdate-l-2 .cp-setdate-start-text").toggle();
+					this_compose.find(".cp-setdate-l-2 .cp-setdate-content").toggle();
+					
+				});
+
+				//初始化 datetimepicker
+				this_compose.find("input.cp-datetimepicker-start").datetimepicker({
+		            minDate: 0  ,
+		            format:'unixtime',
+		            onChangeDateTime: function() {
+		            	composeDatetimepickerFormat(this_compose,"start");
+		            }
+		        });
+				//初始化 datetimepicker
+		        this_compose.find("input.cp-datetimepicker-end").datetimepicker({
+		        	startDate:'+1970/01/02',
+		            minDate: 0  ,
+		            format:'unixtime',
+		            onChangeDateTime: function(dateText) {
+		            	composeDatetimepickerFormat(this_compose,"end");
+		            }
+		        });
+
+		        //點擊開啟 datetimepicker
+				this_compose.find(".cp-setdate-l").click(function(){
+					var start_time_chk = this_compose.data("start-time-chk");
+					if(!start_time_chk) return false;
+					this_compose.find("input.cp-datetimepicker-start").datetimepicker("show");
+				});
+
+				//點擊開啟 datetimepicker
+				this_compose.find(".cp-setdate-r").click(function(){
+					this_compose.find("input.cp-datetimepicker-end").datetimepicker("show");
+				});
+			}
 		}));
+	}
+
+	composeDatetimepickerFormat = function(this_compose,type){
+		var this_input = this_compose.find("input.cp-datetimepicker-" + type);
+
+		//未選時間 就跳出
+		if(!this_input.val()) return false;
+
+		var time = new Date(this_input.val()*1000);
+		var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:00" );
+        var time_format_arr = time_format.split(",");
+
+        if(type == "start"){
+
+        	//記錄在thit_compose data
+        	this_compose.data("start-timestamp",this_input.val()*1000);
+
+        	//如果開始時間大於結束時間 就將結束時間改為開始時間
+            var timestamp_start = this_input.val()*1;
+            var end_input = this_compose.find("input.cp-datetimepicker-end");
+            var timestamp_end = end_input.val()*1;
+			if(timestamp_start > timestamp_end){
+
+				//因為更改到結束時間 所以也要記錄在this_compose data中
+				this_compose.data("end-timestamp",this_input.val()*1000);				
+
+				//設定 datetimepicker 前 先destroy 結果還是錯亂 
+				end_input.datetimepicker({
+		            minDate: time.customFormat( "#YYYY#/#M#/#D#" ),
+                    value: timestamp_start
+		        });
+
+				this_compose.find(".cp-setdate-r .cp-setdate-date").html(time_format_arr[0]);
+		        this_compose.find(".cp-setdate-r .cp-setdate-week").html(time_format_arr[1]);
+		        this_compose.find(".cp-setdate-r .cp-setdate-time").html(time_format_arr[2]);
+
+			}
+
+            var target = this_compose.find(".cp-setdate-l");
+        }else{
+
+        	//記錄在this_compose data
+			this_compose.data("end-timestamp",this_input.val()*1000);	
+
+        	var target = this_compose.find(".cp-setdate-r");
+        }
+        
+        target.find(".cp-setdate-date").html(time_format_arr[0]);
+        target.find(".cp-setdate-week").html(time_format_arr[1]);
+        target.find(".cp-setdate-time").html(time_format_arr[2]);
 	}
 
 
@@ -1000,15 +1144,6 @@ $(function(){
 
 				console.debug("opt total:",this_ques.data("opt-total"));
 
-				//等於2表示回到最低值 關閉刪除選項
-				// if(opt_total == 2){
-				// 	console.debug("opt total = 2");
-				// 	this_ques.find(".cp-vote-opt img").hide();
-
-				// 	this_ques.data("opts-delete",false);
-
-				// }
-
 				opt_total += 1;
 				//存回
 				this_ques.data("opt-total",opt_total);
@@ -1016,7 +1151,7 @@ $(function(){
 					'<div class="cp-vote-opt cp-new-opt-' + opt_total + ' ">' +
 		                '<img src="images/common/icon/icon_compose_close.png" style="display:block"/>' +
 		                '<span>' + opt_total + '</span>' +
-		                '<textarea class="cp-opt-textarea textarea-animated" placeholder="投票項目" data-role="none"></textarea>' +
+		                '<textarea class="cp-opt-textarea textarea-animated cp-vote-empty-chk" placeholder="投票項目" data-role="none"></textarea>' +
 		            '</div>'
 				);
 
@@ -1046,7 +1181,14 @@ $(function(){
 				this_compose.data("ques-total",ques_total);
 
 				//刪除題目
-				this_ques.remove();
+				this_ques.hide("slow", function(){ 
+
+					$(this).remove();
+						//重新編號
+					this_compose.find(".cp-vote-ques-area").each(function(i,val){
+						$(this).find(".cp-vote-ques-title span").html(i+1);
+					});
+				});
 
 				//刪除後等於1 關閉按鈕
 				if(ques_total == 1){
@@ -1054,10 +1196,7 @@ $(function(){
 					this_compose.find(".cp-vote-ques-title img:eq(0)").hide()
 				}
 
-				//重新編號
-				this_compose.find(".cp-vote-ques-area").each(function(i,val){
-					$(this).find(".cp-vote-ques-title span").html(i+1);
-				});
+				
 			});
 
 		}));
@@ -1075,11 +1214,18 @@ $(function(){
 			//存回
 			this_ques.data("opt-total",opt_total);
 
-			this_opt.remove();
+			this_opt.hide("slow", function(){ 
 
-			for(i=0;i<opt_total;i++){
-				this_ques.find(".cp-vote-opt:eq(" + i + ") span").html(i+1);
-			}
+				$(this).remove();
+
+				for(i=0;i<opt_total;i++){
+					this_ques.find(".cp-vote-opt:eq(" + i + ") span").html(i+1);
+				}
+				
+			});
+			//this_opt.remove();
+
+			
 
 
 			//連動影響最高可投票數
@@ -1148,6 +1294,61 @@ $(function(){
 
 	}
 
+
+	composeVoteObjMake = function(this_compose,body){
+
+      	//檢查項目使否都有填寫
+    	var empty_chk = false;
+    	this_compose.find(".cp-vote-empty-chk").each(function(){
+    		if(!$(this).val()){
+    			empty_chk = true;
+    			return false;
+    		}
+    	});
+    	//有空值 跳出
+    	if(empty_chk) return true;
+
+
+    	var ml_obj = {
+    		"li" : [],
+    		"b": this_compose.data("start-timestamp"),
+			"e": this_compose.data("end-timestamp"),
+			"tp": 14
+    	}
+
+      	//投票題目數
+		var ques_total = this_compose.data("ques-total");
+      	
+		this_compose.find(".cp-vote-ques-area").each(function(){
+			var this_ques = $(this);
+
+			//可投票數 
+			var vote_count = this_ques.data("vote-count");
+			//投票題目obj
+			var ques_obj = {
+	          "k": this_ques.find(".cp-vote-ques-title span").html()*1-1,
+	          "t": this_ques.find("textarea").val(),
+	          "v": this_ques.data("vote-count"),
+	          "i": []
+	      	};
+	      	//每個投票選項
+	      	this_ques.find(".cp-vote-opt").each(function(){
+	      		var this_opt = $(this);
+	      		//投票選項obj
+	      		var opt_obj = {
+	      			"k": this_opt.find("span").html()*1-1,
+	              	"o": this_opt.find(".cp-opt-textarea").val()
+	      		};
+
+	      		ques_obj.i.push(opt_obj);
+	      	});
+
+	      	ml_obj.li.push(ques_obj);
+		});
+		console.debug("vote obj k-1!:",ml_obj);
+		body.ml.push(ml_obj);
+	}
+
 /*
 
  ######   #######  ##     ## ########   #######   ######  ########        ######  ######## ##    ## ########  
@@ -1161,11 +1362,11 @@ $(function(){
 
 */
 
-	composeSend = function (this_event){
+	composeSend = function (this_compose){
 
-		var ctp = this_event.data("compose-tp");
-		var compose_content = this_event.data("compose-content");
-		var ml = this_event.data("message-list");
+		var ctp = this_compose.data("compose-tp");
+		var compose_content = this_compose.data("compose-content");
+		var ml = this_compose.data("message-list");
 		var body = {
 			"meta" : {
 				"lv" : 1,
@@ -1201,13 +1402,19 @@ $(function(){
 //	                   }
 //	                 ]
 //	               };
+		
+		//欄位是否填寫 檢查
+		var empty_chk = false;
+		var empty_msg;
+
+		//任務 投票之類的 因為是可預測的 又是單一的ml 就在這邊處理
 		switch(ctp){
 			//普通貼文
 			case 0:
 				break;
 			//公告
 			case 1:
-				body.meta.tt = this_event.data("compose-title");
+				body.meta.tt = this_compose.data("compose-title");
 				break;
 			//通報
 			case 2:
@@ -1217,12 +1424,25 @@ $(function(){
 				break;
 			//任務 投票
 			case 4:
+
+				body.meta.tt = this_compose.data("compose-title");
+
+				empty_chk = composeVoteObjMake(this_compose,body);
+
+				empty_msg = "投票內容不完整！";
+				console.debug("body:",JSON.stringify(body,null,2));
+				console.debug("compose data :",this_compose.data());
 				break;
 			//任務 定點回報
 			case 5:
 				break;
 		}
 
+		//有空值就跳出
+		if(empty_chk) { 
+			popupShowAdjust(empty_msg);
+			return false;
+		}
 
 		//網址
 
@@ -1255,17 +1475,24 @@ $(function(){
 
 
 		// 內容狀態 會有很多ml內容組成
-		$.each(ml,function(i,mtp){
-			var obj = {};
 
+		//這邊的概念是 貼文可能會有網址 附檔之類的 有這些東西 就用這個迴圈去加出來
+		//但像是任務 投票之類的 因為是可預測的 又是單一的ml 就在上面那邊解決
+		$.each(ml,function(i,mtp){
+			var obj = {"tp":mtp};
+			var is_push = true;
 			switch(mtp){
 				//普通貼文
 				case 0:
 					obj.c = compose_content;
+
+					is_push = false;
+					body.ml.unshift(obj);
+
 					break;
 				//一般網站url
 				case 1:
-					var url_content = this_event.data("url-content");
+					var url_content = this_compose.data("url-content");
 					console.log("url_content");
 					console.log(url_content);
 					obj.c = url_content.url
@@ -1287,9 +1514,9 @@ $(function(){
 					break;
 			}
 
-			obj.tp = mtp;
 
-			body.ml.push(obj);
+			//會有順序問題 因為ios只會照ml順序排 所以必須設定順序
+			if(is_push) body.ml.push(obj);
 		});
 
 // 		console.log(body);
@@ -1374,8 +1601,6 @@ $(function(){
 	    	
     	var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
-
-	    	
 	    	
 	    	$(".sm-group-list-area").html("");
 	    	$(".sm-group-list-area-add").html("");
@@ -1383,14 +1608,12 @@ $(function(){
 	    	var tmp_selector,count,chk;
 	    	group_list = $.parseJSON(data.responseText).gl;
 	    	
-	        //每次讀取timeline時 順便重新設定permission  後面不做了
+	        //每次讀取timeline時 順便重新設定permission
 	    	if(permission){
 	    		permissionControl(group_list);
-	    		return false;
 	    	}
 			
 			var total = group_list.length;	
-
 	        $.each(group_list,function(i,val){
 	        	if(i < 2){
 	        		tmp_selector = ".sm-group-list-area";
@@ -1542,12 +1765,10 @@ $(function(){
 
 
 */
+
 					setEventStatus(this_event);
 					
 
-		        	
-	        		
-	        		
 	        		var category;
 	        		
 	        		switch(tp){
@@ -1826,6 +2047,12 @@ $(function(){
 	
 	timelineContentMake = function (this_event,target_div,ml,is_detail){
 		
+		//結束時間檢查
+		var end_time_chk = false;
+
+		//需要記共有幾張圖片
+		var gallery_arr = [];
+
 		$.each(ml,function(i,val){
 			//有附檔 開啟附檔區域 not_attach_type_arr是判斷不開啟附檔 設定在init.js
 			if($.inArray(val.tp,not_attach_type_arr) < 0 && !this_event.find(".st-sub-box-2-attach-area").is(":visible")){
@@ -1880,7 +2107,13 @@ $(function(){
 					break;
 				case 4:
 					break;
-				case 5:
+				case 6://圖片
+					//this_event.find(".st-attach-img").show();
+					//.st-attach-img-arrow-l,.st-attach-img-arrow-r
+
+					//必須要知道總共有幾張圖片
+					//gallery_arr.push(val);
+
 					break;
 				case 9:
 					this_event.find(".st-attach-map").show();
@@ -1898,11 +2131,15 @@ $(function(){
 			    	});
 					break;
 				case 14:
+					end_time_chk = true;
 					break;
 			};
+
+			//若有圖片 則呼叫函式處理
+			if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr);
 			
-			//結束時間存在 就填入
-			if(val.e){
+			//需要填入結束時間 以及 結束時間存在 就填入
+			if(end_time_chk && val.e){
 				
     			var time = new Date(val.e);
         		var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
@@ -1920,6 +2157,29 @@ $(function(){
     		}
 			this_event.find(".st-box2-more-time span").html(time_format);
 		});
+	}
+
+
+
+	timelineGalleryMake = function (this_event,gallery_arr){
+
+		
+
+		
+		// var api_name = "groups/" + gi + "/files/" + val_obj.c + "?pi=" + val_obj.p;
+
+  //       var headers = {
+  //                "ui":ui,
+  //                "at":at, 
+  //                "li":"zh_TW",
+  //                    };
+  //       var method = "get";
+
+  //       var result = ajaxDo(api_name,headers,method,true);
+		// result.complete(function(data){
+		// 	console.debug("s3:",data);
+		// });
+
 	}
 
 /*

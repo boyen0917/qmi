@@ -23,8 +23,8 @@
         <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
     </div>
 
-    <div class="cp-vote-area">
-        
+    <div class="cp-vote-area" style="display:none">
+         
         
         <div class="cp-vote-add-ques">
             <img src="images/compose/vote/compose_post_vote_icon_add_yellow.png" style="width:35px"/>
@@ -33,20 +33,19 @@
         </div>
     </div>
 
-    <div class="cp-content-box cp-content-addcal">
+    <div class="cp-content-box cp-content-addcal" style="display:none">
         <img class="cp-icon-size" src="images/compose/vote/compose_form_icon_addcal.png"/>
         加入成員行事曆
         <img class="cp-icon-size cp-top-btn" src="images/compose/compose_form_icon_check_none.png"/>
     </div>
 
-    <div class="cp-content-box cp-content-first">
+    <div class="cp-content-box cp-content-first" style="display:none">
         <img class="cp-icon-size" src="images/compose/vote/compose_form_icon_first.png"/>
         優先處理
         <img class="cp-icon-size cp-top-btn" class="cp-top-btn" src="images/compose/compose_form_icon_check_none.png"/>
     </div>
 
-    <div class="cp-time-area">
-        <div class=""></div>
+    <div class="cp-time-area" style="display:none">
         <div class="cp-setdate-chk">
             <img src="images/common/icon/icon_check_gray.png"/>
             <span>指定開始時間</span>
@@ -58,13 +57,13 @@
                 <div class="cp-setdate-l-2">
                     
                     <div class="cp-setdate-ttl">開始時間</div>
-                    <div class="cp-setdate-start-text" style="display:none">立即發佈</div>
-                    <div class="cp-setdate-content">
+                    <div class="cp-setdate-start-text">立即發佈</div>
+                    <div class="cp-setdate-content" style="display:none">
                         <div class="cp-setdate-date">12月14日</div>
                         <div class="cp-setdate-time">09:00</div>
                         <div class="cp-setdate-week">星期二</div>
                     </div>
-                    
+                    <input class="cp-datetimepicker-start"/>
                 </div>
                 <div class="cp-setdate-l-3"></div>
             </div>
@@ -76,6 +75,7 @@
                         <div class="cp-setdate-time">09:00</div>
                         <div class="cp-setdate-week">星期二</div>
                     </div>
+                    <input class="cp-datetimepicker-end"/>
                 </div>
                 <div class="cp-setdate-r-2"></div>
             </div>
@@ -90,8 +90,11 @@
         </div>
     </div>
 
-</div>
 
+    <div class="cp-content-height-adj"></div>
+
+</div>
+<!-- end of cp-content -->
 
 
 
@@ -101,17 +104,17 @@
         <img src="images/common/icon/icon_compose_close.png"/>
         <span></span>
         <img src="images/compose/vote/compose_post_vote_icon_edit.png"/>
-        <textarea class="cp-vq-textarea-title textarea-animated" placeholder="主題" data-role="none"></textarea>
+        <textarea class="cp-vq-textarea-title textarea-animated cp-vote-empty-chk" placeholder="主題" data-role="none"></textarea>
     </div>
     <div class="cp-vote-opt">
         <img src="images/common/icon/icon_compose_close.png"/>
         <span>1</span>
-        <textarea class="cp-opt-textarea textarea-animated" placeholder="投票項目" data-role="none"></textarea>
+        <textarea class="cp-opt-textarea textarea-animated cp-vote-empty-chk" placeholder="投票項目" data-role="none"></textarea>
     </div>
     <div class="cp-vote-opt">
         <img src="images/common/icon/icon_compose_close.png"/>
         <span>2</span>
-        <textarea class="cp-opt-textarea textarea-animated" placeholder="投票項目" data-role="none"></textarea>
+        <textarea class="cp-opt-textarea textarea-animated cp-vote-empty-chk" placeholder="投票項目" data-role="none"></textarea>
     </div>
     <div class="cp-vote-add-opt">
         <img src="images/compose/vote/compose_post_vote_icon_add_gray.png" style="width:35px"/>
