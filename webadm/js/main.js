@@ -111,7 +111,10 @@ function prepareMembersData(orgTree,members){
         if(val["mobile"].indexOf("0")==0 && val["mobile"].length==10){
             val["mobile"]=val["mobile"].substring(1);
         }
+        val["ext"]=val["phone"].substring(val["phone"].indexOf("p")+1);
+        val["phone"]=val["phone"].substring(0,val["phone"].indexOf("p"));
         members[i]=val;
+        //console.log(members[i]["nickname"]+"   mail="+ members[i]["mail"]+"  phone="+members[i]["phone"]+" ext="+members[i]["ext"]+" mail="+members[i]["mail"]);
     });
 
     inviteMemberApi(orgTree,members);
@@ -192,7 +195,6 @@ function createBranchMember(parendId,node,members){
             if(mem_val[2]==node.branch_path){
                 console.log("create account "+(mem_val[0])+ " "+ node.branch_path+ " "+ mem_val[2]  +" api");
                 setMemberBranch(branchId,mem_val.gu);
-            }
         });
     }*/
     return branchId;
@@ -219,7 +221,7 @@ function setMemberBranch(branchId,groupUserId){
 
     ul[0]=user;
     body.ul=ul;
-
+    console.log(JSON.stringify(body));
     var result = ajaxDo(api_name,headers,method,false,JSON.stringify(body));
     
     result.complete(function(data){
@@ -297,6 +299,8 @@ function inviteMemberApi(orgTree,members){
         var member={};
         member.cc="+886";
         member.pn=val.mobile;
+        member.pn2=val.phone;
+        member.ext=val.ext;
         member.em=val.mail;
         member.nk=val.name;
         ul[i]=(member);

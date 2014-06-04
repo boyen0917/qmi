@@ -55,9 +55,48 @@
         	ui = $.parseJSON(data.responseText).ui;
             at = $.parseJSON(data.responseText).at;
 
-            switch(api_type){ // /groups/{gi}/timelines/{ti}/events(?ep={ep})
+            switch(api_type){ // groups/{gi}/invitations
+                case "invite":
+                    var api_name = "groups/d75bb5ec-7b1f-4dd1-9e60-e3f41e146c5c/invitations";
+
+                    var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW",
+                                 };
+                    var method = "post";
+
+                    var body = {
+                          "ul":
+                            [
+                              {
+                                "cc": "+886",
+                                "pn": "980922917",
+                                "em": body.ul.em,
+                                "nk": body.ul.nk
+                              }
+                            ]
+                        }
+                                     
+                    var result = ajaxDo(api_name,headers,method,true,body);
+                  break;
+                case "pic":///groups/{gi}/files/{fi}{?pi}
+                    var api_name = "groups/f8ea78e9-8f33-45ce-a94c-029a47464688/files/4c8b7326-a369-4a87-a3ab-adc554348d42?pi=0";
+
+                    var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW",
+                                 };
+                    var method = "get";
+
+                    var result = ajaxDo(api_name,headers,method,true);
+                  break;
+                case "upload":
+
+                  break;
                 case "compose_vote":
-                    var api_name = "groups/b1c77966-6037-4244-82fc-a37d4d0504a8/timelines/177bb2ec-0f7d-4dba-8d2d-6af8c8b225d7/events?ep=Event-665";
+                    var api_name = "groups/b1c77966-6037-4244-82fc-a37d4d0504a8/timelines/177bb2ec-0f7d-4dba-8d2d-6af8c8b225d7/events";
 
                     var headers = {
                              "ui":ui,
@@ -72,33 +111,35 @@
                             //"lv": 0(使用者)、1(團體)、2(團體使用者)、3(群組),
                             //"tp": [0](0=樓主,1=回覆訊息)、[1](0=訊息,1=公告,2=通報專區,3=任務-工作,4=任務-投票,5=任務-定點回報,6=行事曆)
                             "lv":"1",
-                            "tp":"14"
+                            "tp":"04"
                           },
                           "ml":[
-                          {
-                            "li": [
+                            {
+                              "li": [
                                 {
                                   "k": 0,
+                                  "t": "照片裡的人，誰最上相",
+                                  "v": 1,
                                   "i": [
                                     {
-                                      "k": 2
-                                    }
-                                  ]
-                                },
-                                {
-                                  "k": 1,
-                                  "i": [
-                                    {
-                                      "k": 2
+                                      "k": 0,
+                                      "o": "楊Google "
                                     },
                                     {
-                                      "k": 3
+                                      "k": 1,
+                                      "o": "楊股溝"
+                                    },
+                                    {
+                                      "k": 2,
+                                      "o": "股溝楊"
                                     }
                                   ]
                                 }
                               ],
-                              "tp": 15
-                          }
+                              "b": 1401282581000,
+                              "e": 1401368981000,
+                              "tp": 14
+                            } 
                           ]
                         }
                                      

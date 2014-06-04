@@ -29,6 +29,7 @@ $(function(){
 	$(".popup-close").click(function(){
 		$(".popup-screen").trigger("click");
 		$(".popup-close").trigger("pageChange");
+		$(".popup-close").trigger("reload");
 	});
 	
 	$(".popup-close-cancel").click(function(){
@@ -154,12 +155,13 @@ $(function(){
 	            var method = "get";
 	            var result = ajaxDo(api_name,headers,method,true);
 	            result.complete(function(data){
-	                if( data.status != 200 )
+	            	//所有團體列表
+	            	group_list = $.parseJSON(data.responseText).gl;
+
+	                if( group_list.length == 0 )
 	                {
 	                	$.mobile.changePage("#page-helper");
 	                } else {
-	                	//所有團體列表
-	                	group_list = $.parseJSON(data.responseText).gl;
 	                	
 	                	//上次點選團體
 	                	if($.lStorage(ui)){
@@ -451,15 +453,15 @@ $(function(){
 	    $("#page-group-main .ui-panel-content-wrap").addClass("page-fixed");
 	    
 		//計數
-		$("div[data-sm-act=feed] .sm-count").show();
-		$(".sm-group-area .sm-count").show();
+		//$("div[data-sm-act=feed] .sm-count").show();
+		//$(".sm-group-area .sm-count").show();
 		
 		//調整頭像大小
 		var img = $(".sm-user-pic img");
 		mathAvatarPos(img,img.width(),img.height(),avatar_size);
 		
-		//團體列表
-		groupMenuListArea();
+		//改做法 打開左側選單時 不load團體列表 改在timeline讀取時load
+		//groupMenuListArea();
 	});
 	
 	$("#side-menu").on( "panelbeforeclose", function() {
@@ -484,7 +486,7 @@ $(function(){
 	$(document).on("click",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
 		var icon_default = "images/side_menu/sidemenu_icon_";
 		var target = $(this);
-		console.log(target);
+		console.debug("target:",target);
 		//開關按鈕ui變化
 		if($(".sm-group-list-area-add").is(":visible") ){
 			if(target.data("switch-chk") == "check2"){
@@ -509,16 +511,22 @@ $(function(){
 		var icon_default = "images/side_menu/sidemenu_icon_";
 		var target = $(this);
 	    setTimeout(function(){
-	    	//開關按鈕ui變化
-	    	if($(".sm-group-list-area-add").is(":visible") ){
-	            if(target.data("switch-chk") == "check2"){
-	                $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
-	            }
-	        }else{
-	            if(target.data("switch-chk") == "check"){
-	                $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
-	            }
-	        }
+
+	    	//mouseup了 左側選單 團體調整線 直接刪除就好了 
+	    	$(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+	    	// //開關按鈕ui變化
+	    	// if($(".sm-group-list-area-add").is(":visible") ){
+	     //        if(target.data("switch-chk") == "check2"){
+	     //        	console.debug("??");
+	     //            $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+	     //        }
+	     //    }else{
+	     //    	console.debug("第三個團體的區域看不見");
+	     //        if(target.data("switch-chk") == "check"){
+	     //        	console.debug("！！");
+	     //            $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+	     //        }
+	     //    }
 	    	target.removeClass("sm-click-bg");
 	    	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
 	    	},500);
@@ -974,6 +982,7 @@ $(function(){
 		var tp = this_event.data("timeline-tp");
 		
 		console.debug("this event:",this_event.data());
+		console.debug("qasx");
 
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp);
@@ -981,11 +990,9 @@ $(function(){
 			return false;
 		}
 		
-
-		
 		//此則動態的按贊狀況
 		getThisTimelinePart(this_event,this_event.find(".st-reply-like-area img:eq(0)"),1);
-		
+
 		//單一動態詳細內容
 		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events/" + this_ei;
         var headers = {
@@ -1018,11 +1025,10 @@ $(function(){
 	    			case 4:
 	    				this_event.find(".st-box2-more-task-area").hide();
 	    				this_event.find(".st-box2-more-task-area-detail").show();
-
+	    				
 	    				if(this_event.data("task-over")) break;
 	    				//判斷有無投票過 顯示送出 已送出 已結束等等
 	    				var event_status = this_event.data("event-status");
-	    				console.debug("event data:",this_event.data());
 	    				if(event_status[this_ei] && event_status[this_ei].ik){
 	    					this_event.find(".st-vote-send").html("完成");
 	    					this_event.find(".st-vote-send").removeClass(".st-vote-send-blue");
@@ -1037,8 +1043,6 @@ $(function(){
 
 	    		//回覆 detail timeline message內容
 				replyDetailTimelineContentMake(this_event,e_data);
-
-
     		});
 	});
 
@@ -1047,7 +1051,6 @@ $(function(){
 	
 	//timeline裏面點擊不做展開收合的區域 設定在init.js
 	$(document).on("click",timeline_detail_exception.join(","),function(e){
-		console.log("stop propagation");
 		e.stopPropagation();
 	});
 	
@@ -1058,11 +1061,11 @@ $(function(){
 	//----------------------------------- timeline-貼文 ---------------------------------------------
 	
 	$(".cp-post").click(function(){
-		var this_event = $(document).find(".cp-content");
-		this_event.data("compose-content",$('.cp-textarea-desc').val());
-		this_event.data("compose-title",$('.cp-textarea-title').val());
+		var this_compose = $(document).find(".cp-content");
+		this_compose.data("compose-content",$('.cp-textarea-desc').val());
+		this_compose.data("compose-title",$('.cp-textarea-title').val());
 
-		var ctp = this_event.data("compose-tp");
+		var ctp = this_compose.data("compose-tp");
 		var empty_chk = true;
 
 		//錯誤訊息
@@ -1089,6 +1092,7 @@ $(function(){
 				break;
 			//任務 投票
 			case 4:
+				chk_arr.push(".cp-textarea-title");
 				break;
 			//任務 定點回報
 			case 5:
@@ -1104,7 +1108,7 @@ $(function(){
  			}
  		});
 
-		if(empty_chk) composeSend(this_event);   
+		if(empty_chk) composeSend(this_compose);   
 	});
 
 	
@@ -1116,7 +1120,10 @@ $(function(){
 		setTimeout(function(){
 			target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
 		},100);
-	})
+	});
+
+	
+	
 	
 	//----------------------------------- 聯絡人 ---------------------------------------------  
 	//功能選單
@@ -1302,7 +1309,43 @@ $(function(){
 	//	this_box.find(".audio-progress div:nth-child(3)").html(secondsToTime(Math.floor($(this).get(0).duration)));
 	//});
 
+	//.st-attach-img-arrow-l,.st-attach-img-arrow-r
+	// $(".st-attach-img-arrow-l, .st-attach-img-arrow-r").mouseover(function(){
+	// 	console.debug("dsafsdf");
+	// 	$(".st-attach-img-arrow-l, .st-attach-img-arrow-r").css("opacity",1);
+	// });
 
+	// $(".st-attach-img-arrow-r").click(function(){
+	// 	console.log("arrow l");
+	// 	$(".st-attach-img").animate({'left':'-=100%'},function(){
+	// 		console.log("complete");
+	// 	});
+	// });
 
+	// $(".st-attach-img-arrow-l").click(function(){
+	// 	console.log("arrow r");
+	// 	$(".st-attach-img").animate({'left':'+=100%'},function(){
+	// 		console.log("complete");
+	// 	});
+	// });
+
+	$(document).on("mouseover",".st-attach-img-arrow-l, .st-attach-img-arrow-r",function(){
+		$(this).parent().find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").css("opacity",1);
+	});
+
+	$(document).on("mouseout",".st-attach-img-arrow-l, .st-attach-img-arrow-r",function(){
+		$(this).parent().find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").css("opacity",0);
+	});
+	
+	$(document).on("click",".st-attach-img-arrow-r",function(){
+		$(this).parent().find(".st-slide-img").animate({'left':'-=395px'},function(){
+		});
+	});
+
+	$(document).on("click",".st-attach-img-arrow-l",function(){
+		$(this).parent().find(".st-slide-img").animate({'left':'+=395px'},function(){
+		});
+	});
+	
 
 });  

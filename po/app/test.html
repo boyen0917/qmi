@@ -21,35 +21,38 @@
 
 
     </style>
+    <link rel="stylesheet" type="text/css" href="datepicker/datetimepicker.css" />
+   
     <script src="../js/jquery.js"></script>
     <script src="js/linq.js"></script>
     <script src="js/jquery.plugin.js"></script>
-    
+     <script src="datepicker/datetimepicker.js"></script>
     <script type="text/javascript">
+
     $(function(){
 
-        url = "http://goo.gl/3adJSy";
+        // url = "http://goo.gl/3adJSy";
 
-        encode_url = "select%20*%20from%20html%20where%20url%3D%22" + url + "%22%20and%20xpath%3D%22%2F%2Fimg%7C%2F%2Ftitle%7C%2F%2Fhead%2Fmeta%5B%40property%3D'og%3Aimage'%20or%20%40property%3D'og%3Atitle'%20or%20%40property%3D'og%3Adescription'%20or%20%40name%3D'description'%20%5D%22%20and%20compat%3D%22html5%22";
-        var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encode_url + '&format=json&callback=?';
-        //var q = 'http://query.yahooapis.com/v1/public/yql?q=' +  + '&format=json&callback=?';
-            console.debug("url:",q);
-            $.ajax({
-                type: 'GET',
-                url: q, 
-                dataType: 'jsonp',
-                success: function(data, textStatus) {
-                    console.log(JSON.stringify(data,null,2));
-                }
-            });
-
-
+        // encode_url = "select%20*%20from%20html%20where%20url%3D%22" + url + "%22%20and%20xpath%3D%22%2F%2Fimg%7C%2F%2Ftitle%7C%2F%2Fhead%2Fmeta%5B%40property%3D'og%3Aimage'%20or%20%40property%3D'og%3Atitle'%20or%20%40property%3D'og%3Adescription'%20or%20%40name%3D'description'%20%5D%22%20and%20compat%3D%22html5%22";
+        // var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encode_url + '&format=json&callback=?';
+        // //var q = 'http://query.yahooapis.com/v1/public/yql?q=' +  + '&format=json&callback=?';
+        //     console.debug("url:",q);
+        //     $.ajax({
+        //         type: 'GET',
+        //         url: q, 
+        //         dataType: 'jsonp',
+        //         success: function(data, textStatus) {
+        //             console.log(JSON.stringify(data,null,2));
+        //         }
+        //     });
 
 
 
 
 
-        return false;
+
+
+        // return false;
         
         //拆成detail及timeline list版 並做 html entities 和 url a tag
         timelineContentFormat = function (c,limit){
@@ -152,20 +155,68 @@
         //     $(this).val(value);
         // });
 
-        $("button").click(function(){
-            var value = $("textarea:eq(0)").val();
+        $("buttons").click(function(){
+            dd = 1401282581000;
+            $("#start").datetimepicker("reset");
+
+            var time = new Date(dd);
+            var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
+            // time_format = time_format.split(",");
+            console.log(time_format);
+            // console.log(time_format[0]);
+            // console.log(time_format[1]);
+            // console.log(time_format[2]);
+            // var value = $("textarea:eq(0)").val();
 
 
-            var tt = urlFormat2(value);
+            // var tt = urlFormat2(value);
 
-            $("div:eq(0)").html(tt);
+            // $("div:eq(0)").html(tt);
+            $("input.DateFrom").datepicker("show");
         });
 
-         
+        // $("input.DateFrom").bind("input",function(){
+        //     console.log($("input.DateFrom").val());
+        // });
+
+        // $("input.DateFrom").datepicker({
+        //     minDate: 0  ,
+        //     dateFormat: "@",
+        //     onSelect: function(dateText) {
+        //         console.log(dateText);
+        //     }
+        // });
+
+        var arr = ["a","b","c","d","e"];
+        arr.push("tail");
+        arr.unshift("head");
+
+        console.debug("arr:",arr);
+        
+
+        $("#start").datetimepicker({
+            minDate: "2014/5/22",
+            format:'unixtime',
+            onChangeDateTime:function(){
+                var time = new Date($("#start").val()*1000);
+                $("#end").datetimepicker({
+                    minDate: time.customFormat( "#YYYY#/#M#/#D#" )
+                });
+
+            }
+        });
+
+        $("#end").datetimepicker({
+            minDate: "2014/5/22",
+            format:'unixtime'
+        });
+
     });
     </script>
 </head>
 <body>
+    <input id="start">
+    <input id="end">
     <textarea></textarea><br/><button>送出</button>
     <div style="font-size:15px;width:300px;height:200px;border:1px solid;"></div>
     <div style="font-size:15px;width:300px;height:200px;border:1px solid red;"></div>
