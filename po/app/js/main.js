@@ -43,8 +43,8 @@ $(function(){
 	
 	$(document).ajaxSend(function() {
 
-		console.log("ajax send! count : " + ajax_count);
-		ajax_count++;
+		// console.log("ajax send! count : " + ajax_count);
+		// ajax_count++;
 
 		//顯示 loading
 		if(!load_show) return false;
@@ -838,8 +838,79 @@ $(function(){
 		putEventStatus(target_obj,1,est);
 	});
 
-	
+	//留言
+	$(document).on('click','.st-message',function(){
+		
+		//判斷開啟或關閉
+		var movement = $(".st-reply-message-area").data("movement");
 
+		//設定 this event
+		var this_event = $(this).parents(".st-sub-box");
+
+		//開啟detail
+		console.debug("event data:",this_event.data());
+		if(!this_event.data("switch-chk")){
+			console.log("yooooooo");
+			this_event.find(".st-sub-box-1").trigger("click");
+		}
+
+		var new_ei = this_event.data("event-id");
+		var old_ei = $(".st-reply-message-area").data("event-id");
+
+		//將新的ei 更新進留言區域
+		$(".st-reply-message-area").data("event-id",new_ei);
+
+		//如果留言區域在沒關閉時就點選新的event => 重新開啟留言區域 然後不執行之後的開關
+		if(movement == -50 && new_ei != old_ei){
+			$(".st-reply-message-area").css("bottom",-50);
+			$(".st-reply-message-area").animate({bottom:0});
+			return false;
+		}
+		
+		//動畫結束與否
+		var animate_chk = $(".st-reply-message-area").data("animate-chk");
+
+		if(animate_chk){
+			//變成不能開啟狀態
+			$(".st-reply-message-area").data("animate-chk",false);
+
+			$(".st-reply-message-area").animate({bottom:movement},function(){
+				//變成可以開啟狀態
+				$(".st-reply-message-area").data("animate-chk",true);
+
+
+				if(movement == 0){
+					$(".st-reply-message-area").data("movement",-50);
+				}else{
+					$(".st-reply-message-area").data("movement",0);
+				}
+				
+			});
+		}
+	});
+
+	//滾動隱藏留言
+	$(document).on('scroll',function(){
+		if($(".st-reply-message-area").data("movement") == 0) return false;
+
+		$(".st-reply-message-area").data("movement",0);
+		$(".st-reply-message-area").data("animate-chk",false);
+
+		$(".st-reply-message-area").animate({bottom:"-50px"},function(){
+			//變成可以開啟狀態
+			$(".st-reply-message-area").data("animate-chk",true);
+			
+		});		
+	});
+
+	//留言送出
+	$(".st-reply-message-send").click(function(){
+		var this_msg = $(this).parents(".st-reply-message-area");
+		var msg_content = this_msg.find(".st-reply-message-textarea textarea").val();
+		this_msg.data("msg-content",msg_content);
+		console.debug("msg data:",this_msg.data())
+		replySend(this_msg);
+	});
 
 
 
@@ -976,13 +1047,20 @@ $(function(){
 	//為了排除複製 滑鼠按下少於0.1秒 判斷為click  暫時不做 
 	//detail view
 	$(document).on("click",".st-sub-box-1, .st-sub-box-2",function(e){
+
+		
+
 		var this_event = $(this).parent();
 		var this_ei = this_event.data("event-id");
 		//此則timeline種類
 		var tp = this_event.data("timeline-tp");
 		
-		console.debug("this event:",this_event.data());
-		console.debug("qasx");
+		//判斷現在是開啟還是關閉
+		if(this_event.data("switch-chk")){
+			this_event.data("switch-chk",false);
+		}else{
+			this_event.data("switch-chk",true);
+		}
 
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp);
@@ -1329,23 +1407,24 @@ $(function(){
 	// 	});
 	// });
 
-	$(document).on("mouseover",".st-attach-img-arrow-l, .st-attach-img-arrow-r",function(){
-		$(this).parent().find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").css("opacity",1);
-	});
+	//this_gallery
+	// $(document).on("mouseover",".st-attach-img",function(){
+	// 	$(this).parent().find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").show();
+	// });
 
-	$(document).on("mouseout",".st-attach-img-arrow-l, .st-attach-img-arrow-r",function(){
-		$(this).parent().find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").css("opacity",0);
-	});
+	// $(document).on("mouseout",".st-attach-img",function(){
+	// 	$(this).parent().find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").hide();
+	// });
 	
-	$(document).on("click",".st-attach-img-arrow-r",function(){
-		$(this).parent().find(".st-slide-img").animate({'left':'-=395px'},function(){
-		});
-	});
+	// $(document).on("click",".st-attach-img-arrow-r",function(){
+	// 	$(this).parent().find(".st-slide-img").animate({'left':'-=360px'},function(){
+	// 	});
+	// });
 
-	$(document).on("click",".st-attach-img-arrow-l",function(){
-		$(this).parent().find(".st-slide-img").animate({'left':'+=395px'},function(){
-		});
-	});
+	// $(document).on("click",".st-attach-img-arrow-l",function(){
+	// 	$(this).parent().find(".st-slide-img").animate({'left':'+=360px'},function(){
+	// 	});
+	// });
 	
 
 });  

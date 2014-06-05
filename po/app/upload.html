@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Project O</title>
+
+        <link href="http://hayageek.github.io/jQuery-Upload-File/uploadfile.min.css" rel="stylesheet">
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="http://hayageek.github.io/jQuery-Upload-File/jquery.uploadfile.min.js"></script>
+    </head>
+    <body>
+    	<div id="fileuploader">Upload</div>
+        <script type="text/javascript">
+	        $(function(){
+				$("#fileuploader").uploadFile({
+					url:"https://project-o.s3.amazonaws.com/groups/3c8552fa-f544-4261-a63a-b0d6064c6197/0/424afd5e-9f55-4c7b-89e2-214977b8ba62?Expires=1717247541&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=TGcP9E%2FMWER3EqvDG%2FWg%2FTg5Wzs%3D",
+					onSuccess:function(files,data,xhr){
+						console.debug("files:",files);
+						console.debug("data:",data);
+						console.debug("xhr:",xhr);
+					}
+					});	        	
+	        });
+        </script>
+    </body>
+</html>

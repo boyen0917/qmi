@@ -304,6 +304,10 @@ $(function(){
 		}
 		
 		//製作每個回覆
+
+		//製作前先清空
+		this_event.find(".st-reply-content-area").parent().remove();
+
 		$.each(e_data,function(el_i,el){
 			console.log("====================回覆============================================================================");
 			console.log(el);
@@ -377,8 +381,6 @@ $(function(){
     		//部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
 			if(without_message || (el.meta.tp.substring(0,1)*1 == 0)) return;
 
-    		
-			
 			this_event.find(".st-reply-area").append($('<div>').load('layout/layout.html .st-reply-content-area',function(){
 				var _groupList = $.lStorage(ui);
 				var user_name = _groupList[gi].guAll[el.meta.gu].n;
@@ -631,6 +633,10 @@ $(function(){
 
 	bindVoteEvent = function (this_event){
 		
+		this_event.find(".st-vote-ques-area-div").click(function(){
+			console.debug("按到題目了:",$(this));
+
+		});		
 
 		this_event.find(".st-vote-detail-option").click(function(){
 			console.debug("進來");
@@ -643,15 +649,15 @@ $(function(){
 			var this_ques = $(this).parent();
 			var this_opt = $(this);
 
-			//該選項的總計數 單選復選都適用
-			var opt_cnt = this_opt.find("span:eq(1)").html()*1;
-
 			//復選的已選計數 單選也用來判斷有無投票
 			var vote_cnt = this_ques.data("multi-count");
 			var vote_chk = false;
 
 			//複選
 			if(this_ques.data("vote-multi") > 1){
+				//該選項的總計數
+				var opt_cnt = this_opt.find("span:eq(1)").html()*1;
+
 				console.debug("復選");
 				//復選的情況就要判斷該選項是否已選擇
 				if(this_opt.data("vote-chk")){
@@ -669,13 +675,15 @@ $(function(){
 				}else if(vote_cnt <  this_ques.data("vote-multi")){
 
 					this_opt.data("vote-chk",true);
-					this_opt.find("img").attr("src",this_ques.data("tick-img"));
 
 					//加一 統計複選票數 才能計算是否達複選上限
 					this_ques.data("multi-count",vote_cnt+1);
 
 					//該項總計加一
 					opt_cnt += 1;
+
+					//複選 這時要變勾勾
+					this_opt.find("img").attr("src",this_ques.data("tick-img"));
 				}
 
 			//單選
@@ -684,6 +692,7 @@ $(function(){
 				//找出點選的那一項要減一
 				$.each(this_ques.find(".st-vote-detail-option"),function(i,val){
 					if($(this).data("vote-chk")){
+						console.debug("here");
 						//找出點選的那一項的vote-chk 變false
 						$(this).data("vote-chk",false);
 						//找出點選的那一項 變成白圈圈
@@ -696,7 +705,12 @@ $(function(){
 					}
 				});
 
+				//該選項的總計數
+				var opt_cnt = this_opt.find("span:eq(1)").html()*1;
+
 				this_opt.data("vote-chk",true);
+
+				//單選 選到的直接是圈圈
 				this_opt.find("img").attr("src",this_ques.data("tick-img"));
 
 
@@ -727,7 +741,6 @@ $(function(){
 			//綁過不要再綁 會重複執行
 			this_event.data("vote-bind-chk",true);
 
-			console.debug("st-vote-send");
 			//沒藍色表示不給送出
 			if(!$(this).hasClass("st-vote-send-blue")){
 				return false;
@@ -798,7 +811,7 @@ $(function(){
 
 	        var method = "post";
 	        var result = ajaxDo(api_name,headers,method,true,body);
-	        result.success(function(data){
+	        result.complete(function(data){
 
 	        	//重新讀取detail
 	        	popupShowAdjust("回覆成功");
@@ -1774,12 +1787,7 @@ $(function(){
 	        		switch(tp){
 	        			//貼文
 	        			case 0:
-	        				//$(this).find(".st-sub-box-2").html(box_content);
-	        	    		//不知道要幹嘛
-	        				//$(this).find(".st-sub-box-2").attr("data-st-cnt",i);
 	        				this_event.find(".st-sub-box-2-more").hide();
-	        				//timeline內容
-	        				
 	        				break;
 	        			//公告
 	        			case 1:
@@ -2108,11 +2116,11 @@ $(function(){
 				case 4:
 					break;
 				case 6://圖片
-					//this_event.find(".st-attach-img").show();
+					this_event.find(".st-attach-img").show();
 					//.st-attach-img-arrow-l,.st-attach-img-arrow-r
 
 					//必須要知道總共有幾張圖片
-					//gallery_arr.push(val);
+					gallery_arr.push(val);
 
 					break;
 				case 9:
@@ -2134,9 +2142,6 @@ $(function(){
 					end_time_chk = true;
 					break;
 			};
-
-			//若有圖片 則呼叫函式處理
-			if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr);
 			
 			//需要填入結束時間 以及 結束時間存在 就填入
 			if(end_time_chk && val.e){
@@ -2157,29 +2162,146 @@ $(function(){
     		}
 			this_event.find(".st-box2-more-time span").html(time_format);
 		});
+
+		//若有圖片 則呼叫函式處理
+		if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr);
 	}
 
 
 
 	timelineGalleryMake = function (this_event,gallery_arr){
+		// console.debug(this_event.data("event-id")+"  "+"gallery:",gallery_arr);
+		// console.debug("gallery length:",gallery_arr.length);
 
+		var this_gallery = this_event.find(".st-attach-img");
+		//記錄圖片張數 以計算位移
+ 		this_gallery.data("gallery-cnt",0);
+
+ 		//檢查移動是否完成
+ 		this_gallery.data("gallery-move-chk",true);
+
+		$.each(gallery_arr,function(i,val){
+
+			//getS3file(val.c);
+
+			var this_img = $(
+				'<div class="st-slide-img">' +
+	            	'<img src="images/loading.gif" style="width:30px;position: relative;top: 130px;"/>' +
+	            '</div>' +
+	            '<span class="st-img-gap"></span>'
+			);
+			this_event.find(".st-attach-img-area").prepend(this_img);
+
+			getS3file(val,gi,this_img,6);
+	            
+		});
 		
+		//gallery 移動事件
+		var this_gallery = this_event.find(".st-attach-img");
+		this_gallery.mouseover(function(){
+			if(gallery_arr.length > 1){
+				this_gallery.find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").show();
+			}
+		});
 
+		this_gallery.mouseout(function(){
+			this_gallery.find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").hide();
+		});
 		
-		// var api_name = "groups/" + gi + "/files/" + val_obj.c + "?pi=" + val_obj.p;
+		this_gallery.find(".st-attach-img-arrow-r").click(function(){
 
-  //       var headers = {
-  //                "ui":ui,
-  //                "at":at, 
-  //                "li":"zh_TW",
-  //                    };
-  //       var method = "get";
+			//判斷可否移動
+			if(this_gallery.data("gallery-move-chk")){
+				this_gallery.data("gallery-move-chk",false);
+			}else{
+				return false;
+			}
 
-  //       var result = ajaxDo(api_name,headers,method,true);
-		// result.complete(function(data){
-		// 	console.debug("s3:",data);
-		// });
+			var gallery_cnt = this_gallery.data("gallery-cnt");//gallery_movement
+			gallery_cnt += 1;
+			
+			//右移 若超過總共張數 就左移到第一張
+			if(gallery_cnt >= gallery_arr.length){
+				gallery_cnt = 0;
+				var movement = {'left':'+=' + gallery_movement*(gallery_arr.length-1) + 'px'};
+			}else{
+				var movement = {'left':'-=' + gallery_movement + 'px'};
+			}
 
+			//開始移動
+			this_gallery.find(".st-slide-img").animate(movement,function(){
+				this_gallery.data("gallery-cnt",gallery_cnt);
+				this_gallery.data("gallery-move-chk",true);
+			});
+		});
+
+		this_gallery.find(".st-attach-img-arrow-l").click(function(){
+
+			//判斷可否移動
+			if(this_gallery.data("gallery-move-chk")){
+				this_gallery.data("gallery-move-chk",false);
+			}else{
+				return false;
+			}
+
+			var gallery_cnt = this_gallery.data("gallery-cnt");//gallery_movement
+			gallery_cnt -= 1;
+			
+			//左移 若小於第一張 就右移到最後一張
+			if(gallery_cnt < 0){
+				gallery_cnt = gallery_arr.length-1;
+				var movement = {'left':'-=' + gallery_movement*(gallery_arr.length-1) + 'px'};
+			}else{
+				var movement = {'left':'+=' + gallery_movement + 'px'};
+			}
+
+			//移動
+			this_gallery.find(".st-slide-img").animate(movement,function(){
+				this_gallery.data("gallery-cnt",gallery_cnt);
+				this_gallery.data("gallery-move-chk",true);
+			});
+		});
+
+	}
+
+	getS3file = function(file_obj,gi,target,tp){
+		var api_name = "groups/" + gi + "/files/" + file_obj.c + "?pi=" + file_obj.p;
+
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":"zh_TW",
+                     };
+        var method = "get";
+
+        var result = ajaxDo(api_name,headers,method,true);
+		result.complete(function(data){
+			var obj =$.parseJSON(data.responseText);
+			if(obj.rsp_code != 0) return false;
+
+			if(target && tp){
+				switch(tp){
+					case 6://圖片
+						var img = target.find("img");
+						img.load(function() {
+
+							//重設 style
+							target.find("img").removeAttr("style");
+
+							var w = img.width();
+				            var h = img.height();
+            
+            				mathAvatarPos(img,w,h,350);
+				        });
+
+						target.find("img").attr("src",obj.s3);
+						
+						break;
+				}
+			}else{
+				return obj.s3;
+			}
+		});
 	}
 
 /*
@@ -2414,6 +2536,73 @@ $(function(){
 			  	}
 		},1000);
 	}
+
+
+	replySend = function(this_msg){
+
+		var body = {
+				"meta" : {
+					"lv" : 1,
+					"tp" : "10"
+				},
+				"ml" : [
+					{
+						"c": this_msg.data("msg-content"),
+						"tp": 0
+					}
+				]
+			};
+
+			var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_msg.data("event-id");
+
+	        var headers = {
+	                 "ui":ui,
+	                 "at":at, 
+	                 "li":"zh_TW",
+	                     };
+
+
+	        var method = "post";
+	        var result = ajaxDo(api_name,headers,method,true,body);
+	        result.complete(function(data){
+
+	        	//重新讀取detail
+	        	popupShowAdjust("回覆成功");
+	        	//客製化 按了確定之後再重讀取
+	        	$(".popup-close").bind("reply",function(){
+	        		var this_event;
+
+	        		$(".st-sub-box").each(function(){
+	        			this_event = $(this);
+						return false;
+					});
+	        		
+					if(!this_event) return false;
+
+	        		//重設任務完成狀態
+	        		setEventStatus(this_event);
+
+	        		//重設完整的detail
+					this_event.data("detail-content",false);
+		    		this_event.find(".st-vote-ques-area-div").remove();
+		    		// timelineDetailClose toggle負負得正
+		    		this_event.find(".st-reply-area").hide();
+
+
+		      		this_event.find(".st-sub-box-1").trigger("click");
+					$(".popup-close").unbind("reply");
+				});
+
+				$(".popup-close").click(function(){
+					$(this).trigger("reply");
+				});
+	        });
+	}
+
+	reloadDetail = function(){
+
+	};
+
 	    
 	  //計算彈出對話框置中
 	popupShowAdjust = function (desc,cancel){

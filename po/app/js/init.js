@@ -49,6 +49,9 @@ $(function(){
 	//ajax 使用次數
 	ajax_count = 0;
 
+	//timeline圖片移動距離
+	gallery_movement = 360;
+
 
 	
 });

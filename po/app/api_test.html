@@ -30,6 +30,8 @@
     	
     	// Getting URL var by its nam
     	api_type = $.getUrlVar('api_type');
+
+      if(!api_type) return false;
     	//api 網址
         var base_url = "https://apserver.mitake.com.tw/apiv1/";
         //var base_url = "http://10.1.17.116:8090/apiv1/";
@@ -49,7 +51,7 @@
         	    "li":"zh_TW"
         	        };
         var method = "post";
-        
+
         var result = ajaxDo(api_name,headers,method,true);
         result.complete(function(data){
         	ui = $.parseJSON(data.responseText).ui;
@@ -80,6 +82,24 @@
                                      
                     var result = ajaxDo(api_name,headers,method,true,body);
                   break;
+                case "upload_s3":
+                    //https://project-o.s3.amazonaws.com/groups/3c8552fa-f544-4261-a63a-b0d6064c6197/0/0fc2fe86-9220-4583-a3fa-72712b0fd194?Expires=1717246979&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=2pR2bpYvzmm5BYRsrD90fxewmFs%3D
+                  break;
+                case "upload":///groups/{gi}/files
+                    var api_name = "groups/3c8552fa-f544-4261-a63a-b0d6064c6197/files";
+
+                    var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW",
+                                 };
+                    var method = "post";
+                    var body = {
+                          fn:"test"
+                        }
+
+                    var result = ajaxDo(api_name,headers,method,true,body);
+                  break;
                 case "pic":///groups/{gi}/files/{fi}{?pi}
                     var api_name = "groups/f8ea78e9-8f33-45ce-a94c-029a47464688/files/4c8b7326-a369-4a87-a3ab-adc554348d42?pi=0";
 
@@ -91,9 +111,6 @@
                     var method = "get";
 
                     var result = ajaxDo(api_name,headers,method,true);
-                  break;
-                case "upload":
-
                   break;
                 case "compose_vote":
                     var api_name = "groups/b1c77966-6037-4244-82fc-a37d4d0504a8/timelines/177bb2ec-0f7d-4dba-8d2d-6af8c8b225d7/events";
