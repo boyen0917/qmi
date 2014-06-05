@@ -827,6 +827,7 @@ $(function(){
 		    		// timelineDetailClose toggle負負得正
 		    		this_event.find(".st-reply-area").hide();
 
+		    		this_event.data("switch-chk",false);
 
 		      		this_event.find(".st-sub-box-1").trigger("click");
 					$(".popup-close").unbind("reload");
@@ -2576,7 +2577,7 @@ $(function(){
 	        			this_event = $(this);
 						return false;
 					});
-	        		
+
 					if(!this_event) return false;
 
 	        		//重設任務完成狀態
