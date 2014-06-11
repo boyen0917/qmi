@@ -454,37 +454,6 @@
                 </div>
             </div>
             <div class="cp-content-load">
-                <div data-sp-box="title" class="cp-content-box cp-content-title" style="display:none">
-                        <img src="images/compose/compose_form_icon_title.png"/>
-                        <textarea data-cp-name="標題" class="cp-textarea-title" placeholder="標題" data-role="none"></textarea>
-                </div>
-                <div data-sp-box="apt" class="cp-content-box cp-content-apt" style="display:none">
-                    <img src="images/compose/compose_form_icon_apt.png"/>
-                    所屬部門
-                    <div class="cp-apt-btn-area">以個人身份發佈<img src="images/ap_box_arrow.png"/></div>
-                </div>
-                <div data-sp-box="object" class="cp-content-box cp-content-object">
-                    <img src="images/compose/compose_form_icon_object.png"/>
-                    發佈對象
-                    <img class="cp-object-btn" src="images/ap_box_arrow.png"/>
-                </div>
-                <div data-sp-box="top" class="cp-content-box cp-content-top" style="display:none">
-                    <img src="images/compose/compose_form_icon_top.png"/>
-                    共同置頂
-                    <img class="cp-top-btn" data-ap-top="0" src="images/compose/compose_form_icon_check_none.png"/>
-                </div>
-                <div class="cp-content-textarea">
-                    <img src="images/compose/compose_form_icon_description.png"/>
-                    <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
-                    
-                </div>
-                <div class="cp-attach-area" style="display:none">
-                    <div class="cp-ta-yql">
-                        <div class="cp-yql-title"></div>
-                        <div class="cp-yql-img"></div>
-                        <div class="cp-yql-desc"></div>
-                    </div>
-                </div>
 
             </div>
             <div class="cp-footer">
@@ -493,6 +462,7 @@
                 <div data-cp-addfile="video" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_video.png"/></div>
                 <div data-cp-addfile="voice" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_voice.png"/></div>
                 <div data-cp-addfile="map" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_map.png"/></div>
+                <input class="cp-file" type="file" multiple style="display:none;" data-role="none"/>
             </div>
         </div>
 
@@ -607,7 +577,10 @@
 		  <a href="#" class="popup-close-cancel" data-role="button" data-inline="true">取消</a>
 		  </div>
 		  <div class="popup-screen"></div>
+
 		</div>
+        
+        <div class="ajax-screen-lock"></div>
 
         <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
         

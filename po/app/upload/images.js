@@ -1,45 +1,63 @@
-window.onload = function() {
-
-		var fileInput = document.getElementById('fileInput');
-		var fileDisplayArea = document.getElementById('fileDisplayArea');
-
-
-		fileInput.addEventListener('change', function(e) {
-			var file = fileInput.files[0];
+$(function(){  
 			var imageType = /image.*/;
-			if (file.type.match(imageType)) {
-				var reader = new FileReader();
+			var file_clone = [];
+			$("#fileInput").data("img-compose-arr",[]);
+			$("#fileInput").data("img-compose-arr")[3] = 1;
+			$("#fileInput").data("img-compose-arr")[5] = 2;
+			console.log($("#fileInput").data("img-compose-arr"));
 
-				reader.onload = function(e) {
-					fileDisplayArea.innerHTML = "";
+		$("#fileInput").change(function(e) {
+			var file_ori = $(this);
 
-					var img = new Image();
-					img.src = reader.result;
-
-					fileDisplayArea.appendChild(img);
+			$.each(file_ori[0].files,function(i,file){
+				if (file.type.match(imageType)) {
+					file_clone.push(file);
 				}
+			});
+			console.log(file_clone[0].type);
+			console.log(file_clone[0].size);
+			file_ori.replaceWith( file_ori.val('').clone( true ) );
 
-				reader.readAsDataURL(file);	
+// return false;
+			var imageType = /image.*/;
+			fileDisplayArea.innerHTML = "";
+			$.each(file_clone,function(i,file){
+				if (file.type.match(imageType)) {
+					var reader = new FileReader();
 
+					reader.onload = function(e) {
+						
 
+						var img = new Image();
+						img.src = reader.result;
+						
+						fileDisplayArea.appendChild(img);
+					}
 
-			} else {
-				fileDisplayArea.innerHTML = "File not supported!";
-			}
+					reader.readAsDataURL(file);	
+
+				} else {
+					console.log(this);
+					fileDisplayArea.appendChild("File not supported!");
+				}
+			});
+				
 		});
-
 
 		$("#submitt").click(function(){
-			console.debug("comming~");
-			var file = fileInput.files[0];
-
-			    $.ajax({
-				  url: "https://project-o.s3.amazonaws.com/groups/3c8552fa-f544-4261-a63a-b0d6064c6197/0/fdb81b32-392a-4fad-a3f0-4b21c2c08e93?Expires=1717252285&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=o%2F5gcsfae3wzXppFCO%2BQTl%2Bfg8w%3D", // the presigned URL
-				  type: 'PUT',
-				  data: file,
-				  processData: false,
-				  success: function() { console.log('Uploaded data successfully.'); }
-				});
+			var file = $("#fileInput")[0].files[0];
+			$.ajax({
+					url: "https://project-o.s3.amazonaws.com/groups/1a9bca59-766d-402d-b5ea-9ad973e10d45/0/bd157262-4fba-46e8-8bff-3c293054e802?Expires=1717750370&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=kFGP9K6XlGVks9N7Xz%2BFfZdtaCE%3D",
+					type: 'PUT',
+					contentType: " ",
+				 	data: file, 
+					processData: false,
+					complete: function(data) { 
+						console.log(data);
+					}
+			});
+			//
+			    
 		});
 
-}
+})

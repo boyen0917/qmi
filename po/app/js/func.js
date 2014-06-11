@@ -845,9 +845,17 @@ $(function(){
 
 			var this_compose = $(this).find(".cp-content");
 			this_compose.css("min-height",$(window).height());
-			//this_compose.find(".cp-content-height-adj").css("min-height",$(window).height()+800);
-			console.debug("pos:",this_compose.find(".cp-content-height-adj").offset());
+			//發文類型陣列以及檢查附檔存在
 			this_compose.data("message-list",[0]);
+
+			//圖片上傳物件及流水號
+			this_compose.data("upload-obj",{});
+			this_compose.data("upload-ai",0);
+
+			this_compose.data("body",{});
+
+			//附檔區域是否存在檔案 用來判斷開關
+			this_compose.data("attach",false);
 
 			// this_compose.find('.cp-textarea-desc, .cp-vote-area textarea').autosize({append: "\n"});
 
@@ -924,13 +932,62 @@ $(function(){
 						return false;
 					}else{
 			            //暫時
-			            this_compose.find(".cp-attach-area").hide();
-						this_compose.find(".cp-ta-yql").hide();
+			   			//this_compose.find(".cp-attach-area").hide();
+						// this_compose.find(".cp-ta-yql").hide();
 					}
 				});
 			});
 
+
+			//datetimepicker
 			if(show_date){
+				setDateTimePicker(this_compose);
+			}
+		}));
+	}
+
+	setDateTimePicker = function(this_compose){
+		//設定現在時間
+		var time = new Date();
+		var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
+        var time_format_arr = time_format.split(",");
+		this_compose.find(".cp-setdate-l .cp-setdate-date").html(time_format_arr[0]);
+        this_compose.find(".cp-setdate-l .cp-setdate-week").html(time_format_arr[1]);
+        this_compose.find(".cp-setdate-l .cp-setdate-time").html(time_format_arr[2]);
+
+        //設定明天時間new Date().getTime() + 24 * 60 * 60 * 1000;
+        var tomorrow_time = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+		var tomorrow_time_format = tomorrow_time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
+        var tomorrow_time_format_arr = tomorrow_time_format.split(",");
+		this_compose.find(".cp-setdate-r .cp-setdate-date").html(tomorrow_time_format_arr[0]);
+        this_compose.find(".cp-setdate-r .cp-setdate-week").html(tomorrow_time_format_arr[1]);
+        this_compose.find(".cp-setdate-r .cp-setdate-time").html(tomorrow_time_format_arr[2]);
+
+        //現在時間預設為今天的unixtime * 1000
+        var milliseconds = (new Date).getTime();
+		var unixtime = Math.round(milliseconds/1000);		
+
+		this_compose.data("start-timestamp",unixtime * 1000);
+
+		//結束時間預設為明天的unixtime * 1000
+        var tomorrow_milliseconds = (new Date).getTime() + 24 * 60 * 60 * 1000;
+		var tomorrow_unixtime = Math.round(tomorrow_milliseconds/1000);		
+
+		this_compose.data("end-timestamp",tomorrow_unixtime * 1000);
+
+        //指定開始時間
+		this_compose.find(".cp-setdate-chk").click(function(){
+			var start_time_chk = this_compose.data("start-time-chk");
+
+			//若是關閉開始時間 則將開始日期改為今天 以及 將結束時間的minDate設定為今天
+			if(start_time_chk){
+				$(this).find("img").attr("src","images/common/icon/icon_check_gray.png");
+				$(this).find("span").removeClass("cp-start-time-text");
+
+				this_compose.data("start-time-chk",false);
+
+				//關閉開始時間 同時將開始日期改為今天
+
 				//設定現在時間
 				var time = new Date();
 				var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
@@ -939,125 +996,82 @@ $(function(){
 		        this_compose.find(".cp-setdate-l .cp-setdate-week").html(time_format_arr[1]);
 		        this_compose.find(".cp-setdate-l .cp-setdate-time").html(time_format_arr[2]);
 
-		        //設定明天時間new Date().getTime() + 24 * 60 * 60 * 1000;
-		        var tomorrow_time = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-				var tomorrow_time_format = tomorrow_time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
-		        var tomorrow_time_format_arr = tomorrow_time_format.split(",");
-				this_compose.find(".cp-setdate-r .cp-setdate-date").html(tomorrow_time_format_arr[0]);
-		        this_compose.find(".cp-setdate-r .cp-setdate-week").html(tomorrow_time_format_arr[1]);
-		        this_compose.find(".cp-setdate-r .cp-setdate-time").html(tomorrow_time_format_arr[2]);
+		        var start_input = this_compose.find("input.cp-datetimepicker-start");
+		        var end_input = this_compose.find("input.cp-datetimepicker-end");
 
-		        //現在時間預設為今天的unixtime * 1000
-		        var milliseconds = (new Date).getTime();
-        		var unixtime = Math.round(milliseconds/1000);		
-
-        		this_compose.data("start-timestamp",unixtime * 1000);
-
-        		//結束時間預設為明天的unixtime * 1000
-		        var tomorrow_milliseconds = (new Date).getTime() + 24 * 60 * 60 * 1000;
-        		var tomorrow_unixtime = Math.round(tomorrow_milliseconds/1000);		
-
-        		this_compose.data("end-timestamp",tomorrow_unixtime * 1000);
-
-		        //指定開始時間
-				this_compose.find(".cp-setdate-chk").click(function(){
-					var start_time_chk = this_compose.data("start-time-chk");
-
-					//若是關閉開始時間 則將開始日期改為今天 以及 將結束時間的minDate設定為今天
-					if(start_time_chk){
-						$(this).find("img").attr("src","images/common/icon/icon_check_gray.png");
-						$(this).find("span").removeClass("cp-start-time-text");
-
-						this_compose.data("start-time-chk",false);
-
-						//關閉開始時間 同時將開始日期改為今天
-
-						//設定現在時間
-						var time = new Date();
-						var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
-				        var time_format_arr = time_format.split(",");
-						this_compose.find(".cp-setdate-l .cp-setdate-date").html(time_format_arr[0]);
-				        this_compose.find(".cp-setdate-l .cp-setdate-week").html(time_format_arr[1]);
-				        this_compose.find(".cp-setdate-l .cp-setdate-time").html(time_format_arr[2]);
-
-				        var start_input = this_compose.find("input.cp-datetimepicker-start");
-				        var end_input = this_compose.find("input.cp-datetimepicker-end");
-
-				        //現在時間的unixtime
-						var milliseconds = (new Date).getTime();
-        				var unixtime = Math.round(milliseconds/1000);
-                		
-                		//設定 datetimepicker
-						start_input.datetimepicker({
-				            minDate: 0,
-		                    format:'unixtime',
-		                    value: unixtime
-				        });
-
-						//開始日期改為今天 記錄在this compose data
-				        this_compose.data("start-timestamp",unixtime * 1000);
-
-						//設定 datetimepicker 前 先destroy 才不會錯亂
-						var end_input_val = end_input.val()*1;
-
-				        end_input.datetimepicker("destroy");
-
-				        //初始化 datetimepicker
-				        this_compose.find("input.cp-datetimepicker-end").datetimepicker({
-				            minDate: 0  ,
-				            format:'unixtime',
-				            value:end_input_val,
-				            onChangeDateTime: function() {
-				            	composeDatetimepickerFormat(this_compose,"end");
-				            }
-				        });
-					}else{
-						//開啟開始時間
-						$(this).find("img").attr("src","images/common/icon/icon_check_gray_check.png");
-						$(this).find("span").addClass("cp-start-time-text");
-
-						this_compose.data("start-time-chk",true);
-					}
-
-					this_compose.find(".cp-setdate-l-2 .cp-setdate-start-text").toggle();
-					this_compose.find(".cp-setdate-l-2 .cp-setdate-content").toggle();
-					
-				});
-
-				//初始化 datetimepicker
-				this_compose.find("input.cp-datetimepicker-start").datetimepicker({
-		            minDate: 0  ,
-		            format:'unixtime',
-		            onChangeDateTime: function() {
-		            	composeDatetimepickerFormat(this_compose,"start");
-		            }
+		        //現在時間的unixtime
+				var milliseconds = (new Date).getTime();
+				var unixtime = Math.round(milliseconds/1000);
+        		
+        		//設定 datetimepicker
+				start_input.datetimepicker({
+		            minDate: 0,
+                    format:'unixtime',
+                    value: unixtime
 		        });
-				//初始化 datetimepicker
+
+				//開始日期改為今天 記錄在this compose data
+		        this_compose.data("start-timestamp",unixtime * 1000);
+
+				//設定 datetimepicker 前 先destroy 才不會錯亂
+				var end_input_val = end_input.val()*1;
+
+		        end_input.datetimepicker("destroy");
+
+		        //初始化 datetimepicker
 		        this_compose.find("input.cp-datetimepicker-end").datetimepicker({
-		        	startDate:'+1970/01/02',
 		            minDate: 0  ,
 		            format:'unixtime',
-		            onChangeDateTime: function(dateText) {
-		            	composeDatetimepickerFormat(this_compose,"end");
+		            value:end_input_val,
+		            onChangeDateTime: function() {
+		            	onChangeDateTime(this_compose,"end");
 		            }
 		        });
+			}else{
+				//開啟開始時間
+				$(this).find("img").attr("src","images/common/icon/icon_check_gray_check.png");
+				$(this).find("span").addClass("cp-start-time-text");
 
-		        //點擊開啟 datetimepicker
-				this_compose.find(".cp-setdate-l").click(function(){
-					var start_time_chk = this_compose.data("start-time-chk");
-					if(!start_time_chk) return false;
-					this_compose.find("input.cp-datetimepicker-start").datetimepicker("show");
-				});
-
-				//點擊開啟 datetimepicker
-				this_compose.find(".cp-setdate-r").click(function(){
-					this_compose.find("input.cp-datetimepicker-end").datetimepicker("show");
-				});
+				this_compose.data("start-time-chk",true);
 			}
-		}));
+
+			this_compose.find(".cp-setdate-l-2 .cp-setdate-start-text").toggle();
+			this_compose.find(".cp-setdate-l-2 .cp-setdate-content").toggle();
+			
+		});
+
+		//初始化 datetimepicker
+		this_compose.find("input.cp-datetimepicker-start").datetimepicker({
+            minDate: 0  ,
+            format:'unixtime',
+            onChangeDateTime: function() {
+            	onChangeDateTime(this_compose,"start");
+            }
+        });
+		//初始化 datetimepicker
+        this_compose.find("input.cp-datetimepicker-end").datetimepicker({
+        	startDate:'+1970/01/02',
+            minDate: 0  ,
+            format:'unixtime',
+            onChangeDateTime: function() {
+            	onChangeDateTime(this_compose,"end");
+            }
+        });
+
+        //點擊開啟 datetimepicker
+		this_compose.find(".cp-setdate-l").click(function(){
+			var start_time_chk = this_compose.data("start-time-chk");
+			if(!start_time_chk) return false;
+			this_compose.find("input.cp-datetimepicker-start").datetimepicker("show");
+		});
+
+		//點擊開啟 datetimepicker
+		this_compose.find(".cp-setdate-r").click(function(){
+			this_compose.find("input.cp-datetimepicker-end").datetimepicker("show");
+		});
 	}
 
-	composeDatetimepickerFormat = function(this_compose,type){
+	onChangeDateTime = function(this_compose,type){
 		var this_input = this_compose.find("input.cp-datetimepicker-" + type);
 
 		//未選時間 就跳出
@@ -1092,6 +1106,11 @@ $(function(){
 		        this_compose.find(".cp-setdate-r .cp-setdate-time").html(time_format_arr[2]);
 
 			}
+
+			//更改結束時間的mindate為開始時間
+			end_input.datetimepicker({
+	            minDate: time.customFormat( "#YYYY#/#M#/#D#" )
+	        });
 
             var target = this_compose.find(".cp-setdate-l");
         }else{
@@ -1381,6 +1400,10 @@ $(function(){
 		var ctp = this_compose.data("compose-tp");
 		var compose_content = this_compose.data("compose-content");
 		var ml = this_compose.data("message-list");
+
+		//發佈上傳檢查
+		var timer_chk = false;
+		// console.debug("ml:",ml);return false;
 		var body = {
 			"meta" : {
 				"lv" : 1,
@@ -1440,7 +1463,6 @@ $(function(){
 			case 4:
 
 				body.meta.tt = this_compose.data("compose-title");
-
 				empty_chk = composeVoteObjMake(this_compose,body);
 
 				empty_msg = "投票內容不完整！";
@@ -1526,6 +1548,35 @@ $(function(){
 				//貼圖
 				case 5:
 					break;
+				//圖片上傳
+				case 6:
+					//上傳檔案有自己的玩法
+					is_push = false;
+
+					//上傳類型
+					var imageType = /image.*/;
+
+					//發佈上傳檢查
+					timer_chk = true;
+
+					var total = Object.keys(this_compose.data("upload-obj")).length;
+
+					var cnt = 0
+					//每次上傳都歸零
+					this_compose.data("uploaded-num",0);
+					this_compose.data("uploaded-err",[]);
+					this_compose.data("img-compose-arr",[]);
+
+					//permission_id
+					var permission_id = 0;
+
+					$.each(this_compose.data("upload-obj"),function(i,file){
+						uploadFileToS3(file,imageType,cnt,total,6,permission_id);
+						cnt++;
+					});
+
+					this_compose.data("body",body);
+					break;
 			}
 
 
@@ -1533,8 +1584,25 @@ $(function(){
 			if(is_push) body.ml.push(obj);
 		});
 
-// 		console.log(body);
-// return false;
+		//等待上傳完畢 最多10秒
+		if(timer_chk){
+			compose_timer = setTimeout(function(){
+				if(!$(".popup").is(":visible")){
+					popupShowAdjust("傳送逾時");	
+				}
+			},10000);
+		}else{
+			composeSendApi(body);
+		}
+		
+		console.debug("good job",body);
+		// return false;
+		
+
+	}
+
+	composeSendApi = function(body){
+		//return false;
 		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events";
 
         var headers = {
@@ -1542,7 +1610,6 @@ $(function(){
                  "at":at, 
                  "li":"zh_TW",
                      };
-
 
         var method = "post";
         console.log(api_name);
@@ -1561,8 +1628,7 @@ $(function(){
         // 	// timelineListWrite();
 	       //  // popupAfterChangePage("#page-group-main");
         // });
-
-	}
+	};
 
 
 /*
@@ -1722,6 +1788,9 @@ $(function(){
 		//先做權限設定
 		groupMenuListArea(true);
 
+		//清空先
+		$(".st-feedbox-area").html('');
+
 	    //製作timeline
 	    var api_name = "groups/"+ gi +"/timelines/"+ ti_feed +"/events";
 	    var headers = {
@@ -1735,7 +1804,7 @@ $(function(){
 	        var timeline_list = $.parseJSON(data.responseText).el;
 	        
 	        var content,box_content,youtube_code,prelink_pic,prelink_title,prelink_desc;
-	        $(".st-feedbox-area").html('');
+	        
 	        $.each(timeline_list,function(i,val){
 	        	console.log(JSON.stringify(val, null, 2));
 	        	
@@ -2305,6 +2374,139 @@ $(function(){
 		});
 	}
 
+	uploadFileToS3 = function(file,imageType,i,total,tp,permission_id){
+		var this_compose = $(document).find(".cp-content");
+		var fname = file.name;
+		//判斷是否符合上傳檔案格式
+		if(!file.type.match(imageType)){
+			//上傳編號加一
+			var num = this_compose.data("uploaded-num");
+			this_compose.data("uploaded-num",num += 1);
+			return false;
+		}
+
+		var api_name = "groups/" + gi + "/files";
+
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":"zh_TW",
+                     };
+        var method = "post";
+        var body = {
+              fn:"filename"
+            }
+
+        var result = ajaxDo(api_name,headers,method,false,body);
+        result.complete(function(data){
+        	var d =$.parseJSON(data.responseText);
+        	if(d.rsp_code == 0){
+
+        		var fi = d.fi;
+        		var s3_url = d.s3;
+
+        		//loading icon on
+        		s_load_show = true;
+        		$.ajax({
+					url: s3_url,
+					type: 'PUT',
+					contentType: " ",
+				 	data: file, 
+					processData: false,
+					complete: function(data) { 
+
+						//上傳s3成功或失敗
+						if(data.status == 200){
+
+							var api_name = "groups/" + gi + "/files/" + fi + "/commit";
+		                    var headers = {
+		                             "ui":ui,
+		                             "at":at, 
+		                             "li":"zh_TW",
+		                                 };
+		                    var method = "put";
+
+		                    var body = {
+		                      "ti": ti_feed,
+		                      "pi": permission_id,
+		                      "tp": 1,
+		                      "mt": file.type,
+		                      "si": file.size
+		                    }
+		                    var result = ajaxDo(api_name,headers,method,true,body);
+		                    result.complete(function(data){
+
+
+	                    		//上傳編號加一
+								var num = this_compose.data("uploaded-num");
+								this_compose.data("uploaded-num",num += 1);
+
+		                    	//commit 成功或失敗
+		                    	if(data.status != 200){
+		                    		this_compose.data("uploaded-err").push(i+1);
+		                    	}else{
+		                    		var img_arr = [fi,permission_id,file.name];
+
+		                    		this_compose.data("img-compose-arr")[i] = img_arr;
+		                    	}
+
+		                    	//判斷是否為最後一個上傳檔案
+		                    	//檢查是否是最後一個上傳的檔案 若是的話 再檢查是否顯示上傳失敗訊息
+								if(this_compose.data("uploaded-num") == total){
+									//loading icon off
+		        					s_load_show = false;
+		        					$('.ui-loader').hide();
+									// $(document).trigger("click");
+
+									if(this_compose.data("uploaded-err").length > 0){
+										popupShowAdjust("第" + this_compose.data("uploaded-err").sort().join("、") + "個檔案上傳失敗 請重新上傳");
+									}else{
+										clearTimeout(compose_timer);
+
+										var body = this_compose.data("body");
+										$.each(this_compose.data("img-compose-arr"),function(i,val){
+											if(val){
+												var obj = {};
+												obj.tp = tp;
+												obj.c = val[0];
+												obj.p = val[1];
+												body.ml.unshift(obj);
+											}
+										});
+										composeSendApi(this_compose.data("body"));
+									}
+								};
+
+	                    	});
+						}else{
+							//上傳編號加一
+							var num = this_compose.data("uploaded-num");
+							this_compose.data("uploaded-num",num += 1);
+
+							this_compose.data("uploaded-err").push(i+1);
+
+							//檢查是否是最後一個上傳的檔案 若是的話 再檢查是否顯示上傳失敗訊息
+							if(this_compose.data("uploaded-num") == total){
+								//loading icon off
+	        					s_load_show = false;
+	        					$('.ui-loader').hide();
+								// $(document).trigger("click");
+								//只會有失敗
+								popupShowAdjust("第" + this_compose.data("uploaded-err").sort().join("、") + "個檔案上傳失敗 請重新上傳");
+							};
+
+						}
+					}
+				});
+
+        	}else{
+        		return false;
+        	}
+
+        });
+				
+	}
+
 /*
 
 ######## ##     ## ##    ##  ######  ######## ####  #######  ##    ##        ##  
@@ -2413,7 +2615,10 @@ $(function(){
 		        success: function(data, textStatus) {
 		            var result = {};
 		            var tmp_img,tmp_desc;
+		            console.debug("data:",data)
 
+		            //error存在 就跳出
+		            if(data.error) return false;
 		            //預設標題
 		            if(data.query.results && data.query.results.title){
 		            	result.title = data.query.results.title;
@@ -2490,6 +2695,7 @@ $(function(){
 						$(".cp-yql-desc").html(result.description);
 						if(result.img) $(".cp-yql-img").html("<img src='" + result.img + "'/>");  
 						$(".cp-ta-yql").fadeIn();
+
 					}
 
 	            	this_event.data("message-list").push(1);
@@ -2574,10 +2780,12 @@ $(function(){
 	        		var this_event;
 
 	        		$(".st-sub-box").each(function(){
-	        			this_event = $(this);
-						return false;
+	        			if($(this).data("event-id") == this_msg.data("event-id")){
+		        			this_event = $(this);
+							return false;
+						}
 					});
-
+	        		console.debug("this event:",this_event);
 					if(!this_event) return false;
 
 	        		//重設任務完成狀態
@@ -2589,6 +2797,7 @@ $(function(){
 		    		// timelineDetailClose toggle負負得正
 		    		this_event.find(".st-reply-area").hide();
 
+		    		this_event.data("switch-chk",false);
 
 		      		this_event.find(".st-sub-box-1").trigger("click");
 					$(".popup-close").unbind("reply");
@@ -2606,9 +2815,13 @@ $(function(){
 
 	    
 	  //計算彈出對話框置中
-	popupShowAdjust = function (desc,cancel){
+	popupShowAdjust = function (desc,cancel,chk){
 		if(!cancel){
 			$(".popup-close-cancel").hide();
+		}
+
+		if(chk){
+			$(".popup-close").hide();
 		}
 		
 		$(".popup-frame").css("margin-left",0);
