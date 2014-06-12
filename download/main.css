@@ -14,15 +14,16 @@
 	height: 200px;
 	box-shadow: 0 1px 10px #c5c5c5;
 	border-radius: 10px;
+    padding-left: 10%;
 }
 
 .file-list-area div{
-	float:left;
-	margin:20px;
-	word-break:break-all;
-	width:150px;
-	color:gray;
-	font-size:15px;
+	float: left;
+    margin: 20px 0;
+    word-break: break-all;
+    width: 33%;
+    color: gray;
+    font-size: 15px;
 }
 
 .file-list-area div img{
@@ -55,14 +56,17 @@
 }
 
 @media all and (min-width: 321px) and (max-width: 640px) {
-    .file-list-area div{
+    /*.file-list-area div{
         width:120px;
         margin:10px;
         font:15px;
-    }
-    .file-list-area div img{
+    }*/
+    /*.file-list-area div img{
         width:120px;
         height:120px;
+    }*/
+    .file-list-area{
+        padding-left: 1%;
     }
     .main{
        width:90%;

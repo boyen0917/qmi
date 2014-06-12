@@ -47,7 +47,7 @@
 	        		  async: false
         		});
 	        	
-	        	 $.getJSON("file_list.json").success(function( json ) {
+	        	 $.getJSON("/download/files/file_list.json").success(function( json ) {
 	        		 json_data = json;
 	        		 settingFileArea()
 	             }); 
@@ -118,7 +118,8 @@
 	                    processData: false, 
 	                    contentType: false, 
 	                    success: function(data, textStatus, jqXHR)
-	                    {
+	                    {	
+	                    	console.debug("upload:",data);
 	                    	updateFilesArea();
 	                        $(".ajax-loading").hide();
 	                        $(".popup-dialog").show();

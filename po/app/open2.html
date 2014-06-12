@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="../js/jquery.js"></script>
+
+        <script type="text/javascript">
+            $(function(){  
+            	$("button").click(function(){
+            		var myWindow = window.open("flexslider/index.html", "", "width=500, height=500");
+            		var url = "https://project-o.s3.amazonaws.com/groups/46e4b6c7-fe55-49fc-ae8d-8da99c0b899b/0/5297b83b-48b1-4455-84f6-d942a1ed0a28?Expires=1717846963&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=nZIZ33l76g7LvFBpGc2FEgOFs5A%3D";
+            		gallery_str = '<li data-thumb="' + url + '"><img src="' + url + '" /></li>';
+            		gallery_str += '<li data-thumb="' + url + '"><img src="' + url + '" /></li>';
+            		gallery_str += '<li data-thumb="' + url + '"><img src="' + url + '" /></li>';
+            		gallery_str += '<li data-thumb="' + url + '"><img src="' + url + '" /></li>';
+            		gallery_str += '<li data-thumb="' + url + '"><img src="' + url + '" /></li>';
+
+            		$(myWindow.document).ready(function(){
+            			setTimeout(function(){
+            				
+            				$(myWindow.document).find(".slides").html(gallery_str);
+            				$(myWindow.document).find("button").trigger("click");
+            			},100);
+            		});
+            	});
+            })
+        </script>
+    </head>
+    <body>
+    	<button>按我</button>
+    </body>
+</html>
+

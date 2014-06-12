@@ -2249,7 +2249,6 @@ $(function(){
 
  		//檢查移動是否完成
  		this_gallery.data("gallery-move-chk",true);
-
 		$.each(gallery_arr,function(i,val){
 
 			//getS3file(val.c);
@@ -2265,7 +2264,7 @@ $(function(){
 			getS3file(val,gi,this_img,6);
 	            
 		});
-		
+
 		//gallery 移動事件
 		var this_gallery = this_event.find(".st-attach-img");
 		this_gallery.mouseover(function(){
@@ -2330,6 +2329,26 @@ $(function(){
 				this_gallery.data("gallery-cnt",gallery_cnt);
 				this_gallery.data("gallery-move-chk",true);
 			});
+		});
+
+		//點選開啟圖庫
+		this_gallery.find(".st-attach-img-area").click(function(){
+			var this_img_area = $(this);
+			var gallery_str = "";
+			this_img_area.find(".st-slide-img").each(function(i,val){
+				var img_url = $(this).find("img").attr("src") ;
+				gallery_str += '<li data-thumb="' + img_url + '"><img src="' + img_url + '" /></li>';
+			});
+
+			var gallery = window.open("flexslider/index.html", "", "width=500, height=500");
+    		$(gallery.document).ready(function(){
+    			setTimeout(function(){
+    				var this_slide = $(gallery.document).find(".slides");
+    				this_slide.html(gallery_str);
+    				$(gallery.document).find("input").val(this_gallery.data("gallery-cnt"));
+    				$(gallery.document).find("button").trigger("click");
+    			},100);
+    		});
 		});
 
 	}

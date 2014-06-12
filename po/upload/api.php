@@ -31,32 +31,17 @@ if(isset($_GET['files']))
   {
    $file_path='/var/www/localhost/htdocs/project-o-web/po/iosplist/';
    $new_filename = 'ios.plist';
-//    $log_file_type = 'plist';
   }
   else
   {
    $new_filename = 'android.apk';
-//    $log_file_type = 'android';
   }
 
-//   $user_ip = $this->get_real_ip();
-//   $upload_log_dir = '/localhost/htdocs/log/';
-//   $log_content = '
-// ip : '.$user_ip.'
-// file type : '.$log_file_type.'
-// file name : '.$filename.'.'.$ext.'
-// time : '.date("H:i:s").'
-// __________________________
-//                 ';
-
-//   $logfile = $upload_log_dir.date("Y_m_d").".log";
-//   $fp = fopen ($logfile, "a");
-//   fwrite($fp,$log_content);
-//   fclose($fp);
-  
   if(move_uploaded_file($file['tmp_name'], $file_path.$new_filename))
   {
    $files[] = $file_path .$new_filename;
+   //copy
+   exec("cp " .$file_path .$new_filename ." ../../download/files");
   }
   else
   {
