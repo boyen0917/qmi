@@ -25,6 +25,10 @@ $(function(){
 	    $(".popup").hide();
 	    $(".popup-screen").hide();
 	});
+
+	$(".ajax-screen-lock").click(function(e){
+	    e.stopPropagation();
+	});
 	
 	$(".popup-close").click(function(){
 		$(".popup-screen").trigger("click");
@@ -45,15 +49,18 @@ $(function(){
 
 		// console.log("ajax send! count : " + ajax_count);
 		// ajax_count++;
-
 		//顯示 loading
-		if(!load_show) return false;
-		
+		if(!load_show && !s_load_show) return false;
 	    if(!$('.ui-loader').is(":visible"))
 		$('.ui-loader').css("display","block");
+		$(".ajax-screen-lock").show();
 	});
 	$(document).ajaxComplete(function(data) {
+		//特別的
+		if(s_load_show) return false;
+
 		$('.ui-loader').hide();
+		$(".ajax-screen-lock").hide();
 		$(document).trigger("click");
 	});
 	
@@ -1191,16 +1198,141 @@ $(function(){
 
 	
 	$(".cp-addfile").click(function(){
-		
+		console.log("here");
 		var img_url = "images/compose/compose_form_addfile_";
 		var target = $(this);
 		target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
 		setTimeout(function(){
 			target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
 		},100);
+
+
+		var this_compose = $(document).find(".cp-content");
+		$(".cp-file").trigger("click");
+
+		var add_type = target.data("cp-addfile");
+		switch(add_type){
+			case "img":
+				break;
+		}
+
 	});
 
-	
+
+	$(".cp-file").change(function(e) {
+
+		var this_compose = $(document).find(".cp-content");
+
+		$(document).find(".cp-attach-area").show();
+		$(document).find(".cp-file-area").show();
+		$(document).find(".cp-file-img-area").show();
+
+		$(".cp-file-img-area").html("");
+
+		var file_ori = $(this);
+		var imageType = /image.*/;
+		var limit_chk = false;
+		// var upload_arr = this_compose.data("upload-arr");
+
+		$.each(file_ori[0].files,function(i,file){
+			if(Object.keys(this_compose.data("upload-obj")).length == 9 ){
+				limit_chk = true;
+				return false;
+			}
+			
+			//流水號
+			var ai = this_compose.data("upload-ai");
+			this_compose.data("upload-obj")[ai] = file;
+			this_compose.data("upload-ai",ai+1)
+		});
+
+		if(limit_chk){
+			popupShowAdjust("圖檔最多限制9個");
+			// return false;
+		}
+
+		//每次選擇完檔案 就reset input file
+		file_ori.replaceWith( file_ori.val('').clone( true ) );
+
+		$.each(this_compose.data("upload-obj"),function(i,file){
+			var this_grid =  $('<div class="cp-grid"><div><img/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
+			$(".cp-file-img-area").append(this_grid);
+			
+			//編號 方便刪除
+			this_grid.data("file-num",i);
+
+			if (file.type.match(imageType)) {
+
+				//有圖片就push進 compose message list
+				if($.inArray(6,this_compose.data("message-list")) < 0){
+					this_compose.data("message-list").push(6);
+
+					//附檔區域存在附檔
+					this_compose.data("attach",true);
+				}
+
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					var img = this_grid.find("div img");
+
+					//調整長寬
+					img.load(function() {
+						var w = img.width();
+			            var h = img.height();
+        				mathAvatarPos(img,w,h,100);
+			        });
+
+			        img.attr("src",reader.result);
+				}
+
+				reader.readAsDataURL(file);	
+			}else{
+				this_grid.find("div").html('<span>file not supported</span>');
+			}
+
+
+		});
+	});
+
+	$(document).on("click",".cp-grid .grid-cancel",function(e){
+		var this_compose = $(document).find(".cp-content");
+		var this_grid = $(this).parent();
+		var file_num = this_grid.data("file-num");
+		var this_cancel = $(this);
+		this_cancel.attr("src","images/common/icon/icon_compose_close_click.png");
+		setTimeout(function(){
+
+			//刪除upload arr
+			delete this_compose.data("upload-obj")[file_num];
+
+			this_cancel.attr("src","images/common/icon/icon_compose_close.png");
+			this_cancel.remove();
+			this_grid.hide('fast', function(){ 
+				this_grid.remove(); 
+
+				//圖檔區沒東西了 就剔除message list
+				if($(document).find(".cp-file-img-area").html() == ""){
+					this_compose.data("message-list").splice($.inArray(6,this_compose.data("message-list")),1);
+
+					//圖檔刪光了 而且附檔區域沒有其他東西 就關閉附檔區域
+					var chk = false;
+					$.each(this_compose.data("message-list"),function(i,val){
+						if($.inArray(val,attach_mtp_arr) >= 0){
+							chk = true;
+							return false;
+						}
+					});
+
+					if(!chk){
+						this_compose.find(".cp-attach-area").hide('fast');
+					}
+					
+				}
+			});
+		},100);
+
+
+	});
 	
 	
 	//----------------------------------- 聯絡人 ---------------------------------------------  

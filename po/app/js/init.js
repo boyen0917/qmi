@@ -32,6 +32,9 @@ $(function(){
 	
 	//顯示loading 圖示 的參數
 	load_show = false;
+
+	//特別的
+	s_load_show = false;
 	
 	//預設使用者大頭照
 	no_pic = "images/common/others/empty_img_personal_xl.png";
@@ -52,6 +55,13 @@ $(function(){
 	//timeline圖片移動距離
 	gallery_movement = 360;
 
+	//發佈計時器
+	compose_timer = false;
 
+	//圖片上傳限制
+	img_total = 9;
+
+	//附檔區域開啓的type id 
+	attach_mtp_arr = [1,6];
 	
 });

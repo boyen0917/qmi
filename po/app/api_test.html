@@ -7,10 +7,6 @@
     <script src="js/sha/enc-base64-min.js"></script>
     <script type="text/javascript">  
     $(function(){  
-    	
-    	
-    	
-    
     	$.extend({
     		  getUrlVars: function(){
     		    var vars = [], hash;
@@ -54,6 +50,7 @@
 
         var result = ajaxDo(api_name,headers,method,true);
         result.complete(function(data){
+            console.log(data);return false;
         	ui = $.parseJSON(data.responseText).ui;
             at = $.parseJSON(data.responseText).at;
 
@@ -82,11 +79,27 @@
                                      
                     var result = ajaxDo(api_name,headers,method,true,body);
                   break;
-                case "upload_s3":
-                    //https://project-o.s3.amazonaws.com/groups/3c8552fa-f544-4261-a63a-b0d6064c6197/0/0fc2fe86-9220-4583-a3fa-72712b0fd194?Expires=1717246979&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=2pR2bpYvzmm5BYRsrD90fxewmFs%3D
+                case "upload_commit":
+                    var api_name = "groups/1a9bca59-766d-402d-b5ea-9ad973e10d45/files/bd157262-4fba-46e8-8bff-3c293054e802/commit";
+
+                    var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW",
+                                 };
+                    var method = "put";
+
+                    var body = {
+                      "ti": "380b2466-6492-465b-ae3e-a498d22eb0c4",
+                      "pi": 0,
+                      "tp": 1,
+                      "mt": "image/gif",
+                      "si": 1954684
+                    }
+                    var result = ajaxDo(api_name,headers,method,true,body);
                   break;
                 case "upload":///groups/{gi}/files
-                    var api_name = "groups/3c8552fa-f544-4261-a63a-b0d6064c6197/files";
+                    var api_name = "groups/1a9bca59-766d-402d-b5ea-9ad973e10d45/files";
 
                     var headers = {
                              "ui":ui,
@@ -95,7 +108,7 @@
                                  };
                     var method = "post";
                     var body = {
-                          fn:"test"
+                          fn:"filename"
                         }
 
                     var result = ajaxDo(api_name,headers,method,true,body);

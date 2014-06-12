@@ -3,6 +3,7 @@ web/
 po/upload/file_list.json
 po/upload/files/
 po/upload/files/.htaccess
+po/app/upload
 *.htaccess
 *DS_Store
 po/app/test.html
