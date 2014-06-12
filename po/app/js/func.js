@@ -2157,6 +2157,11 @@ $(function(){
 					
 					this_event.find(".st-attach-url-title").html(val.t);
 					this_event.find(".st-attach-url-desc").html(val.d);
+
+					this_event.find(".st-attach-url").click(function(){
+						window.open(val.c);
+					});
+
 					break;
 				case 2:
 					this_event.find(".st-attach-url").show();
@@ -2340,7 +2345,7 @@ $(function(){
 				gallery_str += '<li data-thumb="' + img_url + '"><img src="' + img_url + '" /></li>';
 			});
 
-			var gallery = window.open("flexslider/index.html", "", "width=500, height=500");
+			var gallery = window.open("flexslider/index.html", "", "width=400, height=700");
     		$(gallery.document).ready(function(){
     			setTimeout(function(){
     				var this_slide = $(gallery.document).find(".slides");

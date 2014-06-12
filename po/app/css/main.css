@@ -1064,6 +1064,13 @@
     margin: 15px 10px;
 }
 
+
+.st-feedbox-area a:link,.st-feedbox-area a:active,.st-feedbox-area a:visited,.st-feedbox-area a:hover {
+    color: cornflowerblue;
+    text-decoration: none;
+}
+
+
 .st-sub-box {
 	position:relative;
     border: 1px solid #d2d2d2;
@@ -1551,6 +1558,17 @@
 	top: 4px;
 }
 
+
+.st-attach-url {
+	background: #edf5fb;
+	border: 1px solid #c3ced7;
+	padding: 10px 0;
+	width: 350px;
+	margin: auto;
+
+}
+
+
 .st-attach-url-img,.st-attach-map {
     width: 93%;
     margin: auto;
@@ -1570,8 +1588,11 @@
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
-	width: 90%;
+	width: 95%;
 	margin: 10px auto;
+	text-align: left;
+	font-weight: 600;
+	color: cornflowerblue;
 }
 
 .st-attach-url-desc {
@@ -1580,7 +1601,7 @@
 	-webkit-line-clamp: 6;
 	-webkit-box-orient: vertical;
 	text-align: left;
-	width: 90%;
+	width: 95%;
 	margin: auto;
 }
 
