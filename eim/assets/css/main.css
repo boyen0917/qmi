@@ -349,10 +349,16 @@ hr:before {
   background-color: #1B1F23;
 }
 
-
+.content-23.custom-bg0 {
+  background-image: url('landing_bg6.jpg');
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: 2;
+}
 
 .content-23.custom-bg1 {
-  background-image: url('feeds3.png');
+  background-image: url('feeds3.jpg');
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -360,7 +366,7 @@ hr:before {
 }
 
 .content-23.custom-bg2 {
-  background-image: url('discussion.png');
+  background-image: url('discussion.jpg');
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -368,7 +374,7 @@ hr:before {
 }
 
 .content-23.custom-bg3 {
-  background-image: url('schedule4.png');
+  background-image: url('schedule4.jpg');
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -376,7 +382,7 @@ hr:before {
 }
 
 .content-23.custom-bg4 {
-  background-image: url('workspace4.png');
+  background-image: url('workspace4.jpg');
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-attachment: fixed;
