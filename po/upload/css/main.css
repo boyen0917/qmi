@@ -37,11 +37,10 @@
 }
 
 @media all and (max-width: 320px) {
-    .file-list-area div{
-        width:80px;
-        margin:2px;
-        font:10px;
+    .file-list-area{
+        padding-left: 1%;
     }
+    
     .file-list-area div img{
         width:80px;
         height:80px;
@@ -65,9 +64,7 @@
         width:120px;
         height:120px;
     }*/
-    .file-list-area{
-        padding-left: 1%;
-    }
+    
     .main{
        width:90%;
     }
