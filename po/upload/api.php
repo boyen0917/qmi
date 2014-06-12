@@ -1,6 +1,6 @@
 <?php 
 if(@$_POST['opt'] == "update"){
- $filename = "file_list.json";
+ $filename = "../../download/files/file_list.json";
  
  $fp=fopen($filename,"w");
  fputs($fp,$_POST["json_string"]);
