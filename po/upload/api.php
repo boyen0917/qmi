@@ -5,6 +5,12 @@ if(@$_POST['opt'] == "update"){
  $fp=fopen($filename,"w");
  fputs($fp,$_POST["json_string"]);
  fclose($fp);
+
+ $filename = "file_list.json";
+ 
+ $fp=fopen($filename,"w");
+ fputs($fp,$_POST["json_string"]);
+ fclose($fp);
  
  exit;
 }
