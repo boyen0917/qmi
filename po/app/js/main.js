@@ -855,76 +855,81 @@ $(function(){
 
 	//留言
 	$(document).on('click','.st-message',function(){
-		
+		//
+		// var pos = $(this).parents(".st-sub-box").find(".st-reply-message-area").position().top;
+
+		// $('html, body').animate({scrollTop: $(this).parents(".st-sub-box").find(".st-reply-message-area").position().top}, 0);
 		//判斷開啟或關閉
 		var movement = $(".st-reply-message-area").data("movement");
 
 		//設定 this event
 		var this_event = $(this).parents(".st-sub-box");
 
+		
+
 		//開啟detail
-		console.debug("event data:",this_event.data());
 		if(!this_event.data("switch-chk")){
-			console.log("yooooooo");
 			this_event.find(".st-sub-box-1").trigger("click");
 		}
 
-		var new_ei = this_event.data("event-id");
-		var old_ei = $(".st-reply-message-area").data("event-id");
+		this_event.find(".st-reply-message-area").slideToggle();
+
+		// var new_ei = this_event.data("event-id");
+		// var old_ei = $(".st-reply-message-area").data("event-id");
 
 		//將新的ei 更新進留言區域
-		$(".st-reply-message-area").data("event-id",new_ei);
+		// $(".st-reply-message-area").data("event-id",new_ei);
 
 		//如果留言區域在沒關閉時就點選新的event => 重新開啟留言區域 然後不執行之後的開關
-		if(movement == -50 && new_ei != old_ei){
-			$(".st-reply-message-area").css("bottom",-50);
-			$(".st-reply-message-area").animate({bottom:0});
-			return false;
-		}
+		// if(movement == -50 && new_ei != old_ei){
+		// 	$(".st-reply-message-area").css("bottom",-50);
+		// 	$(".st-reply-message-area").animate({bottom:0});
+		// 	return false;
+		// }
 		
 		//動畫結束與否
-		var animate_chk = $(".st-reply-message-area").data("animate-chk");
+		// var animate_chk = $(".st-reply-message-area").data("animate-chk");
 
-		if(animate_chk){
-			//變成不能開啟狀態
-			$(".st-reply-message-area").data("animate-chk",false);
+		// if(animate_chk){
+		// 	//變成不能開啟狀態
+		// 	$(".st-reply-message-area").data("animate-chk",false);
 
-			$(".st-reply-message-area").animate({bottom:movement},function(){
-				//變成可以開啟狀態
-				$(".st-reply-message-area").data("animate-chk",true);
+		// 	$(".st-reply-message-area").animate({bottom:movement},function(){
+		// 		//變成可以開啟狀態
+		// 		$(".st-reply-message-area").data("animate-chk",true);
 
 
-				if(movement == 0){
-					$(".st-reply-message-area").data("movement",-50);
-				}else{
-					$(".st-reply-message-area").data("movement",0);
-				}
+		// 		if(movement == 0){
+		// 			$(".st-reply-message-area").data("movement",-50);
+		// 		}else{
+		// 			$(".st-reply-message-area").data("movement",0);
+		// 		}
 				
-			});
-		}
+		// 	});
+		// }
 	});
 
 	//滾動隱藏留言
-	$(document).on('scroll',function(){
-		if($(".st-reply-message-area").data("movement") == 0) return false;
+	// $(document).on('scroll',function(){
+	// 	if($(".st-reply-message-area").data("movement") == 0) return false;
 
-		$(".st-reply-message-area").data("movement",0);
-		$(".st-reply-message-area").data("animate-chk",false);
+	// 	$(".st-reply-message-area").data("movement",0);
+	// 	$(".st-reply-message-area").data("animate-chk",false);
 
-		$(".st-reply-message-area").animate({bottom:"-50px"},function(){
-			//變成可以開啟狀態
-			$(".st-reply-message-area").data("animate-chk",true);
+	// 	$(".st-reply-message-area").animate({bottom:"-50px"},function(){
+	// 		//變成可以開啟狀態
+	// 		$(".st-reply-message-area").data("animate-chk",true);
 			
-		});		
-	});
+	// 	});		
+	// });
 
 	//留言送出
-	$(".st-reply-message-send").click(function(){
-		var this_msg = $(this).parents(".st-reply-message-area");
-		var msg_content = this_msg.find(".st-reply-message-textarea textarea").val();
-		this_msg.data("msg-content",msg_content);
-		console.debug("msg data:",this_msg.data())
-		replySend(this_msg);
+	$(document).on('click','.st-reply-message-send',function(){
+		var this_event = $(this).parents(".st-sub-box");
+		// var this_msg = $(this).parents(".st-reply-message-area");
+		// var msg_content = this_msg.find(".st-reply-message-textarea textarea").val();
+		// this_msg.data("msg-content",msg_content);
+		replySend(this_event);
 	});
 
 

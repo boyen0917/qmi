@@ -304,9 +304,8 @@ $(function(){
 		}
 		
 		//製作每個回覆
-
-		//製作前先清空
-		this_event.find(".st-reply-content-area").parent().remove();
+		//重置
+		this_event.find(".st-reply-all-content-area").html("");
 
 		$.each(e_data,function(el_i,el){
 			console.log("====================回覆============================================================================");
@@ -408,7 +407,7 @@ $(function(){
     		//部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
 			if(without_message || (el.meta.tp.substring(0,1)*1 == 0)) return;
 
-			this_event.find(".st-reply-area").append($('<div>').load('layout/layout.html .st-reply-content-area',function(){
+			this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/layout.html .st-reply-content-area',function(){
 				var _groupList = $.lStorage(ui);
 				var user_name = _groupList[gi].guAll[el.meta.gu].n;
 				var this_load = $(this).find(".st-reply-content-area");
@@ -534,7 +533,8 @@ $(function(){
 		});
 		var new_li = me_arr.concat(rest_li);
 		var _groupList = $.lStorage(ui);
-
+		//重置
+		this_event.find(".st-task-work-detail").html("");
 		$.each(new_li,function(i,val){
 			var this_work = $('<div class="st-work-option" data-item-index="' + val.k + '"><img src="images/common/icon/icon_check_round_white.png"><span>' + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' + _groupList[gi].guAll[val.u].n + '</span></div></div>');
 			this_event.find(".st-task-work-detail").append(this_work);
@@ -625,7 +625,7 @@ $(function(){
 	}
 
 	voteContentMake = function (this_event,li){
-
+		console.debug("voteContentMake:");
 		$.each(li,function(v_i,v_val){
 
 			this_event.find(".st-vote-all-ques-area").html($('<div class="st-vote-ques-area-div">').load('layout/layout.html .st-vote-ques-area',function(){
@@ -2429,6 +2429,9 @@ $(function(){
 	        			this_event.css("opacity",1);
 	        		},timer);
 	        		
+
+	        		//留言
+	        		//this_event.find('.st-reply-message-textarea textarea').autosize({append: "\n"});
 	        		
 	        	}));
 	        });
@@ -3388,7 +3391,7 @@ $(function(){
 	// }
 
 
-	replySend = function(this_msg){
+	replySend = function(this_event){
 
 		var body = {
 				"meta" : {
@@ -3397,20 +3400,19 @@ $(function(){
 				},
 				"ml" : [
 					{
-						"c": this_msg.data("msg-content"),
+						"c": this_event.find(".st-reply-message-textarea textarea").val(),
 						"tp": 0
 					}
 				]
 			};
 
-			var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_msg.data("event-id");
+			var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
 
 	        var headers = {
 	                 "ui":ui,
 	                 "at":at, 
 	                 "li":"zh_TW",
 	                     };
-
 
 	        var method = "post";
 	        var result = ajaxDo(api_name,headers,method,true,body);
@@ -3420,16 +3422,19 @@ $(function(){
 	        	popupShowAdjust("回覆成功");
 	        	//客製化 按了確定之後再重讀取
 	        	$(".popup-close").bind("reply",function(){
-	        		var this_event;
+	    //     		var this_event;
 
-	        		$(".st-sub-box").each(function(){
-	        			if($(this).data("event-id") == this_msg.data("event-id")){
-		        			this_event = $(this);
-							return false;
-						}
-					});
-	        		console.debug("this event:",this_event);
-					if(!this_event) return false;
+	    //     		$(".st-sub-box").each(function(){
+	    //     			if($(this).data("event-id") == this_msg.data("event-id")){
+		   //      			this_event = $(this);
+					// 		return false;
+					// 	}
+					// });
+	    //     		console.debug("this event:",this_event);
+					// if(!this_event) return false;
+
+					//重置
+					this_event.find(".st-reply-message-textarea textarea").val("");
 
 	        		//重設任務完成狀態
 	        		setEventStatus(this_event);

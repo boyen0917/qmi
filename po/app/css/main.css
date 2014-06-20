@@ -1909,11 +1909,10 @@
 }
 
 .st-reply-message-area {
-	position: fixed;
-	bottom: -50px;
+	position: relative;
 	width: 100%;
 	background: rgb(239,239,239);
-	min-height: 45px;
+	height: 45px;
 	z-index: 100;
 }
 
@@ -1930,13 +1929,13 @@
 
 .st-reply-message-textarea {
 	width: 73%;
-	margin-right: 8%;
+	margin-left: 5px;
 	padding: 5px 0 0;
-	float: right;
+	float: left;
 }
 
 .st-reply-message-textarea textarea {
-	width: 100%;
+	width: 80%;
 	border: 1px solid #d8d8d8;
 	border-radius: 7px;
 	padding: 6px 10px 0;
@@ -1951,16 +1950,14 @@
 
 .st-reply-message-send {
 	position: absolute;
-	right: -22px;
+	right: 5px;
 	top: 6px;
-	margin: 0 8%;
 	background: rgb(0,102,162);
 	color: #fff;
 	width: 45px;
 	height: 27px;
 	padding: 5px 0 0 10px;
-	border-bottom-right-radius: 7px;
-	border-top-right-radius: 7px;
+	border-radius: 7px;
 }
 
 .st-reply-message-send:hover {
