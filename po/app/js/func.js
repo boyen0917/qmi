@@ -357,13 +357,13 @@ $(function(){
 							var this_work = $(this);
 							if(this_work.data("item-index") == val.k ){
 								if(val.a){
-									if(this_work.data("mine")) this_work.addClass("st-work-option-mine");
+									if(this_work.data("mine")) this_work.addClass("work-mine-finished");
 									this_work.data("work-status",true);
 									this_work.addClass("st-work-option-gray");
 	        						this_work.find(".st-work-option-tu img").attr("src","images/common/icon/icon_work_member_lightgray.png");
 									this_work.find("img:eq(0)").attr("src","images/common/icon/icon_check_red_l.png");
 								}else{
-									if(this_work.data("mine")) this_work.removeClass("st-work-option-mine");
+									if(this_work.data("mine")) this_work.removeClass("work-mine-finished");
 									this_work.data("work-status",false);
 									this_work.removeClass("st-work-option-gray");
 	        						this_work.find(".st-work-option-tu img").attr("src","images/common/icon/icon_work_member_gray.png");
@@ -468,6 +468,8 @@ $(function(){
 			case 2:
 				break;
 			case 3:
+				//bottom_block = true;
+				detail_data = ".st-box2-more-task-area";
 				break;
 			case 4:
 				//bottom_block = true;
@@ -475,8 +477,8 @@ $(function(){
 				
 				break;
 			case 5:
-				break;
-			case 6:
+				//bottom_block = true;
+				detail_data = ".st-box2-more-task-area";
 				break;
 		}
 
@@ -534,21 +536,11 @@ $(function(){
 		var _groupList = $.lStorage(ui);
 
 		$.each(new_li,function(i,val){
-			var gu_str;
-			if(val.u.split(",").length == 1){
-				gu_str = _groupList[gi].guAll[val.u].n;
-			}else{
-				if(val.m) {
-					gu_str = _groupList[gi].guAll[gu].n + "...";
-				}else{
-					gu_str = val.u.split(",").length + "位成員";
-				}
-			}
-				
-			var this_work = $('<div class="st-work-option" data-item-index="' + val.k + '"><img src="images/common/icon/icon_check_round_white.png"><span>' + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' + gu_str + '</span></div></div>');
+			var this_work = $('<div class="st-work-option" data-item-index="' + val.k + '"><img src="images/common/icon/icon_check_round_white.png"><span>' + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' + _groupList[gi].guAll[val.u].n + '</span></div></div>');
 			this_event.find(".st-task-work-detail").append(this_work);
 			if(val.m) {
-				this_work.data("mine",true)
+				this_work.data("mine",true);
+				this_work.addClass("work-mine-chk");
 			};
 		});
 
@@ -560,15 +552,22 @@ $(function(){
 		this_event.find(".st-work-option").click(function(){
 
 			var this_work = $(this);
+			var fin = false;
+			var mine_total = this_event.find(".work-mine-chk").length;
+			var mine_finished_total = this_event.find(".work-mine-finished").length;
 
-			//不是自己的工作就不能點選
-			if(!this_work.data("mine")) return false;
+			//不是自己的工作 或是結束時間到了 就不能點選
+			if(!this_work.data("mine") || this_event.data("task-over")) return false;
 
 			if(this_work.data("work-status")){
 				var a = false;
 			}else{
 				var a = true;
+
+				//表示最後一個工作也要完成了
+				if(mine_finished_total == mine_total-1) fin = true;
 			}
+
 			var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
 
             var headers = {
@@ -583,7 +582,7 @@ $(function(){
                   {
                     "lv":"1",
                     "tp":"13",
-                    "fin":false
+                    "fin":fin
                   },
                   "ml":
                   [
@@ -597,16 +596,27 @@ $(function(){
             var result = ajaxDo(api_name,headers,method,true,body);
             result.complete(function(data){
 	        	if(a){
-	        		if(this_work.data("mine")) this_work.addClass("st-work-option-mine");
+	        		if(this_work.data("mine")) this_work.addClass("work-mine-finished");
 	        		this_work.addClass("st-work-option-gray");
 	        		this_work.find(".st-work-option-tu img").attr("src","images/common/icon/icon_work_member_lightgray.png");
 	        		this_work.find("img:eq(0)").attr("src","images/common/icon/icon_check_red_l.png");
 	        	}else{
-	        		if(this_work.data("mine")) this_work.removeClass("st-work-option-mine");
+	        		if(this_work.data("mine")) this_work.removeClass("work-mine-finished");
 	        		this_work.removeClass("st-work-option-gray");
 	        		this_work.find(".st-work-option-tu img").attr("src","images/common/icon/icon_work_member_gray.png");
 	        		this_work.find("img:eq(0)").attr("src","images/common/icon/icon_check_round_white.png");
 	        	}
+
+	        	//更改工作狀態為 已完成
+	        	if(fin) {
+	        		this_event.find(".st-task-status").html("已完成");
+	        		this_event.find(".st-task-status-area img").attr("src","images/common/icon/icon_check_red_l.png");
+	        	}else{
+	        		//更改工作狀態為 未完成
+	        		this_event.find(".st-task-status").html("未完成");
+	        		this_event.find(".st-task-status-area img").attr("src","images/common/icon/icon_check_lightblue_l.png");
+	        	}
+
 	        	//存回
 	        	this_work.data("work-status",a);
 	    	});
@@ -1169,27 +1179,44 @@ $(function(){
 
 					//清空選擇區域先
 					$(".obj-selected div:eq(1)").html("");
-		    		//是否點選
-		    		if(this_cell.data("chk")){
-		    			this_cell.data("chk",false);
-		    			this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
-		    			
-		    			delete selected_obj[this_cell.data("gu")];
-		    			
-		    		}else{
-		    			this_cell.data("chk",true);
-		    			this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
-		    			
-		    			selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
-		    		}
+
+					//工作是單選
+					if(this_compose_obj.parent().hasClass("cp-work-item")){
+						console.debug("work");
+						//全部清除
+						$(document).find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+						$(document).find(".obj-cell-chk").data("chk",false);
+
+						this_cell.data("chk",true);
+			    		this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+
+			    		$(".obj-selected div:eq(1)").html("<span>" + this_cell.data("gu-name") + "</span>");
+			    		//重置
+			    		selected_obj ={};
+			    		selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
+					}else{
+						//其餘發佈對象是復選
+			    		//是否點選
+			    		if(this_cell.data("chk")){
+			    			this_cell.data("chk",false);
+			    			this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+			    			
+			    			delete selected_obj[this_cell.data("gu")];
+			    			
+			    		}else{
+			    			this_cell.data("chk",true);
+			    			this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+			    			
+			    			selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
+			    		}
+			    		//寫入到選擇區域
+			    		$.each(selected_obj,function(i,val){
+			    			$(".obj-selected div:eq(1)").append("<span>" + val + "</span>");
+			    		});
+					}
 
 		    		//存回
 		    		$(".obj-content").data("selected-obj",selected_obj);
-
-		    		//寫入到選擇區域
-		    		$.each(selected_obj,function(i,val){
-		    			$(".obj-selected div:eq(1)").append("<span>" + val + "</span>");
-		    		});
 
 		    		//更改標題
 		    		$(".header-cp-object span:eq(1)").html(Object.keys($(".obj-content").data("selected-obj")).length);
@@ -1204,9 +1231,11 @@ $(function(){
 		    		//工作
 		    		if(this_compose_obj.parent().hasClass("cp-work-item")){
 		    			var target = ".cp-work-item-object span:eq(" + this_compose_obj.parents(".cp-work-item").data("work-index") + ")";
+		    			var selected_obj = $(".obj-content").data("selected-obj");
 						var obj_str = "分派對象";
-						if(obj_length != 0){
-							obj_str = obj_length + "位成員";
+						if(obj_length){
+							var key = Object.keys(selected_obj)[0];
+							obj_str = selected_obj[key];
 							$(target).css("color","red");
 						}else{
 							$(target).removeAttr("style");
@@ -1214,7 +1243,7 @@ $(function(){
 						$(target).html(obj_str);
 
 		    			//製作發佈對象list 轉換成str 避免call by reference
-		    			var obj_str = JSON.stringify($(".obj-content").data("selected-obj"));
+		    			var obj_str = JSON.stringify(selected_obj);
 		    			this_compose_obj.data("obj",obj_str);
 		    		}else{
 		    			//其餘發佈對象
@@ -1838,6 +1867,16 @@ $(function(){
 					});
 				});
 
+				var me_gu_obj = {
+					gu : gu,
+					n : $.lStorage(ui)[gi].guAll[gu].n
+				};
+				gul_arr.push(me_gu_obj);
+
+				body.meta.tu = {
+					gul : gul_arr
+				};
+
 				if(empty_chk) break;
 				
 				var ml_obj = {
@@ -1857,8 +1896,6 @@ $(function(){
 				empty_chk = composeVoteObjMake(this_compose,body);
 
 				empty_smsg = "投票內容不完整！";
-				console.debug("body:",JSON.stringify(body,null,2));
-				console.debug("compose data :",this_compose.data());
 				break;
 			//任務 定點回報
 			case 5:
@@ -1868,20 +1905,23 @@ $(function(){
 		//加入發佈對象 工作需要特別處理
 		if(ctp != 3){
 			//空值表示 發佈全體
-			if(this_compose.data("obj") && Object.keys(this_compose.data("obj")).length){
-				var gul_arr = [];
-				$.each(this_compose.data("obj"),function(i,val){
-					var temp_obj = {
-						gu : i,
-						n : val
+			if(this_compose.data("obj")){
+				var object_obj = $.parseJSON(this_compose.data("obj"));
+				if(Object.keys(object_obj).length){
+					var gul_arr = [];
+					$.each(object_obj,function(i,val){
+						var temp_obj = {
+							gu : i,
+							n : val
+						};
+						gul_arr.push(temp_obj);
+					});
+					body.meta.tu = {
+						gul : gul_arr
 					};
-					gul_arr.push(temp_obj);
-				});
-				body.meta.tu = {
-					gul : gul_arr
-				};
-			}else{
-				delete body.meta.tu;	
+				}else{
+					delete body.meta.tu;	
+				}
 			}
 		}
 		
@@ -1998,7 +2038,7 @@ $(function(){
 			if(is_push) body.ml.push(obj);
 		});
 
-		console.debug("body:",JSON.stringify(body,null,2));
+		// console.debug("body:",JSON.stringify(body,null,2));
 		// return false;
 
 		//等待上傳完畢 最多10秒
@@ -2410,6 +2450,7 @@ $(function(){
         var result = ajaxDo(api_name,headers,method,true);
     	result.complete(function(data){
     		var s_data = $.parseJSON(data.responseText).el;
+    		if(this_ei == "Event-3092") console.debug("s_data:",s_data);
     		//將此則動態的按讚狀態寫入data中
 			//轉換array 成json object 減少回圈使用
 			var s_obj = {};

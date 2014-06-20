@@ -1479,7 +1479,7 @@
 	background: rgb(223,236,244);
 }
 
-.st-work-option-mine {
+.work-mine-finished {
 	background: rgb(173,223,233);
 }
 
@@ -1618,8 +1618,9 @@
 	border: 1px solid #c3ced7;
 	padding: 10px 0;
 	width: 350px;
-	margin: auto;
-
+	margin: 0 auto 10px;
+	position: relative;
+	left: 1px;
 }
 
 

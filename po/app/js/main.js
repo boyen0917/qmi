@@ -65,12 +65,11 @@ $(function(){
 	
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
 		//logout~
-		
-		popupShowAdjust("發生錯誤 請重新登入");
+		console.debug("jqxhr:",jqxhr);
+		popupShowAdjust(jqxhr.statusText);
 		popupAfterChangePage("#page-login");
-		console.log(jqxhr.responseText);
-		console.log(jqxhr.status);
-		console.log(ajaxSettings);
+		$('.ui-loader').hide();
+		$(".ajax-screen-lock").hide();
 	});
 	
 	//上一頁功能
@@ -1063,8 +1062,6 @@ $(function(){
 	//為了排除複製 滑鼠按下少於0.1秒 判斷為click  暫時不做 
 	//detail view
 	$(document).on("click",".st-sub-box-1, .st-sub-box-2",function(e){
-
-		
 
 		var this_event = $(this).parent();
 		var this_ei = this_event.data("event-id");
