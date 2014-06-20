@@ -6,7 +6,6 @@ $(function(){
 
     	localStorage.clear();
 	}
-
 	//沒宣告就會變成 global 我已經勸過前輩不要這樣寫
 	// var ui,at,gi,gu,gn,gd,ga,gm,ti_cal,ti_feed,ti_chat,device_token,zoom_out_cnt,zoom_in_cnt,filter_name,
 	// group_list,default_group,group_name,post_tmp_url,activityTimeout,
@@ -68,39 +67,52 @@ $(function(){
 		//logout~
 		
 		popupShowAdjust("發生錯誤 請重新登入");
-		popupAfterChangePage("#page-login")
+		popupAfterChangePage("#page-login");
 		console.log(jqxhr.responseText);
 		console.log(jqxhr.status);
 		console.log(ajaxSettings);
-	//	{"rsp_code":999,"rsp_msg":"參數不完整"}
-	//	400 
 	});
 	
 	//上一頁功能
-	$("#page-back-chk").html(window.location.hash);
+	$(document).data("page-history",[["#page-login"]]);
 	$(document).on("pagebeforeshow",function(event,ui){
-	    $("#page-back-chk-pre").html($("#page-back-chk").html());
-	    $("#page-back-chk").html(window.location.hash);
-	    $("#page-back-pre-title").html($($("#page-back-chk-pre").html() + " div[data-role=header] h3").html());
-	    
-	    //timeline detail 換頁前寫資料進去
-//	    if(window.location.hash == "#page-timeline-detail"){
-//	    	timelineDetailWrite(timeline_type);
-//	    }
+		var hash = window.location.hash;
+		//同一頁就不存了
+		// if(hash == $(document).data("page-history").last()[0] || back_exception){
+		// 	$(document).data("page-history").pop();
+		// 	//重置 跳頁例外確認
+		// 	back_exception = false;
+		// 	return false;
+		// }
+
+		//部分跳頁及上一頁按鈕不需要記錄歷程
+		if(back_exception){
+			back_exception = false;
+			return false;
+		}
+
+		var page_title = $(hash + " .page-title").html();
+		var page_arr = [hash,page_title];
+
+		$(document).data("page-history").push(page_arr);
 	});
 	
 	$(".page-back").click(function(){
-		$.mobile.changePage($("#page-back-chk-pre").html(), {transition: "slide",reverse: true});
-		$($("#page-back-chk-pre").html() + " div[data-role=header] h3").html($("#page-back-pre-title").html());
+
+		//按上一頁不需要記錄歷程
+		back_exception = true;
+		var t= $(document).data("page-history");
+
+		$(document).data("page-history").pop();
+		$.mobile.changePage($(document).data("page-history").last()[0], {transition: "slide",reverse: true});
+		//console.debug("last:",$(document).data("page-history").last()[0]);
 	});
-	
+
 	//----------------------------------- 登入 ---------------------------------------------
 
 	
 	//若local storage 有記錄密碼 就顯示
 	if($.lStorage("_loginInfo")){
-		console.log(12313);
-		console.log($.lStorage("_loginInfo"));
 		$("#phone").val($.lStorage("_loginInfo").phone);
 		$("#code").val($.lStorage("_loginInfo").code);
 
@@ -127,9 +139,7 @@ $(function(){
 	        "li":"zh_TW"
 	    };
 	    var method = "post";
-	    console.log(headers);
 	    var result = ajaxDo(api_name,headers,method,true);
-	    console.log(result);
 	    result.complete(function(data){
 	        if(data.status != 200){
 	        	popupShowAdjust("帳號或密碼不對");
@@ -718,7 +728,6 @@ $(function(){
 	
 	//主要filter
 	$(".st-filter-main").click(function(){
-		console.log(11);
 		if($(".st-filter-other").is(":visible")){
 			$(".st-filter-other").slideUp();	
 		}else{
@@ -1106,10 +1115,26 @@ $(function(){
 	    			case 2:
 	    				break;
 	    			case 3:
+	    				//工作
+	    				this_event.find(".st-box2-more-task-area").hide();
+	    				this_event.find(".st-box2-more-task-area-detail").show();
+	    				//開啟工作細節
+	    				this_event.find(".st-task-work-detail").show();
+
+	    				if(this_event.data("task-over")) break;
+	    				//判斷有無投票過 顯示送出 已送出 已結束等等
+	    				// var event_status = this_event.data("event-status");
+	    				// if(event_status[this_ei] && event_status[this_ei].ik){
+	    				// 	this_event.find(".st-vote-send").html("完成");
+	    				// 	this_event.find(".st-vote-send").removeClass(".st-vote-send-blue");
+	    				// }
+
 	    				break;
 	    			case 4:
 	    				this_event.find(".st-box2-more-task-area").hide();
 	    				this_event.find(".st-box2-more-task-area-detail").show();
+	    				//開啟投票細節
+	    				this_event.find(".st-task-vote-detail").show();
 	    				
 	    				if(this_event.data("task-over")) break;
 	    				//判斷有無投票過 顯示送出 已送出 已結束等等
@@ -1126,8 +1151,13 @@ $(function(){
 	    				break;
 	    		};
 
-	    		//回覆 detail timeline message內容
-				replyDetailTimelineContentMake(this_event,e_data);
+	    		//讚留言閱讀
+        		this_event.find(".st-sub-box-3 div:eq(0)").html(e_data[0].meta.lct);
+        		this_event.find(".st-sub-box-3 div:eq(1)").html(e_data[0].meta.pct);
+        		this_event.find(".st-sub-box-3 div:eq(2)").html(e_data[0].meta.rct);
+
+	    		//detail timeline message內容
+				detailTimelineContentMake(this_event,e_data);
     		});
 	});
 
@@ -1155,32 +1185,27 @@ $(function(){
 
 		//錯誤訊息
 		var error_msg_arr = [];
-		error_msg_arr[".cp-textarea-desc"] = "內容尚未填寫";
 		error_msg_arr[".cp-textarea-title"] = "標題尚未填寫";
+		error_msg_arr[".cp-textarea-desc"] = "內容尚未填寫";
 
 		var chk_arr = [".cp-textarea-desc"];
 
 		//判斷欄位是否填寫
 		switch(ctp){
-			//普通貼文
-			case 0:
+			case 0://普通貼文
 				break;
-			//公告
-			case 1:
+			case 1://公告
 				chk_arr.push(".cp-textarea-title");
 				break;
-			//通報
-			case 2:
+			case 2://通報
 				break;
-			//任務 工作
-			case 3:
-				break;
-			//任務 投票
-			case 4:
+			case 3://任務 工作
 				chk_arr.push(".cp-textarea-title");
 				break;
-			//任務 定點回報
-			case 5:
+			case 4://任務 投票
+				chk_arr.push(".cp-textarea-title");
+				break;
+			case 5://任務 定點回報
 				break;
 		}
  		

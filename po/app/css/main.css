@@ -720,11 +720,18 @@
 }
 
 
-.header-group-name {
+.header-group-name ,.header-cp-object{
 	text-align: center;
 	width: 50%;
 	margin: 2px auto -1px;
 	height: 50px;
+}
+
+.header-cp-object{
+	position: relative;
+	right: 15px;
+	line-height: 45px;
+	font-size: 18px;
 }
 
 .header-group-name div:nth-child(1) {
@@ -1414,7 +1421,7 @@
 
 .st-box2-more-desc,.st-box2-more-desc-detail,.st-box2-more-time,.st-box2-more-task-area,
 .st-task-vote-detail-count, .st-vote-detail-top, .st-vote-detail-option, .st-vote-send,
-.st-vote-detail-desc,.st-box2-bottom-block {
+.st-vote-detail-desc,.st-box2-bottom-block,.st-work-option {
     position: relative;
     top: -30px;
     left: -15px;
@@ -1466,6 +1473,44 @@
     height: 26px;
 }
 
+
+
+.st-work-option {
+	background: rgb(223,236,244);
+}
+
+.st-work-option-mine {
+	background: rgb(173,223,233);
+}
+
+.st-work-option-gray {
+	color: #a9a9a9;
+}
+
+.st-work-option-tu {
+	position: absolute;
+	right: 5px;
+	top: 15px;
+	width: 80px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.st-work-option-tu img {
+	top: 2px;
+	width: 17px;
+	margin-right: 5px;
+}
+
+.st-work-option > span {
+	width: 70%;
+	display: -webkit-box;
+	margin-top: 3px;
+}
+
+
+
+
 .st-vote-detail-desc {
     background: rgb(212,227,233);
     border: 1px solid rgb(207,221,227);
@@ -1474,13 +1519,13 @@
 .st-vote-detail-option span:nth-child(2) {
 	width: 90%;
     display: block;
-    padding-top: 3px;
+    padding-top: 5px;
 }
 
 .st-vote-detail-option span:nth-child(3) {
 	position: relative;
 	top: 2px;
-	right: 5px;
+	right: 15px;
 }
 
 .st-vote-send,.st-vote-send-blue {
@@ -1501,12 +1546,17 @@
     border: 1px solid rgb(83,175,217);
 }
 
+
+
 .st-box2-more-task-area {
     border: 1px solid rgb(200,220,240);
 }
 
 .st-box2-more-task-area img{
     float: left;
+    width: 30px;
+	position: relative;
+	bottom: 2px;
 }
 
 .st-task-status {
@@ -1516,7 +1566,7 @@
 
 .st-box2-next {
 	float: right;
-	background: url(../images/common/icon_arrow_next_blue.png) no-repeat;
+	background: url(../images/common/icon/icon_arrow_next_blue.png) no-repeat;
 	background-size: cover;
 	height: 20px;
 	width: 20px;
@@ -1546,16 +1596,20 @@
 }
 
 .st-vote-detail-option {
-	border: 1px solid rgb(200,220,240);
 	border-top: 0px;
+}
+
+.st-vote-detail-option,.st-work-option {
+	border: 1px solid rgb(200,220,240);
 	min-height: 26px;
 	display: -webkit-box;
 }
 
-.st-vote-detail-option img {
+.st-vote-detail-option > img, .st-work-option > img {
 	margin-right: 10px;
 	position: relative;
-	top: 4px;
+	top: 2px;
+	width:30px;
 }
 
 
@@ -1582,6 +1636,7 @@
 
 .st-attach-url-img img {
     position: relative;
+    width: 100%;
 }
 
 .st-attach-url-title {
@@ -1706,7 +1761,7 @@
     outline:none;
 }
 
-.st-attach-audio {
+.st-attach-audio-bak {
 	background: #e9eef2;
 	border: 1px solid #c5cbd0;
 	border-radius: 3px;
@@ -1774,7 +1829,7 @@
 }
 
 .st-feedback-box-content{
-    background: url(../images/common/icon_check_round_white.png) no-repeat;
+    background: url(../images/common/icon/icon_check_round_white.png) no-repeat;
     background-size: 25px;
     padding-left:40px;
     height: 30px;
@@ -1788,13 +1843,15 @@
 }
 
 .st-feedback-next{
-	background: url(../images/common/icon_arrow_next_blue.png) no-repeat;
+	background: url(../images/common/icon/icon_arrow_next_blue.png) no-repeat;
 	background-size: cover;
 	height: 23px;
 	width: 23px;
 	float: right;
 	margin-right: 5px;
 }
+
+
 
 .st-reply-area {
     background: white;
@@ -1935,7 +1992,7 @@
     font-size: 12px;
 }
 
-.cp-post {
+.cp-post ,.obj-done {
 	position: absolute;
 	right: 0;
 	top: 0px;
@@ -1948,17 +2005,17 @@
 	border-left: 1px solid #000;
 }
 
-.cp-post:active {
+.cp-post:active ,.obj-done:active {
     background:rgb(0,86,138);
 }
 
-.cp-post img {
+.cp-post img ,.obj-done img {
 	position: relative;
 	top: 12px;
 	right: 2px;
 }
 
-.cp-post span {
+.cp-post span ,.obj-done span {
 	position: relative;
 	top: 3px;
 }
@@ -1969,7 +2026,7 @@
     display:table;
 }
 
-.cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-vote-area-test,.cp-time-area{
+.cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-work-area,.cp-vote-area-test,.cp-time-area{
     background: white;
 	width: 95%;
 	margin: 13px auto;
@@ -2074,8 +2131,19 @@
     top: 5px;
 }
 
+.cp-content-object {
+	cursor:pointer;
+}
+
+.cp-content-object span {
+	position: absolute;
+	right: 45px;
+	font-size: 15px;
+	color: red;
+}
+
 .cp-object-btn{
-	width: 20px;
+	width: 25px;
 	float: right;
 	position: relative;
 	top: 9px;
@@ -2127,28 +2195,16 @@
 
 
 
-/*
-
- ######   #######  ##     ## ########   #######   ######  ########       ##     ##  #######  ######## ######## 
-##    ## ##     ## ###   ### ##     ## ##     ## ##    ## ##             ##     ## ##     ##    ##    ##       
-##       ##     ## #### #### ##     ## ##     ## ##       ##             ##     ## ##     ##    ##    ##       
-##       ##     ## ## ### ## ########  ##     ##  ######  ######         ##     ## ##     ##    ##    ######   
-##       ##     ## ##     ## ##        ##     ##       ## ##              ##   ##  ##     ##    ##    ##       
-##    ## ##     ## ##     ## ##        ##     ## ##    ## ##               ## ##   ##     ##    ##    ##       
- ######   #######  ##     ## ##         #######   ######  ########          ###     #######     ##    ######## 
-
-*/
 
 
-
-.cp-vote-area {
+.cp-vote-area,.cp-work-area {
 	overflow: hidden;
 	position: relative;
 	padding-bottom: 55px;
 }
 
 
-.cp-vote-area img{
+.cp-vote-area img,.cp-work-area > img{
 	cursor:pointer;
 }
 
@@ -2159,14 +2215,13 @@
 	line-height: 60px;
 }
 
-.cp-vote-area textarea{
+.cp-vote-area textarea,.cp-work-area textarea{
 	position: relative;
 	top: 23px;
 }
 
 
-.cp-vote-area textarea {
-	width: 75%;
+.cp-vote-area textarea,.cp-work-area textarea {
 	border: 0;
 	font-size: 15px;
 	height: 15px;
@@ -2174,7 +2229,7 @@
 	margin: -2px 10px;
 }
 
-.cp-vote-area textarea:focus{ outline:none } 
+.cp-vote-area textarea:focus,.cp-work-area textarea { outline:none } 
 
 
 .cp-vote-ques-title img:nth-child(1) {
@@ -2182,6 +2237,10 @@
 	top: 18px;
 	width: 30px;
 	left:5px;
+}
+
+.cp-vote-area textarea {
+	width: 75%;
 }
 
 .cp-vote-ques-title span {
@@ -2201,18 +2260,19 @@
 
 
 
-.cp-vote-ques-title img:nth-child(1), .cp-vote-opt img {
+.cp-vote-ques-title img:nth-child(1), .cp-vote-opt img,.cp-work-item > img {
 	display:none;
 }
 
-.cp-vote-opt {
+.cp-vote-opt,.cp-work-item {
 	min-height: 60px;
 	line-height: 60px;
 	padding-left: 20px;
 	border-bottom: 1px solid rgb(245,245,245);
+	position: relative;
 }
 
-.cp-vote-opt img, .cp-vote-opt span, .cp-vote-ques-title img, .cp-vote-ques-title span {
+.cp-vote-opt img, .cp-vote-opt span, .cp-vote-ques-title img, .cp-vote-ques-title span,.cp-work-item > img,.cp-work-item span {
 	float: left;
 }
 
@@ -2228,12 +2288,46 @@
 	position: relative;
 	top: 3px;
 	left: 10px;
-
 }
 
+.cp-work-area textarea {
+	width: 60%;
+}
 
+.cp-work-item > img{
+	width: 25px;
+	position: relative;
+	top: 21px;
+}
 
+.cp-work-item > span{
+	margin-right: 10px;
+	position: relative;
+	top: 3px;
+	left: 10px;
+}
 
+.cp-work-item-object {
+	position: absolute;
+	top: 0;
+	right: 3px;
+	cursor: pointer;
+}
+
+.cp-work-item-object span {
+	position: relative;
+	top: 2px;
+	color: #aaa;
+}
+
+.cp-work-item-object-red {color:red;}
+.cp-work-item-object-black {color:black;}
+
+.cp-work-item-object img {
+	width: 30px;
+	position: relative;
+	top: 12px;
+}
 
 
 .cp-vote-add-opt {
@@ -2290,7 +2384,7 @@
 	width: 60px;
 }
 
-.cp-vote-add-ques {
+.cp-vote-add-ques ,.cp-work-add-item{
 	background: #7bbbec;
 	height: 60px;
 	width:100%;
@@ -2302,11 +2396,11 @@
 	cursor: pointer;
 }
 
-.cp-vote-add-ques:active {
+.cp-vote-add-ques:active,.cp-work-add-item:active {
 	background: #72c5eb;
 }
 
-.cp-vote-add-ques img {
+.cp-vote-add-ques img ,.cp-work-add-item img {
 	position: relative;
 	top: 10px;
 	right: 0px;
@@ -2493,17 +2587,115 @@ input.cp-datetimepicker-end {
 .cp-yql-img {
 	display: inline-block;
 	margin: 10px;
+	height: 150px;
+	overflow: hidden;
 }
 
 .cp-yql-img img {
-    width: 200px;
+    width: 300px;
 }
 
 .cp-yql-desc {
 	line-height: 20px;
 	width: 90%;
-	display: inline-block;
 	text-align: left;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 6;
+	-webkit-box-orient: vertical;
+	margin: auto;
+}
+
+
+/* =============================== page object ==================================== */
+
+.obj-content {
+	background: #d2d2d2;
+	width: 100%;
+	overflow: hidden;
+}
+
+.obj-selected {
+	display: flex;
+	background: rgb(223,236,243);
+	white-space: nowrap;
+	height: 50px;
+	font-size: 18px;
+	line-height: 50px;
+}
+
+.obj-selected div:nth-child(1) {
+	margin: 0 10px;
+	color: #1264a7;
+}
+
+.obj-selected div:nth-child(2) {
+	overflow: scroll;
+	white-space: nowrap;
+	margin: 0 10px;
+	padding-right: 30px;
+}
+
+.obj-selected > div > img {
+	width: 25px;
+	position: relative;
+	top: 5px;
+	left: 3px;
+}
+
+.obj-selected span {
+	margin-right: 10px;
+	color: #535759;
+}
+
+.obj-cell {
+	background: white;
+	display: -webkit-box;
+	height: 80px;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.obj-cell-chk {
+	margin-left: 20px;
+	position: relative;
+	top: 22px;
+}
+
+.obj-cell-chk img {
+	width: 35px;
+}
+
+.obj-cell-user-pic {
+	margin-left: 20px;
+	position: relative;
+	top: 9px;
+	border: 1px solid #d2d2d2;
+	height: 60px;
+	width: 60px;
+	overflow: hidden;
+	border-radius: 5px;
+}
+
+.obj-cell-user-pic img {
+	width: 60px;
+}
+
+.obj-cell-user-data {
+	margin: 15px 0 0 20px;
+	width: 60%;
+	display: block;
+}
+
+.obj-user-name {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	outline: 0!important;
+	font-size: 18px;
+}
+
+.obj-user-title {
+	color: #777;
 }
 
 /* =============================== page chatroom ==================================== */
@@ -2754,4 +2946,23 @@ input.cp-datetimepicker-end {
 .chat-bar-send:active{
 	background:rgb(8,39,66);
 	color:black;
+}
+
+
+
+
+.st-sub-name span {
+	position: absolute;
+	left: 83px;
+	top: 3px;
+	color: #d2d2d2;
+	font-size: 15px;
+}
+
+
+.st-reply-username span {
+	position: absolute;
+	right: 15px;
+	font-size: 15px;
+	color: #d2d2d2;
 }

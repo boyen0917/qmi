@@ -8,9 +8,10 @@
         所屬部門
         <div class="cp-apt-btn-area">以個人身份發佈<img src="images/ap_box_arrow.png"/></div>
     </div>
-    <div data-sp-box="object" class="cp-content-box cp-content-object">
+    <div data-sp-box="object" class="cp-content-box cp-content-object" style="display:none">
         <img class="cp-icon-size" src="images/compose/compose_form_icon_object.png"/>
         發佈對象
+        <span></span>
         <img class="cp-object-btn" src="images/ap_box_arrow.png"/>
     </div>
     <div data-sp-box="top" class="cp-content-box cp-content-top" style="display:none">
@@ -23,13 +24,29 @@
         <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
     </div>
 
+    <div class="cp-work-area" style="display:none">
+         
+        <div class="cp-work-item" data-work-index="0">
+            <img src="images/common/icon/icon_compose_close.png"/>
+            <span>1</span>
+            <textarea class="cp-opt-textarea textarea-animated cp-work-empty-chk" placeholder="" data-role="none"></textarea>
+            <div class="cp-work-item-object">
+                <span>分派對象</span>
+                <img src="images/ap_box_arrow.png"/>
+            </div>
+        </div>
+        <div class="cp-work-add-item">
+            <img src="images/compose/vote/compose_post_vote_icon_add_yellow.png" style="width:35px"/>
+            <span>新增項目</span>
+        </div>
+    </div>
+
     <div class="cp-vote-area" style="display:none">
          
         
         <div class="cp-vote-add-ques">
             <img src="images/compose/vote/compose_post_vote_icon_add_yellow.png" style="width:35px"/>
             <span>新增項目</span>
-            <!-- <div class="cp-vote-bottom-cover"></div> -->
         </div>
     </div>
 

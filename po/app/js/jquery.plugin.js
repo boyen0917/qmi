@@ -81,4 +81,8 @@
 	    ss=(s=dateObject.getSeconds())<10?('0'+s):s;
 	    return formatString.replace("#hhh#",hhh).replace("#hh#",hh).replace("#h#",h).replace("#mm#",mm).replace("#m#",m).replace("#ss#",ss).replace("#s#",s).replace("#ampm#",ampm).replace("#AMPM#",AMPM);
 	}
+
+	Array.prototype.last = function(){
+        return this[this.length - 1];
+    };
 })(jQuery);

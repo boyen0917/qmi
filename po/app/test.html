@@ -3,21 +3,6 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
-.st-vote-send {
-    background: rgb(179,192,199);
-    border: 1px solid rgb(177,188,199);
-}
-
-.st-vote-send,.st-vote-send-blue {
-    color: white;
-    text-align: center;
-    font-size: 20px;
-}
-
-.st-vote-send-blue {
-    background: rgb(76,157,193);
-    border: 1px solid rgb(83,175,217);
-}
 
 
     </style>
@@ -30,196 +15,23 @@
     <script type="text/javascript">
 
     $(function(){
-
-        // url = "http://goo.gl/3adJSy";
-
-        // encode_url = "select%20*%20from%20html%20where%20url%3D%22" + url + "%22%20and%20xpath%3D%22%2F%2Fimg%7C%2F%2Ftitle%7C%2F%2Fhead%2Fmeta%5B%40property%3D'og%3Aimage'%20or%20%40property%3D'og%3Atitle'%20or%20%40property%3D'og%3Adescription'%20or%20%40name%3D'description'%20%5D%22%20and%20compat%3D%22html5%22";
-        // var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encode_url + '&format=json&callback=?';
-        // //var q = 'http://query.yahooapis.com/v1/public/yql?q=' +  + '&format=json&callback=?';
-        //     console.debug("url:",q);
-        //     $.ajax({
-        //         type: 'GET',
-        //         url: q, 
-        //         dataType: 'jsonp',
-        //         success: function(data, textStatus) {
-        //             console.log(JSON.stringify(data,null,2));
-        //         }
-        //     });
-
-
-
-
-
-
-
-        // return false;
+        var xxx = "victoria";
+        var yyy = "toria";
+        var rgxp = new RegExp(yyy, "g");
         
-        //拆成detail及timeline list版 並做 html entities 和 url a tag
-        timelineContentFormat = function (c,limit){
-            limit = limit*6;
-            if(!c){
-                return false;
-            }
-
-            //html entities
-            var content = encodeHtmlEntity(c);
-            var result_str = [];
-            
-            for(n=0;n<2;n++){
-                if(n == 0){
-                    result_str[n] = content.substring(0,limit);
-                }else{
-                    result_str[n] = content;
-                }
-
-                result_str[n] = urlFormat2(result_str[n]);
-                
-            }
-            
-            if(c.length > limit){
-                result_str[0] += "...";
-            }
-            return result_str;
-        }
-
-    urlFormat = function (str){
-        console.debug("urlFormat before:",str);
-        str = str.replace(/\n|\r/g,"&#32;<br/>&#32;").split("&#32;");
-        $.each(str,function(i,val){
-            if(val.substring(0, 39) == '&#104;&#116;&#116;&#112;&#58;&#47;&#47;' || val.substring(0, 45) == '&#104;&#116;&#116;&#112;&#115;&#58;&#47;&#47;'){
-                
-                str.splice(i,1,"<a href=\"" + val + "\" target=\"_blank\">" + val + "</a>");
-            }
-        });
-
-        console.debug("urlFormat after:",str.join(" "));
-        return str.join(" ");
-
-    }
-
-    urlFormat2 = function (str){
-        str = str.replace(/\n/g," \n ").split(" ");
-        console.debug("begin:",str);
-        $.each(str,function(i,val){
-            if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
-                encode_val = "<a href=\"" + encodeHtmlEntity(val) + "\" target=\"_blank\">" + encodeHtmlEntity(val) + "</a>";
-            }else{
-                encode_val = encodeHtmlEntity(val);
-            }
-            str.splice(i,1,encode_val);
-        });
-
-        return str.join(" ");
-
-    }
-
-
-        var decodeHtmlEntity = function(str) {
-          return str.replace(/&#(\d+);/g, function(match, dec) {
-            return String.fromCharCode(dec);
-          });
-        };
-         
-        var encodeHtmlEntity = function(str) {
-            if(!str) return false;
-
-            var escape_list = {"10":"<br/>"};
-            var buf = [];
-            for (var i=str.length-1;i>=0;i--) {
-                var char_code = str[i].charCodeAt();
-                if(escape_list[char_code]){
-                    buf.unshift(escape_list[char_code]);
-                }else{
-                    buf.unshift(['&#', char_code, ';'].join(''));
-                }
-             }
-          return buf.join('');
-        };
-
-
-
-        var test = "";
-
-        // $("textarea:eq(0)").bind('input',function(){
-        //     var value = $(this).val();
-        //     // console.debug("textarea:",value);
-
-        // });
-
-        // $("textarea:eq(1)").click(function(){
-        //     var value = $("textarea:eq(0)").val();
-
-
-
-
-        //     $(this).val(value);
-        // });
-
-        $("buttons").click(function(){
-            dd = 1401282581000;
-            $("#start").datetimepicker("reset");
-
-            var time = new Date(dd);
-            var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
-            // time_format = time_format.split(",");
-            console.log(time_format);
-            // console.log(time_format[0]);
-            // console.log(time_format[1]);
-            // console.log(time_format[2]);
-            // var value = $("textarea:eq(0)").val();
-
-
-            // var tt = urlFormat2(value);
-
-            // $("div:eq(0)").html(tt);
-            $("input.DateFrom").datepicker("show");
-        });
-
-        // $("input.DateFrom").bind("input",function(){
-        //     console.log($("input.DateFrom").val());
-        // });
-
-        // $("input.DateFrom").datepicker({
-        //     minDate: 0  ,
-        //     dateFormat: "@",
-        //     onSelect: function(dateText) {
-        //         console.log(dateText);
-        //     }
-        // });
-
-        var arr = ["a","b","c","d","e"];
-        arr.push("tail");
-        arr.unshift("head");
-
-        console.debug("arr:",arr);
+        console.log(xxx.match(rgxp));
         
-
-        $("#start").datetimepicker({
-            minDate: "2014/5/22",
-            format:'unixtime',
-            onChangeDateTime:function(){
-                var time = new Date($("#start").val()*1000);
-                $("#end").datetimepicker({
-                    minDate: time.customFormat( "#YYYY#/#M#/#D#" )
-                });
-
-            }
-        });
-
-        $("#end").datetimepicker({
-            minDate: "2014/5/22",
-            format:'unixtime'
-        });
+        // $.ajax ({
+        //     url: "http://gdata.youtube.com/feeds/api/videos/xUAsrIorY5s?v=2&prettyprint=true&alt=jsonc",
+        //     success: function(result){
+        //         console.log(result);
+        //         console.debug("title",result.data.title);
+        //     }   
+        // });     
 
     });
     </script>
 </head>
 <body>
-    <input id="start">
-    <input id="end">
-    <textarea></textarea><br/><button>送出</button>
-    <div style="font-size:15px;width:300px;height:200px;border:1px solid;"></div>
-    <div style="font-size:15px;width:300px;height:200px;border:1px solid red;"></div>
-    <!-- <textarea  style="font-size:15px;width:80%;height:500px"></textarea> -->
 </body>
 </html>

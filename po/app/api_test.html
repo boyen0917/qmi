@@ -50,7 +50,6 @@
 
         var result = ajaxDo(api_name,headers,method,true);
         result.complete(function(data){
-            console.log(data);return false;
         	ui = $.parseJSON(data.responseText).ui;
             at = $.parseJSON(data.responseText).at;
 
@@ -176,8 +175,8 @@
                     var result = ajaxDo(api_name,headers,method,true,body);
                      
                     break;
-                case "timeline_post":
-                    var api_name = "groups/b1c77966-6037-4244-82fc-a37d4d0504a8/timelines/177bb2ec-0f7d-4dba-8d2d-6af8c8b225d7/events";
+                case "timeline_post"://0efa069a-b882-4ea6-a78e-c36966ee4aa1
+                    var api_name = "groups/0efa069a-b882-4ea6-a78e-c36966ee4aa1/timelines/14876c4b-508c-4bb4-9e23-ff292a01acbc/events?ep=Event-999";
 
                     var headers = {
                              "ui":ui,
@@ -192,16 +191,17 @@
                             //"lv": 0(使用者)、1(團體)、2(團體使用者)、3(群組),
                             //"tp": [0](0=樓主,1=回覆訊息)、[1](0=訊息,1=公告,2=通報專區,3=任務-工作,4=任務-投票,5=任務-定點回報,6=行事曆)
                             "lv":"1",
-                            "tp":"01",
-                            "tt":"公告標題"
-                          }/*,
+                            "tp":"13",
+                            "fin":false
+                          },
                           "ml":
                           [
-                            // {
-                            //   "tp": 0,
-                            //   "c": ""
-                            // }
-                          ]*/
+                            {
+                              "tp": 13,
+                              "k": 1,
+                              "a": true
+                            }
+                          ]
                         }
                                      
                     var result = ajaxDo(api_name,headers,method,true,body);
@@ -296,7 +296,7 @@
                     	break;
                     
                 case "group/user"://單一團體
-                	var api_name = "groups/e2b777c8-68a7-468e-b9e4-b2434ccb86fb/users";
+                	var api_name = "groups/0efa069a-b882-4ea6-a78e-c36966ee4aa1/users";
                     var headers = {
                         "ui":ui,
                         "at":at,

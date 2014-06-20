@@ -73,7 +73,7 @@
         <div data-role="page" id="page-register">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3>行動電話號碼註冊</h3>
+                <h3 class="page-title">行動電話號碼註冊</h3>
             </div>
             <div data-role="content">
                 <input type="text" id="countrycode" value="地區&nbsp;&nbsp;&nbsp;&nbsp;+886&nbsp;台灣" readonly>
@@ -94,7 +94,7 @@
         <div data-role="page" id="page-register-auth">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3>行動電話號碼認證</h3>
+                <h3 class="page-title">行動電話號碼認證</h3>
             </div>
             <div data-role="content">
                  <div class="register-desc-area">
@@ -112,7 +112,7 @@
         <div data-role="page" id="page-password">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3>密碼設定</h3>
+                <h3 class="page-title">密碼設定</h3>
             </div>
             <div data-role="content">
                 <input type="password" id="pw-setting" maxlength=20 placeholder="請輸入6-20半形英數字" onkeyup="value=value.replace(/[^-_A-Z0-9a-z]/g,'')">
@@ -125,7 +125,7 @@
         <div data-role="page" id="page-helper">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3>團體建立/加入</h3>
+                <h3  class="page-title">團體建立/加入</h3>
             </div>
             <div class="center-style">
 			    <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
@@ -144,7 +144,7 @@
         <div data-role="page" id="page-group-menu">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3>團體列表</h3>
+                <h3 class="page-title">團體列表</h3>
                 <div id="group-nav-area" data-role="navbar">
 			        <ul>        
                         <li><a href="#" data-group-act="gc">創建團體</a></li>
@@ -240,7 +240,7 @@
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <img class="side-menu-btn" src="images/navi/navi_icon_sidemenu.png"/>
                 <div class="header-group-name">
-                    <div>動態消息</div>
+                    <div class="page-title">動態消息</div>
                     <div></div>
                 </div>
                 <div class="feed-compose"></div>
@@ -446,7 +446,7 @@
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <div class="header-group-name">
-                    <div></div>
+                    <div class="page-title"></div>
                     <div></div>
                 </div>
                 <div class="cp-post">
@@ -466,7 +466,28 @@
                 <input class="cp-file" type="file" multiple style="display:none;" data-role="none"/>
             </div>
         </div>
-
+<!---------------------------------- page-object ------------------------------------>
+        <div data-role="page" id="page-object">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <div class="header-cp-object">
+                    <span class="page-title">選擇發佈對象</span>(<span>0</span>)
+                </div>
+                <div class="obj-done">
+                    <img src="images/navi/navi_icon_finish.png"/>
+                    <span>完成</span>
+                </div>
+            </div>
+            <div class="obj-content">
+                <div class="obj-selected">
+                    <div>選擇<img src="images/compose/compose_selectobject_icon_arrow.png"/></div>
+                    <div></div>
+                </div>
+                <div class="obj-cell-area">
+                
+                </div>
+            </div>
+        </div>
 
 <!---------------------------------- page-chatroom ------------------------------------>
         <div data-role="page" id="page-chatroom">

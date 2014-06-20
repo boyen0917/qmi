@@ -14,11 +14,16 @@ $(function(){
 	//計算螢幕長寬以維持比例
 	proportion = 1.7;
 	
+	//上一頁按鈕不需要記錄
+	back_button = false;
+	//部分跳頁不需要記錄
+	back_exception = false;
+
 	//timeline裏面點擊不做展開收合的區域
 	timeline_detail_exception = [
 		".st-sub-box-2-content-detail a",
 		".st-sub-box-2-more-desc-detail a",
-		".st-task-vote-detail",
+		".st-box2-more-task-area-detail",
 		".audio-play",
 		".st-sub-box-more-btn",
 		".st-more-close",
@@ -28,7 +33,7 @@ $(function(){
 	];
 	
 	//timeline內容 判斷不開啓附檔區域的type
-	not_attach_type_arr = [0,14,15];
+	not_attach_type_arr = [0,12,13,14,15];
 	
 	//顯示loading 圖示 的參數
 	load_show = false;
