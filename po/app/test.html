@@ -15,10 +15,6 @@
     <script type="text/javascript">
 
     $(function(){
-        var t = {
-            aaa:111
-        }        
-        console.log();
         
         // $.ajax ({
         //     url: "http://gdata.youtube.com/feeds/api/videos/xUAsrIorY5s?v=2&prettyprint=true&alt=jsonc",
@@ -26,11 +22,26 @@
         //         console.log(result);
         //         console.debug("title",result.data.title);
         //     }   
-        // });     
+        // });  
+
+        $("button").click(function(){
+            $("input").trigger("input");
+        });
+
+        $("input").bind("input",function(){
+            console.debug("input");
+        });
+        
+        var t = "fun_asdlfjaskld";
+
+        console.debug(t.substring(0,3));
+
 
     });
     </script>
 </head>
 <body>
+    <button>click</button>
+    <input type="text">
 </body>
 </html>
