@@ -10,7 +10,7 @@ function loginFun(pno,pwd){
     };
     var body={};
     body.id=id;
-    body.up=toSha1Encode(pwd);
+    body.pw=toSha1Encode(pwd);
     body.tp="0"
     var method = "post";
     return result = ajaxDo(api_name,headers,method,true,JSON.stringify(body));
