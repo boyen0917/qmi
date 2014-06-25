@@ -299,8 +299,8 @@ function inviteMemberApi(orgTree,members){
     var ul=[];
     $.each(members,function(i,val){
         var member={};
-        member.cc="+886";
-        member.pn=val.mobile;
+        //member.cc="+886";
+        member.pn="+886"+val.mobile;
         member.pn2=val.phone;
         member.ext=val.ext;
         member.em=val.mail;
