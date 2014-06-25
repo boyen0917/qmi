@@ -1124,13 +1124,18 @@ $(function(){
 		    		var this_obj = $(
 		    			'<div class="obj-cell">' +
 		                   '<div class="obj-cell-chk"><img src="images/common/icon/icon_check_round.png"/></div>' +
-		                   '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_personal_xl.png"/></div>' +
+		                   '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
 		                   '<div class="obj-cell-user-data">' + 
 		                   		'<div class="obj-user-name">' + gu_obj.n + '</div>' +
 		                   		'<div class="obj-user-title">雲端事業群。經理</div>' +
 		                '</div>'
 		    		);
-		    		if(gu_obj.au) this_obj.find(".obj-cell-user-pic img").attr("src",gu_obj.au);
+		    		var object_img = this_obj.find(".obj-cell-user-pic img");
+		    		if(gu_obj.au) {
+		    			object_img.attr("src",gu_obj.au);
+		    			//object_img.removeAttr("style");
+		    			avatarPos(object_img);
+		    		}
 
 		    		this_obj.data("gu",gu_obj.gu);
 		    		this_obj.data("gu-name",gu_obj.n);
@@ -2973,7 +2978,6 @@ $(function(){
 
 						//上傳s3成功或失敗
 						if(data.status == 200){
-
 							var api_name = "groups/" + gi + "/files/" + fi + "/commit";
 		                    var headers = {
 		                             "ui":ui,
@@ -2991,8 +2995,6 @@ $(function(){
 		                    }
 		                    var result = ajaxDo(api_name,headers,method,true,body);
 		                    result.complete(function(data){
-
-
 	                    		//上傳編號加一
 								var num = this_compose.data("uploaded-num");
 								this_compose.data("uploaded-num",num += 1);
@@ -3462,7 +3464,7 @@ $(function(){
 	};
 
 	    
-	  //計算彈出對話框置中
+	//計算彈出對話框置中
 	popupShowAdjust = function (desc,cancel,chk){
 		if(!cancel){
 			$(".popup-close-cancel").hide();

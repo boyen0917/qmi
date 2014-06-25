@@ -1,0 +1,416 @@
+.ui-body-c, .ui-body-c input, .ui-body-c select,textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c{
+    font-family: "微軟正黑體","Microsoft JhengHei";
+    -webkit-font-smoothing: antialiased;
+    font-weight: normal;
+}
+
+.ui-header.ui-bar-c.ui-header-fixed {
+	min-height: 55px;
+}
+
+.ui-bar-c {
+	background: rgb(1,102,161);
+	border-color: rgb(50,73,105);
+	color: white;
+	text-shadow: 0 0;
+}
+
+.page-back {
+	height: 40px;
+	width: 40px;
+	float: left;
+	margin: 12px 0 0 5px;
+	cursor: pointer;
+}
+
+.page-back img {
+	width: 30px;
+}
+
+.ui-body-c, .ui-overlay-c {
+	background: #eef0f2;
+}
+
+#page-registration {
+	background: url("../images/registration/registration_logins_bgimg.png") center no-repeat;
+	background-size: cover;
+}
+
+.registration-content {
+	width: 100%;
+	text-align: center;
+}
+
+.registration-logo {
+	margin: 100px 0 20px;
+}
+
+.registration-logo img {
+	width: 150px;
+	margin: 0 auto;
+}
+
+.login-desc {
+	color: white;
+	margin-bottom: 100px;
+	opacity: 0.7;
+}
+
+.login {
+	background: rgb(86,113,133);
+	width: 250px;
+	margin: 0 auto;
+	color: white;
+	text-align: center;
+	border-radius: 5px;
+	height: 30px;
+	padding-top: 10px;
+	opacity: 0.6;
+	-webkit-user-select: none;
+}
+
+.login:active {
+	background: rgb(76,103,123);
+}
+
+.register {
+	background: rgb(170,195,210);
+	width: 250px;
+	margin: 15px auto 0;
+	color: white;
+	text-align: center;
+	border-radius: 5px;
+	height: 30px;
+	padding-top: 10px;
+	opacity: 0.6;
+	-webkit-user-select: none;
+}
+
+.register:active {
+	background: rgb(150,175,190);
+}
+
+.register-area {
+	width: 300px;
+	background: white;
+	margin: 30px auto 10px;
+	border-radius: 3px;
+	box-shadow: 0px 5px 15px -10px #d2d2d2;
+}
+
+.countrycode {
+	height: 50px;
+	line-height: 50px;
+	border-bottom: 1px solid #eee;
+}
+
+.countrycode span:nth-child(1) {
+	margin-left: 20px;
+}
+
+.countrycode span:nth-child(2) {
+	color: #888;
+}
+
+.countrycode img {
+	float: right;
+	margin: 15px 10px 0 0;
+	width: 20px;
+}
+
+.register-phone{
+	height: 50px;
+	line-height: 50px;
+	padding-left: 20px;
+}
+
+.register-phone input {
+	width: 220px;
+	border: 0;
+	font-size: 15px;
+}
+
+.register-phone input:focus, .register-otp-input input,.password-setting input, .password-confirm input {
+	outline:none;
+}
+
+.register-phone img {
+	width: 30px;
+	float: right;
+	margin: 10px 5px 0 0;
+}
+
+.register-text {
+	font-size: 13px;
+	margin: 0 auto;
+	display: table;
+}
+
+.register-next, .resend-otp, .register-otp-next, .password-next, .setting-next {
+	width: 300px;
+	background: rgb(182,202,222);
+	color: white;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	border-radius: 5px;
+	-webkit-user-select: none;
+}
+
+.register-next {
+	margin: 250px auto 0;
+}
+
+.password-next {
+	margin: 230px auto 0;
+}
+
+
+.register-next-ready, .register-otp-next-ready, .resend-otp-ready, .password-next-ready, .setting-next-ready {
+	background: rgb(98,162,223);
+}
+
+.register-next-ready:active, .register-otp-next-ready:active, .resend-otp-ready:active, .password-next-ready:active {
+	background: rgb(88,152,213);
+}
+
+.register-otp-desc-area {
+	text-align: center;
+	margin: 30px 0 20px;
+}
+
+.register-otp-desc-area span {
+	color: rgb(86,178,254);
+}
+
+.register-otp-next {
+	margin: 10px auto 0;
+}
+
+.register-otp-input {
+	margin: 0 auto;
+	width: 300px;
+	background: white;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	border-radius: 3px;
+	box-shadow: 0px 5px 15px -10px #d2d2d2;
+}
+
+.register-otp-input input {
+	width: 100px;
+	margin: 0 auto;
+	font-size: 15px;
+	border: 0;
+}
+
+.resend-otp {
+	margin: 236px auto 0;
+}
+
+.register-otp-input input.register-otp-input-style {
+	font-size: 25px;
+	letter-spacing: 10px;
+	margin-top: 5px;
+}
+
+.password-setting-area {
+	width:300px;
+	background: white;
+	margin: 30px auto 0;
+	border-radius: 3px;
+	box-shadow: 0px 5px 15px -10px #d2d2d2;
+}
+
+.password-setting, .password-confirm {
+	height: 50px;
+	line-height: 50px;
+}
+
+.password-setting input, .password-confirm input {
+	width: 220px;
+	border: 0;
+	font-size: 15px;
+	margin-left: 15px;
+}
+
+.password-setting {
+	border-bottom: 1px solid #eee;
+}
+
+.setting-area {
+	width: 300px;
+	background: white;
+	margin: 50px auto;
+	border-radius: 3px;
+	box-shadow: 0px 6px 10px -6px #d2d2d2;
+	height: 150px;
+	overflow: hidden;
+}
+
+.avatar-area {
+	background: #d2d2d2;
+	width: 110px;
+	height: 100px;
+	float: left;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.avatar-default {
+	margin: 20px 0 0 25px;
+	width: 60px;
+}
+
+/*.avatar-area .has-file {
+	margin: 0;
+	width: 110px;
+}*/
+
+.setting-name-area {
+	float: left;
+	width: 190px;
+}
+
+.setting-first-name, .setting-last-name, .setting-birth {
+	height: 49px;
+	border-bottom: 1px solid #eee;
+}
+
+.setting-birth {
+	float: left;
+	width: 100%;
+	cursor: pointer;
+}
+
+.setting-birth input{
+	cursor: pointer;
+}
+
+.setting-area input {
+	border: 0;
+	font-size: 15px;
+	margin: 15px 0 0 10px;
+	width: 90%;
+	outline: none;
+}
+
+.setting-next {
+	margin: 150px auto 0;
+}
+
+input.setting-birth-hidden {
+	position: relative;
+	top: -48px;
+	z-index: -1;
+}
+
+
+
+
+
+
+
+
+
+
+/* ======================= popup =================================*/
+.popup{
+	display: none;
+}
+
+.popup-frame {
+	position: fixed;
+	z-index: 100000;
+	border-radius: 3px;
+	top: 200px;
+	text-align: center;
+	width: 300px;
+	border: 1px solid white;
+	text-shadow: none;
+	overflow: auto;
+}
+
+.popup-title {
+	margin: 15px 0 5px;
+	color: white;
+	font-size: 18px;
+	min-height: 1px;
+}
+
+.popup-confirm-area {
+}
+
+.popup-cancel, .popup-confirm {
+	background: rgb(233,233,233);
+	color: rgb(86,178,254);
+	height: 40px;
+	font-size: 18px;
+	line-height: 40px;
+	-webkit-user-select: none;
+}
+
+.popup-confirm {
+	width: 149px;
+	float: right;
+}
+
+.popup-cancel {
+	float: left;
+	width: 149px;
+}
+
+.full-width {
+	width:100%;
+}
+
+.popup-confirm:active, .popup-cancel:active {
+	background: rgb(86,178,254);
+	color: rgb(233,233,233);
+}
+
+.popup-screen {
+	z-index:1000;
+}
+
+.popup-text {
+	color: white;
+	text-align: left;
+	margin: 5px 25px 20px;
+}
+
+.popup-screen,.ajax-screen-lock {
+	display: none;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background: black;
+	opacity: 0.85;
+}
+
+.ajax-screen-lock {
+	background: #000;
+	opacity: 0.5;
+	z-index: 1000;
+}
+
+.popup-close,.popup-close-cancel {
+    margin: 0 10px;
+    margin-top: 20px;
+    display: inline-block;
+    box-shadow: 0 1px 5px #000;
+    height: 35px;
+    width: 70px;
+    text-align: center;
+    line-height: 35px;
+    border-radius: 2px;
+    text-decoration: blink;
+    color: black;
+}
+
+.popup-close:hover {
+	background: #f9f9f9;
+}

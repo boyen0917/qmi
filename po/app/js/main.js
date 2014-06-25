@@ -1529,6 +1529,13 @@ $(function(){
 		});
 		
 	});
+
+
+
+	$(document).on("click",".namecard",function(e){
+		e.stopPropagation();
+		console.debug("hehe");
+	});
 	
 	//$(document).on("timeupdate",".st-attach-audio audio",function(){
 	//	console.log(55555);

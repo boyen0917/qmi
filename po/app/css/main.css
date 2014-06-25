@@ -4,6 +4,10 @@
     font-weight: normal;
 }
 
+.ui-header.ui-bar-c.ui-header-fixed {
+	min-height: 55px;
+}
+
 .main{
 	height:1136px;
     width:640px;
@@ -20,11 +24,15 @@
 }
 
 .page-back {
-	height: 25px;
-	width: 25px;
+	height: 40px;
+	width: 40px;
 	float: left;
-    margin: 13px 0 0 5px;
+    margin: 12px 0 0 5px;
 	cursor:pointer;
+}
+
+.page-back img {
+	width: 30px;
 }
 
 .launch_kv{
@@ -2675,7 +2683,7 @@ input.cp-datetimepicker-end {
 }
 
 .obj-cell-user-pic img {
-	width: 60px;
+	/*width: 60px;*/
 }
 
 .obj-cell-user-data {
