@@ -303,7 +303,7 @@ function inviteMemberApi(orgTree,members){
         member.pn="+886"+val.mobile;
         member.pn2=val.phone;
         member.ext=val.ext;
-        member.em=val.mail;
+        //member.em=val.mail;
         member.nk=val.name;
         ul[i]=(member);
     });
