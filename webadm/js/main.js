@@ -7,7 +7,8 @@ function loginFun(pno,pwd){
     var api_name = "login";
     var headers = {
         "id":id,
-        "up":toSha1Encode(pwd), 
+        "up":toSha1Encode(pwd),
+        "tp": 0, 
         "ns":"",
         "li":"zh_TW"
     };
