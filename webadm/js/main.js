@@ -6,14 +6,15 @@ function loginFun(pno,pwd){
     //登入認證
     var api_name = "login";
     var headers = {
-        "id":id,
-        "up":toSha1Encode(pwd),
-        "tp": 0, 
-        "ns":"",
         "li":"zh_TW"
     };
+    var body={};
+    body.id=id;
+    body.up=toSha1Encode(pwd);
+    body.tp="0"
     var method = "post";
-    return result = ajaxDo(api_name,headers,method,true);
+    return result = ajaxDo(api_name,headers,method,true,JSON.stringify(body));
+                    
 
 }
 
