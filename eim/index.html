@@ -42,28 +42,30 @@
 
 
     <!-- Fixed navbar -->
-	    <div id="navigation" class="navbar navbar-inverse navbar-fixed-top">
+	    <nav id="navigation" class="navbar navbar-inverse navbar-fixed-top">
 	      <div class="container">
+	      	
 	        <div class="navbar-header">
+	        	<!--
 	          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 	            <span class="icon-bar"></span>
 	            <span class="icon-bar"></span>
 	            <span class="icon-bar"></span>
-	          </button>
+	          </button>-->
 	          <a class="navbar-brand" href="#"><b>Co+</b></a>
 	        </div>
 	        <div class="navbar-collapse collapse">
 	          <ul class="nav navbar-nav">
 	            <li class="active"><a href="#home" class="smothscroll">首頁</a></li>
-	            <li><a href="#desc" class="smothscroll">簡介</a></li>
-	            <li><a href="#func" class="smothscroll">功能介紹</a></li>
-	            <li><a href="#showcase" class="smothscroll">線上試用</a></li>
-	            <li><a href="#contact" class="smothscroll">聯絡我們</a></li>
-	            <li><a href="http://www.mitake.com.tw/" target="_blank" class="smothscroll">三竹資訊</a></li>
+	            <li ><a href="#desc" class="smothscroll">簡介</a></li>
+	            <li ><a href="#func" class="smothscroll">功能介紹</a></li>
+	            <li ><a href="#showcase" class="smothscroll">線上試用</a></li>
+	            <li ><a href="#contact" class="smothscroll">聯絡我們</a></li>
+	            <li ><a href="http://www.mitake.com.tw/" target="_blank" class="smothscroll">三竹資訊</a></li>
 	          </ul>
 	        </div><!--/.nav-collapse -->
 	      </div>
-	    </div>
+	    </nav>
 
 
 
@@ -457,17 +459,20 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="assets/js/bootstrap.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
 	<script>
 	$('.carousel').carousel({
 	  interval: 4000
 	})
+	if(location.href.indexOf("#")==-1){
+		location.href="index.html#home";
+	}
+
 	</script>
 
     <!-- Parallax core JavaScript
     ================================================== -->
     <script src="assets/js/jquery-1.10.2.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
     <script src="assets/js/modernizr.custom.js"></script>
     <script src="assets/js/jquery.scrollTo-1.4.3.1-min.js"></script>
     <script src="assets/js/jquery.parallax.min.js"></script>
