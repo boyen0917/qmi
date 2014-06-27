@@ -6,13 +6,15 @@ function loginFun(pno,pwd){
     //登入認證
     var api_name = "login";
     var headers = {
-        "id":id,
-        "up":toSha1Encode(pwd), 
-        "ns":"",
         "li":"zh_TW"
     };
+    var body={};
+    body.id=id;
+    body.pw=toSha1Encode(pwd);
+    body.tp="0"
     var method = "post";
-    return result = ajaxDo(api_name,headers,method,true);
+    return result = ajaxDo(api_name,headers,method,true,JSON.stringify(body));
+                    
 
 }
 
@@ -297,11 +299,11 @@ function inviteMemberApi(orgTree,members){
     var ul=[];
     $.each(members,function(i,val){
         var member={};
-        member.cc="+886";
-        member.pn=val.mobile;
+        //member.cc="+886";
+        member.pn="+886"+val.mobile;
         member.pn2=val.phone;
         member.ext=val.ext;
-        member.em=val.mail;
+        //member.em=val.mail;
         member.nk=val.name;
         ul[i]=(member);
     });
