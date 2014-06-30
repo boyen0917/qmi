@@ -10,4 +10,7 @@ po/app/upload
 po/app/test.html
 po/app/api_test.html
 
-testfiles/upload/files/
+po/iosplist/ios.plist
+
+testfile/upload/files/
+
