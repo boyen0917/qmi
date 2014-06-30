@@ -1,14 +1,14 @@
 {
   "ipa": {
-    "version": "0.5.8",
-    "datetime": "2014-06-27 10:23"
+    "version": "",
+    "datetime": "2014-06-30 11:0"
   },
   "plist": {
     "version": "",
     "datetime": "2014-05-08 14:40"
   },
   "apk": {
-    "version": "0.5.8",
-    "datetime": "2014-06-27 22:3"
+    "version": "sod",
+    "datetime": "2014-06-30 11:1"
   }
 }
