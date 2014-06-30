@@ -50,21 +50,3 @@ if(isset($_GET['files']))
 echo json_encode($data);
 
 ?>
-
-
-git rm testfile/download/ajax-loader.gif
-git rm testfile/download/images/apk.png
-git rm testfile/download/images/ipa.png
-git rm testfile/download/images/plist.png
-git rm testfile/download/index.html.bak
-git rm testfile/download/ios.plist
-git rm testfile/download/jquery.js
-git rm testfile/download/jquery.mobile-1.3.2.min.css
-git rm testfile/download/jquery.mobile-1.3.2.min.js
-git rm testfile/download/main.css
-git rm testfile/download/style.css
-git rm testfile/file_list.json
-git rm testfile/files/file_list.json
-git rm testfile/index.html
-git rm testfile/upload/file_list.json
-git rm testfile/upload/file_list_bak.json
