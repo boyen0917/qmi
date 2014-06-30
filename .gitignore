@@ -9,3 +9,5 @@ po/app/upload
 *DS_Store
 po/app/test.html
 po/app/api_test.html
+
+testfiles/upload/files/
