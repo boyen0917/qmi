@@ -1,6 +1,6 @@
 <?php 
 if(@$_POST['opt'] == "update"){
- $filename = "files/file_list.json";
+ $filename = "../files/file_list.json";
  
  $fp=fopen($filename,"w");
  fputs($fp,$_POST["json_string"]);
@@ -15,7 +15,7 @@ if(isset($_GET['files']))
  $error = false;
  $files = array();
  
- $file_path='files/';
+ $file_path='../files/';
   
  foreach($_FILES as $file)
  {

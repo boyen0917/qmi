@@ -12,7 +12,7 @@
     <body>
         <div class="ajax-area"></div>
         <div class="ajax-loading ui-corner-all"><img style="width:25px;height:25px; vertical-align:middle;" src="../images/ajax-loader.gif" height='14'/>  Loading</div>
-        <div class="popup-dialog ui-corner-all"><div class="xx-area ui-corner-all"></div><span></span></div>
+        <div class="popup-dialog ui-corner-all"><span></span></div>
         <div data-role="header" class="header-style">
 	        <div style="font-size:30px; text-shadow:1px 1px 0 #525050; margin-top:5px">檔案傳輸</div>
 	    </div><!-- /header -->
@@ -47,7 +47,7 @@
 	        		  async: false
         		});
 	        	
-	        	 $.getJSON("files/file_list.json").success(function( json ) {
+	        	 $.getJSON("../files/file_list.json").success(function( json ) {
 	        		 json_data = json;
 	        		 settingFileArea()
 	             }); 
@@ -75,12 +75,12 @@
 	                 e.preventDefault();  //stop the browser from following
 	                 var file_dir;
 	                 if($(this).attr('chk') == 'plist'){
-	                     file_dir = 'itms-services://?action=download-manifest&url=https://apserver.mitake.com.tw/testfile/upload/files/ios.plist';
+	                     file_dir = 'itms-services://?action=download-manifest&url=https://apserver.mitake.com.tw/testfile/files/ios.plist';
 	                 }else if($(this).attr('chk') == 'ipa'){
-	                     file_dir = 'files/ios.ipa';
+	                     file_dir = '../files/ios.ipa';
 	                 }
 	                 else if($(this).attr('chk') == 'apk'){
-	                     file_dir = 'files/android.apk';
+	                     file_dir = '../files/android.apk';
 	                 }
 	                 window.location.href = file_dir;
 	             });
@@ -89,11 +89,6 @@
 	        		uploadFiles();
 	            });
 	        	
-	        	
-	        	$('.xx-area').click(function(){
-	                $(".ajax-area").hide();
-	                $(".popup-dialog").hide();
-	            });
 	        	
 	        	function uploadFiles(event){
 	                if(!$('#file').val()){
@@ -126,7 +121,7 @@
 	                        setTimeout(function(){
 	                        	$(".popup-dialog").hide();
 	                        	$(".ajax-area").hide();
-	                        },500);
+	                        },1000);
 	                        $(".popup-dialog > span").html('傳輸成功');
 	                        $('.cover-text').val('');
 	                    },

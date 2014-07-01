@@ -10,8 +10,6 @@
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
     </head>
     <body>
-        <div class="ajax-area"></div>
-        <div class="popup-dialog ui-corner-all"><div class="xx-area ui-corner-all"></div><span></span></div>
         <div data-role="header" class="header-style">
 	        <div style="font-size:30px; text-shadow:1px 1px 0 #525050; margin-top:5px">檔案下載</div>
 	    </div><!-- /header -->
@@ -36,7 +34,7 @@
 	        		  async: false
         		});
 	        	
-	        	 $.getJSON("../upload/files/file_list.json").success(function( json ) {
+	        	 $.getJSON("../files/file_list.json").success(function( json ) {
 	        		 json_data = json;
 	        		 settingFileArea()
 	             }); 
@@ -64,21 +62,16 @@
 	                 e.preventDefault();  //stop the browser from following
 	                 var file_dir;
 	                 if($(this).attr('chk') == 'plist'){
-	                     file_dir = 'itms-services://?action=download-manifest&url=https://apserver.mitake.com.tw/cop/upload/files/ios.plist';
+	                     file_dir = 'itms-services://?action=download-manifest&url=https://apserver.mitake.com.tw/cop/files/ios.plist';
 	                 }else if($(this).attr('chk') == 'ipa'){
-	                     file_dir = '../upload/files/ios.ipa';
+	                     file_dir = '../files/ios.ipa';
 	                 }
 	                 else if($(this).attr('chk') == 'apk'){
-	                     file_dir = '../upload/files/android.apk';
+	                     file_dir = '../files/android.apk';
 	                 }
 	                 window.location.href = file_dir;
 	             });
 	        	
-	        	
-	        	$('.xx-area').click(function(){
-	                $(".ajax-area").hide();
-	                $(".popup-dialog").hide();
-	            });
 	        	
 	        	function settingFileArea(){
                     if(json_data.ipa && json_data.plist){
