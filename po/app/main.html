@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Project O</title>
+        <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
+        <link rel="stylesheet" href="css/main.css" />
+        
+        <script src="../js/jquery.js"></script>
+        <script src="../js/jquery.mobile-1.3.2.min.js"></script>
+        
+        <script src="js/jquery.plugin.js"></script>
+        
+        <script type="text/javascript" src="js/init.js"></script>
+        <script type="text/javascript" src="js/func.js"></script>
+        
+        <script type="text/javascript" src="js/main.js"></script>
+        <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script src="test/map/jquery.tinyMap.js"></script>
+        <script src="js/linq.js"></script>
+        
+        <script src="js/sha/sha1.js"></script>
+        <script src="js/sha/enc-base64-min.js"></script>
+        <script type="text/javascript" src="js/jquery.autosize.min.js"></script>
+
+
+        <!-- jquery ui datepicker -->
+        <link rel="stylesheet" type="text/css" href="datepicker/datetimepicker.css" />
+        <script src="datepicker/datetimepicker.js"></script>
+
+        <!-- 圖庫呈現 flex slider  -->
+        <script src="flexslider/modernizr.js"></script>
+        <script defer src="flexslider/jquery.flexslider.js"></script>
+        
+
+    </head>
+    <body>
+<!---------------------------------- page-group-menu ------------------------------------>
+        <div data-role="page" id="page-group-menu">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title">團體列表</h3>
+                <div id="group-nav-area" data-role="navbar">
+			        <ul>        
+                        <li><a href="#" data-group-act="gc">創建團體</a></li>
+                        <li><a href="#" data-group-act="gj">加入團體</a></li>
+                        <li><a href="#" data-group-act="gi">團體邀請</a></li>
+                    </ul>
+			    </div>
+            </div>
+            
+            <div class="group-nav-chk" data-group-act="gl">
+            </div>
+            <div class="group-nav-chk" data-group-act="gc">
+                <img class="gm-create-head" src="images/head.png"/>
+                <div class="gm-create-content-area">
+                    團體名稱
+                    <input type="text" id="group-name" placeholder="請輸入您的團體名稱">
+                    團體介紹
+                    <textarea name="textarea-8" id="group-desc"></textarea>
+                    <a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>
+                </div>
+            </div>
+            <div class="group-nav-chk" data-group-act="gj">
+	            <div class="gm-join-area">
+	                <input type="text" id="gm-group-num" placeholder="團體編號">
+	                <input type="text" id="gm-group-pw" placeholder="團體密碼"/>
+	                <a href="#" id="gm-join-submit" data-role="button" data-theme="b" >確認</a>
+	            </div>
+            </div>
+            <div class="group-nav-chk" data-group-act="gi">
+            團體邀請
+            </div>
+        </div>
+
+        
+<!---------------------------------- page-helper ------------------------------------>
+        <div data-role="page" id="page-helper">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3  class="page-title">團體建立/加入</h3>
+            </div>
+            <div class="center-style">
+                <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
+                <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true">立即加入團體</a>
+            </div>
+            <div class="helper-title">小幫手</div>
+            <div data-role="collapsible-set" class="helper-collapsible-area ui-icon-alt" data-inset="false" data-iconpos="right" data-collapsed-icon="arrow-d">
+                <div data-role="collapsible"><h3>如何創建團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"創建團體"後,設定您的團體照片,輸入團體名稱,團體介紹,並選取""預定使用人數".</li><li>完成輸入後,點擊"建立",即完成團體之建立.</li></ol></p><a class="hg-create inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即創建團體</a><br/></div> 
+                <div data-role="collapsible"><h3>如何加入團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"加入團體"後,輸入您來自"簡訊"或"邀請訊息"內的組織代碼及OTP</li><li>完成輸入後,點擊"加入",即加入該團體.</li></ol></p><a class="hg-join inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即加入團體</a><br/></div> 
+                <div data-role="collapsible"><h3>建立事件提醒重要事項</h3><p>建立事件提醒重要事項</p></div> 
+                <div data-role="collapsible"><h3>舉辦投票不漏聽任何人的心聲</h3><p>舉辦投票不漏聽任何人的心聲</p></div> 
+                <div data-role="collapsible"><h3>多人群聊加快訊息傳遞</h3><p>多人群聊加快訊息傳遞</p></div> 
+            </div><!-- /collapsible -->
+        </div>
+<!---------------------------------- page-group-main ------------------------------------>
+        <div data-role="page" id="page-group-main">
+            <div data-role="panel" id="side-menu" data-display="push">
+	            <div class="sm-user-area">
+	               <div class="sm-user-area-l">
+	                   <div class="sm-user-pic namecard">
+                           <img src="images/common/others/empty_img_personal_xl.png" style="width: 60px;"/>
+                       </div>
+	               </div>
+                   <div class="sm-user-area-r">
+                   <div></div>
+                   <div></div>
+                   </div>
+	            </div>
+	            <div data-sm-act="feed" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_feed.png"/></div>
+                   <div class="sm-small-area-r">動態消息</div>
+                   <div class="sm-count">315</div>
+                </div>
+	            <div data-sm-act="contact" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_contact.png"/></div>
+                   <div class="sm-small-area-r">聯絡人</div>
+                   <div class="sm-count"></div>
+                </div>
+                <div data-sm-act="chat" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_chat.png"/></div>
+                   <div class="sm-small-area-r">聊天</div>
+                   <div class="sm-count"></div>
+                </div>
+                <div data-sm-act="calendar" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_calendar.png"/></div>
+                   <div class="sm-small-area-r">行事曆</div>
+                   <div class="sm-count"></div>
+                </div>
+                <div class="sm-hr">團體</div>
+                <div class="sm-group-list-area">
+                  
+                </div>
+                <div class="sm-group-list-area-add">
+                    
+                </div>
+                <div class="sm-group-switch"><div class="sm-switch-ui-adj"></div><img src="images/side_menu/sidemenu_slidedown_icon_click.png"/></div>
+                <div class="sm-group-cj">
+	                <div class="hg-create sm-group-cj-btn">新增團體</div>
+	                <div class="hg-invited sm-group-cj-btn" >團體邀請</div>
+	            </div>
+                <div class="sm-hr">系統</div>
+                <div data-sm-act="help" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_help.png"/></div>
+                   <div class="sm-small-area-r">幫助</div>
+                </div>
+                <div data-sm-act="news" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_news.png"/></div>
+                   <div class="sm-small-area-r">最新消息</div>
+                </div>
+                <div data-sm-act="setting" class="sm-small-area">
+                   <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_setting.png"/></div>
+                   <div class="sm-small-area-r">系統設定</div>
+                </div>
+            </div>
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <img class="side-menu-btn" src="images/navi/navi_icon_sidemenu.png"/>
+                <div class="header-group-name">
+                    <div class="page-title">動態消息</div>
+                    <div></div>
+                </div>
+                <div class="feed-compose"></div>
+                <div class="navi-alert"></div>
+                <div class="feed-compose-area">
+                    <div data-fc-box="post" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_post.png"/><div>貼文</div></div>
+                    <div data-fc-box="announcement" class="fc-area-subbox" style="display:none"><img class="fc-icon-size" src="images/compose/compose_box_bticon_announcement.png"/><div>公告</div></div>
+                    <div data-fc-box="feedback" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_feedback.png"/><div>通報</div></div>
+                    <div data-fc-box="work" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_work.png"/><div>任務-工作</div></div>
+                    <div data-fc-box="vote" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_vote.png"/><div>任務-投票</div></div>
+                    <div data-fc-box="check" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_check.png"/><div>任務-定點回報</div></div>
+                </div>
+                <div class="feed-compose-area-cover"></div>
+            </div>
+            <div data-role="content">
+        <!------------------------------------- 動態消息 ---------------------------------------->
+            <div class="subpage-timeline">
+                <div class="st-navi-area">
+                    <div class="st-navi-subarea-main" data-st-navi-group="navi" data-st-navi="home">
+                        <img src="images/timeline/timeline_tab_icon_home_white.png"/>
+                        <div class="color-white">全部</div>
+                    </div>
+                    <img class="st-navi-tridiv-l" src="images/timeline/timeline_tab_arrow_left.png" style="width:15px;display:none;">
+                    <img class="st-navi-tridiv-r" src="images/timeline/timeline_tab_arrow_right.png" style="width:15px">
+                    <div class="st-navi-subarea-other" data-st-navi-group="navi" data-st-navi="announcement">
+                        <img src="images/timeline/timeline_tab_icon_announcement.png"/>
+                        <div>公告</div>
+                    </div>
+                    <div class="st-navi-divider"></div>
+                    <div class="st-navi-subarea-other" data-st-navi-group="navi" data-st-navi="feedback">
+                        <img src="images/timeline/timeline_tab_icon_feedback.png"/>
+                        <div>通報</div>
+                        <div class="st-navi-count">99+</div>
+                    </div>
+                    <div class="st-navi-divider"></div>
+                    <div class="st-navi-subarea-other" data-st-navi-group="navi" data-st-navi="task">
+                        <img src="images/timeline/timeline_tab_icon_task.png"/>
+                        <div>任務</div>
+                    </div>
+                </div>
+                <div class="st-cover-area">
+                    <img class="st-cover-area-la" src="images/arrow.png">
+                    <img class="st-cover-area-ra" src="images/arrow.png">
+                    <div class="st-cover-main">
+                        
+                    </div>
+                    <div class="st-cover-bar-area">
+                        <div class="st-cover-bar-selector"></div>
+                        <div class="st-cover-bar-case">
+                            <span style="background:#fff;border-radius:7px 0 0 7px;"></span>
+                            <span style="background:#ededed;"></span>
+                            <span style="background:#dddddd;"></span>
+                            <span style="background:#d1d0d0;"></span>
+                            <span style="background:#b7b7b7;"></span>
+                            <span style="background:#9d9d9d;"></span>
+                            <span style="background:#878787;"></span>
+                            <span style="background:#6b6b6b;"></span>
+                            <span style="background:#474747;"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="st-filter-area">
+                    <div data-st-filter="all" class="st-filter-list st-filter-main"><span>全部</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
+                    <div class="st-filter-other">
+	                    <div data-st-filter="unread" class="st-filter-list"><span>未讀</span></div>
+	                    <div data-st-filter="list-1" class="st-filter-list"><span>已讀</span></div>
+	                    <div class="st-filter-list-btn"><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
+                    </div>
+                </div>
+                <select id="type-trans">
+                    <option value="te-example4"></option>
+                </select>
+                <div class="st-feedbox-area">
+                </div>
+                <!-- <div class="st-reply-message-area" data-movement="0" data-animate-chk="true">
+                  <div class="st-reply-message-bg">
+                    <img class="st-reply-message-attach" src="images/chatroom/chat_textbar_icon_add.png"/>
+                    <img class="st-reply-message-sticker" src="images/chatroom/chat_textbar_icon_emoticon.png"/>
+                    <div class="st-reply-message-textarea">
+                        <textarea placeholder="請輸入訊息..." data-role="none"></textarea>
+                        <div class="st-reply-message-send">傳送</div>
+                    </div>
+                    
+
+                  </div>
+                </div> -->
+            </div>
+        <!------------------------------------- 聯絡人 ---------------------------------------->
+                <div class="subpage-contact">
+	                <div class="main-user-area">
+	                   <div class="main-user-area-l"><img class="sm-user-pic" src="images/user_pic.png"/></div>
+	                   <div class="main-user-area-r color-white"></div>
+	                </div>
+	                <div class="main-contact-l">
+	                   <div class="main-contact-l-content-area">
+	                       <div class="main-contact-l-row">全部聯絡人<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	                       <div data-main-sub-chk="y" class="main-contact-l-row">我的最愛<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	                       <div class="main-contact-l-row-subarea">
+	                          <div class="main-contact-l-subarea-row">科技部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+	                       </div>
+	                       <div data-main-sub-chk="y" class="main-contact-l-row">總經理室<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	                       <div class="main-contact-l-row-subarea">
+	                          <div class="main-contact-l-subarea-row">策略行銷部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+	                          <div class="main-contact-l-subarea-row">科技部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+	                       </div>
+	                       <div data-main-sub-chk="y" class="main-contact-l-row">管理部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	                       <div class="main-contact-l-row-subarea">
+	                          <div class="main-contact-l-subarea-row">廉政部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+	                          <div class="main-contact-l-subarea-row">行政部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+	                       </div>
+	                       <div data-main-sub-chk="y" class="main-contact-l-row">財會部<img src="images/contact/contact_sidemenu_icon_arrow.png"/></div>
+	                       <div class="main-contact-l-row-subarea">
+	                          <div class="main-contact-l-subarea-row">聚餐部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+	                          <div class="main-contact-l-subarea-row">查帳部<img src="images/contact/contact_sidemenu_icon_arrow_white.png"/></div>
+	                       </div>
+	                       
+	                   </div>
+	                </div>
+	                <div class="main-contact-r">
+	                   <div class="main-contact-r-bar">
+	                       <div class="main-contact-r-bar-l">群組</div>
+	                       <div class="main-contact-r-bar-r">(可拖拉複製、移動群組)</div>
+	                       <div class="main-count">0</div>
+	                   </div>
+	                   <div class="main-contact-r-group">
+	                       <div class="main-contact-r-group-l"><img src="images/contact/contact_group_default_list_apt.png"></div>
+	                       <div class="main-contact-r-group-r">策略行銷部</div>
+	                   </div>
+	                   <div class="main-contact-r-bar">
+	                       <div class="main-contact-r-bar-l">成員</div>
+	                       <div class="main-contact-r-bar-r">(可拖拉複製、移動群組)</div>
+	                       <div class="main-count">3</div>
+	                   </div>
+	                   <div class="main-contact-r-block">
+	                        <div class="main-contact-r-block-l"><img class="user-pic gm-user-pic" src="images/1.jpg"></div>
+	                        <div class="main-contact-r-block-r">
+	                            <div class="main-contact-r-block-r-1">孫協志</div>
+	                            <div class="main-contact-r-block-r-2">放假中，有事請手機聯絡</div>
+	                        </div>
+	                   </div>
+	                   <div class="main-contact-r-block">
+	                        <div class="main-contact-r-block-l"><img src="images/2.jpg"></div>
+	                        <div class="main-contact-r-block-r">
+	                            <div class="main-contact-r-block-r-1">王仁甫</div>
+	                            <div class="main-contact-r-block-r-2">放假中，有事請手機聯絡</div>
+	                        </div>
+	                   </div>
+	                   <div class="main-contact-r-block">
+	                        <div class="main-contact-r-block-l"><img src="images/3.jpg"></div>
+	                        <div class="main-contact-r-block-r">
+	                            <div class="main-contact-r-block-r-1">王紹偉</div>
+	                            <div class="main-contact-r-block-r-2">放假中，有事請手機聯絡</div>
+	                        </div>
+	                   </div>
+	                   <div class="main-contact-r-block">
+	                        <div class="main-contact-r-block-l"><img src="images/4.jpg"></div>
+	                        <div class="main-contact-r-block-r">
+	                            <div class="main-contact-r-block-r-1">許孟哲</div>
+	                            <div class="main-contact-r-block-r-2">放假中，有事請手機聯絡</div>
+	                        </div>
+	                   </div>
+	                </div>
+	                
+	                <div class="main-footer">
+	                    <div data-main-act="event" class="main-footer-item"><img src="images/contact/toolbar_icon_event.png"/><div class="main-footer-desc">近期活動</div></div>
+	                    <div data-main-act="contact" class="main-footer-item"><img src="images/contact/toolbar_icon_contact.png"/><div class="main-footer-desc">聯絡人</div></div>
+	                    <div data-main-act="chat" class="main-footer-item"><img src="images/contact/toolbar_icon_chat.png"/><div class="main-footer-desc">聊天</div></div>
+	                    <div data-main-act="post" class="main-footer-item"><img src="images/contact/toolbar_icon_post.png"/><div class="main-footer-desc">公告</div></div>
+	                    <div class="main-footer-more"><img src="images/contact/toolbar_icon_more.png"/></div>
+	                    <div class="main-more-btn"></div>
+	                </div><!-- /footer -->
+	                <div class="main-footer-add">
+	                    <div data-main-act="notification" class="main-footer-item"><img src="images/contact/toolbar_icon_notification.png"/><div class="main-footer-desc">通報專區</div></div>
+	                    <div data-main-act="command" class="main-footer-item"><img src="images/contact/toolbar_icon_command.png"/><div class="main-footer-desc">命令</div></div>
+	                    <div data-main-act="calendar" class="main-footer-item"><img src="images/contact/toolbar_icon_calendar.png"/><div class="main-footer-desc">行事曆</div></div>
+	                    <div data-main-act="file" class="main-footer-item"><img src="images/contact/toolbar_icon_file.png"/><div class="main-footer-desc">檔案</div></div>
+	                    <div data-main-act="setting" class="main-footer-item"><img src="images/contact/toolbar_icon_setting.png"/><div class="main-footer-desc">團體設定</div></div>
+	                </div>
+	                <div class="clear"></div>
+	            </div>
+            </div>
+	            
+        </div><!-- /page-group-main -->
+
+
+<!-- 
+
+ ######   #######  ##     ## ########   #######   ######  ########       ##     ## #### ######## ##      ## 
+##    ## ##     ## ###   ### ##     ## ##     ## ##    ## ##             ##     ##  ##  ##       ##  ##  ## 
+##       ##     ## #### #### ##     ## ##     ## ##       ##             ##     ##  ##  ##       ##  ##  ## 
+##       ##     ## ## ### ## ########  ##     ##  ######  ######         ##     ##  ##  ######   ##  ##  ## 
+##       ##     ## ##     ## ##        ##     ##       ## ##              ##   ##   ##  ##       ##  ##  ## 
+##    ## ##     ## ##     ## ##        ##     ## ##    ## ##               ## ##    ##  ##       ##  ##  ## 
+ ######   #######  ##     ## ##         #######   ######  ########          ###    #### ########  ###  ###  
+
+
+ -->
+
+
+
+<!---------------------------------- page-compose ------------------------------------>
+        <div data-role="page" id="page-compose">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <div class="header-group-name">
+                    <div class="page-title"></div>
+                    <div></div>
+                </div>
+                <div class="cp-post">
+                    <img src="images/navi/navi_icon_post.png"/>
+                    <span>發佈</span>
+                </div>
+            </div>
+            <div class="cp-content-load">
+
+            </div>
+            <div class="cp-footer">
+                <div data-cp-addfile="sticker" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_sticker.png"/></div>
+                <div data-cp-addfile="img" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_img.png"/></div>
+                <div data-cp-addfile="video" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_video.png"/></div>
+                <div data-cp-addfile="voice" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_voice.png"/></div>
+                <div data-cp-addfile="map" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_map.png"/></div>
+                <input class="cp-file" type="file" multiple style="display:none;" data-role="none"/>
+            </div>
+        </div>
+<!---------------------------------- page-object ------------------------------------>
+        <div data-role="page" id="page-object">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <div class="header-cp-object">
+                    <span class="page-title">選擇發佈對象</span>(<span>0</span>)
+                </div>
+                <div class="obj-done">
+                    <img src="images/navi/navi_icon_finish.png"/>
+                    <span>完成</span>
+                </div>
+            </div>
+            <div class="obj-content">
+                <div class="obj-selected">
+                    <div>選擇<img src="images/compose/compose_selectobject_icon_arrow.png"/></div>
+                    <div></div>
+                </div>
+                <div class="obj-cell-area">
+                
+                </div>
+            </div>
+        </div>
+
+<!---------------------------------- page-chatroom ------------------------------------>
+        <div data-role="page" id="page-chatroom">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3>三竹資訊</h3>
+                <div class="chatroom-addstate-top-btn"><img src="images/chatroom_top_btn.png"/></div>
+            </div>
+            <div class="chatroom-addstate-top-area">
+                <div data-chat-b-act="editgup" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_editgup.png"><div>編輯群組</div></div>
+                <div data-chat-b-act="invit" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_invit.png"><div>邀請</div></div>
+                <div data-chat-b-act="nonotice" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_nonotice.png"><div>關閉通知</div></div>
+                <div data-chat-b-act="leave" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_leave.png"><div>離開聊天室</div></div>
+                <div data-chat-b-act="calendar" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_calendar.png"><div>事件</div></div>
+                <div data-chat-b-act="file" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_file.png"><div>檔案</div></div>
+                <div data-chat-b-act="backup" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_backup.png"><div>備份聊天記錄</div></div>
+                <div data-chat-b-act="search" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_search.png"><div>查詢聊天訊息</div></div>
+                <div data-chat-b-act="work" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_work.png"><div>工作</div></div>
+                <div data-chat-b-act="questionnaire" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_questionnaire.png"><div>問卷</div></div>
+                <div data-chat-b-act="vote" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_vote.png"><div>投票</div></div>
+                <div data-chat-b-act="direction" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_direction.png"><div>定點回報</div></div>
+            </div>
+            <div data-role="content">
+                <div class="chat-area">
+                    <div class="chat-other">
+                        <img src="images/2.jpg">
+                        <div class="chat-other-subarea">
+                            <div>仁甫</div>
+                            <div class="chat-other-text">
+                                大家對新產品有什麼看法
+                                <div class="chat-other-time">10:12</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-other">
+                        <img src="images/2.jpg">
+                        <div class="chat-other-subarea">
+                            <div>仁甫</div>
+                            <div class="chat-other-text">
+                                季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正
+                                <div class="chat-other-time">10:12</div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                     <div class="chat-me">
+                        <div class="chat-me-text">
+                            師兄贏了好多錢 我要買雙
+                            <div class="chat-me-time">10:12</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-me">
+                        <div class="chat-me-text">
+                            新球鞋～
+                            <div class="chat-me-time">10:12</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-other">
+                        <img src="images/2.jpg">
+                        <div class="chat-other-subarea">
+                            <div>仁甫</div>
+                            <div class="chat-other-text">
+                                .......
+                                <div class="chat-other-time">10:12</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-other">
+                        <img src="images/2.jpg">
+                        <div class="chat-other-subarea">
+                            <div>仁甫</div>
+                            <div class="chat-other-text">
+                                .......
+                                <div class="chat-other-time">10:12</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <br/><br/><br/>
+            <div class="chatroom-footer">
+                <img class="chat-bar-add" src="images/chatroom/chat_textbar_icon_add.png"/>
+                <img class="chat-bar-emoticon" src="images/chatroom/chat_textbar_icon_emoticon.png"/>
+                <input class="chat-bar-input" type="text" placeholder="輸入訊息" data-role="none" />
+                <div class="chat-bar-send">傳送</div>
+            </div>
+            <div class="chatroom-addstate-area">
+                <div class="chatroom-addstate-bg"></div>
+                <div data-chat-b-act="pic" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_pic.png"><div>選擇照片</div></div>
+                <div data-chat-b-act="takepic" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_takepic.png"><div>拍攝照片</div></div>
+                <div data-chat-b-act="voice" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_voice.png"><div>傳送聲音訊息</div></div>
+                <div data-chat-b-act="direction" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_direction.png"><div>傳送位置訊息</div></div>
+                <div data-chat-b-act="file" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_file.png"><div>傳送檔案</div></div>
+                <div  class="chatroom-addstate-box"></div>
+            </div>
+        </div>
+
+<!---------------------------------- 全域 ------------------------------------>        
+		<div class="popup">
+            <div class="popup-frame">
+                <div class="popup-title"></div>
+                <div class="popup-text" style="display:none"></div>
+                <div class="popup-confirm-area">
+                    <div class="popup-cancel" style="display:none">取消</div>
+                    <div class="popup-confirm" style="display:none">確定</div>    
+                </div>
+                
+            </div>
+            <div class="popup-gap"></div>
+            <div class="popup-screen"></div>
+        </div>
+
+        <div class="ajax-screen-lock"></div>
+
+        <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
+        
+        <div id="page-back-chk"></div>
+        <div id="page-back-chk-pre"></div>
+        <div id="page-back-pre-title"></div>
+    </body>
+</html>
