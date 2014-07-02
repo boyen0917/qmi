@@ -56,10 +56,9 @@
 	opacity: 0.7;
 }
 
-.login {
-	background: rgb(86,113,133);
+.login, .register {
 	width: 250px;
-	margin: 0 auto;
+	margin: 0 auto 15px;
 	color: white;
 	text-align: center;
 	border-radius: 5px;
@@ -67,6 +66,11 @@
 	padding-top: 10px;
 	opacity: 0.6;
 	-webkit-user-select: none;
+	cursor: pointer;
+}
+
+.login {
+	background: rgb(86,113,133);
 }
 
 .login:active {
@@ -75,27 +79,120 @@
 
 .register {
 	background: rgb(170,195,210);
-	width: 250px;
-	margin: 15px auto 0;
-	color: white;
-	text-align: center;
-	border-radius: 5px;
-	height: 30px;
-	padding-top: 10px;
-	opacity: 0.6;
-	-webkit-user-select: none;
 }
 
 .register:active {
 	background: rgb(150,175,190);
 }
 
-.register-area {
+.login-phone, .login-password  {
+	border-bottom: 1px solid #eee;
+}
+
+.login-user-pic {
+	position: relative;
+	width: 100px;
+	height: 100px;
+	margin: 0 auto;
+}
+
+.login-user-pic > img {
+	width: 105px;
+	position: absolute;
+	top: -2px;
+	left: -2px;
+}
+
+.avatar-wrap {
+	width: 100px;
+	height: 100px;
+	overflow: hidden;
+}
+
+.login-remeber-area {
+	position: relative;
+	text-align: center;
+	margin: 30px auto 10px;
+}
+
+.login-remeber-password {
+	background: white;
+	box-shadow: 0px 2px #e2e2e2;
+	height: 50px;
+	margin: 0 auto; 
+	line-height: 50px;
+	border-radius: 3px;
+	text-align: left;
+	padding-left: 20px;
+	width: 280px;
+}
+
+.login-account {
+	margin: 12px 0 15px;
+}
+
+.login-account span {
+	color: #999;
+	margin-right: 10px;
+	font-size: 17px;
+	position: relative;
+	top: 1px;
+}
+
+.login-option {
+	position: relative;
+	display: -webkit-box;
+	width: 295px;
+	margin: -8px auto;
+	-webkit-user-select: none;
+}
+
+.login-remeber img {
+	width: 25px;
+	position: relative;
+	top: 6px;
+	margin-right: 5px;
+}
+
+.login-forget-pw {
+	position: absolute;
+	right: 0px;
+	top: 7px;
+	border: 2px solid #d2d2d2;
+	border-radius: 12px;
+	padding: 0 5px 0 8px;
+	font-size: 15px;
+	color: #555;
+}
+
+.login-forget-pw:active {
+	background: white;
+}
+
+.login-next {
+	margin: 150px auto 10px;
+}
+
+.login-next.login-next-adjust {
+	margin-top: 104px;
+}
+
+.login-change {
+	margin: 0 auto;	
+}
+
+.login-remeber , .login-forget-pw {
+	cursor: pointer;
+}
+
+
+
+.register-area, .login-default-area {
 	width: 300px;
 	background: white;
 	margin: 30px auto 10px;
 	border-radius: 3px;
-	box-shadow: 0px 5px 15px -10px #d2d2d2;
+	box-shadow: 0px 2px #e2e2e2;
 }
 
 .countrycode {
@@ -118,20 +215,20 @@
 	width: 20px;
 }
 
-.register-phone{
+.register-phone, .login-phone, .login-password {
 	height: 50px;
 	line-height: 50px;
 	padding-left: 20px;
 }
 
-.register-phone input {
+.register-phone input, .login-phone input, .login-password input {
 	width: 220px;
-	border: 0;
-	font-size: 15px;
 }
 
-.register-phone input:focus, .register-otp-input input,.password-setting input, .password-confirm input {
+input {
 	outline:none;
+	border: 0;
+	font-size: 15px;
 }
 
 .register-phone img {
@@ -146,7 +243,7 @@
 	display: table;
 }
 
-.register-next, .resend-otp, .register-otp-next, .password-next, .setting-next {
+.register-next, .resend-otp, .register-otp-next, .password-next, .setting-next, .login-next, .login-change {
 	width: 300px;
 	background: rgb(182,202,222);
 	color: white;
@@ -155,6 +252,7 @@
 	text-align: center;
 	border-radius: 5px;
 	-webkit-user-select: none;
+	box-shadow: 0px 2px rgb(162,182,202);
 }
 
 .register-next {
@@ -166,11 +264,13 @@
 }
 
 
-.register-next-ready, .register-otp-next-ready, .resend-otp-ready, .password-next-ready, .setting-next-ready {
+.register-next-ready, .register-otp-next-ready, .resend-otp-ready, .password-next-ready, .setting-next-ready, .login-next-ready, .login-change-ready {
 	background: rgb(98,162,223);
+	box-shadow: 0px 2px rgb(78,142,203);
+	cursor: pointer;
 }
 
-.register-next-ready:active, .register-otp-next-ready:active, .resend-otp-ready:active, .password-next-ready:active {
+.register-next-ready:active, .register-otp-next-ready:active, .resend-otp-ready:active, .password-next-ready:active, .login-next-ready:active, .login-change-ready:active {
 	background: rgb(88,152,213);
 }
 
@@ -252,10 +352,11 @@
 .avatar-area {
 	background: #d2d2d2;
 	width: 110px;
-	height: 100px;
+	height: 99px;
 	float: left;
 	cursor: pointer;
 	overflow: hidden;
+	border-bottom: 1px solid #eee; 
 }
 
 .avatar-default {

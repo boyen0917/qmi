@@ -24,24 +24,156 @@
         //     }   
         // });  
 
-        $("button").click(function(){
-            $("input").trigger("input");
-        });
+        // $("button").click(function(){
+        //     $("input").trigger("input");
+        // });
 
-        $("input").bind("input",function(){
-            console.debug("input");
-        });
+        // $("input").bind("input",function(){
+        //     console.debug("input");
+        // });
         
-        var t = "fun_asdlfjaskld";
+        // var t = "fun_asdlfjaskld";
 
-        console.debug(t.substring(0,3));
+        // console.debug(t.substring(0,3));
 
 
     });
     </script>
 </head>
 <body>
-    <button>click</button>
-    <input type="text">
+    <input type="file"/>
+    <button>upload</button>
+    <script>
+    $(function(){
+
+      //   $("input").change(function(){
+      //       console.debug($(this)[0].files[0]);
+      //   });
+
+      // var canvas = document.getElementById('myCanvas');
+      // var context = canvas.getContext('2d');
+      // var x = 188;
+      // var y = 30;
+      // var width = 200;
+      // var height = 137;
+      // var imageObj = new Image();
+
+      // imageObj.onload = function() {
+      //   context.drawImage(imageObj, x, y, width, height);
+      // };
+      // imageObj.src = 'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
+
+      // var pic = document.getElementById("myCanvas").toDataURL("image/png");
+
+       var s3_url = "https://s3.mitake.com.tw/Project-o/users/0062d0a7-9b59-46c3-988a-c419931b50e6/avatars/da48a09c-59f6-4b73-b569-c49039fe950b_o?Expires=1719480784&AWSAccessKeyId=W5J78BQKFH0N4RE47X90&Signature=PlRCOGoI4E5OGk8cO8wbAkRXCv4%3D";
+
+        $("button").click(function(){
+
+//             document.location = ' ,' + $("input")[0].files[0];
+
+//             // var fd = new FormData();
+//             // var file = $("input")[0].files[0];
+//             // fd.append("subUpload", file);
+//             // var blob = dataURItoBlob(pic);
+//             // console.debug("blob",blob);
+//             // console.debug("input:",$("input")[0].files[0]);
+//             // var img_data= pic.replace("data:image/png;base64,","");
+//             console.debug("blob",blob);
+//             console.debug("fd",fd);
+//             console.debug("file",file);
+//             console.debug("input",$("input"));
+
+
+// var test = base64_encode($("input")[0].files[0])
+// console.debug(test);
+
+//  return false;
+
+
+
+            $.ajax({
+                url: s3_url,
+                type: 'PUT',
+                contentType: " ",
+                data: $("input")[0].files[0], 
+                processData: false,
+                complete: function(data) { 
+                    console.debug("test data:",data);
+                }
+            });
+        });
+            
+
+
+
+        function dataURItoBlob(dataURI) {
+            // convert base64 to raw binary data held in a string
+            // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+            var byteString = atob(dataURI.split(',')[1]);
+
+            // separate out the mime component
+            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+            // write the bytes of the string to an ArrayBuffer
+            var ab = new ArrayBuffer(byteString.length);
+            var ia = new Uint8Array(ab);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+
+            return new Blob([ab], {type: mimeString});
+        }
+
+
+        function base64_encode(data) {
+            //  discuss at: http://phpjs.org/functions/base64_encode/
+            // original by: Tyler Akins (http://rumkin.com)
+            // improved by: Bayron Guevara
+            // improved by: Thunder.m
+            // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+            // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+            // improved by: Rafał Kukawski (http://kukawski.pl)
+            // bugfixed by: Pellentesque Malesuada
+            //   example 1: base64_encode('Kevin van Zonneveld');
+            //   returns 1: 'S2V2aW4gdmFuIFpvbm5ldmVsZA=='
+            //   example 2: base64_encode('a');
+            //   returns 2: 'YQ=='
+
+            var b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+            var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+              ac = 0,
+              enc = '',
+              tmp_arr = [];
+
+            if (!data) {
+              return data;
+            }
+
+            do { // pack three octets into four hexets
+              o1 = data.charCodeAt(i++);
+              o2 = data.charCodeAt(i++);
+              o3 = data.charCodeAt(i++);
+
+              bits = o1 << 16 | o2 << 8 | o3;
+
+              h1 = bits >> 18 & 0x3f;
+              h2 = bits >> 12 & 0x3f;
+              h3 = bits >> 6 & 0x3f;
+              h4 = bits & 0x3f;
+
+              // use hexets to index into b64, and append result to encoded string
+              tmp_arr[ac++] = b64.charAt(h1) + b64.charAt(h2) + b64.charAt(h3) + b64.charAt(h4);
+            } while (i < data.length);
+
+            enc = tmp_arr.join('');
+
+            var r = data.length % 3;
+
+            return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
+          }
+
+        
+    });
+    </script>
 </body>
 </html>

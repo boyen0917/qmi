@@ -915,7 +915,7 @@ $(function(){
 			
 
 			if(vote_chk){
-				popupShowAdjust("第" + vote_chk_index +" 題尚未完成投票");
+				popupShowAdjust("","第" + vote_chk_index +" 題尚未完成投票");
 				return false;
 			}
 
@@ -942,7 +942,7 @@ $(function(){
 	        result.complete(function(data){
 
 	        	//重新讀取detail
-	        	popupShowAdjust("回覆成功");
+	        	popupShowAdjust("","回覆成功");
 	        	this_event.find(".st-vote-send").removeClass("st-vote-send-blue");
 	        	//客製化 按了確定之後再重讀取
 	        	$(".popup-close").bind("reload",function(){
@@ -1773,7 +1773,8 @@ $(function(){
 		var ctp = this_compose.data("compose-tp");
 		var compose_content = this_compose.data("compose-content");
 		var ml = this_compose.data("message-list");
-
+console.debug("obj:",this_compose.data("obj"));
+console.debug("obj:",typeof this_compose.data("obj"));return false;
 		//發佈上傳檢查
 		var timer_chk = false;
 		var body = {
@@ -1932,7 +1933,7 @@ $(function(){
 		
 		//有空值就跳出
 		if(empty_chk) { 
-			popupShowAdjust(empty_msg);
+			popupShowAdjust("",empty_msg,true);
 			return false;
 		}
 		// console.debug("obj:",JSON.stringify(gul_arr,null,2));
@@ -2050,7 +2051,7 @@ $(function(){
 		if(timer_chk){
 			compose_timer = setTimeout(function(){
 				if(!$(".popup").is(":visible")){
-					popupShowAdjust("傳送逾時");	
+					popupShowAdjust("","傳送逾時",true);	
 				}
 			},10000);
 		}else{
@@ -2078,9 +2079,9 @@ $(function(){
         console.log(body);
         var result = ajaxDo(api_name,headers,method,true,body);
         result.success(function(data){
-        	popupShowAdjust("發佈成功");
+        	popupShowAdjust("","發佈成功","hash+#page-group-main");
         	timelineListWrite();
-	        popupAfterChangePage("#page-group-main");
+	        //popupAfterChangePage("#page-group-main");
         });
         // result.success(function(data){
         // 	rsp_code = $.parseJSON(data.responseText).rsp_code;
@@ -2788,6 +2789,7 @@ $(function(){
 			var this_img = $(
 				'<div class="st-slide-img">' +
 	            	'<img src="images/loading.gif" style="width:30px;position: relative;top: 130px;"/>' +
+	            	'<img src="" style="display:none"/>' +
 	            '</div>' +
 	            '<span class="st-img-gap"></span>'
 			);
@@ -2868,12 +2870,13 @@ $(function(){
 			var this_img_area = $(this);
 			var gallery_str = "";
 			this_img_area.find(".st-slide-img").each(function(i,val){
-				var img_url = $(this).find("img").attr("src") ;
+				var img_url = $(this).find("img:eq(1)").attr("src") ;
+				// var img_url = $(this).find("img").attr("src") ;
 				gallery_str += '<li data-thumb="' + img_url + '"><img src="' + img_url + '" /></li>';
 			});
 
-			var testt = this_img_area.find(".st-slide-img:eq(" + this_gallery.data("gallery-cnt") + ") img").attr("src");
-			
+			var this_s32 = this_img_area.find(".st-slide-img:eq(" + this_gallery.data("gallery-cnt") + ") img:eq(1)").attr("src");
+
 			var img = new Image();
 			img.onload = function() {
 				var gallery = window.open("flexslider/index.html", "", "width=" + this.width + ", height=" + this.height);
@@ -2886,15 +2889,14 @@ $(function(){
 	    			},300);
 	    		});
 			}
-			img.src = testt;
-
+			img.src = this_s32;
 			
 		});
 	}
 
 	getS3file = function(file_obj,target,tp){
-		var api_name = "groups/" + gi + "/files/" + file_obj.c + "?pi=" + file_obj.p;
-
+		var api_name = "groups/" + gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + ti_feed;
+		console.debug("api name:",api_name);
         var headers = {
                  "ui":ui,
                  "at":at, 
@@ -2905,7 +2907,7 @@ $(function(){
         var result = ajaxDo(api_name,headers,method,true);
 		result.complete(function(data){
 			var obj =$.parseJSON(data.responseText);
-			if(obj.rsp_code != 0) return false;
+			if(data.status != 200) return false;
 
 			if(target && tp){
 				switch(tp){
@@ -2913,20 +2915,21 @@ $(function(){
 						target.attr("src",obj.s3);
 						break;
 					case 6://圖片
-						var img = target.find("img");
+						var img = target.find("img:eq(0)");
 						img.load(function() {
 
 							//重設 style
-							target.find("img").removeAttr("style");
+							img.removeAttr("style");
 
 							var w = img.width();
 				            var h = img.height();
             
             				mathAvatarPos(img,w,h,350);
 				        });
-
-						target.find("img").attr("src",obj.s3);
-						
+						//小圖
+						target.find("img:eq(0)").attr("src",obj.s3);
+						//大圖
+						target.find("img:eq(1)").attr("src",obj.s32);
 						break;
 				}
 			}else{
@@ -3017,7 +3020,7 @@ $(function(){
 									// $(document).trigger("click");
 
 									if(this_compose.data("uploaded-err").length > 0){
-										popupShowAdjust("第" + this_compose.data("uploaded-err").sort().join("、") + "個檔案上傳失敗 請重新上傳");
+										popupShowAdjust("","第" + this_compose.data("uploaded-err").sort().join("、") + "個檔案上傳失敗 請重新上傳",true);
 									}else{
 										clearTimeout(compose_timer);
 
@@ -3421,51 +3424,108 @@ $(function(){
 	        result.complete(function(data){
 
 	        	//重新讀取detail
-	        	popupShowAdjust("回覆成功");
-	        	//客製化 按了確定之後再重讀取
-	        	$(".popup-close").bind("reply",function(){
-	    //     		var this_event;
+	        	popupShowAdjust("","回覆成功");
 
-	    //     		$(".st-sub-box").each(function(){
-	    //     			if($(this).data("event-id") == this_msg.data("event-id")){
-		   //      			this_event = $(this);
-					// 		return false;
-					// 	}
-					// });
-	    //     		console.debug("this event:",this_event);
-					// if(!this_event) return false;
+	        	setTimeout(function(){
+	        		console.log("hehehehehe");
+					reloadDetail(this_event);
+	        	},1000);
 
-					//重置
-					this_event.find(".st-reply-message-textarea textarea").val("");
-
-	        		//重設任務完成狀態
-	        		setEventStatus(this_event);
-
-	        		//重設完整的detail
-					this_event.data("detail-content",false);
-		    		this_event.find(".st-vote-ques-area-div").remove();
-		    		// timelineDetailClose toggle負負得正
-		    		this_event.find(".st-reply-area").hide();
-
-		    		this_event.data("switch-chk",false);
-
-		      		this_event.find(".st-sub-box-1").trigger("click");
-					$(".popup-close").unbind("reply");
-				});
-
-				$(".popup-close").click(function(){
-					$(this).trigger("reply");
-				});
 	        });
 	}
 
-	reloadDetail = function(){
+	reloadDetail = function(this_event){
+		//重置
+		this_event.find(".st-reply-message-textarea textarea").val("");
 
+		//重設任務完成狀態
+		setEventStatus(this_event);
+
+		//重設完整的detail
+		this_event.data("detail-content",false);
+		this_event.find(".st-vote-ques-area-div").remove();
+		// timelineDetailClose toggle負負得正
+		this_event.find(".st-reply-area").hide();
+
+		this_event.data("switch-chk",false);
+
+  		this_event.find(".st-sub-box-1").trigger("click");
 	};
 
+	//對話框設定
+	popupShowAdjust = function (title,desc,confirm,cancel){
+		console.debug("========彈跳視窗========");
+		console.debug("title:",title);
+		console.debug("desc:",desc);
+		console.debug("confirm:",confirm);
+		console.debug("cancel:",cancel);
+		console.debug("=======================");
+
+		$("body").addClass("screen-lock");
+
+		//default
+		$(".popup-confirm").html("確認");
+		$(".popup-cancel").html("取消");
+
+		if(title){
+			$('.popup-title').html(title);
+		}else{
+			$('.popup-title').html("");
+		}
+	    if(desc){
+	    	$('.popup-text').show();
+	        $('.popup-text').html(desc);
+	    }else{
+	    	$('.popup-text').hide();
+	    }
+	    if(confirm){
+	    	$(".popup-confirm").data("todo","");
+	    	$(".popup-confirm").show();
+	    	$('.popup-cancel').removeClass("full-width");
+
+	    	if(typeof confirm == "string"){
+	    		if(confirm.split("+")[2]){
+	    			$(".popup-confirm").html(confirm.split("+")[2]);
+	    		}
+	    		$(".popup-confirm").data("todo",confirm);
+	    	}
+	    }else{
+	    	$(".popup-confirm").hide();
+	    	$('.popup-cancel').addClass("full-width");
+	    	
+	    }
+	    if(cancel){
+	    	$(".popup-cancel").show();
+	    	$('.popup-confirm').removeClass("full-width");
+	    	if(typeof cancel == "string"){
+	    		if(cancel.split("+")[2]){
+	    			$(".popup-cancel").html(cancel.split("+")[2]);
+	    		}
+	    		$(".popup-cancel").data("todo",cancel);
+	    	}
+	    }else{
+	    	$(".popup-cancel").hide();
+	    	$('.popup-confirm').addClass("full-width");
+	    }
+
+
+	    if(!confirm && !cancel){
+	    	setTimeout(function(){
+    			$(".popup-screen").trigger("click");
+    			$("body").removeClass("screen-lock");
+    		},1000);
+	    }
+
+	    $(".popup-screen").show();
+	    $(".popup").show();
+
+	    $(".popup-frame").css("margin-left",0);
+	    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2);
+	    
+	}
 	    
 	//計算彈出對話框置中
-	popupShowAdjust = function (desc,cancel,chk){
+	popupShowAdjust_backup = function (desc,cancel,chk){
 		if(!cancel){
 			$(".popup-close-cancel").hide();
 		}

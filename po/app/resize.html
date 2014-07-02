@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+
+
+    </style>
+    <link rel="stylesheet" type="text/css" href="datepicker/datetimepicker.css" />
+   
+    <script src="../js/jquery.js"></script>
+    <script src="js/linq.js"></script>
+    <script src="js/jquery.plugin.js"></script>
+     <script src="datepicker/datetimepicker.js"></script>
+    <script type="text/javascript">
+
+    </script>
+</head>
+<body>
+  <!-- <form action="upload.php" method="post" enctype="multipart/form-data">
+<label for="file">Filename:</label>
+<input type="file" name="file" id="file"><br>
+<input type="submit" name="submit" value="Submit">
+</form> -->
+
+    <input id="the-file" name="file" type="file">
+    <button>upload</button>
+
+    <script>
+    $(function(){
+        $("input").change(function(){
+            console.debug($(this)[0].files[0]);
+        });
+
+        // var canvas = document.getElementById('myCanvas');
+        // var context = canvas.getContext('2d');
+        // var x = 188;
+        // var y = 30;
+        // var width = 200;
+        // var height = 137;
+        // var imageObj = new Image();
+
+        // imageObj.onload = function() {
+        //   context.drawImage(imageObj, x, y, width, height);
+        // };
+        // imageObj.src = 'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
+
+        // var pic = document.getElementById("myCanvas").toDataURL("image/png");
+
+        var s3_url = "https://project-o.s3.amazonaws.com/groups/0efa069a-b882-4ea6-a78e-c36966ee4aa1/0/beb7f288-c332-4d7d-b9a8-676437b1e7e3?Expires=1719048852&AWSAccessKeyId=AKIAIXGU3YMKDJDPL7IA&Signature=2C77g2VDwejHI1Bgy9jngxtQ8N8%3D";
+
+
+
+        $("button").click(function(){
+
+          var resized_file = resizeAndUpload($('input[type=file]')[0].files[0]);
+
+          return false;
+
+          
+        });
+       
+
+        function resizeAndUpload(file) {
+          var reader = new FileReader();
+          reader.onloadend = function() {
+           
+              var tempImg = new Image();
+              tempImg.src = reader.result;
+              tempImg.onload = function() {
+                  var MAX_WIDTH = 500;
+                  var MAX_HEIGHT = 500;
+                  var tempW = tempImg.width;
+                  var tempH = tempImg.height;
+                  if (tempW > tempH) {
+                      if (tempW > MAX_WIDTH) {
+                         tempH *= MAX_WIDTH / tempW;
+                         tempW = MAX_WIDTH;
+                      }
+                  } else {
+                      if (tempH > MAX_HEIGHT) {
+                         tempW *= MAX_HEIGHT / tempH;
+                         tempH = MAX_HEIGHT;
+                      }
+                  }
+           
+                  var canvas = document.createElement('canvas');
+                  canvas.width = tempW;
+                  canvas.height = tempH;
+                  var ctx = canvas.getContext("2d");
+                  ctx.drawImage(this, 0, 0, tempW, tempH);
+                  var dataURL = canvas.toDataURL("image/jpeg",0.5);
+                  var blob = dataURItoBlob(dataURL);
+
+                  $.ajax({
+                      url: s3_url,
+                      type: 'PUT',
+                      contentType: " ",
+                      data: blob, 
+                      processData: false,
+                      complete: function(data) { 
+                          console.debug("resize data:",data);
+                      }
+                  });
+
+                  return false;
+
+                  return dataURL;
+                }
+           
+             }
+             reader.readAsDataURL(file);
+          }
+
+          function dataURItoBlob(dataURI) {
+            var binary = atob(dataURI.split(',')[1]);
+            var array = [];
+            for(var i = 0; i < binary.length; i++) {
+                array.push(binary.charCodeAt(i));
+            }
+            return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
+        }
+
+    });
+    </script>
+</body>
+</html>

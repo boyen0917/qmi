@@ -29,7 +29,8 @@
 
       if(!api_type) return false;
     	//api 網址
-        var base_url = "https://mapserver.mitake.com.tw/apiv1/";
+        //var base_url = "https://mapserver.mitake.com.tw/apiv1/";
+        var base_url = "https://apserver.mitake.com.tw/apiv1/";
         //var base_url = "http://10.1.17.116:8090/apiv1/";
         
         var ui,at,gi,gn,gd,ga,gm,device_token,zoom_out_cnt,zoom_in_cnt,group_list;
@@ -38,6 +39,32 @@
         var myRand = Math.floor((Math.random()*1000)+1);
 
         switch(api_type){ // groups/{gi}/invitations
+            case "geturl":
+                var api_name = "me/avatar";
+
+                var headers = {
+                     "ui":"0062d0a7-9b59-46c3-988a-c419931b50e6 ",
+                     "at":"64da2852-7151-4293-a322-6e31f0611458", 
+                     "li":"zh_TW"
+                };
+
+                var method = "put";
+                var result = ajaxDo(api_name,headers,method,true,body);
+            break;
+            case "login":
+                var api_name = "login";
+                var headers = {
+                    "li":"zh_TW"
+                };
+                var body = {
+                    "id":"+886980922917",
+                    "tp":"0",
+                    "pw":toSha1Encode("111111")
+                };
+                console.debug(body);
+                var method = "post";
+                var result = ajaxDo(api_name,headers,method,true,body);
+                break;
             case "registration":
                 //http://localhost/po/app/register_api.html?api_type=registration
                 var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";

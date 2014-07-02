@@ -8,6 +8,10 @@
 	min-height: 55px;
 }
 
+.screen-lock {
+	overflow: hidden;
+}
+
 .main{
 	height:1136px;
     width:640px;
@@ -279,20 +283,66 @@
 	display: none;
 }
 
-.popup-frame{
-	position:fixed;
-    z-index:100000;
-    background: white;
-    box-shadow: 0 0px 10px 5px #a5a5a5;
-    border-radius: 10px;
-    padding: 15px;
-    top: 200px;
-    text-align:center;
+.popup-frame {
+	position: fixed;
+	z-index: 100000;
+	border-radius: 3px;
+	top: 200px;
+	text-align: center;
+	width: 300px;
+	border: 1px solid white;
+	text-shadow: none;
+	overflow: auto;
+}
+
+.popup-title {
+	margin: 15px 0 5px;
+	color: white;
+	font-size: 18px;
+	min-height: 1px;
+}
+
+.popup-confirm-area {
+}
+
+.popup-cancel, .popup-confirm {
+	background: rgb(233,233,233);
+	color: rgb(86,178,254);
+	height: 40px;
+	font-size: 18px;
+	line-height: 40px;
+	-webkit-user-select: none;
+}
+
+.popup-confirm {
+	width: 149px;
+	float: right;
+}
+
+.popup-cancel {
+	float: left;
+	width: 149px;
+}
+
+.full-width {
+	width:100%;
+}
+
+.popup-confirm:active, .popup-cancel:active {
+	background: rgb(86,178,254);
+	color: rgb(233,233,233);
 }
 
 .popup-screen {
-	z-index:9;
+	z-index:1000;
 }
+
+.popup-text {
+	color: white;
+	text-align: left;
+	margin: 5px 25px 20px;
+}
+
 .popup-screen,.ajax-screen-lock {
 	display: none;
 	position: fixed;
@@ -300,6 +350,8 @@
 	height: 100%;
 	left: 0;
 	top: 0;
+	background: black;
+	opacity: 0.85;
 }
 
 .ajax-screen-lock {
@@ -326,22 +378,16 @@
 	background: #f9f9f9;
 }
 
-.side-menu-btn{
-	/* flex: 4; */
-	float: left;
-	cursor:pointer;
-	width: 40px;
-	position: relative;
-	left: 7px;
-	top: 2px;
-}
-
-#page-group-main .ui-content {
-    padding: 0;
-}
-
 
 /* ======================= 左側選單 =================================*/
+
+.side-menu-btn {
+	height: 40px;
+	width: 40px;
+	float: left;
+	margin: 5px 0 0 5px;
+	cursor: pointer;
+}
 
 .page-fixed{
 	position:fixed;
@@ -2963,6 +3009,9 @@ input.cp-datetimepicker-end {
 	top: 3px;
 	color: #d2d2d2;
 	font-size: 15px;
+	width: 100px;
+	overflow: hidden;
+	height: 20px;
 }
 
 
@@ -2971,4 +3020,7 @@ input.cp-datetimepicker-end {
 	right: 15px;
 	font-size: 15px;
 	color: #d2d2d2;
+	width: 100px;
+	height: 20px;
+	overflow: hidden;
 }

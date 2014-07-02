@@ -33,113 +33,9 @@
         <script src="flexslider/modernizr.js"></script>
         <script defer src="flexslider/jquery.flexslider.js"></script>
         
-<!--         
 
-
-     ##        #######   ######   #### ##    ## 
-     ##       ##     ## ##    ##   ##  ###   ## 
-     ##       ##     ## ##         ##  ####  ## 
-     ##       ##     ## ##   ####  ##  ## ## ## 
-     ##       ##     ## ##    ##   ##  ##  #### 
-     ##       ##     ## ##    ##   ##  ##   ### 
-     ########  #######   ######   #### ##    ## 
-
-     
- -->
     </head>
     <body>
-        <img class="preload"/>
-        <div data-role="page" id="page-login">
-	        <div class="main launch_kv">
-	            <div class="login-area">
-	             <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號">
-	             <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼">
-	             
-	             <!-- <input type="text" id="phone" placeholder="&nbsp;帳&nbsp;號" value="0928858828">
-                 <input type="password" id="code" placeholder="&nbsp;密&nbsp;碼" value="1qw23e"> -->
-	             
-                <div class="login-remember">
-	                <span class="login-radio"><img src="images/bt.png"/></span><span class="login-text">記住帳號</span>
-                </div>
-	             <a href="#" id="login" data-role="button" data-theme="d" style="-webkit-user-select: none;">登&nbsp;&nbsp;入</a>
-	             
-	             <a class="login-text-l" href="#">忘記密碼?</a>
-	             <a class="login-text-r" href="#page-register">註冊帳號</a>
-	            </div>
-	        </div>
-	        
-        </div>
-<!---------------------------------- page-register ------------------------------------>
-        <div data-role="page" id="page-register">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3 class="page-title">行動電話號碼註冊</h3>
-            </div>
-            <div data-role="content">
-                <input type="text" id="countrycode" value="地區&nbsp;&nbsp;&nbsp;&nbsp;+886&nbsp;台灣" readonly>
-                 <input type="text" id="r-phone" maxlength=10 placeholder="請輸入手機號碼" onkeyup="value=value.replace(/[^-_0-9]/g,'')"/>
-                 <div class="register-desc-area">
-                    <span class="register-radio"><img src="images/radio2.png"/></span>
-                    <span class="register-text">
-                        我看過並同意
-                        <a href="#">使用條款</a>及
-                        <a href="#">隱私政策</a>
-                    </span>
-                 </div>
-                 
-                 <a href="#" id="register-next" data-role="button" data-theme="b" >下一步</a>
-            </div>
-        </div>
-<!---------------------------------- page-register-auth ------------------------------------>
-        <div data-role="page" id="page-register-auth">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3 class="page-title">行動電話號碼認證</h3>
-            </div>
-            <div data-role="content">
-                 <div class="register-desc-area">
-                     我們已經將驗證碼傳送至下列電話號碼，請輸入驗證碼已完成您的手機號碼認證。<br/>
-                     <h1></h1>
-                     <input type="text" id="otp" maxlength=6 placeholder="驗證碼" onkeyup="value=value.replace(/[^-_0-9]/g,'')"/>
-                 </div>
-                
-                 <div class="resend-otp-close">重送驗證碼</div>
-                 <a href="#" id="resend-otp" data-role="button" data-theme="b" >重送驗證碼</a>
-                 <a href="#" id="register-auth-next" data-role="button" data-theme="b" >下一步</a>
-            </div>
-        </div>
-<!---------------------------------- page-password ------------------------------------>
-        <div data-role="page" id="page-password">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3 class="page-title">密碼設定</h3>
-            </div>
-            <div data-role="content">
-                <input type="password" id="pw-setting" maxlength=20 placeholder="請輸入6-20半形英數字" onkeyup="value=value.replace(/[^-_A-Z0-9a-z]/g,'')">
-                <input type="password" id="pw-setting-c" maxlength=20 placeholder="請重複輸入密碼"/>
-                
-                <a href="#" id="pw-send" data-role="button" data-theme="b" >確認</a>
-            </div>
-        </div>
-<!---------------------------------- page-helper ------------------------------------>
-        <div data-role="page" id="page-helper">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3  class="page-title">團體建立/加入</h3>
-            </div>
-            <div class="center-style">
-			    <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
-			    <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true">立即加入團體</a>
-			</div>
-			<div class="helper-title">小幫手</div>
-			<div data-role="collapsible-set" class="helper-collapsible-area ui-icon-alt" data-inset="false" data-iconpos="right" data-collapsed-icon="arrow-d">
-                <div data-role="collapsible"><h3>如何創建團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"創建團體"後,設定您的團體照片,輸入團體名稱,團體介紹,並選取""預定使用人數".</li><li>完成輸入後,點擊"建立",即完成團體之建立.</li></ol></p><a class="hg-create inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即創建團體</a><br/></div> 
-                <div data-role="collapsible"><h3>如何加入團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"加入團體"後,輸入您來自"簡訊"或"邀請訊息"內的組織代碼及OTP</li><li>完成輸入後,點擊"加入",即加入該團體.</li></ol></p><a class="hg-join inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即加入團體</a><br/></div> 
-                <div data-role="collapsible"><h3>建立事件提醒重要事項</h3><p>建立事件提醒重要事項</p></div> 
-                <div data-role="collapsible"><h3>舉辦投票不漏聽任何人的心聲</h3><p>舉辦投票不漏聽任何人的心聲</p></div> 
-                <div data-role="collapsible"><h3>多人群聊加快訊息傳遞</h3><p>多人群聊加快訊息傳遞</p></div> 
-            </div><!-- /collapsible -->
-        </div>
 <!---------------------------------- page-group-menu ------------------------------------>
         <div data-role="page" id="page-group-menu">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -176,6 +72,27 @@
             <div class="group-nav-chk" data-group-act="gi">
             團體邀請
             </div>
+        </div>
+
+        
+<!---------------------------------- page-helper ------------------------------------>
+        <div data-role="page" id="page-helper">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3  class="page-title">團體建立/加入</h3>
+            </div>
+            <div class="center-style">
+                <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
+                <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true">立即加入團體</a>
+            </div>
+            <div class="helper-title">小幫手</div>
+            <div data-role="collapsible-set" class="helper-collapsible-area ui-icon-alt" data-inset="false" data-iconpos="right" data-collapsed-icon="arrow-d">
+                <div data-role="collapsible"><h3>如何創建團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"創建團體"後,設定您的團體照片,輸入團體名稱,團體介紹,並選取""預定使用人數".</li><li>完成輸入後,點擊"建立",即完成團體之建立.</li></ol></p><a class="hg-create inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即創建團體</a><br/></div> 
+                <div data-role="collapsible"><h3>如何加入團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"加入團體"後,輸入您來自"簡訊"或"邀請訊息"內的組織代碼及OTP</li><li>完成輸入後,點擊"加入",即加入該團體.</li></ol></p><a class="hg-join inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即加入團體</a><br/></div> 
+                <div data-role="collapsible"><h3>建立事件提醒重要事項</h3><p>建立事件提醒重要事項</p></div> 
+                <div data-role="collapsible"><h3>舉辦投票不漏聽任何人的心聲</h3><p>舉辦投票不漏聽任何人的心聲</p></div> 
+                <div data-role="collapsible"><h3>多人群聊加快訊息傳遞</h3><p>多人群聊加快訊息傳遞</p></div> 
+            </div><!-- /collapsible -->
         </div>
 <!---------------------------------- page-group-main ------------------------------------>
         <div data-role="page" id="page-group-main">
@@ -593,14 +510,18 @@
 
 <!---------------------------------- 全域 ------------------------------------>        
 		<div class="popup">
-		  <div class="popup-frame">
-		  <div class="popup-text"></div>
-		  <a href="#" class="popup-close" data-role="button" data-inline="true">確定</a>
-		  <a href="#" class="popup-close-cancel" data-role="button" data-inline="true">取消</a>
-		  </div>
-		  <div class="popup-screen"></div>
-
-		</div>
+            <div class="popup-frame">
+                <div class="popup-title"></div>
+                <div class="popup-text" style="display:none"></div>
+                <div class="popup-confirm-area">
+                    <div class="popup-cancel" style="display:none">取消</div>
+                    <div class="popup-confirm" style="display:none">確定</div>    
+                </div>
+                
+            </div>
+            <div class="popup-gap"></div>
+            <div class="popup-screen"></div>
+        </div>
 
         <div class="ajax-screen-lock"></div>
 

@@ -40,20 +40,64 @@
         var id = "+886980922917";
         //登入認證
         var api_name = "login";
-        var headers = {
-                "id":id,
-                "up":toSha1Encode("111111"), 
-                "ns":"",
-        	    "li":"zh_TW"
-        	        };
-        var method = "post";
 
-        var result = ajaxDo(api_name,headers,method,true);
+        var headers = {
+            li:"zh_TW"
+        };
+        var body = {
+            id: id,
+            tp:"0",
+            pw:toSha1Encode("111111")
+        };
+        var method = "post";
+        var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
         	ui = $.parseJSON(data.responseText).ui;
             at = $.parseJSON(data.responseText).at;
 
             switch(api_type){ // groups/{gi}/invitations
+                case "permission":
+                    var api_name = "groups/5db48ed8-4f8c-4c68-b147-21f4d0a48e7b/permissions";
+
+                    var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW",
+                                 };
+                    var body = {
+                            ti: "fd97294e-eee3-4e64-bdf5-10e853de4373",
+                            tu:{
+                              gul: [
+                                {
+                                    gu: "2c50b7c3-56e3-45a3-a7ee-985ee37c5170",
+                                    n : "夏目優希"
+                                }
+                              ]  
+                            }
+                        }
+
+                    var method = "post";
+                    var result = ajaxDo(api_name,headers,method,false,body);
+                    break;
+                case "getS3url":
+                    var api_name = "groups/5db48ed8-4f8c-4c68-b147-21f4d0a48e7b/files/";
+
+                    var headers = {
+                             "ui":ui,
+                             "at":at, 
+                             "li":"zh_TW",
+                                 };
+                    var body = {
+                          fn: "test",
+                          tp: 1,
+                          ti: "fd97294e-eee3-4e64-bdf5-10e853de4373",
+                          pi: 0
+                        }
+
+                    var method = "post";
+
+                    var result = ajaxDo(api_name,headers,method,false,body);
+                    break;
                 case "invite":
                     var api_name = "groups/d75bb5ec-7b1f-4dd1-9e60-e3f41e146c5c/invitations";
 

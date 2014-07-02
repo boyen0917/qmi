@@ -1,23 +1,32 @@
 $(function(){
 	//api 網址
+	//base_url = "https://mapserver.mitake.com.tw/apiv1/";
 	base_url = "https://apserver.mitake.com.tw/apiv1/";
-	//var base_url = "http://10.1.17.116:8090/apiv1/";
+	//base_url = "http://10.1.17.116:8090/apiv1/";
+
 	//ajax用
 	myRand = Math.floor((Math.random()*1000)+1);
 	
 	//國碼
 	country_code = "+886";
+
+	//語言
+	lang = "zh_TW";
 	
 	//動態消息的字數限制
 	content_limit = 400;
 	
 	//計算螢幕長寬以維持比例
 	proportion = 1.7;
+
+	//上一頁 預設
+	$(document).data("page-history",[["login"],["#page-group-menu","團體列表"]]);
 	
 	//上一頁按鈕不需要記錄
 	back_button = false;
 	//部分跳頁不需要記錄
 	back_exception = false;
+	back_hash = false;
 
 	//timeline裏面點擊不做展開收合的區域
 	timeline_detail_exception = [
@@ -68,5 +77,10 @@ $(function(){
 
 	//附檔區域開啓的type id 
 	attach_mtp_arr = [1,6];
+
+	//縮圖寬高
+	max_w = 500;
+	max_h = 500;
+	quality = 0.5;
 	
 });
