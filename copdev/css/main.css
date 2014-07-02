@@ -41,9 +41,6 @@
 }
 
 @media all and (max-width: 320px) {
-    .file-list-area{
-        padding-left: 1%;
-    }
     
     .file-list-area div img{
         width:80px;
@@ -59,24 +56,11 @@
 }
 
 @media all and (min-width: 321px) and (max-width: 640px) {
-    /*.file-list-area div{
-        width:120px;
-        margin:10px;
-        font:15px;
-    }*/
-    /*.file-list-area div img{
-        width:120px;
-        height:120px;
-    }*/
 
     .file-list-area{
         padding-left: 2%;
     }
 
-    .download-area .file-list-area{
-        padding-left: 10%;
-    }
-    
     .main{
        width:90%;
     }
