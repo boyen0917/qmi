@@ -91,6 +91,11 @@
 	        	
 	        	
 	        	function uploadFiles(event){
+	        		setTimeout(function(){
+                    	$(".popup-dialog").hide();
+                    	$(".ajax-area").hide();
+                    },1000);
+                    
 	                if(!$('#file').val()){
 	                    $(".ajax-area").show();
 	                    $(".popup-dialog").show();

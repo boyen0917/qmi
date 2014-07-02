@@ -88,9 +88,18 @@
 	        	$("#upload-submit").click(function(){
 	        		uploadFiles();
 	            });
+
+	            $(document).on("click",function(){
+	            	$(".popup-dialog").hide();
+                	$(".ajax-area").hide();	
+	            });
 	        	
 	        	
 	        	function uploadFiles(event){
+	        		setTimeout(function(){
+                    	$(".popup-dialog").hide();
+                    	$(".ajax-area").hide();
+                    },1000);
 	                if(!$('#file').val()){
 	                    $(".ajax-area").show();
 	                    $(".popup-dialog").show();
