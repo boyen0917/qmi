@@ -245,7 +245,7 @@ $(function(){
 				//儲存登入資料 跳轉到timeline
 				result.page = "timeline";
         		$.lStorage("_loginData",result);
-        		document.location = "index.html#page-group-main";
+        		document.location = "main.html#page-group-main";
 
         	}
         });

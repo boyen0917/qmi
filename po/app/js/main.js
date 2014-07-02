@@ -80,8 +80,8 @@ $(function(){
         });
 	}else{
 
-		//暫時/*
-		var api_name = "login";
+		//暫時
+		/*var api_name = "login";
 
         var headers = {
             li:lang
@@ -168,7 +168,7 @@ $(function(){
 
 
 
-		document.location = "login.html";
+		document.location = "index.html";
 	}
 
 
@@ -297,7 +297,7 @@ $(function(){
 
 		//若上一頁為login 導去login
 		if( $(document).data("page-history").last()[0] == "login" ) {
-			document.location = "login.html";
+			document.location = "index.html";
 		}
 
 		$.mobile.changePage($(document).data("page-history").last()[0], {transition: "slide",reverse: true});
