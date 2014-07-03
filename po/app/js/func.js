@@ -1831,6 +1831,7 @@ $(function(){
 				break;
 			//通報
 			case 2:
+				body.meta.tt = this_compose.data("compose-title");
 				break;
 			//任務 工作
 			case 3:
@@ -1838,7 +1839,7 @@ $(function(){
 				var obj_arr = [];
 				var gul_arr = [];
 				//設定標題
-				body.meta.tt = this_compose.find(".cp-content-title textarea").val();
+				body.meta.tt = this_compose.data("compose-title");
 
 				this_compose.find(".cp-work-item-object").each(function(i,val){
 					var this_work = $(this).parent();
