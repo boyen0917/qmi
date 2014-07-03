@@ -27,7 +27,7 @@ $(function(){
         var headers = {
             "ui":ui,
             "at":at,
-            "li":"zh_TW",
+            "li":lang,
         };
         var method = "get";
         var result = ajaxDo(api_name,headers,method,true);
@@ -187,7 +187,7 @@ $(function(){
 		var headers = {
             "ui":ui,
 			"at":at, 
-			"li":"zh_TW"
+			"li":lang
 			            };
 			var method = "get";
 			var result = ajaxDo(api_name,headers,method,false);
@@ -422,7 +422,7 @@ $(function(){
 	    		var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
 	    		
 
-				this_load.find(".st-reply-username").html(user_name + "<span>" + el.ei + "</span>");
+				this_load.find(".st-reply-username").html(user_name + "<span>" + el.ei.substring(el.ei.length-8) + "</span>");
 				this_load.find(".st-reply-content").html(reply_content);
 				this_load.find(".st-reply-footer span:eq(0)").html(time_format);
 
@@ -573,7 +573,7 @@ $(function(){
             var headers = {
                      "ui":ui,
                      "at":at, 
-                     "li":"zh_TW",
+                     "li":lang,
                          };
             var method = "post";
 
@@ -933,7 +933,7 @@ $(function(){
 	        var headers = {
 	                 "ui":ui,
 	                 "at":at, 
-	                 "li":"zh_TW",
+	                 "li":lang,
 	                     };
 
 
@@ -979,6 +979,9 @@ $(function(){
 			//圖片上傳物件及流水號
 			this_compose.data("upload-obj",{});
 			this_compose.data("upload-ai",0);
+
+			//預設發佈對象
+			//this_compose.data("object_str","{}");
 
 			this_compose.data("body",{});
 
@@ -1101,7 +1104,7 @@ $(function(){
             var headers = {
                 "ui":ui,
                 "at":at,
-                "li":"zh_TW",
+                "li":lang,
             };
             var method = "get";
             var result = ajaxDo(api_name,headers,method,true);
@@ -1114,10 +1117,10 @@ $(function(){
 		    	var obj_data;
 	    		if(this_compose_obj.parent().hasClass("cp-work-item")){
 	    			//工作發佈對象
-	    			obj_data = this_compose_obj.data("obj");
+	    			obj_data = this_compose_obj.data("object_str");
 	    		}else{
 	    			//其餘發佈對象
-	    			obj_data = this_compose.data("obj");
+	    			obj_data = this_compose.data("object_str");
 	    		}
 
 		    	$.each(gu_list,function(i,gu_obj){
@@ -1144,7 +1147,7 @@ $(function(){
 
 		    	//已經有內容 就製作已選的樣式
 		    	
-		    	if(obj_data){
+		    	if(obj_data && obj_data){
 		    		obj_data = $.parseJSON(obj_data);
 		    		if(Object.keys(obj_data).length){
 		    			$(".obj-content").data("selected-obj",obj_data);
@@ -1181,7 +1184,7 @@ $(function(){
 		    	$(document).on("click",".obj-cell",function(){
 		    		var this_cell = $(this);
 		    		var selected_obj = $(".obj-content").data("selected-obj");
-
+		    		console.debug("selected_obj:",selected_obj);
 					//清空選擇區域先
 					$(".obj-selected div:eq(1)").html("");
 
@@ -1249,7 +1252,7 @@ $(function(){
 
 		    			//製作發佈對象list 轉換成str 避免call by reference
 		    			var obj_str = JSON.stringify(selected_obj);
-		    			this_compose_obj.data("obj",obj_str);
+		    			this_compose_obj.data("object_str",obj_str);
 		    		}else{
 		    			//其餘發佈對象
 		    			if(obj_length != 0){
@@ -1260,7 +1263,7 @@ $(function(){
 		    			
 		    			//製作發佈對象list 轉換成str 避免call by reference
 		    			var obj_str = JSON.stringify($(".obj-content").data("selected-obj"));
-		    			this_compose.data("obj",obj_str);
+		    			this_compose.data("object_str",obj_str);
 		    		}
 
 		    		//回上一頁
@@ -1773,8 +1776,7 @@ $(function(){
 		var ctp = this_compose.data("compose-tp");
 		var compose_content = this_compose.data("compose-content");
 		var ml = this_compose.data("message-list");
-console.debug("obj:",this_compose.data("obj"));
-console.debug("obj:",typeof this_compose.data("obj"));return false;
+
 		//發佈上傳檢查
 		var timer_chk = false;
 		var body = {
@@ -1835,15 +1837,18 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 				//發佈對象
 				var obj_arr = [];
 				var gul_arr = [];
+				//設定標題
+				body.meta.tt = this_compose.find(".cp-content-title textarea").val();
+
 				this_compose.find(".cp-work-item-object").each(function(i,val){
 					var this_work = $(this).parent();
 					var parsed_obj = {};
-					if($(this).data("obj")){
-						parsed_obj = $.parseJSON($(this).data("obj"));
+					if($(this).data("object_str")){
+						parsed_obj = $.parseJSON($(this).data("object_str"));
 					}
 
 					//分派對象檢查
-					if(!$(this).data("obj") || Object.keys(parsed_obj).length == 0){
+					if(!$(this).data("object_str") || Object.keys(parsed_obj).length == 0){
 						empty_chk = true;
 						empty_msg = "分派對象尚未完成";
 						return false;
@@ -1886,10 +1891,10 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 				if(empty_chk) break;
 				
 				var ml_obj = {
-		    		"li" : [],
-		    		"b": this_compose.data("start-timestamp"),
-					"e": this_compose.data("end-timestamp"),
-					"tp": 12
+		    		li : [],
+		    		b : this_compose.data("start-timestamp"),
+					e : this_compose.data("end-timestamp"),
+					tp : 12
 		    	}
 		    	ml_obj.li = obj_arr;
 				body.ml.push(ml_obj);
@@ -1911,8 +1916,9 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 		//加入發佈對象 工作需要特別處理
 		if(ctp != 3){
 			//空值表示 發佈全體
-			if(this_compose.data("obj")){
-				var object_obj = $.parseJSON(this_compose.data("obj"));
+
+			if(this_compose.data("object_str")){
+				var object_obj = $.parseJSON(this_compose.data("object_str"));
 				if(Object.keys(object_obj).length){
 					var gul_arr = [];
 					$.each(object_obj,function(i,val){
@@ -1937,7 +1943,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 			return false;
 		}
 		// console.debug("obj:",JSON.stringify(gul_arr,null,2));
-		// return false;
+		 // return false;
 		//網址
 
 		// "ei": "Event-340",
@@ -2018,7 +2024,6 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 
 					//發佈上傳檢查
 					timer_chk = true;
-
 					var total = Object.keys(this_compose.data("upload-obj")).length;
 
 					var cnt = 0
@@ -2027,14 +2032,29 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 					this_compose.data("uploaded-err",[]);
 					this_compose.data("img-compose-arr",[]);
 
-					//permission_id
-					var permission_id = 0;
+					//開啟loading icon
+			        s_load_show = true;
 
-					$.each(this_compose.data("upload-obj"),function(i,file){
-						uploadFileToS3(file,imageType,cnt,total,6,permission_id);
-						cnt++;
-					});
-
+					//先做permission id 
+					console.debug("object str:",this_compose.data("object_str"));
+					// var object_obj = $.parseJSON(this_compose.data("object_str"));
+					if(this_compose.data("object_str")){
+						$.each(this_compose.data("upload-obj"),function(i,file){
+							getFilePermissionId(this_compose.data("object_str")).complete(function(data){
+								var pi_result = $.parseJSON(data.responseText);
+								if(data.status == 200){
+									uploadFile(file,imageType,cnt,total,6,pi_result.pi);		
+									cnt++;
+								}
+							});
+						});							
+							
+					}else{
+						$.each(this_compose.data("upload-obj"),function(i,file){
+							uploadFile(file,imageType,cnt,total,6,0);
+							cnt++;
+						});
+					}
 					this_compose.data("body",body);
 					break;
 			}
@@ -2065,32 +2085,20 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 	}
 
 	composeSendApi = function(body){
-		//return false;
 		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events";
 
         var headers = {
                  "ui":ui,
                  "at":at, 
-                 "li":"zh_TW",
+                 "li":lang,
                      };
 
         var method = "post";
-        console.log(api_name);
-        console.log(body);
         var result = ajaxDo(api_name,headers,method,true,body);
         result.success(function(data){
         	popupShowAdjust("","發佈成功","hash+#page-group-main");
         	timelineListWrite();
-	        //popupAfterChangePage("#page-group-main");
         });
-        // result.success(function(data){
-        // 	rsp_code = $.parseJSON(data.responseText).rsp_code;
-        // 	console.log(rsp_code);
-        // 	console.log(data);
-        // 	// popupShowAdjust("發佈成功");
-        // 	// timelineListWrite();
-	       //  // popupAfterChangePage("#page-group-main");
-        // });
 	};
 
 
@@ -2138,7 +2146,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 	    var headers = {
 	        "ui":ui,
 	        "at":at,
-	        "li":"zh_TW"
+	        "li":lang
 	    };
 	    var method = "get";
 	    	
@@ -2259,7 +2267,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 	    var headers = {
 	            "ui":ui,
 	            "at":at, 
-	            "li":"zh_TW"
+	            "li":lang
 	                };
 	    var method = "get";
 	    var result = ajaxDo(api_name,headers,method,true);
@@ -2452,7 +2460,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
         var headers = {
                 "ui":ui,
                 "at":at, 
-                "li":"zh_TW"
+                "li":lang
                     };
         var method = "get";
         
@@ -2896,11 +2904,10 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 
 	getS3file = function(file_obj,target,tp){
 		var api_name = "groups/" + gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + ti_feed;
-		console.debug("api name:",api_name);
         var headers = {
                  "ui":ui,
                  "at":at, 
-                 "li":"zh_TW",
+                 "li":lang,
                      };
         var method = "get";
 
@@ -2917,7 +2924,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 					case 6://圖片
 						var img = target.find("img:eq(0)");
 						img.load(function() {
-
+							console.debug("getS3file img load");
 							//重設 style
 							img.removeAttr("style");
 
@@ -2938,9 +2945,105 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 		});
 	}
 
-	uploadFileToS3 = function(file,imageType,i,total,tp,permission_id){
+	getFilePermissionId = function(object_str){
+		var object_obj = $.parseJSON(object_str);
+		var gul_arr = [];
+		$.each(object_obj,function(i,val){
+			var temp_obj = {
+				gu: i,
+				n: val
+			}
+			gul_arr.push(temp_obj);
+		});
+		var api_name = "groups/" + gi + "/permissions";
+
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var body = {
+                ti: ti_feed,
+                tu:{
+                  gul: gul_arr 
+                }
+            }
+
+        var method = "post";
+        var pi_result = ajaxDo(api_name,headers,method,false,body);
+		return pi_result;
+	}
+
+	getS3UploadUrl = function(ti,tp,pi){
+		var api_name = "groups/" + gi + "/files";
+
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "post";
+        var body = {
+                  fn: "filename",
+                  tp: tp,
+                  ti: ti,
+                  pi: pi
+                }
+        return ajaxDo(api_name,headers,method,false,body);
+	}
+
+	uploadToS3 = function(url,file){
+		return $.ajax ({
+            url: url,
+			type: 'PUT',
+			contentType: " ",
+		 	data: file, 
+			processData: false
+        });
+	}
+
+	uploadCommit = function(fi,ti,pi,tp,mt,si,md){
+		var api_name = "groups/" + gi + "/files/" + fi + "/commit";
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "put";
+
+        var body = {
+          ti: ti,
+          pi: pi,
+          tp: tp,
+          mt: mt,
+          si: si,
+          md: md
+        }
+        return ajaxDo(api_name,headers,method,false,body);
+	}
+
+	uploadErrorCnt = function(this_compose,file_num,total){
+		//上傳編號加一
+		var num = this_compose.data("uploaded-num");
+		this_compose.data("uploaded-num",num += 1);
+
+		this_compose.data("uploaded-err").push(file_num+1);
+
+		//檢查是否是最後一個上傳的檔案 若是的話 再檢查是否顯示上傳失敗訊息
+		if(this_compose.data("uploaded-num") == total){
+			//loading icon off
+			s_load_show = false;
+			$('.ui-loader').hide();
+			// $(document).trigger("click");
+			//只會有失敗
+			clearTimeout(compose_timer);
+			popupShowAdjust("第" + this_compose.data("uploaded-err").sort().join("、") + "個檔案上傳失敗 請重新上傳");
+		};
+	}
+
+	uploadFile = function(file,imageType,file_num,total,cp_tp,permission_id){
 		var this_compose = $(document).find(".cp-content");
-		var fname = file.name;
+		
 		//判斷是否符合上傳檔案格式
 		if(!file.type.match(imageType)){
 			//上傳編號加一
@@ -2949,12 +3052,116 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 			return false;
 		}
 
+		//縮圖 先做縮圖 因為要一起做commit 的 md 
+		var reader = new FileReader();
+        reader.onloadend = function() {
+            var tempImg = new Image();
+            tempImg.src = reader.result;
+            tempImg.onload = function() {
+                //縮圖
+                var img_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
+
+                //compose tp to upload file tp
+				var file_tp = 0,md = {};
+				switch(cp_tp){
+					case 6:
+						file_tp = 1;
+        				md.w = img_obj.w;
+        				md.h = img_obj.h;
+						break;
+				}
+				getS3UploadUrl(ti_feed,file_tp,permission_id).complete(function(data){
+					var s3url_result = $.parseJSON(data.responseText);
+					if(data.status == 200){
+						var fi = s3url_result.fi;
+		        		var s3_url = s3url_result.s3;
+		        		var s32_url = s3url_result.s32;
+
+		        		//傳大圖
+		        		uploadToS3(s32_url,file).complete(function(data){
+	        			if(data.status == 200){
+
+	        				//傳小圖 已經縮好囉
+			        		uploadToS3(s3_url,img_obj.blob).complete(function(data){
+
+		        			if(data.status == 200){
+		        				var tempW = this.width;
+								var tempH = this.height;
+
+		        				uploadCommit(fi,ti_feed,permission_id,file_tp,file.type,img_obj.blob.size,md).complete(function(data){
+
+		        					var commit_result = $.parseJSON(data.responseText);
+
+		        					//上傳編號加一
+									var num = this_compose.data("uploaded-num");
+									this_compose.data("uploaded-num",num += 1);
+
+			                    	//commit 成功或失敗
+			                    	if(data.status != 200){
+			                    		this_compose.data("uploaded-err").push(file_num+1);
+			                    	}else{
+
+			                    		var img_arr = [fi,permission_id,file.name];
+			                    		this_compose.data("img-compose-arr")[file_num] = img_arr;
+			                    	}
+
+			                    	//判斷是否為最後一個上傳檔案
+			                    	//檢查是否是最後一個上傳的檔案 若是的話 再檢查是否顯示上傳失敗訊息
+									if(this_compose.data("uploaded-num") == total){
+										//loading icon off
+			        					s_load_show = false;
+			        					$('.ui-loader').hide();
+										// $(document).trigger("click");
+
+										if(this_compose.data("uploaded-err").length > 0){
+											popupShowAdjust("","第" + this_compose.data("uploaded-err").sort().join("、") + "個檔案上傳失敗 請重新上傳",true);
+										}else{
+											clearTimeout(compose_timer);
+
+											var body = this_compose.data("body");
+											$.each(this_compose.data("img-compose-arr"),function(i,val){
+												if(val){
+													var obj = {};
+													obj.tp = cp_tp;
+													obj.c = val[0];
+													obj.p = val[1];
+													body.ml.unshift(obj);
+												}
+											});
+											composeSendApi(this_compose.data("body"));
+										}
+									}
+		        				});
+		        			}else{
+								//傳小圖失敗
+								uploadErrorCnt(this_compose,file_num,total);
+				        		return false;
+				        	}});
+
+	        			}else{
+							//傳大圖失敗
+							uploadErrorCnt(this_compose,file_num,total);
+			        		return false;
+			        	}});
+					}else{
+						//取得上傳網址
+		        		return false;
+		        	}
+				});
+			}
+        }
+        reader.readAsDataURL(file);
+
+		
+
+		return false;
+
 		var api_name = "groups/" + gi + "/files";
 
         var headers = {
                  "ui":ui,
                  "at":at, 
-                 "li":"zh_TW",
+                 "li":lang,
                      };
         var method = "post";
         var body = {
@@ -2985,7 +3192,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 		                    var headers = {
 		                             "ui":ui,
 		                             "at":at, 
-		                             "li":"zh_TW",
+		                             "li":lang,
 		                                 };
 		                    var method = "put";
 
@@ -3004,11 +3211,11 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 
 		                    	//commit 成功或失敗
 		                    	if(data.status != 200){
-		                    		this_compose.data("uploaded-err").push(i+1);
+		                    		this_compose.data("uploaded-err").push(file_num+1);
 		                    	}else{
 		                    		var img_arr = [fi,permission_id,file.name];
 
-		                    		this_compose.data("img-compose-arr")[i] = img_arr;
+		                    		this_compose.data("img-compose-arr")[file_num] = img_arr;
 		                    	}
 
 		                    	//判斷是否為最後一個上傳檔案
@@ -3028,7 +3235,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 										$.each(this_compose.data("img-compose-arr"),function(i,val){
 											if(val){
 												var obj = {};
-												obj.tp = tp;
+												obj.tp = cp_tp;
 												obj.c = val[0];
 												obj.p = val[1];
 												body.ml.unshift(obj);
@@ -3044,7 +3251,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 							var num = this_compose.data("uploaded-num");
 							this_compose.data("uploaded-num",num += 1);
 
-							this_compose.data("uploaded-err").push(i+1);
+							this_compose.data("uploaded-err").push(file_num+1);
 
 							//檢查是否是最後一個上傳的檔案 若是的話 再檢查是否顯示上傳失敗訊息
 							if(this_compose.data("uploaded-num") == total){
@@ -3104,7 +3311,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
         var headers = {
                  "ui":ui,
                  "at":at, 
-                 "li":"zh_TW",
+                 "li":lang,
                  "etp":etp,
                  "est":est
                      };
@@ -3233,7 +3440,6 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 					if(!result.img){
 						//預設圖片 隨便找一張img tag
 			            if(data.query.results && data.query.results.img){
-			            	console.debug("hehe");
 		            		$.each(data.query.results.img,function(i,val){
 		                        if (val.src && val.src.match(/\.jpg|\.png/)) {
 		                        	var temp_img = val.src;
@@ -3254,7 +3460,6 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 									// img.src = val.src;
 
 		                        }
-		                        console.debug("---------------------------");
 		                    });
 		            	}
 					}
@@ -3416,7 +3621,7 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 	        var headers = {
 	                 "ui":ui,
 	                 "at":at, 
-	                 "li":"zh_TW",
+	                 "li":lang,
 	                     };
 
 	        var method = "post";
@@ -3427,9 +3632,8 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 	        	popupShowAdjust("","回覆成功");
 
 	        	setTimeout(function(){
-	        		console.log("hehehehehe");
 					reloadDetail(this_event);
-	        	},1000);
+	        	},400);
 
 	        });
 	}
@@ -3618,5 +3822,47 @@ console.debug("obj:",typeof this_compose.data("obj"));return false;
 			return String.fromCharCode(dec);
 		});
 	};
+
+
+	//縮圖
+	imgResizeByCanvas = function(img,x,y,max_w,max_h,quality){
+		var MAX_WIDTH = max_w;
+		var MAX_HEIGHT = max_h;
+		var tempW = img.width;
+		var tempH = img.height;
+		if (tempW > tempH) {
+			if (tempW > MAX_WIDTH) {
+				tempH *= MAX_WIDTH / tempW;
+				tempW = MAX_WIDTH;
+			}
+		} else {
+			if (tempH > MAX_HEIGHT) {
+				tempW *= MAX_HEIGHT / tempH;
+				tempH = MAX_HEIGHT;
+			}
+		}
+
+		var canvas = document.createElement('canvas');
+		canvas.width = tempW;
+		canvas.height = tempH;
+		var ctx = canvas.getContext("2d");
+		ctx.drawImage(img, x, y, tempW, tempH);
+		var dataURL = canvas.toDataURL("image/jpeg",quality);
+		var img_obj = {
+			w: tempW,
+			h: tempH,
+			blob: dataURItoBlob(dataURL)
+		}
+		return img_obj;
+	}
+
+	dataURItoBlob = function(dataURI) {
+        var binary = atob(dataURI.split(',')[1]);
+        var array = [];
+        for(var i = 0; i < binary.length; i++) {
+            array.push(binary.charCodeAt(i));
+        }
+        return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
+    }
 	
 });

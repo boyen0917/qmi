@@ -17,7 +17,7 @@ $(function(){
         var headers = {
             "ui":ui,
             "at":at,
-            "li":"zh_TW"
+            "li":lang
         };
         var method = "get";
         var result = ajaxDo(api_name,headers,method,true);
@@ -81,90 +81,90 @@ $(function(){
 	}else{
 
 		//暫時
-		/*var api_name = "login";
+		// var api_name = "login";
 
-        var headers = {
-            li:lang
-        };
-        var body = {
-            id: "+886980922917",
-            tp:"0",
-            pw:toSha1Encode("111111")
-        };
-        var method = "post";
-        var result = ajaxDo(api_name,headers,method,true,body);
-        result.complete(function(data){
-        	ui = $.parseJSON(data.responseText).ui;
-            at = $.parseJSON(data.responseText).at;
+  //       var headers = {
+  //           li:lang
+  //       };
+  //       var body = {
+  //           id: "+886980922917",
+  //           tp:"0",
+  //           pw:toSha1Encode("111111")
+  //       };
+  //       var method = "post";
+  //       var result = ajaxDo(api_name,headers,method,true,body);
+  //       result.complete(function(data){
+  //       	ui = $.parseJSON(data.responseText).ui;
+  //           at = $.parseJSON(data.responseText).at;
 
 
-            //取得團體列表
-	        var api_name = "groups";
-	        var headers = {
-	            "ui":ui,
-	            "at":at,
-	            "li":"zh_TW"
-	        };
-	        var method = "get";
-	        var result = ajaxDo(api_name,headers,method,true);
-	        result.complete(function(data){
-	        	//所有團體列表
-	        	group_list = $.parseJSON(data.responseText).gl;
+  //           //取得團體列表
+	 //        var api_name = "groups";
+	 //        var headers = {
+	 //            "ui":ui,
+	 //            "at":at,
+	 //            "li":lang
+	 //        };
+	 //        var method = "get";
+	 //        var result = ajaxDo(api_name,headers,method,true);
+	 //        result.complete(function(data){
+	 //        	//所有團體列表
+	 //        	group_list = $.parseJSON(data.responseText).gl;
 
-	            if( group_list.length == 0 )
-	            {
-	            	$.mobile.changePage("#page-helper");
-	            } else {
+	 //            if( group_list.length == 0 )
+	 //            {
+	 //            	$.mobile.changePage("#page-helper");
+	 //            } else {
 	            	
-	            	//上次點選團體
-	            	if($.lStorage(ui)){
-	            		var _groupList = $.lStorage(ui);
-	            		var dgi = _groupList.default_gi;
-	            		var defaultGroup = _groupList[dgi];
+	 //            	//上次點選團體
+	 //            	if($.lStorage(ui)){
+	 //            		var _groupList = $.lStorage(ui);
+	 //            		var dgi = _groupList.default_gi;
+	 //            		var defaultGroup = _groupList[dgi];
 	            		
-	            		gi = dgi;
-	            		gu = defaultGroup.gu;
-	            		gn = defaultGroup.gn;
-	            		ti_cal = defaultGroup.ti_cal;
-	            		ti_feed = defaultGroup.ti_feed;
-	            		ti_chat = defaultGroup.ti_chat;
+	 //            		gi = dgi;
+	 //            		gu = defaultGroup.gu;
+	 //            		gn = defaultGroup.gn;
+	 //            		ti_cal = defaultGroup.ti_cal;
+	 //            		ti_feed = defaultGroup.ti_feed;
+	 //            		ti_chat = defaultGroup.ti_chat;
 	            		
-	            	}else{
+	 //            	}else{
 	            		
-	            		//預設團體暫定為第一個團體？
-	                	var default_group = group_list[0];
-	                	$.each(default_group.tl,function(i,val){
-	                		if(val.tp == 1){
-	                			ti_cal = val.ti;
-	                		}else if(val.tp == 2){
-	                			ti_feed = val.ti;
-	                		}else{
-	                			ti_chat = val.ti;
-	                		}
-	                	});
+	 //            		//預設團體暫定為第一個團體？
+	 //                	var default_group = group_list[0];
+	 //                	$.each(default_group.tl,function(i,val){
+	 //                		if(val.tp == 1){
+	 //                			ti_cal = val.ti;
+	 //                		}else if(val.tp == 2){
+	 //                			ti_feed = val.ti;
+	 //                		}else{
+	 //                			ti_chat = val.ti;
+	 //                		}
+	 //                	});
 	                	
-	                	gi = default_group.gi;
-	            		gu = default_group.me;
-	            		gn = default_group.gn;
+	 //                	gi = default_group.gi;
+	 //            		gu = default_group.me;
+	 //            		gn = default_group.gn;
 	            		
-	            		//存入localstorage
-	            		var _groupList = {"default_gi":gi};
-	            		_groupList[gi] = {"gu":gu,"gn":gn,"ti_cal":ti_cal,"ti_feed":ti_feed,"ti_chat":ti_chat};
-	            		$.lStorage(ui,_groupList);
-	            	}
+	 //            		//存入localstorage
+	 //            		var _groupList = {"default_gi":gi};
+	 //            		_groupList[gi] = {"gu":gu,"gn":gn,"ti_cal":ti_cal,"ti_feed":ti_feed,"ti_chat":ti_chat};
+	 //            		$.lStorage(ui,_groupList);
+	 //            	}
 	            	
-	            	//header 設定團體名稱
-	            	$(".header-group-name div:eq(1)").html(gn);
+	 //            	//header 設定團體名稱
+	 //            	$(".header-group-name div:eq(1)").html(gn);
 	            	
-	            	//sidemenu name
-	            	setSmUserData(gi,gu,gn);
+	 //            	//sidemenu name
+	 //            	setSmUserData(gi,gu,gn);
 	            	
-	            	//動態消息
-	            	timelineListWrite();
-	            	$.mobile.changePage("#page-group-main", {transition: "pop"});
-	            }
-	        });
-        });*/
+	 //            	//動態消息
+	 //            	timelineListWrite();
+	 //            	$.mobile.changePage("#page-group-main", {transition: "pop"});
+	 //            }
+	 //        });
+  //       });
 
 
 
@@ -346,7 +346,7 @@ $(function(){
             var headers = {
                 "ui":ui,
                 "at":at,
-                "li":"zh_TW",
+                "li":lang,
             };
             var body = {
            		"gn":$("#group-name").val(),
@@ -866,9 +866,7 @@ $(function(){
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){
 		var this_event = $(this).parents(".st-sub-box");
-		// var this_msg = $(this).parents(".st-reply-message-area");
-		// var msg_content = this_msg.find(".st-reply-message-textarea textarea").val();
-		// this_msg.data("msg-content",msg_content);
+		if(!this_event.find(".st-reply-message-textarea textarea").val()) return false;
 		replySend(this_event);
 	});
 
@@ -1034,7 +1032,7 @@ $(function(){
         var headers = {
                 "ui":ui,
                 "at":at, 
-                "li":"zh_TW"
+                "li":lang
                     };
         var method = "get";
         var result = ajaxDo(api_name,headers,method,false);

@@ -2468,6 +2468,7 @@
 
 .cp-time-area {
 	-webkit-user-select: none;
+	margin-bottom: 27px;
 }
 
 .cp-setdate-chk {
@@ -2674,6 +2675,9 @@ input.cp-datetimepicker-end {
 	height: 50px;
 	font-size: 18px;
 	line-height: 50px;
+	position: fixed;
+	width: 100%;
+	z-index: 100;
 }
 
 .obj-selected div:nth-child(1) {
@@ -2698,6 +2702,10 @@ input.cp-datetimepicker-end {
 .obj-selected span {
 	margin-right: 10px;
 	color: #535759;
+}
+
+.obj-cell-area {
+	padding-top: 51px;
 }
 
 .obj-cell {

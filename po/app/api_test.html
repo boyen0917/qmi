@@ -68,10 +68,7 @@
                             ti: "fd97294e-eee3-4e64-bdf5-10e853de4373",
                             tu:{
                               gul: [
-                                {
-                                    gu: "2c50b7c3-56e3-45a3-a7ee-985ee37c5170",
-                                    n : "夏目優希"
-                                }
+                                
                               ]  
                             }
                         }
@@ -139,21 +136,6 @@
                       "mt": "image/gif",
                       "si": 1954684
                     }
-                    var result = ajaxDo(api_name,headers,method,true,body);
-                  break;
-                case "upload":///groups/{gi}/files
-                    var api_name = "groups/1a9bca59-766d-402d-b5ea-9ad973e10d45/files";
-
-                    var headers = {
-                             "ui":ui,
-                             "at":at, 
-                             "li":"zh_TW",
-                                 };
-                    var method = "post";
-                    var body = {
-                          fn:"filename"
-                        }
-
                     var result = ajaxDo(api_name,headers,method,true,body);
                   break;
                 case "pic":///groups/{gi}/files/{fi}{?pi}
