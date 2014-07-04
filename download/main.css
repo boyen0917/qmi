@@ -5,7 +5,7 @@
 }
 
 .main{
-       width:80%;
+       width:40%;
        margin:auto;
     }
 
@@ -21,7 +21,7 @@
     float: left;
     margin: 20px 0;
     word-break: break-all;
-    width: 33%;
+    width: 50%;
     color: gray;
     font-size: 15px;
 }
@@ -55,16 +55,6 @@
 }
 
 @media all and (min-width: 321px) and (max-width: 640px) {
-    /*.file-list-area div{
-        width:120px;
-        margin:10px;
-        font:15px;
-    }*/
-    /*.file-list-area div img{
-        width:120px;
-        height:120px;
-    }*/
-    
     .main{
        width:90%;
     }
