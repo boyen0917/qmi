@@ -9,9 +9,15 @@ function loginFun(pno,pwd){
         "li":"zh_TW"
     };
     var body={};
+    body.tp="0";
+    if(pno.indexOf("@")>=0){
+        body.tp="1";
+        id=pno;
+    }
     body.id=id;
     body.pw=toSha1Encode(pwd);
-    body.tp="0"
+    
+
     var method = "post";
     return result = ajaxDo(api_name,headers,method,true,JSON.stringify(body));
                     
@@ -303,9 +309,13 @@ function inviteMemberApi(orgTree,members){
         member.pn="+886"+val.mobile;
         member.pn2=val.phone;
         member.ext=val.ext;
-        //member.em=val.mail;
+        member.em=val.mail;
         member.nk=val.name;
+        if(val.title.length>0){
+            member.ti=val.title;
+        }
         ul[i]=(member);
+
     });
     var body={};
     body.ul=ul;
@@ -357,6 +367,161 @@ function createMemberApi(parendId,branchName){
         }
     });
     return branchId;
+}
+
+function openApiTokenFun(){
+    html="<div class='col-lg-6'> ";
+    html+="<label>請輸入email進行驗證</label>"; 
+    html+="<input id='email' type='text' class='form-control' placeholder='Please input email'><BR>";
+    html+="<button id='openApiEmailBut' type='button' class='btn btn-primary'>確定</button><BR><HR>";
+    
+    html+="<label>請輸入email驗證碼</label>"; 
+    html+="<input id='auth' type='text' class='form-control' placeholder='Please input auth code'></input><BR>";
+    html+="<button id='openApiAuthBut' type='button' class='btn btn-primary'>建立</button><BR><HR>";
+    
+    html+="<label>請輸入密碼</label>"; 
+    html+="<input id='pwd' type='text' class='form-control' placeholder='Please input password'></input><BR>";
+    html+="<input id='pwd1' type='text' class='form-control' placeholder='Please input password again'></input><BR>";
+    html+="<button id='openApiPwdBut' type='button' class='btn btn-primary'>確定</button><BR><HR>";
+
+    html+="<label>請輸入基本資料</label>"; 
+    html+="<input id='fname' type='text' class='form-control' placeholder='Please input your first namae'></input><BR>";
+    html+="<input id='lname' type='text' class='form-control' placeholder='Please input your last name'></input><BR>";
+    html+="<input id='bday' type='text' class='form-control' placeholder='Please input your brithday' value='19910530'></input><BR>";
+    html+="<button id='openApiProfileBut' type='button' class='btn btn-primary'>確定</button><BR><HR>";
+    
+    
+    html+="</div>";
+    $("#content").html(html);
+
+    $("#openApiEmailBut").click(function(){
+        
+        var id= $("#email").val();
+        var tp="1";
+        var ud="APITOKEN-"+$.jStorage.get("currnetGroupId");
+        
+        var api_name = "registration";
+        var headers = {
+            "li":"zh_TW"
+            };
+        var method = "post";
+        var body={};
+        body.id=id;
+        body.tp="1";
+        body.ud=ud;
+        var result = ajaxDo(api_name,headers,method,false,JSON.stringify(body));
+        
+        result.complete(function(data){
+            if(data.status != 200){
+                        //$.mobile.changePage("#page-helper");三個人
+            }else{
+                var resp=$.parseJSON(data.responseText);
+                alert(resp.rsp_msg+":建立成功，檢查email");
+                //loadGroupList(userId,accessToken);
+            }
+        });
+    });
+
+    $("#openApiAuthBut").click(function(){
+        
+        var id= $("#email").val();
+        var tp="1";
+        var vc=$("#auth").val();
+        var ud="APITOKEN-"+$.jStorage.get("currnetGroupId");
+        
+        var api_name = "activation/step1";
+        var headers = {
+            "li":"zh_TW"
+            };
+        var method = "put";
+        var body={};
+        body.id=id;
+        body.tp="1";
+        body.vc=vc;
+        body.ud=ud;
+        var result = ajaxDo(api_name,headers,method,false,JSON.stringify(body));
+        
+        result.complete(function(data){
+            if(data.status != 200){
+                        //$.mobile.changePage("#page-helper");三個人
+            }else{
+                var resp=$.parseJSON(data.responseText);
+                alert(resp.rsp_msg);
+                //loadGroupList(userId,accessToken);
+            }
+        });
+    });
+    var tempUi,tempAt;
+
+    $("#openApiPwdBut").click(function(){
+        
+        var id= $("#email").val();
+        var tp="1";
+        var pw=toSha1Encode($("#pwd").val());
+        var ud="APITOKEN-"+$.jStorage.get("currnetGroupId");
+        
+        var api_name = "activation/step2";
+        var headers = {
+            "li":"zh_TW"
+            };
+        var method = "put";
+        var body={};
+        body.id=id;
+        body.tp="1";
+        body.ud=ud;
+        body.pw=pw;
+        var result = ajaxDo(api_name,headers,method,false,JSON.stringify(body));
+        
+        result.complete(function(data){
+            if(data.status != 200){
+                        //$.mobile.changePage("#page-helper");三個人
+            }else{
+                var resp=$.parseJSON(data.responseText);
+                alert(resp.rsp_msg);
+                tempUi=resp.ui;
+                tempAt=resp.at;
+                //loadGroupList(userId,accessToken);
+            }
+        });
+    });
+
+    $("#openApiProfileBut").click(function(){
+        
+        var id= $("#email").val();
+        var tp="1";
+        var ud="APITOKEN-"+$.jStorage.get("currnetGroupId");
+        var fn=$("#fname").val();
+        var ln=$("#lname").val();
+        var bd=$("#bday").val();
+        
+        var api_name = "activation/step3";
+        var headers = {
+            "ui":tempUi,
+            "at":tempAt,
+            "li":"zh_TW"
+            };
+        var method = "put";
+        var body={};
+        body.id=id;
+        body.tp="1";
+        body.ud=ud;
+        body.fn=fn;
+        body.ln=ln;
+        body.bd=bd;
+        var result = ajaxDo(api_name,headers,method,false,JSON.stringify(body));
+        
+        result.complete(function(data){
+            if(data.status != 200){
+                        //$.mobile.changePage("#page-helper");三個人
+            }else{
+                var resp=$.parseJSON(data.responseText);
+                alert(resp.rsp_msg);
+                //loadGroupList(userId,accessToken);
+            }
+        });
+    });
+
+
 }
 
 function addGroupFun(){
@@ -421,12 +586,17 @@ function loadGroupList(userId, accessToken){
 
                     var groupList=$.parseJSON(data.responseText);
                     $("#groupList").empty(); 
+                    $("#gitHook").empty(); 
+                    
 
                     if(groupList.gl.length==0){
                         $("#groupList").append('<li><a>目前尚無群組</a></li>');
                     }else{
                         for(i=0;i<groupList.gl.length;i++){
-                            $("#groupList").append("<li id='"+i+"'><a>"+groupList.gl[i].gn+"</a></li>");
+                            if(groupList.gl[i].ad=="1"){
+                                $("#groupList").append("<li id='"+i+"'><a>"+groupList.gl[i].gn+" ("+groupList.gl[i].cnt+")</a></li>");
+                                $("#gitHook").append("<li id='"+i+"'><a>"+groupList.gl[i].gn+" ("+groupList.gl[i].cnt+")</a></li>");
+                            }
                         }
                     }
                     $('#groupList').on('click', 'li', function(event){
@@ -435,6 +605,15 @@ function loadGroupList(userId, accessToken){
                         $("#content").html("");
                         $.jStorage.set("currnetGroupName",groupList.gl[this.id].gn);
                         $.jStorage.set("currnetGroupId",groupList.gl[this.id].gi);
+                    });
+
+                    $('#gitHook').on('click', 'li', function(event){
+                        $("#content").html("");
+                        $("#memberEditor").hide();
+                        $("#mainTitle").text("OpenAPI Token - "+groupList.gl[this.id].gn);
+                        $.jStorage.set("currnetGroupName",groupList.gl[this.id].gn);
+                        $.jStorage.set("currnetGroupId",groupList.gl[this.id].gi);
+                        openApiTokenFun();
                     });
 
                     //製作timeline
