@@ -266,16 +266,137 @@
 }
 
 /* =======================團體選單 =================================*/
-.group-nav-chk{
-	display:none;
+
+#page-group-menu {
+	background: #ddd;
 }
 
-.gm-join-area{
-	margin: 20px;
+.gm-nav {
+	background: rgb(234,242,246);
+	display: -webkit-box;
+	height: 90px;
+	cursor: pointer;
 }
 
-#gm-join-submit{
-	margin-top:80%;
+.gm-nav-active {
+	background: rgb(132,195,234);
+}
+
+.gm-nav-box {
+	width: 50%;
+	text-align: center;
+}
+
+.gm-nav-box img {
+	display: block;
+	margin: 0 auto;
+}
+
+.gmc-avatar {
+	position: relative;
+	margin: 35px auto;
+	width: 120px;
+	cursor: pointer;
+}
+
+.gmc-avatar-wrap {
+	width: 120px;
+	height: 120px;
+	overflow: hidden;
+	border-radius: 10px;
+}
+
+.gmc-frame {
+	width: 120px;
+	height: 120px;
+	position: absolute;
+	top: -3px;
+	left: -3px;
+	border: 3px solid white;
+	border-radius: 15px;
+}
+
+.gmc-word {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 35px;
+	line-height: 35px;
+	background: #333;
+	color: white;
+	text-align: center;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+
+
+.gmc-name {
+	background: white;
+	height: 50px;
+	margin: 1px auto;
+	line-height: 50px;
+	border-radius: 3px;
+	text-align: left;
+	width: 350px;
+}
+
+.gmc-desc {
+	background: white;
+	box-shadow: 0px 2px #d2d2d2;
+	height: 80px;
+	margin: 0 auto;
+	line-height: 50px;
+	border-radius: 3px;
+	text-align: left;
+	width: 350px;
+}
+
+.gmc-name img {
+	width: 30px;
+	float: left;
+	margin: 10px;
+}
+
+.gmc-desc img {
+	width: 30px;
+	float: left;
+	margin: 22px 10px 0 10px;
+}
+
+.gmc-name input {
+	width: 75%;
+	font-size: 15px;
+	height: 30px;
+	border: 0;
+	resize: none;
+	outline: none;
+}
+
+.gmc-desc textarea {
+	width: 75%;
+	font-size: 15px;
+	border: 0;
+	resize: none;
+	outline: none;
+	margin-top: 25px;
+}
+
+.gm-create-submit {
+	width: 350px;
+	color: white;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	border-radius: 5px;
+	-webkit-user-select: none;
+	margin: 40px auto;
+	background: rgb(98,162,223);
+	box-shadow: 0px 2px rgb(78,142,203);
+	cursor: pointer;
+}
+
+.gm-create-submit:active {
+	background: rgb(88,152,213);
 }
 
 /* ======================= popup =================================*/
@@ -303,6 +424,7 @@
 }
 
 .popup-confirm-area {
+	cursor: pointer;
 }
 
 .popup-cancel, .popup-confirm {
@@ -450,11 +572,11 @@
 
 .sm-small-area {
 	clear: both;
-	height: 40px;
-	line-height: 28px;
+	height: 51px;
 	padding-left: 20px;
 	cursor: pointer;
 	background: url(../images/side_menu/sidebar_group_bg01.png)repeat-x;
+	border-top: 1px solid rgb(68,74,79);
 }
 
 .sm-small-area-l {
@@ -463,9 +585,13 @@
     margin-top: 7px;
 }
 
+.sm-small-area-l img {
+	width: 40px;
+}
+
 .sm-small-area-r {
     float: left;
-    padding-top: 6px;
+    padding-top: 15px;
 }
 .sm-count {
 	display:none;
@@ -493,26 +619,39 @@
 }
 
 .sm-group-area {
-    height: 71px;
-    background: url(../images/side_menu/sidemenu_slidedown_bg.png);
+	height: 80px;
+	display: -webkit-box;
+	position: relative;
+	border-top: 1px solid rgb(68,74,79);
+}
+
+.sm-icon_host {
+	position: absolute;
+	width: 30px;
+	top: 48px;
+	left: 50px;
 }
 
 .sm-group-area-l {
-    float: left;
+	height: 60px;
+	overflow-y: hidden;
+	margin: 10px;
+	width: 60px;
+	border-radius: 8px;
+	border: 1px solid #abbabf;
 }
 
 .sm-group-area-r {
-	float: left;
-	padding: 25px 0px 0px 5px;
+	padding: 30px 0px 0px 5px;
+	width: 50%;
+	height: 25px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	outline: 0!important;
 }
 
 .sm-group-area-l img {
-	width: 30px;
-	float: left;
-	width: 50px;
-	height: 49px;
-	border-radius: 5px;
-	margin: 10px;
 }
 
 .sm-group-area .sm-count {
@@ -520,7 +659,7 @@
 }
 
 .sm-group-list-area-add {
-    display:none;
+    overflow: hidden;
 }
 .sm-group-switch{
 	display:none;
@@ -1788,6 +1927,7 @@
 	float: left;
 }
 
+
 .audio-progress input[type="range"]{
     -webkit-appearance: none;
     -moz-apperance: none;
@@ -1814,6 +1954,11 @@
 
 .audio-progress input[type='range']:focus{
     outline:none;
+}
+
+
+.st-attach-audio {
+	margin-top: 20px;
 }
 
 .st-attach-audio-bak {
@@ -1971,14 +2116,15 @@
 }
 
 .st-reply-message-bg {
-	background: url("../images/chatroom/textbar_bg46.png") repeat-x;
+	background: url("../images/compose/compose_form_addfile_bg.png") repeat-x;
 	width: 100%;
 	height: 20px;
 }
 
 .st-reply-message-attach, .st-reply-message-sticker {
-	margin: 12px 0 0 10px;
+	margin: 7px 0 0 0px;
 	float: left;
+	width: 32px;
 }
 
 .st-reply-message-textarea {
@@ -2783,7 +2929,7 @@ input.cp-datetimepicker-end {
 
 .chatroom-footer, .cp-footer{
     height: 44px;
-    background: url("../images/chatroom/textbar_bg46.png") repeat-x;
+    background: url("../images/compose/compose_form_addfile_bg.png") repeat-x;
     display: inline-block;
     width: 100%;
     border-bottom: 1px solid rgb(218,218,218);

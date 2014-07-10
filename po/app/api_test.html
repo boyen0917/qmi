@@ -54,7 +54,7 @@
         result.complete(function(data){
         	ui = $.parseJSON(data.responseText).ui;
             at = $.parseJSON(data.responseText).at;
-
+            console.debug(data);
             switch(api_type){ // groups/{gi}/invitations
                 case "permission":
                     var api_name = "groups/5db48ed8-4f8c-4c68-b147-21f4d0a48e7b/permissions";
@@ -76,24 +76,18 @@
                     var method = "post";
                     var result = ajaxDo(api_name,headers,method,false,body);
                     break;
-                case "getS3url":
-                    var api_name = "groups/5db48ed8-4f8c-4c68-b147-21f4d0a48e7b/files/";
+                case "me":
+                    var api_name = "me";
 
                     var headers = {
                              "ui":ui,
                              "at":at, 
                              "li":"zh_TW",
                                  };
-                    var body = {
-                          fn: "test",
-                          tp: 1,
-                          ti: "fd97294e-eee3-4e64-bdf5-10e853de4373",
-                          pi: 0
-                        }
+                    
+                    var method = "get";
 
-                    var method = "post";
-
-                    var result = ajaxDo(api_name,headers,method,false,body);
+                    var result = ajaxDo(api_name,headers,method,false);
                     break;
                 case "invite":
                     var api_name = "groups/d75bb5ec-7b1f-4dd1-9e60-e3f41e146c5c/invitations";

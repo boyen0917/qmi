@@ -26,9 +26,8 @@ $(function(){
 
 
 
-
-
 	$.ajaxSetup ({
+		timeout: 15000,
 	    // Disable caching of AJAX responses
 	    cache: false
 	});
@@ -49,21 +48,27 @@ $(function(){
 
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
-		$(document).trigger("click");
+		// $(document).trigger("click");
 	});
 	
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
-		//logout~
 
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
-
-		console.debug("jqxhr:",jqxhr);
-		popupShowAdjust("",$.parseJSON(jqxhr.responseText).rsp_msg,true);
-		if(back_hash){
-			popupAfterChangePage(back_hash);	
-		}
 		
+
+		//ajax逾時
+		if(jqxhr.statusText == "timeout"){
+			console.debug("error timeout");
+			popupShowAdjust("","網路不穩 請稍後再試",true);
+			return false;
+		}
+		console.debug("error jqxhr:",jqxhr);
+		//logout~暫時不做
+
+		// popupShowAdjust("",$.parseJSON(jqxhr.responseText).rsp_msg,true);
+		popupShowAdjust("",errorResponse(jqxhr),true);
+
 	});
 
 	$("#page-registration").css("height",$(window).height());
@@ -100,7 +105,7 @@ $(function(){
 
 	$(".login").click(function(){
 		//若local storage 有記錄密碼 就顯示
-		console.debug($.lStorage("_loginRemeber"));
+		console.debug("remeber:",$.lStorage("_loginRemeber"));
 		if($.lStorage("_loginRemeber")){
 
 			//順便幫他打個勾
@@ -213,6 +218,7 @@ $(function(){
 
 
 	login = function(phone_id,password,countrycode){
+
 		var api_name = "login";
         var headers = {
             li:lang
@@ -224,9 +230,8 @@ $(function(){
         };
 
         var method = "post";
-        var result = ajaxDo(api_name,headers,method,true,body);
-        result.complete(function(data){
-        	var result = $.parseJSON(data.responseText);
+        ajaxDo(api_name,headers,method,true,body).complete(function(data){
+        	var login_result = $.parseJSON(data.responseText);
         	if(data.status == 200){
 
         		//登入成功 記錄帳號密碼
@@ -243,13 +248,40 @@ $(function(){
 				}
 
 				//儲存登入資料 跳轉到timeline
-				result.page = "timeline";
-        		$.lStorage("_loginData",result);
-        		document.location = "main.html#page-group-main";
+				login_result.page = "timeline";
+        		$.lStorage("_loginData",login_result);
 
+        		//附上group list
+        		getGroupList(login_result.ui,login_result.at).complete(function(data){
+        			if(data.status == 200){
+        				if($.parseJSON(data.responseText).gl.length > 0){
+        					//有group
+        					login_result.gl = $.parseJSON(data.responseText).gl;
+        					$.lStorage("_loginData",login_result);
+        					document.location = "main.html#page-group-main";
+        				}else{
+        					//沒group
+        					document.location = "main.html#page-group-menu";
+        				}
+        			}else{
+        				//取得group list 失敗
+        			}
+        		});
         	}
         });
 	}
+
+	getGroupList = function(ui,at){
+    	//取得團體列表
+        var api_name = "groups";
+        var headers = {
+            "ui":ui,
+            "at":at,
+            "li":lang
+        };
+        var method = "get";
+        return ajaxDo(api_name,headers,method,true);
+    }
 /*	
 
 
@@ -284,7 +316,7 @@ $(function(){
 		if($(this).hasClass("register-next-ready")){
 			console.debug("傳送驗證碼 還沒按確定");
 			var desc = "我們將傳送驗證碼簡訊至此手機<br/>號碼 : ( " + countrycode + " ) " + $(".register-phone input").val().substring(1);
-			popupShowAdjust("確認手機號碼",desc,"fun+registration",true);	
+			popupShowAdjust("確認手機號碼",desc,"func+registration",true);
 		}else{
 			return false;
 		}
@@ -310,7 +342,6 @@ $(function(){
 	$(".register-otp-next").click(function(){
 
 		if($(this).hasClass("register-otp-next-ready")){
-			console.debug("驗證 驗證碼");
 			activateStep1();
 		}else{
 			return false;
@@ -379,7 +410,7 @@ $(function(){
     	var imageType = /image.*/;
     	var file = $(this)[0].files[0];
     	if (file.type.match(imageType)) {
-
+    		console.debug("file:",file);
 			var reader = new FileReader();
 			reader.onload = function(e) {
 				var img = $(".avatar-area img");
@@ -398,9 +429,15 @@ $(function(){
 			}
 			reader.readAsDataURL(file);	
 		}else{
+			
 			$(".avatar-area img").addClass("avatar-default");
 			$(".avatar-area img").removeAttr( 'style' );
 			$(".avatar-area img").attr("src","images/registration/registration_form_personalinfo_cam.png");
+
+			//刪除檔案
+			$(this).replaceWith( $(this).val('').clone( true ) );
+			//警語
+			popupShowAdjust("","檔案格式必須為圖檔");
 		}
     });
 
@@ -415,14 +452,12 @@ $(function(){
 
 
 
-    $(".setting-next").click(function(){
+    $(".setting-next-ready").click(function(){
 
-    	// $(document).data("ui","80f0b8e7-7b48-40ef-b2ea-658a17206d58");
-    	// $(document).data("at","1ebc9204-bec6-43a9-9161-1a7e3d5620b1");
-    	// $(document).data("phone-id","+886980922917");
-     //    $(document).data("device-token","web-5566");
-
-    	if(!$(this).hasClass("setting-next-ready")) return false;
+    	// $(document).data("ui","U000002607C");
+    	// $(document).data("at","0318f649-e8d7-499d-bf4b-39c7ddea23f3");
+    	// $(document).data("phone-id","+886999000065");
+    	// $(document).data("device-token","web-5566");
 
     	//有上傳圖檔 圖檔上傳完畢之後再做註冊步驟3
     	if(!$(".avatar-area img").hasClass("avatar-default")){
@@ -434,8 +469,6 @@ $(function(){
 
 	    	activateStep3(first_name,last_name,birth);
     	}
-
-    	
     });
 
 
@@ -517,6 +550,8 @@ $(function(){
 
 	activateStep2 = function(){
 
+		$(document).data("password",$(".password-confirm input").val());
+
 		var api_name = "activation/step2";
         var headers = {
                  "li":lang,
@@ -526,14 +561,14 @@ $(function(){
                 id: $(document).data("phone-id"),
                 tp: 0,
                 ud: $(document).data("device-token"),
-                pw: toSha1Encode($(".password-confirm input").val())
+                pw: toSha1Encode($(document).data("password"))
             }
         console.debug("activateStep2() 變更密碼前的 body:",JSON.stringify(body,null,2));
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
         	console.debug("變更密碼後的 data:",data);
-        	var data = $.parseJSON(data.responseText);
-        	if(data.rsp_code == 0){
+        	if(data.status == 200){
+        		var data = $.parseJSON(data.responseText);
         		//default
         		$(document).data("ui",data.ui);
         		$(document).data("at",data.at);
@@ -545,6 +580,7 @@ $(function(){
         		$(".password-setting").val("");
         		$(".password-confirm").val("");
         		$(".register-otp-input input").trigger("input");
+        		popupShowAdjust("",errorResponse(data),true);
         	}
         });
 	}
@@ -565,8 +601,6 @@ $(function(){
                 ln: last_name,
                 bd: birth
             }
-        console.debug("activateStep3() 資料設定前的 headers:",JSON.stringify(headers,null,2));
-        console.debug("activateStep3() 資料設定前的 body:",JSON.stringify(body,null,2));
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
         	//loading icon off
@@ -574,7 +608,21 @@ $(function(){
 			$('.ui-loader').hide();
         	console.debug("資料設定後的 data:",data);
         	if(data.status == 200){
-        		popupShowAdjust("","註冊完成囉");
+        		//登入成功 記錄帳號密碼
+				var _loginRemeber = {};
+	    		_loginRemeber.phone = "0" + $(document).data("phone-id").substring(3);
+	    		_loginRemeber.password = $(document).data("password");
+	    		_loginRemeber.countrycode = countrycode;
+	    		$.lStorage("_loginRemeber",_loginRemeber);
+
+				//儲存登入資料 跳轉到timeline
+				var _loginData = {
+					ui: $(document).data("ui"),
+					at: $(document).data("at")
+				}
+
+				$.lStorage("_loginData",_loginData);
+        		popupShowAdjust("","註冊完成囉","func+toGroupMenu");
         	}
         });
 	}
@@ -599,43 +647,44 @@ $(function(){
         var result = ajaxDo(api_name,headers,method,false);
         result.complete(function(data){
         	console.debug("取得s3 url後的 data:",data);
-        	var d =$.parseJSON(data.responseText);
-        	if(d.rsp_code == 0){
-
+        	if(data.status == 200){
+        		var d =$.parseJSON(data.responseText);
         		var fi = d.fi;
         		var ou = d.ou;
         		var tu = d.tu;
         		console.debug("s3 fi:",fi);
         		console.debug("s3 ou:",ou);
         		console.debug("s3 tu:",tu);
-        		//先大圖
-        		$.ajax({
-					url: ou,
-					type: 'PUT',
-					contentType: " ",
-				 	data: file, 
-					processData: false,
-					complete: function(data) { 
-						console.debug("上傳大圖後的 data:",data);
-						//大圖上傳s3成功或失敗
-						if(data.status == 200){
-							//再小圖 
-							//縮圖
-							var reader = new FileReader();
-					        reader.onloadend = function() {
-					           console.debug("reader.onloadend");
-					            var tempImg = new Image();
-					            tempImg.src = reader.result;
-					            tempImg.onload = function() {
-					                console.debug("tempImg.onload this:",this);
-					                //縮圖
-					                var blob = imgResizeByCanvas(this,0,0,max_w,max_h,quality);
-					                console.debug("上傳小圖前的 blob:",blob);
+
+        		//大小圖都要縮圖
+				var reader = new FileReader();
+		        reader.onloadend = function() {
+		            var tempImg = new Image();
+		            tempImg.src = reader.result;
+		            tempImg.onload = function() {
+		                
+		                //大小圖都要縮圖
+		                var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
+		                var t_obj = imgResizeByCanvas(this,0,0,120,120,0.6);
+		                console.debug("o_blob:",o_blob);
+		                console.debug("t_blob:",t_blob);
+		                //先大圖
+		        		$.ajax({
+							url: ou,
+							type: 'PUT',
+							contentType: " ",
+						 	data: o_obj.blob, 
+							processData: false,
+							complete: function(data) { 
+								console.debug("上傳大圖後的 data:",data);
+								//大圖上傳s3成功或失敗
+								if(data.status == 200){
+									//再小圖 
 									$.ajax({
 										url: tu,
 										type: 'PUT',
 										contentType: " ",
-										data: blob, 
+										data: t_obj.blob, 
 										processData: false,
 										complete: function(data) { 
 											console.debug("上傳小圖後的 data:",data);
@@ -659,11 +708,8 @@ $(function(){
 							                    var result = ajaxDo(api_name,headers,method,true,body);
 							                    result.complete(function(data){
 							                    	console.debug("commit後的 data:",data);
-							                    	var data = $.parseJSON(data.responseText);
 							                    	//commit 成功或失敗
-							                    	if(data.rsp_code == 0){
-							                    		result_msg = "個人頭像設定完成";
-							                    		popupShowAdjust("",result_msg);
+							                    	if(data.status == 200){
 
 							                    		//大小圖上傳完畢 再做註冊步驟3
 							                    		var first_name = $(".setting-first-name input").val();
@@ -674,35 +720,32 @@ $(function(){
 
 							                    	}else{
 							                    		//commit 失敗
-							                    		result_msg = data.rsp_msg;
-							                    		popupShowAdjust("",result_msg,true);
+							                    		console.debug("commit 失敗");
 							                    	}
 						                    	});
 											}else{
 												// 小圖上傳 錯誤
-												result_msg = "小圖上傳 錯誤";
-												popupShowAdjust("",result_msg,true);
+												console.debug("小圖上傳 錯誤");
 											}
 										}
 									});
-					            }
-					        }
-					        reader.readAsDataURL(file);
-						}else{
-							// 大圖上傳 錯誤
-							result_msg = "大圖上傳 錯誤";
-							popupShowAdjust("",result_msg,true);
-						}
-					}
-				});
-
+								}else{
+									// 大圖上傳 錯誤
+									console.debug("大圖上傳 錯誤");
+								}
+							}
+						});
+		            }
+			    }
+		        reader.readAsDataURL(file);
         	}else{
         		// me/avatar 錯誤
-        		result_msg = d.rsp_msg;
-        		popupShowAdjust("",result_msg,true);
+        		popupShowAdjust("",errorResponse(data),true);
         	}
         });
 	}
+
+
 
 	imgResizeByCanvas = function(img,x,y,max_w,max_h,quality){
 		var MAX_WIDTH = max_w;
@@ -727,8 +770,13 @@ $(function(){
 		var ctx = canvas.getContext("2d");
 		ctx.drawImage(img, x, y, tempW, tempH);
 		var dataURL = canvas.toDataURL("image/jpeg",quality);
-		console.debug("imgResizeByCanvas dataURL:",dataURL);
-		return dataURItoBlob(dataURL);
+
+		var img_obj = {
+			w: tempW,
+			h: tempH,
+			blob: dataURItoBlob(dataURL)
+		}
+		return img_obj;
 	}
 
 	dataURItoBlob = function(dataURI) {
@@ -816,20 +864,20 @@ $(function(){
    //  		console.debug("todo_type:",todo_type);
 			// console.debug("todo_act:",todo_act);
 
-			if(todo_type == "fun"){
+			if(todo_type == "func"){
 		    	switch(todo_act){
 					case "registration":
 						registration();
 						break;
-					case "activateStep1":
-						activateStep1();
+					case "toGroupMenu":
+						toGroupMenu();
 						break;
 				}
 	    	}else if(todo_type == "hash"){
 	    		$.mobile.changePage(todo_act);
 	    	}
     	}
-		$(".popup-screen").trigger("click");
+		$(".popup-screen").trigger("close");
 	});
 
 	$(".popup-cancel").click(function(){
@@ -838,23 +886,26 @@ $(function(){
     	if(typeof todo == "string"){
     		var todo_type = todo.split("+")[0];
     		var todo_act = todo.split("+")[1];
-			if(todo_type == "fun"){
+			if(todo_type == "func"){
 
 	    	}else if(todo_type == "hash"){
 	    		$.mobile.changePage(todo_act);
 	    	}
     	}
-		$(".popup-screen").trigger("click");
+		$(".popup-screen").trigger("close");
 	});
 
 
-	$(".popup-screen").click(function(){
+	$(".popup-screen").bind("close",function(){
 	    $(".popup").hide();
 	    $(".popup-screen").hide();
 	});
 
 
-
+	toGroupMenu = function(){
+		console.debug(" to group menu ??");
+		document.location = "main.html#page-group-menu";
+	}
 
     //對話框設定
 	popupShowAdjust = function (title,desc,confirm,cancel){
@@ -913,8 +964,8 @@ $(function(){
 
 	    if(!confirm && !cancel){
 	    	setTimeout(function(){
-    			$(".popup-screen").trigger("click");
-    		},1000);
+    			$(".popup-screen").trigger("close");
+    		},2000);
 	    }
 
 	    $(".popup-screen").show();
@@ -930,6 +981,15 @@ $(function(){
 			$.mobile.changePage(dest);
 			$(".popup-close").unbind("pageChange");
 		});
+	}
+
+	errorResponse = function(data){
+		if(data.responseText){
+			return $.parseJSON(data.responseText).rsp_msg;
+		}else{
+			console.debug("errorResponse:",data);
+			return "網路連線不穩 請稍後再試";
+		}
 	}
 	
 	//sha1 and base64 encode

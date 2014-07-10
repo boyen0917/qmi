@@ -41,37 +41,49 @@
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <h3 class="page-title">團體列表</h3>
-                <div id="group-nav-area" data-role="navbar">
-			        <ul>        
-                        <li><a href="#" data-group-act="gc">創建團體</a></li>
-                        <li><a href="#" data-group-act="gj">加入團體</a></li>
-                        <li><a href="#" data-group-act="gi">團體邀請</a></li>
-                    </ul>
-			    </div>
             </div>
-            
-            <div class="group-nav-chk" data-group-act="gl">
-            </div>
-            <div class="group-nav-chk" data-group-act="gc">
-                <img class="gm-create-head" src="images/head.png"/>
-                <div class="gm-create-content-area">
-                    團體名稱
-                    <input type="text" id="group-name" placeholder="請輸入您的團體名稱">
-                    團體介紹
-                    <textarea name="textarea-8" id="group-desc"></textarea>
-                    <a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>
+            <div class="gm-nav">
+                <div class="gm-create gm-nav-box gm-nav-active" data-type="build">
+                    <img src="images/groupmenu/buildgroup_tab_bt_build_click.png"/>
+                    建立團體
+                </div>
+                <div class="gm-join gm-nav-box" data-type="invite">
+                    <img src="images/groupmenu/buildgroup_tab_bt_invite.png"/>
+                    團體邀請
                 </div>
             </div>
-            <div class="group-nav-chk" data-group-act="gj">
-	            <div class="gm-join-area">
-	                <input type="text" id="gm-group-num" placeholder="團體編號">
-	                <input type="text" id="gm-group-pw" placeholder="團體密碼"/>
-	                <a href="#" id="gm-join-submit" data-role="button" data-theme="b" >確認</a>
-	            </div>
+            <div class="gm-create-area">
+                <div class="gmc-avatar">
+                    <div class="gmc-avatar-wrap">
+                        <img src="images/common/others/empty_img_group_190x190.png" style="width:120px"/>
+                    </div>
+                    <div class="gmc-word">編輯</div>
+                    <div class="gmc-frame"></div>
+
+                </div>
+                <input type="file" class="gmc-file" style="display:none" data-role="none"/>
+                <div class="gmc-name">
+                    <img src="images/groupmenu/buildgroup_icon_group.png"/>
+                    <input placeholder="團體名稱" data-role="none"/>
+                </div>
+                <div class="gmc-desc">
+                    <img src="images/groupmenu/buildgroup_icon_introduction.png"/>
+                    <textarea placeholder="團體介紹(150字以內)" maxlength="150" data-role="none"></textarea>
+                </div>
+
+                <div class="gm-create-submit">確認</div>
             </div>
-            <div class="group-nav-chk" data-group-act="gi">
-            團體邀請
+            <div class="gm-invite-area">
             </div>
+
+            <!-- <img class="gm-create-head" src="images/head.png"/>
+            <div class="gm-create-content-area">
+                團體名稱
+                <input type="text" id="group-name" placeholder="請輸入您的團體名稱">
+                團體介紹
+                <textarea name="textarea-8" id="group-desc"></textarea>
+                <a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>
+            </div> -->
         </div>
 
         
@@ -100,7 +112,8 @@
 	            <div class="sm-user-area">
 	               <div class="sm-user-area-l">
 	                   <div class="sm-user-pic namecard">
-                           <img src="images/common/others/empty_img_personal_xl.png" style="width: 60px;"/>
+                           <img src="images/common/others/empty_img_personal_xl.png"/>
+                           <img src="" style="display: none;"/>
                        </div>
 	               </div>
                    <div class="sm-user-area-r">
@@ -132,7 +145,7 @@
                 <div class="sm-group-list-area">
                   
                 </div>
-                <div class="sm-group-list-area-add">
+                <div class="sm-group-list-area-add" style="display:none">
                     
                 </div>
                 <div class="sm-group-switch"><div class="sm-switch-ui-adj"></div><img src="images/side_menu/sidemenu_slidedown_icon_click.png"/></div>
@@ -414,7 +427,7 @@
                 <div class="chatroom-addstate-top-btn"><img src="images/chatroom_top_btn.png"/></div>
             </div>
             <div class="chatroom-addstate-top-area">
-                <div data-chat-b-act="editgup" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_editgup.png"><div>編輯群組</div></div>
+                <!-- <div data-chat-b-act="editgup" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_editgup.png"><div>編輯群組</div></div>
                 <div data-chat-b-act="invit" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_invit.png"><div>邀請</div></div>
                 <div data-chat-b-act="nonotice" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_nonotice.png"><div>關閉通知</div></div>
                 <div data-chat-b-act="leave" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_leave.png"><div>離開聊天室</div></div>
@@ -425,7 +438,7 @@
                 <div data-chat-b-act="work" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_work.png"><div>工作</div></div>
                 <div data-chat-b-act="questionnaire" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_questionnaire.png"><div>問卷</div></div>
                 <div data-chat-b-act="vote" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_vote.png"><div>投票</div></div>
-                <div data-chat-b-act="direction" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_direction.png"><div>定點回報</div></div>
+                <div data-chat-b-act="direction" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_direction.png"><div>定點回報</div></div> -->
             </div>
             <div data-role="content">
                 <div class="chat-area">
@@ -499,12 +512,12 @@
             </div>
             <div class="chatroom-addstate-area">
                 <div class="chatroom-addstate-bg"></div>
-                <div data-chat-b-act="pic" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_pic.png"><div>選擇照片</div></div>
+                <!-- <div data-chat-b-act="pic" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_pic.png"><div>選擇照片</div></div>
                 <div data-chat-b-act="takepic" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_takepic.png"><div>拍攝照片</div></div>
                 <div data-chat-b-act="voice" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_voice.png"><div>傳送聲音訊息</div></div>
                 <div data-chat-b-act="direction" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_direction.png"><div>傳送位置訊息</div></div>
                 <div data-chat-b-act="file" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_file.png"><div>傳送檔案</div></div>
-                <div  class="chatroom-addstate-box"></div>
+                <div  class="chatroom-addstate-box"></div> -->
             </div>
         </div>
 
@@ -525,8 +538,6 @@
 
         <div class="ajax-screen-lock"></div>
 
-        <div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div>
-        
         <div id="page-back-chk"></div>
         <div id="page-back-chk-pre"></div>
         <div id="page-back-pre-title"></div>

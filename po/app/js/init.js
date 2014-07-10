@@ -1,8 +1,16 @@
 $(function(){
+
+	// ui = "227f07f2-71b7-49b9-b395-e10ca4d8c956";
+	// at = "d7ade0c8-ea3f-4592-acc5-c16905eb5197"; 
+	// gi = "0e508d9c-90b1-454b-88b0-7f60d054a4bf";
+
 	//api 網址
 	//base_url = "https://mapserver.mitake.com.tw/apiv1/";
 	base_url = "https://apserver.mitake.com.tw/apiv1/";
 	//base_url = "http://10.1.17.116:8090/apiv1/";
+
+	//傳送逾時
+	ajax_timeout = 15000;
 
 	//ajax用
 	myRand = Math.floor((Math.random()*1000)+1);

@@ -12,103 +12,92 @@
     <script src="js/linq.js"></script>
     <script src="js/jquery.plugin.js"></script>
      <script src="datepicker/datetimepicker.js"></script>
-    <script type="text/javascript">
 
-    $(function(){
-
-      // var ff = {};
-      if(ff && Object.keys(ff).length != 0){
-        console.debug(12);
-      }else{
-        console.debug(34);
-      }
-      return false;
-        
-        // $.ajax ({
-        //     url: "http://gdata.youtube.com/feeds/api/videos/xUAsrIorY5s?v=2&prettyprint=true&alt=jsonc",
-        //     success: function(result){
-        //         console.log(result);
-        //         console.debug("title",result.data.title);
-        //     }   
-        // });  
-
-        // $("button").click(function(){
-        //     $("input").trigger("input");
-        // });
-
-        // $("input").bind("input",function(){
-        //     console.debug("input");
-        // });
-        
-        // var t = "fun_asdlfjaskld";
-
-        // console.debug(t.substring(0,3));
-
-
-    });
-    </script>
-</head>
+   </head>
 <body>
     <input type="file"/>
     <button>upload</button>
+    <div style="display:none">
+      <span style="width:100px">asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf</span>
+    </div>
     <script>
     $(function(){
 
-      //   $("input").change(function(){
-      //       console.debug($(this)[0].files[0]);
-      //   });
-
-      // var canvas = document.getElementById('myCanvas');
-      // var context = canvas.getContext('2d');
-      // var x = 188;
-      // var y = 30;
-      // var width = 200;
-      // var height = 137;
-      // var imageObj = new Image();
-
-      // imageObj.onload = function() {
-      //   context.drawImage(imageObj, x, y, width, height);
-      // };
-      // imageObj.src = 'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
-
-      // var pic = document.getElementById("myCanvas").toDataURL("image/png");
+      
 
        var s3_url = "https://s3.mitake.com.tw/Project-o/users/0062d0a7-9b59-46c3-988a-c419931b50e6/avatars/da48a09c-59f6-4b73-b569-c49039fe950b_o?Expires=1719480784&AWSAccessKeyId=W5J78BQKFH0N4RE47X90&Signature=PlRCOGoI4E5OGk8cO8wbAkRXCv4%3D";
 
-        $("button").click(function(){
-
-//             document.location = ' ,' + $("input")[0].files[0];
-
-//             // var fd = new FormData();
-//             // var file = $("input")[0].files[0];
-//             // fd.append("subUpload", file);
-//             // var blob = dataURItoBlob(pic);
-//             // console.debug("blob",blob);
-//             // console.debug("input:",$("input")[0].files[0]);
-//             // var img_data= pic.replace("data:image/png;base64,","");
-//             console.debug("blob",blob);
-//             console.debug("fd",fd);
-//             console.debug("file",file);
-//             console.debug("input",$("input"));
-
-
-// var test = base64_encode($("input")[0].files[0])
-// console.debug(test);
-
-//  return false;
-
-
-
+       function aaa(data_arr){
             $.ajax({
-                url: s3_url,
-                type: 'PUT',
-                contentType: " ",
-                data: $("input")[0].files[0], 
-                processData: false,
-                complete: function(data) { 
-                    console.debug("test data:",data);
+                url: "test.php",
+                type: "post",
+                data: {value1:data_arr[0]},
+                complete:function(data){
+                  data_arr[1]($.parseJSON(data.responseText));
                 }
             });
+
+          
+       }
+
+       function bbb(value){
+            $.ajax({
+                url: "test.php",
+                type: "post",
+                data: {value1:value},
+                complete:function(data){
+                  console.debug(data);
+                }
+            });
+       }
+
+
+        $("button").click(function(){
+
+          console.debug("高高",$("div").height());
+return false;
+          // var test = $.ajax({
+          //     url: "test.php",
+          //     type: "post",
+          //     data: {timer:2},
+          //     complete:function(data){
+          //       console.debug("1:",data);
+          //       $.ajax({
+          //           url: "test.php",
+          //           type: "post",
+          //           data: {timer:2},
+          //           complete:function(data){
+          //             console.debug("2:",data);
+          //             $.ajax({
+          //                 url: "test.php",
+          //                 type: "post",
+          //                 data: {timer:2},
+          //                 complete:function(data){
+          //                   console.debug("3:",data);
+          //                   $.ajax({
+          //                       url: "test.php",
+          //                       type: "post",
+          //                       data: {timer:2},
+          //                       complete:function(data){
+          //                         console.debug("4:",data);
+          //                       }
+          //                   });
+          //                 }
+          //             });
+          //           }
+          //       });
+          //     }
+          // });
+
+
+            test.complete(function(data){
+              
+            });
+          // var test_aaa = aaa();
+          // test_aaa.complete(function(data){
+          //   console.debug("test_aaa:",data);
+          // });
+      return false;
         });
             
 

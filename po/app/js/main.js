@@ -5,170 +5,69 @@ $(function(){
 		var _loginData = $.lStorage("_loginData");
 		//清除_loginData
 		localStorage.removeItem("_loginData");
-
 		ui = _loginData.ui;
 		at = _loginData.at;
 
-        console.log(ui);
-        console.log(at);
+        console.debug("_loginData:",_loginData);
 
-        //取得團體列表
-        var api_name = "groups";
-        var headers = {
-            "ui":ui,
-            "at":at,
-            "li":lang
-        };
-        var method = "get";
-        var result = ajaxDo(api_name,headers,method,true);
-        result.complete(function(data){
-        	//所有團體列表
-        	group_list = $.parseJSON(data.responseText).gl;
+    	//所有團體列表
+    	group_list = _loginData.gl;
 
-            if( group_list.length == 0 )
-            {
-            	$.mobile.changePage("#page-helper");
-            } else {
+    	//有group list 就是timeline 沒有就是group menu
+        if(group_list) {
+        	//上次點選團體
+        	if($.lStorage(ui)){
+        		var _groupList = $.lStorage(ui);
+        		var dgi = _groupList.default_gi;
+        		var defaultGroup = _groupList[dgi];
+        		
+        		gi = dgi;
+        		gu = defaultGroup.gu;
+        		gn = defaultGroup.gn;
+        		ti_cal = defaultGroup.ti_cal;
+        		ti_feed = defaultGroup.ti_feed;
+        		ti_chat = defaultGroup.ti_chat;
+        		
+        	}else{
+        		
+        		//預設團體暫定為第一個團體？
+            	var default_group = group_list[0];
+            	$.each(default_group.tl,function(i,val){
+            		if(val.tp == 1){
+            			ti_cal = val.ti;
+            		}else if(val.tp == 2){
+            			ti_feed = val.ti;
+            		}else{
+            			ti_chat = val.ti;
+            		}
+            	});
             	
-            	//上次點選團體
-            	if($.lStorage(ui)){
-            		var _groupList = $.lStorage(ui);
-            		var dgi = _groupList.default_gi;
-            		var defaultGroup = _groupList[dgi];
-            		
-            		gi = dgi;
-            		gu = defaultGroup.gu;
-            		gn = defaultGroup.gn;
-            		ti_cal = defaultGroup.ti_cal;
-            		ti_feed = defaultGroup.ti_feed;
-            		ti_chat = defaultGroup.ti_chat;
-            		
-            	}else{
-            		
-            		//預設團體暫定為第一個團體？
-                	var default_group = group_list[0];
-                	$.each(default_group.tl,function(i,val){
-                		if(val.tp == 1){
-                			ti_cal = val.ti;
-                		}else if(val.tp == 2){
-                			ti_feed = val.ti;
-                		}else{
-                			ti_chat = val.ti;
-                		}
-                	});
-                	
-                	gi = default_group.gi;
-            		gu = default_group.me;
-            		gn = default_group.gn;
-            		
-            		//存入localstorage
-            		var _groupList = {"default_gi":gi};
-            		_groupList[gi] = {"gu":gu,"gn":gn,"ti_cal":ti_cal,"ti_feed":ti_feed,"ti_chat":ti_chat};
-            		$.lStorage(ui,_groupList);
-            	}
-            	
-            	//header 設定團體名稱
-            	$(".header-group-name div:eq(1)").html(gn);
-            	
-            	//sidemenu name
-            	setSmUserData(gi,gu,gn);
-            	
-            	//動態消息
-            	timelineListWrite();
-            	$.mobile.changePage("#page-group-main", {transition: "pop"});
-            }
-        });
+            	gi = default_group.gi;
+        		gu = default_group.me;
+        		gn = default_group.gn;
+        		
+        		//存入localstorage
+        		var _groupList = {"default_gi":gi};
+        		_groupList[gi] = {"gu":gu,"gn":gn,"ti_cal":ti_cal,"ti_feed":ti_feed,"ti_chat":ti_chat};
+        		$.lStorage(ui,_groupList);
+        	}
+        	
+        	//header 設定團體名稱
+        	$(".header-group-name div:eq(1)").html(gn);
+        	
+        	//sidemenu name
+        	setSmUserData(gi,gu,gn);
+        	
+        	//做團體列表
+        	groupMenuListArea();
+
+        	//動態消息
+        	timelineListWrite();
+        }
+
 	}else{
-
-		//暫時
-		// var api_name = "login";
-
-  //       var headers = {
-  //           li:lang
-  //       };
-  //       var body = {
-  //           id: "+886980922917",
-  //           tp:"0",
-  //           pw:toSha1Encode("111111")
-  //       };
-  //       var method = "post";
-  //       var result = ajaxDo(api_name,headers,method,true,body);
-  //       result.complete(function(data){
-  //       	ui = $.parseJSON(data.responseText).ui;
-  //           at = $.parseJSON(data.responseText).at;
-
-
-  //           //取得團體列表
-	 //        var api_name = "groups";
-	 //        var headers = {
-	 //            "ui":ui,
-	 //            "at":at,
-	 //            "li":lang
-	 //        };
-	 //        var method = "get";
-	 //        var result = ajaxDo(api_name,headers,method,true);
-	 //        result.complete(function(data){
-	 //        	//所有團體列表
-	 //        	group_list = $.parseJSON(data.responseText).gl;
-
-	 //            if( group_list.length == 0 )
-	 //            {
-	 //            	$.mobile.changePage("#page-helper");
-	 //            } else {
-	            	
-	 //            	//上次點選團體
-	 //            	if($.lStorage(ui)){
-	 //            		var _groupList = $.lStorage(ui);
-	 //            		var dgi = _groupList.default_gi;
-	 //            		var defaultGroup = _groupList[dgi];
-	            		
-	 //            		gi = dgi;
-	 //            		gu = defaultGroup.gu;
-	 //            		gn = defaultGroup.gn;
-	 //            		ti_cal = defaultGroup.ti_cal;
-	 //            		ti_feed = defaultGroup.ti_feed;
-	 //            		ti_chat = defaultGroup.ti_chat;
-	            		
-	 //            	}else{
-	            		
-	 //            		//預設團體暫定為第一個團體？
-	 //                	var default_group = group_list[0];
-	 //                	$.each(default_group.tl,function(i,val){
-	 //                		if(val.tp == 1){
-	 //                			ti_cal = val.ti;
-	 //                		}else if(val.tp == 2){
-	 //                			ti_feed = val.ti;
-	 //                		}else{
-	 //                			ti_chat = val.ti;
-	 //                		}
-	 //                	});
-	                	
-	 //                	gi = default_group.gi;
-	 //            		gu = default_group.me;
-	 //            		gn = default_group.gn;
-	            		
-	 //            		//存入localstorage
-	 //            		var _groupList = {"default_gi":gi};
-	 //            		_groupList[gi] = {"gu":gu,"gn":gn,"ti_cal":ti_cal,"ti_feed":ti_feed,"ti_chat":ti_chat};
-	 //            		$.lStorage(ui,_groupList);
-	 //            	}
-	            	
-	 //            	//header 設定團體名稱
-	 //            	$(".header-group-name div:eq(1)").html(gn);
-	            	
-	 //            	//sidemenu name
-	 //            	setSmUserData(gi,gu,gn);
-	            	
-	 //            	//動態消息
-	 //            	timelineListWrite();
-	 //            	$.mobile.changePage("#page-group-main", {transition: "pop"});
-	 //            }
-	 //        });
-  //       });
-
-
-
-		document.location = "index.html";
+		//getLoginDataForTest();
+		//document.location = "index.html";
 	}
 
 
@@ -187,23 +86,13 @@ $(function(){
     		var todo_type = todo.split("+")[0];
     		var todo_act = todo.split("+")[1];
 
-   //  		console.debug("todo_type:",todo_type);
-			// console.debug("todo_act:",todo_act);
-
 			if(todo_type == "fun"){
-		    	switch(todo_act){
-					case "registration":
-						registration();
-						break;
-					case "activateStep1":
-						activateStep1();
-						break;
-				}
+
 	    	}else if(todo_type == "hash"){
 	    		$.mobile.changePage(todo_act);
 	    	}
     	}
-		$(".popup-screen").trigger("click");
+		$(".popup-screen").trigger("close");
 	});
 
 	$(".popup-cancel").click(function(){
@@ -218,13 +107,18 @@ $(function(){
 	    		$.mobile.changePage(todo_act);
 	    	}
     	}
-		$(".popup-screen").trigger("click");
+		$(".popup-screen").trigger("close");
 	});
 
 
-	$(".popup-screen").click(function(){
+	$(".popup-screen").bind("close",function(){
+		
 	    $(".popup").hide();
 	    $(".popup-screen").hide();
+
+	    //ajax也關
+	    $('.ui-loader').hide();
+		$(".ajax-screen-lock").hide();
 
 	    $("body").removeClass("screen-lock");
 	});
@@ -233,6 +127,7 @@ $(function(){
 	
 	$.ajaxSetup ({
 	    // Disable caching of AJAX responses
+	    timeout: ajax_timeout,
 	    cache: false
 	});
 	
@@ -252,21 +147,21 @@ $(function(){
 
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
-		$(document).trigger("click");
 	});
 
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
+
+		//ajax逾時
+		if(jqxhr.statusText == "timeout"){
+			popupShowAdjust("","網路不穩 請稍後再試",true);
+			return false;
+		}
 		//logout~
 
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
 
-		console.debug("jqxhr:",jqxhr);
-		popupShowAdjust("",$.parseJSON(jqxhr.responseText).rsp_msg,true);
-		if(back_hash){
-			popupAfterChangePage(back_hash);	
-		}
-		
+		popupShowAdjust("",errorResponse(jqxhr),true);
 	});
 	
 	//上一頁功能 預設在init.js
@@ -284,6 +179,33 @@ $(function(){
 		var page_arr = [hash,page_title];
 
 		$(document).data("page-history").push(page_arr);
+
+		//調整團體頭像
+		if(hash == "#page-group-main" && $(document).data("group-avatar")){
+			console.debug("調整團體頭像");
+			$(".sm-group-area").each(function(i,val){
+				var this_img = $(this).find(".sm-group-area-l img:eq(0)");
+				var img = new Image();
+				img.onload = function() {
+					mathAvatarPos(this_img,this.width,this.height,avatar_size);
+				}
+				img.src = this_img.attr("src");
+				
+			});
+			//改完就改回false
+			$(document).data("group-avatar",false);
+		}
+
+	});
+
+	//test
+	$(".navi-alert").click(function(){
+		$(".sm-group-area").each(function(i,val){
+			var img = $(this).find(".sm-group-area-l img:eq(0)");
+			console.debug("img 0:",img[0]);
+			console.debug("img w:",img[0].width);
+			mathAvatarPos(img,img.width(),img.height(),avatar_size);
+		});
 	});
 	
 	$(".page-back").click(function(){
@@ -304,6 +226,12 @@ $(function(){
 		//console.debug("last:",$(document).data("page-history").last()[0]);
 	});
 
+
+	$(document).bind("afterAjax",function(event,data_arr){
+		
+    });
+
+
 	//----------------------------------- 團體選單 ---------------------------------------------                
 	//團體選單 點選團體
 	$(document).on('click','.group-list-box',function(e){
@@ -311,54 +239,88 @@ $(function(){
 	});
 	
 	//團體選單 點選nav
-	$("#group-nav-area li a").click(function(){
-	    var act = $(this).data("group-act");
-	    $(".group-nav-chk").each(function(i,val){
-	        if($(this).data("group-act") == act){
-	            $(this).fadeIn();
-	            //個別的動作
-	            switch (act) {
-	                case "gl": 
-	                    groupMenuListArea();
-	                  break;
-	                case "gc": 
-	                    $(".group-create-area").find("input").val("");
-	                    $(".group-create-area").find("textarea").val("");
-	                  break;
-	                case "gj":
-	                  break;
-	                case "gi":
-	                  break;
-	            }
-	        }else{
-	            $(this).hide();
-	        }
+	$(".gm-nav-box").click(function(){
+	    $(".gm-nav-box").removeClass("gm-nav-active");
+	    $(".gm-nav-box").each(function(i,val){
+	    	$(this).find("img").attr("src","images/groupmenu/buildgroup_tab_bt_" + $(this).data("type") + ".png")
 	    });
+	    
+	    $(this).addClass("gm-nav-active");
+	    $(this).find("img").attr("src","images/groupmenu/buildgroup_tab_bt_" + $(this).data("type") + "_click.png")
+
+	    //images/groupmenu/buildgroup_tab_bt_build_click.png
+	});
+
+	$(".gmc-avatar").click(function(){
+		$(".gmc-file").trigger("click");
+	});
+
+	$(".gmc-file").change(function(e) {
+		var file_ori = $(this);
+		var imageType = /image.*/;
+
+		//每次選擇完檔案 就reset input file
+		// file_ori.replaceWith( file_ori.val('').clone( true ) );
+		var file = file_ori[0].files[0];
+
+		if (file.type.match(imageType)) {
+			//是否存在圖片
+			$(".gmc-avatar").data("chk",true);
+
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				var img = $(".gmc-avatar-wrap img");
+
+				//調整長寬
+				img.load(function() {
+					var w = img.width();
+		            var h = img.height();
+    				mathAvatarPos(img,w,h,120);
+		        });
+
+		        img.attr("src",reader.result);
+			}
+
+			reader.readAsDataURL(file);	
+		}else{
+			popupShowAdjust("","檔案必須為圖檔",true);
+		}
 	});
 	
 	//創建團體 建立
-	$("#gm-create-submit").click(function(){
-		if(!$("#group-name").val()){
-	        popupShowAdjust("","團體名稱不可空白");
+	$(".gm-create-submit").click(function(){
+
+		if ( !$(".gmc-avatar").data("chk" )){
+			popupShowAdjust("","圖片未上傳",true);
+	        return false;
+		} 
+		if ( !$(".gmc-name input").val() ){
+			popupShowAdjust("","團體名稱未填寫",true);
+	        return false;
+		} 
+
+		if ( !$(".gmc-desc textarea").val() ){
+	        popupShowAdjust("","團體介紹未填寫",true);
 	        return false;
 		}else{
-	        var api_name = "groups";
-            var headers = {
-                "ui":ui,
-                "at":at,
-                "li":lang,
-            };
-            var body = {
-           		"gn":$("#group-name").val(),
-                "gd":$("#group-desc").val()
-            }
-            var method = "post";
+			var file = $(".gmc-file")[0].files[0];
+			var group_name = $(".gmc-name input").val();
+			var group_desc = $(".gmc-desc textarea").val();
 
-	        var result = ajaxDo(api_name,headers,method,true,body);
-	        result.success(function(data){
-	            popupShowAdjust("","創建成功。","hash+#page-group-main");
-	            // popupAfterChangePage("#page-group-main");			
+			var ori_arr = [1280,1280,0.7];
+			var tmb_arr = [120,120,0.6];
+
+			createGroup(group_name,group_desc).complete(function(data){
+	        	console.debug("create group data:",data);
+	        	if(data.status == 200){
+	        		var cg_result = $.parseJSON(data.responseText);
+
+	        		var api_name = "groups/" + cg_result.gi + "/avatar"
+
+	        		avatarToS3(file,api_name,ori_arr,tmb_arr,[groupMenuListArea,cg_result.gi]);
+	        	}
 	        });
+			
 		}
 	});
 	//----------------------------------- 小幫手 ---------------------------------------------
@@ -366,6 +328,7 @@ $(function(){
 	$(".hg-create").click(function(){
 		$("#group-nav-area li a[data-group-act=gc]").trigger("click");
 		$("#group-nav-area li a[data-group-act=gc]").addClass("ui-btn-active");
+
 		$.mobile.changePage("#page-group-menu");
 	});
 	//小幫手 加入團體
@@ -401,6 +364,11 @@ $(function(){
 	$(".side-menu-btn").click(function(){
 	    $( "#side-menu" ).panel( "open");
 	});
+
+	$("#page-group-main div[data-role=content]").click(function(e){
+		// e.stopPropagation();
+		// $( "#side-menu" ).panel( "close");
+	});
 	
 	//用戶區
 	//detect page changing
@@ -420,29 +388,67 @@ $(function(){
 		//groupMenuListArea();
 	});
 	
+	// $("#side-menu").on( "panelbeforeclose", function() {
+	// 	//timeline固定右邊頁面
+	//     $("#page-group-main .ui-panel-content-wrap").removeClass("page-fixed");
+	// });
+
+	// //開關團體列表
+	// $(".sm-group-switch").click(function(){
+	// 	$(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+	// 	$(".sm-group-list-area-add").slideToggle(
+	// 		function(){
+	// 			if($(".sm-group-list-area-add").is(":visible")){
+	// 				$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_none.png");
+	// 			}else{
+	// 				$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_click.png");	
+	// 			}
+	// 		}
+	// 	);
+	// });
+
 	$("#side-menu").on( "panelbeforeclose", function() {
 		//timeline固定右邊頁面
 	    $("#page-group-main .ui-panel-content-wrap").removeClass("page-fixed");
+
+		if($(".sm-group-list-area-add").data("switch")){
+			$(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
+	    	$(".sm-group-list-area-add").data("switch",false);
+	    	$(".sm-group-list-area-add").css("height",0);
+	    }
 	});
+
 	//開關團體列表
 	$(".sm-group-switch").click(function(){
-		$(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
-		$(".sm-group-list-area-add").slideToggle(
-			function(){
-				if($(".sm-group-list-area-add").is(":visible")){
-					$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_none.png");
-				}else{
-					$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_click.png");	
-				}
-			}
-		);
+		var target = $(".sm-group-list-area-add");
+		var target_height = target.data("height");
+
+		if(target.data("switch")){
+			var movement = "-=" + target_height;
+		}else{
+			var movement = "+=" + target_height;
+		}
+		console.debug("movement:",movement);
+		console.debug("$(this).data:",$(this).data());
+		$(".sm-group-list-area-add").animate({
+		    height: movement
+		  	}, 500, function() {
+		  		console.debug("animate end");
+		  		if(target.data("switch")){
+		  			target.data("switch",false);
+		  			$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_click.png");		
+		  		}else{
+		  			target.data("switch",true);	
+		  			$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_none.png");
+		  		}
+		    	
+	  	});
 	});
 	
 	//按鈕效果
 	$(document).on("click",".sm-small-area,.sm-group-area,.sm-group-cj-btn",function(){
 		var icon_default = "images/side_menu/sidemenu_icon_";
 		var target = $(this);
-		console.debug("target:",target);
 		//開關按鈕ui變化
 		if($(".sm-group-list-area-add").is(":visible") ){
 			if(target.data("switch-chk") == "check2"){
@@ -453,10 +459,9 @@ $(function(){
 	            $(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
 	        }
 	    }
-		
 		target.addClass("sm-click-bg");
 		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_click.png");
-		mainActionSwitch(target.data("sm-act"));
+		timelineSwitch(target.data("sm-act"));
 			
 	});
 	
@@ -470,66 +475,17 @@ $(function(){
 
 	    	//mouseup了 左側選單 團體調整線 直接刪除就好了 
 	    	$(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
-	    	// //開關按鈕ui變化
-	    	// if($(".sm-group-list-area-add").is(":visible") ){
-	     //        if(target.data("switch-chk") == "check2"){
-	     //        	console.debug("??");
-	     //            $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
-	     //        }
-	     //    }else{
-	     //    	console.debug("第三個團體的區域看不見");
-	     //        if(target.data("switch-chk") == "check"){
-	     //        	console.debug("！！");
-	     //            $(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
-	     //        }
-	     //    }
+
 	    	target.removeClass("sm-click-bg");
 	    	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
 	    	},500);
 	});
 	
-	//更換團體 重新設定 gi gu gn tl
+	//更換團體
 	$(document).on("click",".sm-group-area",function(){
-		
-		gi = $(this).attr("data-gi");
-		gu = $(this).attr("data-gu");
-		gn = $(this).find(".sm-group-area-r").html();
-		
-		//header 設定團體名稱
-    	$(".header-group-name div:eq(1)").html(gn);
-		
-		$.each(group_list,function(g_i,g_val){
-			if(g_val.gi == gi){
-				$.each(g_val.tl,function(t_i,t_val){
-					if(t_val.tp == 1){
-            			ti_cal = t_val.ti;
-            		}else if(t_val.tp == 2){
-            			ti_feed = t_val.ti;
-            		}else{
-            			ti_chat = t_val.ti;
-            		}
-				});
-			}
-		});
-		
-		//點選團體 記錄在localstorage 以便下次登入預設
-		var _groupList = $.lStorage(ui);
-		if(typeof(_groupList[gi]) == "undefined"){
-			_groupList[gi] = {};
-    	}
-		//更新預設團體gi
-		_groupList.default_gi = gi;
-		_groupList[gi].gu = gu;
-		_groupList[gi].gn = gn;
-		_groupList[gi].ti_cal = ti_cal;
-		_groupList[gi].ti_feed = ti_feed;
-		_groupList[gi].ti_chat = ti_chat;
-		
-		//存回
-		$.lStorage(ui,_groupList);
-		
-		setSmUserData(gi,gu,gn);
-		mainActionSwitch("feed");
+		$( "#side-menu" ).panel( "close");
+		setThisGroup($(this).attr("data-gi"));
+		timelineSwitch("feed");
 	});
 	
 	
@@ -871,8 +827,6 @@ $(function(){
 	});
 
 
-
-
 	//文章區塊 編輯按鈕
 	$(document).on('click','.st-sub-box-more-btn',function(e){
 		//按下效果
@@ -935,6 +889,23 @@ $(function(){
 		
 	});
 
+
+ //    //調整團體頭像 在發文後 timelineListWrite 會無法挑整 所以在這邊在調一次
+	// $("#page-group-main").bind("pageshow",function(){
+	// 	if (typeof gi != 'undefined' && back_exception == false){
+	// 		console.debug("yooooooo");
+	// 		$(".sm-group-area-l").each(function(i,val){
+	// 			var img = $(this).find("img:eq(0)")
+	// 			var w = img.width();
+	//             var h = img.height();
+	// 			mathAvatarPos(img,w,h,60);
+	// 		});
+			
+	//         $(".sm-group-list-area-add").removeAttr("style");
+	//         $(".sm-group-list-area-add").data("height",$(".sm-group-list-area-add").height());
+	//         $(".sm-group-list-area-add").css("height",0);
+	// 	}
+	// });
 
 
 
@@ -1163,7 +1134,6 @@ $(function(){
 
 	
 	$(".cp-addfile").click(function(){
-		console.log("here");
 		var img_url = "images/compose/compose_form_addfile_";
 		var target = $(this);
 		target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
