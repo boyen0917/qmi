@@ -14,6 +14,7 @@ $(function(){
         if(group_list) {
         	//上次點選團體
         	if($.lStorage(ui)){
+        		console.debug("has ui");
         		var _groupList = $.lStorage(ui);
         		var dgi = _groupList.default_gi;
         		var defaultGroup = _groupList[dgi];
@@ -26,7 +27,7 @@ $(function(){
         		ti_chat = defaultGroup.ti_chat;
         		
         	}else{
-        		
+        		console.debug("no ui");
         		//預設團體暫定為第一個團體？
             	var default_group = group_list[0];
             	$.each(default_group.tl,function(i,val){
@@ -49,7 +50,7 @@ $(function(){
         		$.lStorage(ui,_groupList);
         	}
 
-        	//設定guAll
+        	//設定guAll 
         	setAllGroupUser();
         	
         	//header 設定團體名稱
@@ -60,9 +61,6 @@ $(function(){
         	
         	//做團體列表
         	groupMenuListArea();
-
-        	//置頂設定
-			topEvent();
 
         	//動態消息
         	timelineListWrite();

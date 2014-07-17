@@ -239,6 +239,9 @@ $(function(){
 	            var _groupList = $.lStorage(ui);
 	            _groupList[gi].guAll = new_group_user;
 	            $.lStorage(ui,_groupList);
+
+	            //置頂設定
+				topEvent();
 			}
 		});
 	}
@@ -318,22 +321,29 @@ $(function(){
 	setSmUserData = function (gi,gu,gn){
 		$(".sm-user-area-r div:eq(0)").html(gn);
 		$(".sm-user-area-r div:eq(1)").html("");
-		console.debug("gi+gu+gn:",gi+"+"+gu+"+"+gn);
+
 		getUserName(gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img"));
 	}
 
 	topEvent = function (){
+		console.debug("topevent:",gi);
 		if(typeof gi == "undefined") return false;
 
 		//取得user name list
 		var _groupList = $.lStorage(ui);
+
+		console.debug("$.lStorage(ui):",$.lStorage(ui));
+		console.debug("_groupList[gi].guAll:",_groupList[gi].guAll);
+
         if(_groupList[gi].guAll){
             var gu_all = _groupList[gi].guAll;
         }else{
+        	
         	return false;
         }
 
 		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/top_events";
+		console.debug("top event api_name:",api_name);
         var headers = {
                  "ui":ui,
                  "at":at, 
@@ -341,7 +351,9 @@ $(function(){
                      };
 
         var method = "get";
+        console.debug("headers:",headers);
         ajaxDo(api_name,headers,method,false).complete(function(data){
+        	console.debug("topevent data:",data);
         	//load 之前先清除是常識
         	$(".st-top-area-load").html("");
         	$(".st-top-area-load").append($('<div>').load('layout/layout.html .st-top-area',function(){
