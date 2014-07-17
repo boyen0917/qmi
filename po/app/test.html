@@ -4,6 +4,25 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
 
+ 
+div {
+  width:100px;
+  height:100px;
+  background: black;
+  position: absolute;
+  top:50px;
+  left:50px;
+  display:none;
+}
+
+span {
+  width:200px;
+  height:200px;
+  background: red;
+  position: relative;  
+  display:block;
+  word-break: break-all;
+}
 
     </style>
     <link rel="stylesheet" type="text/css" href="datepicker/datetimepicker.css" />
@@ -15,161 +34,15 @@
 
    </head>
 <body>
-    <input type="file"/>
-    <button>upload</button>
-    <div style="display:none">
-      <span style="width:100px">asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf</span>
-    </div>
+  <span></span>
+  <p></p>
+  <div></div>
+  <button>click</button>
+
     <script>
     $(function(){
-
-      
-
-       var s3_url = "https://s3.mitake.com.tw/Project-o/users/0062d0a7-9b59-46c3-988a-c419931b50e6/avatars/da48a09c-59f6-4b73-b569-c49039fe950b_o?Expires=1719480784&AWSAccessKeyId=W5J78BQKFH0N4RE47X90&Signature=PlRCOGoI4E5OGk8cO8wbAkRXCv4%3D";
-
-       function aaa(data_arr){
-            $.ajax({
-                url: "test.php",
-                type: "post",
-                data: {value1:data_arr[0]},
-                complete:function(data){
-                  data_arr[1]($.parseJSON(data.responseText));
-                }
-            });
-
-          
-       }
-
-       function bbb(value){
-            $.ajax({
-                url: "test.php",
-                type: "post",
-                data: {value1:value},
-                complete:function(data){
-                  console.debug(data);
-                }
-            });
-       }
-
-
-        $("button").click(function(){
-
-          console.debug("高高",$("div").height());
-return false;
-          // var test = $.ajax({
-          //     url: "test.php",
-          //     type: "post",
-          //     data: {timer:2},
-          //     complete:function(data){
-          //       console.debug("1:",data);
-          //       $.ajax({
-          //           url: "test.php",
-          //           type: "post",
-          //           data: {timer:2},
-          //           complete:function(data){
-          //             console.debug("2:",data);
-          //             $.ajax({
-          //                 url: "test.php",
-          //                 type: "post",
-          //                 data: {timer:2},
-          //                 complete:function(data){
-          //                   console.debug("3:",data);
-          //                   $.ajax({
-          //                       url: "test.php",
-          //                       type: "post",
-          //                       data: {timer:2},
-          //                       complete:function(data){
-          //                         console.debug("4:",data);
-          //                       }
-          //                   });
-          //                 }
-          //             });
-          //           }
-          //       });
-          //     }
-          // });
-
-
-            test.complete(function(data){
-              
-            });
-          // var test_aaa = aaa();
-          // test_aaa.complete(function(data){
-          //   console.debug("test_aaa:",data);
-          // });
-      return false;
-        });
-            
-
-
-
-        function dataURItoBlob(dataURI) {
-            // convert base64 to raw binary data held in a string
-            // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-            var byteString = atob(dataURI.split(',')[1]);
-
-            // separate out the mime component
-            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-            // write the bytes of the string to an ArrayBuffer
-            var ab = new ArrayBuffer(byteString.length);
-            var ia = new Uint8Array(ab);
-            for (var i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-
-            return new Blob([ab], {type: mimeString});
-        }
-
-
-        function base64_encode(data) {
-            //  discuss at: http://phpjs.org/functions/base64_encode/
-            // original by: Tyler Akins (http://rumkin.com)
-            // improved by: Bayron Guevara
-            // improved by: Thunder.m
-            // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-            // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-            // improved by: Rafał Kukawski (http://kukawski.pl)
-            // bugfixed by: Pellentesque Malesuada
-            //   example 1: base64_encode('Kevin van Zonneveld');
-            //   returns 1: 'S2V2aW4gdmFuIFpvbm5ldmVsZA=='
-            //   example 2: base64_encode('a');
-            //   returns 2: 'YQ=='
-
-            var b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-            var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-              ac = 0,
-              enc = '',
-              tmp_arr = [];
-
-            if (!data) {
-              return data;
-            }
-
-            do { // pack three octets into four hexets
-              o1 = data.charCodeAt(i++);
-              o2 = data.charCodeAt(i++);
-              o3 = data.charCodeAt(i++);
-
-              bits = o1 << 16 | o2 << 8 | o3;
-
-              h1 = bits >> 18 & 0x3f;
-              h2 = bits >> 12 & 0x3f;
-              h3 = bits >> 6 & 0x3f;
-              h4 = bits & 0x3f;
-
-              // use hexets to index into b64, and append result to encoded string
-              tmp_arr[ac++] = b64.charAt(h1) + b64.charAt(h2) + b64.charAt(h3) + b64.charAt(h4);
-            } while (i < data.length);
-
-            enc = tmp_arr.join('');
-
-            var r = data.length % 3;
-
-            return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
-          }
-
-        
+        var cnt = 0;
+       
     });
     </script>
 </body>

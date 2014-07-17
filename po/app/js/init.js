@@ -5,7 +5,7 @@ $(function(){
 	// gi = "0e508d9c-90b1-454b-88b0-7f60d054a4bf";
 
 	//api 網址
-	//base_url = "https://mapserver.mitake.com.tw/apiv1/";
+	// base_url = "https://mapserver.mitake.com.tw/apiv1/";
 	base_url = "https://apserver.mitake.com.tw/apiv1/";
 	//base_url = "http://10.1.17.116:8090/apiv1/";
 
@@ -16,7 +16,7 @@ $(function(){
 	myRand = Math.floor((Math.random()*1000)+1);
 	
 	//國碼
-	country_code = "+886";
+	countrycode = "+886";
 
 	//語言
 	lang = "zh_TW";
@@ -90,5 +90,9 @@ $(function(){
 	max_w = 500;
 	max_h = 500;
 	quality = 0.5;
+
+
+	//timeline置頂millisecond
+	top_timer_ms = 5000;
 	
 });

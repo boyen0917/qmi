@@ -47,12 +47,12 @@
                     <img src="images/groupmenu/buildgroup_tab_bt_build_click.png"/>
                     建立團體
                 </div>
-                <div class="gm-join gm-nav-box" data-type="invite">
+                <div class="gm-invite gm-nav-box" data-type="invite">
                     <img src="images/groupmenu/buildgroup_tab_bt_invite.png"/>
                     團體邀請
                 </div>
             </div>
-            <div class="gm-create-area">
+            <div class="gm-create-area gm-sub-area">
                 <div class="gmc-avatar">
                     <div class="gmc-avatar-wrap">
                         <img src="images/common/others/empty_img_group_190x190.png" style="width:120px"/>
@@ -73,17 +73,17 @@
 
                 <div class="gm-create-submit">確認</div>
             </div>
-            <div class="gm-invite-area">
+
+
+            <div class="gm-invite-area gm-sub-area" style="display:none">
+                <div class="gmi-coachmake">
+                    <img src="images/coachmake/logo_status_group.png"/>
+                    <span>目前沒有任何團體邀請</span>
+                </div>
+                <div class="gmi-div-area">
+                </div>
             </div>
 
-            <!-- <img class="gm-create-head" src="images/head.png"/>
-            <div class="gm-create-content-area">
-                團體名稱
-                <input type="text" id="group-name" placeholder="請輸入您的團體名稱">
-                團體介紹
-                <textarea name="textarea-8" id="group-desc"></textarea>
-                <a href="#" id="gm-create-submit" data-role="button" data-theme="b" >建立</a>
-            </div> -->
         </div>
 
         
@@ -150,8 +150,8 @@
                 </div>
                 <div class="sm-group-switch"><div class="sm-switch-ui-adj"></div><img src="images/side_menu/sidemenu_slidedown_icon_click.png"/></div>
                 <div class="sm-group-cj">
-	                <div class="hg-create sm-group-cj-btn">新增團體</div>
-	                <div class="hg-invited sm-group-cj-btn" >團體邀請</div>
+	                <div class="hg-create sm-group-cj-btn">建立團體</div>
+	                <div class="hg-invite sm-group-cj-btn" >團體邀請</div>
 	            </div>
                 <div class="sm-hr">系統</div>
                 <div data-sm-act="help" class="sm-small-area">
@@ -189,54 +189,37 @@
         <!------------------------------------- 動態消息 ---------------------------------------->
             <div class="subpage-timeline">
                 <div class="st-navi-area">
-                    <div class="st-navi-subarea-main" data-st-navi-group="navi" data-st-navi="home">
+                    <div class="st-navi-subarea main" data-st-navi-group="navi" data-st-navi="home">
                         <img src="images/timeline/timeline_tab_icon_home_white.png"/>
                         <div class="color-white">全部</div>
                     </div>
                     <img class="st-navi-tridiv-l" src="images/timeline/timeline_tab_arrow_left.png" style="width:15px;display:none;">
                     <img class="st-navi-tridiv-r" src="images/timeline/timeline_tab_arrow_right.png" style="width:15px">
-                    <div class="st-navi-subarea-other" data-st-navi-group="navi" data-st-navi="announcement">
+                    <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="announcement" data-tp="01">
                         <img src="images/timeline/timeline_tab_icon_announcement.png"/>
                         <div>公告</div>
                     </div>
                     <div class="st-navi-divider"></div>
-                    <div class="st-navi-subarea-other" data-st-navi-group="navi" data-st-navi="feedback">
+                    <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feedback" data-tp="02">
                         <img src="images/timeline/timeline_tab_icon_feedback.png"/>
                         <div>通報</div>
                         <div class="st-navi-count">99+</div>
                     </div>
                     <div class="st-navi-divider"></div>
-                    <div class="st-navi-subarea-other" data-st-navi-group="navi" data-st-navi="task">
+                    <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="task" data-tp="03">
                         <img src="images/timeline/timeline_tab_icon_task.png"/>
                         <div>任務</div>
                     </div>
                 </div>
-                <div class="st-cover-area">
-                    <img class="st-cover-area-la" src="images/arrow.png">
-                    <img class="st-cover-area-ra" src="images/arrow.png">
-                    <div class="st-cover-main">
-                        
-                    </div>
-                    <div class="st-cover-bar-area">
-                        <div class="st-cover-bar-selector"></div>
-                        <div class="st-cover-bar-case">
-                            <span style="background:#fff;border-radius:7px 0 0 7px;"></span>
-                            <span style="background:#ededed;"></span>
-                            <span style="background:#dddddd;"></span>
-                            <span style="background:#d1d0d0;"></span>
-                            <span style="background:#b7b7b7;"></span>
-                            <span style="background:#9d9d9d;"></span>
-                            <span style="background:#878787;"></span>
-                            <span style="background:#6b6b6b;"></span>
-                            <span style="background:#474747;"></span>
-                        </div>
-                    </div>
-                </div>
+
+                <div class="st-top-area-load"></div>
+
                 <div class="st-filter-area">
-                    <div data-st-filter="all" class="st-filter-list st-filter-main"><span>全部</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
+                    <div class="st-filter-list st-filter-main"><span>全部</span><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
+                    <div data-status="all" class="st-filter-action st-filter-list st-filter-main-hide" style="display:none"><span>全部</span></div>
                     <div class="st-filter-other">
-	                    <div data-st-filter="unread" class="st-filter-list"><span>未讀</span></div>
-	                    <div data-st-filter="list-1" class="st-filter-list"><span>已讀</span></div>
+	                    <div data-status="unread" class="st-filter-action st-filter-list"><span>未讀</span></div>
+	                    <div data-status="read" class="st-filter-action st-filter-list"><span>已讀</span></div>
 	                    <div class="st-filter-list-btn"><img src="images/timeline/timeline_filter_icon_arrow.png"/></div>
                     </div>
                 </div>
@@ -245,18 +228,6 @@
                 </select>
                 <div class="st-feedbox-area">
                 </div>
-                <!-- <div class="st-reply-message-area" data-movement="0" data-animate-chk="true">
-                  <div class="st-reply-message-bg">
-                    <img class="st-reply-message-attach" src="images/chatroom/chat_textbar_icon_add.png"/>
-                    <img class="st-reply-message-sticker" src="images/chatroom/chat_textbar_icon_emoticon.png"/>
-                    <div class="st-reply-message-textarea">
-                        <textarea placeholder="請輸入訊息..." data-role="none"></textarea>
-                        <div class="st-reply-message-send">傳送</div>
-                    </div>
-                    
-
-                  </div>
-                </div> -->
             </div>
         <!------------------------------------- 聯絡人 ---------------------------------------->
                 <div class="subpage-contact">
@@ -521,7 +492,12 @@
             </div>
         </div>
 
-<!---------------------------------- 全域 ------------------------------------>        
+<!---------------------------------- 全域 ------------------------------------>  
+        
+        <div class="toast">
+            <div></div>
+        </div>
+
 		<div class="popup">
             <div class="popup-frame">
                 <div class="popup-title"></div>

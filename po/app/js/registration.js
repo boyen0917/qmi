@@ -1,31 +1,5 @@
 $(function(){
 
-	//部分跳頁不需要記錄
-	back_exception = false;
-	//國碼
-	countrycode = "+886";
-
-	//語言
-	lang = "zh_TW";
-
-	//api
-	//base_url = "https://mapserver.mitake.com.tw/apiv1/";
-	base_url = "https://apserver.mitake.com.tw/apiv1/";
-	//base_url = "http://10.1.17.116:8090/apiv1/";
-
-	//讀取圖示開啓
-	load_show = false;
-	s_load_show = false;
-
-	back_hash = false;
-
-	//縮圖寬高
-	max_w = 500;
-	max_h = 500;
-	quality = 0.5;
-
-
-
 	$.ajaxSetup ({
 		timeout: 15000,
 	    // Disable caching of AJAX responses
@@ -232,6 +206,8 @@ $(function(){
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
         	var login_result = $.parseJSON(data.responseText);
+        	// console.debug("login resutl:",JSON.stringify(login_result));
+        	// return false;
         	if(data.status == 200){
 
         		//登入成功 記錄帳號密碼
@@ -410,7 +386,6 @@ $(function(){
     	var imageType = /image.*/;
     	var file = $(this)[0].files[0];
     	if (file.type.match(imageType)) {
-    		console.debug("file:",file);
 			var reader = new FileReader();
 			reader.onload = function(e) {
 				var img = $(".avatar-area img");
@@ -452,12 +427,12 @@ $(function(){
 
 
 
-    $(".setting-next-ready").click(function(){
-
-    	// $(document).data("ui","U000002607C");
-    	// $(document).data("at","0318f649-e8d7-499d-bf4b-39c7ddea23f3");
-    	// $(document).data("phone-id","+886999000065");
-    	// $(document).data("device-token","web-5566");
+    $(document).on("click",".setting-next-ready",function(){
+    	// console.debug("document data:",$(document).data());
+    	$(document).data("ui","U0000RU80DK");
+    	$(document).data("at","53e9cd3d-07d1-41d9-84b7-00d1fda4d58a");
+    	$(document).data("phone-id","+886928858828");
+    	$(document).data("device-token","web-5566");
 
     	//有上傳圖檔 圖檔上傳完畢之後再做註冊步驟3
     	if(!$(".avatar-area img").hasClass("avatar-default")){
@@ -666,8 +641,8 @@ $(function(){
 		                //大小圖都要縮圖
 		                var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
 		                var t_obj = imgResizeByCanvas(this,0,0,120,120,0.6);
-		                console.debug("o_blob:",o_blob);
-		                console.debug("t_blob:",t_blob);
+		                console.debug("o_obj:",o_obj);
+		                console.debug("t_obj:",t_obj);
 		                //先大圖
 		        		$.ajax({
 							url: ou,

@@ -56,25 +56,17 @@
             at = $.parseJSON(data.responseText).at;
             console.debug(data);
             switch(api_type){ // groups/{gi}/invitations
-                case "permission":
-                    var api_name = "groups/5db48ed8-4f8c-4c68-b147-21f4d0a48e7b/permissions";
+                case "top":
+                    var api_name = "groups/G00000170DO/timelines/T000003Q0Dl/top_events";
 
                     var headers = {
                              "ui":ui,
                              "at":at, 
                              "li":"zh_TW",
                                  };
-                    var body = {
-                            ti: "fd97294e-eee3-4e64-bdf5-10e853de4373",
-                            tu:{
-                              gul: [
-                                
-                              ]  
-                            }
-                        }
 
-                    var method = "post";
-                    var result = ajaxDo(api_name,headers,method,false,body);
+                    var method = "get";
+                    var result = ajaxDo(api_name,headers,method,false);
                     break;
                 case "me":
                     var api_name = "me";
@@ -89,29 +81,17 @@
 
                     var result = ajaxDo(api_name,headers,method,false);
                     break;
-                case "invite":
-                    var api_name = "groups/d75bb5ec-7b1f-4dd1-9e60-e3f41e146c5c/invitations";
+                case "me_invite":
+                    var api_name = "me/invitations";
 
                     var headers = {
                              "ui":ui,
                              "at":at, 
                              "li":"zh_TW",
                                  };
-                    var method = "post";
+                    var method = "get";
 
-                    var body = {
-                          "ul":
-                            [
-                              {
-                                "cc": "+886",
-                                "pn": "980922917",
-                                "em": body.ul.em,
-                                "nk": body.ul.nk
-                              }
-                            ]
-                        }
-                                     
-                    var result = ajaxDo(api_name,headers,method,true,body);
+                    var result = ajaxDo(api_name,headers,method,true);
                   break;
                 case "upload_commit":
                     var api_name = "groups/1a9bca59-766d-402d-b5ea-9ad973e10d45/files/bd157262-4fba-46e8-8bff-3c293054e802/commit";

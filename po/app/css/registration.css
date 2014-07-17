@@ -270,7 +270,7 @@ input {
 	cursor: pointer;
 }
 
-.register-next-ready:active, .register-otp-next-ready:active, .resend-otp-ready:active, .password-next-ready:active, .login-next-ready:active, .login-change-ready:active {
+.register-next-ready:active, .register-otp-next-ready:active, .resend-otp-ready:active, .password-next-ready:active, .setting-next-ready:active, .login-next-ready:active, .login-change-ready:active {
 	background: rgb(88,152,213);
 }
 
