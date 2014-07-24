@@ -10,7 +10,7 @@ $(function(){
 	//base_url = "http://10.1.17.116:8090/apiv1/";
 
 	//傳送逾時
-	ajax_timeout = 15000;
+	ajax_timeout = 20000;
 
 	//ajax用
 	myRand = Math.floor((Math.random()*1000)+1);

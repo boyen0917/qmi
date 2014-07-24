@@ -11,7 +11,7 @@ $(function() {
 					console.log(reader.result);
 					var file_name = fileInput.files[0].name.slice(0,-4);
 					hierachy_arr = treeJsonMake(reader.result,file_name);
-					
+					console.debug("hierachy_arr:",JSON.stringify(hierachy_arr,null,2));
 					visitEachToAddId(hierachy_arr.children);
 					$(".edit-outside-area").show();
 					$("h1").next().hide();

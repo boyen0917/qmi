@@ -9,10 +9,8 @@ div {
   width:100px;
   height:100px;
   background: black;
-  position: absolute;
-  top:50px;
-  left:50px;
-  display:none;
+ margin-bottom: 5px;
+ color:white;
 }
 
 span {
@@ -36,14 +34,73 @@ span {
 <body>
   <span></span>
   <p></p>
-  <div></div>
-  <button>click</button>
+  <div>1234</div>
+  <div>1234</div>
+  <div>1234</div>
+  <div>1234</div>
+  <div>1234</div>
+  <div>1234</div>
+  <div>1234</div>
+  <div>123444</div>
+  <p>111</p>
+  <button>click1</button>
+  <button>click2</button>
 
     <script>
-    $(function(){
-        var cnt = 0;
-       
-    });
+      $(function(){
+
+        var a = 10;
+
+        if(a > 10){
+
+        }else{
+
+        }
+
+        $("div").last().bind("append",function(){
+          $("div").last().after("<div>33333</div>");
+        })
+
+        $("div").last().trigger("append");
+        $("button:eq(0)").click(function(){
+          var tt = $("div").last().after("<div>123444</div>");
+          $("div").last().after("<div>123444</div>");
+        });
+
+        $("button:eq(1)").click(function(){
+          $("div").last().before("<div>99999</div>");
+        });
+        
+      });
+    //先確定瀏覽器是否支援indexedDB
+    // var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+    // var accountData = [
+    //     { title: "Food", price: "500", date:"2012/07/29", notes:"朋友聚餐吃太好..."},
+    //     { title: "Transportation", price: "30", date:"2012/7/20"}
+    // ];
+     
+    // var request = indexedDB.open("accountDB", 1);  
+    // request.onsuccess = function (evt) {
+    //     // 將db暫存起來供以後操作
+    //     db = request.result;                                                            
+    // };
+     
+    // request.onerror = function (evt) {
+    //     console.log("IndexedDB error: " + evt.target.errorCode);
+    // };
+     
+    // request.onupgradeneeded = function (evt) {                   
+    //     var objectStore = evt.currentTarget.result.createObjectStore("account", { keyPath: "id", autoIncrement: true });
+     
+    //     objectStore.createIndex("title", "title", { unique: false });
+    //     objectStore.createIndex("price", "price", { unique: false });
+    //     objectStore.createIndex("date", "date", { unique: false });
+     
+    //     accountData.forEach(objectStore.add);
+    // };
+
+
+
     </script>
 </body>
 </html>

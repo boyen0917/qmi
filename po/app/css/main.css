@@ -1084,7 +1084,8 @@ img.auo {
 .feed-compose {
 	background: url(../images/navi/navi_icon_edit.png);
 	background-size: cover;
-	right: 55px;
+	/*right: 55px;*/
+	right: 15px;
 	z-index: 10;
 }
 
@@ -1101,7 +1102,8 @@ img.auo {
 .navi-alert {
 	background: url(../images/navi/navi_icon_alert.png);
 	background-size: cover;
-	right: 8px;;
+	right: 8px;
+	display: none;
 }
 
 .feed-compose-area {
@@ -1182,7 +1184,7 @@ img.auo {
 .st-navi-subarea.main {
 	background: rgb(73,85,110);
 	color: #858fac;
-	max-height: 56px;
+	max-height: 51px;
 	position: relative;
 	top: 20px;
 	padding-top: 9px;
@@ -2384,6 +2386,16 @@ img.auo {
 	width: 44px;
 }
 
+.st-feedbox-area-bottom {
+	min-height: 50px;
+	text-align: center;
+	color:white;
+	padding-bottom: 20px;
+}
+
+.st-feedbox-area-bottom > img {
+	margin-top:10px;
+}
 
 /* =============================== page timeline detail ==================================== */
 
