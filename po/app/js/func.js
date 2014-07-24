@@ -291,14 +291,14 @@ $(function(){
 	        	$("#page-group-main").find("div[data-role=header] h3").html("動態消息");
 	          break;
 	        case "contact": 
-	        	$(".subpage-contact").show();
-	            $(".subpage-timeline").hide();
+	        	//$(".subpage-contact").show();
+	            //$(".subpage-timeline").hide();
 	            // $( "#side-menu" ).panel( "close");
-	            $("#page-group-main").find("div[data-role=header] h3").html("聯絡人");
+	            //$("#page-group-main").find("div[data-role=header] h3").html("聯絡人");
 	          break;
 	        case "chat":
-	        	$.mobile.changePage("#page-chatroom");
-	        	$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
+	        	//$.mobile.changePage("#page-chatroom");
+	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
 	          break;
 	        case "calendar":
 	          break;
@@ -2885,8 +2885,6 @@ $(function(){
 	        	if(val.meta.del) return;
 
 	        	var tp = val.meta.tp.substring(1,2)*1;
-
-	        	
 	        	
 	        	selector.append($('<div>').load('layout/timeline_event.html .st-sub-box',function(){
 	        		var this_event = $(this).find(".st-sub-box");
