@@ -5,7 +5,7 @@ $(function(){
 	// gi = "0e508d9c-90b1-454b-88b0-7f60d054a4bf";
 
 	//api 網址
-	// base_url = "https://mapserver.mitake.com.tw/apiv1/";
+	//base_url = "https://mapserver.mitake.com.tw/apiv1/";
 	base_url = "https://apserver.mitake.com.tw/apiv1/";
 	//base_url = "http://10.1.17.116:8090/apiv1/";
 

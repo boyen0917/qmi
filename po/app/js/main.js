@@ -193,9 +193,6 @@ $(function(){
 		//timeline頁面
 		if(hash == "#page-group-main"){
 
-			//置頂設定
-			//topEvent();
-
 			//調整團體頭像
 			if($(document).data("group-avatar")){
 				$(".sm-group-area").each(function(i,val){
@@ -261,7 +258,7 @@ $(function(){
 		}
 	});
 
-	//----------------------------------- 團體選單 ---------------------------------------------                
+//----------------------------------- 團體選單 ---------------------------------------------                
 	//團體選單 點選團體
 	$(document).on('click','.group-list-box',function(e){
 	    $.mobile.changePage("#page-group-main");
@@ -496,7 +493,7 @@ $(function(){
 
 	    	target.removeClass("sm-click-bg");
 	    	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
-	    	},500);
+	    },500);
 	});
 	
 	//更換團體
@@ -506,13 +503,7 @@ $(function(){
 		setThisGroup($(this).attr("data-gi"));
 		//更新gu all
 		setGroupAllUser();
-
-		//清空先
-		$(".feed-subarea").html('');
-
-		//切換團體 重設下拉更新
-		$(".st-feedbox-area-bottom").data("chk",false);
-
+		
 		timelineSwitch("feed");
 	});
 	

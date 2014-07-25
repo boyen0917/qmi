@@ -300,6 +300,9 @@ $(function(){
 	timelineSwitch = function (act){
 		switch (act) {
 	        case "feed":
+	        	//先清空
+				$(".feed-subarea").html('');
+
 	        	//點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
 			    $(".st-navi-area .main").trigger("click");
 
@@ -2571,7 +2574,7 @@ $(function(){
         var result = ajaxDo(api_name,headers,method,true,body);
         result.success(function(data){
         	$.mobile.changePage("#page-group-main");
-        	timelineListWrite();
+        	timelineSwitch("feed");
         	toastShow("發佈成功");
         });
 	};
@@ -2764,14 +2767,13 @@ $(function(){
 	        //歸零 表示為關閉狀態
 	        $(".sm-group-list-area-add").css("height",0);
 
-
 	        //new gi 表示新增團體 完成後跳訊息
 	        if(new_gi) {
 	        	//創建團體結束 取消強制開啓loading 圖示
 	        	s_load_show = false;
 
 	        	if(invite){
-	        		popupShowAdjust("","恭喜您成功加入團體！");
+	        		toastShow("恭喜您成功加入團體！");
 	        	}else{
 	        		//popupShowAdjust("","創建成功。",true);
 	        		toastShow("團體建立成功");
@@ -2855,7 +2857,7 @@ $(function(){
     			//隱藏其他類別
 				$(".feed-subarea").hide();
 				selector.show();
-	    		return false;菲律宾鹰
+	    		return false;
     		}else{
     			//load_chk 避免沒資料的
 	    		selector.append("<p class='load-chk'></p>");
@@ -2975,38 +2977,11 @@ $(function(){
 	        			//公告
 	        			case 1:
 	        				category = "公告";
-
-	        				// //隱藏線
-	        				// this_event.find(".st-box2-bottom-block").show();
-	        				//this_event.find(".st-box2-more-title").html(val.meta.tt);
-	        				
-//	        				this_event.find(".st-attach-audio").show();
-//	        				
-//	        				this_event.find("audio").on('timeupdate', function() {
-//	        					this_event.find('input[type="range"]').val(($(this).get(0).currentTime / $(this).get(0).duration)*100);
-//	        					this_event.find('input[type="range"]').css('background-image',
-//	        			                '-webkit-gradient(linear, left top, right top, '
-//	        			                + 'color-stop(' + ((($(this).get(0).currentTime / $(this).get(0).duration)<0.5)?(($(this).get(0).currentTime / $(this).get(0).duration)+0.02):($(this).get(0).currentTime / $(this).get(0).duration)) + ', rgb(95,212,226)), '
-//	        			                + 'color-stop(' + ((($(this).get(0).currentTime / $(this).get(0).duration)<0.5)?(($(this).get(0).currentTime / $(this).get(0).duration)+0.02):($(this).get(0).currentTime / $(this).get(0).duration)) + ', rgb(197,203,207))'
-//	        			                + ')'
-//	        			                );
-//	        					this_event.find(".audio-progress div:nth-child(1)").html(secondsToTime(Math.floor($(this).get(0).currentTime)));
-//	        					this_event.find(".audio-progress div:nth-child(3)").html(secondsToTime(Math.floor($(this).get(0).duration)));
-//	        				});
-	        				
 	        				break;
 	        			//通報
 	        			case 2:
 	        				this_event.find(".st-box2-more-category").addClass("st-box2-more-category-fb");
 	        				category = "通報";
-	        	//			this_event.find(".st-feedback-box").click(function(){
-	        	//				$(".st-feedback-box").data("fb-tick",0);
-	        	//				$(".st-feedback-box-content img").hide();
-	        	//				$(this).find("img").show();
-	        	//				$(this).data("fb-tick",1);
-	        	//				console.log($(".st-feedback-box:nth-child(1)").data("fb-tick"));
-	        	//				console.log($(".st-feedback-box:nth-child(2)").data("fb-tick"));
-	        	//			});
 	        				
 	        				break;
 	        			case 3:
@@ -3688,9 +3663,8 @@ $(function(){
 								
 								//mime type
 								var md = {};
-		        				md.w = o_obj.w*1.213804712983741293874092374091283;
+		        				md.w = o_obj.w;
 		        				md.h = o_obj.h;
-		        				console.debug("md:",md);
 		        				uploadCommit(fi,ti_feed,permission_id,1,file.type,o_obj.blob.size,md).complete(function(data){
 
 		        					var commit_result = $.parseJSON(data.responseText);
@@ -3700,7 +3674,7 @@ $(function(){
 									this_compose.data("uploaded-num",num += 1);
 
 			                    	//commit 成功或失敗
-			                    	if(data.status != 200){d
+			                    	if(data.status != 200){
 			                    		this_compose.data("uploaded-err").push(file_num+1);
 			                    	}else{
 
@@ -3755,29 +3729,6 @@ $(function(){
         }
         reader.readAsDataURL(file);
 	}
-
-/*
-
-######## ##     ## ##    ##  ######  ######## ####  #######  ##    ##        ##  
-##       ##     ## ###   ## ##    ##    ##     ##  ##     ## ###   ##       #### 
-##       ##     ## ####  ## ##          ##     ##  ##     ## ####  ##        ##  
-######   ##     ## ## ## ## ##          ##     ##  ##     ## ## ## ##            
-##       ##     ## ##  #### ##          ##     ##  ##     ## ##  ####        ##  
-##       ##     ## ##   ### ##    ##    ##     ##  ##     ## ##   ###       #### 
-##        #######  ##    ##  ######     ##    ####  #######  ##    ##        ##  
-
-
-
-
-######## ##     ## ######## ##    ## ########     ######  ########    ###    ######## ##     ##  ######  
-##       ##     ## ##       ###   ##    ##       ##    ##    ##      ## ##      ##    ##     ## ##    ## 
-##       ##     ## ##       ####  ##    ##       ##          ##     ##   ##     ##    ##     ## ##       
-######   ##     ## ######   ## ## ##    ##        ######     ##    ##     ##    ##    ##     ##  ######  
-##        ##   ##  ##       ##  ####    ##             ##    ##    #########    ##    ##     ##       ## 
-##         ## ##   ##       ##   ###    ##       ##    ##    ##    ##     ##    ##    ##     ## ##    ## 
-########    ###    ######## ##    ##    ##        ######     ##    ##     ##    ##     #######   ######  
-
-*/
 
 
 	putEventStatus = function (target_obj,etp,est){
