@@ -68,8 +68,8 @@ $(function(){
         }
 
 	}else{
-		//getLoginDataForTest();
-		document.location = "index.html";
+		getLoginDataForTest();
+		//document.location = "index.html";
 	}
 
 
@@ -162,6 +162,11 @@ $(function(){
 			return false;
 		}
 		//logout~
+		if(jqxhr.status == 401){
+			//xxxxxxxxxx
+			popupShowAdjust("","驗證失敗 請重新登入",true,false,[reLogin]);
+			return false;
+		}
 
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
@@ -231,11 +236,12 @@ $(function(){
 
 	//timeline下拉更新
 	$(window).scroll(function() {
-		
-		//判斷關閉圖示顯示時 就不動作
-		if($(".st-feedbox-area-bottom > div").is(":visible")) return false;
+		var feed_type = $("#page-group-main").data("navi") || "00";
 
-		var last_event = $(".st-sub-box").last();
+		//判斷沒資料的元件存在時 就不動作
+		if($(".feed-subarea[data-feed=" + feed_type + "] .no-data").length) return false;
+		
+		var last_event = $(".feed-subarea[data-feed=" + feed_type + "] .st-sub-box").last();
 		
 		if(last_event.length){
 			var view_height = $(window).scrollTop() + $(window).height();
@@ -246,10 +252,10 @@ $(function(){
 
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
 		    if(view_height && view_height >= last_height && !last_event.data("scroll-chk")){
+		    	//避免重複
 		    	last_event.data("scroll-chk",true);
 
-		    	var ct_timer = $(".st-sub-box").last().data("ct");
-
+		    	var ct_timer = last_event.data("ct");
 		    	timelineListWrite($("#page-group-main").data("navi"),ct_timer);
 		    }
 		}
@@ -502,7 +508,7 @@ $(function(){
 		setGroupAllUser();
 
 		//清空先
-		$(".st-feedbox-area").html('');
+		$(".feed-subarea").html('');
 
 		//切換團體 重設下拉更新
 		$(".st-feedbox-area-bottom").data("chk",false);
@@ -596,23 +602,26 @@ $(function(){
 		//先關閉全區域
 		$(".st-feedbox-area").hide();
 
+		var feed_type = $("#page-group-main").data("navi") || "00";
+		var this_events = $(".feed-subarea[data-feed=" + feed_type + "] .st-sub-box");
+
 		var filter_status = $(this).data("status");
 		var chk = false;
 
 		//全部
 		if(filter_status == "all"){
-			$(".st-sub-box").show();
+			this_events.show();
 			//開啟全區域
 			$(".st-feedbox-area").fadeIn("slow");
 			return false;
 		}else if(filter_status == "read"){
 			var chk = true;
 		}
-
-		$(".st-sub-box").hide();
+		
+		this_events.hide();
 
 		//已讀未讀
-		$(".st-sub-box").each(function(i,val){
+		this_events.each(function(i,val){
 			var event_status = $(this).data("event-status");
 			if(chk){
 				if(event_status && event_status.ir) $(this).show();

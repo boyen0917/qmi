@@ -429,10 +429,10 @@ $(function(){
 
     $(document).on("click",".setting-next-ready",function(){
     	// console.debug("document data:",$(document).data());
-    	$(document).data("ui","U0000RU80DK");
-    	$(document).data("at","53e9cd3d-07d1-41d9-84b7-00d1fda4d58a");
-    	$(document).data("phone-id","+886928858828");
-    	$(document).data("device-token","web-5566");
+    	// $(document).data("ui","U00039hX02C");
+    	// $(document).data("at","6031f2f2-9dc4-424f-a430-8ed6746674b9");
+    	// $(document).data("phone-id","+886980922917");
+    	// $(document).data("device-token","web-5566");
 
     	//有上傳圖檔 圖檔上傳完畢之後再做註冊步驟3
     	if(!$(".avatar-area img").hasClass("avatar-default")){
@@ -721,7 +721,6 @@ $(function(){
 	}
 
 
-
 	imgResizeByCanvas = function(img,x,y,max_w,max_h,quality){
 		var MAX_WIDTH = max_w;
 		var MAX_HEIGHT = max_h;
@@ -737,7 +736,7 @@ $(function(){
 				tempW *= MAX_HEIGHT / tempH;
 				tempH = MAX_HEIGHT;
 			}
-		}
+		} 
 
 		var canvas = document.createElement('canvas');
 		canvas.width = tempW;

@@ -1,5 +1,23 @@
 $(function(){  
 
+	reLogin = function() {
+		document.location = "index.html";
+	}
+
+	logout = function(){
+		var api_name = "logout";
+        var headers = {
+            ui: ui,
+            at: at,
+            li: lang
+        };
+        var method = "delete";
+
+        ajaxDo(api_name,headers,method,true).complete(function(data){
+        	document.location = "index.html";
+        });
+	}
+
 	createGroup = function (group_name,group_desc){
         var api_name = "groups";
         var headers = {
@@ -2828,16 +2846,30 @@ $(function(){
 	//動態消息列表
 	timelineListWrite = function (event_tp,ct_timer){
 
+		event_tp = event_tp || "00";
+    	var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
+
+    	//判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
+    	if(!ct_timer){
+    		if(selector.find(".load-chk").length){
+    			//隱藏其他類別
+				$(".feed-subarea").hide();
+				selector.show();
+	    		return false;菲律宾鹰
+    		}else{
+    			//load_chk 避免沒資料的
+	    		selector.append("<p class='load-chk'></p>");
+    		}
+    	}
+
 		//開啟timeline loading 關閉沒資料圖示
 		$(".st-feedbox-area-bottom > img").show();
 		$(".st-feedbox-area-bottom > div").hide();
-		
-		console.debug("img show");
+				
 	    //製作timeline
 	    var api_name = "groups/"+ gi +"/timelines/"+ ti_feed +"/events";
 	    if(ct_timer){
 	    	api_name = api_name + "?ct=" + ct_timer;
-	    	console.debug("api_name zzz:",api_name);
 	    }
 	    var headers = {
 	            ui:ui,
@@ -2852,23 +2884,25 @@ $(function(){
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 
 	    	//判斷是否為下拉更新
-        	var selector = $('.st-feedbox-area');
+        	// var selector = $('.st-feedbox-area');
         	var close_chk = false;
         	if(ct_timer){
         		//沒資料 關閉圖示
         		if(timeline_list.length == 0){
         			//關閉timeline loading 開啟沒資料圖示
         			close_chk = true;
-        		}else{
-        			selector = $('.st-sub-box').last().parent();
         		}
         	}else{
-        		//不是下拉更新 就清空
-				$(".st-feedbox-area").html('');
+        		//不是下拉更新 就隱藏其他類別
+				$(".feed-subarea").hide();
+				selector.show();
         	}
 
         	//資料個數少於這個數量 表示沒東西了
 	        if(timeline_list.length < 15 || close_chk){
+	        	//沒資料的確認
+	    		selector.append("<p class='no-data'></p>");
+
 	        	//關閉timeline loading 開啟沒資料圖示
 	        	setTimeout(function(){
 	        		$(".st-feedbox-area-bottom > img").hide();
@@ -3030,19 +3064,6 @@ $(function(){
 	        		//timeline message內容
 
     				timelineContentMake(this_event,target_div,val.ml);
-	        		
-	        		var timer = 600;
-	        		if(i == 0){
-	        			timer = 300;
-	        		}
-	        		setTimeout(function(){
-	        			this_event.css("opacity",1);
-	        		},timer);
-	        		
-
-	        		//留言
-	        		//this_event.find('.st-reply-message-textarea textarea').autosize({append: "\n"});
-	        		
 	        	}));
 	        });
 	    });
@@ -3102,7 +3123,6 @@ $(function(){
 	    			this_event.find(".st-task-status-area img").attr("src","images/common/icon/icon_check_red_l.png");
 					this_event.find(".st-task-status").html(task_str);
 	    		}
-
 			}
 
 			//存回

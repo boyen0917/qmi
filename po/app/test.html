@@ -32,44 +32,98 @@ span {
 
    </head>
 <body>
-  <span></span>
-  <p></p>
-  <div>1234</div>
-  <div>1234</div>
-  <div>1234</div>
-  <div>1234</div>
-  <div>1234</div>
-  <div>1234</div>
-  <div>1234</div>
-  <div>123444</div>
-  <p>111</p>
-  <button>click1</button>
+  <input type="file">
   <button>click2</button>
 
     <script>
       $(function(){
 
-        var a = 10;
+        var ou = "https://mapserver.mitake.com.tw/Project-o/users/U00039hX02C/avatars/daf6e318-db35-4b5b-8885-52331d56592b_o?Expires=1721634079&AWSAccessKeyId=WUYE89N1MLU9S8CZ58EE&Signature=cEKyp9hD8Ou7ZaFF3RKA51lpM%2F0%3D";
 
-        if(a > 10){
 
-        }else{
+        $("button").click(function(){
+          var file = $("input")[0].files[0];
 
+          $.ajax({
+                  url: ou,
+                  type: 'PUT',
+                  contentType: " ",
+                  data: "", 
+                  processData: false,
+                  complete: function(data) { 
+                    console.debug("上傳大圖後的 data:",data);
+                }
+          });
+                return false;
+
+          var reader = new FileReader();
+              reader.onloadend = function() {
+                  var tempImg = new Image();
+                  tempImg.src = reader.result;
+                  tempImg.onload = function() {
+                      
+                //大小圖都要縮圖
+                var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
+                var t_obj = imgResizeByCanvas(this,0,0,120,120,0.6);
+                console.debug("o_obj:",o_obj);
+                console.debug("t_obj:",t_obj);
+                //先大圖
+                $.ajax({
+                  url: ou,
+                  type: 'PUT',
+                  contentType: " ",
+                  data: o_obj.blob, 
+                  processData: false,
+                  complete: function(data) { 
+                    console.debug("上傳大圖後的 data:",data);
+                }
+              });
+              }
+            }
+            reader.readAsDataURL(file);
+        });
+          
+
+        imgResizeByCanvas = function(img){
+          var MAX_WIDTH = 500;
+          var MAX_HEIGHT = 500;
+          var tempW = img.width;
+          var tempH = img.height;
+          if (tempW > tempH) {
+            if (tempW > MAX_WIDTH) {
+              tempH *= MAX_WIDTH / tempW;
+              tempW = MAX_WIDTH;
+            }
+          } else {
+            if (tempH > MAX_HEIGHT) {
+              tempW *= MAX_HEIGHT / tempH;
+              tempH = MAX_HEIGHT;
+            }
+          }
+
+          var canvas = document.createElement('canvas');
+          canvas.width = tempW;
+          canvas.height = tempH;
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, tempW, tempH);
+          var dataURL = canvas.toDataURL("image/jpeg",0.5);
+
+          var img_obj = {
+            w: tempW,
+            h: tempH,
+            blob: dataURItoBlob(dataURL)
+          }
+          return img_obj;
         }
 
-        $("div").last().bind("append",function(){
-          $("div").last().after("<div>33333</div>");
-        })
-
-        $("div").last().trigger("append");
-        $("button:eq(0)").click(function(){
-          var tt = $("div").last().after("<div>123444</div>");
-          $("div").last().after("<div>123444</div>");
-        });
-
-        $("button:eq(1)").click(function(){
-          $("div").last().before("<div>99999</div>");
-        });
+        dataURItoBlob = function(dataURI) {
+          var binary = atob(dataURI.split(',')[1]);
+          var array = [];
+          for(var i = 0; i < binary.length; i++) {
+              array.push(binary.charCodeAt(i));
+          }
+          return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
+        }
         
       });
     //先確定瀏覽器是否支援indexedDB

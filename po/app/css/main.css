@@ -1492,7 +1492,7 @@ img.auo {
     margin:0 0 15px;
     box-shadow: 0 0 5px #a2a2a2;
     cursor:pointer;
-    opacity:0;
+    /*opacity:0;*/
     -webkit-user-select: none;
 }
 
