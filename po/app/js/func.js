@@ -356,15 +356,6 @@ $(function(){
 		//判斷是否存在gu all 
 		var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img")];
 		chkGroupAllUser(data_arr);
-
-		// //先檢查localStorage[gi].guAll是否存在
-  //       if(!$.lStorage(ui)[gi].guAll){
-  //       	console.debug("set sm");
-  //       	var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img")];
-  //       	setGroupAllUser(data_arr);
-  //       }else{
-  //       	getUserName(gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img"));	
-  //       }
 	}
 
 	chkGroupAllUser = function(data_arr){
@@ -409,11 +400,11 @@ $(function(){
 		//取得user name list
 		var _groupList = $.lStorage(ui);
 
-		console.debug("$.lStorage(ui):",$.lStorage(ui));
-		console.debug("_groupList[gi].guAll:",_groupList[gi].guAll);
+		// console.debug("$.lStorage(ui):",$.lStorage(ui));
+		// console.debug("_groupList[gi].guAll:",_groupList[gi].guAll);
 
 		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/top_events";
-		console.debug("top event api_name:",api_name);
+		console.debug("top event ap?i_name:",api_name);
         var headers = {
                  "ui":ui,
                  "at":at, 
@@ -421,9 +412,9 @@ $(function(){
                      };
 
         var method = "get";
-        console.debug("headers:",headers);
+        // console.debug("headers:",headers);
         ajaxDo(api_name,headers,method,false).complete(function(data){
-        	console.debug("topevent data:",data);
+        	// console.debug("topevent data:",data);
 
         	if(data.status == 200){
 
@@ -2806,13 +2797,13 @@ $(function(){
  */  
 	
 	//動態消息列表
-	timelineListWrite = function (event_tp,ct_timer){
+	timelineListWrite = function (event_tp,ct_timer,top_selector){
 
 		event_tp = event_tp || "00";
     	var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
     	//判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
-    	if(!ct_timer){
+    	if(!ct_timer && !top_selector){
     		if(selector.find(".load-chk").length){
     			//隱藏其他類別
 				$(".feed-subarea").hide();
@@ -2873,8 +2864,25 @@ $(function(){
 	        }
         	
 	        var content,box_content,youtube_code,prelink_pic,prelink_title,prelink_desc;
-	        
+	        var method = "append";
 	        $.each(timeline_list,function(i,val){
+
+	        	//上拉更新
+	        	if(top_selector){
+	        		if(val.meta.ct > top_selector.data("ct")){
+		        		selector = top_selector;
+		        		method = "before";
+	        		}else{
+	        			setTimeout(function(){
+	        				$(".st-navi-area").removeClass("st-navi-fixed");
+	        				$(".st-refresh-top").hide("fast");
+							$(".st-refresh-top img").hide();
+							$(".st-navi-area").data("scroll-chk",false);
+	        			},1000);
+	        			return false;
+	        		}
+	        	}
+
 	        	console.log(JSON.stringify(val, null, 2));
 
 	        	//刪除event
@@ -2882,7 +2890,7 @@ $(function(){
 
 	        	var tp = val.meta.tp.substring(1,2)*1;
 	        	
-	        	selector.append($('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+	        	selector[method]($('<div>').load('layout/timeline_event.html .st-sub-box',function(){
 	        		var this_event = $(this).find(".st-sub-box");
 	        		
 	        		//記錄timeline種類
@@ -3070,7 +3078,7 @@ $(function(){
 	eventFilter = function(this_event,filter){
 		//先關再開
 		this_event.hide();
-		
+
 		var event_status = this_event.data("event-status");
 		//用以判斷下拉更新
 		this_event.removeClass("filter-show");
@@ -3091,13 +3099,23 @@ $(function(){
 		}
 	}
 	
+	timelineTopRefresh = function(){
+		$(".st-navi-area").addClass("st-navi-fixed");
+		$(".st-refresh-top").show("fast");
+		setTimeout(function(){
+			$(".st-refresh-top img").show();
+		},500);
+		
+		var selector = $(".feed-subarea[data-feed=00] .st-sub-box:eq(0)");
+		timelineListWrite("","",selector);
+	}
+
 	mathAlignCenter = function (outer,inner){
 		return (outer-inner)/2;
 	}
 	
 	//拆成detail及timeline list版 並做 html entities 和 url a tag
 	timelineContentFormat = function (c,limit,ei){
-		console.log("~~~~~~~~~~~~~~~~~~~~~~~~~");
 		if(!c){
 			return false;
 		}

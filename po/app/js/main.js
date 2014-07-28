@@ -192,7 +192,6 @@ $(function(){
 
 		//timeline頁面
 		if(hash == "#page-group-main"){
-
 			//調整團體頭像
 			if($(document).data("group-avatar")){
 				$(".sm-group-area").each(function(i,val){
@@ -211,6 +210,7 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
+
 	});
 	
 	$(".page-back").click(function(){
@@ -231,8 +231,58 @@ $(function(){
 		//console.debug("last:",$(document).data("page-history").last()[0]);
 	});
 
+
+
+
+
+	var keys = [37, 38, 39, 40];
+
+   function preventDefault(e) {
+     e = e || window.event;
+     if (e.preventDefault)
+     e.preventDefault();
+     e.returnValue = false;  
+   }
+
+   function keydown(e) {
+       for (var i = keys.length; i--;) {
+           if (e.keyCode === keys[i]) {
+               preventDefault(e);
+               return;
+           }
+       }
+   }
+	function wheel(e) {
+	     preventDefault(e);
+	   }
+	 function disable_scroll() {
+	     if (window.addEventListener) {
+	         window.addEventListener('DOMMouseScroll', wheel, false);
+	     }
+	     window.onmousewheel = document.onmousewheel = wheel;
+	     document.onkeydown = keydown;
+	   }
+
+	   function enable_scroll() {
+	       if (window.removeEventListener) {
+	           window.removeEventListener('DOMMouseScroll', wheel, false);
+	       }
+	       window.onmousewheel = document.onmousewheel = document.onkeydown = null;  
+	   }
+
 	//timeline下拉更新
 	$(window).scroll(function() {
+
+		var top_height = $(window).scrollTop();
+		
+		//上拉更新
+		if (top_height < 0 && !$(".st-navi-area").data("scroll-chk")){
+			console.debug("top_height:",top_height);
+			$(".st-navi-area").data("scroll-chk",true);
+			timelineTopRefresh();
+		}
+
+		//下拉更新
 		var feed_type = $("#page-group-main").data("navi") || "00";
 
 		//判斷沒資料的元件存在時 就不動作
@@ -242,14 +292,14 @@ $(function(){
 		var last_event = $(".feed-subarea[data-feed=" + feed_type + "] .st-sub-box").last();
 		
 		if(last_event.length){
-			var view_height = $(window).scrollTop() + $(window).height();
+			var bottom_height = $(window).scrollTop() + $(window).height();
 			var last_height = last_show_event.offset().top + last_show_event.height() + 25;
 
-			console.debug("height:",view_height);
-			console.debug("last_height:",last_height);
+			// console.debug("bottom_height:",bottom_height);
+			// console.debug("last_height:",last_height);
 
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
-		    if(view_height && view_height >= last_height && !last_show_event.data("scroll-chk")){
+		    if(bottom_height && bottom_height >= last_height && !last_show_event.data("scroll-chk")){
 		    	//避免重複
 		    	last_show_event.data("scroll-chk",true);
 
