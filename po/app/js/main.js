@@ -238,19 +238,20 @@ $(function(){
 		//判斷沒資料的元件存在時 就不動作
 		if($(".feed-subarea[data-feed=" + feed_type + "] .no-data").length) return false;
 		
+		var last_show_event = $(".feed-subarea[data-feed=" + feed_type + "] .filter-show").last();
 		var last_event = $(".feed-subarea[data-feed=" + feed_type + "] .st-sub-box").last();
 		
 		if(last_event.length){
 			var view_height = $(window).scrollTop() + $(window).height();
-			var last_height = last_event.offset().top + last_event.height() + 25;
+			var last_height = last_show_event.offset().top + last_show_event.height() + 25;
 
-			// console.debug("height:",view_height);
-			// console.debug("last_height:",last_height);
+			console.debug("height:",view_height);
+			console.debug("last_height:",last_height);
 
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
-		    if(view_height && view_height >= last_height && !last_event.data("scroll-chk")){
+		    if(view_height && view_height >= last_height && !last_show_event.data("scroll-chk")){
 		    	//避免重複
-		    	last_event.data("scroll-chk",true);
+		    	last_show_event.data("scroll-chk",true);
 
 		    	var ct_timer = last_event.data("ct");
 		    	timelineListWrite($("#page-group-main").data("navi"),ct_timer);
@@ -513,12 +514,12 @@ $(function(){
 	$(".st-navi-subarea").click(function(){
 
 		var img_dir = "images/timeline/timeline_tab_icon_";
-		var subarea = $(".st-navi-area [data-st-navi-group=navi]");
-		var subarea_this = $(this);
-		subarea.find("div").removeClass("color-white");
+		var subareas = $(".st-navi-area [data-st-navi-group=navi]");
+		var this_subarea = $(this);
+		subareas.find("div").removeClass("color-white");
 
 		//將選項存入
-		$("#page-group-main").data("navi",subarea_this.data("tp"));
+		$("#page-group-main").data("navi",this_subarea.data("tp"));
 
 		//改filter文字為 全部 
 		$(".st-filter-main span").html("全部");
@@ -527,34 +528,34 @@ $(function(){
 	        //全關 switch開
 			$(this).find("img").attr("src",img_dir + $(this).data("st-navi") + ".png");
 	    });
-		switch(subarea_this.data("st-navi")){
+		switch(this_subarea.data("st-navi")){
 	    	case "home":
 	    		 $(".st-navi-tridiv-r").show();
 	    		 $(".st-navi-tridiv-l").hide();
-	    		 subarea_this.find("img").attr("src",img_dir + "home_white.png");
-	    		 subarea_this.find("div:eq(0)").addClass("color-white");
+	    		 this_subarea.find("img").attr("src",img_dir + "home_white.png");
+	    		 this_subarea.find("div:eq(0)").addClass("color-white");
 	          break;
 	    	case "announcement":
 	    		$(".st-navi-tridiv-l").show();
 	    		$(".st-navi-tridiv-r").hide();
-	    		subarea_this.find("img").attr("src",img_dir + "announcement_white.png");
-	    		subarea_this.find("div:eq(0)").addClass("color-white");
+	    		this_subarea.find("img").attr("src",img_dir + "announcement_white.png");
+	    		this_subarea.find("div:eq(0)").addClass("color-white");
 	          break;
 	    	case "feedback":
 	    		$(".st-navi-tridiv-l").show();
 	    		$(".st-navi-tridiv-r").hide();
-	    		subarea_this.find("img").attr("src",img_dir + "feedback_white.png");
-	    		subarea_this.find("div:eq(0)").addClass("color-white");
+	    		this_subarea.find("img").attr("src",img_dir + "feedback_white.png");
+	    		this_subarea.find("div:eq(0)").addClass("color-white");
 	          break;
 	    	case "task":
 	    		$(".st-navi-tridiv-l").show();
 	    		$(".st-navi-tridiv-r").hide();
-	    		subarea_this.find("img").attr("src",img_dir + "task_white.png");
-	    		subarea_this.find("div:eq(0)").addClass("color-white");
+	    		this_subarea.find("img").attr("src",img_dir + "task_white.png");
+	    		this_subarea.find("div:eq(0)").addClass("color-white");
 	          break;
 		}
 
-		timelineListWrite(subarea_this.data("tp"));
+		timelineListWrite(this_subarea.data("tp"));
 	});
 
 	//主要filter
@@ -576,7 +577,6 @@ $(function(){
 	});
 
 	$(".st-filter-action").click(function(){
-
 		//動態變化
 		$(".st-filter-main span").fadeOut("fast");
 		$(".st-filter-other").slideUp(function(){
@@ -597,28 +597,13 @@ $(function(){
 		var this_events = $(".feed-subarea[data-feed=" + feed_type + "] .st-sub-box");
 
 		var filter_status = $(this).data("status");
-		var chk = false;
 
-		//全部
-		if(filter_status == "all"){
-			this_events.show();
-			//開啟全區域
-			$(".st-feedbox-area").fadeIn("slow");
-			return false;
-		}else if(filter_status == "read"){
-			var chk = true;
-		}
+		//記錄
+		$(".st-filter-area").data("filter",filter_status);
 		
-		this_events.hide();
-
 		//已讀未讀
 		this_events.each(function(i,val){
-			var event_status = $(this).data("event-status");
-			if(chk){
-				if(event_status && event_status.ir) $(this).show();
-			}else{
-				if(!event_status || (event_status && !event_status.ir)) $(this).show();
-			}
+			eventFilter($(this),filter_status);
 		});
 
 		//開啟全區域
@@ -874,42 +859,7 @@ $(function(){
 	});
 
 
-/*
 
-
- ######   #######  ##     ## ########   #######   ######  ######## 
-##    ## ##     ## ###   ### ##     ## ##     ## ##    ## ##       
-##       ##     ## #### #### ##     ## ##     ## ##       ##       
-##       ##     ## ## ### ## ########  ##     ##  ######  ######   
-##       ##     ## ##     ## ##        ##     ##       ## ##       
-##    ## ##     ## ##     ## ##        ##     ## ##    ## ##       
- ######   #######  ##     ## ##         #######   ######  ######## 
-
-
- */
-
-
-
-
-	
-	//貼文選單
-	$(".fc-area-subbox").click(function(){
-
-	    var title = $(this).find("div").html();
-
-	    $("#page-compose .header-group-name div:eq(0)").html(title);
-		$("#page-compose .header-group-name div:eq(1)").html(gn);
-
-		$.mobile.changePage("#page-compose");
-
-		composeContentMake($(this).data("fc-box"));
-
-		$(".feed-compose").trigger("click");
-	});
-	
-	$(".feed-compose-area-cover").click(function(){
-		$(".feed-compose").trigger("click");
-	});
 	
 
 
@@ -968,8 +918,7 @@ $(function(){
                 "li":lang
                     };
         var method = "get";
-        var result = ajaxDo(api_name,headers,method,false);
-        result.complete(function(data){
+        ajaxDo(api_name,headers,method,false).complete(function(data){
         	var e_data = $.parseJSON(data.responseText).el;
 
 	        	//計算投票的回文人次
@@ -995,13 +944,6 @@ $(function(){
 	    				this_event.find(".st-task-work-detail").show();
 
 	    				if(this_event.data("task-over")) break;
-	    				//判斷有無投票過 顯示送出 已送出 已結束等等
-	    				// var event_status = this_event.data("event-status");
-	    				// if(event_status[this_ei] && event_status[this_ei].ik){
-	    				// 	this_event.find(".st-vote-send").html("完成");
-	    				// 	this_event.find(".st-vote-send").removeClass(".st-vote-send-blue");
-	    				// }
-
 	    				break;
 	    			case 4:
 	    				this_event.find(".st-box2-more-task-area").hide();
@@ -1043,11 +985,31 @@ $(function(){
 	});
 	
 	
-
+	//----------------------------------- compose-貼文 ---------------------------------------------
 
 	
-	//----------------------------------- timeline-貼文 ---------------------------------------------
+	//貼文選單
+	$(".fc-area-subbox").click(function(){
+		//定點回報暫時不做
+		if($(this).hasClass("fc-check")) return false;
+
+	    var title = $(this).find("div").html();
+
+	    $("#page-compose .header-group-name div:eq(0)").html(title);
+		$("#page-compose .header-group-name div:eq(1)").html(gn);
+
+		$.mobile.changePage("#page-compose");
+
+		composeContentMake($(this).data("fc-box"));
+
+		$(".feed-compose").trigger("click");
+	});
 	
+	$(".feed-compose-area-cover").click(function(){
+		$(".feed-compose").trigger("click");
+	});
+
+	//compose 送出	
 	$(".cp-post").click(function(){
 		var this_compose = $(document).find(".cp-content");
 
