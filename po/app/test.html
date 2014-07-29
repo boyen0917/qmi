@@ -33,6 +33,7 @@ span {
    </head>
 <body>
   <input type="file">
+  <img/>
   <button>click2</button>
 
     <script>
@@ -44,42 +45,19 @@ span {
         $("button").click(function(){
           var file = $("input")[0].files[0];
 
-          $.ajax({
-                  url: ou,
-                  type: 'PUT',
-                  contentType: " ",
-                  data: "", 
-                  processData: false,
-                  complete: function(data) { 
-                    console.debug("上傳大圖後的 data:",data);
-                }
-          });
-                return false;
 
-          var reader = new FileReader();
+              var reader = new FileReader();
               reader.onloadend = function() {
                   var tempImg = new Image();
                   tempImg.src = reader.result;
                   tempImg.onload = function() {
                       
-                //大小圖都要縮圖
-                var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
-                var t_obj = imgResizeByCanvas(this,0,0,120,120,0.6);
-                console.debug("o_obj:",o_obj);
-                console.debug("t_obj:",t_obj);
-                //先大圖
-                $.ajax({
-                  url: ou,
-                  type: 'PUT',
-                  contentType: " ",
-                  data: o_obj.blob, 
-                  processData: false,
-                  complete: function(data) { 
-                    console.debug("上傳大圖後的 data:",data);
-                }
-              });
+                    //大小圖都要縮圖
+                    var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
+                    var t_obj = imgResizeByCanvas(this,0,0,120,120,0.6);
+                      $("img").attr("src",o_obj.url);
+                  };
               }
-            }
             reader.readAsDataURL(file);
         });
           
@@ -111,7 +89,8 @@ span {
           var img_obj = {
             w: tempW,
             h: tempH,
-            blob: dataURItoBlob(dataURL)
+            blob: dataURItoBlob(dataURL),
+            url:dataURL
           }
           return img_obj;
         }

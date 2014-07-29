@@ -100,6 +100,7 @@ $(function(){
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
         	if(data.status == 200){
         		groupMenuListArea(invite_data.gi,true);
+        		this_invite.remove();
         	}
         });
     }
@@ -363,8 +364,48 @@ $(function(){
         if(!$.lStorage(ui)[gi].guAll){
         	setGroupAllUser(data_arr);
         }else{
+        	console.debug("data_arr:",data_arr);
         	getUserName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
         }
+	}
+
+	topEventChk = function(){
+		topEventApi().complete(function(data){
+			if(data.status != 200) return false;
+
+			var top_events_arr = $.parseJSON(data.responseText).el;
+			
+			$.each(top_events_arr,function(i,val){
+			
+				var data_ei = val.ei;
+				var chk = false;
+				$(".st-top-event").each(function(i,val){
+					if($(this).data("data-obj").ei == data_ei) {
+						chk = true;
+						return;
+					}
+				});
+
+				if(!chk){
+					console.debug("new top event!!!!!!!!!");
+					return false;
+				}
+			});
+
+			console.debug("end");
+		});
+	}
+
+	topEventApi = function(){
+		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/top_events";
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":"zh_TW",
+                     };
+
+        var method = "get";
+        return ajaxDo(api_name,headers,method,false);
 	}
 
 	topEvent = function (){
@@ -404,7 +445,6 @@ $(function(){
 		// console.debug("_groupList[gi].guAll:",_groupList[gi].guAll);
 
 		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/top_events";
-		console.debug("top event ap?i_name:",api_name);
         var headers = {
                  "ui":ui,
                  "at":at, 
@@ -435,7 +475,7 @@ $(function(){
         				src:"images/timeline/timeline_cover_icon_announcement.png",
         			},
         			default:{
-        				name:"傻逼",
+        				name:"測試",
         				src:"images/pighead.png"	
         			}
         		};
@@ -477,6 +517,65 @@ $(function(){
         		});
 	        }
         });
+	}
+
+	topEventMake = function(top_area,top_events_arr){
+
+		var top_msg_num = top_events_arr.length;
+		if(top_msg_num == 0){
+			return false;
+		}
+
+		//default 關閉
+		$(".st-top-event-default").hide();
+
+		//timeline 六種規格 設定
+		var tl_setting_obj = {
+			1:{
+				name:"公告",
+				src:"images/timeline/timeline_cover_icon_announcement.png",
+			},
+			default:{
+				name:"傻逼",
+				src:"images/pighead.png"	
+			}
+		};
+		$.each(top_events_arr,function(i,val){
+			var event_type = val.meta.tp.substring(1,2);
+			var this_top_obj = tl_setting_obj[event_type];
+			if(typeof this_top_obj == "undefined"){
+				this_top_obj = tl_setting_obj["default"]
+			}
+
+			top_area.find(".st-top-event-set").append($('<div class="st-top-event">').load('layout/layout.html .st-top-event-load',function(){
+				var this_top_event = $(this);
+				this_top_event.data("data-obj",val);
+				this_top_event.data("pos",i);
+				//圖片及類型
+				this_top_event.find(".st-top-event-l img").attr("src",this_top_obj.src);
+				this_top_event.find(".st-top-event-l div").html(this_top_obj.name);
+				//標題 內容
+				this_top_event.find(".st-top-event-r-ttl").html(val.meta.tt);
+				this_top_event.find(".st-top-event-r-content").html(val.ml[0].c);
+				// this_top_event.find(".st-top-event-r-content").html(
+				// 	"哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈"
+				// );
+				//用戶名稱 時間
+				//this_top_event.find(".st-top-event-r-footer span:eq(0)").html(gu_all[val.meta.gu].n);
+				setTopEventUserName(this_top_event,val.meta.gu);
+
+				var time = new Date(val.meta.ct);
+				var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
+				this_top_event.find(".st-top-event-r-footer span:eq(1)").html(time_format);
+
+				//最後一筆
+				if(i == (top_msg_num-1)){
+					setTimeout(function(){
+						topBarMake(top_area,top_msg_num);
+					},500);
+				}
+			}));
+		});
 	}
 
 	//為了避免gu all還沒取得
@@ -2728,10 +2827,9 @@ $(function(){
 	        	}else{
 	        		//popupShowAdjust("","創建成功。",true);
 	        		toastShow("團體建立成功");
+
+	        		timelineSwitch("feed");
 	        	}
-	        		
-	        	$.mobile.changePage("#page-group-main");
-	        	timelineSwitch("feed");
 	        }
 	    });
 	}
@@ -2797,9 +2895,9 @@ $(function(){
  */  
 	
 	//動態消息列表
-	timelineListWrite = function (event_tp,ct_timer,top_selector){
+	timelineListWrite = function (ct_timer,top_selector){
 
-		event_tp = event_tp || "00";
+		var event_tp = $("#page-group-main").data("navi") || "00";
     	var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
     	//判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
@@ -2830,6 +2928,7 @@ $(function(){
 	            li:lang,
 	            tp: event_tp
 	                };
+	                console.debug("headers:",headers);
 	    var method = "get";
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
@@ -2874,9 +2973,11 @@ $(function(){
 		        		method = "before";
 	        		}else{
 	        			setTimeout(function(){
-	        				$(".st-navi-area").removeClass("st-navi-fixed");
-	        				$(".st-refresh-top").hide("fast");
+        					$(".st-navi-area").removeClass("st-navi-fixed");
+        					$(".st-top-area-load").removeClass("mt");
+	        				$(".st-refresh-top").slideUp("fast");
 							$(".st-refresh-top img").hide();
+							$(".st-refresh-top span").hide();
 							$(".st-navi-area").data("scroll-chk",false);
 	        			},1000);
 	        			return false;
@@ -3101,13 +3202,19 @@ $(function(){
 	
 	timelineTopRefresh = function(){
 		$(".st-navi-area").addClass("st-navi-fixed");
+		$(".st-top-area-load").addClass("mt");
 		$(".st-refresh-top").show("fast");
 		setTimeout(function(){
 			$(".st-refresh-top img").show();
-		},500);
-		
-		var selector = $(".feed-subarea[data-feed=00] .st-sub-box:eq(0)");
-		timelineListWrite("","",selector);
+			$(".st-refresh-top span").show();
+		},300);
+
+		var event_tp = $("#page-group-main").data("navi") || "00";
+    	var selector = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box:eq(0)");
+		timelineListWrite("",selector);
+
+		//置頂設定
+		// topEvent();
 	}
 
 	mathAlignCenter = function (outer,inner){
@@ -3495,8 +3602,9 @@ $(function(){
 
         var result = ajaxDo(api_name,headers,method,true);
 		result.complete(function(data){
-			var obj =$.parseJSON(data.responseText);
 			if(data.status != 200) return false;
+
+			var obj =$.parseJSON(data.responseText);
 
 			if(target && tp){
 				switch(tp){

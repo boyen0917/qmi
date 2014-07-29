@@ -133,7 +133,7 @@ $(function(){
 	$.ajaxSetup ({
 	    // Disable caching of AJAX responses
 	    timeout: ajax_timeout,
-	    cache: false
+	    cache: true
 	});
 	
 	$(document).ajaxSend(function() {
@@ -210,7 +210,7 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-
+		topEventChk();
 	});
 	
 	$(".page-back").click(function(){
@@ -232,52 +232,13 @@ $(function(){
 	});
 
 
-
-
-
-	var keys = [37, 38, 39, 40];
-
-   function preventDefault(e) {
-     e = e || window.event;
-     if (e.preventDefault)
-     e.preventDefault();
-     e.returnValue = false;  
-   }
-
-   function keydown(e) {
-       for (var i = keys.length; i--;) {
-           if (e.keyCode === keys[i]) {
-               preventDefault(e);
-               return;
-           }
-       }
-   }
-	function wheel(e) {
-	     preventDefault(e);
-	   }
-	 function disable_scroll() {
-	     if (window.addEventListener) {
-	         window.addEventListener('DOMMouseScroll', wheel, false);
-	     }
-	     window.onmousewheel = document.onmousewheel = wheel;
-	     document.onkeydown = keydown;
-	   }
-
-	   function enable_scroll() {
-	       if (window.removeEventListener) {
-	           window.removeEventListener('DOMMouseScroll', wheel, false);
-	       }
-	       window.onmousewheel = document.onmousewheel = document.onkeydown = null;  
-	   }
-
 	//timeline下拉更新
 	$(window).scroll(function() {
 
 		var top_height = $(window).scrollTop();
 		
 		//上拉更新
-		if (top_height < 0 && !$(".st-navi-area").data("scroll-chk")){
-			console.debug("top_height:",top_height);
+		if (top_height < -20 && !$(".st-navi-area").data("scroll-chk")){
 			$(".st-navi-area").data("scroll-chk",true);
 			timelineTopRefresh();
 		}
@@ -304,7 +265,7 @@ $(function(){
 		    	last_show_event.data("scroll-chk",true);
 
 		    	var ct_timer = last_event.data("ct");
-		    	timelineListWrite($("#page-group-main").data("navi"),ct_timer);
+		    	timelineListWrite(ct_timer);
 		    }
 		}
 	});
@@ -558,7 +519,9 @@ $(function(){
 		timelineSwitch("feed");
 	});
 	
-	
+	$(".sm-small-area.setting").click(function(){
+		popupShowAdjust("","確定登出？",true,true,[logout]);
+	});
 	
 	//----------------------------------- timeline ---------------------------------------------  
 	$(".st-navi-subarea").click(function(){
@@ -605,7 +568,7 @@ $(function(){
 	          break;
 		}
 
-		timelineListWrite(this_subarea.data("tp"));
+		timelineListWrite();
 	});
 
 	//主要filter
