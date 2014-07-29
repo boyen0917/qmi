@@ -68,8 +68,8 @@ $(function(){
         }
 
 	}else{
-		getLoginDataForTest();
-		//document.location = "index.html";
+		//getLoginDataForTest();
+		document.location = "index.html";
 	}
 
 
