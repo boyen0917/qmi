@@ -241,6 +241,9 @@ $(function(){
 		if (top_height < -20 && !$(".st-navi-area").data("scroll-chk")){
 			$(".st-navi-area").data("scroll-chk",true);
 			timelineTopRefresh();
+
+			//順便檢查置頂
+			topEventChk();
 		}
 
 		//下拉更新

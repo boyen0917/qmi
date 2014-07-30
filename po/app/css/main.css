@@ -2422,13 +2422,14 @@ img.auo {
 	height: 150px;
 	width: 250px;
 	overflow: hidden;
-	margin: 10px;
+	margin: 10px 0;
 	border: 1px solid #d2d2d2;
 	cursor: pointer;
 	display: none;
 }
 
-img.sticker {
+.st-reply-content img.sticker {
+	display: none;
 	width: 120px;
 }
 
