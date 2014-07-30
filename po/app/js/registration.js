@@ -447,26 +447,16 @@ $(function(){
     });
 
 
-
-
-
-
-
-
-
 // ---------------- tool action --------------------------------------------------------------------------
-
 
 	$(".ajax-screen-lock").click(function(e){
 	    e.stopPropagation();
 	});
-	
-
 
 	registration = function(resend){
 		if(!resend){
 			// $(document).data("device-token",deviceTokenMake());
-			$(document).data("device-token","web-5566");
+			$(document).data("device-token","web-device");
 			$(document).data("phone-id", countrycode + $(".register-phone input").val().substring(1));	
 		}
 		

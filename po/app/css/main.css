@@ -269,6 +269,7 @@ img.auo {
 	
 }
 
+
 /* =======================團體選單 =================================*/
 
 #page-group-menu {
@@ -2417,6 +2418,20 @@ img.auo {
 	width: 44px;
 }
 
+.st-reply-content .au-area {
+	height: 150px;
+	width: 250px;
+	overflow: hidden;
+	margin: 10px;
+	border: 1px solid #d2d2d2;
+	cursor: pointer;
+	display: none;
+}
+
+img.sticker {
+	width: 120px;
+}
+
 .st-feedbox-area-bottom {
 	min-height: 50px;
 	text-align: center;
@@ -2604,12 +2619,15 @@ img.auo {
 	right: 9px;
 }
 
+.cp-content-top{
+	cursor:pointer;
+}
+
 .cp-top-btn {
 	float: right;
 	position: relative;
 	top: 10px;
 	right: 15px;
-	cursor:pointer;
 }
 
 .cp-textarea-desc {
