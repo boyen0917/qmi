@@ -965,91 +965,59 @@ $(function(){
 							break;
 						case 18:
 							//投票回覆 不用製作留言
-							without_message = true;reply
+							without_message = true;
 							break;
 					}
+				});
 				
+				//部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
+				if(without_message || el.meta.del || (el.meta.tp.substring(0,1)*1 == 0)){
+					this_load.hide();
+					_debug("this_load:",this_load);
+				}else{
 
+					//製作留言
 
-					//部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
-					if(without_message || el.meta.del || (el.meta.tp.substring(0,1)*1 == 0)){
-						this_load.hide();
-					}else{
+					var _groupList = $.lStorage(ui);
+					var user_name = _groupList[gi].guAll[el.meta.gu].n;
 
-						//製作留言
+					//大頭照
+					if(_groupList[gi].guAll[el.meta.gu].aut){
+	        			this_load.find(".st-user-pic img:eq(0)").attr("src",_groupList[gi].guAll[el.meta.gu].aut);
+	        			this_load.find(".st-user-pic img:eq(1)").attr("src",_groupList[gi].guAll[el.meta.gu].auo);
+	        			avatarPos(this_load.find(".st-user-pic img:eq(0)"));
+	        		}
+					
+					var time = new Date(el.meta.ct);
+		    		var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
+		    		
 
-						var _groupList = $.lStorage(ui);
-						var user_name = _groupList[gi].guAll[el.meta.gu].n;
+					this_load.find(".st-reply-username").html(user_name);
 
-						//大頭照
-						if(_groupList[gi].guAll[el.meta.gu].aut){
-		        			this_load.find(".st-user-pic img:eq(0)").attr("src",_groupList[gi].guAll[el.meta.gu].aut);
-		        			this_load.find(".st-user-pic img:eq(1)").attr("src",_groupList[gi].guAll[el.meta.gu].auo);
-		        			avatarPos(this_load.find(".st-user-pic img:eq(0)"));
-		        		}
-						
-						var time = new Date(el.meta.ct);
-			    		var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
-			    		
+					//回覆內容在上面switch完成
+					
+					this_load.find(".st-reply-footer span:eq(0)").html(time_format);
 
-						this_load.find(".st-reply-username").html(user_name);
+					var ei = el.ei;
+					this_load.data("event-id",ei);
 
-						//回覆內容在上面switch完成
-						
-						this_load.find(".st-reply-footer span:eq(0)").html(time_format);
+					//存入event path 之後才可以按讚
+					this_load.data("event-path",this_event.data("event-id") + "." + this_load.data("event-id"));
 
-						var ei = el.ei;
-						this_load.data("event-id",ei);
+					if(el.meta.lct){
+						this_load.find(".st-reply-footer img").show();
+						this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like.png");
+						this_load.find(".st-reply-footer span:eq(2)").html(el.meta.lct);
 
-						//存入event path 之後才可以按讚
-						this_load.data("event-path",this_event.data("event-id") + "." + this_load.data("event-id"));
-
-						if(el.meta.lct){
-							this_load.find(".st-reply-footer img").show();
-							this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like.png");
-							this_load.find(".st-reply-footer span:eq(2)").html(el.meta.lct);
-
-							//此則動態 自己的按贊狀況
-							if(event_status && event_status.il){
-								this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
-								this_load.find(".st-reply-footer span:eq(1)").html("收回讚");
-							}
+						//此則動態 自己的按贊狀況
+						if(event_status && event_status.il){
+							this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
+							this_load.find(".st-reply-footer span:eq(1)").html("收回讚");
 						}
 					}
-				});
+				}
 			}));	
 		});	
-	}
-
-	replyContentMake = function(ml,selector){
-
-		_debug("ml reply:",ml);
-		// $.each(ml_arr,function(i,val){
-		// 	_debug("ml_arr val:",val);
-
-		// 	switch(ml.tp){
-		// 		case 0://文字
-
-		// 			break;
-		// 		case 5://貼圖
-		// 			var sticker_path = "sticker/" + ml.c.split("_")[1] + "/" + ml.c + ".png";
-		// 			selector.find(".sticker").attr("src",sticker_path).show();
-		// 			break;
-		// 		case 6://圖片
-		// 			selector.find(".au-area").show();
-		// 			getS3file(ml,selector,ml.tp,250);
-		// 			break;
-		// 	}
-
-
-		// });
-		// var ml = el.ml[0];
-		// if(ml.tp){
-		// 	replyContentMake(ml,this_load.find(".st-reply-content"));
-		// }else{
-		// 	this_load.find(".st-reply-content").html(reply_content);
-		// }
-
 	}
 
 	detailTimelineContentMake_bak = function (this_event,e_data){
@@ -2993,7 +2961,7 @@ $(function(){
 	        		setThisGroup(new_gi,val);
 	        	}
 
-	        	if(i < 2){
+	        	if(i < 5){
 	        		tmp_selector = ".sm-group-list-area";
 	        	}else{
 	        		tmp_selector = ".sm-group-list-area-add";
@@ -3568,6 +3536,7 @@ $(function(){
 			//內容格式
 			switch(val.tp){
 				case 0://文字
+					if(!val.c) break;
 					this_event.find(target_div).show();
 					this_event.find(target_div).html(c[0]);
 					this_event.find(target_div + "-detail").html(c[1]);
