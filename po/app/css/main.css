@@ -2107,6 +2107,15 @@ img.auo {
 }
 
 
+.st-attach-sticker {
+	text-align: left;
+}
+
+.st-attach-sticker img {
+	width: 150px;
+}
+
+
 .st-attach-img {
 	height: 300px;
 	width: 110%;

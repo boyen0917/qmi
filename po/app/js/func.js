@@ -3602,7 +3602,10 @@ $(function(){
 					var h = this_event.find(".st-attach-url-img img").height();
 					mathAvatarPos(this_event.find(".st-attach-url-img img"),w,h,0,360);
 					break;
-				case 4:
+				case 5:
+					var sticker_path = "sticker/" + val.c.split("_")[1] + "/" + val.c + ".png";
+					this_event.find(".st-attach-sticker").show();
+					this_event.find(".st-attach-sticker img").attr("src",sticker_path);
 					break;
 				case 6://圖片
 					this_event.find(".st-attach-img").show();
