@@ -73,6 +73,11 @@ $(function(){
 	}
 
 
+	$(".st-feedbox-area-bottom > div > div").click(function(){
+		document.location = "db.html";
+
+	});
+
 	// url參數 clear 存在 就清 local storage
     clear = $.getUrlVar('clear');
     if(clear == 123456) {
