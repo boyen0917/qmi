@@ -94,5 +94,31 @@ $(function(){
 
 	//timeline置頂millisecond
 	top_timer_ms = 5000;
+
+
+	//debug control 
+	setDebug(true);
+
+	function setDebug(isDebug) {
+      if (isDebug) {
+        window.cns = {
+          log: window.console.log.bind(window.console, '%s: %s'),
+          error: window.console.error.bind(window.console, 'error: %s'),
+          info: window.console.info.bind(window.console, 'info: %s'),
+          warn: window.console.warn.bind(window.console, 'warn: %s'),
+          debug: window.console.debug.bind(window.console, 'debug: %s')
+        };
+      } else {
+        var __no_op = function() {};
+
+        window.cns = {
+          log: __no_op,
+          error: __no_op,
+          warn: __no_op,
+          info: __no_op,
+          debug: __no_op
+        }
+      }
+    }
 	
 });

@@ -118,8 +118,10 @@ $(function(){
 
 	$(".popup-screen").bind("close",function(){
 		
-	    $(".popup").hide();
-	    $(".popup-screen").hide();
+	    $(".popup").fadeOut("fast",function(){
+	    	$(".popup-screen").hide();	
+	    });
+	    
 
 	    //ajax也關
 	    $('.ui-loader').hide();
@@ -138,7 +140,7 @@ $(function(){
 	
 	$(document).ajaxSend(function() {
 
-		// _debug("ajax send! count : " + ajax_count);
+		// cns.debug("ajax send! count : " + ajax_count);
 		// ajax_count++;
 		//顯示 loading
 		if(!load_show && !s_load_show) return false;
@@ -228,7 +230,7 @@ $(function(){
 		}
 
 		$.mobile.changePage($(document).data("page-history").last()[0], {transition: "slide",reverse: true});
-		//_debug("last:",$(document).data("page-history").last()[0]);
+		//cns.debug("last:",$(document).data("page-history").last()[0]);
 	});
 
 
@@ -259,8 +261,8 @@ $(function(){
 			var bottom_height = $(window).scrollTop() + $(window).height();
 			var last_height = last_show_event.offset().top + last_show_event.height() + 25;
 
-			// _debug("bottom_height:",bottom_height);
-			// _debug("last_height:",last_height);
+			// cns.debug("bottom_height:",bottom_height);
+			// cns.debug("last_height:",last_height);
 
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
 		    if(bottom_height && bottom_height >= last_height && !last_show_event.data("scroll-chk")){
@@ -356,7 +358,7 @@ $(function(){
 			var tmb_arr = [120,120,0.6];
 
 			createGroup(group_name,group_desc).complete(function(data){
-	        	_debug("create group data:",data);
+	        	cns.debug("create group data:",data);
 	        	if(data.status == 200){
 	        		var cg_result = $.parseJSON(data.responseText);
 
@@ -574,6 +576,24 @@ $(function(){
 		timelineListWrite();
 	});
 
+	//綁定點選公告事件
+	$(document).on("click",".st-top-event",function(){
+		var this_top_event = $(this);
+		var event_tp = $("#page-group-main").data("navi") || "00";
+    	var selector = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box");
+
+    	selector.each(function(){
+    		var this_event = $(this);
+    		cns.debug("ei:",this_event.data("event-id"));
+    		if(this_event.data("event-id") == this_top_event.data("data-obj").ei){
+    			cns.debug("this event data:",this_event.data());	
+    		}
+    	});
+		// cns.debug("this event:",$(this).data("data-obj"));
+
+		// cns.debug("event:",selector);
+	});
+
 	//主要filter
 	$(".st-filter-main").click(function(){
 		$(this).hide();
@@ -661,7 +681,7 @@ $(function(){
 
     	//檢查按讚了沒
 		var like_chk = chkEventStatus(this_event,"il");
-		// _debug("like_chk:",like_chk);
+		// cns.debug("like_chk:",like_chk);
 		//按讚 like_chk是true
 		if(like_chk){
 			$(this).html("收回讚");
@@ -964,8 +984,8 @@ $(function(){
 	        	//計算投票的回文人次
 	        	var count = 0;
 	        	
-	        	_debug("==================== 詳細內容 ================================");
-	            _debug(JSON.stringify(e_data,null,2));
+	        	cns.debug("==================== 詳細內容 ================================");
+	            cns.debug(JSON.stringify(e_data,null,2));
 	            
 	            //單一動態詳細內容 根據此則timeline類型 設定並開關區域
 	        	//event種類 不同 讀取不同layout
@@ -1060,6 +1080,11 @@ $(function(){
 
 		this_compose.data("send-chk",false);
 
+		//允許繼續點選送出
+		setTimeout(function(){
+			this_compose.data("send-chk",true);
+		},1500);
+ 			
 		this_compose.data("compose-content",$('.cp-textarea-desc').val());
 		this_compose.data("compose-title",$('.cp-textarea-title').val());
 
@@ -1317,6 +1342,7 @@ $(function(){
 	    	$(".main-contact-l-subarea-row").height("opx");
 	    }
 	});
+
 	//----------------------------------- chatroom ---------------------------------------------
 	$(".chatroom-addstate-top-btn").click(function(){
 		$(".chatroom-addstate-top-area").slideToggle();
@@ -1414,14 +1440,14 @@ $(function(){
 
 	$(document).on("click",".namecard",function(e){
 		e.stopPropagation();
-		_debug("hehe");
+		cns.debug("hehe");
 	});
 	
 	//$(document).on("timeupdate",".st-attach-audio audio",function(){
-	//	_debug(55555);
+	//	cns.debug(55555);
 	////this_box.find("audio").on('timeupdate', function() {
 	//	this_box = $(this).parent(".st-attach-audio");
-	//	_debug(this_box.find('input[type="range"]'));
+	//	cns.debug(this_box.find('input[type="range"]'));
 	//	this_box.find('input[type="range"]').val(($(this).get(0).currentTime / $(this).get(0).duration)*100);
 	//	this_box.find('input[type="range"]').css('background-image',
 	//            '-webkit-gradient(linear, left top, right top, '

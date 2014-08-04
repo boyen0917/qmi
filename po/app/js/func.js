@@ -1,14 +1,5 @@
 $(function(){  
 
-	_debug = function(arg1,arg2){
-		// return false;
-		if(arg2){
-			console.debug(arg1,arg2);
-		}else{
-			console.debug(arg1);
-		}
-	}
-
 	reLogin = function() {
 		document.location = "index.html";
 	}
@@ -200,31 +191,31 @@ $(function(){
 							                      si: o_obj.blob.size
 							                    }
 							                    ajaxDo(api_name,headers,method,true,body).complete(function(data){
-													_debug("commit後的 data:",data);
+													cns.debug("commit後的 data:",data);
 										        	//commit 成功
 										        	if(data.status == 200){
 										        		if(callback){
-										        			_debug("callback:",callback);
+										        			cns.debug("callback:",callback);
 										        			callback[0](callback[1]);
 										        		}
 										        	}else{
 										        		//commit 失敗 
-										        		_debug("commit 失敗");
+										        		cns.debug("commit 失敗");
 										        	}
 							                    });
 											}else{
-												_debug("小圖上傳 錯誤");
+												cns.debug("小圖上傳 錯誤");
 											}
 									}});
 								}else{
-									_debug("大圖上傳 錯誤");
+									cns.debug("大圖上傳 錯誤");
 								}
 						}});
 		            }
 		        }
 		        reader.readAsDataURL(file);
 			}else{
-				_debug("取得s3網址 錯誤");
+				cns.debug("取得s3網址 錯誤");
 			}
 		});
 	}
@@ -236,9 +227,9 @@ $(function(){
     	//設定圖片
     	if(set_img){
     		//調整圖片位置
-    		_debug("_groupList:",_groupList);
-    		_debug("target_gi:",target_gi);
-    		_debug("target_gu:",target_gu);
+    		cns.debug("_groupList:",_groupList);
+    		cns.debug("target_gi:",target_gi);
+    		cns.debug("target_gu:",target_gu);
     		if(_groupList[target_gi].guAll[target_gu].aut){
     			set_img.attr("src",_groupList[target_gi].guAll[target_gu].aut);
     			set_img.parent().find("img:eq(1)").attr("src",_groupList[target_gi].guAll[gu].auo);
@@ -376,7 +367,7 @@ $(function(){
         if(!$.lStorage(ui)[gi].guAll){
         	setGroupAllUser(data_arr);
         }else{
-        	_debug("data_arr:",data_arr);
+        	cns.debug("data_arr:",data_arr);
         	getUserName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
         }
 	}
@@ -398,14 +389,14 @@ $(function(){
 					}
 				});
 
+				//new top event
 				if(!chk){
-					_debug("new top event!!!!!!!!!");
 					topEvent();
 					return false;
 				}
 			});
 
-			_debug("end");
+			cns.debug("end");
 		});
 	}
 
@@ -455,11 +446,11 @@ $(function(){
 		//取得user name list
 		var _groupList = $.lStorage(ui);
 
-		// _debug("$.lStorage(ui):",$.lStorage(ui));
-		// _debug("_groupList[gi].guAll:",_groupList[gi].guAll);
+		// cns.debug("$.lStorage(ui):",$.lStorage(ui));
+		// cns.debug("_groupList[gi].guAll:",_groupList[gi].guAll);
 
 		topEventApi().complete(function(data){
-        	// _debug("topevent data:",data);
+        	// cns.debug("topevent data:",data);
 
         	if(data.status == 200){
 
@@ -526,64 +517,7 @@ $(function(){
         });
 	}
 
-	topEventMake = function(top_area,top_events_arr){
-
-		var top_msg_num = top_events_arr.length;
-		if(top_msg_num == 0){
-			return false;
-		}
-
-		//default 關閉
-		$(".st-top-event-default").hide();
-
-		//timeline 六種規格 設定
-		var tl_setting_obj = {
-			1:{
-				name:"公告",
-				src:"images/timeline/timeline_cover_icon_announcement.png",
-			},
-			default:{
-				name:"傻逼",
-				src:"images/pighead.png"	
-			}
-		};
-		$.each(top_events_arr,function(i,val){
-			var event_type = val.meta.tp.substring(1,2);
-			var this_top_obj = tl_setting_obj[event_type];
-			if(typeof this_top_obj == "undefined"){
-				this_top_obj = tl_setting_obj["default"]
-			}
-
-			top_area.find(".st-top-event-set").append($('<div class="st-top-event">').load('layout/layout.html .st-top-event-load',function(){
-				var this_top_event = $(this);
-				this_top_event.data("data-obj",val);
-				this_top_event.data("pos",i);
-				//圖片及類型
-				this_top_event.find(".st-top-event-l img").attr("src",this_top_obj.src);
-				this_top_event.find(".st-top-event-l div").html(this_top_obj.name);
-				//標題 內容
-				this_top_event.find(".st-top-event-r-ttl").html(val.meta.tt);
-				this_top_event.find(".st-top-event-r-content").html(val.ml[0].c);
-				// this_top_event.find(".st-top-event-r-content").html(
-				// 	"哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈"
-				// );
-				//用戶名稱 時間
-				//this_top_event.find(".st-top-event-r-footer span:eq(0)").html(gu_all[val.meta.gu].n);
-				setTopEventUserName(this_top_event,val.meta.gu);
-
-				var time = new Date(val.meta.ct);
-				var time_format = time.customFormat( "#MM#/#DD# #CD# #hhh#:#mm#" );
-				this_top_event.find(".st-top-event-r-footer span:eq(1)").html(time_format);
-
-				//最後一筆
-				if(i == (top_msg_num-1)){
-					setTimeout(function(){
-						topBarMake(top_area,top_msg_num);
-					},500);
-				}
-			}));
-		});
-	}
+	
 
 	//為了避免gu all還沒取得
 	setTopEventUserName = function(this_top_event,this_gu){
@@ -644,8 +578,8 @@ $(function(){
 		//起始位置
 		var selector_pos = (10-top_msg_num)/2*10;
 		var first_span = top_area.find(".st-top-bar-case span:eq(0)");
-		_debug("top_area:",top_area);
-		_debug("first_span:",first_span);
+		cns.debug("top_area:",top_area);
+		cns.debug("first_span:",first_span);
 		var start_left = first_span.offset().left;
 		var start_top = first_span.offset().top;
 		var movement = first_span.width();
@@ -679,13 +613,13 @@ $(function(){
 		top_area.find(".st-top-right-arrow").data("direction",true);
 
 		//先解綁
-		top_area.find(".st-top-left-arrow, .st-top-right-arrow, .st-top-arrow").unbind();
+		top_area.find(".st-top-left-arrow, .st-top-right-arrow, .st-top-arrow, st-top-event").unbind();
 		top_area.find(".st-top-event-block").hover(
 			function(){
-				top_area.find(".st-top-arrow div img").fadeIn("fast");
+				top_area.find(".st-top-arrow div img").stop().fadeIn("fast");
 			},
 			function(){
-				top_area.find(".st-top-arrow div img").fadeOut("fast");
+				top_area.find(".st-top-arrow div img").stop().fadeOut("fast");
 			}
 		);
 
@@ -876,8 +810,8 @@ $(function(){
 		this_event.find(".st-reply-all-content-area").html("");
 
 		$.each(e_data,function(el_i,el){
-			_debug("====================回覆============================================================================");
-			_debug(el);
+			cns.debug("====================回覆============================================================================");
+			cns.debug(el);
 
 			var without_message = false;
 			var reply_content;
@@ -889,8 +823,8 @@ $(function(){
 
 				$.each(el.ml,function(i,val){
 
-					_debug("========================");
-					_debug(JSON.stringify(val,null,2));
+					cns.debug("========================");
+					cns.debug(JSON.stringify(val,null,2));
 					
 					//event種類 不同 讀取不同layout
 					switch(val.tp){
@@ -973,7 +907,7 @@ $(function(){
 				//部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
 				if(without_message || el.meta.del || (el.meta.tp.substring(0,1)*1 == 0)){
 					this_load.hide();
-					_debug("this_load:",this_load);
+					cns.debug("this_load:",this_load);
 				}else{
 
 					//製作留言
@@ -1055,16 +989,16 @@ $(function(){
 		this_event.find(".st-reply-all-content-area").html("");
 
 		$.each(e_data,function(el_i,el){
-			_debug("====================回覆============================================================================");
-			_debug(el);
+			cns.debug("====================回覆============================================================================");
+			cns.debug(el);
 
 			var without_message = false;
 			var reply_content;
 			var ml_arr = [];
 			$.each(el.ml,function(i,val){
 
-				_debug("========================");
-				_debug(JSON.stringify(val,null,2));
+				cns.debug("========================");
+				cns.debug(JSON.stringify(val,null,2));
 				
 				//所有狀態的c 都做format?(url、entities)
 				if(val.c){
@@ -1280,7 +1214,7 @@ $(function(){
 		var _groupList = $.lStorage(ui);
 		//重置
 		this_event.find(".st-task-work-detail").html("");
-		_debug("new_li:",new_li);
+		cns.debug("new_li:",new_li);
 		$.each(new_li,function(i,val){
 			var this_work = $('<div class="st-work-option" data-item-index="' + val.k + '"><img src="images/common/icon/icon_check_round_white.png"><span>' + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' + _groupList[gi].guAll[val.u].n + '</span></div></div>');
 			this_event.find(".st-task-work-detail").append(this_work);
@@ -1441,8 +1375,8 @@ $(function(){
 		
 		var vote_obj = this_event.data("vote-result");
 		var all_ques = this_event.find(".st-vote-ques-area");
-		_debug("votevotevotevote");
-		_debug(JSON.stringify(vote_obj,null,2));
+		cns.debug("votevotevotevote");
+		cns.debug(JSON.stringify(vote_obj,null,2));
 
 		//設定投票人數
 	    this_event.find(".st-task-vote-detail-count span").html(Object.keys(vote_obj).length + "人已投票");
@@ -1500,15 +1434,15 @@ $(function(){
 	bindVoteEvent = function (this_event){
 		
 		this_event.find(".st-vote-ques-area-div").click(function(){
-			_debug("按到題目了:",$(this));
+			cns.debug("按到題目了:",$(this));
 
 		});		
 
 		this_event.find(".st-vote-detail-option").click(function(){
-			_debug("進來");
+			cns.debug("進來");
 			//時間到 不給點
 			if(this_event.data("task-over")){
-				_debug("時間到");
+				cns.debug("時間到");
 				return false;
 			}
 
@@ -1524,7 +1458,7 @@ $(function(){
 				//該選項的總計數
 				var opt_cnt = this_opt.find("span:eq(1)").html()*1;
 
-				_debug("復選");
+				cns.debug("復選");
 				//復選的情況就要判斷該選項是否已選擇
 				if(this_opt.data("vote-chk")){
 					this_opt.data("vote-chk",false);
@@ -1554,11 +1488,11 @@ $(function(){
 
 			//單選
 			}else{
-				_debug("單選");
+				cns.debug("單選");
 				//找出點選的那一項要減一
 				$.each(this_ques.find(".st-vote-detail-option"),function(i,val){
 					if($(this).data("vote-chk")){
-						_debug("here");
+						cns.debug("here");
 						//找出點選的那一項的vote-chk 變false
 						$(this).data("vote-chk",false);
 						//找出點選的那一項 變成白圈圈
@@ -1791,13 +1725,14 @@ $(function(){
 			//url parse
 			this_compose.find('.cp-textarea-desc').bind('input',function(){
 				//有東西就不作了
-				if(this_compose.find(".cp-ta-yql").is(":visible")) return false;
+				if(this_compose.data("url-chk")) return false;
 
 				//先將換行符號換成<br/>加空格 再以空格切出陣列
 				var url_chk = this_compose.find('.cp-textarea-desc').val().replace(/\n|\r/g," <br/> ").split(' ');
 				
 				$.each(url_chk,function(i,val){
 					if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
+						// this_compose.data("url-chk",true);
 						if(val.match(/youtube.com|youtu.be/)){
 							getLinkYoutube(this_compose,val);
 						}else{
@@ -1917,13 +1852,13 @@ $(function(){
 	    	$(document).on("click",".obj-cell",function(){
 	    		var this_cell = $(this);
 	    		var selected_obj = $(".obj-content").data("selected-obj");
-	    		_debug("selected_obj:",selected_obj);
+	    		cns.debug("selected_obj:",selected_obj);
 				//清空選擇區域先
 				$(".obj-selected div:eq(1)").html("");
 
 				//工作是單選
 				if(this_compose_obj.parent().hasClass("cp-work-item")){
-					_debug("work");
+					cns.debug("work");
 					//全部清除
 					$(document).find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
 					$(document).find(".obj-cell-chk").data("chk",false);
@@ -2285,7 +2220,7 @@ $(function(){
 
 				var opt_total = this_ques.data("opt-total");
 
-				_debug("opt total:",this_ques.data("opt-total"));
+				cns.debug("opt total:",this_ques.data("opt-total"));
 
 				opt_total += 1;
 				//存回
@@ -2504,13 +2439,13 @@ $(function(){
 */
 
 	composeSend = function (this_compose){
-
+		
 		var ctp = this_compose.data("compose-tp");
 		var compose_content = this_compose.data("compose-content");
-		var ml = this_compose.data("message-list");
+		var ml = this_compose.data("message-list").unique();
 
 		//發佈上傳檢查
-		var timer_chk = false;
+		var upload_chk = false;
 		var body = {
 				meta : {
 					lv : 1,
@@ -2681,7 +2616,7 @@ $(function(){
 			popupShowAdjust("",empty_msg,true);
 			return false;
 		}
-		// _debug("obj:",JSON.stringify(gul_arr,null,2));
+		// cns.debug("obj:",JSON.stringify(gul_arr,null,2));
 		 // return false;
 		//網址
 
@@ -2762,7 +2697,7 @@ $(function(){
 					var imageType = /image.*/;
 
 					//發佈上傳檢查
-					timer_chk = true;
+					upload_chk = true;
 					var total = Object.keys(this_compose.data("upload-obj")).length;
 
 					var cnt = 0
@@ -2775,7 +2710,7 @@ $(function(){
 			        s_load_show = true;
 
 					//先做permission id 
-					_debug("object str:",this_compose.data("object_str"));
+					cns.debug("object str:",this_compose.data("object_str"));
 					// var object_obj = $.parseJSON(this_compose.data("object_str"));
 					if(this_compose.data("object_str")){
 						$.each(this_compose.data("upload-obj"),function(i,file){
@@ -2798,23 +2733,20 @@ $(function(){
 					break;
 			}
 
-
 			//會有順序問題 因為ios只會照ml順序排 所以必須設定順序
 			if(is_push) body.ml.push(obj);
 		});
 
-		// _debug("body:",JSON.stringify(body,null,2));
+		// cns.debug("body:",JSON.stringify(body,null,2));
 		// return false;
 
-		//等待上傳完畢 最多10秒
-		if(!timer_chk){
+		//
+		if(!upload_chk){
 			composeSendApi(body);
 		}
 		
-		_debug("good job",body);
+		cns.debug("good job",body);
 		// return false;
-		
-
 	}
 
 	composeSendApi = function(body){
@@ -2860,7 +2792,7 @@ $(function(){
 		//設定是否顯示 loading 圖示
 		load_show = load_show_chk;
 		
-	    //_debug(api_url);
+	    //cns.debug(api_url);
 	    var api_url = base_url + api_name;
 	    var myRand = Math.floor((Math.random()*1000)+1);
 
@@ -2887,9 +2819,9 @@ $(function(){
 					gl = g_val;
 				}
 			});
-			_debug("gl !:",gl);
+			cns.debug("gl !:",gl);
 		}else{
-			_debug("gl:",gl);	
+			cns.debug("gl:",gl);	
 		}
 
 		gi = new_gi;
@@ -2953,7 +2885,7 @@ $(function(){
 	    	var icon_host = "<img src='images/sidemenu/icon_host.png'/>";
 
 			var total = group_list.length;
-			_debug("group list:",group_list);
+			cns.debug("group list:",group_list);
 	        $.each(group_list,function(i,val){
 
 	        	//記錄新增團體的資訊 用以跳轉
@@ -3122,9 +3054,11 @@ $(function(){
     		}
     	}
 
-		//開啟timeline loading 關閉沒資料圖示
-		$(".st-feedbox-area-bottom > img").show();
-		$(".st-feedbox-area-bottom > div").hide();
+		//開啟timeline loading 關閉沒資料圖示 上拉更新除外
+		if(!top_selector){
+			$(".st-feedbox-area-bottom > img").show();
+			$(".st-feedbox-area-bottom > div").hide();
+		}
 				
 	    //製作timeline
 	    var api_name = "groups/"+ gi +"/timelines/"+ ti_feed +"/events";
@@ -3142,7 +3076,7 @@ $(function(){
 	    result.complete(function(data){
 	    	if(data.status != 200) return false;
 	    	var timeline_list = $.parseJSON(data.responseText).el;
-
+	    	
 	    	//判斷是否為下拉更新
         	// var selector = $('.st-feedbox-area');
         	var close_chk = false;
@@ -3192,7 +3126,7 @@ $(function(){
 	        		}
 	        	}
 
-	        	_debug(JSON.stringify(val, null, 2));
+	        	cns.debug(JSON.stringify(val, null, 2));
 
 	        	//刪除event
 	        	if(val.meta.del) return;
@@ -3682,8 +3616,8 @@ $(function(){
 	}
 
 	timelineGalleryMake = function (this_event,gallery_arr){
-		// _debug(this_event.data("event-id")+"  "+"gallery:",gallery_arr);
-		// _debug("gallery length:",gallery_arr.length);
+		// cns.debug(this_event.data("event-id")+"  "+"gallery:",gallery_arr);
+		// cns.debug("gallery length:",gallery_arr.length);
 
 		var this_gallery = this_event.find(".st-attach-img");
 		//記錄圖片張數 以計算位移
@@ -3702,10 +3636,9 @@ $(function(){
 	            '</div>' +
 	            '<span class="st-img-gap"></span>'
 			);
-			this_event.find(".st-attach-img-area").prepend(this_img);
+			this_event.find(".st-attach-img-area .st-img-gap-last").before(this_img);
 
 			getS3file(val,this_img,6);
-	            
 		});
 
 		//gallery 移動事件
@@ -3806,7 +3739,7 @@ $(function(){
 	getS3file = function(file_obj,target,tp,size){
 		//default
 		size = size || 350;
-		_debug("size:",size);
+		cns.debug("size:",size);
 		var api_name = "groups/" + gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + ti_feed;
         var headers = {
                  "ui":ui,
@@ -3814,13 +3747,13 @@ $(function(){
                  "li":lang,
                      };
         var method = "get";
-
         var result = ajaxDo(api_name,headers,method,true);
 		result.complete(function(data){
 			if(data.status != 200) return false;
 
 			var obj =$.parseJSON(data.responseText);
-
+			obj.api_name = api_name;
+			cns.debug("get s3 obj:",obj);
 			if(target && tp){
 				switch(tp){
 					case 6://圖片
@@ -3922,7 +3855,7 @@ $(function(){
           si: si,
           md: md
         }
-        _debug("commit body:",body);
+        cns.debug("commit body:",body);
         return ajaxDo(api_name,headers,method,false,body);
 	}
 
@@ -3967,8 +3900,8 @@ $(function(){
                 var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
                 var t_obj = imgResizeByCanvas(this,0,0,480,480,0.6);
 
-                _debug("o_obj:",o_obj);
-                _debug("t_obj:",t_obj);
+                cns.debug("o_obj:",o_obj);
+                cns.debug("t_obj:",t_obj);
                 //compose tp to upload file tp
 				getS3UploadUrl(ti_feed,1,permission_id).complete(function(data){
 					var s3url_result = $.parseJSON(data.responseText);
@@ -4130,116 +4063,105 @@ $(function(){
 	}
 	//parse 網址
 	getLinkMeta = function (this_compose,url) {
-
+		cns.debug("getLinkMeta");
 		// clearTimeout(activityTimeout);
 		// activityTimeout = setTimeout(function(){
 
-			var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
-			_debug("url:",q);
-			$.ajax({
-		        type: 'GET',
-		        url: q, 
-		        dataType: 'jsonp',
-		        success: function(data, textStatus) {
-		            var result = {};
-		            var tmp_img,tmp_desc;
-		            _debug("data:",data)
+		var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
+		cns.debug("url:",q);
+		$.ajax({
+	        type: 'GET',
+	        url: q, 
+	        dataType: 'jsonp',
+	        success: function(data, textStatus) {
+	            var result = {};
+	            var tmp_img,tmp_desc;
+	            cns.debug("data:",data)
 
-		            //error存在 就跳出
-		            if(data.error) return false;
-		            //預設標題
-		            if(data.query.results && data.query.results.title){
-		            	result.title = data.query.results.title;
-		            }
-		            _debug("data:",data.query);
-		            //從meta取網址標題 大綱和圖片
-		            if(data.query.results && data.query.results.meta){
-		            	_debug("meta:",data.query.results.meta);
-		            	$.each(data.query.results.meta, function(key, val){
-		                    if (val.property) {
+	            //error存在 就跳出
+	            if(data.error) return false;
+	            //預設標題
+	            if(data.query.results && data.query.results.title){
+	            	result.title = data.query.results.title;
+	            }
+	            cns.debug("data:",data.query);
+	            //從meta取網址標題 大綱和圖片
+	            if(data.query.results && data.query.results.meta){
+	            	cns.debug("meta:",data.query.results.meta);
+	            	$.each(data.query.results.meta, function(key, val){
+	                    if (val.property) {
 
-		                    	// title
-		                    	if (val.property.match(/og:title/i)) {
-		                            result.title = val.content;
-		                        }
-		                    	
-		                        // description
-		                        if (val.property.match(/og:description/i)) {
-		                            result.description = val.content;
-		                        }
-
-		                        // img
-		                        if (val.property.match(/og:image/i)) {
-		                            result.img = val.content;
-		                        }
-
-		                        // 取圖片
-		                        // if ((val.content.substring(0, 7) == 'http://'||val.content.substring(0, 2) == '//') && val.content.match(/\.jpg|\.png/)) {
-		                        //     if (val.content != 'undefined') {
-		                        //     	if(val.content.substring(0, 2) == '//'){
-		                        //     		val.content = "http://" + val.content.substring(2);
-		                        //     	}
-		                        //     	result.img = val.content;
-		                        //     }
-		                        // }
-		                    }
-
-		                    if (val.name && val.name.match(/description/i)) {
-	                            tmp_desc = val.content;
+	                    	// title
+	                    	if (val.property.match(/og:title/i)) {
+	                            result.title = val.content;
 	                        }
-		                });
-		            }
-			            
+	                    	
+	                        // description
+	                        if (val.property.match(/og:description/i)) {
+	                            result.description = val.content;
+	                        }
 
-					if (!result.description) {
-                        result.description = result.title;
-                    }
+	                        // img
+	                        if (val.property.match(/og:image/i)) {
+	                            result.img = val.content;
+	                        }
 
-		            //如果meta圖片存在 並檢查是否圖太小 太小或沒圖的話就從網頁裡的img tag裡面隨便找一張
-					if(!result.img){
-						//預設圖片 隨便找一張img tag
-			            if(data.query.results && data.query.results.img){
-		            		$.each(data.query.results.img,function(i,val){
-		                        if (val.src && val.src.match(/\.jpg|\.png/)) {
-		                        	var temp_img = val.src;
-		                        	if(val.src.substring(0, 4) != 'http'){
-		                        		temp_img = url + temp_img;
-		                        	}
-		                        	result.img = temp_img;
-		                        	return false;
-		       //                      var img = new Image();
-									// img.onload = function() {
-									// 	if((this.width*this.height) > 10000){
-									// 		_debug(val.src);
-									// 		result.img = val.src;
-									// 		$(".cp-yql-img").html("<img src='" + result.img + "'/>"); 
-									// 		//return false; 
-									// 	}
-									// }
-									// img.src = val.src;
+	                        // 取圖片
+	                        // if ((val.content.substring(0, 7) == 'http://'||val.content.substring(0, 2) == '//') && val.content.match(/\.jpg|\.png/)) {
+	                        //     if (val.content != 'undefined') {
+	                        //     	if(val.content.substring(0, 2) == '//'){
+	                        //     		val.content = "http://" + val.content.substring(2);
+	                        //     	}
+	                        //     	result.img = val.content;
+	                        //     }
+	                        // }
+	                    }
 
-		                        }
-		                    });
-		            	}
-					}
+	                    if (val.name && val.name.match(/description/i)) {
+                            tmp_desc = val.content;
+                        }
+	                });
+	            }
+		            
 
-	            	if(result.title){
-	            		_debug("url:",result);
-	        			$(".cp-attach-area").show();
-						$(".cp-yql-title").html(result.title);
-						$(".cp-yql-desc").html(result.description.substring(0,200));
-						if(result.img) $(".cp-yql-img").html("<img src='" + result.img + "'/>");  
-						$(".cp-ta-yql").fadeIn();
+				if (!result.description) {
+                    result.description = result.title;
+                }
 
-					}
+	            //如果meta圖片存在 並檢查是否圖太小 太小或沒圖的話就從網頁裡的img tag裡面隨便找一張
+				if(!result.img){
+					//預設圖片 隨便找一張img tag
+		            if(data.query.results && data.query.results.img){
+	            		$.each(data.query.results.img,function(i,val){
+	                        if (val.src && val.src.match(/\.jpg|\.png/)) {
+	                        	var temp_img = val.src;
+	                        	if(val.src.substring(0, 4) != 'http'){
+	                        		temp_img = url + temp_img;
+	                        	}
+	                        	result.img = temp_img;
+	                        	return false;
 
-	            	this_compose.data("message-list").push(1);
+	                        }
+	                    });
+	            	}
+				}
 
-	            	result.url = url;
-	            	this_compose.data("url-content",result);
-	    	    }
-	    	});
-		// });
+            	if(result.title){
+            		cns.debug("url:",result);
+        			$(".cp-attach-area").show();
+					$(".cp-yql-title").html(result.title);
+					$(".cp-yql-desc").html(result.description.substring(0,200));
+					if(result.img) $(".cp-yql-img").html("<img src='" + result.img + "'/>");  
+					$(".cp-ta-yql").fadeIn();
+
+				}
+
+            	this_compose.data("message-list").push(1);
+
+            	result.url = url;
+            	this_compose.data("url-content",result);
+    	    }
+    	});
 	}
 
 	getYoutubeCode = function(url){
@@ -4265,7 +4187,7 @@ $(function(){
 	//parse Youtube
 	getLinkYoutube = function (this_compose,url) {
 		if(activityTimeout) clearTimeout(activityTimeout);
-		_debug("url:",url);
+		cns.debug("url:",url);
 		var activityTimeout = setTimeout(function(){
 				$(".cp-yql-img").html("");
 			  	var result={};
@@ -4277,7 +4199,7 @@ $(function(){
 			            url: "http://gdata.youtube.com/feeds/api/videos/" + youtube_code + "?v=2&prettyprint=true&alt=jsonc",
 			            complete: function(data){
 			            	var result = $.parseJSON(data.responseText);
-			                _debug(result);
+			                cns.debug(result);
 			                $(".cp-attach-area").show();
 							$(".cp-yql-title").html(result.data.title);
 							$(".cp-yql-desc").html(result.data.description);
@@ -4303,61 +4225,6 @@ $(function(){
 
 		},1000);
 	}
-
-
-	// getLinkYoutube = function (this_compose,url) {
-	// 	if(activityTimeout) clearTimeout(activityTimeout);
-	// 	_debug("url:",url);
-	// 	var activityTimeout = setTimeout(function(){
-	// 			$(".cp-yql-img").html("");
-	// 		  	var strpos,result={};
-	// 		  	if(url.match(/\?v=/)){
-	// 		  		if(url.match(/youtube.com/)){
-	// 					strpos = url.indexOf("?v=")+3;
-	// 				}else{
-	// 					strpos = url.indexOf("youtu.be")+9;
-	// 				}
-	// 				var youtube_code = url.substring(strpos,strpos+11);
-	// 				_debug(youtube_code);
-	// 				if(youtube_code.length < 11 || youtube_code.match(/\&/)){
-	// 					post_tmp_url = '';
-	// 					$(".cp-ta-yql").hide();
-	// 					getLinkMeta(url);
-	// 					return false;
-	// 				}else{
-	// 					_debug(youtube_code.length);
-	// 				}
-					
-	// 				load_show = false;
-	// 				$.ajax ({
-	// 		            url: "http://gdata.youtube.com/feeds/api/videos/" + youtube_code + "?v=2&prettyprint=true&alt=jsonc",
-	// 		            complete: function(data){
-	// 		            	var result = $.parseJSON(data.responseText);
-	// 		                _debug(result);
-	// 		                $(".cp-attach-area").show();
-	// 						$(".cp-yql-title").html(result.data.title);
-	// 						$(".cp-yql-desc").html(result.data.description);
-	// 						$(".cp-yql-img").html("<img src='" + result.data.thumbnail.hqDefault + "'/>");
-	// 						$(".cp-ta-yql").fadeIn();
-
-	// 						var url_content = {
-	// 							c: url,
-	// 							t: result.data.title,
-	// 							d: result.data.description,
-	// 							i: result.data.thumbnail.hqDefault,
-	// 							v: ""
-	// 						}
-	// 						this_compose.data("url-content",url_content);
-	// 						this_compose.data("message-list").push(2);
-	// 		            }   
-	// 		        });  
-	// 		  	}else{
-	// 		  		post_tmp_url = '';
-	// 		  		$(".cp-ta-yql").hide();
-	// 		  		getLinkMeta(this_compose,url);
-	// 		  	}
-	// 	},1000);
-	// }
 
 
 	replySend = function(this_event){
@@ -4435,12 +4302,12 @@ $(function(){
 
 	//對話框設定
 	popupShowAdjust = function (title,desc,confirm,cancel,callback){
-		// _debug("========彈跳視窗========");
-		// _debug("title:",title);
-		// _debug("desc:",desc);
-		// _debug("confirm:",confirm);
-		// _debug("cancel:",cancel);
-		// _debug("=======================");
+		// cns.debug("========彈跳視窗========");
+		// cns.debug("title:",title);
+		// cns.debug("desc:",desc);
+		// cns.debug("confirm:",confirm);
+		// cns.debug("cancel:",cancel);
+		// cns.debug("=======================");
 
 		$("body").addClass("screen-lock");
 
@@ -4660,7 +4527,7 @@ $(function(){
 		if(data.responseText){
 			return $.parseJSON(data.responseText).rsp_msg;
 		}else{
-			_debug("errorResponse:",data);
+			cns.debug("errorResponse:",data);
 			return "網路連線不穩 請稍後再試";
 		}
 	}

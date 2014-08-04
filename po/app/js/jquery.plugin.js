@@ -2,8 +2,6 @@
 
 
     $.fn.htmlEntities = function(str) {
-    	
-
     	var encodeHtmlEntity = function(str) {
     		var escape_list = {"10":"\n"};
 		  	var buf = [];
@@ -85,4 +83,8 @@
 	Array.prototype.last = function(){
         return this[this.length - 1];
     };
+
+    Array.prototype.unique = function(a){
+		return function(){ return this.filter(a) }
+    }(function(a,b,c){ return c.indexOf(a,b+1) < 0 });
 })(jQuery);

@@ -1272,6 +1272,7 @@ img.auo {
 	padding: 12px 0;
 	color: white;
 	width: 100%;
+	cursor: pointer;
 }
 
 .st-top-event-default {
@@ -1288,7 +1289,7 @@ img.auo {
 .st-top-left-arrow, .st-top-right-arrow {
 	position: absolute;
 	z-index: 10;
-	width: 50%;
+	width: 25%;
 	height: 123px;
 	cursor: pointer;
 	opacity: 0.5;
@@ -1380,7 +1381,10 @@ img.auo {
 
 .st-top-event-r-ttl {
     font-size:20px;
-    margin-bottom:5px;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	height: 30px;
 }
 
 .st-top-event-r-content {
@@ -1402,6 +1406,15 @@ img.auo {
 	margin-top:5px;
 	font-size: 15px;
 	color: #d0d0d0;
+	display: -webkit-box;
+}
+
+.st-top-event-r-footer span:nth-child(1) {
+	max-width: 80px;
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .st-top-event-r-footer span:nth-child(3){
@@ -2106,7 +2119,6 @@ img.auo {
     height:150px;	
 }
 
-
 .st-attach-sticker {
 	text-align: left;
 }
@@ -2114,7 +2126,6 @@ img.auo {
 .st-attach-sticker img {
 	width: 150px;
 }
-
 
 .st-attach-img {
 	height: 300px;
@@ -2342,6 +2353,7 @@ img.auo {
 	margin: 2px 0;
 	min-height: 20px;
 	word-break:break-all;
+	padding-right: 5px;
 }
 
 .st-reply-footer {

@@ -39,99 +39,37 @@ span {
     <script>
       $(function(){
 
-        var ou = "https://mapserver.mitake.com.tw/Project-o/users/U00039hX02C/avatars/daf6e318-db35-4b5b-8885-52331d56592b_o?Expires=1721634079&AWSAccessKeyId=WUYE89N1MLU9S8CZ58EE&Signature=cEKyp9hD8Ou7ZaFF3RKA51lpM%2F0%3D";
+        var openRequest = indexedDB.open("test2",1);
+        var db;
 
+        openRequest.onupgradeneeded = function(e) {
+            console.log("Upgrading...");
 
-        $("button").click(function(){
-          var file = $("input")[0].files[0];
+            db = e.target.result;
 
-
-              var reader = new FileReader();
-              reader.onloadend = function() {
-                  var tempImg = new Image();
-                  tempImg.src = reader.result;
-                  tempImg.onload = function() {
-                      
-                    //大小圖都要縮圖
-                    var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
-                    var t_obj = imgResizeByCanvas(this,0,0,120,120,0.6);
-                      $("img").attr("src",o_obj.url);
-                  };
-              }
-            reader.readAsDataURL(file);
-        });
-          
-
-        imgResizeByCanvas = function(img){
-          var MAX_WIDTH = 500;
-          var MAX_HEIGHT = 500;
-          var tempW = img.width;
-          var tempH = img.height;
-          if (tempW > tempH) {
-            if (tempW > MAX_WIDTH) {
-              tempH *= MAX_WIDTH / tempW;
-              tempW = MAX_WIDTH;
+            if(!db.objectStoreNames.contains("firstOS")) {
+                 db.createObjectStore("firstOS");
             }
-          } else {
-            if (tempH > MAX_HEIGHT) {
-              tempW *= MAX_HEIGHT / tempH;
-              tempH = MAX_HEIGHT;
-            }
-          }
 
-          var canvas = document.createElement('canvas');
-          canvas.width = tempW;
-          canvas.height = tempH;
-          var ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, tempW, tempH);
-          var dataURL = canvas.toDataURL("image/jpeg",0.5);
-
-          var img_obj = {
-            w: tempW,
-            h: tempH,
-            blob: dataURItoBlob(dataURL),
-            url:dataURL
-          }
-          return img_obj;
+            // var t = db.transaction(["firstOS"],"readwrite");
+        }
+         
+        openRequest.onsuccess = function(e) {
+            console.log("Success!");
+            db = e.target.result;
+            
+        }
+         
+        openRequest.onerror = function(e) {
+            console.log("Error");
+            console.dir(e);
         }
 
-        dataURItoBlob = function(dataURI) {
-          var binary = atob(dataURI.split(',')[1]);
-          var array = [];
-          for(var i = 0; i < binary.length; i++) {
-              array.push(binary.charCodeAt(i));
-          }
-          return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
-        }
-        
+
+
+
+
       });
-    //先確定瀏覽器是否支援indexedDB
-    // var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
-    // var accountData = [
-    //     { title: "Food", price: "500", date:"2012/07/29", notes:"朋友聚餐吃太好..."},
-    //     { title: "Transportation", price: "30", date:"2012/7/20"}
-    // ];
-     
-    // var request = indexedDB.open("accountDB", 1);  
-    // request.onsuccess = function (evt) {
-    //     // 將db暫存起來供以後操作
-    //     db = request.result;                                                            
-    // };
-     
-    // request.onerror = function (evt) {
-    //     console.log("IndexedDB error: " + evt.target.errorCode);
-    // };
-     
-    // request.onupgradeneeded = function (evt) {                   
-    //     var objectStore = evt.currentTarget.result.createObjectStore("account", { keyPath: "id", autoIncrement: true });
-     
-    //     objectStore.createIndex("title", "title", { unique: false });
-    //     objectStore.createIndex("price", "price", { unique: false });
-    //     objectStore.createIndex("date", "date", { unique: false });
-     
-    //     accountData.forEach(objectStore.add);
-    // };
-
 
 
     </script>
