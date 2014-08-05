@@ -873,12 +873,6 @@ $(function(){
 
     //對話框設定
 	popupShowAdjust = function (title,desc,confirm,cancel){
-		console.debug("========彈跳視窗========");
-		console.debug("title:",title);
-		console.debug("desc:",desc);
-		console.debug("confirm:",confirm);
-		console.debug("cancel:",cancel);
-		console.debug("=======================");
 
 		//default
 		$(".popup-confirm").html("確認");
