@@ -1,85 +1,17 @@
 $(function(){
-
-	$.ajaxSetup ({
-		timeout: 15000,
-	    // Disable caching of AJAX responses
-	    cache: false
-	});
+	//預設上一頁
+	$(document).data("page-history",[["#page-registration"]]);
 	
-	$(document).ajaxSend(function() {
-
-		// console.log("ajax send! count : " + ajax_count);
-		// ajax_count++;
-		//顯示 loading
-		if(!load_show && !s_load_show) return false;
-	    if(!$('.ui-loader').is(":visible"))
-		$('.ui-loader').css("display","block");
-		$(".ajax-screen-lock").show();
-	});
-	$(document).ajaxComplete(function(data) {
-		//特別的
-		if(s_load_show) return false;
-
-		$('.ui-loader').hide();
-		$(".ajax-screen-lock").hide();
-		// $(document).trigger("click");
-	});
 	
-	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
-
-		$('.ui-loader').hide();
-		$(".ajax-screen-lock").hide();
-		
-
-		//ajax逾時
-		if(jqxhr.statusText == "timeout"){
-			console.debug("error timeout");
-			popupShowAdjust("","網路不穩 請稍後再試",true);
-			return false;
-		}
-		console.debug("error jqxhr:",jqxhr);
-		//logout~暫時不做
-
-		// popupShowAdjust("",$.parseJSON(jqxhr.responseText).rsp_msg,true);
-		popupShowAdjust("",errorResponse(jqxhr),true);
-
-	});
-
+	//首頁大圖
 	$("#page-registration").css("height",$(window).height());
 	$(window).resize(function(){ 
 		$("#page-registration").css("height",$(window).height());
 	});
 
-	//上一頁功能
-	$(document).data("page-history",[["#page-registration"]]);
-	$(document).on("pagebeforeshow",function(event,ui){
-		var hash = window.location.hash;
-
-		//部分跳頁及上一頁按鈕不需要記錄歷程
-		if(back_exception){
-			back_exception = false;
-			return false;
-		}
-
-		var page_title = $(hash + " .page-title").html();
-		var page_arr = [hash,page_title];
-
-		$(document).data("page-history").push(page_arr);
-	});
-	
-	$(".page-back").click(function(){
-		//按上一頁不需要記錄歷程
-		back_exception = true;
-		var t= $(document).data("page-history");
-
-		$(document).data("page-history").pop();
-		$.mobile.changePage($(document).data("page-history").last()[0], {transition: "slide",reverse: true});
-		//console.debug("last:",$(document).data("page-history").last()[0]);
-	});
-
 	$(".login").click(function(){
 		//若local storage 有記錄密碼 就顯示
-		console.debug("remeber:",$.lStorage("_loginRemeber"));
+		cns.debug("remeber:",$.lStorage("_loginRemeber"));
 		if($.lStorage("_loginRemeber")){
 
 			//順便幫他打個勾
@@ -206,7 +138,7 @@ $(function(){
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
         	var login_result = $.parseJSON(data.responseText);
-        	// console.debug("login resutl:",JSON.stringify(login_result));
+        	// cns.debug("login resutl:",JSON.stringify(login_result));
         	// return false;
         	if(data.status == 200){
 
@@ -290,9 +222,9 @@ $(function(){
 
 	$(".register-next").click(function(){
 		if($(this).hasClass("register-next-ready")){
-			console.debug("傳送驗證碼 還沒按確定");
+			cns.debug("傳送驗證碼 還沒按確定");
 			var desc = "我們將傳送驗證碼簡訊至此手機<br/>號碼 : ( " + countrycode + " ) " + $(".register-phone input").val().substring(1);
-			popupShowAdjust("確認手機號碼",desc,"func+registration",true);
+			popupShowAdjust("確認手機號碼",desc,true,true,[registration]);
 		}else{
 			return false;
 		}
@@ -428,11 +360,11 @@ $(function(){
 
 
     $(document).on("click",".setting-next-ready",function(){
-    	// console.debug("document data:",$(document).data());
-    	// $(document).data("ui","U00039hX02C");
-    	// $(document).data("at","6031f2f2-9dc4-424f-a430-8ed6746674b9");
+    	// cns.debug("document data:",$(document).data());
+    	// $(document).data("ui","U0000tXY08o");
+    	// $(document).data("at","6a174db2-420b-4bda-97ce-6069d88f2926");
     	// $(document).data("phone-id","+886980922917");
-    	// $(document).data("device-token","web-5566");
+    	// $(document).data("device-token","web-test");
 
     	//有上傳圖檔 圖檔上傳完畢之後再做註冊步驟3
     	if(!$(".avatar-area img").hasClass("avatar-default")){
@@ -442,8 +374,14 @@ $(function(){
 	    	var last_name = $(".setting-last-name input").val();
 	    	var birth = $(".setting-birth-hidden").val()*1000;
 
-	    	activateStep3(first_name,last_name,birth);
+	    	//姓名暫時先顛倒
+	    	activateStep3(last_name,first_name,birth);
     	}
+    });
+
+    //test
+    $(".login-forget-pw").click(function(){
+    	// popupShowAdjust("","註冊完成",true,false,[toGroupMenu]);
     });
 
 
@@ -470,12 +408,13 @@ $(function(){
                 tp: 0,
                 ud: $(document).data("device-token")
             }
-        console.debug("registration() 傳送驗證碼前的 body:",JSON.stringify(body,null,2));
+        cns.debug("registration() 傳送驗證碼前的 body:",JSON.stringify(body,null,2));
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
-        	console.debug("傳送驗證碼後的 data:",data);
+        	cns.debug("傳送驗證碼後的 data:",data);
         	if(resend){
-        		popupShowAdjust("","驗證碼已重新送出");
+        		//popupShowAdjust("","驗證碼已重新送出");
+        		toastShow("驗證碼已重新送出");
         		
 			}else if(data.status == 200){
 				$(".register-otp-desc-area div").html($(document).data("phone-id"));
@@ -498,13 +437,13 @@ $(function(){
                 vc: $(".register-otp-input input").val(),
                 ud: $(document).data("device-token")
             }
-        console.debug("activateStep1() 驗證 驗證碼前的 body:",JSON.stringify(body,null,2));
+        cns.debug("activateStep1() 驗證 驗證碼前的 body:",JSON.stringify(body,null,2));
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
-        	console.debug("驗證 驗證碼後的 data:",data);
+        	cns.debug("驗證 驗證碼後的 data:",data);
         	if(data.status == 200){
-        		console.debug("跳到 #page-password");
-        		popupShowAdjust("",$.parseJSON(data.responseText).rsp_msg,"hash+#page-password");
+        		cns.debug("跳到 #page-password");//"hash+#page-password"
+        		popupShowAdjust("",$.parseJSON(data.responseText).rsp_msg,true,false,[changePageAfterPopUp,"#page-password"]);
         	}else{
         		$(".register-otp-input input").val("");
         		$(".register-otp-input input").trigger("input");
@@ -528,24 +467,25 @@ $(function(){
                 ud: $(document).data("device-token"),
                 pw: toSha1Encode($(document).data("password"))
             }
-        console.debug("activateStep2() 變更密碼前的 body:",JSON.stringify(body,null,2));
+        cns.debug("activateStep2() 變更密碼前的 body:",JSON.stringify(body,null,2));
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
-        	console.debug("變更密碼後的 data:",data);
+        	cns.debug("變更密碼後的 data:",data);
         	if(data.status == 200){
         		var data = $.parseJSON(data.responseText);
         		//default
         		$(document).data("ui",data.ui);
         		$(document).data("at",data.at);
-        		console.debug("變更密碼後的 ui:",$(document).data("ui"));
-        		console.debug("變更密碼後的 at:",$(document).data("at"));
+        		cns.debug("變更密碼後的 ui:",$(document).data("ui"));
+        		cns.debug("變更密碼後的 at:",$(document).data("at"));
         		$(".avatar-area img").addClass("avatar-default");
-        		popupShowAdjust("",data.rsp_msg,"hash+#page-user-setting");
+        		// popupShowAdjust("",data.rsp_msg,"hash+#page-user-setting");
+        		popupShowAdjust("",data.rsp_msg,true,false,[changePageAfterPopUp,"#page-user-setting"]);
         	}else{
         		$(".password-setting").val("");
         		$(".password-confirm").val("");
         		$(".register-otp-input input").trigger("input");
-        		popupShowAdjust("",errorResponse(data),true);
+        		//popupShowAdjust("",errorResponse(data),true);
         	}
         });
 	}
@@ -566,12 +506,13 @@ $(function(){
                 ln: last_name,
                 bd: birth
             }
+        cns.debug("step3 body:",body);
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
         	//loading icon off
 			s_load_show = false;
 			$('.ui-loader').hide();
-        	console.debug("資料設定後的 data:",data);
+        	cns.debug("資料設定後的 data:",data);
         	if(data.status == 200){
         		//登入成功 記錄帳號密碼
 				var _loginRemeber = {};
@@ -587,7 +528,8 @@ $(function(){
 				}
 
 				$.lStorage("_loginData",_loginData);
-        		popupShowAdjust("","註冊完成囉","func+toGroupMenu");
+        		// popupShowAdjust("","註冊完成囉","func+toGroupMenu");
+        		popupShowAdjust("","註冊完成",true,false,[toGroupMenu]);
         	}
         });
 	}
@@ -606,20 +548,20 @@ $(function(){
         };
 
         var method = "put";
-        console.debug("avatarToS3() 取得s3 url前的 headers:",JSON.stringify(headers,null,2));
+        cns.debug("avatarToS3() 取得s3 url前的 headers:",JSON.stringify(headers,null,2));
 
         s_load_show = true;
         var result = ajaxDo(api_name,headers,method,false);
         result.complete(function(data){
-        	console.debug("取得s3 url後的 data:",data);
+        	cns.debug("取得s3 url後的 data:",data);
         	if(data.status == 200){
         		var d =$.parseJSON(data.responseText);
         		var fi = d.fi;
         		var ou = d.ou;
         		var tu = d.tu;
-        		console.debug("s3 fi:",fi);
-        		console.debug("s3 ou:",ou);
-        		console.debug("s3 tu:",tu);
+        		cns.debug("s3 fi:",fi);
+        		cns.debug("s3 ou:",ou);
+        		cns.debug("s3 tu:",tu);
 
         		//大小圖都要縮圖
 				var reader = new FileReader();
@@ -631,8 +573,8 @@ $(function(){
 		                //大小圖都要縮圖
 		                var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
 		                var t_obj = imgResizeByCanvas(this,0,0,120,120,0.6);
-		                console.debug("o_obj:",o_obj);
-		                console.debug("t_obj:",t_obj);
+		                cns.debug("o_obj:",o_obj);
+		                cns.debug("t_obj:",t_obj);
 		                //先大圖
 		        		$.ajax({
 							url: ou,
@@ -641,7 +583,7 @@ $(function(){
 						 	data: o_obj.blob, 
 							processData: false,
 							complete: function(data) { 
-								console.debug("上傳大圖後的 data:",data);
+								cns.debug("上傳大圖後的 data:",data);
 								//大圖上傳s3成功或失敗
 								if(data.status == 200){
 									//再小圖 
@@ -652,7 +594,7 @@ $(function(){
 										data: t_obj.blob, 
 										processData: false,
 										complete: function(data) { 
-											console.debug("上傳小圖後的 data:",data);
+											cns.debug("上傳小圖後的 data:",data);
 
 											//小圖上傳s3成功或失敗
 											if(data.status == 200){
@@ -668,11 +610,11 @@ $(function(){
 							                      "fi": fi,
 							                      "si": file.size
 							                    }
-							                    console.debug("commit前的 headers:",headers);
-							                    console.debug("commit前的 body:",body);
+							                    cns.debug("commit前的 headers:",headers);
+							                    cns.debug("commit前的 body:",body);
 							                    var result = ajaxDo(api_name,headers,method,true,body);
 							                    result.complete(function(data){
-							                    	console.debug("commit後的 data:",data);
+							                    	cns.debug("commit後的 data:",data);
 							                    	//commit 成功或失敗
 							                    	if(data.status == 200){
 
@@ -685,101 +627,32 @@ $(function(){
 
 							                    	}else{
 							                    		//commit 失敗
-							                    		console.debug("commit 失敗");
+							                    		cns.debug("commit 失敗");
 							                    	}
 						                    	});
 											}else{
 												// 小圖上傳 錯誤
-												console.debug("小圖上傳 錯誤");
+												cns.debug("小圖上傳 錯誤");
 											}
 										}
 									});
 								}else{
 									// 大圖上傳 錯誤
-									console.debug("大圖上傳 錯誤");
+									cns.debug("大圖上傳 錯誤");
 								}
 							}
 						});
 		            }
 			    }
 		        reader.readAsDataURL(file);
-        	}else{
-        		// me/avatar 錯誤
-        		popupShowAdjust("",errorResponse(data),true);
         	}
         });
 	}
 
 
-	imgResizeByCanvas = function(img,x,y,max_w,max_h,quality){
-		var MAX_WIDTH = max_w;
-		var MAX_HEIGHT = max_h;
-		var tempW = img.width;
-		var tempH = img.height;
-		if (tempW > tempH) {
-			if (tempW > MAX_WIDTH) {
-				tempH *= MAX_WIDTH / tempW;
-				tempW = MAX_WIDTH;
-			}
-		} else {
-			if (tempH > MAX_HEIGHT) {
-				tempW *= MAX_HEIGHT / tempH;
-				tempH = MAX_HEIGHT;
-			}
-		} 
-
-		var canvas = document.createElement('canvas');
-		canvas.width = tempW;
-		canvas.height = tempH;
-		var ctx = canvas.getContext("2d");
-		ctx.drawImage(img, x, y, tempW, tempH);
-		var dataURL = canvas.toDataURL("image/jpeg",quality);
-
-		var img_obj = {
-			w: tempW,
-			h: tempH,
-			blob: dataURItoBlob(dataURL)
-		}
-		return img_obj;
-	}
-
-	dataURItoBlob = function(dataURI) {
-        var binary = atob(dataURI.split(',')[1]);
-        var array = [];
-        for(var i = 0; i < binary.length; i++) {
-            array.push(binary.charCodeAt(i));
-        }
-        return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
-    }
-
-
 // tool function ----------------------------------------------------------------------
-
-
 	
 	
-	mathAvatarPos = function (img,w,h,x,limit){
-		//設最大值 若小於此值 就用原尺寸
-		if(limit){
-			w < limit ? x = w : x = limit ;
-		}
-		
-        if(w == 0 || h == 0) return false;
-        
-        img.removeAttr( 'style' );
-        img.removeAttr( 'width' );
-        img.removeAttr( 'height' );
-
-        if(w <= h){
-        	img.attr("width",x);
-            var p = ((h/(w/x))-x)/2*(-1);
-            img.css("margin-top",p +"px");
-        }else{
-        	img.attr("height",x);
-        	var p = ((w/(h/x))-x)/2*(-1);
-        	img.css("margin-left",p +"px");
-        }
-	}
 
 	deviceTokenMake = function(){
 		var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
@@ -793,86 +666,62 @@ $(function(){
 	}
 
 
-	//ajax
-    ajaxDo = function(api_name,headers,method,load_show_chk,body){
-        //設定是否顯示 loading 圖示
-        load_show = load_show_chk;
 
-        //console.log(api_url);
-        var api_url = base_url + api_name;
-        var myRand = Math.floor((Math.random()*1000)+1);
+ //    //對話框設定
+ //    $(".popup-confirm").click(function(){
+ //    	var todo = $(".popup-confirm").data("todo");
 
-        if(body){
-            body = JSON.stringify(body);
-        }
+ //    	if(typeof todo == "string"){
+ //    		var todo_type = todo.split("+")[0];
+ //    		var todo_act = todo.split("+")[1];
 
-        var result = $.ajax ({
-            url: api_url,
-            type: method,
-            headers:headers,
-            data:body
-        });
+ //   //  		cns.debug("todo_type:",todo_type);
+	// 		// cns.debug("todo_act:",todo_act);
 
-        return result;
-    }
+	// 		if(todo_type == "func"){
+	// 	    	switch(todo_act){
+	// 				case "registration":
+	// 					registration();
+	// 					break;
+	// 				case "toGroupMenu":
+	// 					toGroupMenu();
+	// 					break;
+	// 			}
+	//     	}else if(todo_type == "hash"){
+	//     		$.mobile.changePage(todo_act);
+	//     	}
+ //    	}
+	// 	$(".popup-screen").trigger("close");
+	// });
 
+	// $(".popup-cancel").click(function(){
+ //    	var todo = $(".popup-cancel").data("todo");
 
-    //對話框設定
-    $(".popup-confirm").click(function(){
-    	var todo = $(".popup-confirm").data("todo");
+ //    	if(typeof todo == "string"){
+ //    		var todo_type = todo.split("+")[0];
+ //    		var todo_act = todo.split("+")[1];
+	// 		if(todo_type == "func"){
 
-    	if(typeof todo == "string"){
-    		var todo_type = todo.split("+")[0];
-    		var todo_act = todo.split("+")[1];
-
-   //  		console.debug("todo_type:",todo_type);
-			// console.debug("todo_act:",todo_act);
-
-			if(todo_type == "func"){
-		    	switch(todo_act){
-					case "registration":
-						registration();
-						break;
-					case "toGroupMenu":
-						toGroupMenu();
-						break;
-				}
-	    	}else if(todo_type == "hash"){
-	    		$.mobile.changePage(todo_act);
-	    	}
-    	}
-		$(".popup-screen").trigger("close");
-	});
-
-	$(".popup-cancel").click(function(){
-    	var todo = $(".popup-cancel").data("todo");
-
-    	if(typeof todo == "string"){
-    		var todo_type = todo.split("+")[0];
-    		var todo_act = todo.split("+")[1];
-			if(todo_type == "func"){
-
-	    	}else if(todo_type == "hash"){
-	    		$.mobile.changePage(todo_act);
-	    	}
-    	}
-		$(".popup-screen").trigger("close");
-	});
+	//     	}else if(todo_type == "hash"){
+	//     		$.mobile.changePage(todo_act);
+	//     	}
+ //    	}
+	// 	$(".popup-screen").trigger("close");
+	// });
 
 
-	$(".popup-screen").bind("close",function(){
-	    $(".popup").hide();
-	    $(".popup-screen").hide();
-	});
+	// $(".popup-screen").bind("close",function(){
+	//     $(".popup").hide();
+	//     $(".popup-screen").hide();
+	// });
 
 
 	toGroupMenu = function(){
-		console.debug(" to group menu ??");
 		document.location = "main.html#page-group-menu";
 	}
 
     //對話框設定
-	popupShowAdjust = function (title,desc,confirm,cancel){
+	popupShowAdjust_bak = function (title,desc,confirm,cancel){
 
 		//default
 		$(".popup-confirm").html("確認");
@@ -934,28 +783,7 @@ $(function(){
 	    
 	}
 	
-	popupAfterChangePage = function (dest){
-		$(".popup-close").bind("pageChange",function(){
-			$.mobile.changePage(dest);
-			$(".popup-close").unbind("pageChange");
-		});
-	}
-
-	errorResponse = function(data){
-		if(data.responseText){
-			return $.parseJSON(data.responseText).rsp_msg;
-		}else{
-			console.debug("errorResponse:",data);
-			return "網路連線不穩 請稍後再試";
-		}
-	}
 	
-	//sha1 and base64 encode
-	toSha1Encode = function (string){
-		var hash = CryptoJS.SHA1(string);
-	    var toBase64 = hash.toString(CryptoJS.enc.Base64);
-	    return toBase64;
-	}
 
 
 

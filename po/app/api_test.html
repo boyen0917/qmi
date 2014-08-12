@@ -31,7 +31,8 @@
 
       if(!api_type) return false;
     	//api 網址
-        var base_url = "https://apserver.mitake.com.tw/apiv1/";
+        // var base_url = "https://apserver.mitake.com.tw/apiv1/";
+        var base_url = "https://mapserver.mitake.com.tw/apiv1/";
         //var base_url = "http://10.1.17.116:8090/apiv1/";
         
         var ui,at,gi,gn,gd,ga,gm,device_token,zoom_out_cnt,zoom_in_cnt,group_list;
@@ -58,171 +59,20 @@
             at = $.parseJSON(data.responseText).at;
             console.debug(data);
             switch(api_type){ // groups/{gi}/invitations
-                case "top1":
-                    var api_name = "groups/G00000170DO/timelines/T000003Q0Dl/top_events";
+                case "polling":
+                    var api_name = "/sys/polling?pt=1407225112800";
 
                     var headers = {
-                             "ui":"U00000H80Ax",
-                             "at":"9ed546d6-6083-4c26-bcf3-eabc7fb4311f", 
+                             "ui":ui,
+                             "at":at, 
                              "li":"zh_TW",
                                  };
-                    console.debug("headers:",headers);
                     var method = "get";
                     var result = ajaxDo(api_name,headers,method,false);
                     break;
-                case "top2":
-                    var api_name = "groups/G00000170DO/timelines/T000003Q0Dl/top_events";
-
-                    var headers = {
-                             "ui":ui,
-                             "at":at, 
-                             "li":"zh_TW",
-                                 };
-                    console.debug("headers:",headers);
-                    var method = "get";
-                    var result = ajaxDo(api_name,headers,method,false);
-                    break;
-                case "me":
-                    var api_name = "me";
-
-                    var headers = {
-                             "ui":ui,
-                             "at":at, 
-                             "li":"zh_TW",
-                                 };
-                    
-                    var method = "get";
-
-                    var result = ajaxDo(api_name,headers,method,false);
-                    break;
-                case "me_invite":
-                    var api_name = "me/invitations";
-
-                    var headers = {
-                             "ui":ui,
-                             "at":at, 
-                             "li":"zh_TW",
-                                 };
-                    var method = "get";
-
-                    var result = ajaxDo(api_name,headers,method,true);
-                  break;
-                case "upload_commit":
-                    var api_name = "groups/1a9bca59-766d-402d-b5ea-9ad973e10d45/files/bd157262-4fba-46e8-8bff-3c293054e802/commit";
-
-                    var headers = {
-                             "ui":ui,
-                             "at":at, 
-                             "li":"zh_TW",
-                                 };
-                    var method = "put";
-
-                    var body = {
-                      "ti": "380b2466-6492-465b-ae3e-a498d22eb0c4",
-                      "pi": 0,
-                      "tp": 1,
-                      "mt": "image/gif",
-                      "si": 1954684
-                    }
-                    var result = ajaxDo(api_name,headers,method,true,body);
-                  break;
-                case "pic":///groups/{gi}/files/{fi}{?pi}
-                    var api_name = "groups/f8ea78e9-8f33-45ce-a94c-029a47464688/files/4c8b7326-a369-4a87-a3ab-adc554348d42?pi=0";
-
-                    var headers = {
-                             "ui":ui,
-                             "at":at, 
-                             "li":"zh_TW",
-                                 };
-                    var method = "get";
-
-                    var result = ajaxDo(api_name,headers,method,true);
-                  break;
-                case "compose_vote":
-                    var api_name = "groups/b1c77966-6037-4244-82fc-a37d4d0504a8/timelines/177bb2ec-0f7d-4dba-8d2d-6af8c8b225d7/events";
-
-                    var headers = {
-                             "ui":ui,
-                             "at":at, 
-                             "li":"zh_TW",
-                                 };
-                    var method = "post";
-
-                    var body = {
-                          "meta":
-                          {
-                            //"lv": 0(使用者)、1(團體)、2(團體使用者)、3(群組),
-                            //"tp": [0](0=樓主,1=回覆訊息)、[1](0=訊息,1=公告,2=通報專區,3=任務-工作,4=任務-投票,5=任務-定點回報,6=行事曆)
-                            "lv":"1",
-                            "tp":"04"
-                          },
-                          "ml":[
-                            {
-                              "li": [
-                                {
-                                  "k": 0,
-                                  "t": "照片裡的人，誰最上相",
-                                  "v": 1,
-                                  "i": [
-                                    {
-                                      "k": 0,
-                                      "o": "楊Google "
-                                    },
-                                    {
-                                      "k": 1,
-                                      "o": "楊股溝"
-                                    },
-                                    {
-                                      "k": 2,
-                                      "o": "股溝楊"
-                                    }
-                                  ]
-                                }
-                              ],
-                              "b": 1401282581000,
-                              "e": 1401368981000,
-                              "tp": 14
-                            } 
-                          ]
-                        }
-                                     
-                    var result = ajaxDo(api_name,headers,method,true,body);
-                     
-                    break;
-                case "timeline_post"://0efa069a-b882-4ea6-a78e-c36966ee4aa1
-                    var api_name = "groups/0efa069a-b882-4ea6-a78e-c36966ee4aa1/timelines/14876c4b-508c-4bb4-9e23-ff292a01acbc/events?ep=Event-999";
-
-                    var headers = {
-                             "ui":ui,
-                             "at":at, 
-                             "li":"zh_TW",
-                                 };
-                    var method = "post";
-
-                    var body = {
-                          "meta":
-                          {
-                            //"lv": 0(使用者)、1(團體)、2(團體使用者)、3(群組),
-                            //"tp": [0](0=樓主,1=回覆訊息)、[1](0=訊息,1=公告,2=通報專區,3=任務-工作,4=任務-投票,5=任務-定點回報,6=行事曆)
-                            "lv":"1",
-                            "tp":"13",
-                            "fin":false
-                          },
-                          "ml":
-                          [
-                            {
-                              "tp": 13,
-                              "k": 1,
-                              "a": true
-                            }
-                          ]
-                        }
-                                     
-                    var result = ajaxDo(api_name,headers,method,true,body);
-                     
-                    break;
-                case "timeline_status_update":
-                    var api_name = "groups/62cd6a3a-77b9-4f84-8f2d-854020665134/timelines/92a940f7-02bd-4413-88fc-57c4f7836ee4/events/Event-115.Event-116";
+            
+                case "step3":
+                    var api_name = "activation/step3";
 
                     // etp: 0(讀取),1(按讚),2(按X),3(按訂閱),4(按置頂),6(是否有行事曆)
                     // est: 0(取消),1(執行)
@@ -230,16 +80,22 @@
                              "ui":ui,
                              "at":at, 
                              "li":"zh_TW",
-                             "etp":0,
-                             "est":1
                                  };
                      var method = "put";
+                     var body = {
+                      "id": "886980922917",
+                      "tp": 0,
+                      "ud": "web-test",
+                      "fn": "First",
+                      "ln": "Last",
+                      "bd": "19850922"
+                    }
                                      
-                    var result = ajaxDo(api_name,headers,method,true);
+                    var result = ajaxDo(api_name,headers,method,true,body);
                      
                     break;
-                case "timeline_participants"://這則單一事件的各種回復狀態 Type(0=讀取,1=按讚,2=按X,3=按訂閱,4=按置頂,7=按任務)
-                	 var api_name = "groups/3564cbb8-81a3-47a3-b0f3-89822762029f/timelines/0efb2a90-fb99-4ce8-b80e-646bba745ea6/events/Event-148.Event-165/participants?tp=1";
+                case "me"://這則單一事件的各種回復狀態 Type(0=讀取,1=按讚,2=按X,3=按訂閱,4=按置頂,7=按任務)
+                	 var api_name = "me";
                 	 var headers = {
                              "ui":ui,
                              "at":at, 
@@ -247,7 +103,6 @@
                                  };
                      var method = "get";
                                      
-                     //{"tp":0,"rsp_code":999,"rsp_msg":"無群組權限"} 
                      
                     var result = ajaxDo(api_name,headers,method,true);
                      
@@ -344,7 +199,6 @@
             
             
             result.complete(function(data){
-                //console.log($.parseJSON(data.responseText));
                 var t =$.parseJSON(data.responseText);
                 console.log(t.rsp_code);
                 console.log(JSON.stringify(t,null,2));

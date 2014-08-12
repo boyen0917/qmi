@@ -3,8 +3,8 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
-      div {
-        width: 200px;
+      .data-show {
+        width: 500px;
         height: 500px;
         border: 1px solid black;
 
@@ -13,54 +13,30 @@
     <link rel="stylesheet" type="text/css" href="datepicker/datetimepicker.css" />
    
     <script src="../js/jquery.js"></script>
-    <script src="js/jquery.plugin.js"></script>
+    <script src="../js/idbstore.min.js"></script>
 
    </head>
 <body>
+  <div class="data-show">
+    
+  </div>
+
   <button class="get">get</button>
   <button class="add">add</button>
   <button class="delete">delete</button>
 
-  <div></div>
 
     <script>
       $(function(){
 
-        $.extend({
-          getUrlVars: function(){
-            var vars = [], hash;
-            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-            for(var i = 0; i < hashes.length; i++)
-            {
-              hash = hashes[i].split('=');
-              vars.push(hash[0]);
-              vars[hash[0]] = hash[1];
-            }
-            return vars;
-          },
-          getUrlVar: function(name){
-            return $.getUrlVars()[name];
-          }
-        });
-      
-      // Getting URL var by its nam
-      var handler = $.getUrlVar('handler');
-
 
       $("button.get").click(function(){
-      $("div").html("get<br/>");
-        fetchStoreByCursor(myDB.db,'students');
       });
 
       $("button.add").click(function(){
-        $("div").html("add<br/>");
-        addData(myDB.db,'students');
       });
 
       $("button.delete").click(function(){
-        $("div").html("delete<br/>");
-        $("div").append(myDB.name);
-        deleteDB(myDB.name);
       });
 
         function openDB (name,version) {
@@ -73,49 +49,14 @@
                 myDB.db=e.target.result;
 
                 $("div").append(myDB.name);
-                // var t = db.transaction(['students','teacher']);  //打开一个事务，使用students 和teacher object store
-                // var objectStore = t.objectStore('students'); //获取students object store
-
-                //getDataByKey(myDB.db,'students',2);
-                // addData(myDB.db,'students');
-                // deleteDataByKey(myDB.db,'students',4);
-                // getDataByIndex(myDB.db,'students','nameIndex','Byron');
-
-                // fetchStoreByCursor(myDB.db,'students');
-                
-                //getMultipleData(myDB.db,'students','ageIndex',26);
-
-                // $("div").append("handler:",handler);
-                // switch(handler){
-                //   case 'add':
-                //       $("div").append("add");
-                //       addData(myDB.db,'students');
-                //     break;
-                //   case 'get':
-                //   $("div").append("get");
-                //       getDataByIndex(myDB.db,'students','nameIndex','Byron');
-                //     break;
-                //   case 'put':
-                //     break;
-                //   case 'delete':
-                //   $("div").append("delete");
-                //       deleteDB(myDB.name);
-                //     break;
-                // }
-
-
-                // closeDB(myDB.db);
-               //deleteDB(myDB.name);
             };
             request.onupgradeneeded=function(e){
                 $("div").append('DB version changed to '+version);
                 myDB.db=e.target.result;
 
-                
-
 
                 if(!myDB.db.objectStoreNames.contains('students')){
-                    $("div").append("no data la");
+                    $("div").append("no data la<br/>");
                     var store=myDB.db.createObjectStore('students',{keyPath: 'id'});
                     store.createIndex('nameIndex','name',{unique:true}); 
                     store.createIndex('ageIndex','age',{unique:false}); 

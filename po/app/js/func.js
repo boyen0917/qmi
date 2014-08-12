@@ -1,8 +1,4 @@
-$(function(){  
-
-	reLogin = function() {
-		document.location = "index.html";
-	}
+$(function(){ 
 
 	logout = function(){
 		var api_name = "logout";
@@ -265,39 +261,6 @@ $(function(){
 		});
 	}
 	
-	//調整個人頭像
-	avatarPos = function (img,x){
-		img.load(function() {
-            var w = img.width();
-            var h = img.height();
-	        if(!x){
-	        	x = avatar_size;
-	        }
-            mathAvatarPos(img,w,h,x);
-        });
-	}
-	
-	mathAvatarPos = function (img,w,h,x,limit){
-		//設最大值 若小於此值 就用原尺寸
-		if(limit){
-			w < limit ? x = w : x = limit ;
-		}
-		
-        if(w == 0 || h == 0) return false;
-        
-        
-        img.removeAttr( 'style' );
-
-        if(w <= h){
-        	img.attr("width",x);
-            var p = ((h/(w/x))-x)/2*(-1);
-            img.css("margin-top",p +"px");
-        }else{
-        	img.attr("height",x);
-        	var p = ((w/(h/x))-x)/2*(-1);
-        	img.css("margin-left",p +"px");
-        }
-	}
 
 	timelineSwitch = function (act){
 		switch (act) {
@@ -1427,7 +1390,8 @@ $(function(){
 	        ajaxDo(api_name,headers,method,true,body).complete(function(data){
 
 	        	//重新讀取detail
-	        	popupShowAdjust("","回覆成功");
+	        	// popupShowAdjust("","回覆成功");
+	        	toastShow("回覆成功");
 	        	this_event.find(".st-vote-send").removeClass("st-vote-send-blue");
 	        	//客製化 按了確定之後再重讀取
 	        	$(".popup-close").bind("reload",function(){
@@ -1616,7 +1580,7 @@ $(function(){
 	                   '<div class="obj-cell-chk"><img src="images/common/icon/icon_check_round.png"/></div>' +
 	                   '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
 	                   '<div class="obj-cell-user-data">' + 
-	                   		'<div class="obj-user-name">' + gu_obj.n + '</div>' +
+	                   		'<div class="obj-user-name">' + gu_obj.nk + '</div>' +
 	                   		'<div class="obj-user-title">雲端事業群。經理</div>' +
 	                '</div>'
 	    		);
@@ -2589,7 +2553,6 @@ $(function(){
         });
 	};
 
-
 /*
 
 
@@ -2604,30 +2567,6 @@ $(function(){
 
 */
 
-
-
-	//ajax
-	ajaxDo = function (api_name,headers,method,load_show_chk,body){
-		//設定是否顯示 loading 圖示
-		load_show = load_show_chk;
-		
-	    //cns.debug(api_url);
-	    var api_url = base_url + api_name;
-	    var myRand = Math.floor((Math.random()*1000)+1);
-
-	    if(body){
-	        body = JSON.stringify(body);
-	    }
-	    
-	    var result = $.ajax ({
-            url: api_url,
-            type: method,
-            headers:headers,
-            data:body
-        });
-	    
-	    return result;
-	}
 
 	setThisGroup = function(new_gi,gl){
 		//新的gi 在新的所有團體列表
@@ -2707,8 +2646,8 @@ $(function(){
 			cns.debug("group list:",group_list);
 	        $.each(group_list,function(i,val){
 
-	        	//記錄新增團體的資訊 用以跳轉
-	        	if(new_gi && new_gi == val.gi){
+	        	//新建團體專用 記錄新增團體的資訊 用以跳轉
+	        	if(new_gi && new_gi == val.gi && !invite){
 	        		setThisGroup(new_gi,val);
 	        	}
 
@@ -2754,6 +2693,7 @@ $(function(){
 	     	    var img = this_group.find(".sm-group-area-l img:eq(0)");
 				avatarPos(img);
 	        });
+
 	        if(group_list.length > 2){
 	        	$(".sm-group-switch").show();
 	        }
@@ -2785,17 +2725,12 @@ $(function(){
 	        	if(invite){
 	        		toastShow("恭喜您成功加入團體！");
 	        	}else{
-	        		//popupShowAdjust("","創建成功。",true);
 	        		toastShow("團體建立成功");
-
+	        		$.mobile.changePage("#page-group-main");
 	        		timelineSwitch("feed");
 	        	}
 	        }
 	    });
-	}
-
-	sidemenuHeightAdj = function(){
-
 	}
 
 	permissionControl = function(group_list){
@@ -2869,6 +2804,7 @@ $(function(){
 	    		return false;
     		}else{
     			//load_chk 避免沒資料的
+    			cns.debug("什麼時候進來的！zaaza");
 	    		selector.append("<p class='load-chk'></p>");
     		}
     	}
@@ -2894,10 +2830,18 @@ $(function(){
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
 	    	if(data.status != 200) return false;
+
+
+
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 	    	
 	    	//判斷是否為下拉更新
-        	// var selector = $('.st-feedbox-area');
+
+        	//讀完就可重新滾動撈取舊資料 setTimeOut避免還沒寫入時就重新撈取
+        	setTimeout(function(){
+        		selector.data("scroll-chk",false);
+        	},1000);
+
         	var close_chk = false;
         	if(ct_timer){
         		//沒資料 關閉圖示
@@ -2933,13 +2877,17 @@ $(function(){
 	        $.each(timeline_list,function(i,val){
 	        	cns.debug(JSON.stringify(val, null, 2));
 
+	        	//寫入最舊的一筆時間
+	        	if(!selector.data("last-ct") || (selector.data("last-ct") && selector.data("last-ct") > val.meta.ct)){
+	        		selector.data("last-ct",val.meta.ct);
+	        	}
+
 	        	//刪除event
 	        	if(val.meta.del) return;
 
 	        	var this_event = this_event_temp.clone();
 
-	        	//寫入
-	        	selector[method](this_event);
+	        	
 
 	        	//上拉更新
 	        	if(top_selector){
@@ -2958,6 +2906,9 @@ $(function(){
 	        			return false;
 	        		}
 	        	}
+
+	        	//寫入
+	        	selector[method](this_event);
 
 	        	var tp = val.meta.tp.substring(1,2)*1;
 
@@ -3213,32 +3164,7 @@ $(function(){
     	return result_str;
 	}
 
-	htmlFormat = function (str){
-        str = str.replace(/\n/g," \n ").split(" ");
-        $.each(str,function(i,val){
-            if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
-                encode_val = "<a href=\"" + encodeHtmlEntity(val) + "\" target=\"_blank\">" + encodeHtmlEntity(val) + "</a>";
-            }else{
-                encode_val = encodeHtmlEntity(val);
-            }
-            if(encode_val) str.splice(i,1,encode_val);
-        });
-
-        return str.join(" ");
-
-    }
-
-	urlFormat2 = function (str){
-        str = str.replace(/\n|\r/g," <br/> ").split(" ");
-        $.each(str,function(i,val){
-        	if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
-                str.splice(i,1,"<a href=\"" + val + "\" target=\"_blank\">" + val + "</a>");
-            }
-        });
-
-    	return str.join(" ");
-
-    }
+	
 
 
 /*
@@ -3302,8 +3228,11 @@ $(function(){
 					break;
 				case 1://網址 寫在附檔區域中
 					this_event.find(".st-attach-url").show();
-					this_event.find(".st-attach-url-img").show();
-					this_event.find(".st-attach-url-img img").attr("src",val.i);
+					
+					if(val.i) {
+						this_event.find(".st-attach-url-img").show();
+						this_event.find(".st-attach-url-img img").attr("src",val.i);
+					}
 					
 					//圖片滿版
 					// var w = this_event.find(".st-attach-url-img img").width();
@@ -3578,7 +3507,6 @@ $(function(){
 
 			var obj =$.parseJSON(data.responseText);
 			obj.api_name = api_name;
-			cns.debug("get s3 obj:",obj);
 			if(target && tp){
 				switch(tp){
 					case 6://圖片
@@ -4107,130 +4035,7 @@ $(function(){
   		this_event.find(".st-sub-box-1").trigger("click");
 	};
 
-	toastShow = function(desc){
-		$(".toast div").html(desc);
-		setTimeout(function(){
-			$(".toast").show();
-			$(".toast").animate({
-				bottom: "+=30px",
-				opacity: "1.0"
-			},100);
-		},100);
-		
-		setTimeout(function(){
-			$(".toast").fadeOut('fast', function(){
-				$(this).css("bottom","0px");
-				$(this).css("opacity","0");
-			});
-		},4000);
-	}
-
-	//對話框設定
-	popupShowAdjust = function (title,desc,confirm,cancel,callback){
-		// cns.debug("========彈跳視窗========");
-		// cns.debug("title:",title);
-		// cns.debug("desc:",desc);
-		// cns.debug("confirm:",confirm);
-		// cns.debug("cancel:",cancel);
-		// cns.debug("=======================");
-
-		$("body").addClass("screen-lock");
-
-		//default
-		$(".popup-confirm").html("確認");
-		$(".popup-cancel").html("取消");
-
-		if(title){
-			$('.popup-title').html(title);
-		}else{
-			$('.popup-title').html("");
-		}
-	    if(desc){
-	    	$('.popup-text').show();
-	        $('.popup-text').html(desc);
-	    }else{
-	    	$('.popup-text').hide();
-	    }
-	    if(confirm){
-	    	$(".popup-confirm").show();
-	    	$('.popup-cancel').removeClass("full-width");
-
-	    	if(typeof confirm == "string"){
-	    		if(confirm.split("+")[2]){
-	    			$(".popup-confirm").html(confirm.split("+")[2]);
-	    		}
-	    		$(".popup-confirm").data("todo",confirm);
-	    	}
-	    }else{
-	    	$(".popup-confirm").hide();
-	    	$('.popup-cancel').addClass("full-width");
-	    	
-	    }
-	    if(cancel){
-	    	$(".popup-cancel").show();
-	    	$('.popup-confirm').removeClass("full-width");
-	    	if(typeof cancel == "string"){
-	    		if(cancel.split("+")[2]){
-	    			$(".popup-cancel").html(cancel.split("+")[2]);
-	    		}
-	    		$(".popup-confirm").data("todo",confirm);
-	    	}
-	    }else{
-	    	$(".popup-cancel").hide();
-	    	$('.popup-confirm').addClass("full-width");
-	    }
-
-	    if(callback) $(".popup").data("callback",callback);
-
-
-	    if(!confirm && !cancel){
-	    	setTimeout(function(){
-    			$(".popup-screen").trigger("close");
-    			$("body").removeClass("screen-lock");
-    		},2000);
-	    }
-
-	    $(".popup-screen").show();
-	    $(".popup").show();
-
-	    $(".popup-frame").css("margin-left",0);
-	    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2);
-	    
-	}
-	    
-	//計算彈出對話框置中
-	popupShowAdjust_backup = function (desc,cancel,chk){
-		if(!cancel){
-			$(".popup-close-cancel").hide();
-		}
-
-		if(chk){
-			$(".popup-close").hide();
-		}
-		
-		$(".popup-frame").css("margin-left",0);
-	    if(desc){
-	        $('.popup-text').html(desc);
-	    }
-	    $(".popup-screen").show();
-	    $(".popup").show();
-	    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2-15);
-	    
-	}
 	
-	popupAfterChangePage = function (dest){
-		$(".popup-close").bind("pageChange",function(){
-			$.mobile.changePage(dest);
-			$(".popup-close").unbind("pageChange");
-		});
-	}
-	
-	//sha1 and base64 encode
-	toSha1Encode = function (string){
-		var hash = CryptoJS.SHA1(string);
-	    var toBase64 = hash.toString(CryptoJS.enc.Base64);
-	    return toBase64;
-	}
 	
 	//timeline more
 	zoomOut = function (target)
@@ -4257,83 +4062,6 @@ $(function(){
 	    }
 	}
 	
-	//秒數轉成時分秒
-	secondsToTime = function (secs)
-	{
-	    var s_hours = Math.floor(secs / (60 * 60));
-	
-	    var divisor_for_minutes = secs % (60 * 60);
-	    var s_minutes = Math.floor(divisor_for_minutes / 60);
-	
-	    var divisor_for_seconds = divisor_for_minutes % 60;
-	    var s_seconds = Math.ceil(divisor_for_seconds);
-	    return s_minutes + ":" + ((s_seconds < 10)?("0" + s_seconds):(s_seconds));
-	}
-
-	//轉換html符號
-	var encodeHtmlEntity = function(str) {
-        if(!str) return false;
-
-        var escape_list = {"10":"<br/>"};
-        var buf = [];
-        for (var i=str.length-1;i>=0;i--) {
-            var char_code = str[i].charCodeAt();
-            if(escape_list[char_code]){
-                buf.unshift(escape_list[char_code]);
-            }else{
-                buf.unshift(['&#', char_code, ';'].join(''));
-            }
-         }
-      return buf.join('');
-    };
-
-    function decodeHTMLEntities(str) {
-		return str.replace(/&#(d+);/g, function(match, dec) {
-			return String.fromCharCode(dec);
-		});
-	};
-
-
-	//縮圖
-	imgResizeByCanvas = function(img,x,y,max_w,max_h,quality){
-		var MAX_WIDTH = max_w;
-		var MAX_HEIGHT = max_h;
-		var tempW = img.width;
-		var tempH = img.height;
-		if (tempW > tempH) {
-			if (tempW > MAX_WIDTH) {
-				tempH *= MAX_WIDTH / tempW;
-				tempW = MAX_WIDTH;
-			}
-		} else {
-			if (tempH > MAX_HEIGHT) {
-				tempW *= MAX_HEIGHT / tempH;
-				tempH = MAX_HEIGHT;
-			}
-		}
-
-		var canvas = document.createElement('canvas');
-		canvas.width = tempW;
-		canvas.height = tempH;
-		var ctx = canvas.getContext("2d");
-		ctx.drawImage(img, x, y, tempW, tempH);
-		var dataURL = canvas.toDataURL("image/jpeg",quality);
-		var img_obj = {
-			w: Math.floor(tempW),
-			h: Math.floor(tempH),
-			blob: dataURItoBlob(dataURL)
-		}
-		return img_obj;
-	}
-
-	dataURItoBlob = function(dataURI) {
-        var binary = atob(dataURI.split(',')[1]);
-        var array = [];
-        for(var i = 0; i < binary.length; i++) {
-            array.push(binary.charCodeAt(i));
-        }
-        return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
-    }
 
     getGroupList = function(){
     	//取得團體列表
@@ -4348,14 +4076,6 @@ $(function(){
     }
 
 
-    errorResponse = function(data){
-		if(data.responseText){
-			return $.parseJSON(data.responseText).rsp_msg;
-		}else{
-			cns.debug("errorResponse:",data);
-			return "網路連線不穩 請稍後再試";
-		}
-	}
 
     getLoginDataForTest = function(){
     	//暫時
@@ -4377,7 +4097,7 @@ $(function(){
 
         		ui = login_result.ui;
 				at = login_result.at;
-
+				cns.debug("ui:",ui,"at:",at);
         		//附上group list
         		getGroupList().complete(function(data){
         			if(data.status == 200){

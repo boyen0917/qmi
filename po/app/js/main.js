@@ -84,163 +84,18 @@ $(function(){
     	localStorage.clear();
 	}
 
-	//對話框設定
-    $(".popup-confirm").click(function(){
-
-    	var todo = $(".popup-confirm").data("todo");
-    	if(typeof todo == "string"){
-    		var todo_type = todo.split("+")[0];
-    		var todo_act = todo.split("+")[1];
-
-	    	if(todo_type == "hash"){
-	    		$.mobile.changePage(todo_act);
-	    	}
-    	}
-
-    	if($(".popup").data("callback")){
-    		var func = $(".popup").data("callback")[0];
-    		var arguments = $(".popup").data("callback")[1];
-			func(arguments);
-    	}
-
-		$(".popup-screen").trigger("close");
-	});
-
-	$(".popup-cancel").click(function(){
-    	var todo = $(".popup-cancel").data("todo");
-
-    	if(typeof todo == "string"){
-    		var todo_type = todo.split("+")[0];
-    		var todo_act = todo.split("+")[1];
-	    	
-	    	if(todo_type == "hash"){
-	    		$.mobile.changePage(todo_act);
-	    	}
-    	}
-		$(".popup-screen").trigger("close");
-	});
-
-
-	$(".popup-screen").bind("close",function(){
-		
-	    $(".popup").fadeOut("fast",function(){
-	    	$(".popup-screen").hide();	
-	    });
-	    
-
-	    //ajax也關
-	    $('.ui-loader').hide();
-		$(".ajax-screen-lock").hide();
-
-	    $("body").removeClass("screen-lock");
-	});
-
-
-	
-	$.ajaxSetup ({
-	    // Disable caching of AJAX responses
-	    timeout: ajax_timeout,
-	    cache: true
-	});
-	
-	$(document).ajaxSend(function() {
-
-		// cns.debug("ajax send! count : " + ajax_count);
-		// ajax_count++;
-		//顯示 loading
-		if(!load_show && !s_load_show) return false;
-	    if(!$('.ui-loader').is(":visible"))
-		$('.ui-loader').css("display","block");
-		$(".ajax-screen-lock").show();
-	});
-	$(document).ajaxComplete(function(data) {
-		//特別的
-		if(s_load_show) return false;
-
-		$('.ui-loader').hide();
-		$(".ajax-screen-lock").hide();
-	});
-
-	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
-
-		//ajax逾時
-		if(jqxhr.statusText == "timeout"){
-			popupShowAdjust("","網路不穩 請稍後再試",true);
-			return false;
-		}
-		//logout~
-		if(jqxhr.status == 401){
-			//xxxxxxxxxx
-			popupShowAdjust("","驗證失敗 請重新登入",true,false,[reLogin]);
-			return false;
-		}
-
-		$('.ui-loader').hide();
-		$(".ajax-screen-lock").hide();
-
-		popupShowAdjust("",errorResponse(jqxhr),true);
-	});
-	
-	//上一頁功能 預設在init.js
-	
-	$(document).on("pagebeforeshow",function(event,ui){
-		var hash = window.location.hash;
-
-		//部分跳頁及上一頁按鈕不需要記錄歷程
-		if(back_exception){
-			back_exception = false;
-			return false;
-		}
-
-		var page_title = $(hash + " .page-title").html();
-		var page_arr = [hash,page_title];
-
-		$(document).data("page-history").push(page_arr);
-
-		//timeline頁面
-		if(hash == "#page-group-main"){
-			//調整團體頭像
-			if($(document).data("group-avatar")){
-				$(".sm-group-area").each(function(i,val){
-					var this_img = $(this).find(".sm-group-area-l img:eq(0)");
-					var img = new Image();
-					img.onload = function() {
-						mathAvatarPos(this_img,this.width,this.height,avatar_size);
-					}
-					img.src = this_img.attr("src");
-				});
-				//改完就改回false
-				$(document).data("group-avatar",false);
-			}
-		}
-	});
 
 	//test
 	$(".header-group-name").click(function(){
 		topEventChk();
 	});
-	
-	$(".page-back").click(function(){
-
-		//按上一頁不需要記錄歷程
-		back_exception = true;
-		var t= $(document).data("page-history");
-
-		//目前這頁先移除
-		$(document).data("page-history").pop();
-
-		//若上一頁為login 導去login
-		if( $(document).data("page-history").last()[0] == "login" ) {
-			document.location = "index.html";
-		}
-
-		$.mobile.changePage($(document).data("page-history").last()[0], {transition: "slide",reverse: true});
-		//cns.debug("last:",$(document).data("page-history").last()[0]);
-	});
 
 
 	//timeline下拉更新
 	$(window).scroll(function() {
+		//timeline 才要做
+		if(!$(".feed-subarea").is(":visible")) return false;
+
 
 		var top_height = $(window).scrollTop();
 		
@@ -259,8 +114,9 @@ $(function(){
 		//判斷沒資料的元件存在時 就不動作
 		if($(".feed-subarea[data-feed=" + feed_type + "] .no-data").length) return false;
 		
-		var last_show_event = $(".feed-subarea[data-feed=" + feed_type + "] .filter-show").last();
-		var last_event = $(".feed-subarea[data-feed=" + feed_type + "] .st-sub-box").last();
+		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+		var last_show_event = this_navi.find(".filter-show").last();
+		var last_event = this_navi.find(".st-sub-box").last();
 		
 		if(last_event.length){
 			var bottom_height = $(window).scrollTop() + $(window).height();
@@ -270,12 +126,17 @@ $(function(){
 			// cns.debug("last_height:",last_height);
 
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
-		    if(bottom_height && bottom_height >= last_height && !last_show_event.data("scroll-chk")){
+		    if(bottom_height && bottom_height >= last_height && !this_navi.data("scroll-chk")){
+		    	if(this_navi.data("last-ct")){
+		    		var time = new Date(this_navi.data("last-ct"));
+	        		var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );	
+	        		cns.debug("last-ct:",this_navi.data("last-ct"));
+	        		cns.debug("最後一筆時間:",time_format);
+		    	}
+		    	
 		    	//避免重複
-		    	last_show_event.data("scroll-chk",true);
-
-		    	var ct_timer = last_event.data("ct");
-		    	timelineListWrite(ct_timer);
+		    	this_navi.data("scroll-chk",true);
+		    	timelineListWrite(this_navi.data("last-ct"));
 		    }
 		}
 	});
@@ -372,7 +233,6 @@ $(function(){
 	        		avatarToS3(file,api_name,ori_arr,tmb_arr,[groupMenuListArea,cg_result.gi]);
 	        	}
 	        });
-			
 		}
 	});
 

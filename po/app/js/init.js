@@ -5,15 +5,10 @@ $(function(){
 	// gi = "0e508d9c-90b1-454b-88b0-7f60d054a4bf";
 
 	//api 網址
-	//base_url = "https://mapserver.mitake.com.tw/apiv1/";
+	// base_url = "https://mapserver.mitake.com.tw/apiv1/";
  	base_url = "https://apserver.mitake.com.tw/apiv1/";
 	//base_url = "http://10.1.17.116:8090/apiv1/";
 
-	//傳送逾時
-	ajax_timeout = 20000;
-
-	//ajax用
-	myRand = Math.floor((Math.random()*1000)+1);
 	
 	//國碼
 	countrycode = "+886";
@@ -64,12 +59,6 @@ $(function(){
 	//預設使用者大頭照 size
 	avatar_size = 60;
 	
-	//記錄timeline種類
-//	this_event.find(".st-sub-box").data("timeline-tp",tp);
-//	this_event.find(".st-sub-box").data("groud-id",gi);
-//	this_event.find(".st-sub-box").data("timeline-id",ti_feed);
-//	this_event.find(".st-sub-box").data("event-id",val.ei);
-	
 
 	//ajax 使用次數
 	ajax_count = 0;
@@ -96,6 +85,117 @@ $(function(){
 	top_timer_ms = 5000;
 
 
+
+	// ajax setting
+
+	//ajax用
+	myRand = Math.floor((Math.random()*1000)+1);
+
+	$.ajaxSetup ({
+		timeout: 30000,
+	    // Disable caching of AJAX responses
+	    cache: false
+	});
+	
+	$(document).ajaxSend(function() {
+
+		//顯示 loading
+		if(!load_show && !s_load_show) return false;
+	    if(!$('.ui-loader').is(":visible"))
+		$('.ui-loader').css("display","block");
+		$(".ajax-screen-lock").show();
+	});
+	$(document).ajaxComplete(function(data) {
+		//特別的
+		if(s_load_show) return false;
+
+		$('.ui-loader').hide();
+		$(".ajax-screen-lock").hide();
+	});
+	
+
+	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
+
+		$('.ui-loader').hide();
+		$(".ajax-screen-lock").hide();
+
+		//ajax逾時
+		if(jqxhr.statusText == "timeout"){
+			popupShowAdjust("","網路不穩 請稍後再試",true);
+			return false;
+		}
+		//logout~
+		if(jqxhr.status == 401){
+			popupShowAdjust("","驗證失敗 請重新登入",true,false,[reLogin]);
+			return false;
+		}
+		popupShowAdjust("",errorResponse(jqxhr),true);
+	});
+
+	//上一頁功能
+	$(document).on("pagebeforeshow",function(event,ui){
+		var hash = window.location.hash;
+
+		//部分跳頁及上一頁按鈕不需要記錄歷程
+		if(back_exception){
+			back_exception = false;
+			return false;
+		}
+
+		var page_title = $(hash + " .page-title").html();
+		var page_arr = [hash,page_title];
+
+		$(document).data("page-history").push(page_arr);
+
+		//timeline頁面
+		if(hash == "#page-group-main"){
+			//調整團體頭像
+			if($(document).data("group-avatar")){
+				$(".sm-group-area").each(function(i,val){
+					var this_img = $(this).find(".sm-group-area-l img:eq(0)");
+					var img = new Image();
+					img.onload = function() {
+						mathAvatarPos(this_img,this.width,this.height,avatar_size);
+					}
+					img.src = this_img.attr("src");
+				});
+				//改完就改回false
+				$(document).data("group-avatar",false);
+			}
+		}
+	});
+
+	
+	$(".page-back").click(function(){
+
+		//按上一頁不需要記錄歷程
+		back_exception = true;
+		var t= $(document).data("page-history");
+
+		//目前這頁先移除
+		$(document).data("page-history").pop();
+
+		//若上一頁為login 導去login
+		if( $(document).data("page-history").last()[0] == "login" ) {
+			document.location = "index.html";
+		}
+
+		$.mobile.changePage($(document).data("page-history").last()[0], {transition: "slide",reverse: true});
+		//cns.debug("last:",$(document).data("page-history").last()[0]);
+	});
+
+
+	errorResponse = function(data){
+		if(data.responseText){
+			return $.parseJSON(data.responseText).rsp_msg;
+		}else{
+			cns.debug("errorResponse:",data);
+			return "網路連線不穩 請稍後再試";
+		}
+	}
+
+	
+
 	//debug control 
 	setDebug(true);
 
@@ -120,5 +220,5 @@ $(function(){
         }
       }
     }
-	
+
 });
