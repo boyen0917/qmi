@@ -996,7 +996,7 @@ $(function(){
 		this_event.find(".st-task-work-detail").html("");
 		cns.debug("new_li:",new_li);
 		$.each(new_li,function(i,val){
-			var this_work = $('<div class="st-work-option" data-item-index="' + val.k + '"><img src="images/common/icon/icon_check_round_white.png"><span>' + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' + _groupList[gi].guAll[val.u].n + '</span></div></div>');
+			var this_work = $('<div class="st-work-option" data-item-index="' + val.k + '"><img src="images/common/icon/icon_check_round_white.png"><span>' + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' + _groupList[gi].guAll[val.u].nk + '</span></div></div>');
 			this_event.find(".st-task-work-detail").append(this_work);
 			if(val.m) {
 				this_work.data("mine",true);
@@ -1213,10 +1213,9 @@ $(function(){
 
 	bindVoteEvent = function (this_event){
 		
-		this_event.find(".st-vote-ques-area-div").click(function(){
-			cns.debug("按到題目了:",$(this));
-
-		});		
+		// this_event.find(".st-vote-ques-area-div").click(function(){
+		// 	cns.debug("按到題目了:",$(this));
+		// });		
 
 		this_event.find(".st-vote-detail-option").click(function(){
 			cns.debug("進來");
