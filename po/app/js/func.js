@@ -539,8 +539,6 @@ $(function(){
 		//起始位置
 		var selector_pos = (10-top_msg_num)/2*10;
 		var first_span = top_area.find(".st-top-bar-case span:eq(0)");
-		cns.debug("top_area:",top_area);
-		cns.debug("first_span:",first_span);
 		var start_left = first_span.offset().left;
 		var start_top = first_span.offset().top;
 		var movement = first_span.width();
@@ -1089,7 +1087,7 @@ $(function(){
 	voteContentMake = function (this_event,li){
 		$.each(li,function(v_i,v_val){
 
-			this_event.find(".st-vote-all-ques-area").html($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html .st-vote-ques-area',function(){
+			this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html .st-vote-ques-area',function(){
 				var this_ques = $(this).find(".st-vote-ques-area");
 				
 				//設定題目的編號
@@ -1592,13 +1590,13 @@ $(function(){
 	    		}
 
 	    		this_obj.data("gu",gu_obj.gu);
-	    		this_obj.data("gu-name",gu_obj.n);
+	    		this_obj.data("gu-name",gu_obj.nk);
 	    		$(".obj-cell-area").append(this_obj);
 	    	});
 
 	    	//已經有內容 就製作已選的樣式
-	    	
-	    	if(obj_data && obj_data){
+	    	console.debug("obj_data:",obj_data);
+	    	if(obj_data){
 	    		obj_data = $.parseJSON(obj_data);
 	    		if(Object.keys(obj_data).length){
 	    			$(".obj-content").data("selected-obj",obj_data);
@@ -2831,8 +2829,6 @@ $(function(){
 	    result.complete(function(data){
 	    	if(data.status != 200) return false;
 
-
-
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 	    	
 	    	//判斷是否為下拉更新
@@ -2871,46 +2867,44 @@ $(function(){
 	        var method = "append";
 
 
-        $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-        	var this_event_temp = $(this).find(".st-sub-box");
+	        $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+	        	var this_event_temp = $(this).find(".st-sub-box");
 
-	        $.each(timeline_list,function(i,val){
-	        	cns.debug(JSON.stringify(val, null, 2));
+		        $.each(timeline_list,function(i,val){
+		        	cns.debug(JSON.stringify(val, null, 2));
 
-	        	//寫入最舊的一筆時間
-	        	if(!selector.data("last-ct") || (selector.data("last-ct") && selector.data("last-ct") > val.meta.ct)){
-	        		selector.data("last-ct",val.meta.ct);
-	        	}
+		        	//寫入最舊的一筆時間
+		        	if(!selector.data("last-ct") || (selector.data("last-ct") && selector.data("last-ct") > val.meta.ct)){
+		        		selector.data("last-ct",val.meta.ct);
+		        	}
 
-	        	//刪除event
-	        	if(val.meta.del) return;
+		        	//刪除event
+		        	if(val.meta.del) return;
 
-	        	var this_event = this_event_temp.clone();
+		        	var this_event = this_event_temp.clone();
 
-	        	
+		        	//上拉更新
+		        	if(top_selector){
+		        		if(val.meta.ct > top_selector.data("ct")){
+			        		selector = top_selector;
+			        		method = "before";
+		        		}else{
+		        			setTimeout(function(){
+	        					$(".st-navi-area").removeClass("st-navi-fixed");
+	        					$(".st-top-area-load").removeClass("mt");
+		        				$(".st-refresh-top").slideUp("fast");
+								$(".st-refresh-top img").hide();
+								$(".st-refresh-top span").hide();
+								$(".st-navi-area").data("scroll-chk",false);
+		        			},1000);
+		        			return false;
+		        		}
+		        	}
 
-	        	//上拉更新
-	        	if(top_selector){
-	        		if(val.meta.ct > top_selector.data("ct")){
-		        		selector = top_selector;
-		        		method = "before";
-	        		}else{
-	        			setTimeout(function(){
-        					$(".st-navi-area").removeClass("st-navi-fixed");
-        					$(".st-top-area-load").removeClass("mt");
-	        				$(".st-refresh-top").slideUp("fast");
-							$(".st-refresh-top img").hide();
-							$(".st-refresh-top span").hide();
-							$(".st-navi-area").data("scroll-chk",false);
-	        			},1000);
-	        			return false;
-	        		}
-	        	}
+		        	//寫入
+		        	selector[method](this_event);
 
-	        	//寫入
-	        	selector[method](this_event);
-
-	        	var tp = val.meta.tp.substring(1,2)*1;
+		        	var tp = val.meta.tp.substring(1,2)*1;
 
 	        		//記錄timeline種類
 	        		this_event.data("timeline-tp",tp);
@@ -3022,7 +3016,7 @@ $(function(){
 	        		setEventStatus(this_event,$(".st-filter-area").data("filter"));
 
 	        		//timeline message內容
-    				timelineContentMake(this_event,target_div,val.ml);
+					timelineContentMake(this_event,target_div,val.ml);
 	        	});
 	        });
 	    });
