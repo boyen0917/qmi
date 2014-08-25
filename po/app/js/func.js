@@ -374,7 +374,6 @@ $(function(){
         return ajaxDo(api_name,headers,method,false);
 	}
 
-
 	topEvent = function (){
 		var top_area = $(
 			'<div class="st-top-area">'+
@@ -412,7 +411,7 @@ $(function(){
 		// cns.debug("_groupList[gi].guAll:",_groupList[gi].guAll);
 
 		topEventApi().complete(function(data){
-        	// cns.debug("topevent data:",data);
+        	cns.debug("topevent data:",data);
 
         	if(data.status == 200){
 
@@ -2788,7 +2787,7 @@ $(function(){
 	//動態消息列表
 	//先從資料庫拉資料 另外也同時從server拉資料存資料庫 再重寫
 	idbPutTimelineEvent = function (ct_timer){
-
+		var event_tp = $("#page-group-main").data("navi") || "00";
 	    //製作timeline
 	    var api_name = "groups/"+ gi +"/timelines/"+ ti_feed +"/events";
 	    if(ct_timer){
@@ -2804,6 +2803,10 @@ $(function(){
 	    var method = "get";
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
+	    	if(data.status != 200) return false;
+
+	    	var timeline_list = $.parseJSON(data.responseText).el;
+
 	    	//存db
             $.each(timeline_list,function(i,val){
                 val.ct = val.meta.ct;
@@ -2823,8 +2826,6 @@ $(function(){
 	}
 
 	idbTimelineListWrite = function (ct_timer,top_selector){
-
-		// idbTimelineListWrite();
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
     	var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
@@ -2850,21 +2851,11 @@ $(function(){
 		}
 				
 	    //製作timeline
-	    var api_name = "groups/"+ gi +"/timelines/"+ ti_feed +"/events";
-	    if(ct_timer){
-	    	api_name = api_name + "?ct=" + ct_timer;
-	    }
-	    var headers = {
-	            ui:ui,
-	            at:at, 
-	            li:lang,
-	            tp: event_tp
-        };
-	    var method = "get";
-	    var result = ajaxDo(api_name,headers,method,false);
-	    result.complete(function(data){
-	    	if(data.status != 200) return false;
+	    var count = 0;
+	    timeline_events.iterate(function(item,obj){
 
+
+	    	
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 	    	
 	    	//判斷是否為下拉更新
@@ -3055,12 +3046,26 @@ $(function(){
 					timelineContentMake(this_event,target_div,val.ml);
 	        	});
 	        });
-	    });
+	    },{
+            index: "gi",
+            keyRange: timeline_events.makeKeyRange({
+              only: gi
+            }),
+            autoContinue: false,
+            order: "DESC",
+            onEnd: function(result){
+                console.debug("onEnd:",result);
+            },
+            onError: function(result){
+                console.debug("onError:",result);
+            }
+        });
 	}
 
 	timelineListWrite = function (ct_timer,top_selector){
 
 		// idbTimelineListWrite();
+		idbPutTimelineEvent();
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
     	var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
