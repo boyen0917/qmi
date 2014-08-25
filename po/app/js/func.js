@@ -4363,7 +4363,6 @@ $(function(){
 
 
     getLoginDataForTest = function(){
-
     	//暫時
 		var api_name = "login";
 
