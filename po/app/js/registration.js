@@ -11,31 +11,32 @@ $(function(){
 
 	$(".login").click(function(){
 		//若local storage 有記錄密碼 就顯示
-		cns.debug("remeber:",$.lStorage("_loginRemeber"));
-		if($.lStorage("_loginRemeber")){
 
-			//順便幫他打個勾
-			$(".login-remeber img").attr("src","images/common/icon/icon_check_gray_check.png");
-			$(".login-remeber").data("chk",true);
-			$(".login-remeber-area").show();
-			$(".login-default-area").hide();
-			$(".login-change").show();
+		idb_login_data.getAll(function(item){
+			if(item.length){
+				//順便幫他打個勾
+				$(".login-remeber img").attr("src","images/common/icon/icon_check_gray_check.png");
+				$(".login-remeber").data("chk",true);
+				$(".login-remeber-area").show();
+				$(".login-default-area").hide();
+				$(".login-change").show();
 
-			$(".login-next").addClass("login-next-adjust");
+				$(".login-next").addClass("login-next-adjust");
 
-			//填入帳號
-			$(".login-account span:eq(1)").html("(" + $.lStorage("_loginRemeber").countrycode + ")" + $.lStorage("_loginRemeber").phone.substring(1));
+				//填入帳號
+				$(".login-account span:eq(1)").html("(" + item[0].countrycode + ")" + item[0].phone.substring(1));
 
-		}else{
-			$(".login-remeber img").attr("src","images/common/icon/icon_check_gray.png");
-			$(".login-remeber").data("chk",false);
-			$(".login-remeber-area").hide();
-			$(".login-default-area").show();
-			$(".login-change").hide();
-			$(".login-next").removeClass("login-next-adjust");
-		}
+			}else{
+				$(".login-remeber img").attr("src","images/common/icon/icon_check_gray.png");
+				$(".login-remeber").data("chk",false);
+				$(".login-remeber-area").hide();
+				$(".login-default-area").show();
+				$(".login-change").hide();
+				$(".login-next").removeClass("login-next-adjust");
+			}
 
-		$.mobile.changePage("#page-login", {transition: "slide"});
+			$.mobile.changePage("#page-login", {transition: "slide"});
+		});
 	});
 
 	$(".register").click(function(){
@@ -108,20 +109,19 @@ $(function(){
 
 
 	$(document).on("click",".login-next-ready",function(){
-
-		if($.lStorage("_loginRemeber") && !$(".login-change").data("chk")){
-			var phone_id = $.lStorage("_loginRemeber").phone;
-			var password = $(".login-remeber-password input").val();
-		}else{
-			var phone_id = $(".login-phone input").val();
-			var password = $(".login-password input").val();
-		}
-
-		//登入
-		login(phone_id,password,countrycode);
+		idb_login_data.getAll(function(item){
+			if(item.length && !$(".login-change").data("chk")){
+				var phone_id = item[0].phone;
+				var password = $(".login-remeber-password input").val();
+			}else{
+				var phone_id = $(".login-phone input").val();
+				var password = $(".login-password input").val();
+			}
+			cns.debug("phone_id:",phone_id,"pw:",password,"countrycode:",countrycode);
+			//登入
+			login(phone_id,password,countrycode);
+		});
 	});
-
-
 
 	login = function(phone_id,password,countrycode){
 
@@ -141,19 +141,17 @@ $(function(){
         	// cns.debug("login resutl:",JSON.stringify(login_result));
         	// return false;
         	if(data.status == 200){
-
-        		//登入成功 記錄帳號密碼
-        		if($(".login-remeber").data("chk")){
-					var _loginRemeber = {};
-		    		_loginRemeber.phone = phone_id;
-		    		_loginRemeber.password = password;
-		    		_loginRemeber.countrycode = countrycode;
-		    		$.lStorage("_loginRemeber",_loginRemeber);
-
-		    	}else{
-		    		//沒打勾的話就清除local storage
-		    		localStorage.removeItem("_loginRemeber");
-				}
+        		//先刪除 有打勾就記錄 沒打勾就不動作
+        		idb_login_data.clear(function(){
+        			//登入成功 記錄帳號密碼
+        			if($(".login-remeber").data("chk")){
+						var login_data_obj = {};
+						login_data_obj.phone = phone_id;
+						login_data_obj.password = password;
+						login_data_obj.countrycode = countrycode;
+						idb_login_data.put(login_data_obj);
+					}
+        		});
 
 				//儲存登入資料 跳轉到timeline
 				login_result.page = "timeline";
@@ -165,6 +163,7 @@ $(function(){
         				if($.parseJSON(data.responseText).gl.length > 0){
         					//有group
         					login_result.gl = $.parseJSON(data.responseText).gl;
+
         					$.lStorage("_loginData",login_result);
         					document.location = "main.html#page-group-main";
         				}else{
@@ -516,7 +515,7 @@ $(function(){
         	if(data.status == 200){
         		//登入成功 記錄帳號密碼
 				var _loginRemeber = {};
-	    		_loginRemeber.phone = "0" + $(document).data("phone-id").substring(3);
+	    		_loginRemeber.phone = "0" + $(document).data("phone-id").substring(4);
 	    		_loginRemeber.password = $(document).data("password");
 	    		_loginRemeber.countrycode = countrycode;
 	    		$.lStorage("_loginRemeber",_loginRemeber);
