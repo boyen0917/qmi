@@ -69,7 +69,7 @@ $(function(){
         }
 
 	}else{
-		if(window.location.href.match(/webdev.cloud.mitake.com.tw/) {
+		if(window.location.href.match(/webdev.cloud.mitake.com.tw/)) {
     		document.location = "index.html";
     		return false;
     	}else{
