@@ -69,8 +69,12 @@ $(function(){
         }
 
 	}else{
-		getLoginDataForTest();
-		//document.location = "index.html";
+		if(window.location.href.match(/webdev.cloud.mitake.com.tw/) {
+    		document.location = "index.html";
+    		return false;
+    	}else{
+    		getLoginDataForTest();
+    	}
 	}
 
 	// url參數 clear 存在 就清 local storage
