@@ -11,9 +11,7 @@ $(function(){
 
 	$(".login").click(function(){
 		//若local storage 有記錄密碼 就顯示
-		cns.debug("remeber:",$.lStorage("_loginRemeber"));
 		if($.lStorage("_loginRemeber")){
-
 			//順便幫他打個勾
 			$(".login-remeber img").attr("src","images/common/icon/icon_check_gray_check.png");
 			$(".login-remeber").data("chk",true);
@@ -108,7 +106,6 @@ $(function(){
 
 
 	$(document).on("click",".login-next-ready",function(){
-
 		if($.lStorage("_loginRemeber") && !$(".login-change").data("chk")){
 			var phone_id = $.lStorage("_loginRemeber").phone;
 			var password = $(".login-remeber-password input").val();
@@ -116,12 +113,10 @@ $(function(){
 			var phone_id = $(".login-phone input").val();
 			var password = $(".login-password input").val();
 		}
-
+		cns.debug("phone_id:",phone_id,"pw:",password,"countrycode:",countrycode);
 		//登入
 		login(phone_id,password,countrycode);
 	});
-
-
 
 	login = function(phone_id,password,countrycode){
 
@@ -141,17 +136,15 @@ $(function(){
         	// cns.debug("login resutl:",JSON.stringify(login_result));
         	// return false;
         	if(data.status == 200){
-
-        		//登入成功 記錄帳號密碼
-        		if($(".login-remeber").data("chk")){
+    			//登入成功 記錄帳號密碼
+    			if($(".login-remeber").data("chk")){
 					var _loginRemeber = {};
-		    		_loginRemeber.phone = phone_id;
-		    		_loginRemeber.password = password;
-		    		_loginRemeber.countrycode = countrycode;
-		    		$.lStorage("_loginRemeber",_loginRemeber);
-
-		    	}else{
-		    		//沒打勾的話就清除local storage
+					_loginRemeber.phone = phone_id;
+					_loginRemeber.password = password;
+					_loginRemeber.countrycode = countrycode;
+					$.lStorage("_loginRemeber",_loginRemeber);
+				}else{
+					//沒打勾的話就清除local storage
 		    		localStorage.removeItem("_loginRemeber");
 				}
 
@@ -165,6 +158,7 @@ $(function(){
         				if($.parseJSON(data.responseText).gl.length > 0){
         					//有group
         					login_result.gl = $.parseJSON(data.responseText).gl;
+
         					$.lStorage("_loginData",login_result);
         					document.location = "main.html#page-group-main";
         				}else{
@@ -516,7 +510,7 @@ $(function(){
         	if(data.status == 200){
         		//登入成功 記錄帳號密碼
 				var _loginRemeber = {};
-	    		_loginRemeber.phone = "0" + $(document).data("phone-id").substring(3);
+	    		_loginRemeber.phone = "0" + $(document).data("phone-id").substring(4);
 	    		_loginRemeber.password = $(document).data("password");
 	    		_loginRemeber.countrycode = countrycode;
 	    		$.lStorage("_loginRemeber",_loginRemeber);

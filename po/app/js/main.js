@@ -1,4 +1,5 @@
 $(function(){  
+
 	//沒有登入資訊 就導回登入頁面
 	if($.lStorage("_loginData")){
 		var _loginData = $.lStorage("_loginData");
@@ -68,15 +69,13 @@ $(function(){
         }
 
 	}else{
-		getLoginDataForTest();
-		//document.location = "index.html";
+		if(window.location.href.match(/webdev.cloud.mitake.com.tw/)) {
+    		document.location = "index.html";
+    		return false;
+    	}else{
+    		getLoginDataForTest();
+    	}
 	}
-
-
-	$(".st-feedbox-area-bottom > div > div").click(function(){
-		document.location = "db.html";
-
-	});
 
 	// url參數 clear 存在 就清 local storage
     clear = $.getUrlVar('clear');
@@ -87,7 +86,7 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		topEventChk();
+		// topEventChk();
 	});
 
 
