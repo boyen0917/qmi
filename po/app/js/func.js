@@ -4385,9 +4385,9 @@ $(function(){
             li:lang
         };
         var body = {
-            id: "+886980922917",
+            id: "+886956634948",
             tp:"0",
-            pw:toSha1Encode("111111")
+            pw:toSha1Encode("zaq12wsx")
         };
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
