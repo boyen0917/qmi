@@ -65,7 +65,11 @@ $(function(){
         	topEvent();
 
         	//動態消息
-        	timelineListWrite();
+        	//timelineListWrite();
+        	setTimeout(function(){
+        		timelineListWrite();
+        	},500);
+        	
         }
 
 	}else{
@@ -86,7 +90,21 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		// topEventChk();
+		// timelineListWrite();
+		var event_tp = $("#page-group-main").data("navi") || "00";
+		var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
+
+		var val = "G00000170DO_T000003Q0Dl_E000001d00";
+		if(selector.find("[data-event-id="+val+"]").length){
+			cns.debug("ya:",selector.find("[data-event-id="+val+"]"));
+		}else{
+			cns.debug("no:",selector.find("[data-event-id="+val+"]"));
+		}
+		
+		// selector.find(".st-sub-box").each(function(){
+			
+			
+		// });
 	});
 
 
@@ -94,7 +112,6 @@ $(function(){
 	$(window).scroll(function() {
 		//timeline 才要做
 		if(!$(".feed-subarea").is(":visible")) return false;
-
 
 		var top_height = $(window).scrollTop();
 		
