@@ -1,0 +1,83 @@
+
+/*.feed-compose,.navi-alert,*/.chatList-add {
+	position:absolute;
+    top: 10px;
+	width:35px;
+	height: 35px;
+	cursor:pointer;
+}
+
+.chatList-add {
+	background: url(../images/navi/navi_icon_chat_addchatroom.png);
+	background-size: cover;
+	/*right: 55px;*/
+	right: 15px;
+	z-index: 10;
+}
+
+.chatList-add-click {
+    background: url(../images/navi/navi_icon_chat_addchatroom_click.png);
+    background-size: cover;
+}
+
+.subpage-chatList {
+	position: fixed;
+	width: 100%;
+	display: none;
+}
+
+.subpage-chatList .rows {
+    background:#d0d0d0;
+    display: block;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+}
+
+.subpage-chatList-row {
+    border-width: 1px 0px 1px 0px;
+    border-color: #d0d0d0;
+    border-style: solid;
+    background:white;
+    display: block;
+    min-height: 80px;
+    padding: 0px 15px 10px 0px;
+    cursor: pointer;
+}
+
+.subpage-chatList-row .pic {
+    /*
+    background:url(../images/navi/navi_icon_chat_addchatroom_click.png);
+    background-size: cover;
+    width:60px;
+    height:60px;
+    float: left;
+    */
+}
+.subpage-chatList-row .name {
+	margin: 22px 0 5px;
+	width: 70%;
+	height: 20px;
+	color: #323537;
+	font-size: 18px;
+}
+
+.subpage-chatList-row .msg {
+	color: #535353;
+	width: 70%;
+	float: left;
+	display: block;
+	font-size: 12px;
+}
+.subpage-chatList-row .time {
+	color: #444648;
+	width: 20%;
+	float: right;
+	text-align: right;
+	font-size: 10px;
+	padding-top: 20px;
+}
+.subpage-chatList-row .drag {
+	background:rgb(255,255,0);
+	float: right;
+}

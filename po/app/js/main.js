@@ -1,5 +1,8 @@
 $(function(){  
 
+	//load language
+	updateLanguage( lang );
+
 	//沒有登入資訊 就導回登入頁面
 	if($.lStorage("_loginData")){
 		var _loginData = $.lStorage("_loginData");

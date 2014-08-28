@@ -6,9 +6,11 @@
         <title>Project O</title>
         <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
         <link rel="stylesheet" href="css/main.css" />
+        <link rel="stylesheet" href="css/chatList.css" />
         
         <script src="../js/jquery.js"></script>
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
+        <script type="text/javascript" src="../js/jquery.i18n.js"></script>
         
         <script src="js/jquery.plugin.js"></script>
         
@@ -21,6 +23,7 @@
         
         <script type="text/javascript" src="js/func.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript" src="js/chatList.js"></script>
         
         <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
         <script src="js/jquery.tinyMap.min.js"></script>
@@ -131,17 +134,17 @@
                    <div class="sm-small-area-r">動態消息</div>
                    <div class="sm-count">315</div>
                 </div>
-	            <!-- <div data-sm-act="contact" class="sm-small-area">
+	            <!--<div data-sm-act="contact" class="sm-small-area">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_contact.png"/></div>
                    <div class="sm-small-area-r">聯絡人</div>
                    <div class="sm-count"></div>
-                </div>
+                </div>-->
                 <div data-sm-act="chat" class="sm-small-area">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_chat.png"/></div>
                    <div class="sm-small-area-r">聊天</div>
                    <div class="sm-count"></div>
                 </div>
-                <div data-sm-act="calendar" class="sm-small-area">
+                <!--<div data-sm-act="calendar" class="sm-small-area">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_calendar.png"/></div>
                    <div class="sm-small-area-r">行事曆</div>
                    <div class="sm-count"></div>
@@ -342,6 +345,12 @@
 	                </div>
 	                <div class="clear"></div>
 	            </div>
+
+            <!------------------------------------- 聊天列表 ---------------------------------------->
+                    <div class="subpage-chatList">
+                        <div class="st-navi-area"></div>
+                        <div class="rows"></div>
+                    </div>
             </div>
 	            
         </div><!-- /page-group-main -->

@@ -45,14 +45,14 @@
       
     },
 
-    load: function(lang_path, callback) {
+    load: function(lang, callback) {
       var this_i18n = this;
       $.ajaxSetup({
         async: false,
         timeout: 2000
       });
 
-      $.get(lang_path,function(load_dict){
+      $.get('lan/'+lang+'.json',function(load_dict){
 
         if (this_i18n.dict !== null) {
           $.extend(this_i18n.dict, load_dict);
@@ -107,6 +107,17 @@
   		// Substitute any params.
   		return this.printf.apply(this, args);
   	},
+
+    getString: function (str) {
+      dict = this.dict;
+      if (dict && dict.hasOwnProperty(str)) {
+        str = dict[str];
+      }
+      args = __slice.call(arguments);
+      args[0] = str;
+      // Substitute any params.
+      return this.printf.apply(this, args);
+    },
 
     /*
      * printf()

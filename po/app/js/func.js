@@ -275,6 +275,7 @@ $(function(){
 			    $(".st-navi-area .main").trigger("click");
 
 	        	$(".subpage-contact").hide();
+	        	$(".subpage-chatList").hide();
 	        	$(".subpage-timeline").show();
 	        	// $( "#side-menu" ).panel( "close");
 	        	$("#page-group-main").find("div[data-role=header] h3").html("動態消息");
@@ -286,6 +287,14 @@ $(function(){
 	            //$("#page-group-main").find("div[data-role=header] h3").html("聯絡人");
 	          break;
 	        case "chat":
+	        	//-- switch sub pages --
+	        	$(".subpage-contact").hide();
+	        	$(".subpage-timeline").hide();
+	        	$(".subpage-chatList").show();
+	        	$( "#side-menu" ).panel( "close");
+
+	        	setChatList();
+
 	        	//$.mobile.changePage("#page-chatroom");
 	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
 	          break;
@@ -4370,9 +4379,9 @@ $(function(){
             li:lang
         };
         var body = {
-            id: "+886980922917",
+            id: "+886956634948",
             tp:"0",
-            pw:toSha1Encode("111111")
+            pw:toSha1Encode("zaq12wsx")
         };
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
@@ -4403,4 +4412,13 @@ $(function(){
         });
     };
 	
+	//================================== language ===========================
+
+	updateLanguage = function( lanPath ){
+		$.i18n.load(lanPath, function(){
+			var tmp = $('.text').data("textid");
+			var text = $('.text')._t( tmp );
+		});
+	}
+
 });

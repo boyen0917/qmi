@@ -78,8 +78,8 @@ $(document).ready(function(){
         getGroupLists();
 	}
 
-
-	updateLanguage('lan/zh_TW.json');
+	//load language
+	updateLanguage( lang );
 
     $(".div").css("overflow", "hidden");
     $(".div").css("position", "fixed");
@@ -102,23 +102,6 @@ $(document).ready(function(){
 	    }
 	});
 });
-
-function updateLanguage( lanPath ){
-
-/*
-	$.i18n.load(lanPath, function(){
-		$('.text')._t('chat-title');
-	});
-	*/
-	
-	$.i18n.load(lanPath, function(){
-		var tmp = $('.text').data("textid");
-		var text = $('.text')._t( tmp );
-		//$('.text').text( $.i18n($(this).data("textid")) );
-	});
-}
-
-
 
 
 
@@ -355,7 +338,7 @@ function enterChatRoom(gid, rid, name){
 	if(g_groupChatRooms[g_chatRID]){
 		g_chatName = name+"("+")";
 	} else {
-		g_chatName = $.i18n._("chat-title");
+		g_chatName = $.i18n.getString("chat-title");
 	}
 
 	$("#msgDiv").removeClass("hid");
