@@ -15,9 +15,8 @@ setChatList = function(){
 			if( currentGroup )	tmp.next().html( currentGroup.gn );
 		}
 		//set add icon
-		var tmp = parent.find("~ div[class=feed-compose]");
-		tmp.removeClass("feed-compose feed-compose-click feed-compose-visit");
-		tmp.addClass("chatList-add");
+		parent.find("~ div[class=feed-compose]").hide();
+		parent.find("~ div[class=chatList-add]").show();
 	}
 	
 	//---- get chat list -----
@@ -30,9 +29,9 @@ setChatList = function(){
 	if( currentGroup ){
 
 		//try get data
-		if( currentGroup.hasOwnProperty("chatAll") ){
-			showChatList();
-		} else {
+		//if( currentGroup.hasOwnProperty("chatAll") ){
+		//	showChatList();
+		//} else {
 
 			//取得聊天室列表
 		    var api_name = "groups/"+ gi +"/chats";
@@ -59,7 +58,7 @@ setChatList = function(){
 				    }
 				}
 		    });
-		}
+		//}
 	}	//end of if( currentGroup )
 }
 

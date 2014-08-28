@@ -279,6 +279,12 @@ $(function(){
 	        	$(".subpage-timeline").show();
 	        	// $( "#side-menu" ).panel( "close");
 	        	$("#page-group-main").find("div[data-role=header] h3").html("動態消息");
+	        	var parent = $("#page-group-main").find("div[data-role=header] div[class=header-group-name]");
+				if( parent ){
+					//set add icon
+					parent.find("~ div[class=feed-compose]").show();
+					parent.find("~ div[class=chatList-add]").hide();
+				}
 	          break;
 	        case "contact": 
 	        	//$(".subpage-contact").show();
@@ -4379,9 +4385,9 @@ $(function(){
             li:lang
         };
         var body = {
-            id: "+886956634948",
+            id: "+886980922917",
             tp:"0",
-            pw:toSha1Encode("zaq12wsx")
+            pw:toSha1Encode("111111")
         };
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
