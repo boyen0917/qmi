@@ -96,11 +96,7 @@ function showChatList(){
 					}
 					
 				} else {
-					if( room.cn.length>10 ){
-						chatRoomName = room.cn.substring(0,10)+"...";
-					} else {
-						chatRoomName = room.cn;
-					}
+					chatRoomName = room.cn;
 					imgSrc="images/common/others/empty_img_mother_l.png";
 				}
 

@@ -139,16 +139,18 @@ body{
 }
 /*設定head bar後div裡的第1個div文字大小（主標題）*/
 .header-group-name div:nth-child(1) {
-    font-size: 18px;
+    font-size: 19px;
+    width: 80%;
 }
 /*設定head bar後div裡第2個div文字大小（副標題）*/
 .header-group-name div:nth-child(2) {
-	font-size: 14px;
+	font-size: 12px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	color: #eee;
 }
+
 /* =============================== center frame ===================================== */
 
 .main{

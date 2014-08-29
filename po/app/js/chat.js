@@ -16,12 +16,12 @@ $(document).ready(function(){
 	g_ui = _loginData.ui;
 	g_at = _loginData.at;
 	g_ci = _loginData.ci;
-	g_cn = _loginData.cn;
     g_userData = $.lStorage( g_ui );
 
     //所有團體列表
     g_group = g_userData[g_gi];
     g_room = g_group["chatAll"][g_ci];
+	g_cn = g_room.uiName;
 
     if( !g_userData ){
     	document.location = "login.html";
@@ -37,7 +37,8 @@ $(document).ready(function(){
     //setGroupAllUser();
 
     //header 設定團體名稱
-    $(".header-group-name div:eq(1)").html(g_cn);
+    var tmp = $(".header-group-name div:nth-child(1)").html();
+    $(".header-group-name div:nth-child(1)").html(g_cn);
     
     //sidemenu name
     //setSmUserData(g_gi,gu,gn);
@@ -69,7 +70,7 @@ $(document).ready(function(){
     //side menu click event
     $(".side-menu-btn").click(function(){
         //$( "#side-menu" ).panel( "open");
-        document.location = "main.html";
+        document.location = "main.html#";
     });
 
 	//- press enter to send msg
