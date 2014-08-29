@@ -2791,7 +2791,7 @@ $(function(){
 	
 	//動態消息列表
 	//先從資料庫拉資料 另外也同時從server拉資料存資料庫 再重寫
-	idbPutTimelineEvent = function (ct_timer){
+	idbPutTimelineEvent = function (ct_timer,is_top){
 		var event_tp = $("#page-group-main").data("navi") || "00";
 	    //製作timeline
 	    var api_name = "groups/"+ gi +"/timelines/"+ ti_feed +"/events";
@@ -2812,46 +2812,47 @@ $(function(){
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 
-	    	var event_tp = $("#page-group-main").data("navi") || "00";
-	    	var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
+	    	// var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
 	    	//存db
-	    	var new_timeline_list = [];
-	    	var update_timeline_list = [];
-            $.each(timeline_list,function(i,val){
-                val.ct = val.meta.ct;
-                val.gi = gi ;
-                // idb_timeline_events.put(val,function(){
-                	var this_event = selector.find("[data-event-id="+ val.ei +"]");
-                	if(this_event.length){
-                		cns.debug("omgomg");
-                		update_timeline_list.push(val);
-                		// timelineBlockMake(this_event,timeline_list);
-					}else{
-						new_timeline_list.push(val);
-						// $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-			        		
-			   //  			timelineBlockMake($(this).find(".st-sub-box"),[val],"",selector.find(".st-sub-box:eq(0)"));
-				  //   	});
-					}
-                // });
-            });
+	    // 	var new_timeline_list = [];
+	    // 	var update_timeline_list = [];
+     //        $.each(timeline_list,function(i,val){
+     //            val.ct = val.meta.ct;
+     //            val.gi = gi ;
+     //            // idb_timeline_events.put(val,function(){
+     //            	var this_event = selector.find("[data-event-id="+ val.ei +"]");
+     //            	if(this_event.length){
+     //            		cns.debug("omgomg");
+     //            		update_timeline_list.push(val);
+     //            		// timelineBlockMake(this_event,timeline_list);
+					// }else{
+					// 	new_timeline_list.push(val);
+					// 	// $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+			  //  //  			timelineBlockMake($(this).find(".st-sub-box"),[val],"",selector.find(".st-sub-box:eq(0)"));
+				 //  //   	});
+					// }
+     //            // });
+     //        });
 
-            //記錄完list後 寫timeline
-            if(update_timeline_list.length != 0){
-            	cns.debug("update timeline:",update_timeline_list);
-            }
+       //      //記錄完list後 寫timeline
+       //      if(update_timeline_list.length != 0){
+       //      	cns.debug("update timeline:",update_timeline_list);
+       //      	timelineBlockMake("",update_timeline_list);
+       //      }
 
-            if(new_timeline_list.length != 0){
-            	cns.debug("update timeline:",new_timeline_list);
-            	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-	    			timelineBlockMake($(this).find(".st-sub-box"),new_timeline_list,"",selector.find(".st-sub-box:eq(0)"));
-		    	});
-            }
+       //      if(new_timeline_list.length != 0){
+       //      	cns.debug("update timeline:",new_timeline_list);
+       //      	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+	    		// 	timelineBlockMake($(this).find(".st-sub-box"),new_timeline_list,selector.find(".st-sub-box:eq(0)"));
+		    	// });
+       //      }
             
 
             //存完後改timeline
-
+            $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
+	    	});
             // timelineBlockMake("",timeline_list);
 	    });
 	}
@@ -2864,13 +2865,13 @@ $(function(){
 		}
 	}
 
-	timelineBlockMake = function(this_event_temp,timeline_list,ct_timer,top_selector){
+	timelineBlockMake = function(this_event_temp,timeline_list,is_top){
 		cns.debug("begin:",timeline_list);
-		cns.debug("top_selector:",top_selector);
 		// $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
 			
 			var event_tp = $("#page-group-main").data("navi") || "00";
 	    	var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
+	    	var top_selector = selector.find(".st-sub-box:eq(0)");
 
 		    //製作timeline
 		    $.each(timeline_list,function(i,val){
@@ -2888,22 +2889,9 @@ $(function(){
 	        		selector.data("last-ct",val.meta.ct);
 	        	}
 
-	        	//下拉更新
-	        	if(top_selector){
-	        		cns.debug("top enter val.ct:",val.meta.ct);
-	        		cns.debug("top enter top_selector ct:",top_selector.data("ct"));
-	        		if(val.meta.ct > top_selector.data("ct")){
-	        			//若timeline是空的 就按照原本的append來做
-	        			if(top_selector.length != 0){
-	        				cns.debug("???:",top_selector.length);
-
-	        				selector = top_selector;
-		        			method = "before";
-	        			}else{
-	        				cns.debug("!!!!:",top_selector);
-	        			}
-
-	        		}else{
+	        	//下拉更新 且 沒新資料 就跳出(或跳出這筆即可？)
+	        	if(is_top && val.meta.ct <= top_selector.data("ct")){
+	        		cns.debug("下拉更新 沒新資料");
 	        			setTimeout(function(){
         					$(".st-navi-area").removeClass("st-navi-fixed");
         					$(".st-top-area-load").removeClass("mt");
@@ -2913,7 +2901,6 @@ $(function(){
 							$(".st-navi-area").data("scroll-chk",false);
 	        			},1000);
 	        			return false;
-	        		}
 	        	}else{
 					//開啟timeline loading 關閉沒資料圖示 上拉更新除外
 	        		$(".st-feedbox-area-bottom > img").show();
@@ -2925,17 +2912,14 @@ $(function(){
 		        	},1000);
 
 		        	var close_chk = false;
-		        	if(ct_timer){
-		        		//沒資料 關閉圖示
-		        		if(timeline_list.length == 0){
-		        			//關閉timeline loading 開啟沒資料圖示
-		        			close_chk = true;
-		        		}
-		        	}else{
-		        		//不是下拉更新 就隱藏其他類別
-						$(".feed-subarea").hide();
-						selector.show();
-		        	}
+		        	if(timeline_list.length == 0){
+	        			//關閉timeline loading 開啟沒資料圖示
+	        			close_chk = true;
+	        		}
+
+	        		//不是下拉更新 就隱藏其他類別
+					$(".feed-subarea").hide();
+					selector.show();
 
 
 		        	//資料個數少於這個數量 表示沒東西了
@@ -2951,23 +2935,24 @@ $(function(){
 			        }
 	        	}
 
-	        	
 
 	        	//傳來的this_event_temp如果存在 表示是需要更新的舊event
-	        	if(Object.keys(this_event_temp.data()).length){
-	        		cns.debug("emmmm");
+	        	// if(Object.keys(this_event_temp.data()).length){
+
+	        	//判斷是否為更新事件
+	        	var this_event = selector.find("[data-event-id="+ val.ei +"]");
+	        	if(this_event.length){
+	        		var time = new Date(val.meta.ct);
+        			var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
+	        		cns.debug("update!:",time_format);
 	        		var this_event = this_event_temp;
 	        	}else{
-	        		var this_event = this_event_temp.clone();	
+	        		this_event = this_event_temp.clone();	
 	        		//寫入
-	        		cns.debug("this_event:",this_event);
-	        		cns.debug("selector:",selector);
-	        		cns.debug("method:",method);
 	        		selector[method](this_event);
 	        	}
-	        	
 
-
+	        	//-------------------------------------------------------------------
 
 	        	var tp = val.meta.tp.substring(1,2)*1;
 
@@ -3100,10 +3085,10 @@ $(function(){
 		// });//here
 	}
 
-	timelineListWrite = function (ct_timer,top_selector){
+	timelineListWrite = function (ct_timer,is_top){
 
 		//判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
-    	if(!ct_timer && !top_selector){
+    	if(!ct_timer && !is_top){
 
     		var event_tp = $("#page-group-main").data("navi") || "00";
     		var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
@@ -3120,15 +3105,18 @@ $(function(){
     	}
 
 		var idb_timer = ct_timer || 9999999999999;
-		cns.debug("ct_timer:",ct_timer);
 		//取得server最新資訊 更新資料庫
-		idbPutTimelineEvent(ct_timer);
+		idbPutTimelineEvent(ct_timer,is_top);
+
+
+		//下拉更新就不需要資料庫了
+		if(is_top) return false;
     	
     	//同時先將資料庫資料取出先寫上
 	    idb_timeline_events.limit(function(timeline_list){
 	    	//寫timeline
 	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,ct_timer,top_selector);
+    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,ct_timer);
 	    	});
 	    },{
             index: "gi_ct",
@@ -3498,9 +3486,9 @@ $(function(){
 			$(".st-refresh-top span").show();
 		},300);
 
-		var event_tp = $("#page-group-main").data("navi") || "00";
-    	var selector = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box:eq(0)");
-		timelineListWrite("",selector);
+		// var event_tp = $("#page-group-main").data("navi") || "00";
+  //   	var selector = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box:eq(0)");
+		timelineListWrite("",true);
 
 		//置頂設定
 		// topEvent();
