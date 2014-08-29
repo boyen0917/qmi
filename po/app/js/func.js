@@ -2792,6 +2792,7 @@ $(function(){
 	//動態消息列表
 	//先從資料庫拉資料 另外也同時從server拉資料存資料庫 再重寫
 	idbPutTimelineEvent = function (ct_timer){
+		cns.debug("ct_timer:",ct_timer);
 		var event_tp = $("#page-group-main").data("navi") || "00";
 	    //製作timeline
 	    var api_name = "groups/"+ gi +"/timelines/"+ ti_feed +"/events";
@@ -2812,7 +2813,6 @@ $(function(){
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 
-	    	var event_tp = $("#page-group-main").data("navi") || "00";
 	    	var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
 	    	//存db
@@ -2830,7 +2830,6 @@ $(function(){
 					}else{
 						new_timeline_list.push(val);
 						// $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-			        		
 			   //  			timelineBlockMake($(this).find(".st-sub-box"),[val],"",selector.find(".st-sub-box:eq(0)"));
 				  //   	});
 					}
@@ -2843,15 +2842,14 @@ $(function(){
             }
 
             if(new_timeline_list.length != 0){
-            	cns.debug("update timeline:",new_timeline_list);
+            	cns.debug("new_timeline_list:",new_timeline_list);
             	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
 	    			timelineBlockMake($(this).find(".st-sub-box"),new_timeline_list,"",selector.find(".st-sub-box:eq(0)"));
 		    	});
             }
-            
 
-            //存完後改timeline
-
+            //存完後改timelinesss
+            //this line is in the branch develop
             // timelineBlockMake("",timeline_list);
 	    });
 	}
@@ -2958,6 +2956,7 @@ $(function(){
 	        		cns.debug("emmmm");
 	        		var this_event = this_event_temp;
 	        	}else{
+	        		cns.debug("yeah");
 	        		var this_event = this_event_temp.clone();	
 	        		//寫入
 	        		cns.debug("this_event:",this_event);
@@ -3126,6 +3125,7 @@ $(function(){
     	
     	//同時先將資料庫資料取出先寫上
 	    idb_timeline_events.limit(function(timeline_list){
+	    	cns.debug("timelineListWrite idb write:",timeline_list);
 	    	//寫timeline
 	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
     			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,ct_timer,top_selector);
