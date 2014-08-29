@@ -63,9 +63,11 @@ setChatList = function(){
 }
 
 function showChatList(){
-	var groupData = $.lStorage(ui)[gi];
+	var data = $.lStorage(ui);
+	var groupData = data[gi];
 	var chatList = groupData["chatAll"];
 	var targetDiv = $(".subpage-chatList .rows");
+
 	if( targetDiv ){
 		var tmp;
 		$.each(chatList,function(key,room){
@@ -94,23 +96,41 @@ function showChatList(){
 					}
 					
 				} else {
-					chatRoomName = room.cn;
+					if( room.cn.length>10 ){
+						chatRoomName = room.cn.substring(0,10)+"...";
+					} else {
+						chatRoomName = room.cn;
+					}
 					imgSrc="images/common/others/empty_img_mother_l.png";
 				}
+
+				room["uiName"]=chatRoomName;
 				$(this).find(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
-				tmp = $("<div class='subpage-chatList-row'>"
+				tmp = $("<div class='subpage-chatList-row' data-id='"+ room.ci +"''>"
 						+ "<img class='aut st-user-pic' src=" + imgSrc + "></img>" 
 						+ "<div class='time'>" + "[last msg time]" + "</div>"
-						+ "<div class='name'>" + chatRoomName + "</div>"
+						+ "<div class='name'>" + chatRoomName.substring(0,15) + "</div>"
 						+ "<div class='msg'>" + "[last msg here]" + "</div>"
 						+ "<div class='drag'></div>"
 					+ "</div>");
-				targetDiv.append(tmp);	
+				targetDiv.append(tmp);
 			}
 		});
+
+		$.lStorage(ui, data);
 	}
 
-	//$(document).on("click",".subpage-chatList-row .pic",function{
-	//	$(this,data
-	//}....)
+
+	$(".subpage-chatList-row").off("click");
+	$(".subpage-chatList-row").on("click", function(){
+		var data= new Object();
+		data["gi"]=gi;
+		data["ci"]=$(this).data("id");
+		data["ui"]=ui;
+		data["at"]=at;
+		//data["cn"]=$(this).data("name");
+		$.lStorage( "_chatRoom", data );
+		//document.location = "chat.html";
+		var gallery = window.open("chat.html", "_blank", "width=400, height=600");
+	});
 }

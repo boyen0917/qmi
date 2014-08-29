@@ -242,42 +242,69 @@ body{
 
 /* =========================== footer ============================== */
 .chat-footer{
-	line-height: 3em;
+	/*line-height: 3em;
+	background-size: 100%;
+	*/
+	background: url("../images/chatroom/chat_textbar_bgimg.png") no-repeat center center fixed;
+	background-color: white;
+	width: 100%;
+	padding: 10px 10px 10px 0;
+	text-align: center;
+}
+
+#chat-input-other{
+	width: 30px;
+}
+
+#chat-input-emoji{
+	width: 30px;
 }
 
 #chat-input{
+	vertical-align: 50%;
+	width: 63%;
+	min-height: 1em;
+	padding: 5px;
+	border: 1px solid #aaa;
+	border-style: solid;
+	border-radius: 3px;
+	box-shadow: inset 0 1px 4px rgba(0,0,0,.2);
+	display: inline-block;
+	color:black;
+	text-align: left;
+}
+
+#chat-send-btn{
 	/*
-	position: absolute;
-	bottom: 0;
-	left: 0;
+	background: url("../images/chatroom/chat_textbar_frame_bt.png") no-repeat;
+	background-size:100% 100%;
+	width: 50px;
 	*/
-	width: 85%; /* 100%-width(其他, icon, send)*/
-	margin-left: 10%;
+	background: rgb(32,79,150);
+	color: white;
+	height: 25px;
+	display: inline-block;
+	vertical-align: 44%;
+	border-style: hidden;
+	border-radius: 6px;
+	padding: 1px 5px 0px 5px;
 }
 
 ::-webkit-scrollbar { 
     display: none; 
 }
+
+.chat-msg-right, .chat-msg-left{
+	clear: both;
+	margin-bottom: 10px;
+}
 .chat-msg-right{
 	text-align: right;
-	clear: both;
-	/*
-	max-width: 80%;
-	margin-left: auto;
-	clear: both;
-	max-width: 80%;
-	*/
 } 
 .chat-msg-left{
 	text-align: left;
-	clear: both;
-	/*
-	max-width: 80%;
-	margin-right: auto;
-	float: left;
-	clear: both;
-	*/
 }
+
 .chat-msg-time{
 	display:inline-block;
 	font-size: 8px;
@@ -293,14 +320,14 @@ body{
 	white-space: pre-line;
 }
 .chat-msg-bubble-right{
-	float: right;
-	border-color: #72DAFD;
-	background: #72DAFD;
-}
-.chat-msg-bubble-left{
 	border-color: rgb(75,124,219);
 	background: rgb(75,124,219);
 	color: white;
+	text-align: left;
+}
+.chat-msg-bubble-left{
+	border-color: #72DAFD;
+	background: #72DAFD;
 }
 .chat-date-tag{
 	display: table;

@@ -278,4 +278,15 @@ $(function(){
 		$.mobile.changePage(page);
 	}
 
+	
+	//================================== language ===========================
+
+	updateLanguage = function( lanPath ){
+		$.i18n.load(lanPath, function(){
+			$('.text').each( function(){
+				var tmp = $(this).data("textid");
+				var text = $(this)._t( tmp );
+			});
+		});
+	}
 });
