@@ -2815,41 +2815,16 @@ $(function(){
 	    	// var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
 	    	//存db
-	    // 	var new_timeline_list = [];
-	    // 	var update_timeline_list = [];
-     //        $.each(timeline_list,function(i,val){
-     //            val.ct = val.meta.ct;
-     //            val.gi = gi ;
-     //            // idb_timeline_events.put(val,function(){
-     //            	var this_event = selector.find("[data-event-id="+ val.ei +"]");
-     //            	if(this_event.length){
-     //            		cns.debug("omgomg");
-     //            		update_timeline_list.push(val);
-     //            		// timelineBlockMake(this_event,timeline_list);
-					// }else{
-					// 	new_timeline_list.push(val);
-					// 	// $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-			  //  //  			timelineBlockMake($(this).find(".st-sub-box"),[val],"",selector.find(".st-sub-box:eq(0)"));
-				 //  //   	});
-					// }
-     //            // });
-     //        });
+	    	var new_timeline_list = [];
+	    	var update_timeline_list = [];
+            $.each(timeline_list,function(i,val){
+                val.ct = val.meta.ct;
+                val.gi = gi ;
+                idb_timeline_events.put(val);
+            });
 
-       //      //記錄完list後 寫timeline
-       //      if(update_timeline_list.length != 0){
-       //      	cns.debug("update timeline:",update_timeline_list);
-       //      	timelineBlockMake("",update_timeline_list);
-       //      }
 
-       //      if(new_timeline_list.length != 0){
-       //      	cns.debug("update timeline:",new_timeline_list);
-       //      	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-	    		// 	timelineBlockMake($(this).find(".st-sub-box"),new_timeline_list,selector.find(".st-sub-box:eq(0)"));
-		    	// });
-       //      }
-            
-
-            //存完後改timeline
+            //存完後改timeline 
             $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
     			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
 	    	});
@@ -2857,13 +2832,6 @@ $(function(){
 	    });
 	}
 
-	timelineBlockMakeTest = function(this_event_temp,rr){
-		cns.debug(rr);
-		cns.debug("this_event_temp:",Object.keys(this_event_temp.data()).length);
-		if(Object.keys(this_event_temp.data()).length){
-			cns.debug("dfsdfds");
-		}
-	}
 
 	timelineBlockMake = function(this_event_temp,timeline_list,is_top){
 		cns.debug("begin:",timeline_list);
@@ -3106,14 +3074,14 @@ $(function(){
 
 		var idb_timer = ct_timer || 9999999999999;
 		//取得server最新資訊 更新資料庫
-		idbPutTimelineEvent(ct_timer,is_top);
-
+		//idbPutTimelineEvent(ct_timer,is_top);
 
 		//下拉更新就不需要資料庫了
 		if(is_top) return false;
-    	
+    	cns.debug("gi:",gi);
     	//同時先將資料庫資料取出先寫上
 	    idb_timeline_events.limit(function(timeline_list){
+	    	cns.debug("idb:",timeline_list);
 	    	//寫timeline
 	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
     			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,ct_timer);
