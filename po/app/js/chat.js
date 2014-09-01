@@ -104,8 +104,8 @@ $(document).ready(function(){
 	// }
 
 	$("#msgDiv").removeClass("hid");
-	$(".page-title").text(g_cn);
-	$(".page-title").append("<div class='text' >");
+	$(".page-title").html(g_cn);
+	$(document).find("title").text("Project O - " + g_cn);
 
 	showChat();
 });
@@ -149,74 +149,10 @@ function op( url, type, data, delegate){
 	});
 }
 
-// function login(id, pwd) {
-// 	$.ajax({
-// 	    url: "https://apserver.mitake.com.tw/apiv1/login",
-// 	    type: "POST",
-// 	    data: JSON.stringify({id: id, tp: 0, pw: encrypt(pwd)}),
-// 	    dataType: "json",
-// 	    headers: {
-// 		li: "TW"
-// 	    },
-// 	    success: function(data, status, xhr) {
-// 	    	$.lStorage("_loginData",data);
-// 			ui = data.ui;
-// 			at = data.at;
-
-// 			g_userData = $.lStorage(ui);
-// 			getGroupLists();
-// 	    }
-// 	});
-// 	//alert( JSON.stringify({id: id, tp: 0, pw: encrypt(pwd)}) );
-// }
-
 function encrypt(a) {
 	var hash = CryptoJS.SHA1(a);
 	return hash.toString(CryptoJS.enc.Base64);
 }
-
-// function getGroupLists() {
-// 	$("#main_groupTable").html("");
-
-// 	var keys = Object.keys(g_userData);
-// 	var tmp = "";
-// 	for( var i=1; i< keys.length; i++ ){
-// 	    var key = keys[i];
-// 	    var group = g_userData[key];
-	    
-// 	    //title
-// 	    tmp += "<h1 class='groupBtn demoHeaders' id='" +key+ "'>"+group.gn+"</h1>"
-// 		+"<div>"
-// 		    + "member count:" + group["guAll"].length + "<br>"
-// 		    + "<div id='" + key+ "_memList'></div>"
-// 		    + "<div id='" +key+ "_chatList'>!!!!</div>"
-// 		+"</div>";
-// 	}
-// 	$("#main_groupTable").append(tmp); 
-// 	/*
-// 	$( "#main_groupTable" ).accordion({
-// 	    heightStyle: "content"
-// 	});
-// */
-// 	//$("#main_groupTable tr:last").after(row);
-	
-// 	$(".groupBtn").click(function(){
-// 	    getGroupMember( $(this).attr("id") );
-// 	});
-// 	g_gi=keys[1];
-// 	getGroupMember( g_gi );
-// 	//$( "#main_groupTable" ).accordion();
-// }
-
-// function getGroupMember( id ){
-// 	var tmp = "<p>Members<br>";
-// 	for( var key in g_userData[id]["guAll"] ){
-// 	    var mem = g_userData[id]["guAll"][key];
-// 	    tmp += "<button>"+mem.nk+"</button>";
-// 	}
-// 	getChatList( id );
-// 	$("#"+id+"_memList").html(tmp+"</p>");
-// }
 
 function getGroupMemberFromData( g_uid ){
 	if(!g_group["guAll"][g_uid])	return null;
@@ -224,87 +160,16 @@ function getGroupMemberFromData( g_uid ){
 	return g_group["guAll"][g_uid];
 }
 
-// function getChatList( id ){
-// 	op("/groups/"+id+"/chats",
-// 	    "GET",
-// 	    "",
-// 	    function(data, status, xhr) {
-// 			var tmp = "<p>Chat Lists<br>";
-// 			if( !g_userData[id].hasOwnProperty("chatAll") ){
-// 				g_userData[id]["chatAll"] = new Array();
-// 			}
-				    
-// 			for( var key in data.cl ){
-// 			    var room = data.cl[key];
-// 			    switch( room.tp ){
-// 				case 0:{    //group default
-// 					//alert("get all group room");
-// 					break;
-// 				} case 1:{    //one to one
-// 				    var memIDs = room.cn.split(",");
-// 				    var nameString = "";
-// 				    for(var key in memIDs ){
-// 						var mem = getGroupMemberFromData(id, memIDs[key]);
-// 						if( null == mem ){
-// 						    //nameString += memIDs[key];
-// 						} else{
-// 						    if(mem.gu != g_userData[id].me ){
-// 								nameString += mem.nk + ", ";
-// 						    }
-// 						}
-// 				    }
-// 				    g_userData[id]["chatAll"][room.ci] = room;
-
-// 				    tmp += "<button class='roomBtn'id='"+room.ci+"'>"+nameString+"</button>";
-// 				    break;
-// 				} case 2:{  //one to multiple
-// 					g_groupChatRooms[room.ci] = room;
-
-// 				    tmp += "<button class='roomBtn' id='"+room.ci +"'>"+room.cn+"</button>";
-// 				    break;
-// 				} default:{
-// 					//alert("room type unknown:"+room.tp);
-// 				    break;
-// 				}
-// 			    }
-// 			}
-
-// 			tmp+="</p>";
-// 			$("#" + id+ "_chatList").html(tmp);
-			
-// 			$(".roomBtn").click(function(){
-// 			    enterChatRoom(id, $(this).attr("id"), $(this).text() );
-// 			    showChat();
-// 			});
-// 			//$("#main_groupRooms").removeClass("hid");
-		
-// 			$.lStorage(g_ui, g_userData);
-// 	    }
-// 	);
-// }
-
-//function enterChatRoom(gid, rid, name){
-// function enterChatRoom(){
-// 	g_bIsChating = true;
-// 	//g_ci = rid;
-// 	var tmp=g_groupChatRooms[g_ci];
-// 	if(g_groupChatRooms[g_ci]){
-// 		g_cn = name+"("+")";
-// 	} else {
-// 		g_cn = $.i18n.getString("chat-title");
-// 	}
-
-// 	$("#msgDiv").removeClass("hid");
-// 	$(".page-title").text(g_cn);
-// 	$(".page-title").append("<div class='text' >");
-// }
-
 function leaveCharRoom(){
 	g_bIsChating = false;
 	$("#msg").addClass("hid"); 
-	}
+}
 
-	function getChatMemName(groupUID){
+function getChatMem(groupUID){
+	return getGroupMemberFromData(groupUID);
+}
+
+function getChatMemName(groupUID){
 	var mem = getGroupMemberFromData(groupUID);
 	if( null == mem )   return "unknown";
 	return mem.nk;
@@ -330,6 +195,9 @@ op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 	                + ')'
 	                );
 */
+
+		var container = $("#chat-contents").html("");
+		var time;
 		for( var key in data.el){
 			var object = data.el[key];
 			if(object.hasOwnProperty("meta")){
@@ -343,31 +211,52 @@ op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 					year = currentDate.getFullYear();	//4 digits
 					month = currentDate.getMonth(); //0-11
 					date = currentDate.getDate(); //1-31
+					container.prepend(tmp);
 				}
 
 				//msg
 				var msgData = data.el[key].ml[0];
 				//is me?
-				test(msgData.c);
 				if( object.meta.gu == g_group.gu ){
 					//right align
 					//time +(msg)
 					tmp = "<div class='chat-msg-right'><div class='chat-msg-time'>" + time.customFormat( "#hhh#:#mm#" ) + "</div>" 
-						+ "<div class='chat-msg-bubble-right'>" + getChatMemName(object.meta.gu) + ": " + htmlFormat(msgData.c)+"</div></div>" 
-						+ tmp;
+						+ "<div class='chat-msg-bubble-right'>" + htmlFormat(msgData.c)+"</div></div>";
 				} else{
 					//left align
-					//(photo)(msg)time
+					var mem = getChatMem(object.meta.gu)
 
-					tmp = "<div class='chat-msg-left'><img class='aut'></img><img class='auo'></img>"
-						+ "<div class='chat-msg-bubble-left'>" + getChatMemName(object.meta.gu) + ": " + htmlFormat(msgData.c)+"</div>" 
-						+ "<div class='chat-msg-time'>" + time.customFormat( "#hhh#:#mm#" ) + "</div></div>" 
-						+ tmp;
+					var div = $("<div class='chat-msg-left'></div>");
+					container.prepend(div);
+
+					//left
+					var pic = $("<img class='aut'></img>");	//left pic (auo for large pic)
+					if(mem.aut && mem.aut.length>0){
+						pic.attr("src", mem.aut);
+					} else {
+						pic.attr("src", "images/common/others/empty_img_personal_l.png");
+					}
+					div.append(pic);
+					
+					//right
+					var subDiv = $("<div></div>");
+					subDiv.append("<div class='name'>"+ mem.nk +"</div>");	//name
+					subDiv.append("<div class='chat-msg-bubble-left'>" + htmlFormat(msgData.c)+"</div>");	//msg
+					subDiv.append("<div class='chat-msg-time'>" + time.customFormat( "#hhh#:#mm#" ) + "</div>");	//time
+					div.append(subDiv);	//right
 				}
+				container.prepend(tmp);
 			}
 		}
-		$("#chat-contents").html("<div class='margin' style='text-align: center;'>"+g_cn+"</div>" + tmp);
-    $('html, body').animate({scrollTop: $(document).height()}, 0);
+
+		tmp = "<div class='chat-date-tag'>" + currentDate.customFormat( "#YYYY#/#M#/#D# #CD# #DDD#" )+"</div>"+tmp;
+		currentDate = time;
+		year = currentDate.getFullYear();	//4 digits
+		month = currentDate.getMonth(); //0-11
+		date = currentDate.getDate(); //1-31
+		container.prepend(tmp);
+
+    	$('html, body').animate({scrollTop: $(document).height()}, 0);
     }
 );
 }
@@ -412,11 +301,11 @@ op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 );
 }
 
-setInterval(function() {
-    if (g_bIsChating) {
-	    showChat();
-    }
-}, 1000);
+// setInterval(function() {
+//     if (g_bIsChating) {
+// 	    showChat();
+//     }
+// }, 1000);
 
 function getFilePath(file_obj, target, tp, size, ti){
 		//default
@@ -461,11 +350,4 @@ function getFilePath(file_obj, target, tp, size, ti){
 				return obj.s3;
 			}
 		});
-	}
-//==================================================
-function test(str){
-	if( str.length > 10 ){
-		var tmp = str.toString().split(' ');
-		var b=10;
-	}
 }

@@ -1,6 +1,8 @@
-$(function(){ 
-	;
-});
+// $(function(){ 
+// 	;
+// });
+
+var windowList = new Object();
 
 setChatList = function(){
 
@@ -119,14 +121,19 @@ function showChatList(){
 
 	$(".subpage-chatList-row").off("click");
 	$(".subpage-chatList-row").on("click", function(){
-		var data= new Object();
-		data["gi"]=gi;
-		data["ci"]=$(this).data("id");
-		data["ui"]=ui;
-		data["at"]=at;
-		//data["cn"]=$(this).data("name");
-		$.lStorage( "_chatRoom", data );
-		//document.location = "chat.html";
-		var gallery = window.open("chat.html", "_blank", "width=400, height=600");
+		var ci = $(this).data("id");
+		if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
+			windowList[ci].focus();
+		} else {
+			var data= new Object();
+			data["gi"]=gi;
+			data["ci"]=ci;
+			data["ui"]=ui;
+			data["at"]=at;
+			//data["cn"]=$(this).data("name");
+			$.lStorage( "_chatRoom", data );
+			//document.location = "chat.html";
+			windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
+		}
 	});
 }

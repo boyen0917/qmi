@@ -118,6 +118,21 @@ body{
 }
 
 /* ==================================================== */
+
+.st-user-pic{
+	height: 60px;
+	overflow-y: hidden;
+	margin: 10px;
+	width: 60px;
+	border-radius: 8px;
+    border:1px solid #abbabf;
+}
+
+.st-user-pic, .st-sub-name, .st-sub-time {
+    float: left;
+    cursor:default;
+}
+
 .side-menu-btn {
 	height: 40px;
 	width: 40px;
@@ -129,7 +144,7 @@ body{
 .header-group-name ,.header-cp-object{
 	text-align: center;
 	width: 50%;
-	margin: 2px auto -1px;
+	margin: auto auto;
 	height: 50px;
 }
 
@@ -138,13 +153,15 @@ body{
     padding-top: 5px;
 }
 /*設定head bar後div裡的第1個div文字大小（主標題）*/
-.header-group-name div:nth-child(1) {
-    font-size: 19px;
+/*.header-group-name div:nth-child(1) {*/
+.page-title{
+    font-size: 23px;
     width: 80%;
+    margin: auto auto;
 }
 /*設定head bar後div裡第2個div文字大小（副標題）*/
-.header-group-name div:nth-child(2) {
-	font-size: 12px;
+.page-title-2 {
+	font-size: 13px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
@@ -230,15 +247,13 @@ body{
          ▀███▀▀      ██   ██     ██   ██       ██         */
 
 #chat-contents{
-	width: 90%;
-	padding-left: 5%;
-	padding-right: 5%;
+	width: 93%;
+	padding-left: 3%;
 }
 .subpage-chat {
 	min-height: 615px;
 	overflow: hidden;
-	float: relative;
-	background: url("../images/chatroom/chat_chetroom_bgimg.png") center no-repeat;
+	background: url("../images/chatroom/chat_chetroom_bgimg.png") center no-repeat fixed;
 	background-size: cover;
 }
 
@@ -296,9 +311,30 @@ body{
     display: none; 
 }
 
+/* other's msg left(pic) */
+.chat-msg-left img{
+	display: inline-block;
+	vertical-align: top;
+	margin-right: 10px;
+
+	height: 50px;
+	width: 50px;
+	overflow-y: hidden;
+	border-radius: 8px;
+    border:1px solid #abbabf;
+}
+/* other's msg right(name, msg, time) */
+.chat-msg-left div:nth-child(2){
+	display: inline-block;
+}
+/* other's msg name */
+.chat-msg-left div:nth-child(2) .name{
+	font-size: 14px;
+	margin-bottom: 3px;
+}
 .chat-msg-right, .chat-msg-left{
 	clear: both;
-	margin-bottom: 10px;
+	margin-bottom: 20px;
 }
 .chat-msg-right{
 	text-align: right;
@@ -314,12 +350,13 @@ body{
 	padding-right: 1em;
 }
 .chat-msg-bubble-right, .chat-msg-bubble-left{
-	padding: 0.3em 1em 0.3em 1em;
+	padding: 0.3em 0.5em 0.7em 0.7em;
 	border: 1px solid grey;
 	border-radius: 1em 1em 1em 1em;
 	display:inline-block;
-	max-width: 80%;
+	max-width: 65%;
 	white-space: pre-line;
+	position: relative;
 }
 .chat-msg-bubble-right{
 	border-color: rgb(75,124,219);
@@ -327,14 +364,36 @@ body{
 	color: white;
 	text-align: left;
 }
+.chat-msg-bubble-right:after, .chat-msg-bubble-left:after{
+	content: '';
+	position: absolute;
+	border-style: solid;
+	display: block;
+	width: 0;
+	z-index: 1;
+	top: 9px;
+}
+.chat-msg-bubble-right:after
+{
+	border-width: 3px 0 8px 17px;
+	border-color: transparent rgb(75,124,219);
+	right: -14px;
+}
 .chat-msg-bubble-left{
 	border-color: #72DAFD;
 	background: #72DAFD;
+	margin-left: 11px;
+}
+.chat-msg-bubble-left:after
+{
+	border-width: 3px 17px 8px 0;
+	border-color: transparent #72DAFD;
+	left: -17px;
 }
 .chat-date-tag{
 	display: table;
 	padding: 0.2em 1em 0.2em 1em;
-	margin: 0 auto;
+	margin: 20px auto;
 	border: 1px solid grey;
 	border-radius: 1em 1em 1em 1em;
 	font-size: 8px;
