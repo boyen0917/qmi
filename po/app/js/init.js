@@ -98,11 +98,11 @@ $(function(){
 	});
 	
 	$(document).ajaxSend(function() {
-
 		//顯示 loading
 		if(!load_show && !s_load_show) return false;
 	    if(!$('.ui-loader').is(":visible"))
 		$('.ui-loader').css("display","block");
+
 		$(".ajax-screen-lock").show();
 	});
 	$(document).ajaxComplete(function(data) {

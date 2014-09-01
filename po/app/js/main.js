@@ -90,21 +90,7 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		// timelineListWrite();
-		var event_tp = $("#page-group-main").data("navi") || "00";
-		var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
-
-		var val = "G00000170DO_T000003Q0Dl_E000001d00";
-		if(selector.find("[data-event-id="+val+"]").length){
-			cns.debug("ya:",selector.find("[data-event-id="+val+"]"));
-		}else{
-			cns.debug("no:",selector.find("[data-event-id="+val+"]"));
-		}
 		
-		// selector.find(".st-sub-box").each(function(){
-			
-			
-		// });
 	});
 
 
@@ -115,7 +101,7 @@ $(function(){
 
 		var top_height = $(window).scrollTop();
 		
-		//上拉更新
+		//下拉更新
 		if (top_height < -20 && !$(".st-navi-area").data("scroll-chk")){
 			$(".st-navi-area").data("scroll-chk",true);
 			timelineTopRefresh();
@@ -124,7 +110,7 @@ $(function(){
 			topEventChk();
 		}
 
-		//下拉更新
+		//取舊資料
 		var feed_type = $("#page-group-main").data("navi") || "00";
 
 		//判斷沒資料的元件存在時 就不動作
