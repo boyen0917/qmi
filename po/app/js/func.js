@@ -4385,9 +4385,9 @@ $(function(){
             li:lang
         };
         var body = {
-            id: "+886956634948",
+            id: "+886980922917",
             tp:"0",
-            pw:toSha1Encode("zaq12wsx")
+            pw:toSha1Encode("111111")
         };
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
@@ -4417,14 +4417,5 @@ $(function(){
         	}
         });
     };
-	
-	//================================== language ===========================
-
-	updateLanguage = function( lanPath ){
-		$.i18n.load(lanPath, function(){
-			var tmp = $('.text').data("textid");
-			var text = $('.text')._t( tmp );
-		});
-	}
 
 });

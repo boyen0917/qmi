@@ -251,7 +251,7 @@ body{
 	padding-left: 3%;
 }
 .subpage-chat {
-	min-height: 615px;
+	min-height: 600px;
 	overflow: hidden;
 	background: url("../images/chatroom/chat_chetroom_bgimg.png") center no-repeat fixed;
 	background-size: cover;
@@ -316,7 +316,6 @@ body{
 	display: inline-block;
 	vertical-align: top;
 	margin-right: 10px;
-
 	height: 50px;
 	width: 50px;
 	overflow-y: hidden;
