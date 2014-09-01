@@ -301,11 +301,11 @@ op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 );
 }
 
-// setInterval(function() {
-//     if (g_bIsChating) {
-// 	    showChat();
-//     }
-// }, 1000);
+setInterval(function() {
+    if (g_bIsChating) {
+	    showChat();
+    }
+}, 1000);
 
 function getFilePath(file_obj, target, tp, size, ti){
 		//default
