@@ -94,7 +94,6 @@ $(document).ready(function(){
 	});
 
 	//enterChatRoom();
-	g_bIsChating = true;
 	//g_ci = rid;
 	var tmp=g_groupChatRooms[g_ci];
 	// if(g_groupChatRooms[g_ci]){
@@ -110,14 +109,16 @@ $(document).ready(function(){
 	showChat();
 });
 
-
+$(window).scroll(function(){
+    g_isEndOfPage = $(document).height() <= $(window).scrollTop() + $(window).height();
+});
 
 
 //======================================================
 var g_userData;
 var g_groupDetailArray = new Array();
 var g_groupChatRooms = new Array();
-var g_bIsChating = false;
+var g_needsRolling = true;
 var g_ui;	//user id
 var g_room;	//chatRoom
 var g_ci;	//chatRoom id
@@ -130,6 +131,7 @@ var eGroupTiType = {
 	CALENDER:1,
 	TIME_LINE:2
 };
+var g_isEndOfPage = false;
 
 function op( url, type, data, delegate){
 	$.ajax({
@@ -158,11 +160,6 @@ function getGroupMemberFromData( g_uid ){
 	if(!g_group["guAll"][g_uid])	return null;
 
 	return g_group["guAll"][g_uid];
-}
-
-function leaveCharRoom(){
-	g_bIsChating = false;
-	$("#msg").addClass("hid"); 
 }
 
 function getChatMem(groupUID){
@@ -256,7 +253,10 @@ op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 		date = currentDate.getDate(); //1-31
 		container.prepend(tmp);
 
-    	$('html, body').animate({scrollTop: $(document).height()}, 0);
+		if( g_needsRolling ){
+			g_needsRolling = false;
+			$('html, body').animate({scrollTop: $(document).height()}, 0);
+		} else if(g_isEndOfPage)	$('html, body').animate({scrollTop: $(document).height()}, 0);
     }
 );
 }
@@ -297,15 +297,14 @@ op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 			g_groupDetailArray[ g_ci ] = new Array();
 		    g_groupDetailArray[ g_ci ][mem.gu] = mem;
 		}
+		g_needsRolling = true;
     }
 );
 }
 
-// setInterval(function() {
-//     if (g_bIsChating) {
-// 	    showChat();
-//     }
-// }, 1000);
+setInterval(function() {
+    showChat();
+}, 1000);
 
 function getFilePath(file_obj, target, tp, size, ti){
 		//default
