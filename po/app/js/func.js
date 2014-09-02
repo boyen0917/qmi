@@ -2809,7 +2809,6 @@ $(function(){
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
 	    	if(data.status != 200) return false;
-
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 
 	    	//資料個數少於這個數量 表示沒東西了
@@ -2838,7 +2837,6 @@ $(function(){
                 idb_timeline_events.put(val);
             });
 
-
             //存完後改timeline 
             $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
     			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
@@ -2849,7 +2847,6 @@ $(function(){
 
 
 	timelineBlockMake = function(this_event_temp,timeline_list,is_top){
-		cns.debug("begin:",timeline_list);
 		//關閉下拉更新的ui
 
     	if(is_top){
@@ -2868,7 +2865,6 @@ $(function(){
 
 	    //製作timeline
 	    $.each(timeline_list,function(i,val){
-        	cns.debug("each:",val);
         	//刪除event
         	if(val.meta.del) return;
 
@@ -2903,6 +2899,9 @@ $(function(){
         		this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
 	    		this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
 	    		this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
+
+	    		//event status
+    			setEventStatus(this_event,$(".st-filter-area").data("filter"));
 	    		return;
         	}
     		
@@ -2929,7 +2928,6 @@ $(function(){
     		this_event.data("timeline-tp",tp);
     		this_event.data("group-id",gi);
     		this_event.data("timeline-id",ti_feed);
-    		// this_event.data("event-id",val.ei);
 			this_event.data("parti-list",[]);
 			this_event.data("ct",val.meta.ct);
 
@@ -3048,13 +3046,11 @@ $(function(){
 
     		//timeline message內容
 			timelineContentMake(this_event,target_div,val.ml);
-			// return false;
         });
 		// });//here
 	}
 
 	timelineListWrite = function (ct_timer,is_top){
-
 		//判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
     	if(!ct_timer && !is_top){
     		var event_tp = $("#page-group-main").data("navi") || "00";
@@ -3097,7 +3093,6 @@ $(function(){
 
     	//同時先將資料庫資料取出先寫上
 	    idb_timeline_events.limit(function(timeline_list){
-	    	cns.debug("idb:",timeline_list);
 	    	//寫timeline
 	    	load_show = false;
 	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
@@ -3117,11 +3112,61 @@ $(function(){
         });
 	}
 
+	eventStatusWrite = function(this_event,s_data,filter){
+		//將此則動態的按讚狀態寫入data中
+		if(!s_data) return false;
+
+		//按讚
+		if(s_data.il){
+			this_event.find(".st-sub-box-3 img:eq(0)").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
+			this_event.find(".st-sub-box-4 .st-like-btn").html("收回讚");
+		}
+		//回覆
+		if(s_data.ip)
+				this_event.find(".st-sub-box-3 img:eq(1)").attr("src","images/timeline/timeline_feedbox_icon_chat_blue.png");
+				
+		//閱讀
+		if(s_data.ir)
+				this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/timeline/timeline_feedbox_icon_read_blue.png");
+		
+		//任務完成
+		if(s_data.ik){
+			var tp = this_event.data("timeline-tp");
+			var task_str;
+			switch(tp){
+				case 3:
+					task_str = "已完成";
+					break;
+				case 4:
+					task_str = "已投票";
+					break;
+				case 5:
+					task_str = "已回報";
+					break;
+			}
+			
+			this_event.find(".st-task-status-area img").attr("src","images/common/icon/icon_check_red_l.png");
+			this_event.find(".st-task-status").html(task_str);
+		}
+
+		//存回
+		this_event.data("event-status",s_data);
+
+		//filter
+		if(filter){
+			eventFilter(this_event,filter);
+		}
+	}
 
 	setEventStatus = function(this_event,filter){
+
+		//先用idb寫 再去向server要
+		var ei_val = this_event.data("event-val");
+		eventStatusWrite(this_event,ei_val.status,filter);
+		// return false;
+
 		//這邊是timeline list 要call這個api判斷 自己有沒有讚過這一串系列文 
 		var this_ei = this_event.data("event-id");
-		var ei_val = this_event.data("event-val");
 
 		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events_status?ep=" + this_ei;
         var headers = {
@@ -3139,53 +3184,11 @@ $(function(){
 
     		//存入idb
     		ei_val.status = s_data;
-    		idb_timeline_events.put(ei_val);
 
-    		//將此則動態的按讚狀態寫入data中
-			if(s_data){
-				
-        		//判斷自己有無 : 
-        		//按讚
-        		if(s_data.il){
-    				this_event.find(".st-sub-box-3 img:eq(0)").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
-					this_event.find(".st-sub-box-4 .st-like-btn").html("收回讚");
-	    		}
-    			//回覆
-	    		if(s_data.ip)
-	    				this_event.find(".st-sub-box-3 img:eq(1)").attr("src","images/timeline/timeline_feedbox_icon_chat_blue.png");
-	    				
-    			//閱讀
-	    		if(s_data.ir)
-	    				this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/timeline/timeline_feedbox_icon_read_blue.png");
-				
-	    		//任務完成
-	    		if(s_data.ik){
-	    			var tp = this_event.data("timeline-tp");
-	    			var task_str;
-	    			switch(tp){
-    					case 3:
-    						task_str = "已完成";
-	    					break;
-	    				case 4:
-	    					task_str = "已投票";
-	    					break;
-    					case 5:
-    						task_str = "已回報";
-	    					break;
-	    			}
-	    			
-	    			this_event.find(".st-task-status-area img").attr("src","images/common/icon/icon_check_red_l.png");
-					this_event.find(".st-task-status").html(task_str);
-	    		}
-			}
-
-			//存回
-			this_event.data("event-status",s_data);
-
-			//filter
-			if(filter){
-    			eventFilter(this_event,filter);
-			}
+    		idb_timeline_events.put(ei_val,function(){
+    			// 存完後改資料
+    			eventStatusWrite(this_event,s_data,filter);
+    		});
     	});
 	}
 
