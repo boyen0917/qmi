@@ -273,6 +273,7 @@ $(function(){
 	        case "feed":
 	        	//先清空
 				$(".feed-subarea").html('');
+				$(".st-filter-main span").html("全部");
 				//filter all
 				$(".st-filter-area").data("filter","all");
 
@@ -2808,6 +2809,19 @@ $(function(){
 	    var method = "get";
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
+	    	//關閉下拉更新的ui
+
+	    	if(is_top){
+				setTimeout(function(){
+					$(".st-navi-area").removeClass("st-navi-fixed");
+					$(".st-top-area-load").removeClass("mt");
+					$(".st-refresh-top").slideUp("fast");
+					$(".st-refresh-top img").hide();
+					$(".st-refresh-top span").hide();
+					$(".st-navi-area").data("scroll-chk",false);
+				},1000);
+	    	}
+	    	
 	    	if(data.status != 200) return false;
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 
@@ -2832,6 +2846,12 @@ $(function(){
                 val.ct = val.meta.ct;
                 val.gi = gi ;
                 val.tp = val.meta.tp ;
+
+                var tp = val.meta.tp.substring(1,2)*1;
+                //為了idb
+                if(tp > 2){
+                	val.tp = "03" ;
+                }
                 idb_timeline_events.put(val);
             });
 
@@ -2844,21 +2864,13 @@ $(function(){
 
 
 	timelineBlockMake = function(this_event_temp,timeline_list,is_top){
-		//關閉下拉更新的ui
-
-    	if(is_top){
-			setTimeout(function(){
-				$(".st-navi-area").removeClass("st-navi-fixed");
-				$(".st-top-area-load").removeClass("mt");
-				$(".st-refresh-top").slideUp("fast");
-				$(".st-refresh-top img").hide();
-				$(".st-refresh-top span").hide();
-				$(".st-navi-area").data("scroll-chk",false);
-			},1000);
-    	}
 			
 		var event_tp = $("#page-group-main").data("navi") || "00";
     	var top_subbox = $(".feed-subarea[data-feed=" + event_tp + "]").find(".st-sub-box:eq(0)");
+
+    	//就隱藏其他類別 開啓當下類別
+		$(".feed-subarea").hide();
+		$(".feed-subarea[data-feed=" + event_tp + "]").show();
 
 	    //製作timeline
 	    $.each(timeline_list,function(i,val){
@@ -2875,12 +2887,6 @@ $(function(){
         	if(!selector.data("last-ct") || (selector.data("last-ct") && selector.data("last-ct") > val.meta.ct)){
         		selector.data("last-ct",val.meta.ct);
         	}
-
-        	//就隱藏其他類別 開啓當下類別
-			$(".feed-subarea").hide();
-			selector.show();
-
-
 
     		//讀完就可重新滾動撈取舊資料 setTimeOut避免還沒寫入時就重新撈取
         	setTimeout(function(){
@@ -3072,7 +3078,7 @@ $(function(){
 
 		//判斷類別
 		var idb_index,idb_keyRange;
-		if(event_tp == "00"){
+		if(!event_tp || event_tp == "00"){
 			idb_index = "gi_ct";
 			idb_keyRange = idb_timeline_events.makeKeyRange({
               upper: [gi,idb_timer],
@@ -3085,7 +3091,6 @@ $(function(){
               lower: [gi,event_tp]
             })
 		}
-
 
     	//同時先將資料庫資料取出先寫上
 	    idb_timeline_events.limit(function(timeline_list){
@@ -3190,10 +3195,12 @@ $(function(){
 	}
 
 	eventFilter = function(this_event,filter){
+
 		//先關再開
 		this_event.hide();
 
 		var event_status = this_event.data("event-status");
+
 		//用以判斷下拉更新
 		this_event.removeClass("filter-show");
 		var show_chk = false;
