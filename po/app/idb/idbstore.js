@@ -1094,7 +1094,7 @@
         result.push(item);
       }, options);
     },
-
+    
     /**
      *
      * Runs a query against the store, but only returns the number of matches

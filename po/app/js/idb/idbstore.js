@@ -1092,6 +1092,29 @@
       }, options);
     },
 
+    limit: function (onSuccess, options) {
+      var result = [];
+      var count = 0;
+      
+      options = options || {};
+      options.limit = options.limit || 0;
+      options.autoContinue = false;
+      options.onEnd = function(){
+        onSuccess(result);
+      }
+      options.onError = function(item){
+        console.debug("error:",item);
+        onSuccess(result);
+      }
+      return this.iterate(function (item,cursor) {
+        if(count <= options.limit){
+          result.push(item);
+
+          count++;
+          cursor.continue();
+        }
+      }, options);
+    },
     /**
      *
      * Runs a query against the store, but only returns the number of matches

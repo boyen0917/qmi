@@ -68,7 +68,11 @@ $(function(){
         	topEvent();
 
         	//動態消息
-        	timelineListWrite();
+        	//timelineListWrite();
+        	setTimeout(function(){
+        		timelineListWrite();
+        	},500);
+        	
         }
 
 	}else{
@@ -89,7 +93,7 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		// topEventChk();
+		
 	});
 
 
@@ -98,10 +102,9 @@ $(function(){
 		//timeline 才要做
 		if(!$(".feed-subarea").is(":visible")) return false;
 
-
 		var top_height = $(window).scrollTop();
 		
-		//上拉更新
+		//下拉更新
 		if (top_height < -20 && !$(".st-navi-area").data("scroll-chk")){
 			$(".st-navi-area").data("scroll-chk",true);
 			timelineTopRefresh();
@@ -110,7 +113,7 @@ $(function(){
 			topEventChk();
 		}
 
-		//下拉更新
+		//取舊資料
 		var feed_type = $("#page-group-main").data("navi") || "00";
 
 		//判斷沒資料的元件存在時 就不動作
