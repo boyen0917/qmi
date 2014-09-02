@@ -7,7 +7,8 @@ $(function(){
           storeName: 'timeline_events',
           keyPath: 'ei',
           indexes: [
-            { name: 'gi_ct',keyPath:['gi','ct']}
+            { name: 'gi_ct',keyPath:['gi','ct']},
+            { name: 'gi_tp_ct',keyPath:['gi','tp','ct']}
           ]
         });
 
