@@ -143,7 +143,7 @@ function showChat(){
 					
 					//another day?
 					if( (time.getFullYear() < year) || (time.getMonth()<month) || time.getDate()<date ){
-						tmp = "<div class='chat-date-tag'>" + currentDate.customFormat( "#YYYY#/#M#/#D# #CD# #DDD#" )+"</div>"+tmp;
+						tmp = "<div class='chat-date-tag'>" + currentDate.customFormat( "#YYYY#/#M#/#D# #CD# #DDD#" )+"</div>";
 						currentDate = time;
 						year = currentDate.getFullYear();	//4 digits
 						month = currentDate.getMonth(); //0-11
@@ -182,7 +182,6 @@ function showChat(){
 						subDiv.append("<div class='chat-msg-time'>" + time.customFormat( "#hhh#:#mm#" ) + "</div>");	//time
 						div.append(subDiv);	//right
 					}
-					container.prepend(tmp);
 				}
 			}
 
@@ -221,3 +220,48 @@ function sendChat(msg){
 	    }
 	);
 }
+
+getS3file = function(file_obj,target,tp,size){
+		//default
+		size = size || 350;
+		cns.debug("size:",size);
+		var api_name = "groups/" + g_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + ti_feed;
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "get";
+        var result = ajaxDo(api_name,headers,method,true);
+		result.complete(function(data){
+			if(data.status != 200) return false;
+
+			var obj =$.parseJSON(data.responseText);
+			obj.api_name = api_name;
+			if(target && tp){
+				switch(tp){
+					case 6://圖片
+						var img = target.find("img.aut");
+						img.load(function() {
+							//重設 style
+							img.removeAttr("style");
+
+							var w = img.width();
+				            var h = img.height();
+            
+            				mathAvatarPos(img,w,h,size);
+				        });
+						//小圖
+						target.find("img.aut").attr("src",obj.s3);
+						//大圖
+						target.find("img.auo").attr("src",obj.s32).hide();
+						break;
+					case 8://聲音
+						target.attr("src",obj.s3);
+						break;
+				}
+			}else{
+				return obj.s3;
+			}
+		});
+	}
