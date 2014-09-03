@@ -121,7 +121,8 @@ $(function(){
 
 		//ajax逾時
 		if(jqxhr.statusText == "timeout"){
-			popupShowAdjust("","網路不穩 請稍後再試",true);
+			// popupShowAdjust("","網路不穩 請稍後再試",true);
+			toastShow("連線逾時");
 			return false;
 		}
 		//logout~
@@ -129,7 +130,10 @@ $(function(){
 			popupShowAdjust("","驗證失敗 請重新登入",true,false,[reLogin]);
 			return false;
 		}
-		popupShowAdjust("",errorResponse(jqxhr),true);
+
+		// popupShowAdjust("",errorResponse(jqxhr),true);
+		toastShow(errorResponse(jqxhr));
+		
 	});
 
 	//上一頁功能
