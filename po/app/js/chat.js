@@ -23,7 +23,6 @@ var g_lastMsgEi=0;
               ███████║███████╗   ██║   ╚██████╔╝██║               
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
-
 $(document).ready(function(){
 	
 	//沒有登入資訊 就導回登入頁面
@@ -77,15 +76,23 @@ $(document).ready(function(){
 	$(document).find("title").text(g_cn + "-Project O");
 
 	showChat();
+
+	$(window).scroll(function() {
+	   var isAtBottom = ($(window).scrollTop() + $(window).height() == $(document).height());
+	   if( g_isEndOfPage != isAtBottom ){
+	   		g_isEndOfPage = isAtBottom;
+	   		if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
+	   		else $("#chat-toBottom").fadeIn('fast');
+	   }
+	});
+
+	$("#chat-toBottom").click(scrollToBottom);
 });
 
 setInterval(function() {
     showChat();
 }, 1000);
 
-$(window).scroll(function() {
-   g_isEndOfPage = ($(window).scrollTop() + $(window).height() == $(document).height());
-});
 /*
               ███████╗██╗   ██╗███╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗          
               ██╔════╝██║   ██║████╗  ██║██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║          
@@ -111,6 +118,10 @@ function op( url, type, data, delegate){
 		  console.log(textStatus, errorThrown);
 		}
 	});
+}
+
+function scrollToBottom(){
+	$('html, body').animate({scrollTop: $(document).height()}, 0);
 }
 
 function getGroupMemberFromData( g_uid ){
@@ -181,9 +192,9 @@ function showChat(){
 
 			if( g_needsRolling ){
 				g_needsRolling = false;
-				$('html, body').animate({scrollTop: $(document).height()}, 0);
+				scrollToBottom();
 			} else if(g_isEndOfPage){
-				$('html, body').animate({scrollTop: $(document).height()}, 0);
+				scrollToBottom();
 			}
 	    }
 	);
@@ -307,7 +318,7 @@ getS3file = function(target, file_c, file_p, tp, ti, size){
 						img.removeAttr("style");
 
 						if(g_isEndOfPage){
-							$('html, body').animate({scrollTop: $(document).height()}, 0);
+							scrollToBottom();
 						}
 			        });
 					//小圖

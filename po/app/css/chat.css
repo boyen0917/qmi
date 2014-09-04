@@ -31,6 +31,7 @@ body {
 	text-align:center;
 	box-shadow: 0px 3px 20px 0px rgba(50, 50, 50, 0.45);
 	z-index: 9999;
+	float:left;
 }
 #header .title{
 	font-size: 23px;
@@ -51,7 +52,7 @@ body {
 */
 #container {
 	margin:0 auto;
-	overflow:auto;
+	overflow:scroll;
 	padding:80px 0;
 }
 
@@ -59,6 +60,21 @@ body {
 	width: 84%;
 	margin-left: 8%;
 	margin-right: 8%;
+}
+
+#chat-toBottom{
+	background: url("../images/chatroom/chat_chatroom_icon_scroll.png");
+	position: fixed;
+	float:right;
+	right:5px;
+	bottom: 55px;
+	width: 50px;
+	height: 50px;
+	background-size: cover;
+}
+#chat-toBottom:hover{
+	background: url("../images/chatroom/chat_chatroom_icon_scroll_click.png");
+	background-size: cover;
 }
 
 /* ------ chat ---------*/
@@ -182,7 +198,7 @@ body {
 	background: linear-gradient(to bottom, white 0%,#E5E8EB 100%);
 	border-top: 1px solid #666;
 	bottom:0;
-	min-height:60px;
+	max-height:70px;
 	left:0;
 	position:fixed;
 	width:100%;
