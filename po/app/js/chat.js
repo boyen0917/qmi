@@ -78,7 +78,10 @@ $(document).ready(function(){
 	showChat();
 
 	$(window).scroll(function() {
-	   var isAtBottom = ($(window).scrollTop() + $(window).height() == $(document).height());
+		var posi = $(window).scrollTop();
+		var height = $(window).height();
+		var docHeight = $(document).height();
+	   var isAtBottom = ((posi + height) == docHeight);
 	   if( g_isEndOfPage != isAtBottom ){
 	   		g_isEndOfPage = isAtBottom;
 	   		if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
@@ -121,7 +124,7 @@ function op( url, type, data, delegate){
 }
 
 function scrollToBottom(){
-	$('html, body').animate({scrollTop: $(document).height()}, 0);
+	$('html, body').animate({scrollTop:$(document).height()}, 'fast');
 }
 
 function getGroupMemberFromData( g_uid ){
