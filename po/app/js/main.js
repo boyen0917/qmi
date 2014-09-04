@@ -409,8 +409,10 @@ $(function(){
 		//將選項存入
 		$("#page-group-main").data("navi",this_subarea.data("tp"));
 
+		var event_tp = $("#page-group-main").data("navi") || "00";
+
 		//改filter文字為 全部 
-		$(".st-filter-main span").html("全部");
+		// $(".st-filter-main span").html("全部");
 
 		$(".st-navi-area [data-st-navi-group=navi]").each(function(i,val){
 	        //全關 switch開
@@ -499,13 +501,14 @@ $(function(){
 		//先關閉全區域
 		$(".st-feedbox-area").hide();
 
-		var feed_type = $("#page-group-main").data("navi") || "00";
-		var this_events = $(".feed-subarea[data-feed=" + feed_type + "] .st-sub-box");
+		var event_tp = $("#page-group-main").data("navi") || "00";
+		var this_events = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box");
 
 		var filter_status = $(this).data("status");
 
 		//記錄
 		$(".st-filter-area").data("filter",filter_status);
+		$(".feed-subarea[data-feed=" + event_tp + "]").data("filter-name",$(this).find("span").html());
 		
 		//已讀未讀
 		this_events.each(function(i,val){
