@@ -12,7 +12,7 @@ var eGroupTiType = {
 	"TIME_LINE":2
 };
 var g_isEndOfPage = false;	//是否在頁面底端
-var g_needsRolling = false;	//是否要卷到頁面最下方？
+var g_needsRolling = true;	//是否要卷到頁面最下方？
 var g_lastMsgEi=0;
 
 /*
@@ -77,23 +77,14 @@ $(document).ready(function(){
 
 	showChat();
 
-	$(window).scroll(function() {
-		var posi = $(window).scrollTop();
-		var height = $(window).height();
-		var docHeight = $(document).height();
-	   var isAtBottom = ((posi + height) == docHeight);
-	   if( g_isEndOfPage != isAtBottom ){
-	   		g_isEndOfPage = isAtBottom;
-	   		if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
-	   		else $("#chat-toBottom").fadeIn('fast');
-	   }
-	});
+	// $(window).scroll(checkIsAtBottom);
 
 	$("#chat-toBottom").click(scrollToBottom);
 });
 
 setInterval(function() {
     showChat();
+    checkIsAtBottom();
 }, 1000);
 
 /*
@@ -125,6 +116,19 @@ function op( url, type, data, delegate){
 
 function scrollToBottom(){
 	$('html, body').animate({scrollTop:$(document).height()}, 'fast');
+	// checkIsAtBottom();
+}
+
+function checkIsAtBottom(){
+	var posi = $(window).scrollTop();
+	var height = $(window).height();
+	var docHeight = $(document).height();
+	var isAtBottom = ((posi + height) >= docHeight);
+	if( g_isEndOfPage != isAtBottom ){
+			g_isEndOfPage = isAtBottom;
+			if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
+			else $("#chat-toBottom").fadeIn('fast');
+	}
 }
 
 function getGroupMemberFromData( g_uid ){
@@ -320,12 +324,16 @@ getS3file = function(target, file_c, file_p, tp, ti, size){
 						//重設 style
 						img.removeAttr("style");
 
-						if(g_isEndOfPage){
-							scrollToBottom();
-						}
+						// if(g_isEndOfPage){
+						// 	scrollToBottom();
+						// }
 			        });
 					//小圖
-					target.find("img").attr("src",obj.s3);
+					img.attr("src",obj.s3);
+					// img.click( function(){
+					// 	var tmp = window.open("");
+					// 	tmp.$("body").append("<img src="+obj.s32+">");
+					// });
 					break;
 				case 8://聲音
 					target.attr("src",obj.s3);
