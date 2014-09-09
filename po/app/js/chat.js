@@ -12,8 +12,13 @@ var eGroupTiType = {
 	"TIME_LINE":2
 };
 var g_isEndOfPage = false;	//是否在頁面底端
-var g_needsRolling = true;	//是否要卷到頁面最下方？
+var g_needsRolling = false;	//是否要卷到頁面最下方？
 var g_lastMsgEi=0;
+var g_idb_chat_msgs;
+var g_msgs = [];
+var g_currentDate = new Date(0);
+var g_lastDate = new Date();
+var g_bIsLoadHistoryMsg = false;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -25,6 +30,8 @@ var g_lastMsgEi=0;
                                                                   */
 $(document).ready(function(){
 	
+	initDB();
+
 	//沒有登入資訊 就導回登入頁面
 	if( !$.lStorage("_chatRoom") ){
 		document.location = "login.html";
@@ -75,17 +82,9 @@ $(document).ready(function(){
 
 	$(document).find("title").text(g_cn + "-Project O");
 
-	showChat();
-
-	// $(window).scroll(checkIsAtBottom);
-
 	$("#chat-toBottom").click(scrollToBottom);
+	
 });
-
-setInterval(function() {
-    showChat();
-    checkIsAtBottom();
-}, 1000);
 
 /*
               ███████╗██╗   ██╗███╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗          
@@ -95,6 +94,74 @@ setInterval(function() {
               ██║     ╚██████╔╝██║ ╚████║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║          
               ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝          
                                                                                           */
+
+function initDB(){
+	g_idb_chat_msgs = new IDBStore({
+	    dbVersion: 1,
+	    storeName: 'chat_msgs',
+	    keyPath: 'ei',
+	    indexes: [
+	    	{ name: 'ci_ct',keyPath:['ci','ct']},
+	    ]
+	    ,onStoreReady: function(){
+	    	var today=new Date();
+	    	$("#chat-contents").html("<div class='firstMsg'></div>");
+	    	var timeTag = $("<div class='chat-date-tag'></div>");
+	    	timeTag.addClass( today.customFormat("_#YYYY#_#M#_#D#") );
+	    	timeTag.html( getFormatTimeTag(today) );
+	    	$("#chat-contents").append( timeTag );
+	    	$("#chat-contents").append( "<div></div>" );
+	    	$("#chat-contents").append( "<div class='lastMsg'></div>" );
+	    	getHistoryMsg( false );
+
+			scrollToBottom();
+	    }
+    });
+}
+
+//show history chat contents
+function getHistoryMsg ( bIsScrollToTop ){
+	g_bIsLoadHistoryMsg = true;
+	console.debug(g_lastDate);
+    g_idb_chat_msgs.limit(function(list){
+        //console.debug("list:",JSON.stringify(list,null,2));
+        if( list.length>0 ){
+        	//list is from near to far day
+	        for( var i in list){
+	        	if( null==list[i] || g_msgs.indexOf(list[i].ct)>=0 ){
+					continue;
+				} else {
+	        		var object = list[i].data;
+					showMsg( object, true );
+				}
+	        }
+	    }
+
+		//set update contents
+		setInterval(function() {
+		    updateChat();
+		    checkPagePosition();
+		}, 1000);
+    	//updateChat();
+    	if(bIsScrollToTop)	scrollToStart();
+    	g_bIsLoadHistoryMsg = false;
+    },{
+        index: "ci_ct",
+        keyRange: g_idb_chat_msgs.makeKeyRange({
+	        upper: [g_ci, g_lastDate.getTime()],
+	        lower: [g_ci]
+	        // only:18
+        }),
+        limit: 20,
+        order: "DESC",
+        onEnd: function(result){
+            console.debug("onEnd:",result.ci + " " + result.ct);
+        },
+        onError: function(result){
+            console.debug("onError:",result);
+        }
+    });
+}
 
 function op( url, type, data, delegate){
 	$.ajax({
@@ -114,20 +181,31 @@ function op( url, type, data, delegate){
 	});
 }
 
-function scrollToBottom(){
-	$('html, body').animate({scrollTop:$(document).height()}, 'fast');
-	// checkIsAtBottom();
+function scrollToStart(){
+	$('html, body').animate({scrollTop:50}, 'fast');
 }
 
-function checkIsAtBottom(){
+function scrollToBottom(){
+	$('html, body').animate({scrollTop:$(document).height()}, 'fast');
+}
+
+function checkPagePosition(){
 	var posi = $(window).scrollTop();
+	if( posi <= 0 ){
+		if( false==g_bIsLoadHistoryMsg ){
+			getHistoryMsg( true );
+		}
+		g_isEndOfPage = false;
+		return;
+	}
+
 	var height = $(window).height();
 	var docHeight = $(document).height();
 	var isAtBottom = ((posi + height) >= docHeight);
 	if( g_isEndOfPage != isAtBottom ){
-			g_isEndOfPage = isAtBottom;
-			if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
-			else $("#chat-toBottom").fadeIn('fast');
+		g_isEndOfPage = isAtBottom;
+		if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
+		else $("#chat-toBottom").fadeIn('fast');
 	}
 }
 
@@ -146,7 +224,7 @@ function getChatMemName(groupUID){
 	if( null == mem )   return "unknown";
 	return mem.nk;
 }
-function showChat(){
+function updateChat (){
 	op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 	    "GET",
 	    "",
@@ -161,53 +239,88 @@ function showChat(){
 				}
 			}
 
-			var tmp = "";
-			var currentDate = new Date();
-			var year = currentDate.getFullYear();	//4 digits
-			var month = currentDate.getMonth(); //0-11
-			var date = currentDate.getDate(); //1-31
+	        $("#chat-contents .lastMsg").removeClass("chat-date-tag");
+	        $("#chat-contents .lastMsg").html("");
 
-			var container = $("#chat-contents").html("");
-			var time;
-
-			for( var key in data.el){
-				var object = data.el[key];
+			for( var i=(data.el.length-1); i>=0; i--){
+				var object = data.el[i];
 				if(object.hasOwnProperty("meta")){
-					//time
-					var time = new Date(object.meta.ct);
-					
-					//another day?
-					if( (time.getFullYear() < year) || (time.getMonth()<month) || time.getDate()<date ){
-						tmp = "<div class='chat-date-tag'>" + currentDate.customFormat( "#YYYY#/#M#/#D# #CD# #DDD#" )+"</div>";
-						currentDate = time;
-						year = currentDate.getFullYear();	//4 digits
-						month = currentDate.getMonth(); //0-11
-						date = currentDate.getDate(); //1-31
-						container.prepend(tmp);
+					//showMsg(container, data.el[key], time);
+
+					if( g_msgs.indexOf(object.meta.ct)>=0 ){
+						continue;
+					} else {
+						//add to db
+						var node = {
+							ei: object.ei,
+							ci: g_ci,
+					        ct: object.meta.ct,
+					        data: object
+					    };
+					    //register msg loaded
+						g_idb_chat_msgs.put( node );
 					}
 
-					showMsg(container, data.el[key], time);
+					showMsg( object, false );
 				}
 			}
 
-			tmp = "<div class='chat-date-tag'>" + currentDate.customFormat( "#YYYY#/#M#/#D# #CD# #DDD#" )+"</div>";
-			currentDate = time;
-			year = currentDate.getFullYear();	//4 digits
-			month = currentDate.getMonth(); //0-11
-			date = currentDate.getDate(); //1-31
-			container.prepend(tmp);
-
+            //scroll to bottom
 			if( g_needsRolling ){
 				g_needsRolling = false;
 				scrollToBottom();
 			} else if(g_isEndOfPage){
 				scrollToBottom();
 			}
-	    }
-	);
+			
+	    }	//end of function
+	);	//end of op
+}	//end of updateChat
+
+function getFormatTimeTag( date ){
+	return date.customFormat( "#YYYY#/#M#/#D# #CD# #DDD#" );
 }
 
-function showMsg(container, object, time){
+function showMsg(object, bIsFront){
+	if( null == object ) return;
+
+	g_msgs.push(object.meta.ct);
+
+	//console.debug("list:",JSON.stringify(object,null,2));
+
+	var container = $("<div></div>");
+	var time = new Date(object.meta.ct);
+	var szSearch = "#chat-contents ."+time.customFormat("_#YYYY#_#M#_#D#");
+	var div = $( szSearch );
+
+	if( div.length>0 && div.next().length>0 ){
+		div = div.next();
+	} else {
+		var timeTag = $("<div class='chat-date-tag'></div>");
+		timeTag.addClass(time.customFormat("_#YYYY#_#M#_#D#"));
+		timeTag.html( getFormatTimeTag(time) );
+		if(time.getTime()<g_lastDate){
+			$("#chat-contents .firstMsg").after(timeTag);
+		} else {
+			$("#chat-contents .lastMsg").before(timeTag);
+		}
+		div = $("<div></div>");
+		timeTag.after(div);
+	}
+
+	if(time.getTime()<g_lastDate){
+		g_lastDate = time;
+	}
+	if(time.getTime()>g_currentDate){
+		g_currentDate = time;
+	}
+
+	if(bIsFront){
+		div.prepend(container);
+	} else {
+		div.append(container);
+	}
+
 	//msg
 	var msgData = object.ml[0];
 	var msgDiv;
@@ -217,7 +330,7 @@ function showMsg(container, object, time){
 		//right align
 		//time +(msg)
 		var div = $("<div class='chat-msg-right'></div>");
-		container.prepend(div);
+		container.append(div);
 
 		div.append( $("<div class='chat-msg-time'>" + time.customFormat( "#hhh#:#mm#" ) + "</div>") );
 		msgDiv = $("<div></div>");
@@ -227,7 +340,7 @@ function showMsg(container, object, time){
 		var mem = getChatMem(object.meta.gu)
 
 		var div = $("<div class='chat-msg-left'></div>");
-		container.prepend(div);
+		container.append(div);
 
 		//left
 		var pic = $("<img class='aut'></img>");	//left pic (auo for large pic)
@@ -243,9 +356,11 @@ function showMsg(container, object, time){
 		subDiv.append("<div class='name'>"+ mem.nk +"</div>");	//name
 		msgDiv = $("<div></div>");
 		subDiv.append(msgDiv);	//msg
-		subDiv.append("<div class='chat-msg-time'>" + time.customFormat( "#hhh#:#mm#" ) + "</div>");	//time
+		subDiv.append("<div class='chat-msg-time'>" + time.customFormat( "#hh#:#mm#" ) + "</div>");	//time
 		div.append(subDiv);	//right
 	}
+
+	console.debug( g_lastDate, time.customFormat( "#M#/#D# #hh#:#mm#" ), msgData.c);
 
 	switch(msgData.tp){
 		case 0: //text or other msg
@@ -262,7 +377,7 @@ function showMsg(container, object, time){
 			} else {
 				msgDiv.addClass('chat-msg-pic-left');
 			}
-			var pic = $("<img>");
+			var pic = $("<img style='width:150px;height:200px;'>");
 			msgDiv.append(pic);
 			getS3file(msgDiv, msgData.c, msgData.p, msgData.tp, g_ci, 120);
 			break;
