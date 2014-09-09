@@ -136,7 +136,14 @@ $(function(){
         	// cns.debug("login resutl:",JSON.stringify(login_result));
         	// return false;
         	if(data.status == 200){
-    			//登入成功 記錄帳號密碼
+
+        		//判斷是否換帳號 換帳號就要清db
+        		if(!$.lStorage(login_result.ui)){
+        			idb_timeline_events.clear();
+			    	localStorage.clear();
+        		}
+
+    			//記錄帳號密碼
     			if($(".login-remeber").data("chk")){
 					var _loginRemeber = {};
 					_loginRemeber.phone = phone_id;

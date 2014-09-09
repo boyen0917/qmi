@@ -71,7 +71,7 @@ $(function(){
         	//timelineListWrite();
         	setTimeout(function(){
         		timelineListWrite();
-        	},500);
+        	},1000);
         	
         }
 
@@ -93,7 +93,19 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		
+		// idbReset();
+		// return false;
+		// req = indexedDB.deleteDatabase("IDBWrapper-timeline_events");
+  //       req.onsuccess = function () {
+  //           console.log("Deleted database successfully");
+  //       };
+  //       req.onerror = function () {
+  //           console.log("Couldn't delete database");
+  //       }
+  //       req.onblocked = function () {
+  //           console.log("Couldn't delete database due to the operation being blocked")
+  //       }
+		// cns.debug("idb:",idb_timeline_events);
 	});
 
 
@@ -310,6 +322,8 @@ $(function(){
 		//調整頭像大小
 		var img = $(".sm-user-pic img");
 		mathAvatarPos(img,img.width(),img.height(),avatar_size);
+
+		//polling
 	});
 	
 

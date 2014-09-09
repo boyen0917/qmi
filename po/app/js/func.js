@@ -1029,6 +1029,8 @@ $(function(){
 		bindWorkEvent(this_event);
 	}
 
+
+
 	bindWorkEvent = function (this_event){
 		this_event.find(".st-work-option").click(function(){
 
@@ -1041,9 +1043,9 @@ $(function(){
 			if(!this_work.data("mine") || this_event.data("task-over")) return false;
 
 			if(this_work.data("work-status")){
-				var a = false;
+				var work_status = false;
 			}else{
-				var a = true;
+				var work_status = true;
 
 				//表示最後一個工作也要完成了
 				if(mine_finished_total == mine_total-1) fin = true;
@@ -1070,13 +1072,13 @@ $(function(){
                     {
                       "tp": 13,
                       "k": this_work.data("item-index"),
-                      "a": a
+                      "a": work_status
                     }
                   ]
                 }
             var result = ajaxDo(api_name,headers,method,true,body);
             result.complete(function(data){
-	        	if(a){
+	        	if(work_status){
 	        		if(this_work.data("mine")) this_work.addClass("work-mine-finished");
 	        		this_work.addClass("st-work-option-gray");
 	        		this_work.find(".st-work-option-tu img").attr("src","images/common/icon/icon_work_member_lightgray.png");
@@ -1099,7 +1101,7 @@ $(function(){
 	        	}
 
 	        	//存回
-	        	this_work.data("work-status",a);
+	        	this_work.data("work-status",work_status);
 	    	});
 
 		})
@@ -1533,7 +1535,7 @@ $(function(){
 				
 				$.each(url_chk,function(i,val){
 					if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
-						// this_compose.data("url-chk",true);
+						this_compose.data("url-chk",true);
 						if(val.match(/youtube.com|youtu.be/)){
 							getLinkYoutube(this_compose,val);
 						}else{
@@ -2856,25 +2858,85 @@ $(function(){
 				$(".st-feedbox-area-bottom > div").hide();
         	}
 
-	    	//存db
-            $.each(timeline_list,function(i,val){
-                val.ct = val.meta.ct;
-                val.gi = gi ;
-                val.tp = val.meta.tp ;
+	    	//存db 先刪後存 因為刪除事件是不回傳的
+	    	//刪db
+	    	idbRemoveTimelineEvent(timeline_list,ct_timer);
 
-                var tp = val.meta.tp.substring(1,2)*1;
-                //為了idb
-                if(tp > 2){
-                	val.tp = "03" ;
-                }
-                idb_timeline_events.put(val);
-            });
+	    	//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
+	    	if(event_tp == "00"){
+	    		//存db	    	
+	            $.each(timeline_list,function(i,val){
+	                val.ct = val.meta.ct;
+	                val.gi = gi ;
+	                val.tp = val.meta.tp ;
+
+	                var tp = val.meta.tp.substring(1,2)*1;
+	                //為了idb
+	                if(tp > 2){
+	                	val.tp = "03" ;
+	                }
+
+	                idb_timeline_events.put(val);
+	            });
+	    	}
 
             //存完後改timeline 
             $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
     			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
 	    	});
 	    });
+	}
+
+	idbRemoveTimelineEvent = function(timeline_list,ct_timer){
+		var ct_timer = ct_timer || 9999999999999;
+		
+		var event_tp = $("#page-group-main").data("navi") || "00";
+		var ei_arr = [];
+		for(obj in timeline_list){
+			ei_arr.push(timeline_list[obj].ei);
+		}
+
+		//判斷類別
+		var idb_index,idb_keyRange;
+		if(!event_tp || event_tp == "00"){
+			idb_index = "gi_ct";
+			idb_keyRange = idb_timeline_events.makeKeyRange({
+              upper: [gi,ct_timer],
+              lower: [gi,timeline_list.last().meta.ct]
+            });
+		}else{
+			idb_index = "gi_tp_ct";
+			idb_keyRange = idb_timeline_events.makeKeyRange({
+              upper: [gi,event_tp,ct_timer],
+              lower: [gi,event_tp,timeline_list.last().meta.ct]
+            })
+		}
+
+		//刪掉server回傳的最後一筆和ct_timer之間的資料
+		idb_timeline_events.iterate(function(item){
+			//刪db
+	    	idb_timeline_events.remove(item.ei);
+
+	    	//刪ui裡面被刪除的event
+	    	//不分type就是要一起刪
+
+	    	var this_event = $(".feed-subarea").find("[data-event-id="+ item.ei +"]");
+	    	if($.inArray(item.ei,ei_arr) == -1){
+	    		this_event.remove();
+	    	}
+	    	// if(this_event.length != 0) this_event.remove();
+	    },{
+            index: idb_index,
+            keyRange: idb_keyRange,
+            order: "DESC",
+            onEnd: function(result){
+                console.debug("onEnd:",result);
+            },
+            onError: function(result){
+                console.debug("onError:",result);
+            }
+        });
+
 	}
 
 
@@ -2889,8 +2951,6 @@ $(function(){
 
 	    //製作timeline
 	    $.each(timeline_list,function(i,val){
-        	//刪除event
-        	if(val.meta.del) return;
 
 	        var content,box_content,youtube_code,prelink_pic,prelink_title,prelink_desc;
 	        var method = "append";
@@ -2919,11 +2979,26 @@ $(function(){
 	    		this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
 
 	    		//event status
+	    		this_event.data("event-val",val);
     			setEventStatus(this_event,$(".st-filter-area").data("filter"));
 	    		return;
         	}
     		
     		this_event = this_event_temp.clone();
+
+
+    		var tp = val.meta.tp.substring(1,2)*1;
+	        
+	        //記錄timeline種類
+    		this_event.attr("data-event-id",val.ei);
+    		this_event.data("event-val",val);
+    		this_event.data("timeline-tp",tp);
+    		this_event.data("group-id",gi);
+    		this_event.data("timeline-id",ti_feed);
+			this_event.data("parti-list",[]);
+			this_event.data("ct",val.meta.ct);
+
+
 
     		//寫新event(等同下拉更新) 判斷有無第一個event 且 時間大於此event的ct
         	if(top_subbox.length && val.meta.ct > top_subbox.data("ct")){
@@ -2937,16 +3012,6 @@ $(function(){
 
         	//-------------------------------------------------------------------
 
-        	var tp = val.meta.tp.substring(1,2)*1;
-
-    		//記錄timeline種類
-    		this_event.attr("data-event-id",val.ei);
-    		this_event.data("event-val",val);
-    		this_event.data("timeline-tp",tp);
-    		this_event.data("group-id",gi);
-    		this_event.data("timeline-id",ti_feed);
-			this_event.data("parti-list",[]);
-			this_event.data("ct",val.meta.ct);
 
     		//時間 名字 
     		// 判斷是否有gu all
