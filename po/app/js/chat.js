@@ -12,7 +12,7 @@ var eGroupTiType = {
 	"TIME_LINE":2
 };
 var g_isEndOfPage = false;	//是否在頁面底端
-var g_needsRolling = false;	//是否要卷到頁面最下方？
+var g_needsRolling = true;	//是否要卷到頁面最下方？
 var g_lastMsgEi=0;
 
 /*
@@ -77,20 +77,14 @@ $(document).ready(function(){
 
 	showChat();
 
-	$(window).scroll(function() {
-	   var isAtBottom = ($(window).scrollTop() + $(window).height() == $(document).height());
-	   if( g_isEndOfPage != isAtBottom ){
-	   		g_isEndOfPage = isAtBottom;
-	   		if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
-	   		else $("#chat-toBottom").fadeIn('fast');
-	   }
-	});
+	// $(window).scroll(checkIsAtBottom);
 
 	$("#chat-toBottom").click(scrollToBottom);
 });
 
 setInterval(function() {
     showChat();
+    checkIsAtBottom();
 }, 1000);
 
 /*
@@ -121,7 +115,20 @@ function op( url, type, data, delegate){
 }
 
 function scrollToBottom(){
-	$('html, body').animate({scrollTop: $(document).height()}, 0);
+	$('html, body').animate({scrollTop:$(document).height()}, 'fast');
+	// checkIsAtBottom();
+}
+
+function checkIsAtBottom(){
+	var posi = $(window).scrollTop();
+	var height = $(window).height();
+	var docHeight = $(document).height();
+	var isAtBottom = ((posi + height) >= docHeight);
+	if( g_isEndOfPage != isAtBottom ){
+			g_isEndOfPage = isAtBottom;
+			if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
+			else $("#chat-toBottom").fadeIn('fast');
+	}
 }
 
 function getGroupMemberFromData( g_uid ){
@@ -317,12 +324,28 @@ getS3file = function(target, file_c, file_p, tp, ti, size){
 						//重設 style
 						img.removeAttr("style");
 
-						if(g_isEndOfPage){
-							scrollToBottom();
-						}
+						// if(g_isEndOfPage){
+						// 	scrollToBottom();
+						// }
 			        });
+			        
 					//小圖
-					target.find("img").attr("src",obj.s3);
+					img.attr("src",obj.s3);
+					//點擊跳出大圖
+					img.click( function(){
+						var imgO = new Image();
+						var gallery_str = "<img src=" + obj.s32 + " />";
+						imgO.onload = function() {
+							var gallery = window.open("layout/chat_gallery.html", "", "width=" + (this.width+30) + ", height=" + (this.height+25));
+					    	$(gallery.document).ready(function(){
+								setTimeout(function(){
+									var this_slide = $(gallery.document).find(".pic");
+									this_slide.html( gallery_str );
+								},300);
+							});
+					    }
+						imgO.src = obj.s32;
+					});
 					break;
 				case 8://聲音
 					target.attr("src",obj.s3);
