@@ -91,7 +91,7 @@
               ╚═╝  ╚═══╝╚══════╝ ╚══╝╚══╝      ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝             
                                                                                          */
 
-.newChat-nextStep{
+.newChat-nextStep, .newChatDetail-nextStep{
 	position: absolute;
 	right: 0px;
 	top: 0px;
@@ -104,24 +104,32 @@
 	line-height: 57px;
 	background: #237bd7;
 }
-.newChat-nextStep:hover{
+.newChat-nextStep:hover, .newChatDetail-nextStep:hover{
     background:rgb(0,86,138);
 }
 
-#page-newChat div:nth-child(1) .header-group-name div:nth-child(1){
+#page-newChat div:nth-child(1) .header-group-name div:nth-child(1),
+#page-newChatDetail div:nth-child(1) .header-group-name div:nth-child(1){
 	line-height: 44px;
 	font-size: 22px;
 }
-
+.addMemListTitleGroup{
+	width: 80px;
+	height: 100%;
+}
 .newChat-list{
 	background: rgb(223, 236, 244);
-	height: 30px;
+	min-height: 30px;
+	color: #333;
+	width: 100%;
 }
-.newChat-list span{
-	line-height: 30px;
-	margin-left: 15px;
+.newChat-list .addMemListTitle{
+	margin-left: 5px;
+	text-align: center;
+	width: 50px;
+	display: inline-block;
 }
-.newChat-list div{
+.newChat-list .addMemListImg{
 	background: url("../images/common/icon/icon_arrow_next_darkblue.png");
 	width: 20px;
 	height: 20px;
@@ -129,6 +137,14 @@
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 	vertical-align: -20%;
+}
+.newChat-list .addMemList{
+	display: inline-block;
+	height: 100%;
+	width: 99%;
+}
+.addMemList span{
+	margin-right: 10px;
 }
 
 
@@ -145,8 +161,9 @@
 	display: inline-block;
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
-	margin: -3px 5px 0 15px;
+	margin: 5px 13px 0 15px;
 	vertical-align: middle;
+	float: left;
 }
 .newChat-selectAll .checked{
 	background: url("../images/common/icon/icon_check_gray_check.png");
@@ -157,15 +174,16 @@
 }
 .newChat-selectAll span:nth-child(2){
 	text-align: left;
-	width: 100px;
+	width: 52px;
 	display: inline-block;
+	float: left;
 }
 .newChat-selectAll span:nth-child(3){
-	text-align: center;
+	text-align: left;
 	width: 100px;
 	right: 0;
 	display: inline-block;
-	float: right;
+	float: left;
 }
 
 .newChat-content .mem{
@@ -194,7 +212,7 @@
 	height: 20px;
 }
 
-.newChat-content .mem img{
+.newChat-content .mem img, .newChatDetail-content .mem img{
 	width: 40px;
 	height: 40px;
 	display: inline-block;
@@ -205,3 +223,61 @@
 	border-style: solid;
 	border-width: 1px;
 }
+
+/*
+              ██████╗ ███████╗████████╗ █████╗ ██╗██╗               
+              ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██║██║               
+    █████╗    ██║  ██║█████╗     ██║   ███████║██║██║         █████╗
+    ╚════╝    ██║  ██║██╔══╝     ██║   ██╔══██║██║██║         ╚════╝
+              ██████╔╝███████╗   ██║   ██║  ██║██║███████╗          
+              ╚═════╝ ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚══════╝          
+                                                                    */
+.newChatDetail{
+	width: 100%;
+	height: 100px;
+	background: rgb(208,208,208);
+	padding-top: 15px;
+}
+.newChatDetail table{
+	width: 94%;
+	height: 90px;
+	background: white;
+	margin: auto;
+	border-radius: 5px;
+	box-shadow: 0px 1px 5px 0px rgba(50, 50, 50, 0.75);
+	padding: 5px 17px 5px 10px;
+}
+.newChatDetail table .img{
+	width: 60px;
+	height: 100%;
+}
+.newChatDetail table .img img{
+	width: 50px;
+	height: 50px;
+}
+.newChatDetail table .title{
+	display: inline-block;
+	float:left;
+}
+.newChatDetail table .count{
+	display: inline-block;
+	float:right;
+}
+.newChatDetail table .input{
+	width: 100%;
+}
+
+.newChatDetail-header{
+	background: rgb(203, 220, 224);
+	padding: 3px 20px;
+}
+.newChatDetail-content .mem{
+	margin: 0px 20px;
+	height: 60px;
+	border-style: solid;
+	border-width: 0 0 1px 0;
+	border-color: #abbabf;
+	line-height: 60px;
+}
+
+

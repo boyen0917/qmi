@@ -7,9 +7,9 @@
 		"choose"  						: "選擇",
 		"selectAll"  					: "全選",
 		"member"  						: "成員",
-		"Example 9"  					: "哈囉哈囉哈囉",
-		"Example 10" 					: "哈囉哈囉",
-		"Dynamic Content" 				: "哈囉 %s 哈囉 %s",
-		"Ordered Dynamic Content" : "%2$s 哈囉 %1$s 哈囉",
-		"HTML Content"            : "哈囉<b><i>%s</i></b> 哈囉 <b><i>%s</i></b>"
+		"edit"  						: "編輯",
+		"finish" 						: "完成",
+		"roomName" 						: "聊天室名稱",
+		"inputRoomName" 				: "輸入聊天室名稱",
+		"enterRoomName"            		: "請輸入聊天室名稱"
 }

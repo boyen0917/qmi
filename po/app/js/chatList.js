@@ -1,5 +1,5 @@
 // $(function(){ 
-	//showNewRoomPage();
+// 	showNewRoomPage();
 // });
 
 var windowList = new Object();
@@ -34,38 +34,42 @@ initChatList = function(){
 
 	//---- get chat list -----
 	//clear old contect
+	updateChatList();
+}
+
+function updateChatList(){
 	$(".subpage-chatList .rows").html("");
 
 	var userData = $.lStorage(ui);
+	if( !userData )	return;
 	var currentGroup = userData[gi];
-	
-	if( currentGroup ){
-		//取得聊天室列表
-		var api_name = "groups/"+ gi +"/chats";
+	if( !currentGroup )	return;
 
-		var headers = {
-		        ui:ui,
-		        at:at, 
-		        li:lang
-	    };
-		var method = "get";
-		var result = ajaxDo(api_name,headers,method,false);
-		result.complete(function(data){
-			if(data.status == 200){
-				var epl = $.parseJSON(data.responseText);
-				if(typeof epl != "undefined"){
-					currentGroup["chatAll"] = new Object();
+	//取得聊天室列表
+	var api_name = "groups/"+ gi +"/chats";
 
-					$.each(epl.cl,function(key,room){
-						currentGroup["chatAll"][room.ci] = room;
-					});
+	var headers = {
+	        ui:ui,
+	        at:at, 
+	        li:lang
+	};
+	var method = "get";
+	var result = ajaxDo(api_name,headers,method,false);
+	result.complete(function(data){
+		if(data.status == 200){
+			var epl = $.parseJSON(data.responseText);
+			if(typeof epl != "undefined"){
+				currentGroup["chatAll"] = new Object();
 
-			    	$.lStorage(ui, userData);
-			    	showChatList();
-			    }
-			}
-		});
-	}
+				$.each(epl.cl,function(key,room){
+					currentGroup["chatAll"][room.ci] = room;
+				});
+
+		    	$.lStorage(ui, userData);
+		    	showChatList();
+		    }
+		}
+	});
 }
 
 /**
@@ -155,22 +159,38 @@ function showChatList(){
               ╚═╝  ╚═══╝╚══════╝ ╚══╝╚══╝      ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝             
                                                                                          */
 
+var g_newChatMemList;
+var g_memCount;
+
 function showNewRoomPage(){
+	g_newChatMemList = [];
 	$.mobile.changePage("#page-newChat");
 
+	//init
 	var container = $(".newChat-content");
 	container.html("");
+	$(".addMemList").html("");
+	$(".newChat-checkbox-gray").removeClass("checked");
+
+	//show data
 	var currentGroup = $.lStorage(ui)[gi];
+	g_memCount = 0;
 	for( var guid in currentGroup.guAll ){
 		var mem = currentGroup.guAll[guid];
 		var memDiv = $("<div class='mem'></div>");
-		memDiv.append("<div class='checkbox' data-memid='"+guid+"' check='false'></div>");
-		memDiv.append("<img src='"+mem.auo+"'>");
+		memDiv.append("<div class='checkbox' data-memid='"+guid+"' data-memname='"+mem.nk+"' check='false'></div>");
+		if(mem.auo){
+			memDiv.append("<img src='"+mem.auo+"'>");
+		} else {
+			memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
+		}
 		memDiv.append("<span>"+mem.nk+"</span>");
 		container.append(memDiv);
+		g_memCount++;
 	}
 
-
+	//bind event
+	$(".newChat-checkbox-gray").off("click");
 	$(".newChat-checkbox-gray").click(function(){
 	    if( $(this).hasClass("checked") ){
 	    	$(this).removeClass("checked");
@@ -182,25 +202,149 @@ function showNewRoomPage(){
 	});
 
 
+	$(".newChat-content .mem .checkbox").off("click");
 	$(".newChat-content .mem .checkbox").click(function(){
-		console.debug($(this).attr("check"));
+		// console.debug($(this).attr("check"));
 	    if( "false"==$(this).attr("check") ){
 	    	$(this).attr("check", "true");
-	    	//toggleMember( $(this).data("memid"), false );
+	    	addMember( $(this).data("memid"), $(this).data("memname") );
 	    } else {
 	    	$(this).attr("check", "false");
-	    	//toggleMember( $(this).data("memid"), true );
+	    	removeMember( $(this).data("memid") );
 	    }
 	});
+
+	$(".newChat-nextStep").off("click");
+	$(".newChat-nextStep").click( showNewRoomDetailPage );
+}
+
+function addMember( memId, memName ){
+	if( g_newChatMemList.indexOf(memId)<0 ){
+		g_newChatMemList.push(memId);
+		var span = $("<span data-memid='"+memId+"'>"+memName+"</span>");
+		$(".newChat-list .addMemList").append(span);
+		if( g_newChatMemList.length >= g_memCount ){
+			$(".newChat-checkbox-gray").addClass("checked");
+		}
+	}
+}
+
+function removeMember( memId ){
+	var index = g_newChatMemList.indexOf(memId);
+	if( index>=0 ){
+		g_newChatMemList.splice(index, 1);
+		$(".newChat-list .addMemList span[data-memid='"+memId+"'").remove();
+		
+		if( g_newChatMemList.length < g_memCount ){
+			$(".newChat-checkbox-gray").removeClass("checked");
+		}
+	}
 }
 
 function toggleSelectAll( bIsSelect ){
 	if( "page-newChat" != $.mobile.activePage.attr('id') ) return;
-	console.debug("!");
 
 	if( bIsSelect ){
-	    $(".newChat-content .mem .checkbox").attr("check", "true");
+	    $(".newChat-content .mem .checkbox").each( function(){
+	    	$(this).attr("check", "true");
+	    	addMember( $(this).data("memid"), $(this).data("memname") );
+	    });
 	} else {
 	    $(".newChat-content .mem .checkbox").attr("check", "false");
+	    $(".newChat-list .addMemList").html("");
+	    g_newChatMemList=[];
 	}
+}
+
+/*
+              ██████╗ ███████╗████████╗ █████╗ ██╗██╗               
+              ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██║██║               
+    █████╗    ██║  ██║█████╗     ██║   ███████║██║██║         █████╗
+    ╚════╝    ██║  ██║██╔══╝     ██║   ██╔══██║██║██║         ╚════╝
+              ██████╔╝███████╗   ██║   ██║  ██║██║███████╗          
+              ╚═════╝ ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚══════╝          
+                                                                    */
+
+function showNewRoomDetailPage(){
+
+	if( g_newChatMemList.length==0 ){
+		alert( $.i18n.getString("enterRoomName") );
+		return;
+	}
+
+	$.mobile.changePage("#page-newChatDetail");
+
+	//init
+	var container = $(".newChatDetail-content");
+	var input = $(".newChatDetail table .input");
+	var count = $(".newChatDetail table .count");
+	input.val("");
+	count.html( "0/"+input.attr("maxlength") );
+	container.html("");
+
+	//load data
+	var currentGroup = $.lStorage(ui)[gi];
+	for( var i=0; i<g_newChatMemList.length; i++ ){
+		var mem = currentGroup.guAll[ g_newChatMemList[i] ];
+		var memDiv = $("<div class='mem'></div>");
+		if(mem.auo){
+			memDiv.append("<img src='"+mem.auo+"'>");
+		} else {
+			memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
+		}
+		memDiv.append("<span>"+mem.nk+"</span>");
+		container.append(memDiv);
+	}
+
+	//bind event
+	var tmp = $.i18n.getString( input.data("textid") );
+	input.attr("placeholder", tmp );
+	input.off( "change" );
+	input.keyup( function(){
+		var text = $(this).val();
+		count.html( (20-text.length)+"/"+$(this).attr("maxlength") );
+	});
+
+	$(".newChatDetail-nextStep").off( "click" );
+	$(".newChatDetail-nextStep").click( requestNewChatRoom );
+}
+
+
+function requestNewChatRoom(){
+	var text = $(".newChatDetail table .input").val();
+	console.debug( text );
+	if( !text || text.length==0 ){
+		alert( $.i18n.getString("enterRoomName") );
+		return;
+	}
+	var arr = [];
+	for( var i=0; i<g_newChatMemList.length; i++ ){
+		arr.push( {gu:g_newChatMemList[i]} );
+	}
+
+	var api_name = "/groups/"+gi+"/chats";
+
+    var headers = {
+        ui: ui,
+        at: at,
+        li: lang
+    };
+    var body = {
+        cn: text,
+        gul: arr
+    };
+
+    console.debug( JSON.stringify(body) );
+    var method = "post";
+    ajaxDo(api_name,headers,method,true,body).complete(function(data){
+    	if(data.status == 200){
+    		var result = $.parseJSON(data.responseText);
+    		console.debug(result);
+    		//$("#page-newChat .page-back").trigger("click");
+    		//$("#page-newChat .page-back").trigger("click");
+    		$.mobile.changePage("#page-group-main");
+    		updateChatList();
+    	}
+    });
+
 }

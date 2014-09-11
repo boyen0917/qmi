@@ -533,10 +533,15 @@
                     <span class="text" data-textid="nextStep"></span>
                 </div>
             </div>
-            <div class="newChat-list">
-                <span class="text" data-textid="choose">Choose</span>
-                <div></div>
-            </div>
+            <table class="newChat-list">
+                <tr>
+                    <td class="addMemListTitleGroup">
+                        <div class="addMemListTitle text" data-textid="choose">Choose</div>
+                        <div class="addMemListImg"></div>
+                    </td>
+                    <td class="addMemList"></td>
+                </tr>
+            </table>
             <div class="newChat-selectAll">
                 <div class="newChat-checkbox-gray"></div>
                 <span class="text" data-textid="selectAll">Select All</span>
@@ -545,6 +550,39 @@
             <div class="newChat-content">
                 <!-- <img src="images/common/icon/icon_check_round.png"/> -->
 
+            </div>
+        </div>
+<!-------------------------------- page-newChatDetail ---------------------------------->
+        <div data-role="page" id="page-newChatDetail">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <div class="header-group-name">
+                    <div class="page-title text" data-textid="edit">Edit</div>
+                    <div></div>
+                </div>
+                <div class="newChatDetail-nextStep">
+                    <!-- <img src="images/navi/navi_icon_post.png"/> -->
+                    <span class="text" data-textid="finish"></span>
+                </div>
+            </div>
+
+            <div class="newChatDetail">
+                <table>
+                    <tr>
+                        <td class="img">
+                            <img src="images/common/others/empty_img_mother_l.png">
+                        </td>
+                        <td>
+                            <div class="title text" data-textid="roomName">Room Name</div>
+                            <div class="count"></div>
+                            <br/>
+                            <input class="input" data-textid="inputRoomName" placeholder="Input name here" data-role="none" maxlength="20"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="newChatDetail-header text" data-textid="member">Member</div>
+            <div class="newChatDetail-content">
             </div>
         </div>
 
