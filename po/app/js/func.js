@@ -305,7 +305,7 @@ $(function(){
 	        	$(".subpage-chatList").show();
 	        	$( "#side-menu" ).panel( "close");
 
-	        	setChatList();
+	        	initChatList();
 
 	        	//$.mobile.changePage("#page-chatroom");
 	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");

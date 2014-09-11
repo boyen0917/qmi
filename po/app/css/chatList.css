@@ -31,6 +31,7 @@
     display: block;
     height: 100%;
     width: 100%;
+    /*padding-top: 50px;*/
 }
 
 .subpage-chatList-row {
@@ -79,4 +80,128 @@
 .subpage-chatList-row .drag {
 	background:rgb(255,255,0);
 	float: right;
+}
+
+/*
+              ███╗   ██╗███████╗██╗    ██╗     ██████╗██╗  ██╗ █████╗ ████████╗          
+              ████╗  ██║██╔════╝██║    ██║    ██╔════╝██║  ██║██╔══██╗╚══██╔══╝          
+    █████╗    ██╔██╗ ██║█████╗  ██║ █╗ ██║    ██║     ███████║███████║   ██║       █████╗
+    ╚════╝    ██║╚██╗██║██╔══╝  ██║███╗██║    ██║     ██╔══██║██╔══██║   ██║       ╚════╝
+              ██║ ╚████║███████╗╚███╔███╔╝    ╚██████╗██║  ██║██║  ██║   ██║             
+              ╚═╝  ╚═══╝╚══════╝ ╚══╝╚══╝      ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝             
+                                                                                         */
+
+.newChat-nextStep{
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	cursor: pointer;
+	width: 100px;
+	height: 57px;
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	line-height: 57px;
+	background: #237bd7;
+}
+.newChat-nextStep:hover{
+    background:rgb(0,86,138);
+}
+
+#page-newChat div:nth-child(1) .header-group-name div:nth-child(1){
+	line-height: 44px;
+	font-size: 22px;
+}
+
+.newChat-list{
+	background: rgb(223, 236, 244);
+	height: 30px;
+}
+.newChat-list span{
+	line-height: 30px;
+	margin-left: 15px;
+}
+.newChat-list div{
+	background: url("../images/common/icon/icon_arrow_next_darkblue.png");
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	vertical-align: -20%;
+}
+
+
+.newChat-selectAll{
+	background: rgb(203, 220, 224);
+	height: 30px;
+	line-height: 30px;
+}
+/*custom checked box*/
+.newChat-selectAll div{
+	background: url("../images/common/icon/icon_check_gray.png");
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	margin: -3px 5px 0 15px;
+	vertical-align: middle;
+}
+.newChat-selectAll .checked{
+	background: url("../images/common/icon/icon_check_gray_check.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	width: 20px;
+	height: 20px;
+}
+.newChat-selectAll span:nth-child(2){
+	text-align: left;
+	width: 100px;
+	display: inline-block;
+}
+.newChat-selectAll span:nth-child(3){
+	text-align: center;
+	width: 100px;
+	right: 0;
+	display: inline-block;
+	float: right;
+}
+
+.newChat-content .mem{
+	height: 60px;
+	border-style: solid;
+	border-width: 0 0 1px 0;
+	border-color: #abbabf;
+	line-height: 60px;
+}
+
+.newChat-content .mem .checkbox{
+	background: url("../images/common/icon/icon_check_round.png");
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	margin: -3px 12px 0 15px;
+	vertical-align: middle;
+}
+.newChat-content .mem .checkbox[check="true"]{
+	background: url("../images/common/icon/icon_check_round_check.png");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	width: 20px;
+	height: 20px;
+}
+
+.newChat-content .mem img{
+	width: 40px;
+	height: 40px;
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 10px;
+	border-radius: 5px;
+	border-color: #abbabf;
+	border-style: solid;
+	border-width: 1px;
 }
