@@ -37,7 +37,7 @@ initChatList = function(){
 	updateChatList();
 }
 
-function updateChatList(){
+function updateChatList( extraCallBack ){
 	$(".subpage-chatList .rows").html("");
 
 	var userData = $.lStorage(ui);
@@ -71,6 +71,7 @@ function updateChatList(){
 		    	showChatList();
 		    }
 		}
+		if(extraCallBack)	extraCallBack();
 	});
 }
 
@@ -138,7 +139,7 @@ function showChatList(){
 				td = $("<td></td>");
 				td.html( $.i18n.getString("delete") );
 				row.append(td);
-				
+
 				targetDiv.append(table);
 			}
 		});
@@ -366,8 +367,10 @@ function requestNewChatRoom(){
 	var text = $(".newChatDetail table .input").val();
 	// console.debug( text );
 	if( !text || text.length==0 ){
-		alert( $.i18n.getString("enterRoomName") );
-		return;
+		if( g_newChatMemList.length > 1 ){
+			alert( $.i18n.getString("enterRoomName") );
+			return;
+		}
 	}
 	var arr = [];
 	for( var i=0; i<g_newChatMemList.length; i++ ){
@@ -393,10 +396,11 @@ function requestNewChatRoom(){
     		var result = $.parseJSON(data.responseText);
     		// console.debug(result);
     		$.mobile.changePage("#page-group-main");
-    		updateChatList();
-    		if(result.ci){
-    			openChatWindow( result.ci );
-    		}
+    		updateChatList( function(){
+    			if(result.ci){
+			    	openChatWindow( result.ci );
+			    }
+    		});
     		// //api上面寫這個可能是批次新增用的..?!
     		// for( var i in result.cl ){
     		// 	var ci = result.cl[i].ci;
