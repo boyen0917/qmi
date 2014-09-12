@@ -1086,6 +1086,16 @@ img.auo {
     padding-top: 5px;
 }
 
+.cp-footer {
+	height: 44px;
+	background: url("../images/compose/compose_form_addfile_bg.png") repeat-x;
+	display: inline-block;
+	width: 100%;
+	border-bottom: 1px solid rgb(218,218,218);
+	position: fixed;
+	bottom: 0px;
+	z-index: 1000;
+}
 
 .header-group-name ,.header-cp-object{
 	text-align: center;
