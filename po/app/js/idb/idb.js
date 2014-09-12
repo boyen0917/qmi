@@ -3,7 +3,7 @@ $(function(){
     init = function(){
       
         idb_timeline_events = new IDBStore({
-          dbVersion: 2,
+          dbVersion: 5,
           storeName: 'timeline_events',
           keyPath: 'ei',
           indexes: [

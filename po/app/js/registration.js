@@ -139,6 +139,7 @@ $(function(){
 
         		//判斷是否換帳號 換帳號就要清db
         		if(!$.lStorage(login_result.ui)){
+        		// if(1){
         			idb_timeline_events.clear();
 			    	localStorage.clear();
         		}
