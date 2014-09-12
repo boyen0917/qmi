@@ -323,6 +323,7 @@ function showNewRoomDetailPage(){
 			}
 		}
 		requestNewChatRoom();
+		return;
 	}
 
 	$.mobile.changePage("#page-newChatDetail");
