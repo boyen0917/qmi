@@ -62,8 +62,8 @@ $(function(){
 
         				if(val.aut){
         					this_invite.find(".gmi-div-avatar .aut").attr("src",val.aut);
-        					this_invite.find(".gmi-div-avatar .auo").attr("src",val.auo);
-
+        					// this_invite.find(".gmi-div-avatar .auo").attr("src",val.auo);
+        					this_invite.find(".group-pic").data("auo",val.auo);
         					avatarPos(this_invite.find(".gmi-div-avatar .aut"),70);
         				}
 
@@ -214,7 +214,7 @@ $(function(){
 		});
 	}
 
-	getUserName = function (target_gi , target_gu , target ,set_img){
+	getUserName = function (target_gi , target_gu , set_name ,set_img){
         //先檢查localStorage[gi].guAll是否存在
         var _groupList = $.lStorage(ui);
         var aut = "",auo = "",nk = "";
@@ -232,14 +232,14 @@ $(function(){
     		set_img.attr("src",aut);
     		if(aut){
     			set_img.attr("src",aut);
-    			set_img.parent().find("img:eq(1)").attr("src",auo);
+    			set_img.parents(".namecard").data("auo",auo);
     			avatarPos(set_img);
         	}else{
         		set_img.attr("src","images/common/others/empty_img_personal_l.png");
         	}
     	}
     	
-        target.html(nk);
+        set_name.html(nk);
     }
 	
 
@@ -388,7 +388,7 @@ $(function(){
         var headers = {
                  "ui":ui,
                  "at":at, 
-                 "li":"zh_TW",
+                 "li":lang,
                      };
 
         var method = "get";
@@ -898,9 +898,10 @@ $(function(){
 					cns.debug("guall:",_groupList[gi].guAll[el.meta.gu]);
 					//大頭照
 					if(_groupList[gi].guAll[el.meta.gu].aut){
-	        			this_load.find(".st-user-pic img:eq(0)").attr("src",_groupList[gi].guAll[el.meta.gu].aut);
-	        			this_load.find(".st-user-pic img:eq(1)").attr("src",_groupList[gi].guAll[el.meta.gu].auo);
-	        			avatarPos(this_load.find(".st-user-pic img:eq(0)"));
+	        			this_load.find(".st-user-pic img").attr("src",_groupList[gi].guAll[el.meta.gu].aut);
+	        			// this_load.find(".st-user-pic img:eq(1)").attr("src",_groupList[gi].guAll[el.meta.gu].auo);
+	        			this_load.find(".st-user-pic.namecard").data("auo",_groupList[gi].guAll[el.meta.gu].auo);
+	        			avatarPos(this_load.find(".st-user-pic img"));
 	        		}
 					
 					var time = new Date(el.meta.ct);
@@ -2691,21 +2692,22 @@ $(function(){
 	            }
 
 	            var this_group = $(
-	           		'<div class="sm-group-area" data-gi="' + val.gi + '" data-gu="' + val.me + '" ' + chk + '>' +
-	           			'<img class="sm-icon_host" src="images/side_menu/icon_host.png"/>' +
-	           	        '<div class="sm-group-area-l">' +
+	           		'<div class="sm-group-area polling-cnt" data-gi="' + val.gi + '" data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
+	           			'<img class="sm-icon-host" src="images/side_menu/icon_host.png"/>' +
+	           	        '<div class="sm-group-area-l group-pic">' +
 	           	            '<img class="aut" src="' + glt_img + '">' +
-	           	            '<img class="auo" src="' + glo_img + '" style="display:none">' +
 	           	        '</div>' +
 	           	        '<div class="sm-group-area-r">' + htmlFormat(val.gn) + '</div>' +
 	           	        '<div class="sm-count" style="display:none"></div>' +
 	           	    '</div>'
 	     	    );
+
+	     	    this_group.find(".group-pic").data("auo",glo_img)
 	     	    $(tmp_selector).append(this_group);
 
 	     	    //管理者圖示
 	     	    if(val.ad != 1) {
-	     	    	this_group.find(".sm-icon_host").hide();
+	     	    	this_group.find(".sm-icon-host").hide();
 	     	    }
 
 	     	    var img = this_group.find(".sm-group-area-l img:eq(0)");
@@ -2930,10 +2932,10 @@ $(function(){
             keyRange: idb_keyRange,
             order: "DESC",
             onEnd: function(result){
-                console.debug("onEnd:",result);
+                console.debug("remove onEnd:",result);
             },
             onError: function(result){
-                console.debug("onError:",result);
+                console.debug("remove onError:",result);
             }
         });
 
@@ -3015,7 +3017,7 @@ $(function(){
 
     		//時間 名字 
     		// 判斷是否有gu all
-    		var data_arr = ["timelineUserName",gi , val.meta.gu , this_event.find(".st-sub-name") , this_event.find(".st-sub-box-1 .st-user-pic img:eq(0)")];
+    		var data_arr = ["timelineUserName",gi , val.meta.gu , this_event.find(".st-sub-name") , this_event.find(".st-sub-box-1 .st-user-pic img")];
     		chkGroupAllUser(data_arr);
 
     		var time = new Date(val.meta.ct);
@@ -4164,17 +4166,17 @@ $(function(){
 	replySend = function(this_event){
 
 		var body = {
-				"meta" : {
-					"lv" : 1,
-					"tp" : "10"
-				},
-				"ml" : [
-					{
-						"c": this_event.find(".st-reply-message-textarea textarea").val(),
-						"tp": 0
-					}
-				]
-			};
+			"meta" : {
+				"lv" : 1,
+				"tp" : "10"
+			},
+			"ml" : [
+				{
+					"c": this_event.find(".st-reply-message-textarea textarea").val(),
+					"tp": 0
+				}
+			]
+		};
 
 			var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
 
@@ -4257,6 +4259,147 @@ $(function(){
     }
 
 
+    polling = function(){
+
+    	var local_pollingData = $.lStorage("_pollingData") || {cnts:{},ts:{}};
+
+    	var polling_timer = local_pollingData.ts.pt || new Date().getTime();
+
+    	var api_name = "/sys/polling?pt=" + polling_timer;
+
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "get";
+        ajaxDo(api_name,headers,method,false).complete(function(data){
+        	if(data.status == 200){
+
+        		// cns.debug("before updata:",JSON.stringify(local_pollingData,null,2));
+        		// cns.debug("api updata:",JSON.stringify($.parseJSON(data.responseText),null,2));
+        		// return false;
+
+        		var new_pollingData = $.parseJSON(data.responseText);
+
+                var tmp_cnts = new_pollingData.cnts;
+                // new_pollingData.cnts = {};
+                new_pollingData.cnts = local_pollingData.cnts;
+                //cnts 做合併
+                $.each(tmp_cnts,function(i,val){
+                	var tmp_gi_obj = $.extend(local_pollingData.cnts[val.gi],val);
+                    new_pollingData.cnts[val.gi] = tmp_gi_obj;
+                });
+
+                //gcnts 做合併
+                new_pollingData.gcnts = $.extend(local_pollingData.gcnts,new_pollingData.gcnts);
+
+                cns.debug("after polling_data:",JSON.stringify(new_pollingData,null,2));
+
+                //寫入數字
+		        pollingCountsWrite(new_pollingData);
+
+                
+                // cns.debug("api updata:",JSON.stringify($.parseJSON(data.responseText),null,2));
+                // cns.debug("polling timer:",polling_timer);
+
+                //寫入cnts數字
+                // $(".sm-group-area[data-gi=G000000209m]")
+
+                //不能在這邊存 要等cmd和 ccs跑完才能存!? 那不就要等到聊天做完...
+        		$.lStorage("_pollingData",new_pollingData);
+        	}
+        });
+    }
+
+    pollingCountsWrite = function(polling_data){
+    	var cnts = polling_data.cnts;
+    	var gcnts = polling_data.gcnts;
+
+    	if(cnts){
+    		$.each(cnts,function(i,val){
+	    		//是否為當下團體
+	    		if(gi == val.gi){
+	    			if(val.A1){
+	    				$(".sm-small-area[data-sm-act=feed]").find(".sm-count").html(countsFormat(val.A1)).show();
+	    			}
+	    			if(val.A2){
+	    				$(".sm-small-area[data-sm-act=chat]").find(".sm-count").html(countsFormat(val.A2)).show();
+	    			}
+	    			if(val.A3){
+	    				// $(".sm-small-area[data-sm-act=]").find(".sm-count").html(countsFormat(val.A3)).show();
+	    			}
+	    			if(val.A4){
+	    				// $(".sm-small-area[data-sm-act=]").find(".sm-count").html(countsFormat(val.A4)).show();
+	    			}
+	    		}
+
+	    		if(val.A5){
+	    			$(".sm-group-area[data-gi=" + val.gi + "]").find(".sm-count").html(countsFormat(val.A5)).show();
+	    		}
+	    	});
+    	}
+
+    	if(gcnts.G1){
+    		$(".sm-group-cj-btn span").html(gcnts.G1).show();
+    	}
+    	if(gcnts.G2){
+    		//最新消息
+    	}
+    	if(gcnts.G3){
+    		//鈴鐺
+    	}
+    }
+
+    countsFormat = function(num){
+    	return num > 99 ? "99+" : num;
+    }
+
+    updatePollingCnts = function(this_count,cnt_type){
+    	var api_name = "/sys/counts";
+    	var body = {
+    		cnts: [],
+    		gcnts: {}
+    	};
+
+    	if(cnt_type.substring(0,1) == "G"){
+			body.gcnts[cnt_type] = 0;
+    	}else{
+    		body.cnts[0] = {
+    			gi: gi
+    		};
+    		body.cnts[0][cnt_type] = 0;
+    	}
+    	
+    	cns.debug("update polling cnt:",body);
+    	// return false;
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "put";
+        ajaxDo(api_name,headers,method,false,body).complete(function(data){
+        	cns.debug("update complete:",data);
+        	if(data.status == 200){
+        		this_count.hide();
+        	}
+        });
+    }
+
+    pollingInterval = function(){
+    	if(!$(document).data("polling-chk")){
+			pc = setInterval(function(){
+				polling();	
+			},3000);
+			$(document).data("polling-chk",true);
+			toastShow("開啓polling");
+		}else{
+			$(document).data("polling-chk",false);
+			toastShow("關閉polling");
+			clearInterval(pc);
+		}
+    }
 
     getLoginDataForTest = function(){
     	//暫時
@@ -4299,4 +4442,65 @@ $(function(){
         });
     };
 
+    supriseKey = function(){
+    	var suprise = $(document).data("suprise") || 0;
+		if(suprise < 100){
+			if(suprise != 0 || suprise == 3) clearTimeout(suprise_timer);
+
+			if(suprise == 3){
+				alert("取得\"2號彩蛋\"的鑰匙！");
+				$(document).data("suprise",100);
+				return false;
+			}
+			suprise++;
+			$(document).data("suprise",suprise);
+
+			
+			suprise_timer = setTimeout(function(){
+				$(document).data("suprise",0);
+			},300);
+		}
+    };
+
+    supriseYeah = function(){
+    	if($(document).data("suprise") != 100) return false;
+
+    	$(".sm-hr").unbind();
+		$(".yeah audio")[0].play();
+		$(".yeah").show();
+		$(".ajax-screen-lock").show();
+		$( "#side-menu" ).panel( "close");
+
+		setTimeout(function(){
+			$(".yeah1").show();
+		},500);
+		setTimeout(function(){
+			$(".yeah2").show();
+		},1500);
+		setTimeout(function(){
+			$(".yeah3").show();
+		},2500);
+		setTimeout(function(){
+			$(".yeah4").show();
+		},3500);
+		setTimeout(function(){
+			$(".yeah5").show();
+		},4500);
+
+		setTimeout(function(){
+			$(".yeah img").hide("slow");
+		},8000);
+
+		setTimeout(function(){
+			$(".yeah-yan img").show();
+		},8500);
+
+		setTimeout(function(){
+			$(".yeah-yan").remove();
+			$(".yeah").remove();
+			$(".ajax-screen-lock").hide();
+			$(document).data("suprise",101);
+			pollingInterval();
+		},12000);
+    }
 });

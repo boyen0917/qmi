@@ -121,30 +121,30 @@
 	               <div class="sm-user-area-l">
 	                   <div class="sm-user-pic namecard">
                            <img src="images/common/others/empty_img_personal_xl.png"/>
-                           <img src="" style="display: none;"/>
                        </div>
 	               </div>
                    <div class="sm-user-area-r">
                    <div></div>
                    <div></div>
+                   <img src="images/edit.png"/>
                    </div>
 	            </div>
-	            <div data-sm-act="feed" class="sm-small-area">
+	            <div data-sm-act="feed" data-polling-cnt="A1" class="sm-small-area polling-cnt">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_feed.png"/></div>
                    <div class="sm-small-area-r">動態消息</div>
                    <div class="sm-count">315</div>
                 </div>
-	            <!--<div data-sm-act="contact" class="sm-small-area">
+	            <!--<div data-sm-act="contact" data-polling-cnt="A2" class="sm-small-area polling-cnt">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_contact.png"/></div>
                    <div class="sm-small-area-r">聯絡人</div>
                    <div class="sm-count"></div>
                 </div>-->
-                <div data-sm-act="chat" class="sm-small-area" style="display:none;">
+                <div data-sm-act="chat" data-polling-cnt="A3" class="sm-small-area polling-cnt" style="display:none;">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_chat.png"/></div>
                    <div class="sm-small-area-r">聊天</div>
                    <div class="sm-count"></div>
                 </div>
-                <!--<div data-sm-act="calendar" class="sm-small-area">
+                <!--<div data-sm-act="calendar" data-polling-cnt="A4" class="sm-small-area">
                    <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_calendar.png"/></div>
                    <div class="sm-small-area-r">行事曆</div>
                    <div class="sm-count"></div>
@@ -159,7 +159,7 @@
                 <div class="sm-group-switch"><div class="sm-switch-ui-adj"></div><img src="images/side_menu/sidemenu_slidedown_icon_click.png"/></div>
                 <div class="sm-group-cj">
 	                <div class="hg-create sm-group-cj-btn">建立團體</div>
-	                <div class="hg-invite sm-group-cj-btn" >團體邀請</div>
+	                <div class="hg-invite sm-group-cj-btn polling-cnt" data-polling-cnt="G1" >團體邀請<span></span></div>
 	            </div>
                 <div class="sm-hr">系統</div>
                <!--  <div data-sm-act="help" class="sm-small-area">
@@ -420,110 +420,28 @@
             </div>
         </div>
 
-<!---------------------------------- page-chatroom ------------------------------------>
-        <div data-role="page" id="page-chatroom">
+<!---------------------------------- page-user-info ------------------------------------>
+        <div data-role="page" id="page-user-info">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3>三竹資訊</h3>
-                <div class="chatroom-addstate-top-btn"><img src="images/chatroom_top_btn.png"/></div>
+                <h3></h3>
             </div>
-            <div class="chatroom-addstate-top-area">
-                <!-- <div data-chat-b-act="editgup" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_editgup.png"><div>編輯群組</div></div>
-                <div data-chat-b-act="invit" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_invit.png"><div>邀請</div></div>
-                <div data-chat-b-act="nonotice" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_nonotice.png"><div>關閉通知</div></div>
-                <div data-chat-b-act="leave" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_leave.png"><div>離開聊天室</div></div>
-                <div data-chat-b-act="calendar" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_calendar.png"><div>事件</div></div>
-                <div data-chat-b-act="file" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_file.png"><div>檔案</div></div>
-                <div data-chat-b-act="backup" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_backup.png"><div>備份聊天記錄</div></div>
-                <div data-chat-b-act="search" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_search.png"><div>查詢聊天訊息</div></div>
-                <div data-chat-b-act="work" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_work.png"><div>工作</div></div>
-                <div data-chat-b-act="questionnaire" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_questionnaire.png"><div>問卷</div></div>
-                <div data-chat-b-act="vote" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_vote.png"><div>投票</div></div>
-                <div data-chat-b-act="direction" class="chatroom-addstate-top-box"><img src="images/chatroom/chat_sliddown_icon_direction.png"><div>定點回報</div></div> -->
-            </div>
-            <div data-role="content">
-                <div class="chat-area">
-                    <div class="chat-other">
-                        <img src="images/2.jpg">
-                        <div class="chat-other-subarea">
-                            <div>仁甫</div>
-                            <div class="chat-other-text">
-                                大家對新產品有什麼看法
-                                <div class="chat-other-time">10:12</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-other">
-                        <img src="images/2.jpg">
-                        <div class="chat-other-subarea">
-                            <div>仁甫</div>
-                            <div class="chat-other-text">
-                                季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正季芹好正
-                                <div class="chat-other-time">10:12</div>
-                            </div>
-                            
-                        </div>
-                    </div>
-                    
-                     <div class="chat-me">
-                        <div class="chat-me-text">
-                            師兄贏了好多錢 我要買雙
-                            <div class="chat-me-time">10:12</div>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-me">
-                        <div class="chat-me-text">
-                            新球鞋～
-                            <div class="chat-me-time">10:12</div>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-other">
-                        <img src="images/2.jpg">
-                        <div class="chat-other-subarea">
-                            <div>仁甫</div>
-                            <div class="chat-other-text">
-                                .......
-                                <div class="chat-other-time">10:12</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-other">
-                        <img src="images/2.jpg">
-                        <div class="chat-other-subarea">
-                            <div>仁甫</div>
-                            <div class="chat-other-text">
-                                .......
-                                <div class="chat-other-time">10:12</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-            <br/><br/><br/>
-            <div class="chatroom-footer">
-                <img class="chat-bar-add" src="images/chatroom/chat_textbar_icon_add.png"/>
-                <img class="chat-bar-emoticon" src="images/chatroom/chat_textbar_icon_emoticon.png"/>
-                <input class="chat-bar-input" type="text" placeholder="輸入訊息" data-role="none" />
-                <div class="chat-bar-send">傳送</div>
-            </div>
-            <div class="chatroom-addstate-area">
-                <div class="chatroom-addstate-bg"></div>
-                <!-- <div data-chat-b-act="pic" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_pic.png"><div>選擇照片</div></div>
-                <div data-chat-b-act="takepic" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_takepic.png"><div>拍攝照片</div></div>
-                <div data-chat-b-act="voice" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_voice.png"><div>傳送聲音訊息</div></div>
-                <div data-chat-b-act="direction" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_direction.png"><div>傳送位置訊息</div></div>
-                <div data-chat-b-act="file" class="chatroom-addstate-box"><img src="images/chatroom/chat_addstate_icon_file.png"><div>傳送檔案</div></div>
-                <div  class="chatroom-addstate-box"></div> -->
+            <div class="">
             </div>
         </div>
 
 <!---------------------------------- 全域 ------------------------------------>  
-        
+        <div class="yeah">
+            <audio src="files/yeah.mp3"></audio>
+            <img class="yeah1" src="files/yeah2.gif"/>
+            <img class="yeah2" src="files/yeah2.gif"/>
+            <img class="yeah3" src="files/yeah2.gif"/>
+            <img class="yeah4" src="files/yeah2.gif"/>
+            <img class="yeah5" src="files/yeah2.gif"/>
+        </div>
+        <div class="yeah-yan">
+            <img class="yan" src="files/yan.png"/>
+        </div>
         <div class="toast">
             <div></div>
         </div>

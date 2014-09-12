@@ -93,6 +93,15 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
+		// $(".yeah audio")[0].play();
+		// $(".yeah").show();
+		// $(".ajax-screen-lock").show();
+		// return false;	
+		//彩蛋鑰匙
+		supriseKey();
+		
+		if($(document).data("suprise") == 101) pollingInterval();
+
 		// idbReset();
 		// return false;
 		// req = indexedDB.deleteDatabase("IDBWrapper-timeline_events");
@@ -399,7 +408,8 @@ $(function(){
 	
 	//更換團體
 	$(document).on("click",".sm-group-area",function(){
-
+		// cns.debug("auo:",$(this).data("auo"));
+		// return false;
 		$( "#side-menu" ).panel( "close");
 		setThisGroup($(this).attr("data-gi"));
 		//更新gu all
@@ -1323,11 +1333,18 @@ $(function(){
 		
 	});
 
+	
+	//polling update cnts
+	$(document).on("click",".polling-cnt",function(e){
+		// cns.debug("polling-cnt:",$(this).data("polling-cnt").substring);
+		// return false;
+		updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
+	});	
 
 
 	$(document).on("click",".namecard",function(e){
 		e.stopPropagation();
-		cns.debug("hehe");
+		cns.debug("hehe:",$(this).data("auo"));
 	});
 	
 	//$(document).on("timeupdate",".st-attach-audio audio",function(){
@@ -1361,6 +1378,9 @@ $(function(){
 		if(smHrCliclTimes>4){
 			$("div[data-sm-act='chat']").show();
 			smHrCliclTimes=0;
+
+			//彩蛋中的彩蛋
+			supriseYeah();
 		}
 	});
 });  
