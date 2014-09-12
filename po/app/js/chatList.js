@@ -61,10 +61,12 @@ function updateChatList(){
 			if(typeof epl != "undefined"){
 				currentGroup["chatAll"] = new Object();
 
+				//update chat list
 				$.each(epl.cl,function(key,room){
 					currentGroup["chatAll"][room.ci] = room;
 				});
 
+				// console.debug( JSON.stringify(userData) );
 		    	$.lStorage(ui, userData);
 		    	showChatList();
 		    }
@@ -116,14 +118,28 @@ function showChatList(){
 
 				room["uiName"]=chatRoomName;
 				$(this).find(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
-				tmp = $("<div class='subpage-chatList-row' data-id='"+ room.ci +"''>"
-						+ "<img class='aut st-user-pic' src=" + imgSrc + "></img>" 
-						+ "<div class='time'>" + "[last msg time]" + "</div>"
-						+ "<div class='name'>" + chatRoomName.substring(0,15) + "</div>"
-						+ "<div class='msg'>" + "[last msg here]" + "</div>"
-						+ "<div class='drag'></div>"
-					+ "</div>");
-				targetDiv.append(tmp);
+				var table = $("<table class='subpage-chatList-row'' style='width:100%'></table>");
+				var row = $("<tr></tr>");
+				table.append(row);
+				var td = $("<td></td>");
+				td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
+				row.append(td);
+
+				td = $("<td data-id='"+ room.ci +"'></td>");
+				td.append("<div class='time'>" + "[last msg time]" + "</div>");
+				td.append("<div class='name'>" + chatRoomName.substring(0,15) + "</div>");
+				td.append("<div class='msg'>" + "[last msg here]" + "</div>");
+				row.append(td);
+
+				td = $("<td></td>");
+				td.append("<img class='drag' src='images/chatroom/chat_list_icon_doubleline.png'/>");
+				row.append(td);
+
+				td = $("<td></td>");
+				td.html( $.i18n.getString("delete") );
+				row.append(td);
+				
+				targetDiv.append(table);
 			}
 		});
 
@@ -131,23 +147,36 @@ function showChatList(){
 	}
 
 
-	$(".subpage-chatList-row").off("click");
-	$(".subpage-chatList-row").on("click", function(){
-		var ci = $(this).data("id");
-		if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
-			windowList[ci].focus();
-		} else {
-			var data= new Object();
-			data["gi"]=gi;
-			data["ci"]=ci;
-			data["ui"]=ui;
-			data["at"]=at;
-			//data["cn"]=$(this).data("name");
-			$.lStorage( "_chatRoom", data );
-			//document.location = "chat.html";
-			windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
-		}
+	$(".subpage-chatList-row td:nth-child(2)").off("click");
+	$(".subpage-chatList-row td:nth-child(2)").on("click", function(){
+		openChatWindow( $(this).data("id") );
 	});
+
+	// $(".subpage-chatList-row .drag").off("click");
+	// $(".subpage-chatList-row .drag").on("click", function(){
+	// 	var table = $(this).parent().parent().parent();
+	// 	table.css("width","110%");
+	// 	table.animate({margin:"-10%"}, 'fast');
+	// 	$(".subpage-chatList-row td:nth-child(4)")
+	// 	$(this).show('fast');
+	// 	$(this).animate({width:"20%"},'fast');
+	// });
+}
+
+function openChatWindow ( ci ){
+	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
+		windowList[ci].focus();
+	} else {
+		var data= new Object();
+		data["gi"]=gi;
+		data["ci"]=ci;
+		data["ui"]=ui;
+		data["at"]=at;
+		//data["cn"]=$(this).data("name");
+		$.lStorage( "_chatRoom", data );
+		//document.location = "chat.html";
+		windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
+	}
 }
 
 /*
@@ -176,6 +205,8 @@ function showNewRoomPage(){
 	var currentGroup = $.lStorage(ui)[gi];
 	g_memCount = 0;
 	for( var guid in currentGroup.guAll ){
+		if( guid== currentGroup.gu ) continue;
+
 		var mem = currentGroup.guAll[guid];
 		var memDiv = $("<div class='mem'></div>");
 		memDiv.append("<div class='checkbox' data-memid='"+guid+"' data-memname='"+mem.nk+"' check='false'></div>");
@@ -267,9 +298,30 @@ function toggleSelectAll( bIsSelect ){
 
 function showNewRoomDetailPage(){
 
+	//no mem
 	if( g_newChatMemList.length==0 ){
 		alert( $.i18n.getString("enterRoomName") );
 		return;
+	}
+
+	//only 1 mem
+	if( g_newChatMemList.length==1 ){
+		var gu = g_newChatMemList[0];
+
+		//is same room exist
+		var currentGroup = $.lStorage(ui)[gi];
+		for( var ci in currentGroup.chatAll ){
+			var room = currentGroup.chatAll[ci];
+			if(1==room.tp){
+				//room exist
+				if( room.cn.indexOf(gu)>=0 ){
+					openChatWindow( room.ci );
+    				$.mobile.changePage("#page-group-main");
+					return;
+				}
+			}
+		}
+		requestNewChatRoom();
 	}
 
 	$.mobile.changePage("#page-newChatDetail");
@@ -312,7 +364,7 @@ function showNewRoomDetailPage(){
 
 function requestNewChatRoom(){
 	var text = $(".newChatDetail table .input").val();
-	console.debug( text );
+	// console.debug( text );
 	if( !text || text.length==0 ){
 		alert( $.i18n.getString("enterRoomName") );
 		return;
@@ -334,16 +386,22 @@ function requestNewChatRoom(){
         gul: arr
     };
 
-    console.debug( JSON.stringify(body) );
+    // console.debug( JSON.stringify(body) );
     var method = "post";
     ajaxDo(api_name,headers,method,true,body).complete(function(data){
     	if(data.status == 200){
     		var result = $.parseJSON(data.responseText);
-    		console.debug(result);
-    		//$("#page-newChat .page-back").trigger("click");
-    		//$("#page-newChat .page-back").trigger("click");
+    		// console.debug(result);
     		$.mobile.changePage("#page-group-main");
     		updateChatList();
+    		if(result.ci){
+    			openChatWindow( result.ci );
+    		}
+    		// //api上面寫這個可能是批次新增用的..?!
+    		// for( var i in result.cl ){
+    		// 	var ci = result.cl[i].ci;
+    		// 	openChatWindow( ci );
+    		// }
     	}
     });
 

@@ -70,6 +70,7 @@ $(document).ready(function(){
 
     
 	//- click "send" to send msg
+	$("#footer .contents .send").off("click");
 	$("#footer .contents .send").click( function(){
 		var inputDom = $("#footer .contents .input");
 		var text = inputDom.html();
@@ -82,8 +83,13 @@ $(document).ready(function(){
 
 	$(document).find("title").text(g_cn + "-Project O");
 
+	$("#chat-toBottom").off("click");
 	$("#chat-toBottom").click(scrollToBottom);
-	
+
+	$("#chat-toBottom").off("resize");
+	$(window).resize(resizeContent);
+
+	resizeContent();
 });
 
 /*
@@ -94,6 +100,16 @@ $(document).ready(function(){
               ██║     ╚██████╔╝██║ ╚████║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║          
               ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝          
                                                                                           */
+
+function resizeContent(){
+	console.debug( $( window ).height(), $("#header").height(), $("#chat-loading").height());
+	$("#container").css("min-height", 
+		$( window ).height()
+		-$("#header").height()
+		-$("#footer").height()
+		+$("#chat-loading").height()
+	);
+}
 
 function initDB(){
 	g_idb_chat_msgs = new IDBStore({
@@ -122,7 +138,7 @@ function initDB(){
 //show history chat contents
 function getHistoryMsg ( bIsScrollToTop ){
 	g_bIsLoadHistoryMsg = true;
-	console.debug(g_lastDate);
+	// console.debug(g_lastDate);
     g_idb_chat_msgs.limit(function(list){
         //console.debug("list:",JSON.stringify(list,null,2));
         if( list.length>0 ){
@@ -360,7 +376,7 @@ function showMsg(object, bIsFront){
 		div.append(subDiv);	//right
 	}
 
-	console.debug( g_lastDate, time.customFormat( "#M#/#D# #hh#:#mm#" ), msgData.c);
+	// console.debug( g_lastDate, time.customFormat( "#M#/#D# #hh#:#mm#" ), msgData.c);
 
 	switch(msgData.tp){
 		case 0: //text or other msg

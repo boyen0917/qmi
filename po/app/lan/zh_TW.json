@@ -11,5 +11,6 @@
 		"finish" 						: "完成",
 		"roomName" 						: "聊天室名稱",
 		"inputRoomName" 				: "輸入聊天室名稱",
-		"enterRoomName"            		: "請輸入聊天室名稱"
+		"enterRoomName"            		: "請輸入聊天室名稱",
+		"delete"						: "刪除"
 }
