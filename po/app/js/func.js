@@ -269,6 +269,7 @@ $(function(){
 	
 
 	timelineSwitch = function (act){
+		// $( "#side-menu" ).panel( "close");
 		switch (act) {
 	        case "feed":
 	        	//先清空
@@ -283,7 +284,6 @@ $(function(){
 	        	$(".subpage-contact").hide();
 	        	$(".subpage-chatList").hide();
 	        	$(".subpage-timeline").show();
-	        	// $( "#side-menu" ).panel( "close");
 	        	$("#page-group-main").find("div[data-role=header] h3").html("動態消息");
 	        	var parent = $("#page-group-main").find("div[data-role=header] div[class=header-group-name]");
 				if( parent ){
@@ -2828,8 +2828,8 @@ $(function(){
 	    var method = "get";
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
+	    	
 	    	//關閉下拉更新的ui
-
 	    	if(is_top){
 				setTimeout(function(){
 					$(".st-navi-area").removeClass("st-navi-fixed");
@@ -2938,27 +2938,29 @@ $(function(){
                 console.debug("remove onError:",result);
             }
         });
-
 	}
 
 
 	timelineBlockMake = function(this_event_temp,timeline_list,is_top){
 			
 		var event_tp = $("#page-group-main").data("navi") || "00";
-    	var top_subbox = $(".feed-subarea[data-feed=" + event_tp + "]").find(".st-sub-box:eq(0)");
+		var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
+    	var top_subbox = ori_selector.find(".st-sub-box:eq(0)");
 
     	//就隱藏其他類別 開啓當下類別
 		$(".feed-subarea").hide();
-		$(".feed-subarea[data-feed=" + event_tp + "]").show();
+		ori_selector.show();
+
+		//reset selector data
+		ori_selector.removeData();
 
 	    //製作timeline
 	    $.each(timeline_list,function(i,val){
 
 	        var content,box_content,youtube_code,prelink_pic,prelink_title,prelink_desc;
 	        var method = "append";
-	        var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
-
-        	cns.debug(JSON.stringify(val, null, 2));
+	        //reset selector
+	        var selector = ori_selector;
 
         	//寫入最舊的一筆時間
         	if(!selector.data("last-ct") || (selector.data("last-ct") && selector.data("last-ct") > val.meta.ct)){
@@ -2975,6 +2977,7 @@ $(function(){
         	//判斷是否為更新事件
         	var this_event = selector.find("[data-event-id="+ val.ei +"]");
         	if(this_event.length){
+        		cns.debug("timeline update");
         		//如果是更新事件 目前只重改按讚狀態 其餘以後再說
         		this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
 	    		this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
@@ -2985,9 +2988,8 @@ $(function(){
     			setEventStatus(this_event,$(".st-filter-area").data("filter"));
 	    		return;
         	}
-    		
-    		this_event = this_event_temp.clone();
 
+    		this_event = this_event_temp.clone();
 
     		var tp = val.meta.tp.substring(1,2)*1;
 	        
@@ -3151,6 +3153,8 @@ $(function(){
     		}
     	}
 
+    	// cns.debug("ct_timer:",ct_timer);
+
 		var idb_timer = ct_timer || 9999999999999;
 		//取得server最新資訊 更新資料庫
 		idbPutTimelineEvent(ct_timer,is_top);
@@ -3176,7 +3180,6 @@ $(function(){
 
     	//同時先將資料庫資料取出先寫上
 	    idb_timeline_events.limit(function(timeline_list){
-	    	cns.debug("timelineListWrite idb write:",timeline_list);
 	    	//寫timeline
 	    	load_show = false;
 	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
@@ -4502,5 +4505,13 @@ $(function(){
 			$(document).data("suprise",101);
 			pollingInterval();
 		},12000);
+    }
+
+
+    //====================================================
+
+    userInfoShow = function(){
+    	$(".user-info-load-area").load('layout/layout.html .user-info-load',function(){
+    	}).show();
     }
 });

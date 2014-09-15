@@ -593,7 +593,7 @@ img.auo {
 	margin: 5px 25px 20px;
 }
 
-.popup-screen,.ajax-screen-lock {
+.popup-screen,.ajax-screen-lock , .screen-lock {
 	display: none;
 	position: fixed;
 	width: 100%;
@@ -612,6 +612,12 @@ img.auo {
 }
 
 .ajax-screen-lock {
+	background: #000;
+	opacity: 0.5;
+	z-index: 1000;
+}
+
+.screen-lock {
 	background: #000;
 	opacity: 0.5;
 	z-index: 1000;
@@ -3272,9 +3278,37 @@ input.cp-datetimepicker-end {
 }
 
 
+.user-info-load-area {
+	display: none;
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+	z-index: 10000;
+}
 
+.user-info-load {
+	background: #fff;
+	width: 380px;
+	height: 620px;
+	margin: 5% auto;
+	border-radius: 5px;
+	overflow: hidden;
+}
 
+.user-avatar {
+	width: 100%;
+	height: 250px;
+}
 
+.user-avatar img {
+	width: 150px;
+	height: 160px;
+	border-radius: 100px;
+	margin: 0 auto;
+	display: block;
+}
 
 
 .yeah img {

@@ -93,28 +93,12 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		// $(".yeah audio")[0].play();
-		// $(".yeah").show();
-		// $(".ajax-screen-lock").show();
-		// return false;	
+
 		//彩蛋鑰匙
 		supriseKey();
 		
-		if($(document).data("suprise") == 101) pollingInterval();
-
-		// idbReset();
-		// return false;
-		// req = indexedDB.deleteDatabase("IDBWrapper-timeline_events");
-  //       req.onsuccess = function () {
-  //           console.log("Deleted database successfully");
-  //       };
-  //       req.onerror = function () {
-  //           console.log("Couldn't delete database");
-  //       }
-  //       req.onblocked = function () {
-  //           console.log("Couldn't delete database due to the operation being blocked")
-  //       }
-		// cns.debug("idb:",idb_timeline_events);
+		if($(document).data("suprise") == 101) 
+			pollingInterval();
 	});
 
 
@@ -162,6 +146,7 @@ $(function(){
 		    	
 		    	//避免重複
 		    	this_navi.data("scroll-chk",true);
+		    	cns.debug("last event ct:",this_navi.data("last-ct"));
 		    	timelineListWrite(this_navi.data("last-ct"));
 		    }
 		}
@@ -442,6 +427,7 @@ $(function(){
 	        //全關 switch開
 			$(this).find("img").attr("src",img_dir + $(this).data("st-navi") + ".png");
 	    });
+	    
 		switch(this_subarea.data("st-navi")){
 	    	case "home":
 	    		 $(".st-navi-tridiv-r").show();
@@ -1236,8 +1222,14 @@ $(function(){
 	        ori_target.children().attr("src",img_url + "icon_arrow_white_below.png");
 	    }else{
 	    	ori_target.children().attr("src",img_url + "icon_arrow_white.png");	
-	    	$(".main-contact-l-subarea-row").height("opx");
+	    	$(".main-contact-l-subarea-row").height("0px");
 	    }
+	});
+
+	$(".sm-user-area-r > img").click(function(){
+		cns.debug("aa");
+		$(".screen-lock").show();
+		userInfoShow();
 	});
 
 	//----------------------------------- chatroom ---------------------------------------------
