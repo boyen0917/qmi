@@ -35,7 +35,11 @@ body {
 }
 #header .title{
 	font-size: 23px;
-	margin:12px auto 5px;
+	margin:12px 10px 5px 10px;
+	height: 23px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 #header .subTitle{
 	font-size: 13px;

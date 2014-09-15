@@ -1,5 +1,4 @@
 // $(function(){ 
-// 	showNewRoomPage();
 // });
 
 var windowList = new Object();
@@ -38,8 +37,6 @@ initChatList = function(){
 }
 
 function updateChatList( extraCallBack ){
-	$(".subpage-chatList .rows").html("");
-
 	var userData = $.lStorage(ui);
 	if( !userData )	return;
 	var currentGroup = userData[gi];
@@ -80,6 +77,7 @@ function updateChatList( extraCallBack ){
 	show chat list data from local storage
 **/
 function showChatList(){
+	$(".subpage-chatList .rows").html("");
 	var data = $.lStorage(ui);
 	var groupData = data[gi];
 	var chatList = groupData["chatAll"];
@@ -127,18 +125,18 @@ function showChatList(){
 				row.append(td);
 
 				td = $("<td data-id='"+ room.ci +"'></td>");
-				td.append("<div class='time'>" + "[last msg time]" + "</div>");
-				td.append("<div class='name'>" + chatRoomName.substring(0,15) + "</div>");
+				td.append("<div class='name'>" + chatRoomName + "</div>");
 				td.append("<div class='msg'>" + "[last msg here]" + "</div>");
 				row.append(td);
 
-				td = $("<td></td>");
-				td.append("<img class='drag' src='images/chatroom/chat_list_icon_doubleline.png'/>");
+				td = $("<td align='right'></td>");
+				td.append("<div class='time'>" + "00:00" + "</div>");
+				td.append("<div class='drag'></div>");
 				row.append(td);
 
-				td = $("<td></td>");
-				td.html( $.i18n.getString("delete") );
-				row.append(td);
+				// td = $("<td></td>");
+				// td.html( $.i18n.getString("delete") );
+				// row.append(td);
 
 				targetDiv.append(table);
 			}
@@ -153,15 +151,47 @@ function showChatList(){
 		openChatWindow( $(this).data("id") );
 	});
 
-	// $(".subpage-chatList-row .drag").off("click");
-	// $(".subpage-chatList-row .drag").on("click", function(){
-	// 	var table = $(this).parent().parent().parent();
-	// 	table.css("width","110%");
-	// 	table.animate({margin:"-10%"}, 'fast');
-	// 	$(".subpage-chatList-row td:nth-child(4)")
-	// 	$(this).show('fast');
-	// 	$(this).animate({width:"20%"},'fast');
-	// });
+	$(".subpage-chatList-row .drag").off("click");
+	$(".subpage-chatList-row .drag").on("click", function(){
+		var memtd = $(this).parent().prev();
+		var group_name = memtd.find(".name").html();
+		popupShowAdjust(
+			$.i18n.getString("deleteRoom"),
+			$.i18n.getString("comfirmDeleteRoom", group_name),
+			true,
+			true,
+			[deleteRoom,memtd]
+		);
+		// var table = $(this).parent().parent().parent();
+		// table.css("width","110%");
+		// table.animate({margin:"-10%"}, 'fast');
+		// $(".subpage-chatList-row td:nth-child(4)")
+		// $(this).show('fast');
+		// $(this).animate({width:"20%"},'fast');
+	});
+}
+
+function deleteRoom ( deleteRow ){
+	var ci = deleteRow.data("id");
+	var api_name = "groups/"+ gi +"/chats/"+ci;
+
+	var headers = {
+	        ui:ui,
+	        at:at, 
+	        li:lang
+	};
+	var method = "delete";
+	var result = ajaxDo(api_name,headers,method,false);
+	result.complete(function(data){
+		if(data.status == 200){
+			//delete room succ
+			updateChatList();
+			toastShow( $.i18n.getString("deleteSucc") );
+		} else {
+			//delete room fail
+			toastShow( $.i18n.getString("deleteFail") );
+		}
+	});
 }
 
 function openChatWindow ( ci ){
