@@ -14,8 +14,8 @@ var eGroupTiType = {
 var g_isEndOfPage = false;	//是否在頁面底端
 var g_needsRolling = false;	//是否要卷到頁面最下方？
 var g_lastMsgEi=0;
-var g_idb_chat_msgs;
 var g_msgs = [];
+var g_msgsByTime = new Object();
 var g_currentDate = new Date(0);
 var g_lastDate = new Date();
 var g_bIsLoadHistoryMsg = false;
@@ -29,8 +29,13 @@ var g_bIsLoadHistoryMsg = false;
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
 $(document).ready(function(){
-	
-	initDB();
+	// $(".title").click(function(){
+	// 	updateChat();
+	// });
+
+
+	initChatDB( onChatDBInit);
+	initChatCntDB( );
 
 	//沒有登入資訊 就導回登入頁面
 	if( !$.lStorage("_chatRoom") ){
@@ -70,15 +75,15 @@ $(document).ready(function(){
 
     
 	//- click "send" to send msg
-	$("#footer .contents .send").off("click");
-	$("#footer .contents .send").click( function(){
-		var inputDom = $("#footer .contents .input");
-		var text = inputDom.html();
-	    if (text.length>0 ) {
-	    	var tmp = text.replace(/<br>/g,"\n");
-			sendChat( tmp );
-			inputDom.html("");
-	    }
+	var sendBtn = $("#footer .contents .send");
+	sendBtn.off("click");
+	sendBtn.click( sendChat );
+	var input = $("#footer .contents .input");
+	input.off("keydown");
+	input.keydown(function(e){
+		if (e.keyCode == 13 && !e.altKey) {
+			sendChat();
+		}
 	});
 
 	$(document).find("title").text(g_cn + "-Project O");
@@ -101,8 +106,8 @@ $(document).ready(function(){
               ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝          
                                                                                           */
 
-function resizeContent(){
-	console.debug( $( window ).height(), $("#header").height(), $("#chat-loading").height());
+function resizeContent (){
+	// console.debug( $( window ).height(), $("#header").height(), $("#chat-loading").height());
 	$("#container").css("min-height", 
 		$( window ).height()
 		-$("#header").height()
@@ -111,28 +116,30 @@ function resizeContent(){
 	);
 }
 
-function initDB(){
-	g_idb_chat_msgs = new IDBStore({
-	    dbVersion: 1,
-	    storeName: 'chat_msgs',
-	    keyPath: 'ei',
-	    indexes: [
-	    	{ name: 'ci_ct',keyPath:['ci','ct']},
-	    ]
-	    ,onStoreReady: function(){
-	    	var today=new Date();
-	    	$("#chat-contents").html("<div class='firstMsg'></div>");
-	    	var timeTag = $("<div class='chat-date-tag'></div>");
-	    	timeTag.addClass( today.customFormat("_#YYYY#_#M#_#D#") );
-	    	timeTag.html( getFormatTimeTag(today) );
-	    	$("#chat-contents").append( timeTag );
-	    	$("#chat-contents").append( "<div></div>" );
-	    	$("#chat-contents").append( "<div class='lastMsg'></div>" );
-	    	getHistoryMsg( false );
+// function initDB (){
+// 	g_idb_chat_msgs = new IDBStore({
+// 	    dbVersion: 1,
+// 	    storeName: 'chat_msgs',
+// 	    keyPath: 'ei',
+// 	    indexes: [
+// 	    	{ name: 'ci_ct',keyPath:['ci','ct']},
+// 	    ]
+// 	    ,onChatDBInit
+//     });
+// }
 
-			scrollToBottom();
-	    }
-    });
+function onChatDBInit(){
+	var today=new Date();
+	$("#chat-contents").html("<div class='firstMsg'></div>");
+	var timeTag = $("<div class='chat-date-tag'></div>");
+	timeTag.addClass( today.customFormat("_#YYYY#_#M#_#D#") );
+	timeTag.html( getFormatTimeTag(today) );
+	$("#chat-contents").append( timeTag );
+	$("#chat-contents").append( "<div></div>" );
+	$("#chat-contents").append( "<div class='lastMsg'></div>" );
+	getHistoryMsg( false );
+
+	scrollToBottom();
 }
 
 //show history chat contents
@@ -144,7 +151,7 @@ function getHistoryMsg ( bIsScrollToTop ){
         if( list.length>0 ){
         	//list is from near to far day
 	        for( var i in list){
-	        	if( null==list[i] || g_msgs.indexOf(list[i].ct)>=0 ){
+	        	if( null==list[i] || g_msgs.indexOf(list[i].ei)>=0 ){
 					continue;
 				} else {
 	        		var object = list[i].data;
@@ -152,20 +159,26 @@ function getHistoryMsg ( bIsScrollToTop ){
 				}
 	        }
 	    }
+	    op("/groups/"+g_gi+"/chats/"+g_ci+"/messages_read"
+		    ,"PUT",
+		    JSON.stringify({lt:g_currentDate.getTime()}),
+		    null
+		);
 
 		//set update contents
 		setInterval(function() {
 		    updateChat();
 		    checkPagePosition();
-		}, 1000);
+		    updateChatCnt();
+		}, 2000);
     	//updateChat();
     	if(bIsScrollToTop)	scrollToStart();
     	g_bIsLoadHistoryMsg = false;
     },{
-        index: "ci_ct",
+        index: "gi_ci_ct",
         keyRange: g_idb_chat_msgs.makeKeyRange({
-	        upper: [g_ci, g_lastDate.getTime()],
-	        lower: [g_ci]
+	        upper: [g_gi, g_ci, g_lastDate.getTime()],
+	        lower: [g_gi, g_ci]
 	        // only:18
         }),
         limit: 20,
@@ -179,7 +192,7 @@ function getHistoryMsg ( bIsScrollToTop ){
     });
 }
 
-function op( url, type, data, delegate){
+function op ( url, type, data, delegate){
 	$.ajax({
 	    url: "https://apserver.mitake.com.tw/apiv1" + url,
 	    type: type,
@@ -197,15 +210,15 @@ function op( url, type, data, delegate){
 	});
 }
 
-function scrollToStart(){
+function scrollToStart (){
 	$('html, body').animate({scrollTop:50}, 'fast');
 }
 
-function scrollToBottom(){
+function scrollToBottom (){
 	$('html, body').animate({scrollTop:$(document).height()}, 'fast');
 }
 
-function checkPagePosition(){
+function checkPagePosition (){
 	var posi = $(window).scrollTop();
 	if( posi <= 0 ){
 		if( false==g_bIsLoadHistoryMsg ){
@@ -225,17 +238,17 @@ function checkPagePosition(){
 	}
 }
 
-function getGroupMemberFromData( g_uid ){
+function getGroupMemberFromData ( g_uid ){
 	if(!g_group["guAll"][g_uid])	return null;
 
 	return g_group["guAll"][g_uid];
 }
 
-function getChatMem(groupUID){
+function getChatMem (groupUID){
 	return getGroupMemberFromData(groupUID);
 }
 
-function getChatMemName(groupUID){
+function getChatMemName (groupUID){
 	var mem = getGroupMemberFromData(groupUID);
 	if( null == mem )   return "unknown";
 	return mem.nk;
@@ -263,21 +276,23 @@ function updateChat (){
 				if(object.hasOwnProperty("meta")){
 					//showMsg(container, data.el[key], time);
 
-					if( g_msgs.indexOf(object.meta.ct)>=0 ){
+					//pass shown msgs
+					if( g_msgs.indexOf(object.ei)>=0 ){
 						continue;
 					} else {
 						//add to db
 						var node = {
-							ei: object.ei,
+							gi: g_gi,
 							ci: g_ci,
+							ei: object.ei,
 					        ct: object.meta.ct,
 					        data: object
 					    };
-					    //register msg loaded
+					    //write msg to db
 						g_idb_chat_msgs.put( node );
-					}
 
-					showMsg( object, false );
+						showMsg( object, false );
+					}
 				}
 			}
 
@@ -288,20 +303,65 @@ function updateChat (){
 			} else if(g_isEndOfPage){
 				scrollToBottom();
 			}
+
+			//groups/G000006s00q/chats/T000011m0Fj/messages_read
+			//update read cnt
+		    op("/groups/"+g_gi+"/chats/"+g_ci+"/messages_read"
+			    ,"PUT",
+			    JSON.stringify({lt:g_currentDate.getTime()}),
+			    null
+			);
 			
 	    }	//end of function
 	);	//end of op
 }	//end of updateChat
 
-function getFormatTimeTag( date ){
+function updateChatCnt (){
+	var userData = $.lStorage(g_ui);
+	// console.debug( JSON.stringify(userData) );
+    g_group = userData[g_gi];
+    g_room = g_group["chatAll"][g_ci];
+
+
+	if( null == g_room || null==g_room.cnt || length<=0 ) return;
+
+    var length = Object.keys(g_room.cnt).length;
+	var list = g_room.cnt;
+    // console.debug("list:",JSON.stringify(list,null,2));
+    var index=length-1;
+	var data = list[index];
+	var cnt = data.cnt;
+	var elements = $(".chat-cnt");
+	for( var i=0; i<elements.length; i++ ){
+		var dom = $(elements[i]);
+		var time = dom.data("t");
+		if(data.ts<=time ){
+			index--;
+			if(index>=0){
+				//dom.css("background", "red");
+				data = list[index];
+				cnt = data.cnt;
+			}
+	    }
+		if(cnt>0){
+			if( 1==g_room.tp ) dom.html("已讀");
+			else dom.html("已讀"+cnt);
+		}
+	}
+}
+
+function getFormatTimeTag ( date ){
 	return date.customFormat( "#YYYY#/#M#/#D# #CD# #DDD#" );
 }
 
-function showMsg(object, bIsFront){
+function getFormatMsgTimeTag ( date ){
+	return date.customFormat( "#hhh#:#mm#" );
+}
+
+function showMsg (object, bIsFront){
 	if( null == object ) return;
 
-	g_msgs.push(object.meta.ct);
-
+	g_msgs.push(object.ei);
 	//console.debug("list:",JSON.stringify(object,null,2));
 
 	var container = $("<div></div>");
@@ -345,17 +405,21 @@ function showMsg(object, bIsFront){
 	if( isMe ){
 		//right align
 		//time +(msg)
-		var div = $("<div class='chat-msg-right'></div>");
+		div = $("<div class='chat-msg-right'></div>");
 		container.append(div);
 
-		div.append( $("<div class='chat-msg-time'>" + time.customFormat( "#hhh#:#mm#" ) + "</div>") );
+		var table = $("<table></table>");
+		table.append( $("<tr><td><div class='chat-cnt' data-t='"+time.getTime()+"'></div></td></tr>") );
+		table.append( $("<tr><td><div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div></td></tr>" ) );
+		div.append( table );
+
 		msgDiv = $("<div></div>");
 		div.append(msgDiv);
 	} else{
 		//left align
 		var mem = getChatMem(object.meta.gu)
 
-		var div = $("<div class='chat-msg-left'></div>");
+		div = $("<div class='chat-msg-left'></div>");
 		container.append(div);
 
 		//left
@@ -372,9 +436,16 @@ function showMsg(object, bIsFront){
 		subDiv.append("<div class='name'>"+ mem.nk +"</div>");	//name
 		msgDiv = $("<div></div>");
 		subDiv.append(msgDiv);	//msg
-		subDiv.append("<div class='chat-msg-time'>" + time.customFormat( "#hh#:#mm#" ) + "</div>");	//time
+
+		var table = $("<table></table>");
+		table.append( $("<tr><td></td></tr>") );
+		table.append( $("<tr><td><div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div></td></tr>") );
+		subDiv.append( table );
+
 		div.append(subDiv);	//right
 	}
+	g_msgsByTime[object.meta.ct] = div;
+
 
 	// console.debug( g_lastDate, time.customFormat( "#M#/#D# #hh#:#mm#" ), msgData.c);
 
@@ -403,7 +474,14 @@ function showMsg(object, bIsFront){
 	}
 }
 
-function sendChat(msg){
+function sendChat (){
+	var inputDom = $("#footer .contents .input");
+	var text = inputDom.html();
+	if (text.length<=0 ) return;
+
+	var msg = text.replace(/<br>/g,"\n");
+	inputDom.html("");
+	
 	op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 	    "POST",
 	    JSON.stringify(

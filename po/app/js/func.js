@@ -4315,6 +4315,8 @@ $(function(){
     pollingCountsWrite = function(polling_data){
     	var cnts = polling_data.cnts;
     	var gcnts = polling_data.gcnts;
+    	var msgs = polling_data.msgs;
+    	var ccs = polling_data.ccs;
 
     	if(cnts){
     		$.each(cnts,function(i,val){
@@ -4348,6 +4350,16 @@ $(function(){
     	}
     	if(gcnts.G3){
     		//鈴鐺
+    	}
+
+    	if(msgs&&msgs.length>0){
+    		console.debug( msgs );
+    		updateChat(msgs);
+    	}
+
+    	if(ccs&&ccs.length>0){
+    		// console.debug( ccs );
+    		updateChatCnt(ccs);
     	}
     }
 

@@ -116,6 +116,18 @@ body {
 	clear: both;
 	margin-bottom: 20px;
 }
+.chat-msg-right table, .chat-msg-left table{
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 2px;
+	margin-left: 2px;
+	margin-bottom: 5px;
+}
+.chat-cnt{
+	/*display: inline-block;*/
+	font-size: 10px;
+	color: gray;
+}
 
 .chat-msg-right{
 	text-align: right;
@@ -130,6 +142,7 @@ body {
 	margin-left: 3px;
 	margin-right: 15px;
 	max-width: 20px;
+	color: gray;
 }
 .chat-msg-bubble-right, .chat-msg-bubble-left{
 	padding: 0.5em 0.7em;
