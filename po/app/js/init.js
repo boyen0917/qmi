@@ -52,6 +52,9 @@ $(function(){
 
 	//特別的
 	s_load_show = false;
+
+	//ajax 提示訊息選擇
+	ajax_msg = false;
 	
 	//預設使用者大頭照
 	no_pic = "images/common/others/empty_img_personal_xl.png";
@@ -131,8 +134,21 @@ $(function(){
 			return false;
 		}
 
-		// popupShowAdjust("",errorResponse(jqxhr),true);
-		toastShow(errorResponse(jqxhr));
+		if(window.location.href.match(/webdev.cloud.mitake.com.tw/)) {
+    		document.location = "index.html";
+    		return false;
+    	}
+
+		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
+		if(ajax_msg || window.location.href.match(/index.html/)){
+			ajax_msg = false;
+			popupShowAdjust("",errorResponse(jqxhr),true);
+		}else{
+			//預設
+			toastShow(errorResponse(jqxhr));	
+		}
+		
+		
 		
 	});
 

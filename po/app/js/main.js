@@ -14,6 +14,13 @@ $(function(){
     	//所有團體列表
     	group_list = _loginData.gl;
 
+    	//所有團體列表 obj
+    	group_list_obj = {};
+    	$.each(group_list,function(i,val){
+			group_list_obj[val.gi] = val;
+    	});
+
+
     	//有group list 就去timeline 沒有就去group menu
         if(group_list) {
         	//上次點選團體
@@ -91,9 +98,29 @@ $(function(){
 	}
 
 
+	$( window ).resize(function() {
+		$(".st-top-bar-area").css("opacity",0);
+		var timer = $(document).data("top-event-resize") || {};
+		clearTimeout(timer);
+		timer = setTimeout(function(){
+			topBarMake($(".st-top-area"),$(".st-top-event").length,true);  		
+			$(".st-top-bar-area").css("opacity",1);
+		},200);
+		$(document).data("top-event-resize",timer);
+
+
+		// $(".st-top-bar-area").css("opacity",0);
+		// $(".st-top-bar-area").animate({
+		//     opacity: 0
+		//   	}, 500, function() {
+		// 	topBarMake($(".st-top-bar-area"),$(".st-top-event").length);  		
+		// 	$(".st-top-bar-area").animate({opacity: 1});
+	 //  	});
+	});
+
 	//test
 	$(".header-group-name").click(function(){
-
+		cns.debug("side-menu:",$("#side-menu").width());
 		//彩蛋鑰匙
 		supriseKey();
 		
@@ -427,7 +454,7 @@ $(function(){
 	        //全關 switch開
 			$(this).find("img").attr("src",img_dir + $(this).data("st-navi") + ".png");
 	    });
-	    
+
 		switch(this_subarea.data("st-navi")){
 	    	case "home":
 	    		 $(".st-navi-tridiv-r").show();
@@ -1227,9 +1254,17 @@ $(function(){
 	});
 
 	$(".sm-user-area-r > img").click(function(){
-		cns.debug("aa");
-		$(".screen-lock").show();
 		userInfoShow();
+	});
+
+
+	$(document).on("mousedown",".user-info-close",function(){
+		$(this).attr("src","images/common/icon/bt_close_activity.png");
+	});
+	$(document).on("mouseup",".user-info-close",function(){
+		$(".screen-lock").fadeOut();
+		$(this).attr("src","images/common/icon/bt_close_normal.png");
+		$(".user-info-load-area").fadeOut("fast");
 	});
 
 	//----------------------------------- chatroom ---------------------------------------------
