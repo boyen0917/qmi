@@ -134,9 +134,15 @@ function onChatDBInit(){
 	var timeTag = $("<div class='chat-date-tag'></div>");
 	timeTag.addClass( today.customFormat("_#YYYY#_#M#_#D#") );
 	timeTag.html( getFormatTimeTag(today) );
-	$("#chat-contents").append( timeTag );
-	$("#chat-contents").append( "<div></div>" );
-	$("#chat-contents").append( "<div class='lastMsg'></div>" );
+	// $("#chat-contents").append( timeTag );
+	// $("#chat-contents").append( "<div></div>" );
+	today.setHours(0);
+	today.setMinutes(0);
+	today.setSeconds(0);
+	var lastMsg = $("<div class='lastMsg'></div>");
+	lastMsg.data("time", today.getTime() );
+	lastMsg.append( timeTag );
+	$("#chat-contents").append( lastMsg );
 	getHistoryMsg( false );
 
 	scrollToBottom();
@@ -268,8 +274,8 @@ function updateChat (){
 				}
 			}
 
-	        $("#chat-contents .lastMsg").removeClass("chat-date-tag");
-	        $("#chat-contents .lastMsg").html("");
+	        // $("#chat-contents .lastMsg").removeClass("chat-date-tag");
+	        // $("#chat-contents .lastMsg").html("");
 
 			for( var i=(data.el.length-1); i>=0; i--){
 				var object = data.el[i];
@@ -382,6 +388,11 @@ function showMsg (object, bIsFront){
 		}
 		div = $("<div></div>");
 		timeTag.after(div);
+
+		var lastTime = new Date( $("#chat-contents .lastMsg").data("time") );
+		if( time.getTime() >= lastTime.getTime() ){
+			$("#chat-contents .lastMsg").html("");
+		}
 	}
 
 	if(time.getTime()<g_lastDate){
