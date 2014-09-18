@@ -96,8 +96,10 @@ $(document).ready(function(){
 
 	resizeContent();
 
-	$("button.pollingCnt").off("click").click( updateChatCnt );
-	$("button.pollingMsg").off("click").click( updateChat );
+	//!!!!!!!!!!!!!!!!!!!!!!
+	// $("button.pollingCnt").off("click").click( updateChatCnt );
+	// $("button.pollingMsg").off("click").click( updateChat );
+	//!!!!!!!!!!!!!!!!!!!!!!
 });
 
 /*
@@ -176,11 +178,15 @@ function getHistoryMsg ( bIsScrollToTop ){
 
 		//set update contents
 		setInterval(function() {
-		    // updateChat();
 		    checkPagePosition();
-		    // updateChatCnt();
+			//!!!!!!!!!!!!!!!!!!!!!!
+		    updateChat();
+		    updateChatCnt();
+			//!!!!!!!!!!!!!!!!!!!!!!
 		}, 1500);
-    	updateChat();
+		//!!!!!!!!!!!!!!!!!!!!!!
+    	// updateChat();
+		//!!!!!!!!!!!!!!!!!!!!!!
     	if(bIsScrollToTop)	scrollToStart();
     	g_bIsLoadHistoryMsg = false;
     },{
@@ -277,10 +283,7 @@ function updateChat (){
 				}
 			}
 
-	        // $("#chat-contents .lastMsg").removeClass("chat-date-tag");
-	        // $("#chat-contents .lastMsg").html("");
-
-			for( var i=(data.el.length-1); i>=0; i--){
+	        for( var i=(data.el.length-1); i>=0; i--){
 				var object = data.el[i];
 				if(object.hasOwnProperty("meta")){
 					//showMsg(container, data.el[key], time);
@@ -351,7 +354,7 @@ function updateChatCnt (){
 			dom.html("");
 		}
 
-		if(data.ts<=time ){
+		while(data.ts<=time && index>=0 ){
 			index--;
 			if(index>=0){
 				//dom.css("background", "red");
@@ -522,7 +525,9 @@ function sendChat (){
 			]
 		    }),
 	    function(data, status, xhr) {
-			updateChat();
+			//!!!!!!!!!!!!!!!!!!!!!!
+			//updateChat();
+			//!!!!!!!!!!!!!!!!!!!!!!
 			g_needsRolling = true;
 	    }
 	);
