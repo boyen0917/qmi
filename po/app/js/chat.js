@@ -95,6 +95,9 @@ $(document).ready(function(){
 	$(window).resize(resizeContent);
 
 	resizeContent();
+
+	$("button.pollingCnt").off("click").click( updateChatCnt );
+	$("button.pollingMsg").off("click").click( updateChat );
 });
 
 /*
@@ -173,11 +176,11 @@ function getHistoryMsg ( bIsScrollToTop ){
 
 		//set update contents
 		setInterval(function() {
-		    updateChat();
+		    // updateChat();
 		    checkPagePosition();
-		    updateChatCnt();
-		}, 2000);
-    	//updateChat();
+		    // updateChatCnt();
+		}, 1500);
+    	updateChat();
     	if(bIsScrollToTop)	scrollToStart();
     	g_bIsLoadHistoryMsg = false;
     },{
@@ -221,7 +224,7 @@ function scrollToStart (){
 }
 
 function scrollToBottom (){
-	$('html, body').animate({scrollTop:$(document).height()}, 'fast');
+	$('html, body').animate({scrollTop:$(document).height()+50}, 'fast');
 }
 
 function checkPagePosition (){
@@ -341,6 +344,13 @@ function updateChatCnt (){
 	for( var i=0; i<elements.length; i++ ){
 		var dom = $(elements[i]);
 		var time = dom.data("t");
+		if(cnt>0){
+			if( 1==g_room.tp ) dom.html("已讀");
+			else dom.html("已讀"+cnt);
+		} else {
+			dom.html("");
+		}
+
 		if(data.ts<=time ){
 			index--;
 			if(index>=0){
@@ -349,10 +359,14 @@ function updateChatCnt (){
 				cnt = data.cnt;
 			}
 	    }
-		if(cnt>0){
-			if( 1==g_room.tp ) dom.html("已讀");
-			else dom.html("已讀"+cnt);
-		}
+	}
+
+    //scroll to bottom
+	if( g_needsRolling ){
+		g_needsRolling = false;
+		scrollToBottom();
+	} else if(g_isEndOfPage){
+		scrollToBottom();
 	}
 }
 
@@ -508,6 +522,7 @@ function sendChat (){
 			]
 		    }),
 	    function(data, status, xhr) {
+			updateChat();
 			g_needsRolling = true;
 	    }
 	);
