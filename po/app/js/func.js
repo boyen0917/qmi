@@ -270,7 +270,7 @@ $(function(){
 	
 
 	timelineSwitch = function (act){
-		// $( "#side-menu" ).panel( "close");
+		$( "#side-menu" ).panel( "close");
 		switch (act) {
 	        case "feed":
 	        	//先清空
@@ -304,7 +304,7 @@ $(function(){
 	        	$(".subpage-contact").hide();
 	        	$(".subpage-timeline").hide();
 	        	$(".subpage-chatList").show();
-	        	$( "#side-menu" ).panel( "close");
+	        	// $( "#side-menu" ).panel( "close");
 
 	        	initChatList();
 
@@ -4844,8 +4844,8 @@ $(function(){
 
     	$(".sm-hr").unbind();
 		$(".yeah audio")[0].play();
-		$(".yeah").show();
-		$(".ajax-screen-lock").show();
+		$(".yeah").fadeIn();
+		$(".ajax-screen-lock").fadeIn();
 		$( "#side-menu" ).panel( "close");
 
 		setTimeout(function(){
@@ -4865,17 +4865,17 @@ $(function(){
 		},4500);
 
 		setTimeout(function(){
-			$(".yeah img").hide("slow");
+			$(".yeah img").fadeOut("slow");
 		},8000);
 
 		setTimeout(function(){
-			$(".yeah-yan img").show();
+			$(".yeah-yan img").fadeIn();
 		},8500);
 
 		setTimeout(function(){
 			$(".yeah-yan").remove();
 			$(".yeah").remove();
-			$(".ajax-screen-lock").hide();
+			$(".ajax-screen-lock").fadeOut();
 			$(document).data("suprise",101);
 			pollingInterval();
 		},12000);

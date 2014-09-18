@@ -99,6 +99,8 @@ $(function(){
 
 
 	$( window ).resize(function() {
+		if($(".st-top-event").length < 2) return false;
+
 		$(".st-top-bar-area").css("opacity",0);
 		var timer = $(document).data("top-event-resize") || {};
 		clearTimeout(timer);
@@ -422,7 +424,7 @@ $(function(){
 	$(document).on("click",".sm-group-area",function(){
 		// cns.debug("auo:",$(this).data("auo"));
 		// return false;
-		$( "#side-menu" ).panel( "close");
+		// $( "#side-menu" ).panel( "close");
 		setThisGroup($(this).attr("data-gi"));
 		//更新gu all
 		setGroupAllUser();

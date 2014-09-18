@@ -3442,7 +3442,7 @@ img.user-info-close {
 
 .yeah img {
 	display: none;
-	z-index: 10000;
+	z-index: 20000;
 	width: 35%;
 	height: 22%;
 	border-radius: 50%;
@@ -3480,7 +3480,7 @@ img.user-info-close {
 
 .yeah-yan img {
 	display: none;
-	z-index: 10000;
+	z-index: 20000;
 	/*width: 45%;*/
 	height: 40%;
 	border-radius: 50%;
