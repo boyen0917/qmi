@@ -1,9 +1,12 @@
 $(function(){
 
 	//ajax
-	ajaxDo = function (api_name,headers,method,load_show_chk,body){
+	ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk){
 		//設定是否顯示 loading 圖示
 		load_show = load_show_chk;
+
+		//提示訊息選擇
+		if(ajax_msg_chk) ajax_msg = true;
 		
 	    //cns.debug(api_url);
 	    var api_url = base_url + api_name;
@@ -71,7 +74,16 @@ $(function(){
 
 
 	//調整個人頭像
-	avatarPos = function (img,x){
+	avatarPos = function (ori_img,x){
+
+		//reset
+		var src = ori_img[0].src;
+		var parent = ori_img.parent();
+		ori_img.remove();
+		var img = $("<img src='" + src + "'>​");
+		parent.prepend(img);
+		
+
 		img.load(function() {
             var w = img.width();
             var h = img.height();
@@ -90,9 +102,8 @@ $(function(){
 		
         if(w == 0 || h == 0) return false;
         
-        
         img.removeAttr( 'style' );
-
+        
         if(w <= h){
         	img.attr("width",x);
             var p = ((h/(w/x))-x)/2*(-1);
@@ -210,8 +221,8 @@ $(function(){
 		// cns.debug("cancel:",cancel);
 		// cns.debug("=======================");
 
-		$("body").addClass("screen-lock");
-
+		// $("body").addClass("screen-lock");
+		
 		//default
 		$(".popup-confirm").html("確認");
 		$(".popup-cancel").html("取消");
@@ -288,5 +299,120 @@ $(function(){
 				var text = $(this)._t( tmp );
 			});
 		});
+	}
+
+
+	avatarToS3 = function(file){
+
+		var result_msg = false;
+
+		var api_name = "me/avatar";
+
+        var headers = {
+             "ui":$(document).data("ui"),
+             "at":$(document).data("at"), 
+             "li":lang
+        };
+
+        var method = "put";
+        cns.debug("avatarToS3() 取得s3 url前的 headers:",JSON.stringify(headers,null,2));
+
+        s_load_show = true;
+        var result = ajaxDo(api_name,headers,method,false);
+        result.complete(function(data){
+        	cns.debug("取得s3 url後的 data:",data);
+        	if(data.status == 200){
+        		var d =$.parseJSON(data.responseText);
+        		var fi = d.fi;
+        		var ou = d.ou;
+        		var tu = d.tu;
+        		cns.debug("s3 fi:",fi);
+        		cns.debug("s3 ou:",ou);
+        		cns.debug("s3 tu:",tu);
+
+        		//大小圖都要縮圖
+				var reader = new FileReader();
+		        reader.onloadend = function() {
+		            var tempImg = new Image();
+		            tempImg.src = reader.result;
+		            tempImg.onload = function() {
+		                
+		                //大小圖都要縮圖
+		                var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
+		                var t_obj = imgResizeByCanvas(this,0,0,120,120,0.6);
+		                cns.debug("o_obj:",o_obj);
+		                cns.debug("t_obj:",t_obj);
+		                //先大圖
+		        		$.ajax({
+							url: ou,
+							type: 'PUT',
+							contentType: " ",
+						 	data: o_obj.blob, 
+							processData: false,
+							complete: function(data) { 
+								cns.debug("上傳大圖後的 data:",data);
+								//大圖上傳s3成功或失敗
+								if(data.status == 200){
+									//再小圖 
+									$.ajax({
+										url: tu,
+										type: 'PUT',
+										contentType: " ",
+										data: t_obj.blob, 
+										processData: false,
+										complete: function(data) { 
+											cns.debug("上傳小圖後的 data:",data);
+
+											//小圖上傳s3成功或失敗
+											if(data.status == 200){
+												var api_name = "me/avatar/commit";
+							                    var headers = {
+							                        "ui":$(document).data("ui"),
+									                "at":$(document).data("at"), 
+									                "li":lang,
+							                    };
+							                    var method = "put";
+
+							                    var body = {
+							                      "fi": fi,
+							                      "si": file.size
+							                    }
+							                    cns.debug("commit前的 headers:",headers);
+							                    cns.debug("commit前的 body:",body);
+							                    var result = ajaxDo(api_name,headers,method,true,body);
+							                    result.complete(function(data){
+							                    	cns.debug("commit後的 data:",data);
+							                    	//commit 成功或失敗
+							                    	if(data.status == 200){
+
+							                    		//大小圖上傳完畢 再做註冊步驟3
+							                    		var first_name = $(".setting-first-name input").val();
+												    	var last_name = $(".setting-last-name input").val();
+												    	var birth = $(".setting-birth-hidden").val()*1000;
+
+												    	activateStep3(first_name,last_name,birth);
+
+							                    	}else{
+							                    		//commit 失敗
+							                    		cns.debug("commit 失敗");
+							                    	}
+						                    	});
+											}else{
+												// 小圖上傳 錯誤
+												cns.debug("小圖上傳 錯誤");
+											}
+										}
+									});
+								}else{
+									// 大圖上傳 錯誤
+									cns.debug("大圖上傳 錯誤");
+								}
+							}
+						});
+		            }
+			    }
+		        reader.readAsDataURL(file);
+        	}
+        });
 	}
 });

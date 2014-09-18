@@ -1,3 +1,5 @@
+/* z-index 區域最高100 全域遮罩1000  全域遮罩上的元件1100 */
+
 .ui-body-c, .ui-body-c input, .ui-body-c select,textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c{
     font-family: "微軟正黑體","Microsoft JhengHei";
     -webkit-font-smoothing: antialiased;
@@ -8,9 +10,9 @@
 	min-height: 55px;
 }
 
-.screen-lock {
+/*.screen-lock {
 	overflow: hidden;
-}
+}*/
 
 .main{
 	height:1136px;
@@ -517,6 +519,7 @@ img.auo {
 	width: 100%;
 	text-align: center;
 	color: white;
+	z-index: 1500;
 }
 
 .toast div {
@@ -534,7 +537,7 @@ img.auo {
 
 .popup-frame {
 	position: fixed;
-	z-index: 100000;
+	z-index: 1100;
 	border-radius: 3px;
 	top: 200px;
 	text-align: center;
@@ -614,7 +617,7 @@ img.auo {
 .ajax-screen-lock {
 	background: #000;
 	opacity: 0.5;
-	z-index: 1000;
+	z-index: 10000;
 }
 
 .screen-lock {
@@ -888,6 +891,7 @@ img.auo {
 	top: 1px;
 }
 
+/* 拿掉會影響 投票的textarea */
 ::-webkit-scrollbar { 
     display: none; 
 }
@@ -1092,6 +1096,7 @@ img.auo {
     padding-top: 5px;
 }
 
+/* datetimepicker 是 9999 所以特例10000 */
 .cp-footer {
 	height: 44px;
 	background: url("../images/compose/compose_form_addfile_bg.png") repeat-x;
@@ -1100,7 +1105,7 @@ img.auo {
 	border-bottom: 1px solid rgb(218,218,218);
 	position: fixed;
 	bottom: 0px;
-	z-index: 1000;
+	z-index: 10000;
 }
 
 .header-group-name ,.header-cp-object{
@@ -1233,7 +1238,7 @@ img.auo {
 .st-navi-fixed {
 	position: fixed;
 	width: 100%;
-	z-index: 15;
+	z-index: 10;
 }
 
 .st-navi-area {
@@ -1497,7 +1502,7 @@ img.auo {
 
 .st-top-bar-case-click {
 	display: -webkit-box;
-	z-index: 15;
+	z-index: 10;
 	height: 30px;
 }
 
@@ -1611,7 +1616,7 @@ img.auo {
 	opacity: 0.9;
 	border-radius: 2px;
 	display:none;
-	z-index: 100;
+	z-index: 10;
 }
 
 .st-sub-box-more-box {
@@ -2389,6 +2394,7 @@ img.auo {
 	border-bottom: 1px solid rgb(204,204,204);
 	line-height: 50px;
 	padding-left: 15px;
+	position: relative;
 }
 
 .st-reply-username {
@@ -2434,9 +2440,10 @@ img.auo {
 }
 
 .st-reply-like-area img:nth-child(3) {
-	float: right;
-	margin: 16px 15px;
 	width: 18px;
+	position: absolute;
+	right: 8px;
+	top: 16px;
 }
 
 .st-reply-message-area {
@@ -2444,7 +2451,7 @@ img.auo {
 	width: 100%;
 	background: rgb(239,239,239);
 	height: 45px;
-	z-index: 100;
+	z-index: 10;
 }
 
 .st-reply-message-bg {
@@ -2666,7 +2673,7 @@ img.auo {
 	right: -11px;
 	top: -11px;
 	width: 25px;
-	z-index: 100;
+	z-index: 10;
 }
 
 
@@ -3117,7 +3124,7 @@ input.cp-datetimepicker-end {
 	height: 1px;
 	background: rgb(200,200,200);
 	position: absolute;
-	z-index: 20;
+	z-index: 10;
 }
 
 .cp-setdate-start-text {
@@ -3196,7 +3203,7 @@ input.cp-datetimepicker-end {
 	line-height: 50px;
 	position: fixed;
 	width: 100%;
-	z-index: 100;
+	z-index: 10;
 }
 
 .obj-selected div:nth-child(1) {
@@ -3285,35 +3292,157 @@ input.cp-datetimepicker-end {
 	width: 100%;
 	top: 0;
 	left: 0;
-	z-index: 10000;
+	z-index: 1100;
+	overflow: scroll;
 }
 
 .user-info-load {
 	background: #fff;
-	width: 380px;
-	height: 620px;
-	margin: 5% auto;
 	border-radius: 5px;
 	overflow: hidden;
+	margin: 10% auto;
+	position: relative;
+}
+
+@media all and (max-width: 500px) {
+    .user-info-load {
+		width: 350px;
+		height: 550px;
+	}
+
+	.user-info-list-area {
+		width: 320px;
+		padding: 10px 15px;
+		height: 230px;
+	}
+}	
+
+@media all and (min-width: 501px) {
+    .user-info-load {
+		width: 400px;
+		height: 650px;
+		margin: 7% auto;
+	}
+
+	.user-info-list-area {
+		width: 350px;
+		padding: 10px 25px;
+		height: 330px;
+	}
 }
 
 .user-avatar {
 	width: 100%;
 	height: 250px;
+	overflow: hidden;
+	background: rgb(217,217,217);
+	position: relative;
+	cursor: pointer;
 }
 
-.user-avatar img {
-	width: 150px;
-	height: 160px;
-	border-radius: 100px;
+.user-avatar-bar {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	background: black;
+	background: rgba(0,0,0,0.5);
+	height: 80px;
+}
+
+.user-avatar-bar .group-avatar {
+	width: 60px;
+	height: 60px;
+	border-radius: 30px;
+	margin: 10px 15px;
+	overflow: hidden;
+}
+
+.user-avatar-bar .group-name {
+	width: 55%;
+	margin: 8px 15px;
+	position: absolute;
+	left: 75px;
+	bottom: 20px;
+	color: white;
+	font-size: 20px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	outline: 0!important;
+}
+
+.user-avatar-bar .upload {
+	position: absolute;
+	right: 12px;
+	bottom: 12px;
+	width: 40px;
+	cursor: pointer;
+}
+
+img.default {
+	width: 75%;
 	margin: 0 auto;
 	display: block;
+}
+
+.user-info-list-area {
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+.user-info-list-area input {
+	width: 100%;
+	font-size: 15px;
+	height: 40px;
+	border: 0;
+	outline: none;
+}
+
+.user-info-list-area input::-webkit-input-placeholder {
+	color: black;
+}
+
+.user-info-list {
+	border-bottom: 1px solid #d2d2d2;
+	margin-bottom: 10px;
+}
+
+.user-info-title {
+ color: #aaa;
+}
+
+
+div.user-info-submit-ready {
+	background: rgb(80,160,240);
+}
+
+div.user-info-submit-ready:active {
+	background: rgb(40,80,120);
+}
+
+.user-info-submit {
+	width: 100%;
+	background: rgb(200,215,230);
+	height: 50px;
+	text-align: center;
+	font-size: 22px;
+	color: white;
+	padding-top: 10px;
+}
+
+img.user-info-close {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	z-index: 10;
+	width: 50px;
+	cursor: pointer;
 }
 
 
 .yeah img {
 	display: none;
-	z-index: 1000000;
+	z-index: 20000;
 	width: 35%;
 	height: 22%;
 	border-radius: 50%;
@@ -3351,7 +3480,7 @@ input.cp-datetimepicker-end {
 
 .yeah-yan img {
 	display: none;
-	z-index: 1000000;
+	z-index: 20000;
 	/*width: 45%;*/
 	height: 40%;
 	border-radius: 50%;
