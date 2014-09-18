@@ -1371,6 +1371,8 @@ $(function(){
 			$("div[data-sm-act='chat']").show();
 			smHrCliclTimes=0;
 
+			initChatDB();
+			initChatCntDB();
 			//彩蛋中的彩蛋
 			supriseYeah();
 		}
