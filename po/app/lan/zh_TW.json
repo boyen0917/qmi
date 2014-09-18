@@ -12,5 +12,9 @@
 		"roomName" 						: "聊天室名稱",
 		"inputRoomName" 				: "輸入聊天室名稱",
 		"enterRoomName"            		: "請輸入聊天室名稱",
-		"delete"						: "刪除"
+		"delete"						: "刪除",
+		"deleteRoom"					: "刪除聊天室",
+		"comfirmDeleteRoom"				: "您確定要刪除 %s 聊天室嗎？",
+		"deleteSucc"					: "刪除成功",
+		"deleteFail"					: "刪除失敗"
 }

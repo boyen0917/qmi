@@ -109,14 +109,7 @@
   	},
 
     getString: function (str) {
-      dict = this.dict;
-      if (dict && dict.hasOwnProperty(str)) {
-        str = dict[str];
-      }
-      args = __slice.call(arguments);
-      args[0] = str;
-      // Substitute any params.
-      return this.printf.apply(this, args);
+      return this._.apply(i18n, arguments);
     },
 
     /*
