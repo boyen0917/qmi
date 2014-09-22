@@ -109,6 +109,7 @@ $(function(){
 		$(".ajax-screen-lock").show();
 	});
 	$(document).ajaxComplete(function(data) {
+		cns.debug("ajax complete");
 		//特別的
 		if(s_load_show) return false;
 
@@ -134,10 +135,10 @@ $(function(){
 			return false;
 		}
 
-		if(window.location.href.match(/webdev.cloud.mitake.com.tw/)) {
-    		document.location = "index.html";
-    		return false;
-    	}
+		// if(window.location.href.match(/webdev.cloud.mitake.com.tw/)) {
+  //   		document.location = "index.html";
+  //   		return false;
+  //   	}
 
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
 		if(ajax_msg || window.location.href.match(/index.html/)){

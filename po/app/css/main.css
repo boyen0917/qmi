@@ -537,7 +537,7 @@ img.auo {
 
 .popup-frame {
 	position: fixed;
-	z-index: 1100;
+	z-index: 1201;
 	border-radius: 3px;
 	top: 200px;
 	text-align: center;
@@ -587,7 +587,7 @@ img.auo {
 }
 
 .popup-screen {
-	z-index:1000;
+	z-index:1200;
 }
 
 .popup-text {
@@ -704,6 +704,7 @@ img.auo {
 .sm-user-area, .main-user-area {
 	background: rgb(72,77,82);
 	height: 80px;
+	cursor: pointer;
 }
 
 .sm-user-area-r, .main-user-area-r {
@@ -1598,7 +1599,7 @@ img.auo {
     box-shadow: 0 0 5px #a2a2a2;
     cursor:pointer;
     /*opacity:0;*/
-    -webkit-user-select: none;
+    /*-webkit-user-select: none;*/
 }
 
 .st-sub-box-more-btn {

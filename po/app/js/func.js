@@ -668,7 +668,7 @@ $(function(){
 		var event_status = this_event.data("event-status");
 
 		//兩種狀況下 要登記已記錄: event_status不存在 或 event_status存在但 此ei 的 ir、il、ip是false
-		if( !event_status || (event_status && !event_status[etp])){
+		if( !event_status || (event_status[this_ei] && !event_status[this_ei][etp])){
 			return true;
 		}else{
 			return false;
@@ -780,12 +780,15 @@ $(function(){
     	//已閱讀
 		if(!event_status){
 			event_status = {};
+			event_status[this_ei] = {}
 		}
+
 
 		//沒閱讀過 就判斷閱讀
 		var read_chk = chkEventStatus(this_event,"ir");
 
 		if(read_chk){
+
 			//回傳已觀看
 			var target_obj = {};
 			target_obj.selector = this_event;
@@ -793,7 +796,7 @@ $(function(){
 			target_obj.order = 2;
 
 			//已讀存回
-			event_status.ir = true;
+			event_status[this_ei].ir = true;
 			target_obj.status = event_status;
 			putEventStatus(target_obj,0,1);
 		}
@@ -801,7 +804,6 @@ $(function(){
 		//製作每個回覆
 		//重置
 		this_event.find(".st-reply-all-content-area").html("");
-
 		$.each(e_data,function(el_i,el){
 			cns.debug("====================回覆============================================================================");
 			cns.debug(el);
@@ -809,7 +811,7 @@ $(function(){
 			var without_message = false;
 			var reply_content;
 			var ml_arr = [];
-
+			
 			this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html .st-reply-content-area',function(){
 				var this_load = $(this).find(".st-reply-content-area");
 				var this_content = this_load.find(".st-reply-content");
@@ -900,15 +902,13 @@ $(function(){
 				//部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
 				if(without_message || el.meta.del || (el.meta.tp.substring(0,1)*1 == 0)){
 					this_load.hide();
-					cns.debug("this_load:",this_load);
 				}else{
 
 					//製作留言
 
 					var _groupList = $.lStorage(ui);
 					var user_name = _groupList[gi].guAll[el.meta.gu].nk;
-					cns.debug("el.meta.gu:",el.meta.gu);
-					cns.debug("guall:",_groupList[gi].guAll[el.meta.gu]);
+
 					//大頭照
 					if(_groupList[gi].guAll[el.meta.gu].aut){
 	        			this_load.find(".st-user-pic img").attr("src",_groupList[gi].guAll[el.meta.gu].aut);
@@ -939,7 +939,7 @@ $(function(){
 						this_load.find(".st-reply-footer span:eq(2)").html(el.meta.lct);
 
 						//此則動態 自己的按贊狀況
-						if(event_status && event_status.il){
+						if(event_status[ei] && event_status[ei].il){
 							this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
 							this_load.find(".st-reply-footer span:eq(1)").html("收回讚");
 						}
@@ -2921,9 +2921,11 @@ $(function(){
             });
 		}else{
 			idb_index = "gi_tp_ct";
+			var last_ct = 0;
+			if(timeline_list.last()) last_ct = timeline_list.last().meta.ct;
 			idb_keyRange = idb_timeline_events.makeKeyRange({
               upper: [gi,event_tp,ct_timer],
-              lower: [gi,event_tp,timeline_list.last().meta.ct]
+              lower: [gi,event_tp,last_ct]
             })
 		}
 
@@ -2990,7 +2992,6 @@ $(function(){
         	//判斷是否為更新事件
         	var this_event = selector.find("[data-event-id="+ val.ei +"]");
         	if(this_event.length){
-        		cns.debug("timeline update");
         		//如果是更新事件 目前只重改按讚狀態 其餘以後再說
         		this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
 	    		this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
@@ -3212,25 +3213,25 @@ $(function(){
         });
 	}
 
-	eventStatusWrite = function(this_event,s_data,filter){
+	eventStatusWrite = function(this_event,this_es_obj,filter){
 		//將此則動態的按讚狀態寫入data中
-		if(!s_data) return false;
+		if(!this_es_obj) return false;
 
 		//按讚
-		if(s_data.il){
+		if(this_es_obj.il){
 			this_event.find(".st-sub-box-3 img:eq(0)").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
 			this_event.find(".st-sub-box-4 .st-like-btn").html("收回讚");
 		}
 		//回覆
-		if(s_data.ip)
+		if(this_es_obj.ip)
 				this_event.find(".st-sub-box-3 img:eq(1)").attr("src","images/timeline/timeline_feedbox_icon_chat_blue.png");
 				
 		//閱讀
-		if(s_data.ir)
+		if(this_es_obj.ir)
 				this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/timeline/timeline_feedbox_icon_read_blue.png");
 		
 		//任務完成
-		if(s_data.ik){
+		if(this_es_obj.ik){
 			var tp = this_event.data("timeline-tp");
 			var task_str;
 			switch(tp){
@@ -3249,9 +3250,6 @@ $(function(){
 			this_event.find(".st-task-status").html(task_str);
 		}
 
-		//存回
-		this_event.data("event-status",s_data);
-
 		//filter
 		if(filter){
 			eventFilter(this_event,filter);
@@ -3262,7 +3260,9 @@ $(function(){
 
 		//先用idb寫 再去向server要
 		var ei_val = this_event.data("event-val");
-		eventStatusWrite(this_event,ei_val.status,filter);
+		if(ei_val.status && ei_val.status[ei_val.ei]){
+			eventStatusWrite(this_event,ei_val.status[ei_val.ei],filter);	
+		}
 		// return false;
 
 		//這邊是timeline list 要call這個api判斷 自己有沒有讚過這一串系列文 
@@ -3270,25 +3270,36 @@ $(function(){
 
 		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events_status?ep=" + this_ei;
         var headers = {
-                "ui":ui,
-                "at":at, 
-                "li":lang
-                    };
+            "ui":ui,
+            "at":at, 
+            "li":lang
+		};
         var method = "get";
         
-        var result = ajaxDo(api_name,headers,method,true);
-    	result.complete(function(data){
+        ajaxDo(api_name,headers,method,true).complete(function(data){
     		if(data.status != 200) return false;
 
-    		var s_data = $.parseJSON(data.responseText).el[0];
+    		var s_data = $.parseJSON(data.responseText).el;
+    		cns.debug("s_data:",s_data);
+    		if(s_data.length != 0){
+    			var es_obj = {}
+				$.each(s_data,function(i,val){
+					es_obj[val.ei] = val;
+				});
 
-    		//存入idb
-    		ei_val.status = s_data;
+				//存入idb
+	    		ei_val.status = es_obj;
 
-    		idb_timeline_events.put(ei_val,function(){
-    			// 存完後改資料
-    			eventStatusWrite(this_event,s_data,filter);
-    		});
+	    		//存入data
+				this_event.data("event-status",es_obj);
+
+	    		idb_timeline_events.put(ei_val,function(){
+	    			// 存完後改資料
+	    			eventStatusWrite(this_event,es_obj[this_ei],filter);
+	    		});
+    		}
+	    		
+	    		
     	});
 	}
 
@@ -3948,27 +3959,29 @@ $(function(){
 		var act = target_obj.act;
 		var order = target_obj.order;
 		var event_status = target_obj.status;
+		var this_ei = this_event.data("event-id");
+		var this_status = false;
+
 
 		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events/" + this_event.data("event-path");
         // etp: 0(讀取),1(按讚),2(按X),3(按訂閱),4(按置頂),6(是否有行事曆)
         // est: 0(取消),1(執行)
         var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                 "etp":etp,
-                 "est":est
-                     };
+             "ui":ui,
+             "at":at, 
+             "li":lang,
+             "etp":etp,
+             "est":est
+        };
          var method = "put";
                          
-        var result = ajaxDo(api_name,headers,method,false);
-        result.complete(function(data){
+        ajaxDo(api_name,headers,method,false).complete(function(data){
         	var d =$.parseJSON(data.responseText);
 
         	//做timeline樓主的回覆狀態
         	if(data.status == 200){
         		//timeline 外層
-        		if(event_status){
+        		if(!target_obj.reply){
 	        		var count_selector = this_event.find(".st-sub-box-3 div:eq(" + order + ")");
 	        		var img_selector = this_event.find(".st-sub-box-3 img:eq(" + order + ")");
 
@@ -3976,13 +3989,16 @@ $(function(){
 		        	if(est){
 		        		img_selector.attr("src","images/timeline/timeline_feedbox_icon_" + act + "_blue.png")
 		        		count_selector.html(count_selector.html()*1+1);
+
+		        		this_event.find(".st-like-btn").html("收回讚");
+
+		        		this_status = true;
 		        	}else{
 		        		img_selector.attr("src","images/timeline/timeline_feedbox_icon_" + act + ".png")
 		        		count_selector.html(count_selector.html()*1-1);
-		        	}
 
-		        	//api成功才存回
-			        this_event.data("event-status",event_status);
+		        		this_event.find(".st-like-btn").html("讚");
+		        	}
 
 	        	}else{
 	        		//回覆按讚
@@ -3991,6 +4007,8 @@ $(function(){
 						this_event.find(".st-reply-footer span:eq(1)").html("收回讚");
 
 						var count = this_event.find(".st-reply-footer span:eq(2)").html()*1+1;
+
+						this_status = true;
 	        		}else{
 	        			this_event.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like.png");
 						this_event.find(".st-reply-footer span:eq(1)").html("讚");
@@ -4007,7 +4025,20 @@ $(function(){
 	        			this_event.find(".st-reply-footer img").show();
 	        			this_event.find(".st-reply-footer span:eq(2)").show();
 	        		}
+
 	        	}
+
+	        	//api成功才存回
+	        	switch(etp){
+	        		case 0:
+	        			event_status[this_ei].ir = this_status;
+	        			break;
+	        		case 1://讚
+	        			event_status[this_ei].il = this_status;
+	        			break;
+	        	}
+	        	
+		        this_event.data("event-status",event_status);
 
 	        }
         });
@@ -4342,10 +4373,10 @@ $(function(){
 	    				$(".sm-small-area[data-sm-act=feed]").find(".sm-count").html(countsFormat(val.A1)).show();
 	    			}
 	    			if(val.A2){
-	    				$(".sm-small-area[data-sm-act=chat]").find(".sm-count").html(countsFormat(val.A2)).show();
+	    				// $(".sm-small-area[data-sm-act=chat]").find(".sm-count").html(countsFormat(val.A2)).show();
 	    			}
 	    			if(val.A3){
-	    				// $(".sm-small-area[data-sm-act=]").find(".sm-count").html(countsFormat(val.A3)).show();
+	    				$(".sm-small-area[data-sm-act=chat]").find(".sm-count").html(countsFormat(val.A3)).show();
 	    			}
 	    			if(val.A4){
 	    				// $(".sm-small-area[data-sm-act=]").find(".sm-count").html(countsFormat(val.A4)).show();
@@ -4610,9 +4641,7 @@ $(function(){
 
         var method = "put";
         ajaxDo(api_name,headers,method,false,body).complete(function(data){
-        	// 關閉load 圖示
-        	s_load_show = false;
-
+        	
         	//重置團體頭像、名稱的參數
 			var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img")];
 
@@ -4620,15 +4649,23 @@ $(function(){
         		this_info.find(".user-info-close").trigger("mouseup");
         		if(this_info.data("avatar-chk")){
     				avatarToS3(this_info.find(".user-avatar-bar input")[0].files[0],function(success){
+    					// 關閉load 圖示
+        				s_load_show = false;
+        				$('.ui-loader').hide();
+						$(".ajax-screen-lock").hide();
+
     					//重置團體頭像、名稱 失敗也要重置
 
     					setGroupAllUser(data_arr);
 
     					if(success) {
-    						toastShow("更新成功了");
+    						toastShow("更新成功");
     					}
     				});
         		}else{
+        			// 關閉load 圖示
+        			s_load_show = false;
+
         			//重置團體頭像、名稱
 					setGroupAllUser(data_arr);
 
@@ -4787,7 +4824,7 @@ $(function(){
         };
         var body = {
             id: "+886980922917",
-            tp:"0",
+            tp: 0,
             pw:toSha1Encode("111111")
         };
         var method = "post";
@@ -4802,7 +4839,7 @@ $(function(){
         		//附上group list
         		getGroupList().complete(function(data){
         			if(data.status == 200){
-        				if($.parseJSON(data.responseText).gl.length > 0){
+        				if($.parseJSON(data.responseText).gl && $.parseJSON(data.responseText).gl.length > 0){
         					//有group
         					login_result.gl = $.parseJSON(data.responseText).gl;
         					$.lStorage("_loginData",login_result);

@@ -127,7 +127,7 @@ $(function(){
         };
         var body = {
             id: countrycode + phone_id.substring(1),
-            tp:"0",
+            tp:"0",//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
             pw:toSha1Encode(password)
         };
 
@@ -466,7 +466,7 @@ $(function(){
         var method = "put";
         var body = {
                 id: $(document).data("phone-id"),
-                tp: 0,
+                tp: 0,//多裝置代碼 0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
                 ud: $(document).data("device-token"),
                 pw: toSha1Encode($(document).data("password"))
             }

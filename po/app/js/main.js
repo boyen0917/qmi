@@ -586,31 +586,35 @@ $(function(){
 
     	if(!event_status){
     		event_status = {};
+    		event_status[this_ei] = {};
     	}
+
+
 
     	//按讚區域
     	var parti_list = this_event.data("parti-list");
 
     	//檢查按讚了沒
-		var like_chk = chkEventStatus(this_event,"il");
-		// cns.debug("like_chk:",like_chk);
+    	cns.debug("event-status",event_status[this_ei]);
+		cns.debug("like_chk:",chkEventStatus(this_event,"il"));
+		// return false;
 		//按讚 like_chk是true
-		if(like_chk){
-			$(this).html("收回讚");
+		if(chkEventStatus(this_event,"il")){
+			// $(this).html("收回讚");
 			var est = 1;
 
 			//存入event status
-			event_status.il = true;
+			// event_status[this_ei].il = true;
 
 			//按讚區域 改寫陣列
 			parti_list.push(gu);
 		}else{
 			//收回
-			$(this).html("讚");
+			// $(this).html("讚");
 			var est = 0;
 
 			//存入event status
-			event_status.il = false;
+			// event_status[this_ei].il = false;
 
 			//按讚區域 改寫陣列
 			var i = $.inArray(gu,parti_list);
@@ -633,12 +637,33 @@ $(function(){
 			target_obj.act = "read";
 			target_obj.order = 2;
 
-			event_status.ir = true;
+			event_status[this_ei].ir = true;
 			//發完api後做真正存入動作
 			target_obj.status = event_status;
 			putEventStatus(target_obj,0,1);
 		}
 	});
+
+	//回覆按讚
+	$(document).on('click','.st-reply-message-like',function(){
+		var this_event = $(this).parents('.st-reply-content-area');
+		var event_path = this_event.data("event-path");
+		var parent_event = $(this).parents(".st-sub-box");
+		
+		//判斷是讚 還是 收回讚
+		var est = 0;
+		if($(this).html().length == 1){
+			est = 1;
+		}
+
+		//更新狀態 參數
+		var target_obj = {};
+		target_obj.selector = this_event;
+		target_obj.status = parent_event.data("event-status");
+		target_obj.reply = true;
+		putEventStatus(target_obj,1,est);
+	});
+
 	
 	//點選開啟圖庫
 	$(document).on("click",".img-show",function(){
@@ -661,24 +686,6 @@ $(function(){
 		}
 		img.src = this_s32;
 		
-	});
-
-	//回覆按讚
-	$(document).on('click','.st-reply-message-like',function(){
-		var this_event = $(this).parents('.st-reply-content-area');
-		var event_path = this_event.data();
-
-		
-		//判斷是讚 還是 收回讚
-		var est = 0;
-		if($(this).html().length == 1){
-			est = 1;
-		}
-
-		//更新狀態 參數
-		var target_obj = {};
-		target_obj.selector = this_event;
-		putEventStatus(target_obj,1,est);
 	});
 
 	//留言
@@ -875,9 +882,10 @@ $(function(){
 
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp);
-		if(!detail_chk){
-			return false;
-		}
+		this_event.find(".st-reply-all-content-area").html("");
+		// if(!detail_chk){
+		// 	return false;
+		// }
 		
 		//此則動態的按贊狀況
 		getThisTimelinePart(this_event,this_event.find(".st-reply-like-area img:eq(0)"),1);
@@ -1255,7 +1263,7 @@ $(function(){
 	    }
 	});
 
-	$(".sm-user-area-r > img").click(function(){
+	$(".sm-user-area").click(function(){
 		userInfoShow();
 	});
 
