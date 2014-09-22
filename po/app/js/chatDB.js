@@ -43,6 +43,13 @@ function updateChat ( msgs ){
 
 				// showMsg( object, false );
 			}
+			if( null != windowList ){
+				if( windowList.hasOwnProperty(data.ci) 
+					&& null != windowList[data.ci] 
+					&& false==windowList[data.ci].closed ){
+					$(windowList[data.ci].document).find("button.pollingMsg").trigger("click");
+				}
+			}
 		}
 	}
 }	//end of updateChat
@@ -99,4 +106,15 @@ function updateChatCnt ( ccs ){
 	}
 	$.lStorage(ui, storage);
 	// console.debug( JSON.stringify($.lStorage(ui)) );
+
+
+	if( null != windowList ){
+		for( var ccsIndex=0; ccsIndex<ccs.length; ccsIndex++){
+			var data = ccs[ccsIndex];
+			if( null != windowList[data.ci] 
+				&& false==windowList[data.ci].closed ){
+				$(windowList[data.ci].document).find("button.pollingCnt").trigger("click");
+			}
+		}
+	}
 }
