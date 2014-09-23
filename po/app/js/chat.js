@@ -571,7 +571,8 @@ function showMsg (object, bIsFront){
 				msgDiv.addClass('chat-msg-bubble-left');
 			}
 			var mapDiv = $("<div class='msg-map'></div>");
-			mapDiv.html(msgData.a);
+			mapDiv.append("<div class='img'></div>" );
+			mapDiv.append("<div class='text'>" + msgData.a + "</div>");
 			// mapDiv.tinyMap({
 			// 	 center: {x: msgData.lat, y: msgData.lng},
 			// 	 panControl: 0,

@@ -83,7 +83,7 @@ body {
 	position: fixed;
 	float:right;
 	right:5px;
-	bottom: 55px;
+	bottom: 60px;
 	width: 50px;
 	height: 50px;
 	background-size: cover;
@@ -149,7 +149,7 @@ body {
 
 .chat-msg-time{
 	font-size: 8px;
-	color: gray;
+	color: #6c7faf;
 }
 .chat-msg-bubble-right, .chat-msg-bubble-left{
 	padding: 0.3em 0.6em 0.3em 0.5em;
@@ -196,10 +196,10 @@ body {
 }
 .chat-date-tag{
 	display: table;
-	padding: 0.2em 1em 0.2em 1em;
+	padding: 0.4em 1em;
 	margin: 35px auto;
-	color: grey;
-	border: 1px solid grey;
+	color: #93a4c3;
+	border: 1px solid #93a4c3;
 	border-radius: 1em 1em 1em 1em;
 	font-size: 8px;
 }
@@ -238,19 +238,36 @@ body {
 }
 .msg-img{
 	border-radius: 10px;
-	box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);
+	/*box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);*/
+	border-style: solid;
+	border-width: 2px;
+	border-color: #6c7faf;
 }
 .msg-sticker{
 	text-align: left;
 	width: 150px;
 }
-.msg-map{
+.msg-map .img{
+	background: url("../images/chatroom/chat_chatroom_icon_address.png");
+	background-size: cover;
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+}
+.msg-map .text{
 	border-radius: 10px;
 	margin-right: 10px;
 	text-decoration: underline;
 	cursor:pointer;
 	margin: 6px;
-	display: block;
+	display: inline-block;
+	width: 80%;
+}
+.chat-msg-bubble-left .msg-map .text{
+	color: #335196;
+}
+.chat-msg-bubble-right .msg-map .text{
+	color: #fff283;
 }
 /* ------ end chat -------------*/
  
