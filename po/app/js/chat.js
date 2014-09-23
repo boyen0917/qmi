@@ -19,6 +19,8 @@ var g_msgsByTime = new Object();
 var g_currentDate = new Date(0);
 var g_lastDate = new Date();
 var g_bIsLoadHistoryMsg = false;
+var g_bIsEndOfHistory = false;
+var g_msgTmp;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -96,10 +98,31 @@ $(document).ready(function(){
 
 	resizeContent();
 
-	//!!!!!!!!!!!!!!!!!!!!!!
-	// $("button.pollingCnt").off("click").click( updateChatCnt );
-	// $("button.pollingMsg").off("click").click( updateChat );
-	//!!!!!!!!!!!!!!!!!!!!!!
+	if( g_bIsPolling ){
+		$("button.pollingCnt").off("click").click( updateChatCnt );
+		$("button.pollingMsg").off("click").click( function(){
+			for( var i=0; i<g_msgTmp.length; i++ ){
+				var object = g_msgTmp[i];
+				if( null!=object && g_msgs.indexOf(object.ei)<0 ){
+					showMsg( object );
+				}
+			}
+			op("/groups/"+g_gi+"/chats/"+g_ci+"/messages_read"
+			    ,"PUT",
+			    JSON.stringify({lt:g_currentDate.getTime()}),
+			    null
+			);
+		});
+	}
+
+	//set update contents
+	setInterval(function() {
+	    checkPagePosition();
+	    if( !g_bIsPolling ){
+		    updateChat();
+		    updateChatCnt();
+	    }
+	}, 1500);
 });
 
 /*
@@ -169,26 +192,22 @@ function getHistoryMsg ( bIsScrollToTop ){
 					showMsg( object, true );
 				}
 	        }
-	    }
-	    op("/groups/"+g_gi+"/chats/"+g_ci+"/messages_read"
-		    ,"PUT",
-		    JSON.stringify({lt:g_currentDate.getTime()}),
-		    null
-		);
+	    
+		    op("/groups/"+g_gi+"/chats/"+g_ci+"/messages_read"
+			    ,"PUT",
+			    JSON.stringify({lt:g_currentDate.getTime()}),
+			    null
+			);
+			
+			if( g_bIsPolling )	updateChat();
 
-		//set update contents
-		setInterval(function() {
-		    checkPagePosition();
-			//!!!!!!!!!!!!!!!!!!!!!!
-		    updateChat();
-		    updateChatCnt();
-			//!!!!!!!!!!!!!!!!!!!!!!
-		}, 1500);
-		//!!!!!!!!!!!!!!!!!!!!!!
-    	// updateChat();
-		//!!!!!!!!!!!!!!!!!!!!!!
-    	if(bIsScrollToTop)	scrollToStart();
-    	g_bIsLoadHistoryMsg = false;
+	    	if(bIsScrollToTop)	scrollToStart();
+	    	g_bIsLoadHistoryMsg = false;
+	    }
+	    // if( 1>=list.length ){
+	    // 	g_bIsEndOfHistory = true;
+	    // 	updateHistoryMsg();
+	    // }
     },{
         index: "gi_ci_ct",
         keyRange: g_idb_chat_msgs.makeKeyRange({
@@ -206,6 +225,48 @@ function getHistoryMsg ( bIsScrollToTop ){
         }
     });
 }
+
+/*
+api打回來的是以ct開始的訊息....
+但每次只會送20筆, 怎麼知道要reverse多少時間回去？？？
+暫時先不處理, 之後再問問其他人怎做
+*/
+function updateHistoryMsg(){
+	op("/groups/"+g_gi+"/chats/"+g_ci+"/messages?"+(g_lastDate.getTime()-2000),
+	    "GET",
+	    "",
+	    function(data, status, xhr) {
+
+	        for( var i=(data.el.length-1); i>=0; i--){
+				var object = data.el[i];
+				if(object.hasOwnProperty("meta")){
+
+					//pass shown msgs
+					if( g_msgs.indexOf(object.ei)>=0 ){
+						continue;
+					} else {
+						//add to db
+						var node = {
+							gi: g_gi,
+							ci: g_ci,
+							ei: object.ei,
+					        ct: object.meta.ct,
+					        data: object
+					    };
+					    //write msg to db
+						g_idb_chat_msgs.put( node );
+
+						showMsg( object, true );
+					}
+				}
+			}
+
+	    	scrollToStart();
+	    	g_bIsLoadHistoryMsg = false;
+
+	    }	//end of function
+	);	//end of op
+}	//end of updateChat
 
 function op ( url, type, data, delegate){
 	$.ajax({
@@ -237,7 +298,8 @@ function checkPagePosition (){
 	var posi = $(window).scrollTop();
 	if( posi <= 0 ){
 		if( false==g_bIsLoadHistoryMsg ){
-			getHistoryMsg( true );
+			if( !g_bIsEndOfHistory )	getHistoryMsg( true );
+			else updateHistoryMsg();
 		}
 		g_isEndOfPage = false;
 		return;
@@ -347,6 +409,16 @@ function updateChatCnt (){
 	for( var i=0; i<elements.length; i++ ){
 		var dom = $(elements[i]);
 		var time = dom.data("t");
+
+		while(data.ts<time && index>=0 ){
+			index--;
+			if(index>=0){
+				//dom.css("background", "red");
+				data = list[index];
+			}
+			cnt = data.cnt;
+	    }
+
 		if(cnt>0){
 			if( 1==g_room.tp ) dom.html("已讀");
 			else dom.html("已讀"+cnt);
@@ -354,13 +426,13 @@ function updateChatCnt (){
 			dom.html("");
 		}
 
-		while(data.ts<=time && index>=0 ){
+		while(data.ts==time && index>=0 ){
 			index--;
 			if(index>=0){
 				//dom.css("background", "red");
 				data = list[index];
-				cnt = data.cnt;
 			}
+			cnt = data.cnt;
 	    }
 	}
 
@@ -460,9 +532,9 @@ function showMsg (object, bIsFront){
 		div.append(pic);
 		
 		//right
-		var subDiv = $("<div></div>");
+		var subDiv = $("<div class='group'></div>");
 		subDiv.append("<div class='name'>"+ mem.nk +"</div>");	//name
-		msgDiv = $("<div></div>");
+		msgDiv = $("<div class='msg-content'></div>");
 		subDiv.append(msgDiv);	//msg
 
 		var table = $("<table></table>");
@@ -486,18 +558,41 @@ function showMsg (object, bIsFront){
 			}
 			msgDiv.html( htmlFormat(msgData.c) );
 			break;
+		case 5:
+			var pic = $("<img class='msg-sticker'>");
+			var sticker_path = "sticker/" + msgData.c.split("_")[1] + "/" + msgData.c + ".png";
+			pic.attr("src",sticker_path);
+			msgDiv.append(pic);
+			break;
 		case 6:
-			if(isMe){
-				msgDiv.addClass('chat-msg-pic-right');
-			} else {
-				msgDiv.addClass('chat-msg-pic-left');
-			}
-			var pic = $("<img style='width:150px;height:200px;'>");
+			var pic = $("<img class='msg-img' style='width:150px;height:200px;'>");
 			msgDiv.append(pic);
 			getS3file(msgDiv, msgData.c, msgData.p, msgData.tp, g_ci, 120);
 			break;
+		case 8: //audio
+			if(isMe){
+				msgDiv.addClass('chat-msg-bubble-right');
+			} else {
+				msgDiv.addClass('chat-msg-bubble-left');
+			}
+			msgDiv.html( "[audio]" );
+			break; 
+		case 9: //map
+			if(isMe){
+				msgDiv.addClass('chat-msg-bubble-right');
+			} else {
+				msgDiv.addClass('chat-msg-bubble-left');
+			}
+			msgDiv.html( "[map]" );
+			break; 
 		default: //text or other msg
-			//alert("!"+msgData.tp);
+			if(isMe){
+				msgDiv.addClass('chat-msg-bubble-right');
+			} else {
+				msgDiv.addClass('chat-msg-bubble-left');
+			}
+			msgDiv.html( "&nbsp" );
+			// msgDiv.html( msgData.tp+"<br/>"+msgData.c );
 			break;
 	}
 }
@@ -525,9 +620,9 @@ function sendChat (){
 			]
 		    }),
 	    function(data, status, xhr) {
-			//!!!!!!!!!!!!!!!!!!!!!!
-			//updateChat();
-			//!!!!!!!!!!!!!!!!!!!!!!
+			if(g_bIsPolling){
+				updateChat();
+			}
 			g_needsRolling = true;
 	    }
 	);

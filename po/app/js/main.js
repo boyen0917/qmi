@@ -1408,6 +1408,11 @@ $(function(){
 			$("div[data-sm-act='chat']").show();
 			smHrCliclTimes=0;
 
+			if( g_bIsPolling ){
+				initChatDB();
+				initChatCntDB();
+				pollingInterval();
+			}
 			//彩蛋中的彩蛋
 			supriseYeah();
 		}

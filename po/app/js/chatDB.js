@@ -1,5 +1,7 @@
 
 
+var g_bIsPolling = false;
+
 /*
                                 ███╗   ███╗███████╗ ██████╗                             
                                 ████╗ ████║██╔════╝██╔════╝                             
@@ -41,14 +43,15 @@ function updateChat ( msgs ){
 				//write msg to db
 				g_idb_chat_msgs.put( node );
 
-				// showMsg( object, false );
 			}
-			if( null != windowList ){
-				if( windowList.hasOwnProperty(data.ci) 
-					&& null != windowList[data.ci] 
-					&& false==windowList[data.ci].closed ){
-					$(windowList[data.ci].document).find("button.pollingMsg").trigger("click");
-				}
+		}
+		// showMsg( object, false );
+		if( null != windowList ){
+			if( windowList.hasOwnProperty(data.ci) 
+				&& null != windowList[data.ci] 
+				&& false==windowList[data.ci].closed ){
+				windowList[data.ci].g_msgTmp = data.el;
+				$(windowList[data.ci].document).find("button.pollingMsg").trigger("click");
 			}
 		}
 	}

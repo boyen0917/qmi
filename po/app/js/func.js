@@ -3423,7 +3423,7 @@ $(function(){
 				case 0://文字
 					if(!val.c) break;
 					this_event.find(target_div).show();
-					this_event.find(target_div).html(c[0]);
+					this_event.find(target_div).html( c[0].replaceEmoji() );
 					this_event.find(target_div + "-detail").html(c[1]);
 					break;
 				case 1://網址 寫在附檔區域中
