@@ -74,15 +74,15 @@ $(document).ready(function(){
 
     //header 設定團體名稱
     $("#header .title").html(g_cn);
-
+    $("#header .subTitle").html(g_group.gn);
     
 	//- click "send" to send msg
 	var sendBtn = $("#footer .contents .send");
 	sendBtn.off("click");
 	sendBtn.click( sendChat );
 	var input = $("#footer .contents .input");
-	input.off("keydown");
-	input.keydown(function(e){
+	input.autosize({append: "\n"});
+	input.off("keyup").keyup(function(e){
 		if (e.keyCode == 13 && !e.altKey) {
 			sendChat();
 		}
@@ -144,26 +144,12 @@ function resizeContent (){
 	);
 }
 
-// function initDB (){
-// 	g_idb_chat_msgs = new IDBStore({
-// 	    dbVersion: 1,
-// 	    storeName: 'chat_msgs',
-// 	    keyPath: 'ei',
-// 	    indexes: [
-// 	    	{ name: 'ci_ct',keyPath:['ci','ct']},
-// 	    ]
-// 	    ,onChatDBInit
-//     });
-// }
-
 function onChatDBInit(){
 	var today=new Date();
 	$("#chat-contents").html("<div class='firstMsg'></div>");
 	var timeTag = $("<div class='chat-date-tag'></div>");
 	timeTag.addClass( today.customFormat("_#YYYY#_#M#_#D#") );
 	timeTag.html( getFormatTimeTag(today) );
-	// $("#chat-contents").append( timeTag );
-	// $("#chat-contents").append( "<div></div>" );
 	today.setHours(0);
 	today.setMinutes(0);
 	today.setSeconds(0);
@@ -204,10 +190,6 @@ function getHistoryMsg ( bIsScrollToTop ){
 	    	if(bIsScrollToTop)	scrollToStart();
 	    	g_bIsLoadHistoryMsg = false;
 	    }
-	    // if( 1>=list.length ){
-	    // 	g_bIsEndOfHistory = true;
-	    // 	updateHistoryMsg();
-	    // }
     },{
         index: "gi_ci_ct",
         keyRange: g_idb_chat_msgs.makeKeyRange({
@@ -565,6 +547,11 @@ function showMsg (object, bIsFront){
 			msgDiv.append(pic);
 			break;
 		case 6:
+			if(isMe){
+				msgDiv.addClass('chat-msg-container-right');
+			} else {
+				msgDiv.addClass('chat-msg-container-left');
+			}
 			var pic = $("<img class='msg-img' style='width:150px;height:200px;'>");
 			msgDiv.append(pic);
 			getS3file(msgDiv, msgData.c, msgData.p, msgData.tp, g_ci, 120);
@@ -583,7 +570,50 @@ function showMsg (object, bIsFront){
 			} else {
 				msgDiv.addClass('chat-msg-bubble-left');
 			}
-			msgDiv.html( "[map]" );
+			var mapDiv = $("<div class='msg-map'></div>");
+			mapDiv.html(msgData.a);
+			// mapDiv.tinyMap({
+			// 	 center: {x: msgData.lat, y: msgData.lng},
+			// 	 panControl: 0,
+			// 	 infoWindowAutoClose: 0,
+			// 	 streetViewControl: 0,
+			// 	 zoomControl: 1,
+			// 	 mapTypeControl: 0,
+			// 	 scaleControl: 0,
+			// 	 scrollwheel: 0,
+			// 	 zoom: 16,
+			// 	 marker: [
+	  //   	         {addr: [msgData.lat, msgData.lng], text: msgData.a}
+			// 	 ]
+			// });
+			mapDiv.click(function(){
+				var gallery = window.open("", "", "width=800, height=600");
+				$(gallery.document).ready(function(){
+					setTimeout(function(){
+						var body = $(gallery.document).find("body");
+						body.css("background","black");
+						body.css( "overflow", "hidden" );
+						body.css( "padding", "0" );
+						var this_slide = $("<div></div>");
+						this_slide.css( "margin", "-8px" );
+						this_slide.css("width","800px");
+						this_slide.css("height","600px");
+						this_slide.tinyMap({
+							 center: {x: msgData.lat, y: msgData.lng},
+							 // zoomControl: 0,
+							 mapTypeControl: 0,
+							 // scaleControl: 0,
+							 scrollwheel: 0,
+							 zoom: 16,
+							 marker: [
+				    	         {addr: [msgData.lat, msgData.lng], text: msgData.a}
+							 ]
+						});
+						body.append( this_slide );
+					},300);
+				});
+			});
+			msgDiv.append(mapDiv);
 			break; 
 		default: //text or other msg
 			if(isMe){
@@ -599,11 +629,11 @@ function showMsg (object, bIsFront){
 
 function sendChat (){
 	var inputDom = $("#footer .contents .input");
-	var text = inputDom.html();
+	var text = inputDom.val();
 	if (text.length<=0 ) return;
 
 	var msg = text.replace(/<br>/g,"\n");
-	inputDom.html("");
+	inputDom.val("").trigger('autosize.resize');
 	
 	op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 	    "POST",

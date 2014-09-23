@@ -114,6 +114,7 @@ body {
 }
 .chat-msg-left .group .msg-content{
 	display: inline-block;
+	min-height: 10px;
 }
 /* other's msg name */
 .chat-msg-left .group .name{
@@ -165,7 +166,7 @@ body {
 	color: white;
 	text-align: left;
 	word-wrap: break-word;
-	max-width: 60%;
+	max-width: 63%;
 }
 .chat-msg-bubble-right:after, .chat-msg-bubble-left:after{
 	content: '';
@@ -212,6 +213,29 @@ body {
 	display: inline-block;
 	min-height: 120px;
 }
+.chat-msg-container-right, .chat-msg-container-left{
+	/*padding: 0.3em 0.6em 0.3em 0.5em;
+	border: 1px solid grey;*/
+	border-radius: 1em 1em 1em 1em;
+	display:inline-block;
+	white-space: pre-line;
+	position: relative;
+	box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);
+}
+.chat-msg-container-right{
+	/*border-color: rgb(75,124,219);
+	background: rgb(75,124,219);
+	color: white;*/
+	text-align: left;
+	word-wrap: break-word;
+	max-width: 63%;
+}
+.chat-msg-container-left{
+	/*border-color: #72DAFD;
+	background: #72DAFD;*/
+	margin-left: 5px;
+	max-width: 76%;
+}
 .msg-img{
 	border-radius: 10px;
 	box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);
@@ -219,6 +243,14 @@ body {
 .msg-sticker{
 	text-align: left;
 	width: 150px;
+}
+.msg-map{
+	border-radius: 10px;
+	margin-right: 10px;
+	text-decoration: underline;
+	cursor:pointer;
+	margin: 6px;
+	display: block;
 }
 /* ------ end chat -------------*/
  
@@ -278,6 +310,7 @@ body {
 	vertical-align: bottom;
 	min-height: 25px;
 	margin: 0 5px;
+	transition: height 0.2s;
 	/*
 	vertical-align: 50%;
 	min-height: 30px;
