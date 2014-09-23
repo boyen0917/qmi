@@ -11,6 +11,10 @@ body {
     background-position: center; 
 	background-size:cover;
 }
+
+.emoji{
+	max-height: 20px;
+}
  
 /* 
               ██╗  ██╗███████╗ █████╗ ██████╗ ███████╗██████╗           
@@ -69,9 +73,9 @@ body {
 }
 
 #chat-contents{
-	width: 84%;
-	margin-left: 8%;
-	margin-right: 8%;
+	width: 90%;
+	margin-left: 4%;
+	margin-right: 5%;
 }
 
 #chat-toBottom{
@@ -96,20 +100,24 @@ body {
 	display: inline-block;
 	vertical-align: top;
 	margin-right: 10px;
-	height: 50px;
-	width: 50px;
+	height: 40px;
+	width: 40px;
 	overflow-y: hidden;
 	border-radius: 8px;
     border:1px solid #abbabf;
 }
 /* other's msg right(name, msg, time) */
-.chat-msg-left div:nth-child(2){
+.chat-msg-left .group{
 	display: inline-block;
-	max-width: 73%;
+	max-width: 84%;
+	word-wrap: break-word;
+}
+.chat-msg-left .group .msg-content{
+	display: inline-block;
 }
 /* other's msg name */
-.chat-msg-left div:nth-child(2) .name{
-	font-size: 14px;
+.chat-msg-left .group .name{
+	font-size: 12px;
 	margin-bottom: 3px;
 }
 .chat-msg-right, .chat-msg-left{
@@ -119,9 +127,11 @@ body {
 .chat-msg-right table, .chat-msg-left table{
 	display: inline-block;
 	vertical-align: middle;
-	margin-right: 2px;
+	margin-right: 4px;
 	margin-left: 2px;
 	margin-bottom: 5px;
+	max-width: 40px;
+	white-space: nowrap;
 }
 .chat-cnt{
 	/*display: inline-block;*/
@@ -137,19 +147,14 @@ body {
 }
 
 .chat-msg-time{
-	display:inline-block;
 	font-size: 8px;
-	margin-left: 3px;
-	margin-right: 10px;
-	max-width: 20px;
 	color: gray;
 }
 .chat-msg-bubble-right, .chat-msg-bubble-left{
-	padding: 0.5em 0.7em;
+	padding: 0.3em 0.6em 0.3em 0.5em;
 	border: 1px solid grey;
 	border-radius: 1em 1em 1em 1em;
 	display:inline-block;
-	max-width: 65%;
 	white-space: pre-line;
 	position: relative;
 	box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);
@@ -159,6 +164,8 @@ body {
 	background: rgb(75,124,219);
 	color: white;
 	text-align: left;
+	word-wrap: break-word;
+	max-width: 60%;
 }
 .chat-msg-bubble-right:after, .chat-msg-bubble-left:after{
 	content: '';
@@ -166,25 +173,25 @@ body {
 	border-style: solid;
 	display: block;
 	width: 0;
-	top: 9px;
+	top: 8px;
 }
 .chat-msg-bubble-right:after
 {
 	border-width: 3px 0 8px 17px;
 	border-color: transparent rgb(75,124,219);
-	right: -14px;
+	right: -11px;
 }
 .chat-msg-bubble-left{
 	border-color: #72DAFD;
 	background: #72DAFD;
-	margin-left: 11px;
-	max-width: 73%;
+	margin-left: 5px;
+	max-width: 76%;
 }
 .chat-msg-bubble-left:after
 {
-	border-width: 3px 17px 8px 0;
+	border-width: 2px 13px 8px 0;
 	border-color: transparent #72DAFD;
-	left: -17px;
+	left: -12px;
 }
 .chat-date-tag{
 	display: table;
@@ -205,10 +212,14 @@ body {
 	display: inline-block;
 	min-height: 120px;
 }
-.chat-msg-pic-right img, .chat-msg-pic-left img{
+.msg-img{
 	border-radius: 10px;
 	box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);
-} 
+}
+.msg-sticker{
+	text-align: left;
+	width: 150px;
+}
 /* ------ end chat -------------*/
  
 /* 
@@ -223,7 +234,7 @@ body {
 	background: linear-gradient(to bottom, white 0%,#E5E8EB 100%);
 	border-top: 1px solid #666;
 	bottom:0;
-	max-height:70px;
+	/*max-height:70px;*/
 	left:0;
 	position:fixed;
 	width:100%;

@@ -133,7 +133,7 @@ $(function(){
             if(encode_val) str.splice(i,1,encode_val);
         });
 
-        return str.join(" ");
+        return str.join(" ").replaceEmoji();
 
     }
 
