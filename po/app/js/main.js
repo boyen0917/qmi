@@ -122,7 +122,8 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		cns.debug("side-menu:",$("#side-menu").width());
+		// idbPutTimelineEvent(9999999999999);
+		idb_timeline_events.remove("G00000170DO_T000003Q0Dl_E000002c09r");
 		//彩蛋鑰匙
 		supriseKey();
 		

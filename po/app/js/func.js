@@ -683,7 +683,7 @@ $(function(){
             "ui":ui,
 			"at":at, 
 			"li":lang
-			            };
+		};
 		var method = "get";
 		var result = ajaxDo(api_name,headers,method,false);
 		result.complete(function(data){
@@ -701,6 +701,55 @@ $(function(){
 	}
 	
 	detailLikeStringMake = function (this_event){
+
+		var epl = this_event.data("parti-list");
+		//gu gi 是全域
+		var me_pos = $.inArray(gu,epl);
+		
+		var guAll = $.lStorage(ui)[gi].guAll;
+        var me_gu = guAll[epl[me_pos]];
+		var like_str_arr = [];
+
+        this_event.find(".st-reply-like-area").show();
+
+        switch(true){
+        	//陣列空的 隱藏 區域
+        	case (epl.length == 0) :
+                like_str_arr[1] = "目前沒人按讚";
+                break;
+            //你 按讚
+            case ( typeof me_gu != "undefined" && epl.length == 1 ) :
+                like_str_arr[0] = "你";
+                like_str_arr[1] = "按讚";
+                break;
+            //林小花 按讚
+            case ( !me_gu && epl.length == 1 ) :
+                like_str_arr[0] = guAll[epl[0]].nk;
+                like_str_arr[1] = "按讚";
+                break;
+            //你、林小花 按讚
+            case ( typeof me_gu != "undefined" && epl.length == 2 ) :
+                like_str_arr[0] = "你、 " + (me_pos ? guAll[epl[0]].nk : guAll[epl[1]].nk);
+                like_str_arr[1] = "按讚";
+                break;
+            //林小花 及其他？個人按讚
+            case ( !me_gu && epl.length > 2 ) :
+            	like_str_arr[0] = guAll[epl[0]].nk;
+                like_str_arr[1] = " 及其他" + (epl.length-1) + "人按讚";
+                break;
+            //你、林小花 按讚
+            case ( typeof me_gu != "undefined" && epl.length > 2 ) :
+                like_str_arr[0] = "你、 " + (me_pos ? guAll[epl[0]].nk : guAll[epl[1]].nk);
+                like_str_arr[1] = " 及其他" + (epl.length-1) + "人按讚";
+                break;
+        }
+        
+        this_event.find(".st-reply-like-area span:eq(0)").html(like_str_arr[0]);
+        this_event.find(".st-reply-like-area span:eq(1)").html(like_str_arr[1]);
+	}
+
+
+	detailLikeStringMake_bak = function (this_event){
 		var epl = this_event.data("parti-list");
 
 		//gu gi 是全域
@@ -2856,12 +2905,12 @@ $(function(){
 	    	
 	    	if(data.status != 200) return false;
 	    	var timeline_list = $.parseJSON(data.responseText).el;
-
+	    	cns.debug("timeline_list:",JSON.stringify(timeline_list,null,2));
+	    	// return false;
 	    	//資料個數少於這個數量 表示沒東西了
 	        if(timeline_list.length < 10){
 	        	//沒資料的確認 加入no data 
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");
-	    		cns.debug("沒資料了？：",timeline_list);
 	        	//關閉timeline loading 開啟沒資料圖示
 	        	setTimeout(function(){
 	        		$(".st-feedbox-area-bottom > img").hide();
@@ -2875,8 +2924,10 @@ $(function(){
 
 	    	//存db 先刪後存 因為刪除事件是不回傳的
 	    	//刪db
+	    	// timeline_list
+	    	// cns.debug("remove timeline_list:",timeline_list);
 	    	idbRemoveTimelineEvent(timeline_list,ct_timer);
-
+	    	// return false;
 	    	//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
 	    	if(event_tp == "00"){
 	    		//存db	    	
@@ -2890,14 +2941,14 @@ $(function(){
 	                if(tp > 2){
 	                	val.tp = "03" ;
 	                }
-
-	                idb_timeline_events.put(val);
+	                cns.debug("put ei:",val);
+	                // idb_timeline_events.put(val);
 	            });
 	    	}
 
             //存完後改timeline 
             $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
+    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,"[idb]");
 	    	});
 	    });
 	}
@@ -2908,9 +2959,10 @@ $(function(){
 		var event_tp = $("#page-group-main").data("navi") || "00";
 		var ei_arr = [];
 		for(obj in timeline_list){
+			cns.debug("timeline_list[obj]:",timeline_list[obj]);
 			ei_arr.push(timeline_list[obj].ei);
 		}
-
+		cns.debug("ei_arr:",ei_arr);
 		//判斷類別
 		var idb_index,idb_keyRange;
 		if(!event_tp || event_tp == "00"){
@@ -2928,20 +2980,22 @@ $(function(){
               lower: [gi,event_tp,last_ct]
             })
 		}
-
+		cns.debug("remove idb_keyRange:",idb_keyRange);
 		//刪掉server回傳的最後一筆和ct_timer之間的資料
 		idb_timeline_events.iterate(function(item){
 			//刪db
+			cns.debug("remove ei:",item.ei);
 	    	idb_timeline_events.remove(item.ei);
 
 	    	//刪ui裡面被刪除的event
 	    	//不分type就是要一起刪
 
-	    	var this_event = $(".feed-subarea").find("[data-event-id="+ item.ei +"]");
+	    	
 	    	if($.inArray(item.ei,ei_arr) == -1){
+	    		var this_event = $(".feed-subarea").find("[data-event-id="+ item.ei +"]");
+	    		cns.debug("zzzzqqqq");
 	    		this_event.remove();
 	    	}
-	    	// if(this_event.length != 0) this_event.remove();
 	    },{
             index: idb_index,
             keyRange: idb_keyRange,
@@ -2956,8 +3010,9 @@ $(function(){
 	}
 
 
-	timelineBlockMake = function(this_event_temp,timeline_list,is_top){
-			
+	timelineBlockMake = function(this_event_temp,timeline_list,is_top,yo){
+		var yo = yo || "";
+
 		var event_tp = $("#page-group-main").data("navi") || "00";
 		var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
     	var top_subbox = ori_selector.find(".st-sub-box:eq(0)");
@@ -2992,6 +3047,7 @@ $(function(){
         	//判斷是否為更新事件
         	var this_event = selector.find("[data-event-id="+ val.ei +"]");
         	if(this_event.length){
+        		this_event.find(".st-sub-time").append("u" + yo);
         		//如果是更新事件 目前只重改按讚狀態 其餘以後再說
         		this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
 	    		this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
@@ -3020,6 +3076,7 @@ $(function(){
 
     		//寫新event(等同下拉更新) 判斷有無第一個event 且 時間大於此event的ct
         	if(top_subbox.length && val.meta.ct > top_subbox.data("ct")){
+        		this_event.find(".st-sub-time").append("n" + yo);
         		//表示這是目前timeline沒有的事件
         		method = "before";
         		selector = top_subbox;
@@ -3038,7 +3095,7 @@ $(function(){
 
     		var time = new Date(val.meta.ct);
     		var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
-    		this_event.find(".st-sub-time").html(time_format);
+    		this_event.find(".st-sub-time").html(time_format + ":" + i + yo);
     		
     		//發佈對象
     		var tu_str = "所有人";
@@ -3175,6 +3232,7 @@ $(function(){
 
 		//下拉更新就不需要資料庫了
 		if(is_top) return false;
+		// return false;
 
 		//判斷類別
 		var idb_index,idb_keyRange;
@@ -3194,10 +3252,14 @@ $(function(){
 
     	//同時先將資料庫資料取出先寫上
 	    idb_timeline_events.limit(function(timeline_list){
+	    	// cns.debug("limit:",timeline_list.length);
 	    	//寫timeline
 	    	load_show = false;
 	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
     			timelineBlockMake($(this).find(".st-sub-box"),timeline_list);
+
+    			//躲在這裡 
+    			// idbPutTimelineEvent(ct_timer,is_top);
 	    	});
 	    },{
             index: idb_index,
@@ -3280,7 +3342,7 @@ $(function(){
     		if(data.status != 200) return false;
 
     		var s_data = $.parseJSON(data.responseText).el;
-    		cns.debug("s_data:",s_data);
+
     		if(s_data.length != 0){
     			var es_obj = {}
 				$.each(s_data,function(i,val){
@@ -3990,14 +4052,14 @@ $(function(){
 		        		img_selector.attr("src","images/timeline/timeline_feedbox_icon_" + act + "_blue.png")
 		        		count_selector.html(count_selector.html()*1+1);
 
-		        		this_event.find(".st-like-btn").html("收回讚");
+		        		if(etp == 1) this_event.find(".st-like-btn").html("收回讚");
 
 		        		this_status = true;
 		        	}else{
 		        		img_selector.attr("src","images/timeline/timeline_feedbox_icon_" + act + ".png")
 		        		count_selector.html(count_selector.html()*1-1);
 
-		        		this_event.find(".st-like-btn").html("讚");
+		        		if(etp == 1) this_event.find(".st-like-btn").html("讚");
 		        	}
 
 	        	}else{
@@ -4027,6 +4089,8 @@ $(function(){
 	        		}
 
 	        	}
+
+	        	if(!event_status[this_ei]) event_status[this_ei] = {};
 
 	        	//api成功才存回
 	        	switch(etp){
@@ -4824,7 +4888,7 @@ $(function(){
         };
         var body = {
             id: "+886980922917",
-            tp: 0,
+            tp: 1,
             pw:toSha1Encode("111111")
         };
         var method = "post";

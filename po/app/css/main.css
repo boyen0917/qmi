@@ -2393,7 +2393,6 @@ img.auo {
 .st-reply-like-area {
 	height: 50px;
 	border-bottom: 1px solid rgb(204,204,204);
-	line-height: 50px;
 	padding-left: 15px;
 	position: relative;
 }
@@ -2440,7 +2439,18 @@ img.auo {
     margin: -1px 5px;
 }
 
-.st-reply-like-area img:nth-child(3) {
+.st-reply-like-area span:nth-child(2) {
+	max-width: 50%;
+	overflow: hidden;
+	height: 31px;
+	display: inline-block;
+	white-space: nowrap;
+	position: relative;
+	top: 14px;
+	text-overflow: ellipsis;
+}
+
+.st-reply-like-area img:nth-child(4) {
 	width: 18px;
 	position: absolute;
 	right: 8px;
