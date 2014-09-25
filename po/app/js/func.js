@@ -4470,11 +4470,11 @@ $(function(){
     	pollingCmds(cmds);
 
     	if(msgs&&msgs.length>0){
-    		// updateChat(msgs);
+    		updateChat(msgs);
     	}
 
     	if(ccs&&ccs.length>0){
-    		// updateChatCnt(ccs);
+    		updateChatCnt(ccs);
     	}
     }
 

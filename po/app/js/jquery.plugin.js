@@ -97,7 +97,7 @@
 		'&#9(6(3[2-9]|[4-9][0-9])|[78][0-9]{2}|9([0-7][0-9]|8[0-3]));&#65039;'
 	];
 	String.prototype.replaceEmoji = function () {
-		console.debug( JSON.stringify(this) );
+		// console.debug( JSON.stringify(this) );
 		return this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
 			var tmp = [];
 			var n = match.lastIndexOf(";&#");
@@ -124,7 +124,7 @@
     	'&#5(5(29[6-9]|[3-9][0-9]{2})|6([0-2][0-9]{2}|3[01][0-9]));&#5(6(3[2-9][0-9]|[4-9][0-9]{2})|7([0-2][0-9]{2}|3([0-3][0-9]|4[0-3])));'
 	];
 	String.prototype.replaceUtf16 = function () {
-		console.debug( JSON.stringify(this) );
+		// console.debug( JSON.stringify(this) );
 		return this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
 			var tmp = [];
 			var n = match.lastIndexOf(";&#");

@@ -87,6 +87,8 @@ $(function(){
 	//timeline置頂millisecond
 	top_timer_ms = 5000;
 
+	//title
+	$("title").html("FIND");
 
 
 	// ajax setting
@@ -217,7 +219,7 @@ $(function(){
 	
 
 	//debug control 
-	setDebug(true);
+	setDebug(false);
 
 	function setDebug(isDebug) {
       if (isDebug) {

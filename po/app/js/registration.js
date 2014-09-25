@@ -133,6 +133,7 @@ $(function(){
 
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
+        	cns.debug("data:",data);
         	var login_result = $.parseJSON(data.responseText);
         	// cns.debug("login resutl:",JSON.stringify(login_result));
         	// return false;
