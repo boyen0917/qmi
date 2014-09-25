@@ -87,6 +87,8 @@ $(function(){
 	//timeline置頂millisecond
 	top_timer_ms = 5000;
 
+	//title
+	$("title").html("FIND");
 
 
 	// ajax setting
@@ -109,7 +111,6 @@ $(function(){
 		$(".ajax-screen-lock").show();
 	});
 	$(document).ajaxComplete(function(data) {
-		cns.debug("ajax complete");
 		//特別的
 		if(s_load_show) return false;
 
@@ -218,7 +219,7 @@ $(function(){
 	
 
 	//debug control 
-	setDebug(true);
+	setDebug(false);
 
 	function setDebug(isDebug) {
       if (isDebug) {

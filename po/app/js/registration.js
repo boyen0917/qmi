@@ -127,12 +127,13 @@ $(function(){
         };
         var body = {
             id: countrycode + phone_id.substring(1),
-            tp:"0",//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
+            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
             pw:toSha1Encode(password)
         };
 
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
+        	cns.debug("data:",data);
         	var login_result = $.parseJSON(data.responseText);
         	// cns.debug("login resutl:",JSON.stringify(login_result));
         	// return false;
@@ -466,7 +467,7 @@ $(function(){
         var method = "put";
         var body = {
                 id: $(document).data("phone-id"),
-                tp: 0,//多裝置代碼 0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
+                tp: 1,//多裝置代碼 0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
                 ud: $(document).data("device-token"),
                 pw: toSha1Encode($(document).data("password"))
             }

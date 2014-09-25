@@ -151,7 +151,7 @@ $(function(){
                 buf.unshift(['&#', char_code, ';'].join(''));
             }
          }
-      return buf.join('');
+    	return buf.join('');
     };
 
     //秒數轉成時分秒
