@@ -1416,8 +1416,8 @@ $(function(){
 			$("div[data-sm-act='chat']").show();
 			smHrCliclTimes=0;
 
+			initChatDB();
 			if( g_bIsPolling ){
-				initChatDB();
 				initChatCntDB();
 				pollingInterval();
 			}
