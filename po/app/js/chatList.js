@@ -63,7 +63,7 @@ function updateChatList( extraCallBack ){
 					currentGroup["chatAll"][room.ci] = room;
 				});
 
-				// console.debug( JSON.stringify(userData) );
+				// cns.debug( JSON.stringify(userData) );
 		    	$.lStorage(ui, userData);
 		    	showChatList();
 		    }
@@ -177,10 +177,10 @@ function showChatList(){
 			        limit: 1,
 			        order: "DESC",
 			        onEnd: function(result){
-			            console.debug("onEnd:",result.ci + " " + result.ct);
+			            cns.debug("onEnd:",result.ci + " " + result.ct);
 			        },
 			        onError: function(result){
-			            console.debug("onError:",result);
+			            cns.debug("onError:",result);
 			        }
 			    });
 
@@ -316,7 +316,7 @@ function showNewRoomPage(){
 
 	$(".newChat-content .mem .checkbox").off("click");
 	$(".newChat-content .mem .checkbox").click(function(){
-		// console.debug($(this).attr("check"));
+		// cns.debug($(this).attr("check"));
 	    if( "false"==$(this).attr("check") ){
 	    	$(this).attr("check", "true");
 	    	addMember( $(this).data("memid"), $(this).data("memname") );
@@ -446,7 +446,7 @@ function showNewRoomDetailPage(){
 
 function requestNewChatRoom(){
 	var text = $(".newChatDetail table .input").val();
-	// console.debug( text );
+	// cns.debug( text );
 	if( !text || text.length==0 ){
 		if( g_newChatMemList.length > 1 ){
 			alert( $.i18n.getString("enterRoomName") );
@@ -470,12 +470,12 @@ function requestNewChatRoom(){
         gul: arr
     };
 
-    // console.debug( JSON.stringify(body) );
+    // cns.debug( JSON.stringify(body) );
     var method = "post";
     ajaxDo(api_name,headers,method,true,body).complete(function(data){
     	if(data.status == 200){
     		var result = $.parseJSON(data.responseText);
-    		// console.debug(result);
+    		// cns.debug(result);
     		$.mobile.changePage("#page-group-main");
     		updateChatList( function(){
     			if(result.ci){

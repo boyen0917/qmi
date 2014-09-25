@@ -116,4 +116,26 @@
 		});
 	};
 
+	//glorialin
+	//遇到一個utf-16的"𥚃"字...(&#55381;&#56963; 一般"裡"為&#35041;)
+	//不過emoji parse出來會變框框 得另外取代
+	//目前只有那個裡要取代兩次好像不是很有效率, 暫時先不套用
+	var utf16Range = [	//utf16 surrogate pair range
+    	'&#5(5(29[6-9]|[3-9][0-9]{2})|6([0-2][0-9]{2}|3[01][0-9]));&#5(6(3[2-9][0-9]|[4-9][0-9]{2})|7([0-2][0-9]{2}|3([0-3][0-9]|4[0-3])));'
+	];
+	String.prototype.replaceUtf16 = function () {
+		console.debug( JSON.stringify(this) );
+		return this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
+			var tmp = [];
+			var n = match.lastIndexOf(";&#");
+			tmp.push( parseInt(match.substring(2,n)) );
+			tmp.push( parseInt(match.substring(n+3,match.length-1)) );
+			var oriCode = 0xffffffff;
+			oriCode = ((tmp[0]-55296)<<10)>>>0;
+			var vl=(tmp[1]-56320)>>>0;
+			oriCode = (oriCode | vl | 0x10000);
+			return String.fromCharCode( tmp[0],tmp[1] );
+		});
+	};
+
 })(jQuery);
