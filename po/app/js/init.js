@@ -109,7 +109,6 @@ $(function(){
 		$(".ajax-screen-lock").show();
 	});
 	$(document).ajaxComplete(function(data) {
-		cns.debug("ajax complete");
 		//特別的
 		if(s_load_show) return false;
 

@@ -1107,7 +1107,7 @@
         onSuccess(result);
       }
       return this.iterate(function (item,cursor) {
-        if(count <= options.limit){
+        if(count <= options.limit-1){
           result.push(item);
 
           count++;
