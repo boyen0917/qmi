@@ -79,7 +79,6 @@ $(function(){
         	setTimeout(function(){
         		timelineListWrite();
         	},1000);
-        	
         }
 
 	}else{
@@ -90,13 +89,6 @@ $(function(){
     		getLoginDataForTest();
     	}
 	}
-
-	// url參數 clear 存在 就清 local storage
-    clear = $.getUrlVar('clear');
-    if(clear == 123456) {
-    	localStorage.clear();
-	}
-
 
 	$( window ).resize(function() {
 		if($(".st-top-event").length < 2) return false;
@@ -117,18 +109,22 @@ $(function(){
 		//   	}, 500, function() {
 		// 	topBarMake($(".st-top-bar-area"),$(".st-top-event").length);  		
 		// 	$(".st-top-bar-area").animate({opacity: 1});
-	 //  	});
+	 	//  });
 	});
 
 	//test
 	$(".header-group-name").click(function(){
-		// idbPutTimelineEvent(9999999999999);
-		idb_timeline_events.remove("G00000170DO_T000003Q0Dl_E000002c09r");
+		// G00000170DO_T000003Q0Dl_E000002f07D
+		// var this_event = $(".feed-subarea").find("[data-event-id=G00000170DO_T000003Q0Dl_E000002f07D]");
+		// this_event.find(".st-task-work-detail").html("");
+
+		// polling();
+
 		//彩蛋鑰匙
 		supriseKey();
 		
-		if($(document).data("suprise") == 101) 
-			pollingInterval();
+		// if($(document).data("suprise") == 101) 
+		// 	pollingInterval();
 	});
 
 
@@ -667,7 +663,7 @@ $(function(){
 
 	
 	//點選開啟圖庫
-	$(document).on("click",".img-show",function(){
+	$(document).on("click",".img-show",function(e){
 		var this_img_area = $(this);
 
 		var this_s32 = this_img_area.find(".auo").attr("src");
@@ -866,9 +862,23 @@ $(function(){
 
 
 	//為了排除複製 滑鼠按下少於0.1秒 判斷為click  暫時不做 
-	//detail view
-	$(document).on("click",".st-sub-box-1, .st-sub-box-2",function(e){
+	$(document).on("mousedown",".st-sub-box-1, .st-sub-box-2",function(e){
+		var this_event = $(this);
 
+		this_event.data("trigger",true);
+		setTimeout(function(){
+			this_event.data("trigger",false);
+		},300);
+			
+		
+	});
+
+	$(document).on("mouseup",".st-sub-box-1, .st-sub-box-2",function(e){
+		if($(this).data("trigger")) $(this).trigger("detailShow");
+	});
+
+	//detail view
+	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2",function(){
 		var this_event = $(this).parent();
 		var this_ei = this_event.data("event-id");
 		//此則timeline種類
@@ -883,10 +893,12 @@ $(function(){
 
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp);
-		this_event.find(".st-reply-all-content-area").html("");
-		// if(!detail_chk){
-		// 	return false;
-		// }
+		
+		if(!detail_chk){
+			this_event.find(".st-reply-all-content-area").html("");
+			this_event.find(".st-vote-all-ques-area").html("");
+			return false;
+		}
 		
 		//此則動態的按贊狀況
 		getThisTimelinePart(this_event,this_event.find(".st-reply-like-area img:eq(0)"),1);
@@ -1418,7 +1430,7 @@ $(function(){
 			smHrCliclTimes=0;
 
 			//彩蛋中的彩蛋
-			supriseYeah();
+			// supriseYeah();
 		}
 	});
 });  

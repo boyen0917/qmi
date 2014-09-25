@@ -715,6 +715,7 @@ $(function(){
         switch(true){
         	//陣列空的 隱藏 區域
         	case (epl.length == 0) :
+        		like_str_arr[0] = "";
                 like_str_arr[1] = "目前沒人按讚";
                 break;
             //你 按讚
@@ -1056,6 +1057,7 @@ $(function(){
 			return true;
 		}else{
 			//表示有detail內容了 不動作
+			this_event.data("detail-content",false);
 			return false;
 		}
 	}
@@ -1171,8 +1173,8 @@ $(function(){
 	}
 
 	voteContentMake = function (this_event,li){
-		$.each(li,function(v_i,v_val){
 
+		$.each(li,function(v_i,v_val){
 			this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html .st-vote-ques-area',function(){
 				var this_ques = $(this).find(".st-vote-ques-area");
 				
@@ -2874,7 +2876,9 @@ $(function(){
 	//動態消息列表
 	//先從資料庫拉資料 另外也同時從server拉資料存資料庫 再重寫
 	idbPutTimelineEvent = function (ct_timer,is_top){
+
 		var event_tp = $("#page-group-main").data("navi") || "00";
+
 	    //製作timeline
 	    var api_name = "groups/"+ gi +"/timelines/"+ ti_feed +"/events";
 	    if(ct_timer){
@@ -2905,7 +2909,7 @@ $(function(){
 	    	
 	    	if(data.status != 200) return false;
 	    	var timeline_list = $.parseJSON(data.responseText).el;
-	    	cns.debug("timeline_list:",JSON.stringify(timeline_list,null,2));
+	    	// cns.debug("timeline_list:",JSON.stringify(timeline_list,null,2));
 	    	// return false;
 	    	//資料個數少於這個數量 表示沒東西了
 	        if(timeline_list.length < 10){
@@ -2942,13 +2946,13 @@ $(function(){
 	                	val.tp = "03" ;
 	                }
 	                cns.debug("put ei:",val);
-	                // idb_timeline_events.put(val);
+	                idb_timeline_events.put(val);
 	            });
 	    	}
 
             //存完後改timeline 
             $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,"[idb]");
+    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
 	    	});
 	    });
 	}
@@ -2980,6 +2984,7 @@ $(function(){
               lower: [gi,event_tp,last_ct]
             })
 		}
+
 		cns.debug("remove idb_keyRange:",idb_keyRange);
 		//刪掉server回傳的最後一筆和ct_timer之間的資料
 		idb_timeline_events.iterate(function(item){
@@ -3010,9 +3015,7 @@ $(function(){
 	}
 
 
-	timelineBlockMake = function(this_event_temp,timeline_list,is_top,yo){
-		var yo = yo || "";
-
+	timelineBlockMake = function(this_event_temp,timeline_list,is_top){
 		var event_tp = $("#page-group-main").data("navi") || "00";
 		var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
     	var top_subbox = ori_selector.find(".st-sub-box:eq(0)");
@@ -3047,7 +3050,6 @@ $(function(){
         	//判斷是否為更新事件
         	var this_event = selector.find("[data-event-id="+ val.ei +"]");
         	if(this_event.length){
-        		this_event.find(".st-sub-time").append("u" + yo);
         		//如果是更新事件 目前只重改按讚狀態 其餘以後再說
         		this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
 	    		this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
@@ -3076,7 +3078,7 @@ $(function(){
 
     		//寫新event(等同下拉更新) 判斷有無第一個event 且 時間大於此event的ct
         	if(top_subbox.length && val.meta.ct > top_subbox.data("ct")){
-        		this_event.find(".st-sub-time").append("n" + yo);
+        		this_event.find(".st-sub-time").append("n");
         		//表示這是目前timeline沒有的事件
         		method = "before";
         		selector = top_subbox;
@@ -3095,7 +3097,7 @@ $(function(){
 
     		var time = new Date(val.meta.ct);
     		var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
-    		this_event.find(".st-sub-time").html(time_format + ":" + i + yo);
+    		this_event.find(".st-sub-time").html(time_format);
     		
     		//發佈對象
     		var tu_str = "所有人";
@@ -3735,7 +3737,9 @@ $(function(){
 		});
 
 		//點選開啟圖庫
-		this_gallery.find(".st-attach-img-area").click(function(){
+		this_gallery.find(".st-attach-img-area").mousedown(function(e){
+			cns.debug("fuck");
+			e.stopPropagation();
 			var this_img_area = $(this);
 			
 			var gallery_str = "";
@@ -4289,26 +4293,26 @@ $(function(){
 			]
 		};
 
-			var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
+		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
 
-	        var headers = {
-	                 "ui":ui,
-	                 "at":at, 
-	                 "li":lang,
-	                     };
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
 
-	        var method = "post";
-	        var result = ajaxDo(api_name,headers,method,false,body);
-	        result.complete(function(data){
+        var method = "post";
+        var result = ajaxDo(api_name,headers,method,false,body);
+        result.complete(function(data){
 
-	        	//重新讀取detail
-	        	// popupShowAdjust("","回覆成功");
+        	//重新讀取detail
+        	// popupShowAdjust("","回覆成功");
 
-	        	setTimeout(function(){
-					reloadDetail(this_event);
-	        	},400);
+        	setTimeout(function(){
+				reloadDetail(this_event);
+        	},400);
 
-	        });
+        });
 	}
 
 	reloadDetail = function(this_event){
@@ -4375,7 +4379,7 @@ $(function(){
     	var local_pollingData = $.lStorage("_pollingData") || {cnts:{},ts:{}};
 
     	var polling_timer = local_pollingData.ts.pt || new Date().getTime();
-
+    	polling_timer = 1411626383762;
     	var api_name = "/sys/polling?pt=" + polling_timer;
 
         var headers = {
@@ -4410,14 +4414,13 @@ $(function(){
                 //寫入數字
 		        pollingCountsWrite(new_pollingData);
 
-                
                 // cns.debug("api updata:",JSON.stringify($.parseJSON(data.responseText),null,2));
                 // cns.debug("polling timer:",polling_timer);
 
                 //寫入cnts數字
                 // $(".sm-group-area[data-gi=G000000209m]")
 
-                //不能在這邊存 要等cmd和 ccs跑完才能存!? 那不就要等到聊天做完...
+                //不能在這邊存 
         		$.lStorage("_pollingData",new_pollingData);
         	}
         });
@@ -4428,50 +4431,67 @@ $(function(){
     	var gcnts = polling_data.gcnts;
     	var msgs = polling_data.msgs;
     	var ccs = polling_data.ccs;
+    	var cmds = polling_data.cmds;
 
     	if(cnts){
     		$.each(cnts,function(i,val){
 	    		//是否為當下團體
 	    		if(gi == val.gi){
-	    			if(val.A1){
+	    			if(val.A1 > 0){
 	    				$(".sm-small-area[data-sm-act=feed]").find(".sm-count").html(countsFormat(val.A1)).show();
 	    			}
-	    			if(val.A2){
+	    			if(val.A2 > 0){
 	    				// $(".sm-small-area[data-sm-act=chat]").find(".sm-count").html(countsFormat(val.A2)).show();
 	    			}
-	    			if(val.A3){
+	    			if(val.A3 > 0){
 	    				$(".sm-small-area[data-sm-act=chat]").find(".sm-count").html(countsFormat(val.A3)).show();
 	    			}
-	    			if(val.A4){
+	    			if(val.A4 > 0){
 	    				// $(".sm-small-area[data-sm-act=]").find(".sm-count").html(countsFormat(val.A4)).show();
 	    			}
 	    		}
 
-	    		if(val.A5){
+	    		if(val.A5 > 0){
 	    			$(".sm-group-area[data-gi=" + val.gi + "]").find(".sm-count").html(countsFormat(val.A5)).show();
 	    		}
 	    	});
     	}
 
-    	if(gcnts.G1){
+    	if(gcnts.G1 > 0){
     		$(".sm-group-cj-btn span").html(gcnts.G1).show();
     	}
-    	if(gcnts.G2){
+    	if(gcnts.G2 > 0){
     		//最新消息
     	}
-    	if(gcnts.G3){
+    	if(gcnts.G3 > 0){
     		//鈴鐺
     	}
 
+    	pollingCmds(cmds);
+
     	if(msgs&&msgs.length>0){
-    		console.debug( msgs );
-    		updateChat(msgs);
+    		// updateChat(msgs);
     	}
 
     	if(ccs&&ccs.length>0){
-    		// console.debug( ccs );
-    		updateChatCnt(ccs);
+    		// updateChatCnt(ccs);
     	}
+    }
+
+    pollingCmds = function(cmds){
+    	cns.debug("fuck2");
+    	$.each(cmds,function(i,val){
+    		cns.debug("fuck arr");
+    		switch(val.tp){
+    			case 1://timeline list
+    			cns.debug("fuck1");
+    				if(val.pm.gi == gi) {
+    					cns.debug("fuck");
+    					idbPutTimelineEvent();
+    				}
+    				break;
+    		}
+    	});
     }
 
     countsFormat = function(num){
@@ -4926,8 +4946,8 @@ $(function(){
 			if(suprise != 0 || suprise == 3) clearTimeout(suprise_timer);
 
 			if(suprise == 3){
-				alert("取得\"2號彩蛋\"的鑰匙！");
 				$(document).data("suprise",100);
+				pollingInterval();
 				return false;
 			}
 			suprise++;
@@ -4937,6 +4957,8 @@ $(function(){
 			suprise_timer = setTimeout(function(){
 				$(document).data("suprise",0);
 			},300);
+		}else{
+			pollingInterval();
 		}
     };
 

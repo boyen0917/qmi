@@ -2003,26 +2003,27 @@ img.auo {
 
 .st-work-option-tu {
 	position: absolute;
-	right: 5px;
+	right: 0px;
 	top: 15px;
-	width: 80px;
+	width: 24%;
 	white-space: nowrap;
 	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .st-work-option-tu img {
+	position: relative;
 	top: 2px;
 	width: 17px;
 	margin-right: 5px;
 }
 
 .st-work-option > span {
-	width: 70%;
+	width: 67%;
 	display: -webkit-box;
 	margin-top: 3px;
+	word-break: break-all;
 }
-
-
 
 
 .st-vote-detail-desc {
