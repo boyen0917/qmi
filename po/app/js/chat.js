@@ -84,18 +84,19 @@ $(document).ready(function(){
 	sendBtn.click( sendChat );
 	var input = $("#footer .contents .input");
 	// input.autosize({append: "\n"});
-	input.off("keyup").keyup(function(e){
+	input.off("keydown").off("keypress");
+	input.keydown(function(e){
 	    if (e.keyCode == '8' || e.keyCode=='46'){	//backspace or delete
-	    	updateChatContentPosition();
+	    	setTimeout(updateChatContentPosition,50);
 	    }
 	});
 
-	input.off("keypress").keypress(function(e){
+	input.keypress(function(e){
 	    if (e.keyCode == '13' && !e.altKey){
 			sendChat();
 	    	// return false;
 	    }
-	    updateChatContentPosition();
+	    setTimeout(updateChatContentPosition,50);
 	});
 
 	$(document).find("title").text(g_cn + "-Project O");
@@ -123,6 +124,7 @@ $(document).ready(function(){
 			    null
 			);
 		});
+		updateChat();
 	}
 
 	//set update contents
@@ -145,13 +147,13 @@ $(document).ready(function(){
                                                                                           */
 
 function updateChatContentPosition (){
-	$("#chat-contents").css("margin-bottom", Math.max(0,$("#footer").height()-45) );
-	$("#chat-toBottom").css("margin-bottom", Math.max(0,$("#footer").height()-45+g_oriFooterHeight))
+	$("#chat-contents").animate({MarginBottom:Math.max(0,$("#footer").height()-45)}, 100);
 	if( g_isEndOfPage ) scrollToBottom();
+	$("#chat-toBottom").animate({bottom: Math.max(0,$("#footer").height()+10)}, 100 );
 }
 
 function resizeContent (){
-	// console.debug( $( window ).height(), $("#header").height(), $("#chat-loading").height());
+	// cns.debug( $( window ).height(), $("#header").height(), $("#chat-loading").height());
 	$("#container").css("min-height", 
 		$( window ).height()
 		-$("#header").height()
@@ -181,9 +183,9 @@ function onChatDBInit(){
 //show history chat contents
 function getHistoryMsg ( bIsScrollToTop ){
 	g_bIsLoadHistoryMsg = true;
-	// console.debug(g_lastDate);
+	// cns.debug(g_lastDate);
     g_idb_chat_msgs.limit(function(list){
-        //console.debug("list:",JSON.stringify(list,null,2));
+        //cns.debug("list:",JSON.stringify(list,null,2));
         if( list.length>0 ){
         	//list is from near to far day
 	        for( var i in list){
@@ -216,10 +218,10 @@ function getHistoryMsg ( bIsScrollToTop ){
         limit: 20,
         order: "DESC",
         onEnd: function(result){
-            console.debug("onEnd:",result.ci + " " + result.ct);
+            cns.debug("onEnd:",result.ci + " " + result.ct);
         },
         onError: function(result){
-            console.debug("onError:",result);
+            cns.debug("onError:",result);
         }
     });
 }
@@ -334,14 +336,16 @@ function updateChat (){
 	    "",
 	    function(data, status, xhr) {
 			//檢查是否需要更新.
-			if( data.el.hasOwnProperty("0") ){
-				var object = data.el["0"];
-				if( g_lastMsgEi==object.ei ){
-					return;
-				} else {
-					g_lastMsgEi=object.ei;
+	    	if( false == g_bIsPolling ){
+				if( data.el.hasOwnProperty("0") ){
+					var object = data.el["0"];
+					if( g_lastMsgEi==object.ei ){
+						return;
+					} else {
+						g_lastMsgEi=object.ei;
+					}
 				}
-			}
+	    	}
 
 	        for( var i=(data.el.length-1); i>=0; i--){
 				var object = data.el[i];
@@ -390,7 +394,7 @@ function updateChat (){
 
 function updateChatCnt (){
 	var userData = $.lStorage(g_ui);
-	// console.debug( JSON.stringify(userData) );
+	// cns.debug( JSON.stringify(userData) );
     g_group = userData[g_gi];
     g_room = g_group["chatAll"][g_ci];
 
@@ -399,7 +403,7 @@ function updateChatCnt (){
 
     var length = Object.keys(g_room.cnt).length;
 	var list = g_room.cnt;
-    // console.debug("list:",JSON.stringify(list,null,2));
+    // cns.debug("list:",JSON.stringify(list,null,2));
     var index=length-1;
 	var data = list[index];
 	var cnt = data.cnt;
@@ -455,7 +459,7 @@ function showMsg (object, bIsFront){
 	if( null == object ) return;
 
 	g_msgs.push(object.ei);
-	//console.debug("list:",JSON.stringify(object,null,2));
+	//cns.debug("list:",JSON.stringify(object,null,2));
 
 	var container = $("<div></div>");
 	var time = new Date(object.meta.ct);
@@ -551,7 +555,7 @@ function showMsg (object, bIsFront){
 	g_msgsByTime[object.meta.ct] = div;
 
 
-	// console.debug( g_lastDate, time.customFormat( "#M#/#D# #hh#:#mm#" ), msgData.c);
+	// s( g_lastDate, time.customFormat( "#M#/#D# #hh#:#mm#" ), msgData.c);
 
 	switch(msgData.tp){
 		case 0: //text or other msg
