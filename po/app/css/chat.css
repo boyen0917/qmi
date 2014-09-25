@@ -10,6 +10,10 @@ body {
     background-attachment: fixed;
     background-position: center; 
 	background-size:cover;
+	font-family: "微軟正黑體","Microsoft JhengHei";
+    -webkit-font-smoothing: antialiased;
+    font-weight: normal;
+    text-shadow: 0 0 0 #fff;
 }
 
 .emoji{
@@ -38,15 +42,15 @@ body {
 	float:left;
 }
 #header .title{
-	font-size: 23px;
-	margin:12px 10px 5px 10px;
-	height: 23px;
+	font-size: 22px;
+	margin: 5px 10px 4px 10px;
+	height: 27px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 #header .subTitle{
-	font-size: 13px;
+	font-size: 14px;
 }
  
 /* 
@@ -118,8 +122,10 @@ body {
 }
 /* other's msg name */
 .chat-msg-left .group .name{
-	font-size: 12px;
+	font-size: 13px;
 	margin-bottom: 3px;
+	color: #495470;
+	font-weight: bolder;
 }
 .chat-msg-right, .chat-msg-left{
 	clear: both;
@@ -131,13 +137,15 @@ body {
 	margin-right: 4px;
 	margin-left: 2px;
 	margin-bottom: 5px;
-	max-width: 40px;
+	max-width: 53px;
 	white-space: nowrap;
+	line-height: 12px;
 }
 .chat-cnt{
 	/*display: inline-block;*/
 	font-size: 10px;
-	color: gray;
+	color: #93a4c3;
+	text-shadow: 0 0 0 #93a4c3;
 }
 
 .chat-msg-right{
@@ -150,6 +158,21 @@ body {
 .chat-msg-time{
 	font-size: 8px;
 	color: #6c7faf;
+	display: inline-block;
+	vertical-align: middle;
+}
+.chat-msg-load-error, .chat-msg-load{
+	background-size: contain;
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	vertical-align: middle;
+}
+.chat-msg-load{
+	background-image: url("../images/chatroom/chat_chatroom_icon_load.png");
+}
+.chat-msg-load-error{
+	background-image: url("../images/chatroom/chat_chatroom_icon_nosent.png");
 }
 .chat-msg-bubble-right, .chat-msg-bubble-left{
 	padding: 0.3em 0.6em 0.3em 0.5em;
@@ -202,6 +225,7 @@ body {
 	border: 1px solid #93a4c3;
 	border-radius: 1em 1em 1em 1em;
 	font-size: 8px;
+	text-shadow: 0 0 0 #93a4c3;
 }
 
 .chat-msg-pic-right{
@@ -246,6 +270,9 @@ body {
 .msg-sticker{
 	text-align: left;
 	width: 150px;
+}
+.msg-audio{
+	max-width: 100%;
 }
 .msg-map .img{
 	background: url("../images/chatroom/chat_chatroom_icon_address.png");
@@ -299,6 +326,7 @@ body {
 	height: 30px;
 	width: 30px;
 	vertical-align: bottom;
+	margin-bottom: 3px;
 	/*
 	background: url("../images/chatroom/chat_textbar_icon_add.png");
 	vertical-align: 14%;
@@ -310,6 +338,7 @@ body {
 	height: 30px;
 	width: 30px;
 	vertical-align: bottom;
+	margin-bottom: 3px;
 	/*
 	background: url("../images/chatroom/chat_textbar_icon_emoticon.png");
 	vertical-align: 14%;
@@ -325,7 +354,7 @@ body {
 	display: inline-block;
 	text-align: left;
 	vertical-align: bottom;
-	min-height: 25px;
+	min-height: 32px;
 	margin: 0 5px;
 	transition: height 0.2s;
 	/*
@@ -336,22 +365,23 @@ body {
 
 #footer .contents .send{
 	/*background: rgb(32,79,150);*/
-	background: linear-gradient(to bottom, rgb(41,137,216) 24%,rgb(32,79,150) 100%);
+	background: rgb(30,78,134);
 	color:white;
 	display: inline-block;
 	border-style: hidden;
 	border-radius: 6px;
 	width: 60px;
 	vertical-align: bottom;
-	line-height: 25px;
+	line-height: 35px;
 	box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.3);
+	height: 35px;
 	/*
 	vertical-align: 56%;
 	line-height: 30px;
 	*/
 }
 #footer .contents .send:hover{
-	background: linear-gradient(to bottom, rgb(45,152,239) 11%,rgb(43,105,198) 100%);
+	background: rgb(41,100,167);
 }
 
 /*

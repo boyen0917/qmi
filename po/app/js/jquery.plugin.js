@@ -87,4 +87,33 @@
     Array.prototype.unique = function(a){
 		return function(){ return this.filter(a) }
     }(function(a,b,c){ return c.indexOf(a,b+1) < 0 });
+
+    /*
+    find & parse emoji to image
+    */
+    var emojiRange = [
+    	'&#55356;&#57(0(8[89]|9[0-9])|[12][0-9]{2}|3([0-3][0-9]|4[0-3]));',
+		'&#55357;&#5(6(3[2-9][0-9]|[4-9][0-9]{2})|7([0-2][0-9]{2}|3([0-3][0-9]|4[0-3])));',
+		'&#9(6(3[2-9]|[4-9][0-9])|[78][0-9]{2}|9([0-7][0-9]|8[0-3]));&#65039;'
+	];
+	String.prototype.replaceEmoji = function () {
+		console.debug( JSON.stringify(this) );
+		return this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
+			var tmp = [];
+			var n = match.lastIndexOf(";&#");
+			tmp.push( parseInt(match.substring(2,n)) );
+			tmp.push( parseInt(match.substring(n+3,match.length-1)) );
+			if( tmp[0] >= 55296 ){
+				var oriCode = 0xffffffff;
+				oriCode = ((tmp[0]-55296)<<10)>>>0;
+				var vl=(tmp[1]-56320)>>>0;
+				oriCode = (oriCode | vl | 0x10000);
+				return "<img style='max-height:20px' class='emoji' src='../images/emojis/" + oriCode.toString(16) + ".png' alt='emoji' />";
+			} else {
+				return "<img style='max-height:20px' class='emoji' src='../images/emojis/" + tmp[0].toString(16) + ".png' alt='emoji' />";
+			}
+			return match;
+		});
+	};
+
 })(jQuery);

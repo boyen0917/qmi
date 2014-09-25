@@ -82,6 +82,7 @@ function showChatList(){
 	var groupData = data[gi];
 	var chatList = groupData["chatAll"];
 	var targetDiv = $(".subpage-chatList .rows");
+	var date = new Date();
 
 	if( targetDiv ){
 		var tmp;
@@ -126,13 +127,62 @@ function showChatList(){
 
 				td = $("<td data-id='"+ room.ci +"'></td>");
 				td.append("<div class='name'>" + chatRoomName + "</div>");
-				td.append("<div class='msg'>" + "[last msg here]" + "</div>");
+				var lastMsg = $("<div class='msg'></div>");
+				td.append(lastMsg);
 				row.append(td);
 
 				td = $("<td align='right'></td>");
-				td.append("<div class='time'>" + "00:00" + "</div>");
+				var lastTime = $("<div class='time'></div>");
+				td.append(lastTime);
 				td.append("<div class='drag'></div>");
 				row.append(td);
+
+				g_idb_chat_msgs.limit(function(list){
+			        if( list.length>0 ){
+			        	if( null!=list[0] ){
+				        	var object = list[0].data;
+				        	var text = "";
+				        	switch( object.ml[0].tp ){
+				        		case 5: //sticker
+									var name = groupData.guAll[object.meta.gu].nk;
+				        			text = $.i18n.getString("someSendSticker", name);
+				        			break; 
+				        		case 6: //pic
+									var name = groupData.guAll[object.meta.gu].nk;
+				        			text = $.i18n.getString("someSendPicture", name);
+				        			break;
+				        		case 8: //audio
+									var name = groupData.guAll[object.meta.gu].nk;
+				        			text = $.i18n.getString("someSendAudio", name);
+				        			break; 
+				        		case 9: //map
+									var name = groupData.guAll[object.meta.gu].nk;
+				        			text = $.i18n.getString("someSendMap", name);
+				        			break;
+				        		default:
+				        			text = object.ml[0].c;
+				        			break;
+				        	}
+				        	lastMsg.html( text );
+				        	lastTime.html( new Date(object.meta.ct).customFormat("#YYYY#/#MM#/#DD# #hh#:#mm#") );
+						}
+				    }
+			    },{
+			        index: "gi_ci_ct",
+			        keyRange: g_idb_chat_msgs.makeKeyRange({
+				        upper: [gi, room.ci, date.getTime()],
+				        lower: [gi, room.ci]
+				        // only:18
+			        }),
+			        limit: 1,
+			        order: "DESC",
+			        onEnd: function(result){
+			            console.debug("onEnd:",result.ci + " " + result.ct);
+			        },
+			        onError: function(result){
+			            console.debug("onError:",result);
+			        }
+			    });
 
 				// td = $("<td></td>");
 				// td.html( $.i18n.getString("delete") );

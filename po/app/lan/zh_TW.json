@@ -1,7 +1,7 @@
 {
 		"chat-title"					: "聊天室",
 		"chat"							: "聊天",
-		"send"  						: "送出",
+		"send"  						: "傳送",
 		"chooseTarget"  				: "選擇對象",
 		"nextStep"  					: "下一步",
 		"choose"  						: "選擇",
@@ -16,5 +16,9 @@
 		"deleteRoom"					: "刪除聊天室",
 		"comfirmDeleteRoom"				: "您確定要刪除 %s 聊天室嗎？",
 		"deleteSucc"					: "刪除成功",
-		"deleteFail"					: "刪除失敗"
+		"deleteFail"					: "刪除失敗",
+		"someSendSticker"				: "%s 傳送了貼圖",
+		"someSendPicture"				: "%s 傳送了照片",
+		"someSendAudio"					: "%s 傳送了聲音",
+		"someSendMap"					: "%s 傳送了地圖"
 }

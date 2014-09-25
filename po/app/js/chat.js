@@ -21,6 +21,7 @@ var g_lastDate = new Date();
 var g_bIsLoadHistoryMsg = false;
 var g_bIsEndOfHistory = false;
 var g_msgTmp;
+var g_oriFooterHeight;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -31,6 +32,7 @@ var g_msgTmp;
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
 $(document).ready(function(){
+	g_oriFooterHeight = $("#footer").height();
 	// $(".title").click(function(){
 	// 	updateChat();
 	// });
@@ -81,11 +83,19 @@ $(document).ready(function(){
 	sendBtn.off("click");
 	sendBtn.click( sendChat );
 	var input = $("#footer .contents .input");
-	input.autosize({append: "\n"});
+	// input.autosize({append: "\n"});
 	input.off("keyup").keyup(function(e){
-		if (e.keyCode == 13 && !e.altKey) {
+	    if (e.keyCode == '8' || e.keyCode=='46'){	//backspace or delete
+	    	updateChatContentPosition();
+	    }
+	});
+
+	input.off("keypress").keypress(function(e){
+	    if (e.keyCode == '13' && !e.altKey){
 			sendChat();
-		}
+	    	// return false;
+	    }
+	    updateChatContentPosition();
 	});
 
 	$(document).find("title").text(g_cn + "-Project O");
@@ -133,6 +143,12 @@ $(document).ready(function(){
               ██║     ╚██████╔╝██║ ╚████║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║          
               ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝          
                                                                                           */
+
+function updateChatContentPosition (){
+	$("#chat-contents").css("margin-bottom", Math.max(0,$("#footer").height()-45) );
+	$("#chat-toBottom").css("margin-bottom", Math.max(0,$("#footer").height()-45+g_oriFooterHeight))
+	if( g_isEndOfPage ) scrollToBottom();
+}
 
 function resizeContent (){
 	// console.debug( $( window ).height(), $("#header").height(), $("#chat-loading").height());
@@ -273,7 +289,7 @@ function scrollToStart (){
 }
 
 function scrollToBottom (){
-	$('html, body').animate({scrollTop:$(document).height()+50}, 'fast');
+	$('html, body').animate({scrollTop:$(document).height()}, 'fast');
 }
 
 function checkPagePosition (){
@@ -432,7 +448,7 @@ function getFormatTimeTag ( date ){
 }
 
 function getFormatMsgTimeTag ( date ){
-	return date.customFormat( "#hhh#:#mm#" );
+	return date.customFormat( "#hh#:#mm#" );
 }
 
 function showMsg (object, bIsFront){
@@ -492,7 +508,13 @@ function showMsg (object, bIsFront){
 
 		var table = $("<table></table>");
 		table.append( $("<tr><td><div class='chat-cnt' data-t='"+time.getTime()+"'></div></td></tr>") );
-		table.append( $("<tr><td><div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div></td></tr>" ) );
+		var tr = $("<tr></tr>");
+		var td = $("<td></td>");
+		td.append("<div></div>");	// class='chat-msg-load'
+		td.append("<div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div>");
+		tr.append(td);
+		table.append(tr);
+
 		div.append( table );
 
 		msgDiv = $("<div></div>");
@@ -562,7 +584,11 @@ function showMsg (object, bIsFront){
 			} else {
 				msgDiv.addClass('chat-msg-bubble-left');
 			}
-			msgDiv.html( "[audio]" );
+			var this_audio = $(
+				"<audio class='msg-audio' src='test' controls></audio>"
+			);
+			msgDiv.append( this_audio );
+			getS3file(this_audio, msgData.c, msgData.p, msgData.tp, g_ci);
 			break; 
 		case 9: //map
 			if(isMe){
@@ -590,7 +616,6 @@ function showMsg (object, bIsFront){
 			mapDiv.click(function(){
 				var gallery = window.open("", "", "width=800, height=600");
 				$(gallery.document).ready(function(){
-					setTimeout(function(){
 						var body = $(gallery.document).find("body");
 						body.css("background","black");
 						body.css( "overflow", "hidden" );
@@ -599,6 +624,8 @@ function showMsg (object, bIsFront){
 						this_slide.css( "margin", "-8px" );
 						this_slide.css("width","800px");
 						this_slide.css("height","600px");
+						body.append( this_slide );
+					setTimeout(function(){
 						this_slide.tinyMap({
 							 center: {x: msgData.lat, y: msgData.lng},
 							 // zoomControl: 0,
@@ -610,7 +637,6 @@ function showMsg (object, bIsFront){
 				    	         {addr: [msgData.lat, msgData.lng], text: msgData.a}
 							 ]
 						});
-						body.append( this_slide );
 					},300);
 				});
 			});
@@ -630,11 +656,13 @@ function showMsg (object, bIsFront){
 
 function sendChat (){
 	var inputDom = $("#footer .contents .input");
-	var text = inputDom.val();
+	// var text = inputDom.val();
+	var text = inputDom[0].innerText;
 	if (text.length<=0 ) return;
 
 	var msg = text.replace(/<br>/g,"\n");
-	inputDom.val("").trigger('autosize.resize');
+	// inputDom.val("").trigger('autosize.resize');
+	inputDom[0].innerText = "";
 	
 	op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
 	    "POST",
