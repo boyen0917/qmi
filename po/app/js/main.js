@@ -59,6 +59,10 @@ $(function(){
         		$.lStorage(ui,_groupList);
         	}
 
+        	//聊天室開啓DB
+        	initChatDB(); 
+ 			initChatCntDB(); 
+
         	//設定guAll 
         	setGroupAllUser();
         	
@@ -701,7 +705,7 @@ $(function(){
 
 		//開啟detail
 		if(!this_event.data("switch-chk")){
-			this_event.find(".st-sub-box-1").trigger("click");
+			this_event.find(".st-sub-box-1").trigger("detailShow");
 		}
 
 		this_event.find(".st-reply-message-area").slideToggle();

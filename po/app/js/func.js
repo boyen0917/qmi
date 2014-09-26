@@ -4377,9 +4377,9 @@ $(function(){
     polling = function(){
 
     	var local_pollingData = $.lStorage("_pollingData") || {cnts:{},ts:{}};
-
+    	
     	var polling_timer = local_pollingData.ts.pt || new Date().getTime();
-    	polling_timer = 1411626383762;
+
     	var api_name = "/sys/polling?pt=" + polling_timer;
 
         var headers = {
@@ -4479,12 +4479,11 @@ $(function(){
     }
 
     pollingCmds = function(cmds){
-    	cns.debug("fuck2");
+    	cns.debug("cmds:",cmds);
+    	cns.debug("gi:",gi);
     	$.each(cmds,function(i,val){
-    		cns.debug("fuck arr");
     		switch(val.tp){
     			case 1://timeline list
-    			cns.debug("fuck1");
     				if(val.pm.gi == gi) {
     					cns.debug("fuck");
     					idbPutTimelineEvent();
@@ -4514,7 +4513,6 @@ $(function(){
     		body.cnts[0][cnt_type] = 0;
     	}
     	
-    	cns.debug("update polling cnt:",body);
     	// return false;
         var headers = {
                  "ui":ui,
@@ -4902,7 +4900,6 @@ $(function(){
     getLoginDataForTest = function(){
     	//暫時
 		var api_name = "login";
-
         var headers = {
             li:lang
         };

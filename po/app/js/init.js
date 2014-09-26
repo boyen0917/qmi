@@ -53,6 +53,9 @@ $(function(){
 	//特別的
 	s_load_show = false;
 
+	//不顯示ajax訊息
+	ajax_no_msg = false;
+
 	//ajax 提示訊息選擇
 	ajax_msg = false;
 	
@@ -88,7 +91,7 @@ $(function(){
 	top_timer_ms = 5000;
 
 	//title
-	$("title").html("FIND");
+	$("title").html("FINE");
 
 
 	// ajax setting
@@ -99,7 +102,7 @@ $(function(){
 	$.ajaxSetup ({
 		timeout: 30000,
 	    // Disable caching of AJAX responses
-	    cache: false
+	    // cache: false
 	});
 	
 	$(document).ajaxSend(function() {
@@ -123,6 +126,8 @@ $(function(){
 
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
+
+		if(ajax_no_msg) return false;
 
 		//ajax逾時
 		if(jqxhr.statusText == "timeout"){
@@ -219,7 +224,7 @@ $(function(){
 	
 
 	//debug control 
-	setDebug(false);
+	setDebug(true);
 
 	function setDebug(isDebug) {
       if (isDebug) {
