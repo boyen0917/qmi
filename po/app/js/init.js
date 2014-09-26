@@ -53,9 +53,6 @@ $(function(){
 	//特別的
 	s_load_show = false;
 
-	//不顯示ajax訊息
-	ajax_no_msg = false;
-
 	//ajax 提示訊息選擇
 	ajax_msg = false;
 	
@@ -64,7 +61,6 @@ $(function(){
 	
 	//預設使用者大頭照 size
 	avatar_size = 60;
-	
 
 	//ajax 使用次數
 	ajax_count = 0;
@@ -89,6 +85,9 @@ $(function(){
 
 	//timeline置頂millisecond
 	top_timer_ms = 5000;
+
+	//polling間距
+	polling_interval = 5000;
 
 	//title
 	$("title").html("FINE");
@@ -123,11 +122,12 @@ $(function(){
 	
 
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
-
+		cns.debug("ajaxSettings:",ajaxSettings);
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
 
-		if(ajax_no_msg) return false;
+		//polling 不做錯誤顯示
+		if(ajaxSettings.url.match(/sys\/polling/)) return false;
 
 		//ajax逾時
 		if(jqxhr.statusText == "timeout"){

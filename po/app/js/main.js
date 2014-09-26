@@ -132,21 +132,56 @@ $(function(){
 	});
 
 
+	//下拉更新 滾輪版
+	$("#page-group-main").bind('mousewheel DOMMouseScroll', function(event){
+		var group_main = $(this);
+
+		//timeline 才要做
+		if(!$(".feed-subarea").is(":visible") || group_main.data("scroll-cnt") < 0 || $(window).scrollTop() > 0) return;
+
+		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+
+			//控制時限
+			if(group_main.data("scroll-timer")) clearTimeout(group_main.data("scroll-timer"));
+
+            var scroll_timer = setTimeout(function(){
+            	group_main.data("scroll-cnt",0);
+            },500);
+            group_main.data("scroll-timer",scroll_timer);
+
+            //計算力道
+            var scroll_cnt = group_main.data("scroll-cnt") || 0;
+            scroll_cnt = scroll_cnt + event.originalEvent.wheelDelta;
+            group_main.data("scroll-cnt",scroll_cnt);
+
+
+            //滾得夠猛 做下拉更新
+            if(scroll_cnt > 3000) {
+            	group_main.data("scroll-cnt",-10000);
+
+				timelineTopRefresh();
+
+				//順便檢查置頂
+				topEventChk();
+            }
+        }
+    });
+
 	//timeline下拉更新
 	$(window).scroll(function() {
 		//timeline 才要做
 		if(!$(".feed-subarea").is(":visible")) return false;
 
-		var top_height = $(window).scrollTop();
+		// var top_height = $(window).scrollTop();
 		
-		//下拉更新
-		if (top_height < -20 && !$(".st-navi-area").data("scroll-chk")){
-			$(".st-navi-area").data("scroll-chk",true);
-			timelineTopRefresh();
+		// //下拉更新
+		// if (top_height < -20 && !$(".st-navi-area").data("scroll-chk")){
+		// 	$(".st-navi-area").data("scroll-chk",true);
+		// 	timelineTopRefresh();
 
-			//順便檢查置頂
-			topEventChk();
-		}
+		// 	//順便檢查置頂
+		// 	topEventChk();
+		// }
 
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi") || "00";
@@ -161,9 +196,6 @@ $(function(){
 		if(last_event.length){
 			var bottom_height = $(window).scrollTop() + $(window).height();
 			var last_height = last_show_event.offset().top + last_show_event.height() + 25;
-
-			// cns.debug("bottom_height:",bottom_height);
-			// cns.debug("last_height:",last_height);
 
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
 		    if(bottom_height && bottom_height >= last_height && !this_navi.data("scroll-chk")){
