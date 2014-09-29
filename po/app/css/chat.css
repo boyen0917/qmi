@@ -267,8 +267,15 @@ body {
 	border-width: 2px;
 	border-color: #6c7faf;
 }
-.msg-sticker{
+.msg-sticker.right{
+	text-align: right;
+	display: inline-block;
+}
+.msg-sticker.left{
 	text-align: left;
+	display: inline-block;
+}
+.msg-sticker img{
 	width: 150px;
 }
 .msg-audio{
@@ -309,7 +316,7 @@ body {
 #footer {
 	background: linear-gradient(to bottom, white 0%,#E5E8EB 100%);
 	border-top: 1px solid #666;
-	bottom:0;
+	bottom:-200px;
 	/*max-height:70px;*/
 	left:0;
 	position:fixed;
