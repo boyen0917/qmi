@@ -1430,8 +1430,8 @@ $(function(){
 			smHrCliclTimes=0;
 
 			initChatDB();
-			initChatCntDB();
 			if( g_bIsPolling ){
+				initChatCntDB();
 				pollingInterval();
 			}
 			//彩蛋中的彩蛋
