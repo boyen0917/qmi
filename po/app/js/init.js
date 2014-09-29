@@ -61,7 +61,6 @@ $(function(){
 	
 	//預設使用者大頭照 size
 	avatar_size = 60;
-	
 
 	//ajax 使用次數
 	ajax_count = 0;
@@ -87,8 +86,11 @@ $(function(){
 	//timeline置頂millisecond
 	top_timer_ms = 5000;
 
+	//polling間距
+	polling_interval = 5000;
+
 	//title
-	$("title").html("FIND");
+	$("title").html("FINE");
 
 
 	// ajax setting
@@ -99,7 +101,7 @@ $(function(){
 	$.ajaxSetup ({
 		timeout: 30000,
 	    // Disable caching of AJAX responses
-	    cache: false
+	    // cache: false
 	});
 	
 	$(document).ajaxSend(function() {
@@ -120,9 +122,12 @@ $(function(){
 	
 
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
-
+		cns.debug("ajaxSettings:",ajaxSettings);
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
+
+		//polling 不做錯誤顯示
+		if(ajaxSettings.url.match(/sys\/polling/)) return false;
 
 		//ajax逾時
 		if(jqxhr.statusText == "timeout"){
@@ -219,7 +224,7 @@ $(function(){
 	
 
 	//debug control 
-	setDebug(false);
+	setDebug(true);
 
 	function setDebug(isDebug) {
       if (isDebug) {

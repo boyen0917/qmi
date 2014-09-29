@@ -3396,11 +3396,11 @@ $(function(){
 	timelineTopRefresh = function(){
 		$(".st-navi-area").addClass("st-navi-fixed");
 		$(".st-top-area-load").addClass("mt");
-		$(".st-refresh-top").show("fast");
+		$(".st-refresh-top").slideDown("fast");
 		setTimeout(function(){
 			$(".st-refresh-top img").show();
 			$(".st-refresh-top span").show();
-		},300);
+		},500);
 
 		// var event_tp = $("#page-group-main").data("navi") || "00";
   //   	var selector = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box:eq(0)");
@@ -4376,10 +4376,11 @@ $(function(){
 
     polling = function(){
 
-    	var local_pollingData = $.lStorage("_pollingData") || {cnts:{},ts:{}};
-
+    	var local_pollingData = $.lStorage("_pollingData") || {cnts:{},ts:{}};    	
     	var polling_timer = local_pollingData.ts.pt || new Date().getTime();
-    	polling_timer = 1411626383762;
+
+    	//polling不顯示錯誤訊息
+    	ajax_no_msg = true;
     	var api_name = "/sys/polling?pt=" + polling_timer;
 
         var headers = {
@@ -4389,6 +4390,8 @@ $(function(){
                      };
         var method = "get";
         ajaxDo(api_name,headers,method,false).complete(function(data){
+        	ajax_no_msg = false;
+
         	if(data.status == 200){
 
         		// cns.debug("before updata:",JSON.stringify(local_pollingData,null,2));
@@ -4479,12 +4482,11 @@ $(function(){
     }
 
     pollingCmds = function(cmds){
-    	cns.debug("fuck2");
+    	cns.debug("cmds:",cmds);
+    	cns.debug("gi:",gi);
     	$.each(cmds,function(i,val){
-    		cns.debug("fuck arr");
     		switch(val.tp){
     			case 1://timeline list
-    			cns.debug("fuck1");
     				if(val.pm.gi == gi) {
     					cns.debug("fuck");
     					idbPutTimelineEvent();
@@ -4514,7 +4516,6 @@ $(function(){
     		body.cnts[0][cnt_type] = 0;
     	}
     	
-    	cns.debug("update polling cnt:",body);
     	// return false;
         var headers = {
                  "ui":ui,
@@ -4534,7 +4535,7 @@ $(function(){
     	if(!$(document).data("polling-chk")){
 			pc = setInterval(function(){
 				polling();	
-			},3000);
+			},polling_interval);
 			$(document).data("polling-chk",true);
 			toastShow("開啓polling");
 		}else{
@@ -4902,7 +4903,6 @@ $(function(){
     getLoginDataForTest = function(){
     	//暫時
 		var api_name = "login";
-
         var headers = {
             li:lang
         };
