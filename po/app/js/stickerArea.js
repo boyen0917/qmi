@@ -4,11 +4,10 @@ var initStickerArea= {
 	path: "sticker/",
 	jsonPath: "sticker/stickerArea",
 	dict: null,
-	ui:null,
 	callback: null,
-	init: function( dom, ui, onSelect ){
+	init: function( dom, onSelect ){
+		
 		var thisTmp = this;
-		thisTmp.ui = ui;
 		thisTmp.callback = onSelect;
 
 		//------ top ---------
@@ -169,32 +168,36 @@ var initStickerArea= {
 	    	var id = $(this).data("id");
 	    	cns.debug( id );
 
-	    	var userData = $.lStorage(thisTmp.ui);
-	    	if( false == userData.hasOwnProperty("sticker") ){
-	    		userData.sticker = new Object();
-	    	}
-	    	if( userData.sticker.hasOwnProperty(id) ){
-	    		delete userData.sticker[id];
+	    	var userData = $.lStorage("sticker");
+	    	if( !userData ){
+	    		userData = [];
+	    	} else {
+	    		var index=userData.indexOf(id);
+	    		if ( userData.indexOf(id)>=0 ){
+		    		delete userData.sticker[id];
+		    		array.splice(index, 1);
+	    		}
 	    	}
 
-	    	userData.sticker[id] = $(this).attr("src");
-	    	$.lStorage(thisTmp.ui, userData);
+	    	userData.push( {"id":id, "src":$(this).attr("src")} );
+	    	$.lStorage("sticker", userData);
 	    	thisTmp.updateHistory();
 
 	    	if( null != thisTmp.callback ) thisTmp.callback(id);
 	    });
 	},
 	updateHistory: function(){
-	    var userData = $.lStorage(this.ui);
-	    if( userData.hasOwnProperty("sticker") ){
+	    var userData = $.lStorage("sticker");
+	    if( null != userData ){
 	    	var values = [];
 	    	var keys = [];
-	    	for(var key in userData.sticker){
-	    		keys.unshift(key);
-	    		values.unshift(userData.sticker[key]);
+	    	for(var i=userData.length-1; i>=0; i--){
+	    		var obj = userData[i];
+	    		keys.push(obj.id);
+	    		values.push(obj.src);
 	    	}
 	    	if( keys.length>0 ){
-				this.showImg("history", keys, values );
+				this.showImg( "history", keys, values );
 			}
 	    }
 	},

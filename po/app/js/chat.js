@@ -108,35 +108,40 @@ $(document).ready(function(){
 	$("#chat-toBottom").off("resize");
 	$(window).resize(resizeContent);
 
-	$(".input-other").off("click").click(function(){
-		if( 0==g_extraSendOpenStatus ){
-			g_extraSendOpenStatus = 1;
-			$("#footer").animate({bottom:0},'fast');
-			$("#chat-contents").animate({marginBottom:200},'fast');
-			updateChatContentPosition();
-		} else if(1==g_extraSendOpenStatus){
-			g_extraSendOpenStatus = 0;
-			$("#footer").animate({bottom:-200},'fast');
-			$("#chat-contents").animate({marginBottom:0},'fast');
-			updateChatContentPosition();
-		} else{
-			g_extraSendOpenStatus = 1;
-		}
-		// cns.debug("other: ",g_extraSendOpenStatus);
-	});
+	// $(".input-other").off("click").click(function(){
+	// 	if( 0==g_extraSendOpenStatus ){
+	// 		g_extraSendOpenStatus = 1;
+	// 		$("#footer").animate({bottom:0},'fast');
+	// 		$("#chat-contents").animate({marginBottom:200},'fast');
+	// 		updateChatContentPosition();
+			// $(this).removeClass("active");
+	// 	} else if(1==g_extraSendOpenStatus){
+	// 		g_extraSendOpenStatus = 0;
+	// 		$("#footer").animate({bottom:-200},'fast');
+	// 		$("#chat-contents").animate({marginBottom:0},'fast');
+	// 		updateChatContentPosition();
+	// 	} else{
+	// 		g_extraSendOpenStatus = 1;
+			// $(this).removeClass("active");
+	// 	}
+	// 	// cns.debug("other: ",g_extraSendOpenStatus);
+	// });
 	$(".input-emoji").off("click").click(function(){
 		if( 0==g_extraSendOpenStatus ){
 			g_extraSendOpenStatus = 2;
 			$("#footer").animate({bottom:0},'fast');
 			$("#chat-contents").animate({marginBottom:200},'fast');
 			updateChatContentPosition();
+			$(this).addClass("active");
 		} else if(2==g_extraSendOpenStatus){
 			g_extraSendOpenStatus = 0;
 			$("#footer").animate({bottom:-200},'fast');
 			$("#chat-contents").animate({marginBottom:0},'fast');
 			updateChatContentPosition();
+			$(this).removeClass("active");
 		} else{
 			g_extraSendOpenStatus = 2;
+			$(this).addClass("active");
 		}
 		// cns.debug("emoji: ", g_extraSendOpenStatus);
 	});
@@ -169,7 +174,7 @@ $(document).ready(function(){
 	    }
 	}, 1500);
 
-	initStickerArea.init( $(".stickerArea"), g_ui, sendSticker);
+	initStickerArea.init( $(".stickerArea"), sendSticker);
 });
 
 /*
