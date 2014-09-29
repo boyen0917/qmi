@@ -1,0 +1,174 @@
+
+.stickerArea{
+	background: url("../images/chatroom/chat_attach_bg.png");
+	background-repeat:repeat-x: 
+}
+
+/*
+              ██╗███╗   ███╗ ██████╗  █████╗ ██████╗ ███████╗ █████╗           
+              ██║████╗ ████║██╔════╝ ██╔══██╗██╔══██╗██╔════╝██╔══██╗          
+    █████╗    ██║██╔████╔██║██║  ███╗███████║██████╔╝█████╗  ███████║    █████╗
+    ╚════╝    ██║██║╚██╔╝██║██║   ██║██╔══██║██╔══██╗██╔══╝  ██╔══██║    ╚════╝
+              ██║██║ ╚═╝ ██║╚██████╔╝██║  ██║██║  ██║███████╗██║  ██║          
+              ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝          
+                                                                               
+*/
+.stickerArea .imgArea{
+	width: 100%;
+	height: 75%;
+}
+
+.stickerArea .imgArea .left{
+	width: 7%;
+	height: 100%;
+	display: inline-block;
+	background-image: url("../images/icon_arrow_prev_darkblue.png");
+	background-position: center center;
+    background-repeat: no-repeat;
+	background-size:100% auto;
+	
+}
+.stickerArea .imgArea .left:hover{
+	background-image: url("../images/icon_arrow_prev_blue.png");
+	background-position: center center;
+    background-repeat: no-repeat;
+	background-size:100% auto;
+}
+
+.stickerArea .imgArea .mid{
+	width: 86%;
+	height: 100%;
+	display: inline-block;
+	overflow: hidden;
+}
+.stickerArea .imgArea .mid .group{
+	height: 100%;
+	float: left;
+}
+.stickerArea .imgArea .mid .group .page{
+	height: 100%;
+	display: inline-block;
+	float: left;
+}
+.stickerArea .imgArea .mid .group .page .row{
+	width: 100%;
+	height: 50%;
+}
+.stickerArea .imgArea .mid .group .page .row div{
+	width: 25%;
+	height: 100%;
+	text-align: center;
+	display: inline-block;
+}
+.stickerArea .imgArea .mid .group .page .row div img{
+	height: 100%;
+}
+
+.stickerArea .imgArea .right{
+	width: 7%;
+	height: 100%;
+	display: inline-block;
+	background-image: url("../images/common/icon/icon_arrow_next_darkblue.png");
+	background-position: center center;
+    background-repeat: no-repeat;
+	background-size:100% auto;
+}
+.stickerArea .imgArea .right:hover{
+	background-image: url("../images/common/icon/icon_arrow_next_blue.png");
+	background-position: center center;
+    background-repeat: no-repeat;
+	background-size:100% auto;
+}
+
+/*
+              ██████╗  █████╗  ██████╗ ███████╗ █████╗ ██████╗ ███████╗ █████╗       
+              ██╔══██╗██╔══██╗██╔════╝ ██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗      
+    █████╗    ██████╔╝███████║██║  ███╗█████╗  ███████║██████╔╝█████╗  ███████║█████╗
+    ╚════╝    ██╔═══╝ ██╔══██║██║   ██║██╔══╝  ██╔══██║██╔══██╗██╔══╝  ██╔══██║╚════╝
+              ██║     ██║  ██║╚██████╔╝███████╗██║  ██║██║  ██║███████╗██║  ██║      
+              ╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝      
+                                                                                     
+*/
+.stickerArea .pageArea{
+	width: 100%;
+	height: 6%;
+	text-align: center;
+	line-height: 6%;
+}
+.stickerArea .pageArea .dot{
+	height: 6px;
+	width: 6px;
+	border-radius: 3px;
+	background: white;
+	display: inline-block;
+	margin-right: 6px;
+	vertical-align: middle;
+	border-style: none;
+}
+.stickerArea .pageArea .dot.active{
+	background: rgb(106,173,224);
+}
+
+/*
+               ██████╗ █████╗ ████████╗ █████╗  ██████╗  ██████╗ ██████╗ ██╗   ██╗     
+              ██╔════╝██╔══██╗╚══██╔══╝██╔══██╗██╔════╝ ██╔═══██╗██╔══██╗╚██╗ ██╔╝     
+    █████╗    ██║     ███████║   ██║   ███████║██║  ███╗██║   ██║██████╔╝ ╚████╔╝█████╗
+    ╚════╝    ██║     ██╔══██║   ██║   ██╔══██║██║   ██║██║   ██║██╔══██╗  ╚██╔╝ ╚════╝
+              ╚██████╗██║  ██║   ██║   ██║  ██║╚██████╔╝╚██████╔╝██║  ██║   ██║        
+               ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝        
+                                                                                       
+*/
+.stickerArea .catagory{
+	width: 100%;
+	height: 19%;
+	background: rgb(206, 226, 237);
+	border-style: solid;
+	border-width: 1px 0 0 0;
+	border-color: rgb(168, 218,247);
+}
+
+.stickerArea .catagory .cata.history{
+	display: inline-block;
+	width: 40px;
+	height: 100%;
+	background-image: url("../images/chatroom/chat_sticker_icon_history.png");
+	background-position: center center;
+	background-color: rgb(168, 218,247);
+    background-repeat: no-repeat;
+	background-size:80%;
+	float: left;
+}
+
+.stickerArea .catagory .cata.history:hover{
+	background-image: url("../images/chatroom/chat_sticker_icon_history_click.png");
+	width: 40px;
+	height: 100%;
+	background-position: center center;
+	background-size:80%;
+    background-repeat: no-repeat;
+}
+
+.stickerArea .catagory .cata{
+	width: 40px;
+	height: 100%;
+	display: inline-block;
+	background-size:cover;
+	float: left;
+	border-style: solid;
+	border-width: 0 1px 0 0;
+	border-color: rgb(168, 218,247);
+}
+.stickerArea .catagory .cata:hover, .stickerArea .catagory .cata.active:not(.history){
+	background: rgb(229, 243,252);
+	background-size:cover;
+}
+
+.stickerArea .catagory .cata img{
+	width: auto;
+	height: 80%;
+    margin: 10%;
+}
+
+.stickerArea .catagory .cata.act{
+	background: rgb(229, 243,252);
+}
