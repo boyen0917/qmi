@@ -2872,15 +2872,20 @@ $(function(){
    ##    #### ##     ## ######## ######## #### ##    ## ########       ######## ####  ######     ##    
 
  */  
-	
+
+
 	//動態消息列表
 	//先從資料庫拉資料 另外也同時從server拉資料存資料庫 再重寫
-	idbPutTimelineEvent = function (ct_timer,is_top){
+	idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
+		var polling_arr = polling_arr || [];
+		var this_gi = polling_arr[0] || gi;
+		var this_ti = polling_arr[1] || ti_feed;
+
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
-
+		// cns.debug("put this_gi:",this_gi);
 	    //製作timeline
-	    var api_name = "groups/"+ gi +"/timelines/"+ ti_feed +"/events";
+	    var api_name = "groups/"+ this_gi +"/timelines/"+ this_ti +"/events";
 	    if(ct_timer){
 	    	api_name = api_name + "?ct=" + ct_timer;
 	    }
@@ -2908,36 +2913,21 @@ $(function(){
 	    	}
 	    	
 	    	if(data.status != 200) return false;
-	    	var timeline_list = $.parseJSON(data.responseText).el;
-	    	// cns.debug("timeline_list:",JSON.stringify(timeline_list,null,2));
-	    	// return false;
-	    	//資料個數少於這個數量 表示沒東西了
-	        if(timeline_list.length < 10){
-	        	//沒資料的確認 加入no data 
-	    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");
-	        	//關閉timeline loading 開啟沒資料圖示
-	        	setTimeout(function(){
-	        		$(".st-feedbox-area-bottom > img").hide();
-    				$(".st-feedbox-area-bottom > div").show();
-	        	},2000);
-	        }else{
-        		//開啟timeline loading 關閉沒資料圖示 下拉更新除外
-	    		$(".st-feedbox-area-bottom > img").show();
-				$(".st-feedbox-area-bottom > div").hide();
-        	}
 
+	    	var timeline_list = $.parseJSON(data.responseText).el;
+	    	cns.debug("timeline_list.length:",timeline_list.length);
 	    	//存db 先刪後存 因為刪除事件是不回傳的
 	    	//刪db
 	    	// timeline_list
 	    	// cns.debug("remove timeline_list:",timeline_list);
-	    	idbRemoveTimelineEvent(timeline_list,ct_timer);
+	    	// idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr);
 	    	// return false;
 	    	//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
 	    	if(event_tp == "00"){
 	    		//存db	    	
 	            $.each(timeline_list,function(i,val){
 	                val.ct = val.meta.ct;
-	                val.gi = gi ;
+	                val.gi = this_gi ;
 	                val.tp = val.meta.tp ;
 
 	                var tp = val.meta.tp.substring(1,2)*1;
@@ -2945,51 +2935,75 @@ $(function(){
 	                if(tp > 2){
 	                	val.tp = "03" ;
 	                }
-	                cns.debug("put ei:",val);
+	                // cns.debug("put ei:",val);
 	                idb_timeline_events.put(val);
 	            });
 	    	}
 
-            //存完後改timeline 
-            $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
-	    	});
+
+	    	if(polling_arr.length == 0){
+	    		// cns.debug("??");
+		    	//資料個數少於這個數量 表示沒東西了
+		        if(timeline_list.length < 10){
+		        	//沒資料的確認 加入no data 
+		    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");
+		        	//關閉timeline loading 開啟沒資料圖示
+		        	setTimeout(function(){
+		        		$(".st-feedbox-area-bottom > img").hide();
+	    				$(".st-feedbox-area-bottom > div").show();
+		        	},2000);
+		        }else{
+	        		//開啟timeline loading 關閉沒資料圖示 下拉更新除外
+		    		$(".st-feedbox-area-bottom > img").show();
+					$(".st-feedbox-area-bottom > div").hide();
+	        	}
+
+	        	//存完後改timeline 
+	            $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+	    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
+		    	});
+	    	}
+	            
 	    });
 	}
 
-	idbRemoveTimelineEvent = function(timeline_list,ct_timer){
+	idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr){
+		var polling_arr = polling_arr || [];
+		var this_gi = polling_arr[0] || gi;
+
 		var ct_timer = ct_timer || 9999999999999;
 		
 		var event_tp = $("#page-group-main").data("navi") || "00";
 		var ei_arr = [];
+
 		for(obj in timeline_list){
-			cns.debug("timeline_list[obj]:",timeline_list[obj]);
+			// cns.debug("timeline_list[obj]:",timeline_list[obj]);
 			ei_arr.push(timeline_list[obj].ei);
 		}
-		cns.debug("ei_arr:",ei_arr);
+		// cns.debug("ei_arr:",ei_arr);
 		//判斷類別
 		var idb_index,idb_keyRange;
 		if(!event_tp || event_tp == "00"){
 			idb_index = "gi_ct";
 			idb_keyRange = idb_timeline_events.makeKeyRange({
-              upper: [gi,ct_timer],
-              lower: [gi,timeline_list.last().meta.ct]
+              upper: [this_gi,ct_timer],
+              lower: [this_gi,timeline_list.last().meta.ct]
             });
 		}else{
 			idb_index = "gi_tp_ct";
 			var last_ct = 0;
 			if(timeline_list.last()) last_ct = timeline_list.last().meta.ct;
 			idb_keyRange = idb_timeline_events.makeKeyRange({
-              upper: [gi,event_tp,ct_timer],
-              lower: [gi,event_tp,last_ct]
+              upper: [this_gi,event_tp,ct_timer],
+              lower: [this_gi,event_tp,last_ct]
             })
 		}
 
-		cns.debug("remove idb_keyRange:",idb_keyRange);
+		// cns.debug("remove idb_keyRange:",idb_keyRange);
 		//刪掉server回傳的最後一筆和ct_timer之間的資料
 		idb_timeline_events.iterate(function(item){
 			//刪db
-			cns.debug("remove ei:",item.ei);
+			// cns.debug("remove ei:",item.ei);
 	    	idb_timeline_events.remove(item.ei);
 
 	    	//刪ui裡面被刪除的event
@@ -2998,7 +3012,7 @@ $(function(){
 	    	
 	    	if($.inArray(item.ei,ei_arr) == -1){
 	    		var this_event = $(".feed-subarea").find("[data-event-id="+ item.ei +"]");
-	    		cns.debug("zzzzqqqq");
+	    		// cns.debug("zzzzqqqq");
 	    		this_event.remove();
 	    	}
 	    },{
@@ -3024,8 +3038,8 @@ $(function(){
 		$(".feed-subarea").hide();
 		ori_selector.show();
 
-		//reset selector data
-		ori_selector.removeData();
+		//reset selector data 忘記作用了
+		// ori_selector.removeData();
 
 	    //製作timeline
 	    $.each(timeline_list,function(i,val){
@@ -3042,6 +3056,7 @@ $(function(){
 
     		//讀完就可重新滾動撈取舊資料 setTimeOut避免還沒寫入時就重新撈取
         	setTimeout(function(){
+        		cns.debug("scroll-chk false");
         		selector.data("scroll-chk",false);
         	},1000);
 
@@ -3234,7 +3249,6 @@ $(function(){
 
 		//下拉更新就不需要資料庫了
 		if(is_top) return false;
-		// return false;
 
 		//判斷類別
 		var idb_index,idb_keyRange;
@@ -3259,9 +3273,6 @@ $(function(){
 	    	load_show = false;
 	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
     			timelineBlockMake($(this).find(".st-sub-box"),timeline_list);
-
-    			//躲在這裡 
-    			// idbPutTimelineEvent(ct_timer,is_top);
 	    	});
 	    },{
             index: idb_index,
@@ -3770,7 +3781,6 @@ $(function(){
 	getS3file = function(file_obj,target,tp,size){
 		//default
 		size = size || 350;
-		cns.debug("size:",size);
 		var api_name = "groups/" + gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + ti_feed;
         var headers = {
                  "ui":ui,
@@ -4417,6 +4427,9 @@ $(function(){
                 //寫入數字
 		        pollingCountsWrite(new_pollingData);
 
+
+		        pollingCmds(new_pollingData.cmds);
+
                 // cns.debug("api updata:",JSON.stringify($.parseJSON(data.responseText),null,2));
                 // cns.debug("polling timer:",polling_timer);
 
@@ -4434,7 +4447,6 @@ $(function(){
     	var gcnts = polling_data.gcnts;
     	var msgs = polling_data.msgs;
     	var ccs = polling_data.ccs;
-    	var cmds = polling_data.cmds;
 
     	if(cnts){
     		$.each(cnts,function(i,val){
@@ -4470,13 +4482,13 @@ $(function(){
     		//鈴鐺
     	}
 
-    	pollingCmds(cmds);
+    	
 
-    	if(msgs&&msgs.length>0){
+    	if(msgs && msgs.length>0){
     		updateChat(msgs);
     	}
 
-    	if(ccs&&ccs.length>0){
+    	if(ccs && ccs.length>0){
     		updateChatCnt(ccs);
     	}
     }
@@ -4484,13 +4496,19 @@ $(function(){
     pollingCmds = function(cmds){
     	cns.debug("cmds:",cmds);
     	cns.debug("gi:",gi);
+    	cns.debug("window.location.hash:",window.location.hash);
     	$.each(cmds,function(i,val){
+    		cns.debug("val.pm.gi:",val.pm.gi);
     		switch(val.tp){
     			case 1://timeline list
-    				if(val.pm.gi == gi) {
-    					cns.debug("fuck");
-    					idbPutTimelineEvent();
+    				var polling_arr = [val.pm.gi,val.pm.ti];
+    				
+    				if(val.pm.gi == gi && window.location.hash == "#page-group-main") {
+    					cns.debug("polling update timeline");
+    					polling_arr = false;
     				}
+
+    				idbPutTimelineEvent("",false,polling_arr);
     				break;
     		}
     	});

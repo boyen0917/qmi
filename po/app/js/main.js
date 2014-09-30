@@ -167,7 +167,7 @@ $(function(){
         }
     });
 
-	//timeline下拉更新
+	//timeline 滾到底部取舊資料
 	$(window).scroll(function() {
 		//timeline 才要做
 		if(!$(".feed-subarea").is(":visible")) return false;
@@ -197,13 +197,14 @@ $(function(){
 			var bottom_height = $(window).scrollTop() + $(window).height();
 			var last_height = last_show_event.offset().top + last_show_event.height() + 25;
 
+			// cns.debug("this_navi:",{name:this_navi.selector,data:this_navi.data("scroll-chk")});
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
 		    if(bottom_height && bottom_height >= last_height && !this_navi.data("scroll-chk")){
 		    	if(this_navi.data("last-ct")){
 		    		var time = new Date(this_navi.data("last-ct"));
 	        		var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );	
-	        		cns.debug("last-ct:",this_navi.data("last-ct"));
-	        		cns.debug("最後一筆時間:",time_format);
+	        		// cns.debug("last-ct:",this_navi.data("last-ct"));
+	        		// cns.debug("最後一筆時間:",time_format);
 		    	}
 		    	
 		    	//避免重複
@@ -909,6 +910,10 @@ $(function(){
 		
 	});
 
+	// $(document).on("mouseup",".st-box2-more-task-area-detail",function(e){
+	// 	e.stopPropagation();
+	// });
+
 	$(document).on("mouseup",".st-sub-box-1, .st-sub-box-2",function(e){
 		if($(this).data("trigger")) $(this).trigger("detailShow");
 	});
@@ -1009,7 +1014,7 @@ $(function(){
 
 	
 	//timeline裏面點擊不做展開收合的區域 設定在init.js
-	$(document).on("click",timeline_detail_exception.join(","),function(e){
+	$(document).on("mouseup",timeline_detail_exception.join(","),function(e){
 		e.stopPropagation();
 	});
 	

@@ -132,12 +132,14 @@ $(function(){
         };
 
         var method = "post";
+        cns.debug("before login");
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
-        	cns.debug("data:",data);
-        	var login_result = $.parseJSON(data.responseText);
-        	// cns.debug("login resutl:",JSON.stringify(login_result));
-        	// return false;
+        	cns.debug("login data:",data);
         	if(data.status == 200){
+        		var login_result = $.parseJSON(data.responseText);
+	        	// cns.debug("login resutl:",JSON.stringify(login_result));
+	        	// return false;
+        	
 
         		//判斷是否換帳號 換帳號就要清db
         		if(!$.lStorage(login_result.ui)){
@@ -360,7 +362,6 @@ $(function(){
 			$(".setting-next").removeClass("setting-next-ready");
 		}
 	});
-
 
 
     $(document).on("click",".setting-next-ready",function(){
