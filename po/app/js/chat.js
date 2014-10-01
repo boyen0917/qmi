@@ -1,11 +1,11 @@
 
-var g_ui;		//user id
+var ui;		//user id
 var g_room;		//chatRoom
-var g_ci;		//chatRoom id
+var ci;		//chatRoom id
 var g_cn;		//聊天室名字
-var g_gi;		//group id
+var gi;		//group id
 var g_group;	//group
-var g_at;		//access token
+var at;		//access token
 var eGroupTiType = {
 	"CHAT":0,
 	"CALENDER":1,
@@ -23,6 +23,7 @@ var g_bIsEndOfHistory = false;
 var g_msgTmp;
 var g_oriFooterHeight;
 var g_extraSendOpenStatus = 0;
+var g_lineHeight = 21;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -33,6 +34,8 @@ var g_extraSendOpenStatus = 0;
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
 $(document).ready(function(){
+	$(document).off("ajaxSend");
+
 	g_oriFooterHeight = $("#footer").height();
 	// $(".title").click(function(){
 	// 	updateChat();
@@ -49,18 +52,18 @@ $(document).ready(function(){
 
 	var _loginData = $.lStorage("_chatRoom");
 
-	g_gi = _loginData.gi;
-	g_ui = _loginData.ui;
-	g_at = _loginData.at;
-	g_ci = _loginData.ci;
-    var userData = $.lStorage( g_ui );
+	gi = _loginData.gi;
+	ui = _loginData.ui;
+	at = _loginData.at;
+	ci = _loginData.ci;
+    var userData = $.lStorage( ui );
     if( !userData ){
     	document.location = "login.html";
     }
 
     //所有團體列表
-    g_group = userData[g_gi];
-    g_room = g_group["chatAll"][g_ci];
+    g_group = userData[gi];
+    g_room = g_group["chatAll"][ci];
 	g_cn = g_room.uiName;
 
 	eGroupTiType["CHAT"] = g_group["ti_chat"];
@@ -86,28 +89,35 @@ $(document).ready(function(){
 	var input = $("#footer .contents .input");
 	// input.autosize({append: "\n"});
 	input.off("keydown").off("keypress");
-	input.keydown(function(e){
-	    if (e.keyCode == '8' || e.keyCode=='46'){	//backspace or delete
-	    	setTimeout(updateChatContentPosition,50);
-	    }
-	});
+	// input.off("keydown").off("keypress");
+	// input.keydown(function(e){
+	//     if (e.keyCode == '8' || e.keyCode=='46'){	//backspace or delete
+	//     	setTimeout(updateChatContentPosition,50);
+	//     }
+	// });
 
 	input.keypress(function(e){
 	    if (e.keyCode == '13' && !e.altKey){
 			sendChat();
 	    	// return false;
 	    }
-	    setTimeout(updateChatContentPosition,50);
 	});
 
-	$(document).find("title").text(g_cn + "-Project O");
+	input.off("keydown").keydown( function(){
+		setTimeout(updateChatContentPosition,50);
+	});
+	input.html("");
+
+	$(document).find("title").text(g_cn + " - FINE");
 
 	$("#chat-toBottom").off("click");
 	$("#chat-toBottom").click(scrollToBottom);
 
 	$("#chat-toBottom").off("resize");
 	$(window).resize(resizeContent);
+	$(".input").data("h", $(".input").innerHeight());
 
+	//other 
 	// $(".input-other").off("click").click(function(){
 	// 	if( 0==g_extraSendOpenStatus ){
 	// 		g_extraSendOpenStatus = 1;
@@ -130,13 +140,13 @@ $(document).ready(function(){
 		if( 0==g_extraSendOpenStatus ){
 			g_extraSendOpenStatus = 2;
 			$("#footer").animate({bottom:0},'fast');
-			$("#chat-contents").animate({marginBottom:200},'fast');
+			// $("#chat-contents").animate({marginBottom:200},'fast');
 			updateChatContentPosition();
 			$(this).addClass("active");
 		} else if(2==g_extraSendOpenStatus){
 			g_extraSendOpenStatus = 0;
 			$("#footer").animate({bottom:-200},'fast');
-			$("#chat-contents").animate({marginBottom:0},'fast');
+			// $("#chat-contents").animate({marginBottom:0},'fast');
 			updateChatContentPosition();
 			$(this).removeClass("active");
 		} else{
@@ -156,7 +166,7 @@ $(document).ready(function(){
 					showMsg( object );
 				}
 			}
-			op("/groups/"+g_gi+"/chats/"+g_ci+"/messages_read"
+			op("/groups/"+gi+"/chats/"+ci+"/messages_read"
 			    ,"PUT",
 			    JSON.stringify({lt:g_currentDate.getTime()}),
 			    null
@@ -187,12 +197,19 @@ $(document).ready(function(){
                                                                                           */
 
 function updateChatContentPosition (){
-	var tmp = (0==g_extraSendOpenStatus)?200:0;
-	var footerHeight = $("#footer").height();
-	footerHeight -= tmp;
-	$("#chat-contents").animate({MarginBottom:Math.max(0,footerHeight-45)}, 100);
-	if( g_isEndOfPage ) scrollToBottom();
-	$("#chat-toBottom").animate({bottom: Math.max(0,footerHeight+10)}, 100 );
+	var staus = (0==g_extraSendOpenStatus);
+	if( $(".input").data("h") != $(".input").innerHeight() 
+		|| $(".input").data("staus")!=staus ){
+		cns.debug( $(".input").data("h"), $(".input").innerHeight() );
+		$(".input").data("h", $(".input").innerHeight() );
+		$(".input").data("staus", staus);
+		var tmp = staus?200:0;
+		var footerHeight = $("#footer").height();
+		footerHeight -= tmp;
+		$("#chat-contents").stop().animate({marginBottom:footerHeight-40}, 100);
+		$("#chat-toBottom").animate({bottom: Math.max(0,footerHeight+10)}, 100 );
+		if( g_isEndOfPage ) scrollToBottom();
+	}
 }
 
 function resizeContent (){
@@ -219,6 +236,7 @@ function onChatDBInit(){
 	lastMsg.data("time", today.getTime() );
 	lastMsg.append( timeTag );
 	$("#chat-contents").append( lastMsg );
+	$("#chat-contents").append( "<div class='tmpMsg'></div>" );
 	getHistoryMsg( false );
 
 	scrollToBottom();
@@ -231,6 +249,7 @@ function getHistoryMsg ( bIsScrollToTop ){
     g_idb_chat_msgs.limit(function(list){
         //cns.debug("list:",JSON.stringify(list,null,2));
         if( list.length>0 ){
+        	var firstDom = $("#chat-contents>div:nth-child(3)>div:nth-child(1)");
         	//list is from near to far day
 	        for( var i in list){
 	        	if( null==list[i] || g_msgs.indexOf(list[i].ei)>=0 ){
@@ -241,7 +260,7 @@ function getHistoryMsg ( bIsScrollToTop ){
 				}
 	        }
 	    
-		    op("/groups/"+g_gi+"/chats/"+g_ci+"/messages_read"
+		    op("/groups/"+gi+"/chats/"+ci+"/messages_read"
 			    ,"PUT",
 			    JSON.stringify({lt:g_currentDate.getTime()}),
 			    null
@@ -249,14 +268,22 @@ function getHistoryMsg ( bIsScrollToTop ){
 			
 			if( g_bIsPolling )	updateChat();
 
-	    	if(bIsScrollToTop)	scrollToStart();
+	    	if(bIsScrollToTop){
+	    		scrollToStart();
+	    	} else if(firstDom.length>0){
+	    		setTimeout( function(){
+		    		// firstDom.css("background", "red");
+		    		var offset = firstDom.offset();
+		    		$('html, body').scrollTop( offset.top+10-$(window).height()*0.25 );
+	    		}, 100);
+	    	}
 	    	g_bIsLoadHistoryMsg = false;
 	    }
     },{
         index: "gi_ci_ct",
         keyRange: g_idb_chat_msgs.makeKeyRange({
-	        upper: [g_gi, g_ci, g_lastDate.getTime()],
-	        lower: [g_gi, g_ci]
+	        upper: [gi, ci, g_lastDate.getTime()],
+	        lower: [gi, ci]
 	        // only:18
         }),
         limit: 20,
@@ -276,7 +303,7 @@ api打回來的是以ct開始的訊息....
 暫時先不處理, 之後再問問其他人怎做
 */
 function updateHistoryMsg(){
-	op("/groups/"+g_gi+"/chats/"+g_ci+"/messages?"+(g_lastDate.getTime()-2000),
+	op("/groups/"+gi+"/chats/"+ci+"/messages?"+(g_lastDate.getTime()-2000),
 	    "GET",
 	    "",
 	    function(data, status, xhr) {
@@ -291,8 +318,8 @@ function updateHistoryMsg(){
 					} else {
 						//add to db
 						var node = {
-							gi: g_gi,
-							ci: g_ci,
+							gi: gi,
+							ci: ci,
 							ei: object.ei,
 					        ct: object.meta.ct,
 					        data: object
@@ -312,37 +339,39 @@ function updateHistoryMsg(){
 	);	//end of op
 }	//end of updateChat
 
-function op ( url, type, data, delegate){
+function op ( url, type, data, delegate, errorDelegate){
 	$.ajax({
 	    url: "https://apserver.mitake.com.tw/apiv1" + url,
 	    type: type,
 	    data: data,
 	    dataType: "json",
 	    headers: {
-			ui: g_ui,
-			at: g_at,
+			ui: ui,
+			at: at,
 			li: "TW"
 	    },
 	    success: delegate,
 	    error: function(jqXHR, textStatus, errorThrown) {
 		  console.log(textStatus, errorThrown);
+		  if( errorDelegate ) errorDelegate();
 		}
 	});
 }
 
 function scrollToStart (){
-	$('html, body').animate({scrollTop:50}, 'fast');
+	$('html, body').stop().animate({scrollTop:50}, 'fast');
 }
 
 function scrollToBottom (){
-	$('html, body').animate({scrollTop:$(document).height()}, 'fast');
+	// cns.debug( $(document).height() );
+	$('html, body').stop().animate({scrollTop:$(document).height()+50}, 'fast');
 }
 
 function checkPagePosition (){
 	var posi = $(window).scrollTop();
-	if( posi <= 0 ){
+	if( posi <= $("#chat-loading").height()*0.5 ){
 		if( false==g_bIsLoadHistoryMsg ){
-			if( !g_bIsEndOfHistory )	getHistoryMsg( true );
+			if( !g_bIsEndOfHistory )	getHistoryMsg( false );
 			else updateHistoryMsg();
 		}
 		g_isEndOfPage = false;
@@ -351,8 +380,9 @@ function checkPagePosition (){
 
 	var height = $(window).height();
 	var docHeight = $(document).height();
-	var isAtBottom = ((posi + height) >= docHeight);
+	var isAtBottom = ((posi + height+5) >= docHeight);
 	if( g_isEndOfPage != isAtBottom ){
+		if( !isAtBottom) cns.debug(height, docHeight, (posi + height), docHeight );
 		g_isEndOfPage = isAtBottom;
 		if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
 		else $("#chat-toBottom").fadeIn('fast');
@@ -375,7 +405,7 @@ function getChatMemName (groupUID){
 	return mem.nk;
 }
 function updateChat (){
-	op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
+	op("/groups/"+gi+"/chats/"+ci+"/messages",
 	    "GET",
 	    "",
 	    function(data, status, xhr) {
@@ -402,8 +432,8 @@ function updateChat (){
 					} else {
 						//add to db
 						var node = {
-							gi: g_gi,
-							ci: g_ci,
+							gi: gi,
+							ci: ci,
 							ei: object.ei,
 					        ct: object.meta.ct,
 					        data: object
@@ -426,7 +456,7 @@ function updateChat (){
 
 			//groups/G000006s00q/chats/T000011m0Fj/messages_read
 			//update read cnt
-		    op("/groups/"+g_gi+"/chats/"+g_ci+"/messages_read"
+		    op("/groups/"+gi+"/chats/"+ci+"/messages_read"
 			    ,"PUT",
 			    JSON.stringify({lt:g_currentDate.getTime()}),
 			    null
@@ -437,10 +467,10 @@ function updateChat (){
 }	//end of updateChat
 
 function updateChatCnt (){
-	var userData = $.lStorage(g_ui);
+	var userData = $.lStorage(ui);
 	// cns.debug( JSON.stringify(userData) );
-    g_group = userData[g_gi];
-    g_room = g_group["chatAll"][g_ci];
+    g_group = userData[gi];
+    g_room = g_group["chatAll"][ci];
 
 
 	if( null == g_room || null==g_room.cnt || length<=0 ) return;
@@ -543,7 +573,11 @@ function showMsg (object, bIsFront){
 		div.append(container);
 	}
 
+	g_msgsByTime[object.meta.ct] = div;
+
+	
 	//msg
+	var time = new Date(object.meta.ct);
 	var msgData = object.ml[0];
 	var msgDiv;
 	var isMe = ( object.meta.gu == g_group.gu );
@@ -596,10 +630,6 @@ function showMsg (object, bIsFront){
 
 		div.append(subDiv);	//right
 	}
-	g_msgsByTime[object.meta.ct] = div;
-
-
-	// s( g_lastDate, time.customFormat( "#M#/#D# #hh#:#mm#" ), msgData.c);
 
 	switch(msgData.tp){
 		case 0: //text or other msg
@@ -630,7 +660,7 @@ function showMsg (object, bIsFront){
 			}
 			var pic = $("<img class='msg-img' style='width:150px;height:200px;'>");
 			msgDiv.append(pic);
-			getS3file(msgDiv, msgData.c, msgData.p, msgData.tp, g_ci, 120);
+			getS3file(msgDiv, msgData.c, msgData.p, msgData.tp, ci, 120);
 			break;
 		case 8: //audio
 			if(isMe){
@@ -642,7 +672,7 @@ function showMsg (object, bIsFront){
 				"<audio class='msg-audio' src='test' controls></audio>"
 			);
 			msgDiv.append( this_audio );
-			getS3file(this_audio, msgData.c, msgData.p, msgData.tp, g_ci);
+			getS3file(this_audio, msgData.c, msgData.p, msgData.tp, ci);
 			break; 
 		case 9: //map
 			if(isMe){
@@ -650,51 +680,7 @@ function showMsg (object, bIsFront){
 			} else {
 				msgDiv.addClass('chat-msg-bubble-left');
 			}
-			var mapDiv = $("<div class='msg-map'></div>");
-			mapDiv.append("<div class='img'></div>" );
-			mapDiv.append("<div class='text'>" + msgData.a + "</div>");
-			// mapDiv.tinyMap({
-			// 	 center: {x: msgData.lat, y: msgData.lng},
-			// 	 panControl: 0,
-			// 	 infoWindowAutoClose: 0,
-			// 	 streetViewControl: 0,
-			// 	 zoomControl: 1,
-			// 	 mapTypeControl: 0,
-			// 	 scaleControl: 0,
-			// 	 scrollwheel: 0,
-			// 	 zoom: 16,
-			// 	 marker: [
-	  //   	         {addr: [msgData.lat, msgData.lng], text: msgData.a}
-			// 	 ]
-			// });
-			mapDiv.click(function(){
-				var gallery = window.open("", "", "width=800, height=600");
-				$(gallery.document).ready(function(){
-						var body = $(gallery.document).find("body");
-						body.css("background","black");
-						body.css( "overflow", "hidden" );
-						body.css( "padding", "0" );
-						var this_slide = $("<div></div>");
-						this_slide.css( "margin", "-8px" );
-						this_slide.css("width","800px");
-						this_slide.css("height","600px");
-						body.append( this_slide );
-					setTimeout(function(){
-						this_slide.tinyMap({
-							 center: {x: msgData.lat, y: msgData.lng},
-							 // zoomControl: 0,
-							 mapTypeControl: 0,
-							 // scaleControl: 0,
-							 scrollwheel: 0,
-							 zoom: 16,
-							 marker: [
-				    	         {addr: [msgData.lat, msgData.lng], text: msgData.a}
-							 ]
-						});
-					},300);
-				});
-			});
-			msgDiv.append(mapDiv);
+			showMap(msgData, msgDiv);
 			break; 
 		default: //text or other msg
 			if(isMe){
@@ -706,22 +692,185 @@ function showMsg (object, bIsFront){
 			// msgDiv.html( msgData.tp+"<br/>"+msgData.c );
 			break;
 	}
+
+	// s( g_lastDate, time.customFormat( "#M#/#D# #hh#:#mm#" ), msgData.c);
 }
 
+function showMap (msgData, container){
+	var mapDiv = $("<div class='msg-map'></div>");
+	mapDiv.append("<div class='img'></div>" );
+	mapDiv.append("<div class='text'>" + msgData.a + "</div>");
+	// mapDiv.tinyMap({
+	// 	 center: {x: msgData.lat, y: msgData.lng},
+	// 	 panControl: 0,
+	// 	 infoWindowAutoClose: 0,
+	// 	 streetViewControl: 0,
+	// 	 zoomControl: 1,
+	// 	 mapTypeControl: 0,
+	// 	 scaleControl: 0,
+	// 	 scrollwheel: 0,
+	// 	 zoom: 16,
+	// 	 marker: [
+	//       {addr: [msgData.lat, msgData.lng], text: msgData.a}
+	// 	 ]
+	// });
+	mapDiv.click(function(){
+		var gallery = window.open("", "", "width=800, height=600");
+		$(gallery.document).ready(function(){
+				var body = $(gallery.document).find("body");
+				body.css("background","black");
+				body.css( "overflow", "hidden" );
+				body.css( "padding", "0" );
+				var this_slide = $("<div></div>");
+				this_slide.css( "margin", "-8px" );
+				this_slide.css("width","800px");
+				this_slide.css("height","600px");
+				body.append( this_slide );
+			setTimeout(function(){
+				this_slide.tinyMap({
+					 center: {x: msgData.lat, y: msgData.lng},
+					 // zoomControl: 0,
+					 mapTypeControl: 0,
+					 // scaleControl: 0,
+					 scrollwheel: 0,
+					 zoom: 16,
+					 marker: [
+		    	         {addr: [msgData.lat, msgData.lng], text: msgData.a}
+					 ]
+				});
+			},300);
+		});
+	});
+	container.append(mapDiv);
+}
+
+function showTmpMsg (data){
+	var msgData = data.ml[0];
+	var time = new Date();
+	var container = $("<div></div>");
+	container.data("send", data);
+	var div = $( "#chat-contents .tmpMsg" );
+	div.append(container);
+
+	//right align
+	//time +(msg)
+	div = $("<div class='chat-msg-right'></div>");
+	container.append(div);
+
+	var table = $("<table></table>");
+	table.append( $("<tr><td><div class='chat-cnt' data-t='"+time.getTime()+"'></div></td></tr>") );
+	var tr = $("<tr></tr>");
+	var td = $("<td></td>");
+	var status = $("<div class='chat-msg-load'></div>");
+	status.click(function(){
+		if( $(this).hasClass("chat-msg-load-error") ){
+			popupShowAdjust( "","",true, true, [sendInput,container] );
+			$(".popup-confirm").html( $.i18n.getString("resend") );
+			$(".popup-cancel").html( $.i18n.getString("delete") );
+			$(".popup-cancel").off("click").click(function(){
+				container.remove();
+				$(".popup-screen").hide();
+	    		$(".popup").hide();
+			});
+		}
+	});
+	td.append(status);
+	td.append("<div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div>");
+	tr.append(td);
+	table.append(tr);
+
+	div.append( table );
+
+	var msgDiv = $("<div></div>");
+	div.append(msgDiv);
+	switch(msgData.tp){
+		case 0: //text or other msg
+			msgDiv.addClass('chat-msg-bubble-right');
+			msgDiv.html( htmlFormat(msgData.c) );
+			break;
+		case 5:
+			msgDiv.addClass("msg-sticker");
+			msgDiv.addClass('right');
+			var pic = $("<img>");
+			var sticker_path = "sticker/" + msgData.c.split("_")[1] + "/" + msgData.c + ".png";
+			pic.attr("src",sticker_path);
+			msgDiv.append(pic);
+			break;
+		case 6:
+			msgDiv.addClass('chat-msg-container-right');
+			var pic = $("<img class='msg-img' style='width:150px;height:200px;'>");
+			msgDiv.append(pic);
+			getS3file(msgDiv, msgData.c, msgData.p, msgData.tp, ci, 120);
+			break;
+		case 8: //audio
+			msgDiv.addClass('chat-msg-bubble-right');
+			var this_audio = $(
+				"<audio class='msg-audio' src='test' controls></audio>"
+			);
+			msgDiv.append( this_audio );
+			getS3file(this_audio, msgData.c, msgData.p, msgData.tp, ci);
+			break; 
+		case 9: //map
+			msgDiv.addClass('chat-msg-bubble-right');
+			showMap(msgData, msgDiv);
+			break; 
+		default: //text or other msg
+			msgDiv.addClass('chat-msg-bubble-right');
+			msgDiv.html( "&nbsp" );
+			// msgDiv.html( msgData.tp+"<br/>"+msgData.c );
+			break;
+	}
+	return container;
+}
+
+function sendInput ( dom ){
+	var sendData = dom.data("send");
+	cns.debug("send");
+
+	op("/groups/"+gi+"/chats/"+ci+"/messages",
+	    "POST",
+	    JSON.stringify(sendData),
+		function(data, status, xhr) {
+			//succ
+			// if(g_bIsPolling){
+			// 	updateChat();
+			// }
+
+			var msgData = {
+				ei:data.ei,
+				meta:{
+					ct:data.ct,
+					gu:g_group.gu
+				},
+				ml:[
+					{
+						c:sendData.ml[0].c,
+						tp:sendData.ml[0].tp
+					}
+				]
+			};
+			dom.remove();
+			
+			showMsg(msgData, false);
+			if( g_isEndOfPage ) scrollToBottom();
+	    },
+	    function(){
+	    	//error
+	    	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+	    }
+	);
+}
 function sendChat (){
 	var inputDom = $("#footer .contents .input");
 	// var text = inputDom.val();
 	var text = inputDom[0].innerText;
-	if (text.length<=0 ) return;
+	inputDom.html("");
+	if (text.length<=1 ) return;
 
 	var msg = text.replace(/<br>/g,"\n");
 	// inputDom.val("").trigger('autosize.resize');
-	inputDom[0].innerText = "";
 	
-	op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
-	    "POST",
-	    JSON.stringify(
-		    {
+	var dom = showTmpMsg({
 			meta:{
 			  lv: 2,
 			  tp: 3
@@ -731,23 +880,15 @@ function sendChat (){
 			    c: msg
 			  }
 			]
-		    }),
-	    function(data, status, xhr) {
-			if(g_bIsPolling){
-				updateChat();
-			}
-			g_needsRolling = true;
-	    }
-	);
+	});
+	scrollToBottom();
+	sendInput( dom );
 }
 
 sendSticker = function( id ){
 	if (id.length<=0 ) return;
 	
-	op("/groups/"+g_gi+"/chats/"+g_ci+"/messages",
-	    "POST",
-	    JSON.stringify(
-		    {
+	var dom = showTmpMsg({
 			meta:{
 			  lv: 2,
 			  tp: 3
@@ -757,25 +898,19 @@ sendSticker = function( id ){
 			    c: id
 			  }
 			]
-		    }),
-	    function(data, status, xhr) {
-			if(g_bIsPolling){
-				updateChat();
-			}
-			g_needsRolling = true;
-	    }
-	);
+	});
+	sendInput( dom );
 }
 
 getS3file = function(target, file_c, file_p, tp, ti, size){
 	//default
 	size = size || 350;
 	cns.debug("size:",size);
-	//var api_name = "groups/" + g_gi + "/files/" + file_c + "?pi=" + file_p + "&ti=" + eGroupTiType[serviceTp];
-    var api_name = "groups/" + g_gi + "/files/" + file_c + "?pi=" + file_p +"&ti=" + ti;
+	//var api_name = "groups/" + gi + "/files/" + file_c + "?pi=" + file_p + "&ti=" + eGroupTiType[serviceTp];
+    var api_name = "groups/" + gi + "/files/" + file_c + "?pi=" + file_p +"&ti=" + ti;
     var headers = {
-             "ui":g_ui,
-             "at":g_at, 
+             "ui":ui,
+             "at":at, 
              "li":lang,
                  };
     var method = "get";

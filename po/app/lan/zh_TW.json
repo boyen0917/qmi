@@ -20,5 +20,7 @@
 		"someSendSticker"				: "%s 傳送了貼圖",
 		"someSendPicture"				: "%s 傳送了照片",
 		"someSendAudio"					: "%s 傳送了聲音",
-		"someSendMap"					: "%s 傳送了地圖"
+		"someSendMap"					: "%s 傳送了地圖",
+		"resend"						: "重新傳送",
+		"fail-sentMsg"					: "未送出的訊息"
 }
