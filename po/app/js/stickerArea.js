@@ -172,13 +172,14 @@ var initStickerArea= {
 	    	if( !userData ){
 	    		userData = [];
 	    	} else {
-	    		var index=userData.indexOf(id);
-	    		if ( userData.indexOf(id)>=0 ){
-		    		delete userData.sticker[id];
-		    		array.splice(index, 1);
+	    		for(var i=0; i<userData.length; i++){
+	    			if( userData[i].id==id ){
+			    		delete userData[i];
+			    		userData.splice(i, 1);
+	    				break;
+	    			}
 	    		}
 	    	}
-
 	    	userData.push( {"id":id, "src":$(this).attr("src")} );
 	    	$.lStorage("sticker", userData);
 	    	thisTmp.updateHistory();

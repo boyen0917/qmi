@@ -268,6 +268,9 @@ body {
 	border-style: solid;
 	border-width: 2px;
 	border-color: #6c7faf;
+	background: url("../images/chatroom/chat_chatroom_icon_nophoto.png");
+	background-size: cover;
+	background-position: center;
 }
 .msg-sticker.right{
 	text-align: right;
@@ -299,10 +302,10 @@ body {
 	display: inline-block;
 	width: 80%;
 }
-.chat-msg-bubble-left .msg-map .text{
+.chat-msg-bubble-left .msg-map .text, .chat-msg-bubble-left a:link{
 	color: #335196;
 }
-.chat-msg-bubble-right .msg-map .text{
+.chat-msg-bubble-right .msg-map .text, .chat-msg-bubble-right a:link{
 	color: #fff283;
 }
 /* ------ end chat -------------*/
