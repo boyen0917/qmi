@@ -1440,20 +1440,20 @@ $(function(){
                  ██║   ███████╗███████║   ██║             
                  ╚═╝   ╚══════╝╚══════╝   ╚═╝                                               
 	*/
-	var smHrCliclTimes = 0;
-	$(".sm-hr").click(function(){
-		smHrCliclTimes++;
-		if(smHrCliclTimes>4){
-			$("div[data-sm-act='chat']").show();
-			smHrCliclTimes=0;
+	// var smHrCliclTimes = 0;
+	// $(".sm-hr").click(function(){
+	// 	smHrCliclTimes++;
+	// 	if(smHrCliclTimes>4){
+	// 		$("div[data-sm-act='chat']").show();
+	// 		smHrCliclTimes=0;
 
-			initChatDB();
-			if( g_bIsPolling ){
-				initChatCntDB();
-				// pollingInterval();
-			}
-			//彩蛋中的彩蛋
-			// supriseYeah();
-		}
-	});
+	// 		initChatDB();
+	// 		if( g_bIsPolling ){
+	// 			initChatCntDB();
+	// 			// pollingInterval();
+	// 		}
+	// 		//彩蛋中的彩蛋
+	// 		// supriseYeah();
+	// 	}
+	// });
 });  
