@@ -880,6 +880,7 @@ img.auo {
 	cursor:pointer;
 }
 
+
 .sm-group-cj-btn span {
 	display: none;
 	background: rgb(34,36,38);
@@ -900,7 +901,7 @@ img.auo {
 #page-group-main {
 }
 
-.sm-click-bg{
+.sm-click-bg, .sm-group-cj-btn:active{
 	background:#202327;
 }
 
