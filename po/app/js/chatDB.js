@@ -1,6 +1,6 @@
 
 
-var g_bIsPolling = false;
+var g_bIsPolling = true;
 
 /*
                                 ███╗   ███╗███████╗ ██████╗                             

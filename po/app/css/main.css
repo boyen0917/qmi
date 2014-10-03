@@ -1679,6 +1679,10 @@ img.auo {
 	height: 20px;
 	color: #323537;
 	font-size: 18px;
+	width: 70%;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .st-sub-time {

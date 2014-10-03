@@ -126,8 +126,8 @@ $(function(){
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
 
-		//polling 不做錯誤顯示
-		if(ajaxSettings.url.match(/sys\/polling/)) return false;
+		//不做錯誤顯示
+		if(ajaxSettings.errHide) return false;
 
 		//ajax逾時
 		if(jqxhr.statusText == "timeout"){

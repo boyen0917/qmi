@@ -1,7 +1,7 @@
 $(function(){
 
 	//ajax
-	ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk){
+	ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide){
 		//設定是否顯示 loading 圖示
 		load_show = load_show_chk;
 
@@ -20,7 +20,8 @@ $(function(){
             url: api_url,
             type: method,
             headers:headers,
-            data:body
+            data:body,
+            errHide: err_hide || false
         });
 	    
 	    return result;

@@ -11,18 +11,14 @@ $(function(){
 		ui = _loginData.ui;
 		at = _loginData.at;
 
-    	//所有團體列表
-    	group_list = _loginData.gl;
-
     	//所有團體列表 obj
     	group_list_obj = {};
-    	$.each(group_list,function(i,val){
+    	$.each($.lStorage("_groupList"),function(i,val){
 			group_list_obj[val.gi] = val;
     	});
 
-
     	//有group list 就去timeline 沒有就去group menu
-        if(group_list) {
+        if($.lStorage("_groupList")) {
         	//上次點選團體
         	if($.lStorage(ui)){
         		var _groupList = $.lStorage(ui);
@@ -38,7 +34,7 @@ $(function(){
         		
         	}else{
         		//預設團體暫定為第一個團體？
-            	var default_group = group_list[0];
+            	var default_group = $.lStorage("_groupList")[0];
             	$.each(default_group.tl,function(i,val){
             		if(val.tp == 1){
             			ti_cal = val.ti;
@@ -118,18 +114,10 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		// G00000170DO_T000003Q0Dl_E000002f07D
-		// var this_event = $(".feed-subarea").find("[data-event-id=G00000170DO_T000003Q0Dl_E000002f07D]");
-		// this_event.find(".st-task-work-detail").html("");
-
-		// polling();
-		$.mobile.changePage("#page-group-menu");
 
 		//彩蛋鑰匙
 		supriseKey();
 		
-		// if($(document).data("suprise") == 101) 
-		// 	pollingInterval();
 	});
 
 	//下拉更新 滾輪版
@@ -1001,8 +989,6 @@ $(function(){
     		});
 	});
 
-
-
 	
 	//timeline裏面點擊不做展開收合的區域 設定在init.js
 	$(document).on("mouseup",timeline_detail_exception.join(","),function(e){
@@ -1464,7 +1450,7 @@ $(function(){
 			initChatDB();
 			if( g_bIsPolling ){
 				initChatCntDB();
-				pollingInterval();
+				// pollingInterval();
 			}
 			//彩蛋中的彩蛋
 			// supriseYeah();

@@ -434,37 +434,13 @@ $(function(){
 	    }
 	}
 
-	// getTlByGroup = function (gi){
-	// 	$.each(group_list,function(i,val){
-	// 		if(val.gi == gi){
-	// 			return val.tl;
-	// 		}
-	// 	});
-	// }
-
 	setSmUserData = function (gi,gu,gn){
 		$(".sm-user-area-r div:eq(0)").html(gn);
 		$(".sm-user-area-r div:eq(1)").html("");
 
-		//這一段好像沒用處
-		var gn;
-		$.each(group_list,function(i,val){
-			if(val.gi == gi){
-				gn = val.gn;
-			}
-		});
-
 		//檢查每個團體是否存在gu all 
 		var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img")];
 		chkGroupAllUser(data_arr);
-	}
-	
-	setSmUserData_bak = function (gi,gu,gn){
-		$(".sm-user-area-r div:eq(0)").html(gn);
-		$(".sm-user-area-r div:eq(1)").html("");
-
-		var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img")];
-		getUserName(data_arr);
 	}
 
 	chkGroupAllUser = function(data_arr){
@@ -1735,15 +1711,16 @@ $(function(){
 	}
 
 
-	getGroupAllUser = function(gi,ajax_load){
-		var api_name = "groups/" + gi + "/users";
+	getGroupAllUser = function(this_gi,ajax_load,err_show){
+		var err_show = err_show || false;
+		var api_name = "groups/" + this_gi + "/users";
         var headers = {
             "ui":ui,
             "at":at,
             "li":lang,
         };
         var method = "get";
-        return ajaxDo(api_name,headers,method,ajax_load);
+        return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
 	}
 
 	composeObjectShow = function(this_compose){
@@ -2767,7 +2744,7 @@ $(function(){
 		//新的gi 在新的所有團體列表
 		if(!gl){
 			var gl;
-			$.each(group_list,function(g_i,g_val){
+			$.each($.lStorage("_groupList"),function(g_i,g_val){
 				if(g_val.gi == new_gi){
 					gl = g_val;
 				}
@@ -2832,13 +2809,15 @@ $(function(){
 	    	$(".sm-group-list-area-add").html("");
 	    	//chk是開關按鈕ui變化的檢查
 	    	var tmp_selector,count,chk;
-	    	group_list = $.parseJSON(data.responseText).gl;
+	    	var group_list = $.parseJSON(data.responseText).gl;
+
+	    	$.lStorage("_groupList",group_list);
 
 	    	//管理者圖示
 	    	var icon_host = "<img src='images/sidemenu/icon_host.png'/>";
 
 			var total = group_list.length;
-			cns.debug("group list:",group_list);
+			// cns.debug("group list:",group_list);
 	        $.each(group_list,function(i,val){
 
 	        	//新建團體專用 記錄新增團體的資訊 用以跳轉
@@ -4512,7 +4491,7 @@ $(function(){
                  "li":lang,
                      };
         var method = "get";
-        ajaxDo(api_name,headers,method,false).complete(function(data){
+        ajaxDo(api_name,headers,method,false,false,false,true).complete(function(data){
         	ajax_no_msg = false;
 
         	if(data.status == 200){
@@ -4549,8 +4528,7 @@ $(function(){
                 //寫入cnts數字
                 // $(".sm-group-area[data-gi=G000000209m]")
 
-                //不能在這邊存 
-        		$.lStorage("_pollingData",new_pollingData);
+                $.lStorage("_pollingData",new_pollingData);
         	}
         });
     }
@@ -4595,21 +4573,30 @@ $(function(){
     		//鈴鐺
     	}
 
-    	
+
+    	// if(msgs && msgs.length>0){
+    	// 	var updateChatCntData = false;
+    	// 	if(ccs && ccs.length>0){
+    	// 		updateChatCnt = ["updateChatCnt",ccs];
+	    // 	}
+
+    	// 	updateChat(msgs,updateChatCntData);
+    	// }
 
     	if(msgs && msgs.length>0){
     		updateChat(msgs);
     	}
 
     	if(ccs && ccs.length>0){
-    		updateChatCnt(ccs);
+			updateChatCnt(ccs);
     	}
+	    	
     }
 
+    //目前不管timeline event 有無更新 只確認user list完成 就
     pollingCmds = function(cmds){
-    	cns.debug("cmds:",cmds);
-    	cns.debug("gi:",gi);
-    	cns.debug("window.location.hash:",window.location.hash);
+    	var user_info_arr = [];
+
     	$.each(cmds,function(i,val){
     		cns.debug("val.pm.gi:",val.pm.gi);
     		switch(val.tp){
@@ -4623,8 +4610,29 @@ $(function(){
 
     				idbPutTimelineEvent("",false,polling_arr);
     				break;
+    			case 4://新增gu
+
+    			case 5://新增gu user info
+    				user_info_arr.push(val.pm);
+    				
+    				break;
     		}
     	});
+
+    	//將tp4 tp5 的user info都更新完 再更新polling時間
+    	// if(user_info_arr.length > 0){
+    	// 	getUserInfo(user_info_arr,function(){
+    	// 		cns.debug("heyhey");
+    	// 	});
+    	// }
+
+
+  //   	userInfoShow(val.pm.gi,val.pm.gu,function(chk){
+		// 	if(chk){
+		// 		//目前
+		// 		$.lStorage("_pollingData",new_pollingData);
+		// 	}
+		// });
     }
 
     countsFormat = function(num){
@@ -4679,14 +4687,53 @@ $(function(){
     
 
     //====================================================
+    getUserInfo = function(data_arr,callback){
+    	var callback = callback || false;
 
-    userInfoShow = function(){
+		//每操作一組 就踢除 直到結束
+		if(data_arr.length > 0){
+			var this_data = data_arr.last();
+            var api_name = "/groups/" + this_data.gi + "/users/" + this_data.gu;
+	        var headers = {
+	                 "ui":ui,
+	                 "at":at, 
+	                 "li":"zh_TW",
+	                     };
+	        var method = "get";
+	                         
+	        ajaxDo(api_name,headers,method,true,false,false,true).complete(function(data){
+	        	if(data.status == 200){
+	        		var user_data = $.parseJSON(data.responseText);
+	        		//存local storage
+	        		var _groupList = $.lStorage(ui);
+	        		// 如果這行有錯 表示流程有問題
+	        		_groupList[this_data.gi].guAll[this_data.gu] = user_data;
+
+	        		data_arr.pop();
+	        		//等於0 就不用再遞迴
+	        		if(data_arr.length == 0){
+						if(callback) callback(user_data);
+	        		}else{//繼續遞迴
+	        			getUserInfo(data_arr,callback);
+	        		}
+
+	        	//失敗就離開遞迴
+	        	}else{ 
+	        		if(callback) callback(false);
+	        	}
+	        });
+		}
+    }
+
+    userInfoShow = function(this_gi,this_gu){
+    	var this_gi = this_gi || gi;
+    	var this_gu = this_gu || gu;
+
     	$(".screen-lock").show();
     	$(".user-info-load-area").load('layout/layout.html .user-info-load',function(){
     		var this_info = $(this).find(".user-info-load");
 
     		//團體頭像
-    		cns.debug("group_list:",group_list);
     		var group_aut = $(".sm-group-area[data-gi=" + gi + "] .group-pic img").attr("src");
     		this_info.find(".group-avatar img").attr("src",group_aut);
     		avatarPos(this_info.find(".group-avatar img"),60);
@@ -4694,17 +4741,15 @@ $(function(){
     		//團體名稱
     		this_info.find(".group-name").html($.lStorage(ui)[gi].gn);
 
-    		var api_name = "/groups/" + gi + "/users/" + gu;
-            var headers = {
-                     "ui":ui,
-                     "at":at, 
-                     "li":"zh_TW",
-                         };
-            var method = "get";
-                             
-            ajaxDo(api_name,headers,method,true).complete(function(data){
-            	if(data.status == 200){
-	        		var user_data = $.parseJSON(data.responseText);
+    		getUserInfo([{gi:gi,gu:gu}],function(user_data){
+    			if(user_data){
+	        		
+	        		cns.debug("user_data:",user_data);
+	        		//存local storage
+	        		var _groupList = $.lStorage(ui);
+	        		// 如果這行有錯 表示流程有問題
+	        		_groupList[this_gi].guAll[this_gu] = user_data;
+	        		$.lStorage(ui,_groupList);
 
 	        		//頭像
 	        		if(user_data.aut){
@@ -4736,6 +4781,79 @@ $(function(){
 		    		this_info.data("avatar-chk",false);
 	        		$(".screen-lock").fadeOut("fast");
 	        		this_info.fadeOut("fast");
+
+	        		if(callback) callback(false);
+	        	}
+            });
+    	}).fadeIn("fast");
+    }
+
+    userInfoShow_bak = function(this_gi,this_gu,callback){
+    	var this_gi = this_gi || gi;
+    	var this_gu = this_gu || gu;
+
+    	$(".screen-lock").show();
+    	$(".user-info-load-area").load('layout/layout.html .user-info-load',function(){
+    		var this_info = $(this).find(".user-info-load");
+
+    		//團體頭像
+    		var group_aut = $(".sm-group-area[data-gi=" + gi + "] .group-pic img").attr("src");
+    		this_info.find(".group-avatar img").attr("src",group_aut);
+    		avatarPos(this_info.find(".group-avatar img"),60);
+
+    		//團體名稱
+    		this_info.find(".group-name").html($.lStorage(ui)[gi].gn);
+
+    		var api_name = "/groups/" + this_gi + "/users/" + this_gu;
+            var headers = {
+                     "ui":ui,
+                     "at":at, 
+                     "li":"zh_TW",
+                         };
+            var method = "get";
+                             
+            ajaxDo(api_name,headers,method,true).complete(function(data){
+            	if(data.status == 200){
+	        		var user_data = $.parseJSON(data.responseText);
+	        		cns.debug("user_data:",user_data);
+	        		//存local storage
+	        		var _groupList = $.lStorage(ui);
+	        		// 如果這行有錯 表示流程有問題
+	        		_groupList[this_gi].guAll[this_gu] = user_data;
+	        		$.lStorage(ui,_groupList);
+
+	        		//頭像
+	        		if(user_data.aut){
+	        			$(".user-avatar .default").attr("src",user_data.auo);
+	        			$(".user-avatar").data("auo",user_data.auo);
+
+	        			//400存在css media min-width中 
+	        			userInfoAvatarPos($(".user-avatar > img"));
+	        			$(".user-avatar .default").removeClass("default");
+	        		}
+
+	        		// this_info.find(".user-info-list input").val("暫無資料");
+	        		for( item in user_data){
+	        			if(user_data[item]){
+	        				if(item == "bd"){
+						        user_data[item] = user_data[item].substring(0,4) + "/" + user_data[item].substring(4,6) + "/" + user_data[item].substring(6);
+		        			}
+		        			this_info.find(".user-info-list ." + item).val(user_data[item]);
+	        			}
+	        		}
+
+	        		if(user_data.mkp) this_info.find(".user-info-list .pn1").val("******");
+	        		if(user_data.mke) this_info.find(".user-info-list .em").val("******");
+	        		if(user_data.mkb) this_info.find(".user-info-list .bd").val("******");
+
+	        		userInfoEvent(this_info);
+
+	        	}else{
+		    		this_info.data("avatar-chk",false);
+	        		$(".screen-lock").fadeOut("fast");
+	        		this_info.fadeOut("fast");
+
+	        		if(callback) callback(false);
 	        	}
             });
     	}).fadeIn("fast");
@@ -4901,8 +5019,6 @@ $(function(){
         });
     }
 
-    
-
 	//這也可以合併..avatarPos
     userInfoAvatarPos = function(img){
     	//魔術數字 是個人資料的長寬比例400/250 小於這個比例 就要以寬為長邊
@@ -4951,8 +5067,7 @@ $(function(){
         			if(data.status == 200){
         				if($.parseJSON(data.responseText).gl && $.parseJSON(data.responseText).gl.length > 0){
         					//有group
-        					login_result.gl = $.parseJSON(data.responseText).gl;
-        					$.lStorage("_loginData",login_result);
+        					$.lStorage("_groupList",$.parseJSON(data.responseText).gl);
         					location.reload();
         				}else{
         					//沒group

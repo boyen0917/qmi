@@ -166,12 +166,13 @@ $(function(){
 
         		//附上group list
         		getGroupList(login_result.ui,login_result.at).complete(function(data){
+        			cns.debug("get group list done");
         			if(data.status == 200){
         				if($.parseJSON(data.responseText).gl.length > 0){
         					//有group
-        					login_result.gl = $.parseJSON(data.responseText).gl;
+        					var group_list = $.parseJSON(data.responseText).gl;
 
-        					$.lStorage("_loginData",login_result);
+        					$.lStorage("_groupList",group_list);
         					document.location = "main.html#page-group-main";
         				}else{
         					//沒group
