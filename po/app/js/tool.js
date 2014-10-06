@@ -170,6 +170,9 @@ $(function(){
 
     toastShow = function(desc){
 		$(".toast div").html(desc);
+		$(".toast").css("bottom","0px");
+		$(".toast").css("opacity","0");
+		
 		setTimeout(function(){
 			$(".toast").show();
 			$(".toast").animate({

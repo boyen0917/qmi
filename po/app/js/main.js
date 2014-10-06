@@ -5,17 +5,16 @@ $(function(){
 
 	//沒有登入資訊 就導回登入頁面
 	if($.lStorage("_loginData")){
+
 		var _loginData = $.lStorage("_loginData");
 		//清除_loginData
 		localStorage.removeItem("_loginData");
 		ui = _loginData.ui;
 		at = _loginData.at;
 
-    	//所有團體列表 obj
-    	group_list_obj = {};
-    	$.each($.lStorage("_groupList"),function(i,val){
-			group_list_obj[val.gi] = val;
-    	});
+		//更新local storage grouplist
+		setGroupList();
+		// return false;
 
     	//有group list 就去timeline 沒有就去group menu
         if($.lStorage("_groupList")) {
@@ -82,13 +81,18 @@ $(function(){
         }
 
 	}else{
-		if(window.location.href.match(/webdev.cloud.mitake.com.tw/)) {
-    		document.location = "index.html";
+		if(window.location.href.match(/localhost/)) {
+    		cns.debug("login test");
+    		getLoginDataForTest();
     		return false;
     	}else{
-    		getLoginDataForTest();
+    		cns.debug("to login");
+    		document.location = "index.html";
     	}
 	}
+
+	//執行polling
+	pollingInterval();
 
 	$( window ).resize(function() {
 		if($(".st-top-event").length < 2) return false;
@@ -102,14 +106,6 @@ $(function(){
 		},200);
 		$(document).data("top-event-resize",timer);
 
-
-		// $(".st-top-bar-area").css("opacity",0);
-		// $(".st-top-bar-area").animate({
-		//     opacity: 0
-		//   	}, 500, function() {
-		// 	topBarMake($(".st-top-bar-area"),$(".st-top-event").length);  		
-		// 	$(".st-top-bar-area").animate({opacity: 1});
-	 	//  });
 	});
 
 	//test
@@ -171,7 +167,7 @@ $(function(){
 		var last_show_event = this_navi.find(".filter-show").last();
 		var last_event = this_navi.find(".st-sub-box").last();
 		
-		if(last_event.length){
+		if(last_show_event.length){
 			var bottom_height = $(window).scrollTop() + $(window).height();
 			var last_height = last_show_event.offset().top + last_show_event.height() + 25;
 
@@ -892,6 +888,7 @@ $(function(){
 	// $(document).on("mouseup",".st-box2-more-task-area-detail",function(e){
 	// 	e.stopPropagation();
 	// });
+	
 
 	$(document).on("mouseup",".st-sub-box-1, .st-sub-box-2",function(e){
 		if($(this).data("trigger")) $(this).trigger("detailShow");
@@ -901,6 +898,7 @@ $(function(){
 	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2",function(){
 		var this_event = $(this).parent();
 		var this_ei = this_event.data("event-id");
+
 		//此則timeline種類
 		var tp = this_event.data("timeline-tp");
 		
@@ -1412,7 +1410,8 @@ $(function(){
 
 	$(document).on("click",".namecard",function(e){
 		e.stopPropagation();
-		cns.debug("hehe:",$(this).data("auo"));
+		var this_event = $(this).parents(".st-sub-box");
+		cns.debug("this_event data:",this_event.data());
 	});
 	
 	//$(document).on("timeupdate",".st-attach-audio audio",function(){
