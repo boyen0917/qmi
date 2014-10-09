@@ -1,10 +1,48 @@
 $(function(){
 
 	setGroupList = function(){
-		
+
+		//上次點選團體
+    	if($.lStorage(ui)){
+    		var _uiGroupList = $.lStorage(ui);
+    		var default_gi = _uiGroupList.default_gi;
+    		var default_group = _uiGroupList[default_gi];
+    		
+    		gi = default_gi;
+    		gu = default_group.gu;
+    		gn = default_group.gn;
+    		ti_cal = default_group.ti_cal;
+    		ti_feed = default_group.ti_feed;
+    		ti_chat = default_group.ti_chat;
+    		
+    	}else{
+    		//預設團體暫定為第一個團體？
+        	var default_group = $.lStorage("_groupList")[0];
+        	$.each(default_group.tl,function(i,val){
+        		if(val.tp == 1){
+        			ti_cal = val.ti;
+        		}else if(val.tp == 2){
+        			ti_feed = val.ti;
+        		}else{
+        			ti_chat = val.ti;
+        		}
+        	});
+        	
+        	gi = default_group.gi;
+    		gu = default_group.me;
+    		gn = default_group.gn;
+
+    		//存入localstorage
+    		var _groupList = {"default_gi":gi};
+    		$.lStorage(ui,_groupList);
+    	}
+
+
 		$.each($.lStorage("_groupList"),function(i,gl_obj){
 			var _uiGroupList = $.lStorage(ui);	
 			if(!$.lStorage(ui)[gl_obj.gi]){
+
+				// setGroupAllUser("",gl_obj.gi);
 				gl_obj.guAll = {};
 				gl_obj.gu = gl_obj.me;
 
@@ -23,6 +61,7 @@ $(function(){
     			$.lStorage(ui,_uiGroupList);
 			}
 		});	
+		cns.debug("setGroupList $.lStorage(ui):",$.lStorage(ui));
 	}
 
 	logout = function(){
@@ -269,6 +308,7 @@ $(function(){
 	
 
 	setGroupAllUser = function(data_arr,this_gi){
+		cns.debug("setGroupAllUser");
 		var this_gi = this_gi || gi;
 		getGroupAllUser(this_gi,false).complete(function(data){
 			if(data.status == 200){
@@ -285,7 +325,7 @@ $(function(){
 	            
 	            if(data_arr && data_arr[0] == "setTopEventUserName"){
 	            	//設定top event 的user name
-	            	data_arr[1].find(".st-top-event-r-footer span:eq(0)").html(new_group_user[data_arr[2]].n);
+	            	data_arr[1].find(".st-top-event-r-footer span:eq(0)").html(new_group_user[data_arr[2]].nk);
 	            }else if(data_arr && data_arr[0] == "userInfo"){
 	            	//設定user info
 	            	_groupList[this_gi].guAll[data_arr[1].gu] = data_arr[1];
@@ -299,6 +339,9 @@ $(function(){
 
 	timelineSwitch = function (act){
 		$( "#side-menu" ).panel( "close");
+		//reset
+		$(".feed-subarea").removeData();
+
 		switch (act) {
 	        case "feed":
 	        	//先清空
@@ -361,7 +404,7 @@ $(function(){
 
 	chkGroupAllUser = function(data_arr){
 		//先檢查localStorage[gi].guAll是否存在
-        if(!$.lStorage(ui)[gi].guAll){
+        if(Object.keys($.lStorage(ui)[gi].guAll).length == 0){
         	setGroupAllUser(data_arr);
         }else{
         	getUserName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
@@ -391,8 +434,6 @@ $(function(){
 					return false;
 				}
 			});
-
-			cns.debug("end");
 		});
 	}
 
@@ -510,15 +551,15 @@ $(function(){
         });
 	}
 
-	
-
 	//為了避免gu all還沒取得
 	setTopEventUserName = function(this_top_event,this_gu){
 		var gu_all = $.lStorage(ui)[gi].guAll;
-		if(!gu_all){
+		if(Object.keys(gu_all).length == 0){
+			cns.debug("top event hey");
 			var data_arr = ["setTopEventUserName",this_top_event,this_gu];
 	        setGroupAllUser(data_arr);
 	    }else{
+	    	cns.debug("top event ho");
 	    	this_top_event.find(".st-top-event-r-footer span:eq(0)").html(gu_all[this_gu].nk);
 	    }
 	}
@@ -2922,59 +2963,73 @@ $(function(){
 	    	if(data.status != 200) return false;
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
+
+	    	//沒資料 後面就什麼都不用了
+	    	if( timeline_list.length == 0 ) {
+	    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");
+	        	//關閉timeline loading 開啟沒資料圖示
+	        	setTimeout(function(){
+	        		$(".st-feedbox-area-bottom > img").hide();
+    				$(".st-feedbox-area-bottom > div").show();
+	        	},2000);
+	        	return false;
+	    	}
+
 	    	cns.debug("timeline_list.length:",timeline_list.length);
 	    	//存db 先刪後存 因為刪除事件是不回傳的
 	    	//刪db
 	    	// timeline_list
 	    	// cns.debug("remove timeline_list:",timeline_list);
-	    	// idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr);
+	    	idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
+	    		//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
+		    	if(event_tp == "00"){
+		    		//存db	    	
+		            $.each(timeline_list,function(i,val){
+		                val.ct = val.meta.ct;
+		                val.gi = this_gi ;
+		                val.tp = val.meta.tp ;
+
+		                var tp = val.meta.tp.substring(1,2)*1;
+		                //為了idb
+		                if(tp > 2){
+		                	val.tp = "03" ;
+		                }
+		                cns.debug("put ei:",val);
+		                idb_timeline_events.put(val);
+		            });
+		    	}
+				// return false;
+
+		    	if(polling_arr.length == 0){
+		    		// cns.debug("??");
+			    	//資料個數少於這個數量 表示沒東西了
+			        if(timeline_list.length < 10){
+			        	//沒資料的確認 加入no data 
+			    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");
+			        	//關閉timeline loading 開啟沒資料圖示
+			        	setTimeout(function(){
+			        		$(".st-feedbox-area-bottom > img").hide();
+		    				$(".st-feedbox-area-bottom > div").show();
+			        	},2000);
+			        }else{
+		        		//開啟timeline loading 關閉沒資料圖示 下拉更新除外
+			    		$(".st-feedbox-area-bottom > img").show();
+						$(".st-feedbox-area-bottom > div").hide();
+		        	}
+
+		        	//存完後改timeline 
+		            $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+		    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
+			    	});
+		    	}
+	    	});
 	    	// return false;
-	    	//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
-	    	if(event_tp == "00"){
-	    		//存db	    	
-	            $.each(timeline_list,function(i,val){
-	                val.ct = val.meta.ct;
-	                val.gi = this_gi ;
-	                val.tp = val.meta.tp ;
-
-	                var tp = val.meta.tp.substring(1,2)*1;
-	                //為了idb
-	                if(tp > 2){
-	                	val.tp = "03" ;
-	                }
-	                // cns.debug("put ei:",val);
-	                idb_timeline_events.put(val);
-	            });
-	    	}
-
-
-	    	if(polling_arr.length == 0){
-	    		// cns.debug("??");
-		    	//資料個數少於這個數量 表示沒東西了
-		        if(timeline_list.length < 10){
-		        	//沒資料的確認 加入no data 
-		    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");
-		        	//關閉timeline loading 開啟沒資料圖示
-		        	setTimeout(function(){
-		        		$(".st-feedbox-area-bottom > img").hide();
-	    				$(".st-feedbox-area-bottom > div").show();
-		        	},2000);
-		        }else{
-	        		//開啟timeline loading 關閉沒資料圖示 下拉更新除外
-		    		$(".st-feedbox-area-bottom > img").show();
-					$(".st-feedbox-area-bottom > div").hide();
-	        	}
-
-	        	//存完後改timeline 
-	            $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-	    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
-		    	});
-	    	}
+		    	
 	            
 	    });
 	}
 
-	idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr){
+	idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr,callback){
 		var polling_arr = polling_arr || [];
 		var this_gi = polling_arr[0] || gi;
 
@@ -2982,12 +3037,11 @@ $(function(){
 		
 		var event_tp = $("#page-group-main").data("navi") || "00";
 		var ei_arr = [];
-
+		cns.debug("timeline_list:",timeline_list);
 		for(obj in timeline_list){
-			// cns.debug("timeline_list[obj]:",timeline_list[obj]);
 			ei_arr.push(timeline_list[obj].ei);
 		}
-		// cns.debug("ei_arr:",ei_arr);
+
 		//判斷類別
 		var idb_index,idb_keyRange;
 		if(!event_tp || event_tp == "00"){
@@ -3006,28 +3060,29 @@ $(function(){
             })
 		}
 
-		// cns.debug("remove idb_keyRange:",idb_keyRange);
+		cns.debug("remove idb_keyRange:",idb_keyRange);
 		//刪掉server回傳的最後一筆和ct_timer之間的資料
 		idb_timeline_events.iterate(function(item){
-			//刪db
-			// cns.debug("remove ei:",item.ei);
-	    	idb_timeline_events.remove(item.ei);
+			//刪db 第一篇不用刪
+			if(item.ct != ct_timer){
+				cns.debug("remove event:",item);
+		    	idb_timeline_events.remove(item.ei);
 
-	    	//刪ui裡面被刪除的event
-	    	//不分type就是要一起刪
-
-	    	
-	    	if($.inArray(item.ei,ei_arr) == -1){
-	    		var this_event = $(".feed-subarea").find("[data-event-id="+ item.ei +"]");
-	    		// cns.debug("zzzzqqqq");
-	    		this_event.remove();
-	    	}
+		    	//刪ui裡面被刪除的event
+		    	//不分type就是要一起刪
+		    	
+		    	if($.inArray(item.ei,ei_arr) == -1){
+		    		var this_event = $(".feed-subarea").find("[data-event-id="+ item.ei +"]");
+		    		this_event.remove();
+		    	}
+			}
 	    },{
             index: idb_index,
             keyRange: idb_keyRange,
             order: "DESC",
             onEnd: function(result){
-                console.debug("remove onEnd:",result);
+            	//結束後 呼叫callback
+            	callback();
             },
             onError: function(result){
                 console.debug("remove onError:",result);
@@ -3095,7 +3150,6 @@ $(function(){
     		this_event.data("timeline-id",ti_feed);
 			this_event.data("parti-list",[]);
 			this_event.data("ct",val.meta.ct);
-
 
 
     		//寫新event(等同下拉更新) 判斷有無第一個event 且 時間大於此event的ct
@@ -3251,11 +3305,12 @@ $(function(){
 
 		var idb_timer = ct_timer || 9999999999999;
 		//取得server最新資訊 更新資料庫
+		// cns.debug("timeline ct_timer:",ct_timer);
 		idbPutTimelineEvent(ct_timer,is_top);
 
 		//下拉更新就不需要資料庫了
 		if(is_top) return false;
-		return false;
+		// return false;
 
 		//判斷類別
 		var idb_index,idb_keyRange;
@@ -3360,7 +3415,7 @@ $(function(){
 		};
         var method = "get";
         
-        ajaxDo(api_name,headers,method,true).complete(function(data){
+        ajaxDo(api_name,headers,method,false).complete(function(data){
     		if(data.status == 200){
     			var s_data = $.parseJSON(data.responseText).el;
 
@@ -3800,7 +3855,7 @@ $(function(){
                  "li":lang,
                      };
         var method = "get";
-        var result = ajaxDo(api_name,headers,method,true);
+        var result = ajaxDo(api_name,headers,method,false);
 		result.complete(function(data){
 			if(data.status != 200) return false;
 
@@ -4391,7 +4446,7 @@ $(function(){
             "li":lang
         };
         var method = "get";
-        return ajaxDo(api_name,headers,method,true);
+        return ajaxDo(api_name,headers,method,false);
     }
 
 
@@ -4910,7 +4965,7 @@ $(function(){
             pw:toSha1Encode("111111")
         };
         var method = "post";
-        ajaxDo(api_name,headers,method,true,body).complete(function(data){
+        ajaxDo(api_name,headers,method,false,body).complete(function(data){
         	if(data.status == 200){
         		var login_result = $.parseJSON(data.responseText);
         		$.lStorage("_loginData",login_result);

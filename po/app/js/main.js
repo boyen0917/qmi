@@ -12,73 +12,69 @@ $(function(){
 		ui = _loginData.ui;
 		at = _loginData.at;
 
-		//更新local storage grouplist
+    	// //上次點選團體
+    	// if($.lStorage(ui)){
+    	// 	var _groupList = $.lStorage(ui);
+    	// 	var dgi = _groupList.default_gi;
+    	// 	var defaultGroup = _groupList[dgi];
+    		
+    	// 	gi = dgi;
+    	// 	gu = defaultGroup.gu;
+    	// 	gn = defaultGroup.gn;
+    	// 	ti_cal = defaultGroup.ti_cal;
+    	// 	ti_feed = defaultGroup.ti_feed;
+    	// 	ti_chat = defaultGroup.ti_chat;
+    		
+    	// }else{
+    	// 	//預設團體暫定為第一個團體？
+     //    	var default_group = $.lStorage("_groupList")[0];
+     //    	$.each(default_group.tl,function(i,val){
+     //    		if(val.tp == 1){
+     //    			ti_cal = val.ti;
+     //    		}else if(val.tp == 2){
+     //    			ti_feed = val.ti;
+     //    		}else{
+     //    			ti_chat = val.ti;
+     //    		}
+     //    	});
+        	
+     //    	gi = default_group.gi;
+    	// 	gu = default_group.me;
+    	// 	gn = default_group.gn;
+
+    	// 	//存入localstorage
+    	// 	var _groupList = {"default_gi":gi};
+    	// 	_groupList[gi] = {"gu":gu,"gn":gn,"ti_cal":ti_cal,"ti_feed":ti_feed,"ti_chat":ti_chat};
+    	// 	$.lStorage(ui,_groupList);
+    	// }
+
+    	//更新local storage grouplist
 		setGroupList();
-		// return false;
 
-    	//有group list 就去timeline 沒有就去group menu
-        if($.lStorage("_groupList")) {
-        	//上次點選團體
-        	if($.lStorage(ui)){
-        		var _groupList = $.lStorage(ui);
-        		var dgi = _groupList.default_gi;
-        		var defaultGroup = _groupList[dgi];
-        		
-        		gi = dgi;
-        		gu = defaultGroup.gu;
-        		gn = defaultGroup.gn;
-        		ti_cal = defaultGroup.ti_cal;
-        		ti_feed = defaultGroup.ti_feed;
-        		ti_chat = defaultGroup.ti_chat;
-        		
-        	}else{
-        		//預設團體暫定為第一個團體？
-            	var default_group = $.lStorage("_groupList")[0];
-            	$.each(default_group.tl,function(i,val){
-            		if(val.tp == 1){
-            			ti_cal = val.ti;
-            		}else if(val.tp == 2){
-            			ti_feed = val.ti;
-            		}else{
-            			ti_chat = val.ti;
-            		}
-            	});
-            	
-            	gi = default_group.gi;
-        		gu = default_group.me;
-        		gn = default_group.gn;
+    	//聊天室開啓DB
+    	initChatDB(); 
+		initChatCntDB(); 
 
-        		//存入localstorage
-        		var _groupList = {"default_gi":gi};
-        		_groupList[gi] = {"gu":gu,"gn":gn,"ti_cal":ti_cal,"ti_feed":ti_feed,"ti_chat":ti_chat};
-        		$.lStorage(ui,_groupList);
-        	}
+    	//設定guAll 
+    	setGroupAllUser();
+    	
+    	//header 設定團體名稱
+    	$(".header-group-name div:eq(1)").html(gn);
+    	
+    	//sidemenu name
+    	setSmUserData(gi,gu,gn);
+    	
+    	//做團體列表
+    	groupMenuListArea();
 
-        	//聊天室開啓DB
-        	initChatDB(); 
- 			initChatCntDB(); 
+    	//top event
+    	topEvent();
 
-        	//設定guAll 
-        	setGroupAllUser();
-        	
-        	//header 設定團體名稱
-        	$(".header-group-name div:eq(1)").html(gn);
-        	
-        	//sidemenu name
-        	setSmUserData(gi,gu,gn);
-        	
-        	//做團體列表
-        	groupMenuListArea();
-
-        	//top event
-        	topEvent();
-
-        	//動態消息
-        	//timelineListWrite();
-        	setTimeout(function(){
-        		timelineListWrite();
-        	},1000);
-        }
+    	//動態消息
+    	//timelineListWrite();
+    	setTimeout(function(){
+    		timelineListWrite();
+    	},1000);
 
 	}else{
 		if(window.location.href.match(/localhost/)) {
@@ -105,12 +101,11 @@ $(function(){
 			$(".st-top-bar-area").css("opacity",1);
 		},200);
 		$(document).data("top-event-resize",timer);
-
 	});
 
 	//test
 	$(".header-group-name").click(function(){
-
+		
 		//彩蛋鑰匙
 		supriseKey();
 		
@@ -118,38 +113,44 @@ $(function(){
 
 	//下拉更新 滾輪版
 	$("#page-group-main").bind('mousewheel DOMMouseScroll', function(event){
-		var group_main = $(this);
 
-		//timeline 才要做
-		if(!$(".feed-subarea").is(":visible") || group_main.data("scroll-cnt") < 0 || $(window).scrollTop() > 0) return;
+		//左側選單沒開啟 才給滾
+		if( $(".ui-panel").hasClass("ui-panel-open") == false ){
+			var group_main = $(this);
 
-		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+			//timeline 才要做
+			if(!$(".feed-subarea").is(":visible") || group_main.data("scroll-cnt") < 0 || $(window).scrollTop() > 0) return;
 
-			//控制時限
-			if(group_main.data("scroll-timer")) clearTimeout(group_main.data("scroll-timer"));
+			if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
 
-            var scroll_timer = setTimeout(function(){
-            	group_main.data("scroll-cnt",0);
-            },500);
+				//控制時限
+				if(group_main.data("scroll-timer")) clearTimeout(group_main.data("scroll-timer"));
 
-            group_main.data("scroll-timer",scroll_timer);
+	            var scroll_timer = setTimeout(function(){
+	            	group_main.data("scroll-cnt",0);
+	            },500);
 
-            //計算力道
-            var scroll_cnt = group_main.data("scroll-cnt") || 0;
-            scroll_cnt = scroll_cnt + event.originalEvent.wheelDelta;
-            group_main.data("scroll-cnt",scroll_cnt);
+	            group_main.data("scroll-timer",scroll_timer);
+
+	            //計算力道
+	            var scroll_cnt = group_main.data("scroll-cnt") || 0;
+	            scroll_cnt = scroll_cnt + event.originalEvent.wheelDelta;
+	            group_main.data("scroll-cnt",scroll_cnt);
 
 
-            //滾得夠猛 做下拉更新
-            if(scroll_cnt > 3000) {
-            	group_main.data("scroll-cnt",-10000);
+	            //滾得夠猛 做下拉更新
+	            if(scroll_cnt > 3000) {
+	            	group_main.data("scroll-cnt",-10000);
 
-				timelineTopRefresh();
+					timelineTopRefresh();
 
-				//順便檢查置頂
-				topEventChk();
-            }
-        }
+					//順便檢查置頂
+					topEventChk();
+	            }
+	        }		   
+		}
+
+			
     });
 
 	//timeline 滾到底部取舊資料
