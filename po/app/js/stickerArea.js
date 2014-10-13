@@ -2,7 +2,7 @@
 
 var initStickerArea= {
 	path: "sticker/",
-	jsonPath: "sticker/stickerArea",
+	jsonPath: "sticker/stickerArea.json",
 	dict: null,
 	callback: null,
 	init: function( dom, onSelect ){

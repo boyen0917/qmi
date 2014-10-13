@@ -394,6 +394,153 @@ $(function(){
 		});
 	}
 
+	getFilePermissionId = function(object_str){
+		var object_obj = $.parseJSON(object_str);
+		var gul_arr = [];
+		$.each(object_obj,function(i,val){
+			var temp_obj = {
+				gu: i,
+				n: val
+			}
+			gul_arr.push(temp_obj);
+		});
+		var api_name = "groups/" + gi + "/permissions";
+
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var body = {
+                ti: ti_feed,
+                tu:{
+                  gul: gul_arr 
+                }
+            }
+
+        var method = "post";
+        var pi_result = ajaxDo(api_name,headers,method,false,body);
+		return pi_result;
+	}
+
+	getS3UploadUrl = function(ti,tp,pi){
+		var api_name = "groups/" + gi + "/files";
+
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "post";
+        var body = {
+                  fn: "filename",
+                  tp: tp,
+                  ti: ti,
+                  pi: pi
+                }
+        return ajaxDo(api_name,headers,method,false,body);
+	}
+
+	uploadImgToS3 = function(url,file){
+		return $.ajax ({
+            url: url,
+			type: 'PUT',
+			contentType: " ",
+		 	data: file, 
+			processData: false
+        });
+	}
+	
+	uploadCommit = function(fi,ti,pi,tp,mt,si,md){
+		var api_name = "groups/" + gi + "/files/" + fi + "/commit";
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "put";
+
+        var body = {
+          ti: ti,
+          pi: pi,
+          tp: tp,
+          mt: mt,
+          si: si,
+          md: md
+        }
+        return ajaxDo(api_name,headers,method,false,body);
+	}
+
+	uploadGroupImage = function(file, ti, permission_id, ori_arr, tmb_arr, pi, callback){
+		
+		var reader = new FileReader();
+		reader.onloadend = function() {
+			var tempImg = new Image();
+		    tempImg.src = reader.result;
+		    tempImg.onload = function(){
+		        var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
+		        var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
+
+				getS3UploadUrl(ti, 1, pi).complete(function(data){
+		    		cns.debug("!");
+		    	
+					var s3url_result = $.parseJSON(data.responseText);
+					if(data.status == 200){
+						var fi = s3url_result.fi;
+				    	var s3_url = s3url_result.s3;
+				    	var s32_url = s3url_result.s32;
+
+				    	//傳大圖
+				    	uploadImgToS3(s32_url,o_obj.blob).complete(function(data){
+				    		if(data.status == 200){
+
+				    			//傳小圖 已經縮好囉
+					    		uploadImgToS3(s3_url,t_obj.blob).complete(function(data){
+
+					        		if(data.status == 200){
+					        			var tempW = this.width;
+										var tempH = this.height;
+										
+										//mime type
+										var md = {};
+					        			md.w = o_obj.w;
+					        			md.h = o_obj.h;
+
+					        			uploadCommit(fi,ti,pi,1,file.type,o_obj.blob.size,md).complete(function(data){
+					        				if(data.status == 200){
+						        				var commit_result = $.parseJSON(data.responseText);
+
+						        				var data = {
+						        					fi:fi,
+						        					s3:s3_url,
+						        					s32:s32_url
+						        				}
+							                	if(callback) callback(data);
+							                } else {
+							                	if(callback) callback();
+							                }
+						                	return;
+					        			}); //end of uploadCommit
+
+					        		} else {
+										if(callback)	callback();
+									} //end of small uploadImgToS3 200
+					    		}); //end of small uploadImgToS3
+
+				    		} else {
+								if(callback)	callback();
+							} //end of big uploadImgToS3 200
+			        	}); //end of big uploadImgToS3
+					
+					} else{
+						if(callback)	callback();
+					} //end of getUrl 200
+				}); //end of getUrl
+			}
+		}
+		reader.readAsDataURL(file);
+	}
+
 	randomHash = function(length){
 		if(length<=0)	return "";
 		
