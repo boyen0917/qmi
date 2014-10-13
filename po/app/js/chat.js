@@ -24,6 +24,7 @@ var g_msgTmp;
 var g_oriFooterHeight;
 var g_extraSendOpenStatus = 0;
 var g_lineHeight = 21;
+var pi;	//permission id for this chat room
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -61,6 +62,7 @@ $(document).ready(function(){
     	document.location = "login.html";
     }
 
+    // cns.debug( JSON.stringify(userData) );
     //所有團體列表
     g_group = userData[gi];
     g_room = g_group["chatAll"][ci];
@@ -74,6 +76,8 @@ $(document).ready(function(){
     ti_cal = g_group.ti_cal;
     ti_feed = g_group.ti_feed;
     ti_chat = g_group.ti_chat;
+
+    getPermition();
 
 	//load language
 	updateLanguage( lang );
@@ -117,25 +121,52 @@ $(document).ready(function(){
 	$(window).resize(resizeContent);
 	$(".input").data("h", $(".input").innerHeight());
 
-	//other 
-	// $(".input-other").off("click").click(function(){
-	// 	if( 0==g_extraSendOpenStatus ){
-	// 		g_extraSendOpenStatus = 1;
-	// 		$("#footer").animate({bottom:0},'fast');
-	// 		$("#chat-contents").animate({marginBottom:200},'fast');
-	// 		updateChatContentPosition();
-			// $(this).removeClass("active");
-	// 	} else if(1==g_extraSendOpenStatus){
-	// 		g_extraSendOpenStatus = 0;
-	// 		$("#footer").animate({bottom:-200},'fast');
-	// 		$("#chat-contents").animate({marginBottom:0},'fast');
-	// 		updateChatContentPosition();
-	// 	} else{
-	// 		g_extraSendOpenStatus = 1;
-			// $(this).removeClass("active");
-	// 	}
-	// 	// cns.debug("other: ",g_extraSendOpenStatus);
-	// });
+	//other (img only now)
+	$(".input-other").off("click").click(function(){
+		$(".cp-file").trigger("click");
+	});
+	$(".cp-file").change(function(e) {
+		var file_ori = $(this);
+		if(file_ori[0].files.length>9){
+			popupShowAdjust("","圖檔最多限制9個");
+			return false;
+		}
+
+		var imageType = /image.*/;
+		$.each(file_ori[0].files,function(i,file){
+
+			if (file.type.match(imageType)) {
+				var this_grid =  showUnsendMsg("", 6);
+				
+				//編號 方便刪除
+				this_grid.data("file-num",i);
+				this_grid.data("file",file);
+
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					var img = this_grid.find("div img");
+
+					//調整長寬
+					img.load(function() {
+						var w = img.width();
+			            var h = img.height();
+        				mathAvatarPos(img,w,h,100);
+			        });
+
+			        img.attr("src",reader.result);
+				}
+
+				reader.readAsDataURL(file);
+				sendImage(this_grid);
+			}else{
+				// this_grid.find("div").html('<span>file not supported</span>');
+			}
+		});
+
+		//每次選擇完檔案 就reset input file
+		file_ori.replaceWith( file_ori.val('').clone( true ) );
+	});
+
 	$(".input-emoji").off("click").click(function(){
 		if( 0==g_extraSendOpenStatus ){
 			g_extraSendOpenStatus = 2;
@@ -628,6 +659,10 @@ function showMsg (object, bIsFront, bIsTmpSend){
 						$(".popup-screen").hide();
 			    		$(".popup").hide();
 					});
+					$(".popup-screen").off("click").click(function(){
+						$(".popup-screen").hide();
+			    		$(".popup").hide();
+					});
 				}
 			});
 			td.append(status);
@@ -811,11 +846,7 @@ function sendInput ( dom ){
 		  lv: 2,
 		  tp: 3
 		},
-		ml:[
-		    {tp: tmpData.ml[0].tp,
-		    c: tmpData.ml[0].c
-		  }
-		]
+		ml:tmpData.ml
 	};
 
 	op("/groups/"+gi+"/chats/"+ci+"/messages",
@@ -823,34 +854,95 @@ function sendInput ( dom ){
 	    JSON.stringify(sendData),
 		function(dd, status, xhr) {
 			//delete old data
-	    	var oldData = dom.data("data");
-	    	g_idb_chat_msgs.remove(oldData.ei);
+	    	g_idb_chat_msgs.remove(tmpData.ei);
 			dom.remove();
 
-			cns.debug("recv", dd.ct, new Date(dd.ct));
+			// cns.debug("recv", dd.ct, new Date(dd.ct));
 			//add new data to db & show
-			tmpData.ei = dd.ei;
-			tmpData.meta.ct = dd.ct;
-			delete tmpData.notSend;
+			var newData = {
+				ei:dd.ei,
+				meta:{
+					gu: g_group.gu,
+					ct: dd.ct
+				},
+				ml:tmpData.ml
+			};
 
 			var node = {
 				gi: gi,
 				ci: ci,
 				ei: dd.ei,
 			    ct: dd.ct,
-			    data: tmpData
+			    data: newData
 			};
 			g_idb_chat_msgs.put( node );
 			
-			showMsg(tmpData, false);
+			showMsg(newData, false);
 
-			if( g_isEndOfPage ) scrollToBottom();
+			// if( g_isEndOfPage ) scrollToBottom();
+			scrollToBottom();
 	    },
 	    function(){
 	    	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-			if( g_isEndOfPage ) scrollToBottom();
+			// if( g_isEndOfPage ) scrollToBottom();
+			scrollToBottom();
 	    }
 	);
+}
+
+function sendImage( dom ){
+	var file = dom.data("file");
+
+	var tmpData = dom.data("data");
+	if( ""!=tmpData.ml[0].c ){
+		sendInput(dom);
+	} else {
+		var ori_arr = [1280,1280,0.9];
+		var tmb_arr = [160,160,0.4];
+		
+		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
+
+		uploadGroupImage(file,ti_chat, 0, ori_arr,tmb_arr, pi, function(data){
+			if( data ){
+				//delete old data
+			    g_idb_chat_msgs.remove(tmpData.ei);
+
+			    tmpData.ml[0].c = data.fi;
+			    tmpData.ml[0].p = pi;
+				//add new data to db & show
+				var newData = {
+					ei:tmpData.ei,
+					meta:{
+						gu: g_group.gu,
+						ct: tmpData.ct
+					},
+					ml:[
+						{tp: tmpData.ml[0].tp,
+			    		c: data.fi,
+			    		p: pi
+			  			}
+					],
+					notSend: true
+				};
+
+				var node = {
+					gi: gi,
+					ci: ci,
+					ei: newData.ei,
+				    ct: newData.ct,
+				    data: newData
+				};
+				g_idb_chat_msgs.put( node );
+				
+				dom.data("data",tmpData);
+
+				sendInput(dom);
+			} else {
+				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+				if( g_isEndOfPage ) scrollToBottom();
+			}
+		});
+	}
 }
 
 function sendChat (){
@@ -876,6 +968,11 @@ sendSticker = function( id ){
 }
 
 getS3file = function(target, file_c, file_p, tp, ti, size){
+	if( !file_c || file_c.length==0 || null==file_p ){
+		cns.debug("null file,", "file_c:", file_c
+			, "file_p:", file_p, "tp:", tp, "ti:", ti, "size:", size);
+		return;
+	}
 	//default
 	size = size || 350;
 	cns.debug("size:",size);
@@ -937,4 +1034,37 @@ getS3file = function(target, file_c, file_p, tp, ti, size){
 			return obj.s3;
 		}
 	});
+}
+
+function getPermition(){
+	//若沒有聊天室權限, 重新取得
+    if( !g_room.hasOwnProperty("pi") || g_room.pi.length>0){
+    	//取得成員列表
+    	//GET /groups/{gi}/chats/{ci}/users
+    	op("/groups/"+gi+"/chats/"+ci+"/users", 
+    		"get", null, function(data, status, xhr){
+		    	//取得權限
+		    	var sendData = {
+		    		ti:eGroupTiType["CHAT"],
+		    		tu:{gul:data.ul}
+		    	};
+		    	op("/groups/"+gi+"/permissions", "post", 
+		    		JSON.stringify(sendData), function(pData, status, xhr){
+		    			cns.debug( JSON.stringify(pData) );
+
+		    			pi = pData.pi;
+					    var userData = $.lStorage( ui );
+					    g_group = userData[gi];
+					    g_room = g_group["chatAll"][ci];
+					    g_room.pi = pi;
+					    $.lStorage( ui, userData );
+		    		}, 
+		    		null
+		    	);
+	    	},
+	    	null
+    	);
+    } else {
+    	pi = g_room.pi;
+    }
 }
