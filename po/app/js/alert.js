@@ -145,17 +145,7 @@ showAlertContent = function(data){
 
 			$(".alert-area .content").append(tmpDiv);
 			group = userData[boxData.gi];
-
 			if( group ){
-				//發布者 照片
-			    var tmp = $(tmpDiv).find(".al-post-img");
-			    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
-			    	var auo = group.guAll[boxData.gu].auo;
-			    	if(auo){
-			    		tmp.css("background-image","url("+auo+")");
-			    	}
-			    }
-
 				//群組名
 			    tmp = $(tmpDiv).find(".al-post-group");
 			    if( tmp ) tmp.html( group.gn.replaceOriEmojiCode() );
@@ -170,6 +160,17 @@ showAlertContent = function(data){
 
 				//發佈xx
 				content = $(tmpDiv).find(".al-content.post");
+
+				if( group ){
+					//發布者 照片
+				    var tmp = $(tmpDiv).find(".al-post-img");
+				    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.nd.opgu) ){
+				    	var auo = group.guAll[boxData.nd.opgu].auo;
+				    	if(auo){
+				    		tmp.css("background-image","url("+auo+")");
+				    	}
+				    }
+				}
 
 			} else { //回覆
 				//xx(及其他xx個人)
@@ -189,6 +190,17 @@ showAlertContent = function(data){
 				content.find(".oriPoster").html(
 					getPosterText(group, boxData)
 				);
+
+				if( group ){
+					//發布者 照片
+				    var tmp = $(tmpDiv).find(".al-post-img");
+				    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.lgu) ){
+				    	var auo = group.guAll[boxData.lgu].auo;
+				    	if(auo){
+				    		tmp.css("background-image","url("+auo+")");
+				    	}
+				    }
+				}
 			}
 
 			if( boxData.nd.hasOwnProperty("et") && boxData.nd.et.length>0 ){
