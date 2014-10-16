@@ -505,11 +505,11 @@ $(function(){
         		var tl_setting_obj = {
         			1:{
         				name:"公告",
-        				src:"images/timeline/timeline_cover_icon_announcement.png",
+        				src:"images/timeline/timeline_cover_icon_announcement.png"
         			},
         			default:{
-        				name:"測試",
-        				src:"images/pighead.png"	
+        				name:"置頂",
+        				src:"images/timeline/timeline_cover_icon_announcement.png"
         			}
         		};
         		$.each(top_events_arr,function(i,val){
@@ -3891,81 +3891,6 @@ $(function(){
 		});
 	}
 
-	getFilePermissionId = function(object_str){
-		var object_obj = $.parseJSON(object_str);
-		var gul_arr = [];
-		$.each(object_obj,function(i,val){
-			var temp_obj = {
-				gu: i,
-				n: val
-			}
-			gul_arr.push(temp_obj);
-		});
-		var api_name = "groups/" + gi + "/permissions";
-
-        var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                     };
-        var body = {
-                ti: ti_feed,
-                tu:{
-                  gul: gul_arr 
-                }
-            }
-
-        var method = "post";
-        var pi_result = ajaxDo(api_name,headers,method,false,body);
-		return pi_result;
-	}
-
-	getS3UploadUrl = function(ti,tp,pi){
-		var api_name = "groups/" + gi + "/files";
-
-        var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                     };
-        var method = "post";
-        var body = {
-                  fn: "filename",
-                  tp: tp,
-                  ti: ti,
-                  pi: pi
-                }
-        return ajaxDo(api_name,headers,method,false,body);
-	}
-
-	uploadImgToS3 = function(url,file){
-		return $.ajax ({
-            url: url,
-			type: 'PUT',
-			contentType: " ",
-		 	data: file, 
-			processData: false
-        });
-	}
-	uploadCommit = function(fi,ti,pi,tp,mt,si,md){
-		var api_name = "groups/" + gi + "/files/" + fi + "/commit";
-        var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                     };
-        var method = "put";
-
-        var body = {
-          ti: ti,
-          pi: pi,
-          tp: tp,
-          mt: mt,
-          si: si,
-          md: md
-        }
-        return ajaxDo(api_name,headers,method,false,body);
-	}
 
 	uploadErrorCnt = function(this_compose,file_num,total){
 		//上傳編號加一

@@ -11,6 +11,7 @@ $(function(){
 	});
 
 	$(".login").click(function(){
+
 		//若local storage 有記錄密碼 就顯示
 		if($.lStorage("_loginRemeber")){
 			//順便幫他打個勾
