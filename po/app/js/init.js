@@ -89,6 +89,9 @@ $(function(){
 	//polling間距
 	polling_interval = 5000;
 
+	//更新鈴鐺間距
+	update_alert_interval = 10000;
+
 	//title
 	$("title").html("FINE");
 

@@ -1,0 +1,233 @@
+
+.navi-alert {
+	position:absolute;
+	cursor:pointer;
+	background: url(../images/navi/navi_icon_notification.png);
+	background-size: cover;
+	right: 15px;
+	width: 28px;
+	height: 28px;
+	top: 13px;
+}
+.navi-alert:hover {
+	transform: scale(1.1);
+}
+
+.navi-alert.new:before {
+    content: "N";
+	position: absolute;
+	top: -1px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #4092ef;
+	opacity: 1;
+	background: #f31e80;
+	width: 20px;
+	height: 20px;
+	z-index: 11;
+	right: -8px;
+	border-radius: 9px;
+	line-height: 18px;
+	font-size: 15px;
+	text-align: center;
+	font-weight: bolder;
+	display: block;
+	-webkit-animation: bounce 0.5s 0s;
+	/*transform: scale(0.85);*/
+}
+
+@-webkit-keyframes bounce {
+  0% { transform: scale(0); opacity: 1 }
+  50% { transform: scale(1.6); opacity: 1; }
+  80% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1) }
+}
+
+.navi-alert:before {
+    content: "N";
+	position: absolute;
+	top: -1px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #4092ef;
+	opacity: 1;
+	background: #f31e80;
+	width: 20px;
+	height: 20px;
+	z-index: 11;
+	right: -8px;
+	border-radius: 9px;
+	line-height: 18px;
+	font-size: 15px;
+	text-align: center;
+	font-weight: bolder;
+	display: none;
+	transition:visibility 0s linear 0.5s,opacity 0.5s linear;
+}
+.alert-area-cover {
+	position: fixed;
+	top: -50px;
+	width: 100%;
+	height: 1000px;
+	background: transparent;/*rgba(50,50,50,0.5);*/
+	display: none;
+	z-index: 9999;
+}
+
+.alert-area {
+	position: fixed;
+	z-index: 99999;
+	right: 8px;
+	background: #f2f2f2;
+	color: #444648;
+	max-height: 88%;
+	border: solid #9e9e9e;
+	border-width: 0px 1px 3px 1px;
+	border-radius: 10px;
+	cursor: pointer;
+	float: right;
+	top: 57px;
+	width: 428px;
+	/* padding: 2%; */
+	overflow: scroll;
+	font-size: 16px;
+	background: rgb(216, 239, 255);
+	opacity: 0.99;
+	box-shadow: 0px 5px 23px 0px rgba(50, 50, 50, 0.75);
+}
+
+.alert-area:after {
+    content: "";
+	position: absolute;
+	top: -3px;
+	right: 11px;
+	border-style: solid;
+	border-width: 9px 9px 0;
+	border-color: rgb(1,102,161) transparent;
+	display: block;
+	width: 0;
+	z-index: 11;
+}
+
+.alert-area .title {
+	width: 100%;
+	display: -webkit-box;
+	/*border-radius: 10px 10px 0 0;*/
+	/* margin: 4% 5% 2% 5%; */
+	border-bottom: rgb(206, 226, 241) 1px solid;
+	padding-bottom: 2%;
+	font-weight: bolder;
+	font-size: 22px;
+	/* background: rgb(226,239, 248); */
+	padding: 3%;
+	color: rgb(75, 152, 211);
+}
+
+.alert-area .content{
+	width: 100%;
+	overflow: hidden;
+	background: white;
+}
+
+.al-subbox {
+	width: 100%;
+	/* line-height: 50px; */
+	display: -webkit-box;
+	/* border-radius: 10px 10px 0 0; */
+	/* margin: 13px 0 0 0; */
+	padding: 17px 0 10px;
+	border-bottom: rgb(220, 234, 247) 1px solid;
+}
+
+.al-subbox .left {
+	width: 10%;
+	margin: 0 5% 0 3%;
+	text-align: center;
+}
+.al-post-img {
+	background-repeat: no-repeat;
+    background-position: center; 
+	background-size:cover;
+	width: 50px;
+	height: 50px;
+    border:1px solid #abbabf;
+    border-radius: 10px;
+}
+.al-subbox .right {
+	width: 80%;
+	line-height: 19px;
+}
+.al-subbox .right .top {
+	width: 100%;
+}
+.posterDetail .and{
+	color: rgb(171, 178, 185);
+}
+.al-post-name, .otherPosterCnt {
+	margin-bottom: 5px;
+	color: black;
+	display: inline-block;
+	font-weight: bolder;
+}
+.al-post-group {
+	padding: 0px 5px;
+	color: white;
+	background: rgb(136,194,238);
+	border-radius: 17px;
+	border: 1px solid #abbabf;
+	float: right;
+	text-align: right;
+	display: inline-block;
+	right: 0;
+}
+
+/*------ content ------*/
+.inline{
+	display: inline-block;
+}
+
+.al-content {
+	width: 100%;
+	margin-bottom: 5px;
+	line-height: 23px;
+	color: rgb(171, 178, 185);
+}
+.al-content .icon{
+	width: 23px;
+	height: 23px;
+	vertical-align: middle;
+	margin-right: 5px;
+}
+.al-content .type{
+	color: rgb(64,146,239);
+}
+.alert-area .boxTitle, .al-content .oriPoster {
+	font-weight: bolder;
+	color: black;
+}
+.al-content .sendFile{
+	color: black;
+}
+
+/*------ time ------*/
+.al-time {
+	width: 100%;
+	margin-bottom: 5px;
+	color: rgb(171, 178, 185);
+	font-size: 10px;
+	line-height: 18px;
+}
+.al-time .icon{
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+	margin-left: 4px;
+}
+
+/*------ extra ------*/
+.al-extra {
+	width: 100%;
+	/* margin-bottom: 5px; */
+	border-top: rgb(234, 240, 245) 1px solid;
+	padding-top: 7px;
+}

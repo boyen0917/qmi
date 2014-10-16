@@ -302,10 +302,10 @@ body {
 	display: inline-block;
 	width: 80%;
 }
-.chat-msg-bubble-left .msg-map .text, .chat-msg-bubble-left a:link{
+.chat-msg-bubble-left .msg-map .text, .chat-msg-bubble-left a:link, .chat-msg-bubble-left a:visited{
 	color: #335196;
 }
-.chat-msg-bubble-right .msg-map .text, .chat-msg-bubble-right a:link{
+.chat-msg-bubble-right .msg-map .text, .chat-msg-bubble-right a:link, .chat-msg-bubble-right a:visited{
 	color: #fff283;
 }
 /* ------ end chat -------------*/

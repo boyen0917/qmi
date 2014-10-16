@@ -116,6 +116,25 @@
 		});
 	};
 
+	//處理未轉成網頁表示的u+code
+	String.prototype.replaceOriEmojiCode = function(){
+		return this.replace( new RegExp( '[\uD800-\uDBFF][\uDC00-\uDFFF]','g'), function(match, contents, offset, s){
+			var tmp = [];
+			tmp.push( match.charCodeAt(0) );
+			tmp.push( match.charCodeAt(1) );
+			if( tmp[0] >= 55296 ){
+				var oriCode = 0xffffffff;
+				oriCode = ((tmp[0]-55296)<<10)>>>0;
+				var vl=(tmp[1]-56320)>>>0;
+				oriCode = (oriCode | vl | 0x10000);
+				return "<img style='max-height:20px' class='emoji' src='../images/emojis/" + oriCode.toString(16) + ".png' alt='emoji' />";
+			} else {
+				return "<img style='max-height:20px' class='emoji' src='../images/emojis/" + tmp[0].toString(16) + ".png' alt='emoji' />";
+			}
+			return match;
+		});
+	}
+
 	//glorialin
 	//遇到一個utf-16的"𥚃"字...(&#55381;&#56963; 一般"裡"為&#35041;)
 	//不過emoji parse出來會變框框 得另外取代

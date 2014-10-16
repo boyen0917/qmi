@@ -563,4 +563,33 @@ $(function(){
 
 	    return text;
 	}
+
+	Date.prototype.toFormatString = function(){
+		var now = new Date();
+		var diff = (now.getTime()-this.getTime())/1000;
+		var language = window.navigator.userLanguage || window.navigator.language;
+
+		//within min
+		if( diff<60 ){
+			return $.i18n.getString("justNow");
+		} else if( diff<3600 ){	//within hour
+			return $.i18n.getString("nMinBefore", Math.floor(diff/60) );
+		} else if( diff<86400 ){	//today
+			return $.i18n.getString("nHoureBefore", Math.floor(diff/3600) );
+		} else if( diff<172800 ){	//yesterday
+			var options = {hour: "2-digit", minute: "2-digit"};
+			return $.i18n.getString("yesterdayTime", this.toLocaleTimeString(language, options) );
+		} else if( now.getYear()==this.getYear() ){	//within a year
+			var options = {
+			    month: "numeric",
+			    day: "numeric", hour: "2-digit", minute: "2-digit"
+			};
+			return this.toLocaleTimeString(language, options);
+		}
+		var options = {
+		    year: "numeric", month: "numeric",
+		    day: "numeric", hour: "2-digit", minute: "2-digit"
+		};
+		return this.toLocaleTimeString(language, options);
+	}
 });
