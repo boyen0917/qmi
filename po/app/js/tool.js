@@ -398,6 +398,11 @@ $(function(){
 		});
 	}
 
+	resetDB = function(){
+		idb_timeline_events.clear();
+    	localStorage.clear();
+	}
+
 	randomHash = function(length){
 		if(length<=0)	return "";
 		

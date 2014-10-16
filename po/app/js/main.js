@@ -12,83 +12,59 @@ $(function(){
 		ui = _loginData.ui;
 		at = _loginData.at;
 
-    	// //上次點選團體
-    	// if($.lStorage(ui)){
-    	// 	var _groupList = $.lStorage(ui);
-    	// 	var dgi = _groupList.default_gi;
-    	// 	var defaultGroup = _groupList[dgi];
-    		
-    	// 	gi = dgi;
-    	// 	gu = defaultGroup.gu;
-    	// 	gn = defaultGroup.gn;
-    	// 	ti_cal = defaultGroup.ti_cal;
-    	// 	ti_feed = defaultGroup.ti_feed;
-    	// 	ti_chat = defaultGroup.ti_chat;
-    		
-    	// }else{
-    	// 	//預設團體暫定為第一個團體？
-     //    	var default_group = $.lStorage("_groupList")[0];
-     //    	$.each(default_group.tl,function(i,val){
-     //    		if(val.tp == 1){
-     //    			ti_cal = val.ti;
-     //    		}else if(val.tp == 2){
-     //    			ti_feed = val.ti;
-     //    		}else{
-     //    			ti_chat = val.ti;
-     //    		}
-     //    	});
-        	
-     //    	gi = default_group.gi;
-    	// 	gu = default_group.me;
-    	// 	gn = default_group.gn;
-
-    	// 	//存入localstorage
-    	// 	var _groupList = {"default_gi":gi};
-    	// 	_groupList[gi] = {"gu":gu,"gn":gn,"ti_cal":ti_cal,"ti_feed":ti_feed,"ti_chat":ti_chat};
-    	// 	$.lStorage(ui,_groupList);
-    	// }
-
-    	//更新local storage grouplist
-		setGroupList();
-
-    	//聊天室開啓DB
+		//聊天室開啓DB
     	initChatDB(); 
 		initChatCntDB(); 
 
-    	//設定guAll 
-    	setGroupAllUser();
-    	
-    	//header 設定團體名稱
-    	$(".header-group-name div:eq(1)").html(gn);
-    	
-    	//sidemenu name
-    	setSmUserData(gi,gu,gn);
-    	
-    	//做團體列表
-    	groupMenuListArea();
+		//第一次進來 沒團體的情況
+		if(!$.lStorage("_groupList")){
+			//關閉返回鍵
+			$("#page-group-menu .page-back").hide();
+			cns.debug("here");
+		}else{
 
-    	//top event
-    	topEvent();
+			cns.debug("there");
 
-    	//動態消息
-    	//timelineListWrite();
-    	setTimeout(function(){
-    		timelineListWrite();
-    	},1000);
+			setGroupList();
+
+	    	//設定guAll 
+	    	setGroupAllUser();
+	    	
+	    	//header 設定團體名稱
+	    	$(".header-group-name div:eq(1)").html(gn);
+	    	
+	    	//sidemenu name
+	    	setSmUserData(gi,gu,gn);
+	    	
+	    	//做團體列表
+	    	groupMenuListArea();
+
+	    	//top event
+	    	topEvent();
+
+	    	//動態消息
+	    	//timelineListWrite();
+	    	setTimeout(function(){
+	    		timelineListWrite();
+	    	},1000);
+
+			//執行polling
+			pollingInterval();
+		}
+
+			
 
 	}else{
 		if(window.location.href.match(/localhost/)) {
     		cns.debug("login test");
     		getLoginDataForTest();
-    		return false;
     	}else{
     		cns.debug("to login");
     		document.location = "index.html";
     	}
-	}
 
-	//執行polling
-	pollingInterval();
+    	return false;
+	}
 
 	$( window ).resize(function() {
 		if($(".st-top-event").length < 2) return false;
@@ -253,8 +229,8 @@ $(function(){
 	$(".gm-create-submit").click(function(){
 
 		if ( !$(".gmc-avatar").data("chk" )){
-			popupShowAdjust("","圖片未上傳",true);
-	        return false;
+				popupShowAdjust("","圖片未上傳",true);
+				return false;
 		} 
 		if ( !$(".gmc-name input").val() ){
 			popupShowAdjust("","團體名稱未填寫",true);
@@ -280,9 +256,11 @@ $(function(){
 	        		var api_name = "groups/" + cg_result.gi + "/avatar"
 
 	        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
-	        			if(chk) {
-	        				groupMenuListArea(cg_result.gi);
+	        			if(!chk) {
+	        				toastShow("團體頭像上傳失敗");
 	        			}
+
+	        			groupMenuListArea(cg_result.gi);
 	        		});
 	        	}
 	        });

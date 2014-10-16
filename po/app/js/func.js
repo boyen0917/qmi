@@ -1,10 +1,13 @@
 $(function(){
 
-	setGroupList = function(){
+	setGroupList = function(update){
 
 		//上次點選團體
-    	if($.lStorage(ui)){
-    		var _uiGroupList = $.lStorage(ui);
+		if($.lStorage(ui)){
+			//update 後面的事情就不用做了
+			if(update) return false;
+
+			var _uiGroupList = $.lStorage(ui);
     		var default_gi = _uiGroupList.default_gi;
     		var default_group = _uiGroupList[default_gi];
     		
@@ -14,7 +17,6 @@ $(function(){
     		ti_cal = default_group.ti_cal;
     		ti_feed = default_group.ti_feed;
     		ti_chat = default_group.ti_chat;
-    		
     	}else{
     		//預設團體暫定為第一個團體？
         	var default_group = $.lStorage("_groupList")[0];
@@ -36,7 +38,6 @@ $(function(){
     		var _groupList = {"default_gi":gi};
     		$.lStorage(ui,_groupList);
     	}
-
 
 		$.each($.lStorage("_groupList"),function(i,gl_obj){
 			var _uiGroupList = $.lStorage(ui);	
@@ -61,7 +62,6 @@ $(function(){
     			$.lStorage(ui,_uiGroupList);
 			}
 		});	
-		cns.debug("setGroupList $.lStorage(ui):",$.lStorage(ui));
 	}
 
 	logout = function(){
@@ -404,6 +404,7 @@ $(function(){
 
 	chkGroupAllUser = function(data_arr){
 		//先檢查localStorage[gi].guAll是否存在
+		cns.debug("$.lStorage(ui):",$.lStorage(ui));
         if(Object.keys($.lStorage(ui)[gi].guAll).length == 0){
         	setGroupAllUser(data_arr);
         }else{
@@ -2769,6 +2770,7 @@ $(function(){
 	    	var group_list = $.parseJSON(data.responseText).gl;
 
 	    	$.lStorage("_groupList",group_list);
+	    	setGroupList(true);
 
 	    	//管理者圖示
 	    	var icon_host = "<img src='images/sidemenu/icon_host.png'/>";

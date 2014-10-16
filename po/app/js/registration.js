@@ -128,6 +128,7 @@ $(function(){
         var body = {
             id: countrycode + phone_id.substring(1),
             tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
+            dn: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
             pw:toSha1Encode(password)
         };
 
@@ -143,9 +144,7 @@ $(function(){
 
         		//判斷是否換帳號 換帳號就要清db
         		if(!$.lStorage(login_result.ui)){
-        		// if(1){
-        			idb_timeline_events.clear();
-			    	localStorage.clear();
+        			resetDB();
         		}
 
     			//記錄帳號密碼
@@ -168,7 +167,7 @@ $(function(){
         		getGroupList(login_result.ui,login_result.at).complete(function(data){
         			cns.debug("get group list done");
         			if(data.status == 200){
-        				if($.parseJSON(data.responseText).gl.length > 0){
+        				if($.parseJSON(data.responseText).gl && $.parseJSON(data.responseText).gl.length > 0){
         					//有group
         					var group_list = $.parseJSON(data.responseText).gl;
 
@@ -447,6 +446,10 @@ $(function(){
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
         	cns.debug("驗證 驗證碼後的 data:",data);
+
+        	//清除db
+        	resetDB();
+
         	if(data.status == 200){
         		cns.debug("跳到 #page-password");//"hash+#page-password"
         		popupShowAdjust("",$.parseJSON(data.responseText).rsp_msg,true,false,[changePageAfterPopUp,"#page-password"]);
