@@ -1,11 +1,8 @@
-var lastAlertEi = "";
 var lastAlertCt = 0;
 
 $(function(){
 
-	showOldAlert();
-
-	setInterval(updateAlert,update_alert_interval);
+	initAlertDB();
 	// updateAlert();
 
 	$(".navi-alert").click(function(){
@@ -25,6 +22,23 @@ $(function(){
 	});
 });
 
+//init global alert db
+initAlertDB = function(){
+	idb_alert_events = new IDBStore({
+      dbVersion: 1,
+      storeName: 'alert_events',
+      keyPath: 'ei_ntp',
+      indexes: [
+        { name: 'ct',keyPath:['ct']}
+      ],
+      onStoreReady: function(){
+      	showAlertFromDB();
+		setInterval(updateAlert,update_alert_interval);
+      }
+    });
+}
+
+//隱藏通知區
 hideAlertBox = function(){
 	$(".alert").removeClass("alert-visit");
 	$(".alert-area-cover").hide();
@@ -34,6 +48,7 @@ hideAlertBox = function(){
 	},100);
 }
 
+//show通知區
 showAlertBox = function(){
 	$(".alert").addClass("alert-click");
 	$(".alert-area").slideDown();
@@ -43,15 +58,30 @@ showAlertBox = function(){
 	},100);
 }
 
-showOldAlert = function(){
-	var data = $.lStorage("_alert");
-	if(data){
-		lastAlertEi = data.nl[0].nd.ei;
-		lastAlertCt = data.nl[0].nd.ct;
-		showAlertContent( data );
-	}
+//撈ＤＢ通知
+showAlertFromDB = function(){
+
+	idb_alert_events.limit(function(list){
+		// cns.debug( JSON.stringify(list) );
+		showAlertContent(list);
+	},{
+        index: "ct",
+        keyRange: idb_alert_events.makeKeyRange({
+          upper: [new Date().getTime()],
+          lower: []
+        }),
+        limit: 20,
+        order: "DESC",
+        onEnd: function(result){
+            console.debug("onEnd:",result);
+        },
+        onError: function(result){
+            console.debug("onError:",result);
+        }
+    });
 }
 
+//打ＡＰＩ更新通知
 updateAlert = function(){
 	if (typeof ui === 'undefined') return;
 
@@ -63,17 +93,45 @@ updateAlert = function(){
 	    	if( data.status==200){
 	    		var returnData = $.parseJSON(data.responseText);
 
-				//check "new" mark & update data
-				if( null!=returnData ){
-					$.lStorage("_alert",returnData);
-					showAlertContent( returnData );
+	    		var lastCt = 0;
+				for(var i=0; i<returnData.nl.length; i++){
+					var boxData = returnData.nl[i];
+	    			var node = {
+	    				ei_ntp: boxData.nd.ei+"_"+boxData.ntp,
+						ct: boxData.nd.ct,
+					    data: boxData
+					};
+					if( boxData.nd.ct>lastCt ){
+						lastCt = boxData.nd.ct;
+					}
+
+					idb_alert_events.put(node);
 				}
+
+				if( lastCt>lastAlertCt ){
+					// cns.debug("showAlertFromDB",lastAlertCt, lastCt);
+					lastAlertCt = lastCt;
+					if( !$(".alert-area").is(":visible") ){
+						$(".navi-alert").addClass("new");
+					}
+					setTimeout(showAlertFromDB,500);
+				}
+
+
+
+				// //check "new" mark & update data
+				// if( null!=returnData ){
+				// 	$.lStorage("_alert",returnData);
+				// 	showAlertContent( returnData );
+				// }
 	    	}
     });
 }
 
+//顯示資料
 showAlertContent = function(data){
 	if( !data ) return;
+	// cns.debug("showAlertContent");
 
 	$(".alert-area .content").html("");
 
@@ -81,21 +139,11 @@ showAlertContent = function(data){
 		var userData = $.lStorage(ui);
 		if( null == userData )	return;
 
-		for(var i=0; i<data.nl.length; i++){
-			var boxData = data.nl[i];
+		for(var i=0; i<data.length; i++){
+			var boxData = data[i].data;
 			var tmpDiv = $(this).clone();
 
 			$(".alert-area .content").append(tmpDiv);
-
-			if( boxData.nd.ct>=lastAlertEi ){
-				if( lastAlertEi!= lastAlertCt ){
-					lastAlertEi = boxData.nd.ei;
-					lastAlertCt = boxData.nd.ct;
-					if( !$(".alert-area").is(":visible") ){
-						$(".navi-alert").addClass("new");
-					}
-				}
-			}
 			group = userData[boxData.gi];
 
 			if( group ){
@@ -128,9 +176,9 @@ showAlertContent = function(data){
 			    tmp = $(tmpDiv).find(".al-post-name");
 			    if( tmp && boxData.lgun){
 			    	tmp.html( boxData.lgun.replaceOriEmojiCode() );
-			    	if(boxData.rcnt>0){
+			    	if(boxData.rcnt>1){
 			    		tmpDiv.find(".posterDetail").css("display","inline-block");
-			    		tmpDiv.find(".otherPosterCnt").html( $.i18n.getString("otherNPeople",boxData.rcnt) );
+			    		tmpDiv.find(".otherPosterCnt").html( $.i18n.getString("otherNPeople",boxData.rcnt-1) );
 			    	}
 			    }
 
@@ -153,13 +201,6 @@ showAlertContent = function(data){
 
 			if(content){
 			    content.css("display","block");
-
-			    //標題
-				// if( boxData.et ){
-				// 	var text = (boxData.et.length>=12) ? boxData.et.substring(0,12)+".." : boxData.et;
-				// 	var title = content.find(".boxTitle");
-				// 	if(title) title.html( $.i18n.getString("formatTitle",text.replaceOriEmojiCode()) );
-				// }
 
 			    //並上傳了檔案
 			    if( boxData.nd.hasOwnProperty("ml") ){
@@ -216,15 +257,15 @@ getPosterText = function(group, data){
 	return data.nd.opgun.replaceOriEmojiCode();
 }
 
-getTimelineEvent = function( ei, dom, callback ){
-	idb_timeline_events.get(ei, function(data){
-		cns.debug(ei);
-		callback(data, dom);
-	}, function(data){
-		cns.debug(ei);
-		callback(null, ei);
-	});
-}
+// getTimelineEvent = function( ei, dom, callback ){
+// 	idb_timeline_events.get(ei, function(data){
+// 		cns.debug(ei);
+// 		callback(data, dom);
+// 	}, function(data){
+// 		cns.debug(ei);
+// 		callback(null, ei);
+// 	});
+// }
 
 getEventTypeText = function(data){
 	switch(data.substring(1,2)){
@@ -284,7 +325,7 @@ getEventTypeIcon = function(data){
 
 getEventTitleText = function(data){
 	if( data ){
-		return $.i18n.getString("formatTitle", data);
+		return $.i18n.getString( "formatTitle", data.replaceOriEmojiCode() );
 	}
 	return "";
 }
