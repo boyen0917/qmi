@@ -101,7 +101,10 @@
       dict = this.dict;
   		if (dict && dict.hasOwnProperty(str)) {
   			str = dict[str];
-  		}
+  		} else {
+        "[!"+str+"]";
+        cns.debug("[!]error str: ", str);
+      }
       args = __slice.call(arguments);
       args[0] = str;
   		// Substitute any params.
@@ -125,7 +128,7 @@
   	printf: function(str, args) {
   		if (arguments.length < 2) return str;
       args = $.isArray(args) ? args : __slice.call(arguments, 1);
-      return str.replace(/([^%]|^)%(?:(\d+)\$)?s/g, function(p0, p, position) {
+      return str.replace(/([^%]|^)%(?:(\d+)\$)?(@|d|ld)/g, function(p0, p, position) {
         if (position) {
           return p + args[parseInt(position)-1];
         }
@@ -149,6 +152,13 @@
   */
   $.fn._t = function(str, params) {
     return $(this).html(i18n._.apply(i18n, arguments));
+  };
+
+  $.fn._i18n = function(params) {
+    $(this).find('[data-textid]').each( function(){
+      var id = $(this).data("textid");
+      $(this).html( i18n._.apply(i18n, [id]) );
+    });
   };
 
   $.i18n = i18n;

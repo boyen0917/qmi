@@ -298,10 +298,7 @@ $(function(){
 
 	updateLanguage = function( lanPath ){
 		$.i18n.load(lanPath, function(){
-			$('.text').each( function(){
-				var tmp = $(this).data("textid");
-				var text = $(this)._t( tmp );
-			});
+			$('body')._i18n();
 		});
 	}
 
@@ -571,14 +568,14 @@ $(function(){
 
 		//within min
 		if( diff<60 ){
-			return $.i18n.getString("justNow");
+			return $.i18n.getString("COMMON_JUST_NOW");
 		} else if( diff<3600 ){	//within hour
-			return $.i18n.getString("nMinBefore", Math.floor(diff/60) );
+			return $.i18n.getString("COMMON_NMINUTES_AGO", Math.floor(diff/60) );
 		} else if( diff<86400 ){	//today
-			return $.i18n.getString("nHoureBefore", Math.floor(diff/3600) );
+			return $.i18n.getString("COMMON_NHOURS_AGO", Math.floor(diff/3600) );
 		} else if( diff<172800 ){	//yesterday
 			var options = {hour: "2-digit", minute: "2-digit"};
-			return $.i18n.getString("yesterdayTime", this.toLocaleTimeString(language, options) );
+			return $.i18n.getString("COMMON_YESTERDAY")+" "+this.toLocaleTimeString(language, options);
 		} else if( now.getYear()==this.getYear() ){	//within a year
 			var options = {
 			    month: "numeric",
@@ -591,5 +588,41 @@ $(function(){
 		    day: "numeric", hour: "2-digit", minute: "2-digit"
 		};
 		return this.toLocaleTimeString(language, options);
+	}
+
+	textSomeonesHtmlFormat = function(name){
+		switch(lang){
+			case "zh_TW":
+			case "zh_CN":
+				return "<label class='name'>"+name+"</label><label class='someone-s'>的</label>";
+				break;
+			case "en_US":
+				return "<label class='name'>"+name+"</label><label class='someone-s'>'s</label>";
+				break;
+		}
+		return name;
+	}
+
+	textAndHtmlFormat = function(text){
+		switch(lang){
+			case "zh_TW":
+			case "zh_CN":
+				return "<label>"+text.replace(/(並|和|跟|以及)/g,function(match) {
+				    return "</label><label class='and'>"+match+"</label><label>";
+			    })+"</label>";
+			 //    return str.replace(/([^%]|^)%(?:(\d+)\$)?(@|d|ld)/g, function(p0, p, position) {
+			 //        if (position) {
+			 //          return p + args[parseInt(position)-1];
+			 //        }
+			 //        return p + args.shift();
+			 //      })
+				// break;
+			case "en_US":
+				return text.replace(/and/g,function(match) {
+				    return "<label class='and'>"+match+"</label>";
+			    });
+				break;
+		}
+		return name;
 	}
 });

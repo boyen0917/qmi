@@ -201,12 +201,15 @@
 .al-content .type{
 	color: rgb(64,146,239);
 }
-.alert-area .boxTitle, .al-content .oriPoster {
+.alert-area .boxTitle, .al-content .oriPoster .name {
 	font-weight: bolder;
 	color: black;
 }
 .al-content .sendFile{
 	color: black;
+}
+.al-content .sendFile .and{
+	color: rgb(171, 178, 185);
 }
 
 /*------ time ------*/

@@ -17,7 +17,7 @@ initChatList = function(){
 		//set title & sub-title
 		var tmp = parent.find("div:first-child");
 		if( tmp ){
-			tmp.html( $.i18n.getString("chat") );
+			tmp.html( $.i18n.getString("CHAT_TITLE") );
 			if( currentGroup )	tmp.next().html( currentGroup.gn );
 		}
 		//set add icon
@@ -141,31 +141,8 @@ function showChatList(){
 			        if( list.length>0 ){
 			        	if( null!=list[0] ){
 				        	var object = list[0].data;
-				        	var text = "";
-				        	switch( object.ml[0].tp ){
-				        		case 5: //sticker
-									var name = groupData.guAll[object.meta.gu].nk;
-				        			text = $.i18n.getString("someSendSticker", name);
-				        			break; 
-				        		case 6: //pic
-									var name = groupData.guAll[object.meta.gu].nk;
-				        			text = $.i18n.getString("someSendPicture", name);
-				        			break;
-				        		case 8: //audio
-									var name = groupData.guAll[object.meta.gu].nk;
-				        			text = $.i18n.getString("someSendAudio", name);
-				        			break; 
-				        		case 9: //map
-									var name = groupData.guAll[object.meta.gu].nk;
-				        			text = $.i18n.getString("someSendMap", name);
-				        			break;
-				        		default:
-				        			text = object.ml[0].c;
-				        			break;
-				        	}
-				        	lastMsg.html( text );
-				        	lastTime.html( new Date(object.meta.ct).customFormat("#YYYY#/#MM#/#DD# #hh#:#mm#") );
-						}
+				        	setLastMsg( lastMsg, lastTime, object );
+				    	}
 				    }
 			    },{
 			        index: "gi_ci_ct",
@@ -206,7 +183,7 @@ function showChatList(){
 		var memtd = $(this).parent().prev();
 		var group_name = memtd.find(".name").html();
 		popupShowAdjust(
-			$.i18n.getString("deleteRoom"),
+			$.i18n.getString("CHAT_DELETE_CHATROOM"),
 			$.i18n.getString("comfirmDeleteRoom", group_name),
 			true,
 			true,
@@ -236,10 +213,10 @@ function deleteRoom ( deleteRow ){
 		if(data.status == 200){
 			//delete room succ
 			updateChatList();
-			toastShow( $.i18n.getString("deleteSucc") );
+			toastShow( $.i18n.getString("CHAT_DELETE_CHATROOM_SUCC") );
 		} else {
 			//delete room fail
-			toastShow( $.i18n.getString("deleteFail") );
+			toastShow( $.i18n.getString("CHAT_DELETE_CHATROOM_FAIL") );
 		}
 	});
 }
@@ -258,6 +235,60 @@ function openChatWindow ( ci ){
 		//document.location = "chat.html";
 		windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
 	}
+}
+
+function setLastMsg( msgDom, timeDom, data ){
+	var text = "";
+	switch( data.ml[0].tp ){
+		case 5: //sticker
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
+			break; 
+		case 6: //pic
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_PHOTO", name);
+			break;
+		case 8: //audio
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_VOICE", name);
+			break; 
+		case 9: //map
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_LOCATION", name);
+			break;
+		default:
+			text = data.ml[0].c;
+			break;
+	}
+	if(msgDom)	msgDom.html( text );
+	if(timeDom)	timeDom.html( new Date(data.meta.ct).customFormat("#YYYY#/#MM#/#DD# #hh#:#mm#") );
+}
+
+function setLastMsg( msgDom, timeDom, data ){
+	var text = "";
+	switch( data.ml[0].tp ){
+		case 5: //sticker
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
+			break; 
+		case 6: //pic
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_PHOTO", name);
+			break;
+		case 8: //audio
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_VOICE", name);
+			break; 
+		case 9: //map
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_LOCATION", name);
+			break;
+		default:
+			text = data.ml[0].c;
+			break;
+	}
+	if(msgDom)	msgDom.html( text );
+	if(timeDom)	timeDom.html( new Date(data.meta.ct).customFormat("#YYYY#/#MM#/#DD# #hh#:#mm#") );
 }
 
 /*
@@ -381,7 +412,7 @@ function showNewRoomDetailPage(){
 
 	//no mem
 	if( g_newChatMemList.length==0 ){
-		alert( $.i18n.getString("enterRoomName") );
+		alert( $.i18n.getString("CHAT_CHATROOM_NAME_EMPTY") );
 		return;
 	}
 
@@ -449,7 +480,7 @@ function requestNewChatRoom(){
 	// cns.debug( text );
 	if( !text || text.length==0 ){
 		if( g_newChatMemList.length > 1 ){
-			alert( $.i18n.getString("enterRoomName") );
+			alert( $.i18n.getString("CHAT_CHATROOM_NAME_EMPTY") );
 			return;
 		}
 	}

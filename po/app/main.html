@@ -189,11 +189,11 @@
                 <div class="navi-alert"></div>
                 <div class="feed-compose-area">
                     <div data-fc-box="post" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_post.png"/><div>貼文</div></div>
-                    <div data-fc-box="announcement" class="fc-area-subbox" style="display:none"><img class="fc-icon-size" src="images/compose/compose_box_bticon_announcement.png"/><div>公告</div></div>
-                    <div data-fc-box="feedback" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_feedback.png"/><div>通報</div></div>
-                    <div data-fc-box="work" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_work.png"/><div>任務-工作</div></div>
-                    <div data-fc-box="vote" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_vote.png"/><div>任務-投票</div></div>
-                    <div data-fc-box="check" class="fc-area-subbox fc-check"><img class="fc-icon-size" src="images/compose/compose_box_bticon_check.png"/><div>任務-定點回報</div></div>
+                    <div data-fc-box="announcement" class="fc-area-subbox" style="display:none"><img class="fc-icon-size" src="images/compose/compose_box_bticon_announcement.png"/><div data-textid='FEED_BULLETIN'>公告</div></div>
+                    <div data-fc-box="feedback" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_feedback.png"/><div data-textid='FEED_REPORT'>通報</div></div>
+                    <div data-fc-box="work" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_work.png"/><div data-textid='FEED_TASK'>任務-工作</div></div>
+                    <div data-fc-box="vote" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_vote.png"/><div data-textid='FEED_MISSION_VOTE'>任務-投票</div></div>
+                    <div data-fc-box="check" class="fc-area-subbox fc-check"><img class="fc-icon-size" src="images/compose/compose_box_bticon_check.png"/><div data-textid='FEED_MISSION_LOCATION'>任務-定點回報</div></div>
                 </div>
                 <div class="feed-compose-area-cover"></div>
             </div>
@@ -436,18 +436,18 @@
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <div class="header-group-name">
-                    <div class="page-title text" data-textid="chooseTarget">Choose Target</div>
+                    <div class="page-title" data-textid="COMMON_SELECT_MEMBERS">Choose Target</div>
                     <div></div>
                 </div>
                 <div class="newChat-nextStep">
                     <!-- <img src="images/navi/navi_icon_post.png"/> -->
-                    <span class="text" data-textid="nextStep"></span>
+                    <span data-textid="COMMON_NEXT"></span>
                 </div>
             </div>
             <table class="newChat-list">
                 <tr>
                     <td class="addMemListTitleGroup">
-                        <div class="addMemListTitle text" data-textid="choose">Choose</div>
+                        <div class="addMemListTitle" data-textid="COMMON_SELECT">Choose</div>
                         <div class="addMemListImg"></div>
                     </td>
                     <td class="addMemList"></td>
@@ -455,8 +455,8 @@
             </table>
             <div class="newChat-selectAll">
                 <div class="newChat-checkbox-gray"></div>
-                <span class="text" data-textid="selectAll">Select All</span>
-                <span class="text" data-textid="member">Member</span>
+                <span data-textid="COMMON_SELECT_ALL">Select All</span>
+                <span data-textid="COMMON_MEMBER">Member</span>
             </div>
             <div class="newChat-content">
                 <!-- <img src="images/common/icon/icon_check_round.png"/> -->
@@ -468,12 +468,12 @@
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <div class="header-group-name">
-                    <div class="page-title text" data-textid="edit">Edit</div>
+                    <div class="page-title" data-textid="COMMON_EDIT">Edit</div>
                     <div></div>
                 </div>
                 <div class="newChatDetail-nextStep">
                     <!-- <img src="images/navi/navi_icon_post.png"/> -->
-                    <span class="text" data-textid="finish"></span>
+                    <span data-textid="COMMON_DONE"></span>
                 </div>
             </div>
 
@@ -484,15 +484,15 @@
                             <img src="images/common/others/empty_img_mother_l.png">
                         </td>
                         <td>
-                            <div class="title text" data-textid="roomName">Room Name</div>
+                            <div class="title" data-textid="CHAT_CHATROOM_NAME">Room Name</div>
                             <div class="count"></div>
                             <br/>
-                            <input class="input" data-textid="inputRoomName" placeholder="Input name here" data-role="none" maxlength="20"/>
+                            <input class="input" data-textid="CHAT_CHATROOM_NAME_EMPTY" placeholder="Input name here" data-role="none" maxlength="20"/>
                         </td>
                     </tr>
                 </table>
             </div>
-            <div class="newChatDetail-header text" data-textid="member">Member</div>
+            <div class="newChatDetail-header" data-textid="COMMON_MEMBER">Member</div>
             <div class="newChatDetail-content">
             </div>
         </div>
@@ -532,7 +532,7 @@
 
 
         <div class="alert-area" style="display:none;">
-            <div class="title text" data-textid="newAlert">New Alert</div>
+            <div class="title" data-textid="NOTICES_TITLE">New Alert</div>
             <div class="content"></div>
         </div>
         <div class="alert-area-cover"></div>

@@ -179,16 +179,16 @@ showAlertContent = function(data){
 			    	tmp.html( boxData.lgun.replaceOriEmojiCode() );
 			    	if(boxData.rcnt>1){
 			    		tmpDiv.find(".posterDetail").css("display","inline-block");
-			    		tmpDiv.find(".otherPosterCnt").html( $.i18n.getString("otherNPeople",boxData.rcnt-1) );
+			    		tmpDiv.find(".NOTICES_RESPONSER_NUM").html( $.i18n.getString("otherNPeople",boxData.rcnt-1) );
 			    	}
 			    }
 
 				//"回覆"xxx的xx『xxx』
 				content = $(tmpDiv).find(".al-content.response");
 
-				//回覆"xxx"的xx『xxx』
+				//回覆"xxx的"xx『xxx』
 				content.find(".oriPoster").html(
-					getPosterText(group, boxData)
+					textSomeonesHtmlFormat( getPosterText(group, boxData) )
 				);
 
 				if( group ){
@@ -218,7 +218,7 @@ showAlertContent = function(data){
 			    if( boxData.nd.hasOwnProperty("ml") ){
 					for( var j=0; j<boxData.nd.ml.length; j++){
 						if( boxData.nd.ml[j].tp!=0 ){
-							content.find('.detail').css("display","inline-block");
+							setDetailAct( content );
 							break;
 						}
 					}
@@ -242,17 +242,14 @@ showAlertContent = function(data){
 		    tmp = $(tmpDiv).find(".al-time .text");
 		    if( tmp ) tmp.html(new Date(boxData.nd.ct).toFormatString() );
 
-			tmpDiv.data("gi", boxData.nd.gi);
+			tmpDiv.data("gi", boxData.gi);
 			tmpDiv.data("ei", boxData.nd.ei);
 			$(tmpDiv).click(function(){
 				alert( "gi:"+$(this).data("gi")+", ei:"+$(this).data("ei") );
 			});
 
 			//取代中文
-			tmpDiv.find('.text').each( function(){
-				var tmp = $(this).data("textid");
-				var text = $(this)._t( tmp );
-			});
+			tmpDiv._i18n();
 
 			// $(".alert-area .content").append(tmpDiv);
 		}
@@ -262,10 +259,10 @@ showAlertContent = function(data){
 getPosterText = function(group, data){
 	//最後回覆者==自己
 	if( data.lgu==data.nd.opgu ){
-		return $.i18n.getString("one'sSelf");
+		return $.i18n.getString("COMMON_SELF");
 	}
 	//最後回覆者==你
-	if(group && group.gu==data.opgu) return $.i18n.getString("you");
+	if(group && group.gu==data.opgu) return $.i18n.getString("COMMON_YOU");
 	return data.nd.opgun.replaceOriEmojiCode();
 }
 
@@ -283,26 +280,26 @@ getEventTypeText = function(data){
 	switch(data.substring(1,2)){
 		//(0=訊息,1=公告,2=通報專區,3=任務-工作,4=任務-投票,5=任務-定點回報,6=行事曆)
 		case "0":
-			return $.i18n.getString("msgPost");
+			return $.i18n.getString("FEED_POST");
 			break;
 		case "1":
-			return $.i18n.getString("announcement");
+			return $.i18n.getString("FEED_BULLETIN");
 			break;
 		case "2":
-			return $.i18n.getString("feedback");
+			return $.i18n.getString("FEED_REPORT");
 			break;
 		case "3":
-			return $.i18n.getString("work");
+			return $.i18n.getString("FEED_TASK");
 			break;
 		case "4":
-			return $.i18n.getString("vote");
+			return $.i18n.getString("FEED_VOTE");
 			break;
 		case "5":
-			return $.i18n.getString("positionCheck");
+			return $.i18n.getString("FEED_LOCATION");
 			break;
-		case "6":
-			return $.i18n.getString("calender");
-			break;
+		// case "6":
+		// 	return $.i18n.getString("calender");
+		// 	break;
 	}
 	return "[type "+data+"]";
 }
@@ -337,7 +334,16 @@ getEventTypeIcon = function(data){
 
 getEventTitleText = function(data){
 	if( data ){
-		return $.i18n.getString( "formatTitle", data.replaceOriEmojiCode() );
+		return "『"+data.replaceOriEmojiCode()+"』";
 	}
 	return "";
+}
+
+setDetailAct = function( dom ){
+	dom.find('.detail').css("display","inline-block");
+	var tmp = dom.find('.sendFile');
+	if( tmp ){
+		cns.debug( textAndHtmlFormat( $.i18n.getString("NOTICES_UPLOAD_FILE") ) );
+		tmp.html( "<label class='and'>並</label>上傳了檔案" );
+	};
 }

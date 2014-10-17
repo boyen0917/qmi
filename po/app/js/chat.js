@@ -206,6 +206,7 @@ $(document).ready(function(){
 		updateChat();
 	}
 
+	var enterTime = new Date();
 	//set update contents
 	setInterval(function() {
 	    checkPagePosition();
@@ -527,8 +528,8 @@ function updateChatCnt (){
 	    }
 
 		if(cnt>0){
-			if( 1==g_room.tp ) dom.html("已讀");
-			else dom.html("已讀"+cnt);
+			if( 1==g_room.tp ) dom.html( $.i18n.getString("CHAT_READ") );
+			else dom.html( $.i18n.getString("CHAT_N_READ", cnt) );
 		} else {
 			dom.html("");
 		}
@@ -649,9 +650,9 @@ function showMsg (object, bIsFront, bIsTmpSend){
 			else  status.addClass('chat-msg-load-error');
 			status.click(function(){
 				if( $(this).hasClass("chat-msg-load-error") ){
-					popupShowAdjust( "",$.i18n.getString("fail-sentMsg"),true, true, [sendInput,container] );
-					$(".popup-confirm").html( $.i18n.getString("resend") );
-					$(".popup-cancel").html( $.i18n.getString("delete") );
+					popupShowAdjust( "",$.i18n.getString("CHAT_FAIL_SENDING_MSG"),true, true, [sendInput,container] );
+					$(".popup-confirm").html( $.i18n.getString("CHAT_RESEND") );
+					$(".popup-cancel").html( $.i18n.getString("COMMON_DELETE") );
 					$(".popup-cancel").off("click").click(function(){
 						container.hide('slow',function(){
 							container.remove();
