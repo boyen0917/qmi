@@ -16,19 +16,26 @@ $(function(){
     	initChatDB(); 
 		initChatCntDB(); 
 
+		//預設 default group
+		setDefaultGroup();
+
 		//第一次進來 沒團體的情況
 		if(!$.lStorage("_groupList")){
 			//關閉返回鍵
 			$("#page-group-menu .page-back").hide();
-			cns.debug("here");
+			cns.debug("no group ");
 		}else{
 
-			cns.debug("there");
-
+			//將團體設定至 localstorage ui裡
 			setGroupList();
 
 	    	//設定guAll 
 	    	setGroupAllUser();
+	    	cns.debug("branch:",$.lStorage(ui)[gi].bl);
+	    	//branch list 只做第一次
+			if(typeof $.lStorage(ui)[gi].bl == "undefined")
+				cns.debug("no branch:",$.lStorage(ui)[gi]);
+				// setBranchList();
 	    	
 	    	//header 設定團體名稱
 	    	$(".header-group-name div:eq(1)").html(gn);
@@ -51,8 +58,6 @@ $(function(){
 			//執行polling
 			pollingInterval();
 		}
-
-			
 
 	}else{
 		if(window.location.href.match(/localhost/)) {
@@ -81,10 +86,8 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		
 		//彩蛋鑰匙
 		supriseKey();
-		
 	});
 
 	//下拉更新 滾輪版
@@ -413,11 +416,16 @@ $(function(){
 		// cns.debug("auo:",$(this).data("auo"));
 		// return false;
 		// $( "#side-menu" ).panel( "close");
-		setThisGroup($(this).attr("data-gi"));
+		var this_gi = $(this).attr("data-gi");
+		setThisGroup(this_gi);
 		//更新gu all
 		setGroupAllUser();
+
+		//只做第一次
+		if(typeof $.lStorage(ui)[this_gi].bl == "undefined")
+			setBranchList(this_gi);
 		
-		timelineSwitch("feed");
+		timelineSwitch("feed",true);
 	});
 	
 	$(".sm-small-area.setting").click(function(){
@@ -617,19 +625,6 @@ $(function(){
 		//做按讚區域改寫 (你、按讚)
 		this_event.data("parti-list",parti_list);
 		detailLikeStringMake(this_event);
-
-
-		//自己判斷的 按讚也算閱讀
-		var read_chk = chkEventStatus(this_event,"ir");
-		if(read_chk){
-			target_obj.act = "read";
-			target_obj.order = 2;
-
-			event_status[this_ei].ir = true;
-			//發完api後做真正存入動作
-			target_obj.status = event_status;
-			putEventStatus(target_obj,0,1);
-		}
 	});
 
 	//回覆按讚
@@ -1271,18 +1266,39 @@ $(function(){
 	    }
 	});
 
-	$(".sm-user-area").click(function(){
-		userInfoShow();
-	});
+	// $(".sm-user-area").click(function(){
+	// 	userInfoShow();
+	// });
 
 
 	$(document).on("mousedown",".user-info-close",function(){
 		$(this).attr("src","images/common/icon/bt_close_activity.png");
 	});
 	$(document).on("mouseup",".user-info-close",function(){
+		$("body").removeClass("overflow-hidden");
+
+		//reset
+		$(".user-info-load-area > div").html("");
+
 		$(".screen-lock").fadeOut();
 		$(this).attr("src","images/common/icon/bt_close_normal.png");
-		$(".user-info-load-area").fadeOut("fast");
+		$(".user-info-load-area").fadeOut("fast",function(){
+			$(".user-info-load-area").removeClass("user-info-flip");
+			$(".user-info-load-area .user").show();
+		});
+	});
+
+	$(document).on("mouseup",".user-info-back",function(){
+		$(".user-info-load-area").removeClass("user-info-flip");
+		$(".user-info-load , .me-info-load").stop().animate({
+			opacity:0
+		},400);
+		setTimeout(function(){
+			$(document).find(".user-info-load-area .user").show();
+			$(".user-info-load , .me-info-load").stop().animate({
+				opacity:1
+			},400);
+		},400);
 	});
 
 	//----------------------------------- chatroom ---------------------------------------------
@@ -1389,8 +1405,18 @@ $(function(){
 
 	$(document).on("click",".namecard",function(e){
 		e.stopPropagation();
-		var this_event = $(this).parents(".st-sub-box");
-		cns.debug("this_event data:",this_event.data());
+
+		$("body").addClass("overflow-hidden");
+
+		cns.debug("main gu:",$(this).data("gu"));
+		userInfoShow("",$(this).data("gu"));
+
+		setTimeout(function(){
+			$(".user-avatar > img").stop().animate({
+				opacity:1
+			},500);
+		},300);
+			
 	});
 	
 	//$(document).on("timeupdate",".st-attach-audio audio",function(){

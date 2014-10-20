@@ -157,9 +157,6 @@ $(function(){
 			//預設
 			toastShow(errorResponse(jqxhr));	
 		}
-		
-		
-		
 	});
 
 	//上一頁功能
