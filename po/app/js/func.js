@@ -4566,7 +4566,7 @@ $(function(){
 	        		}else{//繼續遞迴
 	        			getUserInfo(user_info_arr,callback);
 	        		}
-
+	        		
 	        	//失敗就離開遞迴
 	        	}else{ 
 	        		if(callback) callback(false);
@@ -4581,6 +4581,8 @@ $(function(){
 
     	$(".screen-lock").show();
     	$(".user-info-load-area").fadeIn("fast");
+    	//為了美觀
+		this_info.find(".user-avatar-bar").hide();
 
     	$(".user-info-load-area .user").load('layout/layout.html .user-info-load',function(){
     		var this_info = $(this).find(".user-info-load");
