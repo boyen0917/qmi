@@ -141,36 +141,6 @@ function showChatList(){
 				row.append(td);
 
 				setLastMsg( gi, room.ci, table );
-				/*
-				g_idb_chat_msgs.limit(function(list){
-			        if( list.length>0 ){
-			        	if( null!=list[0] ){
-				        	var object = list[0].data;
-				        	setLastMsgContent( lastMsg, lastTime, object );
-				    	}
-				    }
-			    },{
-			        index: "gi_ci_ct",
-			        keyRange: g_idb_chat_msgs.makeKeyRange({
-				        upper: [gi, room.ci, date.getTime()],
-				        lower: [gi, room.ci]
-				        // only:18
-			        }),
-			        limit: 1,
-			        order: "DESC",
-			        onEnd: function(result){
-			            cns.debug("onEnd:",result.ci + " " + result.ct);
-			        },
-			        onError: function(result){
-			            cns.debug("onError:",result);
-			        }
-			    });
-*/
-
-				// td = $("<td></td>");
-				// td.html( $.i18n.getString("delete") );
-				// row.append(td);
-
 				targetDiv.append(table);
 			}
 		});
@@ -324,10 +294,20 @@ function sortRoomList(){
 			$(this).find(".time").html( new Date(ct).toFormatString() );
 		}
 	});
-	var elem = $('.subpage-chatList-row').sort(function(a, b) {
+
+	$('.rows').each(function(){
+	    var $this = $(this);
+	    $this.append($this.find('.subpage-chatList-row').get().sort(function(a, b) {
+	        return $(b).data('time') - $(a).data('time');
+	    }));
+	});
+/*
+	var elem = $('.subpage-chatList-row').sort( function(a, b){
+		console.debug( $(a).data("time"), $(b).data("time") );
 		return $(a).data("time") < $(b).data("time");
 	});
 	$('.rows').append(elem);
+	*/
 }
 /*
               ███╗   ██╗███████╗██╗    ██╗     ██████╗██╗  ██╗ █████╗ ████████╗          
