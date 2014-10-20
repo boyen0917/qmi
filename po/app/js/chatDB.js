@@ -44,18 +44,27 @@ function updateChat ( msgs ){
 				};
 				//write msg to db
 				g_idb_chat_msgs.put( node );
+			}
+		}
 
+		setTimeout( function(){
+			/* 更新聊天室列表最後訊息 */
+			if( typeof( updateLastMsg ) != 'undefined' ){
+				updateLastMsg( data.gi, data.ci );
 			}
-		}
-		// showMsg( object, false );
-		if( null != windowList ){
-			if( windowList.hasOwnProperty(data.ci) 
-				&& null != windowList[data.ci] 
-				&& false==windowList[data.ci].closed ){
-				windowList[data.ci].g_msgTmp = data.el;
-				$(windowList[data.ci].document).find("button.pollingMsg").trigger("click");
+
+			/* 更新聊天室訊息 */
+			// showMsg( object, false );
+			if( null != windowList ){
+				if( windowList.hasOwnProperty(data.ci) 
+					&& null != windowList[data.ci] 
+					&& false==windowList[data.ci].closed ){
+					windowList[data.ci].g_msgTmp = data.el;
+					$(windowList[data.ci].document).find("button.pollingMsg").trigger("click");
+				}
 			}
-		}
+
+		}, 300 );
 	}
 }	//end of updateChat
 

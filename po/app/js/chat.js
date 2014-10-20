@@ -240,7 +240,7 @@ function updateChatContentPosition (){
 		footerHeight -= tmp;
 		$("#chat-contents").stop().animate({marginBottom:footerHeight-40}, 100);
 		$("#chat-toBottom").animate({bottom: Math.max(0,footerHeight+10)}, 100 );
-		if( g_isEndOfPage ) scrollToBottom();
+		// if( g_isEndOfPage ) scrollToBottom();
 	}
 }
 
@@ -259,7 +259,8 @@ function onChatDBInit(){
 	var today=new Date();
 	$("#chat-contents").html("<div class='firstMsg'></div>");
 	var timeTag = $("<div class='chat-date-tag'></div>");
-	timeTag.addClass( today.customFormat("_#YYYY#_#M#_#D#") );
+	// timeTag.addClass( today.customFormat("_#YYYY#_#MM#_#DD#") );
+	timeTag.data( "time", today.getTime() );
 	timeTag.html( getFormatTimeTag(today) );
 	today.setHours(0);
 	today.setMinutes(0);
@@ -391,12 +392,12 @@ function op ( url, type, data, delegate, errorDelegate){
 }
 
 function scrollToStart (){
-	$('html, body').stop().animate({scrollTop:50}, 'fast');
+	$('html, body').stop(false, true).animate({scrollTop:50}, 'fast');
 }
 
 function scrollToBottom (){
-	// cns.debug( $(document).height() );
-	$('html, body').stop().animate({scrollTop:$(document).height()+50}, 'fast');
+	cns.debug( "scrollToBottom" );
+	$('html, body').stop(false, true).animate({scrollTop:$(document).height()+50}, 'fast');
 }
 
 function checkPagePosition (){
@@ -414,7 +415,10 @@ function checkPagePosition (){
 	var docHeight = $(document).height();
 	var isAtBottom = ((posi + height+15) >= docHeight);
 	if( g_isEndOfPage != isAtBottom ){
-		if( !isAtBottom) cns.debug(height, docHeight, (posi + height), docHeight );
+		if(g_isEndOfPage){
+			scrollToBottom();
+		}
+		// if( !isAtBottom) cns.debug(height, docHeight, (posi + height), docHeight );
 		g_isEndOfPage = isAtBottom;
 		if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
 		else $("#chat-toBottom").fadeIn('fast');
@@ -482,8 +486,6 @@ function updateChat (){
 			if( g_needsRolling ){
 				g_needsRolling = false;
 				scrollToBottom();
-			} else if(g_isEndOfPage){
-				scrollToBottom();
 			}
 
 			//groups/G000006s00q/chats/T000011m0Fj/messages_read
@@ -548,8 +550,6 @@ function updateChatCnt (){
 	if( g_needsRolling ){
 		g_needsRolling = false;
 		scrollToBottom();
-	} else if(g_isEndOfPage){
-		scrollToBottom();
 	}
 }
 
@@ -571,26 +571,50 @@ function showMsg (object, bIsFront, bIsTmpSend){
 	var container = $("<div></div>");
 	container.data("time", time);
 	// cns.debug( bIsFront, time, object.notSend, object.ml[0].c );
-	var szSearch = "#chat-contents ."+time.customFormat("_#YYYY#_#M#_#D#");
+	var szSearch = "#chat-contents ."+time.customFormat("_#YYYY#_#MM#_#DD#");
 	var div = $( szSearch );
 
 	if( div.length>0 && div.next().length>0 ){
 		div = div.next();
 	} else {
 		var timeTag = $("<div class='chat-date-tag'></div>");
-		timeTag.addClass(time.customFormat("_#YYYY#_#M#_#D#"));
+		timeTag.addClass(time.customFormat("_#YYYY#_#MM#_#DD#"));
 		timeTag.html( getFormatTimeTag(time) );
-		if(time.getTime()<g_lastDate){
-			$("#chat-contents .firstMsg").after(timeTag);
-		} else {
+		timeTag.data( "time", time.getTime() );
+
+		var allTimeTag = $("#chat-contents .chat-date-tag");
+		if( 1 < allTimeTag.length ){
+			var bIsAdd = false;
+			for( var i=0; i<allTimeTag.length-1; i++){
+				cns.debug( $(allTimeTag[i]).data("time") );
+				cns.debug( time.getTime() );
+
+				if( $(allTimeTag[i]).data("time") > time.getTime() ){
+					cns.debug("1", time);
+					$(allTimeTag[i]).before(timeTag);
+					bIsAdd = true;
+					break;
+				}
+			}
+			if(!bIsAdd){
+				$("#chat-contents .lastMsg").before(timeTag);
+					cns.debug("2", time);
+			}
+		} else{
 			$("#chat-contents .lastMsg").before(timeTag);
+					cns.debug("3", time);
 		}
+		// if(time.getTime()<g_lastDate){
+		// 	$("#chat-contents .firstMsg").after(timeTag);
+		// } else {
+		// 	$("#chat-contents .lastMsg").before(timeTag);
+		// }
 		div = $("<div></div>");
 		timeTag.after(div);
 
 		var lastTime = new Date( $("#chat-contents .lastMsg").data("time") );
 		if( time.getTime() >= lastTime.getTime() ){
-			$("#chat-contents .lastMsg").html("");
+			$("#chat-contents .lastMsg .chat-date-tag").css("display","none");
 		}
 	}
 
@@ -940,7 +964,7 @@ function sendImage( dom ){
 				sendInput(dom);
 			} else {
 				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-				if( g_isEndOfPage ) scrollToBottom();
+				// if( g_isEndOfPage ) scrollToBottom();
 			}
 		});
 	}

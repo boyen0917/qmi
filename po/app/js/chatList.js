@@ -2,6 +2,7 @@
 // });
 
 var windowList = new Object();
+var sortRoomListTimeout = 700;
 
 /**
 @brief
@@ -82,7 +83,6 @@ function showChatList(){
 	var groupData = data[gi];
 	var chatList = groupData["chatAll"];
 	var targetDiv = $(".subpage-chatList .rows");
-	var date = new Date();
 
 	if( targetDiv ){
 		var tmp;
@@ -118,14 +118,16 @@ function showChatList(){
 
 				room["uiName"]=chatRoomName;
 				$(this).find(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
-				var table = $("<table class='subpage-chatList-row'' style='width:100%'></table>");
+				var table = $("<table class='subpage-chatList-row' data-rid='"+room.ci+"' style='width:100%'></table>");
+				$(table).data("time", 0);
+				
 				var row = $("<tr></tr>");
 				table.append(row);
 				var td = $("<td></td>");
 				td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
 				row.append(td);
 
-				td = $("<td data-id='"+ room.ci +"'></td>");
+				td = $("<td></td>");
 				td.append("<div class='name'>" + chatRoomName + "</div>");
 				var lastMsg = $("<div class='msg'></div>");
 				td.append(lastMsg);
@@ -137,11 +139,13 @@ function showChatList(){
 				td.append("<div class='drag'></div>");
 				row.append(td);
 
+				setLastMsg( gi, room.ci, table );
+				/*
 				g_idb_chat_msgs.limit(function(list){
 			        if( list.length>0 ){
 			        	if( null!=list[0] ){
 				        	var object = list[0].data;
-				        	setLastMsg( lastMsg, lastTime, object );
+				        	setLastMsgContent( lastMsg, lastTime, object );
 				    	}
 				    }
 			    },{
@@ -160,6 +164,7 @@ function showChatList(){
 			            cns.debug("onError:",result);
 			        }
 			    });
+*/
 
 				// td = $("<td></td>");
 				// td.html( $.i18n.getString("delete") );
@@ -169,6 +174,7 @@ function showChatList(){
 			}
 		});
 
+		setTimeout(sortRoomList, sortRoomListTimeout);
 		$.lStorage(ui, data);
 	}
 
@@ -237,34 +243,52 @@ function openChatWindow ( ci ){
 	}
 }
 
-function setLastMsg( msgDom, timeDom, data ){
-	var text = "";
-	switch( data.ml[0].tp ){
-		case 5: //sticker
-			var name = groupData.guAll[data.meta.gu].nk;
-			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
-			break; 
-		case 6: //pic
-			var name = groupData.guAll[data.meta.gu].nk;
-			text = $.i18n.getString("CHAT_SOMEONE_SEND_PHOTO", name);
-			break;
-		case 8: //audio
-			var name = groupData.guAll[data.meta.gu].nk;
-			text = $.i18n.getString("CHAT_SOMEONE_SEND_VOICE", name);
-			break; 
-		case 9: //map
-			var name = groupData.guAll[data.meta.gu].nk;
-			text = $.i18n.getString("CHAT_SOMEONE_SEND_LOCATION", name);
-			break;
-		default:
-			text = data.ml[0].c;
-			break;
+function updateLastMsg(giTmp, ci){
+	var table = $(".subpage-chatList-row[data-rid='"+ci+"']");
+	if(!table || 0>=table.length ){
+		cns.debug("[!]dom not find.gi:"+giTmp+" ci:"+ci);
+		return;
 	}
-	if(msgDom)	msgDom.html( text );
-	if(timeDom)	timeDom.html( new Date(data.meta.ct).customFormat("#YYYY#/#MM#/#DD# #hh#:#mm#") );
+	setLastMsg( giTmp, ci, table );
+	setTimeout(sortRoomList, sortRoomListTimeout);
 }
 
-function setLastMsg( msgDom, timeDom, data ){
+function setLastMsg( giTmp, ci, table ){
+	// if( gi!=giTmp ) return;
+	// if(!table) return;
+
+	g_idb_chat_msgs.limit(function(list){
+	    if( list.length>0 ){
+	    	if( null!=list[0] ){
+	        	var object = list[0].data;
+	        	setLastMsgContent( table, object );
+	    	}
+	    }
+	},{
+	    index: "gi_ci_ct",
+	    keyRange: g_idb_chat_msgs.makeKeyRange({
+	        upper: [gi, ci, new Date().getTime()],
+	        lower: [gi, ci]
+	        // only:18
+	    }),
+	    limit: 1,
+	    order: "DESC",
+	    onEnd: function(result){
+	        cns.debug("setLastMsg end:",result.ci + " " + result.ct);
+	    },
+	    onError: function(result){
+	        cns.debug("[!] setLastMsg error:",result);
+	    }
+	});
+}
+
+function setLastMsgContent( table, data ){
+	table.data("time", data.meta.ct);
+	var msgDom = table.find(".msg");
+	var timeDom = table.find(".time");
+
+	var userData = $.lStorage(ui);
+	var groupData = userData[gi];
 	var text = "";
 	switch( data.ml[0].tp ){
 		case 5: //sticker
@@ -288,9 +312,22 @@ function setLastMsg( msgDom, timeDom, data ){
 			break;
 	}
 	if(msgDom)	msgDom.html( text );
+	cns.debug( new Date(data.meta.ct).toFormatString() );
 	if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
 }
 
+function sortRoomList(){
+	$('.subpage-chatList-row').each(function(){
+		var ct = $(this).data("time");
+		if( ct > 0 ){
+			$(this).find(".time").html( new Date(ct).toFormatString() );
+		}
+	});
+	var elem = $('.subpage-chatList-row').sort(function(a, b) {
+		return $(a).data("time") < $(b).data("time");
+	});
+	$('.rows').append(elem);
+}
 /*
               ███╗   ██╗███████╗██╗    ██╗     ██████╗██╗  ██╗ █████╗ ████████╗          
               ████╗  ██║██╔════╝██║    ██║    ██╔════╝██║  ██║██╔══██╗╚══██╔══╝          
