@@ -177,7 +177,7 @@ function showChatList(){
 	$(".update").off("click").click(function(){
 		// console.debug( $(this).data("gi"), $(this).data("ci"));
 		// console.debug( $(this).attr("data-gi"), $(this).attr("data-ci"));
-		updateLastMsg( $(this).data("gi"), $(this).data("ci") );
+		updateLastMsg( $(this).attr("data-gi"), $(this).attr("data-ci") );
 	});
 }
 
