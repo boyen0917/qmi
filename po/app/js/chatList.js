@@ -130,6 +130,7 @@ function showChatList(){
 				td = $("<td></td>");
 				td.append("<div class='name'>" + chatRoomName + "</div>");
 				var lastMsg = $("<div class='msg'></div>");
+				td.data("id", room.ci);
 				td.append(lastMsg);
 				row.append(td);
 
