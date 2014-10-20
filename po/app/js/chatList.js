@@ -184,7 +184,7 @@ function showChatList(){
 		var group_name = memtd.find(".name").html();
 		popupShowAdjust(
 			$.i18n.getString("CHAT_DELETE_CHATROOM"),
-			$.i18n.getString("comfirmDeleteRoom", group_name),
+			$.i18n.getString("CHAT_CONFIRM_DELETE_CHATROOM", group_name),
 			true,
 			true,
 			[deleteRoom,memtd]
@@ -288,7 +288,7 @@ function setLastMsg( msgDom, timeDom, data ){
 			break;
 	}
 	if(msgDom)	msgDom.html( text );
-	if(timeDom)	timeDom.html( new Date(data.meta.ct).customFormat("#YYYY#/#MM#/#DD# #hh#:#mm#") );
+	if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
 }
 
 /*

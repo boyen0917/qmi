@@ -96,6 +96,10 @@ updateAlert = function(){
 	    		var lastCt = 0;
 				for(var i=0; i<returnData.nl.length; i++){
 					var boxData = returnData.nl[i];
+
+					//預防舊版的打進來
+					if( !boxData || !boxData.hasOwnProperty("nd") ) return;
+	    			
 	    			var node = {
 	    				ei_ntp: boxData.nd.ei+"_"+boxData.ntp,
 						ct: boxData.nd.ct,
