@@ -10,15 +10,29 @@
 	min-height: 55px;
 }
 
-/*.screen-lock {
-	overflow: hidden;
-}*/
+body {
+	-webkit-perspective: 1000;
+}
+
+/* 為了名片的翻轉 */
+.ui-panel-animate.ui-panel-content-fixed-toolbar {
+	-webkit-transform: initial;
+}
+
+.overflow-hidden {
+	/*overflow: hidden;	*/
+}
+
 
 .main{
 	height:1136px;
     width:640px;
     margin:auto;
     margin-top:-20px;
+}
+
+.font-black {
+	color: black;
 }
 
 img.auo {
@@ -601,7 +615,7 @@ img.auo {
 	display: none;
 	position: fixed;
 	width: 100%;
-	height: 100%;
+	height: 200%;
 	left: 0;
 	top: 0;
 	background: black;
@@ -1713,10 +1727,6 @@ img.auo {
 .st-sub-else{
 	font-size:12px
 }
-
-/*.st-sub-box-1-footer img{
-    margin-right: 10px;
-}*/
 
 .st-sub-box-1-footer img {
 	margin-right: 10px;
@@ -3317,10 +3327,30 @@ input.cp-datetimepicker-end {
 	top: 0;
 	left: 0;
 	z-index: 1100;
-	overflow: scroll;
+	transition: transform 1s;
+	transform-style: preserve-3d;
 }
 
-.user-info-load {
+
+
+.user-info-flip {
+	transform: rotateY( 180deg );
+}
+
+.user-info-load-area .user{
+	position: absolute;
+	backface-visibility: hidden;
+	width: 100%;
+}
+
+.user-info-load-area .me.me-rotate {
+	position: absolute;
+	transform: rotateY( 180deg );
+	backface-visibility: hidden;
+	width: 100%;
+}
+
+.user-info-load,.me-info-load {
 	background: #fff;
 	border-radius: 5px;
 	overflow: hidden;
@@ -3329,7 +3359,7 @@ input.cp-datetimepicker-end {
 }
 
 @media all and (max-width: 500px) {
-    .user-info-load {
+    .user-info-load,.me-info-load {
 		width: 350px;
 		height: 550px;
 	}
@@ -3337,12 +3367,16 @@ input.cp-datetimepicker-end {
 	.user-info-list-area {
 		width: 320px;
 		padding: 10px 15px;
-		height: 230px;
+		height: 225px;
+	}
+
+	.user-info-list .content {
+		margin: 5px 0 12px;
 	}
 }	
 
 @media all and (min-width: 501px) {
-    .user-info-load {
+    .user-info-load,.me-info-load {
 		width: 400px;
 		height: 650px;
 		margin: 7% auto;
@@ -3351,7 +3385,15 @@ input.cp-datetimepicker-end {
 	.user-info-list-area {
 		width: 350px;
 		padding: 10px 25px;
-		height: 330px;
+		height: 310px;
+	}
+
+	.user-info-list .content {
+		margin: 10px 0 20px;
+	}
+
+	.user-avatar {
+		margin-bottom: 15px;
 	}
 }
 
@@ -3362,15 +3404,22 @@ input.cp-datetimepicker-end {
 	background: rgb(217,217,217);
 	position: relative;
 	cursor: pointer;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.user-avatar > img{
+	opacity: 0;
 }
 
 .user-avatar-bar {
+	display: none;
 	position: absolute;
 	bottom: 0;
 	width: 100%;
 	background: black;
 	background: rgba(0,0,0,0.5);
-	height: 80px;
+	color: white;
 }
 
 .user-avatar-bar .group-avatar {
@@ -3404,12 +3453,12 @@ input.cp-datetimepicker-end {
 }
 
 img.default {
-	width: 75%;
+	width: 250px;
 	margin: 0 auto;
 	display: block;
 }
 
-.user-info-list-area {
+.user-info-list-area.me-list {
 	overflow-y: scroll;
 	overflow-x: hidden;
 }
@@ -3427,14 +3476,21 @@ img.default {
 }
 
 .user-info-list {
-	border-bottom: 1px solid #d2d2d2;
 	margin-bottom: 10px;
+	position: relative;
+}
+
+.user-info-list.bar {
+	border-bottom: 1px solid #d2d2d2;
 }
 
 .user-info-title {
- color: #aaa;
+	color: #aaa;
 }
 
+.user-info-list .content {
+	color: #ddd;
+}
 
 div.user-info-submit-ready {
 	background: rgb(80,160,240);
@@ -3447,11 +3503,15 @@ div.user-info-submit-ready:active {
 .user-info-submit {
 	width: 100%;
 	background: rgb(200,215,230);
-	height: 50px;
+	height: 45px;
 	text-align: center;
 	font-size: 22px;
 	color: white;
 	padding-top: 10px;
+	position: absolute;
+	bottom: 0;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
 }
 
 img.user-info-close {
@@ -3461,6 +3521,115 @@ img.user-info-close {
 	z-index: 10;
 	width: 50px;
 	cursor: pointer;
+}
+
+img.user-info-back {
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	z-index: 10;
+	width: 50px;
+	cursor: pointer;
+	opacity: 0.7;
+}
+
+
+.user-info-list .title {
+	color: #aaa;
+}
+
+.user-info-load .action {
+	background: rgb(222,238,242);
+	width: 100%;
+	height: 57px;
+	display: flex;
+}
+
+.user-info-load .action img {
+	width: 27px;
+	position: relative;
+	top: 7px;
+	right: 5px;
+}
+
+.user-info-load .action div {
+	flex: 1;
+	text-align: center;
+	padding-top: 8px;
+	font-size: 18px;
+	color: rgb(142,176,184);
+}
+
+.user-info-load .action div:active {
+	background: rgb(212,228,232);
+}
+
+.user-info-load .action-bar {
+	background: white;
+	width: 1px;
+	height: 57px;
+	position: absolute;
+	left: 50%;
+}
+
+.user-info-list img {
+	position: absolute;
+	width: 40px;
+	top: 3%;
+	right: 3%;
+}
+
+.user-avatar-bar .user-name {
+	font-size: 20px;
+	margin-top: 10px;
+}
+
+.user-avatar-bar div {
+	margin-left: 20px;
+}
+
+.user-avatar-bar .birth {
+	position: absolute;
+	top: 12px;
+	right: 10%;
+	color: rgb(177,212,222);
+	text-shadow: 0 0 0 rgb(177,212,222);
+	display: none;
+}
+
+.user-avatar-bar .birth img {
+	width: 18px;
+	position: relative;
+	top: 1px;
+	right: 8px;
+}
+
+.user-avatar-bar .branch {
+	opacity: 0.9;
+	font-weight: 100;
+	margin-top: 3px;
+	font-size: 15px;
+	text-shadow: 0 0 0 black;
+	display: none;
+}
+
+.user-avatar-bar .title {
+	margin-top: 3px;
+	text-shadow: 0 0 0 black;
+	display: none;
+}
+
+.user-avatar-bar .user-desc {
+	margin-top: 3px;
+	font-weight: 100;
+	font-size: 15px;
+	color: rgb(183,222,231);
+	text-shadow: 0 0 0 rgb(183,222,231);
+	display: none;
+}
+
+.user-avatar-bar .bottom {
+	height: 10px;
 }
 
 
@@ -3510,4 +3679,29 @@ img.user-info-close {
 	border-radius: 50%;
 	position: relative;
 	top: 30%;
+}
+
+.fixed-area {
+	display: none;
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+	z-index: 1100;
+	transition: transform 1s;
+	transform-style: preserve-3d;
+	background: green;
+
+
+	/*display: none;
+	position: fixed;
+	height: 100px;
+	width: 100px;
+	top: 500px;
+	left: 0;
+	 z-index: 1100; 
+	 transition: transform 1s; 
+	 transform-style: preserve-3d; 
+	background: green;*/
 }

@@ -197,7 +197,7 @@
             </div>
             <div data-role="content">
         <!------------------------------------- 動態消息 ---------------------------------------->
-            <div class="subpage-timeline">
+            <div class="subpage-timeline ">
                 <div class="st-navi-area">
                     <div class="st-navi-subarea main" data-st-navi-group="navi" data-st-navi="home" data-tp="00">
                         <img src="images/timeline/timeline_tab_icon_home_white.png"/>
@@ -241,10 +241,10 @@
                     <option value="te-example4"></option>
                 </select>
                 <div class="st-feedbox-area">
-                    <div data-feed="00" class="feed-home feed-subarea"></div>
-                    <div data-feed="01" class="feed-annoucement feed-subarea"></div>
-                    <div data-feed="02" class="feed-feedback feed-subarea"></div>
-                    <div data-feed="03" class="feed-task feed-subarea"></div>
+                    <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
+                    <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
+                    <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
+                    <div data-feed="03" class="feed-task feed-subarea switch-reset"></div>
                 </div>
                 <div class="st-feedbox-area-bottom">
                     <img src="images/st_bottom_loading.gif"/>
@@ -419,16 +419,6 @@
             </div>
         </div>
 
-<!---------------------------------- page-user-info ------------------------------------>
-        <div data-role="page" id="page-user-info">
-            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3></h3>
-            </div>
-            <div class="">
-            </div>
-        </div>
-
 <!---------------------------------- page-newChat ------------------------------------>
         <div data-role="page" id="page-newChat">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -508,8 +498,10 @@
             <img class="yan" src="files/yan.png"/>
         </div>
 
-
-        <div class="user-info-load-area"></div>
+        <div class="user-info-load-area">
+            <div class="user"></div>
+            <div class="me"></div>
+        </div>
 
         <div class="toast">
             <div></div>

@@ -141,7 +141,6 @@ $(function(){
         		var login_result = $.parseJSON(data.responseText);
 	        	// cns.debug("login resutl:",JSON.stringify(login_result));
 	        	// return false;
-        	
 
         		//判斷是否換帳號 換帳號就要清db
         		if(!$.lStorage(login_result.ui)){
