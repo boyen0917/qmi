@@ -127,10 +127,9 @@ function showChatList(){
 				td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
 				row.append(td);
 
-				td = $("<td></td>");
+				td = $("<td data-id='"+room.ci+"'></td>");
 				td.append("<div class='name'>" + chatRoomName + "</div>");
 				var lastMsg = $("<div class='msg'></div>");
-				td.data("id", room.ci);
 				td.append(lastMsg);
 				row.append(td);
 
@@ -152,6 +151,7 @@ function showChatList(){
 
 	$(".subpage-chatList-row td:nth-child(2)").off("click");
 	$(".subpage-chatList-row td:nth-child(2)").on("click", function(){
+		// console.debug( $(this).data("id") );
 		openChatWindow( $(this).data("id") );
 	});
 
@@ -172,6 +172,12 @@ function showChatList(){
 		// $(".subpage-chatList-row td:nth-child(4)")
 		// $(this).show('fast');
 		// $(this).animate({width:"20%"},'fast');
+	});
+
+	$(".update").off("click").click(function(){
+		// console.debug( $(this).data("gi"), $(this).data("ci"));
+		// console.debug( $(this).attr("data-gi"), $(this).attr("data-ci"));
+		updateLastMsg( $(this).data("gi"), $(this).data("ci") );
 	});
 }
 
@@ -301,13 +307,6 @@ function sortRoomList(){
 	        return $(b).data('time') - $(a).data('time');
 	    }));
 	});
-/*
-	var elem = $('.subpage-chatList-row').sort( function(a, b){
-		console.debug( $(a).data("time"), $(b).data("time") );
-		return $(a).data("time") < $(b).data("time");
-	});
-	$('.rows').append(elem);
-	*/
 }
 /*
               ███╗   ██╗███████╗██╗    ██╗     ██████╗██╗  ██╗ █████╗ ████████╗          

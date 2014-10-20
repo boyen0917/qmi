@@ -66,7 +66,7 @@ $(document).ready(function(){
     //所有團體列表
     g_group = userData[gi];
     g_room = g_group["chatAll"][ci];
-	g_cn = g_room.uiName;
+	g_cn = g_room.uiName ? g_room.uiName : g_group.gn;
 
 	eGroupTiType["CHAT"] = g_group["ti_chat"];
 	eGroupTiType["CALENDER"] = g_group["ti_cal"];
@@ -906,6 +906,15 @@ function sendInput ( dom ){
 
 			// if( g_isEndOfPage ) scrollToBottom();
 			scrollToBottom();
+
+			if( parent && false==parent.closed ){
+				var tmp = $(opener.document).find(".subpage-chatList .update");
+				if( tmp && tmp.length > 0){
+					tmp.attr("data-gi", gi);
+					tmp.attr("data-ci", ci);
+					tmp.trigger("click");
+				}
+			}
 	    },
 	    function(){
 	    	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
