@@ -1,12 +1,10 @@
 var lastAlertCt = 0;
 
 $(function(){
-
 	initAlertDB();
 	// updateAlert();
 
 	$(".navi-alert").click(function(){
-		
 		$(".navi-alert").removeClass("new");
 
 		if($(".alert-area").is(":visible")){
@@ -33,9 +31,16 @@ initAlertDB = function(){
       ],
       onStoreReady: function(){
       	showAlertFromDB();
-		setInterval(updateAlert,update_alert_interval);
+      	updateAlert();
+		// setInterval(updateAlert,update_alert_interval);
       }
     });
+}
+
+showNewAlertIcon = function(){
+	if( !$(".alert-area").is(":visible") ){
+		$(".navi-alert").addClass("new");
+	}
 }
 
 //隱藏通知區
@@ -50,6 +55,7 @@ hideAlertBox = function(){
 
 //show通知區
 showAlertBox = function(){
+	updateAlert();
 	$(".alert").addClass("alert-click");
 	$(".alert-area").slideDown();
 	$(".alert-area-cover").show();
@@ -85,7 +91,7 @@ showAlertFromDB = function(){
 updateAlert = function(){
 	if (typeof ui === 'undefined') return;
 
-	ajaxDo("/notices", {
+	ajaxDo("/notices2", {
 	    "ui":ui,
 	    "at":at, 
 	    "li":lang,
@@ -115,13 +121,8 @@ updateAlert = function(){
 				if( lastCt>lastAlertCt ){
 					// cns.debug("showAlertFromDB",lastAlertCt, lastCt);
 					lastAlertCt = lastCt;
-					if( !$(".alert-area").is(":visible") ){
-						$(".navi-alert").addClass("new");
-					}
 					setTimeout(showAlertFromDB,500);
 				}
-
-
 
 				// //check "new" mark & update data
 				// if( null!=returnData ){

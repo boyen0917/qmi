@@ -12,6 +12,8 @@ var eGroupTiType = {
 	"TIME_LINE":2
 };
 var g_isEndOfPage = false;	//是否在頁面底端
+var g_isEndOfPageTime = 0;
+var g_lastScrollTime = 0;
 var g_needsRolling = false;	//是否要卷到頁面最下方？
 var g_lastMsgEi=0;
 var g_msgs = [];
@@ -188,6 +190,26 @@ $(document).ready(function(){
 	});
 	resizeContent();
 
+	$( window ).scroll( function(){
+		var posi = $(window).scrollTop();
+		if( posi <= $("#chat-loading").height()*0.5 ){
+			if( false==g_bIsLoadHistoryMsg ){
+				if( !g_bIsEndOfHistory )	getHistoryMsg( false );
+				else updateHistoryMsg();
+			}
+			g_isEndOfPage = false;
+			return;
+		}
+		var height = $(window).height();
+		var docHeight = $(document).height();
+		var isAtBottom = ((posi + height+5) >= docHeight);
+		if( g_isEndOfPage != isAtBottom ){
+			g_isEndOfPage = isAtBottom;
+			g_isEndOfPageTime = new Date().getTime();
+			cns.debug("!");
+		}
+	});
+
 	if( g_bIsPolling ){
 		$("button.pollingCnt").off("click").click( updateChatCnt );
 		$("button.pollingMsg").off("click").click( function(){
@@ -209,12 +231,15 @@ $(document).ready(function(){
 	var enterTime = new Date();
 	//set update contents
 	setInterval(function() {
-	    checkPagePosition();
 	    if( !g_bIsPolling ){
 		    updateChat();
 		    updateChatCnt();
 	    }
 	}, 1500);
+
+	setInterval(function() {
+	    checkPagePosition();
+	}, 300);
 
 	initStickerArea.init( $(".stickerArea"), sendSticker);
 });
@@ -401,28 +426,33 @@ function scrollToBottom (){
 }
 
 function checkPagePosition (){
-	var posi = $(window).scrollTop();
-	if( posi <= $("#chat-loading").height()*0.5 ){
-		if( false==g_bIsLoadHistoryMsg ){
-			if( !g_bIsEndOfHistory )	getHistoryMsg( false );
-			else updateHistoryMsg();
-		}
-		g_isEndOfPage = false;
-		return;
-	}
+	if( new Date().getTime() > (g_isEndOfPageTime+500) ){
+		if( g_isEndOfPage ){
+			var posi = $(window).scrollTop();
+			// if( posi <= $("#chat-loading").height()*0.5 ){
+			// 	if( false==g_bIsLoadHistoryMsg ){
+			// 		if( !g_bIsEndOfHistory )	getHistoryMsg( false );
+			// 		else updateHistoryMsg();
+			// 	}
+			// 	g_isEndOfPage = false;
+			// 	return;
+			// }
 
-	var height = $(window).height();
-	var docHeight = $(document).height();
-	var isAtBottom = ((posi + height+15) >= docHeight);
-	if( g_isEndOfPage != isAtBottom ){
-		if(g_isEndOfPage){
-			scrollToBottom();
+			var height = $(window).height();
+			var docHeight = $(document).height();
+			var isAtBottom = ((posi + height+5) >= docHeight);
+			if( !isAtBottom )	scrollToBottom();
+
+			$("#chat-toBottom").fadeOut('fast');
+		} else{
+			$("#chat-toBottom").fadeIn('fast');
 		}
-		// if( !isAtBottom) cns.debug(height, docHeight, (posi + height), docHeight );
-		g_isEndOfPage = isAtBottom;
-		if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
-		else $("#chat-toBottom").fadeIn('fast');
 	}
+	// if( g_isEndOfPage != isAtBottom ){
+	// 	// if( !isAtBottom) cns.debug(height, docHeight, (posi + height), docHeight );
+	// 	if(g_isEndOfPage) $("#chat-toBottom").fadeOut('fast');
+	// 	else $("#chat-toBottom").fadeIn('fast');
+	// }
 }
 
 function getGroupMemberFromData ( g_uid ){
