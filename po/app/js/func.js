@@ -4407,6 +4407,7 @@ $(function(){
     	}
     	if(gcnts.G3 > 0){
     		//鈴鐺
+    		if( typeof(showNewAlertIcon)!='undefined' ) showNewAlertIcon();
     	}
     	
 	    	
