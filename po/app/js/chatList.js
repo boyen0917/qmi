@@ -2,6 +2,7 @@
 // });
 
 var windowList = new Object();
+var sortRoomListTimeout = 700;
 
 /**
 @brief
@@ -17,7 +18,7 @@ initChatList = function(){
 		//set title & sub-title
 		var tmp = parent.find("div:first-child");
 		if( tmp ){
-			tmp.html( $.i18n.getString("chat") );
+			tmp.html( $.i18n.getString("CHAT_TITLE") );
 			if( currentGroup )	tmp.next().html( currentGroup.gn );
 		}
 		//set add icon
@@ -82,7 +83,6 @@ function showChatList(){
 	var groupData = data[gi];
 	var chatList = groupData["chatAll"];
 	var targetDiv = $(".subpage-chatList .rows");
-	var date = new Date();
 
 	if( targetDiv ){
 		var tmp;
@@ -118,14 +118,16 @@ function showChatList(){
 
 				room["uiName"]=chatRoomName;
 				$(this).find(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
-				var table = $("<table class='subpage-chatList-row'' style='width:100%'></table>");
+				var table = $("<table class='subpage-chatList-row' data-rid='"+room.ci+"' style='width:100%'></table>");
+				$(table).data("time", 0);
+				
 				var row = $("<tr></tr>");
 				table.append(row);
 				var td = $("<td></td>");
 				td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
 				row.append(td);
 
-				td = $("<td data-id='"+ room.ci +"'></td>");
+				td = $("<td data-id='"+room.ci+"'></td>");
 				td.append("<div class='name'>" + chatRoomName + "</div>");
 				var lastMsg = $("<div class='msg'></div>");
 				td.append(lastMsg);
@@ -137,67 +139,19 @@ function showChatList(){
 				td.append("<div class='drag'></div>");
 				row.append(td);
 
-				g_idb_chat_msgs.limit(function(list){
-			        if( list.length>0 ){
-			        	if( null!=list[0] ){
-				        	var object = list[0].data;
-				        	var text = "";
-				        	switch( object.ml[0].tp ){
-				        		case 5: //sticker
-									var name = groupData.guAll[object.meta.gu].nk;
-				        			text = $.i18n.getString("someSendSticker", name);
-				        			break; 
-				        		case 6: //pic
-									var name = groupData.guAll[object.meta.gu].nk;
-				        			text = $.i18n.getString("someSendPicture", name);
-				        			break;
-				        		case 8: //audio
-									var name = groupData.guAll[object.meta.gu].nk;
-				        			text = $.i18n.getString("someSendAudio", name);
-				        			break; 
-				        		case 9: //map
-									var name = groupData.guAll[object.meta.gu].nk;
-				        			text = $.i18n.getString("someSendMap", name);
-				        			break;
-				        		default:
-				        			text = object.ml[0].c;
-				        			break;
-				        	}
-				        	lastMsg.html( text );
-				        	lastTime.html( new Date(object.meta.ct).customFormat("#YYYY#/#MM#/#DD# #hh#:#mm#") );
-						}
-				    }
-			    },{
-			        index: "gi_ci_ct",
-			        keyRange: g_idb_chat_msgs.makeKeyRange({
-				        upper: [gi, room.ci, date.getTime()],
-				        lower: [gi, room.ci]
-				        // only:18
-			        }),
-			        limit: 1,
-			        order: "DESC",
-			        onEnd: function(result){
-			            cns.debug("onEnd:",result.ci + " " + result.ct);
-			        },
-			        onError: function(result){
-			            cns.debug("onError:",result);
-			        }
-			    });
-
-				// td = $("<td></td>");
-				// td.html( $.i18n.getString("delete") );
-				// row.append(td);
-
+				setLastMsg( gi, room.ci, table );
 				targetDiv.append(table);
 			}
 		});
 
+		setTimeout(sortRoomList, sortRoomListTimeout);
 		$.lStorage(ui, data);
 	}
 
 
 	$(".subpage-chatList-row td:nth-child(2)").off("click");
 	$(".subpage-chatList-row td:nth-child(2)").on("click", function(){
+		// console.debug( $(this).data("id") );
 		openChatWindow( $(this).data("id") );
 	});
 
@@ -206,8 +160,8 @@ function showChatList(){
 		var memtd = $(this).parent().prev();
 		var group_name = memtd.find(".name").html();
 		popupShowAdjust(
-			$.i18n.getString("deleteRoom"),
-			$.i18n.getString("comfirmDeleteRoom", group_name),
+			$.i18n.getString("CHAT_DELETE_CHATROOM"),
+			$.i18n.getString("CHAT_CONFIRM_DELETE_CHATROOM", group_name),
 			true,
 			true,
 			[deleteRoom,memtd]
@@ -218,6 +172,12 @@ function showChatList(){
 		// $(".subpage-chatList-row td:nth-child(4)")
 		// $(this).show('fast');
 		// $(this).animate({width:"20%"},'fast');
+	});
+
+	$(".update").off("click").click(function(){
+		// console.debug( $(this).data("gi"), $(this).data("ci"));
+		// console.debug( $(this).attr("data-gi"), $(this).attr("data-ci"));
+		updateLastMsg( $(this).attr("data-gi"), $(this).attr("data-ci") );
 	});
 }
 
@@ -236,10 +196,10 @@ function deleteRoom ( deleteRow ){
 		if(data.status == 200){
 			//delete room succ
 			updateChatList();
-			toastShow( $.i18n.getString("deleteSucc") );
+			toastShow( $.i18n.getString("CHAT_DELETE_CHATROOM_SUCC") );
 		} else {
 			//delete room fail
-			toastShow( $.i18n.getString("deleteFail") );
+			toastShow( $.i18n.getString("CHAT_DELETE_CHATROOM_FAIL") );
 		}
 	});
 }
@@ -260,6 +220,94 @@ function openChatWindow ( ci ){
 	}
 }
 
+function updateLastMsg(giTmp, ci){
+	var table = $(".subpage-chatList-row[data-rid='"+ci+"']");
+	if(!table || 0>=table.length ){
+		cns.debug("[!]dom not find.gi:"+giTmp+" ci:"+ci);
+		return;
+	}
+	setLastMsg( giTmp, ci, table );
+	setTimeout(sortRoomList, sortRoomListTimeout);
+}
+
+function setLastMsg( giTmp, ci, table ){
+	// if( gi!=giTmp ) return;
+	// if(!table) return;
+
+	g_idb_chat_msgs.limit(function(list){
+	    if( list.length>0 ){
+	    	if( null!=list[0] ){
+	        	var object = list[0].data;
+	        	setLastMsgContent( table, object );
+	    	}
+	    }
+	},{
+	    index: "gi_ci_ct",
+	    keyRange: g_idb_chat_msgs.makeKeyRange({
+	        upper: [gi, ci, new Date().getTime()],
+	        lower: [gi, ci]
+	        // only:18
+	    }),
+	    limit: 1,
+	    order: "DESC",
+	    onEnd: function(result){
+	        cns.debug("setLastMsg end:",result.ci + " " + result.ct);
+	    },
+	    onError: function(result){
+	        cns.debug("[!] setLastMsg error:",result);
+	    }
+	});
+}
+
+function setLastMsgContent( table, data ){
+	table.data("time", data.meta.ct);
+	var msgDom = table.find(".msg");
+	var timeDom = table.find(".time");
+
+	var userData = $.lStorage(ui);
+	var groupData = userData[gi];
+	var text = "";
+	switch( data.ml[0].tp ){
+		case 5: //sticker
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
+			break; 
+		case 6: //pic
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_PHOTO", name);
+			break;
+		case 8: //audio
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_VOICE", name);
+			break; 
+		case 9: //map
+			var name = groupData.guAll[data.meta.gu].nk;
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_LOCATION", name);
+			break;
+		default:
+			text = data.ml[0].c;
+			break;
+	}
+	if(msgDom)	msgDom.html( text );
+	cns.debug( new Date(data.meta.ct).toFormatString() );
+	if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
+}
+
+function sortRoomList(){
+	$('.subpage-chatList-row').each(function(){
+		var ct = $(this).data("time");
+		if( ct > 0 ){
+			$(this).find(".time").html( new Date(ct).toFormatString() );
+		}
+	});
+
+	$('.rows').each(function(){
+	    var $this = $(this);
+	    $this.append($this.find('.subpage-chatList-row').get().sort(function(a, b) {
+	        return $(b).data('time') - $(a).data('time');
+	    }));
+	});
+}
 /*
               ███╗   ██╗███████╗██╗    ██╗     ██████╗██╗  ██╗ █████╗ ████████╗          
               ████╗  ██║██╔════╝██║    ██║    ██╔════╝██║  ██║██╔══██╗╚══██╔══╝          
@@ -381,7 +429,7 @@ function showNewRoomDetailPage(){
 
 	//no mem
 	if( g_newChatMemList.length==0 ){
-		alert( $.i18n.getString("enterRoomName") );
+		alert( $.i18n.getString("CHAT_CHATROOM_NAME_EMPTY") );
 		return;
 	}
 
@@ -449,7 +497,7 @@ function requestNewChatRoom(){
 	// cns.debug( text );
 	if( !text || text.length==0 ){
 		if( g_newChatMemList.length > 1 ){
-			alert( $.i18n.getString("enterRoomName") );
+			alert( $.i18n.getString("CHAT_CHATROOM_NAME_EMPTY") );
 			return;
 		}
 	}
