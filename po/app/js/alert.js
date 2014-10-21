@@ -1,4 +1,5 @@
 var lastAlertCt = 0;
+var lastCnt = 0;
 
 $(function(){
 	initAlertDB();
@@ -37,10 +38,14 @@ initAlertDB = function(){
     });
 }
 
-showNewAlertIcon = function(){
-	if( !$(".alert-area").is(":visible") ){
-		$(".navi-alert").addClass("new");
+showNewAlertIcon = function( cnt ){
+	if( cnt != lastCnt ){
+		lastCnt = cnt;
+		if( !$(".alert-area").is(":visible") ){
+			$(".navi-alert").addClass("new");
+		}
 	}
+
 }
 
 //隱藏通知區
@@ -55,6 +60,11 @@ hideAlertBox = function(){
 
 //show通知區
 showAlertBox = function(){
+	if( typeof(updatePollingCnts)!= 'undefined' ){
+		lastCnt = 0;
+		updatePollingCnts( $("<div></div>"), "G3" );
+	}
+    		
 	updateAlert();
 	$(".alert").addClass("alert-click");
 	$(".alert-area").slideDown();
@@ -90,13 +100,14 @@ showAlertFromDB = function(){
 //打ＡＰＩ更新通知
 updateAlert = function(){
 	if (typeof ui === 'undefined') return;
-
+	
 	ajaxDo("/notices2", {
 	    "ui":ui,
 	    "at":at, 
 	    "li":lang,
 	    }, "get", false, null).complete(function(data){
 	    	if( data.status==200){
+
 	    		var returnData = $.parseJSON(data.responseText);
 
 	    		var lastCt = 0;
@@ -161,7 +172,7 @@ showAlertContent = function(data){
 			if(boxData.ntp==1){
 				//xx(發布者 名)
 			    tmp = $(tmpDiv).find(".al-post-name");
-			    if( tmp ) tmp.html( boxData.nd.opgun.replaceOriEmojiCode() );
+			    if( tmp ) tmp.html( boxData.gun.replaceOriEmojiCode() );
 
 				//發佈xx
 				content = $(tmpDiv).find(".al-content.post");
@@ -169,8 +180,8 @@ showAlertContent = function(data){
 				if( group ){
 					//發布者 照片
 				    var tmp = $(tmpDiv).find(".al-post-img");
-				    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.nd.opgu) ){
-				    	var auo = group.guAll[boxData.nd.opgu].auo;
+				    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
+				    	var auo = group.guAll[boxData.gu].auo;
 				    	if(auo){
 				    		tmp.css("background-image","url("+auo+")");
 				    	}
@@ -180,8 +191,8 @@ showAlertContent = function(data){
 			} else { //回覆
 				//xx(及其他xx個人)
 			    tmp = $(tmpDiv).find(".al-post-name");
-			    if( tmp && boxData.lgun){
-			    	tmp.html( boxData.lgun.replaceOriEmojiCode() );
+			    if( tmp && boxData.gun){
+			    	tmp.html( boxData.gun.replaceOriEmojiCode() );
 			    	if(boxData.rcnt>1){
 			    		tmpDiv.find(".posterDetail").css("display","inline-block");
 			    		tmpDiv.find(".NOTICES_RESPONSER_NUM").html( $.i18n.getString("otherNPeople",boxData.rcnt-1) );
@@ -199,8 +210,8 @@ showAlertContent = function(data){
 				if( group ){
 					//發布者 照片
 				    var tmp = $(tmpDiv).find(".al-post-img");
-				    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.lgu) ){
-				    	var auo = group.guAll[boxData.lgu].auo;
+				    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
+				    	var auo = group.guAll[boxData.gu].auo;
 				    	if(auo){
 				    		tmp.css("background-image","url("+auo+")");
 				    	}
@@ -263,12 +274,12 @@ showAlertContent = function(data){
 
 getPosterText = function(group, data){
 	//最後回覆者==自己
-	if( data.lgu==data.nd.opgu ){
+	if( data.gu==data.ogu ){
 		return $.i18n.getString("COMMON_SELF");
 	}
 	//最後回覆者==你
-	if(group && group.gu==data.opgu) return $.i18n.getString("COMMON_YOU");
-	return data.nd.opgun.replaceOriEmojiCode();
+	if(group && group.gu==data.ogu) return $.i18n.getString("COMMON_YOU");
+	return data.ogun.replaceOriEmojiCode();
 }
 
 // getTimelineEvent = function( ei, dom, callback ){
