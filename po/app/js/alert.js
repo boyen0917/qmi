@@ -261,7 +261,7 @@ showAlertContent = function(data){
 			tmpDiv.data("gi", boxData.gi);
 			tmpDiv.data("ei", boxData.nd.ei);
 			$(tmpDiv).click(function(){
-				alert( "gi:"+$(this).data("gi")+", ei:"+$(this).data("ei") );
+				// alert( "gi:"+$(this).data("gi")+", ei:"+$(this).data("ei") );
 			});
 
 			//取代中文
