@@ -221,7 +221,7 @@ $(function(){
 	
 
 	//debug control 
-	setDebug(false);
+	setDebug(true);
 
 	function setDebug(isDebug) {
       if (isDebug) {
