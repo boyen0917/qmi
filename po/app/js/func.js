@@ -235,7 +235,22 @@ $(function(){
 
         		if(branch_list.bl.length) {
         			$.each(branch_list.bl,function(i,val){
-	        			new_bl[val.bp] = val.bn;
+        				var bp_arr = val.bp.split(".");
+        				new_bl[bp_arr.last()] = {
+        					lv: bp_arr.length,
+        					bn: val.bn,
+        					cl:[],
+        					bp_arr: bp_arr
+        				};
+        				
+	        		});
+
+	        		$.each(new_bl,function(i,val){
+        				if(val.lv > 1){
+        					var parent = val.bp_arr[val.bp_arr.length-2];
+        					new_bl[parent].cl.push(i);
+        				}
+        				delete val.bp_arr;
 	        		});
         		}
 
@@ -244,10 +259,54 @@ $(function(){
 	        			new_fbl[val.bp] = val.bn;
 	        		});
         		}
+
         		var _groupList = $.lStorage(ui);
             	_groupList[this_gi].bl = new_bl;
             	_groupList[this_gi].fbl = new_fbl;
             	$.lStorage(ui,_groupList);
+        	}
+        });
+    }
+
+    setBranchListBack = function(this_gi){
+		var this_gi = this_gi || gi;
+
+    	//取得團體列表
+        var api_name = "groups/" + this_gi + "/branches";
+        var headers = {
+            "ui":ui,
+            "at":at,
+            "li":lang
+        };
+        var method = "get";
+        ajaxDo(api_name,headers,method,false).complete(function(data){
+        	if(data.status == 200){
+        		var branch_list = $.parseJSON(data.responseText);
+        		cns.debug("hehe:",JSON.stringify(new_bl,null,2));
+        		var new_bl = {};
+
+        		if(branch_list.bl.length) {
+        			$.each(branch_list.bl,function(i,val){
+        				var bp_arr = val.bp.split(".");
+        				new_bl[bp_arr.last()] = {
+        					lv: bp_arr.length,
+        					bn: val.bn,
+        					cl:[],
+        					bp_arr: bp_arr
+        				};
+        				
+	        		});
+
+	        		$.each(new_bl,function(i,val){
+        				if(val.lv > 1){
+        					var parent = val.bp_arr[val.bp_arr.length-2];
+        					new_bl[parent].cl.push(i);
+        				}
+        				delete val.bp_arr;
+	        		});
+        		}
+
+        		cns.debug("hehe:",JSON.stringify(new_bl,null,2));
         	}
         });
     }
@@ -258,7 +317,6 @@ $(function(){
 		getGroupAllUser(this_gi,false).complete(function(data){
 			if(data.status == 200){
 				data_group_user = $.parseJSON(data.responseText).ul;
-				cns.debug("data_group_user:",data_group_user);
 	            var new_group_user = {};
 	            $.each(data_group_user,function(i,val){
 	                //將gu設成key 方便選取
@@ -4668,9 +4726,8 @@ $(function(){
 				}
 
 				if(item == "bl"){
-
-					user_data.bl = $.lStorage(ui)[this_gi].bl[user_data.bl];
-
+					var bi = user_data.bl.split(".").last();
+					user_data.bl = $.lStorage(ui)[this_gi].bl[bi].bn;
 				}
 
 				selector.find("."+item)[method](user_data[item]).show();

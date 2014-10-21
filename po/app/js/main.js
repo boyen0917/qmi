@@ -86,13 +86,9 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
+		setBranchListBack();
 		//彩蛋鑰匙
 		supriseKey();
-	});
-
-	$(document).on("click",".me-info-load .group-avatar",function(){
-		var this_info = $(this).parents(".me-info-load");
-		cns.debug("width:",this_info.data("avatar-chk"));
 	});
 
 	//下拉更新 滾輪版
@@ -1294,7 +1290,7 @@ $(function(){
 	});
 
 	$(document).on("mouseup",".user-info-back",function(){
-		
+
 		$(".user-info-load-area").removeClass("user-info-flip");
 		$(".user-info-load , .me-info-load").stop().animate({
 			opacity:0
