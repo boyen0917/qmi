@@ -3402,7 +3402,7 @@ input.cp-datetimepicker-end {
 }
 
 .user-avatar > img{
-	opacity: 0;
+	/*opacity: 0;*/
 }
 
 .user-avatar-bar {

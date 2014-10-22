@@ -79,6 +79,23 @@ $(function(){
         });
 	}
 
+    chkBranch = function(){
+        // cns.debug("=========================");
+        // cns.debug("typeof $.lStorage(ui)[gi].bl:",typeof $.lStorage(ui)[gi].bl);
+        // cns.debug("first key",Object.keys($.lStorage(ui)[gi].bl)[0]);
+        // cns.debug("typeof first element",typeof $.lStorage(ui)[gi].bl[Object.keys($.lStorage(ui)[gi].bl)[0]].lv);
+        // cns.debug("=========================");
+        if(typeof $.lStorage(ui)[gi].bl == "object"){
+            var first_key = Object.keys($.lStorage(ui)[gi].bl)[0];
+            if(typeof first_key != "undefined" && typeof $.lStorage(ui)[gi].bl[first_key].lv == "undefined")
+                return true;
+        }else{
+            return true;
+        }
+
+        return false;
+    }
+
 	createGroup = function (group_name,group_desc){
         var api_name = "groups";
         var headers = {
