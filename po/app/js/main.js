@@ -31,12 +31,13 @@ $(function(){
 
 	    	//設定guAll 
 	    	setGroupAllUser();
-	    	cns.debug("branch:",$.lStorage(ui)[gi].bl);
+	    	// chkBranch();
+
 	    	//branch list 只做第一次
-			if(typeof $.lStorage(ui)[gi].bl == "undefined")
-				cns.debug("no branch:",$.lStorage(ui)[gi]);
-				// setBranchList();
+			if(chkBranch())
+				setBranchList();
 	    	
+
 	    	//header 設定團體名稱
 	    	$(".header-group-name div:eq(1)").html(gn);
 	    	
@@ -60,7 +61,7 @@ $(function(){
 		}
 
 	}else{
-		if(window.location.href.match(/localhost/)) {
+		if(debug_flag) {
     		cns.debug("login test");
     		getLoginDataForTest();
     	}else{
@@ -70,6 +71,7 @@ $(function(){
 
     	return false;
 	}
+
 
 	$( window ).resize(function() {
 		if($(".st-top-event").length < 2) return false;
@@ -86,7 +88,6 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		setBranchListBack();
 		//彩蛋鑰匙
 		supriseKey();
 	});
@@ -1290,7 +1291,7 @@ $(function(){
 	});
 
 	$(document).on("mouseup",".user-info-back",function(){
-
+		// $(".me-info-load user-avatar > ")
 		$(".user-info-load-area").removeClass("user-info-flip");
 		$(".user-info-load , .me-info-load").stop().animate({
 			opacity:0

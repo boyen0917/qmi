@@ -9,6 +9,11 @@ $(function(){
  	base_url = "https://apserver.mitake.com.tw/apiv1/";
 	//base_url = "http://10.1.17.116:8090/apiv1/";
 
+	//local測試 預設開啟console
+	debug_flag = false;
+	if(window.location.href.match(/localhost/)) {
+		debug_flag = true;
+	}
 	
 	//國碼
 	countrycode = "+886";
@@ -224,7 +229,7 @@ $(function(){
 	
 
 	//debug control 
-	setDebug(false);
+	setDebug(debug_flag);
 
 	function setDebug(isDebug) {
       if (isDebug) {
