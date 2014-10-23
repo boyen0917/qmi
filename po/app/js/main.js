@@ -71,8 +71,7 @@ $(function(){
     		cns.debug("login test");
     		getLoginDataForTest();
     	}else{
-    		cns.debug("to login");
-    		// document.location = "index.html";
+    		document.location = "index.html";
     	}
 
     	return false;
