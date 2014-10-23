@@ -5,12 +5,18 @@ $(function(){
 
 	//沒有登入資訊 就導回登入頁面
 	if($.lStorage("_loginData")){
-
+		
 		var _loginData = $.lStorage("_loginData");
-		//清除_loginData
-		localStorage.removeItem("_loginData");
+
+		//自動登入
+		if(!$.lStorage("_loginAutoChk")){
+			//清除_loginData
+			localStorage.removeItem("_loginData");
+		}
+
 		ui = _loginData.ui;
 		at = _loginData.at;
+			
 
 		//聊天室開啓DB
     	initChatDB(); 
@@ -66,7 +72,7 @@ $(function(){
     		getLoginDataForTest();
     	}else{
     		cns.debug("to login");
-    		document.location = "index.html";
+    		// document.location = "index.html";
     	}
 
     	return false;

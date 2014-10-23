@@ -9,8 +9,15 @@
 	height: 28px;
 	top: 13px;
 }
-.navi-alert:hover {
+/*.navi-alert:hover {
 	transform: scale(1.1);
+}*/
+
+.navi-alert:hover {
+	width: 30px;
+	height: 30px;
+	right: 14px;
+	top: 12px;
 }
 
 .navi-alert.new:before {

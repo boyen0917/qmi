@@ -1152,19 +1152,22 @@ img.auo {
 }
 
 .feed-compose {
+	background: url(../images/navi/navi_icon_edit.png);
+	background-size: cover;
 	position:absolute;
     top: 10px;
+	right: 55px;
 	width: 35px;
 	height: 35px;
 	cursor:pointer;
+	z-index: 10;
 }
 
-.feed-compose {
-	background: url(../images/navi/navi_icon_edit.png);
-	background-size: cover;
-	right: 55px;
-	/*right: 15px;*/
-	z-index: 10;
+.feed-compose:hover {
+	top: 9px;
+	right: 54px;
+	width: 37px;
+	height: 37px;
 }
 
 .feed-compose-click {
@@ -3622,78 +3625,4 @@ img.user-info-back {
 
 .user-avatar-bar .bottom {
 	height: 10px;
-}
-
-
-.yeah img {
-	display: none;
-	z-index: 20000;
-	width: 35%;
-	height: 22%;
-	border-radius: 50%;
-	position: absolute;
-}
-
-
-.yeah1 {
-	top: 5%;
-	left: 1%
-}
-
-.yeah2 {
-	top: 5%;
-	right: 1%
-}
-.yeah3 {
-	bottom: 5%;
-	left: 1%
-}
-.yeah4 {
-	bottom: 5%;
-	right: 1%
-}
-.yeah5 {
-	top: 36%;
-	left: 33%
-}
-
-
-.yeah-yan {
-	height: 100%;
-	text-align: center;
-}
-
-.yeah-yan img {
-	display: none;
-	z-index: 20000;
-	/*width: 45%;*/
-	height: 40%;
-	border-radius: 50%;
-	position: relative;
-	top: 30%;
-}
-
-.fixed-area {
-	display: none;
-	position: fixed;
-	height: 100%;
-	width: 100%;
-	top: 0;
-	left: 0;
-	z-index: 1100;
-	transition: transform 1s;
-	transform-style: preserve-3d;
-	background: green;
-
-
-	/*display: none;
-	position: fixed;
-	height: 100px;
-	width: 100px;
-	top: 500px;
-	left: 0;
-	 z-index: 1100; 
-	 transition: transform 1s; 
-	 transform-style: preserve-3d; 
-	background: green;*/
 }

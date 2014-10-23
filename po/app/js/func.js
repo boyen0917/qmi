@@ -74,7 +74,8 @@ $(function(){
         var method = "delete";
 
         ajaxDo(api_name,headers,method,true).complete(function(data){
-        	console.debug("logout");
+        	localStorage.removeItem("_loginAutoChk");
+            localStorage.removeItem("_loginData");
         	document.location = "index.html";
         });
 	}
@@ -4400,7 +4401,6 @@ $(function(){
     }
 
     polling = function(){
-    	cns.debug("pp!!");
     	if(!$.lStorage("_pollingData")){
     		$.lStorage("_pollingData",{cnts:{},ts:{pt: new Date().getTime()}})
     	}
@@ -4420,7 +4420,7 @@ $(function(){
 
         	if(data.status == 200){
         		var new_pollingData = $.parseJSON(data.responseText);
-        		cns.debug("new_pollingData.ts.pt:",new_pollingData.ts.pt);
+                cns.debug("pollingData time:",new_pollingData.ts.pt);
                 var tmp_cnts = new_pollingData.cnts;
                 // new_pollingData.cnts = {};
                 new_pollingData.cnts = local_pollingData.cnts;
@@ -4433,7 +4433,8 @@ $(function(){
                 //gcnts 做合併
                 new_pollingData.gcnts = $.extend(local_pollingData.gcnts,new_pollingData.gcnts);
 
-                cns.debug("after polling_data:",JSON.stringify(new_pollingData,null,2));
+                // cns.debug("after polling_data:",JSON.stringify(new_pollingData,null,2));
+
 
                 //暫存
                 if(!$.lStorage("_tmpPollingData"))
@@ -4500,14 +4501,15 @@ $(function(){
 	    		cns.debug("val.pm.gi:",val.pm.gi);
 	    		switch(val.tp){
 	    			case 1://timeline list
-	    				var polling_arr = [val.pm.gi,val.pm.ti];
+                        // 因為現在polling邏輯有問題 暫時關閉timeline 更新
+	    				// var polling_arr = [val.pm.gi,val.pm.ti];
 	    				
-	    				if(val.pm.gi == gi && window.location.hash == "#page-group-main") {
-	    					cns.debug("polling update timeline");
-	    					polling_arr = false;
-	    				}
+	    				// if(val.pm.gi == gi && window.location.hash == "#page-group-main") {
+	    				// 	cns.debug("polling update timeline");
+	    				// 	polling_arr = false;
+	    				// }
 
-	    				idbPutTimelineEvent("",false,polling_arr);
+	    				// idbPutTimelineEvent("",false,polling_arr);
 	    				break;
 	    			case 4://新增gu
 
@@ -4517,25 +4519,20 @@ $(function(){
 	    		}
 	    	});
 
-    		cns.debug("user_info_arr:",user_info_arr);
 	    	//將tp4 tp5 的user info都更新完 再更新polling時間
 	    	if(user_info_arr.length > 0){
 	    		getUserInfo(user_info_arr,function(chk){
 	    			if(chk){
 	    				//更新polling
 	    				pollingUpdate(msgs,ccs);
-	    				cns.debug("cmds with user info～");
 	    			}
 	    		});
 	    	}else{
-
 	    		pollingUpdate(msgs,ccs);
-	    		cns.debug("cmds without user info～");
 	    	}
     	}else{
     		//沒有cmds 更新polling
     		pollingUpdate(msgs,ccs);
-    		cns.debug("no cmds");
     	}
     }
 
