@@ -9,6 +9,8 @@
 	"FEED_MISSION_VOTE"		:"任務-投票",
 	"FEED_MISSION_LOCATION"	:"任務-成員定位",
 
+	"COMPOSE_SUBGROUP" : "群組",
+
 	"COMMON_SELECT_MEMBERS"  				: "選擇對象",
 	"COMMON_NEXT"  					: "下一步",
 	"COMMON_SELECT"  						: "選擇",
