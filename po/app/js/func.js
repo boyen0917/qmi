@@ -1845,7 +1845,6 @@ $(function(){
                 //branch全選
                 memSubTitle.off("click").click( function(){
                     clearMeAndAllSelect();
-                    clearMemAndBranchAll();
 
                     if( $(this).data("chk") ){
                         $(this).data("chk", false );
@@ -1888,7 +1887,7 @@ $(function(){
     		//----- 加入成員列表 ------
     		
     		//標題bar
-    		var memSubTitle = $("<div class='obj-cell-subTitle'></div>");
+    		var memSubTitle = $("<div class='obj-cell-subTitle mem'></div>");
     		if( isShowGroup ){ //show群組的話show全選圈圈
     			memSubTitle.append( '<div class="obj-cell-subTitle-chk">'+
     				'<div class="img"></div>'+
@@ -2202,12 +2201,49 @@ $(function(){
             $.each(branch,function(i,val){
                 $(".obj-selected div:eq(1)").append(val+"   ");
             });
+
+            var bAllSelect = true;
+            $(".obj-cell.branch").each(function(){
+                if( !$(this).data("chk") ){
+                    bAllSelect = false;
+                    return false;
+                }
+            });
+            var all = $(".obj-cell-subTitle.group");
+            if( bAllSelect ){
+                //群組全選
+                all.data("chk", true );
+                all.find(".img").addClass("chk");
+            } else {
+                //清除群組全選
+                all.data("chk", false );
+                all.find(".img").removeClass("chk");
+            }
         }
+
         if( null != mem ){
             len += Object.keys(mem).length;
             $.each(mem,function(i,val){
                 $(".obj-selected div:eq(1)").append(val+"   ");
             });
+
+            var bAllSelect = true;
+            $(".obj-cell.mem").each(function(){
+                if( !$(this).data("chk") ){
+                    bAllSelect = false;
+                    return false;
+                }
+            });
+            var all = $(".obj-cell-subTitle.mem");
+            if( bAllSelect ){
+                //群組全選
+                all.data("chk", true );
+                all.find(".img").addClass("chk");
+            } else {
+                //清除群組全選
+                all.data("chk", false );
+                all.find(".img").removeClass("chk");
+            }
         }
         $(".obj-cell-area").css("padding-top",($(".obj-selected div:eq(1)").height()+20)+"px");
         
@@ -2252,13 +2288,6 @@ $(function(){
                 //clear data
                 $(".obj-content").data("selected-branch",{});
                 $(".obj-content").data("selected-obj",{});
-            }
-        });
-        //deselect 
-        $(".obj-cell-subTitle").each( function(){
-            if( $(this).data("chk") ){
-                $(this).data("chk", false );
-                $(this).find(".img").removeClass("chk");
             }
         });
     }
