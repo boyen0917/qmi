@@ -1735,54 +1735,61 @@ $(function(){
     			obj_data = this_compose.data("object_str");
     		}
 
-            //----- 自己 -------
-            var cell = $("<div class='obj-cell self'>"+
-                '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
-                '<div class="obj-cell-subgroup-data">' + 
-                    '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
-            $(".obj-cell-area").append(cell);
-            cell.off("click").click( function(){
-                clearMeAndAllSelect();
-                if( !$(this).data("chk") ){
-                    $(this).data("chk",true);
-                    $(this).find(".img").addClass("chk");
-                    //set only me select
-                    var guTmp = $.lStorage(ui)[gi].gu;
-                    var gn = $.lStorage(ui)[gi].guAll[gu].nk;
-                    var obj = {};
-                    obj[guTmp] = gn;
-                    $(".obj-content").data("selected-branch",{});
-                    $(".obj-content").data("selected-obj",obj);
-                    
-                    //deselect group&mem "select all"
-                    $(".obj-cell-subTitle").data("chk",false);
-                    //deselect all branch
-                    $(".obj-cell-area").find(".obj-cell.branch").each(function(){
-                        var this_cell = $(this);
-                        this_cell.data("chk",false);
-                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-                    });
-                    //deselect all mem
-                    $(".obj-cell-area").find(".obj-cell.mem").each(function(){
-                        var this_cell = $(this);
-                        this_cell.data("chk",false);
-                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-                    });
-                }
-                updateSelectedObj();
-            });
+            $(".obj-content").data("selected-branch",{});
+            $(".obj-content").data("selected-obj",{});
+            updateSelectedObj();
+            
+            if( isShowGroup ){
+                //----- 自己 -------
+                var cell = $("<div class='obj-cell self'>"+
+                    '<div class="obj-cell-chk"><div class="img"></div></div>' +
+                    '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+                    '<div class="obj-cell-subgroup-data">' + 
+                        '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
+                $(".obj-cell-area").append(cell);
+                cell.off("click").click( function(){
+                    clearMeAndAllSelect();
+                    clearMemAndBranchAll();
+                    if( !$(this).data("chk") ){
+                        $(this).data("chk",true);
+                        $(this).find(".img").addClass("chk");
+                        //set only me select
+                        var guTmp = $.lStorage(ui)[gi].gu;
+                        var gn = $.lStorage(ui)[gi].guAll[gu].nk;
+                        var obj = {};
+                        obj[guTmp] = gn;
+                        $(".obj-content").data("selected-branch",{});
+                        $(".obj-content").data("selected-obj",obj);
+                        
+                        //deselect group&mem "select all"
+                        $(".obj-cell-subTitle").data("chk",false);
+                        //deselect all branch
+                        $(".obj-cell-area").find(".obj-cell.branch").each(function(){
+                            var this_cell = $(this);
+                            this_cell.data("chk",false);
+                            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                        });
+                        //deselect all mem
+                        $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+                            var this_cell = $(this);
+                            this_cell.data("chk",false);
+                            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                        });
+                    }
+                    updateSelectedObj();
+                });
 
-            //----- 全選 ------
-            var cell = $("<div class='obj-cell all'>"+
-                '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
-                '<div class="obj-cell-subgroup-data">' + 
-                    '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELECT_ALL") + '</div></div>');
-            $(".obj-cell-area").append(cell);
-            cell.data("chk",true);
-            cell.find(".img").addClass("chk");
-            cell.off("click").click( selectTargetAll );
+                //----- 全選 ------
+                var cell = $("<div class='obj-cell all'>"+
+                    '<div class="obj-cell-chk"><div class="img"></div></div>' +
+                    '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+                    '<div class="obj-cell-subgroup-data">' + 
+                        '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELECT_ALL") + '</div></div>');
+                $(".obj-cell-area").append(cell);
+                cell.data("chk",true);
+                cell.find(".img").addClass("chk");
+                cell.off("click").click( selectTargetAll );
+            }
 
     		//----- 團體列表 ------
     		if( bl&&isShowGroup&&Object.keys(bl).length>0 ){
@@ -1838,6 +1845,7 @@ $(function(){
                 //branch全選
                 memSubTitle.off("click").click( function(){
                     clearMeAndAllSelect();
+                    clearMemAndBranchAll();
 
                     if( $(this).data("chk") ){
                         $(this).data("chk", false );
@@ -2192,13 +2200,13 @@ $(function(){
         if( null != branch ){
             len += Object.keys(branch).length;
             $.each(branch,function(i,val){
-                $(".obj-selected div:eq(1)").append(val+"  ");
+                $(".obj-selected div:eq(1)").append(val+"   ");
             });
         }
         if( null != mem ){
             len += Object.keys(mem).length;
             $.each(mem,function(i,val){
-                $(".obj-selected div:eq(1)").append(val+"  ");
+                $(".obj-selected div:eq(1)").append(val+"   ");
             });
         }
         $(".obj-cell-area").css("padding-top",($(".obj-selected div:eq(1)").height()+20)+"px");
@@ -2235,6 +2243,7 @@ $(function(){
 	}
 
     clearMeAndAllSelect = function(){
+        //deselect self & all
         var speSelect = $(".obj-cell.self, .obj-cell.all");
         speSelect.each( function(){
             if( $(this).data("chk") ){
@@ -2245,6 +2254,16 @@ $(function(){
                 $(".obj-content").data("selected-obj",{});
             }
         });
+        //deselect 
+        $(".obj-cell-subTitle").each( function(){
+            if( $(this).data("chk") ){
+                $(this).data("chk", false );
+                $(this).find(".img").removeClass("chk");
+            }
+        });
+    }
+    clearMemAndBranchAll = function(){
+        //deselect "select all" of branch & mem
         $(".obj-cell-subTitle").each( function(){
             if( $(this).data("chk") ){
                 $(this).data("chk", false );
@@ -2255,6 +2274,7 @@ $(function(){
 
     selectTargetAll = function(){
         clearMeAndAllSelect();
+        clearMemAndBranchAll();
         $(".obj-cell.all").data("chk",true);
         $(".obj-cell.all").find(".img").addClass("chk");
         //clear data
