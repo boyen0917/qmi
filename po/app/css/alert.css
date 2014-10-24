@@ -148,7 +148,7 @@
 
 .al-subbox .left {
 	width: 10%;
-	margin: 0 5% 0 3%;
+	margin: 0 6% 0 3%;
 	text-align: center;
 }
 .al-post-img {
@@ -195,7 +195,7 @@
 
 .al-content {
 	width: 100%;
-	margin-bottom: 5px;
+	margin-bottom: 8px;
 	line-height: 23px;
 	color: rgb(171, 178, 185);
 }
@@ -203,7 +203,7 @@
 	width: 23px;
 	height: 23px;
 	vertical-align: middle;
-	margin-right: 5px;
+	margin-left: 2px;
 }
 .al-content .type{
 	color: rgb(64,146,239);
@@ -225,13 +225,13 @@
 	margin-bottom: 5px;
 	color: rgb(171, 178, 185);
 	font-size: 10px;
-	line-height: 18px;
+	line-height: 13px;
 }
 .al-time .icon{
-	width: 16px;
-	height: 16px;
-	vertical-align: middle;
-	margin-left: 4px;
+	width: 13px;
+	height: 13px;
+	/* vertical-align: middle; */
+	margin-left: 6px;
 }
 
 /*------ extra ------*/

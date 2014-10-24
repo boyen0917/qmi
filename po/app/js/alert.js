@@ -31,7 +31,7 @@ initAlertDB = function(){
         { name: 'ct',keyPath:['ct']}
       ],
       onStoreReady: function(){
-      	showAlertFromDB();
+      	// showAlertFromDB();
       	updateAlert();
 		// setInterval(updateAlert,update_alert_interval);
       }
@@ -41,8 +41,11 @@ initAlertDB = function(){
 showNewAlertIcon = function( cnt ){
 	if( cnt != lastCnt ){
 		lastCnt = cnt;
+		//關閉的話只顯示new icon
 		if( !$(".alert-area").is(":visible") ){
 			$(".navi-alert").addClass("new");
+		} else { //開啟的話直接更新
+			updateAlert();
 		}
 	}
 
@@ -110,36 +113,38 @@ updateAlert = function(){
 
 	    		var returnData = $.parseJSON(data.responseText);
 
-	    		var lastCt = 0;
-				for(var i=0; i<returnData.nl.length; i++){
-					var boxData = returnData.nl[i];
+	    		showAlertContent(returnData.nl);
 
-					//預防舊版的打進來
-					if( !boxData || !boxData.hasOwnProperty("nd") ) return;
+	   //  		var lastCt = 0;
+				// for(var i=0; i<returnData.nl.length; i++){
+				// 	var boxData = returnData.nl[i];
+
+				// 	//預防舊版的打進來
+				// 	if( !boxData || !boxData.hasOwnProperty("nd") ) return;
 	    			
-	    			var node = {
-	    				ei_ntp: boxData.nd.ei+"_"+boxData.ntp,
-						ct: boxData.nd.ct,
-					    data: boxData
-					};
-					if( boxData.nd.ct>lastCt ){
-						lastCt = boxData.nd.ct;
-					}
+	   //  			var node = {
+	   //  				ei_ntp: boxData.nd.ei+"_"+boxData.ntp,
+				// 		ct: boxData.nd.ct,
+				// 	    data: boxData
+				// 	};
+				// 	if( boxData.nd.ct>lastCt ){
+				// 		lastCt = boxData.nd.ct;
+				// 	}
 
-					idb_alert_events.put(node);
-				}
-
-				if( lastCt>lastAlertCt ){
-					// cns.debug("showAlertFromDB",lastAlertCt, lastCt);
-					lastAlertCt = lastCt;
-					setTimeout(showAlertFromDB,500);
-				}
-
-				// //check "new" mark & update data
-				// if( null!=returnData ){
-				// 	$.lStorage("_alert",returnData);
-				// 	showAlertContent( returnData );
+				// 	idb_alert_events.put(node);
 				// }
+
+				// if( lastCt>lastAlertCt ){
+				// 	// cns.debug("showAlertFromDB",lastAlertCt, lastCt);
+				// 	lastAlertCt = lastCt;
+				// 	setTimeout(showAlertFromDB,500);
+				// }
+
+				// // //check "new" mark & update data
+				// // if( null!=returnData ){
+				// // 	$.lStorage("_alert",returnData);
+				// // 	showAlertContent( returnData );
+				// // }
 	    	}
     });
 }
@@ -149,17 +154,25 @@ showAlertContent = function(data){
 	if( !data ) return;
 	// cns.debug("showAlertContent");
 
-	$(".alert-area .content").html("");
-
+	// $(".alert-area .content").hide('fast');
 	$('<div>').load('layout/alert_subbox.html .al-subbox',function(){
+		// var tmpContainer = $("<div></div>");
+		var tmpContainer = $(".alert-area .content");
+		tmpContainer.html("");
 		var userData = $.lStorage(ui);
 		if( null == userData )	return;
 
 		for(var i=0; i<data.length; i++){
-			var boxData = data[i].data;
+			//預防舊的ＡＰＩ
+			if( !data[i].hasOwnProperty("nd") ) continue;
+
+			var boxData = data[i];
+
+			/* ----------- TODO: 檢查是否已show過 ------------ */
+
 			var tmpDiv = $(this).clone();
 
-			$(".alert-area .content").append(tmpDiv);
+			tmpContainer.append(tmpDiv);
 			group = userData[boxData.gi];
 			if( group ){
 				//群組名
@@ -207,22 +220,26 @@ showAlertContent = function(data){
 					textSomeonesHtmlFormat( getPosterText(group, boxData) )
 				);
 
-				if( group ){
-					//發布者 照片
-				    var tmp = $(tmpDiv).find(".al-post-img");
-				    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
-				    	var auo = group.guAll[boxData.gu].auo;
-				    	if(auo){
-				    		tmp.css("background-image","url("+auo+")");
-				    	}
-				    }
+				//發布者 照片
+				var tmp = $(tmpDiv).find(".al-post-img");
+				if( tmp ){
+					if( boxData.aurl ){
+						tmp.css("background-image","url("+boxData.aurl+")");
+					} else if( group && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
+						var auo = group.guAll[boxData.gu].auo;
+						if(auo){
+							tmp.css("background-image","url("+auo+")");
+						}
+					}
 				}
 			}
 
+			//event title
 			if( boxData.nd.hasOwnProperty("et") && boxData.nd.et.length>0 ){
 				$(content).find(".boxTitle").html( getEventTitleText(boxData.nd.et) ).css("display","inline-block");
 			}
-				
+			
+			//event type
 			$(content).find(".type").html( getEventTypeText(boxData.nd.etp) );
 			$(content).find(".icon").attr( "src", getEventTypeIcon(boxData.nd.etp) );
 
@@ -279,7 +296,7 @@ getPosterText = function(group, data){
 	}
 	//最後回覆者==你
 	if(group && group.gu==data.ogu) return $.i18n.getString("COMMON_YOU");
-	return data.ogun.replaceOriEmojiCode();
+	return (data.ogun) ? data.ogun.replaceOriEmojiCode() : "unknown";
 }
 
 // getTimelineEvent = function( ei, dom, callback ){

@@ -1712,35 +1712,232 @@ $(function(){
 		//避免重複綁定事件 先解除
 		$(document).off('click', '.cp-content-object ,.cp-work-item-object');
     	$(document).on("click",".cp-content-object ,.cp-work-item-object",function(){
-    		//清空選擇區域跟標題先
-			$(".obj-selected div:eq(1)").html("");
-			$(".header-cp-object span:eq(1)").html(0);
+    		$(".header-cp-object span:eq(1)").html(0);
 
     		var this_compose_obj = $(this);
     		$.mobile.changePage("#page-object", {transition: "slide"});
 
     		var guAll = $.lStorage(ui)[gi].guAll;
+    		var bl = $.lStorage(ui)[gi].bl;
 
 	    	$(".obj-cell-area").html("");
 
 	    	//工作
 	    	var obj_data;
+            var isShowGroup = false;
     		if(this_compose_obj.parent().hasClass("cp-work-item")){
     			//工作發佈對象
+                isShowGroup = false;
     			obj_data = this_compose_obj.data("object_str");
     		}else{
     			//其餘發佈對象
+                isShowGroup = true;
     			obj_data = this_compose.data("object_str");
     		}
 
+            //----- 自己 -------
+            var cell = $("<div class='obj-cell self'>"+
+                '<div class="obj-cell-chk"><div class="img"></div></div>' +
+                '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+                '<div class="obj-cell-subgroup-data">' + 
+                    '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
+            $(".obj-cell-area").append(cell);
+            cell.off("click").click( function(){
+                clearMeAndAllSelect();
+                if( !$(this).data("chk") ){
+                    $(this).data("chk",true);
+                    $(this).find(".img").addClass("chk");
+                    //set only me select
+                    var guTmp = $.lStorage(ui)[gi].gu;
+                    var gn = $.lStorage(ui)[gi].guAll[gu].nk;
+                    var obj = {};
+                    obj[guTmp] = gn;
+                    $(".obj-content").data("selected-branch",{});
+                    $(".obj-content").data("selected-obj",obj);
+                    
+                    //deselect group&mem "select all"
+                    $(".obj-cell-subTitle").data("chk",false);
+                    //deselect all branch
+                    $(".obj-cell-area").find(".obj-cell.branch").each(function(){
+                        var this_cell = $(this);
+                        this_cell.data("chk",false);
+                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                    });
+                    //deselect all mem
+                    $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+                        var this_cell = $(this);
+                        this_cell.data("chk",false);
+                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                    });
+                }
+                updateSelectedObj();
+            });
+
+            //----- 全選 ------
+            var cell = $("<div class='obj-cell all'>"+
+                '<div class="obj-cell-chk"><div class="img"></div></div>' +
+                '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+                '<div class="obj-cell-subgroup-data">' + 
+                    '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELECT_ALL") + '</div></div>');
+            $(".obj-cell-area").append(cell);
+            cell.data("chk",true);
+            cell.find(".img").addClass("chk");
+            cell.off("click").click( selectTargetAll );
+
+    		//----- 團體列表 ------
+    		if( bl&&isShowGroup&&Object.keys(bl).length>0 ){
+                $(".obj-content").data("selected-branch",{});
+				//標題bar
+	    		var memSubTitle = $("<div class='obj-cell-subTitle group' data-chk='false'></div>");
+	    		memSubTitle.append( '<div class="obj-cell-subTitle-chk">'+
+	    			'<div class="img"></div>'+
+    				'<div class="select">'+$.i18n.getString("COMMON_SELECT_ALL")+'</div></div>' );
+	    		memSubTitle.append( "<div class='text'>"+$.i18n.getString("COMPOSE_SUBGROUP")+"</div>" );
+		    	$(".obj-cell-area").append(memSubTitle);
+
+		    	//團體rows
+		    	$.each(bl,function(key,bl_obj){
+		    		//第一層顯示開關
+		    		if(1==bl_obj.lv){
+		    			var tmp = $("<div class='subgroup-row'></div>");
+                        var innerTmp = $("<div class='subgroup-parent'></div>");
+		    			var firststCell = $("<div class='obj-cell subgroup branch' data-bl='"+key+"' data-bl-name='"+bl_obj.bn+"'>"+
+		    				'<div class="obj-cell-chk"><div class="img"></div></div>' +
+		    				'<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+		    				'<div class="obj-cell-subgroup-data">' + 
+		                   		'<div class="obj-user-name">' + bl_obj.bn + '</div></div>');
+		                firststCell.data( "bl-name", bl_obj.bn );
+		                firststCell.data( "bl", key );
+                        innerTmp.html(firststCell);
+		    			// tmp.data("bi",key);
+		    			tmp.html( innerTmp );
+		    			if(bl_obj.cl.length>0){
+                            innerTmp.append('<div class="obj-cell-arrow" data-open="false">v</div>');
+                            createChild( bl, tmp, bl_obj );
+                        }
+		    			$(".obj-cell-area").append(tmp);
+                        $(".obj-cell-area").append('<hr color="#F3F3F3">');
+		    		}
+		    	});
+
+                $(".obj-cell-arrow").off("click").click( function(){
+
+                    var dom = $(this).parent().next();
+                    if( false==$(this).data("open") ){
+                        $(this).data("open",true);
+                        $(this).html("^");
+                        dom.slideDown();
+                    } else {
+                        $(this).data("open",false);
+                        $(this).html("v");
+                        dom.slideUp();
+                    }
+                });
+
+
+                //branch全選
+                memSubTitle.off("click").click( function(){
+                    clearMeAndAllSelect();
+
+                    if( $(this).data("chk") ){
+                        $(this).data("chk", false );
+                        $(this).find(".img").removeClass("chk");
+
+                        //deselect all
+                        $(".obj-cell-area").find(".obj-cell.branch").each(function(){
+                            var this_cell = $(this);
+                            this_cell.data("chk",false);
+                            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                        });
+
+                        //存回
+                        $(".obj-content").data("selected-branch",{});
+                    } else {
+                        $(this).data("chk", true );
+                        $(this).find(".img").addClass("chk");
+
+                        //select all mem
+                        var selected_obj = {};
+                        $(".obj-cell-area").find(".obj-cell.branch").each(function(){
+                            var this_cell = $(this);
+                            this_cell.data("chk",true);
+                            this_cell.find(".obj-cell-chk .img").addClass("chk");
+
+                            if( this_cell.data("bl-name") ){
+                                selected_obj[this_cell.data("bl")] = this_cell.data("bl-name");
+                            }
+                        });
+
+                        //存回
+                        $(".obj-content").data("selected-branch",selected_obj);
+                    }
+
+                    updateSelectedObj();
+                });
+    		}
+
+
+    		//----- 加入成員列表 ------
+    		
+    		//標題bar
+    		var memSubTitle = $("<div class='obj-cell-subTitle'></div>");
+    		if( isShowGroup ){ //show群組的話show全選圈圈
+    			memSubTitle.append( '<div class="obj-cell-subTitle-chk">'+
+    				'<div class="img"></div>'+
+    				'<div class="select">'+$.i18n.getString("COMMON_SELECT_ALL")+'</div></div>' );
+    		}
+    		memSubTitle.append( "<div class='text'>"+$.i18n.getString("COMMON_MEMBER")+"</div>" );
+	    	$(".obj-cell-area").append(memSubTitle);
+            
+            //mem全選
+            memSubTitle.click( function(){
+                clearMeAndAllSelect();
+
+                if( $(this).data("chk") ){
+                    $(this).data("chk", false );
+                    $(this).find(".img").removeClass("chk");
+
+                    //deselect all
+                    $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+                        var this_cell = $(this);
+                        this_cell.data("chk",false);
+                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                    });
+
+                    //存回
+                    $(".obj-content").data("selected-obj",{});
+                } else {
+                    $(this).data("chk", true );
+                    $(this).find(".img").addClass("chk");
+
+                    //select all mem
+                    var selected_obj = {};
+                    $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+                        var this_cell = $(this);
+                        this_cell.data("chk",true);
+                        this_cell.find(".obj-cell-chk .img").addClass("chk");
+                        
+                        if( this_cell.data("gu-name") ){
+                            selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
+                        }
+                    });
+
+                    //存回
+                    $(".obj-content").data("selected-obj",selected_obj);
+                }
+
+                updateSelectedObj();
+            });
+
+	    	//成員rows
 	    	$.each(guAll,function(i,gu_obj){
 	    		var this_obj = $(
-	    			'<div class="obj-cell">' +
-	                   '<div class="obj-cell-chk"><img src="images/common/icon/icon_check_round.png"/></div>' +
+	    			'<div class="obj-cell mem">' +
+	                   '<div class="obj-cell-chk"><div class="img"></div></div>' +
 	                   '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
 	                   '<div class="obj-cell-user-data">' + 
 	                   		'<div class="obj-user-name">' + gu_obj.nk + '</div>' +
-	                   		'<div class="obj-user-title">雲端事業群。經理</div>' +
+	                   		// '<div class="obj-user-title">雲端事業群。經理</div>' +
 	                '</div>'
 	    		);
 	    		var object_img = this_obj.find(".obj-cell-user-pic img");
@@ -1766,20 +1963,16 @@ $(function(){
 		    			//有被選擇過 存在obj_data中
 		    			if($.inArray(this_cell.data("gu"),Object.keys(obj_data)) >= 0){
 		    				this_cell.data("chk",true);
-		    				this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+		    				// this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+                            // this_cell.find(".img").addClass("chk");
 		    			}else{
 		    				this_cell.data("chk",false);
-		    				this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+		    				// this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+                            // this_cell.find(".img").removeClass("chk");
 		    			}
 		    		});
 
-		    		//製作選擇區域
-		    		$.each(obj_data,function(i,val){
-		    			$(".obj-selected div:eq(1)").append("<span>" + val + "</span>");
-		    		});
-
-		    		//更改標題
-		    		$(".header-cp-object span:eq(1)").html(Object.keys(obj_data).length);
+                    updateSelectedObj();
 		    	}
 		    		
 	    	}else{
@@ -1787,26 +1980,26 @@ $(function(){
 				$(".obj-content").data("selected-obj",{});	
     		}
 
-
-
 	    	//避免重複綁定事件 先解除
-			$(document).off('click', '.obj-cell');
-	    	$(document).on("click",".obj-cell",function(){
+			$(document).off('click', '.obj-cell.mem');
+	    	$(document).on("click",".obj-cell.mem",function(){
+                clearMeAndAllSelect();
+
 	    		var this_cell = $(this);
 	    		var selected_obj = $(".obj-content").data("selected-obj");
-	    		cns.debug("selected_obj:",selected_obj);
-				//清空選擇區域先
-				$(".obj-selected div:eq(1)").html("");
-
+	    		// cns.debug("selected_obj:",selected_obj);
+				
 				//工作是單選
 				if(this_compose_obj.parent().hasClass("cp-work-item")){
 					cns.debug("work");
 					//全部清除
-					$(document).find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+					// $(document).find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
 					$(document).find(".obj-cell-chk").data("chk",false);
+                    $(document).find(".obj-cell-chk .img").removeClass("chk");
 
 					this_cell.data("chk",true);
-		    		this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+                    this_cell.find(".obj-cell-chk .img").addClass("chk");
+		    		// this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
 
 		    		$(".obj-selected div:eq(1)").html("<span>" + this_cell.data("gu-name") + "</span>");
 		    		//重置
@@ -1817,34 +2010,137 @@ $(function(){
 		    		//是否點選
 		    		if(this_cell.data("chk")){
 		    			this_cell.data("chk",false);
-		    			this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
+		    			// this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
 		    			
 		    			delete selected_obj[this_cell.data("gu")];
 		    			
 		    		}else{
 		    			this_cell.data("chk",true);
-		    			this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+                        this_cell.find(".obj-cell-chk .img").addClass("chk");
+		    			// this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
 		    			
-		    			selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
+		    			if( this_cell.data("gu-name") ){
+		    				selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
+		    			}
 		    		}
-		    		//寫入到選擇區域
-		    		$.each(selected_obj,function(i,val){
-		    			$(".obj-selected div:eq(1)").append("<span>" + val + "</span>");
-		    		});
 				}
 
 	    		//存回
 	    		$(".obj-content").data("selected-obj",selected_obj);
 
-	    		//更改標題
-	    		$(".header-cp-object span:eq(1)").html(Object.keys($(".obj-content").data("selected-obj")).length);
-	    	});
+                updateSelectedObj();
+            });
+
+            $(document).off('click', '.obj-cell.branch:not(.subgroup)');
+            $(document).on("click",".obj-cell.branch:not(.subgroup)",function(){
+                clearMeAndAllSelect();
+
+                var this_cell = $(this);
+                var selected_obj = $(".obj-content").data("selected-branch");
+                // cns.debug("selected_obj:",selected_obj);
+                
+                //其餘發佈對象是復選
+                //是否點選
+                if(this_cell.data("chk")){
+                    this_cell.data("chk",false);
+                    this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                    // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+                    
+                    delete selected_obj[this_cell.data("bl")];
+                    
+                }else{
+                    this_cell.data("chk",true);
+                    this_cell.find(".obj-cell-chk .img").addClass("chk");
+                    // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+                    
+                    if( this_cell.data("bl-name") ){
+                        selected_obj[this_cell.data("bl")] = this_cell.data("bl-name");
+                    }
+                }
+
+                //存回
+                $(".obj-content").data("selected-branch",selected_obj);
+
+                updateSelectedObj();
+            });
+
+            $(document).off('click', '.obj-cell.subgroup');
+            $(document).on("click",".obj-cell.subgroup",function(){
+                clearMeAndAllSelect();
+
+                var this_cell = $(this);
+                var selected_obj = $(".obj-content").data("selected-branch");
+                // cns.debug("selected_obj:",selected_obj);
+
+                //其餘發佈對象是復選
+                //是否點選
+                if(this_cell.data("chk")){
+                    this_cell.data("chk",false);
+                    this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                    // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+                    
+                    delete selected_obj[this_cell.data("bl")];
+
+                    //deselect sub-branches if all sub r selected
+                    var sublist = this_cell.parent().next().find(".obj-cell.branch");
+                    var allChkTrue = true;
+                    sublist.each( function(){
+                        if( !$(this).data("chk") ){
+                            allChkTrue = false;
+                            return false;
+                        }
+                    });
+                    if( allChkTrue ){
+                        sublist.each( function(){
+                            $(this).data("chk",false);
+                            $(this).find(".obj-cell-chk .img").removeClass("chk");
+                            delete selected_obj[$(this).data("bl")];
+                        });
+                    }
+                }else{
+                    this_cell.data("chk",true);
+                    this_cell.find(".obj-cell-chk .img").addClass("chk");
+                    // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+                    
+                    if( this_cell.data("bl-name") ){
+                        selected_obj[this_cell.data("bl")] = this_cell.data("bl-name");
+                    }
+
+                    //select sub-branches if all sub r not selected
+                    var sublist = this_cell.parent().next().find(".obj-cell.branch");
+                    var allChkFalse = true;
+                    sublist.each( function(){
+                        if( true == $(this).data("chk") ){
+                            allChkFalse = false;
+                            return false;
+                        }
+                    });
+                    if( allChkFalse ){
+                        sublist.each( function(){
+                            $(this).data("chk",true);
+                            $(this).find(".obj-cell-chk .img").addClass("chk");
+                            if( $(this).data("bl-name") ){
+                                selected_obj[$(this).data("bl")] = $(this).data("bl-name");
+                            }
+                        });
+                    }
+                }
+
+                //存回
+                $(".obj-content").data("selected-branch",selected_obj);
+
+                updateSelectedObj();
+            });
+
+            $(".obj-selected div:nth-child(3)").off("click").click( selectTargetAll );
 
 	    	//避免重複
 	    	$(".obj-done").unbind("click");
 	    	$(".obj-done").click(function(){
 
-	    		var obj_length = Object.keys($(".obj-content").data("selected-obj")).length;
+	    		var obj_length = Object.keys($(".obj-content").data("selected-obj")).length
+                    +Object.keys($(".obj-content").data("selected-branch")).length;
 
 	    		//工作
 	    		if(this_compose_obj.parent().hasClass("cp-work-item")){
@@ -1874,6 +2170,8 @@ $(function(){
 	    			//製作發佈對象list 轉換成str 避免call by reference
 	    			var obj_str = JSON.stringify($(".obj-content").data("selected-obj"));
 	    			this_compose.data("object_str",obj_str);
+                    var branch_str = JSON.stringify($(".obj-content").data("selected-branch"));
+                    this_compose.data("branch_str",branch_str);
 	    		}
 
 	    		//回上一頁
@@ -1883,6 +2181,102 @@ $(function(){
     	});
 	}
 
+    updateSelectedObj = function(){
+        var len = 0;
+        var cnt = 0;
+        var branch = $(".obj-content").data("selected-branch");
+        var mem = $(".obj-content").data("selected-obj");
+        
+        $(".obj-selected div:eq(1)").html("");
+        //寫入到選擇區域
+        if( null != branch ){
+            len += Object.keys(branch).length;
+            $.each(branch,function(i,val){
+                $(".obj-selected div:eq(1)").append(val+"  ");
+            });
+        }
+        if( null != mem ){
+            len += Object.keys(mem).length;
+            $.each(mem,function(i,val){
+                $(".obj-selected div:eq(1)").append(val+"  ");
+            });
+        }
+        $(".obj-cell-area").css("padding-top",($(".obj-selected div:eq(1)").height()+20)+"px");
+        
+        //更改標題
+        $(".header-cp-object span:eq(1)").html(len);
+    }
+
+	createChild = function( bl, parent, bl_obj ){
+		var tmp = $("<div></div>");
+        if( 1==bl_obj.lv ) tmp.css("display","none");
+		for( var i=0; i<bl_obj.cl.length; i++ ){
+            var key = bl_obj.cl[i];
+			var data = bl[key];
+
+            //目前除了第一層外所有階層都同級
+			// var content = $("<div class='obj-cell branch _"+data.lv+"' data-bl='"+key+"' data-bl-name='"+data.bn+"'>"+
+            var content = $("<div class='obj-cell branch _2' data-bl='"+key+"' data-bl-name='"+data.bn+"'>"+
+		    	'<div class="obj-cell-chk"><div class="img"></div></div>' +
+		    	'<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+		    	'<div class="obj-cell-subgroup-data">' + 
+		        	'<div class="obj-user-name">' + data.bn + '</div>' +
+		        '</div>'
+		    );
+
+            // content.css("padding-left", (data.lv-1)*20+"px;");
+            // content.css("background", ;
+
+            tmp.append( content );
+			if( data.cl.length>0 ) createChild(bl, tmp, data );
+		}
+		
+		parent.append(tmp);
+	}
+
+    clearMeAndAllSelect = function(){
+        var speSelect = $(".obj-cell.self, .obj-cell.all");
+        speSelect.each( function(){
+            if( $(this).data("chk") ){
+                $(this).data("chk", false );
+                $(this).find(".img").removeClass("chk");
+                //clear data
+                $(".obj-content").data("selected-branch",{});
+                $(".obj-content").data("selected-obj",{});
+            }
+        });
+        $(".obj-cell-subTitle").each( function(){
+            if( $(this).data("chk") ){
+                $(this).data("chk", false );
+                $(this).find(".img").removeClass("chk");
+            }
+        });
+    }
+
+    selectTargetAll = function(){
+        clearMeAndAllSelect();
+        $(".obj-cell.all").data("chk",true);
+        $(".obj-cell.all").find(".img").addClass("chk");
+        //clear data
+        $(".obj-content").data("selected-branch",{});
+        $(".obj-content").data("selected-obj",{});
+        
+        //deselect group&mem "select all"
+        $(".obj-cell-subTitle").data("chk",false);
+        //deselect all branch
+        $(".obj-cell-area").find(".obj-cell.branch").each(function(){
+            var this_cell = $(this);
+            this_cell.data("chk",false);
+            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        });
+        //deselect all mem
+        $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+            var this_cell = $(this);
+            this_cell.data("chk",false);
+            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        });
+        updateSelectedObj();
+    }
 
 	setDateTimePicker = function(this_compose){
 		//設定現在時間
@@ -2530,6 +2924,7 @@ $(function(){
 		if(ctp != 3){
 			//空值表示 發佈全體
 
+            var tu = {};
 			if(this_compose.data("object_str")){
 				var object_obj = $.parseJSON(this_compose.data("object_str"));
 				if(Object.keys(object_obj).length){
@@ -2541,13 +2936,33 @@ $(function(){
 						};
 						gul_arr.push(temp_obj);
 					});
-					body.meta.tu = {
-						gul : gul_arr
-					};
-				}else{
-					delete body.meta.tu;	
+                    tu.gul=gul_arr;
 				}
 			}
+            //branch
+            if(this_compose.data("branch_str")){
+                var object_obj = $.parseJSON(this_compose.data("branch_str"));
+                if(Object.keys(object_obj).length){
+                    var bl_arr = [];
+                    $.each(object_obj,function(i,val){
+                        var temp_obj = {
+                            bi : i,
+                            bn : val
+                        };
+                        bl_arr.push(temp_obj);
+                    });
+                    tu.bl=bl_arr;
+                }
+            }
+
+            body.meta.tu = {
+                gul : gul_arr
+            };
+            if( Object.keys(tu).length>0 ){
+                body.meta.tu = tu;
+            } else{
+                delete body.meta.tu;    
+            }
 		}
 		
 		//有空值就跳出
@@ -3297,7 +3712,7 @@ $(function(){
     		//0:普通貼文 共用區
     		if(tp != 0){
     			this_event.find(".st-box2-more-category").html(category);
-        		this_event.find(".st-box2-more-title").html(val.meta.tt);
+        		this_event.find(".st-box2-more-title").html( val.meta.tt.replaceOriEmojiCode() );
     		}
     		
     		//tp = 0 是普通貼文 在content區填內容 其餘都在more desc填
