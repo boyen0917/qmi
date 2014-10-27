@@ -92,6 +92,7 @@
     find & parse emoji to image
     */
     var emojiRange = [
+    	'&#(99(8[4-9]|9[0-9])|10(0[0-9]{2}|1([0-6][0-9]|7[0-5])));',
     	'&#55356;&#57(0(8[89]|9[0-9])|[12][0-9]{2}|3([0-3][0-9]|4[0-3]));',
 		'&#55357;&#5(6(3[2-9][0-9]|[4-9][0-9]{2})|7([0-2][0-9]{2}|3([0-3][0-9]|4[0-3])));',
 		'&#9(6(3[2-9]|[4-9][0-9])|[78][0-9]{2}|9([0-7][0-9]|8[0-3]));&#65039;'
@@ -101,8 +102,13 @@
 		return this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
 			var tmp = [];
 			var n = match.lastIndexOf(";&#");
-			tmp.push( parseInt(match.substring(2,n)) );
-			tmp.push( parseInt(match.substring(n+3,match.length-1)) );
+			if(n<0){
+				n = match.lastIndexOf(";");
+				tmp.push( parseInt(match.substring(2,n)) );
+			} else {
+				tmp.push( parseInt(match.substring(2,n)) );
+				tmp.push( parseInt(match.substring(n+3,match.length-1)) );
+			}
 			if( tmp[0] >= 55296 ){
 				var oriCode = 0xffffffff;
 				oriCode = ((tmp[0]-55296)<<10)>>>0;
@@ -118,7 +124,7 @@
 
 	//處理未轉成網頁表示的u+code
 	String.prototype.replaceOriEmojiCode = function(){
-		return this.replace( new RegExp( '[\uD800-\uDBFF][\uDC00-\uDFFF]','g'), function(match, contents, offset, s){
+		return this.replace( new RegExp( '([\u2700-\u27BF]|[\uD800-\uDBFF][\uDC00-\uDFFF])','g'), function(match, contents, offset, s){
 			var tmp = [];
 			tmp.push( match.charCodeAt(0) );
 			tmp.push( match.charCodeAt(1) );
