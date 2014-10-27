@@ -237,7 +237,12 @@
 /*------ extra ------*/
 .al-extra {
 	width: 100%;
-	/* margin-bottom: 5px; */
 	border-top: rgb(234, 240, 245) 1px solid;
 	padding-top: 7px;
+	max-height: 57px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
 }

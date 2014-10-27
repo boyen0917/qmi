@@ -265,7 +265,7 @@ showAlertContent = function(data){
 				for( var j=0; j<boxData.nd.ml.length; j++){
 					if( boxData.nd.ml[j].tp==0 ){
 						extra.html( boxData.nd.ml[j].c.replaceOriEmojiCode() );
-						extra.css("display","block");
+						extra.css("display","");
 						break;
 					}
 				}
