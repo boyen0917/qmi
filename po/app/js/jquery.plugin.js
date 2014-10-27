@@ -92,14 +92,17 @@
     find & parse emoji to image
     */
     var emojiRange = [
-    	'&#(99(8[4-9]|9[0-9])|10(0[0-9]{2}|1([0-6][0-9]|7[0-5])));',
     	'&#55356;&#57(0(8[89]|9[0-9])|[12][0-9]{2}|3([0-3][0-9]|4[0-3]));',
 		'&#55357;&#5(6(3[2-9][0-9]|[4-9][0-9]{2})|7([0-2][0-9]{2}|3([0-3][0-9]|4[0-3])));',
-		'&#9(6(3[2-9]|[4-9][0-9])|[78][0-9]{2}|9([0-7][0-9]|8[0-3]));&#65039;'
+		'&#9(6(3[2-9]|[4-9][0-9])|[78][0-9]{2}|9([0-7][0-9]|8[0-3]));&#65039;',
+		'&#(99(8[4-9]|9[0-9])|10(0[0-9]{2}|1([0-6][0-9]|7[0-5])));&#65039;'
 	];
+    var emojiRange2 = [
+    	'&#(99(8[4-9]|9[0-9])|10(0[0-9]{2}|1([0-6][0-9]|7[0-5])));'
+    ]
 	String.prototype.replaceEmoji = function () {
 		// console.debug( JSON.stringify(this) );
-		return this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
+		var tmpString = this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
 			var tmp = [];
 			var n = match.lastIndexOf(";&#");
 			if(n<0){
@@ -120,11 +123,17 @@
 			}
 			return match;
 		});
+		
+		return tmpString = tmpString.replace( new RegExp( emojiRange2.join('|'), 'g'), function(match, contents, offset, s){
+			var n = match.lastIndexOf(";");
+			var tmp = parseInt(match.substring(2,n));
+			return "<img style='max-height:20px' class='emoji' src='../images/emojis/" + tmp.toString(16) + ".png' alt='emoji' />";
+		});
 	};
 
 	//處理未轉成網頁表示的u+code
 	String.prototype.replaceOriEmojiCode = function(){
-		return this.replace( new RegExp( '([\u2700-\u27BF]|[\uD800-\uDBFF][\uDC00-\uDFFF])','g'), function(match, contents, offset, s){
+		return this.replace( new RegExp( '(([\u2700-\u27BF]$)|[\uD800-\uDBFF][\uDC00-\uDFFF])','g'), function(match, contents, offset, s){
 			var tmp = [];
 			tmp.push( match.charCodeAt(0) );
 			tmp.push( match.charCodeAt(1) );

@@ -177,15 +177,8 @@
 	font-weight: bolder;
 }
 .al-post-group {
-	padding: 0px 5px;
-	color: white;
-	background: rgb(136,194,238);
-	border-radius: 17px;
-	border: 1px solid #abbabf;
-	float: right;
-	text-align: right;
-	display: inline-block;
-	right: 0;
+	padding-bottom: 2px;
+	color: rgb(136,194,238);
 }
 
 /*------ content ------*/
