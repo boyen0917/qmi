@@ -192,7 +192,7 @@ showAlertContent = function(data){
 
 				if( group ){
 					//發布者 照片
-				    var tmp = $(tmpDiv).find(".al-post-img");
+				    var tmp = $(tmpDiv).find(".al-post-img.namecard");
 				    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
 				    	var auo = group.guAll[boxData.gu].auo;
 				    	if(auo){
@@ -283,6 +283,9 @@ showAlertContent = function(data){
 
 			//取代中文
 			tmpDiv._i18n();
+
+			//個人名片
+			$(tmpDiv).find(".al-post-img.namecard").data("gu",boxData.gu);
 
 			// $(".alert-area .content").append(tmpDiv);
 		}

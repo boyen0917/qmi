@@ -434,7 +434,9 @@ $(function(){
 
 	setSmUserData = function (gi,gu,gn){
 		$(".sm-user-area-r div:eq(0)").html(gn);
-		$(".sm-user-area-r div:eq(1)").html("");
+		$(".sm-user-area-r div:eq(1)").html("");  
+
+        $(".sm-user-area.namecard").data("gu",gu);
 
 		//檢查每個團體是否存在gu all 
 		var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img")];
@@ -1955,6 +1957,7 @@ $(function(){
 	    		}
 
 	    		this_obj.data("gu",gu_obj.gu);
+                this_obj.find(".obj-cell-user-pic.namecard").data("gu",gu_obj.gu);
 	    		this_obj.data("gu-name",gu_obj.nk);
 	    		$(".obj-cell-area").append(this_obj);
 	    	});
@@ -5116,8 +5119,10 @@ $(function(){
     }
 
     userInfoShow = function(this_gi,this_gu){
-    	var this_gi = this_gi || gi;
-    	var this_gu = this_gu || gu;
+    	
+        if(!this_gu) return false;
+
+        var this_gi = this_gi || gi;
 
     	$(".screen-lock").show();
     	$(".user-info-load-area").fadeIn("fast");
@@ -5477,11 +5482,17 @@ $(function(){
 			if((this.width / this.height) > magic_number){
 				img.css("height",250);
 				img.css("margin-left",((img.width()-user_info_width)/2)* -1);
+                img.css("opacity",0);
 			}else{
 			//寬為長邊
 				img.css("width",user_info_width);
 				img.css("margin-top",((img.height()-250)/2)* -1);
+                img.css("opacity",0);
 			}
+
+            setTimeout(function(){
+                img.css("opacity",1);
+            },300);
         });
     }
 
