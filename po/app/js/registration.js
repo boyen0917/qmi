@@ -3,7 +3,6 @@ $(function(){
 	//預設上一頁
 	$(document).data("page-history",[["#page-registration"]]);
 	
-	
 	//首頁大圖
 	$("#page-registration").css("height",$(window).height());
 	$(window).resize(function(){ 
@@ -11,11 +10,12 @@ $(function(){
 	});
 
 	$(".login").click(function(){
+
 		if($.lStorage("_loginData")){
 			loginAction($.lStorage("_loginData"));
 			return false;
 		}
-
+		
 		//若local storage 有記錄密碼 就顯示
 		if($.lStorage("_loginRemeber")){
 			//順便幫他打個勾
@@ -260,11 +260,15 @@ $(function(){
 					//沒group
 					document.location = "main.html#page-group-menu";
 				}
-			}else{
-				//取得group list 失敗
+			}else if(data.status == 401){
+				//取得group list 失敗 代表自動登入失敗了
+
+				localStorage.removeItem("_loginData");
+				$(".login").trigger("click");
 			}
 		});
 	}
+
 
 	getGroupList = function(ui,at){
     	//取得團體列表
@@ -275,7 +279,7 @@ $(function(){
             "li":lang
         };
         var method = "get";
-        return ajaxDo(api_name,headers,method,true);
+        return ajaxDo(api_name,headers,method,true,false,false,true);
     }
 /*	
 
