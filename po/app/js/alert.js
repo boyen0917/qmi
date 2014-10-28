@@ -286,6 +286,7 @@ showAlertContent = function(data){
 
 			//個人名片
 			$(tmpDiv).find(".al-post-img.namecard").data("gu",boxData.gu);
+			$(tmpDiv).find(".al-post-img.namecard").data("gi",boxData.gi);
 
 			// $(".alert-area .content").append(tmpDiv);
 		}

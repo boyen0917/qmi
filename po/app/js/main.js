@@ -1416,8 +1416,8 @@ $(function(){
 
 		$("body").addClass("overflow-hidden");
 
-		cns.debug("main gu:",$(this).data("gu"));
-		userInfoShow("",$(this).data("gu"));
+		cns.debug("main gi:",$(this).data("gi"));
+		userInfoShow($(this).data("gi"),$(this).data("gu"));
 
 		setTimeout(function(){
 			$(".user-avatar > img").stop().animate({
