@@ -130,7 +130,78 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 		title.find(".arrow").toggleClass("open");
 	});
 	title.find(".btn").off("click").click( function(){
-		cns.debug("!")
+		if( true==$(this).hasClass("list") ){
+			subPageBottom.find(".contact-mems").fadeIn();
+			subPageBottom.find(".contact-memLists").fadeOut();
+			$(this).removeClass("list");
+		} else {
+			var mem = subPageBottom.find(".contact-mems");
+			var memList = subPageBottom.find(".contact-memLists");
+			if( !memList || memList.length==0 ){
+				memList = $("<div class='contact-memLists'></div>");
+				$.each( mem.find(".mem"),function(key,dom){
+					var gu = $(dom).data("gu");
+					var memData = guAll[gu];
+					var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
+					var left = tmp.find(".left");
+					// $(left).data("gu", gu );
+					//photo
+					$(dom).find(".img").clone().appendTo(left);
+					//name, ?
+					var mid = tmp.find(".mid");
+					// $(mid).data("gu", gu );
+					$(dom).find(".name").clone().appendTo(mid);
+					mid.append("<div class='detail'>Manager</div>");
+					//favorite
+					var right = tmp.find(".right");
+					var fav = $("<div class='fav'></div>");
+					if( memData && true==memData.fav ){
+						right.addClass("active", true);
+					}
+					right.append(fav);
+					right.data("gu", gu );
+					cns.debug(right.data("gu"));
+
+					memList.append(tmp);
+				});
+				mem.find(".noMem").clone().appendTo( memList );
+			}
+
+			mem.after(memList);
+			mem.fadeOut();
+			memList.fadeIn();
+			$(this).addClass("list");
+
+
+
+			memList.find(".right").off("click").click( function(){
+				var thisTmp = $(this);
+				if( thisTmp.hasClass("sending") ) return;
+				thisTmp.addClass("sending");
+				var gu = thisTmp.data("gu");
+				cns.debug(gu);
+				if( !gu ) return;
+
+				var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
+			    var headers = {
+			             "ui":ui,
+			             "at":at, 
+			             "li":lang,
+			                 };
+				ajaxDo(api_name,headers,"put",true,null).complete(function(data){
+					thisTmp.removeClass("sending");
+					if(data.status == 200){
+						//save to db
+						var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
+						cns.debug("add:",isAdded);
+						thisTmp.toggleClass("active", isAdded);
+						var data = $.lStorage(ui);
+						data[gi].guAll[gu].fav = isAdded;
+						$.lStorage(ui, data);
+					}
+				});
+			});
+		}
 	});
 
 	//sub branch list
