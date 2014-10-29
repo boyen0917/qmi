@@ -81,7 +81,7 @@
 	height: 30px;
 	display: inline-block;
 	float: right;
-	background-image: url("../images/icon/icon_grid_normal.png");
+	background-image: url("../images/icon/icon_list_normal.png");
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: contain;
@@ -90,7 +90,7 @@
 	cursor: pointer;
 }
 .contact-titleBar .btn.list{
-	background-image: url("../images/icon/icon_list_normal.png");
+	background-image: url("../images/icon/icon_grid_normal.png");
 }
 
 .contact-branchList{
