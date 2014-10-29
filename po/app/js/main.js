@@ -680,17 +680,11 @@ $(function(){
 
 	//留言
 	$(document).on('click','.st-message',function(){
-		//
-		// var pos = $(this).parents(".st-sub-box").find(".st-reply-message-area").position().top;
-
-		// $('html, body').animate({scrollTop: $(this).parents(".st-sub-box").find(".st-reply-message-area").position().top}, 0);
 		//判斷開啟或關閉
 		var movement = $(".st-reply-message-area").data("movement");
 
 		//設定 this event
 		var this_event = $(this).parents(".st-sub-box");
-
-		
 
 		//開啟detail
 		if(!this_event.data("switch-chk")){
@@ -733,20 +727,6 @@ $(function(){
 		// 	});
 		// }
 	});
-
-	//滾動隱藏留言
-	// $(document).on('scroll',function(){
-	// 	if($(".st-reply-message-area").data("movement") == 0) return false;
-
-	// 	$(".st-reply-message-area").data("movement",0);
-	// 	$(".st-reply-message-area").data("animate-chk",false);
-
-	// 	$(".st-reply-message-area").animate({bottom:"-50px"},function(){
-	// 		//變成可以開啟狀態
-	// 		$(".st-reply-message-area").data("animate-chk",true);
-			
-	// 	});		
-	// });
 
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){

@@ -1708,7 +1708,7 @@ img.auo {
 .st-sub-box-1-footer {
 	display: -webkit-box;
 	clear: both;
-	margin: 0 0 5px 20px;
+	margin: 0 0 7px 20px;
 	color: #868686;
     font-size: 13px;
 }
@@ -1727,7 +1727,8 @@ img.auo {
 .st-sub-box-1-footer img {
 	margin-right: 10px;
 	width: 17px;
-	display: -webkit-box;
+	position: relative;
+	top: 3px;
 }
 
 .st-sub-box-2 {
@@ -1736,14 +1737,6 @@ img.auo {
 	padding: 15px;
     word-wrap: break-word;
 }
-
-/* .st-sub-box-2-content ,.st-box2-more-desc  {
-	overflow: hidden;
-	display: -webkit-box;
-	-webkit-line-clamp: 6;
-	-webkit-box-orient: vertical;
-} */
-
 
 .st-sub-box-3 {
 	position:relative;

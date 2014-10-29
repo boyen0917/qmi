@@ -1028,50 +1028,96 @@ $(function(){
 					this_load.hide();
 				}else{
 
-					//製作留言
-					var _groupList = $.lStorage(ui);
-					var user_name = _groupList[gi].guAll[el.meta.gu].nk;
+                    eventReplyMake(this_load,el,this_event.data("event-id"),event_status);
 
-					this_load.find(".st-user-pic.namecard").data("gu",el.meta.gu)
-					//大頭照
-					if(_groupList[gi].guAll[el.meta.gu].aut){
-	        			this_load.find(".st-user-pic img").attr("src",_groupList[gi].guAll[el.meta.gu].aut);
-	        			// this_load.find(".st-user-pic img:eq(1)").attr("src",_groupList[gi].guAll[el.meta.gu].auo);
-	        			this_load.find(".st-user-pic.namecard").data("auo",_groupList[gi].guAll[el.meta.gu].auo);
-	        			avatarPos(this_load.find(".st-user-pic img"));
-	        		}
+					// //製作留言
+					// var _groupList = $.lStorage(ui);
+					// var user_name = _groupList[gi].guAll[el.meta.gu].nk;
+
+					// this_load.find(".st-user-pic.namecard").data("gu",el.meta.gu)
+					// //大頭照
+					// if(_groupList[gi].guAll[el.meta.gu].aut){
+	    //     			this_load.find(".st-user-pic img").attr("src",_groupList[gi].guAll[el.meta.gu].aut);
+	    //     			// this_load.find(".st-user-pic img:eq(1)").attr("src",_groupList[gi].guAll[el.meta.gu].auo);
+	    //     			this_load.find(".st-user-pic.namecard").data("auo",_groupList[gi].guAll[el.meta.gu].auo);
+	    //     			avatarPos(this_load.find(".st-user-pic img"));
+	    //     		}
 					
-					var time = new Date(el.meta.ct);
-		    		var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
+					// var time = new Date(el.meta.ct);
+		   //  		var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
 		    		
 
-					this_load.find(".st-reply-username").html(user_name);
+					// this_load.find(".st-reply-username").html(user_name);
 
-					//回覆內容在上面switch完成
+					// //回覆內容在上面switch完成
 					
-					this_load.find(".st-reply-footer span:eq(0)").html(time_format);
+					// this_load.find(".st-reply-footer span:eq(0)").html(time_format);
 
-					var ei = el.ei;
-					this_load.data("event-id",ei);
+					// var ei = el.ei;
+					// this_load.data("event-id",ei);
 
-					//存入event path 之後才可以按讚
-					this_load.data("event-path",this_event.data("event-id") + "." + this_load.data("event-id"));
+					// //存入event path 之後才可以按讚
+					// this_load.data("event-path",this_event.data("event-id") + "." + this_load.data("event-id"));
 
-					if(el.meta.lct){
-						this_load.find(".st-reply-footer img").show();
-						this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like.png");
-						this_load.find(".st-reply-footer span:eq(2)").html(el.meta.lct);
+					// if(el.meta.lct){
+					// 	this_load.find(".st-reply-footer img").show();
+					// 	this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like.png");
+					// 	this_load.find(".st-reply-footer span:eq(2)").html(el.meta.lct);
 
-						//此則動態 自己的按贊狀況
-						if(event_status[ei] && event_status[ei].il){
-							this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
-							this_load.find(".st-reply-footer span:eq(1)").html("收回讚");
-						}
-					}
+					// 	//此則動態 自己的按贊狀況
+					// 	if(event_status[ei] && event_status[ei].il){
+					// 		this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
+					// 		this_load.find(".st-reply-footer span:eq(1)").html("收回讚");
+					// 	}
+					// }
 				}
 			}));	
 		});	
 	}
+
+    eventReplyMake = function(this_load,el,parent_ei,event_status){
+        
+        //製作留言
+        var _groupList = $.lStorage(ui);
+        var user_name = _groupList[gi].guAll[el.meta.gu].nk;
+
+        this_load.find(".st-user-pic.namecard").data("gu",el.meta.gu)
+        //大頭照
+        if(_groupList[gi].guAll[el.meta.gu].aut){
+            this_load.find(".st-user-pic img").attr("src",_groupList[gi].guAll[el.meta.gu].aut);
+            // this_load.find(".st-user-pic img:eq(1)").attr("src",_groupList[gi].guAll[el.meta.gu].auo);
+            this_load.find(".st-user-pic.namecard").data("auo",_groupList[gi].guAll[el.meta.gu].auo);
+            avatarPos(this_load.find(".st-user-pic img"));
+        }
+        
+        var time = new Date(el.meta.ct);
+        var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
+        
+
+        this_load.find(".st-reply-username").html(user_name);
+
+        //回覆內容在上面switch完成
+        
+        this_load.find(".st-reply-footer span:eq(0)").html(time_format);
+
+        var ei = el.ei;
+        this_load.data("event-id",ei);
+
+        //存入event path 之後才可以按讚
+        this_load.data("event-path",parent_ei + "." + this_load.data("event-id"));
+
+        if(el.meta.lct){
+            this_load.find(".st-reply-footer img").show();
+            this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like.png");
+            this_load.find(".st-reply-footer span:eq(2)").html(el.meta.lct);
+
+            //此則動態 自己的按贊狀況
+            if(event_status[ei] && event_status[ei].il){
+                this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
+                this_load.find(".st-reply-footer span:eq(1)").html("收回讚");
+            }
+        }
+    }
 
 	//動態消息 判斷關閉區域
 	timelineDetailClose = function (this_event,tp){
@@ -4803,6 +4849,8 @@ $(function(){
         	//重新讀取detail
         	// popupShowAdjust("","回覆成功");
 
+            this_event.find(".st-reply-message-send").data("reply-chk",false);
+
         	setTimeout(function(){
 				reloadDetail(this_event);
         	},400);
@@ -4818,14 +4866,14 @@ $(function(){
 		setEventStatus(this_event);
 
 		//重設完整的detail
-		this_event.data("detail-content",false);
-		this_event.find(".st-vote-ques-area-div").remove();
-		// timelineDetailClose toggle負負得正
-		this_event.find(".st-reply-area").hide();
+		// this_event.data("detail-content",false);
+		// this_event.find(".st-vote-ques-area-div").remove();
+		// // timelineDetailClose toggle負負得正
+		// this_event.find(".st-reply-area").hide();
 
-		this_event.data("switch-chk",false);
+		// this_event.data("switch-chk",false);
 
-  		this_event.find(".st-sub-box-1").trigger("click");
+        // this_event.find(".st-sub-box-1").trigger("detailShow");
 	};
 
 	
