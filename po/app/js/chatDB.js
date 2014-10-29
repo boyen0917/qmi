@@ -124,7 +124,7 @@ function updateChatCnt ( ccs ){
 	// cns.debug( JSON.stringify($.lStorage(ui)) );
 
 
-	if( null != windowList ){
+	if( typeof(windowList)!='undefined' && null != windowList ){
 		for( var ccsIndex=0; ccsIndex<ccs.length; ccsIndex++){
 			var data = ccs[ccsIndex];
 			if( null != windowList[data.ci] 

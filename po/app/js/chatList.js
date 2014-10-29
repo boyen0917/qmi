@@ -267,25 +267,22 @@ function setLastMsgContent( table, data ){
 	var userData = $.lStorage(ui);
 	var groupData = userData[gi];
 	var text = "";
+	var name = groupData.guAll[data.meta.gu].nk.replaceOriEmojiCode();
 	switch( data.ml[0].tp ){
 		case 5: //sticker
-			var name = groupData.guAll[data.meta.gu].nk;
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
 			break; 
 		case 6: //pic
-			var name = groupData.guAll[data.meta.gu].nk;
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_PHOTO", name);
 			break;
 		case 8: //audio
-			var name = groupData.guAll[data.meta.gu].nk;
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_VOICE", name);
 			break; 
 		case 9: //map
-			var name = groupData.guAll[data.meta.gu].nk;
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_LOCATION", name);
 			break;
 		default:
-			text = data.ml[0].c;
+			text = data.ml[0].c.replaceOriEmojiCode();
 			break;
 	}
 	if(msgDom)	msgDom.html( text );

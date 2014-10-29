@@ -692,11 +692,11 @@ img.auo {
 	text-shadow: 0 0;
 }
 
-.subpage-contact {
+/*.subpage-contact {
 	position: fixed;
 	width: 100%;
 	display:none;
-}
+}*/
 
 .ui-panel-animate.ui-panel-content-fixed-toolbar-position-left.ui-panel-content-fixed-toolbar-open.ui-panel-content-fixed-toolbar-display-push{
 	margin:0;

@@ -215,7 +215,7 @@ $(function(){
         if(_groupList[target_gi].guAll[target_gu]){
         	aut = _groupList[target_gi].guAll[target_gu].aut;
         	auo = _groupList[target_gi].guAll[target_gu].auo;
-        	nk = _groupList[target_gi].guAll[target_gu].nk;
+        	nk = _groupList[target_gi].guAll[target_gu].nk.replaceOriEmojiCode();
         }
 
     	//設定圖片
@@ -404,10 +404,11 @@ $(function(){
 				}
 	          break;
 	        case "contact": 
-	        	//$(".subpage-contact").show();
-	            //$(".subpage-timeline").hide();
-	            // $( "#side-menu" ).panel( "close");
-	            //$("#page-group-main").find("div[data-role=header] h3").html("聯絡人");
+	        	$(".subpage-contact").show();
+	            $(".subpage-timeline").hide();
+	        	$(".subpage-chatList").hide();
+	            $( "#side-menu" ).panel( "close");
+	        	initContactList();
 	          break;
 	        case "chat":
 	        	//-- switch sub pages --

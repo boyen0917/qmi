@@ -207,8 +207,8 @@ showAlertContent = function(data){
 			    if( tmp && boxData.gun){
 			    	tmp.html( boxData.gun.replaceOriEmojiCode() );
 			    	if(boxData.rcnt>1){
-			    		tmpDiv.find(".posterDetail").css("display","inline-block");
-			    		tmpDiv.find(".NOTICES_RESPONSER_NUM").html( $.i18n.getString("otherNPeople",boxData.rcnt-1) );
+			    		$(tmpDiv).find(".posterDetail").css("display","inline-block");
+			    		$(tmpDiv).find(".otherPosterCnt").html( $.i18n.getString("NOTICES_RESPONSER_NUM",boxData.rcnt-1) );
 			    	}
 			    }
 
@@ -263,7 +263,7 @@ showAlertContent = function(data){
 			extra.css("display","none");
 			if( boxData.nd.hasOwnProperty("ml") ){
 				for( var j=0; j<boxData.nd.ml.length; j++){
-					if( boxData.nd.ml[j].tp==0 ){
+					if( boxData.nd.ml[j].tp==0 && boxData.nd.ml[j].c.length>0 ){
 						extra.html( boxData.nd.ml[j].c.replaceOriEmojiCode() );
 						extra.css("display","");
 						break;
