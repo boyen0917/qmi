@@ -874,7 +874,6 @@ $(function(){
 		var detail_chk = timelineDetailClose(this_event,tp);
 		
 		if(!detail_chk){
-			this_event.find(".st-reply-all-content-area").html("");
 			this_event.find(".st-vote-all-ques-area").html("");
 			return false;
 		}
@@ -883,14 +882,7 @@ $(function(){
 		getThisTimelinePart(this_event,this_event.find(".st-reply-like-area img:eq(0)"),1);
 
 		//單一動態詳細內容
-		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events/" + this_ei;
-        var headers = {
-                "ui":ui,
-                "at":at, 
-                "li":lang
-                    };
-        var method = "get";
-        ajaxDo(api_name,headers,method,false).complete(function(data){
+        getEventDetail(this_ei).complete(function(data){
         	var e_data = $.parseJSON(data.responseText).el;
 
 	        	//計算投票的回文人次
