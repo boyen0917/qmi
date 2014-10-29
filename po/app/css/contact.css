@@ -156,6 +156,10 @@
 	color: rgb(58,135,221);
 	margin-left: -14px;
 }
+.contact-memLists .noMem{
+	margin-left: -7px;
+	margin-top: 5px;
+}
 .contact-mems .mem{
 	height: 128px;
 	width: 96px;

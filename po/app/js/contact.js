@@ -131,8 +131,9 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	});
 	title.find(".btn").off("click").click( function(){
 		if( true==$(this).hasClass("list") ){
-			subPageBottom.find(".contact-mems").fadeIn();
-			subPageBottom.find(".contact-memLists").fadeOut();
+			subPageBottom.find(".contact-memLists").fadeOut('fast', function(){
+				subPageBottom.find(".contact-mems").show(0);
+			});
 			$(this).removeClass("list");
 		} else {
 			var mem = subPageBottom.find(".contact-mems");
@@ -151,7 +152,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 					var mid = tmp.find(".mid");
 					// $(mid).data("gu", gu );
 					$(dom).find(".name").clone().appendTo(mid);
-					mid.append("<div class='detail'>Manager</div>");
+					mid.append("<div class='detail'>職稱？群組？or?</div>");
 					//favorite
 					var right = tmp.find(".right");
 					var fav = $("<div class='fav'></div>");
@@ -167,9 +168,10 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 				mem.find(".noMem").clone().appendTo( memList );
 			}
 
-			mem.after(memList);
-			mem.fadeOut();
-			memList.fadeIn();
+			mem.fadeOut('slow', function(){
+				mem.after(memList);
+				memList.show(0);
+			});
 			$(this).addClass("list");
 
 
