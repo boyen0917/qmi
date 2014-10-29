@@ -404,10 +404,11 @@ $(function(){
 				}
 	          break;
 	        case "contact": 
-	        	//$(".subpage-contact").show();
-	            //$(".subpage-timeline").hide();
-	            // $( "#side-menu" ).panel( "close");
-	            //$("#page-group-main").find("div[data-role=header] h3").html("聯絡人");
+	        	$(".subpage-contact").show();
+	            $(".subpage-timeline").hide();
+	        	$(".subpage-chatList").hide();
+	            $( "#side-menu" ).panel( "close");
+	        	initContactList();
 	          break;
 	        case "chat":
 	        	//-- switch sub pages --

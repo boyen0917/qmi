@@ -207,8 +207,8 @@ showAlertContent = function(data){
 			    if( tmp && boxData.gun){
 			    	tmp.html( boxData.gun.replaceOriEmojiCode() );
 			    	if(boxData.rcnt>1){
-			    		tmpDiv.find(".posterDetail").css("display","inline-block");
-			    		tmpDiv.find(".NOTICES_RESPONSER_NUM").html( $.i18n.getString("otherNPeople",boxData.rcnt-1) );
+			    		$(tmpDiv).find(".posterDetail").css("display","inline-block");
+			    		$(tmpDiv).find(".otherPosterCnt").html( $.i18n.getString("NOTICES_RESPONSER_NUM",boxData.rcnt-1) );
 			    	}
 			    }
 

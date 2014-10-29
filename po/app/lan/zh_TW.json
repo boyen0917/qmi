@@ -10,6 +10,11 @@
 	"FEED_MISSION_LOCATION"	:"任務-成員定位",
 
 	"COMPOSE_SUBGROUP" : "群組",
+	"COMPOSE_N_SUBGROUP" : "%ld個群組",
+	"COMPOSE_N_MEMBERS" : "%ld位成員",
+
+	"MEMBER_ALL" : "全部",
+	"MEMBER_X_GROUP_NO_MEMBER": "%@目前沒有成員",
 
 	"COMMON_SELECT_MEMBERS"  				: "選擇對象",
 	"COMMON_NEXT"  					: "下一步",
