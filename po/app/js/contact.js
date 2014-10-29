@@ -168,7 +168,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 				mem.find(".noMem").clone().appendTo( memList );
 			}
 
-			mem.fadeOut('slow', function(){
+			mem.fadeOut('fast', function(){
 				mem.after(memList);
 				memList.show(0);
 			});
