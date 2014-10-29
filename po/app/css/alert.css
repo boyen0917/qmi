@@ -78,7 +78,7 @@
 	height: 1000px;
 	background: transparent;/*rgba(50,50,50,0.5);*/
 	display: none;
-	z-index: 999;
+	z-index: 1001;
 }
 
 .alert-area {

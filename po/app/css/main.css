@@ -1686,8 +1686,8 @@ img.auo {
 }
 
 .st-sub-name {
-	margin: 22px 0 5px;
-	height: 20px;
+	margin: 18px 0 5px;
+	height: 25px;
 	color: #323537;
 	font-size: 18px;
 	width: 70%;
@@ -1727,7 +1727,7 @@ img.auo {
 .st-sub-box-1-footer img {
 	margin-right: 10px;
 	width: 17px;
-	float: left;
+	display: -webkit-box;
 }
 
 .st-sub-box-2 {

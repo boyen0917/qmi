@@ -230,7 +230,6 @@ $(function(){
 				}
 
 				loginAction(login_result);
-				
         	}
         });
 	}

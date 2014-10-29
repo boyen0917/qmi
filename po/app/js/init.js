@@ -155,7 +155,8 @@ $(function(){
   //   	}
 
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
-		if(ajax_msg || window.location.href.match(/index.html/)){
+		//eim 登入網址沒有index.html
+		if(ajax_msg || !window.location.href.match(/.html/) || window.location.href.match(/index.html/)){
 			ajax_msg = false;
 			popupShowAdjust("",errorResponse(jqxhr),true);
 		}else{
