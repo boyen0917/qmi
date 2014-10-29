@@ -215,7 +215,7 @@ $(function(){
         if(_groupList[target_gi].guAll[target_gu]){
         	aut = _groupList[target_gi].guAll[target_gu].aut;
         	auo = _groupList[target_gi].guAll[target_gu].auo;
-        	nk = _groupList[target_gi].guAll[target_gu].nk;
+        	nk = _groupList[target_gi].guAll[target_gu].nk.replaceOriEmojiCode();
         }
 
     	//設定圖片
@@ -1046,7 +1046,7 @@ $(function(){
 		    		var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
 		    		
 
-					this_load.find(".st-reply-username").html(user_name);
+					this_load.find(".st-reply-username").html(user_name.replaceOriEmojiCode());
 
 					//回覆內容在上面switch完成
 					
