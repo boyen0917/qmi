@@ -81,6 +81,7 @@
 	height: 30px;
 	display: inline-block;
 	float: right;
+	/*要放相反模式的圖！*/
 	background-image: url("../images/icon/icon_list_normal.png");
 	background-repeat: no-repeat;
 	background-position: center;
@@ -184,7 +185,7 @@
 .contact-memLists .left .img{
 	width: 70px;
 	height: 70px;
-	border-radius: 6px;
+	border-radius: 8px;
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-position: center;
@@ -225,6 +226,9 @@
 	/* width: 92%; */
 	border-bottom: rgb(249,249,249) 1px solid;
 	pointer: cursor;
+}
+.contact-memLists .row:nth-child(1){
+	margin-top: -15px;
 }
 .contact-memLists .row{
 	background: white;

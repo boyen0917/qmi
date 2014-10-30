@@ -282,7 +282,7 @@ function setLastMsgContent( table, data ){
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_LOCATION", name);
 			break;
 		default:
-			text = data.ml[0].c.replaceOriEmojiCode();
+			text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c.replaceOriEmojiCode():"";
 			break;
 	}
 	if(msgDom)	msgDom.html( text );

@@ -30,6 +30,7 @@
 	"COMMON_YESTERDAY"					: "昨天",
 	"COMMON_YOU"							: "你",
 	"COMMON_SELF"						: "自己",
+	"COMMON_FAVORIATE" : "我的最愛",
 
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",

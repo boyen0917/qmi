@@ -1015,7 +1015,7 @@ $(function(){
 
 					//製作留言
 					var _groupList = $.lStorage(ui);
-					var user_name = _groupList[gi].guAll[el.meta.gu].nk;
+					var user_name = _groupList[gi].guAll[el.meta.gu].nk.replaceOriEmojiCode();
 
                     // this_load.attr("")
 					this_load.find(".st-user-pic.namecard").data("gu",el.meta.gu)
