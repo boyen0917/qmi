@@ -15,6 +15,7 @@
 
 	"MEMBER_ALL" : "全部",
 	"MEMBER_X_GROUP_NO_MEMBER": "%@目前沒有成員",
+	"INVITE_SEARCH" : "搜尋",
 
 	"COMMON_SELECT_MEMBERS"  				: "選擇對象",
 	"COMMON_NEXT"  					: "下一步",

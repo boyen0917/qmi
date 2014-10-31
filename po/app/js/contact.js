@@ -1,6 +1,7 @@
 var bl;
 var guAll;
 var isList = true;
+// var isKeyPress = false;
 
 initContactList = function(){
 	//get user data
@@ -76,7 +77,163 @@ initContactList = function(){
 	rowContainer.find(".row.branch").off("click").click( function(){
 		showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
 	});
-	//是否要做search cache???
+
+	//search bar
+	var searchBar = $(".contact-search .content");
+	var searchBarInput = searchBar.find(".input");
+	searchBarInput.data("searchText","");
+	searchBarInput.off("keyup").keyup( onSearchInput );
+	// searchBarInput.off("keypress").keypress( function(){
+	// 	isKeyPress = true;
+	// });
+	searchBar.find(".clear").off("click").click(deactiveSearch);
+	//若沒有文字的話點別處取消搜尋
+	searchBarInput.off("focusout").focusout( function(){
+		var text = searchBarInput.val();
+		if( !text || text.length==0 ){
+			deactiveSearch();
+		}
+	});
+
+	var searchHint = $(".contact-search .hintDiv");
+	searchHint.off("click").click( function(){
+		$(this).hide();
+		searchBar.show();
+		searchBarInput.focus();
+	});
+}
+
+deactiveSearch = function(){
+	var content = $(".contact-search .content");
+	content.hide();
+	var input = content.find(".input");
+	input.data("searchText","");
+	input.val("");
+	
+	$(".contact-search .hintDiv").show();
+	$(".subpage-contact .contact-rows").show();
+	$(".contact-searchResult").hide();
+	return;
+}
+
+onSearchInput = function(e){
+	var input = $(this);
+	if( input.val().indexOf("\n") >= 0 ){
+		input.val( input.val().replace("/\n/g","") );
+	}
+	var str = input.val();	//+String.fromCharCode(e.keyCode);
+
+	//if no search text, show ori rows
+	if( !str || str.length==0 ){
+		$(".contact-searchResult").hide();
+		$(".subpage-contact .contact-rows").show();
+		return;
+	}
+
+	//for chinese...enter for comfirm chinese triggers no event
+	// if( e.keyCode == '13' || e.keyCode == '8' || e.keyCode == '46'){
+	// 	if( input.val() != input.data("searchText") ){
+	// 		isKeyPress = true;
+	// 	}
+	// }
+
+	//check complete chinese typing
+	// if( !isKeyPress ){
+	// 	cns.debug("(",input.val(),")");
+	// 	return;
+	// }
+	// isKeyPress = false;
+	
+	//return if no text changed
+	if( input.data("searchText")==str ) return;
+	input.data("searchText", str);
+	cns.debug(str);
+
+	//hide ori rows
+	var contact = $(".subpage-contact .contact-rows");
+	var searchResult = $(".subpage-contact .contact-searchResult");
+	if( !str || str.length==0 ){
+		$(".contact-searchResult").hide();
+		$(".subpage-contact .contact-rows").show();
+		return;
+	}
+	if( !searchResult || searchResult.length==0 ){
+		searchResult = $('<div class="contact-searchResult" style="display:none;"></div>');
+		contact.after( searchResult );
+	}
+	searchResult.show();
+	contact.hide();
+
+	//search with no case sensitive
+	str = str.toLowerCase();
+
+	//search mem
+	var memObject = {};
+	var memCount = 0;
+	for( var key in guAll ){
+		var mem = guAll[key];
+		if( null==mem.nk ){
+			cns.debug( JSON.stringify(mem) );
+		} else {
+			if( mem.nk.toLowerCase().indexOf(str)>=0 ){
+				memObject[key] = mem;
+				memCount++;
+			}	
+		}
+	}
+
+	//search bl
+	var branchList = [];
+	for( var key in bl ){
+		var branch = bl[key];
+		if( branch.bn.toLowerCase().indexOf(str)>=0 ){
+			branchList.push(key);
+		}
+	}
+	var branchCount = branchList.length;
+	
+	var memTitle = $(".contact-searchResult .memTitle");
+	var branchTitle = $(".contact-searchResult .branchTitle");
+
+	if( branchCount==0 && memCount==0 ){
+		$(".contact-searchResult .noResult").show();
+		memTitle.hide();
+		branchTitle.hide();
+		$(".contact-searchResult .contact-memLists").hide();
+		$(".contact-searchResult .contact-rows").hide();
+		return;
+	}
+
+	$(".contact-searchResult .noResult").hide();
+	if( branchCount==0 || memCount==0 ){
+		memTitle.hide();
+		branchTitle.hide();
+	} else {
+		memTitle.show();
+		branchTitle.show();
+	}
+
+	if( memCount>0 ){
+		var memListContainer = $(".contact-searchResult .contact-memLists");
+		if( memListContainer && memListContainer.length>0 ){
+			memListContainer.remove();
+		}
+		memListContainer = showMemberList(memObject);
+		memTitle.after(memListContainer);
+	}
+
+	if( branchCount>0 ){
+		var branchListContainer = $(".contact-searchResult .contact-rows");
+		if( branchListContainer && branchListContainer.length>0 ){
+			branchListContainer.remove();
+		}
+		branchListContainer = showBranchList( branchList );
+		branchTitle.after(branchListContainer);
+
+		branchListContainer.find(".row.branch").off("click").click( function(){
+			showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
+		});
+	}
 }
 
 showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
@@ -249,23 +406,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 		subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_SUBGROUP", "")+'</div>');
 		subPageBottom.append( subTitle );
 
-		var branch = $("<div class='contact-rows'></div>");
-		for(var i=0; i<childList.length; i++ ){
-			var key = childList[i];
-			var childData = bl[key];
-			if( childData ){
-				var tmp = $("<div class='row branch'><div class='left'></div><div class='right'></div></div>");
-				var left = tmp.find(".left");
-				left.append("<div class='name'>"+childData.bn+"</div>");
-				left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", 0)+"</div>");
-				if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
-				
-				tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
-				tmp.data("bi", key );
-				
-				branch.append(tmp);
-			}
-		}
+		var branch = showBranchList(childList);
 		subPageBottom.append(branch);
 		subPageBottom.find(".row.branch").off("click").click( function(){
 			showSubContactPage( pageID, $(this).data("bi"), JSON.stringify(lvStack) );
@@ -406,8 +547,17 @@ showFavorite = function(){
 	nameArea.append("<div class='name'>"+$.i18n.getString("COMMON_FAVORIATE")+"</div>");
 	// nameArea.append("<div class='arrow'></div>");
 	title.append(nameArea);
+	title.append("<div class='btnExtra'></div>");
 	title.append("<div class='btn'></div>");
 	subPage.append(title);
+
+	var extra = $("<div class='contact-extra'></div>");
+	subPage.append(extra);
+	extra.css("display","none");
+	//btn
+	//content
+	var extraScreen = $();
+	extra.append("<div class='contact-extraScreen'></div>");
 
 	var subPageBottom = $('<div class="contact-scroll"></div>');
 	subPage.append(subPageBottom);
@@ -419,6 +569,9 @@ showFavorite = function(){
 	// });
 	title.find(".btn").off("click").click( function(){
 		switchListAndGrid( $(this), subPageBottom );
+	});
+	title.find(".btnExtra").off("click").click( function(){
+		extra.slideToggle();
 	});
 
 	//mem-title
@@ -556,4 +709,25 @@ showMemberList = function( memObject, favCallback ){
 	});
 
 	return memContainer;
+}
+
+showBranchList = function( childList ){
+	var branch = $("<div class='contact-rows'></div>");
+	for(var i=0; i<childList.length; i++ ){
+		var key = childList[i];
+		var childData = bl[key];
+		if( childData ){
+			var tmp = $("<div class='row branch'><div class='left'></div><div class='right'></div></div>");
+			var left = tmp.find(".left");
+			left.append("<div class='name'>"+childData.bn+"</div>");
+			left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", 0)+"</div>");
+			if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
+			
+			tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+			tmp.data("bi", key );
+			
+			branch.append(tmp);
+		}
+	}
+	return branch;
 }
