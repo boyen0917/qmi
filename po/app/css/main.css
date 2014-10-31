@@ -14,6 +14,10 @@ body {
 	-webkit-perspective: 1000;
 }
 
+.fixed-initial {
+	-webkit-transform: translate3d(0,0,0);
+}
+
 /* 為了名片的翻轉 */
 .ui-panel-animate.ui-panel-content-fixed-toolbar {
 	-webkit-transform: initial;
@@ -1121,7 +1125,7 @@ img.auo {
 	width: 100%;
 	border-bottom: 1px solid rgb(218,218,218);
 	position: fixed;
-	bottom: 0px;
+	bottom: -2px;
 	z-index: 10000;
 }
 
@@ -3766,4 +3770,8 @@ img.user-info-back {
 
 .user-avatar-bar .bottom {
 	height: 10px;
+}
+
+.timeline-detail {
+	margin: 15px 10px;
 }
