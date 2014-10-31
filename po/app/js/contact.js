@@ -659,7 +659,7 @@ showMemberList = function( memObject, favCallback ){
 		//pic
 		var left = tmp.find(".left");
 		if( mem.aut && mem.aut.length>0 ){
-			left.append("<div class='img' style='background-image:url("+mem.aut+")'></div>");
+			left.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
 		} else {
 			left.append("<div class='img'></div>");
 		}
@@ -679,6 +679,10 @@ showMemberList = function( memObject, favCallback ){
 		mid.data("gu",key);
 		right.data("gu",key);
 
+		//is admin?
+		if( mem.ad==1 ){
+			tmp.addClass("admin");
+		}
 		memContainer.append(tmp);
 	});
 
