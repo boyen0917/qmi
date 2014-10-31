@@ -873,7 +873,9 @@ $(function(){
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp);
 		
+		//重置
 		if(!detail_chk){
+			this_event.find(".st-reply-all-content-area").html("");
 			this_event.find(".st-vote-all-ques-area").html("");
 			return false;
 		}
@@ -882,7 +884,7 @@ $(function(){
 		getThisTimelinePart(this_event,this_event.find(".st-reply-like-area img:eq(0)"),1);
 
 		//單一動態詳細內容
-        getEventDetail(this_ei).complete(function(data){
+        getEventDetail(gi,this_ei).complete(function(data){
         	var e_data = $.parseJSON(data.responseText).el;
 
 	        	//計算投票的回文人次

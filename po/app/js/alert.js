@@ -52,9 +52,12 @@ showNewAlertIcon = function( cnt ){
 }
 
 //隱藏通知區
-hideAlertBox = function(){
+hideAlertBox = function(detail){
 	$(".alert").removeClass("alert-visit");
 	$(".alert-area-cover").hide();
+
+	if(detail) return false;
+
 	setTimeout(function(){
 	    $(".alert").removeClass("alert-click");
 	    $(".alert-area").slideUp();
@@ -278,7 +281,18 @@ showAlertContent = function(data){
 			tmpDiv.data("gi", boxData.gi);
 			tmpDiv.data("ei", boxData.nd.ei);
 			$(tmpDiv).click(function(){
-				// alert( "gi:"+$(this).data("gi")+", ei:"+$(this).data("ei") );
+				// var this_gi = $(this).data("gi");
+				// var this_ei = $(this).data("ei");
+				// // alert( "gi:"+$(this).data("gi")+", ei:"+$(this).data("ei") );
+				// hideAlertBox(true);
+				// $(".alert").removeClass("alert-click");
+	   //  		$(".alert-area").slideUp("fast",function(){
+	   //  			setTimeout(function(){
+		  //   			$.mobile.changePage("#page-timeline-detail", {transition: "slide"});
+				// 		eventDetailShow(this_gi,this_ei);	
+				// 	},100);
+	   //  		});
+				
 			});
 
 			//取代中文
