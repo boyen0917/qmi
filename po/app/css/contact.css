@@ -304,6 +304,32 @@
 	margin-left: 13px;
 	margin-bottom: 6px;
 }
+.contact-mems .mem.admin .img:before {
+    background: url("../images/common/icon/icon_members_admin.png");
+	width: 25px;
+	height: 25px;
+	background-size: 25px 25px;
+	content: "";
+	/* z-index: 10000; */
+	display: inline-block;
+	/* right: 0px; */
+	margin-left: 52px;
+	margin-top: 50px;
+}
+.contact-mems .mem .img .new {
+    float: left;
+	height: 15px;
+	width: 93%;
+	background-color: #f31e80;
+	color: white;
+	font-weight: bold;
+	font-size: 10px;
+	margin-top: -24px;
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
+	line-height: 15px;
+	padding-left: 7%;
+}
 .contact-memLists .left .img{
 	width: 70px;
 	height: 70px;

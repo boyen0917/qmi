@@ -637,12 +637,16 @@ showMemberGrid = function( memObject ){
 	$.each(memObject,function(key,mem){
 		var tmp = $("<div class='mem namecard'></div>");
 		if( mem.aut && mem.aut.length>0 ){
-			tmp.append("<div class='img' style='background-image:url("+mem.aut+")'></div>");
+			tmp.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
 		} else {
 			tmp.append("<div class='img'></div>");
 		}
 		tmp.append("<div class='name'>"+mem.nk+"</div>");
 		tmp.data("gu",key);
+		//is admin?
+		if( mem.ad==1 ){
+			tmp.addClass("admin");
+		}
 		memContainer.append(tmp);
 	});
 	return memContainer;
