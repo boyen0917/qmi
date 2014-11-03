@@ -205,24 +205,21 @@ onSearchInput = function(e){
 	}
 
 	$(".contact-searchResult .noResult").hide();
-	if( branchCount==0 || memCount==0 ){
-		memTitle.hide();
-		branchTitle.hide();
-	} else {
-		memTitle.show();
-		branchTitle.show();
-	}
 
 	if( memCount>0 ){
+		memTitle.show();
 		var memListContainer = $(".contact-searchResult .contact-memLists");
 		if( memListContainer && memListContainer.length>0 ){
 			memListContainer.remove();
 		}
 		memListContainer = showMemberList(memObject);
 		memTitle.after(memListContainer);
+	} else {
+		memTitle.hide();
 	}
 
 	if( branchCount>0 ){
+		branchTitle.show();
 		var branchListContainer = $(".contact-searchResult .contact-rows");
 		if( branchListContainer && branchListContainer.length>0 ){
 			branchListContainer.remove();
@@ -233,6 +230,8 @@ onSearchInput = function(e){
 		branchListContainer.find(".row.branch").off("click").click( function(){
 			showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
 		});
+	} else {
+		branchTitle.hide();
 	}
 }
 
@@ -250,7 +249,8 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+                // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+                +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
@@ -274,7 +274,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 
 	page.find(".page-title").html( data.bn );
 	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#"+parentPageID);
+		$.mobile.changePage("#"+parentPageID); //, { transition: "slide", reverse: true}
 		var tmp = $( "#"+parentPageID );
 		if( tmp && tmp.length>0 && false==tmp.data("gen") ){
 			showSubContactPage( tmp.data("parentPageID"),
@@ -451,14 +451,14 @@ showAllMember = function(gn) {
             +'</div><div class="subpage-contact"></div></div>');
 		$("#page-group-main").after(page);
 	} else if( gi==page.data("gi") ){
-		$.mobile.changePage("#"+pageID);
+		$.mobile.changePage("#"+pageID, { transition: "slide"});
 		return;
 	}
 	page.data("gi", gi);
 
 	page.find(".page-title").html( $.i18n.getString("MEMBER_ALL") );
 	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#page-group-main");
+		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 	});
 	
 	var subPage = page.find(".subpage-contact");
@@ -512,7 +512,7 @@ showAllMember = function(gn) {
 		subTitle.find(".count").html(count);
 	}
 
-	$.mobile.changePage("#"+pageID);
+	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
 showFavorite = function(){
@@ -535,13 +535,13 @@ showFavorite = function(){
 
 	page.find(".page-title").html( $.i18n.getString("COMMON_FAVORIATE") );
 	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#page-group-main");
+		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 	});
 	
 	var subPage = page.find(".subpage-contact");
 	subPage.html("");
 
-	//title
+	//----- title -----
 	var title = $("<div class='contact-titleBar'></div>");
 	var nameArea = $("<div class='nameArea'></div>");
 	nameArea.append("<div class='name'>"+$.i18n.getString("COMMON_FAVORIATE")+"</div>");
@@ -551,14 +551,29 @@ showFavorite = function(){
 	title.append("<div class='btn'></div>");
 	subPage.append(title);
 
+	//---- extra ------
 	var extra = $("<div class='contact-extra'></div>");
 	subPage.append(extra);
 	extra.css("display","none");
 	//btn
 	//content
-	var extraScreen = $();
-	extra.append("<div class='contact-extraScreen'></div>");
+	var extraContent = $("<div class='content'></div>");
+	extraContent.append("<div class='btn addGroup' align='center'><div class='img'></div><div class='text'>"+$.i18n.getString("MEMBER_CREATE_CUSTOMIZE_GROUP")+"</div></div>");
+	extra.append( extraContent );
 
+	extra.off("click").click( function(){
+		extra.fadeToggle('fast');
+	});
+	extraContent.off("click").click( function(e){
+    	e.stopPropagation();
+		cns.debug("!");
+	});
+	extraContent.find(".btn.addGroup").off("click").click( function(e){
+    	e.stopPropagation();
+		showAddGroup( subPage );
+	});
+
+	//---- part below title bar -----
 	var subPageBottom = $('<div class="contact-scroll"></div>');
 	subPage.append(subPageBottom);
 
@@ -571,7 +586,7 @@ showFavorite = function(){
 		switchListAndGrid( $(this), subPageBottom );
 	});
 	title.find(".btnExtra").off("click").click( function(){
-		extra.slideToggle();
+		extra.fadeToggle('fast');
 	});
 
 	//mem-title
@@ -608,7 +623,7 @@ showFavorite = function(){
 		subTitle.find(".count").html(count);
 	}
 
-	$.mobile.changePage("#"+pageID);
+	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
 switchListAndGrid = function( dom, subPageBottom ){
@@ -646,8 +661,10 @@ showMemberGrid = function( memObject ){
 		//is admin?
 		if( mem.ad==1 ){
 			tmp.addClass("admin");
+			memContainer.prepend(tmp);
+		} else {
+			memContainer.append(tmp);
 		}
-		memContainer.append(tmp);
 	});
 	return memContainer;
 }
@@ -655,7 +672,9 @@ showMemberList = function( memObject, favCallback ){
 	var memContainer = $("<div class='contact-memLists'></div>");
 	var count = 0;
 	$.each(memObject,function(key,mem){
-		var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
+		//favorite ver.
+		// var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
+		var tmp = $("<div class='row mem namecard'><div class='left namecard'></div><div class='mid'></div><div class='right'>&nbsp</div></div>");
 		//pic
 		var left = tmp.find(".left");
 		if( mem.aut && mem.aut.length>0 ){
@@ -666,55 +685,61 @@ showMemberList = function( memObject, favCallback ){
 		//name, ?
 		var mid = tmp.find(".mid");
 		mid.append("<div class='name'>"+mem.nk+"</div>");
-		mid.append("<div class='detail'>職稱？群組？or?</div>");
-		//favorite
-		var right = tmp.find(".right");
-		var fav = $("<div class='fav'></div>");
-		if( mem && true==mem.fav ){
-			right.addClass("active", true);
-		}
-		right.append(fav);
+		mid.append("<div class='detail'>職稱, 心情留言</div>");
 
-		left.data("gu",key);
-		mid.data("gu",key);
-		right.data("gu",key);
+		//favorite disabled, remove '.namecard' of .right before enable this
+		////favorite
+		// var right = tmp.find(".right");
+		// var fav = $("<div class='fav'></div>");
+		// if( mem && true==mem.fav ){
+		// 	right.addClass("active", true);
+		// }
+		// right.append(fav);
+
+		// right.data("gu",key);
+		// left.data("gu",key);
+		// mid.data("gu",key);
+		tmp.data("gu",key)
+
 
 		//is admin?
 		if( mem.ad==1 ){
 			tmp.addClass("admin");
+			memContainer.prepend(tmp);
+		} else {
+			memContainer.append(tmp);
 		}
-		memContainer.append(tmp);
 	});
 
-	memContainer.find(".right").off("click").click( function(){
-		var thisTmp = $(this);
-		if( thisTmp.hasClass("sending") ) return;
-		thisTmp.addClass("sending");
-		var gu = thisTmp.data("gu");
-		cns.debug(gu);
-		if( !gu ) return;
+	// memContainer.find(".right").off("click").click( function(){
+	// 	var thisTmp = $(this);
+	// 	if( thisTmp.hasClass("sending") ) return;
+	// 	thisTmp.addClass("sending");
+	// 	var gu = thisTmp.data("gu");
+	// 	cns.debug(gu);
+	// 	if( !gu ) return;
 
-		var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
-	    var headers = {
-	             "ui":ui,
-	             "at":at, 
-	             "li":lang,
-	                 };
-		ajaxDo(api_name,headers,"put",true,null).complete(function(data){
-			thisTmp.removeClass("sending");
-			if(data.status == 200){
-				//save to db
-				var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
-				cns.debug("add:",isAdded);
-				thisTmp.toggleClass("active", isAdded);
-				var data = $.lStorage(ui);
-				data[gi].guAll[gu].fav = isAdded;
-				guAll = data[gi].guAll;
-				$.lStorage(ui, data);
-			}
-			if( favCallback ) favCallback();
-		});
-	});
+	// 	var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
+	//     var headers = {
+	//              "ui":ui,
+	//              "at":at, 
+	//              "li":lang,
+	//                  };
+	// 	ajaxDo(api_name,headers,"put",true,null).complete(function(data){
+	// 		thisTmp.removeClass("sending");
+	// 		if(data.status == 200){
+	// 			//save to db
+	// 			var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
+	// 			cns.debug("add:",isAdded);
+	// 			thisTmp.toggleClass("active", isAdded);
+	// 			var data = $.lStorage(ui);
+	// 			data[gi].guAll[gu].fav = isAdded;
+	// 			guAll = data[gi].guAll;
+	// 			$.lStorage(ui, data);
+	// 		}
+	// 		if( favCallback ) favCallback();
+	// 	});
+	// });
 
 	return memContainer;
 }
@@ -738,4 +763,51 @@ showBranchList = function( childList ){
 		}
 	}
 	return branch;
+}
+
+showAddGroup = function( subPage ){
+	var container = $(".contact-createSubgroup");
+	if( container.length==0 ){
+		subPage.append("<div class='contact-createSubgroup' style='display:none;' data-init='f'>"
+            +"<table class='innerContainer'>"
+                +"<tr><td class='title' data-textid='MEMBER_CREATE_CUSTOMIZE_GROUP'></td></tr>"
+                +"<tr><td><input class='input'/></td></tr>"
+                +"<tr><td class='cancel' data-textid='COMMON_CANCEL'></td>"
+                    +"<td class='create' data-textid='MEMBER_CREATE'></td></tr>"
+            +"</table></div>");
+		container = subPage.find(".contact-createSubgroup");
+		container._i18n();
+
+		//name input
+		var input = container.find(".input");
+		input.attr("placeholder", $.i18n.getString("MEMBER_CUSTOMIZE_GROUP_NAME") );
+		
+		container.off("click").click( function(){
+			container.fadeOut();
+			cns.debug("1");
+		});
+		container.find("table").off("click").click( function(e){
+			e.stopPropagation();
+			cns.debug("2");
+		});
+
+		container.find(".cancel").off("click").click( function(e){
+			e.stopPropagation();
+			container.fadeOut();
+			input.val("");
+			cns.debug("3");
+		});
+
+		container.find(".create").off("click").click( function(e){
+			e.stopPropagation();
+			cns.debug( "create", input.val() );
+			input.val("");
+			container.fadeOut();
+			cns.debug("4");
+		});
+	}
+	container.fadeToggle();
+
+	var extra = subPage.find(".contact-extra");
+	extra.fadeToggle('fast');
 }

@@ -7,7 +7,7 @@
 	padding: 10px 2% 10px 2%;
 	background: rgb(240,240,240);
 	width: 96%;
-	position: fixed;
+	position: static;
 	top: 61px;
 	/*box-shadow: 0px 10px 10px 0px rgba(255, 255, 255, 0.97);*/
 	/*z-index: 1;*/
@@ -172,7 +172,7 @@
 	cursor: pointer;
 }
 
-.contact-extra{
+.contact-extra, .contact-createSubgroup{
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -181,29 +181,93 @@
 	top: 0;
 }
 .contact-extra .content{
-	margin: 101px 5px 0px;
+	margin: 104px 10px 0px 10px;
 	background: white;
-	top: 101px;
+	/* top: 104px; */
 	max-height: 555px;
 	text-align: center;
 	padding: 10px;
-	min-width: 150px;
+	/* min-width: 150px; */
+	/* width: 96%; */
+	text-align: center;
 }
 .contact-extra .content:before{
 	content: "";
-    position: absolute;
-    top: -9px;
-    left: 220px;
-    border-style: solid;
-    border-width: 0 11px 9px;
-    border-color: #ADB400 transparent;
-    display: block;
-    width: 0;
-    z-index: 1;
+	position: fixed;
+	top: 95px;
+	right: 16px;
+	border-style: solid;
+	border-width: 0 11px 9px;
+	border-color: #FFFFFF transparent;
+	display: block;
+	width: 0;
+	z-index: 1;
 }
 
 .contact-extra .btn{
+	display: inline-block;
+	width: 160px;
+	height: 75px;
+	cursor: pointer;
+}
+.contact-extra .btn .img{
+	width: 35px;
+	height: 50px;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+}
+.contact-extra .btn.addGroup .img{
+	background-image: url("../images/common/icon/icon_members_addgroup.png");
+}
+.contact-extra .btn.addGroup:hover .img{
+	background-image: url("../images/common/icon/icon_members_addgroup_disable.png");
+}
+.contact-extra .btn .text{
+	width: 100%;
+	height: 25px;
+}
 
+.contact-createSubgroup .innerContainer{
+	margin: 250px 2% 0 2%;
+	background: white;
+	text-align: center;
+	width: 96%;
+	border-collapse: collapse;
+	color: black;
+}
+.contact-createSubgroup .innerContainer .title{
+	margin-bottom: 24px;
+	height: 20px;
+	padding-top: 15px;
+	/* font-weight: bold; */
+	font-size: 20px;
+}
+.contact-createSubgroup .innerContainer .input{
+	width: 89%;
+	height: 40px;
+	line-height: 20px;
+	font-size: 20px;
+	padding: 0 10px;
+	border-width: 0;
+	background: rgb(238,238,238);
+	margin-bottom: 20px;
+	margin-top: 15px;
+}
+.contact-createSubgroup .innerContainer .cancel,
+.contact-createSubgroup .innerContainer .create{
+	display: inline-block;
+	width: 45.2%;
+	padding: 2%;
+	height: 40px;
+	border-top: rgb(229, 229, 229) 2px solid;
+	line-height: 40px;
+	font-size: 20px;
+	cursor: pointer;
+}
+.contact-createSubgroup .innerContainer .create{
+	border-left: rgb(229, 229, 229) 1px solid;
+	color: #4092ef;
 }
 
 .contact-branchList{
@@ -211,7 +275,7 @@
 	float: left;
 	/* border: 1px solid gray; */
 	position: fixed;
-	background: white;
+	background: rgba(50, 50, 50, 0.7);
 	top: 112px;
 	width: 100%;
 	font-size: 20px;
@@ -220,7 +284,8 @@
 	max-height: 555px;
 	cursor: pointer;
 	z-index: 1;
-	box-shadow: 0px 3px 8px 0px rgba(219, 219, 219, 0.4);
+	/* box-shadow: 0px 3px 8px 0px rgba(219, 219, 219, 0.4); */
+	height: 589px;
 }
 /*.contact-branchList div{
 	margin: 10px 14px;
@@ -241,7 +306,7 @@
 
 .contact-rows.top, .contact-searchResult{
 	/*min-height: 536px;*/
-	position: fixed;
+	position: static;
 	top: 127px;
 	 background: white; 
 	/* border: black 1px solid; */
@@ -412,7 +477,7 @@
 	padding: 9px 10px 9px 20px;
 	/* width: 92%; */
 	border-bottom: rgb(249,249,249) 1px solid;
-	pointer: cursor;
+	cursor: pointer;
 }
 .contact-rows .left, .contact-branchList .left{
 	width: 90%;
@@ -470,7 +535,7 @@
 	overflow: hidden;
 }
 .contact-branchList .row:first-child .name{
-	color: rgb(58,135,221);
+	color: #f4511e;
 }
 .contact-rows .detail, .contact-branchList .detail, 
 .contact-memLists .detail{
