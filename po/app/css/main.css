@@ -1707,6 +1707,9 @@ img.auo {
 
 .st-sub-time img {
     margin-right: 5px;
+    width: 15px;
+	position: relative;
+	top: 3px;
 }
 
 .st-sub-box-1-footer {
@@ -2494,14 +2497,14 @@ img.auo {
 }
 
 .st-reply-message-textarea {
-	width: 73%;
+	/*width: 73%;*/
 	margin-left: 5px;
 	padding: 5px 0 0;
 	float: left;
 }
 
 .st-reply-message-textarea textarea {
-	width: 80%;
+	width: 100%;
 	border: 1px solid #d8d8d8;
 	border-radius: 7px;
 	padding: 6px 10px 0;
@@ -3774,4 +3777,11 @@ img.user-info-back {
 
 .timeline-detail {
 	margin: 15px 10px;
+}
+
+.detail-title {
+	font-size: 22px;
+	position: relative;
+	top: 10px;
+	float: left;
 }
