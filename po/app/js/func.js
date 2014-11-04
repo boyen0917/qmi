@@ -299,7 +299,7 @@ $(function(){
 
         		if(branch_list.fbl.length) {
         			$.each(branch_list.fbl,function(i,val){
-	        			new_fbl[val.bp] = val.bn;
+	        			new_fbl[val.fi] = val.fn;
 	        		});
         		}
 
