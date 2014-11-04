@@ -274,6 +274,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 
 	page.find(".page-title").html( data.bn );
 	page.find(".page-back").off("click").click(function(){
+		$(".contact-branchList").hide();
 		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 		// $.mobile.changePage("#"+parentPageID); //, { transition: "slide", reverse: true}
 		// var tmp = $( "#"+parentPageID );
@@ -300,7 +301,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	});
 
 	//sub branch list
-			cns.debug( parentLevel );
+	cns.debug( parentLevel );
 	var subbranchList = $(".contact-branchList");
 	if( subbranchList.length==0 || parentLevel==1 ){
 		subbranchList.remove();
