@@ -40,8 +40,8 @@ $(function(){
 	    	// chkBranch();
 
 	    	//branch list 只做第一次
-			if(chkBranch())
-				setBranchList();
+			// if(chkBranch())
+			// 	setBranchList();
 	    	
 
 	    	//header 設定團體名稱
@@ -77,8 +77,8 @@ $(function(){
     	return false;
 	}
 
-
 	$( window ).resize(function() {
+		//top event
 		if($(".st-top-event").length < 2) return false;
 
 		$(".st-top-bar-area").css("opacity",0);
@@ -89,6 +89,9 @@ $(function(){
 			$(".st-top-bar-area").css("opacity",1);
 		},200);
 		$(document).data("top-event-resize",timer);
+
+		//reply textarea
+		$(document).find(".st-reply-message-textarea").css("width",$(window).width()-180);
 	});
 
 	//test
@@ -429,8 +432,8 @@ $(function(){
 		setGroupAllUser();
 
 		//只做第一次
-		if(typeof $.lStorage(ui)[this_gi].bl == "undefined")
-			setBranchList(this_gi);
+		// if(typeof $.lStorage(ui)[this_gi].bl == "undefined")
+		// 	setBranchList(this_gi);
 		
 		timelineSwitch("feed",true);
 	});
@@ -503,7 +506,7 @@ $(function(){
     			cns.debug("this event data:",this_event.data());	
     		}
     	});
-		// cns.debug("this event:",$(this).data("data-obj"));
+		// cns.debug("this event data:",$(this).data("data-obj"));
 
 		// cns.debug("event:",selector);
 	});
@@ -571,6 +574,7 @@ $(function(){
 	
 	$(document).on('click','.st-like-btn',function(){
 		var this_event = $(this).parents(".st-sub-box");
+		cns.debug("like this event:",this_event);
 		var like_count = parseInt(this_event.find(".st-sub-box-3 div:eq(0)").html());
 		//按讚 收回 api
 		var target_obj = {};
@@ -598,26 +602,16 @@ $(function(){
     	var parti_list = this_event.data("parti-list");
 
     	//檢查按讚了沒
-    	cns.debug("event-status",event_status[this_ei]);
-		cns.debug("like_chk:",chkEventStatus(this_event,"il"));
-		// return false;
 		//按讚 like_chk是true
 		if(chkEventStatus(this_event,"il")){
 			// $(this).html("收回讚");
 			var est = 1;
 
-			//存入event status
-			// event_status[this_ei].il = true;
-
 			//按讚區域 改寫陣列
 			parti_list.push(gu);
 		}else{
 			//收回
-			// $(this).html("讚");
 			var est = 0;
-
-			//存入event status
-			// event_status[this_ei].il = false;
 
 			//按讚區域 改寫陣列
 			var i = $.inArray(gu,parti_list);
@@ -680,11 +674,16 @@ $(function(){
 
 	//留言
 	$(document).on('click','.st-message',function(){
-		//判斷開啟或關閉
-		var movement = $(".st-reply-message-area").data("movement");
-
 		//設定 this event
 		var this_event = $(this).parents(".st-sub-box");
+
+		if(this_event.data("detail-page")) return false;
+		cns.debug("kerker");
+		//調整寬度
+		this_event.find(".st-reply-message-textarea").css("width",$(window).width()-180);
+		
+		//判斷開啟或關閉
+		var movement = $(".st-reply-message-area").data("movement");
 
 		//開啟detail
 		if(!this_event.data("switch-chk")){
@@ -692,40 +691,6 @@ $(function(){
 		}
 
 		this_event.find(".st-reply-message-area").slideToggle();
-
-		// var new_ei = this_event.data("event-id");
-		// var old_ei = $(".st-reply-message-area").data("event-id");
-
-		//將新的ei 更新進留言區域
-		// $(".st-reply-message-area").data("event-id",new_ei);
-
-		//如果留言區域在沒關閉時就點選新的event => 重新開啟留言區域 然後不執行之後的開關
-		// if(movement == -50 && new_ei != old_ei){
-		// 	$(".st-reply-message-area").css("bottom",-50);
-		// 	$(".st-reply-message-area").animate({bottom:0});
-		// 	return false;
-		// }
-		
-		//動畫結束與否
-		// var animate_chk = $(".st-reply-message-area").data("animate-chk");
-
-		// if(animate_chk){
-		// 	//變成不能開啟狀態
-		// 	$(".st-reply-message-area").data("animate-chk",false);
-
-		// 	$(".st-reply-message-area").animate({bottom:movement},function(){
-		// 		//變成可以開啟狀態
-		// 		$(".st-reply-message-area").data("animate-chk",true);
-
-
-		// 		if(movement == 0){
-		// 			$(".st-reply-message-area").data("movement",-50);
-		// 		}else{
-		// 			$(".st-reply-message-area").data("movement",0);
-		// 		}
-				
-		// 	});
-		// }
 	});
 
 	//留言送出
@@ -857,7 +822,12 @@ $(function(){
 
 	//detail view
 	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2",function(){
+
 		var this_event = $(this).parent();
+
+		//detail頁面 離去
+		if(this_event.data("detail-page")) return false;
+
 		var this_ei = this_event.data("event-id");
 
 		//此則timeline種類
@@ -869,11 +839,13 @@ $(function(){
 		}else{
 			this_event.data("switch-chk",true);
 		}
-
+		cns.debug("st-sub-box-2-content:",this_event.find(".st-sub-box-2-content").is(":visible"));
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp);
 		
+		//重置
 		if(!detail_chk){
+			this_event.find(".st-reply-all-content-area").html("");
 			this_event.find(".st-vote-all-ques-area").html("");
 			return false;
 		}
@@ -1374,7 +1346,6 @@ $(function(){
 		
 	});
 
-	
 	//polling update cnts
 	$(document).on("click",".polling-cnt",function(e){
 		// cns.debug("polling-cnt:",$(this).data("polling-cnt").substring);
@@ -1383,9 +1354,10 @@ $(function(){
 	});	
 
 
-	$(document).on("click",".namecard",function(e){
+	$(document).on("mouseup",".namecard",function(e){
 		e.stopPropagation();
-
+		// var target = $(".al-subbox");
+		// $(document).off("click");
 		$("body").addClass("overflow-hidden");
 
 		cns.debug("main gi:",$(this).data("gi"));
