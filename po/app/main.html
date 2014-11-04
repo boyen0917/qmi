@@ -262,11 +262,28 @@
             </div>
         <!------------------------------------- 聯絡人 ---------------------------------------->
 
-                <div class="subpage-contact">
+                <div class="subpage-contact" style="display:none;">
                     <div class="contact-search">
-                        <div contenteditable="true"></div>
+                        <div class="inputDiv">
+                            <div class="hintDiv">
+                                <img class="icon" src="images/common/icon/icon_search.png"/>
+                                <span class="text" data-textid="INVITE_SEARCH"/>
+                            </div>
+                            <div class="content" style="display:none;">
+                                <img class="icon" src="images/common/icon/icon_search.png"/>
+                                <input type="input" align="middle" class="input" maxlength="20" data-role="none"/>
+                                <img class="clear" src="images/common/icon/icon_search_clean.png"/>
+                            </div>
+                        </div>
                     </div>
 	                <div class="contact-rows top"></div>
+                    <div class="contact-searchResult" style="display:none;">
+                        <div class="container">
+                            <div class="noResult" style="display:none;">No Result...O_Q</div>
+                            <div class="memTitle" data-textid="COMMON_MEMBER"></div>
+                            <div class="branchTitle" data-textid="COMPOSE_SUBGROUP"></div>
+                        </div>
+                    </div>
 	            </div>
 
             <!------------------------------------- 聊天列表 ---------------------------------------->

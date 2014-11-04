@@ -1,6 +1,7 @@
 var bl;
 var guAll;
 var isList = true;
+// var isKeyPress = false;
 
 initContactList = function(){
 	//get user data
@@ -76,7 +77,162 @@ initContactList = function(){
 	rowContainer.find(".row.branch").off("click").click( function(){
 		showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
 	});
-	//是否要做search cache???
+
+	//search bar
+	var searchBar = $(".contact-search .content");
+	var searchBarInput = searchBar.find(".input");
+	searchBarInput.data("searchText","");
+	searchBarInput.off("keyup").keyup( onSearchInput );
+	// searchBarInput.off("keypress").keypress( function(){
+	// 	isKeyPress = true;
+	// });
+	searchBar.find(".clear").off("click").click(deactiveSearch);
+	//若沒有文字的話點別處取消搜尋
+	searchBarInput.off("focusout").focusout( function(){
+		var text = searchBarInput.val();
+		if( !text || text.length==0 ){
+			deactiveSearch();
+		}
+	});
+
+	var searchHint = $(".contact-search .hintDiv");
+	searchHint.off("click").click( function(){
+		$(this).hide();
+		searchBar.show();
+		searchBarInput.focus();
+	});
+}
+
+deactiveSearch = function(){
+	var content = $(".contact-search .content");
+	content.hide();
+	var input = content.find(".input");
+	input.data("searchText","");
+	input.val("");
+	
+	$(".contact-search .hintDiv").show();
+	$(".subpage-contact .contact-rows").show();
+	$(".contact-searchResult").hide();
+	return;
+}
+
+onSearchInput = function(e){
+	var input = $(this);
+	if( input.val().indexOf("\n") >= 0 ){
+		input.val( input.val().replace("/\n/g","") );
+	}
+	var str = input.val();	//+String.fromCharCode(e.keyCode);
+
+	//if no search text, show ori rows
+	if( !str || str.length==0 ){
+		$(".contact-searchResult").hide();
+		$(".subpage-contact .contact-rows").show();
+		return;
+	}
+
+	//for chinese...enter for comfirm chinese triggers no event
+	// if( e.keyCode == '13' || e.keyCode == '8' || e.keyCode == '46'){
+	// 	if( input.val() != input.data("searchText") ){
+	// 		isKeyPress = true;
+	// 	}
+	// }
+
+	//check complete chinese typing
+	// if( !isKeyPress ){
+	// 	cns.debug("(",input.val(),")");
+	// 	return;
+	// }
+	// isKeyPress = false;
+	
+	//return if no text changed
+	if( input.data("searchText")==str ) return;
+	input.data("searchText", str);
+	cns.debug(str);
+
+	//hide ori rows
+	var contact = $(".subpage-contact .contact-rows");
+	var searchResult = $(".subpage-contact .contact-searchResult");
+	if( !str || str.length==0 ){
+		$(".contact-searchResult").hide();
+		$(".subpage-contact .contact-rows").show();
+		return;
+	}
+	if( !searchResult || searchResult.length==0 ){
+		searchResult = $('<div class="contact-searchResult" style="display:none;"></div>');
+		contact.after( searchResult );
+	}
+	searchResult.show();
+	contact.hide();
+
+	//search with no case sensitive
+	str = str.toLowerCase();
+
+	//search mem
+	var memObject = {};
+	var memCount = 0;
+	for( var key in guAll ){
+		var mem = guAll[key];
+		if( null==mem.nk ){
+			cns.debug( JSON.stringify(mem) );
+		} else {
+			if( mem.nk.toLowerCase().indexOf(str)>=0 ){
+				memObject[key] = mem;
+				memCount++;
+			}	
+		}
+	}
+
+	//search bl
+	var branchList = [];
+	for( var key in bl ){
+		var branch = bl[key];
+		if( branch.bn.toLowerCase().indexOf(str)>=0 ){
+			branchList.push(key);
+		}
+	}
+	var branchCount = branchList.length;
+	
+	var memTitle = $(".contact-searchResult .memTitle");
+	var branchTitle = $(".contact-searchResult .branchTitle");
+
+	if( branchCount==0 && memCount==0 ){
+		$(".contact-searchResult .noResult").show();
+		memTitle.hide();
+		branchTitle.hide();
+		$(".contact-searchResult .contact-memLists").hide();
+		$(".contact-searchResult .contact-rows").hide();
+		return;
+	}
+
+	$(".contact-searchResult .noResult").hide();
+
+	if( memCount>0 ){
+		memTitle.show();
+		var memListContainer = $(".contact-searchResult .contact-memLists");
+		if( memListContainer && memListContainer.length>0 ){
+			memListContainer.remove();
+		}
+		memListContainer = showMemberList(memObject);
+		memTitle.after(memListContainer);
+	} else {
+		memTitle.hide();
+	}
+
+	if( branchCount>0 ){
+		branchTitle.show();
+		var branchListContainer = $(".contact-searchResult .contact-rows");
+		if( branchListContainer && branchListContainer.length>0 ){
+			branchListContainer.remove();
+		}
+		branchListContainer = showBranchList( branchList );
+		branchTitle.after(branchListContainer);
+
+		branchListContainer.find(".row.branch").off("click").click( function(){
+			showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
+		});
+	} else {
+		branchTitle.hide();
+	}
 }
 
 showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
@@ -91,9 +247,10 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	var pageID = "page-contact_sub"+parentLevel;
 	var page = $( "#"+pageID );
 	if( !page || page.length==0 ){
-		page = $('<div data-role="page" id="'+pageID+'">'
+		page = $('<div data-role="page" id="'+pageID+'" class="subPage">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+                // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+                +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
@@ -117,12 +274,14 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 
 	page.find(".page-title").html( data.bn );
 	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#"+parentPageID);
-		var tmp = $( "#"+parentPageID );
-		if( tmp && tmp.length>0 && false==tmp.data("gen") ){
-			showSubContactPage( tmp.data("parentPageID"),
-				tmp.data("bi"), tmp.data("lvStackString") );
-		}
+		$(".contact-branchList").hide();
+		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
+		// $.mobile.changePage("#"+parentPageID); //, { transition: "slide", reverse: true}
+		// var tmp = $( "#"+parentPageID );
+		// if( tmp && tmp.length>0 && false==tmp.data("gen") ){
+		// 	showSubContactPage( tmp.data("parentPageID"),
+		// 		tmp.data("bi"), tmp.data("lvStackString") );
+		// }
 	});
 	
 	var subPage = page.find(".subpage-contact");
@@ -137,42 +296,62 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	title.append("<div class='btn'></div>");
 	subPage.append(title);
 
-	nameArea.off("click").click( function(){
-		//show sub divs
-		subbranchList.slideToggle();
-		title.find(".arrow").toggleClass("open");
-	});
 	title.find(".btn").off("click").click( function(){
 		switchListAndGrid( $(this), subPageBottom );
 	});
 
 	//sub branch list
-	var subbranchList = $('<div class="contact-branchList" style="display:none;"></div>');
-	showSubbranchList( subbranchList, data.lv, bi, JSON.stringify([]) );
-	subbranchList.find(".row.list").off("click").click( function(){
-		//產生目前的頁面到指定階層中間的頁面, 除最後一頁外其餘內容留空, 走到那頁時才產
-		var stackString = $(this).data("stack");
-		var currentStack = lvStack.slice(0);
-		if( stackString && stackString.length > 0 ){
-			var stackTmp = $.parseJSON(stackString);
-			var currentStackLvl = parentLevel;
-			for( var i=1; i<stackTmp.length-1; i++ ){
+	cns.debug( parentLevel );
+	var subbranchList = $(".contact-branchList");
+	if( subbranchList.length==0 || parentLevel==1 ){
+		subbranchList.remove();
+		subbranchList = $('<div class="contact-branchList" style="display:none;"></div>');
+		showSubbranchList( subbranchList, data.lv, bi, JSON.stringify([]) );
+
+		subbranchList.find(".row:nth-child(1)").addClass("current");
+
+		subbranchList.find(".row.list").off("click").click( function(){
+			cns.debug( $(this).data("bi") );
+			//產生目前的頁面到指定階層中間的頁面, 除最後一頁外其餘內容留空, 走到那頁時才產
+			var stackString = $(this).data("stack");
+			var currentStack = lvStack.slice(0);
+			if( stackString && stackString.length > 0 ){
+				var stackTmp = $.parseJSON(stackString);
+				var currentStackLvl = parentLevel;
+				
 				var pageIDTmp = "page-contact_sub"+currentStackLvl;
-				showSubContactPage( pageIDTmp, stackTmp[i], JSON.stringify(currentStack), false );
-				if( bl.hasOwnProperty(stackTmp[i]) ){
-					currentStack.push( bl[stackTmp[i]].bn );
-				} else currentStack.push( stackTmp[i] );
-				currentStackLvl++;
+				showSubContactPage( pageIDTmp, stackTmp[stackTmp.length-1], JSON.stringify(currentStack) );
+
+				// for( var i=1; i<stackTmp.length-1; i++ ){
+				// 	var pageIDTmp = "page-contact_sub"+currentStackLvl;
+				// 	showSubContactPage( pageIDTmp, stackTmp[i], JSON.stringify(currentStack), false );
+				// 	if( bl.hasOwnProperty(stackTmp[i]) ){
+				// 		currentStack.push( bl[stackTmp[i]].bn );
+				// 	} else currentStack.push( stackTmp[i] );
+				// 	currentStackLvl++;
+				// }
+				// var pageIDTmp = "page-contact_sub"+currentStackLvl;
+				// showSubContactPage( pageIDTmp, stackTmp[i], JSON.stringify(currentStack) );
 			}
-			var pageIDTmp = "page-contact_sub"+currentStackLvl;
-			showSubContactPage( pageIDTmp, stackTmp[i], JSON.stringify(currentStack) );
-		}
-		//避免回來時看到開著的列表, 把列表卷上去
-		// subbranchList.slideUp();
-		subbranchList.css("display","none");
-		title.find(".arrow").removeClass("open");
+			//避免回來時看到開著的列表, 把列表卷上去
+			// subbranchList.slideUp();
+			subbranchList.css("display","none");
+			title.find(".arrow").removeClass("open");
+		});
+		page.after(subbranchList);
+	}
+	else {
+		var parentRow = subbranchList.find(".row.current");
+		parentRow.removeClass("current");
+		var current = subbranchList.find(".row."+bi);
+		current.addClass("current");
+	}
+
+	nameArea.off("click").click( function(){
+		//show sub divs
+		subbranchList.slideToggle();
+		title.find(".arrow").toggleClass("open");
 	});
-	subPage.append(subbranchList);
 
 	// title.off("click").click( function(){
 	// 	if( parentLevel==1 ){
@@ -249,29 +428,18 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 		subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_SUBGROUP", "")+'</div>');
 		subPageBottom.append( subTitle );
 
-		var branch = $("<div class='contact-rows'></div>");
-		for(var i=0; i<childList.length; i++ ){
-			var key = childList[i];
-			var childData = bl[key];
-			if( childData ){
-				var tmp = $("<div class='row branch'><div class='left'></div><div class='right'></div></div>");
-				var left = tmp.find(".left");
-				left.append("<div class='name'>"+childData.bn+"</div>");
-				left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", 0)+"</div>");
-				if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
-				
-				tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
-				tmp.data("bi", key );
-				
-				branch.append(tmp);
-			}
-		}
+		var branch = showBranchList(childList);
 		subPageBottom.append(branch);
 		subPageBottom.find(".row.branch").off("click").click( function(){
 			showSubContactPage( pageID, $(this).data("bi"), JSON.stringify(lvStack) );
 		});
 	}
-	$.mobile.changePage("#"+pageID);
+	//第一頁滑進來, 其餘用fade
+	if( "page-group-main"== parentPageID ){
+		$.mobile.changePage("#"+pageID, { transition: "slide", reverse: false} );
+	} else {
+		$.mobile.changePage("#"+pageID);
+	}
 }
 
 showSubbranchList = function( dom, startLvl, bi, stackString ){
@@ -280,12 +448,13 @@ showSubbranchList = function( dom, startLvl, bi, stackString ){
 	stack.push(bi);
 	stackString = JSON.stringify(stack);
 	var data = bl[bi];
-	var tmp = $("<div class='row list _"+(data.lv-startLvl+1)+"'><div class='left'></div><div class='right'>"+data.lv+"</div></div>");
+	var tmp = $("<div class='row list _"+(data.lv-startLvl+1)+" "+bi+"'><div class='left'></div><div class='right'>"+data.lv+"</div></div>");
 	var left = tmp.find(".left");
 	left.append("<div class='name'>"+data.bn+"</div>");
 	// left.append("<div class='name'>拉拉拉拉拉拉拉拉拉拉拉拉+</div>");
 	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", 0)+"</div>");
 	tmp.data("stack", stackString);
+	tmp.data("bi", bi);
 	tmp.css("padding-left",((Math.min(11,data.lv-startLvl)+1)*20)+"px");
 	if( startLvl== data.lv ) dom.append(tmp);
 	else dom.after(tmp);
@@ -310,14 +479,14 @@ showAllMember = function(gn) {
             +'</div><div class="subpage-contact"></div></div>');
 		$("#page-group-main").after(page);
 	} else if( gi==page.data("gi") ){
-		$.mobile.changePage("#"+pageID);
+		$.mobile.changePage("#"+pageID, { transition: "slide"});
 		return;
 	}
 	page.data("gi", gi);
 
 	page.find(".page-title").html( $.i18n.getString("MEMBER_ALL") );
 	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#page-group-main");
+		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 	});
 	
 	var subPage = page.find(".subpage-contact");
@@ -371,7 +540,7 @@ showAllMember = function(gn) {
 		subTitle.find(".count").html(count);
 	}
 
-	$.mobile.changePage("#"+pageID);
+	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
 showFavorite = function(){
@@ -394,21 +563,45 @@ showFavorite = function(){
 
 	page.find(".page-title").html( $.i18n.getString("COMMON_FAVORIATE") );
 	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#page-group-main");
+		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 	});
 	
 	var subPage = page.find(".subpage-contact");
 	subPage.html("");
 
-	//title
+	//----- title -----
 	var title = $("<div class='contact-titleBar'></div>");
 	var nameArea = $("<div class='nameArea'></div>");
 	nameArea.append("<div class='name'>"+$.i18n.getString("COMMON_FAVORIATE")+"</div>");
 	// nameArea.append("<div class='arrow'></div>");
 	title.append(nameArea);
+	title.append("<div class='btnExtra'></div>");
 	title.append("<div class='btn'></div>");
 	subPage.append(title);
 
+	//---- extra ------
+	var extra = $("<div class='contact-extra'></div>");
+	subPage.append(extra);
+	extra.css("display","none");
+	//btn
+	//content
+	var extraContent = $("<div class='content'></div>");
+	extraContent.append("<div class='btn addGroup' align='center'><div class='img'></div><div class='text'>"+$.i18n.getString("MEMBER_CREATE_CUSTOMIZE_GROUP")+"</div></div>");
+	extra.append( extraContent );
+
+	extra.off("click").click( function(){
+		extra.fadeToggle('fast');
+	});
+	extraContent.off("click").click( function(e){
+    	e.stopPropagation();
+		cns.debug("!");
+	});
+	extraContent.find(".btn.addGroup").off("click").click( function(e){
+    	e.stopPropagation();
+		showAddGroup( subPage );
+	});
+
+	//---- part below title bar -----
 	var subPageBottom = $('<div class="contact-scroll"></div>');
 	subPage.append(subPageBottom);
 
@@ -419,6 +612,9 @@ showFavorite = function(){
 	// });
 	title.find(".btn").off("click").click( function(){
 		switchListAndGrid( $(this), subPageBottom );
+	});
+	title.find(".btnExtra").off("click").click( function(){
+		extra.fadeToggle('fast');
 	});
 
 	//mem-title
@@ -455,7 +651,7 @@ showFavorite = function(){
 		subTitle.find(".count").html(count);
 	}
 
-	$.mobile.changePage("#"+pageID);
+	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
 switchListAndGrid = function( dom, subPageBottom ){
@@ -484,13 +680,19 @@ showMemberGrid = function( memObject ){
 	$.each(memObject,function(key,mem){
 		var tmp = $("<div class='mem namecard'></div>");
 		if( mem.aut && mem.aut.length>0 ){
-			tmp.append("<div class='img' style='background-image:url("+mem.aut+")'></div>");
+			tmp.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
 		} else {
 			tmp.append("<div class='img'></div>");
 		}
 		tmp.append("<div class='name'>"+mem.nk+"</div>");
 		tmp.data("gu",key);
-		memContainer.append(tmp);
+		//is admin?
+		if( mem.ad==1 ){
+			tmp.addClass("admin");
+			memContainer.prepend(tmp);
+		} else {
+			memContainer.append(tmp);
+		}
 	});
 	return memContainer;
 }
@@ -498,62 +700,145 @@ showMemberList = function( memObject, favCallback ){
 	var memContainer = $("<div class='contact-memLists'></div>");
 	var count = 0;
 	$.each(memObject,function(key,mem){
-		var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
+		//favorite ver.
+		// var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
+		var tmp = $("<div class='row mem namecard'><div class='left namecard'></div><div class='mid'></div><div class='right'>&nbsp</div></div>");
 		//pic
 		var left = tmp.find(".left");
 		if( mem.aut && mem.aut.length>0 ){
-			left.append("<div class='img' style='background-image:url("+mem.aut+")'></div>");
+			left.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
 		} else {
 			left.append("<div class='img'></div>");
 		}
 		//name, ?
 		var mid = tmp.find(".mid");
 		mid.append("<div class='name'>"+mem.nk+"</div>");
-		mid.append("<div class='detail'>職稱？群組？or?</div>");
-		//favorite
-		var right = tmp.find(".right");
-		var fav = $("<div class='fav'></div>");
-		if( mem && true==mem.fav ){
-			right.addClass("active", true);
+		mid.append("<div class='detail'>職稱, 心情留言</div>");
+
+		//favorite disabled, remove '.namecard' of .right before enable this
+		////favorite
+		// var right = tmp.find(".right");
+		// var fav = $("<div class='fav'></div>");
+		// if( mem && true==mem.fav ){
+		// 	right.addClass("active", true);
+		// }
+		// right.append(fav);
+
+		// right.data("gu",key);
+		// left.data("gu",key);
+		// mid.data("gu",key);
+		tmp.data("gu",key)
+
+
+		//is admin?
+		if( mem.ad==1 ){
+			tmp.addClass("admin");
+			memContainer.prepend(tmp);
+		} else {
+			memContainer.append(tmp);
 		}
-		right.append(fav);
-
-		left.data("gu",key);
-		mid.data("gu",key);
-		right.data("gu",key);
-
-		memContainer.append(tmp);
 	});
 
-	memContainer.find(".right").off("click").click( function(){
-		var thisTmp = $(this);
-		if( thisTmp.hasClass("sending") ) return;
-		thisTmp.addClass("sending");
-		var gu = thisTmp.data("gu");
-		cns.debug(gu);
-		if( !gu ) return;
+	////favorite click(disabled)
+	// memContainer.find(".right").off("click").click( function(){
+	// 	var thisTmp = $(this);
+	// 	if( thisTmp.hasClass("sending") ) return;
+	// 	thisTmp.addClass("sending");
+	// 	var gu = thisTmp.data("gu");
+	// 	cns.debug(gu);
+	// 	if( !gu ) return;
 
-		var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
-	    var headers = {
-	             "ui":ui,
-	             "at":at, 
-	             "li":lang,
-	                 };
-		ajaxDo(api_name,headers,"put",true,null).complete(function(data){
-			thisTmp.removeClass("sending");
-			if(data.status == 200){
-				//save to db
-				var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
-				cns.debug("add:",isAdded);
-				thisTmp.toggleClass("active", isAdded);
-				var data = $.lStorage(ui);
-				data[gi].guAll[gu].fav = isAdded;
-				guAll = data[gi].guAll;
-				$.lStorage(ui, data);
-			}
-			if( favCallback ) favCallback();
-		});
-	});
+	// 	var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
+	//     var headers = {
+	//              "ui":ui,
+	//              "at":at, 
+	//              "li":lang,
+	//                  };
+	// 	ajaxDo(api_name,headers,"put",true,null).complete(function(data){
+	// 		thisTmp.removeClass("sending");
+	// 		if(data.status == 200){
+	// 			//save to db
+	// 			var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
+	// 			cns.debug("add:",isAdded);
+	// 			thisTmp.toggleClass("active", isAdded);
+	// 			var data = $.lStorage(ui);
+	// 			data[gi].guAll[gu].fav = isAdded;
+	// 			guAll = data[gi].guAll;
+	// 			$.lStorage(ui, data);
+	// 		}
+	// 		if( favCallback ) favCallback();
+	// 	});
+	// });
 
 	return memContainer;
+}
+
+showBranchList = function( childList ){
+	var branch = $("<div class='contact-rows'></div>");
+	for(var i=0; i<childList.length; i++ ){
+		var key = childList[i];
+		var childData = bl[key];
+		if( childData ){
+			var tmp = $("<div class='row branch'><div class='left'></div><div class='right'></div></div>");
+			var left = tmp.find(".left");
+			left.append("<div class='name'>"+childData.bn+"</div>");
+			left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", 0)+"</div>");
+			if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
+			
+			tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+			tmp.data("bi", key );
+			
+			branch.append(tmp);
+		}
+	}
+	return branch;
+}
+
+showAddGroup = function( subPage ){
+	var container = $(".contact-createSubgroup");
+	if( container.length==0 ){
+		subPage.append("<div class='contact-createSubgroup' style='display:none;' data-init='f'>"
+            +"<table class='innerContainer'>"
+                +"<tr><td class='title' data-textid='MEMBER_CREATE_CUSTOMIZE_GROUP'></td></tr>"
+                +"<tr><td><input class='input'/></td></tr>"
+                +"<tr><td class='cancel' data-textid='COMMON_CANCEL'></td>"
+                    +"<td class='create cp-custom-subgroup' data-textid='MEMBER_CREATE'></td></tr>"
+            +"</table></div>");
+		container = subPage.find(".contact-createSubgroup");
+		container._i18n();
+
+		//name input
+		var input = container.find(".input");
+		input.attr("placeholder", $.i18n.getString("MEMBER_CUSTOMIZE_GROUP_NAME") );
+		
+		container.off("click").click( function(){
+			container.fadeOut();
+			cns.debug("1");
+		});
+		container.find("table").off("click").click( function(e){
+			// e.stopPropagation();
+			cns.debug("2");
+		});
+
+		container.find(".cancel").off("click").click( function(e){
+			e.stopPropagation();
+			container.fadeOut();
+			input.val("");
+			cns.debug("3");
+		});
+
+		composeObjectShow( container.find(".create") );
+		
+		// container.find(".create").off("click").click( function(e){
+		// 	e.stopPropagation();
+		// 	cns.debug( "create", input.val() );
+		// 	input.val("");
+		// 	// container.fadeOut();
+		// 	cns.debug("4");
+		// });
+	}
+	container.fadeToggle();
+
+	var extra = subPage.find(".contact-extra");
+	extra.fadeToggle('fast');
 }

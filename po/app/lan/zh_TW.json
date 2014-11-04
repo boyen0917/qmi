@@ -15,6 +15,10 @@
 
 	"MEMBER_ALL" : "全部",
 	"MEMBER_X_GROUP_NO_MEMBER": "%@目前沒有成員",
+	"MEMBER_CREATE_CUSTOMIZE_GROUP" : "新增自定群組",
+	"MEMBER_CREATE" : "新增",
+	"MEMBER_CUSTOMIZE_GROUP_NAME": "群組名稱",
+	"INVITE_SEARCH" : "搜尋",
 
 	"COMMON_SELECT_MEMBERS"  				: "選擇對象",
 	"COMMON_NEXT"  					: "下一步",
@@ -31,6 +35,7 @@
 	"COMMON_YOU"							: "你",
 	"COMMON_SELF"						: "自己",
 	"COMMON_FAVORIATE" : "我的最愛",
+	"COMMON_CANCEL" : "取消",
 
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",
