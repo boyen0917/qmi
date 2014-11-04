@@ -274,7 +274,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 
 	page.find(".page-title").html( data.bn );
 	page.find(".page-back").off("click").click(function(){
-		$(".contact-branchList").hide();
+		$(".contact-branchList").remove();
 		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 		// $.mobile.changePage("#"+parentPageID); //, { transition: "slide", reverse: true}
 		// var tmp = $( "#"+parentPageID );
