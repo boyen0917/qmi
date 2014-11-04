@@ -171,6 +171,7 @@ showAlertContent = function(data){
 
 			var boxData = data[i];
 
+
 			/* ----------- TODO: 檢查是否已show過 ------------ */
 
 			var tmpDiv = $(this).clone();
@@ -181,7 +182,7 @@ showAlertContent = function(data){
 				//群組名
 			    tmp = $(tmpDiv).find(".al-post-group");
 			    if( tmp ) tmp.html( group.gn.replaceOriEmojiCode() );
-			    cns.debug( htmlFormat(group.gn) );
+			    // cns.debug( htmlFormat(group.gn) );
 			}
 
 		    var content;
@@ -281,18 +282,27 @@ showAlertContent = function(data){
 			tmpDiv.data("gi", boxData.gi);
 			tmpDiv.data("ei", boxData.nd.ei);
 			$(tmpDiv).click(function(){
-				// var this_gi = $(this).data("gi");
-				// var this_ei = $(this).data("ei");
-				// // alert( "gi:"+$(this).data("gi")+", ei:"+$(this).data("ei") );
-				// hideAlertBox(true);
-				// $(".alert").removeClass("alert-click");
-	   //  		$(".alert-area").slideUp("fast",function(){
-	   //  			setTimeout(function(){
-		  //   			$.mobile.changePage("#page-timeline-detail", {transition: "slide"});
-				// 		eventDetailShow(this_gi,this_ei);	
-				// 	},100);
-	   //  		});
-				
+
+				var this_gi = $(this).data("gi");
+				var this_ei = $(this).data("ei");
+				cns.debug("this_gi:",this_gi);
+				cns.debug("this_ei:",this_ei);
+				if(Object.keys($.lStorage(ui)[this_gi].guAll).length == 0){
+					cns.debug("no guall",$.lStorage(ui)[this_gi]);
+					var data_arr = ["eventDetail",$(this)];
+		        	setGroupAllUser(data_arr,this_gi);
+		        	return false;
+		        }
+
+				hideAlertBox(true);
+
+				$(".alert").removeClass("alert-click");
+	    		$(".alert-area").slideUp("fast",function(){
+	    			setTimeout(function(){
+		    			$.mobile.changePage("#page-timeline-detail", {transition: "slide"});
+						eventDetailShow(this_gi,this_ei);	
+					},100);
+	    		});
 			});
 
 			//取代中文
@@ -394,7 +404,7 @@ setDetailAct = function( dom ){
 	dom.find('.detail').css("display","inline-block");
 	var tmp = dom.find('.sendFile');
 	if( tmp ){
-		cns.debug( textAndHtmlFormat( $.i18n.getString("NOTICES_UPLOAD_FILE") ) );
+		// cns.debug( textAndHtmlFormat( $.i18n.getString("NOTICES_UPLOAD_FILE") ) );
 		tmp.html( "<label class='and'>並</label>上傳了檔案" );
 	};
 }
