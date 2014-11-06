@@ -493,23 +493,23 @@ $(function(){
 		timelineListWrite();
 	});
 
-	//綁定點選公告事件
-	$(document).on("click",".st-top-event",function(){
-		var this_top_event = $(this);
-		var event_tp = $("#page-group-main").data("navi") || "00";
-    	var selector = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box");
+	// //綁定點選公告事件
+	// $(document).on("click",".st-top-event",function(){
+	// 	var this_top_event = $(this);
+	// 	var event_tp = $("#page-group-main").data("navi") || "00";
+ //    	var selector = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box");
 
-    	selector.each(function(){
-    		var this_event = $(this);
-    		cns.debug("ei:",this_event.data("event-id"));
-    		if(this_event.data("event-id") == this_top_event.data("data-obj").ei){
-    			cns.debug("this event data:",this_event.data());	
-    		}
-    	});
-		// cns.debug("this event data:",$(this).data("data-obj"));
+ //    	selector.each(function(){
+ //    		var this_event = $(this);
+ //    		cns.debug("ei:",this_event.data("event-id"));
+ //    		if(this_event.data("event-id") == this_top_event.data("data-obj").ei){
+ //    			cns.debug("this event data:",this_event.data());	
+ //    		}
+ //    	});
+	// 	// cns.debug("this event data:",$(this).data("data-obj"));
 
-		// cns.debug("event:",selector);
-	});
+	// 	// cns.debug("event:",selector);
+	// });
 
 	//主要filter
 	$(".st-filter-main").click(function(){
@@ -1226,7 +1226,7 @@ $(function(){
 		$(this).attr("src","images/common/icon/bt_close_activity.png");
 	});
 	$(document).on("mouseup",".user-info-close",function(){
-		$("body").removeClass("overflow-hidden");
+		$("body").removeClass("user-info-adjust");
 
 		//reset
 		$(".user-info-load-area > div").html("");
@@ -1356,19 +1356,10 @@ $(function(){
 
 	$(document).on("mouseup",".namecard",function(e){
 		e.stopPropagation();
-		// var target = $(".al-subbox");
-		// $(document).off("click");
-		$("body").addClass("overflow-hidden");
+		//鈴鐺頁面不動作
+		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);
 
-		cns.debug("main gi:",$(this).data("gi"));
 		userInfoShow($(this).data("gi"),$(this).data("gu"));
-
-		setTimeout(function(){
-			$(".user-avatar > img").stop().animate({
-				opacity:1
-			},500);
-		},300);
-			
 	});
 	
 	//$(document).on("timeupdate",".st-attach-audio audio",function(){

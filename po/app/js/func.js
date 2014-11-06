@@ -560,6 +560,7 @@ $(function(){
         				var this_top_event = $(this);
         				this_top_event.data("data-obj",val);
         				this_top_event.data("pos",i);
+
         				//圖片及類型
         				this_top_event.find(".st-top-event-l img").attr("src",this_top_obj.src);
         				this_top_event.find(".st-top-event-l div").html(this_top_obj.name);
@@ -581,6 +582,13 @@ $(function(){
 	    						topBarMake(top_area,top_msg_num);
 	    					},500);
 	    				}
+
+                        //event 
+                        this_top_event.click(function(){
+                            cns.debug("hehehe:",$(this).data("data-obj"));
+                            $.mobile.changePage("#page-timeline-detail", {transition: "slide"});
+                            eventDetailShow($(this).data("data-obj").ei);   
+                        });
         			}));
 					// return false;
         		});
@@ -3600,7 +3608,6 @@ $(function(){
 
             var content,box_content,youtube_code,prelink_pic,prelink_title,prelink_desc;
 
-
             //detail 不需要
             if(!detail){
                 method = "append";
@@ -3639,9 +3646,6 @@ $(function(){
 
             var tp = val.meta.tp.substring(1,2)*1;
 
-            //名片使用
-            this_event.find(".st-user-pic.namecard").data("gi",val.ei.split("_")[0]);
-            this_event.find(".st-user-pic.namecard").data("gu",val.meta.gu);
 
             //detail 不需要
             if(!detail){
@@ -3665,6 +3669,9 @@ $(function(){
             this_event.data("parti-list",[]);
             this_event.data("ct",val.meta.ct);
 
+            //名片使用
+            this_event.find(".st-user-pic.namecard").data("gi",val.ei.split("_")[0]);
+            this_event.find(".st-user-pic.namecard").data("gu",val.meta.gu);
 
             if(detail){
                 $(".timeline-detail").fadeIn("fast");
@@ -4101,8 +4108,18 @@ $(function(){
 					this_event.find(target_div + "-detail").html(c[1]);
 					break;
 				case 1://網址 寫在附檔區域中
+
+                    if(val.c){
+                        this_event.find(".st-attach-url").click(function(){
+                            window.open(val.c);
+                        });
+                    }
+
+                    if(!val.d && !val.i && !val.t) return false;
+
 					this_event.find(".st-attach-url").show();
-					
+					this_event.find(".st-sub-box-2-attach-area").show();
+
 					if(val.i) {
 						this_event.find(".st-attach-url-img").show();
 						this_event.find(".st-attach-url-img img").attr("src",val.i);
@@ -4115,10 +4132,6 @@ $(function(){
 					
 					this_event.find(".st-attach-url-title").html(val.t);
 					this_event.find(".st-attach-url-desc").html(val.d);
-
-					this_event.find(".st-attach-url").click(function(){
-						window.open(val.c);
-					});
 
 					break;
 				case 2:
@@ -4640,9 +4653,6 @@ $(function(){
 	}
 	//parse 網址
 	getLinkMeta = function (this_compose,url) {
-		cns.debug("getLinkMeta");
-		// clearTimeout(activityTimeout);
-		// activityTimeout = setTimeout(function(){
 
 		var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
 		cns.debug("url:",q);
@@ -4653,7 +4663,7 @@ $(function(){
 	        success: function(data, textStatus) {
 	            var result = {};
 	            var tmp_img,tmp_desc;
-	            cns.debug("data:",data)
+	            cns.debug("data:",data);
 
 	            //error存在 就跳出
 	            if(data.error) return false;
@@ -4804,6 +4814,9 @@ $(function(){
 
 
 	replySend = function(this_event){
+        var this_ei = this_event.data("event-id");
+        var this_gi = this_ei.split("_")[0];
+        var this_ti = this_ei.split("_")[1];
 
 		var body = {
 			"meta" : {
@@ -4818,7 +4831,7 @@ $(function(){
 			]
 		};
 
-		var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
+		var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events?ep=" + this_ei;
 
         var headers = {
                  "ui":ui,
@@ -4939,9 +4952,6 @@ $(function(){
                 //gcnts 做合併
                 new_pollingData.gcnts = $.extend(local_pollingData.gcnts,new_pollingData.gcnts);
 
-                // cns.debug("after polling_data:",JSON.stringify(new_pollingData,null,2));
-
-
                 //暫存
                 if(!$.lStorage("_tmpPollingData"))
                 	$.lStorage("_tmpPollingData",new_pollingData);
@@ -5010,10 +5020,12 @@ $(function(){
                         // 因為現在polling邏輯有問題 暫時關閉timeline 更新
 	    				// var polling_arr = [val.pm.gi,val.pm.ti];
 	    				
-	    				// if(val.pm.gi == gi && window.location.hash == "#page-group-main") {
-	    				// 	cns.debug("polling update timeline");
-	    				// 	polling_arr = false;
-	    				// }
+	    				if(val.pm.gi == gi && window.location.hash == "#page-group-main") {
+	    					cns.debug("polling update timeline");
+	    					polling_arr = false;
+
+                            idbPutTimelineEvent("",false,polling_arr);
+	    				}
 
 	    				// idbPutTimelineEvent("",false,polling_arr);
 	    				break;
@@ -5161,7 +5173,6 @@ $(function(){
     userInfoShow = function(this_gi,this_gu){
     	
         if(!this_gu) return false;
-
         var this_gi = this_gi || gi;
 
     	$(".screen-lock").show();
@@ -5173,20 +5184,32 @@ $(function(){
     		//為了美觀
 			this_info.find(".user-avatar-bar").hide();
 
+            if(this_gu == gu){
+                //css 調整
+                $(".user-info-load-area .me").addClass("me-rotate");
+                this_info.find(".action-chat").hide();
+                
+            }else{
+                //css 調整
+                $(".user-info-load-area .me").removeClass("me-rotate");
+                this_info.find(".action-edit").hide();
+            }
+
     		getUserInfo([{gi:this_gi,gu:this_gu}],function(user_data){
 	    			
     			if(user_data){
+                    $("body").addClass("user-info-adjust");
+
     				//為了美觀
     				this_info.find(".user-avatar-bar").show();
 
 			    	//頭像
 	        		if(user_data.aut){
-	        			$(".user-avatar .default").attr("src",user_data.auo);
+	        			$(".user-avatar .user-pic").attr("src",user_data.auo);
 	        			$(".user-avatar").data("auo",user_data.auo);
 
 	        			//400存在css media min-width中 
-	        			userInfoAvatarPos($(".user-avatar > img"));
-	        			$(".user-avatar .default").removeClass("default");
+	        			userInfoAvatarPos($(".user-avatar .user-pic"));
 	        		}
 
 	        		//存local storage
@@ -5194,23 +5217,13 @@ $(function(){
 	        		_groupList[this_gi].guAll[this_gu] = user_data;
 	        		$.lStorage(ui,_groupList);
 
+                    if(this_gu == gu) meInfoShow(user_data);
+
 	        		userInfoDataShow(this_gi,this_info,user_data);
-
-	        		if(this_gu == gu){
-			    		//css 調整
-			    		$(".user-info-load-area .me").addClass("me-rotate");
-
-			    		this_info.find(".action-chat").hide();
-			    		meInfoShow(user_data);
-			    		
-			    	}else{
-			    		//css 調整
-			    		$(".user-info-load-area .me").removeClass("me-rotate");
-			    		this_info.find(".action-edit").hide();
-			    	}
 
 	        		userInfoEvent(this_info);
 	        	}else{
+
 		    		this_info.data("avatar-chk",false);
 	        		$(".screen-lock").fadeOut("fast");
 	        		this_info.fadeOut("fast");
@@ -5245,6 +5258,7 @@ $(function(){
 				}
 
 				if(!me && item == "bd") {
+                    cns.debug("user_data",user_data);
 					user_data.bd = user_data.bd.substring(4,6) + "." + user_data.bd.substring(6,8);
 					method = "append";
 				}
@@ -5354,7 +5368,7 @@ $(function(){
 	    			},300);
 	    		});
 			}
-			img.src = $(this).find("img:eq(0)").attr("src");
+			img.src = $(this).find(".user-pic").attr("src");
     	});	
 
     	this_info.find(".user-avatar-bar").click(function(e){
@@ -5362,6 +5376,7 @@ $(function(){
     	});
 
     	if(me){
+
 	    	this_info.find(".user-avatar-bar.me .upload").click(function(){
 	    		this_info.find(".user-avatar-bar.me input").trigger("click");
 	    	});
@@ -5530,8 +5545,8 @@ $(function(){
                 img.css("opacity",0);
 			}
 
-            setTimeout(function(){
-                img.css("opacity",1);
+            img.stop().animate({
+                opacity:1
             },300);
         });
     }
@@ -5578,7 +5593,8 @@ $(function(){
         });
     };
 
-    eventDetailShow = function(this_gi,this_ei){
+    eventDetailShow = function(this_ei){
+        var this_gi = this_ei.split("_")[0];
         $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
             var this_event = $(this).find(".st-sub-box");
             $(".timeline-detail").html(this_event).hide();

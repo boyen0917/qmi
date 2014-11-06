@@ -10,12 +10,8 @@
 	min-height: 55px;
 }
 
-body {
-	-webkit-perspective: 1000;
-}
-
 .fixed-initial {
-	-webkit-transform: translate3d(0,0,0);
+	/*-webkit-transform: translate3d(0,0,0);*/
 }
 
 /* 為了名片的翻轉 */
@@ -3463,6 +3459,10 @@ input.cp-datetimepicker-end {
 	color: #777;
 }
 
+.user-info-adjust {
+	overflow: hidden;
+	-webkit-perspective: 1000;
+}
 
 .user-info-load-area {
 	display: none;
@@ -3550,10 +3550,7 @@ input.cp-datetimepicker-end {
 	cursor: pointer;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
-}
-
-.user-avatar > img{
-	opacity: 0;
+	-webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
 }
 
 .user-avatar-bar {
@@ -3599,6 +3596,12 @@ img.default {
 	width: 250px;
 	margin: 0 auto;
 	display: block;
+}
+
+.user-avatar .user-pic {
+	opacity: 0;
+	position: absolute;
+	top: 0;
 }
 
 .user-info-list-area.me-list {
