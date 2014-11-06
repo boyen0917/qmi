@@ -281,12 +281,15 @@ showAlertContent = function(data){
 
 			tmpDiv.data("gi", boxData.gi);
 			tmpDiv.data("ei", boxData.nd.ei);
-			$(tmpDiv).click(function(){
+			tmpDiv.click(function(){
+				if($(this).find(".al-subbox").data("stop")) {
+					$(this).find(".al-subbox").data("stop",false);
+					return false;	
+				} 
 
 				var this_gi = $(this).data("gi");
 				var this_ei = $(this).data("ei");
-				cns.debug("this_gi:",this_gi);
-				cns.debug("this_ei:",this_ei);
+				
 				if(Object.keys($.lStorage(ui)[this_gi].guAll).length == 0){
 					cns.debug("no guall",$.lStorage(ui)[this_gi]);
 					var data_arr = ["eventDetail",$(this)];
@@ -300,7 +303,7 @@ showAlertContent = function(data){
 	    		$(".alert-area").slideUp("fast",function(){
 	    			setTimeout(function(){
 		    			$.mobile.changePage("#page-timeline-detail", {transition: "slide"});
-						eventDetailShow(this_gi,this_ei);	
+						eventDetailShow(this_ei);	
 					},100);
 	    		});
 			});

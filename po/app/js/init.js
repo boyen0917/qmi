@@ -49,8 +49,8 @@ $(function(){
 		".st-sub-box-2-attach-area"
 	];
 	
-	//timeline內容 判斷不開啓附檔區域的type
-	not_attach_type_arr = [0,12,13,14,15];
+	//timeline內容 判斷不開啓附檔區域的type ;1是網址 但要另外判斷
+	not_attach_type_arr = [0,1,12,13,14,15];
 	
 	//顯示loading 圖示 的參數
 	load_show = false;
