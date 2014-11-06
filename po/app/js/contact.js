@@ -1,5 +1,6 @@
 var bl;
 var guAll;
+var fbl;
 var isList = true;
 // var isKeyPress = false;
 
@@ -19,6 +20,8 @@ initContactList = function(){
 	bl = group.bl;
 	if( !bl ) return;
 
+	fbl = group.fbl;
+
 	//get mem data
 	guAll = group.guAll;
 	if( !guAll ) return;
@@ -32,22 +35,23 @@ initContactList = function(){
 	var tmp = $("<div class='row all'><div class='left'></div><div class='right'></div></div>");
 	var left = tmp.find(".left");
 	left.append("<div class='name'>"+$.i18n.getString("MEMBER_ALL")+"</div>");
-	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",0)+"</div>");
+	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",Object.keys(guAll).length)+"</div>");
 	tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
 	rowContainer.append(tmp);
 	rowContainer.find(".row.all").off("click").click( function(){
-		showAllMember(group.gn) 
+		showAllMemberPage(group.gn) 
 	});
 
 	//add row favorite
 	var tmp = $("<div class='row favorite'><div class='left'></div><div class='right'></div></div>");
 	var left = tmp.find(".left");
+	var branchCount = Object.keys(fbl).length;
 	left.append("<div class='name'>"+$.i18n.getString("COMMON_FAVORIATE")+"</div>");
-	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",0)+"</div>");
-	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", 0)+"</div>");
+	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",(group.favCnt)?group.favCnt:0 )+"</div>");
+	if(branchCount>0) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", branchCount)+"</div>");
 	tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
 	rowContainer.append(tmp);
-	rowContainer.find(".row.favorite").off("click").click( showFavorite );
+	rowContainer.find(".row.favorite").off("click").click( showFavoritePage );
 
 	//set title
 	$("#page-group-main").find(".page-title").html( group.gn );
@@ -64,7 +68,7 @@ initContactList = function(){
 				var tmp = $("<div class='row branch'><div class='left'></div><div class='right'></div></div>");
 				var left = tmp.find(".left");
 				left.append("<div class='name'>"+bl_obj.bn+"</div>");
-				left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", 0)+"</div>");
+				left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", bl_obj.cnt)+"</div>");
 				if( bl_obj.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", bl_obj.cl.length)+"</div>");
 				
 				tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
@@ -212,7 +216,7 @@ onSearchInput = function(e){
 		if( memListContainer && memListContainer.length>0 ){
 			memListContainer.remove();
 		}
-		memListContainer = showMemberList(memObject);
+		memListContainer = generateMemberList(memObject);
 		memTitle.after(memListContainer);
 	} else {
 		memTitle.hide();
@@ -224,7 +228,7 @@ onSearchInput = function(e){
 		if( branchListContainer && branchListContainer.length>0 ){
 			branchListContainer.remove();
 		}
-		branchListContainer = showBranchList( branchList );
+		branchListContainer = generateBranchList( branchList );
 		branchTitle.after(branchListContainer);
 
 		branchListContainer.find(".row.branch").off("click").click( function(){
@@ -274,7 +278,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 
 	page.find(".page-title").html( data.bn );
 	page.find(".page-back").off("click").click(function(){
-		$(".contact-branchList").hide();
+		$(".contact-branchList").remove();
 		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 		// $.mobile.changePage("#"+parentPageID); //, { transition: "slide", reverse: true}
 		// var tmp = $( "#"+parentPageID );
@@ -289,7 +293,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 
 	//title
 	var title = $("<div class='contact-titleBar'></div>");
-	var nameArea = $("<div class='nameArea'></div>");
+	var nameArea = $("<div class='nameArea list'></div>");
 	nameArea.append("<div class='name'>"+data.bn+"</div>");
 	nameArea.append("<div class='arrow'></div>");
 	title.append(nameArea);
@@ -306,7 +310,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	if( subbranchList.length==0 || parentLevel==1 ){
 		subbranchList.remove();
 		subbranchList = $('<div class="contact-branchList" style="display:none;"></div>');
-		showSubbranchList( subbranchList, data.lv, bi, JSON.stringify([]) );
+		showSubbranchListBox( subbranchList, data.lv, bi, JSON.stringify([]) );
 
 		subbranchList.find(".row:nth-child(1)").addClass("current");
 
@@ -349,8 +353,17 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 
 	nameArea.off("click").click( function(){
 		//show sub divs
-		subbranchList.slideToggle();
+		subbranchList.slideToggle(400, function(){
+			var currentRow = $(this).find(".row.current");
+			var parent = $(this);
+			var offset = currentRow.position().top;
+			cns.debug( currentRow.position().top, parent.scrollTop() );
+			if( offset>parent.height() || offset<0 ){
+				parent.scrollTop( parent.scrollTop()+currentRow.position().top );
+			}
+		});
 		title.find(".arrow").toggleClass("open");
+
 	});
 
 	// title.off("click").click( function(){
@@ -402,9 +415,9 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 			memObject[key] = mem;
 		}
 	});
-	var memContainer = showMemberGrid(memObject);
+	var memContainer = generateMemberGrid(memObject);
 	subPageBottom.append(memContainer);
-	var memListContainer = showMemberList(memObject);
+	var memListContainer = generateMemberList(memObject);
 	subPageBottom.append(memListContainer);
 	if( isList ){
 		title.find(".btn").addClass("list");
@@ -424,11 +437,11 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	//sub-branches
 	if( childList.length>0 ){
 		var subTitle = $("<div class='contact-rows-title'></div>");
-		subTitle.append( '<div class="count">'+childList.length+'</div>');
-		subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_SUBGROUP", "")+'</div>');
+		// subTitle.append( '<div class="count">'+childList.length+'</div>');
+		subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_SUBGROUP", "<b class='count'>"+childList.length+"</b>")+'</div>');
 		subPageBottom.append( subTitle );
 
-		var branch = showBranchList(childList);
+		var branch = generateBranchList(childList);
 		subPageBottom.append(branch);
 		subPageBottom.find(".row.branch").off("click").click( function(){
 			showSubContactPage( pageID, $(this).data("bi"), JSON.stringify(lvStack) );
@@ -442,7 +455,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	}
 }
 
-showSubbranchList = function( dom, startLvl, bi, stackString ){
+showSubbranchListBox = function( dom, startLvl, bi, stackString ){
 	if( !bi || !dom || dom.length<0 ) return;
 	var stack = $.parseJSON(stackString);
 	stack.push(bi);
@@ -452,7 +465,7 @@ showSubbranchList = function( dom, startLvl, bi, stackString ){
 	var left = tmp.find(".left");
 	left.append("<div class='name'>"+data.bn+"</div>");
 	// left.append("<div class='name'>拉拉拉拉拉拉拉拉拉拉拉拉+</div>");
-	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", 0)+"</div>");
+	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", data.cnt)+"</div>");
 	tmp.data("stack", stackString);
 	tmp.data("bi", bi);
 	tmp.css("padding-left",((Math.min(11,data.lv-startLvl)+1)*20)+"px");
@@ -461,13 +474,13 @@ showSubbranchList = function( dom, startLvl, bi, stackString ){
 
 	if( data.cl.length>0 ){
 		for( var i=0;i<data.cl.length;i++ ){
-			showSubbranchList(tmp, startLvl, data.cl[i], stackString );
+			showSubbranchListBox(tmp, startLvl, data.cl[i], stackString );
 		}
 	}
-	
 }
 
-showAllMember = function(gn) {
+//顯示所有成員page
+showAllMemberPage = function(gn) {
 	var pageID = "page-contact_all";
 	var page = $( "#"+pageID );
 
@@ -521,9 +534,9 @@ showAllMember = function(gn) {
 	
 	//mem
 	var count = Object.keys(guAll).length;
-	var memContainer = showMemberGrid(guAll);
+	var memContainer = generateMemberGrid(guAll);
 	subPageBottom.append(memContainer);
-	var memListContainer = showMemberList(guAll);
+	var memListContainer = generateMemberList(guAll);
 	subPageBottom.append(memListContainer);
 	if( isList ){
 		title.find(".btn").addClass("list");
@@ -543,7 +556,165 @@ showAllMember = function(gn) {
 	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
-showFavorite = function(){
+switchListAndGrid = function( dom, subPageBottom ){
+	isList = !isList;
+	var userData = $.lStorage(ui);
+	userData.isMemberShowList = isList;
+	$.lStorage(ui,userData);
+
+	var mem = subPageBottom.find(".contact-mems");
+	var memList = subPageBottom.find(".contact-memLists");
+	if( isList ){
+		mem.fadeOut('fast', function(){
+			memList.show(0);
+		});
+		dom.addClass("list");
+	} else {
+		memList.fadeOut('fast', function(){
+			mem.show(0);
+		});
+		dom.removeClass("list");
+	}
+}
+
+generateMemberGrid = function( memObject ){
+	var memContainer = $("<div class='contact-mems'></div>");
+	$.each(memObject,function(key,mem){
+		var tmp = $("<div class='mem namecard'></div>");
+		if( mem.aut && mem.aut.length>0 ){
+			tmp.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
+		} else {
+			tmp.append("<div class='img'></div>");
+		}
+		tmp.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
+		tmp.data("gu",key);
+		//is admin?
+		if( mem.ad==1 ){
+			tmp.addClass("admin");
+			memContainer.prepend(tmp);
+		} else {
+			memContainer.append(tmp);
+		}
+	});
+	return memContainer;
+}
+generateMemberList = function( memObject, favCallback ){
+	var memContainer = $("<div class='contact-memLists'></div>");
+	var count = 0;
+	$.each(memObject,function(key,mem){
+		//favorite ver.
+		// var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
+		var tmp = $("<div class='row mem namecard'><div class='left'></div><div class='mid'></div><div class='right'>&nbsp</div></div>");
+		//pic
+		var left = tmp.find(".left");
+		if( mem.aut && mem.aut.length>0 ){
+			left.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
+		} else {
+			left.append("<div class='img'></div>");
+		}
+		//name, (職稱), detail
+		var mid = tmp.find(".mid");
+		mid.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
+		var posi = "";
+		mid.append("<div class='detail'>"+posi+"</div>");
+		var sl = (mem.sl)? mem.sl : "&nbsp;";
+		mid.append("<div class='detail'>"+sl+"</div>");
+		if( !posi || posi.length==0 ){
+			mid.find(".detail:last-child").addClass("twoLine");
+		}
+
+		//favorite disabled, remove '.namecard' of .right before enable this
+		////favorite
+		// var right = tmp.find(".right");
+		// var fav = $("<div class='fav'></div>");
+		// if( mem && true==mem.fav ){
+		// 	right.addClass("active", true);
+		// }
+		// right.append(fav);
+
+		// right.data("gu",key);
+		// left.data("gu",key);
+		// mid.data("gu",key);
+		tmp.data("gu",key)
+
+
+		//is admin?
+		if( mem.ad==1 ){
+			tmp.addClass("admin");
+			memContainer.prepend(tmp);
+		} else {
+			memContainer.append(tmp);
+		}
+	});
+
+	////favorite click(disabled)
+	// memContainer.find(".right").off("click").click( function(){
+	// 	var thisTmp = $(this);
+	// 	if( thisTmp.hasClass("sending") ) return;
+	// 	thisTmp.addClass("sending");
+	// 	var gu = thisTmp.data("gu");
+	// 	cns.debug(gu);
+	// 	if( !gu ) return;
+
+	// 	var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
+	//     var headers = {
+	//              "ui":ui,
+	//              "at":at, 
+	//              "li":lang,
+	//                  };
+	// 	ajaxDo(api_name,headers,"put",true,null).complete(function(data){
+	// 		thisTmp.removeClass("sending");
+	// 		if(data.status == 200){
+	// 			//save to db
+	// 			var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
+	// 			cns.debug("add:",isAdded);
+	// 			thisTmp.toggleClass("active", isAdded);
+	// 			var data = $.lStorage(ui);
+	// 			data[gi].guAll[gu].fav = isAdded;
+	// 			guAll = data[gi].guAll;
+	// 			$.lStorage(ui, data);
+	// 		}
+	// 		if( favCallback ) favCallback();
+	// 	});
+	// });
+
+	return memContainer;
+}
+
+generateBranchList = function( childList ){
+	var branch = $("<div class='contact-rows'></div>");
+	for(var i=0; i<childList.length; i++ ){
+		var key = childList[i];
+		var childData = bl[key];
+		if( childData ){
+			var tmp = $("<div class='row branch'><div class='left'></div><div class='right'></div></div>");
+			var left = tmp.find(".left");
+			left.append("<div class='name'>"+childData.bn+"</div>");
+			left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", childData.cnt)+"</div>");
+			if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
+			
+			tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+			tmp.data("bi", key );
+			
+			branch.append(tmp);
+		}
+	}
+	return branch;
+}
+
+
+/*
+              ███████╗ █████╗ ██╗   ██╗ ██████╗ ██████╗ ██╗████████╗███████╗          
+              ██╔════╝██╔══██╗██║   ██║██╔═══██╗██╔══██╗██║╚══██╔══╝██╔════╝          
+    █████╗    █████╗  ███████║██║   ██║██║   ██║██████╔╝██║   ██║   █████╗      █████╗
+    ╚════╝    ██╔══╝  ██╔══██║╚██╗ ██╔╝██║   ██║██╔══██╗██║   ██║   ██╔══╝      ╚════╝
+              ██║     ██║  ██║ ╚████╔╝ ╚██████╔╝██║  ██║██║   ██║   ███████╗          
+              ╚═╝     ╚═╝  ╚═╝  ╚═══╝   ╚═════╝ ╚═╝  ╚═╝╚═╝   ╚═╝   ╚══════╝          
+
+*/
+
+//顯示我的最愛頁面
+showFavoritePage = function(){
 	var pageID = "page-contact_favorite";
 	var page = $( "#"+pageID );
 
@@ -632,9 +803,9 @@ showFavorite = function(){
 			memObject[key] = mem;
 		}
 	});
-	var memContainer = showMemberGrid(memObject);
+	var memContainer = generateMemberGrid(memObject);
 	subPageBottom.append(memContainer);
-	var memListContainer = showMemberList(memObject, showFavorite);
+	var memListContainer = generateMemberList(memObject, showFavoritePage);
 	subPageBottom.append(memListContainer);
 	if( isList ){
 		title.find(".btn").addClass("list");
@@ -650,150 +821,170 @@ showFavorite = function(){
 	} else {
 		subTitle.find(".count").html(count);
 	}
+	
+	//sub-branches
+	if( fbl ){
+		var length = Object.keys(fbl).length;
+		if( length>0 ){
+			var subTitle = $("<div class='contact-rows-title'></div>");
+			subTitle.append( '<div class="count">'+length+'</div>');
+			subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_SUBGROUP", "")+'</div>');
+			subPageBottom.append( subTitle );
+
+			var branch = generateFavBranchList( fbl );
+			subPageBottom.append(branch);
+		}
+	}
 
 	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
-switchListAndGrid = function( dom, subPageBottom ){
-	isList = !isList;
-	var userData = $.lStorage(ui);
-	userData.isMemberShowList = isList;
-	$.lStorage(ui,userData);
-
-	var mem = subPageBottom.find(".contact-mems");
-	var memList = subPageBottom.find(".contact-memLists");
-	if( isList ){
-		mem.fadeOut('fast', function(){
-			memList.show(0);
-		});
-		dom.addClass("list");
-	} else {
-		memList.fadeOut('fast', function(){
-			mem.show(0);
-		});
-		dom.removeClass("list");
+//顯示單一自定群組內容
+showSubFavoritePage = function( fi ){
+	var data = fbl[fi];
+	var parentPageID = "page-contact_favorite";
+	var pageID = "page-contact_sub_favorite";
+	var page = $( "#"+pageID );
+	if( !page || page.length==0 ){
+		page = $('<div data-role="page" id="'+pageID+'" class="subPage">'
+            +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
+                // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+                +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
+                +'<h3 class="page-title">成員列表</h3>'
+            +'</div><div class="subpage-contact"></div></div>');
+		$("#"+parentPageID).after(page);
 	}
-}
 
-showMemberGrid = function( memObject ){
-	var memContainer = $("<div class='contact-mems'></div>");
-	$.each(memObject,function(key,mem){
-		var tmp = $("<div class='mem namecard'></div>");
-		if( mem.aut && mem.aut.length>0 ){
-			tmp.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
-		} else {
-			tmp.append("<div class='img'></div>");
-		}
-		tmp.append("<div class='name'>"+mem.nk+"</div>");
-		tmp.data("gu",key);
-		//is admin?
-		if( mem.ad==1 ){
-			tmp.addClass("admin");
-			memContainer.prepend(tmp);
-		} else {
-			memContainer.append(tmp);
-		}
+	page.find(".page-title").html( data.fn );
+	page.find(".page-back").off("click").click(function(){
+		$.mobile.changePage("#"+parentPageID, { transition: "slide", reverse: true});
 	});
-	return memContainer;
-}
-showMemberList = function( memObject, favCallback ){
-	var memContainer = $("<div class='contact-memLists'></div>");
+	
+	var subPage = page.find(".subpage-contact");
+	subPage.html("");
+
+	//title
+	var title = $("<div class='contact-titleBar'></div>");
+	var nameArea = $("<div class='nameArea'></div>");
+	nameArea.append("<div class='name'>"+data.fn+"</div>");
+	// nameArea.append("<div class='arrow'></div>");
+	title.append(nameArea);
+	title.append("<div class='btnExtra'></div>");
+	title.append("<div class='btn'></div>");
+	subPage.append(title);
+
+	title.find(".btn").off("click").click( function(){
+		switchListAndGrid( $(this), subPageBottom );
+	});
+
+	//---- extra ------
+	var extra = $("<div class='contact-extra'></div>");
+	subPage.append(extra);
+	extra.css("display","none");
+	//btn
+	//content
+	var extraContent = $("<div class='content'></div>");
+	extraContent.append("<div class='btn editGroup' align='center'><div class='img'></div><div class='text'>"+$.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_NAME")+"</div></div>");
+	extraContent.append("<div class='btn editMem' align='center'><div class='img'></div><div class='text'>"+$.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_MEMBER")+"</div></div>");
+	extraContent.append("<div class='btn delete' align='center'><div class='img'></div><div class='text'>"+$.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP")+"</div></div>");
+	extra.append( extraContent );
+
+	extra.off("click").click( function(){
+		extra.fadeToggle('fast');
+	});
+	extraContent.off("click").click( function(e){
+    	e.stopPropagation();
+		cns.debug("!");
+	});
+	extraContent.find(".btn.editGroup").off("click").click( function(e){
+    	e.stopPropagation();
+		// showEditGroup( subPage );
+	});
+	extraContent.find(".btn.editMem").off("click").click( function(e){
+    	e.stopPropagation();
+		cns.debug("editMem");
+	});
+	extraContent.find(".btn.delete").off("click").click( function(e){
+    	e.stopPropagation();
+		// showAddGroup( subPage );
+		cns.debug("delete");
+	});
+	title.find(".btnExtra").off("click").click( function(){
+		extra.fadeToggle('fast');
+	});
+
+	var subPageBottom = $('<div class="contact-scroll"></div>');
+	subPage.append(subPageBottom);
+
+	//mem-title
+	var subTitle = $("<div class='contact-mems-title'></div>");
+	subTitle.append( '<div class="count">'+0+'</div>');
+	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
+	subPageBottom.append(subTitle);
+	
+	//mem
+	var memObject = {};
 	var count = 0;
-	$.each(memObject,function(key,mem){
-		//favorite ver.
-		// var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
-		var tmp = $("<div class='row mem namecard'><div class='left namecard'></div><div class='mid'></div><div class='right'>&nbsp</div></div>");
-		//pic
-		var left = tmp.find(".left");
-		if( mem.aut && mem.aut.length>0 ){
-			left.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
-		} else {
-			left.append("<div class='img'></div>");
-		}
-		//name, ?
-		var mid = tmp.find(".mid");
-		mid.append("<div class='name'>"+mem.nk+"</div>");
-		mid.append("<div class='detail'>職稱, 心情留言</div>");
-
-		//favorite disabled, remove '.namecard' of .right before enable this
-		////favorite
-		// var right = tmp.find(".right");
-		// var fav = $("<div class='fav'></div>");
-		// if( mem && true==mem.fav ){
-		// 	right.addClass("active", true);
-		// }
-		// right.append(fav);
-
-		// right.data("gu",key);
-		// left.data("gu",key);
-		// mid.data("gu",key);
-		tmp.data("gu",key)
-
-
-		//is admin?
-		if( mem.ad==1 ){
-			tmp.addClass("admin");
-			memContainer.prepend(tmp);
-		} else {
-			memContainer.append(tmp);
+	$.each(guAll,function(key,mem){
+		if( mem.fbl && mem.fbl.length>0 ){
+			for(var i=0;i<mem.fbl.length;i++){
+				if( mem.fbl[i]==fi ){
+					memObject[key] = mem;
+					count++;
+					break;
+				}
+			}
 		}
 	});
+	var memContainer = generateMemberGrid(memObject);
+	subPageBottom.append(memContainer);
+	var memListContainer = generateMemberList(memObject);
+	subPageBottom.append(memListContainer);
+	if( isList ){
+		title.find(".btn").addClass("list");
+		memContainer.css("display","none");
+	} else {
+		memListContainer.css("display","none");
+	}
 
-	////favorite click(disabled)
-	// memContainer.find(".right").off("click").click( function(){
-	// 	var thisTmp = $(this);
-	// 	if( thisTmp.hasClass("sending") ) return;
-	// 	thisTmp.addClass("sending");
-	// 	var gu = thisTmp.data("gu");
-	// 	cns.debug(gu);
-	// 	if( !gu ) return;
+	if( 0==count ){
+		subTitle.hide();
+		memListContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", data.fn)+"</div>");
+		memContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", data.fn)+"</div>");
+	} else {
+		subTitle.find(".count").html(count);
+	}
 
-	// 	var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
-	//     var headers = {
-	//              "ui":ui,
-	//              "at":at, 
-	//              "li":lang,
-	//                  };
-	// 	ajaxDo(api_name,headers,"put",true,null).complete(function(data){
-	// 		thisTmp.removeClass("sending");
-	// 		if(data.status == 200){
-	// 			//save to db
-	// 			var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
-	// 			cns.debug("add:",isAdded);
-	// 			thisTmp.toggleClass("active", isAdded);
-	// 			var data = $.lStorage(ui);
-	// 			data[gi].guAll[gu].fav = isAdded;
-	// 			guAll = data[gi].guAll;
-	// 			$.lStorage(ui, data);
-	// 		}
-	// 		if( favCallback ) favCallback();
-	// 	});
-	// });
-
-	return memContainer;
+	//滑進來
+	$.mobile.changePage("#"+pageID, { transition: "slide", reverse: false} );
 }
 
-showBranchList = function( childList ){
+//產生自定群組列表
+generateFavBranchList = function( childList ){
 	var branch = $("<div class='contact-rows'></div>");
-	for(var i=0; i<childList.length; i++ ){
-		var key = childList[i];
-		var childData = bl[key];
-		if( childData ){
-			var tmp = $("<div class='row branch'><div class='left'></div><div class='right'></div></div>");
+	for( var key in childList ){
+		// var key = childList[i];
+		var data = childList[key];
+		if( data ){
+			var tmp = $("<div class='row fav'><div class='left'></div><div class='right'></div></div>");
 			var left = tmp.find(".left");
-			left.append("<div class='name'>"+childData.bn+"</div>");
-			left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", 0)+"</div>");
-			if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
+			left.append("<div class='name'>"+data.fn+"</div>");
+			left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", data.cnt)+"</div>");
+			// if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
 			
 			tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
-			tmp.data("bi", key );
+			tmp.data("fi", key );
 			
 			branch.append(tmp);
 		}
 	}
+	branch.find(".row.fav").off("click").click( function(){
+		showSubFavoritePage( $(this).data("fi") );
+	});
 	return branch;
 }
 
+//顯示新增自定群組對話框
 showAddGroup = function( subPage ){
 	var container = $(".contact-createSubgroup");
 	if( container.length==0 ){
@@ -813,29 +1004,88 @@ showAddGroup = function( subPage ){
 		
 		container.off("click").click( function(){
 			container.fadeOut();
-			cns.debug("1");
 		});
 		container.find("table").off("click").click( function(e){
-			// e.stopPropagation();
-			cns.debug("2");
+			e.stopPropagation();
 		});
 
 		container.find(".cancel").off("click").click( function(e){
 			e.stopPropagation();
 			container.fadeOut();
 			input.val("");
-			cns.debug("3");
 		});
 
-		composeObjectShow( container.find(".create") );
-		
-		// container.find(".create").off("click").click( function(e){
-		// 	e.stopPropagation();
-		// 	cns.debug( "create", input.val() );
-		// 	input.val("");
-		// 	// container.fadeOut();
-		// 	cns.debug("4");
-		// });
+		var create = container.find(".create");
+		create.data("object_str","");
+		create.off("click").click( function(e){
+			var name = input.val();
+			if( null==name || name.length==0 ){
+				toastShow( $.i18n.getString("MEMBER_ENTER_CUSTOMIZE_GROUP_NAME") );
+				return;
+			}
+			e.stopPropagation();
+			cns.debug( "create", name );
+			// container.fadeOut();
+			var option = {
+				isShowGroup:false,
+				isShowAll:false,
+				isShowFav:true
+			};
+			composeObjectShowDelegate( $(this), $(this), option, function(){
+				var obj = create.data("object_str");
+				cns.debug( obj );
+				// cns.debug( create.data("branch_str") );
+
+				var api_name = "groups/" + gi + "/favorites";
+				var headers = {
+					"ui":ui,
+					"at":at, 
+					"li":lang
+				};
+				var memObject = $.parseJSON(obj);
+				var memKeys = Object.keys(memObject);
+				var body = {
+				  "fn": name, // Favorite Branch Name
+				  "gul": memKeys
+				};
+
+				ajaxDo(api_name,headers,"post",true,body).complete(function(data){
+					if(data.status == 200){
+						var tmp = $.parseJSON( data.responseText );
+						var data = {};
+						var userData = $.lStorage(ui);
+						var group = userData[gi];
+
+						//add fi to mem data
+						guAll = group.guAll;
+						for(var key in memObject){
+							guAll[key].fbl.push(tmp.fi);
+						}
+
+						//add fi data to fbl
+						fbl = group.fbl;
+						fbl[tmp.fi] = {cnt:memKeys.length, fn:name};
+						data[tmp.fi] = fbl[tmp.fi];
+						$.lStorage(ui, userData );
+
+						var branch = generateFavBranchList( data );
+						var rows = $("#page-contact_favorite .contact-rows");
+						if( rows.length>0 ){
+							branch.find(".row").appendTo( rows );
+						} else {
+							branch.appendTo("#page-contact_favorite .contact-scroll");
+						}
+						cns.debug( data.responseText );
+						container.fadeOut();
+
+						toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_SUCC") );
+						input.val("");
+					} else {
+						toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_FAIL") );
+					}
+				});
+			});
+		});
 	}
 	container.fadeToggle();
 
