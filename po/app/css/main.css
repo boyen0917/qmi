@@ -3311,12 +3311,14 @@ input.cp-datetimepicker-end {
 	margin-bottom: 5px;
 }
 
-.obj-cell.subgroup {
+.obj-cell.subgroup, .obj-cell.fav {
 	display: inline-block;
 	width: 90%;
 	border-bottom: 0px;
 	vertical-align: middle;
+	cursor: pointer;
 }
+
 .subgroup-parent {
 	width: 100%;
 	height: 80px;
@@ -3396,12 +3398,21 @@ input.cp-datetimepicker-end {
 	line-height: 80px;
 	cursor: pointer;
 	color: rgb(180,180,180);
+	background-image: url("../images/common/icon/icon_arrow_down.png");
+	background-size: 30px;
+	background-repeat: no-repeat;
+	background-position: 50%;
 }
+.obj-cell-arrow.open{
+	background-image: url("../images/common/icon/icon_arrow_top.png");
+}
+
 .obj-cell-chk {
 	display: inline-block;
 	margin-left: 20px;
 	/* margin-top: -25px; */
 	vertical-align: super;
+	min-width: 35px;
 }
 
 .obj-cell-chk .img {
