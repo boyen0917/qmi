@@ -253,6 +253,8 @@ $(function(){
                 var _groupList = $.lStorage(ui);
                 var guAll = _groupList[this_gi].guAll;
                 cns.debug("guAll:",guAll);
+
+                //branch
         		if(branch_list.bl.length) {
                     //初始化陣列
         			$.each(branch_list.bl,function(i,val){
@@ -280,10 +282,27 @@ $(function(){
         				}
         				delete val.bp_arr;
 	        		});
+                    
+                    //計算人數
+                    //*NOTE*
+                    // 同一人可能隸屬于多個群組, 若兩個子群組有同一人,
+                    // 母群組應該只能算一人, 普通加法不成立...
+                    for( var biTmp in new_bl ){
+                        //每個群組走過一次所有成員, 只要含有這個群組ＩＤ數量就加一..
+                        var cnt=0;
+                        for( var id in guAll ){
+                            var mem = guAll[id];
+                            if( mem.bl.indexOf(biTmp)>=0 ){
+                                cnt++;
+                            }
+                        }
+                        new_bl[biTmp].cnt = cnt;
+                    }
 
                     cns.debug("new_bl:",new_bl);
         		}
 
+                //fav branch
         		if(branch_list.fbl.length) {
         			$.each(branch_list.fbl,function(i,val){
 	        			new_fbl[val.fi] = {fn:val.fn, cnt:0};
@@ -293,10 +312,6 @@ $(function(){
                 //計算人數
                 var favCnt = 0;
                 $.each(guAll,function(i,val){
-                    //bi mem cnt
-                    var bi = val.bl.split(".").last();
-                    if(new_bl[bi]) new_bl[bi].cnt++;
-
                     //fi mem cnt
                     if( val.fbl && val.fbl.length>0 ){
                         for(var i=0; i<val.fbl.length; i++){
@@ -304,16 +319,9 @@ $(function(){
                             if(new_fbl[fi]) new_fbl[fi].cnt++;
                         }
                     }
+
                     //fav cnt
                     if( true==val.fav ) favCnt++;
-                });
-
-
-                //計算子群組人數
-                $.each(new_bl,function(i,val){
-                    if(val.lv==1){
-                        setGroupListCountMember(new_bl, i);
-                    }
                 });
 
                 _groupList[this_gi].favCnt = favCnt;
@@ -324,19 +332,19 @@ $(function(){
         });
     }
 
-    setGroupListCountMember = function(newBl, bi){
-        var data = newBl[bi];
-        var cnt = data.cnt;
+    // setGroupListCountMember = function(newBl, bi){
+    //     var data = newBl[bi];
+    //     var cnt = data.cnt;
 
-        if(data.cl && data.cl.length > 0){
-            for( var i=0; i<data.cl.length; i++ ){
-                cnt += setGroupListCountMember(newBl, data.cl[i]);
-            }
-        }
-        cns.debug(data.bn, data.lv, data.cnt, cnt);
-        data.cnt = cnt;
-        return cnt;
-    }
+    //     if(data.cl && data.cl.length > 0){
+    //         for( var i=0; i<data.cl.length; i++ ){
+    //             cnt += setGroupListCountMember(newBl, data.cl[i]);
+    //         }
+    //     }
+    //     cns.debug(data.bn, data.lv, data.cnt, cnt);
+    //     data.cnt = cnt;
+    //     return cnt;
+    // }
     
 
 	setGroupAllUser = function(data_arr,this_gi){

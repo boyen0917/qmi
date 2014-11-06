@@ -1396,12 +1396,12 @@ $(function(){
                  ██║   ███████╗███████║   ██║             
                  ╚═╝   ╚══════╝╚══════╝   ╚═╝                                               
 	*/
-	var smHrCliclTimes = 0;
-	$(".sm-hr").click(function(){
-		smHrCliclTimes++;
-		if(smHrCliclTimes>4){
-			$("div[data-sm-act='contact']").show();
-			smHrCliclTimes=0;
-		}
-	});
+	// var smHrCliclTimes = 0;
+	// $(".sm-hr").click(function(){
+	// 	smHrCliclTimes++;
+	// 	if(smHrCliclTimes>4){
+	// 		$("div[data-sm-act='contact']").show();
+	// 		smHrCliclTimes=0;
+	// 	}
+	// });
 });  
