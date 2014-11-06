@@ -24,6 +24,7 @@
 	"MEMBER_EDIT_CUSTOMIZE_GROUP_NAME" : "編輯群組名稱",
 	"MEMBER_EDIT_CUSTOMIZE_GROUP_MEMBER" : "編輯成員",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP" : "刪除群組",
+	"MEMBER_DELETE_CUSTOMIZE_GROUP_CONFIRM" : "您確定要刪除%@群組？",
 	"INVITE_SEARCH" : "搜尋",
 
 	"COMMON_SELECT_MEMBERS"  				: "選擇對象",
@@ -41,6 +42,7 @@
 	"COMMON_YOU"							: "你",
 	"COMMON_SELF"						: "自己",
 	"COMMON_FAVORIATE" : "我的最愛",
+	"COMMON_OK" : "確定",
 	"COMMON_CANCEL" : "取消",
 
 	"CHAT_TITLE"							: "聊天",

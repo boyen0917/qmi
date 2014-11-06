@@ -36,7 +36,7 @@ initContactList = function(){
 	var left = tmp.find(".left");
 	left.append("<div class='name'>"+$.i18n.getString("MEMBER_ALL")+"</div>");
 	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",Object.keys(guAll).length)+"</div>");
-	tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+	tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 	rowContainer.append(tmp);
 	rowContainer.find(".row.all").off("click").click( function(){
 		showAllMemberPage(group.gn) 
@@ -49,7 +49,7 @@ initContactList = function(){
 	left.append("<div class='name'>"+$.i18n.getString("COMMON_FAVORIATE")+"</div>");
 	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",(group.favCnt)?group.favCnt:0 )+"</div>");
 	if(branchCount>0) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", branchCount)+"</div>");
-	tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+	tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 	rowContainer.append(tmp);
 	rowContainer.find(".row.favorite").off("click").click( showFavoritePage );
 
@@ -71,7 +71,7 @@ initContactList = function(){
 				left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", bl_obj.cnt)+"</div>");
 				if( bl_obj.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", bl_obj.cl.length)+"</div>");
 				
-				tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+				tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 				tmp.data("bi", key );
 				rowContainer.append(tmp);
 			}
@@ -104,6 +104,12 @@ initContactList = function(){
 		$(this).hide();
 		searchBar.show();
 		searchBarInput.focus();
+	});
+
+	$(".subpage-contact").height( $(window).height()-63 );
+	$(window).off("resize").resize( function(){
+		$(".contact-branchList").height( $(window).height()-105 );
+		$(".contact-scroll").height( $(window).height()-45 );
 	});
 }
 
@@ -279,7 +285,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	page.find(".page-title").html( data.bn );
 	page.find(".page-back").off("click").click(function(){
 		$(".contact-branchList").remove();
-		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
+		showMainContact();
 		// $.mobile.changePage("#"+parentPageID); //, { transition: "slide", reverse: true}
 		// var tmp = $( "#"+parentPageID );
 		// if( tmp && tmp.length>0 && false==tmp.data("gen") ){
@@ -447,6 +453,10 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 			showSubContactPage( pageID, $(this).data("bi"), JSON.stringify(lvStack) );
 		});
 	}
+
+	$(".contact-branchList").height( $(window).height()-105 );
+	$(".contact-scroll").height( $(window).height()-45 );
+	
 	//第一頁滑進來, 其餘用fade
 	if( "page-group-main"== parentPageID ){
 		$.mobile.changePage("#"+pageID, { transition: "slide", reverse: false} );
@@ -498,9 +508,7 @@ showAllMemberPage = function(gn) {
 	page.data("gi", gi);
 
 	page.find(".page-title").html( $.i18n.getString("MEMBER_ALL") );
-	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
-	});
+	page.find(".page-back").off("click").click( showMainContact );
 	
 	var subPage = page.find(".subpage-contact");
 	subPage.html("");
@@ -553,6 +561,7 @@ showAllMemberPage = function(gn) {
 		subTitle.find(".count").html(count);
 	}
 
+	$(".contact-scroll").height( $(window).height()-45 );
 	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
@@ -693,7 +702,7 @@ generateBranchList = function( childList ){
 			left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", childData.cnt)+"</div>");
 			if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
 			
-			tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+			tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 			tmp.data("bi", key );
 			
 			branch.append(tmp);
@@ -702,6 +711,10 @@ generateBranchList = function( childList ){
 	return branch;
 }
 
+showMainContact = function(){
+	$(".subpage-contact .contact-rows").height( $(window).height()-63 );
+	$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
+}
 
 /*
               ███████╗ █████╗ ██╗   ██╗ ██████╗ ██████╗ ██╗████████╗███████╗          
@@ -733,9 +746,7 @@ showFavoritePage = function(){
 	// page.data("gi", gi);
 
 	page.find(".page-title").html( $.i18n.getString("COMMON_FAVORIATE") );
-	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
-	});
+	page.find(".page-back").off("click").click( showMainContact );
 	
 	var subPage = page.find(".subpage-contact");
 	subPage.html("");
@@ -836,6 +847,7 @@ showFavoritePage = function(){
 		}
 	}
 
+	$(".contact-scroll").height( $(window).height()-45 );
 	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
@@ -856,9 +868,7 @@ showSubFavoritePage = function( fi ){
 	}
 
 	page.find(".page-title").html( data.fn );
-	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#"+parentPageID, { transition: "slide", reverse: true});
-	});
+	page.find(".page-back").off("click").click( showMainContact );
 	
 	var subPage = page.find(".subpage-contact");
 	subPage.html("");
@@ -906,8 +916,13 @@ showSubFavoritePage = function( fi ){
 	});
 	extraContent.find(".btn.delete").off("click").click( function(e){
     	e.stopPropagation();
-		// showAddGroup( subPage );
-		cns.debug("delete");
+		popupShowAdjust($.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP"),
+			$.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP_CONFIRM"),
+			$.i18n.getString("COMMON_OK"),$.i18n.getString("COMMON_CANCEL"),
+			function(e){
+				// if()
+				cns.debug("!", e);
+		});
 	});
 	title.find(".btnExtra").off("click").click( function(){
 		extra.fadeToggle('fast');
@@ -956,6 +971,7 @@ showSubFavoritePage = function( fi ){
 	}
 
 	//滑進來
+	$(".contact-scroll").height( $(window).height()-45 );
 	$.mobile.changePage("#"+pageID, { transition: "slide", reverse: false} );
 }
 
@@ -972,7 +988,7 @@ generateFavBranchList = function( childList ){
 			left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", data.cnt)+"</div>");
 			// if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
 			
-			tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+			tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 			tmp.data("fi", key );
 			
 			branch.append(tmp);
