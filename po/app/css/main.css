@@ -1255,7 +1255,7 @@ img.auo {
 }
 
 .st-navi-area {
-    display: flex;
+    display: none;
     border: 2px solid rgb(73,85,110);
     cursor:pointer;
 }
@@ -1314,8 +1314,8 @@ img.auo {
 	height: 40px;
 	padding: 10px 0 4px;
 	display: none;
-	position: relative;
-	top: 75px;
+	/*position: relative;
+	top: 75px;*/
 }
 
 .st-refresh-top span {
@@ -1325,7 +1325,7 @@ img.auo {
 }
 
 .mt {
-	margin-top: 74px;
+	/*margin-top: 74px;*/
 }
 
 .st-top-event-area {
@@ -2486,17 +2486,18 @@ img.auo {
 	height: 20px;
 }
 
+img.st-reply-message-attach {
+	margin-left: 8px;
+}
+
 .st-reply-message-attach, .st-reply-message-sticker {
-	margin: 7px 0 0 0px;
-	float: left;
+	margin: 8px 0 0 0px;
 	width: 32px;
 }
 
 .st-reply-message-textarea {
-	/*width: 73%;*/
 	margin-left: 5px;
-	padding: 5px 0 0;
-	float: left;
+	display: inline-block;
 }
 
 .st-reply-message-textarea textarea {
@@ -2516,7 +2517,7 @@ img.auo {
 .st-reply-message-send {
 	position: absolute;
 	right: 5px;
-	top: 6px;
+	top: 7px;
 	background: rgb(0,102,162);
 	color: #fff;
 	width: 45px;

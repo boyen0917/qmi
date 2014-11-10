@@ -91,7 +91,7 @@ $(function(){
 		$(document).data("top-event-resize",timer);
 
 		//reply textarea
-		$(document).find(".st-reply-message-textarea").css("width",$(window).width()-180);
+		$(document).find(".st-reply-message-textarea").css("width",$(window).width()-200);
 	});
 
 	//test
@@ -125,7 +125,6 @@ $(function(){
 	            var scroll_cnt = group_main.data("scroll-cnt") || 0;
 	            scroll_cnt = scroll_cnt + event.originalEvent.wheelDelta;
 	            group_main.data("scroll-cnt",scroll_cnt);
-
 
 	            //滾得夠猛 做下拉更新
 	            if(scroll_cnt > 3000) {
@@ -164,12 +163,6 @@ $(function(){
 			// cns.debug("this_navi:",{name:this_navi.selector,data:this_navi.data("scroll-chk")});
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
 		    if(bottom_height && bottom_height >= last_height && !this_navi.data("scroll-chk")){
-		    	if(this_navi.data("last-ct")){
-		    		var time = new Date(this_navi.data("last-ct"));
-	        		var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );	
-	        		// cns.debug("last-ct:",this_navi.data("last-ct"));
-	        		// cns.debug("最後一筆時間:",time_format);
-		    	}
 		    	
 		    	//避免重複
 		    	this_navi.data("scroll-chk",true);
@@ -542,14 +535,25 @@ $(function(){
 			$(".st-filter-main").show();
 		});
 
-		//做搜尋
-		//先關閉全區域
-		$(".st-feedbox-area").hide();
+
+		
+
+		var filter_status = $(this).data("status");
+
+		//過濾發文類型
+		if(filter_status == "navi"){
+			cns.debug("navi:",".st-navi-subarea[data-navi="+ $(this).data("navi") +"]");
+        	$(".st-navi-subarea[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
+        	return false;
+		}
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
 		var this_events = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box");
 
-		var filter_status = $(this).data("status");
+		//做過濾
+		//先關閉全區域
+		$(".st-feedbox-area").hide();
+
 
 		//記錄
 		$(".st-filter-area").data("filter",filter_status);
@@ -672,6 +676,13 @@ $(function(){
 		
 	});
 
+	$(document).on('click','.st-reply-message-sticker',function(){
+		var this_sticker = $(this).parents(".st-reply-message-area").find(".stickerArea");
+		initStickerArea.init( this_sticker, function(id){
+			cns.debug("hehe:",id);
+		});
+	});
+
 	//留言
 	$(document).on('click','.st-message',function(){
 		//設定 this event
@@ -680,7 +691,7 @@ $(function(){
 		if(this_event.data("detail-page")) return false;
 		cns.debug("kerker");
 		//調整寬度
-		this_event.find(".st-reply-message-textarea").css("width",$(window).width()-180);
+		this_event.find(".st-reply-message-textarea").css("width",$(window).width()-200);
 		
 		//判斷開啟或關閉
 		var movement = $(".st-reply-message-area").data("movement");
