@@ -278,7 +278,7 @@ $(function(){
 	        		$.each(new_bl,function(i,val){
         				if(val.lv > 1){
         					var parent = val.bp_arr[val.bp_arr.length-2];
-        					new_bl[parent].cl.push(i);
+        					if(new_bl[parent]) new_bl[parent].cl.push(i);
         				}
         				delete val.bp_arr;
 	        		});
@@ -4117,8 +4117,6 @@ $(function(){
 			$(".st-refresh-top span").show();
 		},500);
 
-		// var event_tp = $("#page-group-main").data("navi") || "00";
-  //   	var selector = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box:eq(0)");
 		timelineListWrite("",true);
 
 		//置頂設定
