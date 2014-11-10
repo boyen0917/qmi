@@ -109,7 +109,7 @@ initContactList = function(){
 	$(".subpage-contact").height( $(window).height()-63 );
 	$(window).off("resize").resize( function(){
 		$(".contact-branchList").height( $(window).height()-105 );
-		$(".contact-scroll").height( $(window).height()-45 );
+		$(".contact-scroll").height( $(window).height()-115 );
 	});
 }
 
@@ -454,8 +454,8 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 		});
 	}
 
-	$(".contact-branchList").height( $(window).height()-105 );
-	$(".contact-scroll").height( $(window).height()-45 );
+	$("#"+pageID +" .contact-branchList").height( $(window).height()-110 );
+	$("#"+pageID +" .contact-scroll").height( $(window).height()-115 );
 	
 	//第一頁滑進來, 其餘用fade
 	if( "page-group-main"== parentPageID ){
@@ -561,7 +561,7 @@ showAllMemberPage = function(gn) {
 		subTitle.find(".count").html(count);
 	}
 
-	$(".contact-scroll").height( $(window).height()-45 );
+	$("#"+pageID +" .contact-scroll").height( $(window).height()-115 );
 	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
@@ -589,20 +589,25 @@ switchListAndGrid = function( dom, subPageBottom ){
 generateMemberGrid = function( memObject ){
 	var memContainer = $("<div class='contact-mems'></div>");
 	$.each(memObject,function(key,mem){
-		var tmp = $("<div class='mem namecard'></div>");
-		if( mem.aut && mem.aut.length>0 ){
-			tmp.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
+		if( null== mem ){
+			cns.debug(key);
 		} else {
-			tmp.append("<div class='img'></div>");
-		}
-		tmp.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
-		tmp.data("gu",key);
-		//is admin?
-		if( mem.ad==1 ){
-			tmp.addClass("admin");
-			memContainer.prepend(tmp);
-		} else {
-			memContainer.append(tmp);
+			var tmp = $("<div class='mem namecard'></div>");
+			if( mem.aut && mem.aut.length>0 ){
+				tmp.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
+			} else {
+				tmp.append("<div class='img'></div>");
+			}
+			cns.debug(key, mem.nk);
+			tmp.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
+			tmp.data("gu",key);
+			//is admin?
+			if( mem.ad==1 ){
+				tmp.addClass("admin");
+				memContainer.prepend(tmp);
+			} else {
+				memContainer.append(tmp);
+			}
 		}
 	});
 	return memContainer;
@@ -712,7 +717,7 @@ generateBranchList = function( childList ){
 }
 
 showMainContact = function(){
-	$(".subpage-contact .contact-rows").height( $(window).height()-63 );
+	$("#page-group-main .contact-rows").height( $(window).height()-63 );
 	$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 }
 
@@ -848,7 +853,7 @@ showFavoritePage = function( isBackward ){
 		}
 	}
 
-	$(".contact-scroll").height( $(window).height()-45 );
+	$("#"+pageID +" .contact-scroll").height( $(window).height()-115 );
 	if( true==isBackward ) $.mobile.changePage("#"+pageID, { transition: "slide", reverse: true} );
 	else  $.mobile.changePage("#"+pageID, { transition: "slide"});
 }
@@ -980,7 +985,7 @@ showSubFavoritePage = function( fi ){
 
 
 	//滑進來
-	$(".contact-scroll").height( $(window).height()-45 );
+	$("#"+pageID +" .contact-scroll").height( $(window).height()-115 );
 	$.mobile.changePage("#"+pageID, { transition: "slide", reverse: false} );
 }
 
@@ -1085,6 +1090,7 @@ showAddFavGroupBox = function( subPage ){
 
 							toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_SUCC") );
 							input.val("");
+							create.data("object_str","");
 						} else {
 							toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_FAIL") );
 						}

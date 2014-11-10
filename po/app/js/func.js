@@ -391,7 +391,11 @@ $(function(){
 		var _groupList = $.lStorage(ui);
 		//先更新就有資料 但不會取得新成員
 		$.each(_groupList[this_gi].guAll,function(i,val){
-			$.extend(val,new_guAll[i]);
+            if( new_guAll.hasOwnProperty(i) ){
+                $.extend(val,new_guAll[i]);
+            } else {
+                delete _groupList[this_gi].guAll[i];
+            }
 		});
 
 		//將更新完的資料倒回新的名單 就會有新成員
