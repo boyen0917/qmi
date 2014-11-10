@@ -40,6 +40,14 @@ initAlertDB = function(){
 
 showNewAlertIcon = function( cnt ){
 	if( cnt != lastCnt ){
+
+		//nodeJS用, show程式小icon上面的數字
+		try{
+			require('nw.gui').Window.get().setBadgeLabel( cnt.toString() );
+		}catch(e){
+			// cns.debug(e);	//必加, 一般瀏覽器require not defined
+		}
+
 		lastCnt = cnt;
 		//關閉的話只顯示new icon
 		if( !$(".alert-area").is(":visible") ){

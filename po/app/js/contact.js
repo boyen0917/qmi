@@ -36,7 +36,7 @@ initContactList = function(){
 	var left = tmp.find(".left");
 	left.append("<div class='name'>"+$.i18n.getString("MEMBER_ALL")+"</div>");
 	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",Object.keys(guAll).length)+"</div>");
-	tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+	tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 	rowContainer.append(tmp);
 	rowContainer.find(".row.all").off("click").click( function(){
 		showAllMemberPage(group.gn) 
@@ -49,7 +49,7 @@ initContactList = function(){
 	left.append("<div class='name'>"+$.i18n.getString("COMMON_FAVORIATE")+"</div>");
 	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",(group.favCnt)?group.favCnt:0 )+"</div>");
 	if(branchCount>0) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", branchCount)+"</div>");
-	tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+	tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 	rowContainer.append(tmp);
 	rowContainer.find(".row.favorite").off("click").click( showFavoritePage );
 
@@ -71,7 +71,7 @@ initContactList = function(){
 				left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", bl_obj.cnt)+"</div>");
 				if( bl_obj.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", bl_obj.cl.length)+"</div>");
 				
-				tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+				tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 				tmp.data("bi", key );
 				rowContainer.append(tmp);
 			}
@@ -104,6 +104,12 @@ initContactList = function(){
 		$(this).hide();
 		searchBar.show();
 		searchBarInput.focus();
+	});
+
+	$(".subpage-contact").height( $(window).height()-63 );
+	$(window).off("resize").resize( function(){
+		$(".contact-branchList").height( $(window).height()-105 );
+		$(".contact-scroll").height( $(window).height()-45 );
 	});
 }
 
@@ -279,7 +285,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	page.find(".page-title").html( data.bn );
 	page.find(".page-back").off("click").click(function(){
 		$(".contact-branchList").remove();
-		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
+		showMainContact();
 		// $.mobile.changePage("#"+parentPageID); //, { transition: "slide", reverse: true}
 		// var tmp = $( "#"+parentPageID );
 		// if( tmp && tmp.length>0 && false==tmp.data("gen") ){
@@ -447,6 +453,10 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 			showSubContactPage( pageID, $(this).data("bi"), JSON.stringify(lvStack) );
 		});
 	}
+
+	$(".contact-branchList").height( $(window).height()-105 );
+	$(".contact-scroll").height( $(window).height()-45 );
+	
 	//第一頁滑進來, 其餘用fade
 	if( "page-group-main"== parentPageID ){
 		$.mobile.changePage("#"+pageID, { transition: "slide", reverse: false} );
@@ -498,9 +508,7 @@ showAllMemberPage = function(gn) {
 	page.data("gi", gi);
 
 	page.find(".page-title").html( $.i18n.getString("MEMBER_ALL") );
-	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
-	});
+	page.find(".page-back").off("click").click( showMainContact );
 	
 	var subPage = page.find(".subpage-contact");
 	subPage.html("");
@@ -553,6 +561,7 @@ showAllMemberPage = function(gn) {
 		subTitle.find(".count").html(count);
 	}
 
+	$(".contact-scroll").height( $(window).height()-45 );
 	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
@@ -693,7 +702,7 @@ generateBranchList = function( childList ){
 			left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", childData.cnt)+"</div>");
 			if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
 			
-			tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+			tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 			tmp.data("bi", key );
 			
 			branch.append(tmp);
@@ -702,6 +711,10 @@ generateBranchList = function( childList ){
 	return branch;
 }
 
+showMainContact = function(){
+	$(".subpage-contact .contact-rows").height( $(window).height()-63 );
+	$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
+}
 
 /*
               ███████╗ █████╗ ██╗   ██╗ ██████╗ ██████╗ ██╗████████╗███████╗          
@@ -714,7 +727,8 @@ generateBranchList = function( childList ){
 */
 
 //顯示我的最愛頁面
-showFavoritePage = function(){
+showFavoritePage = function( isBackward ){
+
 	var pageID = "page-contact_favorite";
 	var page = $( "#"+pageID );
 
@@ -733,9 +747,7 @@ showFavoritePage = function(){
 	// page.data("gi", gi);
 
 	page.find(".page-title").html( $.i18n.getString("COMMON_FAVORIATE") );
-	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
-	});
+	page.find(".page-back").off("click").click( showMainContact );
 	
 	var subPage = page.find(".subpage-contact");
 	subPage.html("");
@@ -769,7 +781,7 @@ showFavoritePage = function(){
 	});
 	extraContent.find(".btn.addGroup").off("click").click( function(e){
     	e.stopPropagation();
-		showAddGroup( subPage );
+		showAddFavGroupBox( subPage );
 	});
 
 	//---- part below title bar -----
@@ -836,7 +848,9 @@ showFavoritePage = function(){
 		}
 	}
 
-	$.mobile.changePage("#"+pageID, { transition: "slide"});
+	$(".contact-scroll").height( $(window).height()-45 );
+	if( true==isBackward ) $.mobile.changePage("#"+pageID, { transition: "slide", reverse: true} );
+	else  $.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
 //顯示單一自定群組內容
@@ -856,8 +870,8 @@ showSubFavoritePage = function( fi ){
 	}
 
 	page.find(".page-title").html( data.fn );
-	page.find(".page-back").off("click").click(function(){
-		$.mobile.changePage("#"+parentPageID, { transition: "slide", reverse: true});
+	page.find(".page-back").off("click").click( function(){
+		showFavoritePage(true);
 	});
 	
 	var subPage = page.find(".subpage-contact");
@@ -884,34 +898,10 @@ showSubFavoritePage = function( fi ){
 	//btn
 	//content
 	var extraContent = $("<div class='content'></div>");
-	extraContent.append("<div class='btn editGroup' align='center'><div class='img'></div><div class='text'>"+$.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_NAME")+"</div></div>");
+	extraContent.append("<div class='btn editGroup disable' align='center'><div class='img'></div><div class='text'>"+$.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_NAME")+"</div></div>");
 	extraContent.append("<div class='btn editMem' align='center'><div class='img'></div><div class='text'>"+$.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_MEMBER")+"</div></div>");
 	extraContent.append("<div class='btn delete' align='center'><div class='img'></div><div class='text'>"+$.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP")+"</div></div>");
 	extra.append( extraContent );
-
-	extra.off("click").click( function(){
-		extra.fadeToggle('fast');
-	});
-	extraContent.off("click").click( function(e){
-    	e.stopPropagation();
-		cns.debug("!");
-	});
-	extraContent.find(".btn.editGroup").off("click").click( function(e){
-    	e.stopPropagation();
-		// showEditGroup( subPage );
-	});
-	extraContent.find(".btn.editMem").off("click").click( function(e){
-    	e.stopPropagation();
-		cns.debug("editMem");
-	});
-	extraContent.find(".btn.delete").off("click").click( function(e){
-    	e.stopPropagation();
-		// showAddGroup( subPage );
-		cns.debug("delete");
-	});
-	title.find(".btnExtra").off("click").click( function(){
-		extra.fadeToggle('fast');
-	});
 
 	var subPageBottom = $('<div class="contact-scroll"></div>');
 	subPage.append(subPageBottom);
@@ -924,19 +914,21 @@ showSubFavoritePage = function( fi ){
 	
 	//mem
 	var memObject = {};
+	var currentFavData = {};
 	var count = 0;
 	$.each(guAll,function(key,mem){
 		if( mem.fbl && mem.fbl.length>0 ){
 			for(var i=0;i<mem.fbl.length;i++){
 				if( mem.fbl[i]==fi ){
 					memObject[key] = mem;
+					currentFavData[key] = mem.nk;
 					count++;
 					break;
 				}
 			}
 		}
 	});
-	var memContainer = generateMemberGrid(memObject);
+    var memContainer = generateMemberGrid(memObject);
 	subPageBottom.append(memContainer);
 	var memListContainer = generateMemberList(memObject);
 	subPageBottom.append(memListContainer);
@@ -955,7 +947,40 @@ showSubFavoritePage = function( fi ){
 		subTitle.find(".count").html(count);
 	}
 
+
+	extra.off("click").click( function(){
+		extra.fadeToggle('fast');
+	});
+	extraContent.off("click").click( function(e){
+    	e.stopPropagation();
+		cns.debug("!");
+	});
+	// extraContent.find(".btn.editGroup").off("click").click( function(e){
+ //    	e.stopPropagation();
+	// 	showEditFavGroupBox( subPage );
+	// });
+	extraContent.find(".btn.editMem").off("click").click( function(e){
+		$(this).data("fi", fi);
+		$(this).data("object_str", JSON.stringify(currentFavData) );
+    	e.stopPropagation();
+		showEditFavGroupBox( $(this) );
+	});
+	extraContent.find(".btn.delete").off("click").click( function(e){
+		$(this).data("fi", fi);
+    	e.stopPropagation();
+		popupShowAdjust($.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP"),
+			$.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP_CONFIRM", data.fn),
+			$.i18n.getString("COMMON_OK"),$.i18n.getString("COMMON_CANCEL"),
+			[deleteFavGroup,$(this)]
+		);
+	});
+	title.find(".btnExtra").off("click").click( function(){
+		extra.fadeToggle('fast');
+	});
+
+
 	//滑進來
+	$(".contact-scroll").height( $(window).height()-45 );
 	$.mobile.changePage("#"+pageID, { transition: "slide", reverse: false} );
 }
 
@@ -972,7 +997,7 @@ generateFavBranchList = function( childList ){
 			left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", data.cnt)+"</div>");
 			// if( childData.cl.length>0 ) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", childData.cl.length)+"</div>");
 			
-			tmp.find(".right").append("<img src='images/icon/icon_arrow_next.png'/>");
+			tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 			tmp.data("fi", key );
 			
 			branch.append(tmp);
@@ -985,22 +1010,200 @@ generateFavBranchList = function( childList ){
 }
 
 //顯示新增自定群組對話框
-showAddGroup = function( subPage ){
+showAddFavGroupBox = function( subPage ){
+	var container = subPage.find(".contact-createSubgroup");
+	if( container.length==0 ){
+		container = generateInputBox( 
+			subPage, 
+			$.i18n.getString("MEMBER_CREATE_CUSTOMIZE_GROUP"), 
+			$.i18n.getString("MEMBER_CUSTOMIZE_GROUP_NAME"),
+			$.i18n.getString("COMMON_CANCEL"), 
+			$.i18n.getString("MEMBER_CREATE"), 
+			function( input ){
+				container.fadeOut();
+				input.val("");
+			}, function( input ){
+				var create = container.find(".create");
+				var name = input.val();
+				if( null==name || name.length==0 ){
+					toastShow( $.i18n.getString("MEMBER_ENTER_CUSTOMIZE_GROUP_NAME") );
+					return;
+				}
+				cns.debug( "create", name );
+				// container.fadeOut();
+				var option = {
+					isShowGroup:false,
+					isShowAll:false,
+					isShowFav:true
+				};
+				composeObjectShowDelegate( create, create, option, function(){
+					var obj = create.data("object_str");
+					cns.debug( obj );
+					// cns.debug( create.data("branch_str") );
+
+					var api_name = "groups/" + gi + "/favorites";
+					var headers = {
+						"ui":ui,
+						"at":at, 
+						"li":lang
+					};
+					var memObject = $.parseJSON(obj);
+					var memKeys = Object.keys(memObject);
+					var body = {
+					  "fn": name, // Favorite Branch Name
+					  "gul": memKeys
+					};
+
+					ajaxDo(api_name,headers,"post",true,body).complete(function(data){
+						if(data.status == 200){
+							var tmp = $.parseJSON( data.responseText );
+							var data = {};
+							var userData = $.lStorage(ui);
+							var group = userData[gi];
+
+							//add fi to mem data
+							guAll = group.guAll;
+							for(var key in memObject){
+								guAll[key].fbl.push(tmp.fi);
+							}
+
+							//add fi data to fbl
+							fbl = group.fbl;
+							fbl[tmp.fi] = {cnt:memKeys.length, fn:name};
+							data[tmp.fi] = fbl[tmp.fi];
+							$.lStorage(ui, userData );
+
+							var branch = generateFavBranchList( data );
+							var rows = $("#page-contact_favorite .contact-rows");
+							if( rows.length>0 ){
+								branch.find(".row").appendTo( rows );
+							} else {
+								branch.appendTo("#page-contact_favorite .contact-scroll");
+							}
+							cns.debug( data.responseText );
+							container.fadeOut();
+
+							toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_SUCC") );
+							input.val("");
+						} else {
+							toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_FAIL") );
+						}
+					});
+				});
+			}
+		);
+		var create = container.find(".create");
+		create.data("object_str","");
+	}
+	container.fadeToggle();
+
+	var extra = subPage.find(".contact-extra");
+	extra.fadeToggle('fast');
+}
+
+showEditFavGroupBox = function( dom ){
+	var oriData = dom.data("object_str");
+	oriData = $.parseJSON(oriData);
+	var option = {
+		isShowGroup:false,
+		isShowAll:false,
+		isShowFav:true
+	};
+	composeObjectShowDelegate( dom, dom, option, function(){
+		var obj = dom.data("object_str");
+		var memObject = $.parseJSON(obj);
+		var memKeys = Object.keys(memObject);
+		var fi = dom.data("fi");
+		cns.debug( obj );
+		// cns.debug( create.data("branch_str") );
+
+		//若沒有人就砍了吧
+		if( memKeys.length==0 ){
+			// delete fi
+			popupShowAdjust($.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP"),
+				$.i18n.getString("MEMBER_CUSTOMIZE_GROUP_NO_MEMBER"),
+				$.i18n.getString("COMMON_OK"),$.i18n.getString("COMMON_CANCEL"),
+				[deleteFavGroup,dom]
+			);
+		} else {
+			// edit mem
+			var api_name = "groups/" + gi + "/favorites/" + fi + "/users";
+			var headers = {
+				"ui":ui,
+				"at":at, 
+				"li":lang
+			};
+			var body = {
+			  "al": [], // add list
+			  "dl": []	// del list
+			};
+
+			//check dl
+			for( var key in oriData ){
+				if( null==memObject[key] ){
+					body.dl.push(key);
+				}
+			}
+			//check al
+			for( var key in memObject ){
+				if( null==oriData[key] ){
+					body.al.push(key);
+				}
+			}
+
+			//沒有變化
+			if( body.al.length==0 && body.dl.length==0 ) return;
+
+			ajaxDo(api_name,headers,"put",true,body).complete(function(data){
+				if(data.status == 200){
+					var userData = $.lStorage(ui);
+					var group = userData[gi];
+
+					//add fi to mem data
+					guAll = group.guAll;
+					for(var i=0; i<body.al.length; i++){
+						var key = body.al[i];
+						guAll[key].fbl.push(fi);
+					}
+					//del fi from mem data
+					for(var i=0; i<body.dl.length; i++){
+						var key = body.dl[i];
+						var index = guAll[key].fbl.indexOf(fi);
+						if( index>=0 ) delete guAll[key].fbl[index];
+					}
+
+					//add fi data to fbl
+					fbl = group.fbl;
+					fbl[fi].cnt = memKeys.length;
+					$.lStorage(ui, userData );
+
+					dom.parent().fadeOut();
+					showSubFavoritePage(fi);
+
+					toastShow( $.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_MEMBER_SUCC") );
+				} else {
+					toastShow( $.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_MEMBER_FAIL") );
+				}
+			});
+		}
+	});
+}
+
+generateInputBox = function( subPage, title, placeholder, cancel, ok, onCancel, onOk ){
 	var container = $(".contact-createSubgroup");
 	if( container.length==0 ){
 		subPage.append("<div class='contact-createSubgroup' style='display:none;' data-init='f'>"
             +"<table class='innerContainer'>"
-                +"<tr><td class='title' data-textid='MEMBER_CREATE_CUSTOMIZE_GROUP'></td></tr>"
+                +"<tr><td class='title'>"+title+"</td></tr>"
                 +"<tr><td><input class='input'/></td></tr>"
-                +"<tr><td class='cancel' data-textid='COMMON_CANCEL'></td>"
-                    +"<td class='create cp-custom-subgroup' data-textid='MEMBER_CREATE'></td></tr>"
+                +"<tr><td class='cancel'>"+cancel+"</td>"
+                    +"<td class='create cp-custom-subgroup'>"+ok+"</td></tr>"
             +"</table></div>");
 		container = subPage.find(".contact-createSubgroup");
-		container._i18n();
 
 		//name input
 		var input = container.find(".input");
-		input.attr("placeholder", $.i18n.getString("MEMBER_CUSTOMIZE_GROUP_NAME") );
+		input.attr("placeholder", placeholder );
 		
 		container.off("click").click( function(){
 			container.fadeOut();
@@ -1011,84 +1214,57 @@ showAddGroup = function( subPage ){
 
 		container.find(".cancel").off("click").click( function(e){
 			e.stopPropagation();
-			container.fadeOut();
-			input.val("");
+			onCancel( input );
 		});
 
 		var create = container.find(".create");
-		create.data("object_str","");
 		create.off("click").click( function(e){
-			var name = input.val();
-			if( null==name || name.length==0 ){
-				toastShow( $.i18n.getString("MEMBER_ENTER_CUSTOMIZE_GROUP_NAME") );
-				return;
-			}
 			e.stopPropagation();
-			cns.debug( "create", name );
-			// container.fadeOut();
-			var option = {
-				isShowGroup:false,
-				isShowAll:false,
-				isShowFav:true
-			};
-			composeObjectShowDelegate( $(this), $(this), option, function(){
-				var obj = create.data("object_str");
-				cns.debug( obj );
-				// cns.debug( create.data("branch_str") );
-
-				var api_name = "groups/" + gi + "/favorites";
-				var headers = {
-					"ui":ui,
-					"at":at, 
-					"li":lang
-				};
-				var memObject = $.parseJSON(obj);
-				var memKeys = Object.keys(memObject);
-				var body = {
-				  "fn": name, // Favorite Branch Name
-				  "gul": memKeys
-				};
-
-				ajaxDo(api_name,headers,"post",true,body).complete(function(data){
-					if(data.status == 200){
-						var tmp = $.parseJSON( data.responseText );
-						var data = {};
-						var userData = $.lStorage(ui);
-						var group = userData[gi];
-
-						//add fi to mem data
-						guAll = group.guAll;
-						for(var key in memObject){
-							guAll[key].fbl.push(tmp.fi);
-						}
-
-						//add fi data to fbl
-						fbl = group.fbl;
-						fbl[tmp.fi] = {cnt:memKeys.length, fn:name};
-						data[tmp.fi] = fbl[tmp.fi];
-						$.lStorage(ui, userData );
-
-						var branch = generateFavBranchList( data );
-						var rows = $("#page-contact_favorite .contact-rows");
-						if( rows.length>0 ){
-							branch.find(".row").appendTo( rows );
-						} else {
-							branch.appendTo("#page-contact_favorite .contact-scroll");
-						}
-						cns.debug( data.responseText );
-						container.fadeOut();
-
-						toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_SUCC") );
-						input.val("");
-					} else {
-						toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_FAIL") );
-					}
-				});
-			});
+			onOk( input );
 		});
 	}
-	container.fadeToggle();
+	return container;
+}
 
-	var extra = subPage.find(".contact-extra");
-	extra.fadeToggle('fast');
+deleteFavGroup = function( dom ){
+	var fi = dom.data("fi");
+	var api_name = "groups/" + gi + "/favorites/"+fi;
+	var headers = {
+		"ui":ui,
+		"at":at, 
+		"li":lang
+	};
+	ajaxDo(api_name,headers,"delete",true,null).complete(function(data){
+		if(data.status == 200){
+			var tmp = $.parseJSON( data.responseText );
+			var data = {};
+			var userData = $.lStorage(ui);
+			var group = userData[gi];
+
+			//-----
+			// if user data is updated when delete
+			// remove this block
+			//-----
+			//remove fi to mem data
+			guAll = group.guAll;
+			for(var key in guAll){
+				for( var fiTmp in guAll[key].fbl ){
+					if( fiTmp.indexOf(fi)>=0 ){
+						delete guAll[key];
+						break;
+					}
+				}
+			}
+
+			//remove fi from fbl
+			fbl = group.fbl;
+			delete fbl[fi];
+			$.lStorage(ui, userData );
+
+			showFavoritePage( true );
+			toastShow( $.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP_SUCC") );
+		} else {
+			toastShow( $.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP_FAIL") );
+		}
+	});
 }
