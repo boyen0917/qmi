@@ -219,6 +219,10 @@
 	height: 75px;
 	cursor: pointer;
 }
+.contact-extra .btn.disable{
+	cursor: auto;
+	color: rgb(148, 160, 166);
+}
 .contact-extra .btn .img{
 	width: 35px;
 	height: 50px;
@@ -230,7 +234,8 @@
 	background-image: url("../images/common/icon/icon_members_addgroup.png");
 }
 .contact-extra .btn.editGroup .img{
-	background-image: url("../images/common/icon/icon_members_edit_group.png");
+	/*background-image: url("../images/common/icon/icon_members_edit_group.png");*/
+	background-image: url("../images/common/icon/icon_members_edit_group_disbale.png");
 }
 .contact-extra .btn.editMem .img{
 	background-image: url("../images/common/icon/icon_members_edit_member.png");

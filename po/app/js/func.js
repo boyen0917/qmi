@@ -278,7 +278,7 @@ $(function(){
 	        		$.each(new_bl,function(i,val){
         				if(val.lv > 1){
         					var parent = val.bp_arr[val.bp_arr.length-2];
-        					new_bl[parent].cl.push(i);
+                            new_bl[parent].cl.push(i);
         				}
         				delete val.bp_arr;
 	        		});
@@ -1778,18 +1778,22 @@ $(function(){
                 //工作發佈對象
                 isShowGroup = false;
                 isShowSelf = false;
-                obj_data = this_compose_obj.data("object_str");
             }else{
                 //其餘發佈對象
                 isShowGroup = true;
                 isShowSelf = true;
-                obj_data = this_compose.data("object_str");
             }
         } else {
             isShowGroup = (null==option.isShowGroup) ? isShowGroup: option.isShowGroup;
             isShowSelf = (null==option.isShowSelf) ? isShowSelf : option.isShowSelf;
             isShowAll = (null==option.isShowAll) ? isShowAll : option.isShowAll;
             isShowFav = (null==option.isShowFav) ? isShowFav : option.isShowFav;
+        }
+
+        if(this_compose_obj.parent().hasClass("cp-work-item")){
+            obj_data = this_compose_obj.data("object_str");
+        }else{
+            obj_data = this_compose.data("object_str");
         }
 
         $(".obj-content").data("selected-branch",{});
@@ -2076,10 +2080,12 @@ $(function(){
                     //有被選擇過 存在obj_data中
                     if($.inArray(this_cell.data("gu"),Object.keys(obj_data)) >= 0){
                         this_cell.data("chk",true);
+                        this_cell.find(".obj-cell-chk .img").addClass("chk");
                         // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
                         // this_cell.find(".img").addClass("chk");
                     }else{
                         this_cell.data("chk",false);
+                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
                         // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
                         // this_cell.find(".img").removeClass("chk");
                     }
