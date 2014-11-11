@@ -8,6 +8,13 @@ $(function(){
 	$(".navi-alert").click(function(){
 		$(".navi-alert").removeClass("new");
 
+		//nodeJS用, show程式小icon上面的數字
+		try{
+			require('nw.gui').Window.get().setBadgeLabel("0");
+		}catch(e){
+			cns.debug(e);	//必加, 一般瀏覽器require not defined
+		}
+
 		if($(".alert-area").is(":visible")){
 			hideAlertBox();
 		}else{

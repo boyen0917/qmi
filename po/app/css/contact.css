@@ -4,6 +4,8 @@
 
 .subpage-contact{
 	background: white;
+	position: fixed;
+	width: 100%;
 }
 
 .contact-search{

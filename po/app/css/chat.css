@@ -2,6 +2,26 @@
     display: none; 
 }
 
+/*@font-face {
+  font-family: SealmemoryHeader;
+  src: url(SealmemoryHeader.eot); IE9 Compat Modes
+  src: url(SealmemoryHeader.eot?#iefix) format("embedded-opentype"), IE6-IE8
+       url(SealmemoryHeader.woff) format("woff"), Modern Browsers
+       url(SealmemoryHeader.ttf) format("truetype"), Safari, Android, iOS
+       url(SealmemoryHeader.svg#SealmemoryHeader) format("svg"); Legacy iOS
+}*/
+
+@font-face {
+  font-family: "reg";
+  /*src: url('../font/NotoSansCJKtc-Medium.otf'); */ /*微胖*/
+  src: url('../font/NotoSansCJKtc-Regular.otf'); /*正常*/
+}
+/*標楷體*/
+@font-face {
+  font-family: "BiauKai";
+  src: url('../font/BiauKai.ttf');
+}
+
 body { 
 	margin: 0;
 	padding: 0;
@@ -10,7 +30,7 @@ body {
     background-attachment: fixed;
     background-position: center; 
 	background-size:cover;
-	font-family: "微軟正黑體","Microsoft JhengHei";
+	font-family: "reg", "微軟正黑體","Microsoft JhengHei";
     -webkit-font-smoothing: antialiased;
     font-weight: normal;
     text-shadow: 0 0 0 #fff;
@@ -228,7 +248,7 @@ body {
 	color: #93a4c3;
 	border: 1px solid #93a4c3;
 	border-radius: 1em 1em 1em 1em;
-	font-size: 8px;
+	font-size: 12px;
 	text-shadow: 0 0 0 #93a4c3;
 }
 
