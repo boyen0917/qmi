@@ -441,7 +441,7 @@ $(function(){
                      };
         var method = "post";
         var body = {
-                  fn: "filename",
+                  // fn: "filename", //目前已無用
                   tp: tp,
                   ti: ti,
                   pi: pi
