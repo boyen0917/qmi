@@ -6,11 +6,6 @@ var g_cn;		//聊天室名字
 var gi;		//group id
 var g_group;	//group
 var at;		//access token
-var eGroupTiType = {
-	"CHAT":0,
-	"CALENDER":1,
-	"TIME_LINE":2
-};
 var g_isEndOfPage = false;	//是否在頁面底端
 var g_isEndOfPageTime = 0;
 var g_lastScrollTime = 0;
@@ -27,6 +22,7 @@ var g_oriFooterHeight;
 var g_extraSendOpenStatus = 0;
 var g_lineHeight = 21;
 var pi;	//permission id for this chat room
+var ti_chat;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -70,14 +66,8 @@ $(document).ready(function(){
     g_room = g_group["chatAll"][ci];
 	g_cn = g_room.uiName ? g_room.uiName : g_group.gn;
 
-	eGroupTiType["CHAT"] = g_group["ti_chat"];
-	eGroupTiType["CALENDER"] = g_group["ti_cal"];
-	eGroupTiType["TIME_LINE"] = g_group["ti_feed"];
-
-    gu = g_group.gu;
-    ti_cal = g_group.ti_cal;
-    ti_feed = g_group.ti_feed;
-    ti_chat = g_group.ti_chat;
+	gu = g_group.gu;
+    ti_chat = ci;
 
     getPermition();
 
@@ -686,6 +676,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 	var msgDiv;
 	var isMe = ( object.meta.gu == g_group.gu );
 	var unSend = object.hasOwnProperty("notSend");
+
 	//is me?
 	if( isMe ){
 		//right align
@@ -791,7 +782,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 			}
 			var pic = $("<img class='msg-img' style='width:150px;height:200px;'>");
 			msgDiv.append(pic);
-			getS3file(msgDiv, msgData.c, msgData.p, msgData.tp, ci, 120);
+			getS3file(msgDiv, msgData.c, msgData.p, msgData.tp, ti_chat, 120);
 			break;
 		case 8: //audio
 			if(isMe){
@@ -803,7 +794,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 				"<audio class='msg-audio' src='test' controls></audio>"
 			);
 			msgDiv.append( this_audio );
-			getS3file(this_audio, msgData.c, msgData.p, msgData.tp, ci);
+			getS3file(this_audio, msgData.c, msgData.p, msgData.tp, ti_chat);
 			break; 
 		case 9: //map
 			if(isMe){
@@ -1040,8 +1031,7 @@ getS3file = function(target, file_c, file_p, tp, ti, size){
 	//default
 	size = size || 350;
 	cns.debug("size:",size);
-	//var api_name = "groups/" + gi + "/files/" + file_c + "?pi=" + file_p + "&ti=" + eGroupTiType[serviceTp];
-    var api_name = "groups/" + gi + "/files/" + file_c + "?pi=" + file_p +"&ti=" + ti;
+	var api_name = "groups/" + gi + "/files/" + file_c + "?pi=" + file_p +"&ti=" + ti;
     var headers = {
              "ui":ui,
              "at":at, 
@@ -1109,7 +1099,7 @@ function getPermition(){
     		"get", null, function(data, status, xhr){
 		    	//取得權限
 		    	var sendData = {
-		    		ti:eGroupTiType["CHAT"],
+		    		ti:ti_chat,
 		    		tu:{gul:data.ul}
 		    	};
 		    	op("/groups/"+gi+"/permissions", "post", 
