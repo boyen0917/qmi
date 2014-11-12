@@ -4388,119 +4388,121 @@ $(function(){
 		// cns.debug("gallery length:",gallery_arr.length);
 
 		var this_gallery = this_event.find(".st-attach-img");
-		//記錄圖片張數 以計算位移
- 		this_gallery.data("gallery-cnt",0);
 
  		//檢查移動是否完成
- 		this_gallery.data("gallery-move-chk",true);
-		$.each(gallery_arr,function(i,val){
+        var count = Math.min(5,Object.keys(gallery_arr).length);
+        var container = this_event.find(".st-attach-img-area");
+        var left = container.find("td:nth-child(1)");
+        var right = left.next();
+        if( count<=0 ) return;
+        if( count==1 ){
+            left.css("width","100%");
+        } else {
+            left.css("width","50%");
+        }
 
-			//getS3file(val.c);
+        if( count<5 ){
+            left.addClass("cnt_"+1);
+            right.addClass( "cnt_"+(count-1) );
+            // var leftHeight = height;
+            $.each(gallery_arr,function(i,val){
+                var this_img = $('<img class="st-slide-img"/>');
+                if( i==0 ){
+                    left.append(this_img);
+                }
+                else{
+                    right.append(this_img);
+                }
 
-			var this_img = $(
-				'<div class="st-slide-img">' +
-	            	'<img class="aut" src="images/loading.gif" style="width:30px;position: relative;top: 130px;"/>' +
-	            	'<img class="auo" src="" style="display:none"/>' +
-	            '</div>' +
-	            '<span class="st-img-gap"></span>'
-			);
-			this_event.find(".st-attach-img-area .st-img-gap-last").before(this_img);
+                getS3fileBackground(val,this_img,6,function(data){
+                    gallery_arr[i].s3 = data.s3;
+                    gallery_arr[i].s32 = data.s32;
+                });
+                if( i>=4 ) return false;
+            });
+        } else {
+            left.addClass("cnt_"+2);
+            right.addClass( "cnt_"+(count-2) );
+            $.each(gallery_arr,function(i,val){
+                var this_img = $('<div class="st-slide-img"/>');
 
-			getS3file(val,this_img,6);
-		});
+                if( i<2 ){
+                    left.append(this_img);
+                }
+                else{
+                    right.append(this_img);
+                }
 
-		//gallery 移動事件
-		var this_gallery = this_event.find(".st-attach-img");
-		this_gallery.mouseover(function(){
-			if(gallery_arr.length > 1){
-				this_gallery.find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").show();
-			}
-		});
+                getS3fileBackground(val,this_img,6,function(data){
+                    gallery_arr[i].s3 = data.s3;
+                    gallery_arr[i].s32 = data.s32;
+                });
+                if( i>=4 ) return false;
+            });
+        }
 
-		this_gallery.mouseout(function(){
-			this_gallery.find(".st-attach-img-arrow-l, .st-attach-img-arrow-r").hide();
-		});
-		
-		this_gallery.find(".st-attach-img-arrow-r").click(function(){
-
-			//判斷可否移動
-			if(this_gallery.data("gallery-move-chk")){
-				this_gallery.data("gallery-move-chk",false);
-			}else{
-				return false;
-			}
-
-			var gallery_cnt = this_gallery.data("gallery-cnt");//gallery_movement
-			gallery_cnt += 1;
-			
-			//右移 若超過總共張數 就左移到第一張
-			if(gallery_cnt >= gallery_arr.length){
-				gallery_cnt = 0;
-				var movement = {'left':'+=' + gallery_movement*(gallery_arr.length-1) + 'px'};
-			}else{
-				var movement = {'left':'-=' + gallery_movement + 'px'};
-			}
-
-			//開始移動
-			this_gallery.find(".st-slide-img").animate(movement,function(){
-				this_gallery.data("gallery-cnt",gallery_cnt);
-				this_gallery.data("gallery-move-chk",true);
-			});
-		});
-
-		this_gallery.find(".st-attach-img-arrow-l").click(function(){
-
-			//判斷可否移動
-			if(this_gallery.data("gallery-move-chk")){
-				this_gallery.data("gallery-move-chk",false);
-			}else{
-				return false;
-			}
-
-			var gallery_cnt = this_gallery.data("gallery-cnt");//gallery_movement
-			gallery_cnt -= 1;
-			
-			//左移 若小於第一張 就右移到最後一張
-			if(gallery_cnt < 0){
-				gallery_cnt = gallery_arr.length-1;
-				var movement = {'left':'-=' + gallery_movement*(gallery_arr.length-1) + 'px'};
-			}else{
-				var movement = {'left':'+=' + gallery_movement + 'px'};
-			}
-
-			//移動
-			this_gallery.find(".st-slide-img").animate(movement,function(){
-				this_gallery.data("gallery-cnt",gallery_cnt);
-				this_gallery.data("gallery-move-chk",true);
-			});
-		});
+        //記錄圖片張數 以計算位移
+        this_gallery.attr("cnt",count);
 
 		//點選開啟圖庫
-		this_gallery.find(".st-attach-img-area").mousedown(function(e){
+		this_gallery.find(".st-attach-img-area").click(function(e){
 			e.stopPropagation();
 			var this_img_area = $(this);
+            var this_ei = this_img_area.parents(".st-sub-box").data("event-id");
+            var this_gi = this_ei.split("_")[0];
+            var this_ti = this_ei.split("_")[1];
 			
-			var gallery_str = "";
-			this_img_area.find(".st-slide-img").each(function(i,val){
-				var img_url = $(this).find("img:eq(1)").attr("src") ;
-				gallery_str += '<li data-thumb="' + img_url + '"><img src="' + img_url + '" /></li>';
-			});
+            var gallery = $(document).data("gallery");
+            if( null != gallery && false==gallery.closed){
+                gallery.focus();
+                gallery.ui = ui;
+                gallery.at = at;
+                gallery.lang = lang;
+                gallery.this_ei = this_ei;
+                gallery.this_gi = this_gi;
+                gallery.this_ti = this_ti;
+                gallery.list = gallery_arr;
+                var dataDom = $(gallery.document).find(".dataDom");
+                dataDom.click();
+            } else {
+                gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
+                $(document).data("gallery", gallery);
+                $(gallery.document).ready(function(){
+                    setTimeout(function(){
+                        gallery.ui = ui;
+                        gallery.at = at;
+                        gallery.lang = lang;
+                        gallery.this_ei = this_ei;
+                        gallery.this_gi = this_gi;
+                        gallery.this_ti = this_ti;
+                        gallery.list = gallery_arr;
+                        var dataDom = $(gallery.document).find(".dataDom");
+                        dataDom.click();
+                    },500);
+                });
+            }
 
-			var this_s32 = this_img_area.find(".st-slide-img:eq(" + this_gallery.data("gallery-cnt") + ") img:eq(1)").attr("src");
+			// var gallery_str = "";
+			// this_img_area.find(".st-slide-img").each(function(i,val){
+			// 	var img_url = $(this).find("img:eq(1)").attr("src") ;
+			// 	gallery_str += '<li data-thumb="' + img_url + '"><img src="' + img_url + '" /></li>';
+			// });
 
-			var img = new Image();
-			img.onload = function() {
-				var gallery = window.open("flexslider/index.html", "", "width=" + this.width + ", height=" + this.height);
-	    		$(gallery.document).ready(function(){
-	    			setTimeout(function(){
-	    				var this_slide = $(gallery.document).find(".slides");
-	    				this_slide.html(gallery_str);
-	    				$(gallery.document).find("input").val(this_gallery.data("gallery-cnt"));
-	    				$(gallery.document).find("button").trigger("click");
-	    			},300);
-	    		});
-			}
-			img.src = this_s32;
+			// var this_s32 = this_img_area.find(".st-slide-img:eq(" + this_gallery.data("gallery-cnt") + ") img:eq(1)").attr("src");
+
+			// var img = new Image();
+			// img.onload = function() {
+			// 	var gallery = window.open("flexslider/index.html", "", "width=" + this.width + ", height=" + this.height);
+	  //   		$(gallery.document).ready(function(){
+	  //   			setTimeout(function(){
+	  //   				var this_slide = $(gallery.document).find(".slides");
+	  //   				this_slide.html(gallery_str);
+	  //   				$(gallery.document).find("input").val(this_gallery.data("gallery-cnt"));
+	  //   				$(gallery.document).find("button").trigger("click");
+	  //   			},300);
+	  //   		});
+			// }
+			// img.src = this_s32;
 		});
 	}
 
@@ -4552,6 +4554,43 @@ $(function(){
 		});
 	}
 
+    getS3fileBackground = function(file_obj,target,tp, callback){
+        var this_ei = target.parents(".st-sub-box").data("event-id");
+        var this_gi = this_ei.split("_")[0];
+        var this_ti = this_ei.split("_")[1];
+
+        //default
+        var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "get";
+        var result = ajaxDo(api_name,headers,method,false);
+        result.complete(function(data){
+            if(data.status != 200) return false;
+
+            var obj =$.parseJSON(data.responseText);
+            obj.api_name = api_name;
+            if(target && tp){
+                switch(tp){
+                    case 6://圖片
+                        //小圖
+                        target.css("background-image","url("+obj.s3+")");
+                        //大圖
+                        target.data("auo",obj.s32);
+                        break;
+                    case 8://聲音
+                        target.attr("src",obj.s3);
+                        break;
+                }
+            }else{
+                return obj.s3;
+            }
+            if( callback ) callback(obj);
+        });
+    }
 
 	uploadErrorCnt = function(this_compose,file_num,total){
 		//上傳編號加一
