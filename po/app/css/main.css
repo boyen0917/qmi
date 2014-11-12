@@ -3485,24 +3485,24 @@ input.cp-datetimepicker-end {
 	left: 0;
 	z-index: 1600;
 	transition: transform 1s;
-	transform-style: preserve-3d;
+	-webkit-transform-style: preserve-3d;
 }
 
 
 .user-info-flip {
-	transform: rotateY( 180deg );
+	-webkit-transform: rotateY( 180deg );
 }
 
 .user-info-load-area .user{
 	position: absolute;
-	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
 	width: 100%;
 }
 
 .user-info-load-area .me.me-rotate {
 	position: absolute;
-	transform: rotateY( 180deg );
-	backface-visibility: hidden;
+	-webkit-transform: rotateY( 180deg );
+	-webkit-backface-visibility: hidden;
 	width: 100%;
 }
 

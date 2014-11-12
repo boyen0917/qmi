@@ -100,6 +100,15 @@ $(function(){
 		supriseKey();
 	});
 
+	//for node-webkit app to open systems browser
+	$(document).on("click","a",function(e){
+		if(navigator.userAgent=="mitake webkit"){
+            var gui = require('nw.gui');
+            gui.Shell.openExternal($(this).attr("href"));
+			return false;        	
+        }
+	});
+
 	//下拉更新 滾輪版
 	$("#page-group-main").bind('mousewheel DOMMouseScroll', function(event){
 
@@ -137,8 +146,6 @@ $(function(){
 	            }
 	        }		   
 		}
-
-			
     });
 
 	//timeline 滾到底部取舊資料
@@ -166,7 +173,7 @@ $(function(){
 		    	
 		    	//避免重複
 		    	this_navi.data("scroll-chk",true);
-		    	cns.debug("last event ct:",this_navi.data("last-ct"));
+		    	// cns.debug("last event ct:",this_navi.data("last-ct"));
 		    	timelineListWrite(this_navi.data("last-ct"));
 		    }
 		}

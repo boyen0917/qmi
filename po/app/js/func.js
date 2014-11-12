@@ -3626,6 +3626,14 @@ $(function(){
 
 		        	//存完後改timeline 
 		            $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+
+                        //更新事件完成後 把原本db拉出來的event刪除 避免影響
+                        var feed_type = $("#page-group-main").data("navi") || "00";
+                        var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+                        cns.debug("events from db:",this_navi.find(".st-sub-box[data-idb=true]"));
+                        this_navi.find(".st-sub-box[data-idb=true]").remove();
+
+                        
 		    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
 			    	});
 		    	}
@@ -3703,9 +3711,13 @@ $(function(){
             var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
             var top_subbox = ori_selector.find(".st-sub-box:eq(0)");
 
+            var total_cnt = timeline_list.length;
+
             //就隱藏其他類別 開啓當下類別
             $(".feed-subarea").hide();
             ori_selector.show();
+
+            ori_selector.data("last-ct",timeline_list.last().meta.ct);
         }
         
         var this_event = this_event_temp;
@@ -3723,10 +3735,10 @@ $(function(){
                 //reset selector
                 selector = ori_selector;
 
-                //寫入最舊的一筆時間
-                if(!selector.data("last-ct") || (selector.data("last-ct") && selector.data("last-ct") > val.meta.ct)){
-                    selector.data("last-ct",val.meta.ct);
-                }
+                //寫入最舊的一筆時間 11/12 改成每次list的最後一筆
+                // if(!selector.data("last-ct") || (selector.data("last-ct") && selector.data("last-ct") > val.meta.ct)){
+                //     selector.data("last-ct",val.meta.ct);
+                // }
 
                 //讀完就可重新滾動撈取舊資料 setTimeOut避免還沒寫入時就重新撈取
                 setTimeout(function(){
@@ -3743,13 +3755,10 @@ $(function(){
                     this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
                     this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
                     this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
-
                     //event status
                     this_event.data("event-val",val);
                     setEventStatus(this_event,$(".st-filter-area").data("filter"));
-                    return;
                 }
-
                 this_event = this_event_temp.clone();
             }
 
@@ -3766,7 +3775,6 @@ $(function(){
                     selector = top_subbox;
                 }
             }
-
 
             //寫入
             selector[method](this_event);
@@ -3802,6 +3810,7 @@ $(function(){
             // var time = new Date(val.meta.ct);
             // var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
             this_event.find(".st-sub-time").append(new Date(val.meta.ct).toFormatString());
+            this_event.find(".st-sub-time").append(val.meta.ct);
 
             //發佈對象
             var tu_str = "所有人";
@@ -3921,9 +3930,8 @@ $(function(){
         });
     }
 
-	
-
 	timelineListWrite = function (ct_timer,is_top){
+        // var ct_timer = ct_timer || "1415721551557";
 		//判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
     	if(!ct_timer && !is_top){
     		var event_tp = $("#page-group-main").data("navi") || "00";
@@ -3973,7 +3981,9 @@ $(function(){
 	    	//寫timeline
 	    	load_show = false;
 	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list);
+                cns.debug("idb event!");
+                $(this).find(".st-sub-box").attr("data-idb",true);
+    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,false,false);
 	    	});
 	    },{
             index: idb_index,
