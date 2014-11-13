@@ -1,0 +1,100 @@
+::-webkit-scrollbar { 
+    display: none; 
+}
+
+body{
+	background: black;
+	color: white;
+	font-family: "微軟正黑體","Microsoft JhengHei";
+    -webkit-font-smoothing: antialiased;
+    font-weight: normal;
+    margin: 0;
+}
+
+.title{
+	width: 100%;
+	/* margin-top: 30px; */
+	text-align: center;
+	font-size: 30px;
+	line-height: 30px;
+	position: fixed;
+	top: 35px;
+}
+
+.subTitle{
+	width: 100%;
+	margin-bottom: 35px;
+	text-align: center;
+	/* font-size: 30px; */
+	line-height: 30px;
+	color: lightgray;
+	font-size: 20px;
+	position: fixed;
+	top: 70px;
+}
+.picArea{
+	height: 73%;
+	width: 96%;
+	position: absolute;
+	/* margin-left: 2%; */
+	left: 0;
+	-webkit-transition: all 0.3s;
+	top: 14%;
+}
+
+.picArea .img{
+	height: 100%;
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+	display: inline-block;
+	/*width: 48%;
+	margin-right: 2%;*/
+}
+
+.lBtn, .rBtn{
+	height: 73%;
+	/*background: rgba(255, 135, 135, 0.5);*/
+	position: fixed;
+	width: 10%;
+	background-position-y: 50%;
+	background-repeat: no-repeat;
+	background-size: 25px;
+	cursor: pointer;
+	top: 14%;
+}
+.lBtn:hover, .rBtn:hover{
+	-webkit-transform: scale(1.02);
+}
+.lBtn{
+	float: left;
+	left: 2%;
+	text-align: left;
+	background-position-x: 30%;
+	background-image: url("../images/calendar/icon_calendar_arrow_red_end.png");
+}
+.rBtn{
+	float: right;
+	right: 2%;
+	text-align: right;
+	background-position-x: 70%;
+	background-image: url("../images/calendar/icon_calendar_arrow_red_start.png");
+}
+
+.cnt{
+	height: 50px;
+	/* width: 100px; */
+	float: right;
+	bottom: 0;
+	position: fixed;
+	right: 20px;
+	font-weight: bolder;
+	font-size: 20px;
+}
+.cnt .current, .cnt .all{
+	margin-right: 5px;
+	margin-left: 5px;
+}
+.cnt .current{
+	color: rgb(29, 142, 244);
+}
