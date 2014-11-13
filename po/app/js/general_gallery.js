@@ -36,77 +36,61 @@ $(document).ready(function(){
 		$(".cnt .all").html( list.length );
 	});
 
-	$(".rBtn").off("click").click( function(){
-		// cns.debug("------- R ---------");
-		scrollPercent = 0;
-		scrollVal = 0;
-		var index = picArea.data("index");
-		index++;
-		if( index>=list.length ){
-			index = 0;
-		}
-		picArea.css("left", (-100*index)+"%");
-		picArea.data("index", index);
-		$(".cnt .current").html( index+1 );
-	});
-
-	$(".lBtn").off("click").click( function(){
-		// cns.debug("------- L ---------");
-		scrollPercent = 0;
-		scrollVal = 0;
-		if( list.length<=1 ) return;
-		var index = picArea.data("index");
-		index--;
-		if( index<0 ){
-			index = list.length-1;
-		}
-		picArea.css("left", (-100*index)+"%");
-		picArea.data("index", index);
-		$(".cnt .current").html( index+1 );
-	});
+	$(".rBtn").off("click").click( moveRight );
+	$(".lBtn").off("click").click( moveLeft );
 
 	picArea.bind("mousewheel", function(e) {
+		var cnt = $(this).data("cnt");
+		if( cnt<=1 ) return;
 		isCheckPosi = true;
 		var data = e.originalEvent;
-		// cns.debug(data.wheelDelta, data.wheelDeltaX, scrollVal);
 
 		var index = $(this).data("index");
-		var left = -100*index;
-		if( data.wheelDeltaX!=0 ){
-			// scrollVal += data.wheelDeltaX;
-			// scrollPercent = scrollVal/200.0;
-			// // scrollPercent = data.wheelDeltaX/60;
-			// left += scrollPercent*100;
+		var maxIndex = cnt-1;
+		var left = 0;
+		var time = new Date().getTime();
+		if( time< nextScrollTime ) return;
 
-			// if( scrollPercent>=0.8 )	$(".lBtn").trigger( "click" );
-			// else if( scrollPercent<=-0.8 )	$(".rBtn").trigger( "click" );
-			// checkTime = new Date().getTime()+1000;
+		if( data.wheelDeltaX!=0 ){
+			cns.debug(data.wheelDeltaX, scrollVal, scrollPercent*100);
+			scrollVal += data.wheelDeltaX;
+			scrollPercent = scrollVal/100;
+			left += scrollPercent*100;
+			checkTime = new Date().getTime()+500;
 		}
 		else{
 			scrollVal += data.wheelDelta;
 			scrollPercent = scrollVal/120;
-			left += scrollPercent*5;
-			if( scrollPercent>=1 ){
-				var time = new Date().getTime();
-				if( time>=nextScrollTime ){
-					nextScrollTime = time+200;
-					$(".lBtn").trigger( "click" );
-				}
-			} else if( scrollPercent<=-1 ) {
-				var time = new Date().getTime();
-				if( time>=nextScrollTime ){
-					nextScrollTime = time+200;
-					$(".rBtn").trigger( "click" );
-				}
-			}
+			left += scrollPercent*100;
 			checkTime = new Date().getTime()+300;
 		}
+		if( (left>0&&0==index) || (left<0&&maxIndex==index) ){
+			left=-100*index+left*0.1;
+
+			if( scrollPercent>=1 ){
+				moveLeft(false);
+				nextScrollTime = time+600;
+			} else if( scrollPercent<=-1 ) {
+				moveRight(false);
+				nextScrollTime = time+600;
+			}
+		}
+		else{
+			left=-100*index+left;
+
+			if( scrollPercent>=1 ){
+				moveLeft(false);
+			} else if( scrollPercent<=-1 ) {
+				moveRight(false);
+			}
+		}
+
 		$(this).css("left", left+"%");
 		return false;
 	});
 
 	setInterval( function(){
-		if( isCheckPosi && (new Date().getTime())>=checkTime){
+		if( isCheckPosi && (new Date().getTime())>checkTime){
 			scrollPercent = 0;
 			var index = picArea.data("index");
 			isCheckPosi = false;
@@ -114,6 +98,36 @@ $(document).ready(function(){
 		}
 	}, 100);
 });
+
+moveRight = function( isMove ){
+	var picArea = $(".picArea");
+	// cns.debug("------- R ---------");
+	scrollPercent = 0;
+	scrollVal = 0;
+	var index = picArea.data("index");
+	index++;
+	if( index>=list.length ){
+		index = 0;
+	}
+	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
+	picArea.data("index", index);
+	$(".cnt .current").html( index+1 );
+}
+moveLeft = function( isMove ){
+	var picArea = $(".picArea");
+	// cns.debug("------- L ---------");
+	scrollPercent = 0;
+	scrollVal = 0;
+	if( list.length<=1 ) return;
+	var index = picArea.data("index");
+	index--;
+	if( index<0 ){
+		index = list.length-1;
+	}
+	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
+	picArea.data("index", index);
+	$(".cnt .current").html( index+1 );
+}
 
 getS3fileBackground = function(file_obj,target,tp){
     //default

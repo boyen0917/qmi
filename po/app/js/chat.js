@@ -209,11 +209,7 @@ $(document).ready(function(){
 					showMsg( object );
 				}
 			}
-			op("/groups/"+gi+"/chats/"+ci+"/messages_read"
-			    ,"PUT",
-			    JSON.stringify({lt:g_currentDate.getTime()}),
-			    null
-			);
+			sendMsgRead( g_currentDate.getTime() );
 		});
 		updateChat();
 	}
@@ -308,11 +304,7 @@ function getHistoryMsg ( bIsScrollToTop ){
 				}
 	        }
 	    
-		    op("/groups/"+gi+"/chats/"+ci+"/messages_read"
-			    ,"PUT",
-			    JSON.stringify({lt:g_currentDate.getTime()}),
-			    null
-			);
+			sendMsgRead(g_currentDate.getTime());
 			
 			if( g_bIsPolling )	updateChat();
 
@@ -1121,4 +1113,12 @@ function getPermition(){
     } else {
     	pi = g_room.pi;
     }
+}
+
+function sendMsgRead( msTime ){
+	op("/groups/"+gi+"/chats/"+ci+"/messages_read"
+	    ,"PUT",
+	    JSON.stringify({lt:msTime}),
+	    null
+	);
 }

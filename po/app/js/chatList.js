@@ -128,7 +128,7 @@ function showChatList(){
 				row.append(td);
 
 				td = $("<td data-id='"+room.ci+"'></td>");
-				td.append("<div class='name'>" + chatRoomName + "</div>");
+				td.append("<div class='name'>" + chatRoomName.replaceOriEmojiCode() + "</div>");
 				var lastMsg = $("<div class='msg'></div>");
 				td.append(lastMsg);
 				row.append(td);
@@ -222,15 +222,12 @@ function openChatWindow ( ci ){
 
 function updateLastMsg(giTmp, ci){
 	var table = $(".subpage-chatList-row[data-rid='"+ci+"']");
-	if(!table || 0>=table.length ){
-		cns.debug("[!]dom not find.gi:"+giTmp+" ci:"+ci);
-		return;
-	}
-	setLastMsg( giTmp, ci, table );
+	setLastMsg( giTmp, ci, table, true );
 	setTimeout(sortRoomList, sortRoomListTimeout);
 }
 
-function setLastMsg( giTmp, ci, table ){
+function setLastMsg( giTmp, ci, table, isShowNotify ){
+	if( null==isShowNotify ) isShowNotify = false;
 	// if( gi!=giTmp ) return;
 	// if(!table) return;
 
@@ -238,7 +235,7 @@ function setLastMsg( giTmp, ci, table ){
 	    if( list.length>0 ){
 	    	if( null!=list[0] ){
 	        	var object = list[0].data;
-	        	setLastMsgContent( table, object );
+	        	setLastMsgContent( ci, table, object, isShowNotify );
 	    	}
 	    }
 	},{
@@ -259,15 +256,13 @@ function setLastMsg( giTmp, ci, table ){
 	});
 }
 
-function setLastMsgContent( table, data ){
-	table.data("time", data.meta.ct);
-	var msgDom = table.find(".msg");
-	var timeDom = table.find(".time");
-
+function setLastMsgContent( ci, table, data, isShowNotify ){
 	var userData = $.lStorage(ui);
 	var groupData = userData[gi];
 	var text = "";
-	var name = groupData.guAll[data.meta.gu].nk.replaceOriEmojiCode();
+	var mem = groupData.guAll[data.meta.gu];
+	if( null==mem ) return;
+	var name = mem.nk;
 	switch( data.ml[0].tp ){
 		case 5: //sticker
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
@@ -285,9 +280,20 @@ function setLastMsgContent( table, data ){
 			text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c.replaceOriEmojiCode():"";
 			break;
 	}
-	if(msgDom)	msgDom.html( text );
-	cns.debug( new Date(data.meta.ct).toFormatString() );
-	if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
+
+	if(table){
+		table.data("time", data.meta.ct);
+		var msgDom = table.find(".msg");
+		var timeDom = table.find(".time");
+
+		if(msgDom)	msgDom.html( text.replaceOriEmojiCode() );
+		cns.debug( new Date(data.meta.ct).toFormatString() );
+		if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
+	}
+	
+	if( isShowNotify && typeof(riseNotification)!='undefined' ) riseNotification (null, groupData.gn+" - "+mem.nk, text, function(){
+		cns.debug(ci); 
+	});
 }
 
 function sortRoomList(){
