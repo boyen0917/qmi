@@ -186,4 +186,11 @@
 	String.prototype.startsWith = function (str){
 		return this.indexOf(str) == 0;
 	};
+
+	String.prototype.parseHtmlString = function () {
+    	return this.replace(/&#([0-9]{1,5});/gi, function(match, numStr) {
+        var num = parseInt(numStr, 10); // read num as normal number
+        return String.fromCharCode(num);
+    });
+}
 })(jQuery);

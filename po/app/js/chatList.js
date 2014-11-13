@@ -277,7 +277,7 @@ function setLastMsgContent( ci, table, data, isShowNotify ){
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_LOCATION", name);
 			break;
 		default:
-			text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c.replaceOriEmojiCode():"";
+			text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c:"";
 			break;
 	}
 
@@ -291,9 +291,16 @@ function setLastMsgContent( ci, table, data, isShowNotify ){
 		if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
 	}
 	
-	if( isShowNotify && typeof(riseNotification)!='undefined' ) riseNotification (null, groupData.gn+" - "+mem.nk, text, function(){
-		cns.debug(ci); 
-	});
+	if( isShowNotify ){
+		try{
+			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
+			riseNotification (null, groupData.gn.parseHtmlString()+" - "+mem.nk, text, function(){
+				cns.debug(ci); 
+			});
+		} catch(e) {
+			cns.debug( e );
+		}
+	}
 }
 
 function sortRoomList(){
