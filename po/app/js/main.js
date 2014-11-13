@@ -96,6 +96,9 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
+		var feed_type = $("#page-group-main").data("navi") || "00";
+		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+		cns.debug("last-ct",this_navi.data("last-ct"));
 		//彩蛋鑰匙
 		supriseKey();
 	});
@@ -542,14 +545,10 @@ $(function(){
 			$(".st-filter-main").show();
 		});
 
-
-		
-
 		var filter_status = $(this).data("status");
 
 		//過濾發文類型
-		if(filter_status == "navi"){
-			cns.debug("navi:",".st-navi-subarea[data-navi="+ $(this).data("navi") +"]");
+		if(filter_status == "navi" || filter_status == "all"){
         	$(".st-navi-subarea[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	return false;
 		}
@@ -560,7 +559,6 @@ $(function(){
 		//做過濾
 		//先關閉全區域
 		$(".st-feedbox-area").hide();
-
 
 		//記錄
 		$(".st-filter-area").data("filter",filter_status);
@@ -582,18 +580,14 @@ $(function(){
 		});
 	});
 
-	
-	$(document).on('click','.st-like-btn',function(){
+	$(document).on('click','.st-sub-box-3 .st-like',function(){
 		var this_event = $(this).parents(".st-sub-box");
-		cns.debug("like this event:",this_event);
 		var like_count = parseInt(this_event.find(".st-sub-box-3 div:eq(0)").html());
 		//按讚 收回 api
 		var target_obj = {};
-		//target_obj.selector = this_event.find(".st-sub-box-3");
 		target_obj.selector = this_event;
-		target_obj.act = "like";
+		target_obj.act = "like1";
 		target_obj.order = 0;
-
 
 		//存回
     	var event_status = this_event.data("event-status");
@@ -607,12 +601,12 @@ $(function(){
     		event_status[this_ei] = {};
     	}
 
+		target_obj.status = event_status;
 
-
-    	//按讚區域
+		//按讚區域
     	var parti_list = this_event.data("parti-list");
 
-    	//檢查按讚了沒
+		//檢查按讚了沒
 		//按讚 like_chk是true
 		if(chkEventStatus(this_event,"il")){
 			// $(this).html("收回讚");
@@ -629,14 +623,18 @@ $(function(){
 			parti_list.splice(i,1);
 		}
 
-		target_obj.status = event_status;
-
 		//發完api後做真正存入動作
-		putEventStatus(target_obj,1,est);
+		putEventStatus(target_obj,1,est,function(chk){
 
-		//做按讚區域改寫 (你、按讚)
-		this_event.data("parti-list",parti_list);
-		detailLikeStringMake(this_event);
+			if(chk){
+				//做按讚區域改寫 (你、按讚)
+				this_event.data("parti-list",parti_list);
+				//detail開啓 才做按讚敘述
+				if(this_event.data("detail-content")) detailLikeStringMake(this_event);
+			}
+		});
+
+		
 	});
 
 	//回覆按讚
@@ -696,7 +694,6 @@ $(function(){
 		var this_event = $(this).parents(".st-sub-box");
 
 		if(this_event.data("detail-page")) return false;
-		cns.debug("kerker");
 		//調整寬度
 		this_event.find(".st-reply-message-textarea").css("width",$(window).width()-200);
 		
@@ -828,11 +825,6 @@ $(function(){
 			
 		
 	});
-
-	// $(document).on("mouseup",".st-box2-more-task-area-detail",function(e){
-	// 	e.stopPropagation();
-	// });
-	
 
 	$(document).on("mouseup",".st-sub-box-1, .st-sub-box-2",function(e){
 		if($(this).data("trigger")) $(this).trigger("detailShow");
@@ -1244,6 +1236,9 @@ $(function(){
 		$(this).attr("src","images/common/icon/bt_close_activity.png");
 	});
 	$(document).on("mouseup",".user-info-close",function(){
+		//歸位
+		$(window).scrollTop($(document).data("namecard-pos"));
+
 		$("body").removeClass("user-info-adjust");
 
 		//reset
@@ -1260,10 +1255,12 @@ $(function(){
 	$(document).on("mouseup",".user-info-back",function(){
 		// $(".me-info-load user-avatar > ")
 		$(".user-info-load-area").removeClass("user-info-flip");
+
 		$(".user-info-load , .me-info-load").stop().animate({
 			opacity:0
 		},400);
 		setTimeout(function(){
+			$(".user-info-load-area .me").addClass("backface-visibility");
 			$(document).find(".user-info-load-area .user").show();
 			$(".user-info-load , .me-info-load").stop().animate({
 				opacity:1
@@ -1371,9 +1368,13 @@ $(function(){
 		updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 	});	
 
-
 	$(document).on("mouseup",".namecard",function(e){
 		e.stopPropagation();
+		$(document).data("namecard-pos",$(window).scrollTop());
+		$(window).scrollTop(0);
+		// $(".user-info-load-area").css("top",$(window).scrollTop());
+		// $(".screen-lock").css("top",$(window).scrollTop());
+
 		//鈴鐺頁面不動作
 		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);
 
