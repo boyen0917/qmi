@@ -18,6 +18,7 @@ $(document).ready(function(){
 		picArea.data("index", 0);
 		picArea.data("cnt", list.length);
 		picArea.css("width",(list.length*100)+"%");
+		picArea.css("left", "0%");
 
 		var width = 100.0/list.length;
 		for( var i=0; i<list.length; i++ ){
