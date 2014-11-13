@@ -1,6 +1,6 @@
 /* z-index 區域最高100 全域遮罩1000  全域遮罩上的元件1100 */
 
-.ui-body-c, .ui-body-c input, .ui-body-c select,textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c{
+.ui-body-c, .ui-body-c input, .ui-body-c select,textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c, .alert-area{
     font-family: "微軟正黑體","Microsoft JhengHei";
     -webkit-font-smoothing: antialiased;
     font-weight: normal;
@@ -738,7 +738,7 @@ img.auo {
 	width: 70%;
 }
 
-.sm-user-area-r img {
+/*.sm-user-area-r img {
 	width: 25px;
 	border: 2px solid #d2d2d2;
 	border-radius: 4px;
@@ -747,7 +747,7 @@ img.auo {
 	right: 5px;
 	top: 25px;
 	cursor: pointer;
-}
+}*/
 
 
 .sm-small-area {
@@ -2218,9 +2218,9 @@ img.auo {
 }
 
 .st-attach-img-area {
-	/*display: -webkit-inline-box;*/
-	width: 500px;
+	width: 90%;
 	height: 500px;
+	max-width: 700px;
 }
 
 .st-slide-img {
