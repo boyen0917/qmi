@@ -4047,7 +4047,6 @@ $(function(){
 	}
 
     setEventStatus = function(this_event,filter,status){
-        cns.debug("new status",status);
         //先用idb寫 再去向server要
         var ei_val = this_event.data("event-val");
         if(ei_val.status && ei_val.status[ei_val.ei]){
@@ -4073,7 +4072,6 @@ $(function(){
             if(data.status == 200){
                 
                 var s_data = $.parseJSON(data.responseText).el;
-                cns.debug("old status",s_data);
                 var es_obj = {}
 
                 if(s_data.length != 0){
@@ -5123,7 +5121,12 @@ $(function(){
 		        //cmds api
 		        pollingCmds(new_pollingData.cmds,new_pollingData.msgs,new_pollingData.ccs);
 
-        	}
+        	}else{
+                //錯誤處理
+                popupShowAdjust("","驗證失敗 請重新登入",true,false,[reLogin]);
+                clearInterval(pc);
+                return false;
+            }
         });
     }
 
