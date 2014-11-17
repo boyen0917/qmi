@@ -1115,11 +1115,18 @@ img.auo {
     padding-top: 5px;
 }
 
+#page-compose .stickerArea{
+	height: 200px;
+	width: 100%;
+	bottom: 0;
+	position: fixed;
+	padding-top: 5px;
+}
 /* datetimepicker 是 9999 所以特例10000 */
 .cp-footer {
 	height: 44px;
 	background: url("../images/compose/compose_form_addfile_bg.png") repeat-x;
-	display: inline-block;
+	/*display: inline-block;*/
 	width: 100%;
 	border-bottom: 1px solid rgb(218,218,218);
 	position: fixed;
@@ -2513,6 +2520,7 @@ img.auo {
 	background: rgb(239,239,239);
 	height: 45px;
 	z-index: 10;
+	display: inline-block;
 }
 
 .st-reply-message-bg {
@@ -2570,6 +2578,16 @@ img.st-reply-message-attach {
 	padding: 6px 0 0 11px;
 	height: 26px;
 	width: 44px;
+}
+
+
+.st-reply-message-img{
+	background: rgb(239,239,239);
+}
+.st-reply-message-img img{
+	max-width: 150px;
+	max-height: 150px;
+	margin: 20px 0 20px 80px;
 }
 
 .st-reply-content .au-area {
@@ -2691,6 +2709,30 @@ img.st-reply-message-attach {
 
 .cp-attach-area {
 	padding: 20px 0;
+}
+
+.cp-sticker-area .sticker{
+	position : relative;
+	max-width: 145px;
+	margin-left: 18px;
+}
+.cp-sticker-area .sticker img{
+	max-width: 100%;
+	max-height: 100%;
+}
+.cp-sticker-area .sticker:before{
+	background-image: url("../images/common/icon/icon_compose_close.png");
+	position: absolute;
+	top: -10px;
+	display: block;
+	width: 27px;
+	z-index: 1;
+	right: -10px;
+	height: 27px;
+	content: "";
+	background-size: 25px 25px;
+	background-repeat: no-repeat;
+	background-position: 50%;
 }
 
 .cp-file-area {
@@ -3259,7 +3301,7 @@ input.cp-datetimepicker-end {
 
 .obj-selected {
 	/*display: flex; */
-	background: rgb(243,252,255);
+	background: #eaf8ff;
 	/* white-space: nowrap; */
 	min-height: 30px;
 	font-size: 18px;
@@ -3273,24 +3315,33 @@ input.cp-datetimepicker-end {
 	border-bottom: rgb(237,238,240) 1px solid;
 }
 
-.obj-selected div:nth-child(1) {
-	color: #1264a7;
+.obj-selected .title {
+	color: #b4b4b4;
 	display: inline-block;
 	vertical-align: top;
 	position: relative;
-	top: 5px;
-	left: 10px;
+	top: 3px;
+	left: 11px;
+}
+.obj-selected .title img {
+	width: 25px;
+	position: relative;
+	top: 3px;
+	/*left: 3px;*/
+}
+.obj-selected .title div {
+	display: inline-block;
 }
 
 
-.obj-selected div:nth-child(2) {
+.obj-selected .list {
 	display: inline-block;
 	width: 70%;
 	max-height: 100px;
 	text-overflow: ellipsis;
 	overflow: scroll;
 	min-height: 30px;
-	color: rgb(71,150,237);
+	color: #4092ef;
 	/* white-space: pre-line; */
 	/* text-align: justify; */
 	text-shadow: 0px 0px 0px rgb(71,150,237);
@@ -3299,7 +3350,7 @@ input.cp-datetimepicker-end {
 	left: 10px;
 }
 
-.obj-selected div:nth-child(3) {
+.obj-selected .clear {
 	display: inline-block;
 	width: 30px;
 	background: url("../images/icon/icon_search_clean.png");
@@ -3309,13 +3360,6 @@ input.cp-datetimepicker-end {
 	float: right;
 	margin-right: 7px;
 	margin-top: 5px;
-}
-
-.obj-selected > div > img {
-	width: 25px;
-	position: relative;
-	top: 2px;
-	left: 3px;
 }
 
 .obj-selected span {
@@ -3362,7 +3406,7 @@ input.cp-datetimepicker-end {
 }
 
 .obj-cell-subTitle {
-	background: rgb(247,249,248);
+	background: #f7f8f9;
 	height: 80px;
 	line-height: 80px;
 	/*vertical-align: middle;*/
@@ -3387,7 +3431,7 @@ input.cp-datetimepicker-end {
 	line-height: 50px;
 	/* top: 10px; */
 	margin-top: 30px;
-	color: rgb(180,180,180);
+	color: #b5b5b5;
 }
 
 .obj-cell-subTitle-chk {
@@ -3399,13 +3443,13 @@ input.cp-datetimepicker-end {
 	margin-left: 14px;
 	display: inline-block;
 	font-size: 20px;
-	color: rgb(71,150,237);
+	color: #4092ef;
 }
 .obj-cell-subTitle-chk .img {
 	width: 35px;
 	height: 80px;
 	vertical-align: middle;
-	background: url("../images/common/icon/icon_check_gray.png");
+	background: url("../images/common/icon/button_rideobutton_none.png");
 	display: inline-block;
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -3415,7 +3459,7 @@ input.cp-datetimepicker-end {
 	width: 35px;
 	height: 80px;
 	vertical-align: middle;
-	background: url("../images/common/icon/icon_check_gray_check.png");
+	background: url("../images/common/icon/button_rideobutton_red_done.png");
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position-y: 43%;
@@ -3450,7 +3494,7 @@ input.cp-datetimepicker-end {
 .obj-cell-chk .img {
 	width: 35px;
 	height: 35px;
-	background: url("../images/common/icon/icon_check_round.png");
+	background: url("../images/common/icon/button_rideobutton_none.png");
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position-y: 50%;
@@ -3458,7 +3502,7 @@ input.cp-datetimepicker-end {
 .obj-cell-chk .img.chk {
 	width: 35px;
 	height: 35px;
-	background: url("../images/common/icon/icon_check_round_check.png");
+	background: url("../images/common/icon/button_rideobutton_red_done.png");
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position-y: 50%;
@@ -3469,7 +3513,7 @@ input.cp-datetimepicker-end {
 	/* position: relative; */
 	display: inline-block;
 	top: 9px;
-	border: 1px solid #d2d2d2;
+	/*border: 1px solid #d2d2d2;*/
 	height: 60px;
 	width: 60px;
 	overflow: hidden;

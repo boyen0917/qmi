@@ -91,7 +91,7 @@
 */
 .stickerArea .pageArea{
 	width: 100%;
-	height: 6%;
+	height: 5.8%;	/*border有點厚度, 少個幾%否則內容會被推出去*/
 	text-align: center;
 	line-height: 6%;
 }

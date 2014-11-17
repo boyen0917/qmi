@@ -924,9 +924,10 @@ $(function(){
     detailTimelineContentMake = function (this_event,e_data,reply_chk){
         var this_gi = this_event.data("event-id").split("_")[0];
         var this_ei = this_event.data("event-id");
-        
+
         //event 自己的閱讀回覆讚好狀態
         var event_status = this_event.data("event-status");
+
 
         //event path
         this_event.data("event-path",this_ei);
@@ -936,9 +937,16 @@ $(function(){
         this_event.find(".st-sub-box-3 div:eq(1)").html(e_data[0].meta.pct);
         this_event.find(".st-sub-box-3 div:eq(2)").html(e_data[0].meta.rct);
 
+        //已閱讀
+        if(!event_status){
+            event_status = {};
+            event_status[this_ei] = {}
+        }
+
         //已讀亮燈
-        if(chkEventStatus(this_event,"ir"))
-            this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png");
+        if(chkEventStatus(this_event,"ir")){
+            this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")    
+        }
         
         //製作每個回覆
         $.each(e_data,function(el_i,el){
@@ -1093,7 +1101,7 @@ $(function(){
                         this_load.find(".st-reply-footer span:eq(2)").html(el.meta.lct);
 
                         //此則動態 自己的按贊狀況
-                        if(el.meta.il){
+                        if(event_status[ei] && event_status[ei].il){
                             this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
                             this_load.find(".st-reply-footer span:eq(1)").html("收回讚");
                         }
@@ -1585,7 +1593,7 @@ $(function(){
 	        	//客製化 按了確定之後再重讀取
 	        	$(".popup-close").bind("reload",function(){
 	        		//重設任務完成狀態
-	        		eventStatusWrite(this_event);
+	        		setEventStatus(this_event);
 
 	        		//重設完整的detail
 					this_event.data("detail-content",false);
@@ -1801,7 +1809,7 @@ $(function(){
         if( isShowSelf ){
             var cell = $("<div class='obj-cell self'>"+
                 '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+                '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_personal_photo.png" style="width:60px"/></div>' +
                 '<div class="obj-cell-subgroup-data">' + 
                     '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
             $(".obj-cell-area").append(cell);
@@ -1842,7 +1850,7 @@ $(function(){
         if( isShowAll ){
             var cell = $("<div class='obj-cell all'>"+
                 '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+                '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
                 '<div class="obj-cell-subgroup-data">' + 
                     '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELECT_ALL") + '</div></div>');
             $(".obj-cell-area").append(cell);
@@ -1918,7 +1926,7 @@ $(function(){
                     var innerTmp = $("<div class='subgroup-parent'></div>");
                     var firststCell = $("<div class='obj-cell subgroup branch' data-bl='"+key+"' data-bl-name='"+bl_obj.bn+"'>"+
                         '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                        '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+                        '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_group_photo.png" style="width:60px"/></div>' +
                         '<div class="obj-cell-subgroup-data">' + 
                             '<div class="obj-user-name">' + bl_obj.bn + '</div></div>');
                     firststCell.data( "bl-name", bl_obj.bn );
@@ -2121,7 +2129,7 @@ $(function(){
                 this_cell.find(".obj-cell-chk .img").addClass("chk");
                 // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
 
-                $(".obj-selected div:eq(1)").html("<span>" + this_cell.data("gu-name") + "</span>");
+                $(".obj-selected .list").html("<span>" + this_cell.data("gu-name") + "</span>");
                 //重置
                 selected_obj ={};
                 selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
@@ -2253,7 +2261,7 @@ $(function(){
             updateSelectedObj();
         });
 
-        $(".obj-selected div:nth-child(3)").off("click").click( selectTargetAll );
+        $(".obj-selected .clear").off("click").click( selectTargetAll );
 
         //避免重複
         $(".obj-done").unbind("click");
@@ -2306,12 +2314,12 @@ $(function(){
         var branch = $(".obj-content").data("selected-branch");
         var mem = $(".obj-content").data("selected-obj");
         
-        $(".obj-selected div:eq(1)").html("");
+        $(".obj-selected .list").html("");
         //寫入到選擇區域
         if( null != branch ){
             len += Object.keys(branch).length;
             $.each(branch,function(i,val){
-                $(".obj-selected div:eq(1)").append(val+"   ");
+                $(".obj-selected .list").append(val+"   ");
             });
 
             var bAllSelect = true;
@@ -2336,7 +2344,7 @@ $(function(){
         if( null != mem ){
             len += Object.keys(mem).length;
             $.each(mem,function(i,val){
-                $(".obj-selected div:eq(1)").append(val+"   ");
+                $(".obj-selected .list").append(val+"   ");
             });
 
             var bAllSelect = true;
@@ -2379,7 +2387,7 @@ $(function(){
 			// var content = $("<div class='obj-cell branch _"+data.lv+"' data-bl='"+key+"' data-bl-name='"+data.bn+"'>"+
             var content = $("<div class='obj-cell branch _2' data-bl='"+key+"' data-bl-name='"+data.bn+"'>"+
 		    	'<div class="obj-cell-chk"><div class="img"></div></div>' +
-		    	'<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_mother_l.png" style="width:60px"/></div>' +
+		    	'<div class="obj-cell-user-pic namecard"><img src="images/common/others/select_empty_group_photo.png" style="width:60px"/></div>' +
 		    	'<div class="obj-cell-subgroup-data">' + 
 		        	'<div class="obj-user-name">' + data.bn + '</div>' +
 		        '</div>'
@@ -3207,6 +3215,12 @@ $(function(){
 					break;
 				//貼圖
 				case 5:
+                    var sticker = this_compose.data("stickerID");
+                    if(sticker){
+                        obj.c = sticker;
+                    } else {
+                        is_push = false;
+                    }
 					break;
 				//圖片上傳
 				case 6:
@@ -3290,6 +3304,25 @@ $(function(){
         });
 	};
 
+    composeCheckMessageList = function(){
+        var this_compose = $(document).find(".cp-content");
+        //圖檔刪光了 而且附檔區域沒有其他東西 就關閉附檔區域
+        var chk = false;
+        var dataList = this_compose.data("message-list");
+        if( null==dataList ) return;
+        cns.debug( JSON.stringify(dataList) );
+        $.each(dataList,function(i,val){
+            //只要有不是普通內文的就不關附檔區
+            if( val > 0){
+                chk = true;
+                return false;
+            }
+        });
+
+        if(!chk){
+            this_compose.find(".cp-attach-area").hide('fast');
+        }
+    }
 /*
 
 
@@ -3741,17 +3774,17 @@ $(function(){
 
                 var close_chk = false;
 
-                // //判斷是否為更新事件
-                // this_event = selector.find("[data-event-id="+ val.ei +"]");
-                // if(this_event.length){
-                //     //如果是更新事件 目前只重改按讚狀態 其餘以後再說
-                //     this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
-                //     this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
-                //     this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
-                //     //event status
-                //     this_event.data("event-val",val);
-                //     eventStatusWrite(this_event);
-                // }
+                //判斷是否為更新事件
+                this_event = selector.find("[data-event-id="+ val.ei +"]");
+                if(this_event.length){
+                    //如果是更新事件 目前只重改按讚狀態 其餘以後再說
+                    this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
+                    this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
+                    this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
+                    //event status
+                    this_event.data("event-val",val);
+                    setEventStatus(this_event,$(".st-filter-area").data("filter"));
+                }
                 this_event = this_event_temp.clone();
             }
 
@@ -3918,9 +3951,7 @@ $(function(){
             }
 
             //event status
-            eventStatusWrite(this_event);
-
-            eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
+            setEventStatus(this_event,$(".st-filter-area").data("filter"),val.meta);
 
             //timeline message內容
             timelineContentMake(this_event,target_div,val.ml);
@@ -3997,8 +4028,10 @@ $(function(){
         });
 	}
 
-	eventStatusWrite = function(this_event,this_es_obj){
-		var this_es_obj = this_event.data("event-val").meta;
+	eventStatusWrite = function(this_event,this_es_obj,filter){
+        cns.debug("this_es_obj",this_es_obj);
+		//將此則動態的按讚狀態寫入data中
+		if(!this_es_obj) return false;
 
 		//按讚
 		if(this_es_obj.il){
@@ -4034,6 +4067,64 @@ $(function(){
 		}
 	}
 
+	setEventStatus_new = function(event_status,filter,status){
+        eventStatusWrite(this_event,es_obj[this_ei],filter);
+	}
+
+    setEventStatus = function(this_event,filter,status){
+        cns.debug("new status",status);
+        //先用idb寫 再去向server要
+        var ei_val = this_event.data("event-val");
+        if(ei_val.status && ei_val.status[ei_val.ei]){
+            eventStatusWrite(this_event,ei_val.status[ei_val.ei],filter);
+        }
+
+        eventFilter(this_event,filter);
+
+        //這邊是timeline list 要call這個api判斷 自己有沒有讚過這一串系列文 
+        var this_ei = this_event.data("event-id");
+        var this_gi = this_ei.split("_")[0];
+        var this_ti = this_ei.split("_")[1];
+
+        var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events_status?ep=" + this_ei;
+        var headers = {
+            "ui":ui,
+            "at":at, 
+            "li":lang
+        };
+        var method = "get";
+        
+        ajaxDo(api_name,headers,method,false).complete(function(data){
+            if(data.status == 200){
+                
+                var s_data = $.parseJSON(data.responseText).el;
+                cns.debug("old status",s_data);
+                var es_obj = {}
+
+                if(s_data.length != 0){
+                    $.each(s_data,function(i,val){
+                        es_obj[val.ei] = val;
+                    });
+                }else{
+                    es_obj[this_ei] = {};
+                }
+
+                //存入data
+                this_event.data("event-status",es_obj);
+
+                //存入idb
+                ei_val.status = es_obj;
+
+                idb_timeline_events.put(ei_val,function(){
+                    // 存完後改資料
+                    eventStatusWrite(this_event,es_obj[this_ei],filter);
+                });
+            }
+
+            //filter
+            eventFilter(this_event,filter);
+        });
+    }
 
 	eventFilter = function(this_event,filter){
 		var filter = filter || "all";
@@ -4050,6 +4141,7 @@ $(function(){
 		if(filter == "all"){
 			show_chk = true;
 		}else if(filter == "read"){
+			cns.debug("this_event data:",this_event.data());
 			if(event_status && event_status[event_id] && event_status[event_id].ir) show_chk = true;
 		}else{
 			if(!event_status || !event_status[event_id] || (event_status[event_id] && !event_status[event_id].ir)) show_chk = true;
@@ -4925,13 +5017,23 @@ $(function(){
 				"lv" : 1,
 				"tp" : "10"
 			},
-			"ml" : [
-				{
-					"c": this_event.find(".st-reply-message-textarea textarea").val(),
-					"tp": 0
-				}
-			]
+			"ml" : []
 		};
+
+        var text = this_event.find(".st-reply-message-textarea textarea").val();
+        if( text ){
+            body.ml.push({
+                "c": text,
+                "tp": 0
+            });
+        }
+        var sticker = this_event.find(".st-reply-message-img").data("id");
+        if( sticker ){
+            body.ml.push({
+                "c": sticker,
+                "tp": 5
+            });
+        }
 
 		var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events?ep=" + this_ei;
 
@@ -4961,9 +5063,16 @@ $(function(){
 
 		//重置
 		this_event.find(".st-reply-message-textarea textarea").val("");
+        this_event.find(".st-reply-message-img").data("id",null);
+        this_event.find(".st-reply-message-img").html("");  //清掉sticker預覽
+        //把sticker欄收起來
+        var stickerIcon = this_event.find(".st-reply-message-sticker");
+        if( true==stickerIcon.data("open") ){
+            stickerIcon.trigger("click");
+        }
 
 		//重設任務完成狀態
-		eventStatusWrite(this_event);
+		setEventStatus(this_event);
 
         //開啓讚好及留言區塊
         this_event.find(".st-reply-all-content-area").slideDown();
@@ -5056,12 +5165,7 @@ $(function(){
 		        //cmds api
 		        pollingCmds(new_pollingData.cmds,new_pollingData.msgs,new_pollingData.ccs);
 
-        	}else{
-                //錯誤處理
-                popupShowAdjust("","驗證失敗 請重新登入",true,false,[reLogin]);
-                clearInterval(pc);
-                return false;
-            }
+        	}
         });
     }
 

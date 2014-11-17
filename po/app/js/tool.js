@@ -625,4 +625,8 @@ $(function(){
 		}
 		return name;
 	}
+
+	getStickerPath = function(id){
+		return "sticker/" + id.split("_")[1] + "/" + id + ".png";
+	}
 });

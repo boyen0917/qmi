@@ -682,10 +682,28 @@ $(function(){
 	});
 
 	$(document).on('click','.st-reply-message-sticker',function(){
-		var this_sticker = $(this).parents(".st-reply-message-area").find(".stickerArea");
-		initStickerArea.init( this_sticker, function(id){
-			cns.debug("hehe:",id);
-		});
+		var stickerIcon = $(this);
+		var stickerArea = stickerIcon.parents(".st-sub-box").find(".stickerArea");
+		if( true!=stickerArea.data("isCreate") ){
+			stickerArea.data("isCreate", true);
+			initStickerArea.init(stickerArea, function(id){
+				//on sitcker selected
+				cns.debug(id);
+				var path = getStickerPath(id);
+				var preview = stickerIcon.parent().find(".st-reply-message-img");
+				preview.html("<img src='"+path+"'/>");
+				preview.data("id", id);
+			});
+		}
+		if( true==stickerIcon.data("open") ){
+			stickerIcon.data("open", false);
+			stickerArea.hide();
+			stickerIcon.attr("src", "images/chatroom/chat_textbar_icon_emoticon.png");
+		} else {
+			stickerIcon.data("open", true);
+			stickerArea.show();
+			stickerIcon.attr("src", "images/chatroom/chat_textbar_icon_emoticon_activity.png");
+		}
 	});
 
 	//留言
@@ -711,7 +729,9 @@ $(function(){
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){
 		var this_event = $(this).parents(".st-sub-box");
-		if(!this_event.find(".st-reply-message-textarea textarea").val()) return false;
+		var text = this_event.find(".st-reply-message-textarea textarea").val();
+		var sticker = this_event.find(".st-reply-message-img").data("id");
+		if(!text && !sticker) return false;
 
 		if($(this).data("reply-chk")){
 			return false;
@@ -1022,14 +1042,39 @@ $(function(){
 			target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
 		},100);
 
-
-		var this_compose = $(document).find(".cp-content");
-		$(".cp-file").trigger("click");
-
+		// var this_compose = $(document).find(".cp-content");
 		var add_type = target.data("cp-addfile");
 		switch(add_type){
 			case "img":
+				$(".cp-file").trigger("click");
 				break;
+			case "sticker":
+				var stickerArea = $("#page-compose .stickerArea");
+
+				if( true!=stickerArea.data("isCreate") ){
+					stickerArea.data("isCreate", true);
+					initStickerArea.init(stickerArea, function(id){
+						var this_compose = $(document).find(".cp-content");
+						var path = getStickerPath( id );
+						var preview = $("#page-compose .cp-sticker-area");
+						preview.html("<div class='sticker'><img src='"+path+"'/></div>")
+						this_compose.data("stickerID", id);
+						preview.show();
+						if( null== this_compose.data("message-list") ) this_compose.data("message-list",[] );
+						if($.inArray(5,this_compose.data("message-list")) < 0){
+							this_compose.data("message-list").push(5);
+						}
+						$("#page-compose .cp-attach-area").show();
+					});
+				}
+				
+				if( true==stickerArea.data("open") ){
+					stickerArea.hide();
+					stickerArea.data("open",false);
+				} else {
+					stickerArea.show();
+					stickerArea.data("open",true);
+				}
 		}
 
 	});
@@ -1110,6 +1155,22 @@ $(function(){
 		});
 	});
 
+	$(document).on("click", ".cp-sticker-area .sticker", function(e){
+		//delete & hide sticker preview
+		var stickerArea = $(document).find(".cp-sticker-area");
+		stickerArea.html("");
+		stickerArea.hide();
+		//clear data
+		var this_compose = $(document).find(".cp-content");
+		this_compose.data("message-list").splice($.inArray(5,this_compose.data("message-list")),1);
+		this_compose.data("stickerID",null);
+		var list = this_compose.data("message-list");
+		if( !list || list.length.length==0 ){
+			this_compose.find(".cp-attach-area").hide('fast');
+		}
+		composeCheckMessageList();
+	});
+
 	$(document).on("click",".cp-grid .grid-cancel",function(e){
 		var this_compose = $(document).find(".cp-content");
 		var this_grid = $(this).parent();
@@ -1130,19 +1191,7 @@ $(function(){
 				if($(document).find(".cp-file-img-area").html() == ""){
 					this_compose.data("message-list").splice($.inArray(6,this_compose.data("message-list")),1);
 
-					//圖檔刪光了 而且附檔區域沒有其他東西 就關閉附檔區域
-					var chk = false;
-					$.each(this_compose.data("message-list"),function(i,val){
-						if($.inArray(val,attach_mtp_arr) >= 0){
-							chk = true;
-							return false;
-						}
-					});
-
-					if(!chk){
-						this_compose.find(".cp-attach-area").hide('fast');
-					}
-					
+					composeCheckMessageList();
 				}
 			});
 		},100);
