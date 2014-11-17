@@ -25,14 +25,14 @@
 	background-image: url("../images/icon_arrow_prev_darkblue.png");
 	background-position: center center;
     background-repeat: no-repeat;
-	background-size:100% auto;
+	background-size:25px auto;
 	
 }
 .stickerArea .imgArea .left:hover{
 	background-image: url("../images/icon_arrow_prev_blue.png");
 	background-position: center center;
     background-repeat: no-repeat;
-	background-size:100% auto;
+	background-size:30px auto;
 }
 
 .stickerArea .imgArea .mid{
@@ -65,7 +65,7 @@
 }
 
 .stickerArea .imgArea .right{
-	width: 7%;
+	width: 25px;
 	height: 100%;
 	display: inline-block;
 	background-image: url("../images/common/icon/icon_arrow_next_darkblue.png");
@@ -77,7 +77,7 @@
 	background-image: url("../images/common/icon/icon_arrow_next_blue.png");
 	background-position: center center;
     background-repeat: no-repeat;
-	background-size:100% auto;
+	background-size:30px auto;
 }
 
 /*
