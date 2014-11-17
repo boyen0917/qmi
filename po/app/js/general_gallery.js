@@ -24,8 +24,8 @@ $(document).ready(function(){
 		for( var i=0; i<list.length; i++ ){
 			var img = $("<div class='img' width='100%'></div>");
 			img.css("width",width+"%");
-			if( list[i].s3 ){
-				img.css("background-image", "url("+list[i].s3+")" );
+			if( list[i].s32 ){
+				img.css("background-image", "url("+list[i].s32+")" );
 				var tt = img.css("background-image");
 			} else {
 				getS3fileBackground( list[i],img, 6 );
@@ -149,7 +149,7 @@ getS3fileBackground = function(file_obj,target,tp){
             switch(tp){
                 case 6://圖片
                     //小圖
-                    target.css("background-image","url("+obj.s3+")");
+                    target.css("background-image","url("+obj.s32+")");
                     //大圖
                     target.data("auo",obj.s32);
                     break;

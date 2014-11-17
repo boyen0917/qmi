@@ -75,8 +75,8 @@ $(document).ready(function(){
 	updateLanguage( lang );
 
     //header 設定團體名稱
-    $("#header .title").html(g_cn);
-    $("#header .subTitle").html(g_group.gn);
+    $("#header .title").html( g_cn.replaceOriEmojiCode() );
+    $("#header .subTitle").html( g_group.gn.replaceOriEmojiCode() );
     
 	//- click "send" to send msg
 	var sendBtn = $("#footer .contents .send");
