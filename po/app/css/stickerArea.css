@@ -15,7 +15,8 @@
 */
 .stickerArea .imgArea{
 	width: 100%;
-	height: 75%;
+	height: 74%;
+	padding-top: 0.5%;
 }
 
 .stickerArea .imgArea .left{

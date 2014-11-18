@@ -684,23 +684,39 @@ $(function(){
 	$(document).on('click','.st-reply-message-sticker',function(){
 		var stickerIcon = $(this);
 		var stickerArea = stickerIcon.parents(".st-sub-box").find(".stickerArea");
-		if( true!=stickerArea.data("isCreate") ){
-			stickerArea.data("isCreate", true);
-			initStickerArea.init(stickerArea, function(id){
-				//on sitcker selected
-				cns.debug(id);
-				var path = getStickerPath(id);
-				var preview = stickerIcon.parent().find(".st-reply-message-img");
-				preview.html("<img src='"+path+"'/>");
-				preview.data("id", id);
-			});
-		}
-		if( true==stickerIcon.data("open") ){
-			stickerIcon.data("open", false);
+
+		if( "t"==stickerIcon.attr("data-open") ){
+			stickerIcon.attr("data-open", "");
 			stickerArea.hide();
 			stickerIcon.attr("src", "images/chatroom/chat_textbar_icon_emoticon.png");
 		} else {
-			stickerIcon.data("open", true);
+			if( true!=stickerArea.data("isCreate") ){
+				stickerArea.data("isCreate", true);
+				initStickerArea.init(stickerArea, function(id){
+					//on sitcker selected
+					cns.debug(id);
+					var path = getStickerPath(id);
+					var preview = stickerIcon.parent().find(".st-reply-message-img");
+					preview.html("<div><img src='"+path+"'/></div>");
+					preview.data("id", id);
+					
+					var allStickerArea = $(".stickerArea .imgArea");
+					$.each( allStickerArea, function(index){
+						var dom = $(this);
+						initStickerArea.updateHistory( dom.parent() );
+					});
+					cns.debug("1");
+
+					//on click -> cancel
+					preview.off("click").click(function(){
+						preview.html("");
+						preview.data("id", null);
+					});
+				});
+			}
+
+			$('.st-reply-message-sticker[data-open="t"]').trigger("click");
+			stickerIcon.attr("data-open", "t");
 			stickerArea.show();
 			stickerIcon.attr("src", "images/chatroom/chat_textbar_icon_emoticon_activity.png");
 		}
@@ -1034,47 +1050,60 @@ $(function(){
 	});
 
 	
+	//貼文-下方附檔功能bar
 	$(".cp-addfile").click(function(){
 		var img_url = "images/compose/compose_form_addfile_";
 		var target = $(this);
-		target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
-		setTimeout(function(){
-			target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
-		},100);
 
 		// var this_compose = $(document).find(".cp-content");
 		var add_type = target.data("cp-addfile");
 		switch(add_type){
-			case "img":
-				$(".cp-file").trigger("click");
-				break;
-			case "sticker":
-				var stickerArea = $("#page-compose .stickerArea");
 
-				if( true!=stickerArea.data("isCreate") ){
-					stickerArea.data("isCreate", true);
-					initStickerArea.init(stickerArea, function(id){
-						var this_compose = $(document).find(".cp-content");
-						var path = getStickerPath( id );
-						var preview = $("#page-compose .cp-sticker-area");
-						preview.html("<div class='sticker'><img src='"+path+"'/></div>")
-						this_compose.data("stickerID", id);
-						preview.show();
-						if( null== this_compose.data("message-list") ) this_compose.data("message-list",[] );
-						if($.inArray(5,this_compose.data("message-list")) < 0){
-							this_compose.data("message-list").push(5);
-						}
-						$("#page-compose .cp-attach-area").show();
-					});
-				}
+			case "img":	//附影像
+				$(".cp-file").trigger("click");
+				target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
+				setTimeout(function(){
+					target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
+				},100);
+				break;
+
+			case "sticker":	//附貼圖
+				var stickerArea = $("#page-compose .stickerArea");
 				
 				if( true==stickerArea.data("open") ){
 					stickerArea.hide();
 					stickerArea.data("open",false);
+					target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
 				} else {
+					if( true!=stickerArea.data("isCreate") ){
+						stickerArea.data("isCreate", true);
+						initStickerArea.init(stickerArea, function(id){
+							var this_compose = $(document).find(".cp-content");
+							var path = getStickerPath( id );
+							var preview = $("#page-compose .cp-sticker-area");
+							preview.html("<div class='sticker'><img src='"+path+"'/></div>")
+							this_compose.data("stickerID", id);
+							preview.show();
+							if( null== this_compose.data("message-list") ) this_compose.data("message-list",[] );
+							if($.inArray(5,this_compose.data("message-list")) < 0){
+								this_compose.data("message-list").push(5);
+							}
+							$("#page-compose .cp-attach-area").show();
+
+							var allStickerArea = $(".stickerArea .imgArea");
+							$.each( allStickerArea, function(index){
+								var dom = $(this);
+								initStickerArea.updateHistory( dom.parent() );
+							});
+							cns.debug("2");
+						});
+					}
+
 					stickerArea.show();
 					stickerArea.data("open",true);
+					target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
 				}
+				break;
 		}
 
 	});
@@ -1155,6 +1184,7 @@ $(function(){
 		});
 	});
 
+	//貼文-點選貼圖時取消貼圖
 	$(document).on("click", ".cp-sticker-area .sticker", function(e){
 		//delete & hide sticker preview
 		var stickerArea = $(document).find(".cp-sticker-area");

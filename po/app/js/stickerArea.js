@@ -4,11 +4,10 @@ var initStickerArea= {
 	path: "sticker/",
 	jsonPath: "sticker/stickerArea.json",
 	dict: null,
-	callback: null,
 	init: function( dom, onSelect ){
 		
 		var thisTmp = this;
-		thisTmp.callback = onSelect;
+		dom.data("callback",onSelect);
 
 		//------ top ---------
 		var imgArea = $("<div class='imgArea'></div>");
@@ -19,8 +18,8 @@ var initStickerArea= {
 	    //left
 	    var btnLeftBtn = $("<div class='left'></div>");
 	    btnLeftBtn.off("click").click(function(){
-	    	var currentTp = $(".mid").data("type");
-	    	var tmp = $(".mid .group."+currentTp);
+	    	var currentTp = $(dom).find(".mid").data("type");
+	    	var tmp = $(dom).find(".mid .group."+currentTp);
 	    	var currentPg = tmp.data("index");
 	    	var maxPg = tmp.data("cnt");
 	    	if( currentPg >0 ){
@@ -30,7 +29,7 @@ var initStickerArea= {
 		    	tmp.data("index", currentPg);
 		    	tmp.animate( {marginLeft:"-"+(100*currentPg)+"%"}, 'fast' );
 	    	}
-	    	thisTmp.updatePageInfo();
+	    	thisTmp.updatePageInfo( dom );
 	    });
 	    imgArea.append(btnLeftBtn);
 
@@ -41,8 +40,8 @@ var initStickerArea= {
 	    //right
 	    var btnRightBtn = $("<div class='right'></div>");
 	    btnRightBtn.off("click").click(function(){
-	    	var currentTp = $(".mid").data("type");
-	    	var tmp = $(".mid .group."+currentTp);
+	    	var currentTp = $(dom).find(".mid").data("type");
+	    	var tmp = $(dom).find(".mid .group."+currentTp);
 	    	var currentPg = tmp.data("index");
 	    	var maxPg = tmp.data("cnt");
 	    	if( currentPg < (maxPg-1) ){
@@ -52,7 +51,7 @@ var initStickerArea= {
 		    	tmp.data("index", currentPg);
 		    	tmp.animate( {marginLeft:"-"+(100*currentPg)+"%"}, 'fast' );
 		    }
-	    	thisTmp.updatePageInfo();
+	    	thisTmp.updatePageInfo( dom );
 	    });
 	    imgArea.append(btnRightBtn);
 
@@ -67,9 +66,8 @@ var initStickerArea= {
 	    cataHistoryBtn.data("type", "history" );
 	    cataHistoryBtn.data("cnt", 0);
 	    catagory.append(cataHistoryBtn);
-	    thisTmp.updateHistory();
 	    dom.append(catagory);
-	    thisTmp.updateHistory();
+	    thisTmp.updateHistory( dom );
 
 	    thisTmp.load( function(){
 	    	for( var key in thisTmp.dict ){
@@ -82,34 +80,34 @@ var initStickerArea= {
 	    		cataBtn.data("type", key );
 	    		catagory.append(cataBtn);
 
-	    		thisTmp.showImg(key, obj.pic);
+	    		thisTmp.showImg(dom, key, obj.pic );
 	    	}
-	    	$(".cata").off("click").click( function(){
+	    	$(dom).find(".cata").off("click").click( function(){
 	    		var type = $(this).data("type");
 	    		cns.debug( type );
-	    		$(".mid").data("type", type);
+	    		$(dom).find(".mid").data("type", type);
 
 	    		//active/deactive sticker group
-	    		var tmp = $(".mid .group:not(."+type+")");
+	    		var tmp = $(dom).find(".mid .group:not(."+type+")");
 	    		tmp.css("display","none");
-	    		tmp = $(".mid .group."+type);
+	    		tmp = $(dom).find(".mid .group."+type);
 	    		tmp.css("display","");
 
 	    		//active/deactive catagory
-	    		tmp = $(".cata.active").removeClass("active");
+	    		tmp = $(dom).find(".cata.active").removeClass("active");
 	    		$(this).addClass("active");
 
 	    		//$(".mid .group:not([data-type='"+type+"'])").css("visibility","hidden");
 	    		//$(".mid .group[data-type='"+type+"']").css("visibility","visible");
-	    		thisTmp.updatePageInfo();
+	    		thisTmp.updatePageInfo( dom );
 	    	});
-	    	$(".cata:eq(1)").trigger("click");
+	    	$(dom).find(".cata:eq(1)").trigger("click");
 	    });
 	},
-	showImg: function(type, arImgId, path){
+	showImg: function(dom, type, arImgId, path){
 		var imgPath = this.path+type+"/{0}.png";
-		var imgContent = $(".mid");
-		var content = $(".mid .group."+type);
+		var imgContent = $(dom).find(".mid");
+		var content = $(dom).find(".mid .group."+type);
 		var pageCnt = Math.ceil(arImgId.length/8);
 
 		if( null==content || content.length <= 0 ){
@@ -164,7 +162,7 @@ var initStickerArea= {
 	    }
 
 	    var thisTmp = this;
-	    $(".page .row img").off("click").click( function(){
+	    $(dom).find(".page .row img").off("click").click( function(){
 	    	var id = $(this).data("id");
 	    	cns.debug( id );
 
@@ -182,12 +180,13 @@ var initStickerArea= {
 	    	}
 	    	userData.push( {"id":id, "src":$(this).attr("src")} );
 	    	$.lStorage("sticker", userData);
-	    	thisTmp.updateHistory();
+	    	thisTmp.updateHistory( dom );
 
-	    	if( null != thisTmp.callback ) thisTmp.callback(id);
+	    	var callback = dom.data("callback");
+	    	if( null != callback ) callback(id);
 	    });
 	},
-	updateHistory: function(){
+	updateHistory: function(dom){
 	    var userData = $.lStorage("sticker");
 	    if( null != userData ){
 	    	var values = [];
@@ -198,46 +197,50 @@ var initStickerArea= {
 	    		values.push(obj.src);
 	    	}
 	    	if( keys.length>0 ){
-				this.showImg( "history", keys, values );
+				this.showImg( dom, "history", keys, values );
 			}
 	    }
 	},
-	updatePageInfo: function(){
-	    var currentTp = $(".mid").data("type");
+	updatePageInfo: function( dom ){
+	    var currentTp = $(dom).find(".mid").data("type");
 	    if( null == currentTp )	return;
 
-	    var tmp = $(".mid .group."+currentTp);
+	    var tmp = $(dom).find(".mid .group."+currentTp);
 	    var maxPg = tmp.data("cnt");
 
 	    //update page dots
-	    if( currentTp != $(".pageArea").data("type") ){
-	    	$(".pageArea").html("");
-	    	$(".pageArea").data("type", currentTp);
+	    if( currentTp != $(dom).find(".pageArea").data("type") ){
+	    	$(dom).find(".pageArea").html("");
+	    	$(dom).find(".pageArea").data("type", currentTp);
 	    	if(maxPg<=1) return;
 
 	    	for(var i=0; i<maxPg; i++){
-	    		$(".pageArea").append("<label class='dot'></label>");
+	    		$(dom).find(".pageArea").append("<label class='dot'></label>");
 	    	}
 	    } else {
 	    	if(maxPg<=1) return;
-	    	$(".pageArea").find(".dot.active").removeClass("active");
+	    	$(dom).find(".pageArea").find(".dot.active").removeClass("active");
 	    }
 
-	    var tmp = $(".mid .group."+currentTp);
+	    var tmp = $(dom).find(".mid .group."+currentTp);
 	    var currentPg = tmp.data("index");
-	    $(".pageArea").find(".dot:eq("+currentPg+")").addClass("active");
+	    $(dom).find(".pageArea").find(".dot:eq("+currentPg+")").addClass("active");
 	},
 	load: function(callback) {
 		var thisTmp = this;
-		$.get(this.jsonPath,function(load_dict){
-	        if (thisTmp.dict !== null) {
-	        	$.extend(thisTmp.dict, load_dict);
-	        } else {
-	        	thisTmp.dict = load_dict;
-	        }
-	        // cns.debug(thisTmp.dict);
-	        callback();
-	    });
+		if( null==thisTmp.dict ){
+			$.get(this.jsonPath,function(load_dict){
+		        if (thisTmp.dict !== null) {
+		        	$.extend(thisTmp.dict, load_dict);
+		        } else {
+		        	thisTmp.dict = load_dict;
+		        }
+		        // cns.debug(thisTmp.dict);
+		        callback();
+		    });
+		} else {
+			callback();
+		}
 	}
 };
 

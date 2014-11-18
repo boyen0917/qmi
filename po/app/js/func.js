@@ -1640,6 +1640,15 @@ $(function(){
 
 			var show_area,title,init_datetimepicker;
 
+            //clear sticker
+            var stickerArea = $("#page-compose .stickerArea");
+            if( true == stickerArea.data("open") ){
+                var stickerIcon = $("#page-compose .cp-addfile[data-cp-addfile='sticker']");
+                stickerIcon.trigger("click");
+            }
+            stickerArea.html("");
+            stickerArea.data("isCreate", null);
+
 			switch (compose_title) {
 		        case "post":
 		        	ctp = 0;
@@ -4432,7 +4441,7 @@ $(function(){
             right.addClass( "cnt_"+(count-1) );
             // var leftHeight = height;
             $.each(gallery_arr,function(i,val){
-                var this_img = $('<img class="st-slide-img"/>');
+                var this_img = $('<span class="st-slide-img"/>');
                 if( i==0 ){
                     left.append(this_img);
                 }
@@ -4443,6 +4452,7 @@ $(function(){
                 getS3fileBackground(val,this_img,6,function(data){
                     gallery_arr[i].s3 = data.s3;
                     gallery_arr[i].s32 = data.s32;
+                    this_img.addClass("loaded");
                 });
                 if( i>=4 ) return false;
             });
@@ -4450,7 +4460,7 @@ $(function(){
             left.addClass("cnt_"+2);
             right.addClass( "cnt_"+(count-2) );
             $.each(gallery_arr,function(i,val){
-                var this_img = $('<div class="st-slide-img"/>');
+                var this_img = $('<span class="st-slide-img"/>');
 
                 if( i<2 ){
                     left.append(this_img);
@@ -4462,6 +4472,7 @@ $(function(){
                 getS3fileBackground(val,this_img,6,function(data){
                     gallery_arr[i].s3 = data.s3;
                     gallery_arr[i].s32 = data.s32;
+                    this_img.addClass("loaded");
                 });
                 if( i>=4 ) return false;
             });
