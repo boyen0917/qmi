@@ -1770,6 +1770,13 @@ img.auo {
     word-wrap: break-word;
 }
 
+.st-sub-box-2-content {
+	word-break: break-all;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 10;
+	-webkit-box-orient: vertical;
+}
 .st-sub-box-3 {
 	position:relative;
 	background: #eef0f2;
@@ -1792,6 +1799,7 @@ img.auo {
 .st-sub-box-3 img:nth-child(5) {
 	float: right;
 	right: 45px;
+	top: 1px;
 }
 
 .st-sub-box-3 div {
@@ -1811,8 +1819,9 @@ img.auo {
 
 .st-sub-box-3 div:nth-child(6) {
 	float: right;
-	left: 10px;
-	top: 2px
+	left: 15px;
+	top: 2px;
+	width: 25px;
 }
 
 .st-sub-box-4 {

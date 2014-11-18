@@ -91,7 +91,9 @@ $(function(){
 		$(document).data("top-event-resize",timer);
 
 		//reply textarea
-		$(document).find(".st-reply-message-textarea").css("width",$(window).width()-450);
+		var reply_textarea = $(document).find(".st-reply-message-textarea");
+		var this_event = reply_textarea.parents(".st-sub-box");
+		reply_textarea.css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
 	});
 
 	//test

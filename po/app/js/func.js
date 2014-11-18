@@ -434,6 +434,9 @@ $(function(){
 					parent.find("~ div[class=feed-compose]").show();
 					parent.find("~ div[class=chatList-add]").hide();
 				}
+
+                //polling 數字重寫
+                pollingCountsWrite();
 	          break;
 	        case "contact": 
 	        	$(".subpage-contact").show();
@@ -686,13 +689,14 @@ $(function(){
 		top_area.find(".st-top-bar-case span").last().addClass("st-r-radius");		
 
 		//st-top-bar-case 幾個就是幾十趴
-		top_area.find(".st-top-bar-case").css("width",top_msg_num*10 + "%")
+		top_area.find(".st-top-bar-case,.st-top-bar-case-click").css("width",top_msg_num*10 + "%")
 		//st-top-bar-area span 平均寬度在case中
-		top_area.find(".st-top-bar-case span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
+		// top_area.find(".st-top-bar-case span,.st-top-bar-case-click span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
+        top_area.find(".st-top-bar-case span,.st-top-bar-case-click span").css("width",Math.floor((1/top_msg_num)*10000)/100 + "%");
 		
 		//點擊區放大
-		top_area.find(".st-top-bar-case-click").css("width",top_msg_num*10 + "%")
-		top_area.find(".st-top-bar-case-click span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
+		// top_area.find(".st-top-bar-case-click").css("width",top_msg_num*10 + "%")
+		// top_area.find(".st-top-bar-case-click span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
 
 		//出現
 		top_area.find(".st-top-bar-area").slideDown("fast");
@@ -701,7 +705,8 @@ $(function(){
 		var selector_pos = (10-top_msg_num)/2*10;
 		var first_span = top_area.find(".st-top-bar-case span:eq(0)");
 		//$("#side-menu").width() 開啓side menu 時的校正
-		var start_left = first_span.offset().left - $("#side-menu").width();
+		// var start_left = first_span.offset().left - $("#side-menu").width();
+        var start_left = first_span.offset().left;
 		var start_top = first_span.offset().top;
 		var movement = first_span.width();
 
@@ -709,7 +714,7 @@ $(function(){
 		var mfinish = false;
 
 		/* 游標位置和移動 */
-		top_area.find(".st-top-bar-selector").offset({top:start_top,left:start_left + $("#side-menu").width()});
+		top_area.find(".st-top-bar-selector").offset({top:start_top ,left:start_left});
 		//movement跟寬度一致
 		top_area.find(".st-top-bar-selector").css("width",movement+2);
 
@@ -721,8 +726,7 @@ $(function(){
 		top_area.find(".st-top-bar-case-click span").unbind();
 		top_area.find(".st-top-bar-case-click span").mouseup(function(){
 			var target_pos = $(this).data("pos");
-
-			top_area.find(".st-top-bar-selector").animate({left: (start_left+movement*target_pos)},function(){
+			top_area.find(".st-top-bar-selector").animate({left: (start_left-250+movement*target_pos)},function(){
 				$(this).data("pos",target_pos);
 			});
 			top_area.find(".st-top-event").animate({'right':target_pos*100 + '%'});
@@ -3771,7 +3775,7 @@ $(function(){
             selector[method](this_event);
 
             //調整留言欄
-            this_event.find(".st-reply-message-textarea").css("width",$(window).width()-450);
+            this_event.find(".st-reply-message-textarea").css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
 
             //記錄timeline種類
             this_event.attr("data-event-id",val.ei);
@@ -5029,7 +5033,6 @@ $(function(){
 
         	if(data.status == 200){
         		var new_pollingData = $.parseJSON(data.responseText);
-                cns.debug("pollingData time:",new_pollingData.ts.pt);
                 var tmp_cnts = new_pollingData.cnts;
                 // new_pollingData.cnts = {};
                 new_pollingData.cnts = local_pollingData.cnts;
@@ -5052,7 +5055,7 @@ $(function(){
 		        //cmds api
 		        pollingCmds(new_pollingData.cmds,new_pollingData.msgs,new_pollingData.ccs);
 
-        	}else{
+        	}else if(data.status == 401){
                 //錯誤處理
                 popupShowAdjust("","驗證失敗 請重新登入",true,false,[reLogin]);
                 clearInterval(pc);
@@ -5062,6 +5065,7 @@ $(function(){
     }
 
     pollingCountsWrite = function(polling_data){
+        var polling_data = polling_data || $.lStorage("_pollingData");
     	var cnts = polling_data.cnts;
     	var gcnts = polling_data.gcnts;
 
@@ -5692,6 +5696,7 @@ $(function(){
         var this_gi = this_ei.split("_")[0];
         $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
             var this_event = $(this).find(".st-sub-box");
+            this_event.addClass("detail");
             $(".timeline-detail").html(this_event).hide();
             //單一動態詳細內容
             getEventDetail(this_ei).complete(function(data){
