@@ -3624,7 +3624,6 @@ $(function(){
 
 		        	//存完後改timeline 
 		            $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-
                         //更新事件完成後 把原本db拉出來的event刪除 避免影響
                         var feed_type = $("#page-group-main").data("navi") || "00";
                         var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
@@ -3735,28 +3734,27 @@ $(function(){
 
                 //讀完就可重新滾動撈取舊資料 setTimeOut避免還沒寫入時就重新撈取
                 setTimeout(function(){
-                    cns.debug("scroll-chk false");
                     selector.data("scroll-chk",false);
                 },1000);
 
                 var close_chk = false;
 
-                // //判斷是否為更新事件
-                // this_event = selector.find("[data-event-id="+ val.ei +"]");
-                // if(this_event.length){
-                //     //如果是更新事件 目前只重改按讚狀態 其餘以後再說
-                //     this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
-                //     this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
-                //     this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
-                //     //event status
-                //     this_event.data("event-val",val);
-                //     eventStatusWrite(this_event);
-                // }
+                //判斷是否為更新事件
+                this_event = selector.find("[data-event-id="+ val.ei +"]");
+                if(this_event.length){
+                    //如果是更新事件 目前只重改按讚狀態 其餘以後再說
+                    this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
+                    this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
+                    this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
+                    //event status
+                    this_event.data("event-val",val);
+                    eventStatusWrite(this_event);
+                    return;
+                }
                 this_event = this_event_temp.clone();
             }
 
             var tp = val.meta.tp.substring(1,2)*1;
-
 
             //detail 不需要
             if(!detail){
@@ -3773,7 +3771,7 @@ $(function(){
             selector[method](this_event);
 
             //調整留言欄
-            this_event.find(".st-reply-message-textarea").css("width",$(window).width()-200);
+            this_event.find(".st-reply-message-textarea").css("width",$(window).width()-450);
 
             //記錄timeline種類
             this_event.attr("data-event-id",val.ei);
@@ -3803,8 +3801,6 @@ $(function(){
             var data_arr = ["timelineUserName",val.ei.split("_")[0] , val.meta.gu , this_event.find(".st-sub-name") , this_event.find(".st-sub-box-1 .st-user-pic img")];
             chkGroupAllUser(data_arr);
 
-            // var time = new Date(val.meta.ct);
-            // var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
             this_event.find(".st-sub-time").append(new Date(val.meta.ct).toFormatString());
             // this_event.find(".st-sub-time").append(val.meta.ct);
 

@@ -663,6 +663,20 @@ img.auo {
 
 
 /* ======================= 左側選單 =================================*/
+.gm-side-menu {
+	width: 250px;
+	position: relative; 
+	background: #3a3d41;
+	color: #f5f5f5;
+	text-shadow: 0 0;
+	height: 100%;
+	overflow: auto;
+	-webkit-box-flex: 0;   
+}
+
+.gm-side-menu:hover {
+	/*position: absolute;*/
+}
 
 .side-menu-btn {
 	height: 40px;
@@ -674,10 +688,6 @@ img.auo {
 
 .page-fixed{
 	position:fixed;
-}
-
-#page-group-main {
-    background: #3a3d41;
 }
 
 #side-menu{
@@ -915,9 +925,6 @@ img.auo {
     display: none; 
 }
 
-#page-group-main {
-}
-
 .sm-click-bg, .sm-group-cj-btn:active{
 	background:#202327;
 }
@@ -930,10 +937,6 @@ img.auo {
 }
 
 /* ========================== group main ================================= */
-
-#page-group-main .ui-body-c {
-    /* background: #fff; */
-}
 
 .main-contact-l {
     float: left;
@@ -1106,13 +1109,37 @@ img.auo {
 
 /* =============================== page timeline ==================================== */
 
-#page-group-main .ui-title {
-	/* margin: 15px auto 11px;
-	flex: 25; */
+#page-group-main {
+	background: #3a3d41;
+	height: 500px;
 }
 
-#page-group-main > div[data-role=header] {
-    padding-top: 5px;
+.gm-frame {
+	display: -webkit-box;
+	height: 100%;
+}
+
+.gm-header {
+	position: fixed;
+	z-index: 100;
+	background: rgb(54, 163, 232);
+	width: -webkit-calc(100% - 250px);
+	padding-top: 5px;
+	color: white;
+	text-shadow: 0 0;
+}
+
+.gm-adjustment { height: 56px; }
+
+#page-group-main .gm-content {
+    position: relative;
+	height: 100%;
+	overflow: auto;
+	-webkit-box-flex: 1;
+}
+
+#page-group-main div[data-role=content]:hover {
+	/*position: absolute;*/
 }
 
 /* datetimepicker 是 9999 所以特例10000 */
@@ -1204,7 +1231,7 @@ img.auo {
 	z-index: 10;
 	border: solid;
 	border-width: 9px 9px 0;
-	border-color: rgb(1,102,161) transparent transparent;
+	border-color: rgb(54, 163, 232) transparent transparent;
 }
 
 .feed-compose-area-cover {
@@ -3554,7 +3581,7 @@ input.cp-datetimepicker-end {
 	position: relative;
 }
 
-@media all and (max-width: 500px) {
+@media all and (max-width: 5000px) {
     .user-info-load,.me-info-load {
 		width: 350px;
 		height: 550px;
@@ -3571,7 +3598,7 @@ input.cp-datetimepicker-end {
 	}
 }	
 
-@media all and (min-width: 501px) {
+/*@media all and (min-width: 501px) {
     .user-info-load,.me-info-load {
 		width: 400px;
 		height: 650px;
@@ -3591,7 +3618,7 @@ input.cp-datetimepicker-end {
 	.user-avatar {
 		margin-bottom: 15px;
 	}
-}
+}*/
 
 .user-avatar {
 	width: 100%;
