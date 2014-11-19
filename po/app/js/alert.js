@@ -267,14 +267,14 @@ showAlertContent = function(data){
 			    content.css("display","block");
 
 			    //並上傳了檔案
-			    if( boxData.nd.hasOwnProperty("ml") ){
-					for( var j=0; j<boxData.nd.ml.length; j++){
-						if( boxData.nd.ml[j].tp!=0 ){
-							setDetailAct( content );
-							break;
-						}
-					}
-			    }
+			  //   if( boxData.nd.hasOwnProperty("ml") ){
+					// for( var j=0; j<boxData.nd.ml.length; j++){
+					// 	if( boxData.nd.ml[j].tp!=0 ){
+					// 		setDetailAct( content );
+					// 		break;
+					// 	}
+					// }
+			  //   }
 			}
 
 			//內容
