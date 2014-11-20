@@ -366,7 +366,8 @@ $(function(){
                 setBranchList(this_gi);
 	            
 	            if(data_arr && data_arr[0] == "setTopEventUserName"){
-	            	//設定top event 的user name
+	            	//設定top event 的user name 及頭像
+                    data_arr[1].find(".st-top-event-l img").attr("src",$.lStorage(ui)[this_gi].guAll[data_arr[2]].aut);
 	            	data_arr[1].find(".st-top-event-r-footer span:eq(0)").html(new_group_user[data_arr[2]].nk);
 
 	            }else if(data_arr && data_arr[0] == "userInfo"){
@@ -617,7 +618,7 @@ $(function(){
         				this_top_event.data("pos",i);
 
         				//圖片及類型
-        				this_top_event.find(".st-top-event-l img").attr("src",_groupList[gi].guAll[val.meta.gu].aut);
+        				// this_top_event.find(".st-top-event-l img").attr("src",_groupList[gi].guAll[val.meta.gu].aut);
         				// this_top_event.find(".st-top-event-l div").html(this_top_obj.name);
         				//標題 內容
         				this_top_event.find(".st-top-event-r-ttl").html(val.meta.tt);
@@ -658,12 +659,13 @@ $(function(){
 			var data_arr = ["setTopEventUserName",this_top_event,this_gu];
 	        setGroupAllUser(data_arr);
 	    }else{
+            this_top_event.find(".st-top-event-l img").attr("src",gu_all[this_gu].aut);
 	    	this_top_event.find(".st-top-event-r-footer span:eq(0)").html(gu_all[this_gu].nk);
 	    }
 	}
 
     topBarMake = function (top_area,top_msg_num,resize) {
-        return false;
+        
         //游標 預設位置0
         top_area.find(".st-top-bar-selector").data("pos",0);
 
@@ -690,7 +692,7 @@ $(function(){
         }
 
         //出現
-        top_area.find(".st-top-bar-area").slideDown("fast");
+        // top_area.find(".st-top-bar-area").slideDown("fast");
 
         //起始位置
         var selector_pos = (10-top_msg_num)/2*10;

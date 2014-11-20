@@ -617,8 +617,6 @@ $(function(){
 				if(this_event.data("detail-content")) detailLikeStringMake(this_event);
 			}
 		});
-
-		
 	});
 
 	//回覆按讚
