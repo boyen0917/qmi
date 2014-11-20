@@ -429,13 +429,9 @@ $(function(){
 	        	$(".subpage-timeline").show();
 	        	$("#page-group-main").find(".gm-header .page-title").html(page_title);
 
-                //不知道在幹嘛
-	   //      	var parent = $("#page-group-main").find("div[data-role=header] div[class=header-group-name]");
-				// if( parent ){
-				// 	//set add icon
-				// 	parent.find("~ div[class=feed-compose]").show();
-				// 	parent.find("~ div[class=chatList-add]").hide();
-				// }
+                //顯示新增貼文按鈕, 藏新增聊天室按鈕
+                $("#page-group-main").find(".gm-header .feed-compose").show();
+                $("#page-group-main").find(".gm-header .chatList-add").hide();
 
                 //polling 數字重寫
                 pollingCountsWrite();
@@ -445,6 +441,10 @@ $(function(){
 	            $(".subpage-timeline").hide();
 	        	$(".subpage-chatList").hide();
 	            $( "#side-menu" ).panel( "close");
+                
+                //藏新增貼文按鈕, 新增聊天室按鈕
+                $("#page-group-main").find(".gm-header .feed-compose").hide();
+                $("#page-group-main").find(".gm-header .chatList-add").hide();
                 
                 page_title = "成員列表";
 
@@ -457,9 +457,13 @@ $(function(){
 	        	$(".subpage-chatList").show();
 	        	// $( "#side-menu" ).panel( "close");
 
-                page_title = "聊天";
+                page_title = $.i18n.getString("CHAT_TITLE");
 
 	        	initChatList();
+
+                //顯示新增聊天室按鈕, 藏新增貼文按鈕
+                $("#page-group-main").find(".gm-header .feed-compose").hide();
+                $("#page-group-main").find(".gm-header .chatList-add").show();
 
 	        	//$.mobile.changePage("#page-chatroom");
 	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");

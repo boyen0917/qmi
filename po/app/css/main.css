@@ -742,6 +742,11 @@ img.auo {
 	border-radius: 6px;
 	border: 1px solid rgb(240,240,240);
 }
+.sm-user-pic img{
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+}
 
 .sm-user-area, .main-user-area {
 	height: 80px;
@@ -777,6 +782,9 @@ img.auo {
 .sm-user-area-r img {
 	width: 25px;
 	margin-top: 1px;
+}
+.sm-user-area-r div img{
+	width: auto;
 }
 
 .sm-small-area {

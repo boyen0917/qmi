@@ -347,8 +347,8 @@ $(function(){
 	    $("#page-group-main .ui-panel-content-wrap").addClass("page-fixed");
 	    
 		//調整頭像大小
-		var img = $(".sm-user-pic img");
-		mathAvatarPos(img,img.width(),img.height(),avatar_size);
+		// var img = $(".sm-user-pic img");
+		// mathAvatarPos(img,img.width(),img.height(),avatar_size);
 
 		//polling
 	});

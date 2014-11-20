@@ -13,18 +13,18 @@ initChatList = function(){
 
 	//----- set title -------
 	var currentGroup = $.lStorage(ui)[gi];
-	var parent = $("#page-group-main").find("div[data-role=header] div[class=header-group-name]");
-	if( parent ){
+	// var parent = $("#page-group-main").find(".gm-header");
+	// if( parent ){
 		//set title & sub-title
-		var tmp = parent.find("div:first-child");
-		if( tmp ){
-			tmp.html( $.i18n.getString("CHAT_TITLE") );
-			if( currentGroup )	tmp.next().html( currentGroup.gn );
-		}
+		// var tmp = parent.find(".page-title");
+		// if( tmp ){
+		// 	tmp.html( $.i18n.getString("CHAT_TITLE") );
+		// 	if( currentGroup )	tmp.next().html( currentGroup.gn );
+		// }
 		//set add icon
-		parent.find("~ div[class=feed-compose]").hide();
-		parent.find("~ div[class=chatList-add]").show();
-	}
+		// parent.find(".feed-compose").hide();
+		// parent.find(".chatList-add").show();
+	// }
 	
 	//set add member button
 	$(".chatList-add").off("click");
@@ -354,7 +354,7 @@ function showNewRoomPage(){
 		} else {
 			memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
 		}
-		memDiv.append("<span>"+mem.nk+"</span>");
+		memDiv.append("<span>"+mem.nk.replaceOriEmojiCode()+"</span>");
 		container.append(memDiv);
 		g_memCount++;
 	}
@@ -391,7 +391,7 @@ function showNewRoomPage(){
 function addMember( memId, memName ){
 	if( g_newChatMemList.indexOf(memId)<0 ){
 		g_newChatMemList.push(memId);
-		var span = $("<span data-memid='"+memId+"'>"+memName+"</span>");
+		var span = $("<span data-memid='"+memId+"'>"+memName.replaceOriEmojiCode()+"</span>");
 		$(".newChat-list .addMemList").append(span);
 		if( g_newChatMemList.length >= g_memCount ){
 			$(".newChat-checkbox-gray").addClass("checked");
@@ -484,7 +484,7 @@ function showNewRoomDetailPage(){
 		} else {
 			memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
 		}
-		memDiv.append("<span>"+mem.nk+"</span>");
+		memDiv.append("<span>"+mem.nk.replaceOriEmojiCode()+"</span>");
 		container.append(memDiv);
 	}
 

@@ -240,7 +240,7 @@
 	height: 30px;
 }
 
-.newChat-content .mem img, .newChatDetail-content .mem img{
+.newChat-content .mem > img, .newChatDetail-content .mem > img{
 	width: 60px;
 	height: 60px;
 	display: inline-block;
