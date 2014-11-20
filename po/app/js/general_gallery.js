@@ -10,9 +10,11 @@ var scrollPercent = 0;
 var isCheckPosi = false;
 var checkTime = 0;
 var nextScrollTime = 0;
+var bIsScrollPage = true;
 
 $(document).ready(function(){
 	var picArea = $(".picArea");
+	//trigger loading
 	$(".dataDom").off("click").click( function(){
 		picArea.html("");
 		picArea.data("index", 0);
@@ -22,25 +24,32 @@ $(document).ready(function(){
 
 		var width = 100.0/list.length;
 		for( var i=0; i<list.length; i++ ){
-			var img = $("<div class='img' width='100%'></div>");
+			var img = $("<div class='img'><img width='100%'/></div>");
 			img.css("width",width+"%");
+			img.data("oriW",width);
 			if( list[i].s32 ){
-				img.css("background-image", "url("+list[i].s32+")" );
-				var tt = img.css("background-image");
+				img.find("img").attr("src", list[i].s32 );
+				// img.css("background-image", "url("+list[i].s32+")" );
 			} else {
-				getS3fileBackground( list[i],img, 6 );
+				getS3file( list[i],img.find("img"), 6 );
 			}
 			picArea.append( img );
 		}
 
 		$(".cnt .current").html( 1 );
 		$(".cnt .all").html( list.length );
+		changeImgViewSize(1);
 	});
 
 	$(".rBtn").off("click").click( moveRight );
 	$(".lBtn").off("click").click( moveLeft );
 
+	$(".zoomIn").off("click").click( zoomIn );
+	$(".zoomOut").off("click").click( zoomOut );
+
 	picArea.bind("mousewheel", function(e) {
+		if(!bIsScrollPage) return;
+
 		var cnt = $(this).data("cnt");
 		if( cnt<=1 ) return;
 		isCheckPosi = true;
@@ -113,6 +122,7 @@ moveRight = function( isMove ){
 	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
 	picArea.data("index", index);
 	$(".cnt .current").html( index+1 );
+	changeImgViewSize(1);
 }
 moveLeft = function( isMove ){
 	var picArea = $(".picArea");
@@ -128,9 +138,10 @@ moveLeft = function( isMove ){
 	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
 	picArea.data("index", index);
 	$(".cnt .current").html( index+1 );
+	changeImgViewSize(1);
 }
 
-getS3fileBackground = function(file_obj,target,tp){
+getS3file = function(file_obj,target,tp){
     //default
     var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
     var headers = {
@@ -149,9 +160,8 @@ getS3fileBackground = function(file_obj,target,tp){
             switch(tp){
                 case 6://圖片
                     //小圖
-                    target.css("background-image","url("+obj.s32+")");
-                    //大圖
-                    target.data("auo",obj.s32);
+                    // target.css("background-image","url("+obj.s32+")");
+                    target.attr("src",obj.s32);
                     break;
                 case 8://聲音
                     target.attr("src",obj.s3);
@@ -161,4 +171,40 @@ getS3fileBackground = function(file_obj,target,tp){
             return obj.s3;
         }
     });
+}
+
+zoomIn = function(){
+	var imgView = $(".picArea .img");
+	var size = imgView.data("size");
+	size = Math.min(5,size+1);
+	changeImgViewSize( size );
+}
+zoomOut = function(){
+	var imgView = $(".picArea .img");
+	var size = imgView.data("size");
+	size = Math.max(1,size-1);
+	changeImgViewSize( size );
+}
+changeImgViewSize = function(size){
+	var picArea = $(".picArea");
+	var index = picArea.data("index");
+	cns.debug( ".img:nth-child("+ (index+1) +")" );
+	var imgView = picArea.find(".img:nth-child("+ (index+1) +")");
+	imgView.data("size",size);
+
+	cns.debug(size);
+
+	$(".zoom .info").html(size+"x");
+	var img = imgView.find("img");
+	img.css("width", size*100+"%");
+	img.css("height", size*100+"%");
+
+	if( size>1 ){
+		imgView.css("overflow", "scroll");
+		bIsScrollPage = false;
+	} else {
+		imgView.css("overflow", "");
+		bIsScrollPage = true;
+	}
+	// $(".picArea .align").css("height",(100*size)+"%");
 }
