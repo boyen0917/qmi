@@ -106,7 +106,7 @@ initContactList = function(){
 		searchBarInput.focus();
 	});
 
-	$(".subpage-contact").height( $(window).height()-63 );
+	// $(".subpage-contact").height( $(window).height()-63 );
 	$(window).off("resize").resize( function(){
 		$(".contact-branchList").height( $(window).height()-105 );
 		$(".contact-scroll").height( $(window).height()-115 );

@@ -127,48 +127,60 @@
         <div data-role="page" id="page-group-main" >
             <div class="gm-frame">
                 <div class="gm-side-menu">
-                    <div class="sm-user-area namecard">
-                       <div class="sm-user-area-l">
-                           <div class="sm-user-pic">
-                               <img src="images/common/others/empty_img_personal_xl.png"/>
+                    <div class="sm-header">
+                        <div class="sm-group-pic"></div>
+                        <div class="sm-group-name"></div>
+                        <div class="sm-user-area namecard">
+                           <div class="sm-user-area-l">
+                               <div class="sm-user-pic">
+                                   <img src="images/common/others/empty_img_personal_xl.png"/>
+                               </div>
                            </div>
-                       </div>
-                       <div class="sm-user-area-r">
-                       <div></div>
-                       <div></div>
-                       </div>
+                           <div class="sm-user-area-r">
+                                <div></div>
+                                <img src="images/icon/icon_sidemenu_arrow_normal.png"/>
+                           </div>                
+                        </div>
                     </div>
-                    <div data-sm-act="feed" data-polling-cnt="A1" class="sm-small-area polling-cnt">
-                       <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_feed.png"/></div>
-                       <div class="sm-small-area-r">動態消息</div>
-                       <div class="sm-count">315</div>
-                    </div>
-                    <div data-sm-act="contact" data-polling-cnt="A2" class="sm-small-area polling-cnt">
-                       <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_contact.png"/></div>
-                       <div class="sm-small-area-r">聯絡人</div>
-                       <div class="sm-count"></div>
-                    </div>
-                    <div data-sm-act="chat" data-polling-cnt="A3" class="sm-small-area polling-cnt">
-                       <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_chat.png"/></div>
-                       <div class="sm-small-area-r">聊天</div>
-                       <div class="sm-count"></div>
-                    </div>
-                    <div class="sm-hr">團體</div>
-                    <div class="sm-group-list-area">
-                      
-                    </div>
-                    <div class="sm-group-list-area-add" style="display:none">
-                        
-                    </div>
-                    <div class="sm-group-switch"><div class="sm-switch-ui-adj"></div><img src="images/side_menu/sidemenu_slidedown_icon_click.png"/></div>
-                    <div class="sm-group-cj">
-                        <div class="hg-create sm-group-cj-btn">建立團體</div>
-                        <div class="hg-invite sm-group-cj-btn polling-cnt" data-polling-cnt="G1" >團體邀請<span></span></div>
-                    </div>
-                    <div class="sm-hr">系統</div>
-                    <div data-sm-act="setting" class="sm-small-area setting">
-                       <div class="sm-small-area-l"><img src="images/side_menu/sidemenu_icon_setting.png"/></div>
-                       <div class="sm-small-area-r"><!-- 系統設定 -->登出</div>
+                    <div class="gm-border">
+                        <div data-sm-act="feeds" data-polling-cnt="A1" class="sm-small-area polling-cnt">
+                           <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_feeds_activity.png"/></div>
+                           <div class="sm-small-area-r">動態消息</div>
+                           <div class="sm-count"></div>
+                        </div>
+                        <div data-sm-act="memberslist" data-polling-cnt="A2" class="sm-small-area polling-cnt">
+                           <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_memberslist_normal.png"/></div>
+                           <div class="sm-small-area-r">成員列表</div>
+                           <div class="sm-count"></div>
+                        </div>
+                        <div data-sm-act="chat" data-polling-cnt="A3" class="sm-small-area polling-cnt">
+                           <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_chat_normal.png"/></div>
+                           <div class="sm-small-area-r">聊天</div>
+                           <div class="sm-count"></div>
+                        </div>
+                        <div class="sm-hr">團體</div>
+                        <div class="sm-group-list-area">
+                          
+                        </div>
+                        <div class="sm-group-list-area-add" style="display:none">
+                            
+                        </div>
+                        <div class="sm-group-cj">
+                            <div class="hg-create sm-group-cj-btn">
+                                <img src="images/icon/icon_sidemenu_group_build.png"/>
+                                建立團體
+                            </div>
+                            <div class="hg-invite sm-group-cj-btn polling-cnt" data-polling-cnt="G1" >
+                                <img src="images/icon/icon_sidemenu_group_invite.png"/>
+                                團體邀請
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="sm-hr">系統</div>
+                        <div data-sm-act="setting" class="sm-small-area setting">
+                           <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_setting_normal.png"/></div>
+                           <div class="sm-small-area-r"><!-- 系統設定 -->登出</div>
+                        </div>
                     </div>
                 </div>
                 <div class="gm-content">
@@ -256,8 +268,7 @@
                 
                     
             <!------------------------------------- 聯絡人 ---------------------------------------->
-
-                    <div class="subpage-contact" style="display:none;">
+                    <div class="subpage-contact" style="display:none;height: 100%">
                         <div class="contact-search">
                             <div class="inputDiv">
                                 <div class="hintDiv">

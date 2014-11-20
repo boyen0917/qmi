@@ -389,32 +389,34 @@ $(function(){
 	});
 	
 	//按鈕效果
-	$(document).on("mousedown",".sm-small-area,.sm-group-area",function(){
-		var icon_default = "images/side_menu/sidemenu_icon_";
+	$(document).on("click",".sm-small-area,.sm-group-area",function(){
+		var icon_default = "images/icon/icon_timeline_tab_";
+		//圖片先還原
+		$(".sm-small-area").each(function(i,val){
+			$(this).find("img").attr("src",icon_default + $(this).data("sm-act") + "_normal.png");
+		});
+		
 		var target = $(this);
 		//開關按鈕ui變化
-		if($(".sm-group-list-area-add").is(":visible") ){
-			if(target.data("switch-chk") == "check2"){
-				$(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
-			}
-	    }else{
-	    	if(target.data("switch-chk") == "check"){
-	            $(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
-	        }
-	    }
+		// if($(".sm-group-list-area-add").is(":visible") ){
+		// 	if(target.data("switch-chk") == "check2"){
+		// 		$(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
+		// 	}
+	 //    }else{
+	 //    	if(target.data("switch-chk") == "check"){
+	 //            $(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
+	 //        }
+	 //    }
 		target.addClass("sm-click-bg");
-		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_click.png");
+		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
+
 	});
 	
-	//按鈕效果
-	$(document).on("mouseup",".sm-small-area,.sm-group-area",function(){
+	//更換timeline
+	$(document).on("mouseup",".sm-small-area",function(){
 		var icon_default = "images/side_menu/sidemenu_icon_";
 		var target = $(this);
-
-    	//mouseup了 左側選單 團體調整線 直接刪除就好了 
-    	$(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
-
-    	target.removeClass("sm-click-bg");
+    	
     	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
 
 	    timelineSwitch(target.data("sm-act"));
@@ -434,7 +436,10 @@ $(function(){
 		// if(typeof $.lStorage(ui)[this_gi].bl == "undefined")
 		// 	setBranchList(this_gi);
 		
-		timelineSwitch("feed",true);
+		//左側選單圖案變換
+		setSidemenuHeader(this_gi);
+
+		timelineSwitch("feeds",true);
 	});
 	
 	$(".sm-small-area.setting").click(function(){
