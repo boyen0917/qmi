@@ -1,6 +1,6 @@
 /* z-index 區域最高100 全域遮罩1000  全域遮罩上的元件1100 */
 
-.ui-body-c, .ui-body-c input, .ui-body-c select,textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c, .alert-area{
+body{
     font-family: "微軟正黑體","Microsoft JhengHei";
     -webkit-font-smoothing: antialiased;
     font-weight: normal;
@@ -749,6 +749,11 @@ img.auo {
 	border-radius: 6px;
 	border: 1px solid rgb(240,240,240);
 }
+.sm-user-pic img{
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+}
 
 .sm-user-area, .main-user-area {
 	height: 80px;
@@ -784,6 +789,9 @@ img.auo {
 .sm-user-area-r img {
 	width: 25px;
 	margin-top: 1px;
+}
+.sm-user-area-r div img{
+	width: auto;
 }
 
 .sm-small-area {
@@ -876,6 +884,9 @@ img.auo {
 }
 
 .sm-group-area-l img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 .sm-group-area .sm-count {
@@ -1726,6 +1737,14 @@ img.auo {
 	border-radius: 8px;
     border:1px solid #abbabf;
 }
+.st-user-pic img{
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+}
+img.st-user-pic{
+	object-fit: cover;
+}
 
 .st-user-pic, .st-sub-name, .st-sub-time {
     float: left;
@@ -1778,7 +1797,7 @@ img.auo {
 	font-size:12px
 }
 
-.st-sub-box-1-footer img {
+.st-sub-box-1-footer img:nth-child(1) {
 	margin-right: 10px;
 	width: 17px;
 	position: relative;
@@ -2638,8 +2657,9 @@ img.st-reply-message-attach {
 
 .st-reply-message-img{
 	background: rgb(239,239,239);
+	cursor: default;
 }
-.st-reply-message-img div{
+.st-reply-message-img .img{
 	position: relative;
 	max-width: 120px;
 	max-height: 120px;
@@ -2649,7 +2669,7 @@ img.st-reply-message-attach {
 	margin-left: 80px;
 	cursor: pointer;
 }
-.st-reply-message-img div:before {
+.st-reply-message-img .img:before {
 	background-image: url("../images/common/icon/icon_compose_close.png");
 	position: absolute;
 	top: -2px;
@@ -2673,9 +2693,14 @@ img.st-reply-message-attach {
 	width: 250px;
 	overflow: hidden;
 	margin: 10px 0;
-	border: 1px solid #d2d2d2;
 	cursor: pointer;
 	display: none;
+}
+.st-reply-content .au-area img{
+    max-width: 99%;
+	height: 98%;
+	object-fit: contain;
+	border: 1px solid #d2d2d2;
 }
 
 .st-reply-content img.sticker {
@@ -3601,7 +3626,9 @@ input.cp-datetimepicker-end {
 }
 
 .obj-cell-user-pic img {
-	/*width: 60px;*/
+	width: 60px;
+	object-fit: cover;
+	height: 60px;
 }
 
 .obj-cell-user-data, .obj-cell-subgroup-data {

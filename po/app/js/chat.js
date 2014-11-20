@@ -733,7 +733,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 		
 		//right
 		var subDiv = $("<div class='group'></div>");
-		subDiv.append("<div class='name'>"+ mem.nk +"</div>");	//name
+		subDiv.append("<div class='name'>"+ mem.nk.replaceOriEmojiCode() +"</div>");	//name
 		msgDiv = $("<div class='msg-content'></div>");
 		subDiv.append(msgDiv);	//msg
 

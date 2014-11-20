@@ -133,18 +133,21 @@
 .addMemListTitleGroup{
 	width: 80px;
 	height: 100%;
+	vertical-align: top;
 }
 .newChat-list{
 	background: rgb(223, 236, 244);
-	min-height: 30px;
+	min-height: 45px;
 	color: #333;
 	width: 100%;
+	font-size: 18px;
+	line-height: 35px;
 }
 .newChat-list .addMemListTitle{
-	margin-left: 5px;
-	text-align: center;
-	width: 50px;
 	display: inline-block;
+	height: 100%;
+	width: 50px;
+	text-align: center;
 }
 .newChat-list .addMemListImg{
 	background: url("../images/common/icon/icon_arrow_next_darkblue.png");
@@ -153,12 +156,15 @@
 	display: inline-block;
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
-	vertical-align: -20%;
+	vertical-align: top;
+	margin-top: 8px;
 }
 .newChat-list .addMemList{
 	display: inline-block;
 	height: 100%;
-	width: 99%;
+	width: -webkit-calc(100%-80px);
+	max-height: 117px;
+	overflow: scroll;
 }
 .addMemList span{
 	margin-right: 10px;
@@ -167,14 +173,15 @@
 
 .newChat-selectAll{
 	background: rgb(203, 220, 224);
-	height: 30px;
-	line-height: 30px;
+	height: 40px;
+	line-height: 40px;
+	font-size: 18px;
 }
 /*custom checked box*/
 .newChat-selectAll div{
 	background: url("../images/common/icon/icon_check_gray.png");
-	width: 20px;
-	height: 20px;
+	width: 30px;
+	height: 30px;
 	display: inline-block;
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
@@ -186,35 +193,39 @@
 	background: url("../images/common/icon/icon_check_gray_check.png");
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
-	width: 20px;
-	height: 20px;
+	width: 30px;
+	height: 30px;
 }
 .newChat-selectAll span:nth-child(2){
 	text-align: left;
-	width: 52px;
+	width: 140px;
 	display: inline-block;
 	float: left;
+	white-space: nowrap;
 }
 .newChat-selectAll span:nth-child(3){
-	text-align: left;
-	width: 100px;
-	right: 0;
+	text-align: right;
+	width: 140px;
+	/* right: 0; */
 	display: inline-block;
-	float: left;
+	float: right;
+	margin-right: 10px;
+	white-space: nowrap;
 }
 
 .newChat-content .mem{
-	height: 60px;
+	height: 80px;
 	border-style: solid;
 	border-width: 0 0 1px 0;
 	border-color: #abbabf;
-	line-height: 60px;
+	line-height: 80px;
+	font-size: 18px;
 }
 
 .newChat-content .mem .checkbox{
 	background: url("../images/common/icon/icon_check_round.png");
-	width: 20px;
-	height: 20px;
+	width: 30px;
+	height: 30px;
 	display: inline-block;
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
@@ -225,13 +236,13 @@
 	background: url("../images/common/icon/icon_check_round_check.png");
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
-	width: 20px;
-	height: 20px;
+	width: 30px;
+	height: 30px;
 }
 
-.newChat-content .mem img, .newChatDetail-content .mem img{
-	width: 40px;
-	height: 40px;
+.newChat-content .mem > img, .newChatDetail-content .mem > img{
+	width: 60px;
+	height: 60px;
 	display: inline-block;
 	vertical-align: middle;
 	margin-right: 10px;
@@ -239,6 +250,8 @@
 	border-color: #abbabf;
 	border-style: solid;
 	border-width: 1px;
+	object-fit: cover;
+	margin-top: -4px;
 }
 
 /*
@@ -265,36 +278,45 @@
 	padding: 5px 17px 5px 10px;
 }
 .newChatDetail table .img{
-	width: 60px;
+	width: 65px;
 	height: 100%;
 }
 .newChatDetail table .img img{
-	width: 50px;
-	height: 50px;
+	width: 60px;
+	height: 60px;
 }
 .newChatDetail table .title{
 	display: inline-block;
-	float:left;
+	float: left;
+	font-size: 18px;
+	line-height: 20px;
 }
 .newChatDetail table .count{
 	display: inline-block;
 	float:right;
+	font-size: 18px;
+	line-height: 20px;
 }
 .newChatDetail table .input{
 	width: 100%;
+	font-size: 14px;
+	line-height: 23px;
+	margin-top: 5px;
 }
 
 .newChatDetail-header{
 	background: rgb(203, 220, 224);
 	padding: 3px 20px;
+	font-size: 18px;
 }
 .newChatDetail-content .mem{
 	margin: 0px 20px;
-	height: 60px;
+	height: 80px;
 	border-style: solid;
 	border-width: 0 0 1px 0;
 	border-color: #abbabf;
-	line-height: 60px;
+	line-height: 80px;
+	font-size: 18px;
 }
 
 

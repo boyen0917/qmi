@@ -1,6 +1,6 @@
-::-webkit-scrollbar { 
+/*::-webkit-scrollbar { 
     display: none; 
-}
+}*/
 
 body{
 	background: black;
@@ -9,47 +9,57 @@ body{
     -webkit-font-smoothing: antialiased;
     font-weight: normal;
     margin: 0;
+    overflow: hidden;
 }
 
 .title{
-	width: 100%;
+	width: -webkit-calc( 50% - 15px );
 	/* margin-top: 30px; */
-	text-align: center;
+	text-align: right;
 	font-size: 30px;
 	line-height: 30px;
 	position: fixed;
-	top: 35px;
+	top: 20px;
+	white-space: nowrap;
+	display: none;
 }
 
 .subTitle{
-	width: 100%;
-	margin-bottom: 35px;
-	text-align: center;
+	width: -webkit-calc( 50% + 10px );
+	/* margin-bottom: 35px; */
+	text-align: left;
 	/* font-size: 30px; */
-	line-height: 30px;
+	line-height: 20px;
 	color: lightgray;
 	font-size: 20px;
 	position: fixed;
-	top: 70px;
+	top: 28px;
+	right: 0;
+	/* float: right; */
+	white-space: nowrap;
+	display: none;
 }
+
 .picArea{
-	height: 73%;
+	height: -webkit-calc(100% - 130px);
 	width: 96%;
 	position: absolute;
 	/* margin-left: 2%; */
 	left: 0;
 	-webkit-transition: all 0.3s;
-	top: 14%;
+	top: 44px;
 }
 
 .picArea .img{
+	width: 100%;
 	height: 100%;
-	background-size: contain;
-	background-position: center;
-	background-repeat: no-repeat;
 	display: inline-block;
-	/*width: 48%;
-	margin-right: 2%;*/
+	overflow: hidden;
+}
+.picArea .img img{
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
 }
 
 .lBtn, .rBtn{
@@ -97,4 +107,28 @@ body{
 }
 .cnt .current{
 	color: rgb(29, 142, 244);
+}
+
+.zoom{
+	position: fixed;
+	/* height: 30px; */
+	bottom: 20px;
+	left: 20px;
+}
+
+.zoom div{
+	display: inline-block;
+}
+.zoom .info{
+	font-size: 20px;
+	color: gray;
+	cursor: default;
+}
+.zoom .zoomIn, .zoom .zoomOut{
+	font-size: 42px;
+	font-weight: bold;
+	margin-bottom: -11px;
+	width: 40px;
+	text-align: center;
+	cursor: pointer;
 }
