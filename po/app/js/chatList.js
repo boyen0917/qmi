@@ -504,16 +504,21 @@ function showNewRoomDetailPage(){
 
 function requestNewChatRoom(){
 	var text = $(".newChatDetail table .input").val();
-	// cns.debug( text );
-	if( !text || text.length==0 ){
-		if( g_newChatMemList.length > 1 ){
-			alert( $.i18n.getString("CHAT_CHATROOM_NAME_EMPTY") );
-			return;
+	var arr = [];
+	var data = $.lStorage(ui);
+	var groupData = data[gi];
+	var me = groupData.gu;
+	for( var i=0; i<g_newChatMemList.length; i++ ){
+		if( g_newChatMemList[i]!=me ){
+			arr.push( {gu:g_newChatMemList[i]} );
 		}
 	}
-	var arr = [];
-	for( var i=0; i<g_newChatMemList.length; i++ ){
-		arr.push( {gu:g_newChatMemList[i]} );
+
+	var isSingleChat = (arr.length == 1);
+	// cns.debug( text );
+	if( !isSingleChat && (!text || text.length==0) ){
+		alert( $.i18n.getString("CHAT_CHATROOM_NAME_EMPTY") );
+		return;
 	}
 
 	var api_name = "/groups/"+gi+"/chats";
@@ -537,7 +542,34 @@ function requestNewChatRoom(){
     		$.mobile.changePage("#page-group-main");
     		updateChatList( function(){
     			if(result.ci){
-			    	openChatWindow( result.ci );
+
+    				//還沒有聊過天的話server聊天室列表不會有這個聊天室
+    				var userData = $.lStorage( ui );
+				    g_group = userData[gi];
+				    if( null==g_group["chatAll"][result.ci] ){
+				    	g_group["chatAll"][result.ci] = {
+				    		ci: result.ci,
+				    	};
+				    	if( isSingleChat ){
+				    		var memGu = arr[0].gu;
+				    		g_group["chatAll"][result.ci].tp = 1;
+				    		g_group["chatAll"][result.ci].cn = me+","+memGu;
+				    		var mem = g_group["guAll"][memGu];
+				    		if( mem )	g_group["chatAll"][result.ci].uiName = mem.nk;
+				    		else	g_group["chatAll"][result.ci].uiName = "";
+				    		
+				    	} else {
+				    		g_group["chatAll"][result.ci].tp = 2;
+				    		g_group["chatAll"][result.ci].cn = text;
+				    		g_group["chatAll"][result.ci].uiName = text;
+				    	}
+				    	$.lStorage( ui, userData );
+				    }
+
+				    //打開聊天室
+	    			setTimeout( function(){
+	    				openChatWindow( result.ci );
+	    			},300);
 			    }
     		});
     		// //api上面寫這個可能是批次新增用的..?!

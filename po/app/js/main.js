@@ -682,6 +682,7 @@ $(function(){
 		
 	});
 
+	//sticker
 	$(document).on('click','.st-reply-message-sticker',function(){
 		var stickerIcon = $(this);
 		var stickerArea = stickerIcon.parents(".st-sub-box").find(".stickerArea");
@@ -698,7 +699,8 @@ $(function(){
 					cns.debug(id);
 					var path = getStickerPath(id);
 					var preview = stickerIcon.parent().find(".st-reply-message-img");
-					preview.html("<div><img src='"+path+"'/></div>");
+					preview.data("type",5);
+					preview.html("<div class='img'><img src='"+path+"'/></div>");
 					preview.data("id", id);
 					
 					var allStickerArea = $(".stickerArea .imgArea");
@@ -707,12 +709,6 @@ $(function(){
 						initStickerArea.updateHistory( dom.parent() );
 					});
 					cns.debug("1");
-
-					//on click -> cancel
-					preview.off("click").click(function(){
-						preview.html("");
-						preview.data("id", null);
-					});
 				});
 			}
 
@@ -721,6 +717,61 @@ $(function(){
 			stickerArea.show();
 			stickerIcon.attr("src", "images/chatroom/chat_textbar_icon_emoticon_activity.png");
 		}
+	});
+
+	//取消sticker或圖片
+	$(document).on('click','.st-reply-message-img .img',function(){
+		$(this).html("");
+		$(this).data("type",null);
+		$(this).data("id", null);
+	});
+
+	//圖片
+	$(document).on('click','.st-reply-message-attach',function(){
+		$(this).siblings(".st-reply-message-file").trigger("click");
+	});
+
+	//圖片檔案處理
+	$(document).on('change','.st-reply-message-file',function(e){
+		var file_ori = $(this);
+		if(file_ori[0].files.length>1){
+			popupShowAdjust("","圖檔最多限制1個");
+			return false;
+		}
+
+		var imageType = /image.*/;
+		$.each(file_ori[0].files,function(i,file){
+
+			if (file.type.match(imageType)) {
+				var this_grid =  file_ori.parent().find(".st-reply-message-img");
+				this_grid.data("type",6);
+				this_grid.html("<div class='img'><img/></div>");
+
+				this_grid.data("file",file);
+
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					var img = this_grid.find("div img");
+
+					//調整長寬
+					// img.load(function() {
+					// 	var w = img.width();
+			  //           var h = img.height();
+     //    				mathAvatarPos(img,w,h,100);
+			  //       });
+
+			        img.attr("src",reader.result);
+			        img.css("border", "lightgray 1px solid");
+				}
+
+				reader.readAsDataURL(file);
+			}else{
+				// this_grid.find("div").html('<span>file not supported</span>');
+			}
+		});
+
+		//每次選擇完檔案 就reset input file
+		file_ori.replaceWith( file_ori.val('').clone( true ) );
 	});
 
 	//留言
@@ -747,7 +798,7 @@ $(function(){
 	$(document).on('click','.st-reply-message-send',function(){
 		var this_event = $(this).parents(".st-sub-box");
 		var text = this_event.find(".st-reply-message-textarea textarea").val();
-		var sticker = this_event.find(".st-reply-message-img").data("id");
+		var sticker = this_event.find(".st-reply-message-img").data("type");
 		if(!text && !sticker) return false;
 
 		if($(this).data("reply-chk")){

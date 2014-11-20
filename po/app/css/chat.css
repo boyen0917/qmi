@@ -129,6 +129,7 @@ body {
 	overflow-y: hidden;
 	border-radius: 8px;
     border:1px solid #abbabf;
+    object-fit: cover;
 }
 /* other's msg right(name, msg, time) */
 .chat-msg-left .group{
