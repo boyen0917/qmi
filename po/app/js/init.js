@@ -187,9 +187,10 @@ $(function(){
 				$(".sm-group-area").each(function(i,val){
 					var this_img = $(this).find(".sm-group-area-l img:eq(0)");
 					var img = new Image();
-					img.onload = function() {
-						mathAvatarPos(this_img,this.width,this.height,avatar_size);
-					}
+					//改使用css自動調整大小位置 2014.11.20 glorialin
+					// img.onload = function() {
+					// 	mathAvatarPos(this_img,this.width,this.height,avatar_size);
+					// }
 					img.src = this_img.attr("src");
 				});
 				//改完就改回false

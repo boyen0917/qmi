@@ -85,14 +85,14 @@ $(function(){
 		parent.prepend(img);
 		
 
-		img.load(function() {
-            var w = img.width();
-            var h = img.height();
-	        if(!x){
-	        	x = avatar_size;
-	        }
-            mathAvatarPos(img,w,h,x);
-        });
+		// img.load(function() {
+  //           var w = img.width();
+  //           var h = img.height();
+	 //        if(!x){
+	 //        	x = avatar_size;
+	 //        }
+  //           mathAvatarPos(img,w,h,x);
+  //       });
 	}
 	
 	mathAvatarPos = function (img,w,h,x,limit){
@@ -402,7 +402,7 @@ $(function(){
     	localStorage.clear();
     }
 
-	getFilePermissionId = function(object_str){
+	getFilePermissionIdWithTarget = function(object_str, branch_str){
 		var object_obj = $.parseJSON(object_str);
 		var gul_arr = [];
 		$.each(object_obj,function(i,val){
@@ -412,6 +412,28 @@ $(function(){
 			}
 			gul_arr.push(temp_obj);
 		});
+
+		var branch_obj = $.parseJSON(branch_str);
+		var bl_arr = [];
+		$.each(branch_obj,function(i,val){
+			var temp_obj = {
+				bi: i,
+				bn: val
+			}
+			bl_arr.push(temp_obj);
+		});
+
+        var body = {
+                ti: ti_feed,
+                tu:{
+                  gul: gul_arr,
+                  bl: bl_arr
+                }
+            }
+        return getFilePermissionId( {gul: gul_arr,bl: bl_arr} );
+	}
+
+	getFilePermissionId = function( tuObject ){
 		var api_name = "groups/" + gi + "/permissions";
 
         var headers = {
@@ -421,9 +443,7 @@ $(function(){
                      };
         var body = {
                 ti: ti_feed,
-                tu:{
-                  gul: gul_arr 
-                }
+                tu: tuObject
             }
 
         var method = "post";

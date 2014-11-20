@@ -1889,7 +1889,7 @@ $(function(){
                            '<div class="obj-cell-chk"><div class="img"></div></div>' +
                            '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
                            '<div class="obj-cell-user-data">' + 
-                                '<div class="obj-user-name">' + gu_obj.nk + '</div>' +
+                                '<div class="obj-user-name">' + gu_obj.nk.replaceOriEmojiCode() + '</div>' +
                                 // '<div class="obj-user-title">雲端事業群。經理</div>' +
                         '</div>'
                     );
@@ -1935,9 +1935,10 @@ $(function(){
                     var innerTmp = $("<div class='subgroup-parent'></div>");
                     var firststCell = $("<div class='obj-cell subgroup branch' data-bl='"+key+"' data-bl-name='"+bl_obj.bn+"'>"+
                         '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                        '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_group_photo.png" style="width:60px"/></div>' +
+                        // '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_group_photo.png" style="width:60px"/></div>' +
+                        '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
                         '<div class="obj-cell-subgroup-data">' + 
-                            '<div class="obj-user-name">' + bl_obj.bn + '</div></div>');
+                            '<div class="obj-user-name">' + bl_obj.bn.replaceOriEmojiCode() + '</div></div>');
                     firststCell.data( "bl-name", bl_obj.bn );
                     firststCell.data( "bl", key );
                     innerTmp.html(firststCell);
@@ -2066,7 +2067,7 @@ $(function(){
                    '<div class="obj-cell-chk"><div class="img"></div></div>' +
                    '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
                    '<div class="obj-cell-user-data">' + 
-                        '<div class="obj-user-name">' + gu_obj.nk + '</div>' +
+                        '<div class="obj-user-name">' + gu_obj.nk.replaceOriEmojiCode() + '</div>' +
                         // '<div class="obj-user-title">雲端事業群。經理</div>' +
                 '</div>'
             );
@@ -2328,7 +2329,7 @@ $(function(){
         if( null != branch ){
             len += Object.keys(branch).length;
             $.each(branch,function(i,val){
-                $(".obj-selected .list").append(val+"   ");
+                $(".obj-selected .list").append(val.replaceOriEmojiCode()+"   ");
             });
 
             var bAllSelect = true;
@@ -2353,7 +2354,7 @@ $(function(){
         if( null != mem ){
             len += Object.keys(mem).length;
             $.each(mem,function(i,val){
-                $(".obj-selected .list").append(val+"   ");
+                $(".obj-selected .list").append(val.replaceOriEmojiCode()+"   ");
             });
 
             var bAllSelect = true;
@@ -2396,9 +2397,10 @@ $(function(){
 			// var content = $("<div class='obj-cell branch _"+data.lv+"' data-bl='"+key+"' data-bl-name='"+data.bn+"'>"+
             var content = $("<div class='obj-cell branch _2' data-bl='"+key+"' data-bl-name='"+data.bn+"'>"+
 		    	'<div class="obj-cell-chk"><div class="img"></div></div>' +
-		    	'<div class="obj-cell-user-pic namecard"><img src="images/common/others/select_empty_group_photo.png" style="width:60px"/></div>' +
-		    	'<div class="obj-cell-subgroup-data">' + 
-		        	'<div class="obj-user-name">' + data.bn + '</div>' +
+		    	// '<div class="obj-cell-user-pic namecard"><img src="images/common/others/select_empty_group_photo.png" style="width:60px"/></div>' +
+		    	'<div class="obj-cell-user-pic namecard"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
+                '<div class="obj-cell-subgroup-data">' + 
+		        	'<div class="obj-user-name">' + data.bn.replaceOriEmojiCode() + '</div>' +
 		        '</div>'
 		    );
 
@@ -3255,9 +3257,10 @@ $(function(){
 					//先做permission id 
 					cns.debug("object str:",this_compose.data("object_str"));
 					// var object_obj = $.parseJSON(this_compose.data("object_str"));
-					if(this_compose.data("object_str")){
+					if(this_compose.data("object_str") || this_compose.data("branch_str") ){
 						$.each(this_compose.data("upload-obj"),function(i,file){
-							getFilePermissionId(this_compose.data("object_str")).complete(function(data){
+                            cns.debug(this_compose.data("object_str"), this_compose.data("branch_str"))
+							getFilePermissionIdWithTarget(this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
 								var pi_result = $.parseJSON(data.responseText);
 								if(data.status == 200){
 									uploadImg(file,imageType,cnt,total,6,pi_result.pi);		
@@ -3852,6 +3855,7 @@ $(function(){
 
             //發佈對象
             var tu_str = "所有人";
+            this_event.data("object_str", JSON.stringify(val.meta.tu) );
             if(val.meta.tu){
                 //用來過濾重複gu
                 var gu_chk_arr = [];
@@ -3876,7 +3880,7 @@ $(function(){
                 }
                 tu_str = tu_arr.join("、");
             }
-            this_event.find(".st-sub-box-1-footer").append(tu_str); 
+            this_event.find(".st-sub-box-1-footer").append(tu_str.replaceOriEmojiCode()); 
             
             //讚留言閱讀
             this_event.find(".st-sub-box-3 div:eq(0)").html(val.meta.lct);
@@ -4574,7 +4578,7 @@ $(function(){
 							var w = img.width();
 				            var h = img.height();
             
-            				mathAvatarPos(img,w,h,size);
+            				// mathAvatarPos(img,w,h,size);
 				        });
 						//小圖
 						target.find("img.aut").attr("src",obj.s3);
@@ -5022,6 +5026,7 @@ $(function(){
         var this_ei = this_event.data("event-id");
         var this_gi = this_ei.split("_")[0];
         var this_ti = this_ei.split("_")[1];
+        var isWaiting = false;
 
 		var body = {
 			"meta" : {
@@ -5038,15 +5043,81 @@ $(function(){
                 "tp": 0
             });
         }
-        var sticker = this_event.find(".st-reply-message-img").data("id");
-        if( sticker ){
-            body.ml.push({
-                "c": sticker,
-                "tp": 5
-            });
-        }
+        var imgArea = this_event.find(".st-reply-message-img");
+        var imgType = imgArea.data("type");
+        switch( imgType ){
+            case 5: //sticker
+                var sticker = imgArea.data("id");
+                if( sticker ){
+                    body.ml.push({
+                        "c": sticker,
+                        "tp": 5
+                    });
+                }
+                break;
+            case 6: //img
+                isWaiting = true;
+                var file = this_event.find(".st-reply-message-img").data("file");
+                if( file ){
 
-		var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events?ep=" + this_ei;
+                    var ori_arr = [1280,1280,0.9];
+                    var tmb_arr = [160,160,0.4];
+                    //上傳類型
+                    var imageType = /image.*/;
+
+                    //發佈上傳檢查
+                    upload_chk = true;
+                    
+                    //開啟loading icon
+                    s_load_show = true;
+
+                    //先做permission id 
+                    cns.debug("object str:",this_event.data("object_str"));
+                    // var object_obj = $.parseJSON(this_compose.data("object_str"));
+                    if( this_event.data("object_str") ){
+                        var obj = $.parseJSON( this_event.data("object_str") );
+                        getFilePermissionId(obj).complete( function(result){
+                            if( result.status==200 ){
+                                try{
+                                    var pi = $.parseJSON(result.responseText).pi;
+
+                                    uploadGroupImage(file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
+                                        body.ml.push({
+                                            "c": data.fi,
+                                            "p": pi,
+                                            "tp": 6
+                                        });
+                                        sendReply( this_event, this_gi, this_ti, this_ei, body );
+                                    });
+                                } catch( e ){
+                                    cns.debug(e);
+                                }
+                            }
+                        });
+                    }else{
+                        var pi = "0";
+                        uploadGroupImage(file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
+                            body.ml.push({
+                                "c": data.fi,
+                                "p": pi,
+                                "tp": 6
+                            });
+                            sendReply( this_event, this_gi, this_ti, this_ei, body );
+                        });
+                    }
+                }
+                break;
+        }
+        
+
+        if( !isWaiting ){
+            sendReply( this_event, this_gi, this_ti, this_ei, body );
+        }
+	}
+
+    sendReply = function(this_event, this_gi, this_ti, this_ei, body){
+        s_load_show = false;
+        var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events?ep=" + this_ei;
 
         var headers = {
                  "ui":ui,
@@ -5058,23 +5129,25 @@ $(function(){
         var result = ajaxDo(api_name,headers,method,false,body);
         result.complete(function(data){
 
-        	//重新讀取detail
-        	// popupShowAdjust("","回覆成功");
+            //重新讀取detail
+            // popupShowAdjust("","回覆成功");
 
             this_event.find(".st-reply-message-send").data("reply-chk",false);
 
-        	setTimeout(function(){
-				replyReload(this_event);
-        	},400);
+            setTimeout(function(){
+                replyReload(this_event);
+            },400);
 
         });
-	}
+    }
 
 	replyReload = function(this_event){
 
 		//重置
 		this_event.find(".st-reply-message-textarea textarea").val("");
         this_event.find(".st-reply-message-img").data("id",null);
+        this_event.find(".st-reply-message-img").data("type",null);
+        this_event.find(".st-reply-message-img").data("file",null);
         this_event.find(".st-reply-message-img").html("");  //清掉sticker預覽
         //把sticker欄收起來
         var stickerIcon = this_event.find(".st-reply-message-sticker");
