@@ -67,13 +67,13 @@ $(function(){
 		}
 
 	}else{
-		if(debug_flag) {
-    		cns.debug("login test");
-    		getLoginDataForTest();
-    	}else{
-    		document.location = "index.html";
-    	}
-
+		// if(debug_flag) {
+  //   		cns.debug("login test");
+  //   		getLoginDataForTest();
+  //   	}else{
+  //   		document.location = "index.html";
+  //   	}
+    	document.location = "index.html";
     	return false;
 	}
 
@@ -523,22 +523,14 @@ $(function(){
 		$(".st-filter-other").slideToggle();
 	});
 
-	//filter 點選的變化
-	$(".st-filter-list").click(function(){
-		filter_name = $(this).find("span").html();
-		//關閉的css樣式
-		$(".st-filter-list").removeClass("st-filter-list-active");
-		
-		//開起的css樣式
-		$(this).addClass("st-filter-list-active");
-	});
-
 	$(".st-filter-action").click(function(){
+		var filter_name = $(this).find("span").html();
+
 		//動態變化
 		$(".st-filter-main span").fadeOut("fast");
 		$(".st-filter-other").slideUp(function(){
 			$(".st-filter-main").addClass("st-filter-list-active");
-			$(".st-filter-main img").attr("src","images/timeline/timeline_filter_icon_arrow.png");
+			$(".st-filter-main img").attr("src","images/icon/icon_arrow_right.png");
 			$(".st-filter-main span").html(filter_name);
 			$(".st-filter-main span").fadeIn("fast");
 
@@ -1316,8 +1308,16 @@ $(function(){
 		$(this).attr("src","images/common/icon/bt_close_activity.png");
 	});
 	$(document).on("mouseup",".user-info-close",function(){
+
 		//歸位
 		$(window).scrollTop($(document).data("namecard-pos"));
+
+		//翻面特殊處理
+		if($(".user-info-load-area .me").hasClass("adjust")){
+			$(".user-info-load-area").addClass("transition1s");
+            $(".user-info-load-area").addClass("user-info-flip");
+            $(".user-info-load-area .me").removeClass("adjust");
+		}
 
 		$("body").removeClass("user-info-adjust");
 
@@ -1330,22 +1330,32 @@ $(function(){
 			$(".user-info-load-area").removeClass("user-info-flip");
 			$(".user-info-load-area .user").show();
 		});
+
 	});
 
 	$(document).on("mouseup",".user-info-back",function(){
 		// $(".me-info-load user-avatar > ")
-		$(".user-info-load-area").removeClass("user-info-flip");
+		$(".user-info-load-area").addClass("user-info-flip");
+        $(".user-info-load-area .me").removeClass("adjust");
 
-		$(".user-info-load , .me-info-load").stop().animate({
-			opacity:0
-		},400);
 		setTimeout(function(){
-			$(".user-info-load-area .me").addClass("backface-visibility");
-			$(document).find(".user-info-load-area .user").show();
+	        $(".user-info-load-area").addClass("transition1s");
+
+			$(".user-info-load-area").removeClass("user-info-flip");
+
 			$(".user-info-load , .me-info-load").stop().animate({
-				opacity:1
+				opacity:0
 			},400);
-		},400);
+			setTimeout(function(){
+				$(".user-info-load-area .me").addClass("backface-visibility");
+				$(document).find(".user-info-load-area .user").show();
+				$(".user-info-load , .me-info-load").stop().animate({
+					opacity:1
+				},400);
+			},400);
+        },100);
+
+			
 	});
 
 	//----------------------------------- chatroom ---------------------------------------------

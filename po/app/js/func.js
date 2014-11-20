@@ -4120,7 +4120,6 @@ $(function(){
             if(data.status == 200){
                 
                 var s_data = $.parseJSON(data.responseText).el;
-                cns.debug("old status",s_data);
                 var es_obj = {}
 
                 if(s_data.length != 0){
@@ -5523,6 +5522,7 @@ $(function(){
 
     	$(".screen-lock").show();
     	$(".user-info-load-area").fadeIn("fast");
+        $(".user-info-load-area").addClass("transition1s");
     	$(".user-info-load-area .me").load('layout/layout.html .me-info-load',function(){
     		var this_info = $(this).find(".me-info-load");
 
@@ -5671,6 +5671,12 @@ $(function(){
 						opacity:1
 					},400);
 	    		},400);
+                
+                setTimeout(function(){
+                    $(".user-info-load-area").removeClass("transition1s");
+                    $(".user-info-load-area").removeClass("user-info-flip");
+                    $(".user-info-load-area .me").addClass("adjust");
+                },1000);
 	    	});
     	}
 
@@ -5795,7 +5801,7 @@ $(function(){
         var body = {
             id: "+886980922917",
             tp: 1,
-            pw:toSha1Encode("111111")
+            pw:toSha1Encode("111121")
         };
         var method = "post";
         ajaxDo(api_name,headers,method,false,body).complete(function(data){
