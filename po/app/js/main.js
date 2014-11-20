@@ -81,15 +81,6 @@ $(function(){
 		//top event
 		if($(".st-top-event").length < 2) return false;
 
-		$(".st-top-bar-area").css("opacity",0);
-		var timer = $(document).data("top-event-resize") || {};
-		clearTimeout(timer);
-		timer = setTimeout(function(){
-			topBarMake($(".st-top-area"),$(".st-top-event").length,true);  		
-			$(".st-top-bar-area").css("opacity",1);
-		},200);
-		$(document).data("top-event-resize",timer);
-
 		//reply textarea
 		var reply_textarea = $(document).find(".st-reply-message-textarea");
 		var this_event = reply_textarea.parents(".st-sub-box");
@@ -1376,10 +1367,6 @@ $(function(){
 	        }); 
 	        $(".chatroom-addstate-area").animate({bottom:"-166px"}); 
 		}
-	});
-	
-	$(".chat-area").click(function(){
-		
 	});
 	
 	// 聊天功能上方 按鈕效果
