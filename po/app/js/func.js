@@ -552,17 +552,17 @@ $(function(){
 							'<img src="images/coachmake/logo_timeline_top.png"/>'+
 							'<div>目前尚未有任何置頂</div>'+
 						'</div>'+
-						'<div class="st-top-event-set">'+
-						'</div>'+
+						'<div class="st-top-event-set"></div>'+
+                        '<div class="st-top-bar-area" style="display:none">'+
+                        '<div class="st-top-bar-selector" style="display:"></div>'+
+                        '<div class="st-top-bar-case">'+
+                        '</div>'+
+                        '<div class="st-top-bar-case-click">'+
+                        '</div>'+
+                    '</div>'+
 					'</div>'+
 				'</div>'+
-				'<div class="st-top-bar-area" style="display:none">'+
-					'<div class="st-top-bar-selector" style="display:"></div>'+
-					'<div class="st-top-bar-case">'+
-					'</div>'+
-					'<div class="st-top-bar-case-click">'+
-					'</div>'+
-				'</div>'+
+    				
 			'</div>'
 		);
 
@@ -617,8 +617,8 @@ $(function(){
         				this_top_event.data("pos",i);
 
         				//圖片及類型
-        				this_top_event.find(".st-top-event-l img").attr("src",this_top_obj.src);
-        				this_top_event.find(".st-top-event-l div").html(this_top_obj.name);
+        				this_top_event.find(".st-top-event-l img").attr("src",_groupList[gi].guAll[val.meta.gu].aut);
+        				// this_top_event.find(".st-top-event-l div").html(this_top_obj.name);
         				//標題 內容
         				this_top_event.find(".st-top-event-r-ttl").html(val.meta.tt);
         				this_top_event.find(".st-top-event-r-content").html(val.ml[0].c);
@@ -662,8 +662,137 @@ $(function(){
 	    }
 	}
 
+    topBarMake = function (top_area,top_msg_num,resize) {
+        return false;
+        //游標 預設位置0
+        top_area.find(".st-top-bar-selector").data("pos",0);
 
-	topBarMake = function (top_area,top_msg_num,resize) {
+        //第一個
+        var start_span = $('<span></span>');
+        top_area.find(".st-top-bar-case").html(start_span);
+        start_span.data("pos",0);
+
+        //點擊區放大
+        var start_span_click = $('<span></span>');
+        top_area.find(".st-top-bar-case-click").html(start_span_click);
+        start_span_click.data("pos",0);
+
+        //第一個已經有了 所以-1
+        for(i=0;i<top_msg_num-1;i++){
+            var this_span = $('<span></span>');
+            top_area.find(".st-top-bar-case").append(this_span);
+            this_span.data("pos",i+1);
+
+            //點擊區放大
+            var this_span_click = $('<span></span>');
+            top_area.find(".st-top-bar-case-click").append(this_span_click);
+            this_span_click.data("pos",i+1);
+        }
+
+        //出現
+        top_area.find(".st-top-bar-area").slideDown("fast");
+
+        //起始位置
+        var selector_pos = (10-top_msg_num)/2*10;
+        var first_span = top_area.find(".st-top-bar-case span:eq(0)");
+        //$("#side-menu").width() 開啓side menu 時的校正
+        // var start_left = first_span.offset().left - $("#side-menu").width();
+        var start_left = first_span.offset().left;
+        var start_top = first_span.offset().top;
+        var movement = first_span.width();
+
+        //流程控制 不能連按
+        var mfinish = false;
+
+        /* 游標位置和移動 */
+        top_area.find(".st-top-bar-selector").offset({top:start_top ,left:start_left});
+        //movement跟寬度一致
+        top_area.find(".st-top-bar-selector").css("width",movement+2);
+
+        //點擊區 位置
+        top_area.find(".st-top-bar-case-click").offset({top:(start_top-14),left:start_left});
+
+
+        //點擊區 先解綁定
+        top_area.find(".st-top-bar-case-click span").unbind();
+        top_area.find(".st-top-bar-case-click span").mouseup(function(){
+            var target_pos = $(this).data("pos");
+            top_area.find(".st-top-bar-selector").animate({left: (start_left-250+movement*target_pos)},function(){
+                $(this).data("pos",target_pos);
+            });
+            top_area.find(".st-top-event").animate({'right':target_pos*100 + '%'});
+        });
+
+        //resize 只重做位置有關的事件就好
+        if(resize) return false;
+
+        //左右換頁 
+        top_area.find(".st-top-left-arrow, .st-top-right-arrow").show();
+        //預設方向
+        top_area.find(".st-top-left-arrow").data("direction",false);
+        top_area.find(".st-top-right-arrow").data("direction",true);
+
+        //先解綁
+        top_area.find(".st-top-left-arrow, .st-top-right-arrow, .st-top-arrow, st-top-event").unbind();
+        top_area.find(".st-top-event-block").hover(
+            function(){
+                top_area.find(".st-top-arrow div img").stop().fadeIn("fast");
+            },
+            function(){
+                top_area.find(".st-top-arrow div img").stop().fadeOut("fast");
+            }
+        );
+
+        //置頂公告 左右換頁
+        top_area.find(".st-top-left-arrow, .st-top-right-arrow").hover(
+            function(){
+                $(this).stop().animate({
+                    opacity:1
+                },200);
+            },
+            function(){
+                //已經顯示 而且 動畫結束 才能繼續
+                $(this).stop().animate({
+                    opacity:0.3
+                },200)
+            }
+        );
+
+        top_area.find(".st-top-left-arrow, .st-top-right-arrow").mouseup(function(){
+            
+            var direction = $(this).data("direction");
+            var here_pos = top_area.find(".st-top-bar-selector").data("pos");
+            if(direction){
+                var target_pos = here_pos+1;
+                if(target_pos > top_msg_num-1) target_pos = 0;
+            }else{
+                var target_pos = here_pos-1;
+            }
+            
+            top_area.find(".st-top-bar-case-click span:eq(" + target_pos + ")").trigger("mouseup");
+        });
+
+
+        //輪播
+        // var top_timer = setInterval();
+
+        // clearInterval(top_timer);
+
+        // top_timer = setInterval(function(){
+        //     top_area.find(".st-top-right-arrow").trigger("mouseup");
+        // },top_timer_ms);
+
+        // //重設輪播
+        // top_area.find(".st-top-bar-case-click span, .st-top-left-arrow, .st-top-right-arrow").click(function(){
+        //     clearInterval(top_timer);
+        //     top_timer = setInterval(function(){
+        //         top_area.find(".st-top-right-arrow").trigger("mouseup");
+        //     },top_timer_ms);
+        // });
+    }
+
+
+	topBarMake_bak = function (top_area,top_msg_num,resize) {
 
 		//顏色設定
 		var color = ["#ededed","#dddddd","#d1d0d0","#b7b7b7","#9d9d9d","#878787","#6b6b6b","#474747"];
@@ -4059,7 +4188,6 @@ $(function(){
 	}
 
 	eventStatusWrite = function(this_event,this_es_obj,filter){
-        cns.debug("this_es_obj",this_es_obj);
 		//將此則動態的按讚狀態寫入data中
 		if(!this_es_obj) return false;
 
@@ -4128,7 +4256,6 @@ $(function(){
             if(data.status == 200){
                 
                 var s_data = $.parseJSON(data.responseText).el;
-                cns.debug("old status",s_data);
                 var es_obj = {}
 
                 if(s_data.length != 0){
@@ -5600,6 +5727,7 @@ $(function(){
 
     	$(".screen-lock").show();
     	$(".user-info-load-area").fadeIn("fast");
+        $(".user-info-load-area").addClass("transition1s");
     	$(".user-info-load-area .me").load('layout/layout.html .me-info-load',function(){
     		var this_info = $(this).find(".me-info-load");
 
@@ -5748,6 +5876,12 @@ $(function(){
 						opacity:1
 					},400);
 	    		},400);
+
+                setTimeout(function(){
+                    $(".user-info-load-area").removeClass("transition1s");
+                    $(".user-info-load-area").removeClass("user-info-flip");
+                    $(".user-info-load-area .me").addClass("adjust");
+                },1000);
 	    	});
     	}
 
@@ -5872,7 +6006,7 @@ $(function(){
         var body = {
             id: "+886980922917",
             tp: 1,
-            pw:toSha1Encode("111111")
+            pw:toSha1Encode("111121")
         };
         var method = "post";
         ajaxDo(api_name,headers,method,false,body).complete(function(data){
