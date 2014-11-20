@@ -91,7 +91,9 @@ $(function(){
 		$(document).data("top-event-resize",timer);
 
 		//reply textarea
-		$(document).find(".st-reply-message-textarea").css("width",$(window).width()-200);
+		var reply_textarea = $(document).find(".st-reply-message-textarea");
+		var this_event = reply_textarea.parents(".st-sub-box");
+		reply_textarea.css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
 	});
 
 	//test
@@ -112,49 +114,43 @@ $(function(){
         }
 	});
 
-	//下拉更新 滾輪版
-	$("#page-group-main").bind('mousewheel DOMMouseScroll', function(event){
+	//下拉更新 滾輪版 
+	$(".subpage-timeline ").bind('mousewheel DOMMouseScroll', function(event){
 
-		//左側選單沒開啟 才給滾
-		if( $(".ui-panel").hasClass("ui-panel-open") == false ){
-			var group_main = $(this);
+		var group_main = $(this);
+		//timeline 才要做
+		if(!$(".feed-subarea").is(":visible") || group_main.data("scroll-cnt") < 0 || $(".st-top-area-load").position().top < 50) return;
 
-			//timeline 才要做
-			if(!$(".feed-subarea").is(":visible") || group_main.data("scroll-cnt") < 0 || $(window).scrollTop() > 0) return;
+		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
 
-			if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+			//控制時限
+			if(group_main.data("scroll-timer")) clearTimeout(group_main.data("scroll-timer"));
 
-				//控制時限
-				if(group_main.data("scroll-timer")) clearTimeout(group_main.data("scroll-timer"));
+            var scroll_timer = setTimeout(function(){
+            	group_main.data("scroll-cnt",0);
+            },500);
 
-	            var scroll_timer = setTimeout(function(){
-	            	group_main.data("scroll-cnt",0);
-	            },500);
+            group_main.data("scroll-timer",scroll_timer);
 
-	            group_main.data("scroll-timer",scroll_timer);
+            //計算力道
+            var scroll_cnt = group_main.data("scroll-cnt") || 0;
+            scroll_cnt = scroll_cnt + event.originalEvent.wheelDelta;
+            group_main.data("scroll-cnt",scroll_cnt);
 
-	            //計算力道
-	            var scroll_cnt = group_main.data("scroll-cnt") || 0;
-	            scroll_cnt = scroll_cnt + event.originalEvent.wheelDelta;
-	            group_main.data("scroll-cnt",scroll_cnt);
+            //滾得夠猛 做下拉更新
+            if(scroll_cnt > 5000) {
+            	group_main.data("scroll-cnt",-10000);
 
-	            //滾得夠猛 做下拉更新
-	            if(scroll_cnt > 3000) {
-	            	group_main.data("scroll-cnt",-10000);
+				timelineTopRefresh();
 
-					timelineTopRefresh();
-
-					//順便檢查置頂
-					topEventChk();
-	            }
-	        }		   
-		}
+				//順便檢查置頂
+				topEventChk();
+            }
+        }		   
     });
 
 	//timeline 滾到底部取舊資料
-	$(window).scroll(function() {
-		//timeline 才要做
-		if(!$(".feed-subarea").is(":visible")) return false;
+	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
 
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi") || "00";
@@ -176,7 +172,7 @@ $(function(){
 		    	
 		    	//避免重複
 		    	this_navi.data("scroll-chk",true);
-		    	// cns.debug("last event ct:",this_navi.data("last-ct"));
+		    	cns.debug("last event ct:",this_navi.data("last-ct"));
 		    	timelineListWrite(this_navi.data("last-ct"));
 		    }
 		}
@@ -393,32 +389,34 @@ $(function(){
 	});
 	
 	//按鈕效果
-	$(document).on("mousedown",".sm-small-area,.sm-group-area",function(){
-		var icon_default = "images/side_menu/sidemenu_icon_";
+	$(document).on("click",".sm-small-area,.sm-group-area",function(){
+		var icon_default = "images/icon/icon_timeline_tab_";
+		//圖片先還原
+		$(".sm-small-area").each(function(i,val){
+			$(this).find("img").attr("src",icon_default + $(this).data("sm-act") + "_normal.png");
+		});
+		
 		var target = $(this);
 		//開關按鈕ui變化
-		if($(".sm-group-list-area-add").is(":visible") ){
-			if(target.data("switch-chk") == "check2"){
-				$(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
-			}
-	    }else{
-	    	if(target.data("switch-chk") == "check"){
-	            $(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
-	        }
-	    }
+		// if($(".sm-group-list-area-add").is(":visible") ){
+		// 	if(target.data("switch-chk") == "check2"){
+		// 		$(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
+		// 	}
+	 //    }else{
+	 //    	if(target.data("switch-chk") == "check"){
+	 //            $(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
+	 //        }
+	 //    }
 		target.addClass("sm-click-bg");
-		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_click.png");
+		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
+
 	});
 	
-	//按鈕效果
-	$(document).on("mouseup",".sm-small-area,.sm-group-area",function(){
+	//更換timeline
+	$(document).on("mouseup",".sm-small-area",function(){
 		var icon_default = "images/side_menu/sidemenu_icon_";
 		var target = $(this);
-
-    	//mouseup了 左側選單 團體調整線 直接刪除就好了 
-    	$(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
-
-    	target.removeClass("sm-click-bg");
+    	
     	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
 
 	    timelineSwitch(target.data("sm-act"));
@@ -438,7 +436,10 @@ $(function(){
 		// if(typeof $.lStorage(ui)[this_gi].bl == "undefined")
 		// 	setBranchList(this_gi);
 		
-		timelineSwitch("feed",true);
+		//左側選單圖案變換
+		setSidemenuHeader(this_gi);
+
+		timelineSwitch("feeds",true);
 	});
 	
 	$(".sm-small-area.setting").click(function(){

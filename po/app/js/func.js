@@ -406,16 +406,16 @@ $(function(){
 	
 
 	timelineSwitch = function (act,reset){
-		$( "#side-menu" ).panel( "close");
-
 		//reset 
 		if(reset) {
 			$(".feed-subarea").removeData();
 			$("#page-group-main .switch-reset").html("");
 		}
 
+        var page_title = "動態消息";
+
 		switch (act) {
-	        case "feed":
+	        case "feeds":
 				$(".feed-subarea").hide();
 				$(".st-filter-main span").html("全部");
 				//filter all
@@ -427,25 +427,27 @@ $(function(){
 	        	$(".subpage-contact").hide();
 	        	$(".subpage-chatList").hide();
 	        	$(".subpage-timeline").show();
-	        	$("#page-group-main").find("div[data-role=header] h3").html("動態消息");
-	        	var parent = $("#page-group-main").find("div[data-role=header] div[class=header-group-name]");
-				if( parent ){
-					//set add icon
-					parent.find("~ div[class=feed-compose]").show();
-					parent.find("~ div[class=chatList-add]").hide();
-				}
+	        	$("#page-group-main").find(".gm-header .page-title").html(page_title);
+
+                //不知道在幹嘛
+	   //      	var parent = $("#page-group-main").find("div[data-role=header] div[class=header-group-name]");
+				// if( parent ){
+				// 	//set add icon
+				// 	parent.find("~ div[class=feed-compose]").show();
+				// 	parent.find("~ div[class=chatList-add]").hide();
+				// }
+
+                //polling 數字重寫
+                pollingCountsWrite();
 	          break;
-	        case "contact": 
+	        case "memberslist": 
 	        	$(".subpage-contact").show();
 	            $(".subpage-timeline").hide();
 	        	$(".subpage-chatList").hide();
 	            $( "#side-menu" ).panel( "close");
-                var parent = $("#page-group-main").find("div[data-role=header] div[class=header-group-name]");
-                if( parent ){
-                    //set add icon
-                    parent.find("~ div[class=feed-compose]").hide();
-                    parent.find("~ div[class=chatList-add]").hide();
-                }
+                
+                page_title = "成員列表";
+
 	        	initContactList();
 	          break;
 	        case "chat":
@@ -454,6 +456,8 @@ $(function(){
 	        	$(".subpage-timeline").hide();
 	        	$(".subpage-chatList").show();
 	        	// $( "#side-menu" ).panel( "close");
+
+                page_title = "聊天";
 
 	        	initChatList();
 
@@ -469,16 +473,18 @@ $(function(){
 	        case "setting":
 	          break;
 	    }
+
+        $("#page-group-main").find(".gm-header .page-title").html(page_title);
 	}
 
 	setSmUserData = function (gi,gu,gn){
-		$(".sm-user-area-r div:eq(0)").html(gn);
-		$(".sm-user-area-r div:eq(1)").html("");  
+		// $(".sm-user-area-r div:eq(0)").html(gn);
+		$(".sm-user-area-r div").html("");  
 
         $(".sm-user-area.namecard").data("gu",gu);
 
 		//檢查每個團體是否存在gu all 
-		var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img")];
+		var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div"),$(".sm-user-pic img")];
 		chkGroupAllUser(data_arr);
 	}
 
@@ -686,13 +692,14 @@ $(function(){
 		top_area.find(".st-top-bar-case span").last().addClass("st-r-radius");		
 
 		//st-top-bar-case 幾個就是幾十趴
-		top_area.find(".st-top-bar-case").css("width",top_msg_num*10 + "%")
+		top_area.find(".st-top-bar-case,.st-top-bar-case-click").css("width",top_msg_num*10 + "%")
 		//st-top-bar-area span 平均寬度在case中
-		top_area.find(".st-top-bar-case span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
+		// top_area.find(".st-top-bar-case span,.st-top-bar-case-click span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
+        top_area.find(".st-top-bar-case span,.st-top-bar-case-click span").css("width",Math.floor((1/top_msg_num)*10000)/100 + "%");
 		
 		//點擊區放大
-		top_area.find(".st-top-bar-case-click").css("width",top_msg_num*10 + "%")
-		top_area.find(".st-top-bar-case-click span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
+		// top_area.find(".st-top-bar-case-click").css("width",top_msg_num*10 + "%")
+		// top_area.find(".st-top-bar-case-click span").css("width",((1/top_msg_num)*100).toFixed(2) + "%");
 
 		//出現
 		top_area.find(".st-top-bar-area").slideDown("fast");
@@ -701,7 +708,8 @@ $(function(){
 		var selector_pos = (10-top_msg_num)/2*10;
 		var first_span = top_area.find(".st-top-bar-case span:eq(0)");
 		//$("#side-menu").width() 開啓side menu 時的校正
-		var start_left = first_span.offset().left - $("#side-menu").width();
+		// var start_left = first_span.offset().left - $("#side-menu").width();
+        var start_left = first_span.offset().left;
 		var start_top = first_span.offset().top;
 		var movement = first_span.width();
 
@@ -709,7 +717,7 @@ $(function(){
 		var mfinish = false;
 
 		/* 游標位置和移動 */
-		top_area.find(".st-top-bar-selector").offset({top:start_top,left:start_left + $("#side-menu").width()});
+		top_area.find(".st-top-bar-selector").offset({top:start_top ,left:start_left});
 		//movement跟寬度一致
 		top_area.find(".st-top-bar-selector").css("width",movement+2);
 
@@ -721,8 +729,7 @@ $(function(){
 		top_area.find(".st-top-bar-case-click span").unbind();
 		top_area.find(".st-top-bar-case-click span").mouseup(function(){
 			var target_pos = $(this).data("pos");
-
-			top_area.find(".st-top-bar-selector").animate({left: (start_left+movement*target_pos)},function(){
+			top_area.find(".st-top-bar-selector").animate({left: (start_left-250+movement*target_pos)},function(){
 				$(this).data("pos",target_pos);
 			});
 			top_area.find(".st-top-event").animate({'right':target_pos*100 + '%'});
@@ -814,7 +821,7 @@ $(function(){
         var this_gi = this_ei.split("_")[0];
         var this_ti = this_ei.split("_")[1];
 
-		var api_name = "/groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/participants?tp=" + tp;
+		var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/participants?tp=" + tp;
 		var headers = {
             "ui":ui,
 			"at":at, 
@@ -3308,7 +3315,7 @@ $(function(){
 
         	//檢查置頂
         	topEventChk();
-        	timelineSwitch("feed");
+        	timelineSwitch("feeds");
         	toastShow("發佈成功");
         });
 	};
@@ -3409,14 +3416,26 @@ $(function(){
 		//置頂設定
 		topEvent();
 	};
+
+    setSidemenuHeader = function (new_gi){
+        //左側選單主題區域
+        var this_gi = new_gi || gi;
+        var pic_num = this_gi.substring(this_gi.length-1,this_gi.length).charCodeAt()%10;
+        $(".sm-header").css("background","url(images/common/cover/sidemeun_cover0" + pic_num + ".png)")
+
+        var _groupList = $.lStorage(ui);
+        $(".sm-group-pic").css("background","url(" + _groupList[this_gi].aut + ")");
+        $(".sm-group-name").html(_groupList[this_gi].gn);
+    }
 	
 	groupMenuListArea = function (new_gi,invite){
-	   
+        setSidemenuHeader(new_gi);
+
     	getGroupList().complete(function(data){
 	    	if(data.status != 200) return false;
 
 	    	$(".sm-group-list-area").html("");
-	    	$(".sm-group-list-area-add").html("");
+	    	// $(".sm-group-list-area-add").html("");
 	    	//chk是開關按鈕ui變化的檢查
 	    	var tmp_selector,count,chk;
 	    	var group_list = $.parseJSON(data.responseText).gl;
@@ -3436,19 +3455,15 @@ $(function(){
 	        		setThisGroup(new_gi,val);
 	        	}
 
-	        	if(i < 5){
-	        		tmp_selector = ".sm-group-list-area";
-	        	}else{
-	        		tmp_selector = ".sm-group-list-area-add";
-	        	}
+                tmp_selector = ".sm-group-list-area";
 	        	
-	        	//開關按鈕ui變化
-	            if(i == 1 || total == 1){
-	                chk = "data-switch-chk=\"check\"";
-	            }
-	            if(i == total-1 ){
-	                chk = "data-switch-chk=\"check2\"";
-	            }
+	        	// //開關按鈕ui變化
+	         //    if(i == 1 || total == 1){
+	         //        chk = "data-switch-chk=\"check\"";
+	         //    }
+	         //    if(i == total-1 ){
+	         //        chk = "data-switch-chk=\"check2\"";
+	         //    }
 	        	
 	        	var glt_img = "images/common/others/empty_img_all_l.png";
 	        	var glo_img = "images/common/others/empty_img_all_l.png";
@@ -3459,7 +3474,7 @@ $(function(){
 
 	            var this_group = $(
 	           		'<div class="sm-group-area polling-cnt" data-gi="' + val.gi + '" data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
-	           			'<img class="sm-icon-host" src="images/side_menu/icon_host.png"/>' +
+	           			'<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
 	           	        '<div class="sm-group-area-l group-pic">' +
 	           	            '<img class="aut" src="' + glt_img + '">' +
 	           	        '</div>' +
@@ -3488,20 +3503,20 @@ $(function(){
     		$(document).data("group-avatar",true);
 
 	        //將限制取消 就可以取得真正的長度
-        	$(".sm-group-list-area-add").removeAttr("style");
+        	// $(".sm-group-list-area-add").removeAttr("style");
 
         	//新增團體 要重寫團體列表 調整團體頭像
 	        //為了調整團體頭像 必須用高度加overflow方式來做其餘團體開合 避免用toggle造成的display none 那會不能計算圖的長寬
-	        var resize_height = $(".sm-group-list-area-add").height();
+	        // var resize_height = $(".sm-group-list-area-add").height();
 
 	        //新增團體 以及隱藏團體區已經有資料 才要增加高
-        	if(new_gi && $(".sm-group-list-area-add").html()) {
-        		resize_height = $(".sm-group-list-area-add").data("height") + $(".sm-group-area").height()+1;
-        	}
+        	// if(new_gi && $(".sm-group-list-area-add").html()) {
+        	// 	resize_height = $(".sm-group-list-area-add").data("height") + $(".sm-group-area").height()+1;
+        	// }
 
-        	$(".sm-group-list-area-add").data("height",resize_height);	
+        	// $(".sm-group-list-area-add").data("height",resize_height);	
 	        //歸零 表示為關閉狀態
-	        $(".sm-group-list-area-add").css("height",0);
+	        // $(".sm-group-list-area-add").css("height",0);
 
 	        //new gi 表示新增團體 完成後跳訊息
 	        if(new_gi) {
@@ -3513,7 +3528,7 @@ $(function(){
 	        	}else{
 	        		toastShow("團體建立成功");
 	        		$.mobile.changePage("#page-group-main");
-	        		timelineSwitch("feed");
+	        		timelineSwitch("feeds");
 	        	}
 	        }
 	    });
@@ -3666,7 +3681,6 @@ $(function(){
 
 		        	//存完後改timeline 
 		            $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-
                         //更新事件完成後 把原本db拉出來的event刪除 避免影響
                         var feed_type = $("#page-group-main").data("navi") || "00";
                         var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
@@ -3777,7 +3791,6 @@ $(function(){
 
                 //讀完就可重新滾動撈取舊資料 setTimeOut避免還沒寫入時就重新撈取
                 setTimeout(function(){
-                    cns.debug("scroll-chk false");
                     selector.data("scroll-chk",false);
                 },1000);
 
@@ -3792,13 +3805,15 @@ $(function(){
                     this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
                     //event status
                     this_event.data("event-val",val);
-                    setEventStatus(this_event,$(".st-filter-area").data("filter"));
+
+                    eventStatusWrite(this_event);
+                    return;
                 }
+
                 this_event = this_event_temp.clone();
             }
 
             var tp = val.meta.tp.substring(1,2)*1;
-
 
             //detail 不需要
             if(!detail){
@@ -3815,7 +3830,7 @@ $(function(){
             selector[method](this_event);
 
             //調整留言欄
-            this_event.find(".st-reply-message-textarea").css("width",$(window).width()-200);
+            this_event.find(".st-reply-message-textarea").css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
 
             //記錄timeline種類
             this_event.attr("data-event-id",val.ei);
@@ -3845,8 +3860,6 @@ $(function(){
             var data_arr = ["timelineUserName",val.ei.split("_")[0] , val.meta.gu , this_event.find(".st-sub-name") , this_event.find(".st-sub-box-1 .st-user-pic img")];
             chkGroupAllUser(data_arr);
 
-            // var time = new Date(val.meta.ct);
-            // var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
             this_event.find(".st-sub-time").append(new Date(val.meta.ct).toFormatString());
             // this_event.find(".st-sub-time").append(val.meta.ct);
 
@@ -5141,7 +5154,7 @@ $(function(){
     	var polling_time = local_pollingData.ts.pt;
     	// var polling_timer = new Date().getTime();
 
-    	var api_name = "/sys/polling?pt=" + polling_time;
+    	var api_name = "sys/polling?pt=" + polling_time;
 
         var headers = {
                  "ui":ui,
@@ -5153,7 +5166,6 @@ $(function(){
 
         	if(data.status == 200){
         		var new_pollingData = $.parseJSON(data.responseText);
-                cns.debug("pollingData time:",new_pollingData.ts.pt);
                 var tmp_cnts = new_pollingData.cnts;
                 // new_pollingData.cnts = {};
                 new_pollingData.cnts = local_pollingData.cnts;
@@ -5176,11 +5188,17 @@ $(function(){
 		        //cmds api
 		        pollingCmds(new_pollingData.cmds,new_pollingData.msgs,new_pollingData.ccs);
 
-        	}
+        	}else if(data.status == 401){
+                //錯誤處理
+                popupShowAdjust("","驗證失敗 請重新登入",true,false,[reLogin]);
+                clearInterval(pc);
+                return false;
+            }
         });
     }
 
     pollingCountsWrite = function(polling_data){
+        var polling_data = polling_data || $.lStorage("_pollingData");
     	var cnts = polling_data.cnts;
     	var gcnts = polling_data.gcnts;
 
@@ -5290,7 +5308,7 @@ $(function(){
     }
 
     updatePollingCnts = function(this_count,cnt_type){
-    	var api_name = "/sys/counts";
+    	var api_name = "sys/counts";
     	var body = {
     		cnts: [],
     		gcnts: {}
@@ -5344,7 +5362,7 @@ $(function(){
 		//每操作一組 就踢除 直到結束
 		if(user_info_arr.length > 0){
 			var this_user_info = user_info_arr.last();
-            var api_name = "/groups/" + this_user_info.gi + "/users/" + this_user_info.gu;
+            var api_name = "groups/" + this_user_info.gi + "/users/" + this_user_info.gu;
             
 	        var headers = {
 	                 "ui":ui,
@@ -5668,7 +5686,7 @@ $(function(){
     	
     	// load show
     	s_load_show = true;
-		var api_name = "/groups/"+gi+"/users/"+gu;
+		var api_name = "groups/"+gi+"/users/"+gu;
         var headers = {
              "ui":ui,
              "at":at, 
@@ -5684,7 +5702,7 @@ $(function(){
         ajaxDo(api_name,headers,method,false,body).complete(function(data){
         	cns.debug("after info send this_info data:",this_info.data());
         	//重置團體頭像、名稱的參數
-			var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img")];
+			var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div"),$(".sm-user-pic img")];
 
         	if(data.status == 200){
 
@@ -5699,18 +5717,18 @@ $(function(){
         			var ori_arr = [1280,1280,0.7];
 					var tmb_arr = [120,120,0.6];
 					var file = this_info.find(".user-avatar-bar input")[0].files[0];
-					var api_name = "/groups/"+gi+"/users/"+gu+"/avatar";
+					var api_name = "groups/"+gi+"/users/"+gu+"/avatar";
 					
 					uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
     					// 關閉load 圖示
         				s_load_show = false;
         				$('.ui-loader').hide();
 						$(".ajax-screen-lock").hide();
-						$(".sm-user-area-r div:eq(1)").html(body.nk);
+						$(".sm-user-area-r div").html(body.nk);
 
     					if(chk) {
     						//重置團體頭像、名稱的參數
-							var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div:eq(1)"),$(".sm-user-pic img")];
+							var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div"),$(".sm-user-pic img")];
 	    					setGroupAllUser(data_arr);
 
     						toastShow("更新成功!");
@@ -5728,7 +5746,7 @@ $(function(){
 					$(".ajax-screen-lock").hide();
 
         			toastShow("更新成功");
-        			$(".sm-user-area-r div:eq(1)").html(body.nk);
+        			$(".sm-user-area-r div").html(body.nk);
 
         			//結束關閉
         			this_info.find(".user-info-close").trigger("mouseup");
@@ -5811,6 +5829,7 @@ $(function(){
         var this_gi = this_ei.split("_")[0];
         $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
             var this_event = $(this).find(".st-sub-box");
+            this_event.addClass("detail");
             $(".timeline-detail").html(this_event).hide();
             //單一動態詳細內容
             getEventDetail(this_ei).complete(function(data){
