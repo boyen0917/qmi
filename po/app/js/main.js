@@ -32,38 +32,34 @@ $(function(){
 			cns.debug("no group ");
 		}else{
 
+			//header 設定團體名稱
+	    	$(".header-group-name div:eq(1)").html(gn);
+	    	
+			//執行polling
+			pollingInterval();
+
 			//將團體設定至 localstorage ui裡
 			setGroupList();
 
 	    	//設定guAll 
-	    	setGroupAllUser();
-	    	// chkBranch();
+	    	setGroupAllUser(false,false,function(){
+	    		//sidemenu name
+		    	setSmUserData(gi,gu,gn);
+		    	
+		    	//做團體列表
+		    	groupMenuListArea();
 
-	    	//branch list 只做第一次
-			// if(chkBranch())
-			// 	setBranchList();
+		    	//top event
+		    	topEvent();
+
+		    	//動態消息
+		    	//timelineListWrite();
+		    	setTimeout(function(){
+		    		timelineListWrite();
+		    	},1000);
+	    	});
+
 	    	
-
-	    	//header 設定團體名稱
-	    	$(".header-group-name div:eq(1)").html(gn);
-	    	
-	    	//sidemenu name
-	    	setSmUserData(gi,gu,gn);
-	    	
-	    	//做團體列表
-	    	groupMenuListArea();
-
-	    	//top event
-	    	topEvent();
-
-	    	//動態消息
-	    	//timelineListWrite();
-	    	setTimeout(function(){
-	    		timelineListWrite();
-	    	},1000);
-
-			//執行polling
-			pollingInterval();
 		}
 
 	}else{
@@ -379,58 +375,39 @@ $(function(){
 	  	});
 	});
 	
-	//按鈕效果
+	//更換動態
 	$(document).on("click",".sm-small-area,.sm-group-area",function(){
 		var icon_default = "images/icon/icon_timeline_tab_";
 		//圖片先還原
 		$(".sm-small-area").each(function(i,val){
 			$(this).find("img").attr("src",icon_default + $(this).data("sm-act") + "_normal.png");
 		});
-		
+
 		var target = $(this);
-		//開關按鈕ui變化
-		// if($(".sm-group-list-area-add").is(":visible") ){
-		// 	if(target.data("switch-chk") == "check2"){
-		// 		$(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
-		// 	}
-	 //    }else{
-	 //    	if(target.data("switch-chk") == "check"){
-	 //            $(".sm-switch-ui-adj").addClass("sm-switch-ui-adj-show");
-	 //        }
-	 //    }
+
+		if($(this).hasClass("sm-group-area"))
+			target = $(".sm-small-area[data-sm-act=feeds]");
+		
+		
 		target.addClass("sm-click-bg");
 		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
-
-	});
-	
-	//更換timeline
-	$(document).on("mouseup",".sm-small-area",function(){
-		var icon_default = "images/side_menu/sidemenu_icon_";
-		var target = $(this);
-    	
-    	target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + ".png");
-
-	    timelineSwitch(target.data("sm-act"));
+		timelineSwitch(target.data("sm-act"));
 	});
 	
 	//更換團體
 	$(document).on("click",".sm-group-area",function(){
-		// cns.debug("auo:",$(this).data("auo"));
-		// return false;
-		// $( "#side-menu" ).panel( "close");
+
 		var this_gi = $(this).attr("data-gi");
 		setThisGroup(this_gi);
 		//更新gu all
-		setGroupAllUser();
-
-		//只做第一次
-		// if(typeof $.lStorage(ui)[this_gi].bl == "undefined")
-		// 	setBranchList(this_gi);
+		setGroupAllUser(false,false,function(){
+			timelineSwitch("feeds",true);
+		});
 		
 		//左側選單圖案變換
 		setSidemenuHeader(this_gi);
 
-		timelineSwitch("feeds",true);
+		
 	});
 	
 	$(".sm-small-area.setting").click(function(){

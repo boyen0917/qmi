@@ -252,7 +252,7 @@ $(function(){
         		var new_fbl = {};
                 var _groupList = $.lStorage(ui);
                 var guAll = _groupList[this_gi].guAll;
-                cns.debug("guAll:",guAll);
+                cns.debug("guAlls:",guAll);
 
                 //branch
         		if(branch_list.bl.length) {
@@ -347,8 +347,8 @@ $(function(){
     // }
     
 
-	setGroupAllUser = function(data_arr,this_gi){
-
+	setGroupAllUser = function(data_arr,this_gi,callback){
+        cns.debug("setGroupAllUser");
 		var this_gi = this_gi || gi;
 		getGroupAllUser(this_gi,false).complete(function(data){
 			if(data.status == 200){
@@ -361,7 +361,6 @@ $(function(){
 
 	            //成員列表存入local storage
 	            updateGuAll(this_gi,new_group_user);
-
                 //按照邏輯 取得群組名單之後 就來設定群組資訊
                 setBranchList(this_gi);
 	            
@@ -384,6 +383,8 @@ $(function(){
                 }else if(data_arr){
 	            	getUserName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
 	            }
+
+                if(callback) callback();
 			}
 		});
 	}
@@ -495,9 +496,9 @@ $(function(){
 
 	chkGroupAllUser = function(data_arr){
 		//只用在 sidemenu 及 timelineblockmake 的檢查
-
 		//先檢查localStorage[gi].guAll是否存在
         if(Object.keys($.lStorage(ui)[gi].guAll).length == 0){
+            cns.debug("chkGroupAllUser");
         	setGroupAllUser(data_arr);
         }else{
         	getUserName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
@@ -550,7 +551,6 @@ $(function(){
 					'<div class="st-top-right-arrow st-top-arrow"><div><img src="images/arrow2.png"></div></div>'+
 					'<div class="st-top-event-area">'+
 						'<div class="st-top-event-default">'+
-							'<img src="images/coachmake/logo_timeline_top.png"/>'+
 							'<div>目前尚未有任何置頂</div>'+
 						'</div>'+
 						'<div class="st-top-event-set"></div>'+
@@ -574,9 +574,6 @@ $(function(){
 
 		//取得user name list
 		var _groupList = $.lStorage(ui);
-
-		// cns.debug("$.lStorage(ui):",$.lStorage(ui));
-		// cns.debug("_groupList[gi].guAll:",_groupList[gi].guAll);
 
 		topEventApi().complete(function(data){
         	cns.debug("topevent data:",data);
@@ -606,26 +603,24 @@ $(function(){
         		};
         		$.each(top_events_arr,function(i,val){
 
-        			var event_type = val.meta.tp.substring(1,2);
-        			var this_top_obj = tl_setting_obj[event_type];
-        			if(typeof this_top_obj == "undefined"){
-        				this_top_obj = tl_setting_obj["default"]
-        			}
-
         			top_area.find(".st-top-event-set").append($('<div class="st-top-event">').load('layout/layout.html .st-top-event-load',function(){
         				var this_top_event = $(this);
         				this_top_event.data("data-obj",val);
         				this_top_event.data("pos",i);
 
-        				//圖片及類型
-        				// this_top_event.find(".st-top-event-l img").attr("src",_groupList[gi].guAll[val.meta.gu].aut);
-        				// this_top_event.find(".st-top-event-l div").html(this_top_obj.name);
         				//標題 內容
-        				this_top_event.find(".st-top-event-r-ttl").html(val.meta.tt);
+                        switch(val.meta.tp){
+                            case "":
+                            break;
+                            case "":
+                            break;
+                            default:
+                                ttl_tp = "任務";
+                        }
+        				this_top_event.find(".st-top-event-r-ttl").append(val.meta.tt);
         				this_top_event.find(".st-top-event-r-content").html(val.ml[0].c);
         				
         				//用戶名稱 時間
-        				//this_top_event.find(".st-top-event-r-footer span:eq(0)").html(gu_all[val.meta.gu].nk);
         				setTopEventUserName(this_top_event,val.meta.gu);
 
         				var time = new Date(val.meta.ct);
@@ -657,6 +652,7 @@ $(function(){
 		var gu_all = $.lStorage(ui)[gi].guAll;
 		if(Object.keys(gu_all).length == 0){
 			var data_arr = ["setTopEventUserName",this_top_event,this_gu];
+            cns.debug("setTopEventUserName guall");
 	        setGroupAllUser(data_arr);
 	    }else{
             this_top_event.find(".st-top-event-l img").attr("src",gu_all[this_gu].aut);
@@ -3957,7 +3953,6 @@ $(function(){
             if(!detail){
                 //寫新event(等同下拉更新) 判斷有無第一個event 且 時間大於此event的ct
                 if(top_subbox.length && val.meta.ct > top_subbox.data("ct")){
-                    this_event.find(".st-sub-time").append("n");
                     //表示這是目前timeline沒有的事件
                     method = "before";
                     selector = top_subbox;
@@ -4232,7 +4227,6 @@ $(function(){
 	}
 
     setEventStatus = function(this_event,filter,status){
-        cns.debug("new status",status);
         //先用idb寫 再去向server要
         var ei_val = this_event.data("event-val");
         if(ei_val.status && ei_val.status[ei_val.ei]){

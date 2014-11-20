@@ -850,7 +850,7 @@ img.auo {
 	height: 80px;
 	display: -webkit-box;
 	position: relative;
-	/*border-top: 1px solid rgb(68,74,79);*/
+	cursor: pointer;
 }
 
 .sm-group-area:active , .sm-small-area:active {
@@ -1148,7 +1148,7 @@ img.auo {
 /* =============================== page timeline ==================================== */
 
 #page-group-main {
-	height: 500px;
+	height: 100%;
 }
 
 .gm-frame {
@@ -1424,6 +1424,14 @@ img.auo {
 
 .st-top-event-default {
 	text-align: center;
+}
+
+.st-top-event-default div {
+	position: absolute;
+	bottom: -15px;
+	right: 20px;
+	color: white;
+	font-size: 18px;
 }
 
 .st-top-event-default img {
