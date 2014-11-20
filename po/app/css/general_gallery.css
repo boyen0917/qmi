@@ -10,6 +10,7 @@ body{
     font-weight: normal;
     margin: 0;
     overflow: hidden;
+	-webkit-user-select: none;
 }
 
 .title{
@@ -100,6 +101,7 @@ body{
 	right: 20px;
 	font-weight: bolder;
 	font-size: 20px;
+	cursor: default;
 }
 .cnt .current, .cnt .all{
 	margin-right: 5px;
