@@ -174,13 +174,13 @@ getS3file = function(file_obj,target,tp){
 }
 
 zoomIn = function(){
-	var imgView = $(".picArea .img");
+	var imgView = $(".picArea");
 	var size = imgView.data("size");
 	size = Math.min(5,size+1);
 	changeImgViewSize( size );
 }
 zoomOut = function(){
-	var imgView = $(".picArea .img");
+	var imgView = $(".picArea");
 	var size = imgView.data("size");
 	size = Math.max(1,size-1);
 	changeImgViewSize( size );
@@ -190,7 +190,7 @@ changeImgViewSize = function(size){
 	var index = picArea.data("index");
 	cns.debug( ".img:nth-child("+ (index+1) +")" );
 	var imgView = picArea.find(".img:nth-child("+ (index+1) +")");
-	imgView.data("size",size);
+	picArea.data("size",size);
 
 	cns.debug(size);
 
@@ -201,8 +201,10 @@ changeImgViewSize = function(size){
 
 	if( size>1 ){
 		imgView.css("overflow", "scroll");
+		img.css("object-position", "left top");
 		bIsScrollPage = false;
 	} else {
+		img.css("object-position", "");
 		imgView.css("overflow", "");
 		bIsScrollPage = true;
 	}
