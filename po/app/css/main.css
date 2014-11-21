@@ -1491,10 +1491,8 @@ img.auo {
 	margin: auto;
 	height: 100%;
 	width: 80%;
-}
-
-.st-top-event-l, .st-top-event-r{
-	float:left;
+	overflow: hidden;
+	display: -webkit-box;
 }
 
 .st-top-event-l {

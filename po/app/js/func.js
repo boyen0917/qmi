@@ -438,7 +438,9 @@ $(function(){
                 $("#page-group-main").find(".gm-header .chatList-add").hide();
 
                 //polling 數字重寫
-                pollingCountsWrite();
+                if($.lStorage("_pollingData"))
+                    pollingCountsWrite();
+
 	          break;
 	        case "memberslist": 
 	        	$(".subpage-contact").show();
@@ -1071,8 +1073,7 @@ $(function(){
         this_event.find(".st-sub-box-3 div:eq(2)").html(e_data[0].meta.rct);
 
         //已讀亮燈
-        if(chkEventStatus(this_event,"ir"))
-            this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")    
+        this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")
         
         //製作每個回覆
         $.each(e_data,function(el_i,el){
@@ -1211,9 +1212,9 @@ $(function(){
                     this_load.find(".st-reply-username").html(user_name.replaceOriEmojiCode());
                     
                     //時間
-                    // var time = new Date(el.meta.ct);
-                    // var time_format = time.customFormat( "#M#/#D# #CD# #hhh#:#mm#" );
                     this_load.find(".st-reply-footer span:eq(0)").html(new Date(el.meta.ct).toFormatString());
+
+                    this_load.data("event-val",el);
 
                     var ei = el.ei;
                     this_load.data("event-id",ei);
@@ -1411,7 +1412,6 @@ $(function(){
 	}
 
 	voteContentMake = function (this_event,li){
-
 		$.each(li,function(v_i,v_val){
 			this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html .st-vote-ques-area',function(){
 				var this_ques = $(this).find(".st-vote-ques-area");
@@ -1481,8 +1481,6 @@ $(function(){
 		
 		var vote_obj = this_event.data("vote-result");
 		var all_ques = this_event.find(".st-vote-ques-area");
-		cns.debug("votevotevotevote");
-		cns.debug(JSON.stringify(vote_obj,null,2));
 
 		//設定投票人數
 	    this_event.find(".st-task-vote-detail-count span").html(Object.keys(vote_obj).length + "人已投票");
@@ -1534,15 +1532,12 @@ $(function(){
         });
 
 		//綁定投票事件
-		bindVoteEvent(this_event);
+        setTimeout(function(){
+            bindVoteEvent(this_event);
+        },500);
 	}
 
 	bindVoteEvent = function (this_event){
-		
-		// this_event.find(".st-vote-ques-area-div").click(function(){
-		// 	cns.debug("按到題目了:",$(this));
-		// });		
-
 		this_event.find(".st-vote-detail-option").click(function(){
 			cns.debug("進來");
 			//時間到 不給點
@@ -3098,35 +3093,6 @@ $(function(){
 				ml : []
 			};
 		
-
-		// if(compose_content){
-		// 	var c = {
-		// 		"tp" : 0,
-		// 		"c" : compose_content
-		// 	} 
-		// 	body.ml.push(c);
-		// }
-
-		//"lv": 0(使用者)、1(團體)、2(團體使用者)、3(群組),
-        //"tp": [0](0=樓主,1=回覆訊息)、[1](0=訊息,1=公告,2=通報專區,3=任務-工作,4=任務-投票,5=任務-定點回報,6=行事曆)
-        
-
-        //普通貼文 內容也是普通貼文
-//       var body = {
-//	                 "meta":
-//	                 {
-//	                   "lv": 1,
-//	                   "tp": "00"
-//	                 },
-//	                 "ml":
-//	                 [
-//	                   {
-//	                     "tp": 0,
-//	                     "c": ap_content
-//	                   }
-//	                 ]
-//	               };
-		
 		//欄位是否填寫 檢查
 		var empty_chk = false;
 		var empty_msg;
@@ -3220,11 +3186,10 @@ $(function(){
 				break;
 			//任務 投票
 			case 4:
-
 				body.meta.tt = this_compose.data("compose-title");
 				empty_chk = composeVoteObjMake(this_compose,body);
 
-				empty_smsg = "投票內容不完整！";
+				empty_msg = "投票內容不完整！";
 				break;
 			//任務 定點回報
 			case 5:
@@ -3281,36 +3246,7 @@ $(function(){
 			popupShowAdjust("",empty_msg,true);
 			return false;
 		}
-		// cns.debug("obj:",JSON.stringify(gul_arr,null,2));
-		 // return false;
-		//網址
-
-		// "ei": "Event-340",
-		//   "meta": {
-		//     "lv": 1,
-		//     "tp": "00",
-		//     "gu": "1f757109-3ecb-48cd-92f7-52bd3af991b2",
-		//     "ct": 1400693543526,
-		//     "rct": 4,
-		//     "fct": 0,
-		//     "lct": 3,
-		//     "pct": 0,
-		//     "top": false,
-		//     "cal": false
-		//   },
-		//   "ml": [
-		//     {
-		//       "c": "http://techorange.com/2014/05/20/why-vc-firms-are-snapping-up-designers/",
-		//       "tp": 0
-		//     },
-		//     {
-		//       "c": "http://techorange.com/2014/05/20/why-vc-firms-are-snapping-up-designers/",
-		//       "d": "Kleiner, Perkins, Caufield & Byers 是世界上最凸出的創投公司之一，它們有一個設計師，而 Google Ventures 則有五位。這些設計好夥伴漸漸的在創投公司中擔任重要的角色，他們幫忙管理、選擇公司的投資。 舉例來說，Irene Au 是前 Google ...",
-		//       "i": "https://farm2.staticflickr.com/1417/5132239581_2033c68dbd_z.jpg",
-		//       "t": "  設計師是新一代大神：矽谷創投投資前得先問設計師的意見",
-		//       "tp": 1
-		//     }
-		//   ]
+		
 
 		// 內容狀態 會有很多ml內容組成
 
@@ -3408,10 +3344,7 @@ $(function(){
 			//會有順序問題 因為ios只會照ml順序排 所以必須設定順序
 			if(is_push) body.ml.push(obj);
 		});
-
-		// cns.debug("body:",JSON.stringify(body,null,2));
-		// return false;
-
+    cns.debug("chk_str2");
 		//
 		if(!upload_chk){
 			composeSendApi(body);
@@ -4270,7 +4203,6 @@ $(function(){
 			}
 
 			result_str[n] = htmlFormat(result_str[n]);
-	    	
 		}
 		
 		if(c.length > limit){
@@ -4835,9 +4767,9 @@ $(function(){
 
 	putEventStatus = function (target_obj,etp,est,callback){
 		var this_event = target_obj.selector;
+        var event_val = this_event.data("event-val");
 		var act = target_obj.act;
 		var order = target_obj.order;
-		var event_status = target_obj.status;
 		var this_ei = this_event.data("event-id");
         var this_gi = this_ei.split("_")[0];
         var this_ti = this_ei.split("_")[1];
@@ -4856,10 +4788,9 @@ $(function(){
          var method = "put";
                          cns.debug("headers:",headers);
         ajaxDo(api_name,headers,method,false).complete(function(data){
-        	var d =$.parseJSON(data.responseText);
-
         	//做timeline樓主的回覆狀態
         	if(data.status == 200){
+                var d =$.parseJSON(data.responseText);
         		//timeline 外層
         		if(!target_obj.reply){
 	        		var count_selector = this_event.find(".st-sub-box-3 div:eq(" + order + ")");
@@ -4869,15 +4800,10 @@ $(function(){
 		        	if(est){
 		        		img_selector.attr("src","images/icon/icon_" + act + "_activity.png")
 		        		count_selector.html(count_selector.html()*1+1);
-
-		        		if(etp == 1) this_event.find(".st-like-btn").html("收回讚");
-
 		        		this_status = true;
 		        	}else{
 		        		img_selector.attr("src","images/icon/icon_" + act + "_normal.png")
 		        		count_selector.html(count_selector.html()*1-1);
-
-		        		if(etp == 1) this_event.find(".st-like-btn").html("讚");
 		        	}
 
 	        	}else{
@@ -4908,22 +4834,20 @@ $(function(){
 
 	        	}
 
-	        	if(!event_status[this_ei]) event_status[this_ei] = {};
-
-	        	//api成功才存回
-	        	switch(etp){
-	        		case 0:
-	        			event_status[this_ei].ir = this_status;
-	        			break;
-	        		case 1://讚
-	        			event_status[this_ei].il = this_status;
-	        			break;
-	        	}
-	        	
-		        this_event.data("event-status",event_status);
+                //api成功才存回
+                switch(etp){
+                    case 0:
+                        event_val.meta.ir = this_status;
+                        break;
+                    case 1://讚
+                        event_val.meta.il = this_status;
+                        break;
+                }
+                
+                this_event.data("event-val",event_val);
 
                 //按讚列表
-                callback(true);
+                if(callback) callback(true);
 	        }
         });
         

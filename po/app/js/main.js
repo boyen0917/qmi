@@ -549,28 +549,20 @@ $(function(){
 		target_obj.selector = this_event;
 		target_obj.act = "like1";
 		target_obj.order = 0;
-
+		
 		//存回
-    	var event_status = this_event.data("event-status");
     	var this_ei = this_event.data("event-id");
 
     	//event path
 		this_event.data("event-path",this_ei);
 
-    	if(!event_status){
-    		event_status = {};
-    		event_status[this_ei] = {};
-    	}
-
-		target_obj.status = event_status;
 
 		//按讚區域
     	var parti_list = this_event.data("parti-list");
 
 		//檢查按讚了沒
 		//按讚 like_chk是true
-		if(chkEventStatus(this_event,"il")){
-			// $(this).html("收回讚");
+		if(!this_event.data("event-val").meta.il){
 			var est = 1;
 
 			//按讚區域 改寫陣列
@@ -1057,11 +1049,11 @@ $(function(){
  			//有一個不存在就跳錯誤訊息
  			if(!$(chk_str).val()){
  				empty_chk = false;
+ 				cns.debug("chk_str",chk_str);
  				popupShowAdjust("",error_msg_arr[chk_str],true);
  				return false;
  			}
  		});
-
 		if(empty_chk) composeSend(this_compose);   
 	});
 
