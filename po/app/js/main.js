@@ -679,9 +679,13 @@ $(function(){
 
 	//取消sticker或圖片
 	$(document).on('click','.st-reply-message-img .img',function(){
-		$(this).html("");
-		$(this).data("type",null);
-		$(this).data("id", null);
+		var tmp = $(this).parent();
+		tmp.html("");
+		cns.debug( tmp.data("type") );
+		tmp.removeData("type");
+		tmp.removeData("id");
+		tmp.removeData("file");
+		cns.debug( tmp.data("type") );
 	});
 
 	//圖片
