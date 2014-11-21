@@ -3369,6 +3369,7 @@ $(function(){
         	$.mobile.changePage("#page-group-main");
 
         	//檢查置頂
+            polling();
         	topEventChk();
         	timelineSwitch("feeds");
         	toastShow("發佈成功");
@@ -4855,7 +4856,7 @@ $(function(){
 	//parse 網址
 	getLinkMeta = function (this_compose,url) {
 
-		var q = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
+		var q = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
 		cns.debug("url:",q);
 		$.ajax({
 	        type: 'GET',
