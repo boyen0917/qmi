@@ -59,7 +59,6 @@ $(function(){
 		    	},1000);
 	    	});
 		}
-
 	}else{
     	document.location = "index.html";
     	return false;
@@ -77,9 +76,8 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		var feed_type = $("#page-group-main").data("navi") || "00";
-		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
-		cns.debug("last-ct",this_navi.data("last-ct"));
+		// $(".subpage-timeline ").animate({bottom:"125px"});
+		cns.debug("asdf");
 		//彩蛋鑰匙
 		supriseKey();
 	});
@@ -369,6 +367,9 @@ $(function(){
 	
 	//更換動態
 	$(document).on("click",".sm-small-area,.sm-group-area",function(){
+		//滾動至最上面
+		// $(".subpage-timeline ").animate({scrollTop: 0}, 0);
+
 		var icon_default = "images/icon/icon_timeline_tab_";
 		//圖片先還原
 		$(".sm-small-area").each(function(i,val){
@@ -910,6 +911,8 @@ $(function(){
 
 		//單一動態詳細內容
         getEventDetail(this_ei).complete(function(data){
+        	if(data.status != 200) return false;
+
         	var e_data = $.parseJSON(data.responseText).el;
 
 	        	//計算投票的回文人次
