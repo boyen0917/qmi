@@ -23,6 +23,7 @@ var g_extraSendOpenStatus = 0;
 var g_lineHeight = 21;
 var pi;	//permission id for this chat room
 var ti_chat;
+var getHistoryMsgTimeout;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -293,7 +294,6 @@ function getHistoryMsg ( bIsScrollToTop ){
     g_idb_chat_msgs.limit(function(list){
         //cns.debug("list:",JSON.stringify(list,null,2));
         if( list.length>0 ){
-        	var firstDom = $("#chat-contents>div:nth-child(3)>div:nth-child(1)");
         	//list is from near to far day
 	        for( var i in list){
 	        	if( null==list[i] || g_msgs.indexOf(list[i].ei)>=0 ){
@@ -310,12 +310,8 @@ function getHistoryMsg ( bIsScrollToTop ){
 
 	    	if(bIsScrollToTop){
 	    		scrollToStart();
-	    	} else if(firstDom.length>0){
-	    		setTimeout( function(){
-		    		// firstDom.css("background", "red");
-		    		var offset = firstDom.offset();
-		    		$('html, body').scrollTop( offset.top+10-$(window).height()*0.25 );
-	    		}, 100);
+	    	} else {
+	    		setTimeout( hideLoading, 100);
 	    	}
 	    	g_bIsLoadHistoryMsg = false;
 	    }
@@ -335,8 +331,28 @@ function getHistoryMsg ( bIsScrollToTop ){
             cns.debug("onError:",result);
         }
     });
+
+	if( null==getHistoryMsgTimeout ){
+		if( g_bIsLoadHistoryMsg ) {
+			getHistoryMsgTimeout = setTimeout(function(){
+				g_bIsLoadHistoryMsg = false;
+				hideLoading();
+				getHistoryMsgTimeout = null;
+			}, 2000);
+		}
+	}
 }
 
+function hideLoading()
+{
+	var loading = $("#container #chat-loading");
+	// firstDom.css("background", "red");
+	var tmp = loading.offset();
+	if( tmp ){
+		var offset = loading.offset().top+loading.height();
+		$('html, body').scrollTop( offset );
+	}
+}
 /*
 api打回來的是以ct開始的訊息....
 但每次只會送20筆, 怎麼知道要reverse多少時間回去？？？
@@ -487,7 +503,12 @@ function updateChat (){
 					        data: object
 					    };
 					    //write msg to db
-						g_idb_chat_msgs.put( node );
+					    try{
+							g_idb_chat_msgs.put( node );
+					    } catch(e){
+
+					    }
+						
 
 						showMsg( object, false );
 					}
