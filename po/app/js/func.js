@@ -603,7 +603,7 @@ $(function(){
         				//標題 內容
                         switch(val.meta.tp){
                             case "00":
-                                ttl_tp = "公告";
+                                ttl_tp = "貼文";
                                 break;
                             case "01":
                                 ttl_tp = "公告";

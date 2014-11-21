@@ -1540,6 +1540,13 @@ img.auo {
 	color: rgb(9, 26, 18);
 }
 
+.st-top-event-r-ttl span {
+	margin-right: 10px;
+	color: rgb(48, 134, 213);
+	font-weight: 600;
+	font-size: 17px;
+}
+
 .st-top-event-r-content {
 	max-height: 41px;
 	width: 100%;
