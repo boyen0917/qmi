@@ -27,9 +27,9 @@ function initChatDB( onReady ){
 }
 function updateChat ( msgs ){
 	//indexed from old to new (api chat is from new to old)
-	for( var msgIndex=0; msgIndex<msgs.length; msgIndex++){
+	$.each( msgs, function(msgIndex, data){
 
-		var data = msgs[msgIndex];
+		// var data = msgs[msgIndex];
 		for( var i=0; i<data.el.length; i++){
 			var object = data.el[i];
 			if(object.hasOwnProperty("meta")){
@@ -47,25 +47,40 @@ function updateChat ( msgs ){
 			}
 		}
 
-		setTimeout( function(){
-			/* 更新聊天室列表最後訊息 */
-			if( typeof( updateLastMsg ) != 'undefined' ){
-				updateLastMsg( data.gi, data.ci );
-			}
+		//add unread cnt
+		var unreadCnt = data.el.length;
+		try{
+			var userData = $.lStorage(ui);
+			g_group = userData[data.gi];
+			g_room = g_group["chatAll"][data.ci];
+			unreadCnt = ( (g_room.unreadCnt)?g_room.unreadCnt:0 )+unreadCnt;
+			g_room.unreadCnt = unreadCnt;
+			$.lStorage(ui, userData);
+		} catch(e){
+			cns.debug(e);
+		}
 
+		setTimeout( function(){
+			var isRoomOpen = false;
 			/* 更新聊天室訊息 */
 			// showMsg( object, false );
 			if( null != windowList ){
 				if( windowList.hasOwnProperty(data.ci) 
 					&& null != windowList[data.ci] 
 					&& false==windowList[data.ci].closed ){
+					isRoomOpen = true;
 					windowList[data.ci].g_msgTmp = data.el;
 					$(windowList[data.ci].document).find("button.pollingMsg").trigger("click");
 				}
 			}
 
+			/* 更新聊天室列表最後訊息 */
+			if( typeof( updateLastMsg ) != 'undefined' ){
+				updateLastMsg( data.gi, data.ci, isRoomOpen );
+			}
+
 		}, 300 );
-	}
+	});
 }	//end of updateChat
 
 /*
