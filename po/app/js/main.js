@@ -58,17 +58,9 @@ $(function(){
 		    		timelineListWrite();
 		    	},1000);
 	    	});
-
-	    	
 		}
 
 	}else{
-		// if(debug_flag) {
-  //   		cns.debug("login test");
-  //   		getLoginDataForTest();
-  //   	}else{
-  //   		document.location = "index.html";
-  //   	}
     	document.location = "index.html";
     	return false;
 	}
@@ -396,18 +388,25 @@ $(function(){
 	
 	//更換團體
 	$(document).on("click",".sm-group-area",function(){
+		//清空畫面
+		$(".st-top-event-default").show();
+		$(".st-top-event-set").hide();
+		$(".feed-subarea").html("");
 
 		var this_gi = $(this).attr("data-gi");
 		setThisGroup(this_gi);
 		//更新gu all
 		setGroupAllUser(false,false,function(){
 			timelineSwitch("feeds",true);
+
+			setSmUserData(gi,gu,gn);
+
+			//置頂設定
+			topEvent();;
 		});
 		
 		//左側選單圖案變換
 		setSidemenuHeader(this_gi);
-
-		
 	});
 	
 	$(".sm-small-area.setting").click(function(){
@@ -770,7 +769,7 @@ $(function(){
 
 
 	//文章區塊 編輯按鈕
-	$(document).on('click','.st-sub-box-more-btn',function(e){
+	$(document).on('click','.st-sub-box-more-btn-stop',function(e){
 		//按下效果
 		$(this).attr("src","images/timeline/timeline_feedbox_icon_list_click.png");
 		setTimeout(function(){
