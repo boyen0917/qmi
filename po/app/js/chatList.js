@@ -58,21 +58,27 @@ function updateChatList( extraCallBack ){
 			try{
 				var epl = $.parseJSON(data.responseText);
 				if(typeof epl != "undefined"){
-					var tmp = {};
-
 					//update chat list
-					$.each(epl.cl,function(key,newRoom){
-						if( currentGroup["chatAll"].hasOwnProperty(newRoom.ci) ){
-							var oriRoom = currentGroup["chatAll"][newRoom.ci];
-							for( var propertyKey in oriRoom ){
-								if( !newRoom.hasOwnProperty(propertyKey) ){
-									newRoom[propertyKey] = oriRoom[propertyKey];
+					var tmp = {};
+					if( !currentGroup.hasOwnProperty("chatAll") ){
+						$.each(epl.cl,function(key,newRoom){
+							tmp[newRoom.ci] = newRoom;
+						});
+						currentGroup.chatAll = tmp;
+					} else {
+						$.each(epl.cl,function(key,newRoom){
+							if( currentGroup["chatAll"].hasOwnProperty(newRoom.ci) ){
+								var oriRoom = currentGroup["chatAll"][newRoom.ci];
+								for( var propertyKey in oriRoom ){
+									if( !newRoom.hasOwnProperty(propertyKey) ){
+										newRoom[propertyKey] = oriRoom[propertyKey];
+									}
 								}
 							}
-						}
-						tmp[newRoom.ci] = newRoom;
-					});
-					currentGroup["chatAll"] = tmp;
+							tmp[newRoom.ci] = newRoom;
+						});
+						currentGroup.chatAll = tmp;
+					}
 
 					// cns.debug( JSON.stringify(userData) );
 			    	$.lStorage(ui, userData);
