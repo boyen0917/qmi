@@ -47,19 +47,6 @@ function updateChat ( msgs ){
 			}
 		}
 
-		//add unread cnt
-		var unreadCnt = data.el.length;
-		try{
-			var userData = $.lStorage(ui);
-			g_group = userData[data.gi];
-			g_room = g_group["chatAll"][data.ci];
-			unreadCnt = ( (g_room.unreadCnt)?g_room.unreadCnt:0 )+unreadCnt;
-			g_room.unreadCnt = unreadCnt;
-			$.lStorage(ui, userData);
-		} catch(e){
-			cns.debug(e);
-		}
-
 		setTimeout( function(){
 			var isRoomOpen = false;
 			/* 更新聊天室訊息 */
@@ -71,6 +58,21 @@ function updateChat ( msgs ){
 					isRoomOpen = true;
 					windowList[data.ci].g_msgTmp = data.el;
 					$(windowList[data.ci].document).find("button.pollingMsg").trigger("click");
+				}
+			}
+
+			//add unread cnt
+			if( !isRoomOpen ){
+				var unreadCnt = data.el.length;
+				try{
+					var userData = $.lStorage(ui);
+					g_group = userData[data.gi];
+					g_room = g_group["chatAll"][data.ci];
+					unreadCnt = ( (g_room.unreadCnt)?g_room.unreadCnt:0 )+unreadCnt;
+					g_room.unreadCnt = unreadCnt;
+					$.lStorage(ui, userData);
+				} catch(e){
+					cns.debug(e);
 				}
 			}
 

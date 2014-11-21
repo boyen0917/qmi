@@ -55,28 +55,32 @@ function updateChatList( extraCallBack ){
 	var result = ajaxDo(api_name,headers,method,false);
 	result.complete(function(data){
 		if(data.status == 200){
-			var epl = $.parseJSON(data.responseText);
-			if(typeof epl != "undefined"){
-				var tmp = {};
+			try{
+				var epl = $.parseJSON(data.responseText);
+				if(typeof epl != "undefined"){
+					var tmp = {};
 
-				//update chat list
-				$.each(epl.cl,function(key,newRoom){
-					var oriRoom = currentGroup["chatAll"][newRoom.ci];
-					if( oriRoom ){
-						for( var propertyKey in oriRoom ){
-							if( !newRoom.hasOwnProperty(propertyKey) ){
-								newRoom[propertyKey] = oriRoom[propertyKey];
+					//update chat list
+					$.each(epl.cl,function(key,newRoom){
+						if( currentGroup["chatAll"].hasOwnProperty(newRoom.ci) ){
+							var oriRoom = currentGroup["chatAll"][newRoom.ci];
+							for( var propertyKey in oriRoom ){
+								if( !newRoom.hasOwnProperty(propertyKey) ){
+									newRoom[propertyKey] = oriRoom[propertyKey];
+								}
 							}
 						}
-					}
-					tmp[newRoom.ci] = newRoom;
-				});
-				currentGroup["chatAll"] = tmp;
+						tmp[newRoom.ci] = newRoom;
+					});
+					currentGroup["chatAll"] = tmp;
 
-				// cns.debug( JSON.stringify(userData) );
-		    	$.lStorage(ui, userData);
-		    	showChatList();
-		    }
+					// cns.debug( JSON.stringify(userData) );
+			    	$.lStorage(ui, userData);
+			    	showChatList();
+			    }
+			} catch (e){
+				cns.debug(e);
+			}
 		}
 		if(extraCallBack)	extraCallBack();
 	});
