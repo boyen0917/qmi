@@ -40,8 +40,9 @@
 	border-style: solid;
 	background: white;
 	display: block;
-	min-height: 80px;
-	padding: 0px 15px 1px 0px;
+	height: 81px;
+	/*padding: 0px 15px 1px 0px;*/
+	padding-bottom: 4px;
 	cursor: pointer;
 	width: 110%;
 }
@@ -86,12 +87,25 @@
 	font-size: 10px;
 	padding-bottom: 10px;
 }
+.subpage-chatList-row .cnt {
+	background-color: rgb(140, 194, 244);
+	color: white;
+	line-height: 20px;
+	border-radius: 17px;
+	padding: 0px 7px;
+	vertical-align: super;
+	margin-right: 5px;
+	text-align: center;
+	display: inline-block;
+	font-size: 13px;
+}
 .subpage-chatList-row .drag {
     width: 23px;
 	height: 25px;
 	background: url("../images/chatroom/chat_list_hiddingmenu_icon_del_click.png");
 	background-repeat: no-repeat;
 	background-size: cover;
+	display: inline-block;
 }
 .subpage-chatList-row .drag:hover {
 	background: url("../images/chatroom/chat_list_hiddingmenu_icon_del.png");

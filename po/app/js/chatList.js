@@ -57,12 +57,21 @@ function updateChatList( extraCallBack ){
 		if(data.status == 200){
 			var epl = $.parseJSON(data.responseText);
 			if(typeof epl != "undefined"){
-				currentGroup["chatAll"] = new Object();
+				var tmp = {};
 
 				//update chat list
-				$.each(epl.cl,function(key,room){
-					currentGroup["chatAll"][room.ci] = room;
+				$.each(epl.cl,function(key,newRoom){
+					var oriRoom = currentGroup["chatAll"][newRoom.ci];
+					if( oriRoom ){
+						for( var propertyKey in oriRoom ){
+							if( !newRoom.hasOwnProperty(propertyKey) ){
+								newRoom[propertyKey] = oriRoom[propertyKey];
+							}
+						}
+					}
+					tmp[newRoom.ci] = newRoom;
 				});
+				currentGroup["chatAll"] = tmp;
 
 				// cns.debug( JSON.stringify(userData) );
 		    	$.lStorage(ui, userData);
@@ -136,6 +145,7 @@ function showChatList(){
 				td = $("<td align='right'></td>");
 				var lastTime = $("<div class='time'></div>");
 				td.append(lastTime);
+				td.append("<div class='cnt'></div>");
 				td.append("<div class='drag'></div>");
 				row.append(td);
 
@@ -205,6 +215,7 @@ function deleteRoom ( deleteRow ){
 }
 
 function openChatWindow ( ci ){
+	clearChatListCnt( gi, ci );
 	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
 		windowList[ci].focus();
 	} else {
@@ -220,14 +231,22 @@ function openChatWindow ( ci ){
 	}
 }
 
-function updateLastMsg(giTmp, ci){
-	var table = $(".subpage-chatList-row[data-rid='"+ci+"']");
-	setLastMsg( giTmp, ci, table, true );
+function updateLastMsg(giTmp, ciTmp, isRoomOpen ){
+	var table = $(".subpage-chatList-row[data-rid='"+ciTmp+"']");
+	setLastMsg( giTmp, ciTmp, table, isRoomOpen );
 	setTimeout(sortRoomList, sortRoomListTimeout);
 }
+function clearChatListCnt( giTmp, ciTmp ){
+	var userData = $.lStorage(ui);
+	g_group = userData[giTmp];
+	g_room = g_group["chatAll"][ciTmp];
+	g_room.unreadCnt = 0;
+	$.lStorage(ui, userData);
+	$(".subpage-chatList-row[data-rid='"+ciTmp+"'] .cnt").html("");
+}
 
-function setLastMsg( giTmp, ci, table, isShowNotify ){
-	if( null==isShowNotify ) isShowNotify = false;
+function setLastMsg( giTmp, ciTmp, table, isRoomOpen ){
+	if( null==isRoomOpen ) isRoomOpen = false;
 	// if( gi!=giTmp ) return;
 	// if(!table) return;
 
@@ -235,14 +254,14 @@ function setLastMsg( giTmp, ci, table, isShowNotify ){
 	    if( list.length>0 ){
 	    	if( null!=list[0] ){
 	        	var object = list[0].data;
-	        	setLastMsgContent( ci, table, object, isShowNotify );
+	        	setLastMsgContent( ciTmp, table, object, isRoomOpen );
 	    	}
 	    }
 	},{
 	    index: "gi_ci_ct",
 	    keyRange: g_idb_chat_msgs.makeKeyRange({
-	        upper: [gi, ci, new Date().getTime()],
-	        lower: [gi, ci]
+	        upper: [gi, ciTmp, new Date().getTime()],
+	        lower: [gi, ciTmp]
 	        // only:18
 	    }),
 	    limit: 1,
@@ -256,9 +275,11 @@ function setLastMsg( giTmp, ci, table, isShowNotify ){
 	});
 }
 
-function setLastMsgContent( ci, table, data, isShowNotify ){
+function setLastMsgContent( ciTmp, table, data, isRoomOpen ){
 	var userData = $.lStorage(ui);
 	var groupData = userData[gi];
+	var room = groupData.chatAll[ciTmp];
+	var unreadCnt = room.unreadCnt;
 	var text = "";
 	var mem = groupData.guAll[data.meta.gu];
 	if( null==mem ) return;
@@ -287,20 +308,32 @@ function setLastMsgContent( ci, table, data, isShowNotify ){
 		var timeDom = table.find(".time");
 
 		if(msgDom)	msgDom.html( text.replaceOriEmojiCode() );
-		cns.debug( new Date(data.meta.ct).toFormatString() );
+		// cns.debug( new Date(data.meta.ct).toFormatString() );
 		if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
+		if( false ==isRoomOpen ){
+			var cntDom = table.find(".cnt");
+			if(cntDom){
+				var cntText = "";
+				if( unreadCnt>99 ){
+					cntText = "99+"
+				} else if(unreadCnt&&unreadCnt>0){
+					cntText = unreadCnt;
+				}
+				cntDom.html(cntText);
+			}
+		}
 	}
 	
-	if( isShowNotify ){
+	// if( false == isRoomOpen ){
 		try{
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			riseNotification (null, groupData.gn.parseHtmlString()+" - "+mem.nk, text, function(){
-				cns.debug(ci); 
+				cns.debug(ciTmp); 
 			});
 		} catch(e) {
 			cns.debug( e );
 		}
-	}
+	// }
 }
 
 function sortRoomList(){

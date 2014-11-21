@@ -2698,8 +2698,9 @@ img.st-reply-message-attach {
 }
 .st-reply-message-img img{
 	max-width: 100%;
-	max-height: 100%;
-	min-height: 80px;
+	/*max-height: 100%;*/
+	/*min-height: 80px;*/
+	height: 100px;
 	object-fit: contain;
 }
 
