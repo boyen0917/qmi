@@ -1049,7 +1049,6 @@ $(function(){
  			//有一個不存在就跳錯誤訊息
  			if(!$(chk_str).val()){
  				empty_chk = false;
- 				cns.debug("chk_str",chk_str);
  				popupShowAdjust("",error_msg_arr[chk_str],true);
  				return false;
  			}

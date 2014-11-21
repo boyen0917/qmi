@@ -3344,8 +3344,7 @@ $(function(){
 			//會有順序問題 因為ios只會照ml順序排 所以必須設定順序
 			if(is_push) body.ml.push(obj);
 		});
-    cns.debug("chk_str2");
-		//
+
 		if(!upload_chk){
 			composeSendApi(body);
 		}
@@ -5278,6 +5277,8 @@ $(function(){
 	    		}
 	    	});
     	}
+
+        if(!gcnts) return false;
 
     	if(gcnts.G1 > 0){
     		$(".sm-group-cj-btn span").html(gcnts.G1).show();

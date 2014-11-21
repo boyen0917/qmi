@@ -3799,6 +3799,12 @@ input.cp-datetimepicker-end {
 	overflow: hidden;
 }
 
+.group-avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
 .user-avatar-bar .group-name {
 	width: 55%;
 	margin: 8px 15px;
