@@ -82,15 +82,6 @@ $(function(){
 		supriseKey();
 	});
 
-	//for node-webkit app to open systems browser
-	$(document).on("click","a",function(e){
-		if(navigator.userAgent=="mitake webkit"){
-            var gui = require('nw.gui');
-            gui.Shell.openExternal($(this).attr("href"));
-			return false;        	
-        }
-	});
-
 	//下拉更新 滾輪版 
 	$(".subpage-timeline ").bind('mousewheel DOMMouseScroll', function(event){
 
@@ -903,7 +894,25 @@ $(function(){
 		}
 		
 		//此則動態的按贊狀況
-		getThisTimelinePart(this_event,this_event.find(".st-reply-like-area img:eq(0)"),1);
+		getThisTimelinePart(this_event,1,function(data){
+			
+			if(!data.responseText) return false;
+
+			var epl = $.parseJSON(data.responseText).epl;
+            
+			if(typeof epl != "undefined" && epl.length > 0){
+				var parti_list = [];
+				$.each(epl,function(i,val){
+					parti_list.push(val.gu);
+				});
+
+				// 存回 陣列
+				this_event.data("parti-list",parti_list);
+				this_event.data("parti-like",epl);
+				// 編輯讚好區域
+				detailLikeStringMake(this_event);
+			}
+		});
 
 		//單一動態詳細內容
         getEventDetail(this_ei).complete(function(data){
@@ -911,61 +920,65 @@ $(function(){
 
         	var e_data = $.parseJSON(data.responseText).el;
 
-	        	//計算投票的回文人次
-	        	var count = 0;
-	        	
-	        	cns.debug("==================== 詳細內容 ================================");
-	            cns.debug(JSON.stringify(e_data,null,2));
-	            
-	            //單一動態詳細內容 根據此則timeline類型 設定並開關區域
-	        	//event種類 不同 讀取不同layout
-	    		switch(tp){
-	    			case 0:
-	    				break;
-	    			case 1:
-	    				break;
-	    			case 2:
-	    				break;
-	    			case 3:
-	    				//工作
-	    				this_event.find(".st-box2-more-task-area").hide();
-	    				this_event.find(".st-box2-more-task-area-detail").show();
-	    				//開啟工作細節
-	    				this_event.find(".st-task-work-detail").show();
+        	//計算投票的回文人次
+        	var count = 0;
+        	
+        	cns.debug("==================== 詳細內容 ================================");
+            cns.debug(JSON.stringify(e_data,null,2));
+            
+            //單一動態詳細內容 根據此則timeline類型 設定並開關區域
+        	//event種類 不同 讀取不同layout
+    		switch(tp){
+    			case 0:
+    				break;
+    			case 1:
+    				break;
+    			case 2:
+    				break;
+    			case 3:
+    				//工作
+    				this_event.find(".st-box2-more-task-area").hide();
+    				this_event.find(".st-box2-more-task-area-detail").show();
+    				//開啟工作細節
+    				this_event.find(".st-task-work-detail").show();
 
-	    				if(this_event.data("task-over")) break;
-	    				break;
-	    			case 4:
-	    				this_event.find(".st-box2-more-task-area").hide();
-	    				this_event.find(".st-box2-more-task-area-detail").show();
-	    				//開啟投票細節
-	    				this_event.find(".st-task-vote-detail").show();
-	    				
-	    				if(this_event.data("task-over")) break;
-	    				//判斷有無投票過 顯示送出 已送出 已結束等等
-	    				var event_status = this_event.data("event-status");
-	    				if(event_status && event_status.ik){
-	    					this_event.find(".st-vote-send").html("完成");
-	    					this_event.find(".st-vote-send").removeClass(".st-vote-send-blue");
-	    				}
-	    				
-	    				break;
-	    			case 5:
-	    				break;
-	    			case 6:
-	    				break;
-	    		};
+    				if(this_event.data("task-over")) break;
+    				break;
+    			case 4:
+    				this_event.find(".st-box2-more-task-area").hide();
+    				this_event.find(".st-box2-more-task-area-detail").show();
+    				//開啟投票細節
+    				this_event.find(".st-task-vote-detail").show();
+    				
+    				if(this_event.data("task-over")) break;
+    				//判斷有無投票過 顯示送出 已送出 已結束等等
+    				var event_status = this_event.data("event-status");
+    				if(event_status && event_status.ik){
+    					this_event.find(".st-vote-send").html("完成");
+    					this_event.find(".st-vote-send").removeClass(".st-vote-send-blue");
+    				}
+    				
+    				break;
+    			case 5:
+    				break;
+    			case 6:
+    				break;
+    		};
 
-	    		//讚留言閱讀
-        		this_event.find(".st-sub-box-3 div:eq(0)").html(e_data[0].meta.lct);
-        		this_event.find(".st-sub-box-3 div:eq(1)").html(e_data[0].meta.pct);
-        		this_event.find(".st-sub-box-3 div:eq(2)").html(e_data[0].meta.rct);
+    		//讚留言閱讀
+    		this_event.find(".st-sub-box-3 div:eq(0)").html(e_data[0].meta.lct);
+    		this_event.find(".st-sub-box-3 div:eq(1)").html(e_data[0].meta.pct);
+    		this_event.find(".st-sub-box-3 div:eq(2)").html(e_data[0].meta.rct);
 
-	    		//detail timeline message內容
-				detailTimelineContentMake(this_event,e_data);
-    		});
+    		//detail timeline message內容
+			detailTimelineContentMake(this_event,e_data);
+		});
 	});
-
+	
+	$(document).on("click",".st-reply-like-area",function(){
+		var this_event = $(this).parents(".st-sub-box");
+		cns.debug("gogoogg",this_event.data());
+	});
 	
 	//timeline裏面點擊不做展開收合的區域 設定在init.js
 	$(document).on("mouseup",timeline_detail_exception.join(","),function(e){

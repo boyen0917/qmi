@@ -944,12 +944,12 @@ $(function(){
 	}
 	
 	//取得單一timeline 回覆讚好等狀態
-	getThisTimelinePart = function (this_event,target_div,tp){
+	getThisTimelinePart = function (this_event,tp,callback){
 		var this_ei = this_event.data("event-id");
         var this_gi = this_ei.split("_")[0];
         var this_ti = this_ei.split("_")[1];
 
-		var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/participants?tp=" + tp;
+		var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/participants2?tp=" + tp;
 		var headers = {
             "ui":ui,
 			"at":at, 
@@ -958,16 +958,7 @@ $(function(){
 		var method = "get";
 		var result = ajaxDo(api_name,headers,method,false);
 		result.complete(function(data){
-			if(data.status == 200){
-				var epl = $.parseJSON(data.responseText).epl;
-				if(typeof epl != "undefined" && epl.length > 0){
-					epl = epl.split(",");
-					//存回 陣列
-					this_event.data("parti-list",epl);
-					//編輯讚好區域
-					detailLikeStringMake(this_event);
-				}
-			}
+			if(data.status == 200 && callback) callback(data);
 		});
 	}
 	
@@ -975,6 +966,7 @@ $(function(){
         var this_gi = this_event.data("event-id").split("_")[0];
         
 		var epl = this_event.data("parti-list");
+
 		//gu gi 是全域
 		var me_pos = $.inArray(gu,epl);
 		
@@ -1013,7 +1005,7 @@ $(function(){
             //你、林小花 按讚
             case ( typeof me_gu != "undefined" && epl.length > 2 ) :
                 like_str_arr[0] = "你、 " + (me_pos ? guAll[epl[0]].nk : guAll[epl[1]].nk);
-                like_str_arr[1] = " 及其他" + (epl.length-1) + "人按讚";
+                like_str_arr[1] = " 及其他" + (epl.length-2) + "人按讚";
                 break;
         }
         
@@ -3683,7 +3675,7 @@ $(function(){
 	    	if(data.status != 200) return false;
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
-
+            cns.debug("timeline_list:",timeline_list);
 	    	//沒資料 後面就什麼都不用了
 	    	if( timeline_list.length == 0 ) {
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");
@@ -4277,7 +4269,7 @@ $(function(){
 
                     if(val.c){
                         this_event.find(".st-attach-url").click(function(){
-                            window.open(val.c);
+                            this_event.find(".st-sub-box-2-content a")[0].click();
                         });
                     }
 

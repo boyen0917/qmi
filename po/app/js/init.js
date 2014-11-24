@@ -219,6 +219,18 @@ $(function(){
 	});
 
 
+	
+	//for node-webkit app to open systems browser
+	$(document).on("click","a",function(e){
+		cns.debug("aaaaaa");
+		if(navigator.userAgent=="mitake webkit"){
+            var gui = require('nw.gui');
+            gui.Shell.openExternal($(this).attr("href"));
+			return false;        	
+        }
+	});
+
+
 	errorResponse = function(data){
 		if(data.responseText){
 			return $.parseJSON(data.responseText).rsp_msg;
