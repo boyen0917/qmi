@@ -959,6 +959,7 @@ $(function(){
 		var result = ajaxDo(api_name,headers,method,false);
 		result.complete(function(data){
 			if(data.status == 200 && callback) callback(data);
+            return;
 		});
 	}
 	
