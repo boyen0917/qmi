@@ -2011,7 +2011,7 @@ img.st-user-pic{
 .st-sub-box-2-attach-area {
 	position: relative;
 	background: white;
-	border-top: 1px solid #d3e0e6;
+	/*border-top: 1px solid #d3e0e6;*/
 	margin: 10px -15px 0;
 	padding-top:12px;
 	text-align: center;
@@ -3676,14 +3676,16 @@ input.cp-datetimepicker-end {
 }
 
 .obj-cell-user-data, .obj-cell-subgroup-data {
-	/*margin: 30px 0 0 20px; */
 	width: 50%;
 	display: inline-block;
-	/* vertical-align: super; */
-	line-height: 67px;
 	vertical-align: bottom;
 	height: 67px;
-	/* border-bottom: gray 1px solid; */
+	margin-left: 10px;
+}
+
+.obj-cell-user-data.extra .obj-user-name {
+	line-height: 35px;
+	margin-top: 4px;
 }
 
 .obj-user-name {
@@ -3692,11 +3694,22 @@ input.cp-datetimepicker-end {
 	white-space: nowrap;
 	outline: 0!important;
 	font-size: 18px;
-	margin-left: 10px;
+	/* margin-left: 10px; */
+	line-height: 67px;
+}
+
+.obj-cell-time{
+	float: right;
+	line-height: 35px;
+	margin-top: 5px;
+	margin-right: 10px;
+	font-size: 12px;
+	color: #777;
 }
 
 .obj-user-title {
 	color: #777;
+	font-size: 12px;
 }
 
 .user-info-adjust {
@@ -4044,4 +4057,70 @@ img.user-info-back {
 	position: relative;
 	top: 10px;
 	float: left;
+}
+
+.tabObj-content{
+	/*background: #d2d2d2;*/
+	width: 100%;
+	overflow-x: scroll;
+	overflow-y: hidden;
+}
+
+.tabObj-tab-area{
+	height: 56px;
+	font-size: 20px;
+	line-height: 30px;
+	white-space: nowrap;
+	background: rgb(210, 228, 237);
+	border-left: white 1px solid;
+	position: fixed;
+	width: 100%;
+}
+
+.tabObj-tab-area .tab{
+    position: relative;
+	display: inline-block;
+	min-width: 200px;
+	border-right: white 1px solid;
+	display: inline-block;
+	background: rgb(210, 228, 237);
+	text-align: center;
+	height: 55px;
+}
+.tabObj-tab-area .tab div{
+	margin-top: 13px;
+	text-align: center;
+}
+.tabObj-tab-area .tab.current div{
+	width: -webkit-calc( 100% - 28px );
+}
+
+.tabObj-tab-area .tab.current{
+	background: rgb(156, 221, 255);
+}
+.tabObj-tab-area .tab.current:before{
+	content: "";
+	position: relative;
+	bottom: -45px;
+	left: -webkit-calc( 50% - 15px );
+	border-style: solid;
+	border-width: 0 15px 15px;
+	border-color: #FFFFFF transparent;
+	display: block;
+	width: 0;
+	z-index: 1;
+	float: left;
+}
+
+.tabObj-cell-area{
+	width: 100%;
+	height: 100%;
+	overflow: scroll;
+	margin-top: 54px;
+}
+.tabObj-cell-area.noTitle{
+	margin-top: 0px;
+}
+
+.tabObj-cell-area .obj-cell{
 }

@@ -8,6 +8,9 @@
 	"FEED_MISSION_TASK"		:"任務-工作",
 	"FEED_MISSION_VOTE"		:"任務-投票",
 	"FEED_MISSION_LOCATION"	:"任務-成員定位",
+	"FEED_LIKE" : "讚",
+	"FEED_READ" : "已讀",
+	"FEED_UNREAD" : "未讀",
 
 	"COMPOSE_SUBGROUP" : "群組",
 	"COMPOSE_N_SUBGROUP" : "%ld個群組",

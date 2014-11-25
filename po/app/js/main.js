@@ -579,6 +579,16 @@ $(function(){
 		});
 	});
 
+	//show 已讀列表
+	$(document).on('click','.st-sub-box-3 .st-read',function(){
+		cns.debug("read list");
+		var this_event = $(this).parents('.st-sub-box');
+
+		timelineObjectTabShowDelegate( this_event, 0, function(){
+			cns.debug("on back from read/unread");
+		});
+	});
+
 	//回覆按讚
 	$(document).on('click','.st-reply-message-like',function(){
 		var this_event = $(this).parents('.st-reply-content-area');
@@ -980,6 +990,9 @@ $(function(){
 	$(document).on("click",".st-reply-like-area",function(){
 		var this_event = $(this).parents(".st-sub-box");
 		cns.debug("gogoogg",this_event.data());
+		timelineObjectTabShowDelegate( this_event, 1, function(){
+			cns.debug("back from like list");
+		});
 	});
 	
 	//timeline裏面點擊不做展開收合的區域 設定在init.js

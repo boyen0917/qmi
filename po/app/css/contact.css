@@ -5,7 +5,7 @@
 .subpage-contact{
 	background: white;
 	position: fixed;
-	width: 100%;
+	width: -webkit-calc( 100% - 250px );
 }
 
 .contact-search{
