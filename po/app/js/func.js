@@ -244,6 +244,7 @@ $(function(){
             "at":at,
             "li":lang
         };
+        
         var method = "get";
         ajaxDo(api_name,headers,method,false).complete(function(data){
         	if(data.status == 200){
@@ -252,7 +253,6 @@ $(function(){
         		var new_fbl = {};
                 var _groupList = $.lStorage(ui);
                 var guAll = _groupList[this_gi].guAll;
-                cns.debug("guAlls:",guAll);
 
                 //branch
         		if(branch_list.bl.length) {

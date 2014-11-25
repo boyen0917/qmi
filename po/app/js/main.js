@@ -809,9 +809,6 @@ $(function(){
 	
 	$(".feed-compose").click(function(){
 		//管理者可開啟公告
-		cns.debug("gi gu",gi +" && "+ gu  +" && "+ ui);
-		cns.debug("$.lStorage(ui)[gi]",$.lStorage(ui)[gi]);
-		cns.debug("$.lStorage(ui)[gi].guAll[gu]",$.lStorage(ui)[gi].guAll[gu]);
 		if($.lStorage(ui)[gi].guAll[gu].ad == 1){
 			$(".fc-area-subbox[data-fc-box=announcement]").show();
 		}else{
