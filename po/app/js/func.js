@@ -945,6 +945,10 @@ $(function(){
 	
 	//取得單一timeline 回覆讚好等狀態
 	getThisTimelinePart = function (this_event,tp,callback){
+        if( this_event.length==0 ){
+            cns.debug("no event");
+            return;
+        }
 		var this_ei = this_event.data("event-id");
         var this_gi = this_ei.split("_")[0];
         var this_ti = this_ei.split("_")[1];
@@ -959,7 +963,6 @@ $(function(){
 		var result = ajaxDo(api_name,headers,method,false);
 		result.complete(function(data){
 			if(data.status == 200 && callback) callback(data);
-            return;
 		});
 	}
 	
@@ -2004,9 +2007,27 @@ $(function(){
                            '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
                            '<div class="obj-cell-user-data">' + 
                                 '<div class="obj-user-name">' + gu_obj.nk.replaceOriEmojiCode() + '</div>' +
-                                // '<div class="obj-user-title">雲端事業群。經理</div>' +
+                                '<div class="obj-user-title"></div>' +
                         '</div>'
                     );
+
+                    //get extra content (bl name or em)
+                    var branchID = gu_obj.bl;
+                    var extraContent = "";  //gu_obj.em;
+                    if( branchID && branchID.length>0 ){
+                        var branchPath = branchID.split(".");
+                        if( branchPath && branchPath.length>0 ){
+                            branchID = branchPath[branchPath.length-1];
+                            if( bl.hasOwnProperty(branchID) ){
+                                extraContent = bl[branchID].bn;
+                            }
+                        }
+                    }
+                    if(extraContent && extraContent.length>0){
+                        this_obj.find(".obj-cell-user-data").addClass("extra");
+                        this_obj.find(".obj-user-title").html( extraContent );
+                    }
+
                     var object_img = this_obj.find(".obj-cell-user-pic img");
                     if(gu_obj.aut) {
                         object_img.attr("src",gu_obj.aut);
@@ -2182,7 +2203,7 @@ $(function(){
                    '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
                    '<div class="obj-cell-user-data">' + 
                         '<div class="obj-user-name">' + gu_obj.nk.replaceOriEmojiCode() + '</div>' +
-                        // '<div class="obj-user-title">雲端事業群。經理</div>' +
+                        '<div class="obj-user-title"></div>' +
                 '</div>'
             );
             var object_img = this_obj.find(".obj-cell-user-pic img");
@@ -2190,6 +2211,23 @@ $(function(){
                 object_img.attr("src",gu_obj.aut);
                 //object_img.removeAttr("style");
                 avatarPos(object_img);
+            }
+
+            //get extra content (bl name or em)
+            var branchID = gu_obj.bl;
+            var extraContent = "";  //gu_obj.em;
+            if( branchID && branchID.length>0 ){
+                var branchPath = branchID.split(".");
+                if( branchPath && branchPath.length>0 ){
+                    branchID = branchPath[branchPath.length-1];
+                    if( bl.hasOwnProperty(branchID) ){
+                        extraContent = bl[branchID].bn;
+                    }
+                }
+            }
+            if(extraContent && extraContent.length>0){
+                this_obj.find(".obj-cell-user-data").addClass("extra");
+                this_obj.find(".obj-user-title").html( extraContent );
             }
 
             this_obj.data("gu",gu_obj.gu);
@@ -2575,6 +2613,159 @@ $(function(){
             this_cell.find(".obj-cell-chk .img").removeClass("chk");
         });
         updateSelectedObj();
+    }
+
+    timelineObjectTabShowDelegate = function( this_event, type, onDone ){
+        var list = [];
+        var title = "";
+
+        //(0=讀取, 1=按讚, 2=按X, 3=按訂閱, 4=按置頂, 7=按任務, 9 = 未讀取)
+        switch( type ){
+            case 0:
+                var isReady = false;
+                //get read
+                list.push( {title:$.i18n.getString("FEED_READ"),ml:null} );
+                getThisTimelinePart( this_event, 0,function(data){
+                    try{
+                        list[0].ml = $.parseJSON( data.responseText ).epl;
+                        if(isReady){
+                            showObjectTabShow(title, list, onDone);
+                        } else {
+                            isReady = true;
+                        }
+                    } catch(e) {
+                        cns.debug( e );
+                    }
+                });
+                //get unread
+                list.push( {title:$.i18n.getString("FEED_UNREAD"),ml:null} );
+                getThisTimelinePart( this_event, 9,function(data){
+                    try{
+                        list[1].ml = $.parseJSON( data.responseText ).epl;
+                        if(isReady){
+                            showObjectTabShow(title, list, onDone);
+                        } else {
+                            isReady = true;
+                        }
+                    } catch(e) {
+                        cns.debug( e );
+                    }
+                });
+                break;
+            case 1:
+                var epl = this_event.data("parti-like");
+                if( null==epl || epl.length==0 ){
+                    cns.debug("null epl:", epl);
+                    return;
+                }
+                title = $.i18n.getString("FEED_LIKE")+"("+epl.length+")";
+                list.push( {title:"",ml:epl} );
+                if( list.length>0 ) showObjectTabShow(title, list, onDone);
+                break;
+        }
+    }
+
+    showObjectTabShow = function( title, list, onDone ){
+        var page = $("#page-tab-object");
+
+        //title
+        page.find(".header-cp-object").html( title?title:"" );
+
+        //tabs
+        var length = list.length;
+        var tabArea = page.find(".tabObj-tab-area");
+        var cellArea = $("#page-tab-object .tabObj-cell-area");
+        tabArea.html("");
+        var width = (100.0/list.length)+"%";
+        $.each( list, function(index, object){
+            var tab = $("<div class='tab'></div>");
+            tab.data("id", index);
+            tab.data("obj", object);
+            tab.css("width",width);
+            var tmp = "<div>" + ((object.title&&object.title.length>0)?object.title:" ") +"</div>";
+            tab.html( tmp );
+            tabArea.append(tab);
+        });
+        if( list.length<=1 ){
+            tabArea.hide();
+            cellArea.addClass("noTitle");
+        } else {
+            tabArea.show();
+            cellArea.removeClass("noTitle");
+        }
+
+        //generate page when click
+        tabArea.next().html("");
+        $(document).find("#page-tab-object .tab").click(function(){
+            var tab = $(this);
+            var index = tab.data("id");
+            var cell = cellArea.find("._"+index);
+
+            $("#page-tab-object .tab").removeClass("current");
+            tab.addClass("current");
+
+            if( cell.length<=0 ){
+                var data = tab.data("obj");
+                cell = $("<div class='obj-cell-page _"+index+"'></div>");
+                cellArea.append( cell );
+
+                //gen mem
+                var guAll = $.lStorage(ui)[gi].guAll;
+                var bl = $.lStorage(ui)[gi].bl;
+                for(var i=0;i<data.ml.length; i++ ){
+                    var gu = data.ml[i].gu;
+                    var rt = data.ml[i].rt;
+                    if( !gu ) continue;
+                    if( !guAll.hasOwnProperty(gu) ) continue;
+                    var mem = guAll[gu];
+                    var this_obj = $(
+                        '<div class="obj-cell mem" data-gu="'+gu+'">' +
+                            '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
+                            '<div class="obj-cell-time"></div>' +
+                            '<div class="obj-cell-user-data">' + 
+                                '<div class="obj-user-name">' + mem.nk.replaceOriEmojiCode() + '</div>' +
+                                '<div class="obj-user-title"></div>' +
+                        '</div>'
+                    );
+
+                    var branchID = mem.bl;
+                    var extraContent = "";  //mem.em;
+                    if( branchID && branchID.length>0 ){
+                        var branchPath = branchID.split(".");
+                        if( branchPath && branchPath.length>0 ){
+                            branchID = branchPath[branchPath.length-1];
+                            if( bl.hasOwnProperty(branchID) ){
+                                extraContent = bl[branchID].bn;
+                            }
+                        }
+                    }
+                    if(extraContent && extraContent.length>0){
+                        this_obj.find(".obj-cell-user-data").addClass("extra");
+                        this_obj.find(".obj-user-title").html( extraContent );
+                    }
+
+                    var object_img = this_obj.find(".obj-cell-user-pic img");
+                    if(mem.aut) {
+                        object_img.attr("src",mem.aut);
+                        //object_img.removeAttr("style");
+                        // avatarPos(object_img);
+                    }
+                    if( rt ) {
+                        this_obj.find(".obj-cell-time").html( new Date(rt).toFormatString() );
+                    }
+                    this_obj.find(".obj-cell-user-pic.namecard").data("gu",mem.gu);
+
+                    this_obj.data("gu",mem.gu);
+                    this_obj.data("gu-name",mem.nk);
+                    cell.append(this_obj);
+                }
+            }
+            $("#page-tab-object .obj-cell-page.current").hide().removeClass("current");
+            cell.show().addClass("current");
+        }); 
+        tabArea.find(".tab:nth-child(1)").trigger("click");
+
+        $.mobile.changePage("#page-tab-object", {transition: "slide"});
     }
 
 	setDateTimePicker = function(this_compose){
@@ -3676,7 +3867,7 @@ $(function(){
 	    	if(data.status != 200) return false;
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
-            cns.debug("timeline_list:",timeline_list);
+
 	    	//沒資料 後面就什麼都不用了
 	    	if( timeline_list.length == 0 ) {
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");

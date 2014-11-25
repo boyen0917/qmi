@@ -289,6 +289,10 @@ function setLastMsgContent( ciTmp, table, data, isRoomOpen ){
 	var userData = $.lStorage(ui);
 	var groupData = userData[gi];
 	var room = groupData.chatAll[ciTmp];
+	if( null==room ){
+		cns.debug("null room, ci:", ciTmp);
+		return;
+	}
 	var unreadCnt = room.unreadCnt;
 	var text = "";
 	var mem = groupData.guAll[data.meta.gu];
