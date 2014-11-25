@@ -348,7 +348,7 @@ $(function(){
     
 
 	setGroupAllUser = function(data_arr,this_gi,callback){
-        cns.debug("setGroupAllUser");
+        
 		var this_gi = this_gi || gi;
 		getGroupAllUser(this_gi,false).complete(function(data){
 			if(data.status == 200){
@@ -3461,12 +3461,14 @@ $(function(){
 	};
 
     setSidemenuHeader = function (new_gi){
+        
         //左側選單主題區域
         var this_gi = new_gi || gi;
         var pic_num = this_gi.substring(this_gi.length-1,this_gi.length).charCodeAt()%10;
         $(".sm-header").css("background","url(images/common/cover/sidemeun_cover0" + pic_num + ".png)")
 
         var _groupList = $.lStorage(ui);
+
         $(".sm-group-pic").css("background","url(" + _groupList[this_gi].aut + ")").stop().animate({
             opacity:1
         },1000);
@@ -3474,9 +3476,15 @@ $(function(){
     }
 	
 	groupMenuListArea = function (new_gi,invite){
-        setSidemenuHeader(new_gi);
-
+        
+        if(!new_gi){
+            setSidemenuHeader(new_gi);  
+        } else {
+            s_load_show = true;    
+        }
+        
     	getGroupList().complete(function(data){
+            s_load_show = false;
 	    	if(data.status != 200) return false;
 
 	    	$(".sm-group-list-area").html("");
@@ -3501,14 +3509,6 @@ $(function(){
 	        	}
 
                 tmp_selector = ".sm-group-list-area";
-	        	
-	        	// //開關按鈕ui變化
-	         //    if(i == 1 || total == 1){
-	         //        chk = "data-switch-chk=\"check\"";
-	         //    }
-	         //    if(i == total-1 ){
-	         //        chk = "data-switch-chk=\"check2\"";
-	         //    }
 	        	
 	        	var glt_img = "images/common/others/empty_img_all_l.png";
 	        	var glo_img = "images/common/others/empty_img_all_l.png";
@@ -3547,34 +3547,24 @@ $(function(){
 			//設定調整團體頭像
     		$(document).data("group-avatar",true);
 
-	        //將限制取消 就可以取得真正的長度
-        	// $(".sm-group-list-area-add").removeAttr("style");
-
-        	//新增團體 要重寫團體列表 調整團體頭像
-	        //為了調整團體頭像 必須用高度加overflow方式來做其餘團體開合 避免用toggle造成的display none 那會不能計算圖的長寬
-	        // var resize_height = $(".sm-group-list-area-add").height();
-
-	        //新增團體 以及隱藏團體區已經有資料 才要增加高
-        	// if(new_gi && $(".sm-group-list-area-add").html()) {
-        	// 	resize_height = $(".sm-group-list-area-add").data("height") + $(".sm-group-area").height()+1;
-        	// }
-
-        	// $(".sm-group-list-area-add").data("height",resize_height);	
-	        //歸零 表示為關閉狀態
-	        // $(".sm-group-list-area-add").css("height",0);
-
 	        //new gi 表示新增團體 完成後跳訊息
 	        if(new_gi) {
 	        	//創建團體結束 取消強制開啓loading 圖示
 	        	s_load_show = false;
 
-	        	if(invite){
-	        		toastShow("恭喜您成功加入團體！");
-	        	}else{
-	        		toastShow("團體建立成功");
-	        		$.mobile.changePage("#page-group-main");
-	        		timelineSwitch("feeds");
-	        	}
+                //加入gu all
+                setGroupAllUser(false,new_gi,function(){
+                    if(invite){
+                        toastShow("恭喜您成功加入團體！");
+                    }else{
+
+                        toastShow("團體建立成功");
+                        $.mobile.changePage("#page-group-main");
+                        timelineSwitch("feeds");
+
+                        setSidemenuHeader(new_gi);
+                    }
+                });
 	        }
 	    });
 	}
@@ -3676,10 +3666,10 @@ $(function(){
 	    	if(data.status != 200) return false;
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
-            cns.debug("timeline_list:",timeline_list);
+
 	    	//沒資料 後面就什麼都不用了
 	    	if( timeline_list.length == 0 ) {
-	    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");
+	    		$(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
 	        	//關閉timeline loading 開啟沒資料圖示
 	        	setTimeout(function(){
 	        		$(".st-feedbox-area-bottom > img").hide();
@@ -3712,7 +3702,7 @@ $(function(){
 			    	//資料個數少於這個數量 表示沒東西了
 			        if(timeline_list.length < 10){
 			        	//沒資料的確認 加入no data 
-			    		$(".feed-subarea[data-feed=" + event_tp + "]").append("<p class='no-data'></p>");
+			    		$(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
 			        	//關閉timeline loading 開啟沒資料圖示
 			        	setTimeout(function(){
 			        		$(".st-feedbox-area-bottom > img").hide();
@@ -3829,11 +3819,6 @@ $(function(){
                 //reset selector
                 selector = ori_selector;
 
-                //寫入最舊的一筆時間 11/12 改成每次list的最後一筆
-                // if(!selector.data("last-ct") || (selector.data("last-ct") && selector.data("last-ct") > val.meta.ct)){
-                //     selector.data("last-ct",val.meta.ct);
-                // }
-
                 //讀完就可重新滾動撈取舊資料 setTimeOut避免還沒寫入時就重新撈取
                 setTimeout(function(){
                     selector.data("scroll-chk",false);
@@ -3875,6 +3860,12 @@ $(function(){
 
             //調整留言欄
             this_event.find(".st-reply-message-textarea").css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
+
+            //autosize textarea
+            this_event.find('.st-reply-message-textarea textarea').autosize({append: "\n"});
+
+
+
 
             //記錄timeline種類
             this_event.attr("data-event-id",val.ei);
@@ -5851,6 +5842,7 @@ $(function(){
             });
         });
     }
+
 
     //反過來 點選四次 關閉
     supriseKey = function(){

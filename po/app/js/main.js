@@ -124,7 +124,7 @@ $(function(){
 		var feed_type = $("#page-group-main").data("navi") || "00";
 
 		//判斷沒資料的元件存在時 就不動作
-		if($(".feed-subarea[data-feed=" + feed_type + "] .no-data").length) return false;
+		if($(".feed-subarea[data-feed=" + feed_type + "]").hasClass("no-data")) return;
 		
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
 		var last_show_event = this_navi.find(".filter-show").last();
@@ -718,25 +718,24 @@ $(function(){
 		//每次選擇完檔案 就reset input file
 		file_ori.replaceWith( file_ori.val('').clone( true ) );
 	});
-
-	//留言
-	$(document).on('click','.st-message',function(){
-		//設定 this event
-		var this_event = $(this).parents(".st-sub-box");
-
-		if(this_event.data("detail-page")) return false;
-		//調整寬度
-		this_event.find(".st-reply-message-textarea").css("width",$(window).width()-200);
-		
-		//判斷開啟或關閉
-		var movement = $(".st-reply-message-area").data("movement");
-
-		//開啟detail
-		if(!this_event.data("switch-chk")){
-			this_event.find(".st-sub-box-1").trigger("detailShow");
+	
+	//留言ui調整
+	$(document).on("input",".st-reply-message-textarea textarea",function(){
+		var this_textarea = $(this);
+		if(this_textarea.height() > 40 && this_textarea.parent().hasClass("adjust")) {
+			this_textarea.parent().removeClass("adjust");
+			this_textarea.addClass("textarea-animated");
+			return false;
 		}
 
-		this_event.find(".st-reply-message-area").slideToggle();
+		setTimeout(function(){
+			cns.debug("this_textarea.height()",this_textarea.height());
+			if (this_textarea.height() < 40 && !this_textarea.parent().hasClass("adjust")) {
+				this_textarea.parent().addClass("adjust");
+				this_textarea.removeClass("textarea-animated");
+			}
+		},201);
+			
 	});
 
 	//留言送出
@@ -800,6 +799,9 @@ $(function(){
 	
 	$(".feed-compose").click(function(){
 		//管理者可開啟公告
+		cns.debug("gi gu",gi +" && "+ gu  +" && "+ ui);
+		cns.debug("$.lStorage(ui)[gi]",$.lStorage(ui)[gi]);
+		cns.debug("$.lStorage(ui)[gi].guAll[gu]",$.lStorage(ui)[gi].guAll[gu]);
 		if($.lStorage(ui)[gi].guAll[gu].ad == 1){
 			$(".fc-area-subbox[data-fc-box=announcement]").show();
 		}else{
