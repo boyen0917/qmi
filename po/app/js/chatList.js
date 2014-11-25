@@ -286,9 +286,8 @@ function setLastMsg( giTmp, ciTmp, table, isRoomOpen ){
 }
 
 function setLastMsgContent( giTmp, ciTmp, table, data, isRoomOpen ){
-	if( gi!=giTmp ) return;
 	var userData = $.lStorage(ui);
-	var groupData = userData[gi];
+	var groupData = userData[giTmp];
 	if( null==groupData || null==groupData.chatAll ) return;
 	if( !groupData.chatAll.hasOwnProperty(ciTmp) ) return;
 	var room = groupData.chatAll[ciTmp];
@@ -320,24 +319,26 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isRoomOpen ){
 			break;
 	}
 
-	if(table){
-		table.data("time", data.meta.ct);
-		var msgDom = table.find(".msg");
-		var timeDom = table.find(".time");
+	if( gi==giTmp ){
+		if(table){
+			table.data("time", data.meta.ct);
+			var msgDom = table.find(".msg");
+			var timeDom = table.find(".time");
 
-		if(msgDom)	msgDom.html( text.replaceOriEmojiCode() );
-		// cns.debug( new Date(data.meta.ct).toFormatString() );
-		if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
-		if( false ==isRoomOpen ){
-			var cntDom = table.find(".cnt");
-			if(cntDom){
-				var cntText = "";
-				if( unreadCnt>99 ){
-					cntText = "99+"
-				} else if(unreadCnt&&unreadCnt>0){
-					cntText = unreadCnt;
+			if(msgDom)	msgDom.html( text.replaceOriEmojiCode() );
+			// cns.debug( new Date(data.meta.ct).toFormatString() );
+			if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
+			if( false ==isRoomOpen ){
+				var cntDom = table.find(".cnt");
+				if(cntDom){
+					var cntText = "";
+					if( unreadCnt>99 ){
+						cntText = "99+"
+					} else if(unreadCnt&&unreadCnt>0){
+						cntText = unreadCnt;
+					}
+					cntDom.html(cntText);
 				}
-				cntDom.html(cntText);
 			}
 		}
 	}
