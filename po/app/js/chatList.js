@@ -264,7 +264,7 @@ function setLastMsg( giTmp, ciTmp, table, isRoomOpen ){
 	    if( list.length>0 ){
 	    	if( null!=list[0] ){
 	        	var object = list[0].data;
-	        	setLastMsgContent( ciTmp, table, object, isRoomOpen );
+	        	setLastMsgContent( giTmp, ciTmp, table, object, isRoomOpen );
 	    	}
 	    }
 	},{
@@ -285,9 +285,12 @@ function setLastMsg( giTmp, ciTmp, table, isRoomOpen ){
 	});
 }
 
-function setLastMsgContent( ciTmp, table, data, isRoomOpen ){
+function setLastMsgContent( giTmp, ciTmp, table, data, isRoomOpen ){
+	if( gi!=giTmp ) return;
 	var userData = $.lStorage(ui);
 	var groupData = userData[gi];
+	if( null==groupData || null==groupData.chatAll ) return;
+	if( !groupData.chatAll.hasOwnProperty(ciTmp) ) return;
 	var room = groupData.chatAll[ciTmp];
 	if( null==room ){
 		cns.debug("null room, ci:", ciTmp);
@@ -295,6 +298,7 @@ function setLastMsgContent( ciTmp, table, data, isRoomOpen ){
 	}
 	var unreadCnt = room.unreadCnt;
 	var text = "";
+	if( !groupData.guAll.hasOwnProperty(data.meta.gu) ) return;
 	var mem = groupData.guAll[data.meta.gu];
 	if( null==mem ) return;
 	var name = mem.nk;
