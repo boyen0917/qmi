@@ -379,12 +379,15 @@ $(function(){
 	});
 	
 	//更換團體
-	$(document).on("click",".sm-group-area",function(){
+	$(document).on("click",".sm-group-area.enable",function(){
+		var this_group = $(this);
+		$(".sm-group-area").removeClass("enable");
+
 		//清空畫面
 		$(".st-top-event-default").show();
 		$(".st-top-event-set").hide();
 		$(".feed-subarea").html("");
-
+		
 		var this_gi = $(this).attr("data-gi");
 		setThisGroup(this_gi);
 		//更新gu all
@@ -392,13 +395,17 @@ $(function(){
 			timelineSwitch("feeds",true);
 
 			setSmUserData(gi,gu,gn);
-
+			cns.debug("this_gi",this_gi);
 			//置頂設定
-			topEvent();;
+			topEvent();
+
+			//左側選單圖案變換
+			setSidemenuHeader(this_gi);
+
+			setTimeout(function(){
+				$(".sm-group-area").addClass("enable");
+			},500);
 		});
-		
-		//左側選單圖案變換
-		setSidemenuHeader(this_gi);
 	});
 	
 	$(".sm-small-area.setting").click(function(){

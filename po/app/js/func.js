@@ -244,7 +244,7 @@ $(function(){
             "at":at,
             "li":lang
         };
-        
+
         var method = "get";
         ajaxDo(api_name,headers,method,false).complete(function(data){
         	if(data.status == 200){
@@ -647,12 +647,14 @@ $(function(){
 
 	//為了避免gu all還沒取得
 	setTopEventUserName = function(this_top_event,this_gu){
+        // alert(gi);
 		var gu_all = $.lStorage(ui)[gi].guAll;
 		if(Object.keys(gu_all).length == 0){
 			var data_arr = ["setTopEventUserName",this_top_event,this_gu];
             cns.debug("setTopEventUserName guall");
 	        setGroupAllUser(data_arr);
 	    }else{
+            // alert(this_gu);
             this_top_event.find(".st-top-event-l img").attr("src",gu_all[this_gu].aut).parent().stop().animate({
                 opacity:1
             },1000);
@@ -3709,7 +3711,7 @@ $(function(){
 	            }
 
 	            var this_group = $(
-	           		'<div class="sm-group-area polling-cnt" data-gi="' + val.gi + '" data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
+	           		'<div class="sm-group-area polling-cnt enable" data-gi="' + val.gi + '" data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
 	           			'<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
 	           	        '<div class="sm-group-area-l group-pic">' +
 	           	            '<img class="aut" src="' + glt_img + '">' +
