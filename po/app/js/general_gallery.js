@@ -24,9 +24,13 @@ $(document).ready(function(){
 
 		var width = 100.0/list.length;
 		for( var i=0; i<list.length; i++ ){
-			var img = $("<div class='img'><img width='100%'/></div>");
+			var img = $("<div class='img'><img style='height: 100%;'/></div>");
 			img.css("width",width+"%");
 			img.data("oriW",width);
+			img.find("img").load( function() {
+				$(this).data("w",this.naturalWidth);
+				$(this).data("h",this.naturalHeight);
+			});
 			if( list[i].s32 ){
 				img.find("img").attr("src", list[i].s32 );
 				// img.css("background-image", "url("+list[i].s32+")" );
@@ -36,9 +40,22 @@ $(document).ready(function(){
 			picArea.append( img );
 		}
 
-		$(".cnt .current").html( 1 );
-		$(".cnt .all").html( list.length );
-		changeImgViewSize(1);
+		if( list.length<=1 ){
+			$(".cnt").hide();
+			$(".cnt .current").html( 1 );
+			$(".cnt .all").html( list.length );
+
+			$(".rBtn").hide();
+			$(".lBtn").hide();
+		} else {
+			$(".cnt").show();
+			$(".cnt .current").html( 1 );
+			$(".cnt .all").html( list.length );
+
+			$(".rBtn").show();
+			$(".lBtn").show();
+		}
+		changeImgViewSize(0);
 	});
 
 	$(".rBtn").off("click").click( moveRight );
@@ -122,7 +139,7 @@ moveRight = function( isMove ){
 	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
 	picArea.data("index", index);
 	$(".cnt .current").html( index+1 );
-	changeImgViewSize(1);
+	changeImgViewSize(0);
 }
 moveLeft = function( isMove ){
 	var picArea = $(".picArea");
@@ -138,7 +155,7 @@ moveLeft = function( isMove ){
 	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
 	picArea.data("index", index);
 	$(".cnt .current").html( index+1 );
-	changeImgViewSize(1);
+	changeImgViewSize(0);
 }
 
 getS3file = function(file_obj,target,tp){
@@ -182,7 +199,7 @@ zoomIn = function(){
 zoomOut = function(){
 	var imgView = $(".picArea");
 	var size = imgView.data("size");
-	size = Math.max(1,size-1);
+	size = Math.max(0,size-1);
 	changeImgViewSize( size );
 }
 changeImgViewSize = function(size){
@@ -194,19 +211,32 @@ changeImgViewSize = function(size){
 
 	cns.debug(size);
 
-	$(".zoom .info").html(size+"x");
 	var img = imgView.find("img");
-	img.css("width", size*100+"%");
-	img.css("height", size*100+"%");
-
-	if( size>1 ){
-		imgView.css("overflow", "scroll");
-		img.css("object-position", "left top");
+	
+	if( size>0 ){
+		var w = img.data("w");
+		var h = img.data("h");
+		img.css("width", w*size+"px");
+		img.css("height", h*size+"px");
+		// if( w>h ){
+			img.css("min-height", "99%");
+		// } else {
+		// 	img.css("min-width", "100%");
+		// }
+		imgView.css("overflow", "auto");
+		// img.css("object-position", "left top");
 		bIsScrollPage = false;
+		$(".zoom .info").html(size+"x");
 	} else {
+		size = 1;
+		img.css("min-width", "");
+		img.css("min-height", "");
+		img.css("width", size*100+"%");
+		img.css("height", size*100+"%");
 		img.css("object-position", "");
 		imgView.css("overflow", "");
 		bIsScrollPage = true;
+		$(".zoom .info").html("auto");
 	}
 	// $(".picArea .align").css("height",(100*size)+"%");
 }

@@ -258,7 +258,7 @@ $(function(){
         		if(branch_list.bl.length) {
                     //初始化陣列
         			$.each(branch_list.bl,function(i,val){
-        				var bp_arr = val.bp.split(".");
+                        var bp_arr = val.bp.replace(/^\./, '').split(".");
                         var pi = "";
                         if(bp_arr.length > 1){
                             pi = bp_arr[bp_arr.length-2]
