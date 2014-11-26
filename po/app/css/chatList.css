@@ -267,6 +267,9 @@
 	object-fit: cover;
 	margin-top: -4px;
 }
+.newChat-content .mem .namecard, .newChatDetail-content .mem .namecard{
+	cursor: pointer;
+}
 
 /*
               ██████╗ ███████╗████████╗ █████╗ ██╗██╗               

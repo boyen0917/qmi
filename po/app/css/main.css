@@ -3975,6 +3975,7 @@ img.user-info-back {
 	padding-top: 8px;
 	font-size: 18px;
 	color: rgb(142,176,184);
+	cursor: pointer;
 }
 
 .user-info-load .action div:active {

@@ -5660,6 +5660,11 @@ $(function(){
                 $(".user-info-load-area .me").removeClass("me-rotate");
                 $(".user-info-load-area .me").removeClass("backface-visibility");
                 this_info.find(".action-edit").hide();
+                this_info.find(".action-chat").off("click").click( function(){
+                    requestNewChatRoomApi(this_gi, "", [{gu:this_gu}], function(data){
+
+                    });
+                });
             }
 
     		getUserInfo([{gi:this_gi,gu:this_gu}],false,function(user_data){
