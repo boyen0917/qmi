@@ -3668,6 +3668,9 @@ input.cp-datetimepicker-end {
 	margin-top: 5px;
 	/* vertical-align: super; */
 }
+.obj-cell-user-pic.namecard, .obj-cell-user-pic .namecard{
+	cursor: pointer;
+}
 
 .obj-cell-user-pic img {
 	width: 60px;
