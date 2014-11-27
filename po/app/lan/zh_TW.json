@@ -1,6 +1,7 @@
 {
 	"LANDING_PAGE_LOGIN" :	"登入",
 	"LANDING_PAGE_REGISTER" :	"註冊",
+	
 	"LOGIN_ACCOUNT" :	"請輸入手機或Email",
 	"LOGIN_PASSWORD" :	"請輸入密碼",
 	"LOGIN_REMEMBER_ACCOUNT" :	"記住帳號",
@@ -61,6 +62,7 @@
 	"MEMBER_CUSTOMIZE_GROUP_NO_MEMBER" : "目前群組內沒有成員會自動刪除群組, 您確定嗎?",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_SUCC" : "刪除群組成功",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_FAIL" : "刪除群組失敗",
+
 	"INVITE_SEARCH" : "搜尋",
 
 	"COMMON_SELECT_MEMBERS"  				: "選擇對象",

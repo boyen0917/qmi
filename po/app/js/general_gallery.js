@@ -205,6 +205,7 @@ zoomOut = function(){
 changeImgViewSize = function(size){
 	var picArea = $(".picArea");
 	var index = picArea.data("index");
+	if( null==index || index<0 ) index = 0;
 	cns.debug( ".img:nth-child("+ (index+1) +")" );
 	var imgView = picArea.find(".img:nth-child("+ (index+1) +")");
 	picArea.data("size",size);
