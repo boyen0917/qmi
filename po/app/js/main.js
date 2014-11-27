@@ -864,7 +864,7 @@ $(function(){
 
 
 	//為了排除複製 滑鼠按下少於0.1秒 判斷為click  暫時不做 
-	$(document).on("mousedown",".st-sub-box-1, .st-sub-box-2",function(e){
+	$(document).on("mousedown",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3 .st-response",function(e){
 		var this_event = $(this);
 
 		this_event.data("trigger",true);
@@ -879,8 +879,12 @@ $(function(){
 		if($(this).data("trigger")) $(this).trigger("detailShow");
 	});
 
+	$(document).on("mouseup",".st-sub-box-3 .st-response",function(e){
+		if($(this).data("trigger")) $(this).parent().trigger("detailShow");
+	});
+
 	//detail view
-	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2",function(){
+	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3",function(){
 
 		var this_event = $(this).parent();
 

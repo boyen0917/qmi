@@ -1074,6 +1074,7 @@ $(function(){
         this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")
         
         //製作每個回覆
+        var okCnt = 0;
         $.each(e_data,function(el_i,el){
             cns.debug("====================回覆============================================================================");
             cns.debug("el",el);
@@ -1232,6 +1233,11 @@ $(function(){
                         }
                     }
                 }
+                okCnt++;
+                if( okCnt==e_data.length ){
+                    cns.debug("slideDown");
+                    this_event.find(".st-reply-all-content-area").slideDown().data("show",true);
+                }
             }));    
         }); 
     }
@@ -1285,7 +1291,10 @@ $(function(){
 		
 		//開啟留言區域
         this_event.find(".st-reply-like-area").toggle();
-		this_event.find(".st-reply-all-content-area").toggle();
+        if( this_event.find(".st-reply-all-content-area").data("show")==true ){
+            cns.debug("slideUp");
+	       this_event.find(".st-reply-all-content-area").slideUp().data("show",false);
+        }
 		
 		//設定動態消息detail開關
 		if(!this_event.data("detail-content")){
@@ -4454,7 +4463,11 @@ $(function(){
 
                     if(val.c){
                         this_event.find(".st-attach-url").click(function(){
-                            this_event.find(".st-sub-box-2-content a")[0].click();
+                            try{
+                                this_event.find(".st-sub-box-2-attach-area a")[0].click();
+                            } catch(e) {
+                                cns.debug(e);
+                            }
                         });
                     }
 
@@ -4475,6 +4488,7 @@ $(function(){
 					
 					this_event.find(".st-attach-url-title").html(val.t);
 					this_event.find(".st-attach-url-desc").html(val.d);
+                    this_event.find(".st-attach-url-link").attr("href", val.c);
 
 					break;
 				case 2:
@@ -5328,7 +5342,10 @@ $(function(){
 		eventStatusWrite(this_event);
 
         //開啓讚好及留言區塊
-        this_event.find(".st-reply-all-content-area").slideDown();
+        if( true == this_event.find(".st-reply-all-content-area").data("show") ){
+            cns.debug("slideUp");
+            this_event.find(".st-reply-all-content-area").slideUp().data("show",false);
+        }
         this_event.find(".st-reply-like-area").show();
 
         //單一動態詳細內容

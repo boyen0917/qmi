@@ -30,8 +30,8 @@ body {
     background-attachment: fixed;
     background-position: center; 
 	background-size:cover;
-	font-family: "reg", "微軟正黑體","Microsoft JhengHei";
-    -webkit-font-smoothing: antialiased;
+	font-family: "reg", "微軟正黑體","Microsoft JhengHei",arial,sans-serif;
+    /*-webkit-font-smoothing: antialiased;*/
     font-weight: normal;
     /*text-shadow: 0 0 0 #fff;*/
 }

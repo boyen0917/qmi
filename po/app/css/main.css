@@ -1,9 +1,10 @@
 /* z-index 區域最高100 全域遮罩1000  全域遮罩上的元件1100 */
 
 body{
-    font-family: "微軟正黑體","Microsoft JhengHei";
-    -webkit-font-smoothing: antialiased;
+    font-family: "微軟正黑體","Microsoft JhengHei",arial,sans-serif;
+    /*-webkit-font-smoothing: antialiased;*/
     font-weight: normal;
+    font-size: 16px;
 }
 /* jquery mobile某些class會設text-shadow
 會造成windows有底色的字看起來糊糊的 */

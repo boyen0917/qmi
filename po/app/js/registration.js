@@ -41,7 +41,10 @@ $(function(){
 			$(".login-next").removeClass("login-next-adjust");
 		}
 
-		if($.lStorage("_loginAutoChk")) $(".login-auto").addClass("login-auto-active");
+		if($.lStorage("_loginAutoChk")){
+			$(".login-auto").find("img").attr("src","images/common/icon/icon_check_gray_check.png");
+    		$(".login-auto").data("chk",true);
+    	}
 
 		$.mobile.changePage("#page-login", {transition: "slide"});
 	});

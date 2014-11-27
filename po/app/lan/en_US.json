@@ -17,6 +17,8 @@
 	"COMMON_SELF" :	"self",
 	"COMMON_YESTERDAY" :	"Yesterday",
 	"COMMON_YOU" :	"You",
+	"COMMON_COUNTRY_TAIWAN":"Taiwan",
+	
 	"FEED_BULLETIN" :	"Bulletin",
 	"FEED_LOCATION" :	"Location",
 	"FEED_MISSION_LOCATION" :	"Mission-Location Report",
