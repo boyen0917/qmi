@@ -20,6 +20,11 @@ $(function(){
 
 	//語言
 	lang = "zh_TW";
+	var userLang = navigator.language || navigator.userLanguage; 
+ 	userLang = userLang.replace(/-/g,"_");
+ 	if( userLang=="en_US" || "zh_TW" ){
+ 		lang = userLang;
+ 	}
 	
 	//動態消息的字數限制
 	content_limit = 400;

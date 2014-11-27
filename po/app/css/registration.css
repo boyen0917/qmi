@@ -142,32 +142,44 @@
 .login-option {
 	position: relative;
 	display: -webkit-box;
-	width: 295px;
-	margin: -8px auto;
+	width: 205px;
+	margin: 10px auto;
 	-webkit-user-select: none;
-}
-
-.login-remeber img {
-	width: 25px;
-	position: relative;
-	top: 6px;
-	margin-right: 5px;
-}
-
-.login-auto {
-	position: relative;
-	left: 102px;
-	top: 15px;
-	width: 75px;
-	border: 2px solid #d2d2d2;
-	border-radius: 12px;
-	padding: 0 5px 0 8px;
-	font-size: 15px;
-	color: #555;
 	text-align: center;
-	margin: auto;
-	cursor: pointer;
+	white-space: nowrap;
+	right: -15px;
+}
+/*.login-option ~ .login-option {
+	margin-left: 0;
+}
+.login-option {
+	margin-left: -webkit-calc( 50% - 138px);
+	display: inline-block;
+	width: 128px;
+	margin-top: 15px; 
 	-webkit-user-select: none;
+	text-align: center;
+	white-space: nowrap;
+}*/
+
+.login-option .text{
+	width: 151px;
+	text-align: center;
+	display: inline-block;
+}
+.login-remeber, .login-auto{
+	width: 100%;
+	text-align: left;
+}
+
+
+.login-remeber img, .login-auto img {
+	width: 25px;
+	margin-right: 5px;
+	vertical-align: middle;
+}
+.login-remember .text, .login-auto .text{
+	vertical-align: middle;
 }
 
  .login-auto-active {
@@ -176,15 +188,20 @@
  }
 
 .login-forget-pw {
-	position: absolute;
-	right: 0px;
-	top: 7px;
-	border: 2px solid #d2d2d2;
-	border-radius: 12px;
-	padding: 0 5px 0 8px;
+	position: relative;
+	left: 106px;
+	/* top: 17px; */
+	/* border: 2px solid #d2d2d2; */
+	/* border-radius: 12px; */
+	/* padding: 0 5px 0 8px; */
 	font-size: 15px;
 	color: #555;
 	cursor: pointer;
+	width: 95px;
+	margin-left: auto;
+	margin-right: auto;
+	color: rgb(98,162,223);
+	margin-bottom: -31px;
 }
 
 .login-forget-pw:active{
@@ -203,7 +220,7 @@
 	margin: 0 auto;	
 }
 
-.login-remeber , .login-forget-pw {
+.login-remeber , .login-forget-pw, .login-auto {
 	cursor: pointer;
 }
 
@@ -260,9 +277,14 @@ input {
 }
 
 .register-text {
-	font-size: 13px;
+	font-size: 15px;
 	margin: 0 auto;
 	display: table;
+}
+.register-text img{
+	width: 22px;
+	vertical-align: middle;
+	margin-right: 5px;
 }
 
 .register-next, .resend-otp, .register-otp-next, .password-next, .setting-next, .login-next, .login-change {
@@ -321,10 +343,11 @@ input {
 }
 
 .register-otp-input input {
-	width: 100px;
+	width: 245px;
 	margin: 0 auto;
 	font-size: 15px;
 	border: 0;
+	text-align: center;
 }
 
 .resend-otp {

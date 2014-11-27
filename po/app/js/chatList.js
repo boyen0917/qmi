@@ -34,17 +34,17 @@ initChatList = function(){
 
 	//---- get chat list -----
 	//clear old contect
-	updateChatList();
+	updateChatList(gi);
 }
 
-function updateChatList( extraCallBack ){
+function updateChatList( giTmp, extraCallBack ){
 	var userData = $.lStorage(ui);
 	if( !userData )	return;
-	var currentGroup = userData[gi];
+	var currentGroup = userData[giTmp];
 	if( !currentGroup )	return;
 
 	//取得聊天室列表
-	var api_name = "groups/"+ gi +"/chats";
+	var api_name = "groups/"+ giTmp +"/chats";
 
 	var headers = {
 	        ui:ui,
@@ -215,7 +215,7 @@ function deleteRoom ( deleteRow ){
 	result.complete(function(data){
 		if(data.status == 200){
 			//delete room succ
-			updateChatList();
+			updateChatList(gi);
 			toastShow( $.i18n.getString("CHAT_DELETE_CHATROOM_SUCC") );
 		} else {
 			//delete room fail
@@ -402,7 +402,9 @@ function showNewRoomPage(){
 		var memDiv = $("<div class='mem'></div>");
 		memDiv.append("<div class='checkbox' data-memid='"+guid+"' data-memname='"+mem.nk+"' check='false'></div>");
 		if(mem.auo){
-			memDiv.append("<img src='"+mem.auo+"'>");
+			memDiv.append("<img class='namecard' src='"+mem.auo+"'>");
+			memDiv.find("img").data("gu", guid);
+			memDiv.find("img").data("gi", gi);
 		} else {
 			memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
 		}
@@ -532,7 +534,9 @@ function showNewRoomDetailPage(){
 		var mem = currentGroup.guAll[ g_newChatMemList[i] ];
 		var memDiv = $("<div class='mem'></div>");
 		if(mem.auo){
-			memDiv.append("<img src='"+mem.auo+"'>");
+			memDiv.append("<img class='namecard' src='"+mem.auo+"'>");
+			memDiv.find("img").data("gu", g_newChatMemList[i]);
+			memDiv.find("img").data("gi", gi);
 		} else {
 			memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
 		}
@@ -573,7 +577,14 @@ function requestNewChatRoom(){
 		return;
 	}
 
-	var api_name = "/groups/"+gi+"/chats";
+	requestNewChatRoomApi( gi, text, arr, function(data){
+    	$.mobile.changePage("#page-group-main");
+    });
+
+}
+
+function requestNewChatRoomApi(giTmp, cnTmp, arr, callback){
+	var api_name = "/groups/"+giTmp+"/chats";
 
     var headers = {
         ui: ui,
@@ -581,23 +592,21 @@ function requestNewChatRoom(){
         li: lang
     };
     var body = {
-        cn: text,
+        cn: cnTmp,
         gul: arr
     };
 
     // cns.debug( JSON.stringify(body) );
     var method = "post";
-    ajaxDo(api_name,headers,method,true,body).complete(function(data){
+    ajaxDo(api_name,headers,method,true,body).complete( function(data){
     	if(data.status == 200){
     		var result = $.parseJSON(data.responseText);
     		// cns.debug(result);
-    		$.mobile.changePage("#page-group-main");
-    		updateChatList( function(){
+    		updateChatList( giTmp, function(){
     			if(result.ci){
-
     				//還沒有聊過天的話server聊天室列表不會有這個聊天室
     				var userData = $.lStorage( ui );
-				    g_group = userData[gi];
+				    g_group = userData[giTmp];
 				    if( null==g_group["chatAll"][result.ci] ){
 				    	g_group["chatAll"][result.ci] = {
 				    		ci: result.ci,
@@ -607,8 +616,8 @@ function requestNewChatRoom(){
 				    		g_group["chatAll"][result.ci].tp = 1;
 				    		g_group["chatAll"][result.ci].cn = me+","+memGu;
 				    		var mem = g_group["guAll"][memGu];
-				    		if( mem )	g_group["chatAll"][result.ci].uiName = mem.nk;
-				    		else	g_group["chatAll"][result.ci].uiName = "";
+				    		if( mem ) g_group["chatAll"][result.ci].uiName = mem.nk;
+				    		else g_group["chatAll"][result.ci].uiName = "";
 				    		
 				    	} else {
 				    		g_group["chatAll"][result.ci].tp = 2;
@@ -623,13 +632,15 @@ function requestNewChatRoom(){
 	    				openChatWindow( result.ci );
 	    			},300);
 			    }
+    			callback( result );
     		});
     		// //api上面寫這個可能是批次新增用的..?!
     		// for( var i in result.cl ){
     		// 	var ci = result.cl[i].ci;
     		// 	openChatWindow( ci );
     		// }
+    	} else {
+    		callback( null );
     	}
-    });
-
+    })
 }

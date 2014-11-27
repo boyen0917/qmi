@@ -12,9 +12,10 @@
         <script src="../js/jquery.js"></script>
         <script src="../js/jquery.mobile-1.3.2.min.js"></script>
         <script src="js/jquery.plugin.js"></script>
+        <script type="text/javascript" src="../js/jquery.i18n.js"></script>
         <script type="text/javascript" src="js/init.js?1234"></script>
-        <script type="text/javascript" src="js/registration.js?1234"></script>
         <script type="text/javascript" src="js/tool.js?1234"></script>
+        <script type="text/javascript" src="js/registration.js?1234"></script>
 
         <!-- IDBWrapper -->
         <script src="js/idb/idb.js"></script>
@@ -49,8 +50,8 @@
                 </div>
                 <div class="login-desc"> World's Largest Professional Network</div>
 	            <div class="login-area">
-                    <div class="login">登入</div>
-                    <div class="register">註冊</div>
+                    <div class="login" data-textid="LANDING_PAGE_LOGIN"></div>
+                    <div class="register" data-textid="LANDING_PAGE_REGISTER"></div>
 	            </div>
 	        </div>
         </div>
@@ -58,21 +59,21 @@
         <div data-role="page" id="page-login">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3 class="page-title">登入</h3>
+                <h3 class="page-title" data-textid="LANDING_PAGE_LOGIN"></h3>
             </div>
             <div class="login-content">
                 <div class="login-default-area" style="">
                     <div class="countrycode">
-                        <span>台灣</span>
+                        <span data-textid="COMMON_COUNTRY_TAIWAN"></span>
                         <span>+886</span>
                         <img src="images/common/icon/icon_arrow_next.png"/>
                     </div>
                     <div class="login-phone">
-                        <input type="text" maxlength=10 placeholder="請輸入手機號碼" data-role="none"/>  
+                        <input type="text" maxlength=10 data-role="none" data-textph-id="LOGIN_ACCOUNT"/>  
                         <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
                     </div>
                     <div class="login-password">
-                        <input type="password" maxlength=20 placeholder="請輸入密碼" data-role="none"/>  
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="LOGIN_PASSWORD"/>  
                         <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
                     </div>
                 </div>
@@ -84,13 +85,29 @@
                         </div>
                         <img src="images/common/others/frame_130x130.png"/>
                     </div>
-                    <div class="login-account"><span>帳號</span><span></span></div>
+                    <div class="login-account">
+                        <span data-textid="LOGIN_SAVE_ACCOUNT_TITLE"></span><span></span>
+                    </div>
                     <div class="login-remeber-password">
-                        <input type="password" maxlength=20 placeholder="請輸入密碼" data-role="none"/>  
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="LOGIN_PASSWORD"/>  
                     </div>
                 </div>
                 
+                <div class="login-forget-pw" style="display:none;" data-textid="LOGIN_FORGET_PASSWORD"></div>
                 <div class="login-option">
+                    <div class="login-remeber">
+                        <img src="images/common/icon/icon_check_gray.png">
+                        <div class="text" data-textid="LOGIN_REMEMBER_ACCOUNT"></div>
+                    </div>
+                </div>
+                <div class="login-option">
+                    <div class="login-auto">
+                        <img src="images/common/icon/icon_check_gray.png">
+                        <div class="text" data-textid="LOGIN_AUTO_LOGIN"></div>
+                    </div>
+                </div>
+
+                <!-- <div class="login-option">
                     <div class="login-remeber">
                         <img src="images/common/icon/icon_check_gray.png"/>
                         <span>記住帳號</span>
@@ -99,17 +116,20 @@
                         忘記密碼？
                     </div>
                 </div>
-                <div class="login-auto">自動登入</div>
+                <div class="login-auto">
+                    <img src="images/common/icon/icon_check_gray.png"/>
+                    <span>自動登入</span>
+                </div> -->
                  
-                 <div class="login-next">登入</div>
-                 <div class="login-change login-change-ready" style="display:none">切換帳號</div>
+                 <div class="login-next" data-textid="LANDING_PAGE_LOGIN"></div>
+                 <div class="login-change login-change-ready" style="display:none" data-textid="LOGIN_SWITCH_ACCOUNT"></div>
             </div>
         </div>
 <!---------------------------------- page-register ------------------------------------>
         <div data-role="page" id="page-register">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3 class="page-title">手機號碼註冊</h3>
+                <h3 class="page-title" data-textid="REGISTER_ACCOUNT_REGITST_TITLE"></h3>
             </div>
             <div class="register-content">
                 <div class="register-area">
@@ -119,55 +139,54 @@
                         <img src="images/common/icon/icon_arrow_next.png"/>
                     </div>
                     <div class="register-phone">
-                        <input type="text" maxlength=10 placeholder="請輸入手機號碼" data-role="none"/>  
+                        <input type="text" maxlength=10 data-role="none" data-textph-id="LOGIN_ACCOUNT"/>  
                         <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
                     </div>
                     
                 </div>
                 
                 <div class="register-text">
-                    建立此帳戶，代表您同意
-                    <a href="#">使用者條款</a>及
-                    <a href="#">隱私權政策</a>
+                    <img src="images/common/icon/icon_check_gray.png"/>
+                    <span></span>
                 </div>
                  
-                 <div class="register-next">下一步</div>
+                 <div class="register-next" data-textid="COMMON_NEXT"></div>
             </div>
         </div>
 <!---------------------------------- page-register-otp ------------------------------------>
         <div data-role="page" id="page-register-otp">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3 class="page-title">手機號碼註冊</h3>
+                <h3 class="page-title" data-textid="REGISTER_ACCOUNT_REGITST_TITLE"></h3>
             </div>
             <div class="register-otp-content">
                 <div class="register-otp-desc-area">
-                     我們已傳送<span>簡訊驗證碼</span>至此手機號碼
+                     <span data-textid="REGISTER_AUTH_SMS_HAS_SENT"></span>
                      <div></div>
                 </div>
                 <div class="register-otp-input">
-                    <input type="text" maxlength=4 placeholder="請輸入驗證碼" data-role="none"/>  
+                    <input type="text" maxlength=4 data-role="none" data-textph-id="REGISTER_AUTH_ENTER_CODE"/>  
                 </div>
-                <div class="resend-otp">重送驗證碼</div>
-                <div class="register-otp-next">下一步</div>
+                <div class="resend-otp" data-textid="REGISTER_AUTH_RESEND_CODE"></div>
+                <div class="register-otp-next" data-textid="COMMON_NEXT"></div>
             </div>
         </div>
 <!---------------------------------- page-password ------------------------------------>
         <div data-role="page" id="page-password">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3 class="page-title">密碼設定</h3>
+                <h3 class="page-title" data-textid="REGISTER_PASSWORD_TITLE"></h3>
             </div>
             <div class="password-content">
                 <div class="password-setting-area">
                     <div class="password-setting">
-                        <input type="password" maxlength=20 placeholder="請輸入6-20半行英數字" data-role="none"/>  
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="REGISTER_PASSWORD_PASSWORD_PLACEHOLDER"/>  
                     </div>
                     <div class="password-confirm">
-                        <input type="password" maxlength=20 placeholder="確認密碼" data-role="none"/>  
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="REGISTER_PASSWORD_CONFIRM_PLACEHOLDER"/>  
                     </div>
                 </div>
-                <div class="password-next">確認</div>
+                <div class="password-next" data-textid="COMMON_OK">COMMON_OK</div>
             </div>
         </div>
 
@@ -175,7 +194,7 @@
         <div data-role="page" id="page-user-setting">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3 class="page-title">資料設定</h3>
+                <h3 class="page-title" data-textid="REGISTER_SETTING_TITLE"></h3>
             </div>
             <div class="setting-content">
                 <div class="setting-area">
@@ -185,19 +204,19 @@
                     <input class="avatar-file" type="file" style="display:none;" data-role="none"/>
                     <div class="setting-name-area">
                         <div class="setting-first-name">
-                            <input type="text" maxlength=20 placeholder="名" data-role="none"/>  
+                            <input type="text" maxlength=20 data-role="none" data-textph-id="REGISTER_SETTING_FIRST_NAME"/>  
                         </div>
                         <div class="setting-last-name">
-                            <input type="text" maxlength=20 placeholder="姓" data-role="none"/>  
+                            <input type="text" maxlength=20 data-role="none" data-textph-id="REGISTER_SETTING_LAST_NAME"/>  
                         </div>
                     </div>
                     <div class="setting-birth">
-                        <input type="text" maxlength=20 placeholder="生日" data-role="none" readonly/>  
+                        <input type="text" maxlength=20 data-role="none" readonly data-textph-id="REGISTER_SETTING_BIRTHDAY"/>  
                     </div>
                     <input class="setting-birth-hidden" type="text" data-role="none" disabled="disabled"/>
                 </div>
                     
-                <div class="setting-next">下一步</div>
+                <div class="setting-next" data-textid="COMMON_NEXT"></div>
             </div>
         </div>
 
@@ -212,8 +231,8 @@
                 <div class="popup-title"></div>
                 <div class="popup-text" style="display:none"></div>
                 <div class="popup-confirm-area">
-                    <div class="popup-cancel" style="display:none">取消</div>
-                    <div class="popup-confirm" style="display:none">確定</div>    
+                    <div class="popup-cancel" style="display:none" data-textid="COMMON_CANCEL"></div>
+                    <div class="popup-confirm" style="display:none" data-textid="COMMON_OK"></div>    
                 </div>
                 
             </div>

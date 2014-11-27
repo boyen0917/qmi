@@ -84,7 +84,7 @@
 .subpage-chatList-row .time {
 	color: #444648;
 	width: 100%;
-	font-size: 10px;
+	font-size: 12px;
 	padding-bottom: 10px;
 }
 .subpage-chatList-row .cnt {
@@ -266,6 +266,9 @@
 	border-width: 1px;
 	object-fit: cover;
 	margin-top: -4px;
+}
+.newChat-content .mem .namecard, .newChatDetail-content .mem .namecard{
+	cursor: pointer;
 }
 
 /*

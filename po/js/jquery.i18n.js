@@ -102,7 +102,7 @@
   		if (dict && dict.hasOwnProperty(str)) {
   			str = dict[str];
   		} else {
-        "[!"+str+"]";
+        str = "[!"+str+"]";
         cns.debug("[!]error str: ", str);
       }
       args = __slice.call(arguments);
@@ -155,9 +155,15 @@
   };
 
   $.fn._i18n = function(params) {
+    //replace html
     $(this).find('[data-textid]').each( function(){
       var id = $(this).data("textid");
       $(this).html( i18n._.apply(i18n, [id]) );
+    });
+    //replace placeholder
+    $(this).find('[data-textph-id]').each( function(){
+      var id = $(this).data("textph-id");
+      $(this).attr( "placeholder", i18n._.apply(i18n, [id]) );
     });
   };
 

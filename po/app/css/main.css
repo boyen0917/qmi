@@ -1,9 +1,15 @@
 /* z-index 區域最高100 全域遮罩1000  全域遮罩上的元件1100 */
 
 body{
-    font-family: "微軟正黑體","Microsoft JhengHei";
-    -webkit-font-smoothing: antialiased;
+    font-family: "微軟正黑體","Microsoft JhengHei",arial,sans-serif;
+    /*-webkit-font-smoothing: antialiased;*/
     font-weight: normal;
+    font-size: 16px;
+}
+/* jquery mobile某些class會設text-shadow
+會造成windows有底色的字看起來糊糊的 */
+div, span, label{
+    text-shadow: none;
 }
 
 .ui-header.ui-bar-c.ui-header-fixed {
@@ -106,7 +112,7 @@ img.auo {
 
 .login-text,.login-text-l,.login-text-r{
     color: #f6f6f6;
-    text-shadow: 0 0 0 #fff;
+    /*text-shadow: 0 0 0 #fff;*/
     text-decoration:none;
 }
 
@@ -214,13 +220,13 @@ img.auo {
 	line-height: 10px;
 	text-align: center;
 	border-radius: 3px;
-	text-shadow: 0 0;
+	/*text-shadow: 0 0;*/
 	color: gainsboro;
 }
 
 .helper-title{
 	background: lightslategrey;
-	text-shadow: 0 0;
+	/*text-shadow: 0 0;*/
 	height: 25px;
 	line-height: 27px;
 	padding-left: 15px;
@@ -245,7 +251,7 @@ img.auo {
 	line-height: 150px;
 	font-size: 45px;
 	text-align: center;
-	text-shadow: 0 1px 1px #000;
+	/*text-shadow: 0 1px 1px #000;*/
 	color: ghostwhite;
 	cursor: pointer;
 }
@@ -626,7 +632,7 @@ img.auo {
 	display: inline;
 	margin: 0 5px;
 	color: rgb(62,136,198);
-	text-shadow: 0 0px rgb(102,176,238);
+	/*text-shadow: 0 0px rgb(102,176,238);*/
 }
 
 .ajax-screen-lock {
@@ -697,7 +703,7 @@ img.auo {
 #side-menu{
 	background:#3a3d41;
 	color: #f5f5f5;
-    text-shadow: 0 0;
+    /*text-shadow: 0 0;*/
     overflow:scroll;
 }
 
@@ -705,7 +711,7 @@ img.auo {
 	background: rgb(57, 148, 232);
 	border-color: rgb(50,73,105);
 	color: white;
-	text-shadow: 0 0;
+	/*text-shadow: 0 0;*/
 }
 
 .ui-panel-animate.ui-panel-content-fixed-toolbar-position-left.ui-panel-content-fixed-toolbar-open.ui-panel-content-fixed-toolbar-display-push{
@@ -1022,14 +1028,14 @@ img.auo {
 .main-contact-r-bar-l {
 	color: #c5cad8;
 	font-size: 14px;
-	text-shadow: 0 1px #000;
+	/*text-shadow: 0 1px #000;*/
 }
 
 .main-contact-r-bar-r {
 	color: #959baf;
 	font-size: 12px;
 	margin-top: 1px;
-	text-shadow: 0 1px #000;
+	/*text-shadow: 0 1px #000;*/
 }
 
 .main-count{
@@ -1181,7 +1187,7 @@ img.auo {
 	width: -webkit-calc(100% - 250px);
 	padding-top: 5px;
 	color: white;
-	text-shadow: 0 0;
+	/*text-shadow: 0 0;*/
 }
 
 .gm-adjustment { height: 56px; }
@@ -3491,7 +3497,7 @@ input.cp-datetimepicker-end {
 	color: #4092ef;
 	/* white-space: pre-line; */
 	/* text-align: justify; */
-	text-shadow: 0px 0px 0px rgb(71,150,237);
+	/*text-shadow: 0px 0px 0px rgb(71,150,237);*/
 	position: relative;
 	top: 3px;
 	left: 10px;
@@ -3667,6 +3673,9 @@ input.cp-datetimepicker-end {
 	border-radius: 5px;
 	margin-top: 5px;
 	/* vertical-align: super; */
+}
+.obj-cell-user-pic.namecard, .obj-cell-user-pic .namecard{
+	cursor: pointer;
 }
 
 .obj-cell-user-pic img {
@@ -3975,6 +3984,7 @@ img.user-info-back {
 	padding-top: 8px;
 	font-size: 18px;
 	color: rgb(142,176,184);
+	cursor: pointer;
 }
 
 .user-info-load .action div:active {
@@ -4010,7 +4020,7 @@ img.user-info-back {
 	top: 12px;
 	right: 10%;
 	color: rgb(177,212,222);
-	text-shadow: 0 0 0 rgb(177,212,222);
+	/*text-shadow: 0 0 0 rgb(177,212,222);*/
 	display: none;
 }
 
@@ -4031,7 +4041,7 @@ img.user-info-back {
 
 .user-avatar-bar .title {
 	margin-top: 3px;
-	text-shadow: 0 0 0 black;
+	/*text-shadow: 0 0 0 black;*/
 	display: none;
 }
 
@@ -4040,7 +4050,7 @@ img.user-info-back {
 	font-weight: 100;
 	font-size: 15px;
 	color: rgb(183,222,231);
-	text-shadow: 0 0 0 rgb(183,222,231);
+	/*text-shadow: 0 0 0 rgb(183,222,231);*/
 	display: none;
 }
 
