@@ -124,7 +124,7 @@ $(function(){
 		var feed_type = $("#page-group-main").data("navi") || "00";
 
 		//判斷沒資料的元件存在時 就不動作
-		if($(".feed-subarea[data-feed=" + feed_type + "]").hasClass("no-data")) return;
+		if($(".feed-subarea[data-feed=" + feed_type + "]").hasClass("no-data")) return;	
 		
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
 		var last_show_event = this_navi.find(".filter-show").last();
@@ -282,79 +282,6 @@ $(function(){
 	    $(".gm-invite").trigger("click");
 	    $.mobile.changePage("#page-group-menu");
 	});
-
-
-
-/*
-
-
- ######  #### ########  ######## ##     ## ######## ##    ## ##     ## 
-##    ##  ##  ##     ## ##       ###   ### ##       ###   ## ##     ## 
-##        ##  ##     ## ##       #### #### ##       ####  ## ##     ## 
- ######   ##  ##     ## ######   ## ### ## ######   ## ## ## ##     ## 
-      ##  ##  ##     ## ##       ##     ## ##       ##  #### ##     ## 
-##    ##  ##  ##     ## ##       ##     ## ##       ##   ### ##     ## 
- ######  #### ########  ######## ##     ## ######## ##    ##  #######  
-	
-
-*/
-
-
-	$(".side-menu-btn").click(function(){
-	    $( "#side-menu" ).panel( "open");
-	});
-
-	$("#page-group-main div[data-role=content]").click(function(e){
-		// e.stopPropagation();
-		// $( "#side-menu" ).panel( "close");
-	});
-	
-	//detect page changing
-	$("#side-menu").on("panelbeforeopen",function(){
-	    //timeline固定右邊頁面
-	    $("#page-group-main .ui-panel-content-wrap").addClass("page-fixed");
-	    
-		//調整頭像大小
-		// var img = $(".sm-user-pic img");
-		// mathAvatarPos(img,img.width(),img.height(),avatar_size);
-
-		//polling
-	});
-	
-
-	$("#side-menu").on( "panelbeforeclose", function() {
-		//timeline固定右邊頁面
-	    $("#page-group-main .ui-panel-content-wrap").removeClass("page-fixed");
-
-		if($(".sm-group-list-area-add").data("switch")){
-			$(".sm-switch-ui-adj").removeClass("sm-switch-ui-adj-show");
-	    	$(".sm-group-list-area-add").data("switch",false);
-	    	$(".sm-group-list-area-add").css("height",0);
-	    }
-	});
-
-	//開關團體列表
-	$(".sm-group-switch").click(function(){
-		var target = $(".sm-group-list-area-add");
-		var target_height = target.data("height");
-
-		if(target.data("switch")){
-			var movement = "-=" + target_height;
-		}else{
-			var movement = "+=" + target_height;
-		}
-		$(".sm-group-list-area-add").animate({
-		    height: movement
-		  	}, 500, function() {
-		  		if(target.data("switch")){
-		  			target.data("switch",false);
-		  			$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_click.png");		
-		  		}else{
-		  			target.data("switch",true);	
-		  			$(".sm-group-switch").find("img").attr("src","images/side_menu/sidemenu_slidedown_icon_none.png");
-		  		}
-	  	});
-	});
 	
 	//更換動態
 	$(document).on("click",".sm-small-area,.sm-group-area",function(){
@@ -369,13 +296,15 @@ $(function(){
 
 		var target = $(this);
 
-		if($(this).hasClass("sm-group-area"))
+		if($(this).hasClass("sm-group-area")){
 			target = $(".sm-small-area[data-sm-act=feeds]");
-		
+		}else{
+			timelineSwitch(target.data("sm-act"));
+		}
 		
 		target.addClass("sm-click-bg");
 		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
-		timelineSwitch(target.data("sm-act"));
+		
 	});
 	
 	//更換團體
@@ -425,13 +354,10 @@ $(function(){
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
 
-		//改filter文字為 全部 
-		// $(".st-filter-main span").html("全部");
-
-		$(".st-navi-area [data-st-navi-group=navi]").each(function(i,val){
-	        //全關 switch開
-			$(this).find("img").attr("src",img_dir + $(this).data("st-navi") + ".png");
-	    });
+		// $(".st-navi-area [data-st-navi-group=navi]").each(function(i,val){
+	 //        //全關 switch開
+		// 	$(this).find("img").attr("src",img_dir + $(this).data("st-navi") + ".png");
+	 //    });
 
 		switch(this_subarea.data("st-navi")){
 	    	case "home":
@@ -509,7 +435,7 @@ $(function(){
 		//過濾發文類型
 		if(filter_status == "navi" || filter_status == "all"){
         	$(".st-navi-subarea[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
-        	return false;
+        	// return false;
 		}
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
@@ -752,7 +678,6 @@ $(function(){
 		}
 
 		setTimeout(function(){
-			cns.debug("this_textarea.height()",this_textarea.height());
 			if (this_textarea.height() < 40 && !this_textarea.parent().hasClass("adjust")) {
 				this_textarea.parent().addClass("adjust");
 				this_textarea.removeClass("textarea-animated");
@@ -934,63 +859,15 @@ $(function(){
 				detailLikeStringMake(this_event);
 			}
 		});
-
+		
 		//單一動態詳細內容
         getEventDetail(this_ei).complete(function(data){
         	if(data.status != 200) return false;
 
         	var e_data = $.parseJSON(data.responseText).el;
 
-        	//計算投票的回文人次
-        	var count = 0;
+        	eventContentDetail(this_event,e_data);
         	
-        	cns.debug("==================== 詳細內容 ================================");
-            cns.debug(JSON.stringify(e_data,null,2));
-            
-            //單一動態詳細內容 根據此則timeline類型 設定並開關區域
-        	//event種類 不同 讀取不同layout
-    		switch(tp){
-    			case 0:
-    				break;
-    			case 1:
-    				break;
-    			case 2:
-    				break;
-    			case 3:
-    				//工作
-    				this_event.find(".st-box2-more-task-area").hide();
-    				this_event.find(".st-box2-more-task-area-detail").show();
-    				//開啟工作細節
-    				this_event.find(".st-task-work-detail").show();
-
-    				if(this_event.data("task-over")) break;
-    				break;
-    			case 4:
-    				this_event.find(".st-box2-more-task-area").hide();
-    				this_event.find(".st-box2-more-task-area-detail").show();
-    				//開啟投票細節
-    				this_event.find(".st-task-vote-detail").show();
-    				
-    				if(this_event.data("task-over")) break;
-    				//判斷有無投票過 顯示送出 已送出 已結束等等
-    				var event_status = this_event.data("event-status");
-    				if(event_status && event_status.ik){
-    					this_event.find(".st-vote-send").html("完成");
-    					this_event.find(".st-vote-send").removeClass(".st-vote-send-blue");
-    				}
-    				
-    				break;
-    			case 5:
-    				break;
-    			case 6:
-    				break;
-    		};
-
-    		//讚留言閱讀
-    		this_event.find(".st-sub-box-3 div:eq(0)").html(e_data[0].meta.lct);
-    		this_event.find(".st-sub-box-3 div:eq(1)").html(e_data[0].meta.pct);
-    		this_event.find(".st-sub-box-3 div:eq(2)").html(e_data[0].meta.rct);
-
     		//detail timeline message內容
 			detailTimelineContentMake(this_event,e_data);
 		});

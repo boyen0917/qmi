@@ -1045,7 +1045,61 @@ $(function(){
 */
 
 
+    eventContentDetail = function(this_event,e_data){
+        //此則timeline種類
+        var tp = this_event.data("timeline-tp");
 
+        //計算投票的回文人次
+        var count = 0;
+
+        cns.debug("==================== 詳細內容 ================================");
+        cns.debug(JSON.stringify(e_data,null,2));
+        
+        //單一動態詳細內容 根據此則timeline類型 設定並開關區域
+        //event種類 不同 讀取不同layout
+        switch(tp){
+         case 0:
+             break;
+         case 1:
+             break;
+         case 2:
+             break;
+         case 3:
+             //工作
+             this_event.find(".st-box2-more-task-area").hide();
+             this_event.find(".st-box2-more-task-area-detail").show();
+             //開啟工作細節
+             this_event.find(".st-task-work-detail").show();
+
+             if(this_event.data("task-over")) break;
+             break;
+         case 4:
+             this_event.find(".st-box2-more-task-area").hide();
+             this_event.find(".st-box2-more-task-area-detail").show();
+             //開啟投票細節
+             this_event.find(".st-task-vote-detail").show();
+                
+             if(this_event.data("task-over")) break;
+             //判斷有無投票過 顯示送出 已送出 已結束等等
+             var event_status = this_event.data("event-status");
+             if(event_status && event_status.ik){
+                 this_event.find(".st-vote-send").html("完成");
+                 this_event.find(".st-vote-send").removeClass(".st-vote-send-blue");
+             }
+             break;
+         case 5:
+             break;
+         case 6:
+             break;
+        };
+
+        //讚留言閱讀
+        this_event.find(".st-sub-box-3 div:eq(0)").html(e_data[0].meta.lct);
+        this_event.find(".st-sub-box-3 div:eq(1)").html(e_data[0].meta.pct);
+        this_event.find(".st-sub-box-3 div:eq(2)").html(e_data[0].meta.rct);
+    }
+
+         
 
 
 	//回覆 detail timeline message內容
@@ -1185,7 +1239,7 @@ $(function(){
                 if(without_message || el.meta.del || (el.meta.tp.substring(0,1)*1 == 0) || reply_duplicate){
                     this_load.parent().remove();
                 }else{
-
+                    cns.debug("reply~~");
 					//製作留言
 					var _groupList = $.lStorage(ui);
 					var user_name = _groupList[this_gi].guAll[el.meta.gu].nk.replaceOriEmojiCode();
@@ -3650,7 +3704,6 @@ $(function(){
 		_groupList[gi].ti_feed = ti_feed;
 		_groupList[gi].ti_chat = ti_chat;
         _groupList[gi].guall = {};
-		cns.debug("_groupList",_groupList);
 		//存回
 		$.lStorage(ui,_groupList);
 	};
@@ -3827,9 +3880,7 @@ $(function(){
 		var this_gi = polling_arr[0] || gi;
 		var this_ti = polling_arr[1] || ti_feed;
 
-
 		var event_tp = $("#page-group-main").data("navi") || "00";
-		// cns.debug("put this_gi:",this_gi);
 	    //製作timeline
 	    var api_name = "groups/"+ this_gi +"/timelines/"+ this_ti +"/events";
 	    if(ct_timer){
@@ -3861,7 +3912,6 @@ $(function(){
 	    	if(data.status != 200) return false;
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
-
 	    	//沒資料 後面就什麼都不用了
 	    	if( timeline_list.length == 0 ) {
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
@@ -3890,10 +3940,8 @@ $(function(){
 		                idb_timeline_events.put(val);
 		            });
 		    	}
-				// return false;
 
 		    	if(polling_arr.length == 0){
-		    		// cns.debug("??");
 			    	//資料個數少於這個數量 表示沒東西了
 			        if(timeline_list.length < 10){
 			        	//沒資料的確認 加入no data 
@@ -4215,33 +4263,26 @@ $(function(){
     }
 
 	timelineListWrite = function (ct_timer,is_top){
-        // var ct_timer = ct_timer || "1415721551557";
 		//判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
     	if(!ct_timer && !is_top){
     		var event_tp = $("#page-group-main").data("navi") || "00";
     		var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
-    		if(selector.find(".load-chk").length){
-    			//隱藏其他類別
-				$(".feed-subarea").hide();
-				selector.show();
-	    		return false;
-    		}else{
-    			//load_chk 避免沒資料的
-	    		selector.append("<p class='load-chk'></p>");
-    		}
-    	}
+            //隱藏其他類別
+            $(".feed-subarea").hide();
+            selector.show();
+            //load_chk 避免沒資料的
+            selector.append("<p class='load-chk'></p>");
 
-    	// cns.debug("ct_timer:",ct_timer);
+    		// if(selector.find(".load-chk").length) return false;
+    	}
 
 		var idb_timer = ct_timer - 1 || 9999999999999;
 		//取得server最新資訊 更新資料庫
-		// cns.debug("timeline ct_timer:",ct_timer);
 		idbPutTimelineEvent(ct_timer,is_top);
 
 		//下拉更新就不需要資料庫了
 		if(is_top) return false;
-		// return false;
 
 		//判斷類別
 		var idb_index,idb_keyRange;
@@ -4322,11 +4363,15 @@ $(function(){
 
 	eventFilter = function(this_event,filter){
 		var filter = filter || "all";
+        
+        if(filter == "navi"){
+            filter = "all";
+        }
 
 		//先關再開
 		this_event.hide();
 		var event_id = this_event.data("event-id");
-		var event_status = this_event.data("event-status");
+		var event_status = this_event.data("event-val").meta;
 		
 		//用以判斷下拉更新
 		this_event.removeClass("filter-show");
@@ -4335,9 +4380,9 @@ $(function(){
 		if(filter == "all"){
 			show_chk = true;
 		}else if(filter == "read"){
-			if(event_status && event_status[event_id] && event_status[event_id].ir) show_chk = true;
+			if(event_status.ir) show_chk = true;
 		}else{
-			if(!event_status || !event_status[event_id] || (event_status[event_id] && !event_status[event_id].ir)) show_chk = true;
+			if(!event_status.ir) show_chk = true;
 		}
 
 		//用以判斷下拉更新
@@ -5279,8 +5324,6 @@ $(function(){
                 }
                 break;
         }
-        
-
         if( !isWaiting ){
             sendReply( this_event, this_gi, this_ti, this_ei, body );
         }
@@ -5299,14 +5342,20 @@ $(function(){
         var method = "post";
         var result = ajaxDo(api_name,headers,method,false,body);
         result.complete(function(data){
-
             //重新讀取detail
             // popupShowAdjust("","回覆成功");
 
             this_event.find(".st-reply-message-send").data("reply-chk",false);
+            var this_textarea = this_event.find(".st-reply-message-textarea textarea");
+            this_textarea.val("").parent().addClass("adjust").removeClass("textarea-animated");
 
             setTimeout(function(){
-                replyReload(this_event);
+
+                if(this_event.find(".st-reply-all-content-area").is(":visible")) {
+                    replyReload(this_event);
+                }else{
+                    this_event.find(".st-sub-box-2").trigger("detailShow");
+                }
             },400);
 
         });
@@ -5335,14 +5384,20 @@ $(function(){
 
         //單一動態詳細內容
         getEventDetail(this_event.data("event-id")).complete(function(data){
-            if(data.status == 200)
-                detailTimelineContentMake(this_event,$.parseJSON(data.responseText).el,true);
+            if(data.status == 200){
+                var e_data = $.parseJSON(data.responseText).el;
+
+                // if(!this_event.find(".st-box2-more-desc-detail").is(":visible"))
+                //     eventContentDetail(this_event,e_data);
+
+                detailTimelineContentMake(this_event,e_data,true);
+            }
+                
         });
 	};
 
 	//timeline more
-	zoomOut = function (target)
-	{
+	zoomOut = function (target) {
 		target.css("zoom",(zoom_out_cnt/100));
 	    if(zoom_out_cnt < 100){
 	    	zoom_out_cnt+=4;
