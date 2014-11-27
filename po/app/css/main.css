@@ -4118,6 +4118,11 @@ img.user-info-back {
 	overflow: scroll;
 	margin-top: 54px;
 }
+
+.obj-cell-page.current {
+	height: 100%;
+}
+
 .tabObj-cell-area.noTitle{
 	margin-top: 0px;
 }

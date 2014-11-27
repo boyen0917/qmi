@@ -11,7 +11,7 @@ $(function(){
 
 	$(".login").click(function(){
 
-		if($.lStorage("_loginData")){
+		if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
 			loginAction($.lStorage("_loginData"));
 			return false;
 		}
@@ -39,7 +39,10 @@ $(function(){
 			$(".login-next").removeClass("login-next-adjust");
 		}
 
-		if($.lStorage("_loginAutoChk")) $(".login-auto").addClass("login-auto-active");
+		if($.lStorage("_loginAutoChk")) {
+			$(".login-auto").addClass("login-auto-active");
+			$(".login-auto").data("chk",true);
+		}
 
 		$.mobile.changePage("#page-login", {transition: "slide"});
 	});
@@ -124,74 +127,11 @@ $(function(){
 		// cns.debug("phone_id:",phone_id,"pw:",password,"countrycode:",countrycode);
 
 		//登入
-		loginNew(phone_id,password,countrycode);
+		login(phone_id,password,countrycode);
 		
 	});
 
-    login = function(phone_id,password,countrycode){
-
-		var api_name = "login";
-        var headers = {
-            li:lang
-        };
-        var body = {
-            id: countrycode + phone_id.substring(1),
-            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
-            dn: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
-            pw:toSha1Encode(password)
-        };
-
-        var method = "post";
-        cns.debug("before login");
-        ajaxDo(api_name,headers,method,true,body).complete(function(data){
-        	cns.debug("login data:",data);
-        	if(data.status == 200){
-        		var login_result = $.parseJSON(data.responseText);
-
-        		//判斷是否換帳號 換帳號就要清db
-        		if(!$.lStorage(login_result.ui)){
-        			resetDB();
-        		}
-
-    			//記錄帳號密碼
-    			if($(".login-remeber").data("chk")){
-					var _loginRemeber = {};
-					_loginRemeber.phone = phone_id;
-					_loginRemeber.password = password;
-					_loginRemeber.countrycode = countrycode;
-					$.lStorage("_loginRemeber",_loginRemeber);
-				}else{
-					//沒打勾的話就清除local storage
-		    		localStorage.removeItem("_loginRemeber");
-				}
-
-				//儲存登入資料 跳轉到timeline
-				login_result.page = "timeline";
-        		$.lStorage("_loginData",login_result);
-
-        		//附上group list
-        		getGroupList(login_result.ui,login_result.at).complete(function(data){
-        			cns.debug("get group list done");
-        			if(data.status == 200){
-        				if($.parseJSON(data.responseText).gl && $.parseJSON(data.responseText).gl.length > 0){
-        					//有group
-        					var group_list = $.parseJSON(data.responseText).gl;
-
-        					$.lStorage("_groupList",group_list);
-        					document.location = "main.html#page-group-main";
-        				}else{
-        					//沒group
-        					document.location = "main.html#page-group-menu";
-        				}
-        			}else{
-        				//取得group list 失敗
-        			}
-        		});
-        	}
-        });
-	}
-
-	loginNew = function(phone_id,password,countrycode){
+	login = function(phone_id,password,countrycode){
 
 		var api_name = "login";
         var headers = {
@@ -249,10 +189,10 @@ $(function(){
 					$.lStorage("_loginAutoChk",true);
 				}
 
-				if($.parseJSON(data.responseText).gl && $.parseJSON(data.responseText).gl.length > 0){
-					//有group
-					var group_list = $.parseJSON(data.responseText).gl;
+				var group_list = $.parseJSON(data.responseText).gl;
 
+				if(group_list && $.parseJSON(data.responseText).gl.length > 0){
+					//有group
 					$.lStorage("_groupList",group_list);
 					document.location = "main.html#page-group-main";
 				}else{

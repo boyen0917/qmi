@@ -745,6 +745,12 @@ $(function(){
 			return false;
 		}
 
+		if(!this_textarea.val()){
+			this_textarea.parent().addClass("adjust");
+			this_textarea.removeClass("textarea-animated");
+			return false;
+		}
+
 		setTimeout(function(){
 			cns.debug("this_textarea.height()",this_textarea.height());
 			if (this_textarea.height() < 40 && !this_textarea.parent().hasClass("adjust")) {
@@ -752,7 +758,6 @@ $(function(){
 				this_textarea.removeClass("textarea-animated");
 			}
 		},201);
-			
 	});
 
 	//留言送出
@@ -1344,11 +1349,6 @@ $(function(){
 	    	$(".main-contact-l-subarea-row").height("0px");
 	    }
 	});
-
-	// $(".sm-user-area").click(function(){
-	// 	userInfoShow();
-	// });
-
 
 	$(document).on("mousedown",".user-info-close",function(){
 		$(this).attr("src","images/common/icon/bt_close_activity.png");

@@ -16,7 +16,10 @@ $(function(){
     		ti_chat = default_group.ti_chat;
     	}else{
     		//預設團體暫定為第一個團體？
+            if(!$.lStorage("_groupList") || $.lStorage("_groupList").length == 0) return false;
+
         	var default_group = $.lStorage("_groupList")[0];
+
         	$.each(default_group.tl,function(i,val){
         		if(val.tp == 1){
         			ti_cal = val.ti;
@@ -38,12 +41,12 @@ $(function(){
 	}
 
 	setGroupList = function(){
+        var test1 = $.lStorage("_groupList");
+        var test2 = $.lStorage(ui);
+        var _uiGroupList = $.lStorage(ui) || {};
 
 		$.each($.lStorage("_groupList"),function(i,gl_obj){
-			var _uiGroupList = $.lStorage(ui);	
 			if(!$.lStorage(ui)[gl_obj.gi]){
-
-				// setGroupAllUser("",gl_obj.gi);
 				gl_obj.guAll = {};
 				gl_obj.gu = gl_obj.me;
 
@@ -57,11 +60,10 @@ $(function(){
 		    			gl_obj.ti_chat = val.ti;
 		    		}
 		    	});
-
 		    	_uiGroupList[gl_obj.gi] = gl_obj;
-    			$.lStorage(ui,_uiGroupList);
 			}
 		});	
+        $.lStorage(ui,_uiGroupList);
 	}
 
 	logout = function(){
@@ -112,7 +114,6 @@ $(function(){
 
         return ajaxDo(api_name,headers,method,true,body);
 	}
-
 
 	getMeInvite = function(){
 		var api_name = "me/invitations";
@@ -205,7 +206,6 @@ $(function(){
         });
     }
 
-
 	getUserName = function (target_gi , target_gu , set_name ,set_img){
         //先檢查localStorage[gi].guAll是否存在
         var _groupList = $.lStorage(ui);
@@ -248,6 +248,7 @@ $(function(){
         var method = "get";
         ajaxDo(api_name,headers,method,false).complete(function(data){
         	if(data.status == 200){
+
         		var branch_list = $.parseJSON(data.responseText);
         		var new_bl = {};
         		var new_fbl = {};
@@ -379,7 +380,6 @@ $(function(){
 
                 }else if(data_arr && data_arr[0] == "eventDetail"){
                     //設定event detail 跨團體
-                    cns.debug("hehehhehehee");
                     data_arr[1].trigger("click");
 
                 }else if(data_arr){
@@ -394,13 +394,15 @@ $(function(){
 	updateGuAll = function(this_gi,new_guAll) {
 		var _groupList = $.lStorage(ui);
 		//先更新就有資料 但不會取得新成員
-		$.each(_groupList[this_gi].guAll,function(i,val){
-            if( new_guAll.hasOwnProperty(i) ){
-                $.extend(val,new_guAll[i]);
-            } else {
-                delete _groupList[this_gi].guAll[i];
-            }
-		});
+        if(_groupList[this_gi].guAll){
+            $.each(_groupList[this_gi].guAll,function(i,val){
+                if( new_guAll.hasOwnProperty(i) ){
+                    $.extend(val,new_guAll[i]);
+                } else {
+                    delete _groupList[this_gi].guAll[i];
+                }
+            });
+        }
 
 		//將更新完的資料倒回新的名單 就會有新成員
 		$.extend(new_guAll,_groupList[this_gi].guAll);
@@ -516,7 +518,6 @@ $(function(){
 			var top_events_arr = $.parseJSON(data.responseText).el;
 			
 			$.each(top_events_arr,function(i,val){
-			
 				var data_ei = val.ei;
 				var chk = false;
 				$(".st-top-event").each(function(i,val){
@@ -567,7 +568,6 @@ $(function(){
                     '</div>'+
 					'</div>'+
 				'</div>'+
-    				
 			'</div>'
 		);
 
@@ -580,7 +580,6 @@ $(function(){
 		var _groupList = $.lStorage(ui);
 
 		topEventApi().complete(function(data){
-        	cns.debug("topevent data:",data);
 
         	if(data.status == 200){
 
@@ -639,7 +638,6 @@ $(function(){
                             eventDetailShow($(this).data("data-obj").ei);   
                         });
         			}));
-					// return false;
         		});
 	        }
         });
@@ -647,14 +645,11 @@ $(function(){
 
 	//為了避免gu all還沒取得
 	setTopEventUserName = function(this_top_event,this_gu){
-        // alert(gi);
 		var gu_all = $.lStorage(ui)[gi].guAll;
 		if(Object.keys(gu_all).length == 0){
 			var data_arr = ["setTopEventUserName",this_top_event,this_gu];
-            cns.debug("setTopEventUserName guall");
 	        setGroupAllUser(data_arr);
 	    }else{
-            // alert(this_gu);
             this_top_event.find(".st-top-event-l img").attr("src",gu_all[this_gu].aut).parent().stop().animate({
                 opacity:1
             },1000);
@@ -2699,6 +2694,12 @@ $(function(){
         //generate page when click
         tabArea.next().html("");
         $(document).find("#page-tab-object .tab").click(function(){
+            $(window).scrollTop(0);
+            $("body").addClass("user-info-adjust");
+            setTimeout(function(){
+                $("body").removeClass("user-info-adjust");
+            },100);
+
             var tab = $(this);
             var index = tab.data("id");
             var cell = cellArea.find("._"+index);
@@ -3648,7 +3649,8 @@ $(function(){
 		_groupList[gi].ti_cal = ti_cal;
 		_groupList[gi].ti_feed = ti_feed;
 		_groupList[gi].ti_chat = ti_chat;
-		
+        _groupList[gi].guall = {};
+		cns.debug("_groupList",_groupList);
 		//存回
 		$.lStorage(ui,_groupList);
 	};
@@ -5691,12 +5693,12 @@ $(function(){
 	        		$(".screen-lock").fadeOut("fast");
 	        		this_info.fadeOut("fast");
 	        	}
-
             });
     	});
     }
 
     userInfoDataShow = function(this_gi,this_info,user_data,me) {
+        
     	var this_gi = this_gi || gi;
 
     	var method = "html";
@@ -5726,8 +5728,10 @@ $(function(){
 				}
 
 				if(item == "bl"){
-					var bi = user_data.bl.split(".").last();
-					user_data.bl = $.lStorage(ui)[this_gi].bl[bi].bn;
+					var bi = user_data.bl.split(",")[0].split(".").last();
+                    var bn = $.lStorage(ui)[this_gi].bl[bi];
+                    if(!bn) return;
+ 					user_data.bl = bn;
 				}
 
 				selector.find("."+item)[method](user_data[item]).show();
@@ -5803,6 +5807,9 @@ $(function(){
     	this_info.unbind();
 		
 		this_info.find(".user-avatar").click(function(){
+            var this_src = $(this).find(".user-pic").attr("src");
+            if(!this_src) return false;
+
     		var img = new Image();
     		img.onload = function() {
     			var min_size = 500;
@@ -5831,7 +5838,7 @@ $(function(){
 	    			},300);
 	    		});
 			}
-			img.src = $(this).find(".user-pic").attr("src");
+			img.src = this_src;
     	});	
 
     	this_info.find(".user-avatar-bar").click(function(e){
