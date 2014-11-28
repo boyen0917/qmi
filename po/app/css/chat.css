@@ -35,6 +35,10 @@ body {
     font-weight: normal;
     /*text-shadow: 0 0 0 #fff;*/
 }
+/*::selection{
+	color: ;
+	background: transparent;
+}*/
 
 .emoji{
 	max-height: 20px;
@@ -94,6 +98,13 @@ body {
 	margin-left: auto;
 	width: 30px;
 	height: 30px;
+}
+#chat-nomore{
+	text-align: center;
+	margin-top: 10px;
+	color: #C0CBDF;
+	font-size: 14px;
+	cursor: default;
 }
 
 #chat-contents{
