@@ -109,7 +109,7 @@ initContactList = function(){
 	// $(".subpage-contact").height( $(window).height()-63 );
 	$(window).off("resize").resize( function(){
 		$(".contact-branchList").height( $(window).height()-105 );
-		$(".contact-scroll").height( $(window).height()-115 );
+		$(".contact-scroll").height( $(window).height()-112 );
 	});
 }
 
@@ -455,7 +455,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	}
 
 	$("#"+pageID +" .contact-branchList").height( $(window).height()-110 );
-	$("#"+pageID +" .contact-scroll").height( $(window).height()-115 );
+	$("#"+pageID +" .contact-scroll").height( $(window).height()-112 );
 	
 	//第一頁滑進來, 其餘用fade
 	if( "page-group-main"== parentPageID ){
@@ -561,7 +561,7 @@ showAllMemberPage = function(gn) {
 		subTitle.find(".count").html(count);
 	}
 
-	$("#"+pageID +" .contact-scroll").height( $(window).height()-115 );
+	$("#"+pageID +" .contact-scroll").height( $(window).height()-112 );
 	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
@@ -853,7 +853,7 @@ showFavoritePage = function( isBackward ){
 		}
 	}
 
-	$("#"+pageID +" .contact-scroll").height( $(window).height()-115 );
+	$("#"+pageID +" .contact-scroll").height( $(window).height()-112 );
 	if( true==isBackward ) $.mobile.changePage("#"+pageID, { transition: "slide", reverse: true} );
 	else  $.mobile.changePage("#"+pageID, { transition: "slide"});
 }
@@ -985,7 +985,7 @@ showSubFavoritePage = function( fi ){
 
 
 	//滑進來
-	$("#"+pageID +" .contact-scroll").height( $(window).height()-115 );
+	$("#"+pageID +" .contact-scroll").height( $(window).height()-112 );
 	$.mobile.changePage("#"+pageID, { transition: "slide", reverse: false} );
 }
 

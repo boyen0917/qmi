@@ -57,16 +57,16 @@
         <div data-role="page" id="page-group-menu">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3 class="page-title">團體列表</h3>
+                <h3 class="page-title" data-textid="GROUP_CREATE_GROUP"></h3>
             </div>
             <div class="gm-nav">
                 <div class="gm-create gm-nav-box gm-nav-active" data-type="build">
                     <img src="images/groupmenu/buildgroup_tab_bt_build_click.png"/>
-                    建立團體
+                    <span data-textid="GROUP_CREATE_GROUP"></span>
                 </div>
                 <div class="gm-invite gm-nav-box" data-type="invite">
                     <img src="images/groupmenu/buildgroup_tab_bt_invite.png"/>
-                    團體邀請
+                    <span data-textid="GROUP_INVITATION"></span>
                 </div>
             </div>
             <div class="gm-create-area gm-sub-area">
@@ -74,27 +74,27 @@
                     <div class="gmc-avatar-wrap">
                         <img src="images/common/others/empty_img_group_190x190.png" style="width:120px"/>
                     </div>
-                    <div class="gmc-word">編輯</div>
+                    <div class="gmc-word" data-textid="GROUP_EDIT"></div>
                     <div class="gmc-frame"></div>
 
                 </div>
                 <input type="file" class="gmc-file" style="display:none" data-role="none"/>
                 <div class="gmc-name">
                     <img src="images/groupmenu/buildgroup_icon_group.png"/>
-                    <input placeholder="團體名稱" data-role="none"/>
+                    <input data-role="none" data-textph-id="GROUP_GROUP_NAME"/>
                 </div>
                 <div class="gmc-desc">
                     <img src="images/groupmenu/buildgroup_icon_introduction.png"/>
-                    <textarea placeholder="團體介紹(150字以內)" maxlength="150" data-role="none"></textarea>
+                    <textarea maxlength="150" data-role="none" data-textph-id="GROUP_ABOUT"></textarea>
                 </div>
 
-                <div class="gm-create-submit">確認</div>
+                <div class="gm-create-submit" data-textid="GROUP_CREATE"></div>
             </div>
 
             <div class="gm-invite-area gm-sub-area" style="display:none">
                 <div class="gmi-coachmake">
                     <img src="images/coachmake/logo_status_group.png"/>
-                    <span>目前沒有任何團體邀請</span>
+                    <span data-textid="GROUP_NO_INVITATION"></span>
                 </div>
                 <div class="gmi-div-area">
                 </div>
@@ -106,13 +106,13 @@
         <div data-role="page" id="page-helper">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
             <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
-                <h3  class="page-title">團體建立/加入</h3>
+                <h3  class="page-title" data-textid="">團體建立/加入</h3>
             </div>
             <div class="center-style">
-                <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
-                <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true">立即加入團體</a>
+                <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true" data-textid="">立即創建團體</a>
+                <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true" data-textid="">立即加入團體</a>
             </div>
-            <div class="helper-title">小幫手</div>
+            <div class="helper-title" data-textid="">小幫手</div>
             <div data-role="collapsible-set" class="helper-collapsible-area ui-icon-alt" data-inset="false" data-iconpos="right" data-collapsed-icon="arrow-d">
                 <div data-role="collapsible"><h3>如何創建團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"創建團體"後,設定您的團體照片,輸入團體名稱,團體介紹,並選取""預定使用人數".</li><li>完成輸入後,點擊"建立",即完成團體之建立.</li></ol></p><a class="hg-create inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即創建團體</a><br/></div> 
                 <div data-role="collapsible"><h3>如何加入團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"加入團體"後,輸入您來自"簡訊"或"邀請訊息"內的組織代碼及OTP</li><li>完成輸入後,點擊"加入",即加入該團體.</li></ol></p><a class="hg-join inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即加入團體</a><br/></div> 
@@ -143,20 +143,20 @@
                     <div class="gm-border">
                         <div data-sm-act="feeds" data-polling-cnt="A1" class="sm-small-area polling-cnt">
                            <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_feeds_activity.png"/></div>
-                           <div class="sm-small-area-r">動態消息</div>
+                           <div class="sm-small-area-r" data-textid="LEFT_FEED"></div>
                            <div class="sm-count"></div>
                         </div>
                         <div data-sm-act="memberslist" data-polling-cnt="A2" class="sm-small-area polling-cnt">
                            <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_memberslist_normal.png"/></div>
-                           <div class="sm-small-area-r">成員列表</div>
+                           <div class="sm-small-area-r" data-textid="LEFT_MEMBER"></div>
                            <div class="sm-count"></div>
                         </div>
                         <div data-sm-act="chat" data-polling-cnt="A3" class="sm-small-area polling-cnt">
                            <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_chat_normal.png"/></div>
-                           <div class="sm-small-area-r">聊天</div>
+                           <div class="sm-small-area-r" data-textid="LEFT_CHAT"></div>
                            <div class="sm-count"></div>
                         </div>
-                        <div class="sm-hr">團體</div>
+                        <div class="sm-hr" data-textid="LEFT_MEMBER"></div>
                         <div class="sm-group-list-area">
                           
                         </div>
@@ -166,18 +166,18 @@
                         <div class="sm-group-cj">
                             <div class="hg-create sm-group-cj-btn">
                                 <img src="images/icon/icon_sidemenu_group_build.png"/>
-                                建立團體
+                                <span data-textid="LEFT_CREATE_GROUP"></span>
                             </div>
                             <div class="hg-invite sm-group-cj-btn polling-cnt" data-polling-cnt="G1" >
                                 <img src="images/icon/icon_sidemenu_group_invite.png"/>
-                                團體邀請
+                                <span data-textid="LEFT_INVITATION"></span>
                                 <span class="sm-count"></span>
                             </div>
                         </div>
-                        <div class="sm-hr">系統</div>
+                        <div class="sm-hr" data-textid="LEFT_SYSTEM_SETTING"></div>
                         <div data-sm-act="setting" class="sm-small-area setting">
                            <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_setting_normal.png"/></div>
-                           <div class="sm-small-area-r"><!-- 系統設定 -->登出</div>
+                           <div class="sm-small-area-r" data-textid="SETTING_LOGOUT"><!-- 系統設定 --></div>
                         </div>
                     </div>
                 </div>
@@ -185,19 +185,19 @@
                     <div class="gm-header">
                         <div class="gm-header-adjustment"></div>
                         <div class="header-group-name">
-                            <div class="page-title">動態消息</div>
+                            <div class="page-title" data-textid="LEFT_FEED"></div>
                             <div></div>
                         </div>
                         <div class="feed-compose"></div>
                         <div class="chatList-add"></div>
                         <div class="navi-alert"></div>
                         <div class="feed-compose-area">
-                            <div data-fc-box="post" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_post.png"/><div>貼文</div></div>
-                            <div data-fc-box="announcement" class="fc-area-subbox" style="display:none"><img class="fc-icon-size" src="images/compose/compose_box_bticon_announcement.png"/><div data-textid='FEED_BULLETIN'>公告</div></div>
-                            <div data-fc-box="feedback" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_feedback.png"/><div data-textid='FEED_REPORT'>通報</div></div>
-                            <div data-fc-box="work" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_work.png"/><div data-textid='FEED_TASK'>任務-工作</div></div>
-                            <div data-fc-box="vote" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_vote.png"/><div data-textid='FEED_MISSION_VOTE'>任務-投票</div></div>
-                            <div data-fc-box="check" class="fc-area-subbox fc-check"><img class="fc-icon-size" src="images/compose/compose_box_bticon_check.png"/><div data-textid='FEED_MISSION_LOCATION'>任務-定點回報</div></div>
+                            <div data-fc-box="post" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_post.png"/><div data-textid="FEED_POST"></div></div>
+                            <div data-fc-box="announcement" class="fc-area-subbox" style="display:none"><img class="fc-icon-size" src="images/compose/compose_box_bticon_announcement.png"/><div data-textid='FEED_BULLETIN'></div></div>
+                            <div data-fc-box="feedback" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_feedback.png"/><div data-textid='FEED_REPORT'></div></div>
+                            <div data-fc-box="work" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_work.png"/><div data-textid='FEED_TASK'></div></div>
+                            <div data-fc-box="vote" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_vote.png"/><div data-textid='FEED_VOTE'></div></div>
+                            <div data-fc-box="check" class="fc-area-subbox fc-check"><img class="fc-icon-size" src="images/compose/compose_box_bticon_check.png"/><div data-textid='FEED_LOCATION'></div></div>
                         </div>
                         <div class="feed-compose-area-cover"></div>
                     </div>
@@ -207,41 +207,41 @@
                         <div class="st-navi-area">
                             <div class="st-navi-subarea main" data-st-navi-group="navi" data-st-navi="home" data-tp="00">
                                 <img src="images/timeline/timeline_tab_icon_home_white.png"/>
-                                <div class="color-white">全部</div>
+                                <div class="color-white" data-textid='FEED_ALL'></div>
                             </div>
                             <img class="st-navi-tridiv-l" src="images/timeline/timeline_tab_arrow_left.png" style="width:15px;display:none;">
                             <img class="st-navi-tridiv-r" src="images/timeline/timeline_tab_arrow_right.png" style="width:15px">
                             <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="announcement" data-tp="01">
                                 <img src="images/timeline/timeline_tab_icon_announcement.png"/>
-                                <div>公告</div>
+                                <div data-textid='FEED_BULLETIN'></div>
                             </div>
                             <div class="st-navi-divider"></div>
                             <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feedback" data-tp="02">
                                 <img src="images/timeline/timeline_tab_icon_feedback.png"/>
-                                <div>通報</div>
+                                <div data-textid='FEED_REPORT'></div>
                             </div>
                             <div class="st-navi-divider"></div>
                             <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="task" data-tp="03">
                                 <img src="images/timeline/timeline_tab_icon_task.png"/>
-                                <div>任務</div>
+                                <div data-textid='FEED_TASK'></div>
                             </div>
                         </div>
 
                         <div class="st-refresh-top">
                             <img style="display:none" src="images/st_bottom_loading.gif"/>
-                            <span>更新中</span>
+                            <span data-textid='COMMON_UPDATING'></span>
                         </div>
                         <div class="st-top-area-load"></div>
 
                         <div class="st-filter-area">
-                            <div class="st-filter-list st-filter-main"><span>全部</span><img src="images/icon/icon_arrow_right.png"/></div>
-                            <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide" style="display:none"><span>全部</span></div>
+                            <div class="st-filter-list st-filter-main"><span data-textid='FEED_ALL'></span><img src="images/icon/icon_arrow_right.png"/></div>
+                            <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide" style="display:none"><span data-textid='FEED_ALL'></span></div>
                             <div class="st-filter-other">
-                                <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list"><span>公告</span></div>
-                                <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list"><span>通報</span></div>
-                                <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list"><span>任務</span></div>
-                                <div data-status="unread" class="st-filter-action st-filter-list"><span>未讀</span></div>
-                                <div data-status="read" class="st-filter-action st-filter-list"><span>已讀</span></div>
+                                <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list"><span data-textid='FEED_BULLETIN'></span></div>
+                                <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list"><span data-textid='FEED_REPORT'></span></div>
+                                <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list"><span data-textid='FEED_TASK'></span></div>
+                                <div data-status="unread" class="st-filter-action st-filter-list"><span data-textid='FEED_UNREAD'></span></div>
+                                <div data-status="read" class="st-filter-action st-filter-list"><span data-textid='FEED_READ'></span></div>
                                 <div class="st-filter-list-btn"><img src="images/icon/icon_arrow_top.png"/></div>
                             </div>
                         </div>
@@ -258,7 +258,7 @@
                             <img src="images/st_bottom_loading.gif"/>
                             <div style="display:none">
                                 <img src="images/coachmake/logo_nomessage.png"/>
-                                <div>已經沒有任何訊息</div>
+                                <div data-textid='FEED_NO_MORE_POST'></div>
                             </div>
                         </div>
                     </div>
@@ -282,7 +282,7 @@
                         <div class="contact-rows top"></div>
                         <div class="contact-searchResult" style="display:none;">
                             <div class="container">
-                                <div class="noResult" style="display:none;">No Result...O_Q</div>
+                                <div class="noResult" style="display:none;" data-textid="MEMBER_SEARCH_NO_RESULT"></div>
                                 <div class="memTitle" data-textid="COMMON_MEMBER"></div>
                                 <div class="branchTitle" data-textid="COMPOSE_SUBGROUP"></div>
                             </div>
@@ -323,7 +323,7 @@
                 </div>
                 <div class="cp-post">
                     <img src="images/navi/navi_icon_post.png"/>
-                    <span>發佈</span>
+                    <span data-textid="COMPOSE_ACT_POSE"></span>
                 </div>
             </div>
             <div class="cp-content-load">
@@ -344,11 +344,11 @@
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <div class="header-cp-object">
-                    <span class="page-title" data-textid="COMMON_SELECT_MEMBERS">選擇發佈對象</span>(<span>0</span>)
+                    <span class="page-title" data-textid="COMMON_SELECT_MEMBERS"></span>(<span>0</span>)
                 </div>
                 <div class="obj-done">
                     <img src="images/navi/navi_icon_finish.png"/>
-                    <span>完成</span>
+                    <span data-textid="COMMON_DONE"></span>
                 </div>
             </div>
             <div class="obj-content">

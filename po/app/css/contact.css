@@ -322,7 +322,7 @@
 	cursor: pointer;
 	z-index: 1;
 	/* box-shadow: 0px 3px 8px 0px rgba(219, 219, 219, 0.4); */
-	height: 555px;
+	height: -webkit-calc( 100% - 112px );
 	font-family: "微軟正黑體","Microsoft JhengHei";
 }
 /*.contact-branchList div{
@@ -350,7 +350,7 @@
 	/* border: black 1px solid; */
 	overflow: scroll;
 	/* max-height: 70%; */
-	height: 537px;
+	height: -webkit-calc( 100% - 123px );
 	width: 100%;
 }
 .contact-searchResult .noResult{
@@ -488,6 +488,7 @@
 	-webkit-box-orient: vertical;
 	text-align: center;
 	font-size: 16px;
+	word-break: break-all;
 }
 .contact-memLists .right .fav{
 	width: 25px;
