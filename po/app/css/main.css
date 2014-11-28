@@ -2424,6 +2424,9 @@ img.st-user-pic{
 	float: left;
 }
 
+.st-attach-video video {
+	width: 80%;
+}
 
 .st-attach-audio, .st-attach-video {
 	margin-top: 20px;

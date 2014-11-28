@@ -1905,9 +1905,11 @@ $(function(){
 				$.each(url_chk,function(i,val){
 					if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
 						this_compose.data("url-chk",true);
-						if(val.match(/youtube.com|youtu.be/)){
+						if(val.match(/youtube.com|youtu.be|m.youtube.com/)){
+                            cns.debug("qqq");
 							getLinkYoutube(this_compose,val);
 						}else{
+                            cns.debug("www");
 							getLinkMeta(this_compose,val);
 						}
 						return false;
@@ -4517,7 +4519,6 @@ $(function(){
 					this_event.find(target_div + "-detail").html(c[1]);
 					break;
 				case 1://網址 寫在附檔區域中
-
                     if(val.c){
                         this_event.find(".st-attach-url").click(function(){
                             try{
@@ -4537,12 +4538,6 @@ $(function(){
 						this_event.find(".st-attach-url-img").show();
 						this_event.find(".st-attach-url-img img").attr("src",val.i);
 					}
-					
-					//圖片滿版
-					// var w = this_event.find(".st-attach-url-img img").width();
-					// var h = this_event.find(".st-attach-url-img img").height();
-					// mathAvatarPos(this_event.find(".st-attach-url-img img"),w,h,0,360);
-					
 					this_event.find(".st-attach-url-title").html(val.t);
 					this_event.find(".st-attach-url-desc").html(val.d);
                     this_event.find(".st-attach-url-link").attr("href", val.c);
@@ -4555,6 +4550,7 @@ $(function(){
 
 					var youtube_code = getYoutubeCode(val.c);
 					if(youtube_code){
+                        cns.debug("youtube_code",youtube_code);
 						this_event.find(".st-attach-youtube").show();
 						this_event.find(".st-attach-youtube").html(
 							'<iframe width="320" height="280" src="//www.youtube.com/embed/'+ youtube_code +'" frameborder="0" allowfullscreen></iframe>'
@@ -4562,11 +4558,6 @@ $(function(){
 					}else{
 						this_event.find(".st-attach-url-img").show();
 						this_event.find(".st-attach-url-img img").attr("src",val.i);
-						
-						//圖片滿版
-						// var w = this_event.find(".st-attach-url-img img").width();
-						// var h = this_event.find(".st-attach-url-img img").height();
-						// mathAvatarPos(this_event.find(".st-attach-url-img img"),w,h,0,360);
 						
 						this_event.find(".st-attach-url").click(function(){
 							window.open(val.c);
@@ -4846,7 +4837,7 @@ $(function(){
 						target.find("img.auo").attr("src",obj.s32).hide();
 						break;
                     case 7://影片
-                        target.attr("src",obj.s3);
+                        target.attr("src",obj.s32);
                         break;
 					case 8://聲音
 						target.attr("src",obj.s3);
@@ -5228,63 +5219,56 @@ $(function(){
 	}
 
 	getYoutubeCode = function(url){
-		if(url.match(/\?v=/)){
+  		if(url.match(/youtube.com/)){
+			var strpos = url.indexOf("?v=")+3;
+		}else if(url.match(/\/\/youtu.be/)){
+			var strpos = url.indexOf("youtu.be")+9;
+		}
 
-	  		if(url.match(/youtube.com/)){
-				var strpos = url.indexOf("?v=")+3;
-			}else{
-				var strpos = url.indexOf("youtu.be")+9;
-			}
-
-			var youtube_code = url.substring(strpos,strpos+11);
-			if(youtube_code.length < 11 || youtube_code.match(/\&/)){
-				return false;
-			}else{
-				return youtube_code;
-			}
-		}else{
+		var youtube_code = url.substring(strpos,strpos+11);
+		if(youtube_code.length < 11 || youtube_code.match(/\&/)){
 			return false;
+		}else{
+			return youtube_code;
 		}
 	}
 	
 	//parse Youtube
 	getLinkYoutube = function (this_compose,url) {
 		if(activityTimeout) clearTimeout(activityTimeout);
-		cns.debug("url:",url);
 		var activityTimeout = setTimeout(function(){
-				$(".cp-yql-img").html("");
-			  	var result={};
-			  	var youtube_code = getYoutubeCode(url);
+			$(".cp-yql-img").html("");
+		  	var result={};
+		  	var youtube_code = getYoutubeCode(url);
 
-			  	if(youtube_code){
-			  		load_show = false;
-					$.ajax ({
-			            url: "http://gdata.youtube.com/feeds/api/videos/" + youtube_code + "?v=2&prettyprint=true&alt=jsonc",
-			            complete: function(data){
-			            	var result = $.parseJSON(data.responseText);
-			                cns.debug(result);
-			                $(".cp-attach-area").show();
-							$(".cp-yql-title").html(result.data.title);
-							$(".cp-yql-desc").html(result.data.description);
-							$(".cp-yql-img").html("<img src='" + result.data.thumbnail.hqDefault + "'/>");
-							$(".cp-ta-yql").fadeIn();
+		  	if(youtube_code){
+		  		load_show = false;
+				$.ajax ({
+		            url: "http://gdata.youtube.com/feeds/api/videos/" + youtube_code + "?v=2&prettyprint=true&alt=jsonc",
+		            complete: function(data){
+		            	var result = $.parseJSON(data.responseText);
+		                $(".cp-attach-area").show();
+						$(".cp-yql-title").html(result.data.title);
+						$(".cp-yql-desc").html(result.data.description);
+						$(".cp-yql-img").html("<img src='" + result.data.thumbnail.hqDefault + "'/>");
+						$(".cp-ta-yql").fadeIn();
 
-							var url_content = {
-								c: url,
-								t: result.data.title,
-								d: result.data.description,
-								i: result.data.thumbnail.hqDefault,
-								v: ""
-							}
-							this_compose.data("url-content",url_content);
-							this_compose.data("message-list").push(2);
-			            }   
-			        });  
-			  	}else{
-			  		post_tmp_url = '';
-			  		$(".cp-ta-yql").hide();
-			  		getLinkMeta(this_compose,url);
-			  	}
+						var url_content = {
+							c: url,
+							t: result.data.title,
+							d: result.data.description,
+							i: result.data.thumbnail.hqDefault,
+							v: ""
+						}
+						this_compose.data("url-content",url_content);
+						this_compose.data("message-list").push(2);
+		            }   
+		        });  
+		  	}else{
+		  		post_tmp_url = '';
+		  		$(".cp-ta-yql").hide();
+		  		getLinkMeta(this_compose,url);
+		  	}
 		},1000);
 	}
 
