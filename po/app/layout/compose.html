@@ -1,7 +1,7 @@
 <div class="cp-content">
     <div data-sp-box="title" class="cp-content-box cp-content-title" style="display:none">
         <img class="cp-icon-size" src="images/compose/compose_form_icon_title.png"/>
-        <textarea data-cp-name="標題" class="cp-textarea-title" placeholder="標題" data-role="none"></textarea>
+        <textarea data-cp-name="標題" class="cp-textarea-title" data-role="none" data-textph-id="COMPOSE_TITLE"></textarea>
     </div>
     <!-- <div data-sp-box="apt" class="cp-content-box cp-content-apt" style="display:none">
         <img class="cp-icon-size" src="images/compose/compose_form_icon_apt.png"/>
@@ -10,18 +10,18 @@
     </div> -->
     <div data-sp-box="object" class="cp-content-box cp-content-object" style="display:none">
         <img class="cp-icon-size" src="images/compose/compose_form_icon_object.png"/>
-        發佈對象
+        <label data-textid="COMPOSE_RECEIVER"></label>
         <span></span>
         <img class="cp-object-btn" src="images/ap_box_arrow.png"/>
     </div>
     <div data-sp-box="top" class="cp-content-box cp-content-top" style="display:none">
         <img class="cp-icon-size" src="images/compose/compose_form_icon_top.png"/>
-        公告置頂
+        <label data-textid="COMPOSE_TOP"></label>
         <img class="cp-icon-size cp-top-btn" src="images/compose/compose_form_icon_check_none.png"/>
     </div>
     <div class="cp-content-textarea">
         <img class="cp-icon-size" src="images/compose/compose_form_icon_description.png"/>
-        <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated" placeholder="內容描述" data-role="none" ></textarea>
+        <textarea data-cp-name="內容" class="cp-textarea-desc textarea-animated" data-role="none" data-textph-id="COMPOSE_DESCRIPTION"></textarea>
     </div>
 
     <div class="cp-work-area" style="display:none">
@@ -31,13 +31,13 @@
             <span>1</span>
             <textarea class="cp-opt-textarea textarea-animated cp-work-empty-chk" placeholder="" data-role="none"></textarea>
             <div class="cp-work-item-object">
-                <span>分派對象</span>
+                <span data-textid="COMPOSE_ASSIGN"></span>
                 <img src="images/ap_box_arrow.png"/>
             </div>
         </div>
         <div class="cp-work-add-item">
             <img src="images/compose/vote/compose_post_vote_icon_add_yellow.png" style="width:35px"/>
-            <span>新增項目</span>
+            <span data-textid="COMPOSE_ADD_OPTION"></span>
         </div>
     </div>
 
@@ -46,7 +46,7 @@
         
         <div class="cp-vote-add-ques">
             <img src="images/compose/vote/compose_post_vote_icon_add_yellow.png" style="width:35px"/>
-            <span>新增項目</span>
+            <span data-textid="COMPOSE_ADD_OPTION"></span>
         </div>
     </div>
 
@@ -65,7 +65,7 @@
     <div class="cp-time-area" style="display:none">
         <div class="cp-setdate-chk">
             <img src="images/common/icon/icon_check_gray.png"/>
-            <span>指定開始時間</span>
+            <span data-textid="COMPOSE_SET_END_TIME"></span>
         </div>
         <div class="cp-setdate-div"></div>
         <div class="cp-setdate-area">
@@ -73,8 +73,8 @@
                 <div class="cp-setdate-l-1"></div>
                 <div class="cp-setdate-l-2">
                     
-                    <div class="cp-setdate-ttl">開始時間</div>
-                    <div class="cp-setdate-start-text">立即發佈</div>
+                    <div class="cp-setdate-ttl" data-textid="COMPOSE_START_TIME"></div>
+                    <div class="cp-setdate-start-text" data-textid="COMPOSE_NOW"></div>
                     <div class="cp-setdate-content" style="display:none">
                         <div class="cp-setdate-date">12月14日</div>
                         <div class="cp-setdate-time">09:00</div>
@@ -86,7 +86,7 @@
             </div>
             <div class="cp-setdate-r">
                 <div class="cp-setdate-r-1">
-                    <div class="cp-setdate-ttl">結束時間</div>
+                    <div class="cp-setdate-ttl" data-textid="COMPOSE_END_TIME"></div>
                     <div class="cp-setdate-content">
                         <div class="cp-setdate-date">12月25日</div>
                         <div class="cp-setdate-time">09:00</div>
@@ -129,21 +129,21 @@
         <img src="images/common/icon/icon_compose_close.png"/>
         <span></span>
         <img src="images/compose/vote/compose_post_vote_icon_edit.png"/>
-        <textarea class="cp-vq-textarea-title textarea-animated cp-vote-empty-chk" placeholder="主題" data-role="none"></textarea>
+        <textarea class="cp-vq-textarea-title textarea-animated cp-vote-empty-chk" data-role="none" data-textph-id="COMPOSE_TOPIC"></textarea>
     </div>
     <div class="cp-vote-opt">
         <img src="images/common/icon/icon_compose_close.png"/>
         <span>1</span>
-        <textarea class="cp-opt-textarea textarea-animated cp-vote-empty-chk" placeholder="投票項目" data-role="none"></textarea>
+        <textarea class="cp-opt-textarea textarea-animated cp-vote-empty-chk" data-role="none" data-textph-id="COMPOSE_OPTION"></textarea>
     </div>
     <div class="cp-vote-opt">
         <img src="images/common/icon/icon_compose_close.png"/>
         <span>2</span>
-        <textarea class="cp-opt-textarea textarea-animated cp-vote-empty-chk" placeholder="投票項目" data-role="none"></textarea>
+        <textarea class="cp-opt-textarea textarea-animated cp-vote-empty-chk" data-role="none" data-textph-id="COMPOSE_OPTION"></textarea>
     </div>
     <div class="cp-vote-add-opt">
         <img src="images/compose/vote/compose_post_vote_icon_add_gray.png" style="width:35px"/>
-        <span>新增選項</span>
+        <span data-textid="COMPOSE_ADD_OPTION"></span>
     </div>
     <div class="cp-vote-count-area">
         <div class="cp-vote-pm cp-vote-minus">
@@ -151,7 +151,7 @@
         </div>
         <div class="cp-vote-count">
             <div>1</div>
-            <div>可投票數</div>
+            <div data-textid="COMPOSE_AVAILABLE_VOTE"></div>
         </div>
         <div class="cp-vote-pm cp-vote-plus">
             <img src="images/compose/vote/compose_post_vote_bt_plus.png"/>

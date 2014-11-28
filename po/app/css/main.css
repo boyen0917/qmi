@@ -932,12 +932,12 @@ img.auo {
 
 .hg-create.sm-group-cj-btn {
 	border-right: 1px solid rgb(210,210,210);
-	width: 45%;
+	/*width: 50%;*/
 }
 
 .hg-invite.sm-group-cj-btn{
 	padding-left: 10px;
-	width: 50%;
+	/*width: 50%;*/
 }
 
 .hg-invite .sm-count {
@@ -969,8 +969,11 @@ img.auo {
 	width: 50%;
 	height: 50px;
 	line-height: 50px;
-	padding-left: 15px;
+	padding-left: 6px;
 	cursor: pointer;
+	font-size: 14px;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
 
