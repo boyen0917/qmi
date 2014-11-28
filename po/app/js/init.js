@@ -22,7 +22,7 @@ $(function(){
 	lang = "zh_TW";
 	var userLang = navigator.language || navigator.userLanguage; 
  	userLang = userLang.replace(/-/g,"_");
- 	if( userLang=="en_US" || "zh_TW" ){
+ 	if( userLang=="en_US" || userLang=="zh_TW" ){
  		lang = userLang;
  	}
 	
