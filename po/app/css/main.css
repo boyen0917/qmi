@@ -1471,8 +1471,8 @@ img.auo {
 .st-top-left-arrow, .st-top-right-arrow {
 	position: absolute;
 	z-index: 10;
-	width: 25%;
-	height: 123px;
+	width: 15%;
+	height: 164px;
 	cursor: pointer;
 	opacity: 0.5;
 	display: none;
@@ -1615,7 +1615,7 @@ img.auo {
 	height: 26px;
 	text-align: center;
 	-webkit-user-select: none;
-	cursor:pointer;
+	cursor:default;
 }
 
 .st-top-bar-case {
@@ -1629,9 +1629,18 @@ img.auo {
 }
 
 .st-top-bar-case-click {
-	display: -webkit-box;
+	display: table;
 	z-index: 10;
 	height: 30px;
+	margin: auto;
+	position: relative;
+	top: -28px;
+}
+
+.st-top-bar-case-click span {
+	cursor: pointer;
+	width: 15px;
+	margin: 0 0.17em 0;
 }
 
 .st-top-bar-case span,.st-top-bar-case-click span {

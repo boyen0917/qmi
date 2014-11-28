@@ -555,8 +555,8 @@ $(function(){
 		var top_area = $(
 			'<div class="st-top-area">'+
 				'<div class="st-top-event-block">'+
-					'<div class="st-top-left-arrow st-top-arrow"><div><img src="images/arrow2.png"></div></div>'+
-					'<div class="st-top-right-arrow st-top-arrow"><div><img src="images/arrow2.png"></div></div>'+
+					'<div class="st-top-left-arrow st-top-arrow" style="max-width:100px"><div><img src="images/arrow2.png"></div></div>'+
+					'<div class="st-top-right-arrow st-top-arrow" style="max-width:100px"><div><img src="images/arrow2.png"></div></div>'+
 					'<div class="st-top-event-area">'+
 						'<div class="st-top-event-default">'+
 							'<div>目前尚未有任何置頂</div>'+
@@ -697,10 +697,6 @@ $(function(){
 
         //流程控制 不能連按
         var mfinish = false;
-
-        //點擊區 位置
-        top_area.find(".st-top-bar-case-click").offset({top:(start_top-11),left:start_left-5});
-
 
         //點擊區 先解綁定
         top_area.find(".st-top-bar-case-click span").unbind();
