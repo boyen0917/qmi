@@ -1298,7 +1298,6 @@ $(function(){
 		var detail_data;
 		//公告通報任務的detail 線要隱藏 
 		var bottom_block = false;
-		//this_event.find(".st-box2-bottom-block").hide();
 		
 		switch(tp){
 			case 0:
@@ -1339,10 +1338,13 @@ $(function(){
 		this_event.find(detail_data + "-detail").toggle();
 		
 		//開啟留言區域
-        this_event.find(".st-reply-like-area").toggle();
         if( this_event.find(".st-reply-all-content-area").data("show")==true ){
-            cns.debug("slideUp");
-	       this_event.find(".st-reply-all-content-area").slideUp().data("show",false);
+	       this_event.find(".st-reply-all-content-area").slideUp("",function(){
+                $(this).html("");
+                this_event.find(".st-reply-like-area").toggle();
+           }).data("show",false);
+        }else{
+            this_event.find(".st-reply-like-area").toggle();
         }
 		
 		//設定動態消息detail開關
@@ -4485,7 +4487,7 @@ $(function(){
 		
 		//需要記共有幾張圖片
 		var gallery_arr = [];
-		var audio_arr = [];
+		var audio_arr = [],video_arr = [];
 
 		$.each(ml,function(i,val){
 			//結束時間檢查
@@ -4594,7 +4596,11 @@ $(function(){
 					gallery_arr.push(val);
 
 					break;
-
+                case 7://影片
+                    this_event.find(".st-attach-video").show();
+                    //總共有幾個聲音
+                    video_arr.push(val);
+                    break;
 				case 8://聲音
 					this_event.find(".st-attach-audio").show();
 					//總共有幾個聲音
@@ -4645,20 +4651,28 @@ $(function(){
 		//若有圖片 則呼叫函式處理
 		if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr);
 		if(audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
+        if(video_arr.length > 0) timelineVideoMake(this_event,video_arr);
 	}
 
 	timelineAudioMake = function (this_event,audio_arr){
- 		var file_obj = audio_arr[0];
 		$.each(audio_arr,function(i,val){
-			//getS3file(val.c);
-
 			var this_audio = $(
-				'<audio src="test" controls></audio>'
+				'<audio controls></audio>'
 			);
 			this_event.find(".st-attach-audio").prepend(this_audio);
 			getS3file(val,this_audio,8);
 		});
 	}
+
+    timelineVideoMake = function (this_event,video_arr){
+        $.each(video_arr,function(i,val){
+            var this_video = $(
+                '<video controls></video>'
+            );
+            this_event.find(".st-attach-video").prepend(this_video);
+            getS3file(val,this_video,7);
+        });
+    }
 
 	timelineGalleryMake = function (this_event,gallery_arr){
 		// cns.debug(this_event.data("event-id")+"  "+"gallery:",gallery_arr);
@@ -4823,6 +4837,9 @@ $(function(){
 						//大圖
 						target.find("img.auo").attr("src",obj.s32).hide();
 						break;
+                    case 7://影片
+                        target.attr("src",obj.s3);
+                        break;
 					case 8://聲音
 						target.attr("src",obj.s3);
 						break;
@@ -5023,11 +5040,11 @@ $(function(){
              "etp":etp,
              "est":est
         };
-         var method = "put";
-                         cns.debug("headers:",headers);
+        var method = "put";
         ajaxDo(api_name,headers,method,false).complete(function(data){
         	//做timeline樓主的回覆狀態
         	if(data.status == 200){
+
                 var d =$.parseJSON(data.responseText);
         		//timeline 外層
         		if(!target_obj.reply){
@@ -5043,6 +5060,18 @@ $(function(){
 		        		img_selector.attr("src","images/icon/icon_" + act + "_normal.png")
 		        		count_selector.html(count_selector.html()*1-1);
 		        	}
+
+                    //記錄在data中 讓按讚列表可使用
+                    var parti_like_arr = this_event.data("parti-like");
+                    if(this_event.find(".st-reply-like-area").is(":visible") && parti_like_arr){
+                        if(est){
+                            parti_like_arr.push({gu:gu,rt:new Date().getTime()});
+                        }else{
+                            $.each(parti_like_arr,function(i,val){
+                                if(val.gu == gu) parti_like_arr.splice(i,1);
+                            });
+                        }
+                    } 
 
 	        	}else{
 	        		//回覆按讚
@@ -5394,8 +5423,7 @@ $(function(){
 
         //開啓讚好及留言區塊
         if( true == this_event.find(".st-reply-all-content-area").data("show") ){
-            cns.debug("slideUp");
-            this_event.find(".st-reply-all-content-area").slideUp().data("show",false);
+            this_event.find(".st-reply-all-content-area").data("show",false);
         }
         this_event.find(".st-reply-like-area").show();
 

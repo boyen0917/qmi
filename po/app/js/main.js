@@ -65,9 +65,6 @@ $(function(){
 	}
 
 	$( window ).resize(function() {
-		//top event
-		if($(".st-top-event").length < 2) return false;
-
 		//reply textarea
 		var reply_textarea = $(document).find(".st-reply-message-textarea");
 		var this_event = reply_textarea.parents(".st-sub-box");
@@ -823,6 +820,13 @@ $(function(){
 
 		var this_ei = this_event.data("event-id");
 
+		//加入已讀
+		if(this_event.data("event-val").meta.ir == false){
+			var event_val = this_event.data("event-val");
+			event_val.meta.ir = true;
+			this_event.data("event-val",event_val);
+		}
+
 		//此則timeline種類
 		var tp = this_event.data("timeline-tp");
 		
@@ -838,7 +842,6 @@ $(function(){
 		
 		//重置
 		if(!detail_chk){
-			this_event.find(".st-reply-all-content-area").html("");
 			this_event.find(".st-vote-all-ques-area").html("");
 			return false;
 		}
