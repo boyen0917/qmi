@@ -140,9 +140,10 @@ $(function(){
         		$.each(invite_result.gl,function(i,val){
         			$(".gmi-div-area").append($('<div>').load('layout/layout.html .gmi-div',function(){
         				var this_invite = $(this).find(".gmi-div");
+                        this_invite._i18n();
         				this_invite.data("invite-data",val);
-        				this_invite.find(".gmi-div-data div:eq(0) span").html(val.gn);
-        				this_invite.find(".gmi-div-data div:eq(1) span").html(val.cnt);
+        				this_invite.find(".gmi-div-data div:eq(0)").html( $.i18n.getString("GROUP_GROUP_INVITATION", "<span>"+val.gn+"</span>") );
+        				this_invite.find(".gmi-div-data div:eq(1)").html( $.i18n.getString("GROUP_MEMBERS", "<span>"+val.cnt+"</sapn>") );
 
         				if(val.aut){
         					this_invite.find(".gmi-div-avatar .aut").attr("src",val.aut);
@@ -259,6 +260,8 @@ $(function(){
         		if(branch_list.bl.length) {
                     //初始化陣列
         			$.each(branch_list.bl,function(i,val){
+                        if( null==val.bp|| val.bp.length==0 ) return;
+
                         var bp_arr = val.bp.replace(/^\./, '').split(".");
                         var pi = "";
                         if(bp_arr.length > 1){
@@ -1796,6 +1799,7 @@ $(function(){
 		$('.cp-content-load').html($('<div>').load('layout/compose.html .cp-content',function(){
 
 			var this_compose = $(this).find(".cp-content");
+            this_compose._i18n();
 
 			//設定 重複送出檢查
 			this_compose.data("send-chk",true);
@@ -2514,7 +2518,7 @@ $(function(){
             }else{
                 //其餘發佈對象
                 if(obj_length != 0){
-                    $(".cp-content-object span").html(obj_length + "位成員");
+                    $(".cp-content-object span").html( $.i18n.getString("GROUP_MEMBERS",obj_length) );
                 }else{
                     $(".cp-content-object span").html("");
                 }
@@ -3071,7 +3075,8 @@ $(function(){
 		//讀取投票題目
 		this_compose.find('.cp-vote-area').append($('<div>').load('layout/compose.html .cp-vote-ques-area',function(){
 			var this_ques = $(this).find('.cp-vote-ques-area');
-			
+			this_ques._i18n();
+
 			//設定
 			//投票題目數加一
 			var ques_total = this_compose.data("ques-total");
@@ -3386,14 +3391,14 @@ $(function(){
 					//分派對象檢查
 					if(!$(this).data("object_str") || Object.keys(parsed_obj).length == 0){
 						empty_chk = true;
-						empty_msg = "分派對象尚未完成";
+						empty_msg = $.i18n.getString("COMPOSE_TASK_OWNER_EMPTY");
 						return false;
 					}
 
 					//工作內容檢查
 					if(!this_work.find("textarea").val()){
 						empty_chk = true;
-						empty_msg = "工作內容尚未完成";
+						empty_msg = $.i18n.getString("COMPOSE_TASK_DESC_EMPTY");
 						return false;
 					}
 
@@ -3441,7 +3446,10 @@ $(function(){
 				body.meta.tt = this_compose.data("compose-title");
 				empty_chk = composeVoteObjMake(this_compose,body);
 
-				empty_msg = "投票內容不完整！";
+				empty_msg = $.i18n.getString("COMPOSE_VOTE_EMPTY");
+                /* ----- TODO --------
+                依照空的欄位回應相對的警告訊息(eg.no title/ no option, etc.)
+                ----------------------*/
 				break;
 			//任務 定點回報
 			case 5:
@@ -3623,7 +3631,7 @@ $(function(){
             polling();
         	topEventChk();
         	timelineSwitch("feeds");
-        	toastShow("發佈成功");
+        	toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
         });
 	};
 
@@ -3814,10 +3822,10 @@ $(function(){
                 //加入gu all
                 setGroupAllUser(false,new_gi,function(){
                     if(invite){
-                        toastShow("恭喜您成功加入團體！");
+                        toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );
                     }else{
 
-                        toastShow("團體建立成功");
+                        toastShow( $.i18n.getString("FEED_GROUP_CREATED") );
                         $.mobile.changePage("#page-group-main");
                         timelineSwitch("feeds");
 
@@ -5560,7 +5568,7 @@ $(function(){
         if(!gcnts) return false;
 
     	if(gcnts.G1 > 0){
-    		$(".sm-group-cj-btn span").html(gcnts.G1).show();
+    		$(".hg-invite .sm-count").html(gcnts.G1).show();
     	}
     	if(gcnts.G2 > 0){
     		//最新消息

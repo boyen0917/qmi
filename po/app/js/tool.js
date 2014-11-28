@@ -228,8 +228,8 @@ $(function(){
 		// $("body").addClass("screen-lock");
 		
 		//default
-		$(".popup-confirm").html("確認");
-		$(".popup-cancel").html("取消");
+		$(".popup-confirm").html( $.i18n.getString("COMMON_OK") );
+		$(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
 
 		if(title){
 			$('.popup-title').html(title);

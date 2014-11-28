@@ -254,7 +254,7 @@ $(function(){
 	$(document).on("click",".gmi-div-delete",function(){
 		var this_invite = $(this).parents(".gmi-div");
 		var group_name = this_invite.find(".gmi-div-data div:eq(0) span").html();
-		popupShowAdjust("","您確定要刪除<div class='popup-blue'>" + group_name + "</div>的團體邀請",true,true,[deleteMeInvite,this_invite]);
+		popupShowAdjust("",$.i18n.getString("GROUP_REJECT_ALERT","<div class='popup-blue'>" + group_name + "</div>"),true,true,[deleteMeInvite,this_invite]);
 	});
 
 	$(document).on("click",".gmi-div-agree",function(){
@@ -335,7 +335,7 @@ $(function(){
 	});
 	
 	$(".sm-small-area.setting").click(function(){
-		popupShowAdjust("","確定登出？",true,true,[logout]);
+		popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
 	});
 	
 	//----------------------------------- timeline ---------------------------------------------  
@@ -942,8 +942,8 @@ $(function(){
 
 		//錯誤訊息
 		var error_msg_arr = [];
-		error_msg_arr[".cp-textarea-title"] = "標題尚未填寫";
-		error_msg_arr[".cp-textarea-desc"] = "內容尚未填寫";
+		error_msg_arr[".cp-textarea-title"] = $.i18n.getString("COMPOSE_TITLE_EMPTY");
+		error_msg_arr[".cp-textarea-desc"] = $.i18n.getString("COMPOSE_ DESCRIPTION_EMPTY");
 
 		var chk_arr = [".cp-textarea-desc"];
 
