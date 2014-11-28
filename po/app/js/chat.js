@@ -183,10 +183,9 @@ $(document).ready(function(){
 
 	$( window ).scroll( function(){
 		var posi = $(window).scrollTop();
-		if( posi <= $("#chat-loading").height()*0.5 ){
+		if(  !g_bIsEndOfHistory && posi <= $("#chat-loading").height()*0.5 ){
 			if( false==g_bIsLoadHistoryMsg ){
-				if( !g_bIsEndOfHistory )	getHistoryMsg( false );
-				else updateHistoryMsg();
+				getHistoryMsg( false );
 			}
 			g_isEndOfPage = false;
 			return;
@@ -304,16 +303,20 @@ function getHistoryMsg ( bIsScrollToTop ){
 				}
 	        }
 	    
-			sendMsgRead(g_currentDate.getTime());
+			// sendMsgRead(g_currentDate.getTime());
 			
-			if( g_bIsPolling )	updateChat();
+			// if( g_bIsPolling )	updateChat();
 
 	    	if(bIsScrollToTop){
 	    		scrollToStart();
+	    		g_bIsLoadHistoryMsg = false;
 	    	} else {
-	    		setTimeout( hideLoading, 100);
+	    		setTimeout( hideLoading, 1000);
 	    	}
-	    	g_bIsLoadHistoryMsg = false;
+	    }
+
+	    if( list.length<20 ){
+	    	updateChat( g_lastDate.getTime() );
 	    }
     },{
         index: "gi_ci_ct",
@@ -352,6 +355,7 @@ function hideLoading()
 		var offset = loading.offset().top+loading.height();
 		$('html, body').scrollTop( offset );
 	}
+	g_bIsLoadHistoryMsg = false;
 }
 /*
 api打回來的是以ct開始的訊息....
@@ -359,40 +363,40 @@ api打回來的是以ct開始的訊息....
 暫時先不處理, 之後再問問其他人怎做
 */
 function updateHistoryMsg(){
-	op("/groups/"+gi+"/chats/"+ci+"/messages?"+(g_lastDate.getTime()-2000),
-	    "GET",
-	    "",
-	    function(data, status, xhr) {
+	// op("/groups/"+gi+"/chats/"+ci+"/messages?"+(g_lastDate.getTime()-2000),
+	//     "GET",
+	//     "",
+	//     function(data, status, xhr) {
 
-	        for( var i=(data.el.length-1); i>=0; i--){
-				var object = data.el[i];
-				if(object.hasOwnProperty("meta")){
+	//         for( var i=(data.el.length-1); i>=0; i--){
+	// 			var object = data.el[i];
+	// 			if(object.hasOwnProperty("meta")){
 
-					//pass shown msgs
-					if( g_msgs.indexOf(object.ei)>=0 ){
-						continue;
-					} else {
-						//add to db
-						var node = {
-							gi: gi,
-							ci: ci,
-							ei: object.ei,
-					        ct: object.meta.ct,
-					        data: object
-					    };
-					    //write msg to db
-						g_idb_chat_msgs.put( node );
+	// 				//pass shown msgs
+	// 				if( g_msgs.indexOf(object.ei)>=0 ){
+	// 					continue;
+	// 				} else {
+	// 					//add to db
+	// 					var node = {
+	// 						gi: gi,
+	// 						ci: ci,
+	// 						ei: object.ei,
+	// 				        ct: object.meta.ct,
+	// 				        data: object
+	// 				    };
+	// 				    //write msg to db
+	// 					g_idb_chat_msgs.put( node );
 
-						showMsg( object, true );
-					}
-				}
-			}
+	// 					showMsg( object, true );
+	// 				}
+	// 			}
+	// 		}
 
-	    	scrollToStart();
-	    	g_bIsLoadHistoryMsg = false;
+	//     	scrollToStart();
+	//     	g_bIsLoadHistoryMsg = false;
 
-	    }	//end of function
-	);	//end of op
+	//     }	//end of function
+	// );	//end of op
 }	//end of updateChat
 
 function op ( url, type, data, delegate, errorDelegate){
@@ -468,11 +472,12 @@ function getChatMemName (groupUID){
 	if( null == mem )   return "unknown";
 	return mem.nk;
 }
-function updateChat (){
-	op("/groups/"+gi+"/chats/"+ci+"/messages",
-	    "GET",
-	    "",
-	    function(data, status, xhr) {
+function updateChat ( time ){
+	var api = "/groups/"+gi+"/chats/"+ci+"/messages";
+	if( time ){
+		api+="?ct="+time;
+	}
+	op(api, "GET", "", function(data, status, xhr) {
 			//檢查是否需要更新.
 	    	if( false == g_bIsPolling ){
 				if( data.el.hasOwnProperty("0") ){
@@ -521,13 +526,15 @@ function updateChat (){
 				scrollToBottom();
 			}
 
-			//groups/G000006s00q/chats/T000011m0Fj/messages_read
-			//update read cnt
-		    op("/groups/"+gi+"/chats/"+ci+"/messages_read"
-			    ,"PUT",
-			    JSON.stringify({lt:g_currentDate.getTime()}),
-			    null
-			);
+			if( typeof(time)=='undefined' ){
+				sendMsgRead( g_currentDate.getTime() );
+			} else {
+				if( data.el.length==0 ){
+					g_bIsEndOfHistory = true;
+					$("#chat-loading").hide();
+					$("#chat-nomore").show();
+				}
+			}
 			
 	    }	//end of function
 	);	//end of op

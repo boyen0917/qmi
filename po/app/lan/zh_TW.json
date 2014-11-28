@@ -127,6 +127,7 @@
 	"CHAT_SOMEONE_SEND_PHOTO"				: "%@ 傳送了照片",
 	"CHAT_SOMEONE_SEND_VOICE"					: "%@ 傳送了聲音",
 	"CHAT_SOMEONE_SEND_LOCATION"					: "%@ 傳送了地圖",
+	"CHAT_NO_MORE_MSG" : "已無舊訊息",
 
 	"NOTICES_TITLE"						: "新通知",
 	"NOTICES_POST"						: "發佈",

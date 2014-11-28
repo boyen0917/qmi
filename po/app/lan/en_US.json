@@ -148,6 +148,8 @@
 	"CHAT_SOMEONE_SEND_PHOTO" :	"%@ sent a photo.",
 	"CHAT_SOMEONE_SEND_VOICE" :	"%@ sent a voice message.",
 	"CHAT_SOMEONE_SEND_LOCATION" :	"%@ sent a location.",
+	"CHAT_NO_MORE_MSG" : "No more past message.",
+	
 	"NOTICES_TITLE" :	"New Notices",
 	"NOTICES_POST" :	"Publish",
 	"NOTICES_RESPONSE" :	"Response",
