@@ -976,19 +976,6 @@ img.auo {
 	overflow: hidden;
 }
 
-
-/*.sm-group-cj-btn span {
-	display: none;
-	background: rgb(34,36,38);
-	padding: 3px 7px;
-	border-radius: 3px;
-	text-align: center;
-	color: #cfdef3;
-	margin: 0px -5px 0 5px;
-	position: relative;
-	top: 1px;
-}*/
-
 /* 拿掉會影響 投票的textarea */
 ::-webkit-scrollbar { 
     display: none; 
@@ -1180,6 +1167,9 @@ img.auo {
 
 .gm-frame {
 	display: -webkit-box;
+}
+
+.gm-frame.scrolltop {
 	height: 100%;
 }
 
@@ -1194,6 +1184,44 @@ img.auo {
 }
 
 .gm-adjustment { height: 56px; }
+
+.gm-user-main-area .background {
+	height: 250px;
+	background-size: cover !important;
+	background-position: center !important;
+	position: relative;
+}
+
+.gm-user-main-area .background .name {
+	position: absolute;
+	bottom: 8%;
+	left: 5%;
+	font-size: 25px;
+	color: white;
+}
+
+.gm-user-main-area .group {
+	height: 70px;
+	background: white;
+	display: -webkit-box;
+}
+
+.gm-user-main-area .group .pic {
+	width: 60px;
+	height: 60px;
+	border-radius: 60px;
+	background-size: cover !important;
+	position: relative;
+	top: 5px;
+	left: 20px;
+}
+
+.gm-user-main-area .group .name {
+	font-size: 20px;
+	position: relative;
+	top: 20px;
+	left: 40px;
+}
 
 #page-group-main .gm-content {
     position: relative;
@@ -2439,6 +2467,7 @@ img.st-user-pic{
 
 .st-attach-audio, .st-attach-video {
 	margin-top: 20px;
+	margin: 0 auto;
 }
 
 .st-box2-feedback-area {
@@ -3965,6 +3994,13 @@ img.user-info-back {
 .user-avatar-bar .user-name {
 	font-size: 20px;
 	margin-top: 10px;
+}
+
+.user-avatar-bar .user-name.hidden {
+	width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .user-avatar-bar div {

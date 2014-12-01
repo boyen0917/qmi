@@ -123,7 +123,7 @@
         </div>
 <!---------------------------------- page-group-main ------------------------------------>
         <div data-role="page" id="page-group-main" >
-            <div class="gm-frame">
+            <div class="gm-frame scrolltop">
                 <div class="gm-side-menu">
                     <div class="sm-header" style="background: url(images/common/cover/sidemeun_cover00.png);">
                         <div class="sm-group-pic"></div>
@@ -182,7 +182,7 @@
                     </div>
                 </div>
                 <div class="gm-content">
-                    <div class="gm-header">
+                    <div class="gm-header user-main-toggle">
                         <div class="gm-header-adjustment"></div>
                         <div class="header-group-name">
                             <div class="page-title" data-textid="LEFT_FEED"></div>
@@ -201,7 +201,16 @@
                         </div>
                         <div class="feed-compose-area-cover"></div>
                     </div>
-                    <div class="gm-adjustment"></div>
+                    <div class="gm-adjustment user-main-toggle"></div>
+                    <div class="gm-user-main-area" style="display:none">
+                        <div class="background">
+                            <div class="name"></div>
+                        </div>
+                        <div class="group">
+                            <div class="pic"></div>
+                            <div class="name"></div>
+                        </div>
+                    </div>
                 <!------------------------------------- 動態消息 ---------------------------------------->
                     <div class="subpage-timeline ">
                         <div class="st-navi-area">
@@ -231,9 +240,9 @@
                             <img style="display:none" src="images/st_bottom_loading.gif"/>
                             <span data-textid='COMMON_UPDATING'></span>
                         </div>
-                        <div class="st-top-area-load"></div>
+                        <div class="st-top-area-load user-main-toggle"></div>
 
-                        <div class="st-filter-area">
+                        <div class="st-filter-area user-main-toggle">
                             <div class="st-filter-list st-filter-main"><span data-textid='FEED_ALL'></span><img src="images/icon/icon_arrow_right.png"/></div>
                             <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide" style="display:none"><span data-textid='FEED_ALL'></span></div>
                             <div class="st-filter-other">
@@ -253,6 +262,7 @@
                             <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
                             <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
                             <div data-feed="03" class="feed-task feed-subarea switch-reset"></div>
+                            <div data-feed="main" class="feed-subarea switch-reset"></div>
                         </div>
                         <div class="st-feedbox-area-bottom">
                             <img src="images/st_bottom_loading.gif"/>

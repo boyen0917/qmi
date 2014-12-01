@@ -73,8 +73,7 @@ $(function(){
 
 	//test
 	$(".header-group-name").click(function(){
-		// $(".subpage-timeline ").animate({bottom:"125px"});
-		cns.debug("asdf");
+		// $(".st-feedbox-area ").animate({bottom:"125px"});
 		//彩蛋鑰匙
 		supriseKey();
 	});
@@ -283,7 +282,10 @@ $(function(){
 	//更換動態
 	$(document).on("click",".sm-small-area,.sm-group-area",function(){
 		//滾動至最上面
-		// $(".subpage-timeline ").animate({scrollTop: 0}, 0);
+		timelineScrollTop();
+
+		//取消主頁
+		timelineMainClose();
 
 		var icon_default = "images/icon/icon_timeline_tab_";
 		//圖片先還原
@@ -464,6 +466,10 @@ $(function(){
 
 	$(document).on('click','.st-sub-box-3 .st-like',function(){
 		var this_event = $(this).parents(".st-sub-box");
+		//api結束前 不能按
+		if(this_event.data("like-lock")) return false;
+		this_event.data("like-lock",true);
+
 		var like_count = parseInt(this_event.find(".st-sub-box-3 div:eq(0)").html());
 		//按讚 收回 api
 		var target_obj = {};
@@ -477,32 +483,18 @@ $(function(){
     	//event path
 		this_event.data("event-path",this_ei);
 
-
-		//按讚區域
-    	var parti_list = this_event.data("parti-list");
-
 		//檢查按讚了沒
 		//按讚 like_chk是true
 		if(!this_event.data("event-val").meta.il){
 			var est = 1;
-
-			//按讚區域 改寫陣列
-			parti_list.push(gu);
 		}else{
 			//收回
 			var est = 0;
-
-			//按讚區域 改寫陣列
-			var i = $.inArray(gu,parti_list);
-			parti_list.splice(i,1);
 		}
 
 		//發完api後做真正存入動作
 		putEventStatus(target_obj,1,est,function(chk){
-
 			if(chk){
-				//做按讚區域改寫 (你、按讚)
-				this_event.data("parti-list",parti_list);
 				//detail開啓 才做按讚敘述
 				if(this_event.data("detail-content")) detailLikeStringMake(this_event);
 			}
@@ -892,10 +884,8 @@ $(function(){
 	$(document).on("mouseup",timeline_detail_exception.join(","),function(e){
 		e.stopPropagation();
 	});
-	
-	
-	//----------------------------------- compose-貼文 ---------------------------------------------
 
+	//----------------------------------- compose-貼文 ---------------------------------------------
 	
 	//貼文選單
 	$(".fc-area-subbox").click(function(){

@@ -302,8 +302,6 @@ $(function(){
                         }
                         new_bl[biTmp].cnt = cnt;
                     }
-
-                    cns.debug("new_bl:",new_bl);
         		}
 
                 //fav branch
@@ -507,7 +505,6 @@ $(function(){
 		//只用在 sidemenu 及 timelineblockmake 的檢查
 		//先檢查localStorage[gi].guAll是否存在
         if(Object.keys($.lStorage(ui)[gi].guAll).length == 0){
-            cns.debug("chkGroupAllUser");
         	setGroupAllUser(data_arr);
         }else{
         	getUserName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
@@ -3896,6 +3893,12 @@ $(function(){
 		var polling_arr = polling_arr || [];
 		var this_gi = polling_arr[0] || gi;
 		var this_ti = polling_arr[1] || ti_feed;
+        var main_gu = $("#page-group-main").data("main-gu");
+
+        if(main_gu){
+            this_gi = $("#page-group-main").data("main-gi");
+            this_ti = $.lStorage(ui)[this_gi].tl[1].ti;
+        }
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
 	    //製作timeline
@@ -3903,6 +3906,15 @@ $(function(){
 	    if(ct_timer){
 	    	api_name = api_name + "?ct=" + ct_timer;
 	    }
+
+        if(main_gu){
+            event_tp = "00";
+            if(api_name.match(/\?/)){
+                api_name = api_name + "&gu=" + main_gu;
+            }else{
+                api_name = api_name + "?gu=" + main_gu;
+            }
+        }
 
 	    var headers = {
 	            ui:ui,
@@ -3913,7 +3925,6 @@ $(function(){
 	    var method = "get";
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
-
 	    	//關閉下拉更新的ui
 	    	if(is_top){
 				setTimeout(function(){
@@ -3939,6 +3950,13 @@ $(function(){
 	        	},2000);
 	        	return false;
 	    	}
+
+            if(main_gu){
+                $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+                    timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
+                });
+                return false;
+            }
 
 	    	idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
 	    		//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
@@ -4052,7 +4070,12 @@ $(function(){
 
         if(!detail){
             var event_tp = $("#page-group-main").data("navi") || "00";
-            var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
+
+            if($("#page-group-main").data("main-gu")){
+                var ori_selector = $(".feed-subarea[data-feed=main]");
+            }else{
+                var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
+            }
             var top_subbox = ori_selector.find(".st-sub-box:eq(0)");
 
             var total_cnt = timeline_list.length;
@@ -4123,9 +4146,6 @@ $(function(){
 
             //autosize textarea
             this_event.find('.st-reply-message-textarea textarea').autosize({append: "\n"});
-
-
-
 
             //記錄timeline種類
             this_event.attr("data-event-id",val.ei);
@@ -4290,16 +4310,14 @@ $(function(){
             selector.show();
             //load_chk 避免沒資料的
             selector.append("<p class='load-chk'></p>");
-
-    		// if(selector.find(".load-chk").length) return false;
     	}
 
 		var idb_timer = ct_timer - 1 || 9999999999999;
 		//取得server最新資訊 更新資料庫
 		idbPutTimelineEvent(ct_timer,is_top);
 
-		//下拉更新就不需要資料庫了
-		if(is_top) return false;
+		//下拉更新 和 個人主頁 就不需要資料庫了
+		if(is_top || $("#page-group-main").data("main-gu")) return false;
 
 		//判斷類別
 		var idb_index,idb_keyRange;
@@ -4546,7 +4564,6 @@ $(function(){
 
 					var youtube_code = getYoutubeCode(val.c);
 					if(youtube_code){
-                        cns.debug("youtube_code",youtube_code);
 						this_event.find(".st-attach-youtube").show();
 						this_event.find(".st-attach-youtube").html(
 							'<iframe width="320" height="280" src="//www.youtube.com/embed/'+ youtube_code +'" frameborder="0" allowfullscreen></iframe>'
@@ -5039,6 +5056,8 @@ $(function(){
         ajaxDo(api_name,headers,method,false).complete(function(data){
         	//做timeline樓主的回覆狀態
         	if(data.status == 200){
+                //解鎖
+                this_event.data("like-lock",false);
 
                 var d =$.parseJSON(data.responseText);
         		//timeline 外層
@@ -5046,15 +5065,28 @@ $(function(){
 	        		var count_selector = this_event.find(".st-sub-box-3 div:eq(" + order + ")");
 	        		var img_selector = this_event.find(".st-sub-box-3 img:eq(" + order + ")");
 
+                    //按讚區域
+                    var parti_list = this_event.data("parti-list");
+
 	        		//0:取消 1:執行
 		        	if(est){
 		        		img_selector.attr("src","images/icon/icon_" + act + "_activity.png")
 		        		count_selector.html(count_selector.html()*1+1);
 		        		this_status = true;
+
+                        //按讚區域 改寫陣列
+                        parti_list.push(gu);
 		        	}else{
 		        		img_selector.attr("src","images/icon/icon_" + act + "_normal.png")
 		        		count_selector.html(count_selector.html()*1-1);
+
+                        //按讚區域 改寫陣列
+                        var i = $.inArray(gu,parti_list);
+                        parti_list.splice(i,1);
 		        	}
+
+                    //存回
+                    this_event.data("parti-list",parti_list);
 
                     //記錄在data中 讓按讚列表可使用
                     var parti_like_arr = this_event.data("parti-like");
@@ -5063,7 +5095,10 @@ $(function(){
                             parti_like_arr.push({gu:gu,rt:new Date().getTime()});
                         }else{
                             $.each(parti_like_arr,function(i,val){
-                                if(val.gu == gu) parti_like_arr.splice(i,1);
+                                if(val && val.gu == gu) {
+                                    parti_like_arr.splice(i,1);
+                                    return false;
+                                }
                             });
                         }
                     } 
@@ -5752,7 +5787,6 @@ $(function(){
                 this_info.find(".action-edit").hide();
                 this_info.find(".action-chat").off("click").click( function(){
                     requestNewChatRoomApi(this_gi, "", [{gu:this_gu}], function(data){
-
                     });
                 });
             }
@@ -5762,6 +5796,9 @@ $(function(){
                     $("body").addClass("user-info-adjust");
     				//為了美觀
     				this_info.find(".user-avatar-bar").show();
+
+                    this_info.data("this-info-gu",this_gu);
+                    this_info.data("this-info-gi",this_gi);
 
 			    	//頭像
 	        		if(user_data.aut){
@@ -5802,7 +5839,7 @@ $(function(){
     	var avatar_bar_arr = ["nk","sl","bd","bl"];
     	var img_arr = ["em","pn","pn1","ext","mv"];
     	var selector;
-    	
+
 		for( item in user_data){
 			if(user_data[item].length > 0){
 				if(item == "bd" && me){
@@ -5816,6 +5853,7 @@ $(function(){
 				}
 
 				if(!me && item == "bd") {
+                    cns.debug("bd????",user_data);
 					user_data.bd = user_data.bd.substring(4,6) + "." + user_data.bd.substring(6,8);
 					method = "append";
 				}
@@ -5841,7 +5879,9 @@ $(function(){
 		if(user_data.mkb) {
 			this_info.find(".user-avatar-bar .bd").hide();
 			this_info.find(".user-info-list .bd").val("******");	
-		}
+		}else{
+            this_info.find(".user-avatar-bar .user-name").addClass("hidden");
+        }
 
     }
 
@@ -6012,7 +6052,39 @@ $(function(){
 	    	});
     	}
 
-	    	
+        //主頁
+        this_info.find(".action-main").off("click").click( function(){
+            //滾動至最上
+            timelineScrollTop();
+
+            var this_gu = this_info.data("this-info-gu");
+            var this_gi = this_info.data("this-info-gi");
+            //結束關閉
+            this_info.find(".user-info-close").trigger("mouseup");
+            $(".alert").removeClass("alert-visit");
+            $(".alert-area-cover").hide();
+            $(".alert").removeClass("alert-click");
+            $(".alert-area").hide();
+
+            //主頁背景
+            $(".gm-user-main-area").fadeIn("fast",function(){
+                var _thisGroupList = $.lStorage(ui)[this_gi];
+                $(".gm-user-main-area .background").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
+                $(".gm-user-main-area .name").html(_thisGroupList.guAll[this_gu].nk);
+                $(".gm-user-main-area .group .pic").css("background","url(" + _thisGroupList.aut + ")");
+                $(".gm-user-main-area .group .name").html(_thisGroupList.gn);
+            });
+
+            $(".user-main-toggle").hide();
+            $(".gm-user-main-area").show();
+            $("#page-group-main").data("main-gu",this_gu);
+            $("#page-group-main").data("main-gi",this_gi);
+            $("#page-group-main").data("navi","main");
+            $(".st-filter-area").data("filter","all");
+            $(".st-feedbox-area div[data-feed=main]").html("");
+            $(".feed-subarea").hide();
+            timelineListWrite();
+        });
     }
 
     userInfoSend = function(this_info){
@@ -6035,10 +6107,9 @@ $(function(){
 		  nk: new_name, // Nickname
 		  sl: this_info.find(".user-info-list .sl").val() // Slogan
 		}
-		cns.debug("before info send this_info data:",this_info.data());
+
         var method = "put";
         ajaxDo(api_name,headers,method,false,body).complete(function(data){
-        	cns.debug("after info send this_info data:",this_info.data());
         	//重置團體頭像、名稱的參數
 			var data_arr = ["getUserName",gi,gu,$(".sm-user-area-r div"),$(".sm-user-pic img")];
 
@@ -6093,7 +6164,6 @@ $(function(){
         });
     }
 
-
 	//這也可以合併..avatarPos
     userInfoAvatarPos = function(img){
     	//魔術數字 是個人資料的長寬比例400/250 小於這個比例 就要以寬為長邊
@@ -6136,6 +6206,19 @@ $(function(){
         });
     }
 
+    timelineMainClose = function(){
+        $("#page-group-main").data("main-gu",false);
+        $(".user-main-toggle").show();
+        $(".gm-user-main-area").hide();
+        $(".st-feedbox-area div[data-feed=main]").html("");
+    }
+
+    timelineScrollTop = function(){
+        $(".gm-frame").removeClass("scrolltop");
+        setTimeout(function(){
+            $(".gm-frame").addClass("scrolltop");
+        },100);
+    }
 
     //反過來 點選四次 關閉
     supriseKey = function(){
