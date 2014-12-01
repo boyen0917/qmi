@@ -159,7 +159,7 @@ function showChatList(){
 				td.append("<div class='drag'></div>");
 				row.append(td);
 
-				setLastMsg( gi, room.ci, table );
+				setLastMsg( gi, room.ci, table, false );
 				targetDiv.append(table);
 			}
 		});
@@ -243,7 +243,7 @@ function openChatWindow ( ci ){
 
 function updateLastMsg(giTmp, ciTmp, isRoomOpen ){
 	var table = $(".subpage-chatList-row[data-rid='"+ciTmp+"']");
-	setLastMsg( giTmp, ciTmp, table, isRoomOpen );
+	setLastMsg( giTmp, ciTmp, table, true, isRoomOpen );
 	setTimeout(sortRoomList, sortRoomListTimeout);
 }
 function clearChatListCnt( giTmp, ciTmp ){
@@ -255,7 +255,7 @@ function clearChatListCnt( giTmp, ciTmp ){
 	$(".subpage-chatList-row[data-rid='"+ciTmp+"'] .cnt").html("");
 }
 
-function setLastMsg( giTmp, ciTmp, table, isRoomOpen ){
+function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 	if( null==isRoomOpen ) isRoomOpen = false;
 	// if( gi!=giTmp ) return;
 	// if(!table) return;
@@ -264,14 +264,14 @@ function setLastMsg( giTmp, ciTmp, table, isRoomOpen ){
 	    if( list.length>0 ){
 	    	if( null!=list[0] ){
 	        	var object = list[0].data;
-	        	setLastMsgContent( giTmp, ciTmp, table, object, isRoomOpen );
+	        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
 	    	}
 	    }
 	},{
 	    index: "gi_ci_ct",
 	    keyRange: g_idb_chat_msgs.makeKeyRange({
-	        upper: [gi, ciTmp, new Date().getTime()],
-	        lower: [gi, ciTmp]
+	        upper: [giTmp, ciTmp, new Date().getTime()],
+	        lower: [giTmp, ciTmp]
 	        // only:18
 	    }),
 	    limit: 1,
@@ -285,7 +285,7 @@ function setLastMsg( giTmp, ciTmp, table, isRoomOpen ){
 	});
 }
 
-function setLastMsgContent( giTmp, ciTmp, table, data, isRoomOpen ){
+function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen ){
 	var userData = $.lStorage(ui);
 	var groupData = userData[giTmp];
 	if( null==groupData || null==groupData.chatAll ) return;
@@ -328,7 +328,7 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isRoomOpen ){
 			if(msgDom)	msgDom.html( text.replaceOriEmojiCode() );
 			// cns.debug( new Date(data.meta.ct).toFormatString() );
 			if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
-			if( false ==isRoomOpen ){
+			if( false==isRoomOpen ){
 				var cntDom = table.find(".cnt");
 				if(cntDom){
 					var cntText = "";
@@ -343,7 +343,7 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isRoomOpen ){
 		}
 	}
 	
-	// if( false == isRoomOpen ){
+	if( isShowAlert ){
 		try{
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			riseNotification (null, groupData.gn.parseHtmlString()+" - "+mem.nk, text, function(){
@@ -352,7 +352,7 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isRoomOpen ){
 		} catch(e) {
 			cns.debug( e );
 		}
-	// }
+	}
 }
 
 function sortRoomList(){
