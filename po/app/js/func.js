@@ -412,7 +412,7 @@ $(function(){
 	}
 	
 
-	timelineSwitch = function (act,reset){
+	timelineSwitch = function (act,reset,main){
 		//reset 
 		if(reset) {
 			$(".feed-subarea").removeData();
@@ -425,11 +425,13 @@ $(function(){
 	        case "feeds":
 				$(".feed-subarea").hide();
 				$(".st-filter-main span").html("全部");
+
 				//filter all
 				$(".st-filter-area").data("filter","all");
 
 	        	//點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
-			    $(".st-navi-area .main").trigger("click");
+                if(!main)
+                    $(".st-navi-area .main").trigger("click");
 
 	        	$(".subpage-contact").hide();
 	        	$(".subpage-chatList").hide();
@@ -4318,7 +4320,7 @@ $(function(){
 
 		//下拉更新 和 個人主頁 就不需要資料庫了
 		if(is_top || $("#page-group-main").data("main-gu")) return false;
-
+        cns.debug("whatzzup");
 		//判斷類別
 		var idb_index,idb_keyRange;
 		if(!event_tp || event_tp == "00"){
@@ -5384,18 +5386,18 @@ $(function(){
                                 "p": pi,
                                 "tp": 6
                             });
-                            sendReply( this_event, this_gi, this_ti, this_ei, body );
+                            replyApi( this_event, this_gi, this_ti, this_ei, body );
                         });
                     }
                 }
                 break;
         }
         if( !isWaiting ){
-            sendReply( this_event, this_gi, this_ti, this_ei, body );
+            replyApi( this_event, this_gi, this_ti, this_ei, body );
         }
 	}
 
-    sendReply = function(this_event, this_gi, this_ti, this_ei, body){
+    replyApi = function(this_event, this_gi, this_ti, this_ei, body){
         s_load_show = false;
         var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events?ep=" + this_ei;
 
@@ -5409,21 +5411,19 @@ $(function(){
         var result = ajaxDo(api_name,headers,method,false,body);
         result.complete(function(data){
             //重新讀取detail
-            // popupShowAdjust("","回覆成功");
-
             this_event.find(".st-reply-message-send").data("reply-chk",false);
             var this_textarea = this_event.find(".st-reply-message-textarea textarea");
             this_textarea.val("").parent().addClass("adjust").removeClass("textarea-animated");
 
             setTimeout(function(){
-
                 if(this_event.find(".st-reply-all-content-area").is(":visible")) {
                     replyReload(this_event);
                 }else{
+                    if(this_event.find(".st-reply-message-img").is(":visible"))this_event.find(".st-reply-message-img").html("");
+                    if(this_event.find(".stickerArea").is(":visible")) this_event.find(".stickerArea").hide();
                     this_event.find(".st-sub-box-2").trigger("detailShow");
                 }
             },400);
-
         });
     }
 
@@ -5441,6 +5441,7 @@ $(function(){
             stickerIcon.trigger("click");
         }
 
+
 		//重設任務完成狀態
 		eventStatusWrite(this_event);
 
@@ -5454,13 +5455,8 @@ $(function(){
         getEventDetail(this_event.data("event-id")).complete(function(data){
             if(data.status == 200){
                 var e_data = $.parseJSON(data.responseText).el;
-
-                // if(!this_event.find(".st-box2-more-desc-detail").is(":visible"))
-                //     eventContentDetail(this_event,e_data);
-
                 detailTimelineContentMake(this_event,e_data,true);
             }
-                
         });
 	};
 
@@ -6054,6 +6050,9 @@ $(function(){
 
         //主頁
         this_info.find(".action-main").off("click").click( function(){
+            $.mobile.changePage("#page-group-main");
+            timelineSwitch("feeds",false,true);
+
             //滾動至最上
             timelineScrollTop();
 
@@ -6061,11 +6060,6 @@ $(function(){
             var this_gi = this_info.data("this-info-gi");
             //結束關閉
             this_info.find(".user-info-close").trigger("mouseup");
-            $(".alert").removeClass("alert-visit");
-            $(".alert-area-cover").hide();
-            $(".alert").removeClass("alert-click");
-            $(".alert-area").hide();
-
             //主頁背景
             $(".gm-user-main-area").fadeIn("fast",function(){
                 var _thisGroupList = $.lStorage(ui)[this_gi];
@@ -6075,15 +6069,30 @@ $(function(){
                 $(".gm-user-main-area .group .name").html(_thisGroupList.gn);
             });
 
+            if($(".alert-area").is(":visible")){
+                $(".alert").removeClass("alert-visit");
+                $(".alert-area-cover").hide();
+                $(".alert").removeClass("alert-click");
+                $(".alert-area").hide();
+            }
+
             $(".user-main-toggle").hide();
             $(".gm-user-main-area").show();
-            $("#page-group-main").data("main-gu",this_gu);
-            $("#page-group-main").data("main-gi",this_gi);
-            $("#page-group-main").data("navi","main");
-            $(".st-filter-area").data("filter","all");
-            $(".st-feedbox-area div[data-feed=main]").html("");
-            $(".feed-subarea").hide();
-            timelineListWrite();
+            $(".st-feedbox-area").hide();
+
+            setTimeout(function(){
+                //滾動至最上
+                timelineScrollTop();
+
+                $(".st-feedbox-area div[data-feed=main]").html("");
+                $(".st-feedbox-area").show();
+                $(".feed-subarea").hide();
+                $("#page-group-main").data("main-gu",this_gu);
+                $("#page-group-main").data("main-gi",this_gi);
+                $("#page-group-main").data("navi","main");
+                $(".st-filter-area").data("filter","all");
+                timelineListWrite();
+            },200);
         });
     }
 
