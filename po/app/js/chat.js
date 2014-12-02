@@ -121,7 +121,7 @@ $(document).ready(function(){
 	$(".cp-file").change(function(e) {
 		var file_ori = $(this);
 		if(file_ori[0].files.length>9){
-			popupShowAdjust("","圖檔最多限制9個");
+			popupShowAdjust("",$.i18n.getString("COMMON_SEND_PHOTO_LIMIT",9) );
 			return false;
 		}
 

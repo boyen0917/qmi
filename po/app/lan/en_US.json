@@ -24,6 +24,9 @@
 	"COMMON_SUBMIT" : "Submit",
 	"COMMON_CONSTRUCTION" : "Under construction",
 	"COMMON_UPLOAD_FAIL" : "Upload failed",
+	"COMMON_SEND_PHOTO_LIMIT" : "You can send up to %ld photos at once.",
+	"COMMON_TIMEOUT_ALERT" : "Timeout, please reconnect.",
+	"COMMON_CHECK_NETWORK" : "",
 	
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
@@ -73,6 +76,7 @@
 	"FEED_VOTE_LIMIT" : "Please select at least one option",
 	"FEED_VOTE_SENDED" : "Voting successed",
 	"FEED_VOTE_FAILED" : "Voting failed",
+	"FEED_REPLY_FILE_LIMIT_ALERT" : "You can only upload one image in each reply.",
 
 	"LANDING_PAGE_LOGIN" :	"Login",
 	"LANDING_PAGE_REGISTER" :	"Sign Up",
@@ -84,6 +88,7 @@
 	"LEFT_CREATE_GROUP" :	"Create Group",
 	"LEFT_INVITATION" :	"Invitation",
 	"LEFT_SYSTEM_SETTING" :	"System Setting",
+
 	"SETTING_LOGOUT" : "Logout",
 	"SETTING_DO_LOGOUT" : "Are you sure want to logout?",
 
@@ -125,6 +130,11 @@
 	"GROUP_JOIN_SUCC" :	"Join group successed!",
 	"GROUP_GROUP_INVITATION" :	"Group %@ has sent you a invitation",
 	"GROUP_MEMBERS" :	"%ld member(s)",
+	"GROUP_NAME_LIMIT" : "Group name should have 6 to 20 digits or characters",
+	"GROUP_AVATAR_ALERT" : "Please take a picture for group icon",
+	"GROUP_ABOUT_ALERT" : "Please enter group description.",
+	"GROUP_AVATAR_UPLOAD_ALERT" : "Group picture upload failed. Please try again.",
+
 	"COMPOSE_DESCRIPTION" :	"Description",
 	"COMPOSE_TITLE" :	"Title",
 	"COMPOSE_RECEIVER" :	"Receiver",
@@ -208,6 +218,17 @@
 	"GROUP_MEMBERS" : "%ld member(s)",
 	"GROUP_REJECT_ALERT" : "Reject %@'s invitation?",
 
+	"SETTING_PROFILE_NAME" : "Name",
+	"SETTING_PROFILE_BIRTHDAY" : "Birthday",
+	"USER_PROFILE_MOOD" : "Signature",
+	"USER_PROFILE_BRANCHE" : "Branch",
+	"USER_PROFILE_POSITION" : "Position",
+	"USER_PROFILE_EXTENSION" : "Ext.",
+	"USER_PROFILE_PHONE" : "Phone",
+	"USER_PROFILE_EMAIL" : "E-Mail",
+	"USER_PROFILE_MVPN" : "MVPN",
+	"USER_PROFILE_HOMEPAGE" : "Homepage",
 	"USER_PROFILE_EMPTY_NAME" : "Please enter your name info.",
-	"USER_PROFILE_UPDATE_SUCC" : "Update successed."
+	"USER_PROFILE_UPDATE_SUCC" : "Update successed.",
+	"USER_PROFILE_NO_DATA" : "No data"
 }

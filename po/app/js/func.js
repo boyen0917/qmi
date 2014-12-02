@@ -598,6 +598,7 @@ $(function(){
 
         			top_area.find(".st-top-event-set").append($('<div class="st-top-event">').load('layout/layout.html .st-top-event-load',function(){
         				var this_top_event = $(this);
+                        this_top_event.find(".st-top-event-load")._i18n();
         				this_top_event.data("data-obj",val);
         				this_top_event.data("pos",i);
 
@@ -5797,6 +5798,7 @@ $(function(){
     	
     	$(".user-info-load-area .user").load('layout/layout.html .user-info-load',function(){
     		var this_info = $(this).find(".user-info-load");
+            this_info._i18n();
     		//為了美觀
 			this_info.find(".user-avatar-bar").hide();
 
@@ -5920,6 +5922,7 @@ $(function(){
         $(".user-info-load-area").addClass("transition1s");
     	$(".user-info-load-area .me").load('layout/layout.html .me-info-load',function(){
     		var this_info = $(this).find(".me-info-load");
+            this_info._i18n();
 
     		//團體頭像
     		this_info.find(".group-avatar img").attr("src",$.lStorage(ui)[gi].aut);

@@ -197,7 +197,7 @@ $(function(){
 
 			reader.readAsDataURL(file);	
 		}else{
-			popupShowAdjust("","檔案必須為圖檔",true);
+			popupShowAdjust("",$.i18n.getString("COMMON_NOT_IMAGE"),true);
 		}
 	});
 	
@@ -205,16 +205,16 @@ $(function(){
 	$(".gm-create-submit").click(function(){
 
 		if ( !$(".gmc-avatar").data("chk" )){
-				popupShowAdjust("","圖片未上傳",true);
+				popupShowAdjust("",$.i18n.getString("GROUP_AVATAR_ALERT"),true); //"圖片未上傳"
 				return false;
 		} 
 		if ( !$(".gmc-name input").val() ){
-			popupShowAdjust("","團體名稱未填寫",true);
+			popupShowAdjust("",$.i18n.getString("GROUP_NAME_LIMIT"),true); //"團體名稱未填寫"
 	        return false;
 		} 
 
 		if ( !$(".gmc-desc textarea").val() ){
-	        popupShowAdjust("","團體介紹未填寫",true);
+	        popupShowAdjust("",$.i18n.getString("GROUP_ABOUT_ALERT"),true);	//"團體介紹未填寫"
 	        return false;
 		}else{
 			var file = $(".gmc-file")[0].files[0];
@@ -233,7 +233,7 @@ $(function(){
 
 	        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
 	        			if(!chk) {
-	        				toastShow("團體頭像上傳失敗");
+	        				toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") ); //團體頭像上傳失敗
 	        			}
 
 	        			groupMenuListArea(cg_result.gi);
@@ -612,7 +612,7 @@ $(function(){
 	$(document).on('change','.st-reply-message-file',function(e){
 		var file_ori = $(this);
 		if(file_ori[0].files.length>1){
-			popupShowAdjust("","圖檔最多限制1個");
+			popupShowAdjust("", $.i18n.getString("COMMON_SEND_PHOTO_LIMIT",1) );	//圖檔最多限制1個
 			return false;
 		}
 
@@ -1058,7 +1058,7 @@ $(function(){
 		});
 
 		if(limit_chk){
-			popupShowAdjust("","圖檔最多限制9個");
+			popupShowAdjust("",$.i18n.getString("COMMON_SEND_PHOTO_LIMIT",9) );
 			// return false;
 		}
 

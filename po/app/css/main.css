@@ -3977,6 +3977,9 @@ img.user-info-back {
 .user-info-load .action div:active {
 	background: rgb(212,228,232);
 }
+.user-info-load .action label {
+	cursor: pointer;
+}
 
 .user-info-load .action-bar {
 	background: white;

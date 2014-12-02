@@ -148,7 +148,10 @@
 	"COMMON_SUBMIT" : "送出",
 	"COMMON_CONSTRUCTION" : "建置中",
 	"COMMON_UPLOAD_FAIL" : "上傳失敗",
-
+	"COMMON_SEND_PHOTO_LIMIT" : "一次只能選取%ld張照片",
+	"COMMON_TIMEOUT_ALERT" : "連線逾時",
+	"COMMON_CHECK_NETWORK" : "目前網路不穩定，請確認連線狀況。",
+	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",
 	"CHAT_READ" : "已讀",
@@ -184,6 +187,7 @@
 	"SETTING_LOGOUT" : "登出",
 	"SETTING_DO_LOGOUT" : "確定要登出嗎?",
 
+
 	"FEED_GROUP_CREATED" : "成功建立團體！",
 	"GROUP_CREATE_GROUP" : "建立團體",
 	"GROUP_INVITATION" : "團體邀請",
@@ -196,7 +200,23 @@
 	"GROUP_GROUP_INVITATION" : "%@ 邀請你加入團體",
 	"GROUP_MEMBERS" : "%ld 位成員",
 	"GROUP_REJECT_ALERT" : "確定拒絕 %@ 的邀請?",
+	"GROUP_NAME_LIMIT" : "請輸入2~20字的團體名稱",
+	"GROUP_AVATAR_ALERT" : "請新增團體頭像",
+	"GROUP_ABOUT_ALERT" : "團體介紹未填寫",
+	"GROUP_AVATAR_UPLOAD_ALERT" : "團體頭像上傳失敗",
 
+	"SETTING_PROFILE_NAME" : "姓名",
+	"SETTING_PROFILE_BIRTHDAY" : "生日",
+	"USER_PROFILE_MOOD" : "心情留言",
+	"USER_PROFILE_BRANCHE" : "部門",
+	"USER_PROFILE_POSITION" : "職稱",
+	"USER_PROFILE_EXTENSION" : "分機",
+	"USER_PROFILE_PHONE" : "手機",
+	"USER_PROFILE_EMAIL" : "信箱",
+	"USER_PROFILE_MVPN" : "MVPN",
+	"USER_PROFILE_HOMEPAGE" : "主頁",
 	"USER_PROFILE_EMPTY_NAME" : "姓名不能為空值",
-	"USER_PROFILE_UPDATE_SUCC" : "更新成功"
+	"USER_PROFILE_UPDATE_SUCC" : "更新成功",
+	"USER_PROFILE_NO_DATA" : "暫無資料"
+
 }
