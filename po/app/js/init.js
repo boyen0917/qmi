@@ -145,12 +145,12 @@ $(function(){
 		//ajax逾時
 		if(jqxhr.statusText == "timeout"){
 			// popupShowAdjust("","網路不穩 請稍後再試",true);
-			toastShow("連線逾時");
+			toastShow( $.i18n.getString("COMMON_TIMEOUT_ALERT") );
 			return false;
 		}
 		//logout~
 		if(jqxhr.status == 401){
-			popupShowAdjust("","驗證失敗 請重新登入",true,false,[reLogin]);
+			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
 			return false;
 		}
 
@@ -241,7 +241,7 @@ $(function(){
 			return $.parseJSON(data.responseText).rsp_msg;
 		}else{
 			cns.debug("errorResponse:",data);
-			return "網路連線不穩 請稍後再試";
+			return $.i18n.getString("COMMON_CHECK_NETWORK");
 		}
 	}
 

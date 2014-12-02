@@ -1923,12 +1923,14 @@ img.st-user-pic{
 	padding: 12px 0 10px 20px;
 	border-bottom: 1px solid rgb(211,216,218);
 	color:#868686;
+	cursor: default;
 }
 
 .st-sub-box-3 img {
 	position: relative;
     margin: 0 5px;
     width: 25px;
+	cursor: pointer;
 }
 
 .st-sub-box-3 img:nth-child(3) {
@@ -3091,7 +3093,7 @@ img.st-reply-message-attach {
 
 .cp-vote-ques-title img:nth-child(3) {
 	position: relative;
-	left: 65px;
+	left: 85px;
 	top: 23px;
 	cursor: default;
 	width: 20px;
@@ -3992,6 +3994,9 @@ img.user-info-back {
 
 .user-info-load .action div:active {
 	background: rgb(212,228,232);
+}
+.user-info-load .action label {
+	cursor: pointer;
 }
 
 .user-info-load .action-bar {

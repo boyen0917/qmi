@@ -2,12 +2,12 @@
     <img class="st-sub-box-more-btn" src="images/timeline/timeline_feedbox_icon_list.png"/>
     <div class="st-sub-box-more">
        <div class="st-more-close"></div>
-       <div data-st-more="top" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_top.png"/><div>置頂</div></div>
-       <div data-st-more="subscribe" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_subscribe.png"/><div>訂閱</div></div>
-       <div data-st-more="copy" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copy.png"/><div>複製</div></div>
-       <div data-st-more="copyword" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copyword.png"/><div>複製內容</div></div>
-       <div data-st-more="calendar" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_calendar.png"/><div>加入行事曆</div></div>
-       <div data-st-more="del" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_del.png"/><div>刪除</div></div>
+       <div data-st-more="top" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_top.png"/><div data-textid="FEED_TOP"></div></div>
+       <div data-st-more="subscribe" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_subscribe.png"/><div data-textid="FEED_SUBSCRIBE"></div></div>
+       <div data-st-more="copy" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copy.png"/><div data-textid="FEED_COPY"></div></div>
+       <div data-st-more="copyword" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_copyword.png"/><div data-textid="FEED_COPY_CONTENT"></div></div>
+       <div data-st-more="calendar" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_calendar.png"/><div data-textid="FEED_CALENDAR"></div></div>
+       <div data-st-more="del" class="st-sub-box-more-box"><img src="images/timeline/timeline_hiddenmenu_icon_del.png"/><div data-textid="FEED_DELETE"></div></div>
     </div>
     <div class="st-sub-box-1">
         <div class="st-sub-box-1-main">
@@ -31,7 +31,7 @@
 			<div class="st-box2-more-desc-detail" style="display:none;"></div>
 			<div class="st-box2-more-time" style="display:none;">
 				<img src="images/task/timeline_task_icon_clock.png"/>
-				結束時間
+				<label data-textid="FEED_CLOSE_TIME"></label>
 				<span></span>
 			</div>
 			<div class="st-box2-more-task-area" style="display:none">
@@ -43,10 +43,10 @@
 			</div>
 			<div class="st-box2-more-task-area-detail" style="display:none">
 			    <div class="st-task-vote-detail" style="display:none">
-				    <div class="st-task-vote-detail-count"><span>計算投票人數..</span></div>   
+				    <div class="st-task-vote-detail-count"><span data-textid="">計算投票人數..</span></div>   
             <div class="st-vote-all-ques-area">
             </div>
-				    <div class="st-vote-send">送出</div>
+				    <div class="st-vote-send" data-textid="COMMON_SUBMIT"></div>
 				  </div>
           <div class="st-task-work-detail" style="display:none">
           </div>
@@ -91,14 +91,14 @@
         <img class="st-read" src="images/icon/icon_view_normal.png"/><div class="st-read">0</div>
     </div>
     <div class="st-sub-box-4">
-        <div class="st-like-btn">讚</div>
-        <div class="st-message">留言</div>
+        <div class="st-like-btn" data-textid="FEED_LIKE"></div>
+        <div class="st-message" data-textid="FEED_REPLY"></div>
     </div>
     <div class="st-reply-area">
         <div class="st-reply-like-area" style="display:none">
             <img src="images/timeline/timeline_feedbox_icon_like.png"/>
             <span></span>
-            <span>目前沒人按讚</span>
+            <span data-textid="FEED_BE_FIRST_LIKE"></span>
             <img src="images/common/icon/icon_arrow_next.png"/>
         </div>
         <div class="st-reply-all-content-area" style="display:none"></div>
@@ -109,8 +109,8 @@
             <input class="st-reply-message-file" type="file" multiple style="display:none;" data-role="none"/>
             <img class="st-reply-message-sticker" src="images/chatroom/chat_textbar_icon_emoticon.png"/>
             <div class="st-reply-message-textarea adjust">
-                <textarea placeholder="請輸入訊息..." data-role="none"></textarea>
-                <div class="st-reply-message-send">傳送</div>
+                <textarea data-role="none" data-textph-id="FEED_SAY_SOMETHING"></textarea>
+                <div class="st-reply-message-send" data-textid="COMMON_SUBMIT"></div>
             </div>
             <div class="st-reply-message-img"></div>
           </div>
@@ -143,7 +143,7 @@
         </div>
         <div class="st-reply-footer">
             <span></span>&nbsp;&nbsp;
-            <span class="st-reply-message-like">讚</span>&nbsp;&nbsp;
+            <span class="st-reply-message-like" data-textid="FEED_LIKE"></span>&nbsp;&nbsp;
             <img src="images/timeline/timeline_feedbox_icon_like.png" style="display:none"/>
             <span></span>
         </div>
