@@ -1238,22 +1238,29 @@ $(function(){
                 if(without_message || el.meta.del || (el.meta.tp.substring(0,1)*1 == 0) || reply_duplicate){
                     this_load.parent().remove();
                 }else{
-                    cns.debug("reply~~");
 					//製作留言
 					var _groupList = $.lStorage(ui);
-					var user_name = _groupList[this_gi].guAll[el.meta.gu].nk.replaceOriEmojiCode();
+                    try{
+                        var user_name = _groupList[this_gi].guAll[el.meta.gu].nk.replaceOriEmojiCode();
+                        //大頭照
+                        if(_groupList[this_gi].guAll[el.meta.gu].aut){
+                            this_load.find(".st-user-pic img").attr("src",_groupList[this_gi].guAll[el.meta.gu].aut);
+                            // this_load.find(".st-user-pic img:eq(1)").attr("src",_groupList[this_gi].guAll[el.meta.gu].auo);
+                            this_load.find(".st-user-pic.namecard").data("auo",_groupList[this_gi].guAll[el.meta.gu].auo);
+                            avatarPos(this_load.find(".st-user-pic img"));
+                        }
+                    } catch(e) {
+                        this_load.remove();
+                        okCnt++;
+                        return;
+                    }
+					
 
                     // namecard
                     this_load.find(".st-user-pic.namecard").data("gi",this_gi);
                     this_load.find(".st-user-pic.namecard").data("gu",el.meta.gu)
 
-                    //大頭照
-                    if(_groupList[this_gi].guAll[el.meta.gu].aut){
-                        this_load.find(".st-user-pic img").attr("src",_groupList[this_gi].guAll[el.meta.gu].aut);
-                        // this_load.find(".st-user-pic img:eq(1)").attr("src",_groupList[this_gi].guAll[el.meta.gu].auo);
-                        this_load.find(".st-user-pic.namecard").data("auo",_groupList[this_gi].guAll[el.meta.gu].auo);
-                        avatarPos(this_load.find(".st-user-pic img"));
-                    }
+                    
 
                     this_load.find(".st-reply-username").html(user_name.replaceOriEmojiCode());
                     
@@ -1282,7 +1289,6 @@ $(function(){
                 }
                 okCnt++;
                 if( okCnt==e_data.length ){
-                    cns.debug("slideDown");
                     this_event.find(".st-reply-all-content-area").slideDown().data("show",true);
                 }
             }));    
@@ -5824,7 +5830,7 @@ $(function(){
     }
 
     userInfoDataShow = function(this_gi,this_info,user_data,me) {
-        
+            cns.debug("user_data",user_data);
     	var this_gi = this_gi || gi;
 
     	var method = "html";
@@ -5849,16 +5855,18 @@ $(function(){
 				}
 
 				if(!me && item == "bd") {
-                    cns.debug("bd????",user_data);
 					user_data.bd = user_data.bd.substring(4,6) + "." + user_data.bd.substring(6,8);
 					method = "append";
 				}
 
 				if(item == "bl"){
-					var bi = user_data.bl.split(",")[0].split(".").last();
-                    var bn = $.lStorage(ui)[this_gi].bl[bi];
-                    if(!bn) return;
- 					user_data.bl = bn;
+                    try{
+                        var bi = user_data.bl.split(",")[0].split(".").last();
+                        var bn = $.lStorage(ui)[this_gi].bl[bi].bn;
+                        user_data.bl = bn;
+                    } catch(e) {
+                       return;
+                    }
 				}
 
 				selector.find("."+item)[method](user_data[item]).show();
