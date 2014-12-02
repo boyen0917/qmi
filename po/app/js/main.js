@@ -856,6 +856,9 @@ $(function(){
 				this_event.data("parti-like",epl);
 				// 編輯讚好區域
 				detailLikeStringMake(this_event);
+			} else {
+		        this_event.find(".st-reply-like-area span:eq(0)").html( $.i18n.getString("FEED_BE_FIRST_LIKE") );
+		        this_event.find(".st-reply-like-area span:eq(1)").html( "" );
 			}
 		});
 		
