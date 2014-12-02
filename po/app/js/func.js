@@ -5902,6 +5902,9 @@ $(function(){
 			}
 		}
 
+        var nkTmp = this_info.find(".user-avatar-bar .nk").html();
+        if( nkTmp && nkTmp.length>0 ) this_info.find(".user-avatar-bar .nk").html( nkTmp.replaceOriEmojiCode() );
+
 		if(user_data.mkp) this_info.find(".user-info-list .pn").val("******");
 		if(user_data.mke) this_info.find(".user-info-list .em").val("******");
 		if(user_data.mkb) {
