@@ -1025,7 +1025,7 @@ $(function(){
         }
         
         this_event.find(".st-reply-like-area span:eq(0)").html( like_str );
-        this_event.find(".st-reply-like-area span:eq(1)").html( "" );
+        this_event.find(".st-reply-like-area span:eq(1)").html( "" ).hide();
 	}
 
 
@@ -1170,6 +1170,12 @@ $(function(){
                             this_content.find(".au-area").show();
                             getS3file(val,this_content,val.tp,280);
                             break;
+                        case 7://影片
+                            getS3file(val,this_content.find("video"),val.tp,280);
+                            break;
+                        case 8://聲音
+                            getS3file(val,this_content.find("audio"),val.tp,280);
+                            break;
                         case 9:
                             //without_message = true;
                             break;
@@ -1307,6 +1313,8 @@ $(function(){
                 if( okCnt==e_data.length ){
                     this_event.find(".st-reply-all-content-area").slideDown().data("show",true);
                 }
+
+                this_event._i18n();
             }));    
         }); 
     }
@@ -4698,12 +4706,14 @@ $(function(){
 		if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr);
 		if(audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
         if(video_arr.length > 0) timelineVideoMake(this_event,video_arr);
+
+        this_event._i18n();
 	}
 
 	timelineAudioMake = function (this_event,audio_arr){
 		$.each(audio_arr,function(i,val){
 			var this_audio = $(
-				'<audio controls></audio>'
+				'<audio controls><source type="audio/mp4"></audio>'
 			);
 			this_event.find(".st-attach-audio").prepend(this_audio);
 			getS3file(val,this_audio,8);
@@ -4872,10 +4882,8 @@ $(function(){
 						img.load(function() {
 							//重設 style
 							img.removeAttr("style");
-
 							var w = img.width();
 				            var h = img.height();
-            
             				// mathAvatarPos(img,w,h,size);
 				        });
 						//小圖
@@ -4884,10 +4892,10 @@ $(function(){
 						target.find("img.auo").attr("src",obj.s32).hide();
 						break;
                     case 7://影片
-                        target.attr("src",obj.s32);
+                        target.attr("src",obj.s32).show();
                         break;
 					case 8://聲音
-						target.attr("src",obj.s3);
+						target.find("source").attr("src",obj.s3).show();
 						break;
 				}
 			}else{
@@ -5584,6 +5592,9 @@ $(function(){
     	var cnts = polling_data.cnts;
     	var gcnts = polling_data.gcnts;
 
+        //排序用
+        var sort_arr = [];
+
     	if(cnts){
     		$.each(cnts,function(i,val){
 	    		//是否為當下團體
@@ -5603,9 +5614,21 @@ $(function(){
 	    		}
 
 	    		if(val.A5 > 0){
+
+                    sort_arr.push([val.gi,val.A5]);
 	    			$(".sm-group-area[data-gi=" + val.gi + "]").find(".sm-count").html(countsFormat(val.A5)).show();
 	    		}
 	    	});
+
+            //排序
+            sort_arr.sort(function(a, b) {return a[1] - b[1]});
+            
+            for(i=0;i<sort_arr.length;i++){
+                var this_group = $(".sm-group-list-area .sm-group-area[data-gi="+ sort_arr[i][0] +"]")
+                var this_group_clone = this_group.clone();
+                $(".sm-group-list-area").prepend(this_group_clone);
+                this_group.remove();
+            }
     	}
 
         if(!gcnts) return false;
@@ -5637,7 +5660,6 @@ $(function(){
 	    				// var polling_arr = [val.pm.gi,val.pm.ti];
 	    				
 	    				if(val.pm.gi == gi && window.location.hash == "#page-group-main") {
-	    					cns.debug("polling update timeline");
 	    					polling_arr = false;
 
                             idbPutTimelineEvent("",false,polling_arr);
@@ -5706,7 +5728,6 @@ $(function(){
     		};
     		body.cnts[0][cnt_type] = 0;
     	}
-    	
     	// return false;
         var headers = {
                  "ui":ui,

@@ -323,10 +323,8 @@ $(function(){
 			timelineSwitch("feeds",true);
 
 			setSmUserData(gi,gu,gn);
-			cns.debug("this_gi",this_gi);
 			//置頂設定
 			topEvent();
-
 			//左側選單圖案變換
 			setSidemenuHeader(this_gi);
 
@@ -1396,13 +1394,20 @@ $(function(){
 			this_play.find("img:nth-child(3)").hide();
 			this_play.find("img:nth-child(1)").show();
 		});
-		
 	});
 
 	//polling update cnts
 	$(document).on("click",".polling-cnt",function(e){
-		// cns.debug("polling-cnt:",$(this).data("polling-cnt").substring);
-		// return false;
+		$(this).find(".sm-count").hide();
+		if($(this).data("gi") == gi) {
+			cns.debug("sm-small-area[data-polling-cnt=A1]",$(".sm-small-area[data-polling-cnt=A1]"));
+			$(".sm-small-area[data-polling-cnt=A1]").find(".sm-count").hide();
+		}
+		//local 歸零 因為
+		var _pollingData = $.lStorage("_pollingData");
+		cns.debug("_pollingData.cnts[gi]",_pollingData.cnts[gi]);
+		_pollingData.cnts[gi].A5 = 0;
+		$.lStorage("_pollingData",_pollingData);
 		updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 	});	
 
@@ -1415,7 +1420,6 @@ $(function(){
 
 		//鈴鐺頁面不動作
 		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);
-
 		userInfoShow($(this).data("gi"),$(this).data("gu"));
 	});
 	

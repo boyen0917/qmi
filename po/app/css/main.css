@@ -693,7 +693,8 @@ img.auo {
 	/*color: #f5f5f5;
 	text-shadow: 0 0;*/
 	height: 100%;
-	overflow: auto;
+	overflow-y: scroll;
+	overflow-x: hidden;
 	-webkit-box-flex: 0; 
 }
 
@@ -2384,6 +2385,7 @@ img.st-user-pic{
 
 .st-attach-map{
     height:150px;	
+    margin-bottom: 20px;
 }
 
 .st-attach-sticker {
@@ -2596,6 +2598,11 @@ img.st-user-pic{
 	min-height: 20px;
 	word-break:break-all;
 	padding-right: 5px;
+}
+
+.st-reply-content video, .st-reply-content audio {
+	display: none;
+	margin: 15px 5px;
 }
 
 .st-reply-footer {
