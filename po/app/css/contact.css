@@ -1,3 +1,22 @@
+.contact-add{
+	background: url(../images/navi/navi_icon_add_member.png);
+	background-size: cover;
+	position: absolute;
+	top: 10px;
+	right: 55px;
+	width: 35px;
+	height: 35px;
+	cursor: pointer;
+	z-index: 10;
+	display: none;
+}
+.contact-add:hover{
+	top: 9px;
+	right: 53px;
+	width: 38px;
+	height: 38px;
+}
+
 .subPage{
 	box-shadow: -4px 4px 26px 0px rgba(50, 50, 50, 0.75);
 }
@@ -666,4 +685,326 @@
 }
 .contact-branchList .row._20{
 	background-color: #17b4ff;
+}
+
+/*
+               █████╗ ██████╗ ██████╗     ███╗   ███╗███████╗███╗   ███╗          
+              ██╔══██╗██╔══██╗██╔══██╗    ████╗ ████║██╔════╝████╗ ████║          
+    █████╗    ███████║██║  ██║██║  ██║    ██╔████╔██║█████╗  ██╔████╔██║    █████╗
+    ╚════╝    ██╔══██║██║  ██║██║  ██║    ██║╚██╔╝██║██╔══╝  ██║╚██╔╝██║    ╚════╝
+              ██║  ██║██████╔╝██████╔╝    ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║          
+              ╚═╝  ╚═╝╚═════╝ ╚═════╝     ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝          
+
+*/
+
+#page-contact-addmem{
+	background: rgb(213, 213, 213);
+	height: -webkit-calc( 100% - 58px);
+	min-height: 10px;
+}
+
+.ca-nav {
+	background: rgb(210, 228, 237);
+	/*display: -webkit-box;*/
+	height: 90px;
+	cursor: pointer;
+
+	/*font-size: 20px;*/
+	/*line-height: 30px;*/
+	white-space: nowrap;
+	position: fixed;
+	width: 100%;
+}
+
+.ca-nav-box {
+	width: 50%;
+	text-align: center;
+	position: relative;
+	display: inline-block;
+	min-width: 200px;
+	/*border-right: white 1px solid;*/
+	display: inline-block;
+	text-align: center;
+	height: 100%;
+}
+
+.ca-nav-box > div {
+	display: block;
+	margin: 9px auto 2px;
+	height: 45px;
+	width: 45px;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+.ca-list > div{
+	background-image: url("../images/invitemembers/invitemembers_tab_icon_request.png");
+}
+.ca-list.ca-nav-active > div{
+	background-image: url("../images/invitemembers/invitemembers_tab_icon_request_click.png");
+}
+.ca-invite > div{
+	background-image: url("../images/invitemembers/invitemembers_tab_icon_keying.png");
+}
+.ca-invite.ca-nav-active > div{
+	background-image: url("../images/invitemembers/invitemembers_tab_icon_keying_click.png");
+}
+
+.ca-nav-active {
+	background: rgb(132,195,234);
+}
+.ca-nav-active:before {
+	content: "";
+	position: relative;
+	bottom: -78px;
+	left: -webkit-calc( 50% - 13px );
+	border-style: solid;
+	border-width: 0 13px 13px;
+	border-color: rgb(213, 213, 213) transparent;
+	display: block;
+	width: 0;
+	z-index: 1;
+	float: left;
+}
+
+.ca-invite-area{
+	margin-top: 150px;
+}
+.ca-list-area{
+	margin-top: 98px;
+}
+
+.cai-name, .cai-num, .cai-area {
+	background: white;
+	height: 70px;
+	margin: 1px auto;
+	line-height: 70px;
+	border-radius: 3px;
+	width: 350px;
+	text-align: center;
+}
+
+.cai-name img, .cai-num img, .cai-area img:nth-child(1) {
+	float: left;
+	width: 30px;
+	margin: 20px 0px 20px 15px;
+}
+
+.cai-area > div{
+	cursor: pointer;
+	font-weight: bold;
+}
+.cai-name input, .cai-num input {
+	min-width: 200px;
+	width: 75%;
+	font-size: 15px;
+	height: 30px;
+	border: 0;
+	resize: none;
+	outline: none;
+	text-align: center;
+}
+.cai-area span:nth-child(1){
+	margin-left: 20px;
+}
+.cai-area span:nth-child(2) {
+	color: #888;
+}
+.cai-area img:last-child{
+	width: 20px;
+	vertical-align: middle;
+	margin-right: 16px;
+	float: right;
+	margin-top: 24px;
+}
+
+/*.cai-desc textarea {
+	width: 75%;
+	font-size: 15px;
+	border: 0;
+	resize: none;
+	outline: none;
+	margin-top: 25px;
+}*/
+
+.ca-invite-submit {
+	width: 350px;
+	color: white;
+	text-align: center;
+	-webkit-user-select: none;
+	margin: 0 auto;
+	background: rgb(98,162,223);
+	cursor: pointer;
+	height: 70px;
+	line-height: 70px;
+	/* float: left; */
+	bottom: 70px;
+	position: absolute;
+	left: -webkit-calc(50% - 175px);
+	border-radius: 5px;
+
+	/*width: 350px;
+	color: white;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	border-radius: 5px;
+	-webkit-user-select: none;
+	margin: 40px auto;
+	background: rgb(98,162,223);
+	box-shadow: 0px 2px rgb(78,142,203);
+	cursor: pointer;*/
+}
+
+.ca-create-submit:active {
+	background: rgb(88,152,213);
+}
+
+.cal-coachmake {
+	text-align: center;
+	position: absolute;
+	width: 100%;
+}
+
+.cal-coachmake img {
+	width: 280px;
+	margin: 130px auto 0;
+	display: block;
+	padding-left: 50px;
+}
+
+.cal-coachmake span {
+	color: #fff;
+	font-size: 18px;
+	position: relative;
+	top: 10px;
+}
+
+.cal-div {
+	background: white;
+	width: 95%;
+	margin: 15px auto;
+	border-radius: 3px;
+	overflow: hidden;
+	box-shadow: 0 2px #bfbfbf;
+}
+
+.cal-div-data-area {
+	display: -webkit-box;
+	width: 100%;
+	padding: 20px;
+}
+
+.cal-div-avatar {
+	width: 70px;
+	height: 70px;
+	overflow: hidden;
+	border: 1px solid #d2d2d2;
+	border-radius: 5px;
+}
+.cal-div-avatar img{
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+	object-position: 50% 50%;
+}
+
+.cal-div-data {
+	margin: 10px;
+	color: #aaa;
+	line-height: 25px;
+}
+
+.cal-div-data div:nth-child(1) {
+	font-size: 18px;
+}
+
+.cal-div-data div:nth-child(1) span{
+	color: black;
+}
+
+.cal-div-data div:nth-child(2) {
+	font-size: 15px;
+}
+
+.cal-div-data div:nth-child(2) span{
+	color: black;
+}
+
+.cal-div-desc-area {
+	padding: 15px 20px;
+	font-size: 17px;
+	border-top: 1px solid #eee;
+}
+
+.cal-div-ans-area {
+	display: -webkit-box;
+	height: 50px;
+	text-align: center;
+	width: 100%;
+	line-height: 50px;
+	cursor: pointer;
+}
+
+.cal-div-delete {
+	width: 50%;
+	background: rgb(208, 221, 229);
+	color: #8dabb8;
+	font-size: 18px;
+	font-weight: 600;
+	letter-spacing: 2px;
+}
+
+.cal-div-delete:active {
+	background: rgb(189, 209, 216);
+}
+
+.cal-div-agree {
+	width: 50%;
+	background: rgb(119, 185, 249);
+	color: white;
+	font-size: 18px;
+	font-weight: 600;
+	letter-spacing: 2px;
+}
+
+.cal-div-agree:active {
+	background: rgb(99, 165, 229);
+}
+
+.cal-div-area{
+	height: -webkit-calc( 100% - 154px );
+	position: absolute;
+	overflow: scroll;
+	width: 100%;
+	background: white;
+}
+.cal-row{
+	width: 96%;
+	margin-left: 2%;
+	border-bottom: lightgray 1px solid;
+}
+.cal-row > div{
+	display: inline-block;
+	vertical-align: middle;
+}
+.cal-row .photo{
+
+}
+.cal-row .info{
+	margin-left: 5px;
+}
+.cal-row .info .name{
+	font-size: 20px;
+}
+.cal-row .info .tel{
+	color: rgb(166, 166, 166);
+	font-size: 14px;
+}
+.cal-row .img{
+	float: right;
+	margin-top: 22px;
+	margin-right: 10px;
+}
+.cal-row .img img{
+	width: 42px;
 }

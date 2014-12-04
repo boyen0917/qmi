@@ -228,6 +228,25 @@ $(document).ready(function(){
 	}, 300);
 
 	initStickerArea.init( $(".stickerArea"), sendSticker);
+
+	//為了阻止網頁跳轉
+	$(document).on("dragover","body",function(e){
+		e.preventDefault();
+	    e.stopPropagation();
+	});
+
+	$(document).on("drop","body",function(e){
+		//為了阻止網頁跳轉
+		e.preventDefault();
+        e.stopPropagation();
+        
+        try{
+        	$("#footer input")[0].files = e.originalEvent.dataTransfer.files;
+        } catch(e){
+        	cns.debug(e);
+        }
+	});
+
 });
 
 /*
