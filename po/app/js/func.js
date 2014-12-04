@@ -441,6 +441,7 @@ $(function(){
                 //顯示新增貼文按鈕, 藏新增聊天室按鈕
                 $("#page-group-main").find(".gm-header .feed-compose").show();
                 $("#page-group-main").find(".gm-header .chatList-add").hide();
+                $("#page-group-main").find(".gm-header .contact-add").hide();
 
                 //polling 數字重寫
                 if($.lStorage("_pollingData"))
@@ -456,6 +457,16 @@ $(function(){
                 //藏新增貼文按鈕, 新增聊天室按鈕
                 $("#page-group-main").find(".gm-header .feed-compose").hide();
                 $("#page-group-main").find(".gm-header .chatList-add").hide();
+                //如果是管理者的話顯示新增成員鈕
+                try{
+                    var userData = $.lStorage(ui);
+                    var me_gu = userData[gi].gu;
+                    if( 1==userData[gi].guAll[gu].ad ){
+                        $("#page-group-main").find(".gm-header .contact-add").show();
+                    }
+                } catch(e){
+                    cns.debug( e );
+                }
                 
                 page_title = $.i18n.getString("LEFT_MEMBER");
 
@@ -475,6 +486,7 @@ $(function(){
                 //顯示新增聊天室按鈕, 藏新增貼文按鈕
                 $("#page-group-main").find(".gm-header .feed-compose").hide();
                 $("#page-group-main").find(".gm-header .chatList-add").show();
+                $("#page-group-main").find(".gm-header .contact-add").hide();
 
 	        	//$.mobile.changePage("#page-chatroom");
 	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");

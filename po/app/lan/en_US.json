@@ -160,7 +160,18 @@
 	"COMPOSE_ DESCRIPTION_EMPTY" : "Please enter description.",
 	"COMPOSE_TITLE_EMPTY" : "Please enter title.",
 
-	"INVITE_SEARCH" : "Search",
+	"INVITE_TITLE" :	"Invitation",
+	"INVITE_INVITED_MEMBER" :	"Invited Members",
+	"INVITE_MANUAL" :	"Manual Invitation",
+	"INVITE_SEARCH" :	"Search",
+	"INVITE_NO_INVITATION" :	"No invited member.",
+	"INVITE_INVITE" :	"Invite",
+	"INVITE_DISPLAY_NAME" :	"Display Name",
+	"INVITE_PHONE_NUMBER" :	"Phone Number",
+	"INVITE_PHONE_ERROR" :	"Invalid phone number.",
+	"INVITE_SUCC" : "Send invitation successed.",
+	"INVITE_FAIL" : "Send invitation failed.",
+	"INVITE_ALREADY_IN_GROUP" : "This member is already in group.",
 
 	"MEMBER_TITLE" :	"Member",
 	"MEMBER_ALL" :	"All",
@@ -214,7 +225,7 @@
 	"GROUP_CREATE" :	"Create",
 	"GROUP_NO_INVITATION" :	"There is no group invitaion.",
 	"GROUP_JOIN_SUCC" : "Join group successed!",
-	"GROUP_GROUP_INVITATION" : "Group %@ has sent you a invitation",
+	"GROUP_GROUP_INVITATION" : "Group %@ has sent you an invitation",
 	"GROUP_MEMBERS" : "%ld member(s)",
 	"GROUP_REJECT_ALERT" : "Reject %@'s invitation?",
 
@@ -228,7 +239,7 @@
 	"USER_PROFILE_EMAIL" : "E-Mail",
 	"USER_PROFILE_MVPN" : "MVPN",
 	"USER_PROFILE_HOMEPAGE" : "Homepage",
-	"USER_PROFILE_EMPTY_NAME" : "Please enter your name info.",
+	"USER_PROFILE_EMPTY_NAME" : "Please enter your name.",
 	"USER_PROFILE_UPDATE_SUCC" : "Update successed.",
 	"USER_PROFILE_NO_DATA" : "No data"
 }
