@@ -350,7 +350,6 @@ $(function(){
     
 
 	setGroupAllUser = function(data_arr,this_gi,callback){
-        
 		var this_gi = this_gi || gi;
 		getGroupAllUser(this_gi,false).complete(function(data){
 			if(data.status == 200){
@@ -368,6 +367,9 @@ $(function(){
 	            
 	            if(data_arr && data_arr[0] == "setTopEventUserName"){
 	            	//設定top event 的user name 及頭像
+                    cns.debug("this_gi",this_gi);
+                    cns.debug("data_arr[2]",data_arr[2]);
+                    cns.debug("lStorage gi",$.lStorage(ui)[this_gi].guAll[data_arr[2]]);
                     data_arr[1].find(".st-top-event-l img").attr("src",$.lStorage(ui)[this_gi].guAll[data_arr[2]].aut).parent().stop().animate({
                         opacity:1
                     },1000);
@@ -386,9 +388,11 @@ $(function(){
                 }else if(data_arr){
 	            	getUserName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
 	            }
-
                 if(callback) callback();
-			}
+			}else{
+                //發生錯誤 開啓更換團體
+                $(".sm-group-area").addClass("enable");
+            }
 		});
 	}
 
@@ -550,7 +554,7 @@ $(function(){
         return ajaxDo(api_name,headers,method,false);
 	}
 
-	topEvent = function (){
+	topEvent = function (callback){
 		var top_area = $(
 			'<div class="st-top-area">'+
 				'<div class="st-top-event-block">'+
@@ -580,7 +584,6 @@ $(function(){
 
 		//取得user name list
 		var _groupList = $.lStorage(ui);
-
 		topEventApi().complete(function(data){
 
         	if(data.status == 200){
@@ -642,7 +645,12 @@ $(function(){
                         });
         			}));
         		});
-	        }
+
+                if(callback) callback();
+	        }else{
+                //發生錯誤 開啓更換團體
+                $(".sm-group-area").addClass("enable");
+            }
         });
 	}
 
@@ -966,12 +974,10 @@ $(function(){
 	
 	detailLikeStringMake = function (this_event){
         var this_gi = this_event.data("event-id").split("_")[0];
-        
 		var epl = this_event.data("parti-list");
 
 		//gu gi 是全域
 		var me_pos = $.inArray(gu,epl);
-		
 		var guAll = $.lStorage(ui)[this_gi].guAll;
         var me_gu = guAll[epl[me_pos]];
 		var like_str = "";
@@ -1004,8 +1010,6 @@ $(function(){
                             (me_pos ? guAll[epl[0]].nk.replaceOriEmojiCode() : guAll[epl[1]].nk.replaceOriEmojiCode()) 
                         );
                     }
-                    // like_str_arr[0] = "你、 " + (me_pos ? guAll[epl[0]].nk : guAll[epl[1]].nk);
-                    // like_str_arr[1] = "按讚";
                     break;
                 //林小花 及其他？個人按讚
                 case ( epl.length > 2 ) :
@@ -1018,8 +1022,6 @@ $(function(){
                             like_str = $.i18n.getString("FEED_YOU_AND_3PEOPLE_LIKE", $.i18n.getString("COMMON_YOU"), guAll[epl[0]].nk.replaceOriEmojiCode(), (epl.length-2) );
                         }
                     }
-                    // like_str_arr[0] = guAll[epl[0]].nk;
-                    // like_str_arr[1] = " 及其他" + (epl.length-1) + "人按讚";
                     break;
             }
         } catch(e){

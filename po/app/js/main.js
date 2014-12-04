@@ -321,16 +321,13 @@ $(function(){
 		//更新gu all
 		setGroupAllUser(false,false,function(){
 			timelineSwitch("feeds",true);
-
 			setSmUserData(gi,gu,gn);
 			//置頂設定
-			topEvent();
-			//左側選單圖案變換
-			setSidemenuHeader(this_gi);
-
-			setTimeout(function(){
+			topEvent(function(){
+				//左側選單圖案變換
+				setSidemenuHeader(this_gi);
 				$(".sm-group-area").addClass("enable");
-			},500);
+			});
 		});
 	});
 	
@@ -833,7 +830,6 @@ $(function(){
 		
 		//此則動態的按贊狀況
 		getThisTimelinePart(this_event,1,function(data){
-			
 			if(!data.responseText) return false;
 
 			var epl = $.parseJSON(data.responseText).epl;
@@ -843,15 +839,11 @@ $(function(){
 				$.each(epl,function(i,val){
 					parti_list.push(val.gu);
 				});
-
 				// 存回 陣列
 				this_event.data("parti-list",parti_list);
 				this_event.data("parti-like",epl);
 				// 編輯讚好區域
 				detailLikeStringMake(this_event);
-			} else {
-		        this_event.find(".st-reply-like-area span:eq(0)").html( $.i18n.getString("FEED_BE_FIRST_LIKE") );
-		        this_event.find(".st-reply-like-area span:eq(1)").html( "" );
 			}
 		});
 		
@@ -1408,7 +1400,6 @@ $(function(){
 			_pollingData.cnts[gi].A5 = 0;
 			$.lStorage("_pollingData",_pollingData);
 		}
-		cns.debug("ls pollingData",$.lStorage("_pollingData",_pollingData));
 		updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 	});	
 
