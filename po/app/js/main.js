@@ -1400,14 +1400,15 @@ $(function(){
 	$(document).on("click",".polling-cnt",function(e){
 		$(this).find(".sm-count").hide();
 		if($(this).data("gi") == gi) {
-			cns.debug("sm-small-area[data-polling-cnt=A1]",$(".sm-small-area[data-polling-cnt=A1]"));
 			$(".sm-small-area[data-polling-cnt=A1]").find(".sm-count").hide();
 		}
 		//local 歸零 因為
 		var _pollingData = $.lStorage("_pollingData");
-		cns.debug("_pollingData.cnts[gi]",_pollingData.cnts[gi]);
-		_pollingData.cnts[gi].A5 = 0;
-		$.lStorage("_pollingData",_pollingData);
+		if(_pollingData && _pollingData.cnts[gi]){
+			_pollingData.cnts[gi].A5 = 0;
+			$.lStorage("_pollingData",_pollingData);
+		}
+		cns.debug("ls pollingData",$.lStorage("_pollingData",_pollingData));
 		updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 	});	
 

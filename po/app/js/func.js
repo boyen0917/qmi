@@ -649,7 +649,9 @@ $(function(){
 	//為了避免gu all還沒取得
 	setTopEventUserName = function(this_top_event,this_gu){
 		var gu_all = $.lStorage(ui)[gi].guAll;
-		if(Object.keys(gu_all).length == 0){
+
+		if(Object.keys(gu_all).length == 0 || !gu_all[this_gu]){
+            cns.debug("!!top event no gu!!")
 			var data_arr = ["setTopEventUserName",this_top_event,this_gu];
 	        setGroupAllUser(data_arr);
 	    }else{
@@ -1544,50 +1546,29 @@ $(function(){
 				
 				//load結束 呼叫function 製作投票結果呈現
 				if(v_i == li.length - 1){
-					voteResultMake(this_event);
+                    setTimeout(function(){
+                        voteResultMake(this_event);
+                    },500);
+					
 				}
             }));
 		});
 
 	}
 
-
-
-
-/*
-
-##     ##  #######  ######## ########       ########  ########  ######  ##     ## ##       ######## 
-##     ## ##     ##    ##    ##             ##     ## ##       ##    ## ##     ## ##          ##    
-##     ## ##     ##    ##    ##             ##     ## ##       ##       ##     ## ##          ##    
-##     ## ##     ##    ##    ######         ########  ######    ######  ##     ## ##          ##    
- ##   ##  ##     ##    ##    ##             ##   ##   ##             ## ##     ## ##          ##    
-  ## ##   ##     ##    ##    ##             ##    ##  ##       ##    ## ##     ## ##          ##    
-   ###     #######     ##    ########       ##     ## ########  ######   #######  ########    ##    
-
-
-*/
-
-
-
 	voteResultMake = function (this_event){
 		
 		var vote_obj = this_event.data("vote-result");
 		var all_ques = this_event.find(".st-vote-ques-area");
-
 		//設定投票人數
 	    this_event.find(".st-task-vote-detail-count span").html(Object.keys(vote_obj).length + "人已投票");
-
-
 		//預設opt 為全部都沒選 fasle
 		this_event.find(".st-vote-detail-option").data("vote-chk",false);
 
     	//根據每個答案的gu  
         $.each(vote_obj,function(ans_gu,ans_val){
-        	//li:[{},{}] time:14001646...
-
         	//答案的多個題目
         	$.each(ans_val.li,function(k_i,k_val){
-
         		//每個題目
 		        $.each(all_ques,function(ques_i,ques_val){
 		        	var this_ques = $(this);
@@ -1612,21 +1593,17 @@ $(function(){
 					            		this_opt.find("img").attr("src",this_ques.data("tick-img"));
 					            	}
 	    						}
-
 	    					});//最後一個 每個選項的k
 	            		});//答案的多個投票
-
             		}//題目的編號
-	            		
             	});//每個題目 
-
         	});//答案的多個題目
         });
 
 		//綁定投票事件
         setTimeout(function(){
             bindVoteEvent(this_event);
-        },500);
+        },100);
 	}
 
 	bindVoteEvent = function (this_event){
