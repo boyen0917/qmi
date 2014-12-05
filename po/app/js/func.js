@@ -4791,58 +4791,7 @@ $(function(){
             var this_ei = this_img_area.parents(".st-sub-box").data("event-id");
             var this_gi = this_ei.split("_")[0];
             var this_ti = this_ei.split("_")[1];
-			
-            var gallery = $(document).data("gallery");
-            if( null != gallery && false==gallery.closed){
-                gallery.focus();
-                gallery.ui = ui;
-                gallery.at = at;
-                gallery.lang = lang;
-                gallery.this_ei = this_ei;
-                gallery.this_gi = this_gi;
-                gallery.this_ti = this_ti;
-                gallery.list = gallery_arr;
-                var dataDom = $(gallery.document).find(".dataDom");
-                dataDom.click();
-            } else {
-                gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
-                $(document).data("gallery", gallery);
-                $(gallery.document).ready(function(){
-                    setTimeout(function(){
-                        gallery.ui = ui;
-                        gallery.at = at;
-                        gallery.lang = lang;
-                        gallery.this_ei = this_ei;
-                        gallery.this_gi = this_gi;
-                        gallery.this_ti = this_ti;
-                        gallery.list = gallery_arr;
-                        var dataDom = $(gallery.document).find(".dataDom");
-                        dataDom.click();
-                    },500);
-                });
-            }
-
-			// var gallery_str = "";
-			// this_img_area.find(".st-slide-img").each(function(i,val){
-			// 	var img_url = $(this).find("img:eq(1)").attr("src") ;
-			// 	gallery_str += '<li data-thumb="' + img_url + '"><img src="' + img_url + '" /></li>';
-			// });
-
-			// var this_s32 = this_img_area.find(".st-slide-img:eq(" + this_gallery.data("gallery-cnt") + ") img:eq(1)").attr("src");
-
-			// var img = new Image();
-			// img.onload = function() {
-			// 	var gallery = window.open("flexslider/index.html", "", "width=" + this.width + ", height=" + this.height);
-	  //   		$(gallery.document).ready(function(){
-	  //   			setTimeout(function(){
-	  //   				var this_slide = $(gallery.document).find(".slides");
-	  //   				this_slide.html(gallery_str);
-	  //   				$(gallery.document).find("input").val(this_gallery.data("gallery-cnt"));
-	  //   				$(gallery.document).find("button").trigger("click");
-	  //   			},300);
-	  //   		});
-			// }
-			// img.src = this_s32;
+            showGallery( this_gi, this_ti, gallery_arr );
 		});
 	}
 

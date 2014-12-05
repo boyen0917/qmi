@@ -649,4 +649,34 @@ $(function(){
 	getStickerPath = function(id){
 		return "sticker/" + id.split("_")[1] + "/" + id + ".png";
 	}
+
+	showGallery = function( this_gi, this_ti, gallery_arr ){
+        var gallery = $(document).data("gallery");
+        if( null != gallery && false==gallery.closed){
+            gallery.focus();
+            gallery.ui = ui;
+            gallery.at = at;
+            gallery.lang = lang;
+            gallery.this_gi = this_gi;
+            gallery.this_ti = this_ti;
+            gallery.list = gallery_arr;
+            var dataDom = $(gallery.document).find(".dataDom");
+            dataDom.click();
+        } else {
+            gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
+            $(document).data("gallery", gallery);
+            $(gallery.document).ready(function(){
+                setTimeout(function(){
+                    gallery.ui = ui;
+                    gallery.at = at;
+                    gallery.lang = lang;
+                    gallery.this_gi = this_gi;
+                    gallery.this_ti = this_ti;
+                    gallery.list = gallery_arr;
+                    var dataDom = $(gallery.document).find(".dataDom");
+                    dataDom.click();
+                },500);
+            });
+        }
+    }
 });

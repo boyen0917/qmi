@@ -1,4 +1,3 @@
-var this_ei;
 var this_gi;
 var this_ti;
 var ui;

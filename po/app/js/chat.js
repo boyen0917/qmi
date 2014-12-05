@@ -1105,18 +1105,19 @@ getS3file = function(target, file_c, file_p, tp, ti, size){
 					img.attr("src",obj.s3);
 					//點擊跳出大圖
 					img.click( function(){
-						var imgO = new Image();
-						var gallery_str = "<img src=" + obj.s32 + " />";
-						imgO.onload = function() {
-							var gallery = window.open("layout/chat_gallery.html", "", "width=" + (this.width+30) + ", height=" + (this.height+25));
-					    	$(gallery.document).ready(function(){
-								setTimeout(function(){
-									var this_slide = $(gallery.document).find(".pic");
-									this_slide.html( gallery_str );
-								},300);
-							});
-					    }
-						imgO.src = obj.s32;
+						showGallery( null, null, [{s32:obj.s32}] );
+					// 	var imgO = new Image();
+					// 	var gallery_str = "<img src=" + obj.s32 + " />";
+					// 	imgO.onload = function() {
+					// 		var gallery = window.open("layout/chat_gallery.html", "", "width=" + (this.width+30) + ", height=" + (this.height+25));
+					//     	$(gallery.document).ready(function(){
+					// 			setTimeout(function(){
+					// 				var this_slide = $(gallery.document).find(".pic");
+					// 				this_slide.html( gallery_str );
+					// 			},300);
+					// 		});
+					//     }
+					// 	imgO.src = obj.s32;
 					});
 					break;
 				case 8://聲音
