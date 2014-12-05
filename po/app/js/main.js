@@ -526,6 +526,13 @@ $(function(){
 		putEventStatus(target_obj,1,est);
 	});
 
+	//回覆按讚列表
+	$(document).on('click','.st-reply-footer .cnt',function(){
+		var this_event = $(this).parents('.st-reply-content-area');
+		timelineShowResponseLikeDelegate( this_event, 1, function(){
+			cns.debug("on back from response like");
+		});
+	});
 	
 	//點選開啟圖庫
 	$(document).on("click",".img-show",function(e){

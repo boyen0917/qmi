@@ -983,6 +983,30 @@ $(function(){
 			if(data.status == 200 && callback) callback(data);
 		});
 	}
+
+    //取得單一timeline 回覆讚好等狀態
+    getThisTimelineResponsePart = function (this_event,tp,callback){
+        if( this_event.length==0 ){
+            cns.debug("no event");
+            return;
+        }
+        var this_ei = this_event.data("event-id");
+        var this_ep = this_event.data("event-path");
+        var this_gi = this_ei.split("_")[0];
+        var this_ti = this_ei.split("_")[1];
+
+        var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ep + "/participants2?tp=" + tp;
+        var headers = {
+            "ui":ui,
+            "at":at, 
+            "li":lang
+        };
+        var method = "get";
+        var result = ajaxDo(api_name,headers,method,false);
+        result.complete(function(data){
+            if(data.status == 200 && callback) callback(data);
+        });
+    }
 	
 	detailLikeStringMake = function (this_event){
         var this_gi = this_event.data("event-id").split("_")[0];
@@ -2757,6 +2781,31 @@ $(function(){
                 if( list.length>0 ) showObjectTabShow(title, list, onDone);
                 break;
         }
+    }
+
+    timelineShowResponseLikeDelegate = function( this_event, type, onDone ){
+        var list = [];
+        var title = "";
+
+        //(0=讀取, 1=按讚, 2=按X, 3=按訂閱, 4=按置頂, 7=按任務, 9 = 未讀取)
+        // switch( type ){
+        //     case 0:
+        //         break;
+        //     case 1:
+                getThisTimelineResponsePart( this_event,type, function(data){
+                    if( data.status==200 ){
+                        try{
+                            var obj = $.parseJSON( data.responseText );
+                            list.push( {title:"",ml:obj.epl} );
+                            title = $.i18n.getString("FEED_LIKE")+"("+obj.epl.length+")";
+                        } catch(e){
+
+                        }
+                    }
+                    if( list.length>0 ) showObjectTabShow(title, list, onDone);
+                });
+        //         break;
+        // }
     }
 
     showObjectTabShow = function( title, list, onDone ){

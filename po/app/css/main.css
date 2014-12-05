@@ -2625,6 +2625,9 @@ img.st-user-pic{
 	width: 15px;
 	margin: 0 8px -1px 0;
 }
+.st-reply-footer .cnt{
+	cursor: pointer;
+}
 
 .st-reply-like-area img:nth-child(1) {
     margin: -1px 5px;
