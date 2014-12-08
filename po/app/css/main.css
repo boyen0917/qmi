@@ -1807,11 +1807,55 @@ img.auo {
 	text-align: center;
 	padding: 15px 0 0 0;
 	color: white;
-	cursor:pointer
+	cursor: pointer;
+}
+.st-sub-box-more-box img{
+	width: 35px;
 }
 
-.st-sub-box-more-box-click{
+.st-sub-box-more-box:hover, .st-sub-box-more-box.dective{
 	color:#a8d7ff;
+}
+.st-sub-box-more-box.dective{
+	cursor: default;
+}
+
+.st-sub-box-more-box[data-st-more="top"] img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_top.png);
+}
+.st-sub-box-more-box[data-st-more="subscribe"] img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_subscribe.png);
+}
+.st-sub-box-more-box[data-st-more="copy"] img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_copy.png);
+}
+.st-sub-box-more-box[data-st-more="copyword"] img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_copyword.png);
+}
+.st-sub-box-more-box[data-st-more="calendar"] img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_calendar.png);
+}
+.st-sub-box-more-box[data-st-more="del"] img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_del.png);
+}
+
+.st-sub-box-more-box[data-st-more="top"]:hover img, .st-sub-box-more-box.dective[data-st-more="top"] img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_top_click.png);
+}
+.st-sub-box-more-box[data-st-more="subscribe"]:hover img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_subscribe_click.png);
+}
+.st-sub-box-more-box[data-st-more="copy"]:hover img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_copy_click.png);
+}
+.st-sub-box-more-box[data-st-more="copyword"]:hover img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_copyword_click.png);
+}
+.st-sub-box-more-box[data-st-more="calendar"]:hover img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_calendar_click.png);
+}
+.st-sub-box-more-box[data-st-more="del"]:hover img, .st-sub-box-more-box.dective[data-st-more="del"] img{
+	content: url(../images/timeline/timeline_hiddenmenu_icon_del_click.png);
 }
 
 .st-more-close {
@@ -1870,6 +1914,12 @@ img.st-user-pic{
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
+}
+.st-sub-subscribe{
+	width: 15px;
+	display: none;
+	margin-left: 5px;
+	margin-top: 2px;
 }
 
 .st-sub-time {

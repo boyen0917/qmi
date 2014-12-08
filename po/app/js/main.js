@@ -692,7 +692,7 @@ $(function(){
 
 
 	//文章區塊 編輯按鈕
-	$(document).on('click','.st-sub-box-more-btn-stop',function(e){
+	$(document).on('click','.st-sub-box-more-btn',function(e){
 		//按下效果
 		$(this).attr("src","images/timeline/timeline_feedbox_icon_list_click.png");
 		setTimeout(function(){
@@ -708,7 +708,8 @@ $(function(){
 		//開啟編輯區塊
 		zoom_out_cnt = 8;
 		var box_width = $(".st-sub-box").width();
-	    $(this).next().width(box_width-3);
+	    // $(this).next().width(box_width-3);
+	    $(this).next().css("width","100%");
 	    
 	    $(this).next().css("zoom","0.05");
 	    $(this).next().show();
@@ -722,15 +723,39 @@ $(function(){
 	
 	
 	//編輯區塊按鈕效果
-	$(document).on('click','.st-sub-box-more-box',function(){
+	$(document).on('click','.st-sub-box-more-box:not(.dective)',function(e){
+		e.stopPropagation();
 	    var target = $(this);
-	    var more_img_url = "images/timeline/timeline_hiddenmenu_icon_";
+	    // var more_img_url = "images/timeline/timeline_hiddenmenu_icon_";
 	    target.addClass("st-sub-box-more-box-click");
-	    target.find("img").attr("src",more_img_url + target.data("st-more") + "_click.png");
-	    setTimeout(function(){
-	        target.removeClass("st-sub-box-more-box-click");
-	        target.find("img").attr("src",more_img_url + target.data("st-more") + ".png");
-	        },500);
+	    // target.find("img").attr("src",more_img_url + target.data("st-more") + "_click.png");
+	    // setTimeout(function(){
+	    //     target.removeClass("st-sub-box-more-box-click");
+	    //     target.find("img").attr("src",more_img_url + target.data("st-more") + ".png");
+	    //     },500);
+	    var this_event = target.parents(".st-sub-box");
+		try{
+			var type = target.data("st-more");
+			switch( type ){
+				case "top":
+					timelineEditStatus( this_event, 8, function(data){
+						cns.debug( data.responseText );
+					});
+					break;
+				case "subscribe":
+					timelineEditStatus( this_event, 3, function(data){
+						cns.debug( data.responseText );
+					});
+					break;
+				case "del":
+					timelineDeleteEvent( this_event, function(data){
+						cns.debug( data.responseText );
+					});
+					break;
+			}
+		} catch(e){
+			cns.debug(e);
+		}
 	});
 	
 	$(".feed-compose").click(function(){
