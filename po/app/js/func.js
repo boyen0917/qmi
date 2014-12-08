@@ -333,20 +333,6 @@ $(function(){
         	}
         });
     }
-
-    // setGroupListCountMember = function(newBl, bi){
-    //     var data = newBl[bi];
-    //     var cnt = data.cnt;
-
-    //     if(data.cl && data.cl.length > 0){
-    //         for( var i=0; i<data.cl.length; i++ ){
-    //             cnt += setGroupListCountMember(newBl, data.cl[i]);
-    //         }
-    //     }
-    //     cns.debug(data.bn, data.lv, data.cnt, cnt);
-    //     data.cnt = cnt;
-    //     return cnt;
-    // }
     
 
 	setGroupAllUser = function(data_arr,this_gi,callback){
@@ -367,9 +353,6 @@ $(function(){
 	            
 	            if(data_arr && data_arr[0] == "setTopEventUserName"){
 	            	//設定top event 的user name 及頭像
-                    cns.debug("this_gi",this_gi);
-                    cns.debug("data_arr[2]",data_arr[2]);
-                    cns.debug("lStorage gi",$.lStorage(ui)[this_gi].guAll[data_arr[2]]);
                     data_arr[1].find(".st-top-event-l img").attr("src",$.lStorage(ui)[this_gi].guAll[data_arr[2]].aut).parent().stop().animate({
                         opacity:1
                     },1000);
@@ -391,6 +374,7 @@ $(function(){
                 if(callback) callback();
 			}else{
                 //發生錯誤 開啓更換團體
+                cns.debug("fun394 enable囉:",this_gi + " : " + data_arr[2]);
                 $(".sm-group-area").addClass("enable");
             }
 		});
@@ -535,6 +519,7 @@ $(function(){
 
 				//new top event
 				if(!chk){
+                    cns.debug("[!!]topEventChk[!!]");
 					topEvent();
 					return false;
 				}
@@ -581,25 +566,19 @@ $(function(){
 
 		//不符合就return false
 		if(typeof gi == "undefined") return false;
-
 		//取得user name list
 		var _groupList = $.lStorage(ui);
 		topEventApi().complete(function(data){
-
         	if(data.status == 200){
-
         		var top_events_arr = $.parseJSON(data.responseText).el;
-
         		var top_msg_num = top_events_arr.length;
         		if(top_msg_num == 0){
         			return false;
         		}
-
         		//default 關閉
         		$(".st-top-event-default").hide();
 
         		$.each(top_events_arr,function(i,val){
-
         			top_area.find(".st-top-event-set").append($('<div class="st-top-event">').load('layout/layout.html .st-top-event-load',function(){
         				var this_top_event = $(this);
                         this_top_event.find(".st-top-event-load")._i18n();
@@ -623,7 +602,7 @@ $(function(){
                         this_top_event.find(".st-top-event-r-ttl span").html(ttl_tp);
         				this_top_event.find(".st-top-event-r-ttl").append(val.meta.tt);
         				this_top_event.find(".st-top-event-r-content").html(val.ml[0].c);
-        				
+
         				//用戶名稱 時間
         				setTopEventUserName(this_top_event,val.meta.gu);
 
@@ -646,7 +625,9 @@ $(function(){
         			}));
         		});
 
-                if(callback) callback();
+                if(callback) {
+                    callback();   
+                }
 	        }else{
                 //發生錯誤 開啓更換團體
                 $(".sm-group-area").addClass("enable");
@@ -657,17 +638,15 @@ $(function(){
 	//為了避免gu all還沒取得
 	setTopEventUserName = function(this_top_event,this_gu){
 		var gu_all = $.lStorage(ui)[gi].guAll;
+        if(!gu_all[this_gu]) {
+            cns.debug("[!]top event gi gu mismatched[!]");
+            return false;
+        }
 
-		if(Object.keys(gu_all).length == 0 || !gu_all[this_gu]){
-            cns.debug("!!top event no gu!!")
-			var data_arr = ["setTopEventUserName",this_top_event,this_gu];
-	        setGroupAllUser(data_arr);
-	    }else{
-            this_top_event.find(".st-top-event-l img").attr("src",gu_all[this_gu].aut).parent().stop().animate({
-                opacity:1
-            },1000);
-	    	this_top_event.find(".st-top-event-r-footer span:eq(0)").html(gu_all[this_gu].nk);
-	    }
+		this_top_event.find(".st-top-event-l img").attr("src",gu_all[this_gu].aut).parent().stop().animate({
+            opacity:1
+        },1000);
+        this_top_event.find(".st-top-event-r-footer span:eq(0)").html(gu_all[this_gu].nk);
 	}
 
     topBarMake = function (top_area,top_msg_num,resize) {
@@ -1300,7 +1279,6 @@ $(function(){
 
                     //存入event path 之後才可以按讚
                     this_load.data("event-path",this_event.data("event-id") + "." + this_load.data("event-id"));
-
                     if(el.meta.lct){
                         this_load.find(".st-reply-footer img").show();
                         this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like.png");
@@ -1310,6 +1288,7 @@ $(function(){
                         if(el.meta.il){
                             this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
                             this_load.find(".st-reply-footer span:eq(1)").html( $.i18n.getString("FEED_UNLIKE") );
+                            this_load.find(".st-reply-footer span:eq(1)").removeAttr("data-textid");
                         }
                     }
                 }
@@ -2113,7 +2092,6 @@ $(function(){
                     var object_img = this_obj.find(".obj-cell-user-pic img");
                     if(gu_obj.aut) {
                         object_img.attr("src",gu_obj.aut);
-                        //object_img.removeAttr("style");
                         avatarPos(object_img);
                     }
 
@@ -4339,7 +4317,7 @@ $(function(){
 
 		//下拉更新 和 個人主頁 就不需要資料庫了
 		if(is_top || $("#page-group-main").data("main-gu")) return false;
-        cns.debug("whatzzup");
+
 		//判斷類別
 		var idb_index,idb_keyRange;
 		if(!event_tp || event_tp == "00"){
@@ -5715,7 +5693,6 @@ $(function(){
                      };
         var method = "put";
         ajaxDo(api_name,headers,method,false,body).complete(function(data){
-        	cns.debug("update complete:",data);
         	if(data.status == 200){
         		this_count.hide();
         	}

@@ -322,6 +322,7 @@ $(function(){
 		setGroupAllUser(false,false,function(){
 			timelineSwitch("feeds",true);
 			setSmUserData(gi,gu,gn);
+
 			//置頂設定
 			topEvent(function(){
 				//左側選單圖案變換
@@ -347,11 +348,6 @@ $(function(){
 		$("#page-group-main").data("navi",this_subarea.data("tp"));
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
-
-		// $(".st-navi-area [data-st-navi-group=navi]").each(function(i,val){
-	 //        //全關 switch開
-		// 	$(this).find("img").attr("src",img_dir + $(this).data("st-navi") + ".png");
-	 //    });
 
 		switch(this_subarea.data("st-navi")){
 	    	case "home":
@@ -508,7 +504,13 @@ $(function(){
 
 	//回覆按讚
 	$(document).on('click','.st-reply-message-like',function(){
+
 		var this_event = $(this).parents('.st-reply-content-area');
+
+		//api結束前 不能按
+		if(this_event.data("like-lock")) return false;
+		this_event.data("like-lock",true);
+
 		var event_path = this_event.data("event-path");
 		var parent_event = $(this).parents(".st-sub-box");
 		
@@ -521,7 +523,6 @@ $(function(){
 		//更新狀態 參數
 		var target_obj = {};
 		target_obj.selector = this_event;
-		target_obj.status = parent_event.data("event-status");
 		target_obj.reply = true;
 		putEventStatus(target_obj,1,est);
 	});
@@ -815,10 +816,12 @@ $(function(){
 		//判斷現在是開啟還是關閉
 		if(this_event.data("switch-chk")){
 			this_event.data("switch-chk",false);
+			this_event.find(".st-reply-message-bg").removeAttr("style");
 		}else{
 			this_event.data("switch-chk",true);
+			this_event.find(".st-reply-message-bg").css("border",0);
 		}
-		cns.debug("st-sub-box-2-content:",this_event.find(".st-sub-box-2-content").is(":visible"));
+
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp);
 		
