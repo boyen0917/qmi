@@ -343,7 +343,7 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
 		}
 	}
 	
-	if( isShowAlert ){
+	if( !groupData.gu==mem.gu && isShowAlert ){
 		try{
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			riseNotification (null, groupData.gn.parseHtmlString()+" - "+mem.nk, text, function(){

@@ -122,7 +122,7 @@ showAlertFromDB = function(){
 updateAlert = function(){
 	if (typeof ui === 'undefined') return;
 	
-	ajaxDo("/notices2", {
+	ajaxDo("/notices", {
 	    "ui":ui,
 	    "at":at, 
 	    "li":lang,
