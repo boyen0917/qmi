@@ -429,6 +429,7 @@ $(function(){
                 //顯示新增貼文按鈕, 藏新增聊天室按鈕
                 $("#page-group-main").find(".gm-header .feed-compose").show();
                 $("#page-group-main").find(".gm-header .chatList-add").hide();
+                $("#page-group-main").find(".gm-header .contact-add").hide();
 
                 //polling 數字重寫
                 if($.lStorage("_pollingData"))
@@ -444,6 +445,16 @@ $(function(){
                 //藏新增貼文按鈕, 新增聊天室按鈕
                 $("#page-group-main").find(".gm-header .feed-compose").hide();
                 $("#page-group-main").find(".gm-header .chatList-add").hide();
+                //如果是管理者的話顯示新增成員鈕
+                try{
+                    var userData = $.lStorage(ui);
+                    var me_gu = userData[gi].gu;
+                    if( 1==userData[gi].guAll[gu].ad ){
+                        $("#page-group-main").find(".gm-header .contact-add").show();
+                    }
+                } catch(e){
+                    cns.debug( e );
+                }
                 
                 page_title = $.i18n.getString("LEFT_MEMBER");
 
@@ -463,6 +474,7 @@ $(function(){
                 //顯示新增聊天室按鈕, 藏新增貼文按鈕
                 $("#page-group-main").find(".gm-header .feed-compose").hide();
                 $("#page-group-main").find(".gm-header .chatList-add").show();
+                $("#page-group-main").find(".gm-header .contact-add").hide();
 
 	        	//$.mobile.changePage("#page-chatroom");
 	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
@@ -950,6 +962,30 @@ $(function(){
 			if(data.status == 200 && callback) callback(data);
 		});
 	}
+
+    //取得單一timeline 回覆讚好等狀態
+    getThisTimelineResponsePart = function (this_event,tp,callback){
+        if( this_event.length==0 ){
+            cns.debug("no event");
+            return;
+        }
+        var this_ei = this_event.data("event-id");
+        var this_ep = this_event.data("event-path");
+        var this_gi = this_ei.split("_")[0];
+        var this_ti = this_ei.split("_")[1];
+
+        var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ep + "/participants2?tp=" + tp;
+        var headers = {
+            "ui":ui,
+            "at":at, 
+            "li":lang
+        };
+        var method = "get";
+        var result = ajaxDo(api_name,headers,method,false);
+        result.complete(function(data){
+            if(data.status == 200 && callback) callback(data);
+        });
+    }
 	
 	detailLikeStringMake = function (this_event){
         var this_gi = this_event.data("event-id").split("_")[0];
@@ -2723,6 +2759,31 @@ $(function(){
                 if( list.length>0 ) showObjectTabShow(title, list, onDone);
                 break;
         }
+    }
+
+    timelineShowResponseLikeDelegate = function( this_event, type, onDone ){
+        var list = [];
+        var title = "";
+
+        //(0=讀取, 1=按讚, 2=按X, 3=按訂閱, 4=按置頂, 7=按任務, 9 = 未讀取)
+        // switch( type ){
+        //     case 0:
+        //         break;
+        //     case 1:
+                getThisTimelineResponsePart( this_event,type, function(data){
+                    if( data.status==200 ){
+                        try{
+                            var obj = $.parseJSON( data.responseText );
+                            list.push( {title:"",ml:obj.epl} );
+                            title = $.i18n.getString("FEED_LIKE")+"("+obj.epl.length+")";
+                        } catch(e){
+
+                        }
+                    }
+                    if( list.length>0 ) showObjectTabShow(title, list, onDone);
+                });
+        //         break;
+        // }
     }
 
     showObjectTabShow = function( title, list, onDone ){
@@ -4757,58 +4818,7 @@ $(function(){
             var this_ei = this_img_area.parents(".st-sub-box").data("event-id");
             var this_gi = this_ei.split("_")[0];
             var this_ti = this_ei.split("_")[1];
-			
-            var gallery = $(document).data("gallery");
-            if( null != gallery && false==gallery.closed){
-                gallery.focus();
-                gallery.ui = ui;
-                gallery.at = at;
-                gallery.lang = lang;
-                gallery.this_ei = this_ei;
-                gallery.this_gi = this_gi;
-                gallery.this_ti = this_ti;
-                gallery.list = gallery_arr;
-                var dataDom = $(gallery.document).find(".dataDom");
-                dataDom.click();
-            } else {
-                gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
-                $(document).data("gallery", gallery);
-                $(gallery.document).ready(function(){
-                    setTimeout(function(){
-                        gallery.ui = ui;
-                        gallery.at = at;
-                        gallery.lang = lang;
-                        gallery.this_ei = this_ei;
-                        gallery.this_gi = this_gi;
-                        gallery.this_ti = this_ti;
-                        gallery.list = gallery_arr;
-                        var dataDom = $(gallery.document).find(".dataDom");
-                        dataDom.click();
-                    },500);
-                });
-            }
-
-			// var gallery_str = "";
-			// this_img_area.find(".st-slide-img").each(function(i,val){
-			// 	var img_url = $(this).find("img:eq(1)").attr("src") ;
-			// 	gallery_str += '<li data-thumb="' + img_url + '"><img src="' + img_url + '" /></li>';
-			// });
-
-			// var this_s32 = this_img_area.find(".st-slide-img:eq(" + this_gallery.data("gallery-cnt") + ") img:eq(1)").attr("src");
-
-			// var img = new Image();
-			// img.onload = function() {
-			// 	var gallery = window.open("flexslider/index.html", "", "width=" + this.width + ", height=" + this.height);
-	  //   		$(gallery.document).ready(function(){
-	  //   			setTimeout(function(){
-	  //   				var this_slide = $(gallery.document).find(".slides");
-	  //   				this_slide.html(gallery_str);
-	  //   				$(gallery.document).find("input").val(this_gallery.data("gallery-cnt"));
-	  //   				$(gallery.document).find("button").trigger("click");
-	  //   			},300);
-	  //   		});
-			// }
-			// img.src = this_s32;
+            showGallery( this_gi, this_ti, gallery_arr );
 		});
 	}
 

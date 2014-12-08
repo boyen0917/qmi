@@ -121,7 +121,18 @@
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_FAIL" : "刪除群組失敗",
 	"MEMBER_SEARCH_NO_RESULT" : "搜尋沒有結果.. O_Q",
 
+	"INVITE_TITLE" : "邀請成員",
+	"INVITE_INVITED_MEMBER" : "邀請中的成員",
+	"INVITE_MANUAL" : "手動輸入",
 	"INVITE_SEARCH" : "搜尋",
+	"INVITE_NO_INVITATION" : "目前沒有任何邀請中的對象",
+	"INVITE_INVITE" : "邀請",
+	"INVITE_DISPLAY_NAME" : "請輸入暱稱",
+	"INVITE_PHONE_NUMBER" : "請輸入手機號碼",
+	"INVITE_PHONE_ERROR" : "無效的電話號碼",
+	"INVITE_SUCC" : "成功送出邀請",
+	"INVITE_FAIL" : "送出邀請失敗",
+	"INVITE_ALREADY_IN_GROUP" : "此成員已在群組裡",
 
 	"COMMON_SELECT_MEMBERS"  				: "選擇對象",
 	"COMMON_NEXT"  					: "下一步",

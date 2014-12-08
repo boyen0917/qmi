@@ -111,6 +111,12 @@ initContactList = function(){
 		$(".contact-branchList").height( $(window).height()-105 );
 		$(".contact-scroll").height( $(window).height()-112 );
 	});
+
+	//set add member button
+	$(".contact-add").off("click");
+	$(".contact-add").on("click", function(){
+		showAddMemberPage();
+	});
 }
 
 deactiveSearch = function(){
@@ -1272,5 +1278,161 @@ deleteFavGroup = function( dom ){
 		} else {
 			toastShow( $.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP_FAIL") );
 		}
+	});
+}
+
+/*
+               █████╗ ██████╗ ██████╗     ███╗   ███╗███████╗███╗   ███╗          
+              ██╔══██╗██╔══██╗██╔══██╗    ████╗ ████║██╔════╝████╗ ████║          
+    █████╗    ███████║██║  ██║██║  ██║    ██╔████╔██║█████╗  ██╔████╔██║    █████╗
+    ╚════╝    ██╔══██║██║  ██║██║  ██║    ██║╚██╔╝██║██╔══╝  ██║╚██╔╝██║    ╚════╝
+              ██║  ██║██████╔╝██████╔╝    ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║          
+              ╚═╝  ╚═╝╚═════╝ ╚═════╝     ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝          
+
+*/
+function showAddMemberPage(){
+	$.mobile.changePage("#page-contact-addmem");
+	$("#page-contact-addmem .ca-list-area .cal-coachmake").show();
+	$("#page-contact-addmem .ca-list-area .cal-div-area").hide();
+
+	$("#page-contact-addmem .ca-nav-box").off("click").click( function(){
+		var this_btn = $(this);
+		if( this_btn.hasClass("ca-invite") ){
+			$("#page-contact-addmem .ca-invite-area").show();
+			$("#page-contact-addmem .ca-list-area").hide();
+		} else {
+			$("#page-contact-addmem .ca-invite-area").hide();
+			$("#page-contact-addmem .ca-list-area").show();
+			getInviteList();
+		}
+		$("#page-contact-addmem .ca-nav-active").removeClass("ca-nav-active");
+		this_btn.addClass("ca-nav-active");
+	});
+	$("#page-contact-addmem .ca-invite").trigger("click");
+	$("#page-contact-addmem .ca-invite-submit").off("click").click( sendInvite );
+}
+
+function getInviteList(){
+	var api_name = "groups/" + gi + "/invitations";
+	var headers = {
+	         "ui":ui,
+	         "at":at, 
+	         "li":lang,
+	             };
+	var method = "get";
+	var result = ajaxDo(api_name,headers,method,false);
+	result.complete(function(data){
+		if(data.status != 200) return false;
+
+		var obj =$.parseJSON(data.responseText);
+		if( obj.il && obj.il.length<=0 ){
+			$("#page-contact-addmem .ca-list-area .cal-coachmake").fadeIn();
+			$("#page-contact-addmem .ca-list-area .cal-div-area").fadeOut();
+
+		} else {
+			var area = $("#page-contact-addmem .ca-list-area .cal-div-area");
+			area.html("");
+
+			for( var i=0; i<obj.il.length; i++){
+				var data_info = obj.il[i];
+				if( !data_info ) continue;
+				// "ik": "+886935398692", or "abc@gmail.com"
+			    // "tp": 0, or 1 // Invitation Type 0(Phone)、1(Email)
+			    // "nk": "小瓶 "
+			    // "auo": "http://s3.url/xxx", // Avatar Original URL
+			    // "aut": "http://s3.url/xxx"  // Avatar Thumbnail URL
+			    var row = $("<div class='cal-row'></div>");
+			    row.append("<div class='photo'><img class='st-user-pic' src='images/common/others/empty_img_personal_l.png'/></div>");
+			    row.append("<div class=info><div class='name'></div><div class='tel'></div></div>");
+			    row.append("<div class='img'><img src='images/invitemembers/invitemembers_icon_reinvite.png'/></div>");
+			    area.append( row );
+
+			    if( data_info.aut ) row.find(".photo img").attr( "src", data_info.aut.replaceOriEmojiCode() );
+			    if( data_info.nk ) row.find(".info .name").html( data_info.nk.replaceOriEmojiCode() );
+			    if( data_info.ik && data_info.ik.length>0 ){
+			    	if( data_info.tp==0 ){
+			    		var tmp = data_info.ik.replace( /^(\+.{3})/, "0")
+			    		row.find(".info .tel").html( tmp );
+			    	} else {
+			    		row.find(".info .tel").html( data_info.ik );
+			    	}
+			    }
+			}
+
+			$("#page-contact-addmem .ca-list-area .cal-coachmake").fadeOut();
+			area.fadeIn();
+		}
+	});
+}
+
+function sendInvite(){
+	var nk = $(".cai-name input").val();
+	if( !nk || nk.length==0 ){
+		popupShowAdjust("", $.i18n.getString("INVITE_DISPLAY_NAME") );
+		return;
+	}
+	var phone = $(".cai-num input").val();
+	if( !phone || phone.length==0 ){
+		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_NUMBER") );
+		return;
+	}
+	if( phone.length<10 || phone.indexOf("0")!=0 ){
+		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR") );
+		return;
+	}
+	var area = $(".cai-area .area");
+	phone = phone.replace(/^0/, area.html() );
+	/* ----- TODO ------
+		 國碼/email
+		不同國別電話格式檢查
+	   ----- TODO ------*/
+	sendInviteAPI( [{
+			"pn": phone,
+			"nk": nk
+		}], function(data){
+			if( data.status==200 ){
+				// "ul":
+				// [
+				//   {
+				//     "gu": "asdfas-awefnasdf", // Group User Id
+				//     "ik": "+886912345678",  // Invitation Key
+				//     "tp": 0,  // Invitation Type(0: Phone, 1: Email)
+				//     "aj": true  // Already Joined Group ?
+				//   }
+				// ]
+				try{
+					var obj = $.parseJSON(data.responseText);
+					/* ----- TODO ------
+						如果已經邀過了...?
+					   ----- TODO ------ */
+					//mem already in group
+					if( obj.ul[0].aj==true ){
+						toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
+					} else {
+						toastShow( $.i18n.getString("INVITE_SUCC") );
+						$(".cai-name input").val("");
+						$(".cai-num input").val("");
+					}
+				} catch(e){
+
+				}
+			} else {
+				toastShow( $.i18n.getString("INVITE_FAIL") );
+			}
+	});
+}
+
+function sendInviteAPI( list, callback ){
+	var api_name = "groups/" + gi + "/invitations";
+	var headers = {
+	         "ui":ui,
+	         "at":at, 
+	         "li":lang,
+	             };
+	var body = { "ul":list };
+	var method = "post";
+	var result = ajaxDo(api_name,headers,method,false, body);
+	result.complete(function(data){
+		callback(data);
 	});
 }

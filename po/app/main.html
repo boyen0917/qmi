@@ -190,6 +190,7 @@
                         </div>
                         <div class="feed-compose"></div>
                         <div class="chatList-add"></div>
+                        <div class="contact-add"></div>
                         <div class="navi-alert"></div>
                         <div class="feed-compose-area">
                             <div data-fc-box="post" class="fc-area-subbox"><img class="fc-icon-size" src="images/compose/compose_box_bticon_post.png"/><div data-textid="FEED_POST"></div></div>
@@ -248,7 +249,7 @@
                             <div class="st-filter-other">
                                 <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list"><span data-textid='FEED_BULLETIN'></span></div>
                                 <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list"><span data-textid='FEED_REPORT'></span></div>
-                                <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list"><span data-textid='FEED_TASK'></span></div>
+                                <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list"><span data-textid='FEED_MISSION'></span></div>
                                 <div data-status="unread" class="st-filter-action st-filter-list"><span data-textid='FEED_UNREAD'></span></div>
                                 <div data-status="read" class="st-filter-action st-filter-list"><span data-textid='FEED_READ'></span></div>
                                 <div class="st-filter-list-btn"><img src="images/icon/icon_arrow_top.png"/></div>
@@ -460,6 +461,58 @@
             </div>
             <div class="newChatDetail-header" data-textid="COMMON_MEMBER">Member</div>
             <div class="newChatDetail-content">
+            </div>
+        </div>
+
+<!------------------------------- page-contact-addmem -------------------------------->
+        
+        <div data-role="page" id="page-contact-addmem">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="INVITE_TITLE"></h3>
+            </div>
+            <div class="ca-nav">
+                <div class="ca-list ca-nav-box" data-type="invite">
+                    <div></div>
+                    <span data-textid="INVITE_INVITED_MEMBER"></span>
+                </div>
+                <div class="ca-invite ca-nav-box" data-type="build">
+                    <div></div>
+                    <span data-textid="INVITE_MANUAL"></span>
+                </div>
+            </div>
+
+            <div class="ca-list-area ca-sub-area" style="display:none">
+                <div class="cal-coachmake">
+                    <img src="images/coachmake/logo_status_inviteobject.png"/>
+                    <span data-textid="INVITE_NO_INVITATION"></span>
+                </div>
+                <div class="cal-div-area">
+                </div>
+            </div>
+            <div class="ca-invite-area ca-sub-area">
+                <input type="file" class="cai-file" style="display:none" data-role="none"/>
+                <div class="cai-name">
+                    <img src="images/invitemembers/invitemembers_icon_name.png"/>
+                    <input maxlength="20" data-role="none" data-textph-id="INVITE_DISPLAY_NAME"/>
+                </div>
+                <div class="cai-area">
+                    <div>
+                        <img src="images/invitemembers/invitemembers_icon_area.png"/>
+                        <span data-textid="COMMON_COUNTRY_TAIWAN"></span>
+                        <span class="area">+886</span>
+                        <img src="images/common/icon/icon_arrow_next.png">
+                    </div>
+                </div>
+                <div class="cai-num">
+                    <img src="images/invitemembers/invitemembers_icon_phonenumber.png"/>
+                    <input maxlength="20" data-role="none" data-textph-id="INVITE_PHONE_NUMBER"/>
+                </div>
+                <!-- <div class="cai-desc">
+                    <textarea maxlength="150" data-role="none" data-textph-id="GROUP_ABOUT"></textarea>
+                </div> -->
+
+                <div class="ca-invite-submit" data-textid="INVITE_INVITE"></div>
             </div>
         </div>
 

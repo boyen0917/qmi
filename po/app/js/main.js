@@ -527,27 +527,36 @@ $(function(){
 		putEventStatus(target_obj,1,est);
 	});
 
+	//回覆按讚列表
+	$(document).on('click','.st-reply-footer .cnt',function(){
+		var this_event = $(this).parents('.st-reply-content-area');
+		timelineShowResponseLikeDelegate( this_event, 1, function(){
+			cns.debug("on back from response like");
+		});
+	});
 	
 	//點選開啟圖庫
 	$(document).on("click",".img-show",function(e){
 		var this_img_area = $(this);
 
 		var this_s32 = this_img_area.find(".auo").attr("src");
-		var gallery_str = '<li data-thumb="' + this_s32 + '"><img src="' + this_s32 + '" /></li>';
 
-		var img = new Image();
-		img.onload = function() {
-			var gallery = window.open("flexslider/index.html", "", "width=" + this.width + ", height=" + this.height);
-    		$(gallery.document).ready(function(){
-    			setTimeout(function(){
-    				var this_slide = $(gallery.document).find(".slides");
-    				this_slide.html(gallery_str);
-    				$(gallery.document).find("input").val(1);
-    				$(gallery.document).find("button").trigger("click");
-    			},300);
-    		});
-		}
-		img.src = this_s32;
+        showGallery( null, null, [{s32:this_s32}] );
+		// var gallery_str = '<li data-thumb="' + this_s32 + '"><img src="' + this_s32 + '" /></li>';
+
+		// var img = new Image();
+		// img.onload = function() {
+		// 	var gallery = window.open("flexslider/index.html", "", "width=" + this.width + ", height=" + this.height);
+  //   		$(gallery.document).ready(function(){
+  //   			setTimeout(function(){
+  //   				var this_slide = $(gallery.document).find(".slides");
+  //   				this_slide.html(gallery_str);
+  //   				$(gallery.document).find("input").val(1);
+  //   				$(gallery.document).find("button").trigger("click");
+  //   			},300);
+  //   		});
+		// }
+		// img.src = this_s32;
 		
 	});
 
