@@ -1791,13 +1791,26 @@ img.auo {
 
 .st-sub-box-more {
 	position: absolute;
-	right:0;
-	background: #5597e2;
-	border: 2px solid #5482b8;
+	right: 0;
+	background: white;
+	/* border: 0px solid #C3C3C3; */
 	opacity: 0.9;
 	border-radius: 2px;
-	display:none;
+	display: none;
 	z-index: 10;
+	-webkit-box-shadow: 0px 3px 12px 0px rgba(121, 121, 121, 0.75);
+}
+.st-sub-box-more-screen{
+	width: 100%;
+	/* zoom: 1; */
+	display: block;
+	height: 100%;
+	float: left;
+	position: absolute;
+	background: rgba(115, 115, 115, 0.7);
+	top: 0;
+	z-index: 9;
+	display: none;
 }
 
 .st-sub-box-more-box {
@@ -1806,56 +1819,60 @@ img.auo {
 	height: 70px;
 	text-align: center;
 	padding: 15px 0 0 0;
-	color: white;
+	color:rgb(37,49,56);
 	cursor: pointer;
 }
 .st-sub-box-more-box img{
 	width: 35px;
 }
-
-.st-sub-box-more-box:hover, .st-sub-box-more-box.dective{
-	color:#a8d7ff;
+.st-sub-box-more-box:not(.deactive):hover img{
+	width: 38px;
+	margin-top: -2px;
+	/*margin-left: -1px;*/
 }
-.st-sub-box-more-box.dective{
+.st-sub-box-more-box.deactive{
+	color: rgb(207,216,220);
+}
+.st-sub-box-more-box.deactive{
 	cursor: default;
 }
 
 .st-sub-box-more-box[data-st-more="top"] img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_top.png);
+	content: url(../images/icon/icon_timelinebox_set_top.png);
 }
 .st-sub-box-more-box[data-st-more="subscribe"] img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_subscribe.png);
+	content: url(../images/icon/icon_timelinebox_set_unsubscribe.png);
 }
 .st-sub-box-more-box[data-st-more="copy"] img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_copy.png);
+	content: url(../images/icon/icon_timelinebox_set_copy.png);
 }
 .st-sub-box-more-box[data-st-more="copyword"] img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_copyword.png);
+	content: url(../images/icon/icon_timelinebox_set_copycontent.png);
 }
 .st-sub-box-more-box[data-st-more="calendar"] img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_calendar.png);
+	content: url(../images/icon/icon_timelinebox_set_calendar.png);
 }
 .st-sub-box-more-box[data-st-more="del"] img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_del.png);
+	content: url(../images/icon/icon_timelinebox_set_delete.png);
 }
 
-.st-sub-box-more-box[data-st-more="top"]:hover img, .st-sub-box-more-box.dective[data-st-more="top"] img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_top_click.png);
+.st-sub-box-more-box.deactive[data-st-more="top"] img{
+	content: url(../images/icon/icon_timelinebox_set_top_disable.png);
 }
-.st-sub-box-more-box[data-st-more="subscribe"]:hover img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_subscribe_click.png);
+.st-sub-box-more-box[data-st-more="subscribe"].deactive img{
+	content: url(../images/icon/icon_timelinebox_set_unsubscribe_disable.png);
 }
-.st-sub-box-more-box[data-st-more="copy"]:hover img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_copy_click.png);
+.st-sub-box-more-box[data-st-more="copy"].deactive img{
+	content: url(../images/icon/icon_timelinebox_set_copy_disable.png);
 }
-.st-sub-box-more-box[data-st-more="copyword"]:hover img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_copyword_click.png);
+.st-sub-box-more-box[data-st-more="copyword"].deactive img{
+	content: url(../images/icon/icon_timelinebox_set_copycontent_disable.png);
 }
-.st-sub-box-more-box[data-st-more="calendar"]:hover img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_calendar_click.png);
+.st-sub-box-more-box[data-st-more="calendar"].deactive img{
+	content: url(../images/icon/icon_timelinebox_set_calendar_disable.png);
 }
-.st-sub-box-more-box[data-st-more="del"]:hover img, .st-sub-box-more-box.dective[data-st-more="del"] img{
-	content: url(../images/timeline/timeline_hiddenmenu_icon_del_click.png);
+.st-sub-box-more-box[data-st-more="del"].deactive img{
+	content: url(../images/icon/icon_timelinebox_set_delete_disable.png);
 }
 
 .st-more-close {
@@ -1916,7 +1933,7 @@ img.st-user-pic{
 	overflow: hidden;
 }
 .st-sub-subscribe{
-	width: 15px;
+	width: 17px;
 	display: none;
 	margin-left: 5px;
 	margin-top: 2px;
@@ -2620,6 +2637,7 @@ img.st-user-pic{
 	height: 50px;
 	padding-left: 15px;
 	position: relative;
+	border-bottom: 1px solid rgb(236,236,236);
 }
 
 .st-reply-username {
@@ -2703,7 +2721,7 @@ img.st-user-pic{
 	position: relative;
 	width: 100%;
 	background: rgb(239,239,239);
-	z-index: 10;
+	z-index: 9;
 	display: inline-block;
 }
 
