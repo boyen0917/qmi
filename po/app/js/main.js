@@ -322,11 +322,12 @@ $(function(){
 		setGroupAllUser(false,false,function(){
 			timelineSwitch("feeds",true);
 			setSmUserData(gi,gu,gn);
-
+			cns.debug("enable test");
 			//置頂設定
 			topEvent(function(){
 				//左側選單圖案變換
 				setSidemenuHeader(this_gi);
+				cns.debug("topEvent enable test");
 				$(".sm-group-area").addClass("enable");
 			});
 		});

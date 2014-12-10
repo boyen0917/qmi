@@ -576,11 +576,14 @@ $(function(){
 
 		$(".st-top-area-load").html(top_area);
 
-		//不符合就return false
-		if(typeof gi == "undefined") return false;
 		//取得user name list
 		var _groupList = $.lStorage(ui);
 		topEventApi().complete(function(data){
+            //不管是不是200 執行callback
+            if(callback) {
+                callback();   
+            }
+
         	if(data.status == 200){
         		var top_events_arr = $.parseJSON(data.responseText).el;
         		var top_msg_num = top_events_arr.length;
@@ -636,10 +639,6 @@ $(function(){
                         });
         			}));
         		});
-
-                if(callback) {
-                    callback();   
-                }
 	        }else{
                 //發生錯誤 開啓更換團體
                 $(".sm-group-area").addClass("enable");
@@ -4153,7 +4152,7 @@ $(function(){
 
         //製作timeline
         $.each(timeline_list,function(i,val){
-
+            cns.debug("detail block val",val);
             var content,box_content,youtube_code,prelink_pic,prelink_title,prelink_desc;
 
             //detail 不需要
