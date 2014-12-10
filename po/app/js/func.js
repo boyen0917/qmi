@@ -938,7 +938,7 @@ $(function(){
 			return false;
 		}
 	}
-	
+
 	//取得單一timeline 回覆讚好等狀態
 	getThisTimelinePart = function (this_event,tp,callback){
         if( this_event.length==0 ){
@@ -4231,7 +4231,7 @@ $(function(){
 
             //-------------------------------------------------------------------
             // 判斷是否有gu all
-            var data_arr = ["timelineUserName",val.ei.split("_")[0] , val.meta.gu , this_event.find(".st-sub-name") , this_event.find(".st-sub-box-1 .st-user-pic img")];
+            var data_arr = ["timelineUserName",val.ei.split("_")[0] , val.meta.gu , this_event.find(".st-sub-name label") , this_event.find(".st-sub-box-1 .st-user-pic img")];
             chkGroupAllUser(data_arr);
 
             this_event.find(".st-sub-time").append(new Date(val.meta.ct).toFormatString());
@@ -4419,6 +4419,20 @@ $(function(){
 	}
 
 	eventStatusWrite = function(this_event,this_es_obj){
+        var event_status = this_event.data("event-val");
+        var this_ei = this_event.data("event-id");
+        var this_gi = this_ei.split("_")[0];
+
+        var isAdmin = false;
+        var isMyPost = false;
+        try{
+            var groupTmp = $.lStorage(ui)[this_gi];
+            var meTmp = groupTmp.guAll[ groupTmp.gu ];
+            isAdmin = (meTmp.ad==1);
+            isMyPost = (event_status.meta.gu==groupTmp.gu);
+        } catch(e){
+            cns.debug(e);
+        }
 		var this_es_obj = this_event.data("event-val").meta;
 
 		//按讚
@@ -4453,6 +4467,35 @@ $(function(){
 			this_event.find(".st-task-status-area img").attr("src","images/common/icon/icon_check_red_l.png");
 			this_event.find(".st-task-status").html(task_str);
 		}
+
+        //訂閱
+        if( true==this_es_obj.is ){
+                this_event.find(".st-sub-subscribe").show();
+                this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='subscribe'] div").html( $.i18n.getString("FEED_UNSUBSCRIBE") );
+        } else {
+                this_event.find(".st-sub-subscribe").hide();
+                this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='subscribe'] div").html( $.i18n.getString("FEED_SUBSCRIBE") );
+        }
+
+        //置頂(一般貼文不能置頂)
+        if( this_es_obj.tp=='00' || false==isAdmin ){
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top']").addClass("dective");
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top'] div").html( $.i18n.getString("FEED_TOP") );
+        } else{
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top']").removeClass("dective");
+            if( true==this_es_obj.top && this_es_obj.tp!='00' ){
+                    this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top'] div").html( $.i18n.getString("FEED_REMOVE_TOP") );
+            } else {
+                    this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top'] div").html( $.i18n.getString("FEED_TOP") );
+            }
+        }
+
+        //刪除
+        if( isAdmin || isMyPost){
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").removeClass("dective");
+        } else {
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").addClass("dective");
+        }
 	}
 
 	eventFilter = function(this_event,filter){
@@ -6234,7 +6277,15 @@ $(function(){
             //單一動態詳細內容
             getEventDetail(this_ei).complete(function(data){
                 if(data.status == 200){
-                    timelineBlockMake(this_event,[$.parseJSON(data.responseText).el[0]],false,true) ;
+                    var data_obj = $.parseJSON(data.responseText);
+                    try{
+                        if( data_obj.el[0].meta.del== true ){
+                            popupShowAdjust($.i18n.getString("FEED_EVENT_DELETED"),"","COMMON_OK","");
+                            $("#page-timeline-detail .page-back").trigger("click");
+                        } else timelineBlockMake(this_event,[data_obj.el[0]],false,true);
+                    } catch(e){
+                        cns.debug(e);
+                    }
                 }
             });
         });
@@ -6252,6 +6303,106 @@ $(function(){
         setTimeout(function(){
             $(".gm-frame").addClass("scrolltop");
         },100);
+    }
+
+    timelineEditStatus = function( this_event, type, callback ){
+        var event_status = this_event.data("event-val");
+
+        var this_ei = this_event.data("event-id");
+        var this_gi = this_ei.split("_")[0];
+        var this_ti = this_ei.split("_")[1];
+
+        try{
+            var act = 0;
+            var typeName = "";
+            switch( type ){
+                case 3:
+                    typeName = "is";
+                    break;
+                case 8:
+                    typeName = "top";
+                    break;
+            }
+
+            if( typeName.length>0 ) {
+                if( true==event_status.meta[typeName] ){
+                    act = 0;
+                    event_status.meta[typeName] = false;
+                }
+                else{
+                    act = 1;
+                    event_status.meta[typeName] = true;
+                }
+            }
+
+            // var length = $(".st-top-event-set").children().length;
+            // if( type==8 && act==1 && length && length>=9 ){
+            //     popupShowAdjust(title,desc,confirm,cancel,callback);
+            // } else {
+                timelineEditStatusApi( this_gi, this_ti, this_ei, "put", type, act, function(data){
+                    if(data.status == 200 && callback){
+                        this_event.data("event-val", event_status);
+                        eventStatusWrite(this_event);
+
+                        if( 8==type ){
+                            topEvent();
+                        }
+                        callback(data);
+                    }
+                });
+            // }
+
+
+        } catch(e){
+            cns.debug(e);
+        }
+    }
+
+    timelineEditStatusApi = function(this_gi, this_ti, this_ei, method, type, act, callback ){
+        var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei;
+        var headers = {
+            "ui":ui,
+            "at":at, 
+            "li":lang,
+            "etp": type,    //0(讀取),1(按讚),2(按X),3(按訂閱),4(蒐藏),6(是否有行事曆),8(置頂)
+            "est": act      //0(取消),1(執行)
+        };
+        var result = ajaxDo(api_name,headers,method,false);
+        result.complete(function(data){
+            if(callback)    callback(data);
+        });
+    }
+
+    timelineDeleteEvent = function( this_event, callback ){
+        var this_ei = this_event.data("event-id");
+        var this_gi = this_ei.split("_")[0];
+        var this_ti = this_ei.split("_")[1];
+
+        try{
+            var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei;
+            var headers = {
+                "ui":ui,
+                "at":at, 
+                "li":lang
+            };
+            var result = ajaxDo(api_name,headers,"delete",false);
+            result.complete(function(data){
+                if(data.status == 200 && callback){
+                    var detailPage = this_event.parents("#page-timeline-detail");
+                    if( detailPage.length>0 ){
+                        detailPage.find(".page-back").trigger("click");
+                        $("#page-group-main .st-feedbox-area .st-sub-box[data-event-id='"+this_ei+"']").remove();
+                    } else {
+                        this_event.remove();
+                    }
+                    idb_timeline_events.remove(this_ei);
+                    topEvent();
+                    callback(data);
+                }
+            });
+        } catch(e){
+            cns.debug(e);
+        }
     }
 
     //反過來 點選四次 關閉

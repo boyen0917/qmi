@@ -76,6 +76,7 @@
 	"FEED_VOTE_LIMIT" : "請至少選擇一個選項",
 	"FEED_VOTE_SENDED" : "投票成功",
 	"FEED_VOTE_FAILED" : "投票失敗",
+	"FEED_EVENT_DELETED" : "此動態已被刪除",
 
 	"COMPOSE_DESCRIPTION" :	"內容描述",
 	"COMPOSE_TITLE" :	"標題",
