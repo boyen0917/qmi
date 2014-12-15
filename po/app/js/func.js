@@ -4152,9 +4152,7 @@ $(function(){
 
         //製作timeline
         $.each(timeline_list,function(i,val){
-            cns.debug("detail block val",val);
             var content,box_content,youtube_code,prelink_pic,prelink_title,prelink_desc;
-
             //detail 不需要
             if(!detail){
                 method = "append";

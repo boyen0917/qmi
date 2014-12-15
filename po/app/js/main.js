@@ -783,7 +783,6 @@ $(function(){
 				$(".feed-compose").addClass("feed-compose-visit");
 		    },100);
 		}
-		
 	});
 
 
