@@ -1,23 +1,23 @@
 
 .navi-alert {
-	position:absolute;
-	cursor:pointer;
+	position: absolute;
+	cursor: pointer;
 	background: url(../images/navi/navi_icon_notification.png);
 	background-size: cover;
-	right: 15px;
-	width: 28px;
-	height: 28px;
-	top: 13px;
+	right: 14px;
+	width: 35px;
+	height: 35px;
+	top: 9px;
 }
 /*.navi-alert:hover {
 	transform: scale(1.1);
 }*/
 
 .navi-alert:hover {
-	width: 30px;
-	height: 30px;
-	right: 14px;
-	top: 12px;
+	width: 38px;
+	height: 38px;
+	right: 12px;
+	top: 8px;
 }
 
 .navi-alert.new:before {

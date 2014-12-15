@@ -4477,10 +4477,10 @@ $(function(){
 
         //置頂(一般貼文不能置頂)
         if( this_es_obj.tp=='00' || false==isAdmin ){
-            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top']").addClass("dective");
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top']").addClass("deactive");
             this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top'] div").html( $.i18n.getString("FEED_TOP") );
         } else{
-            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top']").removeClass("dective");
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top']").removeClass("deactive");
             if( true==this_es_obj.top && this_es_obj.tp!='00' ){
                     this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='top'] div").html( $.i18n.getString("FEED_REMOVE_TOP") );
             } else {
@@ -4490,9 +4490,9 @@ $(function(){
 
         //刪除
         if( isAdmin || isMyPost){
-            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").removeClass("dective");
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").removeClass("deactive");
         } else {
-            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").addClass("dective");
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").addClass("deactive");
         }
 	}
 

@@ -705,7 +705,7 @@ $(function(){
 		    	$(this).trigger("click");
 		    }                		
 		});
-		
+
 		//開啟編輯區塊
 		zoom_out_cnt = 8;
 		var box_width = $(".st-sub-box").width();
@@ -715,16 +715,18 @@ $(function(){
 	    $(this).next().css("zoom","0.05");
 	    $(this).next().show();
 	    zoomOut($(this).next());
+		$(this).parent().find(".st-sub-box-more-screen").fadeIn();
 	});
 	
 	$(document).on('click','.st-more-close',function(e){
 		zoom_in_cnt = 100;
 		zoomIn($(this).parent());
+		$(this).parent().parent().find(".st-sub-box-more-screen").fadeOut();
 	});
 	
 	
 	//編輯區塊按鈕效果
-	$(document).on('click','.st-sub-box-more-box:not(.dective)',function(e){
+	$(document).on('click','.st-sub-box-more-box:not(.deactive)',function(e){
 		e.stopPropagation();
 	    var target = $(this);
 	    // var more_img_url = "images/timeline/timeline_hiddenmenu_icon_";
