@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title></title>
         <link rel="stylesheet" href="css/chat.css"/>
+        <link rel="stylesheet" href="css/memberList.css"/>
         
         <script src="../js/jquery.js"></script>
         
@@ -24,62 +25,84 @@
         <script type="text/javascript" src="js/jquery.autosize.min.js"></script>
         <script type="text/javascript" src="../js/jquery.i18n.js"></script>
         
+        <script type="text/javascript" src="js/pageControl.js"></script>
         <script type="text/javascript" src="js/chatDB.js"></script>
+        <script type="text/javascript" src="js/memberList.js"></script>
+        <script type="text/javascript" src="js/selectMember.js"></script>
         <script type="text/javascript" src="js/chat.js"></script>
 
         <script type="text/javascript" src="js/stickerArea.js"></script>
         <link rel="stylesheet" href="css/stickerArea.css"/>
     </head>
     <body>
-
-        <!-- BEGIN: Sticky Header -->
-        <div id="header">
-            <div class="title"></div>
-            <div class="subTitle"></div>
-        </div>
-        <!-- END: Sticky Header -->
-         
-        <!-- BEGIN: Page Content -->
-        <div id="container">
-            <img id="chat-loading" src="images/st_bottom_loading.gif" />
-            <div id="chat-nomore" data-textid="CHAT_NO_MORE_MSG" style="display:none;"></div>
-            <div id="chat-contents"></div>
-            <div id="chat-toBottom"></div>
-        </div>
-        <!-- END: Page Content -->
-         
-        <!-- BEGIN: Sticky Footer -->
-        <div id="footer">
-            <div class="contents">
-                <div class="input-other"></div>
-                <input class="cp-file" type="file" multiple style="display:none;" data-role="none"/>
-                <div class="input-emoji"></div>
-                <!-- <textarea class="input"></textarea> -->
-                <div class="input" contenteditable="true"></div>
-                <div class="send" data-textid="CHAT_SEND">送出</div>
-                <button type="button" class="pollingMsg" style="display:none;"></button>
-                <button type="button" class="pollingCnt" style="display:none;"></button>
-            </div>
-            <div class="stickerArea" style="height:200px;width:100%;"></div>
-        </div>
-        <!-- END: Sticky Footer -->
-
-        <!-- BEGIN: popup -->
-        <div class="popup">
-            <div class="popup-frame">
-                <div class="popup-title"></div>
-                <div class="popup-text" style="display:none"></div>
-                <div class="popup-confirm-area">
-                    <div class="popup-cancel" style="display:none">取消</div>
-                    <div class="popup-confirm" style="display:none">確定</div>    
+        <div id="page-chat" class="ui-page">
+            <!-- BEGIN: Sticky Header -->
+            <div id="header" class="ui-header fixed">
+                <div class="title">
+                    <span class="text"></span>
+                    <span class="count"></span>
+                </div>
+                <div class="subTitle"></div>
+                <div class="extra"><img src="images/navi/navi_icon_chat_more.png"/></div>
+                <div class="extra-content">
+                    <div class="btn" data-type="exit">
+                        <div class="img"></div><div class="text" data-textid="CHAT_LEAVE"></div>
+                    </div>
+                    <div class="btn" data-type="edit">
+                        <div class="img"></div><div class="text" data-textid="COMMON_EDIT"></div>
+                    </div>
+                    <div class="btn" data-type="invite">
+                        <div class="img"></div><div class="text" data-textid="CHAT_INVITE"></div>
+                    </div>
+                    <div class="btn disable" data-type="album">
+                        <div class="img"></div><div class="text" data-textid="COMMON_ALBUM"></div>
+                    </div>
                 </div>
             </div>
-            <div class="popup-gap"></div>
-            <div class="popup-screen"></div>
-        </div>
+            <!-- END: Sticky Header -->
+             
+            <!-- BEGIN: Page Content -->
+            <div id="container" class="ui-container">
+                <img id="chat-loading" src="images/st_bottom_loading.gif" />
+                <div id="chat-nomore" data-textid="CHAT_NO_MORE_MSG" style="display:none;"></div>
+                <div id="chat-contents"></div>
+                <div id="chat-toBottom"></div>
+            </div>
+            <!-- END: Page Content -->
+             
+            <!-- BEGIN: Sticky Footer -->
+            <div id="footer">
+                <div class="contents">
+                    <div class="input-other"></div>
+                    <input class="cp-file" type="file" multiple style="display:none;" data-role="none"/>
+                    <div class="input-emoji"></div>
+                    <!-- <textarea class="input"></textarea> -->
+                    <div class="input" contenteditable="true"></div>
+                    <div class="send" data-textid="CHAT_SEND">送出</div>
+                    <button type="button" class="pollingMsg" style="display:none;"></button>
+                    <button type="button" class="pollingCnt" style="display:none;"></button>
+                </div>
+                <div class="stickerArea" style="height:200px;width:100%;"></div>
+            </div>
+            <!-- END: Sticky Footer -->
 
-        <div class="ajax-screen-lock"></div>
-        <div class="screen-lock"></div>
-        <!-- END: popup -->
+            <!-- BEGIN: popup -->
+            <div class="popup">
+                <div class="popup-frame">
+                    <div class="popup-title"></div>
+                    <div class="popup-text" style="display:none"></div>
+                    <div class="popup-confirm-area">
+                        <div class="popup-cancel" style="display:none">取消</div>
+                        <div class="popup-confirm" style="display:none">確定</div>    
+                    </div>
+                </div>
+                <div class="popup-gap"></div>
+                <div class="popup-screen"></div>
+            </div>
+
+            <div class="ajax-screen-lock"></div>
+            <div class="screen-lock"></div>
+            <!-- END: popup -->
+        </div>
     </body>
 </html>

@@ -24,6 +24,8 @@ var g_lineHeight = 21;
 var pi;	//permission id for this chat room
 var ti_chat;
 var getHistoryMsgTimeout;
+var isUpdatePermission = false;
+var isGettingPermission = false;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -34,6 +36,8 @@ var getHistoryMsgTimeout;
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
 $(document).ready(function(){
+	$.changePage("#page-chat");
+	
 	$(document).off("ajaxSend");
 
 	g_oriFooterHeight = $("#footer").height();
@@ -65,6 +69,29 @@ $(document).ready(function(){
     //所有團體列表
     g_group = userData[gi];
     g_room = g_group["chatAll"][ci];
+	if( null==g_room.uiName ){
+		try{
+			if( g_room.tp==1 ){
+				var split = g_room.cn.split(",");
+				var me = g_group.gu;
+				for( var i=0; i<split.length; i++ ){
+					if( split[i]!= me ){
+						if( g_group.guAll.hasOwnProperty( split[i] ) ){
+							var mem = g_group.guAll[ split[i] ];
+							g_room.uiName = mem.nk;
+							break;
+						}
+					}
+				}
+			} else {
+				g_room.uiName = g_room.cn;
+			}
+			$.lStorage( ui, userData );
+
+		} catch(e) {
+			cns.debug( e.message );
+		}
+	}
 	g_cn = g_room.uiName ? g_room.uiName : g_group.gn;
 
 	gu = g_group.gu;
@@ -76,8 +103,17 @@ $(document).ready(function(){
 	updateLanguage( lang );
 
     //header 設定團體名稱
-    $("#header .title").html( g_cn.replaceOriEmojiCode() );
+    $("#header .title .text").html( g_cn.replaceOriEmojiCode() );
     $("#header .subTitle").html( g_group.gn.replaceOriEmojiCode() );
+    if( null==g_room.memCount ){
+    	g_room.memCount = (g_room.memList) ? Object.keys(g_room.memList).length : 0;
+    }
+    if( g_room.memCount>2 ){
+    	$("#header .count").show();
+    	$("#header .count").html( "("+g_room.memCount+")" );
+    } else {
+    	$("#header .count").hide();
+    }
     
 	//- click "send" to send msg
 	var sendBtn = $("#footer .contents .send");
@@ -105,7 +141,7 @@ $(document).ready(function(){
 	});
 	input.html("");
 
-	$(document).find("title").text(g_cn + " - FINE");
+	$(document).find("title").text(g_cn + " - Qmi");
 
 	$("#chat-toBottom").off("click");
 	$("#chat-toBottom").click(scrollToBottom);
@@ -182,6 +218,8 @@ $(document).ready(function(){
 	resizeContent();
 
 	$( window ).scroll( function(){
+		if( !$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition") ) return;
+
 		var posi = $(window).scrollTop();
 		if(  !g_bIsEndOfHistory && posi <= $("#chat-loading").height()*0.5 ){
 			if( false==g_bIsLoadHistoryMsg ){
@@ -210,6 +248,7 @@ $(document).ready(function(){
 				}
 			}
 			sendMsgRead( g_currentDate.getTime() );
+			if( isUpdatePermission ) getPermition(true);
 		});
 		updateChat();
 	}
@@ -247,6 +286,80 @@ $(document).ready(function(){
         }
 	});
 
+	//extra functions
+	$(".screen-lock").off("click").click(function(){
+		var tmp = $("#header .extra-content");
+		if( "none"!=tmp.css("display") ){
+			$("#header .extra").trigger("click");
+		}
+	});
+	$("#header .extra").off("click").click(function(){
+		var tmp = $("#header .extra-content");
+		if( "none"==tmp.css("display") ){
+			tmp.slideDown();
+			$(".screen-lock").fadeIn();
+		} else {
+			tmp.slideUp();
+			$(".screen-lock").fadeOut();
+		}
+	});
+	$(".extra-content .btn:not(.disable)").off("click").click(function(){
+		var btn = $(this);
+		var type = btn.attr("data-type");
+		switch( type ){
+			case "exit":
+				leaveChatRoom();
+				break;
+			case "edit": //edit mem
+				delMember();
+				break;
+			case "invite":
+				addMember();
+				break;
+			case "album":
+				showAlbum();
+				break;
+		}
+		$("#header .extra-content").hide();
+		$(".screen-lock").hide();
+	});
+
+	$(document).on('mousedown','.chat-msg-bubble-left, .chat-msg-bubble-right',function(e){
+	    $(this).addClass("active");
+	});
+	$(document).on('blur mouseleave','.chat-msg-bubble-left.active, .chat-msg-bubble-right.active',function(e){
+	    $(this).removeClass("active");
+	});
+
+    $("#header .title .text, #header .title .count").click( function(){
+    	var tmpData = [];
+    	for( var gu in g_room.memList ){
+    		tmpData.push( {gu:gu} );
+    	}
+  //   	$(this).data("object_str", tmpData );
+		// $(this).data("object_opt", {
+		// 	title: $.i18n.getString("COMMON_MEMBER"),
+		// 	isShowGroup : false,
+		// 	isShowSelf : false,
+		// 	isShowAll : false,
+		// 	isShowFav : true,
+		// 	isSingleSelect : false
+		// });
+
+		$("#page-chat").addClass("transition");
+		showMemListPage( $("body"), $.i18n.getString("COMMON_MEMBER"), [{title:"",ml:tmpData}], 
+			function(){
+				cns.debug("on page change done");
+			},function( isDone ){
+				scrollToBottom();
+				setTimeout( function(){
+					checkPagePosition();
+					$("#page-chat").removeClass("transition");
+				}, 500 );
+				$("#page-tab-object").remove();
+				cns.debug("on back from memList");
+		});
+	});
 });
 
 /*
@@ -321,6 +434,7 @@ function getHistoryMsg ( bIsScrollToTop ){
 					showMsg( object, true );
 				}
 	        }
+	        if( isUpdatePermission ) getPermition(true);
 	    
 			// sendMsgRead(g_currentDate.getTime());
 			
@@ -365,8 +479,9 @@ function getHistoryMsg ( bIsScrollToTop ){
 	}
 }
 
-function hideLoading()
-{
+function hideLoading(){
+	if( !$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition") ) return;
+	
 	var loading = $("#container #chat-loading");
 	// firstDom.css("background", "red");
 	var tmp = loading.offset();
@@ -376,47 +491,6 @@ function hideLoading()
 	}
 	g_bIsLoadHistoryMsg = false;
 }
-/*
-api打回來的是以ct開始的訊息....
-但每次只會送20筆, 怎麼知道要reverse多少時間回去？？？
-暫時先不處理, 之後再問問其他人怎做
-*/
-function updateHistoryMsg(){
-	// op("/groups/"+gi+"/chats/"+ci+"/messages?"+(g_lastDate.getTime()-2000),
-	//     "GET",
-	//     "",
-	//     function(data, status, xhr) {
-
-	//         for( var i=(data.el.length-1); i>=0; i--){
-	// 			var object = data.el[i];
-	// 			if(object.hasOwnProperty("meta")){
-
-	// 				//pass shown msgs
-	// 				if( g_msgs.indexOf(object.ei)>=0 ){
-	// 					continue;
-	// 				} else {
-	// 					//add to db
-	// 					var node = {
-	// 						gi: gi,
-	// 						ci: ci,
-	// 						ei: object.ei,
-	// 				        ct: object.meta.ct,
-	// 				        data: object
-	// 				    };
-	// 				    //write msg to db
-	// 					g_idb_chat_msgs.put( node );
-
-	// 					showMsg( object, true );
-	// 				}
-	// 			}
-	// 		}
-
-	//     	scrollToStart();
-	//     	g_bIsLoadHistoryMsg = false;
-
-	//     }	//end of function
-	// );	//end of op
-}	//end of updateChat
 
 function op ( url, type, data, delegate, errorDelegate){
 	$.ajax({
@@ -442,22 +516,17 @@ function scrollToStart (){
 }
 
 function scrollToBottom (){
-	cns.debug( "scrollToBottom" );
+	cns.debug( "scrollToBottom", $(document).height()+50  );
 	$('html, body').stop(false, true).animate({scrollTop:$(document).height()+50}, 'fast');
+	g_isEndOfPage = true;
 }
 
 function checkPagePosition (){
+	if( !$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition") ) return;
+
 	if( new Date().getTime() > (g_isEndOfPageTime+500) ){
 		if( g_isEndOfPage ){
 			var posi = $(window).scrollTop();
-			// if( posi <= $("#chat-loading").height()*0.5 ){
-			// 	if( false==g_bIsLoadHistoryMsg ){
-			// 		if( !g_bIsEndOfHistory )	getHistoryMsg( false );
-			// 		else updateHistoryMsg();
-			// 	}
-			// 	g_isEndOfPage = false;
-			// 	return;
-			// }
 
 			var height = $(window).height();
 			var docHeight = $(document).height();
@@ -491,6 +560,7 @@ function getChatMemName (groupUID){
 	if( null == mem )   return "unknown";
 	return mem.nk;
 }
+
 function updateChat ( time ){
 	var api = "/groups/"+gi+"/chats/"+ci+"/messages";
 	if( time ){
@@ -538,6 +608,7 @@ function updateChat ( time ){
 					}
 				}
 			}
+			if( isUpdatePermission ) getPermition( true );
 
             //scroll to bottom
 			if( g_needsRolling ){
@@ -577,6 +648,7 @@ function updateChatCnt (){
 	var elements = $(".chat-cnt");
 	for( var i=0; i<elements.length; i++ ){
 		var dom = $(elements[i]);
+		if( dom.parents(".sys-msg").length>0 )	continue;
 		var time = dom.data("t");
 
 		while(data.ts<time && index>=0 ){
@@ -843,6 +915,38 @@ function showMsg (object, bIsFront, bIsTmpSend){
 			}
 			showMap(msgData, msgDiv);
 			break; 
+		case 22: //mem join/leave
+			msgDiv.addClass('content');
+			var textTmp = "";
+			try{
+				var memTmp = g_group.guAll[msgData.t];
+				if(1==msgData.a){
+					if( g_room.memList.hasOwnProperty(memTmp.gu) ){
+						isUpdatePermission = true;
+					}
+					textTmp = $.i18n.getString("CHAT_SOMEONE_LEAVE", memTmp.nk );
+				} else {
+					if( !g_room.memList.hasOwnProperty(memTmp.gu) ){
+						isUpdatePermission = true;
+					}
+					textTmp = $.i18n.getString("CHAT_SOMEONE_JOIN", memTmp.nk );
+				}
+
+			} catch(e){
+				cns.debug( e.message );
+			}
+			msgDiv.html( htmlFormat(textTmp) );
+			if( isMe ) msgDiv.parent().removeClass("chat-msg-right").addClass("sys-msg");
+			else{
+				var newParent = msgDiv.parent().parent().parent();
+				newParent.find(".chat-msg-left").remove();
+				var child = msgDiv.parent().detach();
+				child.addClass("sys-msg");
+				child.find(".name").remove();
+				child.append( child.find(".msg-content").detach() );
+				newParent.append( child );
+			}
+			break;
 		default: //text or other msg
 			if(isMe){
 				msgDiv.addClass('chat-msg-bubble-right');
@@ -1130,34 +1234,58 @@ getS3file = function(target, file_c, file_p, tp, ti, size){
 	});
 }
 
-function getPermition(){
+function getPermition( isReget ){
 	//若沒有聊天室權限, 重新取得
-    if( !g_room.hasOwnProperty("pi") || g_room.pi.length>0){
-    	//取得成員列表
-    	//GET /groups/{gi}/chats/{ci}/users
-    	op("/groups/"+gi+"/chats/"+ci+"/users", 
-    		"get", null, function(data, status, xhr){
-		    	//取得權限
-		    	var sendData = {
-		    		ti:ti_chat,
-		    		tu:{gul:data.ul}
-		    	};
-		    	op("/groups/"+gi+"/permissions", "post", 
-		    		JSON.stringify(sendData), function(pData, status, xhr){
-		    			cns.debug( JSON.stringify(pData) );
+    if( true==isReget || !g_room.hasOwnProperty("memList") || !g_room.hasOwnProperty("pi") || g_room.pi.length<=0){
+    	try{
+        	isUpdatePermission = false;
+        	if( isGettingPermission ) return;
+        	isGettingPermission = true;
+	    	//取得成員列表
+	    	//GET /groups/{gi}/chats/{ci}/users
+	    	op("/groups/"+gi+"/chats/"+ci+"/users", 
+	    		"get", null, function(data, status, xhr){
+			    	//取得權限
+			    	var sendData = {
+			    		ti:ti_chat,
+			    		tu:{gul:data.ul}
+			    	};
+					var userData = $.lStorage( ui );
+					g_room = userData[gi].chatAll[ci];
+					g_room.memList = {};
+					for( var i=0; i<data.ul.length; i++){
+						g_room.memList[data.ul[i].gu] = data.ul[i];
+					}
+					g_room.memCount = data.ul.length;
+					if( g_room.memCount>2 ){
+				    	$("#header .count").show();
+				    	$("#header .count").html( "("+g_room.memCount+")" );
+				    } else {
+				    	$("#header .count").hide();
+				    }
+					$.lStorage( ui, userData );
 
-		    			pi = pData.pi;
-					    var userData = $.lStorage( ui );
-					    g_group = userData[gi];
-					    g_room = g_group["chatAll"][ci];
-					    g_room.pi = pi;
-					    $.lStorage( ui, userData );
-		    		}, 
-		    		null
-		    	);
-	    	},
-	    	null
-    	);
+			    	op("/groups/"+gi+"/permissions", "post", 
+			    		JSON.stringify(sendData), function(pData, status, xhr){
+        					isGettingPermission = false;
+			    			cns.debug( JSON.stringify(pData) );
+
+			    			pi = pData.pi;
+			    			userData = $.lStorage( ui );
+						    g_group = userData[gi];
+						    g_room = g_group["chatAll"][ci];
+						    g_room.pi = pi;
+						    $.lStorage( ui, userData );
+			    		}, 
+			    		null
+			    	);
+		    	},
+		    	null
+	    	);
+    	} catch(e){
+    		cns.debug( "[!]"+e.message );
+        	isGettingPermission = false;
+    	}
     } else {
     	pi = g_room.pi;
     }
@@ -1169,4 +1297,180 @@ function sendMsgRead( msTime ){
 	    JSON.stringify({lt:msTime}),
 	    null
 	);
+}
+
+function leaveChatRoom(){
+	cns.debug("leaveChatRoom");
+
+	var tmp = function(){
+		window.close();
+	};
+	popupShowAdjust( $.i18n.getString("CHAT_LEAVE"), 
+		$.i18n.getString("CHAT_LEAVE_CONFIRM"), 
+		$.i18n.getString("COMMON_OK"),
+		$.i18n.getString("COMMON_CANCEL"), [function(){ //on ok
+			editMemInRoomAPI( ci, "put", [{gu:g_group.gu}], tmp );
+		}]
+	);
+}
+
+function editMemInRoomAPI(ciTmp, method, list, callback){
+	var sendData = {ul: list};
+	op("/groups/"+gi+"/chats/"+ciTmp+"/users", method, 
+		JSON.stringify(sendData), function(pData, status, xhr){
+			cns.debug( status, JSON.stringify(pData) );
+			if( callback ) callback(pData);
+		}, 
+		null
+	);
+}
+
+function delMember(){
+	cns.debug("delMember");
+
+	try{
+		var btn = $(".extra-content .btn[data-type='edit']");
+		var tmpList = {};
+		for( var gu in g_room.memList ){
+			tmpList[gu] = g_group.guAll[gu].nk;
+		}
+
+		btn.data("exclude_str", JSON.stringify( [g_group.gu] ) );
+		btn.data("object_str", JSON.stringify( tmpList ) );
+		btn.data("object_opt", {
+			isShowGroup : false,
+			isShowSelf : false,
+			isShowAll : false,
+			isShowFav : false,
+			isSingleSelect : false,
+			min_count: 1
+		});
+		
+
+		$("#page-chat").addClass("transition");
+		showSelectMemPage( $("body"), btn, function(){
+			}, function(isDone){
+				if( isDone ){
+					scrollToBottom();
+					//on select done
+					// send add mem to room api
+					var memListString = btn.data("object_str");
+					try{
+						cns.debug( memListString );
+						var memList = $.parseJSON( memListString );
+						memList[g_group.gu] = g_group.guAll[g_group.gu].nk;
+						var addList = [];
+						var removeList = [];
+						for( var guTmp in memList ){
+							if( !g_room.memList.hasOwnProperty(guTmp) ){
+								addList.push( {gu:guTmp} );
+							}
+						}
+						for( var guTmp in g_room.memList ){
+							if( !memList.hasOwnProperty(guTmp) ){
+								removeList.push( {gu:guTmp} );
+							}
+						}
+						var isSend = false;
+						if( addList.length>0 ){
+							editMemInRoomAPI( ci, "post", addList, function(data){
+								if( isSend ){
+									getPermition( true );
+									updateChat();
+								}
+								isSend = true;
+							});
+						} else {
+							isSend = true;
+						}
+						if( removeList.length>0 ){
+							editMemInRoomAPI( ci, "put", removeList, function(data){
+								if( isSend ){
+									getPermition( true );
+									updateChat();
+								}
+								isSend = true;
+							});
+						} else {
+							isSend = true;
+						}
+					} catch(e){
+						cns.debug("[!]"+e.message);
+					}
+				}
+				scrollToBottom();
+				setTimeout( function(){
+					checkPagePosition();
+					$("#page-chat").removeClass("transition");
+				}, 500 );
+				$("#page-tab-object").remove();
+			}
+		);
+	} catch(e){
+		cns.debug(e.message);
+	}
+}
+
+function addMember(){
+	cns.debug("addMember");
+
+	try{
+		var btn = $(".extra-content .btn[data-type='invite']");
+		
+		var tmpList = [];
+		for( var gu in g_room.memList ){
+			tmpList.push( gu );
+		}
+		btn.data("exclude_str", JSON.stringify(tmpList) );
+		btn.data("object_str", "" );
+		btn.data("object_opt", {
+			isShowGroup : false,
+			isShowSelf : false,
+			isShowAll : false,
+			isShowFav : true,
+			isSingleSelect : false,
+			min_count: 1
+		});
+
+		$("#page-chat").addClass("transition");
+		showSelectMemPage( $("body"), btn, function(){
+				// $("#page-chat").removeClass("transition");
+			}, function( isDone ){
+				scrollToBottom();
+				if(isDone){
+					//on select done
+					// send add mem to room api
+					var memListString = btn.data("object_str");
+					try{
+						cns.debug( memListString );
+						var memList = $.parseJSON( memListString );
+						var newList = [];
+						for( var guTmp in memList ){
+							newList.push( {gu:guTmp} );
+						}
+						editMemInRoomAPI( ci, "post", newList, function(data){
+							// if( data.status==200){
+								getPermition( true );
+								updateChat();
+							// }
+						});
+					} catch(e){
+						cns.debug(e.message);
+					}
+				}
+				scrollToBottom();
+				setTimeout( function(){
+					checkPagePosition();
+					$("#page-chat").removeClass("transition");
+				}, 500 );
+				$("#page-tab-object").remove();
+			}
+		);
+	} catch(e){
+		cns.debug(e.message);
+	}
+}
+
+function showAlbum(){
+	cns.debug("showAlbum");
 }

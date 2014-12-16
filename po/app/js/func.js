@@ -489,6 +489,11 @@ $(function(){
 	          break;
 	    }
 
+        //關閉筆功能
+        if($(".feed-compose-area").is(":visible")){
+            $(".feed-compose").trigger("click");
+        }
+
         $("#page-group-main").find(".gm-header .page-title").html(page_title);
 	}
 
@@ -1956,19 +1961,6 @@ $(function(){
 		}));
 	}
 
-
-	getGroupAllUser = function(this_gi,ajax_load,err_show){
-		var err_show = err_show || false;
-		var api_name = "groups/" + this_gi + "/users";
-        var headers = {
-            "ui":ui,
-            "at":at,
-            "li":lang,
-        };
-        var method = "get";
-        return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
-	}
-
 	composeObjectShow = function(this_compose){
 
 		//避免重複綁定事件 先解除
@@ -2005,6 +1997,7 @@ $(function(){
                 //工作發佈對象
                 isShowGroup = false;
                 isShowSelf = false;
+                isShowAll = false;
             }else{
                 //其餘發佈對象
                 isShowGroup = true;
@@ -2144,6 +2137,9 @@ $(function(){
                 $(this).next().toggleClass("open");
                 $(this).parent().next().toggle();
             });
+            tmp.find(".obj-cell.fav + .obj-cell-arrow").off("click").click( function(){
+                $(this).prev().trigger("click");
+            });
         }
 
         //----- 團體列表 ------
@@ -2242,53 +2238,54 @@ $(function(){
         
         //標題bar
         var memSubTitle = $("<div class='obj-cell-subTitle mem'></div>");
-        if( isShowGroup ){ //show群組的話show全選圈圈
+        if(!this_compose_obj.parent().hasClass("cp-work-item")){ //show群組的話show全選圈圈
             memSubTitle.append( '<div class="obj-cell-subTitle-chk">'+
                 '<div class="img"></div>'+
                 '<div class="select">'+$.i18n.getString("COMMON_SELECT_ALL")+'</div></div>' );
+        
+            //mem全選
+            memSubTitle.click( function(){
+                clearMeAndAllSelect();
+
+                if( $(this).data("chk") ){
+                    $(this).data("chk", false );
+                    $(this).find(".img").removeClass("chk");
+
+                    //deselect all
+                    $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+                        var this_cell = $(this);
+                        this_cell.data("chk",false);
+                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                    });
+
+                    //存回
+                    $(".obj-content").data("selected-obj",{});
+                } else {
+                    $(this).data("chk", true );
+                    $(this).find(".img").addClass("chk");
+
+                    //select all mem
+                    var selected_obj = {};
+                    $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+                        var this_cell = $(this);
+                        this_cell.data("chk",true);
+                        this_cell.find(".obj-cell-chk .img").addClass("chk");
+                        
+                        if( this_cell.data("gu-name") ){
+                            selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
+                        }
+                    });
+
+                    //存回
+                    $(".obj-content").data("selected-obj",selected_obj);
+                }
+
+                updateSelectedObj();
+            });
         }
         memSubTitle.append( "<div class='text'>"+$.i18n.getString("COMMON_MEMBER")+"</div>" );
         $(".obj-cell-area").append(memSubTitle);
         
-        //mem全選
-        memSubTitle.click( function(){
-            clearMeAndAllSelect();
-
-            if( $(this).data("chk") ){
-                $(this).data("chk", false );
-                $(this).find(".img").removeClass("chk");
-
-                //deselect all
-                $(".obj-cell-area").find(".obj-cell.mem").each(function(){
-                    var this_cell = $(this);
-                    this_cell.data("chk",false);
-                    this_cell.find(".obj-cell-chk .img").removeClass("chk");
-                });
-
-                //存回
-                $(".obj-content").data("selected-obj",{});
-            } else {
-                $(this).data("chk", true );
-                $(this).find(".img").addClass("chk");
-
-                //select all mem
-                var selected_obj = {};
-                $(".obj-cell-area").find(".obj-cell.mem").each(function(){
-                    var this_cell = $(this);
-                    this_cell.data("chk",true);
-                    this_cell.find(".obj-cell-chk .img").addClass("chk");
-                    
-                    if( this_cell.data("gu-name") ){
-                        selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
-                    }
-                });
-
-                //存回
-                $(".obj-content").data("selected-obj",selected_obj);
-            }
-
-            updateSelectedObj();
-        });
 
         //成員rows
         $.each(guAll,function(i,gu_obj){
@@ -3776,7 +3773,7 @@ $(function(){
 		_groupList[gi].ti_cal = ti_cal;
 		_groupList[gi].ti_feed = ti_feed;
 		_groupList[gi].ti_chat = ti_chat;
-        _groupList[gi].guall = {};
+        _groupList[gi].guAll = {};
 		//存回
 		$.lStorage(ui,_groupList);
 	};
