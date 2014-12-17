@@ -4514,13 +4514,20 @@ $(function(){
 		this_event.removeClass("filter-show");
 		var show_chk = false;
 
-		if(filter == "all"){
-			show_chk = true;
-		}else if(filter == "read"){
-			if(event_status.ir) show_chk = true;
-		}else{
-			if(!event_status.ir) show_chk = true;
-		}
+        switch( filter ){
+            case "all":
+                show_chk = true;
+                break;
+            case "read":
+                if(event_status.ir) show_chk = true;
+                break;
+            case "unread":
+                if(!event_status.ir) show_chk = true;
+                break;
+            case "subscribe":
+                if(event_status.is) show_chk = true;
+                break;
+        }
 
 		//用以判斷下拉更新
 		if(show_chk){
