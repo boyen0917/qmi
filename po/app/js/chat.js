@@ -36,6 +36,9 @@ var isGettingPermission = false;
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
 $(document).ready(function(){
+	window.resizeTo( $(window.opener.document).width(), $(window.opener.document).height() );
+	window.moveTo( window.opener.screenX+20, window.opener.screenY+20 );
+
 	$.changePage("#page-chat");
 	
 	$(document).off("ajaxSend");
