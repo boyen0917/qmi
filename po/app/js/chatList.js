@@ -358,13 +358,20 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		case 9: //map
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_LOCATION", name);
 			break;
+		case 22: //sys
+			if(1==data.ml[0].a){
+				text = $.i18n.getString("CHAT_SOMEONE_LEAVE", name );
+			} else {
+				text = $.i18n.getString("CHAT_SOMEONE_JOIN", name );
+			}
+			break;
 		default:
 			text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c:"";
 			break;
 	}
 
 	if( gi==giTmp ){
-		if(table){
+		if(table.length>0){
 			table.data("time", data.meta.ct);
 			var msgDom = table.find(".msg");
 			var timeDom = table.find(".time");
@@ -384,6 +391,8 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 					cntDom.html(cntText);
 				}
 			}
+		} else {
+			$('.gm-border > .sm-small-area[data-sm-act="chat"]').trigger("click");
 		}
 	}
 	

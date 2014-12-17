@@ -1302,14 +1302,18 @@ function sendMsgRead( msTime ){
 function leaveChatRoom(){
 	cns.debug("leaveChatRoom");
 
-	var tmp = function(){
-		window.close();
-	};
 	popupShowAdjust( $.i18n.getString("CHAT_LEAVE"), 
 		$.i18n.getString("CHAT_LEAVE_CONFIRM"), 
 		$.i18n.getString("COMMON_OK"),
 		$.i18n.getString("COMMON_CANCEL"), [function(){ //on ok
-			editMemInRoomAPI( ci, "put", [{gu:g_group.gu}], tmp );
+			editMemInRoomAPI( ci, "put", [{gu:g_group.gu}], function(){
+				var userData = $.lStorage(ui);
+				g_group = userData[gi];
+				delete g_group.chatAll[ci];
+				$.lStorage(ui, userData);
+				$('.gm-border > .sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
+				window.close();
+			});
 		}]
 	);
 }

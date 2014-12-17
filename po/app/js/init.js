@@ -237,11 +237,15 @@ $(function(){
 
 
 	errorResponse = function(data){
-		if(data.responseText){
-			return $.parseJSON(data.responseText).rsp_msg;
-		}else{
-			cns.debug("errorResponse:",data);
-			return $.i18n.getString("COMMON_CHECK_NETWORK");
+		try{
+			if(data.responseText){
+				return $.parseJSON(data.responseText).rsp_msg;
+			}else{
+				cns.debug("errorResponse:",data);
+				return $.i18n.getString("COMMON_CHECK_NETWORK");
+			}
+		} catch(e){
+			cns.debug( e.message );
 		}
 	}
 
