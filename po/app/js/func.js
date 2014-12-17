@@ -2710,6 +2710,8 @@ $(function(){
     timelineObjectTabShowDelegate = function( this_event, type, onDone ){
         var list = [];
         var title = "";
+        var this_ei = this_event.data("event-id");
+        var this_gi = this_ei.split("_")[0];
 
         //(0=讀取, 1=按讚, 2=按X, 3=按訂閱, 4=按置頂, 7=按任務, 9 = 未讀取)
         switch( type ){
@@ -2721,7 +2723,7 @@ $(function(){
                     try{
                         list[0].ml = $.parseJSON( data.responseText ).epl;
                         if(isReady){
-                            showObjectTabShow(title, list, onDone);
+                            showObjectTabShow(this_gi, title, list, onDone);
                         } else {
                             isReady = true;
                         }
@@ -2735,7 +2737,7 @@ $(function(){
                     try{
                         list[1].ml = $.parseJSON( data.responseText ).epl;
                         if(isReady){
-                            showObjectTabShow(title, list, onDone);
+                            showObjectTabShow(this_gi, title, list, onDone);
                         } else {
                             isReady = true;
                         }
@@ -2752,7 +2754,7 @@ $(function(){
                 }
                 title = $.i18n.getString("FEED_LIKE")+"("+epl.length+")";
                 list.push( {title:"",ml:epl} );
-                if( list.length>0 ) showObjectTabShow(title, list, onDone);
+                if( list.length>0 ) showObjectTabShow(this_gi, title, list, onDone);
                 break;
         }
     }
@@ -2769,20 +2771,23 @@ $(function(){
                 getThisTimelineResponsePart( this_event,type, function(data){
                     if( data.status==200 ){
                         try{
+                            var this_ei = this_event.data("event-id");
+                            var this_gi = this_ei.split("_")[0];
+                            
                             var obj = $.parseJSON( data.responseText );
                             list.push( {title:"",ml:obj.epl} );
                             title = $.i18n.getString("FEED_LIKE")+"("+obj.epl.length+")";
+                            if( list.length>0 ) showObjectTabShow(this_gi, title, list, onDone);
                         } catch(e){
 
                         }
                     }
-                    if( list.length>0 ) showObjectTabShow(title, list, onDone);
                 });
         //         break;
         // }
     }
 
-    showObjectTabShow = function( title, list, onDone ){
+    showObjectTabShow = function( giTmp, title, list, onDone ){
         var page = $("#page-tab-object");
 
         //title
@@ -2833,8 +2838,8 @@ $(function(){
                 cellArea.append( cell );
 
                 //gen mem
-                var guAll = $.lStorage(ui)[gi].guAll;
-                var bl = $.lStorage(ui)[gi].bl;
+                var guAll = $.lStorage(ui)[giTmp].guAll;
+                var bl = $.lStorage(ui)[giTmp].bl;
                 for(var i=0;i<data.ml.length; i++ ){
                     var gu = data.ml[i].gu;
                     var rt = data.ml[i].rt;
