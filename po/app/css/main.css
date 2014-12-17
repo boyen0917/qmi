@@ -2911,19 +2911,23 @@ img.st-reply-message-attach {
 	width: 100px;
 	height: 100%;
 	text-align: center;
-	background: #237bd7;
+	/*background: #237bd7;*/
 	font-size: 18px;
-	border-left: 1px solid #000;
+	/*border-left: 1px solid #000;*/
+	line-height: 46px;
 }
-
+/*
 .cp-post:active ,.obj-done:active {
     background:rgb(0,86,138);
-}
+}*/
 
 .cp-post img ,.obj-done img {
 	position: relative;
 	top: 12px;
 	right: 2px;
+	width: 20px;
+	vertical-align: super;
+	display: none;
 }
 
 .cp-post span ,.obj-done span {
