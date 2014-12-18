@@ -3647,12 +3647,15 @@ input.cp-datetimepicker-end {
 	margin-bottom: 5px;
 }
 
-.obj-cell.subgroup, .obj-cell.fav {
+.obj-cell.subgroup, .obj-cell.fav,  .obj-cell.fav-branch {
 	display: inline-block;
 	width: 90%;
 	border-bottom: 0px;
 	vertical-align: middle;
 	cursor: pointer;
+}
+.obj-cell.fav-branch{
+	width: -webkit-calc( 90% - 65px );
 }
 
 .subgroup-parent {
@@ -3663,6 +3666,10 @@ input.cp-datetimepicker-end {
 .obj-cell._2{
 	padding-left: 65px;
 	/*background: rgb(233,248,254);*/
+}
+.obj-cell._3{
+	margin-left: 130px;
+	max-width: -webkit-calc( 100% - 140px);
 }
 
 .obj-cell-subTitle {
