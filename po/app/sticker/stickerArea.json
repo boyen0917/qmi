@@ -34,7 +34,9 @@
                         "st_mrpig_17",
                         "st_mrpig_18",
                         "st_mrpig_19",
-                        "st_mrpig_20"
+                        "st_mrpig_20",
+                        "st_mrpig_21",
+                        "st_mrpig_22"
                 ]
         },
         "piglovers":{
@@ -78,7 +80,24 @@
                         "st_pinkgirl_19",
                         "st_pinkgirl_20",
                         "st_pinkgirl_21",
-                        "st_pinkgirl_22"
+                        "st_pinkgirl_22",
+                        "st_pinkgirl_23",
+                        "st_pinkgirl_24"
+                ]
+        },
+        "cacique":{
+                "icon":"icon_cacique",
+                "pic":[
+                        "st_cacique_1",
+                        "st_cacique_2",
+                        "st_cacique_3",
+                        "st_cacique_4",
+                        "st_cacique_5",
+                        "st_cacique_6",
+                        "st_cacique_7",
+                        "st_cacique_8",
+                        "st_cacique_9",
+                        "st_cacique_10"
                 ]
         }
 }

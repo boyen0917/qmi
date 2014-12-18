@@ -1139,7 +1139,7 @@ showEditFavGroupBox = function( dom ){
 			);
 		} else {
 			// edit mem
-			var api_name = "groups/" + gi + "/favorites/" + fi + "/users";
+			var api_name = "groups/" + gi + "/favorites/" + fi;
 			var headers = {
 				"ui":ui,
 				"at":at, 

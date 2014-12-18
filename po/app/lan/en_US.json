@@ -27,6 +27,7 @@
 	"COMMON_SEND_PHOTO_LIMIT" : "You can send up to %ld photos at once.",
 	"COMMON_TIMEOUT_ALERT" : "Timeout, please reconnect.",
 	"COMMON_CHECK_NETWORK" : "",
+	"COMMON_ALBUM" : "Album",
 	
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
@@ -211,6 +212,11 @@
 	"CHAT_SOMEONE_SEND_VOICE" :	"%@ sent a voice message.",
 	"CHAT_SOMEONE_SEND_LOCATION" :	"%@ sent a location.",
 	"CHAT_NO_MORE_MSG" : "No more past message.",
+	"CHAT_LEAVE" : "Leave",
+	"CHAT_INVITE" : "Invite",
+	"CHAT_LEAVE_CONFIRM" : "Are you sure to leave this chat room?",
+	"CHAT_SOMEONE_LEAVE" : "%@ left chat room.",
+	"CHAT_SOMEONE_JOIN" : "%@ joined chat room.",
 	
 	"NOTICES_TITLE" :	"New Notices",
 	"NOTICES_POST" :	"Publish",

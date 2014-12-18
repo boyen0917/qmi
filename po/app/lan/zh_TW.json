@@ -85,7 +85,7 @@
 	"COMPOSE_SET_START_TIME" :	"設定開始時間",
 	"COMPOSE_START_TIME" :	"開始",
 	"COMPOSE_NOW" :	"現在",
-	"COMPOSE_START_TIME" :	"結束",
+	"COMPOSE_END_TIME" :	"結束",
 	"COMPOSE_ASSIGN" :	"分派對象",
 	"COMPOSE_TOPIC" :	"主題",
 	"COMPOSE_OPTION" :	"投票項目",
@@ -163,6 +163,7 @@
 	"COMMON_SEND_PHOTO_LIMIT" : "一次只能選取%ld張照片",
 	"COMMON_TIMEOUT_ALERT" : "連線逾時",
 	"COMMON_CHECK_NETWORK" : "目前網路不穩定，請確認連線狀況。",
+	"COMMON_ALBUM" : "相簿",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",
@@ -181,6 +182,11 @@
 	"CHAT_SOMEONE_SEND_VOICE"					: "%@ 傳送了聲音",
 	"CHAT_SOMEONE_SEND_LOCATION"					: "%@ 傳送了地圖",
 	"CHAT_NO_MORE_MSG" : "已無舊訊息",
+	"CHAT_LEAVE" : "離開",
+	"CHAT_INVITE" : "邀請",
+	"CHAT_LEAVE_CONFIRM" : "你確定要退出聊天室?",
+	"CHAT_SOMEONE_LEAVE" : "%@ 離開聊天室",
+	"CHAT_SOMEONE_JOIN" : "%@ 加入聊天室",
 
 	"NOTICES_TITLE"						: "新通知",
 	"NOTICES_POST"						: "發佈",

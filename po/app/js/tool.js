@@ -679,4 +679,119 @@ $(function(){
             });
         }
     }
+
+	getGroupAllUser = function(this_gi,ajax_load,err_show){
+		var err_show = err_show || false;
+		var api_name = "groups/" + this_gi + "/users";
+        var headers = {
+            "ui":ui,
+            "at":at,
+            "li":lang,
+        };
+        var method = "get";
+        return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
+	}
+
+
+	setBranchList = function(this_gi, callback){
+		var this_gi = this_gi || gi;
+		if( !this_gi ) return;
+
+    	//取得團體列表
+        var api_name = "groups/" + this_gi + "/branches";
+        var headers = {
+            "ui":ui,
+            "at":at,
+            "li":lang
+        };
+
+        var method = "get";
+        ajaxDo(api_name,headers,method,false).complete(function(data){
+        	if(data.status == 200){
+
+        		var branch_list = $.parseJSON(data.responseText);
+        		var new_bl = {};
+        		var new_fbl = {};
+                var _groupList = $.lStorage(ui);
+                var guAll = _groupList[this_gi].guAll;
+
+                //branch
+        		if(branch_list.bl.length) {
+                    //初始化陣列
+        			$.each(branch_list.bl,function(i,val){
+                        if( null==val.bp|| val.bp.length==0 ) return;
+
+                        var bp_arr = val.bp.replace(/^\./, '').split(".");
+                        var pi = "";
+                        if(bp_arr.length > 1){
+                            pi = bp_arr[bp_arr.length-2]
+                        }
+        				new_bl[bp_arr.last()] = {
+        					lv: bp_arr.length,
+        					bn: val.bn,
+        					cl: [],
+                            cnt: 0,
+                            pi: pi,
+        					bp_arr: bp_arr
+        				};
+        				
+	        		});
+
+                    //建立子群組
+	        		$.each(new_bl,function(i,val){
+        				if(val.lv > 1){
+        					var parent = val.bp_arr[val.bp_arr.length-2];
+        					if(new_bl[parent]) new_bl[parent].cl.push(i);
+        				}
+        				delete val.bp_arr;
+	        		});
+                    
+                    //計算人數
+                    //*NOTE*
+                    // 同一人可能隸屬于多個群組, 若兩個子群組有同一人,
+                    // 母群組應該只能算一人, 普通加法不成立...
+                    for( var biTmp in new_bl ){
+                        //每個群組走過一次所有成員, 只要含有這個群組ＩＤ數量就加一..
+                        var cnt=0;
+                        for( var id in guAll ){
+                            var mem = guAll[id];
+                            if( mem.bl.indexOf(biTmp)>=0 ){
+                                cnt++;
+                            }
+                        }
+                        new_bl[biTmp].cnt = cnt;
+                    }
+        		}
+
+                //fav branch
+        		if(branch_list.fbl.length) {
+        			$.each(branch_list.fbl,function(i,val){
+	        			new_fbl[val.fi] = {fn:val.fn, cnt:0};
+	        		});
+        		}
+
+                //計算人數
+                var favCnt = 0;
+                $.each(guAll,function(i,val){
+                    //fi mem cnt
+                    if( val.fbl && val.fbl.length>0 ){
+                        for(var i=0; i<val.fbl.length; i++){
+                            var fi = val.fbl[i];
+                            if(new_fbl[fi]) new_fbl[fi].cnt++;
+                        }
+                    }
+
+                    //fav cnt
+                    if( true==val.fav ) favCnt++;
+                });
+
+                _groupList[this_gi].favCnt = favCnt;
+            	_groupList[this_gi].bl = new_bl;
+            	_groupList[this_gi].fbl = new_fbl;
+            	$.lStorage(ui,_groupList);
+
+            	if( callback ) callback();
+        	}
+        });
+    }
 });
