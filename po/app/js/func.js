@@ -996,8 +996,9 @@ $(function(){
 		var epl = this_event.data("parti-list");
 
 		//gu gi 是全域
-		var me_pos = $.inArray(gu,epl);
-		var guAll = $.lStorage(ui)[this_gi].guAll;
+        var group = $.lStorage(ui)[this_gi];
+		var me_pos = $.inArray(group.gu,epl);
+		var guAll = group.guAll;
         var me_gu = guAll[epl[me_pos]];
 		var like_str = "";
 
@@ -5118,6 +5119,7 @@ $(function(){
                 this_event.data("like-lock",false);
 
                 var d =$.parseJSON(data.responseText);
+                var gu = $.lStorage(ui)[this_gi].gu;
         		//timeline 外層
         		if(!target_obj.reply){
 	        		var count_selector = this_event.find(".st-sub-box-3 div:eq(" + order + ")");
