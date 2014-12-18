@@ -85,7 +85,7 @@
 	"COMPOSE_SET_START_TIME" :	"設定開始時間",
 	"COMPOSE_START_TIME" :	"開始",
 	"COMPOSE_NOW" :	"現在",
-	"COMPOSE_START_TIME" :	"結束",
+	"COMPOSE_END_TIME" :	"結束",
 	"COMPOSE_ASSIGN" :	"分派對象",
 	"COMPOSE_TOPIC" :	"主題",
 	"COMPOSE_OPTION" :	"投票項目",
