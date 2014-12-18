@@ -4348,7 +4348,8 @@ $(function(){
             //event status
             eventStatusWrite(this_event);
 
-            eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
+            //detail 不做filter
+            if(!detail) eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
 
             //timeline message內容
             timelineContentMake(this_event,target_div,val.ml);

@@ -380,24 +380,6 @@ $(function(){
 		timelineListWrite();
 	});
 
-	// //綁定點選公告事件
-	// $(document).on("click",".st-top-event",function(){
-	// 	var this_top_event = $(this);
-	// 	var event_tp = $("#page-group-main").data("navi") || "00";
- //    	var selector = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box");
-
- //    	selector.each(function(){
- //    		var this_event = $(this);
- //    		cns.debug("ei:",this_event.data("event-id"));
- //    		if(this_event.data("event-id") == this_top_event.data("data-obj").ei){
- //    			cns.debug("this event data:",this_event.data());	
- //    		}
- //    	});
-	// 	// cns.debug("this event data:",$(this).data("data-obj"));
-
-	// 	// cns.debug("event:",selector);
-	// });
-
 	//主要filter
 	$(".st-filter-main").click(function(){
 		$(this).hide();
