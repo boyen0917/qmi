@@ -66,9 +66,9 @@ $(function(){
 
 	$( window ).resize(function() {
 		//reply textarea
-		var reply_textarea = $(document).find(".st-reply-message-textarea");
-		var this_event = reply_textarea.parents(".st-sub-box");
-		reply_textarea.css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
+		// var reply_textarea = $(document).find(".st-reply-message-textarea");
+		// var this_event = reply_textarea.parents(".st-sub-box");
+		// reply_textarea.css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
 	});
 
 	//test
@@ -389,19 +389,21 @@ $(function(){
 	});
 
 	$(".st-filter-action").click(function(){
+		$(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
+		$(this).addClass("st-filter-list-active");
 		var filter_name = $(this).find("span").html();
 
 		//動態變化
-		$(".st-filter-main span").fadeOut("fast");
-		$(".st-filter-other").slideUp(function(){
-			$(".st-filter-main").addClass("st-filter-list-active");
-			$(".st-filter-main img").attr("src","images/icon/icon_arrow_right.png");
-			$(".st-filter-main span").html(filter_name);
-			$(".st-filter-main span").fadeIn("fast");
+		// $(".st-filter-main span").fadeOut("fast");
+		// $(".st-filter-other").slideUp(function(){
+		// 	$(".st-filter-main").addClass("st-filter-list-active");
+		// 	$(".st-filter-main img").attr("src","images/icon/icon_arrow_right.png");
+		// 	$(".st-filter-main span").html(filter_name);
+		// 	$(".st-filter-main span").fadeIn("fast");
 
-			$(".st-filter-main-hide").hide();
-			$(".st-filter-main").show();
-		});
+		// 	$(".st-filter-main-hide").hide();
+		// 	$(".st-filter-main").show();
+		// });
 
 		var filter_status = $(this).data("status");
 

@@ -256,27 +256,60 @@
                         <div class="st-top-area-load user-main-toggle"></div>
 
                         <div class="st-filter-area user-main-toggle">
-                            <div class="st-filter-list st-filter-main"><span data-textid='FEED_ALL'></span><img src="images/icon/icon_arrow_right.png"/></div>
-                            <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide" style="display:none"><span data-textid='FEED_ALL'></span></div>
-                            <div class="st-filter-other">
+                            <!-- <div class="st-filter-list st-filter-main">
+                                <span data-textid='FEED_ALL'></span>
+                                <img src="images/icon/icon_arrow_right.png"/>
+                            </div> -->
+                            <div class="st-filter-hide left">&nbsp&nbsp...</div>
+                            <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide">
+                                <span data-textid='FEED_ALL'></span>
+                            </div>
+                            <!-- <div class="st-filter-other"> -->
                                 <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list"><span data-textid='FEED_BULLETIN'></span></div>
                                 <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list"><span data-textid='FEED_REPORT'></span></div>
                                 <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list"><span data-textid='FEED_MISSION'></span></div>
                                 <div data-status="unread" class="st-filter-action st-filter-list"><span data-textid='FEED_UNREAD'></span></div>
                                 <div data-status="read" class="st-filter-action st-filter-list"><span data-textid='FEED_READ'></span></div>
                                 <div data-status="subscribe" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_SUBSCRIBE'></span></div>
-                                <div class="st-filter-list-btn"><img src="images/icon/icon_arrow_top.png"/></div>
-                            </div>
+                                <!-- <div class="st-filter-list-btn">
+                                    <img src="images/icon/icon_arrow_top.png"/>
+                                </div> -->
+                            <!-- </div> -->
+                            <div class="st-filter-hide right">...&nbsp&nbsp</div>
                         </div>
                         <select id="type-trans">
                             <option value="te-example4"></option>
                         </select>
                         <div class="st-feedbox-area">
-                            <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
+                        <div style="
+                                width: -webkit-calc( 100% - 30px );
+                            height: 500px;
+                            /* background: gray; */
+                            margin-left: 15px;
+                            position: relative;
+                                        "><div style="
+                                    width: 100%;
+                                /* background: lightblue; */
+                                height: 50px;
+                                max-width: 700px;
+                                min-width: 400px;
+                                margin-left: auto;
+                                margin-right: auto;
+                                ">
+
+                                    <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
+                                    <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
+                                    <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
+                                    <div data-feed="03" class="feed-task feed-subarea switch-reset"></div>
+                                    <div data-feed="main" class="feed-subarea switch-reset"></div>
+
+                                </div>
+                            </div>
+                           <!--  <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
                             <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
                             <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
                             <div data-feed="03" class="feed-task feed-subarea switch-reset"></div>
-                            <div data-feed="main" class="feed-subarea switch-reset"></div>
+                            <div data-feed="main" class="feed-subarea switch-reset"></div> -->
                         </div>
                         <div class="st-feedbox-area-bottom">
                             <img src="images/st_bottom_loading.gif"/>

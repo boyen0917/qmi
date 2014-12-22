@@ -4202,7 +4202,7 @@ $(function(){
             selector[method](this_event);
 
             //調整留言欄
-            this_event.find(".st-reply-message-textarea").css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
+            // this_event.find(".st-reply-message-textarea").css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
 
             //autosize textarea
             this_event.find('.st-reply-message-textarea textarea').autosize({append: "\n"});
