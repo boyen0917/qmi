@@ -1445,7 +1445,7 @@ img.auo {
 }*/
 
 .subpage-timeline {
-	background: rgb(245, 245, 245);
+	background: rgb(242, 242, 242);
 	min-height: 800px;
 	overflow: hidden;
 }
@@ -1531,7 +1531,7 @@ img.auo {
 }
 
 .st-top-event-area {
-	background: url(../images/common/others/timeline_kv_android.png) no-repeat;
+	background: url(../images/common/others/timeline_kv1_android.png) no-repeat;
 	width: 100%;
 	height: 150px;
 	background-size: cover;
@@ -1862,6 +1862,21 @@ img.auo {
 	position: absolute;
 	width: -webkit-calc( 100% - 25px );
 }
+.st-feebox-area-container{
+    width: -webkit-calc( 100% - 30px );
+    margin-left: 15px;
+}
+.st-feebox-area-outter-container{
+    width: -webkit-calc( 100% - 30px );
+    margin-left: 15px;
+}
+.st-feebox-area-inner-container{
+    width: 100%;
+    max-width: 700px;
+    min-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
 
 
 .st-feedbox-area a:link,.st-feedbox-area a:active,.st-feedbox-area a:visited,.st-feedbox-area a:hover {
@@ -1875,8 +1890,9 @@ img.auo {
 	border: 1px solid rgb(200,200,200);
 	margin: 0 0 15px;
 	cursor: pointer;
-	-webkit-box-shadow: 0px 2px 5px 0px rgba(82, 82, 82, 0.75);
-	border-radius: 8px;
+	-webkit-box-shadow: 0px 2px 5px 0px rgba(82, 82, 82, 0.4);
+	border-radius: 5px;
+	padding: 5px 0;
 }
 
 .st-sub-box-more-btn {

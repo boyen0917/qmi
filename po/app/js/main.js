@@ -146,14 +146,14 @@ $(function(){
 	var init = 221;
 	function checkFilterPosition(tt){
 		var dom = $(".gm-content");
-		cns.debug( tt, dom.scrollTop() );  
+		// cns.debug( tt, dom.scrollTop() );  
 		var menu = $(".st-filter-area");
-	    if (!docked && dom.scrollTop() >= 160) 
+	    if (!docked && dom.scrollTop() >= 163) 
 	    {
 	        menu.addClass("fixed");
 	        docked = true;
 	    } 
-	    else if(docked && dom.scrollTop() <= 160)
+	    else if(docked && dom.scrollTop() <= 163)
 	    {
 	        menu.removeClass("fixed");
 
@@ -165,7 +165,7 @@ $(function(){
 	$(".gm-content").bind('mousewheel DOMMouseScroll', function(){     
 		clearTimeout( checkFilterPositionTimeout );
 		checkFilterPosition("onscroll");
-	    checkFilterPositionTimeout = setTimeout( checkFilterPosition ,50);
+	    checkFilterPositionTimeout = setTimeout( checkFilterPosition ,10);
 	});
 
 //----------------------------------- 團體選單 ---------------------------------------------                
