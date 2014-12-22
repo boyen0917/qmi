@@ -142,6 +142,32 @@ $(function(){
 		}
 	});
 
+	var docked = false;
+	var init = 221;
+	function checkFilterPosition(tt){
+		var dom = $(".gm-content");
+		cns.debug( tt, dom.scrollTop() );  
+		var menu = $(".st-filter-area");
+	    if (!docked && dom.scrollTop() >= 160) 
+	    {
+	        menu.addClass("fixed");
+	        docked = true;
+	    } 
+	    else if(docked && dom.scrollTop() <= 160)
+	    {
+	        menu.removeClass("fixed");
+
+	        docked = false;
+	    }
+	}
+
+	var checkFilterPositionTimeout;
+	$(".gm-content").bind('mousewheel DOMMouseScroll', function(){     
+		clearTimeout( checkFilterPositionTimeout );
+		checkFilterPosition("onscroll");
+	    checkFilterPositionTimeout = setTimeout( checkFilterPosition ,50);
+	});
+
 //----------------------------------- 團體選單 ---------------------------------------------                
 	//團體選單 點選團體
 	$(document).on('click','.group-list-box',function(e){
