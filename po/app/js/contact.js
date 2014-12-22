@@ -635,10 +635,22 @@ generateMemberList = function( memObject, favCallback ){
 		//name, (職稱), detail
 		var mid = tmp.find(".mid");
 		mid.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
+		
+		//暫時用部門取代職稱
 		var posi = "";
-		mid.append("<div class='detail'>"+posi+"</div>");
-		var sl = (mem.sl)? mem.sl : "&nbsp;";
-		mid.append("<div class='detail'>"+sl+"</div>");
+		try{
+			posi = bl[mem.bl.split(",")[0].split(".")[0]].bn;
+		} catch( e ){
+			cns.debug( e.message );
+		}
+		var tmpRow = $("<div class='detail'>"+posi+"</div>");
+		if(posi.length==0) tmpRow.css("display","none");
+		mid.append(tmpRow);
+		
+		var sl = (mem.sl)? mem.sl : "";
+		tmpRow = $("<div class='detail'>"+sl+"</div>");
+		if(sl.length==0) tmpRow.css("display","none");
+		mid.append(tmpRow);
 		if( !posi || posi.length==0 ){
 			mid.find(".detail:last-child").addClass("twoLine");
 		}

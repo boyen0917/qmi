@@ -591,17 +591,20 @@ $(function(){
 			return $.i18n.getString("COMMON_JUST_NOW");
 		} else if( diff<3600 ){	//within hour
 			return $.i18n.getString("COMMON_NMINUTES_AGO", Math.floor(diff/60) );
-		} else if( diff<86400 ){	//today
+		} else if( diff<86400 ){	//n-hours ago
 			return $.i18n.getString("COMMON_NHOURS_AGO", Math.floor(diff/3600) );
-		} else if( diff<172800 ){	//yesterday
-			var options = {hour: "2-digit", minute: "2-digit"};
-			return $.i18n.getString("COMMON_YESTERDAY")+" "+this.toLocaleTimeString(language, options);
-		} else if( now.getYear()==this.getYear() ){	//within a year
-			var options = {
-			    month: "numeric",
-			    day: "numeric", hour: "2-digit", minute: "2-digit"
-			};
-			return this.toLocaleTimeString(language, options);
+		} else if( now.getYear()==this.getYear() ){
+			//yesterday
+			if( this.getMonth()==now.getMonth() && this.getDate()==(now.getDate()-1) ){
+				var options = {hour: "2-digit", minute: "2-digit"};
+				return $.i18n.getString("COMMON_YESTERDAY")+" "+this.toLocaleTimeString(language, options);
+			} else {	//within a year
+				var options = {
+				    month: "numeric",
+				    day: "numeric", hour: "2-digit", minute: "2-digit"
+				};
+				return this.toLocaleTimeString(language, options);
+			}
 		}
 		var options = {
 		    year: "numeric", month: "numeric",
