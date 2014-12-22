@@ -2811,7 +2811,7 @@ img.st-reply-message-attach {
 }
 .st-reply-message-img .img{
 	position: relative;
-	max-width: 200px;
+	max-width: 130px;
 	max-height: 120px;
 	padding: 6px 0;
 	/* background: rgb(239,239,239); */
@@ -2826,7 +2826,7 @@ img.st-reply-message-attach {
 	display: block;
 	width: 27px;
 	z-index: 1;
-	left: -10px;
+	right: -10px;
 	height: 27px;
 	content: "";
 	background-size: 25px 25px;

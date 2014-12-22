@@ -1994,12 +1994,15 @@ $(function(){
         var isShowSelf = false;
         var isShowAll = true;
         var isShowFav = true;
+        var isShowFavBranch = true;
         if( null== option ){
             if(this_compose_obj.parent().hasClass("cp-work-item")){
                 //工作發佈對象
                 isShowGroup = false;
                 isShowSelf = false;
                 isShowAll = false;
+                isShowFav = true;
+                isShowFavBranch = false;
             }else{
                 //其餘發佈對象
                 isShowGroup = true;
@@ -2010,6 +2013,7 @@ $(function(){
             isShowSelf = (null==option.isShowSelf) ? isShowSelf : option.isShowSelf;
             isShowAll = (null==option.isShowAll) ? isShowAll : option.isShowAll;
             isShowFav = (null==option.isShowFav) ? isShowFav : option.isShowFav;
+            isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
         }
 
         if(this_compose_obj.parent().hasClass("cp-work-item")){
@@ -2092,81 +2096,91 @@ $(function(){
             
             var memfold = $("<div></div>");
             memfold.css("display","none")
-            $.each(guAll,function(i,gu_obj){
+            for( var i in guAll){
+                var gu_obj = guAll[i];
                 if( gu_obj.fav==true ){
                     var this_obj = getMemObjectRow(gu_obj, bl);
                     this_obj.addClass("_2");
                     memfold.append(this_obj);
                 }
-            });
-
-            //  add fbl in to memfold
-            // for( var fi in fbl ){
-            //     var fb_obj = fbl[fi];
-            //     var this_obj = $(
-            //         '<div class="subgroup-parent">'+
-            //             '<div class="obj-cell fav-branch _2" data-gu="'+fi+'">'+
-            //                 '<div class="obj-cell-chk">'+
-            //                     '<div class="img"></div>'+
-            //                 '</div>' +
-            //                 '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
-            //                 '<div class="obj-cell-subgroup-data">' + 
-            //                      '<div class="obj-user-name">' + fb_obj.fn.replaceOriEmojiCode() + '</div>' +
-            //                      '<div class="obj-user-title">'+
-            //                 '</div></div>'+
-            //             '</div>'+
-            //             '<div class="obj-cell-arrow"></div>'+
-            //         '</div>'
-            //     );
-
-            //     this_obj.data("fi",fi);
-            //     this_obj.data("fn",fb_obj.fn);
-            //     memfold.append(this_obj);
-
-            //     var fblFold = $('<div></div>');
-            //     fblFold.css("display","none")
-            //     memfold.append(fblFold);
-            //     for( var gu in guAll ){
-            //         var memTmp = guAll[gu];
-            //         if( memTmp .fbl.indexOf(fi)<0 ) continue;
-            //         var fblMemRow = getMemObjectRow(memTmp, bl);
-            //         fblFold.append(fblMemRow);
-            //     }
-            //     fblFold.find(".obj-cell.mem").addClass("_3");
-            // }
-            // tmp.append( memfold );
-            //  add fbl in to memfold
-            for( var fi in fbl ){
-                var fb_obj = fbl[fi];
-                var this_obj = $(
-                    '<div class="obj-cell fav-branch _2" data-gu="'+fi+'">'+
-                        '<div class="obj-cell-chk">'+
-                            '<div class="img"></div>'+
-                        '</div>' +
-                        '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
-                        '<div class="obj-cell-subgroup-data">' + 
-                             '<div class="obj-user-name">' + fb_obj.fn.replaceOriEmojiCode() + '</div>' +
-                             '<div class="obj-user-title">'+
-                        '</div></div>'+
-                    '</div>'
-                );
-                
-                this_obj.data("fi",fi);
-                this_obj.data("fn",fb_obj.fn);
-                memfold.append(this_obj);
             }
-            tmp.append( memfold );
+
+            if( isShowFavBranch ){
+                //  add fbl in to memfold
+                // for( var fi in fbl ){
+                //     var fb_obj = fbl[fi];
+                //     var this_obj = $(
+                //         '<div class="subgroup-parent">'+
+                //             '<div class="obj-cell fav-branch _2" data-gu="'+fi+'">'+
+                //                 '<div class="obj-cell-chk">'+
+                //                     '<div class="img"></div>'+
+                //                 '</div>' +
+                //                 '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
+                //                 '<div class="obj-cell-subgroup-data">' + 
+                //                      '<div class="obj-user-name">' + fb_obj.fn.replaceOriEmojiCode() + '</div>' +
+                //                      '<div class="obj-user-title">'+
+                //                 '</div></div>'+
+                //             '</div>'+
+                //             '<div class="obj-cell-arrow"></div>'+
+                //         '</div>'
+                //     );
+
+                //     this_obj.data("fi",fi);
+                //     this_obj.data("fn",fb_obj.fn);
+                //     memfold.append(this_obj);
+
+                //     var fblFold = $('<div></div>');
+                //     fblFold.css("display","none")
+                //     memfold.append(fblFold);
+                //     for( var gu in guAll ){
+                //         var memTmp = guAll[gu];
+                //         if( memTmp .fbl.indexOf(fi)<0 ) continue;
+                //         var fblMemRow = getMemObjectRow(memTmp, bl);
+                //         fblFold.append(fblMemRow);
+                //     }
+                //     fblFold.find(".obj-cell.mem").addClass("_3");
+                // }
+                // tmp.append( memfold );
+
+                //  add fbl in to memfold
+                for( var fi in fbl ){
+                    var fb_obj = fbl[fi];
+                    var this_obj = $(
+                        '<div class="obj-cell fav-branch _2" data-gu="'+fi+'">'+
+                            '<div class="obj-cell-chk">'+
+                                '<div class="img"></div>'+
+                            '</div>' +
+                            '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
+                            '<div class="obj-cell-subgroup-data">' + 
+                                 '<div class="obj-user-name">' + fb_obj.fn.replaceOriEmojiCode() + '</div>' +
+                                 '<div class="obj-user-title">'+
+                            '</div></div>'+
+                        '</div>'
+                    );
+                    
+                    this_obj.data("fi",fi);
+                    this_obj.data("fn",fb_obj.fn);
+                    memfold.append(this_obj);
+                }
+            }
+
+            //若fav裡面有內容才show
+            if( memfold.find(".obj-cell").length>0 ){
+
+                tmp.append( memfold );
 
 
-            $(".obj-cell-area").append(tmp);
-            
-            // tmp.find(".obj-cell.fav").off("click").click( function(){
-                // $(this).next().toggleClass("open");
-                // $(this).parent().next().toggle();
-            // });
-            tmp.find(".obj-cell.fav + .obj-cell-arrow").off("click").click( function(){
-                $(this).prev().trigger("click");
-            });
+                $(".obj-cell-area").append(tmp);
+                
+                // tmp.find(".obj-cell.fav").off("click").click( function(){
+                    // $(this).next().toggleClass("open");
+                    // $(this).parent().next().toggle();
+                // });
+                tmp.find(".obj-cell.fav + .obj-cell-arrow").off("click").click( function(){
+                    $(this).toggleClass("open");
+                    $(this).parent().next().toggle();
+                });
+            }
         }
 
         //----- 團體列表 ------
@@ -2632,7 +2646,7 @@ $(function(){
         $(".obj-done").click(function(){
 
             var obj_length = Object.keys($(".obj-content").data("selected-obj")).length
-                +Object.keys($(".obj-content").data("selected-branch")).length;
+                +Object.keys($(".obj-content").data("selected-branch") ).length +Object.keys($(".obj-content").data("selected-fav") ).length;
 
             //工作
             if(this_compose_obj.parent().hasClass("cp-work-item")){
@@ -2664,6 +2678,8 @@ $(function(){
                 this_compose.data("object_str",obj_str);
                 var branch_str = JSON.stringify($(".obj-content").data("selected-branch"));
                 this_compose.data("branch_str",branch_str);
+                var favorite_str = JSON.stringify($(".obj-content").data("selected-fav"));
+                this_compose.data("favorite_str",favorite_str);
             }
 
             //回上一頁
@@ -3720,6 +3736,13 @@ $(function(){
                         bl_arr.push(temp_obj);
                     });
                     tu.bl=bl_arr;
+                }
+            }
+            //fbl
+            if(this_compose.data("favorite_str")){
+                var object_obj = $.parseJSON(this_compose.data("favorite_str"));
+                if(Object.keys(object_obj).length){
+                    tu.fl=Object.keys(object_obj);
                 }
             }
 
