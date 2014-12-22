@@ -2893,7 +2893,7 @@ img.st-reply-message-attach {
 }
 .st-reply-message-img .img{
 	position: relative;
-	max-width: 200px;
+	max-width: 130px;
 	max-height: 120px;
 	padding: 6px 0;
 	/* background: rgb(239,239,239); */
@@ -2908,7 +2908,7 @@ img.st-reply-message-attach {
 	display: block;
 	width: 27px;
 	z-index: 1;
-	left: -10px;
+	right: -10px;
 	height: 27px;
 	content: "";
 	background-size: 25px 25px;
@@ -3729,12 +3729,15 @@ input.cp-datetimepicker-end {
 	margin-bottom: 5px;
 }
 
-.obj-cell.subgroup, .obj-cell.fav {
+.obj-cell.subgroup, .obj-cell.fav,  .obj-cell.fav-branch {
 	display: inline-block;
 	width: 90%;
 	border-bottom: 0px;
 	vertical-align: middle;
 	cursor: pointer;
+}
+.obj-cell.fav-branch{
+	width: -webkit-calc( 90% - 65px );
 }
 
 .subgroup-parent {
@@ -3745,6 +3748,10 @@ input.cp-datetimepicker-end {
 .obj-cell._2{
 	padding-left: 65px;
 	/*background: rgb(233,248,254);*/
+}
+.obj-cell._3{
+	margin-left: 130px;
+	max-width: -webkit-calc( 100% - 140px);
 }
 
 .obj-cell-subTitle {

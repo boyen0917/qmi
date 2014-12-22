@@ -1984,6 +1984,7 @@ $(function(){
 
         var guAll = $.lStorage(ui)[gi].guAll;
         var bl = $.lStorage(ui)[gi].bl;
+        var fbl = $.lStorage(ui)[gi].fbl;
 
         $(".obj-cell-area").html("");
 
@@ -1993,12 +1994,15 @@ $(function(){
         var isShowSelf = false;
         var isShowAll = true;
         var isShowFav = true;
+        var isShowFavBranch = true;
         if( null== option ){
             if(this_compose_obj.parent().hasClass("cp-work-item")){
                 //工作發佈對象
                 isShowGroup = false;
                 isShowSelf = false;
                 isShowAll = false;
+                isShowFav = true;
+                isShowFavBranch = false;
             }else{
                 //其餘發佈對象
                 isShowGroup = true;
@@ -2009,6 +2013,7 @@ $(function(){
             isShowSelf = (null==option.isShowSelf) ? isShowSelf : option.isShowSelf;
             isShowAll = (null==option.isShowAll) ? isShowAll : option.isShowAll;
             isShowFav = (null==option.isShowFav) ? isShowFav : option.isShowFav;
+            isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
         }
 
         if(this_compose_obj.parent().hasClass("cp-work-item")){
@@ -2019,6 +2024,7 @@ $(function(){
 
         $(".obj-content").data("selected-branch",{});
         $(".obj-content").data("selected-obj",{});
+        $(".obj-content").data("selected-fav",{});
         updateSelectedObj();
         
         //----- 自己 -------
@@ -2077,70 +2083,104 @@ $(function(){
 
         //----- 我的最愛 ------
         if( isShowFav ){
-            var tmp = $("<div class='subgroup-row'></div>");
+            var tmp = $("<div class='subgroup-row fav-parent'></div>");
             var innerTmp = $("<div class='subgroup-parent'></div>");
             var firststCell = $("<div class='obj-cell fav'>"+
-                '<div class="obj-cell-chk"></div>' +
+                '<div class="obj-cell-chk"><div class="img"></div></div>' +
                 '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_favor.png" style="width:60px"/></div>' +
                 '<div class="obj-cell-subgroup-data">' + 
                     '<div class="obj-user-name">' + $.i18n.getString("COMMON_FAVORIATE") + '</div></div>');
             innerTmp.html(firststCell);
             innerTmp.append('<div class="obj-cell-arrow"></div>');
+            tmp.append( innerTmp );
             
             var memfold = $("<div></div>");
             memfold.css("display","none")
-            $.each(guAll,function(i,gu_obj){
+            for( var i in guAll){
+                var gu_obj = guAll[i];
                 if( gu_obj.fav==true ){
-                    var this_obj = $(
-                        '<div class="obj-cell mem" data-gu="'+gu_obj.gu+'">' +
-                           '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                           '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
-                           '<div class="obj-cell-user-data">' + 
-                                '<div class="obj-user-name">' + gu_obj.nk.replaceOriEmojiCode() + '</div>' +
-                                '<div class="obj-user-title"></div>' +
-                        '</div>'
-                    );
-
-                    //get extra content (bl name or em)
-                    var branchID = gu_obj.bl;
-                    var extraContent = "";  //gu_obj.em;
-                    if( branchID && branchID.length>0 ){
-                        var branchPath = branchID.split(".");
-                        if( branchPath && branchPath.length>0 ){
-                            branchID = branchPath[branchPath.length-1];
-                            if( bl.hasOwnProperty(branchID) ){
-                                extraContent = bl[branchID].bn;
-                            }
-                        }
-                    }
-                    if(extraContent && extraContent.length>0){
-                        this_obj.find(".obj-cell-user-data").addClass("extra");
-                        this_obj.find(".obj-user-title").html( extraContent );
-                    }
-
-                    var object_img = this_obj.find(".obj-cell-user-pic img");
-                    if(gu_obj.aut) {
-                        object_img.attr("src",gu_obj.aut);
-                        avatarPos(object_img);
-                    }
-
-                    this_obj.data("gu",gu_obj.gu);
-                    this_obj.find(".obj-cell-user-pic.namecard").data("gu",gu_obj.gu);
-                    this_obj.data("gu-name",gu_obj.nk);
+                    var this_obj = getMemObjectRow(gu_obj, bl);
+                    this_obj.addClass("_2");
                     memfold.append(this_obj);
                 }
-            });
-            tmp.append( innerTmp );
-            tmp.append( memfold );
-            $(".obj-cell-area").append(tmp);
-            
-            tmp.find(".obj-cell.fav").off("click").click( function(){
-                $(this).next().toggleClass("open");
-                $(this).parent().next().toggle();
-            });
-            tmp.find(".obj-cell.fav + .obj-cell-arrow").off("click").click( function(){
-                $(this).prev().trigger("click");
-            });
+            }
+
+            if( isShowFavBranch ){
+                //  add fbl in to memfold
+                // for( var fi in fbl ){
+                //     var fb_obj = fbl[fi];
+                //     var this_obj = $(
+                //         '<div class="subgroup-parent">'+
+                //             '<div class="obj-cell fav-branch _2" data-gu="'+fi+'">'+
+                //                 '<div class="obj-cell-chk">'+
+                //                     '<div class="img"></div>'+
+                //                 '</div>' +
+                //                 '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
+                //                 '<div class="obj-cell-subgroup-data">' + 
+                //                      '<div class="obj-user-name">' + fb_obj.fn.replaceOriEmojiCode() + '</div>' +
+                //                      '<div class="obj-user-title">'+
+                //                 '</div></div>'+
+                //             '</div>'+
+                //             '<div class="obj-cell-arrow"></div>'+
+                //         '</div>'
+                //     );
+
+                //     this_obj.data("fi",fi);
+                //     this_obj.data("fn",fb_obj.fn);
+                //     memfold.append(this_obj);
+
+                //     var fblFold = $('<div></div>');
+                //     fblFold.css("display","none")
+                //     memfold.append(fblFold);
+                //     for( var gu in guAll ){
+                //         var memTmp = guAll[gu];
+                //         if( memTmp .fbl.indexOf(fi)<0 ) continue;
+                //         var fblMemRow = getMemObjectRow(memTmp, bl);
+                //         fblFold.append(fblMemRow);
+                //     }
+                //     fblFold.find(".obj-cell.mem").addClass("_3");
+                // }
+                // tmp.append( memfold );
+
+                //  add fbl in to memfold
+                for( var fi in fbl ){
+                    var fb_obj = fbl[fi];
+                    var this_obj = $(
+                        '<div class="obj-cell fav-branch _2" data-gu="'+fi+'">'+
+                            '<div class="obj-cell-chk">'+
+                                '<div class="img"></div>'+
+                            '</div>' +
+                            '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
+                            '<div class="obj-cell-subgroup-data">' + 
+                                 '<div class="obj-user-name">' + fb_obj.fn.replaceOriEmojiCode() + '</div>' +
+                                 '<div class="obj-user-title">'+
+                            '</div></div>'+
+                        '</div>'
+                    );
+                    
+                    this_obj.data("fi",fi);
+                    this_obj.data("fn",fb_obj.fn);
+                    memfold.append(this_obj);
+                }
+            }
+
+            //若fav裡面有內容才show
+            if( memfold.find(".obj-cell").length>0 ){
+
+                tmp.append( memfold );
+
+
+                $(".obj-cell-area").append(tmp);
+                
+                // tmp.find(".obj-cell.fav").off("click").click( function(){
+                    // $(this).next().toggleClass("open");
+                    // $(this).parent().next().toggle();
+                // });
+                tmp.find(".obj-cell.fav + .obj-cell-arrow").off("click").click( function(){
+                    $(this).toggleClass("open");
+                    $(this).parent().next().toggle();
+                });
+            }
         }
 
         //----- 團體列表 ------
@@ -2290,42 +2330,7 @@ $(function(){
 
         //成員rows
         $.each(guAll,function(i,gu_obj){
-            var this_obj = $(
-                '<div class="obj-cell mem" data-gu="'+gu_obj.gu+'">' +
-                   '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                   '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
-                   '<div class="obj-cell-user-data">' + 
-                        '<div class="obj-user-name">' + gu_obj.nk.replaceOriEmojiCode() + '</div>' +
-                        '<div class="obj-user-title"></div>' +
-                '</div>'
-            );
-            var object_img = this_obj.find(".obj-cell-user-pic img");
-            if(gu_obj.aut) {
-                object_img.attr("src",gu_obj.aut);
-                //object_img.removeAttr("style");
-                avatarPos(object_img);
-            }
-
-            //get extra content (bl name or em)
-            var branchID = gu_obj.bl;
-            var extraContent = "";  //gu_obj.em;
-            if( branchID && branchID.length>0 ){
-                var branchPath = branchID.split(".");
-                if( branchPath && branchPath.length>0 ){
-                    branchID = branchPath[branchPath.length-1];
-                    if( bl.hasOwnProperty(branchID) ){
-                        extraContent = bl[branchID].bn;
-                    }
-                }
-            }
-            if(extraContent && extraContent.length>0){
-                this_obj.find(".obj-cell-user-data").addClass("extra");
-                this_obj.find(".obj-user-title").html( extraContent );
-            }
-
-            this_obj.data("gu",gu_obj.gu);
-            this_obj.find(".obj-cell-user-pic.namecard").data("gu",gu_obj.gu);
-            this_obj.data("gu-name",gu_obj.nk);
+            var this_obj = getMemObjectRow(gu_obj, bl);
             $(".obj-cell-area").append(this_obj);
         });
 
@@ -2516,6 +2521,124 @@ $(function(){
             updateSelectedObj();
         });
 
+
+        $(document).off('click', '.obj-cell.fav-branch');
+        $(document).on("click",".obj-cell.fav-branch",function(){
+            clearMeAndAllSelect();
+
+            var this_cell = $(this);
+            var selected_obj = $(".obj-content").data("selected-fav");
+            // cns.debug("selected_obj:",selected_obj);
+
+            //其餘發佈對象是復選
+            //是否點選
+            if(this_cell.data("chk")){
+                this_cell.data("chk",false);
+                this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+                
+                delete selected_obj[this_cell.data("fi")];
+            }else{
+                this_cell.data("chk",true);
+                this_cell.find(".obj-cell-chk .img").addClass("chk");
+                // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+                
+                if( this_cell.data("fn") ){
+                    selected_obj[this_cell.data("fi")] = this_cell.data("fn");
+                }
+            }
+
+            //存回
+            $(".obj-content").data("selected-fav",selected_obj);
+
+            updateSelectedObj();
+        });
+
+        $(document).off('click', '.obj-cell.fav');
+        $(document).on("click",".obj-cell.fav",function(){
+            clearMeAndAllSelect();
+
+            var this_cell = $(this);
+            var selected_fav = $(".obj-content").data("selected-fav");
+            var selected_mem = $(".obj-content").data("selected-obj");
+
+            //其餘發佈對象是復選
+            //是否點選
+            if(this_cell.data("chk")){
+                this_cell.data("chk",false);
+                this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+                
+                // delete selected_obj[this_cell.data("bi")];
+
+                //deselect sub-branches if all sub r selected
+                var sublist = this_cell.parent().next().find(".obj-cell");
+                var allChkTrue = true;
+                sublist.each( function(){
+                    if( !$(this).data("chk") ){
+                        allChkTrue = false;
+                        return false;
+                    }
+                });
+                if( allChkTrue ){
+                    sublist.each( function(){
+                        if( $(this).data("fi") ){
+                            $(this).data("chk",false);
+                            $(this).find(".obj-cell-chk .img").removeClass("chk");
+                            delete selected_fav[$(this).data("fi")];
+                        }
+                        else if( $(this).data("gu") ){
+                            var tmpRow = $(".obj-cell.mem[data-gu="+$(this).data("gu")+"]");
+                            tmpRow.data("chk",false);
+                            tmpRow.find(".obj-cell-chk .img").removeClass("chk");
+                            delete selected_mem[$(this).data("gu")];
+                        }
+                    });
+                }
+            }else{
+                this_cell.data("chk",true);
+                this_cell.find(".obj-cell-chk .img").addClass("chk");
+                // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+                
+                if( this_cell.data("fn") ){
+                    selected_fav[this_cell.data("fi")] = this_cell.data("fn");
+                } else if( this_cell.data("gu-name") ){
+                    selected_mem[this_cell.data("gu")] = this_cell.data("gu-name");
+                }
+
+                //select sub-branches if all sub r not selected
+                var sublist = this_cell.parent().next().find(".obj-cell");
+                var allChkFalse = true;
+                sublist.each( function(){
+                    if( true == $(this).data("chk") ){
+                        allChkFalse = false;
+                        return false;
+                    }
+                });
+                if( allChkFalse ){
+                    sublist.each( function(){
+                        if( $(this).data("fi") ){
+                            $(this).data("chk",true);
+                            $(this).find(".obj-cell-chk .img").addClass("chk");
+                            selected_fav[$(this).data("fi")] = $(this).data("fn");
+                        }
+                        else if( $(this).data("gu") ){
+                            var tmpRow = $(".obj-cell.mem[data-gu="+$(this).data("gu")+"]");
+                            tmpRow.data("chk",true);
+                            tmpRow.find(".obj-cell-chk .img").addClass("chk");
+                            selected_mem[$(this).data("gu")] = $(this).data("gu-name");
+                        }
+                    });
+                }
+            }
+
+            //存回
+            $(".obj-content").data("selected-fav",selected_fav);
+            $(".obj-content").data("selected-obj",selected_mem);
+
+            updateSelectedObj();
+        });
+
         $(".obj-selected .clear").off("click").click( selectTargetAll );
 
         //避免重複
@@ -2523,7 +2646,7 @@ $(function(){
         $(".obj-done").click(function(){
 
             var obj_length = Object.keys($(".obj-content").data("selected-obj")).length
-                +Object.keys($(".obj-content").data("selected-branch")).length;
+                +Object.keys($(".obj-content").data("selected-branch") ).length +Object.keys($(".obj-content").data("selected-fav") ).length;
 
             //工作
             if(this_compose_obj.parent().hasClass("cp-work-item")){
@@ -2555,6 +2678,8 @@ $(function(){
                 this_compose.data("object_str",obj_str);
                 var branch_str = JSON.stringify($(".obj-content").data("selected-branch"));
                 this_compose.data("branch_str",branch_str);
+                var favorite_str = JSON.stringify($(".obj-content").data("selected-fav"));
+                this_compose.data("favorite_str",favorite_str);
             }
 
             //回上一頁
@@ -2568,6 +2693,7 @@ $(function(){
         var cnt = 0;
         var branch = $(".obj-content").data("selected-branch");
         var mem = $(".obj-content").data("selected-obj");
+        var fbl = $(".obj-content").data("selected-fav");
         
         $(".obj-selected .list").html("");
         //寫入到選擇區域
@@ -2616,6 +2742,30 @@ $(function(){
                 all.find(".img").addClass("chk");
             } else {
                 //清除群組全選
+                all.data("chk", false );
+                all.find(".img").removeClass("chk");
+            }
+        }
+
+        if( null != fbl ){
+            len += Object.keys(fbl).length;
+            $.each(fbl,function(i,val){
+                $(".obj-selected .list").append(val.replaceOriEmojiCode()+"   ");
+            });
+            var bAllSelect = true;
+            $(".subgroup-row.fav-parent div:nth-child(2) .obj-cell").each(function(){
+                if( !$(this).data("chk") ){
+                    bAllSelect = false;
+                    return false;
+                }
+            });
+            var all = $(".obj-cell.fav");
+            if( bAllSelect ){
+                //最愛全選
+                all.data("chk", true );
+                all.find(".img").addClass("chk");
+            } else {
+                //清除最愛全選
                 all.data("chk", false );
                 all.find(".img").removeClass("chk");
             }
@@ -2706,6 +2856,47 @@ $(function(){
             this_cell.find(".obj-cell-chk .img").removeClass("chk");
         });
         updateSelectedObj();
+    }
+
+    getMemObjectRow = function( gu_obj, bl ){
+        var this_obj = $(
+            '<div class="obj-cell mem" data-gu="'+gu_obj.gu+'">' +
+               '<div class="obj-cell-chk"><div class="img"></div></div>' +
+               '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
+               '<div class="obj-cell-user-data">' + 
+                    '<div class="obj-user-name">' + gu_obj.nk.replaceOriEmojiCode() + '</div>' +
+                    '<div class="obj-user-title"></div>' +
+            '</div>'
+        );
+
+        //get extra content (bl name or em)
+        var branchID = gu_obj.bl;
+        var extraContent = "";  //gu_obj.em;
+        if( branchID && branchID.length>0 ){
+            var branchPath = branchID.split(".");
+            if( branchPath && branchPath.length>0 ){
+                branchID = branchPath[branchPath.length-1];
+                if( bl.hasOwnProperty(branchID) ){
+                    extraContent = bl[branchID].bn;
+                }
+            }
+        }
+        if(extraContent && extraContent.length>0){
+            this_obj.find(".obj-cell-user-data").addClass("extra");
+            this_obj.find(".obj-user-title").html( extraContent );
+        }
+
+        var object_img = this_obj.find(".obj-cell-user-pic img");
+        if(gu_obj.aut) {
+            object_img.attr("src",gu_obj.aut);
+            avatarPos(object_img);
+        }
+
+        this_obj.data("gu",gu_obj.gu);
+        this_obj.find(".obj-cell-user-pic.namecard").data("gu",gu_obj.gu);
+        this_obj.data("gu-name",gu_obj.nk);
+
+        return this_obj;
     }
 
     timelineObjectTabShowDelegate = function( this_event, type, onDone ){
@@ -3545,6 +3736,13 @@ $(function(){
                         bl_arr.push(temp_obj);
                     });
                     tu.bl=bl_arr;
+                }
+            }
+            //fbl
+            if(this_compose.data("favorite_str")){
+                var object_obj = $.parseJSON(this_compose.data("favorite_str"));
+                if(Object.keys(object_obj).length){
+                    tu.fl=Object.keys(object_obj);
                 }
             }
 
