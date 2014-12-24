@@ -1314,7 +1314,7 @@ function leaveChatRoom(){
 				g_group = userData[gi];
 				delete g_group.chatAll[ci];
 				$.lStorage(ui, userData);
-				$('.gm-border > .sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
+				$('.sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
 				window.close();
 			});
 		}]

@@ -1,21 +1,13 @@
 .contact-add{
-	background: url(../images/navi/navi_icon_add_member.png);
-	background-size: cover;
-	position: absolute;
-	top: 10px;
-	right: 55px;
-	width: 35px;
-	height: 35px;
-	cursor: pointer;
-	z-index: 10;
+	background-image: url(../images/navi/navi_icon_add_member.png);
 	display: none;
 }
-.contact-add:hover{
+/*.contact-add:hover{
 	top: 9px;
 	right: 53px;
 	width: 38px;
 	height: 38px;
-}
+}*/
 
 .subPage{
 	box-shadow: -4px 4px 26px 0px rgba(50, 50, 50, 0.75);

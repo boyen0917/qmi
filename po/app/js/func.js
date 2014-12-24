@@ -412,7 +412,9 @@ $(function(){
 		switch (act) {
 	        case "feeds":
 				$(".feed-subarea").hide();
-                $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
+                $(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
+                $(".st-filter-action[data-status='all']").addClass("st-filter-list-active");
+                // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
 
 				//filter all
 				$(".st-filter-area").data("filter","all");
@@ -4021,6 +4023,11 @@ $(function(){
 	    	//管理者圖示
 	    	var icon_host = "<img src='images/sidemenu/icon_host.png'/>";
 
+            var default_gi;
+            if($.lStorage(ui)){
+                default_gi = $.lStorage(ui).default_gi;
+            }
+
 			var total = group_list.length;
 			// cns.debug("group list:",group_list);
 	        $.each(group_list,function(i,val){
@@ -4053,6 +4060,11 @@ $(function(){
 	     	    this_group.find(".group-pic").data("auo",glo_img)
 	     	    $(tmp_selector).append(this_group);
 
+                //目前團體顏色顯示
+                if( val.gi==default_gi ){
+                    this_group.addClass("active");
+                }
+
 	     	    //管理者圖示
 	     	    if(val.ad != 1) {
 	     	    	this_group.find(".sm-icon-host").hide();
@@ -4065,6 +4077,12 @@ $(function(){
 	        if(group_list.length > 2){
 	        	$(".sm-group-switch").show();
 	        }
+
+            //若沒有預設團體, 第一個顯示為目前團體
+            if( $(".sm-group-area.active").length<=0 ){
+                var tmp = $(".sm-group-area");
+                if( tmp.length>0 )  tmp[0].addClass("active");
+            }
 
 			//設定調整團體頭像
     		$(document).data("group-avatar",true);
@@ -4196,6 +4214,7 @@ $(function(){
 					$(".st-navi-area").data("scroll-chk",false);
 				},1000);
 	    	}
+            $(".st-filter-area").removeClass("st-filter-lock");
 	    	
 	    	if(data.status != 200) return false;
 
@@ -4556,9 +4575,12 @@ $(function(){
             timelineContentMake(this_event,target_div,val.ml);
                 
         });
+
+
     }
 
 	timelineListWrite = function (ct_timer,is_top){
+        $(".st-filter-area").addClass("st-filter-lock");
 		//判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
     	if(!ct_timer && !is_top){
     		var event_tp = $("#page-group-main").data("navi") || "00";
@@ -5882,7 +5904,7 @@ $(function(){
                             idbPutTimelineEvent("",false,polling_arr);
 	    				}
 
-	    				// idbPutTimelineEvent("",false,polling_arr);
+	    				//  ("",false,polling_arr);
 	    				break;
 	    			case 4://新增gu
 

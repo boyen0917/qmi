@@ -307,6 +307,18 @@ $(function(){
 	
 	//更換動態
 	$(document).on("click",".sm-small-area,.sm-group-area",function(){
+
+		if( $(".st-filter-area").hasClass("st-filter-lock") ){
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("lock .sm-small-area,.sm-group-area");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			return;
+		}
+
 		//滾動至最上面
 		timelineScrollTop();
 
@@ -321,12 +333,19 @@ $(function(){
 
 		var target = $(this);
 
+		if( target.hasClass("sm-group-area") ){
+			$(".sm-group-area.active").removeClass("active");
+		} else if( target.hasClass("sm-small-area") ){
+			$(".sm-small-area.active").removeClass("active");
+		}
+		target.addClass("active");
+
 		if($(this).hasClass("sm-group-area")){
 			target = $(".sm-small-area[data-sm-act=feeds]");
 		}else{
 			timelineSwitch(target.data("sm-act"));
 		}
-		
+
 		target.addClass("sm-click-bg");
 		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
 		
@@ -334,6 +353,18 @@ $(function(){
 	
 	//更換團體
 	$(document).on("click",".sm-group-area.enable",function(){
+
+		if( $(".st-filter-area").hasClass("st-filter-lock") ){
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("lock .sm-group-area.enable");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			return;
+		}
+
 		var this_group = $(this);
 		$(".sm-group-area").removeClass("enable");
 
@@ -365,7 +396,16 @@ $(function(){
 	
 	//----------------------------------- timeline ---------------------------------------------  
 	$(".st-navi-subarea").click(function(){
-
+		if( $(".st-filter-lock").hasClass("st-filter-lock") ){
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("lock st-filter-lock");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			return;
+		}
 		var img_dir = "images/timeline/timeline_tab_icon_";
 		var subareas = $(".st-navi-area [data-st-navi-group=navi]");
 		var this_subarea = $(this);
@@ -415,9 +455,31 @@ $(function(){
 	});
 
 	$(".st-filter-action").click(function(){
+		var parent = $(this).parent();
+		if( parent.hasClass("lock") ){
+			return;
+		}
+		parent.addClass("lock");
+		setTimeout( function(){
+			parent.removeClass("lock");
+		}, 500);
+
+		//------如果不是已讀未讀----
+		if( parent.hasClass("st-filter-lock") ){
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("lock st-filter-action");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			return;
+		}
+		//-----------------------
+
 		$(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
 		$(this).addClass("st-filter-list-active");
-		var filter_name = $(this).find("span").html();
+		// var filter_name = $(this).find("span").html();
 
 		//動態變化
 		// $(".st-filter-main span").fadeOut("fast");
@@ -437,6 +499,8 @@ $(function(){
 		if(filter_status == "navi" || filter_status == "all"){
         	$(".st-navi-subarea[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	// return false;
+		} else {
+			$(".st-navi-subarea[data-st-navi=home]").trigger("click");
 		}
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
@@ -780,19 +844,19 @@ $(function(){
 		}
 
 		if($(".feed-compose-area").is(":visible")){
-			$(".feed-compose").removeClass("feed-compose-visit");
+			$(".feed-compose").removeClass("active");
 			$(".feed-compose-area-cover").hide();
 			setTimeout(function(){
-	            $(".feed-compose").removeClass("feed-compose-click");
+	            // $(".feed-compose").removeClass("feed-compose-click");
 	            $(".feed-compose-area").slideUp();
 	        },100);
 		}else{
 			//var edit_pic = "image"
-			$(".feed-compose").addClass("feed-compose-click");
+			// $(".feed-compose").addClass("feed-compose-click");
 			$(".feed-compose-area").slideDown();
 			$(".feed-compose-area-cover").show();
 			setTimeout(function(){
-				$(".feed-compose").addClass("feed-compose-visit");
+				$(".feed-compose").addClass("active");
 		    },100);
 		}
 	});

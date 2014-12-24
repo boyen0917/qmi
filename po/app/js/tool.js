@@ -78,6 +78,9 @@ $(function(){
 	avatarPos = function (ori_img,x){
 
 		//reset
+		if( ori_img.length<=0 ){
+			return;
+		}
 		var src = ori_img[0].src;
 		var parent = ori_img.parent();
 		ori_img.remove();

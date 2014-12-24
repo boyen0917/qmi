@@ -392,7 +392,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 				}
 			}
 		} else {
-			$('.gm-border > .sm-small-area[data-sm-act="chat"]').trigger("click");
+			$('.sm-small-area[data-sm-act="chat"]').trigger("click");
 		}
 	}
 	
