@@ -155,6 +155,14 @@
                                <div class="sm-small-area-r" data-textid="LEFT_CHAT"></div>
                                <!-- <div class="sm-count"></div> -->
                             </div>
+                            <div data-sm-act="feed-public" class="sm-small-area">
+                               <div class="sm-small-area-r">團體動態</div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
+                            <div data-sm-act="feed-post" class="sm-small-area">
+                               <div class="sm-small-area-r">成員動態</div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
                         </div>
 
 
@@ -278,6 +286,14 @@
                                 <img src="images/timeline/timeline_tab_icon_task.png"/>
                                 <div data-textid='FEED_TASK'></div>
                             </div>
+                            <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feed-public" data-tp="A1">
+                                <img src="images/timeline/timeline_tab_icon_home_white.png"/>
+                                <div class="color-white" data-textid='FEED_ALL'></div>
+                            </div>
+                            <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feed-post" data-tp="A2">
+                                <img src="images/timeline/timeline_tab_icon_home_white.png"/>
+                                <div class="color-white" data-textid='FEED_ALL'></div>
+                            </div>
                         </div>
 
                         <div class="st-refresh-top">
@@ -296,6 +312,8 @@
                                 <span data-textid='FEED_ALL'></span>
                             </div>
                             <!-- <div class="st-filter-other"> -->
+                                <div data-status="all" data-navi="feed-public" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_ALL'></span></div>
+                                <div data-status="all" data-navi="feed-post" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_ALL'></span></div>
                                 <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list"><span data-textid='FEED_BULLETIN'></span></div>
                                 <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list"><span data-textid='FEED_REPORT'></span></div>
                                 <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list"><span data-textid='FEED_MISSION'></span></div>
@@ -318,6 +336,8 @@
                                     <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
                                     <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
                                     <div data-feed="03" class="feed-task feed-subarea switch-reset"></div>
+                                    <div data-feed="A1" class="feed-public feed-subarea switch-reset"></div>
+                                    <div data-feed="A2" class="feed-post feed-subarea switch-reset"></div>
                                     <div data-feed="main" class="feed-subarea switch-reset"></div>
 
                                 </div>

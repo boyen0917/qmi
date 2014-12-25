@@ -413,7 +413,13 @@ $(function(){
 	        case "feeds":
 				$(".feed-subarea").hide();
                 $(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
-                $(".st-filter-action[data-status='all']").addClass("st-filter-list-active");
+                $(".st-navi-area").data("currentHome", "home");
+                $(".st-filter-action[data-status='all']").show().addClass("st-filter-list-active");
+                $(".st-filter-action[data-navi='announcement']").show();
+                $(".st-filter-action[data-navi='feedback']").show();
+                $(".st-filter-action[data-navi='task']").show();
+                $(".st-filter-action[data-navi='feed-post']").hide();
+                $(".st-filter-action[data-navi='feed-public']").hide();
                 // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
 
 				//filter all
@@ -489,6 +495,74 @@ $(function(){
 	          break;
 	        case "setting":
 	          break;
+            case "feed-post":
+                $(".feed-subarea").hide();
+                $(".st-navi-area").data("currentHome", "feed-post");
+                $(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
+                $(".st-filter-action[data-status='all']").hide();
+                $(".st-filter-action[data-navi='announcement']").hide();
+                $(".st-filter-action[data-navi='feedback']").hide();
+                $(".st-filter-action[data-navi='task']").hide();
+                $(".st-filter-action[data-navi='feed-public']").hide();
+                $(".st-filter-action[data-navi='feed-post']").show().addClass("st-filter-list-active");
+                // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
+
+                //filter all
+                $(".st-filter-area").data("filter","all");
+
+                //點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
+                // if(!main)
+                    $(".st-navi-subarea[data-st-navi=feed-post]").trigger("click");
+
+                $(".subpage-contact").hide();
+                $(".subpage-chatList").hide();
+                $(".subpage-timeline").show();
+                $("#page-group-main").find(".gm-header .page-title").html(page_title);
+
+                //顯示新增貼文按鈕, 藏新增聊天室按鈕
+                $("#page-group-main").find(".gm-header .feed-compose").show();
+                $("#page-group-main").find(".gm-header .chatList-add").hide();
+                $("#page-group-main").find(".gm-header .contact-add").hide();
+
+                //polling 數字重寫
+                if($.lStorage("_pollingData"))
+                    pollingCountsWrite();
+
+              break;
+            case "feed-public":
+                $(".feed-subarea").hide();
+                $(".st-navi-area").data("currentHome", "feed-public");
+                $(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
+                $(".st-filter-action[data-status='all']").hide();
+                $(".st-filter-action[data-navi='announcement']").hide();
+                $(".st-filter-action[data-navi='feedback']").hide();
+                $(".st-filter-action[data-navi='task']").hide();
+                $(".st-filter-action[data-navi='feed-post']").hide();
+                $(".st-filter-action[data-navi='feed-public']").show().addClass("st-filter-list-active");
+                // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
+
+                //filter all
+                $(".st-filter-area").data("filter","all");
+
+                //點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
+                // if(!main)
+                    $(".st-navi-subarea[data-st-navi=feed-public]").trigger("click");
+
+                $(".subpage-contact").hide();
+                $(".subpage-chatList").hide();
+                $(".subpage-timeline").show();
+                $("#page-group-main").find(".gm-header .page-title").html(page_title);
+
+                //顯示新增貼文按鈕, 藏新增聊天室按鈕
+                $("#page-group-main").find(".gm-header .feed-compose").show();
+                $("#page-group-main").find(".gm-header .chatList-add").hide();
+                $("#page-group-main").find(".gm-header .contact-add").hide();
+
+                //polling 數字重寫
+                if($.lStorage("_pollingData"))
+                    pollingCountsWrite();
+
+              break;
 	    }
 
         //關閉筆功能
@@ -4397,6 +4471,9 @@ $(function(){
                     this_event.data("event-val",val);
 
                     eventStatusWrite(this_event);
+
+                    //已經存在的文章還是要檢查filter
+                    eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
                     return;
                 }
 

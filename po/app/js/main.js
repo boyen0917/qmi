@@ -325,11 +325,11 @@ $(function(){
 		//取消主頁
 		timelineMainClose();
 
-		var icon_default = "images/icon/icon_timeline_tab_";
+		// var icon_default = "images/icon/icon_timeline_tab_";
 		//圖片先還原
-		$(".sm-small-area").each(function(i,val){
-			$(this).find("img").attr("src",icon_default + $(this).data("sm-act") + "_normal.png");
-		});
+		// $(".sm-small-area").each(function(i,val){
+		// 	$(this).find("img").attr("src",icon_default + $(this).data("sm-act") + "_normal.png");
+		// });
 
 		var target = $(this);
 
@@ -347,7 +347,7 @@ $(function(){
 		}
 
 		target.addClass("sm-click-bg");
-		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
+		// target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
 		
 	});
 	
@@ -500,7 +500,9 @@ $(function(){
         	$(".st-navi-subarea[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	// return false;
 		} else {
-			$(".st-navi-subarea[data-st-navi=home]").trigger("click");
+			//檢查目前的首頁是哪頁(動態消息/團體消息/成員消息)
+			var currentHome = $(".st-navi-area").data("currentHome") || "home";
+			$(".st-navi-subarea[data-st-navi="+currentHome+"]").trigger("click");
 		}
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
