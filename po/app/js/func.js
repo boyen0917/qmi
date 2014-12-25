@@ -6532,6 +6532,7 @@ $(function(){
         $(".gm-frame").removeClass("scrolltop");
         setTimeout(function(){
             $(".gm-frame").addClass("scrolltop");
+            $(".st-filter-area").removeClass("fixed");
         },100);
     }
 

@@ -345,6 +345,8 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 	var mem = groupData.guAll[data.meta.gu];
 	if( null==mem ) return;
 	var name = mem.nk;
+	if( null==data.ml || data.ml.length<=0 ) return;
+
 	switch( data.ml[0].tp ){
 		case 5: //sticker
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
@@ -365,8 +367,21 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 				text = $.i18n.getString("CHAT_SOMEONE_JOIN", name );
 			}
 			break;
+		//---------- TODO ------------
+		// case 23: //sip?void
+		// 	if(1==data.ml[0].a){
+		// 		text = $.i18n.getString("CHAT_SOMEONE_LEAVE", name );
+		// 	} else {
+		// 		text = $.i18n.getString("CHAT_SOMEONE_JOIN", name );
+		// 	}
+		// 	break;
+		//---------- TODO ------------
 		default:
-			text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c:"";
+			try{
+				text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c:"";
+			} catch(e){
+				cns.debug( e.message );
+			}
 			break;
 	}
 

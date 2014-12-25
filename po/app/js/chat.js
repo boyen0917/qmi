@@ -786,6 +786,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 	
 	//msg
 	var time = new Date(object.meta.ct);
+	if( null==object.ml || object.ml.length<=0 ) return;
 	var msgData = object.ml[0];
 	var msgDiv;
 	var isMe = ( object.meta.gu == g_group.gu );
