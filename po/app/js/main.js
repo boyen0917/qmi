@@ -55,7 +55,14 @@ $(function(){
 		    	//動態消息
 		    	//timelineListWrite();
 		    	setTimeout(function(){
-		    		timelineListWrite();
+			    	var tmp = $(".sm-small-area:visible");
+					if( tmp.length>0 ){
+						$(tmp[0]).addClass("active");
+						timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
+					}
+					else{
+						timelineSwitch("feeds",true);
+					}
 		    	},1000);
 	    	});
 		}
@@ -307,33 +314,83 @@ $(function(){
 	
 	//更換動態
 	$(document).on("click",".sm-small-area,.sm-group-area",function(){
+
+		if( $(".st-filter-area").hasClass("st-filter-lock") ){
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("lock .sm-small-area,.sm-group-area");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			return;
+		}
+
 		//滾動至最上面
 		timelineScrollTop();
 
 		//取消主頁
 		timelineMainClose();
 
-		var icon_default = "images/icon/icon_timeline_tab_";
+		// var icon_default = "images/icon/icon_timeline_tab_";
 		//圖片先還原
-		$(".sm-small-area").each(function(i,val){
-			$(this).find("img").attr("src",icon_default + $(this).data("sm-act") + "_normal.png");
-		});
+		// $(".sm-small-area").each(function(i,val){
+		// 	$(this).find("img").attr("src",icon_default + $(this).data("sm-act") + "_normal.png");
+		// });
 
 		var target = $(this);
 
 		if($(this).hasClass("sm-group-area")){
+			$(".sm-group-area.active").removeClass("active");
 			target = $(".sm-small-area[data-sm-act=feeds]");
 		}else{
+			//check pens
+			//如果該tab的筆功能都沒開的話, 直接把筆hide起來
+			var act = target.data("sm-act");
+			var menu = $(".feed-compose-area");
+			$(".feed-compose").show();
+			switch( act ){
+				case "feed-post": //貼文only
+					if( menu.find(".fc-area-subbox.active[data-fc-box=post]").length<=0 ){
+						$(".feed-compose").hide();
+					}
+					break;
+				case "feed-public": //團體動態, 貼文不開
+					if( menu.find(".fc-area-subbox.active:not([data-fc-box=post])").length<=0 ){
+						$(".feed-compose").hide();
+					}
+					break;
+				default: //一般&其他?, 筆有的都開
+					if( menu.find(".fc-area-subbox.active").length<=0 ){
+						$(".feed-compose").hide();
+					}
+					break;
+			}
+
+			$(".sm-small-area.active").removeClass("active");
 			timelineSwitch(target.data("sm-act"));
 		}
-		
+		$(this).addClass("active");
+
 		target.addClass("sm-click-bg");
-		target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
+		// target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
 		
 	});
 	
 	//更換團體
 	$(document).on("click",".sm-group-area.enable",function(){
+
+		if( $(".st-filter-area").hasClass("st-filter-lock") ){
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("lock .sm-group-area.enable");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			return;
+		}
+
 		var this_group = $(this);
 		$(".sm-group-area").removeClass("enable");
 
@@ -346,7 +403,18 @@ $(function(){
 		setThisGroup(this_gi);
 		//更新gu all
 		setGroupAllUser(false,false,function(){
-			timelineSwitch("feeds",true);
+			$(".sm-small-area.active").removeClass("active");
+
+			//切換團體時, 選目前第一個選項
+			var tmp = $(".sm-small-area:visible");
+			if( tmp.length>0 ){
+				$(tmp[0]).addClass("active");
+				timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
+			}
+			else{
+				timelineSwitch("feeds",true);
+			}
+			
 			setSmUserData(gi,gu,gn);
 			cns.debug("enable test");
 			//置頂設定
@@ -365,7 +433,16 @@ $(function(){
 	
 	//----------------------------------- timeline ---------------------------------------------  
 	$(".st-navi-subarea").click(function(){
-
+		if( $(".st-filter-lock").hasClass("st-filter-lock") ){
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("lock st-filter-lock");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			// cns.debug("-------------");
+			return;
+		}
 		var img_dir = "images/timeline/timeline_tab_icon_";
 		var subareas = $(".st-navi-area [data-st-navi-group=navi]");
 		var this_subarea = $(this);
@@ -404,6 +481,7 @@ $(function(){
 		}
 
 		timelineListWrite();
+		timelineScrollTop();
 	});
 
 	//主要filter
@@ -415,9 +493,18 @@ $(function(){
 	});
 
 	$(".st-filter-action").click(function(){
+		var parent = $(this).parent();
+		if( parent.hasClass("lock") ){
+			return;
+		}
+		parent.addClass("lock");
+		setTimeout( function(){
+			parent.removeClass("lock");
+		}, 500);
+
 		$(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
 		$(this).addClass("st-filter-list-active");
-		var filter_name = $(this).find("span").html();
+		// var filter_name = $(this).find("span").html();
 
 		//動態變化
 		// $(".st-filter-main span").fadeOut("fast");
@@ -437,6 +524,10 @@ $(function(){
 		if(filter_status == "navi" || filter_status == "all"){
         	$(".st-navi-subarea[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	// return false;
+		} else {
+			//檢查目前的首頁是哪頁(動態消息/團體消息/成員消息)
+			var currentHome = $(".st-navi-area").data("currentHome") || "home";
+			$(".st-navi-subarea[data-st-navi="+currentHome+"]").trigger("click");
 		}
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
@@ -772,27 +863,51 @@ $(function(){
 	});
 	
 	$(".feed-compose").click(function(){
-		//管理者可開啟公告
-		if($.lStorage(ui)[gi].guAll[gu].ad == 1){
-			$(".fc-area-subbox[data-fc-box=announcement]").show();
-		}else{
-			$(".fc-area-subbox[data-fc-box=announcement]").hide();
-		}
-
 		if($(".feed-compose-area").is(":visible")){
-			$(".feed-compose").removeClass("feed-compose-visit");
+			$(".feed-compose").removeClass("active");
 			$(".feed-compose-area-cover").hide();
 			setTimeout(function(){
-	            $(".feed-compose").removeClass("feed-compose-click");
+	            // $(".feed-compose").removeClass("feed-compose-click");
 	            $(".feed-compose-area").slideUp();
 	        },100);
 		}else{
+			//非管理者不能使用公告
+			if($.lStorage(ui)[gi].guAll[gu].ad == 1){
+				$(".fc-area-subbox[data-fc-box=announcement]").removeClass("disabled");
+			}else{
+				$(".fc-area-subbox[data-fc-box=announcement]").addClass("disabled");
+			}
+
+			//check pens
+			var act = $(".header-menu .sm-small-area:visible.active").data("sm-act");
+			var menu = $(".feed-compose-area");
+			menu.find(".fc-area-subbox").hide();
+			switch( act ){
+				case "feed-public": //團體動態, 貼文不開
+					menu.find(".fc-area-subbox.active:not([data-fc-box=post])").show();
+					break;
+				case "feed-post": //貼文only
+					// menu.find(".fc-area-subbox.active[data-fc-box=post]").show();
+					$(".feed-compose-area").css("opacity","0");
+					$(".feed-compose-area").show();
+					$(".feed-compose-area-cover").show();
+					$(".feed-compose").addClass("active");
+						menu.find(".fc-area-subbox.active[data-fc-box=post]").click();
+			    	
+					return;
+					break;
+				default: //一般&其他?, 筆有的都開
+					menu.find(".fc-area-subbox.active").show();
+					break;
+			}
+
 			//var edit_pic = "image"
-			$(".feed-compose").addClass("feed-compose-click");
+			// $(".feed-compose").addClass("feed-compose-click");
+			$(".feed-compose-area").css("opacity","");
 			$(".feed-compose-area").slideDown();
 			$(".feed-compose-area-cover").show();
 			setTimeout(function(){
-				$(".feed-compose").addClass("feed-compose-visit");
+				$(".feed-compose").addClass("active");
 		    },100);
 		}
 	});
@@ -925,7 +1040,7 @@ $(function(){
 	//----------------------------------- compose-貼文 ---------------------------------------------
 	
 	//貼文選單
-	$(".fc-area-subbox").click(function(){
+	$(document).on("click",".fc-area-subbox:not(.disabled)", function(){
 		//定點回報暫時不做
 		if($(this).hasClass("fc-check")) return false;
 

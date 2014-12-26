@@ -36,7 +36,7 @@ var isGettingPermission = false;
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
 $(document).ready(function(){
-	window.resizeTo( $(window.opener.document).width(), $(window.opener.document).height() );
+	window.resizeTo( Math.min(450,$(window).width()), $(window).height() );
 	window.moveTo( window.opener.screenX+20, window.opener.screenY+20 );
 
 	$.changePage("#page-chat");
@@ -786,6 +786,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 	
 	//msg
 	var time = new Date(object.meta.ct);
+	if( null==object.ml || object.ml.length<=0 ) return;
 	var msgData = object.ml[0];
 	var msgDiv;
 	var isMe = ( object.meta.gu == g_group.gu );
@@ -1314,7 +1315,7 @@ function leaveChatRoom(){
 				g_group = userData[gi];
 				delete g_group.chatAll[ci];
 				$.lStorage(ui, userData);
-				$('.gm-border > .sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
+				$('.sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
 				window.close();
 			});
 		}]

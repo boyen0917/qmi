@@ -124,8 +124,79 @@
 <!---------------------------------- page-group-main ------------------------------------>
         <div data-role="page" id="page-group-main" >
             <div class="gm-frame scrolltop">
+                <div class="gm-header user-main-toggle">
+                    <div class="gm-header-left">
+                        <div class="sm-group-name"></div>
+                    </div>
+                    <div class="gm-header-right">
+                        <div class="gm-header-adjustment"></div>
+                        <!-- <div class="header-group-name">
+                            <div class="page-title" data-textid="LEFT_FEED"></div>
+                        </div> -->
+
+                        <div class="sm-user-area namecard">
+                           <div class="sm-user-area-l">
+                               <div class="sm-user-pic">
+                                   <img src="images/common/others/empty_img_personal_xl.png"/>
+                               </div>
+                           </div>           
+                        </div>
+
+                        <div class="header-menu">
+                            <div data-sm-act="feeds" data-polling-cnt="A1" class="sm-small-area polling-cnt active">
+                               <div class="sm-small-area-r" data-textid="LEFT_FEED"></div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
+                            <div data-sm-act="memberslist" data-polling-cnt="A2" class="sm-small-area polling-cnt">
+                               <div class="sm-small-area-r" data-textid="LEFT_MEMBER"></div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
+                            <div data-sm-act="chat" data-polling-cnt="A3" class="sm-small-area polling-cnt">
+                               <div class="sm-small-area-r" data-textid="LEFT_CHAT"></div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
+                            <div data-sm-act="feed-public" class="sm-small-area">
+                               <div class="sm-small-area-r">團體動態</div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
+                            <div data-sm-act="feed-post" class="sm-small-area">
+                               <div class="sm-small-area-r">成員動態</div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
+                        </div>
+
+
+
+                        <div class="feed-compose header-icon _2"></div>
+                        <div class="chatList-add header-icon _2"></div>
+                        <div class="contact-add header-icon _2"></div>
+                        <div class="navi-alert header-icon _1"></div>
+                        <div class="feed-compose-area">
+                            <div data-fc-box="announcement" class="fc-area-subbox" style="display:none">
+                                <img class="fc-icon-size" src="images/icon/icon_compose_bulletin.png"/><div data-textid='FEED_BULLETIN'></div>
+                            </div>
+                            <div data-fc-box="post" class="fc-area-subbox">
+                                <img class="fc-icon-size" src="images/icon/icon_compose_post.png"/><div data-textid="FEED_POST"></div>
+                            </div>
+                            <div data-fc-box="feedback" class="fc-area-subbox">
+                                <img class="fc-icon-size" src="images/icon/icon_compose_report.png"/><div data-textid='FEED_REPORT'></div>
+                            </div>
+                            <div data-fc-box="work" class="fc-area-subbox">
+                                <img class="fc-icon-size" src="images/icon/icon_compose_task.png"/><div data-textid='FEED_TASK'></div>
+                            </div>
+                            <div data-fc-box="vote" class="fc-area-subbox">
+                                <img class="fc-icon-size" src="images/icon/icon_compose_vote.png"/><div data-textid='FEED_VOTE'></div>
+                            </div>
+                            <div data-fc-box="check" class="fc-area-subbox fc-check">
+                                <img class="fc-icon-size" src="images/icon/icon_compose_location.png"/><div data-textid='FEED_LOCATION'></div>
+                            </div>
+                        </div>
+                        <div class="feed-compose-area-cover"></div>
+                    </div>
+                </div>
                 <div class="gm-side-menu">
-                    <div class="sm-header" style="background: url(images/common/cover/sidemeun_cover00.png);">
+                    <div style="height:44px"></div>
+                    <!-- <div class="sm-header" style="background: url(images/common/cover/sidemeun_cover00.png);">
                         <div class="sm-group-pic"></div>
                         <div class="sm-group-name"></div>
                         <div class="sm-user-area namecard">
@@ -139,9 +210,9 @@
                                 <img src="images/icon/icon_arrow_right.png"/>
                            </div>                
                         </div>
-                    </div>
+                    </div> -->
                     <div class="gm-border">
-                        <div data-sm-act="feeds" data-polling-cnt="A1" class="sm-small-area polling-cnt">
+                        <!-- <div data-sm-act="feeds" data-polling-cnt="A1" class="sm-small-area polling-cnt">
                            <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_feeds_activity.png"/></div>
                            <div class="sm-small-area-r" data-textid="LEFT_FEED"></div>
                            <div class="sm-count"></div>
@@ -155,7 +226,7 @@
                            <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_chat_normal.png"/></div>
                            <div class="sm-small-area-r" data-textid="LEFT_CHAT"></div>
                            <div class="sm-count"></div>
-                        </div>
+                        </div> -->
                         <div class="sm-hr" data-textid="LEFT_GROUP"></div>
                         <div class="sm-group-list-area">
                           
@@ -182,38 +253,6 @@
                     </div>
                 </div>
                 <div class="gm-content">
-                    <div class="gm-header user-main-toggle">
-                        <div class="gm-header-adjustment"></div>
-                        <div class="header-group-name">
-                            <div class="page-title" data-textid="LEFT_FEED"></div>
-                            <div></div>
-                        </div>
-                        <div class="feed-compose"></div>
-                        <div class="chatList-add"></div>
-                        <div class="contact-add"></div>
-                        <div class="navi-alert"></div>
-                        <div class="feed-compose-area">
-                            <div data-fc-box="announcement" class="fc-area-subbox" style="display:none">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_bulletin.png"/><div data-textid='FEED_BULLETIN'></div>
-                            </div>
-                            <div data-fc-box="post" class="fc-area-subbox">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_post.png"/><div data-textid="FEED_POST"></div>
-                            </div>
-                            <div data-fc-box="feedback" class="fc-area-subbox">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_report.png"/><div data-textid='FEED_REPORT'></div>
-                            </div>
-                            <div data-fc-box="work" class="fc-area-subbox">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_task.png"/><div data-textid='FEED_TASK'></div>
-                            </div>
-                            <div data-fc-box="vote" class="fc-area-subbox">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_vote.png"/><div data-textid='FEED_VOTE'></div>
-                            </div>
-                            <div data-fc-box="check" class="fc-area-subbox fc-check">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_location.png"/><div data-textid='FEED_LOCATION'></div>
-                            </div>
-                        </div>
-                        <div class="feed-compose-area-cover"></div>
-                    </div>
                     <div class="gm-adjustment user-main-toggle"></div>
                     <div class="gm-user-main-area" style="display:none">
                         <div class="background">
@@ -247,6 +286,14 @@
                                 <img src="images/timeline/timeline_tab_icon_task.png"/>
                                 <div data-textid='FEED_TASK'></div>
                             </div>
+                            <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feed-public" data-tp="A1">
+                                <img src="images/timeline/timeline_tab_icon_home_white.png"/>
+                                <div class="color-white" data-textid='FEED_ALL'></div>
+                            </div>
+                            <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feed-post" data-tp="A2">
+                                <img src="images/timeline/timeline_tab_icon_home_white.png"/>
+                                <div class="color-white" data-textid='FEED_ALL'></div>
+                            </div>
                         </div>
 
                         <div class="st-refresh-top">
@@ -261,10 +308,12 @@
                                 <img src="images/icon/icon_arrow_right.png"/>
                             </div> -->
                             <div class="st-filter-hide left">&nbsp&nbsp...</div>
-                            <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide">
+                            <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide st-filter-list-active">
                                 <span data-textid='FEED_ALL'></span>
                             </div>
                             <!-- <div class="st-filter-other"> -->
+                                <div data-status="all" data-navi="feed-public" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_ALL'></span></div>
+                                <div data-status="all" data-navi="feed-post" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_ALL'></span></div>
                                 <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list"><span data-textid='FEED_BULLETIN'></span></div>
                                 <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list"><span data-textid='FEED_REPORT'></span></div>
                                 <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list"><span data-textid='FEED_MISSION'></span></div>
@@ -287,6 +336,8 @@
                                     <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
                                     <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
                                     <div data-feed="03" class="feed-task feed-subarea switch-reset"></div>
+                                    <div data-feed="A1" class="feed-public feed-subarea switch-reset"></div>
+                                    <div data-feed="A2" class="feed-post feed-subarea switch-reset"></div>
                                     <div data-feed="main" class="feed-subarea switch-reset"></div>
 
                                 </div>
