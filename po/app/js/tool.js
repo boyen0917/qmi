@@ -686,9 +686,9 @@ $(function(){
         }
     }
 
-	getGroupAllUser = function(this_gi,ajax_load,err_show){
+	getGroupData = function(this_gi,ajax_load,err_show){
 		var err_show = err_show || false;
-		var api_name = "groups/" + this_gi + "/users";
+		var api_name = "groups/" + this_gi;
         var headers = {
             "ui":ui,
             "at":at,
@@ -696,26 +696,46 @@ $(function(){
         };
         var method = "get";
         return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
+		// var err_show = err_show || false;
+		// var api_name = "groups/" + this_gi + "/users";
+  //       var headers = {
+  //           "ui":ui,
+  //           "at":at,
+  //           "li":lang,
+  //       };
+  //       var method = "get";
+  //       return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
 	}
 
+	setGrouUser = function( this_gi, data ){
+		var data_group_user = data.ul;
+		var new_group_user = {};
+	    $.each(data_group_user,function(i,val){
+	        //將gu設成key 方便選取
+	        new_group_user[val.gu] = val;
+	    });
 
-	setBranchList = function(this_gi, callback){
+	    //成員列表存入local storage
+	    updateGuAll(this_gi,new_group_user);
+	}
+
+	setBranchList = function(this_gi, branch_list, callback){
 		var this_gi = this_gi || gi;
 		if( !this_gi ) return;
 
     	//取得團體列表
-        var api_name = "groups/" + this_gi + "/branches";
-        var headers = {
-            "ui":ui,
-            "at":at,
-            "li":lang
-        };
+        // var api_name = "groups/" + this_gi + "/branches";
+        // var headers = {
+        //     "ui":ui,
+        //     "at":at,
+        //     "li":lang
+        // };
 
-        var method = "get";
-        ajaxDo(api_name,headers,method,false).complete(function(data){
-        	if(data.status == 200){
+        // var method = "get";
+        // ajaxDo(api_name,headers,method,false).complete(function(data){
+        	// if(data.status == 200){
 
-        		var branch_list = $.parseJSON(data.responseText);
+        		// var branch_list = $.parseJSON(data.responseText);
         		var new_bl = {};
         		var new_fbl = {};
                 var _groupList = $.lStorage(ui);
@@ -797,7 +817,7 @@ $(function(){
             	$.lStorage(ui,_groupList);
 
             	if( callback ) callback();
-        	}
-        });
+        	// }
+    //     });
     }
 });

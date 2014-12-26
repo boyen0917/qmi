@@ -301,39 +301,33 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
 	 當團體還沒點過時guAll為空內容
 	   ----- TODO ------ */
 	if( !groupData.guAll.hasOwnProperty(data.meta.gu) ){
-		//get guAll
-		getGroupAllUser( giTmp,false).complete( function(memData){
-			try{
-				if(memData.status == 200){
-					var data_group_user = $.parseJSON(memData.responseText).ul;
-		            var new_group_user = {};
-		            $.each(data_group_user,function(i,val){
-		                //將gu設成key 方便選取
-		                new_group_user[val.gu] = val;
-		            });
-					groupData.guAll = new_group_user;
-					$.lStorage(ui, userData);
+		getGroupData(this_gi,false).complete(function(data){
+			if(data.status == 200){
+                var groupData = $.parseJSON(data.responseText);
+                setGroupAllUser( this_gi, groupData );
 
-					var isReady = false;
-					//set branch
-					setBranchList( giTmp, function(){
-						if( isReady ){
-							setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
-						}
-						isReady = true;
-					});
-					//update chatList
-					updateChatList( giTmp, function(){
-						if( isReady ){
-							setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
-						}
-						isReady = true;
-					});
-				}
-			} catch(e){
-				cns.debug(e.message);
+
+
+                //按照邏輯 取得群組名單之後 就來設定群組資訊
+                setBranchList(this_gi, groupData, function(){
+					if( isReady ){
+						setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
+					}
+					isReady = true;
+				});
+				//update chatList
+				updateChatList( giTmp, function(){
+					if( isReady ){
+						setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
+					}
+					isReady = true;
+				});
+
+
+
 			}
 		}, null);
+
 	} else {
 		setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
 	}
