@@ -2277,7 +2277,12 @@ $(function(){
                     // $(this).next().toggleClass("open");
                     // $(this).parent().next().toggle();
                 // });
-                tmp.find(".obj-cell.fav + .obj-cell-arrow").off("click").click( function(){
+                tmp.find(".obj-cell.fav + .obj-cell-arrow").off("click").click( function(e){
+                    if( $(".obj-content").hasClass("on-search") ){
+                        $(this).previous().trigger("click");
+                        e.stopPropagation();
+                        return;
+                    }
                     $(this).toggleClass("open");
                     $(this).parent().next().toggle();
                 });
@@ -2321,7 +2326,12 @@ $(function(){
                 }
             });
 
-            $(".obj-cell-area").find(".obj-cell-arrow").off("click").click( function(){
+            $(".obj-cell-area .obj-cell-arrow").off("click").click( function(e){
+                if( $(".obj-content").hasClass("on-search") ){
+                    $(this).prev().trigger("click");
+                    e.stopPropagation();
+                    return;
+                }
 
                 var dom = $(this).parent().next();
                 if( $(this).hasClass("open") ){
@@ -2336,6 +2346,10 @@ $(function(){
 
             //branch全選
             memSubTitle.off("click").click( function(){
+                //搜尋中關閉全選
+                if( $(".obj-content").hasClass("on-search") ){
+                    return;
+                }
                 clearMeAndAllSelect();
 
                 if( $(this).data("chk") ){
@@ -2387,6 +2401,11 @@ $(function(){
         
             //mem全選
             memSubTitle.click( function(){
+                //搜尋中關閉全選
+                if( $(".obj-content").hasClass("on-search") ){
+                    return;
+                }
+
                 clearMeAndAllSelect();
 
                 if( $(this).data("chk") ){
@@ -2490,7 +2509,7 @@ $(function(){
                 this_cell.find(".obj-cell-chk .img").addClass("chk");
                 // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
 
-                $(".obj-selected .list").html("<span>" + this_cell.data("gu-name") + "</span>");
+                $(".obj-selected .list .text").html("<span>" + this_cell.data("gu-name") + "</span>");
                 //重置
                 selected_obj ={};
                 selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
@@ -2787,6 +2806,74 @@ $(function(){
             $(".obj-done").parent().find(".page-back").trigger("click");
             if( onDone ) onDone();
         });
+
+        //避免重複綁定事件 先解除
+        $(".obj-selected .list").off("click").click(function(e){
+            $(this).find(".search").focus();
+            e.stopPropagation();
+        });
+        // $(".obj-selected .list .search").off("focusout").focusout( function(){
+        //     $(".obj-content").removeClass("on-search");
+        //     $(".obj-cell").show();
+        //     $(".subgroup-parent").show();
+        //     $(this).html("");
+        // });
+        $(document).on("click", ".on-search .obj-cell, .on-search .subgroup-parent", function(){
+            $(".obj-selected .list .search").html("").trigger("input");
+            $(".obj-cell-area").scrollTop(0);
+        });
+        $(".obj-selected .list .search").off("input").on("input", function(){
+            //更新搜尋結果
+            var search = $(this).html();
+            var rows = $(".obj-cell");
+            if( search.length<=0 ){
+                rows.show();
+                $(".obj-cell-arrow.open").removeClass("open");
+                $(".subgroup-parent").next().hide();
+                $(".obj-cell-arrow").css("opacity","1");
+
+                $(".obj-content").removeClass("on-search");
+                $(".obj-cell").show();
+                $(".subgroup-parent").show();
+                $(this).html("");
+                $(".obj-cell-area hr").show();
+                return;
+            }
+
+            $(".obj-cell-area hr").hide();
+            $(".subgroup-parent").hide();
+            $(".subgroup-parent").next().show();
+            $(".obj-cell-arrow").css("opacity","0");
+            $(".obj-content").addClass("on-search");
+            $(".subgroup-row.fav-parent").hide();
+            $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
+            if( $(".obj-content").hasClass("on-search") ){
+                rows.each( function( index, rowElement ){
+                    var row = $(rowElement);
+                    if( row.hasClass("self") 
+                        || row.hasClass("all") 
+                        || row.hasClass("fav") ){
+                        row.hide();
+                        return;
+                    }
+                    var parent = row.parents(".subgroup-parent");
+                    var name = row.find(".obj-user-name").text();
+                    var title = row.find(".obj-user-title").text();
+                    if( (name && name.toLowerCase().indexOf(search)>=0) 
+                        || (title && title.toLowerCase().indexOf(search)>=0) ){
+                        parent.show();
+                        row.show();
+                        return;
+                    }
+                    if( parent.length>0 ){
+                        parent.hide();
+                    } else {
+                        row.hide();
+                    }
+                    
+                });
+            }
+        });
     }
 
     updateSelectedObj = function(){
@@ -2796,12 +2883,12 @@ $(function(){
         var mem = $(".obj-content").data("selected-obj");
         var fbl = $(".obj-content").data("selected-fav");
         
-        $(".obj-selected .list").html("");
+        $(".obj-selected .list .text").html("");
         //寫入到選擇區域
         if( null != branch ){
             len += Object.keys(branch).length;
             $.each(branch,function(i,val){
-                $(".obj-selected .list").append(val.replaceOriEmojiCode()+"   ");
+                $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
             });
 
             var bAllSelect = true;
@@ -2826,7 +2913,7 @@ $(function(){
         if( null != mem ){
             len += Object.keys(mem).length;
             $.each(mem,function(i,val){
-                $(".obj-selected .list").append(val.replaceOriEmojiCode()+"   ");
+                $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
             });
 
             var bAllSelect = true;
@@ -2851,7 +2938,7 @@ $(function(){
         if( null != fbl ){
             len += Object.keys(fbl).length;
             $.each(fbl,function(i,val){
-                $(".obj-selected .list").append(val.replaceOriEmojiCode()+"   ");
+                $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
             });
             var bAllSelect = true;
             $(".subgroup-row.fav-parent div:nth-child(2) .obj-cell").each(function(){

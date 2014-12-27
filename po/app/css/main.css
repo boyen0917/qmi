@@ -3739,7 +3739,6 @@ input.cp-datetimepicker-end {
 
 .obj-selected .list {
 	display: inline-block;
-	width: 70%;
 	max-height: 100px;
 	text-overflow: ellipsis;
 	overflow: scroll;
@@ -3751,6 +3750,24 @@ input.cp-datetimepicker-end {
 	position: relative;
 	top: 3px;
 	left: 10px;
+	cursor: pointer;
+	width: 70%;
+}
+
+.on-search .obj-selected .list .text {
+	color: #b4b4b4;
+}
+.obj-selected .list .text span {
+    margin-right: 10px;
+}
+
+.obj-selected .list .search {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 2px;
+	margin-right: 5px;
+	outline: 0px solid transparent;
+	padding-left: 3px;
 }
 
 .obj-selected .clear {
@@ -3763,11 +3780,6 @@ input.cp-datetimepicker-end {
 	float: right;
 	margin-right: 7px;
 	margin-top: 5px;
-}
-
-.obj-selected span {
-	margin-right: 10px;
-	color: #535759;
 }
 
 .obj-cell-area {
