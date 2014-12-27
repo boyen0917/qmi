@@ -2839,6 +2839,7 @@ $(function(){
                 $(".obj-cell-area hr").show();
                 return;
             }
+            search = search.toLowerCase();
 
             $(".obj-cell-area hr").hide();
             $(".subgroup-parent").hide();
