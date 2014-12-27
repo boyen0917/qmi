@@ -4026,7 +4026,7 @@ $(function(){
 					if(this_compose.data("object_str") || this_compose.data("branch_str") ){
 						$.each(this_compose.data("upload-obj"),function(i,file){
                             cns.debug(this_compose.data("object_str"), this_compose.data("branch_str"))
-							getFilePermissionIdWithTarget(this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
+							getFilePermissionIdWithTarget(gi, this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
 								var pi_result = $.parseJSON(data.responseText);
 								if(data.status == 200){
 									uploadImg(file,imageType,cnt,total,6,pi_result.pi);		
@@ -5421,7 +5421,7 @@ $(function(){
                 cns.debug("o_obj:",o_obj);
                 cns.debug("t_obj:",t_obj);
                 //compose tp to upload file tp
-				getS3UploadUrl(ti_feed,1,permission_id).complete(function(data){
+				getS3UploadUrl(gi, ti_feed,1,permission_id).complete(function(data){
 					var s3url_result = $.parseJSON(data.responseText);
 					if(data.status == 200){
 						var fi = s3url_result.fi;
@@ -5443,7 +5443,7 @@ $(function(){
 								var md = {};
 		        				md.w = o_obj.w;
 		        				md.h = o_obj.h;
-		        				uploadCommit(fi,ti_feed,permission_id,1,file.type,o_obj.blob.size,md).complete(function(data){
+		        				uploadCommit(gi, fi,ti_feed,permission_id,1,file.type,o_obj.blob.size,md).complete(function(data){
 
 		        					var commit_result = $.parseJSON(data.responseText);
 
@@ -5836,12 +5836,12 @@ $(function(){
                     // var object_obj = $.parseJSON(this_compose.data("object_str"));
                     if( this_event.data("object_str") ){
                         var obj = $.parseJSON( this_event.data("object_str") );
-                        getFilePermissionId(obj).complete( function(result){
+                        getFilePermissionId(this_gi, obj).complete( function(result){
                             if( result.status==200 ){
                                 try{
                                     var pi = $.parseJSON(result.responseText).pi;
 
-                                    uploadGroupImage(file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
+                                    uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
                                         body.ml.push({
                                             "c": data.fi,
                                             "p": pi,
@@ -5856,13 +5856,17 @@ $(function(){
                         });
                     }else{
                         var pi = "0";
-                        uploadGroupImage(file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
-                            body.ml.push({
-                                "c": data.fi,
-                                "p": pi,
-                                "tp": 6
-                            });
-                            replyApi( this_event, this_gi, this_ti, this_ei, body );
+                        uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
+                            try{
+                                body.ml.push({
+                                    "c": data.fi,
+                                    "p": pi,
+                                    "tp": 6
+                                });
+                                replyApi( this_event, this_gi, this_ti, this_ei, body );
+                            } catch(e){
+                                cns.debug("[!] replySend:"+e.message);
+                            }
                         });
                     }
                 }

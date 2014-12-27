@@ -90,7 +90,9 @@ $(function(){
 
 		var group_main = $(this);
 		//timeline 才要做
-		if(!$(".feed-subarea").is(":visible") || group_main.data("scroll-cnt") < 0 || $(".st-top-area-load").position().top < 50) return;
+		if( $(".feed-subarea:visible").length<=0
+			|| group_main.data("scroll-cnt") < 0
+			|| $(".st-top-area-load").position().top < 40) return;
 
 		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
 
@@ -109,7 +111,7 @@ $(function(){
             group_main.data("scroll-cnt",scroll_cnt);
 
             //滾得夠猛 做下拉更新
-            if(scroll_cnt > 5000) {
+            if(scroll_cnt > 4100) {
             	group_main.data("scroll-cnt",-10000);
 
 				timelineTopRefresh();
