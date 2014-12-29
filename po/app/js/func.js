@@ -1052,8 +1052,84 @@ $(function(){
 	setTabList = function(this_gi, groupData){
         //save data
         var userData = $.lStorage(ui);
-        userData[this_gi].tab = groupData.tab;
-        userData[this_gi].pen = groupData.pen;
+        if( groupData.tab ){
+            userData[this_gi].tab = groupData.tab;
+        } else {
+            userData[this_gi].tab = [
+                {
+                    "tp": 0,
+                    "nm": "團體動態",
+                    "sw": true
+                },
+                {
+                    "tp": 1,
+                    "nm": "成員動態",
+                    "sw": true
+                },
+                {
+                    "tp": 2,
+                    "nm": "動態消息",
+                    "sw": false
+                },
+                {
+                    "tp": 3,
+                    "nm": "聊天室",
+                    "sw": true
+                },
+                {
+                    "tp": 4,
+                    "nm": "行事曆",
+                    "sw": false
+                },
+                {
+                    "tp": 5,
+                    "nm": "相簿",
+                    "sw": false
+                },
+                {
+                    "tp": 6,
+                    "nm": "成員列表",
+                    "sw": true
+                },
+                {
+                    "tp": 7,
+                    "nm": "團體設定",
+                    "sw": true
+                }
+            ];
+        }
+        if( groupData.pen ){
+            userData[this_gi].pen = groupData.pen;
+        } else {
+            userData[this_gi].pen = [
+                {
+                    "tp": 0,
+                    "nm": "公告",
+                    "sw": true
+                },
+                {
+                    "tp": 1,
+                    "nm": "通報",
+                    "sw": true
+                },
+                {
+                    "tp": 2,
+                    "nm": "工作",
+                    "sw": true
+                },
+                {
+                    "tp": 3,
+                    "nm": "投票",
+                    "sw": true
+                },
+                {
+                    "tp": 4,
+                    "nm": "成員定位",
+                    "sw": true
+                }
+            ];
+        }
+
         $.lStorage(ui, userData);
 
         updateTab( this_gi );
@@ -2196,7 +2272,7 @@ $(function(){
             tmp.append( innerTmp );
             
             var memfold = $("<div></div>");
-            memfold.css("display","none")
+            memfold.css("display","none");
             for( var i in guAll){
                 var gu_obj = guAll[i];
                 if( gu_obj.fav==true ){
@@ -2808,16 +2884,18 @@ $(function(){
         });
 
         //避免重複綁定事件 先解除
-        $(".obj-selected .list").off("click").click(function(e){
-            $(this).find(".search").focus();
+        // $(".obj-selected .search-trigger").off("click").click(function(e){
+        //     $(".obj-selected .search").focus();
+        //     e.stopPropagation();
+        // });
+        $(".obj-selected").off("click").click(function(e){
+            $(".obj-selected .search").focus();
+        });
+        $(document).on("click", ".obj-selected .list .text span", function(e){
+            $(".obj-selected .list .search").html( $(this).text() ).trigger("input");
+            $(".obj-cell-area").scrollTop(0);
             e.stopPropagation();
         });
-        // $(".obj-selected .list .search").off("focusout").focusout( function(){
-        //     $(".obj-content").removeClass("on-search");
-        //     $(".obj-cell").show();
-        //     $(".subgroup-parent").show();
-        //     $(this).html("");
-        // });
         $(document).on("click", ".on-search .obj-cell, .on-search .subgroup-parent", function(){
             $(".obj-selected .list .search").html("").trigger("input");
             $(".obj-cell-area").scrollTop(0);
@@ -2837,6 +2915,7 @@ $(function(){
                 $(".subgroup-parent").show();
                 $(this).html("");
                 $(".obj-cell-area hr").show();
+                $(".obj-cell-subTitle .obj-cell-subTitle-chk").show();
                 return;
             }
             search = search.toLowerCase();
@@ -6575,9 +6654,11 @@ $(function(){
                 $(".alert-area").hide();
             }
 
-            $(".user-main-toggle").hide();
+            //不隱藏header
+            $(".user-main-toggle:not(.gm-header)").hide();
             $(".gm-user-main-area").show();
             $(".st-feedbox-area").hide();
+            $(".sm-small-area.active").removeClass("active");
 
             setTimeout(function(){
                 //滾動至最上

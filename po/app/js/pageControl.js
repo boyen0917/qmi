@@ -5,6 +5,7 @@
     history: [],
     currentID: null,
     changePage: function( id, onShow, onDone ) {
+      cns.debug("[changePage] ", id, onShow);
       var tmp = $(id);
       var pc = this;
       if( tmp.length>0 ){
@@ -34,16 +35,22 @@
       if( pc.history.length<=0 ) return;
 
       var oldID = pc.currentID;
-      var id = $(pc.history.pop());
+      var id = pc.history.pop();
+      var dom = $(id);
       pc.currentID = id;
-      $(id).fadeIn( pc.animateInterval );
+      cns.debug("onDone");
+      $(dom).fadeIn( pc.animateInterval );
+      var isSend = false;
       $(oldID+", "+oldID + " .fixed").animate({
           marginLeft: "100%",
         }, pc.animateInterval, function() {
-          $(oldID).hide();
-          cns.debug("onDone");
-          var onDone = $(oldID).data( "onDone" );
-          if( onDone ) onDone(false);
+          if( !isSend ){
+            isSend = true;
+            $(oldID).hide();
+            cns.debug("[popPage] ", id, oldID);
+            var onDone = $(oldID).data( "onDone" );
+            if( onDone ) onDone(false);
+          }
       });
     },
     onPageBack: null

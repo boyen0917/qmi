@@ -36,7 +36,12 @@ var isGettingPermission = false;
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
 $(document).ready(function(){
-	window.resizeTo( Math.min(450,$(window).width()), $(window).height() );
+	if( window.opener ){
+		window.resizeTo( Math.min(450,$(window.opener).width()), window.opener.outerHeight );
+	} else {
+		window.resizeTo( 450, 800 );
+	}
+	
 	// window.moveTo( window.opener.screenX+20, window.opener.screenY+20 );
 
 	$.changePage("#page-chat");

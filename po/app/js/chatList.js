@@ -29,6 +29,7 @@ initChatList = function(){
 	//set add member button
 	$(".chatList-add").off("click");
 	$(".chatList-add").on("click", function(){
+		$(".chatList-add").data("object_str","");
 		showNewRoomPage();
 	});
 
@@ -105,6 +106,14 @@ function showChatList(){
 	var chatList = groupData.chatAll;
 	if( null==chatList ) return;
 	var targetDiv = $(".subpage-chatList .rows");
+
+	if( Object.keys(chatList).length<=1 ){
+		targetDiv.hide();
+		$(".subpage-chatList .coachmake").show();
+		return;
+	}
+	targetDiv.show();
+	$(".subpage-chatList .coachmake").hide();
 
 	if( targetDiv ){
 		var tmp;
@@ -301,15 +310,15 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
 	 當團體還沒點過時guAll為空內容
 	   ----- TODO ------ */
 	if( !groupData.guAll.hasOwnProperty(data.meta.gu) ){
-		getGroupData(this_gi,false).complete(function(data){
+		getGroupData(giTmp,false).complete(function(data){
 			if(data.status == 200){
                 var groupData = $.parseJSON(data.responseText);
-                setGroupAllUser( this_gi, groupData );
+                setGroupAllUser( giTmp, groupData );
 
 
 
                 //按照邏輯 取得群組名單之後 就來設定群組資訊
-                setBranchList(this_gi, groupData, function(){
+                setBranchList(giTmp, groupData, function(){
 					if( isReady ){
 						setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
 					}
@@ -355,10 +364,16 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_LOCATION", name);
 			break;
 		case 22: //sys
+			var actMemName = "unknown";
+			if( data.ml[0].t && groupData.guAll.hasOwnProperty(data.ml[0].t) ){
+				var actMem = groupData.guAll[data.ml[0].t];
+				if( actMem ) actMemName = actMem.nk;
+			}
+			if( null==mem ) return;
 			if(1==data.ml[0].a){
-				text = $.i18n.getString("CHAT_SOMEONE_LEAVE", name );
+				text = $.i18n.getString("CHAT_SOMEONE_LEAVE", actMemName );
 			} else {
-				text = $.i18n.getString("CHAT_SOMEONE_JOIN", name );
+				text = $.i18n.getString("CHAT_SOMEONE_JOIN", actMemName );
 			}
 			break;
 		//---------- TODO ------------
@@ -408,7 +423,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 	if( groupData.gu!=mem.gu && isShowAlert ){
 		try{
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
-			riseNotification (null, groupData.gn.parseHtmlString()+" - "+mem.nk, text, function(){
+			riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+room.cn.parseHtmlString()+")", text, function(){
 				cns.debug(ciTmp);
 				openChatWindow( giTmp, ciTmp );
 			});
@@ -446,86 +461,25 @@ var g_newChatMemList;
 var g_memCount;
 
 function showNewRoomPage(){
-	g_newChatMemList = [];
-	$.mobile.changePage("#page-newChat");
-
-	//init
-	var container = $(".newChat-content");
-	container.html("");
-	$(".addMemList").html("");
-	$(".newChat-checkbox-gray").removeClass("checked");
-
-	//show data
-	var currentGroup = $.lStorage(ui)[gi];
-	g_memCount = 0;
-	for( var guid in currentGroup.guAll ){
-		if( guid== currentGroup.gu ) continue;
-
-		var mem = currentGroup.guAll[guid];
-		var memDiv = $("<div class='mem'></div>");
-		memDiv.append("<div class='checkbox' data-memid='"+guid+"' data-memname='"+mem.nk+"' check='false'></div>");
-		if(mem.auo){
-			memDiv.append("<img class='namecard' src='"+mem.auo+"'>");
-			memDiv.find("img").data("gu", guid);
-			memDiv.find("img").data("gi", gi);
-		} else {
-			memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
+	composeObjectShowDelegate( $(".chatList-add"), $(".chatList-add"), {
+		isShowGroup : false,
+        isShowSelf : false,
+        isShowAll : true,
+        isShowFav : true,
+        isShowFavBranch : false
+	}, function(){
+		try{
+			var data = $.parseJSON( $(".chatList-add").data("object_str") );
+			var currentGroup = $.lStorage(ui)[gi];
+			if( data.hasOwnProperty(currentGroup.gu) ){
+				delete data[currentGroup.gu];
+			}
+			g_newChatMemList = Object.keys(data);
+			showNewRoomDetailPage();
+		} catch(e){
+			cns.debug( "[!]showNewRoomPage", e.message );
 		}
-		memDiv.append("<span>"+mem.nk.replaceOriEmojiCode()+"</span>");
-		container.append(memDiv);
-		g_memCount++;
-	}
-
-	//bind event
-	$(".newChat-checkbox-gray").off("click");
-	$(".newChat-checkbox-gray").click(function(){
-	    if( $(this).hasClass("checked") ){
-	    	$(this).removeClass("checked");
-	    	toggleSelectAll(false);
-	    } else {
-	    	$(this).addClass("checked");
-	    	toggleSelectAll(true);
-	    }
 	});
-
-
-	$(".newChat-content .mem .checkbox").off("click");
-	$(".newChat-content .mem .checkbox").click(function(){
-		// cns.debug($(this).attr("check"));
-	    if( "false"==$(this).attr("check") ){
-	    	$(this).attr("check", "true");
-	    	addMember( $(this).data("memid"), $(this).data("memname") );
-	    } else {
-	    	$(this).attr("check", "false");
-	    	removeMember( $(this).data("memid") );
-	    }
-	});
-
-	$(".newChat-nextStep").off("click");
-	$(".newChat-nextStep").click( showNewRoomDetailPage );
-}
-
-function addMember( memId, memName ){
-	if( g_newChatMemList.indexOf(memId)<0 ){
-		g_newChatMemList.push(memId);
-		var span = $("<span data-memid='"+memId+"'>"+memName.replaceOriEmojiCode()+"</span>");
-		$(".newChat-list .addMemList").append(span);
-		if( g_newChatMemList.length >= g_memCount ){
-			$(".newChat-checkbox-gray").addClass("checked");
-		}
-	}
-}
-
-function removeMember( memId ){
-	var index = g_newChatMemList.indexOf(memId);
-	if( index>=0 ){
-		g_newChatMemList.splice(index, 1);
-		$(".newChat-list .addMemList span[data-memid='"+memId+"'").remove();
-		
-		if( g_newChatMemList.length < g_memCount ){
-			$(".newChat-checkbox-gray").removeClass("checked");
-		}
-	}
 }
 
 function toggleSelectAll( bIsSelect ){

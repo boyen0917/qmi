@@ -187,6 +187,7 @@
 	"CHAT_LEAVE_CONFIRM" : "你確定要退出聊天室?",
 	"CHAT_SOMEONE_LEAVE" : "%@ 離開聊天室",
 	"CHAT_SOMEONE_JOIN" : "%@ 加入聊天室",
+	"CHAT_NO_CHATROOM" : "目前沒有任何聊天室，您可立即建立！",
 
 	"NOTICES_TITLE"						: "新通知",
 	"NOTICES_POST"						: "發佈",
