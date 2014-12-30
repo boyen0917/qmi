@@ -39,6 +39,8 @@ initChatList = function(){
 }
 
 function updateChatList( giTmp, extraCallBack ){
+	//預設開啟loading, 關閉rows & coachmark
+	$(".subpage-chatList .coachmake").hide();
 	$(".subpage-chatList .loading").show();
 	$(".subpage-chatList .rows").html("");
 	var userData = $.lStorage(ui);
