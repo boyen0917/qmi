@@ -6792,8 +6792,15 @@ $(function(){
                     var data_obj = $.parseJSON(data.responseText);
                     try{
                         if( data_obj.el[0].meta.del== true ){
-                            popupShowAdjust($.i18n.getString("FEED_EVENT_DELETED"),"","COMMON_OK","");
-                            $("#page-timeline-detail .page-back").trigger("click");
+                            setTimeout( function(){
+                                popupShowAdjust(
+                                    $.i18n.getString("FEED_EVENT_DELETED"),
+                                    "",
+                                    "COMMON_OK",
+                                    "",[function(){
+                                        $("#page-timeline-detail .page-back").trigger("click");
+                                    },null]);
+                            },100);
                         } else timelineBlockMake(this_event,[data_obj.el[0]],false,true);
                     } catch(e){
                         cns.debug(e);
