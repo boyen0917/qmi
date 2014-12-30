@@ -820,4 +820,14 @@ $(function(){
         	// }
     //     });
     }
+
+    errorReport = function(e){
+    	if( e ){
+	    	if (e.stack){
+	    		cns.debug("[!]", e.stack);
+	    	} else {
+	    		cns.debug("[!]", arguments.callee.caller, e.message);
+	    	}
+    	}
+    }
 });

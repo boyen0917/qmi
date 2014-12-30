@@ -366,7 +366,7 @@ $(function(){
                         $("#page-group-main").find(".gm-header .contact-add").show();
                     }
                 } catch(e){
-                    cns.debug( e );
+                    errorReport(e);
                 }
                 
                 page_title = $.i18n.getString("LEFT_MEMBER");
@@ -1025,7 +1025,7 @@ $(function(){
                     break;
             }
         } catch(e){
-            cns.debug( e );
+            errorReport(e);
         }
         
         this_event.find(".st-reply-like-area span:eq(0)").html( like_str );
@@ -1140,7 +1140,8 @@ $(function(){
         try{
             groupData = $.lStorage(ui)[this_gi];
         } catch(e){
-            cns.debug("[!] updateTab:" + e.message );
+            // cns.debug("[!] updateTab:" + e.message );
+            errorReport(e);
             return;
         }
 
@@ -1189,7 +1190,8 @@ $(function(){
                 }
             }
         } catch(e){
-            cns.debug("[!] setTabList(set tab): " + e.message);
+            errorReport(e);
+            //cns.debug("[!] setTabList(set tab): " + e.message);
         }
 
         //set pen
@@ -1244,7 +1246,8 @@ $(function(){
                 dom.addClass("active");
             }
         } catch(e){
-            cns.debug("[!] setTabList(set pen): " + e.message);
+            //cns.debug("[!] setTabList(set pen): " + e.message);
+            errorReport(e);
         }
     }
 /*
@@ -1473,6 +1476,7 @@ $(function(){
                             avatarPos(this_load.find(".st-user-pic img"));
                         }
                     } catch(e) {
+                        errorReport(e);
                         this_load.remove();
                         okCnt++;
                         return;
@@ -3188,7 +3192,7 @@ $(function(){
                             isReady = true;
                         }
                     } catch(e) {
-                        cns.debug( e );
+                        errorReport(e);
                     }
                 });
                 //get unread
@@ -3202,7 +3206,7 @@ $(function(){
                             isReady = true;
                         }
                     } catch(e) {
-                        cns.debug( e );
+                        errorReport(e);
                     }
                 });
                 break;
@@ -3239,7 +3243,7 @@ $(function(){
                             title = $.i18n.getString("FEED_LIKE")+"("+obj.epl.length+")";
                             if( list.length>0 ) showObjectTabShow(this_gi, title, list, onDone);
                         } catch(e){
-
+                            errorReport(e);
                         }
                     }
                 });
@@ -4929,7 +4933,7 @@ $(function(){
             isAdmin = (meTmp.ad==1);
             isMyPost = (event_status.meta.gu==groupTmp.gu);
         } catch(e){
-            cns.debug(e);
+            errorReport(e);
         }
 		var this_es_obj = this_event.data("event-val").meta;
 
@@ -5145,7 +5149,7 @@ $(function(){
                             try{
                                 this_event.find(".st-sub-box-2-attach-area a")[0].click();
                             } catch(e) {
-                                cns.debug(e);
+                                errorReport(e);
                             }
                         });
                     }
@@ -5929,7 +5933,7 @@ $(function(){
                                         sendReply( this_event, this_gi, this_ti, this_ei, body );
                                     });
                                 } catch( e ){
-                                    cns.debug(e);
+                                    errorReport(e);
                                 }
                             }
                         });
@@ -5944,7 +5948,8 @@ $(function(){
                                 });
                                 replyApi( this_event, this_gi, this_ti, this_ei, body );
                             } catch(e){
-                                cns.debug("[!] replySend:"+e.message);
+                                // cns.debug("[!] replySend:"+e.message);
+                                errorReport(e);
                             }
                         });
                     }
@@ -6303,22 +6308,26 @@ $(function(){
 	        		var _groupList = $.lStorage(ui);
 
 	        		// 沒gu all就順便去撈 
-	        		if(Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
-	        			cns.debug("guall content exist");
-	        			_groupList[this_user_info.gi].guAll[this_user_info.gu] = user_data;
-	        		}else{
-	        			cns.debug("no guall content");
-	            		var data_arr = ["userInfo",user_data];
-	        			setGroupAllUser(data_arr,this_user_info.gi);
-	        		}
+                    try{
+                        if(Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
+                            cns.debug("guall content exist");
+                            _groupList[this_user_info.gi].guAll[this_user_info.gu] = user_data;
+                        }else{
+                            cns.debug("no guall content");
+                            var data_arr = ["userInfo",user_data];
+                            setGroupAllUser(data_arr,this_user_info.gi);
+                        }
 
-	        		user_info_arr.pop();
-	        		//等於0 就不用再遞迴
-	        		if(user_info_arr.length == 0){
-						if(callback) callback(user_data);
-	        		}else{//繼續遞迴
-	        			getUserInfo(user_info_arr,load_show_chk,callback);
-	        		}
+                        user_info_arr.pop();
+                        //等於0 就不用再遞迴
+                        if(user_info_arr.length == 0){
+                            if(callback) callback(user_data);
+                        }else{//繼續遞迴
+                            getUserInfo(user_info_arr,load_show_chk,callback);
+                        }
+                    } catch(e){
+                        errorReport(e);
+                    }
 
 	        	//失敗就離開遞迴
 	        	}else{ 
@@ -6431,7 +6440,8 @@ $(function(){
                         var bn = $.lStorage(ui)[this_gi].bl[bi].bn;
                         user_data.bl = bn;
                     } catch(e) {
-                       return;
+                        errorReport(e);
+                        return;
                     }
 				}
 
@@ -6803,7 +6813,7 @@ $(function(){
                             },100);
                         } else timelineBlockMake(this_event,[data_obj.el[0]],false,true);
                     } catch(e){
-                        cns.debug(e);
+                        errorReport(e);
                     }
                 }
             });
@@ -6871,7 +6881,7 @@ $(function(){
 
 
         } catch(e){
-            cns.debug(e);
+            errorReport(e);
         }
     }
 
@@ -6918,7 +6928,7 @@ $(function(){
                 }
             });
         } catch(e){
-            cns.debug(e);
+            errorReport(e);
         }
     }
 

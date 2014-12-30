@@ -17,6 +17,11 @@
 	display: none;
 }
 
+.subpage-chatList .loading{
+	width: 100%;
+	text-align: center;
+	margin-top: 50px;
+}
 .subpage-chatList .rows {
     background:#d0d0d0;
     display: block;

@@ -634,6 +634,7 @@ function requestNewChatRoomApi(giTmp, cnTmp, arr, callback){
 				    	g_group["chatAll"][result.ci] = {
 				    		ci: result.ci,
 				    	};
+				    	var isSingleChat = (arr.length == 1);
 				    	if( isSingleChat ){
 				    		var memGu = arr[0].gu;
 				    		g_group["chatAll"][result.ci].tp = 1;
