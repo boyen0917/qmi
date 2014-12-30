@@ -39,6 +39,8 @@ initChatList = function(){
 }
 
 function updateChatList( giTmp, extraCallBack ){
+	$(".subpage-chatList .loading").show();
+	$(".subpage-chatList .rows").html("");
 	var userData = $.lStorage(ui);
 	if( !userData )	return;
 	var currentGroup = userData[giTmp];
@@ -56,6 +58,7 @@ function updateChatList( giTmp, extraCallBack ){
 	var result = ajaxDo(api_name,headers,method,false);
 	result.complete(function(data){
 		if(data.status == 200){
+			$(".subpage-chatList .loading").hide();
 			try{
 				var epl = $.parseJSON(data.responseText);
 				if(typeof epl != "undefined"){
@@ -98,7 +101,6 @@ function updateChatList( giTmp, extraCallBack ){
 	show chat list data from local storage
 **/
 function showChatList(){
-	$(".subpage-chatList .rows").html("");
 	var data = $.lStorage(ui);
 	if( null==data ) return;
 	var groupData = data[gi];
@@ -112,7 +114,8 @@ function showChatList(){
 		$(".subpage-chatList .coachmake").show();
 		return;
 	}
-	targetDiv.show();
+	$(".subpage-chatList .rows").html("");
+	targetDiv.hide();
 	$(".subpage-chatList .coachmake").hide();
 
 	if( targetDiv ){
@@ -173,8 +176,11 @@ function showChatList(){
 				targetDiv.append(table);
 			}
 		});
-
-		setTimeout(sortRoomList, sortRoomListTimeout);
+		setTimeout(function(){
+			targetDiv.show();
+			sortRoomList();
+		}, 150);
+		
 		$.lStorage(ui, data);
 	}
 
