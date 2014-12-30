@@ -405,7 +405,7 @@ $(function(){
     	localStorage.clear();
     }
 
-	getFilePermissionIdWithTarget = function(object_str, branch_str){
+	getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){
 		var object_obj = $.parseJSON(object_str);
 		var gul_arr = [];
 		$.each(object_obj,function(i,val){
@@ -433,11 +433,11 @@ $(function(){
                   bl: bl_arr
                 }
             }
-        return getFilePermissionId( {gul: gul_arr,bl: bl_arr} );
+        return getFilePermissionId( this_gi, {gul: gul_arr,bl: bl_arr} );
 	}
 
-	getFilePermissionId = function( tuObject ){
-		var api_name = "groups/" + gi + "/permissions";
+	getFilePermissionId = function( this_gi, tuObject ){
+		var api_name = "groups/" + this_gi + "/permissions";
 
         var headers = {
                  "ui":ui,
@@ -454,8 +454,8 @@ $(function(){
 		return pi_result;
 	}
 
-	getS3UploadUrl = function(ti,tp,pi){
-		var api_name = "groups/" + gi + "/files";
+	getS3UploadUrl = function(this_gi, ti,tp,pi){
+		var api_name = "groups/" + this_gi + "/files";
 
         var headers = {
                  "ui":ui,
@@ -482,8 +482,8 @@ $(function(){
         });
 	}
 	
-	uploadCommit = function(fi,ti,pi,tp,mt,si,md){
-		var api_name = "groups/" + gi + "/files/" + fi + "/commit";
+	uploadCommit = function(this_gi, fi,ti,pi,tp,mt,si,md){
+		var api_name = "groups/" + this_gi + "/files/" + fi + "/commit";
         var headers = {
                  "ui":ui,
                  "at":at, 
@@ -502,7 +502,7 @@ $(function(){
         return ajaxDo(api_name,headers,method,false,body);
 	}
 
-	uploadGroupImage = function(file, ti, permission_id, ori_arr, tmb_arr, pi, callback){
+	uploadGroupImage = function(this_gi, file, ti, permission_id, ori_arr, tmb_arr, pi, callback){
 		
 		var reader = new FileReader();
 		reader.onloadend = function() {
@@ -512,7 +512,7 @@ $(function(){
 		        var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
 		        var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
 
-				getS3UploadUrl(ti, 1, pi).complete(function(data){
+				getS3UploadUrl(this_gi, ti, 1, pi).complete(function(data){
 		    		cns.debug("!");
 		    	
 					var s3url_result = $.parseJSON(data.responseText);
@@ -537,7 +537,7 @@ $(function(){
 					        			md.w = o_obj.w;
 					        			md.h = o_obj.h;
 
-					        			uploadCommit(fi,ti,pi,1,file.type,o_obj.blob.size,md).complete(function(data){
+					        			uploadCommit(this_gi, fi,ti,pi,1,file.type,o_obj.blob.size,md).complete(function(data){
 					        				if(data.status == 200){
 						        				var commit_result = $.parseJSON(data.responseText);
 

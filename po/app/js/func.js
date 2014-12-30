@@ -1052,8 +1052,84 @@ $(function(){
 	setTabList = function(this_gi, groupData){
         //save data
         var userData = $.lStorage(ui);
-        userData[this_gi].tab = groupData.tab;
-        userData[this_gi].pen = groupData.pen;
+        if( groupData.tab ){
+            userData[this_gi].tab = groupData.tab;
+        } else {
+            userData[this_gi].tab = [
+                {
+                    "tp": 0,
+                    "nm": "團體動態",
+                    "sw": true
+                },
+                {
+                    "tp": 1,
+                    "nm": "成員動態",
+                    "sw": true
+                },
+                {
+                    "tp": 2,
+                    "nm": "動態消息",
+                    "sw": false
+                },
+                {
+                    "tp": 3,
+                    "nm": "聊天室",
+                    "sw": true
+                },
+                {
+                    "tp": 4,
+                    "nm": "行事曆",
+                    "sw": false
+                },
+                {
+                    "tp": 5,
+                    "nm": "相簿",
+                    "sw": false
+                },
+                {
+                    "tp": 6,
+                    "nm": "成員列表",
+                    "sw": true
+                },
+                {
+                    "tp": 7,
+                    "nm": "團體設定",
+                    "sw": true
+                }
+            ];
+        }
+        if( groupData.pen ){
+            userData[this_gi].pen = groupData.pen;
+        } else {
+            userData[this_gi].pen = [
+                {
+                    "tp": 0,
+                    "nm": "公告",
+                    "sw": true
+                },
+                {
+                    "tp": 1,
+                    "nm": "通報",
+                    "sw": true
+                },
+                {
+                    "tp": 2,
+                    "nm": "工作",
+                    "sw": true
+                },
+                {
+                    "tp": 3,
+                    "nm": "投票",
+                    "sw": true
+                },
+                {
+                    "tp": 4,
+                    "nm": "成員定位",
+                    "sw": true
+                }
+            ];
+        }
+
         $.lStorage(ui, userData);
 
         updateTab( this_gi );
@@ -2196,7 +2272,7 @@ $(function(){
             tmp.append( innerTmp );
             
             var memfold = $("<div></div>");
-            memfold.css("display","none")
+            memfold.css("display","none");
             for( var i in guAll){
                 var gu_obj = guAll[i];
                 if( gu_obj.fav==true ){
@@ -2277,7 +2353,12 @@ $(function(){
                     // $(this).next().toggleClass("open");
                     // $(this).parent().next().toggle();
                 // });
-                tmp.find(".obj-cell.fav + .obj-cell-arrow").off("click").click( function(){
+                tmp.find(".obj-cell.fav + .obj-cell-arrow").off("click").click( function(e){
+                    if( $(".obj-content").hasClass("on-search") ){
+                        $(this).previous().trigger("click");
+                        e.stopPropagation();
+                        return;
+                    }
                     $(this).toggleClass("open");
                     $(this).parent().next().toggle();
                 });
@@ -2321,7 +2402,12 @@ $(function(){
                 }
             });
 
-            $(".obj-cell-area").find(".obj-cell-arrow").off("click").click( function(){
+            $(".obj-cell-area .obj-cell-arrow").off("click").click( function(e){
+                if( $(".obj-content").hasClass("on-search") ){
+                    $(this).prev().trigger("click");
+                    e.stopPropagation();
+                    return;
+                }
 
                 var dom = $(this).parent().next();
                 if( $(this).hasClass("open") ){
@@ -2336,6 +2422,10 @@ $(function(){
 
             //branch全選
             memSubTitle.off("click").click( function(){
+                //搜尋中關閉全選
+                if( $(".obj-content").hasClass("on-search") ){
+                    return;
+                }
                 clearMeAndAllSelect();
 
                 if( $(this).data("chk") ){
@@ -2387,6 +2477,11 @@ $(function(){
         
             //mem全選
             memSubTitle.click( function(){
+                //搜尋中關閉全選
+                if( $(".obj-content").hasClass("on-search") ){
+                    return;
+                }
+
                 clearMeAndAllSelect();
 
                 if( $(this).data("chk") ){
@@ -2490,7 +2585,7 @@ $(function(){
                 this_cell.find(".obj-cell-chk .img").addClass("chk");
                 // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
 
-                $(".obj-selected .list").html("<span>" + this_cell.data("gu-name") + "</span>");
+                $(".obj-selected .list .text").html("<span>" + this_cell.data("gu-name") + "</span>");
                 //重置
                 selected_obj ={};
                 selected_obj[this_cell.data("gu")] = this_cell.data("gu-name");
@@ -2787,6 +2882,78 @@ $(function(){
             $(".obj-done").parent().find(".page-back").trigger("click");
             if( onDone ) onDone();
         });
+
+        //避免重複綁定事件 先解除
+        // $(".obj-selected .search-trigger").off("click").click(function(e){
+        //     $(".obj-selected .search").focus();
+        //     e.stopPropagation();
+        // });
+        $(".obj-selected").off("click").click(function(e){
+            $(".obj-selected .search").focus();
+        });
+        $(document).on("click", ".obj-selected .list .text span", function(e){
+            $(".obj-selected .list .search").html( $(this).text() ).trigger("input");
+            $(".obj-cell-area").scrollTop(0);
+            e.stopPropagation();
+        });
+        $(document).on("click", ".on-search .obj-cell, .on-search .subgroup-parent", function(){
+            $(".obj-selected .list .search").html("").trigger("input");
+            $(".obj-cell-area").scrollTop(0);
+        });
+        $(".obj-selected .list .search").off("input").on("input", function(){
+            //更新搜尋結果
+            var search = $(this).html();
+            var rows = $(".obj-cell");
+            if( search.length<=0 ){
+                rows.show();
+                $(".obj-cell-arrow.open").removeClass("open");
+                $(".subgroup-parent").next().hide();
+                $(".obj-cell-arrow").css("opacity","1");
+
+                $(".obj-content").removeClass("on-search");
+                $(".obj-cell").show();
+                $(".subgroup-parent").show();
+                $(this).html("");
+                $(".obj-cell-area hr").show();
+                $(".obj-cell-subTitle .obj-cell-subTitle-chk").show();
+                return;
+            }
+            search = search.toLowerCase();
+
+            $(".obj-cell-area hr").hide();
+            $(".subgroup-parent").hide();
+            $(".subgroup-parent").next().show();
+            $(".obj-cell-arrow").css("opacity","0");
+            $(".obj-content").addClass("on-search");
+            $(".subgroup-row.fav-parent").hide();
+            $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
+            if( $(".obj-content").hasClass("on-search") ){
+                rows.each( function( index, rowElement ){
+                    var row = $(rowElement);
+                    if( row.hasClass("self") 
+                        || row.hasClass("all") 
+                        || row.hasClass("fav") ){
+                        row.hide();
+                        return;
+                    }
+                    var parent = row.parents(".subgroup-parent");
+                    var name = row.find(".obj-user-name").text();
+                    var title = row.find(".obj-user-title").text();
+                    if( (name && name.toLowerCase().indexOf(search)>=0) 
+                        || (title && title.toLowerCase().indexOf(search)>=0) ){
+                        parent.show();
+                        row.show();
+                        return;
+                    }
+                    if( parent.length>0 ){
+                        parent.hide();
+                    } else {
+                        row.hide();
+                    }
+                    
+                });
+            }
+        });
     }
 
     updateSelectedObj = function(){
@@ -2796,12 +2963,12 @@ $(function(){
         var mem = $(".obj-content").data("selected-obj");
         var fbl = $(".obj-content").data("selected-fav");
         
-        $(".obj-selected .list").html("");
+        $(".obj-selected .list .text").html("");
         //寫入到選擇區域
         if( null != branch ){
             len += Object.keys(branch).length;
             $.each(branch,function(i,val){
-                $(".obj-selected .list").append(val.replaceOriEmojiCode()+"   ");
+                $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
             });
 
             var bAllSelect = true;
@@ -2826,7 +2993,7 @@ $(function(){
         if( null != mem ){
             len += Object.keys(mem).length;
             $.each(mem,function(i,val){
-                $(".obj-selected .list").append(val.replaceOriEmojiCode()+"   ");
+                $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
             });
 
             var bAllSelect = true;
@@ -2851,7 +3018,7 @@ $(function(){
         if( null != fbl ){
             len += Object.keys(fbl).length;
             $.each(fbl,function(i,val){
-                $(".obj-selected .list").append(val.replaceOriEmojiCode()+"   ");
+                $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
             });
             var bAllSelect = true;
             $(".subgroup-row.fav-parent div:nth-child(2) .obj-cell").each(function(){
@@ -3938,7 +4105,7 @@ $(function(){
 					if(this_compose.data("object_str") || this_compose.data("branch_str") ){
 						$.each(this_compose.data("upload-obj"),function(i,file){
                             cns.debug(this_compose.data("object_str"), this_compose.data("branch_str"))
-							getFilePermissionIdWithTarget(this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
+							getFilePermissionIdWithTarget(gi, this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
 								var pi_result = $.parseJSON(data.responseText);
 								if(data.status == 200){
 									uploadImg(file,imageType,cnt,total,6,pi_result.pi);		
@@ -5333,7 +5500,7 @@ $(function(){
                 cns.debug("o_obj:",o_obj);
                 cns.debug("t_obj:",t_obj);
                 //compose tp to upload file tp
-				getS3UploadUrl(ti_feed,1,permission_id).complete(function(data){
+				getS3UploadUrl(gi, ti_feed,1,permission_id).complete(function(data){
 					var s3url_result = $.parseJSON(data.responseText);
 					if(data.status == 200){
 						var fi = s3url_result.fi;
@@ -5355,7 +5522,7 @@ $(function(){
 								var md = {};
 		        				md.w = o_obj.w;
 		        				md.h = o_obj.h;
-		        				uploadCommit(fi,ti_feed,permission_id,1,file.type,o_obj.blob.size,md).complete(function(data){
+		        				uploadCommit(gi, fi,ti_feed,permission_id,1,file.type,o_obj.blob.size,md).complete(function(data){
 
 		        					var commit_result = $.parseJSON(data.responseText);
 
@@ -5748,12 +5915,12 @@ $(function(){
                     // var object_obj = $.parseJSON(this_compose.data("object_str"));
                     if( this_event.data("object_str") ){
                         var obj = $.parseJSON( this_event.data("object_str") );
-                        getFilePermissionId(obj).complete( function(result){
+                        getFilePermissionId(this_gi, obj).complete( function(result){
                             if( result.status==200 ){
                                 try{
                                     var pi = $.parseJSON(result.responseText).pi;
 
-                                    uploadGroupImage(file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
+                                    uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
                                         body.ml.push({
                                             "c": data.fi,
                                             "p": pi,
@@ -5768,13 +5935,17 @@ $(function(){
                         });
                     }else{
                         var pi = "0";
-                        uploadGroupImage(file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
-                            body.ml.push({
-                                "c": data.fi,
-                                "p": pi,
-                                "tp": 6
-                            });
-                            replyApi( this_event, this_gi, this_ti, this_ei, body );
+                        uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
+                            try{
+                                body.ml.push({
+                                    "c": data.fi,
+                                    "p": pi,
+                                    "tp": 6
+                                });
+                                replyApi( this_event, this_gi, this_ti, this_ei, body );
+                            } catch(e){
+                                cns.debug("[!] replySend:"+e.message);
+                            }
                         });
                     }
                 }
@@ -6483,9 +6654,11 @@ $(function(){
                 $(".alert-area").hide();
             }
 
-            $(".user-main-toggle").hide();
+            //不隱藏header
+            $(".user-main-toggle:not(.gm-header)").hide();
             $(".gm-user-main-area").show();
             $(".st-feedbox-area").hide();
+            $(".sm-small-area.active").removeClass("active");
 
             setTimeout(function(){
                 //滾動至最上
@@ -6619,8 +6792,15 @@ $(function(){
                     var data_obj = $.parseJSON(data.responseText);
                     try{
                         if( data_obj.el[0].meta.del== true ){
-                            popupShowAdjust($.i18n.getString("FEED_EVENT_DELETED"),"","COMMON_OK","");
-                            $("#page-timeline-detail .page-back").trigger("click");
+                            setTimeout( function(){
+                                popupShowAdjust(
+                                    $.i18n.getString("FEED_EVENT_DELETED"),
+                                    "",
+                                    "COMMON_OK",
+                                    "",[function(){
+                                        $("#page-timeline-detail .page-back").trigger("click");
+                                    },null]);
+                            },100);
                         } else timelineBlockMake(this_event,[data_obj.el[0]],false,true);
                     } catch(e){
                         cns.debug(e);

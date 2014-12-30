@@ -217,6 +217,7 @@
 	"CHAT_LEAVE_CONFIRM" : "Are you sure to leave this chat room?",
 	"CHAT_SOMEONE_LEAVE" : "%@ left chat room.",
 	"CHAT_SOMEONE_JOIN" : "%@ joined chat room.",
+	"CHAT_NO_CHATROOM" : "No chatroom now. Create one then start chat!",
 	
 	"NOTICES_TITLE" :	"New Notices",
 	"NOTICES_POST" :	"Publish",

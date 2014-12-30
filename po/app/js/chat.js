@@ -36,8 +36,13 @@ var isGettingPermission = false;
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
 $(document).ready(function(){
-	window.resizeTo( Math.min(450,$(window).width()), $(window).height() );
-	window.moveTo( window.opener.screenX+20, window.opener.screenY+20 );
+	if( window.opener ){
+		window.resizeTo( Math.min(450,$(window.opener).width()), window.opener.outerHeight );
+	} else {
+		window.resizeTo( 450, 800 );
+	}
+	
+	// window.moveTo( window.opener.screenX+20, window.opener.screenY+20 );
 
 	$.changePage("#page-chat");
 	
@@ -1104,7 +1109,7 @@ function sendImage( dom ){
 		
 		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
 
-		uploadGroupImage(file,ti_chat, 0, ori_arr,tmb_arr, pi, function(data){
+		uploadGroupImage(gi,file,ti_chat, 0, ori_arr,tmb_arr, pi, function(data){
 			if( data ){
 				//delete old data
 			    g_idb_chat_msgs.remove(tmpData.ei);

@@ -25,6 +25,22 @@
     /*padding-top: 50px;*/
 }
 
+.subpage-chatList .coachmake{
+	display: none;
+    background:#d0d0d0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+.subpage-chatList .coachmake img{
+	width: 200px;
+}
+.subpage-chatList .coachmake .cm-content{
+	text-align: center;
+	margin-top: 100px;
+}
+.subpage-chatList .coachmake .cm-content div {
+}
 .subpage-chatList-row {
     border-width: 1px 0px 1px 0px;
 	border-color: #d0d0d0;
