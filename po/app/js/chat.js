@@ -1158,6 +1158,9 @@ function sendChat (){
 	var text = inputDom[0].innerText;
 	inputDom.html("");
 	if (text.length<=0 ) return;
+	updateChatContentPosition();
+
+	// updateChatContentPosition();
 
 	var msg = text.replace(/<br>/g,"\n");
 	// inputDom.val("").trigger('autosize.resize');

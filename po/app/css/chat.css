@@ -447,7 +447,7 @@ body {
 .chat-msg-bubble-right .msg-map .text, .chat-msg-bubble-right a:link, .chat-msg-bubble-right a:visited{
 	color: #fff283;
 }
-.chat-msg-bubble-left.active, .chat-msg-bubble-right.active{
+/*.chat-msg-bubble-left.active, .chat-msg-bubble-right.active{
 	background-color: rgb(246,63,12);
 	border-color: transparent rgb(246,63,12);
 	color: white;
@@ -455,11 +455,11 @@ body {
 .chat-msg-bubble-left.active::selection, .chat-msg-bubble-right.active::selection{
 	background-color: transparent;
 	color: rgb(255, 254, 141);
-}
-.chat-msg-bubble-left.active:after, .chat-msg-bubble-right.active:after
+}*/
+/*.chat-msg-bubble-left.active:after, .chat-msg-bubble-right.active:after
 {
 	border-color: transparent rgb(246,63,12);
-}
+}*/
 /* ------ end chat -------------*/
  
 /* 

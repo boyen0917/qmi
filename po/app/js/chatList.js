@@ -113,7 +113,7 @@ function showChatList(){
 
 	if( Object.keys(chatList).length<=1 ){
 		targetDiv.hide();
-		$(".subpage-chatList .coachmake").show();
+		$(".subpage-chatList .coachmake").fadeIn();
 		return;
 	}
 	$(".subpage-chatList .rows").html("");
@@ -632,6 +632,8 @@ function requestNewChatRoomApi(giTmp, cnTmp, arr, callback){
     				//還沒有聊過天的話server聊天室列表不會有這個聊天室
     				var userData = $.lStorage( ui );
 				    g_group = userData[giTmp];
+				    if( null==g_group ) return;
+					var me = g_group.gu;
 				    if( null==g_group["chatAll"][result.ci] ){
 				    	g_group["chatAll"][result.ci] = {
 				    		ci: result.ci,
