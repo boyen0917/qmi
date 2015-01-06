@@ -584,7 +584,7 @@ $(function(){
 	    return text;
 	}
 
-	Date.prototype.toFormatString = function(){
+	Date.prototype.toFormatString = function(isShowTime){
 		var now = new Date();
 		var diff = (now.getTime()-this.getTime())/1000;
 		var language = window.navigator.userLanguage || window.navigator.language;
@@ -602,18 +602,25 @@ $(function(){
 				var options = {hour: "2-digit", minute: "2-digit"};
 				return $.i18n.getString("COMMON_YESTERDAY")+" "+this.toLocaleTimeString(language, options);
 			} else {	//within a year
-				var options = {
-				    month: "numeric",
-				    day: "numeric", hour: "2-digit", minute: "2-digit"
-				};
-				return this.toLocaleTimeString(language, options);
+				if( isShowTime ){
+					var options={
+					    month: "numeric",
+					    day: "numeric", hour: "2-digit", minute: "2-digit"
+					};
+					return this.toLocaleTimeString(language, options);
+				} else {
+					return this.toLocaleDateString(language);
+				}
 			}
 		}
-		var options = {
-		    year: "numeric", month: "numeric",
-		    day: "numeric", hour: "2-digit", minute: "2-digit"
-		};
-		return this.toLocaleTimeString(language, options);
+		if( isShowTime ){
+			var options = {
+			    year: "numeric", month: "numeric",
+			    day: "numeric", hour: "2-digit", minute: "2-digit"
+			};
+			return this.toLocaleTimeString(language, options);
+		}
+		return this.toLocaleDateString(language);
 	}
 
 	textSomeonesHtmlFormat = function(name){

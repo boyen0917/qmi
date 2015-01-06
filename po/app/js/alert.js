@@ -48,18 +48,25 @@ initAlertDB = function(){
 showNewAlertIcon = function( cnt ){
 	if( cnt != lastCnt ){
 
-		//nodeJS用, show程式小icon上面的數字
-		try{
-			require('nw.gui').Window.get().setBadgeLabel( cnt.toString() );
-		}catch(e){
-			// cns.debug(e);	//必加, 一般瀏覽器require not defined
-		}
-
 		lastCnt = cnt;
+
 		//關閉的話只顯示new icon
+		//若鈴鐺已開啟, 程式icon不更新數量, 並直接通知server已讀, 並卷回最上面
 		if( !$(".alert-area").is(":visible") ){
 			$(".navi-alert").addClass("new");
+
+			//nodeJS用, show程式小icon上面的數字
+			try{
+				require('nw.gui').Window.get().setBadgeLabel( cnt.toString() );
+			}catch(e){
+				// cns.debug(e);	//必加, 一般瀏覽器require not defined
+			}
 		} else { //開啟的話直接更新
+			$(".alert-area").scrollTop(0);
+			if( typeof(updatePollingCnts)!= 'undefined' ){
+				lastCnt = 0;
+				updatePollingCnts( $("<div></div>"), "G3" );
+			}
 			updateAlert();
 		}
 	}
@@ -305,8 +312,13 @@ showAlertContent = function(data){
 				var this_gi = $(this).data("gi");
 				var this_ei = $(this).data("ei");
 				
-				if(Object.keys($.lStorage(ui)[this_gi].guAll).length == 0){
-					cns.debug("no guall",$.lStorage(ui)[this_gi]);
+				if( null==this_gi || null==this_ei ) return;
+
+				var group = $.lStorage(ui)[this_gi];
+				if( null==group ) return;
+
+				if( null==group.guAll || Object.keys(group.guAll).length == 0){
+					cns.debug("no guall",this_gi);
 					var data_arr = ["eventDetail",$(this)];
 		        	setGroupAllUser(data_arr,this_gi);
 		        	return false;

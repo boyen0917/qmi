@@ -188,6 +188,8 @@
 	"CHAT_SOMEONE_LEAVE" : "%@ 離開聊天室",
 	"CHAT_SOMEONE_JOIN" : "%@ 加入聊天室",
 	"CHAT_NO_CHATROOM" : "目前沒有任何聊天室，您可立即建立！",
+	"CHAT_VOIP_GET_CALL" : "%@在Qmi上撥電話給你",
+	"CHAT_VOIP_MAKE_CALL" : "你撥了一通電話",
 
 	"NOTICES_TITLE"						: "新通知",
 	"NOTICES_POST"						: "發佈",
@@ -202,6 +204,8 @@
 	"LEFT_CREATE_GROUP" : "建立團體",
 	"LEFT_INVITATION" : "團體邀請",
 	"LEFT_SYSTEM_SETTING" : "系統設定",
+	"LEFT_FEED_GROUP" : "團體動態",
+	"LEFT_FEED_MEMBER" : "成員動態",
 
 	"SETTING_LOGOUT" : "登出",
 	"SETTING_DO_LOGOUT" : "確定要登出嗎?",

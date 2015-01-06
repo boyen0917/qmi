@@ -1058,73 +1058,61 @@ $(function(){
             userData[this_gi].tab = [
                 {
                     "tp": 0,
-                    "nm": "團體動態",
-                    "sw": true
-                },
-                {
-                    "tp": 1,
-                    "nm": "成員動態",
-                    "sw": true
-                },
-                {
-                    "tp": 2,
-                    "nm": "動態消息",
                     "sw": false
                 },
                 {
+                    "tp": 1,
+                    "sw": false
+                },
+                {
+                    "tp": 2,
+                    "sw": true
+                },
+                {
                     "tp": 3,
-                    "nm": "聊天室",
                     "sw": true
                 },
                 {
                     "tp": 4,
-                    "nm": "行事曆",
                     "sw": false
                 },
                 {
                     "tp": 5,
-                    "nm": "相簿",
                     "sw": false
                 },
                 {
                     "tp": 6,
-                    "nm": "成員列表",
                     "sw": true
                 },
                 {
                     "tp": 7,
-                    "nm": "團體設定",
                     "sw": true
                 }
             ];
         }
+
         if( groupData.pen ){
             userData[this_gi].pen = groupData.pen;
         } else {
             userData[this_gi].pen = [
                 {
                     "tp": 0,
-                    "nm": "公告",
                     "sw": true
                 },
                 {
                     "tp": 1,
-                    "nm": "通報",
                     "sw": true
                 },
                 {
                     "tp": 2,
-                    "nm": "工作",
                     "sw": true
                 },
                 {
                     "tp": 3,
-                    "nm": "投票",
                     "sw": true
                 },
                 {
                     "tp": 4,
-                    "nm": "成員定位",
                     "sw": true
                 }
             ];
@@ -1182,7 +1170,12 @@ $(function(){
                         menu.append( dom );
                         dom.show();
                         //set name
-                        dom.find(".sm-small-area-r").html( obj.nm );
+                        var nameDom = dom.find(".sm-small-area-r");
+                        if( obj.nm && obj.nm.length>0 ){
+                            nameDom.html( obj.nm );
+                        } else {
+                            nameDom.html( $.i18n.getString(nameDom.attr("data-textid")) );
+                        }
                     }
                     // else {
                     //     dom.hide();
@@ -1231,7 +1224,12 @@ $(function(){
                         menu.append( dom );
                         dom.addClass("active");
                         //set name
-                        dom.find("div").html( obj.nm );
+                        var nameDom = dom.find("div");
+                        if( obj.nm && obj.nm.length>0 ){
+                            nameDom.html( obj.nm );
+                        } else {
+                            nameDom.html( $.i18n.getString(nameDom.attr("data-textid")) );
+                        }
                     }
                     // else {
                     //     dom.hide();
@@ -4642,6 +4640,7 @@ $(function(){
 
         //製作timeline
         $.each(timeline_list,function(i,val){
+            if(null==val) return;
             var content,box_content,youtube_code,prelink_pic,prelink_title,prelink_desc;
             //detail 不需要
             if(!detail){
@@ -4922,6 +4921,8 @@ $(function(){
 
 	eventStatusWrite = function(this_event,this_es_obj){
         var event_status = this_event.data("event-val");
+        if( null== event_status ) return;
+
         var this_ei = this_event.data("event-id");
         var this_gi = this_ei.split("_")[0];
 

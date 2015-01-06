@@ -152,22 +152,22 @@ function showChatList(){
 
 				room["uiName"]=chatRoomName;
 				$(this).find(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
-				var table = $("<table class='subpage-chatList-row' data-rid='"+room.ci+"' style='width:100%'></table>");
+				var table = $("<div class='subpage-chatList-row' data-rid='"+room.ci+"' style='width:100%'></div>");
 				$(table).data("time", 0);
 				
-				var row = $("<tr></tr>");
+				var row = $("<div class='tr'></div>");
 				table.append(row);
-				var td = $("<td></td>");
+				var td = $("<div class='td'></div>");
 				td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
 				row.append(td);
 
-				td = $("<td data-id='"+room.ci+"'></td>");
+				td = $("<div class='td' data-id='"+room.ci+"'></div>");
 				td.append("<div class='name'>" + chatRoomName.replaceOriEmojiCode() + "</div>");
 				var lastMsg = $("<div class='msg'></div>");
 				td.append(lastMsg);
 				row.append(td);
 
-				td = $("<td align='right'></td>");
+				td = $("<div class='td' align='right'></div>");
 				var lastTime = $("<div class='time'></div>");
 				td.append(lastTime);
 				td.append("<div class='cnt'></div>");
@@ -187,8 +187,8 @@ function showChatList(){
 	}
 
 
-	$(".subpage-chatList-row td:nth-child(2)").off("click");
-	$(".subpage-chatList-row td:nth-child(2)").on("click", function(){
+	$(".subpage-chatList-row .td:nth-child(2)").off("click");
+	$(".subpage-chatList-row .td:nth-child(2)").on("click", function(){
 		// console.debug( $(this).data("id") );
 		openChatWindow( gi, $(this).data("id") );
 	});
@@ -323,8 +323,7 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
                 var groupData = $.parseJSON(data.responseText);
                 setGroupAllUser( giTmp, groupData );
 
-
-
+                var isReady = false;
                 //按照邏輯 取得群組名單之後 就來設定群組資訊
                 setBranchList(giTmp, groupData, function(){
 					if( isReady ){
@@ -357,6 +356,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 	if( null==mem ) return;
 	var name = mem.nk;
 	if( null==data.ml || data.ml.length<=0 ) return;
+	var isMe = (data.meta.gu==groupData.gu);
 
 	switch( data.ml[0].tp ){
 		case 5: //sticker
@@ -384,15 +384,13 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 				text = $.i18n.getString("CHAT_SOMEONE_JOIN", actMemName );
 			}
 			break;
-		//---------- TODO ------------
-		// case 23: //sip?void
-		// 	if(1==data.ml[0].a){
-		// 		text = $.i18n.getString("CHAT_SOMEONE_LEAVE", name );
-		// 	} else {
-		// 		text = $.i18n.getString("CHAT_SOMEONE_JOIN", name );
-		// 	}
-		// 	break;
-		//---------- TODO ------------
+		case 23: //sip?void
+			if(isMe){
+				text = $.i18n.getString("CHAT_VOIP_MAKE_CALL" );
+			} else {
+				text = $.i18n.getString("CHAT_VOIP_GET_CALL", name );
+			}
+			break;
 		default:
 			try{
 				text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c:"";
@@ -410,7 +408,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 
 			if(msgDom)	msgDom.html( text.replaceOriEmojiCode() );
 			// cns.debug( new Date(data.meta.ct).toFormatString() );
-			if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString() );
+			if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString(false) );
 			if( false==isRoomOpen ){
 				var cntDom = table.find(".cnt");
 				if(cntDom){

@@ -126,6 +126,8 @@ $(document).ready(function(){
 });
 
 moveRight = function( isMove ){
+	if( null==list ) return;
+	
 	var picArea = $(".picArea");
 	// cns.debug("------- R ---------");
 	scrollPercent = 0;
@@ -141,6 +143,7 @@ moveRight = function( isMove ){
 	changeImgViewSize(0);
 }
 moveLeft = function( isMove ){
+	if( null==list ) return;
 	var picArea = $(".picArea");
 	// cns.debug("------- L ---------");
 	scrollPercent = 0;
@@ -206,7 +209,7 @@ changeImgViewSize = function(size){
 	var index = picArea.data("index");
 	if( null==index || index<0 ) index = 0;
 	cns.debug( ".img:nth-child("+ (index+1) +")" );
-	var imgView = picArea.find(".img:nth-child("+ (index+1) +")");
+	var imgView = picArea.find(".img:eq("+ index +")");
 	picArea.data("size",size);
 
 	cns.debug(size);
