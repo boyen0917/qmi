@@ -6138,7 +6138,6 @@ $(function(){
 	    		}
 
 	    		if(val.A5 > 0){
-
                     sort_arr.push([val.gi,val.A5]);
 	    			$(".sm-group-area[data-gi=" + val.gi + "]").find(".sm-count").html(countsFormat(val.A5)).show();
 	    		}
