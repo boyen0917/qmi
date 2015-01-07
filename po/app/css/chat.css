@@ -30,7 +30,7 @@ body {
     background-attachment: fixed;
     background-position: center; 
 	background-size:cover;
-	font-family: "reg", "微軟正黑體","Microsoft JhengHei",arial,sans-serif;
+	font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC", "reg", arial,sans-serif;
     /*-webkit-font-smoothing: antialiased;*/
     font-weight: normal;
     /*text-shadow: 0 0 0 #fff;*/
@@ -72,7 +72,7 @@ body {
 .ui-header .title{
 	font-size: 22px;
 	margin: 5px 10px 4px 10px;
-	height: 27px;
+	height: 30px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -257,6 +257,15 @@ body {
 .chat-msg-right, .chat-msg-left, .sys-msg{
 	clear: both;
 	margin-bottom: 20px;
+}
+.chat-msg-right, .chat-msg-left, .sys-msg > div{
+	width: 100%;
+    display: inline-block;
+    vertical-align: -webkit-baseline-middle;
+    padding: 5px 0;
+}
+.sys-msg > div{
+    max-width: -webkit-calc( 100% - 58px);
 }
 .chat-msg-right table, .chat-msg-left table, .sys-msg table{
 	display: inline-block;
@@ -447,7 +456,7 @@ body {
 .chat-msg-bubble-right .msg-map .text, .chat-msg-bubble-right a:link, .chat-msg-bubble-right a:visited{
 	color: #fff283;
 }
-.chat-msg-bubble-left.active, .chat-msg-bubble-right.active{
+/*.chat-msg-bubble-left.active, .chat-msg-bubble-right.active{
 	background-color: rgb(246,63,12);
 	border-color: transparent rgb(246,63,12);
 	color: white;
@@ -455,11 +464,11 @@ body {
 .chat-msg-bubble-left.active::selection, .chat-msg-bubble-right.active::selection{
 	background-color: transparent;
 	color: rgb(255, 254, 141);
-}
-.chat-msg-bubble-left.active:after, .chat-msg-bubble-right.active:after
+}*/
+/*.chat-msg-bubble-left.active:after, .chat-msg-bubble-right.active:after
 {
 	border-color: transparent rgb(246,63,12);
-}
+}*/
 /* ------ end chat -------------*/
  
 /* 

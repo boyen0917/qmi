@@ -956,6 +956,22 @@ function showMsg (object, bIsFront, bIsTmpSend){
 				newParent.append( child );
 			}
 			break;
+		case 23: //voip
+			if(isMe){
+				msgDiv.parent().removeClass("chat-msg-right").addClass("sys-msg");
+				msgDiv.html( "You've made a VOIP call." );
+			} else {
+				var newParent = msgDiv.parent().parent().parent();
+				newParent.find(".chat-msg-left").remove();
+				var child = msgDiv.parent().detach();
+				child.addClass("sys-msg");
+				child.find(".name").remove();
+				child.append( child.find(".msg-content").detach() );
+				newParent.append( child );
+
+				msgDiv.html( "You've missed a VOIP call, download Qmi on phone to receive it." );
+			}
+			break;
 		default: //text or other msg
 			if(isMe){
 				msgDiv.addClass('chat-msg-bubble-right');
@@ -1158,6 +1174,9 @@ function sendChat (){
 	var text = inputDom[0].innerText;
 	inputDom.html("");
 	if (text.length<=0 ) return;
+	updateChatContentPosition();
+
+	// updateChatContentPosition();
 
 	var msg = text.replace(/<br>/g,"\n");
 	// inputDom.val("").trigger('autosize.resize');

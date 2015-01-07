@@ -90,6 +90,8 @@
 	"LEFT_CREATE_GROUP" :	"Create Group",
 	"LEFT_INVITATION" :	"Invitation",
 	"LEFT_SYSTEM_SETTING" :	"System Setting",
+	"LEFT_FEED_GROUP" : "Group Feed",
+	"LEFT_FEED_MEMBER" : "Member Feed",
 
 	"SETTING_LOGOUT" : "Logout",
 	"SETTING_DO_LOGOUT" : "Are you sure want to logout?",
@@ -218,6 +220,8 @@
 	"CHAT_SOMEONE_LEAVE" : "%@ left chat room.",
 	"CHAT_SOMEONE_JOIN" : "%@ joined chat room.",
 	"CHAT_NO_CHATROOM" : "No chatroom now. Create one then start chat!",
+	"CHAT_VOIP_GET_CALL" : "%@ have called you from Qmi.",
+	"CHAT_VOIP_MAKE_CALL" : "You've made a call from Qmi.",
 	
 	"NOTICES_TITLE" :	"New Notices",
 	"NOTICES_POST" :	"Publish",

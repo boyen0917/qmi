@@ -59,14 +59,20 @@
 	width: 110%;
 }
 
-.subpage-chatList-row td:nth-child(2){
-    width:80%;
+.subpage-chatList-row .td{
+    display: inline-block;
+    vertical-align: -webkit-baseline-middle;
 }
-.subpage-chatList-row td:nth-child(3){
-    width:17%;
-    padding-right: 10px;
+.subpage-chatList-row .td:nth-child(1){
+	width: 82px;
 }
-.subpage-chatList-row td:nth-child(4){
+.subpage-chatList-row .td:nth-child(2){
+    width:-webkit-calc( 100% - 159px );
+}
+.subpage-chatList-row .td:nth-child(3){
+    width:69px;
+}
+.subpage-chatList-row .td:nth-child(4){
     display: none;
     background: red;
     color: white;
@@ -75,7 +81,6 @@
 }
 
 .subpage-chatList-row .name {
-	margin: 0px 0 10px;
 	max-width: 220px;
 	height: 26px;
 	color: #323537;
@@ -84,14 +89,22 @@
 	text-overflow: ellipsis;
 	overflow: hidden;
 	line-height: 26px;
+	margin: 0px 0 5px;
 }
 
 .subpage-chatList-row .msg {
 	color: #535353;
-	width: 70%;
+	width: 95%;
 	float: left;
-	display: block;
+	display: -webkit-box;
 	font-size: 12px;
+	overflow: hidden;
+	max-height: 39px;
+	text-overflow: ellipsis;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	word-wrap: break-word;
+	min-height: 32px;
 }
 .subpage-chatList-row .time {
 	color: #444648;
