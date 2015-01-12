@@ -10,22 +10,34 @@ var isCheckPosi = false;
 var checkTime = 0;
 var nextScrollTime = 0;
 var bIsScrollPage = true;
+var startIndex = 0;
+var title;
 
 $(document).ready(function(){
 	var picArea = $(".picArea");
 	//trigger loading
 	$(".dataDom").off("click").click( function(){
 		picArea.html("");
-		picArea.data("index", 0);
+		picArea.data("index", startIndex);
 		picArea.data("cnt", list.length);
 		picArea.css("width",(list.length*100)+"%");
-		picArea.css("left", "0%");
+		picArea.css("left", (-100*startIndex)+"%");
+
+		if( null != title ){
+			$(".title").html(title).show();
+		} else {
+			$(".title").hide();
+		}
+		if( startIndex >list.length && null!=list[startIndex] ){
+			$(".subTitle").html(list[startIndex].text);
+		}
 
 		var width = 100.0/list.length;
 		for( var i=0; i<list.length; i++ ){
 			var img = $("<div class='img'><img style='height: 100%;'/></div>");
 			img.css("width",width+"%");
 			img.data("oriW",width);
+			img.data("text",list[i].text);
 			img.find("img").load( function() {
 				$(this).data("w",this.naturalWidth);
 				$(this).data("h",this.naturalHeight);
@@ -41,14 +53,14 @@ $(document).ready(function(){
 
 		if( list.length<=1 ){
 			$(".cnt").hide();
-			$(".cnt .current").html( 1 );
-			$(".cnt .all").html( list.length );
+			// $(".cnt .current").html( 1 );
+			// $(".cnt .all").html( list.length );
 
 			$(".rBtn").hide();
 			$(".lBtn").hide();
 		} else {
 			$(".cnt").show();
-			$(".cnt .current").html( 1 );
+			$(".cnt .current").html( startIndex+1 );
 			$(".cnt .all").html( list.length );
 
 			$(".rBtn").show();
@@ -140,6 +152,7 @@ moveRight = function( isMove ){
 	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
 	picArea.data("index", index);
 	$(".cnt .current").html( index+1 );
+	$(".subTitle").html(list[index].text);
 	changeImgViewSize(0);
 }
 moveLeft = function( isMove ){
@@ -157,6 +170,7 @@ moveLeft = function( isMove ){
 	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
 	picArea.data("index", index);
 	$(".cnt .current").html( index+1 );
+	$(".subTitle").html(list[index].text);
 	changeImgViewSize(0);
 }
 

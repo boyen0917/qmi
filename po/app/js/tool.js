@@ -663,7 +663,8 @@ $(function(){
 		return "sticker/" + id.split("_")[1] + "/" + id + ".png";
 	}
 
-	showGallery = function( this_gi, this_ti, gallery_arr ){
+	showGallery = function( this_gi, this_ti, gallery_arr, startIndex, title ){
+		startIndex = startIndex || 0;
         var gallery = $(document).data("gallery");
         if( null != gallery && false==gallery.closed){
             gallery.focus();
@@ -673,6 +674,8 @@ $(function(){
             gallery.this_gi = this_gi;
             gallery.this_ti = this_ti;
             gallery.list = gallery_arr;
+            gallery.startIndex = startIndex;
+            gallery.title = title;
             var dataDom = $(gallery.document).find(".dataDom");
             dataDom.click();
         } else {
@@ -686,11 +689,66 @@ $(function(){
                     gallery.this_gi = this_gi;
                     gallery.this_ti = this_ti;
                     gallery.list = gallery_arr;
+                    gallery.startIndex = startIndex;
+                    gallery.title = title;
                     var dataDom = $(gallery.document).find(".dataDom");
                     dataDom.click();
                 },500);
             });
         }
+    }
+
+	showAlbumPage = function( this_gi, this_ti, this_gai, name ){
+		// if( window.parent ){
+		// 	$(window.parent.document).
+		// }
+        var gallery = $(document).data("gallery");
+        if( null != gallery && false==gallery.closed){
+            gallery.focus();
+            gallery.ui = ui;
+            gallery.at = at;
+            gallery.lang = lang;
+            gallery.this_gi = this_gi;
+            gallery.this_ti = this_ti;
+            gallery.this_gai = this_gai;
+            gallery.name = name;
+            var dataDom = $(gallery.document).find(".dataDom");
+            dataDom.click();
+        } else {
+            gallery = window.open("general_album.html", "", "width=480, height=730");
+            $(document).data("gallery", gallery);
+            $(gallery.document).ready(function(){
+                setTimeout(function(){
+                    gallery.ui = ui;
+                    gallery.at = at;
+                    gallery.lang = lang;
+                    gallery.this_gi = this_gi;
+                    gallery.this_ti = this_ti;
+                    gallery.this_gai = this_gai;
+            		gallery.name = name;
+                    var dataDom = $(gallery.document).find(".dataDom");
+                    dataDom.click();
+                },500);
+            });
+        }
+    }
+
+    getAlbum = function( this_gi, this_gai, ajax_load,err_show ){
+    	try{
+			var err_show = err_show || false;
+	    	//GET /groups/{gi}/galleries/{gai}/images
+	    	var api_name = "groups/" + this_gi + "/galleries/" + this_gai + "/images";
+	        var headers = {
+	            "ui":ui,
+	            "at":at,
+	            "li":lang,
+	        };
+	        var method = "get";
+	        return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
+	    } catch(e){
+	    	errorReport(e);
+	    	return null;
+	    }
     }
 
 	getGroupData = function(this_gi,ajax_load,err_show){
