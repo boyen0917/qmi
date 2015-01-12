@@ -699,38 +699,17 @@ $(function(){
     }
 
 	showAlbumPage = function( this_gi, this_ti, this_gai, name ){
-		// if( window.parent ){
-		// 	$(window.parent.document).
-		// }
-        var gallery = $(document).data("gallery");
-        if( null != gallery && false==gallery.closed){
+		if( null== window ) return;
+		gallery = window.opener;
+		if( gallery && false==gallery.closed ){
+			var dataDom = $(gallery.document).find(".al-single .dataDom");
             gallery.focus();
-            gallery.ui = ui;
-            gallery.at = at;
-            gallery.lang = lang;
-            gallery.this_gi = this_gi;
-            gallery.this_ti = this_ti;
-            gallery.this_gai = this_gai;
-            gallery.name = name;
-            var dataDom = $(gallery.document).find(".dataDom");
-            dataDom.click();
-        } else {
-            gallery = window.open("general_album.html", "", "width=480, height=730");
-            $(document).data("gallery", gallery);
-            $(gallery.document).ready(function(){
-                setTimeout(function(){
-                    gallery.ui = ui;
-                    gallery.at = at;
-                    gallery.lang = lang;
-                    gallery.this_gi = this_gi;
-                    gallery.this_ti = this_ti;
-                    gallery.this_gai = this_gai;
-            		gallery.name = name;
-                    var dataDom = $(gallery.document).find(".dataDom");
-                    dataDom.click();
-                },500);
-            });
-        }
+	    	dataDom.attr("data-gi",this_gi);
+	    	dataDom.attr("data-ti",this_ti);
+	    	dataDom.attr("data-gai",this_gai);
+	    	dataDom.attr("data-name",name);
+	        dataDom.click();
+        } 
     }
 
     getAlbum = function( this_gi, this_gai, ajax_load,err_show ){

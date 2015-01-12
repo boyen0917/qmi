@@ -12,7 +12,8 @@
 }
 
 .subpage-album .back{
-	display: inline-block;
+	/*display: inline-block;*/
+	display: none;
 	margin-right: 5px;
 	cursor: pointer;
 }

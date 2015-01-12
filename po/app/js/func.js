@@ -1213,10 +1213,10 @@ $(function(){
         }
 
         //暫時先將相簿tab show出來
-        dom = menu.find(".sm-small-area[data-sm-act=album]");
-        dom.detach();
-        menu.append( dom );
-        dom.show();
+        // dom = menu.find(".sm-small-area[data-sm-act=album]");
+        // dom.detach();
+        // menu.append( dom );
+        // dom.show();
 
         //set pen
         try{
