@@ -1050,10 +1050,13 @@ $(function(){
     }
 
 	setTabList = function(this_gi, groupData){
+        var isDataMissing = false;
+        if( null==groupData || null==groupData.set ) isDataMissing = true;
+
         //save data
         var userData = $.lStorage(ui);
-        if( groupData.tab ){
-            userData[this_gi].tab = groupData.tab;
+        if( !isDataMissing && groupData.set.tab ){
+            userData[this_gi].tab = groupData.set.tab;
         } else {
             userData[this_gi].tab = [
                 {
@@ -1091,8 +1094,8 @@ $(function(){
             ];
         }
 
-        if( groupData.pen ){
-            userData[this_gi].pen = groupData.pen;
+        if( !isDataMissing && groupData.set.pen ){
+            userData[this_gi].pen = groupData.set.pen;
         } else {
             userData[this_gi].pen = [
                 {
