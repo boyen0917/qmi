@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="css/chatList.css?ver=0.27" />
         <link rel="stylesheet" href="css/alert.css?ver=0.27" />
         <link rel="stylesheet" href="css/contact.css?ver=0.27" />
+        <link rel="stylesheet" href="css/general_album.css?ver=0.27" />
         
         <script src="js/ga.js"></script>
 
@@ -25,6 +26,7 @@
         <script src="js/idb/idb.js"></script>
         <script src="js/idb/idbstore.js"></script>
         
+        <script type="text/javascript" src="js/general_album.js?ver=0.27"></script>
         <script type="text/javascript" src="js/contact.js?ver=0.27"></script>
         <script type="text/javascript" src="js/chatDB.js?ver=0.27"></script>
         <script type="text/javascript" src="js/func.js?ver=0.27"></script>
@@ -161,6 +163,10 @@
                             </div>
                             <div data-sm-act="feed-post" class="sm-small-area">
                                <div class="sm-small-area-r" data-textid="LEFT_FEED_MEMBER"></div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
+                            <div data-sm-act="album" class="sm-small-area">
+                               <div class="sm-small-area-r" data-textid="COMMON_ALBUM"></div>
                                <!-- <div class="sm-count"></div> -->
                             </div>
                         </div>
@@ -402,6 +408,54 @@
                             </div>
                         </div>
                         <div class="update" style="display:none;"></div>
+                    </div>
+
+                <!------------------------------ 相簿 ------------------------------>
+                    <div class="subpage-album">
+                        <div class="al-all" style="display:none;">
+                            <header>
+                                <div class="title" data-textid="FEED_ALL"></div>
+                            </header>
+                            <main>
+                                <div class="container">
+                                    <div class="category">
+                                        <div class="grid" data-type="chatroom">
+                                            <div class="img">
+                                                <img src="images/icon/icon_chatroom_more_albums_normal.png"/>
+                                            </div>
+                                            <div class="text" data-textid="CHAT_TITLE"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </main>
+                        </div>
+
+                        <div class="al-category" style="display:none;">
+                            <header>
+                                <div class="back">
+                                    <img src="images/icon/icon_arrow_top.png"/>
+                                </div>
+                                <div class="title"></div>
+                            </header>
+                            <main>
+                                <div class="container"></div>
+                            </main>
+                        </div>
+
+                        <div class="al-single" style="display:none;">
+                            <header>
+                                <div class="back">
+                                    <img src="images/icon/icon_arrow_top.png"/>
+                                </div>
+                                <div class="title">title</div>
+                                <div class="hd-photoCnt">0</div>
+                            </header>
+                            <main>
+                            </main>
+                            <div class="loading"></div>
+                            <div class="dataDom" style="display:none;"></div>
+                        </div>
+                    </div>
                     </div>
                </div> 
             </div>

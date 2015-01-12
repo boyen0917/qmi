@@ -337,6 +337,7 @@ $(function(){
 	        	$(".subpage-contact").hide();
 	        	$(".subpage-chatList").hide();
 	        	$(".subpage-timeline").show();
+                $(".subpage-album").hide();
 	        	$("#page-group-main").find(".gm-header .page-title").html(page_title);
 
                 //顯示新增貼文按鈕, 藏新增聊天室按鈕
@@ -353,6 +354,7 @@ $(function(){
 	        	$(".subpage-contact").show();
 	            $(".subpage-timeline").hide();
 	        	$(".subpage-chatList").hide();
+                $(".subpage-album").hide();
 	            $( "#side-menu" ).panel( "close");
                 
                 //藏新增貼文按鈕, 新增聊天室按鈕
@@ -378,6 +380,7 @@ $(function(){
 	        	$(".subpage-contact").hide();
 	        	$(".subpage-timeline").hide();
 	        	$(".subpage-chatList").show();
+                $(".subpage-album").hide();
 	        	// $( "#side-menu" ).panel( "close");
 
                 page_title = $.i18n.getString("CHAT_TITLE");
@@ -421,6 +424,7 @@ $(function(){
                 $(".subpage-contact").hide();
                 $(".subpage-chatList").hide();
                 $(".subpage-timeline").show();
+                $(".subpage-album").hide();
                 $("#page-group-main").find(".gm-header .page-title").html(page_title);
 
                 //顯示新增貼文按鈕, 藏新增聊天室按鈕
@@ -454,6 +458,7 @@ $(function(){
                 $(".subpage-contact").hide();
                 $(".subpage-chatList").hide();
                 $(".subpage-timeline").show();
+                $(".subpage-album").hide();
                 $("#page-group-main").find(".gm-header .page-title").html(page_title);
 
                 //顯示新增貼文按鈕, 藏新增聊天室按鈕
@@ -465,6 +470,26 @@ $(function(){
                 if($.lStorage("_pollingData"))
                     pollingCountsWrite();
 
+              break;
+            case "album":
+                //-- switch sub pages --
+                $(".subpage-contact").hide();
+                $(".subpage-timeline").hide();
+                $(".subpage-chatList").hide();
+                $(".subpage-album").show();
+                // $( "#side-menu" ).panel( "close");
+
+                page_title = $.i18n.getString("COMMON_ALBUM");
+
+                initGallery();
+
+                //顯示新增聊天室按鈕, 藏新增貼文按鈕
+                $("#page-group-main").find(".gm-header .feed-compose").hide();
+                $("#page-group-main").find(".gm-header .chatList-add").hide();
+                $("#page-group-main").find(".gm-header .contact-add").hide();
+
+                //$.mobile.changePage("#page-chatroom");
+                //$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
               break;
 	    }
         setTimeout( timelineScrollTop, 1000 );
@@ -1189,6 +1214,12 @@ $(function(){
             errorReport(e);
             //cns.debug("[!] setTabList(set tab): " + e.message);
         }
+
+        //暫時先將相簿tab show出來
+        // dom = menu.find(".sm-small-area[data-sm-act=album]");
+        // dom.detach();
+        // menu.append( dom );
+        // dom.show();
 
         //set pen
         try{

@@ -1504,5 +1504,5 @@ function addMember(){
 }
 
 function showAlbum(){
-	cns.debug("showAlbum");
+	showAlbumPage( gi, ci, ci, g_cn);
 }
