@@ -228,7 +228,7 @@ changeImgViewSize = function(size){
 	var imgView = picArea.find(".img:eq("+ index +")");
 	picArea.data("size",size);
 
-	cns.debug(size);
+	// cns.debug(size);
 
 	var img = imgView.find("img");
 	

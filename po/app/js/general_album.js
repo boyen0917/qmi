@@ -187,19 +187,23 @@ function initSingleChatGallery( ci, cn ){
 
 					//load img
 					if( tp>0 ){
-						gridImg.find("img").data("index", list.length).load( function(){
-							gridImg.removeClass("loading");
-							var index = $(this).data("index");
-							if( index>=objList.fl.length ){
-								cns.debug("!");
-							}
-							list[index].s32 = $(this).data("s32");
-							if( null!=this_ti && this_ti==obj.fi ){
-								gridImg.trigger("click");
-							}
-						});
+						var imgDom = gridImg.find("img");
+						imgDom.data("index", list.length);
+						imgDom.attr("src",obj.th);
+						cns.debug(list.length, obj.th);
+						// imgDom.load( function(){
+						// 	$(this).parent().removeClass("loading");
+						// 	var index = $(this).data("index");
+						// 	if( index>=objList.fl.length ){
+						// 		cns.debug("!");
+						// 	}
+						// 	list[index].s32 = $(this).data("s32");
+						// 	if( null!=this_ti && this_ti==obj.fi ){
+						// 		$(this).parent().trigger("click");
+						// 	}
+						// });
 						list.push({s32:"", text:dateString});
-						getS3fileSP(obj.fi, obj.pi ,gridImg.find("img"), tp);
+						getS3fileSP(obj.fi, obj.pi ,imgDom, tp);
 					}
 					container.find(".ct-imgList").append(gridImg);
 
@@ -232,8 +236,12 @@ function getS3fileSP(fi, pi, target, tp){
                 case 6://圖片
                     //小圖
                     // target.css("background-image","url("+obj.s32+")");
-                    target.attr("src",obj.s3);
-                    target.data("s32",obj.s32);
+                    // target.data("s3",obj.s3);
+                    // target.data("s32",obj.s32);
+                    var index = target.data("index");
+                    if( index>=0 && index<list.length ){
+                    	list[index].s32 = obj.s32;
+                    }
                     break;
                 case 8://聲音
                     target.attr("src",obj.s3);
@@ -246,6 +254,8 @@ function getS3fileSP(fi, pi, target, tp){
 }
 
 minetypeToTypeID = function(mineTypeString){
+	if( null==mineTypeString ) return -1;
+	mineTypeString = mineTypeString.toLowerCase();
 	if( mineTypeString.indexOf("text")>=0 ) return 0;
 	if( mineTypeString.indexOf("image")>=0 ) return 6;
 	if( mineTypeString.indexOf("audio")>=0 ) return 8;

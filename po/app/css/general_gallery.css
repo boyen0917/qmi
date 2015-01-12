@@ -14,6 +14,7 @@ body{
 }
 
 header{
+	white-space: nowrap;
 	line-height: 30px;
 	margin-top: 13px;
 	width: 100%;
