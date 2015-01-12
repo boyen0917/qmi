@@ -81,6 +81,29 @@ function updateChatList( giTmp, extraCallBack ){
 									}
 								}
 							}
+
+							//init name
+							if( null==newRoom.cn ){
+								newRoom.cn = "";
+							} else if("1"==newRoom.tp){
+								try{
+									var split = newRoom.cn.split(",");
+									var me = currentGroup.gu;
+									for( var i=0; i<split.length; i++ ){
+										if( split[i]!= me ){
+											if( currentGroup.guAll.hasOwnProperty( split[i] ) ){
+												var mem = currentGroup.guAll[ split[i] ];
+												newRoom.cn = mem.nk;
+												break;
+											}
+										}
+									}
+								} catch(e){
+									errorReport(e);
+									newRoom.cn = "";
+								}
+							}
+
 							tmp[newRoom.ci] = newRoom;
 						});
 						currentGroup.chatAll = tmp;
@@ -318,31 +341,21 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
 	 當團體還沒點過時guAll為空內容
 	   ----- TODO ------ */
 	if( !groupData.guAll.hasOwnProperty(data.meta.gu) ){
-		getGroupData(giTmp,false).complete(function(data){
-			if(data.status == 200){
-                var groupData = $.parseJSON(data.responseText);
-                setGroupAllUser( giTmp, groupData );
+		setGroupAllUser( null, giTmp, function(){
+			updateChatList( giTmp, function(){
 
-                var isReady = false;
-                //按照邏輯 取得群組名單之後 就來設定群組資訊
-                setBranchList(giTmp, groupData, function(){
-					if( isReady ){
-						setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
-					}
-					isReady = true;
-				});
-				//update chatList
-				updateChatList( giTmp, function(){
-					if( isReady ){
-						setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
-					}
-					isReady = true;
-				});
-
-
-
-			}
-		}, null);
+	            userData = $.lStorage(ui);
+				groupData = userData[giTmp];
+				if( null==groupData || null==groupData.chatAll ) return;
+				if( !groupData.chatAll.hasOwnProperty(ciTmp) ) return;
+				room = groupData.chatAll[ciTmp];
+				if( null==room ){
+					cns.debug("null room, ci:", ciTmp);
+					return;
+				}
+				setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
+			});
+		});
 
 	} else {
 		setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
@@ -428,6 +441,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 	
 	if( groupData.gu!=mem.gu && isShowAlert ){
 		try{
+			if( null==room.cn ) room.cn = "";
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+room.cn.parseHtmlString()+")", text, function(){
 				cns.debug(ciTmp);
