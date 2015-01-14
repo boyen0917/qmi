@@ -55,7 +55,7 @@ $(function(){
 		    	//動態消息
 		    	//timelineListWrite();
 		    	setTimeout(function(){
-			    	var tmp = $(".sm-small-area:visible");
+			    	var tmp = $(".sm-small-area:not(.setting):visible");
 					if( tmp.length>0 ){
 						$(tmp[0]).addClass("active");
 						timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
@@ -1597,6 +1597,54 @@ $(function(){
 	//	this_box.find(".audio-progress div:nth-child(3)").html(secondsToTime(Math.floor($(this).get(0).duration)));
 	//});
 
+	/*
+	               ██████╗  ███████╗ ███████╗ ██╗  ██████╗ ██╗  █████╗  ██╗               
+	              ██╔═══██╗ ██╔════╝ ██╔════╝ ██║ ██╔════╝ ██║ ██╔══██╗ ██║               
+	    █████╗    ██║   ██║ █████╗   █████╗   ██║ ██║      ██║ ███████║ ██║         █████╗
+	    ╚════╝    ██║   ██║ ██╔══╝   ██╔══╝   ██║ ██║      ██║ ██╔══██║ ██║         ╚════╝
+	              ╚██████╔╝ ██║      ██║      ██║ ╚██████╗ ██║ ██║  ██║ ███████╗          
+	               ╚═════╝  ╚═╝      ╚═╝      ╚═╝  ╚═════╝ ╚═╝ ╚═╝  ╚═╝ ╚══════╝          
+
+	*/
+	$(document).on("click",".admin .st-official-tab",function(e){
+		var type = $(this).data("type");
+		switch(type){
+			case "about":
+				cns.debug("about");
+				//group description
+				break;
+			case "chat":
+				$(".sm-small-area[data-sm-act=chat]").trigger("click");
+				break;
+			case "setting":
+				//group setting
+				break;
+			case "invite":
+				$(".contact-add").trigger("click");
+				break;
+			case "share":
+				cns.debug("share");
+				break;
+			case "cnt":
+				cns.debug("cnt");
+				break;
+		}
+	});
+	$(document).on("click",".general .st-official-tab",function(e){
+		var type = $(this).data("type");
+		switch(type){
+			case "about":
+				cns.debug("about");
+				//group description
+				break;
+			case "chat":
+				$(".sm-small-area[data-sm-act=chat]").trigger("click");
+				break;
+			case "cnt":
+				cns.debug("cnt");
+				break;
+		}
+	});
 	
 	/*
               ████████╗███████╗███████╗████████╗          

@@ -164,6 +164,7 @@
 	"COMMON_TIMEOUT_ALERT" : "連線逾時",
 	"COMMON_CHECK_NETWORK" : "目前網路不穩定，請確認連線狀況。",
 	"COMMON_ALBUM" : "相簿",
+	"COMMON_SELECTABLE_MEMBER" : "沒有可選擇的對象",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",
@@ -209,6 +210,7 @@
 
 	"SETTING_LOGOUT" : "登出",
 	"SETTING_DO_LOGOUT" : "確定要登出嗎?",
+	"GROUPSETTING_TITLE" : "團體設定",
 
 
 	"FEED_GROUP_CREATED" : "成功建立團體！",
@@ -240,6 +242,12 @@
 	"USER_PROFILE_HOMEPAGE" : "主頁",
 	"USER_PROFILE_EMPTY_NAME" : "姓名不能為空值",
 	"USER_PROFILE_UPDATE_SUCC" : "更新成功",
-	"USER_PROFILE_NO_DATA" : "暫無資料"
+	"USER_PROFILE_NO_DATA" : "暫無資料",
 
+	"OFFICIAL_ABOUT" : "關於",
+	"OFFICIAL_CHAT" : "聊天",
+	"OFFICIAL_SETTING" : "設定",
+	"OFFICIAL_INVITE" : "邀請",
+	"OFFICIAL_SHARE" : "分享",
+	"OFFICIAL_N_FOLLOWER" : "%ld人追蹤"
 }

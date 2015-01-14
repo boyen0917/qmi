@@ -243,6 +243,8 @@ $(function(){
                 var groupData = $.parseJSON(data.responseText);
                 setGrouUser( this_gi, groupData );
 				// data_group_user = groupData.ul;
+
+                initOfficialGroup( this_gi );
 	   //          var new_group_user = {};
 	   //          $.each(data_group_user,function(i,val){
 	   //              //將gu設成key 方便選取
@@ -376,24 +378,30 @@ $(function(){
 	        	initContactList();
 	          break;
 	        case "chat":
-	        	//-- switch sub pages --
-	        	$(".subpage-contact").hide();
-	        	$(".subpage-timeline").hide();
-	        	$(".subpage-chatList").show();
-                $(".subpage-album").hide();
-	        	// $( "#side-menu" ).panel( "close");
 
-                page_title = $.i18n.getString("CHAT_TITLE");
+                //offical general
+                if( false==onClickOfficialGeneralChat(gi) ){
 
-	        	initChatList();
+    	        	//-- switch sub pages --
+                    $(".subpage-groupSetting").hide();
+    	        	$(".subpage-contact").hide();
+    	        	$(".subpage-timeline").hide();
+    	        	$(".subpage-chatList").show();
+                    $(".subpage-album").hide();
+    	        	// $( "#side-menu" ).panel( "close");
 
-                //顯示新增聊天室按鈕, 藏新增貼文按鈕
-                $("#page-group-main").find(".gm-header .feed-compose").hide();
-                $("#page-group-main").find(".gm-header .chatList-add").show();
-                $("#page-group-main").find(".gm-header .contact-add").hide();
+                    page_title = $.i18n.getString("CHAT_TITLE");
 
-	        	//$.mobile.changePage("#page-chatroom");
-	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
+    	        	initChatList();
+
+                    //顯示新增聊天室按鈕, 藏新增貼文按鈕
+                    $("#page-group-main").find(".gm-header .feed-compose").hide();
+                    $("#page-group-main").find(".gm-header .chatList-add").show();
+                    $("#page-group-main").find(".gm-header .contact-add").hide();
+
+    	        	//$.mobile.changePage("#page-chatroom");
+    	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
+                }
 	          break;
 	        case "calendar":
 	          break;
@@ -500,6 +508,8 @@ $(function(){
         }
 
         $("#page-group-main").find(".gm-header .page-title").html(page_title);
+
+        setOfficialGroup(gi);
 	}
 
 	setSmUserData = function (gi,gu,gn){
@@ -1080,71 +1090,56 @@ $(function(){
 
         //save data
         var userData = $.lStorage(ui);
-        if( !isDataMissing && groupData.set.tab ){
-            userData[this_gi].tab = groupData.set.tab;
-        } else {
+        var group = userData[this_gi];
+        //如果tp為c,d開頭為官方團體
+        if( true==group.isOfficial ){
             userData[this_gi].tab = [
-                {
-                    "tp": 0,
-                    "sw": false
-                },
-                {
-                    "tp": 1,
-                    "sw": false
-                },
-                {
-                    "tp": 2,
-                    "sw": true
-                },
-                {
-                    "tp": 3,
-                    "sw": true
-                },
-                {
-                    "tp": 4,
-                    "sw": false
-                },
-                {
-                    "tp": 5,
-                    "sw": false
-                },
-                {
-                    "tp": 6,
-                    "sw": true
-                },
-                {
-                    "tp": 7,
-                    "sw": true
-                }
+                { "tp": 0, "sw": false },
+                { "tp": 1, "sw": false },
+                { "tp": 2, "sw": true },
+                { "tp": 3, "sw": true },
+                { "tp": 4, "sw": false },
+                { "tp": 5, "sw": false },
+                { "tp": 6, "sw": false },
+                { "tp": 7, "sw": true }
             ];
-        }
+            // userData[this_gi].pen = [
+            //     { "tp": 0, "sw": true },
+            //     { "tp": 1, "sw": true },
+            //     { "tp": 2, "sw": true },
+            //     { "tp": 3, "sw": true },
+            //     { "tp": 4, "sw": true }
+            // ];
+        } else{
 
-        if( !isDataMissing && groupData.set.pen ){
-            userData[this_gi].pen = groupData.set.pen;
-        } else {
-            userData[this_gi].pen = [
-                {
-                    "tp": 0,
-                    "sw": true
-                },
-                {
-                    "tp": 1,
-                    "sw": true
-                },
-                {
-                    "tp": 2,
-                    "sw": true
-                },
-                {
-                    "tp": 3,
-                    "sw": true
-                },
-                {
-                    "tp": 4,
-                    "sw": true
-                }
-            ];
+
+            if( !isDataMissing && groupData.set.tab ){
+                userData[this_gi].tab = groupData.set.tab;
+            } else {
+                userData[this_gi].tab = [
+                    { "tp": 0, "sw": false },
+                    { "tp": 1, "sw": false },
+                    { "tp": 2, "sw": true },
+                    { "tp": 3, "sw": true },
+                    { "tp": 4, "sw": false },
+                    { "tp": 5, "sw": false },
+                    { "tp": 6, "sw": true },
+                    { "tp": 7, "sw": true }
+                ];
+            }
+
         }
+            if( !isDataMissing && groupData.set.pen ){
+                userData[this_gi].pen = groupData.set.pen;
+            } else {
+                userData[this_gi].pen = [
+                    { "tp": 0, "sw": true },
+                    { "tp": 1, "sw": true },
+                    { "tp": 2, "sw": true },
+                    { "tp": 3, "sw": true },
+                    { "tp": 4, "sw": true }
+                ];
+            }
 
         $.lStorage(ui, userData);
 
@@ -1281,6 +1276,135 @@ $(function(){
             //cns.debug("[!] setTabList(set pen): " + e.message);
             errorReport(e);
         }
+    }
+
+    initOfficialGroup = function( this_gi ){
+        var userData;
+        var groupData;
+        try{
+            userData = $.lStorage(ui);
+            groupData = userData[this_gi];
+        } catch(e){
+            // cns.debug("[!] updateTab:" + e.message );
+            errorReport(e);
+            return;
+        }
+
+        try{
+            //如果tp為c,d開頭為官方團體
+            var tp = groupData.tp.toLowerCase();
+            groupData.isOfficial = ( tp.indexOf('c')==0 || tp.indexOf('d')==0 );
+            $.lStorage(ui,userData);
+            
+            //如果非admin, 沒有聊天室的話隨便找個admin預建聊天室
+            if( groupData.isOfficial && groupData.ad!=1 ){
+                updateChatList(this_gi, function(){
+                    if( null==groupData.chatAll || Object.keys(groupData.chatAll).length<=1 ){
+                        var target;
+                        //find an admin
+                        for( var gu in groupData.guAll){
+                            var mem = groupData.guAll[gu];
+                            if( mem.ad==1 ){
+                                target = mem;
+                                break;
+                            }
+                        }
+                        requestNewChatRoomApi(this_gi, target.nk, [{gu:target.gu}], null, false);
+                    }
+                });
+            }
+        } catch(e){
+            errorReport(e);
+        }
+    }
+
+    setOfficialGroup = function( this_gi ){
+        var groupData;
+        try{
+            groupData = $.lStorage(ui)[this_gi];
+        } catch(e){
+            // cns.debug("[!] updateTab:" + e.message );
+            errorReport(e);
+            return;
+        }
+
+        try{
+            if( !groupData.isOfficial ){
+
+                //set tab
+                $(".header-menu").show();
+                //set filters
+                $(".st-filter-area").show();
+
+                $(".official").hide();
+
+                $(".st-feedbox-area").removeClass("official-admin-adjust");
+                $(".sm-small-area[data-sm-act=chat]").removeClass("official-general");
+                return;
+            }
+
+            //-- set tabs --
+            // var menu = $(".header-menu");
+            // menu.find(".sm-small-area").hide();
+
+            // //feed
+            // var dom = menu.find(".sm-small-area[data-sm-act=feeds]");
+            // dom.show();
+            // dom.detach();
+            // menu.append( dom );
+            // // dom.addClass("active");
+            // // var nameDom = dom.find("div");
+            // // nameDom.html( $.i18n.getString(nameDom.attr("data-textid")) );
+
+            // //chat
+            // dom = menu.find(".sm-small-area[data-sm-act=chat]");
+            // dom.detach();
+            // dom.show();
+            // menu.append( dom );
+
+
+            //set filters
+            $(".st-filter-area").hide();
+
+            //admin
+            if( groupData.ad==1 ){
+                $(".official.admin").show();
+                $(".official.general").hide();
+                $(".st-feedbox-area").addClass("official-admin-adjust");
+                $(".sm-small-area[data-sm-act=chat]").removeClass("official-general");
+            } else{
+                $(".feed-compose").hide();
+                $(".official.admin").hide();
+                $(".official.general").show();
+                $(".st-feedbox-area").removeClass("official-admin-adjust");
+                $(".sm-small-area[data-sm-act=chat]").addClass("official-general");
+            }
+            $(".st-official-tab[data-type=cnt] .text").html( $.i18n.getString("OFFICIAL_N_FOLLOWER","<span class='cnt'>"+groupData.cnt+"</span>") );
+        } catch(e){
+            errorReport(e);
+        }
+
+
+    }
+
+    onClickOfficialGeneralChat = function( this_gi ){
+        try{
+            var groupData = $.lStorage(ui)[this_gi];
+            if( true==groupData.isOfficial && groupData.ad!=1 ){
+                if( null!=groupData.chatAll ){
+                    for( var ci in groupData.chatAll ){
+                        var room = groupData.chatAll[ci];
+                        if( room.tp!=0 ){
+                            openChatWindow ( this_gi, ci );
+                        }
+                    }
+                }
+                return true;
+            }
+        } catch(e){
+            errorReport(e);
+        }
+        return false;
     }
 /*
 
@@ -2195,10 +2319,13 @@ $(function(){
         // var this_compose_obj = $(this);
         $.mobile.changePage("#page-object", {transition: "slide"});
 
-        var guAll = $.lStorage(ui)[gi].guAll;
-        var bl = $.lStorage(ui)[gi].bl;
-        var fbl = $.lStorage(ui)[gi].fbl;
+        var group = $.lStorage(ui)[gi];
+        var guAll = group.guAll;
+        var bl = group.bl;
+        var fbl = group.fbl;
 
+
+        if( null==guAll ) return;
         $(".obj-cell-area").html("");
 
         //工作
@@ -2228,6 +2355,22 @@ $(function(){
             isShowFav = (null==option.isShowFav) ? isShowFav : option.isShowFav;
             isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
         }
+
+        //check cnt
+        var guList = Object.keys(guAll);
+        if( null==guList
+            || (isShowSelf && guList.length<=0)
+            || (false==isShowSelf && guList.length<=1) ){
+            //no one to select
+            //show coachmark & return
+            $("#page-object .obj-content").hide();
+            $("#page-object .obj-coach-noMember").show();
+            $(".obj-done").hide();
+            return;
+        } 
+        $("#page-object .obj-content").show();
+        $("#page-object .obj-coach-noMember").hide();
+        $(".obj-done").show();
 
         if(this_compose_obj.parent().hasClass("cp-work-item")){
             obj_data = this_compose_obj.data("object_str");
@@ -2562,6 +2705,7 @@ $(function(){
 
         //成員rows
         $.each(guAll,function(i,gu_obj){
+            if( false==isShowSelf && i==group.gu ) return;
             var this_obj = getMemObjectRow(gu_obj, bl);
             $(".obj-cell-area").append(this_obj);
         });

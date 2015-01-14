@@ -4,6 +4,12 @@
 var windowList = new Object();
 var sortRoomListTimeout = 700;
 
+$(document).ready(function(){
+	$(".chatList-add-done").on("click", function(){
+		$(".chatList-add").data("object_str", $(this).attr("data-object_str") );
+		onShowNewRoomPageDone();
+	});
+});
 /**
 @brief
 	initial chat list page
@@ -304,38 +310,66 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 				userData = $.lStorage(ui);
 				g_group = userData[giTmp];
 				g_room = g_group["chatAll"][ciTmp];
-				setLastMsgContent( giTmp, ciTmp, table, g_room.cm, isShowAlert, isRoomOpen );
+				
+				g_idb_chat_msgs.limit(function(list){
+				    if( list.length>0 ){
+				    	if( null!=list[0] ){
+				        	var object = list[0].data;
+				        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
+				    	}
+				    } else {
+				    	setLastMsgContent( giTmp, ciTmp, table, g_room.cm, isShowAlert, isRoomOpen );
+				    }
+
+				},{
+				    index: "gi_ci_ct",
+				    keyRange: g_idb_chat_msgs.makeKeyRange({
+				        upper: [giTmp, ciTmp, new Date().getTime()],
+				        lower: [giTmp, ciTmp]
+				        // only:18
+				    }),
+				    limit: 1,
+				    order: "DESC",
+				    onEnd: function(result){
+				        cns.debug("setLastMsg end:",result.ci + " " + result.ct);
+				    },
+				    onError: function(result){
+				        cns.debug("[!] setLastMsg error:",result);
+				    }
+				});
 			});
 		} else{
-			g_room = g_group["chatAll"][ciTmp];
-			setLastMsgContent( giTmp, ciTmp, table, g_room.cm, isShowAlert, isRoomOpen );
+			g_idb_chat_msgs.limit(function(list){
+				g_room = g_group["chatAll"][ciTmp];
+			    if( list.length>0 ){
+			    	if( null!=list[0] ){
+			        	var object = list[0].data;
+			        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
+			    	}
+			    } else {
+					setLastMsgContent( giTmp, ciTmp, table, g_room.cm, isShowAlert, isRoomOpen );
+				}
+			},{
+			    index: "gi_ci_ct",
+			    keyRange: g_idb_chat_msgs.makeKeyRange({
+			        upper: [giTmp, ciTmp, new Date().getTime()],
+			        lower: [giTmp, ciTmp]
+			        // only:18
+			    }),
+			    limit: 1,
+			    order: "DESC",
+			    onEnd: function(result){
+			        cns.debug("setLastMsg end:",result.ci + " " + result.ct);
+			    },
+			    onError: function(result){
+			        cns.debug("[!] setLastMsg error:",result);
+			    }
+			});
 		}
 	} catch(e){
 		errorReport(e);
 
-		// g_idb_chat_msgs.limit(function(list){
-		//     if( list.length>0 ){
-		//     	if( null!=list[0] ){
-		//         	var object = list[0].data;
-		//         	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
-		//     	}
-		//     }
-		// },{
-		//     index: "gi_ci_ct",
-		//     keyRange: g_idb_chat_msgs.makeKeyRange({
-		//         upper: [giTmp, ciTmp, new Date().getTime()],
-		//         lower: [giTmp, ciTmp]
-		//         // only:18
-		//     }),
-		//     limit: 1,
-		//     order: "DESC",
-		//     onEnd: function(result){
-		//         cns.debug("setLastMsg end:",result.ci + " " + result.ct);
-		//     },
-		//     onError: function(result){
-		//         cns.debug("[!] setLastMsg error:",result);
-		//     }
-		// });
+		
 	}
 }
 
@@ -496,22 +530,25 @@ function showNewRoomPage(){
 	composeObjectShowDelegate( $(".chatList-add"), $(".chatList-add"), {
 		isShowGroup : false,
         isShowSelf : false,
-        isShowAll : true,
+        isShowAll : false,
         isShowFav : true,
         isShowFavBranch : false
-	}, function(){
-		try{
-			var data = $.parseJSON( $(".chatList-add").data("object_str") );
-			var currentGroup = $.lStorage(ui)[gi];
-			if( data.hasOwnProperty(currentGroup.gu) ){
-				delete data[currentGroup.gu];
-			}
-			g_newChatMemList = Object.keys(data);
-			showNewRoomDetailPage();
-		} catch(e){
-			cns.debug( "[!]showNewRoomPage", e.message );
+	}, onShowNewRoomPageDone);
+}
+
+function onShowNewRoomPageDone(){
+	try{
+		var data = $.parseJSON( $(".chatList-add").data("object_str") );
+		var currentGroup = $.lStorage(ui)[gi];
+		if( data.hasOwnProperty(currentGroup.gu) ){
+			delete data[currentGroup.gu];
 		}
-	});
+		g_newChatMemList = Object.keys(data);
+		showNewRoomDetailPage();
+	} catch(e){
+		cns.debug( "[!]showNewRoomPage", e.message );
+		errorReport(e);
+	}
 }
 
 function toggleSelectAll( bIsSelect ){
@@ -632,7 +669,8 @@ function requestNewChatRoom(){
 
 }
 
-function requestNewChatRoomApi(giTmp, cnTmp, arr, callback){
+function requestNewChatRoomApi(giTmp, cnTmp, arr, callback, isOpenRoom){
+	if( null==isOpenRoom ) isOpenRoom = true;
 	var api_name = "/groups/"+giTmp+"/chats";
 
     var headers = {
@@ -680,11 +718,13 @@ function requestNewChatRoomApi(giTmp, cnTmp, arr, callback){
 				    }
 
 				    //打開聊天室
-	    			setTimeout( function(){
-	    				openChatWindow( giTmp, result.ci );
-	    			},300);
+				    if( isOpenRoom ){
+		    			setTimeout( function(){
+		    				openChatWindow( giTmp, result.ci );
+		    			},300);
+		    		}
 			    }
-    			callback( result );
+    			if(callback) callback( result );
     		});
     		// //api上面寫這個可能是批次新增用的..?!
     		// for( var i in result.cl ){
@@ -692,7 +732,7 @@ function requestNewChatRoomApi(giTmp, cnTmp, arr, callback){
     		// 	openChatWindow( ci );
     		// }
     	} else {
-    		callback( null );
+    		if(callback) callback( null );
     	}
     })
 }

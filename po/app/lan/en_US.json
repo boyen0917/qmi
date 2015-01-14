@@ -28,6 +28,7 @@
 	"COMMON_TIMEOUT_ALERT" : "Timeout, please reconnect.",
 	"COMMON_CHECK_NETWORK" : "",
 	"COMMON_ALBUM" : "Album",
+	"COMMON_SELECTABLE_MEMBER" : "No selectable member.",
 	
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
@@ -95,6 +96,7 @@
 
 	"SETTING_LOGOUT" : "Logout",
 	"SETTING_DO_LOGOUT" : "Are you sure want to logout?",
+	"GROUPSETTING_TITLE" : "Group Setting",
 
 	"LOGIN_ACCOUNT" :	"Phone Number or Email",
 	"LOGIN_ACCOUNT_OR_PASSWORD_ERROR" :	"Error account or password. Please try again.",
@@ -253,5 +255,12 @@
 	"USER_PROFILE_HOMEPAGE" : "Homepage",
 	"USER_PROFILE_EMPTY_NAME" : "Please enter your name.",
 	"USER_PROFILE_UPDATE_SUCC" : "Update successed.",
-	"USER_PROFILE_NO_DATA" : "No data"
+	"USER_PROFILE_NO_DATA" : "No data",
+
+	"OFFICIAL_ABOUT" :	"About",
+	"OFFICIAL_CHAT" :	"Chat",
+	"OFFICIAL_SETTING" :	"Setting",
+	"OFFICIAL_INVITE" :	"Invite",
+	"OFFICIAL_SHARE" :	"Share",
+	"OFFICIAL_N_FOLLOWER" :	"%ld follower(s)"
 }

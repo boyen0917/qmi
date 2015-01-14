@@ -139,9 +139,9 @@ function initSingleChatGallery( ci, cn ){
 	var gridArea = $(".al-single main");
 	list = [];
 	if( name ){
-		$(".title").html(name).show();
+		$(".subpage-album .title").html(name).show();
 	} else {
-		$(".title").hide();
+		$(".subpage-album .title").hide();
 	}
 
 	gridArea.html("");

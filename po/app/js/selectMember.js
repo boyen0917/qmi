@@ -19,9 +19,10 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone ){
     // var this_compose = $(this);
     $.changePage("#page-selectMem", onPageChanged, onDone);
 
-    var guAll = $.lStorage(ui)[gi].guAll;
-    var bl = $.lStorage(ui)[gi].bl;
-    var fbl = $.lStorage(ui)[gi].fbl;
+    var group = $.lStorage(ui)[gi];
+    var guAll = group.guAll;
+    var bl = group.bl;
+    var fbl = group.fbl;
 
     $(".obj-cell-area").html("");
 
@@ -46,13 +47,6 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone ){
             $(".header-title .text").html( option.title );
         }
     }
-    $(".page-next").data("min_count",min_count);
-    if( isSingleSelect ) isShowAll = false;
-
-    $("#page-selectMem .ui-container").data("selected-branch",{});
-    $("#page-selectMem .ui-container").data("selected-obj",{});
-    $("#page-selectMem .ui-container").data("selected-fav",{});
-    updateSelectedObj();
 
     var excludeList = [];
     try{
@@ -60,6 +54,36 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone ){
     } catch(e){
         cns.debug( e.message );
     }
+
+    //check cnt
+    var guList = Object.keys(guAll);
+    var cnt = 0;
+    $.each(guAll,function(i,gu_obj){
+        if( excludeList.indexOf(i)>=0 ) return;
+        if( false==isShowSelf && i==group.gu ) return;
+        cnt++;
+    });
+    if( null==guList || cnt<=0 ){
+        //no one to select
+        //show coachmark & return
+        $("#page-selectMem .ui-container").hide();
+        $("#page-selectMem .obj-coach-noMember").show()._i18n();
+        $(".page-next").hide();
+        return;
+    } 
+    $("#page-selectMem .ui-container").show();
+    $("#page-selectMem .obj-coach-noMember").hide();
+    $(".page-next").show();
+
+
+
+    $(".page-next").data("min_count",min_count);
+    if( isSingleSelect ) isShowAll = false;
+
+    $("#page-selectMem .ui-container").data("selected-branch",{});
+    $("#page-selectMem .ui-container").data("selected-obj",{});
+    $("#page-selectMem .ui-container").data("selected-fav",{});
+    updateSelectedObj();
     
     //----- 自己 -------
     if( isShowSelf ){
