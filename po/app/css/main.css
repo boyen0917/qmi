@@ -4487,6 +4487,7 @@ img.user-info-back {
 .st-official-tab{
 	display: inline-block;
 	text-align: center;
+	cursor: pointer;
 }
 .st-official-tab-row:nth-child(1){
 	width: 100%%;

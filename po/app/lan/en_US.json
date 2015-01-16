@@ -97,6 +97,9 @@
 	"SETTING_LOGOUT" : "Logout",
 	"SETTING_DO_LOGOUT" : "Are you sure want to logout?",
 	"GROUPSETTING_TITLE" : "Group Setting",
+	"GROUPSETTING_GROUP" : "Group",
+	"BACKENDMANAGER_ASSIGN_MANAGER" : "Assign Admin",
+	"GROUPSETTING_GROUP_INFORMATION" : "Group Information",
 
 	"LOGIN_ACCOUNT" :	"Phone Number or Email",
 	"LOGIN_ACCOUNT_OR_PASSWORD_ERROR" :	"Error account or password. Please try again.",

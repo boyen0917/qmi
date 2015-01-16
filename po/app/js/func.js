@@ -241,6 +241,11 @@ $(function(){
 			if(data.status == 200){
 
                 var groupData = $.parseJSON(data.responseText);
+
+                setGroupAttributes( this_gi, groupData );
+
+                updateGroupIcon( this_gi );
+
                 setGrouUser( this_gi, groupData );
 				// data_group_user = groupData.ul;
 
@@ -336,6 +341,8 @@ $(function(){
                 if(!main)
                     $(".st-navi-area .main").trigger("click");
 
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
 	        	$(".subpage-contact").hide();
 	        	$(".subpage-chatList").hide();
 	        	$(".subpage-timeline").show();
@@ -353,6 +360,8 @@ $(function(){
 
 	          break;
 	        case "memberslist": 
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
 	        	$(".subpage-contact").show();
 	            $(".subpage-timeline").hide();
 	        	$(".subpage-chatList").hide();
@@ -384,6 +393,7 @@ $(function(){
 
     	        	//-- switch sub pages --
                     $(".subpage-groupSetting").hide();
+                    $(".subpage-groupAbout").hide();
     	        	$(".subpage-contact").hide();
     	        	$(".subpage-timeline").hide();
     	        	$(".subpage-chatList").show();
@@ -429,6 +439,8 @@ $(function(){
                 // if(!main)
                     $(".st-navi-subarea[data-st-navi=feed-post]").trigger("click");
 
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
                 $(".subpage-contact").hide();
                 $(".subpage-chatList").hide();
                 $(".subpage-timeline").show();
@@ -463,6 +475,8 @@ $(function(){
                 // if(!main)
                     $(".st-navi-subarea[data-st-navi=feed-public]").trigger("click");
 
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
                 $(".subpage-contact").hide();
                 $(".subpage-chatList").hide();
                 $(".subpage-timeline").show();
@@ -481,6 +495,8 @@ $(function(){
               break;
             case "album":
                 //-- switch sub pages --
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
                 $(".subpage-contact").hide();
                 $(".subpage-timeline").hide();
                 $(".subpage-chatList").hide();
@@ -499,6 +515,23 @@ $(function(){
                 //$.mobile.changePage("#page-chatroom");
                 //$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
               break;
+            case "groupSetting":
+                $(".subpage-groupSetting").show();
+                $(".subpage-groupAbout").hide();
+                $(".subpage-contact").hide();
+                $(".subpage-timeline").hide();
+                $(".subpage-chatList").hide();
+                $(".subpage-album").hide();
+                $( "#side-menu" ).panel( "close");
+                
+                //藏新增貼文按鈕, 新增聊天室按鈕
+                $("#page-group-main").find(".gm-header .feed-compose").hide();
+                $("#page-group-main").find(".gm-header .chatList-add").hide();
+                
+                page_title = $.i18n.getString("GROUPSETTING_TITLE");
+
+                initGroupSetting();
+                break;
 	    }
         setTimeout( timelineScrollTop, 1000 );
 
@@ -1184,6 +1217,7 @@ $(function(){
                         dom = menu.find(".sm-small-area[data-sm-act=memberslist]");
                         break;
                     case 7: //團體設定
+                        dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
                         break;
                 }
                 if( dom ){
@@ -1240,6 +1274,9 @@ $(function(){
                         break;
                     case 4: //成員定位
                         dom = menu.find(".fc-area-subbox[data-fc-box=check]");
+
+                        //成員定位尚未有功能, 有顯示的話先disabled掉
+                        dom.addClass("disabled");
                         break;
                     case 5: //貼文
                         dom = menu.find(".fc-area-subbox[data-fc-box=post]");
@@ -2384,45 +2421,46 @@ $(function(){
         updateSelectedObj();
         
         //----- 自己 -------
-        if( isShowSelf ){
-            var cell = $("<div class='obj-cell self'>"+
-                '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_personal_photo.png" style="width:60px"/></div>' +
-                '<div class="obj-cell-subgroup-data">' + 
-                    '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
-            $(".obj-cell-area").append(cell);
-            cell.off("click").click( function(){
-                clearMeAndAllSelect();
-                clearMemAndBranchAll();
-                if( !$(this).data("chk") ){
-                    $(this).data("chk",true);
-                    $(this).find(".img").addClass("chk");
-                    //set only me select
-                    var guTmp = $.lStorage(ui)[gi].gu;
-                    var gn = $.lStorage(ui)[gi].guAll[gu].nk;
-                    var obj = {};
-                    obj[guTmp] = gn;
-                    $(".obj-content").data("selected-branch",{});
-                    $(".obj-content").data("selected-obj",obj);
+        // if( isShowSelf ){
+        //     var cell = $("<div class='obj-cell self'>"+
+        //         '<div class="obj-cell-chk"><div class="img"></div></div>' +
+        //         '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_personal_photo.png" style="width:60px"/></div>' +
+        //         '<div class="obj-cell-subgroup-data">' + 
+        //             '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
+        //     cell.data("gu",group.gu);
+        //     $(".obj-cell-area").append(cell);
+        //     cell.off("click").click( function(){
+        //         clearMeAndAllSelect();
+        //         clearMemAndBranchAll();
+        //         if( !$(this).data("chk") ){
+        //             $(this).data("chk",true);
+        //             $(this).find(".img").addClass("chk");
+        //             //set only me select
+        //             var guTmp = $.lStorage(ui)[gi].gu;
+        //             var gn = $.lStorage(ui)[gi].guAll[gu].nk;
+        //             var obj = $(".obj-content").data("selected-obj";
+        //             obj[guTmp] = gn;
+        //             $(".obj-content").data("selected-branch",{});
+        //             $(".obj-content").data("selected-obj",obj);
                     
-                    //deselect group&mem "select all"
-                    $(".obj-cell-subTitle").data("chk",false);
-                    //deselect all branch
-                    $(".obj-cell-area").find(".obj-cell.branch").each(function(){
-                        var this_cell = $(this);
-                        this_cell.data("chk",false);
-                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-                    });
-                    //deselect all mem
-                    $(".obj-cell-area").find(".obj-cell.mem").each(function(){
-                        var this_cell = $(this);
-                        this_cell.data("chk",false);
-                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-                    });
-                }
-                updateSelectedObj();
-            });
-        }
+        //             //deselect group&mem "select all"
+        //             $(".obj-cell-subTitle").data("chk",false);
+        //             //deselect all branch
+        //             $(".obj-cell-area").find(".obj-cell.branch").each(function(){
+        //                 var this_cell = $(this);
+        //                 this_cell.data("chk",false);
+        //                 this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        //             });
+        //             //deselect all mem
+        //             $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+        //                 var this_cell = $(this);
+        //                 this_cell.data("chk",false);
+        //                 this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        //             });
+        //         }
+        //         updateSelectedObj();
+        //     });
+        // }
 
         //----- 全選 ------
         if( isShowAll ){
@@ -3171,6 +3209,17 @@ $(function(){
         }
 
         if( null != mem ){
+            //check me
+            var meGu = $(".obj-cell.self").data("gu");
+            if( true==$(".obj-cell.mem[data-gu="+meGu+"]").data("chk") ){
+                $(".obj-cell.self").data("chk",true);
+                $(".obj-cell.self").find(".img").addClass("chk");
+            } else {
+                $(".obj-cell.self").data("chk",false);
+                $(".obj-cell.self").find(".img").removeClass("chk");
+            }
+            
+
             len += Object.keys(mem).length;
             $.each(mem,function(i,val){
                 $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
@@ -3288,6 +3337,7 @@ $(function(){
         //clear data
         $(".obj-content").data("selected-branch",{});
         $(".obj-content").data("selected-obj",{});
+        $(".obj-content").data("selected-fav",{});
         
         //deselect group&mem "select all"
         $(".obj-cell-subTitle").data("chk",false);
@@ -3299,6 +3349,18 @@ $(function(){
         });
         //deselect all mem
         $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+            var this_cell = $(this);
+            this_cell.data("chk",false);
+            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        });
+        //deselect all mem
+        $(".obj-cell-area").find(".obj-cell.fav").each(function(){
+            var this_cell = $(this);
+            this_cell.data("chk",false);
+            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        });
+        //deselect all mem
+        $(".obj-cell-area").find(".obj-cell.fav-branch").each(function(){
             var this_cell = $(this);
             this_cell.data("chk",false);
             this_cell.find(".obj-cell-chk .img").removeClass("chk");

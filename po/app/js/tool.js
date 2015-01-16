@@ -751,6 +751,42 @@ $(function(){
   //       return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
 	}
 
+	setGroupAttributes = function( this_gi, data ){
+		try{
+			var userData = $.lStorage(ui);
+			var group = userData[this_gi];
+
+			var updateKeys = ["auo","aut","cnt","gd"];
+			var ignoreKeys = ["rsp_code"];
+			for( var key in data ){
+				//update auo, aut, etc.
+				if( updateKeys.indexOf(key)>=0 ){
+					group[key] = data[key];
+				} //add new keys
+				else if( !group.hasOwnProperty(key) ){
+					if( typeof(data[key])=="object" ) continue;
+					if( ignoreKeys.indexOf(key)>=0 ) continue;
+					group[key] = data[key];
+				}
+			}
+			$.lStorage(ui, userData);
+		} catch(e){
+			errorReport(e);
+		}
+	}
+
+	updateGroupIcon = function( this_gi ){
+		try{
+			var userData = $.lStorage(ui);
+			var group = userData[this_gi];
+
+			$(".polling-group-pic-o").attr("src", group.auo);
+			$(".polling-group-pic-t").attr("src", group.aut);
+		} catch(e){
+			errorReport(e);
+		}
+	}
+
 	setGrouUser = function( this_gi, data ){
 		var data_group_user = data.ul;
 		var new_group_user = {};

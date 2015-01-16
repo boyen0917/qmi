@@ -1610,14 +1610,13 @@ $(function(){
 		var type = $(this).data("type");
 		switch(type){
 			case "about":
-				cns.debug("about");
-				//group description
+				showGroupInfoPage();
 				break;
 			case "chat":
 				$(".sm-small-area[data-sm-act=chat]").trigger("click");
 				break;
 			case "setting":
-				//group setting
+				$(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
 				break;
 			case "invite":
 				$(".contact-add").trigger("click");
@@ -1634,8 +1633,7 @@ $(function(){
 		var type = $(this).data("type");
 		switch(type){
 			case "about":
-				cns.debug("about");
-				//group description
+				showGroupInfoPage();
 				break;
 			case "chat":
 				$(".sm-small-area[data-sm-act=chat]").trigger("click");

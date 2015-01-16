@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="css/alert.css?ver=0.27" />
         <link rel="stylesheet" href="css/contact.css?ver=0.27" />
         <link rel="stylesheet" href="css/general_album.css?ver=0.27" />
+        <link rel="stylesheet" href="css/setting.css?ver=0.27" />
         
         <script src="js/ga.js"></script>
 
@@ -28,6 +29,7 @@
         
         <script type="text/javascript" src="js/general_album.js?ver=0.27"></script>
         <script type="text/javascript" src="js/contact.js?ver=0.27"></script>
+        <script type="text/javascript" src="js/setting.js?ver=0.27"></script>
         <script type="text/javascript" src="js/chatDB.js?ver=0.27"></script>
         <script type="text/javascript" src="js/func.js?ver=0.27"></script>
         <script type="text/javascript" src="js/main.js?ver=0.27"></script>
@@ -169,6 +171,10 @@
                                <div class="sm-small-area-r" data-textid="COMMON_ALBUM"></div>
                                <!-- <div class="sm-count"></div> -->
                             </div>
+                            <div data-sm-act="groupSetting" class="sm-small-area">
+                               <div class="sm-small-area-r" data-textid="GROUPSETTING_TITLE"></div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
                         </div>
 
 
@@ -275,7 +281,7 @@
                             <div class="name"></div>
                         </div>
                     </div>
-                <!------------------------------------- 動態消息 ---------------------------------------->
+                <!------------------------------- 動態消息 ---------------------------->
                     <div class="subpage-timeline ">
                         <div class="st-navi-area">
                             <div class="st-navi-subarea main" data-st-navi-group="navi" data-st-navi="home" data-tp="00">
@@ -427,7 +433,7 @@
                     </div>
                 
                     
-            <!------------------------------------- 聯絡人 ---------------------------------------->
+            <!--------------------------------- 聯絡人 -------------------------------->
                     <div class="subpage-contact" style="display:none;height: 100%">
                         <div class="contact-search">
                             <div class="inputDiv">
@@ -452,7 +458,7 @@
                         </div>
                     </div>
 
-                <!------------------------------------- 聊天列表 ---------------------------------------->
+                <!--------------------------------- 聊天列表 -------------------------->
                     <div class="subpage-chatList">
                         <div class="loading" style="display:none">
                             <img src="images/st_bottom_loading.gif">
@@ -514,6 +520,62 @@
                             <div class="dataDom" style="display:none;"></div>
                         </div>
                     </div>
+                <!--------------------------------- 團體設定 -------------------------->
+                    <div class="subpage-groupSetting">
+                        <!-- <div class="loading" style="display:none">
+                            <img src="images/st_bottom_loading.gif">
+                        </div> -->
+                        <div class="gs-type group">
+                            <div class="gs-row-title">
+                                <div data-textid="GROUPSETTING_GROUP"></div>
+                            </div>
+                            <div class="gs-rows">
+                                <div class="gs-row" data-type="permission">
+                                    <div class="text" data-textid="BACKENDMANAGER_ASSIGN_MANAGER"></div>
+                                    <img class="img" src="images/icon/icon_arrow_right.png"/>
+                                </div>
+                                <div class="gs-row" data-type="info">
+                                    <div class="text" data-textid="GROUPSETTING_GROUP_INFORMATION"></div>
+                                    <img class="img" src="images/icon/icon_arrow_right.png"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <!--------------------------------- 團體關於 -------------------------->
+                    <div class="subpage-groupAbout">
+                        <div class="ga-wrapper">
+                            <div class="ga-content">
+                                <div class="ga-avatar">
+                                    <img class="ga-avatar-img default" src="images/common/others/name_card_nophoto_profile.png"/>
+                                    <img class="ga-avatar-img polling-group-pic-o"/>
+                                    <div class="ga-header-bar">
+                                        <div class="ga-avatar-name general groupName"></div>
+                                        <img class="ga-avatar-photo admin" src="images/common/icon/bt_camera_nornal.png"/>
+                                    </div>
+                                </div>
+                                <div class="ga-info">
+                                    <div class="ga-info-row admin" data-type="name">
+                                        <div class="title" data-textid="GROUP_GROUP_NAME"></div>
+                                        <div class="content groupName"></div>
+                                    </div>
+                                    <div class="ga-info-row" data-type="info">
+                                        <div class="title" data-textid="GROUP_ABOUT"></div>
+                                        <div class="content groupDescription"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ga-header">
+                                <div class="ga-header-back">
+                                    <img src="images/navi/navi_icon_back.png"/>
+                                </div>
+                                <div class="ga-header-title"></div>
+                                <div class="ga-header-done"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     </div>
                </div> 
             </div>
@@ -649,7 +711,7 @@
 
             </div>
         </div>
-<!-------------------------------- page-newChatDetail ---------------------------------->
+<!-------------------------------- page-newChatDetail -------------------------------->
         <div data-role="page" id="page-newChatDetail">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
@@ -690,25 +752,6 @@
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <h3 class="page-title" data-textid="INVITE_TITLE"></h3>
             </div>
-            <div class="ca-nav">
-                <div class="ca-list ca-nav-box" data-type="invite">
-                    <div></div>
-                    <span data-textid="INVITE_INVITED_MEMBER"></span>
-                </div>
-                <div class="ca-invite ca-nav-box" data-type="build">
-                    <div></div>
-                    <span data-textid="INVITE_MANUAL"></span>
-                </div>
-            </div>
-
-            <div class="ca-list-area ca-sub-area" style="display:none">
-                <div class="cal-coachmake">
-                    <img src="images/coachmake/logo_status_inviteobject.png"/>
-                    <span data-textid="INVITE_NO_INVITATION"></span>
-                </div>
-                <div class="cal-div-area">
-                </div>
-            </div>
             <div class="ca-invite-area ca-sub-area">
                 <input type="file" class="cai-file" style="display:none" data-role="none"/>
                 <div class="cai-name">
@@ -734,6 +777,7 @@
                 <div class="ca-invite-submit" data-textid="INVITE_INVITE"></div>
             </div>
         </div>
+
 
 <!---------------------------------- 全域 ------------------------------------>  
 
