@@ -1318,10 +1318,11 @@ img.auo {
 
 .header-menu{
 	padding: 0 7px;
-	float: left;
 	line-height: 35px;
 	margin-top: -1px;
-	margin-left: 10px;
+	margin-left: 49px;
+	max-width: -webkit-calc( 100% - 115px );
+	overflow-x: scroll;
 }
 .header-group-name ,.header-cp-object{
 	text-align: center;

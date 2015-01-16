@@ -246,7 +246,7 @@ $(document).ready(function(){
 		}
 	});
 
-	if( g_bIsPolling ){
+	// if( g_bIsPolling ){
 		$("button.pollingCnt").off("click").click( updateChatCnt );
 		$("button.pollingMsg").off("click").click( function(){
 			for( var i=0; i<g_msgTmp.length; i++ ){
@@ -259,16 +259,16 @@ $(document).ready(function(){
 			if( isUpdatePermission ) getPermition(true);
 		});
 		updateChat();
-	}
+	// }
 
 	var enterTime = new Date();
 	//set update contents
-	setInterval(function() {
-	    if( !g_bIsPolling ){
-		    updateChat();
-		    updateChatCnt();
-	    }
-	}, 1500);
+	// setInterval(function() {
+	//     if( !g_bIsPolling ){
+	// 	    updateChat();
+	// 	    updateChatCnt();
+	//     }
+	// }, 1500);
 
 	setInterval(function() {
 	    checkPagePosition();
@@ -930,19 +930,19 @@ function showMsg (object, bIsFront, bIsTmpSend){
 			try{
 				var memTmp = g_group.guAll[msgData.t];
 				if(1==msgData.a){
-					if( g_room.memList.hasOwnProperty(memTmp.gu) ){
+					if( null==g_room.memList || g_room.memList.hasOwnProperty(memTmp.gu) ){
 						isUpdatePermission = true;
 					}
 					textTmp = $.i18n.getString("CHAT_SOMEONE_LEAVE", memTmp.nk );
 				} else {
-					if( !g_room.memList.hasOwnProperty(memTmp.gu) ){
+					if( null==g_room.memList || !g_room.memList.hasOwnProperty(memTmp.gu) ){
 						isUpdatePermission = true;
 					}
 					textTmp = $.i18n.getString("CHAT_SOMEONE_JOIN", memTmp.nk );
 				}
 
 			} catch(e){
-				cns.debug( e.message );
+				errorReport( e );
 			}
 			msgDiv.html( htmlFormat(textTmp) );
 			if( isMe ) msgDiv.parent().removeClass("chat-msg-right").addClass("sys-msg");
@@ -1504,5 +1504,5 @@ function addMember(){
 }
 
 function showAlbum(){
-	cns.debug("showAlbum");
+	showAlbumPage( gi, ci, ci, g_cn);
 }
