@@ -166,7 +166,7 @@ $(function(){
     			if($(".login-remeber").data("chk")){
 					var _loginRemeber = {};
 					_loginRemeber.phone = phone_id;
-					_loginRemeber.password = password;
+					// _loginRemeber.password = password;
 					_loginRemeber.countrycode = countrycode;
 					$.lStorage("_loginRemeber",_loginRemeber);
 				}else{
