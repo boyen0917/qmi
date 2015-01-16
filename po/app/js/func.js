@@ -1,14 +1,13 @@
 $(function(){
 
-	setDefaultGroup = function(){
+	setDefaultGroup = function(dgi){
 
 		//上次點選團體
-		if($.lStorage(ui)){
+		if(dgi && $.lStorage(ui)){
 			var _uiGroupList = $.lStorage(ui);
-    		var default_gi = _uiGroupList.default_gi;
-    		var default_group = _uiGroupList[default_gi];
+    		var default_group = _uiGroupList[dgi];
     		
-    		gi = default_gi;
+    		gi = dgi;
     		gu = default_group.gu;
     		gn = default_group.gn;
     		ti_cal = default_group.ti_cal;
@@ -35,7 +34,6 @@ $(function(){
     		gn = default_group.gn;
 
     		//存入localstorage
-    		var _groupList = {"default_gi":gi};
     		$.lStorage(ui,_groupList);
     	}
 	}
@@ -242,15 +240,7 @@ $(function(){
 
                 var groupData = $.parseJSON(data.responseText);
                 setGrouUser( this_gi, groupData );
-				// data_group_user = groupData.ul;
-	   //          var new_group_user = {};
-	   //          $.each(data_group_user,function(i,val){
-	   //              //將gu設成key 方便選取
-	   //              new_group_user[val.gu] = val;
-	   //          });
 
-	   //          //成員列表存入local storage
-	   //          updateGuAll(this_gi,new_group_user);
                 //按照邏輯 取得群組名單之後 就來設定群組資訊
                 setBranchList(this_gi, groupData);
 

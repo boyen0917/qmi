@@ -23,7 +23,7 @@ $(function(){
 		initChatCntDB(); 
 
 		//預設 default group
-		setDefaultGroup();
+		setDefaultGroup(_loginData.dgi);
 
 		//第一次進來 沒團體的情況
 		if(!$.lStorage("_groupList")){
