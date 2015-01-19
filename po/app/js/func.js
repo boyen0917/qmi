@@ -17,6 +17,7 @@ $(function(){
     		//預設團體暫定為第一個團體？
             if(!$.lStorage("_groupList") || $.lStorage("_groupList").length == 0) return false;
 
+            cns.debug("gl",$.lStorage("_groupList"));
         	var default_group = $.lStorage("_groupList")[0];
 
         	$.each(default_group.tl,function(i,val){
@@ -32,15 +33,10 @@ $(function(){
         	gi = default_group.gi;
     		gu = default_group.me;
     		gn = default_group.gn;
-
-    		//存入localstorage
-    		$.lStorage(ui,_groupList);
     	}
 	}
 
 	setGroupList = function(){
-        var test1 = $.lStorage("_groupList");
-        var test2 = $.lStorage(ui);
         var _uiGroupList = $.lStorage(ui) || {};
 
 		$.each($.lStorage("_groupList"),function(i,gl_obj){
@@ -4371,10 +4367,8 @@ $(function(){
 	        }
 
             //若沒有預設團體, 第一個顯示為目前團體
-            if( $(".sm-group-area.active").length<=0 ){
-                var tmp = $(".sm-group-area");
-                if( tmp.length>0 )  tmp[0].addClass("active");
-            }
+            if( $(".sm-group-area.active").length<=0 )
+                $(".sm-group-area:first").addClass("active");
 
 			//設定調整團體頭像
     		$(document).data("group-avatar",true);
