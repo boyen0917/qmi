@@ -135,6 +135,11 @@ $(document).ready( function(){
 			resetGroupInfo();
 		});
 	});
+
+	$(document).on("click",".ga-info.view.admin", function(){
+		$(this).hide();
+		$(".ga-info.edit").show();
+	});
 });
 
 /*
