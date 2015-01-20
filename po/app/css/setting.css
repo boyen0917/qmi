@@ -75,13 +75,15 @@
 .ga-header{
 	position: fixed;
 	height: 45px;
-	width: 100%;
+	width: -webkit-calc( 100% - 261px );
 	/*border-bottom: 1px solid rgb(57, 148, 232);*/
-	border-top-right-radius: 10px;
 	background: rgba(127,127,127,0.5);
 	top: 44px;
 	padding-left: 5px;
 	padding-right: 5px;
+}
+.ga-header div{
+	display: inline-block;
 }
 .ga-header-back{
 	height: 100%;
@@ -92,19 +94,33 @@
 	width:30px;
 	object-fit: cover;
 }
+.ga-header-done{
+	color: rgb(187, 187, 187);
+	cursor: default;
+	float: right;
+	line-height: 45px;
+	margin-right: 13px;
+}
+.ga-header-done.ready{
+	color: white;
+	cursor: pointer;
+}
 
 .ga-content{
 	width: 100%;
 	/*margin-top: 47px;*/
 }
+
 .ga-avatar{
 	height: 360px;
 }
+
 .ga-avatar-img, .ga-avatar-img.default{
 	height: 370px;
 	width: 100%;
 	object-fit: cover;
 	position: absolute;
+	z-index: 0;
 }
 .ga-avatar-img.group-pic{
 	display: none;
@@ -117,6 +133,30 @@
 	padding: 10px 20px;
 	white-space: nowrap;
 }
+@media screen and (min-width: 0px) and (max-width: 799px){
+	.ga-avatar, .ga-avatar-img, .ga-avatar-img.default{
+		height: 360px;
+	}
+	.ga-header-bar{
+		top: 311px;
+	}
+}
+@media screen and (min-width: 900px){
+	.ga-avatar{
+		height: 450px;
+		background: rgb(20,20,20);
+		width: 100%;
+	}
+	.ga-avatar-img, .ga-avatar-img.default{
+		height: 450px;
+		max-width: 650px;
+		margin-left: -webkit-calc( 50% - 325px );
+	}
+	.ga-header-bar{
+		top: 400px;
+	}
+}
+
 .ga-header-bar.bgColor{
 	background: rgba(127,127,127,0.5);
 }
@@ -148,14 +188,36 @@
 	color: #7d8795;
 }
 .ga-info-row .content{
-	padding-left: 10px;
-	padding-right: 10px;
+	margin-left: 20px;
+	margin-right: 20px;
 	line-height: 24px;
-	height: 24px;
 	color: black;
 	border-bottom: 1px solid rgb(229,234,237);
-	outline: 0px solid transparent;
+	min-height: 24px;
+	width: -webkit-calc( 100% - 40px);
 }
-.ga-info-row .content.editable{
-	cursor: text;
+.ga-info-row textarea.content, .ga-info-row input.content{
+	border-bottom: 1px solid rgb(229,234,237);
+	border-radius: 5px;
+	border: none;
+	/*padding: 5px;*/
+	/*resize: none;*/
+	overflow: auto;
+	font-size: 16px;
+	padding: 0;
+}
+.ga-info-row textarea.content:focus, .ga-info-row input.content:focus{
+	border-radius: 5px;
+	border: 3px solid #cccccc;
+	padding: 0px 2px;
+}
+.ga-info-row input.content{
+	line-height: 16px;
+	height: 16px;
+	margin-top: 4px;
+}
+.ga-info-row input.content:focus{
+	line-height: 18px;
+	height: 12px;
+	margin-top: 0px;
 }

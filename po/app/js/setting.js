@@ -39,9 +39,120 @@ $(document).ready( function(){
 		*/
 	});
 
-	// $(document).on("load", ".ga-avatar-img.groupImg",function(e){
-	// 	$(".ga-avatar-img.default").fadeOut();
-	// 	$(this).fadeIn();
+	//-------------- group img -------------------
+
+	//file upload
+	$(document).on("click",".ga-avatar-photo.admin",function(e){
+		$(".ga-avatar input").trigger("click");
+	});
+
+	//檔案上傳
+	$(document).on("change",".ga-avatar input",function(e){
+		var input = $(this);
+		input.removeClass("ready");
+		var imageType = /image.*/;
+		var file = $(this)[0].files[0];
+		if (file.type.match(imageType)) {
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				var img = $(".ga-avatar-img.upload");
+				//reset
+				img.attr("src",reader.result);
+				img.fadeIn();
+		        
+		        input.addClass("ready");
+		        //有更動即可按確定
+		        // this_info.find(".user-info-submit").addClass("user-info-submit-ready");
+
+		        // //記錄更動
+		        // this_info.data("avatar-chk",true);
+				checkGroupInfoChange();
+			}
+			reader.readAsDataURL(file);
+		}else{
+			//clear input file
+			var this_file = $(this);
+			this_file.replaceWith( this_file = this_file.clone( true ) );
+
+			//警語
+			popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
+		}
+	});
+	//為了阻止網頁跳轉
+	$(document).on("dragover","body",function(e){
+		e.preventDefault();
+        e.stopPropagation();
+	});
+	$(document).on("drop","body",function(e){
+		e.preventDefault();
+        e.stopPropagation();
+	});
+
+	$(document).on("drop",".ga-avatar.admin",function(e){
+		//為了阻止網頁跳轉
+		e.preventDefault();
+	    e.stopPropagation();
+	        
+	    $(".ga-avatar input")[0].files = e.originalEvent.dataTransfer.files;
+	});
+
+	//--------------- group name & description ---------
+	$(document).on("input",".ga-info.edit .ga-info-row .content",function(e){
+		var content = $(this);
+		if( content.val() 
+			&& content.val().length>0 
+			&& content.data("oriText") != content.val() ){
+			content.addClass("ready");
+		} else {
+			content.removeClass("ready");
+		}
+		checkGroupInfoChange();
+	});
+	$(document).on("keydown keyup",".ga-info.edit .ga-info-row .autoHeight",function(e){
+		$(this).height('0px').height($(this).prop("scrollHeight")+"px");
+	});
+
+	//---------- on done ---------------
+	$(document).on("click",".ga-header-done.ready", function(e){
+		var edit = $(".ga-info.edit");
+		var newGn = null;
+		var newGd = null;
+		var updateDom = edit.find(".ga-info-row .content");
+		$.each( updateDom, function(i,domTmp){
+			var dom = $(domTmp);
+			var type = dom.parent().data("type");
+			switch( type ){
+				case "name":
+					if(dom.hasClass("ready")) newGn = dom.val();
+					else newGn = dom.data("oriText");
+					break;
+				case "info":
+					if(dom.hasClass("ready")) newGd = dom.val();
+					else newGd = dom.data("oriText");
+					break;
+			}
+		});
+		var file = null;
+		var input = $(".ga-avatar input.ready");
+		if( input.length> 0 ){
+			file = input[0].files[0];
+		}
+		requestUpdateGroupInfo( gi, newGn, newGd, file, function(){
+			resetGroupInfo();
+		});
+	});
+
+	$(document).on("click", ".ga-info.view.admin", function(){
+		$(this).hide();
+		$(".ga-info.edit").show();
+		$(".ga-info.edit .ga-info-row .autoHeight").trigger("keydown");
+	});
+
+	// $(document).on("focusout", ".ga-info.edit", function(){
+	// 	var edit = $(".ga-info.edit");
+	// 	if( edit.is(":visible") ){
+	// 		resetGroupInfo();
+	// 	}
 	// });
 });
 
@@ -148,13 +259,13 @@ function requestUpdatePermission( this_gi, addList, delList, callback){
     var body = {
               el: addList,
               dl: delList
-            }
+            };
     
     ajaxDo(api_name,headers,method,true,body).complete(function(data){
     	if(data.status == 200){
     		//可以直接改權限, 不過取消admin的權限該是多少？
     		//改成直接打api更新好了...
-    		setGroupAllUser(null, gi, callback);
+    		setGroupAllUser(null, this_gi, callback);
     		// try{
 		    //     var userData = $.lStorage(ui);
 		    //     var guAll = userData[gi].guAll;
@@ -201,21 +312,28 @@ function showGroupInfoPage(){
     }
 
 	//admin
+	var view = $(".ga-info.view");
+	view.show();
+	$(".ga-info.edit").hide();
+
 	if( isAdmin ){
+		view.addClass("admin");
+		$(".ga-avatar").addClass("admin");
 		$(".subpage-groupAbout .admin").show();
 		$(".subpage-groupAbout .general").hide();
 		$(".ga-header-bar").removeClass("bgColor");
 
-		$(".ga-info-row .content").attr("contenteditable","true");
+		$(".ga-info.edit .ga-info-row[data-type='name'] .content").val( groupName );
+		$(".ga-info.edit .ga-info-row[data-type='info'] .content").val( groupDescription );
 	} else {
+		view.removeClass("admin");
+		$(".ga-avatar").removeClass("admin");
 		$(".subpage-groupAbout .admin").hide();
 		$(".subpage-groupAbout .general").show();
 		$(".ga-header-bar").addClass("bgColor");
-		$(".ga-info-row .content").attr("contenteditable","false");
 	}
+	
 
-	$(".subpage-groupAbout .groupName").html( groupName.replaceOriEmojiCode() );
-	$(".subpage-groupAbout .groupDescription").html( groupDescription.replaceOriEmojiCode() );
 	// if( groupImg ){
 	// 	if( $(".ga-avatar-img.groupImg").attr("src")!=groupImg ){
 	// 		$(".ga-avatar-img.default").hide();
@@ -266,4 +384,95 @@ function showGroupInfoPage(){
     // $(".subpage-chatList").fadeOut();
     // $(".subpage-album").fadeOut();
 
+	//reset
+	resetGroupInfo();
+}
+
+function resetGroupInfo(){
+	var img = $(".ga-avatar-img.upload");
+	img.css("display","none");
+	$(".ga-header-done").removeClass("ready");
+	var input = $(".ga-avatar input");
+	input.replaceWith( input.clone(true) );
+
+	var contents = $(".ga-info.edit .ga-info-row .content");
+	$.each( contents, function(i,dom){
+		var domTmp = $(dom);
+		domTmp.data("oriText", domTmp.val() );
+	});
+
+	$(".ga-info.view").show();
+	$(".ga-info.edit").hide();
+}
+
+function checkGroupInfoChange(){
+	if( $(".ga-avatar input").hasClass("ready") 
+		|| $(".ga-info.edit .ga-info-row .content.ready").length>0 ){
+		$(".ga-header-done").addClass("ready");
+	} else {
+		$(".ga-header-done").removeClass("ready");
+	}
+}
+
+function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
+	
+	var isReady = false;
+	//如果更新資料
+	if( null!=newGn || null!=newGd ){
+		getUpdateGroupInfoApi(this_gi, newGn, newGd).complete(function(data){
+	    	if(data.status == 200){
+	    		if( isReady ){
+	    			setGroupAllUser(null, this_gi, function(){
+		    			if(callback) callback();
+		    			s_load_show = false;
+		    		});
+	    		}
+	    		isReady = true;
+	    	}
+	    });
+	} else isReady = true;
+
+    //如果更新頭像
+    if( file ){
+		var ori_arr = [1280,1280,0.7];
+		var tmb_arr = [120,120,0.6];
+
+	    var api_name = "groups/" + this_gi + "/avatar"
+
+	    uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
+	    	if(!chk) {
+	    		toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") ); //團體頭像上傳失敗
+	    	}
+
+	    	if( isReady ){
+	    		setGroupAllUser(null, this_gi, function(){
+	    			if(callback) callback();
+	    			s_load_show = false;
+	    		});
+	    	}
+	    	isReady = true;
+	    });
+    } else isReady = true;
+}
+
+function getUpdateGroupInfoApi( this_gi, newGn, newGd ){
+	//PUT /groups/{gi}{?tp} 
+	//tp=??
+	//{
+	//   "gn": "四竹資訊",
+	//   "gd": "這是一個敘述"
+	// }
+
+	var api_name = "/groups/"+this_gi;
+	var headers = {
+	        ui: ui,
+	        at: at,
+	        li: lang
+	             };
+	var method = "put";
+	var body = {};
+	if( newGn ) body.gn = newGn;
+	if( newGd ) body.gd = newGd;
+	
+	return ajaxDo(api_name,headers,method,true,body);
 }

@@ -1133,7 +1133,8 @@ showEditFavGroupBox = function( dom ){
 	var option = {
 		isShowGroup:false,
 		isShowAll:false,
-		isShowFav:true
+		isShowFav:true,
+		isShowSelf:true
 	};
 	composeObjectShowDelegate( dom, dom, option, function(){
 		var obj = dom.data("object_str");

@@ -61,9 +61,13 @@ $(function(){
 		    		}
 		    	});
 		    	_uiGroupList[gl_obj.gi] = gl_obj;
-			}
+			} else if(gl_obj.ad) {
+                //update admin value
+                _uiGroupList[gl_obj.gi].ad = gl_obj.ad;
+            }
 		});	
         $.lStorage(ui,_uiGroupList);
+        updateTab(gi);
 	}
 
 	logout = function(){
@@ -244,8 +248,6 @@ $(function(){
 
                 setGroupAttributes( this_gi, groupData );
 
-                updateGroupIcon( this_gi );
-
                 setGrouUser( this_gi, groupData );
 				// data_group_user = groupData.ul;
 
@@ -283,6 +285,9 @@ $(function(){
                 }else if(data_arr){
 	            	getUserName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
 	            }
+
+                updateGroupAllInfoDom( this_gi );
+
                 if(callback) callback();
 			}else{
                 //發生錯誤 開啓更換團體
@@ -1126,7 +1131,7 @@ $(function(){
         var group = userData[this_gi];
         //如果tp為c,d開頭為官方團體
         if( true==group.isOfficial ){
-            userData[this_gi].tab = [
+            group.tab = [
                 { "tp": 0, "sw": false },
                 { "tp": 1, "sw": false },
                 { "tp": 2, "sw": true },
@@ -1136,7 +1141,7 @@ $(function(){
                 { "tp": 6, "sw": false },
                 { "tp": 7, "sw": true }
             ];
-            // userData[this_gi].pen = [
+            // group.pen = [
             //     { "tp": 0, "sw": true },
             //     { "tp": 1, "sw": true },
             //     { "tp": 2, "sw": true },
@@ -1147,9 +1152,9 @@ $(function(){
 
 
             if( !isDataMissing && groupData.set.tab ){
-                userData[this_gi].tab = groupData.set.tab;
+                group.tab = groupData.set.tab;
             } else {
-                userData[this_gi].tab = [
+                group.tab = [
                     { "tp": 0, "sw": false },
                     { "tp": 1, "sw": false },
                     { "tp": 2, "sw": true },
@@ -1162,17 +1167,18 @@ $(function(){
             }
 
         }
-            if( !isDataMissing && groupData.set.pen ){
-                userData[this_gi].pen = groupData.set.pen;
-            } else {
-                userData[this_gi].pen = [
-                    { "tp": 0, "sw": true },
-                    { "tp": 1, "sw": true },
-                    { "tp": 2, "sw": true },
-                    { "tp": 3, "sw": true },
-                    { "tp": 4, "sw": true }
-                ];
-            }
+
+        if( !isDataMissing && groupData.set.pen ){
+            group.pen = groupData.set.pen;
+        } else {
+            group.pen = [
+                { "tp": 0, "sw": true },
+                { "tp": 1, "sw": true },
+                { "tp": 2, "sw": true },
+                { "tp": 3, "sw": true },
+                { "tp": 4, "sw": true }
+            ];
+        }
 
         $.lStorage(ui, userData);
 
@@ -1249,6 +1255,12 @@ $(function(){
         // dom.detach();
         // menu.append( dom );
         // dom.show();
+
+        //不是admin團體設定空空的, 暫時先關起來
+        if( 1!=groupData.ad ){
+            dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
+            dom.hide();
+        }
 
         //set pen
         try{
@@ -3131,6 +3143,7 @@ $(function(){
                 $(".obj-content").removeClass("on-search");
                 $(".obj-cell").show();
                 $(".subgroup-parent").show();
+                $(".subgroup-row.fav-parent").show();
                 $(this).html("");
                 $(".obj-cell-area hr").show();
                 $(".obj-cell-subTitle .obj-cell-subTitle-chk").show();
@@ -4504,7 +4517,7 @@ $(function(){
         $(".sm-group-pic").css("background","url(" + _groupList[this_gi].aut + ")").stop().animate({
             opacity:1
         },1000);
-        $(".sm-group-name").html(_groupList[this_gi].gn);
+        // $(".sm-group-name").html(_groupList[this_gi].gn);
     }
 	
 	groupMenuListArea = function (new_gi,invite){
@@ -4554,13 +4567,14 @@ $(function(){
 	            	glo_img = val.auo;
 	            }
 
+                var data_gi_str = 'data-gi="' + val.gi + '" ';
 	            var this_group = $(
-	           		'<div class="sm-group-area polling-cnt enable" data-gi="' + val.gi + '" data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
+	           		'<div class="sm-group-area polling-cnt enable" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
 	           			'<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
 	           	        '<div class="sm-group-area-l group-pic">' +
-	           	            '<img class="aut" src="' + glt_img + '">' +
+	           	            '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
 	           	        '</div>' +
-	           	        '<div class="sm-group-area-r">' + htmlFormat(val.gn) + '</div>' +
+	           	        '<div class="sm-group-area-r polling-group-name" '+ data_gi_str+'>' + htmlFormat(val.gn) + '</div>' +
 	           	        '<div class="sm-count" style="display:none"></div>' +
 	           	    '</div>'
 	     	    );
@@ -6171,7 +6185,7 @@ $(function(){
                                             "p": pi,
                                             "tp": 6
                                         });
-                                        sendReply( this_event, this_gi, this_ti, this_ei, body );
+                                        replyApi( this_event, this_gi, this_ti, this_ei, body );
                                     });
                                 } catch( e ){
                                     errorReport(e);

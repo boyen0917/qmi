@@ -130,7 +130,7 @@
             <div class="gm-frame scrolltop">
                 <div class="gm-header user-main-toggle">
                     <div class="gm-header-left">
-                        <div class="sm-group-name">&nbsp;</div>
+                        <div class="sm-group-name polling-group-name currentGroup">&nbsp;</div>
                     </div>
                     <div class="gm-header-right">
                         <div class="gm-header-adjustment"></div>
@@ -548,20 +548,32 @@
                             <div class="ga-content">
                                 <div class="ga-avatar">
                                     <img class="ga-avatar-img default" src="images/common/others/name_card_nophoto_profile.png"/>
-                                    <img class="ga-avatar-img polling-group-pic-o"/>
+                                    <img class="ga-avatar-img polling-group-pic-o currentGroup"/>
+                                    <img class="ga-avatar-img upload"/>
                                     <div class="ga-header-bar">
-                                        <div class="ga-avatar-name general groupName"></div>
+                                        <div class="ga-avatar-name general polling-group-name currentGroup"></div>
                                         <img class="ga-avatar-photo admin" src="images/common/icon/bt_camera_nornal.png"/>
                                     </div>
+                                    <input type="file" style="display:none" data-role="none">
                                 </div>
-                                <div class="ga-info">
+                                <div class="ga-info view">
                                     <div class="ga-info-row admin" data-type="name">
                                         <div class="title" data-textid="GROUP_GROUP_NAME"></div>
-                                        <div class="content groupName"></div>
+                                        <div class="content polling-group-name currentGroup"></div>
                                     </div>
                                     <div class="ga-info-row" data-type="info">
                                         <div class="title" data-textid="GROUP_ABOUT"></div>
-                                        <div class="content groupDescription"></div>
+                                        <div class="content polling-group-description currentGroup"></div>
+                                    </div>
+                                </div>
+                                <div class="ga-info edit">
+                                    <div class="ga-info-row" data-type="name">
+                                        <div class="title" data-textid="GROUP_GROUP_NAME"></div>
+                                        <input class="content" data-textph-id="GROUP_NAME_LIMIT" data-role="none"/>
+                                    </div>
+                                    <div class="ga-info-row" data-type="info">
+                                        <div class="title" data-textid="GROUP_ABOUT"></div>
+                                        <textarea class="content autoHeight" data-textph-id="GROUP_ABOUT_ALERT" maxLength="300" data-role="none"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -570,7 +582,7 @@
                                     <img src="images/navi/navi_icon_back.png"/>
                                 </div>
                                 <div class="ga-header-title"></div>
-                                <div class="ga-header-done"></div>
+                                <div class="ga-header-done" data-textid="COMMON_DONE"></div>
                             </div>
                         </div>
                     </div>
