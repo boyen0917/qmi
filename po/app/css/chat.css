@@ -522,18 +522,18 @@ body {
 	width: 30px;
 	vertical-align: bottom;
 	margin-bottom: 3px;
-	background: url("../images/icon/chat_textbar_icon_sticker.png");
+	background: url("../images/chatroom/chat_textbar_icon_emoticon.png");
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
 #footer .contents .input-emoji:hover{
-	background: url("../images/icon/chat_textbar_icon_sticker_onclick.png");
+	background: url("../images/chatroom/chat_textbar_icon_emoticon_onclick.png");
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 }
 #footer .contents .input-emoji.active{
-	background: url("../images/icon/chat_textbar_icon_sticker_activity.png");
+	background: url("../images/chatroom/chat_textbar_icon_emoticon_activity.png");
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 }
