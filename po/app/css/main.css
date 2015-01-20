@@ -2480,12 +2480,23 @@ img.st-user-pic{
 
 .st-vote-detail-option span:nth-child(3) {
 	position: relative;
-	top: 2px;
+	top: 6px;
 	right: 35px;
 	width: 30px;
 	display: block;
 	text-align: right;
 }
+
+.st-vote-detail-option img.more {
+	position: relative;
+	top: 8px;
+	right: 25px;
+	width: 20px;
+	height: 20px;
+	display: block;
+	text-align: right;
+}
+
 
 .st-vote-send,.st-vote-send-blue {
 	color: white;
@@ -2531,9 +2542,20 @@ img.st-user-pic{
 }
 
 .st-task-vote-detail-count {
+	display: none;
 	border: 1px solid rgb(200,220,240);
 	padding: 4px 10px 0px;
 	margin: 15px 0;
+}
+
+.st-task-vote-detail-count .align-right {
+	float: right;
+	min-width: 20%;
+}
+
+.st-task-vote-detail-count .vote-type {
+	margin-left: 5%;
+	color: red;
 }
 
 .st-vote-detail-top {
@@ -2562,7 +2584,7 @@ img.st-user-pic{
 	display: -webkit-box;
 }
 
-.st-vote-detail-option > img, .st-work-option > img {
+.st-vote-detail-option img.check, .st-work-option img.check {
 	margin-right: 10px;
 	position: relative;
 	top: 2px;
@@ -3093,7 +3115,7 @@ img.st-reply-message-attach {
     display:table;
 }
 
-.cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-work-area,.cp-vote-area-test,.cp-time-area{
+.cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-work-area,.cp-vote-area-test,.cp-time-area,.cp-vote-type-area{
     background: white;
 	width: 95%;
 	margin: 13px auto;
@@ -3287,9 +3309,27 @@ img.st-reply-message-attach {
 	cursor: pointer;
 }
 
+.cp-vote-type .content{
+	margin: 25px;
+}
 
+.cp-vote-type .tick {
+	margin: 25px;
+}
 
+.cp-vote-type .tick img {
+	width: 30px;
+}
 
+.cp-vote-type .content {
+	margin-top: 20px;
+}
+
+.cp-vote-type .desc {
+	font-size: 15px;
+	color: #aaa;
+	margin-top: 3px;
+}
 
 
 .cp-vote-area,.cp-work-area {
@@ -3301,6 +3341,12 @@ img.st-reply-message-attach {
 
 .cp-vote-area img,.cp-work-area > img{
 	cursor:pointer;
+}
+
+.cp-vote-type {
+display: -webkit-box;
+height: 80px;
+border-bottom: 1px solid #eee;
 }
 
 .cp-vote-ques-title {

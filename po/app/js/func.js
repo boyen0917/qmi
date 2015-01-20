@@ -1,12 +1,11 @@
 $(function(){
 
 	setDefaultGroup = function(dgi){
-
 		//上次點選團體
 		if(dgi && $.lStorage(ui)){
 			var _uiGroupList = $.lStorage(ui);
     		var default_group = _uiGroupList[dgi];
-    		
+
     		gi = dgi;
     		gu = default_group.gu;
     		gn = default_group.gn;
@@ -17,7 +16,6 @@ $(function(){
     		//預設團體暫定為第一個團體？
             if(!$.lStorage("_groupList") || $.lStorage("_groupList").length == 0) return false;
 
-            cns.debug("gl",$.lStorage("_groupList"));
         	var default_group = $.lStorage("_groupList")[0];
 
         	$.each(default_group.tl,function(i,val){
@@ -1009,6 +1007,7 @@ $(function(){
 			"at":at, 
 			"li":lang
 		};
+        cns.debug("api_name",api_name);
 		var method = "get";
 		var result = ajaxDo(api_name,headers,method,false);
 		result.complete(function(data){
@@ -1543,6 +1542,7 @@ $(function(){
         
         //製作每個回覆
         var okCnt = 0;
+        cns.debug("e_data",e_data);
         $.each(e_data,function(el_i,el){
             cns.debug("====================回覆============================================================================");
             cns.debug("el",el);
@@ -1620,7 +1620,7 @@ $(function(){
                             if(reply_chk) break;
 
                             //投票內容 照理說要做投票表格 但因為是非同步 因此先做的話 會無法更改資料
-                            voteContentMake(this_event,val.li);
+                            voteContentMake(this_event,val);
                             //without_message = true;
                             break;
                         case 15:
@@ -1813,7 +1813,7 @@ $(function(){
 		this_event.find(".st-task-work-detail").html("");
 		cns.debug("new_li:",new_li);
 		$.each(new_li,function(i,val){
-			var this_work = $('<div class="st-work-option" data-item-index="' + val.k + '"><img src="images/common/icon/icon_check_round_white.png"><span>' + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' + _groupList[gi].guAll[val.u].nk + '</span></div></div>');
+			var this_work = $('<div class="st-work-option" data-item-index="' + val.k + '"><img class="check" src="images/common/icon/icon_check_round_white.png"><span>' + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' + _groupList[gi].guAll[val.u].nk + '</span></div></div>');
 			this_event.find(".st-task-work-detail").append(this_work);
 			if(val.m) {
 				this_work.data("mine",true);
@@ -1899,11 +1899,11 @@ $(function(){
 	        	//存回
 	        	this_work.data("work-status",work_status);
 	    	});
-
 		})
 	}
 
-	voteContentMake = function (this_event,li){
+	voteContentMake = function (this_event,vote_obj){
+        var li = vote_obj.li;
 		$.each(li,function(v_i,v_val){
 			this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html .st-vote-ques-area',function(){
 				var this_ques = $(this).find(".st-vote-ques-area");
@@ -1917,7 +1917,7 @@ $(function(){
 	        	if(v_val.v > 1){
 	        		tick_img = "images/common/icon/icon_check_red.png";
 				}
-				//
+				
 				this_ques.data("vote-multi",v_val.v);
 				this_ques.data("tick-img",tick_img);
 
@@ -1938,55 +1938,89 @@ $(function(){
 				$.each(v_val.i,function(i_i,i_val){
 					this_ques.append(
 						'<div class="st-vote-detail-option" data-item-index="' + i_val.k + '">' +
-					        '<img src="images/common/icon/icon_check_round_white.png"/>' +
-					        '<span>' + i_val.o + '</span>' +
-					        '<span>' + 0 + '</span>' +
+					        '<img class="check vote-do" src="images/common/icon/icon_check_round_white.png"/>' +
+					        '<span class="vote-do">' + i_val.o + '</span>' +
+					        '<span class="cnt vote-set">' + 0 + '</span>' +
+                            '<img class="more vote-set" src="images/common/icon/icon_arrow_next.png">' +
 					    '</div>'
 					);
 
 					//設定複選投票數為 0
 		        	this_ques.data("multi-count",0);
 				});
-				
-				//load結束 呼叫function 製作投票結果呈現
+
+				//load結束 根據投票類型做限制 以及 製作投票結果呈現
 				if(v_i == li.length - 1){
+                    voteTypeSetting(this_event,vote_obj);
                     setTimeout(function(){
                         voteResultMake(this_event);
                     },500);
-					
 				}
             }));
 		});
 
 	}
 
+    voteTypeSetting = function (this_event,vote_obj){
+
+        //寫入類型
+        var vote_type = $.i18n.getString("FEED_VOTE_GENERAL");
+        if(vote_obj.lv == 1) vote_type = $.i18n.getString("FEED_VOTE_PUBLIC");
+        if(vote_obj.lv == 2) vote_type = $.i18n.getString("FEED_VOTE_ANONYMOUS");
+        this_event.find(".st-task-vote-detail-count span.vote-type").html(vote_type);
+
+
+        //非發文者 會受投票類型限制
+        if(this_event.data("event-val").meta.gu == gu) return false;
+
+        var cnt_close = true,member_close = true;
+        //現在時間 大於 結束時間
+        if(new Date().getTime() > vote_obj.e){
+            if(vote_obj.lv == 2) member_close = false;
+        }else{
+            //投票進行中 只有公開模式都是開啓
+            if(vote_obj.lv != 1){
+                cnt_close = false,member_close = false;
+            }
+        }
+
+        if(cnt_close == false) this_event.find(".st-vote-detail-option .cnt").hide();
+        if(member_close == false) this_event.find(".st-vote-detail-option .more").hide();
+
+    }
+
 	voteResultMake = function (this_event){
-		
 		var vote_obj = this_event.data("vote-result");
 		var all_ques = this_event.find(".st-vote-ques-area");
 		//設定投票人數
-	    this_event.find(".st-task-vote-detail-count span").html(Object.keys(vote_obj).length + "人已投票");
+        this_event.find(".st-task-vote-detail-count").show();
+	    this_event.find(".st-task-vote-detail-count span:first").html(Object.keys(vote_obj).length + "人已投票");
+
 		//預設opt 為全部都沒選 fasle
 		this_event.find(".st-vote-detail-option").data("vote-chk",false);
 
-    	//根據每個答案的gu  
+    	//根據每個答案的gu
         $.each(vote_obj,function(ans_gu,ans_val){
-        	//答案的多個題目
+        	//每個gu的答案 有多個題目
         	$.each(ans_val.li,function(k_i,k_val){
-        		//每個題目
+        		//畫面上的每個題目
 		        $.each(all_ques,function(ques_i,ques_val){
 		        	var this_ques = $(this);
             		//題目的編號 和 答案的編號相同 而且 有投票的內容(可能 "i": [])
-            		if(k_val.k == this_ques.data("ques-index") && k_val.i){
+            		if(k_val.k == this_ques.data("ques-index") && k_val.i.length > 0){
             			//答案的多個投票
 	            		$.each(k_val.i,function(i_i,i_val){
-
 	            			//最後一個 每個選項的k
 	            			$.each(this_ques.find(".st-vote-detail-option"),function(opt_i,opt_val){
 	            				var this_opt = $(this);
 	    						if(this_opt.data("item-index") == i_val.k){
 	    							var count = this_opt.find("span:eq(1)").html();
 	    							this_opt.find("span:eq(1)").html(count*1+1);
+
+                                    //將gu記錄起來
+                                    var member_list = this_opt.data("member-list") || [];
+                                    member_list.push({gu:ans_gu,rt:ans_val.time});
+                                    this_opt.data("member-list",member_list);
 	    							
 	    							//自己投的 要打勾
 					            	if(ans_gu == gu){
@@ -1994,7 +2028,7 @@ $(function(){
 					            		var n = this_ques.data("multi-count")*1;
 					            		this_ques.data("multi-count",n+1)
 					            		this_opt.data("vote-chk",true);
-					            		this_opt.find("img").attr("src",this_ques.data("tick-img"));
+					            		this_opt.find("img.check").attr("src",this_ques.data("tick-img"));
 					            	}
 	    						}
 	    					});//最後一個 每個選項的k
@@ -2011,16 +2045,17 @@ $(function(){
 	}
 
 	bindVoteEvent = function (this_event){
-		this_event.find(".st-vote-detail-option").click(function(){
-			cns.debug("進來");
+
+		this_event.find(".st-vote-detail-option .vote-do").click(function(){
 			//時間到 不給點
 			if(this_event.data("task-over")){
-				cns.debug("時間到");
 				return false;
 			}
 
-			var this_ques = $(this).parent();
-			var this_opt = $(this);
+			
+			var this_opt = $(this).parent();
+            var this_ques = this_opt.parent();
+            var ml_minus_chk = false;
 
 			//復選的已選計數 單選也用來判斷有無投票
 			var vote_cnt = this_ques.data("multi-count");
@@ -2031,11 +2066,10 @@ $(function(){
 				//該選項的總計數
 				var opt_cnt = this_opt.find("span:eq(1)").html()*1;
 
-				cns.debug("復選");
 				//復選的情況就要判斷該選項是否已選擇
 				if(this_opt.data("vote-chk")){
 					this_opt.data("vote-chk",false);
-					this_opt.find("img").attr("src","images/common/icon/icon_check_round_white.png");
+					this_opt.find("img.check").attr("src","images/common/icon/icon_check_round_white.png");
 
 					//該項總計減一
 					
@@ -2043,6 +2077,14 @@ $(function(){
 
 					//減一 統計複選票數 才能計算是否達複選上限
 					this_ques.data("multi-count",vote_cnt-1);
+
+                    //將自己的gu從ml剔除
+                    var member_list = this_opt.data("member-list") || [];
+                    if(member_list.length > 0){
+                        for(var i in member_list){
+                            if(member_list[i].gu == gu) member_list.splice(i, 1);
+                        }
+                    }
 
 				//沒選變已選 投票數未達上限
 				}else if(vote_cnt <  this_ques.data("vote-multi")){
@@ -2055,40 +2097,54 @@ $(function(){
 					//該項總計加一
 					opt_cnt += 1;
 
+                    //member_list也加上自己
+                    var member_list = this_opt.data("member-list") || [];
+                    member_list.push({gu:gu,rt:new Date().getTime()});
+                    this_opt.data("member-list",member_list);
+
 					//複選 這時要變勾勾
-					this_opt.find("img").attr("src",this_ques.data("tick-img"));
+					this_opt.find("img.check").attr("src",this_ques.data("tick-img"));
 				}
 
 			//單選
 			}else{
-				cns.debug("單選");
 				//找出點選的那一項要減一
 				$.each(this_ques.find(".st-vote-detail-option"),function(i,val){
 					if($(this).data("vote-chk")){
-						cns.debug("here");
 						//找出點選的那一項的vote-chk 變false
 						$(this).data("vote-chk",false);
 						//找出點選的那一項 變成白圈圈
-						$(this).find("img").attr("src","images/common/icon/icon_check_round_white.png");
+						$(this).find("img.check").attr("src","images/common/icon/icon_check_round_white.png");
 
 						//該項總計減一
 						var this_cnt = $(this).find("span:eq(1)").html()*1;
-						//更改票數
 						$(this).find("span:eq(1)").html(this_cnt-1);
+
+                        //將自己的gu從ml剔除
+                        var member_list = $(this).data("member-list") || [];
+                        if(member_list.length > 0){
+                            for(var i in member_list){
+                                if(member_list[i].gu == gu) member_list.splice(i, 1);
+                            }
+                        }
 					}
 				});
+                
 
 				//該選項的總計數
 				var opt_cnt = this_opt.find("span:eq(1)").html()*1;
-
 				this_opt.data("vote-chk",true);
 
 				//單選 選到的直接是圈圈
-				this_opt.find("img").attr("src",this_ques.data("tick-img"));
-
+				this_opt.find("img.check").attr("src",this_ques.data("tick-img"));
 
 				//該項總計加一
 				opt_cnt += 1;
+
+                //member_list也加上自己
+                var member_list = this_opt.data("member-list") || [];
+                member_list.push({gu:gu,rt:new Date().getTime()});
+                this_opt.data("member-list",member_list);
 
 				//加一 計算是否有投票
 				if(vote_cnt == 0)
@@ -2206,6 +2262,22 @@ $(function(){
                 }
 	        });
 		});
+
+        this_event.find(".st-vote-detail-option .vote-set").click(function(){
+
+            var this_opt = $(this).parent();
+            var this_ques = this_opt.parent();
+
+            if(this_opt.data("member-list").length == 0) return false;
+
+            var title = this_ques.find(".st-vote-detail-desc").html() + " - " + this_opt.find(".vote-do:not(.check)").html();
+            var list = [ {title:title,ml:this_opt.data("member-list")} ];
+
+            var this_ei = this_event.data("event-id");
+            var this_gi = this_ei.split("_")[0];
+            cns.debug("list",list);
+            showObjectTabShow(this_gi, title, list);
+        });
 	}
 
 
@@ -2273,7 +2345,7 @@ $(function(){
 		          	break;
 		        case "vote":
 		        	ctp = 4;
-		        	show_area = ".cp-content-title,.cp-content-object, .cp-content-object ,.cp-vote-area,.cp-content-addcal,.cp-time-area";  //.cp-content-first,
+		        	show_area = ".cp-content-title,.cp-content-object, .cp-content-object ,.cp-vote-area,.cp-vote-type-area,.cp-content-addcal,.cp-time-area";  //.cp-content-first,
 
 		        	//預設題目數為0
 		        	this_compose.data("ques-total",0);
@@ -3711,8 +3783,9 @@ $(function(){
         });
 		//初始化 datetimepicker
         this_compose.find("input.cp-datetimepicker-end").datetimepicker({
-        	startDate:'+1970/01/02',
-            minDate: 0  ,
+        	startDate:'+1970/01/01',
+            minDate:'-1969/12/31'  ,
+            // minTime: (new Date().getHours()+1)+':00:00',
             format:'unixtime',
             onChangeDateTime: function() {
             	onChangeDateTime(this_compose,"end");
@@ -3743,7 +3816,6 @@ $(function(){
         var time_format_arr = time_format.split(",");
 
         if(type == "start"){
-
         	//記錄在thit_compose data
         	this_compose.data("start-timestamp",this_input.val()*1000);
 
@@ -3752,7 +3824,6 @@ $(function(){
             var end_input = this_compose.find("input.cp-datetimepicker-end");
             var timestamp_end = end_input.val()*1;
 			if(timestamp_start > timestamp_end){
-
 				//因為更改到結束時間 所以也要記錄在this_compose data中
 				this_compose.data("end-timestamp",this_input.val()*1000);				
 
@@ -3943,6 +4014,17 @@ $(function(){
 	}
 
 	composeVoteEvent = function(this_compose){
+        //選擇投票類型
+        this_compose.find(".cp-vote-type").click(function(){
+            this_compose.find(".cp-vote-type").data("chk",false);
+            this_compose.find(".cp-vote-type .tick img").attr("src","images/common/icon/icon_check_gray.png");
+
+            $(this).data("chk",true);
+            $(this).find(".tick img").attr("src","images/common/icon/icon_check_gray_check.png");
+
+            this_compose.data("vote-type",$(this).data("vote-type"));
+        });
+
 		//刪除一個投票項目
 		$(document).on("click",".cp-vote-opt img",function(){
 			var this_ques = $(this).parents(".cp-vote-ques-area");
@@ -3963,10 +4045,6 @@ $(function(){
 				}
 				
 			});
-			//this_opt.remove();
-
-			
-
 
 			//連動影響最高可投票數
 			var vote_count = this_ques.data("vote-count");
@@ -4053,7 +4131,8 @@ $(function(){
     		"li" : [],
     		"b": this_compose.data("start-timestamp"),
 			"e": this_compose.data("end-timestamp"),
-			"tp": 14
+			"tp": 14,
+            "lv": this_compose.data("vote-type")
     	}
 
       	//投票題目數
