@@ -235,7 +235,7 @@ $(function(){
 
 	setGroupAllUser = function(data_arr,this_gi,callback){
 		var this_gi = this_gi || gi;
-		getGroupData(this_gi,false).complete(function(data){
+		getGroupData(this_gi,false,1).complete(function(data){
 			if(data.status == 200){
 
                 var groupData = $.parseJSON(data.responseText);
@@ -1253,10 +1253,10 @@ $(function(){
         // dom.show();
 
         //不是admin團體設定空空的, 暫時先關起來
-        if( 1!=groupData.ad ){
-            dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
-            dom.hide();
-        }
+        // if( 1!=groupData.ad ){
+        //     dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
+        //     dom.hide();
+        // }
 
         //set pen
         try{
@@ -6714,6 +6714,13 @@ $(function(){
             this_info.find(".user-avatar-bar .user-name").addClass("hidden");
         }
 
+        if( user_data.st==2 ){
+            this_info.find(".user-info-list-area").hide();
+            this_info.find(".user-info-leave-area").html( $.i18n.getString("USER_PROFILE_LEAVE") ).show();
+            this_info.find(".action, .sl, .bd, .bl").hide();
+        } else {
+            this_info.find(".user-info-leave-area").hide();
+        }
     }
 
     meInfoShow = function(user_data){

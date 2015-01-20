@@ -100,6 +100,9 @@
 	"GROUPSETTING_GROUP" : "Group",
 	"BACKENDMANAGER_ASSIGN_MANAGER" : "Assign Admin",
 	"GROUPSETTING_GROUP_INFORMATION" : "Group Information",
+	"GROUPSETTING_LEAVE_ALERT_TITLE" : "Leave the group?",
+	"GROUPSETTING_LEAVE_ALERT_CONTENT" : "You can't access any data in this group after leave, make sure you have backup important files",
+	"GROUPSETTING_LEAVE_GROUP" : "Leave Group",
 
 	"LOGIN_ACCOUNT" :	"Phone Number or Email",
 	"LOGIN_ACCOUNT_OR_PASSWORD_ERROR" :	"Error account or password. Please try again.",
@@ -227,6 +230,7 @@
 	"CHAT_NO_CHATROOM" : "No chatroom now. Create one then start chat!",
 	"CHAT_VOIP_GET_CALL" : "%@ have called you from Qmi.",
 	"CHAT_VOIP_MAKE_CALL" : "You've made a call from Qmi.",
+	"CHAT_SOMEONE_LEAVE_GROUP" : "%@ left group.",
 	
 	"NOTICES_TITLE" :	"New Notices",
 	"NOTICES_POST" :	"Publish",
@@ -259,6 +263,7 @@
 	"USER_PROFILE_EMPTY_NAME" : "Please enter your name.",
 	"USER_PROFILE_UPDATE_SUCC" : "Update successed.",
 	"USER_PROFILE_NO_DATA" : "No data",
+	"USER_PROFILE_LEAVE" : "Member left",
 
 	"OFFICIAL_ABOUT" :	"About",
 	"OFFICIAL_CHAT" :	"Chat",

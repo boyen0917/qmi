@@ -729,9 +729,10 @@ $(function(){
 	    }
     }
 
-	getGroupData = function(this_gi,ajax_load,err_show){
+	getGroupData = function(this_gi,ajax_load,tp,err_show){
 		var err_show = err_show || false;
 		var api_name = "groups/" + this_gi;
+		if( tp ) api_name = api_name +"?tp=" +tp;
         var headers = {
             "ui":ui,
             "at":at,
@@ -771,6 +772,7 @@ $(function(){
 			
 			group.gn = data.gn || "";
 			group.gd = data.gd || "";
+			group.set = data.set;
 
 			$.lStorage(ui, userData);
 		} catch(e){

@@ -11,13 +11,18 @@ $(document).ready( function(){
 				break;
 		}
 	});
-	// $(document).on("click",".group-info-close",function(e){
-	// 	if( $("#page-group-info").is(":visible") ){
-	// 		$("#page-group-info").fadeOut();
-	// 		$(".screen-lock").fadeOut();
-	// 		$(".screen-lock").css("height","");
-	// 	}
-	// });
+
+	$(document).on("click", ".gs-leave", function(){
+		popupShowAdjust( $.i18n.getString("GROUPSETTING_LEAVE_ALERT_TITLE"),
+			$.i18n.getString("GROUPSETTING_LEAVE_ALERT_CONTENT"),
+			true, true, [function(){
+				requestLeaveGroup( gi, gu);
+			},null] );
+	});
+
+
+
+
 	$(document).on("click",".ga-header-back",function(e){
 		var tmp = $(".subpage-groupAbout").data("lastPage");
 		if( tmp ) $(tmp).show();
@@ -26,17 +31,6 @@ $(document).ready( function(){
 			{marginLeft: '100%'}, 1000, function(){
 				$(".subpage-groupAbout").hide();
 		});
-		/*
-
-		if( tmp && tmp==".subpage-groupSetting" ){
-			$(".subpage-groupAbout").off("animate").animate(
-				{marginLeft: '100%'}, 1000, function(){
-					$(".subpage-groupAbout").hide();
-			});
-		} else {
-			$(".subpage-groupAbout").fadeOut();
-		}
-		*/
 	});
 
 	//-------------- group img -------------------
@@ -141,36 +135,87 @@ $(document).ready( function(){
 			resetGroupInfo();
 		});
 	});
-
-	$(document).on("click", ".ga-info.view.admin", function(){
-		$(this).hide();
-		$(".ga-info.edit").show();
-		$(".ga-info.edit .ga-info-row .autoHeight").trigger("keydown");
-	});
-
-	// $(document).on("focusout", ".ga-info.edit", function(){
-	// 	var edit = $(".ga-info.edit");
-	// 	if( edit.is(":visible") ){
-	// 		resetGroupInfo();
-	// 	}
-	// });
 });
+
+/*
+              ██╗     ███████╗ █████╗ ██╗   ██╗███████╗          
+              ██║     ██╔════╝██╔══██╗██║   ██║██╔════╝          
+    █████╗    ██║     █████╗  ███████║██║   ██║█████╗      █████╗
+    ╚════╝    ██║     ██╔══╝  ██╔══██║╚██╗ ██╔╝██╔══╝      ╚════╝
+              ███████╗███████╗██║  ██║ ╚████╔╝ ███████╗          
+              ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝          
+                                                                 
+*/
 
 function initGroupSetting(){
 	// 如果是管理者的話顯示額外設定
     try{
         var userData = $.lStorage(ui);
-        var me_gu = userData[gi].gu;
-        if( 1==userData[gi].guAll[gu].ad ){
+        var group = userData[gi];
+        if( 1==group.ad ){
             $(".gs-row[data-type=permission]").show();
             $(".gs-row[data-type=info]").show();
         } else {
             $(".gs-row[data-type=permission]").hide();
             $(".gs-row[data-type=info]").hide();
         }
+
+        //離開團體開關
+        if( group.set.s11==0 || group.set.s11==2 ){
+        	$(".gs-leave").show();
+        } else {
+        	$(".gs-leave").hide();
+        }
     } catch(e){
         errorReport(e);
     }
+}
+
+function requestLeaveGroup( this_gi, this_gu, callback ){
+	// PUT /groups/{gi}/users/{gu}/status
+	// {
+	//   "st": 1 // 1(正常)、2(已退出)
+	// }
+	var api_name = "/groups/"+this_gi+"/users/"+this_gu+"/status";
+    var headers = {
+            ui: ui,
+	        at: at,
+	        li: lang
+                 };
+    var method = "put";
+    var body = { st: 2 };
+    
+    ajaxDo(api_name,headers,method,true,body).complete(function(data){
+    	if(data.status == 200){
+    		$(".sm-group-area[data-gi="+this_gi+"]").remove();
+    		var otherGroup = $(".sm-group-area.enable");
+    		if( otherGroup.length>0 ){
+    			$(otherGroup[0]).trigger("click");
+    		} else{
+    			document.location = "login.html";
+    		}
+
+    		//remove group data
+    		try{
+    			//local storage
+	    		var userData = $.lStorage(ui);
+	    		if( userData.hasOwnProperty(this_gi) ){
+	    			delete userData[this_gi];
+	    		}
+
+	    		//----- TODO -------
+	    		//
+	    		// remove from idb
+	    		//
+	    		//----- TODO -------
+
+		    } catch(e){
+		    	errorReport(e);
+		    }
+
+	        if( callback ) callback();
+    	}
+    });
 }
 
 

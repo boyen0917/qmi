@@ -77,6 +77,8 @@ $(document).ready(function(){
     //所有團體列表
     g_group = userData[gi];
     g_room = g_group["chatAll"][ci];
+
+    //get name
 	if( null==g_room.uiName ){
 		try{
 			if( g_room.tp==1 ){
@@ -101,6 +103,9 @@ $(document).ready(function(){
 		}
 	}
 	g_cn = g_room.uiName ? g_room.uiName : g_group.gn;
+
+	//check member left
+	checkMemberLeft();
 
 	gu = g_group.gu;
     ti_chat = ci;
@@ -1293,6 +1298,8 @@ function getPermition( isReget ){
 				    }
 					$.lStorage( ui, userData );
 
+					checkMemberLeft();
+
 			    	op("/groups/"+gi+"/permissions", "post", 
 			    		JSON.stringify(sendData), function(pData, status, xhr){
         					isGettingPermission = false;
@@ -1520,4 +1527,31 @@ function addMember(){
 
 function showAlbum(){
 	showAlbumPage( gi, ci, ci, g_cn);
+}
+
+function checkMemberLeft(){
+	try{
+		if( g_room.tp==1 && null!=g_room.memList ){
+			for( var guTmp in g_room.memList ){
+				if( guTmp!=g_group.gu ){
+					if( g_group.guAll.hasOwnProperty( guTmp ) ){
+						var mem = g_group.guAll[ guTmp ];
+						if(mem.st==2){
+							$("#footer").hide();
+							$("#chat-leaveGroup").html(
+								$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP",(mem.nk||"").replaceOriEmojiCode())
+							).show();
+							return;
+						}
+						break;
+					}
+				}
+			}
+		}
+	} catch(e){
+		errorReport(e);
+	}
+
+	$("#footer").show();
+	$("#chat-leaveGroup").hide();
 }
