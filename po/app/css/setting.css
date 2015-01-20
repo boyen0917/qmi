@@ -45,6 +45,19 @@
 	margin-right: 10px;
 	float: right;
 }
+.gs-leave{
+	color: rgb(85, 169, 224);
+	border: 2px solid rgb(178,211,242);
+	margin: 20px auto;
+	border-radius: 5px;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	cursor: pointer;
+	background: white;
+	width: 90%;
+	max-width: 350px;
+}
 
 /*
                █████╗ ██████╗  ██████╗ ██╗   ██╗████████╗          

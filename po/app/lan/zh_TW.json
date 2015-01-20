@@ -201,6 +201,7 @@
 	"CHAT_NO_CHATROOM" : "目前沒有任何聊天室，您可立即建立！",
 	"CHAT_VOIP_GET_CALL" : "%@在Qmi上撥電話給你",
 	"CHAT_VOIP_MAKE_CALL" : "你撥了一通電話",
+	"CHAT_SOMEONE_LEAVE_GROUP" : "%@ 已離開團體",
 
 	"NOTICES_TITLE"						: "新通知",
 	"NOTICES_POST"						: "發佈",
@@ -241,6 +242,9 @@
 	"GROUP_AVATAR_ALERT" : "請新增團體頭像",
 	"GROUP_ABOUT_ALERT" : "團體介紹未填寫",
 	"GROUP_AVATAR_UPLOAD_ALERT" : "團體頭像上傳失敗",
+	"GROUPSETTING_LEAVE_ALERT_TITLE" : "確定要退出團體嗎？",
+	"GROUPSETTING_LEAVE_ALERT_CONTENT" : "退出團體後您將無法取得所有資料及紀錄，請在刪除前完成備份的動作。",
+	"GROUPSETTING_LEAVE_GROUP" : "退出團體",
 
 	"SETTING_PROFILE_NAME" : "姓名",
 	"SETTING_PROFILE_BIRTHDAY" : "生日",
@@ -255,6 +259,7 @@
 	"USER_PROFILE_EMPTY_NAME" : "姓名不能為空值",
 	"USER_PROFILE_UPDATE_SUCC" : "更新成功",
 	"USER_PROFILE_NO_DATA" : "暫無資料",
+	"USER_PROFILE_LEAVE" : "已退出",
 
 	"OFFICIAL_ABOUT" : "關於",
 	"OFFICIAL_CHAT" : "聊天",

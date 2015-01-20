@@ -1100,3 +1100,16 @@ body {
 	margin-top: 5px;
 	/* vertical-align: super; */
 }
+
+
+
+
+#chat-leaveGroup{
+	text-align: left;
+	color: #6f7b98;
+	border-radius: 1em 1em 1em 1em;
+	font-size: 12px;
+	background-color: rgba(123,187,236,0.4);
+	padding: 5px 15px;
+	margin: 50px 15px 0 20px;
+} 

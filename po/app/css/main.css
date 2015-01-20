@@ -4094,6 +4094,11 @@ input.cp-datetimepicker-end {
 	-webkit-transform: rotateY( 180deg );
 }
 
+.user-info-leave-area{
+	padding: 10px;
+	color: #aaa;
+}
+
 .user-info-load-area .user{
 	position: absolute;
 	-webkit-backface-visibility: hidden;
