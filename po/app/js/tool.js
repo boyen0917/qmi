@@ -78,14 +78,14 @@ $(function(){
 	avatarPos = function (ori_img,x){
 
 		//reset
-		if( ori_img.length<=0 ){
-			return;
-		}
-		var src = ori_img[0].src;
-		var parent = ori_img.parent();
-		ori_img.remove();
-		var img = $("<img src='" + src + "'>​");
-		parent.prepend(img);
+		// if( ori_img.length<=0 ){
+		// 	return;
+		// }
+		// var src = ori_img[0].src;
+		// var parent = ori_img.parent();
+		// ori_img.remove();
+		// var img = $("<img src='" + src + "'>​");
+		// parent.prepend(img);
 		
 
 		// img.load(function() {
@@ -138,7 +138,6 @@ $(function(){
         });
 
         return str.join(" ").replaceEmoji();
-
     }
 
     //轉換html符號
@@ -749,6 +748,106 @@ $(function(){
   //       };
   //       var method = "get";
   //       return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
+	}
+
+	setGroupAttributes = function( this_gi, data ){
+		try{
+			var userData = $.lStorage(ui);
+			var group = userData[this_gi];
+
+			var updateKeys = ["auo","aut","cnt"];
+			var ignoreKeys = ["rsp_code"];
+			for( var key in data ){
+				//update auo, aut, etc.
+				if( updateKeys.indexOf(key)>=0 ){
+					group[key] = data[key];
+				} //add new keys
+				else if( !group.hasOwnProperty(key) ){
+					if( typeof(data[key])=="object" ) continue;
+					if( ignoreKeys.indexOf(key)>=0 ) continue;
+					group[key] = data[key];
+				}
+			}
+			
+			group.gn = data.gn || "";
+			group.gd = data.gd || "";
+
+			$.lStorage(ui, userData);
+		} catch(e){
+			errorReport(e);
+		}
+	}
+
+	//更新團體資訊
+	updateGroupAllInfoDom = function( this_gi ){
+		try{
+			var userData = $.lStorage(ui);
+			var group = userData[this_gi];
+
+			//update icon
+			var emptyAuo = "images/common/others/name_card_nophoto_profile.png";
+			var emptyAut = "images/common/others/empty_img_all_l.png";
+			if( group.auo ){
+				$(".polling-group-pic-o[data-gi="+this_gi+"]").attr("src", group.auo);
+			} else {
+				$(".polling-group-pic-o[data-gi="+this_gi+"]").attr("src", emptyAuo);
+			}
+			if( group.aut ){
+				$(".polling-group-pic-t[data-gi="+this_gi+"]").attr("src", group.aut);
+			} else {
+				$(".polling-group-pic-t[data-gi="+this_gi+"]").attr("src", emptyAut);
+			}
+
+			//update name
+			var gn = htmlFormat( group.gn );
+			var gd = htmlFormat( group.gd );
+			$(".polling-group-name[data-gi="+this_gi+"]").html(gn);
+			$(".polling-group-description[data-gi="+this_gi+"]").html(gd);
+
+			if( gi==this_gi ){
+				//update icon
+				if( group.auo ){
+					$(".polling-group-pic-o.currentGroup").attr("src", group.auo);
+				} else {
+					$(".polling-group-pic-o.currentGroup").attr("src", emptyAuo);
+				}
+				if( group.aut ){
+					$(".polling-group-pic-t.currentGroup").attr("src", group.aut);
+				} else {
+					$(".polling-group-pic-t.currentGroup").attr("src", emptyAut);
+				}
+
+				//update name
+				$(".polling-group-name.currentGroup").html(gn);
+				$(".polling-group-description.currentGroup").html(gd);
+			}
+			
+		} catch(e){
+			errorReport(e);
+		}
+	}
+
+	updateGroupIconDom = function( this_gi ){
+		try{
+			var userData = $.lStorage(ui);
+			var group = userData[this_gi];
+
+			//update icon
+			var emptyAuo = "images/common/others/name_card_nophoto_profile.png";
+			var emptyAut = "images/common/others/empty_img_all_l.png";
+			if( group.auo ){
+				$(".polling-group-pic-o[data-gi="+this_gi+"]").attr("src", group.auo);
+			} else {
+				$(".polling-group-pic-o[data-gi="+this_gi+"]").attr("src", emptyAuo);
+			}
+			if( group.aut ){
+				$(".polling-group-pic-t[data-gi="+this_gi+"]").attr("src", group.aut);
+			} else {
+				$(".polling-group-pic-t[data-gi="+this_gi+"]").attr("src", emptyAut);
+			}
+		} catch(e){
+			errorReport(e);
+		}
 	}
 
 	setGrouUser = function( this_gi, data ){

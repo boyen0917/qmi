@@ -4,6 +4,14 @@ var fbl;
 var isList = true;
 // var isKeyPress = false;
 
+$(document).ready(function(){
+	//set add member button
+	$(document).off("click",".contact-add");
+	$(document).on("click",".contact-add",function(e){
+		showAddMemberPage();
+	});
+});
+
 initContactList = function(){
 	//get user data
 	if( typeof(ui)=='undefined' ) return;
@@ -110,12 +118,6 @@ initContactList = function(){
 	$(window).off("resize").resize( function(){
 		$(".contact-branchList").height( $(window).height()-105 );
 		$(".contact-scroll").height( $(window).height()-112 );
-	});
-
-	//set add member button
-	$(".contact-add").off("click");
-	$(".contact-add").on("click", function(){
-		showAddMemberPage();
 	});
 }
 
@@ -1131,7 +1133,8 @@ showEditFavGroupBox = function( dom ){
 	var option = {
 		isShowGroup:false,
 		isShowAll:false,
-		isShowFav:true
+		isShowFav:true,
+		isShowSelf:true
 	};
 	composeObjectShowDelegate( dom, dom, option, function(){
 		var obj = dom.data("object_str");

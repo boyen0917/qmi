@@ -55,9 +55,13 @@ $(function(){
 		    		}
 		    	});
 		    	_uiGroupList[gl_obj.gi] = gl_obj;
-			}
+			} else if(gl_obj.ad) {
+                //update admin value
+                _uiGroupList[gl_obj.gi].ad = gl_obj.ad;
+            }
 		});	
         $.lStorage(ui,_uiGroupList);
+        updateTab(gi);
 	}
 
 	logout = function(){
@@ -235,8 +239,23 @@ $(function(){
 			if(data.status == 200){
 
                 var groupData = $.parseJSON(data.responseText);
+
+                setGroupAttributes( this_gi, groupData );
+
                 setGrouUser( this_gi, groupData );
 
+				// data_group_user = groupData.ul;
+
+                initOfficialGroup( this_gi );
+	   //          var new_group_user = {};
+	   //          $.each(data_group_user,function(i,val){
+	   //              //將gu設成key 方便選取
+	   //              new_group_user[val.gu] = val;
+	   //          });
+
+	   //          //成員列表存入local storage
+	   //          updateGuAll(this_gi,new_group_user);
+       
                 //按照邏輯 取得群組名單之後 就來設定群組資訊
                 setBranchList(this_gi, groupData);
 
@@ -262,6 +281,9 @@ $(function(){
                 }else if(data_arr){
 	            	getUserName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
 	            }
+
+                updateGroupAllInfoDom( this_gi );
+
                 if(callback) callback();
 			}else{
                 //發生錯誤 開啓更換團體
@@ -320,6 +342,8 @@ $(function(){
                 if(!main)
                     $(".st-navi-area .main").trigger("click");
 
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
 	        	$(".subpage-contact").hide();
 	        	$(".subpage-chatList").hide();
 	        	$(".subpage-timeline").show();
@@ -337,6 +361,8 @@ $(function(){
 
 	          break;
 	        case "memberslist": 
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
 	        	$(".subpage-contact").show();
 	            $(".subpage-timeline").hide();
 	        	$(".subpage-chatList").hide();
@@ -362,24 +388,31 @@ $(function(){
 	        	initContactList();
 	          break;
 	        case "chat":
-	        	//-- switch sub pages --
-	        	$(".subpage-contact").hide();
-	        	$(".subpage-timeline").hide();
-	        	$(".subpage-chatList").show();
-                $(".subpage-album").hide();
-	        	// $( "#side-menu" ).panel( "close");
 
-                page_title = $.i18n.getString("CHAT_TITLE");
+                //offical general
+                if( false==onClickOfficialGeneralChat(gi) ){
 
-	        	initChatList();
+    	        	//-- switch sub pages --
+                    $(".subpage-groupSetting").hide();
+                    $(".subpage-groupAbout").hide();
+    	        	$(".subpage-contact").hide();
+    	        	$(".subpage-timeline").hide();
+    	        	$(".subpage-chatList").show();
+                    $(".subpage-album").hide();
+    	        	// $( "#side-menu" ).panel( "close");
 
-                //顯示新增聊天室按鈕, 藏新增貼文按鈕
-                $("#page-group-main").find(".gm-header .feed-compose").hide();
-                $("#page-group-main").find(".gm-header .chatList-add").show();
-                $("#page-group-main").find(".gm-header .contact-add").hide();
+                    page_title = $.i18n.getString("CHAT_TITLE");
 
-	        	//$.mobile.changePage("#page-chatroom");
-	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
+    	        	initChatList();
+
+                    //顯示新增聊天室按鈕, 藏新增貼文按鈕
+                    $("#page-group-main").find(".gm-header .feed-compose").hide();
+                    $("#page-group-main").find(".gm-header .chatList-add").show();
+                    $("#page-group-main").find(".gm-header .contact-add").hide();
+
+    	        	//$.mobile.changePage("#page-chatroom");
+    	        	//$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
+                }
 	          break;
 	        case "calendar":
 	          break;
@@ -407,6 +440,8 @@ $(function(){
                 // if(!main)
                     $(".st-navi-subarea[data-st-navi=feed-post]").trigger("click");
 
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
                 $(".subpage-contact").hide();
                 $(".subpage-chatList").hide();
                 $(".subpage-timeline").show();
@@ -441,6 +476,8 @@ $(function(){
                 // if(!main)
                     $(".st-navi-subarea[data-st-navi=feed-public]").trigger("click");
 
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
                 $(".subpage-contact").hide();
                 $(".subpage-chatList").hide();
                 $(".subpage-timeline").show();
@@ -459,6 +496,8 @@ $(function(){
               break;
             case "album":
                 //-- switch sub pages --
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
                 $(".subpage-contact").hide();
                 $(".subpage-timeline").hide();
                 $(".subpage-chatList").hide();
@@ -477,6 +516,23 @@ $(function(){
                 //$.mobile.changePage("#page-chatroom");
                 //$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
               break;
+            case "groupSetting":
+                $(".subpage-groupSetting").show();
+                $(".subpage-groupAbout").hide();
+                $(".subpage-contact").hide();
+                $(".subpage-timeline").hide();
+                $(".subpage-chatList").hide();
+                $(".subpage-album").hide();
+                $( "#side-menu" ).panel( "close");
+                
+                //藏新增貼文按鈕, 新增聊天室按鈕
+                $("#page-group-main").find(".gm-header .feed-compose").hide();
+                $("#page-group-main").find(".gm-header .chatList-add").hide();
+                
+                page_title = $.i18n.getString("GROUPSETTING_TITLE");
+
+                initGroupSetting();
+                break;
 	    }
         setTimeout( timelineScrollTop, 1000 );
 
@@ -486,6 +542,8 @@ $(function(){
         }
 
         $("#page-group-main").find(".gm-header .page-title").html(page_title);
+
+        setOfficialGroup(gi);
 	}
 
 	setSmUserData = function (gi,gu,gn){
@@ -1066,69 +1124,55 @@ $(function(){
 
         //save data
         var userData = $.lStorage(ui);
-        if( !isDataMissing && groupData.set.tab ){
-            userData[this_gi].tab = groupData.set.tab;
-        } else {
-            userData[this_gi].tab = [
-                {
-                    "tp": 0,
-                    "sw": false
-                },
-                {
-                    "tp": 1,
-                    "sw": false
-                },
-                {
-                    "tp": 2,
-                    "sw": true
-                },
-                {
-                    "tp": 3,
-                    "sw": true
-                },
-                {
-                    "tp": 4,
-                    "sw": false
-                },
-                {
-                    "tp": 5,
-                    "sw": false
-                },
-                {
-                    "tp": 6,
-                    "sw": true
-                },
-                {
-                    "tp": 7,
-                    "sw": true
-                }
+        var group = userData[this_gi];
+        //如果tp為c,d開頭為官方團體
+        if( true==group.isOfficial ){
+            group.tab = [
+                { "tp": 0, "sw": false },
+                { "tp": 1, "sw": false },
+                { "tp": 2, "sw": true },
+                { "tp": 3, "sw": true },
+                { "tp": 4, "sw": false },
+                { "tp": 5, "sw": false },
+                { "tp": 6, "sw": false },
+                { "tp": 7, "sw": true }
             ];
+            // group.pen = [
+            //     { "tp": 0, "sw": true },
+            //     { "tp": 1, "sw": true },
+            //     { "tp": 2, "sw": true },
+            //     { "tp": 3, "sw": true },
+            //     { "tp": 4, "sw": true }
+            // ];
+        } else{
+
+
+            if( !isDataMissing && groupData.set.tab ){
+                group.tab = groupData.set.tab;
+            } else {
+                group.tab = [
+                    { "tp": 0, "sw": false },
+                    { "tp": 1, "sw": false },
+                    { "tp": 2, "sw": true },
+                    { "tp": 3, "sw": true },
+                    { "tp": 4, "sw": false },
+                    { "tp": 5, "sw": false },
+                    { "tp": 6, "sw": true },
+                    { "tp": 7, "sw": true }
+                ];
+            }
+
         }
 
         if( !isDataMissing && groupData.set.pen ){
-            userData[this_gi].pen = groupData.set.pen;
+            group.pen = groupData.set.pen;
         } else {
-            userData[this_gi].pen = [
-                {
-                    "tp": 0,
-                    "sw": true
-                },
-                {
-                    "tp": 1,
-                    "sw": true
-                },
-                {
-                    "tp": 2,
-                    "sw": true
-                },
-                {
-                    "tp": 3,
-                    "sw": true
-                },
-                {
-                    "tp": 4,
-                    "sw": true
-                }
+            group.pen = [
+                { "tp": 0, "sw": true },
+                { "tp": 1, "sw": true },
+                { "tp": 2, "sw": true },
+                { "tp": 3, "sw": true },
+                { "tp": 4, "sw": true }
             ];
         }
 
@@ -1175,6 +1219,7 @@ $(function(){
                         dom = menu.find(".sm-small-area[data-sm-act=memberslist]");
                         break;
                     case 7: //團體設定
+                        dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
                         break;
                 }
                 if( dom ){
@@ -1207,6 +1252,12 @@ $(function(){
         // menu.append( dom );
         // dom.show();
 
+        //不是admin團體設定空空的, 暫時先關起來
+        if( 1!=groupData.ad ){
+            dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
+            dom.hide();
+        }
+
         //set pen
         try{
             //set tabs
@@ -1231,6 +1282,9 @@ $(function(){
                         break;
                     case 4: //成員定位
                         dom = menu.find(".fc-area-subbox[data-fc-box=check]");
+
+                        //成員定位尚未有功能, 有顯示的話先disabled掉
+                        dom.addClass("disabled");
                         break;
                     case 5: //貼文
                         dom = menu.find(".fc-area-subbox[data-fc-box=post]");
@@ -1267,6 +1321,135 @@ $(function(){
             //cns.debug("[!] setTabList(set pen): " + e.message);
             errorReport(e);
         }
+    }
+
+    initOfficialGroup = function( this_gi ){
+        var userData;
+        var groupData;
+        try{
+            userData = $.lStorage(ui);
+            groupData = userData[this_gi];
+        } catch(e){
+            // cns.debug("[!] updateTab:" + e.message );
+            errorReport(e);
+            return;
+        }
+
+        try{
+            //如果tp為c,d開頭為官方團體
+            var tp = groupData.tp.toLowerCase();
+            groupData.isOfficial = ( tp.indexOf('c')==0 || tp.indexOf('d')==0 );
+            $.lStorage(ui,userData);
+            
+            //如果非admin, 沒有聊天室的話隨便找個admin預建聊天室
+            if( groupData.isOfficial && groupData.ad!=1 ){
+                updateChatList(this_gi, function(){
+                    if( null==groupData.chatAll || Object.keys(groupData.chatAll).length<=1 ){
+                        var target;
+                        //find an admin
+                        for( var gu in groupData.guAll){
+                            var mem = groupData.guAll[gu];
+                            if( mem.ad==1 ){
+                                target = mem;
+                                break;
+                            }
+                        }
+                        requestNewChatRoomApi(this_gi, target.nk, [{gu:target.gu}], null, false);
+                    }
+                });
+            }
+        } catch(e){
+            errorReport(e);
+        }
+    }
+
+    setOfficialGroup = function( this_gi ){
+        var groupData;
+        try{
+            groupData = $.lStorage(ui)[this_gi];
+        } catch(e){
+            // cns.debug("[!] updateTab:" + e.message );
+            errorReport(e);
+            return;
+        }
+
+        try{
+            if( !groupData.isOfficial ){
+
+                //set tab
+                $(".header-menu").show();
+                //set filters
+                $(".st-filter-area").show();
+
+                $(".official").hide();
+
+                $(".st-feedbox-area").removeClass("official-admin-adjust");
+                $(".sm-small-area[data-sm-act=chat]").removeClass("official-general");
+                return;
+            }
+
+            //-- set tabs --
+            // var menu = $(".header-menu");
+            // menu.find(".sm-small-area").hide();
+
+            // //feed
+            // var dom = menu.find(".sm-small-area[data-sm-act=feeds]");
+            // dom.show();
+            // dom.detach();
+            // menu.append( dom );
+            // // dom.addClass("active");
+            // // var nameDom = dom.find("div");
+            // // nameDom.html( $.i18n.getString(nameDom.attr("data-textid")) );
+
+            // //chat
+            // dom = menu.find(".sm-small-area[data-sm-act=chat]");
+            // dom.detach();
+            // dom.show();
+            // menu.append( dom );
+
+
+            //set filters
+            $(".st-filter-area").hide();
+
+            //admin
+            if( groupData.ad==1 ){
+                $(".official.admin").show();
+                $(".official.general").hide();
+                $(".st-feedbox-area").addClass("official-admin-adjust");
+                $(".sm-small-area[data-sm-act=chat]").removeClass("official-general");
+            } else{
+                $(".feed-compose").hide();
+                $(".official.admin").hide();
+                $(".official.general").show();
+                $(".st-feedbox-area").removeClass("official-admin-adjust");
+                $(".sm-small-area[data-sm-act=chat]").addClass("official-general");
+            }
+            $(".st-official-tab[data-type=cnt] .text").html( $.i18n.getString("OFFICIAL_N_FOLLOWER","<span class='cnt'>"+groupData.cnt+"</span>") );
+        } catch(e){
+            errorReport(e);
+        }
+
+
+    }
+
+    onClickOfficialGeneralChat = function( this_gi ){
+        try{
+            var groupData = $.lStorage(ui)[this_gi];
+            if( true==groupData.isOfficial && groupData.ad!=1 ){
+                if( null!=groupData.chatAll ){
+                    for( var ci in groupData.chatAll ){
+                        var room = groupData.chatAll[ci];
+                        if( room.tp!=0 ){
+                            openChatWindow ( this_gi, ci );
+                        }
+                    }
+                }
+                return true;
+            }
+        } catch(e){
+            errorReport(e);
+        }
+        return false;
     }
 /*
 
@@ -2181,10 +2364,13 @@ $(function(){
         // var this_compose_obj = $(this);
         $.mobile.changePage("#page-object", {transition: "slide"});
 
-        var guAll = $.lStorage(ui)[gi].guAll;
-        var bl = $.lStorage(ui)[gi].bl;
-        var fbl = $.lStorage(ui)[gi].fbl;
+        var group = $.lStorage(ui)[gi];
+        var guAll = group.guAll;
+        var bl = group.bl;
+        var fbl = group.fbl;
 
+
+        if( null==guAll ) return;
         $(".obj-cell-area").html("");
 
         //工作
@@ -2215,6 +2401,22 @@ $(function(){
             isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
         }
 
+        //check cnt
+        var guList = Object.keys(guAll);
+        if( null==guList
+            || (isShowSelf && guList.length<=0)
+            || (false==isShowSelf && guList.length<=1) ){
+            //no one to select
+            //show coachmark & return
+            $("#page-object .obj-content").hide();
+            $("#page-object .obj-coach-noMember").show();
+            $(".obj-done").hide();
+            return;
+        } 
+        $("#page-object .obj-content").show();
+        $("#page-object .obj-coach-noMember").hide();
+        $(".obj-done").show();
+
         if(this_compose_obj.parent().hasClass("cp-work-item")){
             obj_data = this_compose_obj.data("object_str");
         }else{
@@ -2227,45 +2429,46 @@ $(function(){
         updateSelectedObj();
         
         //----- 自己 -------
-        if( isShowSelf ){
-            var cell = $("<div class='obj-cell self'>"+
-                '<div class="obj-cell-chk"><div class="img"></div></div>' +
-                '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_personal_photo.png" style="width:60px"/></div>' +
-                '<div class="obj-cell-subgroup-data">' + 
-                    '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
-            $(".obj-cell-area").append(cell);
-            cell.off("click").click( function(){
-                clearMeAndAllSelect();
-                clearMemAndBranchAll();
-                if( !$(this).data("chk") ){
-                    $(this).data("chk",true);
-                    $(this).find(".img").addClass("chk");
-                    //set only me select
-                    var guTmp = $.lStorage(ui)[gi].gu;
-                    var gn = $.lStorage(ui)[gi].guAll[gu].nk;
-                    var obj = {};
-                    obj[guTmp] = gn;
-                    $(".obj-content").data("selected-branch",{});
-                    $(".obj-content").data("selected-obj",obj);
+        // if( isShowSelf ){
+        //     var cell = $("<div class='obj-cell self'>"+
+        //         '<div class="obj-cell-chk"><div class="img"></div></div>' +
+        //         '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_personal_photo.png" style="width:60px"/></div>' +
+        //         '<div class="obj-cell-subgroup-data">' + 
+        //             '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
+        //     cell.data("gu",group.gu);
+        //     $(".obj-cell-area").append(cell);
+        //     cell.off("click").click( function(){
+        //         clearMeAndAllSelect();
+        //         clearMemAndBranchAll();
+        //         if( !$(this).data("chk") ){
+        //             $(this).data("chk",true);
+        //             $(this).find(".img").addClass("chk");
+        //             //set only me select
+        //             var guTmp = $.lStorage(ui)[gi].gu;
+        //             var gn = $.lStorage(ui)[gi].guAll[gu].nk;
+        //             var obj = $(".obj-content").data("selected-obj";
+        //             obj[guTmp] = gn;
+        //             $(".obj-content").data("selected-branch",{});
+        //             $(".obj-content").data("selected-obj",obj);
                     
-                    //deselect group&mem "select all"
-                    $(".obj-cell-subTitle").data("chk",false);
-                    //deselect all branch
-                    $(".obj-cell-area").find(".obj-cell.branch").each(function(){
-                        var this_cell = $(this);
-                        this_cell.data("chk",false);
-                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-                    });
-                    //deselect all mem
-                    $(".obj-cell-area").find(".obj-cell.mem").each(function(){
-                        var this_cell = $(this);
-                        this_cell.data("chk",false);
-                        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-                    });
-                }
-                updateSelectedObj();
-            });
-        }
+        //             //deselect group&mem "select all"
+        //             $(".obj-cell-subTitle").data("chk",false);
+        //             //deselect all branch
+        //             $(".obj-cell-area").find(".obj-cell.branch").each(function(){
+        //                 var this_cell = $(this);
+        //                 this_cell.data("chk",false);
+        //                 this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        //             });
+        //             //deselect all mem
+        //             $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+        //                 var this_cell = $(this);
+        //                 this_cell.data("chk",false);
+        //                 this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        //             });
+        //         }
+        //         updateSelectedObj();
+        //     });
+        // }
 
         //----- 全選 ------
         if( isShowAll ){
@@ -2548,6 +2751,7 @@ $(function(){
 
         //成員rows
         $.each(guAll,function(i,gu_obj){
+            if( false==isShowSelf && i==group.gu ) return;
             var this_obj = getMemObjectRow(gu_obj, bl);
             $(".obj-cell-area").append(this_obj);
         });
@@ -2935,6 +3139,7 @@ $(function(){
                 $(".obj-content").removeClass("on-search");
                 $(".obj-cell").show();
                 $(".subgroup-parent").show();
+                $(".subgroup-row.fav-parent").show();
                 $(this).html("");
                 $(".obj-cell-area hr").show();
                 $(".obj-cell-subTitle .obj-cell-subTitle-chk").show();
@@ -3013,6 +3218,17 @@ $(function(){
         }
 
         if( null != mem ){
+            //check me
+            var meGu = $(".obj-cell.self").data("gu");
+            if( true==$(".obj-cell.mem[data-gu="+meGu+"]").data("chk") ){
+                $(".obj-cell.self").data("chk",true);
+                $(".obj-cell.self").find(".img").addClass("chk");
+            } else {
+                $(".obj-cell.self").data("chk",false);
+                $(".obj-cell.self").find(".img").removeClass("chk");
+            }
+            
+
             len += Object.keys(mem).length;
             $.each(mem,function(i,val){
                 $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
@@ -3130,6 +3346,7 @@ $(function(){
         //clear data
         $(".obj-content").data("selected-branch",{});
         $(".obj-content").data("selected-obj",{});
+        $(".obj-content").data("selected-fav",{});
         
         //deselect group&mem "select all"
         $(".obj-cell-subTitle").data("chk",false);
@@ -3141,6 +3358,18 @@ $(function(){
         });
         //deselect all mem
         $(".obj-cell-area").find(".obj-cell.mem").each(function(){
+            var this_cell = $(this);
+            this_cell.data("chk",false);
+            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        });
+        //deselect all mem
+        $(".obj-cell-area").find(".obj-cell.fav").each(function(){
+            var this_cell = $(this);
+            this_cell.data("chk",false);
+            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+        });
+        //deselect all mem
+        $(".obj-cell-area").find(".obj-cell.fav-branch").each(function(){
             var this_cell = $(this);
             this_cell.data("chk",false);
             this_cell.find(".obj-cell-chk .img").removeClass("chk");
@@ -4284,7 +4513,7 @@ $(function(){
         $(".sm-group-pic").css("background","url(" + _groupList[this_gi].aut + ")").stop().animate({
             opacity:1
         },1000);
-        $(".sm-group-name").html(_groupList[this_gi].gn);
+        // $(".sm-group-name").html(_groupList[this_gi].gn);
     }
 	
 	groupMenuListArea = function (new_gi,invite){
@@ -4334,13 +4563,14 @@ $(function(){
 	            	glo_img = val.auo;
 	            }
 
+                var data_gi_str = 'data-gi="' + val.gi + '" ';
 	            var this_group = $(
-	           		'<div class="sm-group-area polling-cnt enable" data-gi="' + val.gi + '" data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
+	           		'<div class="sm-group-area polling-cnt enable" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
 	           			'<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
 	           	        '<div class="sm-group-area-l group-pic">' +
-	           	            '<img class="aut" src="' + glt_img + '">' +
+	           	            '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
 	           	        '</div>' +
-	           	        '<div class="sm-group-area-r">' + htmlFormat(val.gn) + '</div>' +
+	           	        '<div class="sm-group-area-r polling-group-name" '+ data_gi_str+'>' + htmlFormat(val.gn) + '</div>' +
 	           	        '<div class="sm-count" style="display:none"></div>' +
 	           	    '</div>'
 	     	    );
@@ -5949,7 +6179,7 @@ $(function(){
                                             "p": pi,
                                             "tp": 6
                                         });
-                                        sendReply( this_event, this_gi, this_ti, this_ei, body );
+                                        replyApi( this_event, this_gi, this_ti, this_ei, body );
                                     });
                                 } catch( e ){
                                     errorReport(e);

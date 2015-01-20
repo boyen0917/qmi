@@ -576,16 +576,16 @@ function updateChat ( time ){
 	}
 	op(api, "GET", "", function(data, status, xhr) {
 			//檢查是否需要更新.
-	    	if( false == g_bIsPolling ){
-				if( data.el.hasOwnProperty("0") ){
-					var object = data.el["0"];
-					if( g_lastMsgEi==object.ei ){
-						return;
-					} else {
-						g_lastMsgEi=object.ei;
-					}
-				}
-	    	}
+	   //  	if( false == g_bIsPolling ){
+				// if( data.el.hasOwnProperty("0") ){
+				// 	var object = data.el["0"];
+				// 	if( g_lastMsgEi==object.ei ){
+				// 		return;
+				// 	} else {
+				// 		g_lastMsgEi=object.ei;
+				// 	}
+				// }
+	   //  	}
 
 	        for( var i=(data.el.length-1); i>=0; i--){
 				var object = data.el[i];
@@ -1383,10 +1383,11 @@ function delMember(){
 		showSelectMemPage( $("body"), btn, function(){
 			}, function(isDone){
 				if( isDone ){
+
 					scrollToBottom();
+					var memListString = btn.data("object_str");
 					//on select done
 					// send add mem to room api
-					var memListString = btn.data("object_str");
 					try{
 						cns.debug( memListString );
 						var memList = $.parseJSON( memListString );
@@ -1473,6 +1474,20 @@ function addMember(){
 					//on select done
 					// send add mem to room api
 					var memListString = btn.data("object_str");
+					//單人聊天室的話變成創新聊天室流程
+					if( g_room.tp==1 ){
+						var list = $.parseJSON(memListString);
+						for( var gu in g_room.memList ){
+							list[gu] = g_group.guAll[gu].nk;
+						}
+						var parent = $(window.opener.document);
+						parent.find(".chatList-add-done").attr("data-object_str",JSON.stringify(list) );
+						parent.find(".chatList-add-done").trigger("click");
+						return;
+					}
+
+
+					//多人直接加進來
 					try{
 						cns.debug( memListString );
 						var memList = $.parseJSON( memListString );
@@ -1499,7 +1514,7 @@ function addMember(){
 			}
 		);
 	} catch(e){
-		cns.debug(e.message);
+		errorReport(e);
 	}
 }
 
