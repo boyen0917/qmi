@@ -220,13 +220,30 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
 	    		var userData = $.lStorage(ui);
 	    		if( userData.hasOwnProperty(this_gi) ){
 	    			delete userData[this_gi];
+	    			$.lStorage(ui,userData);
 	    		}
+	    		var _groupList = $.lStorage("_groupList");
+	    		$.each(_groupList,function(i,gl_obj){
+	    			var groupTmp = _groupList[i];
+	    			if( groupTmp.gi==this_gi ){
+	    				_groupList.splice(i, 1);
+	    				return false;
+	    			}
+				});
+				$.lStorage("_groupList", _groupList);
+	    		userData = $.lStorage(ui);
 
-	    		//----- TODO -------
-	    		//
-	    		// remove from idb
-	    		//
-	    		//----- TODO -------
+	    		//----- remove from idb -------
+	    		//chat
+	    		if( null==g_idb_chat_cnts ){
+	    			initChatCntDB( clearChatIDB(this_gi) );
+	    		} else{
+	    			clearChatIDB(this_gi);
+	    		}
+				//timeline_events
+				// if( null!=idb_timeline_events ){
+	   //  			clearTimelineIDB(this_gi);
+	   //  		}
 
 		    } catch(e){
 		    	errorReport(e);
@@ -237,6 +254,61 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
     });
 }
 
+function clearChatIDB( this_gi, callback ){
+	g_idb_chat_msgs.iterate(function(item){
+	    try{
+			if( null!=item ){
+				cns.debug(item.ei);
+				g_idb_chat_msgs.remove(item.ei);
+			}
+		} catch(e){
+			errorReport(e);
+		}
+    },{
+        index: "gi_ci_ct",
+        keyRange: g_idb_chat_msgs.makeKeyRange({
+	        upper: [this_gi,"T9999999999"],
+	        lower: [this_gi,"T0000000000"]
+	        // only:18
+        }),
+        order: "DESC",
+        onEnd: function(result){
+        	cns.debug("onError:",result);
+        	if(callback) callback();
+        },
+        onError: function(result){
+            cns.debug("onError:",result);
+        }
+    });
+}
+
+function clearTimelineIDB( this_gi, callback ){
+	idb_timeline_events.iterate(function(item){
+	    try{
+			if( null!=item ){
+				cns.debug(item.ei);
+				idb_timeline_events.remove(item.ei);
+			}
+		} catch(e){
+			errorReport(e);
+		}
+    },{
+        index: "gi_ct",
+        keyRange: idb_timeline_events.makeKeyRange({
+	        upper: [this_gi,9999999999999],
+	        lower: [this_gi]
+	        // only:18
+        }),
+        order: "DESC",
+        onEnd: function(result){
+        	cns.debug("onError:",result);
+        	if(callback) callback();
+        },
+        onError: function(result){
+            cns.debug("onError:",result);
+        }
+    });
+}
 
 /*
          ██████╗ ███████╗ ██████╗  ███╗   ███╗ ██╗ ███████╗ ███████╗ ██╗  ██████╗  ███╗   ██╗          

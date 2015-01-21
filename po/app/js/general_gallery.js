@@ -140,40 +140,49 @@ $(document).ready(function(){
 });
 
 moveRight = function( isMove ){
-	if( null==list ) return;
+	try{
+		if( null==list ) return;
 	
-	var picArea = $(".picArea");
-	// cns.debug("------- R ---------");
-	scrollPercent = 0;
-	scrollVal = 0;
-	var index = picArea.data("index");
-	index++;
-	if( index>=list.length ){
-		index = 0;
+		var picArea = $(".picArea");
+		// cns.debug("------- R ---------");
+		scrollPercent = 0;
+		scrollVal = 0;
+		var index = picArea.data("index");
+		index++;
+		if( index>=list.length ){
+			index = 0;
+		}
+		if( false!=isMove ) picArea.css("left", (-100*index)+"%");
+		picArea.data("index", index);
+		$(".cnt .current").html( index+1 );
+		$(".subTitle").html(list[index].text||"");
+		changeImgViewSize(0);
+	} catch(e){
+		errorReport(e);
 	}
-	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
-	picArea.data("index", index);
-	$(".cnt .current").html( index+1 );
-	$(".subTitle").html(list[index].text||"");
-	changeImgViewSize(0);
 }
 moveLeft = function( isMove ){
-	if( null==list ) return;
-	var picArea = $(".picArea");
-	// cns.debug("------- L ---------");
-	scrollPercent = 0;
-	scrollVal = 0;
-	if( list.length<=1 ) return;
-	var index = picArea.data("index");
-	index--;
-	if( index<0 ){
-		index = list.length-1;
+	try{
+		if( null==list ) return;
+
+		var picArea = $(".picArea");
+		// cns.debug("------- L ---------");
+		scrollPercent = 0;
+		scrollVal = 0;
+		if( list.length<=1 ) return;
+		var index = picArea.data("index");
+		index--;
+		if( index<0 ){
+			index = list.length-1;
+		}
+		if( false!=isMove ) picArea.css("left", (-100*index)+"%");
+		picArea.data("index", index);
+		$(".cnt .current").html( index+1 );
+		$(".subTitle").html(list[index].text||"");
+		changeImgViewSize(0);
+	} catch(e){
+		errorReport(e);
 	}
-	if( false!=isMove ) picArea.css("left", (-100*index)+"%");
-	picArea.data("index", index);
-	$(".cnt .current").html( index+1 );
-	$(".subTitle").html(list[index].text||"");
-	changeImgViewSize(0);
 }
 
 getS3file = function(file_obj,target,tp){

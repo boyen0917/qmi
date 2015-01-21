@@ -196,16 +196,16 @@ showAlertContent = function(data){
 
 			/* ----------- TODO: 檢查是否已show過 ------------ */
 
-			var tmpDiv = $(this).clone();
-
-			tmpContainer.append(tmpDiv);
 			group = userData[boxData.gi];
-			if( group ){
-				//群組名
-			    tmp = $(tmpDiv).find(".al-post-group");
-			    if( tmp ) tmp.html( group.gn.replaceOriEmojiCode() );
-			    // cns.debug( htmlFormat(group.gn) );
-			}
+			if( null==group ) continue;
+
+			var tmpDiv = $(this).clone();
+			tmpContainer.append(tmpDiv);
+
+			//群組名
+			tmp = $(tmpDiv).find(".al-post-group");
+			if( tmp ) tmp.html( group.gn.replaceOriEmojiCode() );
+			// cns.debug( htmlFormat(group.gn) );
 
 		    var content;
 			if(boxData.ntp==1){

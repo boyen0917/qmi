@@ -99,17 +99,18 @@ var g_idb_chat_cnts;	//訊息未讀數idb
 init chat cnt db
 */
 function initChatCntDB ( onReady ){
-	if( null == g_idb_chat_cnts ){
-		g_idb_chat_cnts = new IDBStore({
-		    dbVersion: 1,
-		    storeName: 'chat_cnts',
-		    keyPath: 'ts', 
-		    indexes: [
-		    	{ name: 'gi_ci_ts',keyPath:['gi','ci','ts']},
-		    ]
-		    ,onStoreReady: onReady
-	    });
-	}
+	// if( null == g_idb_chat_cnts ){
+	// 	g_idb_chat_cnts = new IDBStore({
+	// 	    dbVersion: 1,
+	// 	    storeName: 'chat_cnts',
+	// 	    keyPath: 'ts', 
+	// 	    indexes: [
+	// 	    	{ name: 'gi_ci_ts',keyPath:['gi','ci','ts']},
+	// 	    ]
+	// 	    ,onStoreReady: onReady
+	//     });
+	// }
+	if(onReady) onReady();
 }
 
 /* save chat cnt into db */

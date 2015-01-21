@@ -4097,6 +4097,7 @@ input.cp-datetimepicker-end {
 .user-info-leave-area{
 	padding: 10px;
 	color: #aaa;
+	display: none;
 }
 
 .user-info-load-area .user{

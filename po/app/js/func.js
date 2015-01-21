@@ -6783,7 +6783,7 @@ $(function(){
                         user_data.bl = bn;
                     } catch(e) {
                         errorReport(e);
-                        return;
+                        continue;
                     }
 				}
 
