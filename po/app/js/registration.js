@@ -199,10 +199,10 @@ $(function(){
 				if(group_list && $.parseJSON(data.responseText).gl.length > 0){
 					//有group
 					$.lStorage("_groupList",group_list);
-					document.location = "main.html?ver=0.28#page-group-main";
+					document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
 				}else{
 					//沒group
-					document.location = "main.html?ver=0.28#page-group-menu";
+					document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
 				}
 			}else if(data.status == 401){
 				//取得group list 失敗 代表自動登入失敗了
@@ -792,7 +792,7 @@ $(function(){
 
 
 	toGroupMenu = function(){
-		document.location = "main.html#page-group-menu";
+		document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
 	}
 
     //對話框設定

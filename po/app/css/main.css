@@ -334,6 +334,12 @@ img.auo {
 	border-radius: 10px;
 }
 
+.gmc-avatar-wrap img {
+	width: 120px;
+	height: 120px;
+	object-fit: cover;
+}
+
 .gmc-frame {
 	width: 120px;
 	height: 120px;

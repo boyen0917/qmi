@@ -221,15 +221,13 @@ $(function(){
 				var img = $(".gmc-avatar-wrap img");
 
 				//調整長寬
-				img.load(function() {
-					var w = img.width();
-		            var h = img.height();
-    				mathAvatarPos(img,w,h,120);
-		        });
-
+				// img.load(function() {
+				// 	var w = img.width();
+		  //           var h = img.height();
+    // 				mathAvatarPos(img,w,h,120);
+		  //       });
 		        img.attr("src",reader.result);
 			}
-
 			reader.readAsDataURL(file);	
 		}else{
 			popupShowAdjust("",$.i18n.getString("COMMON_NOT_IMAGE"),true);
@@ -267,9 +265,8 @@ $(function(){
 	        		var api_name = "groups/" + cg_result.gi + "/avatar"
 
 	        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
-	        			if(!chk) {
-	        				toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") ); //團體頭像上傳失敗
-	        			}
+	        			//團體頭像上傳失敗
+	        			if(!chk) toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") ); 
 
 	        			groupMenuListArea(cg_result.gi);
 	        		});
@@ -333,12 +330,6 @@ $(function(){
 
 		//取消主頁
 		timelineMainClose();
-
-		// var icon_default = "images/icon/icon_timeline_tab_";
-		//圖片先還原
-		// $(".sm-small-area").each(function(i,val){
-		// 	$(this).find("img").attr("src",icon_default + $(this).data("sm-act") + "_normal.png");
-		// });
 
 		var target = $(this);
 
@@ -418,12 +409,10 @@ $(function(){
 			}
 			
 			setSmUserData(gi,gu,gn);
-			cns.debug("enable test");
 			//置頂設定
 			topEvent(function(){
 				//左側選單圖案變換
 				setSidemenuHeader(this_gi);
-				cns.debug("topEvent enable test");
 				$(".sm-group-area").addClass("enable");
 			});
 		});

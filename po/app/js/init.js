@@ -135,7 +135,7 @@ $(function(){
 	
 
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
-		cns.debug("ajaxSettings:",ajaxSettings);
+		cns.debug("ajax error:",ajaxSettings);
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
 

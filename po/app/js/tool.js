@@ -584,8 +584,7 @@ $(function(){
 	}
 
 	Date.prototype.toFormatString = function(isShowTime){
-		var now = new Date();
-		var diff = (now.getTime()-this.getTime())/1000;
+		var diff = (this.getTime()-this.getTime())/1000;
 		var language = window.navigator.userLanguage || window.navigator.language;
 
 		//within min
@@ -595,9 +594,9 @@ $(function(){
 			return $.i18n.getString("COMMON_NMINUTES_AGO", Math.floor(diff/60) );
 		} else if( diff<86400 ){	//n-hours ago
 			return $.i18n.getString("COMMON_NHOURS_AGO", Math.floor(diff/3600) );
-		} else if( now.getYear()==this.getYear() ){
+		} else if( this.getYear()==this.getYear() ){
 			//yesterday
-			if( this.getMonth()==now.getMonth() && this.getDate()==(now.getDate()-1) ){
+			if( this.getMonth()==this.getMonth() && this.getDate()==(this.getDate()-1) ){
 				var options = {hour: "2-digit", minute: "2-digit"};
 				return $.i18n.getString("COMMON_YESTERDAY")+" "+this.toLocaleTimeString(language, options);
 			} else {	//within a year
@@ -620,6 +619,13 @@ $(function(){
 			return this.toLocaleTimeString(language, options);
 		}
 		return this.toLocaleDateString(language);
+	}
+
+	Date.prototype.getRandomString = function(digit){
+		if (!digit || digit < 1) digit = 4;
+		var time_str = new Date().getTime().toString();
+		var length = time_str.length;
+		return time_str.substring(length-digit,length);
 	}
 
 	textSomeonesHtmlFormat = function(name){
@@ -740,15 +746,6 @@ $(function(){
         };
         var method = "get";
         return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
-		// var err_show = err_show || false;
-		// var api_name = "groups/" + this_gi + "/users";
-  //       var headers = {
-  //           "ui":ui,
-  //           "at":at,
-  //           "li":lang,
-  //       };
-  //       var method = "get";
-  //       return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
 	}
 
 	setGroupAttributes = function( this_gi, data ){

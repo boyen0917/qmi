@@ -107,7 +107,6 @@ $(function(){
             gd: group_desc
         }
         var method = "post";
-
         return ajaxDo(api_name,headers,method,true,body);
 	}
 
@@ -285,7 +284,7 @@ $(function(){
                 if(callback) callback();
 			}else{
                 //發生錯誤 開啓更換團體
-                cns.debug("fun394 enable囉:",this_gi + " : " + data_arr[2]);
+                cns.debug("groups/gi 發生錯誤:",this_gi + " : " + data_arr[2]);
                 $(".sm-group-area").addClass("enable");
             }
 		});
@@ -1007,7 +1006,6 @@ $(function(){
 			"at":at, 
 			"li":lang
 		};
-        cns.debug("api_name",api_name);
 		var method = "get";
 		var result = ajaxDo(api_name,headers,method,false);
 		result.complete(function(data){
@@ -1542,11 +1540,8 @@ $(function(){
         
         //製作每個回覆
         var okCnt = 0;
-        cns.debug("e_data",e_data);
+        cns.debug("e_data",JSON.stringify(e_data,null,2));
         $.each(e_data,function(el_i,el){
-            cns.debug("====================回覆============================================================================");
-            cns.debug("el",el);
-
             var without_message = false;
             var reply_content;
             var ml_arr = [];
@@ -1556,10 +1551,6 @@ $(function(){
                 var this_content = this_load.find(".st-reply-content");
 
                 $.each(el.ml,function(i,val){
-
-                    cns.debug("========================");
-                    cns.debug(JSON.stringify(val,null,2));
-                    
                     //event種類 不同 讀取不同layout
                     switch(val.tp){
                         case 0:
@@ -4546,9 +4537,6 @@ $(function(){
 					gl = g_val;
 				}
 			});
-			cns.debug("gl !:",gl);
-		}else{
-			cns.debug("gl:",gl);	
 		}
 
 		gi = new_gi;
@@ -4789,6 +4777,7 @@ $(function(){
         }
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
+        cns.debug("event_tp",event_tp);
 	    //製作timeline
 	    var api_name = "groups/"+ this_gi +"/timelines/"+ this_ti +"/events";
 	    if(ct_timer){
@@ -4811,6 +4800,10 @@ $(function(){
 	            tp: event_tp
         };
 	    var method = "get";
+        cns.debug("api parameters",JSON.stringify({
+            api_name: api_name,
+            headers: headers
+        },null,2));
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
 	    	//關閉下拉更新的ui
@@ -4829,6 +4822,7 @@ $(function(){
 	    	if(data.status != 200) return false;
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
+            cns.debug("server timeline_list:",timeline_list);
 	    	//沒資料 後面就什麼都不用了
 	    	if( timeline_list.length == 0 ) {
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
@@ -4848,6 +4842,7 @@ $(function(){
             }
 
 	    	idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
+                cns.debug("remove lo");
 	    		//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
 		    	if(event_tp == "00"){
 		    		//存db	    	
@@ -4861,6 +4856,7 @@ $(function(){
 		                if(tp > 2){
 		                	val.tp = "03" ;
 		                }
+                        cns.debug("put event",val.ml[0].c);
 		                idb_timeline_events.put(val);
 		            });
 		    	}
@@ -5200,13 +5196,6 @@ $(function(){
     		var event_tp = $("#page-group-main").data("navi") || "00";
     		var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
-            // cns.debug("------------------");
-            // cns.debug("------------------");
-            // cns.debug("------------------");
-            // cns.debug(event_tp);
-            // cns.debug("------------------");
-            // cns.debug("------------------");
-            // cns.debug("------------------");
             //隱藏其他類別
             $(".feed-subarea").hide();
             selector.show();
@@ -5239,8 +5228,8 @@ $(function(){
 
     	//同時先將資料庫資料取出先寫上
 	    idb_timeline_events.limit(function(timeline_list){
+            cns.debug("timeline list",timeline_list);
             if(timeline_list.length == 0) return false;
-
 	    	//寫timeline
 	    	load_show = false;
 	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
