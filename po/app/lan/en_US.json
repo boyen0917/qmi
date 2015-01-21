@@ -90,6 +90,7 @@
 	"FEED_VOTE_ANONYMOUS_DESC" : "anonymous voting , only publishing the number of votes",
 	"FEED_REPLY_FILE_LIMIT_ALERT" : "You can only upload one image in each reply.",
 	"FEED_EVENT_DELETED" : "This event has been deleted.",
+	"FEED_READ_LIST_DISABLED" : "This group is not able to check read/unread list.",
 
 	"LANDING_PAGE_LOGIN" :	"Login",
 	"LANDING_PAGE_REGISTER" :	"Sign Up",

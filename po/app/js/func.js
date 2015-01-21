@@ -529,7 +529,7 @@ $(function(){
                 
                 page_title = $.i18n.getString("GROUPSETTING_TITLE");
 
-                initGroupSetting();
+                //initGroupSetting(gi);
                 break;
 	    }
         setTimeout( timelineScrollTop, 1000 );
@@ -1251,11 +1251,11 @@ $(function(){
         // menu.append( dom );
         // dom.show();
 
-        //不是admin團體設定空空的, 暫時先關起來
-        // if( 1!=groupData.ad ){
-        //     dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
-        //     dom.hide();
-        // }
+        //檢查團體設定裡有沒有開放的設定, 都沒有隱藏設定tab
+        if( false==initGroupSetting(this_gi) ){
+            dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
+            dom.hide();
+        }
 
         //set pen
         try{
@@ -3499,6 +3499,21 @@ $(function(){
         //(0=讀取, 1=按讚, 2=按X, 3=按訂閱, 4=按置頂, 7=按任務, 9 = 未讀取)
         switch( type ){
             case 0:
+            case 9:
+                //免費團體or s9=1or3無法看已未讀列表
+                try{
+                    var group = $.lStorage(ui)[this_gi];
+                    if( group.tp=="A1" 
+                        || group.set.s9==1
+                        || group.set.s9==3){
+                        toastShow( $.i18n.getString("FEED_READ_LIST_DISABLED") );
+                        return;
+                    }
+                } catch(e){
+                    errorReport(e);
+                    return;
+                }
+
                 var isReady = false;
                 //get read
                 list.push( {title:$.i18n.getString("FEED_READ"),ml:null} );

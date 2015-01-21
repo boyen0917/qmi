@@ -87,6 +87,7 @@
 	"FEED_VOTE_PUBLIC_DESC" : "投票中，即公開當前結果",
 	"FEED_VOTE_ANONYMOUS_DESC" : "完全匿名，結束後公開票數",
 	"FEED_EVENT_DELETED" : "此動態已被刪除",
+	"FEED_READ_LIST_DISABLED" : "此團體無查看已/未讀列表功能",
 
 	"COMPOSE_DESCRIPTION" :	"內容描述",
 	"COMPOSE_TITLE" :	"標題",
