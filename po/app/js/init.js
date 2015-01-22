@@ -154,10 +154,6 @@ $(function(){
 			return false;
 		}
 
-		// if(window.location.href.match(/webdev.cloud.mitake.com.tw/)) {
-  //   		document.location = "index.html";
-  //   		return false;
-  //   	}
 
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
 		//eim 登入網址沒有index.html
@@ -222,6 +218,14 @@ $(function(){
 		$.mobile.changePage($(document).data("page-history").last()[0], {transition: "slide",reverse: true});
 		//cns.debug("last:",$(document).data("page-history").last()[0]);
 	});
+
+	//地圖檢測
+	// $.getScript( "https://mapss.google.com/maps/api/js?sensor=false", function( data, textStatus, jqxhr ) {
+	//   console.log( data ); // Data returned
+	//   console.log( textStatus ); // Success
+	//   console.log( jqxhr.status ); // 200
+	//   console.log( "Load was performed." );
+	// });
 
 
 	

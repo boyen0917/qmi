@@ -584,7 +584,8 @@ $(function(){
 	}
 
 	Date.prototype.toFormatString = function(isShowTime){
-		var diff = (this.getTime()-this.getTime())/1000;
+		var now = new Date();
+		var diff = (now.getTime()-this.getTime())/1000;
 		var language = window.navigator.userLanguage || window.navigator.language;
 
 		//within min
@@ -594,9 +595,9 @@ $(function(){
 			return $.i18n.getString("COMMON_NMINUTES_AGO", Math.floor(diff/60) );
 		} else if( diff<86400 ){	//n-hours ago
 			return $.i18n.getString("COMMON_NHOURS_AGO", Math.floor(diff/3600) );
-		} else if( this.getYear()==this.getYear() ){
+		} else if( now.getYear()==this.getYear() ){
 			//yesterday
-			if( this.getMonth()==this.getMonth() && this.getDate()==(this.getDate()-1) ){
+			if( this.getMonth()==now.getMonth() && this.getDate()==(now.getDate()-1) ){
 				var options = {hour: "2-digit", minute: "2-digit"};
 				return $.i18n.getString("COMMON_YESTERDAY")+" "+this.toLocaleTimeString(language, options);
 			} else {	//within a year

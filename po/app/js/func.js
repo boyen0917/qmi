@@ -4777,7 +4777,6 @@ $(function(){
         }
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
-        cns.debug("event_tp",event_tp);
 	    //製作timeline
 	    var api_name = "groups/"+ this_gi +"/timelines/"+ this_ti +"/events";
 	    if(ct_timer){
@@ -4800,10 +4799,6 @@ $(function(){
 	            tp: event_tp
         };
 	    var method = "get";
-        cns.debug("api parameters",JSON.stringify({
-            api_name: api_name,
-            headers: headers
-        },null,2));
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
 	    	//關閉下拉更新的ui
@@ -4822,7 +4817,6 @@ $(function(){
 	    	if(data.status != 200) return false;
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
-            cns.debug("server timeline_list:",timeline_list);
 	    	//沒資料 後面就什麼都不用了
 	    	if( timeline_list.length == 0 ) {
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
@@ -4842,7 +4836,6 @@ $(function(){
             }
 
 	    	idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
-                cns.debug("remove lo");
 	    		//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
 		    	if(event_tp == "00"){
 		    		//存db	    	
@@ -4856,7 +4849,6 @@ $(function(){
 		                if(tp > 2){
 		                	val.tp = "03" ;
 		                }
-                        cns.debug("put event",val.ml[0].c);
 		                idb_timeline_events.put(val);
 		            });
 		    	}
@@ -5228,7 +5220,6 @@ $(function(){
 
     	//同時先將資料庫資料取出先寫上
 	    idb_timeline_events.limit(function(timeline_list){
-            cns.debug("timeline list",timeline_list);
             if(timeline_list.length == 0) return false;
 	    	//寫timeline
 	    	load_show = false;
@@ -5562,19 +5553,44 @@ $(function(){
 					audio_arr.push(val);
 					break;
 				case 9:
-					this_event.find(".st-attach-map").show();
-					
-					this_event.find(".st-attach-map").tinyMap({
-			    		 center: {x: val.lat, y: val.lng},
-			    		 zoomControl: 0,
-			    		 mapTypeControl: 0,
-			    		 scaleControl: 0,
-			    		 scrollwheel: 0,
-			    		 zoom: 16,
-			    		 marker: [
-	    		             {addr: [val.lat, val.lng], text: val.a}
-			    		 ]
-			    	});
+                    try {
+                        this_event.find(".st-attach-google-map").show();
+                        this_event.find(".st-attach-google-map").tinyMap({
+                             center: {x: val.lat, y: val.lng},
+                             zoomControl: 0,
+                             mapTypeControl: 0,
+                             scaleControl: 0,
+                             scrollwheel: 0,
+                             zoom: 16,
+                             marker: [
+                                 {addr: [val.lat, val.lng], text: val.a}
+                             ]
+                        });
+                        if(ui == "U000000209P")
+                            ccc;
+                    } catch(e) {
+                        cns.debug("google 失敗 換高德上",val.lat+":"+val.lng);
+                        this_event.find(".st-attach-google-map").hide();
+                        this_event.find(".st-attach-amap-map").show();
+                        var id_str = "amap-" + new Date().getRandomString();
+                        this_event.find(".st-attach-amap-map").attr("id",id_str);
+                        var mapObj = new AMap.Map(id_str,{
+                            rotateEnable:false,
+                            dragEnable:true,
+                            zoomEnable:false,
+                            //二维地图显示视口
+                            view: new AMap.View2D({
+                                center:new AMap.LngLat(val.lng,val.lat),//地图中心点
+                                zoom:15 //地图显示的缩放级别
+                            })
+                        });
+
+                        var marker=new AMap.Marker({                    
+                            position:new AMap.LngLat(val.lng,val.lat)  
+                        });  
+                        marker.setMap(mapObj);
+                    }
+    					
 					break;
 				case 12:
 					end_time_chk = true;

@@ -2609,7 +2609,7 @@ img.st-user-pic{
 }
 
 
-.st-attach-url-img,.st-attach-map {
+.st-attach-url-img,.st-attach-google-map,.st-attach-amap-map {
     width: 93%;
     margin: auto;
 }
@@ -2650,7 +2650,7 @@ img.st-user-pic{
 	margin: auto;
 }
 
-.st-attach-map{
+.st-attach-google-map,.st-attach-amap-map{
     height:150px;	
     margin-bottom: 20px;
 }
