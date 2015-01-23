@@ -12,7 +12,7 @@ $(function(){
 	});
 
 	$(".login").click(function(){
-
+		s_load_show = true;
 		if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
 			loginAction($.lStorage("_loginData"));
 			return false;
@@ -31,7 +31,6 @@ $(function(){
 
 			//填入帳號
 			$(".login-account span:eq(1)").html("(" + $.lStorage("_loginRemeber").countrycode + ")" + $.lStorage("_loginRemeber").phone.substring(1));
-
 		}else{
 			$(".login-remeber img").attr("src","images/common/icon/icon_check_gray.png");
 			$(".login-remeber").data("chk",false);
@@ -41,10 +40,6 @@ $(function(){
 			$(".login-next").removeClass("login-next-adjust");
 		}
 
-		// if($.lStorage("_loginAutoChk")) {
-		// 	$(".login-auto").addClass("login-auto-active");
-		// 	$(".login-auto").data("chk",true);
-		// }
 		if($.lStorage("_loginAutoChk")){
 			$(".login-auto").find("img").attr("src","images/common/icon/icon_check_gray_check.png");
     		$(".login-auto").data("chk",true);
@@ -137,7 +132,6 @@ $(function(){
 	});
 
 	login = function(phone_id,password,countrycode){
-
 		var api_name = "login";
         var headers = {
             li:lang
@@ -151,16 +145,12 @@ $(function(){
 
         s_load_show = true;
         var method = "post";
-        cns.debug("before login");
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
-        	s_load_show = false;
         	if(data.status == 200){
         		var login_result = $.parseJSON(data.responseText);
 
         		//判斷是否換帳號 換帳號就要清db
-        		if(!$.lStorage(login_result.ui)){
-        			resetDB();
-        		}
+        		if(!$.lStorage(login_result.ui)) resetDB();
 
     			//記錄帳號密碼
     			if($(".login-remeber").data("chk")){
@@ -173,14 +163,12 @@ $(function(){
 					//沒打勾的話就清除local storage
 		    		localStorage.removeItem("_loginRemeber");
 				}
-
 				loginAction(login_result);
         	}
         });
 	}
 
 	loginAction = function(login_result){
-
 		//儲存登入資料 跳轉到timeline
 		login_result.page = "timeline";
 		$.lStorage("_loginData",login_result);
@@ -188,14 +176,10 @@ $(function(){
 		//附上group list
 		getGroupList(login_result.ui,login_result.at).complete(function(data){
 			if(data.status == 200){
-
 				//自動登入儲存
-				if($(".login-auto").data("chk")){
-					$.lStorage("_loginAutoChk",true);
-				}
+				if($(".login-auto").data("chk")) $.lStorage("_loginAutoChk",true);
 
 				var group_list = $.parseJSON(data.responseText).gl;
-
 				if(group_list && $.parseJSON(data.responseText).gl.length > 0){
 					//有group
 					$.lStorage("_groupList",group_list);
@@ -206,7 +190,6 @@ $(function(){
 				}
 			}else if(data.status == 401){
 				//取得group list 失敗 代表自動登入失敗了
-
 				localStorage.removeItem("_loginData");
 				$(".login").trigger("click");
 			}

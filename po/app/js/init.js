@@ -122,13 +122,13 @@ $(function(){
 		if(!load_show && !s_load_show) return false;
 	    if(!$('.ui-loader').is(":visible"))
 		$('.ui-loader').css("display","block");
-
+		cns.debug("show");
 		$(".ajax-screen-lock").show();
 	});
 	$(document).ajaxComplete(function(data) {
 		//特別的
 		if(s_load_show) return false;
-
+		cns.debug("s_load_show",s_load_show);
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
 	});

@@ -71,13 +71,6 @@ $(function(){
     	return false;
 	}
 
-	$( window ).resize(function() {
-		//reply textarea
-		// var reply_textarea = $(document).find(".st-reply-message-textarea");
-		// var this_event = reply_textarea.parents(".st-sub-box");
-		// reply_textarea.css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
-	});
-
 	//test
 	$(".header-group-name").click(function(){
 		// $(".st-feedbox-area ").animate({bottom:"125px"});

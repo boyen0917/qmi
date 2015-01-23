@@ -5566,7 +5566,7 @@ $(function(){
                                  {addr: [val.lat, val.lng], text: val.a}
                              ]
                         });
-                        if(ui == "U000000209P")
+                        if(gi == "G000000209m")
                             ccc;
                     } catch(e) {
                         cns.debug("google 失敗 換高德上",val.lat+":"+val.lng);
@@ -5793,7 +5793,7 @@ $(function(){
                 switch(tp){
                     case 6://圖片
                         //小圖
-                        target.css("background-image","url("+obj.s3+")");
+                        target.css("background-image","url("+obj.s32+")");
                         //大圖
                         target.data("auo",obj.s32);
                         break;
@@ -6134,7 +6134,6 @@ $(function(){
 	                        	}
 	                        	result.img = temp_img;
 	                        	return false;
-
 	                        }
 	                    });
 	            	}
@@ -6160,7 +6159,15 @@ $(function(){
 
 	getYoutubeCode = function(url){
   		if(url.match(/youtube.com/)){
-			var strpos = url.indexOf("?v=")+3;
+            if(url.indexOf("?v=") >= 0) {
+                var strpos = url.indexOf("?v=")+3;
+            } else if(url.indexOf("&v=") >= 0) {
+                var strpos = url.indexOf("&v=")+3;
+            }else{
+                cns.debug("youtube code not find");
+                return false;
+            }
+			
 		}else if(url.match(/\/\/youtu.be/)){
 			var strpos = url.indexOf("youtu.be")+9;
 		}
