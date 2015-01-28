@@ -862,6 +862,28 @@ $(function(){
 	    updateGuAll(this_gi,new_group_user);
 	}
 
+	updateBranchList = function(this_gi, callback){
+		var this_gi = this_gi || gi;
+		if( !this_gi ) return;
+
+    	//取得團體列表
+        var api_name = "groups/" + this_gi + "/branches";
+        var headers = {
+            "ui":ui,
+            "at":at,
+            "li":lang
+        };
+
+        var method = "get";
+        ajaxDo(api_name,headers,method,false).complete(function(data){
+        	if(data.status == 200){
+
+        		var branch_list = $.parseJSON(data.responseText);
+        		setBranchList( this_gi, branch_list, callback );
+        	}
+        });
+	}
+
 	setBranchList = function(this_gi, branch_list, callback){
 		var this_gi = this_gi || gi;
 		if( !this_gi ) return;

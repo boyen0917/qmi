@@ -246,6 +246,8 @@
 	"GROUPSETTING_LEAVE_ALERT_TITLE" : "確定要退出團體嗎？",
 	"GROUPSETTING_LEAVE_ALERT_CONTENT" : "退出團體後您將無法取得所有資料及紀錄，請在刪除前完成備份的動作。",
 	"GROUPSETTING_LEAVE_GROUP" : "退出團體",
+	"GROUP_RECEIVE_INVITATION" : "你收到了一個團體邀請",
+	"GROUP_X_DELETED" : "團體%@已被刪除",
 
 	"SETTING_PROFILE_NAME" : "姓名",
 	"SETTING_PROFILE_BIRTHDAY" : "生日",

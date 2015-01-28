@@ -855,7 +855,6 @@ img.auo {
 }
 
 .sm-count {
-	display: none;
 	font-size: 12px;
 	background: rgb(74, 144, 226);
 	height: 20px;
@@ -868,6 +867,19 @@ img.auo {
 	overflow: hidden;
 	text-align: center;
 	color: white;
+	display: none;
+}
+.header-menu .sm-count{
+	right: ;
+	position: relative;
+	background: #f31e80;
+	line-height: 18px;
+	height: 18px;
+	width: 18px;
+	border-radius: 13px;
+	margin-right: -19px;
+	top: -6px;
+	margin-left: -3px;
 }
 
 .sm-hr {
@@ -4133,6 +4145,10 @@ input.cp-datetimepicker-end {
 	overflow: hidden;
 	margin: 10% auto;
 	position: relative;
+}
+
+.user-info-list-area {
+	display: none;
 }
 
 @media all and (max-width: 5000px) {

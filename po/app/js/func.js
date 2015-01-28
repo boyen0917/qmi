@@ -12,6 +12,11 @@ $(function(){
     		ti_cal = default_group.ti_cal;
     		ti_feed = default_group.ti_feed;
     		ti_chat = default_group.ti_chat;
+
+            //save default group
+            _uiGroupList.default_gi = dgi;
+            $.lStorage(ui, _uiGroupList);
+
     	}else{
     		//預設團體暫定為第一個團體？
             if(!$.lStorage("_groupList") || $.lStorage("_groupList").length == 0) return false;
@@ -208,10 +213,17 @@ $(function(){
         var aut = "",auo = "",nk = "";
 
         //可能會沒有會員資訊
-        if(_groupList[target_gi].guAll[target_gu]){
-        	aut = _groupList[target_gi].guAll[target_gu].aut;
-        	auo = _groupList[target_gi].guAll[target_gu].auo;
-        	nk = _groupList[target_gi].guAll[target_gu].nk.replaceOriEmojiCode();
+        try{
+            if(_groupList[target_gi].guAll[target_gu]){
+            	aut = _groupList[target_gi].guAll[target_gu].aut;
+            	auo = _groupList[target_gi].guAll[target_gu].auo;
+            	nk = _groupList[target_gi].guAll[target_gu].nk.replaceOriEmojiCode();
+            }
+        } catch(e){
+            aut = "images/common/others/empty_img_personal_l.png";
+            auo = "images/common/others/empty_img_personal_l.png";
+            nk = "unknown";
+            errorReport(e);
         }
 
     	//設定圖片
@@ -305,6 +317,14 @@ $(function(){
 
 		//將更新完的資料倒回新的名單 就會有新成員
 		$.extend(new_guAll,_groupList[this_gi].guAll);
+
+        //狀態0為未加入, 從清單剔除掉
+        $.each(new_guAll,function(i,val){
+            if( new_guAll[i].st==0 ){
+                delete new_guAll[i];
+            }
+        });
+
 		_groupList[this_gi].guAll = new_guAll;
         $.lStorage(ui,_groupList);
 	}
@@ -4581,6 +4601,8 @@ $(function(){
         _groupList[gi].guAll = {};
 		//存回
 		$.lStorage(ui,_groupList);
+
+        $(".sm-small-area .sm-count").hide();
 	};
 
     setSidemenuHeader = function (new_gi){
@@ -6474,15 +6496,16 @@ $(function(){
 	    			if(val.A1 > 0){
 	    				$(".sm-small-area[data-sm-act=feed]").find(".sm-count").html(countsFormat(val.A1)).show();
 	    			}
-	    			if(val.A2 > 0){
-	    				// $(".sm-small-area[data-sm-act=chat]").find(".sm-count").html(countsFormat(val.A2)).show();
+	    			if(val.A2 > 0){ //new member
+	    				$(".sm-small-area[data-sm-act=memberslist]").find(".sm-count").html(countsFormat(val.A2)).show();
 	    			}
-	    			if(val.A3 > 0){
+	    			if(val.A3 > 0){ //chat cnts
 	    				$(".sm-small-area[data-sm-act=chat]").find(".sm-count").html(countsFormat(val.A3)).show();
 	    			}
 	    			if(val.A4 > 0){
 	    				// $(".sm-small-area[data-sm-act=]").find(".sm-count").html(countsFormat(val.A4)).show();
 	    			}
+                    cns.debug(val.A2, val.A3, val.B5);
 	    		}
 
 	    		if(val.A5 > 0){
@@ -6515,14 +6538,27 @@ $(function(){
     		if( typeof(showNewAlertIcon)!='undefined' ) showNewAlertIcon( gcnts.G3 );
     	}
     	
-	    	
+	    
+        // if(gcnts.B1 > 0){   //全部
+        // }
+        // if(gcnts.B2 > 0){   //公告
+        // }
+        // if(gcnts.B3 > 0){   //通報
+        // }
+        // if(gcnts.B4 > 0){   //任務
+        // }
     }
 
     //目前不管timeline event 有無更新 只確認user list完成 就
     pollingCmds = function(cmds,msgs,ccs){
     	var user_info_arr = [];
+        var branch_info_arr = [];
+        var isUpdateMemPage = false;
 
-    	if(cmds){
+        if( null==gi ){
+            gi = $(".sm-group-area.active").data("gi");
+        }
+    	if(cmds&&cmds.length>0){
     		$.each(cmds,function(i,val){
 	    		cns.debug("val.pm.gi:",val.pm.gi);
 	    		switch(val.tp){
@@ -6538,25 +6574,88 @@ $(function(){
 
 	    				//  ("",false,polling_arr);
 	    				break;
-	    			case 4://新增gu
-
-	    			case 5://新增gu user info
+                    case 3://invite
+                        //pm empty content??
+                        if( $("#page-group-menu").is(":visible") ){
+                            $(".hg-invite").trigger("click");
+                        } else {
+                            try{
+                                riseNotification (null, $.i18n.getString("GROUP_INVITATION"), $.i18n.getString("GROUP_RECEIVE_INVITATION"), function(){
+                                    $(".hg-invite").trigger("click");
+                                });
+                            } catch(e) {
+                                cns.debug( e.message );
+                            }
+                        }
+                        break;
+	    			case 4: //someone join
+                        user_info_arr.push(val.pm);
+                        cns.debug(gi, val.pm.gi);
+                        if( gi==val.pm.gi ){
+                            isUpdateMemPage = true;
+                        }
+                        break;
+	    			case 5://edit user info
 	    				user_info_arr.push(val.pm);
 	    				break;
+                    case 6://delete user info
+                        user_info_arr.push(val.pm);
+                        // if( gi==val.pm.gi ){
+                        //     isUpdateMemPage = true;
+                        // }
+                        break;
+                    case 7://branch edit
+                        branch_info_arr.push( val.pm );
+                        break;
+                    case 10://group info edit
+                        if( $.lStorage(ui).hasOwnProperty(val.pm.gi) ){
+                            setGroupAllUser(null,val.pm.gi);
+                        }
+                        break;
+                    case 11://create group
+                        if( false==$.lStorage(ui).hasOwnProperty(val.pm.gi) ){
+                            groupMenuListArea(val.pm.gi, false);
+                        }
+                        break;
+                    case 12://delete group
+                        removeGroup( val.pm.gi );
+                        break;
 	    		}
 	    	});
 
 	    	//將tp4 tp5 的user info都更新完 再更新polling時間
 	    	if(user_info_arr.length > 0){
-	    		getUserInfo(user_info_arr,false,function(chk){
-	    			if(chk){
+	    		getUserInfo(user_info_arr,false,function(memData){
+	    			if(memData){
 	    				//更新polling
 	    				pollingUpdate(msgs,ccs);
+                        if(isUpdateMemPage && $(".subpage-contact").is(":visible") ){
+                            initContactList();
+                        }
 	    			}
 	    		});
 	    	}else{
 	    		pollingUpdate(msgs,ccs);
 	    	}
+
+            if(branch_info_arr.length > 0){
+                var cnt = 0;
+                for( var i in branch_info_arr ){
+                    var gi = branch_info_arr[i].gi;
+                    if( null!=gi ){
+                        updateBranchList(gi,function(){
+                            cnt++;
+                            if(cnt>=branch_info_arr.length){
+                                if( $(".subpage-contact").is(":visible") ){
+                                    $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+                                }
+                            }
+                        });
+                    }
+                    
+                }
+            }
+
     	}else{
     		//沒有cmds 更新polling
     		pollingUpdate(msgs,ccs);
@@ -6659,6 +6758,9 @@ $(function(){
                         if(Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
                             cns.debug("guall content exist");
                             _groupList[this_user_info.gi].guAll[this_user_info.gu] = user_data;
+                            
+                            //有取資料但是沒有存...?!
+                            $.lStorage(ui, _groupList);
                         }else{
                             cns.debug("no guall content");
                             var data_arr = ["userInfo",user_data];
@@ -6752,7 +6854,15 @@ $(function(){
     }
 
     userInfoDataShow = function(this_gi,this_info,user_data,me) {
-            cns.debug("user_data",user_data);
+        cns.debug("user_data",user_data);
+        if( user_data.st==2 ){
+            this_info.find(".user-info-list-area").hide();
+            this_info.find(".user-info-leave-area").show();
+        } else {
+            this_info.find(".user-info-list-area").show();
+            this_info.find(".user-info-leave-area").hide();
+        }
+
     	var this_gi = this_gi || gi;
 
     	var method = "html";
@@ -6813,12 +6923,9 @@ $(function(){
             this_info.find(".user-avatar-bar .user-name").addClass("hidden");
         }
 
+
         if( user_data.st==2 ){
-            this_info.find(".user-info-list-area").hide();
-            this_info.find(".user-info-leave-area").html( $.i18n.getString("USER_PROFILE_LEAVE") ).show();
             this_info.find(".action, .sl, .bd, .bl").hide();
-        } else {
-            this_info.find(".user-info-leave-area").hide();
         }
     }
 
