@@ -169,7 +169,7 @@ function initGroupSetting(this_gi){
 
         //離開團體開關
         //目前僅免費團體可自由退出
-        if( group.tp=="A1" ){
+        if( group.tp=="A1" && group.set ){
 	        if( group.set.s11==0 || group.set.s11==2 ){
 	        	$(".gs-leave").show();
 	        } else{
@@ -206,52 +206,64 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
     
     ajaxDo(api_name,headers,method,true,body).complete(function(data){
     	if(data.status == 200){
-    		$(".sm-group-area[data-gi="+this_gi+"]").remove();
-    		var otherGroup = $(".sm-group-area.enable");
-    		if( otherGroup.length>0 ){
-    			$(otherGroup[0]).trigger("click");
-    		} else{
-    			document.location = "login.html";
-    		}
-
-    		//remove group data
-    		try{
-    			//local storage
-	    		var userData = $.lStorage(ui);
-	    		if( userData.hasOwnProperty(this_gi) ){
-	    			delete userData[this_gi];
-	    			$.lStorage(ui,userData);
-	    		}
-	    		var _groupList = $.lStorage("_groupList");
-	    		$.each(_groupList,function(i,gl_obj){
-	    			var groupTmp = _groupList[i];
-	    			if( groupTmp.gi==this_gi ){
-	    				_groupList.splice(i, 1);
-	    				return false;
-	    			}
-				});
-				$.lStorage("_groupList", _groupList);
-	    		userData = $.lStorage(ui);
-
-	    		//----- remove from idb -------
-	    		//chat
-	    		if( null==g_idb_chat_cnts ){
-	    			initChatCntDB( clearChatIDB(this_gi) );
-	    		} else{
-	    			clearChatIDB(this_gi);
-	    		}
-				//timeline_events
-				// if( null!=idb_timeline_events ){
-	   //  			clearTimelineIDB(this_gi);
-	   //  		}
-
-		    } catch(e){
-		    	errorReport(e);
-		    }
+    		removeGroup( this_gi );
 
 	        if( callback ) callback();
     	}
     });
+}
+
+function removeGroup( this_gi ){
+	$(".sm-group-area[data-gi="+this_gi+"]").remove();
+	if( gi==this_gi ){
+	    var otherGroup = $(".sm-group-area.enable");
+	    if( otherGroup.length>0 ){
+	    	$(otherGroup[0]).trigger("click");
+	    } else{
+	    	document.location = "login.html";
+	    }
+	}
+
+    //remove group data
+    try{
+    	var gn = "unknown";
+    	//local storage
+		var userData = $.lStorage(ui);
+		if( userData.hasOwnProperty(this_gi) ){
+			var groupDataTmp = userData[this_gi];
+			if( null!=groupDataTmp && null!=groupDataTmp.gn ){
+				gn = groupDataTmp.gn;
+			}
+			delete userData[this_gi];
+			$.lStorage(ui,userData);
+		}
+		var _groupList = $.lStorage("_groupList");
+		$.each(_groupList,function(i,gl_obj){
+			var groupTmp = _groupList[i];
+			if( groupTmp.gi==this_gi ){
+				_groupList.splice(i, 1);
+				return false;
+			}
+		});
+		$.lStorage("_groupList", _groupList);
+		userData = $.lStorage(ui);
+
+		//----- remove from idb -------
+		//chat
+		if( null==g_idb_chat_cnts ){
+			initChatCntDB( clearChatIDB(this_gi) );
+		} else{
+			clearChatIDB(this_gi);
+		}
+		//timeline_events
+		// if( null!=idb_timeline_events ){
+		//  			clearTimelineIDB(this_gi);
+		//  		}
+		toastShow( $.i18n.getString("GROUP_X_DELETED",gn) );
+
+	} catch(e){
+		errorReport(e);
+	}
 }
 
 function clearChatIDB( this_gi, callback ){

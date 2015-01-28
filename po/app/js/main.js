@@ -271,7 +271,8 @@ $(function(){
 	        				toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") ); //團體頭像上傳失敗
 	        			}
 
-	        			groupMenuListArea(cg_result.gi);
+	        			//統一由polling執行更新
+	        			// groupMenuListArea(cg_result.gi);
 	        		});
 	        	}
 	        });
