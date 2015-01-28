@@ -480,6 +480,8 @@ $(function(){
 			processData: false
         });
 	}
+
+	
 	
 	uploadCommit = function(this_gi, fi,ti,pi,tp,mt,si,md){
 		var api_name = "groups/" + this_gi + "/files/" + fi + "/commit";
@@ -736,6 +738,7 @@ $(function(){
 	    }
     }
 
+
 	getGroupData = function(this_gi,ajax_load,tp,err_show){
 		var err_show = err_show || false;
 		var api_name = "groups/" + this_gi;
@@ -743,7 +746,7 @@ $(function(){
         var headers = {
             "ui":ui,
             "at":at,
-            "li":lang,
+            "li":lang
         };
         var method = "get";
         return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);
@@ -835,6 +838,7 @@ $(function(){
 			//update icon
 			var emptyAuo = "images/common/others/name_card_nophoto_profile.png";
 			var emptyAut = "images/common/others/empty_img_all_l.png";
+			
 			if( group.auo ){
 				$(".polling-group-pic-o[data-gi="+this_gi+"]").attr("src", group.auo);
 			} else {
@@ -850,17 +854,6 @@ $(function(){
 		}
 	}
 
-	setGrouUser = function( this_gi, data ){
-		var data_group_user = data.ul;
-		var new_group_user = {};
-	    $.each(data_group_user,function(i,val){
-	        //將gu設成key 方便選取
-	        new_group_user[val.gu] = val;
-	    });
-
-	    //成員列表存入local storage
-	    updateGuAll(this_gi,new_group_user);
-	}
 
 	setBranchList = function(this_gi, branch_list, callback){
 		var this_gi = this_gi || gi;

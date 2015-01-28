@@ -3,27 +3,27 @@ $(function(){
 	//load language
 	updateLanguage( lang );
 
+
 	//沒有登入資訊 就導回登入頁面
 	if($.lStorage("_loginData")){
 		
 		var _loginData = $.lStorage("_loginData");
 
+		ui = _loginData.ui;
+		at = _loginData.at;
+
 		//自動登入
 		if(!$.lStorage("_loginAutoChk")){
 			//清除_loginData
-			localStorage.removeItem("_loginData");
+			// localStorage.removeItem("_loginData");
+			delete _loginData.at;
+			$.lStorage("_loginData",_loginData);
 		}
-
-		ui = _loginData.ui;
-		at = _loginData.at;
 			
 
 		//聊天室開啓DB
     	initChatDB(); 
 		initChatCntDB(); 
-
-		//預設 default group
-		setDefaultGroup(_loginData.dgi);
 
 		//第一次進來 沒團體的情況
 		if(!$.lStorage("_groupList")){
@@ -32,39 +32,39 @@ $(function(){
 			cns.debug("no group ");
 		}else{
 
+			//設定目前團體
+			setThisGroup(_loginData.dgi);
+
 			//header 設定團體名稱
 	    	$(".header-group-name div:eq(1)").html(gn);
 	    	
 			//執行polling
 			pollingInterval();
+	    	
+	    	//做團體列表
+	    	groupMenuListArea();
 
-			//將團體設定至 localstorage ui裡
-			setGroupList();
+	    	//top event
+	    	topEvent();
 
-	    	//設定guAll 
-	    	setGroupAllUser(false,false,function(){
-	    		//sidemenu name
-		    	setSmUserData(gi,gu,gn);
-		    	
-		    	//做團體列表
-		    	groupMenuListArea();
+	    	//檢查官方帳號
+            initOfficialGroup( gi );
 
-		    	//top event
-		    	topEvent();
+            //重新設定功能選單
+	        updateTab(gi);
 
-		    	//動態消息
-		    	//timelineListWrite();
-		    	setTimeout(function(){
-			    	var tmp = $(".sm-small-area:not(.setting):visible");
-					if( tmp.length>0 ){
-						$(tmp[0]).addClass("active");
-						timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
-					}
-					else{
-						timelineSwitch("feeds",true);
-					}
-		    	},1000);
-	    	});
+	    	//動態消息
+	    	//timelineListWrite();
+	    	setTimeout(function(){
+		    	var tmp = $(".sm-small-area:not(.setting):visible");
+				if( tmp.length>0 ){
+					$(tmp[0]).addClass("active");
+					timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
+				}
+				else{
+					timelineSwitch("feeds",true);
+				}
+	    	},1000);
 		}
 	}else{
     	document.location = "index.html";
@@ -79,7 +79,7 @@ $(function(){
 	});
 
 	//下拉更新 滾輪版 
-	$(".subpage-timeline ").bind('mousewheel DOMMouseScroll', function(event){
+	$(".subpage-timeline_no ").bind('mousewheel DOMMouseScroll', function(event){
 
 		var group_main = $(this);
 		//timeline 才要做
@@ -366,6 +366,46 @@ $(function(){
 	//更換團體
 	$(document).on("click",".sm-group-area.enable",function(){
 
+		var this_group = $(this);
+		var this_gi = $(this).attr("data-gi");
+
+		var _groupData = $.lStorage(ui);
+		if(Object.keys(_groupData[this_gi].guAll).length == 0){
+			getGroupCombo(this_gi,function(){
+                this_group.trigger("click");
+            });
+            return false;
+		}
+
+		$(".sm-group-area").removeClass("enable");
+
+		//清空畫面
+		$(".st-top-event-default").show();
+		$(".st-top-event-set").hide();
+		$(".feed-subarea").html("");
+		$(".sm-small-area.active").removeClass("active");
+
+		//指定gi
+		timelineChangeGroup(this_gi);
+			
+		//切換團體時, 選目前第一個選項
+		var tmp = $(".sm-small-area:visible");
+		if( tmp.length>0 ){
+			$(tmp[0]).addClass("active");
+			timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
+		}else{
+			timelineSwitch("feeds",true);
+		}
+
+		//置頂設定
+		topEvent(function(){
+			$(".sm-group-area").addClass("enable");
+		});
+	});
+
+	//更換團體 備份
+	$(document).on("click",".sm-group-area.enable.back",function(){
+
 		if( $(".st-filter-area").hasClass("st-filter-lock") ){
 			// cns.debug("-------------");
 			// cns.debug("-------------");
@@ -396,8 +436,7 @@ $(function(){
 			if( tmp.length>0 ){
 				$(tmp[0]).addClass("active");
 				timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
-			}
-			else{
+			}else{
 				timelineSwitch("feeds",true);
 			}
 			
@@ -1398,7 +1437,8 @@ $(function(){
 		$(this).attr("src","images/common/icon/bt_close_activity.png");
 	});
 	$(document).on("mouseup",".user-info-close",function(){
-
+		//調整
+		$("#page-group-main .gm-content").removeAttr("style");
 		//歸位
 		$(window).scrollTop($(document).data("namecard-pos"));
 
@@ -1557,6 +1597,9 @@ $(function(){
 		$(window).scrollTop(0);
 		// $(".user-info-load-area").css("top",$(window).scrollTop());
 		// $(".screen-lock").css("top",$(window).scrollTop());
+
+		//調整
+		$("#page-group-main .gm-content").css("overflow","initial");
 
 		//鈴鐺頁面不動作
 		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);

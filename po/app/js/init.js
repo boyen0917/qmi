@@ -128,7 +128,7 @@ $(function(){
 	$(document).ajaxComplete(function(data) {
 		//特別的
 		if(s_load_show) return false;
-		cns.debug("s_load_show",s_load_show);
+
 		$('.ui-loader').hide();
 		$(".ajax-screen-lock").hide();
 	});

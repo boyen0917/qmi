@@ -168,6 +168,7 @@ $(function(){
         });
 	}
 
+	//初始化
 	loginAction = function(login_result){
 		//儲存登入資料 跳轉到timeline
 		login_result.page = "timeline";
@@ -176,14 +177,27 @@ $(function(){
 		//附上group list
 		getGroupList(login_result.ui,login_result.at).complete(function(data){
 			if(data.status == 200){
+
+				ui = login_result.ui;
+				at = login_result.at;
+
 				//自動登入儲存
 				if($(".login-auto").data("chk")) $.lStorage("_loginAutoChk",true);
 
 				var group_list = $.parseJSON(data.responseText).gl;
 				if(group_list && $.parseJSON(data.responseText).gl.length > 0){
 					//有group
+
 					$.lStorage("_groupList",group_list);
-					document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
+					//將group list 更新到 lstorage ui
+					groupListToLStorage();
+
+					// 取dgi的combo
+					getGroupCombo(login_result.dgi,function(){
+                		document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
+					});
+					
+					
 				}else{
 					//沒group
 					document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";

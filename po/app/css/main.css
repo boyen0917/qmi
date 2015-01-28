@@ -2556,7 +2556,8 @@ img.st-user-pic{
 
 .st-task-vote-detail-count .align-right {
 	float: right;
-	min-width: 20%;
+	min-width: 120px;
+	white-space: nowrap;
 }
 
 .st-task-vote-detail-count .vote-type {
@@ -4089,6 +4090,7 @@ input.cp-datetimepicker-end {
 	z-index: 1800;
 	overflow: scroll;
 	-webkit-transform-style: preserve-3d;
+	
 }
 
 .transition1s {
