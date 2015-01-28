@@ -6242,8 +6242,6 @@ $(function(){
 
     	if(cmds){
     		$.each(cmds,function(i,val){
-	    		cns.debug("val:",val);
-                cns.debug("val.pm.gi:",val.pm.gi);
 	    		switch(val.tp){
 	    			case 1://timeline list
                         // 因為現在polling邏輯有問題 暫時關閉timeline 更新
@@ -6402,14 +6400,8 @@ $(function(){
     }
 
     updateAllAvatarName = function(this_gi,this_gu,name,img){
-        cns.debug("this_gu",this_gu);
         $(".update-avatar-all").filter(function(){
-            cns.debug("this data",$(this).data());
             if($(this).data("update-id") == this_gu){
-                cns.debug("change!");
-                if($(this).data("testest")){
-                    cns.debug("hey",$(this));
-                }
                 getUserAvatarName(this_gi,this_gu,$(this).parents(".update-parent-all").find(".update-name-all"),$(this));
             }
         });
