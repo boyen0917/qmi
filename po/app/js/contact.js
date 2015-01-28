@@ -39,6 +39,12 @@ initContactList = function(){
 	if( !rowContainer || rowContainer.length<=0 ) return;
 	rowContainer.html("");
 
+	var pagesTmp = $(".contact-subpages");
+	if( pagesTmp.is(":visible") ){
+		pagesTmp.find(".page-back").trigger("click");
+	}
+	$("#page-contact_all").data("gi",null);
+
 	//add row all
 	var tmp = $("<div class='row all'><div class='left'></div><div class='right'></div></div>");
 	var left = tmp.find(".left");
@@ -265,7 +271,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	var pageID = "page-contact_sub"+parentLevel;
 	var page = $( "#"+pageID );
 	if( !page || page.length==0 ){
-		page = $('<div data-role="page" id="'+pageID+'" class="subPage">'
+		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
                 // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
@@ -503,7 +509,7 @@ showAllMemberPage = function(gn) {
 	var page = $( "#"+pageID );
 
 	if( !page || page.length==0 ){
-		page = $('<div data-role="page" id="'+pageID+'">'
+		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
                 +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
@@ -737,7 +743,7 @@ generateBranchList = function( childList ){
 }
 
 showMainContact = function(){
-	$("#page-group-main .contact-rows").height( $(window).height()-63 );
+	// $("#page-group-main .contact-rows").height( $(window).height()-63 );
 	$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 }
 
@@ -758,7 +764,7 @@ showFavoritePage = function( isBackward ){
 	var page = $( "#"+pageID );
 
 	if( !page || page.length==0 ){
-		page = $('<div data-role="page" id="'+pageID+'">'
+		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
                 +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
@@ -885,7 +891,7 @@ showSubFavoritePage = function( fi ){
 	var pageID = "page-contact_sub_favorite";
 	var page = $( "#"+pageID );
 	if( !page || page.length==0 ){
-		page = $('<div data-role="page" id="'+pageID+'" class="subPage">'
+		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
                 // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'

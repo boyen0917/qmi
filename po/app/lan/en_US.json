@@ -33,7 +33,7 @@
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
 	"FEED_BULLETIN" :	"Bulletin",
-	"FEED_LOCATION" :	"Location",
+	"FEED_LOCATION" :	"Location Report",
 	"FEED_MISSION_LOCATION" :	"Mission-Location Report",
 	"FEED_MISSION_TASK" :	"Mission-Task",
 	"FEED_MISSION_VOTE" :	"Mission-Vote",
@@ -114,6 +114,8 @@
 	"GROUPSETTING_LEAVE_ALERT_TITLE" : "Leave the group?",
 	"GROUPSETTING_LEAVE_ALERT_CONTENT" : "You can't access any data in this group after leave, make sure you have backup important files",
 	"GROUPSETTING_LEAVE_GROUP" : "Leave Group",
+	"GROUP_RECEIVE_INVITATION" : "You've recrived an group invitation.",
+	"GROUP_X_DELETED" : "Group %@ has been deleted.",
 
 	"LOGIN_ACCOUNT" :	"Phone Number or Email",
 	"LOGIN_ACCOUNT_OR_PASSWORD_ERROR" :	"Error account or password. Please try again.",
