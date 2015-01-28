@@ -2467,7 +2467,7 @@ $(function(){
             if(this_compose_obj.parent().hasClass("cp-work-item")){
                 //工作發佈對象
                 isShowGroup = false;
-                isShowSelf = false;
+                isShowSelf = true;
                 isShowAll = false;
                 isShowFav = true;
                 isShowFavBranch = false;
@@ -5132,7 +5132,7 @@ $(function(){
                     break;
                 case 3:
                     this_event.find(".st-box2-more-category").addClass("st-box2-more-category-task");
-                    category = $.i18n.getString("FEED_MISSION")+"<img src=\"images/task/timeline_task_icon_task_work.png\"> <span>"+$.i18n.getString("FEED_TASK")+"</span>";
+                    category = $.i18n.getString("FEED_TASK");
                     title = $.i18n.getString("FEED_TASK");
 
                     //任務狀態
@@ -5144,8 +5144,8 @@ $(function(){
                     this_event.find(".st-task-status").html( $.i18n.getString("FEED_UNFINISHED") );
                     break;
                 case 4://投票
-                    this_event.find(".st-box2-more-category").addClass("st-box2-more-category-task");
-                    category = $.i18n.getString("FEED_MISSION")+"<img src=\"images/task/timeline_task_icon_task_vote.png\"> <span>"+$.i18n.getString("FEED_VOTE")+"</span>";
+                    this_event.find(".st-box2-more-category").addClass("st-box2-more-category-vote");
+                    category = $.i18n.getString("FEED_VOTE");
                     title = $.i18n.getString("FEED_VOTE");
                     //任務狀態
                     this_event.find(".st-box2-more-task-area").show();
@@ -5159,8 +5159,8 @@ $(function(){
                     this_event.find(".st-task-status").html( $.i18n.getString("FEED_NOT_VOTED") );
                     break;
                 case 5://地點回報
-                    this_event.find(".st-box2-more-category").addClass("st-box2-more-category-task");
-                    category = $.i18n.getString("FEED_MISSION")+"<img src=\"images/task/timeline_task_icon_task_checkin.png\"> <span>"+$.i18n.getString("FEED_LOCATION")+"</span>";
+                    this_event.find(".st-box2-more-category").addClass("st-box2-more-category-location");
+                    category = $.i18n.getString("FEED_LOCATION");
                     title = $.i18n.getString("FEED_LOCATION");
                     //任務狀態
                     this_event.find(".st-box2-more-task-area").show();
@@ -5506,7 +5506,9 @@ $(function(){
 
 					if(val.i) {
 						this_event.find(".st-attach-url-img").show();
-						this_event.find(".st-attach-url-img img").attr("src",val.i);
+						this_event.find(".st-attach-url-img img").attr("src",val.i).error(function(){
+                            $(this).attr("src","images/common/icon/icon_noPhoto.png");
+                        });
 					}
 					this_event.find(".st-attach-url-title").html(val.t);
 					this_event.find(".st-attach-url-desc").html(val.d);
@@ -5515,20 +5517,28 @@ $(function(){
 					break;
 				case 2:
 					this_event.find(".st-attach-url").show();
-					this_event.find(".st-attach-url-img img").attr("src",val.i);
-					this_event.find(".st-attach-url-img img").css("width","100%");
+                    var imgTmp = this_event.find(".st-attach-url-img img");
+					imgTmp.attr("src",val.i);
+					imgTmp.css("width","100%");
+                    imgTmp.error( function(){
+                        $(this).attr("src","images/common/icon/icon_noPhoto.png");
+                    });
 
 					var youtube_code = getYoutubeCode(val.c);
 					if(youtube_code){
 						this_event.find(".st-attach-youtube").show();
 						this_event.find(".st-attach-youtube").html(
-							'<iframe width="320" height="280" src="//www.youtube.com/embed/'+ youtube_code +'" frameborder="0" allowfullscreen></iframe>'
+							'<iframe width="450" height="280" src="//www.youtube.com/embed/'+ youtube_code +'" frameborder="0" allowfullscreen></iframe>'
 						);
 					}else{
-						this_event.find(".st-attach-url-img").show();
-						this_event.find(".st-attach-url-img img").attr("src",val.i);
+                        var imgTmp = this_event.find(".st-attach-url-img");
+						imgTmp.show();
+						imgTmp.attr("src",val.i);
+						imgTmp.error( function(){
+                            $(this).attr("src","images/common/icon/icon_noPhoto.png");
+                        });
 						
-						this_event.find(".st-attach-url").click(function(){
+                        this_event.find(".st-attach-url").click(function(){
 							window.open(val.c);
 						});
 					}
@@ -5543,8 +5553,12 @@ $(function(){
 					this_event.find(".st-attach-url-title").hide();
 					this_event.find(".st-attach-url-desc").hide();
 					
-					this_event.find(".st-attach-url-img").show();
-					this_event.find(".st-attach-url-img img").attr("src",val.c);
+                    var imgTmp = this_event.find(".st-attach-url-img");
+                    imgTmp.show();
+                    imgTmp.attr("src",val.c);
+                    imgTmp.error( function(){
+                        $(this).attr("src","images/common/icon/icon_noPhoto.png");
+                    });
 					
 					//圖片滿版
 					var w = this_event.find(".st-attach-url-img img").width();

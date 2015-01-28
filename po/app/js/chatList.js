@@ -340,14 +340,18 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 			});
 		} else{
 			g_idb_chat_msgs.limit(function(list){
-				g_room = g_group["chatAll"][ciTmp];
-			    if( list.length>0 ){
-			    	if( null!=list[0] ){
-			        	var object = list[0].data;
-			        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
-			    	}
-			    } else {
-					setLastMsgContent( giTmp, ciTmp, table, g_room.cm, isShowAlert, isRoomOpen );
+				try{
+					g_room = g_group.chatAll[ciTmp];
+				    if( list.length>0 ){
+				    	if( null!=list[0] ){
+				        	var object = list[0].data;
+				        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
+				    	}
+				    } else {
+						setLastMsgContent( giTmp, ciTmp, table, g_room.cm, isShowAlert, isRoomOpen );
+					}
+				} catch(e){
+					errorReport(e);
 				}
 			},{
 			    index: "gi_ci_ct",

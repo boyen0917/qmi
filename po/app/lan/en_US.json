@@ -33,7 +33,7 @@
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
 	"FEED_BULLETIN" :	"Bulletin",
-	"FEED_LOCATION" :	"Location",
+	"FEED_LOCATION" :	"Location Report",
 	"FEED_MISSION_LOCATION" :	"Mission-Location Report",
 	"FEED_MISSION_TASK" :	"Mission-Task",
 	"FEED_MISSION_VOTE" :	"Mission-Vote",
