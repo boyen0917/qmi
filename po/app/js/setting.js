@@ -152,44 +152,6 @@ $(document).ready( function(){
                                                                  
 */
 
-function initGroupSetting(this_gi){
-	// 如果是管理者的話顯示額外設定
-    try{
-        var userData = $.lStorage(ui);
-        var group = userData[this_gi];
-        var hide = 0;
-        if( 1==group.ad ){
-            $(".gs-row[data-type=permission]").show();
-            $(".gs-row[data-type=info]").show();
-        } else {
-            $(".gs-row[data-type=permission]").hide();
-            $(".gs-row[data-type=info]").hide();
-            hide+=2;
-        }
-
-        //離開團體開關
-        //目前僅免費團體可自由退出
-        if( group.tp=="A1" && group.set ){
-	        if( group.set.s11==0 || group.set.s11==2 ){
-	        	$(".gs-leave").show();
-	        } else{
-	        	$(".gs-leave").hide();
-            	hide+=1;
-	        }
-        } else {
-        	$(".gs-leave").hide();
-            hide+=1;
-        }
-
-        if( hide>=3 ){
-        	return false;
-        }
-        return true;
-    } catch(e){
-        errorReport(e);
-    }
-}
-
 function requestLeaveGroup( this_gi, this_gu, callback ){
 	// PUT /groups/{gi}/users/{gu}/status
 	// {
