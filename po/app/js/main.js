@@ -1570,6 +1570,10 @@ $(function(){
 		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);
 		userInfoShow($(this).data("gi"),$(this).data("gu"));
 	});
+
+	$(document).on("mouseup",".user-avatar-bar-favorite .fav",function(e){
+		clickUserInfoFavorite( $(this) );
+	});
 	
 	//$(document).on("timeupdate",".st-attach-audio audio",function(){
 	//	cns.debug(55555);

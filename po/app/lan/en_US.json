@@ -244,6 +244,7 @@
 	"CHAT_VOIP_GET_CALL" : "%@ have called you from Qmi.",
 	"CHAT_VOIP_MAKE_CALL" : "You've made a call from Qmi.",
 	"CHAT_SOMEONE_LEAVE_GROUP" : "%@ left group.",
+	"CHAT_CHATROOM_MEMBER_EMPTY" : "Please select a target.",
 	
 	"NOTICES_TITLE" :	"New Notices",
 	"NOTICES_POST" :	"Publish",

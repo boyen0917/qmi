@@ -9,6 +9,14 @@ $(document).ready(function(){
 		$(".chatList-add").data("object_str", $(this).attr("data-object_str") );
 		onShowNewRoomPageDone();
 	});
+	$(document).on("click",".newChatDetail-header",function(){
+		var tmp = $(this).next();
+		// if( false==tmp.is(":visible") ){
+		// 	$(this).
+		// }
+		$(this).toggleClass("hide");
+		tmp.slideToggle();
+	});
 });
 /**
 @brief
@@ -528,6 +536,7 @@ function sortRoomList(){
                                                                                          */
 
 var g_newChatMemList;
+var g_newChatFavList;
 var g_memCount;
 
 function showNewRoomPage(){
@@ -536,7 +545,8 @@ function showNewRoomPage(){
         isShowSelf : false,
         isShowAll : false,
         isShowFav : true,
-        isShowFavBranch : false
+        isShowFavBranch : true,
+        isBack: false
 	}, onShowNewRoomPageDone);
 }
 
@@ -548,6 +558,11 @@ function onShowNewRoomPageDone(){
 			delete data[currentGroup.gu];
 		}
 		g_newChatMemList = Object.keys(data);
+
+		data = $.parseJSON( $(".chatList-add").data("favorite_str") );
+		if( null==data ) g_newChatFavList = [];
+		else g_newChatFavList = Object.keys(data);
+
 		showNewRoomDetailPage();
 	} catch(e){
 		cns.debug( "[!]showNewRoomPage", e.message );
@@ -582,13 +597,13 @@ function toggleSelectAll( bIsSelect ){
 function showNewRoomDetailPage(){
 
 	//no mem
-	if( g_newChatMemList.length==0 ){
-		alert( $.i18n.getString("CHAT_CHATROOM_NAME_EMPTY") );
+	if( g_newChatMemList.length==0 && g_newChatFavList.length==0 ){
+		alert( $.i18n.getString("CHAT_CHATROOM_MEMBER_EMPTY") );
 		return;
 	}
 
 	//only 1 mem
-	if( g_newChatMemList.length==1 ){
+	if( g_newChatMemList.length==1 && g_newChatFavList.length==0 ){
 		var gu = g_newChatMemList[0];
 
 		//is same room exist
@@ -611,7 +626,7 @@ function showNewRoomDetailPage(){
 	$.mobile.changePage("#page-newChatDetail");
 
 	//init
-	var container = $(".newChatDetail-content");
+	var container = $(".newChatDetail-content.mem");
 	var input = $(".newChatDetail table .input");
 	var count = $(".newChatDetail table .count");
 	input.val("");
@@ -622,7 +637,7 @@ function showNewRoomDetailPage(){
 	var currentGroup = $.lStorage(ui)[gi];
 	for( var i=0; i<g_newChatMemList.length; i++ ){
 		var mem = currentGroup.guAll[ g_newChatMemList[i] ];
-		var memDiv = $("<div class='mem'></div>");
+		var memDiv = $("<div class='row mem'></div>");
 		if(mem.auo){
 			memDiv.append("<img class='namecard' src='"+mem.auo+"'>");
 			memDiv.find("img").data("gu", g_newChatMemList[i]);
@@ -632,6 +647,17 @@ function showNewRoomDetailPage(){
 		}
 		memDiv.append("<span>"+mem.nk.replaceOriEmojiCode()+"</span>");
 		container.append(memDiv);
+	}
+
+	// favorite
+	container = $(".newChatDetail-content.fav");
+	container.html("");
+	for( var i=0; i<g_newChatFavList.length; i++ ){
+		var fav = currentGroup.fbl[ g_newChatFavList[i] ];
+		var favDiv = $("<div class='row fav'></div>");
+		favDiv.append("<img src='images/common/others/select_empty_all_photo.png'>");
+		favDiv.append("<span>"+fav.fn.replaceOriEmojiCode()+"</span>");
+		container.append(favDiv);
 	}
 
 	//bind event
@@ -667,13 +693,13 @@ function requestNewChatRoom(){
 		return;
 	}
 
-	requestNewChatRoomApi( gi, text, arr, function(data){
+	requestNewChatRoomApi( gi, text, arr, g_newChatFavList, function(data){
     	$.mobile.changePage("#page-group-main");
     });
 
 }
 
-function requestNewChatRoomApi(giTmp, cnTmp, arr, callback, isOpenRoom){
+function requestNewChatRoomApi(giTmp, cnTmp, gul, fl, callback, isOpenRoom){
 	if( null==isOpenRoom ) isOpenRoom = true;
 	var api_name = "/groups/"+giTmp+"/chats";
 
@@ -683,9 +709,11 @@ function requestNewChatRoomApi(giTmp, cnTmp, arr, callback, isOpenRoom){
         li: lang
     };
     var body = {
-        cn: cnTmp,
-        gul: arr
+        cn: cnTmp
     };
+
+    if( null!=gul ) body.gul = gul;
+    if( null!=fl ) body.fl = fl;
 
     // cns.debug( JSON.stringify(body) );
     var method = "post";
