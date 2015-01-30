@@ -2178,6 +2178,7 @@ $(function(){
         var isShowAll = true;
         var isShowFav = true;
         var isShowFavBranch = true;
+        var isBack = true;
         if( null== option ){
             if(this_compose_obj.parent().hasClass("cp-work-item")){
                 //工作發佈對象
@@ -2197,6 +2198,7 @@ $(function(){
             isShowAll = (null==option.isShowAll) ? isShowAll : option.isShowAll;
             isShowFav = (null==option.isShowFav) ? isShowFav : option.isShowFav;
             isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
+            isBack = (null==option.isBack) ? isBack : option.isBack;
         }
 
         //check cnt
@@ -2224,6 +2226,7 @@ $(function(){
         $(".obj-content").data("selected-branch",{});
         $(".obj-content").data("selected-obj",{});
         $(".obj-content").data("selected-fav",{});
+        $(".obj-content").data("isBack", isBack );
         updateSelectedObj();
         
         //----- 自己 -------
@@ -2903,7 +2906,10 @@ $(function(){
             }
 
             //回上一頁
-            $(".obj-done").parent().find(".page-back").trigger("click");
+            var isBack = $(".obj-content").data("isBack");
+            if( null==isBack || true==isBack ){
+                $(".obj-done").parent().find(".page-back").trigger("click");
+            }
             if( onDone ) onDone();
         });
 
@@ -6350,7 +6356,7 @@ $(function(){
 
 	    	//將tp4 tp5 的user info都更新完 再更新polling時間
 	    	if(user_info_arr.length > 0){
-	    		getUserInfo(user_info_arr,false,function(memData){
+	    		getUserInfo(user_info_arr,false, false, function(memData){
 	    			if(memData){
 
 	    				//更新polling
@@ -6480,12 +6486,23 @@ $(function(){
 	        		var _groupList = $.lStorage(ui);
 
                     try{
-                        _groupList[this_user_info.gi].guAll[this_user_info.gu] = user_data;
-                        $.lStorage(ui,_groupList);
+                        if(Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
+                            cns.debug("guall content exist");
+                            var userTmp = _groupList[this_user_info.gi].guAll[this_user_info.gu];
+                            //user全部資料竟然不含fav...?!用extend的比較保險
+                            _groupList[this_user_info.gi].guAll[this_user_info.gu] = $.extend(userTmp, user_data);
+                    
+                            //有取資料但是沒有存...?!
+                            $.lStorage(ui, _groupList);
 
-                        //更新所有照片、名字 this_gi , this_gu , set_name ,set_img
-                        if(update_chk){
-                            updateAllAvatarName(this_user_info.gi,this_user_info.gu);
+                            //更新所有照片、名字 this_gi , this_gu , set_name ,set_img
+                            if(update_chk){
+                                updateAllAvatarName(this_user_info.gi,this_user_info.gu);
+                            }
+                        }else{
+                            cns.debug("[!!!] getUserInfo: no guAll");
+                            var data_arr = ["userInfo",user_data];
+                            setGroupAllUser(data_arr,this_user_info.gi);
                         }
 
                         user_info_arr.pop();
@@ -6493,7 +6510,7 @@ $(function(){
                         if(user_info_arr.length == 0){
                             if(callback) callback(user_data);
                         }else{//繼續遞迴
-                            getUserInfo(user_info_arr,load_show_chk,callback);
+                            getUserInfo(user_info_arr, update_chk, load_show_chk,callback);
                         }
                     } catch(e){
                         errorReport(e);
@@ -6533,6 +6550,7 @@ $(function(){
                 $(".user-info-load-area .me").addClass("me-rotate");
                 $(".user-info-load-area .me").addClass("backface-visibility");
                 this_info.find(".action-chat").hide();
+                $(".user-avatar-bar-favorite").hide();
                 
             }else{
                 //css 調整
@@ -6543,6 +6561,7 @@ $(function(){
                     requestNewChatRoomApi(this_gi, "", [{gu:this_gu}], function(data){
                     });
                 });
+                $(".user-avatar-bar-favorite").show();
             }
 
     		getUserInfo([{gi:this_gi,gu:this_gu}],false,false,function(user_data){
@@ -6563,10 +6582,18 @@ $(function(){
 	        			userInfoAvatarPos($(".user-avatar .user-pic"));
 	        		}
 
+                    //get user info 已存過, 不再重存
 	        		//存local storage
 	        		var _groupList = $.lStorage(ui);
-	        		_groupList[this_gi].guAll[this_gu] = user_data;
-	        		$.lStorage(ui,_groupList);
+                    var userTmp = _groupList[this_gi].guAll[this_gu];
+	        		
+                    if( true==userTmp.fav ){
+                        $(".user-avatar-bar-favorite .active").show();
+                    } else if( false==userTmp.fav ){
+                        $(".user-avatar-bar-favorite .deactive").show();
+                    }
+
+	        		// $.lStorage(ui,_groupList);
 
                     if(this_gu == gu) meInfoShow(user_data);
 
@@ -6978,6 +7005,67 @@ $(function(){
                 opacity:1
             },300);
         });
+    }
+
+    clickUserInfoFavorite = function( this_fav ){
+        var this_info = this_fav.parents(".user-info-load");
+        var this_gu = this_info.data("this-info-gu");
+        var this_gi = this_info.data("this-info-gi");
+        
+        if( null==this_gu || null==this_gi ) return;
+
+        var result;
+        var succFav;
+        if( this_fav.hasClass("active") ){
+            result = updateUserFavoriteStatusApi(this_gi, null, [this_gu] );
+            succFav = false;
+        } else {
+            result = updateUserFavoriteStatusApi(this_gi, [this_gu], null );
+            succFav = true;
+        }
+        result.complete(function(data){
+            if(data.status == 200){
+                //update user fav
+                var tmp = $.lStorage(ui);
+                if( tmp.hasOwnProperty(this_gi) ){
+                    if( tmp[this_gi].guAll && tmp[this_gi].guAll.hasOwnProperty(this_gu) ){
+                        tmp[this_gi].guAll[this_gu].fav = succFav;
+                        if(succFav){
+                            tmp[this_gi].favCnt++;
+                            this_fav.parent().find(".active").show();
+                            this_fav.parent().find(".deactive").hide();
+                        } else {
+                            tmp[this_gi].favCnt--;
+                            if( tmp[this_gi].favCnt<0 ) tmp[this_gi].favCnt = 0;
+                            this_fav.parent().find(".active").hide();
+                            this_fav.parent().find(".deactive").show();
+                        }
+                        $.lStorage(ui, tmp);
+
+                        if( $(".subpage-contact").is(":visible") ){
+                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+                            initContactList();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    updateUserFavoriteStatusApi = function( this_gi, al, dl ){
+        //PUT groups/G000006s00q/favorite_users
+        var api_name = "groups/" + this_gi + "/favorite_users";
+        var headers = {
+            "ui":ui,
+            "at":at, 
+            "li":lang
+        };
+        var body = {};
+        if( null!=al ) body.al = al;
+        if( null!=dl ) body.dl = dl;
+
+        var method = "put";
+        return ajaxDo(api_name,headers,method,true,body);
     }
 
     eventDetailShow = function(this_ei){

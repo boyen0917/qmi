@@ -1117,6 +1117,23 @@ showAddFavGroupBox = function( subPage ){
 							toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_SUCC") );
 							input.val("");
 							create.data("object_str","");
+
+							//update subpage-contact
+							var fav = $(".subpage-contact .row.favorite");
+							if( fav.length>0 ){
+								var branchCntDiv = fav.find(".detail:eq(1)");
+								var branchCount = Object.keys(fbl).length;
+								if(branchCount<=0) branchCntDiv.hide();
+								else{
+									var text = $.i18n.getString("COMPOSE_N_SUBGROUP", branchCount);
+									if( branchCntDiv.length>0 ){
+										branchCntDiv.text( text );
+									}
+									else{
+										fav.find("left").append("<div class='detail'>"+text+"</div>");
+									}
+								}
+							}
 						} else {
 							toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_FAIL") );
 						}

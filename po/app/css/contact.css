@@ -277,12 +277,13 @@
 }
 
 .contact-createSubgroup .innerContainer{
-	margin: 250px 2% 0 2%;
+	margin: 250px auto 0;
 	background: white;
 	text-align: center;
 	width: 96%;
 	border-collapse: collapse;
 	color: black;
+	max-width: 700px;
 }
 .contact-createSubgroup .innerContainer .title{
 	margin-bottom: 24px;
