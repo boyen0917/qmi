@@ -83,7 +83,7 @@ $(function(){
                 delete new_guAll[i];
             }
         });
-        
+
         _groupList[this_gi].guAll = new_guAll;
         $.lStorage(ui,_groupList);
     }
@@ -151,57 +151,31 @@ $(function(){
     }
 
 
-    setThisGroup = function(this_gi,gl){
-        //新建團體
-        var _groupList = $.lStorage(ui);
-        if(typeof(_groupList[this_gi]) == "undefined"){
-            _groupList[this_gi] = {};
-
-            $.each(gl.tl,function(t_i,t_val){
-                if(t_val.tp == 1){
-                    ti_cal = t_val.ti;
-                }else if(t_val.tp == 2){
-                    ti_feed = t_val.ti;
-                }else{
-                    ti_chat = t_val.ti;
-                }
-            });
-
-            //新預設團體gi
-            _groupList[this_gi].gu = gu;
-            _groupList[this_gi].gn = gn;
-            _groupList[this_gi].ti_cal = ti_cal;
-            _groupList[this_gi].ti_feed = ti_feed;
-            _groupList[this_gi].ti_chat = ti_chat;
-            _groupList[this_gi].guAll = {};
-
-            //存回
-            $.lStorage(ui,_groupList);
-        }
-
-        //表示非新建團體 但也不一定有combo
-        if(!gl){
+    setThisGroup = function(this_gi){
+        try{
             var gl = $.lStorage(ui)[this_gi];
+            
+            gi = this_gi;
+            gu = gl.me;
+            gn = htmlFormat(gl.gn);
+
             ti_cal = gl.ti_cal;
             ti_feed = gl.ti_feed;
             ti_chat = gl.ti_chat;
+            
+            //設定左側選單 gu
+            $(".sm-user-area.namecard").data("gu",gu);
+            
+            //header 設定團體名稱
+            $(".header-group-name div:eq(1)").html(gn);
+
+            //替換該團體的畫面
+            updateGroupAllInfoDom( this_gi );
+
+        } catch(e){
+            errorReport(e);
+            return;
         }
-
-        gi = this_gi;
-        gu = gl.me;
-        gn = htmlFormat(gl.gn);
-        
-        //設定左側選單 gu
-        $(".sm-user-area.namecard").data("gu",gu);
-        
-        //header 設定團體名稱
-        $(".header-group-name div:eq(1)").html(gn);
-
-        //sidemenu name
-        setSmUserData(gi,gu,gn);
-
-        //替換該團體的畫面
-        updateGroupAllInfoDom( this_gi );
     };
 
     updateTab = function(this_gi){

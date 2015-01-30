@@ -2649,9 +2649,8 @@ img.st-user-pic{
 }
 
 .st-attach-url-img img {
-	top: -1px;
-	left: -1px;
-	width: 101%;
+	top: 10px;
+	width: 95%;
 	position: relative;
 	object-fit: cover;
 	max-height: 213px;

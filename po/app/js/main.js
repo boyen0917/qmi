@@ -35,6 +35,9 @@ $(function(){
 			//設定目前團體
 			setThisGroup(_loginData.dgi);
 
+			//sidemenu user
+        	setSmUserData(gi,gu,gn);
+
 			//header 設定團體名稱
 	    	$(".header-group-name div:eq(1)").html(gn);
 	    	
@@ -404,52 +407,6 @@ $(function(){
 		});
 	});
 
-	//更換團體 備份
-	$(document).on("click",".sm-group-area.enable.back",function(){
-
-		if( $(".st-filter-area").hasClass("st-filter-lock") ){
-			// cns.debug("-------------");
-			// cns.debug("-------------");
-			// cns.debug("-------------");
-			// cns.debug("lock .sm-group-area.enable");
-			// cns.debug("-------------");
-			// cns.debug("-------------");
-			// cns.debug("-------------");
-			return;
-		}
-
-		var this_group = $(this);
-		$(".sm-group-area").removeClass("enable");
-
-		//清空畫面
-		$(".st-top-event-default").show();
-		$(".st-top-event-set").hide();
-		$(".feed-subarea").html("");
-		
-		var this_gi = $(this).attr("data-gi");
-		setThisGroup(this_gi);
-		//更新gu all
-		setGroupAllUser(false,false,function(){
-			$(".sm-small-area.active").removeClass("active");
-
-			//切換團體時, 選目前第一個選項
-			var tmp = $(".sm-small-area:visible");
-			if( tmp.length>0 ){
-				$(tmp[0]).addClass("active");
-				timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
-			}else{
-				timelineSwitch("feeds",true);
-			}
-			
-			setSmUserData(gi,gu,gn);
-			//置頂設定
-			topEvent(function(){
-				//左側選單圖案變換
-				setSidemenuHeader(this_gi);
-				$(".sm-group-area").addClass("enable");
-			});
-		});
-	});
 	
 	$(".sm-small-area.setting").click(function(){
 		popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);

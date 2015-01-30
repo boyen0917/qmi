@@ -368,7 +368,6 @@ $(function(){
 							                      si: o_obj.blob.size
 							                    }
 							                    ajaxDo(api_name,headers,method,true,body).complete(function(data){
-													cns.debug("commit後的 data:",data);
 										        	//commit 成功
 										        	if(data.status == 200){
 										        		if(callback) callback(true);

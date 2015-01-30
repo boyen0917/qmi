@@ -273,6 +273,9 @@ $(function(){
         //指定gi
         setThisGroup(this_gi);
 
+        //sidemenu name
+        setSmUserData(gi,gu,gn);
+
         //檢查官方帳號
         initOfficialGroup( gi );
 
@@ -4358,7 +4361,7 @@ $(function(){
 
 	        	//新建團體專用 記錄新增團體的資訊 用以跳轉
 	        	if(new_gi && new_gi == val.gi && !invite){
-	        		setThisGroup(new_gi,val);
+	        		setThisGroup(new_gi);
 	        	}
 
                 tmp_selector = ".sm-group-list-area";
@@ -4416,6 +4419,10 @@ $(function(){
                     if(invite){
                         toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );
                     }else{
+
+                        //sidemenu user
+                        setSmUserData(gi,gu,gn);
+
                         //top event
                         topEvent();
 
@@ -5258,7 +5265,7 @@ $(function(){
 					this_event.find(".st-attach-url-title").hide();
 					this_event.find(".st-attach-url-desc").hide();
 					
-                    var imgTmp = this_event.find(".st-attach-url-img");
+                    var imgTmp = this_event.find(".st-attach-url-img").show().find("img");
                     imgTmp.show();
                     imgTmp.attr("src",val.c);
                     imgTmp.error( function(){
@@ -6192,6 +6199,9 @@ $(function(){
                 popupShowAdjust("",$.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);
                 clearInterval(pc);
                 return false;
+            }else{
+                cns.debug("polling err:",data);
+                return false;
             }
         });
     }
@@ -6328,6 +6338,7 @@ $(function(){
                         break;
                     case 11://create group
                         if( false==$.lStorage(ui).hasOwnProperty(val.pm.gi) ){
+                            cns.debug("polling~ create grouop");
                             groupMenuListArea(val.pm.gi, false);
                         }
                         break;
@@ -6487,7 +6498,6 @@ $(function(){
                     } catch(e){
                         errorReport(e);
                     }
-
 	        	//失敗就離開遞迴
 	        	}else{ 
 	        		if(callback) callback(false);
