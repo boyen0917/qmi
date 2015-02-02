@@ -5261,7 +5261,7 @@ $(function(){
 					if(youtube_code){
 						this_event.find(".st-attach-youtube").show();
 						this_event.find(".st-attach-youtube").html(
-							'<iframe width="450" height="280" src="//www.youtube.com/embed/'+ youtube_code +'" frameborder="0" allowfullscreen></iframe>'
+							'<iframe width="100%" height="100%" src="//www.youtube.com/embed/'+ youtube_code +'" frameborder="0" allowfullscreen></iframe>'
 						);
 					}else{
                         var imgTmp = this_event.find(".st-attach-url-img");

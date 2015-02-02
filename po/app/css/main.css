@@ -1906,14 +1906,14 @@ img.auo {
 	border-radius: 9px;
 	line-height: 17px;
 	font-size: 12px;
-	text-align: center;
 	font-weight: bolder;
 	display: inline-block;
-	margin-right: -20px;
-	margin-left: -5px;
+	margin-right: -22px;
+	margin-left: -6px;
 	margin-top: -5px;
 	right: 0;
 	padding: 1px;
+	width: 0;
 }
 
 .st-filter-other{
@@ -2666,14 +2666,18 @@ img.st-user-pic{
 	vertical-align: baseline;
 	display: none;
 	margin-bottom: 10px;
+	border-bottom: 1px solid #E4E4E4;
 }
 
 .st-attach-url-img img {
-	top: 10px;
-	width: 95%;
+	width: 100%;
 	position: relative;
 	object-fit: cover;
 	max-height: 213px;
+}
+.st-attach-youtube{
+	width: 480px;
+	height: 280px;
 }
 
 .st-attach-url-title {
@@ -2801,6 +2805,7 @@ img.st-user-pic{
 
 .st-attach-video video {
 	width: 100%;
+	max-height: 350px;
 }
 
 .st-attach-audio, .st-attach-video {
