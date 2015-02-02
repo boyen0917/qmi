@@ -176,6 +176,7 @@
 	"COMMON_CHECK_NETWORK" : "目前網路不穩定，請確認連線狀況。",
 	"COMMON_ALBUM" : "相簿",
 	"COMMON_SELECTABLE_MEMBER" : "沒有可選擇的對象",
+	"COMMON_ALL_MEMBERS" : "全體成員",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",
@@ -249,6 +250,8 @@
 	"GROUPSETTING_LEAVE_GROUP" : "退出團體",
 	"GROUP_RECEIVE_INVITATION" : "你收到了一個團體邀請",
 	"GROUP_X_DELETED" : "團體%@已被刪除",
+	"GROUP_X_JOIN_GROUP" : "%@ 已加入團體",
+	"GROUP_X_LEAVE_GROUP" : "%@ 已離開團體",
 
 	"SETTING_PROFILE_NAME" : "姓名",
 	"SETTING_PROFILE_BIRTHDAY" : "生日",

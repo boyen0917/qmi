@@ -152,15 +152,15 @@
                         </div>
 
                         <div class="header-menu">
-                            <div data-sm-act="feeds" data-polling-cnt="A1" class="sm-small-area polling-cnt active">
+                            <div data-sm-act="feeds" data-polling-cnt="A1" class="sm-small-area polling-cnt active polling-local">
                                <div class="sm-small-area-r" data-textid="LEFT_FEED"></div>
-                               <!-- <div class="sm-count"></div> -->
+                               <div class="sm-count" style="display:none;"></div>
                             </div>
-                            <div data-sm-act="memberslist" data-polling-cnt="A2" class="sm-small-area polling-cnt">
+                            <div data-sm-act="memberslist" data-polling-cnt="A2" class="sm-small-area polling-cnt polling-local">
                                <div class="sm-small-area-r" data-textid="LEFT_MEMBER"></div>
                                <div class="sm-count" style="display:none;"></div>
                             </div>
-                            <div data-sm-act="chat" data-polling-cnt="A3" class="sm-small-area polling-cnt">
+                            <div data-sm-act="chat" data-polling-cnt="A3" class="sm-small-area polling-cnt polling-local">
                                <div class="sm-small-area-r" data-textid="LEFT_CHAT"></div>
                                <div class="sm-count" style="display:none;"></div>
                             </div>
@@ -331,17 +331,35 @@
                                 <img src="images/icon/icon_arrow_right.png"/>
                             </div> -->
                             <div class="st-filter-hide left">&nbsp&nbsp...</div>
-                            <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide st-filter-list-active">
+                            <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide st-filter-list-active polling-cnt polling-local" data-polling-cnt="B1">
                                 <span data-textid='FEED_ALL'></span>
+                                <div class="sm-count" style="display:none;"></div>
                             </div>
                             <!-- <div class="st-filter-other"> -->
-                                <div data-status="all" data-navi="feed-public" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_ALL'></span></div>
-                                <div data-status="all" data-navi="feed-post" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_ALL'></span></div>
-                                <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list"><span data-textid='FEED_BULLETIN'></span></div>
-                                <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list"><span data-textid='FEED_REPORT'></span></div>
-                                <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list"><span data-textid='FEED_MISSION'></span></div>
-                                <div data-status="unread" class="st-filter-action st-filter-list"><span data-textid='FEED_UNREAD'></span></div>
-                                <div data-status="read" class="st-filter-action st-filter-list"><span data-textid='FEED_READ'></span></div>
+                                <div data-status="all" data-navi="feed-public" class="st-filter-action st-filter-list" style="display:none;">
+                                    <span data-textid='FEED_ALL'></span>
+                                </div>
+                                <div data-status="all" data-navi="feed-post" class="st-filter-action st-filter-list" style="display:none;">
+                                    <span data-textid='FEED_ALL'></span>
+                                </div>
+                                <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B2">
+                                    <span data-textid='FEED_BULLETIN'></span>
+                                    <div class="sm-count" style="display:none;"></div>
+                                </div>
+                                <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B3">
+                                    <span data-textid='FEED_REPORT'></span>
+                                    <div class="sm-count" style="display:none;"></div>
+                                </div>
+                                <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B4">
+                                    <span data-textid='FEED_MISSION'></span>
+                                    <div class="sm-count" style="display:none;"></div>
+                                </div>
+                                <div data-status="unread" class="st-filter-action st-filter-list">
+                                    <span data-textid='FEED_UNREAD'></span>
+                                </div>
+                                <div data-status="read" class="st-filter-action st-filter-list">
+                                    <span data-textid='FEED_READ'></span>
+                                </div>
                                 <div data-status="subscribe" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_SUBSCRIBE'></span></div>
                                 <!-- <div class="st-filter-list-btn">
                                     <img src="images/icon/icon_arrow_top.png"/>

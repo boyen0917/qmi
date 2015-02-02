@@ -29,6 +29,7 @@
 	"COMMON_CHECK_NETWORK" : "",
 	"COMMON_ALBUM" : "Album",
 	"COMMON_SELECTABLE_MEMBER" : "No selectable member.",
+	"COMMON_ALL_MEMBERS" : "All Members",
 	
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
@@ -263,6 +264,8 @@
 	"GROUP_GROUP_INVITATION" : "Group %@ has sent you an invitation",
 	"GROUP_MEMBERS" : "%ld member(s)",
 	"GROUP_REJECT_ALERT" : "Reject %@'s invitation?",
+	"GROUP_X_JOIN_GROUP" : "%@ joined group.",
+	"GROUP_X_LEAVE_GROUP" : "%@ left group.",
 
 	"SETTING_PROFILE_NAME" : "Name",
 	"SETTING_PROFILE_BIRTHDAY" : "Birthday",

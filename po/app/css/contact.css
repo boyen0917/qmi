@@ -458,7 +458,7 @@
 	color: white;
 	font-weight: bold;
 	font-size: 12px;
-	margin-top: -24px;
+	margin-top: 56px;
 	border-bottom-left-radius: 6px;
 	border-bottom-right-radius: 6px;
 	line-height: 15px;
@@ -536,8 +536,9 @@
 	cursor: pointer;
 }
 .contact-rows .left, .contact-branchList .left{
-	width: 90%;
+	width: -webkit-calc( 100% - 70px );
 	display: inline-block;
+	white-space: nowrap;
 	/*vertical-align: middle;*/
 }
 .contact-memLists .left{
@@ -563,7 +564,7 @@
 	cursor: pointer;
 }
 .contact-rows .right, .contact-branchList .right{
-	width: 10%;
+	width: 70px;
 	display: inline-block;
 	float: right;
 	/* height: 100%; */
@@ -579,6 +580,20 @@
 	height: 30px;
 	width: 30px;
 	margin-top: 10px;
+}
+.contact-rows .right .new{
+	color: white;
+    vertical-align: super;
+	background: #f31e80;
+	min-width: 18px;
+	height: 18px;
+	border-radius: 9px;
+	line-height: 17px;
+	font-size: 12px;
+	text-align: center;
+	font-weight: bolder;
+	display: inline-block;
+	padding: 1px;
 }
 .contact-rows .name, .contact-branchList .name, 
 .contact-memLists .name{

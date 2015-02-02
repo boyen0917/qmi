@@ -103,7 +103,8 @@ $(function(){
 	update_alert_interval = 10000;
 
 	//title
-	$("title").html("Qmi");
+	g_Qmi_title = "Qmi";
+	$("title").html(g_Qmi_title);
 
 
 	// ajax setting

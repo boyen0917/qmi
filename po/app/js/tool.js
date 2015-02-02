@@ -973,13 +973,33 @@ $(function(){
             	_groupList[this_gi].fbl = new_fbl;
             	$.lStorage(ui,_groupList);
 
-            	if( callback ) callback();
+            	if( callback ) callback(this_gi);
         	// }
     //     });
     }
 
+    getGroupCompetence = function( this_gi ){
+    	var tmp = {
+    		isAdmin: false,
+    		isOfficial: false
+    	}
+    	try{
+    		var groupData = $.lStorage(ui)[this_gi];
+			if( groupData.ad==1 ){
+				tmp.isAdmin = true;
+			}
+			if( groupData.isOfficial ){
+				tmp.isOfficial = groupData.isOfficial;
+			}
+    	} catch(e){
+    		errorReport(e);
+    	}
+    	return tmp;
+    }
+
     errorReport = function(e){
     	if( e ){
+    		if( e.message.indexOf("riseNotification")==0 ) return;
 	    	if (e.stack){
 	    		cns.debug("[!]", e.stack);
 	    	} else {

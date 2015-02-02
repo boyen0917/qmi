@@ -76,6 +76,10 @@ $(document).ready(function(){
     // cns.debug( JSON.stringify(userData) );
     //所有團體列表
     g_group = userData[gi];
+    if( null==g_group ) return;
+    if( g_group.ad!=1 && true==g_group.isOfficial ){
+    	$(".extra").hide();
+    }
     g_room = g_group["chatAll"][ci];
 
     //get name

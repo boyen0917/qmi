@@ -360,6 +360,7 @@ $(function(){
 			$(".sm-small-area.active").removeClass("active");
 			timelineSwitch(target.data("sm-act"));
 		}
+		$(".polling-local .sm-count").hide();
 		$(this).addClass("active");
 
 		target.addClass("sm-click-bg");

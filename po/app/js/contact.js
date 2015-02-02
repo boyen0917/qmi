@@ -48,13 +48,22 @@ initContactList = function(){
 	//add row all
 	var tmp = $("<div class='row all'><div class='left'></div><div class='right'></div></div>");
 	var left = tmp.find(".left");
-	left.append("<div class='name'>"+$.i18n.getString("MEMBER_ALL")+"</div>");
+	left.append("<div class='name'>"+$.i18n.getString("COMMON_ALL_MEMBERS")+"</div>");
 	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",Object.keys(guAll).length)+"</div>");
 	tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 	rowContainer.append(tmp);
 	rowContainer.find(".row.all").off("click").click( function(){
 		showAllMemberPage(group.gn) 
 	});
+	//any new mem
+	var newMemCnt = 0;
+	for( var gu in guAll ){
+		var memTmp = guAll[gu];
+		if( true==memTmp.isNewMem ) newMemCnt++;
+	}
+	if( newMemCnt>0 ){
+		tmp.find(".right").prepend("<div class='new'>"+newMemCnt+"</div>");
+	}
 
 	//add row favorite
 	var tmp = $("<div class='row favorite'><div class='left'></div><div class='right'></div></div>");
@@ -610,7 +619,7 @@ generateMemberGrid = function( memObject ){
 			if( mem.aut && mem.aut.length>0 ){
 				tmp.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
 			} else {
-				tmp.append("<div class='img'></div>");
+				tmp.append("<div class='img'><div class='new' style='display:none;'>NEW</div></div>");
 			}
 			cns.debug(key, mem.nk);
 			tmp.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
@@ -621,6 +630,10 @@ generateMemberGrid = function( memObject ){
 				memContainer.prepend(tmp);
 			} else {
 				memContainer.append(tmp);
+			}
+			//is new mem
+			if( true==mem.isNewMem ){
+				tmp.find(".new").show();
 			}
 		}
 	});
@@ -1473,4 +1486,15 @@ function sendInviteAPI( list, callback ){
 	result.complete(function(data){
 		callback(data);
 	});
+}
+
+function updateContactBranchList(){
+    if( $(".subpage-contact").is(":visible") ){
+        $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+    } else{
+    	var dom = $(".contact-subpages");
+    	if( dom.is(":visible") ){
+    		dom.find( ".page-back" ).trigger("click");
+    	}
+    }
 }
