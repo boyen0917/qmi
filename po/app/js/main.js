@@ -371,6 +371,9 @@ $(function(){
 	//更換團體
 	$(document).on("click",".sm-group-area.enable",function(){
 
+		if( $(".st-filter-area").hasClass("st-filter-lock") ){
+			return;
+		}
 		var this_group = $(this);
 		var this_gi = $(this).attr("data-gi");
 
@@ -415,7 +418,7 @@ $(function(){
 	
 	//----------------------------------- timeline ---------------------------------------------  
 	$(".st-navi-subarea").click(function(){
-		if( $(".st-filter-lock").hasClass("st-filter-lock") ){
+		if( $(".st-filter-area").hasClass("st-filter-lock") ){
 			// cns.debug("-------------");
 			// cns.debug("-------------");
 			// cns.debug("-------------");
@@ -600,9 +603,15 @@ $(function(){
 		
 		//判斷是讚 還是 收回讚
 		var est = 0;
-		if($(this).html().length == 1){
+		//不能用字串長度判斷, 英文版的囧給你看OTL
+		if( $(this).data("like")== false ){
 			est = 1;
 		}
+		/*
+		if( $(this).html().length == 1){
+			est = 1;
+		}
+		*/
 
 		//更新狀態 參數
 		var target_obj = {};
@@ -1631,6 +1640,23 @@ $(function(){
 				break;
 		}
 	});
+
+	$(document).on("click",".st-attach-video.play div",function(e){
+		var tmp = $(this).prev('video');
+		if( tmp.length>0 ){
+			tmp[0].play();
+			tmp.attr('controls',true);
+		}
+		$(this).parent().removeClass("play");
+	});
+
+	document.addEventListener('ended', function(e){
+	    if($(e.target).is('video')){
+	    	var tmp = $(e.target);
+			tmp.attr('controls',false);
+	        tmp.parent().addClass("play");
+	    }
+	}, true);
 	
 	/*
               ████████╗███████╗███████╗████████╗          

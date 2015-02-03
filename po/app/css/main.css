@@ -2803,12 +2803,50 @@ img.st-user-pic{
 	float: left;
 }
 
-.st-attach-video video {
+
+.st-attach-video {
+	margin: 20px auto;
+	max-width: 480px;
+	border: 1px solid #bebebe;
+	background-color: black;
+	overflow: hidden;
+}
+.st-attach-video.play div:nth-child(2),.st-attach-video.play div:nth-child(2):active {
+	content: "a";
+	position: absolute;
+	top: 0;
+	left: 0;
 	width: 100%;
-	max-height: 350px;
+	height: 100%;
+	background-size: 60px 60px;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+}
+.st-attach-video.play div:nth-child(2) {
+	background-image: url("../images/icon/icon_video_play_56x56_click.png");
+}
+.st-attach-video.play div:nth-child(2):hover {
+	background-image: url("../images/icon/icon_video_play_56x56.png");
+}
+.st-attach-video video {
+	-webkit-transition: all .5s ease-in-out;
+	   -moz-transition: all .5s ease-in-out;
+	    -ms-transition: all .5s ease-in-out;
+	     -o-transition: all .5s ease-in-out;
+	        transition: all .5s ease-in-out;
+}
+.st-attach-video.play video {
+	object-fit: cover;
+	width: 100%;
+	max-height: 250px;
+}
+.st-attach-video video {
+	object-fit: contain;
+	width: 100%;
+	max-height: 500px;
 }
 
-.st-attach-audio, .st-attach-video {
+.st-attach-audio {
 	margin: 20px auto;
 	max-width: 480px;
 }

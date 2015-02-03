@@ -1443,9 +1443,11 @@ $(function(){
 
                         //此則動態 自己的按贊狀況
                         if(el.meta.il){
-                            this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like_blue.png");
-                            this_load.find(".st-reply-footer span:eq(1)").html( $.i18n.getString("FEED_UNLIKE") );
-                            this_load.find(".st-reply-footer span:eq(1)").removeAttr("data-textid");
+                            this_load.find(".st-reply-footer img").attr("src","images/icon/icon_like1_activity.png");
+                            var likeDom = this_load.find(".st-reply-footer span:eq(1)");
+                            likeDom.html( $.i18n.getString("FEED_UNLIKE") );
+                            likeDom.removeAttr("data-textid");
+                            likeDom.data("like", true);
                         }
                     }
                 }
@@ -4566,13 +4568,13 @@ $(function(){
 					$(".st-navi-area").data("scroll-chk",false);
 				},1000);
 	    	}
-            $(".st-filter-area").removeClass("st-filter-lock");
 	    	
 	    	if(data.status != 200) return false;
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 	    	//沒資料 後面就什麼都不用了
 	    	if( timeline_list.length == 0 ) {
+                $(".st-filter-area").removeClass("st-filter-lock");
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
 	        	//關閉timeline loading 開啟沒資料圖示
 	        	setTimeout(function(){
@@ -4584,12 +4586,14 @@ $(function(){
 
             if(main_gu){
                 $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-                    timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
+                    timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
+                    $(".st-filter-area").removeClass("st-filter-lock");
                 });
                 return false;
             }
 
 	    	idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
+                $(".st-filter-area").removeClass("st-filter-lock");
 	    		//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
 		    	if(event_tp == "00"){
 		    		//存db	    	
@@ -4630,7 +4634,7 @@ $(function(){
                         var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
                         this_navi.find(".st-sub-box[data-idb=true]").remove();
 
-		    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top);
+		    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
 			    	});
 		    	}
 	    	});
@@ -4697,14 +4701,17 @@ $(function(){
         });
 	}
 
-    timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail){
+    timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi){
+
 
         if(!detail){
             var event_tp = $("#page-group-main").data("navi") || "00";
 
             if($("#page-group-main").data("main-gu")){
+                var tmp = ".feed-subarea[data-feed=main]";
                 var ori_selector = $(".feed-subarea[data-feed=main]");
-            }else{
+            } else {
+                var tmp = ".feed-subarea[data-feed=" + event_tp + "]";
                 var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
             }
             var top_subbox = ori_selector.find(".st-sub-box:eq(0)");
@@ -4717,7 +4724,15 @@ $(function(){
 
             ori_selector.data("last-ct",timeline_list.last().meta.ct);
         }
-        
+
+        //檢查非同步timeline是否有清空
+        if( this_gi ){
+            if( this_gi!=gi ){
+                ori_selector.html("");
+            }
+        }
+
+
         var this_event = this_event_temp;
         var selector = $(".timeline-detail");
         var method = "html";
@@ -5416,7 +5431,7 @@ $(function(){
     timelineVideoMake = function (this_event,video_arr){
         $.each(video_arr,function(i,val){
             var this_video = $(
-                '<video controls></video>'
+                '<video></video>'
             );
             this_event.find(".st-attach-video").prepend(this_video);
             getS3file(val,this_video,7);
@@ -5792,14 +5807,18 @@ $(function(){
 	        		//回覆按讚
 	        		if(est){
 						this_event.find(".st-reply-footer img").attr("src","images/icon/icon_like1_activity.png");
-						this_event.find(".st-reply-footer span:eq(1)").html( $.i18n.getString("FEED_UNLIKE") );
+						var likeDom = this_event.find(".st-reply-footer span:eq(1)");
+                        likeDom.html( $.i18n.getString("FEED_UNLIKE") );
+                        likeDom.data("like", true);
 
 						var count = this_event.find(".st-reply-footer span:eq(2)").html()*1+1;
 
 						this_status = true;
 	        		}else{
 	        			this_event.find(".st-reply-footer img").attr("src","images/icon/icon_like1_normal.png");
-						this_event.find(".st-reply-footer span:eq(1)").html( $.i18n.getString("FEED_LIKE") );
+						var likeDom = this_event.find(".st-reply-footer span:eq(1)");
+                        likeDom.html( $.i18n.getString("FEED_LIKE") );
+                        likeDom.data("like", false);
 
 						var count = this_event.find(".st-reply-footer span:eq(2)").html()*1-1;
 	        		}

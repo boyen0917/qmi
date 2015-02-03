@@ -251,7 +251,7 @@ $(document).ready(function(){
 		if( g_isEndOfPage != isAtBottom ){
 			g_isEndOfPage = isAtBottom;
 			g_isEndOfPageTime = new Date().getTime();
-			cns.debug("!");
+			// cns.debug("!");
 		}
 	});
 
@@ -392,7 +392,7 @@ function updateChatContentPosition (){
 	var staus = (0==g_extraSendOpenStatus);
 	if( $(".input").data("h") != $(".input").innerHeight() 
 		|| $(".input").data("staus")!=staus ){
-		cns.debug( $(".input").data("h"), $(".input").innerHeight() );
+		// cns.debug( $(".input").data("h"), $(".input").innerHeight() );
 		$(".input").data("h", $(".input").innerHeight() );
 		$(".input").data("staus", staus);
 		var tmp = staus?200:0;
@@ -533,7 +533,7 @@ function scrollToStart (){
 }
 
 function scrollToBottom (){
-	cns.debug( "scrollToBottom", $(document).height()+50  );
+	// cns.debug( "scrollToBottom", $(document).height()+50  );
 	$('html, body').stop(false, true).animate({scrollTop:$(document).height()+50}, 'fast');
 	g_isEndOfPage = true;
 }
