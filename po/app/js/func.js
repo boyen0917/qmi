@@ -261,7 +261,7 @@ $(function(){
                 //替換該團體的圖像
                 updateGroupAllInfoDom( this_gi );
 
-                if(callback) callback();
+                if(callback) callback( this_gi );
 			}else{
                 //發生錯誤 開啓更換團體
                 cns.debug("groups/gi 發生錯誤:",this_gi + " : " + data_arr[2]);
@@ -4456,7 +4456,7 @@ $(function(){
 
                         toastShow( $.i18n.getString("FEED_GROUP_CREATED") );
                         $.mobile.changePage("#page-group-main");
-                        timelineSwitch("feeds");
+                        timelineSwitch("feeds", true);
                     }
                 });
 	        }
@@ -6420,7 +6420,14 @@ $(function(){
                         break;
                     case 10://group info edit
                         if( $.lStorage(ui).hasOwnProperty(val.pm.gi) ){
-                            setGroupAllUser(null,val.pm.gi);
+                            setGroupAllUser(null,val.pm.gi, function(this_gi){
+                                if(gi==this_gi){
+                                    var tmp = $(".sm-small-area:visible");
+                                    if(tmp.length>0){
+                                        $(tmp[0]).trigger("click");
+                                    }
+                                }
+                            });
                         }
                         break;
                     case 11://create group

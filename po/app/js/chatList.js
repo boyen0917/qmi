@@ -536,8 +536,8 @@ function parseRoomName(groupData, room){
 			for( var i=0; i<split.length; i++ ){
 				room.memList[ split[i] ] = {gu:split[i]};
 				if( split[i]!= me ){
-					if( currentGroup.guAll.hasOwnProperty( split[i] ) ){
-						var mem = currentGroup.guAll[ split[i] ];
+					if( groupData.guAll.hasOwnProperty( split[i] ) ){
+						var mem = groupData.guAll[ split[i] ];
 						return mem.nk || "";
 					}
 				}

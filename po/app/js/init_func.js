@@ -389,7 +389,7 @@ $(function(){
                                 break;
                             }
                         }
-                        requestNewChatRoomApi(this_gi, target.nk, [{gu:target.gu}], null, false);
+                        requestNewChatRoomApi(this_gi, target.nk, [{gu:target.gu}], null, null, false);
                     }
                 });
             }
