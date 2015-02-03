@@ -2810,6 +2810,7 @@ img.st-user-pic{
 	border: 1px solid #bebebe;
 	background-color: black;
 	overflow: hidden;
+	position: inherit;
 }
 .st-attach-video.play div:nth-child(2),.st-attach-video.play div:nth-child(2):active {
 	content: "a";

@@ -492,7 +492,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 					cntDom.html(cntText);
 				}
 			}
-		} else {
+		} else if( $(".subpage-chatList").is(":visible") ){
 			$('.sm-small-area[data-sm-act="chat"]').trigger("click");
 		}
 	}
@@ -501,7 +501,8 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		try{
 			if( null==room.cn ) room.cn = "";
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
-			riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+room.cn.parseHtmlString()+")", text, function(){
+			var cnTmp = parseRoomName(groupData, room);
+			riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
 				cns.debug(ciTmp);
 				openChatWindow( giTmp, ciTmp );
 			});
@@ -525,6 +526,29 @@ function sortRoomList(){
 	        return $(b).data('time') - $(a).data('time');
 	    }));
 	});
+}
+
+function parseRoomName(groupData, room){
+	try{
+		if( room.tp==1 ){
+			var split = room.cn.split(",");
+			var me = groupData.gu;
+			for( var i=0; i<split.length; i++ ){
+				room.memList[ split[i] ] = {gu:split[i]};
+				if( split[i]!= me ){
+					if( currentGroup.guAll.hasOwnProperty( split[i] ) ){
+						var mem = currentGroup.guAll[ split[i] ];
+						return mem.nk || "";
+					}
+				}
+			}
+			return 
+		}
+		return room.cn || "";
+	} catch(e){
+		errorReport(e);
+	}
+	return "";
 }
 /*
               ███╗   ██╗███████╗██╗    ██╗     ██████╗██╗  ██╗ █████╗ ████████╗          

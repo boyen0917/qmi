@@ -6278,7 +6278,7 @@ $(function(){
 	    			// 	// $(".sm-small-area[data-sm-act=]").find(".sm-count").html(countsFormat(val.A4)).show();
 	    			// }
 
-                    var keys = ["A1","A2","A3","A4","B1","B2","B3","B4"];
+                    var keys = ["A1","A2","A3","A4"];//,"B1","B2","B3","B4"
                     for( var i in keys ){
                         var key = keys[i];
                         if( val.hasOwnProperty(key) ){
