@@ -6446,14 +6446,11 @@ $(function(){
 	    	if(user_info_arr.length > 0){
 	    		getUserInfo(user_info_arr,false, false, function(memData){
                     try{
-    	    			if(memData){
-
-    	    				//更新polling
-    	    				pollingUpdate(msgs,ccs);
-                            if(isUpdateMemPage && $(".subpage-contact").is(":visible") ){
-                                initContactList();
-                            }
-    	    			}
+                        //更新polling
+    	    			pollingUpdate(msgs,ccs);
+                        if(isUpdateMemPage && $(".subpage-contact").is(":visible") ){
+                            initContactList();
+                        }
                     } catch(e){
                         pollingUpdate(msgs,ccs);
                         errorReport(e);
