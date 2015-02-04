@@ -6376,9 +6376,8 @@ $(function(){
                         break;
 	    			case 4: //someone join
                         val.pm.isNewMem = true;
-                        user_info_arr.push(val.pm);
                         cns.debug(gi, val.pm.gi);
-                        onGetMemDataCallback = function(this_gi, memData){
+                        val.pm.onGetMemData = function(this_gi, memData){
                             try{
                                 riseNotification( null, g_Qmi_title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
                                     if( gi==this_gi ){
@@ -6391,6 +6390,7 @@ $(function(){
                                 errorReport(e);
                             }
                         }
+                        user_info_arr.push(val.pm);
                         if( gi==val.pm.gi ){
                             isUpdateMemPage = true;
                         }
@@ -6399,8 +6399,7 @@ $(function(){
 	    				user_info_arr.push(val.pm);
 	    				break;
                     case 6://delete user info
-                        user_info_arr.push(val.pm);
-                        onGetMemDataCallback = function(this_gi, memData){
+                        val.pm.onGetMemData = function(this_gi, memData){
                             try{
                                 riseNotification( null, g_Qmi_title, $.i18n.getString("GROUP_X_LEAVE_GROUP", memData.nk), function(){
                                     if( gi==this_gi ){
@@ -6411,6 +6410,7 @@ $(function(){
                                 errorReport(e);
                             }
                         }
+                        user_info_arr.push(val.pm);
                         // if( gi==val.pm.gi ){
                         //     isUpdateMemPage = true;
                         // }
@@ -6445,32 +6445,41 @@ $(function(){
 	    	//將tp4 tp5 的user info都更新完 再更新polling時間
 	    	if(user_info_arr.length > 0){
 	    		getUserInfo(user_info_arr,false, false, function(memData){
-	    			if(memData){
+                    try{
+    	    			if(memData){
 
-	    				//更新polling
-	    				pollingUpdate(msgs,ccs);
-                        if(isUpdateMemPage && $(".subpage-contact").is(":visible") ){
-                            initContactList();
-                        }
-	    			}
-	    		}, onGetMemDataCallback);
+    	    				//更新polling
+    	    				pollingUpdate(msgs,ccs);
+                            if(isUpdateMemPage && $(".subpage-contact").is(":visible") ){
+                                initContactList();
+                            }
+    	    			}
+                    } catch(e){
+                        pollingUpdate(msgs,ccs);
+                        errorReport(e);
+                    }
+	    		});
 	    	}else{
 	    		pollingUpdate(msgs,ccs);
 	    	}
 
             if(branch_info_arr.length > 0){
                 var cnt = 0;
-                for( var i in branch_info_arr ){
-                    var giTmp = branch_info_arr[i].gi;
-                    if( null!=giTmp ){
-                        updateBranchList(giTmp,function(giTmp){
-                            cnt++;
-                            if(cnt>=branch_info_arr.length && gi==giTmp ){
-                                updateContactBranchList();
-                            }
-                        });
+                try{
+                    for( var i in branch_info_arr ){
+                        var giTmp = branch_info_arr[i].gi;
+                        if( null!=giTmp ){
+                            updateBranchList(giTmp,function(giTmp){
+                                cnt++;
+                                if(cnt>=branch_info_arr.length && gi==giTmp ){
+                                    updateContactBranchList();
+                                }
+                            });
+                        }
+                        
                     }
-                    
+                } catch(e){
+                    errorReport(e);
                 }
             }
 
@@ -6549,7 +6558,7 @@ $(function(){
     
 
     //====================================================
-    getUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone, onGetMemData){
+    getUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone){
         var load_show_chk = load_show_chk || false;
     	var onAllDone = onAllDone || false;
 
@@ -6595,7 +6604,7 @@ $(function(){
                             setGroupAllUser(data_arr,this_user_info.gi);
                         }
 
-                        if( onGetMemData ) onGetMemData(this_user_info.gi, user_data);
+                        if( this_user_info.onGetMemData ) this_user_info.onGetMemData(this_user_info.gi, user_data);
                         user_info_arr.pop();
                         
                         //等於0 就不用再遞迴
@@ -7304,6 +7313,16 @@ $(function(){
 
     timelineUpdateAvatar = function(this_gu){
 
+    }
+
+    clearCreateGroupPage = function(){
+        var area = $("#page-group-menu .gm-create-area");
+        area.find(".gmc-avatar").data("chk", false );
+        area.find(".gmc-avatar-wrap img").attr("src", "images/common/others/empty_img_group_190x190.png");
+        area.find(".gmc-name input").val("");
+        area.find(".gmc-desc textarea").val("");
+        var file = area.find(".gmc-file");
+        file.replaceWith( file.clone(true) );
     }
 
     //反過來 點選四次 關閉

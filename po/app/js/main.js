@@ -295,6 +295,7 @@ $(function(){
 	$(".hg-create").click(function(){
 		$("#page-group-menu").data("type","create");
 		$(".gm-create").trigger("click");
+		clearCreateGroupPage();
 		$.mobile.changePage("#page-group-menu");
 	});
 	//小幫手 加入團體
