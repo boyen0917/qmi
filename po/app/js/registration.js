@@ -855,8 +855,14 @@ $(function(){
 	    
 	}
 	
-	
-
+	var logoClickCnt = 0;
+	$(".registration-logo").click(function(){
+		logoClickCnt++;
+		if( logoClickCnt>=10 ){
+			logoClickCnt = 0;
+			clearCache();	
+		}
+	});
 
 
 })

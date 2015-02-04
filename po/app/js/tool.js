@@ -1007,4 +1007,29 @@ $(function(){
 	    	}
     	}
     }
+
+	deleteFolderRecursive = function(fs, path) {
+		if( fs.existsSync(path) ) {
+		  fs.readdirSync(path).forEach(function(file,index){
+		    var curPath = path + "/" + file;
+		    if(fs.lstatSync(curPath).isDirectory()) { // recurse
+		      deleteFolderRecursive(fs, curPath);
+		    } else { // delete file
+		      fs.unlinkSync(curPath);
+		    }
+		  });
+		  fs.rmdirSync(path);
+		}
+	}
+
+    clearCache = function(){
+    	try{
+			var path = require('nw.gui').App.dataPath;
+	    	var fs = require('fs');
+			deleteFolderRecursive(fs, path);
+			alert("clear cache succ");
+		} catch(e){
+			alert("clear cache fail");
+		}
+    }
 });
