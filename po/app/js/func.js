@@ -3250,13 +3250,15 @@ $(function(){
             case 0:
             case 9:
                 //免費團體or s9=1or3無法看已未讀列表
+                var isShowUnreadAndTime = true;
                 try{
                     var group = $.lStorage(ui)[this_gi];
                     if( group.tp=="A1" 
                         || group.set.s9==1
                         || group.set.s9==3){
-                        toastShow( $.i18n.getString("FEED_READ_LIST_DISABLED") );
-                        return;
+                        // toastShow( $.i18n.getString("FEED_READ_LIST_DISABLED") );
+                        // return;
+                        isShowUnreadAndTime = false;
                     }
                 } catch(e){
                     errorReport(e);
@@ -3268,7 +3270,13 @@ $(function(){
                 list.push( {title:$.i18n.getString("FEED_READ"),ml:null} );
                 getThisTimelinePart( this_event, 0,function(data){
                     try{
-                        list[0].ml = $.parseJSON( data.responseText ).epl;
+                        var parseData = $.parseJSON( data.responseText ).epl;
+                        if( false==isShowUnreadAndTime ){
+                            for( var i=0; i<parseData.length; i++ ){
+                                delete parseData[i].rt;
+                            }
+                        }
+                        list[0].ml = parseData;
                         if(isReady){
                             showObjectTabShow(this_gi, title, list, onDone);
                         } else {
@@ -3279,19 +3287,27 @@ $(function(){
                     }
                 });
                 //get unread
-                list.push( {title:$.i18n.getString("FEED_UNREAD"),ml:null} );
-                getThisTimelinePart( this_event, 9,function(data){
-                    try{
-                        list[1].ml = $.parseJSON( data.responseText ).epl;
-                        if(isReady){
-                            showObjectTabShow(this_gi, title, list, onDone);
-                        } else {
-                            isReady = true;
+                if( isShowUnreadAndTime ){
+                    list.push( {title:$.i18n.getString("FEED_UNREAD"),ml:null} );
+                    getThisTimelinePart( this_event, 9,function(data){
+                        try{
+                            list[1].ml = $.parseJSON( data.responseText ).epl;
+                            if(isReady){
+                                showObjectTabShow(this_gi, title, list, onDone);
+                            } else {
+                                isReady = true;
+                            }
+                        } catch(e) {
+                            errorReport(e);
                         }
-                    } catch(e) {
-                        errorReport(e);
+                    });
+                } else {
+                    list.push( {title:$.i18n.getString("FEED_UNREAD"),clickable:false} );
+                    if(isReady){
+                        showObjectTabShow(this_gi, title, list, onDone);
                     }
-                });
+                    isReady = true;
+                }
                 break;
             case 1:
                 var epl = this_event.data("parti-like");
@@ -3353,26 +3369,32 @@ $(function(){
             tab.css("width",width);
             var tmp = "<div>" + ((object.title&&object.title.length>0)?object.title:" ") +"</div>";
             tab.html( tmp );
+            tab.data("clickable", (null==object.clickable)?true:(object.clickable) );
             tabArea.append(tab);
         });
-        if( list.length<=1 ){
-            tabArea.hide();
-            cellArea.addClass("noTitle");
-        } else {
+        // if( list.length<=1 ){
+        //     tabArea.hide();
+        //     cellArea.addClass("noTitle");
+        // } else {
             tabArea.show();
             cellArea.removeClass("noTitle");
-        }
+        // }
 
         //generate page when click
         tabArea.next().html("");
         $(document).find("#page-tab-object .tab").click(function(){
+            var tab = $(this);
+            if( false==tab.data("clickable") ){
+                popupShowAdjust( $.i18n.getString("COMMON_PAID_FEATURE_TITLE"), $.i18n.getString("COMMON_PAID_FEATURE_CONTENT") );
+                return;
+            }
+
             $(window).scrollTop(0);
             $("body").addClass("user-info-adjust");
             setTimeout(function(){
                 $("body").removeClass("user-info-adjust");
             },100);
 
-            var tab = $(this);
             var index = tab.data("id");
             var cell = cellArea.find("._"+index);
 
