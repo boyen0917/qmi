@@ -72,7 +72,7 @@ function updateChat ( msgs ){
 					g_room.unreadCnt = unreadCnt;
 					$.lStorage(ui, userData);
 				} catch(e){
-					cns.debug(e);
+					errorReport(e);
 				}
 			}
 

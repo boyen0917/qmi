@@ -6608,7 +6608,7 @@ $(function(){
                         if(user_info_arr.length == 0){
                             if(onAllDone) onAllDone(user_data);
                         }else{//繼續遞迴
-                            getUserInfo(user_info_arr, update_chk, load_show_chk,onAllDone, onGetMemData);
+                            getUserInfo(user_info_arr, update_chk, load_show_chk,onAllDone);
                         }
                     } catch(e){
                         errorReport(e);
