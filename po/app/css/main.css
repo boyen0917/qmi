@@ -11,6 +11,12 @@ body{
 div, span, label, h3{
     text-shadow: none;
 }
+::-webkit-input-placeholder{
+	font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC",arial,sans-serif;
+    /*-webkit-font-smoothing: antialiased;*/
+    font-weight: normal;
+    font-size: 14px;
+}
 
 .ui-header.ui-bar-c.ui-header-fixed {
 	min-height: 55px;

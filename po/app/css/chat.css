@@ -1,6 +1,12 @@
 ::-webkit-scrollbar { 
     display: none; 
 }
+::-webkit-input-placeholder{
+	font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC",arial,sans-serif;
+    /*-webkit-font-smoothing: antialiased;*/
+    font-weight: normal;
+    font-size: 14px;
+}
 
 /*@font-face {
   font-family: SealmemoryHeader;
