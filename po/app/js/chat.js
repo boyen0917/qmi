@@ -1615,14 +1615,15 @@ showChatReadUnreadList = function( cntDom ){
 	var onDone = function( isDone ){
 		// scrollToBottom();
 		$("#page-chat").removeClass("transition");
+		scrollToBottom();
 		setTimeout( function(){
 			checkPagePosition();
 		}, 200 );
 		$("#page-tab-object").remove();
 		cns.debug("on back from showChatReadUnreadList");
-		if( false== g_bIsLoadHistoryMsg){
-			hideLoading();
-		}
+		// if( false== g_bIsLoadHistoryMsg){
+		// 	hideLoading();
+		// }
 	};
 
 	var rt = cntDom.data("t");
