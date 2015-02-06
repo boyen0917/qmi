@@ -4418,7 +4418,7 @@ $(function(){
 
                 var data_gi_str = 'data-gi="' + val.gi + '" ';
 	            var this_group = $(
-	           		'<div class="sm-group-area polling-cnt enable" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
+	           		'<div class="sm-group-area polling-cnt" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
 	           			'<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
 	           	        '<div class="sm-group-area-l group-pic">' +
 	           	            '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
@@ -4589,12 +4589,15 @@ $(function(){
 				},1000);
 	    	}
 	    	
-	    	if(data.status != 200) return false;
+	    	if(data.status != 200){
+                $(".st-filter-area").removeClass("st-filter-lock");
+                $(".sm-group-area").addClass("enable");
+                return false;
+            }
 
 	    	var timeline_list = $.parseJSON(data.responseText).el;
 	    	//沒資料 後面就什麼都不用了
 	    	if( timeline_list.length == 0 ) {
-                $(".st-filter-area").removeClass("st-filter-lock");
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
 	        	//關閉timeline loading 開啟沒資料圖示
 	        	setTimeout(function(){
@@ -4657,6 +4660,11 @@ $(function(){
 		    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
 			    	});
 		    	}
+
+                setTimeout(function(){
+                    $(".st-filter-area").removeClass("st-filter-lock");
+                    $(".sm-group-area").addClass("enable");
+                }, 500);
 	    	});
 	    });
 	}
@@ -4967,12 +4975,11 @@ $(function(){
 
             //timeline message內容
             timelineContentMake(this_event,target_div,val.ml);
-                
         });
     }
 
 	timelineListWrite = function (ct_timer,is_top){
-        $(".st-filter-area").addClass("st-filter-lock");
+        // $(".st-filter-area").addClass("st-filter-lock");
 		//判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
     	if(!ct_timer && !is_top){
     		var event_tp = $("#page-group-main").data("navi") || "00";

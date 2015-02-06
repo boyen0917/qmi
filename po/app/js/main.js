@@ -312,29 +312,35 @@ $(function(){
 	//更換動態
 	$(document).on("click",".sm-small-area,.sm-group-area",function(){
 
-		if( $(".st-filter-area").hasClass("st-filter-lock") ){
-			// cns.debug("-------------");
-			// cns.debug("-------------");
-			// cns.debug("-------------");
-			// cns.debug("lock .sm-small-area,.sm-group-area");
-			// cns.debug("-------------");
-			// cns.debug("-------------");
-			// cns.debug("-------------");
-			return;
-		}
-
-		//滾動至最上面
-		timelineScrollTop();
-
-		//取消主頁
-		timelineMainClose();
 
 		var target = $(this);
 
 		if($(this).hasClass("sm-group-area")){
-			$(".sm-group-area.active").removeClass("active");
+			//滾動至最上面
+			timelineScrollTop();
+
+			//取消主頁
+			timelineMainClose();
+
 			target = $(".sm-small-area[data-sm-act=feeds]");
 		}else{
+
+			if( $(".st-filter-area").hasClass("st-filter-lock") ){
+				// cns.debug("-------------");
+				// cns.debug("-------------");
+				// cns.debug("-------------");
+				// cns.debug("lock .sm-small-area,.sm-group-area");
+				// cns.debug("-------------");
+				// cns.debug("-------------");
+				// cns.debug("-------------");
+				return;
+			}
+			//滾動至最上面
+			timelineScrollTop();
+
+			//取消主頁
+			timelineMainClose();
+
 			//check pens
 			//如果該tab的筆功能都沒開的話, 直接把筆hide起來
 			var act = target.data("sm-act");
@@ -360,9 +366,9 @@ $(function(){
 
 			$(".sm-small-area.active").removeClass("active");
 			timelineSwitch(target.data("sm-act"));
+			$(this).addClass("active");
 		}
 		$(".polling-local .sm-count").hide();
-		$(this).addClass("active");
 
 		target.addClass("sm-click-bg");
 		// target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
@@ -372,9 +378,6 @@ $(function(){
 	//更換團體
 	$(document).on("click",".sm-group-area.enable",function(){
 
-		if( $(".st-filter-area").hasClass("st-filter-lock") ){
-			return;
-		}
 		var this_group = $(this);
 		var this_gi = $(this).attr("data-gi");
 
@@ -387,6 +390,8 @@ $(function(){
 		}
 
 		$(".sm-group-area").removeClass("enable");
+		$(".sm-group-area.active").removeClass("active");
+		$(this).addClass("active");
 
 		//清空畫面
 		$(".st-top-event-default").show();
@@ -407,9 +412,7 @@ $(function(){
 		}
 
 		//置頂設定
-		topEvent(function(){
-			$(".sm-group-area").addClass("enable");
-		});
+		topEvent();
 	});
 
 	
