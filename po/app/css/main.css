@@ -4620,8 +4620,11 @@ img.user-info-back {
 }
 
 .obj-cell-page.current {
-	height: 100%;
+	height: -webkit-calc( 100% - 114px );
 	background: white;
+	position: fixed;
+	width: 100%;
+	overflow: scroll;
 }
 
 .tabObj-cell-area.noTitle{
