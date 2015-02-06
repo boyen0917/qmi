@@ -60,9 +60,10 @@
 
 .tabObj-cell-area{
 	width: 100%;
-	height: 100%;
+	height: -webkit-calc( 100% - 121px );
 	overflow: scroll;
-	margin-top: 54px;
+	margin-top: 55px;
+	position: fixed;
 }
 
 .obj-cell-page.current {
