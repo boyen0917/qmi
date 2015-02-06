@@ -40,25 +40,22 @@
 	margin-top: 13px;
 	text-align: center;
 }
-.tabObj-tab-area .tab.current div{
-	width: -webkit-calc( 100% - 28px );
-}
 
 .tabObj-tab-area .tab.current{
 	background: rgb(156, 221, 255);
 }
-.tabObj-tab-area .tab.current:before{
+.tabObj-tab-area .tab.current:after{
 	content: "";
 	position: relative;
-	bottom: -45px;
-	left: -webkit-calc( 50% - 15px );
+	left: -webkit-calc( 50% - 12px );
 	border-style: solid;
-	border-width: 0 15px 15px;
+	border-width: 0 12px 12px;
 	border-color: #FFFFFF transparent;
 	display: block;
 	width: 0;
 	z-index: 1;
 	float: left;
+	bottom: -1px;
 }
 
 .tabObj-cell-area{

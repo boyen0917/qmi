@@ -1,15 +1,16 @@
-showMemListPage = function( parentDom, title, list, onPageChanged, onDone ){
-	if( $("#page-select-object").length>0 ){
-		showMemListPageDelegate( title, list, onPageChanged, onDone );
-	} else {
-		$('<div>').load('layout/memberList.html',function(){
-			parentDom.append( $(this).find("#page-select-object") );
-			showMemListPageDelegate( title, list, onPageChanged, onDone );
-		});
-	}
+loadObjectTabPage = function( parentDom, onDone ){
+    if( $("#page-tab-object").length>0 ){
+        if( onDone ) onDone();
+    } else {
+        $('<div>').load('layout/memberList.html',function(){
+            parentDom.after( $(this).find("#page-tab-object") );
+            if( onDone ) onDone();
+        });
+    }
 }
-showMemListPageDelegate = function( title, list, onPageChanged, onDone ){
-    var page = $("#page-select-object");
+
+showObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
+    var page = $("#page-tab-object");
 
     //title
     page.find(".header-cp-object").html( title?title:"" );
@@ -17,7 +18,7 @@ showMemListPageDelegate = function( title, list, onPageChanged, onDone ){
     //tabs
     var length = list.length;
     var tabArea = page.find(".tabObj-tab-area");
-    var cellArea = $("#page-select-object .tabObj-cell-area");
+    var cellArea = $("#page-tab-object .tabObj-cell-area");
     tabArea.html("");
     var width = (100.0/list.length)+"%";
     $.each( list, function(index, object){
@@ -27,30 +28,36 @@ showMemListPageDelegate = function( title, list, onPageChanged, onDone ){
         tab.css("width",width);
         var tmp = "<div>" + ((object.title&&object.title.length>0)?object.title:" ") +"</div>";
         tab.html( tmp );
+        tab.data("clickable", (null==object.clickable)?true:(object.clickable) );
         tabArea.append(tab);
     });
-    if( list.length<=1 ){
-        tabArea.hide();
-        cellArea.addClass("noTitle");
-    } else {
+    // if( list.length<=1 ){
+    //     tabArea.hide();
+    //     cellArea.addClass("noTitle");
+    // } else {
         tabArea.show();
         cellArea.removeClass("noTitle");
-    }
+    // }
 
     //generate page when click
     tabArea.next().html("");
-    $(document).find("#page-select-object .tab").click(function(){
-        // $(window).scrollTop(20);
+    $(document).find("#page-tab-object .tab").click(function(){
+        var tab = $(this);
+        if( false==tab.data("clickable") ){
+            popupShowAdjust( $.i18n.getString("COMMON_PAID_FEATURE_TITLE"), $.i18n.getString("COMMON_PAID_FEATURE_CONTENT") );
+            return;
+        }
+
+        $(window).scrollTop(0);
         $("body").addClass("user-info-adjust");
         setTimeout(function(){
             $("body").removeClass("user-info-adjust");
         },100);
 
-        var tab = $(this);
         var index = tab.data("id");
         var cell = cellArea.find("._"+index);
 
-        $("#page-select-object .tab").removeClass("current");
+        $("#page-tab-object .tab").removeClass("current");
         tab.addClass("current");
 
         if( cell.length<=0 ){
@@ -59,8 +66,8 @@ showMemListPageDelegate = function( title, list, onPageChanged, onDone ){
             cellArea.append( cell );
 
             //gen mem
-            var guAll = $.lStorage(ui)[gi].guAll;
-            var bl = $.lStorage(ui)[gi].bl;
+            var guAll = $.lStorage(ui)[giTmp].guAll;
+            var bl = $.lStorage(ui)[giTmp].bl;
             for(var i=0;i<data.ml.length; i++ ){
                 var gu = data.ml[i].gu;
                 var rt = data.ml[i].rt;
@@ -109,10 +116,11 @@ showMemListPageDelegate = function( title, list, onPageChanged, onDone ){
                 cell.append(this_obj);
             }
         }
-        $("#page-select-object .obj-cell-page.current").hide().removeClass("current");
+        $("#page-tab-object .obj-cell-page.current").hide().removeClass("current");
         cell.show().addClass("current");
     }); 
     tabArea.find(".tab:nth-child(1)").trigger("click");
 
-    $.changePage("#page-select-object", onPageChanged, onDone);
+    // $.mobile.changePage("#page-tab-object", {transition: "slide"});
+    $.changePage("#page-tab-object", onPageChanged, onDone);
 }

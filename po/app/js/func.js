@@ -3249,13 +3249,11 @@ $(function(){
         switch( type ){
             case 0:
             case 9:
-                //免費團體or s9=1or3無法看已未讀列表
+                //s9=1or3無法看已未讀列表
                 var isShowUnreadAndTime = true;
                 try{
                     var group = $.lStorage(ui)[this_gi];
-                    if( group.tp=="A1" 
-                        || group.set.s9==1
-                        || group.set.s9==3){
+                    if( group.set.s9==1 || group.set.s9==3){
                         // toastShow( $.i18n.getString("FEED_READ_LIST_DISABLED") );
                         // return;
                         isShowUnreadAndTime = false;

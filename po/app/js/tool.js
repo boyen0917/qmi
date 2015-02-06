@@ -1029,7 +1029,7 @@ $(function(){
 			deleteFolderRecursive(fs, path);
 			alert("clear cache succ");
 		} catch(e){
-			alert("clear cache fail");
+			alert(e.stack);
 		}
     }
 });

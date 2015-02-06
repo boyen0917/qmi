@@ -26,6 +26,7 @@ var ti_chat;
 var getHistoryMsgTimeout;
 var isUpdatePermission = false;
 var isGettingPermission = false;
+var isShowUnreadAndReadTime = true;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -79,6 +80,12 @@ $(document).ready(function(){
     if( null==g_group ) return;
     if( g_group.ad!=1 && true==g_group.isOfficial ){
     	$(".extra").hide();
+    }
+    isShowUnreadAndReadTime = true;
+    if( g_group.set && null!=g_group.set.s8 ){
+    	if( g_group.set.s8==1 || g_group.set.s8==3 ){
+    		isShowUnreadAndReadTime = false;
+    	}
     }
     g_room = g_group["chatAll"][ci];
 
@@ -364,7 +371,7 @@ $(document).ready(function(){
 		// });
 
 		$("#page-chat").addClass("transition");
-		showMemListPage( $("body"), $.i18n.getString("COMMON_MEMBER"), [{title:"",ml:tmpData}], 
+		showMemListPage( $("#pagesContainer"), $.i18n.getString("COMMON_MEMBER"), [{title:"",ml:tmpData}], 
 			function(){
 				cns.debug("on page change done");
 			},function( isDone ){
@@ -373,9 +380,13 @@ $(document).ready(function(){
 					checkPagePosition();
 					$("#page-chat").removeClass("transition");
 				}, 500 );
-				$("#page-tab-object").remove();
+				$("#page-select-object").remove();
 				cns.debug("on back from memList");
 		});
+	});
+
+	$(document).on("click",".chat-cnt", function(){
+		showChatReadUnreadList( $(this) );
 	});
 });
 
@@ -463,6 +474,7 @@ function getHistoryMsg ( bIsScrollToTop ){
 	    	} else {
 	    		setTimeout( hideLoading, 1000);
 	    	}
+	    	updateChatCnt();
 	    }
 
 	    if( list.length<20 ){
@@ -641,6 +653,7 @@ function updateChat ( time ){
 					$("#chat-loading").hide();
 					$("#chat-nomore").show();
 				}
+				updateChatCnt();
 			}
 			
 	    }	//end of function
@@ -1391,7 +1404,7 @@ function delMember(){
 		
 
 		$("#page-chat").addClass("transition");
-		showSelectMemPage( $("body"), btn, function(){
+		showSelectMemPage( $("#pagesContainer"), btn, function(){
 			}, function(isDone){
 				if( isDone ){
 
@@ -1447,7 +1460,7 @@ function delMember(){
 					checkPagePosition();
 					$("#page-chat").removeClass("transition");
 				}, 500 );
-				$("#page-tab-object").remove();
+				$("#page-select-object").remove();
 			}
 		);
 	} catch(e){
@@ -1477,7 +1490,7 @@ function addMember(){
 		});
 
 		$("#page-chat").addClass("transition");
-		showSelectMemPage( $("body"), btn, function(){
+		showSelectMemPage( $("#pagesContainer"), btn, function(){
 				// $("#page-chat").removeClass("transition");
 			}, function( isDone ){
 				scrollToBottom();
@@ -1521,7 +1534,7 @@ function addMember(){
 					checkPagePosition();
 					$("#page-chat").removeClass("transition");
 				}, 500 );
-				$("#page-tab-object").remove();
+				$("#page-select-object").remove();
 			}
 		);
 	} catch(e){
@@ -1558,4 +1571,114 @@ function checkMemberLeft(){
 
 	$("#footer").show();
 	$("#chat-leaveGroup").hide();
+}
+
+/*
+              ██████╗ ███████╗ █████╗ ██████╗     ██╗     ██╗███████╗████████╗          
+              ██╔══██╗██╔════╝██╔══██╗██╔══██╗    ██║     ██║██╔════╝╚══██╔══╝          
+    █████╗    ██████╔╝█████╗  ███████║██║  ██║    ██║     ██║███████╗   ██║       █████╗
+    ╚════╝    ██╔══██╗██╔══╝  ██╔══██║██║  ██║    ██║     ██║╚════██║   ██║       ╚════╝
+              ██║  ██║███████╗██║  ██║██████╔╝    ███████╗██║███████║   ██║             
+              ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝     ╚══════╝╚═╝╚══════╝   ╚═╝             
+                                                                                        
+*/
+
+getChatReadUnreadApi = function( this_gi, this_ci, this_rt, this_tp ){
+    //GET /groups/{gi}/chats/{ci}/messages_read?rt=<timestamp>&tp=<read_type>
+    //tp: Read type (1: 已讀, 2:未讀)
+    //rt: Read Timestamp
+    var api_name = "groups/" + this_gi + "/chats/" + this_ci + "/messages_read?rt=" + this_rt +"&tp=" + this_tp;
+    var headers = {
+             "ui":ui,
+             "at":at, 
+             "li":lang,
+                 };
+    var method = "get";
+    return result = ajaxDo(api_name,headers,method,true);
+}
+
+showChatReadUnreadList = function( cntDom ){
+	var chat = $("#page-chat");
+	if( chat.hasClass("loadRead") ){
+		return;
+	}
+	
+	chat.addClass("transition").addClass("loadRead");
+	$(".screen-lock").show();
+	
+	var onPageLoad = function(){
+		chat.removeClass("loadRead");
+		$(".screen-lock").hide();
+	};
+	var onDone = function( isDone ){
+		// scrollToBottom();
+		setTimeout( function(){
+			checkPagePosition();
+			$("#page-chat").removeClass("transition");
+		}, 200 );
+		$("#page-tab-object").remove();
+		cns.debug("on back from showChatReadUnreadList");
+	};
+
+	var rt = cntDom.data("t");
+    var dataReadyCnt = 0;
+    var isPageReady = false;
+    var list = [];
+    var title = "";
+
+    //get read
+    list.push( {title:$.i18n.getString("FEED_READ"),ml:null} );
+    getChatReadUnreadApi(gi,ci,rt, 1).complete(function(data){
+        try{
+            var parseData = $.parseJSON( data.responseText ).gul;
+            if( false==isShowUnreadAndReadTime ){
+                for( var i=0; i<parseData.length; i++ ){
+                    delete parseData[i].rt;
+                }
+            }
+            list[0].ml = parseData;
+            dataReadyCnt++;
+            if( isPageReady && dataReadyCnt>1){
+                showObjectTabShow( gi, title, list, onPageLoad, onDone);
+            }
+        } catch(e) {
+            errorReport(e);
+            chat.removeClass("loadRead");
+			$(".screen-lock").hide();
+        }
+    });
+
+    //get unread
+    if( isShowUnreadAndReadTime ){
+        list.push( {title:$.i18n.getString("FEED_UNREAD"),ml:null} );
+
+
+        getChatReadUnreadApi(gi,ci,rt, 2).complete(function(data){
+            if(data.status != 200) return false;
+            try{
+                list[1].ml = $.parseJSON( data.responseText ).gul;
+
+                dataReadyCnt++;
+	            if( isPageReady && dataReadyCnt>1){
+	                showObjectTabShow(gi, title, list, onPageLoad, onDone);
+	            }
+            } catch(e) {
+                errorReport(e);
+	            chat.removeClass("loadRead");
+				$(".screen-lock").hide();
+            }
+        });
+    } else {
+        list.push( {title:$.i18n.getString("FEED_UNREAD"),clickable:false} );
+        dataReadyCnt++;
+        if( isPageReady && dataReadyCnt>1){
+            showObjectTabShow(gi, title, list, onPageLoad, onDone);
+        }
+    }
+    loadObjectTabPage( $("#pagesContainer"), function(){
+    	isPageReady = true;
+    	if(dataReadyCnt>1){
+            showObjectTabShow(gi, title, list, null, onDone);
+        }
+    });
 }
