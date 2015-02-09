@@ -1,4 +1,6 @@
-
+/* ----- TODO -------
+ 不同頁面按下載/選擇貼圖時應共同更新
+-------- TODO -------*/
 
 var initStickerArea= {
 	isUpdated: false,
