@@ -2753,6 +2753,11 @@ img.st-user-pic{
 .st-slide-img.loaded {
 	background-size: cover;
 }
+.st-attach-img-area .st-slide-img.loadError {
+	background-image: url(../images/common/icon/icon_noPhoto.png);
+	background-size: 300px 130px;
+	background-color: rgb(223,233,239);
+}
 .st-attach-img-area .cnt_1 .st-slide-img {
 	height: 99%;
 }
@@ -2763,7 +2768,7 @@ img.st-user-pic{
 	margin-bottom: 4px;
 }*/
 .st-attach-img-area .cnt_3 .st-slide-img {
-	height: 32.4%;
+	height: 32.47%;
 }
 /*.st-attach-img-area .cnt_3 .st-slide-img:not(:last-child) {
 	margin-bottom: 2px;
@@ -3159,7 +3164,7 @@ img.st-reply-message-attach {
 .st-feedbox-area-bottom {
 	min-height: 50px;
 	text-align: center;
-	color:white;
+	color:rgb(213, 213, 213);
 	padding-bottom: 20px;
 }
 
