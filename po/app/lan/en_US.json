@@ -32,6 +32,8 @@
 	"COMMON_ALL_MEMBERS" : "All Members",
 	"COMMON_PAID_FEATURE_TITLE" : "Paid Feature",
 	"COMMON_PAID_FEATURE_CONTENT" : "This group does not buy this feature.",
+	"COMMON_DOWNLOAD" : "Download",
+	"COMMON_FREE" : "Free",
 	
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",

@@ -14,12 +14,12 @@
                                                                                
 */
 .stickerArea .imgArea{
-	width: 100%;
 	height: 74%;
 	padding-top: 0.5%;
+	width: 100%;
 }
 
-.stickerArea .imgArea .left{
+.stickerArea .imgArea > .left{
 	width: 7%;
 	height: 100%;
 	display: inline-block;
@@ -29,7 +29,7 @@
 	background-size:25px auto;
 	
 }
-.stickerArea .imgArea .left:hover{
+.stickerArea .imgArea > .left:hover{
 	background-image: url("../images/icon_arrow_prev_blue.png");
 	background-position: center center;
     background-repeat: no-repeat;
@@ -45,6 +45,7 @@
 .stickerArea .imgArea .mid .group{
 	height: 100%;
 	float: left;
+	width: 100%;
 }
 .stickerArea .imgArea .mid .group .page{
 	height: 100%;
@@ -65,7 +66,7 @@
 	height: 100%;
 }
 
-.stickerArea .imgArea .right{
+.stickerArea .imgArea > .right{
 	width: 25px;
 	height: 100%;
 	display: inline-block;
@@ -74,13 +75,69 @@
     background-repeat: no-repeat;
 	background-size:100% auto;
 }
-.stickerArea .imgArea .right:hover{
+.stickerArea .imgArea > .right:hover{
 	background-image: url("../images/common/icon/icon_arrow_next_blue.png");
 	background-position: center center;
     background-repeat: no-repeat;
 	background-size:27px auto;
 }
 
+/*
+              ██████╗  ██████╗ ██╗    ██╗███╗   ██╗██╗      ██████╗  █████╗ ██████╗           
+              ██╔══██╗██╔═══██╗██║    ██║████╗  ██║██║     ██╔═══██╗██╔══██╗██╔══██╗          
+    █████╗    ██║  ██║██║   ██║██║ █╗ ██║██╔██╗ ██║██║     ██║   ██║███████║██║  ██║    █████╗
+    ╚════╝    ██║  ██║██║   ██║██║███╗██║██║╚██╗██║██║     ██║   ██║██╔══██║██║  ██║    ╚════╝
+              ██████╔╝╚██████╔╝╚███╔███╔╝██║ ╚████║███████╗╚██████╔╝██║  ██║██████╔╝          
+              ╚═════╝  ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝           
+
+*/
+.stickerArea .imgArea .mid .group .downloadArea{
+	margin-top:5px;
+	cursor: default;
+}
+.stickerArea .imgArea .mid .group .downloadArea .info{
+	width: 100%;
+	height: 110px;
+}
+.stickerArea .imgArea .mid .group .downloadArea .info .left{
+	width:35%;
+	height: 100%;
+	display: inline-block;
+	vertical-align: middle;
+}
+.stickerArea .imgArea .mid .group .downloadArea .info .left img{
+	width: 80%;
+	height: 80%;
+	object-fit: contain;
+	margin-top: 10%;
+	margin-left: 10%;
+}
+.stickerArea .imgArea .mid .group .downloadArea .info .right{
+	width:65%;
+	display: inline-block;
+	vertical-align: middle;
+}
+.stickerArea .imgArea .mid .group .downloadArea .info .right > div{
+	line-height: 24px;
+}
+.stickerArea .imgArea .mid .group .downloadArea .info .right .name{
+	font-size: 16px;
+}
+.stickerArea .imgArea .mid .group .downloadArea .info .right .price{
+	color: rgb(115,162,244);
+	font-size: 14px;
+}
+.stickerArea .imgArea .mid .group .downloadArea .download{
+	width:130px;
+	height: 35px;
+	line-height: 35px;
+	text-align: center;
+	background-color: rgb(115,162,244);
+	color: white;
+	margin-right: auto;
+	margin-left: auto;
+	cursor: pointer;
+}
 /*
               ██████╗  █████╗  ██████╗ ███████╗ █████╗ ██████╗ ███████╗ █████╗       
               ██╔══██╗██╔══██╗██╔════╝ ██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗      
@@ -172,4 +229,10 @@
 
 .stickerArea .catagory .cata.act{
 	background: rgb(229, 243,252);
+}
+.imgArea{
+	width:86%;
+	height:100%;
+	display:inline-block;
+	overflow:hidden; 
 }

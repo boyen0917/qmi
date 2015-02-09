@@ -179,6 +179,8 @@
 	"COMMON_ALL_MEMBERS" : "全體成員",
 	"COMMON_PAID_FEATURE_TITLE" : "付費功能",
 	"COMMON_PAID_FEATURE_CONTENT" : "該團體未向Qmi購買此功能",
+	"COMMON_DOWNLOAD" : "下載",
+	"COMMON_FREE" : "免費",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",

@@ -3097,35 +3097,32 @@ img.st-reply-message-attach {
 	cursor: default;
 }
 .st-reply-message-img .img{
-	position: relative;
-	max-width: 130px;
-	max-height: 120px;
 	padding: 6px 0;
 	/* background: rgb(239,239,239); */
 	/* border: black 1px solid; */
-	margin-left: 80px;
+	margin-left: 15px;
 	cursor: pointer;
+	position: relative;
 }
-.st-reply-message-img .img:before {
+.st-reply-message-img .img:after {
 	background-image: url("../images/common/icon/icon_compose_close.png");
-	position: absolute;
-	top: -2px;
-	display: block;
+	display: inline-block;
 	width: 27px;
-	z-index: 1;
-	right: -10px;
 	height: 27px;
 	content: "";
 	background-size: 25px 25px;
 	background-repeat: no-repeat;
 	background-position: 50%;
+	vertical-align: top;
+	margin-left: -13px;
+	margin-top: -9px;
 }
 .st-reply-message-img img{
 	max-width: 100%;
 	/*max-height: 100%;*/
 	/*min-height: 80px;*/
-	height: 100px;
 	object-fit: contain;
+	max-height: 150px;
 }
 
 .st-reply-content .au-area {

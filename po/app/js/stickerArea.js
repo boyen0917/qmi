@@ -1,9 +1,11 @@
 
 
 var initStickerArea= {
+	isUpdated: false,
 	path: "sticker/",
 	jsonPath: "sticker/stickerArea.json",
-	dict: null,
+	// dict: null,
+	splDict: null,
 	init: function( dom, onSelect ){
 		
 		var thisTmp = this;
@@ -69,18 +71,20 @@ var initStickerArea= {
 	    dom.append(catagory);
 	    thisTmp.updateHistory( dom );
 
-	    thisTmp.load( function(){
-	    	for( var key in thisTmp.dict ){
-	    		var obj = thisTmp.dict[key];
+	    var callbackTmp = function(){
+	    	thisTmp.isUpdated = true;
+	    	for( var key in thisTmp.splDict ){
+	    		var obj = thisTmp.splDict[key];
 	    		var cataBtn = $("<div class='cata'></div>");
-	    		var imgPath = thisTmp.path+key+"/{0}.png";
+	    		// var imgPath = thisTmp.path+key+"/{0}.png";
 	    		var img = $("<img/>");
-	    		img.attr("src", imgPath.format(obj.icon) );
+	    		img.attr("src", obj.l );
 	    		cataBtn.append(img);
 	    		cataBtn.data("type", key );
 	    		catagory.append(cataBtn);
 
-	    		thisTmp.showImg(dom, key, obj.pic );
+	    		// var localObj = thisTmp.dict[key];
+	    		thisTmp.showImg(dom, key, obj );
 	    	}
 	    	$(dom).find(".cata").off("click").click( function(){
 	    		var type = $(this).data("type");
@@ -102,145 +106,289 @@ var initStickerArea= {
 	    		thisTmp.updatePageInfo( dom );
 	    	});
 	    	$(dom).find(".cata:eq(1)").trigger("click");
-	    });
-	},
-	showImg: function(dom, type, arImgId, path){
-		var imgPath = this.path+type+"/{0}.png";
-		var imgContent = $(dom).find(".mid");
-		var content = $(dom).find(".mid .group."+type);
-		var pageCnt = Math.ceil(arImgId.length/8);
+	    };
 
+		if( thisTmp.isUpdated ) callbackTmp();
+	    else thisTmp.load( callbackTmp );
+	},
+	showImg: function(dom, type, dataObj, path){
+		var thisTmp = this;
+		var content = $(dom).find(".mid .group."+type);
 		if( null==content || content.length <= 0 ){
 		    content = $("<div class='group'></div>");
 		    content.css("display","none");
 		    content.css("left","0");
 		    content.data("index",0);
 		    content.addClass(type);
+			var imgContent = $(dom).find(".mid");
 		    imgContent.append(content);
-		} else {
-			content.html("");
 		}
-		content.css("width",pageCnt*100+"%");
-		content.data("cnt",pageCnt);
 
-	    var iRowCnt = 0;
-	    var width = Math.floor((1/pageCnt)*100);
-		var div = null;
-	    var subDiv1 = null;
-	    var subDiv2 = null;
-	    for(var i=0; i<arImgId.length; i++){
-	    	if( i%8==0 ){
-				div = $("<div class='page'></div>");
-				div.css("width", width+"%");
-				content.append(div);
-				
-				var last = div.find(".up:last");
-				subDiv1 = $("<div class='row up'></div>");
-				if( last.length>0 )	last.after(subDiv1);
-				else	div.append(subDiv1);
-				
-				last = div.find(".down:last");
-				subDiv2 = $("<div class='row down'></div>");
-				if( last.length>0 )	last.after(subDiv2);
-				else	div.append(subDiv2);
-	    	}
+		if( true==dataObj.isDownload ){
+			arImgId = dataObj.sl;
+			content.html("");
+			// var imgPath = thisTmp.path+type+"/{0}.png";
+			var pageCnt = Math.ceil(arImgId.length/8);
 
-	    	var imgDiv = $("<div></div>");
-	    	var st = null;
-	    	if(path){
-	    		st = $("<img src="+path[i]+">");
-	    	} else{
-	    		st = $("<img src="+imgPath.format(arImgId[i])+">");
-	    	}
-	    	st.data( "id", arImgId[i] );
-	    	imgDiv.append(st);
-	    	if( i%8<4 ){
-				subDiv1.append(imgDiv);
-	    	} else{
-				subDiv2.append(imgDiv);
-	    	}
-	    }
+		    var iRowCnt = 0;
+		    var width = Math.floor((1/pageCnt)*100);
+			var div = null;
+		    var subDiv1 = null;
+		    var subDiv2 = null;
+			content.css("width",pageCnt*100+"%");
+			content.data("cnt",pageCnt);
+		    for(var i=0; i<arImgId.length; i++){
+		    	if( i%8==0 ){
+					div = $("<div class='page'></div>");
+					div.css("width", width+"%");
+					
+					var last = div.find(".up:last");
+					subDiv1 = $("<div class='row up'></div>");
+					if( last.length>0 )	last.after(subDiv1);
+					else	div.append(subDiv1);
+					
+					last = div.find(".down:last");
+					subDiv2 = $("<div class='row down'></div>");
+					if( last.length>0 )	last.after(subDiv2);
+					else	div.append(subDiv2);
+					content.append(div);
+		    	}
 
-	    var thisTmp = this;
-	    $(dom).find(".page .row img").off("click").click( function(){
-	    	var id = $(this).data("id");
-	    	cns.debug( id );
+		    	var imgDiv = $("<div></div>");
+		    	var st = null;
+		    	// if(path){
+		    	// 	st = $("<img src="+path[i]+">");
+		    	// } else{
+		    		// st = $("<img src="+imgPath.format(arImgId[i])+">");
+		    	// }
+		    	st = $("<img src="+arImgId[i].sou+">");
+		    	st.data( "id", arImgId[i].sid );
+		    	imgDiv.append(st);
+		    	if( i%8<4 ){
+					subDiv1.append(imgDiv);
+		    	} else{
+					subDiv2.append(imgDiv);
+		    	}
+		    }
 
-	    	var userData = $.lStorage("sticker");
-	    	if( !userData ){
-	    		userData = [];
-	    	} else {
-	    		for(var i=0; i<userData.length; i++){
-	    			if( userData[i].id==id ){
-			    		delete userData[i];
-			    		userData.splice(i, 1);
-	    				break;
-	    			}
-	    		}
-	    	}
-	    	userData.push( {"id":id, "src":$(this).attr("src")} );
-	    	$.lStorage("sticker", userData);
-	    	thisTmp.updateHistory( dom );
+		    $(dom).find(".page .row img").off("click").click( function(){
+		    	var thisDom = $(this);
+		    	var id = thisDom.data("id");
+		    	cns.debug( id );
 
-	    	var callback = dom.data("callback");
-	    	if( null != callback ) callback(id);
-	    });
+		    	var userData = $.lStorage("_stickerHistory");
+		    	if( !userData ){
+		    		userData = [];
+		    	} else {
+		    		for(var i=0; i<userData.length; i++){
+		    			if( userData[i].id==id ){
+				    		delete userData[i];
+				    		userData.splice(i, 1);
+		    				break;
+		    			}
+		    		}
+		    	}
+		    	userData.push( {"id":id, "src":thisDom.attr("src")} );
+		    	$.lStorage("_stickerHistory", userData);
+		    	thisTmp.updateHistory( dom );
+
+		    	var callback = dom.data("callback");
+		    	if( null != callback ) callback(id);
+		    });
+		} else {
+			var downloadDom = $("<div class='downloadArea'></div>");
+
+			var info = $("<div class='info'></div>");
+			var left = $("<div class='left'></div>");
+			left.append("<img src='"+dataObj.l+"'/>");
+			info.append(left);
+
+			var right = $("<div class='right'></div>");
+			right.append("<div class='name'>"+dataObj.na+"</div>");
+			right.append("<div class='price'>"+$.i18n.getString("COMMON_FREE")+"</div>");
+			info.append(right);
+			downloadDom.append(info);
+
+			downloadDom.append("<div class='download'>"+$.i18n.getString("COMMON_DOWNLOAD")+"</div>");
+			content.append(downloadDom);
+			
+			downloadDom.find(".download").click( function(){
+				thisTmp.downloadSticker(type, function(){
+					dataObj = thisTmp.splDict[type];
+					thisTmp.showImg(dom, type, dataObj, path);
+					thisTmp.updatePageInfo(dom);
+				});
+			});
+		}
 	},
 	updateHistory: function(dom){
-	    var userData = $.lStorage("sticker");
-	    if( null != userData ){
-	    	var values = [];
-	    	var keys = [];
-	    	for(var i=userData.length-1; i>=0; i--){
-	    		var obj = userData[i];
-	    		keys.push(obj.id);
-	    		values.push(obj.src);
-	    	}
-	    	if( keys.length>0 ){
-				this.showImg( dom, "history", keys, values );
-			}
-	    }
+	    var userData = $.lStorage("_stickerHistory");
+	    try{
+		    if( null != userData ){
+		    	var object = {
+		    		isDownload: true,
+		    		sl:[],
+		    		spi:history
+		    	};
+		    	if( userData.length>0 ){
+			    	for(var i=userData.length-1; i>=0; i--){
+			    		var obj = userData[i];
+			    		object.sl.push({sid:obj.id, sou:obj.src});
+			    		// keys.push(obj.id);
+			    		// values.push(obj.src);
+			    	}
+					this.showImg( dom, "history", object );
+				}
+		    }
+		} catch(e){
+			errorReport(e);
+		}
 	},
 	updatePageInfo: function( dom ){
-	    var currentTp = $(dom).find(".mid").data("type");
+		var domTmp = $(dom);
+	    var currentTp = domTmp.find(".mid").data("type");
 	    if( null == currentTp )	return;
 
-	    var tmp = $(dom).find(".mid .group."+currentTp);
+	    var tmp = domTmp.find(".mid .group."+currentTp);
 	    var maxPg = tmp.data("cnt");
 
+		if( tmp.find(".downloadArea").length>0 || maxPg<=1 ){
+			domTmp.children(".pageArea").css("opacity",0);
+			domTmp.children(".imgArea").children(".left, .right").css("opacity",0);
+			return;
+		}
+		domTmp.children(".pageArea").css("opacity",1);
+		domTmp.children(".imgArea").children(".left, .right").css("opacity",1);
+
+
 	    //update page dots
-	    if( currentTp != $(dom).find(".pageArea").data("type") ){
-	    	$(dom).find(".pageArea").html("");
-	    	$(dom).find(".pageArea").data("type", currentTp);
+	    if( currentTp != domTmp.find(".pageArea").data("type") ){
+	    	domTmp.find(".pageArea").html("");
+	    	domTmp.find(".pageArea").data("type", currentTp);
 	    	if(maxPg<=1) return;
 
 	    	for(var i=0; i<maxPg; i++){
-	    		$(dom).find(".pageArea").append("<label class='dot'></label>");
+	    		domTmp.find(".pageArea").append("<label class='dot'></label>");
 	    	}
 	    } else {
 	    	if(maxPg<=1) return;
-	    	$(dom).find(".pageArea").find(".dot.active").removeClass("active");
+	    	domTmp.find(".pageArea").find(".dot.active").removeClass("active");
 	    }
 
-	    var tmp = $(dom).find(".mid .group."+currentTp);
+	    var tmp = domTmp.find(".mid .group."+currentTp);
 	    var currentPg = tmp.data("index");
-	    $(dom).find(".pageArea").find(".dot:eq("+currentPg+")").addClass("active");
+	    domTmp.find(".pageArea").find(".dot:eq("+currentPg+")").addClass("active");
 	},
 	load: function(callback) {
 		var thisTmp = this;
-		if( null==thisTmp.dict ){
-			$.get(this.jsonPath,function(load_dict){
-		        if (thisTmp.dict !== null) {
-		        	$.extend(thisTmp.dict, load_dict);
-		        } else {
-		        	thisTmp.dict = load_dict;
-		        }
-		        // cns.debug(thisTmp.dict);
-		        callback();
-		    });
-		} else {
-			callback();
-		}
+		thisTmp.initStickerList( function(){
+	    	$.lStorage("_sticker", thisTmp.splDict);
+	    	if( callback() ) callback();
+	    });
+
+		// if( null==thisTmp.dict ){
+		// 	$.get(thisTmp.jsonPath,function(load_dict){
+		//         if (thisTmp.dict !== null) {
+		//         	$.extend(thisTmp.dict, load_dict);
+		//         } else {
+		//         	thisTmp.dict = load_dict;
+		//         }
+		//         cns.debug(thisTmp.dict);
+		//         callback();
+		//     });
+		// } else {
+		// 	callback();
+		// }
+	},
+	initStickerList: function( callback ){
+		try{
+			var thisTmp = this;
+			thisTmp.getStickerListApi().complete(function(data){
+	        	if(data.status == 200){
+	        		var obj =$.parseJSON(data.responseText);
+
+	        		thisTmp.splDict = $.lStorage("_sticker") || {};
+	        		var currentCnt = 0;
+	        		var cnt = obj.spl.length;
+	        		for( var i=0; i<cnt; i++ ){
+	        			var tmpObj = obj.spl[i];
+	        			if( thisTmp.splDict.hasOwnProperty(tmpObj.spi) ){
+	        				var tmpOriObj = thisTmp.splDict[tmpObj.spi];
+	        				//update downloaded stickers
+	        				if( true==tmpOriObj.isDownload && tmpOriObj.ut<tmpObj.ut ){
+	        					thisTmp.getStickerDetailApi(tmpOriObj.spi).complete(function(detailDataTmp){
+	        						if(detailDataTmp.status == 200){
+	        							var detailData = $.parseJSON(detailDataTmp.responseText);
+	        							thisTmp.splDict[tmpObj.spi].sl = $.extend(thisTmp.splDict[tmpObj.spi].sl, detailData);
+	        						}
+	        						currentCnt++;
+	        						if( cnt==currentCnt ){
+	        							if( callback() ) callback();
+	        						}
+	        					});
+	        				} else {
+	        					currentCnt++;
+	        				}
+	        				thisTmp.splDict[tmpObj.spi] = $.extend(thisTmp.splDict[tmpObj.spi], tmpObj);
+	        			} else {
+	        				currentCnt++;
+	        				thisTmp.splDict[tmpObj.spi] = tmpObj;
+	        			}
+
+	        			if( cnt==currentCnt ){
+	        				if( callback() ) callback();
+	        			}
+	        		}
+	        	}
+	        });
+	    } catch(e){
+	    	errorReport(e);
+	    	if( callback() ) callback();
+	    }
+	},
+	getStickerListApi: function(){
+		var thisTmp = this;
+		var api_name = "sticker_packages";
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "get";
+
+        return ajaxDo(api_name,headers,method,false,null);
+	},
+	getStickerDetailApi: function(spi) {
+		var thisTmp = this;
+		var api_name = "sticker_packages/"+spi;
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "get";
+
+        return ajaxDo(api_name,headers,method,false,null);
+	},
+	downloadSticker: function(spi, callback){
+		var thisTmp = this;
+		thisTmp.getStickerDetailApi(spi).complete(function(data){
+	    	if(data.status == 200){
+	    		try{
+		    		var detailData = $.parseJSON(data.responseText);
+		    		if( null!=thisTmp.splDict[spi].sl ){
+		    			thisTmp.splDict[spi].sl.extend(detailData.sl);
+		    		} else {
+		    			thisTmp.splDict[spi].sl = detailData.sl;
+		    		}
+		    		thisTmp.splDict[spi].isDownload = true;
+		    		$.lStorage("_sticker", thisTmp.splDict);
+		    	} catch(e){
+		    		errorReport(e);
+		    	}
+	    	}
+	    	if( callback ) callback();
+	    });
 	}
 };
 
