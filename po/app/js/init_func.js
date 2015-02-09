@@ -44,7 +44,7 @@ $(function(){
                 if(callback) callback();
             }else{
                 //發生錯誤 開啓更換團體
-                $(".sm-group-area").addClass("enable");
+                groupSwitchEnable();
             }
         });
     }

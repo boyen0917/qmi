@@ -265,7 +265,7 @@ $(function(){
 			}else{
                 //發生錯誤 開啓更換團體
                 cns.debug("groups/gi 發生錯誤:",this_gi + " : " + data_arr[2]);
-                $(".sm-group-area").addClass("enable");
+                groupSwitchEnable();
             }
 		});
 	}
@@ -675,7 +675,7 @@ $(function(){
         		});
 	        }else{
                 //發生錯誤 開啓更換團體
-                $(".sm-group-area").addClass("enable");
+                groupSwitchEnable();
             }
         });
 	}
@@ -4590,8 +4590,7 @@ $(function(){
 	    	}
 	    	
 	    	if(data.status != 200){
-                $(".st-filter-area").removeClass("st-filter-lock");
-                $(".sm-group-area").addClass("enable");
+                groupSwitchEnable();
                 return false;
             }
 
@@ -4599,6 +4598,8 @@ $(function(){
 	    	//沒資料 後面就什麼都不用了
 	    	if( timeline_list.length == 0 ) {
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
+                //開啟更換團體
+                groupSwitchEnable();
 	        	//關閉timeline loading 開啟沒資料圖示
 	        	setTimeout(function(){
 	        		$(".st-feedbox-area-bottom > img").hide();
@@ -4662,8 +4663,7 @@ $(function(){
 		    	}
 
                 setTimeout(function(){
-                    $(".st-filter-area").removeClass("st-filter-lock");
-                    $(".sm-group-area").addClass("enable");
+                    groupSwitchEnable();
                 }, 500);
 	    	});
 	    });
@@ -4730,8 +4730,6 @@ $(function(){
 	}
 
     timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi){
-
-
         if(!detail){
             var event_tp = $("#page-group-main").data("navi") || "00";
 
@@ -5172,6 +5170,11 @@ $(function(){
 		//置頂設定
 		// topEvent();
 	}
+
+    groupSwitchEnable = function() {
+        $(".st-filter-area").removeClass("st-filter-lock");
+        $(".sm-group-area").addClass("enable");
+    }
 
 	mathAlignCenter = function (outer,inner){
 		return (outer-inner)/2;
