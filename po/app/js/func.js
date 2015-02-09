@@ -4388,8 +4388,7 @@ $(function(){
 
 	    	$(".sm-group-list-area").html("");
 	    	// $(".sm-group-list-area-add").html("");
-	    	//chk是開關按鈕ui變化的檢查
-	    	var tmp_selector,count,chk;
+	    	var tmp_selector,count;
 	    	var group_list = $.parseJSON(data.responseText).gl;
 
 	    	$.lStorage("_groupList",group_list);
@@ -4416,9 +4415,12 @@ $(function(){
 	            	glo_img = val.auo;
 	            }
 
+                var enable = "";
+                if(invite) enable = "enable";
+
                 var data_gi_str = 'data-gi="' + val.gi + '" ';
 	            var this_group = $(
-	           		'<div class="sm-group-area polling-cnt" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '" ' + chk + '>' +
+	           		'<div class="sm-group-area polling-cnt ' + enable + '" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '">' +
 	           			'<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
 	           	        '<div class="sm-group-area-l group-pic">' +
 	           	            '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
@@ -5172,6 +5174,7 @@ $(function(){
 	}
 
     groupSwitchEnable = function() {
+        cns.debug("qwerqowieuroiw");
         $(".st-filter-area").removeClass("st-filter-lock");
         $(".sm-group-area").addClass("enable");
     }
