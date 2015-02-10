@@ -139,6 +139,8 @@ $(document).ready(function(){
     	$("#header .count").html( "("+g_room.memCount+")" );
     } else {
     	$("#header .count").hide();
+    	$(".extra-content .btn[data-type=edit]").hide();
+    	$(".extra-content .btn[data-type=exit]").hide();
     }
     
 	//- click "send" to send msg
