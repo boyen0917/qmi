@@ -5625,6 +5625,12 @@ $(function(){
                         target.attr("src",obj.s3);
                         break;
                 }
+                var image = new Image();
+                $(image).error(function() {
+                    target.css("background-image","");
+                    target.addClass("loadError");
+                });
+                $(image).attr("src", obj.s32);
             }else{
                 return obj.s3;
             }
