@@ -489,7 +489,7 @@ body {
 #footer {
 	background: linear-gradient(to bottom, white 0%,#E5E8EB 100%);
 	border-top: 1px solid #666;
-	bottom:-200px;
+	bottom:-205px;
 	/*max-height:70px;*/
 	left:0;
 	position:fixed;

@@ -229,7 +229,7 @@ $(document).ready(function(){
 			$(this).addClass("active");
 		} else if(2==g_extraSendOpenStatus){
 			g_extraSendOpenStatus = 0;
-			$("#footer").animate({bottom:-200},'fast');
+			$("#footer").animate({bottom:-205},'fast');
 			// $("#chat-contents").animate({marginBottom:0},'fast');
 			updateChatContentPosition();
 			$(this).removeClass("active");
@@ -388,6 +388,35 @@ $(document).ready(function(){
 	$(document).on("click",".chat-cnt", function(){
 		showChatReadUnreadList( $(this) );
 	});
+
+	try{
+		window.frame = require("nw.gui").Window.get();
+		window.frame.isFocused = true;
+		window_focus = true;
+
+		var windowFocusHandler = function() {
+			window.frame.isFocused = true;
+			window_focus = true;
+			// $("#header .text").css("color","orange");
+			if( g_isReadPending ){
+				g_isReadPending = false;
+			    sendMsgRead( g_currentDate.getTime());
+			}
+		  }
+		  , windowBlurHandler = function() {
+		    window.frame.isFocused = false;
+		    window_focus = false;
+		    // $("#header .text").css("color","white");
+		  }
+		;
+		
+		window.frame.on("focus", windowFocusHandler);
+		window.frame.on("blur", windowBlurHandler);
+		window.addEventListener("focus", windowFocusHandler);
+		window.addEventListener("blur", windowBlurHandler);
+	} catch(e){
+		cns.debug("not work");
+	}
 });
 
 /*
@@ -1346,6 +1375,12 @@ function getPermition( isReget ){
 }
 
 function sendMsgRead( msTime ){
+	if(false==window_focus){
+		g_isReadPending = true;
+		cns.debug("[sendMsgRead]not focus");
+	    return;
+	}
+
 	op("/groups/"+gi+"/chats/"+ci+"/messages_read"
 	    ,"PUT",
 	    JSON.stringify({lt:msTime}),
