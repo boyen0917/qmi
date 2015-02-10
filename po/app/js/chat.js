@@ -960,7 +960,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 			}
 			var pic = $("<img class='msg-img' style='width:150px;height:200px;'>");
 			msgDiv.append(pic);
-			getS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
+			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
 		case 8: //audio
 			if(isMe){
@@ -972,7 +972,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 				"<audio class='msg-audio' src='test' controls></audio>"
 			);
 			msgDiv.append( this_audio );
-			getS3file(this_audio, msgData.c, msgData.tp, ti_chat);
+			getChatS3file(this_audio, msgData.c, msgData.tp, ti_chat);
 			break; 
 		case 9: //map
 			if(isMe){
@@ -1251,7 +1251,7 @@ sendSticker = function( id ){
 	sendInput( dom );
 }
 
-getS3file = function(target, file_c, tp, this_ti){
+getChatS3file = function(target, file_c, tp, this_ti, this_tu){
 	this_ti = this_ti || ti;
 	if( !file_c || file_c.length==0 ){
 		cns.debug("null file,", "file_c:", file_c, "tp", tp
@@ -1266,9 +1266,12 @@ getS3file = function(target, file_c, tp, this_ti){
              "li":lang,
                  };
     var method = "post";
-    var body = {
-    	tu: g_tu
-    };
+    var body = null;
+    if( null != this_tu ){
+    	body ={
+    		tu: this_tu
+	    };
+	}
 
     var result = ajaxDo(api_name,headers,method,true,body);
 	result.complete(function(data){
