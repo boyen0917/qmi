@@ -29,6 +29,7 @@ var isGettingPermission = false;
 var isShowUnreadAndReadTime = true;
 var window_focus = true;
 var g_isReadPending = false;
+var g_tu;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -959,7 +960,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 			}
 			var pic = $("<img class='msg-img' style='width:150px;height:200px;'>");
 			msgDiv.append(pic);
-			getS3file(msgDiv, msgData.c, msgData.p, msgData.tp, ti_chat, 120);
+			getS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
 		case 8: //audio
 			if(isMe){
@@ -971,7 +972,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 				"<audio class='msg-audio' src='test' controls></audio>"
 			);
 			msgDiv.append( this_audio );
-			getS3file(this_audio, msgData.c, msgData.p, msgData.tp, ti_chat);
+			getS3file(this_audio, msgData.c, msgData.tp, ti_chat);
 			break; 
 		case 9: //map
 			if(isMe){
@@ -1250,23 +1251,26 @@ sendSticker = function( id ){
 	sendInput( dom );
 }
 
-getS3file = function(target, file_c, file_p, tp, ti, size){
-	if( !file_c || file_c.length==0 || null==file_p ){
-		cns.debug("null file,", "file_c:", file_c
-			, "file_p:", file_p, "tp:", tp, "ti:", ti, "size:", size);
+getS3file = function(target, file_c, tp, this_ti){
+	this_ti = this_ti || ti;
+	if( !file_c || file_c.length==0 ){
+		cns.debug("null file,", "file_c:", file_c, "tp", tp
+			, "this_ti:", this_ti, "g_tu", g_tu);
 		return;
 	}
 	//default
-	size = size || 350;
-	cns.debug("size:",size);
-	var api_name = "groups/" + gi + "/files/" + file_c + "?pi=" + file_p +"&ti=" + ti;
+	var api_name = "groups/" + gi + "/chats/" + this_ti + "/files/" + file_c + "/dl";
     var headers = {
              "ui":ui,
              "at":at, 
              "li":lang,
                  };
-    var method = "get";
-    var result = ajaxDo(api_name,headers,method,true);
+    var method = "post";
+    var body = {
+    	tu: g_tu
+    };
+
+    var result = ajaxDo(api_name,headers,method,true,body);
 	result.complete(function(data){
 		if(data.status != 200) return false;
 
@@ -1281,7 +1285,6 @@ getS3file = function(target, file_c, file_p, tp, ti, size){
 						var w = img.width();
 			            var h = img.height();
         
-        				mathAvatarPos(img,w,h,size);
 						//重設 style
 						img.removeAttr("style");
 
@@ -1352,20 +1355,24 @@ function getPermition( isReget ){
 
 					checkMemberLeft();
 
-			    	op("/groups/"+gi+"/permissions", "post", 
-			    		JSON.stringify(sendData), function(pData, status, xhr){
+			    	// -- set pi to 0 ----
+			    	// op("/groups/"+gi+"/permissions", "post", 
+			    	// 	JSON.stringify(sendData), function(pData, status, xhr){
         					isGettingPermission = false;
-			    			cns.debug( JSON.stringify(pData) );
+			    			// cns.debug( JSON.stringify(pData) );
 
-			    			pi = pData.pi;
+			    			// pi = pData.pi;
+			    			pi=0;
 			    			userData = $.lStorage( ui );
 						    g_group = userData[gi];
 						    g_room = g_group["chatAll"][ci];
 						    g_room.pi = pi;
+						    g_room.tu = g_tu;
+						    g_tu = data.ul;
 						    $.lStorage( ui, userData );
-			    		}, 
-			    		null
-			    	);
+			    	// 	}, 
+			    	// 	null
+			    	// );
 		    	},
 		    	null
 	    	);
@@ -1374,7 +1381,11 @@ function getPermition( isReget ){
         	isGettingPermission = false;
     	}
     } else {
-    	pi = g_room.pi;
+    	//set pi to 0
+    	pi = 0;
+    	// pi = g_room.pi;
+
+		g_tu = g_room.tu;
     }
 }
 
