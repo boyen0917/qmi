@@ -212,7 +212,7 @@ function showChatList(){
 		});
 		setTimeout(function(){
 			targetDiv.show();
-			sortRoomList();
+			// sortRoomList();
 		}, 150);
 		
 		$.lStorage(ui, data);
@@ -294,7 +294,7 @@ function openChatWindow ( giTmp, ci ){
 function updateLastMsg(giTmp, ciTmp, isRoomOpen ){
 	var table = $(".subpage-chatList-row[data-rid='"+ciTmp+"']");
 	setLastMsg( giTmp, ciTmp, table, true, isRoomOpen );
-	setTimeout(sortRoomList, sortRoomListTimeout);
+	// setTimeout(sortRoomList, sortRoomListTimeout);
 }
 function clearChatListCnt( giTmp, ciTmp ){
 	var userData = $.lStorage(ui);
@@ -495,6 +495,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		} else if( $(".subpage-chatList").is(":visible") ){
 			$('.sm-small-area[data-sm-act="chat"]').trigger("click");
 		}
+		sortRoomList();
 	}
 	
 	if( groupData.gu!=mem.gu && isShowAlert ){
@@ -522,9 +523,13 @@ function sortRoomList(){
 
 	$('.rows').each(function(){
 	    var $this = $(this);
-	    $this.append($this.find('.subpage-chatList-row').get().sort(function(a, b) {
+	    var tmp = $this.find('.subpage-chatList-row').get().sort(function(a, b) {
 	        return $(b).data('time') - $(a).data('time');
-	    }));
+	    });
+	    // for( var i=0;i<tmp.length;i++){
+	    // 	cns.debug( $(tmp[i]).data("time") );
+	    // }
+	    $this.append(tmp);
 	});
 }
 
