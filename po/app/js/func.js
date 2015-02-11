@@ -6436,6 +6436,9 @@ $(function(){
                         break;
 	    			case 5://edit user info
 	    				user_info_arr.push(val.pm);
+                        if( gi==val.pm.gi ){
+                            isUpdateMemPage = true;
+                        }
 	    				break;
                     case 6://delete user info
                         val.pm.onGetMemData = function(this_gi, memData){
@@ -6487,8 +6490,8 @@ $(function(){
                     try{
                         //更新polling
     	    			pollingUpdate(msgs,ccs);
-                        if(isUpdateMemPage && $(".subpage-contact").is(":visible") ){
-                            initContactList();
+                        if(isUpdateMemPage ){
+                            updateBranchMemberCnt(gi);
                         }
                     } catch(e){
                         pollingUpdate(msgs,ccs);
@@ -7168,25 +7171,68 @@ $(function(){
                     if( tmp[this_gi].guAll && tmp[this_gi].guAll.hasOwnProperty(this_gu) ){
                         tmp[this_gi].guAll[this_gu].fav = succFav;
                         if(succFav){
-                            tmp[this_gi].favCnt++;
                             this_fav.parent().find(".active").show();
                             this_fav.parent().find(".deactive").hide();
                         } else {
-                            tmp[this_gi].favCnt--;
                             if( tmp[this_gi].favCnt<0 ) tmp[this_gi].favCnt = 0;
                             this_fav.parent().find(".active").hide();
                             this_fav.parent().find(".deactive").show();
                         }
                         $.lStorage(ui, tmp);
 
-                        if( $(".subpage-contact").is(":visible") ){
-                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
-                            initContactList();
-                        }
+                        updateFavoriteMember(this_gi);
                     }
                 }
             }
         });
+    }
+
+    updateFavoriteMember = function(this_gi){
+        try{
+            var _groupList = $.lStorage(ui);
+            var guAll = _groupList[this_gi].guAll;
+            var favCnt = 0;
+            $.each(guAll,function(i,val){
+                if(null==val || val.st!=1 ) return;
+                //fav cnt
+                if( true==val.fav ) favCnt++;
+            });
+            _groupList[this_gi].favCnt = favCnt;
+            $.lStorage(ui, _groupList);
+
+            if( this_gi==gi ){
+                updateContactFavorite();
+            }
+        } catch(e){
+            errorReport(e);
+        }
+    }
+
+    updateBranchMemberCnt = function(this_gi){
+        try{
+            var _groupList = $.lStorage(ui);
+            var guAll = _groupList[this_gi].guAll;
+            var bl = _groupList[this_gi].bl;
+            for( var biTmp in bl ){
+                //每個群組走過一次所有成員, 只要含有這個群組ＩＤ數量就加一..
+                var cnt=0;
+                for( var id in guAll ){
+                    var mem = guAll[id];
+                    if( mem && mem.st==1 && mem.bl.indexOf(biTmp)>=0 ){
+                        cnt++;
+                    }
+                }
+                bl[biTmp].cnt = cnt;
+            }
+            _groupList[this_gi].bl = bl;
+            $.lStorage(ui, _groupList);
+
+            if( this_gi==gi && $(".subpage-contact").length>0 ){
+                initContactList();
+            }
+        } catch(e){
+            errorReport(e);
+        }
     }
 
     updateUserFavoriteStatusApi = function( this_gi, al, dl ){

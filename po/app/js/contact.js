@@ -1,7 +1,9 @@
 var bl;
 var guAll;
+var guAllExsit;
 var fbl;
 var isList = true;
+var g_group;
 // var isKeyPress = false;
 
 $(document).ready(function(){
@@ -13,26 +15,7 @@ $(document).ready(function(){
 });
 
 initContactList = function(){
-	//get user data
-	if( typeof(ui)=='undefined' ) return;
-	var userData = $.lStorage(ui);
-	if( !userData )	return;
-	isList = (userData.isMemberShowList)?userData.isMemberShowList:false;
-
-	//get group data
-	if( typeof(gi)=='undefined' ) return;
-	var group = userData[gi];
-	if( !group ) return;
-
-	//get branch data
-	bl = group.bl;
-	if( !bl ) return;
-
-	fbl = group.fbl;
-
-	//get mem data
-	guAll = group.guAll;
-	if( !guAll ) return;
+	if( false==initContactData() ) return;
 
 	//get html container
 	var rowContainer = $(".contact-rows");
@@ -49,16 +32,16 @@ initContactList = function(){
 	var tmp = $("<div class='row all'><div class='left'></div><div class='right'></div></div>");
 	var left = tmp.find(".left");
 	left.append("<div class='name'>"+$.i18n.getString("COMMON_ALL_MEMBERS")+"</div>");
-	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",Object.keys(guAll).length)+"</div>");
+	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",Object.keys(guAllExsit).length)+"</div>");
 	tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 	rowContainer.append(tmp);
 	rowContainer.find(".row.all").off("click").click( function(){
-		showAllMemberPage(group.gn) 
+		showAllMemberPage(g_group.gn) 
 	});
 	//any new mem
 	var newMemCnt = 0;
-	for( var gu in guAll ){
-		var memTmp = guAll[gu];
+	for( var gu in guAllExsit ){
+		var memTmp = guAllExsit[gu];
 		if( true==memTmp.isNewMem ) newMemCnt++;
 	}
 	if( newMemCnt>0 ){
@@ -70,14 +53,14 @@ initContactList = function(){
 	var left = tmp.find(".left");
 	var branchCount = Object.keys(fbl).length;
 	left.append("<div class='name'>"+$.i18n.getString("COMMON_FAVORIATE")+"</div>");
-	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",(group.favCnt)?group.favCnt:0 )+"</div>");
-	if(branchCount>0) left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", branchCount)+"</div>");
+	left.append("<div class='detail mem'>"+$.i18n.getString("COMPOSE_N_MEMBERS",(g_group.favCnt)?g_group.favCnt:0 )+"</div>");
+	if(branchCount>0) left.append("<div class='detail branch'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", branchCount)+"</div>");
 	tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 	rowContainer.append(tmp);
 	rowContainer.find(".row.favorite").off("click").click( showFavoritePage );
 
 	//set title
-	$("#page-group-main").find(".page-title").html( group.gn );
+	$("#page-group-main").find(".page-title").html( g_group.gn );
 	//set sidemenu
 	// $(".side-menu-btn").off("click").click(function(){
 	//     $( "#side-menu" ).panel( "open");
@@ -203,8 +186,8 @@ onSearchInput = function(e){
 	//search mem
 	var memObject = {};
 	var memCount = 0;
-	for( var key in guAll ){
-		var mem = guAll[key];
+	for( var key in guAllExsit ){
+		var mem = guAllExsit[key];
 		if( null==mem.nk ){
 			cns.debug( JSON.stringify(mem) );
 		} else {
@@ -437,7 +420,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	//mem
 	var memObject = {};
 	var count = 0;
-	$.each(guAll,function(key,mem){
+	$.each(guAllExsit,function(key,mem){
 		var id = mem.bl.substring(mem.bl.length-11,mem.bl.length);
 		if( id==bi ){
 			count++;
@@ -564,10 +547,10 @@ showAllMemberPage = function(gn) {
 	subPageBottom.append(subTitle);
 	
 	//mem
-	var count = Object.keys(guAll).length;
-	var memContainer = generateMemberGrid(guAll);
+	var count = Object.keys(guAllExsit).length;
+	var memContainer = generateMemberGrid(guAllExsit);
 	subPageBottom.append(memContainer);
-	var memListContainer = generateMemberList(guAll);
+	var memListContainer = generateMemberList(guAllExsit);
 	subPageBottom.append(memListContainer);
 	if( isList ){
 		title.find(".btn").addClass("list");
@@ -760,6 +743,36 @@ showMainContact = function(){
 	$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 }
 
+initContactData = function(){
+	//get user data
+	if( typeof(ui)=='undefined' ) return;
+	var userData = $.lStorage(ui);
+	if( !userData )	return;
+	isList = (userData.isMemberShowList)?userData.isMemberShowList:false;
+
+	//get group data
+	if( typeof(gi)=='undefined' ) return;
+	g_group = userData[gi];
+	if( !g_group ) return;
+
+	//get branch data
+	bl = g_group.bl;
+	if( !bl ) return;
+
+	fbl = g_group.fbl;
+
+	//get mem data
+	guAll = g_group.guAll;
+	if( !guAll ) return;
+
+	guAllExsit = {};
+	$.each( guAll, function(key,obj){
+		if( obj && obj.st==1 ){
+			guAllExsit[key] = obj;
+		}
+	});
+}
+
 /*
               ███████╗ █████╗ ██╗   ██╗ ██████╗ ██████╗ ██╗████████╗███████╗          
               ██╔════╝██╔══██╗██║   ██║██╔═══██╗██╔══██╗██║╚══██╔══╝██╔════╝          
@@ -772,7 +785,14 @@ showMainContact = function(){
 
 //顯示我的最愛頁面
 showFavoritePage = function( isBackward ){
+	var pageID = "page-contact_favorite";
+	updateFavoritePage();
+	$("#"+pageID +" .contact-scroll").height( $(window).height()-112 );
+	if( true==isBackward ) $.mobile.changePage("#"+pageID, { transition: "slide", reverse: true} );
+	else  $.mobile.changePage("#"+pageID, { transition: "slide"});
+}
 
+updateFavoritePage = function(){
 	var pageID = "page-contact_favorite";
 	var page = $( "#"+pageID );
 
@@ -853,7 +873,7 @@ showFavoritePage = function( isBackward ){
 	//mem
 	var memObject = {};
 	var count = 0;
-	$.each(guAll,function(key,mem){
+	$.each(guAllExsit,function(key,mem){
 		if( mem.fav ){
 			count++;
 			memObject[key] = mem;
@@ -891,10 +911,6 @@ showFavoritePage = function( isBackward ){
 			subPageBottom.append(branch);
 		}
 	}
-
-	$("#"+pageID +" .contact-scroll").height( $(window).height()-112 );
-	if( true==isBackward ) $.mobile.changePage("#"+pageID, { transition: "slide", reverse: true} );
-	else  $.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
 //顯示單一自定群組內容
@@ -960,7 +976,7 @@ showSubFavoritePage = function( fi ){
 	var memObject = {};
 	var currentFavData = {};
 	var count = 0;
-	$.each(guAll,function(key,mem){
+	$.each(guAllExsit,function(key,mem){
 		if( mem.fbl && mem.fbl.length>0 ){
 			for(var i=0;i<mem.fbl.length;i++){
 				if( mem.fbl[i]==fi ){
@@ -1101,18 +1117,19 @@ showAddFavGroupBox = function( subPage ){
 					ajaxDo(api_name,headers,"post",true,body).complete(function(data){
 						if(data.status == 200){
 							var tmp = $.parseJSON( data.responseText );
+							cns.debug( data.responseText );
 							var data = {};
 							var userData = $.lStorage(ui);
-							var group = userData[gi];
+							g_group = userData[gi];
 
 							//add fi to mem data
-							guAll = group.guAll;
+							guAll = g_group.guAll;
 							for(var key in memObject){
 								guAll[key].fbl.push(tmp.fi);
 							}
 
 							//add fi data to fbl
-							fbl = group.fbl;
+							fbl = g_group.fbl;
 							fbl[tmp.fi] = {cnt:memKeys.length, fn:name};
 							data[tmp.fi] = fbl[tmp.fi];
 							$.lStorage(ui, userData );
@@ -1124,8 +1141,9 @@ showAddFavGroupBox = function( subPage ){
 							} else {
 								branch.appendTo("#page-contact_favorite .contact-scroll");
 							}
-							cns.debug( data.responseText );
 							container.fadeOut();
+
+							initContactData();
 
 							toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_SUCC") );
 							input.val("");
@@ -1220,10 +1238,10 @@ showEditFavGroupBox = function( dom ){
 			ajaxDo(api_name,headers,"put",true,body).complete(function(data){
 				if(data.status == 200){
 					var userData = $.lStorage(ui);
-					var group = userData[gi];
+					g_group = userData[gi];
 
 					//add fi to mem data
-					guAll = group.guAll;
+					guAll = g_group.guAll;
 					for(var i=0; i<body.al.length; i++){
 						var key = body.al[i];
 						guAll[key].fbl.push(fi);
@@ -1236,10 +1254,11 @@ showEditFavGroupBox = function( dom ){
 					}
 
 					//add fi data to fbl
-					fbl = group.fbl;
+					fbl = g_group.fbl;
 					fbl[fi].cnt = memKeys.length;
 					$.lStorage(ui, userData );
 
+					initContactData();
 					dom.parent().fadeOut();
 					showSubFavoritePage(fi);
 
@@ -1302,14 +1321,14 @@ deleteFavGroup = function( dom ){
 			var tmp = $.parseJSON( data.responseText );
 			var data = {};
 			var userData = $.lStorage(ui);
-			var group = userData[gi];
+			g_group = userData[gi];
 
 			//-----
 			// if user data is updated when delete
 			// remove this block
 			//-----
 			//remove fi to mem data
-			guAll = group.guAll;
+			guAll = g_group.guAll;
 			for(var key in guAll){
 				for( var fiTmp in guAll[key].fbl ){
 					if( fiTmp.indexOf(fi)>=0 ){
@@ -1320,10 +1339,11 @@ deleteFavGroup = function( dom ){
 			}
 
 			//remove fi from fbl
-			fbl = group.fbl;
+			fbl = g_group.fbl;
 			delete fbl[fi];
 			$.lStorage(ui, userData );
 
+			initContactData();
 			showFavoritePage( true );
 			toastShow( $.i18n.getString("MEMBER_DELETE_CUSTOMIZE_GROUP_SUCC") );
 		} else {
@@ -1488,6 +1508,15 @@ function sendInviteAPI( list, callback ){
 	});
 }
 
+/*
+              ██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗          
+              ██║   ██║██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝          
+    █████╗    ██║   ██║██████╔╝██║  ██║███████║   ██║   █████╗      █████╗
+    ╚════╝    ██║   ██║██╔═══╝ ██║  ██║██╔══██║   ██║   ██╔══╝      ╚════╝
+              ╚██████╔╝██║     ██████╔╝██║  ██║   ██║   ███████╗          
+               ╚═════╝ ╚═╝     ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝          
+
+*/
 function updateContactBranchList(){
     if( $(".subpage-contact").is(":visible") ){
         $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
@@ -1497,4 +1526,30 @@ function updateContactBranchList(){
     		dom.find( ".page-back" ).trigger("click");
     	}
     }
+}
+
+function updateContactFavorite(){
+	initContactData();
+
+	//update all page
+	var contactPage = $(".subpage-contact");
+	if( contactPage.length>0 ){
+		var favDetail = contactPage.find(".row.favorite .left");
+		if( favDetail.length>0 ){
+			var branchCount = Object.keys(fbl).length;
+			favDetail.find(".detail.mem").html( $.i18n.getString("COMPOSE_N_MEMBERS",(g_group.favCnt)?g_group.favCnt:0 ) );
+			var branch = favDetail.find(".detail.branch");
+			if( branchCount>0 ) branch.html( $.i18n.getString("COMPOSE_N_SUBGROUP", branchCount) );
+			else branch.hide();
+		}
+	}
+
+	//update fav page
+	var favPage = $("#page-contact_favorite");
+	if( favPage.length>0 ){
+		updateFavoritePage(false);
+	}
+	// if( $(".subpage-contact").is(":visible") ){
+    //     $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+
 }

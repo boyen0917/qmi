@@ -938,7 +938,7 @@ $(function(){
                         var cnt=0;
                         for( var id in guAll ){
                             var mem = guAll[id];
-                            if( mem.bl.indexOf(biTmp)>=0 ){
+                            if( mem && mem.st==1 && mem.bl.indexOf(biTmp)>=0 ){
                                 cnt++;
                             }
                         }
@@ -956,6 +956,8 @@ $(function(){
                 //計算人數
                 var favCnt = 0;
                 $.each(guAll,function(i,val){
+                	if(null==val || val.st!=1 ) return;
+
                     //fi mem cnt
                     if( val.fbl && val.fbl.length>0 ){
                         for(var i=0; i<val.fbl.length; i++){
