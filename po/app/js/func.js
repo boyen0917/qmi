@@ -1683,8 +1683,9 @@ $(function(){
 						'<div class="st-vote-detail-option" data-item-index="' + i_val.k + '">' +
 					        '<img class="check vote-do" src="images/common/icon/icon_check_round_white.png"/>' +
 					        '<span class="vote-do">' + i_val.o + '</span>' +
-					        '<span class="cnt vote-set">' + 0 + '</span>' +
                             '<img class="more vote-set" src="images/common/icon/icon_arrow_next.png">' +
+                            '<span class="cnt vote-set">' + 0 + '</span>' +
+                            '<div class="clear-both"></div>' +
 					    '</div>'
 					);
 
@@ -1794,7 +1795,6 @@ $(function(){
 			if(this_event.data("task-over")){
 				return false;
 			}
-
 			
 			var this_opt = $(this).parent();
             var this_ques = this_opt.parent();
@@ -5428,7 +5428,9 @@ $(function(){
 	        			this_event.find(".st-task-status").html( $.i18n.getString("FEED_CLOSED") ); //"已結束");
 	        			this_event.find(".st-vote-send").html( $.i18n.getString("FEED_CLOSED") ); //"已結束");
 	        			this_event.data("task-over",true);
-	        		}
+	        		}else{
+                        this_event.find(".st-vote-send").html( $.i18n.getString("COMMON_SUBMIT") ); //"已結束"    
+                    }
 	    		}else{
 	    			var time_format = $.i18n.getString("FEED_CLOSE_TIME_NO_LIMIT"); //"無結束時間";
 	    		}
@@ -6930,7 +6932,6 @@ $(function(){
 
 	    	//檔案上傳
 	    	this_info.find(".user-avatar-bar.me input").change(function() {
-
 	    		var imageType = /image.*/;
 		    	var file = $(this)[0].files[0];
 		    	if (file.type.match(imageType)) {

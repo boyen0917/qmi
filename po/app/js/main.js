@@ -382,6 +382,21 @@ $(function(){
 		var this_gi = $(this).attr("data-gi");
 
 		var _groupData = $.lStorage(ui);
+
+		//後台還原已退出團體 會出現左側選單團體點選時 guAll空的或是this_gi不存在的問題
+		try{
+			Object.keys(_groupData[this_gi].guAll).length;
+		}catch(e){
+			e.special = {
+				error:"後台還原已退出團體 會出現左側選單團體點選時 guAll空的或是this_gi不存在的問題",
+				_groupData: _groupData,
+				this_gi: this_gi,
+				code: "_groupData[this_gi].guAll"
+			}
+			errorReport(e);
+			return false;
+		}
+
 		if(Object.keys(_groupData[this_gi].guAll).length == 0){
 			getGroupCombo(this_gi,function(){
                 this_group.trigger("click");
@@ -1185,7 +1200,6 @@ $(function(){
 		$(".cp-file-img-area").html("");
 
 		var file_ori = $(this);
-		cns.debug("file_ori",file_ori[0].files);
 		var imageType = /image.*/;
 		var limit_chk = false;
 		// var upload_arr = this_compose.data("upload-arr");
