@@ -6618,7 +6618,11 @@ $(function(){
 	        	if(data.status == 200){
 
 	        		var user_data = $.parseJSON(data.responseText);
-                    user_data.isNewMem = this_user_info.isNewMem;
+                    //新成員, 三天後失效
+                    if( this_user_info.isNewMem ){
+                        user_data.isNewMem = this_user_info.isNewMem;
+                        user_data.isNewMemDate = new Date().getTime()+(86400000*3);
+                    }
 
 	        		//存local storage
 	        		var _groupList = $.lStorage(ui);

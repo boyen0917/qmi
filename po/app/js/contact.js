@@ -762,15 +762,23 @@ initContactData = function(){
 	fbl = g_group.fbl;
 
 	//get mem data
+	var currentTime = new Date().getTime();
 	guAll = g_group.guAll;
 	if( !guAll ) return;
 
 	guAllExsit = {};
 	$.each( guAll, function(key,obj){
 		if( obj && obj.st==1 ){
+			if( obj.isNewMem ){
+				if( null==obj.isNewMemDate || obj.isNewMemDate<=currentTime ){
+					guAll[key].isNewMem = false;
+					delete guAll[key].isNewMemDate;
+				}
+			}
 			guAllExsit[key] = obj;
 		}
 	});
+	$.lStorage(ui, userData);
 }
 
 /*
