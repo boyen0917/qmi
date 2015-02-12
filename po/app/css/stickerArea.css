@@ -14,7 +14,7 @@
                                                                                
 */
 .stickerArea .imgArea{
-	height: 74%;
+	height: 72%;
 	padding-top: 0.5%;
 	width: 100%;
 }
@@ -129,8 +129,8 @@
 }
 .stickerArea .imgArea .mid .group .downloadArea .download{
 	width:130px;
-	height: 35px;
-	line-height: 35px;
+	height: 30px;
+	line-height: 30px;
 	text-align: center;
 	background-color: rgb(115,162,244);
 	color: white;
