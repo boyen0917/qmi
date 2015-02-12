@@ -65,14 +65,30 @@ var initStickerArea= {
 
 	    //----- botoom -------
 	    //history stickers
-	    var catagory = $("<div class='catagory'></div>");
+	    var catagoryContainer = $("<div class='catagory'></div>");
+	    catagoryContainer.append("<div class='cataBtn left'></div>");
+	    var catagory = $("<div class='content'></div>");
 	    var cataHistoryBtn = $("<div class='cata history'></div>");
 	    cataHistoryBtn.data("type", "history" );
 	    cataHistoryBtn.data("cnt", 0);
 	    catagory.append(cataHistoryBtn);
-	    dom.append(catagory);
+	    catagoryContainer.append(catagory);
+
+	    catagoryContainer.append("<div class='cataBtn right'></div>");
+
+	    dom.append(catagoryContainer);
 	    thisTmp.updateHistory( dom );
 
+	    catagoryContainer.find(".cataBtn").click(function(){
+	    	var thisDom = $(this);
+	    	var cata = thisDom.parent().find(".content");
+	    	var currentScrollLeft = cata.scrollLeft();
+	    	if( thisDom.hasClass("right") ){
+	    		cata.animate( { scrollLeft: currentScrollLeft+cata.width() }, 800);
+	    	} else {
+	    		cata.animate( { scrollLeft: currentScrollLeft-cata.width() }, 800);
+	    	}
+	    });
 	    var callbackTmp = function(){
 	    	thisTmp.isUpdated = true;
 	    	for( var key in thisTmp.splDict ){
@@ -88,6 +104,7 @@ var initStickerArea= {
 	    		// var localObj = thisTmp.dict[key];
 	    		thisTmp.showImg(dom, key, obj );
 	    	}
+
 	    	$(dom).find(".cata").off("click").click( function(){
 	    		var type = $(this).data("type");
 	    		cns.debug( type );

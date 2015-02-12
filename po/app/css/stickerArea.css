@@ -183,8 +183,41 @@
 	border-style: solid;
 	border-width: 1px 0 0 0;
 	border-color: rgb(168, 218,247);
+	white-space: nowrap;
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+.stickerArea .catagory .cataBtn{
+	display: inline-block;
+	width: 40px;
+	height: 40px;
+	background-repeat: no-repeat;
+	background-size: 70% 70%;
+	background-position: 50% 50%;
+	/*background-image: url("../images/arrow2.png");*/
+	position: absolute;
+	/*-webkit-box-shadow: 0px 3px 14px 0px rgba(50, 50, 50, 0.36);*/
+}
+.stickerArea .catagory .cataBtn.left{
+	left: 0;
+	background-image: url("../images/icon_arrow_prev_darkblue.png");
+}
+.stickerArea .catagory .cataBtn.right{
+	background-image: url("../images/common/icon/icon_arrow_next_darkblue.png");
+	right: 0;
+}
+.stickerArea .catagory .cataBtn:hover{
+	background-size: 75% 75%;
 }
 
+.stickerArea .catagory .content{
+	width: -webkit-calc( 100% - 80px );
+	height: 40px;
+	display: inline-block;
+	margin-left: 40px;
+	white-space: nowrap;
+	overflow: hidden;
+}
 .stickerArea .catagory .cata.history{
 	display: inline-block;
 	width: 40px;
@@ -194,7 +227,7 @@
 	background-color: rgb(168, 218,247);
     background-repeat: no-repeat;
 	background-size:80%;
-	float: left;
+	/*float: left;*/
 }
 
 .stickerArea .catagory .cata.history:hover{
@@ -207,11 +240,11 @@
 }
 
 .stickerArea .catagory .cata{
-	width: 40px;
+	width: 45px;
 	height: 100%;
 	display: inline-block;
 	background-size:cover;
-	float: left;
+	/*float: left;*/
 	border-style: solid;
 	border-width: 0 1px 0 0;
 	border-color: rgb(168, 218,247);
@@ -222,9 +255,9 @@
 }
 
 .stickerArea .catagory .cata img{
-	width: auto;
-	height: 80%;
-    margin: 10%;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
 }
 
 .stickerArea .catagory .cata.act{
