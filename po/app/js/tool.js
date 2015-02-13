@@ -1026,12 +1026,21 @@ $(function(){
 
     clearCache = function(){
     	try{
-			var path = require('nw.gui').App.dataPath;
-	    	var fs = require('fs');
-			deleteFolderRecursive(fs, path);
-			alert("clear cache succ");
-		} catch(e){
-			alert(e.stack);
-		}
+    		require('nw.gui').App.clearCache();
+			alert("clear cache 1 succ");
+    	} catch(e){
+    		alert(e.stack);
+			alert("clear cache 1 fail");
+
+	    	try{
+				var path = require('nw.gui').App.dataPath;
+		    	var fs = require('fs');
+				deleteFolderRecursive(fs, path);
+				alert("clear cache 2 succ");
+			} catch(e){
+				alert(e.stack);
+				alert("clear cache 2 fail");
+			}
+    	}
     }
 });
