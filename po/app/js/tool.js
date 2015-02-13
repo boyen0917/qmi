@@ -1026,7 +1026,9 @@ $(function(){
 
     clearCache = function(){
     	try{
-    		require('nw.gui').App.clearCache();
+    		var gui = require('nw.gui');
+    		gui.App.clearCache();
+    		gui.Window.get().reload();
 			alert("clear cache 1 succ");
     	} catch(e){
     		alert(e.stack);
