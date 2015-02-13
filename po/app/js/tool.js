@@ -1018,13 +1018,17 @@ $(function(){
 	    		cns.debug("update ver to ", g_currentVersion);
 	    		$.lStorage("_ver",{ver:g_currentVersion});
 	    		$(".version_update_lock").fadeIn();
-	    		setTimeout( clearCache, 1000 );
+	    		setTimeout( function(){
+	    			if( false==clearCache() ){
+	    				//if error clear cache
+	    				$(".version_update_lock").hide();
+	    			}
+	    		}, 1000 );
 	    	} else {
 	    		cns.debug("latest ver", g_currentVersion);
 	    	}
 	    } catch(e){
 	    	errorReport(e);
-	    	$(".version_update_lock").hide();
 	    }
     }
 
