@@ -1,6 +1,10 @@
 $(function(){
+
 	//設定語言, 還沒登入先用瀏覽器的語言設定
 	updateLanguage( lang );
+
+
+	checkVersion();
 
 	//預設上一頁
 	$(document).data("page-history",[["#page-registration"]]);
@@ -860,9 +864,9 @@ $(function(){
 		logoClickCnt++;
 		if( logoClickCnt>=10 ){
 			logoClickCnt = 0;
-			clearCache();	
+			if( clearCache() ){
+				alert("succ");
+			}
 		}
 	});
-
-
 })

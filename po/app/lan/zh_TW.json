@@ -1,6 +1,7 @@
 {
 	"LANDING_PAGE_LOGIN" :	"登入",
 	"LANDING_PAGE_REGISTER" :	"註冊",
+	"LANDING_PAGE_UPDATE" : "版本更新中..",
 	
 	"LOGIN_ACCOUNT" :	"請輸入手機或Email",
 	"LOGIN_PASSWORD" :	"請輸入密碼",

@@ -1,8 +1,12 @@
-.ui-body-c, .ui-body-c input, .ui-body-c select,textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c{
+.ui-body-c, .ui-body-c input, .ui-body-c select,textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c, .version_update_lock{
     font-family: "微軟正黑體","Microsoft JhengHei";
     -webkit-font-smoothing: antialiased;
     font-weight: normal;
 }
+div, span, label, h3{
+    /*text-shadow: none;*/
+}
+
 
 .ui-header.ui-bar-c.ui-header-fixed {
 	min-height: 55px;
@@ -458,6 +462,28 @@ input.setting-birth-hidden {
 
 
 
+.version_update_lock{
+	background: rgba(0,0,0,0.5);
+	z-index: 1000;
+	display: none;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+}
+.version_update_lock div{
+	width: 300px;
+	height: 50px;
+	opacity: 1;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top: -webkit-calc( 50% - 75px );
+	text-align: center;
+	line-height: 50px;
+	background: rgba(255,255,255,0.8);
+	border-radius: 15px;
+}
 
 
 

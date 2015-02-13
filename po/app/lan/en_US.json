@@ -99,6 +99,7 @@
 
 	"LANDING_PAGE_LOGIN" :	"Login",
 	"LANDING_PAGE_REGISTER" :	"Sign Up",
+	"LANDING_PAGE_UPDATE" : "Updating version..",
 
 	"LEFT_FEED" :	"News Feed",
 	"LEFT_MEMBER" :	"Member",

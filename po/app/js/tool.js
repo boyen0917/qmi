@@ -1010,6 +1010,24 @@ $(function(){
     	}
     }
 
+	g_currentVersion = "0.1.0";
+    checkVersion = function(){
+    	try{
+	    	var currentVersion = $.lStorage("_ver");
+	    	if( null==currentVersion || (g_currentVersion != currentVersion.ver) ){
+	    		cns.debug("update ver to ", g_currentVersion);
+	    		$.lStorage("_ver",{ver:g_currentVersion});
+	    		$(".version_update_lock").fadeIn();
+	    		setTimeout( clearCache, 1000 );
+	    	} else {
+	    		cns.debug("latest ver", g_currentVersion);
+	    	}
+	    } catch(e){
+	    	errorReport(e);
+	    	$(".version_update_lock").hide();
+	    }
+    }
+
 	deleteFolderRecursive = function(fs, path) {
 		if( fs.existsSync(path) ) {
 		  fs.readdirSync(path).forEach(function(file,index){
@@ -1029,20 +1047,24 @@ $(function(){
     		var gui = require('nw.gui');
     		gui.App.clearCache();
     		gui.Window.get().reload();
-			alert("clear cache 1 succ");
+    		cns.debug("update successed");
+    		return true;
+			// alert("clear cache 1 succ");
     	} catch(e){
-    		alert(e.stack);
-			alert("clear cache 1 fail");
+    		cns.debug(e.stack);
+   //  		alert(e.stack);
+			// alert("clear cache 1 fail");
 
-	    	try{
-				var path = require('nw.gui').App.dataPath;
-		    	var fs = require('fs');
-				deleteFolderRecursive(fs, path);
-				alert("clear cache 2 succ");
-			} catch(e){
-				alert(e.stack);
-				alert("clear cache 2 fail");
-			}
+	  //   	try{
+			// 	var path = require('nw.gui').App.dataPath;
+		 //    	var fs = require('fs');
+			// 	deleteFolderRecursive(fs, path);
+			// 	alert("clear cache 2 succ");
+			// } catch(e){
+			// 	alert(e.stack);
+			// 	alert("clear cache 2 fail");
+			// }
     	}
+    	return false;
     }
 });
