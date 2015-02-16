@@ -1010,7 +1010,7 @@ $(function(){
     	}
     }
 
-	g_currentVersion = "0.1.0";
+	g_currentVersion = "0.1.1";
     checkVersion = function(){
     	try{
 	    	var currentVersion = $.lStorage("_ver");

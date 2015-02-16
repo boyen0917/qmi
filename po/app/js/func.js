@@ -5456,7 +5456,7 @@ $(function(){
 	timelineAudioMake = function (this_event,audio_arr){
 		$.each(audio_arr,function(i,val){
 			var this_audio = $(
-				'<audio controls><source type="audio/mp4"></audio>'
+				'<audio controls></audio>'
 			);
 			this_event.find(".st-attach-audio").prepend(this_audio);
 			getS3file(val,this_audio,8);
@@ -5587,7 +5587,8 @@ $(function(){
                         target.attr("src",obj.s32).show();
                         break;
 					case 8://聲音
-						target.find("source").attr("src",obj.s3).show();
+						// target.find("source").attr("src",obj.s3);
+                        target.html('<source type="audio/mp4" yo src="'+ obj.s3 +'">').show();
 						break;
 				}
 			}else{
