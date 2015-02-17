@@ -14,6 +14,11 @@ $(function(){
 	if(window.location.href.match(/localhost/)) {
 		debug_flag = true;
 	}
+
+	if(window.location.href.match(/wp.qmi.emome.net/)) {
+		base_url = "https://ap.qmi.emome.net/apiv1/";
+	}
+	
 	
 	//國碼
 	countrycode = "+886";
