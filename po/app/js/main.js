@@ -1595,23 +1595,14 @@ $(function(){
 	$(document).on("mouseup",".user-avatar-bar-favorite .fav",function(e){
 		clickUserInfoFavorite( $(this) );
 	});
-	
-	//$(document).on("timeupdate",".st-attach-audio audio",function(){
-	//	cns.debug(55555);
-	////this_box.find("audio").on('timeupdate', function() {
-	//	this_box = $(this).parent(".st-attach-audio");
-	//	cns.debug(this_box.find('input[type="range"]'));
-	//	this_box.find('input[type="range"]').val(($(this).get(0).currentTime / $(this).get(0).duration)*100);
-	//	this_box.find('input[type="range"]').css('background-image',
-	//            '-webkit-gradient(linear, left top, right top, '
-	//            + 'color-stop(' + ((($(this).get(0).currentTime / $(this).get(0).duration)<0.5)?(($(this).get(0).currentTime / $(this).get(0).duration)+0.02):($(this).get(0).currentTime / $(this).get(0).duration)) + ', rgb(95,212,226)), '
-	//            + 'color-stop(' + ((($(this).get(0).currentTime / $(this).get(0).duration)<0.5)?(($(this).get(0).currentTime / $(this).get(0).duration)+0.02):($(this).get(0).currentTime / $(this).get(0).duration)) + ', rgb(197,203,207))'
-	//            + ')'
-	//            );
-	//	this_box.find(".audio-progress div:nth-child(1)").html(secondsToTime(Math.floor($(this).get(0).currentTime)));
-	//	this_box.find(".audio-progress div:nth-child(3)").html(secondsToTime(Math.floor($(this).get(0).duration)));
-	//});
 
+	$(".st-feedbox-area").on("mouseenter",".attach-download",function(){
+		var this_media = $(this);
+		var download_img = $('<a href="'+ this_media.find(".download").attr("src") +'" download><img style="position:absolute;top:5px;right:5px;width:50px;opacity:0.9;" src="images/dl.png"/></a>');
+		this_media.append(download_img);
+		this_media.unbind("mouseleave").mouseleave(function(){download_img.remove()});
+	});
+	
 	/*
 	               ██████╗  ███████╗ ███████╗ ██╗  ██████╗ ██╗  █████╗  ██╗               
 	              ██╔═══██╗ ██╔════╝ ██╔════╝ ██║ ██╔════╝ ██║ ██╔══██╗ ██║               

@@ -5360,7 +5360,7 @@ $(function(){
 
 					break;
                 case 7://影片
-                    this_event.find(".st-attach-video").show();
+                    this_event.find(".st-attach-video").show().addClass("attach-download");
                     //總共有幾個聲音
                     video_arr.push(val);
                     break;
@@ -5453,6 +5453,7 @@ $(function(){
         }
 	}
 
+
 	timelineAudioMake = function (this_event,audio_arr){
 		$.each(audio_arr,function(i,val){
 			var this_audio = $(
@@ -5466,7 +5467,7 @@ $(function(){
     timelineVideoMake = function (this_event,video_arr){
         $.each(video_arr,function(i,val){
             var this_video = $(
-                '<video></video>'
+                '<video class="download"></video>'
             );
             this_event.find(".st-attach-video").prepend(this_video);
             getS3file(val,this_video,7);
