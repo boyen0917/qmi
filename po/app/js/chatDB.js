@@ -62,19 +62,19 @@ function updateChat ( msgs ){
 			}
 
 			//add unread cnt
-			if( !isRoomOpen ){
-				var unreadCnt = data.el.length;
-				try{
-					var userData = $.lStorage(ui);
-					g_group = userData[data.gi];
-					g_room = g_group["chatAll"][data.ci];
-					unreadCnt = ( (g_room.unreadCnt)?g_room.unreadCnt:0 )+unreadCnt;
-					g_room.unreadCnt = unreadCnt;
-					$.lStorage(ui, userData);
-				} catch(e){
-					errorReport(e);
-				}
-			}
+			// if( !isRoomOpen ){
+			// 	var unreadCnt = data.el.length;
+			// 	try{
+			// 		var userData = $.lStorage(ui);
+			// 		g_group = userData[data.gi];
+			// 		g_room = g_group["chatAll"][data.ci];
+			// 		unreadCnt = ( (g_room.unreadCnt)?g_room.unreadCnt:0 )+unreadCnt;
+			// 		g_room.unreadCnt = unreadCnt;
+			// 		$.lStorage(ui, userData);
+			// 	} catch(e){
+			// 		errorReport(e);
+			// 	}
+			// }
 
 			/* 更新聊天室列表最後訊息 */
 			if( typeof( updateLastMsg ) != 'undefined' ){
