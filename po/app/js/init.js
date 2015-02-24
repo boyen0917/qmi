@@ -236,14 +236,15 @@ $(function(){
 	
 	//for node-webkit app to open systems browser
 	$(document).on("click","a",function(e){
-		var isNode = (typeof(require) != "undefined");
-		cns.debug( isNode );
-		if( isNode ){
-		// if(navigator.userAgent=="mitake webkit"){
-            var gui = require('nw.gui');
-            gui.Shell.openExternal($(this).attr("href"));
-			return false;        	
-        }
+		if(!$(this).is("[download]")){
+			var isNode = (typeof(require) != "undefined");
+			cns.debug( isNode );
+			if( isNode ){
+	            var gui = require('nw.gui');
+	            gui.Shell.openExternal($(this).attr("href"));
+				return false;        	
+	        }
+    	}
 	});
 
 
