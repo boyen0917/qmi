@@ -3360,6 +3360,8 @@ $(function(){
         var cellArea = $("#page-tab-object .tabObj-cell-area");
         tabArea.html("");
         var width = (100.0/list.length)+"%";
+
+        var cnt = 0;
         $.each( list, function(index, object){
             var tab = $("<div class='tab'></div>");
             tab.data("id", index);
@@ -3369,14 +3371,16 @@ $(function(){
             tab.html( tmp );
             tab.data("clickable", (null==object.clickable)?true:(object.clickable) );
             tabArea.append(tab);
+            cnt++;
         });
-        // if( list.length<=1 ){
-        //     tabArea.hide();
-        //     cellArea.addClass("noTitle");
-        // } else {
+
+        if( cnt<=1 ){
+            tabArea.hide();
+            cellArea.addClass("noTitle");
+        } else {
             tabArea.show();
             cellArea.removeClass("noTitle");
-        // }
+        }
 
         //generate page when click
         tabArea.next().html("");
