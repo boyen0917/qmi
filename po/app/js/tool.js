@@ -572,6 +572,77 @@ $(function(){
 		reader.readAsDataURL(file);
 	}
 
+
+	uploadGroupVideo = function(this_gi, file, ti, permission_id, ori_arr, tmb_arr, pi, callback){
+		
+		var reader = new FileReader();
+		reader.onloadend = function() {
+			// var tempImg = new Image();
+		 //    tempImg.src = reader.result;
+		 //    tempImg.onload = function(){
+		        // var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
+		        // var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
+
+				getS3UploadUrl(this_gi, ti, 1, pi).complete(function(data){
+		    		cns.debug("!");
+		    	
+					var s3url_result = $.parseJSON(data.responseText);
+					if(data.status == 200){
+						var fi = s3url_result.fi;
+				    	var s3_url = s3url_result.s3;
+				    	var s32_url = s3url_result.s32;
+
+				    	//傳大圖
+				    	uploadImgToS3(s32_url,o_obj.blob).complete(function(data){
+				    		if(data.status == 200){
+
+				    			//傳小圖 已經縮好囉
+					    		// uploadImgToS3(s3_url,t_obj.blob).complete(function(data){
+
+					      //   		if(data.status == 200){
+					        			var tempW = this.width;
+										var tempH = this.height;
+										
+										//mime type
+										var md = {};
+					        			md.w = o_obj.w;
+					        			md.h = o_obj.h;
+
+					        			uploadCommit(this_gi, fi,ti,pi,1,file.type,o_obj.blob.size,md).complete(function(data){
+					        				if(data.status == 200){
+						        				var commit_result = $.parseJSON(data.responseText);
+
+						        				var data = {
+						        					fi:fi,
+						        					s3:s3_url,
+						        					s32:s32_url
+						        				}
+							                	if(callback) callback(data);
+							                } else {
+							                	if(callback) callback();
+							                }
+						                	return;
+					        			}); //end of uploadCommit
+
+					     //    		} else {
+										// if(callback)	callback();
+									// } //end of small uploadImgToS3 200
+					    		// }); //end of small uploadImgToS3
+
+				    		} else {
+								if(callback)	callback();
+							} //end of big uploadImgToS3 200
+			        	}); //end of big uploadImgToS3
+					
+					} else{
+						if(callback)	callback();
+					} //end of getUrl 200
+				}); //end of getUrl
+			// }
+		}
+		reader.readAsDataURL(file);
+	}
+
 	randomHash = function(length){
 		if(length<=0)	return "";
 		
@@ -997,6 +1068,22 @@ $(function(){
     		errorReport(e);
     	}
     	return tmp;
+    }
+
+    getS3FileNameWithExtension = function( s3Addr, type ){
+	    var szFileName = "qmi_file";
+    	if( s3Addr ){
+    		szFileName = s3Addr;
+			var index = szFileName.indexOf("?");
+			szFileName = szFileName.substring(index-38, index);
+		}
+
+	    switch( type ){
+	    	case 6:
+	    		szFileName = szFileName + ".png";
+	    		break;
+	    }
+    	return szFileName;
     }
 
     errorReport = function(e){
