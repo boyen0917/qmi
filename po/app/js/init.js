@@ -128,7 +128,7 @@ $(function(){
 		$('.ui-loader').css("display","block");
 		$(".ajax-screen-lock").show();
 	});
-	
+
 	$(document).ajaxComplete(function(event,jqXHR,ajaxOptions) {
 		//特別的
 		if(s_load_show) return false;
@@ -141,11 +141,15 @@ $(function(){
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
 		cns.debug("ajax error:",ajaxSettings);
 
+		//polling錯誤不關閉 為了url parse
+		if(!ajaxSettings.url.match(/sys\/polling/)){
+			$('.ui-loader').hide();
+			$(".ajax-screen-lock").hide();
+		}
+			
 		//不做錯誤顯示
 		if(ajaxSettings.errHide) return false;
-
-		$('.ui-loader').hide();
-		$(".ajax-screen-lock").hide();
+		
 
 		//ajax逾時
 		if(jqxhr.statusText == "timeout"){
