@@ -2134,13 +2134,17 @@ $(function(){
 				var url_chk = this_compose.find('.cp-textarea-desc').val().replace(/\n|\r/g," <br/> ").split(' ');
 				
 				$.each(url_chk,function(i,val){
-					if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
+					if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://' || val.substring(0, 4) == 'www.'){
+                        this_compose.data("parse-error",false);
 						this_compose.data("url-chk",true);
+
+                        //送出判斷 等到網址內容取得成功 再送出
+                        this_compose.data("parse-waiting",true);
+                        if(!this_compose.data("parse-resend")) $(".cp-attach-area").show().find(".url-loading").css("display","block");
+
 						if(val.match(/youtube.com|youtu.be|m.youtube.com/)){
-                            cns.debug("qqq");
 							getLinkYoutube(this_compose,val);
 						}else{
-                            cns.debug("www");
 							getLinkMeta(this_compose,val);
 						}
 						return false;
@@ -4288,7 +4292,7 @@ $(function(){
         });
 
         if(!chk){
-            this_compose.find(".cp-attach-area").hide('fast');
+            this_compose.find(".cp-attach-area").fadeOut();
         }
     }
 /*
@@ -5899,89 +5903,108 @@ $(function(){
 	//parse 網址
 	getLinkMeta = function (this_compose,url) {
 		var q = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
-		cns.debug("url:",q);
-		$.ajax({
-	        type: 'GET',
-	        url: q, 
-	        dataType: 'jsonp',
-	        success: function(data, textStatus) {
-	            var result = {};
-	            var tmp_img,tmp_desc;
-	            cns.debug("data:",data);
+        $.ajax({
+            type: 'GET',
+            url: q, 
+            dataType: 'jsonp',
+            timeout: 5000 ,
+            success: function(data, textStatus) {
+                var result = {};
+                var tmp_img,tmp_desc;
+                cns.debug("data:",data);
 
-	            //error存在 就跳出
-	            if(data.error) return false;
-	            //預設標題
-	            if(data.query.results && data.query.results.title){
-	            	result.title = data.query.results.title;
-	            }
-	            cns.debug("data:",data.query);
-	            //從meta取網址標題 大綱和圖片
-	            if(data.query.results && data.query.results.meta){
-	            	cns.debug("meta:",data.query.results.meta);
-	            	$.each(data.query.results.meta, function(key, val){
-	                    if (val.property) {
+                //loading圖示隱藏
+                $(".cp-attach-area .url-loading").hide();
 
-	                    	// title
-	                    	if (val.property.match(/og:title/i)) {
-	                            result.title = val.content;
-	                        }
-	                    	
-	                        // description
-	                        if (val.property.match(/og:description/i)) {
-	                            result.description = val.content;
-	                        }
-
-	                        // img
-	                        if (val.property.match(/og:image/i)) {
-	                            result.img = val.content;
-	                        }
-	                    }
-
-	                    if (val.name && val.name.match(/description/i)) {
-                            tmp_desc = val.content;
-                        }
-	                });
-	            }
-		            
-
-				if (!result.description) {
-                    result.description = result.title;
+                //error存在 就跳出
+                if(data.error) return false;
+                //預設標題
+                if(data.query.results && data.query.results.title){
+                    result.title = data.query.results.title;
                 }
 
-	            //如果meta圖片存在 並檢查是否圖太小 太小或沒圖的話就從網頁裡的img tag裡面隨便找一張
-				if(!result.img){
-					//預設圖片 隨便找一張img tag
-		            if(data.query.results && data.query.results.img){
-	            		$.each(data.query.results.img,function(i,val){
-	                        if (val.src && val.src.match(/\.jpg|\.png/)) {
-	                        	var temp_img = val.src;
-	                        	if(val.src.substring(0, 4) != 'http'){
-	                        		temp_img = url + temp_img;
-	                        	}
-	                        	result.img = temp_img;
-	                        	return false;
-	                        }
-	                    });
-	            	}
-				}
+                //從meta取網址標題 大綱和圖片
+                if(data.query.results && data.query.results.meta){
+                    $.each(data.query.results.meta, function(key, val){
+                        if (val.property) {
 
-            	if(result.title){
-            		cns.debug("url:",result);
-        			$(".cp-attach-area").show();
-					$(".cp-yql-title").html(result.title);
-					$(".cp-yql-desc").html(result.description.substring(0,200));
-					if(result.img) $(".cp-yql-img").html("<img src='" + result.img + "'/>");  
-					$(".cp-ta-yql").fadeIn();
+                            // title
+                            if (val.property.match(/og:title/i)) {
+                                result.title = val.content;
+                            }
+                            
+                            // description
+                            if (val.property.match(/og:description/i)) {
+                                result.description = val.content;
+                            }
 
-				}
+                            // img
+                            if (val.property.match(/og:image/i)) {
+                                result.img = val.content;
+                            }
+                        }
 
-            	this_compose.data("message-list").push(1);
+                        if (val.name && val.name.match(/description/i)) {
+                            tmp_desc = val.content;
+                        }
+                    });
+                }
+                    
+                //如果meta圖片存在 並檢查是否圖太小 太小或沒圖的話就從網頁裡的img tag裡面隨便找一張
+                if(!result.img){
+                    //預設圖片 隨便找一張img tag
+                    if(data.query.results && data.query.results.img){
+                        $.each(data.query.results.img,function(i,val){
+                            if (val.src && val.src.match(/\.jpg|\.png/)) {
+                                var temp_img = val.src;
+                                if(val.src.substring(0, 4) != 'http'){
+                                    temp_img = url + temp_img;
+                                }
+                                result.img = temp_img;
+                                return false;
+                            }
+                        });
+                    }
+                }
 
-            	result.url = url;
-            	this_compose.data("url-content",result);
-    	    }
-    	});
+                if(result.title){
+                    //按送出重新截取網站內容 不用顯示在畫面
+                    if(this_compose.data("parse-resend")) {
+                        this_compose.data("parse-resend",false);
+                        $(".cp-post").trigger("click");
+                    }else{
+                        cns.debug("url:",result);
+                        $(".cp-yql-title").html(result.title);
+                        if(result.description) $(".cp-yql-desc").html(result.description.substring(0,200));
+                        if(result.img) $(".cp-yql-img").show().html("<img src='" + result.img + "'/>");  
+                        $(".cp-ta-yql").fadeIn();
+                    }
+                }else{
+                    this_compose.data("parse-error",true);
+                }
+
+                this_compose.data("message-list").push(1);
+
+                result.url = url;
+                this_compose.data("url-content",result);
+
+                //網址讀取結束
+                this_compose.data("parse-waiting",false);
+            },
+            error: function(jqXHR,textStatus,errorThrown ){
+                //網址讀取結束
+                this_compose.data("parse-waiting",false);
+                this_compose.data("parse-error",true);
+                this_compose.data("parse-resend",false);
+                //錯誤訊息
+                toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+
+                $(".cp-attach-area .url-loading").hide();
+                //判斷關閉副檔區
+                composeCheckMessageList();
+                cns.debug("yql error",{jqXHR:jqXHR, textStatus:textStatus,errorThrown:errorThrown});
+            }   
+        });
 	}
 
 	getYoutubeCode = function(url){
@@ -6014,18 +6037,29 @@ $(function(){
 			$(".cp-yql-img").html("");
 		  	var result={};
 		  	var youtube_code = getYoutubeCode(url);
-
+            cns.debug("youtube_code",youtube_code);
 		  	if(youtube_code){
 		  		load_show = false;
 				$.ajax ({
-		            url: "http://gdata.youtube.com/feeds/api/videos/" + youtube_code + "?v=2&prettyprint=true&alt=jsonc",
-		            complete: function(data){
-		            	var result = $.parseJSON(data.responseText);
-		                $(".cp-attach-area").show();
-						$(".cp-yql-title").html(result.data.title);
-						$(".cp-yql-desc").html(result.data.description);
-						$(".cp-yql-img").html("<img src='" + result.data.thumbnail.hqDefault + "'/>");
-						$(".cp-ta-yql").fadeIn();
+		            url: "https://gdata.youtube.com/feeds/api/videos/" + youtube_code + "?v=2&prettyprint=true&alt=jsonc",
+                    timeout: 5000,
+                    complete: function(){
+                        //loading圖示隱藏
+                        $(".cp-attach-area .url-loading").hide();
+                        //網址讀取結束
+                        this_compose.data("parse-waiting",false);
+                    },
+		            success: function(result){
+                        if(this_compose.data("parse-resend")) {
+                            this_compose.data("parse-resend",false);
+                            $(".cp-post").trigger("click");
+                        }else{
+    		                $(".cp-attach-area").show();
+    						$(".cp-yql-title").html(result.data.title);
+    						$(".cp-yql-desc").html(result.data.description);
+    						$(".cp-yql-img").show().html("<img src='" + result.data.thumbnail.hqDefault + "'/>");
+    						$(".cp-ta-yql").fadeIn();
+                        }
 
 						var url_content = {
 							c: url,
@@ -6036,7 +6070,15 @@ $(function(){
 						}
 						this_compose.data("url-content",url_content);
 						this_compose.data("message-list").push(2);
-		            }   
+		            },
+                    error: function(jqXHR,textStatus,errorThrown ){
+                        this_compose.data("parse-error",true);
+                        this_compose.data("parse-resend",false);
+                        //錯誤訊息
+                        toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+                        //判斷關閉副檔區
+                        composeCheckMessageList();
+                    }   
 		        });  
 		  	}else{
 		  		post_tmp_url = '';

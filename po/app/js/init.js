@@ -118,9 +118,7 @@ $(function(){
 	myRand = Math.floor((Math.random()*1000)+1);
 
 	$.ajaxSetup ({
-		timeout: 30000,
-	    // Disable caching of AJAX responses
-	    // cache: false
+		timeout: 30000
 	});
 	
 	$(document).ajaxSend(function() {
@@ -130,7 +128,8 @@ $(function(){
 		$('.ui-loader').css("display","block");
 		$(".ajax-screen-lock").show();
 	});
-	$(document).ajaxComplete(function(data) {
+	
+	$(document).ajaxComplete(function(event,jqXHR,ajaxOptions) {
 		//特別的
 		if(s_load_show) return false;
 
@@ -141,11 +140,12 @@ $(function(){
 
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
 		cns.debug("ajax error:",ajaxSettings);
-		$('.ui-loader').hide();
-		$(".ajax-screen-lock").hide();
 
 		//不做錯誤顯示
 		if(ajaxSettings.errHide) return false;
+
+		$('.ui-loader').hide();
+		$(".ajax-screen-lock").hide();
 
 		//ajax逾時
 		if(jqxhr.statusText == "timeout"){
@@ -158,7 +158,6 @@ $(function(){
 			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
 			return false;
 		}
-
 
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
 		//eim 登入網址沒有index.html

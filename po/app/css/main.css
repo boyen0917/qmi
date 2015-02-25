@@ -3854,7 +3854,7 @@ input.cp-datetimepicker-end {
 }
 
 .cp-yql-img {
-	display: inline-block;
+	display: none;
 	margin: 10px;
 	height: 150px;
 	overflow: hidden;

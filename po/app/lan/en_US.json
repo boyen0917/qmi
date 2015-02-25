@@ -190,6 +190,7 @@
 	"COMPOSE_POST_SUCCESSED" : "Post successed",
 	"COMPOSE_ DESCRIPTION_EMPTY" : "Please enter description.",
 	"COMPOSE_TITLE_EMPTY" : "Please enter title.",
+	"COMPOSE_PARSE_ERROR" : "Oops,can not get the result of this URL",
 
 	"INVITE_TITLE" :	"Invitation",
 	"INVITE_INVITED_MEMBER" :	"Invited Members",

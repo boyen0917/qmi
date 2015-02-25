@@ -114,6 +114,7 @@
 	"COMPOSE_POST_SUCCESSED" : "發佈成功",
 	"COMPOSE_ DESCRIPTION_EMPTY" : "內容尚未填寫",
 	"COMPOSE_TITLE_EMPTY" : "標題尚未填寫",
+	"COMPOSE_PARSE_ERROR" : "網址內容取得失敗",
 
 	"MEMBER_ALL" : "全部",
 	"MEMBER_X_GROUP_NO_MEMBER": "%@目前沒有成員",

@@ -1072,7 +1072,38 @@ $(function(){
 
 	//compose 送出	
 	$(".cp-post").click(function(){
+
+		$('.ui-loader').css("display","block");
+		$(".ajax-screen-lock").show();
+
 		var this_compose = $(document).find(".cp-content");
+		this_compose.data("parse-resend",false);
+
+		//等待截取網址內容 時間太久則取消
+		if(this_compose.data("parse-waiting")){
+			setTimeout(function(){
+				cns.debug("parse-retry",this_compose.data("parse-waiting-retry"));
+				var cnt = this_compose.data("parse-waiting-retry") || 0;
+				if(cnt < 3) {
+					cnt++;
+					this_compose.data("parse-waiting-retry",cnt);
+					$(".cp-post").trigger("click");
+				}else{
+					cns.debug("parse retry toast");
+					toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+				}
+			},1000);
+			return false;
+		}
+
+		//網址截取 預備判斷
+		if(this_compose.data("parse-error")) {
+			cns.debug("parse url again");
+			this_compose.data("url-chk",false);
+			this_compose.data("parse-resend",true);
+			this_compose.find('.cp-textarea-desc').trigger("input");
+			return false;
+		}
 
 		//防止重複送出
 		if(!this_compose.data("send-chk")){
@@ -1596,7 +1627,7 @@ $(function(){
 		clickUserInfoFavorite( $(this) );
 	});
 
-	$(".st-feedbox-area").on("mouseenter",".attach-download",function(){
+	$(".st-feedbox-area,#page-timeline-detail").on("mouseenter",".attach-download",function(){
 		var this_media = $(this);
 		var download_img = $('<a href="'+ this_media.find(".download").attr("src") +'" download><img style="position:absolute;top:5px;right:5px;width:50px;opacity:0.9;" src="images/dl.png"/></a>');
 		this_media.append(download_img);
@@ -1683,4 +1714,7 @@ $(function(){
 	// 		smHrCliclTimes=0;
 	// 	}
 	// });
+	$("#page-compose .page-title").click(function(){
+		cns.debug("ddd",$("#page-compose").find(".cp-content").data());
+	});
 });  
