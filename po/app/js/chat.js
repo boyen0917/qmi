@@ -877,6 +877,10 @@ function showMsg (object, bIsFront, bIsTmpSend){
 					$(".popup-confirm").html( $.i18n.getString("CHAT_RESEND") );
 					$(".popup-cancel").html( $.i18n.getString("COMMON_DELETE") );
 					$(".popup-cancel").off("click").click(function(){
+						var data = container.data("data");
+						if( data ){
+							g_idb_chat_msgs.remove(data.ei);
+						}
 						container.hide('slow',function(){
 							container.remove();
 						});

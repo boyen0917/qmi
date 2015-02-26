@@ -106,7 +106,7 @@ header img{
 	background-image: url("../images/calendar/icon_calendar_arrow_red_end.png");
 }
 .rBtn{
-	height: -webkit-calc( 73% - 50px );
+	height: -webkit-calc( 73% - 40px );
 	float: right;
 	right: 0;
 	padding-left: 2%;
