@@ -6367,19 +6367,37 @@ $(function(){
                     for( var i in keys ){
                         var key = keys[i];
                         if( val.hasOwnProperty(key) ){
-                            var tmpDiv = $(".polling-cnt[data-polling-cnt="+key+"] .sm-count");
                             if( val[key] > 0){
+                                var tmpDiv = $(".polling-cnt[data-polling-cnt="+key+"] .sm-count");
                                 tmpDiv.html(countsFormat(val[key])).show();
                                 tmpDiv.data("gi",gi);
-                                // cns.debug(gi, key, val[key]);
                             }
                         }
                     }
 
-                    // if( val.B5 ){
-                    //     cns.debug( val.B5 );
-                    // }
 	    		}
+                
+                if( val.cl && val.cl.length>0 ){
+                    var userData = $.lStorage(ui);
+                    g_group = userData[val.gi];
+                    var isSaving = false;
+                    for( var i=0; i<val.cl.length; i++ ){
+                        try{
+                            var clTmp = val.cl[i];
+                            g_room = g_group["chatAll"][clTmp.ci];
+                            if( g_room.unreadCnt!=clTmp.B7 ){
+                                isSaving = true;
+                                g_room.unreadCnt = clTmp.B7;
+                                cns.debug(val.gi, "cl.B7", clTmp.ci, clTmp.B7);
+                            }
+                        } catch(e){
+                            errorReport(e);
+                        }
+                    }
+                    if( isSaving ){
+                        $.lStorage(ui, userData);
+                    }
+                }
 
 	    		if(null!=val.A5){
                     var dom = $(".sm-group-area[data-gi=" + val.gi + "]").find(".sm-count");
@@ -6610,7 +6628,19 @@ $(function(){
     		body.cnts[0] = {
     			gi: this_gi
     		};
-    		body.cnts[0][cnt_type] = 0;
+            if( this_count.hasClass("sm-cl-count") ){
+                if( null==body.cnts[0].cl ){
+                    body.cnts[0].cl = [];
+                }
+                var obj = {};
+                var ciTmp = this_count.data("ci");
+                if( null==ciTmp ) return;
+                obj[cnt_type] = 0;
+                obj.ci = ciTmp;
+                body.cnts[0].cl.push(obj);
+            } else {
+    		    body.cnts[0][cnt_type] = 0;
+            }
     	}
     	// return false;
         var headers = {

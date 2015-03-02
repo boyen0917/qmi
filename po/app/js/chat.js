@@ -559,6 +559,7 @@ function hideLoading(){
 
 function op ( url, type, data, delegate, errorDelegate){
 	$.ajax({
+		// url: "https://caprivateeim.mitake.com.tw/apiv1" + url,
 	    url: "https://apserver.mitake.com.tw/apiv1" + url,
 	    type: type,
 	    data: data,

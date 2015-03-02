@@ -1608,6 +1608,12 @@ $(function(){
 		updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 	});	
 
+	//polling update cnts
+	$(document).on("click",".polling-cnt-cl",function(e){
+		$(this).find(".sm-cl-count").hide();
+		updatePollingCnts( $(this).find(".sm-cl-count"),$(this).data("polling-cnt"));
+	});	
+
 	$(document).on("mouseup",".namecard",function(e){
 		e.stopPropagation();
 		$(document).data("namecard-pos",$(window).scrollTop());
