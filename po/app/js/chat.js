@@ -191,7 +191,7 @@ $(document).ready(function(){
 		}
 
 		var imageType = /image.*/;
-		var videoType = /video.*/;
+		var videoType = /video.mp4/;
 		$.each(file_ori[0].files,function(i,file){
 
 			if (file.type.match(imageType)) {
@@ -229,12 +229,16 @@ $(document).ready(function(){
 					parent.addClass("loaded");
 					parent.find(".length").html( secondsToTime(videoTag[0].duration) );
 					sendVideo(this_grid);
-				}, function(){
+				}, function(videoTag){
 					var parent = videoTag.parents(".msg-video");
 					parent.addClass("error");
 				});
 			} else{
 				// this_grid.find("div").html('<span>file not supported</span>');
+				popupShowAdjust( "", 
+					$.i18n.getString("COMMON_NOT_MP4"), 
+					$.i18n.getString("COMMON_OK")
+				);
 			}
 		});
 
@@ -1456,7 +1460,7 @@ getChatS3file = function(target, file_c, tp, this_ti, this_tu){
 						var parent = videoTag.parents(".msg-video");
 						parent.addClass("loaded");
 						parent.find(".length").html( secondsToTime(videoTag[0].duration) );
-					}, function(){
+					}, function(videoTag){
 						var parent = videoTag.parents(".msg-video");
 						parent.addClass("error");
 					});

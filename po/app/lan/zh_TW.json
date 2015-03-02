@@ -183,6 +183,7 @@
 	"COMMON_PAID_FEATURE_CONTENT" : "該團體未向Qmi購買此功能",
 	"COMMON_DOWNLOAD" : "下載",
 	"COMMON_FREE" : "免費",
+	"COMMON_NOT_MP4" : "檔案格式必須為MP4",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",
@@ -200,6 +201,7 @@
 	"CHAT_SOMEONE_SEND_PHOTO"				: "%@ 傳送了照片",
 	"CHAT_SOMEONE_SEND_VOICE"					: "%@ 傳送了聲音",
 	"CHAT_SOMEONE_SEND_LOCATION"					: "%@ 傳送了地圖",
+	"CHAT_SOMEONE_SEND_VIDEO"	: "%@ 傳送了影片",
 	"CHAT_NO_MORE_MSG" : "已無舊訊息",
 	"CHAT_LEAVE" : "離開",
 	"CHAT_INVITE" : "邀請",
