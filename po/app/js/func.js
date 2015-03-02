@@ -338,6 +338,7 @@ $(function(){
 
 	          break;
 	        case "memberslist": 
+                groupSwitchEnable();
                 $(".subpage-groupSetting").hide();
                 $(".subpage-groupAbout").hide();
 	        	$(".subpage-contact").show();
@@ -365,7 +366,7 @@ $(function(){
 	        	initContactList();
 	          break;
 	        case "chat":
-
+                groupSwitchEnable();
                 //offical general
                 if( false==onClickOfficialGeneralChat(gi) ){
 
@@ -498,6 +499,7 @@ $(function(){
                 //$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
               break;
             case "groupSetting":
+                groupSwitchEnable();
                 $(".subpage-groupSetting").show();
                 $(".subpage-groupAbout").hide();
                 $(".subpage-contact").hide();
@@ -5202,7 +5204,7 @@ $(function(){
 	}
 
     groupSwitchEnable = function() {
-        cns.debug("qwerqowieuroiw");
+        cns.debug("groupSwitchEnable");
         $(".st-filter-area").removeClass("st-filter-lock");
         $(".sm-group-area").addClass("enable");
     }
