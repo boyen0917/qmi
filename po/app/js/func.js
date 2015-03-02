@@ -4151,6 +4151,11 @@ $(function(){
 
 		// 內容狀態 會有很多ml內容組成
 
+        // 若有副件要上傳取得permission id
+        var isWaitingPermission = (this_compose.data("object_str") || this_compose.data("branch_str") );
+        var sendingFileData = [];
+
+
 		//這邊的概念是 貼文可能會有網址 附檔之類的 有這些東西 就用這個迴圈去加出來
 		//但像是任務 投票之類的 因為是可預測的 又是單一的ml 就在上面那邊解決
 		$.each(ml,function(i,mtp){
@@ -4217,34 +4222,49 @@ $(function(){
 					//開啟loading icon
 			        s_load_show = true;
 
-					//先做permission id 
-					cns.debug("object str:",this_compose.data("object_str"));
-					// var object_obj = $.parseJSON(this_compose.data("object_str"));
-					if(this_compose.data("object_str") || this_compose.data("branch_str") ){
-						$.each(this_compose.data("upload-obj"),function(i,file){
-                            cns.debug(this_compose.data("object_str"), this_compose.data("branch_str"))
-							getFilePermissionIdWithTarget(gi, this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
-								var pi_result = $.parseJSON(data.responseText);
-								if(data.status == 200){
-									uploadImg(file,imageType,cnt,total,6,pi_result.pi);		
-									cnt++;
-								}
-							});
-						});							
-							
-					}else{
-						$.each(this_compose.data("upload-obj"),function(i,file){
-							uploadImg(file,imageType,cnt,total,6,0);
-							cnt++;
-						});
-					}
-					this_compose.data("body",body);
+                    //上傳附檔
+                    $.each(this_compose.data("upload-obj"),function(i,file){
+                        if( isWaitingPermission ){
+                            sendingFileData.push({
+                                file: file,
+                                imageType: imageType,
+                                cnt: cnt,
+                                total: total,
+                                type: 6
+                            });
+                        }else{
+                            uploadImg(file,imageType,cnt,total,6,0);
+                            cnt++;
+                        }
+                    });
+					
+                    this_compose.data("body",body);
 					break;
 			}
 
 			//會有順序問題 因為ios只會照ml順序排 所以必須設定順序
 			if(is_push) body.ml.push(obj);
 		});
+
+        // 若有副件要上傳取得permission id
+        if( isWaitingPermission ){
+            cns.debug(this_compose.data("object_str"), this_compose.data("branch_str"))
+            getFilePermissionIdWithTarget(gi, this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
+                if(data.status == 200){
+                    var pi_result = $.parseJSON(data.responseText);
+                
+                    //每次上傳都歸零
+                    this_compose.data("uploaded-num",0);
+                    this_compose.data("uploaded-err",[]);
+                    this_compose.data("img-compose-arr",[]);
+
+                    for(var i=0; i<sendingFileData.length;i++){
+                        var obj = sendingFileData[i];
+                        uploadImg( obj.file, obj.imageType, i, obj.total, obj.type, pi_result.pi);
+                    }
+                }
+            });
+        }
 
 		if(!upload_chk){
 			composeSendApi(body);
