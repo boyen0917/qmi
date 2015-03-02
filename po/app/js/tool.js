@@ -55,7 +55,7 @@ $(function(){
 		canvas.height = tempH;
 		var ctx = canvas.getContext("2d");
 		ctx.drawImage(img, x, y, tempW, tempH);
-		var dataURL = canvas.toDataURL("image/jpeg",quality);
+		var dataURL = canvas.toDataURL("image/png",quality);
 		var img_obj = {
 			w: Math.floor(tempW),
 			h: Math.floor(tempH),
@@ -65,13 +65,35 @@ $(function(){
 	}
 
 	dataURItoBlob = function(dataURI) {
+		var contentType;
+		try{
+			contentType = dataURI.split(';')[0];
+			contentType = contentType.substring(5,contentType.length);
+		} catch(e){
+			contentType = 'image/png';
+			errorReport(e);
+		}
         var binary = atob(dataURI.split(',')[1]);
         var array = [];
         for(var i = 0; i < binary.length; i++) {
             array.push(binary.charCodeAt(i));
         }
-        return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
+        return new Blob([new Uint8Array(array)], {type: contentType});
     }
+
+	getVideoBlob = function(videoDom, x,y,max_w,max_h,quality){
+		// var dataView = new Uint8Array(video);
+		// var dataBlob = new Blob([dataView]);//new blob
+		// return dataBlob;
+		if( null==videoDom || videoDom.length<=0 ) return null;
+		var video = videoDom[0];
+		if( null==video ) return null;
+		var vid_obj = {
+			l: Math.floor(video.duration*1000),
+			blob: dataURItoBlob( videoDom.attr("src") )
+		}
+		return vid_obj;
+	}
 
 
 	//調整個人頭像
@@ -480,6 +502,17 @@ $(function(){
         });
 	}
 
+	uploadVideoToS3 = function(url, file){
+		cns.debug(file.type);
+		return $.ajax ({
+            url: url,
+			type: 'PUT',
+			contentType: "video/mp4",
+		 	data: file, 
+			processData: false
+        });
+	}
+
 	
 	
 	uploadCommit = function(this_gi, fi,ti,pi,tp,mt,si,md){
@@ -573,75 +606,93 @@ $(function(){
 	}
 
 
-	uploadGroupVideo = function(this_gi, file, ti, permission_id, ori_arr, tmb_arr, pi, callback){
+	uploadGroupVideo = function(this_gi, file, video, ti, permission_id, ori_arr, tmb_arr, pi, callback){
 		
-		var reader = new FileReader();
-		reader.onloadend = function() {
-			// var tempImg = new Image();
-		 //    tempImg.src = reader.result;
-		 //    tempImg.onload = function(){
-		        // var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
-		        // var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
+		var o_obj = getVideoBlob(video, 0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
+		var t_obj = getVideoThumbnail(video,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
 
-				getS3UploadUrl(this_gi, ti, 1, pi).complete(function(data){
-		    		cns.debug("!");
-		    	
-					var s3url_result = $.parseJSON(data.responseText);
-					if(data.status == 200){
-						var fi = s3url_result.fi;
-				    	var s3_url = s3url_result.s3;
-				    	var s32_url = s3url_result.s32;
+		getS3UploadUrl(this_gi, ti, 2, pi).complete(function(data){
+			cns.debug("!");
+		
+			var s3url_result = $.parseJSON(data.responseText);
+			if(data.status == 200){
+				var fi = s3url_result.fi;
+		    	var s3_url = s3url_result.s3; //截圖
+		    	var s32_url = s3url_result.s32;	//影片原檔
 
-				    	//傳大圖
-				    	uploadImgToS3(s32_url,o_obj.blob).complete(function(data){
-				    		if(data.status == 200){
+		    	//傳大圖
+		    	uploadVideoToS3(s32_url,o_obj.blob).complete(function(data){
+		    		if(data.status == 200){
 
-				    			//傳小圖 已經縮好囉
-					    		// uploadImgToS3(s3_url,t_obj.blob).complete(function(data){
+		    			//傳縮圖(縮圖一樣要用video/mp4傳...?!)
+			    		uploadVideoToS3(s3_url,t_obj.blob).complete(function(data){
 
-					      //   		if(data.status == 200){
-					        			var tempW = this.width;
-										var tempH = this.height;
-										
-										//mime type
-										var md = {};
-					        			md.w = o_obj.w;
-					        			md.h = o_obj.h;
+			    			if(data.status == 200){
+			        			var tempW = this.width;
+								var tempH = this.height;
+								
+								//mime type
+								var md = {};
+			        			md.l = o_obj.l;
 
-					        			uploadCommit(this_gi, fi,ti,pi,1,file.type,o_obj.blob.size,md).complete(function(data){
-					        				if(data.status == 200){
-						        				var commit_result = $.parseJSON(data.responseText);
+			        			uploadCommit(this_gi, fi,ti,pi,2,file.type,o_obj.blob.size,md).complete(function(data){
+			        				if(data.status == 200){
+				        				var commit_result = $.parseJSON(data.responseText);
 
-						        				var data = {
-						        					fi:fi,
-						        					s3:s3_url,
-						        					s32:s32_url
-						        				}
-							                	if(callback) callback(data);
-							                } else {
-							                	if(callback) callback();
-							                }
-						                	return;
-					        			}); //end of uploadCommit
+				        				var data = {
+				        					fi:fi,
+				        					s3:s3_url,
+				        					s32:s32_url
+				        				}
+					                	if(callback) callback(data);
+					                } else {
+					                	if(callback) callback();
+					                }
+				                	return;
+			        			}); //end of uploadCommit
 
-					     //    		} else {
-										// if(callback)	callback();
-									// } //end of small uploadImgToS3 200
-					    		// }); //end of small uploadImgToS3
-
-				    		} else {
+			        		} else {
 								if(callback)	callback();
-							} //end of big uploadImgToS3 200
-			        	}); //end of big uploadImgToS3
-					
-					} else{
+							} //end of small uploadImgToS3 200
+			    		}); //end of small uploadImgToS3
+
+		    		} else {
 						if(callback)	callback();
-					} //end of getUrl 200
-				}); //end of getUrl
-			// }
-		}
-		reader.readAsDataURL(file);
+					} //end of big uploadImgToS3 200
+		    	}); //end of big uploadImgToS3
+			
+			} else{
+				if(callback)	callback();
+			} //end of getUrl 200
+		}); //end of getUrl
 	}
+
+	getVideoThumbnail = function( videoDom, x,y,max_w,max_h,quality ) {
+		if( !videoDom ) return null;
+		var video = videoDom[0];
+        if( !video ) return null;
+        var canvas = document.createElement("canvas");
+		var hScale = max_h/video.videoHeight;
+		var wScale = max_w/video.videoWidth;
+		var scale = (wScale>hScale)?hScale:wScale;
+	    var width = video.videoWidth*scale;
+	    var height = video.videoHeight*scale;
+
+	    canvas.width = width;
+	    canvas.height = height;
+		var ctx = canvas.getContext("2d");
+		ctx.drawImage(video, x, y, width, height);
+		var dataURL = canvas.toDataURL("image/png",quality);
+		var img_obj = {
+			w: Math.floor(width),
+			h: Math.floor(height),
+			blob: dataURItoBlob(dataURL)
+		}
+		// var img = new Image;
+		// img.src = dataURL;
+		// $("#container").append(img);
+		return img_obj;
+    };
 
 	randomHash = function(length){
 		if(length<=0)	return "";
@@ -1085,6 +1136,67 @@ $(function(){
 	    }
     	return szFileName;
     }
+
+    renderVideoFile = function(file, videoTag, onload, onError){
+		var reader = new FileReader();
+		reader.onload = function(event){
+			videoTag.addClass("loaded");
+			if( videoTag.length>0 ){
+				var video = videoTag[0];
+				video.oncanplay = function(event){
+					videoTag.addClass("loaded");
+					if(onload) onload(videoTag);
+				}
+				video.onerror = function(event){
+					videoTag.addClass("error");
+					if(onError) onError(videoTag);
+				}
+				// var timer = 0;
+				// video.addEventListener('progress', function (e) {
+				//     if (this.buffered.length > 0) {
+
+				//         if (timer != 0) {
+				//             clearTimeout(timer);
+				//         }
+
+				//         timer = setTimeout(function () {
+				//         	var loadPercent = parseInt(video.buffered.end(0) / video.duration * 100);
+				//             if( loadPercent== 100 ) {
+				//                 if( onload ) onload(videoTag);
+				//                 clearTimeout(timer);
+				//             };          
+				//         }, 1500);
+
+				//     }
+				// }, false); 
+			} else {
+				if(onload) onload(videoTag);
+			}
+			videoTag.attr("src",reader.result);
+		}
+		reader.onerror = function(event){
+			videoTag.addClass("error");
+			if(onError) onError(videoTag);
+		}
+    
+		reader.readAsDataURL(file);
+	}
+
+    renderVideoUrl = function(url, videoTag, onload, onError){
+    	if( videoTag.length>0 ){
+			videoTag[0].oncanplay = function(event){
+				videoTag.addClass("loaded");
+				if(onload) onload(videoTag);
+			}
+			videoTag[0].onerror = function(event){
+				videoTag.addClass("error");
+				if(onError) onError(videoTag);
+			}
+	    
+			videoTag.attr("src", url);
+		}
+	}
+
 
     errorReport = function(e){
     	if( e ){
