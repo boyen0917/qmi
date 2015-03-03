@@ -228,10 +228,12 @@ $(document).ready(function(){
 					var parent = videoTag.parents(".msg-video");
 					parent.addClass("loaded");
 					parent.find(".length").html( secondsToTime(videoTag[0].duration) );
+					parent.find(".download").remove();
 					sendVideo(this_grid);
 				}, function(videoTag){
 					var parent = videoTag.parents(".msg-video");
 					parent.addClass("error");
+					parent.find(".download").remove();
 				});
 			} else{
 				// this_grid.find("div").html('<span>file not supported</span>');
@@ -455,14 +457,14 @@ $(document).ready(function(){
           	video.currentTime = 0;
 			video.play();
 			video.onended = function(){
-				$(this).parent().removeClass("playing");
 				$(this).prop("controls",false);
+				$(this).parents(".msg-video").removeClass("playing");
 			}
 			video.onpause = function(){
-				$(this).parent().addClass("pause");
+				$(this).parents(".msg-video").addClass("pause");
 			}
 			video.onplay = function(){
-				$(this).parent().removeClass("pause");
+				$(this).parents(".msg-video").removeClass("pause");
 			}
 		}
 	});
@@ -1042,7 +1044,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><div class='info'><div class='play'></div><div class='length'></div></div></div>");
+			var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
 			msgDiv.append(video);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
@@ -1460,9 +1462,11 @@ getChatS3file = function(target, file_c, tp, this_ti, this_tu){
 						var parent = videoTag.parents(".msg-video");
 						parent.addClass("loaded");
 						parent.find(".length").html( secondsToTime(videoTag[0].duration) );
+						parent.find(".download").attr( "href",videoTag.attr("src") );
 					}, function(videoTag){
 						var parent = videoTag.parents(".msg-video");
 						parent.addClass("error");
+						parent.find(".download").remove();
 					});
 					break;
 				case 8://聲音
