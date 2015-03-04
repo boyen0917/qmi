@@ -34,6 +34,7 @@
 	"COMMON_PAID_FEATURE_CONTENT" : "This group does not buy this feature.",
 	"COMMON_DOWNLOAD" : "Download",
 	"COMMON_FREE" : "Free",
+	"COMMON_NOT_MP4" : "File must be MP4.",
 	
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
@@ -241,6 +242,7 @@
 	"CHAT_SOMEONE_SEND_PHOTO" :	"%@ sent a photo.",
 	"CHAT_SOMEONE_SEND_VOICE" :	"%@ sent a voice message.",
 	"CHAT_SOMEONE_SEND_LOCATION" :	"%@ sent a location.",
+	"CHAT_SOMEONE_SEND_VIDEO"	: "%@ sent a video.",
 	"CHAT_NO_MORE_MSG" : "No more past message.",
 	"CHAT_LEAVE" : "Leave",
 	"CHAT_INVITE" : "Invite",
@@ -252,6 +254,7 @@
 	"CHAT_VOIP_MAKE_CALL" : "You've made a call from Qmi.",
 	"CHAT_SOMEONE_LEAVE_GROUP" : "%@ left group.",
 	"CHAT_CHATROOM_MEMBER_EMPTY" : "Please select a target.",
+	"CHAT_UPLOAD_FILE_MISSING" : "File missing, please resend.",
 	
 	"NOTICES_TITLE" :	"New Notices",
 	"NOTICES_POST" :	"Publish",

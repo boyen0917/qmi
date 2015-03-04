@@ -207,9 +207,10 @@ getS3file = function(file_obj,target,tp){
             switch(tp){
                 case 6://圖片
                     //小圖
+                    var fileName = getS3FileNameWithExtension( obj.s32, 6 );
                     // target.css("background-image","url("+obj.s32+")");
-                    target.attr("src",obj.s32);
-                    break;
+                    target.attr("src",obj.s32).after('<a href="'+ obj.s32 +'" download="'+fileName+'"><div></div></a>');
+				    break;
                 case 8://聲音
                     target.attr("src",obj.s3);
                     break;

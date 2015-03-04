@@ -191,7 +191,7 @@ $(document).ready(function(){
 		}
 
 		var imageType = /image.*/;
-		var videoType = /video.*/;
+		var videoType = /video.mp4/;
 		$.each(file_ori[0].files,function(i,file){
 
 			if (file.type.match(imageType)) {
@@ -228,13 +228,19 @@ $(document).ready(function(){
 					var parent = videoTag.parents(".msg-video");
 					parent.addClass("loaded");
 					parent.find(".length").html( secondsToTime(videoTag[0].duration) );
+					parent.find(".download").remove();
 					sendVideo(this_grid);
-				}, function(){
+				}, function(videoTag){
 					var parent = videoTag.parents(".msg-video");
 					parent.addClass("error");
+					parent.find(".download").remove();
 				});
 			} else{
 				// this_grid.find("div").html('<span>file not supported</span>');
+				popupShowAdjust( "", 
+					$.i18n.getString("COMMON_NOT_MP4"), 
+					$.i18n.getString("COMMON_OK")
+				);
 			}
 		});
 
@@ -451,14 +457,14 @@ $(document).ready(function(){
           	video.currentTime = 0;
 			video.play();
 			video.onended = function(){
-				$(this).parent().removeClass("playing");
 				$(this).prop("controls",false);
+				$(this).parents(".msg-video").removeClass("playing");
 			}
 			video.onpause = function(){
-				$(this).parent().addClass("pause");
+				$(this).parents(".msg-video").addClass("pause");
 			}
 			video.onplay = function(){
-				$(this).parent().removeClass("pause");
+				$(this).parents(".msg-video").removeClass("pause");
 			}
 		}
 	});
@@ -558,7 +564,7 @@ function getHistoryMsg ( bIsScrollToTop ){
 					continue;
 				} else {
 	        		var object = list[i].data;
-					showMsg( object, true );
+					showMsg( object );
 				}
 	        }
 	        if( isUpdatePermission ) getPermition(true);
@@ -735,7 +741,7 @@ function updateChat ( time ){
 					    }
 						
 
-						showMsg( object, false );
+						showMsg( object );
 					}
 				}
 			}
@@ -824,8 +830,9 @@ function getFormatMsgTimeTag ( date ){
 	return date.customFormat( "#hhh#:#mm#" );
 }
 
-function showMsg (object, bIsFront, bIsTmpSend){
+function showMsg (object, bIsTmpSend){
 	if( null == object ) return;
+	bIsTmpSend = bIsTmpSend || false;
 
 	g_msgs.push(object.ei);
 	//cns.debug("list:",JSON.stringify(object,null,2));
@@ -833,7 +840,6 @@ function showMsg (object, bIsFront, bIsTmpSend){
 	var time = new Date(object.meta.ct);
 	var container = $("<div></div>");
 	container.data("time", time);
-	// cns.debug( bIsFront, time, object.notSend, object.ml[0].c );
 	var szSearch = "#chat-contents ."+time.customFormat("_#YYYY#_#MM#_#DD#");
 	var div = $( szSearch );
 
@@ -935,7 +941,10 @@ function showMsg (object, bIsFront, bIsTmpSend){
 		if( unSend ){
 			container.data("data", object);
 			var status = $("<div></div>");
-			if( bIsTmpSend ) status.addClass('chat-msg-load');
+			table.find(".chat-cnt").hide();
+			if( bIsTmpSend ){
+				status.addClass('chat-msg-load');
+			}
 			else  status.addClass('chat-msg-load-error');
 			status.click(function(){
 				if( $(this).hasClass("chat-msg-load-error") ){
@@ -1038,7 +1047,7 @@ function showMsg (object, bIsFront, bIsTmpSend){
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><div class='info'><div class='play'></div><div class='length'></div></div></div>");
+			var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
 			msgDiv.append(video);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
@@ -1192,6 +1201,28 @@ function sendInput ( dom ){
 	dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
 	var tmpData = dom.data("data");
 	if( null == tmpData )	return;
+	try{
+
+		switch(tmpData.ml[0].tp){
+			case 0: //text
+			case 5: //sticker
+				sendText(dom);
+				break;
+			case 6: //img
+				sendImage(dom);
+				break;
+			case 7: //video
+				sendVideo(dom);
+				break;
+		}
+	} catch(e){
+		errorReport(e);
+		dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+	}
+}
+
+function sendText(dom){
+	var tmpData = dom.data("data");
 	cns.debug("send", new Date(tmpData.meta.ct), new Date(tmpData.meta.ct) );
 	var sendData = {
 		meta:{
@@ -1229,7 +1260,7 @@ function sendInput ( dom ){
 			};
 			g_idb_chat_msgs.put( node );
 			
-			showMsg(newData, false);
+			showMsg(newData);
 
 			// if( g_isEndOfPage ) scrollToBottom();
 			scrollToBottom();
@@ -1253,11 +1284,26 @@ function sendInput ( dom ){
 
 function sendImage( dom ){
 	var file = dom.data("file");
-
 	var tmpData = dom.data("data");
-	if( ""!=tmpData.ml[0].c ){
-		sendInput(dom);
-	} else {
+	if( null==file ){
+		setTimeout(function(){
+			popupShowAdjust( "", 
+				$.i18n.getString("CHAT_UPLOAD_FILE_MISSING"), 
+				$.i18n.getString("COMMON_OK"),
+				"", [function(){ //on ok
+					g_idb_chat_msgs.remove(tmpData.ei);
+					dom.hide('slow',function(){
+						dom.remove();
+					});
+				}]
+			);
+		}, 500);
+		return;
+	}
+
+	// if( ""!=tmpData.ml[0].c ){
+	// 	sendText(dom);
+	// } else {
 		var ori_arr = [1280,1280,0.9];
 		var tmb_arr = [160,160,0.4];
 		
@@ -1297,22 +1343,37 @@ function sendImage( dom ){
 				
 				dom.data("data",tmpData);
 
-				sendInput(dom);
+				sendText(dom);
 			} else {
 				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
 				// if( g_isEndOfPage ) scrollToBottom();
 			}
 		});
-	}
+	// }
 }
 function sendVideo( dom ){
 	var file = dom.data("file");
+	var tmpData = dom.data("data");
+	if( null==file ){
+		setTimeout(function(){
+			popupShowAdjust( "", 
+				$.i18n.getString("CHAT_UPLOAD_FILE_MISSING"), 
+				$.i18n.getString("COMMON_OK"),
+				"", [function(){ //on ok
+					g_idb_chat_msgs.remove(tmpData.ei);
+					dom.hide('slow',function(){
+						dom.remove();
+					});
+				}]
+			);
+		}, 500);
+		return;
+	}
 	var video = dom.find("video");
 
-	var tmpData = dom.data("data");
-	if( ""!=tmpData.ml[0].c ){
-		sendInput(dom);
-	} else {
+	// if( ""!=tmpData.ml[0].c ){
+	// 	sendText(dom);
+	// } else {
 		var ori_arr = [1280,1280,0.9];
 		var tmb_arr = [160,160,0.4];
 		
@@ -1352,13 +1413,13 @@ function sendVideo( dom ){
 				
 				dom.data("data",tmpData);
 
-				sendInput(dom);
+				sendText(dom);
 			} else {
 				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
 				// if( g_isEndOfPage ) scrollToBottom();
 			}
 		});
-	}
+	// }
 }
 
 function sendChat (){
@@ -1456,9 +1517,11 @@ getChatS3file = function(target, file_c, tp, this_ti, this_tu){
 						var parent = videoTag.parents(".msg-video");
 						parent.addClass("loaded");
 						parent.find(".length").html( secondsToTime(videoTag[0].duration) );
-					}, function(){
+						parent.find(".download").attr( "href",videoTag.attr("src") );
+					}, function(videoTag){
 						var parent = videoTag.parents(".msg-video");
 						parent.addClass("error");
+						parent.find(".download").remove();
 					});
 					break;
 				case 8://聲音

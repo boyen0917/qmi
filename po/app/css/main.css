@@ -2686,7 +2686,7 @@ img.st-user-pic{
 }
 
 .st-attach-url-img {
-	max-height: 211px;
+	height: 211px;
 	overflow: hidden;
 	vertical-align: baseline;
 	display: none;
@@ -2698,7 +2698,7 @@ img.st-user-pic{
 	width: 100%;
 	position: relative;
 	object-fit: cover;
-	max-height: 213px;
+	height: 211px;
 }
 .st-attach-youtube{
 	width: 480px;

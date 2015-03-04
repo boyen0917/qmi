@@ -561,6 +561,22 @@ body {
 	text-align: center;
 }
 
+/* download */
+.msg-video .download{
+	display: none;
+	position:absolute;
+	top:5px;
+	right:5px;
+	width:50px;
+	opacity:0.9;
+}
+.msg-video.playing .download{
+	display: block;
+}
+.msg-video .download img{
+	width: 100%;
+}
+
 /*左右分色區*/
 .chat-msg-container-right .msg-video{
 	border: 2px solid rgb(59,97,181);
@@ -568,7 +584,7 @@ body {
 .chat-msg-container-left .msg-video{
 	border: 2px solid rgb(123,187,236);
 }
-.chat-msg-container-right .msg-video.playing{
+.chat-msg-container-right .msg-video.playing, .chat-msg-container-left .msg-video.playing{
 	border: none;
 }
 .chat-msg-container-left .msg-video .info .play{

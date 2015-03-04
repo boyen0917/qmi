@@ -436,6 +436,9 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		case 6: //pic
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_PHOTO", name);
 			break;
+		case 7: //video
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_VIDEO", name);
+			break; 
 		case 8: //audio
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_VOICE", name);
 			break; 

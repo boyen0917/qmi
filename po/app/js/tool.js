@@ -548,8 +548,8 @@ $(function(){
 				getS3UploadUrl(this_gi, ti, 1, pi).complete(function(data){
 		    		cns.debug("!");
 		    	
-					var s3url_result = $.parseJSON(data.responseText);
 					if(data.status == 200){
+						var s3url_result = $.parseJSON(data.responseText);
 						var fi = s3url_result.fi;
 				    	var s3_url = s3url_result.s3;
 				    	var s32_url = s3url_result.s32;
@@ -614,8 +614,8 @@ $(function(){
 		getS3UploadUrl(this_gi, ti, 2, pi).complete(function(data){
 			cns.debug("!");
 		
-			var s3url_result = $.parseJSON(data.responseText);
 			if(data.status == 200){
+				var s3url_result = $.parseJSON(data.responseText);
 				var fi = s3url_result.fi;
 		    	var s3_url = s3url_result.s3; //截圖
 		    	var s32_url = s3url_result.s32;	//影片原檔
@@ -1195,6 +1195,64 @@ $(function(){
 	    
 			videoTag.attr("src", url);
 		}
+	}
+
+	function drawCanvasImageBg( ctx, img, x, y, w, h ){
+		ctx.save();
+		ctx.drawImage(img, x,y,w, h);
+		ctx.restore();
+	}
+
+	function drawCanvasSlashAndText(ctx, w, h, text, lineHeight, textSpace ){
+		if( !text || text.length<=0 ) return;
+		lineHeight = lineHeight || 44;
+		var newWH = (w+h)/1.41421356237;	//sqrt(2)
+		var offset = h/2;	//sqrt(2)
+		var cnt = Math.ceil(newWH/lineHeight)+2;
+		ctx.font = "12px";	// Calibri
+		var textWidth = ctx.measureText(text).width+textSpace;
+		var textCnt = Math.ceil(w/textWidth)+2;
+
+		ctx.save();
+		ctx.translate(-offset,offset);
+		ctx.rotate(-0.25*Math.PI);
+
+		var yTmp = 0;
+		ctx.fillStyle = "rgba(255,255,255,0.3)";
+		ctx.strokeStyle = "rgba(255,255,255,0.3)";
+	    ctx.lineWidth = 2;
+		for( var i=0; i<cnt; i++){
+			var xTmp = 0;
+			for( var j=0; j<textCnt; j++){
+			    ctx.fillText(text, xTmp, yTmp);
+				console.debug(xTmp, yTmp);
+				xTmp+=textWidth;
+			}
+			// ctx.beginPath();
+			// ctx.moveTo( 0, yTmp );
+			// ctx.lineTo( newWH, yTmp );
+			// ctx.stroke();
+			yTmp+=lineHeight;
+		}
+		ctx.restore();
+	}
+	renderImageWithWatermark = function(newImage, text, url, quality){
+		//eg.
+		//	var img = $("<img/>");
+		//	renderImageWithWatermark(img,"text拉拉", s3url, 0.9);
+
+		var img = new Image;
+		img .setAttribute('crossOrigin', 'anonymous');
+		img.onload = function(){
+			var c    = document.createElement('canvas');
+			var ctx  = c.getContext('2d');
+			c.width  = img.width;
+			c.height = img.height;
+			drawCanvasImageBg( ctx, img, 0, 0, c.width, c.height);
+			drawCanvasSlashAndText(ctx, c.width, c.height, text, 44, 5);
+			newImage.attr("src", c.toDataURL("image/png",quality) );
+		};
+		img.src = url;
 	}
 
 

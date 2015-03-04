@@ -338,7 +338,10 @@ $(function(){
 
 	          break;
 	        case "memberslist": 
-
+                groupSwitchEnable();
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
+                
 	        	$(".subpage-contact").show();
                 
                 //藏新增貼文按鈕, 新增聊天室按鈕
@@ -360,7 +363,7 @@ $(function(){
 	        	initContactList();
 	          break;
 	        case "chat":
-
+                groupSwitchEnable();
                 //offical general
                 if( false==onClickOfficialGeneralChat(gi) ){
 
@@ -476,6 +479,7 @@ $(function(){
                 //$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
               break;
             case "groupSetting":
+                groupSwitchEnable();
                 $(".subpage-groupSetting").show();
                 
                 //藏新增貼文按鈕, 新增聊天室按鈕
@@ -5174,7 +5178,7 @@ $(function(){
 	}
 
     groupSwitchEnable = function() {
-        cns.debug("qwerqowieuroiw");
+        cns.debug("groupSwitchEnable");
         $(".st-filter-area").removeClass("st-filter-lock");
         $(".sm-group-area").addClass("enable");
     }
