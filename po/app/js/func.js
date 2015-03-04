@@ -288,6 +288,7 @@ $(function(){
     }
 
 	timelineSwitch = function (act,reset,main){
+
         $("#page-group-main").data("currentAct",act);
 		//reset 
 		if(reset) {
@@ -296,6 +297,10 @@ $(function(){
 		}
 
         var page_title = $.i18n.getString("LEFT_FEED");
+
+        //關閉所有subpage 暫時除了系統設定除外
+        if(act != "system-setting")
+            $("#page-group-main .main-subpage").hide();
 
 		switch (act) {
 	        case "feeds":
@@ -316,12 +321,7 @@ $(function(){
                 if(!main)
                     $(".st-navi-area .main").trigger("click");
 
-                $(".subpage-groupSetting").hide();
-                $(".subpage-groupAbout").hide();
-	        	$(".subpage-contact").hide();
-	        	$(".subpage-chatList").hide();
 	        	$(".subpage-timeline").show();
-                $(".subpage-album").hide();
 	        	$("#page-group-main").find(".gm-header .page-title").html(page_title);
 
                 //顯示新增貼文按鈕, 藏新增聊天室按鈕
@@ -338,13 +338,8 @@ $(function(){
 
 	          break;
 	        case "memberslist": 
-                $(".subpage-groupSetting").hide();
-                $(".subpage-groupAbout").hide();
+
 	        	$(".subpage-contact").show();
-	            $(".subpage-timeline").hide();
-	        	$(".subpage-chatList").hide();
-                $(".subpage-album").hide();
-	            $( "#side-menu" ).panel( "close");
                 
                 //藏新增貼文按鈕, 新增聊天室按鈕
                 $("#page-group-main").find(".gm-header .feed-compose").hide();
@@ -370,13 +365,7 @@ $(function(){
                 if( false==onClickOfficialGeneralChat(gi) ){
 
     	        	//-- switch sub pages --
-                    $(".subpage-groupSetting").hide();
-                    $(".subpage-groupAbout").hide();
-    	        	$(".subpage-contact").hide();
-    	        	$(".subpage-timeline").hide();
     	        	$(".subpage-chatList").show();
-                    $(".subpage-album").hide();
-    	        	// $( "#side-menu" ).panel( "close");
 
                     page_title = $.i18n.getString("CHAT_TITLE");
 
@@ -397,7 +386,12 @@ $(function(){
 	          break;
 	        case "news":
 	          break;
-	        case "setting":
+	        case "system-setting":
+
+              $("#page-group-main .main-subpage").hide();
+              $(".subpage-systemSetting").show();
+
+              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
 	          break;
             case "feed-post":
                 $(".st-navi-area").data("currentHome", "feed-post");
@@ -417,12 +411,7 @@ $(function(){
                 // if(!main)
                     $(".st-navi-subarea[data-st-navi=feed-post]").trigger("click");
 
-                $(".subpage-groupSetting").hide();
-                $(".subpage-groupAbout").hide();
-                $(".subpage-contact").hide();
-                $(".subpage-chatList").hide();
                 $(".subpage-timeline").show();
-                $(".subpage-album").hide();
                 $("#page-group-main").find(".gm-header .page-title").html(page_title);
 
                 //顯示新增貼文按鈕, 藏新增聊天室按鈕
@@ -455,12 +444,7 @@ $(function(){
                 // if(!main)
                     $(".st-navi-subarea[data-st-navi=feed-public]").trigger("click");
 
-                $(".subpage-groupSetting").hide();
-                $(".subpage-groupAbout").hide();
-                $(".subpage-contact").hide();
-                $(".subpage-chatList").hide();
                 $(".subpage-timeline").show();
-                $(".subpage-album").hide();
                 $("#page-group-main").find(".gm-header .page-title").html(page_title);
 
                 //顯示新增貼文按鈕, 藏新增聊天室按鈕
@@ -477,13 +461,7 @@ $(function(){
               break;
             case "album":
                 //-- switch sub pages --
-                $(".subpage-groupSetting").hide();
-                $(".subpage-groupAbout").hide();
-                $(".subpage-contact").hide();
-                $(".subpage-timeline").hide();
-                $(".subpage-chatList").hide();
                 $(".subpage-album").show();
-                // $( "#side-menu" ).panel( "close");
 
                 page_title = $.i18n.getString("COMMON_ALBUM");
 
@@ -499,12 +477,6 @@ $(function(){
               break;
             case "groupSetting":
                 $(".subpage-groupSetting").show();
-                $(".subpage-groupAbout").hide();
-                $(".subpage-contact").hide();
-                $(".subpage-timeline").hide();
-                $(".subpage-chatList").hide();
-                $(".subpage-album").hide();
-                $( "#side-menu" ).panel( "close");
                 
                 //藏新增貼文按鈕, 新增聊天室按鈕
                 $("#page-group-main").find(".gm-header .feed-compose").hide();
@@ -5902,12 +5874,18 @@ $(function(){
 	}
 	//parse 網址
 	getLinkMeta = function (this_compose,url) {
+        s_load_show = true;
 		var q = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
         $.ajax({
             type: 'GET',
             url: q, 
             dataType: 'jsonp',
             timeout: 5000 ,
+            complete: function(){
+                s_load_show = false;
+                $('.ui-loader').hide();
+                $(".ajax-screen-lock").hide();
+            },
             success: function(data, textStatus) {
                 var result = {};
                 var tmp_img,tmp_desc;
@@ -6032,6 +6010,7 @@ $(function(){
 	
 	//parse Youtube
 	getLinkYoutube = function (this_compose,url) {
+        s_load_show = true;
 		if(activityTimeout) clearTimeout(activityTimeout);
 		var activityTimeout = setTimeout(function(){
 			$(".cp-yql-img").html("");
@@ -6044,6 +6023,10 @@ $(function(){
 		            url: "https://gdata.youtube.com/feeds/api/videos/" + youtube_code + "?v=2&prettyprint=true&alt=jsonc",
                     timeout: 5000,
                     complete: function(){
+                        s_load_show = false;
+                        $('.ui-loader').hide();
+                        $(".ajax-screen-lock").hide();
+                        
                         //loading圖示隱藏
                         $(".cp-attach-area .url-loading").hide();
                         //網址讀取結束

@@ -429,11 +429,6 @@ $(function(){
 		//置頂設定
 		topEvent();
 	});
-
-	
-	$(".sm-small-area.setting").click(function(){
-		popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
-	});
 	
 	//----------------------------------- timeline ---------------------------------------------  
 	$(".st-navi-subarea").click(function(){
@@ -1073,9 +1068,6 @@ $(function(){
 	//compose 送出	
 	$(".cp-post").click(function(){
 
-		$('.ui-loader').css("display","block");
-		$(".ajax-screen-lock").show();
-
 		var this_compose = $(document).find(".cp-content");
 		this_compose.data("parse-resend",false);
 
@@ -1098,6 +1090,8 @@ $(function(){
 
 		//網址截取 預備判斷
 		if(this_compose.data("parse-error")) {
+			$('.ui-loader').css("display","block");
+			$(".ajax-screen-lock").show();
 			cns.debug("parse url again");
 			this_compose.data("url-chk",false);
 			this_compose.data("parse-resend",true);
