@@ -191,6 +191,7 @@ $(document).ready(function(){
 		}
 
 		var imageType = /image.*/;
+		var videoType = /video.*/;
 		$.each(file_ori[0].files,function(i,file){
 
 			if (file.type.match(imageType)) {
@@ -216,7 +217,23 @@ $(document).ready(function(){
 
 				reader.readAsDataURL(file);
 				sendImage(this_grid);
-			}else{
+			} else if(file.type.match(videoType)) {
+				var this_grid =  showUnsendMsg("", 7);
+				
+				//編號 方便刪除
+				this_grid.data("file-num",i);
+				this_grid.data("file",file);
+
+				renderVideoFile( file, this_grid.find("div video"), function(videoTag){
+					var parent = videoTag.parents(".msg-video");
+					parent.addClass("loaded");
+					parent.find(".length").html( secondsToTime(videoTag[0].duration) );
+					sendVideo(this_grid);
+				}, function(){
+					var parent = videoTag.parents(".msg-video");
+					parent.addClass("error");
+				});
+			} else{
 				// this_grid.find("div").html('<span>file not supported</span>');
 			}
 		});
@@ -422,6 +439,54 @@ $(document).ready(function(){
 	} catch(e){
 		cns.debug("not work");
 	}
+
+	$(document).on("click",".msg-video.loaded:not(.playing)", function(){
+		var thisTag = $(this);
+		var videoTag = thisTag.find("video");
+		if( videoTag.length>0 ){
+			thisTag.addClass("playing");
+			// thisTag.append("<div class='stopBtn'></div>");
+			videoTag.prop("controls",true);
+			var video = videoTag[0];
+          	video.currentTime = 0;
+			video.play();
+			video.onended = function(){
+				$(this).parent().removeClass("playing");
+				$(this).prop("controls",false);
+			}
+			video.onpause = function(){
+				$(this).parent().addClass("pause");
+			}
+			video.onplay = function(){
+				$(this).parent().removeClass("pause");
+			}
+		}
+	});
+	// $(document).on("click",".msg-video.playing .stopBtn", function(){
+	// 	var thisTag = $(this);
+	// 	var parent = thisTag.parent();
+	// 	var videoTag = parent.find("video");
+	// 	if( videoTag.length>0 ){
+	// 		parent.removeClass("playing");
+	// 		videoTag.prop("controls",false);
+	// 		var video = videoTag[0];
+ //          	video.pause();
+ //          	video.currentTime = video.duration-0.1;
+	// 	}
+	// 	thisTag.remove();
+	// });
+
+	$(document).on("click",".msg-video.loaded.playing", function(){
+		var thisTag = $(this);
+		var videoTag = thisTag.find("video");
+		if( videoTag.length>0 ){
+			thisTag.removeClass("playing");
+			videoTag.prop("controls",false);
+			var video = videoTag[0];
+          	video.pause();
+          	video.currentTime = video.duration-0.1;
+		}
+	});
 });
 
 /*
@@ -559,6 +624,7 @@ function hideLoading(){
 
 function op ( url, type, data, delegate, errorDelegate){
 	$.ajax({
+		// url: "https://caprivateeim.mitake.com.tw/apiv1" + url,
 	    url: "https://apserver.mitake.com.tw/apiv1" + url,
 	    type: type,
 	    data: data,
@@ -877,6 +943,10 @@ function showMsg (object, bIsFront, bIsTmpSend){
 					$(".popup-confirm").html( $.i18n.getString("CHAT_RESEND") );
 					$(".popup-cancel").html( $.i18n.getString("COMMON_DELETE") );
 					$(".popup-cancel").off("click").click(function(){
+						var data = container.data("data");
+						if( data ){
+							g_idb_chat_msgs.remove(data.ei);
+						}
 						container.hide('slow',function(){
 							container.remove();
 						});
@@ -960,6 +1030,16 @@ function showMsg (object, bIsFront, bIsTmpSend){
 			}
 			var pic = $("<img class='msg-img' style='width:150px;height:200px;'>");
 			msgDiv.append(pic);
+			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
+			break;
+		case 7:
+			if(isMe){
+				msgDiv.addClass('chat-msg-container-right');
+			} else {
+				msgDiv.addClass('chat-msg-container-left');
+			}
+			var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><div class='info'><div class='play'></div><div class='length'></div></div></div>");
+			msgDiv.append(video);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
 		case 8: //audio
@@ -1225,6 +1305,61 @@ function sendImage( dom ){
 		});
 	}
 }
+function sendVideo( dom ){
+	var file = dom.data("file");
+	var video = dom.find("video");
+
+	var tmpData = dom.data("data");
+	if( ""!=tmpData.ml[0].c ){
+		sendInput(dom);
+	} else {
+		var ori_arr = [1280,1280,0.9];
+		var tmb_arr = [160,160,0.4];
+		
+		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
+
+		uploadGroupVideo(gi,file,video,ti_chat, 0, ori_arr,tmb_arr, pi, function(data){
+			if( data ){
+				//delete old data
+			    g_idb_chat_msgs.remove(tmpData.ei);
+
+			    tmpData.ml[0].c = data.fi;
+			    tmpData.ml[0].p = pi;
+				//add new data to db & show
+				var newData = {
+					ei:tmpData.ei,
+					meta:{
+						gu: g_group.gu,
+						ct: tmpData.ct
+					},
+					ml:[
+						{tp: tmpData.ml[0].tp,
+			    		c: data.fi,
+			    		p: pi
+			  			}
+					],
+					notSend: true
+				};
+
+				var node = {
+					gi: gi,
+					ci: ci,
+					ei: newData.ei,
+				    ct: newData.ct,
+				    data: newData
+				};
+				g_idb_chat_msgs.put( node );
+				
+				dom.data("data",tmpData);
+
+				sendInput(dom);
+			} else {
+				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+				// if( g_isEndOfPage ) scrollToBottom();
+			}
+		});
+	}
+}
 
 function sendChat (){
 	var inputDom = $("#footer .contents .input");
@@ -1290,6 +1425,7 @@ getChatS3file = function(target, file_c, tp, this_ti, this_tu){
         
 						//重設 style
 						img.removeAttr("style");
+						img.css("background-image","none");
 
 						// if(g_isEndOfPage){
 						// 	scrollToBottom();
@@ -1313,6 +1449,16 @@ getChatS3file = function(target, file_c, tp, this_ti, this_tu){
 					// 		});
 					//     }
 					// 	imgO.src = obj.s32;
+					});
+					break;
+				case 7://video
+					renderVideoUrl(obj.s32, target.find("video"),function(videoTag){
+						var parent = videoTag.parents(".msg-video");
+						parent.addClass("loaded");
+						parent.find(".length").html( secondsToTime(videoTag[0].duration) );
+					}, function(){
+						var parent = videoTag.parents(".msg-video");
+						parent.addClass("error");
 					});
 					break;
 				case 8://聲音

@@ -3336,6 +3336,8 @@ $(function(){
         var cellArea = $("#page-tab-object .tabObj-cell-area");
         tabArea.html("");
         var width = (100.0/list.length)+"%";
+
+        var cnt = 0;
         $.each( list, function(index, object){
             var tab = $("<div class='tab'></div>");
             tab.data("id", index);
@@ -3345,14 +3347,16 @@ $(function(){
             tab.html( tmp );
             tab.data("clickable", (null==object.clickable)?true:(object.clickable) );
             tabArea.append(tab);
+            cnt++;
         });
-        // if( list.length<=1 ){
-        //     tabArea.hide();
-        //     cellArea.addClass("noTitle");
-        // } else {
+
+        if( cnt<=1 ){
+            tabArea.hide();
+            cellArea.addClass("noTitle");
+        } else {
             tabArea.show();
             cellArea.removeClass("noTitle");
-        // }
+        }
 
         //generate page when click
         tabArea.next().html("");
@@ -4123,6 +4127,11 @@ $(function(){
 
 		// 內容狀態 會有很多ml內容組成
 
+        // 若有副件要上傳取得permission id
+        var isWaitingPermission = (this_compose.data("object_str") || this_compose.data("branch_str") );
+        var sendingFileData = [];
+
+
 		//這邊的概念是 貼文可能會有網址 附檔之類的 有這些東西 就用這個迴圈去加出來
 		//但像是任務 投票之類的 因為是可預測的 又是單一的ml 就在上面那邊解決
 		$.each(ml,function(i,mtp){
@@ -4189,34 +4198,49 @@ $(function(){
 					//開啟loading icon
 			        s_load_show = true;
 
-					//先做permission id 
-					cns.debug("object str:",this_compose.data("object_str"));
-					// var object_obj = $.parseJSON(this_compose.data("object_str"));
-					if(this_compose.data("object_str") || this_compose.data("branch_str") ){
-						$.each(this_compose.data("upload-obj"),function(i,file){
-                            cns.debug(this_compose.data("object_str"), this_compose.data("branch_str"))
-							getFilePermissionIdWithTarget(gi, this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
-								var pi_result = $.parseJSON(data.responseText);
-								if(data.status == 200){
-									uploadImg(file,imageType,cnt,total,6,pi_result.pi);		
-									cnt++;
-								}
-							});
-						});							
-							
-					}else{
-						$.each(this_compose.data("upload-obj"),function(i,file){
-							uploadImg(file,imageType,cnt,total,6,0);
-							cnt++;
-						});
-					}
-					this_compose.data("body",body);
+                    //上傳附檔
+                    $.each(this_compose.data("upload-obj"),function(i,file){
+                        if( isWaitingPermission ){
+                            sendingFileData.push({
+                                file: file,
+                                imageType: imageType,
+                                cnt: cnt,
+                                total: total,
+                                type: 6
+                            });
+                        }else{
+                            uploadImg(file,imageType,cnt,total,6,0);
+                            cnt++;
+                        }
+                    });
+					
+                    this_compose.data("body",body);
 					break;
 			}
 
 			//會有順序問題 因為ios只會照ml順序排 所以必須設定順序
 			if(is_push) body.ml.push(obj);
 		});
+
+        // 若有副件要上傳取得permission id
+        if( isWaitingPermission ){
+            cns.debug(this_compose.data("object_str"), this_compose.data("branch_str"))
+            getFilePermissionIdWithTarget(gi, this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
+                if(data.status == 200){
+                    var pi_result = $.parseJSON(data.responseText);
+                
+                    //每次上傳都歸零
+                    this_compose.data("uploaded-num",0);
+                    this_compose.data("uploaded-err",[]);
+                    this_compose.data("img-compose-arr",[]);
+
+                    for(var i=0; i<sendingFileData.length;i++){
+                        var obj = sendingFileData[i];
+                        uploadImg( obj.file, obj.imageType, i, obj.total, obj.type, pi_result.pi);
+                    }
+                }
+            });
+        }
 
 		if(!upload_chk){
 			composeSendApi(body);
@@ -6350,19 +6374,37 @@ $(function(){
                     for( var i in keys ){
                         var key = keys[i];
                         if( val.hasOwnProperty(key) ){
-                            var tmpDiv = $(".polling-cnt[data-polling-cnt="+key+"] .sm-count");
                             if( val[key] > 0){
+                                var tmpDiv = $(".polling-cnt[data-polling-cnt="+key+"] .sm-count");
                                 tmpDiv.html(countsFormat(val[key])).show();
                                 tmpDiv.data("gi",gi);
-                                // cns.debug(gi, key, val[key]);
                             }
                         }
                     }
 
-                    // if( val.B5 ){
-                    //     cns.debug( val.B5 );
-                    // }
 	    		}
+                
+                if( val.cl && val.cl.length>0 ){
+                    var userData = $.lStorage(ui);
+                    g_group = userData[val.gi];
+                    var isSaving = false;
+                    for( var i=0; i<val.cl.length; i++ ){
+                        try{
+                            var clTmp = val.cl[i];
+                            g_room = g_group["chatAll"][clTmp.ci];
+                            if( g_room.unreadCnt!=clTmp.B7 ){
+                                isSaving = true;
+                                g_room.unreadCnt = clTmp.B7;
+                                cns.debug(val.gi, "cl.B7", clTmp.ci, clTmp.B7);
+                            }
+                        } catch(e){
+                            errorReport(e);
+                        }
+                    }
+                    if( isSaving ){
+                        $.lStorage(ui, userData);
+                    }
+                }
 
 	    		if(null!=val.A5){
                     var dom = $(".sm-group-area[data-gi=" + val.gi + "]").find(".sm-count");
@@ -6593,7 +6635,19 @@ $(function(){
     		body.cnts[0] = {
     			gi: this_gi
     		};
-    		body.cnts[0][cnt_type] = 0;
+            if( this_count.hasClass("sm-cl-count") ){
+                if( null==body.cnts[0].cl ){
+                    body.cnts[0].cl = [];
+                }
+                var obj = {};
+                var ciTmp = this_count.data("ci");
+                if( null==ciTmp ) return;
+                obj[cnt_type] = 0;
+                obj.ci = ciTmp;
+                body.cnts[0].cl.push(obj);
+            } else {
+    		    body.cnts[0][cnt_type] = 0;
+            }
     	}
     	// return false;
         var headers = {

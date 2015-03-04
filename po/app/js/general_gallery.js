@@ -45,7 +45,8 @@ $(document).ready(function(){
 				$(this).data("h",this.naturalHeight);
 			});
 			if( list[i].s32 ){
-				img.find("img").attr("src", list[i].s32 );
+				var fileName = getS3FileNameWithExtension( list[i].s32, 6 );
+				img.find("img").attr("src", list[i].s32 ).after('<a href="'+ list[i].s32 +'" download="'+fileName+'"><div></div></a>');
 				// img.css("background-image", "url("+list[i].s32+")" );
 			} else {
 				getS3file( list[i],img.find("img"), 6 );
@@ -60,6 +61,7 @@ $(document).ready(function(){
 
 			$(".rBtn").hide();
 			$(".lBtn").hide();
+			// picArea.addClass("singleImage");
 		} else {
 			$(".cnt").show();
 			$(".cnt .current").html( startIndex+1 );
@@ -67,6 +69,7 @@ $(document).ready(function(){
 
 			$(".rBtn").show();
 			$(".lBtn").show();
+			// picArea.removeClass("singleImage");
 		}
 		changeImgViewSize(0);
 	});
@@ -268,3 +271,11 @@ changeImgViewSize = function(size){
 	}
 	// $(".picArea .align").css("height",(100*size)+"%");
 }
+// downloadImage = function(){
+// 	var picArea = $(".picArea");
+// 	var index = picArea.data("index");
+// 	var imgView = picArea.find(".img:eq("+ index +")");
+
+// 	var download_img = $('<a href="'+ imgView.find("img").attr("src") +'" download></a>');
+// 	download_img.trigger("click");
+// }

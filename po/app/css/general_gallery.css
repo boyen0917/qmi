@@ -55,6 +55,20 @@ header img{
 	-webkit-transition: all 0.3s;
 	top: 63px;
 }
+.picArea .img:hover a div{
+	content: "";
+	width: 100vw;
+	height: 50px;
+	background-position: 95% 50%;
+	background-repeat: no-repeat;
+	background-image: url("../images/dl.png");
+	background-size: contain;
+	position: absolute;
+	bottom: 5px;
+	cursor: pointer;
+	opacity: 0.8;
+}
+
 
 .picArea .img{
 	width: 100%;
@@ -85,14 +99,17 @@ header img{
 }
 .lBtn{
 	float: left;
-	left: 2%;
+	left: 0;
+	padding-right: 2%;
 	text-align: left;
 	background-position-x: 30%;
 	background-image: url("../images/calendar/icon_calendar_arrow_red_end.png");
 }
 .rBtn{
+	height: -webkit-calc( 73% - 40px );
 	float: right;
-	right: 2%;
+	right: 0;
+	padding-left: 2%;
 	text-align: right;
 	background-position-x: 70%;
 	background-image: url("../images/calendar/icon_calendar_arrow_red_start.png");
@@ -122,6 +139,7 @@ header img{
 	/* height: 30px; */
 	bottom: 20px;
 	left: 20px;
+	color: #ccc;
 }
 
 .zoom div{
@@ -134,9 +152,18 @@ header img{
 }
 .zoom .zoomIn, .zoom .zoomOut{
 	font-size: 42px;
-	font-weight: bold;
+	/*font-weight: bold;*/
 	margin-bottom: -11px;
 	width: 40px;
 	text-align: center;
 	cursor: pointer;
+}
+.zoom .download{
+	margin-left: 10px;
+	font-size: 20px;
+	cursor: pointer;
+}
+.zoom .download:hover, .zoom .zoomIn:hover, .zoom .zoomOut:hover{
+	font-weight: bold;
+	color: white;
 }

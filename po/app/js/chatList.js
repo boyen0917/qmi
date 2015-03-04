@@ -184,7 +184,7 @@ function showChatList(){
 
 				room["uiName"]=chatRoomName;
 				$(this).find(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
-				var table = $("<div class='subpage-chatList-row' data-rid='"+room.ci+"' style='width:100%'></div>");
+				var table = $("<div class='subpage-chatList-row polling-cnt-cl' data-rid='"+room.ci+"' style='width:100%' data-polling-cnt='B7' data-ci='"+room.ci+"'></div>");
 				$(table).data("time", 0);
 				
 				var row = $("<div class='tr'></div>");
@@ -202,7 +202,7 @@ function showChatList(){
 				td = $("<div class='td' align='right'></div>");
 				var lastTime = $("<div class='time'></div>");
 				td.append(lastTime);
-				td.append("<div class='cnt'></div>");
+				td.append("<div class='cnt sm-cl-count' data-gi='"+gi+"' data-ci='"+room.ci+"'></div>");
 				td.append("<div class='drag'></div>");
 				row.append(td);
 
@@ -485,11 +485,14 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 				if(cntDom){
 					var cntText = "";
 					if( unreadCnt>99 ){
-						cntText = "99+"
+						cntText = "99+";
+						cntDom.html(cntText).show();
 					} else if(unreadCnt&&unreadCnt>0){
 						cntText = unreadCnt;
+						cntDom.html(cntText).show();
+					} else {
+						cntDom.hide();
 					}
-					cntDom.html(cntText);
 				}
 			}
 		} else if( $(".subpage-chatList").is(":visible") ){

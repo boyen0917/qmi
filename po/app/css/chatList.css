@@ -47,9 +47,7 @@
 .subpage-chatList .coachmake .cm-content div {
 }
 .subpage-chatList-row {
-    border-width: 1px 0px 1px 0px;
-	border-color: #d0d0d0;
-	border-style: solid;
+	border-bottom: #EDEDED 1px solid;
 	background: white;
 	display: block;
 	height: 81px;
@@ -127,15 +125,14 @@
 .subpage-chatList-row .drag {
     width: 23px;
 	height: 25px;
-	background: url("../images/chatroom/chat_list_hiddingmenu_icon_del_click.png");
+	opacity: 0.5;
+	background: url("../images/icon/icon_chatroom_chatlist_del.png");
 	background-repeat: no-repeat;
-	background-size: cover;
+	background-size: contain;
 	display: inline-block;
 }
 .subpage-chatList-row .drag:hover {
-	background: url("../images/chatroom/chat_list_hiddingmenu_icon_del.png");
-	background-repeat: no-repeat;
-	background-size: cover;
+	opacity: 1;
 }
 
 /*

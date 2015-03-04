@@ -332,6 +332,7 @@ body {
 	width: 23px;
 	height: 23px;
 	background-image: url("../images/chatroom/chat_chatroom_icon_nosent.png");
+	margin-top: -11px;
 }
 .chat-msg-bubble-right, .chat-msg-bubble-left{
 	padding: 0.3em 0.6em 0.3em 0.5em;
@@ -343,12 +344,12 @@ body {
 	/*box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);*/
 }
 .chat-msg-bubble-right{
-	border-color: rgb(75,124,219);
 	background: rgb(75,124,219);
 	color: white;
 	text-align: left;
 	word-wrap: break-word;
 	max-width: 63%;
+	border-color: rgb(75,124,219);
 }
 .chat-msg-bubble-right:after, .chat-msg-bubble-left:after{
 	content: '';
@@ -418,15 +419,176 @@ body {
 	max-width: 76%;
 }
 .msg-img{
-	border-radius: 10px;
-	box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);
-	border-style: solid;
-	border-width: 2px;
-	border-color: #6c7faf;
-	background: url("../images/chatroom/chat_chatroom_icon_nophoto.png");
+	border-radius: 6px;
+	/*box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);*/
+	/*border-style: solid;*/
+	/*border-width: 2px;*/
 	background-size: cover;
 	background-position: center;
+	background-image: url("../images/chatroom/chat_chatroom_icon_nophoto.png");
+	border-color: #6c7faf;
 }
+
+
+/*-------------- 影片start ----------------*/
+
+.msg-video{
+	width: 120px;
+	max-height: 120px;
+	height: 120px;
+	content: "X";
+}
+.msg-video:not(.loaded):before{
+	position: absolute;
+	width: 123%;
+	content: "";
+	border-top: 2px solid dimgrey;
+	-webkit-transform: rotate(37deg) translate(13px,45px);  
+	/*background-image: url(../images/st_bottom_loading.gif);*/
+}
+.msg-video.loaded{
+	cursor: pointer;
+	overflow: hidden;
+}
+.msg-video.playing{
+	z-index: 9999;
+	top: 0%;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	max-height: 100%;
+	position: fixed;
+	background-color: rgba(0,0,0,0.9);
+	/*cursor: default;*/
+}
+
+/* videoContainer */
+.msg-video .videoContainer{
+	height: 75%;
+	width: 100%;
+	overflow: hidden;
+}
+.msg-video.playing .videoContainer{
+	height: 100%;
+	width: 100%;
+}
+.msg-video:not(.loaded) .videoContainer{
+	/*border: 1px solid gray;*/
+	background-image: url("../images/chatroom/chat_message_status_icon_video.png");
+	background-repeat: no-repeat;
+	background-size: auto 50%;
+	background-position: 50% 50%;
+	background-color: lightgray;
+	/*border-radius: 5px;*/
+}
+.msg-video.loaded:not(.playing) .videoContainer:before{
+	content: "";
+	background-image: url("../images/chatroom/chat_message_status_icon_video.png");
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 80%;
+	background-size: auto 50%;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+}
+.msg-video.loaded:not(.playing):hover .videoContainer:before{
+	background-image: url("../images/chatroom/chat_message_status_icon_video_click.png");
+}
+
+/* stop btn(暫無用) */
+/*.msg-video.playing .stopBtn{
+	opacity: 0;
+	position: fixed;
+	background-color: rgb(255, 255, 255);
+	border-radius: 3px;
+	width: 30px;
+	height: 30px;
+	bottom: -webkit-calc( 50% - 15px);
+	right: -webkit-calc( 50% - 15px);
+	-webkit-transition: all .3s cubic-bezier(.29,.34,1,.72);
+	   -moz-transition: all .3s cubic-bezier(.29,.34,1,.72);
+	    -ms-transition: all .3s cubic-bezier(.29,.34,1,.72);
+	     -o-transition: all .3s cubic-bezier(.29,.34,1,.72);
+	        transition: all .3s cubic-bezier(.29,.34,1,.72);
+}
+.msg-video.playing:hover .stopBtn,.msg-video.pause .stopBtn{
+	opacity: 0.8;
+}*/
+
+
+/* video本體 */
+.msg-video video{
+	width: 100%;
+	height: 100%;
+	/*border-radius: 5px;*/
+}
+.msg-video video{
+	object-fit: cover;
+}
+.msg-video.playing video{
+	object-fit: contain;
+}
+
+/* info */
+.msg-video .info{
+	height: 25%;
+	width: 100%;
+	/*margin-top: -1px;*/
+}
+.msg-video.playing .info{
+	display: none;
+}
+.msg-video .info div{
+	display: inline-block;
+}
+.msg-video .info .play{
+	height: 100%;
+	width: 25%;
+	background-image: url("../images/chatroom/chat_chatroom_player_icon_play_left.png");
+	background-size: auto 70%;
+	background-repeat: no-repeat;
+	background-position: 28% 50%;
+	vertical-align: middle;
+}
+.msg-video .info .length{
+	height: 100%;
+	width: 75%;
+	color: white;
+	vertical-align: middle;
+	line-height: 30px;
+	text-align: center;
+}
+
+/*左右分色區*/
+.chat-msg-container-right .msg-video{
+	border: 2px solid rgb(59,97,181);
+}
+.chat-msg-container-left .msg-video{
+	border: 2px solid rgb(123,187,236);
+}
+.chat-msg-container-right .msg-video.playing{
+	border: none;
+}
+.chat-msg-container-left .msg-video .info .play{
+	background-color: rgb(102,156,197);
+}
+.chat-msg-container-right .msg-video .info .play{
+	background-color: rgb(59,97,181);
+}
+.chat-msg-container-left .msg-video .info .length{
+	background-color: rgb(123,187,236);
+}
+.chat-msg-container-right .msg-video .info .length{
+	background-color: rgb(81,125,223);
+}
+
+/*-------------- 影片end ----------------*/
+
+
+
+
 .msg-sticker.right{
 	text-align: right;
 	display: inline-block;
@@ -497,7 +659,7 @@ body {
 }
 
 #footer .contents{
-	margin:10px auto;
+	margin: 7px auto 13px;
 	text-align:center;
 	cursor: default;
 }
@@ -546,34 +708,41 @@ body {
 }
 
 #footer .contents .input{
-	width: 60%;
+	width: -webkit-calc( 100% - 165px );
 	border: 1px solid #aaa;
 	border-style: solid;
 	border-radius: 3px;
-	box-shadow: inset 0 1px 4px rgba(0,0,0,.2);
 	display: inline-block;
 	text-align: left;
 	vertical-align: bottom;
 	min-height: 32px;
 	margin: 0 5px;
 	transition: height 0.2s;
+	outline: none;
+	box-shadow: none;
+	/*outline: 2px solid rgb(100, 170, 255);
+	outline-offset: 1px;
+	outline-radius: 3px;*/
 	/*
 	vertical-align: 50%;
 	min-height: 30px;
 	*/
 }
+#footer .contents .input:active,#footer .contents .input:focus{
+	box-shadow: 0 0 3px 2px rgba(57, 148, 232,0.5);
+	border: 1px solid rgba(57, 148, 232,0.7);
+}
 
 #footer .contents .send{
-	/*background: rgb(32,79,150);*/
-	background: rgb(30,78,134);
+	background: rgb(52, 102, 197);
 	color:white;
 	display: inline-block;
 	border-style: hidden;
-	border-radius: 6px;
+	border-radius: 4px;
 	width: 60px;
 	vertical-align: bottom;
 	line-height: 35px;
-	box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.3);
+	/*box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.3);*/
 	height: 35px;
 	/*
 	vertical-align: 56%;
@@ -581,7 +750,7 @@ body {
 	*/
 }
 #footer .contents .send:hover{
-	background: rgb(41,100,167);
+	background: rgb(57, 148, 232);
 }
 
 /*
