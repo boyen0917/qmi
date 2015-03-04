@@ -254,6 +254,7 @@
 	"CHAT_VOIP_MAKE_CALL" : "You've made a call from Qmi.",
 	"CHAT_SOMEONE_LEAVE_GROUP" : "%@ left group.",
 	"CHAT_CHATROOM_MEMBER_EMPTY" : "Please select a target.",
+	"CHAT_UPLOAD_FILE_MISSING" : "File missing, please resend.",
 	
 	"NOTICES_TITLE" :	"New Notices",
 	"NOTICES_POST" :	"Publish",
