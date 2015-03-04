@@ -388,10 +388,10 @@ $(function(){
 	          break;
 	        case "system-setting":
 
-              $("#page-group-main .main-subpage").hide();
-              $(".subpage-systemSetting").show();
+              // $("#page-group-main .main-subpage").hide();
+              // $(".subpage-systemSetting").show();
 
-              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
+              popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
 	          break;
             case "feed-post":
                 $(".st-navi-area").data("currentHome", "feed-post");
