@@ -47,6 +47,11 @@ $(function(){
 	back_exception = false;
 	back_hash = false;
 
+	//登入時間
+	var currentDate = new Date();
+	console.debug("login_time", currentDate.getTime(), currentDate.toString());
+	login_time = currentDate.getTime();
+
 	//timeline裏面點擊不做展開收合的區域
 	timeline_detail_exception = [
 		".st-sub-box-2-content-detail a",

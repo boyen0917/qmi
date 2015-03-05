@@ -423,8 +423,10 @@ $(document).ready(function(){
 		window_focus = true;
 
 		var windowFocusHandler = function() {
-			window.frame.isFocused = true;
-			window_focus = true;
+		  	if( window && window.frame ){
+				window.frame.isFocused = true;
+				window_focus = true;
+			}
 			// $("#header .text").css("color","orange");
 			if( g_isReadPending ){
 				g_isReadPending = false;
@@ -432,8 +434,10 @@ $(document).ready(function(){
 			}
 		  }
 		  , windowBlurHandler = function() {
-		    window.frame.isFocused = false;
-		    window_focus = false;
+		  	if( window && window.frame ){
+			    window.frame.isFocused = false;
+			    window_focus = false;
+		  	}
 		    // $("#header .text").css("color","white");
 		  }
 		;
@@ -443,7 +447,7 @@ $(document).ready(function(){
 		window.addEventListener("focus", windowFocusHandler);
 		window.addEventListener("blur", windowBlurHandler);
 	} catch(e){
-		cns.debug("not work");
+		cns.debug("windows focus detection not work");
 	}
 
 	$(document).on("click",".msg-video.loaded:not(.playing)", function(){
