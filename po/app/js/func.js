@@ -2039,6 +2039,9 @@ $(function(){
             stickerArea.html("");
             stickerArea.data("isCreate", null);
 
+            //set type to adjust content area css height
+            this_compose.attr("data-type", compose_title);
+
 			switch (compose_title) {
 		        case "post":
 		        	ctp = 0;

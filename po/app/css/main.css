@@ -3414,6 +3414,15 @@ img.st-reply-message-attach {
 	left: 4px;
 	max-height: -webkit-calc( 100vh - 224px );
 }
+.cp-content[data-type=announcement] .cp-textarea-desc,
+.cp-content[data-type=feedback] .cp-textarea-desc {
+	max-height: -webkit-calc( 100vh - 339px );
+}
+
+.cp-content[data-type=work] .cp-textarea-desc,
+.cp-content[data-type=vote] .cp-textarea-desc {
+	max-height: 200px;
+}
 
 .cp-content-textarea img{
     margin: auto 15px;
