@@ -1255,6 +1255,21 @@ $(function(){
 		img.src = url;
 	}
 
+	/* node-webkit only */
+	copyTextToClipboard = function( text ){
+		try{
+			// Load native UI library
+			var gui = require('nw.gui');
+			// We can not create a clipboard, we have to receive the system clipboard
+			var clipboard = gui.Clipboard.get();
+			// Or write something
+			clipboard.set(text, 'text');
+			toastShow("copied to clipboard");
+		} catch(e) {
+			// errorReport(e);
+		}
+	}
+
 
     errorReport = function(e){
     	if( e ){
