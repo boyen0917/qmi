@@ -3412,7 +3412,7 @@ img.st-reply-message-attach {
 	position: relative;
 	top: 23px;
 	left: 4px;
-	max-height: 200px;
+	max-height: -webkit-calc( 100vh - 224px );
 }
 
 .cp-content-textarea img{
