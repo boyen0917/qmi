@@ -17,6 +17,18 @@ $(document).ready(function(){
 	var picArea = $(".picArea");
 	//trigger loading
 	$(".dataDom").off("click").click( function(){
+		try{
+			console.debug("on data dom clicked");
+			console.debug("ui", ui, "at", at, "lang", lang);
+			console.debug("startIndex", startIndex);
+			console.debug("this_gi", this_gi);
+			console.debug("this_ti", this_ti);
+			console.debug("list", list);
+			if( null!= list ) console.debug(JSON.stringify(list));
+		} catch(e){
+			errorReport(e);
+		}
+
 		picArea.html("");
 		picArea.data("index", startIndex);
 		picArea.data("cnt", list.length);
@@ -45,10 +57,21 @@ $(document).ready(function(){
 				$(this).data("h",this.naturalHeight);
 			});
 			if( list[i].s32 ){
+				try{
+					console.debug("i", i);
+					console.debug("list[i].s32", list[i].s32);
+				} catch(e){
+					errorReport(e);
+				}
 				var fileName = getS3FileNameWithExtension( list[i].s32, 6 );
 				img.find("img").attr("src", list[i].s32 ).after('<a href="'+ list[i].s32 +'" download="'+fileName+'"><div></div></a>');
 				// img.css("background-image", "url("+list[i].s32+")" );
 			} else {
+				try{
+					console.debug("i", i, "getting s3");
+				} catch(e){
+					errorReport(e);
+				}
 				getS3file( list[i],img.find("img"), 6 );
 			}
 			picArea.append( img );
@@ -198,8 +221,21 @@ getS3file = function(file_obj,target,tp){
         };
     var method = "get";
     var result = ajaxDo(api_name,headers,method,false);
+
+    console.debug(api_name);
+
     result.complete(function(data){
-        if(data.status != 200) return false;
+        if(data.status != 200){
+        	console.debug("get s3 fail");
+        	return false;
+        }
+
+		try{
+			console.debug(data.responseText);
+			console.debug("target",target, "tp",tp);
+		} catch(e){
+			errorReport(e);
+		}
 
         var obj =$.parseJSON(data.responseText);
         obj.api_name = api_name;
