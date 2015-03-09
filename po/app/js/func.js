@@ -780,7 +780,7 @@ $(function(){
 
 
         //輪播
-        var top_timer = setInterval();
+        var top_timer;
 
         clearInterval(top_timer);
 
