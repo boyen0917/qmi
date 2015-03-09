@@ -5982,7 +5982,7 @@ $(function(){
                         $(".cp-ta-yql").fadeIn();
                     }
                 }else{
-                    this_compose.data("parse-error",true);
+                    // this_compose.data("parse-error",true);
                 }
 
                 this_compose.data("message-list").push(1);
@@ -5996,10 +5996,10 @@ $(function(){
             error: function(jqXHR,textStatus,errorThrown ){
                 //網址讀取結束
                 this_compose.data("parse-waiting",false);
-                this_compose.data("parse-error",true);
+                // this_compose.data("parse-error",true);
                 this_compose.data("parse-resend",false);
                 //錯誤訊息
-                toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+                // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
 
                 $(".cp-attach-area .url-loading").hide();
                 //判斷關閉副檔區
@@ -6079,10 +6079,10 @@ $(function(){
 						this_compose.data("message-list").push(2);
 		            },
                     error: function(jqXHR,textStatus,errorThrown ){
-                        this_compose.data("parse-error",true);
+                        // this_compose.data("parse-error",true);
                         this_compose.data("parse-resend",false);
                         //錯誤訊息
-                        toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+                        // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
                         //判斷關閉副檔區
                         composeCheckMessageList();
                     }   
