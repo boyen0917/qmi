@@ -1282,7 +1282,7 @@ $(function(){
     	}
     }
 
-	g_currentVersion = "0.1.4";
+	g_currentVersion = "0.1.5";
     checkVersion = function(){
     	try{
 	    	var currentVersion = $.lStorage("_ver");
