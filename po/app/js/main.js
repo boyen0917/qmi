@@ -861,6 +861,34 @@ $(function(){
 						cns.debug( data.responseText );
 					});
 					break;
+				// case "copy":
+				// 	//get content (title & attachment excluded)
+			 //        var data = this_event.data("event-val");
+			 //        if(data){
+				//     	var stringify = JSON.stringify(data);
+				//     	cns.debug(stringify);
+				// 		copyTextToClipboard( stringify );
+				// 	} else {
+				//     	toastShow("error occurred, null result.");
+				//     }
+				// 	break;
+				case "copyword":
+					//get content (title & attachment excluded)
+			        var data = this_event.data("event-val");
+			        var text = null;
+			        try{
+			        	text = data.ml[0].c;
+					} catch(e) {
+						errorReport(e);
+				    }
+				    if( null!=text ){
+					    cns.debug( text );
+						copyTextToClipboard( text );
+					} else {
+				    	toastShow("error occurred.");
+					}
+					target.siblings(".st-more-close").trigger("click");
+					break;
 			}
 		} catch(e){
 			cns.debug(e);

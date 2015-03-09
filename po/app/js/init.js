@@ -25,11 +25,16 @@ $(function(){
 	countrycode = "+886";
 
 	//語言
-	lang = "zh_TW";
+	lang = "en_US";
 	var userLang = navigator.language || navigator.userLanguage; 
- 	userLang = userLang.replace(/-/g,"_");
- 	if( userLang=="en_US" || userLang=="zh_TW" ){
- 		lang = userLang;
+ 	userLang = userLang.replace(/-/g,"_").toLowerCase();
+
+ 	if( 0==userLang.indexOf("zh") ){
+ 		if( userLang=="zh_cn" ){
+ 			lang = "zh_CN";
+ 		} else {
+ 			lang = "zh_TW";
+ 		}
  	}
 	
 	//動態消息的字數限制
@@ -46,6 +51,11 @@ $(function(){
 	//部分跳頁不需要記錄
 	back_exception = false;
 	back_hash = false;
+
+	//登入時間
+	var currentDate = new Date();
+	console.debug("login_time", currentDate.getTime(), currentDate.toString());
+	login_time = currentDate.getTime();
 
 	//timeline裏面點擊不做展開收合的區域
 	timeline_detail_exception = [

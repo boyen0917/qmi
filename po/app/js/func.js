@@ -338,7 +338,10 @@ $(function(){
 
 	          break;
 	        case "memberslist": 
-
+                groupSwitchEnable();
+                $(".subpage-groupSetting").hide();
+                $(".subpage-groupAbout").hide();
+                
 	        	$(".subpage-contact").show();
                 
                 //藏新增貼文按鈕, 新增聊天室按鈕
@@ -360,7 +363,7 @@ $(function(){
 	        	initContactList();
 	          break;
 	        case "chat":
-
+                groupSwitchEnable();
                 //offical general
                 if( false==onClickOfficialGeneralChat(gi) ){
 
@@ -476,6 +479,7 @@ $(function(){
                 //$("#page-group-main").find("div[data-role=header] h3").html("聊天室");
               break;
             case "groupSetting":
+                groupSwitchEnable();
                 $(".subpage-groupSetting").show();
                 
                 //藏新增貼文按鈕, 新增聊天室按鈕
@@ -2034,6 +2038,9 @@ $(function(){
             }
             stickerArea.html("");
             stickerArea.data("isCreate", null);
+
+            //set type to adjust content area css height
+            this_compose.attr("data-type", compose_title);
 
 			switch (compose_title) {
 		        case "post":
@@ -5174,7 +5181,7 @@ $(function(){
 	}
 
     groupSwitchEnable = function() {
-        cns.debug("qwerqowieuroiw");
+        cns.debug("groupSwitchEnable");
         $(".st-filter-area").removeClass("st-filter-lock");
         $(".sm-group-area").addClass("enable");
     }
@@ -6386,23 +6393,27 @@ $(function(){
                 
                 if( val.cl && val.cl.length>0 ){
                     var userData = $.lStorage(ui);
-                    g_group = userData[val.gi];
-                    var isSaving = false;
-                    for( var i=0; i<val.cl.length; i++ ){
-                        try{
-                            var clTmp = val.cl[i];
-                            g_room = g_group["chatAll"][clTmp.ci];
-                            if( g_room.unreadCnt!=clTmp.B7 ){
-                                isSaving = true;
-                                g_room.unreadCnt = clTmp.B7;
-                                cns.debug(val.gi, "cl.B7", clTmp.ci, clTmp.B7);
+                    if( userData.hasOwnProperty(val.gi) ){
+                        g_group = userData[val.gi];
+                        var isSaving = false;
+                        for( var i=0; i<val.cl.length; i++ ){
+                            try{
+                                var clTmp = val.cl[i];
+                                if( g_group.chatAll && g_group.chatAll.hasOwnProperty(clTmp.ci) ){
+                                    g_room = g_group["chatAll"][clTmp.ci];
+                                    if( g_room.unreadCnt!=clTmp.B7 ){
+                                        isSaving = true;
+                                        g_room.unreadCnt = clTmp.B7;
+                                        cns.debug(val.gi, "cl.B7", clTmp.ci, clTmp.B7);
+                                    }
+                                }
+                            } catch(e){
+                                errorReport(e);
                             }
-                        } catch(e){
-                            errorReport(e);
                         }
-                    }
-                    if( isSaving ){
-                        $.lStorage(ui, userData);
+                        if( isSaving ){
+                            $.lStorage(ui, userData);
+                        }
                     }
                 }
 
@@ -6457,6 +6468,15 @@ $(function(){
             gi = $(".sm-group-area.active").data("gi");
         }
     	if(cmds&&cmds.length>0){
+            var pollingDataTmp = $.lStorage("_pollingData");
+            var currentPollingCt = 9999999999999;
+            if(pollingDataTmp){
+                currentPollingCt = pollingDataTmp.ts.pt;
+            }
+            if( currentPollingCt>=login_time ){
+            } else {
+                cns.debug("----- hide " );
+            }
     		$.each(cmds,function(i,val){
 	    		switch(val.tp){
 	    			case 1://timeline list
@@ -6477,9 +6497,11 @@ $(function(){
                             $(".hg-invite").trigger("click");
                         }
                         try{
-                            riseNotification (null, g_Qmi_title, $.i18n.getString("GROUP_RECEIVE_INVITATION"), function(){
-                                $(".hg-invite").trigger("click");
-                            });
+                            if( currentPollingCt>=login_time ){
+                                riseNotification (null, g_Qmi_title, $.i18n.getString("GROUP_RECEIVE_INVITATION"), function(){
+                                    $(".hg-invite").trigger("click");
+                                });
+                            }
                         } catch(e) {
                             cns.debug( e.message );
                         }
@@ -6489,13 +6511,15 @@ $(function(){
                         cns.debug(gi, val.pm.gi);
                         val.pm.onGetMemData = function(this_gi, memData){
                             try{
-                                riseNotification( null, g_Qmi_title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
-                                    if( gi==this_gi ){
-                                        $(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
-                                    } else {
-                                        $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
-                                    }
-                                });
+                                if( currentPollingCt>=login_time ){
+                                    riseNotification( null, g_Qmi_title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
+                                        if( gi==this_gi ){
+                                            $(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
+                                        } else {
+                                            $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
+                                        }
+                                    });
+                                }
                             } catch(e){
                                 errorReport(e);
                             }
@@ -6514,11 +6538,13 @@ $(function(){
                     case 6://delete user info
                         val.pm.onGetMemData = function(this_gi, memData){
                             try{
-                                riseNotification( null, g_Qmi_title, $.i18n.getString("GROUP_X_LEAVE_GROUP", memData.nk), function(){
-                                    if( gi==this_gi ){
-                                        $(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
-                                    }
-                                });
+                                if( currentPollingCt>=login_time ){
+                                    riseNotification( null, g_Qmi_title, $.i18n.getString("GROUP_X_LEAVE_GROUP", memData.nk), function(){
+                                        if( gi==this_gi ){
+                                            $(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
+                                        }
+                                    });
+                                }
                             } catch(e){
                                 errorReport(e);
                             }

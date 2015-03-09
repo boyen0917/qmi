@@ -436,6 +436,9 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		case 6: //pic
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_PHOTO", name);
 			break;
+		case 7: //video
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_VIDEO", name);
+			break; 
 		case 8: //audio
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_VOICE", name);
 			break; 
@@ -506,13 +509,20 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			if( null==room.cn ) room.cn = "";
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			var cnTmp = parseRoomName(groupData, room);
-			riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
-				cns.debug(ciTmp);
-				openChatWindow( giTmp, ciTmp );
-			});
+			if( data.meta.ct>=login_time ){
+				riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
+					cns.debug(ciTmp);
+					openChatWindow( giTmp, ciTmp );
+				});
+			} else{
+				cns.debug("chat", data.meta.ct);
+				cns.debug("chat", login_time);
+			}
 		} catch(e) {
 			cns.debug( e.message );
 		}
+	} else {
+		cns.debug(groupData.gu, mem.gu, isShowAlert);
 	}
 }
 
