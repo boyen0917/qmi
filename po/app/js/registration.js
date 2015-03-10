@@ -4,8 +4,6 @@ $(function(){
 	updateLanguage( lang );
 
 
-	checkVersion();
-
 	//預設上一頁
 	$(document).data("page-history",[["#page-registration"]]);
 	
