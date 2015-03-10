@@ -1142,30 +1142,12 @@ function showMap (msgData, container){
 	mapDiv.append("<div class='img'></div>" );
 	mapDiv.append("<div class='text'>" + msgData.a + "</div>");
 	mapDiv.click(function(){
-		var gallery = window.open("", "", "width=800, height=800");
+		var gallery = window.open("layout/mapPreview.html", "", "width=800, height=800");
 		$(gallery.document).ready(function(){
-				var body = $(gallery.document).find("body");
-				body.css("background","black");
-				body.css( "overflow", "hidden" );
-				body.css( "padding", "0" );
-				var this_slide = $("<div></div>");
-				this_slide.css( "margin", "-8px" );
-				this_slide.css("width","800px");
-				this_slide.css("height","800px");
-				body.append( this_slide );
 			setTimeout(function(){
-				this_slide.tinyMap({
-					 center: {x: msgData.lat, y: msgData.lng},
-					 // zoomControl: 0,
-					 mapTypeControl: 0,
-					 // scaleControl: 0,
-					 scrollwheel: 0,
-					 zoom: 16,
-					 marker: [
-		    	         {addr: [msgData.lat, msgData.lng], text: msgData.a}
-					 ]
-				});
-			},300);
+				gallery.msgData = msgData;
+				$(gallery.document).find("#dataDom").trigger("click");
+			},800);
 		});
 	});
 	container.append(mapDiv);
