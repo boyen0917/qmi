@@ -1334,7 +1334,7 @@ function sendInput ( dom ){
 
 function sendText(dom){
 	var tmpData = dom.data("data");
-	cns.debug("send", new Date(tmpData.meta.ct), new Date(tmpData.meta.ct) );
+	cns.debug("send" );	//, new Date(tmpData.meta.ct), new Date(tmpData.meta.ct)
 	var sendData = {
 		meta:{
 		  lv: 2,
@@ -1880,13 +1880,20 @@ function addMember(){
 					var memListString = btn.data("object_str");
 					//單人聊天室的話變成創新聊天室流程
 					if( g_room.tp==1 ){
-						var list = $.parseJSON(memListString);
-						for( var gu in g_room.memList ){
-							list[gu] = g_group.guAll[gu].nk;
+						try{
+							var list = $.parseJSON(memListString);
+							for( var gu in g_room.memList ){
+								list[gu] = g_group.guAll[gu].nk;
+							}
+							var parent = $(window.opener.document);
+							var tmp = parent.find(".chatList-add-done");
+							tmp.attr("data-object_str",JSON.stringify(list) );
+							tmp.attr("data-favorite_str","{}");
+							parent.find(".chatList-add-done").trigger("click");
+							$(window.opener)[0].focus();
+						} catch(e){
+							errorReport(e);
 						}
-						var parent = $(window.opener.document);
-						parent.find(".chatList-add-done").attr("data-object_str",JSON.stringify(list) );
-						parent.find(".chatList-add-done").trigger("click");
 						return;
 					}
 

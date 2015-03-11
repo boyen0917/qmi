@@ -7,6 +7,7 @@ var sortRoomListTimeout = 700;
 $(document).ready(function(){
 	$(".chatList-add-done").on("click", function(){
 		$(".chatList-add").data("object_str", $(this).attr("data-object_str") );
+		$(".chatList-add").data("favorite_str", $(this).attr("data-favorite_str") );
 		onShowNewRoomPageDone();
 	});
 	$(document).on("click",".newChatDetail-header",function(){
