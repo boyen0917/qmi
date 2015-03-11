@@ -30,6 +30,8 @@ var isShowUnreadAndReadTime = true;
 var window_focus = true;
 var g_isReadPending = false;
 var g_tu;
+var g_firstLoadingProcess = 1;
+var g_currentScrollToDom = null;
 
 /*
               ███████╗███████╗████████╗██╗   ██╗██████╗           
@@ -40,10 +42,17 @@ var g_tu;
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   */
 $(document).ready(function(){
-	if( window.opener ){
-		window.resizeTo( Math.min(450,$(window.opener).width()), window.opener.outerHeight );
-	} else {
-		window.resizeTo( 450, 800 );
+	try{
+		var gui = require('nw.gui');
+		var win = gui.Window.get();
+		win.width = 450;
+	} catch(e){
+		cns.debug("not node-webkit");
+		if( window.opener ){
+			window.resizeTo( Math.min(450,$(window.opener).width()), window.opener.outerHeight );
+		} else {
+			window.resizeTo( 450, 800 );
+		}
 	}
 	
 	// window.moveTo( window.opener.screenX+20, window.opener.screenY+20 );
@@ -176,7 +185,7 @@ $(document).ready(function(){
 	$("#chat-toBottom").click(scrollToBottom);
 
 	$("#chat-toBottom").off("resize");
-	$(window).resize(resizeContent);
+	// $(window).resize(resizeContent);
 	$(".input").data("h", $(".input").innerHeight());
 
 	//other (img only now)
@@ -196,6 +205,7 @@ $(document).ready(function(){
 
 			if (file.type.match(imageType)) {
 				var this_grid =  showUnsendMsg("", 6);
+				scrollToBottom();
 				
 				//編號 方便刪除
 				this_grid.data("file-num",i);
@@ -219,6 +229,7 @@ $(document).ready(function(){
 				sendImage(this_grid);
 			} else if(file.type.match(videoType)) {
 				var this_grid =  showUnsendMsg("", 7);
+				scrollToBottom();
 				
 				//編號 方便刪除
 				this_grid.data("file-num",i);
@@ -267,52 +278,18 @@ $(document).ready(function(){
 		}
 		// cns.debug("emoji: ", g_extraSendOpenStatus);
 	});
-	resizeContent();
+	// resizeContent();
 
-	$( window ).scroll( function(){
-		if( !$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition") ) return;
+	$( "#container" ).on("mousewheel", onScrollContainer );
+	$( "html, body" ).scroll( onScrollBody );
 
-		var posi = $(window).scrollTop();
-		if(  !g_bIsEndOfHistory && posi <= $("#chat-loading").height()*0.5 ){
-			if( false==g_bIsLoadHistoryMsg ){
-				getHistoryMsg( false );
-			}
-			g_isEndOfPage = false;
-			return;
-		}
-		var height = $(window).height();
-		var docHeight = $(document).height();
-		var isAtBottom = ((posi + height+5) >= docHeight);
-		if( g_isEndOfPage != isAtBottom ){
-			g_isEndOfPage = isAtBottom;
-			g_isEndOfPageTime = new Date().getTime();
-			// cns.debug("!");
-		}
+	$("button.pollingCnt").off("click").click( updateChatCnt );
+	$("button.pollingMsg").off("click").click( function(){
+		updateChat(g_room.lastCt, true);
 	});
-
-	// if( g_bIsPolling ){
-		$("button.pollingCnt").off("click").click( updateChatCnt );
-		$("button.pollingMsg").off("click").click( function(){
-			for( var i=0; i<g_msgTmp.length; i++ ){
-				var object = g_msgTmp[i];
-				if( null!=object && g_msgs.indexOf(object.ei)<0 ){
-					showMsg( object );
-				}
-			}
-			sendMsgRead( g_currentDate.getTime() );
-			if( isUpdatePermission ) getPermition(true);
-		});
-		updateChat();
-	// }
+	updateChat(g_room.lastCt, true);
 
 	var enterTime = new Date();
-	//set update contents
-	// setInterval(function() {
-	//     if( !g_bIsPolling ){
-	// 	    updateChat();
-	// 	    updateChatCnt();
-	//     }
-	// }, 1500);
 
 	setInterval(function() {
 	    checkPagePosition();
@@ -403,7 +380,7 @@ $(document).ready(function(){
 			function(){
 				cns.debug("on page change done");
 			},function( isDone ){
-				scrollToBottom();
+				// scrollToBottom();
 				setTimeout( function(){
 					checkPagePosition();
 					$("#page-chat").removeClass("transition");
@@ -430,7 +407,7 @@ $(document).ready(function(){
 			// $("#header .text").css("color","orange");
 			if( g_isReadPending ){
 				g_isReadPending = false;
-			    sendMsgRead( g_currentDate.getTime());
+			    sendMsgRead();
 			}
 		  }
 		  , windowBlurHandler = function() {
@@ -454,6 +431,13 @@ $(document).ready(function(){
 		var thisTag = $(this);
 		var videoTag = thisTag.find("video");
 		if( videoTag.length>0 ){
+			var header = $("#header");
+			header.slideUp();
+			var footer = $("#footer");
+			footer.animate({bottom:"-255px"});
+			var containerTmp = $("#container");
+			var oriOffset = containerTmp.scrollTop();
+			containerTmp.css("top","0").css("height","100%");
 			thisTag.addClass("playing");
 			// thisTag.append("<div class='stopBtn'></div>");
 			videoTag.prop("controls",true);
@@ -463,6 +447,14 @@ $(document).ready(function(){
 			video.onended = function(){
 				$(this).prop("controls",false);
 				$(this).parents(".msg-video").removeClass("playing");
+				header.slideDown();
+				footer.animate({bottom:"-205px"});
+				
+				containerTmp.css("top","65px").css("height","-webkit-calc( 100vh - 116px )").scrollTop(oriOffset);
+				// containerTmp.animate({top:"65px",height:"-=116"},function(){
+				// 	containerTmp.css("height","-webkit-calc( 100vh - 116px )");
+				// 	containerTmp.scrollTop(oriOffset);
+				// });
 			}
 			video.onpause = function(){
 				$(this).parents(".msg-video").addClass("pause");
@@ -491,10 +483,11 @@ $(document).ready(function(){
 		var videoTag = thisTag.find("video");
 		if( videoTag.length>0 ){
 			thisTag.removeClass("playing");
-			videoTag.prop("controls",false);
+			// videoTag.prop("controls",false);
 			var video = videoTag[0];
           	video.pause();
           	video.currentTime = video.duration-0.1;
+          	video.onended();
 		}
 	});
 });
@@ -550,44 +543,78 @@ function onChatDBInit(){
 	lastMsg.append( timeTag );
 	$("#chat-contents").append( lastMsg );
 	$("#chat-contents").append( "<div class='tmpMsg'></div>" );
-	getHistoryMsg( false );
+	// getHistoryMsg( false );
 
 	scrollToBottom();
 }
 
 //show history chat contents
 function getHistoryMsg ( bIsScrollToTop ){
+	var container = $("#container");
+	// $("#container").off("scroll");
 	g_bIsLoadHistoryMsg = true;
-	// cns.debug(g_lastDate);
+
+	$("#chat-loading-grayArea").hide();
+	$("#chat-loading").show();
+	cns.debug("----- getHistoryMsg ------");
     g_idb_chat_msgs.limit(function(list){
+    	var firstDayDiv = $("#chat-contents .chat-date-tag");
+    	var scrollToDiv = (firstDayDiv.length>0 ) ? firstDayDiv[0] : null;
+    	var currentFirstDiv = firstDayDiv.next().children("div:eq(0)");
+	    
+	    //add red border to fist dom to test current position
+	    // $(".sdfsfg").removeClass("sdfsfg").css("border", "");
+	    // currentFirstDiv.addClass("sdfsfg").css("border", "1px solid red");
+
         //cns.debug("list:",JSON.stringify(list,null,2));
         if( list.length>0 ){
         	//list is from near to far day
 	        for( var i in list){
-	        	if( null==list[i] || g_msgs.indexOf(list[i].ei)>=0 ){
+	        	if( null==list[i]|| null==list[i].ei || g_msgs.indexOf(list[i].ei)>=0 ){
 					continue;
 				} else {
 	        		var object = list[i].data;
 					showMsg( object );
+					if(scrollToDiv) scrollToDiv.scrollIntoView();
 				}
 	        }
 	        if( isUpdatePermission ) getPermition(true);
 	    
 			// sendMsgRead(g_currentDate.getTime());
-			
-			// if( g_bIsPolling )	updateChat();
+
 
 	    	if(bIsScrollToTop){
-	    		scrollToStart();
+	    		// container.scroll( onScrollContainer );
 	    		g_bIsLoadHistoryMsg = false;
+	    		cns.debug("---- end loading -----");
 	    	} else {
-	    		setTimeout( hideLoading, 1000);
+	    		// setTimeout( hideLoading, 1000);
 	    	}
 	    	updateChatCnt();
 	    }
+	    setTimeout( function(){
+	    	//onScrollContainer
+			g_bIsLoadHistoryMsg = false;
+	    	cns.debug("---- end loading -----");
+		},1000);
 
-	    if( list.length<20 ){
-	    	updateChat( g_lastDate.getTime() );
+
+	    if( 0==g_firstLoadingProcess ){
+	    	if( list.length<20 ){
+	    		//not enough history in db, fetch from server
+		    	updateChat( g_lastDate.getTime(),false, currentFirstDiv );
+	    	} else{
+	    		//end loading history, hide loading & scroll to last dom we were at
+	    		hideLoading( currentFirstDiv );
+	    	}
+	    } else {
+	    	//first time loading finished,
+	    	// scroll to bottom
+			scrollToBottom();
+
+			$("#chat-loading").hide();
+			$("#chat-loading-grayArea").show();
+			g_firstLoadingProcess--;
 	    }
     },{
         index: "gi_ci_ct",
@@ -606,30 +633,53 @@ function getHistoryMsg ( bIsScrollToTop ){
         }
     });
 
-	if( null==getHistoryMsgTimeout ){
-		if( g_bIsLoadHistoryMsg ) {
-			getHistoryMsgTimeout = setTimeout(function(){
-				g_bIsLoadHistoryMsg = false;
-				hideLoading();
-				getHistoryMsgTimeout = null;
-			}, 2000);
-		}
-	}
+	// if( null==getHistoryMsgTimeout ){
+	// 	if( g_bIsLoadHistoryMsg ) {
+	// 		getHistoryMsgTimeout = setTimeout(function(){
+	// 			g_bIsLoadHistoryMsg = false;
+	// 			hideLoading();
+	// 			getHistoryMsgTimeout = null;
+	// 		}, 2000);
+	// 	}
+	// }
 }
 
-function hideLoading(){
+function hideLoading( targetScrollTo ){
 	if( !$("#page-chat").is(":visible") 
 		|| $("#page-chat").hasClass("transition")
 		|| g_bIsEndOfHistory ) return;
 	
-	var loading = $("#container #chat-loading");
-	// firstDom.css("background", "red");
-	var tmp = loading.offset();
-	if( tmp ){
-		var offset = loading.offset().top+loading.height();
-		$('html, body').scrollTop( offset );
-	}
-	g_bIsLoadHistoryMsg = false;
+	cns.debug("-- hideLoading start --");
+	$("#chat-loading").stop().fadeOut( function(){
+		if( false==g_bIsEndOfHistory ){
+			$("#chat-loading-grayArea").show();
+		}
+		// if( targetScrollTo) targetScrollTo = targetScrollTo.prev();
+		if( targetScrollTo && targetScrollTo.length>0 ){
+			targetScrollTo[0].scrollIntoView();
+			g_currentScrollToDom = targetScrollTo[0];
+		} else {
+			var container = $("#container");
+			var loading = container.children("#chat-loading");
+			var posi = container.scrollTop();
+			if( posi <= loading.height() ){
+				var content = $("#chat-contents");
+				// if( content.length>0 ){
+				// 	content[0].scrollIntoView();
+				// }
+				container.scrollTop( content.offset().top );
+			}
+		}
+		cns.debug("-- hideLoading end --");
+	});
+	// // firstDom.css("background", "red");
+	// var tmp = loading.offset();
+	// if( tmp ){
+	// 	var offset = loading.offset().top+loading.height();
+	// 	$('html, body').scrollTop( offset );
+	// }
+	// g_bIsLoadHistoryMsg = false;
+
 }
 
 function op ( url, type, data, delegate, errorDelegate){
@@ -653,31 +703,50 @@ function op ( url, type, data, delegate, errorDelegate){
 }
 
 function scrollToStart (){
-	$('html, body').stop(false, true).animate({scrollTop:50}, 'fast');
+	$('#container').stop(false, true).animate({scrollTop:50}, 'fast');
 }
 
 function scrollToBottom (){
 	// cns.debug( "scrollToBottom", $(document).height()+50  );
-	$('html, body').stop(false, true).animate({scrollTop:$(document).height()+50}, 'fast');
+	$('#container').stop(false, true).animate({scrollTop:$("#chat-contents").height()+50}, 'fast');
 	g_isEndOfPage = true;
 }
 
 function checkPagePosition (){
 	if( !$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition") ) return;
 
-	if( new Date().getTime() > (g_isEndOfPageTime+500) ){
-		if( g_isEndOfPage ){
-			var posi = $(window).scrollTop();
+	var currentTime = new Date().getTime();
+	if( currentTime >= g_isEndOfPageTime ){
+		// if( g_isEndOfPage ){
+		// 	var container = $('#container');
+		// 	if( container.length>0 ){
+		// 		var posi = container.scrollTop();
 
-			var height = $(window).height();
-			var docHeight = $(document).height();
-			var isAtBottom = ((posi + height+5) >= docHeight);
-			if( !isAtBottom )	scrollToBottom();
+		// 		var height = container.height();
+		// 		var docHeight = container[0].scrollHeight;
+		// 		var isAtBottom = ((posi + height+5) >= docHeight);
+		// 		// if( !isAtBottom )	scrollToBottom();
 
-			$("#chat-toBottom").fadeOut('fast');
-		} else{
-			$("#chat-toBottom").fadeIn('fast');
-		}
+		// 		$("#chat-toBottom").fadeOut('fast');
+		// 	}
+		// } else{
+		// 	$("#chat-toBottom").fadeIn('fast');
+		// }
+
+			var container = $('#container');
+			if( container.length>0 ){
+				var posi = container.scrollTop();
+				var height = container.height();
+				var docHeight = container[0].scrollHeight;
+				var isAtBottom = ((posi + height+35) >= docHeight);
+				// cns.debug(isAtBottom, posi, height, docHeight);
+				// if( !isAtBottom )	scrollToBottom();
+
+				if( isAtBottom ) $("#chat-toBottom").fadeOut('fast');
+				else $("#chat-toBottom").fadeIn('fast');
+				g_isEndOfPage = isAtBottom;
+			}
+			g_isEndOfPageTime = currentTime +1000; 
 	}
 	// if( g_isEndOfPage != isAtBottom ){
 	// 	// if( !isAtBottom) cns.debug(height, docHeight, (posi + height), docHeight );
@@ -702,27 +771,35 @@ function getChatMemName (groupUID){
 	return mem.nk;
 }
 
-function updateChat ( time ){
+function updateChat ( time, isGetNewer, firstScrollDom ){
+	cns.debug("-------- updateChat", isGetNewer, time, " ---------");
 	var api = "/groups/"+gi+"/chats/"+ci+"/messages";
-	if( time ){
+	if( null!=isGetNewer ){
+		if( true==isGetNewer ) api+="?d=true";
+		else if( false==isGetNewer ) api+="?d=false";
+		if( time ){
+			api+="&ct="+time;
+		}
+	} else if( time ){
 		api+="?ct="+time;
 	}
-	op(api, "GET", "", function(data, status, xhr) {
-			//檢查是否需要更新.
-	   //  	if( false == g_bIsPolling ){
-				// if( data.el.hasOwnProperty("0") ){
-				// 	var object = data.el["0"];
-				// 	if( g_lastMsgEi==object.ei ){
-				// 		return;
-				// 	} else {
-				// 		g_lastMsgEi=object.ei;
-				// 	}
-				// }
-	   //  	}
 
+	var scrollToDom = ( false==isGetNewer && null!=firstScrollDom && firstScrollDom.length>0 )?firstScrollDom[0]:null ;
+
+	op(api, "GET", "", function(data, status, xhr) {
+			var userData = $.lStorage(ui);
+		    g_group = userData[gi];
+		    g_room = g_group["chatAll"][ci];
+		    if( null==g_room.lastCt ) g_room.lastCt = 0;
+		    var isEndOfPageTmp = g_isEndOfPage;
 	        for( var i=(data.el.length-1); i>=0; i--){
 				var object = data.el[i];
 				if(object.hasOwnProperty("meta")){
+
+					if( object.meta.ct>g_room.lastCt ){
+						g_room.lastCt = object.meta.ct;
+						cns.debug(object.meta.ct ); //, new Date(object.meta.ct)
+					}
 					//showMsg(container, data.el[key], time);
 
 					//pass shown msgs
@@ -746,29 +823,77 @@ function updateChat ( time ){
 						
 
 						showMsg( object );
+						if(scrollToDom) scrollToDom.scrollIntoView();
+						// isUpdateFinish = false;
 					}
 				}
 			}
+			$.lStorage(ui, userData);
+
 			if( isUpdatePermission ) getPermition( true );
 
-            //scroll to bottom
-			if( g_needsRolling ){
-				g_needsRolling = false;
-				scrollToBottom();
-			}
+			//getting new msg
+			if( isGetNewer || (false==isGetNewer && null==time)){
 
-			if( typeof(time)=='undefined' ){
-				sendMsgRead( g_currentDate.getTime() );
-			} else {
-				if( data.el.length==0 ){
+				//update finished
+				if( data.el.length<=1 ){
+					//if first enter
+					if( 1>=g_firstLoadingProcess ){
+						//if server only response 'few' msg
+						// & no time specified, there might be history msgs
+						if( g_msgs.length<20 && null!=time && false==g_bIsEndOfHistory ) getHistoryMsg();
+						else{
+							g_firstLoadingProcess--;
+							cns.debug("----- finished new ", data.el.length, isGetNewer, " -----");
+							//the few msgs r all msgs in this chatroom
+							//first time in, so scroll to bottom
+							scrollToBottom();
+							//hide loading
+							if( false==g_bIsEndOfHistory ){
+								$("#chat-loading").hide();
+								$("#chat-loading-grayArea").show();
+							}
+							sendMsgRead();
+						}
+					} else{ //not first time in
+						//just scroll to bottom if we were at bottom
+						sendMsgRead();
+						if( isEndOfPageTmp ) scrollToBottom();
+					}
+			    } else { //update not finish
+					cns.debug("----- not finished new ", data.el.length, " -----");
+					updateChat ( g_room.lastCt, isGetNewer );
+			    }
+			} else{ //getting old msgs
+				cns.debug("----- finished old ", data.el.length, isGetNewer, " -----");
+	            
+				//no more history
+				if( 1>=data.el.length ){
 					g_bIsEndOfHistory = true;
+					$("#chat-loading-grayArea").hide();
 					$("#chat-loading").hide();
-					$("#chat-nomore").show();
+						$("#chat-nomore").show();
+					// $("#chat-loading").fadeOut( function(){
+						// $("#chat-nomore").show();
+					// });
+					// $("#chat-loading-grayArea").hide();
+					// $('#container').scrollTop(0);
+				} else{
+			        //scroll to the last dom we were at
+					hideLoading(firstScrollDom);
 				}
+
+
 				updateChatCnt();
 			}
 			
-	    }	//end of function
+	    },	//end of onsucc function
+	    function(){	
+	    	if( false==isGetNewer ){
+	    		popupShowAdjust("",$.i18n.getString("COMMON_CHECK_NETWORK"));
+	    		hideLoading();
+	    	}
+	    }	//end of onerror function
 	);	//end of op
 }	//end of updateChat
 
@@ -860,10 +985,10 @@ function showMsg (object, bIsTmpSend){
 			var bIsAdd = false;
 			for( var i=0; i<allTimeTag.length-1; i++){
 				cns.debug( $(allTimeTag[i]).data("time") );
-				cns.debug( time.getTime() );
+				// cns.debug( time.getTime(), time.toString() );
 
 				if( $(allTimeTag[i]).data("time") > time.getTime() ){
-					cns.debug("1", time);
+					// cns.debug("1", time);
 					$(allTimeTag[i]).before(timeTag);
 					bIsAdd = true;
 					break;
@@ -871,11 +996,11 @@ function showMsg (object, bIsTmpSend){
 			}
 			if(!bIsAdd){
 				$("#chat-contents .lastMsg").before(timeTag);
-					cns.debug("2", time);
+					// cns.debug("2", time);
 			}
 		} else{
 			$("#chat-contents .lastMsg").before(timeTag);
-					cns.debug("3", time);
+					// cns.debug("3", time);
 		}
 		// if(time.getTime()<g_lastDate){
 		// 	$("#chat-contents .firstMsg").after(timeTag);
@@ -1041,7 +1166,7 @@ function showMsg (object, bIsTmpSend){
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			var pic = $("<img class='msg-img' style='width:150px;height:200px;'>");
+			var pic = $("<img class='msg-img' style='width:150px;'>");
 			msgDiv.append(pic);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
@@ -1422,7 +1547,6 @@ function sendChat (){
 	// inputDom.val("").trigger('autosize.resize');
 	
 	var dom = showUnsendMsg(msg, 0);
-	scrollToBottom();
 	sendInput( dom );
 }
 
@@ -1546,8 +1670,12 @@ function getPermition( isReget ){
 					if( g_room.memCount>2 ){
 				    	$("#header .count").show();
 				    	$("#header .count").html( "("+g_room.memCount+")" );
+				    	$(".extra-content .btn[data-type=edit]").show();
+				    	$(".extra-content .btn[data-type=exit]").show();
 				    } else {
 				    	$("#header .count").hide();
+				    	$(".extra-content .btn[data-type=edit]").hide();
+				    	$(".extra-content .btn[data-type=exit]").hide();
 				    }
 					$.lStorage( ui, userData );
 
@@ -1588,6 +1716,8 @@ function getPermition( isReget ){
 }
 
 function sendMsgRead( msTime ){
+	msTime = g_room.lastCt || msTime;
+	if( null==msTime ) return;
 	if(false==window_focus){
 		g_isReadPending = true;
 		cns.debug("[sendMsgRead]not focus");
@@ -1658,7 +1788,7 @@ function delMember(){
 			}, function(isDone){
 				if( isDone ){
 
-					scrollToBottom();
+					// scrollToBottom();
 					var memListString = btn.data("object_str");
 					//on select done
 					// send add mem to room api
@@ -1705,9 +1835,9 @@ function delMember(){
 						cns.debug("[!]"+e.message);
 					}
 				}
-				scrollToBottom();
+				// scrollToBottom();
 				setTimeout( function(){
-					checkPagePosition();
+					// checkPagePosition();
 					$("#page-chat").removeClass("transition");
 				}, 500 );
 				$("#page-select-object").remove();
@@ -1743,7 +1873,7 @@ function addMember(){
 		showSelectMemPage( $("#pagesContainer"), btn, function(){
 				// $("#page-chat").removeClass("transition");
 			}, function( isDone ){
-				scrollToBottom();
+				// scrollToBottom();
 				if(isDone){
 					//on select done
 					// send add mem to room api
@@ -1779,9 +1909,9 @@ function addMember(){
 						cns.debug(e.message);
 					}
 				}
-				scrollToBottom();
+				// scrollToBottom();
 				setTimeout( function(){
-					checkPagePosition();
+					// checkPagePosition();
 					$("#page-chat").removeClass("transition");
 				}, 500 );
 				$("#page-select-object").remove();
@@ -1821,6 +1951,41 @@ function checkMemberLeft(){
 
 	$("#footer").show();
 	$("#chat-leaveGroup").hide();
+}
+
+function onScrollContainer(e){
+	if( !$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition") ) return;
+
+	// cns.debug(e.originalEvent.wheelDelta);
+	var posi = $(this).scrollTop();
+	if( g_bIsLoadHistoryMsg ){
+		cns.debug("scroll blocking ", posi);
+		e.stopPropagation();
+		e.preventDefault();
+		return;
+	}
+	if(  !g_bIsEndOfHistory && posi <= $("#chat-loading").outerHeight()*0.5 ){
+		// cns.debug("!");
+		getHistoryMsg( false );
+		// g_isEndOfPage = false;
+		return;
+	}
+	var height = $(window).height();
+	var docHeight = $(document).height();
+	var isAtBottom = ((posi + height+5) >= docHeight);
+	// if( g_isEndOfPage != isAtBottom ){
+	// 	g_isEndOfPage = isAtBottom;
+	// 	g_isEndOfPageTime = new Date().getTime();
+	// 	// cns.debug("!");
+	// }
+}
+function onScrollBody(e){
+	if( g_bIsLoadHistoryMsg ){
+		cns.debug("prevent!");
+		e.stopPropagation();
+		e.preventDefault();
+		return;
+	}
 }
 
 /*
@@ -1863,9 +2028,9 @@ showChatReadUnreadList = function( cntDom ){
 	var onDone = function( isDone ){
 		// scrollToBottom();
 		$("#page-chat").removeClass("transition");
-		scrollToBottom();
+		// scrollToBottom();
 		setTimeout( function(){
-			checkPagePosition();
+			// checkPagePosition();
 		}, 200 );
 		$("#page-tab-object").remove();
 		cns.debug("on back from showChatReadUnreadList");

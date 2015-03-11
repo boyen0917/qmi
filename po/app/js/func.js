@@ -6474,9 +6474,13 @@ $(function(){
                 currentPollingCt = pollingDataTmp.ts.pt;
             }
             if( currentPollingCt>=login_time ){
+                // cns.debug("----- show notification ----");
             } else {
-                cns.debug("----- hide " );
+                cns.debug("(notification muted, login_time-currentPollingCt=", (login_time-currentPollingCt), " )" );
             }
+                // cns.debug( new Date(currentPollingCt).toString() );
+                // cns.debug( new Date(login_time).toString() );
+
     		$.each(cmds,function(i,val){
 	    		switch(val.tp){
 	    			case 1://timeline list
@@ -6512,9 +6516,17 @@ $(function(){
                         val.pm.onGetMemData = function(this_gi, memData){
                             try{
                                 if( currentPollingCt>=login_time ){
-                                    riseNotification( null, g_Qmi_title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
+                                    var title = g_Qmi_title;
+                                    var userDataTmp = $.lStorage(ui);
+                                    if( userDataTmp && userDataTmp.hasOwnProperty(val.pm.gi) ){
+                                        var groupTmp = userDataTmp[val.pm.gi];
+                                        if( groupTmp && groupTmp.gn ){
+                                            title = groupTmp.gn;
+                                        }
+                                    }
+                                    riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
                                         if( gi==this_gi ){
-                                            $(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
+                                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
                                         } else {
                                             $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
                                         }
@@ -6539,9 +6551,19 @@ $(function(){
                         val.pm.onGetMemData = function(this_gi, memData){
                             try{
                                 if( currentPollingCt>=login_time ){
-                                    riseNotification( null, g_Qmi_title, $.i18n.getString("GROUP_X_LEAVE_GROUP", memData.nk), function(){
+                                    var title = g_Qmi_title;
+                                    var userDataTmp = $.lStorage(ui);
+                                    if( userDataTmp && userDataTmp.hasOwnProperty(val.pm.gi) ){
+                                        var groupTmp = userDataTmp[val.pm.gi];
+                                        if( groupTmp && groupTmp.gn ){
+                                            title = groupTmp.gn;
+                                        }
+                                    }
+                                    riseNotification( null, title, $.i18n.getString("GROUP_X_LEAVE_GROUP", memData.nk), function(){
                                         if( gi==this_gi ){
-                                            $(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
+                                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+                                        } else {
+                                            $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
                                         }
                                     });
                                 }

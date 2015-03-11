@@ -112,7 +112,7 @@
 	"COMPOSE_TASK_OWNER_EMPTY" : "請指定分派對象",
 	"COMPOSE_VOTE_EMPTY" : "投票內容不完整",
 	"COMPOSE_POST_SUCCESSED" : "發佈成功",
-	"COMPOSE_ DESCRIPTION_EMPTY" : "內容尚未填寫",
+	"COMPOSE_DESCRIPTION_EMPTY" : "內容尚未填寫",
 	"COMPOSE_TITLE_EMPTY" : "標題尚未填寫",
 	"COMPOSE_PARSE_ERROR" : "網址內容取得失敗",
 
@@ -214,6 +214,7 @@
 	"CHAT_SOMEONE_LEAVE_GROUP" : "%@ 已離開團體",
 	"CHAT_CHATROOM_MEMBER_EMPTY" : "請選擇聊天室對象",
 	"CHAT_UPLOAD_FILE_MISSING" : "上傳檔案遺失, 請重新上傳",
+	"CHAT_SCROLL_UP_TO_UPDATE" : "上捲更新...",
 
 	"NOTICES_TITLE"						: "新通知",
 	"NOTICES_POST"						: "發佈",
