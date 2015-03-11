@@ -1272,7 +1272,7 @@ function showMap (msgData, container){
 			setTimeout(function(){
 				gallery.msgData = msgData;
 				$(gallery.document).find("#dataDom").trigger("click");
-			},800);
+			},1500);
 		});
 	});
 	container.append(mapDiv);
