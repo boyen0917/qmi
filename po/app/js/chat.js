@@ -361,6 +361,13 @@ $(document).ready(function(){
 	});
 
     $("#header .title .text, #header .title .count").click( function(){
+    	//if extra panel is open, close it
+    	var extra = $("#header .extra-content");
+		if( "none"!=extra.css("display") ){
+			extra.slideUp();
+			$(".screen-lock").fadeOut();
+		}
+
     	var tmpData = [];
     	for( var gu in g_room.memList ){
     		tmpData.push( {gu:gu} );
