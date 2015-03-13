@@ -239,7 +239,7 @@ body {
 	width: 90%;
 	margin-left: 4%;
 	margin-right: 5%;
-	min-height: -webkit-calc( 100vh - 165px );
+	min-height: -webkit-calc( 100vh - 160px );
 }
 
 #chat-toBottom{
