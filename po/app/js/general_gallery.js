@@ -13,8 +13,20 @@ var bIsScrollPage = true;
 var startIndex = 0;
 var title;
 var picArea;
+var isLoaded = false;
 
 $(document).ready(function(){
+	cns.debug(this_gi);
+	cns.debug(this_ti);
+	cns.debug(ui);
+	cns.debug(list);
+	cns.debug(isLoaded);
+
+	if( false==isLoaded && null!=list){
+		cns.debug("trigger loading from gallary");
+		$(".dataDom").click();
+	}
+
 	picArea = $(".picArea");
 
 	$(".rBtn").off("click").click( moveRight );
@@ -239,6 +251,7 @@ changeImgViewSize = function(size){
 
 //trigger loading
 function onDataDomClick(){
+	isLoaded = true;
 	picArea = $(".picArea");
 	try{
 		console.debug("on data dom clicked");
