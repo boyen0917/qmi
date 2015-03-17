@@ -822,7 +822,7 @@ $(function(){
                     gallery.title = title;
                     var dataDom = $(gallery.document).find(".dataDom");
                     dataDom.click();
-                },500);
+                },1000);
             });
         }
     }
