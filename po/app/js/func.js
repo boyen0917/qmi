@@ -5964,7 +5964,7 @@ $(function(){
                     //預設圖片 隨便找一張img tag
                     if(data.query.results && data.query.results.img){
                         $.each(data.query.results.img,function(i,val){
-                            if (val.src && val.src.match(/\.jpg|\.png/)) {
+                            if (val != null && val.src && val.src.match(/\.jpg|\.png/)) {
                                 var temp_img = val.src;
                                 if(val.src.substring(0, 4) != 'http'){
                                     temp_img = url + temp_img;
