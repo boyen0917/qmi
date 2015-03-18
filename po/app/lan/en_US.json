@@ -13,6 +13,12 @@
 	"LOGIN_ACCOUNT_OR_PASSWORD_ERROR" :	"Error account or password. Please try again.",
 	"LOGIN_FORGETPASSWD_NOT_MATCH" : "Passwords don't match",
 	"LOGIN_AUTO_LOGIN_FAIL" : "Authentication failed, please login again.",
+	"LOGIN_COUNTRY_CODE_TAIWAN" : "Taiwan +886",
+	"LOGIN_COUNTRY_CODE_CHINA" : "China +86",
+	"LOGIN_COUNTRY_CODE_HONGKONG" : "Hong Kong +852",
+	"LOGIN_COUNTRY_CODE_MACAU" : "Macau +853",
+	"LOGIN_COUNTRY_CODE_US" : "United States +1",
+
 	
 	"REGISTER_ACCOUNT_REGITST_TITLE" :	"Sign Up",
 	"REGISTER_ACCOUNT_POLICY" :	"I agree to Co+'s %@Term of Use%@ and %@Privacy Policy%@.",

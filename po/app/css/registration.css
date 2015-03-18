@@ -41,21 +41,24 @@ body{
 }
 
 #page-registration {
-	background: url("../images/registration/registration_logins_bgimg.png") center no-repeat;
+	background: url("../images/registration/login_bgimg.png") center no-repeat;
 	background-size: cover;
 }
 
 .registration-content {
 	width: 100%;
 	text-align: center;
+	height: 540px;
+	margin-top: -webkit-calc( 50vh - 290px );
+	margin-bottom: -webkit-calc( 50vh - 250px );
 }
 
 .registration-logo {
-	margin: 100px 0 20px;
+    margin-bottom: 20px;
 }
 
 .registration-logo img {
-	width: 150px;
+	width: 95px;
 	margin: 0 auto;
 }
 
@@ -590,4 +593,145 @@ input.setting-birth-hidden {
 
 .popup-close:hover {
 	background: #f9f9f9;
+}
+
+
+/* ----- new landpage style -------*/
+
+
+.login-area{
+	width: 398px;
+	margin-right: auto;
+	margin-left: auto;
+	background-color: rgba(255,255,255,0.7);
+	border: 1px solid rgb(230,230,230);
+}
+.login-landing{
+	padding: 26px 20px 20px 20px;
+}
+.login-tab-area{
+	width: 100%;
+	height: 60px;
+	line-height: 60px;
+}
+.login-tab{
+	width: 198px;
+	display: inline-block;
+	float: left;
+	color: #3e8feb;
+	font-size: 18px;
+}
+.login-tab[data-type=phone]{
+	border-right: 1px solid rgb(230,230,230);
+}
+.login-tab:not(.active){
+	border-bottom: 1px solid rgb(230,230,230);
+	color: #96abc2;
+}
+.login-ld-phone, .login-option-area{
+	height: 40px; 
+}
+.login-ld-countrycode {
+	width: 40%;
+	height: 100%;
+	overflow: visible;
+	/*background: url(../images/registration/icon_arrow_bottom.png) no-repeat 100% 0%;*/
+	/*border: 1px solid rgb(230,230,230);*/
+	border-radius: 0px;
+	display: inline-block; 
+	vertical-align: top;
+	text-align: left;
+	margin-right: 10px;
+}
+.login-ld-countrycode select{
+	border-radius: 0;
+	color: #9BA0AA;
+	font-weight: bold;
+	background: white;
+	width: 100%;
+	height: 100%;
+	font-size: 12px;
+	border: none;
+	background: url(../images/registration/icon_arrow_bottom.png) no-repeat 100% 0%;
+	background-size: 25% 100%;
+	-webkit-appearance: none;
+	padding-left: 10px;
+	padding-right: 10px;
+	line-height: 36px;
+	font-size: 12px;
+}
+.login-ld-countrycode .sbHolder{
+	font-size: 12px;
+}
+
+.login-ld-email, .login-ld-password{
+	height: 40px;
+	/*height: 36px;
+	line-height: 36px;
+	width: auto;*/
+}
+.login-ld-phone input, .login-ld-email input, .login-ld-password input{
+	height: 38px;
+	line-height: 38px;
+	text-align: left;
+	padding-left: 10px;
+	padding-right: 10px;
+	width: -webkit-calc( 100% - 22px );
+	font-size: 14px;
+}
+.login-ld-phone input{
+	display: inline-block;
+	width: -webkit-calc( 60% - 36px );
+	vertical-align: top;
+}
+.login-ld-email input{
+	width: -webkit-calc( 100% - 23px );
+}
+.login-ld-email{
+	display: none;
+}
+
+.login-option-area div{
+	display: inline-block;
+	line-height: 36px;
+}
+.login-option-area .login-auto{
+	float: left;
+	color: #4092ef;
+}
+.login-option-area .login-forgot{
+	float: right;
+	color: #e92663;
+}
+
+
+.login-area .login{
+	color: white;
+	background-color: #4092ef;
+	opacity: 1;
+}
+.login-area .login:hover{
+	background-color: #197ae8;
+}
+.login-area .register{
+	color: rgb(109,137,150);
+	background-color: #F0F9FE;
+	opacity: 1;
+}
+.login-area .register:hover{
+	/*color: black;*/
+	background-color: #C6e7fa;
+}
+.login-ld-password, .login-area .login, .login-option-area, .login-area .register{
+	margin-top: 12px;
+}
+.login-area .login, .login-area .register{
+	width: 100%;
+}
+
+.login-ld-countrycode select, .sbHolder, .login-ld-phone input, .login-ld-email input, .login-ld-password input{
+	border-radius: 3px;
+	border: 1px solid rgb(230,230,230);
+	margin-left: 0;
+	margin-right: 0;
 }

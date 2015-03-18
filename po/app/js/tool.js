@@ -791,6 +791,13 @@ $(function(){
 	getStickerPath = function(id){
 		return "sticker/" + id.split("_")[1] + "/" + id + ".png";
 	}
+	setStickerUrl = function(dom, id){
+		if( null!= initStickerArea ){
+			initStickerArea.getStickerPath(id, function(path){
+				dom.attr("url",path);
+			});
+		}
+	}
 
 	showGallery = function( this_gi, this_ti, gallery_arr, startIndex, title ){
 		startIndex = startIndex || 0;

@@ -58,6 +58,8 @@ function updateChat ( msgs ){
 					isRoomOpen = true;
 					windowList[data.ci].g_msgTmp = data.el;
 					$(windowList[data.ci].document).find("button.pollingMsg").trigger("click");
+				} else {
+					cns.debug("room ", data.ci, " not opened");
 				}
 			}
 
