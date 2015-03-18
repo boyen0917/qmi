@@ -30,7 +30,7 @@
       }
       $(id).data( "onDone", onDone);
     },
-    popPage: function() {
+    popPage: function(isForward) {
       var pc = this;
       if( pc.history.length<=0 ) return;
 
@@ -49,7 +49,7 @@
             $(oldID).hide();
             cns.debug("[popPage] ", id, oldID);
             var onDone = $(oldID).data( "onDone" );
-            if( onDone ) onDone(false);
+            if( onDone ) onDone(isForward);
           }
       });
     },
@@ -64,7 +64,7 @@
   // }
   $(document).ready(function(){
     $(document).on('click','.page-back',function(e){
-        pageControl.popPage();
+        pageControl.popPage(false);
     });
   });
 })(jQuery);

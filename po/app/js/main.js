@@ -1148,7 +1148,7 @@ $(function(){
 		//錯誤訊息
 		var error_msg_arr = [];
 		error_msg_arr[".cp-textarea-title"] = $.i18n.getString("COMPOSE_TITLE_EMPTY");
-		error_msg_arr[".cp-textarea-desc"] = $.i18n.getString("COMPOSE_ DESCRIPTION_EMPTY");
+		error_msg_arr[".cp-textarea-desc"] = $.i18n.getString("COMPOSE_DESCRIPTION_EMPTY");
 
 		var chk_arr = [".cp-textarea-desc"];
 

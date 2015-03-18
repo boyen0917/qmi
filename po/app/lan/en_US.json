@@ -112,7 +112,7 @@
 	"COMPOSE_TASK_OWNER_EMPTY" : "Please assign a task owner.",
 	"COMPOSE_VOTE_EMPTY" : "Please fill all fields.",
 	"COMPOSE_POST_SUCCESSED" : "Post successed.",
-	"COMPOSE_ DESCRIPTION_EMPTY" : "Please enter description.",
+	"COMPOSE_DESCRIPTION_EMPTY" : "Please enter description.",
 	"COMPOSE_TITLE_EMPTY" : "Please enter title.",
 	"COMPOSE_PARSE_ERROR" : "Oops,can not get the result of this URL",
 
@@ -214,6 +214,7 @@
 	"CHAT_SOMEONE_LEAVE_GROUP" : "%@ left group.",
 	"CHAT_CHATROOM_MEMBER_EMPTY" : "Please select a target.",
 	"CHAT_UPLOAD_FILE_MISSING" : "File missing, please resend.",
+	"CHAT_SCROLL_UP_TO_UPDATE" : "Scroll up to get messages...",
 
 	"NOTICES_TITLE"						: "New Notices",
 	"NOTICES_POST"						: "Publish",

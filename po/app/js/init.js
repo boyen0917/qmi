@@ -54,7 +54,7 @@ $(function(){
 
 	//登入時間
 	var currentDate = new Date();
-	console.debug("login_time", currentDate.getTime(), currentDate.toString());
+	console.debug("login_time", currentDate.getTime());
 	login_time = currentDate.getTime();
 
 	//timeline裏面點擊不做展開收合的區域

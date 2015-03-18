@@ -1,10 +1,15 @@
 .ui-body-c, .ui-body-c input, .ui-body-c select,textarea, .ui-body-c button ,.ui-btn-up-d, .ui-btn-hover-d, .ui-btn-down-d, .ui-body-c .ui-link, .ui-btn-up-c, .version_update_lock{
-    font-family: "微軟正黑體","Microsoft JhengHei";
+    font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC", "reg", arial,sans-serif;
     -webkit-font-smoothing: antialiased;
     font-weight: normal;
 }
 div, span, label, h3{
     /*text-shadow: none;*/
+}
+body{
+	font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC", "reg", arial,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-weight: normal;
 }
 
 

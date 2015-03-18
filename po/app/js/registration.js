@@ -4,8 +4,6 @@ $(function(){
 	updateLanguage( lang );
 
 
-	checkVersion();
-
 	//預設上一頁
 	$(document).data("page-history",[["#page-registration"]]);
 	
@@ -241,7 +239,7 @@ $(function(){
 */	
 
 
-	$("#page-register .register-text span").html( $.i18n.getString("REGISTER_ACCOUNT_POLICY", "<a href='#'>", "</a>", "<a href='#'>", "</a>") );
+	$("#page-register .register-text span").html( $.i18n.getString("REGISTER_ACCOUNT_POLICY", "<a href='http://webdev.cloud.mitake.com.tw/user_agreement.html' target='_blank'>", "</a>", "<a href='http://webdev.cloud.mitake.com.tw/privacy_policy.html' target='_blank'>", "</a>") );
 	
 	$(document).on("click", "#page-register .register-text img", function(){
 		var img = $(this);

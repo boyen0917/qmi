@@ -1,78 +1,16 @@
-var this_gi;
-var this_ti;
-var ui;
-var at;
-var lang;
-var list;
-var scrollVal = 0;
-var scrollPercent = 0;
-var isCheckPosi = false;
-var checkTime = 0;
-var nextScrollTime = 0;
-var bIsScrollPage = true;
-var startIndex = 0;
-var title;
-
 $(document).ready(function(){
-	var picArea = $(".picArea");
-	//trigger loading
-	$(".dataDom").off("click").click( function(){
-		picArea.html("");
-		picArea.data("index", startIndex);
-		picArea.data("cnt", list.length);
-		picArea.css("width",(list.length*100)+"%");
-		picArea.css("left", (-100*startIndex)+"%");
+	cns.debug(this_gi);
+	cns.debug(this_ti);
+	cns.debug(ui);
+	cns.debug(list);
+	cns.debug(isLoaded);
 
-		if( null != title ){
-			$(".title").html(title).show();
-		} else {
-			$(".title").hide();
-		}
-		if( startIndex <list.length && null!=list[startIndex] ){
-			$(".subTitle").html(list[startIndex].text||"");
-		} else {
-			$(".subTitle").html("");
-		}
+	if( false==isLoaded && null!=list){
+		cns.debug("trigger loading from gallary");
+		$(".dataDom").click();
+	}
 
-		var width = 100.0/list.length;
-		for( var i=0; i<list.length; i++ ){
-			var img = $("<div class='img'><img style='height: 100%;'/></div>");
-			img.css("width",width+"%");
-			img.data("oriW",width);
-			img.data("text",list[i].text);
-			img.find("img").load( function() {
-				$(this).data("w",this.naturalWidth);
-				$(this).data("h",this.naturalHeight);
-			});
-			if( list[i].s32 ){
-				var fileName = getS3FileNameWithExtension( list[i].s32, 6 );
-				img.find("img").attr("src", list[i].s32 ).after('<a href="'+ list[i].s32 +'" download="'+fileName+'"><div></div></a>');
-				// img.css("background-image", "url("+list[i].s32+")" );
-			} else {
-				getS3file( list[i],img.find("img"), 6 );
-			}
-			picArea.append( img );
-		}
-
-		if( list.length<=1 ){
-			$(".cnt").hide();
-			// $(".cnt .current").html( 1 );
-			// $(".cnt .all").html( list.length );
-
-			$(".rBtn").hide();
-			$(".lBtn").hide();
-			// picArea.addClass("singleImage");
-		} else {
-			$(".cnt").show();
-			$(".cnt .current").html( startIndex+1 );
-			$(".cnt .all").html( list.length );
-
-			$(".rBtn").show();
-			$(".lBtn").show();
-			// picArea.removeClass("singleImage");
-		}
-		changeImgViewSize(0);
-	});
+	picArea = $(".picArea");
 
 	$(".rBtn").off("click").click( moveRight );
 	$(".lBtn").off("click").click( moveLeft );
@@ -198,8 +136,21 @@ getS3file = function(file_obj,target,tp){
         };
     var method = "get";
     var result = ajaxDo(api_name,headers,method,false);
+
+    console.debug(api_name);
+
     result.complete(function(data){
-        if(data.status != 200) return false;
+        if(data.status != 200){
+        	console.debug("get s3 fail");
+        	return false;
+        }
+
+		try{
+			console.debug(data.responseText);
+			console.debug("target",target, "tp",tp);
+		} catch(e){
+			errorReport(e);
+		}
 
         var obj =$.parseJSON(data.responseText);
         obj.api_name = api_name;

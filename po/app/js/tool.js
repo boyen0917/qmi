@@ -822,7 +822,7 @@ $(function(){
                     gallery.title = title;
                     var dataDom = $(gallery.document).find(".dataDom");
                     dataDom.click();
-                },500);
+                },1000);
             });
         }
     }
@@ -1280,28 +1280,6 @@ $(function(){
 	    		cns.debug("[!]", arguments.callee.caller, e.message);
 	    	}
     	}
-    }
-
-	g_currentVersion = "0.1.4";
-    checkVersion = function(){
-    	try{
-	    	var currentVersion = $.lStorage("_ver");
-	    	if( null==currentVersion || (g_currentVersion != currentVersion.ver) ){
-	    		cns.debug("update ver to ", g_currentVersion);
-	    		$.lStorage("_ver",{ver:g_currentVersion});
-	    		$(".version_update_lock").fadeIn();
-	    		setTimeout( function(){
-	    			if( false==clearCache() ){
-	    				//if error clear cache
-	    				$(".version_update_lock").hide();
-	    			}
-	    		}, 1000 );
-	    	} else {
-	    		cns.debug("latest ver", g_currentVersion);
-	    	}
-	    } catch(e){
-	    	errorReport(e);
-	    }
     }
 
 	deleteFolderRecursive = function(fs, path) {

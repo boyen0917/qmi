@@ -7,6 +7,7 @@ var sortRoomListTimeout = 700;
 $(document).ready(function(){
 	$(".chatList-add-done").on("click", function(){
 		$(".chatList-add").data("object_str", $(this).attr("data-object_str") );
+		$(".chatList-add").data("favorite_str", $(this).attr("data-favorite_str") );
 		onShowNewRoomPageDone();
 	});
 	$(document).on("click",".newChatDetail-header",function(){
@@ -349,6 +350,9 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 		} else{
 			g_idb_chat_msgs.limit(function(list){
 				try{
+					if( g_group.gi != giTmp ){
+						cns.debug("incoming chat msg is not currentGroup");
+					}
 					g_room = g_group.chatAll[ciTmp];
 				    if( list.length>0 ){
 				    	if( null!=list[0] ){
@@ -515,8 +519,8 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 					openChatWindow( giTmp, ciTmp );
 				});
 			} else{
-				cns.debug("chat", data.meta.ct);
-				cns.debug("chat", login_time);
+				cns.debug("chat msg muted, msg time", data.meta.ct);
+				cns.debug("chat msg muted, login tm", login_time);
 			}
 		} catch(e) {
 			cns.debug( e.message );
