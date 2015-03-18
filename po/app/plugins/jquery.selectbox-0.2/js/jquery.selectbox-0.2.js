@@ -1,3 +1,5 @@
+/* glorialin edited for Qmi */
+
 /*!
  * jQuery Selectbox plugin 0.2
  *
@@ -107,7 +109,7 @@
 				"tabindex": $target.attr("tabindex")
 			});
 			
-			sbSelector = $("<a>", {
+			sbSelector = $("<label>", {
 				"id": "sbSelector_" + inst.uid,
 				"href": "#",
 				"class": inst.settings.classSelector,
@@ -123,7 +125,7 @@
 				}
 			});
 			
-			sbToggle = $("<a>", {
+			sbToggle = $("<label>", {
 				"id": "sbToggle_" + inst.uid,
 				"href": "#",
 				"class": inst.settings.classToggle,
@@ -181,7 +183,7 @@
 						li.addClass("last");
 					}
 					if (!that.is(":disabled") && !disabled) {
-						child = $("<a>", {
+						child = $("<label>", {
 							"href": "#" + that.val(),
 							"rel": that.val()
 						}).text(that.text()).bind("click.sb", function (e) {
@@ -195,7 +197,7 @@
 							self._closeSelectbox(target);
 						}).bind("mouseover.sb", function () {
 							var $this = $(this);
-							$this.parent().siblings().find("a").removeClass(inst.settings.classFocus);
+							$this.parent().siblings().find("label").removeClass(inst.settings.classFocus);
 							$this.addClass(inst.settings.classFocus);
 						}).bind("mouseout.sb", function () {
 							$(this).removeClass(inst.settings.classFocus);
@@ -232,14 +234,14 @@
 					uid = $this.data("uid"),
 					inst = $this.siblings("select[sb='"+uid+"']").data(PROP_NAME),
 					trgt = $this.siblings(["select[sb='", uid, "']"].join("")).get(0),
-					$f = $this.find("ul").find("a." + inst.settings.classFocus);
+					$f = $this.find("ul").find("label." + inst.settings.classFocus);
 				switch (key) {
 					case 37: //Arrow Left
 					case 38: //Arrow Up
 						if ($f.length > 0) {
 							var $next;
-							$("a", $this).removeClass(inst.settings.classFocus);
-							$next = $f.parent().prevAll("li:has(a)").eq(0).find("a");
+							$("label", $this).removeClass(inst.settings.classFocus);
+							$next = $f.parent().prevAll("li:has(label)").eq(0).find("label");
 							if ($next.length > 0) {
 								$next.addClass(inst.settings.classFocus).focus();
 								$("#sbSelector_" + uid).text($next.text());
@@ -249,11 +251,11 @@
 					case 39: //Arrow Right
 					case 40: //Arrow Down
 						var $next;
-						$("a", $this).removeClass(inst.settings.classFocus);
+						$("label", $this).removeClass(inst.settings.classFocus);
 						if ($f.length > 0) {
-							$next = $f.parent().nextAll("li:has(a)").eq(0).find("a");
+							$next = $f.parent().nextAll("li:has(label)").eq(0).find("label");
 						} else {
-							$next = $this.find("ul").find("a").eq(0);
+							$next = $this.find("ul").find("label").eq(0);
 						}
 						if ($next.length > 0) {
 							$next.addClass(inst.settings.classFocus).focus();
@@ -290,9 +292,9 @@
 				}
 				e.stopPropagation();
 				return false;
-			}).delegate("a", "mouseover", function (e) {
+			}).delegate("label", "mouseover", function (e) {
 				$(this).addClass(inst.settings.classFocus);
-			}).delegate("a", "mouseout", function (e) {
+			}).delegate("label", "mouseout", function (e) {
 				$(this).removeClass(inst.settings.classFocus);	
 			});
 			

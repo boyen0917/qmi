@@ -1,4 +1,4 @@
-/*color edited glorialin 2015/3/17 */
+/* glorialin edited for Qmi */
 @CHARSET "UTF-8";
 .sbHolder{
 	background-color: #FFFFFF;
@@ -8,6 +8,7 @@
 	height: 100%;
 	position: relative;
 	width: 100%;
+	outline: none;
 }
 .sbHolder:focus .sbSelector{
 	
@@ -75,22 +76,22 @@
 .sbOptions li{
 	padding: 0px 7px;
 }
-.sbOptions a{
+.sbOptions label{
 	border-bottom: dotted 1px #D0D0D0;
 	display: block;
 	outline: none;
 	padding: 10px 0 10px 3px;
 }
-.sbOptions a:link, .sbOptions a:visited{
+.sbOptions label:link, .sbOptions label:visited{
 	color: #aaa;
 	text-decoration: none;
 }
-.sbOptions a:hover,
-.sbOptions a:focus,
-.sbOptions a.sbFocus{
+.sbOptions label:hover,
+.sbOptions label:focus,
+.sbOptions label.sbFocus{
 	color: #65696F;
 }
-.sbOptions li.last a{
+.sbOptions li.last label{
 	border-bottom: none;
 }
 .sbOptions .sbDisabled{

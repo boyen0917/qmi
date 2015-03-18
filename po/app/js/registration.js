@@ -93,13 +93,13 @@ $(function(){
 	var selectDom = $('.login-ld-countrycode select');
 	selectDom.selectbox({
 		onOpen: function (inst) {
-			console.log("open", inst);
+			console.log("open"); //, inst
 		},
 		onClose: function (inst) {
-			console.log("close", inst);
+			console.log("close"); //, inst
 		},
 		onChange: function (val, inst) {
-			cns.debug(val,inst);
+			cns.debug(val); //, inst
 			if( val != countrycode ){
 				countrycode = val;
 				var loginData = $.lStorage("_loginRemeber");
