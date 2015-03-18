@@ -1954,7 +1954,7 @@ $(function(){
 
 
 	        var method = "post";
-	        ajaxDo(api_name,headers,method,true,body).complete(function(data){
+	        ajaxDo(api_name,headers,method,false,body).complete(function(data){
                 if( 200==data.status ){
                     //重新讀取detail
                     // popupShowAdjust("","回覆成功");
