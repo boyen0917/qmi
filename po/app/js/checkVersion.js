@@ -1,5 +1,5 @@
 $(function(){
-	g_currentVersion = "0.1.8";
+	g_currentVersion = "0.2.0";
     checkVersion = function(){
     	try{
 	    	var currentVersion = $.lStorage("_ver");
