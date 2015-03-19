@@ -48,9 +48,9 @@ body{
 .registration-content {
 	width: 100%;
 	text-align: center;
-	height: 540px;
-	margin-top: -webkit-calc( 50vh - 290px );
-	margin-bottom: -webkit-calc( 50vh - 250px );
+	height: 564px;
+	margin-top: -webkit-calc( 50vh - 282px );
+	margin-bottom: -webkit-calc( 50vh - 282px );
 }
 
 .registration-logo {
@@ -60,6 +60,27 @@ body{
 .registration-logo img {
 	width: 95px;
 	margin: 0 auto;
+}
+/* responsive logo size.. */
+@media screen and (min-width: 801px){
+	.registration-content {
+		height: 600px;
+		margin-top: -webkit-calc( 50vh - 300px );
+		margin-bottom: -webkit-calc( 50vh - 300px );
+	}
+	.registration-logo img {
+		width: 115px;
+	}
+}
+@media screen and (max-width: 800px){
+	.registration-content {
+		height: 564px;
+		margin-top: -webkit-calc( 50vh - 282px );
+		margin-bottom: -webkit-calc( 50vh - 282px );
+	}
+	.registration-logo img {
+		width: 95px;
+	}
 }
 
 .login-desc {
@@ -186,7 +207,7 @@ body{
 
 
 .login-remeber img, .login-auto img {
-	width: 25px;
+	width: 20px;
 	margin-right: 5px;
 	vertical-align: middle;
 }
@@ -247,9 +268,23 @@ body{
 }
 
 .countrycode {
-	height: 50px;
-	line-height: 50px;
 	border-bottom: 1px solid #eee;
+	line-height: 50px;
+	height: 50px;
+}
+.countrycode .sbContainer{
+	width: 100%;
+	height: 50px;
+}
+.countrycode .sbHolder{
+	border: none;
+	top: 0;
+}
+.countrycode .sbSelector{
+	text-indent: 22px;
+}
+.countrycode ul li{
+	line-height: 30px;
 }
 
 .countrycode span:nth-child(1) {
@@ -609,6 +644,9 @@ input.setting-birth-hidden {
 .login-landing{
 	padding: 26px 20px 20px 20px;
 }
+.login-landing .register{
+	margin-bottom: 0;
+}
 .login-tab-area{
 	width: 100%;
 	height: 60px;
@@ -629,7 +667,11 @@ input.setting-birth-hidden {
 	color: #96abc2;
 }
 .login-ld-phone, .login-option-area{
-	height: 40px; 
+	height: 40px;
+	white-space: nowrap; 
+}
+.login-option-area{
+	width: 50%;
 }
 .login-ld-countrycode {
 	width: 40%;
@@ -691,17 +733,33 @@ input.setting-birth-hidden {
 	display: none;
 }
 
-.login-option-area div{
+.login-ld-extra{
+	width: 100%;
+	height: 50px;
+}
+.login-ld-extra > div{
+	width: 49%;
 	display: inline-block;
-	line-height: 36px;
+	vertical-align: top;
+}
+.login-ld-extra .login-ld-forget-pw{
+	text-align: right;
+}
+.login-option-area > div{
+	line-height: 24px;
+	width: 100%;
+	font-size: 14px;
+	color: #4092ef;
+	display: block;
+}
+.login-option-area > div div{
+	display: inline-block;
 }
 .login-option-area .login-auto{
-	float: left;
-	color: #4092ef;
+	/*text-align: right;*/
 }
-.login-option-area .login-forgot{
-	float: right;
-	color: #e92663;
+.login-option-area .login-remeber{
+	/*text-align: left;*/
 }
 
 
@@ -722,7 +780,7 @@ input.setting-birth-hidden {
 	/*color: black;*/
 	background-color: #C6e7fa;
 }
-.login-ld-password, .login-area .login, .login-option-area, .login-area .register{
+.login-ld-password, .login-area .login, .login-area .register{
 	margin-top: 12px;
 }
 .login-area .login, .login-area .register{
@@ -734,4 +792,13 @@ input.setting-birth-hidden {
 	border: 1px solid rgb(230,230,230);
 	margin-left: 0;
 	margin-right: 0;
+}
+
+.login-ld-forget-pw{
+	width: 100%;
+	color: #E92663;
+	font-size: 14px;
+}
+.login-ld-forget-pw:hover{
+	text-decoration: underline;
 }

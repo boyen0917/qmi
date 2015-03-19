@@ -301,6 +301,8 @@
 			sbSelector.appendTo(sbHolder);
 			sbOptions.appendTo(sbHolder);			
 			sbHolder.insertAfter($target);
+			cns.debug( sbSelector.height() );
+			sbSelector.css("line-height",sbSelector.height()+"px");
 			
 			$("html").live('mousedown', function(e) {
 				e.stopPropagation();          

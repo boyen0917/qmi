@@ -6,9 +6,9 @@
 	font-family: Arial, sans-serif;
 	font-weight: normal;
 	height: 100%;
-	position: relative;
 	width: 100%;
 	outline: none;
+	position: relative;
 }
 .sbHolder:focus .sbSelector{
 	
@@ -31,7 +31,10 @@
 	text-decoration: none;
 }
 .sbToggle{
-	background: url(../img/select-icons.png) 0 -113px no-repeat rgb(230,230,230);
+	background-image: url(../img/closed.png);
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-color: rgb(230,230,230);
 	display: block;
 	height: 100%;
 	outline: none;
@@ -41,13 +44,16 @@
 	width: 30px;
 }
 .sbToggle:hover{
-	background: url(../img/select-icons.png) 0 -164px no-repeat rgb(225,225,225);
+	background-color: rgb(225,225,225);
 }
 .sbToggleOpen{
-	background: url(../img/select-icons.png) 0 -14px no-repeat rgb(230,230,230);
+	background-image: url(../img/opened.png);
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-color: rgb(230,230,230);
 }
 .sbToggleOpen:hover{
-	background: url(../img/select-icons.png) 0 -64px no-repeat rgb(225,225,225);
+	background-color: rgb(225,225,225);
 }
 .sbHolderDisabled{
 	background-color: #3C3C3C;
@@ -77,19 +83,20 @@
 	padding: 0px 7px;
 }
 .sbOptions label{
-	border-bottom: dotted 1px #D0D0D0;
+	color: #A5A9AD;
+	border-bottom: dotted 1px #A5A9AD;
 	display: block;
 	outline: none;
 	padding: 10px 0 10px 3px;
 }
 .sbOptions label:link, .sbOptions label:visited{
-	color: #aaa;
+	color: #D0D0D0;
 	text-decoration: none;
 }
 .sbOptions label:hover,
 .sbOptions label:focus,
 .sbOptions label.sbFocus{
-	color: #65696F;
+	color: #5F6469;
 }
 .sbOptions li.last label{
 	border-bottom: none;

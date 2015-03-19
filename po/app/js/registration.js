@@ -55,18 +55,46 @@ $(function(){
 		// 	var phone_id = $.lStorage("_loginRemeber").phone;
 		// 	var password = $(".login-ld-remember-password input").val();
 		// }else{
-			var phone_id = $(".login-ld-phone input").val();
+			var isMail = false;
+			var phone_id = "";
+			var phoneInput = $(".login-ld-phone input");
+			if( phoneInput.is(":visible") ){
+				phone_id = phoneInput.val();
+			} else {
+				phone_id = $(".login-ld-email input").val();
+				isMail = true;
+			}
 			var password = $(".login-ld-password input").val();
 		// }
 		// cns.debug("phone_id:",phone_id,"pw:",password,"countrycode:",countrycode);
 
 		//登入
-		login(phone_id,password,countrycode);
+		login(phone_id,password,countrycode,isMail);
 		
 	});
 
 	$(".register").click(function(){
 		$.mobile.changePage("#page-register", {transition: "slide"});
+		//contry code
+		var countryCodeDoms = $('#page-register .countrycode select');
+		countryCodeDoms.selectbox({
+			onOpen: function (inst) {
+				console.log("open"); //, inst
+			},
+			onClose: function (inst) {
+				console.log("close"); //, inst
+			},
+			onChange: function (val, inst) {
+				cns.debug(val, inst);
+				countryCodeDoms.attr("data-val",val);
+				var text = countryCodeDoms.find("option[value='"+val+"']").text() || "";
+				countryCodeDoms.attr("data-text",text);
+			},
+			effect: "slide"
+		});
+		var firstDom = countryCodeDoms.find("option:eq(0)");
+		countryCodeDoms.attr("data-val",firstDom.attr("value")||"+886");
+		countryCodeDoms.attr("data-text",firstDom.text()||"");
 	});
 
 
@@ -90,8 +118,8 @@ $(function(){
 
 
 	//contry code
-	var selectDom = $('.login-ld-countrycode select');
-	selectDom.selectbox({
+	var countryCodeDoms = $('.login-ld-countrycode select');
+	countryCodeDoms.selectbox({
 		onOpen: function (inst) {
 			console.log("open"); //, inst
 		},
@@ -99,7 +127,7 @@ $(function(){
 			console.log("close"); //, inst
 		},
 		onChange: function (val, inst) {
-			cns.debug(val); //, inst
+			cns.debug(val, inst);
 			if( val != countrycode ){
 				countrycode = val;
 				var loginData = $.lStorage("_loginRemeber");
@@ -113,9 +141,10 @@ $(function(){
 	//set default value
 	var loginData = $.lStorage("_loginRemeber");
 	if( null!=loginData && null!=loginData ){
-		var targetCountryDom = selectDom.find("option[value='"+loginData.countrycode+"']");
+		var targetCountryDom = countryCodeDoms.find("option[value='"+loginData.countrycode+"']");
 		if( targetCountryDom.length>0 ){
-			selectDom.selectbox("change", targetCountryDom.val(), targetCountryDom.text() );
+			countryCodeDoms.selectbox("change", targetCountryDom.val(), $(targetCountryDom[0]).text() );
+			cns.debug(targetCountryDom.text());
 		}
 	}
 /*
@@ -155,10 +184,18 @@ $(function(){
 	$(".login-remeber").click(function(){
 		var remeber_chk = $(this).data("chk");
 		if(remeber_chk){
-			$(this).find("img").attr("src","images/common/icon/icon_check_gray.png");
+			if( $(this).hasClass("landpage") ){
+				$(this).find("img").attr("src","images/registration/checkbox_none.png");
+			} else {
+				$(this).find("img").attr("src","images/common/icon/icon_check_gray.png");
+			}
 			remeber_chk = false;
 		}else{
-			$(this).find("img").attr("src","images/common/icon/icon_check_gray_check.png");
+			if( $(this).hasClass("landpage") ){
+				$(this).find("img").attr("src","images/registration/checkbox_check.png");
+			} else {
+				$(this).find("img").attr("src","images/common/icon/icon_check_gray_check.png");
+			}
 			remeber_chk = true;
 		}
 
@@ -197,13 +234,18 @@ $(function(){
 		
 	});
 
-	login = function(phone_id,password,countrycode){
+	login = function(phone_id,password,countrycode,isMail){
+		isMail = isMail || false;
 		var api_name = "login";
         var headers = {
             li:lang
         };
+        var id = phone_id;
+        if( false==isMail ){
+        	id = countrycode + phone_id.substring(1);
+        }
         var body = {
-            id: countrycode + phone_id.substring(1),
+            id: id,
             tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
             dn: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
             pw:toSha1Encode(password)
@@ -222,6 +264,7 @@ $(function(){
     			if($(".login-remeber").data("chk")){
 					var _loginRemeber = {};
 					_loginRemeber.phone = phone_id;
+					_loginRemeber.isMail = isMail;
 					// _loginRemeber.password = password;
 					_loginRemeber.countrycode = countrycode;
 					$.lStorage("_loginRemeber",_loginRemeber);
@@ -310,11 +353,11 @@ $(function(){
 		var next = $(".register-next");
 		var chk = next.data("chk");
 		if( true==chk ){
-			img.attr("src","images/common/icon/icon_check_gray.png");
+			img.attr("src","images/registration/checkbox_none.png");
 			next.data("chk", false);
 			$(".register-next").removeClass("register-next-ready");
 		} else {
-			img.attr("src","images/common/icon/icon_check_gray_check.png");
+			img.attr("src","images/registration/checkbox_check.png");
 			next.data("chk", true);
 
 			if( true==next.data("textChk") ){
@@ -345,6 +388,24 @@ $(function(){
 	$(".register-next").click(function(){
 		if($(this).hasClass("register-next-ready")){
 			cns.debug("傳送驗證碼 還沒按確定");
+
+			//get country code
+			var countryCodeDoms = $('#page-register .countrycode select');
+			var newCountryCode = countryCodeDoms.attr("data-val");
+			var newCountryText = countryCodeDoms.attr("data-text");
+			cns.debug("newCountryCode", newCountryCode);
+			// if( newCountryCode != countrycode ){
+			// 	countrycode = newCountryCode;
+			// 	var loginData = $.lStorage("_loginRemeber");
+			// 	loginData.countrycode = newCountryCode;
+			// 	$.lStorage("_loginRemeber", loginData);
+			// }
+			var targetCountryDom = $('.login-ld-countrycode select');
+			if( targetCountryDom.length>0 ){
+				targetCountryDom.selectbox("change", newCountryCode, newCountryText );
+				cns.debug(newCountryCode, newCountryText);
+			}
+
 			var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + $(".register-phone input").val().substring(1)+"</label>";
 			popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
 		}else{
@@ -662,6 +723,7 @@ $(function(){
         	if(data.status == 200){
         		//登入成功 記錄帳號密碼
 				var _loginRemeber = {};
+				_loginRemeber.isMail = false;
 	    		_loginRemeber.phone = "0" + $(document).data("phone-id").substring(4);
 	    		_loginRemeber.password = $(document).data("password");
 	    		_loginRemeber.countrycode = countrycode;
@@ -937,9 +999,10 @@ $(function(){
 		}
 		
 		//若local storage 有記錄密碼 就顯示
-		if($.lStorage("_loginRemeber")){
+		var rememberData = $.lStorage("_loginRemeber");
+		if( rememberData ){
 			//順便幫他打個勾
-			$(".login-remeber img").attr("src","images/common/icon/icon_check_gray_check.png");
+			$(".login-remeber img").attr("src","images/registration/checkbox_check.png");
 			$(".login-remeber").data("chk",true);
 			$(".login-remeber-area").show();
 			$(".login-default-area").hide();
@@ -948,9 +1011,14 @@ $(function(){
 			$(".login-next").addClass("login-next-adjust");
 
 			//填入帳號
-			$(".login-account span:eq(1)").html("(" + $.lStorage("_loginRemeber").countrycode + ")" + $.lStorage("_loginRemeber").phone.substring(1));
+			if( rememberData.isMail ){
+				$(".login-ld-email input").val( rememberData.phone );
+				$(".login-tab[data-type=email]").trigger("click");
+			} else {
+				$(".login-ld-phone input").val( rememberData.phone );	//"(" + rememberData.countrycode + ")" + 
+			}
 		}else{
-			$(".login-remeber img").attr("src","images/common/icon/icon_check_gray.png");
+			// $("#page-registration .login-remeber img").attr("src","images/common/icon/icon_check_gray.png");
 			$(".login-remeber").data("chk",false);
 			$(".login-remeber-area").hide();
 			$(".login-default-area").show();
@@ -959,7 +1027,7 @@ $(function(){
 		}
 
 		if($.lStorage("_loginAutoChk")){
-			$(".login-auto").find("img").attr("src","images/common/icon/icon_check_gray_check.png");
+			$(".login-auto").find("img").attr("src","images/registration/checkbox_check.png");
 	    	$(".login-auto").data("chk",true);
 	    }
 	}

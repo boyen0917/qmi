@@ -79,7 +79,7 @@
                                 <input type="text" maxlength="10" data-role="none" data-textph-id="LOGIN_ACCOUNT" placeholder="請輸入手機">
                             </div>
                             <div class="login-ld-email">
-                                <input type="text" maxlength="10" data-role="none" data-textph-id="LOGIN_ACCOUNT" placeholder="請輸入Email">
+                                <input type="text" maxlength="99" data-role="none" data-textph-id="LOGIN_ACCOUNT" placeholder="請輸入Email">
                             </div>
                         </div>
                         <div class="login-ld-password">
@@ -87,15 +87,18 @@
                             <img src="images/common/icon/compose_form_icon_check.png" style="display:none">  
                         </div>
                         <div class="login login-ready" data-textid="LANDING_PAGE_LOGIN"></div>
-                        <div class="login-option-area">
-                            <!-- <div class="login-remeber">
-                                <img src="images/common/icon/icon_check_gray.png">
-                                <div class="text" data-textid="LOGIN_REMEMBER_ACCOUNT">Remember Account</div>
-                            </div> -->
-                            <div class="login-auto landpage">
-                                <img src="images/registration/checkbox_none.png">
-                                <div class="text" data-textid="LOGIN_AUTO_LOGIN">Auto login</div>
+                        <div class="login-ld-extra">
+                            <div class="login-option-area">
+                                <div class="login-remeber landpage">
+                                    <img src="images/registration/checkbox_none.png">
+                                    <div class="text" data-textid="LOGIN_REMEMBER_ACCOUNT">Remember Account</div>
+                                </div>
+                                <div class="login-auto landpage">
+                                    <img src="images/registration/checkbox_none.png">
+                                    <div class="text" data-textid="LOGIN_AUTO_LOGIN">Auto login</div>
+                                </div>
                             </div>
+                            <div class="login-ld-forget-pw">forget password?</div>
                         </div>
                         <div class="register" data-textid="LANDING_PAGE_REGISTER"></div>
                     </div>
@@ -181,10 +184,20 @@
             <div class="register-content">
                 <div class="register-area">
                     <div class="countrycode">
-                        <span data-textid="COMMON_COUNTRY_TAIWAN">台灣</span>
+                        <!-- <span data-textid="COMMON_COUNTRY_TAIWAN">台灣</span>
                         <span>+886</span>
-                        <img src="images/common/icon/icon_arrow_next.png"/>
+                        <img src="images/common/icon/icon_arrow_next.png"/> -->
+                        <div class="sbContainer">
+                            <select name="Country Code" data-role="none" tabindex="1">
+                                <option value="+886" data-textid="LOGIN_COUNTRY_CODE_TAIWAN" selected="selected">Taiwan +886</option>
+                                <option value="+86" data-textid="LOGIN_COUNTRY_CODE_CHINA">China +86</option>
+                                <option value="+852" data-textid="LOGIN_COUNTRY_CODE_HONGKONG">Hong Kong +852</option>
+                                <option value="+853" data-textid="LOGIN_COUNTRY_CODE_MACAU">Macau +853</option>
+                                <option value="+1" data-textid="LOGIN_COUNTRY_CODE_US">United States +1</option>
+                            </select>
+                        </div>
                     </div>
+
                     <div class="register-phone">
                         <input type="text" maxlength=10 data-role="none" data-textph-id="LOGIN_ACCOUNT"/>  
                         <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
