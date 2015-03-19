@@ -781,18 +781,17 @@ function getChatMemName (groupUID){
 function updateChat ( time, isGetNewer, firstScrollDom ){
 	cns.debug("-------- updateChat", isGetNewer, time, " ---------");
 	var api = "/groups/"+gi+"/chats/"+ci+"/messages";
-	if( null!=isGetNewer ){
-		if( true==isGetNewer ) api+="?d=true";
-		else if( false==isGetNewer ) api+="?d=false";
-		if( time ){
-			api+="&ct="+time;
-		}
-	} else if( time ){
+	if( time ){
 		api+="?ct="+time;
+		if( null!=isGetNewer ){
+			if( true==isGetNewer ) api+="&d=true";
+			else api+="&d=false";
+		}
 	}
 
 	var scrollToDom = ( false==isGetNewer && null!=firstScrollDom && firstScrollDom.length>0 )?firstScrollDom[0]:null ;
 
+	cns.debug(api);
 	op(api, "GET", "", function(data, status, xhr) {
 			var userData = $.lStorage(ui);
 		    g_group = userData[gi];
