@@ -66,8 +66,8 @@ $(document).ready(function(){
 	// 	updateChat();
 	// });
 
-
-	initChatDB( onChatDBInit);
+	onChatDBInit();
+	initChatDB();
 	initChatCntDB( );
 
 	//沒有登入資訊 就導回登入頁面
@@ -563,7 +563,7 @@ function getHistoryMsg ( bIsScrollToTop ){
 
 	$("#chat-loading-grayArea").hide();
 	$("#chat-loading").show();
-	cns.debug("----- getHistoryMsg ------");
+	console.debug("----- getHistoryMsg ------");
     g_idb_chat_msgs.limit(function(list){
     	var firstDayDiv = $("#chat-contents .chat-date-tag");
     	var scrollToDiv = (firstDayDiv.length>0 ) ? firstDayDiv[0] : null;
@@ -593,7 +593,7 @@ function getHistoryMsg ( bIsScrollToTop ){
 	    	if(bIsScrollToTop){
 	    		// container.scroll( onScrollContainer );
 	    		g_bIsLoadHistoryMsg = false;
-	    		cns.debug("---- end loading -----");
+	    		console.debug("---- end loading -----");
 	    	} else {
 	    		// setTimeout( hideLoading, 1000);
 	    	}
@@ -602,7 +602,7 @@ function getHistoryMsg ( bIsScrollToTop ){
 	    setTimeout( function(){
 	    	//onScrollContainer
 			g_bIsLoadHistoryMsg = false;
-	    	cns.debug("---- end loading -----");
+	    	console.debug("---- end loading -----");
 		},1000);
 
 
@@ -621,7 +621,7 @@ function getHistoryMsg ( bIsScrollToTop ){
 
 			$("#chat-loading").hide();
 			$("#chat-loading-grayArea").show();
-			g_firstLoadingProcess--;
+			if( g_firstLoadingProcess>0 ) g_firstLoadingProcess--;
 	    }
     },{
         index: "gi_ci_ct",
@@ -690,23 +690,36 @@ function hideLoading( targetScrollTo ){
 }
 
 function op ( url, type, data, delegate, errorDelegate){
-	$.ajax({
-		// url: "https://caprivateeim.mitake.com.tw/apiv1" + url,
-	    url: "https://ap.qmi.emome.net/apiv1" + url,
-	    type: type,
-	    data: data,
-	    dataType: "json",
-	    headers: {
+	var result = ajaxDo(url,{
 			ui: ui,
 			at: at,
-			li: "TW"
-	    },
-	    success: delegate,
-	    error: function(jqXHR, textStatus, errorThrown) {
-		  console.log(textStatus, errorThrown);
-		  if( errorDelegate ) errorDelegate();
-		}
+			li: lang
+	    },type,false,data);
+	result.error( function(jqXHR, textStatus, errorThrown){
+		console.log(textStatus, errorThrown);
+		if( errorDelegate ) errorDelegate();
 	});
+	result.success( function(data, status, xhr){
+		if( delegate ) delegate(data, status, xhr);
+	});
+	return result;
+	// $.ajax({
+	// 	// url: "https://caprivateeim.mitake.com.tw/apiv1" + url,
+	//     url: "https://ap.qmi.emome.net/apiv1" + url,
+	//     type: type,
+	//     data: data,
+	//     dataType: "json",
+	//     headers: {
+	// 		ui: ui,
+	// 		at: at,
+	// 		li: "TW"
+	//     },
+	//     success: delegate,
+	//     error: function(jqXHR, textStatus, errorThrown) {
+	// 	  console.log(textStatus, errorThrown);
+	// 	  if( errorDelegate ) errorDelegate();
+	// 	}
+	// });
 }
 
 function scrollToStart (){
@@ -779,13 +792,13 @@ function getChatMemName (groupUID){
 }
 
 function updateChat ( time, isGetNewer, firstScrollDom ){
-	cns.debug("-------- updateChat", isGetNewer, time, " ---------");
-	var api = "/groups/"+gi+"/chats/"+ci+"/messages";
-	if( null!=isGetNewer ){
-		if( true==isGetNewer ) api+="?d=true";
-		else if( false==isGetNewer ) api+="?d=false";
-		if( time ){
-			api+="&ct="+time;
+	console.debug("-------- updateChat", isGetNewer, time, " ---------");
+	var api = "groups/"+gi+"/chats/"+ci+"/messages";
+	if( time ){
+		api+="?ct="+time;
+		if( null!=isGetNewer ){
+			if( true==isGetNewer ) api+="&d=true";
+			else api+="&d=false";
 		}
 	} else if( time ){
 		api+="?ct="+time;
@@ -793,6 +806,7 @@ function updateChat ( time, isGetNewer, firstScrollDom ){
 
 	var scrollToDom = ( false==isGetNewer && null!=firstScrollDom && firstScrollDom.length>0 )?firstScrollDom[0]:null ;
 
+	console.debug(api);
 	op(api, "GET", "", function(data, status, xhr) {
 			var userData = $.lStorage(ui);
 		    g_group = userData[gi];
@@ -805,7 +819,7 @@ function updateChat ( time, isGetNewer, firstScrollDom ){
 
 					if( object.meta.ct>g_room.lastCt ){
 						g_room.lastCt = object.meta.ct;
-						cns.debug(object.meta.ct ); //, new Date(object.meta.ct)
+						console.debug(object.meta.ct ); //, new Date(object.meta.ct)
 					}
 					//showMsg(container, data.el[key], time);
 
@@ -840,7 +854,7 @@ function updateChat ( time, isGetNewer, firstScrollDom ){
 			if( isUpdatePermission ) getPermition( true );
 
 			//getting new msg
-			if( isGetNewer || (false==isGetNewer && null==time)){
+			if( isGetNewer || null==time ){
 
 				//update finished
 				if( data.el.length<=1 ){
@@ -850,8 +864,8 @@ function updateChat ( time, isGetNewer, firstScrollDom ){
 						// & no time specified, there might be history msgs
 						if( g_msgs.length<20 && null!=time && false==g_bIsEndOfHistory ) getHistoryMsg();
 						else{
-							g_firstLoadingProcess--;
-							cns.debug("----- finished new ", data.el.length, isGetNewer, " -----");
+							if( g_firstLoadingProcess>0 ) g_firstLoadingProcess--;
+							console.debug("----- finished new ", data.el.length, isGetNewer, " -----");
 							//the few msgs r all msgs in this chatroom
 							//first time in, so scroll to bottom
 							scrollToBottom();
@@ -868,11 +882,11 @@ function updateChat ( time, isGetNewer, firstScrollDom ){
 						if( isEndOfPageTmp ) scrollToBottom();
 					}
 			    } else { //update not finish
-					cns.debug("----- not finished new ", data.el.length, " -----");
+					console.debug("----- not finished new ", data.el.length, " -----");
 					updateChat ( g_room.lastCt, isGetNewer );
 			    }
 			} else{ //getting old msgs
-				cns.debug("----- finished old ", data.el.length, isGetNewer, " -----");
+				console.debug("----- finished old ", data.el.length, isGetNewer, " -----");
 	            
 				//no more history
 				if( 1>=data.el.length ){
@@ -1350,9 +1364,9 @@ function sendText(dom){
 		ml:tmpData.ml
 	};
 
-	op("/groups/"+gi+"/chats/"+ci+"/messages",
+	op("groups/"+gi+"/chats/"+ci+"/messages",
 	    "POST",
-	    JSON.stringify(sendData),
+	    sendData,
 		function(dd, status, xhr) {
 			//delete old data
 	    	g_idb_chat_msgs.remove(tmpData.ei);
@@ -1660,7 +1674,7 @@ function getPermition( isReget ){
         	isGettingPermission = true;
 	    	//取得成員列表
 	    	//GET /groups/{gi}/chats/{ci}/users
-	    	op("/groups/"+gi+"/chats/"+ci+"/users", 
+	    	op("groups/"+gi+"/chats/"+ci+"/users", 
 	    		"get", null, function(data, status, xhr){
 			    	//取得權限
 			    	var sendData = {
@@ -1731,9 +1745,9 @@ function sendMsgRead( msTime ){
 	    return;
 	}
 
-	op("/groups/"+gi+"/chats/"+ci+"/messages_read"
+	op("groups/"+gi+"/chats/"+ci+"/messages_read"
 	    ,"PUT",
-	    JSON.stringify({lt:msTime}),
+	    {lt:msTime},
 	    null
 	);
 }
@@ -1759,8 +1773,8 @@ function leaveChatRoom(){
 
 function editMemInRoomAPI(ciTmp, method, list, callback){
 	var sendData = {ul: list};
-	op("/groups/"+gi+"/chats/"+ciTmp+"/users", method, 
-		JSON.stringify(sendData), function(pData, status, xhr){
+	op("groups/"+gi+"/chats/"+ciTmp+"/users", method, 
+		sendData, function(pData, status, xhr){
 			cns.debug( status, JSON.stringify(pData) );
 			if( callback ) callback(pData);
 		}, 
