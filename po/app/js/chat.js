@@ -66,10 +66,6 @@ $(document).ready(function(){
 	// 	updateChat();
 	// });
 
-	onChatDBInit();
-	initChatDB();
-	initChatCntDB( );
-
 	//沒有登入資訊 就導回登入頁面
 	if( !$.lStorage("_chatRoom") ){
 		document.location = "login.html";
@@ -100,6 +96,9 @@ $(document).ready(function(){
     	}
     }
     g_room = g_group["chatAll"][ci];
+
+	initChatDB( onChatDBInit );
+	initChatCntDB( );
 
     //get name
 	if( null==g_room.uiName ){
@@ -287,7 +286,6 @@ $(document).ready(function(){
 	$("button.pollingMsg").off("click").click( function(){
 		updateChat(g_room.lastCt, true);
 	});
-	updateChat(g_room.lastCt, true);
 
 	var enterTime = new Date();
 
@@ -536,6 +534,7 @@ function resizeContent (){
 }
 
 function onChatDBInit(){
+	console.debug("-------- onChatDBInit ---------");
 	var today=new Date();
 	$("#chat-contents").html("<div class='firstMsg'></div>");
 	var timeTag = $("<div class='chat-date-tag'></div>");
@@ -553,6 +552,8 @@ function onChatDBInit(){
 	// getHistoryMsg( false );
 
 	scrollToBottom();
+
+	updateChat(g_room.lastCt, true);
 }
 
 //show history chat contents
