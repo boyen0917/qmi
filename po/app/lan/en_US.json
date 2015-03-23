@@ -4,6 +4,8 @@
 	"LANDING_PAGE_UPDATE" : "Updating version..",
 	
 	"LOGIN_ACCOUNT" :	"Phone Number or Email",
+	"LOGIN_ACCOUNT_EMAIL" : "Please enter your e-mail",
+	"LOGIN_ACCOUNT_PHONE" : "Enter phone number",
 	"LOGIN_PASSWORD" :	"Password",
 	"LOGIN_REMEMBER_ACCOUNT" :	"Remember Account",
 	"LOGIN_FORGET_PASSWORD" :	"Forgot Password？",

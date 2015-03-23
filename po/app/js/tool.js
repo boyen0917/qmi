@@ -295,7 +295,9 @@ $(function(){
 	    	$('.popup-confirm').addClass("full-width");
 	    }
 
-	    if(callback) $(".popup").data("callback",callback);
+	    //clear callback
+	    // if(callback) $(".popup").data("callback",callback);
+	    $(".popup").data("callback",callback);
 
 
 	    if(!confirm && !cancel){

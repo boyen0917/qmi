@@ -353,11 +353,11 @@ $(function(){
 		var next = $(".register-next");
 		var chk = next.data("chk");
 		if( true==chk ){
-			img.attr("src","images/registration/checkbox_none.png");
+			img.attr("src","images/common/icon/icon_check_gray.png");
 			next.data("chk", false);
 			$(".register-next").removeClass("register-next-ready");
 		} else {
-			img.attr("src","images/registration/checkbox_check.png");
+			img.attr("src","images/common/icon/icon_check_gray_check.png");
 			next.data("chk", true);
 
 			if( true==next.data("textChk") ){

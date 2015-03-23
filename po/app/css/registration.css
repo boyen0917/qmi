@@ -61,25 +61,36 @@ body{
 	width: 95px;
 	margin: 0 auto;
 }
+@media screen and (max-width: 800px){
+	.registration-content {
+		height: 564px;
+		margin-top: -webkit-calc( 50vh - 302px );
+		margin-bottom: -webkit-calc( 50vh - 262px );
+	}
+	.registration-logo img {
+		width: 95px;
+	}
+}
 /* responsive logo size.. */
-@media screen and (min-width: 801px){
+@media screen and (min-width: 801px) and (max-width: 1100px){
 	.registration-content {
 		height: 600px;
-		margin-top: -webkit-calc( 50vh - 300px );
-		margin-bottom: -webkit-calc( 50vh - 300px );
+		margin-top: -webkit-calc( 50vh - 320px );
+		margin-bottom: -webkit-calc( 50vh - 280px );
 	}
 	.registration-logo img {
 		width: 115px;
 	}
 }
-@media screen and (max-width: 800px){
+/* responsive logo size.. */
+@media screen and (min-width: 1101px){
 	.registration-content {
-		height: 564px;
-		margin-top: -webkit-calc( 50vh - 282px );
-		margin-bottom: -webkit-calc( 50vh - 282px );
+		height: 630px;
+		margin-top: -webkit-calc( 50vh - 330px );
+		margin-bottom: -webkit-calc( 50vh - 300px );
 	}
 	.registration-logo img {
-		width: 95px;
+		width: 130px;
 	}
 }
 
@@ -508,12 +519,12 @@ input.setting-birth-hidden {
 .version_update_lock{
 	background: rgba(0,0,0,0.5);
 	z-index: 1000;
-	display: none;
 	position: fixed;
 	width: 100%;
 	height: 100%;
 	left: 0;
 	top: 0;
+	display: none;
 }
 .version_update_lock div{
 	width: 300px;
@@ -521,7 +532,7 @@ input.setting-birth-hidden {
 	opacity: 1;
 	margin-right: auto;
 	margin-left: auto;
-	margin-top: -webkit-calc( 50% - 75px );
+	margin-top: -webkit-calc( 50vh - 50px );
 	text-align: center;
 	line-height: 50px;
 	background: rgba(255,255,255,0.8);

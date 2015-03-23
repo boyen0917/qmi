@@ -4,6 +4,8 @@
 	"LANDING_PAGE_UPDATE" : "版本更新中..",
 	
 	"LOGIN_ACCOUNT" :	"請輸入手機或Email",
+	"LOGIN_ACCOUNT_EMAIL" : "请输入Email",
+	"LOGIN_ACCOUNT_PHONE" : "请输入手机号码",
 	"LOGIN_PASSWORD" :	"請輸入密碼",
 	"LOGIN_REMEMBER_ACCOUNT" :	"記住帳號",
 	"LOGIN_FORGET_PASSWORD" :	"忘記密碼？",

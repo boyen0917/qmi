@@ -4468,6 +4468,9 @@ $(function(){
 	        	//創建團體結束 取消強制開啓loading 圖示
 	        	s_load_show = false;
 
+                if( null==gi ){
+                    gi = new_gi;
+                }
                 //combo
                 getGroupCombo(gi,function(){
                     if(invite){
