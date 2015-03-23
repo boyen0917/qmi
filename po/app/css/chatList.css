@@ -65,10 +65,10 @@
 	width: 82px;
 }
 .subpage-chatList-row .td:nth-child(2){
-    width:-webkit-calc( 100% - 167px );
+    width:-webkit-calc( 100% - 177px );
 }
 .subpage-chatList-row .td:nth-child(3){
-    width:80px;
+    width:95px;
 }
 .subpage-chatList-row .td:nth-child(4){
     display: none;

@@ -8,9 +8,10 @@ var initStickerArea= {
 	jsonPath: "sticker/stickerArea.json",
 	// dict: null,
 	splDict: null,
+	domList: [],
 	init: function( dom, onSelect ){
-		
 		var thisTmp = this;
+		thisTmp.domList.push(dom);
 		dom.data("callback",onSelect);
 
 		//------ top ---------
@@ -144,10 +145,11 @@ var initStickerArea= {
 		}
 
 		if( true==dataObj.isDownload ){
-			arImgId = dataObj.sl;
+			singleStickerObject = dataObj.list;
+			var arImgCnt = Object.keys(singleStickerObject).length;
 			content.html("");
 			// var imgPath = thisTmp.path+type+"/{0}.png";
-			var pageCnt = Math.ceil(arImgId.length/8);
+			var pageCnt = Math.ceil(arImgCnt/8);
 
 		    var iRowCnt = 0;
 		    var width = Math.floor((1/pageCnt)*100);
@@ -156,7 +158,9 @@ var initStickerArea= {
 		    var subDiv2 = null;
 			content.css("width",pageCnt*100+"%");
 			content.data("cnt",pageCnt);
-		    for(var i=0; i<arImgId.length; i++){
+			var i =0;
+			$.each( singleStickerObject, function(key, obj){
+		    // for(var i=0; i<arImgCnt; i++){
 		    	if( i%8==0 ){
 					div = $("<div class='page'></div>");
 					div.css("width", width+"%");
@@ -178,17 +182,18 @@ var initStickerArea= {
 		    	// if(path){
 		    	// 	st = $("<img src="+path[i]+">");
 		    	// } else{
-		    		// st = $("<img src="+imgPath.format(arImgId[i])+">");
+		    		// st = $("<img src="+imgPath.format(singleStickerObject[i])+">");
 		    	// }
-		    	st = $("<img src="+arImgId[i].sou+">");
-		    	st.data( "id", arImgId[i].sid );
+		    	st = $("<img src="+obj.sou+">");
+		    	st.data( "id", key );
 		    	imgDiv.append(st);
 		    	if( i%8<4 ){
 					subDiv1.append(imgDiv);
 		    	} else{
 					subDiv2.append(imgDiv);
 		    	}
-		    }
+		    	i++;
+		    });
 
 		    $(dom).find(".page .row img").off("click").click( function(){
 		    	var thisDom = $(this);
@@ -233,9 +238,9 @@ var initStickerArea= {
 			
 			downloadDom.find(".download").click( function(){
 				thisTmp.downloadSticker(type, function(){
-					dataObj = thisTmp.splDict[type];
-					thisTmp.showImg(dom, type, dataObj, path);
-					thisTmp.updatePageInfo(dom);
+					// dataObj = thisTmp.splDict[type];
+					// thisTmp.showImg(dom, type, dataObj, path);
+					// thisTmp.updatePageInfo(dom);
 				});
 			});
 		}
@@ -246,13 +251,13 @@ var initStickerArea= {
 		    if( null != userData ){
 		    	var object = {
 		    		isDownload: true,
-		    		sl:[],
+		    		list:{},
 		    		spi:history
 		    	};
 		    	if( userData.length>0 ){
 			    	for(var i=userData.length-1; i>=0; i--){
 			    		var obj = userData[i];
-			    		object.sl.push({sid:obj.id, sou:obj.src});
+			    		object.list[obj.id] = {sid:obj.id, sou:obj.src};
 			    		// keys.push(obj.id);
 			    		// values.push(obj.src);
 			    	}
@@ -301,7 +306,6 @@ var initStickerArea= {
 	load: function(callback) {
 		var thisTmp = this;
 		thisTmp.initStickerList( function(){
-	    	$.lStorage("_sticker", thisTmp.splDict);
 	    	if( callback() ) callback();
 	    });
 
@@ -330,15 +334,25 @@ var initStickerArea= {
 	        		var currentCnt = 0;
 	        		var cnt = obj.spl.length;
 	        		for( var i=0; i<cnt; i++ ){
-	        			var tmpObj = obj.spl[i];
-	        			if( thisTmp.splDict.hasOwnProperty(tmpObj.spi) ){
-	        				var tmpOriObj = thisTmp.splDict[tmpObj.spi];
+	        			var tmpNewSpiDetail = obj.spl[i];
+	        			if( thisTmp.splDict.hasOwnProperty(tmpNewSpiDetail.spi) ){
+	        				var tmpSpiDetail = thisTmp.splDict[tmpNewSpiDetail.spi];
 	        				//update downloaded stickers
-	        				if( true==tmpOriObj.isDownload && tmpOriObj.ut<tmpObj.ut ){
-	        					thisTmp.getStickerDetailApi(tmpOriObj.spi).complete(function(detailDataTmp){
+	        				if( true==tmpSpiDetail.isDownload && tmpSpiDetail.ut<tmpNewSpiDetail.ut ){
+	        					thisTmp.getStickerDetailApi(tmpSpiDetail.spi).complete(function(detailDataTmp){
 	        						if(detailDataTmp.status == 200){
 	        							var detailData = $.parseJSON(detailDataTmp.responseText);
-	        							thisTmp.splDict[tmpObj.spi].sl = $.extend(thisTmp.splDict[tmpObj.spi].sl, detailData);
+	        							
+	        							// thisTmp.splDict[tmpNewSpiDetail.spi].sl = $.extend(thisTmp.splDict[tmpNewSpiDetail.spi].sl, detailData);
+
+		        						tmpSpiDetail.list = {};
+		        						var oriList = detailData;
+		        						for(var j=0; j<oriList.length; j++){
+		        							tmpSpiDetail.list[oriList[j].sid] = oriList[j];
+		        						}
+		        						if( null!=tmpSpiDetail.sl ){
+		        							delete tmpSpiDetail.sl;
+		        						}
 	        						}
 	        						currentCnt++;
 	        						if( cnt==currentCnt ){
@@ -347,17 +361,28 @@ var initStickerArea= {
 	        					});
 	        				} else {
 	        					currentCnt++;
+	        					//將array改存為object, 方便查詢
+	        					if( null!=tmpSpiDetail.sl && null==tmpSpiDetail.list ){
+	        						tmpSpiDetail.list = {};
+	        						var oriList = thisTmp.splDict[tmpNewSpiDetail.spi].sl;
+	        						for(var j=0; j<oriList.length; j++){
+	        							tmpSpiDetail.list[oriList[j].sid] = oriList[j];
+	        						}
+	        						delete tmpSpiDetail.sl;
+	        					}
 	        				}
-	        				thisTmp.splDict[tmpObj.spi] = $.extend(thisTmp.splDict[tmpObj.spi], tmpObj);
+
+	        				// thisTmp.splDict[tmpNewSpiDetail.spi] = $.extend(thisTmp.splDict[tmpNewSpiDetail.spi], tmpNewSpiDetail);
 	        			} else {
 	        				currentCnt++;
-	        				thisTmp.splDict[tmpObj.spi] = tmpObj;
+	        				thisTmp.splDict[tmpNewSpiDetail.spi] = tmpNewSpiDetail;
 	        			}
 
 	        			if( cnt==currentCnt ){
 	        				if( callback() ) callback();
 	        			}
 	        		}
+		    		$.lStorage("_sticker", thisTmp.splDict);
 	        	}
 	        });
 	    } catch(e){
@@ -389,25 +414,118 @@ var initStickerArea= {
 
         return ajaxDo(api_name,headers,method,false,null);
 	},
+	getSingleStickerPathApi: function(sid) {
+		var thisTmp = this;
+		var api_name = "stickers/"+sid;
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "get";
+
+        return ajaxDo(api_name,headers,method,false,null);
+	},
 	downloadSticker: function(spi, callback){
 		var thisTmp = this;
 		thisTmp.getStickerDetailApi(spi).complete(function(data){
 	    	if(data.status == 200){
 	    		try{
 		    		var detailData = $.parseJSON(data.responseText);
-		    		if( null!=thisTmp.splDict[spi].sl ){
-		    			thisTmp.splDict[spi].sl.extend(detailData.sl);
-		    		} else {
-		    			thisTmp.splDict[spi].sl = detailData.sl;
+		    		// if( null!=thisTmp.splDict[spi].sl ){
+		    		// 	thisTmp.splDict[spi].sl.extend(detailData.sl);
+		    		// } else {
+		    		// 	thisTmp.splDict[spi].sl = detailData.sl;
+		    		// }
+		    		if( null==thisTmp.splDict[spi].list ){
+		    			thisTmp.splDict[spi].list = {};
 		    		}
+		    		for( var i=0; i<detailData.sl.length; i++ ){
+		    			thisTmp.splDict[spi].list[detailData.sl[i].sid] = detailData.sl[i];
+		    		}
+
 		    		thisTmp.splDict[spi].isDownload = true;
 		    		$.lStorage("_sticker", thisTmp.splDict);
+		    		thisTmp.updateTypeInDomList( spi );
 		    	} catch(e){
 		    		errorReport(e);
+		    		if( callback ) callback();
 		    	}
 	    	}
 	    	if( callback ) callback();
 	    });
+	},
+	updateTypeInDomList : function( type ){
+		var thisTmp = this;
+		var dataObj = thisTmp.splDict[type];
+		for( var i=thisTmp.domList.length-1;i>=0; i-- ){
+			if( null==thisTmp.domList[i] || thisTmp.domList[i].length==0 ){
+				thisTmp.domList.splice(i,1);
+			} else {
+				thisTmp.showImg(thisTmp.domList[i], type, dataObj);
+				thisTmp.updatePageInfo(thisTmp.domList[i]);
+			}
+		}
+	},
+	getStickerPath: function(sid, callback){
+		var thisTmp = this;
+		try{
+			var spi = sid.split("_")[1];
+			if( thisTmp.isUpdated ){
+				if( null!=thisTmp.splDict[spi].list && thisTmp.splDict[spi].list.hasOwnProperty(sid) ){
+					callback(thisTmp.splDict[spi].list[sid].sou);
+				} else {
+					if( null==thisTmp.splDict[spi].list ){
+						thisTmp.splDict[spi].list = {};
+					}
+					thisTmp.getSingleStickerPathApi(sid).complete( function(data){
+						if( data.status==200 ){
+							var detailData = $.parseJSON(data.responseText);
+							thisTmp.splDict[spi].list[sid] = {
+								sid: sid,
+								sou: detailData.sou,
+								stu: detailData.stu
+							};
+							callback(thisTmp.splDict[spi].list[sid].sou);
+							$.lStorage("_sticker",thisTmp.splDict);
+						} else {
+							callback("");
+						}
+					});
+				}
+			} else {
+				thisTmp.load( function(){
+					if( null!=thisTmp.splDict[spi].list && thisTmp.splDict[spi].list.hasOwnProperty(sid) ){
+						callback(thisTmp.splDict[spi].list[sid].sou);
+					} else {
+						if( null==thisTmp.splDict[spi].list ){
+							thisTmp.splDict[spi].list = {};
+						}
+						thisTmp.getSingleStickerPathApi(sid).complete( function(data){
+							if( data.status==200 ){
+								var detailData = $.parseJSON(data.responseText);
+								thisTmp.splDict[spi].list[sid] = {
+									sid: sid,
+									sou: detailData.sou,
+									stu: detailData.stu
+								};
+								callback(thisTmp.splDict[spi].list[sid].sou);
+								$.lStorage("_sticker",thisTmp.splDict);
+							} else {
+								callback("");
+							}
+						});
+					}
+				});
+			}
+		} catch(e){
+			errorReport(e);
+		}
+	},
+	setStickerSrc: function(dom, sid){
+		this.getStickerPath(sid, function(path){
+			dom.attr("src",path);
+		});
 	}
 };
 

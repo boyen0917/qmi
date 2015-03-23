@@ -4,6 +4,8 @@
 	"LANDING_PAGE_UPDATE" : "版本更新中..",
 	
 	"LOGIN_ACCOUNT" :	"請輸入手機或Email",
+	"LOGIN_ACCOUNT_EMAIL" : "请输入Email",
+	"LOGIN_ACCOUNT_PHONE" : "请输入手机号码",
 	"LOGIN_PASSWORD" :	"請輸入密碼",
 	"LOGIN_REMEMBER_ACCOUNT" :	"記住帳號",
 	"LOGIN_FORGET_PASSWORD" :	"忘記密碼？",
@@ -13,6 +15,11 @@
 	"LOGIN_ACCOUNT_OR_PASSWORD_ERROR" :	"帳號或密碼錯誤，請重新登入",
 	"LOGIN_FORGETPASSWD_NOT_MATCH" : "兩次輸入的密碼不一致",
 	"LOGIN_AUTO_LOGIN_FAIL" : "驗證失敗 請重新登入",
+	"LOGIN_COUNTRY_CODE_TAIWAN" : "台灣 +886",
+	"LOGIN_COUNTRY_CODE_CHINA" : "中國 +86",
+	"LOGIN_COUNTRY_CODE_HONGKONG" : "香港 +852",
+	"LOGIN_COUNTRY_CODE_MACAU" : "澳門 +853",
+	"LOGIN_COUNTRY_CODE_US" : "美國 +1",
 	
 	"REGISTER_ACCOUNT_REGITST_TITLE" :	"註冊帳號",
 	"REGISTER_ACCOUNT_POLICY" :	"我看過並同意%@使用條款%@及%@隱私政策%@",

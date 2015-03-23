@@ -793,6 +793,7 @@ function getChatMemName (groupUID){
 }
 
 function updateChat ( time, isGetNewer, firstScrollDom ){
+// <<<<<<< HEAD
 	console.debug("-------- updateChat", isGetNewer, time, " ---------");
 	var api = "groups/"+gi+"/chats/"+ci+"/messages";
 	if( time ){
@@ -801,8 +802,6 @@ function updateChat ( time, isGetNewer, firstScrollDom ){
 			if( true==isGetNewer ) api+="&d=true";
 			else api+="&d=false";
 		}
-	} else if( time ){
-		api+="?ct="+time;
 	}
 
 	var scrollToDom = ( false==isGetNewer && null!=firstScrollDom && firstScrollDom.length>0 )?firstScrollDom[0]:null ;

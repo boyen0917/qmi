@@ -4468,6 +4468,9 @@ $(function(){
 	        	//創建團體結束 取消強制開啓loading 圖示
 	        	s_load_show = false;
 
+                if( null==gi ){
+                    gi = new_gi;
+                }
                 //combo
                 getGroupCombo(gi,function(){
                     if(invite){
@@ -5354,9 +5357,10 @@ $(function(){
 					// mathAvatarPos(this_event.find(".st-attach-url-img img"),w,h,0,360);
 					break;
 				case 5:
-					var sticker_path = "sticker/" + val.c.split("_")[1] + "/" + val.c + ".png";
+					// var sticker_path = "sticker/" + val.c.split("_")[1] + "/" + val.c + ".png";
 					this_event.find(".st-attach-sticker").show();
-					this_event.find(".st-attach-sticker img").attr("src",sticker_path);
+					// this_event.find(".st-attach-sticker img").attr("src",sticker_path);
+                    initStickerArea.setStickerSrc(this_event.find(".st-attach-sticker img"),val.c);
 					break;
 				case 6://圖片
 					this_event.find(".st-attach-img").show();
