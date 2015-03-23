@@ -159,6 +159,62 @@ $(function(){
 
 */     
 	
+	//----- landing page login start -------
+
+	$(".login-ld-phone input").bind("input",function(){
+		//限制輸入數字
+		if($(this).parent().hasClass("login-ld-phone")){
+			$(this).val($(this).val().replace(/[^-_0-9]/g,''));	
+		}
+		checkLoginReady();
+	});
+	$(".login-ld-password input").bind("input",function(){
+		checkLoginReady();
+	});
+	$(".login-ld-email input").bind("input",function(){
+		checkLoginReady();
+	});
+
+	checkLoginReady = function(){
+		var page = $("#page-registration");
+		var activeTab = page.find(".login-tab.active");
+		if( "phone" == activeTab.attr("data-type") ){
+			var pwdInput = $(".login-ld-password input");
+			var phoneInput = $(".login-ld-phone input");
+			switch( countrycode ){
+				case "+886":
+					//電話號碼10碼 開頭為09 密碼大於等於6
+					if(pwdInput.val().length >= 6 && phoneInput.val().length == 10 && phoneInput.val().substring(0,2) == "09"){
+						$("#page-registration .login").addClass("login-ready");
+					}else{
+						$("#page-registration .login").removeClass("login-ready");
+					}
+					break;
+				default:
+					cns.debug("unknown rules, just pass it");
+					$("#page-registration .login").addClass("login-ready");
+					break;
+			}
+		} else {
+			var pwdInput = $(".login-ld-password input");
+			var emailInput = $(".login-ld-email input");
+			var email = emailInput.val();
+			if( email && email.length>3 ){
+				var notMatch = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,'');
+				
+				//電話號碼10碼 開頭為09 密碼大於等於6
+				if(pwdInput.val().length >= 6 && notMatch.length == 0 ){
+					$("#page-registration .login").addClass("login-ready");
+				}else{
+					$("#page-registration .login").removeClass("login-ready");
+				}
+			} else {
+				$("#page-registration .login").removeClass("login-ready");
+			}
+		}
+	}
+
+	//------- landing page login end -------
 
 	$(".login-phone input, .login-password input").bind("input",function(){
 		//限制輸入數字
