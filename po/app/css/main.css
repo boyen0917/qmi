@@ -311,13 +311,15 @@ img.auo {
 	cursor: pointer;
 }
 
-.gm-nav-active {
-	background: rgb(132,195,234);
-}
-
 .gm-nav-box {
 	width: 50%;
 	text-align: center;
+	color: rgb(33,97,138);
+}
+
+.gm-nav-active {
+	background: rgb(132,195,234);
+	color: white;
 }
 
 .gm-nav-box img {
@@ -746,7 +748,7 @@ img.auo {
 
 .ui-bar-c {
 	background: rgb(57, 148, 232);
-	border-color: rgb(50,73,105);
+	border-color: rgb(57, 148, 232);
 	color: white;
 	/*text-shadow: 0 0;*/
 }

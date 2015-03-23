@@ -793,7 +793,6 @@ function getChatMemName (groupUID){
 }
 
 function updateChat ( time, isGetNewer, firstScrollDom ){
-// <<<<<<< HEAD
 	console.debug("-------- updateChat", isGetNewer, time, " ---------");
 	var api = "groups/"+gi+"/chats/"+ci+"/messages";
 	if( time ){
