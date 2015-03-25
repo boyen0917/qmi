@@ -1225,9 +1225,9 @@ $(function(){
              break;
         };
 
-        //讚留言閱讀
+        //讚留言閱讀 任務會影響回文數 
         this_event.find(".st-sub-box-3 div:eq(0)").html(e_data[0].meta.lct);
-        this_event.find(".st-sub-box-3 div:eq(1)").html(e_data[0].meta.pct);
+        // this_event.find(".st-sub-box-3 div:eq(1)").html(e_data[0].meta.pct);
         this_event.find(".st-sub-box-3 div:eq(2)").html(e_data[0].meta.rct);
     }
 
@@ -1245,11 +1245,6 @@ $(function(){
 
         //event path
         this_event.data("event-path",this_ei);
-
-        //更新數字
-        this_event.find(".st-sub-box-3 div:eq(0)").html(e_data[0].meta.lct);
-        this_event.find(".st-sub-box-3 div:eq(1)").html(e_data[0].meta.pct);
-        this_event.find(".st-sub-box-3 div:eq(2)").html(e_data[0].meta.rct);
 
         //已讀亮燈
         this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")
