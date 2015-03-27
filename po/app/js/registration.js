@@ -1050,8 +1050,12 @@ $(function(){
 	initLandPage = function(){
 		s_load_show = true;
 		if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
-			loginAction($.lStorage("_loginData"));
-			return false;
+			$('.ui-loader').css("display","block");
+			$(".ajax-screen-lock").show();
+			setTimeout( function(){
+				loginAction($.lStorage("_loginData"));
+				return false;
+			},1500);
 		}
 		
 		//若local storage 有記錄密碼 就顯示

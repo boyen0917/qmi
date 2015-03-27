@@ -6899,7 +6899,7 @@ $(function(){
     		method = "val";
     	}
 
-    	var avatar_bar_arr = ["nk","sl","bd","bl"];
+    	var avatar_bar_arr = ["nk","sl","bd","bl","ti"];
     	var img_arr = ["em","pn","pn1","ext","mv"];
     	var selector;
 
