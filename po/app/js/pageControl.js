@@ -53,11 +53,38 @@
           }
       });
     },
+    popAllPage: function() {
+      var pc = this;
+      if( pc.history.length<=0 ) return;
+
+      var oldID = pc.currentID;
+      var id = pc.history[0];
+      pc.history = [];
+      var dom = $(id);
+      pc.currentID = id;
+      cns.debug("onDone");
+      $(dom).fadeIn( pc.animateInterval );
+      var isSend = false;
+      $(oldID+", "+oldID + " .fixed").animate({
+          marginLeft: "100%",
+        }, pc.animateInterval, function() {
+          if( !isSend ){
+            isSend = true;
+            $(oldID).hide();
+            cns.debug("[popPage] ", id, oldID);
+            var onDone = $(oldID).data( "onDone" );
+            if( onDone ) onDone(false);
+          }
+      });
+    },
     onPageBack: null
   };
 
   $.changePage = function( id, onShow, onDone ){
     pageControl.changePage( id, onShow, onDone );
+  }
+  $.popAllPage = function(){
+    pageControl.popAllPage();
   }
   // $.setOnPageBack = function( callBack ){
   //   pageControl.onPageBack = callBack;

@@ -5,10 +5,21 @@ var windowList = new Object();
 var sortRoomListTimeout = 700;
 
 $(document).ready(function(){
+	//add new chat done, refresh list
 	$(".chatList-add-done").on("click", function(){
-		$(".chatList-add").data("object_str", $(this).attr("data-object_str") );
-		$(".chatList-add").data("favorite_str", $(this).attr("data-favorite_str") );
-		onShowNewRoomPageDone();
+		var this_dom = $(this);
+		var giTmp = this_dom.attr("data-gi");
+		var ciTmp = this_dom.attr("data-ci");
+		if( gi == giTmp ){
+			updateChatList(gi, function(){
+				openChatWindow( giTmp, ciTmp );
+			});
+		} else {
+			openChatWindow( giTmp, ciTmp );
+		}
+		// $(".chatList-add").data("object_str", $(this).attr("data-object_str") );
+		// $(".chatList-add").data("favorite_str", $(this).attr("data-favorite_str") );
+		// onShowNewRoomPageDone();
 	});
 	$(document).on("click",".newChatDetail-header",function(){
 		var tmp = $(this).next();
@@ -278,7 +289,7 @@ function deleteRoom ( deleteRow ){
 function openChatWindow ( giTmp, ci ){
 	clearChatListCnt( giTmp, ci );
 	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
-		windowList[ci].focus();
+		// windowList[ci].focus();
 	} else {
 		var data= new Object();
 		data["gi"]=giTmp;
@@ -290,6 +301,7 @@ function openChatWindow ( giTmp, ci ){
 		//document.location = "chat.html";
 		windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
 	}
+	windowList[ci].focus();
 }
 
 function updateLastMsg(giTmp, ciTmp, isRoomOpen ){
@@ -299,9 +311,9 @@ function updateLastMsg(giTmp, ciTmp, isRoomOpen ){
 }
 function clearChatListCnt( giTmp, ciTmp ){
 	var userData = $.lStorage(ui);
-	g_group = userData[giTmp];
-	g_room = g_group["chatAll"][ciTmp];
-	g_room.unreadCnt = 0;
+	var groupTmp = userData[giTmp];
+	var roomTmp = groupTmp["chatAll"][ciTmp];
+	roomTmp.unreadCnt = 0;
 	$.lStorage(ui, userData);
 	$(".subpage-chatList-row[data-rid='"+ciTmp+"'] .cnt").html("");
 }
@@ -313,12 +325,12 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 
 	try{
 		var userData = $.lStorage(ui);
-		g_group = userData[giTmp];
-		if( null==g_group.guAll ){
+		var groupTmp = userData[giTmp];
+		if( null==groupTmp.guAll ){
 			setGroupAllUser( null, giTmp, function(){
 				userData = $.lStorage(ui);
-				g_group = userData[giTmp];
-				g_room = g_group["chatAll"][ciTmp];
+				groupTmp = userData[giTmp];
+				var roomTmp = groupTmp["chatAll"][ciTmp];
 				
 				g_idb_chat_msgs.limit(function(list){
 				    if( list.length>0 ){
@@ -327,7 +339,7 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 				        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
 				    	}
 				    } else {
-				    	setLastMsgContent( giTmp, ciTmp, table, g_room.cm, isShowAlert, isRoomOpen );
+				    	setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
 				    }
 
 				},{
@@ -350,17 +362,17 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 		} else{
 			g_idb_chat_msgs.limit(function(list){
 				try{
-					if( g_group.gi != giTmp ){
+					if( groupTmp.gi != giTmp ){
 						cns.debug("incoming chat msg is not currentGroup");
 					}
-					g_room = g_group.chatAll[ciTmp];
+					var roomTmp = groupTmp.chatAll[ciTmp];
 				    if( list.length>0 ){
 				    	if( null!=list[0] ){
 				        	var object = list[0].data;
 				        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
 				    	}
 				    } else {
-						setLastMsgContent( giTmp, ciTmp, table, g_room.cm, isShowAlert, isRoomOpen );
+						setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
 					}
 				} catch(e){
 					errorReport(e);
@@ -771,26 +783,26 @@ function requestNewChatRoomApi(giTmp, cnTmp, gul, fl, callback, isOpenRoom){
     			if(result.ci){
     				//還沒有聊過天的話server聊天室列表不會有這個聊天室
     				var userData = $.lStorage( ui );
-				    g_group = userData[giTmp];
-				    if( null==g_group ) return;
-					var me = g_group.gu;
-				    if( null==g_group["chatAll"][result.ci] ){
-				    	g_group["chatAll"][result.ci] = {
+				    var groupTmp = userData[giTmp];
+				    if( null==groupTmp ) return;
+					var me = groupTmp.gu;
+				    if( null==groupTmp["chatAll"][result.ci] ){
+				    	groupTmp["chatAll"][result.ci] = {
 				    		ci: result.ci,
 				    	};
 				    	var isSingleChat = (gul.length == 1);
 				    	if( isSingleChat ){
 				    		var memGu = gul[0].gu;
-				    		g_group["chatAll"][result.ci].tp = 1;
-				    		g_group["chatAll"][result.ci].cn = me+","+memGu;
-				    		var mem = g_group["guAll"][memGu];
-				    		if( mem ) g_group["chatAll"][result.ci].uiName = mem.nk;
-				    		else g_group["chatAll"][result.ci].uiName = "";
+				    		groupTmp["chatAll"][result.ci].tp = 1;
+				    		groupTmp["chatAll"][result.ci].cn = me+","+memGu;
+				    		var mem = groupTmp["guAll"][memGu];
+				    		if( mem ) groupTmp["chatAll"][result.ci].uiName = mem.nk;
+				    		else groupTmp["chatAll"][result.ci].uiName = "";
 				    		
 				    	} else {
-				    		g_group["chatAll"][result.ci].tp = 2;
-				    		g_group["chatAll"][result.ci].cn = text;
-				    		g_group["chatAll"][result.ci].uiName = text;
+				    		groupTmp["chatAll"][result.ci].tp = 2;
+				    		groupTmp["chatAll"][result.ci].cn = text;
+				    		groupTmp["chatAll"][result.ci].uiName = text;
 				    	}
 				    	$.lStorage( ui, userData );
 				    }

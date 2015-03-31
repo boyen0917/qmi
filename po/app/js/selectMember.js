@@ -1,14 +1,15 @@
-showSelectMemPage = function( parentDom, dataDom, onPageChanged, onDone ){
+showSelectMemPage = function( parentDom, dataDom, onPageChanged, onDone, isBackWhenDone ){
 	if( $("#page-selectMem").length>0 ){
-		showSelectMemPageDelegate( dataDom, onPageChanged, onDone );
+		showSelectMemPageDelegate( dataDom, onPageChanged, onDone, isBackWhenDone );
 	} else {
 		$('<div>').load('layout/memberSelect.html',function(){
 			parentDom.append( $(this).find("#page-selectMem") );
-			showSelectMemPageDelegate( dataDom, onPageChanged, onDone );
+			showSelectMemPageDelegate( dataDom, onPageChanged, onDone, isBackWhenDone );
 		});
 	}
 }
-showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone ){
+showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBackWhenDone ){
+    if( null==isBackWhenDone ) isBackWhenDone = true;
     $(".header-title div:eq(1)").html(0);
 
     //設定高
@@ -609,8 +610,10 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone ){
     $(".obj-selected .clear").off("click").click( selectTargetAll );
 
     //避免重複
+    $(".ui-header .page-next").data("isBackWhenDone", isBackWhenDone);
     $(document).off("click",".ui-header .page-next:not(.disable)");
     $(document).on("click",".ui-header .page-next:not(.disable)",function(e){
+        var isBackWhenDone = $(this).data("isBackWhenDone");
         var obj_length = Object.keys($("#page-selectMem .ui-container").data("selected-obj")).length
             +Object.keys($("#page-selectMem .ui-container").data("selected-branch")).length;
 
@@ -647,7 +650,7 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone ){
         }
 
         //回上一頁
-        $(".page-next").parent().find(".page-back").trigger("click");
+        if(isBackWhenDone ) $(".page-next").parent().find(".page-back").trigger("click");
         if( onDone ) onDone(true);
     });
 
