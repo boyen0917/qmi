@@ -289,6 +289,7 @@ $(function(){
 
 	timelineSwitch = function (act,reset,main){
 
+        var oriAct = $("#page-group-main").data("currentAct");
         $("#page-group-main").data("currentAct",act);
 		//reset 
 		if(reset) {
@@ -365,7 +366,30 @@ $(function(){
 	        case "chat":
                 groupSwitchEnable();
                 //offical general
-                if( false==onClickOfficialGeneralChat(gi) ){
+                if( onClickOfficialGeneralChat(gi) ){
+                    $("#page-group-main").data("currentAct",oriAct);
+                    switch(oriAct){
+                        case "feeds":
+                        case "feed-post":
+                        case "feed-public":
+                            $(".subpage-timeline").show();
+                            break;
+                        case "memberslist":
+                            $(".subpage-contact").show();
+                            break;
+                        case "album":
+                            $(".subpage-album").show();
+                            break;
+                        case "groupSetting":
+                            $(".subpage-groupSetting").show();
+                            break;
+                        case "calendar":
+                        case "help":
+                        case "news":
+                        case "system-setting":
+                          break;
+                    }
+                } else {
 
     	        	//-- switch sub pages --
     	        	$(".subpage-chatList").show();
@@ -1152,13 +1176,14 @@ $(function(){
                 if( null!=groupData.chatAll ){
                     for( var ci in groupData.chatAll ){
                         var room = groupData.chatAll[ci];
-                        if( room.tp!=0 ){
+                        if( room.tp==1 ){
                             openChatWindow ( this_gi, ci );
+                            return true;
                         }
                     }
                 }
-                return true;
             }
+            return false;
         } catch(e){
             errorReport(e);
         }
