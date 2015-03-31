@@ -89,6 +89,7 @@ $(function(){
 				countryCodeDoms.attr("data-val",val);
 				var text = countryCodeDoms.find("option[value='"+val+"']").text() || "";
 				countryCodeDoms.attr("data-text",text);
+				if( "undefined"!=typeof(checkRegisterPhone) ) checkRegisterPhone();
 			},
 			effect: "slide"
 		});
@@ -116,7 +117,6 @@ $(function(){
 		}
 	});
 
-
 	//contry code
 	var countryCodeDoms = $('.login-ld-countrycode select');
 	countryCodeDoms.selectbox({
@@ -134,6 +134,7 @@ $(function(){
 				loginData.countrycode = val;
 				$.lStorage("_loginRemeber", loginData);
 			}
+			if( "undefined"!=typeof(checkLoginReady) ) checkLoginReady();
 		},
 		effect: "slide"
 	});
@@ -147,6 +148,7 @@ $(function(){
 			cns.debug(targetCountryDom.text());
 		}
 	}
+
 /*
 
      ##        #######   ######   #### ##    ## 
@@ -176,34 +178,25 @@ $(function(){
 	});
 
 	checkLoginReady = function(){
+		cns.debug("[checkLoginReady]");
 		var page = $("#page-registration");
 		var activeTab = page.find(".login-tab.active");
 		if( "phone" == activeTab.attr("data-type") ){
 			var pwdInput = $(".login-ld-password input");
 			var phoneInput = $(".login-ld-phone input");
-			switch( countrycode ){
-				case "+886":
-					//電話號碼10碼 開頭為09 密碼大於等於6
-					if(pwdInput.val().length >= 6 && phoneInput.val().length == 10 && phoneInput.val().substring(0,2) == "09"){
-						$("#page-registration .login").addClass("login-ready");
-					}else{
-						$("#page-registration .login").removeClass("login-ready");
-					}
-					break;
-				default:
-					cns.debug("unknown rules, just pass it");
-					$("#page-registration .login").addClass("login-ready");
-					break;
+			if( checkPhoneValidation( countrycode, phoneInput.val())&&pwdInput.val().length >= 6 ){
+				$("#page-registration .login").addClass("login-ready");
+			} else {
+				$("#page-registration .login").removeClass("login-ready");
 			}
 		} else {
 			var pwdInput = $(".login-ld-password input");
 			var emailInput = $(".login-ld-email input");
 			var email = emailInput.val();
 			if( email && email.length>3 ){
-				var notMatch = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,'');
+				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,'');
 				
-				//電話號碼10碼 開頭為09 密碼大於等於6
-				if(pwdInput.val().length >= 6 && notMatch.length == 0 ){
+				if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
 					$("#page-registration .login").addClass("login-ready");
 				}else{
 					$("#page-registration .login").removeClass("login-ready");
@@ -213,6 +206,7 @@ $(function(){
 			}
 		}
 	}
+
 
 	//------- landing page login end -------
 
@@ -298,7 +292,7 @@ $(function(){
         };
         var id = phone_id;
         if( false==isMail ){
-        	id = countrycode + phone_id.substring(1);
+        	id = countrycode + getInternationalPhoneNumber(countrycode, phone_id);
         }
         var body = {
             id: id,
@@ -422,24 +416,27 @@ $(function(){
 		}
 	});
 
-	$(".register-phone input").bind("input",function(){
-		$(this).val($(this).val().replace(/[^-_0-9]/g,''));
-		var this_register = $(this).parent();
-
-		if($(this).val().length == 10 && $(this).val().substring(0,2) == "09"){
+	checkRegisterPhone = function(){
+		var this_dom = $(".register-phone input");
+		cns.debug("[checkRegisterPhone]");
+		this_dom.val(this_dom.val().replace(/[^-_0-9]/g,''));
+		var this_register = this_dom.parent();
+		var countryCodeDoms = $('#page-register .countrycode select');
+		var tmpCountryCode = countryCodeDoms.attr("data-val");
+		if( checkPhoneValidation( tmpCountryCode, this_dom.val()) ){
 			this_register.find("img").show();
 			$(".register-next").data("textChk", true );
 
 			if( true==$(".register-next").data("chk") ){
 				$(".register-next").addClass("register-next-ready");
 			}
-		}else{
+		} else {
 			this_register.find("img").hide();
 			$(".register-next").data("textChk", false );
 			$(".register-next").removeClass("register-next-ready");
 		}
-
-	});
+	};
+	$(".register-phone input").bind("input",checkRegisterPhone );
 
 	$(".register-next").click(function(){
 		if($(this).hasClass("register-next-ready")){
@@ -462,8 +459,11 @@ $(function(){
 				cns.debug(newCountryCode, newCountryText);
 			}
 
-			var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + $(".register-phone input").val().substring(1)+"</label>";
-			popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
+			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
+			if( newPhoneNumber.length>0 ){
+				var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + newPhoneNumber+"</label>";
+				popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
+			}
 		}else{
 			return false;
 		}
@@ -652,9 +652,15 @@ $(function(){
 
 	registration = function(resend){
 		if(!resend){
+			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
+			if( newPhoneNumber.length>0 ){
+				var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + newPhoneNumber+"</label>";
+				popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
+			}
 			// $(document).data("device-token",deviceTokenMake());
 			$(document).data("device-token","web-device");
-			$(document).data("phone-id", countrycode + $(".register-phone input").val().substring(1));	
+			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
+			$(document).data("phone-id", countrycode + newPhoneNumber );	
 		}
 		
         var api_name = "registration";

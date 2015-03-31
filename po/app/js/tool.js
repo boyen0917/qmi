@@ -1264,6 +1264,46 @@ $(function(){
 		img.src = url;
 	}
 
+	//ref: http://en.wikipedia.org/wiki/National_conventions_for_writing_telephone_numbers
+	checkPhoneValidation = function(countryCode, phone){
+		if( null==countryCode || null==phone ) return;
+
+		switch(countryCode){
+			case "+886": //taiwan 手機10碼 開頭為09, 轉國際電話時去掉前綴'0'共1碼
+				return (phone.length == 10 && phone.substring(0,2) == "09");
+				break;
+			case "+86": //china 手機11碼 開頭為1, 轉國際電話時無前綴碼
+				return (phone.length == 11 && phone.substring(0,1) == "1");
+				break;
+			case "+852": //hongkong 手機8碼 無開頭, 轉國際電話時無前綴碼
+				return (phone.length == 8);
+				break;
+			case "+853": //Macau 手機8碼 6開頭, 轉國際電話時無前綴碼
+				return (phone.length == 8 && phone.substring(0,1) == "6");
+				break;
+			case "+1": //america (XXX)XXX-XXXX, 手機10碼 開頭區碼, 轉國際電話時無前綴碼
+				return (phone.length == 10);
+				break;
+		}
+		return true;
+	}
+
+	getInternationalPhoneNumber = function(countryCode, phone){
+		if( null==countryCode || null==phone ) return "";
+
+		if( checkPhoneValidation(countryCode, phone) ){
+			switch(countryCode){
+				case "+886": //taiwan 手機10碼 開頭為09, 轉國際電話時去掉前綴'0'共1碼
+					return phone.substring(1,phone.length);
+					break;
+				default: //china 手機號碼11碼 開頭為1, 轉國際電話時無前綴碼
+					return phone;
+					break;
+			}
+		}
+		return "";
+	}
+
 	/* node-webkit only */
 	copyTextToClipboard = function( text ){
 		try{
