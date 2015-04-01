@@ -118,9 +118,7 @@ $(function(){
         }		   
     });
 
-	//timeline 滾到底部取舊資料
 	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
-
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi") || "00";
 
@@ -1725,7 +1723,75 @@ $(function(){
 	        tmp.parent().addClass("play");
 	    }
 	}, true);
-	
+
+/*
+         ███████╗ ██████╗██████╗  ██████╗ ██╗     ██╗     ██████╗  █████╗ ██████╗           
+         ██╔════╝██╔════╝██╔══██╗██╔═══██╗██║     ██║     ██╔══██╗██╔══██╗██╔══██╗          
+ █████╗  ███████╗██║     ██████╔╝██║   ██║██║     ██║     ██████╔╝███████║██████╔╝    █████╗
+ ╚════╝  ╚════██║██║     ██╔══██╗██║   ██║██║     ██║     ██╔══██╗██╔══██║██╔══██╗    ╚════╝
+         ███████║╚██████╗██║  ██║╚██████╔╝███████╗███████╗██████╔╝██║  ██║██║  ██║          
+         ╚══════╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝          
+
+*/
+
+	$(".gm-content > div:eq(1)").niceScroll({
+		// styler:"fb",
+		cursorcolor:"#d2d2d2", 
+		cursorwidth: '10',
+		cursorborderradius: '10px',
+		background: 'rgba(255,255,255,0)',
+		cursorborder:"",
+		boxzoom:false,
+		zindex: 999
+		// horizrailenabled: false,
+		// ,autohidemode: "leave"
+	});
+
+	//timeline 滾到底部取舊資料
+	fetchHistoryTimeline = function(){
+		console.debug("fetchHistoryTimeline");
+
+		var currentPage = $(".subpage-timeline");
+		if( false == currentPage.is(":visible") ){
+			return;
+		}
+		console.debug("fetchHistoryTimeline in timeline");
+
+		//取舊資料
+		var feed_type = $("#page-group-main").data("navi") || "00";
+
+		//判斷沒資料的元件存在時 就不動作
+		if($(".feed-subarea[data-feed=" + feed_type + "]").hasClass("no-data")) return;	
+		
+		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+		var last_show_event = this_navi.find(".filter-show").last();
+		var last_event = this_navi.find(".st-sub-box").last();
+		
+		if(last_show_event.length){
+			if( !this_navi.data("scroll-chk") ){
+		    	
+		    	//避免重複
+		    	this_navi.data("scroll-chk",true);
+		    	cns.debug("last event ct:",this_navi.data("last-ct"));
+		    	timelineListWrite(this_navi.data("last-ct"));
+		    }
+		}
+	}
+	var niceScrollTmp = $(".gm-content > div:eq(1)").getNiceScroll()[0];
+	niceScrollTmp.onDragToBottom = fetchHistoryTimeline;
+
+	$(".contact-rows, .contact-searchResult").niceScroll({
+		// styler:"fb",
+		cursorcolor:"#d2d2d2", 
+		cursorwidth: '10',
+		cursorborderradius: '10px',
+		background: 'rgba(255,255,255,0)',
+		cursorborder:"",
+		boxzoom:false,
+		zindex: 999
+		// horizrailenabled: false,
+		// autohidemode: false
+	});
 	/*
               ████████╗███████╗███████╗████████╗          
               ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝          
@@ -1745,4 +1811,7 @@ $(function(){
 	$("#page-compose .page-title").click(function(){
 		cns.debug("ddd",$("#page-compose").find(".cp-content").data());
 	});
+
+
+
 });  

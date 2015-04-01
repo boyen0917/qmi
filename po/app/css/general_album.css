@@ -158,10 +158,10 @@
 .al-single .container{
 }
 .al-single .ct-info{
-	padding: 14px;
+	padding: 10px;
 	font-size: 16px;
 	color: #4092EF;
-	margin-top: 15px;
+	margin-top: 5px;
 }
 .al-single .ct-info div, .ct-info img{
 	display: inline-block;
@@ -183,8 +183,8 @@
 }
 
 .subpage-album .imgGrid{
-	width: 180px;
-	height: 180px;
+	width: 150px;
+	height: 150px;
 	margin: 0 0px 2px 5px;
 	overflow: hidden;
 	text-align: center;
@@ -211,8 +211,8 @@
 }
 .subpage-album .imgGrid img{
 	text-align: center;
-	width: 200px;
-	height: 200px;
+	width: 150px;
+	height: 150px;
 	object-fit: cover;
 }
 
