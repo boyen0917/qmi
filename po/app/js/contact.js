@@ -15,6 +15,9 @@ $(document).ready(function(){
 });
 
 initContactList = function(){
+	//clear search result
+	$(".subpage-contact .contact-search .clear").trigger("click");
+
 	if( false==initContactData() ) return;
 
 	//get html container
