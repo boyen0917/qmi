@@ -1,7 +1,60 @@
 /* depend: init.js, tool.js */
 $(function(){
 	g_currentVersion = "0.2.1";
-    checkVersion = function(){
+
+
+    checkContainerVersion = function( onDone ){
+    	try{
+    		var g_currentVersion = require('nw.gui').App.manifest.version;
+			if( null==g_currentVersion ){
+				g_currentVersion = "0.0.0";
+			}
+
+	  //   	var api_name = "/sys/version";
+	  //   	var headers = {
+	  //   		os: 2,
+			// 	tp: 1,
+			// 	av: g_currentVersion,
+			// 	li: lang
+			// };
+			// var method = "get";
+	  //   	var result = ajaxDo(api_name,headers,method,false);
+	  //       result.complete(function(data){
+		 //    	if(data.status == 200){
+		 //    		var getS3_result =$.parseJSON(data.responseText);
+
+		 			var getS3_result = {av:"0.6.2"};
+
+			    	if( g_currentVersion != getS3_result.av ){
+			    		console.debug("need update container ver");
+			    		// $(".version_update_lock").fadeIn();
+			    		onDone(true);
+			    		popupShowAdjust(
+			    			$.i18n.getString("LANDING_PAGE_UPDATE_CONTAINER_TITLE"),	//"Need update container version"
+			    			$.i18n.getString("LANDING_PAGE_UPDATE_CONTAINER_DESCRIPTION"),	//"Please click ok to download newest container version.",
+			    			$.i18n.getString("COMMON_OK"),null,[onClickDownload]);
+			    	} else {
+			    		onDone(false);
+			    		console.debug("latest ver", g_currentVersion);
+			    	}
+		    // 	}
+		    // });
+    	} catch(e){
+    		console.debug("ignore container ver");
+    		onDone(false);
+    		// onDone(true);
+    		// $(".container_update_lock").show();
+    	}
+    }
+
+    onClickDownload = function(){
+		$(".container_update_lock").show();
+    	var link = $(".container_update_lock a");
+    	link.trigger("click");
+    	console.debug("download");
+    }
+
+    checkWebVersion = function( onDone ){
 
     // 	if( (typeof clearCache != 'function')|| 'undefined'==lang ){
     // 		console.debug("clearCache",typeof clearCache, "lang", typeof lang );
@@ -41,6 +94,7 @@ $(function(){
 				    		console.debug("update ver to ", g_currentVersion);
 				    		$.lStorage("_ver",{ver:g_currentVersion});
 				    		$(".version_update_lock").fadeIn();
+				    		onDone(true);
 				    		setTimeout( function(){
 				    			if( false==clearCache() ){
 				    				//if error clear cache
@@ -48,6 +102,7 @@ $(function(){
 				    			}
 				    		}, 1000 );
 				    	} else {
+				    		onDone(false);
 				    		console.debug("latest ver", g_currentVersion);
 				    	}
 		        	}
@@ -67,5 +122,14 @@ $(function(){
 		    }
 		// }
     }
-	checkVersion();
+
+    checkVersion = function( onDone ){
+    	checkWebVersion( function(needUpdate){
+    		if( false==needUpdate ){
+	    		checkContainerVersion(function(){
+	    			onDone();
+	    		});
+    		}
+    	});
+    }
 });

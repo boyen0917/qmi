@@ -1,7 +1,7 @@
-$(function(){
-
-	//設定語言, 還沒登入先用瀏覽器的語言設定
-	updateLanguage( lang );
+onCheckVersionDone = function(needUpdate){
+	if( needUpdate ){
+		return;
+	}
 
 	//預設上一頁
 	$(document).data("page-history",[["#page-registration"]]);
@@ -1109,4 +1109,13 @@ $(function(){
 			}
 		}
 	});
-})
+}
+
+
+$(function(){
+
+	//設定語言, 還沒登入先用瀏覽器的語言設定
+	updateLanguage( lang );
+
+	checkVersion( onCheckVersionDone );
+});

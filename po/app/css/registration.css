@@ -516,7 +516,7 @@ input.setting-birth-hidden {
 
 
 
-.version_update_lock{
+.version_update_lock, .container_update_lock{
 	background: rgba(0,0,0,0.5);
 	z-index: 1000;
 	position: fixed;
@@ -526,7 +526,7 @@ input.setting-birth-hidden {
 	top: 0;
 	display: none;
 }
-.version_update_lock div{
+.version_update_lock div, .container_update_lock a{
 	width: 300px;
 	height: 50px;
 	opacity: 1;
@@ -537,6 +537,17 @@ input.setting-birth-hidden {
 	line-height: 50px;
 	background: rgba(255,255,255,0.8);
 	border-radius: 15px;
+	display: block;
+	text-decoration: none;
+	color: black;
+}
+.container_update_lock a{
+	background: rgb(255,255,255);
+	color: black;
+	padding: 20px;
+}
+.container_update_lock a:visited{
+	color: black;
 }
 
 
