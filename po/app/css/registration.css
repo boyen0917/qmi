@@ -549,6 +549,14 @@ input.setting-birth-hidden {
 .container_update_lock a:visited{
 	color: black;
 }
+#container_version{
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	padding: 5px;
+	color: lightgray;
+	font-size: 14px;
+}
 
 
 

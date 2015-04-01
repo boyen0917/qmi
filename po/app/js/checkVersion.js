@@ -9,6 +9,7 @@ $(function(){
 			if( null==g_currentVersion ){
 				g_currentVersion = "0.0.0";
 			}
+			$("#container_version").html(g_currentVersion);
 
 	  //   	var api_name = "/sys/version";
 	  //   	var headers = {
@@ -40,6 +41,7 @@ $(function(){
 		    // 	}
 		    // });
     	} catch(e){
+			$("#container_version").html("0.0.0");
     		console.debug("ignore container ver");
     		onDone(false);
     		// onDone(true);
