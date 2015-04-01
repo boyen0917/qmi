@@ -6628,26 +6628,26 @@ $(function(){
 	    	});
 
 	    	//將tp4 tp5 的user info都更新完 再更新polling時間
-	    	if(user_info_arr.length > 0){
-	    		getUserInfo(user_info_arr,false, false, function(memData){
-                    try{
+            try{
+    	    	if(user_info_arr.length > 0){
+    	    		getUserInfo(user_info_arr,false, false, function(memData){
                         //更新polling
-    	    			pollingUpdate(msgs,ccs);
+        	    		pollingUpdate(msgs,ccs);
                         if(isUpdateMemPage ){
                             updateBranchMemberCnt(gi);
                         }
-                    } catch(e){
-                        pollingUpdate(msgs,ccs);
-                        errorReport(e);
-                    }
-	    		});
-	    	}else{
-	    		pollingUpdate(msgs,ccs);
-	    	}
+    	    		});
+    	    	}else{
+    	    		pollingUpdate(msgs,ccs);
+    	    	}
+            } catch(e){
+                pollingUpdate(msgs,ccs);
+                errorReport(e);
+            }
 
-            if(branch_info_arr.length > 0){
-                var cnt = 0;
-                try{
+            try{
+                if(branch_info_arr.length > 0){
+                    var cnt = 0;
                     for( var i in branch_info_arr ){
                         var giTmp = branch_info_arr[i].gi;
                         if( null!=giTmp ){
@@ -6660,9 +6660,9 @@ $(function(){
                         }
                         
                     }
-                } catch(e){
-                    errorReport(e);
                 }
+            } catch(e){
+                errorReport(e);
             }
 
     	}else{

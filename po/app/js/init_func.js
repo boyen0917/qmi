@@ -33,6 +33,9 @@ $(function(){
                 //取得單一團體的所有詳細內容 更新到local storage
                 //更新團體資訊
                 setGroupAttributes( this_gi, groupData );
+
+                initOfficialGroup( this_gi );
+
                 //更新user info
                 setGroupUser( this_gi, groupData );
 
@@ -107,6 +110,9 @@ $(function(){
                 { "tp": 6, "sw": false },
                 { "tp": 7, "sw": true }
             ];
+            if( group.ad==1 ){
+                group.tab[6].sw = true;
+            }
             // group.pen = [
             //     { "tp": 0, "sw": true },
             //     { "tp": 1, "sw": true },
