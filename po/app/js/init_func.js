@@ -395,7 +395,8 @@ $(function(){
                                 break;
                             }
                         }
-                        requestNewChatRoomApi(this_gi, target.nk, [{gu:target.gu}], null, null, false);
+                        if( null!= target ) requestNewChatRoomApi(this_gi, target.nk, [{gu:target.gu}], null, null, false);
+                        else cns.debug(" has no admin in official group", this_gi);
                     }
                 });
             }
