@@ -1734,9 +1734,9 @@ $(function(){
 
 */
 
-	$(".gm-content > div:eq(1)").niceScroll({
+	var lightgraySetting = {
 		// styler:"fb",
-		cursorcolor:"#d2d2d2", 
+		cursorcolor:"rgba(210, 210, 210, 0.8)", 
 		cursorwidth: '10',
 		cursorborderradius: '10px',
 		background: 'rgba(255,255,255,0)',
@@ -1745,7 +1745,22 @@ $(function(){
 		zindex: 999
 		// horizrailenabled: false,
 		// ,autohidemode: "leave"
-	});
+	};
+	$(".gm-content > div:eq(1)").niceScroll( lightgraySetting );
+	$(".contact-rows, .contact-searchResult").niceScroll( lightgraySetting );
+	var darkgraySetting = {
+		// styler:"fb",
+		cursorcolor:"rgba(107, 107, 107,0.8)", 
+		cursorwidth: '10',
+		cursorborderradius: '10px',
+		background: 'rgba(255,255,255,0)',
+		cursorborder:"",
+		boxzoom:false,
+		zindex: 999
+		// horizrailenabled: false,
+		// ,autohidemode: "leave"
+	};
+	$(".sm-group-list-area").niceScroll( darkgraySetting );
 
 	//timeline 滾到底部取舊資料
 	fetchHistoryTimeline = function(){
@@ -1780,18 +1795,6 @@ $(function(){
 	var niceScrollTmp = $(".gm-content > div:eq(1)").getNiceScroll()[0];
 	niceScrollTmp.onDragToBottom = fetchHistoryTimeline;
 
-	$(".contact-rows, .contact-searchResult").niceScroll({
-		// styler:"fb",
-		cursorcolor:"#d2d2d2", 
-		cursorwidth: '10',
-		cursorborderradius: '10px',
-		background: 'rgba(255,255,255,0)',
-		cursorborder:"",
-		boxzoom:false,
-		zindex: 999
-		// horizrailenabled: false,
-		// autohidemode: false
-	});
 	/*
               ████████╗███████╗███████╗████████╗          
               ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝          
