@@ -229,9 +229,11 @@
     var self = this;
 
 
-
+    //variables for chrome drag event
     this.dragToBottom = false;
     this.onDragToBottom = function(){};
+    this.dragToTop = false;
+    this.onDragToTop = function(){};
 
 
     this.version = '3.6.0';
@@ -1469,7 +1471,15 @@
                 if (self.scroll.x > mw) self.scroll.x = mw;
               } else {
                 self.scroll.y = self.rail.drag.sy + (e.clientY - self.rail.drag.y);
-                if (self.scroll.y < 0) self.scroll.y = 0;
+                if (self.scroll.y < 0){
+                  self.scroll.y = 0;
+                  if( false==self.dragToTop ){
+                    self.dragToTop = true;
+                    self.onDragToTop();
+                  }
+                } else {
+                  self.dragToTop = false;
+                }
                 var my = self.scrollvaluemax;
                 if (self.scroll.y > my){
                   self.scroll.y = my;
