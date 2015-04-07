@@ -60,6 +60,9 @@
         <script src="flexslider/modernizr.js"></script>
         <script defer src="flexslider/jquery.flexslider.js"></script>
         
+        <!-- nice scroll  -->
+        <!-- <script src="http://areaaperta.com/nicescroll/js/jquery.nicescroll.min.js"></script> -->
+        <script src="plugins/nicescroll/jquery.nicescroll.js"></script>
 
     </head>
     <body>
@@ -277,352 +280,355 @@
                     </div>
                 </div>
                 <div class="gm-content">
-                    <div class="gm-adjustment user-main-toggle"></div>
-                    <div class="gm-user-main-area" style="display:none">
-                        <div class="background">
-                            <div class="name"></div>
-                        </div>
-                        <div class="group">
-                            <div class="pic"></div>
-                            <div class="name"></div>
+                    <div>
+                        <div class="gm-adjustment user-main-toggle"></div>
+                        <div class="gm-user-main-area" style="display:none">
+                            <div class="background">
+                                <div class="name"></div>
+                            </div>
+                            <div class="group">
+                                <div class="pic"></div>
+                                <div class="name"></div>
+                            </div>
                         </div>
                     </div>
-                <!------------------------------- 動態消息 ---------------------------->
-                    <div class="subpage-timeline main-subpage">
-                        <div class="st-navi-area">
-                            <div class="st-navi-subarea main" data-st-navi-group="navi" data-st-navi="home" data-tp="00">
-                                <img src="images/timeline/timeline_tab_icon_home_white.png"/>
-                                <div class="color-white" data-textid='FEED_ALL'></div>
+                    <div>
+                    <!------------------------------- 動態消息 ---------------------------->
+                        <div class="subpage-timeline main-subpage">
+                            <div class="st-navi-area">
+                                <div class="st-navi-subarea main" data-st-navi-group="navi" data-st-navi="home" data-tp="00">
+                                    <img src="images/timeline/timeline_tab_icon_home_white.png"/>
+                                    <div class="color-white" data-textid='FEED_ALL'></div>
+                                </div>
+                                <img class="st-navi-tridiv-l" src="images/timeline/timeline_tab_arrow_left.png" style="width:15px;display:none;">
+                                <img class="st-navi-tridiv-r" src="images/timeline/timeline_tab_arrow_right.png" style="width:15px">
+                                <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="announcement" data-tp="01">
+                                    <img src="images/timeline/timeline_tab_icon_announcement.png"/>
+                                    <div data-textid='FEED_BULLETIN'></div>
+                                </div>
+                                <div class="st-navi-divider"></div>
+                                <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feedback" data-tp="02">
+                                    <img src="images/timeline/timeline_tab_icon_feedback.png"/>
+                                    <div data-textid='FEED_REPORT'></div>
+                                </div>
+                                <div class="st-navi-divider"></div>
+                                <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="task" data-tp="A3">
+                                    <img src="images/timeline/timeline_tab_icon_task.png"/>
+                                    <div data-textid='FEED_TASK'></div>
+                                </div>
+                                <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feed-public" data-tp="A1">
+                                    <img src="images/timeline/timeline_tab_icon_home_white.png"/>
+                                    <div class="color-white" data-textid='FEED_ALL'></div>
+                                </div>
+                                <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feed-post" data-tp="A2">
+                                    <img src="images/timeline/timeline_tab_icon_home_white.png"/>
+                                    <div class="color-white" data-textid='FEED_ALL'></div>
+                                </div>
                             </div>
-                            <img class="st-navi-tridiv-l" src="images/timeline/timeline_tab_arrow_left.png" style="width:15px;display:none;">
-                            <img class="st-navi-tridiv-r" src="images/timeline/timeline_tab_arrow_right.png" style="width:15px">
-                            <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="announcement" data-tp="01">
-                                <img src="images/timeline/timeline_tab_icon_announcement.png"/>
-                                <div data-textid='FEED_BULLETIN'></div>
-                            </div>
-                            <div class="st-navi-divider"></div>
-                            <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feedback" data-tp="02">
-                                <img src="images/timeline/timeline_tab_icon_feedback.png"/>
-                                <div data-textid='FEED_REPORT'></div>
-                            </div>
-                            <div class="st-navi-divider"></div>
-                            <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="task" data-tp="A3">
-                                <img src="images/timeline/timeline_tab_icon_task.png"/>
-                                <div data-textid='FEED_TASK'></div>
-                            </div>
-                            <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feed-public" data-tp="A1">
-                                <img src="images/timeline/timeline_tab_icon_home_white.png"/>
-                                <div class="color-white" data-textid='FEED_ALL'></div>
-                            </div>
-                            <div class="st-navi-subarea other" data-st-navi-group="navi" data-st-navi="feed-post" data-tp="A2">
-                                <img src="images/timeline/timeline_tab_icon_home_white.png"/>
-                                <div class="color-white" data-textid='FEED_ALL'></div>
-                            </div>
-                        </div>
 
-                        <div class="st-refresh-top">
-                            <img style="display:none" src="images/st_bottom_loading.gif"/>
-                            <span data-textid='COMMON_UPDATING'></span>
-                        </div>
-                        <div class="st-top-area-load user-main-toggle"></div>
-
-                        <div class="st-filter-area user-main-toggle">
-                            <!-- <div class="st-filter-list st-filter-main">
-                                <span data-textid='FEED_ALL'></span>
-                                <img src="images/icon/icon_arrow_right.png"/>
-                            </div> -->
-                            <div class="st-filter-hide left">&nbsp&nbsp...</div>
-                            <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide st-filter-list-active polling-cnt polling-local" data-polling-cnt="B1">
-                                <span data-textid='FEED_ALL'></span>
-                                <div class="sm-count" style="display:none;"></div>
+                            <div class="st-refresh-top">
+                                <img style="display:none" src="images/st_bottom_loading.gif"/>
+                                <span data-textid='COMMON_UPDATING'></span>
                             </div>
-                            <!-- <div class="st-filter-other"> -->
-                                <div data-status="all" data-navi="feed-public" class="st-filter-action st-filter-list" style="display:none;">
+                            <div class="st-top-area-load user-main-toggle"></div>
+
+                            <div class="st-filter-area user-main-toggle">
+                                <!-- <div class="st-filter-list st-filter-main">
                                     <span data-textid='FEED_ALL'></span>
-                                </div>
-                                <div data-status="all" data-navi="feed-post" class="st-filter-action st-filter-list" style="display:none;">
-                                    <span data-textid='FEED_ALL'></span>
-                                </div>
-                                <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B2">
-                                    <span data-textid='FEED_BULLETIN'></span>
-                                    <div class="sm-count" style="display:none;"></div>
-                                </div>
-                                <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B3">
-                                    <span data-textid='FEED_REPORT'></span>
-                                    <div class="sm-count" style="display:none;"></div>
-                                </div>
-                                <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B4">
-                                    <span data-textid='FEED_MISSION'></span>
-                                    <div class="sm-count" style="display:none;"></div>
-                                </div>
-                                <div data-status="unread" class="st-filter-action st-filter-list">
-                                    <span data-textid='FEED_UNREAD'></span>
-                                </div>
-                                <div data-status="read" class="st-filter-action st-filter-list">
-                                    <span data-textid='FEED_READ'></span>
-                                </div>
-                                <div data-status="subscribe" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_SUBSCRIBE'></span></div>
-                                <!-- <div class="st-filter-list-btn">
-                                    <img src="images/icon/icon_arrow_top.png"/>
+                                    <img src="images/icon/icon_arrow_right.png"/>
                                 </div> -->
-                            <!-- </div> -->
-                            <div class="st-filter-hide right">...&nbsp&nbsp</div>
+                                <div class="st-filter-hide left">&nbsp&nbsp...</div>
+                                <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide st-filter-list-active polling-cnt polling-local" data-polling-cnt="B1">
+                                    <span data-textid='FEED_ALL'></span>
+                                    <div class="sm-count" style="display:none;"></div>
+                                </div>
+                                <!-- <div class="st-filter-other"> -->
+                                    <div data-status="all" data-navi="feed-public" class="st-filter-action st-filter-list" style="display:none;">
+                                        <span data-textid='FEED_ALL'></span>
+                                    </div>
+                                    <div data-status="all" data-navi="feed-post" class="st-filter-action st-filter-list" style="display:none;">
+                                        <span data-textid='FEED_ALL'></span>
+                                    </div>
+                                    <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B2">
+                                        <span data-textid='FEED_BULLETIN'></span>
+                                        <div class="sm-count" style="display:none;"></div>
+                                    </div>
+                                    <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B3">
+                                        <span data-textid='FEED_REPORT'></span>
+                                        <div class="sm-count" style="display:none;"></div>
+                                    </div>
+                                    <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B4">
+                                        <span data-textid='FEED_MISSION'></span>
+                                        <div class="sm-count" style="display:none;"></div>
+                                    </div>
+                                    <div data-status="unread" class="st-filter-action st-filter-list">
+                                        <span data-textid='FEED_UNREAD'></span>
+                                    </div>
+                                    <div data-status="read" class="st-filter-action st-filter-list">
+                                        <span data-textid='FEED_READ'></span>
+                                    </div>
+                                    <div data-status="subscribe" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_SUBSCRIBE'></span></div>
+                                    <!-- <div class="st-filter-list-btn">
+                                        <img src="images/icon/icon_arrow_top.png"/>
+                                    </div> -->
+                                <!-- </div> -->
+                                <div class="st-filter-hide right">...&nbsp&nbsp</div>
+                            </div>
+
+                            <!-- 官方帳號admin start -->
+                            <div class="st-official-tab-area official admin" style="display:none;">
+                                <div class="st-official-tab-row">
+                                    <div class="st-official-tab" data-type="about">
+                                        <img class="icon" src="images/icon/icon_offical_info_normal.png"/>
+                                        <div class="text" data-textid="OFFICIAL_ABOUT"></div>
+                                    </div>
+                                    <div class="st-official-tab" data-type="chat">
+                                        <img class="icon" src="images/icon/icon_meg_normal.png"/>
+                                        <div class="text" data-textid="OFFICIAL_CHAT"></div>
+                                    </div>
+                                    <div class="st-official-tab" data-type="setting">
+                                        <img class="icon" src="images/icon/icon_offical_set_normal.png"/>
+                                        <div class="text" data-textid="OFFICIAL_SETTING"></div>
+                                    </div>
+                                </div>
+
+                                <div class="st-official-tab-row">
+                                    <div class="st-official-tab" data-type="invite">
+                                        <img class="icon" src="images/icon/icon_offical_invite_activity.png"/>
+                                        <div class="text" data-textid="OFFICIAL_INVITE"></div>
+                                    </div>
+                                    <div class="st-official-tab" data-type="share">
+                                        <img class="icon" src="images/icon/icon_offical_share_activity.png"/>
+                                        <div class="text" data-textid="OFFICIAL_SHARE"></div>
+                                    </div>
+                                </div>
+
+                                <div class="st-official-tab-row">
+                                    <div class="st-official-tab" data-type="cnt">
+                                        <div class="text"></div>
+                                        <img class="icon" src="images/icon/icon_arrow_right.png"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 官方帳號admin end -->
+
+                            <!-- 官方帳號非admin start -->
+                            <div class="st-official-tab-area official general" style="display:none;">
+                                <div class="st-official-tab-row">
+                                    <div class="st-official-tab" data-type="about">
+                                        <img class="icon" src="images/icon/icon_offical_info_normal.png"/>
+                                        <div class="text" data-textid="OFFICIAL_ABOUT"></div>
+                                    </div>
+                                    <div class="st-official-tab" data-type="chat">
+                                        <img class="icon" src="images/icon/icon_meg_normal.png"/>
+                                        <div class="text" data-textid="OFFICIAL_CHAT"></div>
+                                    </div>
+                                    <div class="st-official-tab" data-type="cnt">
+                                        <div class="text"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 官方帳號非admin end -->
+
+
+                            <select id="type-trans">
+                                <option value="te-example4"></option>
+                            </select>
+                            <div class="st-feedbox-area">
+                                <div class="st-feebox-area-container">
+                                    <div class="st-feebox-area-inner-container">
+                                        <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
+                                        <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
+                                        <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
+                                        <div data-feed="A3" class="feed-task feed-subarea switch-reset"></div>
+                                        <div data-feed="A1" class="feed-public feed-subarea switch-reset"></div>
+                                        <div data-feed="A2" class="feed-post feed-subarea switch-reset"></div>
+                                        <div data-feed="main" class="feed-subarea switch-reset"></div>
+
+                                    </div>
+                                </div>
+                               <!--  <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
+                                <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
+                                <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
+                                <div data-feed="03" class="feed-task feed-subarea switch-reset"></div>
+                                <div data-feed="main" class="feed-subarea switch-reset"></div> -->
+                                <div class="st-feedbox-area-bottom">
+                                    <img src="images/st_bottom_loading.gif"/>
+                                    <div style="display:none">
+                                        <img src="images/coachmake/logo_nomessage.png"/>
+                                        <div data-textid='FEED_NO_MORE_POST'></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- 官方帳號admin start -->
-                        <div class="st-official-tab-area official admin" style="display:none;">
-                            <div class="st-official-tab-row">
-                                <div class="st-official-tab" data-type="about">
-                                    <img class="icon" src="images/icon/icon_offical_info_normal.png"/>
-                                    <div class="text" data-textid="OFFICIAL_ABOUT"></div>
-                                </div>
-                                <div class="st-official-tab" data-type="chat">
-                                    <img class="icon" src="images/icon/icon_meg_normal.png"/>
-                                    <div class="text" data-textid="OFFICIAL_CHAT"></div>
-                                </div>
-                                <div class="st-official-tab" data-type="setting">
-                                    <img class="icon" src="images/icon/icon_offical_set_normal.png"/>
-                                    <div class="text" data-textid="OFFICIAL_SETTING"></div>
-                                </div>
-                            </div>
-
-                            <div class="st-official-tab-row">
-                                <div class="st-official-tab" data-type="invite">
-                                    <img class="icon" src="images/icon/icon_offical_invite_activity.png"/>
-                                    <div class="text" data-textid="OFFICIAL_INVITE"></div>
-                                </div>
-                                <div class="st-official-tab" data-type="share">
-                                    <img class="icon" src="images/icon/icon_offical_share_activity.png"/>
-                                    <div class="text" data-textid="OFFICIAL_SHARE"></div>
-                                </div>
-                            </div>
-
-                            <div class="st-official-tab-row">
-                                <div class="st-official-tab" data-type="cnt">
-                                    <div class="text"></div>
-                                    <img class="icon" src="images/icon/icon_arrow_right.png"/>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 官方帳號admin end -->
-
-                        <!-- 官方帳號非admin start -->
-                        <div class="st-official-tab-area official general" style="display:none;">
-                            <div class="st-official-tab-row">
-                                <div class="st-official-tab" data-type="about">
-                                    <img class="icon" src="images/icon/icon_offical_info_normal.png"/>
-                                    <div class="text" data-textid="OFFICIAL_ABOUT"></div>
-                                </div>
-                                <div class="st-official-tab" data-type="chat">
-                                    <img class="icon" src="images/icon/icon_meg_normal.png"/>
-                                    <div class="text" data-textid="OFFICIAL_CHAT"></div>
-                                </div>
-                                <div class="st-official-tab" data-type="cnt">
-                                    <div class="text"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 官方帳號非admin end -->
-
-
-                        <select id="type-trans">
-                            <option value="te-example4"></option>
-                        </select>
-                        <div class="st-feedbox-area">
-                            <div class="st-feebox-area-container">
-                                <div class="st-feebox-area-inner-container">
-                                    <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
-                                    <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
-                                    <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
-                                    <div data-feed="A3" class="feed-task feed-subarea switch-reset"></div>
-                                    <div data-feed="A1" class="feed-public feed-subarea switch-reset"></div>
-                                    <div data-feed="A2" class="feed-post feed-subarea switch-reset"></div>
-                                    <div data-feed="main" class="feed-subarea switch-reset"></div>
-
-                                </div>
-                            </div>
-                           <!--  <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
-                            <div data-feed="01" class="feed-annoucement feed-subarea switch-reset"></div>
-                            <div data-feed="02" class="feed-feedback feed-subarea switch-reset"></div>
-                            <div data-feed="03" class="feed-task feed-subarea switch-reset"></div>
-                            <div data-feed="main" class="feed-subarea switch-reset"></div> -->
-                            <div class="st-feedbox-area-bottom">
-                                <img src="images/st_bottom_loading.gif"/>
-                                <div style="display:none">
-                                    <img src="images/coachmake/logo_nomessage.png"/>
-                                    <div data-textid='FEED_NO_MORE_POST'></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                
                     
-            <!--------------------------------- 聯絡人 -------------------------------->
-                    <div class="subpage-contact main-subpage" style="display:none;height: 100%">
-                        <div class="contact-search">
-                            <div class="inputDiv">
-                                <div class="hintDiv">
-                                    <img class="icon" src="images/common/icon/icon_search.png"/>
-                                    <span class="text" data-textid="INVITE_SEARCH"/>
+                        
+                <!--------------------------------- 聯絡人 -------------------------------->
+                        <div class="subpage-contact main-subpage" style="display:none;height: 100%">
+                            <div class="contact-search">
+                                <div class="inputDiv">
+                                    <div class="hintDiv">
+                                        <img class="icon" src="images/common/icon/icon_search.png"/>
+                                        <span class="text" data-textid="INVITE_SEARCH"/>
+                                    </div>
+                                    <div class="content" style="display:none;">
+                                        <img class="icon" src="images/common/icon/icon_search.png"/>
+                                        <input type="input" align="middle" class="input" maxlength="20" data-role="none"/>
+                                        <img class="clear" src="images/common/icon/icon_search_clean.png"/>
+                                    </div>
                                 </div>
-                                <div class="content" style="display:none;">
-                                    <img class="icon" src="images/common/icon/icon_search.png"/>
-                                    <input type="input" align="middle" class="input" maxlength="20" data-role="none"/>
-                                    <img class="clear" src="images/common/icon/icon_search_clean.png"/>
-                                </div>
                             </div>
-                        </div>
-                        <div class="contact-rows top"></div>
-                        <div class="contact-searchResult" style="display:none;">
-                            <div class="container">
-                                <div class="noResult" style="display:none;" data-textid="MEMBER_SEARCH_NO_RESULT"></div>
-                                <div class="memTitle" data-textid="COMMON_MEMBER"></div>
-                                <div class="branchTitle" data-textid="COMPOSE_SUBGROUP"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                <!--------------------------------- 聊天列表 -------------------------->
-                    <div class="subpage-chatList main-subpage">
-                        <div class="loading" style="display:none">
-                            <img src="images/st_bottom_loading.gif">
-                        </div>
-                        <div class="rows"></div>
-                        <div class="coachmake">
-                            <div class="cm-content">
-                                <img src="images/coachmake/logo_status_chatroom.png"/>
-                                <div data-textid="CHAT_NO_CHATROOM"></div>
-                            </div>
-                        </div>
-                        <div class="update" style="display:none;"></div>
-                        <div class="chatList-add-done" style="display:none;"></div>
-                    </div>
-
-                <!------------------------------ 相簿 ------------------------------>
-                    <div class="subpage-album main-subpage">
-                        <div class="al-all" style="display:none;">
-                            <header>
-                                <div class="title" data-textid="FEED_ALL"></div>
-                            </header>
-                            <main>
+                            <div class="contact-rows top"></div>
+                            <div class="contact-searchResult" style="display:none;">
                                 <div class="container">
-                                    <div class="category">
-                                        <div class="grid" data-type="chatroom">
-                                            <div class="img">
-                                                <img src="images/icon/icon_chatroom_more_albums_normal.png"/>
+                                    <div class="noResult" style="display:none;" data-textid="MEMBER_SEARCH_NO_RESULT"></div>
+                                    <div class="memTitle" data-textid="COMMON_MEMBER"></div>
+                                    <div class="branchTitle" data-textid="COMPOSE_SUBGROUP"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <!--------------------------------- 聊天列表 -------------------------->
+                        <div class="subpage-chatList main-subpage">
+                            <div class="loading" style="display:none">
+                                <img src="images/st_bottom_loading.gif">
+                            </div>
+                            <div class="rows"></div>
+                            <div class="coachmake">
+                                <div class="cm-content">
+                                    <img src="images/coachmake/logo_status_chatroom.png"/>
+                                    <div data-textid="CHAT_NO_CHATROOM"></div>
+                                </div>
+                            </div>
+                            <div class="update" style="display:none;"></div>
+                            <div class="chatList-add-done" style="display:none;"></div>
+                        </div>
+
+                    <!------------------------------ 相簿 ------------------------------>
+                        <div class="subpage-album main-subpage">
+                            <div class="al-all" style="display:none;">
+                                <header>
+                                    <div class="title" data-textid="FEED_ALL"></div>
+                                </header>
+                                <main>
+                                    <div class="container">
+                                        <div class="category">
+                                            <div class="grid" data-type="chatroom">
+                                                <div class="img">
+                                                    <img src="images/icon/icon_chatroom_more_albums_normal.png"/>
+                                                </div>
+                                                <div class="text" data-textid="CHAT_TITLE"></div>
                                             </div>
-                                            <div class="text" data-textid="CHAT_TITLE"></div>
+                                        </div>
+                                    </div>
+                                </main>
+                            </div>
+
+                            <div class="al-category" style="display:none;">
+                                <header>
+                                    <div class="back">
+                                        <img src="images/icon/icon_arrow_top.png"/>
+                                    </div>
+                                    <div class="title"></div>
+                                </header>
+                                <main>
+                                    <div class="container"></div>
+                                </main>
+                            </div>
+
+                            <div class="al-single" style="display:none;">
+                                <header>
+                                    <div class="back">
+                                        <img src="images/icon/icon_arrow_top.png"/>
+                                    </div>
+                                    <div class="title">title</div>
+                                    <div class="hd-photoCnt">0</div>
+                                </header>
+                                <main>
+                                </main>
+                                <div class="loading"></div>
+                                <div class="dataDom" style="display:none;"></div>
+                            </div>
+                        </div>
+                    <!--------------------------------- 團體設定 -------------------------->
+                        <div class="subpage-groupSetting main-subpage" style="display:none;">
+                            <!-- <div class="loading" style="display:none">
+                                <img src="images/st_bottom_loading.gif">
+                            </div> -->
+                            <div class="gs-type group">
+                                <div class="gs-row-title">
+                                    <div data-textid="GROUPSETTING_GROUP"></div>
+                                </div>
+                                <div class="gs-rows">
+                                    <div class="gs-row" data-type="permission">
+                                        <div class="text" data-textid="BACKENDMANAGER_ASSIGN_MANAGER"></div>
+                                        <img class="img" src="images/icon/icon_arrow_right.png"/>
+                                    </div>
+                                    <div class="gs-row" data-type="info">
+                                        <div class="text" data-textid="GROUPSETTING_GROUP_INFORMATION"></div>
+                                        <img class="img" src="images/icon/icon_arrow_right.png"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gs-leave" data-textid="GROUPSETTING_LEAVE_GROUP">
+                            </div>
+                        </div>
+
+                    <!--------------------------------- 系統設定 -------------------------->
+                        <div class="subpage-systemSetting main-subpage" style="display:none;">
+                            系統設定
+                        </div>
+
+                    <!--------------------------------- 團體關於 -------------------------->
+                        <div class="subpage-groupAbout">
+                            <div class="ga-wrapper">
+                                <div class="ga-content">
+                                    <div class="ga-avatar">
+                                        <img class="ga-avatar-img default" src="images/common/others/name_card_nophoto_profile.png"/>
+                                        <img class="ga-avatar-img polling-group-pic-o currentGroup"/>
+                                        <img class="ga-avatar-img upload"/>
+                                        <div class="ga-header-bar">
+                                            <div class="ga-avatar-name general polling-group-name currentGroup"></div>
+                                            <img class="ga-avatar-photo admin" src="images/common/icon/bt_camera_nornal.png"/>
+                                        </div>
+                                        <input type="file" style="display:none" data-role="none">
+                                    </div>
+                                    <div class="ga-info view">
+                                        <div class="ga-info-row admin" data-type="name">
+                                            <div class="title" data-textid="GROUP_GROUP_NAME"></div>
+                                            <div class="content polling-group-name currentGroup"></div>
+                                        </div>
+                                        <div class="ga-info-row" data-type="info">
+                                            <div class="title" data-textid="GROUP_ABOUT"></div>
+                                            <div class="content polling-group-description currentGroup"></div>
+                                        </div>
+                                    </div>
+                                    <div class="ga-info edit">
+                                        <div class="ga-info-row" data-type="name">
+                                            <div class="title" data-textid="GROUP_GROUP_NAME"></div>
+                                            <input class="content" data-textph-id="GROUP_NAME_LIMIT" data-role="none"/>
+                                        </div>
+                                        <div class="ga-info-row" data-type="info">
+                                            <div class="title" data-textid="GROUP_ABOUT"></div>
+                                            <textarea class="content autoHeight" data-textph-id="GROUP_ABOUT_ALERT" maxLength="300" data-role="none"></textarea>
                                         </div>
                                     </div>
                                 </div>
-                            </main>
-                        </div>
-
-                        <div class="al-category" style="display:none;">
-                            <header>
-                                <div class="back">
-                                    <img src="images/icon/icon_arrow_top.png"/>
-                                </div>
-                                <div class="title"></div>
-                            </header>
-                            <main>
-                                <div class="container"></div>
-                            </main>
-                        </div>
-
-                        <div class="al-single" style="display:none;">
-                            <header>
-                                <div class="back">
-                                    <img src="images/icon/icon_arrow_top.png"/>
-                                </div>
-                                <div class="title">title</div>
-                                <div class="hd-photoCnt">0</div>
-                            </header>
-                            <main>
-                            </main>
-                            <div class="loading"></div>
-                            <div class="dataDom" style="display:none;"></div>
-                        </div>
-                    </div>
-                <!--------------------------------- 團體設定 -------------------------->
-                    <div class="subpage-groupSetting main-subpage" style="display:none;">
-                        <!-- <div class="loading" style="display:none">
-                            <img src="images/st_bottom_loading.gif">
-                        </div> -->
-                        <div class="gs-type group">
-                            <div class="gs-row-title">
-                                <div data-textid="GROUPSETTING_GROUP"></div>
-                            </div>
-                            <div class="gs-rows">
-                                <div class="gs-row" data-type="permission">
-                                    <div class="text" data-textid="BACKENDMANAGER_ASSIGN_MANAGER"></div>
-                                    <img class="img" src="images/icon/icon_arrow_right.png"/>
-                                </div>
-                                <div class="gs-row" data-type="info">
-                                    <div class="text" data-textid="GROUPSETTING_GROUP_INFORMATION"></div>
-                                    <img class="img" src="images/icon/icon_arrow_right.png"/>
+                                <div class="ga-header">
+                                    <div class="ga-header-back">
+                                        <img src="images/navi/navi_icon_back.png"/>
+                                    </div>
+                                    <div class="ga-header-title"></div>
+                                    <div class="ga-header-done" data-textid="COMMON_DONE"></div>
                                 </div>
                             </div>
                         </div>
-                        <div class="gs-leave" data-textid="GROUPSETTING_LEAVE_GROUP">
-                        </div>
-                    </div>
-
-                <!--------------------------------- 系統設定 -------------------------->
-                    <div class="subpage-systemSetting main-subpage" style="display:none;">
-                        系統設定
-                    </div>
-
-                <!--------------------------------- 團體關於 -------------------------->
-                    <div class="subpage-groupAbout">
-                        <div class="ga-wrapper">
-                            <div class="ga-content">
-                                <div class="ga-avatar">
-                                    <img class="ga-avatar-img default" src="images/common/others/name_card_nophoto_profile.png"/>
-                                    <img class="ga-avatar-img polling-group-pic-o currentGroup"/>
-                                    <img class="ga-avatar-img upload"/>
-                                    <div class="ga-header-bar">
-                                        <div class="ga-avatar-name general polling-group-name currentGroup"></div>
-                                        <img class="ga-avatar-photo admin" src="images/common/icon/bt_camera_nornal.png"/>
-                                    </div>
-                                    <input type="file" style="display:none" data-role="none">
-                                </div>
-                                <div class="ga-info view">
-                                    <div class="ga-info-row admin" data-type="name">
-                                        <div class="title" data-textid="GROUP_GROUP_NAME"></div>
-                                        <div class="content polling-group-name currentGroup"></div>
-                                    </div>
-                                    <div class="ga-info-row" data-type="info">
-                                        <div class="title" data-textid="GROUP_ABOUT"></div>
-                                        <div class="content polling-group-description currentGroup"></div>
-                                    </div>
-                                </div>
-                                <div class="ga-info edit">
-                                    <div class="ga-info-row" data-type="name">
-                                        <div class="title" data-textid="GROUP_GROUP_NAME"></div>
-                                        <input class="content" data-textph-id="GROUP_NAME_LIMIT" data-role="none"/>
-                                    </div>
-                                    <div class="ga-info-row" data-type="info">
-                                        <div class="title" data-textid="GROUP_ABOUT"></div>
-                                        <textarea class="content autoHeight" data-textph-id="GROUP_ABOUT_ALERT" maxLength="300" data-role="none"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="ga-header">
-                                <div class="ga-header-back">
-                                    <img src="images/navi/navi_icon_back.png"/>
-                                </div>
-                                <div class="ga-header-title"></div>
-                                <div class="ga-header-done" data-textid="COMMON_DONE"></div>
-                            </div>
-                        </div>
-                    </div>
-
 
                     </div>
-               </div> 
-            </div>
-        </div><!-- /page-group-main -->
+                </div>
+            </div> 
+        </div>
+    </div><!-- /page-group-main -->
 
 
 <!-- 

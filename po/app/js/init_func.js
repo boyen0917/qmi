@@ -175,6 +175,9 @@ $(function(){
             //header 設定團體名稱
             $(".header-group-name div:eq(1)").html(gn);
 
+            //清除timeline無資料旗標
+            $(".feed-subarea.no-data").removeClass("no-data");
+
             //替換該團體的畫面
             updateGroupAllInfoDom( this_gi );
 

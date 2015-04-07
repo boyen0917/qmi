@@ -65,7 +65,7 @@
 	width: 82px;
 }
 .subpage-chatList-row .td:nth-child(2){
-    width:-webkit-calc( 100% - 177px );
+    width:-webkit-calc( 100% - 183px );
 }
 .subpage-chatList-row .td:nth-child(3){
     width:95px;
