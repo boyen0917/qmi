@@ -345,8 +345,8 @@ $(function(){
             }
 
             //離開團體開關
-            //目前僅免費團體可自由退出
-            if( group.tp=="A1" ){
+            //目前僅免費團體及官方帳號可自由退出
+            if( group.tp=="A1" || group.tp.indexOf("C")==0 ){
                 if( group.set.s11==0 || group.set.s11==2 ){
                     $(".gs-leave").show();
                 } else{

@@ -1688,7 +1688,7 @@ $(function(){
 				cns.debug("share");
 				break;
 			case "cnt":
-				cns.debug("cnt");
+				$(".sm-small-area[data-sm-act=memberslist]").trigger("click");
 				break;
 		}
 	});
@@ -1703,6 +1703,9 @@ $(function(){
 				break;
 			case "cnt":
 				cns.debug("cnt");
+				break;
+			case "setting":
+				$(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
 				break;
 		}
 	});

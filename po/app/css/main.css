@@ -909,7 +909,7 @@ img.auo {
 	cursor: pointer;
 }
 
-.sm-group-area:active , .gm-border .sm-small-area:active, .gm-border .sm-group-area.active {
+.sm-group-area.enable:active , .gm-border .sm-small-area:active, .gm-border .sm-group-area.active {
 	background: rgb(20,20,20);
 }
 
@@ -4754,12 +4754,16 @@ img.user-info-back {
 	margin-top: 11px;
 	margin-right: 0px;
 }
-.general .st-official-tab{
+/*.general .st-official-tab{
 	width: 30%;
 }
 .general .st-official-tab:last-child{
 	width: 36%;
 	text-align: right;
+}*/
+
+.general .st-official-tab{
+	width: 32.8%;
 }
 
 .st-official-tab .icon{
