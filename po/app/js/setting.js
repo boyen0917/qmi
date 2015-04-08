@@ -299,12 +299,14 @@ function showUpdatePermissionPage(){
 	//find current admins
 	var list = {};
 	try{
-        var userData = $.lStorage(ui);
-        var guAll = userData[gi].guAll;
-        for( var gu in guAll ){
-        	var mem = guAll[gu];
-        	if( 1==mem.ad ){
-        		list[gu] = mem.nk;
+        var userDataTmp = $.lStorage(ui);
+        var guAllTmp = userDataTmp[gi].guAll;
+        for( var gu in guAllTmp ){
+        	var mem = guAllTmp[gu];
+        	if( 1==mem.st ){
+	        	if( 1==mem.ad ){
+	        		list[gu] = mem.nk;
+	        	}
         	}
         }
     } catch(e){
@@ -316,7 +318,8 @@ function showUpdatePermissionPage(){
         isShowSelf:true,
 		isShowAll:false,
 		isShowFav:true,
-		isShowFavBranch:false
+		isShowFavBranch:false,
+		isShowLeftMem:false
 	};
 	var dom = $(".gs-row[data-type=permission]");
 	dom.data("object_str",JSON.stringify(list) );

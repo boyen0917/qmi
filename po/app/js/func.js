@@ -2199,6 +2199,7 @@ $(function(){
         var isShowFav = true;
         var isShowFavBranch = true;
         var isBack = true;
+        var isShowLeftMem = false;
         if( null== option ){
             if(this_compose_obj.parent().hasClass("cp-work-item")){
                 //工作發佈對象
@@ -2219,6 +2220,7 @@ $(function(){
             isShowFav = (null==option.isShowFav) ? isShowFav : option.isShowFav;
             isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
             isBack = (null==option.isBack) ? isBack : option.isBack;
+            isShowLeftMem = (null==option.isShowLeftMem) ? isShowLeftMem : option.isShowLeftMem;
         }
 
         //check cnt
@@ -2573,6 +2575,7 @@ $(function(){
         //成員rows
         $.each(guAll,function(i,gu_obj){
             if( false==isShowSelf && i==group.gu ) return;
+            if( false==isShowLeftMem && gu_obj.st!=1 ) return;
             var this_obj = getMemObjectRow(gu_obj, bl);
             $(".obj-cell-area").append(this_obj);
         });
