@@ -94,7 +94,7 @@ onCheckVersionDone = function(needUpdate){
 			effect: "slide"
 		});
 		var firstDom = countryCodeDoms.find("option:eq(0)");
-		countryCodeDoms.attr("data-val",firstDom.attr("value")||"+886");
+		countryCodeDoms.attr("data-val",firstDom.attr("value")||"TW");
 		countryCodeDoms.attr("data-text",firstDom.text()||"");
 	});
 
@@ -128,21 +128,24 @@ onCheckVersionDone = function(needUpdate){
 		},
 		onChange: function (val, inst) {
 			cns.debug(val, inst);
-			if( val != countrycode ){
-				countrycode = val;
-				var loginData = $.lStorage("_loginRemeber");
-				loginData.countrycode = val;
-				$.lStorage("_loginRemeber", loginData);
-			}
+			// if( val != countrycode ){
+				cns.debug(val);
+				countryCodeDoms.attr("data-val",val||"");
+				// countrycode = val;
+				// var loginData = $.lStorage("_loginRemeber");
+				// loginData.countrycode = val;
+				// $.lStorage("_loginRemeber", loginData);
+			// }
 			if( "undefined"!=typeof(checkLoginReady) ) checkLoginReady();
 		},
 		effect: "slide"
 	});
 
 	//set default value
+	countryCodeDoms.attr("data-val","TW");
 	var loginData = $.lStorage("_loginRemeber");
 	if( null!=loginData && null!=loginData ){
-		var targetCountryDom = countryCodeDoms.find("option[value='"+loginData.countrycode+"']");
+		var targetCountryDom = countryCodeDoms.find("option[data-code='"+loginData.countrycode+"']");
 		if( targetCountryDom.length>0 ){
 			countryCodeDoms.selectbox("change", targetCountryDom.val(), $(targetCountryDom[0]).text() );
 			cns.debug(targetCountryDom.text());
@@ -184,8 +187,15 @@ onCheckVersionDone = function(needUpdate){
 		if( "phone" == activeTab.attr("data-type") ){
 			var pwdInput = $(".login-ld-password input");
 			var phoneInput = $(".login-ld-phone input");
-			if( checkPhoneValidation( countrycode, phoneInput.val())&&pwdInput.val().length >= 6 ){
+			var countryInput = $(".login-ld-countrycode select");
+			var phoneObj = getPhoneNumberObject( phoneInput.val(), countryInput.attr("data-val") );
+			if( phoneObj.isValid && pwdInput.val().length >= 6 ){
 				$("#page-registration .login").addClass("login-ready");
+
+				countrycode = "+"+phoneObj.country_code;
+				var loginData = $.lStorage("_loginRemeber");
+				loginData.countrycode = countrycode;
+				$.lStorage("_loginRemeber", loginData);
 			} else {
 				$("#page-registration .login").removeClass("login-ready");
 			}
@@ -423,7 +433,11 @@ onCheckVersionDone = function(needUpdate){
 		var this_register = this_dom.parent();
 		var countryCodeDoms = $('#page-register .countrycode select');
 		var tmpCountryCode = countryCodeDoms.attr("data-val");
-		if( checkPhoneValidation( tmpCountryCode, this_dom.val()) ){
+
+		var phoneObj = getPhoneNumberObject( this_dom.val(), tmpCountryCode );
+		if( phoneObj.isValid ){
+			countryCodeDoms.attr("data-countryCode", "+"+phoneObj.country_code);
+			countryCodeDoms.attr("data-nationalNum", phoneObj.national_number);
 			this_register.find("img").show();
 			$(".register-next").data("textChk", true );
 
@@ -444,8 +458,11 @@ onCheckVersionDone = function(needUpdate){
 
 			//get country code
 			var countryCodeDoms = $('#page-register .countrycode select');
-			var newCountryCode = countryCodeDoms.attr("data-val");
+			var newCountryName = countryCodeDoms.attr("data-val");
+			var newCountryCode = countryCodeDoms.attr("data-countryCode");
 			var newCountryText = countryCodeDoms.attr("data-text");
+			var nationalNum = countryCodeDoms.attr("data-nationalNum");
+			countrycode = newCountryCode;
 			cns.debug("newCountryCode", newCountryCode);
 			// if( newCountryCode != countrycode ){
 			// 	countrycode = newCountryCode;
@@ -455,11 +472,11 @@ onCheckVersionDone = function(needUpdate){
 			// }
 			var targetCountryDom = $('.login-ld-countrycode select');
 			if( targetCountryDom.length>0 ){
-				targetCountryDom.selectbox("change", newCountryCode, newCountryText );
-				cns.debug(newCountryCode, newCountryText);
+				targetCountryDom.selectbox("change", newCountryName, newCountryText );
+				cns.debug(newCountryName, newCountryText);
 			}
 
-			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
+			var newPhoneNumber = nationalNum;
 			if( newPhoneNumber.length>0 ){
 				var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + newPhoneNumber+"</label>";
 				popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
@@ -674,6 +691,7 @@ onCheckVersionDone = function(needUpdate){
                 ud: $(document).data("device-token")
             }
         cns.debug("registration() 傳送驗證碼前的 body:",JSON.stringify(body,null,2));
+        
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
         	cns.debug("傳送驗證碼後的 data:",data);

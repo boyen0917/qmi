@@ -296,8 +296,11 @@ $(function(){
 	    }
 
 	    //clear callback
-	    // if(callback) $(".popup").data("callback",callback);
-	    $(".popup").data("callback",callback);
+	    if( null==callback ){
+	    	$(".popup").removeData("callback");
+	    } else{
+	    	$(".popup").data("callback",callback);
+	    }
 
 
 	    if(!confirm && !cancel){

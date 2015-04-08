@@ -43,6 +43,7 @@ body{
 #page-registration {
 	background: url("../images/registration/login_bgimg.png") center no-repeat;
 	background-size: cover;
+	position: fixed;
 }
 
 .registration-content {

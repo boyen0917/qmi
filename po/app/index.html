@@ -25,6 +25,7 @@
         <script type="text/javascript" src="js/init_func.js?ver=0.35"></script>
         <script type="text/javascript" src="js/tool.js?ver=0.35"></script>
         <script type="text/javascript" src="js/checkVersion.js?ver=0.35"></script>
+        <script type="text/javascript" src="plugins/phoneformat/phone-format.js"></script>
         <script type="text/javascript" src="js/registration.js?ver=0.35"></script>
 
         <!-- IDBWrapper -->
@@ -69,11 +70,11 @@
                             <div class="login-ld-phone">
                                 <div class="login-ld-countrycode">
                                     <select name="Country Code" data-role="none" tabindex="1">
-                                        <option value="+886" data-textid="LOGIN_COUNTRY_CODE_TAIWAN"></option>
-                                        <option value="+86" data-textid="LOGIN_COUNTRY_CODE_CHINA"></option>
-                                        <option value="+852" data-textid="LOGIN_COUNTRY_CODE_HONGKONG"></option>
-                                        <option value="+853" data-textid="LOGIN_COUNTRY_CODE_MACAU"></option>
-                                        <option value="+1" data-textid="LOGIN_COUNTRY_CODE_US"></option>
+                                        <option SELECTED data-code="+886" value="TW" data-textid="LOGIN_COUNTRY_CODE_TAIWAN"></option>
+                                        <option data-code="+86" value="CN" data-textid="LOGIN_COUNTRY_CODE_CHINA"></option>
+                                        <option data-code="+852" value="HK" data-textid="LOGIN_COUNTRY_CODE_HONGKONG"></option>
+                                        <option data-code="+853" value="MO" data-textid="LOGIN_COUNTRY_CODE_MACAU"></option>
+                                        <option data-code="+1" value="US" data-textid="LOGIN_COUNTRY_CODE_US"></option>
                                     </select>
                                 </div>
                                 <input type="text" maxlength="20" data-role="none" data-textph-id="LOGIN_ACCOUNT_PHONE" placeholder="請輸入手機">
@@ -190,11 +191,11 @@
                         <img src="images/common/icon/icon_arrow_next.png"/> -->
                         <div class="sbContainer">
                             <select name="Country Code" data-role="none" tabindex="1">
-                                <option value="+886" data-textid="LOGIN_COUNTRY_CODE_TAIWAN" selected="selected">Taiwan +886</option>
-                                <option value="+86" data-textid="LOGIN_COUNTRY_CODE_CHINA">China +86</option>
-                                <option value="+852" data-textid="LOGIN_COUNTRY_CODE_HONGKONG">Hong Kong +852</option>
-                                <option value="+853" data-textid="LOGIN_COUNTRY_CODE_MACAU">Macau +853</option>
-                                <option value="+1" data-textid="LOGIN_COUNTRY_CODE_US">United States +1</option>
+                                <option SELECTED data-code="+886" value="TW" data-textid="LOGIN_COUNTRY_CODE_TAIWAN"></option>
+                                <option data-code="+86" value="CN" data-textid="LOGIN_COUNTRY_CODE_CHINA"></option>
+                                <option data-code="+852" value="HK" data-textid="LOGIN_COUNTRY_CODE_HONGKONG"></option>
+                                <option data-code="+853" value="MO" data-textid="LOGIN_COUNTRY_CODE_MACAU"></option>
+                                <option data-code="+1" value="US" data-textid="LOGIN_COUNTRY_CODE_US"></option>
                             </select>
                         </div>
                     </div>
