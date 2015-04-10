@@ -495,27 +495,8 @@ var initStickerArea= {
 				}
 			} else {
 				thisTmp.load( function(){
-					if( null!=thisTmp.splDict[spi].list && thisTmp.splDict[spi].list.hasOwnProperty(sid) ){
-						callback(thisTmp.splDict[spi].list[sid].sou);
-					} else {
-						if( null==thisTmp.splDict[spi].list ){
-							thisTmp.splDict[spi].list = {};
-						}
-						thisTmp.getSingleStickerPathApi(sid).complete( function(data){
-							if( data.status==200 ){
-								var detailData = $.parseJSON(data.responseText);
-								thisTmp.splDict[spi].list[sid] = {
-									sid: sid,
-									sou: detailData.sou,
-									stu: detailData.stu
-								};
-								callback(thisTmp.splDict[spi].list[sid].sou);
-								$.lStorage("_sticker",thisTmp.splDict);
-							} else {
-								callback("");
-							}
-						});
-					}
+					thisTmp.isUpdated = true;
+					thisTmp.getStickerPath(sid, callback);
 				});
 			}
 		} catch(e){

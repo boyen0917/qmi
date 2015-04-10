@@ -19,9 +19,10 @@ $(function(){
 	if(window.location.href.match(/localhost/)) {
 		debug_flag = true;
 	}
-
 	if(window.location.href.match(/wp.qmi.emome.net/)) {
 		base_url = "https://ap.qmi.emome.net/apiv1/";
+	} else if(window.location.href.match(/eimweb.mitake.com.tw/)) {
+		base_url = "https://apserver.mitake.com.tw/apiv1/";
 	}
 	
 	

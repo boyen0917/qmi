@@ -1,15 +1,23 @@
 /* depend: init.js, tool.js */
 $(function(){
 	g_currentVersion = "0.2.1";
+	// g_downloadPath = "http://webdev.cloud.mitake.com.tw/qmipc/download.html";
 
 
     checkContainerVersion = function( onDone ){
     	try{
-    		var g_currentVersion = require('nw.gui').App.manifest.version;
+    		if( typeof(getWebCntrVersion)!= "undefined" ){
+	    		var versionObj = getWebCntrVersion();
+	    		g_currentVersion = versionObj.APP_VERSION;
+	    		cns.debug( getComputerName() );
+	    	} else {
+	    		g_currentVersion = require('nw.gui').App.manifest.version;
+	    	}
+
 			if( null==g_currentVersion ){
 				g_currentVersion = "0.0.0";
 			}
-			$("#container_version").html(g_currentVersion);
+			$("#container_version span.container").html(g_currentVersion);
 
 	  //   	var api_name = "/sys/version";
 	  //   	var headers = {
@@ -26,7 +34,8 @@ $(function(){
 
 		 			var getS3_result = {av:"0.6.2"};
 
-			    	if( g_currentVersion != getS3_result.av ){
+		 			cns.debug( "old:", g_currentVersion, "new:", getS3_result.av );
+			    	if( versionCompare(g_currentVersion, getS3_result.av)>0 ){
 			    		console.debug("need update container ver");
 			    		// $(".version_update_lock").fadeIn();
 			    		onDone(true);
@@ -41,19 +50,39 @@ $(function(){
 		    // 	}
 		    // });
     	} catch(e){
-			$("#container_version").html("0.0.0");
-    		console.debug("ignore container ver");
+			$("#container_version span.container").html("0.0.0");
+    		console.debug("ignore container ver", e.stack);
     		onDone(false);
     		// onDone(true);
     		// $(".container_update_lock").show();
     	}
     }
 
+    versionCompare = function(oldVerStr, newVerStr){
+    	var oldVerAry = oldVerStr.split(".");
+    	var newVerAry = newVerStr.split(".");
+    	for( var i=0; i<oldVerAry.length; i++ ){
+    		if( newVerAry[i] == oldVerAry[i] ){
+	    		cns.debug("compare(str)",i,newVerAry[i],oldVerAry[i]);
+    			continue;
+    		} else {
+	    		newVerAry[i] = parseInt( newVerAry[i] );
+	    		oldVerAry[i] = parseInt( oldVerAry[i] );
+	    		cns.debug("compare(int)",i,newVerAry[i],oldVerAry[i]);
+    			cns.debug( "result", (newVerAry[i]- oldVerAry[i] ) );
+    			return (newVerAry[i]- oldVerAry[i] );
+    		}
+    	}
+    	cns.debug( "result", (newVerAry[i]- oldVerAry[i] ) );
+    	return 0;
+    }
+
     onClickDownload = function(){
 		$(".container_update_lock").show();
     	var link = $(".container_update_lock a");
+    	// link.attr("href",g_downloadPath);
     	link.trigger("click");
-    	console.debug("download");
+    	console.debug("download clicked");
     }
 
     checkWebVersion = function( onDone ){
@@ -78,6 +107,7 @@ $(function(){
 			    } else {
 			    	g_currentVersion = versionData.ver;
 			    }
+				$("#container_version span.web").html("("+g_currentVersion+")");
 	    		var api_name = "/sys/version";
 	    		var headers = {
 	    			os: 2,

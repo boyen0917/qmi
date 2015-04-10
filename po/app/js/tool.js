@@ -798,9 +798,7 @@ $(function(){
 	}
 	setStickerUrl = function(dom, id){
 		if( null!= initStickerArea ){
-			initStickerArea.getStickerPath(id, function(path){
-				dom.attr("url",path);
-			});
+			initStickerArea.setStickerSrc(dom, id );
 		}
 	}
 

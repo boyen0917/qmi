@@ -1295,8 +1295,9 @@ $(function(){
                         case 1:
                             break;
                         case 5:
-                            var sticker_path = "sticker/" + val.c.split("_")[1] + "/" + val.c + ".png";
-                            this_content.find(".sticker").attr("src",sticker_path).show();
+                            var stickerDom = this_content.find(".sticker");
+                            stickerDom.show();
+                            setStickerUrl(stickerDom, val.c);
                             break;
                         case 6:
                             this_content.find(".au-area").show();
