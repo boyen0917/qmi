@@ -6544,14 +6544,15 @@ $(function(){
                         val.pm.onGetMemData = function(this_gi, memData){
                             try{
                                 if( currentPollingCt>=login_time ){
-                                    var title = g_Qmi_title;
-                                    var userDataTmp = $.lStorage(ui);
-                                    if( userDataTmp && userDataTmp.hasOwnProperty(val.pm.gi) ){
-                                        var groupTmp = userDataTmp[val.pm.gi];
-                                        if( groupTmp && groupTmp.gn ){
-                                            title = groupTmp.gn;
-                                        }
-                                    }
+                                    var title = memData.gn || g_Qmi_title;
+                                    // var title = g_Qmi_title;
+                                    // var userDataTmp = $.lStorage(ui);
+                                    // if( userDataTmp && userDataTmp.hasOwnProperty(val.pm.gi) ){
+                                    //     var groupTmp = userDataTmp[val.pm.gi];
+                                    //     if( groupTmp && groupTmp.gn ){
+                                    //         title = groupTmp.gn;
+                                    //     }
+                                    // }
                                     riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
                                         if( gi==this_gi ){
                                             $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
@@ -6579,14 +6580,15 @@ $(function(){
                         val.pm.onGetMemData = function(this_gi, memData){
                             try{
                                 if( currentPollingCt>=login_time ){
-                                    var title = g_Qmi_title;
-                                    var userDataTmp = $.lStorage(ui);
-                                    if( userDataTmp && userDataTmp.hasOwnProperty(val.pm.gi) ){
-                                        var groupTmp = userDataTmp[val.pm.gi];
-                                        if( groupTmp && groupTmp.gn ){
-                                            title = groupTmp.gn;
-                                        }
-                                    }
+                                    var title = memData.gn || g_Qmi_title;
+                                    // var title = g_Qmi_title;
+                                    // var userDataTmp = $.lStorage(ui);
+                                    // if( userDataTmp && userDataTmp.hasOwnProperty(val.pm.gi) ){
+                                    //     var groupTmp = userDataTmp[val.pm.gi];
+                                    //     if( groupTmp && groupTmp.gn ){
+                                    //         title = groupTmp.gn;
+                                    //     }
+                                    // }
                                     riseNotification( null, title, $.i18n.getString("GROUP_X_LEAVE_GROUP", memData.nk), function(){
                                         if( gi==this_gi ){
                                             $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
@@ -6633,15 +6635,23 @@ $(function(){
 
 	    	//將tp4 tp5 的user info都更新完 再更新polling時間
             try{
-    	    	if(user_info_arr.length > 0){
-    	    		getUserInfo(user_info_arr,false, false, function(memData){
+    	    	if(user_info_arr.length > 1){
+    	    		getMultipleUserInfo(user_info_arr,false, false, function(isSucc){
                         //更新polling
         	    		pollingUpdate(msgs,ccs);
                         if(isUpdateMemPage ){
                             updateBranchMemberCnt(gi);
                         }
     	    		});
-    	    	}else{
+    	    	}else if(user_info_arr.length > 0){
+                    getUserInfo(user_info_arr,false, false, function(memData){
+                        //更新polling
+                        pollingUpdate(msgs,ccs);
+                        if(isUpdateMemPage ){
+                            updateBranchMemberCnt(gi);
+                        }
+                    });
+                }else{
     	    		pollingUpdate(msgs,ccs);
     	    	}
             } catch(e){
@@ -6806,6 +6816,7 @@ $(function(){
                             setGroupAllUser(data_arr,this_user_info.gi);
                         }
 
+                        user_data.gn = _groupList[this_user_info.gi].gn || "";
                         if( this_user_info.onGetMemData ) this_user_info.onGetMemData(this_user_info.gi, user_data);
                         user_info_arr.pop();
                         
@@ -6824,6 +6835,77 @@ $(function(){
 	        	}
 	        });
 		}
+    }
+
+    getMultipleUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone){
+        if( null==user_info_arr || user_info_arr.length==0 ){
+            cns.debug("[getMultipleUserInfo] null user array");
+        }
+        cns.debug( "[getMultipleUserInfo] length:", user_info_arr.length );
+        var load_show_chk = load_show_chk || false;
+        var onAllDone = onAllDone || false;
+
+        var api_name = "sys/group_users";
+        
+        var headers = {
+                 "ui":ui,
+                 "at":at,
+                 "li":lang
+        };
+        var method = "post";
+        var body = {
+            gul:user_info_arr
+        }
+
+        ajaxDo(api_name,headers,method,load_show_chk,body,false,true).complete(function(data){
+            if(data.status == 200){
+
+                try{
+                    var user_data_object = $.parseJSON(data.responseText);
+                    var _groupList = $.lStorage(ui);
+                    //新成員, 三天後失效
+                    var invalidTime = new Date().getTime()+(86400000*3);
+                    $.each(user_data_object.gul, function(index,user_data){
+                        var this_user_info = user_info_arr[index];
+                        //新成員, 三天後失效
+                        if( this_user_info.isNewMem ){
+                            user_data.isNewMem = true;
+                            user_data.isNewMemDate = invalidTime;
+                        }
+                        if( _groupList[this_user_info.gi].guAll && Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
+                            cns.debug("guall content exist");
+                            var userTmp = _groupList[this_user_info.gi].guAll[this_user_info.gu];
+                            //user全部資料竟然不含fav...?!用extend的比較保險
+                            _groupList[this_user_info.gi].guAll[this_user_info.gu] = $.extend(userTmp, user_data);
+                    
+                            //更新所有照片、名字 this_gi , this_gu , set_name ,set_img
+                            if(update_chk){
+                                updateAllAvatarName(this_user_info.gi,this_user_info.gu);
+                            }
+                        }else{
+                            cns.debug("[!!!] getUserInfo: no guAll");
+                            var data_arr = ["userInfo",user_data];
+                            _groupList[this_user_info.gi].guAll[this_user_info.gu] = user_data;
+                            setGroupAllUser(data_arr,this_user_info.gi);
+                        }
+
+                        user_data.gn = _groupList[this_user_info.gi].gn || "";
+                        if( this_user_info.onGetMemData ) this_user_info.onGetMemData(this_user_info.gi, user_data);
+                    });
+
+
+                    //儲存
+                    $.lStorage(ui, _groupList);
+                    onAllDone(true);
+
+                } catch(e){
+                    errorReport(e);
+                }
+            //失敗就離開遞迴
+            }else{ 
+                if(onAllDone) onAllDone(false);
+            }
+        });
     }
 
     updateAllAvatarName = function(this_gi,this_gu,name,img){
