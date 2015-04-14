@@ -1324,13 +1324,13 @@ $(function(){
     errorReport = function(e){
     	if( e ){
     		if( e.message.indexOf("riseNotification")==0 ) return;
-	    	cns.debug("----- errorReport --------------------");
+	    	console.debug("----- errorReport --------------------");
 	    	if (e.stack){
-	    		cns.debug(e.stack);
+	    		console.debug(e.stack);
 	    	} else {
-	    		cns.debug(arguments.callee.caller, e.message);
+	    		console.debug(arguments.callee.caller, e.message);
 	    	}
-	    	cns.debug("-------------------- errorReport -----");
+	    	console.debug("-------------------- errorReport -----");
     	}
     }
 

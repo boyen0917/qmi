@@ -1221,8 +1221,9 @@ function showMsg (object, bIsTmpSend){
 				msgDiv.addClass('left');
 			}
 			var pic = $("<img>");
-			var sticker_path = "sticker/" + msgData.c.split("_")[1] + "/" + msgData.c + ".png";
-			pic.attr("src",sticker_path);
+			setStickerUrl(pic, msgData.c);
+			// var sticker_path = "sticker/" + msgData.c.split("_")[1] + "/" + msgData.c + ".png";
+			// pic.attr("src",sticker_path);
 			msgDiv.append(pic);
 			break;
 		case 6:

@@ -9,6 +9,8 @@ var initStickerArea= {
 	// dict: null,
 	splDict: null,
 	domList: [],
+	loadStash:[],
+	isInit: false,
 	init: function( dom, onSelect ){
 		var thisTmp = this;
 		thisTmp.domList.push(dom);
@@ -333,10 +335,15 @@ var initStickerArea= {
 	        		thisTmp.splDict = $.lStorage("_sticker") || {};
 	        		var currentCnt = 0;
 	        		var cnt = obj.spl.length;
+	        		var newList = {};
 	        		for( var i=0; i<cnt; i++ ){
 	        			var tmpNewSpiDetail = obj.spl[i];
+	        			newList[tmpNewSpiDetail.spi] = tmpNewSpiDetail;
+
 	        			if( thisTmp.splDict.hasOwnProperty(tmpNewSpiDetail.spi) ){
 	        				var tmpSpiDetail = thisTmp.splDict[tmpNewSpiDetail.spi];
+	        				
+	        				tmpSpiDetail = $.extend( tmpSpiDetail, newList[tmpNewSpiDetail.spi] );
 	        				//update downloaded stickers
 	        				if( true==tmpSpiDetail.isDownload && tmpSpiDetail.ut<tmpNewSpiDetail.ut ){
 	        					thisTmp.getStickerDetailApi(tmpSpiDetail.spi).complete(function(detailDataTmp){
@@ -354,9 +361,10 @@ var initStickerArea= {
 		        							delete tmpSpiDetail.sl;
 		        						}
 	        						}
+	        						newList[tmpNewSpiDetail.spi] = tmpSpiDetail;
 	        						currentCnt++;
 	        						if( cnt==currentCnt ){
-	        							if( callback() ) callback();
+	        							thisTmp.onInitSucc( newList, callback );
 	        						}
 	        					});
 	        				} else {
@@ -370,25 +378,39 @@ var initStickerArea= {
 	        						}
 	        						delete tmpSpiDetail.sl;
 	        					}
+	        					newList[tmpNewSpiDetail.spi] = tmpSpiDetail;
 	        				}
 
 	        				// thisTmp.splDict[tmpNewSpiDetail.spi] = $.extend(thisTmp.splDict[tmpNewSpiDetail.spi], tmpNewSpiDetail);
 	        			} else {
 	        				currentCnt++;
-	        				thisTmp.splDict[tmpNewSpiDetail.spi] = tmpNewSpiDetail;
+	        				// thisTmp.splDict[tmpNewSpiDetail.spi] = tmpNewSpiDetail;
 	        			}
 
 	        			if( cnt==currentCnt ){
-	        				if( callback() ) callback();
+	        				thisTmp.onInitSucc( newList, callback );
 	        			}
 	        		}
-		    		$.lStorage("_sticker", thisTmp.splDict);
+		    		// $.lStorage("_sticker", thisTmp.splDict);
 	        	}
 	        });
 	    } catch(e){
 	    	errorReport(e);
 	    	if( callback() ) callback();
 	    }
+	},
+	onInitSucc: function( newList, callback){
+		var thisTmp = this;
+		thisTmp.isInit = true;
+	    thisTmp.splDict = newList;
+	    $.lStorage("_sticker",thisTmp.splDict);
+	    if( null!=callback )	callback();
+		if( thisTmp.loadStash.length>0 ){
+			for( var i=0; i<thisTmp.loadStash.length; i++ ){
+				var obj = thisTmp.loadStash[i];
+				getStickerPath(obj.sid,obj.callback);
+			}
+		}
 	},
 	getStickerListApi: function(){
 		var thisTmp = this;
@@ -469,9 +491,13 @@ var initStickerArea= {
 	},
 	getStickerPath: function(sid, callback){
 		var thisTmp = this;
+		if( false==thisTmp.isInit){
+			thisTmp.loadStash.push({sid:sid,callback:callback});
+			return;
+		}
 		try{
-			var spi = sid.split("_")[1];
 			if( thisTmp.isUpdated ){
+				var spi = sid.split("_")[1];
 				if( null!=thisTmp.splDict[spi].list && thisTmp.splDict[spi].list.hasOwnProperty(sid) ){
 					callback(thisTmp.splDict[spi].list[sid].sou);
 				} else {

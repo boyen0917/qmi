@@ -6346,9 +6346,9 @@ $(function(){
 
         	if(data.status == 200){
         		var new_pollingData = $.parseJSON(data.responseText);
-                var tmp_cnts = new_pollingData.cnts;
+                var tmp_cnts = new_pollingData.cnts || [];
                 // new_pollingData.cnts = {};
-                new_pollingData.cnts = local_pollingData.cnts;
+                new_pollingData.cnts = local_pollingData.cnts || [];
                 //cnts 做合併
                 $.each(tmp_cnts,function(i,val){
                 	var tmp_gi_obj = $.extend(local_pollingData.cnts[val.gi],val);
@@ -6356,7 +6356,7 @@ $(function(){
                 });
 
                 //gcnts 做合併
-                new_pollingData.gcnts = $.extend(local_pollingData.gcnts,new_pollingData.gcnts);
+                new_pollingData.gcnts = $.extend(local_pollingData.gcnts||{},new_pollingData.gcnts||{});
 
                 //暫存
                 if(!$.lStorage("_tmpPollingData"))
