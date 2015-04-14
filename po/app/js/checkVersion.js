@@ -146,10 +146,12 @@ $(function(){
 		    		gui.App.clearCache();
 		    		gui.Window.get().reload();
 		    		console.debug("update successed");
+		    		onDone(false);
 		    		return true;
 					// alert("clear cache 1 succ");
 		    	} catch(e){
 		    		console.debug(e.stack);
+		    		onDone(false);
 		    	}
 		    }
 		// }

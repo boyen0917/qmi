@@ -39,7 +39,7 @@ initAlertDB = function(){
       ],
       onStoreReady: function(){
       	// showAlertFromDB();
-      	updateAlert();
+      	// updateAlert();
 		// setInterval(updateAlert,update_alert_interval);
       }
     });
@@ -188,154 +188,240 @@ showAlertContent = function(data){
 		if( null == userData )	return;
 
 		for(var i=0; i<data.length; i++){
-			//預防舊的ＡＰＩ
-			if( !data[i].hasOwnProperty("nd") ) continue;
 
 			var boxData = data[i];
 
 
 			/* ----------- TODO: 檢查是否已show過 ------------ */
 
-			group = userData[boxData.gi];
-			if( null==group ) continue;
-
 			var tmpDiv = $(this).clone();
-			tmpContainer.append(tmpDiv);
-
-			//群組名
-			tmp = $(tmpDiv).find(".al-post-group");
-			if( tmp ) tmp.html( group.gn.replaceOriEmojiCode() );
-			// cns.debug( htmlFormat(group.gn) );
 
 		    var content;
-			if(boxData.ntp==1){
-				//xx(發布者 名)
-			    tmp = $(tmpDiv).find(".al-post-name");
-			    if( tmp ) tmp.html( boxData.gun.replaceOriEmojiCode() );
+		    if( boxData.ntp==30 ){
 
-				//發佈xx
-				content = $(tmpDiv).find(".al-content.post");
-
-				if( group ){
-					//發布者 照片
-				    var tmp = $(tmpDiv).find(".al-post-img.namecard");
-				    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
-				    	var auo = group.guAll[boxData.gu].auo;
-				    	if(auo){
-				    		tmp.css("background-image","url("+auo+")");
-				    	}
-				    }
+				//團體頭像
+				var tmp = $(tmpDiv).find(".al-post-img.namecard");
+				if(boxData.gat){
+					tmp.css("background-image","url("+boxData.gat+")");
+				} else {
+					tmp.css("background-image","url(images/common/others/empty_img_all_l.png)");
 				}
 
-			} else { //回覆
-				//xx(及其他xx個人)
-			    tmp = $(tmpDiv).find(".al-post-name");
-			    if( tmp && boxData.gun){
-			    	tmp.html( boxData.gun.replaceOriEmojiCode() );
-			    	if(boxData.rcnt>1){
-			    		$(tmpDiv).find(".posterDetail").css("display","inline-block");
-			    		$(tmpDiv).find(".otherPosterCnt").html( $.i18n.getString("NOTICES_RESPONSER_NUM",boxData.rcnt-1) );
-			    	}
-			    }
+				tmp = $(tmpDiv).find(".al-post-group");
+				if( tmp ) tmp.html( boxData.gn.replaceOriEmojiCode() );
 
-				//"回覆"xxx的xx『xxx』
-				content = $(tmpDiv).find(".al-content.response");
+				//邀請者名稱
+				tmp = $(tmpDiv).find(".al-post-name");
+				if( tmp ) tmp.html( boxData.in.replaceOriEmojiCode() );
 
-				//回覆"xxx的"xx『xxx』
-				content.find(".oriPoster").html(
-					textSomeonesHtmlFormat( getPosterText(group, boxData) )
-				);
+				//title
+				content = $(tmpDiv).find(".al-content.invite");
+				content.show();
 
-				//發布者 照片
-				var tmp = $(tmpDiv).find(".al-post-img");
-				if( tmp ){
-					if( boxData.aurl ){
-						tmp.css("background-image","url("+boxData.aurl+")");
-					} else if( group && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
-						var auo = group.guAll[boxData.gu].auo;
-						if(auo){
-							tmp.css("background-image","url("+auo+")");
+				//time
+			    tmp = $(tmpDiv).find(".al-time .text");
+			    if( tmp ) tmp.html(new Date(boxData.it).toFormatString() );
+
+				//內容
+				var extra = $(tmpDiv).find(".al-extra");
+				extra.html(boxData.im).show();
+
+		    } else {
+
+				//預防舊的ＡＰＩ
+				if( !data[i].hasOwnProperty("nd") ) continue;
+
+				group = userData[boxData.gi];
+				if( null==group ) continue;
+
+				//群組名
+				tmp = $(tmpDiv).find(".al-post-group");
+				if( tmp ) tmp.html( group.gn.replaceOriEmojiCode() );
+				// cns.debug( htmlFormat(group.gn) );
+
+				if(boxData.ntp==1){ //貼文
+					//xx(發布者 名)
+				    tmp = $(tmpDiv).find(".al-post-name");
+				    if( tmp ) tmp.html( boxData.gun.replaceOriEmojiCode() );
+
+					//發佈xx
+					content = $(tmpDiv).find(".al-content.post");
+
+					if( group ){
+						//發布者 照片
+					    var tmp = $(tmpDiv).find(".al-post-img.namecard");
+					    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
+					    	var auo = group.guAll[boxData.gu].auo;
+					    	if(auo){
+					    		tmp.css("background-image","url("+auo+")");
+					    	}
+					    }
+					}
+
+				} else { //回覆
+					//xx(及其他xx個人)
+				    tmp = $(tmpDiv).find(".al-post-name");
+				    if( tmp && boxData.gun){
+				    	tmp.html( boxData.gun.replaceOriEmojiCode() );
+				    	if(boxData.rcnt>1){
+				    		$(tmpDiv).find(".posterDetail").css("display","inline-block");
+				    		$(tmpDiv).find(".otherPosterCnt").html( $.i18n.getString("NOTICES_RESPONSER_NUM",boxData.rcnt-1) );
+				    	}
+				    }
+
+					//"回覆"xxx的xx『xxx』
+					content = $(tmpDiv).find(".al-content.response");
+
+					//回覆"xxx的"xx『xxx』
+					content.find(".oriPoster").html(
+						textSomeonesHtmlFormat( getPosterText(group, boxData) )
+					);
+
+					//發布者 照片
+					var tmp = $(tmpDiv).find(".al-post-img");
+					if( tmp ){
+						if( boxData.aurl ){
+							tmp.css("background-image","url("+boxData.aurl+")");
+						} else if( group && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
+							var auo = group.guAll[boxData.gu].auo;
+							if(auo){
+								tmp.css("background-image","url("+auo+")");
+							}
 						}
 					}
 				}
-			}
 
-			//event title
-			if( boxData.nd.hasOwnProperty("et") && boxData.nd.et.length>0 ){
-				$(content).find(".boxTitle").html( getEventTitleText(boxData.nd.et) ).css("display","inline-block");
-			}
-			
-			//event type
-			$(content).find(".type").html( getEventTypeText(boxData.nd.etp) );
-			$(content).find(".icon").attr( "src", getEventTypeIcon(boxData.nd.etp) );
+				if(boxData.ntp==1){ //貼文
+					//xx(發布者 名)
+				    tmp = $(tmpDiv).find(".al-post-name");
+				    if( tmp ) tmp.html( boxData.gun.replaceOriEmojiCode() );
 
+					//發佈xx
+					content = $(tmpDiv).find(".al-content.post");
 
-			if(content){
-			    content.css("display","block");
+					if( group ){
+						//發布者 照片
+					    var tmp = $(tmpDiv).find(".al-post-img.namecard");
+					    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
+					    	var auo = group.guAll[boxData.gu].auo;
+					    	if(auo){
+					    		tmp.css("background-image","url("+auo+")");
+					    	}
+					    }
+					}
 
-			    //並上傳了檔案
-			  //   if( boxData.nd.hasOwnProperty("ml") ){
-					// for( var j=0; j<boxData.nd.ml.length; j++){
-					// 	if( boxData.nd.ml[j].tp!=0 ){
-					// 		setDetailAct( content );
-					// 		break;
-					// 	}
-					// }
-			  //   }
-			}
+				} else { //回覆
+					//xx(及其他xx個人)
+				    tmp = $(tmpDiv).find(".al-post-name");
+				    if( tmp && boxData.gun){
+				    	tmp.html( boxData.gun.replaceOriEmojiCode() );
+				    	if(boxData.rcnt>1){
+				    		$(tmpDiv).find(".posterDetail").css("display","inline-block");
+				    		$(tmpDiv).find(".otherPosterCnt").html( $.i18n.getString("NOTICES_RESPONSER_NUM",boxData.rcnt-1) );
+				    	}
+				    }
 
-			//內容
-		    var extra = $(tmpDiv).find(".al-extra");
-			extra.css("display","none");
-			if( boxData.nd.hasOwnProperty("ml") ){
-				for( var j=0; j<boxData.nd.ml.length; j++){
-					if( boxData.nd.ml[j].tp==0 && boxData.nd.ml[j].c.length>0 ){
-						extra.html( boxData.nd.ml[j].c.replaceOriEmojiCode() );
-						extra.css("display","");
-						break;
+					//"回覆"xxx的xx『xxx』
+					content = $(tmpDiv).find(".al-content.response");
+
+					//回覆"xxx的"xx『xxx』
+					content.find(".oriPoster").html(
+						textSomeonesHtmlFormat( getPosterText(group, boxData) )
+					);
+
+					//發布者 照片
+					var tmp = $(tmpDiv).find(".al-post-img");
+					if( tmp ){
+						if( boxData.aurl ){
+							tmp.css("background-image","url("+boxData.aurl+")");
+						} else if( group && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
+							var auo = group.guAll[boxData.gu].auo;
+							if(auo){
+								tmp.css("background-image","url("+auo+")");
+							}
+						}
 					}
 				}
+
+				//event title
+				if( boxData.nd.hasOwnProperty("et") && boxData.nd.et.length>0 ){
+					$(content).find(".boxTitle").html( getEventTitleText(boxData.nd.et) ).css("display","inline-block");
+				}
+				
+				//event type
+				$(content).find(".type").html( getEventTypeText(boxData.nd.etp) );
+				$(content).find(".icon").attr( "src", getEventTypeIcon(boxData.nd.etp) );
+
+
+				if(content){
+				    content.css("display","block");
+
+				    //並上傳了檔案
+				  //   if( boxData.nd.hasOwnProperty("ml") ){
+						// for( var j=0; j<boxData.nd.ml.length; j++){
+						// 	if( boxData.nd.ml[j].tp!=0 ){
+						// 		setDetailAct( content );
+						// 		break;
+						// 	}
+						// }
+				  //   }
+				}
+
+				//內容
+			    var extra = $(tmpDiv).find(".al-extra");
+				extra.css("display","none");
+				if( boxData.nd.hasOwnProperty("ml") ){
+					for( var j=0; j<boxData.nd.ml.length; j++){
+						if( boxData.nd.ml[j].tp==0 && boxData.nd.ml[j].c.length>0 ){
+							extra.html( boxData.nd.ml[j].c.replaceOriEmojiCode() );
+							extra.css("display","");
+							break;
+						}
+					}
+				}
+
+				tmpDiv.data("gi", boxData.gi);
+				tmpDiv.data("ei", boxData.nd.ei);
+				tmpDiv.click(function(){
+					if($(this).find(".al-subbox").data("stop")) {
+						$(this).find(".al-subbox").data("stop",false);
+						return false;	
+					} 
+
+					var this_gi = $(this).data("gi");
+					var this_ei = $(this).data("ei");
+					
+					if( null==this_gi || null==this_ei ) return;
+
+					var group = $.lStorage(ui)[this_gi];
+					if( null==group ) return;
+
+					if( null==group.guAll || Object.keys(group.guAll).length == 0){
+						cns.debug("no guall",this_gi);
+						var this_alert = $(this);
+			        	setGroupAllUser(false,this_gi,function(){
+			        		this_alert.trigger("click");
+			        	});
+			        	return false;
+			        }
+
+					hideAlertBox(true);
+
+					$(".alert").removeClass("alert-click");
+		    		$(".alert-area").slideUp("fast",function(){
+		    			setTimeout(function(){
+			    			$.mobile.changePage("#page-timeline-detail", {transition: "slide"});
+							eventDetailShow(this_ei);	
+						},100);
+		    		});
+				});
+
+				//動作時間
+			    tmp = $(tmpDiv).find(".al-time .text");
+			    if( tmp ) tmp.html(new Date(boxData.nd.ct).toFormatString() );
 			}
 
-			//動作時間
-		    tmp = $(tmpDiv).find(".al-time .text");
-		    if( tmp ) tmp.html(new Date(boxData.nd.ct).toFormatString() );
-
-			tmpDiv.data("gi", boxData.gi);
-			tmpDiv.data("ei", boxData.nd.ei);
-			tmpDiv.click(function(){
-				if($(this).find(".al-subbox").data("stop")) {
-					$(this).find(".al-subbox").data("stop",false);
-					return false;	
-				} 
-
-				var this_gi = $(this).data("gi");
-				var this_ei = $(this).data("ei");
-				
-				if( null==this_gi || null==this_ei ) return;
-
-				var group = $.lStorage(ui)[this_gi];
-				if( null==group ) return;
-
-				if( null==group.guAll || Object.keys(group.guAll).length == 0){
-					cns.debug("no guall",this_gi);
-					var this_alert = $(this);
-		        	setGroupAllUser(false,this_gi,function(){
-		        		this_alert.trigger("click");
-		        	});
-		        	return false;
-		        }
-
-				hideAlertBox(true);
-
-				$(".alert").removeClass("alert-click");
-	    		$(".alert-area").slideUp("fast",function(){
-	    			setTimeout(function(){
-		    			$.mobile.changePage("#page-timeline-detail", {transition: "slide"});
-						eventDetailShow(this_ei);	
-					},100);
-	    		});
-			});
+			tmpContainer.append(tmpDiv);
 
 			//取代中文
 			tmpDiv._i18n();

@@ -207,6 +207,12 @@
 	vertical-align: middle;
 	margin-left: 2px;
 }
+.al-content.invite .icon{
+	width: 20px;
+	height: 20px;
+	vertical-align: text-bottom;
+	margin-left: 2px;
+}
 .al-content .type{
 	color: rgb(64,146,239);
 }
