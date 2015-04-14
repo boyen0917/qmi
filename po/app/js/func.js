@@ -6841,6 +6841,19 @@ $(function(){
         if( null==user_info_arr || user_info_arr.length==0 ){
             cns.debug("[getMultipleUserInfo] null user array");
         }
+
+        var new_user_info_obj = {};
+        var new_user_info_arr = [];
+        for( var i=0; i<user_info_arr.length; i++){
+            var tmpObj = user_info_arr[i];
+            new_user_info_obj[tmpObj.gu] = tmpObj;
+            new_user_info_arr.push({
+                gu: tmpObj.gu,
+                gi: tmpObj.gi
+            });
+        }
+
+
         cns.debug( "[getMultipleUserInfo] length:", user_info_arr.length );
         var load_show_chk = load_show_chk || false;
         var onAllDone = onAllDone || false;
@@ -6854,7 +6867,7 @@ $(function(){
         };
         var method = "post";
         var body = {
-            gul:user_info_arr
+            gul:new_user_info_arr
         }
 
         ajaxDo(api_name,headers,method,load_show_chk,body,false,true).complete(function(data){
@@ -6866,7 +6879,15 @@ $(function(){
                     //新成員, 三天後失效
                     var invalidTime = new Date().getTime()+(86400000*3);
                     $.each(user_data_object.gul, function(index,user_data){
-                        var this_user_info = user_info_arr[index];
+                        if( false==new_user_info_obj.hasOwnProperty(user_data.gu) ){
+                            cns.debug("[getMultipleUserInfo] get ?? gu", user_data.gu);
+                            return;
+                        }
+                        var this_user_info = new_user_info_obj[user_data.gu];
+                        if( null==this_user_info ){
+                            cns.debug("[getMultipleUserInfo] null this_user_info", user_data.gu);
+                            return;
+                        }
                         //新成員, 三天後失效
                         if( this_user_info.isNewMem ){
                             user_data.isNewMem = true;
