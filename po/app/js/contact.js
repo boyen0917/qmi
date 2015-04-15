@@ -4,6 +4,7 @@ var guAllExsit;
 var fbl;
 var isList = true;
 var g_group;
+var g_contactWaitLoadImgs;
 // var isKeyPress = false;
 
 $(document).ready(function(){
@@ -603,11 +604,11 @@ generateMemberGrid = function( memObject ){
 		} else {
 			var tmp = $("<div class='mem namecard'></div>");
 			if( mem.aut && mem.aut.length>0 ){
-				tmp.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
+				tmp.append("<div class='img waitLoad' data-url='"+mem.aut+"'><div class='new' style='display:none;'>NEW</div></div>");
 			} else {
 				tmp.append("<div class='img'><div class='new' style='display:none;'>NEW</div></div>");
 			}
-			cns.debug(key, mem.nk);
+			// cns.debug(key, mem.nk);
 			tmp.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
 			tmp.data("gu",key);
 			//is admin?
@@ -623,8 +624,54 @@ generateMemberGrid = function( memObject ){
 			}
 		}
 	});
+	//"<div class='img' style='background-image:url("+mem.aut+");'><div class='new' style='display:none;'>NEW</div></div>");
+	
+	var tmp = memContainer.find(".img.waitLoad:lt(30)");
+	$.each(tmp, function(index,domTmp){
+		var dom = $(domTmp);
+		dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
+	});
+	g_contactWaitLoadImgs = memContainer.find(".img.waitLoad");
+
+	setOnMemGridScroll();
 	return memContainer;
 }
+
+setOnMemGridScroll = function(){
+	$(".contact-scroll").unbind("scroll").scroll(function(){
+		if( null==g_contactWaitLoadImgs) return;
+		var height = $(this).height()+128;
+		// cns.debug();
+		// cns.debug($(this).scrollTop(), $(this).attr("data-url"));
+		for( var i=g_contactWaitLoadImgs.length-1; i>=0; i-- ){
+			var tmpDom = $(g_contactWaitLoadImgs[i]);
+			// tmpDom.html( tmpDom.offset().top );
+			if( tmpDom.offset().top <height ){
+				tmpDom.css("background-image","url("+tmpDom.attr("data-url")+")");
+				tmpDom.removeAttr("data-url").removeClass("waitLoad");
+				g_contactWaitLoadImgs.splice(i,1);
+			}
+		}
+	});
+}
+setOnMemListScroll = function(){
+	$(".contact-scroll").unbind("scroll").scroll(function(){
+		if( null==g_contactWaitLoadImgs) return;
+		var height = $(this).height()+99;
+		// cns.debug();
+		// cns.debug($(this).scrollTop(), $(this).attr("data-url"));
+		for( var i=g_contactWaitLoadImgs.length-1; i>=0; i-- ){
+			var tmpDom = $(g_contactWaitLoadImgs[i]);
+			// tmpDom.html( tmpDom.offset().top );
+			if( tmpDom.offset().top <height ){
+				tmpDom.css("background-image","url("+tmpDom.attr("data-url")+")");
+				tmpDom.removeAttr("data-url").removeClass("waitLoad");
+				g_contactWaitLoadImgs.splice(i,1);
+			}
+		}
+	});
+}
+
 generateMemberList = function( memObject, favCallback ){
 	var memContainer = $("<div class='contact-memLists'></div>");
 	var count = 0;
@@ -635,7 +682,8 @@ generateMemberList = function( memObject, favCallback ){
 		//pic
 		var left = tmp.find(".left");
 		if( mem.aut && mem.aut.length>0 ){
-			left.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
+			// left.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
+			left.append("<div class='img waitLoad' data-url='"+mem.aut+"'><div class='new' style='display:none;'>NEW</div></div>");
 		} else {
 			left.append("<div class='img'></div>");
 		}
@@ -648,7 +696,7 @@ generateMemberList = function( memObject, favCallback ){
 		try{
 			posi = bl[mem.bl.split(",")[0].split(".")[0]].bn;
 		} catch( e ){
-			cns.debug( e.message );
+			// cns.debug( e.message );
 		}
 		var tmpRow = $("<div class='detail'>"+posi+"</div>");
 		if(posi.length==0) tmpRow.css("display","none");
@@ -717,6 +765,14 @@ generateMemberList = function( memObject, favCallback ){
 	// 	});
 	// });
 
+	var tmp = memContainer.find(".img.waitLoad:lt(8)");
+	$.each(tmp, function(index,domTmp){
+		var dom = $(domTmp);
+		dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
+	});
+	g_contactWaitLoadImgs = memContainer.find(".img.waitLoad");
+
+	setOnMemListScroll();
 	return memContainer;
 }
 
