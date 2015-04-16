@@ -308,7 +308,7 @@ var initStickerArea= {
 	load: function(callback) {
 		var thisTmp = this;
 		thisTmp.initStickerList( function(){
-	    	if( callback() ) callback();
+	    	if( callback ) callback();
 	    });
 
 		// if( null==thisTmp.dict ){

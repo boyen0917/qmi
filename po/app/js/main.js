@@ -1798,6 +1798,9 @@ $(function(){
 	var niceScrollTmp = $(".gm-content > div:eq(1)").getNiceScroll()[0];
 	niceScrollTmp.onDragToBottom = fetchHistoryTimeline;
 
+
+	//init sticker
+	initStickerArea.load();
 	/*
               ████████╗███████╗███████╗████████╗          
               ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝          
