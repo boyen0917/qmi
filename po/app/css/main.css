@@ -2185,9 +2185,16 @@ img.st-user-pic{
 .st-sub-box-1-footer {
 	display: -webkit-box;
 	clear: both;
-	margin: 0 0 0px 20px;
+	margin: 0 10px 0px 20px;
 	color: #868686;
     font-size: 13px;
+    -webkit-line-clamp: 20;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.st-sub-box-1-footer.hideOverflow {
+    -webkit-line-clamp: 3;
 }
 
 .st-sub-oval {

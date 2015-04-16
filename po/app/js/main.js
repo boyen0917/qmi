@@ -1009,9 +1009,13 @@ $(function(){
 		if(this_event.data("switch-chk")){
 			this_event.data("switch-chk",false);
 			this_event.find(".st-reply-message-bg").removeAttr("style");
+			//顯示隱藏發佈對象detail
+			this_event.find(".st-sub-box-1-footer").addClass("hideOverflow");
 		}else{
 			this_event.data("switch-chk",true);
 			this_event.find(".st-reply-message-bg").css("border",0);
+			//顯示隱藏發佈對象detail
+			this_event.find(".st-sub-box-1-footer").removeClass("hideOverflow");
 		}
 
 		//動態消息 判斷detail關閉區域
