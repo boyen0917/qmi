@@ -32,7 +32,7 @@ $(function(){
 		 //    	if(data.status == 200){
 		 //    		var getS3_result =$.parseJSON(data.responseText);
 
-		 			var getS3_result = {av:"0.6.2"};
+		 			var getS3_result = {av:"0.6.3"};
 
 		 			cns.debug( "old:", g_currentVersion, "new:", getS3_result.av );
 			    	if( versionCompare(g_currentVersion, getS3_result.av)>0 ){
