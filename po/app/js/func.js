@@ -76,8 +76,9 @@ $(function(){
         var method = "delete";
 
         ajaxDo(api_name,headers,method,true).complete(function(data){
-        	localStorage.removeItem("_loginAutoChk");
-            localStorage.removeItem("_loginData");
+        	// localStorage.removeItem("_loginAutoChk");
+         //    localStorage.removeItem("_loginData");
+            resetDB();
         	document.location = "index.html";
         });
 	}
@@ -6787,10 +6788,16 @@ $(function(){
 	        	if(data.status == 200){
 
 	        		var user_data = $.parseJSON(data.responseText);
+
                     //新成員, 三天後失效
                     if( this_user_info.isNewMem ){
-                        user_data.isNewMem = this_user_info.isNewMem;
-                        user_data.isNewMemDate = new Date().getTime()+(86400000*3);
+                        var newMemList = $.lStorage("_newMemList");
+                        if( !newMemList ) newMemList = {};
+                        if( false==newMemList.hasOwnProperty(this_user_info.gi) ){
+                            newMemList[this_user_info.gi] = {};
+                        }
+                        newMemList[this_user_info.gi][this_user_info.gu] = new Date().getTime()+(86400000*3);
+                        $.lStorage("_newMemList", newMemList);
                     }
 
 	        		//存local storage
@@ -6890,9 +6897,15 @@ $(function(){
                         }
                         //新成員, 三天後失效
                         if( this_user_info.isNewMem ){
-                            user_data.isNewMem = true;
-                            user_data.isNewMemDate = invalidTime;
+                            var newMemList = $.lStorage("_newMemList");
+                            if( !newMemList ) newMemList = {};
+                            if( false==newMemList.hasOwnProperty(this_user_info.gi) ){
+                                newMemList[this_user_info.gi] = {};
+                            }
+                            newMemList[this_user_info.gi][this_user_info.gu] = invalidTime;
+                            $.lStorage("_newMemList", newMemList);
                         }
+                        
                         if( _groupList[this_user_info.gi].guAll && Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
                             cns.debug("guall content exist");
                             var userTmp = _groupList[this_user_info.gi].guAll[this_user_info.gu];

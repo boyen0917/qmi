@@ -5,6 +5,7 @@ var fbl;
 var isList = true;
 var g_group;
 var g_contactWaitLoadImgs;
+var g_newMemList;
 // var isKeyPress = false;
 
 $(document).ready(function(){
@@ -43,11 +44,7 @@ initContactList = function(){
 		showAllMemberPage(g_group.gn) 
 	});
 	//any new mem
-	var newMemCnt = 0;
-	for( var gu in guAllExsit ){
-		var memTmp = guAllExsit[gu];
-		if( true==memTmp.isNewMem ) newMemCnt++;
-	}
+	var newMemCnt = Object.keys(g_newMemList).length;
 	if( newMemCnt>0 ){
 		tmp.find(".right").prepend("<div class='new'>"+newMemCnt+"</div>");
 	}
@@ -594,12 +591,14 @@ switchListAndGrid = function( dom, subPageBottom ){
 		});
 		dom.addClass("list");
 		setOnMemListScroll();
+		updateNewMemTag( memList );
 	} else {
 		memList.fadeOut('fast', function(){
 			mem.show(0);
 		});
 		dom.removeClass("list");
 		setOnMemGridScroll();
+		updateNewMemTag( mem );
 	}
 }
 
@@ -626,9 +625,21 @@ generateMemberGrid = function( memObject ){
 				memContainer.append(tmp);
 			}
 			//is new mem
-			if( true==mem.isNewMem ){
-				tmp.find(".new").show();
-			}
+			setNewMemTag( tmp, mem );
+			// if( g_newMemList.hasOwnProperty(mem.gu) ){
+			// 	tmp.find(".new").show();
+			// 	tmp.click( function(){
+			// 		if( g_newMemList.hasOwnProperty(mem.gu) ){
+			// 			delete g_newMemList[mem.gu];
+			// 			var tmpMemList = $.lStorage("_newMemList");
+			// 			tmpMemList[gi] = g_newMemList;
+			// 			$.lStorage("_newMemList",tmpMemList);
+			// 		}
+			// 		$(this).find(".new").hide();
+			// 		$(this).unbind("click");
+			// 	});
+			// }
+
 		}
 	});
 	//"<div class='img' style='background-image:url("+mem.aut+");'><div class='new' style='display:none;'>NEW</div></div>");
@@ -704,6 +715,9 @@ generateMemberList = function( memObject, favCallback ){
 		} else {
 			memContainer.append(tmp);
 		}
+
+		//is new mem
+		setNewMemTag( tmp, mem );
 	});
 
 	////favorite click(disabled)
@@ -744,6 +758,37 @@ generateMemberList = function( memObject, favCallback ){
 	});
 
 	return memContainer;
+}
+
+setNewMemTag = function( tmp, mem ){
+	if( g_newMemList.hasOwnProperty(mem.gu) ){
+		tmp.find(".new").show();
+		tmp.click( function(){
+			if( g_newMemList.hasOwnProperty(mem.gu) ){
+				delete g_newMemList[mem.gu];
+				var tmpMemList = $.lStorage("_newMemList");
+				tmpMemList[gi] = g_newMemList;
+				$.lStorage("_newMemList",tmpMemList);
+
+				$(".subpage-contact.main-subpage > .contact-rows > .row.all > .right .new").html( Object.keys(g_newMemList).length );
+			}
+			$(this).find(".new").hide();
+			$(this).unbind("click");
+		});
+	}
+}
+updateNewMemTag = function( dom ){
+	var memDoms = dom.find(".mem.namecard");
+	$.each( memDoms, function(index, domTmp ){
+		var dom = $(domTmp);
+		var gu = dom.data("gu");
+		var newTag = dom.find(".new");
+		if( newTag.css("display")=="block" ){
+			if( false == g_newMemList.hasOwnProperty(gu) ){
+				newTag.hide().unbind("click");
+			}
+		}
+	});
 }
 
 setOnMemGridScroll = function(){
@@ -830,23 +875,31 @@ initContactData = function(){
 	fbl = g_group.fbl;
 
 	//get mem data
-	var currentTime = new Date().getTime();
 	guAll = g_group.guAll;
 	if( !guAll ) return;
 
 	guAllExsit = {};
 	$.each( guAll, function(key,obj){
 		if( obj && obj.st==1 ){
-			if( obj.isNewMem ){
-				if( null==obj.isNewMemDate || obj.isNewMemDate<=currentTime ){
-					guAll[key].isNewMem = false;
-					delete guAll[key].isNewMemDate;
-				}
-			}
 			guAllExsit[key] = obj;
 		}
 	});
 	$.lStorage(ui, userData);
+
+	//get new mem data
+	var currentTime = new Date().getTime();
+    var tmpMemList = $.lStorage("_newMemList");
+    if( tmpMemList && tmpMemList.hasOwnProperty(gi) ){
+        g_newMemList = tmpMemList[gi];
+        $.each(g_newMemList, function(key,time){
+        	if( time<=currentTime ){
+        		delete g_newMemList[key];
+        	}
+        });
+        $.lStorage("_newMemList",tmpMemList);
+    } else {
+    	g_newMemList = {};
+    }
 }
 
 /*

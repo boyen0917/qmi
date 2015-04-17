@@ -427,7 +427,11 @@ $(function(){
 		if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 		if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 		if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
+    	var verTmp = localStorage["_ver"];
+
     	localStorage.clear();
+
+    	if(verTmp) localStorage["_ver"] = verTmp;
     }
 
 	getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){
