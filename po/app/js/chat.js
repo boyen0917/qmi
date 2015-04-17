@@ -83,7 +83,7 @@ $(document).ready(function(){
 	page.attr("data-gi", gi);
 	page.attr("data-ci", ci);
 
-    var userData = $.lStorage( ui );
+    var userData = $.userStorage();
     if( !userData ){
     	document.location = "login.html";
     }
@@ -124,7 +124,7 @@ $(document).ready(function(){
 			} else {
 				g_room.uiName = g_room.cn;
 			}
-			$.lStorage( ui, userData );
+			$.userStorage( userData );
 
 		} catch(e) {
 			cns.debug( e.message );
@@ -151,7 +151,7 @@ $(document).ready(function(){
     if( tmpMemCount != g_room.memCount ){
     	cns.debug("mem count not fit, updated.");
     	g_room.memCount = tmpMemCount;
-    	$.lStorage( ui, userData );
+    	$.userStorage( userData );
     }
     
     if( g_room.memCount>2 ){
@@ -849,7 +849,7 @@ function updateChat ( time, isGetNewer, firstScrollDom ){
 
 	console.debug(api);
 	op(api, "GET", "", function(data, status, xhr) {
-			var userData = $.lStorage(ui);
+			var userData = $.userStorage();
 		    g_group = userData[gi];
 		    g_room = g_group["chatAll"][ci];
 		    if( null==g_room.lastCt ) g_room.lastCt = 0;
@@ -890,7 +890,7 @@ function updateChat ( time, isGetNewer, firstScrollDom ){
 					}
 				}
 			}
-			$.lStorage(ui, userData);
+			$.userStorage(userData);
 
 			if( isUpdatePermission ) getPermition( true );
 
@@ -963,7 +963,7 @@ function updateChat ( time, isGetNewer, firstScrollDom ){
 }	//end of updateChat
 
 function updateChatCnt (){
-	var userData = $.lStorage(ui);
+	var userData = $.userStorage();
 	// cns.debug( JSON.stringify(userData) );
     g_group = userData[gi];
     g_room = g_group["chatAll"][ci];
@@ -1726,7 +1726,7 @@ function getPermition( isReget ){
 			    		ti:ti_chat,
 			    		tu:{gul:data.ul}
 			    	};
-					var userData = $.lStorage( ui );
+					var userData = $.userStorage();
 					g_room = userData[gi].chatAll[ci];
 					g_room.memList = {};
 					for( var i=0; i<data.ul.length; i++){
@@ -1743,7 +1743,7 @@ function getPermition( isReget ){
 				    	$(".extra-content .btn[data-type=edit]").hide();
 				    	$(".extra-content .btn[data-type=exit]").hide();
 				    }
-					$.lStorage( ui, userData );
+					$.userStorage( userData );
 
 					checkMemberLeft();
 
@@ -1755,13 +1755,13 @@ function getPermition( isReget ){
 
 			    			// pi = pData.pi;
 			    			pi=0;
-			    			userData = $.lStorage( ui );
+			    			userData = $.userStorage();
 						    g_group = userData[gi];
 						    g_room = g_group["chatAll"][ci];
 						    g_room.pi = pi;
 						    g_room.tu = g_tu;
 						    g_tu = data.ul;
-						    $.lStorage( ui, userData );
+						    $.userStorage(userData );
 			    	// 	}, 
 			    	// 	null
 			    	// );
@@ -1805,10 +1805,10 @@ function leaveChatRoom(){
 		$.i18n.getString("COMMON_OK"),
 		$.i18n.getString("COMMON_CANCEL"), [function(){ //on ok
 			editMemInRoomAPI( ci, "put", [{gu:g_group.gu}], function(){
-				var userData = $.lStorage(ui);
+				var userData = $.userStorage();
 				g_group = userData[gi];
 				delete g_group.chatAll[ci];
-				$.lStorage(ui, userData);
+				$.userStorage(userData);
 				$('.sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
 				window.close();
 			});
@@ -2224,7 +2224,7 @@ function showNewRoomDetailPage_chatroom(){
 				//room exist
 				if( room.cn.indexOf(gu)>=0 ){
 					openChatWindow( gi, room.ci );
-    				$.mobile.changePage("#page-group-main");
+    				// $.mobile.changePage("#page-group-main");
 					return;
 				}
 			}
@@ -2320,9 +2320,29 @@ function requestNewChatRoom_chatroom(){
 		}
 		gi = page.attr("data-gi");
 		ci = page.attr("data-ci");
-		var userData = $.lStorage(ui);
+		var userData = $.userStorage();
 		g_group = userData[gi];
 		g_room = g_group["chatAll"][ci];
     }, false );
     $.popAllPage();
 }
+
+
+
+/*
+              ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
+              ██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔══██╗██╔════╝ ██╔════╝          
+    █████╗    ███████╗   ██║   ██║   ██║██████╔╝███████║██║  ███╗█████╗      █████╗
+    ╚════╝    ╚════██║   ██║   ██║   ██║██╔══██╗██╔══██║██║   ██║██╔══╝      ╚════╝
+              ███████║   ██║   ╚██████╔╝██║  ██║██║  ██║╚██████╔╝███████╗          
+              ╚══════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝          
+
+*/
+
+$.userStorage = function(value) {
+	if(value){
+		window.opener.g_uiData = value;
+	}else{
+		return window.opener.g_uiData;
+	}
+};

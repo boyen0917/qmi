@@ -10,6 +10,7 @@ $(function(){
 	//base_url = "http://10.1.17.116:8090/apiv1/";
  	// base_url = "https://caprivateeim.mitake.com.tw/apiv1/";
 
+ 	gi = null;
 
  	//HiCloud
  	base_url = "https://ap.qmi.emome.net/apiv1/";
@@ -23,6 +24,11 @@ $(function(){
 		base_url = "https://ap.qmi.emome.net/apiv1/";
 	} else if(window.location.href.match(/eimweb.mitake.com.tw/)) {
 		base_url = "https://apserver.mitake.com.tw/apiv1/";
+	}
+
+	if( window.location.href.match(/main.html/) ){
+		var tmp = localStorage["uiData"];
+		if( tmp ) $.lStorage("UXXX",$.parseJSON(tmp));
 	}
 	
 	

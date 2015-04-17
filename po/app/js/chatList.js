@@ -191,7 +191,7 @@ function showChatList(){
 					}
 					
 				} else {
-					imgSrc="images/common/others/empty_img_mother_l.png";
+					imgSrc= room.cat || "images/common/others/empty_img_mother_l.png";
 				}
 
 				room["uiName"]=chatRoomName;

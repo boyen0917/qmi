@@ -4,7 +4,7 @@ $(function(){
         var _uiGroupList = $.lStorage(ui) || {};
 
         $.each($.lStorage("_groupList"),function(i,gl_obj){
-            if(!$.lStorage(ui)[gl_obj.gi]){
+            if(!$.lStorage(ui).hasOwnProperty(gl_obj.gi) ){
                 gl_obj.guAll = {};
                 gl_obj.gu = gl_obj.me;
 

@@ -363,8 +363,9 @@ onCheckVersionDone = function(needUpdate){
 
 					// 取dgi的combo
 					getGroupCombo(login_result.dgi,function(){
-                		document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
-					});
+                		localStorage["uiData"] = JSON.stringify($.lStorage(ui));
+						document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
+                	});
 					
 					
 				}else{
