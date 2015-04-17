@@ -344,6 +344,7 @@ var initStickerArea= {
 	        				var tmpSpiDetail = thisTmp.splDict[tmpNewSpiDetail.spi];
 	        				
 	        				tmpSpiDetail = $.extend( tmpSpiDetail, newList[tmpNewSpiDetail.spi] );
+	        				
 	        				//update downloaded stickers
 	        				if( true==tmpSpiDetail.isDownload && tmpSpiDetail.ut<tmpNewSpiDetail.ut ){
 	        					thisTmp.getStickerDetailApi(tmpSpiDetail.spi).complete(function(detailDataTmp){

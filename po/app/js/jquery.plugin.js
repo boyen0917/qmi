@@ -1,7 +1,7 @@
 (function($) {
 
-
-    $.fn.htmlEntities = function(str) {
+	window.g_uiData = {};
+	$.fn.htmlEntities = function(str) {
     	var encodeHtmlEntity = function(str) {
     		var escape_list = {"10":"\n"};
 		  	var buf = [];
@@ -26,16 +26,24 @@
 
 	//localstorage for object
     $.lStorage = function(key,value) {
-		if(value){
-			if(typeof(value) == "object"){
-				value = JSON.stringify(value);
-	    	}
-			localStorage[key] = value;
-		}else{
-			if(!localStorage[key]){
-				return false;
+    	if( 0==key.indexOf("U") ){
+    		if(value){
+				window.g_uiData = value;
+			}else{
+				return window.g_uiData;
 			}
-			return $.parseJSON(localStorage[key])
+    	} else {
+			if(value){
+				if(typeof(value) == "object"){
+					value = JSON.stringify(value);
+		    	}
+				localStorage[key] = value;
+			}else{
+				if(!localStorage[key]){
+					return false;
+				}
+				return $.parseJSON(localStorage[key])
+			}
 		}
     };
     

@@ -20,7 +20,8 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
     // var this_compose = $(this);
     $.changePage("#page-selectMem", onPageChanged, onDone);
 
-    var group = $.lStorage(ui)[gi];
+    var uiData = $.userStorage();
+    var group = uiData[gi];
     var guAll = group.guAll;
     var bl = group.bl;
     var fbl = group.fbl;
@@ -101,8 +102,9 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
                 $(this).data("chk",true);
                 $(this).find(".img").addClass("chk");
                 //set only me select
-                var guTmp = $.lStorage(ui)[gi].gu;
-                var gn = $.lStorage(ui)[gi].guAll[gu].nk;
+                var uiData = $.userStorage();
+                var guTmp = uiData[gi].gu;
+                var gn = uiData[gi].guAll[gu].nk;
                 var obj = {};
                 obj[guTmp] = gn;
                 $("#page-selectMem .ui-container").data("selected-branch",{});
