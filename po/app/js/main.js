@@ -56,6 +56,9 @@ $(function(){
             //重新設定功能選單
 	        updateTab(gi);
 
+	        console.debug("ui",JSON.stringify($.lStorage(ui)));
+
+
 	    	//動態消息
 	    	//timelineListWrite();
 	    	setTimeout(function(){

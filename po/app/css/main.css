@@ -1967,9 +1967,9 @@ img.auo {
 
 
 .st-feedbox-area {
-    margin: 20px 10px;
-	top: 260px;
-	position: absolute;
+    margin: 40px 10px;
+	/*top: 260px;
+	position: absolute;*/
 	width: -webkit-calc( 100% - 25px );
 }
 .st-feedbox-area.official-admin-adjust{
@@ -4792,4 +4792,5 @@ img.user-info-back {
 }
 .st-official-tab[data-type=cnt] .text span.cnt{
 	color: #838383;
+
 }

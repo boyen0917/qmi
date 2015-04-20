@@ -31,6 +31,7 @@ $(function(){
 		if( tmp ) $.lStorage("UXXX",$.parseJSON(tmp));
 	}
 	
+
 	
 	//國碼
 	countrycode = "+886";
@@ -313,5 +314,7 @@ $(function(){
         }
       }
     }
+
+    
 
 });
