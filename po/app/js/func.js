@@ -3316,6 +3316,16 @@ $(function(){
                 }
                 break;
             case 1:
+                var isShowNamecard = true;
+                try{
+                    var group = $.lStorage(ui)[this_gi];
+                    if( group.isOfficial && 1!=group.ad ){
+                        isShowNamecard = false;
+                    }
+                } catch(e){
+                    errorReport(e);
+                    return;
+                }
                 var epl = this_event.data("parti-like");
                 if( null==epl || epl.length==0 ){
                     cns.debug("null epl:", epl);
@@ -3323,7 +3333,7 @@ $(function(){
                 }
                 title = $.i18n.getString("FEED_LIKE")+"("+epl.length+")";
                 list.push( {title:"",ml:epl} );
-                if( list.length>0 ) showObjectTabShow(this_gi, title, list, onDone);
+                if( list.length>0 ) showObjectTabShow(this_gi, title, list, onDone, isShowNamecard);
                 break;
         }
     }
@@ -3356,8 +3366,9 @@ $(function(){
         // }
     }
 
-    showObjectTabShow = function( giTmp, title, list, onDone ){
+    showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
         var page = $("#page-tab-object");
+        if( null== isShowNamecard ) isShowNamecard = true;
 
         //title
         page.find(".header-cp-object").html( title?title:"" );
@@ -3427,13 +3438,14 @@ $(function(){
                     var mem = guAll[gu];
                     var this_obj = $(
                         '<div class="obj-cell mem" data-gu="'+gu+'">' +
-                            '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
+                            '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
                             '<div class="obj-cell-time"></div>' +
                             '<div class="obj-cell-user-data">' + 
                                 '<div class="obj-user-name">' + mem.nk.replaceOriEmojiCode() + '</div>' +
                                 '<div class="obj-user-title"></div>' +
                         '</div>'
                     );
+                    if( isShowNamecard ) this_obj.find(".obj-cell-user-pic").addClass("namecard");
 
                     var branchID = mem.bl;
                     var extraContent = "";  //mem.em;
@@ -7708,4 +7720,21 @@ $(function(){
 		}
     };
 
+/*
+              ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
+              ██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔══██╗██╔════╝ ██╔════╝          
+    █████╗    ███████╗   ██║   ██║   ██║██████╔╝███████║██║  ███╗█████╗      █████╗
+    ╚════╝    ╚════██║   ██║   ██║   ██║██╔══██╗██╔══██║██║   ██║██╔══╝      ╚════╝
+              ███████║   ██║   ╚██████╔╝██║  ██║██║  ██║╚██████╔╝███████╗          
+              ╚══════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝          
+
+*/
+
+    $.userStorage = function(value) {
+        if(value){
+            window.g_uiData = value;
+        }else{
+            return window.g_uiData;
+        }
+    };
 });
