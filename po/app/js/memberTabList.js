@@ -66,8 +66,9 @@ showObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
             cellArea.append( cell );
 
             //gen mem
-            var guAll = $.lStorage(ui)[giTmp].guAll;
-            var bl = $.lStorage(ui)[giTmp].bl;
+            var userData = $.userStorage();
+            var guAll = userData[gi].guAll;
+            var bl = userData[gi].bl;
             for(var i=0;i<data.ml.length; i++ ){
                 var gu = data.ml[i].gu;
                 var rt = data.ml[i].rt;
