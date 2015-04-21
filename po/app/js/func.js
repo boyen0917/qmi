@@ -7077,18 +7077,29 @@ $(function(){
 					method = "append";
 				}
 
-				if(item == "bl"){
+				selector.find("."+item)[method](user_data[item]).show();
+
+
+                if(item == "bl"){
                     try{
-                        var bi = user_data.bl.split(",")[0].split(".").last();
-                        var bn = $.lStorage(ui)[this_gi].bl[bi].bn;
-                        user_data.bl = bn;
+                        var bi_arr = user_data.bl.split(",")[0].split(".");
+                        var bn = "";
+                        var branch_list = $.lStorage(ui)[this_gi].bl;
+                        for( var i=0; i<bi_arr.length; i++ ){
+                            var bi = bi_arr[i];
+                            bn += branch_list[bi].bn+"-";
+                        }
+                        if( bn.length>0 ){
+                            user_data.bl = bn.substring(0,bn.length-1);
+                        } else{
+                            user_data.bl = bn;
+                        }
+                        selector.find(".bl")[method](user_data.bl).css("display","-webkit-box");
                     } catch(e) {
                         errorReport(e);
                         continue;
                     }
-				}
-
-				selector.find("."+item)[method](user_data[item]).show();
+                }
 
 				if(!me && $.inArray(item,img_arr) >= 0) {
 					var this_img = selector.find("img."+item);

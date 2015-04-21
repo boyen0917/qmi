@@ -4583,6 +4583,13 @@ img.user-info-back {
 	margin-top: 3px;
 	font-size: 15px;
 	display: none;
+	max-width: 220px;
+
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .user-avatar-bar .title {
