@@ -7077,29 +7077,53 @@ $(function(){
 					method = "append";
 				}
 
-				selector.find("."+item)[method](user_data[item]).show();
-
-
                 if(item == "bl"){
                     try{
                         var bi_arr = user_data.bl.split(",")[0].split(".");
                         var bn = "";
                         var branch_list = $.lStorage(ui)[this_gi].bl;
-                        for( var i=0; i<bi_arr.length; i++ ){
+                        var test = selector.find(".bl");
+                        test.show();
+                        test = test[0];
+                        // $(test).css("font-family", selector.find(".bl").css("font-family") );
+                        // $(test).css("font-size", "12px" );
+                        // $(test).css("line-height", "12px" );
+                        var isClipped = false;
+                        for( var i=bi_arr.length-1; i>=0; i-- ){
                             var bi = bi_arr[i];
-                            bn += branch_list[bi].bn+"-";
+                            bn = branch_list[bi].bn+"-"+bn;
+                            test.innerHTML = bn;
+                            // cns.debug(test.offsetHeight);
+                            if( test.offsetHeight>42 ){
+                                bn = bn.substring(0,bn.length-1)+"......";
+                                test.innerHTML = bn;
+                                while( test.offsetHeight>40 ){
+                                    // cns.debug("!", test.offsetHeight);
+                                    bn = bn.substring(1,bn.length);
+                                    test.innerHTML = bn;
+                                }
+                                bn = "..."+bn.substring(0,bn.length-6);
+                                isClipped = true;
+                                break;
+                            }
                         }
-                        if( bn.length>0 ){
+                        if( false==isClipped && bn.length>0 ){
                             user_data.bl = bn.substring(0,bn.length-1);
                         } else{
                             user_data.bl = bn;
                         }
-                        selector.find(".bl")[method](user_data.bl).css("display","-webkit-box");
+                        // cns.debug(bn);
+                        // cns.debug(user_data.bl);
+                        
                     } catch(e) {
                         errorReport(e);
                         continue;
                     }
                 }
+
+				selector.find("."+item)[method](user_data[item]).show();
+
+
 
 				if(!me && $.inArray(item,img_arr) >= 0) {
 					var this_img = selector.find("img."+item);
