@@ -7205,15 +7205,18 @@ $(function(){
 			img.src = this_src;
     	});	
 
-    	this_info.find(".user-avatar-bar").click(function(e){
-    		e.stopPropagation();
-    	});
+    	// this_info.find(".user-avatar-bar").click(function(e){
+    	// 	e.stopPropagation();
+    	// });
 
     	if(me){
 
-	    	this_info.find(".user-avatar-bar.me .upload").click(function(){
-	    		this_info.find(".user-avatar-bar.me input").trigger("click");
-	    	});
+	    	// this_info.find(".user-avatar-bar.me .upload").click(function(){
+	    	// 	this_info.find(".user-avatar-bar.me input").trigger("click");
+	    	// });
+            this_info.find(".user-avatar.me.adjust").click(function(){
+                this_info.find(".user-avatar-bar.me input").trigger("click");
+            });
 
 	    	//檔案上傳
 	    	this_info.find(".user-avatar-bar.me input").change(function() {

@@ -498,7 +498,15 @@ var initStickerArea= {
 		}
 		try{
 			if( thisTmp.isUpdated ){
-				var spi = sid.split("_")[1];
+
+				var spi;
+				//針對某一版貼圖名稱無st_
+				if( -1==sid.indexOf("st_") ){
+					spi = sid.split("_")[0];
+				} else {
+					spi = sid.split("_")[1];
+				}
+
 				if( null!=thisTmp.splDict[spi].list && thisTmp.splDict[spi].list.hasOwnProperty(sid) ){
 					callback(thisTmp.splDict[spi].list[sid].sou);
 				} else {
