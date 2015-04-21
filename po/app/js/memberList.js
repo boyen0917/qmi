@@ -59,8 +59,9 @@ showMemListPageDelegate = function( title, list, onPageChanged, onDone ){
             cellArea.append( cell );
 
             //gen mem
-            var guAll = $.lStorage(ui)[gi].guAll;
-            var bl = $.lStorage(ui)[gi].bl;
+            var userData = $.userStorage();
+            var guAll = userData[gi].guAll;
+            var bl = userData[gi].bl;
             for(var i=0;i<data.ml.length; i++ ){
                 var gu = data.ml[i].gu;
                 var rt = data.ml[i].rt;
