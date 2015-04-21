@@ -7205,23 +7205,26 @@ $(function(){
 			img.src = this_src;
     	});	
 
-    	// this_info.find(".user-avatar-bar").click(function(e){
-    	// 	e.stopPropagation();
-    	// });
+
+        this_info.find(".user-avatar-bar:not(.me)").click(function(e){
+            e.stopPropagation();
+        });
 
     	if(me){
 
-	    	// this_info.find(".user-avatar-bar.me .upload").click(function(){
-	    	// 	this_info.find(".user-avatar-bar.me input").trigger("click");
-	    	// });
-            this_info.find(".user-avatar.me.adjust").click(function(){
-                this_info.find(".user-avatar-bar.me input").trigger("click");
+            this_info.find(".user-avatar.me").click(function(){
+                this_info.find(".user-avatar-upload").trigger("click");
             });
 
+	    	// this_info.find(".user-avatar-bar.me .upload").click(function(){
+	    	// 	this_info.find(".user-avatar-upload").trigger("click");
+	    	// });
+
 	    	//檔案上傳
-	    	this_info.find(".user-avatar-bar.me input").change(function() {
+	    	this_info.find(".user-avatar-upload").change(function() {
 	    		var imageType = /image.*/;
 		    	var file = $(this)[0].files[0];
+                if( !file ) return;
 		    	if (file.type.match(imageType)) {
 					var reader = new FileReader();
 					reader.onload = function(e) {
@@ -7369,7 +7372,7 @@ $(function(){
         		if(this_info.data("avatar-chk")){
         			var ori_arr = [1280,1280,0.7];
 					var tmb_arr = [120,120,0.6];
-					var file = this_info.find(".user-avatar-bar input")[0].files[0];
+					var file = this_info.find(".user-avatar-upload")[0].files[0];
 					var api_name = "groups/"+gi+"/users/"+gu+"/avatar";
 
 					uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
