@@ -7274,10 +7274,39 @@ $(function(){
 				        img.attr("src",reader.result);
 				        
 				        //有更動即可按確定
-				        this_info.find(".user-info-submit").addClass("user-info-submit-ready");
+				        // this_info.find(".user-info-submit").addClass("user-info-submit-ready");
 
 				        //記錄更動
-				        this_info.data("avatar-chk",true);
+				        // this_info.data("avatar-chk",true);
+
+
+                        var ori_arr = [1280,1280,0.7];
+                        var tmb_arr = [120,120,0.6];
+                        var file = this_info.find(".user-avatar-upload")[0].files[0];
+                        var api_name = "groups/"+gi+"/users/"+gu+"/avatar";
+
+                        uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
+                            // 關閉load 圖示
+                            s_load_show = false;
+            
+                            if(chk) {
+                                //重置團體頭像、名稱的參數
+                                getGroupCombo(gi,function(){
+                                    //結束關閉
+                                    this_info.find(".user-info-close").trigger("mouseup");
+                                    toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );    
+                                    updateAllAvatarName(gi,gu);
+                                    // this_info.find(".user-avatar .user-pic").attr("src",auo);
+                                    // this_info.find(".user-avatar").data("auo",auo);
+                                });
+                            }else{
+                                $('.ui-loader').hide();
+                                $(".ajax-screen-lock").hide();
+
+                                //結束關閉
+                                this_info.find(".user-info-close").trigger("mouseup");
+                            }
+                        });
 					}
 					reader.readAsDataURL(file);
 				}else{
@@ -7404,33 +7433,33 @@ $(function(){
         		_groupList[gi].guAll[gu].sl = body.sl;
         		$.lStorage(ui,_groupList);
 
-        		if(this_info.data("avatar-chk")){
-        			var ori_arr = [1280,1280,0.7];
-					var tmb_arr = [120,120,0.6];
-					var file = this_info.find(".user-avatar-upload")[0].files[0];
-					var api_name = "groups/"+gi+"/users/"+gu+"/avatar";
+     //    		if(this_info.data("avatar-chk")){
+     //    			var ori_arr = [1280,1280,0.7];
+					// var tmb_arr = [120,120,0.6];
+					// var file = this_info.find(".user-avatar-upload")[0].files[0];
+					// var api_name = "groups/"+gi+"/users/"+gu+"/avatar";
 
-					uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
-                        // 關閉load 圖示
-                        s_load_show = false;
+					// uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
+     //                    // 關閉load 圖示
+     //                    s_load_show = false;
         
-    					if(chk) {
-    						//重置團體頭像、名稱的參數
-                            getGroupCombo(gi,function(){
-                                //結束關閉
-                                this_info.find(".user-info-close").trigger("mouseup");
-                                toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );    
-                                updateAllAvatarName(gi,gu);    
-                            });
-    					}else{
-                            $('.ui-loader').hide();
-                            $(".ajax-screen-lock").hide();
+    	// 				if(chk) {
+    	// 					//重置團體頭像、名稱的參數
+     //                        getGroupCombo(gi,function(){
+     //                            //結束關閉
+     //                            this_info.find(".user-info-close").trigger("mouseup");
+     //                            toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );    
+     //                            updateAllAvatarName(gi,gu);    
+     //                        });
+    	// 				}else{
+     //                        $('.ui-loader').hide();
+     //                        $(".ajax-screen-lock").hide();
 
-                            //結束關閉
-                            this_info.find(".user-info-close").trigger("mouseup");
-                        }
-    				});
-        		}else{
+     //                        //結束關閉
+     //                        this_info.find(".user-info-close").trigger("mouseup");
+     //                    }
+    	// 			});
+     //    		}else{
         			// 關閉load 圖示
         			s_load_show = false;
         			
@@ -7446,7 +7475,7 @@ $(function(){
 
         			//結束關閉
         			this_info.find(".user-info-close").trigger("mouseup");
-        		}
+        		// }
         	}
         });
     }
