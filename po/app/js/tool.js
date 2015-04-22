@@ -428,10 +428,12 @@ $(function(){
 		if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 		if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
     	var verTmp = localStorage["_ver"];
+    	var loginRememberTmp = localStorage["_loginRemeber"];
 
     	localStorage.clear();
 
     	if(verTmp) localStorage["_ver"] = verTmp;
+    	if(loginRememberTmp) localStorage["_loginRemeber"] = loginRememberTmp;
     }
 
 	getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){
