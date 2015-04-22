@@ -7181,9 +7181,9 @@ $(function(){
     		// this_info.find(".user-info-list input").val("暫無資料");
     		for( item in user_data){
     			if(user_data[item]){
-    				if(item == "bd"){
-				        user_data[item] = user_data[item].substring(0,4) + "/" + user_data[item].substring(4,6) + "/" + user_data[item].substring(6);
-        			}
+    				// if(item == "bd"){
+				    //     user_data[item] = user_data[item].substring(0,4) + "/" + user_data[item].substring(4,6) + "/" + user_data[item].substring(6);
+        // 			}
         			this_info.find(".user-info-list ." + item).val(user_data[item]);
     			}
     		}
