@@ -5297,6 +5297,8 @@ $(function(){
 		var gallery_arr = [];
 		var audio_arr = [],video_arr = [];
 
+        var isApplyWatermark = false;
+        var watermarkText;
 		$.each(ml,function(i,val){
 			//結束時間檢查
 			var end_time_chk = false;
@@ -5463,6 +5465,22 @@ $(function(){
 				case 14:
 					end_time_chk = true;
 					break;
+                case 27:
+                    if( false==isApplyWatermark && 1==val.wm ){
+                        try{
+                            var this_ei = this_event.data("event-id");
+                            var this_gi = this_ei.split("_")[0];
+                            // var this_gu = this_event.data("this_gu", val.meta.gu);
+                            //get poster name
+                            var name = this_event.find(".st-sub-box-1-main .st-sub-name > .update-name-all").text() || "unknown";
+                            var groupName = $.lStorage(ui)[this_gi].gn;
+                            watermarkText = groupName + " " + name;
+                            isApplyWatermark = true;
+                        }catch(e){
+                            errorReport(e);
+                        }
+                    }
+                    break;
 			};
 			
 			//需要填入結束時間 以及 結束時間存在 就填入
@@ -5487,7 +5505,7 @@ $(function(){
 		});
 
 		//若有圖片 則呼叫函式處理
-		if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr);
+		if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr, isApplyWatermark, watermarkText);
 		if(audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
         if(video_arr.length > 0) timelineVideoMake(this_event,video_arr);
 
@@ -5522,7 +5540,7 @@ $(function(){
         });
     }
 
-	timelineGalleryMake = function (this_event,gallery_arr){
+	timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermarkText){
 		// cns.debug(this_event.data("event-id")+"  "+"gallery:",gallery_arr);
 		// cns.debug("gallery length:",gallery_arr.length);
 
@@ -5553,11 +5571,19 @@ $(function(){
                     right.append(this_img);
                 }
 
-                getS3fileBackground(val,this_img,6,function(data){
-                    gallery_arr[i].s3 = data.s3;
-                    gallery_arr[i].s32 = data.s32;
-                    this_img.addClass("loaded");
-                });
+                if( isApplyWatermark ){
+                    getS3fileBackgroundWatermark(val,this_img, 6, watermarkText, function(data){
+                        gallery_arr[i].s3 = data.s3;
+                        gallery_arr[i].s32 = data.s32;
+                        // this_img.addClass("loaded");
+                    });
+                } else {
+                    getS3fileBackground(val,this_img,6,function(data){
+                        gallery_arr[i].s3 = data.s3;
+                        gallery_arr[i].s32 = data.s32;
+                        this_img.addClass("loaded");
+                    });
+                }
                 if( i>=4 ) return false;
             });
         } else {
@@ -5573,11 +5599,19 @@ $(function(){
                     right.append(this_img);
                 }
 
-                getS3fileBackground(val,this_img,6,function(data){
-                    gallery_arr[i].s3 = data.s3;
-                    gallery_arr[i].s32 = data.s32;
-                    this_img.addClass("loaded");
-                });
+                if( isApplyWatermark ){
+                    getS3fileBackgroundWatermark(val,this_img, 6, watermarkText, function(data){
+                        gallery_arr[i].s3 = data.s3;
+                        gallery_arr[i].s32 = data.s32;
+                        // this_img.addClass("loaded");
+                    });
+                } else {
+                    getS3fileBackground(val,this_img,6,function(data){
+                        gallery_arr[i].s3 = data.s3;
+                        gallery_arr[i].s32 = data.s32;
+                        this_img.addClass("loaded");
+                    });
+                }
                 if( i>=4 ) return false;
             });
         }
@@ -5687,6 +5721,46 @@ $(function(){
                 return obj.s3;
             }
             if( callback ) callback(obj);
+        });
+    }
+
+    getS3fileBackgroundWatermark = function(file_obj,target,tp, text, callback){
+        var this_ei = target.parents(".st-sub-box").data("event-id");
+        var this_gi = this_ei.split("_")[0];
+        var this_ti = this_ei.split("_")[1];
+
+        //default
+        var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "get";
+        var result = ajaxDo(api_name,headers,method,false);
+        result.complete(function(data){
+            if(data.status != 200){
+                target.addClass("loadError");
+                return false;
+            }
+
+            var obj =$.parseJSON(data.responseText);
+            obj.api_name = api_name;
+            if(target && tp){
+                if(6==tp){
+                    getWatermarkImage(text, obj.s32, 1, function(imgUrl){
+                        // alert(imgUrl);
+                        target.css("background-image","url("+imgUrl+")");
+                        target.addClass("loaded");
+                        target.data("auo",imgUrl);
+                        obj.s32 = imgUrl;
+                        obj.s3 = imgUrl;
+                        if( callback ) callback(obj);
+                    });
+                }
+            }else{
+                return obj.s3;
+            }
         });
     }
 

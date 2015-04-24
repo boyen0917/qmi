@@ -1140,9 +1140,10 @@ $(function(){
     getS3FileNameWithExtension = function( s3Addr, type ){
 	    var szFileName = "qmi_file";
     	if( s3Addr ){
-    		szFileName = s3Addr;
-			var index = szFileName.indexOf("?");
-			szFileName = szFileName.substring(index-38, index);
+			var index = s3Addr.indexOf("?");
+			if( index>=0 ){
+				szFileName = s3Addr.substring(index-38, index);
+			}
 		}
 
 	    switch( type ){
@@ -1219,15 +1220,15 @@ $(function(){
 		ctx.restore();
 	}
 
-	function drawCanvasSlashAndText(ctx, w, h, text, lineHeight, textSpace ){
+	function drawCanvasSlashAndText(ctx, w, h, text, textSize, lineHeight, textSpace ){
 		if( !text || text.length<=0 ) return;
 		lineHeight = lineHeight || 44;
 		var newWH = (w+h)/1.41421356237;	//sqrt(2)
 		var offset = h/2;	//sqrt(2)
 		var cnt = Math.ceil(newWH/lineHeight)+2;
-		ctx.font = "12px";	// Calibri
+		ctx.font = textSize+' "微軟正黑體"';	// Calibri
 		var textWidth = ctx.measureText(text).width+textSpace;
-		var textCnt = Math.ceil(w/textWidth)+2;
+		var textCnt = Math.ceil(newWH/textWidth)+2;
 
 		ctx.save();
 		ctx.translate(-offset,offset);
@@ -1265,8 +1266,57 @@ $(function(){
 			c.width  = img.width;
 			c.height = img.height;
 			drawCanvasImageBg( ctx, img, 0, 0, c.width, c.height);
-			drawCanvasSlashAndText(ctx, c.width, c.height, text, 44, 5);
+			drawCanvasSlashAndText(ctx, c.width, c.height, text, "48px", 44, 5);
 			newImage.attr("src", c.toDataURL("image/png",quality) );
+		};
+		img.src = url;
+	}
+
+	getWatermarkImage = function(text, url, quality, callback, textSize){
+		//eg.
+		//	var img = $("<img/>");
+		//	renderImageWithWatermark(img,"text拉拉", s3url, 0.9);
+		if( !callback ) return;
+		if( !textSize ) textSize = "24px";
+
+		var img = new Image();
+		img.crossOrigin = '*';
+		img.onload = function(){
+			var c    = document.createElement('canvas');
+			var ctx  = c.getContext('2d');
+			c.width  = img.width;
+			c.height = img.height;
+			drawCanvasImageBg( ctx, img, 0, 0, c.width, c.height);
+			drawCanvasSlashAndText(ctx, c.width, c.height, text, textSize, 44, 5);
+			// cns.debug( c.toDataURL("image/png",1) );
+
+            // callback( c.toDataURL("image/png",1) );
+
+            var tmpUrl = c.toDataURL("image/png",1);
+			var image_data = atob(tmpUrl.split(',')[1]);
+            // Use typed arrays to convert the binary data to a Blob
+            var arraybuffer = new ArrayBuffer(image_data.length);
+            var view = new Uint8Array(arraybuffer);
+            for (var i=0; i<image_data.length; i++) {
+                view[i] = image_data.charCodeAt(i) & 0xff;
+            }
+            try {
+                // This is the recommended method:
+                var blob = new Blob([arraybuffer], {type: 'application/octet-stream'});
+            } catch (e) {
+                // The BlobBuilder API has been deprecated in favour of Blob, but older
+                // browsers don't know about the Blob constructor
+                // IE10 also supports BlobBuilder, but since the `Blob` constructor
+                //  also works, there's no need to add `MSBlobBuilder`.
+                var bb = new (window.WebKitBlobBuilder || window.MozBlobBuilder);
+                bb.append(arraybuffer);
+                var blob = bb.getBlob('application/octet-stream'); // <-- Here's the Blob
+            }
+
+            // Use the URL object to create a temporary URL
+            var blobUrl = window.URL.createObjectURL(blob);
+            callback( blobUrl );
+
 		};
 		img.src = url;
 	}
