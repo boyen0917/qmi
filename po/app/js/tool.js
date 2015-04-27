@@ -485,7 +485,7 @@ $(function(){
 		return pi_result;
 	}
 
-	getS3UploadUrl = function(this_gi, ti,tp,pi){
+	getS3UploadUrl = function(this_gi, ti,tp,pi, isApplyWatermark){
 		var api_name = "groups/" + this_gi + "/files";
 
         var headers = {
@@ -500,6 +500,9 @@ $(function(){
                   ti: ti,
                   pi: pi
                 }
+        if( isApplyWatermark ){
+        	body.wm = 1
+        }
         return ajaxDo(api_name,headers,method,false,body);
 	}
 

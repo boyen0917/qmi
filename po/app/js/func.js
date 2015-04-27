@@ -4021,8 +4021,9 @@ $(function(){
 
 
         //浮水印
+        var isApplyWatermark = false;
         if(this_compose.data("cp-watermark")){
-            body.meta.top = true;
+            isApplyWatermark = true;
 
             var ml_obj = {
                 wm : 1,
@@ -4276,7 +4277,7 @@ $(function(){
                                 type: 6
                             });
                         }else{
-                            uploadImg(file,imageType,cnt,total,6,0);
+                            uploadImg(file,imageType,cnt,total,6,0,isApplyWatermark);
                             cnt++;
                         }
                     });
@@ -4303,7 +4304,7 @@ $(function(){
 
                     for(var i=0; i<sendingFileData.length;i++){
                         var obj = sendingFileData[i];
-                        uploadImg( obj.file, obj.imageType, i, obj.total, obj.type, pi_result.pi);
+                        uploadImg( obj.file, obj.imageType, i, obj.total, obj.type, pi_result.pi,isApplyWatermark);
                     }
                 }
             });
@@ -5807,7 +5808,7 @@ $(function(){
 		};
 	}
 
-	uploadImg = function(file,imageType,file_num,total,cp_tp,permission_id){
+	uploadImg = function(file,imageType,file_num,total,cp_tp,permission_id, isApplyWatermark){
 		var this_compose = $(document).find(".cp-content");
 		
 		//判斷是否符合上傳檔案格式
@@ -5832,7 +5833,7 @@ $(function(){
                 cns.debug("o_obj:",o_obj);
                 cns.debug("t_obj:",t_obj);
                 //compose tp to upload file tp
-				getS3UploadUrl(gi, ti_feed,1,permission_id).complete(function(data){
+				getS3UploadUrl(gi, ti_feed,1,permission_id,isApplyWatermark).complete(function(data){
 					var s3url_result = $.parseJSON(data.responseText);
 					if(data.status == 200){
 						var fi = s3url_result.fi;
