@@ -105,6 +105,7 @@
 	"COMPOSE_TITLE" :	"Title",
 	"COMPOSE_RECEIVER" :	"Receiver",
 	"COMPOSE_TOP" :	"Top",
+	"COMPOSE_WATERMARK" : "Watermark",
 	"COMPOSE_SET_START_TIME" :	"Specify start time",
 	"COMPOSE_START_TIME" :	"Starts",
 	"COMPOSE_NOW" :	"Now",

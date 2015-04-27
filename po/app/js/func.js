@@ -2071,12 +2071,12 @@ $(function(){
 		        	break;
 		        case "announcement": 
 		        	ctp = 1;
-		        	show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-top";
+		        	show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-top , .cp-content-watermark";
 		        	
 		        	break;
 		        case "feedback":
 		            ctp = 2;
-		            show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-top";
+		            show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-watermark";
 
 		        	break;
 		        case "work"://cp-work-area
@@ -2116,6 +2116,7 @@ $(function(){
 
 			//共同綁定事件
 			//打勾
+            //置頂
 			this_compose.find(".cp-content-top").click(function(){
 				if(this_compose.data("cp-top")){
 					$(this).find(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
@@ -2125,6 +2126,16 @@ $(function(){
 					this_compose.data("cp-top",true);
 				}
 			});
+            //浮水印
+            this_compose.find(".cp-content-watermark").click(function(){
+                if(this_compose.data("cp-watermark")){
+                    $(this).find(".cp-watermark-btn").attr("src","images/compose/compose_form_icon_check_none.png");
+                    this_compose.data("cp-watermark",false);
+                }else{
+                    $(this).find(".cp-watermark-btn").attr("src","images/compose/compose_form_icon_check.png");
+                    this_compose.data("cp-watermark",true);
+                }
+            });
 
 			//url parse
 			this_compose.find('.cp-textarea-desc').bind('input',function(){
@@ -4008,6 +4019,18 @@ $(function(){
 		var empty_chk = false;
 		var empty_msg;
 
+
+        //浮水印
+        if(this_compose.data("cp-watermark")){
+            body.meta.top = true;
+
+            var ml_obj = {
+                wm : 1,
+                tp : 27
+            }
+            body.ml.push(ml_obj);
+        }
+
 		//任務 投票之類的 因為是可預測的 又是單一的ml 就在這邊處理
 		switch(ctp){
 			//普通貼文
@@ -5298,7 +5321,7 @@ $(function(){
 		var audio_arr = [],video_arr = [];
 
         var isApplyWatermark = false;
-        var watermarkText;
+        var watermarkText = "--- ---";
 		$.each(ml,function(i,val){
 			//結束時間檢查
 			var end_time_chk = false;
@@ -5472,8 +5495,9 @@ $(function(){
                             var this_gi = this_ei.split("_")[0];
                             // var this_gu = this_event.data("this_gu", val.meta.gu);
                             //get poster name
-                            var name = this_event.find(".st-sub-box-1-main .st-sub-name > .update-name-all").text() || "unknown";
-                            var groupName = $.lStorage(ui)[this_gi].gn;
+                            var groupData = $.lStorage(ui)[this_gi];
+                            var name = groupData.guAll[groupData.gu].nk;
+                            var groupName = groupData.gn;
                             watermarkText = groupName + " " + name;
                             isApplyWatermark = true;
                         }catch(e){

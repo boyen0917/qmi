@@ -1220,13 +1220,13 @@ $(function(){
 		ctx.restore();
 	}
 
-	function drawCanvasSlashAndText(ctx, w, h, text, textSize, lineHeight, textSpace ){
+	function drawCanvasSlashAndText(ctx, w, h, text, textSize, lineHeight, textSpace, color ){
 		if( !text || text.length<=0 ) return;
 		lineHeight = lineHeight || 44;
 		var newWH = (w+h)/1.41421356237;	//sqrt(2)
 		var offset = h/2;	//sqrt(2)
 		var cnt = Math.ceil(newWH/lineHeight)+2;
-		ctx.font = textSize+' "微軟正黑體"';	// Calibri
+		ctx.font = textSize+' Microsoft JhengHei';	// Calibri
 		var textWidth = ctx.measureText(text).width+textSpace;
 		var textCnt = Math.ceil(newWH/textWidth)+2;
 
@@ -1235,14 +1235,14 @@ $(function(){
 		ctx.rotate(-0.25*Math.PI);
 
 		var yTmp = 0;
-		ctx.fillStyle = "rgba(255,255,255,0.3)";
-		ctx.strokeStyle = "rgba(255,255,255,0.3)";
+		ctx.fillStyle = color || "rgba(255,255,255,0.3)";
+		// ctx.strokeStyle = "rgba(255,255,255,0.3)";
 	    ctx.lineWidth = 2;
 		for( var i=0; i<cnt; i++){
 			var xTmp = 0;
 			for( var j=0; j<textCnt; j++){
 			    ctx.fillText(text, xTmp, yTmp);
-				console.debug(xTmp, yTmp);
+				// console.debug(xTmp, yTmp);
 				xTmp+=textWidth;
 			}
 			// ctx.beginPath();
@@ -1253,6 +1253,7 @@ $(function(){
 		}
 		ctx.restore();
 	}
+
 	renderImageWithWatermark = function(newImage, text, url, quality){
 		//eg.
 		//	var img = $("<img/>");
@@ -1266,60 +1267,115 @@ $(function(){
 			c.width  = img.width;
 			c.height = img.height;
 			drawCanvasImageBg( ctx, img, 0, 0, c.width, c.height);
-			drawCanvasSlashAndText(ctx, c.width, c.height, text, "48px", 44, 5);
+			drawCanvasSlashAndText(ctx, c.width, c.height, text, "48px", 68, 5);
 			newImage.attr("src", c.toDataURL("image/png",quality) );
 		};
 		img.src = url;
 	}
 
-	getWatermarkImage = function(text, url, quality, callback, textSize){
-		//eg.
-		//	var img = $("<img/>");
-		//	renderImageWithWatermark(img,"text拉拉", s3url, 0.9);
-		if( !callback ) return;
-		if( !textSize ) textSize = "24px";
+	/* 浮水印, 會有cross-domain問題, 不支援網頁版 */
+	if( typeof(require)!="undefined" ) {
+		getWatermarkImage = function(text, url, quality, callback, textSize){
+			//eg.
+			//	var img = $("<img/>");
+			//	renderImageWithWatermark(img,"text拉拉", s3url, 0.9);
+			if( !callback ) return;
+			if( !textSize ) textSize = "24px";
 
-		var img = new Image();
-		img.crossOrigin = '*';
-		img.onload = function(){
+			var img = new Image();
+			img.crossOrigin = '*';
+			img.onload = function(){
+				var c    = document.createElement('canvas');
+				var ctx  = c.getContext('2d');
+				c.width  = img.width;
+				c.height = img.height;
+				drawCanvasImageBg( ctx, img, 0, 0, c.width, c.height);
+				drawCanvasSlashAndText(ctx, c.width, c.height, text, textSize, 68, 5);
+				// cns.debug( c.toDataURL("image/png",1) );
+
+	            // callback( c.toDataURL("image/png",1) );
+
+	            var tmpUrl = c.toDataURL("image/png",1);
+				var image_data = atob(tmpUrl.split(',')[1]);
+	            // Use typed arrays to convert the binary data to a Blob
+	            var arraybuffer = new ArrayBuffer(image_data.length);
+	            var view = new Uint8Array(arraybuffer);
+	            for (var i=0; i<image_data.length; i++) {
+	                view[i] = image_data.charCodeAt(i) & 0xff;
+	            }
+	            try {
+	                // This is the recommended method:
+	                var blob = new Blob([arraybuffer], {type: 'application/octet-stream'});
+	            } catch (e) {
+	                // The BlobBuilder API has been deprecated in favour of Blob, but older
+	                // browsers don't know about the Blob constructor
+	                // IE10 also supports BlobBuilder, but since the `Blob` constructor
+	                //  also works, there's no need to add `MSBlobBuilder`.
+	                var bb = new (window.WebKitBlobBuilder || window.MozBlobBuilder);
+	                bb.append(arraybuffer);
+	                var blob = bb.getBlob('application/octet-stream'); // <-- Here's the Blob
+	            }
+
+	            // Use the URL object to create a temporary URL
+	            var blobUrl = window.URL.createObjectURL(blob);
+	            callback( blobUrl );
+
+			};
+			img.src = url;
+		}
+	} else {
+		drawCanvasBgColor = function(ctx, color, x, y, w, h){
+			ctx.save();
+			ctx.rect(x,y,w,h);
+			ctx.fillStyle=color;
+			ctx.fill();
+			ctx.restore();
+		}
+		getWatermarkImage = function(text, url, quality, callback, textSize){
+			//eg.
+			//	var img = $("<img/>");
+			//	renderImageWithWatermark(img,"text拉拉", s3url, 0.9);
+			if( !callback ) return;
+			if( !textSize ) textSize = "24px";
+
 			var c    = document.createElement('canvas');
 			var ctx  = c.getContext('2d');
-			c.width  = img.width;
-			c.height = img.height;
-			drawCanvasImageBg( ctx, img, 0, 0, c.width, c.height);
-			drawCanvasSlashAndText(ctx, c.width, c.height, text, textSize, 44, 5);
+			c.width  = 300;
+			c.height = 300;
+			text = "watermark not supported."
+			drawCanvasBgColor( ctx, "white", 0, 0, c.width, c.height);
+			drawCanvasSlashAndText(ctx, c.width, c.height, text, textSize, 68, 5, "gray");
 			// cns.debug( c.toDataURL("image/png",1) );
 
-            // callback( c.toDataURL("image/png",1) );
+	        // callback( c.toDataURL("image/png",1) );
 
-            var tmpUrl = c.toDataURL("image/png",1);
+	        var tmpUrl = c.toDataURL("image/png",1);
 			var image_data = atob(tmpUrl.split(',')[1]);
-            // Use typed arrays to convert the binary data to a Blob
-            var arraybuffer = new ArrayBuffer(image_data.length);
-            var view = new Uint8Array(arraybuffer);
-            for (var i=0; i<image_data.length; i++) {
-                view[i] = image_data.charCodeAt(i) & 0xff;
-            }
-            try {
-                // This is the recommended method:
-                var blob = new Blob([arraybuffer], {type: 'application/octet-stream'});
-            } catch (e) {
-                // The BlobBuilder API has been deprecated in favour of Blob, but older
-                // browsers don't know about the Blob constructor
-                // IE10 also supports BlobBuilder, but since the `Blob` constructor
-                //  also works, there's no need to add `MSBlobBuilder`.
-                var bb = new (window.WebKitBlobBuilder || window.MozBlobBuilder);
-                bb.append(arraybuffer);
-                var blob = bb.getBlob('application/octet-stream'); // <-- Here's the Blob
-            }
+	        // Use typed arrays to convert the binary data to a Blob
+	        var arraybuffer = new ArrayBuffer(image_data.length);
+	        var view = new Uint8Array(arraybuffer);
+	        for (var i=0; i<image_data.length; i++) {
+	            view[i] = image_data.charCodeAt(i) & 0xff;
+	        }
+	        try {
+	            // This is the recommended method:
+	            var blob = new Blob([arraybuffer], {type: 'application/octet-stream'});
+	        } catch (e) {
+	            // The BlobBuilder API has been deprecated in favour of Blob, but older
+	            // browsers don't know about the Blob constructor
+	            // IE10 also supports BlobBuilder, but since the `Blob` constructor
+	            //  also works, there's no need to add `MSBlobBuilder`.
+	            var bb = new (window.WebKitBlobBuilder || window.MozBlobBuilder);
+	            bb.append(arraybuffer);
+	            var blob = bb.getBlob('application/octet-stream'); // <-- Here's the Blob
+	        }
 
-            // Use the URL object to create a temporary URL
-            var blobUrl = window.URL.createObjectURL(blob);
-            callback( blobUrl );
-
-		};
-		img.src = url;
+	        // Use the URL object to create a temporary URL
+	        var blobUrl = window.URL.createObjectURL(blob);
+	        callback( blobUrl );
+		}
 	}
+	
 
 	//ref: http://en.wikipedia.org/wiki/National_conventions_for_writing_telephone_numbers
 	checkPhoneValidation = function(countryCode, phone){

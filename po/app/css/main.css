@@ -3423,7 +3423,7 @@ img.st-reply-message-attach {
 	cursor:pointer;
 }
 
-.cp-top-btn {
+.cp-top-btn, .cp-watermark-btn {
 	float: right;
 	position: relative;
 	top: 10px;

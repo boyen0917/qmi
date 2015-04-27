@@ -56,7 +56,7 @@ $(function(){
             //重新設定功能選單
 	        updateTab(gi);
 
-	        console.debug("ui",JSON.stringify($.lStorage(ui)));
+	        // console.debug("ui",JSON.stringify($.lStorage(ui)));
 
 
 	    	//動態消息
@@ -1752,7 +1752,9 @@ $(function(){
 		background: 'rgba(255,255,255,0)',
 		cursorborder:"",
 		boxzoom:false,
-		zindex: 999
+		zindex: 999,
+		scrollspeed: 90,
+		mousescrollstep: 40
 		// horizrailenabled: false,
 		// ,autohidemode: "leave"
 	};
@@ -1766,7 +1768,9 @@ $(function(){
 		background: 'rgba(255,255,255,0)',
 		cursorborder:"",
 		boxzoom:false,
-		zindex: 999
+		zindex: 999,
+		scrollspeed: 90,
+		mousescrollstep: 40
 		// horizrailenabled: false,
 		// ,autohidemode: "leave"
 	};
