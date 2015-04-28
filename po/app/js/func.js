@@ -2074,7 +2074,7 @@ $(function(){
 		        	show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-top";
                     try{
                         var tmpGroup = $.lStorage(ui)[gi];
-                        console.debug(tmpGroup.tp);
+                        // console.debug(tmpGroup.tp);
                         if( tmpGroup.tp!="A1" ){
                             show_area += ", .cp-content-watermark";
                         }
@@ -2089,7 +2089,7 @@ $(function(){
 		            show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt";
                     try{
                         var tmpGroup = $.lStorage(ui)[gi];
-                        console.debug(tmpGroup.tp);
+                        // console.debug(tmpGroup.tp);
                         if( tmpGroup.tp!="A1" ){
                             show_area += ", .cp-content-watermark";
                         }
