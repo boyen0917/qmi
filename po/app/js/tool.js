@@ -1223,14 +1223,15 @@ $(function(){
 		ctx.restore();
 	}
 
-	function drawCanvasSlashAndText(ctx, w, h, text, textSize, lineHeight, textSpace, color ){
+	function drawCanvasText(ctx, w, h, text, textSize, lineHeight, color ){
 		if( !text || text.length<=0 ) return;
 		lineHeight = lineHeight || 44;
 		var newWH = (w+h)/1.41421356237;	//sqrt(2)
 		var offset = h/2;	//sqrt(2)
 		var cnt = Math.ceil(newWH/lineHeight)+2;
 		ctx.font = textSize+' Microsoft JhengHei';	// Calibri
-		var textWidth = ctx.measureText(text).width+textSpace;
+		text = text+"  ";
+		var textWidth = ctx.measureText(text).width;
 		var textCnt = Math.ceil(newWH/textWidth)+2;
 
 		ctx.save();
@@ -1241,17 +1242,13 @@ $(function(){
 		ctx.fillStyle = color || "rgba(255,255,255,0.3)";
 		// ctx.strokeStyle = "rgba(255,255,255,0.3)";
 	    ctx.lineWidth = 2;
+	    var longTextString = "";
+	    for( var j=0; j<textCnt; j++){
+		    longTextString += text;
+		}
 		for( var i=0; i<cnt; i++){
 			var xTmp = 0;
-			for( var j=0; j<textCnt; j++){
-			    ctx.fillText(text, xTmp, yTmp);
-				// console.debug(xTmp, yTmp);
-				xTmp+=textWidth;
-			}
-			// ctx.beginPath();
-			// ctx.moveTo( 0, yTmp );
-			// ctx.lineTo( newWH, yTmp );
-			// ctx.stroke();
+			ctx.fillText( longTextString, xTmp, yTmp);
 			yTmp+=lineHeight;
 		}
 		ctx.restore();
@@ -1270,7 +1267,7 @@ $(function(){
 			c.width  = img.width;
 			c.height = img.height;
 			drawCanvasImageBg( ctx, img, 0, 0, c.width, c.height);
-			drawCanvasSlashAndText(ctx, c.width, c.height, text, "48px", 68, 5);
+			drawCanvasText(ctx, c.width, c.height, text, "48px", 68);
 			newImage.attr("src", c.toDataURL("image/png",quality) );
 		};
 		img.src = url;
@@ -1293,7 +1290,7 @@ $(function(){
 				c.width  = img.width;
 				c.height = img.height;
 				drawCanvasImageBg( ctx, img, 0, 0, c.width, c.height);
-				drawCanvasSlashAndText(ctx, c.width, c.height, text, textSize, 68, 5);
+				drawCanvasText(ctx, c.width, c.height, text, textSize, 68);
 				// cns.debug( c.toDataURL("image/png",1) );
 
 	            // callback( c.toDataURL("image/png",1) );
@@ -1347,7 +1344,7 @@ $(function(){
 			c.height = 300;
 			text = "watermark not supported."
 			drawCanvasBgColor( ctx, "white", 0, 0, c.width, c.height);
-			drawCanvasSlashAndText(ctx, c.width, c.height, text, textSize, 68, 5, "gray");
+			drawCanvasText(ctx, c.width, c.height, text, textSize, 68, "gray");
 			// cns.debug( c.toDataURL("image/png",1) );
 
 	        // callback( c.toDataURL("image/png",1) );

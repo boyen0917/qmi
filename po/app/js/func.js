@@ -2071,13 +2071,32 @@ $(function(){
 		        	break;
 		        case "announcement": 
 		        	ctp = 1;
-		        	show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-top , .cp-content-watermark";
+		        	show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-top";
+                    try{
+                        var tmpGroup = $.lStorage(ui)[gi];
+                        console.debug(tmpGroup.tp);
+                        if( tmpGroup.tp!="A1" ){
+                            show_area += ", .cp-content-watermark";
+                        }
+                    }
+                    catch(e){
+                        errorReport(e);
+                    }
 		        	
 		        	break;
 		        case "feedback":
 		            ctp = 2;
-		            show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-watermark";
-
+		            show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt";
+                    try{
+                        var tmpGroup = $.lStorage(ui)[gi];
+                        console.debug(tmpGroup.tp);
+                        if( tmpGroup.tp!="A1" ){
+                            show_area += ", .cp-content-watermark";
+                        }
+                    }
+                    catch(e){
+                        errorReport(e);
+                    }
 		        	break;
 		        case "work"://cp-work-area
 		        	ctp = 3;
