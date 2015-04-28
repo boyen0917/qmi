@@ -516,11 +516,19 @@ var initStickerArea= {
 					thisTmp.getSingleStickerPathApi(sid).complete( function(data){
 						if( data.status==200 ){
 							var detailData = $.parseJSON(data.responseText);
+							if( !thisTmp.splDict.hasOwnProperty(spi) ){
+								thisTmp.splDict[spi] = {
+									list: {}
+								};
+							} else if( !thisTmp.splDict[spi].list ){
+								thisTmp.splDict[spi].list = {};
+							}
 							thisTmp.splDict[spi].list[sid] = {
 								sid: sid,
 								sou: detailData.sou,
 								stu: detailData.stu
 							};
+
 							callback(thisTmp.splDict[spi].list[sid].sou);
 							$.lStorage("_sticker",thisTmp.splDict);
 						} else {
