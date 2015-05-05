@@ -137,7 +137,10 @@ $(function(){
 				    		onDone(false);
 				    		console.debug("latest ver", g_currentVersion);
 				    	}
-		        	}
+		        	} else {
+						console.debug("fail to get version");
+						onDone(false);
+					}
 		        });
 		    } catch(e){
 		    	console.debug(e.stack);
