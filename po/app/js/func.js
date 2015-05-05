@@ -2072,31 +2072,33 @@ $(function(){
 		        case "announcement": 
 		        	ctp = 1;
 		        	show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-top";
-                    try{
-                        var tmpGroup = $.lStorage(ui)[gi];
-                        // console.debug(tmpGroup.tp);
-                        if( tmpGroup.tp!="A1" ){
-                            show_area += ", .cp-content-watermark";
-                        }
-                    }
-                    catch(e){
-                        errorReport(e);
-                    }
+                    //hide watermark
+                    // try{
+                    //     var tmpGroup = $.lStorage(ui)[gi];
+                    //     console.debug(tmpGroup.tp);
+                    //     if( tmpGroup.tp!="A1" ){
+                    //         show_area += ", .cp-content-watermark";
+                    //     }
+                    // }
+                    // catch(e){
+                    //     errorReport(e);
+                    // }
 		        	
 		        	break;
 		        case "feedback":
 		            ctp = 2;
 		            show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt";
-                    try{
-                        var tmpGroup = $.lStorage(ui)[gi];
-                        // console.debug(tmpGroup.tp);
-                        if( tmpGroup.tp!="A1" ){
-                            show_area += ", .cp-content-watermark";
-                        }
-                    }
-                    catch(e){
-                        errorReport(e);
-                    }
+                    //hide watermark
+                    // try{
+                    //     var tmpGroup = $.lStorage(ui)[gi];
+                    //     console.debug(tmpGroup.tp);
+                    //     if( tmpGroup.tp!="A1" ){
+                    //         show_area += ", .cp-content-watermark";
+                    //     }
+                    // }
+                    // catch(e){
+                    //     errorReport(e);
+                    // }
 		        	break;
 		        case "work"://cp-work-area
 		        	ctp = 3;
@@ -6882,9 +6884,7 @@ $(function(){
 
     pollingInterval = function(show_msg){
     	if(!$(document).data("polling-chk")){
-			pc = setInterval(function(){
-				polling();	
-			},polling_interval);
+			pc = setInterval( polling, polling_interval);
 			$(document).data("polling-chk",true);
 			if(show_msg) toastShow("開啓polling");
 		}else{

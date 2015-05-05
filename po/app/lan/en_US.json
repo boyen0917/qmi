@@ -263,7 +263,7 @@
 	"GROUP_GROUP_INVITATION" : "Group %@ has sent you an invitation",
 	"GROUP_MEMBERS" : "%ld member(s)",
 	"GROUP_REJECT_ALERT" : "Reject %@'s invitation?",
-	"GROUP_NAME_LIMIT" : "Group name should have 6 to 20 digits or characters",
+	"GROUP_NAME_LIMIT" : "Group name should have 1 to 20 digits or characters",
 	"GROUP_AVATAR_ALERT" : "Please take a picture for group icon",
 	"GROUP_ABOUT_ALERT" : "Please enter group description.",
 	"GROUP_AVATAR_UPLOAD_ALERT" : "Group picture upload failed. Please try again.",

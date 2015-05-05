@@ -262,7 +262,7 @@
 	"GROUP_GROUP_INVITATION" : "%@ 邀请你加入团体",
 	"GROUP_MEMBERS" : "%ld 位成员",
 	"GROUP_REJECT_ALERT" : "确定拒绝 %@ 的邀请?",
-	"GROUP_NAME_LIMIT" : "请输入2~20字的团体名称",
+	"GROUP_NAME_LIMIT" : "请输入1~20字的团体名称",
 	"GROUP_AVATAR_ALERT" : "请新增团体头像",
 	"GROUP_ABOUT_ALERT" : "团体介绍未填写",
 	"GROUP_AVATAR_UPLOAD_ALERT" : "团体头像上传失败",

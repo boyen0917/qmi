@@ -362,12 +362,19 @@ onCheckVersionDone = function(needUpdate){
 					groupListToLStorage();
 
 					// 取dgi的combo
-					getGroupCombo(login_result.dgi,function(){
-                		localStorage["uiData"] = JSON.stringify($.lStorage(ui));
-						document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
-                	});
-					
-					
+					if( login_result.dgi || group_list.length>0 ){
+						if( null==login_result.dgi ){
+							login_result.dgi = group_list[0].gi;
+							$.lStorage("_loginData",login_result);
+						}
+						getGroupCombo(login_result.dgi,function(){
+	                		localStorage["uiData"] = JSON.stringify($.lStorage(ui));
+							document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
+	                	});
+					} else{
+						//沒group
+						document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
+					}
 				}else{
 					//沒group
 					document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
@@ -521,7 +528,12 @@ onCheckVersionDone = function(needUpdate){
 	});
 
 	$(".password-setting input,.password-confirm input").bind("input",function(){
-		if($(".password-setting input").val() && $(".password-confirm input").val() && $(".password-setting input").val().length == $(".password-confirm input").val().length){
+		var p1 = $(".password-setting input").val();
+		var p2 = $(".password-confirm input").val();
+		if( p1 && p2 
+			&& (p1.length>=6 && p1.length<=20)
+			&& p1==p2
+		){
 			$(".password-next").addClass("password-next-ready");
 		}else{
 			$(".password-next").removeClass("password-next-ready");
@@ -608,7 +620,10 @@ onCheckVersionDone = function(needUpdate){
 
 
     $(".setting-first-name input,.setting-last-name input").bind("input",function(){
-		if($(".setting-first-name input").val() && $(".setting-last-name input").val()  && $(".setting-birth input").val()){
+		if($(".setting-first-name input").val() 
+			&& $(".setting-last-name input").val()  
+			&& $(".setting-birth input").val()
+		){
 			$(".setting-next").addClass("setting-next-ready");
 		}else{
 			$(".setting-next").removeClass("setting-next-ready");
@@ -698,6 +713,10 @@ onCheckVersionDone = function(needUpdate){
         	cns.debug("傳送驗證碼後的 data:",data);
         	if(resend){
         		//popupShowAdjust("","驗證碼已重新送出");
+				
+                s_load_show = false;
+                $('.ui-loader').hide();
+                $(".ajax-screen-lock").hide();
         		toastShow( $.i18n.getString("REGISTER_AUTH_SMS_HAS_SENT") );
         		
 			}else if(data.status == 200){
@@ -722,7 +741,28 @@ onCheckVersionDone = function(needUpdate){
                 ud: $(document).data("device-token")
             }
         cns.debug("activateStep1() 驗證 驗證碼前的 body:",JSON.stringify(body,null,2));
-        var result = ajaxDo(api_name,headers,method,true,body);
+        var result = ajaxDo(api_name,headers,method,true,body, null, true);
+
+        		
+	    result.error(function(jqXHR, textStatus, errorThrown) {
+	    	try{
+	    		//if(jqxhr.status == 400){
+					if(jqXHR.responseText){
+						var tmp = $.parseJSON(jqXHR.responseText);
+						if( 900==tmp.rsp_code ){
+			        		popupShowAdjust("",tmp.rsp_msg,true,true,[onRewriteRegitration,null]);
+			        	} else {
+	    					popupShowAdjust("",tmp.rsp_msg,true);
+			        	}
+					}else{
+						cns.debug("errorResponse:",data);
+						return $.i18n.getString("COMMON_CHECK_NETWORK");
+					}
+				//}
+	    	} catch(e){
+				cns.debug( e.message );
+			}
+	    });
         result.complete(function(data){
         	cns.debug("驗證 驗證碼後的 data:",data);
 
@@ -733,9 +773,37 @@ onCheckVersionDone = function(needUpdate){
         		cns.debug("跳到 #page-password");//"hash+#page-password"
         		popupShowAdjust("",$.parseJSON(data.responseText).rsp_msg,true,false,[changePageAfterPopUp,"#page-password"]);
         	}else{
-        		$(".register-otp-input input").val("");
+        		// var parseJSON = $.parseJSON(data.responseText);
+        		// $(".register-otp-input input").val("");
+        		// $(".register-otp-input input").trigger("input");
+        		// $(".resend-otp").addClass("resend-otp-ready");
+        	}
+        });
+	}
+
+	onRewriteRegitration = function(){
+		var api_name = "activation/unbind";
+        var headers = {
+                 "li":lang,
+                     };
+        var method = "post";
+        var body = {
+            id: $(document).data("phone-id"),
+            ud: $(document).data("device-token")
+        }
+        
+        var result = ajaxDo(api_name,headers,method,true,body);
+        result.complete(function(data){
+        	
+        	if(data.status == 200){
+        		var data = $.parseJSON(data.responseText);
+        		//default
+        		$.mobile.changePage("#page-password");
+        	}else{
+        		$(".password-setting").val("");
+        		$(".password-confirm").val("");
         		$(".register-otp-input input").trigger("input");
-        		$(".resend-otp").addClass("resend-otp-ready");
+        		//popupShowAdjust("",errorResponse(data),true);
         	}
         });
 	}
@@ -786,13 +854,14 @@ onCheckVersionDone = function(needUpdate){
                 li: lang,
             };
         var method = "put";
+        //no bd now
         var body = {
                 id: $(document).data("phone-id"),
                 tp: 0,
                 ud: $(document).data("device-token"),
                 fn: first_name,
                 ln: last_name,
-                bd: birth
+                //bd: birth
             }
         cns.debug("step3 body:",body);
         var result = ajaxDo(api_name,headers,method,true,body);
@@ -1006,7 +1075,10 @@ onCheckVersionDone = function(needUpdate){
 
 
 	toGroupMenu = function(){
-		document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
+		//document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
+		$('.ui-loader').css("display","block");
+		$(".ajax-screen-lock").show();
+		loginAction($.lStorage("_loginData"));
 	}
 
     //對話框設定

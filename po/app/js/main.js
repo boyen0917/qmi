@@ -41,8 +41,6 @@ $(function(){
 			//header 設定團體名稱
 	    	$(".header-group-name div:eq(1)").html(gn);
 	    	
-			//執行polling
-			pollingInterval();
 	    	
 	    	//做團體列表
 	    	groupMenuListArea();
@@ -72,6 +70,9 @@ $(function(){
 				}
 	    	},1000);
 		}
+
+		//執行polling
+		pollingInterval();
 	}else{
     	document.location = "index.html";
     	return false;
@@ -683,11 +684,12 @@ $(function(){
 				initStickerArea.init(stickerArea, function(id){
 					//on sitcker selected
 					cns.debug(id);
-					var path = getStickerPath(id);
+					// var path = getStickerPath(id);
 					var preview = stickerIcon.parent().find(".st-reply-message-img");
 					preview.data("type",5);
-					preview.html("<div class='img'><img src='"+path+"'/></div>");
+					preview.html("<div class='img'><img/></div>");
 					preview.data("id", id);
+					setStickerUrl( preview.find("img"), id);
 					
 					var allStickerArea = $(".stickerArea .imgArea");
 					$.each( allStickerArea, function(index){
@@ -1217,9 +1219,11 @@ $(function(){
 						stickerArea.data("isCreate", true);
 						initStickerArea.init(stickerArea, function(id){
 							var this_compose = $(document).find(".cp-content");
-							var path = getStickerPath( id );
+							// var path = getStickerPath( id );
 							var preview = $("#page-compose .cp-sticker-area");
-							preview.html("<div class='sticker'><img src='"+path+"'/></div>")
+							preview.html("<div class='sticker'><img/></div>");
+							setStickerUrl( preview.find("img"), id );
+
 							this_compose.data("stickerID", id);
 							preview.show();
 							if( null== this_compose.data("message-list") ) this_compose.data("message-list",[] );
