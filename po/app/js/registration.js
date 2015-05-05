@@ -376,6 +376,7 @@ onCheckVersionDone = function(needUpdate){
 						document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
 					}
 				}else{
+					localStorage.removeItem("_groupList");
 					//沒group
 					document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
 				}
