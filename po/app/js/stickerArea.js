@@ -1,6 +1,6 @@
-/* ----- TODO -------
- 不同頁面按下載/選擇貼圖時應共同更新
--------- TODO -------*/
+/* 
+下載及歷史有改變時會trigger $("#send-sync-sticker-signal")
+*/
 
 var initStickerArea= {
 	isUpdated: false,
@@ -36,7 +36,7 @@ var initStickerArea= {
 		    	tmp.data("index", currentPg);
 		    	tmp.animate( {marginLeft:"-"+(100*currentPg)+"%"}, 'fast' );
 	    	}
-	    	thisTmp.updatePageInfo( dom );
+	    	thisTmp.showPageCount( dom );
 	    });
 	    imgArea.append(btnLeftBtn);
 
@@ -58,7 +58,7 @@ var initStickerArea= {
 		    	tmp.data("index", currentPg);
 		    	tmp.animate( {marginLeft:"-"+(100*currentPg)+"%"}, 'fast' );
 		    }
-	    	thisTmp.updatePageInfo( dom );
+	    	thisTmp.showPageCount( dom );
 	    });
 	    imgArea.append(btnRightBtn);
 
@@ -80,7 +80,7 @@ var initStickerArea= {
 	    catagoryContainer.append("<div class='cataBtn right'></div>");
 
 	    dom.append(catagoryContainer);
-	    thisTmp.updateHistory( dom );
+	    thisTmp.showHistory( dom );
 
 	    catagoryContainer.find(".cataBtn").click(function(){
 	    	var thisDom = $(this);
@@ -125,7 +125,7 @@ var initStickerArea= {
 
 	    		//$(".mid .group:not([data-type='"+type+"'])").css("visibility","hidden");
 	    		//$(".mid .group[data-type='"+type+"']").css("visibility","visible");
-	    		thisTmp.updatePageInfo( dom );
+	    		thisTmp.showPageCount( dom );
 	    	});
 	    	$(dom).find(".cata:eq(1)").trigger("click");
 	    };
@@ -216,8 +216,9 @@ var initStickerArea= {
 		    	}
 		    	userData.push( {"id":id, "src":thisDom.attr("src")} );
 		    	$.lStorage("_stickerHistory", userData);
-		    	thisTmp.updateHistory( dom );
+		    	thisTmp.showHistory( dom );
 
+		    	$("#send-sync-sticker-signal").click();
 		    	var callback = dom.data("callback");
 		    	if( null != callback ) callback(id);
 		    });
@@ -242,19 +243,19 @@ var initStickerArea= {
 				thisTmp.downloadSticker(type, function(){
 					// dataObj = thisTmp.splDict[type];
 					// thisTmp.showImg(dom, type, dataObj, path);
-					// thisTmp.updatePageInfo(dom);
+					// thisTmp.showPageCount(dom);
 				});
 			});
 		}
 	},
-	updateHistory: function(dom){
+	showHistory: function(dom){
 	    var userData = $.lStorage("_stickerHistory");
 	    try{
 		    if( null != userData ){
 		    	var object = {
 		    		isDownload: true,
 		    		list:{},
-		    		spi:history
+		    		spi:"history"
 		    	};
 		    	if( userData.length>0 ){
 			    	for(var i=userData.length-1; i>=0; i--){
@@ -270,7 +271,7 @@ var initStickerArea= {
 			errorReport(e);
 		}
 	},
-	updatePageInfo: function( dom ){
+	showPageCount: function( dom ){
 		var domTmp = $(dom);
 	    var currentTp = domTmp.find(".mid").data("type");
 	    if( null == currentTp )	return;
@@ -470,6 +471,7 @@ var initStickerArea= {
 		    		thisTmp.splDict[spi].isDownload = true;
 		    		$.lStorage("_sticker", thisTmp.splDict);
 		    		thisTmp.updateTypeInDomList( spi );
+		    		$("#send-sync-sticker-signal").click();
 		    	} catch(e){
 		    		errorReport(e);
 		    		if( callback ) callback();
@@ -486,7 +488,7 @@ var initStickerArea= {
 				thisTmp.domList.splice(i,1);
 			} else {
 				thisTmp.showImg(thisTmp.domList[i], type, dataObj);
-				thisTmp.updatePageInfo(thisTmp.domList[i]);
+				thisTmp.showPageCount(thisTmp.domList[i]);
 			}
 		}
 	},
@@ -550,6 +552,56 @@ var initStickerArea= {
 		this.getStickerPath(sid, function(path){
 			dom.attr("src",path);
 		});
+	},
+	syncSticker: function(){
+		var thisTmp = this;
+		//no any dom yet, return
+		if( !thisTmp.domList || thisTmp.domList.length<=0 ) return;
+
+		var domLength = thisTmp.domList.length;
+
+		//sync history
+	    var history = $.lStorage("_stickerHistory");
+		if( history ){
+		    try{
+		    	var object = {
+		    		isDownload: true,
+		    		list:{},
+		    		spi:"history"
+		    	};
+		    	for(var i=history.length-1; i>=0; i--){
+			    		var obj = history[i];
+			    		object.list[obj.id] = {sid:obj.id, sou:obj.src};
+			    }
+				for( var i=0; i<domLength; i++ ){
+					var tmpDom = thisTmp.domList[i];
+					thisTmp.showImg( tmpDom, "history", object );
+				}
+			} catch(e){
+				errorReport(e);
+			}
+		}
+
+		//sync downloaded
+	    var newStickerData = $.lStorage("_sticker");
+		if( newStickerData ){
+		    try{
+		    	$.each( thisTmp.splDict, function(sid, obj){
+		    		if( !newStickerData.hasOwnProperty(sid)
+		    			|| !newStickerData[sid] || sid=="history") return;
+
+		    		if( obj.isDownload != newStickerData[sid].isDownload ){
+		    			thisTmp.splDict[sid] = newStickerData[sid];
+						for( var i=0; i<domLength; i++ ){
+							var tmpDom = thisTmp.domList[i];
+							thisTmp.showImg( tmpDom, sid, thisTmp.splDict[sid] );
+						}
+		    		}
+		    	});
+			} catch(e){
+				errorReport(e);
+			}
+		}
 	}
 };
 

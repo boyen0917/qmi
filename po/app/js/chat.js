@@ -305,7 +305,23 @@ $(document).ready(function(){
 	    checkPagePosition();
 	}, 300);
 
+	//init sticker
 	initStickerArea.init( $(".stickerArea"), sendSticker);
+
+	//set sticker sync events
+	$("#send-sync-sticker-signal").off("click").click(function(){
+		cns.debug("sending sync sticker signal");
+		if( window.opener ){
+			var dom = $(window.opener.document).find("#recv-sync-sticker-signal");
+			dom.data("ci",ci);
+			dom.click();
+		}
+
+	});
+	$("#recv-sync-sticker-signal").off("click").click(function(){
+		cns.debug("update sticker");
+		initStickerArea.syncSticker();
+	});
 
 	//為了阻止網頁跳轉
 	$(document).on("dragover","body",function(e){

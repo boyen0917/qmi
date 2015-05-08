@@ -694,7 +694,7 @@ $(function(){
 					var allStickerArea = $(".stickerArea .imgArea");
 					$.each( allStickerArea, function(index){
 						var dom = $(this);
-						initStickerArea.updateHistory( dom.parent() );
+						initStickerArea.showHistory( dom.parent() );
 					});
 					cns.debug("1");
 				});
@@ -1235,7 +1235,7 @@ $(function(){
 							var allStickerArea = $(".stickerArea .imgArea");
 							$.each( allStickerArea, function(index){
 								var dom = $(this);
-								initStickerArea.updateHistory( dom.parent() );
+								initStickerArea.showHistory( dom.parent() );
 							});
 							cns.debug("2");
 						});
@@ -1816,6 +1816,28 @@ $(function(){
 
 	//init sticker
 	initStickerArea.load();
+	//on downloading sticker in main window
+	$("#send-sync-sticker-signal").off("click").click(function(){
+		cns.debug("sending sync sticker signal");
+		if( windowList ){
+			$.each( windowList, function(ciTmp, windowTmp){
+				$(windowTmp.document).find("#recv-sync-sticker-signal").click();
+			});
+		}
+
+	});
+	//on downloading sticker in one chat room
+	$("#recv-sync-sticker-signal").off("click").click(function(){
+		cns.debug("update sticker");
+		initStickerArea.syncSticker();
+		var senderCi = $(this).data("ci");
+		if( senderCi && windowList ){
+			$.each( windowList, function(ciTmp, windowTmp){
+				if( senderCi == ciTmp) return;
+				$(windowTmp.document).find("#recv-sync-sticker-signal").click();
+			});
+		}
+	});
 	/*
               ████████╗███████╗███████╗████████╗          
               ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝          
