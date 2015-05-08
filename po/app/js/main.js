@@ -1830,7 +1830,7 @@ $(function(){
 	$("#recv-sync-sticker-signal").off("click").click(function(){
 		cns.debug("update sticker");
 		initStickerArea.syncSticker();
-		var senderCi = $(this).data("ci");
+		var senderCi = $(this).attr("data-ci");
 		if( senderCi && windowList ){
 			$.each( windowList, function(ciTmp, windowTmp){
 				if( senderCi == ciTmp) return;

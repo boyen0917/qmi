@@ -313,7 +313,8 @@ $(document).ready(function(){
 		cns.debug("sending sync sticker signal");
 		if( window.opener ){
 			var dom = $(window.opener.document).find("#recv-sync-sticker-signal");
-			dom.data("ci",ci);
+			cns.debug(ci);
+			dom.attr("data-ci",ci);
 			dom.click();
 		}
 

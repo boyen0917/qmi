@@ -121,7 +121,7 @@ $(function(){
 		        	if(data.status == 200){
 		        		var getS3_result =$.parseJSON(data.responseText);
 
-				    	if( g_currentVersion != getS3_result.av ){
+				    	if( g_currentVersion != getS3_result.av && typeof(require)!="undefined" ){
 	        				g_currentVersion = getS3_result.av;
 				    		console.debug("update ver to ", g_currentVersion);
 				    		$.lStorage("_ver",{ver:g_currentVersion});
