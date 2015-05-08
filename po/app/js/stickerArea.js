@@ -138,7 +138,9 @@ var initStickerArea= {
 		var content = $(dom).find(".mid .group."+type);
 		if( null==content || content.length <= 0 ){
 		    content = $("<div class='group'></div>");
-		    content.css("display","none");
+		    if( !$(dom).find(".cata.active").hasClass(type) ){
+				content.css("display","none");
+		    }
 		    content.css("left","0");
 		    content.data("index",0);
 		    content.addClass(type);
