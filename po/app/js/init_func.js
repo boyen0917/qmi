@@ -388,6 +388,23 @@ $(function(){
             //如果非admin, 沒有聊天室的話隨便找個admin預建聊天室
             if( groupData.isOfficial && groupData.ad!=1 ){
                 updateChatList(this_gi, function(){
+                    //remove illegal chat rooms
+                    try {
+                        if (groupData.chatAll && Object.keys(groupData.chatAll).length > 1) {
+                            $.each(groupData.chatAll, function (key, obj) {
+                                if (obj && obj.tp == 1) {
+                                    if (obj.other && 1 != obj.other.ad) {
+                                        leaveRoomAPI(key);
+                                        delete groupData.chatAll[key];
+                                    }
+                                }
+                            });
+                            $.lStorage(ui, userData);
+                        }
+                    } catch(e){
+                        errorReport(e);
+                    }
+
                     if( null==groupData.chatAll || Object.keys(groupData.chatAll).length<=1 ){
                         var target;
                         //find an admin
@@ -398,13 +415,36 @@ $(function(){
                                 break;
                             }
                         }
-                        if( null!= target ) requestNewChatRoomApi(this_gi, target.nk, [{gu:target.gu}], null, null, false);
-                        else cns.debug(" has no admin in official group", this_gi);
+                        if( null!= target ) {
+                            cns.debug("[initOfficialGroup] create an official chat", this_gi, target.nk, target.gu);
+                            requestNewChatRoomApi(this_gi, target.nk, [{gu: target.gu}], null, null, false);
+                        }
+                        else cns.debug("[initOfficialGroup] has no admin in official group", this_gi);
                     }
                 });
             }
         } catch(e){
             errorReport(e);
         }
+    }
+
+    function leaveRoomAPI(ciTmp, callback) {
+        var apiName = "groups/" + gi + "/chats/" + ciTmp + "/users";
+        var headers = {
+            ui:ui,
+            at:at,
+            li:lang
+        };
+        var result = ajaxDo(apiName, headers, 'delete',true,null, null, true);
+        result.error(function(jqXHR, textStatus, errorThrown) {
+            console.debug(1);
+            return;
+        });
+        result.complete( function(data) {
+            if (data.status == 200) {
+                var result = $.parseJSON(data.responseText);
+                if (callback) callback(result);
+            }
+        });
     }
 });

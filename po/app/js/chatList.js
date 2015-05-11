@@ -338,7 +338,7 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 				        	var object = list[0].data;
 				        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
 				    	}
-				    } else {
+				    } else if(roomTmp){
 				    	setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
 				    }
 
@@ -371,7 +371,7 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 				        	var object = list[0].data;
 				        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
 				    	}
-				    } else {
+				    } else if(roomTmp){
 						setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
 					}
 				} catch(e){
