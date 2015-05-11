@@ -217,6 +217,9 @@ var initStickerArea= {
 		    		}
 		    	}
 		    	userData.push( {"id":id, "src":thisDom.attr("src")} );
+			    if( userData.length>40 ){
+				    userData.splice(0, userData.length-40);
+			    }
 		    	$.lStorage("_stickerHistory", userData);
 		    	thisTmp.showHistory( dom );
 

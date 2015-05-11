@@ -73,6 +73,12 @@ onCheckVersionDone = function(needUpdate){
 		
 	});
 
+	$(".login-ld-password").off("keypress").keypress(function(e){
+		if( e.which == 13 ) {
+			$(".login-ready").click();
+		}
+	});
+
 	$(".register").click(function(){
 		$.mobile.changePage("#page-register", {transition: "slide"});
 		//contry code
