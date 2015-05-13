@@ -730,33 +730,50 @@ $(function(){
 			return $.i18n.getString("COMMON_JUST_NOW");
 		} else if( diff<3600 ){	//within hour
 			return $.i18n.getString("COMMON_NMINUTES_AGO", Math.floor(diff/60) );
-		} else if( diff<86400 ){	//n-hours ago
-			return $.i18n.getString("COMMON_NHOURS_AGO", Math.floor(diff/3600) );
 		} else if( now.getYear()==this.getYear() ){
-			//yesterday
-			if( this.getMonth()==now.getMonth() && this.getDate()==(now.getDate()-1) ){
-				var options = {hour: "2-digit", minute: "2-digit"};
+			if( now.getDate()==this.getDate() ){	//n-hours ago
+				return $.i18n.getString("COMMON_NHOURS_AGO", Math.floor(diff/3600) );
+			}//yesterday
+			else if( this.getMonth()==now.getMonth() && this.getDate()==(now.getDate()-1) ){
+				var options = {hour: "2-digit", minute: "2-digit",hour12:false};
 				return $.i18n.getString("COMMON_YESTERDAY")+" "+this.toLocaleTimeString(language, options);
+			} else if( this.getWeek()==now.getWeek() ){
+				var options = {weekday: "short"};
+				
+				//星期四 15:40
+				console.debug( this.toLocaleTimeString(language, options) );
+				return this.toLocaleTimeString(language, options).split(" ")[0]
+						+" "+this.getHours()+":"+this.getMinutes();
 			} else {	//within a year
-				if( isShowTime ){
-					var options={
-					    month: "numeric",
-					    day: "numeric", hour: "2-digit", minute: "2-digit"
-					};
-					return this.toLocaleTimeString(language, options);
-				} else {
-					return this.toLocaleDateString(language);
-				}
+				//2/20 15:40
+				return (this.getMonth()+1)+"/"+this.getDate()
+					+" "+this.getHours()
+					+":"+padStringToTwoChar(this.getMinutes());
 			}
 		}
 		if( isShowTime ){
 			var options = {
 			    year: "numeric", month: "numeric",
-			    day: "numeric", hour: "2-digit", minute: "2-digit"
+			    day: "numeric", hour: "2-digit", minute: "2-digit",hour12:false
 			};
 			return this.toLocaleTimeString(language, options);
 		}
 		return this.toLocaleDateString(language);
+	}
+	padStringToTwoChar = function(d) {
+	    return (d < 10) ? '0' + d.toString() : d.toString();
+	}
+
+	Date.prototype.getWeek = function() {
+		var date = new Date(this.getTime());
+		 date.setHours(0, 0, 0, 0);
+		// Thursday in current week decides the year.
+		date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+		// January 4 is always in week 1.
+		var week1 = new Date(date.getFullYear(), 0, 4);
+		// Adjust to Thursday in week 1 and count number of weeks from date to week1.
+		return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000
+		                      - 3 + (week1.getDay() + 6) % 7) / 7);
 	}
 
 	Date.prototype.getRandomString = function(digit){
