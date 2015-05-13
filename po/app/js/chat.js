@@ -534,7 +534,7 @@ $(document).ready(function () {
 		cursorborderradius: '10px',
 		background: 'rgba(255,255,255,0)',
 		cursorborder: "",
-		boxzoom: false,
+		boxzoom: false
 		// zindex: 999
 		// horizrailenabled: false,
 		// ,autohidemode: "leave"
@@ -1198,7 +1198,7 @@ function showMsg(object, bIsTmpSend) {
 		container.append(div);
 
 		//left
-		var pic = $("<img class='aut'></img>");	//left pic (auo for large pic)
+		var pic = $("<img class='aut'/>");	//left pic (auo for large pic)
 		if (mem.aut && mem.aut.length > 0) {
 			pic.attr("src", mem.aut);
 		} else {
@@ -1212,9 +1212,9 @@ function showMsg(object, bIsTmpSend) {
 		msgDiv = $("<div class='msg-content'></div>");
 		subDiv.append(msgDiv);	//msg
 
-		var table = $("<table></table>");
-		table.append($("<tr><td></td></tr>"));
-		table.append($("<tr><td><div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div></td></tr>"));
+		table = $("<table></table>");
+		table.append( "<tr><td></td></tr>" );
+		table.append( "<tr><td><div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div></td></tr>" );
 		subDiv.append(table);
 
 		div.append(subDiv);	//right
@@ -1361,7 +1361,7 @@ function showMap(msgData, container) {
 }
 
 function showUnsendMsg(c, tp) {
-	var eiTmp = "{0}_{1}_{2}".format(randomHash(11), randomHash(11), randomHash(11));
+	var eiTmp = "{0}_{1}_{2}".format( randomHash(11), randomHash(11), randomHash(11));
 	var time = new Date().getTime();
 	var newData = {
 		ei: eiTmp,
@@ -1653,7 +1653,7 @@ getChatS3file = function (target, file_c, tp, this_ti, this_tu) {
 	var headers = {
 		"ui": ui,
 		"at": at,
-		"li": lang,
+		"li": lang
 	};
 	var method = "post";
 	var body = null;
@@ -2113,7 +2113,7 @@ getChatReadUnreadApi = function (this_gi, this_ci, this_rt, this_tp) {
 	var headers = {
 		"ui": ui,
 		"at": at,
-		"li": lang,
+		"li": lang
 	};
 	var method = "get";
 	return result = ajaxDo(api_name, headers, method, true);
