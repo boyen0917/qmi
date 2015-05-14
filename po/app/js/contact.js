@@ -1541,6 +1541,11 @@ function showAddMemberPage(){
 
 
 	//render invite pending member list
+	updateInvitePending();
+}
+
+function updateInvitePending () {
+	//render invite pending member list
 	var pendingAreaParent = $("#page-contact-addmem .ca-pending-area");
 	var pendingArea = pendingAreaParent.children(".list");
 	var coachArea = pendingAreaParent.children(".coach").hide();
@@ -1572,6 +1577,7 @@ function showAddMemberPage(){
 		pendingArea.hide();
 	}
 }
+
 
 function getInviteList(){
 	var api_name = "groups/" + gi + "/invitations";
@@ -1674,6 +1680,18 @@ function sendInvite(){
 						$(".cai-name input").val("");
 						$(".cai-num input").val("");
 					}
+					//update inviting list
+					if(!inviteGuAll) inviteGuAll = {};
+					inviteGuAll[obj.ul[0].gu] = {
+						gu: obj.ul[0].gu,
+						ik: obj.ul[0].ik,
+						tp: obj.ul[0].tp,
+						st: 0,
+						nk: nk,
+						pn: phone
+					};
+					updateInvitePending();
+
 				} catch(e){
 
 				}

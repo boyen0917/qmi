@@ -835,6 +835,7 @@
 .ca-pending-area .coach{
 	text-align: center;
 	background-color: #d0d0d0;
+	height: -webkit-calc( 100vh - 149px );
 }
 .ca-pending-area .coach img{
 	width: 300px;
