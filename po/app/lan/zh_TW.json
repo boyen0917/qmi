@@ -158,6 +158,7 @@
 	"INVITE_SUCC" : "成功送出邀請",
 	"INVITE_FAIL" : "送出邀請失敗",
 	"INVITE_ALREADY_IN_GROUP" : "此成員已在群組裡",
+	"QRCODE_TITLE" : "QR Code",
 
 	"COMMON_SELECT_MEMBERS"  				: "選擇對象",
 	"COMMON_NEXT"  					: "下一步",

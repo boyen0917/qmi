@@ -473,12 +473,12 @@ $(function(){
         var headers = {
                  "ui":ui,
                  "at":at, 
-                 "li":lang,
-                     };
+                 "li":lang
+        };
         var body = {
                 ti: ti_feed,
                 tu: tuObject
-            }
+            };
 
         var method = "post";
         var pi_result = ajaxDo(api_name,headers,method,false,body);
@@ -491,7 +491,7 @@ $(function(){
         var headers = {
                  "ui":ui,
                  "at":at, 
-                 "li":lang,
+                 "li":lang
                      };
         var method = "post";
         var body = {
@@ -499,12 +499,12 @@ $(function(){
                   tp: tp,
                   ti: ti,
                   pi: pi
-                }
+                };
         if( isApplyWatermark ){
         	body.wm = 1
         }
         return ajaxDo(api_name,headers,method,false,body);
-	}
+	};
 
 	uploadImgToS3 = function(url,file){
 		return $.ajax ({
@@ -534,7 +534,7 @@ $(function(){
         var headers = {
                  "ui":ui,
                  "at":at, 
-                 "li":lang,
+                 "li":lang
                      };
         var method = "put";
 
@@ -885,7 +885,7 @@ $(function(){
 	        var headers = {
 	            "ui":ui,
 	            "at":at,
-	            "li":lang,
+	            "li":lang
 	        };
 	        var method = "get";
 	        return ajaxDo(api_name,headers,method,ajax_load,false,false,err_show);

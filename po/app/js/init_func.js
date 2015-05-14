@@ -80,13 +80,15 @@ $(function(){
         //將更新完的資料倒回新的名單 就會有新成員
         $.extend(new_guAll,_groupList[this_gi].guAll);
 
+        var inviteGuAll = {};
         //狀態0為未加入, 從清單剔除掉
         $.each(new_guAll,function(i,val){
             if( new_guAll[i].st==0 ){
+                inviteGuAll[i] = new_guAll[i];
                 delete new_guAll[i];
             }
         });
-
+        _groupList[this_gi].inviteGuAll = inviteGuAll;
         _groupList[this_gi].guAll = new_guAll;
         $.lStorage(ui,_groupList);
     }

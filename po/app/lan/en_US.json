@@ -159,6 +159,7 @@
 	"INVITE_SUCC" : "Send invitation successed.",
 	"INVITE_FAIL" : "Send invitation failed.",
 	"INVITE_ALREADY_IN_GROUP" : "This member is already in group.",
+	"QRCODE_TITLE" : "QR Code",
 
 	"COMMON_SELECT_MEMBERS"  				: "Select members",
 	"COMMON_NEXT"  					: "Next",

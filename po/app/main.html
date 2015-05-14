@@ -807,29 +807,52 @@
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <h3 class="page-title" data-textid="INVITE_TITLE"></h3>
             </div>
-            <div class="ca-invite-area ca-sub-area">
-                <input type="file" class="cai-file" style="display:none" data-role="none"/>
-                <div class="cai-name">
-                    <img src="images/invitemembers/invitemembers_icon_name.png"/>
-                    <input maxlength="20" data-role="none" data-textph-id="INVITE_DISPLAY_NAME"/>
+            <div class="ca-tab-area">
+                <div class="ca-tab active" data-type="pending">
+                    <img src="images/icon/icon_invite_tab_invited.png"/>
+                    <div class="text" data-textid="INVITE_INVITED_MEMBER"></div>
                 </div>
-                <div class="cai-area">
-                    <div>
-                        <img src="images/invitemembers/invitemembers_icon_area.png"/>
-                        <span data-textid="COMMON_COUNTRY_TAIWAN"></span>
-                        <span class="area">+886</span>
-                        <img src="images/common/icon/icon_arrow_next.png">
+                <div class="ca-tab" data-type="qrcode">
+                    <img src="images/icon/icon_invite_tab_qrcode.png"/>
+                    <div class="text" data-textid="QRCODE_TITLE"></div>
+                </div>
+                <div class="ca-tab" data-type="handTyping">
+                    <img src="images/icon/icon_invite_tab__hand.png"/>
+                    <div class="text" data-textid="INVITE_MANUAL"></div>
+                </div>
+            </div>
+            <div class="ca-content-area">
+                <div class="ca-pending-area ca-sub-area pending active">
+                    <div class="list"></div>
+                    <div class="coach">
+                        <img src="images/coachmake/logo_status_inviteobject.png"/>
+                        <div data-textid="INVITE_NO_INVITATION"></div>
                     </div>
                 </div>
-                <div class="cai-num">
-                    <img src="images/invitemembers/invitemembers_icon_phonenumber.png"/>
-                    <input maxlength="20" data-role="none" data-textph-id="INVITE_PHONE_NUMBER"/>
-                </div>
-                <!-- <div class="cai-desc">
-                    <textarea maxlength="150" data-role="none" data-textph-id="GROUP_ABOUT"></textarea>
-                </div> -->
+                <div class="ca-invite-area ca-sub-area handTyping">
+                    <input type="file" class="cai-file" style="display:none" data-role="none"/>
+                    <div class="cai-name">
+                        <!-- <img src="images/invitemembers/invitemembers_icon_name.png"/> -->
+                        <input maxlength="20" data-role="none" data-textph-id="INVITE_DISPLAY_NAME"/>
+                    </div>
+                    <div class="cai-area">
+                        <div>
+                            <!-- <img src="images/invitemembers/invitemembers_icon_area.png"/> -->
+                            <span data-textid="COMMON_COUNTRY_TAIWAN"></span>
+                            <span class="area">+886</span>
+                            <img src="images/common/icon/icon_arrow_next.png">
+                        </div>
+                    </div>
+                    <div class="cai-num">
+                        <!-- <img src="images/invitemembers/invitemembers_icon_phonenumber.png"/> -->
+                        <input maxlength="20" data-role="none" data-textph-id="INVITE_PHONE_NUMBER"/>
+                    </div>
+                    <!-- <div class="cai-desc">
+						<textarea maxlength="150" data-role="none" data-textph-id="GROUP_ABOUT"></textarea>
+					</div> -->
 
-                <div class="ca-invite-submit" data-textid="INVITE_INVITE"></div>
+                    <div class="ca-invite-submit" data-textid="INVITE_INVITE"></div>
+                </div>
             </div>
         </div>
 

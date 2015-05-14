@@ -1,5 +1,6 @@
 var bl;
 var guAll;
+var inviteGuAll;
 var guAllExsit;
 var fbl;
 var isList = true;
@@ -14,6 +15,20 @@ $(document).ready(function(){
 	$(document).on("click",".contact-add",function(e){
 		showAddMemberPage();
 	});
+	$("#page-contact-addmem .ca-content-area").niceScroll( {
+		// styler:"fb",
+		cursorcolor:"rgba(107, 107, 107,0.8)", 
+		cursorwidth: '10',
+		cursorborderradius: '10px',
+		background: 'rgba(255,255,255,0)',
+		cursorborder:"",
+		boxzoom:false,
+		zindex: 999,
+		scrollspeed: 90,
+		mousescrollstep: 40
+		// horizrailenabled: false,
+		// ,autohidemode: "leave"
+	} );
 });
 
 initContactList = function(){
@@ -877,6 +892,7 @@ initContactData = function(){
 	//get mem data
 	guAll = g_group.guAll;
 	if( !guAll ) return;
+	inviteGuAll = g_group.inviteGuAll;
 
 	guAllExsit = {};
 	$.each( guAll, function(key,obj){
@@ -1499,6 +1515,14 @@ function showAddMemberPage(){
 	$("#page-contact-addmem .ca-list-area .cal-coachmake").show();
 	$("#page-contact-addmem .ca-list-area .cal-div-area").hide();
 
+	$("#page-contact-addmem .ca-tab").off("click").click( function(){
+		$(this).parent().find(".ca-tab.active").removeClass("active");
+		$(this).addClass("active");
+		var type = $(this).attr("data-type");
+		$("#page-contact-addmem .ca-sub-area.active").removeClass("active");
+		$("#page-contact-addmem ."+type).addClass("active");
+	});
+
 	$("#page-contact-addmem .ca-nav-box").off("click").click( function(){
 		var this_btn = $(this);
 		if( this_btn.hasClass("ca-invite") ){
@@ -1514,6 +1538,39 @@ function showAddMemberPage(){
 	});
 	$("#page-contact-addmem .ca-invite").trigger("click");
 	$("#page-contact-addmem .ca-invite-submit").off("click").click( sendInvite );
+
+
+	//render invite pending member list
+	var pendingAreaParent = $("#page-contact-addmem .ca-pending-area");
+	var pendingArea = pendingAreaParent.children(".list");
+	var coachArea = pendingAreaParent.children(".coach").hide();
+	pendingArea.html("").show();
+	var noData = true;
+	if( inviteGuAll ){
+		var template = $('<div class="row">'
+				+'<div class="left"><img class="namecard"/></div>'
+				+'<div class="mid"><div class="name"></div><div class="phone"></div></div>'
+				+'<div class="right"><img src="images/icon/icon_invite_mail.png"/></div>'
+			+'</div>');
+		$.each(inviteGuAll, function(guTmp, mem){
+			if( mem && mem.st==0 ){
+				noData = false;
+				var newRow = template.clone();
+				//img
+				newRow.find(".namecard").data("gu",guTmp).data("gi",gi).attr("src",mem.aut||"images/common/others/empty_img_personal_l.png");
+				//name
+				newRow.find(".name").html( htmlFormat(mem.nk||"") );
+				//phone
+				newRow.find(".phone").text( mem.pn||"" );
+				pendingArea.append(newRow);
+			}
+		});
+
+	}
+	if(noData){
+		coachArea.show();
+		pendingArea.hide();
+	}
 }
 
 function getInviteList(){
