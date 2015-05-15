@@ -1818,10 +1818,11 @@ $(function(){
 	initStickerArea.load();
 	//on downloading sticker in main window
 	$("#send-sync-sticker-signal").off("click").click(function(){
+		var sid = $(this).attr("data-sid");
 		cns.debug("sending sync sticker signal");
 		if( windowList ){
 			$.each( windowList, function(ciTmp, windowTmp){
-				$(windowTmp.document).find("#recv-sync-sticker-signal").click();
+				$(windowTmp.document).find("#recv-sync-sticker-signal").attr("data-sid",sid).click();
 			});
 		}
 
@@ -1829,7 +1830,8 @@ $(function(){
 	//on downloading sticker in one chat room
 	$("#recv-sync-sticker-signal").off("click").click(function(){
 		cns.debug("update sticker");
-		initStickerArea.syncSticker();
+		initStickerArea.syncSticker( $(this).attr("data-sid") );
+		$(this).removeAttr("data-sid");
 		var senderCi = $(this).attr("data-ci");
 		if( senderCi && windowList ){
 			$.each( windowList, function(ciTmp, windowTmp){

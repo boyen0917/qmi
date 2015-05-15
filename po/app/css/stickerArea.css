@@ -65,6 +65,10 @@
 .stickerArea .imgArea .mid .group .page .row div img{
 	height: 100%;
 }
+.stickerArea .imgArea .mid .group .page .row div img.error{
+	padding: 10%;
+	height: 80%;
+}
 
 .stickerArea .imgArea > .right{
 	width: 25px;

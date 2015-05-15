@@ -314,13 +314,16 @@ $(document).ready(function () {
 			var dom = $(window.opener.document).find("#recv-sync-sticker-signal");
 			cns.debug(ci);
 			dom.attr("data-ci", ci);
+			var sid = $(this).attr("data-sid");
+			if(sid) dom.attr("data-sid", sid);
 			dom.click();
 		}
 
 	});
 	$("#recv-sync-sticker-signal").off("click").click(function () {
 		cns.debug("update sticker");
-		initStickerArea.syncSticker();
+		initStickerArea.syncSticker( $(this).attr("data-sid") );
+		$(this).removeAttr("data-sid");
 	});
 
 	//為了阻止網頁跳轉

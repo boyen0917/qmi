@@ -148,7 +148,7 @@ var initStickerArea= {
 		    imgContent.append(content);
 		}
 
-		if( true==dataObj.isDownload ){
+		if( true==dataObj.isDownload && dataObj.list && Object.keys(dataObj.list).length>0 ){
 			singleStickerObject = dataObj.list;
 			var arImgCnt = Object.keys(singleStickerObject).length;
 			content.html("");
@@ -163,6 +163,7 @@ var initStickerArea= {
 			content.css("width",pageCnt*100+"%");
 			content.data("cnt",pageCnt);
 			var i =0;
+
 			$.each( singleStickerObject, function(key, obj){
 		    // for(var i=0; i<arImgCnt; i++){
 		    	if( i%8==0 ){
@@ -188,8 +189,12 @@ var initStickerArea= {
 		    	// } else{
 		    		// st = $("<img src="+imgPath.format(singleStickerObject[i])+">");
 		    	// }
-		    	st = $("<img src="+obj.sou+">");
+		    	st = $("<img class='stImg' src="+obj.sou+">");
 		    	st.data( "id", key );
+		    	st.error( function(){
+					$(this).addClass("error");
+					$(this).attr("src", "images/chatroom/chat_chatroom_icon_nosent.png");
+				});
 		    	imgDiv.append(st);
 		    	if( i%8<4 ){
 					subDiv1.append(imgDiv);
@@ -201,6 +206,30 @@ var initStickerArea= {
 
 		    $(dom).find(".page .row img").off("click").click( function(){
 		    	var thisDom = $(this);
+
+		    	if( thisDom.hasClass("error") ){
+					thisTmp.getStickerDetailApi(type).complete(function(detailDataTmp){
+		        		if(detailDataTmp.status == 200){
+		        			var detailData = $.parseJSON(detailDataTmp.responseText);
+		        			if(detailData &&detailData.sl) detailData = detailData.sl;
+		        			if( !thisTmp.splDict[type] ) thisTmp.splDict[type] = {};
+			        		thisTmp.splDict[type].list = {};
+		        			for(var j=0; j<detailData.length; j++){
+		        				thisTmp.splDict[type].list[detailData[j].sid] = detailData[j];
+		        			}
+		        			$.lStorage("_sticker",thisTmp.splDict);
+
+		        			//redraw
+		        			thisTmp.showImg(dom, type, thisTmp.splDict[type] );
+
+		        			//sync
+		    				$("#send-sync-sticker-signal").attr("data-sid", type);
+		    				$("#send-sync-sticker-signal").click();
+		        		}
+		        	});
+		        	return;
+				}
+
 		    	var id = thisDom.data("id");
 		    	cns.debug( id );
 
@@ -223,6 +252,7 @@ var initStickerArea= {
 		    	$.lStorage("_stickerHistory", userData);
 		    	thisTmp.showHistory( dom );
 
+		    	$("#send-sync-sticker-signal").removeAttr("data-sid");
 		    	$("#send-sync-sticker-signal").click();
 		    	var callback = dom.data("callback");
 		    	if( null != callback ) callback(id);
@@ -476,6 +506,7 @@ var initStickerArea= {
 		    		thisTmp.splDict[spi].isDownload = true;
 		    		$.lStorage("_sticker", thisTmp.splDict);
 		    		thisTmp.updateTypeInDomList( spi );
+		    		$("#send-sync-sticker-signal").removeAttr("data-sid");
 		    		$("#send-sync-sticker-signal").click();
 		    	} catch(e){
 		    		errorReport(e);
@@ -558,7 +589,7 @@ var initStickerArea= {
 			dom.attr("src",path);
 		});
 	},
-	syncSticker: function(){
+	syncSticker: function( targetSpi ){
 		var thisTmp = this;
 		//no any dom yet, return
 		if( !thisTmp.domList || thisTmp.domList.length<=0 ) return;
@@ -595,7 +626,7 @@ var initStickerArea= {
 		    		if( !newStickerData.hasOwnProperty(sid)
 		    			|| !newStickerData[sid] || sid=="history") return;
 
-		    		if( obj.isDownload != newStickerData[sid].isDownload ){
+		    		if( obj.isDownload != newStickerData[sid].isDownload || targetSpi==sid ){
 		    			thisTmp.splDict[sid] = newStickerData[sid];
 						for( var i=0; i<domLength; i++ ){
 							var tmpDom = thisTmp.domList[i];
