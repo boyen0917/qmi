@@ -6952,7 +6952,7 @@ $(function(){
 	        		var _groupList = $.lStorage(ui);
                             
                     try{
-                        if(Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
+                        if( _groupList[this_user_info.gi].guAll && Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
                             cns.debug("guall content exist");
                             var userTmp = _groupList[this_user_info.gi].guAll[this_user_info.gu];
                             //user全部資料竟然不含fav...?!用extend的比較保險

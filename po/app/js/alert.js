@@ -129,7 +129,7 @@ showAlertFromDB = function(){
 updateAlert = function(){
 	if (typeof ui === 'undefined') return;
 	
-	ajaxDo("/notices", {
+	ajaxDo("notices", {
 	    "ui":ui,
 	    "at":at, 
 	    "li":lang,
@@ -139,37 +139,6 @@ updateAlert = function(){
 	    		var returnData = $.parseJSON(data.responseText);
 
 	    		showAlertContent(returnData.nl);
-
-	   //  		var lastCt = 0;
-				// for(var i=0; i<returnData.nl.length; i++){
-				// 	var boxData = returnData.nl[i];
-
-				// 	//預防舊版的打進來
-				// 	if( !boxData || !boxData.hasOwnProperty("nd") ) return;
-	    			
-	   //  			var node = {
-	   //  				ei_ntp: boxData.nd.ei+"_"+boxData.ntp,
-				// 		ct: boxData.nd.ct,
-				// 	    data: boxData
-				// 	};
-				// 	if( boxData.nd.ct>lastCt ){
-				// 		lastCt = boxData.nd.ct;
-				// 	}
-
-				// 	idb_alert_events.put(node);
-				// }
-
-				// if( lastCt>lastAlertCt ){
-				// 	// cns.debug("showAlertFromDB",lastAlertCt, lastCt);
-				// 	lastAlertCt = lastCt;
-				// 	setTimeout(showAlertFromDB,500);
-				// }
-
-				// // //check "new" mark & update data
-				// // if( null!=returnData ){
-				// // 	$.lStorage("_alert",returnData);
-				// // 	showAlertContent( returnData );
-				// // }
 	    	}
     });
 }
