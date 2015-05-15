@@ -442,6 +442,12 @@ $(document).ready(function () {
 					g_isReadPending = false;
 					sendMsgRead();
 				}
+				if( window.opener ){
+					var dom = $(window.opener.document).find("#recv-chatroom-focus");
+					dom.attr("data-gi", gi);
+					dom.attr("data-ci", ci);
+					dom.trigger("click");
+				}
 			}
 			, windowBlurHandler = function () {
 				if (window && window.frame) {
