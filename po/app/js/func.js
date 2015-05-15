@@ -6542,10 +6542,12 @@ $(function(){
                     for( var i in keys ){
                         var key = keys[i];
                         if( val.hasOwnProperty(key) ){
+                            var tmpDiv = $(".polling-cnt[data-polling-cnt="+key+"] .sm-count");
                             if( val[key] > 0){
-                                var tmpDiv = $(".polling-cnt[data-polling-cnt="+key+"] .sm-count");
                                 tmpDiv.html(countsFormat(val[key])).show();
                                 tmpDiv.data("gi",gi);
+                            } else {
+                                tmpDiv.hide();
                             }
                         }
                     }
@@ -6560,12 +6562,28 @@ $(function(){
                         for( var i=0; i<val.cl.length; i++ ){
                             try{
                                 var clTmp = val.cl[i];
-                                if( g_group.chatAll && g_group.chatAll.hasOwnProperty(clTmp.ci) ){
-                                    g_room = g_group["chatAll"][clTmp.ci];
-                                    if( g_room.unreadCnt!=clTmp.B7 ){
-                                        isSaving = true;
-                                        g_room.unreadCnt = clTmp.B7;
-                                        cns.debug(val.gi, "cl.B7", clTmp.ci, clTmp.B7);
+                                if( g_group.chatAll ){
+                                    if( g_group.chatAll.hasOwnProperty(clTmp.ci) ) {
+                                        g_room = g_group["chatAll"][clTmp.ci];
+                                        if (g_room.unreadCnt != clTmp.B7) {
+                                            isSaving = true;
+                                            g_room.unreadCnt = clTmp.B7;
+                                            cns.debug(val.gi, "cl.B7", clTmp.ci, clTmp.B7);
+
+                                            //update ui unread cnt
+                                            if (gi == val.gi) {
+                                                var tmpDiv = $(".sm-cl-count[data-ci=" + clTmp.ci + "]");
+                                                if (clTmp.B7 > 0) {
+                                                    tmpDiv.html(countsFormat(clTmp.B7)).show();
+                                                } else {
+                                                    tmpDiv.hide();
+                                                }
+                                            }
+                                        }
+                                    } else if (clTmp.B7 > 0 && val.gi==gi) {
+                                        cns.debug("[pollingCountsWrite] remove ghost cnt", val.gi, clTmp.ci, clTmp.B7);
+                                        var tmp = $('<div class="sm-cl-count" data-gi="'+val.gi+'" data-ci="'+clTmp.ci+'"></div>');
+                                        updatePollingCnts(tmp,"B7");
                                     }
                                 }
                             } catch(e){
