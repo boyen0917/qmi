@@ -83,6 +83,11 @@ $(function(){
     	// link.attr("href",g_downloadPath);
     	link.trigger("click");
     	console.debug("download clicked");
+    	try{
+	    	require('nw.gui').App.quit();
+	    } catch(e){
+	    	console.debug(e.stack);
+	    }
     }
 
     checkWebVersion = function( onDone ){
@@ -163,8 +168,8 @@ $(function(){
     checkVersion = function( onDone ){
     	checkWebVersion( function(needUpdate){
     		if( false==needUpdate ){
-	    		checkContainerVersion(function(){
-	    			onDone();
+	    		checkContainerVersion(function(needUpdate){
+	    			if( false==needUpdate ) onDone();
 	    		});
     		}
     	});
