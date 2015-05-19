@@ -310,11 +310,11 @@ $(function(){
 	    $(".gm-invite").trigger("click");
 	    $.mobile.changePage("#page-group-menu");
 	});
-	
+
 	//更換動態
-	$(document).on("click",".sm-small-area,.sm-group-area",function(){
+	$(document).on("click",".sm-small-area,.sm-group-area.enable",function(){
 
-
+		$(".sm-group-list-area").removeAttr("data-unlock");
 		var target = $(this);
 
 		if($(this).hasClass("sm-group-area")){
@@ -326,6 +326,7 @@ $(function(){
 
 			target = $(".sm-small-area[data-sm-act=feeds]");
 		}else{
+			// $(".polling-local .sm-count").hide();
 
 			if( $(".st-filter-area").hasClass("st-filter-lock") ){
 				// cns.debug("-------------");
@@ -370,7 +371,6 @@ $(function(){
 			timelineSwitch(target.data("sm-act"));
 			$(this).addClass("active");
 		}
-		$(".polling-local .sm-count").hide();
 
 		target.addClass("sm-click-bg");
 		// target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
@@ -1626,8 +1626,12 @@ $(function(){
 
 	//polling update cnts
 	$(document).on("click",".polling-cnt",function(e){
-		$(this).find(".sm-count").hide();
-		if($(this).data("gi") == gi) {
+		var thisDom = $(this);
+		if( thisDom.hasClass("sm-group-area") && !thisDom.hasClass("enable") ){
+			return;
+		}
+		thisDom.find(".sm-count").hide();
+		if(thisDom.data("gi") == gi) {
 			$(".sm-small-area[data-polling-cnt=A1]").find(".sm-count").hide();
 		}
 		//local 歸零 因為
@@ -1636,8 +1640,25 @@ $(function(){
 			_pollingData.cnts[gi].A5 = 0;
 			$.lStorage("_pollingData",_pollingData);
 		}
-		updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
+		updatePollingCnts(thisDom.find(".sm-count"),thisDom.data("polling-cnt"));
 	});	
+	
+	//如果更換動態卡住...點任何團體共兩次即可解鎖OTL
+	$(document).on("click",".sm-group-area:not(.enable)",function(e){
+		e.preventDefault();
+        e.stopPropagation();
+		try{
+			var tmp = $(".sm-group-list-area").attr("data-unlock")||0;
+			if( tmp>0 ){
+				$(".sm-group-list-area").removeAttr("data-unlock");
+				groupSwitchEnable();
+			} else {
+				$(".sm-group-list-area").attr("data-unlock",++tmp);
+			}
+		} catch(e){
+			errorReport(e);
+		}
+	});
 
 	//polling update cnts
 	$(document).on("click",".polling-cnt-cl",function(e){

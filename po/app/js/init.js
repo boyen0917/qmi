@@ -65,9 +65,11 @@ $(function(){
 	back_hash = false;
 
 	//登入時間
-	var currentDate = new Date();
-	console.debug("login_time", currentDate.getTime());
-	login_time = currentDate.getTime();
+	if( window.parent && window.parent.login_time ){
+		login_time = window.parent.login_time;
+	} else {
+		login_time = new Date().getTime();
+	}
 
 	//timeline裏面點擊不做展開收合的區域
 	timeline_detail_exception = [
@@ -183,6 +185,7 @@ $(function(){
 		}
 		//logout~
 		if(jqxhr.status == 401){
+			localStorage.removeItem("_loginData");
 			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
 			return false;
 		}

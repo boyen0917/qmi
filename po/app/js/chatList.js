@@ -304,9 +304,9 @@ function openChatWindow ( giTmp, ci ){
 	windowList[ci].focus();
 }
 
-function updateLastMsg(giTmp, ciTmp, isRoomOpen ){
+function updateLastMsg(giTmp, ciTmp, isRoomOpen, eiTmp ){
 	var table = $(".subpage-chatList-row[data-rid='"+ciTmp+"']");
-	setLastMsg( giTmp, ciTmp, table, true, isRoomOpen );
+	setLastMsg( giTmp, ciTmp, table, true, isRoomOpen, eiTmp );
 	// setTimeout(sortRoomList, sortRoomListTimeout);
 }
 function clearChatListCnt( giTmp, ciTmp ){
@@ -318,7 +318,7 @@ function clearChatListCnt( giTmp, ciTmp ){
 	$(".subpage-chatList-row[data-rid='"+ciTmp+"'] .cnt").html("");
 }
 
-function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
+function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
 	if( null==isRoomOpen ) isRoomOpen = false;
 	// if( gi!=giTmp ) return;
 	// if(!table) return;
@@ -326,124 +326,208 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen ){
 	try{
 		var userData = $.lStorage(ui);
 		var groupTmp = userData[giTmp];
-		if( null==groupTmp.guAll ){
+		if( !groupTmp.guAll||0==Object.keys(groupTmp.guAll).length ){
 			setGroupAllUser( null, giTmp, function(){
 				userData = $.lStorage(ui);
 				groupTmp = userData[giTmp];
-				var roomTmp = groupTmp["chatAll"][ciTmp];
+				// var roomTmp = groupTmp["chatAll"][ciTmp];
 				
-				g_idb_chat_msgs.limit(function(list){
-				    if( list.length>0 ){
-				    	if( null!=list[0] ){
-				        	var object = list[0].data;
-				        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
-				    	}
-				    } else if(roomTmp){
-				    	setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
-				    }
+				getDBMsg(giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp );
+				// g_idb_chat_msgs.limit(function(list){
+				//     if( list.length>0 ){
+				//     	if( null!=list[0] ){
+				//         	var object = list[0].data;
+				//         	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
+				//     	}
+				//     } else {
+				//     	cns.debug( "[setLastMsg] no list 1", giTmp, ciTmp );
+				//     }
+				//     // if(roomTmp){
+				//     // 	setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
+				//     // }
 
-				},{
-				    index: "gi_ci_ct",
-				    keyRange: g_idb_chat_msgs.makeKeyRange({
-				        upper: [giTmp, ciTmp, new Date().getTime()],
-				        lower: [giTmp, ciTmp]
-				        // only:18
-				    }),
-				    limit: 1,
-				    order: "DESC",
-				    onEnd: function(result){
-				        cns.debug("setLastMsg end:",result.ci + " " + result.ct);
-				    },
-				    onError: function(result){
-				        cns.debug("[!] setLastMsg error:",result);
-				    }
-				});
+				// },{
+				//     index: "gi_ci_ct",
+				//     keyRange: g_idb_chat_msgs.makeKeyRange({
+				//         upper: [giTmp, ciTmp, new Date().getTime()],
+				//         lower: [giTmp, ciTmp]
+				//         // only:18
+				//     }),
+				//     limit: 1,
+				//     order: "DESC",
+				//     onEnd: function(result){
+				//         cns.debug("setLastMsg end:",result.ci + " " + result.ct);
+				//     },
+				//     onError: function(result){
+				//         cns.debug("[!] setLastMsg error:",result);
+				//     }
+				// });
 			});
 		} else{
-			g_idb_chat_msgs.limit(function(list){
-				try{
-					if( groupTmp.gi != giTmp ){
-						cns.debug("incoming chat msg is not currentGroup");
-					}
-					var roomTmp = groupTmp.chatAll[ciTmp];
-				    if( list.length>0 ){
-				    	if( null!=list[0] ){
-				        	var object = list[0].data;
-				        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
-				    	}
-				    } else if(roomTmp){
-						setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
-					}
-				} catch(e){
-					errorReport(e);
-				}
-			},{
-			    index: "gi_ci_ct",
-			    keyRange: g_idb_chat_msgs.makeKeyRange({
-			        upper: [giTmp, ciTmp, new Date().getTime()],
-			        lower: [giTmp, ciTmp]
-			        // only:18
-			    }),
-			    limit: 1,
-			    order: "DESC",
-			    onEnd: function(result){
-			        cns.debug("setLastMsg end:",result.ci + " " + result.ct);
-			    },
-			    onError: function(result){
-			        cns.debug("[!] setLastMsg error:",result);
-			    }
-			});
+			getDBMsg(giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp );
+			// g_idb_chat_msgs.limit(function(list){
+			// 	try{
+			// 		if( groupTmp.gi != giTmp ){
+			// 			cns.debug("incoming chat msg is not currentGroup");
+			// 		}
+			// 		// var roomTmp = groupTmp.chatAll[ciTmp];
+			// 	    if( list.length>0 ){
+			// 	    	if( null!=list[0] ){
+			// 	        	var object = list[0].data;
+			// 	        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
+			// 	    	}
+			// 	    } else {
+			// 	    	cns.debug( "[setLastMsg] no list 2", giTmp, ciTmp );
+			// 	    }
+			// 	 //    else if(roomTmp){
+			// 		// 	setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
+			// 		// }
+			// 	} catch(e){
+			// 		errorReport(e);
+			// 	}
+			// },{
+			//     index: "gi_ci_ct",
+			//     keyRange: g_idb_chat_msgs.makeKeyRange({
+			//         upper: [giTmp, ciTmp, new Date().getTime()],
+			//         lower: [giTmp, ciTmp]
+			//         // only:18
+			//     }),
+			//     limit: 1,
+			//     order: "DESC",
+			//     onEnd: function(result){
+			//         cns.debug("setLastMsg end:",result.ci + " " + result.ct);
+			//     },
+			//     onError: function(result){
+			//         cns.debug("[!] setLastMsg error:",result);
+			//     }
+			// });
 		}
 	} catch(e){
 		errorReport(e);
+	}
+}
 
-		
+function getDBMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
+	var userData = $.lStorage(ui);
+	var groupData = userData[giTmp];
+	var index, key;
+	if( eiTmp ){
+		g_idb_chat_msgs.get(eiTmp, function(dataTmp){
+			var object = dataTmp.data;
+			try{
+				if( groupData.gi != giTmp ){
+					cns.debug("incoming chat msg is not currentGroup");
+				}
+				setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
+			    
+			} catch(e){
+				errorReport(e);
+			}
+		});
+	} else {
+		index = "gi_ci_ct";
+		key = new Date().getTime();
+
+		g_idb_chat_msgs.limit(function(list){
+			try{
+				if( groupData.gi != giTmp ){
+					cns.debug("incoming chat msg is not currentGroup");
+				}
+				// var roomTmp = groupData.chatAll[ciTmp];
+			    if( list.length>0 ){
+			    	if( null!=list[0] ){
+			        	var object = list[0].data;
+			        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
+			    	}
+			    } else {
+			    	cns.debug( "[setLastMsg] no list 2", giTmp, ciTmp );
+			    }
+			 //    else if(roomTmp){
+				// 	setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
+				// }
+			} catch(e){
+				errorReport(e);
+			}
+		},{
+		    index: index,
+		    keyRange: g_idb_chat_msgs.makeKeyRange({
+		        upper: [giTmp, ciTmp, key],
+		        lower: [giTmp, ciTmp]
+		        // only:18
+		    }),
+		    limit: 1,
+		    order: "DESC",
+		    onEnd: function(result){
+		        cns.debug("setLastMsg end:",result.ci + " " + result.ct);
+		    },
+		    onError: function(result){
+		        cns.debug("[!] setLastMsg error:",result);
+		    }
+		});
 	}
 }
 
 function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen ){
-	if( null==data || ""==data ) return;
-
-	var userData = $.lStorage(ui);
-	var groupData = userData[giTmp];
-	if( null==groupData || null==groupData.chatAll ) return;
-	if( !groupData.chatAll.hasOwnProperty(ciTmp) ) return;
-	var room = groupData.chatAll[ciTmp];
-	if( null==room ){
-		cns.debug("null room, ci:", ciTmp);
+	if( null==data || ""==data ){
+		cns.debug("[setLastMsgContent] null data");
 		return;
 	}
 
-	if( !groupData.guAll.hasOwnProperty(data.meta.gu) ){
+	var userData = $.lStorage(ui);
+	var groupData = userData[giTmp];
+	if( null==groupData ){
+		cns.debug("[setLastMsgContent] no groupData");
+		return;
+	}
+	var cnt;
+	if( groupData.chatAll && groupData.chatAll.hasOwnProperty(ciTmp) ){
+		var room = groupData.chatAll[ciTmp];
+		cnt = room.unreadCnt||0;
+		// return;
+	}
+	// if( null==room ){
+	// 	cns.debug("null room, ci:", ciTmp);
+	// 	return;
+	// }
+
+	if( !groupData.guAll||!groupData.guAll.hasOwnProperty(data.meta.gu) ){
 		setGroupAllUser( null, giTmp, function(){
-			updateChatList( giTmp, function(){
+			// updateChatList( giTmp, function(){
 
 	            userData = $.lStorage(ui);
 				groupData = userData[giTmp];
 				if( null==groupData || null==groupData.chatAll ) return;
 				if( !groupData.chatAll.hasOwnProperty(ciTmp) ) return;
-				room = groupData.chatAll[ciTmp];
-				if( null==room ){
-					cns.debug("null room, ci:", ciTmp);
-					return;
-				}
-				setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
-			});
+				// room = groupData.chatAll[ciTmp];
+				// if( null==room ){
+				// 	cns.debug("null room, ci:", ciTmp);
+				// 	return;
+				// }
+				setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, cnt);
+			// });
 		});
 
 	} else {
-		setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room);
+		setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, cnt);
 	}
 }
 
-function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, room ){
-	var unreadCnt = room.unreadCnt;
+function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, unreadCnt ){
 	var text = "";
 	var mem = groupData.guAll[data.meta.gu];
-	if( null==mem ) return;
+	if( null==mem ){
+		cns.debug("[setLastMsgContentPart2] mem null");
+		return;
+	}
 	var name = mem.nk;
-	if( null==data.ml || data.ml.length<=0 ) return;
+	if( null==data.ml || data.ml.length<=0 ){
+		cns.debug("[setLastMsgContentPart2] data.ml null");
+		return;
+	}
 	var isMe = (data.meta.gu==groupData.gu);
+	if( isMe ){
+		name = $.i18n.getString("COMMON_YOU");
+	}
 
 	switch( data.ml[0].tp ){
 		case 5: //sticker
@@ -520,11 +604,10 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		sortRoomList();
 	}
 	
-	if( groupData.gu!=mem.gu && isShowAlert ){
+	if( !isMe && isShowAlert ){
 		try{
-			if( null==room.cn ) room.cn = "";
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
-			var cnTmp = parseRoomName(groupData, room);
+			var cnTmp = data.cn||"";
 			if( data.meta.ct>=login_time ){
 				riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
 					cns.debug(ciTmp);

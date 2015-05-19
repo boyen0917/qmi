@@ -6503,6 +6503,7 @@ $(function(){
 
         	}else if(data.status == 401){
                 //錯誤處理
+                localStorage.removeItem("_loginData");
                 popupShowAdjust("",$.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);
                 clearInterval(pc);
                 return false;
@@ -6652,9 +6653,12 @@ $(function(){
             if(pollingDataTmp){
                 currentPollingCt = pollingDataTmp.ts.pt;
             }
-            if( currentPollingCt>=login_time ){
+            var isShowNotification = true;
+            //登入5分鐘前的polling可show
+            if( (currentPollingCt+300000)>=login_time ){
                 // cns.debug("----- show notification ----");
             } else {
+                isShowNotification = false;
                 cns.debug("(notification muted, login_time-currentPollingCt=", (login_time-currentPollingCt), " )" );
             }
                 // cns.debug( new Date(currentPollingCt).toString() );
@@ -6680,7 +6684,7 @@ $(function(){
                             $(".hg-invite").trigger("click");
                         }
                         try{
-                            if( currentPollingCt>=login_time ){
+                            if( isShowNotification ){
                                 riseNotification (null, g_Qmi_title, $.i18n.getString("GROUP_RECEIVE_INVITATION"), function(){
                                     $(".hg-invite").trigger("click");
                                 });
@@ -6694,7 +6698,7 @@ $(function(){
                         cns.debug(gi, val.pm.gi);
                         val.pm.onGetMemData = function(this_gi, memData){
                             try{
-                                if( currentPollingCt>=login_time ){
+                                if( isShowNotification ){
                                     var title = memData.gn || g_Qmi_title;
                                     // var title = g_Qmi_title;
                                     // var userDataTmp = $.lStorage(ui);
@@ -6730,7 +6734,7 @@ $(function(){
                     case 6://delete user info
                         val.pm.onGetMemData = function(this_gi, memData){
                             try{
-                                if( currentPollingCt>=login_time ){
+                                if( isShowNotification ){
                                     var title = memData.gn || g_Qmi_title;
                                     // var title = g_Qmi_title;
                                     // var userDataTmp = $.lStorage(ui);
@@ -6844,7 +6848,7 @@ $(function(){
 
 		//更新聊天內容
 		if(msgs && msgs.length>0){
-    		updateChat(msgs);
+    		updateChatDB(msgs);
     	}
 
     	//更新聊天已讀未讀時間

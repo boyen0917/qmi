@@ -25,13 +25,16 @@ function initChatDB( onReady ){
 	    });
 	}
 }
-function updateChat ( msgs ){
+function updateChatDB ( msgs ){
+  console.debug("-----------------------");
 	//indexed from old to new (api chat is from new to old)
-	$.each( msgs, function(msgIndex, data){
+	for( var j = 0; j<msgs.length; j++){
+		var data = msgs[j];
 
 		// var data = msgs[msgIndex];
 		for( var i=0; i<data.el.length; i++){
 			var object = data.el[i];
+			object.cn = data.cn;
 			if(object.hasOwnProperty("meta")){
 
 				//add to db
@@ -43,49 +46,58 @@ function updateChat ( msgs ){
 				    data: object
 				};
 				//write msg to db
-				g_idb_chat_msgs.put( node );
+				var tmp = g_idb_chat_msgs.put( node, function(ei){
+					onSucc(msgs, ei, object);
+				});
+				// tmp.onabort = onSucc;
+				// tmp.onerror = onSucc;
+				// tmp.oncomplete = onSucc;
+				// tmp.onsuccess = onSucc;
+
+				cns.debug("[updateChatDB]",data.gi,data.ci,object.ei,object.ml[0].c);
 			}
 		}
-
-		setTimeout( function(){
-			var isRoomOpen = false;
-			/* 更新聊天室訊息 */
-			// showMsg( object, false );
-			if( null != windowList ){
-				if( windowList.hasOwnProperty(data.ci) 
-					&& null != windowList[data.ci] 
-					&& false==windowList[data.ci].closed ){
-					isRoomOpen = true;
-					windowList[data.ci].g_msgTmp = data.el;
-					$(windowList[data.ci].document).find("button.pollingMsg").trigger("click");
-				} else {
-					cns.debug("room ", data.ci, " not opened");
-				}
-			}
-
-			//add unread cnt
-			// if( !isRoomOpen ){
-			// 	var unreadCnt = data.el.length;
-			// 	try{
-			// 		var userData = $.lStorage(ui);
-			// 		g_group = userData[data.gi];
-			// 		g_room = g_group["chatAll"][data.ci];
-			// 		unreadCnt = ( (g_room.unreadCnt)?g_room.unreadCnt:0 )+unreadCnt;
-			// 		g_room.unreadCnt = unreadCnt;
-			// 		$.lStorage(ui, userData);
-			// 	} catch(e){
-			// 		errorReport(e);
-			// 	}
-			// }
-
-			/* 更新聊天室列表最後訊息 */
-			if( typeof( updateLastMsg ) != 'undefined' ){
-				updateLastMsg( data.gi, data.ci, isRoomOpen );
-			}
-
-		}, 300 );
-	});
+	}
 }	//end of updateChat
+
+function onSucc(msgs, eiTmp, object){
+	var object;
+	for( var j = 0; j<msgs.length; j++){
+		var data = msgs[j];
+		for( var i=0; i<data.el.length; i++){
+			object = data.el[i];
+			if(object.ei==eiTmp){
+				break;
+			}
+		}
+	}
+	if(!object){
+		cns.debug("ei no match", ei);
+		return;
+	}
+	var giTmp = data.gi;
+	var ciTmp = data.ci;
+	cns.debug(object.ei);
+	var isRoomOpen = false;
+	/* 更新聊天室訊息 */
+	// showMsg( object, false );
+	if( null != windowList ){
+		if( windowList.hasOwnProperty(giTmp) 
+			&& null != windowList[giTmp] 
+			&& false==windowList[giTmp].closed ){
+			isRoomOpen = true;
+			windowList[ciTmp].g_msgTmp = data.el;
+			$(windowList[ciTmp].document).find("button.pollingMsg").attr("data-ei",object.ei).trigger("click");
+		} else {
+			cns.debug("room ", ciTmp, " not opened");
+		}
+	}
+
+	/* 更新聊天室列表最後訊息 */
+	if( typeof( updateLastMsg ) != 'undefined' ){
+		updateLastMsg( giTmp, ciTmp, isRoomOpen, object.ei );
+	}
+}
 
 /*
               ███╗   ███╗███████╗ ██████╗      ██████╗ ██████╗ ██╗   ██╗███╗   ██╗████████╗          
