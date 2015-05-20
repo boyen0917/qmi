@@ -2123,6 +2123,9 @@ $(function(){
 		          	break;
 		        case "check":
 		        	ctp = 5;
+                    show_area = ".cp-content-title,.cp-content-object, .cp-content-object ,.cp-content-addcal,.cp-time-area";  //.cp-content-first,
+
+                    init_datetimepicker = true;
 		          	break;
 		    }
 
@@ -4152,6 +4155,19 @@ $(function(){
 				break;
 			//任務 定點回報
 			case 5:
+                body.meta.tt = this_compose.data("compose-title");
+                var ml_obj = {
+                    b : this_compose.data("start-timestamp"),
+                    e : this_compose.data("end-timestamp"),
+                    li: lang,
+                    lng: 0,
+                    lat: 0,
+                    r: 0,
+                    b: 1432108135000,
+                    e: 1432194535000,
+                    tp: 17
+                }
+                body.ml.push(ml_obj);
 				break;
 		}
 
@@ -5510,6 +5526,9 @@ $(function(){
 				case 14:
 					end_time_chk = true;
 					break;
+                case 17:
+                    end_time_chk = true;
+                    break;
                 case 27:
                     if( false==isApplyWatermark && 1==val.wm ){
                         try{

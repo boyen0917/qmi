@@ -1082,7 +1082,7 @@ $(function(){
 	//貼文選單
 	$(document).on("click",".fc-area-subbox:not(.disabled)", function(){
 		//定點回報暫時不做
-		if($(this).hasClass("fc-check")) return false;
+		// if($(this).hasClass("fc-check")) return false;
 
 	    var title = $(this).find("div").html();
 
