@@ -94,7 +94,17 @@ function updateChatList( giTmp, extraCallBack ){
 					//update chat list
 					var tmp = {};
 					var isCheckOri = ( currentGroup.hasOwnProperty("chatAll") );
+					var list = [];
 					$.each(epl.cl,function(key,newRoom){
+						if( newRoom.cm && "object"==typeof(newRoom.cm) ){
+							list.push({
+								gi: giTmp,
+								ci: key,
+								ei: newRoom.cm.ei,
+							    ct: newRoom.cm.meta.ct,
+							    data: newRoom.cm
+							});
+						}
 						if( isCheckOri ){
 							if( currentGroup["chatAll"].hasOwnProperty(newRoom.ci) ){
 								var oriRoom = currentGroup["chatAll"][newRoom.ci];
@@ -139,7 +149,23 @@ function updateChatList( giTmp, extraCallBack ){
 
 					// cns.debug( JSON.stringify(userData) );
 			    	$.lStorage(ui, userData);
-			    	if( gi==giTmp ) showChatList();
+			    	if( gi==giTmp ){
+			    		showChatList();
+			    	}
+
+			    	if(list.length>0){
+				    	var cnt=0;
+				    	for( var i=0; i<list.length; i++ ){
+							g_idb_chat_msgs.put( list[i], function(){
+								cnt++;
+								if( cnt>=list.length ){
+									if( gi==giTmp ){
+										showChatList();
+									}
+								}
+							});
+				    	}
+				    }
 			    }
 			} catch (e){
 				errorReport(e);
