@@ -1510,8 +1510,19 @@ $(function(){
 		});
 
 	});
+	$(document).on("click",".user-info-load-area",function(e){
+		var target = event.target || event.srcElement;
+		cns.debug(target);
+		target = $(target);
+		if( target.hasClass("user") ){
+			var tmp = target.parent();
+			if( tmp.length>0 && tmp[0]==this ){
+				$(".user-info-close").trigger("mouseup");
+			}
+		}
+	});
 
-	$(document).on("mouseup",".user-info-back",function(){
+	$(document).on("mouseup",".user-info-back",function(e){
 		// $(".me-info-load user-avatar > ")
 		$(".user-info-load-area").addClass("user-info-flip");
         $(".user-info-load-area .me").removeClass("adjust");
@@ -1533,7 +1544,8 @@ $(function(){
 			},400);
         },100);
 
-			
+		e.stopPropagation();
+		e.preventDefault();
 	});
 
 	//----------------------------------- chatroom ---------------------------------------------

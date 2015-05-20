@@ -6700,14 +6700,6 @@ $(function(){
                             try{
                                 if( isShowNotification ){
                                     var title = memData.gn || g_Qmi_title;
-                                    // var title = g_Qmi_title;
-                                    // var userDataTmp = $.lStorage(ui);
-                                    // if( userDataTmp && userDataTmp.hasOwnProperty(val.pm.gi) ){
-                                    //     var groupTmp = userDataTmp[val.pm.gi];
-                                    //     if( groupTmp && groupTmp.gn ){
-                                    //         title = groupTmp.gn;
-                                    //     }
-                                    // }
                                     riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
                                         if( gi==this_gi ){
                                             $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
@@ -6950,6 +6942,10 @@ $(function(){
                         }
                         newMemList[this_user_info.gi][this_user_info.gu] = new Date().getTime()+(86400000*3);
                         $.lStorage("_newMemList", newMemList);
+
+                        //----------- TODO ----------
+                        //  remove from inviting list
+                        //----------- TODO ----------
                     }
 
 	        		//存local storage
