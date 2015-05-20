@@ -550,6 +550,9 @@ $(document).ready(function () {
 	});
 	var niceScrollTmp = container.getNiceScroll()[0];
 	niceScrollTmp.onDragToTop = onDragContainer;
+
+	updateChat(null,true);
+	sendMsgRead(new Date().getTime())
 });
 
 /*
@@ -608,7 +611,7 @@ function onChatDBInit() {
 
 	scrollToBottom();
 
-	updateChat(g_room.lastCt, true);
+	// updateChat(g_room.lastCt, true);
 }
 
 //show history chat contents
@@ -1058,7 +1061,7 @@ function showMsg(object, bIsTmpSend) {
 
 	var time = new Date(object.meta.ct);
 	var container = $("<div class='chat-msg'></div>");
-	container.data("time", time);
+	container.data("time", object.meta.ct);
 	var szSearch = "#chat-contents ." + time.customFormat("_#YYYY#_#MM#_#DD#");
 	var div = $(szSearch);
 
@@ -1117,15 +1120,15 @@ function showMsg(object, bIsTmpSend) {
 	if (msgList.length > 0) {
 		var bIsAdd = false;
 		var i = 0;
-
+		var ctTmp = time.getTime();
 		for (; i < msgList.length; i++) {
-			if (time <= $(msgList[i]).data("time")) {
+			if (ctTmp <= $(msgList[i]).data("time")) {
 				//若已為開頭, 或上方時間小於this
-				if (i == 0 || time >= $(msgList[i - 1]).data("time")) {
+				if (i == 0 || ctTmp >= $(msgList[i-1]).data("time") ) {
 					$(msgList[i]).before(container);
 					bIsAdd = true;
 					break;
-				}
+				 }
 			}
 		}
 		if (!bIsAdd) {
@@ -1434,6 +1437,7 @@ function sendText(dom) {
 		ml: tmpData.ml
 	};
 
+	scrollToBottom();
 	op("groups/" + gi + "/chats/" + ci + "/messages",
 		"POST",
 		sendData,
@@ -1465,7 +1469,7 @@ function sendText(dom) {
 			showMsg(newData);
 
 			// if( g_isEndOfPage ) scrollToBottom();
-			scrollToBottom();
+			// scrollToBottom();
 
 			if (parent && false == parent.closed) {
 				var tmp = $(opener.document).find(".subpage-chatList .update");
@@ -1479,7 +1483,7 @@ function sendText(dom) {
 		function () {
 			dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
 			// if( g_isEndOfPage ) scrollToBottom();
-			scrollToBottom();
+			// scrollToBottom();
 		}
 	);
 }

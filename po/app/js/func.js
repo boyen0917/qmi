@@ -6845,7 +6845,7 @@ $(function(){
 
     	//更新聊天已讀未讀時間
     	if(ccs && ccs.length>0){
-			updateChatCnt(ccs);
+			updateChatCntDB(ccs);
     	}
     }
 

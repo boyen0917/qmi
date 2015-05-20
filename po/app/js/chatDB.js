@@ -31,6 +31,7 @@ function updateChatDB ( msgs ){
 	for( var j = 0; j<msgs.length; j++){
 		var data = msgs[j];
 
+		data.cnt = 0;
 		// var data = msgs[msgIndex];
 		for( var i=0; i<data.el.length; i++){
 			var object = data.el[i];
@@ -46,9 +47,11 @@ function updateChatDB ( msgs ){
 				    data: object
 				};
 				//write msg to db
-				var tmp = g_idb_chat_msgs.put( node, function(ei){
-					onSucc(msgs, ei, object);
-				});
+				// if( !g_idb_chat_msgs.get(object.ei) ){
+					var tmp = g_idb_chat_msgs.put( node, function(eiTmp){
+						onSucc(msgs, eiTmp, object);
+					});
+				// }
 				// tmp.onabort = onSucc;
 				// tmp.onerror = onSucc;
 				// tmp.oncomplete = onSucc;
@@ -67,6 +70,7 @@ function onSucc(msgs, eiTmp, object){
 		for( var i=0; i<data.el.length; i++){
 			object = data.el[i];
 			if(object.ei==eiTmp){
+				data.cnt++;
 				break;
 			}
 		}
@@ -82,12 +86,14 @@ function onSucc(msgs, eiTmp, object){
 	/* 更新聊天室訊息 */
 	// showMsg( object, false );
 	if( null != windowList ){
-		if( windowList.hasOwnProperty(giTmp) 
-			&& null != windowList[giTmp] 
-			&& false==windowList[giTmp].closed ){
+		if( windowList.hasOwnProperty(ciTmp) 
+			&& null != windowList[ciTmp] 
+			&& false==windowList[ciTmp].closed ){
 			isRoomOpen = true;
-			windowList[ciTmp].g_msgTmp = data.el;
-			$(windowList[ciTmp].document).find("button.pollingMsg").attr("data-ei",object.ei).trigger("click");
+			if( data.cnt>=data.el.length ){
+				windowList[ciTmp].g_msgTmp = data.el;
+				$(windowList[ciTmp].document).find("button.pollingMsg").trigger("click");
+			}
 		} else {
 			cns.debug("room ", ciTmp, " not opened");
 		}
@@ -128,7 +134,7 @@ function initChatCntDB ( onReady ){
 }
 
 /* save chat cnt into db */
-function updateChatCnt ( ccs ){
+function updateChatCntDB ( ccs ){
 	var storage = $.lStorage(ui);
 
 	//indexed from old to new (api chat is from new to old)
