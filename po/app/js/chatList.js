@@ -99,7 +99,7 @@ function updateChatList( giTmp, extraCallBack ){
 						if( newRoom.cm && "object"==typeof(newRoom.cm) ){
 							list.push({
 								gi: giTmp,
-								ci: key,
+								ci: newRoom.ci,
 								ei: newRoom.cm.ei,
 							    ct: newRoom.cm.meta.ct,
 							    data: newRoom.cm
