@@ -6619,8 +6619,14 @@ $(function(){
 	    		if(null!=val.A5){
                     var dom = $(".sm-group-area[data-gi=" + val.gi + "]").find(".sm-count");
                     if( val.A5 > 0 ){
-                        sort_arr.push([val.gi,val.A5]);
-    	    			dom.html(countsFormat(val.A5)).show();
+                        if(gi == val.gi){
+                            dom.hide();
+                            updatePollingCnts(dom,"A5");
+                        } else{
+                            sort_arr.push([val.gi,val.A5]);
+                            dom.html(countsFormat(val.A5));
+                            dom.show();
+                        }
                     } else {
                         dom.hide();
                     }
@@ -6910,7 +6916,7 @@ $(function(){
         var method = "put";
         ajaxDo(api_name,headers,method,false,body).complete(function(data){
         	if(data.status == 200){
-        		this_count.hide();
+        		// this_count.hide();
         	}
         });
     }

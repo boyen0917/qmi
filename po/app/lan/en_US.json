@@ -3,7 +3,7 @@
 	"LANDING_PAGE_REGISTER" :	"Sign Up",
 	"LANDING_PAGE_UPDATE" : "Updating version..",
 	"LANDING_PAGE_UPDATE_CONTAINER_TITLE" : "Update container version",
-	"LANDING_PAGE_UPDATE_CONTAINER_DESCRIPTION" : "Please click OK to download latest version.",
+	"LANDING_PAGE_UPDATE_CONTAINER_DESCRIPTION" : "Please click OK to close program and download latest version.",
 	"LANDING_PAGE_UPDATE_CONTAINER_LOCK" : "Please click to download latest version.",
 	
 	"LOGIN_ACCOUNT" :	"Phone Number or Email",

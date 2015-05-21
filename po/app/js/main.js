@@ -418,6 +418,9 @@ $(function(){
 
 		//指定gi
 		timelineChangeGroup(this_gi);
+
+		//updatePollingCnts
+		updatePollingCnts(this_group.find(".sm-count"),this_group.data("polling-cnt"));
 			
 		//切換團體時, 選目前第一個選項
 		var tmp = $(".sm-small-area:visible");
@@ -1514,7 +1517,7 @@ $(function(){
 		var target = event.target || event.srcElement;
 		cns.debug(target);
 		target = $(target);
-		if( target.hasClass("user") ){
+		if( target.hasClass("user") || target.hasClass("rotate.adjust") ){
 			var tmp = target.parent();
 			if( tmp.length>0 && tmp[0]==this ){
 				$(".user-info-close").trigger("mouseup");
@@ -1644,7 +1647,7 @@ $(function(){
 		}
 		thisDom.find(".sm-count").hide();
 		if(thisDom.data("gi") == gi) {
-			$(".sm-small-area[data-polling-cnt=A1]").find(".sm-count").hide();
+			$(".sm-small-area[data-polling-cnt=A1]").find(".sm-count");
 		}
 		//local 歸零 因為
 		var _pollingData = $.lStorage("_pollingData");
