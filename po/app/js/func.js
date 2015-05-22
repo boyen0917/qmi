@@ -5602,6 +5602,8 @@ $(function(){
             );
             this_event.find(".st-attach-video").prepend(this_video);
             getS3file(val,this_video,7);
+            //影片只能有一個, 做完收工
+            return false;
         });
     }
 
