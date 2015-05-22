@@ -6321,8 +6321,8 @@ $(function(){
                 var file = this_event.find(".st-reply-message-img").data("file");
                 if( file ){
 
-                    var ori_arr = [1280,1280,0.9];
-                    var tmb_arr = [160,160,0.4];
+                    var ori_arr = [1280,1280,0.7];
+                    var tmb_arr = [480,480,0.6];
                     //上傳類型
                     var imageType = /image.*/;
 

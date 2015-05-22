@@ -1510,7 +1510,7 @@ function sendImage(dom) {
 	// if( ""!=tmpData.ml[0].c ){
 	// 	sendText(dom);
 	// } else {
-	var ori_arr = [1280, 1280, 0.9];
+	var ori_arr = [1280, 1280, 0.7];
 	var tmb_arr = [160, 160, 0.4];
 
 	dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
