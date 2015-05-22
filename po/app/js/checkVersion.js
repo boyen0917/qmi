@@ -1,6 +1,6 @@
 /* depend: init.js, tool.js */
 $(function(){
-	g_currentVersion = "0.2.1";
+	g_currentContainerVersion = "0.2.1";
 	// g_downloadPath = "http://webdev.cloud.mitake.com.tw/qmipc/download.html";
 
 
@@ -8,22 +8,22 @@ $(function(){
     	try{
     		if( typeof(getWebCntrVersion)!= "undefined" ){
 	    		var versionObj = getWebCntrVersion();
-	    		g_currentVersion = versionObj.APP_VERSION;
+	    		g_currentContainerVersion = versionObj.APP_VERSION;
 	    		cns.debug( getComputerName() );
 	    	} else {
-	    		g_currentVersion = require('nw.gui').App.manifest.version;
+	    		g_currentContainerVersion = require('nw.gui').App.manifest.version;
 	    	}
 
-			if( null==g_currentVersion ){
-				g_currentVersion = "0.0.0";
+			if( null==g_currentContainerVersion ){
+				g_currentContainerVersion = "0.0.0";
 			}
-			$("#container_version span.container").html(g_currentVersion);
+			$("#container_version span.container").html(g_currentContainerVersion);
 
 	  //   	var api_name = "/sys/version";
 	  //   	var headers = {
 	  //   		os: 2,
 			// 	tp: 1,
-			// 	av: g_currentVersion,
+			// 	av: g_currentContainerVersion,
 			// 	li: lang
 			// };
 			// var method = "get";
@@ -34,8 +34,8 @@ $(function(){
 
 		 			var getS3_result = {av:"0.6.5"};
 
-		 			cns.debug( "old:", g_currentVersion, "new:", getS3_result.av );
-			    	if( versionCompare(g_currentVersion, getS3_result.av)>0 ){
+		 			cns.debug( "old:", g_currentContainerVersion, "new:", getS3_result.av );
+			    	if( versionCompare(g_currentContainerVersion, getS3_result.av)>0 ){
 			    		console.debug("need update container ver");
 			    		// $(".version_update_lock").fadeIn();
 			    		onDone(true);
@@ -45,7 +45,7 @@ $(function(){
 			    			$.i18n.getString("COMMON_OK"),null,[onClickDownload]);
 			    	} else {
 			    		onDone(false);
-			    		console.debug("latest ver", g_currentVersion);
+			    		console.debug("latest container ver", g_currentContainerVersion);
 			    	}
 		    // 	}
 		    // });
@@ -108,7 +108,7 @@ $(function(){
 	    	try{
 			    var versionData = $.lStorage("_ver");
 			    if( null==versionData || null==versionData.ver ){
-			    	g_currentVersion = "0.0.0";
+			    	
 			    } else {
 			    	g_currentVersion = versionData.ver;
 			    }
@@ -140,7 +140,7 @@ $(function(){
 				    		}, 1000 );
 				    	} else {
 				    		onDone(false);
-				    		console.debug("latest ver", g_currentVersion);
+				    		console.debug("latest ver", g_currentVersion, getS3_result.av);
 				    	}
 		        	} else {
 						console.debug("fail to get version");
