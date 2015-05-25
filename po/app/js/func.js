@@ -6361,6 +6361,16 @@ $(function(){
                         var pi = "0";
                         uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
                             try{
+                                //if fail uploading
+                                if(!data){
+                                    toastShow( $.i18n.getString("COMMON_UPLOAD_FAIL") );
+                                    //loading icon off
+                                    s_load_show = false;
+                                    $('.ui-loader').hide();
+                                    //set sending flag false
+                                    this_event.find(".st-reply-message-send").data("reply-chk",false);
+                                    return;
+                                }
                                 body.ml.push({
                                     "c": data.fi,
                                     "p": pi,
