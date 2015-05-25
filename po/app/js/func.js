@@ -6980,9 +6980,6 @@ $(function(){
                         newMemList[this_user_info.gi][this_user_info.gu] = new Date().getTime()+(86400000*3);
                         $.lStorage("_newMemList", newMemList);
 
-                        //----------- TODO ----------
-                        //  remove from inviting list
-                        //----------- TODO ----------
                     }
 
 	        		//存local storage
@@ -7006,6 +7003,24 @@ $(function(){
                             cns.debug("[!!!] getUserInfo: no guAll");
                             var data_arr = ["userInfo",user_data];
                             setGroupAllUser(data_arr,this_user_info.gi);
+                        }
+
+                        // remove from inviting list
+                        if( this_user_info.isNewMem ){
+                            var invitingList = _groupList[this_user_info.gi].inviteGuAll;
+                            if( invitingList ){
+                                $.each(inviteGuAll, function(guTmp, mem){
+                                    if( guTmp == this_user_info.gu ){
+                                        delete inviteGuAll[this_user_info.gu];
+                                        $.lStorage(ui, _groupList);
+                                        //redraw #page-contact-addmem .ca-content-area
+                                        if( typeof(updateInvitePending)=="function" ){
+                                            updateInvitePending();
+                                        }
+                                        return false;
+                                    }
+                                });
+                            }
                         }
 
                         user_data.gn = _groupList[this_user_info.gi].gn || "";
