@@ -1,6 +1,7 @@
 /* depend: init.js, tool.js */
 $(function(){
 	g_currentContainerVersion = "0.2.1";
+	g_currentVersion = "0.0.0";
 	// g_downloadPath = "http://webdev.cloud.mitake.com.tw/qmipc/download.html";
 
 
