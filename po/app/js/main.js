@@ -651,7 +651,7 @@ $(function(){
 	$(document).on("click",".img-show",function(e){
 		var this_img_area = $(this);
 
-		var this_s32 = this_img_area.find(".auo").attr("src");
+		var this_s32 = this_img_area.find(".auo").data("src");
 
         showGallery( null, null, [{s32:this_s32}] );
 		// var gallery_str = '<li data-thumb="' + this_s32 + '"><img src="' + this_s32 + '" /></li>';

@@ -5731,7 +5731,8 @@ $(function(){
 						//小圖
 						target.find("img.aut").attr("src",obj.s3);
 						//大圖
-						target.find("img.auo").attr("src",obj.s32).hide();
+						//target.find("img.auo").attr("src",obj.s32).hide();
+                        target.find("img.auo").data("src",obj.s32).hide();
 						break;
                     case 7://影片
                         target.attr("src",obj.s32).show();
@@ -5770,7 +5771,8 @@ $(function(){
                 switch(tp){
                     case 6://圖片
                         //小圖
-                        target.css("background-image","url("+obj.s32+")");
+                        target.attr("s3bg",obj.s32);
+                        target.css("background-image","url('"+obj.s32+"')");
                         //大圖
                         target.data("auo",obj.s32);
                         break;
