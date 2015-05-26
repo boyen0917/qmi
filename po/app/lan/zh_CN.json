@@ -159,6 +159,9 @@
 	"INVITE_FAIL" : "送出邀请失败",
 	"INVITE_ALREADY_IN_GROUP" : "此成员已在群组里",
 	"QRCODE_TITLE" : "QR Code",
+	"QRCODE_JOIN_ENABLED" : "开放QR Code加入团体",
+	"QRCODE_UPDATE" : "更新QR Code",
+	"QRCODE_UPDATE_ALERT" : "请问确定要更新二维码吗？更新后，现有的二维码将会失效。",
 
 	"COMMON_SELECT_MEMBERS"  				: "选择对象",
 	"COMMON_NEXT"  					: "下一步",
@@ -196,6 +199,7 @@
 	"COMMON_DOWNLOAD" : "下载",
 	"COMMON_FREE" : "免费",
 	"COMMON_NOT_MP4" : "档案格式必须为MP4",
+	"COMMON_ACT_TOO_FREQUENT" : "操作过于频繁",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "传送",

@@ -160,6 +160,9 @@
 	"INVITE_FAIL" : "Send invitation failed.",
 	"INVITE_ALREADY_IN_GROUP" : "This member is already in group.",
 	"QRCODE_TITLE" : "QR Code",
+	"QRCODE_JOIN_ENABLED" : "Enable join group by scaning QR Code",
+	"QRCODE_UPDATE" : "Update QR Code",
+	"QRCODE_UPDATE_ALERT" : "Are you sure you want to generate a new QR Code? Your existing QR Code will no longer be valid.",
 
 	"COMMON_SELECT_MEMBERS"  				: "Select members",
 	"COMMON_NEXT"  					: "Next",
@@ -197,6 +200,7 @@
 	"COMMON_DOWNLOAD" : "Download",
 	"COMMON_FREE" : "Free",
 	"COMMON_NOT_MP4" : "File must be MP4.",
+	"COMMON_ACT_TOO_FREQUENT" : "Too frequent activity.",
 	
 	"CHAT_TITLE"							: "Chat",
 	"CHAT_SEND"  						: "Send",

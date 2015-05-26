@@ -1515,6 +1515,7 @@ function showAddMemberPage(){
 	$("#page-contact-addmem .ca-list-area .cal-coachmake").show();
 	$("#page-contact-addmem .ca-list-area .cal-div-area").hide();
 
+	initQRCodePage();
 	$("#page-contact-addmem .ca-tab").off("click").click( function(){
 		$(this).parent().find(".ca-tab.active").removeClass("active");
 		$(this).addClass("active");
@@ -1522,6 +1523,40 @@ function showAddMemberPage(){
 		$("#page-contact-addmem .ca-sub-area.active").removeClass("active");
 		$("#page-contact-addmem ."+type).addClass("active");
 	});
+	$("#page-contact-addmem .ca-qrcode-area .switch").off("click").click( function(){
+		var switchBtn = $(this);
+		var now = new Date().getTime();
+		if( switchBtn.data("enabledTime") && switchBtn.data("enabledTime")>now ){
+			toastShow( $.i18n.getString("COMMON_ACT_TOO_FREQUENT") );
+			return;
+		}
+		switchBtn.data("enabledTime",now+3000);
+		if( 0==switchBtn.attr("data-enabled") ){
+			updateQRCodeSetting(1); // QRcode Status(0：已啟用、1：已停用)
+		} else {
+			updateQRCodeSetting(0);
+		}
+	});
+	$("#page-contact-addmem .ca-qrcode-area .qr_btn[data-type='update']").off("click").click( function(){
+		var switchBtn = $(this);
+		var now = new Date().getTime();
+		if( switchBtn.data("enabledTime") && switchBtn.data("enabledTime")>now ){
+			toastShow( $.i18n.getString("COMMON_ACT_TOO_FREQUENT") );
+			return;
+		}
+		switchBtn.data("enabledTime",now+3000);
+		refreshQRCode();
+	});
+	// $("#page-contact-addmem .ca-qrcode-area .qr_btn[data-type='save']").off("click").click( function(){
+	// 	if( $(this).hasClass("disabled") ) return;
+	// 	var src = $(".qr_img_container img").attr("src");
+	// 	// if(!src || 0==src.length) return;
+	// 	// var aDom = $('<a href="'+src+'" download></a>');
+	// 	// $("body").append(aDom);
+	// 	// aDom.trigger("click");
+	// 	// aDom.remove();
+	// 	window.location.href = src;
+	// });
 
 	$("#page-contact-addmem .ca-nav-box").off("click").click( function(){
 		var this_btn = $(this);
@@ -1760,4 +1795,111 @@ function updateContactFavorite(){
 	// if( $(".subpage-contact").is(":visible") ){
     //     $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
 
+}
+function initQRCodePage(){
+	var page = $(".ca-qrcode-area");
+	var imgContainer = page.find(".qr_img_container");
+	imgContainer.find("img").hide();
+	var switchBtn = page.find(".switch");
+	var downloadBtn = page.find(".qr_btn[data-type=save]");
+	downloadBtn.addClass("disabled");
+	downloadBtn.removeAttr("href");
+	downloadBtn.removeAttr("download");
+
+	var api_name = "groups/" + gi + "/qrcode";
+	var headers = {
+		"ui":ui,
+		"at":at, 
+		"li":lang
+	};
+
+	ajaxDo(api_name,headers,"get",true).complete(function(data){
+		if(data.status == 200){
+			var rps = $.parseJSON(data.responseText);
+			if(!rps) return;
+			switchBtn.attr("data-enabled",rps.rps);
+			if(rps.qst==0){ //donno why 0 stands for enabled...
+				imgContainer.removeClass("disabled");
+				switchBtn.children("img").attr("src", "images/registration/checkbox_check.png");
+			} else {
+				imgContainer.addClass("disabled");
+				switchBtn.children("img").attr("src", "images/registration/checkbox_none.png");
+			}
+			imgContainer.find('img').attr('src', rps.qru).show();
+			downloadBtn.removeClass("disabled");
+			downloadBtn.attr("href", rps.qru );
+			var fileName = getQRCodeFileNameWithExtension( rps.qru );
+			downloadBtn.attr("download", fileName );
+		}
+	});
+}
+
+function refreshQRCode( callback ){
+	cns.debug("refreshQRCode");
+	var page = $(".ca-qrcode-area");
+	var imgContainer = page.find(".qr_img_container");
+	imgContainer.addClass("disabled");
+	imgContainer.find('img').hide();
+	var downloadBtn = page.find(".qr_btn[data-type=save]");
+	downloadBtn.addClass("disabled");
+	downloadBtn.removeAttr("href");
+	downloadBtn.removeAttr("download");
+	var api_name = "groups/" + gi +"/qrcode";
+	var headers = {
+		"ui":ui,
+		"at":at, 
+		"li":lang
+	};
+
+	ajaxDo(api_name,headers,"put",true).complete(function(data){
+		if(data.status == 200){
+			var rps = $.parseJSON(data.responseText);
+			if(!rps) return;
+			imgContainer.find('img').attr("src", rps.qru ).off("load").load(function(){
+				$(this).show();
+				imgContainer.removeClass("disabled");
+				downloadBtn.removeClass("disabled");
+			});
+			downloadBtn.attr("href", rps.qru );
+			var fileName = getQRCodeFileNameWithExtension( rps.qru );
+			downloadBtn.attr("download", fileName );
+			if(callback) callback(true);
+		} else {
+			imgContainer.find('img').show();
+			imgContainer.removeClass("disabled");
+			if(callback) callback(false);
+		}
+	});
+}
+
+function updateQRCodeSetting( switchVal, callback ){
+	var api_name = "groups/" + gi;
+	var headers = {
+		"ui":ui,
+		"at":at, 
+		"li":lang
+	};
+	var body = {
+		qst: switchVal
+	}
+
+	ajaxDo(api_name,headers,"put",true,body).complete(function(data){
+		if(data.status == 200){
+			var rps = $.parseJSON(data.responseText);
+			var page = $("#page-contact-addmem");
+			var switchBtn = page.find(".ca-qrcode-area .switch");
+			switchBtn.attr("data-enabled",rps.qst);
+			var imgContainer = page.find(".qr_img_container");
+			if(rps.qst==1){
+				imgContainer.addClass("disabled");
+				switchBtn.children("img").attr("src","images/registration/checkbox_none.png");
+			} else {
+				imgContainer.removeClass("disabled");
+				switchBtn.children("img").attr("src","images/registration/checkbox_check.png");
+			}
+			if(callback) callback(true);
+		} else {
+			if(callback) callback(false);
+		}
+	});
 }

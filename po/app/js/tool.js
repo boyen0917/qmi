@@ -1174,6 +1174,19 @@ $(function(){
     	return szFileName;
     }
 
+    getQRCodeFileNameWithExtension = function( addr ){
+    	//https://project-o.s3.hicloud.net.tw/qrcode/bfded2e0-4fa4-41de-bb8a-160a49b94037
+
+	    var szFileName = "qmi_qrcode.png";
+    	if( addr ){
+			var index = addr.lastIndexOf("/");
+			if( index>=0 ){
+				szFileName = addr.substring(index+1, addr.length) + ".png";
+			}
+		}
+    	return szFileName;
+    }
+
     renderVideoFile = function(file, videoTag, onload, onError){
 		var reader = new FileReader();
 		reader.onload = function(event){
