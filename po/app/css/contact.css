@@ -144,8 +144,8 @@
 	z-index: 2;
 }
 .contact-titleBar .nameArea{
-	margin-left: 30px;
-	width: -webkit-calc( 100% - 68px );
+	margin-left: 69px;
+	width: -webkit-calc( 100% - 150px );
 	display: inline-block;
 	text-align: center;
 }
@@ -169,35 +169,29 @@
 .contact-titleBar .arrow.open{
 	background-image: url("../images/icon/icon_arrow_black_top.png");
 }
-.contact-titleBar .btn{
+.contact-titleBar .btn,
+.contact-titleBar .btnExtra{
 	width: 30px;
 	height: 30px;
 	display: inline-block;
-	/*要放相反模式的圖！*/
-	background-image: url("../images/icon/icon_list_normal.png");
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: contain;
-	/* vertical-align: middle; */
 	cursor: pointer;
 	vertical-align: sub;
+	margin-top: 6px;
+	float: right;
+	margin-right: 6px;
+}
+.contact-titleBar .btn{
+	/*要放相反模式的圖！*/
+	background-image: url("../images/icon/icon_list_normal.png");
 }
 .contact-titleBar .btn.list{
 	background-image: url("../images/icon/icon_grid_normal.png");
 }
 .contact-titleBar .btnExtra{
-	width: 30px;
-	height: 30px;
-	display: inline-block;
-	float: right;
-	/*要放相反模式的圖！*/
 	background-image: url("../images/navi/navi_icon_chat_more_normal.png");
-	background-repeat: no-repeat;
-	background-position: center;
-	background-size: contain;
-	/* vertical-align: middle; */
-	margin-top: 6px;
-	cursor: pointer;
 }
 
 .contact-extra, .contact-createSubgroup{
