@@ -1516,47 +1516,6 @@ function showAddMemberPage(){
 	$("#page-contact-addmem .ca-list-area .cal-div-area").hide();
 
 	initQRCodePage();
-	$("#page-contact-addmem .ca-tab").off("click").click( function(){
-		$(this).parent().find(".ca-tab.active").removeClass("active");
-		$(this).addClass("active");
-		var type = $(this).attr("data-type");
-		$("#page-contact-addmem .ca-sub-area.active").removeClass("active");
-		$("#page-contact-addmem ."+type).addClass("active");
-	});
-	$("#page-contact-addmem .ca-qrcode-area .switch").off("click").click( function(){
-		var switchBtn = $(this);
-		var now = new Date().getTime();
-		if( switchBtn.data("enabledTime") && switchBtn.data("enabledTime")>now ){
-			toastShow( $.i18n.getString("COMMON_ACT_TOO_FREQUENT") );
-			return;
-		}
-		switchBtn.data("enabledTime",now+3000);
-		if( 0==switchBtn.attr("data-enabled") ){
-			updateQRCodeSetting(1); // QRcode Status(0：已啟用、1：已停用)
-		} else {
-			updateQRCodeSetting(0);
-		}
-	});
-	$("#page-contact-addmem .ca-qrcode-area .qr_btn[data-type='update']").off("click").click( function(){
-		var switchBtn = $(this);
-		var now = new Date().getTime();
-		if( switchBtn.data("enabledTime") && switchBtn.data("enabledTime")>now ){
-			toastShow( $.i18n.getString("COMMON_ACT_TOO_FREQUENT") );
-			return;
-		}
-		switchBtn.data("enabledTime",now+3000);
-		refreshQRCode();
-	});
-	// $("#page-contact-addmem .ca-qrcode-area .qr_btn[data-type='save']").off("click").click( function(){
-	// 	if( $(this).hasClass("disabled") ) return;
-	// 	var src = $(".qr_img_container img").attr("src");
-	// 	// if(!src || 0==src.length) return;
-	// 	// var aDom = $('<a href="'+src+'" download></a>');
-	// 	// $("body").append(aDom);
-	// 	// aDom.trigger("click");
-	// 	// aDom.remove();
-	// 	window.location.href = src;
-	// });
 
 	$("#page-contact-addmem .ca-nav-box").off("click").click( function(){
 		var this_btn = $(this);
@@ -1576,7 +1535,36 @@ function showAddMemberPage(){
 
 
 	//render invite pending member list
-	updateInvitePending();
+	// updateInvitePending();
+	var api_name = "groups/" + gi + "/users?tp=1";
+	var headers = {
+	         "ui":ui,
+	         "at":at, 
+	         "li":lang,
+	             };
+	var method = "get";
+	var result = ajaxDo(api_name,headers,method,false);
+	result.complete(function(data){
+		if(data.status != 200) return false;
+		var obj =$.parseJSON(data.responseText).ul;
+		inviteGuAll = {};
+		for( var i=0; i<obj.length; i++ ){
+			var mem = obj[i];
+			if( 0==mem.st ){
+				inviteGuAll[mem.gu] = mem;
+			}
+		}
+		var userData = $.lStorage(ui);
+		if( userData && gi ){
+			if( userData.hasOwnProperty(gi) ){
+				userData[gi].inviteGuAll = inviteGuAll;
+			}
+		}
+		$.lStorage(ui, userData);
+
+
+		updateInvitePending();
+	});
 }
 
 function updateInvitePending () {
@@ -1832,6 +1820,48 @@ function initQRCodePage(){
 			downloadBtn.attr("download", fileName );
 		}
 	});
+
+	$("#page-contact-addmem .ca-tab").off("click").click( function(){
+		$(this).parent().find(".ca-tab.active").removeClass("active");
+		$(this).addClass("active");
+		var type = $(this).attr("data-type");
+		$("#page-contact-addmem .ca-sub-area.active").removeClass("active");
+		$("#page-contact-addmem ."+type).addClass("active");
+	});
+	$("#page-contact-addmem .ca-qrcode-area .switch").off("click").click( function(){
+		var switchBtn = $(this);
+		var now = new Date().getTime();
+		if( switchBtn.data("enabledTime") && switchBtn.data("enabledTime")>now ){
+			toastShow( $.i18n.getString("COMMON_ACT_TOO_FREQUENT") );
+			return;
+		}
+		switchBtn.data("enabledTime",now+3000);
+		if( 0==switchBtn.attr("data-enabled") ){
+			updateQRCodeSetting(1); // QRcode Status(0：已啟用、1：已停用)
+		} else {
+			updateQRCodeSetting(0);
+		}
+	});
+	$("#page-contact-addmem .ca-qrcode-area .qr_btn[data-type='update']").off("click").click( function(){
+		var switchBtn = $(this);
+		var now = new Date().getTime();
+		if( switchBtn.data("enabledTime") && switchBtn.data("enabledTime")>now ){
+			toastShow( $.i18n.getString("COMMON_ACT_TOO_FREQUENT") );
+			return;
+		}
+		switchBtn.data("enabledTime",now+3000);
+		refreshQRCode();
+	});
+	// $("#page-contact-addmem .ca-qrcode-area .qr_btn[data-type='save']").off("click").click( function(){
+	// 	if( $(this).hasClass("disabled") ) return;
+	// 	var src = $(".qr_img_container img").attr("src");
+	// 	// if(!src || 0==src.length) return;
+	// 	// var aDom = $('<a href="'+src+'" download></a>');
+	// 	// $("body").append(aDom);
+	// 	// aDom.trigger("click");
+	// 	// aDom.remove();
+	// 	window.location.href = src;
+	// });
 }
 
 function refreshQRCode( callback ){
