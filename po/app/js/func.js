@@ -6957,6 +6957,17 @@ $(function(){
 		//每操作一組 就踢除 直到結束
 		if(user_info_arr.length > 0){
 			var this_user_info = user_info_arr.last();
+
+            //if no group data
+            var _groupList = $.lStorage(ui);
+            if( !_groupList.hasOwnProperty(this_user_info.gi) ){
+                cns.debug("[getUserInfo] no group data, getting..",this_user_info.gi);
+                getGroupCombo(this_user_info.gi, function(){
+                    getUserInfo(user_info_arr, update_chk, load_show_chk,onAllDone);
+                });
+                return;
+            }
+            
             if(this_user_info.isNewMem==null) this_user_info.isNewMem = false; 
             var api_name = "groups/" + this_user_info.gi + "/users/" + this_user_info.gu;
             

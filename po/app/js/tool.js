@@ -912,6 +912,11 @@ $(function(){
 	setGroupAttributes = function( this_gi, data ){
 		try{
 			var userData = $.lStorage(ui);
+			if( !userData.hasOwnProperty(this_gi) ){
+				userData[this_gi] = data;
+				$.lStorage(ui, userData);
+				return;
+			}
 			var group = userData[this_gi];
 
 			var updateKeys = ["auo","aut","cnt"];
