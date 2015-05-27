@@ -1287,6 +1287,13 @@ $(function(){
                 var this_load = $(this).find(".st-reply-content-area");
                 var this_content = this_load.find(".st-reply-content");
 
+                var targetTu = null;
+                if(el.meta){
+                    targetTu = {
+                        tu: el.meta.tu,
+                        pu: el.meta.gu
+                    };
+                }
                 $.each(el.ml,function(i,val){
                     //event種類 不同 讀取不同layout
                     switch(val.tp){
@@ -1302,13 +1309,13 @@ $(function(){
                             break;
                         case 6:
                             this_content.find(".au-area").show();
-                            getS3file(val,this_content,val.tp,280);
+                            getS3file(val,this_content,val.tp,280,targetTu);
                             break;
                         case 7://影片
-                            getS3file(val,this_content.find("video"),val.tp,280);
+                            getS3file(val,this_content.find("video"),val.tp,280,targetTu);
                             break;
                         case 8://聲音
-                            getS3file(val,this_content.find("audio"),val.tp,280);
+                            getS3file(val,this_content.find("audio"),val.tp,280,targetTu);
                             break;
                         case 9:
                             //without_message = true;
@@ -4233,7 +4240,7 @@ $(function(){
 		// 內容狀態 會有很多ml內容組成
 
         // 若有副件要上傳取得permission id
-        var isWaitingPermission = (this_compose.data("object_str") || this_compose.data("branch_str") );
+        var isWaitingPermission = false; //(this_compose.data("object_str") || this_compose.data("branch_str") );
         var sendingFileData = [];
 
 
@@ -5082,7 +5089,13 @@ $(function(){
             if(!detail) eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
 
             //timeline message內容
-            timelineContentMake(this_event,target_div,val.ml);
+            var tuTmp =null;
+            if( val.meta.tu ){
+                tuTmp = {};
+                tuTmp.tu =  val.meta.tu;
+                tuTmp.pu = val.meta.gu
+            }
+            timelineContentMake(this_event,target_div,val.ml,false,tuTmp);
         });
     }
 
@@ -5352,7 +5365,7 @@ $(function(){
 
 
 	
-	timelineContentMake = function (this_event,target_div,ml,is_detail){
+	timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 		
 		//需要記共有幾張圖片
 		var gallery_arr = [];
@@ -5570,7 +5583,7 @@ $(function(){
 		});
 
 		//若有圖片 則呼叫函式處理
-		if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr, isApplyWatermark, watermarkText);
+		if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr, isApplyWatermark, watermarkText, tu);
 		if(audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
         if(video_arr.length > 0) timelineVideoMake(this_event,video_arr);
 
@@ -5607,7 +5620,7 @@ $(function(){
         });
     }
 
-	timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermarkText){
+	timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermarkText, tu){
 		// cns.debug(this_event.data("event-id")+"  "+"gallery:",gallery_arr);
 		// cns.debug("gallery length:",gallery_arr.length);
 
@@ -5639,13 +5652,13 @@ $(function(){
                 }
 
                 if( isApplyWatermark ){
-                    getS3fileBackgroundWatermark(val,this_img, 6, watermarkText, function(data){
+                    getS3fileBackgroundWatermark(val,this_img, 6, watermarkText, tu, function(data){
                         gallery_arr[i].s3 = data.s3;
                         gallery_arr[i].s32 = data.s32;
                         // this_img.addClass("loaded");
                     });
                 } else {
-                    getS3fileBackground(val,this_img,6,function(data){
+                    getS3fileBackground(val,this_img,6,tu, function(data){
                         gallery_arr[i].s3 = data.s3;
                         gallery_arr[i].s32 = data.s32;
                         this_img.addClass("loaded");
@@ -5667,13 +5680,13 @@ $(function(){
                 }
 
                 if( isApplyWatermark ){
-                    getS3fileBackgroundWatermark(val,this_img, 6, watermarkText, function(data){
+                    getS3fileBackgroundWatermark(val,this_img, 6, watermarkText, tu, function(data){
                         gallery_arr[i].s3 = data.s3;
                         gallery_arr[i].s32 = data.s32;
                         // this_img.addClass("loaded");
                     });
                 } else {
-                    getS3fileBackground(val,this_img,6,function(data){
+                    getS3fileBackground(val,this_img,6,tu, function(data){
                         gallery_arr[i].s3 = data.s3;
                         gallery_arr[i].s32 = data.s32;
                         this_img.addClass("loaded");
@@ -5697,71 +5710,121 @@ $(function(){
 		});
 	}
 
-	getS3file = function(file_obj,target,tp,size){
-        var this_ei = target.parents(".st-sub-box").data("event-id");
-        var this_gi = this_ei.split("_")[0];
-        var this_ti = this_ei.split("_")[1];
+	// getS3file = function(file_obj,target,tp,size){
+ //        var this_ei = target.parents(".st-sub-box").data("event-id");
+ //        var this_gi = this_ei.split("_")[0];
+ //        var this_ti = this_ei.split("_")[1];
 
-		//default
-		size = size || 350;
-		var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
-        var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                     };
-        var method = "get";
-        var result = ajaxDo(api_name,headers,method,false);
-		result.complete(function(data){
-			if(data.status != 200) return false;
+	// 	//default
+	// 	size = size || 350;
+	// 	var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
+ //        var headers = {
+ //                 "ui":ui,
+ //                 "at":at, 
+ //                 "li":lang,
+ //                     };
+ //        var method = "get";
+ //        var result = ajaxDo(api_name,headers,method,false);
+	// 	result.complete(function(data){
+	// 		if(data.status != 200) return false;
 
-			var obj =$.parseJSON(data.responseText);
-			obj.api_name = api_name;
-			if(target && tp){
-				switch(tp){
-					case 6://圖片
-						var img = target.find("img.aut");
-						img.load(function() {
-							//重設 style
-							img.removeAttr("style");
-							var w = img.width();
-				            var h = img.height();
-            				// mathAvatarPos(img,w,h,size);
-				        });
-						//小圖
-						target.find("img.aut").attr("src",obj.s3);
-						//大圖
-						//target.find("img.auo").attr("src",obj.s32).hide();
-                        target.find("img.auo").data("src",obj.s32).hide();
-						break;
-                    case 7://影片
-                        target.attr("src",obj.s32).show();
-                        break;
-					case 8://聲音
-						// target.find("source").attr("src",obj.s3);
-                        target.html('<source type="audio/mp4" yo src="'+ obj.s3 +'">').show();
-						break;
-				}
-			}else{
-				return obj.s3;
-			}
-		});
-	}
-
-    getS3fileBackground = function(file_obj,target,tp, callback){
+	// 		var obj =$.parseJSON(data.responseText);
+	// 		obj.api_name = api_name;
+	// 		if(target && tp){
+	// 			switch(tp){
+	// 				case 6://圖片
+	// 					var img = target.find("img.aut");
+	// 					img.load(function() {
+	// 						//重設 style
+	// 						img.removeAttr("style");
+	// 						var w = img.width();
+	// 			            var h = img.height();
+ //            				// mathAvatarPos(img,w,h,size);
+	// 			        });
+	// 					//小圖
+	// 					target.find("img.aut").attr("src",obj.s3);
+	// 					//大圖
+	// 					//target.find("img.auo").attr("src",obj.s32).hide();
+ //                        target.find("img.auo").data("src",obj.s32).hide();
+	// 					break;
+ //                    case 7://影片
+ //                        target.attr("src",obj.s32).show();
+ //                        break;
+	// 				case 8://聲音
+	// 					// target.find("source").attr("src",obj.s3);
+ //                        target.html('<source type="audio/mp4" yo src="'+ obj.s3 +'">').show();
+	// 					break;
+	// 			}
+	// 		}else{
+	// 			return obj.s3;
+	// 		}
+	// 	});
+	// }
+    getS3file = function(file_obj,target,tp,size, tu){
         var this_ei = target.parents(".st-sub-box").data("event-id");
         var this_gi = this_ei.split("_")[0];
         var this_ti = this_ei.split("_")[1];
 
         //default
-        var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
+        size = size || 350;
+        var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + file_obj.c + "/dl";
         var headers = {
                  "ui":ui,
                  "at":at, 
                  "li":lang,
                      };
-        var method = "get";
-        var result = ajaxDo(api_name,headers,method,false);
+        var method = "post";
+        var result = ajaxDo(api_name,headers,method,false, tu);
+        result.complete(function(data){
+            if(data.status != 200) return false;
+
+            var obj =$.parseJSON(data.responseText);
+            obj.api_name = api_name;
+            if(target && tp){
+                switch(tp){
+                    case 6://圖片
+                        var img = target.find("img.aut");
+                        img.load(function() {
+                            //重設 style
+                            img.removeAttr("style");
+                            var w = img.width();
+                            var h = img.height();
+                            // mathAvatarPos(img,w,h,size);
+                        });
+                        //小圖
+                        target.find("img.aut").attr("src",obj.s3);
+                        //大圖
+                        //target.find("img.auo").attr("src",obj.s32).hide();
+                        target.find("img.auo").data("src",obj.s32).hide();
+                        break;
+                    case 7://影片
+                        target.attr("src",obj.s32).show();
+                        break;
+                    case 8://聲音
+                        // target.find("source").attr("src",obj.s3);
+                        target.html('<source type="audio/mp4" yo src="'+ obj.s3 +'">').show();
+                        break;
+                }
+            }else{
+                return obj.s3;
+            }
+        });
+    }
+
+    getS3fileBackground = function(file_obj,target,tp, tu, callback){
+        var this_ei = target.parents(".st-sub-box").data("event-id");
+        var this_gi = this_ei.split("_")[0];
+        var this_ti = this_ei.split("_")[1];
+
+        //default
+        var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + file_obj.c + "/dl";
+        var headers = {
+                 "ui":ui,
+                 "at":at, 
+                 "li":lang,
+                     };
+        var method = "post";
+        var result = ajaxDo(api_name,headers,method,false, tu);
         result.complete(function(data){
             if(data.status != 200) return false;
 
@@ -5793,20 +5856,20 @@ $(function(){
         });
     }
 
-    getS3fileBackgroundWatermark = function(file_obj,target,tp, text, callback){
+    getS3fileBackgroundWatermark = function(file_obj,target,tp, text, tu, callback){
         var this_ei = target.parents(".st-sub-box").data("event-id");
         var this_gi = this_ei.split("_")[0];
         var this_ti = this_ei.split("_")[1];
 
         //default
-        var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
+        var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + file_obj.c + "/dl";
         var headers = {
                  "ui":ui,
                  "at":at, 
                  "li":lang,
                      };
-        var method = "get";
-        var result = ajaxDo(api_name,headers,method,false);
+        var method = "post";
+        var result = ajaxDo(api_name,headers,method,false,tu);
         result.complete(function(data){
             if(data.status != 200){
                 target.addClass("loadError");
@@ -6300,6 +6363,10 @@ $(function(){
 			},
 			"ml" : []
 		};
+        var object_obj = $.parseJSON(this_event.data("object_str") );
+        if( object_obj ){
+            body.meta.tu = object_obj;
+        }
 
         var text = this_event.find(".st-reply-message-textarea textarea").val();
         if( text ){
@@ -6338,28 +6405,27 @@ $(function(){
 
                     //先做permission id 
                     cns.debug("object str:",this_event.data("object_str"));
-                    // var object_obj = $.parseJSON(this_compose.data("object_str"));
-                    if( this_event.data("object_str") ){
-                        var obj = $.parseJSON( this_event.data("object_str") );
-                        getFilePermissionId(this_gi, obj).complete( function(result){
-                            if( result.status==200 ){
-                                try{
-                                    var pi = $.parseJSON(result.responseText).pi;
+                    // if( this_event.data("object_str") ){
+                    //     var obj = $.parseJSON( this_event.data("object_str") );
+                    //     getFilePermissionId(this_gi, obj).complete( function(result){
+                    //         if( result.status==200 ){
+                    //             try{
+                    //                 var pi = $.parseJSON(result.responseText).pi;
 
-                                    uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
-                                        body.ml.push({
-                                            "c": data.fi,
-                                            "p": pi,
-                                            "tp": 6
-                                        });
-                                        replyApi( this_event, this_gi, this_ti, this_ei, body );
-                                    });
-                                } catch( e ){
-                                    errorReport(e);
-                                }
-                            }
-                        });
-                    }else{
+                    //                 uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
+                    //                     body.ml.push({
+                    //                         "c": data.fi,
+                    //                         "p": pi,
+                    //                         "tp": 6
+                    //                     });
+                    //                     replyApi( this_event, this_gi, this_ti, this_ei, body );
+                    //                 });
+                    //             } catch( e ){
+                    //                 errorReport(e);
+                    //             }
+                    //         }
+                    //     });
+                    // }else{
                         var pi = "0";
                         uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
                             try{
@@ -6384,7 +6450,7 @@ $(function(){
                                 errorReport(e);
                             }
                         });
-                    }
+                    // }
                 }
                 break;
         }
