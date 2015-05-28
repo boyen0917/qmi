@@ -124,7 +124,11 @@ $(function(){
 
 
 	//timeline置頂millisecond
-	top_timer_ms = 5000;
+	top_timer_ms = $.lStorage("_topTimeMs") || 5000;
+
+	//開啟通知
+
+	notification =  $.lStorage("_notification"); 
 
 	//polling間距
 	polling_interval = 5000;
