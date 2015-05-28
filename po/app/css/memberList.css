@@ -72,6 +72,10 @@
 
 .tabObj-cell-area.noTitle{
 	margin-top: 0px;
+	height: -webkit-calc( 100% - 57px );
+}
+.tabObj-cell-area.noTitle .obj-cell-page.current{
+	height: -webkit-calc( 100% - 57px );
 }
 
 .tabObj-cell-area .obj-cell{
