@@ -6363,8 +6363,9 @@ $(function(){
 			},
 			"ml" : []
 		};
-        var object_obj = $.parseJSON(this_event.data("object_str") );
+        var object_obj = this_event.data("object_str");
         if( object_obj ){
+            object_obj = $.parseJSON( object_obj );
             body.meta.tu = object_obj;
         }
 
