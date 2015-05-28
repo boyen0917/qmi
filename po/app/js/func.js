@@ -303,7 +303,10 @@ $(function(){
         //關閉所有subpage 暫時除了系統設定除外
         if(act != "system-setting")
             $("#page-group-main .main-subpage").hide();
+        cns.debug(act);
 
+        $(".header-menu .sm-small-area.active").removeClass("active");
+        $('.header-menu .sm-small-area[data-sm-act="'+act+'"]').addClass("active");
 		switch (act) {
 	        case "feeds":
                 $(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
