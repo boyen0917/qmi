@@ -2188,11 +2188,7 @@ $(function(){
                         this_compose.data("parse-waiting",true);
                         if(!this_compose.data("parse-resend")) $(".cp-attach-area").show().find(".url-loading").css("display","block");
 
-						if(val.match(/youtube.com|youtu.be|m.youtube.com/)){
-							getLinkYoutube(this_compose,val);
-						}else{
-							getLinkMeta(this_compose,val);
-						}
+						getLinkMeta(this_compose,val);
 						return false;
 					}else{
 			            //暫時
@@ -4272,10 +4268,10 @@ $(function(){
 				//影片網站url
 				case 2:
 					var url_content = this_compose.data("url-content");
-					obj.c = url_content.c
-					obj.t = url_content.t;
-					obj.d = url_content.d;
-					obj.i = url_content.i;
+					obj.c = url_content.url
+					obj.t = url_content.title;
+					obj.d = url_content.description;
+					obj.i = url_content.img;
 					break;
 				//圖片url
 				case 3:
@@ -6242,7 +6238,12 @@ $(function(){
                     // this_compose.data("parse-error",true);
                 }
 
-                this_compose.data("message-list").push(1);
+                if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
+                    this_compose.data("message-list").push(2);
+                }else{
+                    this_compose.data("message-list").push(1);
+                }
+                
 
                 result.url = url;
                 this_compose.data("url-content",result);
