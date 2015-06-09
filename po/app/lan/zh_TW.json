@@ -78,6 +78,7 @@
 	"FEED_DELETE" : "刪除",
 	"FEED_COPY" : "複製",
 	"FEED_COPY_CONTENT" : "複製內容",
+	"FEED_COPY_CONTENT_SUCC" : "成功複製內容",
 	"FEED_CALENDAR" : "加入行事曆",
 	"FEED_UNTOP_AVAILABLE" : "目前尚未有任何置頂",
 	"FEED_CLOSE_TIME" : "結束時間",
@@ -299,5 +300,8 @@
 	"OFFICIAL_SETTING" : "設定",
 	"OFFICIAL_INVITE" : "邀請",
 	"OFFICIAL_SHARE" : "分享",
-	"OFFICIAL_N_FOLLOWER" : "%ld人追蹤"
+	"OFFICIAL_N_FOLLOWER" : "%ld人追蹤",
+
+	"ADDRESSBOOK_TITLE" : "團體通訊錄"
+
 }

@@ -79,6 +79,7 @@
 	"FEED_DELETE" : "Delete",
 	"FEED_COPY" : "Copy",
 	"FEED_COPY_CONTENT" : "Copy content",
+	"FEED_COPY_CONTENT_SUCC" : "Copied to clipboard",
 	"FEED_CALENDAR" : "Add to Calendar",
 	"FEED_UNTOP_AVAILABLE" : "No Top Feed Now",
 	"FEED_CLOSE_TIME" : "End Time",
@@ -300,5 +301,7 @@
 	"OFFICIAL_SETTING" : "Setting",
 	"OFFICIAL_INVITE" : "Invite",
 	"OFFICIAL_SHARE" : "Share",
-	"OFFICIAL_N_FOLLOWER" : "%ld follower(s)"
+	"OFFICIAL_N_FOLLOWER" : "%ld follower(s)",
+
+	"ADDRESSBOOK_TITLE" : "AddressList"
 }

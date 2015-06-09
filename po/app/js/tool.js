@@ -1461,7 +1461,7 @@ $(function(){
 			var clipboard = gui.Clipboard.get();
 			// Or write something
 			clipboard.set(text, 'text');
-			toastShow("copied to clipboard");
+			toastShow( $.i18n.getString("FEED_COPY_CONTENT_SUCC") );
 		} catch(e) {
 			// errorReport(e);
 		}

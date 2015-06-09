@@ -78,6 +78,7 @@
 	"FEED_DELETE" : "删除",
 	"FEED_COPY" : "复制",
 	"FEED_COPY_CONTENT" : "复制内容",
+	"FEED_COPY_CONTENT_SUCC" : "成功复制内容",
 	"FEED_CALENDAR" : "加入行事历",
 	"FEED_UNTOP_AVAILABLE" : "目前尚未有任何置顶",
 	"FEED_CLOSE_TIME" : "结束时间",
@@ -299,5 +300,7 @@
 	"OFFICIAL_SETTING" : "设定",
 	"OFFICIAL_INVITE" : "邀请",
 	"OFFICIAL_SHARE" : "分享",
-	"OFFICIAL_N_FOLLOWER" : "%ld人追踪"
+	"OFFICIAL_N_FOLLOWER" : "%ld人追踪",
+
+	"ADDRESSBOOK_TITLE" : "团体通讯录"
 }
