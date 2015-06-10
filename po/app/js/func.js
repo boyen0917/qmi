@@ -4169,8 +4169,8 @@ $(function(){
                     lng: 0,
                     lat: 0,
                     r: 0,
-                    b: 1432108135000,
-                    e: 1432194535000,
+                    b : this_compose.data("start-timestamp"),
+                    e : this_compose.data("end-timestamp"),
                     tp: 17
                 }
                 body.ml.push(ml_obj);
@@ -5055,7 +5055,7 @@ $(function(){
                     category = $.i18n.getString("FEED_LOCATION");
                     title = $.i18n.getString("FEED_LOCATION");
                     //任務狀態
-                    this_event.find(".st-box2-more-task-area").show();
+                    this_event.find(".st-box2-more-task-area").hide();
                     this_event.find(".st-box2-more-time").show();
                     this_event.find(".st-task-status-area").show();
                     //任務預設的文字

@@ -36,10 +36,6 @@ body{
 	width: 30px;
 }
 
-.ui-body-c, .ui-overlay-c {
-	background: #eef0f2;
-}
-
 #page-registration {
 	background: url("../images/registration/login_bgimg.png") center no-repeat;
 	background-size: cover;

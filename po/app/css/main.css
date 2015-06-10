@@ -1374,6 +1374,10 @@ img.auo {
 	height: 51px;
 }
 
+.header-group-name {
+	  margin-top: 2px;
+}
+
 .header-cp-object{
 	position: relative;
 	right: 15px;

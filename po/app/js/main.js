@@ -1107,6 +1107,20 @@ $(function(){
 	$(".cp-post").click(function(){
 
 		var this_compose = $(document).find(".cp-content");
+
+		//防止重複送出
+		if(!this_compose.data("send-chk")){
+			return false;
+		}
+
+		this_compose.data("send-chk",false);
+
+		//允許繼續點選送出
+		setTimeout(function(){
+			this_compose.data("send-chk",true);
+		},1500);
+
+
 		this_compose.data("parse-resend",false);
 
 		//等待截取網址內容 時間太久則取消
@@ -1136,18 +1150,6 @@ $(function(){
 			this_compose.find('.cp-textarea-desc').trigger("input");
 			return false;
 		}
-
-		//防止重複送出
-		if(!this_compose.data("send-chk")){
-			return false;
-		}
-
-		this_compose.data("send-chk",false);
-
-		//允許繼續點選送出
-		setTimeout(function(){
-			this_compose.data("send-chk",true);
-		},1500);
  			
 		this_compose.data("compose-content",$('.cp-textarea-desc').val());
 		this_compose.data("compose-title",$('.cp-textarea-title').val());
@@ -1178,6 +1180,7 @@ $(function(){
 				chk_arr.push(".cp-textarea-title");
 				break;
 			case 5://任務 定點回報
+				chk_arr.push(".cp-textarea-title");
 				break;
 		}
  		

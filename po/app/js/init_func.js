@@ -292,7 +292,7 @@ $(function(){
                         dom = menu.find(".fc-area-subbox[data-fc-box=check]");
 
                         //成員定位尚未有功能, 有顯示的話先disabled掉
-                        dom.addClass("disabled");
+                        // dom.addClass("disabled");
                         break;
                     case 5: //貼文
                         dom = menu.find(".fc-area-subbox[data-fc-box=post]");
