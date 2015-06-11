@@ -362,7 +362,7 @@
 	/* border: black 1px solid; */
 	overflow: scroll;
 	/* max-height: 70%; */
-	height: -webkit-calc( 100% - 67px );
+	height: -webkit-calc( 100% - 110px );
 	width: 100%;
 }
 .contact-searchResult .noResult{
