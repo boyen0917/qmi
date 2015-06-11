@@ -4372,14 +4372,19 @@ $(function(){
 
         var method = "post";
         var result = ajaxDo(api_name,headers,method,true,body);
-        result.success(function(data){
-        	$.mobile.changePage("#page-group-main");
+        result.complete(function(data){
+            //允許點選送出
+            this_compose.data("send-chk",true);
 
-        	//檢查置頂
-            polling();
-        	topEventChk();
-        	timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
-        	toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
+            if(data.status == 200){
+                $.mobile.changePage("#page-group-main");
+
+                //檢查置頂
+                polling();
+                topEventChk();
+                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+                toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
+            }
         });
 	};
 
@@ -4389,7 +4394,7 @@ $(function(){
         var chk = false;
         var dataList = this_compose.data("message-list");
         if( null==dataList ) return;
-        cns.debug( JSON.stringify(dataList) );
+        // cns.debug( JSON.stringify(dataList) );
         $.each(dataList,function(i,val){
             //只要有不是普通內文的就不關附檔區
             if( val > 0){
@@ -6162,17 +6167,25 @@ $(function(){
                 s_load_show = false;
                 $('.ui-loader').hide();
                 $(".ajax-screen-lock").hide();
+
+                //判斷關閉副檔區
+                composeCheckMessageList();
             },
             success: function(data, textStatus) {
                 var result = {};
                 var tmp_img,tmp_desc;
+                var yqlHtml = $(".cp-ta-yql").html();
+
                 cns.debug("data:",data);
 
                 //loading圖示隱藏
                 $(".cp-attach-area .url-loading").hide();
 
-                //error存在 就跳出
-                if(data.error) return false;
+                //error存在 或 result null 就跳出
+                if(data.error || data.query.results == null) {
+                    return false;
+                }
+
                 //預設標題
                 if(data.query.results && data.query.results.title){
                     result.title = data.query.results.title;
@@ -6184,7 +6197,7 @@ $(function(){
                         if (val.property) {
 
                             // title
-                            if (val.property.match(/og:title/i)) {
+                            if (val.property.match(/og:title/i) && val.content) {
                                 result.title = val.content;
                             }
                             
@@ -6207,6 +6220,7 @@ $(function(){
                     
                 //如果meta圖片存在 並檢查是否圖太小 太小或沒圖的話就從網頁裡的img tag裡面隨便找一張
                 if(!result.img){
+
                     //預設圖片 隨便找一張img tag
                     if(data.query.results && data.query.results.img){
                         $.each(data.query.results.img,function(i,val){
@@ -6250,6 +6264,25 @@ $(function(){
 
                 //網址讀取結束
                 this_compose.data("parse-waiting",false);
+                //關閉事件
+                $(".cp-ta-yql > img").off().click(function(){
+
+                    $(".cp-ta-yql").html(yqlHtml).fadeOut();
+                    this_compose.data("url-chk",false).data("url-content",false);
+
+                    //message list pop
+                    var mlArr = this_compose.data("message-list");
+                    for(key in mlArr){
+                        if(mlArr[key] == 1 || mlArr[key] == 2){
+                            mlArr.splice(key,1);
+                        }
+                    }
+
+                    this_compose.data("message-list",mlArr);
+
+                    //判斷關閉副檔區
+                    composeCheckMessageList();
+                });
             },
             error: function(jqXHR,textStatus,errorThrown ){
                 //網址讀取結束
@@ -6260,8 +6293,7 @@ $(function(){
                 // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
 
                 $(".cp-attach-area .url-loading").hide();
-                //判斷關閉副檔區
-                composeCheckMessageList();
+                
                 cns.debug("yql error",{jqXHR:jqXHR, textStatus:textStatus,errorThrown:errorThrown});
             }   
         });

@@ -72,7 +72,7 @@ $(function(){
 		}
 
 		//執行polling
-		pollingInterval();
+		// pollingInterval();
 	}else{
     	document.location = "index.html";
     	return false;
@@ -83,6 +83,10 @@ $(function(){
 		// $(".st-feedbox-area ").animate({bottom:"125px"});
 		//彩蛋鑰匙
 		supriseKey();
+	});
+
+	$(".page-group-name").click(function(){
+		$(".cp-post").trigger("click");
 	});
 
 	//下拉更新 滾輪版 
@@ -1105,7 +1109,6 @@ $(function(){
 
 	//compose 送出	
 	$(".cp-post").click(function(){
-
 		var this_compose = $(document).find(".cp-content");
 
 		//防止重複送出
@@ -1115,41 +1118,50 @@ $(function(){
 
 		this_compose.data("send-chk",false);
 
-		//允許繼續點選送出
-		setTimeout(function(){
-			this_compose.data("send-chk",true);
-		},1500);
+		// //允許繼續點選送出
+		// setTimeout(function(){
+		// 	this_compose.data("send-chk",true);
+		// },1500);
 
 
 		this_compose.data("parse-resend",false);
 
 		//等待截取網址內容 時間太久則取消
 		if(this_compose.data("parse-waiting")){
+
 			setTimeout(function(){
+
+				//重新送出
+				this_compose.data("send-chk",true);
+
 				cns.debug("parse-retry",this_compose.data("parse-waiting-retry"));
 				var cnt = this_compose.data("parse-waiting-retry") || 0;
 				if(cnt < 3) {
 					cnt++;
 					this_compose.data("parse-waiting-retry",cnt);
+					console.debug("yooo",cnt);
+
 					$(".cp-post").trigger("click");
 				}else{
 					cns.debug("parse retry toast");
+					this_compose.data("parse-waiting-retry",0);
 					toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
 				}
+				
 			},1000);
 			return false;
 		}
 
-		//網址截取 預備判斷
-		if(this_compose.data("parse-error")) {
-			$('.ui-loader').css("display","block");
-			$(".ajax-screen-lock").show();
-			cns.debug("parse url again");
-			this_compose.data("url-chk",false);
-			this_compose.data("parse-resend",true);
-			this_compose.find('.cp-textarea-desc').trigger("input");
-			return false;
-		}
+		//網址截取 預備判斷 **此功能取消**
+		// if(this_compose.data("parse-error")) {
+		// 	$('.ui-loader').css("display","block");
+		// 	$(".ajax-screen-lock").show();
+		// 	cns.debug("parse url again");
+		// 	this_compose.data("url-chk",false);
+		// 	this_compose.data("parse-resend",true);
+		// 	this_compose.find('.cp-textarea-desc').trigger("input");
+		// 	return false;
+		// }
  			
 		this_compose.data("compose-content",$('.cp-textarea-desc').val());
 		this_compose.data("compose-title",$('.cp-textarea-title').val());

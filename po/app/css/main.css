@@ -3888,6 +3888,7 @@ input.cp-datetimepicker-end {
 	line-height: 20px;
 	padding: 15px 0px;
 	margin:auto;
+	position: relative;
 }
 
 .cp-yql-title {
@@ -3914,6 +3915,15 @@ input.cp-datetimepicker-end {
 	-webkit-line-clamp: 6;
 	-webkit-box-orient: vertical;
 	margin: auto;
+}
+
+.cp-ta-yql > img{
+  width: 30px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+  opacity: 0.7;
 }
 
 
