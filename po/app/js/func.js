@@ -1450,7 +1450,7 @@ $(function(){
                     this_load.find(".st-reply-username").html(user_name.replaceOriEmojiCode());
                     
                     //時間
-                    this_load.find(".st-reply-footer span:eq(0)").html(new Date(el.meta.ct).toFormatString());
+                    this_load.find(".st-reply-footer-time").html(new Date(el.meta.ct).toFormatString()).data("ct",el.meta.ct);
 
                     this_load.data("event-val",el);
 
@@ -4713,7 +4713,8 @@ $(function(){
             //---------- TODO -----------
             //  隱藏底部更新ui
             //---------------------------
-
+            //更新時間
+            timelineUpdateTime();
 
 	    	//關閉下拉更新的ui
 	    	if(is_top){
@@ -4990,7 +4991,7 @@ $(function(){
             // 頭像、姓名
             getUserAvatarName(val.ei.split("_")[0] , val.meta.gu , this_event.find(".st-sub-name label") , this_event.find(".st-sub-box-1 .st-user-pic img"));
 
-            this_event.find(".st-sub-time").append(new Date(val.meta.ct).toFormatString());
+            this_event.find(".st-sub-time").append('<label class="text">'+new Date(val.meta.ct).toFormatString()+'</label>');
             // this_event.find(".st-sub-time").append(val.meta.ct);
 
             //發佈對象
@@ -8068,6 +8069,24 @@ $(function(){
         } catch(e){
             errorReport(e);
         }
+    }
+
+    timelineUpdateTime = function(){
+        var page = $("#page-group-main");
+        $.each( page.find(".st-sub-box:visible"), function(index,domTmp){
+            var this_event = $(domTmp);
+            var ct = this_event.data("ct");
+            this_event.find(".st-sub-time .text").html('<label class="text">'+new Date(ct).toFormatString()+'</label>');
+
+            //回文
+            var reply = this_event.find(".st-reply-all-content-area:visible");
+            $.each( reply, function(replyIndex, replyDomTmp){
+                var replyDom = $(replyDomTmp);
+                var time = replyDom.find(".st-reply-footer-time");
+                ct = time.data("ct");
+                time.html(new Date(ct).toFormatString());
+            });
+        });
     }
 
     timelineUpdateAvatar = function(this_gu){

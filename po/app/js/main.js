@@ -1064,6 +1064,8 @@ $(function(){
         	
     		//detail timeline message內容
 			detailTimelineContentMake(this_event,e_data);
+
+			timelineUpdateTime();
 		});
 	});
 	
