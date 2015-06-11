@@ -682,7 +682,7 @@ function getHistoryMsg(bIsScrollToTop) {
 					g_bIsLoadHistoryMsg = false;
 					//end loading history, hide loading & scroll to last dom we were at
 					hideLoading();
-				}, 1000);
+				}, 600);
 			}
 		} else {
 			g_bIsLoadHistoryMsg = false;
@@ -693,6 +693,7 @@ function getHistoryMsg(bIsScrollToTop) {
 			$("#chat-loading").hide();
 			$("#chat-loading-grayArea").show();
 			if (g_firstLoadingProcess > 0) g_firstLoadingProcess--;
+			g_container.getNiceScroll()[0].wheelprevented = false;
 		}
 		console.debug("---- end loading -----");
 	}, {
@@ -739,7 +740,8 @@ function hideLoading() {
 			$("#chat-loading-grayArea").show();
 		}
 		$("#chat-loading").hide();
-		// g_currentScrollToDom.scrollIntoView();
+		g_currentScrollToDom.scrollIntoView();
+		g_currentScrollToDom = null;
 		g_container.getNiceScroll()[0].wheelprevented = false;
 
 	} else {
