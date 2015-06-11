@@ -7,7 +7,6 @@ var g_group;	//group
 var at;		//access token
 var g_isEndOfPage = false;	//是否在頁面底端
 var g_isEndOfPageTime = 0;
-var g_lastScrollTime = 0;
 var g_needsRolling = false;	//是否要卷到頁面最下方？
 var g_lastMsgEi = 0;
 var g_msgs = [];
@@ -31,6 +30,7 @@ var g_isReadPending = false;
 var g_tu;
 var g_firstLoadingProcess = 1;
 var g_currentScrollToDom = null;
+var container;
 
 /*
  ███████╗███████╗████████╗██╗   ██╗██████╗
@@ -289,8 +289,9 @@ $(document).ready(function () {
 	});
 	// resizeContent();
 
-	$("#container").on("mousewheel", onScrollContainer);
-	$("#container").scroll(onScrollContainer);
+	g_container = $("#container");
+	g_container.on("mousewheel", onScrollContainer);
+	g_container.scroll(onScrollContainer);
 	$("html, body").scroll(onScrollBody);
 
 	$("button.pollingCnt").off("click").click(updateChatCnt);
@@ -477,9 +478,8 @@ $(document).ready(function () {
 			header.slideUp();
 			var footer = $("#footer");
 			footer.animate({bottom: "-255px"});
-			var containerTmp = $("#container");
-			var oriOffset = containerTmp.scrollTop();
-			containerTmp.css("top", "0").css("height", "100%");
+			var oriOffset = g_container.scrollTop();
+			g_container.css("top", "0").css("height", "100%");
 			thisTag.addClass("playing");
 			// thisTag.append("<div class='stopBtn'></div>");
 			videoTag.prop("controls", true);
@@ -492,10 +492,10 @@ $(document).ready(function () {
 				header.slideDown();
 				footer.animate({bottom: "-205px"});
 
-				containerTmp.css("top", "65px").css("height", "-webkit-calc( 100vh - 116px )").scrollTop(oriOffset);
-				// containerTmp.animate({top:"65px",height:"-=116"},function(){
-				// 	containerTmp.css("height","-webkit-calc( 100vh - 116px )");
-				// 	containerTmp.scrollTop(oriOffset);
+				g_container.css("top", "65px").css("height", "-webkit-calc( 100vh - 116px )").scrollTop(oriOffset);
+				// g_container.animate({top:"65px",height:"-=116"},function(){
+				// 	g_container.css("height","-webkit-calc( 100vh - 116px )");
+				// 	g_container.scrollTop(oriOffset);
 				// });
 			}
 			video.onpause = function () {
@@ -635,11 +635,11 @@ function getHistoryMsg(bIsScrollToTop) {
 		// 	firstDayDiv = firstDayDiv.prev();
 		// }
 		var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
-		var currentFirstDiv = (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null;
-
+		setCurrentFocus( (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null );
+		
 		//add red border to fist dom to test current position
 		// $(".sdfsfg").removeClass("sdfsfg").css("border", "");
-		// currentFirstDiv.addClass("sdfsfg").css("border", "1px solid red");
+		// g_currentScrollToDom.addClass("sdfsfg").css("border", "1px solid red");
 
 		//cns.debug("list:",JSON.stringify(list,null,2));
 		if (list.length > 0) {
@@ -650,8 +650,9 @@ function getHistoryMsg(bIsScrollToTop) {
 				} else {
 					var object = list[i].data;
 					showMsg(object, null);
-					// if(currentFirstDiv){
-					// 	currentFirstDiv.scrollIntoView();
+					if (g_currentScrollToDom) g_currentScrollToDom.scrollIntoView();
+					// if(g_currentScrollToDom){
+					// 	g_currentScrollToDom.scrollIntoView();
 					// 	// $("#chat-contents").scrollTop( $("#chat-contents").scrollTop()+50 );
 					// }
 				}
@@ -675,13 +676,13 @@ function getHistoryMsg(bIsScrollToTop) {
 		if (0 == g_firstLoadingProcess) {
 			if (list.length < 20) {
 				//not enough history in db, fetch from server
-				updateChat(g_lastDate.getTime(), false, currentFirstDiv);
+				updateChat(g_lastDate.getTime(), false, g_currentScrollToDom);
 			} else {
 				setTimeout(function () {
 					g_bIsLoadHistoryMsg = false;
 					//end loading history, hide loading & scroll to last dom we were at
-					hideLoading($(currentFirstDiv));
-				}, 200);
+					hideLoading();
+				}, 1000);
 			}
 		} else {
 			g_bIsLoadHistoryMsg = false;
@@ -721,35 +722,43 @@ function getHistoryMsg(bIsScrollToTop) {
 	// 	}
 	// }
 }
-
-function hideLoading(targetScrollTo) {
+function setCurrentFocus(dom){
+	if( dom ){
+		g_currentScrollToDom = dom;
+		g_container.getNiceScroll()[0].wheelprevented = true;
+	}
+}
+function hideLoading() {
 	if (!$("#page-chat").is(":visible")
 		|| $("#page-chat").hasClass("transition")
 		|| g_bIsEndOfHistory) return;
 
-	cns.debug("-- hideLoading start --");
-	$("#chat-loading").stop().fadeOut(function () {
+	cns.debug("-- hideLoading start --", g_currentScrollToDom);
+	if (g_currentScrollToDom) {
 		if (false == g_bIsEndOfHistory) {
 			$("#chat-loading-grayArea").show();
 		}
-		// if( targetScrollTo) targetScrollTo = targetScrollTo.prev();
-		if (targetScrollTo && targetScrollTo.length > 0) {
-			targetScrollTo[0].scrollIntoView();
-			g_currentScrollToDom = targetScrollTo[0];
-		} else {
-			var container = $("#container");
-			var loading = container.children("#chat-loading");
-			var posi = container.scrollTop();
+		$("#chat-loading").hide();
+		// g_currentScrollToDom.scrollIntoView();
+		g_container.getNiceScroll()[0].wheelprevented = false;
+
+	} else {
+		$("#chat-loading").stop().fadeOut(function () {
+			if (false == g_bIsEndOfHistory) {
+				$("#chat-loading-grayArea").show();
+			}
+			var loading = g_container.children("#chat-loading");
+			var posi = g_container.scrollTop();
 			if (posi <= loading.height()) {
 				var content = $("#chat-contents");
 				// if( content.length>0 ){
 				// 	content[0].scrollIntoView();
 				// }
-				container.scrollTop(content.offset().top);
+				g_container.scrollTop(content.offset().top);
 			}
-		}
-		cns.debug("-- hideLoading end --");
-	});
+			cns.debug("-- hideLoading end --");
+		});
+	}
 	// // firstDom.css("background", "red");
 	// var tmp = loading.offset();
 	// if( tmp ){
@@ -794,12 +803,11 @@ function op(url, type, data, delegate, errorDelegate) {
 }
 
 function scrollToStart() {
-	$('#container').stop(false, true).animate({scrollTop: 50}, 'fast');
+	g_container.stop(false, true).animate({scrollTop: 50}, 'fast');
 }
 
 function scrollToBottom() {
-	// cns.debug( "scrollToBottom", $(document).height()+50  );
-	$('#container').stop(false, true).animate({scrollTop: $("#chat-contents").height() + 50}, 'fast');
+	g_container.stop(false, true).animate({scrollTop: $("#chat-contents").height() + 50}, 'fast');
 	g_isEndOfPage = true;
 }
 
@@ -824,11 +832,10 @@ function checkPagePosition() {
 		// 	$("#chat-toBottom").fadeIn('fast');
 		// }
 
-		var container = $('#container');
-		if (container.length > 0) {
-			var posi = container.scrollTop();
-			var height = container.height();
-			var docHeight = container[0].scrollHeight;
+		if (g_container.length > 0) {
+			var posi = g_container.scrollTop();
+			var height = g_container.height();
+			var docHeight = g_container[0].scrollHeight;
 			var isAtBottom = ((posi + height + 35) >= docHeight);
 			// cns.debug(isAtBottom, posi, height, docHeight);
 			// if( !isAtBottom )	scrollToBottom();
@@ -862,7 +869,7 @@ function getChatMemName(groupUID) {
 	return mem.nk;
 }
 
-function updateChat(time, isGetNewer, firstScrollDom) {
+function updateChat(time, isGetNewer) {
 	console.debug("-------- updateChat", isGetNewer, time, " ---------");
 	var api = "groups/" + gi + "/chats/" + ci + "/messages";
 	if (time) {
@@ -872,8 +879,6 @@ function updateChat(time, isGetNewer, firstScrollDom) {
 			else api += "&d=false";
 		}
 	}
-
-	var scrollToDom = ( false == isGetNewer && null != firstScrollDom && firstScrollDom.length > 0 ) ? firstScrollDom[0] : null;
 
 	console.debug(api);
 	op(api, "GET", "", function (data, status, xhr) {
@@ -913,7 +918,7 @@ function updateChat(time, isGetNewer, firstScrollDom) {
 
 
 						showMsg(object);
-						if (scrollToDom) scrollToDom.scrollIntoView();
+						if (g_currentScrollToDom&&!isGetNewer) g_currentScrollToDom.scrollIntoView();
 						// isUpdateFinish = false;
 					}
 				}
@@ -972,7 +977,7 @@ function updateChat(time, isGetNewer, firstScrollDom) {
 						// $('#container').scrollTop(0);
 					} else {
 						//scroll to the last dom we were at
-						hideLoading(firstScrollDom);
+						hideLoading();
 					}
 				}, 500);
 
@@ -2070,7 +2075,8 @@ function onScrollContainer(e) {
 	// cns.debug(e.originalEvent.wheelDelta);
 	var posi = $(this).scrollTop();
 	if (g_bIsLoadHistoryMsg) {
-		cns.debug("scroll blocking ", posi);
+		// if(g_currentScrollToDom) g_currentScrollToDom.scrollIntoView();
+		// cns.debug("scroll blocking ", posi, g_container.getNiceScroll()[0].wheelprevented);
 		e.stopPropagation();
 		e.preventDefault();
 		return;
