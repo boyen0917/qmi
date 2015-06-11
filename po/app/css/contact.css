@@ -1,4 +1,4 @@
-.contact-add{
+.contact-add, .addressBook-add{
 	background-image: url(../images/navi/navi_icon_add_member.png);
 	display: none;
 }

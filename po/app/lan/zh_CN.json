@@ -302,5 +302,7 @@
 	"OFFICIAL_SHARE" : "分享",
 	"OFFICIAL_N_FOLLOWER" : "%ld人追踪",
 
-	"ADDRESSBOOK_TITLE" : "团体通讯录"
+	"ADDRESSBOOK_TITLE" : "团体通讯录",
+	"ADDRESSBOOK_ADD" : "新增自定联络人",
+	"ADDRESSBOOK_CUSTOM" : "自定联络人"
 }

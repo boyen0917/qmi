@@ -303,5 +303,7 @@
 	"OFFICIAL_SHARE" : "Share",
 	"OFFICIAL_N_FOLLOWER" : "%ld follower(s)",
 
-	"ADDRESSBOOK_TITLE" : "AddressList"
+	"ADDRESSBOOK_TITLE" : "AddressBook",
+	"ADDRESSBOOK_ADD" : "Add custom address book",
+	"ADDRESSBOOK_CUSTOM" : "Custom address book"
 }

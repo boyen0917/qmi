@@ -149,9 +149,11 @@ function updateChatList( giTmp, extraCallBack ){
 
 					// cns.debug( JSON.stringify(userData) );
 			    	$.lStorage(ui, userData);
-			    	if( gi==giTmp ){
-			    		showChatList();
-			    	}
+
+			    	//remove first drawing, wait untile db saving
+			    	// if( gi==giTmp ){
+			    	// 	showChatList();
+			    	// }
 
 			    	if(list.length>0){
 				    	var cnt=0;

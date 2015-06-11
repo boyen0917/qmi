@@ -38,7 +38,7 @@ initContactList = function(){
 	if( false==initContactData() ) return;
 
 	//get html container
-	var rowContainer = $(".contact-rows");
+	var rowContainer = $(".subpage-contact .contact-rows");
 	if( !rowContainer || rowContainer.length<=0 ) return;
 	rowContainer.html("");
 
