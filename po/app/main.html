@@ -31,6 +31,7 @@
         
         <script type="text/javascript" src="js/general_album.js?ver=0.35"></script>
         <script type="text/javascript" src="js/contact.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/addressBook.js?ver=0.35"></script>
         <script type="text/javascript" src="js/setting.js?ver=0.35"></script>
         <script type="text/javascript" src="js/chatDB.js?ver=0.35"></script>
         <script type="text/javascript" src="js/func.js?ver=0.35"></script>
@@ -184,6 +185,10 @@
                                <div class="sm-small-area-r" data-textid="GROUPSETTING_TITLE"></div>
                                <!-- <div class="sm-count"></div> -->
                             </div>
+                            <div data-sm-act="addressBook" class="sm-small-area">
+                               <div class="sm-small-area-r" data-textid="ADDRESSBOOK_TITLE"></div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
                         </div>
 
 
@@ -191,6 +196,7 @@
                         <div class="feed-compose header-icon _2"></div>
                         <div class="chatList-add header-icon _2"></div>
                         <div class="contact-add header-icon _2"></div>
+                        <div class="addressBook-add header-icon _2"></div>
                         <div class="navi-alert header-icon _1"></div>
                         <div class="feed-compose-area">
                             <div data-fc-box="announcement" class="fc-area-subbox" style="display:none">
@@ -470,6 +476,31 @@
                         
                 <!--------------------------------- 聯絡人 -------------------------------->
                         <div class="subpage-contact main-subpage" style="display:none;height: 100%">
+                            <div class="contact-search">
+                                <div class="inputDiv">
+                                    <div class="hintDiv">
+                                        <img class="icon" src="images/common/icon/icon_search.png"/>
+                                        <span class="text" data-textid="INVITE_SEARCH"/>
+                                    </div>
+                                    <div class="content" style="display:none;">
+                                        <img class="icon" src="images/common/icon/icon_search.png"/>
+                                        <input type="input" align="middle" class="input" maxlength="20" data-role="none"/>
+                                        <img class="clear" src="images/common/icon/icon_search_clean.png"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="contact-rows top"></div>
+                            <div class="contact-searchResult" style="display:none;">
+                                <div class="container">
+                                    <div class="noResult" style="display:none;" data-textid="MEMBER_SEARCH_NO_RESULT"></div>
+                                    <div class="memTitle" data-textid="COMMON_MEMBER"></div>
+                                    <div class="branchTitle" data-textid="COMPOSE_SUBGROUP"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                <!--------------------------------- 團體電話簿 -------------------------------->
+                        <div class="subpage-addressBook main-subpage" style="display:none;height: 100%">
                             <div class="contact-search">
                                 <div class="inputDiv">
                                     <div class="hintDiv">

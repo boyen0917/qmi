@@ -1,4 +1,4 @@
-.contact-add{
+.contact-add, .addressBook-add{
 	background-image: url(../images/navi/navi_icon_add_member.png);
 	display: none;
 }
@@ -362,7 +362,7 @@
 	/* border: black 1px solid; */
 	overflow: scroll;
 	/* max-height: 70%; */
-	height: -webkit-calc( 100% - 110px );
+	height: -webkit-calc( 100% - 67px );
 	width: 100%;
 }
 .contact-searchResult .noResult{

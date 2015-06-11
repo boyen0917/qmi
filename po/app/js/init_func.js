@@ -110,7 +110,9 @@ $(function(){
                 { "tp": 4, "sw": false },
                 { "tp": 5, "sw": false },
                 { "tp": 6, "sw": false },
-                { "tp": 7, "sw": true }
+                { "tp": 7, "sw": true },
+                { "tp": 8, "sw": false },
+                { "tp": 9, "sw": false }
             ];
             if( group.ad==1 ){
                 group.tab[6].sw = true;
@@ -136,7 +138,9 @@ $(function(){
                     { "tp": 4, "sw": false },
                     { "tp": 5, "sw": false },
                     { "tp": 6, "sw": true },
-                    { "tp": 7, "sw": true }
+                    { "tp": 7, "sw": true },
+                    { "tp": 8, "sw": false },
+                    { "tp": 9, "sw": false }
                 ];
             }
         }
@@ -228,6 +232,9 @@ $(function(){
                         break;
                     case 7: //團體設定
                         dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
+                        break;
+                    case 9: //團體通訊錄
+                        dom = menu.find(".sm-small-area[data-sm-act=addressBook]");
                         break;
                 }
                 if( dom ){

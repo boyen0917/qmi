@@ -302,6 +302,8 @@
 	"OFFICIAL_SHARE" : "分享",
 	"OFFICIAL_N_FOLLOWER" : "%ld人追蹤",
 
-	"ADDRESSBOOK_TITLE" : "團體通訊錄"
+	"ADDRESSBOOK_TITLE" : "團體通訊錄",
+	"ADDRESSBOOK_ADD" : "新增自定聯絡人",
+	"ADDRESSBOOK_CUSTOM" : "自定聯絡人"
 
 }

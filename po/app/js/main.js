@@ -1520,7 +1520,11 @@ $(function(){
 		var target = event.target || event.srcElement;
 		cns.debug(target);
 		target = $(target);
-		if( target.hasClass("user") || target.hasClass("rotate.adjust") ){
+		if( target.hasClass("user-info-load-area") ){
+			$(this).hide();
+			$(".screen-lock").hide();
+		}
+		else if( target.hasClass("user") || target.hasClass("rotate.adjust") ){
 			var tmp = target.parent();
 			if( tmp.length>0 && tmp[0]==this ){
 				$(".user-info-close").trigger("mouseup");
@@ -1699,9 +1703,24 @@ $(function(){
 		userInfoShow($(this).data("gi"),$(this).data("gu"));
 	});
 
-	$(document).on("mouseup",".user-avatar-bar-favorite .fav",function(e){
-		clickUserInfoFavorite( $(this) );
+	$(document).on("mouseup",".ab_namecard",function(e){
+		e.stopPropagation();
+		$(document).data("namecard-pos",$(window).scrollTop());
+		$(window).scrollTop(0);
+		// $(".user-info-load-area").css("top",$(window).scrollTop());
+		// $(".screen-lock").css("top",$(window).scrollTop());
+
+		//調整
+		$("#page-group-main .gm-content").css("overflow","initial");
+
+		//鈴鐺頁面不動作
+		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);
+		AddressBook.userInfoShow($(this).data("gi"),$(this).data("gu"));
 	});
+
+	// $(document).on("mouseup",".user-avatar-bar-favorite .fav",function(e){
+	// 	clickUserInfoFavorite( $(this) );
+	// });
 
 	$(".st-feedbox-area,#page-timeline-detail").on("mouseenter",".attach-download",function(){
 		var this_media = $(this);
