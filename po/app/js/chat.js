@@ -1857,9 +1857,8 @@ function leaveRoomAPI(ciTmp, callback) {
 	);
 }
 
-function editMemInRoomAPI(ciTmp, method, list, callback) {
-	var sendData = {ul: list};
-	op("groups/" + gi + "/chats/" + ciTmp + "/users", method,
+function editMemInRoomAPI(ciTmp, sendData, callback) {
+	op("groups/" + gi + "/chats/" + ciTmp + "/users", "put",
 		sendData, function (pData, status, xhr) {
 			cns.debug(status, JSON.stringify(pData));
 			if (callback) callback(pData);
@@ -1907,36 +1906,31 @@ function delMember() {
 						var removeList = [];
 						for (var guTmp in memList) {
 							if (!g_room.memList.hasOwnProperty(guTmp)) {
-								addList.push({gu: guTmp});
+								addList.push(guTmp);
 							}
 						}
 						for (var guTmp in g_room.memList) {
 							if (!memList.hasOwnProperty(guTmp)) {
-								removeList.push({gu: guTmp});
+								removeList.push(guTmp);
 							}
 						}
 						var isSend = false;
+						var data = {};
 						if (addList.length > 0) {
-							editMemInRoomAPI(ci, "post", addList, function (data) {
-								if (isSend) {
-									getPermition(true);
-									updateChat();
-								}
-								isSend = true;
-							});
-						} else {
+							data.add = {gul:addList};
 							isSend = true;
 						}
+
 						if (removeList.length > 0) {
-							editMemInRoomAPI(ci, "put", removeList, function (data) {
-								if (isSend) {
-									getPermition(true);
-									updateChat();
-								}
-								isSend = true;
-							});
-						} else {
+							data.del = {gul:removeList};
 							isSend = true;
+						}
+
+						if( isSend ){
+							editMemInRoomAPI(ci, data, function (data) {
+								getPermition(true);
+								updateChat();
+							});
 						}
 					} catch (e) {
 						cns.debug("[!]" + e.message);
@@ -2014,9 +2008,9 @@ function addMember() {
 						var memList = $.parseJSON(memListString);
 						var newList = [];
 						for (var guTmp in memList) {
-							newList.push({gu: guTmp});
+							newList.push( guTmp);
 						}
-						editMemInRoomAPI(ci, "post", newList, function (data) {
+						editMemInRoomAPI(ci, {add:{gul:newList}}, function (data) {
 							// if( data.status==200){
 							getPermition(true);
 							updateChat();
@@ -2032,7 +2026,7 @@ function addMember() {
 					$("#page-chat").removeClass("transition");
 				}, 500);
 				$("#page-select-object").remove();
-			}, false
+			}, true
 		);
 	} catch (e) {
 		errorReport(e);
@@ -2347,24 +2341,26 @@ function requestNewChatRoom_chatroom() {
 		return;
 	}
 
-	requestNewChatRoomApi(gi, text, arr, g_newChatFavList, function (data) {
-		var page = $("#page-chat");
-		gi = page.attr("data-gi");
+	if (window.opener) {
+		window.opener.requestNewChatRoomApi(gi, text, arr, g_newChatFavList, function (data) {
+			var page = $("#page-chat");
+			gi = page.attr("data-gi");
 
-		if (window.opener) {
-			var parent = $(window.opener.document);
-			var tmp = parent.find(".chatList-add-done");
-			tmp.attr("data-gi", gi);
-			tmp.attr("data-ci", data.ci);
-			tmp.trigger("click");
-			// $(window.opener)[0].focus();
-		}
-		gi = page.attr("data-gi");
-		ci = page.attr("data-ci");
-		var userData = $.userStorage();
-		g_group = userData[gi];
-		g_room = g_group["chatAll"][ci];
-	}, false);
+			
+				// var parent = $(window.opener.document);
+				// var tmp = parent.find(".chatList-add-done");
+				// tmp.attr("data-gi", gi);
+				// tmp.attr("data-ci", data.ci);
+				// tmp.trigger("click");
+				// $(window.opener)[0].focus();
+
+			gi = page.attr("data-gi");
+			ci = page.attr("data-ci");
+			var userData = $.userStorage();
+			g_group = userData[gi];
+			g_room = g_group["chatAll"][ci];
+		}, true);
+	}
 	$.popAllPage();
 }
 

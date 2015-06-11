@@ -4693,6 +4693,13 @@ $(function(){
 	    var method = "get";
 	    var result = ajaxDo(api_name,headers,method,false);
 	    result.complete(function(data){
+            var feedboxAreaBottom = $(".st-feedbox-area-bottom");
+            
+            //---------- TODO -----------
+            //  隱藏底部更新ui
+            //---------------------------
+
+
 	    	//關閉下拉更新的ui
 	    	if(is_top){
 				setTimeout(function(){
@@ -4718,8 +4725,8 @@ $(function(){
                 groupSwitchEnable();
 	        	//關閉timeline loading 開啟沒資料圖示
 	        	setTimeout(function(){
-	        		$(".st-feedbox-area-bottom > img").hide();
-    				$(".st-feedbox-area-bottom > div").show();
+	        		feedboxAreaBottom.children("img").hide();
+    				feedboxAreaBottom.children("div").show();
 	        	},2000);
 	        	return false;
 	    	}
