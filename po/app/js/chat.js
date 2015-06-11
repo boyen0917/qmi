@@ -970,6 +970,7 @@ function updateChat(time, isGetNewer) {
 						$("#chat-loading-grayArea").hide();
 						$("#chat-loading").hide();
 						$("#chat-nomore").show();
+						g_container.getNiceScroll()[0].wheelprevented = false;
 						// $("#chat-loading").fadeOut( function(){
 						// $("#chat-nomore").show();
 						// });
