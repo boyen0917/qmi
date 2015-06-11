@@ -668,6 +668,7 @@ img.auo {
 	background: #000;
 	opacity: 0.8;
 	z-index: 1700;
+	max-height: 100vh;
 }
 
 .compose-dnd {
