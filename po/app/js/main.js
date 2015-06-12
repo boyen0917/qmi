@@ -129,11 +129,11 @@ $(function(){
 	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi") || "00";
+		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
 
 		//判斷沒資料的元件存在時 就不動作
-		if($(".feed-subarea[data-feed=" + feed_type + "]").hasClass("no-data")) return;	
+		if( this_navi.hasClass("no-data") ) return;	
 		
-		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
 		var last_show_event = this_navi.find(".filter-show").last();
 		var last_event = this_navi.find(".st-sub-box").last();
 		
@@ -153,10 +153,41 @@ $(function(){
 		}
 	});
 
+	$(".st-feebox-area-no-content ").bind('mousewheel DOMMouseScroll', function(){
+		var this_dom = $(this);
+		//取舊資料
+		var feed_type = $("#page-group-main").data("navi") || "00";
+		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+
+		//判斷沒資料的元件存在時 就不動作
+		if( this_navi.hasClass("no-data") ) return;	
+
+		var last_show_event = this_dom.siblings(".st-feedbox-area-bottom");
+		var last_event = this_navi.find(".st-sub-box").last();
+		
+		
+		//目前filter 沒內容, 但是還有資料可以拉
+		var bottom_height = $(window).scrollTop() + $(window).height();
+		var last_height = this_navi.offset().top + this_navi.height() + 25;
+
+		// cns.debug("this_navi:",{name:this_navi.selector,data:this_navi.data("scroll-chk")});
+	    //scroll 高度 達到 bottom位置 並且只執行一次
+		if(bottom_height && bottom_height >= last_height && !this_navi.data("scroll-chk")){
+			this_dom.addClass("disabled");
+			//避免重複
+			this_navi.data("scroll-chk",true);
+			cns.debug("last event ct:",this_navi.data("last-ct"));
+			timelineListWrite(this_navi.data("last-ct"));
+			timelineScrollTop();
+			$(".gm-content > div:eq(1)").getNiceScroll(0).doScrollTop(0, 500);
+		}
+	});
+
 	var docked = false;
 	var init = 221;
 	function checkFilterPosition(tt){
 		var dom = $(".gm-content");
+		if( !dom.is(":visible") ) return;
 		// cns.debug( tt, dom.scrollTop() );  
 		var menu = $(".st-filter-area");
 	    if (!docked && dom.scrollTop() >= 163) 
@@ -501,6 +532,8 @@ $(function(){
 	});
 
 	$(".st-filter-action").click(function(){
+		var filter_action = $(this);
+		var navi_area = $(".st-navi-subarea");
 		var parent = $(this).parent();
 		if( parent.hasClass("lock") ){
 			return;
@@ -510,8 +543,8 @@ $(function(){
 			parent.removeClass("lock");
 		}, 500);
 
-		$(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
-		$(this).addClass("st-filter-list-active");
+		filter_action.filter(".st-filter-list-active").removeClass("st-filter-list-active");
+		filter_action.addClass("st-filter-list-active");
 		// var filter_name = $(this).find("span").html();
 
 		//動態變化
@@ -530,32 +563,39 @@ $(function(){
 
 		//過濾發文類型
 		if(filter_status == "navi" || filter_status == "all"){
-        	$(".st-navi-subarea[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
+        	navi_area.filter("[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	// return false;
 		} else {
 			//檢查目前的首頁是哪頁(動態消息/團體消息/成員消息)
 			var currentHome = $(".st-navi-area").data("currentHome") || "home";
-			$(".st-navi-subarea[data-st-navi="+currentHome+"]").trigger("click");
+			navi_area.filter("[data-st-navi="+currentHome+"]").trigger("click");
 		}
 
 		var event_tp = $("#page-group-main").data("navi") || "00";
-		var this_events = $(".feed-subarea[data-feed=" + event_tp + "] .st-sub-box");
+		var event_area = $(".feed-subarea[data-feed=" + event_tp + "]");
+		var this_events = event_area.find(".st-sub-box");
 
 		//做過濾
 		//先關閉全區域
-		$(".st-feedbox-area").hide();
+		var feedbox_area = $(".st-feedbox-area");
+		feedbox_area.hide();
 
 		//記錄
 		$(".st-filter-area").data("filter",filter_status);
-		$(".feed-subarea[data-feed=" + event_tp + "]").data("filter-name",$(this).find("span").html());
+		event_area.data("filter-name",$(this).find("span").html());
 		
 		//已讀未讀
+		var cnt = 0;
 		this_events.each(function(i,val){
 			eventFilter($(this),filter_status);
+			if( $(val).hasClass("filter-show") ){
+				cnt++;
+			}
 		});
+		showFeedboxNoContent( (cnt>0) );
 
 		//開啟全區域
-		$(".st-feedbox-area").fadeIn("slow");
+		feedbox_area.fadeIn("slow");
 	});
 
 	$(".st-filter-list-btn").click(function(){
@@ -954,7 +994,20 @@ $(function(){
 		    },100);
 		}
 	});
-
+	
+	$(".st-filter-hide").click( function(e){
+		var this_dom = $(this);
+		var parent = this_dom.parent();
+		e.stopPropagation();
+		if( this_dom.hasClass("left") ){
+			parent.animate({scrollLeft: 0}, 'fast');
+			this_dom.siblings(".right").show();
+		} else {
+			parent.animate({scrollLeft: parent.width()}, 'fast');
+			this_dom.siblings(".left").show();
+		}
+		this_dom.hide();
+	});
 
 /*########################################################################################################################
 

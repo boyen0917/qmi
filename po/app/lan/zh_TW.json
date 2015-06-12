@@ -201,6 +201,9 @@
 	"COMMON_FREE" : "免費",
 	"COMMON_NOT_MP4" : "檔案格式必須為MP4",
 	"COMMON_ACT_TOO_FREQUENT" : "操作過於頻繁",
+	"COMMON_SCROLL_DOWN_UPDATE" : "下拉更新...",
+	"COMMON_PRIVATE" : "不公開",
+	"COMMON_PUBLIC" : "公開",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",

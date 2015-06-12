@@ -331,7 +331,11 @@ $(function(){
                 // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
 
 				//filter all
-				$(".st-filter-area").data("filter","all");
+                var filterArea = $(".st-filter-area");
+                filterArea.data("filter","all");
+                filterArea.children(".st-filter-hide.right").show();
+                filterArea.children(".st-filter-hide.left").hide();
+                filterArea.scrollLeft(0);
 
 	        	//點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
                 if(!main)
@@ -452,10 +456,14 @@ $(function(){
                 filterAction.filter("[data-navi='task']").hide();
                 filterAction.filter("[data-navi='feed-public']").hide();
                 filterAction.filter("[data-navi='feed-post']").show().addClass("st-filter-list-active");
+                
                 // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
 
                 //filter all
-                $(".st-filter-area").data("filter","all");
+                var filterArea = $(".st-filter-area");
+                filterArea.data("filter","all");
+                filterArea.children(".st-filter-hide").hide();
+                filterArea.scrollLeft(0);
 
                 //點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
                 // if(!main)
@@ -486,7 +494,11 @@ $(function(){
                 // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
 
                 //filter all
-                $(".st-filter-area").data("filter","all");
+                var filterArea = $(".st-filter-area");
+                filterArea.data("filter","all");
+                filterArea.children(".st-filter-hide.right").show();
+                filterArea.children(".st-filter-hide.left").hide();
+                filterArea.scrollLeft(0);
 
                 //點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
                 // if(!main)
@@ -4906,6 +4918,7 @@ $(function(){
         var this_event = this_event_temp;
         var selector = $(".timeline-detail");
         var method = "html";
+        var visibleEventCnt = 0;
 
         //製作timeline
         $.each(timeline_list,function(i,val){
@@ -4938,6 +4951,10 @@ $(function(){
 
                     //已經存在的文章還是要檢查filter
                     eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
+
+                    if( this_event.hasClass("filter-show") ){
+                        visibleEventCnt++;
+                    }
                     return;
                 }
 
@@ -5114,6 +5131,9 @@ $(function(){
 
             //detail 不做filter
             if(!detail) eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
+            if( this_event.hasClass("filter-show") ){
+                visibleEventCnt++;
+            }
 
             //timeline message內容
             var tuTmp =null;
@@ -5124,6 +5144,8 @@ $(function(){
             }
             timelineContentMake(this_event,target_div,val.ml,false,tuTmp);
         });
+
+        showFeedboxNoContent( (visibleEventCnt>0) );
     }
 
 	timelineListWrite = function (ct_timer,is_top){
@@ -5240,11 +5262,11 @@ $(function(){
 
         //訂閱
         if( true==this_es_obj.is ){
-                this_event.find(".st-sub-subscribe").show();
-                this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='subscribe'] div").html( $.i18n.getString("FEED_UNSUBSCRIBE") );
+            this_event.find(".st-sub-subscribe").show();
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='subscribe'] div").html( $.i18n.getString("FEED_UNSUBSCRIBE") );
         } else {
-                this_event.find(".st-sub-subscribe").hide();
-                this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='subscribe'] div").html( $.i18n.getString("FEED_SUBSCRIBE") );
+            this_event.find(".st-sub-subscribe").hide();
+            this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='subscribe'] div").html( $.i18n.getString("FEED_SUBSCRIBE") );
         }
 
         //置頂(一般貼文不能置頂)
@@ -7462,11 +7484,11 @@ $(function(){
         var nkTmp = this_info.find(".user-avatar-bar .nk").html();
         if( nkTmp && nkTmp.length>0 ) this_info.find(".user-avatar-bar .nk").html( nkTmp.replaceOriEmojiCode() );
 
-		if(user_data.mkp) this_info.find(".user-info-list .pn").val("******");
-		if(user_data.mke) this_info.find(".user-info-list .em").val("******");
+		if(user_data.mkp) this_info.find(".user-info-list .pn").html("******");
+		if(user_data.mke) this_info.find(".user-info-list .em").html("******");
 		if(user_data.mkb) {
 			this_info.find(".user-avatar-bar .bd").hide();
-			this_info.find(".user-info-list .bd").val("******");	
+			this_info.find(".user-info-list .bd").html("******");	
 		}else{
             this_info.find(".user-avatar-bar .user-name").addClass("hidden");
         }
@@ -7515,9 +7537,22 @@ $(function(){
     			}
     		}
 
-    		if(user_data.mkp) this_info.find(".user-info-list .pn1").val("******");
-    		if(user_data.mke) this_info.find(".user-info-list .em").val("******");
-    		if(user_data.mkb) this_info.find(".user-info-list .bd").val("******");
+            var keys = {
+                mkp: "pn1",
+                mke: "em",
+                mkb: "bd"
+            };
+            $.each( keys, function(key, obj){
+                var input = this_info.find(".user-info-list ."+obj);
+                var statusText = this_info.find(".me-info-status."+obj+" .status-text")
+                input.data("ori", input.val() );
+                if( user_data[key] ){
+                    input.val("******");
+                    statusText.text( $.i18n.getString("COMMON_PRIVATE") ).data("val", true);
+                } else {
+                    statusText.text( $.i18n.getString("COMMON_PUBLIC") ).data("val", false);
+                }
+            });
 
     		userInfoEvent(this_info,true);
 
@@ -7645,6 +7680,35 @@ $(function(){
 					popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
 				}
 	    	});
+            
+            //資料開放設定
+            this_info.find(".me-info-status").click(function(){
+                $(this).parent().siblings(".me-info-status-switch").toggle();
+            });
+            this_info.find(".me-info-status-switch div").click(function(){
+                var isPrivate = $(this).data("type")=="private";
+                var parentDom = $(this).parent();
+                var type = parentDom.data("type");
+
+                var input = this_info.find(".user-info-list ."+type);
+                var statusText = this_info.find(".me-info-status."+type+" .status-text")
+
+                var oriIsPrivate = statusText.data("val");
+                cns.debug(isPrivate, oriIsPrivate, type);
+                if( oriIsPrivate!=isPrivate ){
+                    if( isPrivate ){
+                        input.val("******");
+                        statusText.text( $.i18n.getString("COMMON_PRIVATE") ).data("val", true);
+                    } else {
+                        input.val( input.data("ori") );
+                        statusText.text( $.i18n.getString("COMMON_PUBLIC") ).data("val", false);
+                    }
+                    //有更動即可按確定
+                    this_info.find(".user-info-submit").addClass("user-info-submit-ready");
+                }
+                
+                parentDom.hide();
+            });
 
 	    	this_info.find(".user-info-list input").bind("input",function(){
 	    		//有更動即可按確定
@@ -7753,7 +7817,10 @@ $(function(){
 
         var body = {
 		  nk: new_name, // Nickname
-		  sl: this_info.find(".user-info-list .sl").val() // Slogan
+		  sl: this_info.find(".user-info-list .sl").val(), // Slogan
+          mke: this_info.find(".me-info-status.em .status-text").data("val"),
+          mkp: this_info.find(".me-info-status.pn1 .status-text").data("val"),
+          mkb: this_info.find(".me-info-status.bd .status-text").data("val"),
 		}
 
         var method = "put";
@@ -8157,6 +8224,15 @@ $(function(){
 			pollingInterval(true);
 		}
     };
+
+    showFeedboxNoContent = function( isShow ){
+        if( isShow ){
+            $(".st-feebox-area-no-content").hide();
+        } else {
+            $(".st-feebox-area-no-content").show().removeClass("disabled");
+            $(".gm-content > div:eq(1)").getNiceScroll(0).doScrollTop(0, 500);
+        }
+    }
 
 /*
               ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
