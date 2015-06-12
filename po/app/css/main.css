@@ -4629,6 +4629,54 @@ img.user-info-back {
 	display: none;
 }
 
+.me-info-bar-extra input{
+	width: 75%;
+}
+.me-info-status{
+	width: 22%;
+	display: inline-block;
+	float: right;
+}
+.me-info-status img{
+	height: 12px;
+	width: auto;
+	position: relative;
+	float: right;
+	margin-top: 6px;
+	margin-left: 5px;
+}
+.me-info-status-switch{
+	display: none;
+	float: right;
+	margin-top: -80px;
+	/* border: 1px solid; */
+	background-color: black;
+	color: white;
+	padding: 5px 9px;
+	/* z-index: 1000; */
+	border-radius: 10px;
+}
+.me-info-status-switch:after{
+	content: '';
+	position: absolute;
+	border-style: solid;
+	border-width: 13px 9px 0;
+	border-color: #000000 transparent;
+	display: block;
+	width: 0;
+	z-index: 1;
+	bottom: 38px;
+	left: 283px;
+}
+.me-info-status-switch div{
+	display: inline-block;
+	cursor: pointer;
+}
+.me-info-status-switch div:nth-child(1){
+	border-right: 1px solid white;
+	padding-right: 5px;
+}
+
 .user-avatar-bar .bottom {
 	height: 10px;
 }

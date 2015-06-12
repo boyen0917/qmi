@@ -7452,11 +7452,11 @@ $(function(){
         var nkTmp = this_info.find(".user-avatar-bar .nk").html();
         if( nkTmp && nkTmp.length>0 ) this_info.find(".user-avatar-bar .nk").html( nkTmp.replaceOriEmojiCode() );
 
-		if(user_data.mkp) this_info.find(".user-info-list .pn").val("******");
-		if(user_data.mke) this_info.find(".user-info-list .em").val("******");
+		if(user_data.mkp) this_info.find(".user-info-list .pn").html("******");
+		if(user_data.mke) this_info.find(".user-info-list .em").html("******");
 		if(user_data.mkb) {
 			this_info.find(".user-avatar-bar .bd").hide();
-			this_info.find(".user-info-list .bd").val("******");	
+			this_info.find(".user-info-list .bd").html("******");	
 		}else{
             this_info.find(".user-avatar-bar .user-name").addClass("hidden");
         }
@@ -7505,9 +7505,22 @@ $(function(){
     			}
     		}
 
-    		if(user_data.mkp) this_info.find(".user-info-list .pn1").val("******");
-    		if(user_data.mke) this_info.find(".user-info-list .em").val("******");
-    		if(user_data.mkb) this_info.find(".user-info-list .bd").val("******");
+            var keys = {
+                mkp: "pn1",
+                mke: "em",
+                mkb: "bd"
+            };
+            $.each( keys, function(key, obj){
+                var input = this_info.find(".user-info-list ."+obj);
+                var statusText = this_info.find(".me-info-status."+obj+" .status-text")
+                input.data("ori", input.val() );
+                if( user_data[key] ){
+                    input.val("******");
+                    statusText.text( $.i18n.getString("COMMON_PRIVATE") ).data("val", true);
+                } else {
+                    statusText.text( $.i18n.getString("COMMON_PUBLIC") ).data("val", false);
+                }
+            });
 
     		userInfoEvent(this_info,true);
 
@@ -7635,6 +7648,35 @@ $(function(){
 					popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
 				}
 	    	});
+            
+            //資料開放設定
+            this_info.find(".me-info-status").click(function(){
+                $(this).parent().siblings(".me-info-status-switch").toggle();
+            });
+            this_info.find(".me-info-status-switch div").click(function(){
+                var isPrivate = $(this).data("type")=="private";
+                var parentDom = $(this).parent();
+                var type = parentDom.data("type");
+
+                var input = this_info.find(".user-info-list ."+type);
+                var statusText = this_info.find(".me-info-status."+type+" .status-text")
+
+                var oriIsPrivate = statusText.data("val");
+                cns.debug(isPrivate, oriIsPrivate, type);
+                if( oriIsPrivate!=isPrivate ){
+                    if( isPrivate ){
+                        input.val("******");
+                        statusText.text( $.i18n.getString("COMMON_PRIVATE") ).data("val", true);
+                    } else {
+                        input.val( input.data("ori") );
+                        statusText.text( $.i18n.getString("COMMON_PUBLIC") ).data("val", false);
+                    }
+                    //有更動即可按確定
+                    this_info.find(".user-info-submit").addClass("user-info-submit-ready");
+                }
+                
+                parentDom.hide();
+            });
 
 	    	this_info.find(".user-info-list input").bind("input",function(){
 	    		//有更動即可按確定
@@ -7743,7 +7785,10 @@ $(function(){
 
         var body = {
 		  nk: new_name, // Nickname
-		  sl: this_info.find(".user-info-list .sl").val() // Slogan
+		  sl: this_info.find(".user-info-list .sl").val(), // Slogan
+          mke: this_info.find(".me-info-status.em .status-text").data("val"),
+          mkp: this_info.find(".me-info-status.pn1 .status-text").data("val"),
+          mkb: this_info.find(".me-info-status.bd .status-text").data("val"),
 		}
 
         var method = "put";

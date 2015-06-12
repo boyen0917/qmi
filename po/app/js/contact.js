@@ -258,11 +258,11 @@ onSearchInput = function(e){
 			branchListContainer.remove();
 		}
 		branchListContainer = generateBranchList( branchList );
-		branchTitle.after(branchListContainer);
 
 		branchListContainer.find(".row.branch").off("click").click( function(){
 			showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
 		});
+		branchTitle.after(branchListContainer);
 	} else {
 		branchTitle.hide();
 	}

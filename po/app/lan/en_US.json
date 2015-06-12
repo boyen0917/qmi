@@ -203,6 +203,8 @@
 	"COMMON_NOT_MP4" : "File must be MP4.",
 	"COMMON_ACT_TOO_FREQUENT" : "Too frequent activity.",
 	"COMMON_SCROLL_DOWN_UPDATE" : "Scroll down to update...",
+	"COMMON_PRIVATE" : "Private",
+	"COMMON_PUBLIC" : "Public",
 	
 	"CHAT_TITLE"							: "Chat",
 	"CHAT_SEND"  						: "Send",
