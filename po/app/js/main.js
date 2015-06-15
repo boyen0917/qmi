@@ -72,7 +72,7 @@ $(function(){
 		}
 
 		//執行polling
-		// pollingInterval();
+		pollingInterval();
 	}else{
     	document.location = "index.html";
     	return false;
