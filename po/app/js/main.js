@@ -1173,19 +1173,12 @@ $(function(){
 
 		this_compose.data("send-chk",false);
 
-		// //允許繼續點選送出
-		// setTimeout(function(){
-		// 	this_compose.data("send-chk",true);
-		// },1500);
-
-
 		this_compose.data("parse-resend",false);
 
 		//等待截取網址內容 時間太久則取消
 		if(this_compose.data("parse-waiting")){
 
 			setTimeout(function(){
-
 				//重新送出
 				this_compose.data("send-chk",true);
 

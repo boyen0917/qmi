@@ -4400,8 +4400,6 @@ $(function(){
         var method = "post";
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
-            //允許點選送出
-            $(document).find(".cp-content").data("send-chk",true);
 
             if(data.status == 200){
                 $.mobile.changePage("#page-group-main");
