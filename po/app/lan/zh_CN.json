@@ -297,6 +297,10 @@
 	"USER_PROFILE_UPDATE_SUCC" : "更新成功",
 	"USER_PROFILE_NO_DATA" : "暂无资料",
 	"USER_PROFILE_LEAVE" : "已退出",
+	"USER_PROFILE_DELETE_MEMBER" : "删除成员",
+	"USER_PROFILE_DELETE_MEMBER_CONFIRM" : "删除此成员？",
+	"USER_PROFILE_DELETE_MEMBER_DESC" : "被删除的成员将无法检视该团体，您可以从管理网页恢复该成员权限。",
+
 
 	"OFFICIAL_ABOUT" : "关于",
 	"OFFICIAL_CHAT" : "聊天",

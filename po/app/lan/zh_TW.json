@@ -297,6 +297,9 @@
 	"USER_PROFILE_UPDATE_SUCC" : "更新成功",
 	"USER_PROFILE_NO_DATA" : "暫無資料",
 	"USER_PROFILE_LEAVE" : "已退出",
+	"USER_PROFILE_DELETE_MEMBER" : "刪除成員",
+	"USER_PROFILE_DELETE_MEMBER_CONFIRM" : "刪除此成員？",
+	"USER_PROFILE_DELETE_MEMBER_DESC" : "被刪除的成員將無法檢視該團體，您可以從管理網頁恢復該成員權限。",
 
 	"OFFICIAL_ABOUT" : "關於",
 	"OFFICIAL_CHAT" : "聊天",

@@ -383,7 +383,8 @@ $(function(){
                 //show page
                 $(".subpage-addressBook").show();
                 //show add btn
-                gmHeader.find(".addressBook-add").show();
+                // gmHeader.find(".addressBook-add").show();
+                gmHeader.find(".addressBook-refresh").show();
                 
                 page_title = $.i18n.getString("ADDRESSBOOK_TITLE");
 
@@ -7340,6 +7341,12 @@ $(function(){
                     });
                 });
                 $(".user-avatar-bar-favorite").show();
+
+                //如果為admin, 顯示刪除成員按鈕
+                var _groupList = $.lStorage(ui);
+                if( _groupList.hasOwnProperty(this_gi) && _groupList[this_gi].ad==1 ){
+                    this_info.find(".user-info-delete").show();
+                }
             }
 
     		getUserInfo([{gi:this_gi,gu:this_gu,isNewMem:false}],false,false,function(user_data){
@@ -7388,6 +7395,7 @@ $(function(){
 
     userInfoDataShow = function(this_gi,this_info,user_data,me) {
         cns.debug("user_data",user_data);
+        this_info.data("gu",user_data.gu);
         if( user_data.st==2 ){
             this_info.find(".user-info-list-area").hide();
             this_info.find(".user-info-leave-area").show();
@@ -7740,6 +7748,16 @@ $(function(){
                 },1000);
 	    	});
 
+            //刪除成員
+            this_info.find(".user-info-delete").click(function(){
+                popupShowAdjust(
+                    $.i18n.getString("USER_PROFILE_DELETE_MEMBER_CONFIRM"),
+                    $.i18n.getString("USER_PROFILE_DELETE_MEMBER_DESC"),
+                    $.i18n.getString("COMMON_OK"),
+                    $.i18n.getString("COMMON_CANCEL"),[function(){
+                        userInfoDelete(this_info);
+                },null]);
+            });
     	}
 
         //click fav
@@ -7875,6 +7893,49 @@ $(function(){
         			this_info.find(".user-info-close").trigger("mouseup");
         		// }
         	}
+        });
+    }
+    userInfoDelete = function(this_info){
+        var this_gu = this_info.data("gu");
+        if(!this_gu){
+            // toastShow( $.i18n.getString("USER_PROFILE_EMPTY_NAME") );
+            cns.debug("userInfoDelete no gu");
+            return false;
+        }
+
+        // load show
+        var api_name = "groups/"+gi+"/users/"+this_gu+"/status";
+        var headers = {
+                ui: ui,
+                at: at,
+                li: lang
+                     };
+        var method = "put";
+        var body = { st: 2 };
+        
+        ajaxDo(api_name,headers,method,true,body).complete(function(data){
+            s_load_show = false;
+            
+            // 關閉load 圖示
+            $('.ui-loader').hide();
+            $(".ajax-screen-lock").hide();
+            //重置團體頭像、名稱的參數
+            if(data.status == 200){
+                //重置團體頭像、名稱 失敗也要重置
+                var _groupList = $.lStorage(ui);
+                _groupList[gi].guAll[this_gu].st = 2;
+                $.lStorage(ui,_groupList);
+
+                if( $(".subpage-contact").length>0 ){
+                    initContactData();
+                    initContactList();
+                }
+
+                //結束關閉
+                this_info.find(".user-info-close").trigger("mouseup");
+            } else {
+                toastShow( $.i18n.getString("COMMON_CHECK_NETWORK") );
+            }
         });
     }
 
@@ -8042,7 +8103,7 @@ $(function(){
                                 popupShowAdjust(
                                     $.i18n.getString("FEED_EVENT_DELETED"),
                                     "",
-                                    "COMMON_OK",
+                                    $.i18n.getString("COMMON_OK"),
                                     "",[function(){
                                         $("#page-timeline-detail .page-back").trigger("click");
                                     },null]);

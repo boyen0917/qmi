@@ -1,9 +1,8 @@
 
 $(document).ready(function(){
-	//set add member button
-	$(".addressBook-add").off("click").on("click",function(e){
+	$(".addressBook-refresh").off("click").on("click",function(e){
 		// AddressBook.showAddMemberPage();
-		AddressBook.meInfoShow();
+		AddressBook.initAddressBookList();
 	});
 	$("#page-addressbook-addmem .ca-content-area").niceScroll( {
 		// styler:"fb",
@@ -65,8 +64,9 @@ var AddressBook = AddressBook || {
 
 				//get mem data
 				if( !tmp.gcl || tmp.gcl.length<=0 ){
-					alert("no gcl data");
-					return;
+					cns.debug("no gcl data");
+					tmp.gcl = {};
+					// return;
 				}
 				//member tp 0: ucl, 1:gcl, 2: fav
 				instance.favGuAll = {}
@@ -86,25 +86,33 @@ var AddressBook = AddressBook || {
 		            }
 		            instance.guAllExsit[key] = instance.guAll[key];
 		        }
-				instance.favCnt = cnt;
-
 				instance.inviteGuAll = {};
 				instance.newMemList = {};
 
 
 				//custom defined
 				if( !tmp.ucl || tmp.ucl.length<=0 ){
-					alert("no ucl data");
-					return;
+					cns.debug("no ucl data");
+					tmp.gcl = {};
+					// return;
 				}
 				instance.ucl = {};
 		        for( var i=0; i<tmp.ucl.length; i++){
 		            //將gu設成key 方便選取
 		            var data = tmp.ucl[i];
+		        	var key = data.ci;
 		            data.isCustom = true;
-		            instance.guAll[ data.ci ] = data;
-		            instance.ucl[ data.ci ] = data;
+		            instance.guAll[ key ] = data;
+		            instance.ucl[ key ] = data;
+		            if( instance.guAll[key].tp==2 ){
+		            	instance.guAll[key].fav = true;
+						instance.favGuAll[key] = tmp.gcl[i];
+						cnt++;
+		            } else{
+		            	instance.guAll[key].fav = false;
+		            }
 		        }
+				instance.favCnt = cnt;
 		        instance.customCnt = Object.keys(instance.ucl).length;
 
 
@@ -841,7 +849,7 @@ var AddressBook = AddressBook || {
 			}
 			//name, (職稱), detail
 			var mid = tmp.find(".mid");
-			mid.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
+			mid.append("<div class='name'>"+mem.nk?(mem.nk.replaceOriEmojiCode()):""+"</div>");
 			
 			//暫時用部門取代職稱
 			var posi = "";
@@ -1001,14 +1009,15 @@ var AddressBook = AddressBook || {
 	showFavoritePage: function( event ){//isBackward
 		var instance = event.data.instance;
 		var pageID = "page-addressbook_favorite";
-		instance.updateFavoritePage(instance);
+		instance.updateFavoritePage();
 		$("#"+pageID +" .contact-scroll").height( $(window).height()-112 );
 		$.mobile.changePage("#"+pageID, { transition: "slide"});
 		// if( true==isBackward ) $.mobile.changePage("#"+pageID, { transition: "slide", reverse: true} );
 		// else  $.mobile.changePage("#"+pageID, { transition: "slide"});
 	},
 
-	updateFavoritePage: function(instance){
+	updateFavoritePage: function(){
+		var instance = AddressBook;
 		var pageID = "page-addressbook_favorite";
 		var page = $( "#"+pageID );
 
@@ -1198,181 +1207,181 @@ var AddressBook = AddressBook || {
 	// 	});
 	// },
 
-	updateInvitePending: function() {
-		var instance = this;
-		//render invite pending member list
-		var pendingAreaParent = $("#page-addressbook-addmem .ca-pending-area");
-		var pendingArea = pendingAreaParent.children(".list");
-		var coachArea = pendingAreaParent.children(".coach").hide();
-		pendingArea.html("").show();
-		var noData = true;
-		if( instance.inviteGuAll ){
-			var template = $('<div class="row">'
-					+'<div class="left"><img class="ab_namecard"/></div>'
-					+'<div class="mid"><div class="name"></div><div class="phone"></div></div>'
-					+'<div class="right"><img src="images/icon/icon_invite_mail.png"/></div>'
-				+'</div>');
-			$.each(instance.inviteGuAll, function(guTmp, mem){
-				if( mem && mem.st==0 ){
-					noData = false;
-					var newRow = template.clone();
-					//img
-					newRow.find(".ab_namecard").data("gu",guTmp).data("gi",gi).attr("src",mem.aut||"images/common/others/empty_img_personal_l.png");
-					//name
-					newRow.find(".name").html( htmlFormat(mem.nk||"") );
-					//phone
-					newRow.find(".phone").text( mem.pn||"" );
-					pendingArea.append(newRow);
-				}
-			});
+	// updateInvitePending: function() {
+	// 	var instance = this;
+	// 	//render invite pending member list
+	// 	var pendingAreaParent = $("#page-addressbook-addmem .ca-pending-area");
+	// 	var pendingArea = pendingAreaParent.children(".list");
+	// 	var coachArea = pendingAreaParent.children(".coach").hide();
+	// 	pendingArea.html("").show();
+	// 	var noData = true;
+	// 	if( instance.inviteGuAll ){
+	// 		var template = $('<div class="row">'
+	// 				+'<div class="left"><img class="ab_namecard"/></div>'
+	// 				+'<div class="mid"><div class="name"></div><div class="phone"></div></div>'
+	// 				+'<div class="right"><img src="images/icon/icon_invite_mail.png"/></div>'
+	// 			+'</div>');
+	// 		$.each(instance.inviteGuAll, function(guTmp, mem){
+	// 			if( mem && mem.st==0 ){
+	// 				noData = false;
+	// 				var newRow = template.clone();
+	// 				//img
+	// 				newRow.find(".ab_namecard").data("gu",guTmp).data("gi",gi).attr("src",mem.aut||"images/common/others/empty_img_personal_l.png");
+	// 				//name
+	// 				newRow.find(".name").html( htmlFormat(mem.nk||"") );
+	// 				//phone
+	// 				newRow.find(".phone").text( mem.pn||"" );
+	// 				pendingArea.append(newRow);
+	// 			}
+	// 		});
 
-		}
-		if(noData){
-			coachArea.show();
-			pendingArea.hide();
-		}
-	},
+	// 	}
+	// 	if(noData){
+	// 		coachArea.show();
+	// 		pendingArea.hide();
+	// 	}
+	// },
 
 
-	getInviteList: function(){
-		var instance = this;
-		var api_name = "groups/" + gi + "/invitations";
-		var headers = {
-		         "ui":ui,
-		         "at":at, 
-		         "li":lang,
-		             };
-		var method = "get";
-		var result = ajaxDo(api_name,headers,method,false);
-		result.complete(function(data){
-			if(data.status != 200) return false;
+	// getInviteList: function(){
+	// 	var instance = this;
+	// 	var api_name = "groups/" + gi + "/invitations";
+	// 	var headers = {
+	// 	         "ui":ui,
+	// 	         "at":at, 
+	// 	         "li":lang,
+	// 	             };
+	// 	var method = "get";
+	// 	var result = ajaxDo(api_name,headers,method,false);
+	// 	result.complete(function(data){
+	// 		if(data.status != 200) return false;
 
-			var obj =$.parseJSON(data.responseText);
-			if( obj.il && obj.il.length<=0 ){
-				$("#page-addressbook-addmem .ca-list-area .cal-coachmake").fadeIn();
-				$("#page-addressbook-addmem .ca-list-area .cal-div-area").fadeOut();
+	// 		var obj =$.parseJSON(data.responseText);
+	// 		if( obj.il && obj.il.length<=0 ){
+	// 			$("#page-addressbook-addmem .ca-list-area .cal-coachmake").fadeIn();
+	// 			$("#page-addressbook-addmem .ca-list-area .cal-div-area").fadeOut();
 
-			} else {
-				var area = $("#page-addressbook-addmem .ca-list-area .cal-div-area");
-				area.html("");
+	// 		} else {
+	// 			var area = $("#page-addressbook-addmem .ca-list-area .cal-div-area");
+	// 			area.html("");
 
-				for( var i=0; i<obj.il.length; i++){
-					var data_info = obj.il[i];
-					if( !data_info ) continue;
-					// "ik": "+886935398692", or "abc@gmail.com"
-				    // "tp": 0, or 1 // Invitation Type 0(Phone)、1(Email)
-				    // "nk": "小瓶 "
-				    // "auo": "http://s3.url/xxx", // Avatar Original URL
-				    // "aut": "http://s3.url/xxx"  // Avatar Thumbnail URL
-				    var row = $("<div class='cal-row'></div>");
-				    row.append("<div class='photo'><img class='st-user-pic' src='images/common/others/empty_img_personal_l.png'/></div>");
-				    row.append("<div class=info><div class='name'></div><div class='tel'></div></div>");
-				    row.append("<div class='img'><img src='images/invitemembers/invitemembers_icon_reinvite.png'/></div>");
-				    area.append( row );
+	// 			for( var i=0; i<obj.il.length; i++){
+	// 				var data_info = obj.il[i];
+	// 				if( !data_info ) continue;
+	// 				// "ik": "+886935398692", or "abc@gmail.com"
+	// 			    // "tp": 0, or 1 // Invitation Type 0(Phone)、1(Email)
+	// 			    // "nk": "小瓶 "
+	// 			    // "auo": "http://s3.url/xxx", // Avatar Original URL
+	// 			    // "aut": "http://s3.url/xxx"  // Avatar Thumbnail URL
+	// 			    var row = $("<div class='cal-row'></div>");
+	// 			    row.append("<div class='photo'><img class='st-user-pic' src='images/common/others/empty_img_personal_l.png'/></div>");
+	// 			    row.append("<div class=info><div class='name'></div><div class='tel'></div></div>");
+	// 			    row.append("<div class='img'><img src='images/invitemembers/invitemembers_icon_reinvite.png'/></div>");
+	// 			    area.append( row );
 
-				    if( data_info.aut ) row.find(".photo img").attr( "src", data_info.aut.replaceOriEmojiCode() );
-				    if( data_info.nk ) row.find(".info .name").html( data_info.nk.replaceOriEmojiCode() );
-				    if( data_info.ik && data_info.ik.length>0 ){
-				    	if( data_info.tp==0 ){
-				    		var tmp = data_info.ik.replace( /^(\+.{3})/, "0")
-				    		row.find(".info .tel").html( tmp );
-				    	} else {
-				    		row.find(".info .tel").html( data_info.ik );
-				    	}
-				    }
-				}
+	// 			    if( data_info.aut ) row.find(".photo img").attr( "src", data_info.aut.replaceOriEmojiCode() );
+	// 			    if( data_info.nk ) row.find(".info .name").html( data_info.nk.replaceOriEmojiCode() );
+	// 			    if( data_info.ik && data_info.ik.length>0 ){
+	// 			    	if( data_info.tp==0 ){
+	// 			    		var tmp = data_info.ik.replace( /^(\+.{3})/, "0")
+	// 			    		row.find(".info .tel").html( tmp );
+	// 			    	} else {
+	// 			    		row.find(".info .tel").html( data_info.ik );
+	// 			    	}
+	// 			    }
+	// 			}
 
-				$("#page-addressbook-addmem .ca-list-area .cal-coachmake").fadeOut();
-				area.fadeIn();
-			}
-		});
-	},
+	// 			$("#page-addressbook-addmem .ca-list-area .cal-coachmake").fadeOut();
+	// 			area.fadeIn();
+	// 		}
+	// 	});
+	// },
 
-	sendInvite: function(){
-		var instance = this;
-		var nk = $(".cai-name input").val();
-		if( !nk || nk.length==0 ){
-			popupShowAdjust("", $.i18n.getString("INVITE_DISPLAY_NAME") );
-			return;
-		}
-		var phone = $(".cai-num input").val();
-		if( !phone || phone.length==0 ){
-			popupShowAdjust("", $.i18n.getString("INVITE_PHONE_NUMBER") );
-			return;
-		}
-		if( phone.length<10 || phone.indexOf("0")!=0 ){
-			popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR") );
-			return;
-		}
-		var area = $(".cai-area .area");
-		phone = phone.replace(/^0/, area.html() );
-		/* ----- TODO ------
-			 國碼/email
-			不同國別電話格式檢查
-		   ----- TODO ------*/
-		instance.sendInviteAPI( [{
-				"pn": phone,
-				"nk": nk
-			}], function(data){
-				if( data.status==200 ){
-					// "ul":
-					// [
-					//   {
-					//     "gu": "asdfas-awefnasdf", // Group User Id
-					//     "ik": "+886912345678",  // Invitation Key
-					//     "tp": 0,  // Invitation Type(0: Phone, 1: Email)
-					//     "aj": true  // Already Joined Group ?
-					//   }
-					// ]
-					try{
-						var obj = $.parseJSON(data.responseText);
-						/* ----- TODO ------
-							如果已經邀過了...?
-						   ----- TODO ------ */
-						//mem already in group
-						if( obj.ul[0].aj==true ){
-							toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
-						} else {
-							toastShow( $.i18n.getString("INVITE_SUCC") );
-							$(".cai-name input").val("");
-							$(".cai-num input").val("");
-						}
-						//update inviting list
-						if(!instance.inviteGuAll) instance.inviteGuAll = {};
-						instance.inviteGuAll[obj.ul[0].gu] = {
-							gu: obj.ul[0].gu,
-							ik: obj.ul[0].ik,
-							tp: obj.ul[0].tp,
-							st: 0,
-							nk: nk,
-							pn: phone
-						};
-						instance.updateInvitePending();
+	// sendInvite: function(){
+	// 	var instance = this;
+	// 	var nk = $(".cai-name input").val();
+	// 	if( !nk || nk.length==0 ){
+	// 		popupShowAdjust("", $.i18n.getString("INVITE_DISPLAY_NAME") );
+	// 		return;
+	// 	}
+	// 	var phone = $(".cai-num input").val();
+	// 	if( !phone || phone.length==0 ){
+	// 		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_NUMBER") );
+	// 		return;
+	// 	}
+	// 	if( phone.length<10 || phone.indexOf("0")!=0 ){
+	// 		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR") );
+	// 		return;
+	// 	}
+	// 	var area = $(".cai-area .area");
+	// 	phone = phone.replace(/^0/, area.html() );
+	// 	/* ----- TODO ------
+	// 		 國碼/email
+	// 		不同國別電話格式檢查
+	// 	   ----- TODO ------*/
+	// 	instance.sendInviteAPI( [{
+	// 			"pn": phone,
+	// 			"nk": nk
+	// 		}], function(data){
+	// 			if( data.status==200 ){
+	// 				// "ul":
+	// 				// [
+	// 				//   {
+	// 				//     "gu": "asdfas-awefnasdf", // Group User Id
+	// 				//     "ik": "+886912345678",  // Invitation Key
+	// 				//     "tp": 0,  // Invitation Type(0: Phone, 1: Email)
+	// 				//     "aj": true  // Already Joined Group ?
+	// 				//   }
+	// 				// ]
+	// 				try{
+	// 					var obj = $.parseJSON(data.responseText);
+	// 					/* ----- TODO ------
+	// 						如果已經邀過了...?
+	// 					   ----- TODO ------ */
+	// 					//mem already in group
+	// 					if( obj.ul[0].aj==true ){
+	// 						toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
+	// 					} else {
+	// 						toastShow( $.i18n.getString("INVITE_SUCC") );
+	// 						$(".cai-name input").val("");
+	// 						$(".cai-num input").val("");
+	// 					}
+	// 					//update inviting list
+	// 					if(!instance.inviteGuAll) instance.inviteGuAll = {};
+	// 					instance.inviteGuAll[obj.ul[0].gu] = {
+	// 						gu: obj.ul[0].gu,
+	// 						ik: obj.ul[0].ik,
+	// 						tp: obj.ul[0].tp,
+	// 						st: 0,
+	// 						nk: nk,
+	// 						pn: phone
+	// 					};
+	// 					instance.updateInvitePending();
 
-					} catch(e){
+	// 				} catch(e){
 
-					}
-				} else {
-					toastShow( $.i18n.getString("INVITE_FAIL") );
-				}
-		});
-	},
+	// 				}
+	// 			} else {
+	// 				toastShow( $.i18n.getString("INVITE_FAIL") );
+	// 			}
+	// 	});
+	// },
 
-	sendInviteAPI: function( list, callback ){
-		var instance = this;
-		var api_name = "groups/" + gi + "/invitations";
-		var headers = {
-		         "ui":ui,
-		         "at":at, 
-		         "li":lang,
-		             };
-		var body = { "ul":list };
-		var method = "post";
-		var result = ajaxDo(api_name,headers,method,false, body);
-		result.complete(function(data){
-			callback(data);
-		});
-	},
+	// sendInviteAPI: function( list, callback ){
+	// 	var instance = this;
+	// 	var api_name = "groups/" + gi + "/invitations";
+	// 	var headers = {
+	// 	         "ui":ui,
+	// 	         "at":at, 
+	// 	         "li":lang,
+	// 	             };
+	// 	var body = { "ul":list };
+	// 	var method = "post";
+	// 	var result = ajaxDo(api_name,headers,method,false, body);
+	// 	result.complete(function(data){
+	// 		callback(data);
+	// 	});
+	// },
 
 	/*
 	              ██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗          
@@ -1435,34 +1444,49 @@ var AddressBook = AddressBook || {
     		var this_info = $(this).find(".user-info-load");
             this_info._i18n();
 
-            //隱藏首頁, 聊天鈕
-            this_info.find(".action").hide();
-
     		//為了美觀
 			this_info.find(".user-avatar-bar").hide();
 
-            if(this_gu == gu){
-                //css 調整
-                $(".user-info-load-area .me").addClass("me-rotate");
-                $(".user-info-load-area .me").addClass("backface-visibility");
-                this_info.find(".action-chat").hide();
-                $(".user-avatar-bar-favorite").hide();
-                
-            }else{
-                //css 調整
-                $(".user-info-load-area .me").removeClass("me-rotate");
-                $(".user-info-load-area .me").removeClass("backface-visibility");
-                this_info.find(".action-edit").hide();
-                this_info.find(".action-chat").off("click").click( function(){
-                    requestNewChatRoomApi(this_gi, "", [{gu:this_gu}], function(data){
-                    });
-                });
-                $(".user-avatar-bar-favorite").show();
-            }
-
     		var user_data = instance.guAll[this_gu];
-
     		if(user_data){
+    			this_info.data("isCustom",user_data.isCustom);
+	            if(user_data.isCustom){
+	                //css 調整
+	                $(".user-info-load-area .me").addClass("me-rotate");
+	                $(".user-info-load-area .me").addClass("backface-visibility");
+	                this_info.find(".action-chat").hide();
+	                $(".user-avatar-bar-favorite").hide();
+
+
+	            	//顯示刪除
+	            	this_info.data("ci", user_data.ci);
+	            	this_info.find(".user-info-delete").show();
+	            	//顯示編輯
+	            	var action = this_info.find(".action");
+	            	action.find(".action-edit").show();
+	            	action.find(".action-bar,.action-main,.action-chat").hide();
+	            }else{
+	                //css 調整
+	                $(".user-info-load-area .me").removeClass("me-rotate");
+	                $(".user-info-load-area .me").removeClass("backface-visibility");
+	                this_info.find(".action-edit").hide();
+	                this_info.find(".action-chat").off("click").click( function(){
+	                    requestNewChatRoomApi(this_gi, "", [{gu:this_gu}], function(data){
+	                    });
+	                });
+	                $(".user-avatar-bar-favorite").show();
+
+
+	                if( true==user_data.fav ){
+	                    $(".user-avatar-bar-favorite .active").show();
+	                } else{
+	                    $(".user-avatar-bar-favorite .deactive").show();
+	                }
+		            //隱藏首頁, 聊天鈕
+		            this_info.find(".action").hide();
+	            }
+
+
                 $("body").addClass("user-info-adjust");
     			//為了美觀
     			this_info.find(".user-avatar-bar").show();
@@ -1479,21 +1503,12 @@ var AddressBook = AddressBook || {
 	        		instance.userInfoAvatarPos($(".user-avatar .user-pic"));
 	        	}
 
-                //get user info 已存過, 不再重存
-	        	//存local storage
-	        	// var _groupList = $.lStorage(ui);
-          //       var userTmp = _groupList[this_gi].guAll[this_gu];
-	        	
-                if( true==user_data.fav ){
-                    $(".user-avatar-bar-favorite .active").show();
-                } else{
-                    $(".user-avatar-bar-favorite .deactive").show();
-                }
-
 	        	// $.lStorage(ui,_groupList);
 
-                // if(this_gu == gu) instance.meInfoShow(user_data);
+                // if(this_gu == gu) instance.showCustomInfo(user_data);
 
+	        	
+	        	if( user_data.isCustom ) instance.showCustomInfo(user_data);
 	        	instance.userInfoDataShow(this_gi,this_info,user_data);
 	        	instance.userInfoEvent(this_info);
 	        }else{
@@ -1621,7 +1636,7 @@ var AddressBook = AddressBook || {
         }
     },
 
-    meInfoShow: function(user_data){
+    showCustomInfo: function(user_data){
 		var instance = this;
     	var this_gi = gi;
     	var this_gu = gu;
@@ -1663,26 +1678,44 @@ var AddressBook = AddressBook || {
     		// if(user_data.mkp) this_info.find(".user-info-list .pn1").val("******");
     		// if(user_data.mke) this_info.find(".user-info-list .em").val("******");
     		// if(user_data.mkb) this_info.find(".user-info-list .bd").val("******");
-    		this_info.find(".user-info-submit").text( $.i18n.getString("ADDRESSBOOK_ADD") );
     		this_info.find("input").removeAttr("readonly");
-
-    		instance.userInfoEvent(this_info,true);
 
     		this_info.find(".bd").attr("readonly","true").off("click").click( {instance: instance}, function(){
     			cns.debug("todo: trigger datePicker");
     		});
-    		this_info.find(".dp,.mv,.bd,.sl").parent().hide();
+    		this_info.find(".dp,.mv,.sl").parent().hide();
+    		this_info.find(".bd").parent().parent().hide();
     		this_info.find(".user-info-back").hide();
+
+    		this_info.find(".em, .pn1").parent().addClass("no-status");
 
     		// this_info.data("avatar-chk",false);
     		// $(".screen-lock").fadeOut("fast");
     		// this_info.fadeOut("fast");
 
     		// if(callback) callback(false);
+
+    		if( user_data ){
+    			this_info.data("isCustom", user_data.isCustom);
+    			this_info.data("ci", user_data.ci);
+	    		for( item in user_data){
+	    			if(user_data[item]){
+	    				// if(item == "bd"){
+					    //     user_data[item] = user_data[item].substring(0,4) + "/" + user_data[item].substring(4,6) + "/" + user_data[item].substring(6);
+	        // 			}
+	        			this_info.find(".user-info-list ." + item).val(user_data[item]);
+	    			}
+	    		}
+	    		this_info.find(".user-info-submit").text( $.i18n.getString("COMMON_DONE") );
+	    	} else {
+	    		this_info.find(".user-info-submit").text( $.i18n.getString("ADDRESSBOOK_ADD") );
+	    		this_info.parent().removeClass("me-rotate");
+	    	}
+    		instance.userInfoEvent(this_info,true);
     	});
     },
 
-    userInfoEvent: function(this_info,me){
+    userInfoEvent: function(this_info,isNew){
 		var instance = this;
     	this_info.unbind();
 		
@@ -1725,11 +1758,11 @@ var AddressBook = AddressBook || {
             e.stopPropagation();
         });
 
-    	if(me){
+    	if(isNew){
 
-            this_info.find(".user-avatar.me").click(function(){
-                this_info.find(".user-avatar-upload").trigger("click");
-            });
+            // this_info.find(".user-avatar.me").click(function(){
+            //     this_info.find(".user-avatar-upload").trigger("click");
+            // });
 
 	    	// this_info.find(".user-avatar-bar.me .upload").click(function(){
 	    	// 	this_info.find(".user-avatar-upload").trigger("click");
@@ -1807,7 +1840,11 @@ var AddressBook = AddressBook || {
 	    	//更改資料 送出
 	    	$(document).off("click",".user-info-submit-ready");
 			$(document).on("click",".user-info-submit-ready",function(){
-	    		instance.userInfoSend(this_info);
+				if( this_info.data("isCustom") ){
+	    			instance.editCustomInfo(this_info);
+				} else {
+	    			instance.addNewCustom(this_info);
+				}
 	    	});
     	}else{
     		this_info.find(".action-edit").click(function(){
@@ -1830,64 +1867,96 @@ var AddressBook = AddressBook || {
                     $(".user-info-load-area .me").addClass("adjust");
                 },1000);
 	    	});
+
+            //刪除成員
+            this_info.find(".user-info-delete").click(function(){
+
+                instance.removeCustomInfo(this_info);
+            });
     	}
 
     	//click fav
         this_info.find(".user-avatar-bar-favorite .fav").mouseup(function(){
-            instance.clickUserInfoFavorite( instance, $(this) );
+            instance.clickUserInfoFavorite( $(this) );
         });
-
-        //主頁
-        // this_info.find(".action-main").off("click").click( function(){
-        //     $.mobile.changePage("#page-group-main");
-        //     timelineSwitch("feeds",false,true);
-
-        //     //滾動至最上
-        //     timelineScrollTop();
-
-        //     var this_gu = this_info.data("this-info-gu");
-        //     var this_gi = this_info.data("this-info-gi");
-        //     //結束關閉
-        //     this_info.find(".user-info-close").trigger("mouseup");
-        //     //主頁背景
-        //     $(".gm-user-main-area").fadeIn("fast",function(){
-        //         var _thisGroupList = $.lStorage(ui)[this_gi];
-        //         $(".gm-user-main-area .background").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
-        //         $(".gm-user-main-area .name").html(_thisGroupList.guAll[this_gu].nk);
-        //         $(".gm-user-main-area .group .pic").css("background","url(" + _thisGroupList.aut + ")");
-        //         $(".gm-user-main-area .group .name").html(_thisGroupList.gn);
-        //     });
-
-        //     if($(".alert-area").is(":visible")){
-        //         $(".alert").removeClass("alert-visit");
-        //         $(".alert-area-cover").hide();
-        //         $(".alert").removeClass("alert-click");
-        //         $(".alert-area").hide();
-        //     }
-
-        //     //不隱藏header
-        //     $(".user-main-toggle:not(.gm-header)").hide();
-        //     $(".gm-user-main-area").show();
-        //     $(".st-feedbox-area").hide();
-        //     $(".sm-small-area.active").removeClass("active");
-
-        //     setTimeout(function(){
-        //         //滾動至最上
-        //         timelineScrollTop();
-
-        //         $(".st-feedbox-area div[data-feed=main]").html("");
-        //         $(".st-feedbox-area").show();
-        //         $(".feed-subarea").hide();
-        //         $("#page-group-main").data("main-gu",this_gu);
-        //         $("#page-group-main").data("main-gi",this_gi);
-        //         $("#page-group-main").data("navi","main");
-        //         $(".st-filter-area").data("filter","all");
-        //         timelineListWrite();
-        //     },200);
-        // });
     },
+	editCustomInfo: function(this_info){
+    	var instance = this;
+    	var new_name = this_info.find(".user-info-list .nk").val().trim().replace(/( +)/g," ").replace(/[&\|\\\\:\/!*^%$#@\-]/g,"");
+    	if(new_name == ""){
+    		toastShow( $.i18n.getString("USER_PROFILE_EMPTY_NAME") );
+    		return false;
+    	}
+    	var ci = this_info.data("ci");
+    	if(!ci){
+    		cns.debug("editCustomInfo, no ci");
+    		return;
+    	}
+    	
+    	// load show
+    	s_load_show = true;
+		var api_name = "groups/"+gi+"/contact_users/"+ci;
+        var headers = {
+             "ui":ui,
+             "at":at, 
+             "li":lang
+        };
 
-    userInfoSend: function(this_info){
+        var body = {
+		  nk: new_name // Nickname
+		}
+		var data = {};
+		data.sl = this_info.find(".user-info-list .sl").val() // Slogan
+		data.tt = this_info.find(".user-info-list .ti").val() // title
+		data.pn1 = this_info.find(".user-info-list .pn1").val() // phone1
+		data.pn2 = this_info.find(".user-info-list .pn2").val() // phone2
+		data.ext = this_info.find(".user-info-list .et").val() // ext
+		data.em = this_info.find(".user-info-list .em").val() // email
+		// data.mv = this_info.find(".user-info-list .mv").val() // MVPN
+
+		$.each( data, function(key, obj){
+			if( obj ){
+				body[key] = obj;
+			}
+		});
+
+        var method = "put";
+        ajaxDo(api_name,headers,method,false,body).complete(function(data){
+        	//重置團體頭像、名稱的參數
+        	if(data.status == 200){
+        		//重置團體頭像、名稱 失敗也要重置
+        		// var _groupList = $.lStorage(ui);
+        		// _groupList[gi].guAll[gu].nk = body.nk;
+        		// _groupList[gi].guAll[gu].sl = body.sl;
+        		// $.lStorage(ui,_groupList);
+        		s_load_show = false;
+        		
+        		// 關閉load 圖示
+        		$('.ui-loader').hide();
+				$(".ajax-screen-lock").hide();
+
+                //重置團體頭像、名稱的參數
+                // getGroupCombo(gi,function(){
+                //     updateAllAvatarName(gi,gu);    
+                //     toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );
+                // });
+
+				var keys = ["nk","tt","pn1","pn2","ext","em"];
+				for (var i = 0; i < keys.length; i++) {
+					var key = keys[i];
+					if( body.hasOwnProperty(key) ){
+						instance.guAll[ci][key] = body[key];
+					}
+				}
+        		instance.updateCustomPage();
+        		// instance.updateCustomCount();
+
+        		//結束關閉
+        		this_info.find(".user-info-close").trigger("mouseup");
+        	}
+        });
+    },
+    addNewCustom: function(this_info){
     	var instance = this;
     	var new_name = this_info.find(".user-info-list .nk").val().trim().replace(/( +)/g," ").replace(/[&\|\\\\:\/!*^%$#@\-]/g,"");
     	if(new_name == ""){
@@ -1942,13 +2011,73 @@ var AddressBook = AddressBook || {
                 //     updateAllAvatarName(gi,gu);    
                 //     toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );
                 // });
-        		instance.initAddressBookList();
+
+				var data = $.parseJSON(data.responseText);
+				if(!data || !data.cl) return;
+				data = data.cl;
+		    	data.isCustom = true;
+		        instance.guAll[ data.ci ] = data;
+		        instance.ucl[ data.ci ] = data;
+		        instance.guAll[data.ci].fav = false;
+		        instance.customCnt = Object.keys(instance.ucl).length;
+
+
+        		instance.updateCustomPage();
+        		instance.updateCustomCount();
 
         		//結束關閉
         		this_info.find(".user-info-close").trigger("mouseup");
         	}
         });
     },
+	removeCustomInfo: function(this_info){
+    	var instance = this;
+    	var ci = this_info.data("ci");
+    	if(!ci){
+    		cns.debug("removeCustomInfo, no ci");
+    		return;
+    	}
+    	
+    	// load show
+    	s_load_show = true;
+		var api_name = "groups/"+gi+"/contact_users/"+ci;
+        var headers = {
+             "ui":ui,
+             "at":at, 
+             "li":lang
+        };
+
+        var method = "DELETE";
+        ajaxDo(api_name,headers,method,false,null).complete(function(data){
+        	//重置團體頭像、名稱的參數
+        	if(data.status == 200){
+        		s_load_show = false;
+        		
+        		// 關閉load 圖示
+        		$('.ui-loader').hide();
+				$(".ajax-screen-lock").hide();
+
+		        if( instance.ucl.hasOwnProperty(ci) ){
+		        	delete instance.ucl[ci];
+		        }
+		        instance.customCnt = Object.keys(instance.ucl).length;
+		        if( instance.guAll.hasOwnProperty(ci) ){
+		        	delete instance.guAll[ci];
+		        }
+		        if( instance.favGuAll.hasOwnProperty(ci) ){
+		        	delete instance.favGuAll[data.ci];
+					instance.favCnt--;
+		        }
+
+
+        		instance.updateCustomPage();
+        		instance.updateCustomCount();
+
+        		//結束關閉
+        		this_info.find(".user-info-close").trigger("mouseup");
+        	}
+        });
+	},
 
 	//這也可以合併..avatarPos
     userInfoAvatarPos: function(img){
@@ -1977,7 +2106,8 @@ var AddressBook = AddressBook || {
         });
     },
 
-    clickUserInfoFavorite: function( instance, this_fav ){
+    clickUserInfoFavorite: function(this_fav ){
+		var instance = AddressBook;
         var this_info = this_fav.parents(".user-info-load");
         var this_gu = this_info.data("this-info-gu");
         var this_gi = this_info.data("this-info-gi");
@@ -2017,7 +2147,7 @@ var AddressBook = AddressBook || {
                     }
 
                     $(".subpage-addressBook .favorite .detail").html( $.i18n.getString("COMPOSE_N_MEMBERS",(instance.favCnt)?instance.favCnt:0 ) );
-                    instance.updateFavoritePage(instance);
+                    instance.updateFavoritePage();
                 }
             }
         });
@@ -2036,14 +2166,15 @@ var AddressBook = AddressBook || {
 	showCustomPage: function( event ){//isBackward
 		var instance = event.data.instance;
 		var pageID = "page-addressbook_Custom";
-		instance.updateCustomPage(instance);
+		instance.updateCustomPage();
 		$("#"+pageID +" .contact-scroll").height( $(window).height()-112 );
 		$.mobile.changePage("#"+pageID, { transition: "slide"});
 		// if( true==isBackward ) $.mobile.changePage("#"+pageID, { transition: "slide", reverse: true} );
 		// else  $.mobile.changePage("#"+pageID, { transition: "slide"});
 	},
 
-	updateCustomPage: function(instance){
+	updateCustomPage: function(){
+		var instance = AddressBook;
 		var pageID = "page-addressbook_Custom";
 		var page = $( "#"+pageID );
 
@@ -2070,10 +2201,11 @@ var AddressBook = AddressBook || {
 		//----- title -----
 		var title = $("<div class='contact-titleBar'></div>");
 		var nameArea = $("<div class='nameArea'></div>");
-		nameArea.append("<div class='name'>"+$.i18n.getString("COMMON_FAVORIATE")+"</div>");
+		nameArea.append("<div class='name'>"+$.i18n.getString("ADDRESSBOOK_CUSTOM")+"</div>");
 		// nameArea.append("<div class='arrow'></div>");
 		title.append(nameArea);
 		title.append("<div class='btn'></div>");
+		title.append("<div class='addressBook-add'><img></div>");
 		subPage.append(title);
 
 		//---- part below title bar -----
@@ -2087,6 +2219,14 @@ var AddressBook = AddressBook || {
 		// });
 		title.find(".btn").off("click").click( function(){
 			instance.switchListAndGrid( $(this), subPageBottom );
+		});
+
+		//set add member button
+		title.find(".addressBook-add").off("click").click( function(e){
+			// AddressBook.showAddMemberPage();
+			AddressBook.showCustomInfo();
+	    	//name card me-info not showing
+	    	// this_info.find(".me-info-load").show();
 		});
 
 		//mem-title
@@ -2104,7 +2244,7 @@ var AddressBook = AddressBook || {
 		// 		memObject[key] = mem;
 		// 	}
 		// });
-		var memContainer = instance.generateMemberGrid(instance.favGuAll);
+		var memContainer = instance.generateMemberGrid(instance.ucl);
 		subPageBottom.append(memContainer);
 		var memListContainer = instance.generateMemberList(instance.ucl, instance.showCustomPage);
 		subPageBottom.append(memListContainer);
@@ -2117,12 +2257,21 @@ var AddressBook = AddressBook || {
 			instance.setOnMemGridScroll();
 		}
 
-		if( 0==instance.favCnt ){
+		$(".contact-scroll").height( $(window).height()-112 );
+		if( 0==instance.customCnt ){
 			subTitle.hide();
-			memContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", $.i18n.getString("COMMON_FAVORIATE"))+"</div>");
-			memListContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", $.i18n.getString("COMMON_FAVORIATE"))+"</div>");
+			memContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", $.i18n.getString("ADDRESSBOOK_CUSTOM"))+"</div>");
+			memListContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", $.i18n.getString("ADDRESSBOOK_CUSTOM"))+"</div>");
 		} else {
-			subTitle.find(".count").html(instance.favCnt);
+			subTitle.find(".count").html(instance.customCnt);
 		}
+	},
+	updateCustomCount: function(){
+		var instance = this;
+		//get html container
+		var rowContainer = $(".subpage-addressBook .contact-rows");
+		if( !rowContainer || rowContainer.length<=0 ) return;
+		//add row all
+		rowContainer.find(".row.custom .mem").html($.i18n.getString("COMPOSE_N_MEMBERS",(instance.customCnt)?instance.customCnt:0 ));
 	},
 };

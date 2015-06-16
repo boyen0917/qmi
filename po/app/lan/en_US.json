@@ -298,6 +298,10 @@
 	"USER_PROFILE_UPDATE_SUCC" : "Update successed.",
 	"USER_PROFILE_NO_DATA" : "No data",
 	"USER_PROFILE_LEAVE" : "Member left",
+	"USER_PROFILE_DELETE_MEMBER" : "Delete Member",
+	"USER_PROFILE_DELETE_MEMBER_CONFIRM" : "Delete this member?",
+	"USER_PROFILE_DELETE_MEMBER_DESC" : "Deleted member will not have permission to view this group until the member is recovered via administration web site.",
+
 
 	"OFFICIAL_ABOUT" : "About",
 	"OFFICIAL_CHAT" : "Chat",
