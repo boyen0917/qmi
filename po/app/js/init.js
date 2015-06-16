@@ -282,7 +282,7 @@ $(function(){
 
 	errorResponse = function(data){
 		try{
-			if(data.responseText){
+			if(data && data.responseText && data.responseText.length>0 ){
 				return $.parseJSON(data.responseText).rsp_msg;
 			}else{
 				cns.debug("errorResponse:",data);

@@ -543,7 +543,7 @@ $(function(){
 			parent.removeClass("lock");
 		}, 500);
 
-		filter_action.filter(".st-filter-list-active").removeClass("st-filter-list-active");
+		filter_action.parent().children(".st-filter-list-active").removeClass("st-filter-list-active");
 		filter_action.addClass("st-filter-list-active");
 		// var filter_name = $(this).find("span").html();
 
