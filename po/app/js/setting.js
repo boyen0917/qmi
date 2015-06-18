@@ -498,14 +498,14 @@ function showGroupInfoPage(){
     // $(".subpage-album").fadeOut();
 
 	//reset
+	var img = $(".ga-avatar-img");
+	img.filter(".upload").hide();
+	img.filter(".currentGroup").show();
 	resetGroupInfo();
 }
 
 function resetGroupInfo(){
 
-
-	// var img = $(".ga-avatar-img.upload");
-	// img.hide();
 	$(".ga-header-done").removeClass("ready");
 	var input = $(".ga-avatar input");
 	input.replaceWith( input.clone(true) );
