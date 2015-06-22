@@ -131,13 +131,26 @@
 	height: 360px;
 }
 
-.ga-avatar-img, .ga-avatar-img.default{
+/*.ga-avatar-img, .ga-avatar-img.default{
 	height: 370px;
 	width: 100%;
 	object-fit: cover;
 	z-index: 0;
 	position: absolute;
+}*/
+
+.ga-avatar-img, .ga-avatar-img.default{
+	height: 370px;
+	object-fit: cover;
+	display: block;
+	margin: auto;
 }
+
+.ga-avatar-img.default {
+	width: 100%;
+}
+
+
 .ga-avatar-img.group-pic{
 	display: none;
 }
