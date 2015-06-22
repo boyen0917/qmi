@@ -8247,10 +8247,9 @@ $(function(){
             this_event.find(".st-sub-time .text").html('<label class="text">'+new Date(ct).toFormatString()+'</label>');
 
             //回文
-            var reply = this_event.find(".st-reply-all-content-area:visible");
-            $.each( reply, function(replyIndex, replyDomTmp){
-                var replyDom = $(replyDomTmp);
-                var time = replyDom.find(".st-reply-footer-time");
+            var timeList = this_event.find(".st-reply-all-content-area:visible").find(".st-reply-footer-time");
+            $.each( timeList, function(replyIndex, timeTmp){
+                var time = $(timeTmp);
                 ct = time.data("ct");
                 time.html(new Date(ct).toFormatString());
             });
