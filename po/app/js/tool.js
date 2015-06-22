@@ -741,7 +741,7 @@ $(function(){
 				var options = {weekday: "short"};
 				
 				//星期四 15:40
-				console.debug( this.toLocaleTimeString(language, options) );
+				// console.debug( this.toLocaleTimeString(language, options) );
 				return this.toLocaleTimeString(language, options).split(" ")[0]
 						+" "+this.getHours()+":"+this.getMinutes();
 			} else {	//within a year

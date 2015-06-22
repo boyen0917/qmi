@@ -1953,6 +1953,8 @@ $(function(){
 				return false;
 			}
 
+            this_event.find(".st-vote-send").removeClass("st-vote-send-blue");
+
 			var reply_obj = {};
 			reply_obj.li = [];
 			reply_obj.tp = 15;
@@ -2018,7 +2020,7 @@ $(function(){
                     //重新讀取detail
                     // popupShowAdjust("","回覆成功");
                     toastShow( $.i18n.getString("FEED_VOTE_SENDED") );
-                    this_event.find(".st-vote-send").removeClass("st-vote-send-blue");
+                    
                     //客製化 按了確定之後再重讀取
                     $(".popup-close").bind("reload",function(){
                         //重設任務完成狀態
@@ -4409,6 +4411,10 @@ $(function(){
                 topEventChk();
                 timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
                 toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
+            }else{
+                setTimeout(function(){
+                    $(document).find(".cp-content").data("send-chk",true);
+                }, 2000);
             }
         });
 	};
@@ -6226,6 +6232,10 @@ $(function(){
 
                 //error存在 或 result null 就跳出
                 if(data.error || data.query.results == null) {
+                    //沒內容也算結束吧 讓它可以送出 
+                    this_compose.data("parse-waiting",false);
+
+                    toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
                     return false;
                 }
 
