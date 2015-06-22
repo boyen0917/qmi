@@ -900,7 +900,7 @@ initContactData = function(){
 			guAllExsit[key] = obj;
 		}
 	});
-	$.lStorage(ui, userData);
+	// $.lStorage(ui, userData);
 
 	//get new mem data
 	var currentTime = new Date().getTime();

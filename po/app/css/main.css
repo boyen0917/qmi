@@ -579,7 +579,7 @@ img.auo {
 
 .popup-frame {
 	position: fixed;
-	z-index: 1701;
+	z-index: 1901;
 	border-radius: 3px;
 	top: 200px;
 	text-align: center;
@@ -630,7 +630,7 @@ img.auo {
 
 .popup-screen {
 	position: fixed;
-	z-index:1700;
+	z-index:1900;
 }
 
 .popup-text {
@@ -4511,16 +4511,37 @@ div.user-info-submit-ready:active {
 	border-bottom-right-radius: 5px;
 }
 
-img.user-info-close {
-	position: absolute;
+.user-info-close {
+	position: fixed;
 	right: 10px;
 	top: 10px;
 	z-index: 10;
 	width: 50px;
 	cursor: pointer;
 }
+.user-info-delete{
+	display: none;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	z-index: 10;
+	width: 90px;
+	cursor: pointer;
+	border-radius: 5px;
+	background-color: #7d7d7d;
+	color: white;
+	font-size: 12px;
+	text-align: center;
+	padding: 3px;
+	overflow: hidden;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.user-info-delete:hover{
+	background-color: #f31e80;
+}
 
-img.user-info-back {
+.user-info-back {
 	position: absolute;
 	left: 10px;
 	top: 10px;
@@ -4685,6 +4706,12 @@ img.user-info-back {
 .me-info-status-switch div:nth-child(1){
 	border-right: 1px solid white;
 	padding-right: 5px;
+}
+.me-info-bar-extra .no-status input{
+	width: 100%;
+}
+.me-info-bar-extra .no-status .me-info-status{
+	display: none;
 }
 
 .user-avatar-bar .bottom {
