@@ -1472,21 +1472,23 @@ function sendText(dom) {
 				ct: dd.ct,
 				data: newData
 			};
-			g_idb_chat_msgs.put(node);
+			// var tmpFunction = function(){
+			// 	if (parent && false == parent.closed) {
+			// 		var tmp = $(opener.document).find(".subpage-chatList .update");
+			// 		if (tmp && tmp.length > 0) {
+			// 			tmp.attr("data-gi", gi);
+			// 			tmp.attr("data-ci", ci);
+			// 			tmp.trigger("click");
+			// 		}
+			// 	}
+			// };
+			// g_idb_chat_msgs.put(node, tmpFunction, tmpFunction);
 
 			showMsg(newData);
 
 			// if( g_isEndOfPage ) scrollToBottom();
 			// scrollToBottom();
 
-			if (parent && false == parent.closed) {
-				var tmp = $(opener.document).find(".subpage-chatList .update");
-				if (tmp && tmp.length > 0) {
-					tmp.attr("data-gi", gi);
-					tmp.attr("data-ci", ci);
-					tmp.trigger("click");
-				}
-			}
 		},
 		function () {
 			dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
