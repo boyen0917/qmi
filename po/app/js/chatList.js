@@ -65,11 +65,11 @@ initChatList = function(){
 }
 
 function updateChatList( giTmp, extraCallBack ){
-
+	var chatListDom = $(".subpage-chatList");
 	//預設開啟loading, 關閉rows & coachmark
-	$(".subpage-chatList .coachmake").hide();
-	$(".subpage-chatList .loading").show();
-	$(".subpage-chatList .rows").html("");
+	chatListDom.find(".coachmake").hide();
+	chatListDom.find(".loading").show();
+	chatListDom.find(".rows").html("");
 	var userData = $.lStorage(ui);
 	if( !userData )	return;
 	var currentGroup = userData[giTmp];
@@ -87,7 +87,7 @@ function updateChatList( giTmp, extraCallBack ){
 	var result = ajaxDo(api_name,headers,method,false);
 	result.complete(function(data){
 		if(data.status == 200){
-			$(".subpage-chatList .loading").hide();
+			chatListDom.find(".loading").hide();
 			try{
 				var epl = $.parseJSON(data.responseText);
 				if(typeof epl != "undefined"){
@@ -167,6 +167,10 @@ function updateChatList( giTmp, extraCallBack ){
 								}
 							});
 				    	}
+				    } else {
+				    	//no list, show coachmark
+						chatListDom.find("rows").hide();
+						chatListDom.find(".coachmake").fadeIn();
 				    }
 			    }
 			} catch (e){
