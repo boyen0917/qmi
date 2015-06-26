@@ -164,7 +164,7 @@ getS3file = function(file_obj,target,tp, isWatermark, text){
                     	getWatermarkImage(text, obj.s32, 1, function(imgUrl){
 	                        // alert(imgUrl);
 	                        target.attr("src",imgUrl).after('<a href="'+ imgUrl +'" download="'+fileName+'"><div></div></a>');
-	                        if( callback ) callback(obj);
+	                        // if( callback ) callback(obj);
 	                    });
                     } else {
                     	target.attr("src",obj.s32).after('<a href="'+ obj.s32 +'" download="'+fileName+'"><div></div></a>');
