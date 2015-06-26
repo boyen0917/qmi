@@ -30,6 +30,8 @@
         var title;
         var picArea;
         var isLoaded = false;
+        var isWatermark = false;
+        var watermarkText;
 
 
         //trigger loading
@@ -91,7 +93,7 @@
                     } catch(e){
                         errorReport(e);
                     }
-                    getS3file( list[i],img.find("img"), 6 );
+                    getS3file( list[i],img.find("img"), 6, isWatermark, watermarkText );
                 }
                 picArea.append( img );
             }

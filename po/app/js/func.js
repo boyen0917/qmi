@@ -5762,7 +5762,7 @@ $(function(){
             var this_ei = this_img_area.parents(".st-sub-box").data("event-id");
             var this_gi = this_ei.split("_")[0];
             var this_ti = this_ei.split("_")[1];
-            showGallery( this_gi, this_ti, gallery_arr );
+            showGallery( this_gi, this_ti, gallery_arr, null, null, isApplyWatermark, watermarkText );
 		});
 	}
 
