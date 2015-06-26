@@ -2112,33 +2112,35 @@ $(function(){
 		        case "announcement": 
 		        	ctp = 1;
 		        	show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-top";
-                    //hide watermark
-                    // try{
-                    //     var tmpGroup = $.lStorage(ui)[gi];
-                    //     console.debug(tmpGroup.tp);
-                    //     if( tmpGroup.tp!="A1" ){
-                    //         show_area += ", .cp-content-watermark";
-                    //     }
-                    // }
-                    // catch(e){
-                    //     errorReport(e);
-                    // }
+                    
+                    //watermark
+                    try{
+                        var tmpGroup = $.lStorage(ui)[gi];
+                        console.debug(tmpGroup.tp);
+                        if( tmpGroup.tp!="A1" ){
+                            show_area += ", .cp-content-watermark";
+                        }
+                    }
+                    catch(e){
+                        errorReport(e);
+                    }
 		        	
 		        	break;
 		        case "feedback":
 		            ctp = 2;
 		            show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt";
-                    //hide watermark
-                    // try{
-                    //     var tmpGroup = $.lStorage(ui)[gi];
-                    //     console.debug(tmpGroup.tp);
-                    //     if( tmpGroup.tp!="A1" ){
-                    //         show_area += ", .cp-content-watermark";
-                    //     }
-                    // }
-                    // catch(e){
-                    //     errorReport(e);
-                    // }
+                    
+                    //watermark
+                    try{
+                        var tmpGroup = $.lStorage(ui)[gi];
+                        console.debug(tmpGroup.tp);
+                        if( tmpGroup.tp!="A1" ){
+                            show_area += ", .cp-content-watermark";
+                        }
+                    }
+                    catch(e){
+                        errorReport(e);
+                    }
 		        	break;
 		        case "work"://cp-work-area
 		        	ctp = 3;
@@ -5760,7 +5762,7 @@ $(function(){
             var this_ei = this_img_area.parents(".st-sub-box").data("event-id");
             var this_gi = this_ei.split("_")[0];
             var this_ti = this_ei.split("_")[1];
-            showGallery( this_gi, this_ti, gallery_arr );
+            showGallery( this_gi, this_ti, gallery_arr, null, null, isApplyWatermark, watermarkText );
 		});
 	}
 

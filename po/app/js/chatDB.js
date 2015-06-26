@@ -26,7 +26,7 @@ function initChatDB( onReady ){
 	}
 }
 function updateChatDB ( msgs ){
-  console.debug("-----------------------");
+	cns.debug("-----------------------");
 	//indexed from old to new (api chat is from new to old)
 	for( var j = 0; j<msgs.length; j++){
 		var data = msgs[j];
