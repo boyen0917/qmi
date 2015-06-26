@@ -1173,6 +1173,11 @@ $(function(){
 
 		this_compose.data("send-chk",false);
 
+		//因為太多例外了 一個一個加似乎很麻煩 會有遺漏
+		setTimeout(function(){
+			this_compose.data("send-chk",true);			
+		}, 1500);
+
 		this_compose.data("parse-resend",false);
 
 		//等待截取網址內容 時間太久則取消
@@ -1243,15 +1248,19 @@ $(function(){
 				chk_arr.push(".cp-textarea-title");
 				break;
 		}
- 		
+
  		$.each(chk_arr,function(i,chk_str){
  			//有一個不存在就跳錯誤訊息
  			if(!$(chk_str).val()){
  				empty_chk = false;
  				popupShowAdjust("",error_msg_arr[chk_str],true);
+
+ 				this_compose.data("send-chk",true);
+
  				return false;
  			}
  		});
+
 		if(empty_chk) composeSend(this_compose);   
 	});
 
