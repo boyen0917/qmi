@@ -2,6 +2,7 @@ onCheckVersionDone = function(needUpdate){
 	if( needUpdate ){
 		return;
 	}
+	clearBadgeLabel();
 
 	//預設上一頁
 	$(document).data("page-history",[["#page-registration"]]);

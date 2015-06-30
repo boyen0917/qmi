@@ -7,13 +7,7 @@ $(function(){
 
 	$(".navi-alert").click(function(){
 		$(".navi-alert").removeClass("new");
-
-		//nodeJS用, show程式小icon上面的數字
-		try{
-			require('nw.gui').Window.get().setBadgeLabel("");
-		}catch(e){
-			cns.debug(e);	//必加, 一般瀏覽器require not defined
-		}
+		clearBadgeLabel();
 
 		if($(".alert-area").is(":visible")){
 			hideAlertBox();
@@ -55,12 +49,7 @@ showNewAlertIcon = function( cnt ){
 		if( !$(".alert-area").is(":visible") ){
 			$(".navi-alert").addClass("new");
 
-			//nodeJS用, show程式小icon上面的數字
-			try{
-				require('nw.gui').Window.get().setBadgeLabel( cnt.toString() );
-			}catch(e){
-				// cns.debug(e);	//必加, 一般瀏覽器require not defined
-			}
+			setBadgeLabel( cnt.toString() );
 		} else { //開啟的話直接更新
 			$(".alert-area").scrollTop(0);
 			if( typeof(updatePollingCnts)!= 'undefined' ){

@@ -424,6 +424,7 @@ $(function(){
 	}
 
 	resetDB = function(){
+		clearBadgeLabel();
 		if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 		if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 		if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
@@ -1527,5 +1528,24 @@ $(function(){
 			// }
     	}
     	return false;
+    }
+
+    setBadgeLabel = function(str){
+
+		//nodeJS用, show程式小icon上面的數字
+		try{
+			require('nw.gui').Window.get().setBadgeLabel( str );
+		}catch(e){
+			// cns.debug(e);	//必加, 一般瀏覽器require not defined
+		}
+    }
+
+    clearBadgeLabel = function(){
+		//nodeJS用, show程式小icon上面的數字
+		try{
+			require('nw.gui').Window.get().setBadgeLabel("");
+		}catch(e){
+			// cns.debug(e);	//必加, 一般瀏覽器require not defined
+		}
     }
 });
