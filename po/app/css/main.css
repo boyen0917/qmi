@@ -2551,7 +2551,7 @@ img.st-user-pic{
 .st-work-option > span {
 	width: 67%;
 	display: -webkit-box;
-	margin-top: 3px;
+	margin-top: 6px;
 	word-break: break-word;
 }
 
@@ -2672,6 +2672,7 @@ img.st-user-pic{
 
 .st-work-option {
 	display: -webkit-box;
+	padding: 5px 0 5px 5px;
 }
 
 .st-vote-detail-option .vote-do {

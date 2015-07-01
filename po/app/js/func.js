@@ -6981,7 +6981,7 @@ $(function(){
 	    	//將tp4 tp5 的user info都更新完 再更新polling時間
             try{
     	    	if(user_info_arr.length > 1){
-    	    		getMultipleUserInfo(user_info_arr,false, false, function(isSucc){
+    	    		getMultipleUserInfo(user_info_arr,true, false, function(isSucc){
                         //更新polling
         	    		pollingUpdate(msgs,ccs);
                         if(isUpdateMemPage ){
@@ -6989,7 +6989,7 @@ $(function(){
                         }
     	    		});
     	    	}else if(user_info_arr.length > 0){
-                    getUserInfo(user_info_arr,false, false, function(memData){
+                    getUserInfo(user_info_arr,true, false, function(memData){
                         //更新polling
                         pollingUpdate(msgs,ccs);
                         if(isUpdateMemPage ){
