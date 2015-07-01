@@ -6209,11 +6209,12 @@ $(function(){
 	//parse 網址
 	getLinkMeta = function (this_compose,url) {
         s_load_show = true;
-		var q = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
+        var q = 'http://opengraph.io/api/1.0/site/'+encodeURIComponent(url);
+		// var q = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
         $.ajax({
             type: 'GET',
             url: q, 
-            dataType: 'jsonp',
+            dataType: 'json',
             timeout: 5000 ,
             complete: function(){
                 s_load_show = false;
@@ -6226,15 +6227,13 @@ $(function(){
             success: function(data, textStatus) {
                 var result = {};
                 var tmp_img,tmp_desc;
-                var yqlHtml = $(".cp-ta-yql").html();
 
-                cns.debug("data:",data);
 
                 //loading圖示隱藏
                 $(".cp-attach-area .url-loading").hide();
 
                 //error存在 或 result null 就跳出
-                if(data.error || data.query.results == null) {
+                if(data.error || (data.hybridGraph == null && data.openGraph==null) ) {
                     //沒內容也算結束吧 讓它可以送出 
                     this_compose.data("parse-waiting",false);
 
@@ -6242,55 +6241,94 @@ $(function(){
                     return false;
                 }
 
-                //預設標題
-                if(data.query.results && data.query.results.title){
-                    result.title = data.query.results.title;
+                if( data.openGraph && data.openGraph.title ){
+                    result.title = data.openGraph.title;
+                    result.description = data.openGraph.description;
+                    result.img = data.openGraph.image;
                 }
+                if( data.hybridGraph ){
+                    if( !result.title ) result.title = data.hybridGraph.title;
+                    if( !result.description ) result.description = data.hybridGraph.description;
+                    if( !result.img ) result.img = data.hybridGraph.image;
+                }
+                cns.debug(result.title, result.description, result.img );
 
-                //從meta取網址標題 大綱和圖片
-                if(data.query.results && data.query.results.meta){
-                    $.each(data.query.results.meta, function(key, val){
-                        if (val.property) {
 
-                            // title
-                            if (val.property.match(/og:title/i) && val.content) {
-                                result.title = val.content;
-                            }
+
+
+                var yqlHtml = $(".cp-ta-yql").html();
+
+                // cns.debug("data:",data);
+
+                // //loading圖示隱藏
+                // $(".cp-attach-area .url-loading").hide();
+
+                // //error存在 或 result null 就跳出
+                // if(data.error || data.query.results == null) {
+                //     //沒內容也算結束吧 讓它可以送出 
+                //     this_compose.data("parse-waiting",false);
+
+                //     toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+                //     return false;
+                // }
+
+                // //預設標題
+                // if(data.query.results && data.query.results.title){
+                //     result.title = data.query.results.title;
+                // }
+
+                // //從meta取網址標題 大綱和圖片
+                // if(data.query.results && data.query.results.meta){
+                //     $.each(data.query.results.meta, function(key, val){
+                //         if (val.property) {
+
+                //             // title
+                //             if (val.property.match(/og:title/i) && val.content) {
+                //                 result.title = val.content;
+                //             }
                             
-                            // description
-                            if (val.property.match(/og:description/i)) {
-                                result.description = val.content;
-                            }
+                //             // description
+                //             if (val.property.match(/og:description/i)) {
+                //                 result.description = val.content;
+                //             }
 
-                            // img
-                            if (val.property.match(/og:image/i)) {
-                                result.img = val.content;
-                            }
-                        }
+                //             // img
+                //             if (val.property.match(/og:image/i)) {
+                //                 result.img = val.content;
+                //             }
+                //         }
 
-                        if (val.name && val.name.match(/description/i)) {
-                            tmp_desc = val.content;
-                        }
-                    });
+                //         if (val.name && val.name.match(/description/i)) {
+                //             tmp_desc = val.content;
+                //         }
+                //     });
+                // }
+
+                if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
+                    this_compose.data("message-list").push(2);
+                    var tmp = getYoutubeThumbnail( url );
+                    if(tmp) result.img = tmp;
+                }else{
+                    this_compose.data("message-list").push(1);
                 }
                     
                 //如果meta圖片存在 並檢查是否圖太小 太小或沒圖的話就從網頁裡的img tag裡面隨便找一張
-                if(!result.img){
+                // if(!result.img){
 
-                    //預設圖片 隨便找一張img tag
-                    if(data.query.results && data.query.results.img){
-                        $.each(data.query.results.img,function(i,val){
-                            if (val != null && val.src && val.src.match(/\.jpg|\.png/)) {
-                                var temp_img = val.src;
-                                if(val.src.substring(0, 4) != 'http'){
-                                    temp_img = url + temp_img;
-                                }
-                                result.img = temp_img;
-                                return false;
-                            }
-                        });
-                    }
-                }
+                //     //預設圖片 隨便找一張img tag
+                //     if(data.query.results && data.query.results.img){
+                //         $.each(data.query.results.img,function(i,val){
+                //             if (val != null && val.src && val.src.match(/\.jpg|\.png/)) {
+                //                 var temp_img = val.src;
+                //                 if(val.src.substring(0, 4) != 'http'){
+                //                     temp_img = url + temp_img;
+                //                 }
+                //                 result.img = temp_img;
+                //                 return false;
+                //             }
+                //         });
+                //     }
+                // }
 
                 if(result.title){
                     //按送出重新截取網站內容 不用顯示在畫面
@@ -6306,12 +6344,6 @@ $(function(){
                     }
                 }else{
                     // this_compose.data("parse-error",true);
-                }
-
-                if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
-                    this_compose.data("message-list").push(2);
-                }else{
-                    this_compose.data("message-list").push(1);
                 }
                 
 
@@ -6354,6 +6386,27 @@ $(function(){
             }   
         });
 	}
+
+    getJsonFromUrl = function(url) {
+        var result = {};
+        var query = url.split("?");
+        if( query && query.length>1 && query[1] ){
+            query[1].split("&").forEach(function(part) {
+                var item = part.split("=");
+                cns.debug(part, item[0]);
+                result[item[0]] = decodeURIComponent(item[1]);
+            });
+        }
+        return result;
+    }
+
+    getYoutubeThumbnail = function(url){
+        var data = getJsonFromUrl( url );
+        if( data.hasOwnProperty("v") ){
+            return 'http://img.youtube.com/vi/'+data["v"]+'/0.jpg';
+        }
+        return null;
+    }
 
 	getYoutubeCode = function(url){
   		if(url.match(/youtube.com/)){
