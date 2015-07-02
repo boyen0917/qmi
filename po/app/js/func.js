@@ -22,20 +22,25 @@ $(function(){
             if(!$.lStorage("_groupList") || $.lStorage("_groupList").length == 0) return false;
 
         	var default_group = $.lStorage("_groupList")[0];
+            if( default_group ){
 
-        	$.each(default_group.tl,function(i,val){
-        		if(val.tp == 1){
-        			ti_cal = val.ti;
-        		}else if(val.tp == 2){
-        			ti_feed = val.ti;
-        		}else{
-        			ti_chat = val.ti;
-        		}
-        	});
-        	
-        	gi = default_group.gi;
-    		gu = default_group.me;
-    		gn = default_group.gn;
+            	$.each(default_group.tl,function(i,val){
+            		if(val.tp == 1){
+            			ti_cal = val.ti;
+            		}else if(val.tp == 2){
+            			ti_feed = val.ti;
+            		}else{
+            			ti_chat = val.ti;
+            		}
+            	});
+            	
+            	gi = default_group.gi;
+        		gu = default_group.me;
+        		gn = default_group.gn;
+            } else {
+                //沒group
+                document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
+            }
     	}
 	}
 
