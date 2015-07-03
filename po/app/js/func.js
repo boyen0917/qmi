@@ -1945,6 +1945,7 @@ $(function(){
 
 			//圖片上傳物件及流水號
 			this_compose.data("upload-obj",{});
+            this_compose.data("upload-video",{});
 			this_compose.data("upload-ai",0);
 			this_compose.data("body",{});
 
@@ -4192,7 +4193,7 @@ $(function(){
 					is_push = false;
 
 					//上傳類型
-					var imageType = /image.*/;
+					var mineType = /image.*/;
 
 					//發佈上傳檢查
 					upload_chk = true;
@@ -4201,6 +4202,7 @@ $(function(){
 					var cnt = 0
 					//每次上傳都歸零
 					this_compose.data("uploaded-num",0);
+                    this_compose.data("uploaded-total",total);
 					this_compose.data("uploaded-err",[]);
 					this_compose.data("img-compose-arr",[]);
 
@@ -4212,19 +4214,62 @@ $(function(){
                         if( isWaitingPermission ){
                             sendingFileData.push({
                                 file: file,
-                                imageType: imageType,
+                                mineType: mineType,
                                 cnt: cnt,
                                 total: total,
                                 type: 6
                             });
                         }else{
-                            uploadImg(file,imageType,cnt,total,6,0,isApplyWatermark);
+                            uploadImg(file,mineType,cnt,total,6,0,isApplyWatermark);
                             cnt++;
                         }
                     });
 					
                     this_compose.data("body",body);
 					break;
+                //影片上傳
+                case 7:
+                    //上傳檔案有自己的玩法
+                    is_push = false;
+
+                    //上傳類型
+                    var mineType = /video.mp4/;
+
+                    //發佈上傳檢查
+                    upload_chk = true;
+                    var total = Object.keys(this_compose.data("upload-video")).length;
+
+                    //每次上傳都歸零
+                    this_compose.data("uploaded-vid-num",0);
+                    this_compose.data("uploaded-vid-total",total);
+                    this_compose.data("uploaded-vid-err",[]);
+                    this_compose.data("video-compose-arr",[]);
+
+                    //開啟loading icon
+                    s_load_show = true;
+
+                    //上傳附檔
+                    $.each(this_compose.data("upload-video"),function(i,file){
+                        var video = this_compose.find('video[data-file-num='+i+']');
+                        if( isWaitingPermission ){
+                            sendingFileData.push({
+                                file: file,
+                                mineType: mineType,
+                                type: 7,
+                                cnt: i,
+                                total: total,
+                                videoDom: video
+                            });
+                        }else{
+                            if(video.length>0){
+                                uploadVideo(file, video, i, total, 7, 0);
+                                cnt++;
+                            }
+                        }
+                    });
+                    
+                    this_compose.data("body",body);
+                    break;
 			}
 
 			//會有順序問題 因為ios只會照ml順序排 所以必須設定順序
@@ -4245,7 +4290,14 @@ $(function(){
 
                     for(var i=0; i<sendingFileData.length;i++){
                         var obj = sendingFileData[i];
-                        uploadImg( obj.file, obj.imageType, i, obj.total, obj.type, pi_result.pi,isApplyWatermark);
+                        switch( obj.type ){
+                            case 6:
+                                uploadImg( obj.file, obj.mineType, i, obj.total, obj.type, pi_result.pi,isApplyWatermark);
+                                break;
+                            case 7:
+                                uploadVideo( obj.file, obj.videoDom, i, obj.total, 7, pi_result.pi);
+                                break;
+                        }
                     }
                 }
             });
@@ -5900,33 +5952,8 @@ $(function(){
 			                    		var img_arr = [fi,permission_id,file.name];
 			                    		this_compose.data("img-compose-arr")[file_num] = img_arr;
 			                    	}
-
-			                    	//判斷是否為最後一個上傳檔案
-			                    	//檢查是否是最後一個上傳的檔案 若是的話 再檢查是否顯示上傳失敗訊息
-									if(this_compose.data("uploaded-num") == total){
-										//loading icon off
-			        					s_load_show = false;
-			        					$('.ui-loader').hide();
-										// $(document).trigger("click");
-
-										if(this_compose.data("uploaded-err").length > 0){
-											popupShowAdjust("", $.i18n.getString("COMMON_UPLOAD_FAIL"),true); //"第" + this_compose.data("uploaded-err").sort().join("、") + "個檔案上傳失敗 請重新上傳"
-										}else{
-											clearTimeout(compose_timer);
-
-											var body = this_compose.data("body");
-											$.each(this_compose.data("img-compose-arr"),function(i,val){
-												if(val){
-													var obj = {};
-													obj.tp = cp_tp;
-													obj.c = val[0];
-													obj.p = val[1];
-													body.ml.push(obj);
-												}
-											});
-											composeSendApi(this_compose.data("body"));	
-										}
-									}
+                                    
+                                    checkIsUploadFinished( this_compose );
 		        				});
 		        			}else{
 								//傳小圖失敗
@@ -5948,6 +5975,96 @@ $(function(){
         }
         reader.readAsDataURL(file);
 	}
+
+    function uploadVideo( file, video, file_num, total, cp_tp, pi) {
+        // var file = dom.data("file");
+        // var video = dom.find("video");
+
+        // if( ""!=tmpData.ml[0].c ){
+        //  sendText(dom);
+        // } else {
+        var ori_arr = [1280, 1280, 0.9];
+        var tmb_arr = [160, 160, 0.4];
+
+        // dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
+
+        uploadGroupVideo(gi, file, video, ti_feed, 0, ori_arr, tmb_arr, pi, function (data) {
+
+            //上傳編號加一
+            var this_compose = $(document).find(".cp-content");
+            var num = this_compose.data("uploaded-vid-num");
+            this_compose.data("uploaded-vid-num",num += 1);
+
+            if (data) {
+                // var data = {
+                //     fi:fi,
+                //     s3:s3_url,
+                //     s32:s32_url
+                // }
+                var img_arr = [data.fi,pi,file.name];
+                this_compose.data("video-compose-arr")[file_num] = img_arr;
+            } else {
+                this_compose.data("uploaded-vid-err").push(file_num+1);
+                //傳小圖失敗
+                uploadErrorCnt(this_compose,file_num,total);
+                return false;
+            }
+
+            checkIsUploadFinished( this_compose );
+        });
+        // }
+    }
+
+    checkIsUploadFinished = function(this_compose){
+        var vidError = this_compose.data("uploaded-vid-err")
+            , imgError = this_compose.data("uploaded-err");
+        cns.debug( this_compose.data("uploaded-vid-num")
+            ,this_compose.data("uploaded-vid-total")
+            ,this_compose.data("uploaded-num")
+            ,this_compose.data("uploaded-total"));
+
+        //判斷是否為最後一個上傳檔案
+        //檢查是否是最後一個上傳的檔案 若是的話 再檢查是否顯示上傳失敗訊息
+        if(this_compose.data("uploaded-vid-num") == this_compose.data("uploaded-vid-total")
+            && this_compose.data("uploaded-num") == this_compose.data("uploaded-total") ){
+            //loading icon off
+            s_load_show = false;
+            $('.ui-loader').hide();
+            // $(document).trigger("click");
+
+            if( (vidError&&vidError.length > 0)||(imgError&&imgError.length>0) ){
+                popupShowAdjust("", $.i18n.getString("COMMON_UPLOAD_FAIL"),true); //"第" + vidError.sort().join("、") + "個檔案上傳失敗 請重新上傳"
+            } else {
+
+                clearTimeout(compose_timer);
+
+                var body = this_compose.data("body");
+                if( this_compose.data("video-compose-arr") ){
+                    $.each(this_compose.data("video-compose-arr"),function(i,val){
+                        if(val){
+                            var obj = {};
+                            obj.tp = 7;
+                            obj.c = val[0];
+                            obj.p = val[1];
+                            body.ml.push(obj);
+                        }
+                    });
+                }
+                if( this_compose.data("img-compose-arr") ){
+                    $.each(this_compose.data("img-compose-arr"),function(i,val){
+                        if(val){
+                            var obj = {};
+                            obj.tp = 6;
+                            obj.c = val[0];
+                            obj.p = val[1];
+                            body.ml.push(obj);
+                        }
+                    });
+                }
+                composeSendApi(this_compose.data("body"));
+            }
+        }
+    }
 
 
 	putEventStatus = function (target_obj,etp,est,callback){

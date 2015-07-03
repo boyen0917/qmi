@@ -1274,8 +1274,15 @@ $(function(){
 		var add_type = target.data("cp-addfile");
 		switch(add_type){
 
+			case "video":
+				$(".cp-file").data("img",false).attr("accept", "video/mp4").trigger("click");
+				target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
+				setTimeout(function(){
+					target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
+				},100);
+				break;
 			case "img":	//附影像
-				$(".cp-file").trigger("click");
+				$(".cp-file").data("img",true).attr("accept", "image/*").trigger("click");
 				target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
 				setTimeout(function(){
 					target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
@@ -1328,73 +1335,162 @@ $(function(){
 
 	$(".cp-file").change(function(e) {
 
-		var this_compose = $(document).find(".cp-content");
-
-		$(document).find(".cp-attach-area").show();
-		$(document).find(".cp-file-area").show();
-		$(document).find(".cp-file-img-area").show();
-
-		$(".cp-file-img-area").html("");
-
+		var composePage = $("#page-compose");
+		var this_compose = composePage.find(".cp-content");
+		var videoList = [];
+		var imgList = [];
 		var file_ori = $(this);
 		var imageType = /image.*/;
-		var limit_chk = false;
-		// var upload_arr = this_compose.data("upload-arr");
-
+		var videoType = /video.mp4/;
+		var isMp4AlertShown = false;
 		$.each(file_ori[0].files,function(i,file){
-			if(Object.keys(this_compose.data("upload-obj")).length == 9 ){
-				limit_chk = true;
-				return false;
+			if( file.type.match(imageType)){
+				imgList.push(file);
+			} else if( file.type.match(videoType)){
+				videoList.push(file);
+			} else if( !isMp4AlertShown && file.type.match(/video.*/) ){
+				isMp4AlertShown = true;
+				toastShow( $.i18n.getString("COMMON_NOT_MP4") );
 			}
-			
-			//流水號
-			var ai = this_compose.data("upload-ai");
-			this_compose.data("upload-obj")[ai] = file;
-			this_compose.data("upload-ai",ai+1)
 		});
 
-		if(limit_chk){
-			popupShowAdjust("",$.i18n.getString("COMMON_SEND_PHOTO_LIMIT",9) );
-			// return false;
+		if( imgList.length>0 ){
+
+			composePage.find(".cp-attach-area").show();
+			composePage.find(".cp-file-area").show();
+			var imageArea = composePage.find(".cp-file-img-area");
+			imageArea.html("").show();
+			
+			var videoArea = this_compose.find(".cp-file-video-area");
+			if( videoArea.is(":visible") ){
+				videoArea.addClass("topBorder");
+			}
+
+			var limit_chk = false;
+			// var upload_arr = this_compose.data("upload-arr");
+
+			$.each(imgList,function(i,file){
+				if(!file || !file.type) return;
+				if(Object.keys(this_compose.data("upload-obj")).length == 9 ){
+					limit_chk = true;
+					return false;
+				}
+				
+				//流水號
+				var ai = this_compose.data("upload-ai");
+				this_compose.data("upload-obj")[ai] = file;
+				this_compose.data("upload-ai",ai+1)
+			});
+
+			if(limit_chk){
+				toastShow( $.i18n.getString("COMMON_SEND_PHOTO_LIMIT",9) );
+				// return false;
+			}
+
+			$.each(this_compose.data("upload-obj"),function(i,file){
+				var this_grid =  $('<div class="cp-grid"><div><img/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
+				$(".cp-file-img-area").append(this_grid);
+				
+				//編號 方便刪除
+				this_grid.data("file-num",i);
+
+				// if (file.type.match(imageType)) {
+
+					//有圖片就push進 compose message list
+					if($.inArray(6,this_compose.data("message-list")) < 0){
+						this_compose.data("message-list").push(6);
+
+						//附檔區域存在附檔
+						this_compose.data("attach",true);
+					}
+
+					var reader = new FileReader();
+					reader.onload = function(e) {
+						var img = this_grid.find("div img");
+
+						//調整長寬
+						img.load(function() {
+							var w = img.width();
+				            var h = img.height();
+	        				mathAvatarPos(img,w,h,100);
+				        });
+				        img.attr("src",reader.result);
+					}
+					reader.readAsDataURL(file);	
+				// }else{
+				// 	this_grid.find("div").html('<span>file not supported</span>');
+				// }
+			});
+		}
+		if( videoList.length>0 ){
+
+			var composePage = $("#page-compose");
+			var this_compose = composePage.find(".cp-content");
+
+			this_compose.find(".cp-attach-area").show();
+			this_compose.find(".cp-file-area").show();
+			var videoArea = this_compose.find(".cp-file-video-area");
+			videoArea.html("").show();
+			if( this_compose.find(".cp-file-img-area").is(":visible") ){
+				videoArea.addClass("topBorder");
+			}
+
+			var limit_chk = false;
+			// var upload_arr = this_compose.data("upload-arr");
+
+			$.each(videoList,function(i,file){
+				if(!file||!file.type) return;
+				if(Object.keys(this_compose.data("upload-video")).length == 1 ){
+					limit_chk = true;
+					return false;
+				}
+				
+				//流水號
+				var ai = this_compose.data("upload-ai");
+				this_compose.data("upload-video")[ai] = file;
+				this_compose.data("upload-ai",ai+1)
+			});
+
+			if(limit_chk){
+				toastShow( $.i18n.getString("COMMON_SEND_VIDEO_LIMIT",1) );
+				// return false;
+			}
+
+			$.each(this_compose.data("upload-video"),function(i,file){
+				var this_grid =  $('<div class="cp-grid"><div><video data-file-num="'+i+'"/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
+				
+				//編號 方便刪除
+				this_grid.data("file-num",i);
+				videoArea.append(this_grid);
+
+				// if( !file.type.match(videoType) ){
+				// 	this_grid.find("div").html('<span>'+$.i18n.getString("COMMON_NOT_MP4")+'</span>');
+				// } else
+				if(file.size > 50000000){ //max 50mb
+					this_grid.find("div").html('<span>'+$.i18n.getString("COMMON_EXCEED_FILE_SIZE")+'</span>');
+				} else {
+
+					//有圖片就push進 compose message list
+					if($.inArray(7,this_compose.data("message-list")) < 0){
+						this_compose.data("message-list").push(7);
+
+						//附檔區域存在附檔
+						this_compose.data("attach",true);
+					}
+					renderVideoFile(file, videoArea.find('video[data-file-num="'+i+'"]'), function (videoTag) {
+						videoTag.parent().addClass("loaded");
+						if( videoTag.width() > 100 ){
+							videoTag.css("margin-left",-(videoTag.width()-100)*0.5);
+						}
+					}, function (videoTag) {
+						videoTag.parent().addClass("error");
+					});
+				}
+			});
 		}
 
 		//每次選擇完檔案 就reset input file
 		file_ori.replaceWith( file_ori.val('').clone( true ) );
-
-		$.each(this_compose.data("upload-obj"),function(i,file){
-			var this_grid =  $('<div class="cp-grid"><div><img/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
-			$(".cp-file-img-area").append(this_grid);
-			
-			//編號 方便刪除
-			this_grid.data("file-num",i);
-
-			if (file.type.match(imageType)) {
-
-				//有圖片就push進 compose message list
-				if($.inArray(6,this_compose.data("message-list")) < 0){
-					this_compose.data("message-list").push(6);
-
-					//附檔區域存在附檔
-					this_compose.data("attach",true);
-				}
-
-				var reader = new FileReader();
-				reader.onload = function(e) {
-					var img = this_grid.find("div img");
-
-					//調整長寬
-					img.load(function() {
-						var w = img.width();
-			            var h = img.height();
-        				mathAvatarPos(img,w,h,100);
-			        });
-			        img.attr("src",reader.result);
-				}
-				reader.readAsDataURL(file);	
-			}else{
-				this_grid.find("div").html('<span>file not supported</span>');
-			}
-		});
 	});
 
 	$(document).on("dragover",".timeline-dnd,.compose-dnd,.user-info-load-area .me",function(e){
@@ -1459,21 +1555,43 @@ $(function(){
 		this_cancel.attr("src","images/common/icon/icon_compose_close_click.png");
 		setTimeout(function(){
 
-			//刪除upload arr
-			delete this_compose.data("upload-obj")[file_num];
+			var area = this_grid.parent();
+			if( area.hasClass("cp-file-img-area") ){
+				//刪除upload arr
+				delete this_compose.data("upload-obj")[file_num];
 
-			this_cancel.attr("src","images/common/icon/icon_compose_close.png");
-			this_cancel.remove();
-			this_grid.hide('fast', function(){ 
-				this_grid.remove(); 
+				this_cancel.attr("src","images/common/icon/icon_compose_close.png");
+				this_cancel.remove();
+				this_grid.hide('fast', function(){ 
+					this_grid.remove(); 
 
-				//圖檔區沒東西了 就剔除message list
-				if($(document).find(".cp-file-img-area").html() == ""){
-					this_compose.data("message-list").splice($.inArray(6,this_compose.data("message-list")),1);
+					//圖檔區沒東西了 就剔除message list
+					if(area.html() == ""){
+						area.hide();
+						area.siblings(".cp-file-video-area").removeClass("topBorder");
+						this_compose.data("message-list").splice($.inArray(6,this_compose.data("message-list")),1);
 
-					composeCheckMessageList();
-				}
-			});
+						composeCheckMessageList();
+					}
+				});
+			} else {
+				//刪除upload arr
+				delete this_compose.data("upload-video")[file_num];
+
+				this_cancel.attr("src","images/common/icon/icon_compose_close.png");
+				this_cancel.remove();
+				this_grid.hide('fast', function(){ 
+					this_grid.remove(); 
+
+					//圖檔區沒東西了 就剔除message list
+					if( area.html() == ""){
+						area.hide().removeClass("topBorder");
+						this_compose.data("message-list").splice($.inArray(7,this_compose.data("message-list")),1);
+
+						composeCheckMessageList();
+					}
+				});
+			}
 		},100);
 
 
