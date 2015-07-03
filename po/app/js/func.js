@@ -7387,13 +7387,16 @@ $(function(){
 
         var new_user_info_obj = {};
         var new_user_info_arr = [];
+        var _groupList = $.lStorage(ui);
         for( var i=0; i<user_info_arr.length; i++){
             var tmpObj = user_info_arr[i];
             new_user_info_obj[tmpObj.gu] = tmpObj;
-            new_user_info_arr.push({
-                gu: tmpObj.gu,
-                gi: tmpObj.gi
-            });
+            if( _groupList.hasOwnProperty(tmpObj.gi) ){
+                new_user_info_arr.push({
+                    gu: tmpObj.gu,
+                    gi: tmpObj.gi
+                });
+            }
         }
 
 
@@ -7418,7 +7421,7 @@ $(function(){
 
                 try{
                     var user_data_object = $.parseJSON(data.responseText);
-                    var _groupList = $.lStorage(ui);
+                    _groupList = $.lStorage(ui);
                     //新成員, 三天後失效
                     var invalidTime = new Date().getTime()+(86400000*3);
                     $.each(user_data_object.gul, function(index,user_data){
