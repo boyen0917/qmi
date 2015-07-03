@@ -19,13 +19,15 @@ $(function(){
 	debug_flag = false;
 	if(window.location.href.match(/localhost/)) {
 		debug_flag = true;
+		base_url = "https://qmi.npta.gov.tw/apiv1/";
 	}
 	if(window.location.href.match(/wp.qmi.emome.net/)) {
 		base_url = "https://ap.qmi.emome.net/apiv1/";
 	} else if(window.location.href.match(/eimweb.mitake.com.tw/)) {
 		base_url = "https://apserver.mitake.com.tw/apiv1/";
+	} else if(window.location.href.match(/qmi.npta.gov.tw/)) {
+		base_url = "https://qmi.npta.gov.tw/apiv1/";
 	}
-
 	if( window.location.href.match(/main.html/) ){
 		var tmp = localStorage["uiData"];
 		if( tmp ) $.lStorage("UXXX",$.parseJSON(tmp));

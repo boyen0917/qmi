@@ -157,7 +157,7 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
 	// {
 	//   "st": 1 // 1(正常)、2(已退出)
 	// }
-	var api_name = "/groups/"+this_gi+"/users/"+this_gu+"/status";
+	var api_name = "groups/"+this_gi+"/users/"+this_gu+"/status";
     var headers = {
             ui: ui,
 	        at: at,
@@ -362,7 +362,7 @@ function requestUpdatePermission( this_gi, addList, delList, callback){
 	//     "vcxnz-8f34nsa-f83fnsda"
 	//   ]
 	// }
-	var api_name = "/groups/"+this_gi+"/administrators";
+	var api_name = "groups/"+this_gi+"/administrators";
     var headers = {
             ui: ui,
 	        at: at,
@@ -585,7 +585,7 @@ function getUpdateGroupInfoApi( this_gi, newGn, newGd ){
 	//   "gd": "這是一個敘述"
 	// }
 
-	var api_name = "/groups/"+this_gi;
+	var api_name = "groups/"+this_gi;
 	var headers = {
 	        ui: ui,
 	        at: at,
