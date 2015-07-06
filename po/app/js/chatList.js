@@ -646,8 +646,8 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 					openChatWindow( giTmp, ciTmp );
 				});
 			} else{
-				cns.debug("chat msg muted, msg time", data.meta.ct);
-				cns.debug("chat msg muted, login tm", login_time);
+				// cns.debug("chat msg muted, msg time", data.meta.ct);
+				// cns.debug("chat msg muted, login tm", login_time);
 			}
 		} catch(e) {
 			cns.debug( e.message );

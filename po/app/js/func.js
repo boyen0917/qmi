@@ -1160,7 +1160,6 @@ $(function(){
         //event 自己的閱讀回覆讚好狀態
         var event_status = this_event.data("event-status");
 
-
         //event path
         this_event.data("event-path",this_ei);
 
@@ -1169,8 +1168,10 @@ $(function(){
         
         //製作每個回覆
         var okCnt = 0;
-        cns.debug("e_data",JSON.stringify(e_data,null,2));
         $.each(e_data,function(el_i,el){
+            //0是發文 不重複製作
+            if(el_i == 0) return ;
+
             var without_message = false;
             var reply_content;
             var ml_arr = [];
@@ -1200,6 +1201,7 @@ $(function(){
                             setStickerUrl(stickerDom, val.c);
                             break;
                         case 6:
+                        console.debug("picture~~~");
                             this_content.find(".au-area").show();
                             getS3file(val,this_content,val.tp,280,targetTu);
                             break;
@@ -1288,11 +1290,14 @@ $(function(){
                     if(tests.length > 0)
                         reply_duplicate = true;
                 }
+
+
                 
                 //部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
                 if(without_message || el.meta.del || (el.meta.tp.substring(0,1)*1 == 0) || reply_duplicate){
                     this_load.parent().remove();
                 }else{
+
 					//製作留言
 					var _groupList = $.lStorage(ui);
                     try{
@@ -1349,7 +1354,7 @@ $(function(){
                     }
                 }
                 okCnt++;
-                if( okCnt==e_data.length ){
+                if( okCnt==e_data.length-1 ){
                     this_event.find(".st-reply-all-content-area").slideDown().data("show",true);
                 }
 
@@ -5212,7 +5217,6 @@ $(function(){
 	}
 
     groupSwitchEnable = function() {
-        cns.debug("groupSwitchEnable");
         $(".st-filter-area").removeClass("st-filter-lock");
         $(".sm-group-area").addClass("enable");
     }
@@ -6860,7 +6864,11 @@ $(function(){
                                 errorReport(e);
                             }
                         }
-                        user_info_arr.push(val.pm);
+
+                        //不存在的團體就不要更新
+                        var _groupList = $.lStorage(ui);
+                        if(_groupList[val.pm.gi].length != 0)
+                            user_info_arr.push(val.pm);
                         // if( gi==val.pm.gi ){
                         //     isUpdateMemPage = true;
                         // }
@@ -6870,6 +6878,7 @@ $(function(){
                         break;
                     case 10://group info edit
                         if( $.lStorage(ui).hasOwnProperty(val.pm.gi) ){
+                            console.debug("uoyoyoyouoiuioo");
                             setGroupAllUser(null,val.pm.gi, function(this_gi){
                                 if(gi==this_gi){
                                     var tmp = $(".sm-small-area:visible");
@@ -6968,7 +6977,6 @@ $(function(){
     updatePollingCnts = function(this_count,cnt_type){
     	var api_name = "sys/counts";
         var this_gi = this_count.data("gi") || gi;
-        cns.debug( "updatePollingCnts", gi, cnt_type );
     	var body = {
     		cnts: [],
     		gcnts: {}

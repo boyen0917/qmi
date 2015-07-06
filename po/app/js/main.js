@@ -289,9 +289,9 @@ $(function(){
 
 			var ori_arr = [1280,1280,0.7];
 			var tmb_arr = [120,120,0.6];
-
+			s_load_show = true;
 			createGroup(group_name,group_desc).complete(function(data){
-	        	cns.debug("create group data:",data);
+				s_load_show = false;
 	        	if(data.status == 200){
 	        		var cg_result = $.parseJSON(data.responseText);
 
@@ -300,7 +300,6 @@ $(function(){
 	        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
 	        			//團體頭像上傳失敗
 	        			if(!chk) toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") ); 
-
 	        			//統一由polling執行更新
 	        			// groupMenuListArea(cg_result.gi);
 	        		});

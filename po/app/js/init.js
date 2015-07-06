@@ -170,7 +170,6 @@ $(function(){
 
 		//polling錯誤不關閉 為了url parse
 		if(!ajaxSettings.url.match(/sys\/polling/)){
-			cns.debug("ghghgghhg");
 			$('.ui-loader').hide();
 			$(".ajax-screen-lock").hide();
 		}
