@@ -190,6 +190,7 @@
 	"COMMON_CONSTRUCTION" : "建置中",
 	"COMMON_UPLOAD_FAIL" : "上傳失敗",
 	"COMMON_SEND_PHOTO_LIMIT" : "一次只能選取%ld張照片",
+	"COMMON_SEND_VIDEO_LIMIT" : "一次只能選取%ld段影片",
 	"COMMON_TIMEOUT_ALERT" : "連線逾時",
 	"COMMON_CHECK_NETWORK" : "目前網路不穩定，請確認連線狀況。",
 	"COMMON_ALBUM" : "相簿",
@@ -204,6 +205,7 @@
 	"COMMON_SCROLL_DOWN_UPDATE" : "下拉更新...",
 	"COMMON_PRIVATE" : "不公開",
 	"COMMON_PUBLIC" : "公開",
+	"COMMON_EXCEED_FILE_SIZE" : "超過檔案大小限制",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",

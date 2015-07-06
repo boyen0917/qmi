@@ -190,7 +190,8 @@
 	"COMMON_SUBMIT" : "Submit",
 	"COMMON_CONSTRUCTION" : "Under construction",
 	"COMMON_UPLOAD_FAIL" : "Upload failed",
-	"COMMON_SEND_PHOTO_LIMIT" : "You can send up to %ld photos at once.",
+	"COMMON_SEND_PHOTO_LIMIT" : "You can send up to %ld photo(s) at once.",
+	"COMMON_SEND_VIDEO_LIMIT" : "You can send up to %ld video(s) at once.",
 	"COMMON_TIMEOUT_ALERT" : "Timeout, please reconnect.",
 	"COMMON_CHECK_NETWORK" : "No connection to network",
 	"COMMON_ALBUM" : "Album",
@@ -205,6 +206,7 @@
 	"COMMON_SCROLL_DOWN_UPDATE" : "Scroll down to update...",
 	"COMMON_PRIVATE" : "Private",
 	"COMMON_PUBLIC" : "Public",
+	"COMMON_EXCEED_FILE_SIZE" : "File size exceeds limit.",
 	
 	"CHAT_TITLE"							: "Chat",
 	"CHAT_SEND"  						: "Send",

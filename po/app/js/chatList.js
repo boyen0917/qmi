@@ -874,7 +874,7 @@ function requestNewChatRoom(){
 
 function requestNewChatRoomApi(giTmp, cnTmp, gul, fl, callback, isOpenRoom){
 	if( null==isOpenRoom ) isOpenRoom = true;
-	var api_name = "/groups/"+giTmp+"/chats";
+	var api_name = "groups/"+giTmp+"/chats";
 
     var headers = {
         ui: ui,
