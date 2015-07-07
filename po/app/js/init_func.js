@@ -358,18 +358,18 @@ $(function(){
             }
 
             //離開團體開關
-            //目前僅免費團體及官方帳號可自由退出
-            if( group.tp=="A1" || group.tp.indexOf("C")==0 ){
+            //據說是其他平台還沒實作, 取消此規則**目前僅免費團體及官方帳號可自由退出**
+            // if( group.tp=="A1" || group.tp.indexOf("C")==0 ){
                 if( group.set && (group.set.s11==0 || group.set.s11==2) ){
                     $(".gs-leave").show();
                 } else{
                     $(".gs-leave").hide();
                     hide+=1;
                 }
-            } else {
-                $(".gs-leave").hide();
-                hide+=1;
-            }
+            // } else {
+            //     $(".gs-leave").hide();
+            //     hide+=1;
+            // }
 
             if( hide>=3 ){
                 return false;
