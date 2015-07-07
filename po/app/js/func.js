@@ -7117,7 +7117,7 @@ $(function(){
 
                         //不存在的團體就不要更新
                         var _groupList = $.lStorage(ui);
-                        if(_groupList[val.pm.gi].length != 0)
+                        if(_groupList.hasOwnProperty(val.pm.gi) && _groupList[val.pm.gi] )
                             user_info_arr.push(val.pm);
                         // if( gi==val.pm.gi ){
                         //     isUpdateMemPage = true;

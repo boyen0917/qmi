@@ -167,6 +167,8 @@ function updateChatList( giTmp, extraCallBack ){
 								}
 							});
 				    	}
+				    } else if( gi==giTmp&&epl.cl.length>1){
+				    	showChatList();
 				    } else {
 				    	//no list, show coachmark
 						chatListDom.find("rows").hide();
@@ -211,7 +213,6 @@ function showChatList(){
 				var chatRoomName=room.nk||"";
 				cns.debug(chatRoomName, room.cn);
 				var imgSrc="";
-				var isOwnAvatarImg = false;
 				if("1"==room.tp){
 					imgSrc="images/common/others/empty_img_personal_l.png";
 					//eg.cn="M00000DK0FS,M00000DJ00n"
@@ -220,7 +221,6 @@ function showChatList(){
 						var mem = groupData.guAll[ guTmp ];
 						if( mem.auo ){
 							imgSrc = mem.auo;
-							isOwnAvatarImg = true;
 						}
 					}
 					
@@ -237,7 +237,7 @@ function showChatList(){
 				table.append(row);
 				var td = $("<div class='td'></div>");
 				td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
-				if( isOwnAvatarImg ){
+				if("1"==room.tp){
 					td.find("img").data("gi",gi).data("gu",guTmp).addClass("namecard");
 				}
 				row.append(td);
