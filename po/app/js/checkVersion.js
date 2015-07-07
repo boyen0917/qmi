@@ -114,7 +114,7 @@ $(function(){
 			    	g_currentVersion = versionData.ver;
 			    }
 				$("#container_version span.web").html("("+g_currentVersion+")");
-	    		var api_name = "sys/version";
+	    		var api_name = "sys/version?"+new Date().getTime(); //add current to prevent cache
 	    		var headers = {
 	    			os: 2,
 					tp: 0,
