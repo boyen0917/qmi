@@ -59,7 +59,7 @@ img.auo {
     text-align:center;
 }
 
-.page-back {
+.page-back, .page-back-comfirm {
 	height: 40px;
 	width: 40px;
 	float: left;
@@ -67,7 +67,7 @@ img.auo {
 	cursor:pointer;
 }
 
-.page-back img {
+.page-back img, .page-back-comfirm img {
 	width: 30px;
 }
 

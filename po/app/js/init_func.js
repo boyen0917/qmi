@@ -30,6 +30,10 @@ $(function(){
         getGroupData(this_gi,false,1).complete(function(data){
             if(data.status == 200){
                 var groupData = $.parseJSON(data.responseText);
+
+                //切換團體時, 若原團體A1有cnt, 新團體A1無cnt, A1的cnt會留著
+                clearGroupPollingCnt();
+
                 //取得單一團體的所有詳細內容 更新到local storage
                 //更新團體資訊
                 setGroupAttributes( this_gi, groupData );
@@ -455,5 +459,13 @@ $(function(){
                 if (callback) callback(result);
             }
         });
+    }
+
+    clearGroupPollingCnt = function(){
+        var keys = ["A1","A2","A3","A4"];//,"B1","B2","B3","B4"
+        for( var i; i<keys.length; i++ ){
+            var key = keys[i];
+            $(".polling-cnt[data-polling-cnt="+key+"] .sm-count").hide();
+        }
     }
 });

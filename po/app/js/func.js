@@ -6900,7 +6900,7 @@ $(function(){
 	    			// }
 
                     var keys = ["A1","A2","A3","A4"];//,"B1","B2","B3","B4"
-                    for( var i in keys ){
+                    for( var i=0; i<keys.length; i++ ){
                         var key = keys[i];
                         if( val.hasOwnProperty(key) ){
                             var tmpDiv = $(".polling-cnt[data-polling-cnt="+key+"] .sm-count");
