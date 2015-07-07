@@ -1597,6 +1597,19 @@ $(function(){
 
 	});
 	
+	//compose 回上一頁確認
+	$("#page-compose").on("click",".page-back-comfirm",function(e){
+		var this_dom = $(this);
+
+		//show comfirm
+		popupShowAdjust("",
+			$.i18n.getString("COMPOSE_DISCARD"),
+			$.i18n.getString("COMMON_OK"),$.i18n.getString("COMMON_CANCEL"),
+			[function(){
+				this_dom.siblings(".page-back").trigger("click");
+			},$(this)]
+		);
+	});
 	
 	//----------------------------------- 聯絡人 ---------------------------------------------  
 	//功能選單
