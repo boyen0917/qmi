@@ -6196,7 +6196,7 @@ $(function(){
 	//parse 網址
 	getLinkMeta = function (this_compose,url) {
         s_load_show = true;
-        if( window.location.href.match(/eimweb.mitake.com.tw/) ){
+        // if( window.location.href.match(/eimweb.mitake.com.tw/) ){
             try{
                 var og = require('open-graph');
                 og( encodeURI(url), function(err, data){
@@ -6322,184 +6322,184 @@ $(function(){
 
                     $(".cp-attach-area .url-loading").hide();
             }
-        } else {
-            var q = 'http://opengraph.io/api/1.0/site/'+encodeURIComponent(url);
-    		// var q = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
-            $.ajax({
-                type: 'GET',
-                url: q, 
-                dataType: 'json',
-                timeout: 5000 ,
-                complete: function(){
-                    s_load_show = false;
-                    $('.ui-loader').hide();
-                    $(".ajax-screen-lock").hide();
+      //   } else {
+      //       var q = 'http://opengraph.io/api/1.0/site/'+encodeURIComponent(url);
+    		// // var q = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//img|//title|//head/meta[@property=\'og:image\' or @property=\'og:title\' or @property=\'og:description\' or @name=\'description\' ]" and compat="html5"' ) + '&format=json&callback=?';
+      //       $.ajax({
+      //           type: 'GET',
+      //           url: q, 
+      //           dataType: 'json',
+      //           timeout: 5000 ,
+      //           complete: function(){
+      //               s_load_show = false;
+      //               $('.ui-loader').hide();
+      //               $(".ajax-screen-lock").hide();
 
-                    //判斷關閉副檔區
-                    composeCheckMessageList();
-                },
-                success: function(data, textStatus) {
-                    var result = {};
-                    var tmp_img,tmp_desc;
-
-
-                    //loading圖示隱藏
-                    $(".cp-attach-area .url-loading").hide();
-
-                    //error存在 或 result null 就跳出
-                    if(data.error || (data.hybridGraph == null && data.openGraph==null) ) {
-                        //沒內容也算結束吧 讓它可以送出 
-                        this_compose.data("parse-waiting",false);
-
-                        toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
-                        return false;
-                    }
-
-                    if( data.openGraph && data.openGraph.title ){
-                        result.title = data.openGraph.title;
-                        result.description = data.openGraph.description;
-                        result.img = data.openGraph.image;
-                    }
-                    if( data.hybridGraph ){
-                        if( !result.title ) result.title = data.hybridGraph.title;
-                        if( !result.description ) result.description = data.hybridGraph.description;
-                        if( !result.img ) result.img = data.hybridGraph.image;
-                    }
-                    cns.debug(result.title, result.description, result.img );
+      //               //判斷關閉副檔區
+      //               composeCheckMessageList();
+      //           },
+      //           success: function(data, textStatus) {
+      //               var result = {};
+      //               var tmp_img,tmp_desc;
 
 
+      //               //loading圖示隱藏
+      //               $(".cp-attach-area .url-loading").hide();
+
+      //               //error存在 或 result null 就跳出
+      //               if(data.error || (data.hybridGraph == null && data.openGraph==null) ) {
+      //                   //沒內容也算結束吧 讓它可以送出 
+      //                   this_compose.data("parse-waiting",false);
+
+      //                   toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+      //                   return false;
+      //               }
+
+      //               if( data.openGraph && data.openGraph.title ){
+      //                   result.title = data.openGraph.title;
+      //                   result.description = data.openGraph.description;
+      //                   result.img = data.openGraph.image;
+      //               }
+      //               if( data.hybridGraph ){
+      //                   if( !result.title ) result.title = data.hybridGraph.title;
+      //                   if( !result.description ) result.description = data.hybridGraph.description;
+      //                   if( !result.img ) result.img = data.hybridGraph.image;
+      //               }
+      //               cns.debug(result.title, result.description, result.img );
 
 
-                    var yqlHtml = $(".cp-ta-yql").html();
 
-                    // cns.debug("data:",data);
 
-                    // //loading圖示隱藏
-                    // $(".cp-attach-area .url-loading").hide();
+      //               var yqlHtml = $(".cp-ta-yql").html();
 
-                    // //error存在 或 result null 就跳出
-                    // if(data.error || data.query.results == null) {
-                    //     //沒內容也算結束吧 讓它可以送出 
-                    //     this_compose.data("parse-waiting",false);
+      //               // cns.debug("data:",data);
 
-                    //     toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
-                    //     return false;
-                    // }
+      //               // //loading圖示隱藏
+      //               // $(".cp-attach-area .url-loading").hide();
 
-                    // //預設標題
-                    // if(data.query.results && data.query.results.title){
-                    //     result.title = data.query.results.title;
-                    // }
+      //               // //error存在 或 result null 就跳出
+      //               // if(data.error || data.query.results == null) {
+      //               //     //沒內容也算結束吧 讓它可以送出 
+      //               //     this_compose.data("parse-waiting",false);
 
-                    // //從meta取網址標題 大綱和圖片
-                    // if(data.query.results && data.query.results.meta){
-                    //     $.each(data.query.results.meta, function(key, val){
-                    //         if (val.property) {
+      //               //     toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+      //               //     return false;
+      //               // }
 
-                    //             // title
-                    //             if (val.property.match(/og:title/i) && val.content) {
-                    //                 result.title = val.content;
-                    //             }
+      //               // //預設標題
+      //               // if(data.query.results && data.query.results.title){
+      //               //     result.title = data.query.results.title;
+      //               // }
+
+      //               // //從meta取網址標題 大綱和圖片
+      //               // if(data.query.results && data.query.results.meta){
+      //               //     $.each(data.query.results.meta, function(key, val){
+      //               //         if (val.property) {
+
+      //               //             // title
+      //               //             if (val.property.match(/og:title/i) && val.content) {
+      //               //                 result.title = val.content;
+      //               //             }
                                 
-                    //             // description
-                    //             if (val.property.match(/og:description/i)) {
-                    //                 result.description = val.content;
-                    //             }
+      //               //             // description
+      //               //             if (val.property.match(/og:description/i)) {
+      //               //                 result.description = val.content;
+      //               //             }
 
-                    //             // img
-                    //             if (val.property.match(/og:image/i)) {
-                    //                 result.img = val.content;
-                    //             }
-                    //         }
+      //               //             // img
+      //               //             if (val.property.match(/og:image/i)) {
+      //               //                 result.img = val.content;
+      //               //             }
+      //               //         }
 
-                    //         if (val.name && val.name.match(/description/i)) {
-                    //             tmp_desc = val.content;
-                    //         }
-                    //     });
-                    // }
+      //               //         if (val.name && val.name.match(/description/i)) {
+      //               //             tmp_desc = val.content;
+      //               //         }
+      //               //     });
+      //               // }
 
-                    if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
-                        this_compose.data("message-list").push(2);
-                        var tmp = getYoutubeThumbnail( url );
-                        if(tmp) result.img = tmp;
-                    }else{
-                        this_compose.data("message-list").push(1);
-                    }
+      //               if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
+      //                   this_compose.data("message-list").push(2);
+      //                   var tmp = getYoutubeThumbnail( url );
+      //                   if(tmp) result.img = tmp;
+      //               }else{
+      //                   this_compose.data("message-list").push(1);
+      //               }
                         
-                    //如果meta圖片存在 並檢查是否圖太小 太小或沒圖的話就從網頁裡的img tag裡面隨便找一張
-                    // if(!result.img){
+      //               //如果meta圖片存在 並檢查是否圖太小 太小或沒圖的話就從網頁裡的img tag裡面隨便找一張
+      //               // if(!result.img){
 
-                    //     //預設圖片 隨便找一張img tag
-                    //     if(data.query.results && data.query.results.img){
-                    //         $.each(data.query.results.img,function(i,val){
-                    //             if (val != null && val.src && val.src.match(/\.jpg|\.png/)) {
-                    //                 var temp_img = val.src;
-                    //                 if(val.src.substring(0, 4) != 'http'){
-                    //                     temp_img = url + temp_img;
-                    //                 }
-                    //                 result.img = temp_img;
-                    //                 return false;
-                    //             }
-                    //         });
-                    //     }
-                    // }
+      //               //     //預設圖片 隨便找一張img tag
+      //               //     if(data.query.results && data.query.results.img){
+      //               //         $.each(data.query.results.img,function(i,val){
+      //               //             if (val != null && val.src && val.src.match(/\.jpg|\.png/)) {
+      //               //                 var temp_img = val.src;
+      //               //                 if(val.src.substring(0, 4) != 'http'){
+      //               //                     temp_img = url + temp_img;
+      //               //                 }
+      //               //                 result.img = temp_img;
+      //               //                 return false;
+      //               //             }
+      //               //         });
+      //               //     }
+      //               // }
 
-                    if(result.title){
-                        //按送出重新截取網站內容 不用顯示在畫面
-                        if(this_compose.data("parse-resend")) {
-                            this_compose.data("parse-resend",false);
-                            $(".cp-post").trigger("click");
-                        }else{
-                            cns.debug("url:",result);
-                            $(".cp-yql-title").html(result.title);
-                            if(result.description) $(".cp-yql-desc").html(result.description.substring(0,200));
-                            if(result.img) $(".cp-yql-img").show().html("<img src='" + result.img + "'/>");  
-                            $(".cp-ta-yql").fadeIn();
-                        }
-                    }else{
-                        // this_compose.data("parse-error",true);
-                    }
+      //               if(result.title){
+      //                   //按送出重新截取網站內容 不用顯示在畫面
+      //                   if(this_compose.data("parse-resend")) {
+      //                       this_compose.data("parse-resend",false);
+      //                       $(".cp-post").trigger("click");
+      //                   }else{
+      //                       cns.debug("url:",result);
+      //                       $(".cp-yql-title").html(result.title);
+      //                       if(result.description) $(".cp-yql-desc").html(result.description.substring(0,200));
+      //                       if(result.img) $(".cp-yql-img").show().html("<img src='" + result.img + "'/>");  
+      //                       $(".cp-ta-yql").fadeIn();
+      //                   }
+      //               }else{
+      //                   // this_compose.data("parse-error",true);
+      //               }
                     
 
-                    result.url = url;
-                    this_compose.data("url-content",result);
+      //               result.url = url;
+      //               this_compose.data("url-content",result);
 
-                    //網址讀取結束
-                    this_compose.data("parse-waiting",false);
-                    //關閉事件
-                    $(".cp-ta-yql > img").off().click(function(){
+      //               //網址讀取結束
+      //               this_compose.data("parse-waiting",false);
+      //               //關閉事件
+      //               $(".cp-ta-yql > img").off().click(function(){
 
-                        $(".cp-ta-yql").html(yqlHtml).fadeOut();
-                        this_compose.data("url-chk",false).data("url-content",false);
+      //                   $(".cp-ta-yql").html(yqlHtml).fadeOut();
+      //                   this_compose.data("url-chk",false).data("url-content",false);
 
-                        //message list pop
-                        var mlArr = this_compose.data("message-list");
-                        for(key in mlArr){
-                            if(mlArr[key] == 1 || mlArr[key] == 2){
-                                mlArr.splice(key,1);
-                            }
-                        }
+      //                   //message list pop
+      //                   var mlArr = this_compose.data("message-list");
+      //                   for(key in mlArr){
+      //                       if(mlArr[key] == 1 || mlArr[key] == 2){
+      //                           mlArr.splice(key,1);
+      //                       }
+      //                   }
 
-                        this_compose.data("message-list",mlArr);
+      //                   this_compose.data("message-list",mlArr);
 
-                        //判斷關閉副檔區
-                        composeCheckMessageList();
-                    });
-                },
-                error: function(jqXHR,textStatus,errorThrown ){
-                    //網址讀取結束
-                    this_compose.data("parse-waiting",false);
-                    // this_compose.data("parse-error",true);
-                    this_compose.data("parse-resend",false);
-                    //錯誤訊息
-                    // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+      //                   //判斷關閉副檔區
+      //                   composeCheckMessageList();
+      //               });
+      //           },
+      //           error: function(jqXHR,textStatus,errorThrown ){
+      //               //網址讀取結束
+      //               this_compose.data("parse-waiting",false);
+      //               // this_compose.data("parse-error",true);
+      //               this_compose.data("parse-resend",false);
+      //               //錯誤訊息
+      //               // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
 
-                    $(".cp-attach-area .url-loading").hide();
+      //               $(".cp-attach-area .url-loading").hide();
                     
-                    cns.debug("yql error",{jqXHR:jqXHR, textStatus:textStatus,errorThrown:errorThrown});
-                }   
-            });
-        }
+      //               cns.debug("yql error",{jqXHR:jqXHR, textStatus:textStatus,errorThrown:errorThrown});
+      //           }   
+      //       });
+      //   }
 	}
 
     getJsonFromUrl = function(url) {

@@ -1,6 +1,8 @@
 /* depend: init.js, tool.js */
 $(function(){
-	g_currentContainerVersion = "0.2.1";
+	g_newContainerVersion = "0.6.7"; //最新版本, 更新版本時須更新此變數, 應由server傳回來的...先將就用
+	
+	g_currentContainerVersion = "0.0.0";	//目前版本
 	g_currentVersion = "0.0.0";
 	// g_downloadPath = "http://webdev.cloud.mitake.com.tw/qmipc/download.html";
 
@@ -33,7 +35,7 @@ $(function(){
 		 //    	if(data.status == 200){
 		 //    		var getS3_result =$.parseJSON(data.responseText);
 
-		 			var getS3_result = {av:"0.6.5"};
+		 			var getS3_result = {av:g_newContainerVersion};
 
 		 			cns.debug( "old:", g_currentContainerVersion, "new:", getS3_result.av );
 			    	if( versionCompare(g_currentContainerVersion, getS3_result.av)>0 ){
