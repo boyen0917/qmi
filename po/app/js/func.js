@@ -1320,8 +1320,6 @@ $(function(){
                     } catch(e) {
                         errorReport(e);
                         this_load.remove();
-                        okCnt++;
-                        return;
                     }
 					
 
