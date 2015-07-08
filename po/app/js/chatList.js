@@ -167,6 +167,8 @@ function updateChatList( giTmp, extraCallBack ){
 								}
 							});
 				    	}
+				    } else if( gi==giTmp&&epl.cl.length>1){
+				    	showChatList();
 				    } else {
 				    	//no list, show coachmark
 						chatListDom.find("rows").hide();
@@ -235,6 +237,9 @@ function showChatList(){
 				table.append(row);
 				var td = $("<div class='td'></div>");
 				td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
+				if("1"==room.tp){
+					td.find("img").data("gi",gi).data("gu",guTmp).addClass("namecard");
+				}
 				row.append(td);
 
 				td = $("<div class='td' data-id='"+room.ci+"'></div>");

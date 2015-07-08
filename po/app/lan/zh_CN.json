@@ -127,6 +127,7 @@
 	"COMPOSE_DESCRIPTION_EMPTY" : "内容尚未填写",
 	"COMPOSE_TITLE_EMPTY" : "标题尚未填写",
 	"COMPOSE_PARSE_ERROR" : "网址内容取得失败",
+	"COMPOSE_DISCARD": "即将舍弃这则贴文？",
 
 	"MEMBER_ALL" : "全部",
 	"MEMBER_X_GROUP_NO_MEMBER": "%@目前没有成员",

@@ -128,6 +128,7 @@
 	"COMPOSE_DESCRIPTION_EMPTY" : "Please enter description.",
 	"COMPOSE_TITLE_EMPTY" : "Please enter title.",
 	"COMPOSE_PARSE_ERROR" : "Oops,can not get the result of this URL",
+	"COMPOSE_DISCARD": "Discard this post?",
 
 	"MEMBER_ALL" : "All",
 	"MEMBER_X_GROUP_NO_MEMBER": "No member in sub group %@ now.",
