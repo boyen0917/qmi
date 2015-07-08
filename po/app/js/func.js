@@ -942,31 +942,36 @@ $(function(){
                     like_str = $.i18n.getString("FEED_CLICK_LIKE_SELF", $.i18n.getString("COMMON_YOU") );
                     break;
                 //林小花 按讚
-                case ( !me_gu && epl.length == 1 ) :
-                    like_str = $.i18n.getString("FEED_CLICK_LIKE", guAll[epl[0]].nk.replaceOriEmojiCode() );
+                case ( !me_gu && epl.length == 1 ):
+                    var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "unknown";
+                    like_str = $.i18n.getString("FEED_CLICK_LIKE", epl0 );
                     break;
                 //你、林小花 按讚
-                case ( epl.length == 2 ) :
+                case ( epl.length == 2 ):
+                    var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "unknown";
+                    var epl1 = ( guAll.hasOwnProperty(epl[1]) && guAll[epl[1]] && guAll[epl[1]].nk ) ? guAll[epl[1]].nk.replaceOriEmojiCode() : "unknown";
                     if( typeof me_gu == "undefined" ){
                         like_str = $.i18n.getString("FEED_CLICK_LIKE_2PEOPLE", 
-                            guAll[epl[0]].nk.replaceOriEmojiCode(), 
-                            guAll[epl[1]].nk.replaceOriEmojiCode() );
+                            epl0, epl1 );
                     } else {
                         like_str = $.i18n.getString("FEED_CLICK_LIKE_2PEOPLE", 
                             $.i18n.getString("COMMON_YOU"), 
-                            (me_pos ? guAll[epl[0]].nk.replaceOriEmojiCode() : guAll[epl[1]].nk.replaceOriEmojiCode()) 
+                            (me_pos ? epl0 : epl1) 
                         );
                     }
                     break;
                 //林小花 及其他？個人按讚
                 case ( epl.length > 2 ) :
                     if( typeof me_gu == "undefined" ){
-                        like_str = $.i18n.getString("FEED_3PEOPLE_LIKE", guAll[epl[0]].nk.replaceOriEmojiCode(), (epl.length-1) );
+                        var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "unknown";
+                        like_str = $.i18n.getString("FEED_3PEOPLE_LIKE", epl0, (epl.length-1) );
                     } else {
                         if( 0==me_pos ){
-                            like_str = $.i18n.getString("FEED_YOU_AND_3PEOPLE_LIKE", $.i18n.getString("COMMON_YOU"), guAll[epl[1]].nk.replaceOriEmojiCode(), (epl.length-2) );
+                            var epl1 = ( guAll.hasOwnProperty(epl[1]) && guAll[epl[1]] && guAll[epl[1]].nk ) ? guAll[epl[1]].nk.replaceOriEmojiCode() : "unknown";
+                            like_str = $.i18n.getString("FEED_YOU_AND_3PEOPLE_LIKE", $.i18n.getString("COMMON_YOU"), epl1, (epl.length-2) );
                         } else {
-                            like_str = $.i18n.getString("FEED_YOU_AND_3PEOPLE_LIKE", $.i18n.getString("COMMON_YOU"), guAll[epl[0]].nk.replaceOriEmojiCode(), (epl.length-2) );
+                            var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "unknown";
+                            like_str = $.i18n.getString("FEED_YOU_AND_3PEOPLE_LIKE", $.i18n.getString("COMMON_YOU"), epl0, (epl.length-2) );
                         }
                     }
                     break;
@@ -1313,9 +1318,11 @@ $(function(){
                 }else{
 
 					//製作留言
+                    var isError = false;
 					var _groupList = $.lStorage(ui);
                     try{
                         var user_name = _groupList[this_gi].guAll[el.meta.gu].nk.replaceOriEmojiCode();
+                        
                         //大頭照
                         if(_groupList[this_gi].guAll[el.meta.gu].aut){
                             this_load.find(".st-user-pic img").attr("src",_groupList[this_gi].guAll[el.meta.gu].aut);
@@ -1328,40 +1335,44 @@ $(function(){
                         }
                     } catch(e) {
                         errorReport(e);
-                        this_load.remove();
+                        this_load.parent().remove();
+                        isError = true;
+                        cns.debug("get unknown reply user", this_gi, el.meta.gu);
                     }
 					
 
-                    // namecard
-                    this_load.find(".st-user-pic.namecard").data("gi",this_gi);
-                    this_load.find(".st-user-pic.namecard").data("gu",el.meta.gu)
+                    if( !isError ){
+                        // namecard
+                        this_load.find(".st-user-pic.namecard").data("gi",this_gi);
+                        this_load.find(".st-user-pic.namecard").data("gu",el.meta.gu)
 
-                    
+                        
 
-                    this_load.find(".st-reply-username").html(user_name.replaceOriEmojiCode());
-                    
-                    //時間
-                    this_load.find(".st-reply-footer-time").html(new Date(el.meta.ct).toFormatString()).data("ct",el.meta.ct);
+                        this_load.find(".st-reply-username").html(user_name.replaceOriEmojiCode());
+                        
+                        //時間
+                        this_load.find(".st-reply-footer-time").html(new Date(el.meta.ct).toFormatString()).data("ct",el.meta.ct);
 
-                    this_load.data("event-val",el);
+                        this_load.data("event-val",el);
 
-                    var ei = el.ei;
-                    this_load.data("event-id",ei);
+                        var ei = el.ei;
+                        this_load.data("event-id",ei);
 
-                    //存入event path 之後才可以按讚
-                    this_load.data("event-path",this_event.data("event-id") + "." + this_load.data("event-id"));
-                    if(el.meta.lct){
-                        this_load.find(".st-reply-footer img").show();
-                        this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like.png");
-                        this_load.find(".st-reply-footer span:eq(2)").html(el.meta.lct);
+                        //存入event path 之後才可以按讚
+                        this_load.data("event-path",this_event.data("event-id") + "." + this_load.data("event-id"));
+                        if(el.meta.lct){
+                            this_load.find(".st-reply-footer img").show();
+                            this_load.find(".st-reply-footer img").attr("src","images/timeline/timeline_feedbox_icon_like.png");
+                            this_load.find(".st-reply-footer span:eq(2)").html(el.meta.lct);
 
-                        //此則動態 自己的按贊狀況
-                        if(el.meta.il){
-                            this_load.find(".st-reply-footer img").attr("src","images/icon/icon_like1_activity.png");
-                            var likeDom = this_load.find(".st-reply-footer span:eq(1)");
-                            likeDom.html( $.i18n.getString("FEED_UNLIKE") );
-                            likeDom.removeAttr("data-textid");
-                            likeDom.data("like", true);
+                            //此則動態 自己的按贊狀況
+                            if(el.meta.il){
+                                this_load.find(".st-reply-footer img").attr("src","images/icon/icon_like1_activity.png");
+                                var likeDom = this_load.find(".st-reply-footer span:eq(1)");
+                                likeDom.html( $.i18n.getString("FEED_UNLIKE") );
+                                likeDom.removeAttr("data-textid");
+                                likeDom.data("like", true);
+                            }
                         }
                     }
                 }
