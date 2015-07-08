@@ -1070,7 +1070,7 @@ $(function(){
     onClickOfficialGeneralChat = function( this_gi ){
         try{
             var groupData = $.lStorage(ui)[this_gi];
-            if( true==groupData.isOfficial && groupData.ad!=1 ){
+            if( isOfficialGroup(groupData) && groupData.ad!=1 ){
                 if( null!=groupData.chatAll ){
                     for( var ci in groupData.chatAll ){
                         var room = groupData.chatAll[ci];
@@ -1085,6 +1085,15 @@ $(function(){
         } catch(e){
             errorReport(e);
         }
+        return false;
+    }
+
+    isOfficialGroup = function( group ){
+        if( !group) return false;
+        if( group.isOfficial ) return true;
+        if( !group.tp ) return false;
+        var tp = group.tp.toLowerCase();
+        if( tp.indexOf('c')==0 || tp.indexOf('d')==0 ) return true;
         return false;
     }
 /*
