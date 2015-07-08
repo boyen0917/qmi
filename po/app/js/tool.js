@@ -732,7 +732,8 @@ $(function(){
 		} else if( diff<3600 ){	//within hour
 			return $.i18n.getString("COMMON_NMINUTES_AGO", Math.floor(diff/60) );
 		} else if( now.getYear()==this.getYear() ){
-			if( now.getDate()==this.getDate() ){	//n-hours ago
+			//today(n-hours ago)
+			if( this.getMonth()==now.getMonth() && now.getDate()==this.getDate() ){
 				return $.i18n.getString("COMMON_NHOURS_AGO", Math.floor(diff/3600) );
 			}//yesterday
 			else if( this.getMonth()==now.getMonth() && this.getDate()==(now.getDate()-1) ){
