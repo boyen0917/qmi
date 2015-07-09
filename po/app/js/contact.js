@@ -193,7 +193,7 @@ onSearchInput = function(e){
 		searchResult = $('<div class="contact-searchResult" style="display:none;"></div>');
 		contact.after( searchResult );
 	}
-	searchResult.show();
+	searchResult.show().scrollTop(0);
 	contact.hide();
 
 	//search with no case sensitive
@@ -826,8 +826,9 @@ setOnMemGridScroll = function(){
 	});
 }
 setOnMemListScroll = function(){
-	var memContainer = $(".contact-scroll");
+	var memContainer = $(".contact-scroll, .subpage-contact .contact-searchResult");
 	g_contactWaitLoadImgs = memContainer.find(".contact-memLists .img.waitLoad");
+
 	memContainer.unbind("scroll").scroll(function(){
 		if( null==g_contactWaitLoadImgs) return;
 		var height = $(this).height()+99;
