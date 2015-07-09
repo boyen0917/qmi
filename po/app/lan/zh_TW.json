@@ -78,6 +78,7 @@
 	"FEED_DELETE" : "刪除",
 	"FEED_COPY" : "複製",
 	"FEED_COPY_CONTENT" : "複製內容",
+	"FEED_COPY_CONTENT_SUCC" : "成功複製內容",
 	"FEED_CALENDAR" : "加入行事曆",
 	"FEED_UNTOP_AVAILABLE" : "目前尚未有任何置頂",
 	"FEED_CLOSE_TIME" : "結束時間",
@@ -126,6 +127,7 @@
 	"COMPOSE_DESCRIPTION_EMPTY" : "內容尚未填寫",
 	"COMPOSE_TITLE_EMPTY" : "標題尚未填寫",
 	"COMPOSE_PARSE_ERROR" : "網址內容取得失敗",
+	"COMPOSE_DISCARD": "即將捨棄這則貼文？",
 
 	"MEMBER_ALL" : "全部",
 	"MEMBER_X_GROUP_NO_MEMBER": "%@目前沒有成員",
@@ -189,6 +191,7 @@
 	"COMMON_CONSTRUCTION" : "建置中",
 	"COMMON_UPLOAD_FAIL" : "上傳失敗",
 	"COMMON_SEND_PHOTO_LIMIT" : "一次只能選取%ld張照片",
+	"COMMON_SEND_VIDEO_LIMIT" : "一次只能選取%ld段影片",
 	"COMMON_TIMEOUT_ALERT" : "連線逾時",
 	"COMMON_CHECK_NETWORK" : "目前網路不穩定，請確認連線狀況。",
 	"COMMON_ALBUM" : "相簿",
@@ -200,6 +203,10 @@
 	"COMMON_FREE" : "免費",
 	"COMMON_NOT_MP4" : "檔案格式必須為MP4",
 	"COMMON_ACT_TOO_FREQUENT" : "操作過於頻繁",
+	"COMMON_SCROLL_DOWN_UPDATE" : "下拉更新...",
+	"COMMON_PRIVATE" : "不公開",
+	"COMMON_PUBLIC" : "公開",
+	"COMMON_EXCEED_FILE_SIZE" : "超過檔案大小限制",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",
@@ -293,11 +300,19 @@
 	"USER_PROFILE_UPDATE_SUCC" : "更新成功",
 	"USER_PROFILE_NO_DATA" : "暫無資料",
 	"USER_PROFILE_LEAVE" : "已退出",
+	"USER_PROFILE_DELETE_MEMBER" : "刪除成員",
+	"USER_PROFILE_DELETE_MEMBER_CONFIRM" : "刪除此成員？",
+	"USER_PROFILE_DELETE_MEMBER_DESC" : "被刪除的成員將無法檢視該團體，您可以從管理網頁恢復該成員權限。",
 
 	"OFFICIAL_ABOUT" : "關於",
 	"OFFICIAL_CHAT" : "聊天",
 	"OFFICIAL_SETTING" : "設定",
 	"OFFICIAL_INVITE" : "邀請",
 	"OFFICIAL_SHARE" : "分享",
-	"OFFICIAL_N_FOLLOWER" : "%ld人追蹤"
+	"OFFICIAL_N_FOLLOWER" : "%ld人追蹤",
+
+	"ADDRESSBOOK_TITLE" : "團體通訊錄",
+	"ADDRESSBOOK_ADD" : "新增自定聯絡人",
+	"ADDRESSBOOK_CUSTOM" : "自定聯絡人"
+
 }

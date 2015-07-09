@@ -59,7 +59,7 @@ img.auo {
     text-align:center;
 }
 
-.page-back {
+.page-back, .page-back-comfirm {
 	height: 40px;
 	width: 40px;
 	float: left;
@@ -67,7 +67,7 @@ img.auo {
 	cursor:pointer;
 }
 
-.page-back img {
+.page-back img, .page-back-comfirm img {
 	width: 30px;
 }
 
@@ -579,7 +579,7 @@ img.auo {
 
 .popup-frame {
 	position: fixed;
-	z-index: 1701;
+	z-index: 1901;
 	border-radius: 3px;
 	top: 200px;
 	text-align: center;
@@ -630,7 +630,7 @@ img.auo {
 
 .popup-screen {
 	position: fixed;
-	z-index:1700;
+	z-index:1900;
 }
 
 .popup-text {
@@ -668,6 +668,7 @@ img.auo {
 	background: #000;
 	opacity: 0.8;
 	z-index: 1700;
+	max-height: 100vh;
 }
 
 .compose-dnd {
@@ -1374,6 +1375,10 @@ img.auo {
 	height: 51px;
 }
 
+.header-group-name {
+	  margin-top: 2px;
+}
+
 .header-cp-object{
 	position: relative;
 	right: 15px;
@@ -1872,13 +1877,15 @@ img.auo {
 
 .st-filter-hide{
 	width: 40px;
-	height: 53px;
+	height: 41px;
 	line-height: 53px;
 	position: absolute;
 	display: inline-block;
 	color: lightgray;
 	cursor: pointer;
 	display: none;
+	top: 165px;
+	line-height: 41px;
 }
 .st-filter-hide.left{
 	background: -webkit-linear-gradient(0deg, rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255,0.8) 80%, rgba(255, 255, 255,0) 100%);
@@ -1894,6 +1901,7 @@ img.auo {
 	float: right;
 	right: 0;
 	text-align: right;
+	display: block;
 }
 .st-filter-hide.right.more{
 	border-left: 3px solid lightgray;
@@ -2543,7 +2551,7 @@ img.st-user-pic{
 .st-work-option > span {
 	width: 67%;
 	display: -webkit-box;
-	margin-top: 3px;
+	margin-top: 6px;
 	word-break: break-word;
 }
 
@@ -2664,6 +2672,7 @@ img.st-user-pic{
 
 .st-work-option {
 	display: -webkit-box;
+	padding: 5px 0 5px 5px;
 }
 
 .st-vote-detail-option .vote-do {
@@ -3201,6 +3210,19 @@ img.st-reply-message-attach {
 }
 
 
+.st-feebox-area-no-content {
+	min-height: -webkit-calc( 100vh - 300px );
+	text-align: center;
+	color:rgb(213, 213, 213);
+	padding-bottom: 20px;
+}
+.st-feebox-area-no-content.disabled{
+	opacity: 0.3;
+}
+
+.st-feedbox-area-bottom > img {
+	margin-top:10px;
+}
 
 
 .st-feedbox-area-bottom {
@@ -3326,10 +3348,11 @@ img.st-reply-message-attach {
 
 .cp-file-area {
 	padding-left: 15px;
+	padding-right: 15px;
 }
 
 
-.cp-file-img-area {
+.cp-file-img-area, .cp-file-video-area {
 	margin-left: 5px;
 	overflow: hidden;
 	padding-top: 15px;
@@ -3346,6 +3369,7 @@ img.st-reply-message-attach {
 .cp-grid div {
 	height: 100px;
 	overflow: hidden;
+	text-align: center;
 }
 
 .cp-grid div span {
@@ -3359,6 +3383,46 @@ img.st-reply-message-attach {
 .cp-grid img:nth-child(1) {
 	/*width: 100px;*/
 	display: block;
+}
+.cp-file-video-area{
+	min-height: 100px;
+}
+.cp-file-video-area.topBorder{
+	border-top: 1px solid #d2d2d2;
+}
+.cp-file-video-area .cp-grid .error:before{
+	content: "Video Error";
+	color: darkgray;
+	font-weight: bolder;
+	position: absolute;
+	top: 40px;
+	left: 0;
+	width: 100%;
+	height: 20px;
+	/*background-size: auto 50%;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	z-index: 3;*/
+}
+/*.cp-file-video-area .cp-grid:before{
+	content: "";
+	background-image: url("../images/chatroom/chat_message_status_icon_video.png");
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-size: auto 50%;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	z-index: 3;
+}
+.cp-file-video-area .cp-grid:hover:before{
+	background-image: url("../images/chatroom/chat_message_status_icon_video_click.png");
+}*/
+.cp-grid video{
+	/*max-width: 100%;*/
+	max-height: 100%;
 }
 
 .grid-cancel {
@@ -3467,7 +3531,7 @@ img.st-reply-message-attach {
 
 .cp-addfile {
 	float: left;
-	width: 50%;
+	width: 33.3%;
 	text-align: center;
 	padding-top: 10px;
 	cursor: pointer;
@@ -3884,6 +3948,7 @@ input.cp-datetimepicker-end {
 	line-height: 20px;
 	padding: 15px 0px;
 	margin:auto;
+	position: relative;
 }
 
 .cp-yql-title {
@@ -3910,6 +3975,15 @@ input.cp-datetimepicker-end {
 	-webkit-line-clamp: 6;
 	-webkit-box-orient: vertical;
 	margin: auto;
+}
+
+.cp-ta-yql > img{
+  width: 30px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+  opacity: 0.7;
 }
 
 
@@ -4480,16 +4554,37 @@ div.user-info-submit-ready:active {
 	border-bottom-right-radius: 5px;
 }
 
-img.user-info-close {
-	position: absolute;
+.user-info-close {
+	position: fixed;
 	right: 10px;
 	top: 10px;
 	z-index: 10;
 	width: 50px;
 	cursor: pointer;
 }
+.user-info-delete{
+	display: none;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	z-index: 10;
+	width: 90px;
+	cursor: pointer;
+	border-radius: 5px;
+	background-color: #7d7d7d;
+	color: white;
+	font-size: 12px;
+	text-align: center;
+	padding: 3px;
+	overflow: hidden;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.user-info-delete:hover{
+	background-color: #f31e80;
+}
 
-img.user-info-back {
+.user-info-back {
 	position: absolute;
 	left: 10px;
 	top: 10px;
@@ -4608,6 +4703,60 @@ img.user-info-back {
 	display: none;
 }
 
+.me-info-bar-extra input{
+	width: 75%;
+}
+.me-info-status{
+	width: 22%;
+	display: inline-block;
+	float: right;
+}
+.me-info-status img{
+	height: 12px;
+	width: auto;
+	position: relative;
+	float: right;
+	margin-top: 6px;
+	margin-left: 5px;
+}
+.me-info-status-switch{
+	display: none;
+	float: right;
+	margin-top: -80px;
+	/* border: 1px solid; */
+	background-color: black;
+	color: white;
+	padding: 5px 9px;
+	/* z-index: 1000; */
+	border-radius: 10px;
+}
+.me-info-status-switch:after{
+	content: '';
+	position: absolute;
+	border-style: solid;
+	border-width: 13px 9px 0;
+	border-color: #000000 transparent;
+	display: block;
+	width: 0;
+	z-index: 1;
+	bottom: 38px;
+	left: 283px;
+}
+.me-info-status-switch div{
+	display: inline-block;
+	cursor: pointer;
+}
+.me-info-status-switch div:nth-child(1){
+	border-right: 1px solid white;
+	padding-right: 5px;
+}
+.me-info-bar-extra .no-status input{
+	width: 100%;
+}
+.me-info-bar-extra .no-status .me-info-status{
+	display: none;
+}
+
 .user-avatar-bar .bottom {
 	height: 10px;
 }
@@ -4693,6 +4842,10 @@ img.user-info-back {
 
 .tabObj-cell-area.noTitle{
 	margin-top: 0px;
+	height: -webkit-calc( 100% - 57px );
+}
+.tabObj-cell-area.noTitle .obj-cell-page.current{
+	height: -webkit-calc( 100% - 57px );
 }
 
 .tabObj-cell-area .obj-cell{

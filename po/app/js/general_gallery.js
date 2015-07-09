@@ -126,7 +126,7 @@ moveLeft = function( isMove ){
 	}
 }
 
-getS3file = function(file_obj,target,tp){
+getS3file = function(file_obj,target,tp, isWatermark, text){
     //default
     var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
     var headers = {
@@ -160,7 +160,15 @@ getS3file = function(file_obj,target,tp){
                     //小圖
                     var fileName = getS3FileNameWithExtension( obj.s32, 6 );
                     // target.css("background-image","url("+obj.s32+")");
-                    target.attr("src",obj.s32).after('<a href="'+ obj.s32 +'" download="'+fileName+'"><div></div></a>');
+                    if(isWatermark){
+                    	getWatermarkImage(text, obj.s32, 1, function(imgUrl){
+	                        // alert(imgUrl);
+	                        target.attr("src",imgUrl).after('<a href="'+ imgUrl +'" download="'+fileName+'"><div></div></a>');
+	                        // if( callback ) callback(obj);
+	                    });
+                    } else {
+                    	target.attr("src",obj.s32).after('<a href="'+ obj.s32 +'" download="'+fileName+'"><div></div></a>');
+                    }
 				    break;
                 case 8://聲音
                     target.attr("src",obj.s3);

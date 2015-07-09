@@ -65,11 +65,11 @@ initChatList = function(){
 }
 
 function updateChatList( giTmp, extraCallBack ){
-
+	var chatListDom = $(".subpage-chatList");
 	//預設開啟loading, 關閉rows & coachmark
-	$(".subpage-chatList .coachmake").hide();
-	$(".subpage-chatList .loading").show();
-	$(".subpage-chatList .rows").html("");
+	chatListDom.find(".coachmake").hide();
+	chatListDom.find(".loading").show();
+	chatListDom.find(".rows").html("");
 	var userData = $.lStorage(ui);
 	if( !userData )	return;
 	var currentGroup = userData[giTmp];
@@ -87,7 +87,7 @@ function updateChatList( giTmp, extraCallBack ){
 	var result = ajaxDo(api_name,headers,method,false);
 	result.complete(function(data){
 		if(data.status == 200){
-			$(".subpage-chatList .loading").hide();
+			chatListDom.find(".loading").hide();
 			try{
 				var epl = $.parseJSON(data.responseText);
 				if(typeof epl != "undefined"){
@@ -149,9 +149,11 @@ function updateChatList( giTmp, extraCallBack ){
 
 					// cns.debug( JSON.stringify(userData) );
 			    	$.lStorage(ui, userData);
-			    	if( gi==giTmp ){
-			    		showChatList();
-			    	}
+
+			    	//remove first drawing, wait untile db saving
+			    	// if( gi==giTmp ){
+			    	// 	showChatList();
+			    	// }
 
 			    	if(list.length>0){
 				    	var cnt=0;
@@ -165,6 +167,12 @@ function updateChatList( giTmp, extraCallBack ){
 								}
 							});
 				    	}
+				    } else if( gi==giTmp&&epl.cl.length>1){
+				    	showChatList();
+				    } else {
+				    	//no list, show coachmark
+						chatListDom.find("rows").hide();
+						chatListDom.find(".coachmake").fadeIn();
 				    }
 			    }
 			} catch (e){
@@ -229,6 +237,9 @@ function showChatList(){
 				table.append(row);
 				var td = $("<div class='td'></div>");
 				td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
+				if("1"==room.tp){
+					td.find("img").data("gi",gi).data("gu",guTmp).addClass("namecard");
+				}
 				row.append(td);
 
 				td = $("<div class='td' data-id='"+room.ci+"'></div>");
@@ -640,8 +651,8 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 					openChatWindow( giTmp, ciTmp );
 				});
 			} else{
-				cns.debug("chat msg muted, msg time", data.meta.ct);
-				cns.debug("chat msg muted, login tm", login_time);
+				// cns.debug("chat msg muted, msg time", data.meta.ct);
+				// cns.debug("chat msg muted, login tm", login_time);
 			}
 		} catch(e) {
 			cns.debug( e.message );
@@ -868,7 +879,7 @@ function requestNewChatRoom(){
 
 function requestNewChatRoomApi(giTmp, cnTmp, gul, fl, callback, isOpenRoom){
 	if( null==isOpenRoom ) isOpenRoom = true;
-	var api_name = "/groups/"+giTmp+"/chats";
+	var api_name = "groups/"+giTmp+"/chats";
 
     var headers = {
         ui: ui,

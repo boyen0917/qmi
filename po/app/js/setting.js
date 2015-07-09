@@ -49,10 +49,12 @@ $(document).ready( function(){
 		if (file.type.match(imageType)) {
 			var reader = new FileReader();
 			reader.onload = function(e) {
-				var img = $(".ga-avatar-img.upload");
+				var imgs = $(".ga-avatar-img");
+				imgs.hide();
+				var img = imgs.filter(".upload");
 				//reset
 				img.attr("src",reader.result);
-				img.fadeIn();
+				img.show();
 		        
 		        input.addClass("ready");
 		        //有更動即可按確定
@@ -131,9 +133,7 @@ $(document).ready( function(){
 		if( input.length> 0 ){
 			file = input[0].files[0];
 		}
-		requestUpdateGroupInfo( gi, newGn, newGd, file, function(){
-			resetGroupInfo();
-		});
+		requestUpdateGroupInfo( gi, newGn, newGd, file, resetGroupInfo );
 	});
 
 	$(document).on("click",".ga-info.view.admin", function(){
@@ -157,7 +157,7 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
 	// {
 	//   "st": 1 // 1(正常)、2(已退出)
 	// }
-	var api_name = "/groups/"+this_gi+"/users/"+this_gu+"/status";
+	var api_name = "groups/"+this_gi+"/users/"+this_gu+"/status";
     var headers = {
             ui: ui,
 	        at: at,
@@ -362,7 +362,7 @@ function requestUpdatePermission( this_gi, addList, delList, callback){
 	//     "vcxnz-8f34nsa-f83fnsda"
 	//   ]
 	// }
-	var api_name = "/groups/"+this_gi+"/administrators";
+	var api_name = "groups/"+this_gi+"/administrators";
     var headers = {
             ui: ui,
 	        at: at,
@@ -498,24 +498,28 @@ function showGroupInfoPage(){
     // $(".subpage-album").fadeOut();
 
 	//reset
+	var img = $(".ga-avatar-img");
+	img.filter(".upload").hide();
+	img.filter(".currentGroup").show();
 	resetGroupInfo();
 }
 
 function resetGroupInfo(){
-	var img = $(".ga-avatar-img.upload");
-	img.css("display","none");
+
 	$(".ga-header-done").removeClass("ready");
 	var input = $(".ga-avatar input");
 	input.replaceWith( input.clone(true) );
+	// $(".ga-avatar-img.currentGroup").show();
 
-	var contents = $(".ga-info.edit .ga-info-row .content");
+	var info = $(".ga-info");
+	var contents = info.filter(".edit .ga-info-row .content");
 	$.each( contents, function(i,dom){
 		var domTmp = $(dom);
 		domTmp.data("oriText", domTmp.val() );
 	});
 
-	$(".ga-info.view").show();
-	$(".ga-info.edit").hide();
+	info.filter(".view").show();
+	info.filter(".edit").hide();
 }
 
 function checkGroupInfoChange(){
@@ -558,6 +562,11 @@ function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
 	    	}
 
 	    	if( isReady ){
+				var img = $(".ga-avatar-img");
+				img.filter(".currentGroup").load(function(){
+					$(this).show().off("load");
+					img.filter(".upload").hide();
+				});
 	    		setGroupAllUser(null, this_gi, function(){
 	    			if(callback) callback();
 	    			s_load_show = false;
@@ -576,7 +585,7 @@ function getUpdateGroupInfoApi( this_gi, newGn, newGd ){
 	//   "gd": "這是一個敘述"
 	// }
 
-	var api_name = "/groups/"+this_gi;
+	var api_name = "groups/"+this_gi;
 	var headers = {
 	        ui: ui,
 	        at: at,

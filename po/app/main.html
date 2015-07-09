@@ -31,6 +31,7 @@
         
         <script type="text/javascript" src="js/general_album.js?ver=0.35"></script>
         <script type="text/javascript" src="js/contact.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/addressBook.js?ver=0.35"></script>
         <script type="text/javascript" src="js/setting.js?ver=0.35"></script>
         <script type="text/javascript" src="js/chatDB.js?ver=0.35"></script>
         <script type="text/javascript" src="js/func.js?ver=0.35"></script>
@@ -184,6 +185,10 @@
                                <div class="sm-small-area-r" data-textid="GROUPSETTING_TITLE"></div>
                                <!-- <div class="sm-count"></div> -->
                             </div>
+                            <div data-sm-act="addressBook" class="sm-small-area">
+                               <div class="sm-small-area-r" data-textid="ADDRESSBOOK_TITLE"></div>
+                               <!-- <div class="sm-count"></div> -->
+                            </div>
                         </div>
 
 
@@ -191,6 +196,8 @@
                         <div class="feed-compose header-icon _2"></div>
                         <div class="chatList-add header-icon _2"></div>
                         <div class="contact-add header-icon _2"></div>
+                        <div class="addressBook-refresh header-icon _2"></div>
+                        <!-- <div class="addressBook-add header-icon _2"></div> -->
                         <div class="navi-alert header-icon _1"></div>
                         <div class="feed-compose-area">
                             <div data-fc-box="announcement" class="fc-area-subbox" style="display:none">
@@ -338,7 +345,7 @@
                                     <span data-textid='FEED_ALL'></span>
                                     <img src="images/icon/icon_arrow_right.png"/>
                                 </div> -->
-                                <div class="st-filter-hide left">&nbsp&nbsp...</div>
+                                <div class="st-filter-hide left">&nbsp&nbsp<</div>
                                 <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide st-filter-list-active polling-cnt polling-local" data-polling-cnt="B1">
                                     <span data-textid='FEED_ALL'></span>
                                     <div class="sm-count" style="display:none;"></div>
@@ -368,12 +375,12 @@
                                     <div data-status="read" class="st-filter-action st-filter-list">
                                         <span data-textid='FEED_READ'></span>
                                     </div>
-                                    <div data-status="subscribe" class="st-filter-action st-filter-list" style="display:none;"><span data-textid='FEED_SUBSCRIBE'></span></div>
+                                    <div data-status="subscribe" class="st-filter-action st-filter-list"><span data-textid='FEED_SUBSCRIBE'></span></div>
                                     <!-- <div class="st-filter-list-btn">
                                         <img src="images/icon/icon_arrow_top.png"/>
                                     </div> -->
                                 <!-- </div> -->
-                                <div class="st-filter-hide right">...&nbsp&nbsp</div>
+                                <div class="st-filter-hide right">>&nbsp&nbsp</div>
                             </div>
 
                             <!-- 官方帳號admin start -->
@@ -440,6 +447,10 @@
                                 <option value="te-example4"></option>
                             </select>
                             <div class="st-feedbox-area">
+                                <div class="st-feebox-area-no-content" style="display:none">
+                                    <img src="images/coachmake/logo_nomessage.png"/>
+                                    <div data-textid='COMMON_SCROLL_DOWN_UPDATE'></div>
+                                </div>
                                 <div class="st-feebox-area-container">
                                     <div class="st-feebox-area-inner-container">
                                         <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
@@ -470,6 +481,31 @@
                         
                 <!--------------------------------- 聯絡人 -------------------------------->
                         <div class="subpage-contact main-subpage" style="display:none;height: 100%">
+                            <div class="contact-search">
+                                <div class="inputDiv">
+                                    <div class="hintDiv">
+                                        <img class="icon" src="images/common/icon/icon_search.png"/>
+                                        <span class="text" data-textid="INVITE_SEARCH"/>
+                                    </div>
+                                    <div class="content" style="display:none;">
+                                        <img class="icon" src="images/common/icon/icon_search.png"/>
+                                        <input type="input" align="middle" class="input" maxlength="20" data-role="none"/>
+                                        <img class="clear" src="images/common/icon/icon_search_clean.png"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="contact-rows top"></div>
+                            <div class="contact-searchResult" style="display:none;">
+                                <div class="container">
+                                    <div class="noResult" style="display:none;" data-textid="MEMBER_SEARCH_NO_RESULT"></div>
+                                    <div class="memTitle" data-textid="COMMON_MEMBER"></div>
+                                    <div class="branchTitle" data-textid="COMPOSE_SUBGROUP"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                <!--------------------------------- 團體電話簿 -------------------------------->
+                        <div class="subpage-addressBook main-subpage" style="display:none;height: 100%">
                             <div class="contact-search">
                                 <div class="inputDiv">
                                     <div class="hintDiv">
@@ -649,11 +685,11 @@
                         </div> 
                
                     <!--------------------------------- 團體關於 -------------------------->
-                        <div class="subpage-groupAbout">
+                        <div class="subpage-groupAbout main-subpage">
                             <div class="ga-wrapper">
                                 <div class="ga-content">
                                     <div class="ga-avatar">
-                                        <img class="ga-avatar-img default" src="images/common/others/name_card_nophoto_profile.png"/>
+                                        <!-- <img class="ga-avatar-img default" src="images/common/others/name_card_nophoto_profile.png"/> -->
                                         <img class="ga-avatar-img polling-group-pic-o currentGroup"/>
                                         <img class="ga-avatar-img upload"/>
                                         <div class="ga-header-bar">
@@ -718,9 +754,11 @@
 <!---------------------------------- page-compose ------------------------------------>
         <div data-role="page" id="page-compose">
             <div class="fixed-initial" data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <div class="page-back-comfirm"><img src="images/navi/navi_icon_back.png"/></div>
+                <div class="page-back" style="display:none;"></div>
                 <div class="header-group-name">
                     <div class="page-title"></div>
+                    <div class="page-group-name"></div>
                 </div>
                 <div class="cp-post">
                     <img src="images/navi/navi_icon_post.png"/>
@@ -734,7 +772,7 @@
             <div class="cp-footer fixed-initial">
                 <div data-cp-addfile="sticker" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_sticker.png"/></div>
                 <div data-cp-addfile="img" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_img.png"/></div>
-                <div data-cp-addfile="video" class="cp-addfile" style="display:none;"><img class="cp-icon-size" src="images/compose/compose_form_addfile_video.png"/></div>
+                <div data-cp-addfile="video" class="cp-addfile"><img class="cp-icon-size" src="images/compose/compose_form_addfile_video.png"/></div>
                 <div data-cp-addfile="voice" class="cp-addfile" style="display:none;"><img class="cp-icon-size" src="images/compose/compose_form_addfile_voice.png"/></div>
                 <div data-cp-addfile="map" class="cp-addfile" style="display:none;"><img class="cp-icon-size" src="images/compose/compose_form_addfile_map.png"/></div>
                 <input class="cp-file" type="file" multiple style="display:none;" data-role="none"/>

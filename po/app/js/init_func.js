@@ -30,6 +30,10 @@ $(function(){
         getGroupData(this_gi,false,1).complete(function(data){
             if(data.status == 200){
                 var groupData = $.parseJSON(data.responseText);
+
+                //切換團體時, 若原團體A1有cnt, 新團體A1無cnt, A1的cnt會留著
+                clearGroupPollingCnt();
+
                 //取得單一團體的所有詳細內容 更新到local storage
                 //更新團體資訊
                 setGroupAttributes( this_gi, groupData );
@@ -110,7 +114,9 @@ $(function(){
                 { "tp": 4, "sw": false },
                 { "tp": 5, "sw": false },
                 { "tp": 6, "sw": false },
-                { "tp": 7, "sw": true }
+                { "tp": 7, "sw": true },
+                { "tp": 8, "sw": false },
+                { "tp": 9, "sw": false }
             ];
             if( group.ad==1 ){
                 group.tab[6].sw = true;
@@ -136,7 +142,9 @@ $(function(){
                     { "tp": 4, "sw": false },
                     { "tp": 5, "sw": false },
                     { "tp": 6, "sw": true },
-                    { "tp": 7, "sw": true }
+                    { "tp": 7, "sw": true },
+                    { "tp": 8, "sw": false },
+                    { "tp": 9, "sw": false }
                 ];
             }
         }
@@ -229,6 +237,9 @@ $(function(){
                     case 7: //團體設定
                         dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
                         break;
+                    case 9: //團體通訊錄
+                        dom = menu.find(".sm-small-area[data-sm-act=addressBook]");
+                        break;
                 }
                 if( dom ){
                     //switch
@@ -292,7 +303,7 @@ $(function(){
                         dom = menu.find(".fc-area-subbox[data-fc-box=check]");
 
                         //成員定位尚未有功能, 有顯示的話先disabled掉
-                        dom.addClass("disabled");
+                        // dom.addClass("disabled");
                         break;
                     case 5: //貼文
                         dom = menu.find(".fc-area-subbox[data-fc-box=post]");
@@ -347,18 +358,18 @@ $(function(){
             }
 
             //離開團體開關
-            //目前僅免費團體及官方帳號可自由退出
-            if( group.tp=="A1" || group.tp.indexOf("C")==0 ){
+            //據說是其他平台還沒實作, 取消此規則**目前僅免費團體及官方帳號可自由退出**
+            // if( group.tp=="A1" || group.tp.indexOf("C")==0 ){
                 if( group.set && (group.set.s11==0 || group.set.s11==2) ){
                     $(".gs-leave").show();
                 } else{
                     $(".gs-leave").hide();
                     hide+=1;
                 }
-            } else {
-                $(".gs-leave").hide();
-                hide+=1;
-            }
+            // } else {
+            //     $(".gs-leave").hide();
+            //     hide+=1;
+            // }
 
             if( hide>=3 ){
                 return false;
@@ -448,5 +459,13 @@ $(function(){
                 if (callback) callback(result);
             }
         });
+    }
+
+    clearGroupPollingCnt = function(){
+        var keys = ["A1","A2","A3","A4"];//,"B1","B2","B3","B4"
+        for( var i; i<keys.length; i++ ){
+            var key = keys[i];
+            $(".polling-cnt[data-polling-cnt="+key+"] .sm-count").hide();
+        }
     }
 });

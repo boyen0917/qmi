@@ -424,6 +424,7 @@ $(function(){
 	}
 
 	resetDB = function(){
+		clearBadgeLabel();
 		if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 		if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 		if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
@@ -741,7 +742,7 @@ $(function(){
 				var options = {weekday: "short"};
 				
 				//星期四 15:40
-				console.debug( this.toLocaleTimeString(language, options) );
+				// console.debug( this.toLocaleTimeString(language, options) );
 				return this.toLocaleTimeString(language, options).split(" ")[0]
 						+" "+this.getHours()+":"+this.getMinutes();
 			} else {	//within a year
@@ -828,7 +829,7 @@ $(function(){
 		}
 	}
 
-	showGallery = function( this_gi, this_ti, gallery_arr, startIndex, title ){
+	showGallery = function( this_gi, this_ti, gallery_arr, startIndex, title, isWatermark, watermarkText ){
 		startIndex = startIndex || 0;
         var gallery = $(document).data("gallery");
         if( null != gallery && false==gallery.closed){
@@ -841,6 +842,8 @@ $(function(){
             gallery.list = gallery_arr;
             gallery.startIndex = startIndex;
             gallery.title = title;
+            gallery.isWatermark = isWatermark;
+            gallery.watermarkText = watermarkText;
             var dataDom = $(gallery.document).find(".dataDom");
             dataDom.click();
         } else {
@@ -856,6 +859,8 @@ $(function(){
                     gallery.list = gallery_arr;
                     gallery.startIndex = startIndex;
                     gallery.title = title;
+                    gallery.isWatermark = isWatermark;
+                    gallery.watermarkText = watermarkText;
                     var dataDom = $(gallery.document).find(".dataDom");
                     dataDom.click();
                 },1000);
@@ -1274,15 +1279,19 @@ $(function(){
 		ctx.rotate(-0.25*Math.PI);
 
 		var yTmp = 0;
+		// stroke color
+		ctx.strokeStyle = "rgba(128,128,128,0.3)";
+	    ctx.lineWidth = 1;
+
 		ctx.fillStyle = color || "rgba(255,255,255,0.3)";
 		// ctx.strokeStyle = "rgba(255,255,255,0.3)";
-	    ctx.lineWidth = 2;
 	    var longTextString = "";
 	    for( var j=0; j<textCnt; j++){
 		    longTextString += text;
 		}
 		for( var i=0; i<cnt; i++){
 			var xTmp = 0;
+			ctx.strokeText(longTextString, xTmp, yTmp);
 			ctx.fillText( longTextString, xTmp, yTmp);
 			yTmp+=lineHeight;
 		}
@@ -1461,7 +1470,7 @@ $(function(){
 			var clipboard = gui.Clipboard.get();
 			// Or write something
 			clipboard.set(text, 'text');
-			toastShow("copied to clipboard");
+			toastShow( $.i18n.getString("FEED_COPY_CONTENT_SUCC") );
 		} catch(e) {
 			// errorReport(e);
 		}
@@ -1519,5 +1528,24 @@ $(function(){
 			// }
     	}
     	return false;
+    }
+
+    setBadgeLabel = function(str){
+
+		//nodeJS用, show程式小icon上面的數字
+		try{
+			require('nw.gui').Window.get().setBadgeLabel( str );
+		}catch(e){
+			// cns.debug(e);	//必加, 一般瀏覽器require not defined
+		}
+    }
+
+    clearBadgeLabel = function(){
+		//nodeJS用, show程式小icon上面的數字
+		try{
+			require('nw.gui').Window.get().setBadgeLabel("");
+		}catch(e){
+			// cns.debug(e);	//必加, 一般瀏覽器require not defined
+		}
     }
 });

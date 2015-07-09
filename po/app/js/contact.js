@@ -38,7 +38,7 @@ initContactList = function(){
 	if( false==initContactData() ) return;
 
 	//get html container
-	var rowContainer = $(".contact-rows");
+	var rowContainer = $(".subpage-contact .contact-rows");
 	if( !rowContainer || rowContainer.length<=0 ) return;
 	rowContainer.html("");
 
@@ -258,11 +258,11 @@ onSearchInput = function(e){
 			branchListContainer.remove();
 		}
 		branchListContainer = generateBranchList( branchList );
-		branchTitle.after(branchListContainer);
 
 		branchListContainer.find(".row.branch").off("click").click( function(){
 			showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
 		});
+		branchTitle.after(branchListContainer);
 	} else {
 		branchTitle.hide();
 	}
@@ -900,7 +900,7 @@ initContactData = function(){
 			guAllExsit[key] = obj;
 		}
 	});
-	$.lStorage(ui, userData);
+	// $.lStorage(ui, userData);
 
 	//get new mem data
 	var currentTime = new Date().getTime();

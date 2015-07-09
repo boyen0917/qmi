@@ -79,6 +79,7 @@
 	"FEED_DELETE" : "Delete",
 	"FEED_COPY" : "Copy",
 	"FEED_COPY_CONTENT" : "Copy content",
+	"FEED_COPY_CONTENT_SUCC" : "Copied to clipboard",
 	"FEED_CALENDAR" : "Add to Calendar",
 	"FEED_UNTOP_AVAILABLE" : "No Top Feed Now",
 	"FEED_CLOSE_TIME" : "End Time",
@@ -127,6 +128,7 @@
 	"COMPOSE_DESCRIPTION_EMPTY" : "Please enter description.",
 	"COMPOSE_TITLE_EMPTY" : "Please enter title.",
 	"COMPOSE_PARSE_ERROR" : "Oops,can not get the result of this URL",
+	"COMPOSE_DISCARD": "Discard this post?",
 
 	"MEMBER_ALL" : "All",
 	"MEMBER_X_GROUP_NO_MEMBER": "No member in sub group %@ now.",
@@ -189,7 +191,8 @@
 	"COMMON_SUBMIT" : "Submit",
 	"COMMON_CONSTRUCTION" : "Under construction",
 	"COMMON_UPLOAD_FAIL" : "Upload failed",
-	"COMMON_SEND_PHOTO_LIMIT" : "You can send up to %ld photos at once.",
+	"COMMON_SEND_PHOTO_LIMIT" : "You can send up to %ld photo(s) at once.",
+	"COMMON_SEND_VIDEO_LIMIT" : "You can send up to %ld video(s) at once.",
 	"COMMON_TIMEOUT_ALERT" : "Timeout, please reconnect.",
 	"COMMON_CHECK_NETWORK" : "No connection to network",
 	"COMMON_ALBUM" : "Album",
@@ -201,6 +204,10 @@
 	"COMMON_FREE" : "Free",
 	"COMMON_NOT_MP4" : "File must be MP4.",
 	"COMMON_ACT_TOO_FREQUENT" : "Too frequent activity.",
+	"COMMON_SCROLL_DOWN_UPDATE" : "Scroll down to update...",
+	"COMMON_PRIVATE" : "Private",
+	"COMMON_PUBLIC" : "Public",
+	"COMMON_EXCEED_FILE_SIZE" : "File size exceeds limit.",
 	
 	"CHAT_TITLE"							: "Chat",
 	"CHAT_SEND"  						: "Send",
@@ -294,11 +301,19 @@
 	"USER_PROFILE_UPDATE_SUCC" : "Update successed.",
 	"USER_PROFILE_NO_DATA" : "No data",
 	"USER_PROFILE_LEAVE" : "Member left",
+	"USER_PROFILE_DELETE_MEMBER" : "Delete Member",
+	"USER_PROFILE_DELETE_MEMBER_CONFIRM" : "Delete this member?",
+	"USER_PROFILE_DELETE_MEMBER_DESC" : "Deleted member will not have permission to view this group until the member is recovered via administration web site.",
+
 
 	"OFFICIAL_ABOUT" : "About",
 	"OFFICIAL_CHAT" : "Chat",
 	"OFFICIAL_SETTING" : "Setting",
 	"OFFICIAL_INVITE" : "Invite",
 	"OFFICIAL_SHARE" : "Share",
-	"OFFICIAL_N_FOLLOWER" : "%ld follower(s)"
+	"OFFICIAL_N_FOLLOWER" : "%ld follower(s)",
+
+	"ADDRESSBOOK_TITLE" : "AddressBook",
+	"ADDRESSBOOK_ADD" : "Add custom address book",
+	"ADDRESSBOOK_CUSTOM" : "Custom address book"
 }

@@ -2,6 +2,7 @@ onCheckVersionDone = function(needUpdate){
 	if( needUpdate ){
 		return;
 	}
+	clearBadgeLabel();
 
 	//預設上一頁
 	$(document).data("page-history",[["#page-registration"]]);
@@ -369,14 +370,19 @@ onCheckVersionDone = function(needUpdate){
 
 					// 取dgi的combo
 					if( login_result.dgi || group_list.length>0 ){
-						if( null==login_result.dgi ){
+						if( null==login_result.dgi || login_result.dgi.length==0 ){
 							login_result.dgi = group_list[0].gi;
 							$.lStorage("_loginData",login_result);
 						}
-						getGroupCombo(login_result.dgi,function(){
-	                		localStorage["uiData"] = JSON.stringify($.lStorage(ui));
-							document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
-	                	});
+						if( login_result.dgi ){
+							getGroupCombo(login_result.dgi,function(){
+		                		localStorage["uiData"] = JSON.stringify($.lStorage(ui));
+								document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
+		                	});
+						} else {
+							//沒group
+							document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
+						}
 					} else{
 						//沒group
 						document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";

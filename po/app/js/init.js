@@ -19,13 +19,15 @@ $(function(){
 	debug_flag = false;
 	if(window.location.href.match(/localhost/)) {
 		debug_flag = true;
+		// base_url = "https://qmi.npta.gov.tw/apiv1/";
 	}
 	if(window.location.href.match(/wp.qmi.emome.net/)) {
 		base_url = "https://ap.qmi.emome.net/apiv1/";
 	} else if(window.location.href.match(/eimweb.mitake.com.tw/)) {
 		base_url = "https://apserver.mitake.com.tw/apiv1/";
+	} else if(window.location.href.match(/qmi.npta.gov.tw/)) {
+		base_url = "https://qmi.npta.gov.tw/apiv1/";
 	}
-
 	if( window.location.href.match(/main.html/) ){
 		var tmp = localStorage["uiData"];
 		if( tmp ) $.lStorage("UXXX",$.parseJSON(tmp));
@@ -149,12 +151,14 @@ $(function(){
 	$.ajaxSetup ({
 		timeout: 30000
 	});
+
 	
 	$(document).ajaxSend(function() {
 		//顯示 loading
 		if(!load_show && !s_load_show) return false;
 	    if(!$('.ui-loader').is(":visible"))
-		$('.ui-loader').css("display","block");
+			$('.ui-loader').css("display","block");
+
 		$(".ajax-screen-lock").show();
 	});
 
@@ -172,7 +176,6 @@ $(function(){
 
 		//polling錯誤不關閉 為了url parse
 		if(!ajaxSettings.url.match(/sys\/polling/)){
-			cns.debug("ghghgghhg");
 			$('.ui-loader').hide();
 			$(".ajax-screen-lock").hide();
 		}
@@ -284,7 +287,7 @@ $(function(){
 
 	errorResponse = function(data){
 		try{
-			if(data.responseText){
+			if(data && data.responseText && data.responseText.length>0 ){
 				return $.parseJSON(data.responseText).rsp_msg;
 			}else{
 				cns.debug("errorResponse:",data);

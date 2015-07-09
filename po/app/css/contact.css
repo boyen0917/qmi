@@ -2,6 +2,13 @@
 	background-image: url(../images/navi/navi_icon_add_member.png);
 	display: none;
 }
+.addressBook-add{
+	background-image: url(../images/common/icon/icon_add_content.png);
+}
+.addressBook-refresh{
+	background-image: url(../images/common/icon/navi_icon_reload.png);
+	display: none;
+}
 /*.contact-add:hover{
 	top: 9px;
 	right: 53px;
@@ -170,6 +177,7 @@
 	background-image: url("../images/icon/icon_arrow_black_top.png");
 }
 .contact-titleBar .btn,
+.contact-titleBar .addressBook-add,
 .contact-titleBar .btnExtra{
 	width: 30px;
 	height: 30px;

@@ -57,14 +57,14 @@ header img{
 }
 .picArea .img:hover a div{
 	content: "";
-	width: 100vw;
+	width: -webkit-calc( 100vw - 20px );
 	height: 50px;
-	background-position: 95% 50%;
+	background-position: 100% 50%;
 	background-repeat: no-repeat;
 	background-image: url("../images/dl.png");
 	background-size: contain;
 	position: absolute;
-	bottom: 5px;
+	bottom: 20px;
 	cursor: pointer;
 	opacity: 0.8;
 }
@@ -108,7 +108,7 @@ header img{
 .rBtn{
 	height: -webkit-calc( 73% - 40px );
 	float: right;
-	right: 0;
+	right: 15px;
 	padding-left: 2%;
 	text-align: right;
 	background-position-x: 70%;
