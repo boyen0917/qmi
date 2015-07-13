@@ -27,13 +27,16 @@ $(function(){
 		base_url = "https://apserver.mitake.com.tw/apiv1/";
 	} else if(window.location.href.match(/qmi.npta.gov.tw/)) {
 		base_url = "https://qmi.npta.gov.tw/apiv1/";
+	} else if(window.location.href.match(/eim.mic.org.tw/)) {
+		base_url = "https://eim.mic.org.tw/apiv1/";
 	}
+
+	
 	if( window.location.href.match(/main.html/) ){
 		var tmp = localStorage["uiData"];
 		if( tmp ) $.lStorage("UXXX",$.parseJSON(tmp));
 	}
 	
-
 	
 	//國碼
 	countrycode = "+886";
