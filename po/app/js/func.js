@@ -1175,7 +1175,7 @@ $(function(){
         var okCnt = 0;
         $.each(e_data,function(el_i,el){
             //0是發文 不重複製作
-            if(el_i == 0) return ;
+            // if(el_i == 0) return ;
 
             var without_message = false;
             var reply_content;
