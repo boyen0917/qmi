@@ -1579,7 +1579,7 @@ function updateInvitePending () {
 		var template = $('<div class="row">'
 				+'<div class="left"><img class="namecard"/></div>'
 				+'<div class="mid"><div class="name"></div><div class="phone"></div></div>'
-				+'<div class="right"><img src="images/icon/icon_invite_mail.png"/></div>'
+				+'<div class="right"><img class="resend" src="images/icon/icon_invite_mail.png"/><img class="del" src="images/icon/icon_chatroom_chatlist_del.png"</div>'
 			+'</div>');
 		$.each(inviteGuAll, function(guTmp, mem){
 			if( mem && mem.st==0 ){
@@ -1591,10 +1591,96 @@ function updateInvitePending () {
 				newRow.find(".name").html( htmlFormat(mem.nk||"") );
 				//phone
 				newRow.find(".phone").text( mem.pn||"" );
+				newRow.data("pn",mem.pn).data("nk",mem.nk).data("gi",gi).data("gu",mem.gu);
 				pendingArea.append(newRow);
 			}
 		});
+		pendingArea.find(".resend").click(function(e){
+			var row = $(this).parents(".row");
+			var this_gi = row.data("gi");
+			var phone = row.data("pn");
+			var nk = row.data("nk");
+			cns.debug("resend", phone, nk );
 
+			if( this_gi && nk && phone ){
+				sendInviteAPI( this_gi, [{
+					"pn": phone,
+					"nk": nk
+				}], function(data){
+					if( data.status==200 ){
+						try{
+							var obj = $.parseJSON(data.responseText);
+							/* ----- TODO ------
+								如果已經邀過了...?
+							   ----- TODO ------ */
+							//mem already in group
+							if( obj.ul[0].aj==true ){
+								toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
+							} else {
+								toastShow( $.i18n.getString("INVITE_SUCC") );
+							}
+							//update inviting list
+							if(!inviteGuAll) inviteGuAll = {};
+							inviteGuAll[obj.ul[0].gu] = {
+								gu: obj.ul[0].gu,
+								ik: obj.ul[0].ik,
+								tp: obj.ul[0].tp,
+								st: 0,
+								nk: nk,
+								pn: phone
+							};
+							updateInvitePending();
+
+						} catch(e){
+							toastShow( $.i18n.getString("INVITE_FAIL") );
+							errorReport(e);
+						}
+					} else {
+						toastShow( $.i18n.getString("INVITE_FAIL") );
+					}
+				});
+			} else{
+				toastShow( $.i18n.getString("INVITE_FAIL") );
+			}
+		});
+		pendingArea.find(".del").click(function(e){
+
+			var row = $(this).parents(".row");
+			var this_gi = row.data("gi");
+			var this_gu = row.data("gu");
+			var phone = row.data("pn");
+			cns.debug("del", this_gi, this_gu, phone );
+
+			if( this_gi && this_gu && phone ){
+				var succ = false;
+				removeInviteAPI( this_gi, [{
+					"ik": phone
+				}], function(data){
+					if( data.status==200 ){
+						try{
+							var obj = $.parseJSON(data.responseText);
+
+							//update inviting list
+							if( inviteGuAll && inviteGuAll.hasOwnProperty(this_gu) ){
+								delete inviteGuAll[this_gu];
+							}
+							updateInvitePending();
+							
+							toastShow( obj.rsp_msg );
+							succ = true;
+						} catch(e){
+							errorReport(e);
+						}
+					}
+
+					if(!succ){
+						toastShow( $.i18n.getString("INVITE_DELETED_FAIL") );
+					}
+				});
+			} else {
+				toastShow( $.i18n.getString("INVITE_DELETED_FAIL") );
+			}
+		});
 	}
 	if(noData){
 		coachArea.show();
@@ -1677,7 +1763,7 @@ function sendInvite(){
 		 國碼/email
 		不同國別電話格式檢查
 	   ----- TODO ------*/
-	sendInviteAPI( [{
+	sendInviteAPI( gi, [{
 			"pn": phone,
 			"nk": nk
 		}], function(data){
@@ -1725,8 +1811,8 @@ function sendInvite(){
 	});
 }
 
-function sendInviteAPI( list, callback ){
-	var api_name = "groups/" + gi + "/invitations";
+function sendInviteAPI( this_gi, list, callback ){
+	var api_name = "groups/" + this_gi + "/invitations";
 	var headers = {
 	         "ui":ui,
 	         "at":at, 
@@ -1734,6 +1820,20 @@ function sendInviteAPI( list, callback ){
 	             };
 	var body = { "ul":list };
 	var method = "post";
+	var result = ajaxDo(api_name,headers,method,false, body);
+	result.complete(function(data){
+		callback(data);
+	});
+}
+function removeInviteAPI( this_gi, list, callback ){
+	var api_name = "groups/" + this_gi + "/invitations";
+	var headers = {
+	         "ui":ui,
+	         "at":at, 
+	         "li":lang,
+	             };
+	var body = { "il":list };
+	var method = "put";
 	var result = ajaxDo(api_name,headers,method,false, body);
 	result.complete(function(data){
 		callback(data);

@@ -161,6 +161,8 @@
 	"INVITE_SUCC" : "Send invitation successed.",
 	"INVITE_FAIL" : "Send invitation failed.",
 	"INVITE_ALREADY_IN_GROUP" : "This member is already in group.",
+	"INVITE_DELETED_SUCC" : "Invitations deleted successfully.",
+	"INVITE_DELETED_FAIL" : "Invitations deleted failed.",
 	"QRCODE_TITLE" : "QR Code",
 	"QRCODE_JOIN_ENABLED" : "Enable join group by scaning QR Code",
 	"QRCODE_UPDATE" : "Update QR Code",

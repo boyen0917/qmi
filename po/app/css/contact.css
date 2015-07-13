@@ -873,7 +873,7 @@
 	cursor: pointer;
 }
 .ca-pending-area .row .mid {
-	width: 65%;
+	width: -webkit-calc( 100% - 170px );
 	display: inline-block;
 	vertical-align: middle;
 }
@@ -897,16 +897,21 @@
 	overflow: hidden;
 }
 .ca-pending-area .row .right {
-	width: 30px;
+	width: 75px;
 	display: inline-block;
 	float: right;
 	/* height: 100%; */
 	/* top: 25px; */
 	text-align: center;
 }
-.ca-pending-area .row .right img {
+.ca-pending-area .row .right .resend {
 	width: 20px;
 	margin-top: 30px;
+}
+.ca-pending-area .row .right .del {
+	width: 22px;
+	margin-top: 28px;
+	margin-left: 5px;
 }
 
 

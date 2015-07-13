@@ -160,6 +160,8 @@
 	"INVITE_SUCC" : "成功送出邀请",
 	"INVITE_FAIL" : "送出邀请失败",
 	"INVITE_ALREADY_IN_GROUP" : "此成员已在群组里",
+	"INVITE_DELETED_SUCC" : "团体邀请函删除成功",
+	"INVITE_DELETED_FAIL" : "团体邀请函删除失败",
 	"QRCODE_TITLE" : "QR Code",
 	"QRCODE_JOIN_ENABLED" : "开放QR Code加入团体",
 	"QRCODE_UPDATE" : "更新QR Code",

@@ -463,7 +463,7 @@ $(function(){
 
     clearGroupPollingCnt = function(){
         var keys = ["A1","A2","A3","A4"];//,"B1","B2","B3","B4"
-        for( var i; i<keys.length; i++ ){
+        for( var i=0; i<keys.length; i++ ){
             var key = keys[i];
             $(".polling-cnt[data-polling-cnt="+key+"] .sm-count").hide();
         }
