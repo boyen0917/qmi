@@ -188,7 +188,7 @@ onCheckVersionDone = function(needUpdate){
 	});
 
 	checkLoginReady = function(){
-		cns.debug("[checkLoginReady]");
+		// cns.debug("[checkLoginReady]");
 		var page = $("#page-registration");
 		var activeTab = page.find(".login-tab.active");
 		if( "phone" == activeTab.attr("data-type") ){
