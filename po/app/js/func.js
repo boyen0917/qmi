@@ -6245,24 +6245,27 @@ $(function(){
                     }
 
                     //title
-                    if( Array.isArray(data.title)
-                        && data.title.length>0 ){
-                        result.title = data.title[0];
+                    if( Array.isArray(data.title) ){
+                        if( data.title.length>0 ){
+                            result.title = data.title[0];
+                        }
                     } else {
                         result.title = data.title;
                     }
                     //description
-                    if( Array.isArray(data.description)
-                        && data.description.length>0 ){
-                        result.description = data.description[0];
+                    if( Array.isArray(data.description) ){
+                        if( data.description.length>0 ){
+                            result.description = data.description[0];
+                        }
                     } else {
                         result.description = data.description;
                     }
                     //image
                     if( data.image && data.image.url ){
-                        if( Array.isArray(data.image.url)
-                            && data.image.url.length>0 ){
-                            result.img = data.image.url[0];
+                        if( Array.isArray(data.image.url) ){
+                            if(data.image.url.length>0){
+                                result.img = data.image.url[0];
+                            }
                         } else {
                             result.img = data.image.url;
                         }

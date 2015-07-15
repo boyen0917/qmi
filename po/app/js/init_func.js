@@ -406,9 +406,11 @@ $(function(){
                         if (groupData.chatAll && Object.keys(groupData.chatAll).length > 1) {
                             $.each(groupData.chatAll, function (key, obj) {
                                 if (obj && obj.tp == 1) {
-                                    if (obj.other && 1 != obj.other.ad) {
-                                        leaveRoomAPI(key);
+                                    if (obj.other 
+                                        && groupData.guAll.hasOwnProperty(obj.other)
+                                        && 1 != groupData.guAll[obj.other].ad ) {
                                         delete groupData.chatAll[key];
+                                        leaveRoomAPI(key);
                                     }
                                 }
                             });
