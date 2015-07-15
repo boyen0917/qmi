@@ -7588,9 +7588,10 @@ $(function(){
 
 	        		// $.lStorage(ui,_groupList);
 
-                    if(this_gu == gu) meInfoShow(user_data);
+                    var isMe = (this_gu == _groupList[this_gi].gu);
+                    if(isMe) meInfoShow(user_data);
 
-	        		userInfoDataShow(this_gi,this_info,user_data);
+	        		userInfoDataShow(this_gi,this_info,user_data,(1==_groupList[this_gi].ad) );
 	        		userInfoEvent(this_info);
 	        	}else{
 		    		this_info.data("avatar-chk",false);
@@ -7601,7 +7602,7 @@ $(function(){
     	});
     }
 
-    userInfoDataShow = function(this_gi,this_info,user_data,me) {
+    userInfoDataShow = function(this_gi,this_info,user_data, isAdmin, me) {
         cns.debug("user_data",user_data);
         this_info.data("gu",user_data.gu);
         if( user_data.st==2 ){
@@ -7698,12 +7699,16 @@ $(function(){
         var nkTmp = this_info.find(".user-avatar-bar .nk").html();
         if( nkTmp && nkTmp.length>0 ) this_info.find(".user-avatar-bar .nk").html( nkTmp.replaceOriEmojiCode() );
 
-		if(user_data.mkp) this_info.find(".user-info-list .pn").html("******");
-		if(user_data.mke) this_info.find(".user-info-list .em").html("******");
-		if(user_data.mkb) {
-			this_info.find(".user-avatar-bar .bd").hide();
-			this_info.find(".user-info-list .bd").html("******");	
-		}else{
+        if(!isAdmin){
+    		if(user_data.mkp) this_info.find(".user-info-list .pn").html("******");
+    		if(user_data.mke) this_info.find(".user-info-list .em").html("******");
+    		if(user_data.mkb) {
+    			this_info.find(".user-avatar-bar .bd").hide();
+    			this_info.find(".user-info-list .bd").html("******");	
+    		}else{
+                this_info.find(".user-avatar-bar .user-name").addClass("hidden");
+            }
+        } else{
             this_info.find(".user-avatar-bar .user-name").addClass("hidden");
         }
 
