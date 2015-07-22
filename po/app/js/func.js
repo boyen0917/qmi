@@ -6304,6 +6304,8 @@ $(function(){
 
                     //網址讀取結束
                     this_compose.data("parse-waiting",false);
+                    
+                    composeCheckMessageList();
                     //關閉事件
                     $(".cp-ta-yql > img").off().click(function(){
 
