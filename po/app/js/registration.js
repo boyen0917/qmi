@@ -635,7 +635,7 @@ onCheckVersionDone = function(needUpdate){
     $(".setting-first-name input,.setting-last-name input").bind("input",function(){
 		if($(".setting-first-name input").val() 
 			&& $(".setting-last-name input").val()  
-			&& $(".setting-birth input").val()
+			// && $(".setting-birth input").val()
 		){
 			$(".setting-next").addClass("setting-next-ready");
 		}else{
