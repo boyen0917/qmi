@@ -9,12 +9,19 @@ $(function(){
                 gl_obj.gu = gl_obj.me;
 
                 $.each(gl_obj.tl,function(i,val){
-                    if(val.tp == 1){
-                        gl_obj.ti_cal = val.ti;
-                    }else if(val.tp == 2){
-                        gl_obj.ti_feed = val.ti;
-                    }else{
-                        gl_obj.ti_chat = val.ti;
+                    switch(val.tp){
+                        case 1:
+                            gl_obj.ti_cal = val.ti;
+                            break;
+                        case 2:
+                            gl_obj.ti_feed = val.ti;
+                            break;
+                        case 3:
+                            gl_obj.ti_chat = val.ti;
+                            break;
+                        case 4:
+                            gl_obj.ti_file = val.ti;
+                            break;
                     }
                 });
                 _uiGroupList[gl_obj.gi] = gl_obj;
@@ -22,6 +29,50 @@ $(function(){
                 $.extend(_uiGroupList[gl_obj.gi],gl_obj)
             }
         }); 
+
+        //init private group
+        var pri_group_list = $.lStorage("_pri_group");
+        $.each(pri_group_list, function(i, p_cloud){
+            if( !p_cloud ) return;
+            if( !p_cloud.tmp_groups ){
+                pri_group_list[i].groups = [];
+                return;
+            }
+            var list = [];
+            $.each(p_cloud.tmp_groups,function(i,gl_obj){
+                list.push(gl_obj.gi);
+                gl_obj.ori_gi = gl_obj.gi;
+                gl_obj.gi = getPrivateGi( p_cloud.ci, gl_obj.gi );
+                if(!$.lStorage(ui).hasOwnProperty(gl_obj.gi) ){
+                    gl_obj.guAll = {};
+                    gl_obj.gu = gl_obj.me;
+                    gl_obj.ci = p_cloud.ci;
+
+                    $.each(gl_obj.tl,function(i,val){
+                        switch(val.tp){
+                            case 1:
+                                gl_obj.ti_cal = val.ti;
+                                break;
+                            case 2:
+                                gl_obj.ti_feed = val.ti;
+                                break;
+                            case 3:
+                                gl_obj.ti_chat = val.ti;
+                                break;
+                            case 4:
+                                gl_obj.ti_file = val.ti;
+                                break;
+                        }
+                    });
+                    _uiGroupList[gl_obj.gi] = gl_obj;
+                } else {
+                    $.extend(_uiGroupList[gl_obj.gi],gl_obj)
+                }
+            });
+            delete pri_group_list[i].tmp_groups;
+            pri_group_list[i].groups = list;
+        });
+        $.lStorage("_pri_group",pri_group_list);
         $.lStorage(ui,_uiGroupList);
     }
 

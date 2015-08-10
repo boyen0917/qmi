@@ -360,33 +360,45 @@ onCheckVersionDone = function(needUpdate){
 				//自動登入儲存
 				if($(".login-auto").data("chk")) $.lStorage("_loginAutoChk",true);
 
-				var group_list = $.parseJSON(data.responseText).gl;
-				if(group_list && $.parseJSON(data.responseText).gl.length > 0){
+				var parse_data = $.parseJSON(data.responseText);
+				if( !parse_data ){
+					console.debug("no group data");
+					return;
+				}
+
+				var private_group_list = parse_data.cl;
+				var group_list = parse_data.gl;
+				if(group_list && (group_list.length > 0||private_group_list.length>0) ){
+
 					//有group
 
 					$.lStorage("_groupList",group_list);
-					//將group list 更新到 lstorage ui
-					groupListToLStorage();
 
-					// 取dgi的combo
-					if( login_result.dgi || group_list.length>0 ){
-						if( null==login_result.dgi || login_result.dgi.length==0 ){
-							login_result.dgi = group_list[0].gi;
-							$.lStorage("_loginData",login_result);
-						}
-						if( login_result.dgi ){
-							getGroupCombo(login_result.dgi,function(){
-		                		localStorage["uiData"] = JSON.stringify($.lStorage(ui));
-								document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
-		                	});
-						} else {
+					getPrivateGroupFromList( private_group_list, function(){
+
+						//將group list 更新到 lstorage ui
+						groupListToLStorage();
+
+						// 取dgi的combo
+						if( login_result.dgi || group_list.length>0 ){
+							if( null==login_result.dgi || login_result.dgi.length==0 ){
+								login_result.dgi = group_list[0].gi;
+								$.lStorage("_loginData",login_result);
+							}
+							if( login_result.dgi ){
+								getGroupCombo(login_result.dgi,function(){
+			                		localStorage["uiData"] = JSON.stringify($.lStorage(ui));
+									document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
+			                	});
+							} else {
+								//沒group
+								document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
+							}
+						} else{
 							//沒group
 							document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
 						}
-					} else{
-						//沒group
-						document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
-					}
+					});
 				}else{
 					localStorage.removeItem("_groupList");
 					//沒group
@@ -401,7 +413,7 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 
-	getGroupList = function(ui,at){
+	getGroupList = function(ui,at,cl){
     	//取得團體列表
         var api_name = "groups";
         var headers = {
@@ -410,7 +422,44 @@ onCheckVersionDone = function(needUpdate){
             "li":lang
         };
         var method = "get";
-        return ajaxDo(api_name,headers,method,true,false,false,true);
+        return ajaxDo(api_name,headers,method,true,false,false,true,cl);
+    }
+
+	getPrivateGroupList = function(p_data, callback){
+    	//取得團體列表
+        var api_name = "groups";
+        var headers = {
+            "ui":p_data.ui,
+            "at":p_data.at,
+            "li":lang
+        };
+        var method = "get";
+        ajaxDo(api_name,headers,method,true,false,false,true,p_data.cl).complete(function(res){
+        	if( res.status==200 ){
+        		var parse_data = $.parseJSON(res.responseText);
+	    		var list = $.lStorage("_pri_group")||{};
+	    		list[p_data.ci] = p_data;
+	    		list[p_data.ci].tmp_groups = parse_data.gl;
+	    		$.lStorage("_pri_group", list);
+	    	}
+	    	if(callback) callback();
+        });
+    }
+
+    getPrivateGroupFromList = function( data, callback ){
+    	if( !data || data.length==0 ){
+    		if(callback) callback();
+    	}
+    	var cnt = 0;
+    	for( var i=0; i<data.length; i++ ){
+    		var p_data = data[i];
+	    	getPrivateGroupList(p_data ,function(res){
+	    		cnt++;
+	    		if(callback && cnt==data.length){
+	    			callback();
+	    		}
+	    	});
+	    }
     }
 /*	
 
