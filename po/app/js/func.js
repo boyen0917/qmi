@@ -8476,7 +8476,7 @@ $(function(){
     clearCreateGroupPage = function(){
         var area = $("#page-group-menu .gm-create-area");
         area.find(".gmc-avatar").data("chk", false );
-        area.find(".gmc-avatar-wrap img").attr("src", "images/common/others/empty_img_group_190x190.png");
+        area.find(".gmc-avatar-wrap img").attr("src", "images/icon/icon_build_photo.png");
         area.find(".gmc-name input").val("");
         area.find(".gmc-desc textarea").val("");
         var file = area.find(".gmc-file");

@@ -299,7 +299,7 @@ $(function(){
 
 	        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
 	        			//團體頭像上傳失敗
-	        			if(!chk) toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") ); 
+	        			if(!chk) toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") );
 	        			//統一由polling執行更新
 	        			// groupMenuListArea(cg_result.gi);
 	        		});
@@ -340,6 +340,7 @@ $(function(){
 
 	  //小幫手 團體邀請  側邊選單
 	$(".hg-invite").click(function(){
+		clearCreateGroupPage();
 	    $("#page-group-menu").data("type","invite");
 	    $(".gm-invite").trigger("click");
 	    $.mobile.changePage("#page-group-menu");
