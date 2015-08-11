@@ -860,7 +860,7 @@
 	margin-right: 13px;
 	vertical-align: middle;
 }
-.ca-pending-area .row .left .namecard {
+.ca-pending-area .row .left .pend_img {
 	width: 70px;
 	height: 70px;
 	border-radius: 8px;
@@ -870,7 +870,6 @@
 	border: rgb(226,226,226) 1px solid;
 	/* margin-left: 13px; */
 	margin-top: 6px;
-	cursor: pointer;
 }
 .ca-pending-area .row .mid {
 	width: -webkit-calc( 100% - 170px );
