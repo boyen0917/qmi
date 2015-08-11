@@ -6282,16 +6282,24 @@ $(function(){
                         this_compose.data("message-list").push(1);
                     }
 
-                    if(result.title){
+                    if(result.title || result.description || result.img){
                         //按送出重新截取網站內容 不用顯示在畫面
                         if(this_compose.data("parse-resend")) {
                             this_compose.data("parse-resend",false);
                             $(".cp-post").trigger("click");
                         }else{
                             cns.debug("url:",result);
-                            $(".cp-yql-title").html(result.title);
+                            if(result.title) $(".cp-yql-title").html(result.title);
                             if(result.description) $(".cp-yql-desc").html(result.description.substring(0,200));
-                            if(result.img) $(".cp-yql-img").show().html("<img src='" + result.img + "'/>");  
+                            if(result.img){
+                                var img = $("<img src='" + result.img + "'/>");
+                                $(".cp-yql-img").show().append(img);
+                                img.error( function(){
+                                    $(this).parent().hide();
+                                    $(this).remove();
+                                    console.debug("img preview failed.");
+                                });
+                            }
                             $(".cp-ta-yql").fadeIn();
                         }
                     }else{
