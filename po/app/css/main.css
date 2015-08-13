@@ -301,8 +301,8 @@ img.auo {
 /* =======================團體選單 =================================*/
 
 #page-group-menu {
-	/*background: rgb(208,208,208);*/
 	background: white;
+	height: 100%;
 }
 
 .gm-nav {

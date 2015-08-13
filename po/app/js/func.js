@@ -132,6 +132,7 @@ $(function(){
         ajaxDo(api_name,headers,method,true).complete(function(data){
         	if(data.status == 200){
         		var invite_result =$.parseJSON(data.responseText);
+                $(".gmi-div-area").html("");
         		//沒有團體邀請即顯示
         		if(invite_result.gl.length == 0) {
         			$(".gmi-coachmake").show();
@@ -141,7 +142,6 @@ $(function(){
         		}
 
         		$(".gmi-coachmake").hide();
-        		$(".gmi-div-area").html("");
         		$.each(invite_result.gl,function(i,val){
         			$(".gmi-div-area").append($('<div>').load('layout/layout.html .gmi-div',function(){
         				var this_invite = $(this).find(".gmi-div");

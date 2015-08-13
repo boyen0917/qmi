@@ -1562,11 +1562,12 @@ function updateInvitePending () {
 		$.lStorage(ui, userData);
 
 
+		var pendingAreaParent = $("#page-contact-addmem .ca-pending-area");
+		var pendingArea = pendingAreaParent.children(".list");
+		var coachArea = pendingAreaParent.children(".coach");
 		//render invite pending member list
 		if( inviteGuAll && inviteGuAll.length>0){
-			var pendingAreaParent = $("#page-contact-addmem .ca-pending-area");
-			var pendingArea = pendingAreaParent.children(".list");
-			var coachArea = pendingAreaParent.children(".coach").hide();
+			coachArea.hide();
 			pendingArea.html("").show();
 			var template = $('<div class="row">'
 					+'<div class="left"><img class="pend_img" src="images/common/others/empty_img_personal_l.png"/></div>'

@@ -1,3 +1,13 @@
+/**
+純顯示成員列表用, 頁面如下
+(<是back鈕)
+
+<   title
+img     name
+img     name
+....
+
+**/
 showMemListPage = function( parentDom, title, list, onPageChanged, onDone ){
 	if( $("#page-select-object").length>0 ){
 		showMemListPageDelegate( title, list, onPageChanged, onDone );
