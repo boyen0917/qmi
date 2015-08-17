@@ -1,3 +1,23 @@
+/**
+通用版已未讀
+(func.js也有一個showObjectTabShow, 沒有整合)
+顯示多tab的成員列表, 主要用在已未讀, 頁面如下
+(<是back鈕)
+
+<      title
+--------------------
+ 已讀      |    未讀
+------------------
+img name/branch  已讀時間
+img name/branch  已讀時間
+....
+
+**/
+
+/**
+parentDom:    頁面的container
+onDone:       按下back扭的callback
+**/
 loadObjectTabPage = function( parentDom, onDone ){
     if( $("#page-tab-object").length>0 ){
         if( onDone ) onDone();
@@ -9,6 +29,33 @@ loadObjectTabPage = function( parentDom, onDone ){
     }
 }
 
+/**
+giTmp:          group id
+title:          顯示標題
+list:           {title: $.i18n.getString("FEED_READ"), ml: null}
+onPageChanged:  頁面跳轉完成的callback
+onDone:         按下back扭的callback
+
+eg.var list = [
+    { //tab 1
+        title: $.i18n.getString("FEED_READ"), 
+        ml: [
+            {"gu":"M00000fx01f","rt":1439437853894},
+            {"gu":"M0000bLh01w","rt":1438159950688}
+        ]
+    }, { //tab 2
+        title: $.i18n.getString("FEED_UNREAD"), 
+        ml: [{"gu":"M000000606f","rt":1413969741770}]
+    }
+]
+
+showObjectTabShow( "G000001", "聊天室已未讀", list, function(){
+        alert("page loaded");
+    }, function(){
+        alert("on back to parent page");
+    }
+);
+**/
 showObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
     var page = $("#page-tab-object");
 

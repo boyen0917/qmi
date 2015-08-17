@@ -1242,7 +1242,7 @@ showAddFavGroupBox = function( subPage ){
 				cns.debug( "create", name );
 				// container.fadeOut();
 				var option = {
-					isShowGroup:false,
+					isShowBranch:false,
 					isShowAll:false,
 					isShowFav:true
 				};
@@ -1335,7 +1335,7 @@ showEditFavGroupBox = function( dom ){
 	var oriData = dom.data("object_str");
 	oriData = $.parseJSON(oriData);
 	var option = {
-		isShowGroup:false,
+		isShowBranch:false,
 		isShowAll:false,
 		isShowFav:true,
 		isShowSelf:true
