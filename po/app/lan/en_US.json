@@ -69,7 +69,7 @@
 	"FEED_CLICK_LIKE" : "%@ likes this",
 	"FEED_CLICK_LIKE_2PEOPLE" : "%@ and %@ like this",
 	"FEED_3PEOPLE_LIKE" : "%@ and %ld others like this",
-	"FEED_YOU_AND_3PEOPLE_LIKE" : "%@, %@ 及其他 %ld人 按讚",
+	"FEED_YOU_AND_3PEOPLE_LIKE" : "%@, %@ and other %ld人 like this",
 	"FEED_BE_FIRST_LIKE" : "Be the first one to like this",
 	"FEED_REPLY" : "Reply",
 	"FEED_TOP" : "Top it",

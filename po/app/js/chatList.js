@@ -719,7 +719,7 @@ var g_memCount;
 
 function showNewRoomPage(){
 	composeObjectShowDelegate( $(".chatList-add"), $(".chatList-add"), {
-		isShowGroup : false,
+		isShowBranch : false,
         isShowSelf : false,
         isShowAll : false,
         isShowFav : true,

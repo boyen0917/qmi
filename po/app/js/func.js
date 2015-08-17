@@ -2158,7 +2158,7 @@ $(function(){
 
         //工作
         var obj_data;
-        var isShowGroup = false;
+        var isShowBranch = false;
         var isShowSelf = false;
         var isShowAll = true;
         var isShowFav = true;
@@ -2168,18 +2168,18 @@ $(function(){
         if( null== option ){
             if(this_compose_obj.parent().hasClass("cp-work-item")){
                 //工作發佈對象
-                isShowGroup = false;
+                isShowBranch = false;
                 isShowSelf = true;
                 isShowAll = false;
                 isShowFav = true;
                 isShowFavBranch = false;
             }else{
                 //其餘發佈對象
-                isShowGroup = true;
+                isShowBranch = true;
                 isShowSelf = true;
             }
         } else {
-            isShowGroup = (null==option.isShowGroup) ? isShowGroup: option.isShowGroup;
+            isShowBranch = (null==option.isShowBranch) ? isShowBranch: option.isShowBranch;
             isShowSelf = (null==option.isShowSelf) ? isShowSelf : option.isShowSelf;
             isShowAll = (null==option.isShowAll) ? isShowAll : option.isShowAll;
             isShowFav = (null==option.isShowFav) ? isShowFav : option.isShowFav;
@@ -2379,7 +2379,7 @@ $(function(){
         }
 
         //----- 團體列表 ------
-        if( bl&&isShowGroup&&Object.keys(bl).length>0 ){
+        if( bl&&isShowBranch&&Object.keys(bl).length>0 ){
             $(".obj-content").data("selected-branch",{});
             //標題bar
             var memSubTitle = $("<div class='obj-cell-subTitle group' data-chk='false'></div>");
