@@ -26,7 +26,7 @@ $(function(){
 		initChatCntDB(); 
 
 		//第一次進來 沒團體的情況
-		if(!$.lStorage("_groupList")){
+		if(!$.lStorage("_groupList") || !_loginData.dgi || _loginData.dgi==""){
 			//關閉返回鍵
 			$("#page-group-menu .page-back").hide();
 			cns.debug("no group ");

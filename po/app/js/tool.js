@@ -1,7 +1,8 @@
 $(function(){
 
 	//ajax
-	ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide){
+	ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl){
+
 		//設定是否顯示 loading 圖示
 		load_show = load_show_chk;
 
@@ -10,7 +11,76 @@ $(function(){
 		
 	    //cns.debug(api_url);
 	    var api_url = base_url + api_name;
-	    var myRand = Math.floor((Math.random()*1000)+1);
+	    // var myRand = Math.floor((Math.random()*1000)+1);
+	    
+	    //帶privateUrl的話自己改header
+	    //如果沒帶privateUrl, 會將api, body, header的ci+gi的形式還原成gi
+	    //再將url, ui, at取代
+	    if( privateUrl ){
+	    	api_url = "https://"+privateUrl +"/apiv1/"+ api_name;
+	    } else {
+			var api_name_parse, header_parse, body_parse, pri_cloud, ori_gi;
+			api_name_parse = parsePrivateGi(api_name);
+			if( headers && headers.gi )	header_parse = parsePrivateGi(headers.gi);
+			if( body && body.gi ) body_parse = parsePrivateGi(headers.gi);
+			if( api_name_parse || header_parse || body_parse ){
+				if( api_name_parse ){
+					var ciTmp = api_name_parse.ci;
+					ori_gi = api_name_parse.gi;
+					var pri_data = $.lStorage("_pri_group");
+					if( pri_data.hasOwnProperty(ciTmp) ){
+						pri_cloud = pri_data[ciTmp];
+						if( pri_cloud ){
+							if( headers.ui ) headers.ui = pri_cloud.ui;
+							if( headers.at ) headers.at = pri_cloud.at;
+						}
+					}
+					api_url = "https://"+pri_cloud.cl +"/apiv1/"+ api_name_parse.newStr;
+				}
+				if( header_parse ){
+					if(ori_gi){
+						headers.gi = ori_gi;
+					} else {
+						var ciTmp = header_parse.ci;
+						ori_gi = header_parse.gi;
+						var pri_data = $.lStorage("_pri_group");
+						if( pri_data.hasOwnProperty(ciTmp) ){
+							pri_cloud = pri_data[ciTmp];
+							if( pri_cloud ){
+								if( headers.ui ) headers.ui = pri_cloud.ui;
+								if( headers.at ) headers.at = pri_cloud.at;
+								if( pri_cloud.hasOwnProperty(giTmp) ){
+									pri_group = pri_cloud[giTmp];
+								}
+							}
+						}
+						headers.gi = giTmp;
+						api_url = "https://"+pri_cloud.cl +"/apiv1/"+ api_name;
+					}
+				}
+				if( body_parse ){
+					if(ori_gi){
+						body.gi = ori_gi;
+					} else {
+						var ciTmp = body_parse.ci;
+						ori_gi = body_parse.gi;
+						var pri_data = $.lStorage("_pri_group");
+						if( pri_data.hasOwnProperty(ciTmp) ){
+							pri_cloud = pri_data[ciTmp];
+							if( pri_cloud ){
+								if( headers.ui ) headers.ui = pri_cloud.ui;
+								if( headers.at ) headers.at = pri_cloud.at;
+								if( pri_cloud.hasOwnProperty(giTmp) ){
+									pri_group = pri_cloud[giTmp];
+								}
+							}
+						}
+						headers.gi = giTmp;
+						api_url = "https://"+pri_cloud.cl +"/apiv1/"+ api_name;
+					}
+				}
+			}
+		}
 
 	    if(body){
 	        body = JSON.stringify(body);
@@ -27,6 +97,24 @@ $(function(){
 	    return result;
 	}
 	 
+    _pri_split_chat = "#";
+    getPrivateGi = function( this_ci, this_gi ){
+        return _pri_split_chat+this_ci+_pri_split_chat+this_gi+_pri_split_chat;
+    }
+    parsePrivateGi = function( str ){
+        if(!str) return null;
+        var parse = str.split(_pri_split_chat);
+        if( parse.length>1 ){
+            var data = {
+                    ci: parse[1],
+                    gi: parse[2]
+                };
+            parse[1]="";
+            data.newStr = parse.join("");
+            return data;
+        }
+        return null;
+    }
 
 	reLogin = function() {
 		document.location = "index.html";
