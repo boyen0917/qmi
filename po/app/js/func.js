@@ -7384,12 +7384,12 @@ $(function(){
 
 		//更新聊天內容
 		if(msgs && msgs.length>0){
-    		updateChatDB(msgs);
+    		onReceivePollingChatMsg(msgs);
     	}
 
     	//更新聊天已讀未讀時間
     	if(ccs && ccs.length>0){
-			updateChatCntDB(ccs);
+			onReceivePollingChatCnt(ccs);
     	}
     }
 

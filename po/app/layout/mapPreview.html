@@ -35,6 +35,7 @@
 	    		/* ----- TODO -----*/
 	    		// pop "some error occured."
 	    		/* ----- TODO -----*/
+    			cns.log("null msgData");
 	    		return;
 	    	}
 
@@ -59,11 +60,11 @@
 	                var mapObj = new AMap.Map(id_str,{
 	                    rotateEnable:false,
 	                    dragEnable:true,
-	                    zoomEnable:false,
+	                    zoomEnable:true,
 	                    //二维地图显示视口
 	                    view: new AMap.View2D({
 	                        center:new AMap.LngLat(msgData.lng,msgData.lat),//地图中心点
-	                        zoom:15 //地图显示的缩放级别
+	                        zoom:13 //地图显示的缩放级别
 	                    })
 	                });
 

@@ -508,6 +508,34 @@ body {
 	height: 100%;
 	width: 100%;
 }
+.msg-video.playing .videoContainer:after{
+	content: "點擊返回";
+    background-color: white;
+    width: 18%;
+    height: 8%;
+    position: fixed;
+    top: 45%;
+    left: 40%;
+    border-radius: 20px;
+    padding: 1%;
+    vertical-align: middle;
+    text-align: center;
+    line-height: 2.6vh;
+    opacity: 0.1;
+}
+.msg-video.playing .videoContainer:hover:after{
+	opacity: 0.5;
+	animation-name: fade-out;
+    animation-duration: 2s;
+    /*animation-iteration-count: infinite;
+    animation-direction: alternate;*/
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(.84,.01,1,.42);
+}
+@keyframes fade-out {
+	from {opacity: 0.5;}
+    to {opacity: 0.1;}
+}
 .msg-video:not(.loaded) .videoContainer{
 	/*border: 1px solid gray;*/
 	background-image: url("../images/chatroom/chat_message_status_icon_video.png");
