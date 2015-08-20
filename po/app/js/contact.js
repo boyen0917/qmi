@@ -778,18 +778,6 @@ generateMemberList = function( memObject, favCallback ){
 setNewMemTag = function( tmp, mem ){
 	if( g_newMemList.hasOwnProperty(mem.gu) ){
 		tmp.find(".new").show();
-		tmp.click( function(){
-			if( g_newMemList.hasOwnProperty(mem.gu) ){
-				delete g_newMemList[mem.gu];
-				var tmpMemList = $.lStorage("_newMemList");
-				tmpMemList[gi] = g_newMemList;
-				$.lStorage("_newMemList",tmpMemList);
-
-				$(".subpage-contact.main-subpage > .contact-rows > .row.all > .right .new").html( Object.keys(g_newMemList).length );
-			}
-			$(this).find(".new").hide();
-			$(this).unbind("click");
-		});
 	}
 }
 updateNewMemTag = function( dom ){
