@@ -143,6 +143,7 @@ var initStickerArea= {
 		    }
 		    content.css("left","0");
 		    content.data("index",0);
+		    content.data("cata-type", type);
 		    content.addClass(type);
 			var imgContent = $(dom).find(".mid");
 		    imgContent.append(content);
@@ -206,26 +207,27 @@ var initStickerArea= {
 
 		    $(dom).find(".page .row img").off("click").click( function(){
 		    	var thisDom = $(this);
-
+		    	var type = thisDom.parents(".group").data("cata-type");
 		    	if( thisDom.hasClass("error") ){
-					thisTmp.getStickerDetailApi(type).complete(function(detailDataTmp){
-		        		if(detailDataTmp.status == 200){
-		        			var detailData = $.parseJSON(detailDataTmp.responseText);
-		        			if(detailData &&detailData.sl) detailData = detailData.sl;
-		        			if( !thisTmp.splDict[type] ) thisTmp.splDict[type] = {};
-			        		thisTmp.splDict[type].list = {};
-		        			for(var j=0; j<detailData.length; j++){
-		        				thisTmp.splDict[type].list[detailData[j].sid] = detailData[j];
-		        			}
-		        			$.lStorage("_sticker",thisTmp.splDict);
+		    		thisTmp.downloadSticker(type, function(spi){
+					// thisTmp.getStickerDetailApi(type).complete(function(detailDataTmp){
+		   //      		if(detailDataTmp.status == 200){
+		   //      			var detailData = $.parseJSON(detailDataTmp.responseText);
+		   //      			if(detailData &&detailData.sl) detailData = detailData.sl;
+		   //      			if( !thisTmp.splDict[type] ) thisTmp.splDict[type] = {};
+			  //       		thisTmp.splDict[type].list = {};
+		   //      			for(var j=0; j<detailData.length; j++){
+		   //      				thisTmp.splDict[type].list[detailData[j].sid] = detailData[j];
+		   //      			}
+		   //      			$.lStorage("_sticker",thisTmp.splDict);
 
-		        			//redraw
-		        			thisTmp.showImg(dom, type, thisTmp.splDict[type] );
+		   //      			//redraw
+		   //      			thisTmp.showImg(dom, type, thisTmp.splDict[type] );
 
 		        			//sync
-		    				$("#send-sync-sticker-signal").attr("data-sid", type);
+		    				$("#send-sync-sticker-signal").attr("data-sid", spi);
 		    				$("#send-sync-sticker-signal").click();
-		        		}
+		        		// }
 		        	});
 		        	return;
 				}
@@ -343,30 +345,15 @@ var initStickerArea= {
 	},
 	load: function(callback) {
 		var thisTmp = this;
-		thisTmp.initStickerList( function(){
-	    	if( callback ) callback();
-	    });
-
-		// if( null==thisTmp.dict ){
-		// 	$.get(thisTmp.jsonPath,function(load_dict){
-		//         if (thisTmp.dict !== null) {
-		//         	$.extend(thisTmp.dict, load_dict);
-		//         } else {
-		//         	thisTmp.dict = load_dict;
-		//         }
-		//         cns.debug(thisTmp.dict);
-		//         callback();
-		//     });
-		// } else {
-		// 	callback();
-		// }
-	},
-	initStickerList: function( callback ){
 		try{
 			var thisTmp = this;
 			thisTmp.getStickerListApi().complete(function(data){
 	        	if(data.status == 200){
-	        		var obj =$.parseJSON(data.responseText);
+	        		var obj = $.parseJSON(data.responseText);
+
+	        		// //for order test
+	        		// data.responseText = '{"spl":[{"spi":"mrpig","na":"Mr. Pig","l":"https://s3.hicloud.net.tw/project-o/stickers/6754a06d993ced8d11049c0c30704779dd989bec/20150416_194815/5547f6bc90f611f5419505e0948f8f3d3e24553f","ut":1429184897114},{"spi":"chtbaby","na":"中華電信萌寶","l":"https://s3.hicloud.net.tw/project-o/stickers/dee069351f7bf0b9641dc80152c201389cf05ccd/20150416_194815/019644e37efcbdf884c53e6afca3980fd0989a86","ut":1429184897115},{"spi":"pinkgirl","na":"朱瑪","l":"https://s3.hicloud.net.tw/project-o/stickers/f7dfe35319ec9ffeffcb6005caf3bcf50f6fcd43/20150416_194815/34dfefc2589b73ecadfd32e7da529429da0ea7d8","ut":1429184897114},{"spi":"piglovers","na":"Mr. Pig&朱瑪(情侶篇)","l":"https://s3.hicloud.net.tw/project-o/stickers/e4439783f8ff111caedf2021b1d0a18eaa194f31/20150416_194815/a7fa15370817aa025a75111e6261a136e8c63152","ut":1429184897114},{"spi":"dogncat-common-2015-1","na":"古意汪&奸詐喵","l":"https://s3.hicloud.net.tw/project-o/stickers/d7e647f03eeea4109faaf41f15504978f36c532e/20150416_194815/26f7235a5607f4146981e7a3ac9c8b3279c04942","ut":1429184897114},{"spi":"mrpig-duanwu-2015-1","na":"Mr. Pig一起慶端午","l":"https://s3.hicloud.net.tw/project-o/stickers/b8d6ff499a9e339515e4e400ac11aaac8bbb4ccd/20150617_193558/8e6a91127f6c54978ead992458e15b95e4dd06d3","ut":1434540960763},{"spi":"mrpig-motherday-2015-1","na":"Mr. Pig(母親節限定)","l":"https://s3.hicloud.net.tw/project-o/stickers/ea3281003b6e5b949047ef7a92411e8ddb88914b/20150506_173633/7a7c2e2a7df7723559e76bd6227052cc6dd20884","ut":1430904995441},{"spi":"mrpig-slaveday-2015-1","na":"Mr. Pig(勞動節限定)","l":"https://s3.hicloud.net.tw/project-o/stickers/4ac94c9679bc470773a36f8d0160ea9291f9b573/20150428_143355/e1b8e9b202fb81a77d9f90b97b9658929d8aaf74","ut":1430202837002},{"spi":"piglovers-child-2015-1","na":"Mr. Pig&朱瑪(童年篇)","l":"https://s3.hicloud.net.tw/project-o/stickers/f3a9f0f9d2ef67f0fabf6ddcf662a1e7e111780f/20150416_194815/8f5c1e6f0e67ea2be8f400b0accc0b1c5d9d7820","ut":1429184897114},{"spi":"mrpig-chow-2015-1","na":"Mr. Pig向星爺致敬","l":"https://s3.hicloud.net.tw/project-o/stickers/d0da82af8462b5f35ec88041ac3b26024808ce1b/20150617_193558/fa999a13d4438cc263166ebf3ab06c6c6729f75a","ut":1434540960763},{"spi":"mrpig-summer-2015-1","na":"Mr. Pig放暑假","l":"https://s3.hicloud.net.tw/project-o/stickers/aa37bd70677e4937b348f81f73b200ab0cb7081a/20150703_143311/591e4604a9538058680df13c91cf49eb8aa9254f","ut":1435905192522},{"spi":"mrpig-life-2015-1","na":"Mr. Pig(生活時事篇)","l":"https://s3.hicloud.net.tw/project-o/stickers/4491506ab39e879ee95c5fe17ffac6b7fe9e2ca6/20150416_194815/91aa76a164270d46c086397cf8b7b0b831c993ca","ut":1429184897114},{"spi":"piglovers-valentine-2015-1","na":"Mr. Pig&朱瑪(情人節限定)","l":"https://s3.hicloud.net.tw/project-o/stickers/7bfd3cc090a8036cdda2971ef737cfc5f2277bd8/20150416_194815/7a5d05c10bb9fe76d720d2b57a56f667c29a8056","ut":1429184897114},{"spi":"piglovers-newyear-2015-1","na":"Mr. Pig&朱瑪(新年限定)","l":"https://s3.hicloud.net.tw/project-o/stickers/e4aab0391914b7c0237be732b198b85df60401a6/20150416_194815/d76f5b680bdd73ce2987187b0ffc198ae5b25e49","ut":1429184897114},{"spi":"cacique","na":"淘氣酋長","l":"https://s3.hicloud.net.tw/project-o/stickers/bd976127d6f288d9b2dac97518674e0ab33f5f36/20150416_194815/e1b7b86361930f4d0d50eba7518fe401cf7ef15b","ut":1429184897114},{"spi":"fatlady","na":"發福大嬸","l":"https://s3.hicloud.net.tw/project-o/stickers/14efcd3ad708812302c5a9daf7a86965eb267b9d/20150416_194815/e8bfd4888c794e7208c88f8f62be0dee2d881acb","ut":1429184897114},{"spi":"curlsman","na":"吊帶褲大叔","l":"https://s3.hicloud.net.tw/project-o/stickers/55559f63e69aed6242e6237e477b570dd8c7964e/20150416_194815/8a769874adf5acd9371472da61a7f5455f97c256","ut":1429184897114},{"spi":"shinegirl","na":"閃亮女孩","l":"https://s3.hicloud.net.tw/project-o/stickers/0782ed7f9bd28898d70c38eee7c205f45e1405e4/20150416_194815/d80bb8b41bec2c35ee55b95c14ed5742d8be5a54","ut":1429184897114},{"spi":"stubblemans","na":"鬍渣台客","l":"https://s3.hicloud.net.tw/project-o/stickers/bee28809408f4817ccabfcfba3c69fdd08a075de/20150416_194815/c84b07a542d0f8a9a5fc60044d87f32a0e2b31df","ut":1429184897114}],"rsp_code":0,"rsp_msg":"回傳成功","rsp_success":true}';
+	        		// obj = $.parseJSON(data.responseText);
 
 	        		thisTmp.splDict = $.lStorage("_sticker") || {};
 	        		var currentCnt = 0;
@@ -377,45 +364,32 @@ var initStickerArea= {
 	        			newList[tmpNewSpiDetail.spi] = tmpNewSpiDetail;
 
 	        			if( thisTmp.splDict.hasOwnProperty(tmpNewSpiDetail.spi) ){
-	        				var tmpSpiDetail = thisTmp.splDict[tmpNewSpiDetail.spi];
+	        				var oriDetail = thisTmp.splDict[tmpNewSpiDetail.spi];
+	        				var oriTime = oriDetail.ut;
 	        				
-	        				tmpSpiDetail = $.extend( tmpSpiDetail, newList[tmpNewSpiDetail.spi] );
+	        				var extendedDetail = $.extend( oriDetail, newList[tmpNewSpiDetail.spi] );
 	        				
 	        				//update downloaded stickers
-	        				if( true==tmpSpiDetail.isDownload && tmpSpiDetail.ut<tmpNewSpiDetail.ut ){
-	        					thisTmp.getStickerDetailApi(tmpSpiDetail.spi).complete(function(detailDataTmp){
-	        						if(detailDataTmp.status == 200){
-	        							var detailData = $.parseJSON(detailDataTmp.responseText);
-	        							
-	        							// thisTmp.splDict[tmpNewSpiDetail.spi].sl = $.extend(thisTmp.splDict[tmpNewSpiDetail.spi].sl, detailData);
-
-		        						tmpSpiDetail.list = {};
-		        						var oriList = detailData;
-		        						for(var j=0; j<oriList.length; j++){
-		        							tmpSpiDetail.list[oriList[j].sid] = oriList[j];
-		        						}
-		        						if( null!=tmpSpiDetail.sl ){
-		        							delete tmpSpiDetail.sl;
-		        						}
-	        						}
-	        						newList[tmpNewSpiDetail.spi] = tmpSpiDetail;
+	        				if( true==extendedDetail.isDownload && extendedDetail.ut!=oriTime ){
+	        					thisTmp.downloadSticker(extendedDetail.spi, function(spi, result){
+	        						newList[spi] = result;
 	        						currentCnt++;
 	        						if( cnt==currentCnt ){
 	        							thisTmp.onInitSucc( newList, callback );
 	        						}
-	        					});
+	        					}, false);
 	        				} else {
 	        					currentCnt++;
 	        					//將array改存為object, 方便查詢
-	        					if( null!=tmpSpiDetail.sl && null==tmpSpiDetail.list ){
-	        						tmpSpiDetail.list = {};
+	        					if( null!=extendedDetail.sl && null==extendedDetail.list ){
+	        						extendedDetail.list = {};
 	        						var oriList = thisTmp.splDict[tmpNewSpiDetail.spi].sl;
 	        						for(var j=0; j<oriList.length; j++){
-	        							tmpSpiDetail.list[oriList[j].sid] = oriList[j];
+	        							extendedDetail.list[oriList[j].sid] = oriList[j];
 	        						}
-	        						delete tmpSpiDetail.sl;
+	        						delete extendedDetail.sl;
 	        					}
-	        					newList[tmpNewSpiDetail.spi] = tmpSpiDetail;
+	        					newList[tmpNewSpiDetail.spi] = extendedDetail;
 	        				}
 
 	        				// thisTmp.splDict[tmpNewSpiDetail.spi] = $.extend(thisTmp.splDict[tmpNewSpiDetail.spi], tmpNewSpiDetail);
@@ -485,12 +459,21 @@ var initStickerArea= {
 
         return ajaxDo(api_name,headers,method,false,null);
 	},
-	downloadSticker: function(spi, callback){
+	downloadSticker: function(spi, callback, isUpdateDom){
+		if(null==isUpdateDom) isUpdateDom = true;
 		var thisTmp = this;
 		thisTmp.getStickerDetailApi(spi).complete(function(data){
 	    	if(data.status == 200){
+		    	var result;
 	    		try{
 		    		var detailData = $.parseJSON(data.responseText);
+	        	
+	        		// //for order test
+		        	// if( spi=="chtbaby"){
+		        	// 	data.responseText = '{"sl":[{"sid":"st_chtbaby_2","sou":"https://s3.hicloud.net.tw/project-o/stickers/dee069351f7bf0b9641dc80152c201389cf05ccd/20150416_194815/9a97d5193d0e109d83d7978f969cf6e6fc92f6ad","stu":"https://s3.hicloud.net.tw/project-o/stickers/dee069351f7bf0b9641dc80152c201389cf05ccd/20150416_194815/9a97d5193d0e109d83d7978f969cf6e6fc92f6ad"},{"sid":"st_chtbaby_1","sou":"https://s3.hicloud.net.tw/project-o/stickers/dee069351f7bf0b9641dc80152c201389cf05ccd/20150416_194815/10a9c0e8c0996261b283064e2de7a5c37e850230","stu":"https://s3.hicloud.net.tw/project-o/stickers/dee069351f7bf0b9641dc80152c201389cf05ccd/20150416_194815/10a9c0e8c0996261b283064e2de7a5c37e850230"},{"sid":"st_chtbaby_3","sou":"https://s3.hicloud.net.tw/project-o/stickers/dee069351f7bf0b9641dc80152c201389cf05ccd/20150416_194815/512ab7293871c5ae70a6ae4f9cdbfa53e543ef34","stu":"https://s3.hicloud.net.tw/project-o/stickers/dee069351f7bf0b9641dc80152c201389cf05ccd/20150416_194815/512ab7293871c5ae70a6ae4f9cdbfa53e543ef34"}],"rsp_code":0,"rsp_msg":"回傳成功","rsp_success":true}';
+		        	// 	detailData = $.parseJSON(data.responseText);
+		        	// }
+
 		    		// if( null!=thisTmp.splDict[spi].sl ){
 		    		// 	thisTmp.splDict[spi].sl.extend(detailData.sl);
 		    		// } else {
@@ -499,21 +482,25 @@ var initStickerArea= {
 		    		if( null==thisTmp.splDict[spi].list ){
 		    			thisTmp.splDict[spi].list = {};
 		    		}
+		    		detailData.sl.sort( function(a,b){
+		    			return a.sid.localeCompare(b.sid);
+		    		});
 		    		for( var i=0; i<detailData.sl.length; i++ ){
 		    			thisTmp.splDict[spi].list[detailData.sl[i].sid] = detailData.sl[i];
 		    		}
 
 		    		thisTmp.splDict[spi].isDownload = true;
+		    		result = thisTmp.splDict[spi];
 		    		$.lStorage("_sticker", thisTmp.splDict);
-		    		thisTmp.updateTypeInDomList( spi );
+		    		if(isUpdateDom) thisTmp.updateTypeInDomList( spi );
 		    		$("#send-sync-sticker-signal").removeAttr("data-sid");
 		    		$("#send-sync-sticker-signal").click();
 		    	} catch(e){
 		    		errorReport(e);
-		    		if( callback ) callback();
+		    		if( callback ) callback(spi,result);
 		    	}
 	    	}
-	    	if( callback ) callback();
+	    	if( callback ) callback(spi,result);
 	    });
 	},
 	updateTypeInDomList : function( type ){
