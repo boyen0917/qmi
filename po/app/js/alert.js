@@ -25,17 +25,22 @@ $(function(){
 //init global alert db
 initAlertDB = function(){
 	idb_alert_events = new IDBStore({
-      dbVersion: 1,
-      storeName: 'alert_events',
-      keyPath: 'ei_ntp',
-      indexes: [
-        { name: 'ct',keyPath:['ct']}
-      ],
-      onStoreReady: function(){
-      	// showAlertFromDB();
-      	// updateAlert();
-		// setInterval(updateAlert,update_alert_interval);
-      }
+    	dbVersion: 2,
+    	storeName: 'alert_events',
+    	keyPath: 'ei_ntp',
+    	autoIncrement: false,
+    	indexes: [
+    	  { name: 'ei_ntp',keyPath:['ei','ntp']}
+    	],
+    	onStoreReady: function(){
+			if( !$.lStorage("alert_db_updated") ){
+				idb_alert_events.clear();
+				$.lStorage("alert_db_updated",true);
+			}
+	      	// showAlertFromDB();
+	      	// updateAlert();
+			// setInterval(updateAlert,update_alert_interval);
+    	}
     });
 }
 
@@ -94,7 +99,7 @@ showAlertBox = function(){
 //撈ＤＢ通知
 showAlertFromDB = function(){
 
-	idb_alert_events.limit(function(list){
+	idb_alert_events.getAll(function(list){
 		// cns.debug( JSON.stringify(list) );
 		showAlertContent(list);
 	},{
@@ -117,7 +122,6 @@ showAlertFromDB = function(){
 //打ＡＰＩ更新通知
 updateAlert = function(){
 	if (typeof ui === 'undefined') return;
-	
 	ajaxDo("notices", {
 	    "ui":ui,
 	    "at":at, 
@@ -127,14 +131,55 @@ updateAlert = function(){
 
 	    		var returnData = $.parseJSON(data.responseText);
 
-	    		showAlertContent(returnData.nl);
+				idb_alert_events.getAll(function(DBData){
+
+					var DBDataObj = {};
+		    		for( var i=0; i<DBData.length; i++){
+		    			if( DBData[i].isRead ){
+		    				DBDataObj[DBData[i].ei+"_"+DBData[i].ntp] = DBData[i].data;
+		    			}
+		    		}
+
+		    		// var ary = [];
+		    		for( var i=0; i<returnData.nl.length; i++){
+		    			try{
+		    				//ct_ei_ntp
+		    				var obj = {
+								ei: returnData.nl[i].nd.ei,
+								ntp: returnData.nl[i].ntp,
+								ei_ntp: returnData.nl[i].nd.ei+"_"+returnData.nl[i].ntp,
+								data: returnData.nl[i]
+							};
+			    			var key = returnData.nl[i].nd.ei+"_"+returnData.nl[i].ntp;
+			    			//有已讀紀錄, 且ct相同, 表示為同一筆貼文或回文
+			    			if( DBDataObj.hasOwnProperty(key) ){
+			    				if( DBDataObj[key].nd.ct==returnData.nl[i].nd.ct ){
+			    					obj.isRead = true;
+			    					returnData.nl[i].isRead = true;
+			    				}
+			    			}
+
+			    			// ary.push(obj);
+			    			idb_alert_events.put(obj);
+			    		} catch(e){
+			    			errorReport(e);
+			    		}
+		    		}
+
+		    		// idb_alert_events.putBatch(ary, null);
+	    			showAlertContent(returnData.nl);
+				});
+
 	    	}
     });
 }
 
 //顯示資料
 showAlertContent = function(data){
-	if( !data ) return;
+	if(!data||data.length==0){
+		$(".alert-area .content").html("");
+		return;
+	}
 	// cns.debug("showAlertContent");
 
 	// $(".alert-area .content").hide('fast');
@@ -153,6 +198,10 @@ showAlertContent = function(data){
 			/* ----------- TODO: 檢查是否已show過 ------------ */
 
 			var tmpDiv = $(this).clone();
+
+			if( boxData.isRead ){
+				tmpDiv.find(".al-subbox").addClass("isRead");
+			}
 
 		    var content;
 		    if( boxData.ntp==30 ){
@@ -340,6 +389,7 @@ showAlertContent = function(data){
 
 				tmpDiv.data("gi", boxData.gi);
 				tmpDiv.data("ei", boxData.nd.ei);
+				tmpDiv.data("ntp", boxData.ntp);
 				tmpDiv.click(function(){
 					if($(this).find(".al-subbox").data("stop")) {
 						$(this).find(".al-subbox").data("stop",false);
@@ -348,7 +398,20 @@ showAlertContent = function(data){
 
 					var this_gi = $(this).data("gi");
 					var this_ei = $(this).data("ei");
+					var this_ntp = $(this).data("ntp");
 					
+					var DBKey = this_ei+"_"+this_ntp;
+					idb_alert_events.get(DBKey, function(data){
+						if(!data){
+							cns.debug("error");
+							return;
+						}
+						data.isRead = true;
+						idb_alert_events.put(data);
+					}, function(data){
+						cns.debug(data);
+					});
+
 					if( null==this_gi || null==this_ei ) return;
 
 					var group = $.lStorage(ui)[this_gi];
