@@ -44,6 +44,9 @@ $(document).ready(function () {
 		var gui = require('nw.gui');
 		var win = gui.Window.get();
 		win.width = 450;
+		if( window.opener ){
+			win.height = window.opener.outerHeight;
+		}
 	} catch (e) {
 		//resize explore window
 		cns.debug("not node-webkit");
