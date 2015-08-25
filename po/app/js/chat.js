@@ -45,7 +45,7 @@ $(document).ready(function () {
 		var win = gui.Window.get();
 		win.width = 450;
 		if( window.opener ){
-			win.height = window.opener.outerHeight;
+			win.height = Math.min(800, window.opener.outerHeight);
 		}
 	} catch (e) {
 		//resize explore window
