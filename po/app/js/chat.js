@@ -377,7 +377,9 @@ $(document).ready(function () {
 				leaveChatRoom();
 				break;
 			case "edit": //edit mem
-				delMember();
+				// delMember();
+				//go to edit preview page
+				showEditPreviewPage();
 				break;
 			case "invite":
 				addMember();
@@ -1793,6 +1795,9 @@ function getPermition(isReget) {
 					// 	},
 					// 	null
 					// );
+					if( $("#page-edit-preview").is(":visible") ){
+						updatePreviewPage();
+					}
 				},
 				null
 			);
@@ -1862,6 +1867,53 @@ function editMemInRoomAPI(ciTmp, sendData, callback) {
 		},
 		null
 	);
+}
+
+function showEditPreviewPage(){
+	$.changePage("#page-edit-preview", function () {
+		cns.debug("on page loaded");
+	}, function () {
+		cns.debug("on done");
+	});
+	updatePreviewPage();
+}
+function updatePreviewPage(){
+	var page = $("#page-edit-preview");
+	//init
+	var container = $("#page-edit-preview .newChatDetail-content.mem");
+	var input = page.find(".newChatDetail table .input");
+	//set current group name
+	input.val( g_cn );
+
+	//set current mem
+	container.html("");
+	$.each( g_room.memList, function(key, memTmp){
+		var mem = g_group.guAll[key];
+		var memDiv = $("<div class='row mem'></div>");
+		if (mem.auo) {
+			memDiv.append("<img class='namecard' src='" + mem.auo + "'>");
+			memDiv.find("img").data("gu", key);
+			memDiv.find("img").data("gi", gi);
+		} else {
+			memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
+		}
+		memDiv.append("<span>" + mem.nk.replaceOriEmojiCode() + "</span>");
+		container.append(memDiv);
+	});
+
+	//bind event
+	// var tmp = $.i18n.getString(input.data("textid"));
+	// input.attr("placeholder", tmp);
+	// input.off("change");
+	// input.keyup(function () {
+	// 	var text = $(this).val();
+	// 	count.html((20 - text.length) + "/" + $(this).attr("maxlength"));
+	// });
+
+	page.find(".newChatDetail-nextStep").off("click");
+	page.find(".newChatDetail-nextStep").click(requestNewChatRoom_chatroom);
+
+	page.find(".preview-add").off("click").click( delMember );
 }
 
 function delMember() {

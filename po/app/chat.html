@@ -126,7 +126,7 @@
                             </td>
                             <td>
                                 <div class="title" data-textid="CHAT_CHATROOM_NAME">Room Name</div>
-                                <div class="count"></div>
+                                <!-- <div class="count"></div> -->
                                 <br/>
                                 <input class="input" data-textid="CHAT_CHATROOM_NAME_EMPTY" placeholder="Input name here" data-role="none" maxlength="20"/>
                             </td>
@@ -136,12 +136,57 @@
                 <!-- <div class="newChatMemberContainer"> -->
                     <div class="newChatDetail-header" data-textid="COMMON_MEMBER">Member</div>
                     <div class="newChatDetail-content mem"></div>
-                    <div class="newChatDetail-header" data-textid="COMMON_FAVORIATE">Fav</div>
-                    <div class="newChatDetail-content fav"></div>
+                    <!-- <div class="newChatDetail-header" data-textid="COMMON_FAVORIATE">Fav</div>
+                    <div class="newChatDetail-content fav"></div> -->
                 <!-- </div> -->
             </div>
             <!-- END: Page Content -->
             <div class="chatList-add" style="display:none;"></div>
+        </div>
+
+    <!----------------------- page-edit-preview -------------------->
+        <div id="page-edit-preview" class="ui-page" style="display:none;">
+            <!-- BEGIN: Sticky Header -->
+            <div class="ui-header fixed">
+                <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <div class="header-title">
+                    <!-- <div class="page-title" data-textid="COMMON_EDIT">Edit</div> -->
+                </div>
+                <!-- <div class="newChatDetail-nextStep">
+                    <img src="images/navi/navi_icon_post.png"/>
+                    <span data-textid="COMMON_DONE"></span>
+                </div> -->
+            </div>
+            <!-- END: Sticky Header -->
+             
+            <!-- BEGIN: Page Content -->
+            <div class="ui-container">
+                <div class="newChatDetail">
+                    <table>
+                        <tr>
+                            <td class="img">
+                                <img src="images/common/others/empty_img_mother_l.png">
+                            </td>
+                            <td>
+                                <div class="title" data-textid="CHAT_CHATROOM_NAME">Room Name</div>
+                                <div class="count"></div>
+                                <br/>
+                                <input class="input" readonly data-textid="CHAT_CHATROOM_NAME_EMPTY" data-role="none" maxlength="20"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- <div class="newChatMemberContainer"> -->
+                    <div class="newChatDetail-header" data-textid="COMMON_MEMBER">Member</div>
+                    <div class="newChatDetail-content mem"></div>
+                    <!-- <div class="newChatDetail-header" data-textid="COMMON_FAVORIATE">Fav</div>
+                    <div class="newChatDetail-content fav"></div> -->
+                <!-- </div> -->
+            </div>
+            <!-- END: Page Content -->
+            <div class="preview-add-container">
+                <div class="preview-add" data-textid="COMMON_EDIT"></div>
+            </div>
         </div>
 
 
