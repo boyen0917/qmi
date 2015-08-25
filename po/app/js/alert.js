@@ -178,6 +178,7 @@ updateAlert = function(){
 showAlertContent = function(data){
 	if(!data||data.length==0){
 		$(".alert-area .content").html("");
+		cns.debug("no alert data");
 		return;
 	}
 	// cns.debug("showAlertContent");
