@@ -1667,7 +1667,19 @@ sendSticker = function (id) {
 }
 
 /**
-取得s3檔案
+* brief: 取得s3檔案及將內容帶入目標dom
+* param:
+	* target: 要顯示這個檔案的dom
+	* file_c: 檔名
+	* tp: 檔案type(6圖, 7影片, 8audio)
+	* ti: 聊天室timeline id (=ci)
+	* (deprecated)tu: 目前聊天室已不需要帶了....神奇的target user列表, 用來取代舊的permition id作檔案權限管理用, server會拿這份列表去產pi取檔案給你
+	* eg: 
+
+		```
+		var this_audio = $("<audio class='msg-audio' src='test' controls></audio>");
+		getChatS3file(this_audio, msgData.c, msgData.tp, ti_chat);
+		```
 **/
 getChatS3file = function (target, file_c, tp, this_ti, this_tu) {
 	this_ti = this_ti || ti;
