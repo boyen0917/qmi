@@ -28,7 +28,7 @@ var g_currentScrollToDom = null;	//捲動到最上方時會讀取舊訊息, 但�
 var lockCurrentFocusInterval;		//讓視窗停留在最後一筆的interval
 var lockCurrentFocusIntervalLength = 100;	//讓視窗停留在最後一筆的interval更新時間
 
-/*
+/**
               ███████╗███████╗████████╗██╗   ██╗██████╗           
               ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗          
     █████╗    ███████╗█████╗     ██║   ██║   ██║██████╔╝    █████╗
@@ -167,7 +167,7 @@ $(document).ready(function () {
 	//- click "send" to send msg
 	var sendBtn = $("#footer .contents .send");
 	sendBtn.off("click");
-	sendBtn.click(triggerSendChat);
+	sendBtn.click(onClickSendChat);
 	var input = $("#footer .contents .input");
 	// input.autosize({append: "\n"});
 	input.off("keydown").off("keypress");
@@ -181,7 +181,7 @@ $(document).ready(function () {
 	//press enter to send text
 	input.keypress(function (e) {
 		if (e.keyCode == '13' && !e.altKey) {
-			triggerSendChat();
+			onClickSendChat();
 			// return false;
 		}
 	});
@@ -303,7 +303,7 @@ $(document).ready(function () {
 	$("html, body").scroll(onScrollBody);
 
 	//pseudo button to receive polling data
-	$("button.pollingCnt").off("click").click(updateChatCnt);
+	$("button.pollingCnt").off("click").click(showChatCnt);
 	$("button.pollingMsg").off("click").click(function () {
 		updateChat(g_room.lastCt, true);
 	});
@@ -380,12 +380,12 @@ $(document).ready(function () {
 				leaveChatRoom();
 				break;
 			case "edit": //edit mem
-				// delMember();
+				// editMember();
 				//go to edit preview page
 				showEditPreviewPage();
 				break;
 			case "invite":
-				addMember();
+				inviteMember();
 				break;
 			case "album":
 				showAlbum();
@@ -572,14 +572,14 @@ $(document).ready(function () {
 	sendMsgRead(new Date().getTime())
 });
 
-/*
+/**
               ███████╗██╗   ██╗███╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗          
               ██╔════╝██║   ██║████╗  ██║██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║          
     █████╗    █████╗  ██║   ██║██╔██╗ ██║██║        ██║   ██║██║   ██║██╔██╗ ██║    █████╗
     ╚════╝    ██╔══╝  ██║   ██║██║╚██╗██║██║        ██║   ██║██║   ██║██║╚██╗██║    ╚════╝
               ██║     ╚██████╔╝██║ ╚████║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║          
               ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝          
-*/
+**/
 
 /**
 檢查目前位置, 離開底部時顯示回到底部button
@@ -640,9 +640,9 @@ function onChatDBInit() {
 	// updateChat(g_room.lastCt, true);
 }
 
-/*
+/**
 show history chat contents
-*/
+**/
 function getHistoryMsg(bIsScrollToTop) {
 	if (g_isLoadHistoryMsgNow) {
 		cns.debug("!");
@@ -697,7 +697,7 @@ function getHistoryMsg(bIsScrollToTop) {
 			} else {
 				// setTimeout( hideLoading, 1000);
 			}
-			updateChatCnt();
+			showChatCnt();
 		}
 
 
@@ -741,9 +741,9 @@ function getHistoryMsg(bIsScrollToTop) {
 		}
 	});
 }
-/*
+/**
 紀錄讀取歷史訊息時, 目前最上方的dom
-*/
+**/
 function setCurrentFocus(dom){
 	if( dom ){
 		g_currentScrollToDom = dom;
@@ -754,9 +754,9 @@ function setCurrentFocus(dom){
 		g_container.getNiceScroll()[0].wheelprevented = true;
 	}
 }
-/*
+/**
 隱藏讀取轉轉轉
-*/
+**/
 function hideLoading() {
 	if (!$("#page-chat").is(":visible")
 		|| $("#page-chat").hasClass("transition")
@@ -802,9 +802,9 @@ function hideLoading() {
 
 }
 
-/*
+/**
 統一ajax function
-*/
+**/
 function op(url, type, data, delegate, errorDelegate) {
 	var result = ajaxDo(url, {
 		ui: ui,
@@ -825,6 +825,7 @@ function op(url, type, data, delegate, errorDelegate) {
 捲動到頂
 **/
 function scrollToStart() {
+	if( !g_container ) g_container = $("#container");
 	g_container.stop(false, true).animate({scrollTop: 50}, 'fast');
 	console.debug(" -- scrollToBottom");
 }
@@ -833,6 +834,7 @@ function scrollToStart() {
 捲動到底
 **/
 function scrollToBottom() {
+	if( !g_container ) g_container = $("#container");
 	g_container.stop(false, true).animate({scrollTop: $("#chat-contents").height() + 50}, 'fast');
 	g_isEndOfPage = true;
 	console.debug(" -- scrollToBottom");
@@ -976,7 +978,7 @@ function updateChat(time, isGetNewer) {
 					}, 500);
 
 
-					updateChatCnt();
+					showChatCnt();
 				}
 			});
 		}, function () {
@@ -988,7 +990,10 @@ function updateChat(time, isGetNewer) {
 	);	//end of op
 }	//end of updateChat
 
-function updateChatCnt() {
+/**
+顯示已讀數
+**/
+function showChatCnt() {
 	var userData = $.userStorage();
 	// cns.debug( JSON.stringify(userData) );
 	g_group = userData[gi];
@@ -1631,7 +1636,10 @@ function sendMsgVideo(dom) {
 	// }
 }
 
-function triggerSendChat() {
+/**
+處理按下送出或enter送出事件
+**/
+function onClickSendChat() {
 	var inputDom = $("#footer .contents .input");
 	// var text = inputDom.val();
 	var text = inputDom[0].innerText;
@@ -1648,6 +1656,9 @@ function triggerSendChat() {
 	sendChat(dom);
 }
 
+/**
+處理點下sticker圖事件
+**/
 sendSticker = function (id) {
 	if (id.length <= 0) return;
 
@@ -1655,6 +1666,9 @@ sendSticker = function (id) {
 	sendChat(dom);
 }
 
+/**
+取得s3檔案
+**/
 getChatS3file = function (target, file_c, tp, this_ti, this_tu) {
 	this_ti = this_ti || ti;
 	if (!file_c || file_c.length == 0) {
@@ -1742,6 +1756,11 @@ getChatS3file = function (target, file_c, tp, this_ti, this_tu) {
 	});
 }
 
+/**
+* brief: 取得聊天室權限, 舊版是取pi, 新版改成取得聊天室成員列表
+* param:
+	* isReget: 若已取過是否要再取一次
+**/
 function getPermition(isReget) {
 	//目前已不使用pi管理權限
 	//若沒有聊天室權限, 重新取得
@@ -1817,6 +1836,11 @@ function getPermition(isReget) {
 	}
 }
 
+/**
+* brief: 更新聊天室已讀時間
+* param:
+	* msTime: 已讀時間
+**/
 function sendMsgRead(msTime) {
 	msTime = g_room.lastCt || msTime;
 	if (null == msTime) return;
@@ -1833,6 +1857,9 @@ function sendMsgRead(msTime) {
 	);
 }
 
+/**
+顯示離開聊天室確認視窗
+**/
 function leaveChatRoom() {
 	cns.debug("leaveChatRoom");
 
@@ -1852,6 +1879,14 @@ function leaveChatRoom() {
 	);
 }
 
+/**
+* brief: 離開聊天室API
+* param:
+	* ci: 聊天室id
+	* callback(rsp): 完成callback
+		* rsp: response text obj 
+**/
+
 function leaveRoomAPI(ciTmp, callback) {
 	op("groups/" + gi + "/chats/" + ciTmp + "/users", 'delete',
 		null, function (pData, status, xhr) {
@@ -1862,6 +1897,33 @@ function leaveRoomAPI(ciTmp, callback) {
 	);
 }
 
+
+/**
+* brief: 編輯聊天室成員API
+* param:
+	* ci: 聊天室id
+	* callback(rsp): 完成callback
+		* rsp: response text obj 
+	* eg:
+
+		```
+		//取得已讀
+		var sendData = {
+		  "add":{
+			  "gul": [
+			    { "gu": "M00000DK0FS", "rt":  }, ...
+			  ]
+		  }, "del":{
+			  "gul": [
+			    { "gu": "M00000M707J", "rt": 1440495162788 }, ...
+			  ]
+		  }
+		};
+		editMemInRoomAPI('T00002ac07i', sendData, function(data){
+			// data = {"mc":3,"rsp_code":0,"rsp_msg":"OK"}; //object, mc=current mem cnt
+		});
+		```
+**/
 function editMemInRoomAPI(ciTmp, sendData, callback) {
 	op("groups/" + gi + "/chats/" + ciTmp + "/users", "put",
 		sendData, function (pData, status, xhr) {
@@ -1872,6 +1934,9 @@ function editMemInRoomAPI(ciTmp, sendData, callback) {
 	);
 }
 
+/**
+顯示編輯預覽頁面
+**/
 function showEditPreviewPage(){
 	$.changePage("#page-edit-preview", function () {
 		cns.debug("on page loaded");
@@ -1880,6 +1945,10 @@ function showEditPreviewPage(){
 	});
 	updatePreviewPage();
 }
+
+/**
+更新編輯預覽頁面內容
+**/
 function updatePreviewPage(){
 	var page = $("#page-edit-preview");
 	//init
@@ -1916,11 +1985,14 @@ function updatePreviewPage(){
 	page.find(".newChatDetail-nextStep").off("click");
 	page.find(".newChatDetail-nextStep").click(requestNewChatRoom_chatroom);
 
-	page.find(".preview-add").off("click").click( delMember );
+	page.find(".preview-add").off("click").click( editMember );
 }
 
-function delMember() {
-	cns.debug("delMember");
+/**
+顯示編輯成員頁面
+**/
+function editMember() {
+	cns.debug("editMember");
 
 	try {
 		var btn = $(".extra-content .btn[data-type='edit']");
@@ -2001,8 +2073,11 @@ function delMember() {
 	}
 }
 
-function addMember() {
-	cns.debug("addMember");
+/**
+顯示邀請成員頁面
+**/
+function inviteMember() {
+	cns.debug("inviteMember");
 
 	try {
 		var btn = $(".extra-content .btn[data-type='invite']");
@@ -2046,7 +2121,7 @@ function addMember() {
 							// 	parent.find(".chatList-add-done").trigger("click");
 							// 	$(window.opener)[0].focus();
 							// }
-							showCreateMultipleChatPage_chatroom(list, {});
+							showCreateMultipleChatPage(list, {});
 						} catch (e) {
 							errorReport(e);
 						}
@@ -2085,10 +2160,16 @@ function addMember() {
 	}
 }
 
+/**
+顯示相簿(顯示在主頁面)
+**/
 function showAlbum() {
 	showAlbumPage(gi, ci, ci, g_cn);
 }
 
+/**
+檢查聊天室成員是否已退團
+**/
 function checkMemberLeft() {
 	try {
 		if (g_room.tp == 1 && null != g_room.memList) {
@@ -2116,6 +2197,9 @@ function checkMemberLeft() {
 	$("#chat-leaveGroup").hide();
 }
 
+/**
+滑鼠捲到頂部取舊訊息
+**/
 function onScrollContainer(e) {
 	if (!$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition")) return;
 
@@ -2143,9 +2227,11 @@ function onScrollContainer(e) {
 	// 	// cns.debug("!");
 	// }
 }
+/* 拉bar捲到頂部取舊訊息 */
 function onDragContainer() {
 	if (!g_isEndOfHistory) getHistoryMsg(false);
 }
+/* 若在取舊訊息時禁止捲動 */
 function onScrollBody(e) {
 	if (g_isLoadHistoryMsgNow) {
 		cns.debug("prevent!");
@@ -2155,7 +2241,7 @@ function onScrollBody(e) {
 	}
 }
 
-/*
+/**
               ██████╗ ███████╗ █████╗ ██████╗     ██╗     ██╗███████╗████████╗          
               ██╔══██╗██╔════╝██╔══██╗██╔══██╗    ██║     ██║██╔════╝╚══██╔══╝          
     █████╗    ██████╔╝█████╗  ███████║██║  ██║    ██║     ██║███████╗   ██║       █████╗
@@ -2163,8 +2249,18 @@ function onScrollBody(e) {
               ██║  ██║███████╗██║  ██║██████╔╝    ███████╗██║███████║   ██║             
               ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝     ╚══════╝╚═╝╚══════╝   ╚═╝             
                                                                                         
-*/
+**/
 
+/**
+* brief: 取得某時間已讀成員清單
+* param:
+	* this_gi: 團體id
+	* this_ci: 聊天室id
+	* this_rt: 要查詢的時間
+	* this_tp: Read type (1: 已讀, 2:未讀)
+* eg
+
+**/
 getChatReadUnreadApi = function (this_gi, this_ci, this_rt, this_tp) {
 	//GET /groups/{gi}/chats/{ci}/messages_read?rt=<timestamp>&tp=<read_type>
 	//tp: Read type (1: 已讀, 2:未讀)
@@ -2179,6 +2275,30 @@ getChatReadUnreadApi = function (this_gi, this_ci, this_rt, this_tp) {
 	return result = ajaxDo(api_name, headers, method, true);
 }
 
+/**
+* brief: 取得已讀數＆時間的api
+* param:
+	* this_gi:
+	* this_ci:
+	* this_rt:
+	* this_tp:
+	* eg:
+
+		```
+		//取得已讀
+		getChatReadUnreadApi('G000006s00q', 'T00002ac07i', 1440471452981, 1).complete(function(data){
+			var parseData = $.parseJSON(data.responseText);
+			// 已讀內容, 未讀也差不多
+			// { "gul": [
+			//     { "gu": "M00000DK0FS", "rt": 1440495096495 },
+			//     { "gu": "M00000M707J", "rt": 1440495162788 }
+			//   ],
+			//   "rsp_code": 0,
+			//   "rsp_msg": "OK"
+			// }
+		}
+		```
+**/
 showChatReadUnreadList = function (cntDom) {
 	var chat = $("#page-chat");
 	if (chat.hasClass("loadRead")) {
@@ -2273,8 +2393,10 @@ showChatReadUnreadList = function (cntDom) {
 	});
 }
 
-
-function showCreateMultipleChatPage_chatroom(newChatMemList, newChatFavList) {
+/**
+顯示從單人變多人的編輯頁面(取得內容)
+**/
+function showCreateMultipleChatPage(newChatMemList, newChatFavList) {
 	$("#page-chat").addClass("transition");
 	try {
 		if (newChatMemList.hasOwnProperty(g_group.gu)) {
@@ -2285,14 +2407,17 @@ function showCreateMultipleChatPage_chatroom(newChatMemList, newChatFavList) {
 		if (null == newChatFavList) g_newChatFavList = [];
 		else g_newChatFavList = Object.keys(newChatFavList);
 
-		showNewRoomDetailPage_chatroom(newChatMemList, newChatFavList);
+		showCreateMultipleChatPageContent(newChatMemList, newChatFavList);
 	} catch (e) {
 		cns.debug("[!]showNewRoomPage", e.message);
 		errorReport(e);
 	}
 }
 
-function showNewRoomDetailPage_chatroom() {
+/**
+顯示從單人變多人的編輯頁面(顯示內容)
+**/
+function showCreateMultipleChatPageContent() {
 
 	//no mem
 	if (g_newChatMemList.length == 0 && g_newChatFavList.length == 0) {
@@ -2377,6 +2502,7 @@ function showNewRoomDetailPage_chatroom() {
 	$(".newChatDetail-nextStep").click(requestNewChatRoom_chatroom);
 }
 
+/* 取得新聊天室(呼叫主畫面處理) */
 function requestNewChatRoom_chatroom() {
 	var text = $(".newChatDetail table .input").val();
 	var arr = [];
@@ -2418,14 +2544,14 @@ function requestNewChatRoom_chatroom() {
 }
 
 
-/*
- ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗
- ██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔══██╗██╔════╝ ██╔════╝
- █████╗    ███████╗   ██║   ██║   ██║██████╔╝███████║██║  ███╗█████╗      █████╗
- ╚════╝    ╚════██║   ██║   ██║   ██║██╔══██╗██╔══██║██║   ██║██╔══╝      ╚════╝
- ███████║   ██║   ╚██████╔╝██║  ██║██║  ██║╚██████╔╝███████╗
- ╚══════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-
+/**
+              ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
+              ██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔══██╗██╔════╝ ██╔════╝          
+    █████╗    ███████╗   ██║   ██║   ██║██████╔╝███████║██║  ███╗█████╗      █████╗
+    ╚════╝    ╚════██║   ██║   ██║   ██║██╔══██╗██╔══██║██║   ██║██╔══╝      ╚════╝
+              ███████║   ██║   ╚██████╔╝██║  ██║██║  ██║╚██████╔╝███████╗          
+              ╚══════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝          
+                                                                                   
  */
 
 $.userStorage = function (value) {
