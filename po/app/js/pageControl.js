@@ -83,6 +83,9 @@
   $.changePage = function( id, onShow, onDone ){
     pageControl.changePage( id, onShow, onDone );
   }
+  $.popPage = function(){
+    pageControl.popPage();
+  }
   $.popAllPage = function(){
     pageControl.popAllPage();
   }

@@ -2104,6 +2104,17 @@ $(function(){
 		cns.debug("on chatroom focus");
 		updatePollingCnts( $(this),"B7" );
 	});
+
+	//update chat list
+	$("#recv-sync-chat-list").off("click").click(function(){
+		var giTmp = $(this).attr("data-gi");
+		cns.debug("update chat list ", giTmp);
+		if( giTmp && giTmp == gi ){
+			if( $(".subpage-chatList").is(":visible") ){
+				$('.header-menu .sm-small-area[data-sm-act="chat"]').trigger("click");
+			}
+		}
+	});
 	/*
               ████████╗███████╗███████╗████████╗          
               ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝          
