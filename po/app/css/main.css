@@ -1402,11 +1402,14 @@ img.auo {
 	display: inline-block;
 	margin-right: 8px;
 }
+
 .header-menu .sm-small-area.active, .header-menu .sm-small-area:hover{
 	border-bottom: 3px solid white;
 }
+
 .header-menu .sm-small-area div{
 	display: inline-block;
+	cursor: pointer;
 }
 /*.header-group-name div:nth-child(1) {
     font-size: 18px;
@@ -4969,3 +4972,88 @@ div.user-info-submit-ready:active {
 	color: #838383;
 
 }
+
+/*
+
+	######## #### ##       ########   
+	##        ##  ##       ##         
+	##        ##  ##       ##         
+	######    ##  ##       ######     
+	##        ##  ##       ##         
+	##        ##  ##       ##         
+	##       #### ######## ########  
+
+   ######  ##     ##    ###    ########  #### ##    ##  ######  
+  ##    ## ##     ##   ## ##   ##     ##  ##  ###   ## ##    ## 
+  ##       ##     ##  ##   ##  ##     ##  ##  ####  ## ##       
+   ######  ######### ##     ## ########   ##  ## ## ## ##   ####
+        ## ##     ## ######### ##   ##    ##  ##  #### ##    ## 
+  ##    ## ##     ## ##     ## ##    ##   ##  ##   ### ##    ## 
+   ######  ##     ## ##     ## ##     ## #### ##    ##  ######  
+
+*/ 
+
+section.fileSharing { min-width: 550px; }
+section.fileSharing .top { height: 40px; border-bottom: 2px solid #ccc; }
+
+section.fileSharing .top img { cursor: pointer; }
+section.fileSharing .top img.home { width: 30px; margin: 5px 15px; }
+section.fileSharing .top img.more {
+	width: 30px;
+	margin: 7px 10px;
+	float: right;
+}
+
+section.fileSharing .title {
+	color: #9B9B9B;
+	border-bottom: 1px solid #ddd;
+	height: 35px;
+	font-size: 14px;
+	width: 100%;
+	line-height: 35px;;
+}
+
+section.fileSharing .cl1{ width: 55%; display: inline-block; }
+section.fileSharing .cl2{ display: inline-block; }
+section.fileSharing .cl3{ float: right; clear: both; width: 85px; overflow: hidden; margin-right: 10px; text-overflow: ellipsis; }
+
+section.fileSharing .title .cl1 { position: relative;left: 15px; }
+section.fileSharing .title .cl2 img {
+    width: 13px;
+    height: 7px;
+    position: relative;
+    left: 5px;
+    top: -3px;  
+}
+
+section.fileSharing section.list { font-size: 14px; }
+section.fileSharing section.list .row {
+    color: #666;
+    line-height: 45px;
+    height: 45px;
+    border-bottom: 2px solid #e5e5e5;
+    cursor: pointer; 
+}
+
+section.fileSharing section.list .row.fs-active { background: #EEF8FF }
+
+section.fileSharing section.list img.icon { width: 40px; margin: 5px 10px 0; float: left;}
+section.fileSharing section.list .cl1 { min-width: 300px; white-space: nowrap;;}
+section.fileSharing section.list .cl1 span {
+    width: 80%;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;;
+}
+
+section.fileSharing section.list .cl2 { position: relative; bottom: 17px; } 
+section.fileSharing section.list .cl3 {
+    float: right;
+    clear: both;
+    width: 85px;
+    overflow: hidden;
+    margin-right: 10px;
+    text-overflow: ellipsis;
+}
+
+

@@ -317,5 +317,7 @@
 
 	"ADDRESSBOOK_TITLE" : "AddressBook",
 	"ADDRESSBOOK_ADD" : "Add custom address book",
-	"ADDRESSBOOK_CUSTOM" : "Custom address book"
+	"ADDRESSBOOK_CUSTOM" : "Custom address book",
+
+	"FILESHARING_TITLE" : "FileSharing"
 }

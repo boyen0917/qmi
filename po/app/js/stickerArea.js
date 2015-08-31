@@ -191,7 +191,7 @@ var initStickerArea= {
 		    		// st = $("<img src="+imgPath.format(singleStickerObject[i])+">");
 		    	// }
 		    	st = $("<img class='stImg' src="+obj.sou+">");
-		    	st.data( "id", key );
+		    	st.data( "id", obj.sid );
 		    	st.error( function(){
 					$(this).addClass("error");
 					$(this).attr("src", "images/chatroom/chat_chatroom_icon_nosent.png");

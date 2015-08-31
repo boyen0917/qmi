@@ -316,11 +316,11 @@ $(function(){
             //cns.debug("[!] setTabList(set tab): " + e.message);
         }
 
-        //暫時先將相簿tab show出來
-        // dom = menu.find(".sm-small-area[data-sm-act=album]");
-        // dom.detach();
-        // menu.append( dom );
-        // dom.show();
+        //暫時先將檔案共享顯示
+        $fsDom = menu.find(".sm-small-area[data-sm-act=fileSharing]");
+        $fsDom.detach();
+        menu.append( $fsDom );
+        $fsDom.show();
 
         //檢查團體設定裡有沒有開放的設定, 都沒有隱藏設定tab
         if( false==initGroupSetting(this_gi) ){

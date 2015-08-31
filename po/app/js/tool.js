@@ -1637,4 +1637,5 @@ $(function(){
 			// cns.debug(e);	//必加, 一般瀏覽器require not defined
 		}
     }
+
 });

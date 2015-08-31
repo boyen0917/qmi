@@ -316,5 +316,7 @@
 
 	"ADDRESSBOOK_TITLE" : "团体通讯录",
 	"ADDRESSBOOK_ADD" : "新增自定联络人",
-	"ADDRESSBOOK_CUSTOM" : "自定联络人"
+	"ADDRESSBOOK_CUSTOM" : "自定联络人",
+
+	"FILESHARING_TITLE" : "档案分享"
 }

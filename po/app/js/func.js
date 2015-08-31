@@ -528,6 +528,34 @@ $(function(){
 	          break;
 	        case "news":
 	          break;
+
+            case "fileSharing":
+                $(".subpage-fileSharing").show();
+                
+                page_title = $.i18n.getString("GROUPSETTING_TITLE");
+
+                // $.get("js/fileSharing.js",function(){
+                //     var fsObj = new FSObj();
+                //     fsObj.ajax();
+                // });
+                var deferred = $.Deferred();
+                var fsObj = fsObj || {};
+                if(Object.keys(fsObj) == 0){
+                    $.get("js/fileSharing.js",function(){
+                        fsObj = new FSObj();
+                        cns.debug("heheheheheh",fsObj.ajaxSetting);
+                        deferred.resolve();
+                    });
+                }else{
+                    deferred.resolve();
+                }
+
+                deferred.done(function(){
+                    cns.debug("fsObj",fsObj);
+                });
+
+                //initGroupSetting(gi);
+                break;
 	        case "system-setting":
 
               // $("#page-group-main .main-subpage").hide();
