@@ -124,6 +124,13 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
     var guList = Object.keys(guAll);
     var cnt = 0;
     $.each(guAll,function(i,gu_obj){
+        //踢除離開或未加入的成員
+        if( gu_obj.st!=1 ){
+            if( excludeList.indexOf(i)<=0 ){
+                excludeList.push(i);
+            }
+            return;
+        }
         if( excludeList.indexOf(i)>=0 ) return;
         if( false==isShowSelf && i==group.gu ) return;
         cnt++;
