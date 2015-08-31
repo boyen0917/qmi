@@ -100,6 +100,7 @@
 	"FEED_VOTE_ANONYMOUS_DESC" : "完全匿名，結束後公開票數",
 	"FEED_EVENT_DELETED" : "此動態已被刪除",
 	"FEED_READ_LIST_DISABLED" : "此團體無查看已/未讀列表功能",
+	"FEED_CONFIRM_DISCARD" : "是否放棄編輯?",
 
 	"COMPOSE_DESCRIPTION" :	"內容描述",
 	"COMPOSE_TITLE" :	"標題",
@@ -209,6 +210,8 @@
 	"COMMON_PRIVATE" : "不公開",
 	"COMMON_PUBLIC" : "公開",
 	"COMMON_EXCEED_FILE_SIZE" : "超過檔案大小限制",
+	"COMMON_NOT_MP4_NOR_IMAGE" : "檔案格式必須為MP4或圖片",
+	"COMMON_NOT_IMAGE" : "檔案格式必須為圖片",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "傳送",

@@ -101,6 +101,7 @@
 	"FEED_VOTE_ANONYMOUS_DESC" : "anonymous voting , only publishing the number of votes",
 	"FEED_EVENT_DELETED" : "This event has been deleted.",
 	"FEED_READ_LIST_DISABLED" : "This group is not able to check read/unread list.",
+	"FEED_CONFIRM_DISCARD" : "Cancel editing?",
 
 	"COMPOSE_DESCRIPTION" :	"Description",
 	"COMPOSE_TITLE" :	"Title",
@@ -210,6 +211,8 @@
 	"COMMON_PRIVATE" : "Private",
 	"COMMON_PUBLIC" : "Public",
 	"COMMON_EXCEED_FILE_SIZE" : "File size exceeds limit.",
+	"COMMON_NOT_MP4_NOR_IMAGE" : "File must be MP4 OR image.",
+	"COMMON_NOT_IMAGE" : "File must be image.",
 	
 	"CHAT_TITLE"							: "Chat",
 	"CHAT_SEND"  						: "Send",
