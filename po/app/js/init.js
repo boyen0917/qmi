@@ -6,14 +6,14 @@ $(function(){
 
 	//api 網址
 	// base_url = "https://mapserver.mitake.com.tw/apiv1/";
- 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	base_url = "https://apserver.mitake.com.tw/apiv1/";
 	//base_url = "http://10.1.17.116:8090/apiv1/";
  	// base_url = "https://caprivateeim.mitake.com.tw/apiv1/";
 
  	gi = null;
 
  	//HiCloud
- 	base_url = "https://ap.qmi.emome.net/apiv1/";
+ 	// base_url = "https://ap.qmi.emome.net/apiv1/";
 
 	//local測試 預設開啟console
 	debug_flag = false;

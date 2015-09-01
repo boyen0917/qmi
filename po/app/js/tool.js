@@ -96,6 +96,10 @@ $(function(){
 	    
 	    return result;
 	}
+
+	ajaxTransfer = function() {
+		var order = [api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl]
+	}
 	 
     _pri_split_chat = "#";
     getPrivateGi = function( this_ci, this_gi ){

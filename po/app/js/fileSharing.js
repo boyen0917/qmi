@@ -1,10 +1,17 @@
-var FSObj = function(){
+
+var FileSharing = function(){
+
 }
+
 //api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl
-FSObj.prototype = {
-	ajaxSetting: {
+FileSharing.prototype = {
+	headers:{
+		ui:ui,
+		at:at,
+		li:lang
+	},
+	ajaxArgs: {
 		api_name:"",
-		headers:"",
 		method:"",
 		load_show_chk:"",
 		body:"",
@@ -12,11 +19,21 @@ FSObj.prototype = {
 		err_hide:"",
 		privateUrl:""
 	},
-	ajax: function(args){
-	    $.extend(this.ajaxSetting,args);
+	ajaxDo: function(args){
+		$.extend(args.headers,this.headers);
+	    $.extend(this.ajaxArgs,args);
 
-	    console.debug("ajaxSetting",this.ajaxSetting);
+	    console.debug("ajaxArgs",this.ajaxArgs);
+
+	    ajaxTransfer.call(this.ajaxArgs);
 
 	    // return $.ajax(ajaxSetting);
+	},
+	events: function(){
+		// var $fileSharing = $("section.fileSharing");
+
+
 	}
 }
+
+// })

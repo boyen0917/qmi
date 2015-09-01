@@ -391,7 +391,7 @@ $(function(){
         //關閉所有subpage 暫時除了系統設定除外
         if(act != "system-setting")
             $("#page-group-main .main-subpage").hide();
-        cns.debug(act);
+        // cns.debug(act);
 
         $(".header-menu .sm-small-area.active").removeClass("active");
         $('.header-menu .sm-small-area[data-sm-act="'+act+'"]').addClass("active");
@@ -531,19 +531,18 @@ $(function(){
 
             case "fileSharing":
                 $(".subpage-fileSharing").show();
-                
                 page_title = $.i18n.getString("GROUPSETTING_TITLE");
 
                 // $.get("js/fileSharing.js",function(){
-                //     var fsObj = new FSObj();
-                //     fsObj.ajax();
-                // });
+                //     var fsObj = new FileSharing();
+
+                //     console.debug("fsObj",fsObj)
+                // })
+
                 var deferred = $.Deferred();
-                var fsObj = fsObj || {};
-                if(Object.keys(fsObj) == 0){
+                if(typeof fsObj == "undefined"){
                     $.get("js/fileSharing.js",function(){
-                        fsObj = new FSObj();
-                        cns.debug("heheheheheh",fsObj.ajaxSetting);
+                        fsObj = new FileSharing();
                         deferred.resolve();
                     });
                 }else{
@@ -551,7 +550,12 @@ $(function(){
                 }
 
                 deferred.done(function(){
-                    cns.debug("fsObj",fsObj);
+                    fsObj.ajaxDo({
+                        headers:{cowbay:true},
+                        load_show_chk:"true",
+                        method:"post",
+                        privateUrl:"http://ssss"
+                    });
                 });
 
                 //initGroupSetting(gi);
