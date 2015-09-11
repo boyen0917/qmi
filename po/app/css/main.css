@@ -5028,8 +5028,8 @@ section.fileSharing .file-cover {
     height: 100vh;
     right: 0;
     z-index: 10;
+    display: none;
 }
-section.fileSharing .file-cover.focus {;}
 
 section.fileSharing .file-cover ul {
     position: absolute;
@@ -5077,6 +5077,7 @@ section.fileSharing .file-cover .general {
     padding: 0 20px;
     z-index: 10;
     overflow: hidden;
+    display: none;
 }
 
 section.fileSharing .file-cover .general .title {

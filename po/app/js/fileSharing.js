@@ -15,7 +15,7 @@ var FileSharing = function(){
 }
 
 FileSharing.prototype = {
-	fileDom: $("section.fileSharing"),
+	fileDom: $("div.subpage-fileSharing section.fileSharing"),
 	bcArrow: '<img src="images/fileSharing/layer_arrow_icon@2x.png">',
 	reset: function(){
 		this.fileDom.find("section.list").html("").end()
@@ -55,6 +55,29 @@ FileSharing.prototype = {
 			var name = $(this).attr("name");
 			var fi = thisFileDom.find("div.row.fs-active").data("fi");
 			thisFile[name](fi);
+		});
+
+		//more
+		thisFileDom.find("section.file-cover").click(thisFile.showMore.bind(thisFile));
+		thisFileDom.find("section.file-cover ul li:eq(0)").click(thisFile.showMoreContent.bind(thisFile));
+        thisFileDom.find("section.file-cover ul li:eq(1)").click(thisFile.uploadFile.bind(thisFile));
+
+
+        var generalDom = thisFileDom.find("section.file-cover div.general");
+		generalDom.click(function(){event.stopPropagation()})
+		.find(".err-msg").html($.i18n.getString("FILESHARING_ERR_MSG")).end()
+		.find("button.cancel").html($.i18n.getString("COMMON_CANCEL")).click(thisFile.showMore.bind(thisFile)).end()
+		.find("button.submit").html($.i18n.getString("COMMON_OK")).click(thisFile.createFolder.bind(thisFile)).end()
+		.find("input").bind("input",function(){
+			var thisVal = $(this).val();
+			generalDom.find(".err-msg").css("opacity",0);
+			for(i=0;i<thisFile.fileItemArr.length;i++){
+				var thisItemObj = thisFile.fileItemArr[i];
+				if(thisItemObj.matchFn == thisVal){
+					generalDom.find(".err-msg").css("opacity",1);
+					return false;
+				}
+			}
 		});
 
 		// 特別event
@@ -107,67 +130,29 @@ FileSharing.prototype = {
 	showMore: function(){
 		var thisFile = this;
 		var coverDom = thisFile.fileDom.find("section.file-cover");
-		if(coverDom.length > 0) {
-			coverDom.find("ul").show();
-			coverDom.find(".general").hide();
-			if(coverDom.is(":visible")){
-				coverDom.hide();
-			}else{
-				coverDom.show();
-			}
-			return false;
+		coverDom.find("ul").show().end()
+		.find(".general").hide();
+
+		if(coverDom.is(":visible")){
+			coverDom.hide();
+		}else{
+			coverDom.show();
 		}
-
-        var coverDom = $('<section class="file-cover"><ul class="more"></ul></section>'),
-        createLiDom = $("<li>").html($.i18n.getString("FILESHARING_CREATE_FOLDER")).click(thisFile.showMoreContent.bind(thisFile));
-        uploadLiDom = $("<li>").html($.i18n.getString("FILESHARING_UPLOAD_FILE")).click(thisFile.uploadFile.bind(thisFile));
-		coverDom.find("ul").append(createLiDom).append(uploadLiDom);
-		thisFile.fileDom.append(coverDom);
-
-		coverDom.click(thisFile.showMore.bind(thisFile));
 	},
 	showMoreContent: function(title,action){
 		event.stopPropagation();
 		var thisFile = this,
-
 		coverDom = this.fileDom.find("section.file-cover");
+
 		coverDom.find("ul").hide();
 
 		if(coverDom.find(".general").length > 0) {
 			coverDom.find(".general").show().end()
 			.find(".loading").hide().end()
 			.find("input").val("");
-			return false;
 		}
 		
-		var generalDom = $(
-			'<div class="general">'+
-			'	<div class="title">'+ $.i18n.getString("FILESHARING_CREATE_FOLDER") +'</div>'+
-            '    <div class="input-area"><input type="text"></div>'+
-            '	 <div class="err-msg"></div>'+
-            '    <div class="confirm">'+
-            '		<button class="cancel" data-textid="COMMON_CANCEL"></button>'+
-            '       <button class="submit" data-textid="COMMON_OK"></button>'+
-            '    </div>'+
-			'</div>'
-		);
-		coverDom.append(generalDom);
-
-		generalDom.click(function(){event.stopPropagation()})
-		generalDom.find(".err-msg").html($.i18n.getString("FILESHARING_ERR_MSG")).end()
-		.find("button.cancel").html($.i18n.getString("COMMON_CANCEL")).click(thisFile.showMore.bind(thisFile)).end()
-		.find("button.submit").html($.i18n.getString("COMMON_OK")).click(thisFile.createFolder.bind(thisFile)).end()
-		.find("input").bind("input",function(){
-			var thisVal = $(this).val();
-			generalDom.find(".err-msg").css("opacity",0);
-			for(i=0;i<thisFile.fileItemArr.length;i++){
-				var thisItemObj = thisFile.fileItemArr[i];
-				if(thisItemObj.matchFn == thisVal){
-					generalDom.find(".err-msg").css("opacity",1);
-					return false;
-				}
-			}
-		});
+		
 	},
 	createFolder: function(){
 		var thisFile = this;
@@ -510,7 +495,6 @@ FileItem.prototype = {
 		.find(".cl2").html(this.timeFormat(this.meta.ct));
 		
 		this.eventBinding($thisItem);
-		// $("section.fileSharing section.list").append($thisItem);
 	},
 	eventBinding: function($thisItem){
 		var thisItemObj = this;
@@ -518,17 +502,14 @@ FileItem.prototype = {
 		$thisItem.children().unbind();
 
 		$thisItem.click(function(){
-			
-			thisFileDom.find("div.row").removeClass("fs-active").end()
-			.find(".operator").show();
-
-			$(this).addClass("fs-active");
-
-			// cns.debug("thisItemObj",JSON.stringify(thisItemObj,null,2));
-
-			//folder
+ 			//folder
 			if(thisItemObj.ti != null){
+				$(this).addClass("fs-active");
 				thisFileDom.trigger("goToFolder",thisItemObj);
+			}else{
+				thisFileDom.find("div.row").removeClass("fs-active").end()
+				.find(".operator").show();
+				$(this).addClass("fs-active");
 			}
 		});
 
