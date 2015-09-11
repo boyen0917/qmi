@@ -269,7 +269,6 @@ $(function(){
 	
 	//創建團體 建立
 	$(".gm-create-submit").click(function(){
-
 		if ( !$(".gmc-avatar").data("chk" )){
 				popupShowAdjust("",$.i18n.getString("GROUP_AVATAR_ALERT"),true); //"圖片未上傳"
 				return false;

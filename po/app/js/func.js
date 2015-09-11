@@ -44,32 +44,32 @@ $(function(){
     	}
 	}
 
-	setGroupList = function(){
-        var _uiGroupList = $.lStorage(ui) || {};
+	// setGroupList = function(){
+ //        var _uiGroupList = $.lStorage(ui) || {};
 
-		$.each($.lStorage("_groupList"),function(i,gl_obj){
-			if(!$.lStorage(ui)[gl_obj.gi]){
-				gl_obj.guAll = {};
-				gl_obj.gu = gl_obj.me;
+	// 	$.each($.lStorage("_groupList"),function(i,gl_obj){
+	// 		if(!$.lStorage(ui)[gl_obj.gi]){
+	// 			gl_obj.guAll = {};
+	// 			gl_obj.gu = gl_obj.me;
 
-				$.each(gl_obj.tl,function(i,val){
-		    		if(val.tp == 1){
-		    			gl_obj.ti_cal = val.ti;
-		    		}else if(val.tp == 2){
-		    			gl_obj.ti_feed = val.ti;
-		    		}else{
-		    			gl_obj.ti_chat = val.ti;
-		    		}
-		    	});
-		    	_uiGroupList[gl_obj.gi] = gl_obj;
-			} else if(gl_obj.ad) {
-                //update admin value
-                _uiGroupList[gl_obj.gi].ad = gl_obj.ad;
-            }
-		});	
-        $.lStorage(ui,_uiGroupList);
-        updateTab(gi);
-	}
+	// 			$.each(gl_obj.tl,function(i,val){
+	// 	    		if(val.tp == 1){
+	// 	    			gl_obj.ti_cal = val.ti;
+	// 	    		}else if(val.tp == 2){
+	// 	    			gl_obj.ti_feed = val.ti;
+	// 	    		}else{
+	// 	    			gl_obj.ti_chat = val.ti;
+	// 	    		}
+	// 	    	});
+	// 	    	_uiGroupList[gl_obj.gi] = gl_obj;
+	// 		} else if(gl_obj.ad) {
+ //                //update admin value
+ //                _uiGroupList[gl_obj.gi].ad = gl_obj.ad;
+ //            }
+	// 	});	
+ //        $.lStorage(ui,_uiGroupList);
+ //        updateTab(gi);
+	// }
 
 	logout = function(){
 		var api_name = "logout";
@@ -533,31 +533,23 @@ $(function(){
                 $(".subpage-fileSharing").show();
                 page_title = $.i18n.getString("GROUPSETTING_TITLE");
 
-                // $.get("js/fileSharing.js",function(){
-                //     var fsObj = new FileSharing();
+                // var groupData = $.lStorage(ui)[gi];
+                // cns.debug("ti",groupData.ti_file);
+                // if(typeof groupData.ti_file == "undefined") {
+                //     alert("沒共享");
+                //     return false;
+                // }
+                loadScript("js/fileSharing.js").done(function(){
 
-                //     console.debug("fsObj",fsObj)
-                // })
+                    var fsObj = new window[arguments[0]]();
+                    
+                    if(typeof fsObj.ti == "undefined"){
+                        alert("這是開發階段 此團體無檔案共享的ti");
+                        return false;
+                    }
 
-                var deferred = $.Deferred();
-                if(typeof fsObj == "undefined"){
-                    $.get("js/fileSharing.js",function(){
-                        fsObj = new FileSharing();
-                        deferred.resolve();
-                    });
-                }else{
-                    deferred.resolve();
-                }
-
-                deferred.done(function(){
-                    fsObj.ajaxDo({
-                        headers:{cowbay:true},
-                        load_show_chk:"true",
-                        method:"post",
-                        privateUrl:"http://ssss"
-                    });
+                    fsObj.getList();
                 });
-
                 //initGroupSetting(gi);
                 break;
 	        case "system-setting":
@@ -5843,56 +5835,6 @@ $(function(){
 		});
 	}
 
-	// getS3file = function(file_obj,target,tp,size){
- //        var this_ei = target.parents(".st-sub-box").data("event-id");
- //        var this_gi = this_ei.split("_")[0];
- //        var this_ti = this_ei.split("_")[1];
-
-	// 	//default
-	// 	size = size || 350;
-	// 	var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
- //        var headers = {
- //                 "ui":ui,
- //                 "at":at, 
- //                 "li":lang,
- //                     };
- //        var method = "get";
- //        var result = ajaxDo(api_name,headers,method,false);
-	// 	result.complete(function(data){
-	// 		if(data.status != 200) return false;
-
-	// 		var obj =$.parseJSON(data.responseText);
-	// 		obj.api_name = api_name;
-	// 		if(target && tp){
-	// 			switch(tp){
-	// 				case 6://圖片
-	// 					var img = target.find("img.aut");
-	// 					img.load(function() {
-	// 						//重設 style
-	// 						img.removeAttr("style");
-	// 						var w = img.width();
-	// 			            var h = img.height();
- //            				// mathAvatarPos(img,w,h,size);
-	// 			        });
-	// 					//小圖
-	// 					target.find("img.aut").attr("src",obj.s3);
-	// 					//大圖
-	// 					//target.find("img.auo").attr("src",obj.s32).hide();
- //                        target.find("img.auo").data("src",obj.s32).hide();
-	// 					break;
- //                    case 7://影片
- //                        target.attr("src",obj.s32).show();
- //                        break;
-	// 				case 8://聲音
-	// 					// target.find("source").attr("src",obj.s3);
- //                        target.html('<source type="audio/mp4" yo src="'+ obj.s3 +'">').show();
-	// 					break;
-	// 			}
-	// 		}else{
-	// 			return obj.s3;
-	// 		}
-	// 	});
-	// }
     getS3file = function(file_obj,target,tp,size, tu){
         var this_ei = target.parents(".st-sub-box").data("event-id");
         var this_gi = this_ei.split("_")[0];

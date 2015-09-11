@@ -154,7 +154,7 @@
 
                         <div class="header-menu">
                             <div data-sm-act="feeds" data-polling-cnt="A1" class="sm-small-area polling-cnt polling-local">
-                               <div class="sm-small-area-r" data-textid="LEFT_FEDs">ss</div>
+                               <div class="sm-small-area-r" data-textid="LEFT_FEED"></div>
                                <div class="sm-count" style="display:none;"></div>
                             </div>
                             <div data-sm-act="memberslist" data-polling-cnt="A2" class="sm-small-area polling-cnt polling-local">
@@ -616,10 +616,18 @@
                     <!--------------------------------- 檔案共享 -------------------------------->
                         <div class="subpage-fileSharing main-subpage" style="display:none;height: 100%">
                             <section class="fileSharing">
-                                <div class="top">
-                                    <img class="home size1" src="images/fileSharing/home_icon@2x.png">
-                                    <span class="breadcrumb"></span>
-                                    <img class="more size1" src="images/fileSharing/more_icon@2x.png">
+                                <div class="top-fixed">
+                                    <div class="top">
+                                        <img class="home size1" src="images/fileSharing/home_icon@2x.png">
+                                        <span class="breadcrumb"></span>
+                                        <span class="operator" style="display:none">
+                                            <img name="download" src="images/fileSharing/download_icon@2x.png">
+                                            <img name="rename" src="images/fileSharing/rename_icon@2x.png">
+                                            <img name="move" src="images/fileSharing/move_icon@2x.png">
+                                            <img name="delete" src="images/fileSharing/delete_icon@2x.png">
+                                        </span>
+                                        <img class="more size1" src="images/fileSharing/more_icon@2x.png">
+                                    </div>
                                 </div>
                                 <div class="title">
                                     <span class="cl1">名稱</span>
@@ -628,32 +636,11 @@
                                     </span>
                                     <span class="cl3">檔案大小</span>
                                 </div>
+
                                 <section class="list">
-                                    <div class="row fs-active">
-                                        <span class="cl1">
-                                            <img class="icon" src="images/fileSharing/word_icon@2x.png">
-                                            <span>APP Spec.docx</span>
-                                        </span>
-                                        <span class="cl2">
-                                            2015/07/28 15:33:12
-                                        </span>
-                                        <span class="cl3">
-                                            24.2mb
-                                        </span>
-                                    </div>
-                                    <div class="row">
-                                        <span class="cl1">
-                                            <img class="icon" src="images/fileSharing/ppt_icon@2x.png">
-                                            <span>產品簡報.ptt</span>
-                                        </span>
-                                        <span class="cl2">
-                                            2015/08/06 10:44:25
-                                        </span>
-                                        <span class="cl3">
-                                            36.7mb
-                                        </span>
-                                    </div>
                                 </section>
+                                
+                                <input type="file" style="display:none">
                             </section>
                         </div>
 

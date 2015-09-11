@@ -2,7 +2,7 @@ $(function(){
 
 	//ajax
 	ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl){
-
+		
 		//設定是否顯示 loading 圖示
 		load_show = load_show_chk;
 
@@ -85,20 +85,67 @@ $(function(){
 	    if(body){
 	        body = JSON.stringify(body);
 	    }
-	    
-	    var result = $.ajax ({
+
+	    var ajaxArgs = {
             url: api_url,
             type: method,
             headers:headers,
             data:body,
             errHide: err_hide || false
-        });
-	    
-	    return result;
+        };
+
+        // AjaxTransfer 使用 ajaxDo.call
+        if(this != window) $.extend(ajaxArgs,this);
+		return $.ajax(ajaxArgs);	
 	}
 
-	ajaxTransfer = function() {
-		var order = [api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl]
+
+	//ajax 轉換
+	AjaxTransfer = function(){
+		this.headers = {ui:ui,at:at,li:lang};
+	}
+
+	AjaxTransfer.prototype = {
+		STRIP_COMMENTS: /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg,
+		ARGUMENT_NAMES: /([^\s,]+)/g,
+
+		ajaxArgs: {
+			method: "get",
+			timeout: 30000
+		},
+		
+		getParamNames: function(func) {
+			var fnStr = func.toString().replace(this.STRIP_COMMENTS, '');
+			var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(this.ARGUMENT_NAMES);
+			if(result === null) result = [];
+
+			return result;  
+		},
+
+		execute: function(args){
+			args.headers = args.headers || {};
+			// object clone 避免把prototype 的ajaxArgs 改變
+			var argsClone = JSON.parse(JSON.stringify(this.ajaxArgs));
+
+			$.extend(args.headers,this.headers);
+		    $.extend(argsClone,args);
+
+			var newArr = [];
+			var paramArr = this.getParamNames(ajaxDo);
+			for (i = 0; i < paramArr.length; i++) {
+				if(paramArr[i] == "api_name"){
+					newArr.push(argsClone.url);
+					delete argsClone.url;
+				}else{
+					newArr.push(argsClone[paramArr[i]] || null);	
+				}
+				delete argsClone[paramArr[i]];
+			};
+
+			cns.debug("ajax args",{args:newArr,newAttr:argsClone});
+			//把新加入的ajax變數當作this 傳到ajaxdo 做 extend加入 return deferred物件
+			return ajaxDo.apply(argsClone,newArr);
+		}
 	}
 	 
     _pri_split_chat = "#";
@@ -854,6 +901,7 @@ $(function(){
 		}
 		return this.toLocaleDateString(language);
 	}
+
 	padStringToTwoChar = function(d) {
 	    return (d < 10) ? '0' + d.toString() : d.toString();
 	}
@@ -1640,6 +1688,23 @@ $(function(){
 		}catch(e){
 			// cns.debug(e);	//必加, 一般瀏覽器require not defined
 		}
+    }
+
+    loadScript = function(filePath) {
+    	var pathArr = filePath.split('/');
+		var scriptName = pathArr[pathArr.length-1].split(".")[0];
+		var objName = scriptName.substring(0,1).toUpperCase() + scriptName.substring(1);
+		var deferred = $.Deferred();
+		    
+		if(typeof window[objName] == "undefined"){
+			$.get(filePath,function(){
+				deferred.resolve(objName);
+			});
+		}else{
+			deferred.resolve(objName);
+		}
+
+		return deferred.promise();
     }
 
 });

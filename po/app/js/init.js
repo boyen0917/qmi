@@ -1,3 +1,5 @@
+var ui,at,lang,gi;
+
 $(function(){
 
 	// ui = "227f07f2-71b7-49b9-b395-e10ca4d8c956";
@@ -150,7 +152,6 @@ $(function(){
 	$.ajaxSetup ({
 		timeout: 30000
 	});
-
 	
 	$(document).ajaxSend(function() {
 		//顯示 loading

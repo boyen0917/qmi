@@ -320,6 +320,12 @@
 	"ADDRESSBOOK_ADD" : "新增自定聯絡人",
 	"ADDRESSBOOK_CUSTOM" : "自定聯絡人",
 
-	"FILESHARING_TITLE" : "檔案共享"
+	"FILESHARING_TITLE" : "檔案共享",
+	"FILESHARING_CREATE_FOLDER" : "建立資料夾",
+	"FILESHARING_UPLOAD_FILE" : "上傳檔案",
+	"FILESHARING_ERR_MSG" : "已存在相同名稱的資料夾或檔案",
+	"FILESHARING_CREATE_SUCCESS" : "資料夾建立成功",
+	"FILESHARING_UPLOAD_SUCCESS" : "檔案上傳成功",
+	"FILESHARING_UPLOAD_OVERLIMIT" : "檔案大小超過限制"
 
 }
