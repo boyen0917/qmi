@@ -532,7 +532,6 @@ $(function(){
             case "fileSharing":
                 $(".subpage-fileSharing").show();
                 page_title = $.i18n.getString("GROUPSETTING_TITLE");
-
                 // var groupData = $.lStorage(ui)[gi];
                 // cns.debug("ti",groupData.ti_file);
                 // if(typeof groupData.ti_file == "undefined") {
@@ -540,14 +539,12 @@ $(function(){
                 //     return false;
                 // }
                 loadScript("js/fileSharing.js").done(function(){
-
                     var fsObj = new window[arguments[0]]();
                     
                     if(typeof fsObj.ti == "undefined"){
                         alert("這是開發階段 此團體無檔案共享的ti");
                         return false;
                     }
-
                     fsObj.getList();
                 });
                 //initGroupSetting(gi);

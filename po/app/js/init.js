@@ -172,7 +172,7 @@ $(function(){
 	
 
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
-		cns.debug("ajax error:",ajaxSettings);
+		// cns.debug("ajax error:",ajaxSettings);
 
 		//polling錯誤不關閉 為了url parse
 		if(!ajaxSettings.url.match(/sys\/polling/)){
@@ -294,7 +294,8 @@ $(function(){
 				return $.i18n.getString("COMMON_CHECK_NETWORK");
 			}
 		} catch(e){
-			cns.debug( e.message );
+			cns.debug("catch error", e.message );
+			return $.i18n.getString("COMMON_UNKNOWN_ERROR");
 		}
 	}
 

@@ -141,8 +141,7 @@ $(function(){
 				}
 				delete argsClone[paramArr[i]];
 			};
-
-			cns.debug("ajax args",{args:newArr,newAttr:argsClone});
+			// cns.debug("ajax args",{args:newArr,newAttr:argsClone});
 			//把新加入的ajax變數當作this 傳到ajaxdo 做 extend加入 return deferred物件
 			return ajaxDo.apply(argsClone,newArr);
 		}

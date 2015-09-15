@@ -2,6 +2,7 @@ var FileSharing = function(){
 	this.mainTi = $.lStorage(ui)[gi].ti_file;
 	this.listOrder = "append";
 	this.ti = this.mainTi;
+	this.activeItemData = "";
 
 	this.breadcrumb = [];
 	this.fileItemArr = [];
@@ -30,36 +31,59 @@ FileSharing.prototype = {
 		//unbind self and all children
 		$("section.fileSharing,section.fileSharing *").off();
 
+		$("section.fileSharing span.breadcrumb").niceScroll({
+			cursorcolor:"rgba(210, 210, 210, 0.4)", 
+			cursorwidth: '5',
+			cursorborderradius: '10px',
+			background: 'rgba(255,255,255,0)',
+			cursorborder:"",
+			boxzoom:false,
+			zindex: 999,
+			scrollspeed: 90,
+			mousescrollstep: 40
+		});
+
 		thisFileDom.find(".home").click(function(){
 			thisFile.ti = thisFile.mainTi;
 			thisFile.getList().done(thisFile.updateBreadcrumb.bind(thisFile));
 		});
 		
-		thisFileDom.find(".title .cl2 img").click(function(){
-			if($(this).hasClass("asc")){
+		thisFileDom.find(".title .cl2").click(function(){
+			var imgArrow = $(this).find("img");
+			if(imgArrow.hasClass("asc")){
 				thisFile.listOrder = "append";
-				$(this).removeClass("asc").addClass("desc");
+				imgArrow.removeClass("asc").addClass("desc");
 			}else{
 				thisFile.listOrder = "prepend";
-				$(this).removeClass("desc").addClass("asc");
+				imgArrow.removeClass("desc").addClass("asc");
 			}
-
+			
 			for(i=0;i<thisFile.fileItemArr.length;i++){
 				thisFile.fileItemArr[i].render(thisFileDom.find("section.list"),thisFile.listOrder);
 			}
 		});
 
-		thisFileDom.find("div.top img.more").click(thisFile.showMore.bind(thisFile));
+		thisFileDom.find(".top img.v-arrow").click(function(){
+			if($(this).hasClass("show")){
+				$(this).addClass("asc");
+				thisFile.showBreadcrumbMore();	
+			}
+		});
 
+		thisFileDom.find("section.breadcrumb-cover").click(function(){
+			thisFileDom.find(".top img.v-arrow").removeClass("asc");
+			$(this).hide();
+		});
+		//more功能
+		thisFileDom.find("div.top img.more").click(thisFile.showMore.bind(thisFile));
+		//檔案操作
 		thisFileDom.find("span.operator img").click(function(){
-			var name = $(this).attr("name");
-			var fi = thisFileDom.find("div.row.fs-active").data("fi");
-			thisFile[name](fi);
+			thisFile[$(this).attr("name")]();
 		});
 
 		//more
 		thisFileDom.find("section.file-cover").click(thisFile.showMore.bind(thisFile));
-		thisFileDom.find("section.file-cover ul li:eq(0)").click(thisFile.showMoreContent.bind(thisFile));
+		thisFileDom.find("section.file-cover ul li:eq(0)").click(thisFile.showGeneralPopup.bind(thisFile,$.i18n.getString("FILESHARING_CREATE_FOLDER"),"createFolder"));
         thisFileDom.find("section.file-cover ul li:eq(1)").click(thisFile.uploadFile.bind(thisFile));
 
 
@@ -67,7 +91,7 @@ FileSharing.prototype = {
 		generalDom.click(function(){event.stopPropagation()})
 		.find(".err-msg").html($.i18n.getString("FILESHARING_ERR_MSG")).end()
 		.find("button.cancel").html($.i18n.getString("COMMON_CANCEL")).click(thisFile.showMore.bind(thisFile)).end()
-		.find("button.submit").html($.i18n.getString("COMMON_OK")).click(thisFile.createFolder.bind(thisFile)).end()
+		// .find("button.submit").html($.i18n.getString("COMMON_OK")).click(thisFile.createFolder.bind(thisFile)).end()
 		.find("input").bind("input",function(){
 			var thisVal = $(this).val();
 			generalDom.find(".err-msg").css("opacity",0);
@@ -83,18 +107,46 @@ FileSharing.prototype = {
 		// 特別event
 		// 進入資料夾
 		thisFileDom.bind("goToFolder",function(event,itemData){
+			cns.debug("goToFolder",itemData);
 			// set ti
 			thisFile.ti = itemData.ti
 			thisFile.getList().done(thisFile.updateBreadcrumb.bind(thisFile,itemData));
 		});
 		// 下載
-		thisFileDom.bind("download",function(event,fi){
-			thisFile.download(fi);
+		thisFileDom.bind("download",function(){
+			thisFile.download();
 		});
+
+		thisFileDom.bind("setItemData",function(event,itemData){
+			thisFile.activeItemData = itemData;
+		});
+	},
+	showBreadcrumbMore: function() {
+		// var thisFile = this;
+		// var thisFileDom = $("section.fileSharing");
+		this.fileDom.find("section.breadcrumb-cover").show();
+		var moreDom = $("section.fileSharing ul.breadcrumb-more");
+		moreDom.find("li:not(:last-child)").remove();
+
+		var moreArr = this.breadcrumb.slice(0,this.breadcrumb.length-3);
+
+		for(i=0;i<moreArr.length;i++){
+			var liDom = $('<li><img src="images/fileSharing/folder_icon@2x.png"><span>'+ moreArr[i].fn +'</span></li>');
+			liDom.click(function(num){
+				cns.debug("moreArr",{moreArrI:moreArr,i:num});
+				this.fileDom.find("section.breadcrumb-cover").click().end()
+				.trigger("goToFolder",moreArr[num]);
+			}.bind(this,i));
+
+			moreDom.prepend(liDom);
+		}
 	},
 	updateBreadcrumb: function(itemData){
 		var $thisBreadcrumb = this.fileDom.find(".breadcrumb");
 		$thisBreadcrumb.html("");
+		// cns.debug("bcArr",this.breadcrumb);
+		//顯示more 箭頭
+		this.fileDom.find(".top img.v-arrow").removeClass("show");
 
 		if(typeof itemData != "undefined") {
 			var chk = false;
@@ -109,23 +161,25 @@ FileSharing.prototype = {
 			//新增路徑
 			if(chk === false) this.breadcrumb.push(itemData);
 
-			for(i=0;i<this.breadcrumb.length;i++){
-				var thisBc = this.breadcrumb[i];
+			//只顯示三個
+			var last3Arr = this.breadcrumb.slice(-3);
+			for(i=0;i<last3Arr.length;i++){
+				var thisBc = last3Arr[i];
 				var $thisPath = $("<span>").html(thisBc.fn);
 				$thisBreadcrumb.append(this.bcArrow).append($thisPath);
 
 				$thisPath.click(function(){
-
 					this.fsObj.ti = this.thisBc.ln.ti;
 					this.fsObj.getList();
 					this.fsObj.updateBreadcrumb(this.thisBc);
-
 				}.bind({fsObj:this,thisBc:thisBc}));
 			}
 		}else{
 			//首頁
 			this.breadcrumb = [];
 		}
+
+		if(this.breadcrumb.length > 3) this.fileDom.find(".top img.v-arrow").addClass("show");
 	},
 	showMore: function(){
 		var thisFile = this;
@@ -139,81 +193,80 @@ FileSharing.prototype = {
 			coverDom.show();
 		}
 	},
-	showMoreContent: function(title,action){
+	showGeneralPopup: function(title,action){
 		event.stopPropagation();
 		var thisFile = this,
 		coverDom = this.fileDom.find("section.file-cover");
-
-		coverDom.find("ul").hide();
-
-		if(coverDom.find(".general").length > 0) {
-			coverDom.find(".general").show().end()
-			.find(".loading").hide().end()
-			.find("input").val("");
+		coverDom.show().find("ul").hide().end()
+		.find("div.general .title").html(title).end()
+		.find("div.general").show().end()
+		.find("button.submit").unbind("click").click(thisFile.generalSubmitChk.bind(thisFile,action)).end()
+		.find("input").val("");
+	},
+	generalSubmitChk: function(action){
+		var name = this.fileDom.find("section.file-cover .general input").val();
+		if(this.fileDom.find("section.file-cover .err-msg").attr("opacity") == 1 ){
+			return false;
+		}else if (name.length == 0){
+			toastShow($.i18n.getString("FILESHARING_EMPTY_MSG"));
+			return false;
+		}else{
+			this[action](name);
 		}
-		
-		
 	},
 	createFolder: function(){
 		var thisFile = this;
 		var coverDom = thisFile.fileDom.find("section.file-cover");
 		var folderName = coverDom.find("input").val();
-		if(thisFile.fileDom.find("section.file-cover .err-msg").attr("opacity") == 1 ){
-			return false;
-		}else if (folderName.length == 0){
-			alert("shit");
-		}else{
-			thisFile.fileDom.find("section.file-cover").trigger("click");
-			var deferred = $.Deferred();
-			$.when(new AjaxTransfer().execute({
-				url: "groups/" + gi + "/files/",
+		thisFile.fileDom.find("section.file-cover").trigger("click");
+		var deferred = $.Deferred();
+		$.when(new AjaxTransfer().execute({
+			url: "groups/" + gi + "/files/",
+			method: "post",
+			body: {
+				tp: 10,
+				ti: thisFile.ti
+			},
+			error: function(data){
+				deferred.reject({response:data,api:1});
+			}
+		})).then(function(data){
+			console.debug("when data 1",data);
+			return (new AjaxTransfer().execute({
+				url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 				method: "post",
 				body: {
-					tp: 10,
-					ti: thisFile.ti
+					meta: {
+						tt: "",
+						tp: "09",
+						lv: 1
+					}, 
+					ml: [
+						{
+							fi: data.fi,
+							ftp: 1,
+							fn: folderName,
+							ln: { ti:data.ln.ti},
+							tp: 26 
+						}
+					]
 				},
-				load_show_chk: true,
 				error: function(data){
-					deferred.reject({response:data,api:1});
+					deferred.reject({response:data,api:2});
 				}
 			})).then(function(data){
-				console.debug("when data 1",data);
-				return (new AjaxTransfer().execute({
-					url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
-					method: "post",
-					body: {
-						meta: {
-							tt: "",
-							tp: "09",
-							lv: 1
-						}, 
-						ml: [
-							{
-								fi: data.fi,
-								ftp: 1,
-								fn: folderName,
-								ln: { ti:data.ln.ti},
-								tp: 26 
-							}
-						]
-					},
-					error: function(data){
-						deferred.reject({response:data,api:2});
-					}
-				})).then(function(data){
-					deferred.resolve(data);
-				});
+				deferred.resolve(data);
 			});
+		});
 
-			deferred.done(function(data){
-				cns.debug("成功喲",data);
-				toastShow($.i18n.getString("FILESHARING_CREATE_SUCCESS"))
-			}).fail(function(data){
-				cns.debug("fileSharing createFolder error ",data);
-			}).always(function(){
-				thisFile.getList();
-			});
-		}
+		deferred.done(function(data){
+			cns.debug("成功喲",data);
+			toastShow($.i18n.getString("FILESHARING_CREATE_SUCCESS"))
+		}).fail(function(data){
+			cns.debug("fileSharing createFolder error ",data);
+		}).always(function(){
+			thisFile.getList();
+		});
 	},
 	getList: function(){
 		var deferred = $.Deferred();
@@ -246,17 +299,23 @@ FileSharing.prototype = {
 
 		return deferred.promise();
 	},
-	download: function(fi){
+	download: function(){
 		new AjaxTransfer().execute({
-			url: "groups/" + gi + "/timelines/" + this.ti + "/files/" + fi + "/dl",
+			url: "groups/" + gi + "/timelines/" + this.ti + "/files/" + this.activeItemData.fi + "/dl",
 			method: "post",
 			complete: function(data){
 				if(data.status != 200) return false;
-
+				// alert("...");
 				var s3Data = JSON.parse(data.responseText);
 				if(typeof s3Data == "undefined") toastShow("檔案錯誤");
+				cns.debug("hoho",JSON.parse(data.responseText));
+				var dlData = JSON.parse(data.responseText);
+				var link = document.createElement('a');
+			    link.download = this.activeItemData.fn;
+			    link.href = dlData.s3;
+			    cns.debug("dlData.s3",dlData.s3);
+			    link.click();
 
-				window.location = JSON.parse(data.responseText).s3;
 			}.bind(this)
 		});
 	},
@@ -282,6 +341,9 @@ FileSharing.prototype = {
 		inputFileDom.off().on('change',function(e){
 			var fileData = $(this)[0].files[0];
 
+			//每次選擇完檔案 就reset input file
+			$(this).replaceWith( $(this).val('').clone( true ) );
+
 			// 大於100MB
 			if(fileData.size > 104857600) {
 				toastShow($.i18n.getString("FILESHARING_UPLOAD_OVERLIMIT"));
@@ -299,8 +361,9 @@ FileSharing.prototype = {
 			}
 
 			coverDom.addClass("disable");
-			thisFile.fileDom.find("ul").hide();
+			thisFile.fileDom.find("section.file-cover ul").hide();
 			var tp = 0;
+			var contentType = " ";
 
 		    switch(true){
 		      case fileData.type.match("image") instanceof Array:
@@ -308,9 +371,9 @@ FileSharing.prototype = {
 		        break;
 		      case fileData.type.match("video") instanceof Array:
 		        tp = 2;
+		        contentType = "video/mp4";
 		        break;
 		    }
-
 		    progressSectionDom.show();
 		    
 		    var deferred = $.Deferred();
@@ -331,7 +394,7 @@ FileSharing.prototype = {
 				return ($.ajax({
 					url: data.s3,
 					type: 'PUT',
-					contentType: " ",
+					contentType: contentType,
 				 	data: fileData, 
 					processData: false,
 					error: function(data){
@@ -357,12 +420,12 @@ FileSharing.prototype = {
 					body: {
 				    	ti: thisFile.ti, 
 				    	tp: tp,
-						mt: fileData.type,
+						mt: fileData.type || "text",
 						si: fileData.size,
 						md: {w:100,h:100,l:100}
 					},
 					error: function(data){
-						deferred.reject({response:data,api:"commit"});
+						deferred.reject({response:data,api:"commit",});
 					}
 				}));
 		    }).then(function(data){
@@ -394,11 +457,7 @@ FileSharing.prototype = {
 		    	deferred.resolve(data);
 		    });
 
-		    //每次選擇完檔案 就reset input file
-			$(this).replaceWith( $(this).val('').clone( true ) );
-
 		    deferred.done(function(data){
-				cns.debug("成功",data);
 				toastShow($.i18n.getString("FILESHARING_UPLOAD_SUCCESS"))
 			}).fail(function(data){
 				cns.debug("error ",data);
@@ -413,9 +472,67 @@ FileSharing.prototype = {
 
 	},
 	rename: function() {
-		
+		this.showGeneralPopup($.i18n.getString("FILESHARING_RENAME"),"renameExecute");
 	},
-	
+	renameExecute: function(name) {
+		var thisFile = this;
+		var oriFn = this.activeItemData.fn;
+		var newName = (this.activeItemData.ti === null) ? name + (oriFn.substring(oriFn.lastIndexOf("."))) : name;
+		var body = {
+				meta: {
+					tt: "",
+					tp: "08",
+					lv: 1
+				}, 
+				ml: [
+					{
+						fi: this.activeItemData.fi,
+						ftp: 0,
+						fn: newName,
+						si: 5566,
+						tp: 26 
+					}
+				]
+			};
+
+		//資料夾
+		if(this.activeItemData.ti !== null){
+			body.ml[0].ln = {
+				ti: this.activeItemData.ti
+			};
+			body.meta.tp = "09";
+		}
+
+		new AjaxTransfer().execute({
+			// /groups/{gi}/timelines/{ti}/events/{ei}
+			url: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
+			method: "post",
+			body: body,
+			complete: function(data){
+				thisFile.fileDom.find("section.file-cover").trigger("click")
+				this.getList();
+				if(data.status == 200) {
+					toastShow($.i18n.getString("USER_PROFILE_UPDATE_SUCC"));	
+				}
+			}.bind(this)
+		})
+	},
+	delete: function(){
+		new AjaxTransfer().execute({
+			// /groups/{gi}/timelines/{ti}/events/{ei}
+			url: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
+			method: "delete",
+			complete: function(data){
+				
+				if(data.status == 200) {
+					this.getList().done(function(){
+						toastShow($.i18n.getString("FILESHARING_DELETE_OK"));	
+					});
+					
+				}
+			}.bind(this)
+		})
+	},
 	api: function(){
 		//tool.js
 		new AjaxTransfer().execute(this);
@@ -424,7 +541,6 @@ FileSharing.prototype = {
 
 // Main Object
 var mainObj = {};
-
 
 //FileItem Object
 var FileItem = function(data){
@@ -486,8 +602,7 @@ FileItem.prototype = {
 			$thisItem.find(".cl1 img").attr("src",this.getFileIcon("folder")).end()
 			.find(".cl3").html("--");
 		}else{
-			$thisItem.data("fi",this.fi)
-			.find(".cl1 img").attr("src",this.getFileIcon(this.fn)).end()
+			$thisItem.find(".cl1 img").attr("src",this.getFileIcon(this.fn)).end()
 			.find(".cl3").html(this.fileSizeTrans(this.si));
 		}
 
@@ -504,19 +619,27 @@ FileItem.prototype = {
 		$thisItem.click(function(){
  			//folder
 			if(thisItemObj.ti != null){
-				$(this).addClass("fs-active");
-				thisFileDom.trigger("goToFolder",thisItemObj);
+				thisFileDom.find(".operator [name=download]").hide();
 			}else{
-				thisFileDom.find("div.row").removeClass("fs-active").end()
-				.find(".operator").show();
-				$(this).addClass("fs-active");
+				thisFileDom.find(".operator [name=download]").show();
 			}
+			// cns.debug("thisItemObj",thisItemObj);
+			thisFileDom.find("div.row").removeClass("fs-active").end()
+			.find(".operator").show();
+			$(this).addClass("fs-active");
+
+			thisFileDom.trigger("setItemData",thisItemObj);
+			
 		});
 
 		$thisItem.dblclick(function(){
-			//folder 不下載
-			if(thisItemObj.ti != null) return false;
-			thisFileDom.trigger("download",thisItemObj.fi);
+
+			if(thisItemObj.ti != null){
+				thisFileDom.trigger("goToFolder",thisItemObj);
+				// thisFileDom.trigger("setItemData",null);
+			}else{
+				thisFileDom.trigger("download");
+			}
 		});
 	},
 

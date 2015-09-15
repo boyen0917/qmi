@@ -4995,9 +4995,9 @@ div.user-info-submit-ready:active {
 
 section.fileSharing { min-width: 550px; position: relative; z-index: 101;;;; }
 section.fileSharing .top-fixed {  position: fixed; left: 0; z-index: 10; top: 43px; width: 100%; }
-section.fileSharing .top { border-bottom: 2px solid #ccc; background: white; margin-left: 250px; line-height: 40px;}
+section.fileSharing .top { border-bottom: 2px solid #ccc; background: white; margin-left: 250px; height: 40px;}
 section.fileSharing .top img { cursor: pointer; }
-section.fileSharing .top img.home { width: 30px; margin: 5px 15px; position: absolute; }
+section.fileSharing .top > img.home { width: 27px; margin: 7px 12px; position: absolute; }
 section.fileSharing .top img.more {
 	width: 30px;
 	margin: 7px 10px;
@@ -5007,21 +5007,36 @@ section.fileSharing .top img.more {
 	z-index: 10;
 }
 
-section.fileSharing .top .breadcrumb {
-    width: calc(100% - 240px);
-    display: inline-block;
-    margin-left: 45px;
-    overflow: scroll;
+section.fileSharing .top img.v-arrow {
+    position: relative;
+    width: 10px;
+    height: 6px;
+    top: 9px;
     vertical-align: top;
-    white-space: nowrap;
+    margin: 10px 5px;
+    padding: 0;
+    left: 33px;
+    opacity: 0;
 }
 
-section.fileSharing .top .breadcrumb img { width: 30px; display: inline-block; vertical-align: middle; }
-section.fileSharing .top .breadcrumb span { position: relative;top: 2px;color: #666;cursor: pointer; }
-section.fileSharing .top .operator { display: inline-block; width: 140px; text-align: right;}
-section.fileSharing .top .operator img { width: 27px;vertical-align: middle}
+section.fileSharing .top .breadcrumb {
+    width: calc(100% - 240px);
+    position: relative;
+    top: 0px;
+    font-size: 13px;
+    white-space: nowrap;
+    height: 40px;
+    line-height: 33px;
+    display: inline-block;
+    left: 22px;
+}
+
+section.fileSharing .top .breadcrumb img { width: 25px; vertical-align: bottom;; }
+section.fileSharing .top .breadcrumb span {cursor: pointer;display: inline-block;/* right: 3px; */color: #666;position: relative;top: 4px; }
+section.fileSharing .top .operator { display: inline-block; text-align: right; width: 140px; vertical-align: top; position: relative; top: 8px; left: 20px;;;;;}
+section.fileSharing .top .operator img { width: 25px;vertical-align: middle}
 section.fileSharing .top .operator img:not(:last-child) { margin-right: 5px}
-section.fileSharing .file-cover {
+section.fileSharing .file-cover,section.fileSharing .breadcrumb-cover {
     position: fixed;
     top: 0;
     width: 100vw;
@@ -5029,6 +5044,42 @@ section.fileSharing .file-cover {
     right: 0;
     z-index: 10;
     display: none;
+}
+section.fileSharing .top img.v-arrow.show { opacity: 1 }
+section.fileSharing ul.breadcrumb-more {
+    background-color: white;
+    position: absolute;
+    border-radius: 3px;
+    box-sizing: border-box;
+    cursor: pointer;
+    left: 265px;
+    box-shadow: 1px 3px 12px 1px #999;
+    top: 65px;
+    transition: 0.3s;
+    padding: 0;
+    overflow: scroll;
+    max-width: 200px;
+    max-height: 300px;
+}
+section.fileSharing ul.breadcrumb-more li img { display: inline-block; width: 27px; vertical-align: bottom;;;;;; }
+section.fileSharing ul.breadcrumb-more li span { 
+	display: inline-block; 
+	position: relative; 
+	top: 10px; 
+	left: 10px; 
+	max-width: 130px;  
+	margin-right: 25px; 
+	text-overflow: ellipsis; 
+	white-space: nowrap;
+	overflow: hidden;
+}
+section.fileSharing ul.breadcrumb-more li:hover { background: rgb(240,240,240); }
+section.fileSharing ul.breadcrumb-more li {
+    list-style: none;
+    padding-left: 10px;
+    height: 50px;
+    line-height: 29px;;;
+	
 }
 
 section.fileSharing .file-cover ul {
@@ -5081,10 +5132,11 @@ section.fileSharing .file-cover .general {
 }
 
 section.fileSharing .file-cover .general .title {
-    /* padding-left: 15px; */
     font-size: 18px;
     padding-top: 15px;
-    margin-bottom: 17px;}
+    margin-bottom: 17px;
+}
+section.fileSharing .title .cl2 { cursor: pointer; }
 section.fileSharing .file-cover .general .input-area input:focus { outline: none;}
 section.fileSharing .file-cover .general .input-area input {
     border: 0;
@@ -5121,7 +5173,6 @@ section.fileSharing .top .file-cover .general {
 	height: 140px;
 	border-radius: 3px;
 	margin: 100px auto;
-
 }
 
 section.fileSharing .cl1{ width: 55%; display: inline-block; }
@@ -5129,7 +5180,7 @@ section.fileSharing .cl2{ display: inline-block; }
 section.fileSharing .cl3{ width: 85px; overflow: hidden; text-overflow: ellipsis; position: absolute; right: 0px;; }
 
 section.fileSharing .title .cl1 { position: relative;left: 15px; }
-section.fileSharing .title .cl2 img {
+section.fileSharing img.v-arrow {
     width: 13px;
     height: 7px;
     position: relative;
@@ -5140,7 +5191,7 @@ section.fileSharing .title .cl2 img {
     transition: 0.3s;  
 }
 
-section.fileSharing .title .cl2 img.asc {
+section.fileSharing img.v-arrow.asc {
     transform: rotateX(-180deg);
     top: 6px;
 }
@@ -5158,7 +5209,7 @@ section.fileSharing section.list .row {
 
 section.fileSharing section.list .row.fs-active { background: #EEF8FF }
 
-section.fileSharing section.list img.icon { width: 40px; margin: 5px 10px 0; float: left;}
+section.fileSharing section.list img.icon { width: 30px; margin: 8px 10px 0; float: left;}
 section.fileSharing section.list .cl1 { min-width: 300px; white-space: nowrap;;}
 section.fileSharing section.list .cl1 span {
     width: 80%;
