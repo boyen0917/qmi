@@ -44,33 +44,6 @@ $(function(){
     	}
 	}
 
-	// setGroupList = function(){
- //        var _uiGroupList = $.lStorage(ui) || {};
-
-	// 	$.each($.lStorage("_groupList"),function(i,gl_obj){
-	// 		if(!$.lStorage(ui)[gl_obj.gi]){
-	// 			gl_obj.guAll = {};
-	// 			gl_obj.gu = gl_obj.me;
-
-	// 			$.each(gl_obj.tl,function(i,val){
-	// 	    		if(val.tp == 1){
-	// 	    			gl_obj.ti_cal = val.ti;
-	// 	    		}else if(val.tp == 2){
-	// 	    			gl_obj.ti_feed = val.ti;
-	// 	    		}else{
-	// 	    			gl_obj.ti_chat = val.ti;
-	// 	    		}
-	// 	    	});
-	// 	    	_uiGroupList[gl_obj.gi] = gl_obj;
-	// 		} else if(gl_obj.ad) {
- //                //update admin value
- //                _uiGroupList[gl_obj.gi].ad = gl_obj.ad;
- //            }
-	// 	});	
- //        $.lStorage(ui,_uiGroupList);
- //        updateTab(gi);
-	// }
-
 	logout = function(){
 		var api_name = "logout";
         var headers = {
@@ -437,8 +410,7 @@ $(function(){
 
                 //polling 數字重寫
 
-                if($.lStorage("_pollingData"))
-                    pollingCountsWrite();
+                if($.lStorage("_pollingData")) pollingCountsWrite();
                 updatePollingCnts( $(".sm-small-area[data-sm-act=feeds]").find(".sm-count"), "A1" );
                 updatePollingCnts( filterAction.filter("[data-status=all]").find(".sm-count"), "B1" );
 
@@ -7272,7 +7244,6 @@ $(function(){
                         break;
                     case 10://group info edit
                         if( $.lStorage(ui).hasOwnProperty(val.pm.gi) ){
-                            console.debug("uoyoyoyouoiuioo");
                             setGroupAllUser(null,val.pm.gi, function(this_gi){
                                 if(gi==this_gi){
                                     var tmp = $(".sm-small-area:visible");

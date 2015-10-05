@@ -213,7 +213,6 @@ $(function(){
         }
 
         $.lStorage(ui, userData);
-
         updateTab( this_gi );
     }
 
@@ -257,70 +256,43 @@ $(function(){
             errorReport(e);
             return;
         }
-
+        
         try{
+            var tabHtml = '<div class="sm-small-area"><div class="sm-small-area-r"></div></div>';
+
             //set tabs
-            var menu = $(".header-menu");
-            menu.find(".sm-small-area").hide();
-            for( var i in groupData.tab ){
-                var obj = groupData.tab[i];
-                var dom = null;
-                switch( obj.tp ){
-                    case 0: //團體動態
-                        dom = menu.find(".sm-small-area[data-sm-act=feed-public]");
-                        break;
-                    case 1: //成員動態
-                        dom = menu.find(".sm-small-area[data-sm-act=feed-post]");
-                        break;
-                    case 2: //動態消息
-                        dom = menu.find(".sm-small-area[data-sm-act=feeds]");
-                        break;
-                    case 3: //聊天室
-                        dom = menu.find(".sm-small-area[data-sm-act=chat]");
-                        break;
-                    case 4: //行事曆
-                        break;
-                    case 5: //相簿
-                        break;
-                    case 6: //成員列表
-                        dom = menu.find(".sm-small-area[data-sm-act=memberslist]");
-                        break;
-                    case 7: //團體設定
-                        dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
-                        break;
-                    case 9: //團體通訊錄
-                        dom = menu.find(".sm-small-area[data-sm-act=addressBook]");
-                        break;
-                }
-                if( dom ){
-                    //switch
-                    if( obj.sw ) {
-                        dom.detach();
-                        menu.append( dom );
-                        dom.show();
-                        //set name
-                        var nameDom = dom.find(".sm-small-area-r");
-                        if( obj.nm && obj.nm.length>0 ){
-                            nameDom.html( obj.nm );
-                        } else {
-                            nameDom.html( $.i18n.getString(nameDom.attr("data-textid")) );
-                        }
+            var menu = $(".header-menu").html("");
+            cns.debug("groupData.tab",groupData.tab);
+            for( i=0;i<groupData.tab.length;i++ ){
+                var tabObj = groupData.tab[i];
+                //switch off
+                if( tabObj.sw === false || typeof initTabMap[tabObj.tp] === "undefined") continue;
+                
+                var tabDom = $(tabHtml);
+                tabDom.attr("data-sm-act",initTabMap[tabObj.tp].act);
+                //tab 對照表 init.js
+                //initTabMap
+                if(initTabMap[tabObj.tp].hasOwnProperty("class")){
+                    for(j=0;j<initTabMap[tabObj.tp].class.length;j++){
+                        tabDom.addClass(initTabMap[tabObj.tp].class[j]);    
                     }
-                    // else {
-                    //     dom.hide();
-                    // }
+                    tabDom.attr("data-polling-cnt",initTabMap[tabObj.tp].pollingType)
+                    .append('<div class="sm-count" style="display:none;"></div>');
+                }
+                menu.append( tabDom );
+
+                //set name
+                var nameDom = tabDom.find(".sm-small-area-r");
+                if( tabObj.nm && tabObj.nm.length>0 ){
+                    nameDom.html( tabObj.nm );
+                } else {
+                    cns.debug("yoyo");
+                    nameDom.html( $.i18n.getString(initTabMap[tabObj.tp].textId) );
                 }
             }
         } catch(e){
             errorReport(e);
-            //cns.debug("[!] setTabList(set tab): " + e.message);
         }
-
-        //暫時先將檔案共享顯示
-        $fsDom = menu.find(".sm-small-area[data-sm-act=fileSharing]");
-        $fsDom.detach();
-        menu.append( $fsDom );
-        $fsDom.show();
 
         //檢查團體設定裡有沒有開放的設定, 都沒有隱藏設定tab
         if( false==initGroupSetting(this_gi) ){
@@ -330,54 +302,30 @@ $(function(){
 
         //set pen
         try{
-            //set tabs
-            var menu = $(".feed-compose-area");
-            menu.find(".fc-area-subbox").removeClass("active");
+            var penHtml = '<div class="fc-area-subbox"><img class="fc-icon-size"/><div name="func-name"></div></div>';
+            //set pen
+            var menu = $(".feed-compose-area").html("");
             var isPostData = false;
             for( var i in groupData.pen ){
-                var obj = groupData.pen[i];
-                var dom = null;
-                switch( obj.tp ){
-                    case 0: //公告
-                        dom = menu.find(".fc-area-subbox[data-fc-box=announcement]");
-                        break;
-                    case 1: //通報
-                        dom = menu.find(".fc-area-subbox[data-fc-box=feedback]");
-                        break;
-                    case 2: //工作
-                        dom = menu.find(".fc-area-subbox[data-fc-box=work]");
-                        break;
-                    case 3: //投票
-                        dom = menu.find(".fc-area-subbox[data-fc-box=vote]");
-                        break;
-                    case 4: //成員定位
-                        dom = menu.find(".fc-area-subbox[data-fc-box=check]");
+                var penObj = groupData.pen[i];
+                //switch關閉或是init沒設定這個tp 就跳過
+                if(penObj.switch === false || typeof initPenMap[penObj.tp] === "undefined") continue;
+                var penDom = $(penHtml);
 
-                        //成員定位尚未有功能, 有顯示的話先disabled掉
-                        // dom.addClass("disabled");
-                        break;
-                    case 5: //貼文
-                        dom = menu.find(".fc-area-subbox[data-fc-box=post]");
-                        isPostData = true;
-                        break;
-                }
-                if( dom ){
-                    //switch
-                    if( obj.sw ) {
-                        dom.detach();
-                        menu.append( dom );
-                        dom.addClass("active");
-                        //set name
-                        var nameDom = dom.find("div");
-                        if( obj.nm && obj.nm.length>0 ){
-                            nameDom.html( obj.nm );
-                        } else {
-                            nameDom.html( $.i18n.getString(nameDom.attr("data-textid")) );
-                        }
-                    }
-                    // else {
-                    //     dom.hide();
-                    // }
+                //fc-box & 圖片
+                penDom.attr("data-fc-box",initPenMap[penObj.tp].fcBox)
+                .find("img").attr("src","images/icon/icon_compose_" + initPenMap[penObj.tp].imgNm + ".png");
+
+                menu.append( penDom );
+                penDom.addClass("active");
+                //set name
+                var nameDom = penDom.find("div[name=func-name]");
+                if( penObj.nm && penObj.nm.length>0 ){
+                    cns.debug("penObj",penObj)
+                    nameDom.html( penObj.nm );
+                } else {
+                    cns.debug("tp: "+penObj+" ; textId: "+initPenMap[penObj.tp].textId);
+                    nameDom.html( $.i18n.getString(initPenMap[penObj.tp].textId) );
                 }
             }
             //如果沒有筆資料預設打開

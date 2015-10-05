@@ -8,14 +8,14 @@ $(function(){
 
 	//api 網址
 	// base_url = "https://mapserver.mitake.com.tw/apiv1/";
- 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	base_url = "https://apserver.mitake.com.tw/apiv1/";
 	//base_url = "http://10.1.17.116:8090/apiv1/";
  	// base_url = "https://caprivateeim.mitake.com.tw/apiv1/";
 
  	gi = null;
 
  	//HiCloud
- 	base_url = "https://ap.qmi.emome.net/apiv1/";
+ 	// base_url = "https://ap.qmi.emome.net/apiv1/";
 
 	//local測試 預設開啟console
 	debug_flag = false;
@@ -138,6 +138,83 @@ $(function(){
 
 	//更新鈴鐺間距
 	update_alert_interval = 10000;
+
+	//tab對照表
+	initTabMap = {
+		0:{	
+			act: "feed-public",
+			textId: "LEFT_FEED_GROUP"
+		},
+		1:{	
+			act: "feed-post",
+			textId: "LEFT_FEED_MEMBER"
+		},
+		2:{	
+			act: "feeds",
+			textId: "LEFT_FEED",
+			class: ["polling-cnt","polling-local"],
+			pollingType: "A1"
+		},
+		3:{	
+			act: "chat",
+			textId: "LEFT_CHAT",
+			class: ["polling-cnt","polling-local"],
+			pollingType: "A3"
+		},
+		6:{	
+			act: "memberslist",
+			textId: "LEFT_MEMBER",
+			class: ["polling-cnt","polling-local"],
+			pollingType: "A2"
+		},
+		7:{	
+			act: "groupSetting",
+			textId: "GROUPSETTING_TITLE"
+		},
+		9:{	
+			act: "addressBook",
+			textId: "ADDRESSBOOK_TITLE"
+		},
+		10:{	
+			act: "fileSharing",
+			textId: "FILESHARING_TITLE"
+		}
+	}
+
+	//pen對照表
+	initPenMap = {
+		0:{	
+			fcBox: "announcement",
+			textId: "FEED_BULLETIN",
+			imgNm: "bulletin"
+		},
+		1:{	
+			fcBox: "feedback",
+			textId: "FEED_REPORT",
+			imgNm: "report"
+		},
+		2:{	
+			fcBox: "work",
+			textId: "FEED_TASK",
+			imgNm: "task"
+		},
+		3:{	
+			fcBox: "vote",
+			textId: "FEED_VOTE",
+			imgNm: "vote"
+		},
+		4:{	
+			fcBox: "check",
+			textId: "FEED_LOCATION",
+			imgNm: "location"
+		},
+		5:{	
+			fcBox: "post",
+			textId: "FEED_POST",
+			imgNm: "post"
+		}
+	}
+
 
 	//title
 	g_Qmi_title = "Qmi";

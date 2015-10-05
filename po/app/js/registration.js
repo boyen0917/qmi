@@ -354,6 +354,10 @@ onCheckVersionDone = function(needUpdate){
 		getGroupList(login_result.ui,login_result.at).complete(function(data){
 			if(data.status == 200){
 
+				// cns.debug("group list",$.parseJSON(data.responseText));
+				// cns.debug("login data",login_result);
+				// return false;
+				
 				ui = login_result.ui;
 				at = login_result.at;
 
