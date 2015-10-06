@@ -322,5 +322,16 @@
 	"ADDRESSBOOK_ADD" : "Add custom address book",
 	"ADDRESSBOOK_CUSTOM" : "Custom address book",
 
-	"FILESHARING_TITLE" : "FileSharing"
+	"FILESHARING_TITLE" : "FileSharing",
+	"FILESHARING_CREATE_FOLDER" : "create folder",
+	"FILESHARING_UPLOAD_FILE" : "upload file",
+	"FILESHARING_ERR_MSG" : "file/folder name has already existed",
+	"FILESHARING_EMPTY_MSG" : "name is required",
+	"FILESHARING_CREATE_SUCCESS" : "create successful",
+	"FILESHARING_UPLOAD_SUCCESS" : "upload successful",
+	"FILESHARING_UPLOAD_OVERLIMIT" : "file size limit exceeded",
+	"FILESHARING_RENAME" : "rename",
+	"FILESHARING_DELETE_OK" : "delete successful",
+	"FILESHARING_HOME" : "home",
+	"COMMON_UNKNOWN_ERROR" : "unknown error"
 }

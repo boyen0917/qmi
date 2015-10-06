@@ -321,10 +321,8 @@ $(function(){
                 //set name
                 var nameDom = penDom.find("div[name=func-name]");
                 if( penObj.nm && penObj.nm.length>0 ){
-                    cns.debug("penObj",penObj)
                     nameDom.html( penObj.nm );
                 } else {
-                    cns.debug("tp: "+penObj+" ; textId: "+initPenMap[penObj.tp].textId);
                     nameDom.html( $.i18n.getString(initPenMap[penObj.tp].textId) );
                 }
             }

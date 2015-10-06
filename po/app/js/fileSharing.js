@@ -337,7 +337,6 @@ FileSharing.prototype = {
 		var inputFileDom = thisFile.fileDom.find("input[type=file]");
 
 		inputFileDom.trigger("click");
-
 		inputFileDom.off().on('change',function(e){
 			var fileData = $(this)[0].files[0];
 
@@ -375,7 +374,6 @@ FileSharing.prototype = {
 		        break;
 		    }
 		    progressSectionDom.show();
-		    
 		    var deferred = $.Deferred();
 		    var fiApiData = {};
 		    $.when(new AjaxTransfer().execute({
@@ -389,7 +387,7 @@ FileSharing.prototype = {
 					deferred.reject({response:data,api:1});
 				}
 			})).then(function(data){
-				cns.debug("upload to s3 data",data);
+				console.debug("upload to s3 data",data);
 				fiApiData = data;
 				return ($.ajax({
 					url: data.s3,
@@ -460,7 +458,7 @@ FileSharing.prototype = {
 		    deferred.done(function(data){
 				toastShow($.i18n.getString("FILESHARING_UPLOAD_SUCCESS"))
 			}).fail(function(data){
-				cns.debug("error ",data);
+				console.debug("error ",data);
 			}).always(function(){
 				coverDom.removeClass("disable").trigger("click").end()
 				.find("ul").show();
