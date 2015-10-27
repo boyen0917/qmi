@@ -33,42 +33,8 @@ $(function(){
 		}else{
 
 			//設定目前團體
-			setThisGroup(_loginData.dgi);
+			setGroupInitial(_loginData.dgi);
 
-			//sidemenu user
-        	setSmUserData(gi,gu,gn);
-
-			//header 設定團體名稱
-	    	$(".header-group-name div:eq(1)").html(gn);
-	    	
-	    	
-	    	//做團體列表
-	    	groupMenuListArea();
-
-	    	//top event
-	    	topEvent();
-
-	    	//檢查官方帳號
-            initOfficialGroup( gi );
-
-            //重新設定功能選單
-	        updateTab(gi);
-
-	        // console.debug("ui",JSON.stringify($.lStorage(ui)));
-
-
-	    	//動態消息
-	    	//timelineListWrite();
-	    	setTimeout(function(){
-		    	var tmp = $(".sm-small-area:not(.setting):visible");
-				if( tmp.length>0 ){
-					$(tmp[0]).addClass("active");
-					timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
-				}
-				else{
-					timelineSwitch("feeds",true);
-				}
-	    	},1000);
 		}
 
 		//執行polling
@@ -1889,6 +1855,9 @@ $(function(){
 
 	$(document).on("mouseup",".namecard",function(e){
 		e.stopPropagation();
+		//temp
+		if($(document).data("official") == true) return false;
+
 		$(document).data("namecard-pos",$(window).scrollTop());
 		$(window).scrollTop(0);
 		// $(".user-info-load-area").css("top",$(window).scrollTop());

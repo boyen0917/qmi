@@ -777,24 +777,40 @@ onCheckVersionDone = function(needUpdate){
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
         	cns.debug("傳送驗證碼後的 data:",data);
+        	//default
+			$(".resend-otp").removeClass("resend-otp-ready");
+
         	if(resend){
         		//popupShowAdjust("","驗證碼已重新送出");
-				
-                s_load_show = false;
-                $('.ui-loader').hide();
-                $(".ajax-screen-lock").hide();
-        		toastShow( $.i18n.getString("REGISTER_AUTH_SMS_HAS_SENT") );
-        		
+				if(data.status == 200){
+	                s_load_show = false;
+	                $('.ui-loader').hide();
+	                $(".ajax-screen-lock").hide();
+	        		toastShow( $.i18n.getString("REGISTER_AUTH_SMS_HAS_SENT") );
+        		}
 			}else if(data.status == 200){
 				$(".register-otp-desc-area div").html($(document).data("phone-id"));
 				//default
-				$(".resend-otp").removeClass("resend-otp-ready");
+
+				$(".register-otp-input input").val("");
 				$.mobile.changePage("#page-register-otp");
+			}else{
+				var str = "unknown error";
+				try {
+					str = JSON.parse(data.responseText).rsp_msg;
+				} catch(e){
+					cns.debug( e.message );
+
+				}
+
+				toastShow( str );
 			}
         });
 	}
 
 	activateStep1 = function(){
+		var otpCode = $(".register-otp-input input").val();
+
 		var api_name = "activation/step1";
         var headers = {
                  "li":lang,
@@ -816,7 +832,7 @@ onCheckVersionDone = function(needUpdate){
 					if(jqXHR.responseText){
 						var tmp = $.parseJSON(jqXHR.responseText);
 						if( 900==tmp.rsp_code ){
-			        		popupShowAdjust("",tmp.rsp_msg,true,true,[onRewriteRegitration,null]);
+			        		popupShowAdjust("",tmp.rsp_msg,true,true,[onRewriteRegitration,otpCode]);
 			        	} else {
 	    					popupShowAdjust("",tmp.rsp_msg,true);
 			        	}
@@ -834,6 +850,10 @@ onCheckVersionDone = function(needUpdate){
 
         	//清除db
         	resetDB();
+        	$(".register-otp-input input").val("");
+
+        	$(".register-otp-input input").trigger("input");
+        	$(".resend-otp").addClass("resend-otp-ready");
 
         	if(data.status == 200){
         		cns.debug("跳到 #page-password");//"hash+#page-password"
@@ -841,13 +861,12 @@ onCheckVersionDone = function(needUpdate){
         	}else{
         		// var parseJSON = $.parseJSON(data.responseText);
         		// $(".register-otp-input input").val("");
-        		// $(".register-otp-input input").trigger("input");
-        		// $(".resend-otp").addClass("resend-otp-ready");
+        		
         	}
         });
 	}
 
-	onRewriteRegitration = function(){
+	onRewriteRegitration = function(otpCode){
 		var api_name = "activation/unbind";
         var headers = {
                  "li":lang,
@@ -855,7 +874,8 @@ onCheckVersionDone = function(needUpdate){
         var method = "post";
         var body = {
             id: $(document).data("phone-id"),
-            ud: $(document).data("device-token")
+            ud: $(document).data("device-token"),
+            vc: otpCode
         }
         
         var result = ajaxDo(api_name,headers,method,true,body);
