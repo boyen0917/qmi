@@ -262,7 +262,6 @@ $(function(){
 
             //set tabs
             var menu = $(".header-menu").html("");
-            cns.debug("groupData.tab",groupData.tab);
             for( i=0;i<groupData.tab.length;i++ ){
                 var tabObj = groupData.tab[i];
                 //switch off
@@ -286,7 +285,6 @@ $(function(){
                 if( tabObj.nm && tabObj.nm.length>0 ){
                     nameDom.html( tabObj.nm );
                 } else {
-                    cns.debug("yoyo");
                     nameDom.html( $.i18n.getString(initTabMap[tabObj.tp].textId) );
                 }
             }

@@ -1104,6 +1104,7 @@ $(function(){
                 return;
             }
 
+
             //-- set tabs --
             // var menu = $(".header-menu");
             // menu.find(".sm-small-area").hide();
@@ -1123,9 +1124,12 @@ $(function(){
             // dom.show();
             // menu.append( dom );
 
-
             //set filters
             $(".st-filter-area").hide();
+
+            //temp
+            // $("#page-group-main .st-feedbox-area .namecard").addClass
+            $("#page-group-main .header-menu [data-sm-act]:not([data-sm-act=feeds])").hide();
 
             //admin
             if( groupData.ad==1 ){
@@ -1134,6 +1138,7 @@ $(function(){
                 $(".st-feedbox-area").addClass("official-admin-adjust");
                 $(".sm-small-area[data-sm-act=chat]").removeClass("official-general");
             } else{
+
                 $(".feed-compose").hide();
                 $(".official.admin").hide();
                 $(".official.general").show();
@@ -3484,7 +3489,7 @@ $(function(){
                                 '<div class="obj-user-title"></div>' +
                         '</div>'
                     );
-                    if( isShowNamecard ) this_obj.find(".obj-cell-user-pic").addClass("namecard");
+                    if( isShowNamecard ) this_obj.find(".obj-cell-user-pic").addClass("namecard").data("gi",giTmp);
 
                     var branchID = mem.bl;
                     var extraContent = "";  //mem.em;
@@ -4547,13 +4552,17 @@ $(function(){
 	
 	groupMenuListArea = function (new_gi,invite){
         
-        if(new_gi) s_load_show = true;    
-        
+        // if(new_gi) s_load_show = true;    
     	getGroupList().complete(function(data){
+            
             if(data.status != 200){
-                console.debug("getGroupList return ", data.status);
+                $(".sm-loading").show();
+                //沒選單就重撈
+                setTimeout(groupMenuListArea.bind(this,new_gi,invite),1000);
                 return false;
             }
+
+            $(".sm-loading").hide();
 
             var parse_data = $.parseJSON(data.responseText);
             if( !parse_data ){
@@ -7416,7 +7425,7 @@ $(function(){
             
             if(this_user_info.isNewMem==null) this_user_info.isNewMem = false; 
             var api_name = "groups/" + this_user_info.gi + "/users/" + this_user_info.gu;
-            
+            cns.debug("mom im here",api_name);
 	        var headers = {
 	                 "ui":ui,
 	                 "at":at,
@@ -7425,6 +7434,7 @@ $(function(){
 	        var method = "get";
 	                         
 	        ajaxDo(api_name,headers,method,load_show_chk,false,false,true).complete(function(data){
+                cns.debug("user info result",data);
 	        	if(data.status == 200){
 
 	        		var user_data = $.parseJSON(data.responseText);
@@ -8566,29 +8576,6 @@ $(function(){
         var file = area.find(".gmc-file");
         file.replaceWith( file.clone(true) );
     }
-
-    //反過來 點選四次 關閉
-    supriseKey = function(){
-    	var suprise = $(document).data("suprise") || 0;
-		if(suprise < 100){
-			if(suprise != 0 || suprise == 3) clearTimeout(suprise_timer);
-
-			if(suprise == 3){
-				$(document).data("suprise",100);
-				pollingInterval(true);
-				return false;
-			}
-			suprise++;
-			$(document).data("suprise",suprise);
-
-			
-			suprise_timer = setTimeout(function(){
-				$(document).data("suprise",0);
-			},300);
-		}else{
-			pollingInterval(true);
-		}
-    };
 
     showFeedboxNoContent = function( isShow ){
         if( isShow ){

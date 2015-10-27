@@ -8,20 +8,21 @@ $(function(){
 
 	//api 網址
 	// base_url = "https://mapserver.mitake.com.tw/apiv1/";
- 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
 	//base_url = "http://10.1.17.116:8090/apiv1/";
  	// base_url = "https://caprivateeim.mitake.com.tw/apiv1/";
 
  	gi = null;
 
  	//HiCloud
- 	// base_url = "https://ap.qmi.emome.net/apiv1/";
+ 	base_url = "https://ap.qmi.emome.net/apiv1/";
 
 	//local測試 預設開啟console
 	debug_flag = false;
 	if(window.location.href.match(/localhost/)) {
 		debug_flag = true;
 		//base_url = "https://capubliceim.mitake.com.tw/apiv1/";
+		base_url = "https://apserver.mitake.com.tw/apiv1/";
 	}
 	if(window.location.href.match(/wp.qmi.emome.net/)) {
 		base_url = "https://ap.qmi.emome.net/apiv1/";
@@ -32,13 +33,11 @@ $(function(){
 	} else if(window.location.href.match(/eim.mic.org.tw/)) {
 		base_url = "https://eim.mic.org.tw/apiv1/";
 	}
-
 	
 	if( window.location.href.match(/main.html/) ){
 		var tmp = localStorage["uiData"];
 		if( tmp ) $.lStorage("UXXX",$.parseJSON(tmp));
 	}
-	
 	
 	//國碼
 	countrycode = "+886";

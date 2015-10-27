@@ -79,10 +79,10 @@ $(function(){
 	}
 
 	//test
-	$(".header-group-name").click(function(){
+	$(".currentGroup").click(function(){
 		// $(".st-feedbox-area ").animate({bottom:"125px"});
-		//彩蛋鑰匙
-		supriseKey();
+		// 彩蛋鑰匙
+		// window.sidemenuChk = true;
 	});
 
 	$(".page-group-name").click(function(){
@@ -1944,7 +1944,7 @@ $(function(){
 				showGroupInfoPage();
 				break;
 			case "chat":
-				$(".sm-small-area[data-sm-act=chat]").trigger("click");
+				// $(".sm-small-area[data-sm-act=chat]").trigger("click");
 				break;
 			case "setting":
 				$(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
@@ -1953,10 +1953,10 @@ $(function(){
 				$(".contact-add").trigger("click");
 				break;
 			case "share":
-				cns.debug("share");
+				// cns.debug("share");
 				break;
 			case "cnt":
-				$(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+				// $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
 				break;
 		}
 	});
