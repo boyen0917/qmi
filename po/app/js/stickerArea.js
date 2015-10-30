@@ -346,7 +346,6 @@ var initStickerArea= {
 	load: function(callback) {
 		var thisTmp = this;
 		try{
-			var thisTmp = this;
 			thisTmp.getStickerListApi().complete(function(data){
 	        	if(data.status == 200){
 	        		var obj = $.parseJSON(data.responseText);
@@ -493,14 +492,22 @@ var initStickerArea= {
 			    			return -1;
 			    		}
 		    		});
-		    		// for( var i=0; i<detailData.sl.length; i++ ){
-		    		// 	thisTmp.splDict[spi].list[detailData.sl[i].sid] = detailData.sl[i];
-		    		// }
+
+		    		//另存detail
+		    		var _stickerDetail = $.lStorage("_stickerDetail") || {};
+		    		for( var i=0; i<detailData.sl.length; i++ ){
+		    			var thisStkr = detailData.sl[i];
+		    			_stickerDetail[thisStkr.sid] = thisStkr;
+		    		}
+
+		    		$.lStorage("_stickerDetail",_stickerDetail);
+
 		    		thisTmp.splDict[spi].list = detailData.sl;
 
 		    		thisTmp.splDict[spi].isDownload = true;
 		    		result = thisTmp.splDict[spi];
 		    		$.lStorage("_sticker", thisTmp.splDict);
+		    		// $.lStorage("_stickerDetail", detailData.sl);
 		    		if(isUpdateDom) thisTmp.updateTypeInDomList( spi );
 		    		$("#send-sync-sticker-signal").removeAttr("data-sid");
 		    		$("#send-sync-sticker-signal").click();
@@ -524,7 +531,26 @@ var initStickerArea= {
 			}
 		}
 	},
+
+	//get sticker detail picture
 	getStickerPath: function(sid, callback){
+		var _stickerDetail = $.lStorage("_stickerDetail") || {};
+		if(_stickerDetail[sid] !== undefined) {
+
+			callback(_stickerDetail[sid].sou);
+
+		} else {
+
+			new AjaxTransfer().execute({
+				url: "stickers/"+sid,
+				method: "get"
+			}).then(function(data){
+				callback(data.sou);
+			});
+		}
+	},
+
+	getStickerPath_bak: function(sid, callback){
 		var thisTmp = this;
 		if( false==thisTmp.isInit){
 			thisTmp.loadStash.push({sid:sid,callback:callback});
