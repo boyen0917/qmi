@@ -174,11 +174,11 @@ $(function(){
 			act: "addressBook",
 			textId: "ADDRESSBOOK_TITLE"
 		}
-		//,
-		// 10:{	
-		// 	act: "fileSharing",
-		// 	textId: "FILESHARING_TITLE"
-		// }
+		,
+		10:{	
+			act: "fileSharing",
+			textId: "FILESHARING_TITLE"
+		}
 	}
 
 	//pen對照表
