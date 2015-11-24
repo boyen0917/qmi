@@ -76,9 +76,10 @@ FileSharing.prototype = {
 		});
 		//more功能
 		thisFileDom.find("div.top img.more").click(thisFile.showMore.bind(thisFile));
-		//檔案操作
+		//檔案操作 delete download
 		thisFileDom.find("span.operator img").click(function(){
-			thisFile[$(this).attr("name")]();
+			popupShowAdjust( "",$.i18n.getString("FILESHARING_DELETE_CONFIRM"),true,true,[thisFile[$(this).attr("name")].bind(thisFile)]);
+			// thisFile[$(this).attr("name")]();
 		});
 
 		//more

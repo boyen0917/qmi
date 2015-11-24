@@ -1513,12 +1513,12 @@ img.auo {
 	right: 15px;
 	background: white;
 	color: #444648;
-	width: -webkit-calc( 100% - 280px );
+	width: 400px;
 	border: 1px solid #9e9e9e;
 	border-width: 0 1px 1px;
-	/*border-radius: 7px;*/
+	border-radius: 7px;
 	top: 61px;
-	-webkit-box-shadow: 0px 3px 12px 0px rgba(50, 50, 50, 0.75);
+	/*-webkit-box-shadow: 0px 3px 12px 0px rgba(50, 50, 50, 0.75);*/
 	white-space: normal;
 	display: none;
 }
@@ -1540,7 +1540,7 @@ img.auo {
 	position: fixed;
 	width: 100%;
 	height: 1000px;
-	background: rgba(15, 15, 15, 0.63);
+	background: rgba(15, 15, 15, 0.2);
 	display:none;
 	top:-50px;
 	left:0;

@@ -2,16 +2,6 @@ var ui,at,lang,gi;
 
 $(function(){
 
-	// ui = "227f07f2-71b7-49b9-b395-e10ca4d8c956";
-	// at = "d7ade0c8-ea3f-4592-acc5-c16905eb5197"; 
-	// gi = "0e508d9c-90b1-454b-88b0-7f60d054a4bf";
-
-	//api 網址
-	// base_url = "https://mapserver.mitake.com.tw/apiv1/";
- 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
-	//base_url = "http://10.1.17.116:8090/apiv1/";
- 	// base_url = "https://caprivateeim.mitake.com.tw/apiv1/";
-
  	gi = null;
 
  	//HiCloud
@@ -19,15 +9,10 @@ $(function(){
 
 	//local測試 預設開啟console
 	debug_flag = false;
-	if(window.location.href.match(/localhost/)) {
+	if(window.location.href.match(/eimweb.mitake.com.tw|10.1.17.114|localhost/)) {
 		debug_flag = true;
-		//base_url = "https://capubliceim.mitake.com.tw/apiv1/";
 		base_url = "https://apserver.mitake.com.tw/apiv1/";
-	}
-	if(window.location.href.match(/wp.qmi.emome.net/)) {
-		base_url = "https://ap.qmi.emome.net/apiv1/";
-	} else if(window.location.href.match(/eimweb.mitake.com.tw/)) {
-		base_url = "https://apserver.mitake.com.tw/apiv1/";
+
 	} else if(window.location.href.match(/qmi.npta.gov.tw/)) {
 		base_url = "https://qmi.npta.gov.tw/apiv1/";
 	} else if(window.location.href.match(/eim.mic.org.tw/)) {
@@ -54,7 +39,6 @@ $(function(){
  			lang = "zh_TW";
  		}
  	}
-	
 	//動態消息的字數限制
 	content_limit = 400;
 	
@@ -338,15 +322,6 @@ $(function(){
 		//cns.debug("last:",$(document).data("page-history").last()[0]);
 	});
 
-	//地圖檢測
-	// $.getScript( "https://mapss.google.com/maps/api/js?sensor=false", function( data, textStatus, jqxhr ) {
-	//   console.log( data ); // Data returned
-	//   console.log( textStatus ); // Success
-	//   console.log( jqxhr.status ); // 200
-	//   console.log( "Load was performed." );
-	// });
-
-
 	
 	//for node-webkit app to open systems browser
 	$(document).on("click","a",function(e){
@@ -376,8 +351,6 @@ $(function(){
 		}
 	}
 
-	
-
 	//debug control 
 	setDebug(debug_flag);
 
@@ -402,7 +375,5 @@ $(function(){
         }
       }
     }
-
-    
 
 });

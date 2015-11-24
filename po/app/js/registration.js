@@ -13,61 +13,18 @@ onCheckVersionDone = function(needUpdate){
 		$("#page-registration").css("height",$(window).height());
 	});
 
-	// $(".login").click(function(){
-	// 	s_load_show = true;
-	// 	if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
-	// 		loginAction($.lStorage("_loginData"));
-	// 		return false;
-	// 	}
-		
-	// 	//若local storage 有記錄密碼 就顯示
-	// 	if($.lStorage("_loginRemeber")){
-	// 		//順便幫他打個勾
-	// 		$(".login-remeber img").attr("src","images/common/icon/icon_check_gray_check.png");
-	// 		$(".login-remeber").data("chk",true);
-	// 		$(".login-remeber-area").show();
-	// 		$(".login-default-area").hide();
-	// 		$(".login-change").show();
-
-	// 		$(".login-next").addClass("login-next-adjust");
-
-	// 		//填入帳號
-	// 		$(".login-account span:eq(1)").html("(" + $.lStorage("_loginRemeber").countrycode + ")" + $.lStorage("_loginRemeber").phone.substring(1));
-	// 	}else{
-	// 		$(".login-remeber img").attr("src","images/common/icon/icon_check_gray.png");
-	// 		$(".login-remeber").data("chk",false);
-	// 		$(".login-remeber-area").hide();
-	// 		$(".login-default-area").show();
-	// 		$(".login-change").hide();
-	// 		$(".login-next").removeClass("login-next-adjust");
-	// 	}
-
-	// 	if($.lStorage("_loginAutoChk")){
-	// 		$(".login-auto").find("img").attr("src","images/common/icon/icon_check_gray_check.png");
- //    		$(".login-auto").data("chk",true);
- //    	}
-
-	// 	$.mobile.changePage("#page-login", {transition: "slide"});
-	// });
-	
 
 	$(document).on("click",".login-ready",function(){
-		// if($.lStorage("_loginRemeber") && !$(".login-change").data("chk")){
-		// 	var phone_id = $.lStorage("_loginRemeber").phone;
-		// 	var password = $(".login-ld-remember-password input").val();
-		// }else{
-			var isMail = false;
-			var phone_id = "";
-			var phoneInput = $(".login-ld-phone input");
-			if( phoneInput.is(":visible") ){
-				phone_id = phoneInput.val();
-			} else {
-				phone_id = $(".login-ld-email input").val();
-				isMail = true;
-			}
-			var password = $(".login-ld-password input").val();
-		// }
-		// cns.debug("phone_id:",phone_id,"pw:",password,"countrycode:",countrycode);
+		var isMail = false;
+		var phone_id = "";
+		var phoneInput = $(".login-ld-phone input");
+		if( phoneInput.is(":visible") ){
+			phone_id = phoneInput.val();
+		} else {
+			phone_id = $(".login-ld-email input").val();
+			isMail = true;
+		}
+		var password = $(".login-ld-password input").val();
 
 		//登入
 		login(phone_id,password,countrycode,isMail);
@@ -134,15 +91,7 @@ onCheckVersionDone = function(needUpdate){
 			console.log("close"); //, inst
 		},
 		onChange: function (val, inst) {
-			cns.debug(val, inst);
-			// if( val != countrycode ){
-				cns.debug(val);
-				countryCodeDoms.attr("data-val",val||"");
-				// countrycode = val;
-				// var loginData = $.lStorage("_loginRemeber");
-				// loginData.countrycode = val;
-				// $.lStorage("_loginRemeber", loginData);
-			// }
+			countryCodeDoms.attr("data-val",val||"");
 			if( "undefined"!=typeof(checkLoginReady) ) checkLoginReady();
 		},
 		effect: "slide"
@@ -344,77 +293,87 @@ onCheckVersionDone = function(needUpdate){
         });
 	}
 
-	//初始化
-	loginAction = function(login_result){
-		//儲存登入資料 跳轉到timeline
-		login_result.page = "timeline";
-		$.lStorage("_loginData",login_result);
+	//初始化 
+    loginAction = function(login_result){
+        //儲存登入資料 跳轉到timeline
+        login_result.page = "timeline";
+        $.lStorage("_loginData",login_result);
 
-		//附上group list
-		getGroupList(login_result.ui,login_result.at).complete(function(data){
-			if(data.status == 200){
+        var deferred = $.Deferred();
 
-				// cns.debug("group list",$.parseJSON(data.responseText));
-				// cns.debug("login data",login_result);
-				// return false;
-				
-				ui = login_result.ui;
-				at = login_result.at;
+        //附上group list
+        getGroupList(login_result.ui,login_result.at).complete(function(data){
+            if(data.status == 200){
 
-				//自動登入儲存
-				if($(".login-auto").data("chk")) $.lStorage("_loginAutoChk",true);
+                ui = login_result.ui;
+                at = login_result.at;
 
-				var parse_data = $.parseJSON(data.responseText);
-				if( !parse_data ){
-					console.debug("no group data");
-					return;
-				}
+                //自動登入儲存
+                if($(".login-auto").data("chk")) $.lStorage("_loginAutoChk",true);
 
-				var private_group_list = parse_data.cl;
-				var group_list = parse_data.gl;
-				if(group_list && (group_list.length > 0||private_group_list.length>0) ){
+                var parse_data = $.parseJSON(data.responseText);
+                if( !parse_data ){
+                    console.debug("no group data");
+                    return;
+                }
 
-					//有group
+                var private_group_list = parse_data.cl;
+                var group_list = parse_data.gl;
+                if(group_list && (group_list.length > 0||private_group_list.length>0) ){
 
-					$.lStorage("_groupList",group_list);
+                    //有group
 
-					getPrivateGroupFromList( private_group_list, function(){
+                    $.lStorage("_groupList",group_list);
 
-						//將group list 更新到 lstorage ui
-						groupListToLStorage();
+                    getPrivateGroupFromList( private_group_list, function(){
 
-						// 取dgi的combo
-						if( login_result.dgi || group_list.length>0 ){
-							if( null==login_result.dgi || login_result.dgi.length==0 ){
-								login_result.dgi = group_list[0].gi;
-								$.lStorage("_loginData",login_result);
-							}
-							if( login_result.dgi ){
-								getGroupCombo(login_result.dgi,function(){
-			                		localStorage["uiData"] = JSON.stringify($.lStorage(ui));
-									document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
-			                	});
-							} else {
-								//沒group
-								document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
-							}
-						} else{
-							//沒group
-							document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
-						}
-					});
-				}else{
-					localStorage.removeItem("_groupList");
-					//沒group
-					document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
-				}
-			}else if(data.status == 401){
-				//取得group list 失敗 代表自動登入失敗了
-				localStorage.removeItem("_loginData");
-				// $(".login").trigger("click");
-			}
-		});
-	}
+                        //將group list 更新到 lstorage ui
+                        groupListToLStorage();
+
+                        // 取dgi的combo
+                        if( login_result.dgi || group_list.length>0 ){
+                            if( null==login_result.dgi || login_result.dgi.length==0 ){
+                                login_result.dgi = group_list[0].gi;
+                                $.lStorage("_loginData",login_result);
+                            }
+                            if( login_result.dgi ){
+                                getGroupCombo(login_result.dgi,function(){
+                                    deferred.resolve({location:"main.html#page-group-main"});
+                                });
+                            } else {
+                                //沒group
+                                deferred.resolve({location:"main.html#page-group-menu"});
+                            }
+                        } else{
+                            //沒group
+                            deferred.resolve({location:"main.html#page-group-menu"});
+                        }
+                    });
+                }else{
+                    localStorage.removeItem("_groupList");
+                    //沒group
+                    deferred.resolve({location:"main.html#page-group-menu"});
+                    // document.location = "main.html#page-group-menu";
+                }
+            }else if(data.status == 401){
+
+                //取得group list 失敗 代表自動登入失敗了
+                deferred.resolve({fail:true});
+            }
+        });
+
+        deferred.done(function(data){
+            if(data.fail === true) {
+                //取得group list 失敗 代表自動登入失敗了
+                localStorage.removeItem("_loginData");
+                return false;
+            }
+
+            $.lStorage("refreshChk", false);
+            localStorage["uiData"] = JSON.stringify($.lStorage(ui));
+            document.location = data.location;    
+        });
+    }
 
 
 	getGroupList = function(ui,at,cl){

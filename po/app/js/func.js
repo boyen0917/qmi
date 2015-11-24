@@ -1,7 +1,6 @@
 $(function(){
 
 	setGroupInitial = function(new_gi){
-
 		//設定目前團體
         setThisGroup(new_gi);
 
@@ -20,7 +19,6 @@ $(function(){
 
         //檢查官方帳號
         initOfficialGroup( gi );
-
         //重新設定功能選單
         updateTab(gi);
 
@@ -382,13 +380,14 @@ $(function(){
 		switch (act) {
 	        case "feeds":
                 var filterAction = $(".st-filter-action");
-                filterAction.filter(".st-filter-list-active").removeClass("st-filter-list-active");
-                filterAction.filter("[data-status='all']").show().addClass("st-filter-list-active");
-                filterAction.filter("[data-navi='announcement']").show();
-                filterAction.filter("[data-navi='feedback']").show();
-                filterAction.filter("[data-navi='task']").show();
-                filterAction.filter("[data-navi='feed-post']").hide();
-                filterAction.filter("[data-navi='feed-public']").hide();
+                filterAction
+                .find(".st-filter-list-active").removeClass("st-filter-list-active").end()
+                .find("[data-status='all']").show().addClass("st-filter-list-active").end()
+                .find("[data-navi='announcement']").show().end()
+                .find("[data-navi='feedback']").show().end()
+                .find("[data-navi='task']").show().end()
+                .find("[data-navi='feed-post']").hide().end()
+                .find("[data-navi='feed-public']").hide();
                 
                 var naviArea = $(".st-navi-area");
                 naviArea.data("currentHome", "home");
@@ -7066,7 +7065,7 @@ $(function(){
                                         if (g_room.unreadCnt != clTmp.B7) {
                                             isSaving = true;
                                             g_room.unreadCnt = clTmp.B7;
-                                            cns.debug(val.gi, "cl.B7", clTmp.ci, clTmp.B7);
+                                            // cns.debug(val.gi, "cl.B7", clTmp.ci, clTmp.B7);
 
                                             //update ui unread cnt
                                             if (gi == val.gi) {

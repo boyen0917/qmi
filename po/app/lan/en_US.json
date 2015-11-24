@@ -331,6 +331,7 @@
 	"FILESHARING_UPLOAD_SUCCESS" : "upload successful",
 	"FILESHARING_UPLOAD_OVERLIMIT" : "file size limit exceeded",
 	"FILESHARING_RENAME" : "rename",
+	"FILESHARING_DELETE_CONFIRM" : "Are you sure to delete this file ?",
 	"FILESHARING_DELETE_OK" : "delete successful",
 	"FILESHARING_HOME" : "home",
 	"COMMON_UNKNOWN_ERROR" : "unknown error"
