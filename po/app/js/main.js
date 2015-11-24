@@ -23,7 +23,6 @@ $(function(){
 		deferred.done(function(){
 			//registration.js會清掉 
 			$.lStorage("refreshChk",true);
-			console.debug("yooo");
 			//自動登入
 			if(!$.lStorage("_loginAutoChk")){
 				//清除_loginData
@@ -42,10 +41,8 @@ $(function(){
 				$("#page-group-menu .page-back").hide();
 				cns.debug("no group ");
 			}else{
-
 				//設定目前團體
 				setGroupInitial(_loginData.dgi);
-
 			}
 
 			//執行polling
