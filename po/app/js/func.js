@@ -6282,45 +6282,25 @@ $(function(){
 	//parse 網址
 	getLinkMeta = function (this_compose,url) {
             try{
-                var timeLimit = 10000;//ms
+                var 
+                // 超過時間就不做 不然會被靠北
+                timeLimit = 5000,//ms
+                deferred = $.Deferred();
 
-                var deferred = $.Deferred();
-
-                deferred
-                .done(function(){
-                    console.debug("done");
-                    composeCheckMessageList();
-                })
-                .fail(function(){
-                    console.debug("fail");
-
-                    s_load_show = false;
-                    $('.ui-loader').hide();
-                    $(".ajax-screen-lock").hide();
-
-                    //網址讀取結束
-                    this_compose.data("parse-waiting",false);
-                    // this_compose.data("parse-error",true);
-                    this_compose.data("parse-resend",false);
-                    //錯誤訊息
-                    // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
-
-                    $(".cp-attach-area .url-loading").hide();
-
-
-                    composeCheckMessageList();
+                // setTimeout(function(){
+                require('open-graph')( encodeURI(url), function(err, data){
+                    deferred.resolve(err, data);
                 });
+                // },2000);
 
 
                 var timer = setTimeout(function(){
                     deferred.reject();
                 }, timeLimit);
 
-
-                
-
-                var og = require('open-graph');
-                og( encodeURI(url), function(err, data){
+                deferred
+                .done(function(err, data){
+                    console.debug("done",data);
 
                     var result = {};
                     var tmp_img,tmp_desc;
@@ -6399,16 +6379,14 @@ $(function(){
                         }
                     }
                     
-
                     result.url = url;
                     this_compose.data("url-content",result);
 
                     //網址讀取結束
                     this_compose.data("parse-waiting",false);
 
-                    // deferred結束
-                    deferred.resolve();
-                    
+                    //關閉副檔區
+                    composeCheckMessageList();
                     
                     //關閉事件
                     $(".cp-ta-yql > img").off().click(function(){
@@ -6429,11 +6407,35 @@ $(function(){
                         //判斷關閉副檔區
                         composeCheckMessageList();
                     });
+                    
+                })
+                .fail(function(){
+                    console.debug("fail");
+
+                    //網址讀取結束
+                    this_compose.data("parse-waiting",false);
+                    // this_compose.data("parse-error",true);
+                    this_compose.data("parse-resend",false);
+                    //錯誤訊息
+                    // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+
+                    $(".cp-attach-area .url-loading").hide();
+
+                    composeCheckMessageList();
                 });
 
-            } catch(e){
-                    
-                deferred.reject();
+             } catch(e){
+
+                //保險
+                //網址讀取結束
+                this_compose.data("parse-waiting",false);
+                // this_compose.data("parse-error",true);
+                this_compose.data("parse-resend",false);
+
+                $(".cp-attach-area .url-loading").hide();
+
+                //關閉副檔區
+                composeCheckMessageList();
             }
 	}
 
