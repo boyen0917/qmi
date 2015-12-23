@@ -6281,162 +6281,161 @@ $(function(){
 	}
 	//parse 網址
 	getLinkMeta = function (this_compose,url) {
-            try{
-                var 
-                // 超過時間就不做 不然會被靠北
-                timeLimit = 5000,//ms
-                deferred = $.Deferred();
+        try{
+            var 
+            // 超過時間就不做 不然會被靠北
+            timeLimit = 5000,//ms
+            deferred = $.Deferred();
 
-                // setTimeout(function(){
-                require('open-graph')( encodeURI(url), function(err, data){
-                    deferred.resolve(err, data);
-                });
-                // },2000);
+            // setTimeout(function(){
+            require('open-graph')( encodeURI(url), function(err, data){
+                deferred.resolve(err, data);
+            });
+            // },2000);
 
+            var timer = setTimeout(function(){
+                deferred.reject();
+            }, timeLimit);
 
-                var timer = setTimeout(function(){
-                    deferred.reject();
-                }, timeLimit);
+            deferred
+            .done(function(err, data){
+                console.debug("done",data);
 
-                deferred
-                .done(function(err, data){
-                    console.debug("done",data);
+                var result = {};
+                var tmp_img,tmp_desc;
 
-                    var result = {};
-                    var tmp_img,tmp_desc;
+                var yqlHtml = $(".cp-ta-yql").html();
 
-                    var yqlHtml = $(".cp-ta-yql").html();
+                //loading圖示隱藏
+                $(".cp-attach-area .url-loading").hide();
 
-                    //loading圖示隱藏
-                    $(".cp-attach-area .url-loading").hide();
+                //error存在 或 result null 就跳出
+                if( !data || err ) {
+                    //沒內容也算結束吧 讓它可以送出 
+                    this_compose.data("parse-waiting",false);
 
-                    //error存在 或 result null 就跳出
-                    if( !data || err ) {
-                        //沒內容也算結束吧 讓它可以送出 
-                        this_compose.data("parse-waiting",false);
+                    toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+                    return false;
+                }
 
-                        toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
-                        return false;
+                //title
+                if( Array.isArray(data.title) ){
+                    if( data.title.length>0 ){
+                        result.title = data.title[0];
                     }
-
-                    //title
-                    if( Array.isArray(data.title) ){
-                        if( data.title.length>0 ){
-                            result.title = data.title[0];
+                } else {
+                    result.title = data.title;
+                }
+                //description
+                if( Array.isArray(data.description) ){
+                    if( data.description.length>0 ){
+                        result.description = data.description[0];
+                    }
+                } else {
+                    result.description = data.description;
+                }
+                //image
+                if( data.image && data.image.url ){
+                    if( Array.isArray(data.image.url) ){
+                        if(data.image.url.length>0){
+                            result.img = data.image.url[0];
                         }
                     } else {
-                        result.title = data.title;
+                        result.img = data.image.url;
                     }
-                    //description
-                    if( Array.isArray(data.description) ){
-                        if( data.description.length>0 ){
-                            result.description = data.description[0];
-                        }
-                    } else {
-                        result.description = data.description;
-                    }
-                    //image
-                    if( data.image && data.image.url ){
-                        if( Array.isArray(data.image.url) ){
-                            if(data.image.url.length>0){
-                                result.img = data.image.url[0];
-                            }
-                        } else {
-                            result.img = data.image.url;
-                        }
-                    }
+                }
 
-                    cns.debug(result.title, result.description, result.img );
+                cns.debug(result.title, result.description, result.img );
 
 
-                    if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
-                        this_compose.data("message-list").push(2);
-                        var tmp = getYoutubeThumbnail( url );
-                        if(tmp) result.img = tmp;
+                if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
+                    this_compose.data("message-list").push(2);
+                    var tmp = getYoutubeThumbnail( url );
+                    if(tmp) result.img = tmp;
+                }else{
+                    this_compose.data("message-list").push(1);
+                }
+
+                if(result.title || result.description || result.img){
+                    //按送出重新截取網站內容 不用顯示在畫面
+                    if(this_compose.data("parse-resend")) {
+                        this_compose.data("parse-resend",false);
+                        $(".cp-post").trigger("click");
                     }else{
-                        this_compose.data("message-list").push(1);
+                        cns.debug("url:",result);
+                        if(result.title) $(".cp-yql-title").html(result.title);
+                        if(result.description) $(".cp-yql-desc").html(result.description.substring(0,200));
+                        if(result.img){
+                            var img = $("<img src='" + result.img + "'/>");
+                            $(".cp-yql-img").show().append(img);
+                            img.error( function(){
+                                $(this).parent().hide();
+                                $(this).remove();
+                                console.debug("img preview failed.");
+                            });
+                        }
+                        $(".cp-ta-yql").fadeIn();
                     }
+                }
+                
+                result.url = url;
+                this_compose.data("url-content",result);
 
-                    if(result.title || result.description || result.img){
-                        //按送出重新截取網站內容 不用顯示在畫面
-                        if(this_compose.data("parse-resend")) {
-                            this_compose.data("parse-resend",false);
-                            $(".cp-post").trigger("click");
-                        }else{
-                            cns.debug("url:",result);
-                            if(result.title) $(".cp-yql-title").html(result.title);
-                            if(result.description) $(".cp-yql-desc").html(result.description.substring(0,200));
-                            if(result.img){
-                                var img = $("<img src='" + result.img + "'/>");
-                                $(".cp-yql-img").show().append(img);
-                                img.error( function(){
-                                    $(this).parent().hide();
-                                    $(this).remove();
-                                    console.debug("img preview failed.");
-                                });
-                            }
-                            $(".cp-ta-yql").fadeIn();
+                //網址讀取結束
+                this_compose.data("parse-waiting",false);
+
+                //關閉副檔區
+                composeCheckMessageList();
+                
+                //關閉事件
+                $(".cp-ta-yql > img").off().click(function(){
+
+                    $(".cp-ta-yql").html(yqlHtml).fadeOut();
+                    this_compose.data("url-chk",false).data("url-content",false);
+
+                    //message list pop
+                    var mlArr = this_compose.data("message-list");
+                    for(key in mlArr){
+                        if(mlArr[key] == 1 || mlArr[key] == 2){
+                            mlArr.splice(key,1);
                         }
                     }
-                    
-                    result.url = url;
-                    this_compose.data("url-content",result);
 
-                    //網址讀取結束
-                    this_compose.data("parse-waiting",false);
+                    this_compose.data("message-list",mlArr);
 
-                    //關閉副檔區
-                    composeCheckMessageList();
-                    
-                    //關閉事件
-                    $(".cp-ta-yql > img").off().click(function(){
-
-                        $(".cp-ta-yql").html(yqlHtml).fadeOut();
-                        this_compose.data("url-chk",false).data("url-content",false);
-
-                        //message list pop
-                        var mlArr = this_compose.data("message-list");
-                        for(key in mlArr){
-                            if(mlArr[key] == 1 || mlArr[key] == 2){
-                                mlArr.splice(key,1);
-                            }
-                        }
-
-                        this_compose.data("message-list",mlArr);
-
-                        //判斷關閉副檔區
-                        composeCheckMessageList();
-                    });
-                    
-                })
-                .fail(function(){
-                    console.debug("fail");
-
-                    //網址讀取結束
-                    this_compose.data("parse-waiting",false);
-                    // this_compose.data("parse-error",true);
-                    this_compose.data("parse-resend",false);
-                    //錯誤訊息
-                    // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
-
-                    $(".cp-attach-area .url-loading").hide();
-
+                    //判斷關閉副檔區
                     composeCheckMessageList();
                 });
+                
+            })
+            .fail(function(){
+                console.debug("fail");
 
-             } catch(e){
-
-                //保險
                 //網址讀取結束
                 this_compose.data("parse-waiting",false);
                 // this_compose.data("parse-error",true);
                 this_compose.data("parse-resend",false);
+                //錯誤訊息
+                // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
 
                 $(".cp-attach-area .url-loading").hide();
 
-                //關閉副檔區
                 composeCheckMessageList();
-            }
+            });
+
+         } catch(e){
+
+            //保險
+            //網址讀取結束
+            this_compose.data("parse-waiting",false);
+            // this_compose.data("parse-error",true);
+            this_compose.data("parse-resend",false);
+
+            $(".cp-attach-area .url-loading").hide();
+
+            //關閉副檔區
+            composeCheckMessageList();
+        }
 	}
 
     getJsonFromUrl = function(url) {
