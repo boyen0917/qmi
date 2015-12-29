@@ -6625,6 +6625,7 @@ $(function(){
                     // }else{
                         var pi = "0";
                         uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
+                            cns.debug("yooeeooeoeoeoeoe");
                             try{
                                 //if fail uploading
                                 if(!data){
