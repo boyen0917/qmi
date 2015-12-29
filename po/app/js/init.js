@@ -32,6 +32,9 @@ $(function(){
 		base_url = "https://qmi.npta.gov.tw/apiv1/";
 	} else if(window.location.href.match(/eim.mic.org.tw/)) {
 		base_url = "https://eim.mic.org.tw/apiv1/";
+
+	} else if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
+		base_url = "https://qaap.qmi.emome.net/apiv1/";
 	}
 	
 	if( window.location.href.match(/main.html/) ){
