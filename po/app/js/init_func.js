@@ -172,15 +172,7 @@ $(function(){
             if( group.ad==1 ){
                 group.tab[6].sw = true;
             }
-            // group.pen = [
-            //     { "tp": 0, "sw": true },
-            //     { "tp": 1, "sw": true },
-            //     { "tp": 2, "sw": true },
-            //     { "tp": 3, "sw": true },
-            //     { "tp": 4, "sw": true }
-            // ];
         } else{
-
 
             if( !isDataMissing && groupData.set.tab ){
                 group.tab = groupData.set.tab;
@@ -212,7 +204,9 @@ $(function(){
             ];
         }
 
-        $.lStorage(ui, userData);
+        userData[this_gi] = group;
+        window.g_uiData = userData;
+
         updateTab( this_gi );
     }
 
@@ -256,7 +250,7 @@ $(function(){
             errorReport(e);
             return;
         }
-        
+
         try{
             var tabHtml = '<div class="sm-small-area"><div class="sm-small-area-r"></div></div>';
 
@@ -309,6 +303,8 @@ $(function(){
                 //switch關閉或是init沒設定這個tp 就跳過
                 if(penObj.switch === false || typeof initPenMap[penObj.tp] === "undefined") continue;
                 var penDom = $(penHtml);
+
+                if(penObj.tp == 5) isPostData = true;
 
                 //fc-box & 圖片
                 penDom.attr("data-fc-box",initPenMap[penObj.tp].fcBox)

@@ -769,7 +769,7 @@ function hideLoading() {
 			$("#chat-loading-grayArea").show();
 		}
 		$("#chat-loading").hide();
-		g_currentScrollToDom.scrollIntoView();
+		// g_currentScrollToDom.scrollIntoView();
 		g_currentScrollToDom = null;
 		g_container.getNiceScroll()[0].wheelprevented = false;
 		clearInterval( lockCurrentFocusInterval );
@@ -957,6 +957,9 @@ function updateChat(time, isGetNewer) {
 					}
 				} else { //getting old msgs
 					console.debug("----- finished old ", data.el.length, isGetNewer, " -----");
+
+					// 12/29 fix bug scrollIntoView infinite
+					clearInterval( lockCurrentFocusInterval )
 
 					setTimeout(function () {
 						g_isLoadHistoryMsgNow = false;

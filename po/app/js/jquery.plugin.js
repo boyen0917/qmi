@@ -33,7 +33,7 @@
 				return window.g_uiData;
 			}
     	} else {
-			if(value){
+			if(value || value === false){
 				if(typeof(value) == "object"){
 					value = JSON.stringify(value);
 		    	}

@@ -1040,6 +1040,10 @@ $(function(){
 	    }
     }
 
+//     at: "dbf24f99-9cee-4f97-a29f-f52a9c236c41"
+// li: "zh_TW"
+// ui: "U000000R0CT"
+
 
 	getGroupData = function(this_gi,ajax_load,tp,err_show){
 		var err_show = err_show || false;
