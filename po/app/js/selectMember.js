@@ -1,3 +1,63 @@
+/**
+勾選成員用列表, 頁面如下
+(<是back鈕)
+
+<       選擇對象(cnt)   下一步
+○   全選                  成員
+○   img     name
+◉   img     name
+
+◉   全選                  群組
+◉   img     name
+◉   img     name
+
+....
+
+**/
+
+/**
+parentDom:       頁面container
+dataDom:         存放成員列表資料的dom, 資料為stringify後的字串(送入跟取回資料都會存放在這個dom)
+onPageChanged:   按下下一步時的callback
+onDone(isDone):  當按下返回時的callback, isDone==false表示為點擊back返回, isDone==true為點擊下一步
+isBackWhenDone:  按下下一步是否要自動返回上一頁
+
+eg:
+var btn = $(".extra-content .btn[data-type='edit']");
+var tmpList = {};
+for (var gu in g_room.memList) {
+    tmpList[gu] = g_group.guAll[gu].nk;
+}
+
+btn.data("exclude_str", JSON.stringify([g_group.gu]));  //不顯示的gu清單, 比如說自己不顯示
+btn.data("object_str", JSON.stringify(tmpList));        //成員資料
+//選項
+//isShowBranch:     是否要顯示群組
+//isShowSelf:       是否要show自己
+//isShowAll:        是否要show全選(如果isSingleSelect==true, isShowAll會被設成false)
+//isShowFav:        是否要show我的最愛
+//isSingleSelect:   是否為單選
+//isShowFavBranch:  是否要show我的最愛群組
+//min_count:        最小選擇數量(未達最小數量不能按下一步)
+
+btn.data("object_opt", {
+    isShowBranch: false,
+    isShowSelf: false,
+    isShowAll: false,
+    isShowFav: false,
+    isSingleSelect: false,
+    min_count: 1
+});
+showSelectMemPage($("#pagesContainer"), btn, function () {
+    }, function (isDone) {
+        if (isDone) {
+            alert("下一步");
+        } else {
+            alert("back");
+        }
+    }
+);
+**/
 showSelectMemPage = function( parentDom, dataDom, onPageChanged, onDone, isBackWhenDone ){
 	if( $("#page-selectMem").length>0 ){
 		showSelectMemPageDelegate( dataDom, onPageChanged, onDone, isBackWhenDone );
@@ -8,6 +68,9 @@ showSelectMemPage = function( parentDom, dataDom, onPageChanged, onDone, isBackW
 		});
 	}
 }
+/**
+private function
+**/
 showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBackWhenDone ){
     if( null==isBackWhenDone ) isBackWhenDone = true;
     $(".header-title div:eq(1)").html(0);
@@ -30,7 +93,7 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
 
     var obj_data = this_compose.data("object_str");
     var option = this_compose.data("object_opt");
-    var isShowGroup = false;
+    var isShowBranch = false;
     var isShowSelf = false;
     var isShowAll = true;
     var isShowFav = true;
@@ -38,7 +101,7 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
     var isShowFavBranch = true;
     var min_count = 0;
     if( option ){
-        if( null!=option.isShowGroup ) isShowGroup = option.isShowGroup;
+        if( null!=option.isShowBranch ) isShowBranch = option.isShowBranch;
         if( null!=option.isShowSelf ) isShowSelf = option.isShowSelf;
         if( null!=option.isShowAll ) isShowAll = option.isShowAll;
         if( null!=option.isShowFav ) isShowFav = option.isShowFav;
@@ -61,6 +124,13 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
     var guList = Object.keys(guAll);
     var cnt = 0;
     $.each(guAll,function(i,gu_obj){
+        //踢除離開或未加入的成員
+        if( gu_obj.st!=1 ){
+            if( excludeList.indexOf(i)<=0 ){
+                excludeList.push(i);
+            }
+            return;
+        }
         if( excludeList.indexOf(i)>=0 ) return;
         if( false==isShowSelf && i==group.gu ) return;
         cnt++;
@@ -250,7 +320,7 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
     }
 
     //----- 團體列表 ------
-    if( !isSingleSelect && bl&&isShowGroup&&Object.keys(bl).length>0 ){
+    if( !isSingleSelect && bl&&isShowBranch&&Object.keys(bl).length>0 ){
         $("#page-selectMem .ui-container").data("selected-branch",{});
         //標題bar
         var memSubTitle = $("<div class='obj-cell-subTitle group' data-chk='false'></div>");

@@ -3,86 +3,62 @@ $(function(){
 	//load language
 	updateLanguage( lang );
 
-
+	var refreshChk = false;
 	//沒有登入資訊 就導回登入頁面
 	if($.lStorage("_loginData")){
-		
 		var _loginData = $.lStorage("_loginData");
 
 		ui = _loginData.ui;
 		at = _loginData.at;
 
-		//自動登入
-		if(!$.lStorage("_loginAutoChk")){
-			//清除_loginData
-			// localStorage.removeItem("_loginData");
-			delete _loginData.at;
-			$.lStorage("_loginData",_loginData);
-		}
-			
-
-		//聊天室開啓DB
-    	initChatDB(); 
-		initChatCntDB(); 
-
-		//第一次進來 沒團體的情況
-		if(!$.lStorage("_groupList")){
-			//關閉返回鍵
-			$("#page-group-menu .page-back").hide();
-			cns.debug("no group ");
+		var deferred = $.Deferred();
+		if($.lStorage("refreshChk") === true) {
+			getGroupCombo(_loginData.dgi,function(){
+				deferred.resolve();
+			});
 		}else{
-
-			//設定目前團體
-			setThisGroup(_loginData.dgi);
-
-			//sidemenu user
-        	setSmUserData(gi,gu,gn);
-
-			//header 設定團體名稱
-	    	$(".header-group-name div:eq(1)").html(gn);
-	    	
-	    	
-	    	//做團體列表
-	    	groupMenuListArea();
-
-	    	//top event
-	    	topEvent();
-
-	    	//檢查官方帳號
-            initOfficialGroup( gi );
-
-            //重新設定功能選單
-	        updateTab(gi);
-
-	        // console.debug("ui",JSON.stringify($.lStorage(ui)));
-
-
-	    	//動態消息
-	    	//timelineListWrite();
-	    	setTimeout(function(){
-		    	var tmp = $(".sm-small-area:not(.setting):visible");
-				if( tmp.length>0 ){
-					$(tmp[0]).addClass("active");
-					timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
-				}
-				else{
-					timelineSwitch("feeds",true);
-				}
-	    	},1000);
+			deferred.resolve();
 		}
 
-		//執行polling
-		pollingInterval();
+		deferred.done(function(){
+			//registration.js會清掉 
+			$.lStorage("refreshChk",true);
+			//自動登入
+			if(!$.lStorage("_loginAutoChk")){
+				//清除_loginData
+				// localStorage.removeItem("_loginData");
+				delete _loginData.at;
+				$.lStorage("_loginData",_loginData);
+			}
+
+			//聊天室開啓DB
+	    	initChatDB(); 
+			initChatCntDB(); 
+
+			//第一次進來 沒團體的情況
+			if(!$.lStorage("_groupList") || !_loginData.dgi || _loginData.dgi==""){
+				//關閉返回鍵
+				$("#page-group-menu .page-back").hide();
+				cns.debug("no group ");
+			}else{
+				//設定目前團體
+				setGroupInitial(_loginData.dgi);
+			}
+
+			//執行polling
+			pollingInterval();
+		});
+
 	}else{
     	document.location = "index.html";
     	return false;
 	}
 
 	//test
-	$(".header-group-name").click(function(){
+	$(".currentGroup").click(function(){
 		// $(".st-feedbox-area ").animate({bottom:"125px"});
-		//彩蛋鑰匙
-		supriseKey();
+		// 彩蛋鑰匙
+		// window.sidemenuChk = true;
 	});
 
 	$(".page-group-name").click(function(){
@@ -271,7 +247,6 @@ $(function(){
 	
 	//創建團體 建立
 	$(".gm-create-submit").click(function(){
-
 		if ( !$(".gmc-avatar").data("chk" )){
 				popupShowAdjust("",$.i18n.getString("GROUP_AVATAR_ALERT"),true); //"圖片未上傳"
 				return false;
@@ -301,7 +276,7 @@ $(function(){
 
 	        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
 	        			//團體頭像上傳失敗
-	        			if(!chk) toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") ); 
+	        			if(!chk) toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") );
 	        			//統一由polling執行更新
 	        			// groupMenuListArea(cg_result.gi);
 	        		});
@@ -342,6 +317,7 @@ $(function(){
 
 	  //小幫手 團體邀請  側邊選單
 	$(".hg-invite").click(function(){
+		clearCreateGroupPage();
 	    $("#page-group-menu").data("type","invite");
 	    $(".gm-invite").trigger("click");
 	    $.mobile.changePage("#page-group-menu");
@@ -1891,6 +1867,9 @@ $(function(){
 
 	$(document).on("mouseup",".namecard",function(e){
 		e.stopPropagation();
+		//temp
+		if($(document).data("official") == true) return false;
+
 		$(document).data("namecard-pos",$(window).scrollTop());
 		$(window).scrollTop(0);
 		// $(".user-info-load-area").css("top",$(window).scrollTop());
@@ -2053,7 +2032,7 @@ $(function(){
 				showGroupInfoPage();
 				break;
 			case "chat":
-				$(".sm-small-area[data-sm-act=chat]").trigger("click");
+				// $(".sm-small-area[data-sm-act=chat]").trigger("click");
 				break;
 			case "setting":
 				$(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
@@ -2062,10 +2041,10 @@ $(function(){
 				$(".contact-add").trigger("click");
 				break;
 			case "share":
-				cns.debug("share");
+				// cns.debug("share");
 				break;
 			case "cnt":
-				$(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+				// $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
 				break;
 		}
 	});
@@ -2211,6 +2190,17 @@ $(function(){
 	$("#recv-chatroom-focus").off("click").click(function(){
 		cns.debug("on chatroom focus");
 		updatePollingCnts( $(this),"B7" );
+	});
+
+	//update chat list
+	$("#recv-sync-chat-list").off("click").click(function(){
+		var giTmp = $(this).attr("data-gi");
+		cns.debug("update chat list ", giTmp);
+		if( giTmp && giTmp == gi ){
+			if( $(".subpage-chatList").is(":visible") ){
+				$('.header-menu .sm-small-area[data-sm-act="chat"]').trigger("click");
+			}
+		}
 	});
 	/*
               ████████╗███████╗███████╗████████╗          

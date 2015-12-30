@@ -25,7 +25,7 @@ function initChatDB( onReady ){
 	    });
 	}
 }
-function updateChatDB ( msgs ){
+function onReceivePollingChatMsg ( msgs ){
 	cns.debug("-----------------------");
 	//indexed from old to new (api chat is from new to old)
 	for( var j = 0; j<msgs.length; j++){
@@ -49,7 +49,7 @@ function updateChatDB ( msgs ){
 				//write msg to db
 				// if( !g_idb_chat_msgs.get(object.ei) ){
 					var tmp = g_idb_chat_msgs.put( node, function(eiTmp){
-						onSucc(msgs, eiTmp, object);
+						onPollingMsgSaveSucc(msgs, eiTmp, object);
 					});
 				// }
 				// tmp.onabort = onSucc;
@@ -63,7 +63,7 @@ function updateChatDB ( msgs ){
 	}
 }	//end of updateChat
 
-function onSucc(msgs, eiTmp, object){
+function onPollingMsgSaveSucc(msgs, eiTmp, object){
 	var object;
 	for( var j = 0; j<msgs.length; j++){
 		var data = msgs[j];
@@ -105,6 +105,58 @@ function onSucc(msgs, eiTmp, object){
 	}
 }
 
+function onChatReceiveMsg ( tmp_gi, tmp_ci, tmp_cn, msgs, callback ){
+	cns.debug("-----------------------");
+	if( !msgs || msgs.length==0 ){
+		if(callback)	callback();
+		return;
+	}
+
+	//indexed from old to new (api chat is from new to old)
+	var cnt = 0;
+	for( var i=0; i<msgs.length; i++){
+		var object = msgs[i];
+		object.cn = tmp_cn || "";
+		if(object.hasOwnProperty("meta")){
+
+			//add to db
+			var node = {
+				gi: tmp_gi,
+				ci: tmp_ci,
+				ei: object.ei,
+			    ct: object.meta.ct,
+			    data: object
+			};
+			//write msg to db
+			// if( !g_idb_chat_msgs.get(object.ei) ){
+				var tmp = g_idb_chat_msgs.put( node, function(eiTmp){
+					cnt++;
+					if( cnt==msgs.length ){
+						if(callback)	callback();
+					}
+				});
+			// }
+			// tmp.onabort = onSucc;
+			// tmp.onerror = onSucc;
+			// tmp.oncomplete = onSucc;
+			// tmp.onsuccess = onSucc;
+
+			cns.debug("[updateChatDB]",tmp_gi,tmp_ci,object.ei,object.ml[0].c);
+		}
+	}
+}
+
+// function onChatMsgSaveSucc(node){
+// 	cns.debug(node.ei);
+
+// 	/* 更新聊天室列表最後訊息 */
+// 	if( window.opener 
+// 		&& window.opener.updateLastMsg 
+// 		&& typeof( window.opener.updateLastMsg ) != 'undefined' ){
+// 		window.opener.updateLastMsg( node.gi, node.ci, true, node.ei );
+// 	}
+// }
+
 /*
               ███╗   ███╗███████╗ ██████╗      ██████╗ ██████╗ ██╗   ██╗███╗   ██╗████████╗          
               ████╗ ████║██╔════╝██╔════╝     ██╔════╝██╔═══██╗██║   ██║████╗  ██║╚══██╔══╝          
@@ -134,7 +186,7 @@ function initChatCntDB ( onReady ){
 }
 
 /* save chat cnt into db */
-function updateChatCntDB ( ccs ){
+function onReceivePollingChatCnt ( ccs ){
 	var storage = $.lStorage(ui);
 
 	//indexed from old to new (api chat is from new to old)

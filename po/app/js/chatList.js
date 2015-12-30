@@ -211,7 +211,6 @@ function showChatList(){
 			//目前type0的全體聊天室無用
 			if( "0"!=room.tp ){
 				var chatRoomName=room.nk||"";
-				cns.debug(chatRoomName, room.cn);
 				var imgSrc="";
 				if("1"==room.tp){
 					imgSrc="images/common/others/empty_img_personal_l.png";
@@ -477,11 +476,8 @@ function getDBMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
 			        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
 			    	}
 			    } else {
-			    	cns.debug( "[setLastMsg] no list 2", giTmp, ciTmp );
+			    	// cns.debug( "[setLastMsg] no list 2", giTmp, ciTmp );
 			    }
-			 //    else if(roomTmp){
-				// 	setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
-				// }
 			} catch(e){
 				errorReport(e);
 			}
@@ -558,7 +554,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 	}
 	var name = mem.nk;
 	if( null==data.ml || data.ml.length<=0 ){
-		cns.debug("[setLastMsgContentPart2] data.ml null");
+		// cns.debug("[setLastMsgContentPart2] data.ml null");
 		return;
 	}
 	var isMe = (data.meta.gu==groupData.gu);
@@ -658,7 +654,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			cns.debug( e.message );
 		}
 	} else {
-		cns.debug(groupData.gu, mem.gu, isShowAlert);
+		// cns.debug(groupData.gu, mem.gu, isShowAlert);
 	}
 }
 
@@ -719,7 +715,7 @@ var g_memCount;
 
 function showNewRoomPage(){
 	composeObjectShowDelegate( $(".chatList-add"), $(".chatList-add"), {
-		isShowGroup : false,
+		isShowBranch : false,
         isShowSelf : false,
         isShowAll : false,
         isShowFav : true,

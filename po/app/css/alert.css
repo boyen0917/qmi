@@ -152,6 +152,10 @@
 	/* margin: 13px 0 0 0; */
 	padding: 17px 0 10px;
 	border-bottom: rgb(220, 234, 247) 1px solid;
+	background-color: #ecf4ff;
+}
+.al-subbox.isRead{
+	background-color: white;
 }
 
 .al-subbox .left {

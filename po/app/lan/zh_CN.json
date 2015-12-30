@@ -100,6 +100,7 @@
 	"FEED_VOTE_ANONYMOUS_DESC" : "完全匿名，结束后公开票数",
 	"FEED_EVENT_DELETED" : "此动态已被删除",
 	"FEED_READ_LIST_DISABLED" : "此团体无查看已/未读列表功能",
+	"FEED_CONFIRM_DISCARD" : "是否放弃编辑?",
 
 	"COMPOSE_DESCRIPTION" :	"内容描述",
 	"COMPOSE_TITLE" :	"标题",
@@ -160,6 +161,8 @@
 	"INVITE_SUCC" : "成功送出邀请",
 	"INVITE_FAIL" : "送出邀请失败",
 	"INVITE_ALREADY_IN_GROUP" : "此成员已在群组里",
+	"INVITE_DELETED_SUCC" : "团体邀请函删除成功",
+	"INVITE_DELETED_FAIL" : "团体邀请函删除失败",
 	"QRCODE_TITLE" : "QR Code",
 	"QRCODE_JOIN_ENABLED" : "开放QR Code加入团体",
 	"QRCODE_UPDATE" : "更新QR Code",
@@ -207,6 +210,8 @@
 	"COMMON_PRIVATE" : "不公开",
 	"COMMON_PUBLIC" : "公开",
 	"COMMON_EXCEED_FILE_SIZE" : "超过档案大小限制",
+	"COMMON_NOT_MP4_NOR_IMAGE" : "档案格式必须为MP4或图片",
+	"COMMON_NOT_IMAGE" : "档案格式必须为图片",
 	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "传送",
@@ -314,5 +319,7 @@
 
 	"ADDRESSBOOK_TITLE" : "团体通讯录",
 	"ADDRESSBOOK_ADD" : "新增自定联络人",
-	"ADDRESSBOOK_CUSTOM" : "自定联络人"
+	"ADDRESSBOOK_CUSTOM" : "自定联络人",
+
+	"FILESHARING_TITLE" : "档案分享"
 }

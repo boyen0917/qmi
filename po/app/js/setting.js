@@ -314,7 +314,7 @@ function showUpdatePermissionPage(){
     }
 
 	var option = {
-		isShowGroup:false,
+		isShowBranch:false,
         isShowSelf:true,
 		isShowAll:false,
 		isShowFav:true,

@@ -83,8 +83,15 @@ $(function(){
     onClickDownload = function(){
 		$(".container_update_lock").show();
     	var link = $(".container_update_lock a");
-    	// link.attr("href",g_downloadPath);
-    	link.trigger("click");
+
+    	var downloadPath = "https://wp.qmi.emome.net/qmipc/";
+		if(window.location.href.match(/qmi.npta.gov.tw/)) {
+			downloadPath = "https://qmi.npta.gov.tw/qmipc/";
+		} else if(window.location.href.match(/eim.mic.org.tw/)) {
+			downloadPath = "https://eim.mic.org.tw/qmipc/";
+		}
+
+    	link.attr("href",downloadPath).trigger("click");
     	console.debug("download clicked");
     	try{
 	    	require('nw.gui').App.quit();

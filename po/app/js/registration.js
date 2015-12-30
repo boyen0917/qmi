@@ -13,61 +13,18 @@ onCheckVersionDone = function(needUpdate){
 		$("#page-registration").css("height",$(window).height());
 	});
 
-	// $(".login").click(function(){
-	// 	s_load_show = true;
-	// 	if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
-	// 		loginAction($.lStorage("_loginData"));
-	// 		return false;
-	// 	}
-		
-	// 	//若local storage 有記錄密碼 就顯示
-	// 	if($.lStorage("_loginRemeber")){
-	// 		//順便幫他打個勾
-	// 		$(".login-remeber img").attr("src","images/common/icon/icon_check_gray_check.png");
-	// 		$(".login-remeber").data("chk",true);
-	// 		$(".login-remeber-area").show();
-	// 		$(".login-default-area").hide();
-	// 		$(".login-change").show();
-
-	// 		$(".login-next").addClass("login-next-adjust");
-
-	// 		//填入帳號
-	// 		$(".login-account span:eq(1)").html("(" + $.lStorage("_loginRemeber").countrycode + ")" + $.lStorage("_loginRemeber").phone.substring(1));
-	// 	}else{
-	// 		$(".login-remeber img").attr("src","images/common/icon/icon_check_gray.png");
-	// 		$(".login-remeber").data("chk",false);
-	// 		$(".login-remeber-area").hide();
-	// 		$(".login-default-area").show();
-	// 		$(".login-change").hide();
-	// 		$(".login-next").removeClass("login-next-adjust");
-	// 	}
-
-	// 	if($.lStorage("_loginAutoChk")){
-	// 		$(".login-auto").find("img").attr("src","images/common/icon/icon_check_gray_check.png");
- //    		$(".login-auto").data("chk",true);
- //    	}
-
-	// 	$.mobile.changePage("#page-login", {transition: "slide"});
-	// });
-	
 
 	$(document).on("click",".login-ready",function(){
-		// if($.lStorage("_loginRemeber") && !$(".login-change").data("chk")){
-		// 	var phone_id = $.lStorage("_loginRemeber").phone;
-		// 	var password = $(".login-ld-remember-password input").val();
-		// }else{
-			var isMail = false;
-			var phone_id = "";
-			var phoneInput = $(".login-ld-phone input");
-			if( phoneInput.is(":visible") ){
-				phone_id = phoneInput.val();
-			} else {
-				phone_id = $(".login-ld-email input").val();
-				isMail = true;
-			}
-			var password = $(".login-ld-password input").val();
-		// }
-		// cns.debug("phone_id:",phone_id,"pw:",password,"countrycode:",countrycode);
+		var isMail = false;
+		var phone_id = "";
+		var phoneInput = $(".login-ld-phone input");
+		if( phoneInput.is(":visible") ){
+			phone_id = phoneInput.val();
+		} else {
+			phone_id = $(".login-ld-email input").val();
+			isMail = true;
+		}
+		var password = $(".login-ld-password input").val();
 
 		//登入
 		login(phone_id,password,countrycode,isMail);
@@ -134,15 +91,7 @@ onCheckVersionDone = function(needUpdate){
 			console.log("close"); //, inst
 		},
 		onChange: function (val, inst) {
-			cns.debug(val, inst);
-			// if( val != countrycode ){
-				cns.debug(val);
-				countryCodeDoms.attr("data-val",val||"");
-				// countrycode = val;
-				// var loginData = $.lStorage("_loginRemeber");
-				// loginData.countrycode = val;
-				// $.lStorage("_loginRemeber", loginData);
-			// }
+			countryCodeDoms.attr("data-val",val||"");
 			if( "undefined"!=typeof(checkLoginReady) ) checkLoginReady();
 		},
 		effect: "slide"
@@ -188,7 +137,7 @@ onCheckVersionDone = function(needUpdate){
 	});
 
 	checkLoginReady = function(){
-		cns.debug("[checkLoginReady]");
+		// cns.debug("[checkLoginReady]");
 		var page = $("#page-registration");
 		var activeTab = page.find(".login-tab.active");
 		if( "phone" == activeTab.attr("data-type") ){
@@ -344,64 +293,90 @@ onCheckVersionDone = function(needUpdate){
         });
 	}
 
-	//初始化
-	loginAction = function(login_result){
-		//儲存登入資料 跳轉到timeline
-		login_result.page = "timeline";
-		$.lStorage("_loginData",login_result);
+	//初始化 
+    loginAction = function(login_result){
+        //儲存登入資料 跳轉到timeline
+        login_result.page = "timeline";
+        $.lStorage("_loginData",login_result);
 
-		//附上group list
-		getGroupList(login_result.ui,login_result.at).complete(function(data){
-			if(data.status == 200){
+        var deferred = $.Deferred();
 
-				ui = login_result.ui;
-				at = login_result.at;
+        //附上group list
+        getGroupList(login_result.ui,login_result.at).complete(function(data){
+            if(data.status == 200){
 
-				//自動登入儲存
-				if($(".login-auto").data("chk")) $.lStorage("_loginAutoChk",true);
+                ui = login_result.ui;
+                at = login_result.at;
 
-				var group_list = $.parseJSON(data.responseText).gl;
-				if(group_list && $.parseJSON(data.responseText).gl.length > 0){
-					//有group
+                //自動登入儲存
+                if($(".login-auto").data("chk")) $.lStorage("_loginAutoChk",true);
 
-					$.lStorage("_groupList",group_list);
-					//將group list 更新到 lstorage ui
-					groupListToLStorage();
+                var parse_data = $.parseJSON(data.responseText);
+                if( !parse_data ){
+                    console.debug("no group data");
+                    return;
+                }
 
-					// 取dgi的combo
-					if( login_result.dgi || group_list.length>0 ){
-						if( null==login_result.dgi || login_result.dgi.length==0 ){
-							login_result.dgi = group_list[0].gi;
-							$.lStorage("_loginData",login_result);
-						}
-						if( login_result.dgi ){
-							getGroupCombo(login_result.dgi,function(){
-		                		localStorage["uiData"] = JSON.stringify($.lStorage(ui));
-								document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-main";
-		                	});
-						} else {
-							//沒group
-							document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
-						}
-					} else{
-						//沒group
-						document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
-					}
-				}else{
-					localStorage.removeItem("_groupList");
-					//沒group
-					document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
-				}
-			}else if(data.status == 401){
-				//取得group list 失敗 代表自動登入失敗了
-				localStorage.removeItem("_loginData");
-				// $(".login").trigger("click");
-			}
-		});
-	}
+                var private_group_list = parse_data.cl;
+                var group_list = parse_data.gl;
+                if(group_list && (group_list.length > 0||private_group_list.length>0) ){
+
+                    //有group
+
+                    $.lStorage("_groupList",group_list);
+
+                    getPrivateGroupFromList( private_group_list, function(){
+
+                        //將group list 更新到 lstorage ui
+                        groupListToLStorage();
+
+                        // 取dgi的combo
+                        if( login_result.dgi || group_list.length>0 ){
+                            if( null==login_result.dgi || login_result.dgi.length==0 ){
+                                login_result.dgi = group_list[0].gi;
+                                $.lStorage("_loginData",login_result);
+                            }
+                            if( login_result.dgi ){
+                                getGroupCombo(login_result.dgi,function(){
+                                    deferred.resolve({location:"main.html#page-group-main"});
+                                });
+                            } else {
+                                //沒group
+                                deferred.resolve({location:"main.html#page-group-menu"});
+                            }
+                        } else{
+                            //沒group
+                            deferred.resolve({location:"main.html#page-group-menu"});
+                        }
+                    });
+                }else{
+                    localStorage.removeItem("_groupList");
+                    //沒group
+                    deferred.resolve({location:"main.html#page-group-menu"});
+                    // document.location = "main.html#page-group-menu";
+                }
+            }else if(data.status == 401){
+
+                //取得group list 失敗 代表自動登入失敗了
+                deferred.resolve({fail:true});
+            }
+        });
+
+        deferred.done(function(data){
+            if(data.fail === true) {
+                //取得group list 失敗 代表自動登入失敗了
+                localStorage.removeItem("_loginData");
+                return false;
+            }
+
+            $.lStorage("refreshChk", false);
+            localStorage["uiData"] = JSON.stringify($.lStorage(ui));
+            document.location = data.location;    
+        });
+    }
 
 
-	getGroupList = function(ui,at){
+	getGroupList = function(ui,at,cl){
     	//取得團體列表
         var api_name = "groups";
         var headers = {
@@ -410,7 +385,44 @@ onCheckVersionDone = function(needUpdate){
             "li":lang
         };
         var method = "get";
-        return ajaxDo(api_name,headers,method,true,false,false,true);
+        return ajaxDo(api_name,headers,method,true,false,false,true,cl);
+    }
+
+	getPrivateGroupList = function(p_data, callback){
+    	//取得團體列表
+        var api_name = "groups";
+        var headers = {
+            "ui":p_data.ui,
+            "at":p_data.at,
+            "li":lang
+        };
+        var method = "get";
+        ajaxDo(api_name,headers,method,true,false,false,true,p_data.cl).complete(function(res){
+        	if( res.status==200 ){
+        		var parse_data = $.parseJSON(res.responseText);
+	    		var list = $.lStorage("_pri_group")||{};
+	    		list[p_data.ci] = p_data;
+	    		list[p_data.ci].tmp_groups = parse_data.gl;
+	    		$.lStorage("_pri_group", list);
+	    	}
+	    	if(callback) callback();
+        });
+    }
+
+    getPrivateGroupFromList = function( data, callback ){
+    	if( !data || data.length==0 ){
+    		if(callback) callback();
+    	}
+    	var cnt = 0;
+    	for( var i=0; i<data.length; i++ ){
+    		var p_data = data[i];
+	    	getPrivateGroupList(p_data ,function(res){
+	    		cnt++;
+	    		if(callback && cnt==data.length){
+	    			callback();
+	    		}
+	    	});
+	    }
     }
 /*	
 
@@ -635,7 +647,7 @@ onCheckVersionDone = function(needUpdate){
     $(".setting-first-name input,.setting-last-name input").bind("input",function(){
 		if($(".setting-first-name input").val() 
 			&& $(".setting-last-name input").val()  
-			&& $(".setting-birth input").val()
+			// && $(".setting-birth input").val()
 		){
 			$(".setting-next").addClass("setting-next-ready");
 		}else{
@@ -724,24 +736,40 @@ onCheckVersionDone = function(needUpdate){
         var result = ajaxDo(api_name,headers,method,true,body);
         result.complete(function(data){
         	cns.debug("傳送驗證碼後的 data:",data);
+        	//default
+			$(".resend-otp").removeClass("resend-otp-ready");
+
         	if(resend){
         		//popupShowAdjust("","驗證碼已重新送出");
-				
-                s_load_show = false;
-                $('.ui-loader').hide();
-                $(".ajax-screen-lock").hide();
-        		toastShow( $.i18n.getString("REGISTER_AUTH_SMS_HAS_SENT") );
-        		
+				if(data.status == 200){
+	                s_load_show = false;
+	                $('.ui-loader').hide();
+	                $(".ajax-screen-lock").hide();
+	        		toastShow( $.i18n.getString("REGISTER_AUTH_SMS_HAS_SENT") );
+        		}
 			}else if(data.status == 200){
 				$(".register-otp-desc-area div").html($(document).data("phone-id"));
 				//default
-				$(".resend-otp").removeClass("resend-otp-ready");
+
+				$(".register-otp-input input").val("");
 				$.mobile.changePage("#page-register-otp");
+			}else{
+				var str = "unknown error";
+				try {
+					str = JSON.parse(data.responseText).rsp_msg;
+				} catch(e){
+					cns.debug( e.message );
+
+				}
+
+				toastShow( str );
 			}
         });
 	}
 
 	activateStep1 = function(){
+		var otpCode = $(".register-otp-input input").val();
+
 		var api_name = "activation/step1";
         var headers = {
                  "li":lang,
@@ -763,7 +791,7 @@ onCheckVersionDone = function(needUpdate){
 					if(jqXHR.responseText){
 						var tmp = $.parseJSON(jqXHR.responseText);
 						if( 900==tmp.rsp_code ){
-			        		popupShowAdjust("",tmp.rsp_msg,true,true,[onRewriteRegitration,null]);
+			        		popupShowAdjust("",tmp.rsp_msg,true,true,[onRewriteRegitration,otpCode]);
 			        	} else {
 	    					popupShowAdjust("",tmp.rsp_msg,true);
 			        	}
@@ -781,6 +809,10 @@ onCheckVersionDone = function(needUpdate){
 
         	//清除db
         	resetDB();
+        	$(".register-otp-input input").val("");
+
+        	$(".register-otp-input input").trigger("input");
+        	$(".resend-otp").addClass("resend-otp-ready");
 
         	if(data.status == 200){
         		cns.debug("跳到 #page-password");//"hash+#page-password"
@@ -788,13 +820,12 @@ onCheckVersionDone = function(needUpdate){
         	}else{
         		// var parseJSON = $.parseJSON(data.responseText);
         		// $(".register-otp-input input").val("");
-        		// $(".register-otp-input input").trigger("input");
-        		// $(".resend-otp").addClass("resend-otp-ready");
+        		
         	}
         });
 	}
 
-	onRewriteRegitration = function(){
+	onRewriteRegitration = function(otpCode){
 		var api_name = "activation/unbind";
         var headers = {
                  "li":lang,
@@ -802,7 +833,8 @@ onCheckVersionDone = function(needUpdate){
         var method = "post";
         var body = {
             id: $(document).data("phone-id"),
-            ud: $(document).data("device-token")
+            ud: $(document).data("device-token"),
+            vc: otpCode
         }
         
         var result = ajaxDo(api_name,headers,method,true,body);

@@ -75,30 +75,26 @@
             </div>
             <div class="gm-nav">
                 <div class="gm-create gm-nav-box gm-nav-active" data-type="build">
-                    <img src="images/groupmenu/buildgroup_tab_bt_build_click.png"/>
                     <span data-textid="GROUP_CREATE_GROUP"></span>
                 </div>
                 <div class="gm-invite gm-nav-box" data-type="invite">
-                    <img src="images/groupmenu/buildgroup_tab_bt_invite.png"/>
                     <span data-textid="GROUP_INVITATION"></span>
                 </div>
             </div>
             <div class="gm-create-area gm-sub-area">
                 <div class="gmc-avatar">
+                    <div class="gmc-avatar-deco"></div>
                     <div class="gmc-avatar-wrap">
-                        <img src="images/common/others/empty_img_group_190x190.png"/>
+                        <img src="images/icon/icon_build_photo.png"/>
                     </div>
-                    <div class="gmc-word" data-textid="GROUP_EDIT"></div>
-                    <div class="gmc-frame"></div>
+                    <!-- <div class="gmc-word" data-textid="GROUP_EDIT"></div> -->
 
                 </div>
                 <input type="file" class="gmc-file" style="display:none" data-role="none"/>
                 <div class="gmc-name">
-                    <img src="images/groupmenu/buildgroup_icon_group.png"/>
                     <input data-role="none" data-textph-id="GROUP_GROUP_NAME"/>
                 </div>
                 <div class="gmc-desc">
-                    <img src="images/groupmenu/buildgroup_icon_introduction.png"/>
                     <textarea maxlength="150" data-role="none" data-textph-id="GROUP_ABOUT"></textarea>
                 </div>
 
@@ -107,7 +103,7 @@
 
             <div class="gm-invite-area gm-sub-area" style="display:none">
                 <div class="gmi-coachmake">
-                    <img src="images/coachmake/logo_status_group.png"/>
+                    <img src="images/icon/icon_empty_invite.png"/>
                     <span data-textid="GROUP_NO_INVITATION"></span>
                 </div>
                 <div class="gmi-div-area">
@@ -157,41 +153,7 @@
                         </div>
 
                         <div class="header-menu">
-                            <div data-sm-act="feeds" data-polling-cnt="A1" class="sm-small-area polling-cnt polling-local">
-                               <div class="sm-small-area-r" data-textid="LEFT_FEED"></div>
-                               <div class="sm-count" style="display:none;"></div>
-                            </div>
-                            <div data-sm-act="memberslist" data-polling-cnt="A2" class="sm-small-area polling-cnt polling-local">
-                               <div class="sm-small-area-r" data-textid="LEFT_MEMBER"></div>
-                               <div class="sm-count" style="display:none;"></div>
-                            </div>
-                            <div data-sm-act="chat" data-polling-cnt="A3" class="sm-small-area polling-cnt polling-local">
-                               <div class="sm-small-area-r" data-textid="LEFT_CHAT"></div>
-                               <div class="sm-count" style="display:none;"></div>
-                            </div>
-                            <div data-sm-act="feed-public" class="sm-small-area">
-                               <div class="sm-small-area-r" data-textid="LEFT_FEED_GROUP"></div>
-                               <!-- <div class="sm-count"></div> -->
-                            </div>
-                            <div data-sm-act="feed-post" class="sm-small-area">
-                               <div class="sm-small-area-r" data-textid="LEFT_FEED_MEMBER"></div>
-                               <!-- <div class="sm-count"></div> -->
-                            </div>
-                            <div data-sm-act="album" class="sm-small-area">
-                               <div class="sm-small-area-r" data-textid="COMMON_ALBUM"></div>
-                               <!-- <div class="sm-count"></div> -->
-                            </div>
-                            <div data-sm-act="groupSetting" class="sm-small-area">
-                               <div class="sm-small-area-r" data-textid="GROUPSETTING_TITLE"></div>
-                               <!-- <div class="sm-count"></div> -->
-                            </div>
-                            <div data-sm-act="addressBook" class="sm-small-area">
-                               <div class="sm-small-area-r" data-textid="ADDRESSBOOK_TITLE"></div>
-                               <!-- <div class="sm-count"></div> -->
-                            </div>
                         </div>
-
-
 
                         <div class="feed-compose header-icon _2"></div>
                         <div class="chatList-add header-icon _2"></div>
@@ -200,30 +162,7 @@
                         <!-- <div class="addressBook-add header-icon _2"></div> -->
                         <div class="navi-alert header-icon _1"></div>
                         <div class="feed-compose-area">
-                            <div data-fc-box="announcement" class="fc-area-subbox" style="display:none">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_bulletin.png"/>
-                                <div data-textid='FEED_BULLETIN'></div>
-                            </div>
-                            <div data-fc-box="post" class="fc-area-subbox">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_post.png"/>
-                                <div data-textid="FEED_POST"></div>
-                            </div>
-                            <div data-fc-box="feedback" class="fc-area-subbox">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_report.png"/>
-                                <div data-textid='FEED_REPORT'></div>
-                            </div>
-                            <div data-fc-box="work" class="fc-area-subbox">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_task.png"/>
-                                <div data-textid='FEED_TASK'></div>
-                            </div>
-                            <div data-fc-box="vote" class="fc-area-subbox">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_vote.png"/>
-                                <div data-textid='FEED_VOTE'></div>
-                            </div>
-                            <div data-fc-box="check" class="fc-area-subbox fc-check">
-                                <img class="fc-icon-size" src="images/icon/icon_compose_location.png"/>
-                                <div data-textid='FEED_LOCATION'></div>
-                            </div>
+                            <!-- 貼文選單 -->
                         </div>
                         <div class="feed-compose-area-cover"></div>
                     </div>
@@ -262,6 +201,7 @@
                            <div class="sm-count"></div>
                         </div> -->
                         <div class="sm-hr" data-textid="LEFT_GROUP"></div>
+                        <div class="sm-loading"></div>
                         <div class="sm-group-list-area">
                           
                         </div>
@@ -390,17 +330,17 @@
                                         <img class="icon" src="images/icon/icon_offical_info_normal.png"/>
                                         <div class="text" data-textid="OFFICIAL_ABOUT"></div>
                                     </div>
-                                    <div class="st-official-tab" data-type="chat">
+                                    <!-- <div class="st-official-tab" data-type="chat">
                                         <img class="icon" src="images/icon/icon_meg_normal.png"/>
                                         <div class="text" data-textid="OFFICIAL_CHAT"></div>
                                     </div>
                                     <div class="st-official-tab" data-type="setting">
                                         <img class="icon" src="images/icon/icon_offical_set_normal.png"/>
                                         <div class="text" data-textid="OFFICIAL_SETTING"></div>
-                                    </div>
+                                    </div> -->
                                 </div>
 
-                                <div class="st-official-tab-row">
+                                <!-- <div class="st-official-tab-row">
                                     <div class="st-official-tab" data-type="invite">
                                         <img class="icon" src="images/icon/icon_offical_invite_activity.png"/>
                                         <div class="text" data-textid="OFFICIAL_INVITE"></div>
@@ -414,9 +354,9 @@
                                 <div class="st-official-tab-row">
                                     <div class="st-official-tab" data-type="cnt">
                                         <div class="text"></div>
-                                        <img class="icon" src="images/icon/icon_arrow_right.png"/>
-                                    </div>
-                                </div>
+                                        <!-- <img class="icon" src="images/icon/icon_arrow_right.png"/> -->
+                                    <!--</div>
+                                </div> -->
                             </div>
                             <!-- 官方帳號admin end -->
 
@@ -613,6 +553,60 @@
                             </div>
                             <div class="gs-leave" data-textid="GROUPSETTING_LEAVE_GROUP">
                             </div>
+                        </div>
+
+                    <!--------------------------------- 檔案共享 -------------------------------->
+                        <div class="subpage-fileSharing main-subpage" style="display:none;height: 100%">
+                            <section class="fileSharing">
+                                <div class="top-fixed">
+                                    <div class="top">
+                                        <img class="home size1" src="images/fileSharing/home_icon@2x.png">
+                                        <img class="v-arrow" src="images/fileSharing/expand_icon.png">
+                                        <section class="breadcrumb-cover">
+                                            <ul class="breadcrumb-more">
+                                                <li><img class="folder" src="images/fileSharing/folder_icon@2x.png"><span>Folder1</span></li>
+                                                <li><img class="folder" src="images/fileSharing/folder_icon@2x.png"><span>Folder2</span></li>
+                                                <li><img class="home" src="images/fileSharing/home_icon@2x.png"><span data-textid="FILESHARING_HOME"></span></li>
+                                            </ul>
+                                        </section>
+                                        <span class="breadcrumb"></span>
+                                        <span class="operator" style="display:none">
+                                            <img name="download" src="images/fileSharing/download_icon@2x.png">
+                                            <img name="rename" src="images/fileSharing/rename_icon@2x.png">
+                                            <img name="move" src="images/fileSharing/move_icon@2x.png" style="display:none">
+                                            <img name="delete" src="images/fileSharing/delete_icon@2x.png">
+                                        </span>
+                                        <img class="more size1" src="images/fileSharing/more_icon@2x.png">
+                                    </div>
+                                </div>
+                                <div class="title">
+                                    <span class="cl1">名稱</span>
+                                    <span class="cl2">
+                                        修改時間<img class="v-arrow" src="images/fileSharing/expand_icon.png">
+                                    </span>
+                                    <span class="cl3">檔案大小</span>
+                                </div>
+
+                                <section class="list">
+                                </section>
+
+                                <section class="file-cover">
+                                    <ul class="more">
+                                        <li data-textid="FILESHARING_CREATE_FOLDER"></li>
+                                        <li data-textid="FILESHARING_UPLOAD_FILE"></li>
+                                    </ul>
+                                    <div class="general">
+                                       <div class="title"></div>
+                                        <div class="input-area"><input type="text" data-role="none"></div>
+                                        <div class="err-msg" data-textid="FILESHARING_ERR_MSG"></div>
+                                        <div class="confirm">
+                                           <button class="cancel" data-role="none" data-textid="COMMON_CANCEL"></button>
+                                           <button class="submit" data-role="none" data-textid="COMMON_OK"></button>
+                                        </div>
+                                    </div>
+                                </section>
+                                <input type="file" style="display:none">
+                            </section>
                         </div>
 
                     <!--------------------------------- 系統設定 -------------------------->
@@ -1053,5 +1047,6 @@
         <div id="send-sync-sticker-signal"></div>
         <div id="recv-sync-sticker-signal"></div>
         <div id="recv-chatroom-focus" class="sm-cl-count"></div>
+        <div id="recv-sync-chat-list"></div>
     </body>
 </html>

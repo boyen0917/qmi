@@ -69,7 +69,7 @@
 	"FEED_CLICK_LIKE" : "%@ likes this",
 	"FEED_CLICK_LIKE_2PEOPLE" : "%@ and %@ like this",
 	"FEED_3PEOPLE_LIKE" : "%@ and %ld others like this",
-	"FEED_YOU_AND_3PEOPLE_LIKE" : "%@, %@ 及其他 %ld人 按讚",
+	"FEED_YOU_AND_3PEOPLE_LIKE" : "%@, %@ and other %ld人 like this",
 	"FEED_BE_FIRST_LIKE" : "Be the first one to like this",
 	"FEED_REPLY" : "Reply",
 	"FEED_TOP" : "Top it",
@@ -101,6 +101,7 @@
 	"FEED_VOTE_ANONYMOUS_DESC" : "anonymous voting , only publishing the number of votes",
 	"FEED_EVENT_DELETED" : "This event has been deleted.",
 	"FEED_READ_LIST_DISABLED" : "This group is not able to check read/unread list.",
+	"FEED_CONFIRM_DISCARD" : "Cancel editing?",
 
 	"COMPOSE_DESCRIPTION" :	"Description",
 	"COMPOSE_TITLE" :	"Title",
@@ -161,6 +162,8 @@
 	"INVITE_SUCC" : "Send invitation successed.",
 	"INVITE_FAIL" : "Send invitation failed.",
 	"INVITE_ALREADY_IN_GROUP" : "This member is already in group.",
+	"INVITE_DELETED_SUCC" : "Invitations deleted successfully.",
+	"INVITE_DELETED_FAIL" : "Invitations deleted failed.",
 	"QRCODE_TITLE" : "QR Code",
 	"QRCODE_JOIN_ENABLED" : "Enable join group by scaning QR Code",
 	"QRCODE_UPDATE" : "Update QR Code",
@@ -208,6 +211,8 @@
 	"COMMON_PRIVATE" : "Private",
 	"COMMON_PUBLIC" : "Public",
 	"COMMON_EXCEED_FILE_SIZE" : "File size exceeds limit.",
+	"COMMON_NOT_MP4_NOR_IMAGE" : "File must be MP4 OR image.",
+	"COMMON_NOT_IMAGE" : "File must be image.",
 	
 	"CHAT_TITLE"							: "Chat",
 	"CHAT_SEND"  						: "Send",
@@ -315,5 +320,19 @@
 
 	"ADDRESSBOOK_TITLE" : "AddressBook",
 	"ADDRESSBOOK_ADD" : "Add custom address book",
-	"ADDRESSBOOK_CUSTOM" : "Custom address book"
+	"ADDRESSBOOK_CUSTOM" : "Custom address book",
+
+	"FILESHARING_TITLE" : "FileSharing",
+	"FILESHARING_CREATE_FOLDER" : "create folder",
+	"FILESHARING_UPLOAD_FILE" : "upload file",
+	"FILESHARING_ERR_MSG" : "file/folder name has already existed",
+	"FILESHARING_EMPTY_MSG" : "name is required",
+	"FILESHARING_CREATE_SUCCESS" : "create successful",
+	"FILESHARING_UPLOAD_SUCCESS" : "upload successful",
+	"FILESHARING_UPLOAD_OVERLIMIT" : "file size limit exceeded",
+	"FILESHARING_RENAME" : "rename",
+	"FILESHARING_DELETE_CONFIRM" : "Are you sure to delete this file ?",
+	"FILESHARING_DELETE_OK" : "delete successful",
+	"FILESHARING_HOME" : "home",
+	"COMMON_UNKNOWN_ERROR" : "unknown error"
 }

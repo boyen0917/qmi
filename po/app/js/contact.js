@@ -193,7 +193,7 @@ onSearchInput = function(e){
 		searchResult = $('<div class="contact-searchResult" style="display:none;"></div>');
 		contact.after( searchResult );
 	}
-	searchResult.show();
+	searchResult.show().scrollTop(0);
 	contact.hide();
 
 	//search with no case sensitive
@@ -619,52 +619,85 @@ switchListAndGrid = function( dom, subPageBottom ){
 
 generateMemberGrid = function( memObject ){
 	var memContainer = $("<div class='contact-mems'></div>");
-	$.each(memObject,function(key,mem){
-		if( null== mem ){
-			cns.debug(key);
-		} else {
-			var tmp = $("<div class='mem namecard'></div>");
-			if( mem.aut && mem.aut.length>0 ){
-				tmp.append("<div class='img waitLoad' data-url='"+mem.aut+"'><div class='new' style='display:none;'>NEW</div></div>");
+	try{
+		var keys = Object.keys(memObject);
+		keys.sort( function(a, b){
+			// console.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
+			if (memObject[a].nk < memObject[b].nk)	return -1;
+			if (memObject[a].nk > memObject[b].nk)	return 1;
+			return 0;
+		});
+		// $.each(memObject,function(key,mem){
+		for( var i=0; i<keys.length; i++){
+			var key = keys[i];
+			var mem = memObject[key];
+			if( null== mem ){
+				cns.debug(key);
 			} else {
-				tmp.append("<div class='img'><div class='new' style='display:none;'>NEW</div></div>");
-			}
-			// cns.debug(key, mem.nk);
-			tmp.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
-			tmp.data("gu",key);
-			//is admin?
-			if( mem.ad==1 ){
-				tmp.addClass("admin");
-				memContainer.prepend(tmp);
-			} else {
-				memContainer.append(tmp);
-			}
-			//is new mem
-			setNewMemTag( tmp, mem );
-			// if( g_newMemList.hasOwnProperty(mem.gu) ){
-			// 	tmp.find(".new").show();
-			// 	tmp.click( function(){
-			// 		if( g_newMemList.hasOwnProperty(mem.gu) ){
-			// 			delete g_newMemList[mem.gu];
-			// 			var tmpMemList = $.lStorage("_newMemList");
-			// 			tmpMemList[gi] = g_newMemList;
-			// 			$.lStorage("_newMemList",tmpMemList);
-			// 		}
-			// 		$(this).find(".new").hide();
-			// 		$(this).unbind("click");
-			// 	});
-			// }
+				var tmp = $("<div class='mem namecard'></div>");
+				if( mem.aut && mem.aut.length>0 ){
+					tmp.append("<div class='img waitLoad' data-url='"+mem.aut+"'><div class='new' style='display:none;'>NEW</div></div>");
+				} else {
+					tmp.append("<div class='img'><div class='new' style='display:none;'>NEW</div></div>");
+				}
+				// cns.debug(key, mem.nk);
+				tmp.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
+				tmp.data("gu",key);
 
+				//new > admin > normal
+				if( isNewMem(mem) ){
+					tmp.addClass("new-mem");
+					var lastNewDom = memContainer.find(".new-mem");
+					if( lastNewDom.length>0 ){
+						$(lastNewDom[lastNewDom.length-1]).after(tmp);
+					} else {
+						memContainer.prepend(tmp);
+					}
+					setNewMemTag( tmp );
+				} else if( mem.ad==1 ){	//is admin?
+					tmp.addClass("admin");
+					var lastAdminDom = memContainer.find(".admin");
+					if( lastAdminDom.length>0 ){
+						$(lastAdminDom[lastAdminDom.length-1]).after(tmp);
+					} else {
+						var lastNewDom = memContainer.find(".new-mem");
+						if( lastNewDom.length>0 ){
+							$(lastNewDom[lastNewDom.length-1]).after(tmp);
+						} else {
+							memContainer.prepend(tmp);
+						}
+					}
+				} else {
+					memContainer.append(tmp);
+				}
+				// if( g_newMemList.hasOwnProperty(mem.gu) ){
+				// 	tmp.find(".new").show();
+				// 	tmp.click( function(){
+				// 		if( g_newMemList.hasOwnProperty(mem.gu) ){
+				// 			delete g_newMemList[mem.gu];
+				// 			var tmpMemList = $.lStorage("_newMemList");
+				// 			tmpMemList[gi] = g_newMemList;
+				// 			$.lStorage("_newMemList",tmpMemList);
+				// 		}
+				// 		$(this).find(".new").hide();
+				// 		$(this).unbind("click");
+				// 	});
+				// }
+
+			}
+		// });
 		}
-	});
-	//"<div class='img' style='background-image:url("+mem.aut+");'><div class='new' style='display:none;'>NEW</div></div>");
-	
-	var tmp = memContainer.find(".img.waitLoad:lt(30)");
-	$.each(tmp, function(index,domTmp){
-		var dom = $(domTmp);
-		dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
-	});
-	g_contactWaitLoadImgs = memContainer.find(".img.waitLoad");
+		//"<div class='img' style='background-image:url("+mem.aut+");'><div class='new' style='display:none;'>NEW</div></div>");
+		
+		var tmp = memContainer.find(".img.waitLoad:lt(30)");
+		$.each(tmp, function(index,domTmp){
+			var dom = $(domTmp);
+			dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
+		});
+		g_contactWaitLoadImgs = memContainer.find(".img.waitLoad");
+	} catch(e){
+		errorReport(e);
+	}
 
 	return memContainer;
 }
@@ -673,124 +706,143 @@ generateMemberGrid = function( memObject ){
 generateMemberList = function( memObject, favCallback ){
 	var memContainer = $("<div class='contact-memLists'></div>");
 	var count = 0;
-	$.each(memObject,function(key,mem){
-		//favorite ver.
-		// var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
-		var tmp = $("<div class='row mem namecard'><div class='left'></div><div class='mid'></div><div class='right'>&nbsp</div></div>");
-		//pic
-		var left = tmp.find(".left");
-		if( mem.aut && mem.aut.length>0 ){
-			// left.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
-			left.append("<div class='img waitLoad' data-url='"+mem.aut+"'><div class='new' style='display:none;'>NEW</div></div>");
-		} else {
-			left.append("<div class='img'></div>");
+	try{
+		var keys = Object.keys(memObject);
+		keys.sort( function(a, b){
+			// console.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
+			if (memObject[a].nk < memObject[b].nk)	return -1;
+			if (memObject[a].nk > memObject[b].nk)	return 1;
+			return 0;
+		});
+		// $.each(memObject,function(key,mem){
+		for( var i=0; i<keys.length; i++){
+			var key = keys[i];
+			var mem = memObject[key];
+			// console.debug(mem.nk);
+			//favorite ver.
+			// var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
+			var tmp = $("<div class='row mem namecard'><div class='left'></div><div class='mid'></div><div class='right'>&nbsp</div></div>");
+			//pic
+			var left = tmp.find(".left");
+			if( mem.aut && mem.aut.length>0 ){
+				// left.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
+				left.append("<div class='img waitLoad' data-url='"+mem.aut+"'><div class='new' style='display:none;'>NEW</div></div>");
+			} else {
+				left.append("<div class='img'></div>");
+			}
+			//name, (職稱), detail
+			var mid = tmp.find(".mid");
+			mid.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
+			
+			//暫時用部門取代職稱
+			var posi = "";
+			try{
+				posi = bl[mem.bl.split(",")[0].split(".")[0]].bn;
+			} catch( e ){
+				// cns.debug( e.message );
+			}
+			var tmpRow = $("<div class='detail'>"+posi+"</div>");
+			if(posi.length==0) tmpRow.css("display","none");
+			mid.append(tmpRow);
+			
+			var sl = (mem.sl)? mem.sl : "";
+			tmpRow = $("<div class='detail'>"+sl+"</div>");
+			if(sl.length==0) tmpRow.css("display","none");
+			mid.append(tmpRow);
+			if( !posi || posi.length==0 ){
+				mid.find(".detail:last-child").addClass("twoLine");
+			}
+
+			//favorite disabled, remove '.namecard' of .right before enable this
+			////favorite
+			// var right = tmp.find(".right");
+			// var fav = $("<div class='fav'></div>");
+			// if( mem && true==mem.fav ){
+			// 	right.addClass("active", true);
+			// }
+			// right.append(fav);
+
+			// right.data("gu",key);
+			// left.data("gu",key);
+			// mid.data("gu",key);
+			tmp.data("gu",key)
+
+
+			if( isNewMem(mem) ){
+				tmp.addClass("new-mem");
+				var lastNewDom = memContainer.find(".new-mem");
+				if( lastNewDom.length>0 ){
+					$(lastNewDom[lastNewDom.length-1]).after(tmp);
+				} else {
+					memContainer.prepend(tmp);
+				}
+				setNewMemTag( tmp );
+			} else if( mem.ad==1 ){	//is admin?
+				tmp.addClass("admin");
+				var lastAdminDom = memContainer.find(".admin");
+				if( lastAdminDom.length>0 ){
+					$(lastAdminDom[lastAdminDom.length-1]).after(tmp);
+				} else {
+					var lastNewDom = memContainer.find(".new-mem");
+					if( lastNewDom.length>0 ){
+						$(lastNewDom[lastNewDom.length-1]).after(tmp);
+					} else {
+						memContainer.prepend(tmp);
+					}
+				}
+			} else {
+				memContainer.append(tmp);
+			}
+		// });
 		}
-		//name, (職稱), detail
-		var mid = tmp.find(".mid");
-		mid.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
-		
-		//暫時用部門取代職稱
-		var posi = "";
-		try{
-			posi = bl[mem.bl.split(",")[0].split(".")[0]].bn;
-		} catch( e ){
-			// cns.debug( e.message );
-		}
-		var tmpRow = $("<div class='detail'>"+posi+"</div>");
-		if(posi.length==0) tmpRow.css("display","none");
-		mid.append(tmpRow);
-		
-		var sl = (mem.sl)? mem.sl : "";
-		tmpRow = $("<div class='detail'>"+sl+"</div>");
-		if(sl.length==0) tmpRow.css("display","none");
-		mid.append(tmpRow);
-		if( !posi || posi.length==0 ){
-			mid.find(".detail:last-child").addClass("twoLine");
-		}
 
-		//favorite disabled, remove '.namecard' of .right before enable this
-		////favorite
-		// var right = tmp.find(".right");
-		// var fav = $("<div class='fav'></div>");
-		// if( mem && true==mem.fav ){
-		// 	right.addClass("active", true);
-		// }
-		// right.append(fav);
+		////favorite click(disabled)
+		// memContainer.find(".right").off("click").click( function(){
+		// 	var thisTmp = $(this);
+		// 	if( thisTmp.hasClass("sending") ) return;
+		// 	thisTmp.addClass("sending");
+		// 	var gu = thisTmp.data("gu");
+		// 	cns.debug(gu);
+		// 	if( !gu ) return;
 
-		// right.data("gu",key);
-		// left.data("gu",key);
-		// mid.data("gu",key);
-		tmp.data("gu",key)
+		// 	var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
+		//     var headers = {
+		//              "ui":ui,
+		//              "at":at, 
+		//              "li":lang,
+		//                  };
+		// 	ajaxDo(api_name,headers,"put",true,null).complete(function(data){
+		// 		thisTmp.removeClass("sending");
+		// 		if(data.status == 200){
+		// 			//save to db
+		// 			var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
+		// 			cns.debug("add:",isAdded);
+		// 			thisTmp.toggleClass("active", isAdded);
+		// 			var data = $.lStorage(ui);
+		// 			data[gi].guAll[gu].fav = isAdded;
+		// 			guAll = data[gi].guAll;
+		// 			$.lStorage(ui, data);
+		// 		}
+		// 		if( favCallback ) favCallback();
+		// 	});
+		// });
 
-
-		//is admin?
-		if( mem.ad==1 ){
-			tmp.addClass("admin");
-			memContainer.prepend(tmp);
-		} else {
-			memContainer.append(tmp);
-		}
-
-		//is new mem
-		setNewMemTag( tmp, mem );
-	});
-
-	////favorite click(disabled)
-	// memContainer.find(".right").off("click").click( function(){
-	// 	var thisTmp = $(this);
-	// 	if( thisTmp.hasClass("sending") ) return;
-	// 	thisTmp.addClass("sending");
-	// 	var gu = thisTmp.data("gu");
-	// 	cns.debug(gu);
-	// 	if( !gu ) return;
-
-	// 	var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
-	//     var headers = {
-	//              "ui":ui,
-	//              "at":at, 
-	//              "li":lang,
-	//                  };
-	// 	ajaxDo(api_name,headers,"put",true,null).complete(function(data){
-	// 		thisTmp.removeClass("sending");
-	// 		if(data.status == 200){
-	// 			//save to db
-	// 			var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
-	// 			cns.debug("add:",isAdded);
-	// 			thisTmp.toggleClass("active", isAdded);
-	// 			var data = $.lStorage(ui);
-	// 			data[gi].guAll[gu].fav = isAdded;
-	// 			guAll = data[gi].guAll;
-	// 			$.lStorage(ui, data);
-	// 		}
-	// 		if( favCallback ) favCallback();
-	// 	});
-	// });
-
-	var tmp = memContainer.find(".img.waitLoad:lt(8)");
-	$.each(tmp, function(index,domTmp){
-		var dom = $(domTmp);
-		dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
-	});
+		var tmp = memContainer.find(".img.waitLoad:lt(8)");
+		$.each(tmp, function(index,domTmp){
+			var dom = $(domTmp);
+			dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
+		});
+	} catch(e){
+		errorReport(e);
+	}
 
 	return memContainer;
 }
-
-setNewMemTag = function( tmp, mem ){
-	if( g_newMemList.hasOwnProperty(mem.gu) ){
-		tmp.find(".new").show();
-		tmp.click( function(){
-			if( g_newMemList.hasOwnProperty(mem.gu) ){
-				delete g_newMemList[mem.gu];
-				var tmpMemList = $.lStorage("_newMemList");
-				tmpMemList[gi] = g_newMemList;
-				$.lStorage("_newMemList",tmpMemList);
-
-				$(".subpage-contact.main-subpage > .contact-rows > .row.all > .right .new").html( Object.keys(g_newMemList).length );
-			}
-			$(this).find(".new").hide();
-			$(this).unbind("click");
-		});
-	}
+isNewMem = function(mem){
+	return g_newMemList.hasOwnProperty(mem.gu);
+}
+setNewMemTag = function( tmp ){
+	tmp.find(".new").show();
 }
 updateNewMemTag = function( dom ){
 	var memDoms = dom.find(".mem.namecard");
@@ -826,8 +878,9 @@ setOnMemGridScroll = function(){
 	});
 }
 setOnMemListScroll = function(){
-	var memContainer = $(".contact-scroll");
+	var memContainer = $(".contact-scroll, .subpage-contact .contact-searchResult");
 	g_contactWaitLoadImgs = memContainer.find(".contact-memLists .img.waitLoad");
+
 	memContainer.unbind("scroll").scroll(function(){
 		if( null==g_contactWaitLoadImgs) return;
 		var height = $(this).height()+99;
@@ -1241,7 +1294,7 @@ showAddFavGroupBox = function( subPage ){
 				cns.debug( "create", name );
 				// container.fadeOut();
 				var option = {
-					isShowGroup:false,
+					isShowBranch:false,
 					isShowAll:false,
 					isShowFav:true
 				};
@@ -1334,7 +1387,7 @@ showEditFavGroupBox = function( dom ){
 	var oriData = dom.data("object_str");
 	oriData = $.parseJSON(oriData);
 	var option = {
-		isShowGroup:false,
+		isShowBranch:false,
 		isShowAll:false,
 		isShowFav:true,
 		isShowSelf:true
@@ -1533,10 +1586,13 @@ function showAddMemberPage(){
 	$("#page-contact-addmem .ca-invite").trigger("click");
 	$("#page-contact-addmem .ca-invite-submit").off("click").click( sendInvite );
 
+	updateInvitePending();
+}
 
+function updateInvitePending () {
 	//render invite pending member list
 	// updateInvitePending();
-	var api_name = "groups/" + gi + "/users?tp=1";
+	var api_name = "groups/" + gi + "/invitations";
 	var headers = {
 	         "ui":ui,
 	         "at":at, 
@@ -1546,14 +1602,9 @@ function showAddMemberPage(){
 	var result = ajaxDo(api_name,headers,method,false);
 	result.complete(function(data){
 		if(data.status != 200) return false;
-		var obj =$.parseJSON(data.responseText).ul;
-		inviteGuAll = {};
-		for( var i=0; i<obj.length; i++ ){
-			var mem = obj[i];
-			if( 0==mem.st ){
-				inviteGuAll[mem.gu] = mem;
-			}
-		}
+		var obj =$.parseJSON(data.responseText);
+		if( obj&&obj.hasOwnProperty("il") ) inviteGuAll = obj.il;
+
 		var userData = $.lStorage(ui);
 		if( userData && gi ){
 			if( userData.hasOwnProperty(gi) ){
@@ -1563,42 +1614,104 @@ function showAddMemberPage(){
 		$.lStorage(ui, userData);
 
 
-		updateInvitePending();
-	});
-}
-
-function updateInvitePending () {
-	//render invite pending member list
-	var pendingAreaParent = $("#page-contact-addmem .ca-pending-area");
-	var pendingArea = pendingAreaParent.children(".list");
-	var coachArea = pendingAreaParent.children(".coach").hide();
-	pendingArea.html("").show();
-	var noData = true;
-	if( inviteGuAll ){
-		var template = $('<div class="row">'
-				+'<div class="left"><img class="namecard"/></div>'
-				+'<div class="mid"><div class="name"></div><div class="phone"></div></div>'
-				+'<div class="right"><img src="images/icon/icon_invite_mail.png"/></div>'
-			+'</div>');
-		$.each(inviteGuAll, function(guTmp, mem){
-			if( mem && mem.st==0 ){
-				noData = false;
+		var pendingAreaParent = $("#page-contact-addmem .ca-pending-area");
+		var pendingArea = pendingAreaParent.children(".list");
+		var coachArea = pendingAreaParent.children(".coach");
+		//render invite pending member list
+		if( inviteGuAll && inviteGuAll.length>0){
+			coachArea.hide();
+			pendingArea.html("").show();
+			var template = $('<div class="row">'
+					+'<div class="left"><img class="pend_img" src="images/common/others/empty_img_personal_l.png"/></div>'
+					+'<div class="mid"><div class="name"></div><div class="phone"></div></div>'
+					+'<div class="right"><img class="resend" src="images/icon/icon_invite_mail.png"/><img class="del" src="images/icon/icon_chatroom_chatlist_del.png"</div>'
+				+'</div>');
+			for( var i=0;i<inviteGuAll.length;i++){
+				var mem = inviteGuAll[i];
 				var newRow = template.clone();
-				//img
-				newRow.find(".namecard").data("gu",guTmp).data("gi",gi).attr("src",mem.aut||"images/common/others/empty_img_personal_l.png");
 				//name
 				newRow.find(".name").html( htmlFormat(mem.nk||"") );
 				//phone
-				newRow.find(".phone").text( mem.pn||"" );
+				newRow.find(".phone").text( mem.ik||"" );
+				newRow.data("pn",mem.ik).data("nk",mem.nk).data("gi",gi);
 				pendingArea.append(newRow);
 			}
-		});
+			pendingArea.find(".resend").click(function(e){
+				var row = $(this).parents(".row");
+				var this_gi = row.data("gi");
+				var phone = row.data("pn");
+				var nk = row.data("nk");
+				cns.debug("resend", phone, nk );
 
-	}
-	if(noData){
-		coachArea.show();
-		pendingArea.hide();
-	}
+				if( this_gi && nk && phone ){
+					sendInviteAPI( this_gi, [{
+						"pn": phone,
+						"nk": nk
+					}], function(data){
+						if( data.status==200 ){
+							try{
+								var obj = $.parseJSON(data.responseText);
+								/* ----- TODO ------
+									如果已經邀過了...?
+								   ----- TODO ------ */
+								//mem already in group
+								if( obj.ul[0].aj==true ){
+									toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
+								} else {
+									toastShow( $.i18n.getString("INVITE_SUCC") );
+								}
+								updateInvitePending();
+
+							} catch(e){
+								toastShow( $.i18n.getString("INVITE_FAIL") );
+								errorReport(e);
+							}
+						} else {
+							toastShow( $.i18n.getString("INVITE_FAIL") );
+						}
+					});
+				} else{
+					toastShow( $.i18n.getString("INVITE_FAIL") );
+				}
+			});
+			pendingArea.find(".del").click(function(e){
+
+				var row = $(this).parents(".row");
+				var this_gi = row.data("gi");
+				var phone = row.data("pn");
+				cns.debug("del", this_gi, phone );
+
+				if( this_gi && phone ){
+					var succ = false;
+					removeInviteAPI( this_gi, [{
+						"ik": phone
+					}], function(data){
+						if( data.status==200 ){
+							try{
+								var obj = $.parseJSON(data.responseText);
+
+								updateInvitePending();
+								
+								toastShow( obj.rsp_msg );
+								succ = true;
+							} catch(e){
+								errorReport(e);
+							}
+						}
+
+						if(!succ){
+							toastShow( $.i18n.getString("INVITE_DELETED_FAIL") );
+						}
+					});
+				} else {
+					toastShow( $.i18n.getString("INVITE_DELETED_FAIL") );
+				}
+			});
+		} else {
+			coachArea.show();
+			pendingArea.hide();
+		}
+	});
 }
 
 
@@ -1676,7 +1789,7 @@ function sendInvite(){
 		 國碼/email
 		不同國別電話格式檢查
 	   ----- TODO ------*/
-	sendInviteAPI( [{
+	sendInviteAPI( gi, [{
 			"pn": phone,
 			"nk": nk
 		}], function(data){
@@ -1724,15 +1837,48 @@ function sendInvite(){
 	});
 }
 
-function sendInviteAPI( list, callback ){
-	var api_name = "groups/" + gi + "/invitations";
+function sendInviteAPI( this_gi, list, callback ){
+	var api_name = "groups/" + this_gi + "/invitations";
 	var headers = {
 	         "ui":ui,
 	         "at":at, 
 	         "li":lang,
 	             };
+
+	//private cloud, add uui & uat
+	var url;
+	try{
+		if( this_gi.indexOf(_pri_split_chat)==0 ){
+			var parse = parsePrivateGi(this_gi);
+			var pri_cloud = $.lStorage("_pri_group")[parse.ci];
+			headers.uui = ui;
+			headers.uat = at;
+			headers.ui = pri_cloud.ui;
+			headers.at = pri_cloud.at;
+			url = pri_cloud.cl;
+			api_name = "groups/" + parse.gi + "/invitations";
+		}
+	} catch(e){
+		errorReport(e);
+	}
+
 	var body = { "ul":list };
 	var method = "post";
+	var result = ajaxDo(api_name,headers,method,false, body, null, null, url);
+	result.complete(function(data){
+		callback(data);
+	});
+}
+
+function removeInviteAPI( this_gi, list, callback ){
+	var api_name = "groups/" + this_gi + "/invitations";
+	var headers = {
+	         "ui":ui,
+	         "at":at, 
+	         "li":lang,
+	             };
+	var body = { "il":list };
+	var method = "put";
 	var result = ajaxDo(api_name,headers,method,false, body);
 	result.complete(function(data){
 		callback(data);
@@ -1804,7 +1950,11 @@ function initQRCodePage(){
 	ajaxDo(api_name,headers,"get",true).complete(function(data){
 		if(data.status == 200){
 			var rps = $.parseJSON(data.responseText);
-			if(!rps) return;
+			if(!rps || rps.rsp_code<0 ){
+				imgContainer.find('img').hide();
+				imgContainer.addClass("disabled");
+				return;
+			}
 			switchBtn.attr("data-enabled",rps.rps);
 			if(rps.qst==0){ //donno why 0 stands for enabled...
 				imgContainer.removeClass("disabled");
@@ -1827,6 +1977,9 @@ function initQRCodePage(){
 		var type = $(this).attr("data-type");
 		$("#page-contact-addmem .ca-sub-area.active").removeClass("active");
 		$("#page-contact-addmem ."+type).addClass("active");
+		if( type=="pending" ){
+			updateInvitePending();
+		}
 	});
 	$("#page-contact-addmem .ca-qrcode-area .switch").off("click").click( function(){
 		var switchBtn = $(this);
@@ -1884,7 +2037,12 @@ function refreshQRCode( callback ){
 	ajaxDo(api_name,headers,"put",true).complete(function(data){
 		if(data.status == 200){
 			var rps = $.parseJSON(data.responseText);
-			if(!rps) return;
+			if(!rps || rps.rsp_code<0 ){
+				imgContainer.find('img').hide();
+				imgContainer.addClass("disabled");
+				if(callback) callback(false);
+				return;
+			}
 			imgContainer.find('img').attr("src", rps.qru ).off("load").load(function(){
 				$(this).show();
 				imgContainer.removeClass("disabled");
@@ -1895,8 +2053,8 @@ function refreshQRCode( callback ){
 			downloadBtn.attr("download", fileName );
 			if(callback) callback(true);
 		} else {
-			imgContainer.find('img').show();
-			imgContainer.removeClass("disabled");
+			imgContainer.find('img').hide();
+			imgContainer.addClass("disabled");
 			if(callback) callback(false);
 		}
 	});
