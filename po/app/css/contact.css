@@ -66,41 +66,29 @@
 .contact-search .content{
 }
 .contact-search .content .icon{
-	float: left;
-	width: 6%;
-	/* vertical-align: middle; */
-	margin-top: 5px;
-	position: fixed;
-	max-width: 25px;
-	margin-left: 2px;
+	width: 28px;
+    position: absolute;
+    top: 18px;
+    left: 20px;
 }
 .contact-search .content .input{
-	height: 100%;
-	width: 92.7%;
-	color: black;
-	line-height: 35px;
-	font-size: 20px;
-	border: white;
-	vertical-align: bottom;
-	float: left;
-	padding-left: 7%;
-	/*background: red;*/
-	padding-top: 4px;
+    height: 100%;
+    width: 90%;
+    color: black;
+    line-height: 40px;
+    font-size: 20px;
+    border: white;
+    padding-left: 45px;
 }
-.contact-search .content .input:active,.contact-search .content .input:focus{
-	box-shadow: 0 0 3px 2px rgba(57, 148, 232,0.5);
-	border: 0px solid rgba(57, 148, 232,0.7);
-	outline-color: rgba(57, 148, 232,0.7);
-}
+
+.contact-search .content .input:focus { outline: none;}
 .contact-search .content .clear{
-	width: 6%;
-	float: right;
-	/* vertical-align: middle; */
-	margin-top: 6px;
-	position: fixed;
-	right: 4%;
-	height: 25px;
-	max-width: 25px;
+	width: 25px;
+    margin-top: 6px;
+    position: absolute;
+    right: 4%;
+    height: 25px;
+    top: 14px;
 }
 
 .contact-searchResult{

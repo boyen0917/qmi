@@ -79,7 +79,7 @@
 }
 
 .subpage-chatList-row .name {
-	max-width: 220px;
+	/*max-width: 220px;*/
 	height: 26px;
 	color: #323537;
 	font-size: 18px;

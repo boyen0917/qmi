@@ -31,6 +31,46 @@ $(document).ready(function(){
 	} );
 });
 
+// getBranchMemCnt = function(bl){
+// 	var guAll = $.lStorage(ui)[gi].guAll;
+// 	var blAll = $.lStorage(ui)[gi].bl;
+// 	var blAllCntArr = [];
+// 	// for(i=0;i<Object.keys(guAll).length;i++){
+// 	// 	var guObj = guAll[Object.keys(guAll)[i]];
+// 	// 	if(guObj.bl !== "") {
+// 	// 		blAll
+// 	// 	}
+// 	// }
+
+// 	Object.keys(blAll).map(function(bl){
+// 		var blObj = blAll[bl];
+// 		// bn: "桑居都"
+// 		// cl: Array[2]
+// 		// cnt: 15
+// 		// lv: 3
+// 		// pi: "B000004j0EX"
+
+// 		Object.keys(blAll).map(function(gu){
+// 			var guObj = guAll[gu];
+// 			// auo: "https://project-o.s3.hicloud.net.tw/groups/G00000Yd0Fb/M0000FnN0BR/avatars/9999ef02-9224-4253-9bed-bf3fc10f24ce_o?Expires=1763708791&AWSAccessKeyId=SE41NTAxNDgyNDE0MjI2MDE4Mjg5MjM&Signature=P3yIO5CsOr8t0nhwQmoloQXqhdQ%3D"
+// 			// aut: "https://project-o.s3.hicloud.net.tw/groups/G00000Yd0Fb/M0000FnN0BR/avatars/9999ef02-9224-4253-9bed-bf3fc10f24ce_t?Expires=1763708791&AWSAccessKeyId=SE41NTAxNDgyNDE0MjI2MDE4Mjg5MjM&Signature=VWgqJZ3pYnf1XHBQITRmkATxzQY%3D"
+// 			// bl: ""
+// 			// gu: "M0000Fp7011"
+// 			// nk: "holger"
+// 			// pn: "+886919291236"
+// 			if(guObj.bl !== "" && guObj.bl.match(new RegExp(guObj.bl, "g"))) {
+// 				blObj.myCnt +=1
+// 			}
+// 		});
+
+// 	})
+
+
+
+
+// 	// return
+// }
+
 initContactList = function(){
 	//clear search result
 	$(".subpage-contact .contact-search .clear").trigger("click");

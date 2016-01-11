@@ -11,10 +11,8 @@ $(function(){
 	if(window.location.href.match(/^http:\/\/localhost|10.1.17.114/)) {
 		debug_flag = true;
 		//base_url = "https://capubliceim.mitake.com.tw/apiv1/";
-		base_url = "https://apserver.mitake.com.tw/apiv1/";
-	}
-
-	if(window.location.href.match(/wp.qmi.emome.net/)) {
+		// base_url = "https://apserver.mitake.com.tw/apiv1/";
+	}else if(window.location.href.match(/wp.qmi.emome.net/)) {
 		base_url = "https://ap.qmi.emome.net/apiv1/";
 	} else if(window.location.href.match(/eimweb.mitake.com.tw/)) {
 		base_url = "https://apserver.mitake.com.tw/apiv1/";

@@ -1245,16 +1245,30 @@ $(function(){
                     //*NOTE*
                     // 同一人可能隸屬于多個群組, 若兩個子群組有同一人,
                     // 母群組應該只能算一人, 普通加法不成立...
+
                     for( var biTmp in new_bl ){
+
                         //每個群組走過一次所有成員, 只要含有這個群組ＩＤ數量就加一..
                         var cnt=0;
                         for( var id in guAll ){
+
                             var mem = guAll[id];
-                            if( mem && mem.st==1 && mem.bl.indexOf(biTmp)>=0 ){
-                                cnt++;
+                            if( 
+                            	mem && 
+                            	// 代表未離開
+                            	mem.st==1 && 
+                            	// 現在遍歷的bi 比對到該成員的bu list xxx,xxx,xx
+                            	mem.bl.indexOf(biTmp)>=0
+                            ){
+                            	// 並且該成員所屬的bi 現在還存在
+                            	for(i=0;i<mem.bl.split(",").length;i++){
+	                        		if(new_bl[mem.bl.split(",")[i].split(".").last()] !== undefined)
+	                                	cnt++;
+	                                	break;
+                            	}
                             }
                         }
-                        new_bl[biTmp].cnt = cnt;
+                        new_bl[biTmp].cnt = 0;
                     }
         		}
 

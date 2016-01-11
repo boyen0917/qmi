@@ -242,7 +242,13 @@ function showChatList(){
 				row.append(td);
 
 				td = $("<div class='td' data-id='"+room.ci+"'></div>");
-				td.append("<div class='name'>" + chatRoomName.replaceOriEmojiCode() + "</div>");
+
+				var roomName = chatRoomName.replaceOriEmojiCode();
+				if(room.cpc !== undefined) 
+					roomName += " ("+ room.cpc +")";
+
+				td.append("<div class='name'>" + roomName + "</div>");
+
 				var lastMsg = $("<div class='msg'></div>");
 				td.append(lastMsg);
 				row.append(td);
