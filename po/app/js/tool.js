@@ -1191,7 +1191,8 @@ $(function(){
 	setBranchList = function(this_gi, branch_list, callback){
 		var this_gi = this_gi || gi;
 		if( !this_gi ) return;
-
+		window.testBl = branch_list;
+		console.debug("branch_list",branch_list);
     	//取得團體列表
         // var api_name = "groups/" + this_gi + "/branches";
         // var headers = {
@@ -1241,6 +1242,7 @@ $(function(){
         				delete val.bp_arr;
 	        		});
                     
+                    window.testNewBl = new_bl;
                     //計算人數
                     //*NOTE*
                     // 同一人可能隸屬于多個群組, 若兩個子群組有同一人,
@@ -1262,13 +1264,14 @@ $(function(){
                             ){
                             	// 並且該成員所屬的bi 現在還存在
                             	for(i=0;i<mem.bl.split(",").length;i++){
-	                        		if(new_bl[mem.bl.split(",")[i].split(".").last()] !== undefined)
+	                        		if(new_bl[mem.bl.split(",")[i].split(".").last()] !== undefined){
 	                                	cnt++;
 	                                	break;
+	                                }
                             	}
                             }
                         }
-                        new_bl[biTmp].cnt = 0;
+                        new_bl[biTmp].cnt = cnt;
                     }
         		}
 
