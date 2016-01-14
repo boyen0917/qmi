@@ -8003,10 +8003,16 @@ $(function(){
           mke: this_info.find(".me-info-status.em .status-text").data("val"),
           mkp: this_info.find(".me-info-status.pn1 .status-text").data("val"),
           mkb: this_info.find(".me-info-status.bd .status-text").data("val"),
+          pn2: $.lStorage(ui)[gi].guAll[gu].pn2,
+          ext: this_info.find(".user-info-list .et").val(),
+          ti: this_info.find(".user-info-list .ti").val(),
+          mv: this_info.find(".user-info-list .mv").val(),
+          em: this_info.find(".user-info-list .em").val()
 		}
 
         var method = "put";
         ajaxDo(api_name,headers,method,false,body).complete(function(data){
+            s_load_show = false;
         	//重置團體頭像、名稱的參數
         	if(data.status == 200){
         		//重置團體頭像、名稱 失敗也要重置
