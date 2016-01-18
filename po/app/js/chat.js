@@ -1001,6 +1001,10 @@ function showChatCnt() {
 	var userData = $.userStorage();
 	// cns.debug( JSON.stringify(userData) );
 	g_group = userData[gi];
+
+	//登出
+	if(g_group === undefined) window.close();
+
 	g_room = g_group["chatAll"][ci];
 
 

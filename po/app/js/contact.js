@@ -141,6 +141,7 @@ initContactList = function(){
 	}
 
 	rowContainer.find(".row.branch").off("click").click( function(){
+		console.debug("???");
 		showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
 	});
 
@@ -478,10 +479,12 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	var memObject = {};
 	var count = 0;
 	$.each(guAllExsit,function(key,mem){
-		var id = mem.bl.substring(mem.bl.length-11,mem.bl.length);
-		if( id==bi ){
-			count++;
-			memObject[key] = mem;
+		for(i=0;i<mem.bl.split(",").length;i++){
+			[mem.bl.split(",")[i].split(".").last()]
+			if( mem.bl.split(",")[i].split(".").last() == bi ){
+				count++;
+				memObject[key] = mem;
+			}
 		}
 	});
 	var memContainer = generateMemberGrid(memObject);
@@ -991,6 +994,9 @@ initContactData = function(){
 	$.each( guAll, function(key,obj){
 		if( obj && obj.st==1 ){
 			guAllExsit[key] = obj;
+		// }else {
+		// 	window.testMem = window.testMem || {}
+		// 	window.testMem[obj.nk] = obj;
 		}
 	});
 	// $.lStorage(ui, userData);
