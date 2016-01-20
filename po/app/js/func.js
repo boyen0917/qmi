@@ -1305,6 +1305,7 @@ $(function(){
                         case 5:
                             var stickerDom = this_content.find(".sticker");
                             stickerDom.show();
+                            console.debug("yoyoyo");
                             setStickerUrl(stickerDom, val.c);
                             break;
                         case 6:

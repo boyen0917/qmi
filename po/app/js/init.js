@@ -359,7 +359,7 @@ $(function(){
 				return $.i18n.getString("COMMON_CHECK_NETWORK");
 			}
 		} catch(e){
-			cns.debug("catch error", e.message );
+			cns.debug("catch error", {e:e,data:data} );
 			return $.i18n.getString("COMMON_UNKNOWN_ERROR");
 		}
 	}

@@ -8,9 +8,9 @@ $(function(){
 
 		//提示訊息選擇
 		if(ajax_msg_chk) ajax_msg = true;
-		
-	    //cns.debug(api_url);
+
 	    var api_url = base_url + api_name;
+
 	    // var myRand = Math.floor((Math.random()*1000)+1);
 	    
 	    //帶privateUrl的話自己改header
@@ -94,8 +94,11 @@ $(function(){
             errHide: err_hide || false
         };
 
-        // AjaxTransfer 使用 ajaxDo.call
-        if(this != window) $.extend(ajaxArgs,this);
+        // AjaxTransfer 使用 ajaxDo.call 把額外的參數 extend進去
+        if(this != window) {
+        	$.extend(this,ajaxArgs);
+        	ajaxArgs = this;
+        }
 		return $.ajax(ajaxArgs);	
 	}
 
@@ -130,20 +133,34 @@ $(function(){
 			$.extend(args.headers,this.headers);
 		    $.extend(argsClone,args);
 
-			var newArr = [];
-			var paramArr = this.getParamNames(ajaxDo);
-			for (i = 0; i < paramArr.length; i++) {
-				if(paramArr[i] == "api_name"){
-					newArr.push(argsClone.url);
-					delete argsClone.url;
-				}else{
-					newArr.push(argsClone[paramArr[i]] || null);	
-				}
-				delete argsClone[paramArr[i]];
-			};
+		 //    var newArr=[];
+			// var paramArr = this.getParamNames(ajaxDo);
+			// for (i = 0; i < paramArr.length; i++) {
+			// 	if(paramArr[i] == "api_name"){
+			// 		newArr.push(argsClone.url);
+			// 		delete argsClone.url;
+			// 	}else{
+			// 		newArr.push(argsClone[paramArr[i]] || null);	
+			// 	}
+			// 	delete argsClone[paramArr[i]];
+			// };
 			// cns.debug("ajax args",{args:newArr,newAttr:argsClone});
 			//把新加入的ajax變數當作this 傳到ajaxdo 做 extend加入 return deferred物件
-			return ajaxDo.apply(argsClone,newArr);
+			// if(args.gsp === true) {
+			var newArr = [
+				argsClone.url,
+				argsClone.headers,
+				argsClone.method,
+				argsClone.load_show_chk ,
+				argsClone.body ,
+				argsClone.ajax_msg_chk ,
+				argsClone.err_hide ,
+				argsClone.privateUrl
+			];
+			// }
+
+			// headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl
+			return (ajaxDo.apply(argsClone,newArr));
 		}
 	}
 	 
