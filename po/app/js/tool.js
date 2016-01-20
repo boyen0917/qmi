@@ -133,21 +133,7 @@ $(function(){
 			$.extend(args.headers,this.headers);
 		    $.extend(argsClone,args);
 
-		 //    var newArr=[];
-			// var paramArr = this.getParamNames(ajaxDo);
-			// for (i = 0; i < paramArr.length; i++) {
-			// 	if(paramArr[i] == "api_name"){
-			// 		newArr.push(argsClone.url);
-			// 		delete argsClone.url;
-			// 	}else{
-			// 		newArr.push(argsClone[paramArr[i]] || null);	
-			// 	}
-			// 	delete argsClone[paramArr[i]];
-			// };
-			// cns.debug("ajax args",{args:newArr,newAttr:argsClone});
-			//把新加入的ajax變數當作this 傳到ajaxdo 做 extend加入 return deferred物件
-			// if(args.gsp === true) {
-			var newArr = [
+			return (ajaxDo.apply(argsClone,[
 				argsClone.url,
 				argsClone.headers,
 				argsClone.method,
@@ -156,11 +142,7 @@ $(function(){
 				argsClone.ajax_msg_chk ,
 				argsClone.err_hide ,
 				argsClone.privateUrl
-			];
-			// }
-
-			// headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl
-			return (ajaxDo.apply(argsClone,newArr));
+			]));
 		}
 	}
 	 
