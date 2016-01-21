@@ -404,6 +404,10 @@ $(document).ready(function () {
 
 	//點擊標題顯示聊天室成員
 	$("#header .title .text, #header .title .count").click(function () {
+		//防止連按
+		if(window.actChk === true) return false;
+		window.actChk = true;
+
 		//if extra panel is open, close it
 		var extra = $("#header .extra-content");
 		if ("none" != extra.css("display")) {
@@ -415,21 +419,14 @@ $(document).ready(function () {
 		for (var gu in g_room.memList) {
 			tmpData.push({gu: gu});
 		}
-		//   	$(this).data("object_str", tmpData );
-		// $(this).data("object_opt", {
-		// 	title: $.i18n.getString("COMMON_MEMBER"),
-		// 	isShowBranch : false,
-		// 	isShowSelf : false,
-		// 	isShowAll : false,
-		// 	isShowFav : true,
-		// 	isSingleSelect : false
-		// });
 
 		$("#page-chat").addClass("transition");
 		showMemListPage($("#pagesContainer"), $.i18n.getString("COMMON_MEMBER"), [{title: "", ml: tmpData}],
 			function () {
 				cns.debug("on page change done");
 			}, function (isDone) {
+				window.actChk = false;
+
 				// scrollToBottom();
 				setTimeout(function () {
 					checkPagePosition();

@@ -333,6 +333,8 @@ onCheckVersionDone = function(needUpdate){
                         // 取dgi的combo
                         if( login_result.dgi || group_list.length>0 ){
                             if( null==login_result.dgi || login_result.dgi.length==0 ){
+                            	localStorage.removeItem("uiData");
+                            	
                                 login_result.dgi = group_list[0].gi;
                                 $.lStorage("_loginData",login_result);
                             }
@@ -350,7 +352,9 @@ onCheckVersionDone = function(needUpdate){
                         }
                     });
                 }else{
+
                     localStorage.removeItem("_groupList");
+                    localStorage.removeItem("uiData");
                     //沒group
                     deferred.resolve({location:"main.html#page-group-menu"});
                     // document.location = "main.html#page-group-menu";

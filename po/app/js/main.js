@@ -35,7 +35,7 @@ $(function(){
 	    	initChatDB(); 
 			initChatCntDB(); 
 
-			//第一次進來 沒團體的情況
+			//沒團體的情況
 			if(!$.lStorage("_groupList") || !_loginData.dgi || _loginData.dgi==""){
 				//關閉返回鍵
 				$("#page-group-menu .page-back").hide();
@@ -436,7 +436,7 @@ $(function(){
 		var tmp = $(".sm-small-area:visible");
 		if( tmp.length>0 ){
 			$(tmp[0]).addClass("active");
-			timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
+			timelineSwitch( ($(tmp[0]).data("sm-act") || "feeds"),true);
 		}else{
 			timelineSwitch("feeds",true);
 		}

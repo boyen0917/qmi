@@ -26,6 +26,7 @@ $(function(){
 		base_url = "https://qaap.qmi.emome.net/apiv1/";
 	}
 	
+	
 	if( window.location.href.match(/main.html/) ){
 		var tmp = localStorage["uiData"];
 		if( tmp ) $.lStorage("UXXX",$.parseJSON(tmp));
@@ -241,7 +242,7 @@ $(function(){
 
 	$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
 		// cns.debug("ajax error:",ajaxSettings);
-
+		s_load_show = false;
 		//polling錯誤不關閉 為了url parse
 		if(!ajaxSettings.url.match(/sys\/polling/)){
 			$('.ui-loader').hide();

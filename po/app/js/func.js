@@ -377,11 +377,16 @@ $(function(){
         gmHeader.find(".header-icon").hide();
         gmHeader.find(".navi-alert").show();
 
+        $(".st-filter-area").andSelf()
+        .find(".st-filter-list-active").removeClass("st-filter-list-active").end()
+        .find("[data-navi=home]").addClass("st-filter-list-active");
+
 		switch (act) {
 	        case "feeds":
                 var filterAction = $(".st-filter-action");
                 filterAction
-                .find(".st-filter-list-active").removeClass("st-filter-list-active").end()
+                // 沒三小鹿用
+                // .find(".st-filter-list-active").removeClass("st-filter-list-active").end()
                 .find("[data-status='all']").show().addClass("st-filter-list-active").end()
                 .find("[data-navi='announcement']").show().end()
                 .find("[data-navi='feedback']").show().end()
@@ -751,21 +756,23 @@ $(function(){
         				this_top_event.data("data-obj",val);
         				this_top_event.data("pos",i);
 
-                        var ttl_tp = $.i18n.getString("FEED_TASK");
+                        var i18Ttl = "FEED_MISSION";
         				//標題 內容
                         switch(val.meta.tp){
                             case "00":
-                                ttl_tp = $.i18n.getString("FEED_POST");
+                                i18Ttl = "FEED_POST";
                                 break;
                             case "01":
-                                ttl_tp = $.i18n.getString("FEED_BULLETIN");
+                                i18Ttl = "FEED_BULLETIN";
                                 break;
                             case "02":
-                                ttl_tp = $.i18n.getString("FEED_REPORT");
+                                i18Ttl = "FEED_REPORT";
                                 break;
                         }
 
-                        this_top_event.find(".st-top-event-r-ttl span").html(ttl_tp);
+
+
+                        this_top_event.find(".st-top-event-r-ttl span").html($.i18n.getString(i18Ttl));
         				this_top_event.find(".st-top-event-r-ttl").append(val.meta.tt);
         				this_top_event.find(".st-top-event-r-content").html(val.ml[0].c);
 
@@ -3924,9 +3931,9 @@ $(function(){
 			}
 			
 		});
-
+        console.debug("go");
 		//可投票數加減1
-		$(document).on("click",".cp-vote-pm",function(){
+		$(document).off().on("click",".cp-vote-pm",function(){
 
 			var this_ques = $(this).parents(".cp-vote-ques-area");
 			var vote_count = this_ques.data("vote-count");
@@ -4588,6 +4595,7 @@ $(function(){
     	    	// $(".sm-group-list-area-add").html("");
     	    	var tmp_selector,count;
 
+                //set lStorage ui
                 groupListToLStorage();
     	    	// setGroupList();
 
@@ -7008,7 +7016,6 @@ $(function(){
     		$.each(cmds,function(i,val){
 	    		switch(val.tp){
 	    			case 1://timeline list
-                        // 因為現在polling邏輯有問題 暫時關閉timeline 更新
 	    				// var polling_arr = [val.pm.gi,val.pm.ti];
 	    				
 	    				if(val.pm.gi == gi && window.location.hash == "#page-group-main") {
