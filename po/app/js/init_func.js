@@ -3,10 +3,10 @@ $(function(){
     groupListToLStorage = function(){
         var _uiGroupList = $.lStorage(ui) || {};
         // 剔除不存在的團體
-        var tmp_groupList = [];
+        // var tmp_groupList = [];
 
         $.each($.lStorage("_groupList"),function(i,gl_obj){
-            tmp_groupList.push(gl_obj.gi);
+            // tmp_groupList.push(gl_obj.gi);
 
             if(!$.lStorage(ui).hasOwnProperty(gl_obj.gi) ){
                 gl_obj.guAll = {};
@@ -78,12 +78,12 @@ $(function(){
         });
 
         //groupList 沒有的group 要從 _uiGroupList 剔除
-        for(gi in _uiGroupList){
-            if(tmp_groupList.indexOf(gi) === -1){
-                console.debug("delete group",_uiGroupList[gi])
-                delete _uiGroupList[gi];
-            }
-        }
+        // for(gi in _uiGroupList){
+        //     if(tmp_groupList.indexOf(gi) === -1){
+        //         console.debug("delete group",_uiGroupList[gi])
+        //         delete _uiGroupList[gi];
+        //     }
+        // }
 
         $.lStorage("_pri_group",pri_group_list);
         $.lStorage(ui,_uiGroupList);
