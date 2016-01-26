@@ -4,7 +4,7 @@ $(function(){
 
  	gi = null;
  	//HiCloud
- 	base_url = "https://ap.qmi.emome.net/apiv1/";
+ 	base_url = "https://qaap.qmi.emome.net/apiv1/";
 
 	//local測試 預設開啟console
 	debug_flag = false;
@@ -12,18 +12,6 @@ $(function(){
 		debug_flag = true;
 		//base_url = "https://capubliceim.mitake.com.tw/apiv1/";
 		// base_url = "https://apserver.mitake.com.tw/apiv1/";
-	}else if(window.location.href.match(/wp.qmi.emome.net/)) {
-		base_url = "https://ap.qmi.emome.net/apiv1/";
-	} else if(window.location.href.match(/eimweb.mitake.com.tw/)) {
-		base_url = "https://apserver.mitake.com.tw/apiv1/";
-
-	} else if(window.location.href.match(/qmi.npta.gov.tw/)) {
-		base_url = "https://qmi.npta.gov.tw/apiv1/";
-	} else if(window.location.href.match(/eim.mic.org.tw/)) {
-		base_url = "https://eim.mic.org.tw/apiv1/";
-
-	} else if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
-		base_url = "https://qaap.qmi.emome.net/apiv1/";
 	}
 	
 	
