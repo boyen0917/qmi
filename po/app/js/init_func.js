@@ -2,6 +2,7 @@ $(function(){
 
     groupListToLStorage = function(){
         var _uiGroupList = $.lStorage(ui) || {};
+        var oriGroupList = $.lStorage("_groupList") || $.lStorage(ui);
         // 剔除不存在的團體
         // var tmp_groupList = [];
 
@@ -78,12 +79,12 @@ $(function(){
         });
 
         //groupList 沒有的group 要從 _uiGroupList 剔除
-        // for(gi in _uiGroupList){
-        //     if(tmp_groupList.indexOf(gi) === -1){
-        //         console.debug("delete group",_uiGroupList[gi])
-        //         delete _uiGroupList[gi];
-        //     }
-        // }
+        for(this_gi in _uiGroupList){
+            if(tmp_groupList.indexOf(this_gi) === -1){
+                console.debug("delete group",_uiGroupList[this_gi])
+                delete _uiGroupList[this_gi];
+            }
+        }
 
         $.lStorage("_pri_group",pri_group_list);
         $.lStorage(ui,_uiGroupList);
