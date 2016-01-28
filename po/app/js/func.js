@@ -1,6 +1,6 @@
 $(function(){
 
-	setGroupInitial = function(new_gi){
+	setGroupInitial = function(new_gi,chk){
 		//設定目前團體
         setThisGroup(new_gi);
 
@@ -10,9 +10,17 @@ $(function(){
         //header 設定團體名稱
         $(".header-group-name div:eq(1)").html(gn);
         
-        
+        var deferred = $.Deferred();
+
+        // chk是從同意邀請來的 不需要再做 groupMenuListArea
+        if(chk === true) 
+            deferred.resolve();
+        else
+            groupMenuListArea().always(function(){ deferred.resolve(); })
+            
+
         //做團體列表、top event
-        $.when(groupMenuListArea(),topEvent()).done(function(){
+        $.when(deferred.promise(),topEvent()).done(function(){
             //檢查官方帳號
             initOfficialGroup( gi );
             //重新設定功能選單
@@ -212,7 +220,6 @@ $(function(){
                 }
             });
         } else {
-            cns.debug("whhhhhaaaat");
             var invite_data = this_invite.data("invite-data");
             var api_name = "me/groups";
             var headers = {
@@ -229,11 +236,15 @@ $(function(){
             
             ajaxDo(api_name,headers,method,true,body).complete(function(data){
                 if(data.status == 200){
+                    //polling cnts
+                    $(".hg-invite .sm-count").html(0).hide();
+
                     groupMenuListArea(invite_data.gi,true).then(function(){
                         //若只有一個團體 就去該團體
                         if(Object.keys($.lStorage(ui)).length == 1) {
-                            setGroupInitial($.lStorage(ui)[Object.keys($.lStorage(ui))[0]].gi);
                             $.mobile.changePage("#page-group-main");
+                            
+                            setGroupInitial($.lStorage(ui)[Object.keys($.lStorage(ui))[0]].gi,true);
                             $("#page-group-menu .page-back").show();
                         }
                     });
@@ -4659,7 +4670,7 @@ $(function(){
     	        	//創建團體結束 取消強制開啓loading 圖示
     	        	s_load_show = false;
 
-                    if( null==gi ){
+                    if( null==gi || $.lStorage(ui)[gi] === undefined ){
                         gi = new_gi;
                     }
                     //combo
@@ -4681,10 +4692,10 @@ $(function(){
                             $.mobile.changePage("#page-group-main");
                             timelineSwitch("feeds", true);
                         }
-                    });
-    	        }
 
-                deferred.resolve();//$.lStorage(ui)
+                        deferred.resolve();//$.lStorage(ui)
+                    });
+    	        } else deferred.resolve();//$.lStorage(ui)    
             });
 	    });
         
@@ -6967,6 +6978,7 @@ $(function(){
 
         if(!gcnts) return false;
 
+        //邀請 若是在團體邀請頁面時 則不寫入
     	if(gcnts.G1 > 0){
     		$(".hg-invite .sm-count").html(gcnts.G1).show();
     	}

@@ -10,7 +10,7 @@ var ui,at,lang,gi;
 	if(window.location.href.match(/^http:\/\/localhost|10.1.17.114/)) {
 		debug_flag = true;
 		// base_url = "https://capubliceim.mitake.com.tw/apiv1/";
-		// base_url = "https://apserver.mitake.com.tw/apiv1/";
+		base_url = "https://apserver.mitake.com.tw/apiv1/";
 	}
 	
 	
@@ -193,6 +193,8 @@ var ui,at,lang,gi;
 			imgNm: "post"
 		}
 	}
+
+	window.myGlobal = {}
 
 
 	//title

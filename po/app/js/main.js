@@ -245,10 +245,6 @@ $(function(){
 	
 	//創建團體 建立
 	$(".gm-create-submit").click(function(){
-		// if ( !$(".gmc-avatar").data("chk" )){
-		// 		popupShowAdjust("",$.i18n.getString("GROUP_AVATAR_ALERT"),true); //"圖片未上傳"
-		// 		return false;
-		// } 
 		if ( !$(".gmc-name input").val() ){
 			popupShowAdjust("",$.i18n.getString("GROUP_NAME_LIMIT"),true); //"團體名稱未填寫"
 	        return false;
@@ -266,19 +262,28 @@ $(function(){
 			var tmb_arr = [120,120,0.6];
 			s_load_show = true;
 			createGroup(group_name,group_desc).complete(function(data){
-				s_load_show = false;
 	        	if(data.status == 200){
+	        		var deferred = $.Deferred();
+
 	        		var cg_result = $.parseJSON(data.responseText);
+		        	var api_name = "groups/" + cg_result.gi + "/avatar";
+		        	
+	        		if(file === undefined) {
+	        			deferred.resolve(true);
+	        		} else {
+						
+		        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
+		        			//團體頭像上傳失敗
+		        			deferred.resolve(chk);
+		        		});
+	        		}
 
-	        		var api_name = "groups/" + cg_result.gi + "/avatar"
-
-	        		if(file === undefined) return false;
-	        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
-	        			//團體頭像上傳失敗
+	        		deferred.done(function(chk){
 	        			if(!chk) toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") );
-	        			//統一由polling執行更新
-	        			// groupMenuListArea(cg_result.gi);
-	        		});
+
+	        			//現在好像不從polling執行更新
+		        		groupMenuListArea(cg_result.gi);
+	        		})
 	        	}
 	        });
 		}

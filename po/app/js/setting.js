@@ -186,6 +186,7 @@ function removeGroup( this_gi ){
 	    if( otherGroup.length>0 ){
 	    	$(otherGroup[0]).trigger("click");
 	    } else{
+	    	gi = null;
 	    	delete $.lStorage(ui)[this_gi];
 	    	$(document).data("page-history",[]);
 	    	$(".page-back").hide();
