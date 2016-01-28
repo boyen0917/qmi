@@ -123,16 +123,18 @@ $(function(){
 			    	g_currentVersion = versionData.ver;
 			    }
 				$("#container_version span.web").html("("+g_currentVersion+")");
-	    		var api_name = "sys/version?"+new Date().getTime(); //add current to prevent cache
-	    		var headers = {
-	    			os: 2,
-					tp: 0,
-					av: g_currentVersion,
-					li: lang
-				};
-				var method = "get";
-	    		var result = ajaxDo(api_name,headers,method,false);
-	        	result.complete(function(data){
+
+	        	new AjaxTransfer().execute({
+	        		url: "sys/version?"+new Date().getTime(), //add current to prevent cache
+	        		headers: {
+		    			os: 2,
+						tp: 0,
+						av: g_currentVersion,
+						li: lang
+					},
+	        		method: "get",
+	        		err_hide: true
+	        	}).complete(function(data){
 		        	if(data.status == 200){
 		        		var getS3_result =$.parseJSON(data.responseText);
 
