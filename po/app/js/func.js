@@ -4766,6 +4766,8 @@ $(function(){
 		var this_ti = polling_arr[1] || ti_feed;
         var main_gu = $("#page-group-main").data("main-gu");
 
+        var deferred = $.Deferred();
+
         if(main_gu){
             this_gi = $("#page-group-main").data("main-gi");
             this_ti = $.lStorage(ui)[this_gi].tl[1].ti;
@@ -4817,7 +4819,13 @@ $(function(){
 	    	}
 	    	
 	    	if(data.status != 200){
-                groupSwitchEnable();
+                deferred.resolve({
+                    desc:"http statusCode: "+ data.status,
+                    status: false,
+                    others: data
+                });
+
+                // groupSwitchEnable();
                 return false;
             }
 
@@ -4826,12 +4834,18 @@ $(function(){
 	    	if( timeline_list.length == 0 ) {
 	    		$(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
                 //開啟更換團體
-                groupSwitchEnable();
+                // groupSwitchEnable();
 	        	//關閉timeline loading 開啟沒資料圖示
 	        	setTimeout(function(){
 	        		feedboxAreaBottom.children("img").hide();
     				feedboxAreaBottom.children("div").show();
 	        	},2000);
+
+                deferred.resolve({
+                    desc:"no events",
+                    status: true
+                });
+
 	        	return false;
 	    	}
 
@@ -4846,29 +4860,34 @@ $(function(){
             if(main_gu){
                 $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
                     timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
-                    $(".st-filter-area").removeClass("st-filter-lock");
-                });
-                return false;
-            }
 
-	    	idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
+                    $(".st-filter-area").removeClass("st-filter-lock");
+                    deferred.resolve({
+                        desc:"main_gu exists",
+                        status: true
+                    });
+                });
+            } else {
+
+            // 移除idb
+	    	// idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
                 $(".st-filter-area").removeClass("st-filter-lock");
 	    		//點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
-		    	if(event_tp == "00"){
-		    		//存db	    	
-		            $.each(timeline_list,function(i,val){
-		                val.ct = val.meta.ct;
-		                val.gi = this_gi ;
-		                val.tp = val.meta.tp ;
+		    	// if(event_tp == "00"){
+		    	// 	//存db	    	
+		     //        $.each(timeline_list,function(i,val){
+		     //            val.ct = val.meta.ct;
+		     //            val.gi = this_gi ;
+		     //            val.tp = val.meta.tp ;
 
-		                var tp = val.meta.tp.substring(1,2)*1;
-		                //為了idb
-		                if(tp > 2){
-		                	val.tp = "03" ;
-		                }
-		                idb_timeline_events.put(val);
-		            });
-		    	}
+		     //            var tp = val.meta.tp.substring(1,2)*1;
+		     //            //為了idb
+		     //            if(tp > 2){
+		     //            	val.tp = "03" ;
+		     //            }
+		     //            idb_timeline_events.put(val);
+		     //        });
+		    	// }
 
 		    	if(polling_arr.length == 0){
 			    	//資料個數少於這個數量 表示沒東西了
@@ -4894,14 +4913,24 @@ $(function(){
                         this_navi.find(".st-sub-box[data-idb=true]").remove();
 
 		    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
+
+                        deferred.resolve({
+                            desc:"main_gu exists",
+                            status: true
+                        });
 			    	});
 		    	}
-
-                setTimeout(function(){
-                    groupSwitchEnable();
-                }, 500);
-	    	});
+                // deferred.done(function(result){
+                //     groupSwitchEnable();
+                // });
+	    	// });
+            }
 	    });
+
+        deferred.done(function(result){
+            cns.debug("result",result);
+            groupSwitchEnable();
+        });
 	}
 
 	idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr,callback){

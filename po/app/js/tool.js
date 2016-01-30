@@ -145,6 +145,10 @@ $(function(){
 			]));
 		}
 	}
+
+	window.MyAjax = function(){
+		
+	}
 	 
     _pri_split_chat = "#";
     getPrivateGi = function( this_ci, this_gi ){
