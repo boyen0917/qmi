@@ -3,7 +3,8 @@ var ui,at,lang,gi;
 
  	gi = null;
  	//HiCloud
- 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	base_url = "https://ap.qmi.emome.net/apiv1/";
 
 	//local測試 預設開啟console
 	debug_flag = false;
@@ -326,6 +327,8 @@ var ui,at,lang,gi;
 	$(document).on("click",".page-back",function(){
 
 		if( window.location.href.match(/chat.html/) !== null ) return false;
+
+		if($(this).hasClass("contact-back")) return false;
 
 		//按上一頁不需要記錄歷程
 		back_exception = true;

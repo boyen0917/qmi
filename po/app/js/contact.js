@@ -324,7 +324,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
                 // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
-                +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
+                +'<div class="page-back contact-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
@@ -964,7 +964,7 @@ generateBranchList = function( childList ){
 
 showMainContact = function(){
 	// $("#page-group-main .contact-rows").height( $(window).height()-63 );
-	// $.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
+	$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 }
 
 initContactData = function(){
@@ -1169,7 +1169,7 @@ showSubFavoritePage = function( fi ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
                 // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
-                +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
+                +'<div class="page-back contact-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
