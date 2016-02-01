@@ -325,7 +325,7 @@ var ui,at,lang,gi;
 	
 	$(document).on("click",".page-back",function(){
 
-		if(typeof g_room !== "undefined") return false;
+		if( window.location.href.match(/chat.html/) !== null ) return false;
 
 		if(typeof g_room !== "undefined") return false;
 

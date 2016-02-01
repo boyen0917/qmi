@@ -1102,29 +1102,29 @@
 
     limit: function (onSuccess, options) {
       this.deferred.done(function(success){
-        // if(success === false) cns.debug("IDB錯誤");
+        if(success === false) cns.debug("IDB錯誤");
 
-        // var result = [];
-        // var count = 0;
+        var result = [];
+        var count = 0;
         
-        // options = options || {};
-        // options.limit = options.limit || 0;
-        // options.autoContinue = false;
-        // options.onEnd = function(){
-        //   onSuccess(result);
-        // }
-        // options.onError = function(item){
-        //   console.debug("error:",item);
-        //   onSuccess(result);
-        // }
-        // return this.iterate(function (item,cursor) {
-        //   if(count <= options.limit-1){
-        //     result.push(item);
+        options = options || {};
+        options.limit = options.limit || 0;
+        options.autoContinue = false;
+        options.onEnd = function(){
+          onSuccess(result);
+        }
+        options.onError = function(item){
+          console.debug("error:",item);
+          onSuccess(result);
+        }
+        return this.iterate(function (item,cursor) {
+          if(count <= options.limit-1){
+            result.push(item);
 
-        //     count++;
-        //     cursor.continue();
-        //   }
-        // }, options);
+            count++;
+            cursor.continue();
+          }
+        }, options);
         
       }.bind(this))
         
