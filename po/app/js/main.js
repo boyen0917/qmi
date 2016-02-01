@@ -245,10 +245,6 @@ $(function(){
 	
 	//創建團體 建立
 	$(".gm-create-submit").click(function(){
-		if ( !$(".gmc-avatar").data("chk" )){
-				popupShowAdjust("",$.i18n.getString("GROUP_AVATAR_ALERT"),true); //"圖片未上傳"
-				return false;
-		} 
 		if ( !$(".gmc-name input").val() ){
 			popupShowAdjust("",$.i18n.getString("GROUP_NAME_LIMIT"),true); //"團體名稱未填寫"
 	        return false;
@@ -266,18 +262,28 @@ $(function(){
 			var tmb_arr = [120,120,0.6];
 			s_load_show = true;
 			createGroup(group_name,group_desc).complete(function(data){
-				s_load_show = false;
 	        	if(data.status == 200){
+	        		var deferred = $.Deferred();
+
 	        		var cg_result = $.parseJSON(data.responseText);
+		        	var api_name = "groups/" + cg_result.gi + "/avatar";
+		        	
+	        		if(file === undefined) {
+	        			deferred.resolve(true);
+	        		} else {
+						
+		        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
+		        			//團體頭像上傳失敗
+		        			deferred.resolve(chk);
+		        		});
+	        		}
 
-	        		var api_name = "groups/" + cg_result.gi + "/avatar"
-
-	        		uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
-	        			//團體頭像上傳失敗
+	        		deferred.done(function(chk){
 	        			if(!chk) toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") );
-	        			//統一由polling執行更新
-	        			// groupMenuListArea(cg_result.gi);
-	        		});
+
+	        			//現在好像不從polling執行更新
+		        		groupMenuListArea(cg_result.gi);
+	        		})
 	        	}
 	        });
 		}
@@ -457,42 +463,42 @@ $(function(){
 			// cns.debug("-------------");
 			return;
 		}
-		var img_dir = "images/timeline/timeline_tab_icon_";
-		var subareas = $(".st-navi-area [data-st-navi-group=navi]");
+		// var img_dir = "images/timeline/timeline_tab_icon_";
+		// var subareas = $(".st-navi-area [data-st-navi-group=navi]");
 		var this_subarea = $(this);
-		subareas.find("div").removeClass("color-white");
+		// subareas.find("div").removeClass("color-white");
 
 		//將選項存入
 		$("#page-group-main").data("navi",this_subarea.data("tp"));
 
-		var event_tp = $("#page-group-main").data("navi") || "00";
+		// var event_tp = $("#page-group-main").data("navi") || "00";
 
-		switch(this_subarea.data("st-navi")){
-	    	case "home":
-	    		 $(".st-navi-tridiv-r").show();
-	    		 $(".st-navi-tridiv-l").hide();
-	    		 this_subarea.find("img").attr("src",img_dir + "home_white.png");
-	    		 this_subarea.find("div:eq(0)").addClass("color-white");
-	          break;
-	    	case "announcement":
-	    		$(".st-navi-tridiv-l").show();
-	    		$(".st-navi-tridiv-r").hide();
-	    		this_subarea.find("img").attr("src",img_dir + "announcement_white.png");
-	    		this_subarea.find("div:eq(0)").addClass("color-white");
-	          break;
-	    	case "feedback":
-	    		$(".st-navi-tridiv-l").show();
-	    		$(".st-navi-tridiv-r").hide();
-	    		this_subarea.find("img").attr("src",img_dir + "feedback_white.png");
-	    		this_subarea.find("div:eq(0)").addClass("color-white");
-	          break;
-	    	case "task":
-	    		$(".st-navi-tridiv-l").show();
-	    		$(".st-navi-tridiv-r").hide();
-	    		this_subarea.find("img").attr("src",img_dir + "task_white.png");
-	    		this_subarea.find("div:eq(0)").addClass("color-white");
-	          break;
-		}
+		// switch(this_subarea.data("st-navi")){
+	 //    	case "home":
+	 //    		 $(".st-navi-tridiv-r").show();
+	 //    		 $(".st-navi-tridiv-l").hide();
+	 //    		 this_subarea.find("img").attr("src",img_dir + "home_white.png");
+	 //    		 this_subarea.find("div:eq(0)").addClass("color-white");
+	 //          break;
+	 //    	case "announcement":
+	 //    		$(".st-navi-tridiv-l").show();
+	 //    		$(".st-navi-tridiv-r").hide();
+	 //    		this_subarea.find("img").attr("src",img_dir + "announcement_white.png");
+	 //    		this_subarea.find("div:eq(0)").addClass("color-white");
+	 //          break;
+	 //    	case "feedback":
+	 //    		$(".st-navi-tridiv-l").show();
+	 //    		$(".st-navi-tridiv-r").hide();
+	 //    		this_subarea.find("img").attr("src",img_dir + "feedback_white.png");
+	 //    		this_subarea.find("div:eq(0)").addClass("color-white");
+	 //          break;
+	 //    	case "task":
+	 //    		$(".st-navi-tridiv-l").show();
+	 //    		$(".st-navi-tridiv-r").hide();
+	 //    		this_subarea.find("img").attr("src",img_dir + "task_white.png");
+	 //    		this_subarea.find("div:eq(0)").addClass("color-white");
+	 //          break;
+		// }
 
 		timelineListWrite();
 		timelineScrollTop();

@@ -331,21 +331,19 @@ onCheckVersionDone = function(needUpdate){
                         groupListToLStorage();
 
                         // 取dgi的combo
-                        if( login_result.dgi || group_list.length>0 ){
-                            if( null==login_result.dgi || login_result.dgi.length==0 ){
+                        if( group_list.length>0 ){
+                        	//有dgi 但不存在列表裡
+                            if( login_result.dgi === undefined || $.lStorage(ui)[login_result.dgi] === undefined ){
                             	localStorage.removeItem("uiData");
                             	
                                 login_result.dgi = group_list[0].gi;
                                 $.lStorage("_loginData",login_result);
                             }
-                            if( login_result.dgi ){
-                                getGroupCombo(login_result.dgi,function(){
-                                    deferred.resolve({location:"main.html#page-group-main"});
-                                });
-                            } else {
-                                //沒group
-                                deferred.resolve({location:"main.html#page-group-menu"});
-                            }
+
+                            getGroupCombo(login_result.dgi,function(){
+                                deferred.resolve({location:"main.html#page-group-main"});
+                            });
+                            
                         } else{
                             //沒group
                             deferred.resolve({location:"main.html#page-group-menu"});

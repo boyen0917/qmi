@@ -1,6 +1,6 @@
 $(function(){
 
-	setGroupInitial = function(new_gi){
+	setGroupInitial = function(new_gi,chk){
 		//設定目前團體
         setThisGroup(new_gi);
 
@@ -10,24 +10,26 @@ $(function(){
         //header 設定團體名稱
         $(".header-group-name div:eq(1)").html(gn);
         
-        
-        //做團體列表
-        groupMenuListArea();
+        var deferred = $.Deferred();
 
-        //top event
-        topEvent();
+        // chk是從同意邀請來的 不需要再做 groupMenuListArea
+        if(chk === true) 
+            deferred.resolve();
+        else
+            groupMenuListArea().always(function(){ deferred.resolve(); })
+            
 
-        //檢查官方帳號
-        initOfficialGroup( gi );
-        //重新設定功能選單
-        updateTab(gi);
+        //做團體列表、top event
+        $.when(deferred.promise(),topEvent()).done(function(){
+            //檢查官方帳號
+            initOfficialGroup( gi );
+            //重新設定功能選單
+            updateTab(gi);
 
-        // console.debug("ui",JSON.stringify($.lStorage(ui)));
+            // console.debug("ui",JSON.stringify($.lStorage(ui)));
 
 
-        //動態消息
-        //timelineListWrite();
-        setTimeout(function(){
+            //動態消息
             var tmp = $(".sm-small-area:not(.setting):visible");
             if( tmp.length>0 ){
                 $(tmp[0]).addClass("active");
@@ -36,7 +38,7 @@ $(function(){
             else{
                 timelineSwitch("feeds",true);
             }
-        },500);
+        });
 	}
 
 	logout = function(){
@@ -234,11 +236,15 @@ $(function(){
             
             ajaxDo(api_name,headers,method,true,body).complete(function(data){
                 if(data.status == 200){
-                    groupMenuListArea(invite_data.gi,true).then(function(groupData){
+                    //polling cnts
+                    $(".hg-invite .sm-count").html(0).hide();
+
+                    groupMenuListArea(invite_data.gi,true).then(function(){
                         //若只有一個團體 就去該團體
-                        if(Object.keys(groupData).length == 1) {
-                            setGroupInitial(groupData[Object.keys(groupData)[0]].gi);
+                        if(Object.keys($.lStorage(ui)).length == 1) {
                             $.mobile.changePage("#page-group-main");
+                            
+                            setGroupInitial($.lStorage(ui)[Object.keys($.lStorage(ui))[0]].gi,true);
                             $("#page-group-menu .page-back").show();
                         }
                     });
@@ -394,9 +400,6 @@ $(function(){
                 .find("[data-navi='feed-post']").hide().end()
                 .find("[data-navi='feed-public']").hide();
                 
-                var naviArea = $(".st-navi-area");
-                naviArea.data("currentHome", "home");
-                
                 $(".subpage-addressBook").hide();
                 // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
 
@@ -407,9 +410,9 @@ $(function(){
                 filterArea.children(".st-filter-hide.left").hide();
                 filterArea.scrollLeft(0);
 
-	        	//點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
-                if(!main)
-                    naviArea.find(".main").trigger("click");
+	        	// 使用已隱藏的舊的方式 來做timeline切換
+                $(".st-navi-subarea.main").trigger("click");
+
 
 	        	gmHeader.find(".page-title").html(page_title);
 
@@ -707,7 +710,8 @@ $(function(){
         return ajaxDo(api_name,headers,method,false);
 	}
 
-	topEvent = function (callback){
+	topEvent = function (){
+        var deferred = $.Deferred();
 		var top_area = $(
 			'<div class="st-top-area">'+
 				'<div class="st-top-event-block">'+
@@ -735,15 +739,11 @@ $(function(){
 		//取得user name list
 		var _groupList = $.lStorage(ui);
 		topEventApi().complete(function(data){
-            //不管是不是200 執行callback
-            if(callback) {
-                callback();   
-            }
-
-        	if(data.status == 200){
+            if(data.status == 200){
         		var top_events_arr = $.parseJSON(data.responseText).el;
         		var top_msg_num = top_events_arr.length;
         		if(top_msg_num == 0){
+                    deferred.resolve();
         			return false;
         		}
         		//default 關閉
@@ -801,7 +801,11 @@ $(function(){
                 //發生錯誤 開啓更換團體
                 groupSwitchEnable();
             }
+
+            deferred.resolve();
         });
+
+        return deferred.promise();
 	}
 
 	//為了避免gu all還沒取得
@@ -3933,7 +3937,7 @@ $(function(){
 		});
         console.debug("go");
 		//可投票數加減1
-		$(document).off().on("click",".cp-vote-pm",function(){
+		$(document).off("click",".cp-vote-pm").on("click",".cp-vote-pm",function(){
 
 			var this_ques = $(this).parents(".cp-vote-ques-area");
 			var vote_count = this_ques.data("vote-count");
@@ -4666,7 +4670,7 @@ $(function(){
     	        	//創建團體結束 取消強制開啓loading 圖示
     	        	s_load_show = false;
 
-                    if( null==gi ){
+                    if( null==gi || $.lStorage(ui)[gi] === undefined ){
                         gi = new_gi;
                     }
                     //combo
@@ -4688,10 +4692,10 @@ $(function(){
                             $.mobile.changePage("#page-group-main");
                             timelineSwitch("feeds", true);
                         }
-                    });
-    	        }
 
-                deferred.resolve(userData);//$.lStorage(ui)
+                        deferred.resolve();//$.lStorage(ui)
+                    });
+    	        } else deferred.resolve();//$.lStorage(ui)    
             });
 	    });
         
@@ -5245,42 +5249,42 @@ $(function(){
 		if(is_top || $("#page-group-main").data("main-gu")) return false;
 
 		//判斷類別
-		var idb_index,idb_keyRange;
-		if(!event_tp || event_tp == "00"){
-			idb_index = "gi_ct";
-			idb_keyRange = idb_timeline_events.makeKeyRange({
-              upper: [gi,idb_timer],
-              lower: [gi]
-            });
-		}else{
-			idb_index = "gi_tp_ct";
-			idb_keyRange = idb_timeline_events.makeKeyRange({
-              upper: [gi,event_tp,idb_timer],
-              lower: [gi,event_tp]
-            })
-		}
+		// var idb_index,idb_keyRange;
+		// if(!event_tp || event_tp == "00"){
+		// 	idb_index = "gi_ct";
+		// 	idb_keyRange = idb_timeline_events.makeKeyRange({
+  //             upper: [gi,idb_timer],
+  //             lower: [gi]
+  //           });
+		// }else{
+		// 	idb_index = "gi_tp_ct";
+		// 	idb_keyRange = idb_timeline_events.makeKeyRange({
+  //             upper: [gi,event_tp,idb_timer],
+  //             lower: [gi,event_tp]
+  //           })
+		// }
 
     	//同時先將資料庫資料取出先寫上
-	    idb_timeline_events.limit(function(timeline_list){
-            if(timeline_list.length == 0) return false;
-	    	//寫timeline
-	    	load_show = false;
-	    	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-                $(this).find(".st-sub-box").attr("data-idb",true);
-    			timelineBlockMake($(this).find(".st-sub-box"),timeline_list);
-	    	});
-	    },{
-            index: idb_index,
-            keyRange: idb_keyRange,
-            limit: 20,
-            order: "DESC",
-            onEnd: function(result){
-                console.debug("onEnd:",result);
-            },
-            onError: function(result){
-                console.debug("onError:",result);
-            }
-        });
+	    // idb_timeline_events.limit(function(timeline_list){
+     //        if(timeline_list.length == 0) return false;
+	    // 	//寫timeline
+	    // 	load_show = false;
+	    // 	$('<div>').load('layout/timeline_event.html .st-sub-box',function(){
+     //            $(this).find(".st-sub-box").attr("data-idb",true);
+    	// 		timelineBlockMake($(this).find(".st-sub-box"),timeline_list);
+	    // 	});
+	    // },{
+     //        index: idb_index,
+     //        keyRange: idb_keyRange,
+     //        limit: 20,
+     //        order: "DESC",
+     //        onEnd: function(result){
+     //            console.debug("onEnd:",result);
+     //        },
+     //        onError: function(result){
+     //            console.debug("onError:",result);
+     //        }
+     //    });
 	}
 
 	eventStatusWrite = function(this_event,this_es_obj){
@@ -6974,6 +6978,7 @@ $(function(){
 
         if(!gcnts) return false;
 
+        //邀請 若是在團體邀請頁面時 則不寫入
     	if(gcnts.G1 > 0){
     		$(".hg-invite .sm-count").html(gcnts.G1).show();
     	}
@@ -7271,13 +7276,23 @@ $(function(){
 			var this_user_info = user_info_arr.last();
 
             //if no group data
-            var _groupList = $.lStorage(ui);
-            if( !_groupList.hasOwnProperty(this_user_info.gi) ){
-                cns.debug("[getUserInfo] no group data, getting..",this_user_info.gi);
-                getGroupCombo(this_user_info.gi, function(){
-                    getUserInfo(user_info_arr, update_chk, load_show_chk,onAllDone);
-                });
-                return;
+            if( !$.lStorage(ui).hasOwnProperty(this_user_info.gi) ){
+
+                //無團體的人 被退出過的團體邀請 要直接進入該團體
+                if(Object.keys($.lStorage(ui)).length === 1){
+
+                    groupMenuListArea().done(function(){
+                        $.mobile.changePage("#page-group-main");
+                        timelineSwitch("feeds", true);
+                    });
+
+                } else {
+                    cns.debug("[getUserInfo] no group data, getting..",this_user_info.gi);
+                    getGroupCombo(this_user_info.gi, function(){
+                        getUserInfo(user_info_arr, update_chk, load_show_chk,onAllDone);
+                    });
+                    return;
+                }
             }
             
             if(this_user_info.isNewMem==null) this_user_info.isNewMem = false; 

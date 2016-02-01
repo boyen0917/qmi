@@ -177,11 +177,16 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
 
 function removeGroup( this_gi ){
 	$(".sm-group-area[data-gi="+this_gi+"]").remove();
+	var rmGroupGn = "unknown";
+	if( $.lStorage(ui) !== false && $.lStorage(ui)[this_gi] !== undefined && $.lStorage(ui)[this_gi].gn)
+		rmGroupGn = $.lStorage(ui)[this_gi].gn;
+
 	if( gi==this_gi ){
 	    var otherGroup = $(".sm-group-area.enable");
 	    if( otherGroup.length>0 ){
 	    	$(otherGroup[0]).trigger("click");
 	    } else{
+	    	gi = null;
 	    	delete $.lStorage(ui)[this_gi];
 	    	$(document).data("page-history",[]);
 	    	$(".page-back").hide();
@@ -191,7 +196,7 @@ function removeGroup( this_gi ){
 
     //remove group data
     try{
-    	var gn = "unknown";
+    	
     	//local storage
 		var userData = $.lStorage(ui);
 		if( userData.hasOwnProperty(this_gi) ){

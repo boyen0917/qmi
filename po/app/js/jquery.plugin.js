@@ -26,6 +26,8 @@
 
 	//localstorage for object
     $.lStorage = function(key,value) {
+    	if(key === undefined) return false;
+
     	if( 0==key.indexOf("U") ){
     		if(value){
 				window.g_uiData = value;

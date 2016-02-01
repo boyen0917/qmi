@@ -1,6 +1,5 @@
 var ui,at,lang,gi;
 
-$(function(){
 
  	gi = null;
  	//HiCloud
@@ -10,7 +9,7 @@ $(function(){
 	debug_flag = false;
 	if(window.location.href.match(/^http:\/\/localhost|10.1.17.114/)) {
 		debug_flag = true;
-		//base_url = "https://capubliceim.mitake.com.tw/apiv1/";
+		// base_url = "https://capubliceim.mitake.com.tw/apiv1/";
 		// base_url = "https://apserver.mitake.com.tw/apiv1/";
 	}
 	
@@ -195,10 +194,28 @@ $(function(){
 		}
 	}
 
+	window.myGlobal = {}
+
 
 	//title
 	g_Qmi_title = "Qmi";
 	$("title").html(g_Qmi_title);
+
+
+	MyDeferred = function  () {
+	  var myResolve;
+	  var p1 = new Promise(function(resolve, reject){
+	    myResolve = resolve;
+	  });
+	  return {
+	    resolve: myResolve,
+	    done: function(cb) { return p1.then(cb) },
+	    //包兩層是防止狀態被外層改變
+	    promise: function(){
+	      return {
+	        done: function(cb){
+	          p1.then(cb);
+	}}}}}
 
 
 	// ajax setting
@@ -306,7 +323,9 @@ $(function(){
 	});
 
 	
-	$(".page-back").click(function(){
+	$(document).on("click",".page-back",function(){
+
+		if(typeof g_room !== "undefined") return false;
 
 		if(typeof g_room !== "undefined") return false;
 
@@ -379,5 +398,3 @@ $(function(){
         }
       }
     }
-
-});
