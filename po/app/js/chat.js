@@ -38,6 +38,7 @@ var lockCurrentFocusIntervalLength = 100;	//讓視窗停留在最後一筆的int
                                                                   
  */
 $(document).ready(function () {
+
 	//resize chat window to slim window
 	try {
 		//resize node webkit window
@@ -63,7 +64,6 @@ $(document).ready(function () {
 	$.changePage("#page-chat");
 
 	//reset events
-	$(".page-back").off("click");
 	$(document).off("ajaxSend");
 
 	//沒有登入資訊 就導回登入頁面

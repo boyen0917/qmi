@@ -3,7 +3,12 @@ var ui,at,lang,gi;
 
  	gi = null;
  	//HiCloud
+<<<<<<< HEAD
  	base_url = "https://qaap.qmi.emome.net/apiv1/";
+=======
+ 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	// base_url = "https://ap.qmi.emome.net/apiv1/";
+>>>>>>> dev
 
 	//local測試 預設開啟console
 	debug_flag = false;
@@ -325,7 +330,9 @@ var ui,at,lang,gi;
 	
 	$(document).on("click",".page-back",function(){
 
-		if(typeof g_room !== "undefined") return false;
+		if( window.location.href.match(/chat.html/) !== null ) return false;
+
+		if($(this).hasClass("contact-back")) return false;
 
 		if(typeof g_room !== "undefined") return false;
 
