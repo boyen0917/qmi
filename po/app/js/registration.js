@@ -272,6 +272,15 @@ onCheckVersionDone = function(needUpdate){
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
         	if(data.status == 200){
         		var login_result = $.parseJSON(data.responseText);
+        		
+        		
+
+        		//自動登入儲存 有_loginData 才代表有選自動登入
+                if($(".login-auto").data("chk")) 
+                	$.lStorage("_loginData",login_result);
+                else
+                	localStorage.removeItem("_loginData");
+
 
         		//判斷是否換帳號 換帳號就要清db
         		if(!$.lStorage(login_result.ui)) resetDB();
@@ -296,9 +305,10 @@ onCheckVersionDone = function(needUpdate){
 	//初始化 
     loginAction = function(login_result){
         //儲存登入資料 跳轉到timeline
-        login_result.page = "timeline";
-        $.lStorage("_loginData",login_result);
-
+        if($.lStorage("_loginData") !== false) {
+        	var login_result = $.lStorage("_loginData");	
+        }
+        
         var deferred = $.Deferred();
 
         //附上group list
@@ -307,9 +317,6 @@ onCheckVersionDone = function(needUpdate){
 
                 ui = login_result.ui;
                 at = login_result.at;
-
-                //自動登入儲存
-                if($(".login-auto").data("chk")) $.lStorage("_loginAutoChk",true);
 
                 var parse_data = $.parseJSON(data.responseText);
                 if( !parse_data ){
@@ -341,12 +348,12 @@ onCheckVersionDone = function(needUpdate){
                             }
 
                             getGroupCombo(login_result.dgi,function(){
-                                deferred.resolve({location:"main.html#page-group-main"});
+                                deferred.resolve({location:"#page-group-main"});
                             });
                             
                         } else{
                             //沒group
-                            deferred.resolve({location:"main.html#page-group-menu"});
+                            deferred.resolve({location:"#page-group-menu"});
                         }
                     });
                 }else{
@@ -354,7 +361,7 @@ onCheckVersionDone = function(needUpdate){
                     localStorage.removeItem("_groupList");
                     localStorage.removeItem("uiData");
                     //沒group
-                    deferred.resolve({location:"main.html#page-group-menu"});
+                    deferred.resolve({location:"#page-group-menu"});
                     // document.location = "main.html#page-group-menu";
                 }
             }else if(data.status == 401){
@@ -367,13 +374,62 @@ onCheckVersionDone = function(needUpdate){
         deferred.done(function(data){
             if(data.fail === true) {
                 //取得group list 失敗 代表自動登入失敗了
-                localStorage.removeItem("_loginData");
+                // localStorage.removeItem("_loginData");
                 return false;
             }
 
             $.lStorage("refreshChk", false);
             localStorage["uiData"] = JSON.stringify($.lStorage(ui));
-            document.location = data.location;    
+            // document.location = data.location;    
+            $.mobile.changePage(data.location)
+
+
+
+            var _loginData = login_result;
+
+			ui = _loginData.ui;
+			at = _loginData.at;
+
+			// var deferred = $.Deferred();
+			// if($.lStorage("refreshChk") === true) {
+			// 	getGroupCombo(_loginData.dgi,function(){
+			// 		deferred.resolve();
+			// 	});
+			// }else{
+			// 	deferred.resolve();
+			// }
+
+			// deferred.done(function(){
+				//registration.js會清掉 
+			// $.lStorage("refreshChk",true);
+			//自動登入
+			// if(!$.lStorage("_loginAutoChk")){
+			// 	//清除_loginData
+			// 	// localStorage.removeItem("_loginData");
+			// 	delete _loginData.at;
+			// 	$.lStorage("_loginData",_loginData);
+			// }
+
+			//聊天室開啓DB
+	    	initChatDB(); 
+			initChatCntDB(); 
+
+			//沒團體的情況
+			if(!$.lStorage("_groupList") || !_loginData.dgi || _loginData.dgi==""){
+				//關閉返回鍵
+				$("#page-group-menu .page-back").hide();
+				cns.debug("no group ");
+			}else{
+				//設定目前團體
+				setGroupInitial(_loginData.dgi);
+			}
+
+			//執行polling
+			pollingInterval();
+			// });
+
+
+
         });
     }
 
@@ -1071,124 +1127,11 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 
-
- //    //對話框設定
- //    $(".popup-confirm").click(function(){
- //    	var todo = $(".popup-confirm").data("todo");
-
- //    	if(typeof todo == "string"){
- //    		var todo_type = todo.split("+")[0];
- //    		var todo_act = todo.split("+")[1];
-
- //   //  		cns.debug("todo_type:",todo_type);
-	// 		// cns.debug("todo_act:",todo_act);
-
-	// 		if(todo_type == "func"){
-	// 	    	switch(todo_act){
-	// 				case "registration":
-	// 					registration();
-	// 					break;
-	// 				case "toGroupMenu":
-	// 					toGroupMenu();
-	// 					break;
-	// 			}
-	//     	}else if(todo_type == "hash"){
-	//     		$.mobile.changePage(todo_act);
-	//     	}
- //    	}
-	// 	$(".popup-screen").trigger("close");
-	// });
-
-	// $(".popup-cancel").click(function(){
- //    	var todo = $(".popup-cancel").data("todo");
-
- //    	if(typeof todo == "string"){
- //    		var todo_type = todo.split("+")[0];
- //    		var todo_act = todo.split("+")[1];
-	// 		if(todo_type == "func"){
-
-	//     	}else if(todo_type == "hash"){
-	//     		$.mobile.changePage(todo_act);
-	//     	}
- //    	}
-	// 	$(".popup-screen").trigger("close");
-	// });
-
-
-	// $(".popup-screen").bind("close",function(){
-	//     $(".popup").hide();
-	//     $(".popup-screen").hide();
-	// });
-
-
 	toGroupMenu = function(){
 		//document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
 		$('.ui-loader').css("display","block");
 		$(".ajax-screen-lock").show();
 		loginAction($.lStorage("_loginData"));
-	}
-
-    //對話框設定
-	popupShowAdjust_bak = function (title,desc,confirm,cancel){
-
-		//default
-		$(".popup-confirm").html( $.i18n.getString("COMMON_OK") );
-		$(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
-
-		if(title){
-			$('.popup-title').html(title);
-		}else{
-			$('.popup-title').html("");
-		}
-	    if(desc){
-	    	$('.popup-text').show();
-	        $('.popup-text').html(desc);
-	    }else{
-	    	$('.popup-text').hide();
-	    }
-	    if(confirm){
-	    	$(".popup-confirm").data("todo","");
-	    	$(".popup-confirm").show();
-	    	$('.popup-cancel').removeClass("full-width");
-
-	    	if(typeof confirm == "string"){
-	    		if(confirm.split("+")[2]){
-	    			$(".popup-confirm").html(confirm.split("+")[2]);
-	    		}
-	    		$(".popup-confirm").data("todo",confirm);
-	    	}
-	    }else{
-	    	$(".popup-confirm").hide();
-	    	$('.popup-cancel').addClass("full-width");
-	    	
-	    }
-	    if(cancel){
-	    	$(".popup-cancel").show();
-	    	$('.popup-confirm').removeClass("full-width");
-	    	if(typeof cancel == "string"){
-	    		if(cancel.split("+")[2]){
-	    			$(".popup-cancel").html(cancel.split("+")[2]);
-	    		}
-	    		$(".popup-cancel").data("todo",cancel);
-	    	}
-	    }else{
-	    	$(".popup-cancel").hide();
-	    	$('.popup-confirm').addClass("full-width");
-	    }
-
-
-	    if(!confirm && !cancel){
-	    	setTimeout(function(){
-    			$(".popup-screen").trigger("close");
-    		},2000);
-	    }
-
-	    $(".popup-screen").show();
-	    $(".popup").show();
-
-	    $(".popup-frame").css("margin-left",0);
-	    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2);
-	    
 	}
 	
 	initLandPage = function(){

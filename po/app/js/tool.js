@@ -355,31 +355,31 @@ $(function(){
 	}
 
 	//對話框設定
-    $(".popup-confirm").click(function(){
-    	if($(".popup").data("callback")){
-    		var func = $(".popup").data("callback")[0];
-    		var arguments = $(".popup").data("callback")[1];
-			func(arguments);
-    	}
-		$(".popup-screen").trigger("close");
-	});
+ //    $(".popup-confirm").click(function(){
+ //    	if($(".popup").data("callback")){
+ //    		var func = $(".popup").data("callback")[0];
+ //    		var arguments = $(".popup").data("callback")[1];
+	// 		func(arguments);
+ //    	}
+	// 	$(".popup-screen").trigger("close");
+	// });
 
-	$(".popup-cancel").click(function(){
-		$(".popup-screen").trigger("close");
-	});
+	// $(".popup-cancel").click(function(){
+	// 	$(".popup-screen").trigger("close");
+	// });
 
 
-	$(".popup-screen").bind("close",function(){
+	// $(".popup-screen").bind("close",function(){
 		
-	    $(".popup").fadeOut("fast",function(){
-	    	$(".popup-screen").hide();	
-	    });
-	    //ajax也關
-	    $('.ui-loader').hide();
-		$(".ajax-screen-lock").hide();
+	//     $(".popup").fadeOut("fast",function(){
+	//     	$(".popup-screen").hide();	
+	//     });
+	//     //ajax也關
+	//     $('.ui-loader').hide();
+	// 	$(".ajax-screen-lock").hide();
 
-	    $("body").removeClass("screen-lock");
-	});
+	//     $("body").removeClass("screen-lock");
+	// });
 
 	//對話框設定
 	popupShowAdjust = function (title,desc,confirm,cancel,callback){
@@ -458,6 +458,86 @@ $(function(){
 	    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2);
 	    
 	}
+
+
+	myGlobal.popup = function(args){
+			var jqHtml = $(this.html);
+
+			jqHtml
+			.find(".popup-confirm").html( $.i18n.getString("COMMON_OK") ).end()
+			.find(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
+
+			if(typeof confirm === "string") jqHtml.find(".popup-confirm").html(confirm);
+	    	if(typeof cancel === "string") jqHtml.find(".popup-cancel").html(cancel);
+
+			if(args.title !== undefined)
+				jqHtml.find('.popup-title').html(args.title);
+
+			if(args.desc !== undefined)
+	    		jqHtml.find('.popup-text').html(args.desc).show();
+	    	
+	    	//按鈕安排
+			switch(args.tp) {
+				case 1://只有確認
+					jqHtml.find(".popup-confirm").addClass("full-width").show();
+					break;
+				case 1://只有取消
+					jqHtml.find(".popup-cancel").addClass("full-width").show();
+					break;
+				case 3://確認加取消
+					jqHtml
+					.find(".popup-confirm").show().end()
+					.find(".popup-cancel").show();
+					break;
+				default://沒有按鈕 自動消失
+					setTimeout(function(){
+	    				this.remove();
+	    			}.bind(this),1500);
+					break;
+			}
+
+			//確認後動作
+	    	if(args.confirm !== undefined && args.action !== undefined) {
+	    		jqHtml.find(".popup-confirm").click(function(){
+	    			args.action[0](args.action[1]);
+	    		})
+	    	}
+
+	    	//取消
+	    	jqHtml.find(".popup-cancel").click(function(){
+	    		this.remove();
+	    	}.bind(this))
+
+			$("body").append(jqHtml.show());
+
+			// jqHtml.show()
+			// .find(".popup-screen").show().end()
+		 //    .find(".popup-frame")
+		 //    .css("margin-left",0)
+		 //    .css("margin-left",($(document).width() - jqHtml.find(".popup-frame").width())/2);
+
+	}
+
+	myGlobal.popup.prototype = {
+		remove: function(jqHtml){
+			jqHtml.remove();
+			$("body").removeClass("screen-lock");
+		},
+		html: 
+			'<div class="popup">' +
+	        '    <div class="popup-frame">' +
+	        '        <div class="popup-title"></div>' +
+	        '        <div class="popup-text" style="display:none"></div>' +
+	        '        <div class="popup-confirm-area">' +
+	        '            <div class="popup-cancel" style="display:none"></div>' +
+	        '            <div class="popup-confirm" style="display:none"></div>   ' + 
+	        '        </div>' +
+	        '    </div>' +
+	        '    <div class="popup-gap"></div>' +
+	        '    <div class="popup-screen" style="display:block;"></div>' +
+	        '</div>'
+	}
+
 
 	changePageAfterPopUp = function(page){
 		$.mobile.changePage(page);

@@ -5,7 +5,7 @@ $(function(){
 
 	var refreshChk = false;
 	//沒有登入資訊 就導回登入頁面
-	if($.lStorage("_loginData")){
+	if($.lStorage("_loginData") && 0){
 		var _loginData = $.lStorage("_loginData");
 
 		ui = _loginData.ui;
@@ -35,6 +35,9 @@ $(function(){
 	    	initChatDB(); 
 			initChatCntDB(); 
 
+			//貼圖initial
+			initStickerArea.load();
+
 			//沒團體的情況
 			if(!$.lStorage("_groupList") || !_loginData.dgi || _loginData.dgi==""){
 				//關閉返回鍵
@@ -49,12 +52,25 @@ $(function(){
 			pollingInterval();
 		});
 
+
+
+
+
+
 	}else{
-    	document.location = "index.html";
-    	return false;
+    	// document.location = "index.html";
+    	$.mobile.changePage("#page-registration");
+    	// return false;
 	}
 
 	//test
+	$(document).on("click",".registration-logo img",function(){
+		new myGlobal.popup({
+			tp:1,
+			confirm: 'shit'
+		});
+	});
+
 	$(".currentGroup").click(function(){
 		// $(".st-feedbox-area ").animate({bottom:"125px"});
 		// 彩蛋鑰匙
@@ -1585,7 +1601,8 @@ $(function(){
 		//show comfirm
 		popupShowAdjust("",
 			$.i18n.getString("COMPOSE_DISCARD"),
-			$.i18n.getString("COMMON_OK"),$.i18n.getString("COMMON_CANCEL"),
+			$.i18n.getString("COMMON_OK"),
+			$.i18n.getString("COMMON_CANCEL"),
 			[function(){
 				this_dom.siblings(".page-back").trigger("click");
 			},$(this)]
@@ -2057,7 +2074,7 @@ $(function(){
 
 
 	//init sticker
-	initStickerArea.load();
+	// initStickerArea.load();
 	//on downloading sticker in main window
 	$("#send-sync-sticker-signal").off("click").click(function(){
 		var sid = $(this).attr("data-sid");

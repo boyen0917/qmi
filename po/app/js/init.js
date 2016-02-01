@@ -196,7 +196,6 @@ var ui,at,lang,gi;
 
 	window.myGlobal = {}
 
-
 	//title
 	g_Qmi_title = "Qmi";
 	$("title").html(g_Qmi_title);
@@ -226,6 +225,13 @@ var ui,at,lang,gi;
 	$.ajaxSetup ({
 		timeout: 30000
 	});
+
+
+	if($.lStorage("_loginAutoChk") == true){
+		loginAction();
+	}
+
+
 	
 	$(document).ajaxSend(function() {
 		//顯示 loading
