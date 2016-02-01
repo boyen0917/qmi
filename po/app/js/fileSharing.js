@@ -7,6 +7,8 @@ var FileSharing = function(){
 	this.breadcrumb = [];
 	this.fileItemArr = [];
 
+	this.updateBreadcrumb();
+
 	this.init = function(){
 		this.reset();
 		this.eventBinding();
@@ -19,6 +21,7 @@ FileSharing.prototype = {
 	fileDom: $("div.subpage-fileSharing section.fileSharing"),
 	bcArrow: '<img src="images/fileSharing/layer_arrow_icon@2x.png">',
 	reset: function(){
+
 		this.fileDom.find("section.list").html("").end()
 		.find(".operator").hide();
 
@@ -164,6 +167,7 @@ FileSharing.prototype = {
 
 			//只顯示三個
 			var last3Arr = this.breadcrumb.slice(-3);
+			
 			for(i=0;i<last3Arr.length;i++){
 				var thisBc = last3Arr[i];
 				var $thisPath = $("<span>").html(thisBc.fn);
