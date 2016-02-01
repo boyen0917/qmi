@@ -4,17 +4,42 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title></title>
-
-
         <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
-
+        <link rel="stylesheet" href="css/main.css?ver=0.35" />
+        <link rel="stylesheet" href="css/chatList.css?ver=0.35" />
+        <link rel="stylesheet" href="css/alert.css?ver=0.35" />
+        <link rel="stylesheet" href="css/contact.css?ver=0.35" />
+        <link rel="stylesheet" href="css/general_album.css?ver=0.35" />
+        <link rel="stylesheet" href="css/setting.css?ver=0.35" />
         
-        <script src='/assist/func_assistant.js'></script>
+        <script type="text/javascript" src='/assist/func_assistant.js'></script>
+        <script src="js/ga.js"></script>
 
-        <!--  -->
+        <script src="../js/jquery.js"></script>
+        <script src="../js/jquery.mobile-1.3.2.min.js"></script>
+        <script type="text/javascript" src="../js/jquery.i18n.js"></script>
+        
+        <script src="js/jquery.plugin.js"></script>
+        
+        <script type="text/javascript" src="js/init.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/init_func.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/tool.js?ver=0.35"></script>
 
-        <link rel="stylesheet" href="build/style.css" />
-        <script type="text/javascript" src="build/app.min.js"></script>
+        <!-- IDBWrapper -->
+        <script src="js/idb/idb.js"></script>
+        <script src="js/idb/idbstore.js"></script>
+        
+        <script type="text/javascript" src="js/general_album.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/contact.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/addressBook.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/setting.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/chatDB.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/func.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/main.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/chatList.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/alert.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/stickerArea.js?ver=0.36"></script>
+        <link rel="stylesheet" href="css/stickerArea.css"/>
         
         <!--<script id="google-map" src="https://maps.google.com/maps/api/js?sensor=false"></script>
         <script src="js/jquery.tinyMap.min.js"></script>-->
@@ -23,12 +48,22 @@
         <script src="js/jquery.tinyMap.min.js"></script>-->
         <script language="javascript" src="https://webapi.amap.com/maps?v=1.3&key=test"></script>
         
+        <script src="js/sha/sha1.js"></script>
+        <script src="js/sha/enc-base64-min.js"></script>
+        <script type="text/javascript" src="js/jquery.autosize.min.js"></script>
 
 
         <!-- jquery ui datepicker -->
         <link rel="stylesheet" type="text/css" href="datepicker/datetimepicker.css" />
+        <script src="datepicker/datetimepicker.js"></script>
 
-    
+        <!-- 圖庫呈現 flex slider  -->
+        <script src="flexslider/modernizr.js"></script>
+        <script defer src="flexslider/jquery.flexslider.js"></script>
+        
+        <!-- nice scroll  -->
+        <!-- <script src="http://areaaperta.com/nicescroll/js/jquery.nicescroll.min.js"></script> -->
+        <script src="plugins/nicescroll/jquery.nicescroll.js"></script>
 
     </head>
     <body>
@@ -76,7 +111,26 @@
             </div>
         </div>
 
-    
+        
+<!---------------------------------- page-helper ------------------------------------>
+        <div data-role="page" id="page-helper">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3  class="page-title">團體建立/加入</h3>
+            </div>
+            <div class="center-style">
+                <a href="#page-group-menu" class="hg-create" data-role="button" data-inline="true">立即創建團體</a>
+                <a href="#page-group-menu" class="hg-join" data-role="button" data-inline="true">立即加入團體</a>
+            </div>
+            <div class="helper-title">小幫手</div>
+            <div data-role="collapsible-set" class="helper-collapsible-area ui-icon-alt" data-inset="false" data-iconpos="right" data-collapsed-icon="arrow-d">
+                <div data-role="collapsible"><h3>如何創建團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"創建團體"後,設定您的團體照片,輸入團體名稱,團體介紹,並選取""預定使用人數".</li><li>完成輸入後,點擊"建立",即完成團體之建立.</li></ol></p><a class="hg-create inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即創建團體</a><br/></div> 
+                <div data-role="collapsible"><h3>如何加入團體</h3><p><ol><li>於"團體列表"的頁面中,點選右上方的"+".</li><li>點選"加入團體"後,輸入您來自"簡訊"或"邀請訊息"內的組織代碼及OTP</li><li>完成輸入後,點擊"加入",即加入該團體.</li></ol></p><a class="hg-join inline-btn" href="#page-group-menu" data-role="button" data-theme="d" data-inline="true">立即加入團體</a><br/></div> 
+                <div data-role="collapsible"><h3>建立事件提醒重要事項</h3><p>建立事件提醒重要事項</p></div> 
+                <div data-role="collapsible"><h3>舉辦投票不漏聽任何人的心聲</h3><p>舉辦投票不漏聽任何人的心聲</p></div> 
+                <div data-role="collapsible"><h3>多人群聊加快訊息傳遞</h3><p>多人群聊加快訊息傳遞</p></div> 
+            </div><!-- /collapsible -->
+        </div>
 <!---------------------------------- page-group-main ------------------------------------>
         <div data-role="page" id="page-group-main" >
             <div class="gm-frame scrolltop">
@@ -243,15 +297,15 @@
                                     <div data-status="all" data-navi="feed-post" class="st-filter-action st-filter-list" style="display:none;">
                                         <span data-textid='FEED_ALL'></span>
                                     </div>
-                                    <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:;" data-polling-cnt="B2">
+                                    <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B2">
                                         <span data-textid='FEED_BULLETIN'></span>
                                         <div class="sm-count" style="display:none;"></div>
                                     </div>
-                                    <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:;" data-polling-cnt="B3">
+                                    <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B3">
                                         <span data-textid='FEED_REPORT'></span>
                                         <div class="sm-count" style="display:none;"></div>
                                     </div>
-                                    <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:;" data-polling-cnt="B4">
+                                    <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B4">
                                         <span data-textid='FEED_MISSION'></span>
                                         <div class="sm-count" style="display:none;"></div>
                                     </div>

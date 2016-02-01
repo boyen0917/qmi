@@ -3937,7 +3937,7 @@ $(function(){
 		});
         console.debug("go");
 		//可投票數加減1
-		$(document).off().on("click",".cp-vote-pm",function(){
+		$(document).off("click",".cp-vote-pm").on("click",".cp-vote-pm",function(){
 
 			var this_ques = $(this).parents(".cp-vote-ques-area");
 			var vote_count = this_ques.data("vote-count");
