@@ -964,7 +964,7 @@ generateBranchList = function( childList ){
 
 showMainContact = function(){
 	// $("#page-group-main .contact-rows").height( $(window).height()-63 );
-	$.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
+	// $.mobile.changePage("#page-group-main", { transition: "slide", reverse: true});
 }
 
 initContactData = function(){

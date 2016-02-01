@@ -325,8 +325,6 @@ var ui,at,lang,gi;
 	
 	$(document).on("click",".page-back",function(){
 
-		if(typeof g_room !== "undefined") return false;
-
 		//按上一頁不需要記錄歷程
 		back_exception = true;
 		var t= $(document).data("page-history");
