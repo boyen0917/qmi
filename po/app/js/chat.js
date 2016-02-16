@@ -28,6 +28,8 @@ var g_currentScrollToDom = null;	//捲動到最上方時會讀取舊訊息, 但�
 var lockCurrentFocusInterval;		//讓視窗停留在最後一筆的interval
 var lockCurrentFocusIntervalLength = 100;	//讓視窗停留在最後一筆的interval更新時間
 
+
+
 /**
               ███████╗███████╗████████╗██╗   ██╗██████╗           
               ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗          
@@ -38,6 +40,21 @@ var lockCurrentFocusIntervalLength = 100;	//讓視窗停留在最後一筆的int
                                                                   
  */
 $(document).ready(function () {
+
+	var winCloseDeferred = $.Deferred();
+
+	//都ok的話 就不關嗎？
+	winCloseDeferred.done(function(chk){
+		if(chk === false) return;
+
+		popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL", 9),true,false,[function(){
+			window.close();
+		}]);
+	});
+
+	//load language
+	updateLanguage(lang);
+	
 
 	//resize chat window to slim window
 	try {
@@ -60,17 +77,22 @@ $(document).ready(function () {
 
 	// window.moveTo( window.opener.screenX+20, window.opener.screenY+20 );
 
-	//set to chat page
+	//set to chat page 必須
 	$.changePage("#page-chat");
 
 	//reset events
 	$(document).off("ajaxSend");
 
 	//沒有登入資訊 就導回登入頁面
+	// $.lStorage("_chatRoom",false)
 	if (!$.lStorage("_chatRoom")) {
 		//document.location = "login.html";
 		//show warning & close window
-		popupShowAdjust("", $.i18n.getString("COMMON_SEND_PHOTO_LIMIT", 9));
+		myWait(function(){
+			return $.i18n.dict;	
+		},null).done(function(){
+			winCloseDeferred.resolve(true);
+		})
 	}
 
 	var _loginData = $.lStorage("_chatRoom");
@@ -84,15 +106,16 @@ $(document).ready(function () {
 	page.attr("data-gi", gi);
 	page.attr("data-ci", ci);
 
-	var userData = $.userStorage();
-	if (!userData) {
-		document.location = "login.html";
-	}
+	var userData = $.userStorage() || {};
 
 	// cns.debug( JSON.stringify(userData) );
 	//所有團體列表
 	g_group = userData[gi];
-	if (null == g_group) return;
+	if (null == g_group) {
+		winCloseDeferred.resolve(true);
+		return;
+	}
+
 	if (g_group.ad != 1 && true == g_group.isOfficial) {
 		$(".extra").hide();
 	}
@@ -107,7 +130,7 @@ $(document).ready(function () {
 	initChatDB(onChatDBInit);
 	initChatCntDB();
 
-	//get name
+	//get name 聊天室名稱
 	if (null == g_room.uiName) {
 		try {
 			if (g_room.tp == 1) {
@@ -131,6 +154,7 @@ $(document).ready(function () {
 			cns.debug(e.message);
 		}
 	}
+
 	g_cn = g_room.uiName ? g_room.uiName : g_group.gn;
 
 	//check member left
@@ -140,9 +164,6 @@ $(document).ready(function () {
 	ti_chat = ci;
 
 	getPermition();
-
-	//load language
-	updateLanguage(lang);
 
 	//header 設定團體名稱
 	$("#header .title .text").html(g_cn.replaceOriEmojiCode());
@@ -298,7 +319,7 @@ $(document).ready(function () {
 
 	//load msg when scroll to top
 	g_container = $("#container");
-	g_container.on("mousewheel", onScrollContainer);
+	// g_container.on("mousewheel", onScrollContainer);
 	g_container.scroll(onScrollContainer);
 	$("html, body").scroll(onScrollBody);
 
@@ -551,20 +572,20 @@ $(document).ready(function () {
 
 	//apply nicescroll
 	var container = $("#container");
-	container.niceScroll({
-		// styler:"fb",
-		cursorcolor: "rgba(210, 210, 210, 0.8)",
-		cursorwidth: '8',
-		cursorborderradius: '10px',
-		background: 'rgba(255,255,255,0)',
-		cursorborder: "",
-		boxzoom: false
-		// zindex: 999
-		// horizrailenabled: false,
-		// ,autohidemode: "leave"
-	});
-	var niceScrollTmp = container.getNiceScroll()[0];
-	niceScrollTmp.onDragToTop = onDragContainer;
+	// container.niceScroll({
+	// 	// styler:"fb",
+	// 	cursorcolor: "rgba(210, 210, 210, 0.8)",
+	// 	cursorwidth: '8',
+	// 	cursorborderradius: '10px',
+	// 	background: 'rgba(255,255,255,0)',
+	// 	cursorborder: "",
+	// 	boxzoom: false
+	// 	// zindex: 999
+	// 	// horizrailenabled: false,
+	// 	// ,autohidemode: "leave"
+	// });
+	// var niceScrollTmp = container.getNiceScroll()[0];
+	// niceScrollTmp.onDragToTop = onDragContainer;
 
 	updateChat(null,true);
 	sendMsgRead(new Date().getTime())
@@ -594,7 +615,6 @@ function updateChatContentPosition() {
 		footerHeight -= tmp;
 		$("#chat-contents").stop().animate({marginBottom: footerHeight - 40}, 100);
 		$("#chat-toBottom").animate({bottom: Math.max(0, footerHeight + 10)}, 100);
-		// if( g_isEndOfPage ) scrollToBottom();
 	}
 }
 
@@ -616,7 +636,7 @@ function resizeContent() {
 聊天室DB初始化完成後callback
 **/
 function onChatDBInit() {
-	console.debug("-------- onChatDBInit ---------");
+	// console.debug("-------- onChatDBInit ---------");
 	var today = new Date();
 	$("#chat-contents").html("<div class='firstMsg'></div>");
 	var timeTag = $("<div class='chat-date-tag'></div>");
@@ -635,7 +655,6 @@ function onChatDBInit() {
 
 	scrollToBottom();
 
-	// updateChat(g_room.lastCt, true);
 }
 
 /**
@@ -648,18 +667,14 @@ function getHistoryMsg(bIsScrollToTop) {
 	}
 	var container = $("#container");
 	// $("#container").off("scroll");
-	g_isLoadHistoryMsgNow = true;
 
+	g_isLoadHistoryMsgNow = true;
+	// console.debug("g_isLoadHistoryMsgNow",g_isLoadHistoryMsgNow);
 	$("#chat-loading-grayArea").hide();
 	$("#chat-loading").show();
 	console.debug("----- getHistoryMsg", bIsScrollToTop, " ------");
 	g_idb_chat_msgs.limit(function (list) {
 		var firstDayDiv = $("#chat-contents .chat-date-tag");
-		// firstDayDiv = $(firstDayDiv[0]).next();
-		// if(firstDayDiv.length>0){
-		// 	firstDayDiv.before("<div>not read</div>");
-		// 	firstDayDiv = firstDayDiv.prev();
-		// }
 		var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
 		setCurrentFocus( (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null );
 		
@@ -676,28 +691,18 @@ function getHistoryMsg(bIsScrollToTop) {
 				} else {
 					var object = list[i].data;
 					showMsg(object, null);
-					// if (g_currentScrollToDom) g_currentScrollToDom.scrollIntoView();
-					// if(g_currentScrollToDom){
-					// 	g_currentScrollToDom.scrollIntoView();
-					// 	// $("#chat-contents").scrollTop( $("#chat-contents").scrollTop()+50 );
-					// }
 				}
 			}
 			if (isUpdatePermission) getPermition(true);
 
-			// sendMsgRead(g_latestDate.getTime());
-
 
 			if (bIsScrollToTop) {
-				// container.scroll( onScrollContainer );
 				g_isLoadHistoryMsgNow = false;
-				console.debug("---- end loading -----");
 			} else {
-				// setTimeout( hideLoading, 1000);
+
 			}
 			showChatCnt();
 		}
-
 
 		if (true==g_isFirstTimeLoading) {
 			g_isLoadHistoryMsgNow = false;
@@ -708,20 +713,20 @@ function getHistoryMsg(bIsScrollToTop) {
 			$("#chat-loading").hide();
 			$("#chat-loading-grayArea").show();
 			g_isFirstTimeLoading=false;
-			g_container.getNiceScroll()[0].wheelprevented = false;
+			// g_container.getNiceScroll()[0].wheelprevented = false;
 		} else {
 			if (list.length < 20) {
 				//not enough history in db, fetch from server
 				updateChat(g_earliestDate.getTime(), false, g_currentScrollToDom);
 			} else {
-				setTimeout(function () {
+				// setTimeout(function () {
 					g_isLoadHistoryMsgNow = false;
 					//end loading history, hide loading & scroll to last dom we were at
 					hideLoading();
-				}, 600);
+				// }, 600);
 			}
 		}
-		console.debug("---- end loading -----");
+		// // console.debug("---- end loading -----");
 	}, {
 		index: "gi_ci_ct",
 		keyRange: g_idb_chat_msgs.makeKeyRange({
@@ -738,6 +743,7 @@ function getHistoryMsg(bIsScrollToTop) {
 			cns.debug("onError:", result);
 		}
 	});
+
 }
 /**
 紀錄讀取歷史訊息時, 目前最上方的dom
@@ -745,11 +751,11 @@ function getHistoryMsg(bIsScrollToTop) {
 function setCurrentFocus(dom){
 	if( dom ){
 		g_currentScrollToDom = dom;
-		console.debug("---- start lockCurrentFocusInterval -----");
-		lockCurrentFocusInterval = setInterval( function(){
-			g_currentScrollToDom.scrollIntoView();
-		}, lockCurrentFocusIntervalLength );
-		g_container.getNiceScroll()[0].wheelprevented = true;
+		// console.debug("---- start lockCurrentFocusInterval -----",g_currentScrollToDom);
+		// lockCurrentFocusInterval = setInterval( function(){
+			// g_currentScrollToDom.scrollIntoView();
+		// }, lockCurrentFocusIntervalLength );
+		// g_container.getNiceScroll()[0].wheelprevented = true;
 	}
 }
 /**
@@ -766,12 +772,12 @@ function hideLoading() {
 			$("#chat-loading-grayArea").show();
 		}
 		$("#chat-loading").hide();
-		// g_currentScrollToDom.scrollIntoView();
+		g_currentScrollToDom.scrollIntoView({behavior: "smooth"});
 		g_currentScrollToDom = null;
-		g_container.getNiceScroll()[0].wheelprevented = false;
-		clearInterval( lockCurrentFocusInterval );
+		// g_container.getNiceScroll()[0].wheelprevented = false;
+		// clearInterval( lockCurrentFocusInterval );
 
-		console.debug("---- end lockCurrentFocusInterval -----");
+		// console.debug("---- end lockCurrentFocusInterval -----");
 
 	} else {
 		$("#chat-loading").stop().fadeOut(function () {
@@ -787,7 +793,6 @@ function hideLoading() {
 				// }
 				g_container.scrollTop(content.offset().top);
 			}
-			cns.debug("-- hideLoading end --");
 		});
 	}
 	// // firstDom.css("background", "red");
@@ -810,7 +815,7 @@ function op(url, type, data, delegate, errorDelegate) {
 		li: lang
 	}, type, false, data);
 	result.error(function (jqXHR, textStatus, errorThrown) {
-		console.log(textStatus, errorThrown);
+		// // console.log(textStatus, errorThrown);
 		if (errorDelegate) errorDelegate();
 	});
 	result.success(function (data, status, xhr) {
@@ -825,7 +830,7 @@ function op(url, type, data, delegate, errorDelegate) {
 function scrollToStart() {
 	if( !g_container ) g_container = $("#container");
 	g_container.stop(false, true).animate({scrollTop: 50}, 'fast');
-	console.debug(" -- scrollToBottom");
+	// console.debug(" -- scrollToBottom");
 }
 
 /**
@@ -835,7 +840,7 @@ function scrollToBottom() {
 	if( !g_container ) g_container = $("#container");
 	g_container.stop(false, true).animate({scrollTop: $("#chat-contents").height() + 50}, 'fast');
 	g_isEndOfPage = true;
-	console.debug(" -- scrollToBottom");
+	// console.debug(" -- scrollToBottom");
 }
 
 /**
@@ -852,7 +857,6 @@ function checkPagePosition() {
 			var docHeight = g_container[0].scrollHeight;
 			var isAtBottom = ((posi + height + 35) >= docHeight);
 			// cns.debug(isAtBottom, posi, height, docHeight);
-			// if( !isAtBottom )	scrollToBottom();
 
 			if (isAtBottom) $("#chat-toBottom").fadeOut('fast');
 			else $("#chat-toBottom").fadeIn('fast');
@@ -885,7 +889,7 @@ function updateChat(time, isGetNewer) {
 		}
 	}
 
-	console.debug(api);
+	// console.debug(api);
 	op(api, "GET", "", function (data, status, xhr) {
 			var userData = $.userStorage();
 			g_group = userData[gi];
@@ -903,7 +907,7 @@ function updateChat(time, isGetNewer) {
 
 						if (object.meta.ct > g_room.lastCt) {
 							g_room.lastCt = object.meta.ct;
-							console.debug(object.meta.ct);
+							// console.debug(object.meta.ct);
 						}
 
 						//pass shown msgs
@@ -932,7 +936,7 @@ function updateChat(time, isGetNewer) {
 							// if (g_msgs.length < 20 && null != time && false == g_isEndOfHistory) getHistoryMsg();
 							// else {
 								g_isFirstTimeLoading=false;
-								console.debug("----- finished new ", data.el.length, isGetNewer, " -----");
+								// console.debug("----- finished new ", data.el.length, isGetNewer, " -----");
 								//the few msgs r all msgs in this chatroom
 								//first time in, so scroll to bottom
 								scrollToBottom();
@@ -949,16 +953,10 @@ function updateChat(time, isGetNewer) {
 							if (isEndOfPageTmp) scrollToBottom();
 						}
 					} else { //update not finish
-						console.debug("----- not finished new ", data.el.length, " -----");
+						// console.debug("----- not finished new ", data.el.length, " -----");
 						updateChat(g_room.lastCt, isGetNewer);
 					}
 				} else { //getting old msgs
-					console.debug("----- finished old ", data.el.length, isGetNewer, " -----");
-
-					// 12/29 fix bug scrollIntoView infinite
-					clearInterval( lockCurrentFocusInterval )
-
-					setTimeout(function () {
 						g_isLoadHistoryMsgNow = false;
 						//no more history
 						if (1 >= data.el.length) {
@@ -966,18 +964,11 @@ function updateChat(time, isGetNewer) {
 							$("#chat-loading-grayArea").hide();
 							$("#chat-loading").hide();
 							$("#chat-nomore").show();
-							g_container.getNiceScroll()[0].wheelprevented = false;
-							// $("#chat-loading").fadeOut( function(){
-							// $("#chat-nomore").show();
-							// });
-							// $("#chat-loading-grayArea").hide();
-							// $('#container').scrollTop(0);
+							// g_container.getNiceScroll()[0].wheelprevented = false;
 						} else {
 							//scroll to the last dom we were at
 							hideLoading();
 						}
-					}, 500);
-
 
 					showChatCnt();
 				}
@@ -1068,7 +1059,7 @@ function showMsg(object, bIsTmpSend) {
 	bIsTmpSend = bIsTmpSend || false;
 
 	g_msgs.push(object.ei);
-	//cns.debug("list:",JSON.stringify(object,null,2));
+	// cns.debug("list:",JSON.stringify(object,null,2));
 
 	var time = new Date(object.meta.ct);
 	var container = $("<div class='chat-msg'></div>");
@@ -1088,7 +1079,7 @@ function showMsg(object, bIsTmpSend) {
 		if (1 < allTimeTag.length) {
 			var bIsAdd = false;
 			for (var i = 0; i < allTimeTag.length - 1; i++) {
-				cns.debug($(allTimeTag[i]).data("time"));
+				// cns.debug($(allTimeTag[i]).data("time"));
 				// cns.debug( time.getTime(), time.toString() );
 
 				if ($(allTimeTag[i]).data("time") > time.getTime()) {
@@ -1361,7 +1352,7 @@ function showMsg(object, bIsTmpSend) {
 			// msgDiv.html( msgData.tp+"<br/>"+msgData.c );
 			break;
 	}
-
+	console.debug("showMsg finished");
 	return container;
 }
 
@@ -1487,14 +1478,9 @@ function sendMsgText(dom) {
 				showMsg(newData);
 			});
 
-			// if( g_isEndOfPage ) scrollToBottom();
-			// scrollToBottom();
-
 		},
 		function () {
 			dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-			// if( g_isEndOfPage ) scrollToBottom();
-			// scrollToBottom();
 		}
 	);
 }
@@ -1564,7 +1550,6 @@ function sendMsgImage(dom) {
 			});
 		} else {
 			dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-			// if( g_isEndOfPage ) scrollToBottom();
 		}
 	});
 	// }
@@ -1635,7 +1620,6 @@ function sendMsgVideo(dom) {
 			});
 		} else {
 			dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-			// if( g_isEndOfPage ) scrollToBottom();
 		}
 	});
 	// }
@@ -1727,9 +1711,6 @@ getChatS3file = function (target, file_c, tp, this_ti, this_tu) {
 						img.removeAttr("style");
 						img.css("background-image", "none");
 
-						// if(g_isEndOfPage){
-						// 	scrollToBottom();
-						// }
 					});
 
 					//小圖
@@ -2264,49 +2245,7 @@ function editMember() {
 						errorReport(e);
 					}
 					
-					// // scrollToBottom();
-					// var memListString = btn.data("object_str");
-					// //on select done
-					// // send add mem to room api
-					// try {
-					// 	cns.debug(memListString);
-					// 	var memList = $.parseJSON(memListString);
-					// 	memList[g_group.gu] = g_group.guAll[g_group.gu].nk;
-					// 	var addList = [];
-					// 	var removeList = [];
-					// 	for (var guTmp in memList) {
-					// 		if (!g_room.memList.hasOwnProperty(guTmp)) {
-					// 			addList.push(guTmp);
-					// 		}
-					// 	}
-					// 	for (var guTmp in g_room.memList) {
-					// 		if (!memList.hasOwnProperty(guTmp)) {
-					// 			removeList.push(guTmp);
-					// 		}
-					// 	}
-					// 	var isSend = false;
-					// 	var data = {};
-					// 	if (addList.length > 0) {
-					// 		data.add = {gul:addList};
-					// 		isSend = true;
-					// 	}
-
-					// 	if (removeList.length > 0) {
-					// 		data.del = {gul:removeList};
-					// 		isSend = true;
-					// 	}
-
-					// 	if( isSend ){
-					// 		editMemInRoomAPI(ci, data, function (data) {
-					// 			getPermition(true);
-					// 			updateChat();
-					// 		});
-					// 	}
-					// } catch (e) {
-					// 	cns.debug("[!]" + e.message);
-					// }
 				}
-				// scrollToBottom();
 				setTimeout(function () {
 					// checkPagePosition();
 					$("#page-chat").removeClass("transition");
@@ -2447,31 +2386,26 @@ function checkMemberLeft() {
 滑鼠捲到頂部取舊訊息
 **/
 function onScrollContainer(e) {
+
 	if (!$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition")) return;
 
-	// cns.debug(e.originalEvent.wheelDelta);
+	//console.debug("wwww",g_container.scrollTop());
+
 	var posi = $(this).scrollTop();
 	if (g_isLoadHistoryMsgNow) {
-		// if(g_currentScrollToDom) g_currentScrollToDom.scrollIntoView();
-		// cns.debug("scroll blocking ", posi, g_container.getNiceScroll()[0].wheelprevented);
+	// 	// if(g_currentScrollToDom) g_currentScrollToDom.scrollIntoView();
+	// 	// cns.debug("scroll blocking ", posi, g_container.getNiceScroll()[0].wheelprevented);
 		e.stopPropagation();
 		e.preventDefault();
 		return;
 	}
-	if (!g_isEndOfHistory && posi <= $("#chat-loading").outerHeight() * 0.5) {
-		// cns.debug("!");
+	if ( !g_isEndOfHistory && posi <= $("#chat-loading").outerHeight() * 0.5) {
+		// cns.debug("!oooooooooops",g_container.scrollTop());
 		getHistoryMsg(false);
 		// g_isEndOfPage = false;
 		return;
 	}
-	var height = $(window).height();
-	var docHeight = $(document).height();
-	var isAtBottom = ((posi + height + 5) >= docHeight);
-	// if( g_isEndOfPage != isAtBottom ){
-	// 	g_isEndOfPage = isAtBottom;
-	// 	g_isEndOfPageTime = new Date().getTime();
-	// 	// cns.debug("!");
-	// }
+
 }
 /* 拉bar捲到頂部取舊訊息 */
 function onDragContainer() {
@@ -2567,9 +2501,6 @@ showChatReadUnreadList = function (cntDom) {
 		}, 200);
 		$("#page-tab-object").remove();
 		cns.debug("on back from showChatReadUnreadList");
-		// if( false== g_isLoadHistoryMsgNow){
-		// 	hideLoading();
-		// }
 	};
 
 	var rt = cntDom.data("t");
