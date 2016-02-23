@@ -5,7 +5,7 @@ onCheckVersionDone = function(needUpdate){
 	clearBadgeLabel();
 
 	//預設上一頁
-	$(document).data("page-history",[["#page-registration"]]);
+	$(document).data("page-history",[["#page-group-menu"]]);
 	
 	//首頁大圖
 	$("#page-registration").css("height",$(window).height());
@@ -311,12 +311,12 @@ onCheckVersionDone = function(needUpdate){
         
         var deferred = $.Deferred();
 
-        //附上group list
-        getGroupList(login_result.ui,login_result.at).complete(function(data){
-            if(data.status == 200){
+        ui = login_result.ui;
+        at = login_result.at;
 
-                ui = login_result.ui;
-                at = login_result.at;
+        //附上group list
+        getGroupList().complete(function(data){
+            if(data.status == 200){
 
                 var parse_data = $.parseJSON(data.responseText);
                 if( !parse_data ){
@@ -383,45 +383,18 @@ onCheckVersionDone = function(needUpdate){
             // document.location = data.location;    
             $.mobile.changePage(data.location)
 
-
-
-            var _loginData = login_result;
-
-			ui = _loginData.ui;
-			at = _loginData.at;
-
-			// var deferred = $.Deferred();
-			// if($.lStorage("refreshChk") === true) {
-			// 	getGroupCombo(_loginData.dgi,function(){
-			// 		deferred.resolve();
-			// 	});
-			// }else{
-			// 	deferred.resolve();
-			// }
-
-			// deferred.done(function(){
-				//registration.js會清掉 
-			// $.lStorage("refreshChk",true);
-			//自動登入
-			// if(!$.lStorage("_loginAutoChk")){
-			// 	//清除_loginData
-			// 	// localStorage.removeItem("_loginData");
-			// 	delete _loginData.at;
-			// 	$.lStorage("_loginData",_loginData);
-			// }
-
 			//聊天室開啓DB
 	    	initChatDB(); 
 			initChatCntDB(); 
 
 			//沒團體的情況
-			if(!$.lStorage("_groupList") || !_loginData.dgi || _loginData.dgi==""){
+			if(!$.lStorage("_groupList") || !login_result.dgi || login_result.dgi==""){
 				//關閉返回鍵
 				$("#page-group-menu .page-back").hide();
 				cns.debug("no group ");
 			}else{
 				//設定目前團體
-				setGroupInitial(_loginData.dgi);
+				setGroupInitial(login_result.dgi);
 			}
 
 			//執行polling
@@ -434,17 +407,17 @@ onCheckVersionDone = function(needUpdate){
     }
 
 
-	getGroupList = function(ui,at,cl){
-    	//取得團體列表
-        var api_name = "groups";
-        var headers = {
-            "ui":ui,
-            "at":at,
-            "li":lang
-        };
-        var method = "get";
-        return ajaxDo(api_name,headers,method,true,false,false,true,cl);
-    }
+	// getGroupList = function(ui,at,cl){
+ //    	//取得團體列表
+ //        var api_name = "groups";
+ //        var headers = {
+ //            "ui":ui,
+ //            "at":at,
+ //            "li":lang
+ //        };
+ //        var method = "get";
+ //        return ajaxDo(api_name,headers,method,true,false,false,true,cl);
+ //    }
 
 	getPrivateGroupList = function(p_data, callback){
     	//取得團體列表

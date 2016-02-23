@@ -538,7 +538,7 @@ $(function(){
               // $("#page-group-main .main-subpage").hide();
               // $(".subpage-systemSetting").show();
 
-              popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
+              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
 	          break;
             case "feed-post":
                 var filterAction = $(".st-filter-action");
@@ -2052,7 +2052,7 @@ $(function(){
 
 
 	composeContentMake = function (compose_title){
-
+        
 		//開始讀取
 		$('.cp-content-load').html($('<div>').load('layout/compose.html .cp-content',function(){
 
@@ -3846,7 +3846,7 @@ $(function(){
 					this_ques.data("opts-delete",true);
 				}
 
-				this_ques.find('.cp-new-opt-' + opt_total + ' textarea').autosize({append: "\n"});
+				this_ques.find('.cp-new-opt-' + opt_total + ' textarea').autosize({append: "\n"})
 			});
 
 			
@@ -3937,7 +3937,7 @@ $(function(){
 		});
         console.debug("go");
 		//可投票數加減1
-		$(document).off().on("click",".cp-vote-pm",function(){
+		$(document).off("click",".cp-vote-pm").on("click",".cp-vote-pm",function(){
 
 			var this_ques = $(this).parents(".cp-vote-ques-area");
 			var vote_count = this_ques.data("vote-count");

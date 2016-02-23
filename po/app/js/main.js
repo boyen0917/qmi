@@ -4,8 +4,8 @@ $(function(){
 	updateLanguage( lang );
 
 	var refreshChk = false;
-	//沒有登入資訊 就導回登入頁面
-	if($.lStorage("_loginData") && 0){
+	//沒有登入資訊 就導回登入頁面 ps. && 0 這段先取消
+	if($.lStorage("_loginData")){
 		var _loginData = $.lStorage("_loginData");
 
 		ui = _loginData.ui;
@@ -53,10 +53,6 @@ $(function(){
 		});
 
 
-
-
-
-
 	}else{
     	// document.location = "index.html";
     	$.mobile.changePage("#page-registration");
@@ -67,7 +63,11 @@ $(function(){
 	$(document).on("click",".registration-logo img",function(){
 		new myGlobal.popup({
 			tp:1,
-			confirm: 'shit'
+			confirm: 'shit',
+			cancel: 'nooo',
+			title: 'what',
+			action: [qqoo,{a:1,b:2,c:3}],
+			desc: 'come on dont be lazy trying to be tough be concentrate on what you do ,alright'
 		});
 	});
 
@@ -171,7 +171,7 @@ $(function(){
 			cns.debug("last event ct:",this_navi.data("last-ct"));
 			timelineListWrite(this_navi.data("last-ct"));
 			timelineScrollTop();
-			$(".gm-content > div:eq(1)").getNiceScroll(0).doScrollTop(0, 500);
+			// $(".gm-content > div:eq(1)").getNiceScroll(0).doScrollTop(0, 500);
 		}
 	});
 
@@ -407,6 +407,17 @@ $(function(){
 		target.addClass("sm-click-bg");
 		// target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
 		
+	});
+
+	//登出 暫時
+	$(".gm-side-menu").on("click","[name=system-setting]",function(){
+		// popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
+		new myGlobal.popup({
+			desc: $.i18n.getString("SETTING_DO_LOGOUT"),
+			confirm: true,
+			cancel: true,
+			action: [logout]
+		});
 	});
 	
 	//更換團體
@@ -2021,8 +2032,8 @@ $(function(){
 		// horizrailenabled: false,
 		// ,autohidemode: "leave"
 	};
-	$(".gm-content > div:eq(1)").niceScroll( lightgraySetting );
-	$(".contact-rows, .contact-searchResult").niceScroll( lightgraySetting );
+	// $(".gm-content > div:eq(1)").niceScroll( lightgraySetting );
+	// $(".contact-rows, .contact-searchResult").niceScroll( lightgraySetting );
 	var darkgraySetting = {
 		// styler:"fb",
 		cursorcolor:"rgba(107, 107, 107,0.8)", 
@@ -2037,7 +2048,7 @@ $(function(){
 		// horizrailenabled: false,
 		// ,autohidemode: "leave"
 	};
-	$(".sm-group-list-area").niceScroll( darkgraySetting );
+	// $(".sm-group-list-area").niceScroll( darkgraySetting );
 
 	//timeline 滾到底部取舊資料
 	fetchHistoryTimeline = function(){
@@ -2069,8 +2080,8 @@ $(function(){
 		    }
 		}
 	}
-	var niceScrollTmp = $(".gm-content > div:eq(1)").getNiceScroll()[0];
-	niceScrollTmp.onDragToBottom = fetchHistoryTimeline;
+	// var niceScrollTmp = $(".gm-content > div:eq(1)").getNiceScroll()[0];
+	// niceScrollTmp.onDragToBottom = fetchHistoryTimeline;
 
 
 	//init sticker

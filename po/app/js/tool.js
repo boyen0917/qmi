@@ -147,7 +147,23 @@ $(function(){
 	}
 
 	window.MyAjax = function(){
-		
+		var deferred = $.Deferred();
+
+	    this.default = {
+	        timeout: 30000,
+	        complete: function(data){
+	        }
+	    }
+
+	    this.headers = {
+	        ui:ui,
+	        at:at,
+	        li:"zh_TW"
+	    }
+
+
+	    return deferred.promise();
+
 	}
 	 
     _pri_split_chat = "#";
@@ -334,6 +350,8 @@ $(function(){
 	}
 
     toastShow = function(desc){
+    	if($(".toast").css("opacity") !== "0") return;
+
 		$(".toast div").html(desc);
 		$(".toast").css("bottom","0px");
 		$(".toast").css("opacity","0");
@@ -355,172 +373,62 @@ $(function(){
 	}
 
 	//對話框設定
- //    $(".popup-confirm").click(function(){
- //    	if($(".popup").data("callback")){
- //    		var func = $(".popup").data("callback")[0];
- //    		var arguments = $(".popup").data("callback")[1];
-	// 		func(arguments);
- //    	}
-	// 	$(".popup-screen").trigger("close");
-	// });
-
-	// $(".popup-cancel").click(function(){
-	// 	$(".popup-screen").trigger("close");
-	// });
-
-
-	// $(".popup-screen").bind("close",function(){
-		
-	//     $(".popup").fadeOut("fast",function(){
-	//     	$(".popup-screen").hide();	
-	//     });
-	//     //ajax也關
-	//     $('.ui-loader').hide();
-	// 	$(".ajax-screen-lock").hide();
-
-	//     $("body").removeClass("screen-lock");
-	// });
-
-	//對話框設定
 	popupShowAdjust = function (title,desc,confirm,cancel,callback){
-		// cns.debug("========彈跳視窗========");
-		// cns.debug("title:",title);
-		// cns.debug("desc:",desc);
-		// cns.debug("confirm:",confirm);
-		// cns.debug("cancel:",cancel);
-		// cns.debug("=======================");
-
-		// $("body").addClass("screen-lock");
-		
-		//default
-		$(".popup-confirm").html( $.i18n.getString("COMMON_OK") );
-		$(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
-
-		if(title){
-			$('.popup-title').html(title);
-		}else{
-			$('.popup-title').html("");
-		}
-	    if(desc){
-	    	$('.popup-text').show();
-	        $('.popup-text').html(desc);
-	    }else{
-	    	$('.popup-text').hide();
-	    }
-	    if(confirm){
-	    	$(".popup-confirm").show();
-	    	$('.popup-cancel').removeClass("full-width");
-
-	    	if(typeof confirm == "string"){
-	    		if(confirm.split("+")[2]){
-	    			$(".popup-confirm").html(confirm.split("+")[2]);
-	    		}
-	    		$(".popup-confirm").data("todo",confirm);
-	    	}
-	    }else{
-	    	$(".popup-confirm").hide();
-	    	$('.popup-cancel').addClass("full-width");
-	    	
-	    }
-	    if(cancel){
-	    	$(".popup-cancel").show();
-	    	$('.popup-confirm').removeClass("full-width");
-	    	if(typeof cancel == "string"){
-	    		if(cancel.split("+")[2]){
-	    			$(".popup-cancel").html(cancel.split("+")[2]);
-	    		}
-	    		$(".popup-confirm").data("todo",confirm);
-	    	}
-	    }else{
-	    	$(".popup-cancel").hide();
-	    	$('.popup-confirm').addClass("full-width");
-	    }
-
-	    //clear callback
-	    if( null==callback ){
-	    	$(".popup").removeData("callback");
-	    } else{
-	    	$(".popup").data("callback",callback);
-	    }
-
-
-	    if(!confirm && !cancel){
-	    	setTimeout(function(){
-    			$(".popup-screen").trigger("close");
-    			$("body").removeClass("screen-lock");
-    		},2000);
-	    }
-
-	    $(".popup-screen").show();
-	    $(".popup").show();
-
-	    $(".popup-frame").css("margin-left",0);
-	    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2);
-	    
+		new myGlobal.popup({
+			title: title,
+			desc: desc,
+			confirm: confirm,
+			cancel: cancel,
+			action: callback
+		});
 	}
 
-
 	myGlobal.popup = function(args){
-			var jqHtml = $(this.html);
+		var self = this;
+		self.jqHtml = $(this.html);
 
-			jqHtml
-			.find(".popup-confirm").html( $.i18n.getString("COMMON_OK") ).end()
-			.find(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
+		self.jqHtml.find(".popup-confirm").html( $.i18n.getString("COMMON_OK") ).end()
+		.find(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
 
-			if(typeof confirm === "string") jqHtml.find(".popup-confirm").html(confirm);
-	    	if(typeof cancel === "string") jqHtml.find(".popup-cancel").html(cancel);
+		if( args.confirm !== false && args.confirm !== undefined ) self.jqHtml.find(".popup-confirm").show();
+		if( args.cancel  !== false && args.cancel  !== undefined ) self.jqHtml.find(".popup-cancel").show();
+		if(typeof args.confirm === "string") self.jqHtml.find(".popup-confirm").html(args.confirm);
+    	if(typeof args.cancel === "string") self.jqHtml.find(".popup-cancel").html(args.cancel);
 
-			if(args.title !== undefined)
-				jqHtml.find('.popup-title').html(args.title);
+		if(args.title !== undefined)
+			self.jqHtml.find('.popup-title').html(args.title);
 
-			if(args.desc !== undefined)
-	    		jqHtml.find('.popup-text').html(args.desc).show();
-	    	
-	    	//按鈕安排
-			switch(args.tp) {
-				case 1://只有確認
-					jqHtml.find(".popup-confirm").addClass("full-width").show();
-					break;
-				case 1://只有取消
-					jqHtml.find(".popup-cancel").addClass("full-width").show();
-					break;
-				case 3://確認加取消
-					jqHtml
-					.find(".popup-confirm").show().end()
-					.find(".popup-cancel").show();
-					break;
-				default://沒有按鈕 自動消失
-					setTimeout(function(){
-	    				this.remove();
-	    			}.bind(this),1500);
-					break;
-			}
+		if(args.desc !== undefined)
+    		self.jqHtml.find('.popup-text').html(args.desc).show();
+    	
+    	//沒有按鈕 自動消失
+    	if( args.confirm === undefined && args.cancel === undefined) {
+    		setTimeout(function(){
+				self.remove();
+			},1500);
+    	}
 
-			//確認後動作
-	    	if(args.confirm !== undefined && args.action !== undefined) {
-	    		jqHtml.find(".popup-confirm").click(function(){
-	    			args.action[0](args.action[1]);
-	    		})
-	    	}
+		//確認後動作
+		self.jqHtml.find(".popup-confirm").click(function(){
+			if(args.confirm !== undefined && args.action !== undefined) {
+				args.action[0].apply({},args.action[1]);
+    		}
+    		self.remove();
+		})
 
-	    	//取消
-	    	jqHtml.find(".popup-cancel").click(function(){
-	    		this.remove();
-	    	}.bind(this))
+    	//取消
+    	self.jqHtml.find(".popup-cancel").click(function(){
+    		self.remove();
+    	})
 
-			$("body").append(jqHtml.show());
-
-			// jqHtml.show()
-			// .find(".popup-screen").show().end()
-		 //    .find(".popup-frame")
-		 //    .css("margin-left",0)
-		 //    .css("margin-left",($(document).width() - jqHtml.find(".popup-frame").width())/2);
-
+		$("body")
+		.find("div.popup").remove().end()
+		.append(self.jqHtml.show());
 	}
 
 	myGlobal.popup.prototype = {
-		remove: function(jqHtml){
-			jqHtml.remove();
+		remove: function(){
+			this.jqHtml.remove();
 			$("body").removeClass("screen-lock");
 		},
 		html: 

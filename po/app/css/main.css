@@ -8,9 +8,9 @@ body{
 }
 /* jquery mobile某些class會設text-shadow
 會造成windows有底色的字看起來糊糊的 */
-div, span, label, h3{
+/*div, span, label, h3{
     text-shadow: none;
-}
+}*/
 ::-webkit-input-placeholder{
 	font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC",arial,sans-serif;
     /*-webkit-font-smoothing: antialiased;*/
@@ -589,15 +589,16 @@ img.auo {
 }
 
 .popup-frame {
-	position: fixed;
+	position: relative;
+	top: 30vh;
 	z-index: 1901;
 	border-radius: 3px;
-	top: 200px;
 	text-align: center;
 	width: 300px;
 	border: 1px solid white;
 	text-shadow: none;
 	overflow: auto;
+	margin: 0 auto;
 }
 
 .popup-title {
@@ -609,6 +610,7 @@ img.auo {
 
 .popup-confirm-area {
 	cursor: pointer;
+	display: flex;
 }
 
 .popup-cancel, .popup-confirm {
@@ -618,20 +620,11 @@ img.auo {
 	font-size: 18px;
 	line-height: 40px;
 	-webkit-user-select: none;
-}
-
-.popup-confirm {
-	width: 149px;
-	float: right;
+	flex:1 ;
 }
 
 .popup-cancel {
-	float: left;
-	width: 149px;
-}
-
-.full-width {
-	width:100%;
+	border-right: 1px solid black;
 }
 
 .popup-confirm:active, .popup-cancel:active {
@@ -653,7 +646,7 @@ img.auo {
 .popup-screen,.ajax-screen-lock , .screen-lock , .compose-dnd{
 	display: none;
 	width: 100%;
-	height: 200%;
+    height: 100%;
 	left: 0;
 	top: 0;
 	background: black;
@@ -849,27 +842,22 @@ img.auo {
 	width: auto;
 }
 
-.gm-border .sm-small-area {
-	clear: both;
-	height: 51px;
-	padding-left: 20px;
-	cursor: pointer;
-	position: relative;
+.gm-border [name=system-setting] { cursor: pointer; }
+
+.gm-border [name=system-setting] .sm-small-area-l {
+    display: inline-block;
+    margin-right: 30px; 
+    position: relative;
+    top: 12px;
+    left: 10px;
 }
 
-.gm-border .sm-small-area-l {
-    float: left;
-    margin-right: 30px;
-    margin-top: 11px;
-}
+.gm-border [name=system-setting] .sm-small-area-l img { width: 28px; }
 
-.gm-border .sm-small-area-l img {
-	width: 28px;
-}
-
-.gm-border .sm-small-area-r {
-    float: left;
-    padding-top: 15px;
+.gm-border [name=system-setting] .sm-small-area-r {
+    display: inline-block;
+    position: relative;
+    top: 5px;
 }
 .gm-border .sm-small-area .sm-count {
 	right: 5px;
@@ -1092,9 +1080,9 @@ img.auo {
 }
 
 /* 拿掉會影響 投票的textarea */
-::-webkit-scrollbar {
+/*::-webkit-scrollbar {
     display: none;  
-}
+}*/
 
 .sm-switch-ui-adj {
 	height: 4px;
@@ -3656,6 +3644,7 @@ border-bottom: 1px solid #eee;
 	height: 15px;
 	background: transparent;
 	margin: -2px 10px;
+	resize: none!important;
 }
 
 .cp-vote-area textarea:focus,.cp-work-area textarea { outline:none } 
