@@ -6941,10 +6941,10 @@ $(function(){
                                 var clTmp = val.cl[i];
                                 if( g_group.chatAll ){
                                     if( g_group.chatAll.hasOwnProperty(clTmp.ci) ) {
-                                        g_room = g_group["chatAll"][clTmp.ci];
-                                        if (g_room.unreadCnt != clTmp.B7) {
+                                        // g_room = g_group["chatAll"][clTmp.ci];
+                                        if (g_group["chatAll"][clTmp.ci].unreadCnt != clTmp.B7) {
                                             isSaving = true;
-                                            g_room.unreadCnt = clTmp.B7;
+                                            g_group["chatAll"][clTmp.ci].unreadCnt = clTmp.B7;
                                             // cns.debug(val.gi, "cl.B7", clTmp.ci, clTmp.B7);
 
                                             //update ui unread cnt

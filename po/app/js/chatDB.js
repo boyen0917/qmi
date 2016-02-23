@@ -106,7 +106,7 @@ function onPollingMsgSaveSucc(msgs, eiTmp, object){
 }
 
 function onChatReceiveMsg ( tmp_gi, tmp_ci, tmp_cn, msgs, callback ){
-	cns.debug("-----------------------");
+	// cns.debug("-----------------------");
 	if( !msgs || msgs.length==0 ){
 		if(callback)	callback();
 		return;
@@ -141,7 +141,7 @@ function onChatReceiveMsg ( tmp_gi, tmp_ci, tmp_cn, msgs, callback ){
 			// tmp.oncomplete = onSucc;
 			// tmp.onsuccess = onSucc;
 
-			cns.debug("[updateChatDB]",tmp_gi,tmp_ci,object.ei,object.ml[0].c);
+			// cns.debug("[updateChatDB]",tmp_gi,tmp_ci,object.ei,object.ml[0].c);
 		}
 	}
 }
