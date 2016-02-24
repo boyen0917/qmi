@@ -1,5 +1,109 @@
 $(function(){
 
+	myGlobal.popup = function(args){
+
+		myGlobal.scrollController.disableScroll();
+
+		var self = this;
+		self.jqHtml = $(this.html);
+
+		self.jqHtml.find(".popup-confirm").html( $.i18n.getString("COMMON_OK") ).end()
+		.find(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
+
+		if( args.confirm !== false && args.confirm !== undefined ) self.jqHtml.find(".popup-confirm").show();
+		if( args.cancel  !== false && args.cancel  !== undefined ) self.jqHtml.find(".popup-cancel").show();
+		if(typeof args.confirm === "string") self.jqHtml.find(".popup-confirm").html(args.confirm);
+    	if(typeof args.cancel === "string") self.jqHtml.find(".popup-cancel").html(args.cancel);
+
+		if(args.title !== undefined)
+			self.jqHtml.find('.popup-title').html(args.title);
+
+		if(args.desc !== undefined)
+    		self.jqHtml.find('.popup-text').html(args.desc).show();
+    	
+    	//沒有按鈕 自動消失
+    	if( args.confirm === undefined && args.cancel === undefined) {
+    		setTimeout(function(){
+				self.remove();
+			},1500);
+    	}
+
+		//確認後動作
+		self.jqHtml.find(".popup-confirm").click(function(){
+			if(args.confirm !== undefined && args.action !== undefined) {
+				args.action[0].apply({},args.action[1]);
+    		}
+    		self.remove();
+		})
+
+    	//取消
+    	self.jqHtml.find(".popup-cancel").click(function(){
+    		self.remove();
+    	})
+
+		$("body")
+		.find("div.popup").remove().end()
+		.append(self.jqHtml.show());
+	}
+
+	myGlobal.popup.prototype = {
+		remove: function(){
+			this.jqHtml.remove();
+			$("body").removeClass("screen-lock");
+
+			myGlobal.scrollController.enableScroll();
+		},
+		html: 
+			'<div class="popup">' +
+	        '    <div class="popup-frame">' +
+	        '        <div class="popup-title"></div>' +
+	        '        <div class="popup-text" style="display:none"></div>' +
+	        '        <div class="popup-confirm-area">' +
+	        '            <div class="popup-cancel" style="display:none"></div>' +
+	        '            <div class="popup-confirm" style="display:none"></div>   ' + 
+	        '        </div>' +
+	        '    </div>' +
+	        '    <div class="popup-gap"></div>' +
+	        '</div>'
+	}
+
+
+
+	myGlobal.scrollController = {
+		keys: {37: 1, 38: 1, 39: 1, 40: 1},
+		preventDefault: function(e) {
+			e = e || window.event;
+			if (e.preventDefault)
+				e.preventDefault();
+			e.returnValue = false;  
+		},
+
+		preventDefaultForScrollKeys: function(e) {
+			if (this.keys[e.keyCode]) {
+				preventDefault(e);
+				return false;
+			}
+		},
+
+		disableScroll: function() {
+			if (window.addEventListener) // older FF
+				window.addEventListener('DOMMouseScroll', this.preventDefault, false);
+			window.onwheel = this.preventDefault; // modern standard
+			window.onmousewheel = document.onmousewheel = this.preventDefault; // older browsers, IE
+			window.ontouchmove  = this.preventDefault; // mobile
+			document.onkeydown  = this.preventDefaultForScrollKeys;
+		},
+
+		enableScroll: function() {
+			if (window.removeEventListener)
+				window.removeEventListener('DOMMouseScroll', this.preventDefault, false);
+			window.onmousewheel = document.onmousewheel = null; 
+			window.onwheel = null; 
+			window.ontouchmove = null;  
+			document.onkeydown = null;  
+		}
+	}
+
 	//ajax
 	ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl){
 		
@@ -383,68 +487,7 @@ $(function(){
 		});
 	}
 
-	myGlobal.popup = function(args){
-		var self = this;
-		self.jqHtml = $(this.html);
 
-		self.jqHtml.find(".popup-confirm").html( $.i18n.getString("COMMON_OK") ).end()
-		.find(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
-
-		if( args.confirm !== false && args.confirm !== undefined ) self.jqHtml.find(".popup-confirm").show();
-		if( args.cancel  !== false && args.cancel  !== undefined ) self.jqHtml.find(".popup-cancel").show();
-		if(typeof args.confirm === "string") self.jqHtml.find(".popup-confirm").html(args.confirm);
-    	if(typeof args.cancel === "string") self.jqHtml.find(".popup-cancel").html(args.cancel);
-
-		if(args.title !== undefined)
-			self.jqHtml.find('.popup-title').html(args.title);
-
-		if(args.desc !== undefined)
-    		self.jqHtml.find('.popup-text').html(args.desc).show();
-    	
-    	//沒有按鈕 自動消失
-    	if( args.confirm === undefined && args.cancel === undefined) {
-    		setTimeout(function(){
-				self.remove();
-			},1500);
-    	}
-
-		//確認後動作
-		self.jqHtml.find(".popup-confirm").click(function(){
-			if(args.confirm !== undefined && args.action !== undefined) {
-				args.action[0].apply({},args.action[1]);
-    		}
-    		self.remove();
-		})
-
-    	//取消
-    	self.jqHtml.find(".popup-cancel").click(function(){
-    		self.remove();
-    	})
-
-		$("body")
-		.find("div.popup").remove().end()
-		.append(self.jqHtml.show());
-	}
-
-	myGlobal.popup.prototype = {
-		remove: function(){
-			this.jqHtml.remove();
-			$("body").removeClass("screen-lock");
-		},
-		html: 
-			'<div class="popup">' +
-	        '    <div class="popup-frame">' +
-	        '        <div class="popup-title"></div>' +
-	        '        <div class="popup-text" style="display:none"></div>' +
-	        '        <div class="popup-confirm-area">' +
-	        '            <div class="popup-cancel" style="display:none"></div>' +
-	        '            <div class="popup-confirm" style="display:none"></div>   ' + 
-	        '        </div>' +
-	        '    </div>' +
-	        '    <div class="popup-gap"></div>' +
-	        '    <div class="popup-screen" style="display:block;"></div>' +
-	        '</div>'
-	}
 
 
 	changePageAfterPopUp = function(page){
@@ -1183,7 +1226,6 @@ $(function(){
 		var this_gi = this_gi || gi;
 		if( !this_gi ) return;
 		window.testBl = branch_list;
-		console.debug("branch_list",branch_list);
     	//取得團體列表
         // var api_name = "groups/" + this_gi + "/branches";
         // var headers = {

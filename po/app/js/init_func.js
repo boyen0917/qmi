@@ -1,12 +1,11 @@
 $(function(){
 
-    groupListToLStorage = function(){
+    groupListToLStorage = function(groupList){
         var _uiGroupList = $.lStorage(ui) || {};
-        var oriGroupList = $.lStorage("_groupList") || $.lStorage(ui);
         // 剔除不存在的團體
         var tmp_groupList = [];
 
-        $.each($.lStorage("_groupList"),function(i,gl_obj){
+        $.each(groupList,function(i,gl_obj){
             tmp_groupList.push(gl_obj.gi);
 
             if(!$.lStorage(ui).hasOwnProperty(gl_obj.gi) ){
@@ -116,22 +115,20 @@ $(function(){
                 if(callback) callback();
             }else{
                 //發生錯誤 以第一個團體為預設
-                if($.lStorage("_groupList")[0] !== undefined && $.lStorage("_groupList")[0].gi !== undefined && chk !== true) {
-                    var _loginData = $.lStorage("_loginData");
-                    if($.lStorage(ui)[_loginData.dgi] === undefined) {
-                        _loginData.dgi = $.lStorage("_groupList")[0].gi;
-                        $.lStorage("_loginData",_loginData);
-                    }
+                if(
+                    $.lStorage(ui)[0]     !== undefined && 
+                    $.lStorage(ui)[0].gi  !== undefined && 
+                    chk                   !== true 
+                ) {
+
+                    myGlobal.myData.dgi = $.lStorage(ui)[0].gi;
 
                     //帶true表示只再做一次
-                    getGroupCombo($.lStorage("_groupList")[0].gi,callback,true);
+                    getGroupCombo($.lStorage(ui)[0].gi,callback,true);
 
                 } else {
                     groupSwitchEnable();    
                 }
-
-                
-                
             }
         });
     }

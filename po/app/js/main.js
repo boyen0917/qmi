@@ -4,60 +4,6 @@ $(function(){
 	updateLanguage( lang );
 
 	var refreshChk = false;
-	//沒有登入資訊 就導回登入頁面 ps. && 0 這段先取消
-	if($.lStorage("_loginData")){
-		var _loginData = $.lStorage("_loginData");
-
-		ui = _loginData.ui;
-		at = _loginData.at;
-
-		var deferred = $.Deferred();
-		if($.lStorage("refreshChk") === true) {
-			getGroupCombo(_loginData.dgi,function(){
-				deferred.resolve();
-			});
-		}else{
-			deferred.resolve();
-		}
-
-		deferred.done(function(){
-			//registration.js會清掉 
-			$.lStorage("refreshChk",true);
-			//自動登入
-			if(!$.lStorage("_loginAutoChk")){
-				//清除_loginData
-				// localStorage.removeItem("_loginData");
-				delete _loginData.at;
-				$.lStorage("_loginData",_loginData);
-			}
-
-			//聊天室開啓DB
-	    	initChatDB(); 
-			initChatCntDB(); 
-
-			//貼圖initial
-			initStickerArea.load();
-
-			//沒團體的情況
-			if(!$.lStorage("_groupList") || !_loginData.dgi || _loginData.dgi==""){
-				//關閉返回鍵
-				$("#page-group-menu .page-back").hide();
-				cns.debug("no group ");
-			}else{
-				//設定目前團體
-				setGroupInitial(_loginData.dgi);
-			}
-
-			//執行polling
-			pollingInterval();
-		});
-
-
-	}else{
-    	// document.location = "index.html";
-    	$.mobile.changePage("#page-registration");
-    	// return false;
-	}
 
 	//test
 	$(document).on("click",".registration-logo img",function(){

@@ -4,6 +4,12 @@ onCheckVersionDone = function(needUpdate){
 	}
 	clearBadgeLabel();
 
+
+
+	if($.lStorage("_loginAutoChk") === true) {
+
+	}
+
 	//預設上一頁
 	$(document).data("page-history",[["#page-group-menu"]]);
 	
@@ -271,19 +277,23 @@ onCheckVersionDone = function(needUpdate){
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
         	if(data.status == 200){
-        		var login_result = $.parseJSON(data.responseText);
+
+
+        		myGlobal.myData = $.parseJSON(data.responseText);
         		
         		
 
-        		//自動登入儲存 有_loginData 才代表有選自動登入
-                if($(".login-auto").data("chk")) 
-                	$.lStorage("_loginData",login_result);
-                else
+        		//自動登入儲存 有_loginData 有_loginAutoChk 才代表有選自動登入
+                if($(".login-auto").data("chk")) {
+                	$.lStorage("_loginData",myGlobal.myData);
+                	$.lStorage("_loginAutoChk",true);
+                }else {
                 	localStorage.removeItem("_loginData");
-
+                	localStorage.removeItem("_loginAutoChk");
+                }
 
         		//判斷是否換帳號 換帳號就要清db
-        		if(!$.lStorage(login_result.ui)) resetDB();
+        		if(!$.lStorage(myGlobal.myData.ui)) resetDB();
 
     			//記錄帳號密碼
     			if($(".login-remeber").data("chk")){
@@ -297,22 +307,24 @@ onCheckVersionDone = function(needUpdate){
 					//沒打勾的話就清除local storage
 		    		localStorage.removeItem("_loginRemeber");
 				}
-				loginAction(login_result);
+				loginAction();
         	}
         });
 	}
 
 	//初始化 
-    loginAction = function(login_result){
+    function loginAction(){
         //儲存登入資料 跳轉到timeline
         if($.lStorage("_loginData") !== false) {
-        	var login_result = $.lStorage("_loginData");	
+        	myGlobal.myData = $.lStorage("_loginData");	
         }
         
-        var deferred = $.Deferred();
+        var 
+        deferred = $.Deferred(),
+        group_list = [];
 
-        ui = login_result.ui;
-        at = login_result.at;
+        ui = myGlobal.myData.ui;
+        at = myGlobal.myData.at;
 
         //附上group list
         getGroupList().complete(function(data){
@@ -324,30 +336,26 @@ onCheckVersionDone = function(needUpdate){
                     return;
                 }
 
-                var private_group_list = parse_data.cl;
-                var group_list = parse_data.gl;
-                if(group_list && (group_list.length > 0||private_group_list.length>0) ){
+				group_list = parse_data.gl;
+                if(group_list && (group_list.length > 0 || parse_data.cl.length>0) ){
 
                     //有group
-
-                    $.lStorage("_groupList",group_list);
-
-                    getPrivateGroupFromList( private_group_list, function(){
+                    getPrivateGroupFromList( parse_data.cl, function(){
 
                         //將group list 更新到 lstorage ui
-                        groupListToLStorage();
+                        groupListToLStorage(group_list);
 
                         // 取dgi的combo
                         if( group_list.length>0 ){
                         	//有dgi 但不存在列表裡
-                            if( login_result.dgi === undefined || $.lStorage(ui)[login_result.dgi] === undefined ){
+                            if( myGlobal.myData.dgi === undefined || $.lStorage(ui)[myGlobal.myData.dgi] === undefined ){
                             	localStorage.removeItem("uiData");
                             	
-                                login_result.dgi = group_list[0].gi;
-                                $.lStorage("_loginData",login_result);
+                                myGlobal.myData.dgi = group_list[0].gi;
+                                $.lStorage("_loginData",myGlobal.myData);
                             }
 
-                            getGroupCombo(login_result.dgi,function(){
+                            getGroupCombo(myGlobal.myData.dgi,function(){
                                 deferred.resolve({location:"#page-group-main"});
                             });
                             
@@ -388,21 +396,18 @@ onCheckVersionDone = function(needUpdate){
 			initChatCntDB(); 
 
 			//沒團體的情況
-			if(!$.lStorage("_groupList") || !login_result.dgi || login_result.dgi==""){
+			if(group_list.length == 0 || !myGlobal.myData.dgi || myGlobal.myData.dgi==""){
 				//關閉返回鍵
 				$("#page-group-menu .page-back").hide();
 				cns.debug("no group ");
 			}else{
 				//設定目前團體
-				setGroupInitial(login_result.dgi);
+				setGroupInitial(myGlobal.myData.dgi);
 			}
 
 			//執行polling
 			pollingInterval();
 			// });
-
-
-
         });
     }
 

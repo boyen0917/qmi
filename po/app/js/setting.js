@@ -207,15 +207,7 @@ function removeGroup( this_gi ){
 			delete userData[this_gi];
 			$.lStorage(ui,userData);
 		}
-		var _groupList = $.lStorage("_groupList");
-		$.each(_groupList,function(i,gl_obj){
-			var groupTmp = _groupList[i];
-			if( groupTmp.gi==this_gi ){
-				_groupList.splice(i, 1);
-				return false;
-			}
-		});
-		$.lStorage("_groupList", _groupList);
+		
 		userData = $.lStorage(ui);
 
 		//----- remove from idb -------

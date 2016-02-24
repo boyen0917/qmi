@@ -661,16 +661,6 @@ $(function(){
         getUserAvatarName(gi,gu,$(".sm-user-area-r div"),$(".sm-user-pic img"));
 	}
 
-	chkGroupAllUser = function(data_arr){
-		//只用在 sidemenu 及 timelineblockmake 的檢查
-		//先檢查localStorage[gi].guAll是否存在
-        if(Object.keys($.lStorage(ui)[gi].guAll).length == 0){
-        	setGroupAllUser(data_arr);
-        }else{
-        	getUserAvatarName(data_arr[1],data_arr[2],data_arr[3],data_arr[4]);
-        }
-	}
-
 
 	topEventChk = function(){
 		topEventApi().complete(function(data){
@@ -1316,11 +1306,9 @@ $(function(){
                         case 5:
                             var stickerDom = this_content.find(".sticker");
                             stickerDom.show();
-                            console.debug("yoyoyo");
                             setStickerUrl(stickerDom, val.c);
                             break;
                         case 6:
-                        console.debug("picture~~~");
                             this_content.find(".au-area").show();
                             getS3file(val,this_content,val.tp,280,targetTu);
                             break;
@@ -4496,64 +4484,6 @@ $(function(){
 
 */
 
-
-	setThisGroup_bak = function(new_gi,gl){
-		//新的gi 在新的所有團體列表
-		if(!gl){
-			var gl;
-			$.each($.lStorage("_groupList"),function(g_i,g_val){
-				if(g_val.gi == new_gi){
-					gl = g_val;
-				}
-			});
-		}
-
-		gi = new_gi;
-		gu = gl.me;
-		gn = htmlFormat(gl.gn);
-
-		//設定左側選單 gu
-		$(".sm-user-area.namecard").data("gu",gu);
-		
-		//header 設定團體名稱
-    	$(".header-group-name div:eq(1)").html(gn);
-
-		$.each(gl.tl,function(t_i,t_val){
-			if(t_val.tp == 1){
-    			ti_cal = t_val.ti;
-    		}else if(t_val.tp == 2){
-    			ti_feed = t_val.ti;
-    		}else{
-    			ti_chat = t_val.ti;
-    		}
-		});
-
-		//點選團體 記錄在localstorage 以便下次登入預設
-		var _groupList = {};
-
-		//若沒有_groupList 表示為第一次使用
-		if($.lStorage(ui)){
-			_groupList = $.lStorage(ui);
-		}
-
-		if(typeof(_groupList[gi]) == "undefined"){
-			_groupList[gi] = {};
-    	}
-
-		//更新預設團體gi
-		// _groupList.default_gi = gi;
-		_groupList[gi].gu = gu;
-		_groupList[gi].gn = gn;
-		_groupList[gi].ti_cal = ti_cal;
-		_groupList[gi].ti_feed = ti_feed;
-		_groupList[gi].ti_chat = ti_chat;
-        _groupList[gi].guAll = {};
-		//存回
-		$.lStorage(ui,_groupList);
-
-        $(".sm-small-area .sm-count").hide();
-	};
-
     setSidemenuHeader = function (new_gi){
         
         //左側選單主題區域
@@ -4591,7 +4521,6 @@ $(function(){
 
             var private_group_list = parse_data.cl;
             var group_list = parse_data.gl;
-            $.lStorage("_groupList",group_list);
             getPrivateGroupFromList( private_group_list, function(){
                 s_load_show = false;
 
@@ -4600,7 +4529,7 @@ $(function(){
     	    	var tmp_selector,count;
 
                 //set lStorage ui
-                groupListToLStorage();
+                groupListToLStorage(group_list);
     	    	// setGroupList();
 
     	    	//管理者圖示
@@ -4644,7 +4573,7 @@ $(function(){
 
                     //目前團體顏色顯示
                     if( (new_gi && val.gi == new_gi && !invite)
-                        || val.gi == $.lStorage("_loginData").dgi ){
+                        || val.gi == myGlobal.myData.dgi ){
                         $(".sm-group-area.active").removeClass("active");
                         this_group.addClass("active");
                     }

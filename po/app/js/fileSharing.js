@@ -81,7 +81,13 @@ FileSharing.prototype = {
 		thisFileDom.find("div.top img.more").click(thisFile.showMore.bind(thisFile));
 		//檔案操作 delete download
 		thisFileDom.find("span.operator img").click(function(){
-			popupShowAdjust( "",$.i18n.getString("FILESHARING_DELETE_CONFIRM"),true,true,[thisFile[$(this).attr("name")].bind(thisFile)]);
+			var name = $(this).attr("name");
+			if( name === "delete"){
+				popupShowAdjust( "",$.i18n.getString("FILESHARING_DELETE_CONFIRM"),true,true,[thisFile.delete.bind(thisFile)]);
+			} else {
+				thisFile[name]();
+			}
+			
 			// thisFile[$(this).attr("name")]();
 		});
 

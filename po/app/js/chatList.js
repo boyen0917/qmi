@@ -264,6 +264,8 @@ function showChatList(){
 				targetDiv.append(table);
 			}
 		});
+
+	
 		setTimeout(function(){
 			targetDiv.show();
 			// sortRoomList();
@@ -375,74 +377,9 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
 				// var roomTmp = groupTmp["chatAll"][ciTmp];
 				
 				getDBMsg(giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp );
-				// g_idb_chat_msgs.limit(function(list){
-				//     if( list.length>0 ){
-				//     	if( null!=list[0] ){
-				//         	var object = list[0].data;
-				//         	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
-				//     	}
-				//     } else {
-				//     	cns.debug( "[setLastMsg] no list 1", giTmp, ciTmp );
-				//     }
-				//     // if(roomTmp){
-				//     // 	setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
-				//     // }
-
-				// },{
-				//     index: "gi_ci_ct",
-				//     keyRange: g_idb_chat_msgs.makeKeyRange({
-				//         upper: [giTmp, ciTmp, new Date().getTime()],
-				//         lower: [giTmp, ciTmp]
-				//         // only:18
-				//     }),
-				//     limit: 1,
-				//     order: "DESC",
-				//     onEnd: function(result){
-				//         cns.debug("setLastMsg end:",result.ci + " " + result.ct);
-				//     },
-				//     onError: function(result){
-				//         cns.debug("[!] setLastMsg error:",result);
-				//     }
-				// });
 			});
 		} else{
 			getDBMsg(giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp );
-			// g_idb_chat_msgs.limit(function(list){
-			// 	try{
-			// 		if( groupTmp.gi != giTmp ){
-			// 			cns.debug("incoming chat msg is not currentGroup");
-			// 		}
-			// 		// var roomTmp = groupTmp.chatAll[ciTmp];
-			// 	    if( list.length>0 ){
-			// 	    	if( null!=list[0] ){
-			// 	        	var object = list[0].data;
-			// 	        	setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
-			// 	    	}
-			// 	    } else {
-			// 	    	cns.debug( "[setLastMsg] no list 2", giTmp, ciTmp );
-			// 	    }
-			// 	 //    else if(roomTmp){
-			// 		// 	setLastMsgContent( giTmp, ciTmp, table, roomTmp.cm, isShowAlert, isRoomOpen );
-			// 		// }
-			// 	} catch(e){
-			// 		errorReport(e);
-			// 	}
-			// },{
-			//     index: "gi_ci_ct",
-			//     keyRange: g_idb_chat_msgs.makeKeyRange({
-			//         upper: [giTmp, ciTmp, new Date().getTime()],
-			//         lower: [giTmp, ciTmp]
-			//         // only:18
-			//     }),
-			//     limit: 1,
-			//     order: "DESC",
-			//     onEnd: function(result){
-			//         cns.debug("setLastMsg end:",result.ci + " " + result.ct);
-			//     },
-			//     onError: function(result){
-			//         cns.debug("[!] setLastMsg error:",result);
-			//     }
-			// });
 		}
 	} catch(e){
 		errorReport(e);

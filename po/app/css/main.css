@@ -584,8 +584,13 @@ img.auo {
 }
 
 /* ======================= popup =================================*/
-.popup{
-	display: none;
+.popup {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  z-index: 1901;
 }
 
 .popup-frame {
@@ -955,7 +960,7 @@ img.auo {
 	cursor: pointer;
 }
 
-.sm-group-area.enable:active , .gm-border .sm-small-area:active, .gm-border .sm-group-area.active {
+.gm-border .sm-group-area.active {
 	background: rgb(20,20,20);
 }
 
