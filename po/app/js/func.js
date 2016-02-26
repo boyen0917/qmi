@@ -6831,18 +6831,6 @@ $(function(){
     		$.each(cnts,function(i,val){
 	    		//是否為當下團體
 	    		if(gi == val.gi){
-	    			// if(val.A1 > 0){
-	    			// 	$(".sm-small-area[data-sm-act=feed]").find(".sm-count").html(countsFormat(val.A1)).show();
-	    			// }
-	    			// if(val.A2 > 0){ //new member
-	    			// 	$(".sm-small-area[data-sm-act=memberslist]").find(".sm-count").html(countsFormat(val.A2)).show();
-	    			// }
-	    			// if(val.A3 > 0){ //chat cnts
-	    			// 	$(".sm-small-area[data-sm-act=chat]").find(".sm-count").html(countsFormat(val.A3)).show();
-	    			// }
-	    			// if(val.A4 > 0){
-	    			// 	// $(".sm-small-area[data-sm-act=]").find(".sm-count").html(countsFormat(val.A4)).show();
-	    			// }
 
                     var keys = ["A1","A2","A3","A4"];//,"B1","B2","B3","B4"
                     for( var i=0; i<keys.length; i++ ){
@@ -6859,6 +6847,9 @@ $(function(){
                     }
 
 	    		}
+
+
+                // 判斷太多 太誇張惹
                 
                 if( val.cl && val.cl.length>0 ){
                     var userData = $.lStorage(ui);

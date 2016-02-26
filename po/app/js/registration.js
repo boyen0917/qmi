@@ -7,7 +7,10 @@ onCheckVersionDone = function(needUpdate){
 
 
 	if($.lStorage("_loginAutoChk") === true) {
-
+		loginAction();
+	} else if( window.location.hash !== "") {
+		// window.location = "index.html";
+		$.mobile.changePage("")
 	}
 
 	//預設上一頁
@@ -113,6 +116,9 @@ onCheckVersionDone = function(needUpdate){
 			cns.debug(targetCountryDom.text());
 		}
 	}
+
+	//調整
+	$(".login-ld-countrycode label.sbSelector").css("line-height","40px")
 
 /*
 
@@ -278,7 +284,7 @@ onCheckVersionDone = function(needUpdate){
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
         	if(data.status == 200){
 
-
+        		
         		myGlobal.myData = $.parseJSON(data.responseText);
         		
         		
@@ -433,7 +439,7 @@ onCheckVersionDone = function(needUpdate){
             "li":lang
         };
         var method = "get";
-        ajaxDo(api_name,headers,method,true,false,false,true,p_data.cl).complete(function(res){
+        ajaxDo(api_name,headers,method,false,false,false,true,p_data.cl).complete(function(res){
         	if( res.status==200 ){
         		var parse_data = $.parseJSON(res.responseText);
 	    		var list = $.lStorage("_pri_group")||{};
@@ -1113,15 +1119,15 @@ onCheckVersionDone = function(needUpdate){
 	}
 	
 	initLandPage = function(){
-		s_load_show = true;
-		if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
-			$('.ui-loader').css("display","block");
-			$(".ajax-screen-lock").show();
-			setTimeout( function(){
-				loginAction($.lStorage("_loginData"));
-				return false;
-			},1500);
-		}
+		// s_load_show = true;
+		// if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
+		// 	$('.ui-loader').css("display","block");
+		// 	$(".ajax-screen-lock").show();
+		// 	// setTimeout( function(){
+		// 		loginAction($.lStorage("_loginData"));
+		// 		return false;
+		// 	// },1500);
+		// }
 		
 		//若local storage 有記錄密碼 就顯示
 		var rememberData = $.lStorage("_loginRemeber");

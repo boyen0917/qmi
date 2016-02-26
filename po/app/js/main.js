@@ -5,64 +5,11 @@ $(function(){
 
 	var refreshChk = false;
 
-	//test
-	$(document).on("click",".registration-logo img",function(){
-		new myGlobal.popup({
-			tp:1,
-			confirm: 'shit',
-			cancel: 'nooo',
-			title: 'what',
-			action: [qqoo,{a:1,b:2,c:3}],
-			desc: 'come on dont be lazy trying to be tough be concentrate on what you do ,alright'
-		});
-	});
-
-	$(".currentGroup").click(function(){
-		// $(".st-feedbox-area ").animate({bottom:"125px"});
-		// 彩蛋鑰匙
-		// window.sidemenuChk = true;
-	});
 
 	$(".page-group-name").click(function(){
 		$(".cp-post").trigger("click");
 	});
 
-	//下拉更新 滾輪版 
-	$(".subpage-timeline_no ").bind('mousewheel DOMMouseScroll', function(event){
-
-		var group_main = $(this);
-		//timeline 才要做
-		if( $(".feed-subarea:visible").length<=0
-			|| group_main.data("scroll-cnt") < 0
-			|| $(".st-top-area-load").position().top < 40) return;
-
-		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
-
-			//控制時限
-			if(group_main.data("scroll-timer")) clearTimeout(group_main.data("scroll-timer"));
-
-            var scroll_timer = setTimeout(function(){
-            	group_main.data("scroll-cnt",0);
-            },500);
-
-            group_main.data("scroll-timer",scroll_timer);
-
-            //計算力道
-            var scroll_cnt = group_main.data("scroll-cnt") || 0;
-            scroll_cnt = scroll_cnt + event.originalEvent.wheelDelta;
-            group_main.data("scroll-cnt",scroll_cnt);
-
-            //滾得夠猛 做下拉更新
-            if(scroll_cnt > 4100) {
-            	group_main.data("scroll-cnt",-10000);
-
-				timelineTopRefresh();
-
-				//順便檢查置頂
-				topEventChk();
-            }
-        }		   
-    });
 
 	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
 		//取舊資料
