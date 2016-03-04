@@ -1,8 +1,8 @@
 $(function(){
 
-	myGlobal.popup = function(args){
+	QmiGlobal.popup = function(args){
 
-		myGlobal.scrollController.disableScroll();
+		QmiGlobal.scrollController.disableScroll();
 
 		var self = this;
 		self.jqHtml = $(this.html);
@@ -46,12 +46,12 @@ $(function(){
 		.append(self.jqHtml.show());
 	}
 
-	myGlobal.popup.prototype = {
+	QmiGlobal.popup.prototype = {
 		remove: function(){
 			this.jqHtml.remove();
 			$("body").removeClass("screen-lock");
 
-			myGlobal.scrollController.enableScroll();
+			QmiGlobal.scrollController.enableScroll();
 		},
 		html: 
 			'<div class="popup">' +
@@ -69,7 +69,7 @@ $(function(){
 
 
 
-	myGlobal.scrollController = {
+	QmiGlobal.scrollController = {
 		keys: {37: 1, 38: 1, 39: 1, 40: 1},
 		preventDefault: function(e) {
 			e = e || window.event;
@@ -478,7 +478,7 @@ $(function(){
 
 	//對話框設定
 	popupShowAdjust = function (title,desc,confirm,cancel,callback){
-		new myGlobal.popup({
+		new QmiGlobal.popup({
 			title: title,
 			desc: desc,
 			confirm: confirm,
@@ -1105,6 +1105,11 @@ $(function(){
 			var updateKeys = ["auo","aut","cnt"];
 			var ignoreKeys = ["rsp_code"];
 			for( var key in data ){
+
+
+				data
+
+
 				//update auo, aut, etc.
 				if( updateKeys.indexOf(key)>=0 ){
 					group[key] = data[key];
@@ -1214,132 +1219,108 @@ $(function(){
 
         var method = "get";
         ajaxDo(api_name,headers,method,false).complete(function(data){
-        	if(data.status == 200){
-
-        		var branch_list = $.parseJSON(data.responseText);
-        		setBranchList( this_gi, branch_list, callback );
-        	}
+        	if(data.status == 200)
+        		setBranchList( this_gi, $.parseJSON(data.responseText), callback );
         });
 	}
 
-	setBranchList = function(this_gi, branch_list, callback){
-		var this_gi = this_gi || gi;
-		if( !this_gi ) return;
-		window.testBl = branch_list;
-    	//取得團體列表
-        // var api_name = "groups/" + this_gi + "/branches";
-        // var headers = {
-        //     "ui":ui,
-        //     "at":at,
-        //     "li":lang
-        // };
+	setBranchList = function(thisGi, originData, callback){
+		var 
+		thisGi = thisGi || gi,
+		qmiGroupData = QmiGlobal.groups[thisGi],
+		new_bl = {},
+		new_fbl = {},
+		guAll = qmiGroupData.guAll;
 
-        // var method = "get";
-        // ajaxDo(api_name,headers,method,false).complete(function(data){
-        	// if(data.status == 200){
+        if( !thisGi ) return;
 
-        		// var branch_list = $.parseJSON(data.responseText);
-        		var new_bl = {};
-        		var new_fbl = {};
-                var _groupList = $.lStorage(ui);
-                var guAll = _groupList[this_gi].guAll;
+        //branch
+        //初始化陣列
+		$.each(originData.bl,function(i,val){
+            if( null==val.bp|| val.bp.length==0 ) return;
 
-                //branch
-        		if(branch_list.bl.length) {
-                    //初始化陣列
-        			$.each(branch_list.bl,function(i,val){
-                        if( null==val.bp|| val.bp.length==0 ) return;
+            var bp_arr = val.bp.replace(/^\./, '').split(".");
+            var pi = "";
+            if(bp_arr.length > 1){
+                pi = bp_arr[bp_arr.length-2]
+            }
+			new_bl[bp_arr.last()] = {
+				lv: bp_arr.length,
+				bn: val.bn,
+				cl: [],
+                cnt: 0,
+                pi: pi,
+				bp_arr: bp_arr
+			};
+			
+		});
 
-                        var bp_arr = val.bp.replace(/^\./, '').split(".");
-                        var pi = "";
-                        if(bp_arr.length > 1){
-                            pi = bp_arr[bp_arr.length-2]
+        //建立子群組
+		$.each(new_bl,function(i,val){
+			if(val.lv > 1){
+				var parent = val.bp_arr[val.bp_arr.length-2];
+				if(new_bl[parent]) new_bl[parent].cl.push(i);
+			}
+			delete val.bp_arr;
+		});
+        
+        //計算人數
+        //*NOTE*
+        // 同一人可能隸屬于多個群組, 若兩個子群組有同一人,
+        // 母群組應該只能算一人, 普通加法不成立...
+
+        for( var biTmp in new_bl ){
+            //每個群組走過一次所有成員, 只要含有這個群組ＩＤ數量就加一..
+            var cnt=0;
+            for( var id in guAll ){
+
+                var mem = guAll[id];
+                if( 
+                	mem && 
+                	// 代表未離開
+                	mem.st==1 && 
+                	// 現在遍歷的bi 比對到該成員的bu list xxx,xxx,xx
+                	mem.bl.indexOf(biTmp)>=0
+                ){
+                	// 並且該成員所屬的bi 現在還存在
+                	for(i=0;i<mem.bl.split(",").length;i++){
+                		if(new_bl[mem.bl.split(",")[i].split(".").last()] !== undefined){
+                        	cnt++;
+                        	break;
                         }
-        				new_bl[bp_arr.last()] = {
-        					lv: bp_arr.length,
-        					bn: val.bn,
-        					cl: [],
-                            cnt: 0,
-                            pi: pi,
-        					bp_arr: bp_arr
-        				};
-        				
-	        		});
+                	}
+                }
+            }
+            new_bl[biTmp].cnt = cnt;
+		}
 
-                    //建立子群組
-	        		$.each(new_bl,function(i,val){
-        				if(val.lv > 1){
-        					var parent = val.bp_arr[val.bp_arr.length-2];
-        					if(new_bl[parent]) new_bl[parent].cl.push(i);
-        				}
-        				delete val.bp_arr;
-	        		});
-                    
-                    window.testNewBl = new_bl;
-                    //計算人數
-                    //*NOTE*
-                    // 同一人可能隸屬于多個群組, 若兩個子群組有同一人,
-                    // 母群組應該只能算一人, 普通加法不成立...
+        //fav branch
+		$.each(originData.fbl,function(i,val){
+			new_fbl[val.fi] = {fn:val.fn, cnt:0};
+		});
 
-                    for( var biTmp in new_bl ){
+        //計算人數
+        var favCnt = 0;
+        $.each(guAll,function(i,val){
+        	if(null==val || val.st!=1 ) return;
 
-                        //每個群組走過一次所有成員, 只要含有這個群組ＩＤ數量就加一..
-                        var cnt=0;
-                        for( var id in guAll ){
+            //fi mem cnt
+            if( val.fbl && val.fbl.length>0 ){
+                for(var i=0; i<val.fbl.length; i++){
+                    var fi = val.fbl[i];
+                    if(new_fbl[fi]) new_fbl[fi].cnt++;
+                }
+            }
 
-                            var mem = guAll[id];
-                            if( 
-                            	mem && 
-                            	// 代表未離開
-                            	mem.st==1 && 
-                            	// 現在遍歷的bi 比對到該成員的bu list xxx,xxx,xx
-                            	mem.bl.indexOf(biTmp)>=0
-                            ){
-                            	// 並且該成員所屬的bi 現在還存在
-                            	for(i=0;i<mem.bl.split(",").length;i++){
-	                        		if(new_bl[mem.bl.split(",")[i].split(".").last()] !== undefined){
-	                                	cnt++;
-	                                	break;
-	                                }
-                            	}
-                            }
-                        }
-                        new_bl[biTmp].cnt = cnt;
-                    }
-        		}
+            //fav cnt
+            if( true==val.fav ) favCnt++;
+        });
 
-                //fav branch
-        		if(branch_list.fbl.length) {
-        			$.each(branch_list.fbl,function(i,val){
-	        			new_fbl[val.fi] = {fn:val.fn, cnt:0};
-	        		});
-        		}
+       	qmiGroupData.favCnt = favCnt;
+    	qmiGroupData.bl = new_bl;
+    	qmiGroupData.fbl = new_fbl;
 
-                //計算人數
-                var favCnt = 0;
-                $.each(guAll,function(i,val){
-                	if(null==val || val.st!=1 ) return;
-
-                    //fi mem cnt
-                    if( val.fbl && val.fbl.length>0 ){
-                        for(var i=0; i<val.fbl.length; i++){
-                            var fi = val.fbl[i];
-                            if(new_fbl[fi]) new_fbl[fi].cnt++;
-                        }
-                    }
-
-                    //fav cnt
-                    if( true==val.fav ) favCnt++;
-                });
-
-                _groupList[this_gi].favCnt = favCnt;
-            	_groupList[this_gi].bl = new_bl;
-            	_groupList[this_gi].fbl = new_fbl;
-            	$.lStorage(ui,_groupList);
-
-            	if( callback ) callback(this_gi);
-        	// }
-    //     });
+    	if( callback ) callback(thisGi);
     }
 
     getGroupCompetence = function( this_gi ){

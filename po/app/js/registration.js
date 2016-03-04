@@ -285,13 +285,13 @@ onCheckVersionDone = function(needUpdate){
         	if(data.status == 200){
 
         		
-        		myGlobal.myData = $.parseJSON(data.responseText);
+        		QmiGlobal.auth = $.parseJSON(data.responseText);
         		
         		
 
         		//自動登入儲存 有_loginData 有_loginAutoChk 才代表有選自動登入
                 if($(".login-auto").data("chk")) {
-                	$.lStorage("_loginData",myGlobal.myData);
+                	$.lStorage("_loginData",QmiGlobal.auth);
                 	$.lStorage("_loginAutoChk",true);
                 }else {
                 	localStorage.removeItem("_loginData");
@@ -299,7 +299,7 @@ onCheckVersionDone = function(needUpdate){
                 }
 
         		//判斷是否換帳號 換帳號就要清db
-        		if(!$.lStorage(myGlobal.myData.ui)) resetDB();
+        		if(!$.lStorage(QmiGlobal.auth.ui)) resetDB();
 
     			//記錄帳號密碼
     			if($(".login-remeber").data("chk")){
@@ -322,15 +322,15 @@ onCheckVersionDone = function(needUpdate){
     function loginAction(){
         //儲存登入資料 跳轉到timeline
         if($.lStorage("_loginData") !== false) {
-        	myGlobal.myData = $.lStorage("_loginData");	
+        	QmiGlobal.auth = $.lStorage("_loginData");	
         }
         
         var 
         deferred = $.Deferred(),
         group_list = [];
 
-        ui = myGlobal.myData.ui;
-        at = myGlobal.myData.at;
+        ui = QmiGlobal.auth.ui;
+        at = QmiGlobal.auth.at;
 
         //附上group list
         getGroupList().complete(function(data){
@@ -354,14 +354,14 @@ onCheckVersionDone = function(needUpdate){
                         // 取dgi的combo
                         if( group_list.length>0 ){
                         	//有dgi 但不存在列表裡
-                            if( myGlobal.myData.dgi === undefined || $.lStorage(ui)[myGlobal.myData.dgi] === undefined ){
+                            if( QmiGlobal.auth.dgi === undefined || $.lStorage(ui)[QmiGlobal.auth.dgi] === undefined ){
                             	localStorage.removeItem("uiData");
                             	
-                                myGlobal.myData.dgi = group_list[0].gi;
-                                $.lStorage("_loginData",myGlobal.myData);
+                                QmiGlobal.auth.dgi = group_list[0].gi;
+                                $.lStorage("_loginData",QmiGlobal.auth);
                             }
 
-                            getGroupCombo(myGlobal.myData.dgi,function(){
+                            getGroupComboInit(QmiGlobal.auth.dgi,function(){
                                 deferred.resolve({location:"#page-group-main"});
                             });
                             
@@ -402,13 +402,13 @@ onCheckVersionDone = function(needUpdate){
 			initChatCntDB(); 
 
 			//沒團體的情況
-			if(group_list.length == 0 || !myGlobal.myData.dgi || myGlobal.myData.dgi==""){
+			if(group_list.length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
 				//關閉返回鍵
 				$("#page-group-menu .page-back").hide();
 				cns.debug("no group ");
 			}else{
 				//設定目前團體
-				setGroupInitial(myGlobal.myData.dgi);
+				setGroupInitial(QmiGlobal.auth.dgi);
 			}
 
 			//執行polling

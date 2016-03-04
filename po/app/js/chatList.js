@@ -371,7 +371,9 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
 		var userData = $.lStorage(ui);
 		var groupTmp = userData[giTmp];
 		if( !groupTmp.guAll||0==Object.keys(groupTmp.guAll).length ){
-			setGroupAllUser( null, giTmp, function(){
+
+			//這不需要惹
+			getGroupComboInit( giTmp, function(){
 				userData = $.lStorage(ui);
 				groupTmp = userData[giTmp];
 				// var roomTmp = groupTmp["chatAll"][ciTmp];
@@ -461,31 +463,17 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
 		cnt = room.unreadCnt||0;
 		// return;
 	}
-	// if( null==room ){
-	// 	cns.debug("null room, ci:", ciTmp);
-	// 	return;
-	// }
-
-	if( !groupData.guAll||!groupData.guAll.hasOwnProperty(data.meta.gu) ){
-		setGroupAllUser( null, giTmp, function(){
-			// updateChatList( giTmp, function(){
-
-	            userData = $.lStorage(ui);
-				groupData = userData[giTmp];
-				if( null==groupData || null==groupData.chatAll ) return;
-				if( !groupData.chatAll.hasOwnProperty(ciTmp) ) return;
-				// room = groupData.chatAll[ciTmp];
-				// if( null==room ){
-				// 	cns.debug("null room, ci:", ciTmp);
-				// 	return;
-				// }
-				setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, cnt);
-			// });
-		});
-
-	} else {
-		setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, cnt);
+	if( !groupData.guAll ) {
+		cns.debug("[setLastMsgContent] no guAll data or ");
+		return;
 	}
+
+	if ( !groupData.guAll.hasOwnProperty(data.meta.gu) ){
+		cns.debug("[setLastMsgContent] "+data.meta.gu+ "does not exist");
+		return;	
+	}
+
+	setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, cnt);
 }
 
 function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, unreadCnt ){
@@ -550,6 +538,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			break;
 	}
 
+	// 當前團體 更新聊天室列表頁面by trigger ; 更新個別聊天室的未讀badge
 	if( gi==giTmp ){
 		if(table.length>0){
 			table.data("time", data.meta.ct);
@@ -566,7 +555,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 					if( unreadCnt>99 ){
 						cntText = "99+";
 						cntDom.html(cntText).show();
-					} else if(unreadCnt&&unreadCnt>0){
+					} else if(unreadCnt>0){
 						cntText = unreadCnt;
 						cntDom.html(cntText).show();
 					} else {

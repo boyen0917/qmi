@@ -309,7 +309,39 @@ $(function(){
         }
     }
 
-	setGroupAllUser = function(data_arr,this_gi,callback){
+    setGroupAllUser = function(data_arr,this_gi,callback){
+        var this_gi = this_gi || gi;
+        getGroupData(this_gi,false,1).complete(function(data){
+            if(data.status == 200){
+                
+                var groupData = $.parseJSON(data.responseText);
+                //更新團體資訊
+                setGroupAttributes( this_gi, groupData );
+    
+                //更新user info
+                setGroupUser( this_gi, groupData );
+           
+                //設定群組資訊
+                setBranchList(this_gi, groupData);
+                //設定功能選單
+                setTabList(this_gi, groupData);
+
+                //檢查官方帳號
+                initOfficialGroup( this_gi );
+
+                //替換該團體的圖像
+                updateGroupAllInfoDom( this_gi );
+
+                if(callback) callback( this_gi );
+            }else{
+                //發生錯誤 開啓更換團體
+                cns.debug("groups/gi 發生錯誤:",this_gi + " : " + data_arr[2]);
+                groupSwitchEnable();
+            }
+        });
+    }
+
+	setGroupAllUserBak = function(data_arr,this_gi,callback){
 		var this_gi = this_gi || gi;
 		getGroupData(this_gi,false,1).complete(function(data){
 			if(data.status == 200){
@@ -2304,47 +2336,6 @@ $(function(){
         $(".obj-content").data("isBack", isBack );
         updateSelectedObj();
         
-        //----- 自己 -------
-        // if( isShowSelf ){
-        //     var cell = $("<div class='obj-cell self'>"+
-        //         '<div class="obj-cell-chk"><div class="img"></div></div>' +
-        //         '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_personal_photo.png" style="width:60px"/></div>' +
-        //         '<div class="obj-cell-subgroup-data">' + 
-        //             '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
-        //     cell.data("gu",group.gu);
-        //     $(".obj-cell-area").append(cell);
-        //     cell.off("click").click( function(){
-        //         clearMeAndAllSelect();
-        //         clearMemAndBranchAll();
-        //         if( !$(this).data("chk") ){
-        //             $(this).data("chk",true);
-        //             $(this).find(".img").addClass("chk");
-        //             //set only me select
-        //             var guTmp = $.lStorage(ui)[gi].gu;
-        //             var gn = $.lStorage(ui)[gi].guAll[gu].nk;
-        //             var obj = $(".obj-content").data("selected-obj";
-        //             obj[guTmp] = gn;
-        //             $(".obj-content").data("selected-branch",{});
-        //             $(".obj-content").data("selected-obj",obj);
-                    
-        //             //deselect group&mem "select all"
-        //             $(".obj-cell-subTitle").data("chk",false);
-        //             //deselect all branch
-        //             $(".obj-cell-area").find(".obj-cell.branch").each(function(){
-        //                 var this_cell = $(this);
-        //                 this_cell.data("chk",false);
-        //                 this_cell.find(".obj-cell-chk .img").removeClass("chk");
-        //             });
-        //             //deselect all mem
-        //             $(".obj-cell-area").find(".obj-cell.mem").each(function(){
-        //                 var this_cell = $(this);
-        //                 this_cell.data("chk",false);
-        //                 this_cell.find(".obj-cell-chk .img").removeClass("chk");
-        //             });
-        //         }
-        //         updateSelectedObj();
-        //     });
-        // }
 
         //----- 全選 ------
         if( isShowAll ){
@@ -4506,7 +4497,7 @@ $(function(){
             
             if(data.status != 200){
                 $(".sm-loading").show();
-                //沒選單就重撈
+                //沒選單就重撈 什麼時候停？
                 setTimeout(groupMenuListArea.bind(this,new_gi,invite),1000);
                 return false;
             }
@@ -4573,7 +4564,7 @@ $(function(){
 
                     //目前團體顏色顯示
                     if( (new_gi && val.gi == new_gi && !invite)
-                        || val.gi == myGlobal.myData.dgi ){
+                        || val.gi == QmiGlobal.auth.dgi ){
                         $(".sm-group-area.active").removeClass("active");
                         this_group.addClass("active");
                     }
@@ -6830,6 +6821,8 @@ $(function(){
     	if(cnts){
     		$.each(cnts,function(i,val){
 	    		//是否為當下團體
+
+                // brian: 判斷有點多 有點誇張
 	    		if(gi == val.gi){
 
                     var keys = ["A1","A2","A3","A4"];//,"B1","B2","B3","B4"
@@ -6849,7 +6842,7 @@ $(function(){
 	    		}
 
 
-                // 判斷太多 太誇張惹
+                // brian: 判斷誇張多 一定要這樣？
                 
                 if( val.cl && val.cl.length>0 ){
                     var userData = $.lStorage(ui);
@@ -6996,6 +6989,8 @@ $(function(){
                         }
                         break;
 	    			case 4: //someone join
+
+                        //聽說 加入當下 當然沒這團體 勢必要去拉combo 但其他msgs 如果有這團體 又會重複去拉combo 是不是其他項目沒有combo 就不要做動作
                         val.pm.isNewMem = true;
                         cns.debug(gi, val.pm.gi);
                         val.pm.onGetMemData = function(this_gi, memData){
@@ -7339,9 +7334,11 @@ $(function(){
             cns.debug("[getMultipleUserInfo] null user array");
         }
 
-        var new_user_info_obj = {};
-        var new_user_info_arr = [];
-        var _groupList = $.lStorage(ui);
+        var 
+        new_user_info_obj = {},
+        new_user_info_arr = [],
+        _groupList = $.lStorage(ui);
+        
         for( var i=0; i<user_info_arr.length; i++){
             var tmpObj = user_info_arr[i];
             new_user_info_obj[tmpObj.gu] = tmpObj;
@@ -8425,9 +8422,9 @@ $(function(){
 
     $.userStorage = function(value) {
         if(value){
-            window.g_uiData = value;
+            QmiGlobal.groups = value;
         }else{
-            return window.g_uiData;
+            return QmiGlobal.groups;
         }
     };
 });

@@ -305,7 +305,7 @@ $(function(){
 	//登出 暫時
 	$(".gm-side-menu").on("click","[name=system-setting]",function(){
 		// popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
-		new myGlobal.popup({
+		new QmiGlobal.popup({
 			desc: $.i18n.getString("SETTING_DO_LOGOUT"),
 			confirm: true,
 			cancel: true,

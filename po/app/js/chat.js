@@ -2834,8 +2834,8 @@ uploadChatAvatar = function(this_gi, file, ti, permission_id, ori_arr, tmb_arr, 
 
 $.userStorage = function (value) {
 	if (value) {
-		window.opener.g_uiData = value;
+		window.opener.QmiGlobal.groups = value;
 	} else {
-		return window.opener.g_uiData;
+		return window.opener.QmiGlobal.groups;
 	}
 };

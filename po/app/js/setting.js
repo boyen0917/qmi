@@ -349,19 +349,6 @@ function showUpdatePermissionPage(){
 	});
 }
 function requestUpdatePermission( this_gi, addList, delList, callback){
-	// PUT /groups/{gi}/administrators
-	// {
-	//   "el": // Enabled Admin List
-	//   [
-	//     "asdfas-fdsa8n3ff-dfsan",
-	//     "i234t9sfh34-fdsnaf-34f"
-	//   ],
-	//   "dl": // Disabled Admin List
-	//   [
-	//     "sdafie3-f8dsnfa-f3nfda",
-	//     "vcxnz-8f34nsa-f83fnsda"
-	//   ]
-	// }
 	var api_name = "groups/"+this_gi+"/administrators";
     var headers = {
             ui: ui,
@@ -378,23 +365,8 @@ function requestUpdatePermission( this_gi, addList, delList, callback){
     	if(data.status == 200){
     		//可以直接改權限, 不過取消admin的權限該是多少？
     		//改成直接打api更新好了...
-    		setGroupAllUser(null, this_gi, callback);
-    		// try{
-		    //     var userData = $.lStorage(ui);
-		    //     var guAll = userData[gi].guAll;
-		    //     for( var i=0; i<addList.length; i++ ){
-		    //     	var gu = addList[i];
-		    //     	var mem = guAll[gu];
-		    //     	mem.ad = 1;
-		    //     }
-		    //     for( var i=0; i<delList.length; i++ ){
-		    //     	var gu = delList[i];
-		    //     	var mem = guAll[gu];
-		    //     	mem.ad = 2;
-		    //     }
-		    // } catch(e){
-		    //     errorReport(e);
-		    // }
+    		getGroupComboInit( this_gi, callback);
+    	
     	} else if(callback) callback( data );
     });
 }
@@ -531,6 +503,8 @@ function checkGroupInfoChange(){
 	}
 }
 
+
+// 需要defer改寫
 function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
 	
 	var isReady = false;
@@ -539,7 +513,7 @@ function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
 		getUpdateGroupInfoApi(this_gi, newGn, newGd).complete(function(data){
 	    	if(data.status == 200){
 	    		if( isReady ){
-	    			setGroupAllUser(null, this_gi, function(){
+	    			getGroupComboInit(null, this_gi, function(){
 		    			if(callback) callback();
 		    			s_load_show = false;
 		    		});
@@ -567,7 +541,7 @@ function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
 					$(this).show().off("load");
 					img.filter(".upload").hide();
 				});
-	    		setGroupAllUser(null, this_gi, function(){
+	    		getGroupComboInit(null, this_gi, function(){
 	    			if(callback) callback();
 	    			s_load_show = false;
 	    		});
