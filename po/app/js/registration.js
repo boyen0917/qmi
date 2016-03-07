@@ -361,8 +361,14 @@ onCheckVersionDone = function(needUpdate){
                                 $.lStorage("_loginData",QmiGlobal.auth);
                             }
 
-                            getGroupComboInit(QmiGlobal.auth.dgi,function(){
-                                deferred.resolve({location:"#page-group-main"});
+                            getGroupComboInit(QmiGlobal.auth.dgi,function(resultObj){
+                            	if( resultObj.status === false ){
+                            		//發生錯誤 回首頁比較保險
+                            		console.debug("dgi combo error",resultObj);
+                            		window.location = "index.html";
+                            	} else {
+                            		deferred.resolve({location:"#page-group-main"});
+                            	}
                             });
                             
                         } else{
@@ -412,7 +418,7 @@ onCheckVersionDone = function(needUpdate){
 			}
 
 			//執行polling
-			pollingInterval();
+			polling();
 			// });
         });
     }

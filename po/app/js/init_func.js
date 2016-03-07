@@ -90,8 +90,11 @@ $(function(){
     }
 
 
-    getGroupComboInit = function(thisGi,callback,chk){
-        var thisGi = thisGi || gi;
+    getGroupComboInit = function(thisGi,callback){
+        var 
+        thisGi = thisGi || gi,
+        comboDeferred = $.Deferred();
+
         getGroupData(thisGi,false,1,true).complete(function(data){
             if(data.status == 200){
                 var comboData = $.parseJSON(data.responseText);
@@ -142,24 +145,25 @@ $(function(){
                 setTabList(thisGi);
 
                 if(callback) callback();
+
+                comboDeferred.resolve({
+                    status: true,
+                    thisGi: thisGi,
+                    data: data
+                });
+
             }else{
-                //發生錯誤 以第一個團體為預設
-                if(
-                    $.lStorage(ui)[0]     !== undefined && 
-                    $.lStorage(ui)[0].gi  !== undefined && 
-                    chk                   !== true 
-                ) {
-
-                    QmiGlobal.auth.dgi = $.lStorage(ui)[0].gi;
-
-                    //帶true表示只再做一次
-                    getGroupCombo($.lStorage(ui)[0].gi,callback,true);
-
-                } else {
-                    groupSwitchEnable();    
-                }
+                //好像不該在這
+                groupSwitchEnable();    
+                comboDeferred.resolve({
+                    status: false,
+                    thisGi: thisGi,
+                    data: data
+                });
             }
         });
+
+        return comboDeferred.promise();
     }
 
     getGroupCombo = function(this_gi,callback,chk){
@@ -273,17 +277,18 @@ $(function(){
     }
 
 
-    setThisGroup = function(this_gi){
+    setThisGroup = function(thisGi){
         try{
-            var gl = $.lStorage(ui)[this_gi];
+            var groupData = QmiGlobal.groups[thisGi];
             
-            gi = this_gi;
-            gu = gl.me;
-            gn = htmlFormat(gl.gn);
+            QmiGlobal.currentGi = thisGi;
+            gi = thisGi;
+            gu = groupData.me;
+            gn = htmlFormat(groupData.gn);
 
-            ti_cal = gl.ti_cal;
-            ti_feed = gl.ti_feed;
-            ti_chat = gl.ti_chat;
+            ti_cal = groupData.ti_cal;
+            ti_feed = groupData.ti_feed;
+            ti_chat = groupData.ti_chat;
             
             //設定左側選單 gu
             $(".sm-user-area.namecard").data("gu",gu);
@@ -295,7 +300,7 @@ $(function(){
             $(".feed-subarea.no-data").removeClass("no-data");
 
             //替換該團體的畫面
-            updateGroupAllInfoDom( this_gi );
+            updateGroupAllInfoDom( thisGi );
 
         } catch(e){
             errorReport(e);

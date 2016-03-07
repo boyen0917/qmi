@@ -199,8 +199,17 @@ initPenMap = {
 window.QmiGlobal = {
 	// $.lStorage(ui)
 	groups: {},
-	auth: {}
+	auth: {},
+	getObjectFirstItem: function(obj,last) {
+		if( last === true ) 
+			return obj[Object.keys(obj)[Object.keys(obj).length-1]];
+		else 	 
+			return obj[Object.keys(obj)[0]];
+	}
 };
+
+
+
 
 // window.QmiGlobal.groupDataModel.get()
 // window.QmiGlobal.groupDataModel.set()
@@ -225,9 +234,6 @@ MyDeferred = function  () {
         done: function(cb){
           p1.then(cb);
 }}}}}
-
-
-
 
 // ajax setting
 
