@@ -31,7 +31,7 @@ $(function(){
 		//確認後動作
 		self.jqHtml.find(".popup-confirm").click(function(){
 			if(args.confirm !== undefined && args.action !== undefined) {
-				args.action[0].apply({},args.action[1]);
+				args.action[0].apply({},[args.action[1]]);
     		}
     		self.remove();
 		})
@@ -1134,8 +1134,7 @@ $(function(){
 	//更新團體資訊
 	updateGroupAllInfoDom = function( this_gi ){
 		try{
-			var userData = $.lStorage(ui);
-			var group = userData[this_gi];
+			var group = QmiGlobal.groups[this_gi];
 
 			//update icon
 			var emptyAuo = "images/common/others/name_card_nophoto_profile.png";

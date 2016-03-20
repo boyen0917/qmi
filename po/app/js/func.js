@@ -1,6 +1,8 @@
 $(function(){
 
     setGroupInitial = function(new_gi,chk){
+        var deferred = $.Deferred();
+
         //設定目前團體
         setThisGroup(new_gi);
 
@@ -38,7 +40,11 @@ $(function(){
             else{
                 timelineSwitch("feeds",true);
             }
+
+            deferred.resolve();
         });
+
+        return deferred.promise();
     }
 
     logout = function(){
@@ -196,29 +202,29 @@ $(function(){
 
         var private_invite_data = this_invite.data("pri-invite-data");
         if( private_invite_data ){
-            var invite_data = this_invite.data("invite-data");
-            var api_name = "me/groups";
-            var headers = {
-                    ui: private_invite_data.ui,
-                    at: private_invite_data.at,
-                    li: lang,
-                    uui: ui,
-                    uat: at
-                };
-            var method = "post";
-            var body = {
-                id: invite_data.ik,
-                tp: invite_data.tp,
-                gi: invite_data.gi
-            }
-            invite_data.gi = "__"+private_invite_data.cl+"__"+invite_data.gi+"__";
+            // var invite_data = this_invite.data("invite-data");
+            // var api_name = "me/groups";
+            // var headers = {
+            //         ui: private_invite_data.ui,
+            //         at: private_invite_data.at,
+            //         li: lang,
+            //         uui: ui,
+            //         uat: at
+            //     };
+            // var method = "post";
+            // var body = {
+            //     id: invite_data.ik,
+            //     tp: invite_data.tp,
+            //     gi: invite_data.gi
+            // }
+            // invite_data.gi = "__"+private_invite_data.cl+"__"+invite_data.gi+"__";
             
-            ajaxDo(api_name,headers,method,true,body,null,null, private_invite_data.cl).complete(function(data){
-                if(data.status == 200){
-                    groupMenuListArea(invite_data.gi,true);
-                    this_invite.remove();
-                }
-            });
+            // ajaxDo(api_name,headers,method,true,body,null,null, private_invite_data.cl).complete(function(data){
+            //     if(data.status == 200){
+            //         groupMenuListArea(invite_data.gi,true);
+            //         this_invite.remove();
+            //     }
+            // });
         } else {
             var invite_data = this_invite.data("invite-data");
             var api_name = "me/groups";
@@ -239,14 +245,22 @@ $(function(){
                     //polling cnts
                     $(".hg-invite .sm-count").html(0).hide();
 
-                    groupMenuListArea(invite_data.gi,true).then(function(){
-                        //若只有一個團體 就去該團體
-                        if(Object.keys($.lStorage(ui)).length == 1) {
-                            $.mobile.changePage("#page-group-main");
+                    groupMenuListArea().done(function(){
+
+                        //combo
+                        getGroupComboInit(invite_data.gi,function(){
+
+                            //若只有一個團體 就去該團體
+                            if(Object.keys(QmiGlobal.groups).length == 1) {
+                                $.mobile.changePage("#page-group-main");
+                                
+                                setGroupInitial( Object.keys( QmiGlobal.groups )[0] , true );
+                                $("#page-group-menu .page-back").show();
+                            } else {
+                                toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );    
+                            }
+                        });
                             
-                            setGroupInitial($.lStorage(ui)[Object.keys($.lStorage(ui))[0]].gi,true);
-                            $("#page-group-menu .page-back").show();
-                        }
                     });
                     this_invite.remove();
                 }
@@ -4430,7 +4444,7 @@ $(function(){
                 $.mobile.changePage("#page-group-main");
 
                 //檢查置頂
-                polling();
+                // polling();
                 topEventChk();
                 timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
                 toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
@@ -4490,7 +4504,7 @@ $(function(){
         // $(".sm-group-name").html(_groupList[this_gi].gn);
     }
     
-    groupMenuListArea = function (new_gi,invite){
+    groupMenuListArea = function (){
         var deferred = $.Deferred();
         // if(new_gi) s_load_show = true;    
         getGroupList().complete(function(data){
@@ -4498,20 +4512,21 @@ $(function(){
             if(data.status != 200){
                 $(".sm-loading").show();
                 //沒選單就重撈 什麼時候停？
-                setTimeout(groupMenuListArea.bind(this,new_gi,invite),1000);
+                // setTimeout(groupMenuListArea.bind(this,new_gi,invite),1000);
+                deferred.resolve({
+                    status: false ,
+                    errMsg: "getGroupList error" ,
+                    data: data
+                });
                 return false;
             }
 
             $(".sm-loading").hide();
 
             var parse_data = $.parseJSON(data.responseText);
-            if( !parse_data ){
-                console.debug("no group data");
-                return false;
-            }
-
             var private_group_list = parse_data.cl;
             var group_list = parse_data.gl;
+
             getPrivateGroupFromList( private_group_list, function(){
                 s_load_show = false;
 
@@ -4526,14 +4541,13 @@ $(function(){
                 //管理者圖示
                 var icon_host = "<img src='images/sidemenu/icon_host.png'/>";
 
-                var userData = $.lStorage(ui);
-                $.each(userData,function(key,val){
+                $.each(QmiGlobal.groups,function(key,val){
                     if( key.indexOf("G")!=0 && key.indexOf(_pri_split_chat)!=0 ) return;
 
                     //新建團體專用 記錄新增團體的資訊 用以跳轉
-                    if(new_gi && new_gi == val.gi && !invite){
-                        setThisGroup(new_gi);
-                    }
+                    // if(new_gi && new_gi == val.gi && !invite){
+                    //     setThisGroup(new_gi);
+                    // }
 
                     tmp_selector = ".sm-group-list-area";
                     
@@ -4544,12 +4558,9 @@ $(function(){
                         glo_img = val.auo;
                     }
 
-                    var enable = "";
-                    if(invite) enable = "enable";
-
                     var data_gi_str = 'data-gi="' + val.gi + '" ';
                     var this_group = $(
-                        '<div class="sm-group-area polling-cnt ' + enable + '" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '">' +
+                        '<div class="sm-group-area polling-cnt enable" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '">' +
                             '<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
                             '<div class="sm-group-area-l group-pic">' +
                                 '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
@@ -4563,11 +4574,11 @@ $(function(){
                     $(tmp_selector).append(this_group);
 
                     //目前團體顏色顯示
-                    if( (new_gi && val.gi == new_gi && !invite)
-                        || val.gi == QmiGlobal.auth.dgi ){
-                        $(".sm-group-area.active").removeClass("active");
-                        this_group.addClass("active");
-                    }
+                    // if( (new_gi && val.gi == new_gi && !invite)
+                    //     || val.gi == QmiGlobal.auth.dgi ){
+                    //     $(".sm-group-area.active").removeClass("active");
+                    //     this_group.addClass("active");
+                    // }
 
                     //管理者圖示
                     if(val.ad != 1) {
@@ -4585,39 +4596,11 @@ $(function(){
                 //設定調整團體頭像
                 $(document).data("group-avatar",true);
 
-                //new gi 表示新增團體或邀請 所以要做combo 完成後跳訊息
-                if(new_gi) {
-                    //創建團體結束 取消強制開啓loading 圖示
-                    s_load_show = false;
-
-                    if( null==gi || $.lStorage(ui)[gi] === undefined ){
-                        gi = new_gi;
-                    }
-                    //combo
-                    getGroupCombo(gi,function(){
-                        if(invite){
-                            toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );
-                        }else{
-
-                            //sidemenu user
-                            setSmUserData(gi,gu,gn);
-
-                            //top event
-                            topEvent();
-
-                            //重新設定功能選單
-                            updateTab(gi);
-
-                            toastShow( $.i18n.getString("FEED_GROUP_CREATED") );
-                            $.mobile.changePage("#page-group-main");
-                            timelineSwitch("feeds", true);
-                        }
-
-                        deferred.resolve();//$.lStorage(ui)
-                    });
-                } else deferred.resolve();//$.lStorage(ui)    
+                deferred.resolve({
+                    status: true
+                });
             });
-        });
+        });   
         
         return deferred.promise();
     }
@@ -5586,26 +5569,33 @@ $(function(){
                         if(gi == "G000000209m")
                             ccc;
                     } catch(e) {
-                        cns.debug("google 失敗 換高德上",val.lat+":"+val.lng);
-                        this_event.find(".st-attach-google-map").hide();
-                        this_event.find(".st-attach-amap-map").show();
-                        var id_str = "amap-" + new Date().getRandomString();
-                        this_event.find(".st-attach-amap-map").attr("id",id_str);
-                        var mapObj = new AMap.Map(id_str,{
-                            rotateEnable:false,
-                            dragEnable:true,
-                            zoomEnable:false,
-                            //二维地图显示视口
-                            view: new AMap.View2D({
-                                center:new AMap.LngLat(val.lng,val.lat),//地图中心点
-                                zoom:15 //地图显示的缩放级别
-                            })
-                        });
 
-                        var marker=new AMap.Marker({                    
-                            position:new AMap.LngLat(val.lng,val.lat)  
-                        });  
-                        marker.setMap(mapObj);
+                        try {
+                            cns.debug("google 失敗 換高德上",val.lat+":"+val.lng);
+                            this_event.find(".st-attach-google-map").hide();
+                            this_event.find(".st-attach-amap-map").show();
+                            var id_str = "amap-" + new Date().getRandomString();
+                            this_event.find(".st-attach-amap-map").attr("id",id_str);
+                            var mapObj = new AMap.Map(id_str,{
+                                rotateEnable:false,
+                                dragEnable:true,
+                                zoomEnable:false,
+                                //二维地图显示视口
+                                view: new AMap.View2D({
+                                    center:new AMap.LngLat(val.lng,val.lat),//地图中心点
+                                    zoom:15 //地图显示的缩放级别
+                                })
+                            });
+
+                            var marker=new AMap.Marker({                    
+                                position:new AMap.LngLat(val.lng,val.lat)  
+                            });  
+                            marker.setMap(mapObj);
+                        } catch( e ) {
+                            cns.debug("高德失敗");
+
+                        }
+                            
                     }
                         
                     break;
@@ -6763,9 +6753,7 @@ $(function(){
 
         var pollingDeferred = $.Deferred();
 
-        if ( QmiGlobal.pollingOff === true ) pollingDeferred.resolve( {interval: polling_interval/2 , status: false});
-
-
+    
         var 
         local_pollingData = $.lStorage("_pollingData"),
         polling_time = local_pollingData.ts.pt,
@@ -6801,24 +6789,19 @@ $(function(){
                 //寫入數字
                 pollingCountsWrite(new_pollingData);
 
+                console.debug({
+                    oriTime: polling_time+": " + new Date(polling_time).toFormatString(),
+                    nextTime: new_pollingData.ts.pt+": " + new Date(new_pollingData.ts.pt).toFormatString(),
+                    cmds: new_pollingData.cmds,
+                    msgs: new_pollingData.msgs
+                })
+                
                 //cmds api
                 pollingCmds(new_pollingData.cmds,new_pollingData.msgs,new_pollingData.ccs).done(function(){
-                    if ( $.lStorage("_pollingData").ts.pt === polling_time) {
-
-                        console.debug("polling time not forward");
-                        pollingDeferred.resolve({
-                            status: true,
-                            interval: polling_interval*2
-                        });
-
-                    } else {
-
-                        pollingDeferred.resolve({
-                            status: true,
-                            interval: polling_interval
-                        });
-                    }
-                    
+                    pollingDeferred.resolve({
+                        status: true,
+                        interval: polling_interval
+                    });
                 });
 
             }else if(data.status == 401){
@@ -6838,10 +6821,14 @@ $(function(){
             }
         });
 
+
         pollingDeferred.done(function(resultObj){
-            setTimeout(function(){
-                polling();
-            },resultObj.interval);
+            if ( QmiGlobal.pollingOff === true ) {
+            } else {
+                setTimeout(function(){
+                    polling();
+                },resultObj.interval);
+            }
         })
     }
 
@@ -6957,7 +6944,16 @@ $(function(){
 
         //邀請 若是在團體邀請頁面時 則不寫入
         if(gcnts.G1 > 0){
-            $(".hg-invite .sm-count").html(gcnts.G1).show();
+            $(".hg-invite .sm-count").html(
+                $("<font>",{
+                    html: gcnts.G1,
+                    style: {
+                        position: "relative",
+                        right: "0.05em",
+                        bottom: "0.05em",
+                    }
+                })
+            ).show();
         }
         if(gcnts.G2 > 0){
             //最新消息
@@ -6971,217 +6967,246 @@ $(function(){
     //polling 事件
     pollingCmds = function(cmds,msgs,ccs){
         var 
-        user_info_arr = [],
+        newCmdsArr = [],
+        user_info_arr = [],// 存tp4,5,6
         branch_info_arr = [],
         isUpdateMemPage = false,
         onGetMemDataCallback = null,
-        // for distinct gi
-        cmdsTmpArr = [],
         comboDeferredPoolArr = [],
         pollingDeferredPoolArr = [
             $.Deferred(),   // tp4,5,6 更新成員資訊
             $.Deferred()    // branchlist 更新
         ],
 
-        allCmdsDoneDeferred = $.Deferred();
+        allCmdsDoneDeferred = $.Deferred(),
 
-        // 需要打combo的情況
-        cmds.forEach(function(item){
+        groupListUpdateFlag = false; // tp 4,11 表示有新的gi 就先做groups
 
-            var 
-            comboDeferred = $.Deferred();
-            insideDeferred = $.Deferred();
-
-            // 更新group info 強制打
-            if( item.tp === 10 ){
-                insideDeferred.resolve();    
+        // tp11 是新團體 或 gi不在 現有列表中 就要統一做一次取得團體列表
+        for( var i = 0 ; i < cmds.length ; i++ ) {
+            var item =  cmds[i];
+            if ( QmiGlobal.groups[item.pm.gi] === undefined || item.tp === 11 ) {
+                groupListUpdateFlag = true;
+                break;
             }
-            // 不重複的gi & 沒 guAll
-            else if( 
-                item.tp !== 11              &&
-                this.indexOf(item.gi) < 0   && // 因為那邊會做 groupMenuListArea
-                ( QmiGlobal.groups[item.gi] === undefined || Object.keys( QmiGlobal.groups[item.gi].guAll ).length === 0 )
-            ){
-            // 不重複的gi & 沒 guAll -> 打combo
-                insideDeferred.resolve();
-            }
+        }
 
-            insideDeferred.done(function(){
-                getGroupComboInit( item.gi ).done(function(result){
-                    comboDeferred.resolve(result);
-                });
-            })
+        
+        var groupListDeferred = $.Deferred();
 
-            this.push(item.gi);
-            comboDeferredPoolArr.push(comboDeferred);
+        if( groupListUpdateFlag === true ) {
+            groupMenuListArea().done( groupListDeferred.resolve );
+        } else {
+            groupListDeferred.resolve();
+        }
 
-        }.bind([]))
+        // combo、groupList 處理完 -> 因為selectbox include的 jquery 1.7.2 導致鏈的deferred不能用
+        groupListDeferred.done(function(){
 
-        // combo處理完
-        $.when($,comboDeferredPoolArr).done(function(){
-            
-            var 
-            pollingDataTmp = $.lStorage("_pollingData"),
-            currentPollingCt = 9999999999999,
-            isShowNotification = true;
-            newGroupArr = [];
+            // 需要打combo的情況
+            cmds.forEach(function(item,i){
 
-            if(pollingDataTmp){
-                currentPollingCt = pollingDataTmp.ts.pt;
-            }
-            
-            //登入5分鐘前的polling可show
-            if( (currentPollingCt+300000) < login_time ){
-                isShowNotification = false;
-            }
+                var 
+                comboDeferred = $.Deferred();
+                insideDeferred = $.Deferred();
 
-            cmds.forEach(function(item){
-                switch(item.tp){
-                    case 1://timeline list
-                        // var polling_arr = [item.pm.gi,item.pm.ti];
-                        
-                        if(item.pm.gi == gi && window.location.hash == "#page-group-main") {
-                            polling_arr = false;
-                            idbPutTimelineEvent("",false,polling_arr);
-                        }
-
-                        //  ("",false,polling_arr);
-                        break;
-                    case 3://invite
-                        //pm empty content??
-                        if( $("#page-group-menu").is(":visible") && false==$("#page-group-main").is(":visible") ){
-                            $(".hg-invite").trigger("click");
-                        }
-                        try{
-                            if( isShowNotification ){
-                                riseNotification (null, g_Qmi_title, $.i18n.getString("GROUP_RECEIVE_INVITATION"), function(){
-                                    $(".hg-invite").trigger("click");
-                                });
-                            }
-                        } catch(e) {
-                            cns.debug( e.message );
-                        }
-                        break;
-                    case 4: //someone join
-                    //聽說 加入當下 當然沒這團體 勢必要去拉combo 但其他msgs 如果有這團體 又會重複去拉combo 是不是其他項目沒有combo 就不要做動作
-                        item.pm.isNewMem = true;
-                        item.pm.onGetMemData = function(this_gi, memData){
-                            try{
-                                if( isShowNotification ){
-                                    var title = memData.gn || g_Qmi_title;
-                                    riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
-                                        if( gi==this_gi ){
-                                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
-                                        } else {
-                                            $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
-                                        }
-                                    });
-                                }
-                            } catch(e){
-                                errorReport(e);
-                            }
-                        }
-                        user_info_arr.push( item.pm );
-                        if( gi == item.pm.gi ){
-                            isUpdateMemPage = true;
-                        }
-                        break;
-                    case 5://edit user info
-                        user_info_arr.push( item.pm );
-                        if( gi == item.pm.gi ){
-                            isUpdateMemPage = true;
-                        }
-                        break;
-                    case 6://delete user info
-                        item.pm.onGetMemData = function(this_gi, memData){
-                            try{
-                                if( isShowNotification ){
-                                    var title = memData.gn || g_Qmi_title;
-                                    riseNotification( null, title, $.i18n.getString("GROUP_X_LEAVE_GROUP", memData.nk), function(){
-                                        if( gi==this_gi ){
-                                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
-                                        } else {
-                                            $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
-                                        }
-                                    });
-                                }
-                            } catch(e){
-                                errorReport(e);
-                            }
-                        }
-
-                        //不存在的團體就不要更新
-                        var _groupList = $.lStorage(ui);
-                        if(_groupList.hasOwnProperty(item.pm.gi) && _groupList[item.pm.gi] )
-                            user_info_arr.push(item.pm);
-                        // if( gi==item.pm.gi ){
-                        //     isUpdateMemPage = true;
-                        // }
-                        break;
-                    case 7://branch edit
-                        if( item.pm.gi !== undefined ) branch_info_arr.push( item.pm );
-                        break;
-                    case 10://group info edit
-                        // 上面打過combo 更新過了
-                        if( gi == item.pm.gi ){
-                            var tmp = $(".sm-small-area:visible");
-                            if(tmp.length>0){
-                                $(tmp[0]).trigger("click");
-                            }
-                        }
-                        break;
-                    case 11://create group
-                        newGroupArr.push(item.pm.gi);
-                        break;
-                    case 12://delete group
-                        removeGroup( item.pm.gi );
-                        break;
+                // 更新group info 強制打
+                if( item.tp === 10 ){
+                    insideDeferred.resolve(true);    
                 }
-            });
-
-    
-            // new group
-            if( newGroupArr.length > 0 ){
-                cns.debug("polling~ create grouop");
-                groupMenuListArea(newGroupArr.last(), false);
-            }
-
-            //將tp4,5,6 的user info都更新完 再更新polling時間
-            if(user_info_arr.length > 0){
-                getMultipleUserInfo(user_info_arr,true, false, function(isSucc){
-
-                    if(isUpdateMemPage ){
-                        updateBranchMemberCnt(gi);
-                    }
-                    //更新polling
-                    pollingDeferredPoolArr[0].resolve();
-                });
-            }else{
-                pollingDeferredPoolArr[0].resolve();
-            }
-
-            var branchDeferredPoolArr = [];
-            branch_info_arr.forEach(function(item){
-                var branchDeferred = $.Deferred();
-                if( this.indexOf(item.gi) < 0 ) {
-                    updateBranchList( item.gi,function(giTmp){
-                        if( giTmp === gi ) updateContactBranchList();
-                        branchDeferred.resolve();
-                    });
+                // 不重複的gi & 沒 guAll
+                else if( 
+                    item.tp !== 11                  &&  // 上面做過了
+                    item.pm.gi !== undefined        &&  // tp 3 是告知有邀請 會沒有tp
+                    this.indexOf(item.pm.gi) < 0    &&  // 不重複的gi
+                    ( QmiGlobal.groups[item.pm.gi] === undefined || Object.keys( QmiGlobal.groups[item.pm.gi].guAll ).length === 0 )
+                ){
+                    insideDeferred.resolve(true);
                 } else {
-                    branchDeferred.resolve();
+                    // 不用做combo
+                    insideDeferred.resolve(false);
                 }
 
-                branchDeferredPoolArr.push(branchDeferred);
-                this.push(val.gi);
-            }.bind([]));
+                insideDeferred.done(function(status){
+                    if( status === false ) return;
 
-            $.when.apply($,branchDeferredPoolArr).done(function(){
-                pollingDeferredPoolArr[1].resolve();
-            })
+                    comboDeferredPoolArr.push(comboDeferred);
 
-        })// deferred done function end
-    
+                    getGroupComboInit( item.pm.gi ).done(function(result){
+                        comboDeferred.resolve(result);
+                    });
+
+                })
+
+                this.push(item.pm.gi);
+            }.bind([]))
+
+            $.when.apply($,comboDeferredPoolArr).done(function(){
+                
+                var 
+                pollingDataTmp = $.lStorage("_pollingData"),
+                currentPollingCt = 9999999999999,
+                isShowNotification = true;
+                newGroupArr = [];
+
+                if(pollingDataTmp){
+                    currentPollingCt = pollingDataTmp.ts.pt;
+                }
+                
+                //登入5分鐘前的polling可show
+                if( (currentPollingCt+300000) < login_time ){
+                    isShowNotification = false;
+                }
+
+                // 等等要剔除這次打過combo的tp4,5,6 避免重複api -> arguments是array-like Object
+                var exceptArr = Array.prototype.map.call(arguments,function(item){ return item.thisGi; })
+
+                cmds.forEach(function(item){
+
+                    if( ( item.tp == 4 || item.tp == 5 || item.tp == 6 ) &&
+                        exceptArr.indexOf(item.pm.gi) > 0
+                    ) return;
+
+                    switch(item.tp){
+                        case 1://timeline list
+                            // var polling_arr = [item.pm.gi,item.pm.ti];
+                            
+                            if(item.pm.gi == gi && window.location.hash == "#page-group-main") {
+                                polling_arr = false;
+                                idbPutTimelineEvent("",false,polling_arr);
+                            }
+
+                            //  ("",false,polling_arr);
+                            break;
+                        case 3://invite
+                            //pm empty content??
+                            if( $("#page-group-menu").is(":visible") && false==$("#page-group-main").is(":visible") ){
+                                $(".hg-invite").trigger("click");
+                            }
+                            try{
+                                if( isShowNotification ){
+                                    riseNotification (null, g_Qmi_title, $.i18n.getString("GROUP_RECEIVE_INVITATION"), function(){
+                                        $(".hg-invite").trigger("click");
+                                    });
+                                }
+                            } catch(e) {
+                                cns.debug( e.message );
+                            }
+                            break;
+                        case 4: //someone join
+                        //聽說 加入當下 當然沒這團體 勢必要去拉combo 但其他msgs 如果有這團體 又會重複去拉combo 是不是其他項目沒有combo 就不要做動作
+                            item.pm.isNewMem = true;
+                            item.pm.onGetMemData = function(this_gi, memData){
+                                try{
+                                    if( isShowNotification ){
+                                        var title = memData.gn || g_Qmi_title;
+                                        riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
+                                            if( gi==this_gi ){
+                                                $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+                                            } else {
+                                                $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
+                                            }
+                                        });
+                                    }
+                                } catch(e){
+                                    errorReport(e);
+                                }
+                            }
+                            user_info_arr.push( item.pm );
+                            if( gi == item.pm.gi ){
+                                isUpdateMemPage = true;
+                            }
+                            break;
+                        case 5://edit user info
+                            user_info_arr.push( item.pm );
+                            if( gi == item.pm.gi ){
+                                isUpdateMemPage = true;
+                            }
+                            break;
+                        case 6://delete user info
+                            item.pm.onGetMemData = function(this_gi, memData){
+                                try{
+                                    if( isShowNotification ){
+                                        var title = memData.gn || g_Qmi_title;
+                                        riseNotification( null, title, $.i18n.getString("GROUP_X_LEAVE_GROUP", memData.nk), function(){
+                                            if( gi==this_gi ){
+                                                $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+                                            } else {
+                                                $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
+                                            }
+                                        });
+                                    }
+                                } catch(e){
+                                    errorReport(e);
+                                }
+                            }
+
+                            break;
+                        case 7://branch edit
+                            if( item.pm.gi !== undefined ) branch_info_arr.push( item.pm );
+                            break;
+                        case 10://group info edit
+                            // 上面打過combo 更新過了
+                            if( gi == item.pm.gi ){
+                                var tmp = $(".sm-small-area:visible");
+                                if(tmp.length>0){
+                                    $(tmp[0]).trigger("click");
+                                }
+                            }
+                            break;
+                        case 11://create group
+                            newGroupArr.push(item.pm.gi);
+                            break;
+                        case 12://delete group
+                            removeGroup( item.pm.gi );
+                            break;
+                    }
+                });
+
+                // new group
+                if( newGroupArr.length > 0 ){
+                    // cns.debug("polling~ create grouop");
+                }
+
+
+                //將tp4,5,6 的user info都更新完 再更新polling時間
+                if(user_info_arr.length > 0){
+
+                    getMultipleUserInfo(user_info_arr,true, false, function(isSucc){
+
+                        if(isUpdateMemPage ){
+                            updateBranchMemberCnt(gi);
+                        }
+                        //更新polling
+                        pollingDeferredPoolArr[0].resolve();
+                    });
+                }else{
+                    pollingDeferredPoolArr[0].resolve();
+                }
+
+                var branchDeferredPoolArr = [];
+                branch_info_arr.forEach(function(item){
+                    var branchDeferred = $.Deferred();
+                    if( this.indexOf(item.gi) < 0 ) {
+                        updateBranchList( item.gi,function(giTmp){
+                            if( giTmp === gi ) updateContactBranchList();
+                            branchDeferred.resolve();
+                        });
+                    } else {
+                        branchDeferred.resolve();
+                    }
+
+                    branchDeferredPoolArr.push(branchDeferred);
+                    this.push(item.gi);
+                }.bind([]));
+
+                $.when.apply($,branchDeferredPoolArr).done(function(){
+                    pollingDeferredPoolArr[1].resolve();
+                })
+
+            })// deferred done function end
+
+        })// groupList deferred done
 
         // 全部 cmds 處理完
         $.when.apply($,pollingDeferredPoolArr).done(function(){
@@ -7439,10 +7464,18 @@ $(function(){
                         }
                         
                         //應該不會有沒有的情況
-                        if( Object.keys(QmiGlobal.groups[this_user_info.gi].guAll).length > 0){
+                        var thisGroupMap = QmiGlobal.groups[this_user_info.gi];
+
+                        if( Object.keys(thisGroupMap.guAll).length > 0){
                             cns.debug("guall content exist");
-                            //user全部資料竟然不含fav...?!用extend的比較保險
-                            $.extend(QmiGlobal.groups[this_user_info.gi].guAll[this_user_info.gu], user_data);
+                            //新加入成員
+                            if( thisGroupMap.guAll.hasOwnProperty(this_user_info.gu) === false ) {
+                                thisGroupMap.guAll[this_user_info.gu] = user_data;
+                            } else {
+                                //user全部資料竟然不含fav...?!用extend的比較保險
+                                $.extend(thisGroupMap.guAll[this_user_info.gu], user_data);    
+                            }
+                            
                     
                             //更新所有照片、名字 this_gi , this_gu , set_name ,set_img
                             if(update_chk){
@@ -7450,7 +7483,7 @@ $(function(){
                             }
                         }
 
-                        user_data.gn = QmiGlobal.groups[this_user_info.gi].gn || "";
+                        user_data.gn = thisGroupMap.gn || "";
                         if( this_user_info.onGetMemData ) this_user_info.onGetMemData(this_user_info.gi, user_data);
                     });
 

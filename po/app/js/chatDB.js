@@ -28,84 +28,60 @@ function initChatDB( onReady ){
 function onReceivePollingChatMsg ( msgs ){
 	cns.debug("-----------------------");
 
-	var deferredPoolArr = [];
-
 	//indexed from old to new (api chat is from new to old)
 
-
 	// 跑兩個回圈 把polling msgs的每一個msg 都存到db
-	for( var j = 0; j<msgs.length; j++){
-		var data = msgs[j];
+	msgs.forEach( function(roomObj){
+		roomObj.cnt = 0;
 
-		data.cnt = 0;
-
-		// 3/2 brian use when deferred
-		var chatRoomGuAllDeferred = $.Deferred();
-		deferredPoolArr.push(chatRoomDeferred);
-
-		if( groupTmp.guAll === undefined || 
-			0 == Object.keys(groupTmp.guAll).length 
-		) {
-			setGroupAllUser()
-		} else {
-			chatRoomGuAllDeferred.resolve();
-		}
-
-
-		// var data = msgs[msgIndex];
+		var 
+		thisGi = roomObj.gi,
+		thisCi = roomObj.ci;
 		// brian 存每筆訊息
-		for( var i=0; i<data.el.length; i++){
-			var object = data.el[i];
-			object.cn = data.cn;
+		roomObj.el.forEach( function(msgObj,i){
+			msgObj.cn = roomObj.cn;
 
-			// 3/2 brian use when deferred
-			var idbMsgPutDeferred = $.Deferred();
-			deferredPoolArr.push(idbMsgPutDeferred);
-
-			if(object.hasOwnProperty("meta")){
+			if(msgObj.hasOwnProperty("meta")){
 
 				//add to db
-				var node = {
-					gi: data.gi,
-					ci: data.ci,
-					ei: object.ei,
-				    ct: object.meta.ct,
-				    data: object
+				var 
+				idbMsgPutDeferred = $.Deferred(),
+
+				node = {
+					gi: thisGi,
+					ci: thisCi,
+					ei: msgObj.ei,
+				    ct: msgObj.meta.ct,
+				    data: msgObj
 				};
 
 				//目前看起來 不需要每次都去跑 那是不是做個例子測看看
-				var tmp = g_idb_chat_msgs.put( node, function(eiTmp){
-					// onPollingMsgSaveSucc(msgs, eiTmp, object);
-				});
+				g_idb_chat_msgs.put( node, function(eiTmp){
+					//是最後一筆 才更新開啟的聊天室 及 聊天列表的最後一筆
+					if( i === this.total-1 ) {
+						var isRoomOpen = false;
 
-				cns.debug("[updateChatDB]",data.gi,data.ci,object.ei,object.ml[0].c);
+						if( windowList.hasOwnProperty(thisCi) 	&&
+							windowList[thisCi].closed === false
+						) {
+							//更新打開的聊天室
+							isRoomOpen = true;
+							// windowList[thisCi].g_msgTmp = data.el;
+							$(windowList[thisCi].document).find("button.pollingMsg").trigger("click");
+						}
+						
+						updateLastMsg( this.gi, this.ci, isRoomOpen, this.ei );	
+					}
+				}.bind({
+					total: roomObj.el.length,
+					index: i,
+					gi: thisGi,
+					ci: thisCi,
+					ei: msgObj.ei
+				}));
 			}
-		}
-	}
-
-	// 更新聊天室
-	// $.when.apply($,idbDeferredPoolArr).done(function(){
-
-	// 	var isRoomOpen = false;
-	// 	/* 更新聊天室訊息 */
-	// 	// showMsg( object, false );
-	// 	if( null != windowList ){
-	// 		if( windowList.hasOwnProperty(ciTmp) 
-	// 			&& null != windowList[ciTmp] 
-	// 			&& false==windowList[ciTmp].closed ){
-	// 			isRoomOpen = true;
-
-	// 			//brian: cnt應該就是判斷是否為開啟中的聊天室 是怎麼大於等於的...不懂
-	// 			if( data.cnt>=data.el.length ){
-	// 				windowList[ciTmp].g_msgTmp = data.el;
-	// 				$(windowList[ciTmp].document).find("button.pollingMsg").trigger("click");
-	// 			}
-	// 		} else {
-	// 			cns.debug("room ", ciTmp, " not opened");
-	// 		}
-	// 	}
-
-	// });
+		})
+	})
 }	//end of updateChat
 
 function onPollingMsgSaveSucc(msgs, eiTmp, object){
@@ -132,7 +108,6 @@ function onPollingMsgSaveSucc(msgs, eiTmp, object){
 	}
 	var giTmp = data.gi;
 	var ciTmp = data.ci;
-	cns.debug(object.ei);
 	var isRoomOpen = false;
 	/* 更新聊天室訊息 */
 	// showMsg( object, false );
@@ -142,7 +117,6 @@ function onPollingMsgSaveSucc(msgs, eiTmp, object){
 			&& false==windowList[ciTmp].closed ){
 			isRoomOpen = true;
 
-			//brian: cnt應該就是判斷是否為開啟中的聊天室 是怎麼大於等於的...不懂
 			if( data.cnt>=data.el.length ){
 				windowList[ciTmp].g_msgTmp = data.el;
 				$(windowList[ciTmp].document).find("button.pollingMsg").trigger("click");

@@ -387,6 +387,8 @@ FileSharing.prototype = {
 		    progressSectionDom.show();
 		    var deferred = $.Deferred();
 		    var fiApiData = {};
+
+		    
 		    $.when(new AjaxTransfer().execute({
 				url: "groups/" + gi + "/files/",
 				method: "post",

@@ -421,7 +421,7 @@ showAlertContent = function(data){
 					if( null==group.guAll || Object.keys(group.guAll).length == 0){
 						cns.debug("no guall",this_gi);
 						var this_alert = $(this);
-			        	getGroupComboInit(false,this_gi,function(){
+			        	getGroupComboInit(false,this_gi).done(function(){
 			        		this_alert.trigger("click");
 			        	});
 			        	return false;

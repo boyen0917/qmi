@@ -14,7 +14,7 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 	//預設上一頁
-	$(document).data("page-history",[["#page-group-menu"]]);
+	// $(document).data("page-history",[["#page-group-menu"]]);
 	
 	//首頁大圖
 	$("#page-registration").css("height",$(window).height());
@@ -287,8 +287,6 @@ onCheckVersionDone = function(needUpdate){
         		
         		QmiGlobal.auth = $.parseJSON(data.responseText);
         		
-        		
-
         		//自動登入儲存 有_loginData 有_loginAutoChk 才代表有選自動登入
                 if($(".login-auto").data("chk")) {
                 	$.lStorage("_loginData",QmiGlobal.auth);
@@ -319,7 +317,7 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 	//初始化 
-    function loginAction(){
+    function loginAction (){
         //儲存登入資料 跳轉到timeline
         if($.lStorage("_loginData") !== false) {
         	QmiGlobal.auth = $.lStorage("_loginData");	
@@ -361,7 +359,7 @@ onCheckVersionDone = function(needUpdate){
                                 $.lStorage("_loginData",QmiGlobal.auth);
                             }
 
-                            getGroupComboInit(QmiGlobal.auth.dgi,function(resultObj){
+                            getGroupComboInit(QmiGlobal.auth.dgi).done(function(resultObj){
                             	if( resultObj.status === false ){
                             		//發生錯誤 回首頁比較保險
                             		console.debug("dgi combo error",resultObj);
@@ -385,7 +383,6 @@ onCheckVersionDone = function(needUpdate){
                     // document.location = "main.html#page-group-menu";
                 }
             }else if(data.status == 401){
-
                 //取得group list 失敗 代表自動登入失敗了
                 deferred.resolve({fail:true});
             }
@@ -412,29 +409,17 @@ onCheckVersionDone = function(needUpdate){
 				//關閉返回鍵
 				$("#page-group-menu .page-back").hide();
 				cns.debug("no group ");
-			}else{
-				//設定目前團體
-				setGroupInitial(QmiGlobal.auth.dgi);
-			}
 
-			//執行polling
-			polling();
-			// });
+				s_load_show = false;
+				// 兩個選項都要執行polling()
+				polling();
+			}else{
+				//設定目前團體 執行polling()
+				setGroupInitial(QmiGlobal.auth.dgi).done(polling);
+			}
         });
     }
 
-
-	// getGroupList = function(ui,at,cl){
- //    	//取得團體列表
- //        var api_name = "groups";
- //        var headers = {
- //            "ui":ui,
- //            "at":at,
- //            "li":lang
- //        };
- //        var method = "get";
- //        return ajaxDo(api_name,headers,method,true,false,false,true,cl);
- //    }
 
 	getPrivateGroupList = function(p_data, callback){
     	//取得團體列表
@@ -759,10 +744,10 @@ onCheckVersionDone = function(needUpdate){
 	registration = function(resend){
 		if(!resend){
 			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
-			if( newPhoneNumber.length>0 ){
-				var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + newPhoneNumber+"</label>";
-				popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
-			}
+			// if( newPhoneNumber.length>0 ){
+				// var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + newPhoneNumber+"</label>";
+				// popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
+			// }
 			// $(document).data("device-token",deviceTokenMake());
 			$(document).data("device-token","web-device");
 			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );

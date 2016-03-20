@@ -190,8 +190,34 @@ $(function(){
 	        		deferred.done(function(chk){
 	        			if(!chk) toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") );
 
-	        			//現在好像不從polling執行更新
-		        		groupMenuListArea(cg_result.gi);
+	        			//現在不從polling執行更新
+		        		groupMenuListArea().done(function(){
+				            s_load_show = false;
+
+				            //combo
+				            getGroupComboInit(cg_result.gi,function(){
+				                // if(invite){
+				                //     toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );
+				                // }else{
+
+				                	//設定目前團體
+        							setThisGroup(cg_result.gi);
+
+				                    //sidemenu user
+				                    setSmUserData(gi,gu,gn);
+
+				                    //top event
+				                    topEvent();
+
+				                    //重新設定功能選單
+				                    updateTab(gi);
+
+				                    toastShow( $.i18n.getString("FEED_GROUP_CREATED") );
+				                    $.mobile.changePage("#page-group-main");
+				                    timelineSwitch("feeds", true);
+				                // }
+				            });
+		        		}); // groupMenuListArea
 	        		})
 	        	}
 	        });
@@ -222,6 +248,8 @@ $(function(){
 		$("#page-group-menu").data("type","create");
 		$(".gm-create").trigger("click");
 		clearCreateGroupPage();
+
+		$("#page-group-menu .page-back").show();
 		$.mobile.changePage("#page-group-menu");
 	});
 	//小幫手 加入團體

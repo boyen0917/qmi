@@ -365,7 +365,7 @@ function requestUpdatePermission( this_gi, addList, delList, callback){
     	if(data.status == 200){
     		//可以直接改權限, 不過取消admin的權限該是多少？
     		//改成直接打api更新好了...
-    		getGroupComboInit( this_gi, callback);
+    		getGroupComboInit( this_gi ).done( callback );
     	
     	} else if(callback) callback( data );
     });
@@ -492,6 +492,7 @@ function resetGroupInfo(){
 
 	info.filter(".view").show();
 	info.filter(".edit").hide();
+
 }
 
 function checkGroupInfoChange(){
@@ -513,7 +514,8 @@ function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
 		getUpdateGroupInfoApi(this_gi, newGn, newGd).complete(function(data){
 	    	if(data.status == 200){
 	    		if( isReady ){
-	    			getGroupComboInit(null, this_gi, function(){
+	    			getGroupComboInit( this_gi ).done( function(){
+	    				updateGroupAllInfoDom( this_gi );
 		    			if(callback) callback();
 		    			s_load_show = false;
 		    		});
@@ -541,7 +543,8 @@ function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
 					$(this).show().off("load");
 					img.filter(".upload").hide();
 				});
-	    		getGroupComboInit(null, this_gi, function(){
+	    		getGroupComboInit( this_gi ).done( function(){
+	    			updateGroupAllInfoDom( this_gi );
 	    			if(callback) callback();
 	    			s_load_show = false;
 	    		});

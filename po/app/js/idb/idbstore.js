@@ -1101,7 +1101,7 @@
     },
 
     limit: function (onSuccess, options) {
-      this.deferred.done(function(success){
+      this.deferred.then(function(success){
         if(success === false) cns.debug("IDB錯誤");
 
         var result = [];

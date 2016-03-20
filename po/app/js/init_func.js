@@ -1,14 +1,16 @@
 $(function(){
 
     groupListToLStorage = function(groupList){
-        var _uiGroupList = $.lStorage(ui) || {};
+        var 
+        groups = QmiGlobal.groups,
+        // var groups = $.lStorage(ui) || {};
         // 剔除不存在的團體
-        var tmp_groupList = [];
+        tmp_groupList = [];
 
         $.each(groupList,function(i,gl_obj){
             tmp_groupList.push(gl_obj.gi);
 
-            if(!$.lStorage(ui).hasOwnProperty(gl_obj.gi) ){
+            if( groups.hasOwnProperty(gl_obj.gi) === false ){
                 gl_obj.guAll = {};
                 gl_obj.gu = gl_obj.me;
 
@@ -28,9 +30,9 @@ $(function(){
                             break;
                     }
                 });
-                _uiGroupList[gl_obj.gi] = gl_obj;
+                groups[gl_obj.gi] = gl_obj;
             } else {
-                $.extend(_uiGroupList[gl_obj.gi],gl_obj)
+                $.extend(groups[gl_obj.gi],gl_obj)
             }
         }); 
 
@@ -68,9 +70,9 @@ $(function(){
                                 break;
                         }
                     });
-                    _uiGroupList[gl_obj.gi] = gl_obj;
+                    groups[gl_obj.gi] = gl_obj;
                 } else {
-                    $.extend(_uiGroupList[gl_obj.gi],gl_obj)
+                    $.extend(groups[gl_obj.gi],gl_obj)
                 }
             });
             delete pri_group_list[i].tmp_groups;
@@ -78,15 +80,15 @@ $(function(){
         });
 
         //groupList 沒有的group 要從 _uiGroupList 剔除
-        for(this_gi in _uiGroupList){
+        for(this_gi in groups){
             if(tmp_groupList.indexOf(this_gi) === -1){
-                console.debug("delete group",_uiGroupList[this_gi])
-                delete _uiGroupList[this_gi];
+                console.debug("delete group",groups[this_gi])
+                delete groups[this_gi];
             }
         }
 
         $.lStorage("_pri_group",pri_group_list);
-        $.lStorage(ui,_uiGroupList);
+        // $.lStorage(ui,_uiGroupList);
     }
 
 
@@ -101,15 +103,17 @@ $(function(){
 
                 // QmiGlobal.groups -> $.lStorage(ui) 
                 // thisGi 不存在list中 重新加入 做tl hash-map
-                if( QmiGlobal.groups.hasOwnProperty(thisGi) === false )
-                    groupListToLStorage( [ comboData ] );
+                // if( QmiGlobal.groups.hasOwnProperty(thisGi) === false ) {
+                //     QmiGlobal.groups[comboData.gi] = comboData;
+                //     groupListToLStorage( [ comboData ] );
+                // }
 
                 var 
                 groupData = QmiGlobal.groups[thisGi],
                 ignoreKeys = ["ul","fl","bl","fbl","tl"],
                 inviteGuAll = {};
 
-                // 部分另外處理成hash-map
+                // 單一團體資訊的部分key 另外處理成hash-map
                 for( var key in comboData ){
                     // ignore
                     if( ignoreKeys.indexOf(key) < 0 ) {
@@ -152,14 +156,15 @@ $(function(){
                     data: data
                 });
 
-            }else{
-                //好像不該在這
-                groupSwitchEnable();    
+            }else{    
                 comboDeferred.resolve({
                     status: false,
                     thisGi: thisGi,
                     data: data
                 });
+
+                //好像不該在這
+                groupSwitchEnable();
             }
         });
 

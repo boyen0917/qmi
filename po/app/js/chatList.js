@@ -1,7 +1,7 @@
 // $(function(){ 
 // });
 
-var windowList = new Object();
+var windowList = {};
 var sortRoomListTimeout = 700;
 
 $(document).ready(function(){
@@ -70,9 +70,8 @@ function updateChatList( giTmp, extraCallBack ){
 	chatListDom.find(".coachmake").hide();
 	chatListDom.find(".loading").show();
 	chatListDom.find(".rows").html("");
-	var userData = $.lStorage(ui);
-	if( !userData )	return;
-	var currentGroup = userData[giTmp];
+
+	var currentGroup = QmiGlobal.groups[giTmp];
 	if( !currentGroup )	return;
 
 	//取得聊天室列表
@@ -143,12 +142,11 @@ function updateChatList( giTmp, extraCallBack ){
 							newRoom.nk = newRoom.cn;
 						}
 
+						newRoom.nk += " ("+ newRoom.cpc +")";
 						tmp[newRoom.ci] = newRoom;
 					});
 					currentGroup.chatAll = tmp;
 
-					// cns.debug( JSON.stringify(userData) );
-			    	$.lStorage(ui, userData);
 
 			    	//remove first drawing, wait untile db saving
 			    	// if( gi==giTmp ){
@@ -188,13 +186,15 @@ function updateChatList( giTmp, extraCallBack ){
 	show chat list data from local storage
 **/
 function showChatList(){
-	var data = $.lStorage(ui);
-	if( null==data ) return;
-	var groupData = data[gi];
+
+	var groupData = QmiGlobal.groups[gi];
 	if( null==groupData ) return;
 	var chatList = groupData.chatAll;
 	if( null==chatList ) return;
-	var targetDiv = $(".subpage-chatList .rows");
+
+	var 
+	deferredPoolArr = [],
+	targetDiv = $(".subpage-chatList .rows");
 
 	if( Object.keys(chatList).length<=1 ){
 		targetDiv.hide();
@@ -210,6 +210,11 @@ function showChatList(){
 		$.each(chatList,function(key,room){
 			//目前type0的全體聊天室無用
 			if( "0"!=room.tp ){
+
+				//全部做完 再做sort
+				var deferred = $.Deferred();
+				deferredPoolArr.push(deferred);
+
 				var chatRoomName=room.nk||"";
 				var imgSrc="";
 				if("1"==room.tp){
@@ -244,8 +249,6 @@ function showChatList(){
 				td = $("<div class='td' data-id='"+room.ci+"'></div>");
 
 				var roomName = chatRoomName.replaceOriEmojiCode();
-				if(room.cpc !== undefined) 
-					roomName += " ("+ room.cpc +")";
 
 				td.append("<div class='name'>" + roomName + "</div>");
 
@@ -260,18 +263,17 @@ function showChatList(){
 				td.append("<div class='drag'></div>");
 				row.append(td);
 
-				setLastMsg( gi, room.ci, table, false );
 				targetDiv.append(table);
+
+				//全部做完 再做sort
+				setLastMsg( gi, room.ci, table, false ).done(deferred.resolve);
 			}
 		});
-
 	
-		setTimeout(function(){
+		$.when.apply($,deferredPoolArr).done(function(){
 			targetDiv.show();
-			// sortRoomList();
-		}, 150);
-		
-		$.lStorage(ui, data);
+			sortRoomList();
+		})
 	}
 
 
@@ -349,9 +351,13 @@ function openChatWindow ( giTmp, ci ){
 }
 
 function updateLastMsg(giTmp, ciTmp, isRoomOpen, eiTmp ){
-	var table = $(".subpage-chatList-row[data-rid='"+ciTmp+"']");
-	setLastMsg( giTmp, ciTmp, table, true, isRoomOpen, eiTmp );
-	// setTimeout(sortRoomList, sortRoomListTimeout);
+	var 
+	deferred = $.Deferred(),
+	table = $(".subpage-chatList-row[data-rid='"+ciTmp+"']");
+
+	setLastMsg( giTmp, ciTmp, table, true, isRoomOpen, eiTmp ).done(deferred.resolve);
+	
+	return deferred.promise();
 }
 function clearChatListCnt( giTmp, ciTmp ){
 	var userData = $.lStorage(ui);
@@ -363,35 +369,30 @@ function clearChatListCnt( giTmp, ciTmp ){
 }
 
 function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
+	var 
+	deferred = $.Deferred(),
+	groupTmp = QmiGlobal.groups[giTmp];
+
 	if( null==isRoomOpen ) isRoomOpen = false;
-	// if( gi!=giTmp ) return;
-	// if(!table) return;
 
-	try{
-		var userData = $.lStorage(ui);
-		var groupTmp = userData[giTmp];
-		if( !groupTmp.guAll||0==Object.keys(groupTmp.guAll).length ){
+	
+	if( groupTmp.guAll && Object.keys(groupTmp.guAll).length != 0){
 
-			//這不需要惹
-			getGroupComboInit( giTmp, function(){
-				userData = $.lStorage(ui);
-				groupTmp = userData[giTmp];
-				// var roomTmp = groupTmp["chatAll"][ciTmp];
-				
-				getDBMsg(giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp );
-			});
-		} else{
-			getDBMsg(giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp );
-		}
-	} catch(e){
-		errorReport(e);
+		getDBMsg(giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ).done(deferred.resolve);
+	} else {
+		deferred.resolve();
 	}
+
+	return deferred.promise();
+		
 }
 
 function getDBMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
-	var userData = $.lStorage(ui);
-	var groupData = userData[giTmp];
-	var index, key;
+	var 
+	deferred = $.Deferred(),
+	groupData = QmiGlobal.groups[giTmp],
+	index, key;
+
 	if( eiTmp ){
 		g_idb_chat_msgs.get(eiTmp, function(dataTmp){
 			var object = dataTmp.data;
@@ -401,6 +402,8 @@ function getDBMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
 				}
 				setLastMsgContent( giTmp, ciTmp, table, object, isShowAlert, isRoomOpen );
 			    
+			    deferred.resolve();
+
 			} catch(e){
 				errorReport(e);
 			}
@@ -426,6 +429,9 @@ function getDBMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
 			} catch(e){
 				errorReport(e);
 			}
+
+			deferred.resolve();
+
 		},{
 		    index: index,
 		    keyRange: g_idb_chat_msgs.makeKeyRange({
@@ -443,6 +449,8 @@ function getDBMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
 		    }
 		});
 	}
+
+	return deferred.promise();
 }
 
 function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen ){
@@ -477,8 +485,10 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
 }
 
 function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, unreadCnt ){
-	var text = "";
-	var mem = groupData.guAll[data.meta.gu];
+	var 
+	text = "",
+	mem = groupData.guAll[data.meta.gu];
+
 	if( null==mem ){
 		cns.debug("[setLastMsgContentPart2] mem null");
 		return;
@@ -566,7 +576,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		} else if( $(".subpage-chatList").is(":visible") ){
 			$('.sm-small-area[data-sm-act="chat"]').trigger("click");
 		}
-		sortRoomList();
+		// sortRoomList();
 	}
 	
 	if( !isMe && isShowAlert ){

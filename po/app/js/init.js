@@ -42,7 +42,8 @@ content_limit = 400;
 proportion = 1.7;
 
 //上一頁 預設
-$(document).data("page-history",[["login"],["#page-group-menu","團體列表"]]);
+// $(document).data("page-history",[["login"],["#page-group-menu","團體列表"]]);
+$(document).data("page-history",[["",""]]);
 
 //上一頁按鈕不需要記錄
 back_button = false;
@@ -222,18 +223,13 @@ $("title").html(g_Qmi_title);
 
 MyDeferred = function  () {
   var myResolve;
-  var p1 = new Promise(function(resolve, reject){
+  var myPromise = new Promise(function(resolve, reject){
     myResolve = resolve;
   });
-  return {
-    resolve: myResolve,
-    done: function(cb) { return p1.then(cb) },
-    //包兩層是防止狀態被外層改變
-    promise: function(){
-      return {
-        done: function(cb){
-          p1.then(cb);
-}}}}}
+
+  myPromise.resolve = myResolve;
+  return myPromise;
+}
 
 // ajax setting
 
