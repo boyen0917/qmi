@@ -345,7 +345,7 @@ $(document).on("click",".page-back",function(){
 
 	if( window.location.href.match(/chat.html/) !== null ) return false;
 
-	if($(this).hasClass("contact-back")) return false;
+	if( this.hasAttribute("customize") ) return false;
 
 	//按上一頁不需要記錄歷程
 	back_exception = true;

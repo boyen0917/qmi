@@ -1784,12 +1784,12 @@ function getPermition(isReget) {
 					}
 					g_room.memCount = data.ul.length;
 					if (g_room.memCount > 2) {
-						$("#header .count").show();
-						$("#header .count").html("(" + g_room.memCount + ")");
+						// $("#header .count").show();
+						// $("#header .count").html("(" + g_room.memCount + ")");
 						$(".extra-content .btn[data-type=edit]").show();
 						$(".extra-content .btn[data-type=exit]").show();
 					} else {
-						$("#header .count").hide();
+						// $("#header .count").hide();
 						$(".extra-content .btn[data-type=edit]").hide();
 						$(".extra-content .btn[data-type=exit]").hide();
 					}
