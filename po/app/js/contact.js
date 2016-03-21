@@ -323,7 +323,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back customize"><img src="images/common/icon/bt_close_activity.png"/></div>'
+                +'<div class="page-back" customize><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
@@ -564,7 +564,7 @@ showAllMemberPage = function(gn) {
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back customize"><img src="images/navi/navi_icon_back.png"/></div>'
+                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#page-group-main").after(page);
@@ -1042,7 +1042,7 @@ updateFavoritePage = function(){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back customize"><img src="images/navi/navi_icon_back.png"/></div>'
+                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#page-group-main").after(page);
@@ -1167,7 +1167,7 @@ showSubFavoritePage = function( fi ){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back customize"><img src="images/common/icon/bt_close_activity.png"/></div>'
+                +'<div class="page-back" customize><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
