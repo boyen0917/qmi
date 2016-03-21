@@ -2,7 +2,7 @@
 $(document).ready(function(){
 	$(".addressBook-refresh").off("click").on("click",function(e){
 		// AddressBook.showAddMemberPage();
-		AddressBook.initAddressBookList();
+		AddressBook.initAddressBookList(true);
 	});
 	$("#page-addressbook-addmem .ca-content-area").niceScroll( {
 		// styler:"fb",
@@ -37,17 +37,24 @@ var AddressBook = AddressBook || {
 	// var isKeyPress = false;
 
 
-	initAddressBookList: function(){
+	initAddressBookList: function(status){
+
+		if (status === undefined) 
+			status = false;
+		else 
+			status = true;
+
 		var instance = this;
 
-		var api_name = "groups/" + gi + "/contacts";
-		var headers = {
+		var 
+		api_name = "groups/" + gi + "/contacts",
+		headers = {
 			"ui":ui,
 			"at":at, 
 			"li":lang
 		};
 
-		ajaxDo(api_name,headers,"get",true).complete(function(data){
+		ajaxDo(api_name,headers,"get",status).complete(function(data){
 			if(data.status == 200){
 				var tmp = $.parseJSON( data.responseText );
 				
@@ -118,7 +125,7 @@ var AddressBook = AddressBook || {
 
 				//get branch data
 				if( !tmp.bl || tmp.bl.length<=0 ){
-					alert("no branch data");
+					// alert("no branch data");
 					return;
 				}
 				instance.bl = {};
@@ -439,8 +446,7 @@ var AddressBook = AddressBook || {
 		if( !page || page.length==0 ){
 			page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
 	            +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-	                // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
-	                +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
+	                +'<div class="page-back" customize><img src="images/common/icon/bt_close_activity.png"/></div>'
 	                +'<h3 class="page-title">成員列表</h3>'
 	            +'</div><div class="subpage-addressBook"></div></div>');
 			$("#"+parentPageID).after(page);
@@ -681,7 +687,7 @@ var AddressBook = AddressBook || {
 		if( !page || page.length==0 ){
 			page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
 	            +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-	                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+	                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
 	                +'<h3 class="page-title">成員列表</h3>'
 	            +'</div><div class="subpage-addressBook"></div></div>');
 			$("#page-group-main").after(page);
@@ -1024,7 +1030,7 @@ var AddressBook = AddressBook || {
 		if( !page || page.length==0 ){
 			page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
 	            +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-	                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+	                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
 	                +'<h3 class="page-title">成員列表</h3>'
 	            +'</div><div class="subpage-addressBook"></div></div>');
 			$("#page-group-main").after(page);
@@ -2181,7 +2187,7 @@ var AddressBook = AddressBook || {
 		if( !page || page.length==0 ){
 			page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
 	            +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-	                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+	                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
 	                +'<h3 class="page-title">成員列表</h3>'
 	            +'</div><div class="subpage-addressBook"></div></div>');
 			$("#page-group-main").after(page);

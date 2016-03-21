@@ -178,7 +178,7 @@ $(document).ready(function () {
 
 	if (g_room.memCount > 2) {
 		$("#header .count").show();
-		$("#header .count").html("(" + g_room.memCount + ")");
+		$("#header .count").html("(" + g_room.cpc + ")");
 	} else {
 		$("#header .count").hide();
 		$(".extra-content .btn[data-type=edit]").hide();
@@ -717,6 +717,7 @@ function getHistoryMsg(bIsScrollToTop) {
 		} else {
 			if (list.length < 20) {
 				//not enough history in db, fetch from server
+				console.log("hiiiiiiii");
 				updateChat(g_earliestDate.getTime(), false, g_currentScrollToDom);
 			} else {
 				// setTimeout(function () {
@@ -974,11 +975,13 @@ function updateChat(time, isGetNewer) {
 				}
 			});
 		}, function () {
-				if (false == isGetNewer) {
-					popupShowAdjust("", $.i18n.getString("COMMON_CHECK_NETWORK"));
-					hideLoading();
-				}
-			}	//end of onerror function
+			g_isLoadHistoryMsgNow = false;
+			
+			if (false == isGetNewer) {
+				popupShowAdjust("", $.i18n.getString("COMMON_CHECK_NETWORK"));
+				hideLoading();
+			}
+		}	//end of onerror function
 	);	//end of op
 }	//end of updateChat
 
@@ -1211,6 +1214,7 @@ function showMsg(object, bIsTmpSend) {
 
 		//left
 		var pic = $("<img class='aut'/>");	//left pic (auo for large pic)
+		console.debug("mem",mem,object.meta.gu)
 		if (mem.aut && mem.aut.length > 0) {
 			pic.attr("src", mem.aut);
 		} else {
@@ -1785,7 +1789,7 @@ function getPermition(isReget) {
 					g_room.memCount = data.ul.length;
 					if (g_room.memCount > 2) {
 						$("#header .count").show();
-						$("#header .count").html("(" + g_room.memCount + ")");
+						$("#header .count").html("(" + g_room.cpc + ")");
 						$(".extra-content .btn[data-type=edit]").show();
 						$(".extra-content .btn[data-type=exit]").show();
 					} else {
