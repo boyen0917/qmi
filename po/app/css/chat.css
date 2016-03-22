@@ -1,6 +1,6 @@
-::-webkit-scrollbar { 
+/*::-webkit-scrollbar { 
     display: none; 
-}
+}*/
 ::-webkit-input-placeholder{
 	font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC",arial,sans-serif;
     /*-webkit-font-smoothing: antialiased;*/

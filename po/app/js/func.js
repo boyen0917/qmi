@@ -4577,7 +4577,7 @@ $(function(){
             if(data.status != 200){
                 $(".sm-loading").show();
                 //沒選單就重撈
-                setTimeout(groupMenuListArea.bind(this,new_gi,invite),1000);
+                // setTimeout(groupMenuListArea.bind(this,new_gi,invite),1000);
                 return false;
             }
 

@@ -34,17 +34,17 @@ FileSharing.prototype = {
 		//unbind self and all children
 		$("section.fileSharing,section.fileSharing *").off();
 
-		$("section.fileSharing span.breadcrumb").niceScroll({
-			cursorcolor:"rgba(210, 210, 210, 0.4)", 
-			cursorwidth: '5',
-			cursorborderradius: '10px',
-			background: 'rgba(255,255,255,0)',
-			cursorborder:"",
-			boxzoom:false,
-			zindex: 999,
-			scrollspeed: 90,
-			mousescrollstep: 40
-		});
+		// $("section.fileSharing span.breadcrumb").niceScroll({
+		// 	cursorcolor:"rgba(210, 210, 210, 0.4)", 
+		// 	cursorwidth: '5',
+		// 	cursorborderradius: '10px',
+		// 	background: 'rgba(255,255,255,0)',
+		// 	cursorborder:"",
+		// 	boxzoom:false,
+		// 	zindex: 999,
+		// 	scrollspeed: 90,
+		// 	mousescrollstep: 40
+		// });
 
 		thisFileDom.find(".home").click(function(){
 			thisFile.ti = thisFile.mainTi;
@@ -81,8 +81,12 @@ FileSharing.prototype = {
 		thisFileDom.find("div.top img.more").click(thisFile.showMore.bind(thisFile));
 		//檔案操作 delete download
 		thisFileDom.find("span.operator img").click(function(){
-			popupShowAdjust( "",$.i18n.getString("FILESHARING_DELETE_CONFIRM"),true,true,[thisFile[$(this).attr("name")].bind(thisFile)]);
-			// thisFile[$(this).attr("name")]();
+			var name = $(this).attr("name");
+			if( name === "delete"){
+				popupShowAdjust( "",$.i18n.getString("FILESHARING_DELETE_CONFIRM"),true,true,[thisFile.delete.bind(thisFile)]);
+			} else {
+				thisFile[name]();
+			}
 		});
 
 		//more
@@ -379,29 +383,38 @@ FileSharing.prototype = {
 		        break;
 		    }
 		    progressSectionDom.show();
-		    var deferred = $.Deferred();
+		    var uploadDeferred = $.Deferred();
 		    var fiApiData = {};
-		    $.when(new AjaxTransfer().execute({
+
+		    
+
+		    var step1Deferred = MyDeferred();
+
+		    new AjaxTransfer().execute({
 				url: "groups/" + gi + "/files/",
 				method: "post",
 				body: {
 					tp: tp,
 					ti: thisFile.ti
 				},
-				error: function(data){
-					deferred.reject({response:data,api:1});
-				}
-			})).then(function(data){
-				console.debug("upload to s3 data",data);
-				fiApiData = data;
-				return ($.ajax({
+				error: function(errData){
+					uploadDeferred.reject({response:errData,api:1});
+				},
+				success: step1Deferred.resolve
+			});
+
+		    step1Deferred.then(function(data){
+		    	fiApiData = data;
+		    	var step2Deferred = MyDeferred();
+
+		    	$.ajax({
 					url: data.s3,
 					type: 'PUT',
 					contentType: contentType,
 				 	data: fileData, 
 					processData: false,
-					error: function(data){
-						deferred.reject({response:data,api:"upload to s3"});
+					error: function(errData){
+						uploadDeferred.reject({response: errData,api:"upload to s3"});
 					},
 					xhr: function() {
 						var progressDom = progressSectionDom.find(".progress");
@@ -414,10 +427,16 @@ FileSharing.prototype = {
 							}
 						});
 						return xhr;
-					}
-				}));
-			}).then(function(data){
-				return (new AjaxTransfer().execute({
+					},
+					success: step2Deferred.resolve
+				})
+
+		    	return step2Deferred;
+
+		    }).then(function(data){
+		    	var step3Deferred = MyDeferred();
+
+		    	new AjaxTransfer().execute({
 					url: "groups/" + gi + "/files/"+ fiApiData.fi +"/commit",
 					method: "put",
 					body: {
@@ -427,12 +446,15 @@ FileSharing.prototype = {
 						si: fileData.size,
 						md: {w:100,h:100,l:100}
 					},
-					error: function(data){
-						deferred.reject({response:data,api:"commit",});
-					}
-				}));
+					error: function(errData){
+						uploadDeferred.reject({response:errData,api:"commit",});
+					},
+					success: step3Deferred.resolve
+				})
+
+				return step3Deferred;
 		    }).then(function(data){
-		    	return (new AjaxTransfer().execute({
+		    	new AjaxTransfer().execute({
 					url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 					method: "post",
 					body: {
@@ -452,15 +474,15 @@ FileSharing.prototype = {
 							} 
 						]
 					},
-					error: function(data){
-						deferred.reject({response:data,api:"post 2"});
-					}
-				}));
-		    }).then(function(data){
-		    	deferred.resolve(data);
-		    });
+					error: function(errData){
+						uploadDeferred.reject({response: errData,api:"post 2"});
+					},
+					success: uploadDeferred.resolve
+				})
+		    })
 
-		    deferred.done(function(data){
+
+		    uploadDeferred.done(function(data){
 				toastShow($.i18n.getString("FILESHARING_UPLOAD_SUCCESS"))
 			}).fail(function(data){
 				console.debug("error ",data);

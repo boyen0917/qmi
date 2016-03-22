@@ -1726,4 +1726,26 @@ $(function(){
 		return deferred.promise();
     }
 
+    //等待變數完成
+    myWait = function(variable,type){
+		var deferred = $.Deferred();
+		var cnt = 0;
+		(function(){
+			if (cnt > 30) {
+				deferred.resolve(false);
+				return false;
+			} else {
+				cnt++;
+			}
+			var args = arguments;
+			setTimeout(function(){
+				if ( ( typeof type === "undefined" && typeof variable() !== "undefined" ) || ( typeof type !== "undefined" && variable() !== type ) )
+				  deferred.resolve();
+				else
+				  args.callee.apply(this,args);
+			},100);
+		})(arguments)
+
+      return deferred.promise();
+	}
 });
