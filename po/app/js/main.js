@@ -344,59 +344,14 @@ $(function(){
 	//更換團體
 	$(document).on("click",".sm-group-area.enable",function(){
 
-		var this_group = $(this);
-		var this_gi = $(this).attr("data-gi");
-
-		var _groupData = $.lStorage(ui);
-
-		//後台還原已退出團體 會出現左側選單團體點選時 guAll空的或是this_gi不存在的問題
-		try{
-			Object.keys(_groupData[this_gi].guAll).length;
-		}catch(e){
-			e.special = {
-				error:"後台還原已退出團體 會出現左側選單團體點選時 guAll空的或是this_gi不存在的問題",
-				_groupData: _groupData,
-				this_gi: this_gi,
-				code: "_groupData[this_gi].guAll"
-			}
-			errorReport(e);
-			return false;
-		}
-
-		if(Object.keys(_groupData[this_gi].guAll).length == 0){
-			getGroupCombo(this_gi,function(){
-                this_group.trigger("click");
-            });
-            return false;
-		}
-
-		$(".sm-group-area").removeClass("enable");
-		$(".sm-group-area.active").removeClass("active");
 		$(this).addClass("active");
 
-		//清空畫面
-		$(".st-top-event-default").show();
-		$(".st-top-event-set").hide();
-		$(".feed-subarea").html("");
-		$(".sm-small-area.active").removeClass("active");
-
 		//指定gi
-		timelineChangeGroup(this_gi);
+		timelineChangeGroup($(this).attr("data-gi")).done(function(){
+			//updatePollingCnts
+            updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
+		}.bind(this));
 
-		//updatePollingCnts
-		updatePollingCnts(this_group.find(".sm-count"),this_group.data("polling-cnt"));
-			
-		//切換團體時, 選目前第一個選項
-		var tmp = $(".sm-small-area:visible");
-		if( tmp.length>0 ){
-			$(tmp[0]).addClass("active");
-			timelineSwitch( ($(tmp[0]).data("sm-act") || "feeds"),true);
-		}else{
-			timelineSwitch("feeds",true);
-		}
-
-		//置頂設定
-		topEvent();
 	});
 	
 	//----------------------------------- timeline ---------------------------------------------  

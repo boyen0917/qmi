@@ -142,16 +142,10 @@ function updateChatList( giTmp, extraCallBack ){
 							newRoom.nk = newRoom.cn;
 						}
 
-						newRoom.nk += " ("+ newRoom.cpc +")";
 						tmp[newRoom.ci] = newRoom;
 					});
 					currentGroup.chatAll = tmp;
 
-
-			    	//remove first drawing, wait untile db saving
-			    	// if( gi==giTmp ){
-			    	// 	showChatList();
-			    	// }
 
 			    	if(list.length>0){
 				    	var cnt=0;
@@ -249,6 +243,9 @@ function showChatList(){
 				td = $("<div class='td' data-id='"+room.ci+"'></div>");
 
 				var roomName = chatRoomName.replaceOriEmojiCode();
+
+				if( room.hasOwnProperty("cpc") === true && room.cpc > 2)
+					roomName +=  " (" + room.cpc + ") ";
 
 				td.append("<div class='name'>" + roomName + "</div>");
 

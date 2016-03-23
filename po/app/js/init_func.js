@@ -277,8 +277,6 @@ $(function(){
                 qmiGroupData.set.tab[6].sw = true;
         }
 
-        //不一定每次都要
-        updateTab( thisGi );
     }
 
 

@@ -1132,31 +1132,31 @@ $(function(){
 	}
 
 	//更新團體資訊
-	updateGroupAllInfoDom = function( this_gi ){
+	updateGroupAllInfoDom = function( thisGi ){
 		try{
-			var group = QmiGlobal.groups[this_gi];
+			var group = QmiGlobal.groups[thisGi];
 
 			//update icon
 			var emptyAuo = "images/common/others/name_card_nophoto_profile.png";
 			var emptyAut = "images/common/others/empty_img_all_l.png";
 			if( group.auo ){
-				$(".polling-group-pic-o[data-gi="+this_gi+"]").attr("src", group.auo);
+				$(".polling-group-pic-o[data-gi="+thisGi+"]").attr("src", group.auo);
 			} else {
-				$(".polling-group-pic-o[data-gi="+this_gi+"]").attr("src", emptyAuo);
+				$(".polling-group-pic-o[data-gi="+thisGi+"]").attr("src", emptyAuo);
 			}
 			if( group.aut ){
-				$(".polling-group-pic-t[data-gi="+this_gi+"]").attr("src", group.aut);
+				$(".polling-group-pic-t[data-gi="+thisGi+"]").attr("src", group.aut);
 			} else {
-				$(".polling-group-pic-t[data-gi="+this_gi+"]").attr("src", emptyAut);
+				$(".polling-group-pic-t[data-gi="+thisGi+"]").attr("src", emptyAut);
 			}
 
 			//update name
 			var gn = htmlFormat( group.gn );
 			var gd = htmlFormat( group.gd );
-			$(".polling-group-name[data-gi="+this_gi+"]").html(gn);
-			$(".polling-group-description[data-gi="+this_gi+"]").html(gd);
+			$(".polling-group-name[data-gi="+thisGi+"]").html(gn);
+			$(".polling-group-description[data-gi="+thisGi+"]").html(gd);
 
-			if( gi==this_gi ){
+			if( gi==thisGi ){
 				//update icon
 				if( group.auo ){
 					$(".polling-group-pic-o.currentGroup").attr("src", group.auo);
@@ -1174,6 +1174,9 @@ $(function(){
 				$(".polling-group-description.currentGroup").html(gd);
 			}
 			
+			// 等於當前團體 再做更新ui tab
+        	updateTab( thisGi );
+        	
 		} catch(e){
 			errorReport(e);
 		}
