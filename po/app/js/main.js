@@ -344,6 +344,11 @@ $(function(){
 	//更換團體
 	$(document).on("click",".sm-group-area.enable",function(){
 
+		
+		$(".sm-group-area")
+		.removeClass("active")
+		.removeClass("enable");
+
 		$(this).addClass("active");
 
 		//指定gi

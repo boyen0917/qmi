@@ -929,17 +929,13 @@ function updateChat(time, isGetNewer) {
 					//getting old msgs
 					if( time !== undefined ) {
 						g_isLoadHistoryMsgNow = false;
+						
 						//no more history
-						if (1 >= data.el.length) {
-							g_isEndOfHistory = true;
-							$("#chat-loading-grayArea").hide();
-							$("#chat-loading").hide();
-							$("#chat-nomore").show();
-							// g_container.getNiceScroll()[0].wheelprevented = false;
-						} else {
-							//scroll to the last dom we were at
+						if (1 >= data.el.length) 
+							noMoreHistoryMsg();
+						else
 							hideLoading();
-						}
+
 					} else {
 						// 第一次進入 滾動至底
 						if (true==g_isFirstTimeLoading) {
@@ -950,6 +946,9 @@ function updateChat(time, isGetNewer) {
 								$("#chat-loading").hide();
 								$("#chat-loading-grayArea").show();
 							}
+
+							//no more history
+							if (1 >= data.el.length) noMoreHistoryMsg();
 
 							scrollToBottom();
 						} 
@@ -2790,6 +2789,15 @@ uploadChatAvatar = function(this_gi, file, ti, permission_id, ori_arr, tmb_arr, 
 	}
 	reader.readAsDataURL(file);
 }
+
+function noMoreHistoryMsg() {
+	g_isEndOfHistory = true;
+	$("#chat-loading-grayArea").hide();
+	$("#chat-loading").hide();
+	$("#chat-nomore").show();
+}
+
+
 
 /**
               ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          

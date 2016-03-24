@@ -389,6 +389,8 @@ onCheckVersionDone = function(needUpdate){
         });
 
         deferred.done(function(data){
+        	s_load_show = false;
+
             if(data.fail === true) {
                 //取得group list 失敗 代表自動登入失敗了
                 // localStorage.removeItem("_loginData");
@@ -398,7 +400,7 @@ onCheckVersionDone = function(needUpdate){
             $.lStorage("refreshChk", false);
             localStorage["uiData"] = JSON.stringify($.lStorage(ui));
             // document.location = data.location;    
-            $.mobile.changePage(data.location)
+            $.mobile.changePage(data.location);
 
 			//聊天室開啓DB
 	    	initChatDB(); 
@@ -409,8 +411,7 @@ onCheckVersionDone = function(needUpdate){
 				//關閉返回鍵
 				$("#page-group-menu .page-back").hide();
 				cns.debug("no group ");
-
-				s_load_show = false;
+				
 				// 兩個選項都要執行polling()
 				polling();
 			}else{

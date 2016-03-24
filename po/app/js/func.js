@@ -325,6 +325,15 @@ $(function(){
 
     timelineChangeGroup = function (thisGi) {
 
+        $(".official").hide();
+        
+        //清空畫面
+        $(".st-top-event-default").show();
+        $(".st-top-event-set").hide();
+        $(".feed-subarea").html("");
+        $(".sm-small-area.active").removeClass("active");
+
+
         var 
         changeDeferred = $.Deferred(),
         comboDeferred = $.Deferred();
@@ -344,15 +353,6 @@ $(function(){
 
             //檢查官方帳號
             initOfficialGroup( gi );
-
-            $(".sm-group-area").removeClass("enable");
-            $(".sm-group-area.active").removeClass("active");
-
-            //清空畫面
-            $(".st-top-event-default").show();
-            $(".st-top-event-set").hide();
-            $(".feed-subarea").html("");
-            $(".sm-small-area.active").removeClass("active");
 
             //置頂設定
             topEvent();
@@ -441,7 +441,7 @@ $(function(){
                 
                 if( $(".st-filter-area").hasClass("st-filter-lock") === false ){
                     //將選項存入
-                    $("#page-group-main").data("navi",this_subarea.data("tp"));
+                    $("#page-group-main").data("navi",0);
 
                     timelineListWrite().done(function(result){
 
@@ -679,6 +679,7 @@ $(function(){
         switchDeferred.done(function(result){
 
             timelineScrollTop();
+            groupSwitchEnable();
 
             //關閉筆功能
             if($(".feed-compose-area").is(":visible")){
@@ -4435,7 +4436,6 @@ $(function(){
                 $.mobile.changePage("#page-group-main");
 
                 //檢查置頂
-                // polling();
                 topEventChk();
                 timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
                 toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
@@ -6812,7 +6812,6 @@ $(function(){
                     status: false,
                     interval: polling_interval*2
                 });
-                setTimeout(polling,polling_interval*2);
                 return false;
             }
         });
