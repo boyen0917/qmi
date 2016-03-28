@@ -929,7 +929,7 @@ function updateChat(time, isGetNewer) {
 					//getting old msgs
 					if( time !== undefined ) {
 						g_isLoadHistoryMsgNow = false;
-						
+
 						//no more history
 						if (1 >= data.el.length) 
 							noMoreHistoryMsg();
@@ -1751,7 +1751,7 @@ function getPermition(isReget) {
 						g_room.memList[data.ul[i].gu] = data.ul[i];
 					}
 					g_room.memCount = data.ul.length;
-					if (g_room.memCount > 2) {
+					if (g_room.cpc !== undefined) {
 						$("#header .count").show();
 						$("#header .count").html("(" + g_room.cpc + ")");
 						$(".extra-content .btn[data-type=edit]").show();

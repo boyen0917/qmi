@@ -6827,7 +6827,83 @@ $(function(){
         })
     }
 
-    pollingCountsWrite = function(polling_data){
+
+    pollingCountsWrite = function(pollingData){
+
+        var 
+        pollingData = ( pollingData       == undefined ?  $.lStorage("_pollingData")  : pollingData       ),
+        cnts        = ( pollingData.cnts  == undefined ?  []                          : pollingData.cnts  ),
+        gcnts       = ( pollingData.gcnts == undefined ?  { G1: 0, G3: 0 }            : pollingData.gcnts ),
+        groupsData  =   QmiGlobal.groups,
+
+        //排序用
+        sort_arr = [],
+
+        // 先將當前團體的 cnts 更新在 ui 中
+        index = cnts.find(function(obj){ return obj.gi === gi; });
+        if( index != undefined) {
+            var cntObj = cnts[index];
+
+            ["A1","A2","A3","A4"].forEach(function(key){
+                if ( cntObj.hasOwnProperty(key) === true ) {
+                    $(".polling-cnt[data-polling-cnt="+ key +"] .sm-count")
+                    .html( countsFormat( cntObj[key] ) ).show()
+                    .data("gi",gi);
+                }
+            });
+
+            // 有cl 就更新 聊天室列表的cnt
+            if( cntObj.hasOwnProperty("cl") === false ) cntObj.cl = [] ;
+            cntObj.cl.forEach(function(obj){
+                var tmpDiv = $(".sm-cl-count[data-ci=" + obj.ci + "]");
+                if (obj.B7 > 0) {
+                    tmpDiv.html(countsFormat(clTmp.B7)).show();
+                } else {
+                    tmpDiv.hide();
+                }
+            })
+        }
+
+        // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
+
+        cnts.forEach(function(cntObj){
+            var thisQmiGroupObj = groupsData[cntObj.gi];
+
+            if( cntObj.A5 > 0 ){
+                var dom = $(".sm-group-area[data-gi=" + cntObj.gi + "]").find(".sm-count").hide();
+                if(gi == cntObj.gi){
+                    updatePollingCnts(dom,"A5");
+                } else{
+                    sort_arr.push([cntObj.gi,cntObj.A5]);
+                    dom.html( countsFormat( cntObj.A5 ) ).show();
+                }
+            }
+
+            // 無cl 或 未有此gi 就不做
+            if( cntObj.hasOwnProperty("cl") === false ||
+                thisQmiGroupObj === undefined ||
+                thisQmiGroupObj.hasOwnProperty( chatAll ) === false 
+            ) return ;
+
+            cntObj.cl.forEach(function(clObj){
+                if( thisQmiGroupObj.chatAll.hasOwnProperty( clObj.ci ) === true ) 
+                    thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
+            })
+
+        })
+
+
+        //排序
+        sort_arr.sort(function(a, b) {return a[1] - b[1]});
+        sort_arr.forEach(function(obj){
+            var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
+            sortedGroup.detach();
+            $(".sm-group-list-area").prepend(sortedGroup);
+        })
+            
+    }
+
+    pollingCountsWriteBak = function(polling_data){
         var polling_data = polling_data || $.lStorage("_pollingData");
         var cnts = polling_data.cnts;
         var gcnts = polling_data.gcnts;
