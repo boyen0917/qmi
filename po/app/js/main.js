@@ -354,7 +354,7 @@ $(function(){
 		//指定gi
 		timelineChangeGroup($(this).attr("data-gi")).done(function(){
 			//updatePollingCnts
-            updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
+        	updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 		}.bind(this));
 
 	});
@@ -1739,19 +1739,13 @@ $(function(){
 	//polling update cnts
 	$(document).on("click",".polling-cnt",function(e){
 		var thisDom = $(this);
-		if( thisDom.hasClass("sm-group-area") && !thisDom.hasClass("enable") ){
-			return;
-		}
+
+		// 尚未與許更換團體
+		if( thisDom.hasClass("sm-group-area") && !thisDom.hasClass("enable") ) return;
+		// 聊天室不做清cnt動作
+		if( thisDom.data("polling-cnt") === "A3" ) return;
+		
 		thisDom.find(".sm-count").hide();
-		if(thisDom.data("gi") == gi) {
-			$(".sm-small-area[data-polling-cnt=A1]").find(".sm-count");
-		}
-		//local 歸零 因為
-		var _pollingData = $.lStorage("_pollingData");
-		if(_pollingData && _pollingData.cnts[gi]){
-			_pollingData.cnts[gi].A5 = 0;
-			$.lStorage("_pollingData",_pollingData);
-		}
 		updatePollingCnts(thisDom.find(".sm-count"),thisDom.data("polling-cnt"));
 	});	
 	

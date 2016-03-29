@@ -270,6 +270,13 @@ function showChatList(){
 		$.when.apply($,deferredPoolArr).done(function(){
 			targetDiv.show();
 			sortRoomList();
+
+			//desktop 版的chrome scrollbar 會被吃掉 這算 activate
+			var scrollDom = $("#page-group-main .gm-content > div:nth-child(2)");
+	        scrollDom.css("overflow-y","hidden");
+	        setTimeout(function(){
+	            scrollDom.css("overflow-y","scroll");
+	        },10);
 		})
 	}
 
@@ -361,7 +368,6 @@ function clearChatListCnt( giTmp, ciTmp ){
 	var groupTmp = userData[giTmp];
 	var roomTmp = groupTmp["chatAll"][ciTmp];
 	roomTmp.unreadCnt = 0;
-	$.lStorage(ui, userData);
 	$(".subpage-chatList-row[data-rid='"+ciTmp+"'] .cnt").html("");
 }
 
@@ -576,25 +582,25 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		// sortRoomList();
 	}
 	
-	if( !isMe && isShowAlert ){
-		try{
-			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
-			var cnTmp = data.cn||"";
-			if( data.meta.ct>=login_time ){
-				riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
-					cns.debug(ciTmp);
-					openChatWindow( giTmp, ciTmp );
-				});
-			} else{
-				// cns.debug("chat msg muted, msg time", data.meta.ct);
-				// cns.debug("chat msg muted, login tm", login_time);
-			}
-		} catch(e) {
-			cns.debug( e.message );
-		}
-	} else {
-		// cns.debug(groupData.gu, mem.gu, isShowAlert);
-	}
+	// if( !isMe && isShowAlert ){
+	// 	try{
+	// 		cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
+	// 		var cnTmp = data.cn||"";
+	// 		if( data.meta.ct>=login_time ){
+	// 			riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
+	// 				cns.debug(ciTmp);
+	// 				openChatWindow( giTmp, ciTmp );
+	// 			});
+	// 		} else{
+	// 			// cns.debug("chat msg muted, msg time", data.meta.ct);
+	// 			// cns.debug("chat msg muted, login tm", login_time);
+	// 		}
+	// 	} catch(e) {
+	// 		cns.debug( e.message );
+	// 	}
+	// } else {
+	// 	// cns.debug(groupData.gu, mem.gu, isShowAlert);
+	// }
 }
 
 function sortRoomList(){

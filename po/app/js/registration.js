@@ -401,7 +401,7 @@ onCheckVersionDone = function(needUpdate){
             localStorage["uiData"] = JSON.stringify($.lStorage(ui));
             // document.location = data.location;    
             $.mobile.changePage(data.location);
-
+            
 			//聊天室開啓DB
 	    	initChatDB(); 
 			initChatCntDB(); 

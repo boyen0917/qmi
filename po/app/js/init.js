@@ -206,11 +206,42 @@ window.QmiGlobal = {
 			return obj[Object.keys(obj)[Object.keys(obj).length-1]];
 		else 	 
 			return obj[Object.keys(obj)[0]];
-	}
+	},
+
+	timelineTestObj: (function(){
+		var timelineArr = [];
+		return {
+			push: function(obj){
+				timelineArr.push(obj);
+			},
+			show: function(){
+				timelineArr.forEach(function(obj){
+					obj.selector[obj.method](obj.event);
+				})
+			}
+		}
+	})(),
+
+	timelineMove: (function(){
+		var chk = false;
+
+		return function(){
+			if(chk === false) {
+				chk = true;
+				$("#page-group-main").animate({marginLeft: "100%"})
+			} else {
+				chk = false;
+				$("#page-group-main").animate({marginLeft: 0})
+			}
+		}
+		
+	})()
 };
 
 
-
+$(".sm-hr").click(function(){
+	
+})
 
 // window.QmiGlobal.groupDataModel.get()
 // window.QmiGlobal.groupDataModel.set()

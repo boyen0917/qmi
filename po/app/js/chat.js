@@ -780,13 +780,6 @@ function hideLoading() {
 			}
 		});
 	}
-	// // firstDom.css("background", "red");
-	// var tmp = loading.offset();
-	// if( tmp ){
-	// 	var offset = loading.offset().top+loading.height();
-	// 	$('html, body').scrollTop( offset );
-	// }
-	// g_isLoadHistoryMsgNow = false;
 
 }
 
@@ -876,12 +869,10 @@ function updateChat(time, isGetNewer) {
 	}
 
 	op(api, "GET", "", function (data, status, xhr) {
-			var userData = $.userStorage();
-			g_group = userData[gi];
+			g_group = $.userStorage()[gi];
 			g_room = g_group["chatAll"][ci];
 			if (null == g_room.lastCt){
 				g_room.lastCt = 0;
-				$.userStorage(userData);
 			}
 
 			onChatReceiveMsg( gi, ci, g_room.uiName, data.el, function(){
@@ -890,40 +881,25 @@ function updateChat(time, isGetNewer) {
 					var object = data.el[i];
 					if (object.hasOwnProperty("meta")) {
 
-						if (object.meta.ct > g_room.lastCt) {
-							g_room.lastCt = object.meta.ct;
-							// console.debug(object.meta.ct);
-						}
+						if (object.meta.ct > g_room.lastCt) g_room.lastCt = object.meta.ct;
 
 						//pass shown msgs
-						if (g_msgs.indexOf(object.ei) >= 0) {
-							continue;
-						} else {
-							showMsg(object);
-							// if (g_currentScrollToDom&&!isGetNewer) g_currentScrollToDom.scrollIntoView();
-							// isUpdateFinish = false;
-						}
+						if (g_msgs.indexOf(object.ei) < 0) showMsg(object);
 					}
 				}
 
 				if (isUpdatePermission) getPermition(true);
 
-				
-
 				// isGetNewer 取時間點舊到新的訊息 只有polling需要 
 				if (isGetNewer) {
 
-					//update finished
-					if (data.el.length <= 1) {
+					// 繼續取新訊息
+					if (data.el.length > 10) updateChat(g_room.lastCt, true);
 
-						sendMsgRead();
-						if (isEndOfPageTmp) scrollToBottom();
+					sendMsgRead();
 
-					} else { //update not finish
-						// 繼續取新訊息
-						if( g_room.lastCt !== undefined )
-							updateChat(g_room.lastCt, true);
-					}
+					if (isEndOfPageTmp) scrollToBottom();
+
 				} else { 
 
 					//getting old msgs
