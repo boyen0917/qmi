@@ -314,8 +314,7 @@ $(function(){
 		var canvas = document.createElement('canvas');
 		canvas.width = tempW;
 		canvas.height = tempH;
-		var ctx = canvas.getContext("2d");
-		ctx.drawImage(img, x, y, tempW, tempH);
+		canvas.getContext("2d").drawImage(img, x, y, tempW, tempH);
 		var dataURL = canvas.toDataURL("image/png",quality);
 		var img_obj = {
 			w: Math.floor(tempW),
@@ -343,17 +342,15 @@ $(function(){
     }
 
 	getVideoBlob = function(videoDom, x,y,max_w,max_h,quality){
-		// var dataView = new Uint8Array(video);
-		// var dataBlob = new Blob([dataView]);//new blob
-		// return dataBlob;
 		if( null==videoDom || videoDom.length<=0 ) return null;
 		var video = videoDom[0];
 		if( null==video ) return null;
-		var vid_obj = {
+		
+		return {
 			l: Math.floor(video.duration*1000),
 			blob: dataURItoBlob( videoDom.attr("src") )
 		}
-		return vid_obj;
+		
 	}
 
 

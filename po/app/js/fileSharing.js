@@ -296,8 +296,7 @@ FileSharing.prototype = {
 				fiArr = this.fileItemArr;
 				// cns.debug("fileList",JSON.stringify(fileList,null,2));
 				for(i=0;i<fileList.length;i++) {
-					var itemObj = new FileItem(fileList[i]);
-					fiArr.push(itemObj);
+					fiArr.push(new FileItem(fileList[i]));
 				}
 				//排序 desc
 				fiArr.sort(function(a, b) {return b.meta.ct - a.meta.ct });
@@ -319,12 +318,10 @@ FileSharing.prototype = {
 				// alert("...");
 				var s3Data = JSON.parse(data.responseText);
 				if(typeof s3Data == "undefined") toastShow("檔案錯誤");
-				cns.debug("hoho",JSON.parse(data.responseText));
 				var dlData = JSON.parse(data.responseText);
 				var link = document.createElement('a');
 			    link.download = this.activeItemData.fn;
 			    link.href = dlData.s3;
-			    cns.debug("dlData.s3",dlData.s3);
 			    link.click();
 
 			}.bind(this)
@@ -350,7 +347,7 @@ FileSharing.prototype = {
 		inputFileDom.trigger("click");
 		inputFileDom.off().on('change',function(e){
 			var fileData = $(this)[0].files[0];
-
+			console.debug("file",fileData.type);return;
 			//每次選擇完檔案 就reset input file
 			$(this).replaceWith( $(this).val('').clone( true ) );
 
@@ -372,171 +369,233 @@ FileSharing.prototype = {
 
 			coverDom.addClass("disable");
 			thisFile.fileDom.find("section.file-cover ul").hide();
-			var tp = 0;
-			var contentType = " ";
+			var fileTp = 0, contentType = " ",
+			switchDeferred = $.Deferred();
 
 		    switch(true){
 		      case fileData.type.match("image") instanceof Array:
-		        tp = 1;
+		        fileTp = 1;
+
+
+		        var reader = new FileReader();
+		        reader.onloadend = function() {
+		            var tempImg = new Image();
+		            tempImg.src = reader.result;
+		            tempImg.onload = function() {
+		                
+		                //大小圖都要縮圖
+		                var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
+		                var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
+		                
+		                data: o_obj.blob,
+		                si: o_obj.blob.size
+		                
+		                switchDeferred.resolve();
+		            }
+		        }
+		        reader.readAsDataURL(fileData);
+
+
+
 		        break;
 		      case fileData.type.match("video") instanceof Array:
-		        tp = 2;
+		        fileTp = 2;
 		        contentType = "video/mp4";
+		        switchDeferred.resolve();
+		        break;
+		      case fileData.type.match("audio") instanceof Array:
+		        fileTp = 3;
+		        contentType = "audio/mp4";
+		        switchDeferred.resolve();
 		        break;
 		    }
 		    progressSectionDom.show();
-		    var uploadDeferred = $.Deferred();
-		    var fiApiData = {};
 
-		    
+		    switchDeferred.done(function(){
 
-		    var step1Deferred = MyDeferred();
 
-		    new AjaxTransfer().execute({
-				url: "groups/" + gi + "/files/",
-				method: "post",
-				body: {
-					tp: tp,
-					ti: thisFile.ti
-				},
-				error: function(errData){
-					uploadDeferred.reject({response:errData,api:1});
-				},
-				success: step1Deferred.resolve
-			});
+		    	var 
+			    uploadDeferred = $.Deferred(),
+			    fiApiData = {},
+				tmpDeferred = MyDeferred();
 
-		    step1Deferred.then(function(data){
-		    	fiApiData = data;
-		    	var step2Deferred = MyDeferred();
-
-		    	$.ajax({
-					url: data.s3,
-					type: 'PUT',
-					contentType: contentType,
-				 	data: fileData, 
-					processData: false,
-					error: function(errData){
-						uploadDeferred.reject({response: errData,api:"upload to s3"});
-					},
-					xhr: function() {
-						var progressDom = progressSectionDom.find(".progress");
-						var textDom = progressSectionDom.find(".text");
-						var xhr = new window.XMLHttpRequest();
-						xhr.upload.addEventListener('progress', function(e) {
-							if (e.lengthComputable) {
-							    progressDom.css('width', '' + (148 * e.loaded / e.total) + 'px');
-							    textDom.html(Math.round(100 * e.loaded / e.total) + "%");
-							}
-						});
-						return xhr;
-					},
-					success: step2Deferred.resolve
-				})
-
-		    	return step2Deferred;
-
-		    }).then(function(data){
-		    	var step3Deferred = MyDeferred();
-
-		    	new AjaxTransfer().execute({
-					url: "groups/" + gi + "/files/"+ fiApiData.fi +"/commit",
-					method: "put",
-					body: {
-				    	ti: thisFile.ti, 
-				    	tp: tp,
-						mt: fileData.type || "text",
-						si: fileData.size,
-						md: {w:100,h:100,l:100}
-					},
-					error: function(errData){
-						uploadDeferred.reject({response:errData,api:"commit",});
-					},
-					success: step3Deferred.resolve
-				})
-
-				return step3Deferred;
-		    }).then(function(data){
-		    	new AjaxTransfer().execute({
-					url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
+			    new AjaxTransfer().execute({
+					url: "groups/" + gi + "/files/",
 					method: "post",
 					body: {
-				    	meta: {
-							tt: "",
-							tp: "08",
-							lv: 1
-						}, 
-						ml: [
-						    {
-						    	fi: fiApiData.fi,
-						    	ftp: "0",
-						    	fn: fileData.name,
-						    	c: "It's a File",
-						    	si: fileData.size,
-						    	tp: 26
-							} 
-						]
+						tp: fileTp,
+						ti: thisFile.ti
 					},
 					error: function(errData){
-						uploadDeferred.reject({response: errData,api:"post 2"});
+						uploadDeferred.reject({response:errData,api:1});
 					},
-					success: uploadDeferred.resolve
-				})
-		    })
+					success: tmpDeferred.resolve
+				});
+
+			    tmpDeferred.then(function(data){
+			    	fiApiData = data;
+			    	var tmpDeferred = MyDeferred(),
+			    	s3Arr = [];
+
+			    	
+
+			    	// pic video -> s3 s32, others -> s3 only
+
+					s3Arr.push( uploadToS3TmpDef(data.s3) );
 
 
-		    uploadDeferred.done(function(data){
-				toastShow($.i18n.getString("FILESHARING_UPLOAD_SUCCESS"))
-			}).fail(function(data){
-				console.debug("error ",data);
-			}).always(function(){
-				coverDom.removeClass("disable").trigger("click").end()
-				.find("ul").show();
 
-				progressSectionDom.hide();
-				thisFile.getList();
-			});
-		});
+					$.when.apply($,s3Arr).done(tmpDeferred.resolve)
+
+
+					
+
+
+
+			    	function uploadToS3TmpDef (url) {
+			    		return $.ajax({
+							url: url,
+							type: 'PUT',
+							contentType: contentType,
+						 	data: fileData, 
+							processData: false,
+							error: function(errData){
+								uploadDeferred.reject({response: errData,api:"upload to s3"});
+							},
+							xhr: function() {
+								var xhr = new window.XMLHttpRequest();
+
+								xhr.upload.addEventListener('progress', function(e) {
+									if (e.lengthComputable) {
+									    progressSectionDom
+									    .find(".progress").css('width', '' + (148 * e.loaded / e.total) + 'px').end()
+									    .find(".text").html(Math.round(100 * e.loaded / e.total) + "%");
+									}
+								});
+								return xhr;
+							}
+						})
+			    	}
+
+			    	return tmpDeferred;
+
+			    }).then(function(data){
+			    	var tmpDeferred = MyDeferred();
+
+			    	new AjaxTransfer().execute({
+						url: "groups/" + gi + "/files/"+ fiApiData.fi +"/commit",
+						method: "put",
+						body: {
+					    	ti: thisFile.ti, 
+					    	tp: fileTp,
+							mt: fileData.type || "text",
+							si: fileData.size,
+							md: {w:100,h:100,l:100}
+						},
+						error: function(errData){
+							uploadDeferred.reject({response:errData,api:"commit",});
+						},
+						success: tmpDeferred.resolve
+					})
+
+					return tmpDeferred;
+			    }).then(function(data){
+			    	new AjaxTransfer().execute({
+						url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
+						method: "post",
+						body: {
+					    	meta: {
+								tt: "",
+								tp: "08",
+								lv: 1
+							}, 
+							ml: [
+							    {
+							    	fi: fiApiData.fi,
+							    	ftp: "0",
+							    	fn: fileData.name,
+							    	c: "It's a File",
+							    	si: fileData.size,
+							    	tp: 26
+								} 
+							]
+						},
+						error: function(errData){
+							uploadDeferred.reject({response: errData,api:"post 2"});
+						},
+						success: uploadDeferred.resolve
+					})
+			    })
+
+
+			    uploadDeferred.done(function(data){
+					toastShow($.i18n.getString("FILESHARING_UPLOAD_SUCCESS"))
+				}).fail(function(data){
+					console.debug("error ",data);
+				}).always(function(){
+					coverDom.removeClass("disable").trigger("click").end()
+					.find("ul").show();
+
+					progressSectionDom.hide();
+					thisFile.getList();
+				});
+
+
+
+
+		    });// switch deferred done
+			    
+		});// inputFileDom change 
 
 	},
 	rename: function() {
 		this.showGeneralPopup($.i18n.getString("FILESHARING_RENAME"),"renameExecute");
 	},
 	renameExecute: function(name) {
-		var thisFile = this;
-		var oriFn = this.activeItemData.fn;
-		var newName = (this.activeItemData.ti === null) ? name + (oriFn.substring(oriFn.lastIndexOf("."))) : name;
-		var body = {
-				meta: {
-					tt: "",
-					tp: "08",
-					lv: 1
-				}, 
-				ml: [
-					{
-						fi: this.activeItemData.fi,
-						ftp: 0,
-						fn: newName,
-						si: 5566,
-						tp: 26 
-					}
-				]
-			};
+		console.debug("active data",this.activeItemData);
+		var 
+		thisItem = this.activeItemData ,
+		newName = (thisItem.ti === null) ? name + (thisItem.fn.substring(thisItem.fn.lastIndexOf("."))) : name,
+
+		// 預設是檔案 下方再判斷是否為資料夾
+		body = {
+			meta: {
+				tt: "",
+				tp: "U8",
+				lv: 1
+			}, 
+			ml: [
+				{	
+					ftp: 0,
+					fi: thisItem.fi,
+					fn: newName,
+					si: thisItem.si ,
+					tp: 26 
+				}
+			]
+		};
+
 
 		//資料夾
-		if(this.activeItemData.ti !== null){
+		if( thisItem.meta.tp == "09"){
 			body.ml[0].ln = {
-				ti: this.activeItemData.ti
+				ti: thisItem.ti
 			};
-			body.meta.tp = "09";
+			body.meta.tp = "U9";
+			body.ml[0].ftp = 1;
+
+			delete body.ml[0].si;
+			
 		}
 
+		console.debug("rename",body);
 		new AjaxTransfer().execute({
 			// /groups/{gi}/timelines/{ti}/events/{ei}
 			url: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
 			method: "post",
 			body: body,
 			complete: function(data){
-				thisFile.fileDom.find("section.file-cover").trigger("click")
+				this.fileDom.find("section.file-cover").trigger("click")
 				this.getList();
 				if(data.status == 200) {
 					toastShow($.i18n.getString("USER_PROFILE_UPDATE_SUCC"));	
@@ -650,7 +709,7 @@ FileItem.prototype = {
 			}else{
 				thisFileDom.find(".operator [name=download]").show();
 			}
-			// cns.debug("thisItemObj",thisItemObj);
+			cns.debug("thisItemObj",thisItemObj);
 			thisFileDom.find("div.row").removeClass("fs-active").end()
 			.find(".operator").show();
 			$(this).addClass("fs-active");
