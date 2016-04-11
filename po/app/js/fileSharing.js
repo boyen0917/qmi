@@ -327,6 +327,7 @@ FileSharing.prototype = {
 			}.bind(this)
 		});
 	},
+
 	uploadFile: function(){
 		event.stopPropagation();
 		var thisFile = this;
@@ -369,50 +370,85 @@ FileSharing.prototype = {
 
 			coverDom.addClass("disable");
 			thisFile.fileDom.find("section.file-cover ul").hide();
-			var fileTp = 0, contentType = " ",
-			switchDeferred = $.Deferred();
+
+			var 
+			fileTp = 0, 
+			contentType = " ",
+			switchDeferred = $.Deferred(),
+			// pic video -> s3 s32, others -> s3 only
+			s3DefArr = []; 
 
 		    switch(true){
+
 		      case fileData.type.match("image") instanceof Array:
 		        fileTp = 1;
 
-
-		        var reader = new FileReader();
-		        reader.onloadend = function() {
-		            var tempImg = new Image();
-		            tempImg.src = reader.result;
-		            tempImg.onload = function() {
-		                
-		                //大小圖都要縮圖
-		                var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
-		                var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
-		                
-		                data: o_obj.blob,
-		                si: o_obj.blob.size
-		                
-		                switchDeferred.resolve();
-		            }
-		        }
-		        reader.readAsDataURL(fileData);
-
-
+		        
+	            var tempImg = new Image();
+	            tempImg.src = URL.createObjectURL(fileData);;
+	            tempImg.onload = function() {
+	                
+	                //大小圖都要縮圖
+	                var originImgObj = { blob: this };
+	                var thumbnailImgObj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
+	                
+					s3DefArr = [ 
+						uploadToS3TmpDef({
+							url: data.s3,
+							contentType: contentType,
+							file: thumbnailImg.blob
+						}), 
+						uploadToS3TmpDef({
+							url: data.s32,
+							contentType: contentType,
+							file: originImgObj.blob
+						})
+					];
+	                switchDeferred.resolve();
+	            }
+		        
 
 		        break;
 		      case fileData.type.match("video") instanceof Array:
 		        fileTp = 2;
-		        contentType = "video/mp4";
-		        switchDeferred.resolve();
+
+		        fileData.onloadeddata = function(){
+		        	var vdoImg = thisFile.getVideoScreenshot(fileData);
+
+		        	s3DefArr = [ 
+						uploadToS3TmpDef({
+							url: data.s3,
+							contentType: " ",
+							file: vdoImg
+						}), 
+						uploadToS3TmpDef({
+							url: data.s32,
+							contentType: "video/mp4",
+							file: fileData
+						})
+					];
+	                switchDeferred.resolve();
+		        }
 		        break;
-		      case fileData.type.match("audio") instanceof Array:
-		        fileTp = 3;
-		        contentType = "audio/mp4";
-		        switchDeferred.resolve();
-		        break;
+		     
+		      default:
+		      	if ( fileData.type.match("audio") === true ){
+		      		fileTp = 3;
+		        	contentType = "audio/mp4";
+		      	}
+		        
+		      	s3DefArr.push(
+		        	uploadToS3TmpDef({
+						url: data.s3,
+						contentType: contentType,
+						file: fileData
+				}))
+		      	switchDeferred.resolve();
 		    }
+
 		    progressSectionDom.show();
 
 		    switchDeferred.done(function(){
-
 
 		    	var 
 			    uploadDeferred = $.Deferred(),
@@ -435,47 +471,15 @@ FileSharing.prototype = {
 			    tmpDeferred.then(function(data){
 			    	fiApiData = data;
 			    	var tmpDeferred = MyDeferred(),
-			    	s3Arr = [];
 
-			    	
-
-			    	// pic video -> s3 s32, others -> s3 only
-
-					s3Arr.push( uploadToS3TmpDef(data.s3) );
-
-
-
-					$.when.apply($,s3Arr).done(tmpDeferred.resolve)
+					$.when.apply($,s3DefArr).done(tmpDeferred.resolve)
 
 
 					
 
 
 
-			    	function uploadToS3TmpDef (url) {
-			    		return $.ajax({
-							url: url,
-							type: 'PUT',
-							contentType: contentType,
-						 	data: fileData, 
-							processData: false,
-							error: function(errData){
-								uploadDeferred.reject({response: errData,api:"upload to s3"});
-							},
-							xhr: function() {
-								var xhr = new window.XMLHttpRequest();
-
-								xhr.upload.addEventListener('progress', function(e) {
-									if (e.lengthComputable) {
-									    progressSectionDom
-									    .find(".progress").css('width', '' + (148 * e.loaded / e.total) + 'px').end()
-									    .find(".text").html(Math.round(100 * e.loaded / e.total) + "%");
-									}
-								});
-								return xhr;
-							}
-						})
-			    	}
+			    	
 
 			    	return tmpDeferred;
 
@@ -544,10 +548,53 @@ FileSharing.prototype = {
 
 
 		    });// switch deferred done
-			    
 		});// inputFileDom change 
 
 	},
+
+	getVideoScreenshot: function(video){
+	  	var tempW = video.videoWidth;
+		var tempH = video.videoHeight;
+
+		var canvas = document.createElement('canvas');
+		canvas.width = tempW;
+		canvas.height = tempH;
+	  	canvas.getContext("2d").drawImage(video, 0, 0, tempW, tempH);
+
+		canvas.toDataURL("image/png")
+
+		var dataURL = canvas.toDataURL("image/png");
+		
+		return dataURItoBlob(dataURL);
+	},
+
+	uploadToS3TmpDef: function (options) {
+		var thisFile = this;
+
+		return $.ajax({
+			url: options.url,
+			type: 'PUT',
+			contentType: options.contentType,
+		 	data: options.file, 
+			processData: false,
+			error: function(errData){
+				uploadDeferred.reject({response: errData,api:"upload to s3"});
+			},
+			xhr: function() {
+				var xhr = new window.XMLHttpRequest();
+
+				xhr.upload.addEventListener('progress', function(e) {
+					if (e.lengthComputable) {
+					    thisFile.fileDom.find("div.progress-bar")
+					    .find(".progress").css('width', '' + (148 * e.loaded / e.total) + 'px').end()
+					    .find(".text").html(Math.round(100 * e.loaded / e.total) + "%");
+					}
+				});
+				return xhr;
+			}
+		})
+	},
+
 	rename: function() {
 		this.showGeneralPopup($.i18n.getString("FILESHARING_RENAME"),"renameExecute");
 	},
