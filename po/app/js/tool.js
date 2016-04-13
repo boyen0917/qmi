@@ -531,7 +531,10 @@ $(function(){
 		                //大小圖都要縮圖
 		                var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
 		                var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
-
+		                console.debug("img",{
+		                	originImgObj: o_obj,
+		                	thumbnailImgObj: t_obj
+		                });
 		                //傳大圖
 		                $.ajax({
 							url: ou,
