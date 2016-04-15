@@ -18,7 +18,7 @@ $(function(){
         if(chk === true) 
             deferred.resolve();
         else
-            groupMenuListArea().always(function(){ deferred.resolve(); })
+            groupMenuListArea(true).always(function(){ deferred.resolve(); })
             
 
         //做團體列表、top event
@@ -4500,102 +4500,88 @@ $(function(){
         // $(".sm-group-name").html(_groupList[this_gi].gn);
     }
     
-    groupMenuListArea = function (){
-        var deferred = $.Deferred();
-        // if(new_gi) s_load_show = true;    
-        getGroupList().complete(function(data){
-            
-            if(data.status != 200){
-                $(".sm-loading").show();
-                //沒選單就重撈 什麼時候停？
-                // setTimeout(groupMenuListArea.bind(this,new_gi,invite),1000);
-                deferred.resolve({
-                    status: false ,
-                    errMsg: "getGroupList error" ,
-                    data: data
-                });
-                return false;
-            }
+    groupMenuListArea = function (noApi){
+        var 
+        noApiDeferred = $.Deferred(),
+        deferred = $.Deferred();
 
-            $(".sm-loading").hide();
-
-            var parse_data = $.parseJSON(data.responseText);
-            var private_group_list = parse_data.cl;
-            var group_list = parse_data.gl;
-
-            getPrivateGroupFromList( private_group_list, function(){
-                s_load_show = false;
-
-                $(".sm-group-list-area").html("");
-                // $(".sm-group-list-area-add").html("");
-                var tmp_selector,count;
-
-                //set lStorage ui
-                groupListToLStorage(group_list);
-                // setGroupList();
-
-                //管理者圖示
-                var icon_host = "<img src='images/sidemenu/icon_host.png'/>";
-
-                $.each(QmiGlobal.groups,function(key,val){
-                    if( key.indexOf("G")!=0 && key.indexOf(_pri_split_chat)!=0 ) return;
-
-                    //新建團體專用 記錄新增團體的資訊 用以跳轉
-                    // if(new_gi && new_gi == val.gi && !invite){
-                    //     setThisGroup(new_gi);
-                    // }
-
-                    tmp_selector = ".sm-group-list-area";
-                    
-                    var glt_img = "images/common/others/empty_img_all_l.png";
-                    var glo_img = "images/common/others/empty_img_all_l.png";
-                    if(val.aut) {
-                        glt_img = val.aut;
-                        glo_img = val.auo;
-                    }
-
-                    var data_gi_str = 'data-gi="' + val.gi + '" ';
-                    var this_group = $(
-                        '<div class="sm-group-area polling-cnt enable" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '">' +
-                            '<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
-                            '<div class="sm-group-area-l group-pic">' +
-                                '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
-                            '</div>' +
-                            '<div class="sm-group-area-r polling-group-name" '+ data_gi_str+'>' + htmlFormat(val.gn) + '</div>' +
-                            '<div class="sm-count" style="display:none"></div>' +
-                        '</div>'
-                    );
-
-                    this_group.find(".group-pic").data("auo",glo_img)
-                    $(tmp_selector).append(this_group);
-
-                    //目前團體顏色顯示
-                    // if( (new_gi && val.gi == new_gi && !invite)
-                    //     || val.gi == QmiGlobal.auth.dgi ){
-                    //     $(".sm-group-area.active").removeClass("active");
-                    //     this_group.addClass("active");
-                    // }
-
-                    //管理者圖示
-                    if(val.ad != 1) {
-                        this_group.find(".sm-icon-host").hide();
-                    }
-
-                    var img = this_group.find(".sm-group-area-l img:eq(0)");
-                    avatarPos(img);
-                });
-
-                if(group_list.length > 2){
-                    $(".sm-group-switch").show();
+        if( noApi === true ) 
+            noApiDeferred.resolve();
+        else {
+            getGroupList().complete(function(data){
+                if(data.status != 200){
+                    $(".sm-loading").show();
+                    //沒選單就重撈 什麼時候停？
+                    // setTimeout(groupMenuListArea.bind(this,new_gi,invite),1000);
+                    deferred.resolve({
+                        status: false ,
+                        errMsg: "getGroupList error" ,
+                        data: data
+                    });
+                    return false;
                 }
 
-                //設定調整團體頭像
-                $(document).data("group-avatar",true);
+                $(".sm-loading").hide();
 
-                deferred.resolve({
-                    status: true
+                var parse_data = $.parseJSON(data.responseText);
+
+                getPrivateGroupFromList( parse_data.cl, function(){
+                    s_load_show = false;
+
+                    $(".sm-group-list-area").html("");
+
+                    //set lStorage ui
+                    groupListToLStorage(parse_data.gl);
+                    // setGroupList();
+
+                    noApiDeferred.resolve();
                 });
+            });   
+        }
+
+        noApiDeferred.done(function(data){
+            //管理者圖示
+            var icon_host = "<img src='images/sidemenu/icon_host.png'/>";
+
+            $.each(QmiGlobal.groups,function(key,val){
+                if( key.indexOf("G")!=0 && key.indexOf(_pri_split_chat)!=0 ) return;
+
+                var tmp_selector = ".sm-group-list-area";
+                
+                var glt_img = "images/common/others/empty_img_all_l.png";
+                var glo_img = "images/common/others/empty_img_all_l.png";
+                if(val.aut) {
+                    glt_img = val.aut;
+                    glo_img = val.auo;
+                }
+
+                var data_gi_str = 'data-gi="' + val.gi + '" ';
+                var this_group = $(
+                    '<div class="sm-group-area polling-cnt enable" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '">' +
+                        '<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
+                        '<div class="sm-group-area-l group-pic">' +
+                            '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
+                        '</div>' +
+                        '<div class="sm-group-area-r polling-group-name" '+ data_gi_str+'>' + htmlFormat(val.gn) + '</div>' +
+                        '<div class="sm-count" style="display:none"></div>' +
+                    '</div>'
+                );
+
+                this_group.find(".group-pic").data("auo",glo_img)
+                $(tmp_selector).append(this_group);
+
+                //管理者圖示
+                if(val.ad != 1) this_group.find(".sm-icon-host").hide();
+
+                avatarPos(this_group.find(".sm-group-area-l img:eq(0)"));
             });
+
+            if(Object.keys( QmiGlobal.groups ).length > 2) $(".sm-group-switch").show();
+
+            //設定調整團體頭像
+            $(document).data("group-avatar",true);
+
+            deferred.resolve({ status: true });
         });   
         
         return deferred.promise();
@@ -6681,6 +6667,7 @@ $(function(){
     }
     
     getGroupList = function(){
+        console.log("getGroupList");
         //取得團體列表
         var api_name = "groups";
         var headers = {
@@ -6693,6 +6680,7 @@ $(function(){
     }
 
     getPrivateGroupList = function(p_data, callback){
+        console.log("getPrivateGroupList");
         //取得團體列表
         var api_name = "groups";
         var headers = {

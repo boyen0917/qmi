@@ -313,6 +313,9 @@ onCheckVersionDone = function(needUpdate){
 				}
 				loginAction();
         	}
+        }).error(function(){
+        	window.errorTest = arguments;
+        	console.debug("login error ",arguments)
         });
 	}
 

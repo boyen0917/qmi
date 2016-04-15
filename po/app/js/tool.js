@@ -105,7 +105,7 @@ $(function(){
 	}
 
 	//ajax
-	ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl){
+	ajaxDoBak = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl){
 		
 		//設定是否顯示 loading 圖示
 		load_show = load_show_chk;
@@ -206,6 +206,19 @@ $(function(){
 		return $.ajax(ajaxArgs);	
 	}
 
+	ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_hide, privateUrl){
+		return new QmiAjax({
+			apiName: api_name,
+			headers: headers,
+			method: method,
+			isLoadingShow: load_show_chk,
+			body: body,
+			ajaxMsg: ajax_msg_chk,
+			errHide: err_hide,
+			privateUrl: privateUrl,
+			ajaxDo: true
+		});
+	}
 
 	//ajax 轉換
 	AjaxTransfer = function(){
@@ -248,26 +261,6 @@ $(function(){
 				argsClone.privateUrl
 			]));
 		}
-	}
-
-	window.MyAjax = function(){
-		var deferred = $.Deferred();
-
-	    this.default = {
-	        timeout: 30000,
-	        complete: function(data){
-	        }
-	    }
-
-	    this.headers = {
-	        ui:ui,
-	        at:at,
-	        li:"zh_TW"
-	    }
-
-
-	    return deferred.promise();
-
 	}
 	 
     _pri_split_chat = "#";

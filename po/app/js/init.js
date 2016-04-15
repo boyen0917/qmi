@@ -1,23 +1,18 @@
-var ui,at,lang,gi;
-
-
-	gi = null;
-	//HiCloud
-	base_url = "https://apserver.mitake.com.tw/apiv1/";
-	// base_url = "https://ap.qmi.emome.net/apiv1/";
+var ui,at,lang,gi,
 
 //local測試 預設開啟console
-debug_flag = false;
+debug_flag = false,
+
+gi = null,
+//HiCloud
+base_url = "https://apserver.mitake.com.tw/apiv1/";
+// base_url = "https://ap.qmi.emome.net/apiv1/";
+
+
 if(window.location.href.match(/^http:\/\/localhost|10.1.17.114/)) {
 	debug_flag = true;
-	// base_url = "https://capubliceim.mitake.com.tw/apiv1/";
+	base_url = "https://capubliceim.mitake.com.tw/apiv1/";
 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
-}
-
-
-if( window.location.href.match(/main.html/) ){
-	var tmp = localStorage["uiData"];
-	if( tmp ) $.lStorage("UXXX",$.parseJSON(tmp));
 }
 
 //國碼
@@ -28,13 +23,14 @@ lang = "en_US";
 var userLang = navigator.language || navigator.userLanguage; 
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
 
-	if( 0==userLang.indexOf("zh") ){
-		if( userLang=="zh_cn" ){
-			lang = "zh_CN";
-		} else {
-			lang = "zh_TW";
-		}
+if( 0==userLang.indexOf("zh") ){
+	if( userLang=="zh_cn" ){
+		lang = "zh_CN";
+	} else {
+		lang = "zh_TW";
 	}
+}
+
 //動態消息的字數限制
 content_limit = 400;
 
@@ -198,44 +194,195 @@ initPenMap = {
 
 
 window.QmiGlobal = {
-	// $.lStorage(ui)
-	groups: {},
+	// 之後取代 ui, at, gi, ... etc
+	current: { 
+		ui: "",
+		at: "",
+		gi: ""
+	}, 
+
+
+	groups: {}, // 全部的公私雲團體資料 $.lStorage(ui) 
+	clouds: {}, // 全部的私雲資料
+	cloudGiMap: {},
 	auth: {},
 	getObjectFirstItem: function(obj,last) {
-		if( last === true ) 
+		if(last === true){ 
 			return obj[Object.keys(obj)[Object.keys(obj).length-1]];
-		else 	 
+		} else 	{
 			return obj[Object.keys(obj)[0]];
-	},
-
-	timelineTestObj: (function(){
-		var timelineArr = [];
-		return {
-			push: function(obj){
-				timelineArr.push(obj);
-			},
-			show: function(){
-				timelineArr.forEach(function(obj){
-					obj.selector[obj.method](obj.event);
-				})
-			}
 		}
-	})()
+	},
+	
+	// QmiGlobal.ajax({
+	// 	url: api_name,
+	// 	headers: headers,
+	// 	method: method,
+	// 	isLoadingShow: load_show_chk,
+	// 	body: body,
+	// 	ajaxMsg: ajax_msg_chk,
+	// 	errHide: err_hide,
+	// 	privateUrl: privateUrl
+	// });
 };
 
 
-$(".sm-hr").click(function(){
-	
-})
+window.QmiAjax = function(args){
+	var 
+	thisQmiAjax = this,
+	isCloudGi = QmiGlobal.cloudGiMap.hasOwnProperty(gi),
 
-// window.QmiGlobal.groupDataModel.get()
-// window.QmiGlobal.groupDataModel.set()
+	newArgs = {
+		url: (isCloudGi === false) ? base_url + args.apiName : QmiGlobal.cloudGiMap[gi].cl + args.apiName,
+
+		headers: (function(){
+			var newHeaders = { ui: ui, at: at, li: lang };
+
+			// 先 extend 新的參數值
+			if(args.headers !== undefined) {
+				$.extend(newHeaders, args.headers);
+			}
+
+			// 做私雲判斷 目前gi 存在 私雲列表裡
+			if(
+				isCloudGi === true
+			) {
+				newHeaders.uui = newHeaders.ui;
+				newHeaders.uat = newHeaders.at;
+				newHeaders.ui = QmiGlobal.clouds[QmiGlobal.cloudGiMap[gi].cl].ui;
+				newHeaders.at = QmiGlobal.clouds[QmiGlobal.cloudGiMap[gi].cl].nowAt;
+			}
+
+			return newHeaders;
+		})(),
+
+		timeout: 30000,
+
+		data: (typeof args.body === "string") ? args.body : JSON.stringify(args.body),
+
+		error: function(ajaxErrData){
+			ajaxErrData.ajaxArgs = newArgs;
+			return thisQmiAjax.onError(ajaxErrData)
+		},
+
+		complete: function(ajaxCompleteDat){
+			ajaxCompleteDat.ajaxArgs = newArgs;
+			return thisQmiAjax.onError(ajaxCompleteDat)
+		}
+	};
+
+	// 將args帶來的多的參數補進去newArgs
+	Object.keys(args).reduce(function(newArgs,iterator){
+		newArgs[iterator] = args[iterator];
+		return newArgs;
+	},newArgs);
+
+
+	if(args.debug === true) console.debug("newArgs", newArgs);
+	return $.ajax(newArgs);
+}
+
+QmiAjax.prototype = {
+
+	//ajax用
+	// myRand = Math.floor((Math.random()*1000)+1);
+
+	// $.ajaxSetup ({
+	// 	timeout: 30000
+	// });
+
+
+
+	// $(document).ajaxSend(function() {
+	// 	//顯示 loading
+	// 	if(!load_show && !s_load_show) return false;
+	//     if(!$('.ui-loader').is(":visible"))
+	// 		$('.ui-loader').css("display","block");
+
+	// 	$(".ajax-screen-lock").show();
+	// });
+
+	// $(document).ajaxComplete(function(event,jqXHR,ajaxOptions) {
+	// 	//特別的
+	// 	if(s_load_show) return false;
+
+	// 	$('.ui-loader').hide();
+	// 	$(".ajax-screen-lock").hide();
+	// });
+
+	onError: function(data){
+	// $(document).ajaxError(function(e, jqxhr, ajaxSettings) {
+		// cns.debug("ajax error:",ajaxSettings);
+		s_load_show = false;
+		//polling錯誤不關閉 為了url parse
+		if(!data.ajaxArgs.url.match(/sys\/polling/)){
+			$('.ui-loader').hide();
+			$(".ajax-screen-lock").hide();
+		}
+			
+		//不做錯誤顯示
+		if(data.ajaxArgs.errHide) return false;
+
+		//ajax逾時
+		if(data.statusText == "timeout"){
+			// popupShowAdjust("","網路不穩 請稍後再試",true);
+			toastShow( $.i18n.getString("COMMON_TIMEOUT_ALERT") );
+			return false;
+		}
+		//logout~
+		if(data.status == 401){
+
+			// 聊天室關閉
+			if(window.location.href.match(/po\/app\/chat.html/)) window.close();
+
+			localStorage.removeItem("_loginData");
+			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
+			return false;
+			
+		}
+
+		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
+		//eim 登入網址沒有index.html
+		if(args.ajaxMsg === true || !window.location.href.match(/.html/) || window.location.href.match(/index.html/)){
+			ajax_msg = false;
+			popupShowAdjust("",errorResponse(data),true);
+		}else{
+			//預設
+			toastShow(errorResponse(data));	
+		}
+	},
+		
+	onComplete: function(data){
+		// // 有自己的判斷 所以直接return
+		// if(
+		// 	data.ajaxArgs.ajaxDo === true && // ajaxDo 是舊的方法預設帶的參數 
+		// 	data.ajaxArgs.hasOwnComplete === true // hasOwnComplete 是新的方法
+		// ) return;
+
+		// // 統一管理錯誤訊息
+		// if(data.status !== 200) {
+
+		// }
+	},
+
+	tokenExpired: function(data) {
+		if(data.rsp_code === 602) {
+			console.debug("token expired!");
+
+			// do something
+		}
+	}
+
+}
+
+
+
+
 
 
 //title
 g_Qmi_title = "Qmi";
 $("title").html(g_Qmi_title);
-
 
 MyDeferred = function  () {
   var myResolve;
@@ -250,74 +397,72 @@ MyDeferred = function  () {
 // ajax setting
 
 //ajax用
-myRand = Math.floor((Math.random()*1000)+1);
+// myRand = Math.floor((Math.random()*1000)+1);
 
-$.ajaxSetup ({
-	timeout: 30000
-});
-
-
-
-$(document).ajaxSend(function() {
-	//顯示 loading
-	if(!load_show && !s_load_show) return false;
-    if(!$('.ui-loader').is(":visible"))
-		$('.ui-loader').css("display","block");
-
-	$(".ajax-screen-lock").show();
-});
-
-$(document).ajaxComplete(function(event,jqXHR,ajaxOptions) {
-	//特別的
-	if(s_load_show) return false;
-
-	$('.ui-loader').hide();
-	$(".ajax-screen-lock").hide();
-});
+// $.ajaxSetup ({
+// 	timeout: 30000
+// });
 
 
-$(document).ajaxError(function(e, jqxhr, ajaxSettings) {
-	// cns.debug("ajax error:",ajaxSettings);
-	s_load_show = false;
-	//polling錯誤不關閉 為了url parse
-	if(!ajaxSettings.url.match(/sys\/polling/)){
-		$('.ui-loader').hide();
-		$(".ajax-screen-lock").hide();
-	}
+
+// $(document).ajaxSend(function() {
+// 	//顯示 loading
+// 	if(!load_show && !s_load_show) return false;
+//     if(!$('.ui-loader').is(":visible"))
+// 		$('.ui-loader').css("display","block");
+
+// 	$(".ajax-screen-lock").show();
+// });
+
+// $(document).ajaxComplete(function(event,jqXHR,ajaxOptions) {
+// 	//特別的
+// 	if(s_load_show) return false;
+
+// 	$('.ui-loader').hide();
+// 	$(".ajax-screen-lock").hide();
+// });
+
+
+// $(document).ajaxError(function(e, jqxhr, ajaxSettings) {
+// 	console.debug("error",arguments);
+// 	s_load_show = false;
+// 	//polling錯誤不關閉 為了url parse
+// 	if(!ajaxSettings.url.match(/sys\/polling/)){
+// 		$('.ui-loader').hide();
+// 		$(".ajax-screen-lock").hide();
+// 	}
 		
-	//不做錯誤顯示
-	if(ajaxSettings.errHide) return false;
-	
+// 	//不做錯誤顯示
+// 	if(ajaxSettings.errHide) return false;
 
-	//ajax逾時
-	if(jqxhr.statusText == "timeout"){
-		// popupShowAdjust("","網路不穩 請稍後再試",true);
-		toastShow( $.i18n.getString("COMMON_TIMEOUT_ALERT") );
-		return false;
-	}
-	//logout~
-	if(jqxhr.status == 401){
+// 	//ajax逾時
+// 	if(jqxhr.statusText == "timeout"){
+// 		// popupShowAdjust("","網路不穩 請稍後再試",true);
+// 		toastShow( $.i18n.getString("COMMON_TIMEOUT_ALERT") );
+// 		return false;
+// 	}
+// 	//logout~
+// 	if(jqxhr.status == 401){
 
-		if(window.location.href.match(/po\/app\/chat.html/)) {
-			window.close();
-		}
+// 		// 聊天室關閉
+// 		if(window.location.href.match(/po\/app\/chat.html/)) window.close();
 
-		localStorage.removeItem("_loginData");
-		popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
-		return false;
+// 		localStorage.removeItem("_loginData");
+// 		popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
+// 		return false;
 		
-	}
+// 	}
 
-	//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
-	//eim 登入網址沒有index.html
-	if(ajax_msg || !window.location.href.match(/.html/) || window.location.href.match(/index.html/)){
-		ajax_msg = false;
-		popupShowAdjust("",errorResponse(jqxhr),true);
-	}else{
-		//預設
-		toastShow(errorResponse(jqxhr));	
-	}
-});
+// 	//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
+// 	//eim 登入網址沒有index.html
+// 	if(args.ajax_msg === true || !window.location.href.match(/.html/) || window.location.href.match(/index.html/)){
+// 		ajax_msg = false;
+// 		popupShowAdjust("",errorResponse(jqxhr),true);
+// 	}else{
+// 		//預設
+// 		toastShow(errorResponse(jqxhr));	
+// 	}
+// });
 
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){
