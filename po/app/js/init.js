@@ -201,6 +201,8 @@ window.QmiGlobal = {
 		gi: ""
 	}, 
 
+	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
+
 
 	groups: {}, // 全部的公私雲團體資料 $.lStorage(ui) 
 	clouds: {}, // 全部的私雲資料
@@ -214,28 +216,58 @@ window.QmiGlobal = {
 		}
 	},
 	
-	// QmiGlobal.ajax({
-	// 	url: api_name,
-	// 	headers: headers,
-	// 	method: method,
-	// 	isLoadingShow: load_show_chk,
-	// 	body: body,
-	// 	ajaxMsg: ajax_msg_chk,
-	// 	errHide: err_hide,
-	// 	privateUrl: privateUrl
-	// });
 };
 
 
 window.QmiAjax = function(args){
+
 	var 
 	thisQmiAjax = this,
-	isCloudGi = QmiGlobal.cloudGiMap.hasOwnProperty(gi),
+	ajaxDeferred = $.Deferred(),
+
+	// 判斷私雲api 
+	isCloudApi = (function(){
+
+		// 有指定url 加上不要私雲 最優先 ex: 公雲polling
+		if(args.isPublicApi === true) 
+			return undefined;
+
+		// 有指定ci 直接給他私雲
+		if(args.ci !== undefined) 
+			return QmiGlobal.clouds[args.ci];
+
+		// 判斷apiName有無包含私雲gi 有的話就給他私雲 
+		if(args.apiName !== undefined){
+			var cgi = Object.keys(QmiGlobal.cloudGiMap).find(function(cgi){	
+				return args.apiName.match(new RegExp(cgi, 'g'))
+			});
+			if(cgi !== undefined ) 
+				return QmiGlobal.clouds[ QmiGlobal.cloudGiMap[cgi].ci ];
+		}
+
+		// 最後判斷 現在團體是私雲團體 就做私雲
+		if(QmiGlobal.cloudGiMap[gi] !== undefined)
+			return QmiGlobal.clouds[ QmiGlobal.cloudGiMap[gi].ci ];
+
+	})(),
 
 	newArgs = {
-		url: (isCloudGi === false) ? base_url + args.apiName : QmiGlobal.cloudGiMap[gi].cl + args.apiName,
+		url: (function(){
+
+			// 指定url 
+			if(args.url !== undefined) return args.url;
+
+			// undefined 表示 不符合私雲條件 給公雲
+			if(isCloudApi === undefined)
+				return base_url + args.apiName;
+			else
+				return "https://" + isCloudApi.cl + "/apiv1/" + args.apiName;
+		})(),
 
 		headers: (function(){
+			// 指定headers 
+			if(args.specifiedHeaders !== undefined) return args.specifiedHeaders;
+
 			var newHeaders = { ui: ui, at: at, li: lang };
 
 			// 先 extend 新的參數值
@@ -243,14 +275,13 @@ window.QmiAjax = function(args){
 				$.extend(newHeaders, args.headers);
 			}
 
-			// 做私雲判斷 目前gi 存在 私雲列表裡
-			if(
-				isCloudGi === true
-			) {
+			// 做私雲判斷
+			if(isCloudApi !== undefined) {
 				newHeaders.uui = newHeaders.ui;
 				newHeaders.uat = newHeaders.at;
-				newHeaders.ui = QmiGlobal.clouds[QmiGlobal.cloudGiMap[gi].cl].ui;
-				newHeaders.at = QmiGlobal.clouds[QmiGlobal.cloudGiMap[gi].cl].nowAt;
+				// tempGi 因為團體尚未切過去
+				newHeaders.ui = isCloudApi.ui;
+				newHeaders.at = isCloudApi.nowAt;
 			}
 
 			return newHeaders;
@@ -258,28 +289,59 @@ window.QmiAjax = function(args){
 
 		timeout: 30000,
 
-		data: (typeof args.body === "string") ? args.body : JSON.stringify(args.body),
+		type: args.method || "get",
+
+		success: function(ajaxSuccessData) {
+			ajaxDeferred.resolve(ajaxSuccessData);
+		},
 
 		error: function(ajaxErrData){
+			ajaxDeferred.resolve(ajaxErrData);
+
 			ajaxErrData.ajaxArgs = newArgs;
 			return thisQmiAjax.onError(ajaxErrData)
 		},
 
-		complete: function(ajaxCompleteDat){
-			ajaxCompleteDat.ajaxArgs = newArgs;
-			return thisQmiAjax.onError(ajaxCompleteDat)
+		complete: function(ajaxCompleteData){
+
+			ajaxDeferred.resolve(ajaxCompleteData);
+
+			ajaxCompleteData.ajaxArgs = newArgs;
+			return thisQmiAjax.onComplete(ajaxCompleteData)
 		}
 	};
 
+	// 不是get 再加入body
+	if(newArgs.type !== "get") newArgs.data = (typeof args.body === "string") ? args.body : JSON.stringify(args.body);
+
 	// 將args帶來的多的參數補進去newArgs
-	Object.keys(args).reduce(function(newArgs,iterator){
-		newArgs[iterator] = args[iterator];
-		return newArgs;
-	},newArgs);
+	Object.keys(args).forEach(function(argsKey){
+		if(newArgs.hasOwnProperty(argsKey) === false)
+			newArgs[argsKey] = args[argsKey];
+	});
 
-
+	//before send
+	if(args.isLoadingShow === true) {
+		$(".ajax-screen-lock").show();
+		$('.ui-loader').css("display","block");
+	} 
+		
 	if(args.debug === true) console.debug("newArgs", newArgs);
+
+	// 執行
+	// $.ajax(newArgs);
+
+	// var thisPromise = ajaxDeferred.promise();
+	// thisPromise.complete = function(cb){
+	// 	ajaxDeferred.done(cb);
+	// }
+
+	// thisPromise.success = thisPromise.done;
+	// thisPromise.error = thisPromise.fail;
+
 	return $.ajax(newArgs);
+
+	// return $.ajax(newArgs);
 }
 
 QmiAjax.prototype = {
@@ -291,28 +353,28 @@ QmiAjax.prototype = {
 	// 	timeout: 30000
 	// });
 
-
-
-	// $(document).ajaxSend(function() {
-	// 	//顯示 loading
-	// 	if(!load_show && !s_load_show) return false;
-	//     if(!$('.ui-loader').is(":visible"))
-	// 		$('.ui-loader').css("display","block");
-
-	// 	$(".ajax-screen-lock").show();
-	// });
-
-	// $(document).ajaxComplete(function(event,jqXHR,ajaxOptions) {
-	// 	//特別的
-	// 	if(s_load_show) return false;
-
-	// 	$('.ui-loader').hide();
-	// 	$(".ajax-screen-lock").hide();
-	// });
+	reAuth: function(){
+		var deferred = $.Deferred();
+		$.ajax({
+		    url: base_url + "auth",
+		    headers: { ui: ui, at: at, li: lang },
+		    type: "put",
+		    error: function(errData){
+		        console.debug("reAuth error",errData);
+		        deferred.resolve(false);
+		    },
+		    success: function(apiData){
+		    	// 重新設定at
+		        at = apiData.at;
+		        deferred.resolve(true);
+		    }
+		})
+		return deferred.promise();
+	},
 
 	onError: function(data){
-	// $(document).ajaxError(function(e, jqxhr, ajaxSettings) {
-		// cns.debug("ajax error:",ajaxSettings);
+		
+		// 舊的有在用 新的不再用
 		s_load_show = false;
 		//polling錯誤不關閉 為了url parse
 		if(!data.ajaxArgs.url.match(/sys\/polling/)){
@@ -331,14 +393,26 @@ QmiAjax.prototype = {
 		}
 		//logout~
 		if(data.status == 401){
+			var authDeferred = $.Deferred();
+			// token 過期
+			if(data.rsp_code === 601) {
+				this.reAuth().done(authDeferred.resolve)
+			} else {
+				authDeferred.resolve(false);
+			}
 
-			// 聊天室關閉
-			if(window.location.href.match(/po\/app\/chat.html/)) window.close();
+			authDeferred.done(function(chk){
+				// reAuth成功 不做錯誤顯示
+				if(chk === true) return;
 
-			localStorage.removeItem("_loginData");
-			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
-			return false;
-			
+				// 聊天室關閉
+				if(window.location.href.match(/po\/app\/chat.html/)) window.close();
+
+				localStorage.removeItem("_loginData");
+				popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
+			})
+
+			return;
 		}
 
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
@@ -353,6 +427,12 @@ QmiAjax.prototype = {
 	},
 		
 	onComplete: function(data){
+		// 舊的有在用 新的不再用
+		// if(s_load_show === false) {
+		// 	$('.ui-loader').hide();
+		// 	$(".ajax-screen-lock").hide();
+		// }
+
 		// // 有自己的判斷 所以直接return
 		// if(
 		// 	data.ajaxArgs.ajaxDo === true && // ajaxDo 是舊的方法預設帶的參數 
@@ -366,7 +446,7 @@ QmiAjax.prototype = {
 	},
 
 	tokenExpired: function(data) {
-		if(data.rsp_code === 602) {
+		if(data.rsp_code === 601) {
 			console.debug("token expired!");
 
 			// do something
@@ -414,13 +494,13 @@ MyDeferred = function  () {
 // 	$(".ajax-screen-lock").show();
 // });
 
-// $(document).ajaxComplete(function(event,jqXHR,ajaxOptions) {
-// 	//特別的
-// 	if(s_load_show) return false;
+$(document).ajaxComplete(function(event,jqXHR,ajaxOptions) {
+	//特別的
+	if(s_load_show) return false;
 
-// 	$('.ui-loader').hide();
-// 	$(".ajax-screen-lock").hide();
-// });
+	$('.ui-loader').hide();
+	$(".ajax-screen-lock").hide();
+});
 
 
 // $(document).ajaxError(function(e, jqxhr, ajaxSettings) {

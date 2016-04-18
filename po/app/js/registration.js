@@ -4,6 +4,7 @@ onCheckVersionDone = function(needUpdate){
 	}
 	clearBadgeLabel();
 
+console.log("why!!!");
 
 
 	if($.lStorage("_loginAutoChk") === true) {
@@ -11,6 +12,7 @@ onCheckVersionDone = function(needUpdate){
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
 		$.mobile.changePage("")
+
 	}
 
 	//預設上一頁
@@ -263,6 +265,7 @@ onCheckVersionDone = function(needUpdate){
 	});
 
 	login = function(phone_id,password,countrycode,isMail){
+
 		isMail = isMail || false;
 		var api_name = "login";
         var headers = {
@@ -275,7 +278,7 @@ onCheckVersionDone = function(needUpdate){
         var body = {
             id: id,
             tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
-            dn: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
+            dn: QmiGlobal.device,
             pw:toSha1Encode(password)
         };
 
@@ -334,71 +337,40 @@ onCheckVersionDone = function(needUpdate){
         at = QmiGlobal.auth.at;
 
         //附上group list
-        getGroupList().complete(function(data){
-            if(data.status == 200){
+        getGroupList().done(function(groupList){
 
-                var parse_data = $.parseJSON(data.responseText);
-                if( !parse_data ){
-                    console.debug("no group data");
-                    return;
+        	// 取dgi的combo
+            if( groupList.length>0 ){
+            	//有dgi 但不存在列表裡
+                if( QmiGlobal.auth.dgi === undefined || $.lStorage(ui)[QmiGlobal.auth.dgi] === undefined ){
+                	localStorage.removeItem("uiData");
+                	
+                    QmiGlobal.auth.dgi = groupList[0].gi;
+                    $.lStorage("_loginData",QmiGlobal.auth);
                 }
 
-				group_list = parse_data.gl;
-                if(group_list && (group_list.length > 0 || parse_data.cl.length>0) ){
-
-                    //有group
-                    getPrivateGroupFromList( parse_data.cl, function(){
-
-                        //將group list 更新到 lstorage ui
-                        groupListToLStorage(group_list);
-
-                        // 取dgi的combo
-                        if( group_list.length>0 ){
-                        	//有dgi 但不存在列表裡
-                            if( QmiGlobal.auth.dgi === undefined || $.lStorage(ui)[QmiGlobal.auth.dgi] === undefined ){
-                            	localStorage.removeItem("uiData");
-                            	
-                                QmiGlobal.auth.dgi = group_list[0].gi;
-                                $.lStorage("_loginData",QmiGlobal.auth);
-                            }
-
-                            getGroupComboInit(QmiGlobal.auth.dgi).done(function(resultObj){
-                            	if( resultObj.status === false ){
-                            		//發生錯誤 回首頁比較保險
-                            		console.debug("dgi combo error",resultObj);
-                            		window.location = "index.html";
-                            	} else {
-                            		deferred.resolve({location:"#page-group-main"});
-                            	}
-                            });
-                            
-                        } else{
-                            //沒group
-                            deferred.resolve({location:"#page-group-menu"});
-                        }
-                    });
-                }else{
-
-                    localStorage.removeItem("_groupList");
-                    localStorage.removeItem("uiData");
-                    //沒group
-                    deferred.resolve({location:"#page-group-menu"});
-                    // document.location = "main.html#page-group-menu";
-                }
-            }else if(data.status == 401){
-                //取得group list 失敗 代表自動登入失敗了
-                deferred.resolve({fail:true});
+                getGroupComboInit(QmiGlobal.auth.dgi).done(function(resultObj){
+                	if( resultObj.status === false ){
+                		//發生錯誤 回首頁比較保險
+                		console.debug("dgi combo error",resultObj);
+                		window.location = "index.html";
+                	} else {
+                		deferred.resolve({location:"#page-group-main"});
+                	}
+                });
+                
+            } else{
+                //沒group
+                deferred.resolve({location:"#page-group-menu"});
             }
+
         });
 
         deferred.done(function(data){
-        	s_load_show = false;
 
-            if(data.fail === true) {
-                //取得group list 失敗 代表自動登入失敗了
-                // localStorage.removeItem("_loginData");
-                return false;
-            }
+        	s_load_show = false;
+        	$('.ui-loader').hide();
+			$(".ajax-screen-lock").hide();
 
             $.lStorage("refreshChk", false);
             localStorage["uiData"] = JSON.stringify($.lStorage(ui));
@@ -410,7 +382,7 @@ onCheckVersionDone = function(needUpdate){
 			initChatCntDB(); 
 
 			//沒團體的情況
-			if(group_list.length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
+			if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
 				//關閉返回鍵
 				$("#page-group-menu .page-back").hide();
 				cns.debug("no group ");

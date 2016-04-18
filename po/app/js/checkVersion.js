@@ -164,7 +164,7 @@ $(function(){
 		    	try{
 		    		var gui = require('nw.gui');
 		    		gui.App.clearCache();
-		    		gui.Window.get().reload();
+		    		// gui.Window.get().reload();
 		    		console.debug("update successed");
 		    		onDone(false);
 		    		return true;
