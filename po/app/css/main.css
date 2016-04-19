@@ -18,6 +18,23 @@ body{
     font-size: 14px;
 }
 
+::-webkit-scrollbar {
+      width: 10px;
+      height: 5px;
+}
+
+
+::-webkit-scrollbar-thumb {
+      background-color: rgba(17, 17, 17, 0.45);
+      opacity: 0.8;
+      border-radius: 8px;
+}
+
+
+/*::-webkit-scrollbar-buttona:horizontal {
+      background-color: transparent;
+}*/
+
 .ui-header.ui-bar-c.ui-header-fixed {
 	min-height: 55px;
 }
@@ -719,8 +736,8 @@ img.auo {
 	/*color: #f5f5f5;
 	text-shadow: 0 0;*/
 	height: 100%;
-	overflow-y: scroll;
-	overflow-x: hidden;
+	/*overflow-y: hidden;
+	overflow-x: hidden;*/
 	-webkit-box-flex: 0; 
 }
 
@@ -999,9 +1016,19 @@ img.auo {
 .sm-group-list-area {
     /*min-height: 123px;*/
     height: -webkit-calc( 100% - 188px );
-	overflow: scroll;
+	overflow: hidden;
+	overflow-x: hidden;
 	padding-bottom: 5px;
 }
+
+.sm-group-list-area:hover {
+    overflow: auto;
+}
+
+.sm-group-list-area::-webkit-scrollbar-thumb {
+    background-color: rgb(86, 85, 85);
+}
+
 .sm-group-list-area-add {
     overflow: hidden;
 }
@@ -1374,11 +1401,19 @@ img.auo {
 	height: 43px;
 }
 #page-group-main .gm-content > div:nth-child(2){
-    overflow-y: scroll;
+    overflow-y: hidden;
 	position: absolute;
 	width: 100%;
 	height: -webkit-calc( 100% - 43px );
 	top: 43px;
+}
+
+#page-group-main .gm-content > div:nth-child(2):hover{
+    overflow-y: auto;
+}
+
+#page-group-main .gm-content > div:nth-child(2)::-webkit-scrollbar-track{
+	background-color: whitesmoke;
 }
 
 #page-group-main div[data-role=content]:hover {
@@ -1411,7 +1446,11 @@ img.auo {
 	margin-top: -1px;
 	margin-left: 49px;
 	max-width: -webkit-calc( 100% - 115px );
-	overflow-x: scroll;
+	overflow-x: hidden;
+}
+
+.header-menu:hover{
+	overflow-x: auto;
 }
 .header-group-name ,.header-cp-object{
 	text-align: center;
@@ -1911,7 +1950,7 @@ img.auo {
 	/*padding: 0 15px;*/
 	font-size: 14px;
 	white-space: nowrap;
-	overflow-x: scroll;
+	/*overflow-x: scroll;*/
 	width: 100%;
 	z-index: 10;
 	-webkit-box-shadow: 0px 2px 4px 0px rgba(190, 190, 190, 0.4);
@@ -3030,8 +3069,6 @@ img.st-user-pic{
 	margin-right: 5px;
 }
 
-
-
 .st-reply-area {
     background: white;
     border-radius: 5px;
@@ -3066,6 +3103,10 @@ img.st-user-pic{
 	display: block;
 	padding: 10px 0;
 	width: 75%;
+}
+
+.st-reply-content-subarea b{
+	cursor: pointer;
 }
 
 .st-reply-content {
@@ -3489,6 +3530,10 @@ img.st-reply-message-attach {
 	font-size: 15px;
 	resize:none;
 	height: 15px;
+}
+
+.cp-textarea-title::-webkit-scrollbar-thumb {
+    background-color: transparent;
 }
 
 .cp-icon-size {
@@ -4107,7 +4152,7 @@ input.cp-datetimepicker-end {
 	display: inline-block;
 	max-height: 100px;
 	text-overflow: ellipsis;
-	overflow: scroll;
+	overflow: auto;
 	min-height: 30px;
 	color: #4092ef;
 	/* white-space: pre-line; */
@@ -4153,7 +4198,7 @@ input.cp-datetimepicker-end {
 	z-index: 1;
 	position: fixed;
 	width: 100%;
-	overflow: scroll;
+	overflow-y: auto;
 	height: 100%;
 	background: white;
 }
@@ -4370,7 +4415,7 @@ input.cp-datetimepicker-end {
 	top: 0;
 	left: 0;
 	z-index: 1800;
-	overflow: scroll;
+	/*overflow: scroll;*/
 	-webkit-transform-style: preserve-3d;
 	
 }
@@ -4920,7 +4965,7 @@ div.user-info-submit-ready:active {
 	border-bottom: 4px solid rgb(200,200,200);
 	font-size: 14px;
 	white-space: nowrap;
-	overflow-x: scroll;
+	overflow-x: auto;
 	width: 100%;
 	z-index: 10;
 	/*height: 140px;*/
@@ -5295,3 +5340,6 @@ section.fileSharing section.progress-bar .frame .progress {
 }
 section.fileSharing section.progress-bar .frame .text { position: absolute; top: 0 ;left: 65px;}
 
+section.subpage-fileSharing{
+	overflow-y: auto;
+}

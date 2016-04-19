@@ -941,7 +941,6 @@ $(function(){
 
 	//detail view
 	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3",function(){
-
 		var this_event = $(this).parent();
 
 		//detail頁面 離去

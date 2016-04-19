@@ -1333,6 +1333,7 @@ $(function(){
                         pu: el.meta.gu
                     };
                 }
+                console.log(el.ml);
                 $.each(el.ml,function(i,val){
                     //event種類 不同 讀取不同layout
                     switch(val.tp){
@@ -1423,7 +1424,20 @@ $(function(){
 
                             without_message = true;
                             break;
+                        case 21:
+                            var mainReplyText = this_content[0].firstChild.textContent;
+                            var findText = "///;" + val.u + ";///";
+                            var markTag = "<b id='" + val.u + "'>" + val.n + "</b>";
+                            mainReplyText = mainReplyText.replace(findText, markTag);
+                            this_content[0].firstChild.textContent = "";
+                            this_content.prepend(mainReplyText);
+
+                            break;
                     }
+                });
+
+                this_event.find("b").bind("click", function(e) {
+                    userInfoShow(gi, e.target.id);
                 });
 
                 //已有的留言就不製作
@@ -5428,6 +5442,7 @@ $(function(){
 
         var isApplyWatermark = false;
         var watermarkText = "--- ---";
+        console.log(ml);
         $.each(ml,function(i,val){
             //結束時間檢查
             var end_time_chk = false;
@@ -5604,6 +5619,15 @@ $(function(){
                 case 17:
                     end_time_chk = true;
                     break;
+                case 21:
+                    var mainContext = this_event.find(target_div).html();
+                    var findText = "///;" + val.u + ";///";
+                    var markTag = "<b id='" + val.u + "'>" + val.n + "</b>";
+                    mainContext = mainContext.replace(findText, markTag);
+                    this_event.find(target_div).html(mainContext);
+                    this_event.find(target_div + "-detail").html(mainContext);
+
+                    break;
                 case 27:
                     if( false==isApplyWatermark && 1==val.wm ){
                         try{
@@ -5622,6 +5646,10 @@ $(function(){
                     }
                     break;
             };
+
+            this_event.find("b").bind("click", function(e) {
+                userInfoShow(gi, e.target.id);
+            });
             
             //需要填入結束時間 以及 結束時間存在 就填入
             if(end_time_chk){
