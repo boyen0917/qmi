@@ -6926,11 +6926,6 @@ combineCloudPolling = function(newPollingData){
     if(localPollingData.clTs === undefined) localPollingData.clTs = {};
 
     // 先將私雲polling加進來
-    // newPollingData.cmds.filter(function(item){
-    //     return  item.tp === 51;
-    // }).forEach(function(item){
-
-    // 目前會漏cnts 所以先把所有私雲的polling一起打 之後改成put counts成功 清掉local 應該就不用每次都打全部私雲
     newPollingData.cmds.filter(function(item){
         return  item.tp === 51;
     }).forEach(function(item){
@@ -7405,6 +7400,31 @@ updatePollingCnts = function(this_count,cnt_type){
     ajaxDo(api_name,headers,method,false,body).complete(function(data){
         if(data.status == 200){
             // 把local cnts 清掉
+            try {
+                var tempPollingData = $.lStorage("_pollingData");
+
+                // gcnts
+                if(cnt_type.substring(0,1) == "G"){
+                    tempPollingData.gcnts[cnt_type] = 0;
+
+                    $.lStorage("_pollingData",tempPollingData);
+                    return;
+                }
+
+                if(typeof ciTmp === "undefined") {
+
+                    tempPollingData.cnts[this_gi][cnt_type] = 0;
+
+                } else if(tempPollingData.cnts[this_gi].cl !== undefined) {
+                    tempPollingData.cnts[this_gi].cl.forEach(function(item){
+                        if(item.ci === ciTmp) item[cnt_type] = 0;
+                    })
+                }
+                
+                $.lStorage("_pollingData",tempPollingData);
+            } catch(e) {
+                // do something..
+            }
         }
     });
 }
