@@ -6926,9 +6926,15 @@ combineCloudPolling = function(newPollingData){
     if(localPollingData.clTs === undefined) localPollingData.clTs = {};
 
     // 先將私雲polling加進來
+    // newPollingData.cmds.filter(function(item){
+    //     return  item.tp === 51;
+    // }).forEach(function(item){
+
+    // 目前會漏cnts 所以先把所有私雲的polling一起打 之後改成put counts成功 清掉local 應該就不用每次都打全部私雲
     newPollingData.cmds.filter(function(item){
         return  item.tp === 51;
     }).forEach(function(item){
+
         // 設定這個私雲的pollingTime
 
         // localPollingData.clTs[item.pm.ci]不使用變數取代 才能直接存取 
@@ -7398,7 +7404,7 @@ updatePollingCnts = function(this_count,cnt_type){
     var method = "put";
     ajaxDo(api_name,headers,method,false,body).complete(function(data){
         if(data.status == 200){
-            // this_count.hide();
+            // 把local cnts 清掉
         }
     });
 }
