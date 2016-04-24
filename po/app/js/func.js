@@ -6830,69 +6830,54 @@ getPrivateGroupFromList = function( data, callback ){
 
 
 polling = function(){
-    if(!$.lStorage("_pollingData"))
-        $.lStorage("_pollingData",{cnts:{},ts:{pt: new Date().getTime()}})
+
+    if(!$.lStorage("_pollingData")) 
+        $.lStorage("_pollingData",{cnts: {},ts: {pt: new Date().getTime()}})
 
     var 
     pollingDeferred = $.Deferred(),
-    local_pollingData = $.lStorage("_pollingData"),
-    polling_time = local_pollingData.ts.pt;
+    localPollingData = $.lStorage("_pollingData"),
+    publicPollingTime = localPollingData.ts.pt;
 
     new QmiAjax({
-        url: base_url + "sys/polling?pt=" + polling_time,
+        url: base_url + "sys/polling?pt=" + publicPollingTime,
         isPublicApi: true
     }).complete(function(data){
         if(data.status == 200){
-            var new_pollingData = $.parseJSON(data.responseText);
+            var newPollingData = $.parseJSON(data.responseText);
+            newPollingData.publicPollingTime = publicPollingTime;
 
-            // 合併私雲polling
-            (function(){
-                var deferred = $.Deferred();
-                
-                // 先將私雲polling加進來
-                // new_pollingData.cmds.filter(function(item){
-                //     return  item.tp === 51;
-                // }).forEach(function(item){
-                //     var cloudObj = QmiGlobal.clouds[item.pm.ci];
-                //     if(cloudObj === undefined) return ;
+            // 合併私雲polling 而且每個私雲polling 都要有自己的時間
+            combineCloudPolling(newPollingData).done(function(pollingObj){
 
-                //     new QmiAjax({
-                //         url: "https://" + cloudObj.cl + "/apiv1/sys/polling" + polling_time,
-                //         useCloudHeader: true
-                //     })
-                // })
+                var newPollingData = pollingObj.newPollingData,
+                    tmp_cnts = newPollingData.cnts || [];
 
-                deferred.resolve();
-                return deferred.promise();
-            })().done(function(){
-
-                var tmp_cnts = new_pollingData.cnts || [];
                 // new_pollingData.cnts = {};
-                new_pollingData.cnts = local_pollingData.cnts || [];
+                newPollingData.cnts = localPollingData.cnts || [];
                 //cnts 做合併
                 $.each(tmp_cnts,function(i,val){
-                    var tmp_gi_obj = $.extend(local_pollingData.cnts[val.gi],val);
-                    new_pollingData.cnts[val.gi] = tmp_gi_obj;
+                    var tmp_gi_obj = $.extend(localPollingData.cnts[val.gi],val);
+                    newPollingData.cnts[val.gi] = tmp_gi_obj;
                 });
 
                 //gcnts 做合併
-                new_pollingData.gcnts = $.extend(local_pollingData.gcnts||{},new_pollingData.gcnts||{});
+                newPollingData.gcnts = $.extend( (localPollingData.gcnts || {}), (newPollingData.gcnts || {}) );
 
                 //暫存
                 if(!$.lStorage("_tmpPollingData"))
-                    $.lStorage("_tmpPollingData",new_pollingData);
+                    $.lStorage("_tmpPollingData",newPollingData);
 
                 //寫入數字
-                pollingCountsWrite(new_pollingData);
+                pollingCountsWrite(newPollingData);
                 
                 //cmds api
-                pollingCmds(new_pollingData.cmds,new_pollingData.msgs,new_pollingData.ccs).done(function(){
+                pollingCmds(newPollingData).done(function(){
                     pollingDeferred.resolve({
                         status: true,
                         interval: polling_interval
                     });
                 });
-
             }); // 合併私雲polling
 
         }else if(data.status == 401){
@@ -6932,13 +6917,97 @@ polling = function(){
     })
 }
 
+combineCloudPolling = function(newPollingData){
+    var combineDeferred = $.Deferred(),
+        localPollingData = $.lStorage("_pollingData"),
+        cloudPollingDefArr = [];
+    
+    // 私雲時間存local
+    if(localPollingData.clTs === undefined) localPollingData.clTs = {};
+
+    // 先將私雲polling加進來
+    newPollingData.cmds.filter(function(item){
+        return  item.tp === 51;
+    }).forEach(function(item){
+        // 設定這個私雲的pollingTime
+
+        // localPollingData.clTs[item.pm.ci]不使用變數取代 才能直接存取 
+        // 各個cloud的polling時間預設值 存到物件中
+        if(localPollingData.clTs[item.pm.ci] === undefined || localPollingData.clTs[item.pm.ci].pollingTime === undefined) {
+            localPollingData.clTs[item.pm.ci] = {
+                pollingTime: newPollingData.publicPollingTime
+            }
+        }
+
+        var deferred = $.Deferred();
+        new QmiAjax({
+            apiName: "sys/polling?pt=" + localPollingData.clTs[item.pm.ci].pollingTime,
+            ci: item.pm.ci,
+            success: function(data){
+                deferred.resolve({
+                    ci: item.pm.ci,
+                    data: data,
+                    isSuccess: true
+                });
+            },
+            error: function(data){
+                deferred.resolve({
+                    ci: item.pm.ci,
+                    data: data,
+                    isSuccess: false
+                });
+            }
+        });
+
+        cloudPollingDefArr.push(deferred) // new QmiAjax ; cloudPollingDefArr.push
+    });
+
+    $.when.apply($,cloudPollingDefArr).done(function(){
+        // 設定arguments
+        Array.prototype.forEach.call(arguments,function(item){
+            if(item.isSuccess === false) return;
+
+            // localPollingData -> 存好每個私雲的時間預設值
+
+            var apiData = item.data;
+            // 存polling time
+            localPollingData.clTs[item.ci].pollingTime = apiData.ts.pt;
+            // cnts
+            newPollingData.cnts = newPollingData.cnts.concat(apiData.cnts);
+            // cmds
+            newPollingData.cmds = newPollingData.cmds.concat(apiData.cmds);
+            // msgs
+            newPollingData.msgs = newPollingData.msgs.concat(apiData.msgs);
+
+            // gcnts 私雲有公雲的就加回去公雲 沒有就等於
+            Object.keys(newPollingData.gcnts).forEach(function(item){
+                if(apiData.gcnts.hasOwnProperty(item) === true) 
+                    newPollingData.gcnts[item] += apiData.gcnts[item];
+            });
+            // gcnts 公雲有私雲的就加回去公雲 沒有就等於
+            Object.keys(apiData.gcnts).forEach(function(item){
+                //私雲的數字加回去公雲
+                if(newPollingData.gcnts.hasOwnProperty(item) === false) 
+                    newPollingData.gcnts[item] = apiData.gcnts[item];
+            });
+            
+        })
+        // 每個私雲的polling時間都更新完成 return 物件
+        combineDeferred.resolve({
+            localPollingData: localPollingData,
+            newPollingData: newPollingData
+        });
+    })
+    return combineDeferred.promise();
+}
+
 
 pollingCountsWrite = function(pollingData){
 
     var 
-    pollingData = ( pollingData       == undefined ?  $.lStorage("_pollingData")  : pollingData       ),
-    cntsAllObj  = ( pollingData.cnts  == undefined ?  {}                          : pollingData.cnts  ),
-    gcnts       = ( pollingData.gcnts == undefined ?  { G1: 0, G3: 0 }            : pollingData.gcnts ),
+    pollingData = ( pollingData       == undefined ? $.lStorage("_pollingData") : pollingData       ),
+    cntsAllObj  = ( pollingData.cnts  == undefined ? {}                         : pollingData.cnts  ),
+    gcnts       = ( pollingData.gcnts == undefined ? { G1: 0, G3: 0 }           : pollingData.gcnts ),
     groupsData  =   QmiGlobal.groups,
 
     //排序用
@@ -7014,8 +7083,8 @@ pollingCountsWrite = function(pollingData){
         
 }
 
-//polling 事件
-pollingCmds = function(cmds,msgs,ccs){
+//polling 事件 newPollingData
+pollingCmds = function(newPollingData){
     var 
     newCmdsArr = [],
     user_info_arr = [],// 存tp4,5,6
@@ -7036,8 +7105,8 @@ pollingCmds = function(cmds,msgs,ccs){
     var groupListDeferred = $.Deferred();
 
     // tp11 是新團體 或 gi不在 現有列表中 就要統一做一次取得團體列表
-    for( var i = 0 ; i < cmds.length ; i++ ) {
-        var item =  cmds[i];
+    for( var i = 0 ; i < newPollingData.cmds.length ; i++ ) {
+        var item =  newPollingData.cmds[i];
         if( 
             item.tp === 11 
             || (item.pm.gi !== undefined && QmiGlobal.groups[item.pm.gi] === undefined) 
@@ -7057,7 +7126,7 @@ pollingCmds = function(cmds,msgs,ccs){
     groupListDeferred.done(function(){
 
         // 需要打combo的情況
-        cmds.forEach(function(item,i){
+        newPollingData.cmds.forEach(function(item,i){
 
             var 
             comboDeferred = $.Deferred();
@@ -7114,7 +7183,7 @@ pollingCmds = function(cmds,msgs,ccs){
             // 等等要剔除這次打過combo的tp4,5,6 避免重複api -> arguments是array-like Object
             var exceptArr = Array.prototype.map.call(arguments,function(item){ return item.thisGi; })
 
-            cmds.forEach(function(item){
+            newPollingData.cmds.forEach(function(item){
 
                 if( ( item.tp == 4 || item.tp == 5 || item.tp == 6 ) &&
                     exceptArr.indexOf(item.pm.gi) > 0
@@ -7264,27 +7333,27 @@ pollingCmds = function(cmds,msgs,ccs){
 
     // 全部 cmds 處理完
     $.when.apply($,pollingDeferredPoolArr).done(function(){
-        pollingUpdate(msgs,ccs);
+        pollingUpdate(newPollingData);
         allCmdsDoneDeferred.resolve();
     })
 
     return allCmdsDoneDeferred.promise();
 }
 
-pollingUpdate = function(msgs,ccs){
+pollingUpdate = function(newPollingData){
     
     //更新polling時間
     $.lStorage("_pollingData",$.lStorage("_tmpPollingData"));
     localStorage.removeItem("_tmpPollingData");
 
     //更新聊天內容
-    if(msgs && msgs.length>0){
-        onReceivePollingChatMsg(msgs);
+    if(newPollingData.msgs && newPollingData.msgs.length>0){
+        onReceivePollingChatMsg(newPollingData.msgs);
     }
 
     //更新聊天已讀未讀時間
-    if(ccs && ccs.length>0){
-        onReceivePollingChatCnt(ccs);
+    if(newPollingData.ccs && newPollingData.ccs.length>0){
+        onReceivePollingChatCnt(newPollingData.ccs);
     }
 }
 
@@ -7471,8 +7540,6 @@ getMultipleUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone)
         }
     }
 
-
-    cns.debug( "[getMultipleUserInfo] length:", user_info_arr.length );
     var load_show_chk = load_show_chk || false;
     var onAllDone = onAllDone || false;
 

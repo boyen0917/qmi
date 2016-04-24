@@ -4,15 +4,11 @@ onCheckVersionDone = function(needUpdate){
 	}
 	clearBadgeLabel();
 
-console.log("why!!!");
-
-
 	if($.lStorage("_loginAutoChk") === true) {
 		loginAction();
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
 		$.mobile.changePage("")
-
 	}
 
 	//預設上一頁
@@ -23,7 +19,6 @@ console.log("why!!!");
 	$(window).resize(function(){ 
 		$("#page-registration").css("height",$(window).height());
 	});
-
 
 	$(document).on("click",".login-ready",function(){
 		var isMail = false;
@@ -286,7 +281,6 @@ console.log("why!!!");
         var method = "post";
         ajaxDo(api_name,headers,method,true,body).complete(function(data){
         	if(data.status == 200){
-
         		
         		QmiGlobal.auth = $.parseJSON(data.responseText);
         		

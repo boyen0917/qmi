@@ -221,95 +221,54 @@ window.QmiGlobal = {
 
 window.QmiAjax = function(args){
 
-	var 
-	thisQmiAjax = this,
-	ajaxDeferred = $.Deferred(),
+	var self = this,
+		ajaxDeferred = $.Deferred(),
 
-	// 判斷私雲api 
-	isCloudApi = (function(){
+		// 判斷私雲api 
+		cloudData = (function(){
 
-		// 有指定url 加上不要私雲 最優先 ex: 公雲polling
-		if(args.isPublicApi === true) 
-			return undefined;
+			// 有指定url 加上不要私雲 最優先 ex: 公雲polling
+			if(args.isPublicApi === true) 
+				return undefined;
 
-		// 有指定ci 直接給他私雲
-		if(args.ci !== undefined) 
-			return QmiGlobal.clouds[args.ci];
+			// 有指定ci 直接給他私雲
+			if(args.ci !== undefined) 
+				return QmiGlobal.clouds[args.ci];
 
-		// 判斷apiName有無包含私雲gi 有的話就給他私雲 
-		if(args.apiName !== undefined){
-			var cgi = Object.keys(QmiGlobal.cloudGiMap).find(function(cgi){	
-				return args.apiName.match(new RegExp(cgi, 'g'))
-			});
-			if(cgi !== undefined ) 
-				return QmiGlobal.clouds[ QmiGlobal.cloudGiMap[cgi].ci ];
-		}
-
-		// 最後判斷 現在團體是私雲團體 就做私雲
-		if(QmiGlobal.cloudGiMap[gi] !== undefined)
-			return QmiGlobal.clouds[ QmiGlobal.cloudGiMap[gi].ci ];
-
-	})(),
-
-	newArgs = {
-		url: (function(){
-
-			// 指定url 
-			if(args.url !== undefined) return args.url;
-
-			// undefined 表示 不符合私雲條件 給公雲
-			if(isCloudApi === undefined)
-				return base_url + args.apiName;
-			else
-				return "https://" + isCloudApi.cl + "/apiv1/" + args.apiName;
-		})(),
-
-		headers: (function(){
-			// 指定headers 
-			if(args.specifiedHeaders !== undefined) return args.specifiedHeaders;
-
-			var newHeaders = { ui: ui, at: at, li: lang };
-
-			// 先 extend 新的參數值
-			if(args.headers !== undefined) {
-				$.extend(newHeaders, args.headers);
+			// 判斷apiName有無包含私雲gi 有的話就給他私雲 
+			if(args.apiName !== undefined){
+				var cgi = Object.keys(QmiGlobal.cloudGiMap).find(function(cgi){	
+					return args.apiName.match(new RegExp(cgi, 'g'))
+				});
+				if(cgi !== undefined ) 
+					return QmiGlobal.clouds[ QmiGlobal.cloudGiMap[cgi].ci ];
 			}
 
-			// 做私雲判斷
-			if(isCloudApi !== undefined) {
-				newHeaders.uui = newHeaders.ui;
-				newHeaders.uat = newHeaders.at;
-				// tempGi 因為團體尚未切過去
-				newHeaders.ui = isCloudApi.ui;
-				newHeaders.at = isCloudApi.nowAt;
-			}
+			// 最後判斷 現在團體是私雲團體 就做私雲
+			if(QmiGlobal.cloudGiMap[gi] !== undefined)
+				return QmiGlobal.clouds[ QmiGlobal.cloudGiMap[gi].ci ];
 
-			return newHeaders;
 		})(),
 
-		timeout: 30000,
+		newArgs = {
+			url: (function(){
+				// 指定url 
+				if(args.url !== undefined) return args.url;
 
-		type: args.method || "get",
+				// undefined 表示 不符合私雲條件 給公雲
+				if(cloudData === undefined)
+					return base_url + args.apiName;
+				else
+					return "https://" + cloudData.cl + "/apiv1/" + args.apiName;
+			})(),
+			// setHeaders: outerArgs,cloudData
+			headers: self.setHeaders(args, cloudData),
 
-		success: function(ajaxSuccessData) {
-			ajaxDeferred.resolve(ajaxSuccessData);
-		},
+			timeout: 30000,
 
-		error: function(ajaxErrData){
-			ajaxDeferred.resolve(ajaxErrData);
+			type: args.method || "get"
 
-			ajaxErrData.ajaxArgs = newArgs;
-			return thisQmiAjax.onError(ajaxErrData)
-		},
-
-		complete: function(ajaxCompleteData){
-
-			ajaxDeferred.resolve(ajaxCompleteData);
-
-			ajaxCompleteData.ajaxArgs = newArgs;
-			return thisQmiAjax.onComplete(ajaxCompleteData)
-		}
-	};
+		};
 
 	// 不是get 再加入body
 	if(newArgs.type !== "get") newArgs.data = (typeof args.body === "string") ? args.body : JSON.stringify(args.body);
@@ -320,55 +279,303 @@ window.QmiAjax = function(args){
 			newArgs[argsKey] = args[argsKey];
 	});
 
+
 	//before send
 	if(args.isLoadingShow === true) {
 		$(".ajax-screen-lock").show();
 		$('.ui-loader').css("display","block");
 	} 
-		
-	if(args.debug === true) console.debug("newArgs", newArgs);
 
-	// 執行
-	// $.ajax(newArgs);
 
-	// var thisPromise = ajaxDeferred.promise();
-	// thisPromise.complete = function(cb){
-	// 	ajaxDeferred.done(cb);
-	// }
+	// 執行前 先看reAuth lock沒
+	var reAuthTimer = setInterval(reAuthInterval,500)
 
-	// thisPromise.success = thisPromise.done;
-	// thisPromise.error = thisPromise.fail;
+	function reAuthInterval(){
+		console.log("lets go!!");
+		// locked! return!
+		if(self.authLock.chk() === true) {
 
-	return $.ajax(newArgs);
+			console.log("lock 囉～～～");
 
-	// return $.ajax(newArgs);
+		} else {
+			
+			// 檢查是否接近過期時間 先替換token
+			// ajaxArgs,cloudData
+
+			self.expireChk({
+				url: newArgs.url,
+				noAuth: args.noAuth,
+				cloudData: cloudData
+			}).done(function(chk){
+
+				// 有經過reAuth 更新headers
+				// setHeaders: outerArgs,cloudData
+				newArgs.headers = self.setHeaders(args, cloudData);
+
+				// 印bug
+				if(args.debug === true) console.debug("newArgs", newArgs);
+
+				// 執行
+				$.ajax(newArgs).complete(function(apiData){
+
+					// deferred chain
+					// 1. 判斷是否reAuth
+					// 2. reAuth之後重做原本的ajax
+					// 3. 做原本ajax的判斷
+					(function(){
+						// 1. 判斷是否reAuth
+						var responseObj = JSON.parse(apiData.responseText),
+							reAuthDefChain = MyDeferred();
+
+						if(responseObj === undefined) {
+							// do something
+						}
+
+						// reAuth: token過期
+						if( apiData.status === 401 
+							&& responseObj.rsp_code === 601
+							&& args.noAuth !== true
+						) {
+							// 執行前 先看reAuth lock沒
+							var reAuthTimer2 = setInterval(reAuthInterval2,500)
+							function reAuthInterval2(){
+								if(self.authLock.chk() === true) {
+									console.log("lock 囉2～～～");
+								} else {
+									self.reAuth(cloudData).done(reAuthDefChain.resolve);
+									clearInterval(reAuthTimer2);
+								}
+							}
+							
+
+						} else {
+							reAuthDefChain.resolve({
+								isReAuth: false,
+								isSuccess: true,
+								data: apiData
+							});
+						}
+
+						return reAuthDefChain;
+					})().then(function(resultObj){
+						// 2. reAuth之後重做原本的ajax
+
+						var reAuthDefChain = MyDeferred();
+
+						if(resultObj.isReAuth === false) {
+							// 不用reAuth 直接進行
+							reAuthDefChain.resolve(resultObj);
+
+						} else if(resultObj.isSuccess === true){
+
+							// 重新取得token成功 換掉at後 重新做ajax
+
+							// setHeaders: outerArgs,cloudData
+							newArgs.headers = self.setHeaders(args, cloudData);
+						
+							$.ajax(newArgs).complete(function(newData){
+								reAuthDefChain.resolve({
+									isSuccess: true,
+									data: newData
+								});
+							})
+
+						} else {
+							// auth 再度發生錯誤 就傳入self.reAuth的錯誤內容
+							reAuthDefChain.resolve(resultObj);
+						}
+
+						return reAuthDefChain;
+					}).then(function(reAuthObj){
+						// 3. 做原本ajax的判斷
+						try {
+							var completeData = reAuthObj.data,
+							responseObj = JSON.parse(completeData.responseText);
+						} catch(e) {
+							// 回傳失敗
+							ajaxDeferred.reject(completeData);
+						}
+						
+
+						completeData.ajaxArgs = newArgs;
+						responseObj.ajaxArgs = newArgs;
+
+						// 這邊只有一個狀況 就是reAuth失敗
+						if(reAuthObj.isSuccess === false || completeData.status !== 200) {
+							// 回傳失敗
+							ajaxDeferred.reject(completeData);
+
+							if(typeof args.error === "function")
+								args.error(completeData);
+
+							return;
+						} 
+
+						if(typeof args.complete === "function")
+							args.complete(completeData);
+
+						if(typeof args.success === "function")
+							args.success(responseObj);
+
+						ajaxDeferred.resolve(completeData);
+
+					}) // end of reAuthDef 
+				})// end of ajax 
+			})// end of expireChk 
+
+			clearInterval(reAuthTimer);
+		} // authLock chk
+	} // end of interval function
+
+			
+
+	ajaxDeferred.promise().complete = ajaxDeferred.always;
+	ajaxDeferred.promise().error = ajaxDeferred.fail;
+    ajaxDeferred.promise().success = function(cb){
+        ajaxDeferred.done(function(data){
+            if(data.status == 200)
+                cb(JSON.parse(data.responseText))
+        })
+    };
+	return ajaxDeferred.promise();
 }
 
 QmiAjax.prototype = {
+	expireTimer: 150 * 1000,//ms
 
-	//ajax用
-	// myRand = Math.floor((Math.random()*1000)+1);
+	authLock: (function(){
+		var isLock = false;
+		var intervalTimer;
 
-	// $.ajaxSetup ({
-	// 	timeout: 30000
-	// });
+		//安全機制 3秒後改回false 避免reAuth裡的interval無限打
+		function unlock(){
+			clearInterval(intervalTimer);
+			intervalTimer = setInterval(function(){
+				isLock = false;
+				clearInterval(intervalTimer);
+			},3000);
+		}
 
-	reAuth: function(){
-		var deferred = $.Deferred();
+		return {
+			set: function(status){
+				isLock = status;
+				unlock();
+			},
+			chk: function() {
+				return isLock;
+			}
+		}
+	})(),
+
+	// 初始設定 以及 reAuth 會用到
+	setHeaders: function(outerArgs,cloudData){
+		// 指定headers 
+		if(outerArgs.specifiedHeaders !== undefined) return outerArgs.specifiedHeaders;
+
+		var newHeaders = {};
+
+		// 先 extend 外部參數值
+		if(outerArgs.headers !== undefined) {
+			$.extend(newHeaders, outerArgs.headers);
+		}
+
+		// 預設公雲ui,at
+		newHeaders = { ui: QmiGlobal.auth.ui, at: QmiGlobal.auth.at, li: lang };
+
+		// 做私雲判斷
+		if(cloudData !== undefined) {
+			newHeaders.uui = newHeaders.ui;
+			newHeaders.uat = newHeaders.at;
+			newHeaders.ui = cloudData.ui;
+			newHeaders.at = cloudData.nowAt;
+		}
+
+		return newHeaders;
+	},
+
+	expireChk: function(args) {
+		// 執行前 先檢查是否接近過期時間 先替換token
+		var nowEt = (args.cloudData === undefined) ? QmiGlobal.auth.et : args.cloudData.et,
+			deferred = $.Deferred();
+
+		console.debug( (args.cloudData === undefined ? "公雲 " : "私雲 ") + (function(){
+			var temp = args.url.substring(0,(args.url.lastIndexOf("/") + 1)-1);
+			var start = temp.lastIndexOf("/") + 1;
+			return args.url.substring(start);
+		}()), (nowEt - ( new Date().getTime() )) / 1000 );
+
+		if(args.noAuth === true) {
+			// 不用auth
+			deferred.resolve({isSuccess: true});
+
+		} else if(nowEt - (new Date().getTime()) < this.expireTimer) {
+			// reAuth 結束
+			this.reAuth(args.cloudData).done(deferred.resolve);
+
+		} else {
+
+			// 還沒過期
+			deferred.resolve({isSuccess: true});
+		}
+
+		return deferred.promise();
+	},
+
+	reAuth: function(cloudData){
+		var self = this,
+			deferred = $.Deferred();
+
+		// auth lock
+		console.log("lets go auth!!");
+		self.authLock.set(true);
+
 		$.ajax({
-		    url: base_url + "auth",
-		    headers: { ui: ui, at: at, li: lang },
+		    url: (function(){
+				if(cloudData === undefined) {
+					return base_url + "auth";
+				} else {
+					return "https://" + cloudData.cl + "/apiv1/auth";
+				}
+			})(),
+
+		    headers: self.setHeaders({},cloudData),
 		    type: "put",
 		    error: function(errData){
 		        console.debug("reAuth error",errData);
-		        deferred.resolve(false);
+		        deferred.resolve({
+		        	isSuccess: false,
+		        	data: errData,
+		        	isReAuth: true
+		        });
 		    },
+
 		    success: function(apiData){
 		    	// 重新設定at
-		        at = apiData.at;
-		        deferred.resolve(true);
+		    	if(
+		    		cloudData !== undefined 
+		    		&& QmiGlobal.clouds[cloudData.ci] !== undefined
+		    	) {
+		    		// 私雲
+		    		QmiGlobal.clouds[cloudData.ci].nowAt = at = apiData.at;
+		    		QmiGlobal.clouds[cloudData.ci].et = apiData.et;
+		    	} else {
+		    		// 公雲
+		    		QmiGlobal.auth.at = at = apiData.at;
+		    		QmiGlobal.auth.et = apiData.et;
+		    	}
+		        
+		        deferred.resolve({
+		        	isSuccess: true,
+		        	data: apiData,
+		        	isReAuth: true
+		        });
+		    },
+		    complete: function(){
+		    	console.log("lock is over");
+		    	self.authLock.set(false);
 		    }
-		})
+		}) // end of reAuth ajax
+		
 		return deferred.promise();
 	},
 
@@ -391,26 +598,15 @@ QmiAjax.prototype = {
 			toastShow( $.i18n.getString("COMMON_TIMEOUT_ALERT") );
 			return false;
 		}
+
 		//logout~
 		if(data.status == 401){
-			var authDeferred = $.Deferred();
-			// token 過期
-			if(data.rsp_code === 601) {
-				this.reAuth().done(authDeferred.resolve)
-			} else {
-				authDeferred.resolve(false);
-			}
 
-			authDeferred.done(function(chk){
-				// reAuth成功 不做錯誤顯示
-				if(chk === true) return;
+			// 聊天室關閉
+			if(window.location.href.match(/po\/app\/chat.html/)) window.close();
 
-				// 聊天室關閉
-				if(window.location.href.match(/po\/app\/chat.html/)) window.close();
-
-				localStorage.removeItem("_loginData");
-				popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
-			})
+			localStorage.removeItem("_loginData");
+			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
 
 			return;
 		}
@@ -443,14 +639,6 @@ QmiAjax.prototype = {
 		// if(data.status !== 200) {
 
 		// }
-	},
-
-	tokenExpired: function(data) {
-		if(data.rsp_code === 601) {
-			console.debug("token expired!");
-
-			// do something
-		}
 	}
 
 }
