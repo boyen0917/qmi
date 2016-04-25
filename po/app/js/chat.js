@@ -799,6 +799,7 @@ function op(url, type, data, delegate, errorDelegate) {
 	result.success(function (data, status, xhr) {
 		if (delegate) delegate(data, status, xhr);
 	});
+	
 	return result;
 }
 

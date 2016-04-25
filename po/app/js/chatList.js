@@ -350,6 +350,7 @@ function openChatWindow ( giTmp, ci ){
 		$.lStorage( "_chatRoom", data );
 		//document.location = "chat.html";
 		windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
+		windowList[ci].QmiGlobal = window.QmiGlobal;
 	}
 	windowList[ci].focus();
 }

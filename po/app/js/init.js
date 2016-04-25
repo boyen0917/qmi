@@ -219,6 +219,12 @@ window.QmiGlobal = {
 };
 
 
+// 聊天室token 處理 暫時
+if(window.location.href.match(/po\/app\/chat.html/)) {
+	QmiGlobal.auth = window.opener.QmiGlobal.auth;
+}
+
+
 window.QmiAjax = function(args){
 
 	var self = this,
@@ -405,17 +411,17 @@ window.QmiAjax = function(args){
 							// 回傳失敗
 							ajaxDeferred.reject(completeData);
 
-							if(typeof args.error === "function")
-								args.error(completeData);
+							// if(typeof args.error === "function")
+							// 	args.error(completeData);
 
 							return;
 						} 
 
-						if(typeof args.complete === "function")
-							args.complete(completeData);
+						// if(typeof args.complete === "function")
+						// 	args.complete(completeData);
 
-						if(typeof args.success === "function")
-							args.success(responseObj);
+						// if(typeof args.success === "function")
+						// 	args.success(responseObj);
 
 						ajaxDeferred.resolve(completeData);
 
