@@ -7117,6 +7117,19 @@ pollingCountsWrite = function(pollingData){
         sortedGroup.detach();
         $(".sm-group-list-area").prepend(sortedGroup);
     })
+
+
+    //邀請 若是在團體邀請頁面時 則不寫入
+    if(gcnts.G1 > 0){
+        $(".hg-invite .sm-count").html(gcnts.G1).show();
+    }
+    if(gcnts.G2 > 0){
+        //最新消息
+    }
+    if(gcnts.G3 > 0){
+        //鈴鐺
+        if( typeof(showNewAlertIcon)!='undefined' ) showNewAlertIcon( gcnts.G3 );
+    }
         
 }
 
