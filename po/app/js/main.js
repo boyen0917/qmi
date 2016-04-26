@@ -244,14 +244,7 @@ $(function(){
 	//----------------------------------- 小幫手 ---------------------------------------------
 
 	//小幫手 創建團體
-	$(".hg-create").click(function(){
-		$("#page-group-menu").data("type","create");
-		$(".gm-create").trigger("click");
-		clearCreateGroupPage();
-
-		$("#page-group-menu .page-back").show();
-		$.mobile.changePage("#page-group-menu");
-	});
+	$(".hg-create").click(goToGroupMenu);
 	//小幫手 加入團體
 	$(".hg-join").click(function(){
     });

@@ -4534,12 +4534,11 @@ groupMenuListArea = function (noApi){
 
     noApiDeferred.done(function(data){
         //管理者圖示
-        var icon_host = "<img src='images/sidemenu/icon_host.png'/>";
+        var icon_host = "<img src='images/sidemenu/icon_host.png'/>",
+            listArea = $(".sm-group-list-area").html("");
 
         $.each(QmiGlobal.groups,function(key,val){
             if( key.indexOf("G")!=0 && key.indexOf(_pri_split_chat)!=0 ) return;
-
-            var tmp_selector = ".sm-group-list-area";
             
             var glt_img = "images/common/others/empty_img_all_l.png";
             var glo_img = "images/common/others/empty_img_all_l.png";
@@ -4561,7 +4560,7 @@ groupMenuListArea = function (noApi){
             );
 
             this_group.find(".group-pic").data("auo",glo_img)
-            $(tmp_selector).append(this_group);
+            listArea.append(this_group);
 
             //管理者圖示
             if(val.ad != 1) this_group.find(".sm-icon-host").hide();
@@ -4571,6 +4570,7 @@ groupMenuListArea = function (noApi){
 
         if(Object.keys( QmiGlobal.groups ).length > 2) $(".sm-group-switch").show();
 
+        // if(Object.keys( QmiGlobal.groups ).length === 0) $.mobile.changePage("#page-group-menu");
         //設定調整團體頭像
         $(document).data("group-avatar",true);
 
@@ -6659,19 +6659,6 @@ zoomIn = function (target)
     }
 }
 
-getGroupListBak = function(){
-    console.log("getGroupList");
-    //取得團體列表
-    var api_name = "groups";
-    var headers = {
-        "ui":ui,
-        "at":at,
-        "li":lang
-    };
-    var method = "get";
-    return ajaxDo(api_name,headers,method,false);
-}
-
 
 getGroupList = function(){
     var groupsDeferred = $.Deferred();
@@ -6681,20 +6668,11 @@ getGroupList = function(){
     }).success(function(apiData){
 
         var 
-        allGroupList = apiData.gl,
+        allGroupList = apiData.gl || [],
         allGlDeferred = $.Deferred();
         clTokenDefArr = [];
 
         if(apiData.cl !== undefined && apiData.cl.length !== 0) {
-
-            // QmiGlobal.clouds = apiData.cl.reduce(function(mapObj,item){
-            //     var certDeferred = $.Deferred();
-            //     mapObj[item.ci] = item;
-
-            //     clTokenDefArr.push( getCloudToken(item) );
-
-            //     return mapObj;
-            // },{});
             
             clTokenDefArr = apiData.cl.reduce(function(defArr,item){
                 defArr.push( getCloudToken(item) );
@@ -6744,7 +6722,8 @@ getGroupList = function(){
 
         allGlDeferred.done(function(){
             //將group list 更新到 lstorage ui
-            groupListToLStorage(allGroupList);
+            if(allGroupList.length > 0)
+                groupListToLStorage(allGroupList);
 
             groupsDeferred.resolve(allGroupList);
         });
@@ -6993,14 +6972,14 @@ combineCloudPolling = function(newPollingData){
             apiName: "sys/polling?pt=" + localPollingData.clTs[item.pm.ci].pollingTime,
             ci: item.pm.ci,
             success: function(data){
-                deferred.resolve({
+                cloudPollingDef.resolve({
                     ci: item.pm.ci,
                     data: data,
                     isSuccess: true
                 });
             },
             error: function(data){
-                deferred.resolve({
+                cloudPollingDef.resolve({
                     ci: item.pm.ci,
                     data: data,
                     isSuccess: false
@@ -7411,50 +7390,50 @@ countsFormat = function(num){
     return num > 99 ? "99+" : num;
 }
 
-updatePollingCnts = function(this_count,cnt_type){
-    var api_name = "sys/counts";
-    var this_gi = this_count.data("gi") || gi;
-    var body = {
-        cnts: [],
-        gcnts: {}
-    };
-
-    if(cnt_type.substring(0,1) == "G"){
-        body.gcnts[cnt_type] = 0;
-    }else{
-        body.cnts[0] = {
-            gi: this_gi
+updatePollingCnts = function(countDom,cntType){
+    var thisGi = countDom.data("gi") || gi,
+        isPublicApi = false,
+        body = {
+            cnts: [],
+            gcnts: {}
         };
-        if( this_count.hasClass("sm-cl-count") ){
-            if( null==body.cnts[0].cl ){
-                body.cnts[0].cl = [];
-            }
-            var obj = {};
-            var ciTmp = this_count.data("ci");
-            if( null==ciTmp ) return;
-            obj[cnt_type] = 0;
+
+    if(cntType.substring(0,1) == "G"){
+        body.gcnts[cntType] = 0;
+        isPublicApi = true; // g 都打公雲
+    }else{
+        body.cnts[0] = { gi: thisGi };
+
+        if( countDom.hasClass("sm-cl-count") ){
+            body.cnts[0].cl = [];
+
+            var obj = {},
+                ciTmp = countDom.data("ci");
+
+            if( ciTmp === undefined ) return;
+
+            obj[cntType] = 0;
             obj.ci = ciTmp;
             body.cnts[0].cl.push(obj);
         } else {
-            body.cnts[0][cnt_type] = 0;
+            body.cnts[0][cntType] = 0;
         }
     }
-    // return false;
-    var headers = {
-             "ui":ui,
-             "at":at, 
-             "li":lang,
-                 };
-    var method = "put";
-    ajaxDo(api_name,headers,method,false,body).complete(function(data){
+
+    new QmiAjax({
+        apiName: "sys/counts",
+        method: "put",
+        body: body,
+        isPublicApi: isPublicApi
+    }).complete(function(data){
         if(data.status == 200){
             // 把local cnts 清掉
             try {
                 var tempPollingData = $.lStorage("_pollingData");
 
                 // gcnts
-                if(cnt_type.substring(0,1) == "G"){
-                    tempPollingData.gcnts[cnt_type] = 0;
+                if(cntType.substring(0,1) == "G"){
+                    tempPollingData.gcnts[cntType] = 0;
 
                     $.lStorage("_pollingData",tempPollingData);
                     return;
@@ -7462,11 +7441,11 @@ updatePollingCnts = function(this_count,cnt_type){
 
                 if(typeof ciTmp === "undefined") {
 
-                    tempPollingData.cnts[this_gi][cnt_type] = 0;
+                    tempPollingData.cnts[thisGi][cntType] = 0;
 
-                } else if(tempPollingData.cnts[this_gi].cl !== undefined) {
-                    tempPollingData.cnts[this_gi].cl.forEach(function(item){
-                        if(item.ci === ciTmp) item[cnt_type] = 0;
+                } else if(tempPollingData.cnts[thisGi].cl !== undefined) {
+                    tempPollingData.cnts[thisGi].cl.forEach(function(item){
+                        if(item.ci === ciTmp) item[cntType] = 0;
                     })
                 }
                 
@@ -8671,6 +8650,19 @@ showFeedboxNoContent = function( isShow ){
         $(".st-feebox-area-no-content").show().removeClass("disabled");
         $(".gm-content > div:eq(1)").getNiceScroll(0).doScrollTop(0, 500);
     }
+}
+
+goToGroupMenu = function(){
+    $("#page-group-menu").data("type","create");
+    $(".gm-create").trigger("click");
+    clearCreateGroupPage();
+
+    if(Object.keys(QmiGlobal.groups).length > 0)
+        $("#page-group-menu .page-back").show();
+    else
+        $("#page-group-menu .page-back").hide();
+    
+    $.mobile.changePage("#page-group-menu");
 }
 
 /*

@@ -1,11 +1,8 @@
 $(function(){
 
     groupListToLStorage = function(groupList){
-        var 
-        groups = QmiGlobal.groups,
-        // var groups = $.lStorage(ui) || {};
-        // 剔除不存在的團體
-        tmp_groupList = [];
+        var groups = QmiGlobal.groups,
+            tmp_groupList = [];
 
         $.each(groupList,function(i,gl_obj){
             tmp_groupList.push(gl_obj.gi);
@@ -36,59 +33,13 @@ $(function(){
             }
         }); 
 
-        //init private group
-        var pri_group_list = $.lStorage("_pri_group");
-        $.each(pri_group_list, function(i, p_cloud){
-            if( !p_cloud ) return;
-            if( !p_cloud.tmp_groups ){
-                pri_group_list[i].groups = [];
-                return;
-            }
-            var list = [];
-            $.each(p_cloud.tmp_groups,function(i,gl_obj){
-                list.push(gl_obj.gi);
-                gl_obj.ori_gi = gl_obj.gi;
-                gl_obj.gi = getPrivateGi( p_cloud.ci, gl_obj.gi );
-                if(!$.lStorage(ui).hasOwnProperty(gl_obj.gi) ){
-                    gl_obj.guAll = {};
-                    gl_obj.gu = gl_obj.me;
-                    gl_obj.ci = p_cloud.ci;
-
-                    $.each(gl_obj.tl,function(i,val){
-                        switch(val.tp){
-                            case 1:
-                                gl_obj.ti_cal = val.ti;
-                                break;
-                            case 2:
-                                gl_obj.ti_feed = val.ti;
-                                break;
-                            case 3:
-                                gl_obj.ti_chat = val.ti;
-                                break;
-                            case 4:
-                                gl_obj.ti_file = val.ti;
-                                break;
-                        }
-                    });
-                    groups[gl_obj.gi] = gl_obj;
-                } else {
-                    $.extend(groups[gl_obj.gi],gl_obj)
-                }
-            });
-            delete pri_group_list[i].tmp_groups;
-            pri_group_list[i].groups = list;
-        });
-
-        //groupList 沒有的group 要從 _uiGroupList 剔除
+        // 剔除不存在的團體
         for(this_gi in groups){
             if(tmp_groupList.indexOf(this_gi) === -1){
                 console.debug("delete group",groups[this_gi])
                 delete groups[this_gi];
             }
         }
-
-        $.lStorage("_pri_group",pri_group_list);
-        // $.lStorage(ui,_uiGroupList);
     }
 
 

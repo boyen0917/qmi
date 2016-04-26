@@ -39,6 +39,14 @@ var lockCurrentFocusIntervalLength = 100;	//讓視窗停留在最後一筆的int
               ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
                                                                   
  */
+
+
+
+
+// 聊天室token 處理 暫時
+// QmiGlobal = window.opener.QmiGlobal;
+
+
 $(document).ready(function () {
 
 	var winCloseDeferred = $.Deferred();
@@ -2773,7 +2781,6 @@ function noMoreHistoryMsg() {
 	$("#chat-loading").hide();
 	$("#chat-nomore").show();
 }
-
 
 
 /**

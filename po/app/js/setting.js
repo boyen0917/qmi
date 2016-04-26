@@ -188,9 +188,8 @@ function removeGroup( this_gi ){
 	    } else{
 	    	gi = null;
 	    	delete $.lStorage(ui)[this_gi];
-	    	$(document).data("page-history",[]);
-	    	$(".page-back").hide();
-	    	$(".hg-create").trigger("click");
+	    	
+	    	goToGroupMenu();
 	    }
 	}
 
