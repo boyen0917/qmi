@@ -93,7 +93,14 @@ QmiGlobal.popup.prototype = {
 
 
 QmiGlobal.scrollController = {
-	keys: {37: 1, 38: 1, 39: 1, 40: 1},
+	
+	keys: {
+		37: 1, 
+		38: 1, 
+		39: 1, 
+		40: 1
+	},
+
 	preventDefault: function(e) {
 		e = e || window.event;
 		if (e.preventDefault)
@@ -1110,10 +1117,10 @@ getGroupData = function(this_gi,ajax_load,tp,err_show){
 
 setGroupAttributes = function( this_gi, data ){
 	try{
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		if( !userData.hasOwnProperty(this_gi) ){
 			userData[this_gi] = data;
-			$.lStorage(ui, userData);
+			// *--* $.lStorage(ui, userData);
 			return;
 		}
 		var group = userData[this_gi];
@@ -1141,7 +1148,7 @@ setGroupAttributes = function( this_gi, data ){
 		group.gd = data.gd || "";
 		group.set = data.set;
 
-		$.lStorage(ui, userData);
+		// *--* $.lStorage(ui, userData);
 	} catch(e){
 		errorReport(e);
 	}
@@ -1200,7 +1207,7 @@ updateGroupAllInfoDom = function( thisGi ){
 
 updateGroupIconDom = function( this_gi ){
 	try{
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		var group = userData[this_gi];
 
 		//update icon
@@ -1347,7 +1354,7 @@ getGroupCompetence = function( this_gi ){
 		isOfficial: false
 	}
 	try{
-		var groupData = $.lStorage(ui)[this_gi];
+		var groupData = QmiGlobal.groups[this_gi];
 		if( groupData.ad==1 ){
 			tmp.isAdmin = true;
 		}

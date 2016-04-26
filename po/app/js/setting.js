@@ -178,8 +178,8 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
 function removeGroup( this_gi ){
 	$(".sm-group-area[data-gi="+this_gi+"]").remove();
 	var rmGroupGn = "unknown";
-	if( $.lStorage(ui) !== false && $.lStorage(ui)[this_gi] !== undefined && $.lStorage(ui)[this_gi].gn)
-		rmGroupGn = $.lStorage(ui)[this_gi].gn;
+	if( QmiGlobal.groups !== false && QmiGlobal.groups[this_gi] !== undefined && QmiGlobal.groups[this_gi].gn)
+		rmGroupGn = QmiGlobal.groups[this_gi].gn;
 
 	if( gi==this_gi ){
 	    var otherGroup = $(".sm-group-area.enable");
@@ -187,7 +187,7 @@ function removeGroup( this_gi ){
 	    	$(otherGroup[0]).trigger("click");
 	    } else{
 	    	gi = null;
-	    	delete $.lStorage(ui)[this_gi];
+	    	delete QmiGlobal.groups[this_gi];
 	    	
 	    	goToGroupMenu();
 	    }
@@ -197,17 +197,17 @@ function removeGroup( this_gi ){
     try{
     	
     	//local storage
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		if( userData.hasOwnProperty(this_gi) ){
 			var groupDataTmp = userData[this_gi];
 			if( null!=groupDataTmp && null!=groupDataTmp.gn ){
 				gn = groupDataTmp.gn;
 			}
 			delete userData[this_gi];
-			$.lStorage(ui,userData);
+			// *--* $.lStorage(ui,userData);
 		}
 		
-		userData = $.lStorage(ui);
+		userData = QmiGlobal.groups;
 
 		//----- remove from idb -------
 		//chat
@@ -298,7 +298,7 @@ function showUpdatePermissionPage(){
 	//find current admins
 	var list = {};
 	try{
-        var userDataTmp = $.lStorage(ui);
+        var userDataTmp = QmiGlobal.groups;
         var guAllTmp = userDataTmp[gi].guAll;
         for( var gu in guAllTmp ){
         	var mem = guAllTmp[gu];
@@ -385,7 +385,7 @@ function showGroupInfoPage(){
 	var groupDescription = groupName;
 	var groupImg = null;
 	try{
-        var userData = $.lStorage(ui);
+        var userData = QmiGlobal.groups;
         var group = userData[gi];
         isAdmin = (1==group.ad);
         groupName = group.gn;

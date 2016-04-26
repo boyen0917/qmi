@@ -52,7 +52,7 @@ $(function(){
             if(data.status == 200){
                 var comboData = $.parseJSON(data.responseText);
 
-                // QmiGlobal.groups -> $.lStorage(ui) 
+                // QmiGlobal.groups -> QmiGlobal.groups 
                 // thisGi 不存在list中 重新加入 做tl hash-map
                 // if( QmiGlobal.groups.hasOwnProperty(thisGi) === false ) {
                 //     QmiGlobal.groups[comboData.gi] = comboData;
@@ -149,15 +149,15 @@ $(function(){
             }else{
                 //發生錯誤 以第一個團體為預設
                 if(
-                    $.lStorage(ui)[0]     !== undefined && 
-                    $.lStorage(ui)[0].gi  !== undefined && 
+                    QmiGlobal.groups[0]     !== undefined && 
+                    QmiGlobal.groups[0].gi  !== undefined && 
                     chk                   !== true 
                 ) {
 
-                    QmiGlobal.auth.dgi = $.lStorage(ui)[0].gi;
+                    QmiGlobal.auth.dgi = QmiGlobal.groups[0].gi;
 
                     //帶true表示只再做一次
-                    getGroupCombo($.lStorage(ui)[0].gi,callback,true);
+                    getGroupCombo(QmiGlobal.groups[0].gi,callback,true);
 
                 } else {
                     groupSwitchEnable();    
@@ -179,7 +179,7 @@ $(function(){
     }
 
     updateGuAll = function(this_gi,new_guAll) {
-        var _groupList = $.lStorage(ui);
+        var _groupList = QmiGlobal.groups;
         //先更新舊有資料 但不會取得新成員
         if(_groupList[this_gi].guAll){
             $.each(_groupList[this_gi].guAll,function(i,val){
@@ -204,7 +204,7 @@ $(function(){
         });
         _groupList[this_gi].inviteGuAll = inviteGuAll;
         _groupList[this_gi].guAll = new_guAll;
-        $.lStorage(ui,_groupList);
+        // *--* $.lStorage(ui,_groupList);
     }
 
     setTabList = function(thisGi, qmiGroupData){
@@ -350,7 +350,7 @@ $(function(){
     initGroupSetting = function(this_gi){
         // 如果是管理者的話顯示額外設定
         try{
-            var userData = $.lStorage(ui);
+            var userData = QmiGlobal.groups;
             var group = userData[this_gi];
             var hide = 0;
             if( 1==group.ad ){

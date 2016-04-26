@@ -1,5 +1,5 @@
 var FileSharing = function(){
-	this.mainTi = $.lStorage(ui)[gi].ti_file;
+	this.mainTi = QmiGlobal.groups[gi].ti_file;
 	this.listOrder = "append";
 	this.ti = this.mainTi;
 	this.activeItemData = "";

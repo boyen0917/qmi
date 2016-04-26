@@ -59,7 +59,7 @@ var AddressBook = AddressBook || {
 				var tmp = $.parseJSON( data.responseText );
 				
 				try{
-					instance.groupName = $.lStorage(ui)[gi].gn;
+					instance.groupName = QmiGlobal.groups[gi].gn;
 				} catch(e){
 					errorReport(e);
 				}
@@ -761,9 +761,9 @@ var AddressBook = AddressBook || {
 	switchListAndGrid: function( dom, subPageBottom ){
 		var instance = this;
 		instance.isList = !instance.isList;
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		userData.isMemberShowList = instance.isList;
-		$.lStorage(ui,userData);
+		// *--* $.lStorage(ui,userData);
 
 		var mem = subPageBottom.find(".contact-mems");
 		var memList = subPageBottom.find(".contact-memLists");
@@ -1276,7 +1276,7 @@ var AddressBook = AddressBook || {
 	        		instance.userInfoAvatarPos($(".user-avatar .user-pic"));
 	        	}
 
-	        	// $.lStorage(ui,_groupList);
+	        	// // *--* $.lStorage(ui,_groupList);
 
                 // if(this_gu == gu) instance.showCustomInfo(user_data);
 
@@ -1422,11 +1422,11 @@ var AddressBook = AddressBook || {
             this_info._i18n();
 
     		//團體頭像
-    		// this_info.find(".group-avatar img").attr("src",$.lStorage(ui)[gi].aut);
+    		// this_info.find(".group-avatar img").attr("src",QmiGlobal.groups[gi].aut);
     		// avatarPos(this_info.find(".group-avatar img"),60);
 
     		//團體名稱
-    		// this_info.find(".group-name").html($.lStorage(ui)[gi].gn);
+    		// this_info.find(".group-name").html(QmiGlobal.groups[gi].gn);
 
     		//頭像
     		// if(user_data.aut){
@@ -1628,10 +1628,10 @@ var AddressBook = AddressBook || {
         	//重置團體頭像、名稱的參數
         	if(data.status == 200){
         		//重置團體頭像、名稱 失敗也要重置
-        		// var _groupList = $.lStorage(ui);
+        		// var _groupList = QmiGlobal.groups;
         		// _groupList[gi].guAll[gu].nk = body.nk;
         		// _groupList[gi].guAll[gu].sl = body.sl;
-        		// $.lStorage(ui,_groupList);
+        		// // *--* $.lStorage(ui,_groupList);
         		s_load_show = false;
         		
         		// 關閉load 圖示
@@ -1699,10 +1699,10 @@ var AddressBook = AddressBook || {
         	//重置團體頭像、名稱的參數
         	if(data.status == 200){
         		//重置團體頭像、名稱 失敗也要重置
-        		// var _groupList = $.lStorage(ui);
+        		// var _groupList = QmiGlobal.groups;
         		// _groupList[gi].guAll[gu].nk = body.nk;
         		// _groupList[gi].guAll[gu].sl = body.sl;
-        		// $.lStorage(ui,_groupList);
+        		// // *--* $.lStorage(ui,_groupList);
         		s_load_show = false;
         		
         		// 關閉load 圖示

@@ -33,7 +33,7 @@ setGroupInitial = function(new_gi,chk){
         //重新設定功能選單
         updateTab(gi);
 
-        // console.debug("ui",JSON.stringify($.lStorage(ui)));
+        // console.debug("ui",JSON.stringify(QmiGlobal.groups));
 
 
         //動態消息
@@ -71,13 +71,13 @@ logout = function(){
 
 chkBranch = function(){
     // cns.debug("=========================");
-    // cns.debug("typeof $.lStorage(ui)[gi].bl:",typeof $.lStorage(ui)[gi].bl);
-    // cns.debug("first key",Object.keys($.lStorage(ui)[gi].bl)[0]);
-    // cns.debug("typeof first element",typeof $.lStorage(ui)[gi].bl[Object.keys($.lStorage(ui)[gi].bl)[0]].lv);
+    // cns.debug("typeof QmiGlobal.groups[gi].bl:",typeof QmiGlobal.groups[gi].bl);
+    // cns.debug("first key",Object.keys(QmiGlobal.groups[gi].bl)[0]);
+    // cns.debug("typeof first element",typeof QmiGlobal.groups[gi].bl[Object.keys(QmiGlobal.groups[gi].bl)[0]].lv);
     // cns.debug("=========================");
-    if(typeof $.lStorage(ui)[gi].bl == "object"){
-        var first_key = Object.keys($.lStorage(ui)[gi].bl)[0];
-        if(typeof first_key != "undefined" && typeof $.lStorage(ui)[gi].bl[first_key].lv == "undefined")
+    if(typeof QmiGlobal.groups[gi].bl == "object"){
+        var first_key = Object.keys(QmiGlobal.groups[gi].bl)[0];
+        if(typeof first_key != "undefined" && typeof QmiGlobal.groups[gi].bl[first_key].lv == "undefined")
             return true;
     }else{
         return true;
@@ -319,7 +319,7 @@ deleteMeInvite = function(this_invite){
 
 getUserAvatarName = function (this_gi , this_gu , set_name ,set_img){
     //先檢查localStorage[gi].guAll是否存在
-    var _groupList = $.lStorage(ui);
+    var _groupList = QmiGlobal.groups;
     var aut = "",auo = "",nk = "";
 
     //可能會沒有會員資訊
@@ -488,7 +488,7 @@ timelineSwitch = function (act,reset,main){
             gmHeader.find(".chatList-add").hide();
             //如果是管理者的話顯示新增成員鈕
             try{
-                var userData = $.lStorage(ui);
+                var userData = QmiGlobal.groups;
                 var groupTmp = userData[gi];
                 if( 1==groupTmp.ad ){
                     gmHeader.find(".contact-add").show();
@@ -574,7 +574,7 @@ timelineSwitch = function (act,reset,main){
         case "fileSharing":
             $(".subpage-fileSharing").show();
             page_title = $.i18n.getString("GROUPSETTING_TITLE");
-            // var groupData = $.lStorage(ui)[gi];
+            // var groupData = QmiGlobal.groups[gi];
             // cns.debug("ti",groupData.ti_file);
             // if(typeof groupData.ti_file == "undefined") {
             //     alert("沒共享");
@@ -865,7 +865,7 @@ topEvent = function (){
 
 //為了避免gu all還沒取得
 setTopEventUserName = function(this_top_event,this_gu){
-    var gu_all = $.lStorage(ui)[gi].guAll;
+    var gu_all = QmiGlobal.groups[gi].guAll;
     if(!gu_all[this_gu]) {
         cns.debug("[!]top event gi gu mismatched[!]");
         return false;
@@ -1069,7 +1069,7 @@ detailLikeStringMake = function (this_event){
     var epl = this_event.data("parti-list");
 
     //gu gi 是全域
-    var group = $.lStorage(ui)[this_gi];
+    var group = QmiGlobal.groups[this_gi];
     var me_pos = $.inArray(group.gu,epl);
     var guAll = group.guAll;
     var me_gu = guAll[epl[me_pos]];
@@ -1152,7 +1152,7 @@ getEventDetail = function(this_ei){
 setOfficialGroup = function( this_gi ){
     var groupData;
     try{
-        groupData = $.lStorage(ui)[this_gi];
+        groupData = QmiGlobal.groups[this_gi];
     } catch(e){
         // cns.debug("[!] updateTab:" + e.message );
         errorReport(e);
@@ -1228,7 +1228,7 @@ setOfficialGroup = function( this_gi ){
 
 onClickOfficialGeneralChat = function( this_gi ){
     try{
-        var groupData = $.lStorage(ui)[this_gi];
+        var groupData = QmiGlobal.groups[this_gi];
         if( isOfficialGroup(groupData) && groupData.ad!=1 ){
             if( null!=groupData.chatAll ){
                 for( var ci in groupData.chatAll ){
@@ -1472,7 +1472,7 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
 
                 //製作留言
                 var isError = false;
-                var _groupList = $.lStorage(ui);
+                var _groupList = QmiGlobal.groups;
                 try{
                     var user_name = _groupList[this_gi].guAll[el.meta.gu].nk.replaceOriEmojiCode();
                     
@@ -1629,7 +1629,7 @@ workContentMake = function (this_event,li){
         }
     });
     var new_li = me_arr.concat(rest_li);
-    var _groupList = $.lStorage(ui);
+    var _groupList = QmiGlobal.groups;
     //重置
     this_event.find(".st-task-work-detail").html("");
     cns.debug("new_li:",new_li);
@@ -2158,7 +2158,7 @@ composeContentMake = function (compose_title){
                 
                 //watermark
                 try{
-                    var tmpGroup = $.lStorage(ui)[gi];
+                    var tmpGroup = QmiGlobal.groups[gi];
                     console.debug(tmpGroup.tp);
                     if( tmpGroup.tp!="A1" ){
                         show_area += ", .cp-content-watermark";
@@ -2175,7 +2175,7 @@ composeContentMake = function (compose_title){
                 
                 //watermark
                 try{
-                    var tmpGroup = $.lStorage(ui)[gi];
+                    var tmpGroup = QmiGlobal.groups[gi];
                     console.debug(tmpGroup.tp);
                     if( tmpGroup.tp!="A1" ){
                         show_area += ", .cp-content-watermark";
@@ -2300,7 +2300,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
     // var this_compose_obj = $(this);
     $.mobile.changePage("#page-object", {transition: "slide"});
 
-    var group = $.lStorage(ui)[gi];
+    var group = QmiGlobal.groups[gi];
     var guAll = group.guAll;
     var bl = group.bl;
     var fbl = group.fbl;
@@ -3335,7 +3335,7 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
             //s9=1or3無法看已未讀列表
             var isShowUnreadAndTime = true;
             try{
-                var group = $.lStorage(ui)[this_gi];
+                var group = QmiGlobal.groups[this_gi];
                 if( group.set.s9==1 || group.set.s9==3){
                     // toastShow( $.i18n.getString("FEED_READ_LIST_DISABLED") );
                     // return;
@@ -3393,7 +3393,7 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
         case 1:
             var isShowNamecard = true;
             try{
-                var group = $.lStorage(ui)[this_gi];
+                var group = QmiGlobal.groups[this_gi];
                 if( group.isOfficial && 1!=group.ad ){
                     isShowNamecard = false;
                 }
@@ -3503,8 +3503,8 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
             cellArea.append( cell );
 
             //gen mem
-            var guAll = $.lStorage(ui)[giTmp].guAll;
-            var bl = $.lStorage(ui)[giTmp].bl;
+            var guAll = QmiGlobal.groups[giTmp].guAll;
+            var bl = QmiGlobal.groups[giTmp].bl;
             for(var i=0;i<data.ml.length; i++ ){
                 var gu = data.ml[i].gu;
                 var rt = data.ml[i].rt;
@@ -4163,7 +4163,7 @@ composeSend = function (this_compose){
 
             var me_gu_obj = {
                 gu : gu,
-                n : $.lStorage(ui)[gi].guAll[gu].nk
+                n : QmiGlobal.groups[gi].guAll[gu].nk
             };
             gul_arr.push(me_gu_obj);
 
@@ -4513,7 +4513,7 @@ setSidemenuHeader = function (new_gi){
     var pic_num = this_gi.substring(this_gi.length-1,this_gi.length).charCodeAt()%10;
     $(".sm-header").css("background","url(images/common/cover/sidemeun_cover0" + pic_num + ".png)")
 
-    var _groupList = $.lStorage(ui);
+    var _groupList = QmiGlobal.groups;
 
     $(".sm-group-pic").css("background","url(" + _groupList[this_gi].aut + ")").stop().animate({
         opacity:1
@@ -4649,7 +4649,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
 
     if(main_gu){
         this_gi = $("#page-group-main").data("main-gi");
-        this_ti = $.lStorage(ui)[this_gi].tl[1].ti;
+        this_ti = QmiGlobal.groups[this_gi].tl[1].ti;
     }
 
     var event_tp = $("#page-group-main").data("navi") || "00";
@@ -5192,7 +5192,7 @@ eventStatusWrite = function(this_event,this_es_obj){
     var isAdmin = false;
     var isMyPost = false;
     try{
-        var groupTmp = $.lStorage(ui)[this_gi];
+        var groupTmp = QmiGlobal.groups[this_gi];
         var meTmp = groupTmp.guAll[ groupTmp.gu ];
         isAdmin = (meTmp.ad==1);
         isMyPost = (event_status.meta.gu==groupTmp.gu);
@@ -5578,7 +5578,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                         var this_gi = this_ei.split("_")[0];
                         // var this_gu = this_event.data("this_gu", val.meta.gu);
                         //get poster name
-                        var groupData = $.lStorage(ui)[this_gi];
+                        var groupData = QmiGlobal.groups[this_gi];
                         var name = groupData.guAll[groupData.gu].nk;
                         var groupName = groupData.gn;
                         watermarkText = groupName + " " + name;
@@ -6100,7 +6100,7 @@ putEventStatus = function (target_obj,etp,est,callback){
             this_event.data("like-lock",false);
 
             var d =$.parseJSON(data.responseText);
-            var gu = $.lStorage(ui)[this_gi].gu;
+            var gu = QmiGlobal.groups[this_gi].gu;
             //timeline 外層
             if(!target_obj.reply){
                 var count_selector = this_event.find(".st-sub-box-3 div:eq(" + order + ")");
@@ -7468,10 +7468,10 @@ getUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone){
         var this_user_info = user_info_arr.last();
 
         //if no group data
-        if( !$.lStorage(ui).hasOwnProperty(this_user_info.gi) ){
+        if( !QmiGlobal.groups.hasOwnProperty(this_user_info.gi) ){
 
             //無團體的人 被退出過的團體邀請 要直接進入該團體
-            if(Object.keys($.lStorage(ui)).length === 1){
+            if(Object.keys(QmiGlobal.groups).length === 1){
 
                 groupMenuListArea().done(function(){
                     $.mobile.changePage("#page-group-main");
@@ -7515,7 +7515,7 @@ getUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone){
                 }
 
                 //存local storage
-                var _groupList = $.lStorage(ui);
+                var _groupList = QmiGlobal.groups;
                         
                 try{
                     if( _groupList[this_user_info.gi].guAll && Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
@@ -7525,7 +7525,7 @@ getUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone){
                         _groupList[this_user_info.gi].guAll[this_user_info.gu] = $.extend(userTmp, user_data);
                 
                         //有取資料但是沒有存...?!
-                        $.lStorage(ui, _groupList);
+                        // *--* $.lStorage(ui, _groupList);
 
                         //更新所有照片、名字 this_gi , this_gu , set_name ,set_img
                         if(update_chk){
@@ -7544,7 +7544,7 @@ getUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone){
                             $.each(invitingList, function(guTmp, mem){
                                 if( guTmp == this_user_info.gu ){
                                     delete invitingList[this_user_info.gu];
-                                    $.lStorage(ui, _groupList);
+                                    // *--* $.lStorage(ui, _groupList);
                                     //redraw #page-contact-addmem .ca-content-area
                                     if( typeof(updateInvitePending)=="function" ){
                                         updateInvitePending();
@@ -7581,7 +7581,7 @@ getMultipleUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone)
     var 
     new_user_info_obj = {},
     new_user_info_arr = [],
-    _groupList = $.lStorage(ui);
+    _groupList = QmiGlobal.groups;
     
     for( var i=0; i<user_info_arr.length; i++){
         var tmpObj = user_info_arr[i];
@@ -7715,7 +7715,7 @@ userInfoShow = function(this_gi,this_gu){
             $(".user-avatar-bar-favorite").show();
 
             //如果為admin, 顯示刪除成員按鈕
-            var _groupList = $.lStorage(ui);
+            var _groupList = QmiGlobal.groups;
             if( _groupList.hasOwnProperty(this_gi) && _groupList[this_gi].ad==1 ){
                 this_info.find(".user-info-delete").show();
             }
@@ -7741,7 +7741,7 @@ userInfoShow = function(this_gi,this_gu){
 
                 //get user info 已存過, 不再重存
                 //存local storage
-                var _groupList = $.lStorage(ui);
+                var _groupList = QmiGlobal.groups;
                 var userTmp = _groupList[this_gi].guAll[this_gu];
                 
                 if( true==userTmp.fav ){
@@ -7750,7 +7750,7 @@ userInfoShow = function(this_gi,this_gu){
                     $(".user-avatar-bar-favorite .deactive").show();
                 }
 
-                // $.lStorage(ui,_groupList);
+                // // *--* $.lStorage(ui,_groupList);
 
                 var isMe = (this_gu == _groupList[this_gi].gu);
                 if(isMe) meInfoShow(user_data);
@@ -7809,7 +7809,7 @@ userInfoDataShow = function(this_gi,this_info,user_data, isAdmin, me) {
                 try{
                     var bi_arr = user_data.bl.split(",")[0].split(".");
                     var bn = "";
-                    var branch_list = $.lStorage(ui)[this_gi].bl;
+                    var branch_list = QmiGlobal.groups[this_gi].bl;
                     var test = selector.find(".bl");
                     test.show();
                     test = test[0];
@@ -7894,11 +7894,11 @@ meInfoShow = function(user_data){
         this_info._i18n();
 
         //團體頭像
-        this_info.find(".group-avatar img").attr("src",$.lStorage(ui)[gi].aut);
+        this_info.find(".group-avatar img").attr("src",QmiGlobal.groups[gi].aut);
         avatarPos(this_info.find(".group-avatar img"),60);
 
         //團體名稱
-        this_info.find(".group-name").html($.lStorage(ui)[gi].gn);
+        this_info.find(".group-name").html(QmiGlobal.groups[gi].gn);
 
         //頭像
         if(user_data.aut){
@@ -8156,7 +8156,7 @@ userInfoEvent = function(this_info,me){
         this_info.find(".user-info-close").trigger("mouseup");
         //主頁背景
         $(".gm-user-main-area").fadeIn("fast",function(){
-            var _thisGroupList = $.lStorage(ui)[this_gi];
+            var _thisGroupList = QmiGlobal.groups[this_gi];
             $(".gm-user-main-area .background").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
             $(".gm-user-main-area .name").html(_thisGroupList.guAll[this_gu].nk);
             $(".gm-user-main-area .group .pic").css("background","url(" + _thisGroupList.aut + ")");
@@ -8214,7 +8214,7 @@ userInfoSend = function(this_info){
       mke: this_info.find(".me-info-status.em .status-text").data("val"),
       mkp: this_info.find(".me-info-status.pn1 .status-text").data("val"),
       mkb: this_info.find(".me-info-status.bd .status-text").data("val"),
-      pn2: $.lStorage(ui)[gi].guAll[gu].pn2,
+      pn2: QmiGlobal.groups[gi].guAll[gu].pn2,
       ext: this_info.find(".user-info-list .et").val(),
       ti: this_info.find(".user-info-list .ti").val(),
       mv: this_info.find(".user-info-list .mv").val(),
@@ -8227,10 +8227,10 @@ userInfoSend = function(this_info){
         //重置團體頭像、名稱的參數
         if(data.status == 200){
             //重置團體頭像、名稱 失敗也要重置
-            var _groupList = $.lStorage(ui);
+            var _groupList = QmiGlobal.groups;
             _groupList[gi].guAll[gu].nk = body.nk;
             _groupList[gi].guAll[gu].sl = body.sl;
-            $.lStorage(ui,_groupList);
+            // *--* $.lStorage(ui,_groupList);
 
  //         if(this_info.data("avatar-chk")){
  //             var ori_arr = [1280,1280,0.7];
@@ -8305,9 +8305,9 @@ userInfoDelete = function(this_info){
         //重置團體頭像、名稱的參數
         if(data.status == 200){
             //重置團體頭像、名稱 失敗也要重置
-            var _groupList = $.lStorage(ui);
+            var _groupList = QmiGlobal.groups;
             _groupList[gi].guAll[this_gu].st = 2;
-            $.lStorage(ui,_groupList);
+            // *--* $.lStorage(ui,_groupList);
 
             if( $(".subpage-contact").length>0 ){
                 initContactData();
@@ -8368,7 +8368,7 @@ clickUserInfoFavorite = function( this_fav ){
     result.complete(function(data){
         if(data.status == 200){
             //update user fav
-            var tmp = $.lStorage(ui);
+            var tmp = QmiGlobal.groups;
             if( tmp.hasOwnProperty(this_gi) ){
                 if( tmp[this_gi].guAll && tmp[this_gi].guAll.hasOwnProperty(this_gu) ){
                     tmp[this_gi].guAll[this_gu].fav = succFav;
@@ -8380,7 +8380,7 @@ clickUserInfoFavorite = function( this_fav ){
                         this_fav.parent().find(".active").hide();
                         this_fav.parent().find(".deactive").show();
                     }
-                    $.lStorage(ui, tmp);
+                    // *--* $.lStorage(ui, tmp);
 
                     updateFavoriteMember(this_gi);
                 }
@@ -8391,7 +8391,7 @@ clickUserInfoFavorite = function( this_fav ){
 
 updateFavoriteMember = function(this_gi){
     try{
-        var _groupList = $.lStorage(ui);
+        var _groupList = QmiGlobal.groups;
         var guAll = _groupList[this_gi].guAll;
         var favCnt = 0;
         $.each(guAll,function(i,val){
@@ -8400,7 +8400,7 @@ updateFavoriteMember = function(this_gi){
             if( true==val.fav ) favCnt++;
         });
         _groupList[this_gi].favCnt = favCnt;
-        $.lStorage(ui, _groupList);
+        // *--* $.lStorage(ui, _groupList);
 
         if( this_gi==gi ){
             updateContactFavorite();
@@ -8412,7 +8412,7 @@ updateFavoriteMember = function(this_gi){
 
 updateBranchMemberCnt = function(this_gi){
     try{
-        var _groupList = $.lStorage(ui);
+        var _groupList = QmiGlobal.groups;
         var guAll = _groupList[this_gi].guAll;
         var bl = _groupList[this_gi].bl;
         for( var biTmp in bl ){
@@ -8427,7 +8427,7 @@ updateBranchMemberCnt = function(this_gi){
             bl[biTmp].cnt = cnt;
         }
         _groupList[this_gi].bl = bl;
-        $.lStorage(ui, _groupList);
+        // *--* $.lStorage(ui, _groupList);
 
         if( this_gi==gi && $(".subpage-contact").length>0 ){
             initContactList();

@@ -215,7 +215,7 @@ showAlertContent = function(data){
 		// var tmpContainer = $("<div></div>");
 		var tmpContainer = $(".alert-area .content");
 		tmpContainer.html("");
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		if( null == userData )	return;
 
 		for(var i=0; i<data.length; i++){
@@ -442,7 +442,7 @@ showAlertContent = function(data){
 
 					if( null==this_gi || null==this_ei ) return;
 
-					var group = $.lStorage(ui)[this_gi];
+					var group = QmiGlobal.groups[this_gi];
 					if( null==group ) return;
 
 					if( null==group.guAll || Object.keys(group.guAll).length == 0){

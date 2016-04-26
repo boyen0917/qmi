@@ -215,7 +215,7 @@ function initChatCntDB ( onReady ){
 
 /* save chat cnt into db */
 function onReceivePollingChatCnt ( ccs ){
-	var storage = $.lStorage(ui);
+	var storage = QmiGlobal.groups;
 
 	//indexed from old to new (api chat is from new to old)
 	for( var ccsIndex=0; ccsIndex<ccs.length; ccsIndex++){
@@ -238,7 +238,7 @@ function onReceivePollingChatCnt ( ccs ){
 		
 		storage[giTmp].chatAll[data.ci].cnt = cntContent;
 	}
-	// cns.debug( JSON.stringify($.lStorage(ui)) );
+	// cns.debug( JSON.stringify(QmiGlobal.groups) );
 
 
 	if( typeof(windowList)!='undefined' && null != windowList ){

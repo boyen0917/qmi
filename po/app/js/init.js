@@ -204,7 +204,7 @@ window.QmiGlobal = {
 
 	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
 
-	groups: {}, // 全部的公私雲團體資料 $.lStorage(ui) 
+	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups 
 	clouds: {}, // 全部的私雲資料
 	cloudGiMap: {},
 

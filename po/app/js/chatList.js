@@ -38,7 +38,7 @@ $(document).ready(function(){
 initChatList = function(){
 
 	//----- set title -------
-	var currentGroup = $.lStorage(ui)[gi];
+	var currentGroup = QmiGlobal.groups[gi];
 	// var parent = $("#page-group-main").find(".gm-header");
 	// if( parent ){
 		//set title & sub-title
@@ -365,7 +365,7 @@ function updateLastMsg(giTmp, ciTmp, isRoomOpen, eiTmp ){
 	return deferred.promise();
 }
 function clearChatListCnt( giTmp, ciTmp ){
-	var userData = $.lStorage(ui);
+	var userData = QmiGlobal.groups;
 	var groupTmp = userData[giTmp];
 	var roomTmp = groupTmp["chatAll"][ciTmp];
 	roomTmp.unreadCnt = 0;
@@ -463,7 +463,7 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
 		return;
 	}
 
-	var userData = $.lStorage(ui);
+	var userData = QmiGlobal.groups;
 	var groupData = userData[giTmp];
 	if( null==groupData ){
 		cns.debug("[setLastMsgContent] no groupData");
@@ -673,7 +673,7 @@ function showNewRoomPage(){
 function onShowNewRoomPageDone(){
 	try{
 		var data = $.parseJSON( $(".chatList-add").data("object_str") );
-		var currentGroup = $.lStorage(ui)[gi];
+		var currentGroup = QmiGlobal.groups[gi];
 		if( data.hasOwnProperty(currentGroup.gu) ){
 			delete data[currentGroup.gu];
 		}
@@ -727,7 +727,7 @@ function showNewRoomDetailPage(){
 		var gu = g_newChatMemList[0];
 
 		//is same room exist
-		var currentGroup = $.lStorage(ui)[gi];
+		var currentGroup = QmiGlobal.groups[gi];
 		for( var ci in currentGroup.chatAll ){
 			var room = currentGroup.chatAll[ci];
 			if(1==room.tp){
@@ -754,7 +754,7 @@ function showNewRoomDetailPage(){
 	container.html("");
 
 	//load data
-	var currentGroup = $.lStorage(ui)[gi];
+	var currentGroup = QmiGlobal.groups[gi];
 	for( var i=0; i<g_newChatMemList.length; i++ ){
 		var mem = currentGroup.guAll[ g_newChatMemList[i] ];
 		var memDiv = $("<div class='row mem'></div>");
@@ -797,7 +797,7 @@ function showNewRoomDetailPage(){
 function requestNewChatRoom(){
 	var text = $(".newChatDetail table .input").val();
 	var arr = [];
-	var data = $.lStorage(ui);
+	var data = QmiGlobal.groups;
 	var groupData = data[gi];
 	var me = groupData.gu;
 	for( var i=0; i<g_newChatMemList.length; i++ ){

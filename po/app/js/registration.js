@@ -336,7 +336,7 @@ onCheckVersionDone = function(needUpdate){
         	// 取dgi的combo
             if( groupList.length>0 ){
             	//有dgi 但不存在列表裡
-                if( QmiGlobal.auth.dgi === undefined || $.lStorage(ui)[QmiGlobal.auth.dgi] === undefined ){
+                if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
                 	localStorage.removeItem("uiData");
                 	
                     QmiGlobal.auth.dgi = groupList[0].gi;
@@ -367,7 +367,7 @@ onCheckVersionDone = function(needUpdate){
 			$(".ajax-screen-lock").hide();
 
             $.lStorage("refreshChk", false);
-            localStorage["uiData"] = JSON.stringify($.lStorage(ui));
+            localStorage["uiData"] = JSON.stringify(QmiGlobal.groups);
             // document.location = data.location;    
             $.mobile.changePage(data.location);
             
