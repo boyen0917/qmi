@@ -1427,7 +1427,7 @@ $(function(){
                         case 21:
                             var mainReplyText = this_content[0].firstChild.textContent;
                             var findText = "///;" + val.u + ";///";
-                            var markTag = "<b id='" + val.u + "'>" + val.n + "</b>";
+                            var markTag = "<b name='" + val.u + "'>" + val.n + "</b>";
                             mainReplyText = mainReplyText.replace(findText, markTag);
                             this_content[0].firstChild.textContent = "";
                             this_content.prepend(mainReplyText);
@@ -1437,7 +1437,7 @@ $(function(){
                 });
 
                 this_event.find("b").bind("click", function(e) {
-                    userInfoShow(gi, e.target.id);
+                    userInfoShow(gi, $(e.target).attr("name"));
                 });
 
                 //已有的留言就不製作
@@ -5622,7 +5622,7 @@ $(function(){
                 case 21:
                     var mainContext = this_event.find(target_div).html();
                     var findText = "///;" + val.u + ";///";
-                    var markTag = "<b id='" + val.u + "'>" + val.n + "</b>";
+                    var markTag = "<b name='" + val.u + "'>" + val.n + "</b>";
                     mainContext = mainContext.replace(findText, markTag);
                     this_event.find(target_div).html(mainContext);
                     this_event.find(target_div + "-detail").html(mainContext);
@@ -5648,7 +5648,7 @@ $(function(){
             };
 
             this_event.find("b").bind("click", function(e) {
-                userInfoShow(gi, e.target.id);
+                userInfoShow(gi, $(e.target).attr("name"));
             });
             
             //需要填入結束時間 以及 結束時間存在 就填入

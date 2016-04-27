@@ -29,7 +29,6 @@ $(function(){
 			// cns.debug("this_navi:",{name:this_navi.selector,data:this_navi.data("scroll-chk")});
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
 		    if(bottom_height && bottom_height >= last_height && !this_navi.data("scroll-chk")){
-		    	
 		    	//避免重複
 		    	this_navi.data("scroll-chk",true);
 		    	cns.debug("last event ct:",this_navi.data("last-ct"));
@@ -719,6 +718,62 @@ $(function(){
 			}
 		},201);
 	});
+	
+	// $(document).on("keyup focus",".st-reply-message-textarea textarea",function(e){
+	// 	var this_textarea = $(this);
+	// 	var keyinText = this_textarea.val().slice(-1);
+	// 	var replyArea = this_textarea.parent();
+	// 	if(replyArea.find(".tag-list")){
+	// 		replyArea.find(".tag-list").remove();
+	// 	}
+	// 	// var tagMenuContainer = $(".st-reply-area").find(".tag-list");
+	// 	// tagMenuContainer.html("");
+
+	// 	if (this_textarea.val().search("@") != -1) {
+	// 		var markSignIndex = this_textarea.val().indexOf("@");
+	// 		var markText = this_textarea.val().substring(markSignIndex+1);
+	// 		var memberslist = QmiGlobal.groups[gi].guAll;
+	// 		var tagElements = ""
+	// 		for (var memberID in memberslist) {
+	// 			var memberMugshot = memberslist[memberID].aut || "images/common/others/empty_img_personal.png";
+	// 			var memberName = memberslist[memberID].nk;
+	// 			if ((memberName) 
+	// 				// && (markText.match(/[\u4E00-\u9FA5]/g))
+	// 				&& ((/^[^\s]/).test(markText))
+	// 				&& (memberName.search(new RegExp(markText, "i")) != -1)) {
+	// 				tagElements += "<li><a><img src='" + memberMugshot + "' />" + memberName + "</a></li>";
+	// 			}
+	// 		}
+
+	// 		if (tagElements.length) {
+	// 			// tagMenuContainer.show();
+	// 			replyArea.prepend($("<ul/>", {
+	// 				"class": "tag-list",
+	// 				html: tagElements
+	// 			}));
+
+	// 			$(".tag-list").find("li").bind("click", function(e) {
+
+ //                    console.log(e.target);
+ //                });
+				
+	// 			// tagMenuContainer.html(tagElements);
+	// 		}else{
+	// 			// tagMenuContainer.html("");
+	// 			// tagMenuContainer.hide();
+	// 		}
+	// 	}
+	// });
+
+	// $(document).on("focusout",".st-reply-message-textarea textarea",function(e){
+	// 	var this_textarea = $(this);
+	// 	var replyArea = this_textarea.parents(".st-reply-area");
+	// 	if (replyArea.find(".tag-list")) {
+	// 		if ($('.tag-list li:hover').length == 0) {
+	// 			replyArea.find(".tag-list").remove();
+	// 		}
+	// 	}
+	// });
 
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){
