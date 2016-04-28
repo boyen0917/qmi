@@ -138,6 +138,9 @@ updateAlert = function(){
 			}
 		});
 
+	// 公雲鈴鐺
+	noticeDefArr.push(publicNoticeAjax);
+
 	Object.keys(QmiGlobal.clouds).forEach(function(cloudId){
 		var ajaxDef = new QmiAjax({
 			apiName: "notices",
@@ -458,10 +461,14 @@ showAlertContent = function(data){
 
 					$(".alert").removeClass("alert-click");
 		    		$(".alert-area").slideUp("fast",function(){
-		    			setTimeout(function(){
-			    			$.mobile.changePage("#page-timeline-detail", {transition: "slide"});
-							eventDetailShow(this_ei);	
-						},100);
+						eventDetailShow(this_ei).done(function(resultObj){
+							if(resultObj.isSuccess === false) {
+								new QmiGlobal.popup({
+									title: $.i18n.getString("USER_PROFILE_NO_DATA"),
+									desc: ""
+								})
+							}
+						});	
 		    		});
 				});
 

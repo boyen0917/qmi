@@ -2,10 +2,10 @@ $(function(){
 
     groupListToLStorage = function(groupList){
         var groups = QmiGlobal.groups,
-            tmp_groupList = [];
+            tmpGroupList = [];
 
         $.each(groupList,function(i,gl_obj){
-            tmp_groupList.push(gl_obj.gi);
+            tmpGroupList.push(gl_obj.gi);
 
             if( groups.hasOwnProperty(gl_obj.gi) === false ){
                 gl_obj.guAll = {};
@@ -34,10 +34,10 @@ $(function(){
         }); 
 
         // 剔除不存在的團體
-        for(this_gi in groups){
-            if(tmp_groupList.indexOf(this_gi) === -1){
-                console.debug("delete group",groups[this_gi])
-                delete groups[this_gi];
+        for(giKey in groups){
+            if(tmpGroupList.indexOf(giKey) === -1){
+                console.debug("delete group",groups[giKey])
+                delete groups[giKey];
             }
         }
     }
@@ -48,7 +48,9 @@ $(function(){
         thisGi = thisGi || gi,
         comboDeferred = $.Deferred();
 
-        getGroupData(thisGi,false,1,true).complete(function(data){
+        new QmiAjax({
+            apiName: "groups/" + thisGi,
+        }).complete(function(data){
             if(data.status == 200){
                 var comboData = $.parseJSON(data.responseText);
 
@@ -124,7 +126,19 @@ $(function(){
 
     getGroupCombo = function(this_gi,callback,chk){
         var this_gi = this_gi || gi;
-        getGroupData(this_gi,false,1,true).complete(function(data){
+        // var err_show = err_show || false;
+        // var api_name = "groups/" + this_gi;
+        // if( tp ) api_name = api_name +"?tp=" +tp;
+        // var headers = {
+        //     "ui":ui,
+        //     "at":at,
+        //     "li":lang
+        // };
+        // var method = "get";
+        // getGroupData(this_gi,false,1,true)
+        new QmiAjax({
+            apiName: "groups/" + this_gi,
+        }).complete(function(data){
             if(data.status == 200){
                 var groupData = $.parseJSON(data.responseText);
 
@@ -253,7 +267,7 @@ $(function(){
             //清除timeline無資料旗標
             $(".feed-subarea.no-data").removeClass("no-data");
 
-            //替換該團體的畫面
+            //替換該團體的畫面 做完做updateTab
             updateGroupAllInfoDom( thisGi );
 
         } catch(e){

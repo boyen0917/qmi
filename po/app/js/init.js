@@ -209,7 +209,7 @@ window.QmiGlobal = {
 	cloudGiMap: {},
 
 	// 聊天室 auth
-	auth: window.chatAuth || {},
+	auth: {},
 
 	getObjectFirstItem: function(obj,last) {
 		if(last === true){ 
@@ -239,11 +239,14 @@ window.QmiAjax = function(args){
 
 			// 判斷apiName有無包含私雲gi 有的話就給他私雲 
 			if(args.apiName !== undefined){
-				var cgi = Object.keys(QmiGlobal.cloudGiMap).find(function(cgi){	
-					return args.apiName.match(new RegExp(cgi, 'g'))
+
+				var apiGi = args.apiName.split("/").find(function(item){
+					return QmiGlobal.groups.hasOwnProperty(item)
 				});
-				if(cgi !== undefined ) 
-					return QmiGlobal.clouds[ QmiGlobal.cloudGiMap[cgi].ci ];
+
+				// api 包含 group id 而且 在私雲內 回傳私雲 否則回傳undefined 不往下做
+				if(apiGi !== undefined) 
+					return QmiGlobal.cloudGiMap.hasOwnProperty(apiGi) ? QmiGlobal.clouds[ QmiGlobal.cloudGiMap[apiGi].ci ] : undefined;
 			}
 
 			// 最後判斷 現在團體是私雲團體 就做私雲
@@ -609,9 +612,9 @@ QmiAjax.prototype = {
 
 		//logout~
 		if(errData.status == 401){
-
+			return;
 			// 聊天室關閉
-			// if(window.location.href.match(/po\/app\/chat.html/)) window.close();
+			if(window.location.href.match(/po\/app\/chat.html/)) window.close();
 
 			localStorage.removeItem("_loginData");
 			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入

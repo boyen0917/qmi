@@ -341,16 +341,23 @@ function openChatWindow ( giTmp, ci ){
 	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
 		// windowList[ci].focus();
 	} else {
-		var data= new Object();
-		data["gi"]=giTmp;
-		data["ci"]=ci;
-		data["ui"]=ui;
-		data["at"]=at;
-		//data["cn"]=$(this).data("name");
+		var data= {
+			gi: giTmp,
+			ci: ci,
+			ui: ui,
+			at: at
+		};
+
 		$.lStorage( "_chatRoom", data );
-		//document.location = "chat.html";
 		windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
-		windowList[ci].chatAuth = window.QmiGlobal.auth;
+		
+		windowList[ci].chatAuthData = {
+			auth: 		window.QmiGlobal.auth,
+			groups: 	window.QmiGlobal.groups,
+			clouds: 	window.QmiGlobal.clouds,
+			cloudGiMap: window.QmiGlobal.cloudGiMap
+		}
+
 	}
 	windowList[ci].focus();
 }

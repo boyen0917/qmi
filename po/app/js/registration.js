@@ -259,27 +259,24 @@ onCheckVersionDone = function(needUpdate){
 		
 	});
 
-	login = function(phone_id,password,countrycode,isMail){
+	login = function(phoneId,password,countrycode,isMail){
 
 		isMail = isMail || false;
-		var api_name = "login";
-        var headers = {
-            li:lang
-        };
-        var id = phone_id;
-        if( false==isMail ){
-        	id = countrycode + getInternationalPhoneNumber(countrycode, phone_id);
-        }
-        var body = {
-            id: id,
-            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
-            dn: QmiGlobal.device,
-            pw:toSha1Encode(password)
-        };
-
         s_load_show = true;
-        var method = "post";
-        ajaxDo(api_name,headers,method,true,body).complete(function(data){
+        
+        new QmiAjax({
+        	apiName: "login",
+        	specifiedHeaders: {
+	            li:lang
+	        },
+        	body: {
+        		id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
+	            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
+	            dn: QmiGlobal.device,
+	            pw:toSha1Encode(password)
+        	},
+        	method: "post"
+        }).complete(function(data){
         	if(data.status == 200){
         		
         		QmiGlobal.auth = $.parseJSON(data.responseText);
@@ -299,7 +296,7 @@ onCheckVersionDone = function(needUpdate){
     			//記錄帳號密碼
     			if($(".login-remeber").data("chk")){
 					var _loginRemeber = {};
-					_loginRemeber.phone = phone_id;
+					_loginRemeber.phone = phoneId;
 					_loginRemeber.isMail = isMail;
 					// _loginRemeber.password = password;
 					_loginRemeber.countrycode = countrycode;

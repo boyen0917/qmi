@@ -317,33 +317,16 @@ deleteMeInvite = function(this_invite){
     });
 }
 
-getUserAvatarName = function (this_gi , this_gu , set_name ,set_img){
+getUserAvatarName = function (thisGi , thisGu , setName ,setImg){
     //先檢查localStorage[gi].guAll是否存在
-    var _groupList = QmiGlobal.groups;
-    var aut = "",auo = "",nk = "";
-
-    //可能會沒有會員資訊
-    if(!_groupList.hasOwnProperty(this_gi)){
-        getGroupCombo(this_gi,function(){
-            getUserAvatarName(this_gi , this_gu , set_name ,set_img);
-        });
-        return false;
-    }
+    var memberData = QmiGlobal.groups[thisGi].guAll[thisGu],
+        aut = auo = nk = "";
         
     try {
-        aut = _groupList[this_gi].guAll[this_gu].aut;
-        auo = _groupList[this_gi].guAll[this_gu].auo;
-        nk = _groupList[this_gi].guAll[this_gu].nk.replaceOriEmojiCode();
-
         //設定圖片
-        if(set_img){
-            if(aut){
-                set_img.attr("src",aut);
-            }else{
-                set_img.attr("src","images/common/others/empty_img_personal_l.png");
-            }
-        }
-        set_name.html(nk);
+        if(setImg) setImg.attr("src",memberData.aut || "images/common/others/empty_img_personal_l.png");
+
+        setName.html(memberData.nk.replaceOriEmojiCode());
     } catch(e) {
         errorReport(e);
     }
@@ -360,9 +343,8 @@ timelineChangeGroup = function (thisGi) {
     $(".sm-small-area.active").removeClass("active");
 
 
-    var 
-    changeDeferred = $.Deferred(),
-    comboDeferred = $.Deferred();
+    var changeDeferred = $.Deferred(),
+        comboDeferred = $.Deferred();
 
     if(Object.keys(QmiGlobal.groups[thisGi].guAll).length == 0){
         getGroupComboInit(thisGi).done( comboDeferred.resolve );
@@ -8470,34 +8452,59 @@ updateAddressbookFavoriteStatusApi = function( this_gi, al, dl ){
     return ajaxDo(api_name,headers,method,true,body);
 }
 
-eventDetailShow = function(this_ei){
-    var this_gi = this_ei.split("_")[0];
+
+eventDetailShow = function(thisEi){
+    var this_gi = thisEi.split("_")[0],
+        deferred = $.Deferred();
+
     $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
         var this_event = $(this).find(".st-sub-box");
         this_event.addClass("detail");
         $(".timeline-detail").html(this_event).hide();
         //單一動態詳細內容
-        getEventDetail(this_ei).complete(function(data){
+        getEventDetail(thisEi)
+
+        // var this_gi = this_ei.split("_")[0];
+        // var this_ti = this_ei.split("_")[1];
+
+        // //單一動態詳細內容
+        // var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei;
+        // var headers = {
+        //         "ui":ui,
+        //         "at":at, 
+        //         "li":lang
+        //             };
+        // var method = "get";
+        // return ajaxDo(api_name,headers,method,false);
+
+        new QmiAjax({
+
+        }).complete(function(data){
             if(data.status == 200){
                 var data_obj = $.parseJSON(data.responseText);
                 try{
-                    if( data_obj.el[0].meta.del== true ){
-                        setTimeout( function(){
-                            popupShowAdjust(
-                                $.i18n.getString("FEED_EVENT_DELETED"),
-                                "",
-                                $.i18n.getString("COMMON_OK"),
-                                "",[function(){
-                                    $("#page-timeline-detail .page-back").trigger("click");
-                                },null]);
-                        },100);
-                    } else timelineBlockMake(this_event,[data_obj.el[0]],false,true);
+                    if(data_obj.el[0].meta.del== true) {
+                        new QmiGlobal.popup({
+                            title: $.i18n.getString("FEED_EVENT_DELETED"),
+                            desc: "", // 增加ui空間 美觀
+                            confirm: $.i18n.getString("COMMON_OK")
+                        })
+                    } else {
+                        $.mobile.changePage("#page-timeline-detail", {transition: "slide"});
+                        timelineBlockMake(this_event,[data_obj.el[0]],false,true);
+                    }
                 } catch(e){
                     errorReport(e);
+                    deferred.resolve({isSuccess: false,data: data});
                 }
+            } else {
+                deferred.resolve({isSuccess: false,data: data});
             }
+            
         });
     });
+
+    return deferred.promise();
 }
 
 timelineMainClose = function(){
