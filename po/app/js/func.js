@@ -6972,7 +6972,7 @@ combineCloudPolling = function(newPollingData){
     });
 
     $.when.apply($,cloudPollingDefArr).done(function(){
-        // 設定arguments
+        // 設定arguments(array-like object)
         Array.prototype.forEach.call(arguments,function(item){
             if(item.isSuccess === false) return;
 
@@ -6987,6 +6987,8 @@ combineCloudPolling = function(newPollingData){
             newPollingData.cmds = newPollingData.cmds.concat(apiData.cmds);
             // msgs
             newPollingData.msgs = newPollingData.msgs.concat(apiData.msgs);
+            // ccs
+            newPollingData.ccs = newPollingData.ccs.concat(apiData.ccs);
 
             // gcnts 是公雲才有 不處理
         })
