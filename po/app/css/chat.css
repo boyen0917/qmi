@@ -187,7 +187,8 @@ body {
 /* chat.js video will change this height when playing */
 .ui-container {
 	/*margin: 40px auto 0; */
-	overflow: scroll;
+	overflow-y: scroll;
+	overflow-x: hidden;
 	/* padding: 70px 0; */
 	/* top: 40px; */
 	/*padding-top: 66px;*/
@@ -809,7 +810,7 @@ body {
     outline: none;
     box-shadow: none;
     max-height: 200px;
-    overflow: scroll;
+    overflow-y: auto;
     padding: 3px 10px 3px;
     line-height: 25px;
 }

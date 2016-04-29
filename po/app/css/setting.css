@@ -124,7 +124,7 @@
 	position: absolute;
 	height: 100%;
 	/*margin-top: 47px;*/
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 .ga-avatar{

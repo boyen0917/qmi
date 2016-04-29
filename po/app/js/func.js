@@ -1330,7 +1330,7 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
         var without_message = false;
         var reply_content;
         var ml_arr = [];
-        
+
         this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html .st-reply-content-area',function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
@@ -1429,8 +1429,16 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
                         return false;
                         break;
                     case 18:
-
                         without_message = true;
+                        break;
+                    case 21:
+                        var mainReplyText = this_content[0].firstChild.textContent;
+                        var findText = "///;" + val.u + ";///";
+                        var markTag = "<b name='" + val.u + "'>" + val.n + "</b>";
+                        mainReplyText = mainReplyText.replace(findText, markTag);
+                        this_content[0].firstChild.textContent = "";
+                        this_content.prepend(mainReplyText);
+
                         break;
                 }
             });
@@ -1444,7 +1452,6 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
                 if(tests.length > 0)
                     reply_duplicate = true;
             }
-
 
             
             //部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
@@ -5511,8 +5518,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                              {addr: [val.lat, val.lng], text: val.a}
                          ]
                     });
-                    if(gi == "G000000209m")
-                        ccc;
+                    
                 } catch(e) {
 
                     try {
@@ -5540,7 +5546,6 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                         cns.debug("高德失敗");
 
                     }
-                        
                 }
                     
                 break;
@@ -5552,6 +5557,15 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 break;
             case 17:
                 end_time_chk = true;
+                break;
+            case 21:
+                var mainContext = this_event.find(target_div).html();
+                var findText = "///;" + val.u + ";///";
+                var markTag = "<b name='" + val.u + "'>" + val.n + "</b>";
+                mainContext = mainContext.replace(findText, markTag);
+                this_event.find(target_div).html(mainContext);
+                this_event.find(target_div + "-detail").html(mainContext);
+
                 break;
             case 27:
                 if( false==isApplyWatermark && 1==val.wm ){
