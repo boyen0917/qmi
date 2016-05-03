@@ -1,6 +1,5 @@
 (function($) {
 
-	window.g_uiData = {};
 	$.fn.htmlEntities = function(str) {
     	var encodeHtmlEntity = function(str) {
     		var escape_list = {"10":"\n"};
@@ -30,9 +29,9 @@
 
     	if( 0==key.indexOf("U") ){
     		if(value){
-				window.g_uiData = value;
+				QmiGlobal.groups = value;
 			}else{
-				return window.g_uiData;
+				return QmiGlobal.groups;
 			}
     	} else {
 			if(value || value === false){

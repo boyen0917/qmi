@@ -178,8 +178,8 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
 function removeGroup( this_gi ){
 	$(".sm-group-area[data-gi="+this_gi+"]").remove();
 	var rmGroupGn = "unknown";
-	if( $.lStorage(ui) !== false && $.lStorage(ui)[this_gi] !== undefined && $.lStorage(ui)[this_gi].gn)
-		rmGroupGn = $.lStorage(ui)[this_gi].gn;
+	if( QmiGlobal.groups !== false && QmiGlobal.groups[this_gi] !== undefined && QmiGlobal.groups[this_gi].gn)
+		rmGroupGn = QmiGlobal.groups[this_gi].gn;
 
 	if( gi==this_gi ){
 	    var otherGroup = $(".sm-group-area.enable");
@@ -187,10 +187,9 @@ function removeGroup( this_gi ){
 	    	$(otherGroup[0]).trigger("click");
 	    } else{
 	    	gi = null;
-	    	delete $.lStorage(ui)[this_gi];
-	    	$(document).data("page-history",[]);
-	    	$(".page-back").hide();
-	    	$(".hg-create").trigger("click");
+	    	delete QmiGlobal.groups[this_gi];
+	    	
+	    	goToGroupMenu();
 	    }
 	}
 
@@ -198,25 +197,17 @@ function removeGroup( this_gi ){
     try{
     	
     	//local storage
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		if( userData.hasOwnProperty(this_gi) ){
 			var groupDataTmp = userData[this_gi];
 			if( null!=groupDataTmp && null!=groupDataTmp.gn ){
 				gn = groupDataTmp.gn;
 			}
 			delete userData[this_gi];
-			$.lStorage(ui,userData);
+			// *--* $.lStorage(ui,userData);
 		}
-		var _groupList = $.lStorage("_groupList");
-		$.each(_groupList,function(i,gl_obj){
-			var groupTmp = _groupList[i];
-			if( groupTmp.gi==this_gi ){
-				_groupList.splice(i, 1);
-				return false;
-			}
-		});
-		$.lStorage("_groupList", _groupList);
-		userData = $.lStorage(ui);
+		
+		userData = QmiGlobal.groups;
 
 		//----- remove from idb -------
 		//chat
@@ -307,7 +298,7 @@ function showUpdatePermissionPage(){
 	//find current admins
 	var list = {};
 	try{
-        var userDataTmp = $.lStorage(ui);
+        var userDataTmp = QmiGlobal.groups;
         var guAllTmp = userDataTmp[gi].guAll;
         for( var gu in guAllTmp ){
         	var mem = guAllTmp[gu];
@@ -357,19 +348,6 @@ function showUpdatePermissionPage(){
 	});
 }
 function requestUpdatePermission( this_gi, addList, delList, callback){
-	// PUT /groups/{gi}/administrators
-	// {
-	//   "el": // Enabled Admin List
-	//   [
-	//     "asdfas-fdsa8n3ff-dfsan",
-	//     "i234t9sfh34-fdsnaf-34f"
-	//   ],
-	//   "dl": // Disabled Admin List
-	//   [
-	//     "sdafie3-f8dsnfa-f3nfda",
-	//     "vcxnz-8f34nsa-f83fnsda"
-	//   ]
-	// }
 	var api_name = "groups/"+this_gi+"/administrators";
     var headers = {
             ui: ui,
@@ -386,23 +364,8 @@ function requestUpdatePermission( this_gi, addList, delList, callback){
     	if(data.status == 200){
     		//可以直接改權限, 不過取消admin的權限該是多少？
     		//改成直接打api更新好了...
-    		setGroupAllUser(null, this_gi, callback);
-    		// try{
-		    //     var userData = $.lStorage(ui);
-		    //     var guAll = userData[gi].guAll;
-		    //     for( var i=0; i<addList.length; i++ ){
-		    //     	var gu = addList[i];
-		    //     	var mem = guAll[gu];
-		    //     	mem.ad = 1;
-		    //     }
-		    //     for( var i=0; i<delList.length; i++ ){
-		    //     	var gu = delList[i];
-		    //     	var mem = guAll[gu];
-		    //     	mem.ad = 2;
-		    //     }
-		    // } catch(e){
-		    //     errorReport(e);
-		    // }
+    		getGroupComboInit( this_gi ).done( callback );
+    	
     	} else if(callback) callback( data );
     });
 }
@@ -422,7 +385,7 @@ function showGroupInfoPage(){
 	var groupDescription = groupName;
 	var groupImg = null;
 	try{
-        var userData = $.lStorage(ui);
+        var userData = QmiGlobal.groups;
         var group = userData[gi];
         isAdmin = (1==group.ad);
         groupName = group.gn;
@@ -528,6 +491,7 @@ function resetGroupInfo(){
 
 	info.filter(".view").show();
 	info.filter(".edit").hide();
+
 }
 
 function checkGroupInfoChange(){
@@ -539,6 +503,8 @@ function checkGroupInfoChange(){
 	}
 }
 
+
+// 需要defer改寫
 function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
 	
 	var isReady = false;
@@ -547,7 +513,8 @@ function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
 		getUpdateGroupInfoApi(this_gi, newGn, newGd).complete(function(data){
 	    	if(data.status == 200){
 	    		if( isReady ){
-	    			setGroupAllUser(null, this_gi, function(){
+	    			getGroupComboInit( this_gi ).done( function(){
+	    				updateGroupAllInfoDom( this_gi );
 		    			if(callback) callback();
 		    			s_load_show = false;
 		    		});
@@ -575,7 +542,8 @@ function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
 					$(this).show().off("load");
 					img.filter(".upload").hide();
 				});
-	    		setGroupAllUser(null, this_gi, function(){
+	    		getGroupComboInit( this_gi ).done( function(){
+	    			updateGroupAllInfoDom( this_gi );
 	    			if(callback) callback();
 	    			s_load_show = false;
 	    		});

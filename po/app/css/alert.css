@@ -104,7 +104,8 @@
 	top: 43px;
 	width: 379px;
 	/* padding: 2%; */
-	overflow: scroll;
+	/*overflow: scroll;*/
+	overflow-y: auto;
 	font-size: 16px;
 	background: rgb(216, 239, 255);
 	opacity: 0.99;
@@ -258,3 +259,4 @@
 	-webkit-line-clamp: 3;
 	-webkit-box-orient: vertical;
 }
+

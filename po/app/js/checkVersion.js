@@ -122,18 +122,20 @@ $(function(){
 			    } else {
 			    	g_currentVersion = versionData.ver;
 			    }
-				$("#container_version span.web").html("("+g_currentVersion+")");
 
-	        	new AjaxTransfer().execute({
-	        		url: "sys/version?"+new Date().getTime(), //add current to prevent cache
-	        		headers: {
+
+				$("#container_version span.web").html("("+g_currentVersion+")");
+	        	new QmiAjax({
+	        		url: base_url + "sys/version?" + new Date().getTime(), //add current to prevent cache
+	        		noAuth: true,
+	        		specifiedHeaders: {
 		    			os: 2,
 						tp: 0,
 						av: g_currentVersion,
 						li: lang
 					},
 	        		method: "get",
-	        		err_hide: true
+	        		errHide: true
 	        	}).complete(function(data){
 		        	if(data.status == 200){
 		        		var getS3_result =$.parseJSON(data.responseText);
