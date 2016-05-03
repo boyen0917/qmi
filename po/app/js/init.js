@@ -1,4 +1,3 @@
-
 var ui,
 	at,
 	//國碼
@@ -21,9 +20,7 @@ var ui,
 		debug_flag = true;
 		base_url = "https://qaap.qmi.emome.net/apiv1/";
 		// base_url = "https://apserver.mitake.com.tw/apiv1/";
-	}
-
-
+	};
 
 
 
@@ -201,7 +198,6 @@ var timeline_detail_exception = [
 			imgNm: "post"
 		}
 	};
-
 
 
 window.QmiGlobal = {
@@ -500,7 +496,9 @@ QmiAjax.prototype = {
 		}
 
 		// 預設公雲ui,at
-		newHeaders = { ui: QmiGlobal.auth.ui, at: QmiGlobal.auth.at, li: lang };
+		newHeaders.ui = QmiGlobal.auth.ui;
+		newHeaders.at = QmiGlobal.auth.at;
+		newHeaders.li = lang;
 
 		// 做私雲判斷
 		if(cloudData !== undefined) {

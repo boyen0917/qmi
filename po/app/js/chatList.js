@@ -270,13 +270,6 @@ function showChatList(){
 		$.when.apply($,deferredPoolArr).done(function(){
 			targetDiv.show();
 			sortRoomList();
-
-			//desktop 版的chrome scrollbar 會被吃掉 這算 activate
-			var scrollDom = $("#page-group-main .gm-content > div:nth-child(2)");
-	        scrollDom.css("overflow-y","hidden");
-	        setTimeout(function(){
-	            scrollDom.css("overflow-y","scroll");
-	        },10);
 		})
 	}
 

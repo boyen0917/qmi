@@ -1064,7 +1064,7 @@ $(function(){
 	
 	$(document).on("click",".st-reply-like-area",function(){
 		var this_event = $(this).parents(".st-sub-box");
-		cns.debug("gogoogg",this_event.data());
+
 		timelineObjectTabShowDelegate( this_event, 1, function(){
 			cns.debug("back from like list");
 		});
