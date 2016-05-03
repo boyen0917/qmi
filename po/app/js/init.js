@@ -425,6 +425,12 @@ window.QmiAjax = function(args){
 			
 	ajaxDeferred.promise().complete = function(cb) {
 		ajaxDeferred.always(function(completeData) {
+
+			if(s_load_show !== true) {
+				$('.ui-loader').hide();
+				$(".ajax-screen-lock").hide();
+			}
+
         	completeData.newArgs = newArgs;
             cb(completeData);
 		})

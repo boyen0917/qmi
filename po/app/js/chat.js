@@ -1672,7 +1672,7 @@
 			};
 		}
 
-		var result = ajaxDo(api_name, headers, method, true, body);
+		var result = ajaxDo(api_name, headers, method, false, body);
 		result.complete(function (data) {
 			if (data.status != 200) return false;
 
