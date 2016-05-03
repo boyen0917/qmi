@@ -275,6 +275,7 @@ onCheckVersionDone = function(needUpdate){
 	            dn: QmiGlobal.device,
 	            pw:toSha1Encode(password)
         	},
+        	isLoadingShow: true,
         	method: "post"
         }).complete(function(data){
         	if(data.status == 200){
