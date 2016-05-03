@@ -276,7 +276,7 @@ function showChatList(){
 
 	$(".subpage-chatList-row .td:nth-child(2)").off("click");
 	$(".subpage-chatList-row .td:nth-child(2)").on("click", function(){
-		// console.debug( $(this).data("id") );
+		// cns.debug( $(this).data("id") );
 		openChatWindow( gi, $(this).data("id") );
 	});
 
@@ -300,8 +300,8 @@ function showChatList(){
 	});
 
 	$(".update").off("click").click(function(){
-		// console.debug( $(this).data("gi"), $(this).data("ci"));
-		// console.debug( $(this).attr("data-gi"), $(this).attr("data-ci"));
+		// cns.debug( $(this).data("gi"), $(this).data("ci"));
+		// cns.debug( $(this).attr("data-gi"), $(this).attr("data-ci"));
 		updateLastMsg( $(this).attr("data-gi"), $(this).attr("data-ci") );
 	});
 }

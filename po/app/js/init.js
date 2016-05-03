@@ -301,7 +301,7 @@ window.QmiAjax = function(args){
 	var reAuthTimer = setInterval(function reAuthInterval(){
 		// locked! return!
 		if(self.authLock.chk() === true) {
-			console.log("reAuth lock!");
+			cns.log("reAuth lock!");
 			return reAuthInterval;
 		} else {
 			
@@ -323,7 +323,7 @@ window.QmiAjax = function(args){
 				newArgs.headers = self.setHeaders(args, cloudData);
 
 				// 印bug
-				if(args.debug === true) console.debug("newArgs", newArgs);
+				if(args.debug === true) cns.debug("newArgs", newArgs);
 
 				// 執行
 				$.ajax(newArgs).complete(function(apiData){
@@ -349,7 +349,7 @@ window.QmiAjax = function(args){
 							// 執行前 先看reAuth lock沒
 							var reAuthTimer2 = setInterval(function reAuthInterval2(){
 								if(self.authLock.chk() === true) {
-									console.log("reAuth lock 2!");
+									cns.log("reAuth lock 2!");
 									return reAuthInterval2;
 								} else {
 									self.reAuth(cloudData).done(reAuthDefChain.resolve);
@@ -525,7 +525,7 @@ QmiAjax.prototype = {
 		var nowEt = (args.cloudData === undefined) ? QmiGlobal.auth.et : args.cloudData.et,
 			deferred = $.Deferred();
 
-		// console.debug( (args.cloudData === undefined ? "公雲 " : "私雲 ") + (function(){
+		// cns.debug( (args.cloudData === undefined ? "公雲 " : "私雲 ") + (function(){
 		// 	var temp = args.url.substring(0,(args.url.lastIndexOf("/") + 1)-1);
 		// 	var start = temp.lastIndexOf("/") + 1;
 		// 	return args.url.substring(start);
@@ -553,7 +553,7 @@ QmiAjax.prototype = {
 			deferred = $.Deferred();
 
 		// auth lock
-		console.log("reAuth starts");
+		cns.log("reAuth starts");
 		self.authLock.set(true);
 
 		$.ajax({
@@ -568,7 +568,7 @@ QmiAjax.prototype = {
 		    headers: self.setHeaders({},cloudData),
 		    type: "put",
 		    error: function(errData){
-		        console.debug("reAuth error",errData);
+		        cns.debug("reAuth error",errData);
 		        deferred.resolve({
 		        	isSuccess: false,
 		        	data: errData,
@@ -598,7 +598,7 @@ QmiAjax.prototype = {
 		        });
 		    },
 		    complete: function(){
-		    	console.log("reAuth done and unlock");
+		    	cns.log("reAuth done and unlock");
 		    	self.authLock.set(false);
 		    }
 		}) // end of reAuth ajax
@@ -773,11 +773,11 @@ setDebug(debug_flag);
 function setDebug(isDebug) {
   if (isDebug) {
     window.cns = {
-      log: window.console.log.bind(window.console, '%s: %s'),
-      error: window.console.error.bind(window.console, 'error: %s'),
-      info: window.console.info.bind(window.console, 'info: %s'),
-      warn: window.console.warn.bind(window.console, 'warn: %s'),
-      debug: window.console.debug.bind(window.console, 'debug: %s')
+      log: window.cns.log.bind(window.console, '%s: %s'),
+      error: window.cns.error.bind(window.console, 'error: %s'),
+      info: window.cns.info.bind(window.console, 'info: %s'),
+      warn: window.cns.warn.bind(window.console, 'warn: %s'),
+      debug: window.cns.debug.bind(window.console, 'debug: %s')
     };
   } else {
     var __no_op = function() {};

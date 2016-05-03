@@ -49,10 +49,10 @@ onCheckVersionDone = function(needUpdate){
 		var countryCodeDoms = $('#page-register .countrycode select');
 		countryCodeDoms.selectbox({
 			onOpen: function (inst) {
-				console.log("open"); //, inst
+				cns.log("open"); //, inst
 			},
 			onClose: function (inst) {
-				console.log("close"); //, inst
+				cns.log("close"); //, inst
 			},
 			onChange: function (val, inst) {
 				cns.debug(val, inst);
@@ -91,10 +91,10 @@ onCheckVersionDone = function(needUpdate){
 	var countryCodeDoms = $('.login-ld-countrycode select');
 	countryCodeDoms.selectbox({
 		onOpen: function (inst) {
-			console.log("open"); //, inst
+			cns.log("open"); //, inst
 		},
 		onClose: function (inst) {
-			console.log("close"); //, inst
+			cns.log("close"); //, inst
 		},
 		onChange: function (val, inst) {
 			countryCodeDoms.attr("data-val",val||"");
@@ -310,7 +310,7 @@ onCheckVersionDone = function(needUpdate){
         	}
         }).error(function(){
         	window.errorTest = arguments;
-        	console.debug("login error ",arguments)
+        	cns.debug("login error ",arguments)
         });
 	}
 
@@ -344,7 +344,7 @@ onCheckVersionDone = function(needUpdate){
                 getGroupComboInit(QmiGlobal.auth.dgi).done(function(resultObj){
                 	if( resultObj.status === false ){
                 		//發生錯誤 回首頁比較保險
-                		console.debug("dgi combo error",resultObj);
+                		cns.debug("dgi combo error",resultObj);
                 		window.location = "index.html";
                 	} else {
                 		deferred.resolve({location:"#page-group-main"});

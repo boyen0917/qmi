@@ -36,7 +36,7 @@ $(function(){
         // 剔除不存在的團體
         for(giKey in groups){
             if(tmpGroupList.indexOf(giKey) === -1){
-                console.debug("delete group",groups[giKey])
+                cns.debug("delete group",groups[giKey])
                 delete groups[giKey];
             }
         }
@@ -49,7 +49,7 @@ $(function(){
         comboDeferred = $.Deferred();
 
         new QmiAjax({
-            apiName: "groups/" + thisGi,
+            apiName: "groups/" + thisGi + "?tp=1" // tp1才能取得退出的成員
         }).complete(function(data){
             if(data.status == 200){
                 var comboData = $.parseJSON(data.responseText);
@@ -80,12 +80,9 @@ $(function(){
                 for( var key in comboData.ul ){
                     var thisGuObj = comboData.ul[key];
                     //用在contact.js 不知道為何
-                    if( thisGuObj.st === 0) {
+                    if( thisGuObj.st === 0) inviteGuAll[thisGuObj.gu] = thisGuObj;
 
-                        inviteGuAll[thisGuObj.gu] = thisGuObj;
-                    } else {
-                        groupData.guAll[thisGuObj.gu] = thisGuObj;
-                    }
+                    groupData.guAll[thisGuObj.gu] = thisGuObj;
                 }
                 groupData.inviteGuAll = inviteGuAll;
 
@@ -466,7 +463,7 @@ $(function(){
         };
         var result = ajaxDo(apiName, headers, 'delete',true,null, null, true);
         result.error(function(jqXHR, textStatus, errorThrown) {
-            console.debug(1);
+            cns.debug(1);
             return;
         });
         result.complete( function(data) {

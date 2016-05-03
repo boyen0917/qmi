@@ -1,4 +1,4 @@
-(function(){
+$(function(){
 	//load language
 	updateLanguage(lang);
 
@@ -658,7 +658,7 @@
 	聊天室DB初始化完成後callback
 	**/
 	function onChatDBInit() {
-		// console.debug("-------- onChatDBInit ---------");
+		// cns.debug("-------- onChatDBInit ---------");
 		var today = new Date();
 		$("#chat-contents").html("<div class='firstMsg'></div>");
 		var timeTag = $("<div class='chat-date-tag'></div>");
@@ -691,10 +691,10 @@
 		// $("#container").off("scroll");
 
 		g_isLoadHistoryMsgNow = true;
-		// console.debug("g_isLoadHistoryMsgNow",g_isLoadHistoryMsgNow);
+		// cns.debug("g_isLoadHistoryMsgNow",g_isLoadHistoryMsgNow);
 		$("#chat-loading-grayArea").hide();
 		$("#chat-loading").show();
-		console.debug("----- getHistoryMsg", bIsScrollToTop, " ------");
+		cns.debug("----- getHistoryMsg", bIsScrollToTop, " ------");
 		g_idb_chat_msgs.limit(function (list) {
 			var firstDayDiv = $("#chat-contents .chat-date-tag");
 			var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
@@ -746,7 +746,7 @@
 					hideLoading();
 				}
 			}
-			// // console.debug("---- end loading -----");
+			// // cns.debug("---- end loading -----");
 		}, {
 			index: "gi_ci_ct",
 			keyRange: g_idb_chat_msgs.makeKeyRange({
@@ -771,7 +771,7 @@
 	function setCurrentFocus(dom){
 		if( dom ){
 			g_currentScrollToDom = dom;
-			// console.debug("---- start lockCurrentFocusInterval -----",g_currentScrollToDom);
+			// cns.debug("---- start lockCurrentFocusInterval -----",g_currentScrollToDom);
 			// lockCurrentFocusInterval = setInterval( function(){
 				// g_currentScrollToDom.scrollIntoView();
 			// }, lockCurrentFocusIntervalLength );
@@ -797,7 +797,7 @@
 			// g_container.getNiceScroll()[0].wheelprevented = false;
 			// clearInterval( lockCurrentFocusInterval );
 
-			// console.debug("---- end lockCurrentFocusInterval -----");
+			// cns.debug("---- end lockCurrentFocusInterval -----");
 
 		} else {
 			$("#chat-loading").stop().fadeOut(function () {
@@ -828,7 +828,7 @@
 			li: lang
 		}, type, false, data);
 		result.error(function (jqXHR, textStatus, errorThrown) {
-			// // console.log(textStatus, errorThrown);
+			// // cns.log(textStatus, errorThrown);
 			if (errorDelegate) errorDelegate();
 		});
 		result.success(function (data, status, xhr) {
@@ -844,7 +844,7 @@
 	function scrollToStart() {
 		if( !g_container ) g_container = $("#container");
 		g_container.stop(false, true).animate({scrollTop: 50}, 'fast');
-		// console.debug(" -- scrollToBottom");
+		// cns.debug(" -- scrollToBottom");
 	}
 
 	/**
@@ -856,7 +856,7 @@
 
 		g_container.stop(false, true).animate({scrollTop: $("#chat-contents").height()}, milisecond);
 		g_isEndOfPage = true;
-		// console.debug(" -- scrollToBottom");
+		// cns.debug(" -- scrollToBottom");
 	}
 
 	/**
@@ -1343,7 +1343,7 @@
 				// msgDiv.html( msgData.tp+"<br/>"+msgData.c );
 				break;
 		}
-		console.debug("showMsg finished");
+		cns.debug("showMsg finished");
 		return container;
 	}
 
@@ -2371,7 +2371,7 @@
 
 		if (!$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition")) return;
 
-		//console.debug("wwww",g_container.scrollTop());
+		//cns.debug("wwww",g_container.scrollTop());
 
 		var posi = $(this).scrollTop();
 		if (g_isLoadHistoryMsgNow) {
@@ -2831,4 +2831,4 @@
 	};
 
 
-}())
+})

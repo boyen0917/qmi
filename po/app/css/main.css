@@ -1013,17 +1013,14 @@ img.auo {
 .sm-group-list-area {
     /*min-height: 123px;*/
     height: -webkit-calc( 100% - 188px );
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: scroll;
 	padding-bottom: 5px;
 }
 
-.sm-group-list-area:hover {
-    overflow: auto;
-}
-
-.sm-group-list-area::-webkit-scrollbar-thumb {
-    background-color: rgb(86, 85, 85);
-}
+.sm-group-list-area::-webkit-scrollbar { width: 0 }
+.sm-group-list-area:hover::-webkit-scrollbar { width: 8px }
+.sm-group-list-area::-webkit-scrollbar-thumb { background-color: rgb(86, 85, 85); }
 
 .sm-group-list-area-add {
     overflow: hidden;
@@ -1636,15 +1633,20 @@ img.auo {
 	border-radius: 0 0 5px 5px;
 }*/
 
+
+.subpage-timeline::-webkit-scrollbar { width: 0; }
+.subpage-timeline:hover::-webkit-scrollbar { width: 8px; }
+/*.subpage-timeline:hover::-webkit-scrollbar { display: block; }*/
+
 .subpage-timeline {
     background: rgb(242, 242, 242);
     height: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: scroll;
     position: relative;
     width: calc(100vw - 250px);
 }
 
-.subpage-timeline:hover { overflow-y: scroll; }
 
 .st-navi-fixed {
 	position: fixed;
@@ -1963,6 +1965,7 @@ img.auo {
 /* 游標 */
 
 .st-filter-area {
+	position: relative;
 	margin-bottom: 10px;
 	background: white;
 	border-bottom: 1px solid rgb(200,200,200);
@@ -1986,7 +1989,7 @@ img.auo {
 	color: lightgray;
 	cursor: pointer;
 	display: none;
-	top: 165px;
+	top: 0px;
 	line-height: 41px;
 }
 .st-filter-hide.left{
@@ -2078,14 +2081,7 @@ img.auo {
 
 .st-feedbox-area {
     margin: 40px 10px;
-    /*margin: -8px 41px;
-    width: -webkit-calc( 100% - 43px );
-    overflow-y: scroll;
-    height: -webkit-calc( 100% - 215px );
-    position: absolute;*/
-	/*top: 260px;
-	position: absolute;*/
-	width: -webkit-calc( 100% - 25px );
+    width: calc( 100vw - 250px );
 }
 
 

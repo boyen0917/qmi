@@ -747,7 +747,7 @@ $(function(){
 
 	// 			$(".tag-list").find("li").bind("click", function(e) {
 
- //                    console.log(e.target);
+ //                    cns.log(e.target);
  //                });
 				
 	// 			// tagMenuContainer.html(tagElements);
@@ -1128,7 +1128,7 @@ $(function(){
 				if(cnt < 3) {
 					cnt++;
 					this_compose.data("parse-waiting-retry",cnt);
-					console.debug("yooo",cnt);
+					cns.debug("yooo",cnt);
 
 					$(".cp-post").trigger("click");
 				}else{
@@ -1974,13 +1974,13 @@ $(function(){
 
 	//timeline 滾到底部取舊資料
 	fetchHistoryTimeline = function(){
-		console.debug("fetchHistoryTimeline");
+		cns.debug("fetchHistoryTimeline");
 
 		var currentPage = $(".subpage-timeline");
 		if( false == currentPage.is(":visible") ){
 			return;
 		}
-		console.debug("fetchHistoryTimeline in timeline");
+		cns.debug("fetchHistoryTimeline in timeline");
 
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi") || "00";

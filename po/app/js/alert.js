@@ -111,10 +111,10 @@ showAlertFromDB = function(){
         limit: 20,
         order: "DESC",
         onEnd: function(result){
-            // console.debug("onEnd:",result);
+            // cns.debug("onEnd:",result);
         },
         onError: function(result){
-            // console.debug("onError:",result);
+            // cns.debug("onError:",result);
         }
     });
 }

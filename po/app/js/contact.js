@@ -141,7 +141,7 @@ initContactList = function(){
 	}
 
 	rowContainer.find(".row.branch").off("click").click( function(){
-		console.debug("???");
+		cns.debug("???");
 		showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
 	});
 
@@ -664,7 +664,7 @@ generateMemberGrid = function( memObject ){
 	try{
 		var keys = Object.keys(memObject);
 		keys.sort( function(a, b){
-			// console.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
+			// cns.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
 			if (memObject[a].nk < memObject[b].nk)	return -1;
 			if (memObject[a].nk > memObject[b].nk)	return 1;
 			return 0;
@@ -751,7 +751,7 @@ generateMemberList = function( memObject, favCallback ){
 	try{
 		var keys = Object.keys(memObject);
 		keys.sort( function(a, b){
-			// console.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
+			// cns.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
 			if (memObject[a].nk < memObject[b].nk)	return -1;
 			if (memObject[a].nk > memObject[b].nk)	return 1;
 			return 0;
@@ -760,7 +760,7 @@ generateMemberList = function( memObject, favCallback ){
 		for( var i=0; i<keys.length; i++){
 			var key = keys[i];
 			var mem = memObject[key];
-			// console.debug(mem.nk);
+			// cns.debug(mem.nk);
 			//favorite ver.
 			// var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
 			var tmp = $("<div class='row mem namecard'><div class='left'></div><div class='mid'></div><div class='right'>&nbsp</div></div>");

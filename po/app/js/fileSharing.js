@@ -243,7 +243,7 @@ FileSharing.prototype = {
 				deferred.reject({response:data,api:1});
 			}
 		})).then(function(data){
-			console.debug("when data 1",data);
+			cns.debug("when data 1",data);
 			return (new AjaxTransfer().execute({
 				url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 				method: "post",
@@ -317,7 +317,7 @@ FileSharing.prototype = {
 			complete: function(data){
 				if(data.status != 200) return false;
 
-				console.debug("dl data",data);
+				cns.debug("dl data",data);
 				// alert("...");
 				var s3Data = JSON.parse(data.responseText);
 				if(typeof s3Data == "undefined") toastShow("檔案錯誤");
@@ -542,7 +542,7 @@ FileSharing.prototype = {
 		    uploadDeferred.done(function(data){
 				toastShow($.i18n.getString("FILESHARING_UPLOAD_SUCCESS"))
 			}).fail(function(data){
-				console.debug("error ",data);
+				cns.debug("error ",data);
 			}).always(function(){
 				thisFile.setUploadProgress(0.05);
 				
@@ -638,7 +638,7 @@ FileSharing.prototype = {
 		this.showGeneralPopup($.i18n.getString("FILESHARING_RENAME"),"renameExecute");
 	},
 	renameExecute: function(name) {
-		console.debug("active data",this.activeItemData);
+		cns.debug("active data",this.activeItemData);
 		var 
 		thisItem = this.activeItemData ,
 		newName = (thisItem.ti === null) ? name + (thisItem.fn.substring(thisItem.fn.lastIndexOf("."))) : name,
@@ -674,7 +674,7 @@ FileSharing.prototype = {
 			
 		}
 
-		console.debug("rename",body);
+		cns.debug("rename",body);
 		new AjaxTransfer().execute({
 			// /groups/{gi}/timelines/{ti}/events/{ei}
 			url: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,

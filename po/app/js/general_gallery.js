@@ -137,17 +137,17 @@ getS3file = function(file_obj,target,tp, isWatermark, text){
     var method = "get";
     var result = ajaxDo(api_name,headers,method,false);
 
-    console.debug(api_name);
+    cns.debug(api_name);
 
     result.complete(function(data){
         if(data.status != 200){
-        	console.debug("get s3 fail");
+        	cns.debug("get s3 fail");
         	return false;
         }
 
 		try{
-			console.debug(data.responseText);
-			console.debug("target",target, "tp",tp);
+			cns.debug(data.responseText);
+			cns.debug("target",target, "tp",tp);
 		} catch(e){
 			errorReport(e);
 		}

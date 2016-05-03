@@ -33,7 +33,7 @@ setGroupInitial = function(new_gi,chk){
         //重新設定功能選單
         updateTab(gi);
 
-        // console.debug("ui",JSON.stringify(QmiGlobal.groups));
+        // cns.debug("ui",JSON.stringify(QmiGlobal.groups));
 
 
         //動態消息
@@ -2152,7 +2152,7 @@ composeContentMake = function (compose_title){
                 //watermark
                 try{
                     var tmpGroup = QmiGlobal.groups[gi];
-                    console.debug(tmpGroup.tp);
+                    cns.debug(tmpGroup.tp);
                     if( tmpGroup.tp!="A1" ){
                         show_area += ", .cp-content-watermark";
                     }
@@ -2169,7 +2169,7 @@ composeContentMake = function (compose_title){
                 //watermark
                 try{
                     var tmpGroup = QmiGlobal.groups[gi];
-                    console.debug(tmpGroup.tp);
+                    cns.debug(tmpGroup.tp);
                     if( tmpGroup.tp!="A1" ){
                         show_area += ", .cp-content-watermark";
                     }
@@ -2651,7 +2651,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
     });
 
     //已經有內容 就製作已選的樣式
-    console.debug("obj_data:",obj_data);
+    cns.debug("obj_data:",obj_data);
     if(obj_data){
         obj_data = $.parseJSON(obj_data);
         if(Object.keys(obj_data).length){
@@ -3940,7 +3940,7 @@ composeVoteEvent = function(this_compose){
         }
         
     });
-    console.debug("go");
+    cns.debug("go");
     //可投票數加減1
     $(document).off("click",".cp-vote-pm").on("click",".cp-vote-pm",function(){
 
@@ -4842,7 +4842,7 @@ idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr,callback){
             callback();
         },
         onError: function(result){
-            console.debug("remove onError:",result);
+            cns.debug("remove onError:",result);
         }
     });
 }
@@ -5166,10 +5166,10 @@ timelineListWrite = function (ct_timer,is_top){
  //        limit: 20,
  //        order: "DESC",
  //        onEnd: function(result){
- //            console.debug("onEnd:",result);
+ //            cns.debug("onEnd:",result);
  //        },
  //        onError: function(result){
- //            console.debug("onError:",result);
+ //            cns.debug("onError:",result);
  //        }
  //    });
 }
@@ -6213,7 +6213,7 @@ getLinkMeta = function (this_compose,url) {
 
         deferred
         .done(function(err, data){
-            console.debug("done",data);
+            cns.debug("done",data);
 
             var result = {};
             var tmp_img,tmp_desc;
@@ -6285,7 +6285,7 @@ getLinkMeta = function (this_compose,url) {
                         img.error( function(){
                             $(this).parent().hide();
                             $(this).remove();
-                            console.debug("img preview failed.");
+                            cns.debug("img preview failed.");
                         });
                     }
                     $(".cp-ta-yql").fadeIn();
@@ -6323,7 +6323,7 @@ getLinkMeta = function (this_compose,url) {
             
         })
         .fail(function(){
-            console.debug("fail");
+            cns.debug("fail");
 
             //網址讀取結束
             this_compose.data("parse-waiting",false);
@@ -6745,11 +6745,11 @@ getCloudToken = function(cloudObj,isReDo){
         }),
         type: "post",
         error: function(errData){
-            console.debug("cloud cl cert error",errData);
+            cns.debug("cloud cl cert error",errData);
         },
         success: function(apiData){
 
-            console.debug("success",apiData);
+            cns.debug("success",apiData);
 
             // http status 200:
             // rsp code 406 為驗證的 Key 被串改…
@@ -6816,7 +6816,7 @@ getCloudKey = function(cloudsArr){
 }
 
 getPrivateGroupList = function(p_data, callback){
-    console.log("getPrivateGroupList");
+    cns.log("getPrivateGroupList");
     //取得團體列表
     var api_name = "groups";
     var headers = {

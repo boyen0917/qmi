@@ -554,7 +554,7 @@ uploadToS3 = function(file,api_name,ori_arr,tmb_arr,callback){
 	                //大小圖都要縮圖
 	                var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
 	                var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
-	                console.debug("img",{
+	                cns.debug("img",{
 	                	originImgObj: o_obj,
 	                	thumbnailImgObj: t_obj
 	                });
@@ -938,7 +938,7 @@ Date.prototype.toFormatString = function(isShowTime){
 			var options = {weekday: "short"};
 			
 			//星期四 15:40
-			// console.debug( this.toLocaleTimeString(language, options) );
+			// cns.debug( this.toLocaleTimeString(language, options) );
 			return this.toLocaleTimeString(language, options).split(" ")[0]
 					+" "+this.getHours()+":"+this.getMinutes();
 		} else {	//within a year
@@ -1680,13 +1680,13 @@ copyTextToClipboard = function( text ){
 errorReport = function(e){
 	if( e ){
 		if( e.message.indexOf("riseNotification")==0 ) return;
-    	console.debug("----- errorReport --------------------");
+    	cns.debug("----- errorReport --------------------");
     	if (e.stack){
-    		console.debug(e.stack);
+    		cns.debug(e.stack);
     	} else {
-    		console.debug(arguments.callee.caller, e.message);
+    		cns.debug(arguments.callee.caller, e.message);
     	}
-    	console.debug("-------------------- errorReport -----");
+    	cns.debug("-------------------- errorReport -----");
 	}
 }
 

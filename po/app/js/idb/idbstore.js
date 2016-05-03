@@ -1114,7 +1114,7 @@
           onSuccess(result);
         }
         options.onError = function(item){
-          console.debug("error:",item);
+          cns.debug("error:",item);
           onSuccess(result);
         }
         return this.iterate(function (item,cursor) {
