@@ -423,40 +423,22 @@ var initStickerArea= {
 		}
 	},
 	getStickerListApi: function(){
-		var thisTmp = this;
-		var api_name = "sticker_packages";
-        var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                     };
-        var method = "get";
-
-        return ajaxDo(api_name,headers,method,false,null);
+        return (new QmiAjax({
+        	apiName: "sticker_packages",
+        	isPublicApi: true
+        }))
 	},
 	getStickerDetailApi: function(spi) {
-		var thisTmp = this;
-		var api_name = "sticker_packages/"+spi;
-        var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                     };
-        var method = "get";
-
-        return ajaxDo(api_name,headers,method,false,null);
+		return (new QmiAjax({
+        	apiName: "sticker_packages/"+spi,
+        	isPublicApi: true
+        }))
 	},
 	getSingleStickerPathApi: function(sid) {
-		var thisTmp = this;
-		var api_name = "stickers/"+sid;
-        var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                     };
-        var method = "get";
-
-        return ajaxDo(api_name,headers,method,false,null);
+		return (new QmiAjax({
+        	apiName: "stickers/"+sid,
+        	isPublicApi: true
+        }))
 	},
 	downloadSticker: function(spi, callback, isUpdateDom){
 		if(null==isUpdateDom) isUpdateDom = true;
@@ -540,13 +522,12 @@ var initStickerArea= {
 			callback(_stickerDetail[sid].sou);
 
 		} else {
-
-			new AjaxTransfer().execute({
-				url: "stickers/"+sid,
-				method: "get"
-			}).then(function(data){
-				callback(data.sou);
-			});
+			new QmiAjax({
+	        	apiName: "stickers/"+sid,
+	        	isPublicApi: true
+	        }).success(function(data){
+	        	callback(data.sou);
+	        })
 		}
 	},
 

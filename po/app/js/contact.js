@@ -32,8 +32,8 @@ $(document).ready(function(){
 });
 
 // getBranchMemCnt = function(bl){
-// 	var guAll = $.lStorage(ui)[gi].guAll;
-// 	var blAll = $.lStorage(ui)[gi].bl;
+// 	var guAll = QmiGlobal.groups[gi].guAll;
+// 	var blAll = QmiGlobal.groups[gi].bl;
 // 	var blAllCntArr = [];
 // 	// for(i=0;i<Object.keys(guAll).length;i++){
 // 	// 	var guObj = guAll[Object.keys(guAll)[i]];
@@ -323,7 +323,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back" customize><img src="images/common/icon/bt_close_activity.png"/></div>'
+                +'<div class="page-back " customize><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
@@ -564,7 +564,7 @@ showAllMemberPage = function(gn) {
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
+                +'<div class="page-back " customize><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#page-group-main").after(page);
@@ -636,9 +636,9 @@ showAllMemberPage = function(gn) {
 
 switchListAndGrid = function( dom, subPageBottom ){
 	isList = !isList;
-	var userData = $.lStorage(ui);
+	var userData = QmiGlobal.groups;
 	userData.isMemberShowList = isList;
-	$.lStorage(ui,userData);
+	// *--* $.lStorage(ui,userData);
 
 	var mem = subPageBottom.find(".contact-mems");
 	var memList = subPageBottom.find(".contact-memLists");
@@ -860,10 +860,10 @@ generateMemberList = function( memObject, favCallback ){
 		// 			var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
 		// 			cns.debug("add:",isAdded);
 		// 			thisTmp.toggleClass("active", isAdded);
-		// 			var data = $.lStorage(ui);
+		// 			var data = QmiGlobal.groups;
 		// 			data[gi].guAll[gu].fav = isAdded;
 		// 			guAll = data[gi].guAll;
-		// 			$.lStorage(ui, data);
+		// 			// *--* $.lStorage(ui, data);
 		// 		}
 		// 		if( favCallback ) favCallback();
 		// 	});
@@ -969,7 +969,7 @@ showMainContact = function(){
 initContactData = function(){
 	//get user data
 	if( typeof(ui)=='undefined' ) return;
-	var userData = $.lStorage(ui);
+	var userData = QmiGlobal.groups;
 	if( !userData )	return;
 	isList = (userData.isMemberShowList)?userData.isMemberShowList:false;
 
@@ -998,7 +998,7 @@ initContactData = function(){
 		// 	window.testMem[obj.nk] = obj;
 		}
 	});
-	// $.lStorage(ui, userData);
+	// // *--* $.lStorage(ui, userData);
 
 	//get new mem data
 	var currentTime = new Date().getTime();
@@ -1042,7 +1042,7 @@ updateFavoritePage = function(){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
+                +'<div class="page-back " customize><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#page-group-main").after(page);
@@ -1167,7 +1167,7 @@ showSubFavoritePage = function( fi ){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back" customize><img src="images/common/icon/bt_close_activity.png"/></div>'
+                +'<div class="page-back " customize><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
@@ -1365,7 +1365,7 @@ showAddFavGroupBox = function( subPage ){
 							var tmp = $.parseJSON( data.responseText );
 							cns.debug( data.responseText );
 							var data = {};
-							var userData = $.lStorage(ui);
+							var userData = QmiGlobal.groups;
 							g_group = userData[gi];
 
 							//add fi to mem data
@@ -1378,7 +1378,7 @@ showAddFavGroupBox = function( subPage ){
 							fbl = g_group.fbl;
 							fbl[tmp.fi] = {cnt:memKeys.length, fn:name};
 							data[tmp.fi] = fbl[tmp.fi];
-							$.lStorage(ui, userData );
+							// *--* $.lStorage(ui, userData );
 
 							var branch = generateFavBranchList( data );
 							var rows = $("#page-contact_favorite .contact-rows");
@@ -1483,7 +1483,7 @@ showEditFavGroupBox = function( dom ){
 
 			ajaxDo(api_name,headers,"put",true,body).complete(function(data){
 				if(data.status == 200){
-					var userData = $.lStorage(ui);
+					var userData = QmiGlobal.groups;
 					g_group = userData[gi];
 
 					//add fi to mem data
@@ -1502,7 +1502,7 @@ showEditFavGroupBox = function( dom ){
 					//add fi data to fbl
 					fbl = g_group.fbl;
 					fbl[fi].cnt = memKeys.length;
-					$.lStorage(ui, userData );
+					// *--* $.lStorage(ui, userData );
 
 					initContactData();
 					dom.parent().fadeOut();
@@ -1566,7 +1566,7 @@ deleteFavGroup = function( dom ){
 		if(data.status == 200){
 			var tmp = $.parseJSON( data.responseText );
 			var data = {};
-			var userData = $.lStorage(ui);
+			var userData = QmiGlobal.groups;
 			g_group = userData[gi];
 
 			//-----
@@ -1587,7 +1587,7 @@ deleteFavGroup = function( dom ){
 			//remove fi from fbl
 			fbl = g_group.fbl;
 			delete fbl[fi];
-			$.lStorage(ui, userData );
+			// *--* $.lStorage(ui, userData );
 
 			initContactData();
 			showFavoritePage( true );
@@ -1649,13 +1649,13 @@ function updateInvitePending () {
 		var obj =$.parseJSON(data.responseText);
 		if( obj&&obj.hasOwnProperty("il") ) inviteGuAll = obj.il;
 
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		if( userData && gi ){
 			if( userData.hasOwnProperty(gi) ){
 				userData[gi].inviteGuAll = inviteGuAll;
 			}
 		}
-		$.lStorage(ui, userData);
+		// *--* $.lStorage(ui, userData);
 
 
 		var pendingAreaParent = $("#page-contact-addmem .ca-pending-area");

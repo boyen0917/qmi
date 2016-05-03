@@ -6,17 +6,30 @@ body{
     font-weight: normal;
     font-size: 16px;
 }
+
 /* jquery mobile某些class會設text-shadow
 會造成windows有底色的字看起來糊糊的 */
-div, span, label, h3{
+/*div, span, label, h3{
     text-shadow: none;
-}
+}*/
 ::-webkit-input-placeholder{
 	font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC",arial,sans-serif;
     /*-webkit-font-smoothing: antialiased;*/
     font-weight: normal;
     font-size: 14px;
 }
+
+::-webkit-scrollbar {
+      width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+      background-color: rgba(17, 17, 17, 0.45);
+      opacity: 0.8;
+      border-radius: 8px;
+}
+
+
 
 .ui-header.ui-bar-c.ui-header-fixed {
 	min-height: 55px;
@@ -34,7 +47,6 @@ div, span, label, h3{
 .overflow-hidden {
 	overflow: hidden;	
 }
-
 
 .main{
 	height:1136px;
@@ -80,7 +92,7 @@ img.auo {
 
 .login-area{
 	position: relative;
-	top: 57%;
+	/*top: 57%;*/
 	margin: auto;
 	width: 80%;
 }
@@ -191,13 +203,8 @@ img.auo {
     top: -1px;
 }
 
-.register-text{
-	float:left;
-    position: relative;
-    top: 2px;
-    left: 10px;
-    letter-spacing:0px;
-}
+.register-text{ margin: auto;width: 300px; }
+.register-text span { position: relative; top: 2px; }
 
 #register-next,#pw-send {
     margin-top: 88%;
@@ -584,20 +591,26 @@ img.auo {
 }
 
 /* ======================= popup =================================*/
-.popup{
-	display: none;
+.popup {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  z-index: 1901;
 }
 
 .popup-frame {
-	position: fixed;
+	position: relative;
+	top: 30vh;
 	z-index: 1901;
 	border-radius: 3px;
-	top: 200px;
 	text-align: center;
 	width: 300px;
 	border: 1px solid white;
 	text-shadow: none;
 	overflow: auto;
+	margin: 0 auto;
 }
 
 .popup-title {
@@ -609,6 +622,7 @@ img.auo {
 
 .popup-confirm-area {
 	cursor: pointer;
+	display: flex;
 }
 
 .popup-cancel, .popup-confirm {
@@ -618,20 +632,11 @@ img.auo {
 	font-size: 18px;
 	line-height: 40px;
 	-webkit-user-select: none;
-}
-
-.popup-confirm {
-	width: 149px;
-	float: right;
+	flex:1 ;
 }
 
 .popup-cancel {
-	float: left;
-	width: 149px;
-}
-
-.full-width {
-	width:100%;
+	border-right: 1px solid black;
 }
 
 .popup-confirm:active, .popup-cancel:active {
@@ -653,7 +658,7 @@ img.auo {
 .popup-screen,.ajax-screen-lock , .screen-lock , .compose-dnd{
 	display: none;
 	width: 100%;
-	height: 200%;
+    height: 100%;
 	left: 0;
 	top: 0;
 	background: black;
@@ -726,8 +731,8 @@ img.auo {
 	/*color: #f5f5f5;
 	text-shadow: 0 0;*/
 	height: 100%;
-	overflow-y: scroll;
-	overflow-x: hidden;
+	/*overflow-y: hidden;
+	overflow-x: hidden;*/
 	-webkit-box-flex: 0; 
 }
 
@@ -849,27 +854,22 @@ img.auo {
 	width: auto;
 }
 
-.gm-border .sm-small-area {
-	clear: both;
-	height: 51px;
-	padding-left: 20px;
-	cursor: pointer;
-	position: relative;
+.gm-border [name=system-setting] { cursor: pointer; height: 50px;}
+
+.gm-border [name=system-setting] .sm-small-area-l {
+    display: inline-block;
+    margin-right: 30px; 
+    position: relative;
+    top: 12px;
+    left: 10px;
 }
 
-.gm-border .sm-small-area-l {
-    float: left;
-    margin-right: 30px;
-    margin-top: 11px;
-}
+.gm-border [name=system-setting] .sm-small-area-l img { width: 28px; }
 
-.gm-border .sm-small-area-l img {
-	width: 28px;
-}
-
-.gm-border .sm-small-area-r {
-    float: left;
-    padding-top: 15px;
+.gm-border [name=system-setting] .sm-small-area-r {
+    display: inline-block;
+    position: relative;
+    top: 5px;
 }
 .gm-border .sm-small-area .sm-count {
 	right: 5px;
@@ -878,30 +878,31 @@ img.auo {
 
 .sm-count {
 	font-size: 12px;
-	background: rgb(74, 144, 226);
-	height: 20px;
-	border-radius: 30px;
-	position: absolute;
-	line-height: 20px;
-	right: 5px;
-	/*top: -2px;*/
-	width: 20px;
-	overflow: hidden;
-	text-align: center;
-	color: white;
-	display: none;
+    background: rgb(74, 144, 226);
+    height: 22px;
+    border-radius: 30px;
+    position: absolute;
+    line-height: 22px;
+    right: 5px;
+    width: 22px;
+    overflow: hidden;
+    text-align: center;
+    color: white;
+    display: none;
+    padding-left: 1px;
 }
 .header-menu .sm-count{
-	/*right: ;*/
 	position: relative;
-	background: #f31e80;
-	line-height: 18px;
-	height: 18px;
-	width: 18px;
-	border-radius: 13px;
-	margin-right: -19px;
-	top: -6px;
-	margin-left: -3px;
+    background: #f31e80;
+    line-height: 17px;
+    height: 18px;
+    width: 17px;
+    border-radius: 13px;
+    margin-right: -19px;
+    bottom: 10px;
+    font-size: 12px;
+    overflow: visible;
+    padding-right: 1px;
 }
 
 .sm-hr {
@@ -962,12 +963,13 @@ img.auo {
 
 .sm-group-area {
 	height: 60px;
+	width: 240px;
 	display: -webkit-box;
 	position: relative;
 	cursor: pointer;
 }
 
-.sm-group-area.enable:active , .gm-border .sm-small-area:active, .gm-border .sm-group-area.active {
+.gm-border .sm-group-area.active {
 	background: rgb(20,20,20);
 }
 
@@ -1011,9 +1013,18 @@ img.auo {
 .sm-group-list-area {
     /*min-height: 123px;*/
     height: -webkit-calc( 100% - 188px );
-	overflow: scroll;
+	overflow: hidden;
 	padding-bottom: 5px;
 }
+
+.sm-group-list-area:hover {
+    overflow: auto;
+}
+
+.sm-group-list-area::-webkit-scrollbar-thumb {
+    background-color: rgb(86, 85, 85);
+}
+
 .sm-group-list-area-add {
     overflow: hidden;
 }
@@ -1059,10 +1070,11 @@ img.auo {
 	background: #f31e80;
 	top: 13px;
 	right: 3px;
-	height: 20px;
-	width: 20px;
+	height: 21px;
+	width: 18px;
 	line-height: 20px;
 	overflow: hidden;
+	padding-right: 2px;
 }
 
 .sm-group-cj-btn > img {
@@ -1092,9 +1104,9 @@ img.auo {
 }
 
 /* 拿掉會影響 投票的textarea */
-::-webkit-scrollbar {
+/*::-webkit-scrollbar {
     display: none;  
-}
+}*/
 
 .sm-switch-ui-adj {
 	height: 4px;
@@ -1377,21 +1389,44 @@ img.auo {
 #page-group-main .gm-content {
     position: relative;
 	height: 100%;
-	overflow: hidden;
 	-webkit-box-flex: 1;
+	overflow-y: hidden;
 }
+
+/*#page-group-main .gm-content::-webkit-scrollbar{
+    width: 10px;
+}
+
+#page-group-main .gm-content::-webkit-scrollbar-track{
+    background-color: transparent;
+}*/
+
+
+
 #page-group-main .gm-content > div:nth-child(1){
     position: absolute;
 	width: 100%;
 	height: 43px;
 }
 #page-group-main .gm-content > div:nth-child(2){
-    overflow-y: scroll;
+    overflow: hidden;
 	position: absolute;
 	width: 100%;
-	height: -webkit-calc( 100% - 43px );
+	height: -webkit-calc( 100% - 40px );
 	top: 43px;
 }
+
+
+
+
+
+/*#page-group-main .gm-content > div:nth-child(2):hover{
+    overflow-y: auto;
+}*/
+
+/*#page-group-main .gm-content > div:nth-child(2)::-webkit-scrollbar-track{
+	background-color: transparent;
+}*/
 
 #page-group-main div[data-role=content]:hover {
 	/*position: absolute;*/
@@ -1417,13 +1452,20 @@ img.auo {
 	z-index: 1000;
 }
 
+
+.header-menu::-webkit-scrollbar { display: none; }
+
 .header-menu{
 	padding: 0 7px;
 	line-height: 35px;
 	margin-top: -1px;
 	margin-left: 49px;
 	max-width: -webkit-calc( 100% - 115px );
-	overflow-x: scroll;
+	overflow-x: hidden;
+}
+
+.header-menu:hover{
+	overflow-x: auto;
 }
 .header-group-name ,.header-cp-object{
 	text-align: center;
@@ -1595,10 +1637,14 @@ img.auo {
 }*/
 
 .subpage-timeline {
-	background: rgb(242, 242, 242);
-	min-height: 800px;
-	overflow: hidden;
+    background: rgb(242, 242, 242);
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    width: calc(100vw - 250px);
 }
+
+.subpage-timeline:hover { overflow-y: scroll; }
 
 .st-navi-fixed {
 	position: fixed;
@@ -1683,7 +1729,7 @@ img.auo {
 
 .st-top-event-area {
 	background: url(../images/common/others/timeline_kv1_android.png) no-repeat;
-	width: 100%;
+	width: calc(100vw - 250px);
 	height: 150px;
 	background-size: cover;
 	padding-top: 15px;
@@ -1920,15 +1966,11 @@ img.auo {
 	margin-bottom: 10px;
 	background: white;
 	border-bottom: 1px solid rgb(200,200,200);
-	/*padding: 0 15px;*/
 	font-size: 14px;
 	white-space: nowrap;
-	overflow-x: scroll;
-	width: 100%;
+    width: calc(100vw - 250px);
 	z-index: 10;
 	-webkit-box-shadow: 0px 2px 4px 0px rgba(190, 190, 190, 0.4);
-	/*position: absolute;*/
-	/*top: 221px;*/
 }
 .st-filter-area.fixed {
 	position: fixed;
@@ -2036,13 +2078,23 @@ img.auo {
 
 .st-feedbox-area {
     margin: 40px 10px;
+    /*margin: -8px 41px;
+    width: -webkit-calc( 100% - 43px );
+    overflow-y: scroll;
+    height: -webkit-calc( 100% - 215px );
+    position: absolute;*/
 	/*top: 260px;
 	position: absolute;*/
 	width: -webkit-calc( 100% - 25px );
 }
-.st-feedbox-area.official-admin-adjust{
-	margin-top: 30px;
+
+
+.st-feedbox-area::-webkit-scrollbar-thumb {
+    height: 80px;
 }
+/*.st-feedbox-area.official-admin-adjust{
+	margin-top: 30px;
+}*/
 .st-feebox-area-container{
     width: -webkit-calc( 100% - 30px );
     margin-left: 15px;
@@ -3042,8 +3094,6 @@ img.st-user-pic{
 	margin-right: 5px;
 }
 
-
-
 .st-reply-area {
     background: white;
     border-radius: 5px;
@@ -3078,6 +3128,10 @@ img.st-user-pic{
 	display: block;
 	padding: 10px 0;
 	width: 75%;
+}
+
+.st-reply-content-subarea b{
+	cursor: pointer;
 }
 
 .st-reply-content {
@@ -3178,6 +3232,7 @@ img.st-reply-message-attach {
 	position: relative;
 	top: 6px;
 	left: 6px;
+	overflow-y: auto;
 }
 
 .st-reply-message-textarea textarea:focus{ outline:none } 
@@ -3503,6 +3558,10 @@ img.st-reply-message-attach {
 	height: 15px;
 }
 
+.cp-textarea-title::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}
+
 .cp-icon-size {
 	width: 25px;
 }
@@ -3656,6 +3715,7 @@ border-bottom: 1px solid #eee;
 	height: 15px;
 	background: transparent;
 	margin: -2px 10px;
+	resize: none!important;
 }
 
 .cp-vote-area textarea:focus,.cp-work-area textarea { outline:none } 
@@ -4118,7 +4178,7 @@ input.cp-datetimepicker-end {
 	display: inline-block;
 	max-height: 100px;
 	text-overflow: ellipsis;
-	overflow: scroll;
+	overflow: auto;
 	min-height: 30px;
 	color: #4092ef;
 	/* white-space: pre-line; */
@@ -4164,7 +4224,7 @@ input.cp-datetimepicker-end {
 	z-index: 1;
 	position: fixed;
 	width: 100%;
-	overflow: scroll;
+	overflow-y: auto;
 	height: 100%;
 	background: white;
 }
@@ -4381,7 +4441,7 @@ input.cp-datetimepicker-end {
 	top: 0;
 	left: 0;
 	z-index: 1800;
-	overflow: scroll;
+	/*overflow: scroll;*/
 	-webkit-transform-style: preserve-3d;
 	
 }
@@ -4931,7 +4991,7 @@ div.user-info-submit-ready:active {
 	border-bottom: 4px solid rgb(200,200,200);
 	font-size: 14px;
 	white-space: nowrap;
-	overflow-x: scroll;
+	overflow-x: auto;
 	width: 100%;
 	z-index: 10;
 	/*height: 140px;*/
@@ -5306,3 +5366,31 @@ section.fileSharing section.progress-bar .frame .progress {
 }
 section.fileSharing section.progress-bar .frame .text { position: absolute; top: 0 ;left: 65px;}
 
+section.subpage-fileSharing{
+	overflow-y: auto;
+}
+
+/* ==========================下拉式選單========================================== */
+
+.tag-list {
+	/*display: none;*/
+    width: 324px;
+    bottom: 31px;
+    left: 86px;
+    position: absolute;
+    height: 140px;
+    overflow: scroll;
+    background-color: beige;
+    padding: 0;
+    color: #111;
+    list-style: none;
+}
+
+.tag-list img{
+	width: 30px;
+	height: 30px;
+}
+
+.tag-list li:hover{
+	background-color: yellow;
+}

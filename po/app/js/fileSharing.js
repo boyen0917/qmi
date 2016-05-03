@@ -1,5 +1,5 @@
 var FileSharing = function(){
-	this.mainTi = $.lStorage(ui)[gi].ti_file;
+	this.mainTi = QmiGlobal.groups[gi].ti_file;
 	this.listOrder = "append";
 	this.ti = this.mainTi;
 	this.activeItemData = "";
@@ -20,6 +20,9 @@ var FileSharing = function(){
 FileSharing.prototype = {
 	fileDom: $("div.subpage-fileSharing section.fileSharing"),
 	bcArrow: '<img src="images/fileSharing/layer_arrow_icon@2x.png">',
+	// 200mb限制
+	uploadLimit: 200 * (1024*1024),
+
 	reset: function(){
 
 		this.fileDom.find("section.list").html("").end()
@@ -294,8 +297,7 @@ FileSharing.prototype = {
 				fiArr = this.fileItemArr;
 				// cns.debug("fileList",JSON.stringify(fileList,null,2));
 				for(i=0;i<fileList.length;i++) {
-					var itemObj = new FileItem(fileList[i]);
-					fiArr.push(itemObj);
+					fiArr.push(new FileItem(fileList[i]));
 				}
 				//排序 desc
 				fiArr.sort(function(a, b) {return b.meta.ct - a.meta.ct });
@@ -314,33 +316,46 @@ FileSharing.prototype = {
 			method: "post",
 			complete: function(data){
 				if(data.status != 200) return false;
+
+				console.debug("dl data",data);
 				// alert("...");
 				var s3Data = JSON.parse(data.responseText);
 				if(typeof s3Data == "undefined") toastShow("檔案錯誤");
-				cns.debug("hoho",JSON.parse(data.responseText));
 				var dlData = JSON.parse(data.responseText);
 				var link = document.createElement('a');
 			    link.download = this.activeItemData.fn;
-			    link.href = dlData.s3;
-			    cns.debug("dlData.s3",dlData.s3);
+
+			    var dlUrl = dlData.s3;
+			    if( dlData.s32.length > 0 ) dlUrl = dlData.s32;
+
+			    link.href = dlUrl;
 			    link.click();
 
 			}.bind(this)
 		});
 	},
+
 	uploadFile: function(){
 		event.stopPropagation();
 		var thisFile = this;
 		var coverDom = thisFile.fileDom.find("section.file-cover");
 
-		if(thisFile.fileDom.find("div.progress-bar").length == 0){
+		window.fsObjj = thisFile;
+
+
+		if(thisFile.fileDom.find("section.progress-bar").length == 0){
 			var progressSectionDom = $('<section class="progress-bar"><div class="frame"><div class="progress"></div><div class="text">0%</div></div></section>');	
 			coverDom.append(progressSectionDom);
 
 			progressSectionDom.click(function(){event.stopPropagation()})
 		}else{
 			var progressSectionDom = thisFile.fileDom.find("section.progress-bar");
+
 		}
+
+		// reset
+		thisFile.setUploadProgress(0,true);
+
 		// return false;
 		
 		var inputFileDom = thisFile.fileDom.find("input[type=file]");
@@ -348,12 +363,12 @@ FileSharing.prototype = {
 		inputFileDom.trigger("click");
 		inputFileDom.off().on('change',function(e){
 			var fileData = $(this)[0].files[0];
-
+			
 			//每次選擇完檔案 就reset input file
 			$(this).replaceWith( $(this).val('').clone( true ) );
 
-			// 大於100MB
-			if(fileData.size > 104857600) {
+			// 大於上傳限制
+			if(fileData.size > thisFile.uploadLimit) {
 				toastShow($.i18n.getString("FILESHARING_UPLOAD_OVERLIMIT"));
 				coverDom.trigger("click");
 				return false;
@@ -370,78 +385,118 @@ FileSharing.prototype = {
 
 			coverDom.addClass("disable");
 			thisFile.fileDom.find("section.file-cover ul").hide();
-			var tp = 0;
-			var contentType = " ";
 
+
+			progressSectionDom.show();
+
+			var 
+			fileTp = 0,
+			fiApiData = {},
+			s3DefArr = [], // pic -> s3 s32,  video -> s32(temporary) ,others -> s3 only
+		    uploadDeferred = $.Deferred(), // 上傳完成 deferred
+			fileOnloadDeferred = MyDeferred(); // 按順序完成的專用deferred
+			
 		    switch(true){
+
 		      case fileData.type.match("image") instanceof Array:
-		        tp = 1;
+		        fileTp = 1;
+
+		        thisFile.fileReader({
+		        	file: fileData,
+		        	tagName: "img",
+		        	onload: "onload"
+		        }).done(function(fileReaderData){
+		        	//大小圖都要縮圖
+	                var thumbnailImgObj = imgResizeByCanvas(fileReaderData,0,0,120,120,0.6);
+
+					s3DefArr = [{
+						s3: "s3",
+						contentType: " ",
+						file: thumbnailImgObj.blob
+					},{
+						s3: "s32",
+						contentType: " ",
+						file: fileData
+					}];
+
+	                fileOnloadDeferred.resolve();
+		        })
+
 		        break;
 		      case fileData.type.match("video") instanceof Array:
-		        tp = 2;
-		        contentType = "video/mp4";
+		        fileTp = 2;
+
+		        s3DefArr = [{
+					s3: "s32",
+					contentType: "video/mp4",
+					file: fileData
+				}];
+
+				fileOnloadDeferred.resolve();
+
 		        break;
-		    }
-		    progressSectionDom.show();
-		    var uploadDeferred = $.Deferred();
-		    var fiApiData = {};
-
-		    
-
-		    var step1Deferred = MyDeferred();
-
-		    new AjaxTransfer().execute({
-				url: "groups/" + gi + "/files/",
-				method: "post",
-				body: {
-					tp: tp,
-					ti: thisFile.ti
-				},
-				error: function(errData){
-					uploadDeferred.reject({response:errData,api:1});
-				},
-				success: step1Deferred.resolve
-			});
-
-		    step1Deferred.then(function(data){
-		    	fiApiData = data;
-		    	var step2Deferred = MyDeferred();
-
-		    	$.ajax({
-					url: data.s3,
-					type: 'PUT',
-					contentType: contentType,
-				 	data: fileData, 
-					processData: false,
-					error: function(errData){
-						uploadDeferred.reject({response: errData,api:"upload to s3"});
-					},
-					xhr: function() {
-						var progressDom = progressSectionDom.find(".progress");
-						var textDom = progressSectionDom.find(".text");
-						var xhr = new window.XMLHttpRequest();
-						xhr.upload.addEventListener('progress', function(e) {
-							if (e.lengthComputable) {
-							    progressDom.css('width', '' + (148 * e.loaded / e.total) + 'px');
-							    textDom.html(Math.round(100 * e.loaded / e.total) + "%");
-							}
-						});
-						return xhr;
-					},
-					success: step2Deferred.resolve
+		     
+		      default:
+		        // contentType暫時通用 " "
+		      	s3DefArr.push({
+					s3: "s3",
+					contentType: " ",
+					file: fileData
 				})
 
-		    	return step2Deferred;
+		      	fileOnloadDeferred.resolve();
+		    }
 
+		    // 完成上傳前準備 因為要取得檔案的onloaded
+		    fileOnloadDeferred.then(function(){
+		    	thisFile.setUploadProgress(0.05);
+
+		    	var tmpDeferred = MyDeferred();
+				// step1 取得上傳網址
+			    new AjaxTransfer().execute({
+					url: "groups/" + gi + "/files/",
+					method: "post",
+					body: {
+						tp: fileTp,
+						ti: thisFile.ti
+					},
+					error: function(errData){
+						uploadDeferred.reject({response:errData,api:1});
+					},
+					success: tmpDeferred.resolve
+				});
+
+		    	return tmpDeferred;
+		    // step2 進行s3 上傳
 		    }).then(function(data){
-		    	var step3Deferred = MyDeferred();
+		    	thisFile.setUploadProgress(0.05);
 
+		    	var tmpDeferred = MyDeferred();
+		    	fiApiData = data;
+		    	
+		    	// s3DefArr
+		    	$.when.apply( {}, s3DefArr.map(function(item){
+
+		    		item.url = fiApiData[item.s3] ;
+		    		return thisFile.uploadToS3TmpDef(item)
+
+		    	})).done(tmpDeferred.resolve)
+		    	.fail(function(errData){
+		    		uploadDeferred.reject({response: errData,api:"upload to s3"});
+		    	})
+
+		    	return tmpDeferred;
+		    // commit 
+		    }).then(function(){
+		    	thisFile.setUploadProgress(0.8);
+		    	var tmpDeferred = MyDeferred();
+		    	
 		    	new AjaxTransfer().execute({
 					url: "groups/" + gi + "/files/"+ fiApiData.fi +"/commit",
 					method: "put",
 					body: {
 				    	ti: thisFile.ti, 
-				    	tp: tp,
+				    	tp: fileTp,
 						mt: fileData.type || "text",
 						si: fileData.size,
 						md: {w:100,h:100,l:100}
@@ -449,11 +504,15 @@ FileSharing.prototype = {
 					error: function(errData){
 						uploadDeferred.reject({response:errData,api:"commit",});
 					},
-					success: step3Deferred.resolve
+					
+					success: tmpDeferred.resolve
 				})
-
-				return step3Deferred;
+				return tmpDeferred;
+				
 		    }).then(function(data){
+		    	
+		    	thisFile.setUploadProgress(0.05);
+
 		    	new AjaxTransfer().execute({
 					url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 					method: "post",
@@ -463,19 +522,17 @@ FileSharing.prototype = {
 							tp: "08",
 							lv: 1
 						}, 
-						ml: [
-						    {
-						    	fi: fiApiData.fi,
-						    	ftp: "0",
-						    	fn: fileData.name,
-						    	c: "It's a File",
-						    	si: fileData.size,
-						    	tp: 26
-							} 
-						]
+						ml: [{
+					    	fi: fiApiData.fi,
+					    	ftp: "0",
+					    	fn: fileData.name,
+					    	c: "It's a File",
+					    	si: fileData.size,
+					    	tp: 26 // ?
+						}]
 					},
 					error: function(errData){
-						uploadDeferred.reject({response: errData,api:"post 2"});
+						uploadDeferred.reject({response: errData,api:"post file"});
 					},
 					success: uploadDeferred.resolve
 				})
@@ -487,54 +544,144 @@ FileSharing.prototype = {
 			}).fail(function(data){
 				console.debug("error ",data);
 			}).always(function(){
-				coverDom.removeClass("disable").trigger("click").end()
-				.find("ul").show();
+				thisFile.setUploadProgress(0.05);
+				
 
-				progressSectionDom.hide();
+				setTimeout(function(){
+					coverDom.removeClass("disable").trigger("click").end()
+					.find("ul").show();
+
+					progressSectionDom.hide()
+				},100);
+				
 				thisFile.getList();
 			});
-		});
 
+		    
+		});// inputFileDom change 
 	},
+
+	fileReader: function(args){
+		var 
+		deferred = $.Deferred(),
+		reader = new FileReader();
+
+		reader.readAsDataURL(args.file);
+		reader.onloadend = function() {
+			var 
+			fileDom = document.createElement(args.tagName);
+			fileDom.src = reader.result;
+			fileDom[args.onload] = function(){
+				deferred.resolve(this);
+			}
+		}
+		return deferred.promise();
+	},
+
+	getVideoScreenshot: function(video){
+	  	var tempW = video.videoWidth;
+		var tempH = video.videoHeight;
+
+		var canvas = document.createElement('canvas');
+		canvas.width = tempW;
+		canvas.height = tempH;
+	  	canvas.getContext("2d").drawImage(video, 0, 0, tempW, tempH);
+
+		canvas.toDataURL("image/png")
+
+		var dataURL = canvas.toDataURL("image/png");
+
+		return dataURItoBlob(dataURL);
+	},
+
+	setUploadProgress: (function(){
+		originProgress = 0;
+
+		// 百分比, bool 累計, bool 從零開始
+	    return function( percentage, reset, increment ){
+
+	    	if( reset === true ) originProgress = 0;
+	    	// 累計
+	    	if( increment === undefined ) {
+	    		originProgress += percentage;
+	    		currentProgress = originProgress;
+	    	} else {
+	    		currentProgress = percentage + originProgress;	
+	    	}
+
+	    	$("section.fileSharing section.progress-bar")
+		    .find(".progress").css('width', '' + (148 * currentProgress) + 'px').end()
+		    .find(".text").html(Math.round( 100 * currentProgress) + "%" );
+	    }
+	})(),
+
+	uploadToS3TmpDef: function (options) {
+		var thisFile = this;
+
+		return $.ajax({
+			url: options.url,
+			type: 'PUT',
+			contentType: options.contentType,
+		 	data: options.file, 
+			processData: false,
+			xhr: function() {
+				var xhr = new window.XMLHttpRequest();
+				xhr.upload.addEventListener('progress', function(e) {
+					if( e.lengthComputable ) thisFile.setUploadProgress(( 0.8 * e.loaded / e.total ), false, true );
+				});
+				return xhr;
+			}
+		})
+	},
+
 	rename: function() {
 		this.showGeneralPopup($.i18n.getString("FILESHARING_RENAME"),"renameExecute");
 	},
 	renameExecute: function(name) {
-		var thisFile = this;
-		var oriFn = this.activeItemData.fn;
-		var newName = (this.activeItemData.ti === null) ? name + (oriFn.substring(oriFn.lastIndexOf("."))) : name;
-		var body = {
-				meta: {
-					tt: "",
-					tp: "08",
-					lv: 1
-				}, 
-				ml: [
-					{
-						fi: this.activeItemData.fi,
-						ftp: 0,
-						fn: newName,
-						si: 5566,
-						tp: 26 
-					}
-				]
-			};
+		console.debug("active data",this.activeItemData);
+		var 
+		thisItem = this.activeItemData ,
+		newName = (thisItem.ti === null) ? name + (thisItem.fn.substring(thisItem.fn.lastIndexOf("."))) : name,
+
+		// 預設是檔案 下方再判斷是否為資料夾
+		body = {
+			meta: {
+				tt: "",
+				tp: "U8",
+				lv: 1
+			}, 
+			ml: [
+				{	
+					ftp: 0,
+					fi: thisItem.fi,
+					fn: newName,
+					si: thisItem.si ,
+					tp: 26 
+				}
+			]
+		};
+
 
 		//資料夾
-		if(this.activeItemData.ti !== null){
+		if( thisItem.meta.tp == "09"){
 			body.ml[0].ln = {
-				ti: this.activeItemData.ti
+				ti: thisItem.ti
 			};
-			body.meta.tp = "09";
+			body.meta.tp = "U9";
+			body.ml[0].ftp = 1;
+
+			delete body.ml[0].si;
+			
 		}
 
+		console.debug("rename",body);
 		new AjaxTransfer().execute({
 			// /groups/{gi}/timelines/{ti}/events/{ei}
 			url: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
 			method: "post",
 			body: body,
 			complete: function(data){
-				thisFile.fileDom.find("section.file-cover").trigger("click")
+				this.fileDom.find("section.file-cover").trigger("click")
 				this.getList();
 				if(data.status == 200) {
 					toastShow($.i18n.getString("USER_PROFILE_UPDATE_SUCC"));	
@@ -648,7 +795,7 @@ FileItem.prototype = {
 			}else{
 				thisFileDom.find(".operator [name=download]").show();
 			}
-			// cns.debug("thisItemObj",thisItemObj);
+			cns.debug("thisItemObj",thisItemObj);
 			thisFileDom.find("div.row").removeClass("fs-active").end()
 			.find(".operator").show();
 			$(this).addClass("fs-active");
