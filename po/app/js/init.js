@@ -398,14 +398,10 @@ window.QmiAjax = function(args){
 						return reAuthDefChain;
 					}).then(function(reAuthObj){
 						// 3. 做原本ajax的判斷
-						try {
-							var completeData = reAuthObj.data,
-							responseObj = JSON.parse(completeData.responseText);
-						} catch(e) {
-							// 回傳失敗
-							ajaxDeferred.reject(completeData);
-						}
-						
+
+						var completeData = reAuthObj.data;
+						completeData.ajaxArgs = newArgs;
+
 						// 這邊只有一個狀況 就是reAuth失敗
 						if(reAuthObj.isSuccess === false || completeData.status !== 200) {
 							// 回傳失敗
@@ -422,43 +418,50 @@ window.QmiAjax = function(args){
 		} // authLock chk
 	}(),500) // end of interval function
 
-			
-	ajaxDeferred.promise().complete = function(cb) {
-		ajaxDeferred.always(function(completeData) {
+	var completeCB,successCB,errorCB;
 
-			if(s_load_show !== true) {
-				$('.ui-loader').hide();
-				$(".ajax-screen-lock").hide();
-			}
+	// 先搜集好callback 如果有呼叫 deferred完成後就執行
+	(function(){
+		ajaxDeferred.promise().complete = function(cb) {
+			completeCB = cb;
+			return ajaxDeferred.promise();
+		};
 
-        	completeData.newArgs = newArgs;
-            cb(completeData);
-		})
-		return ajaxDeferred.promise();
-	};
+	    ajaxDeferred.promise().success = function(cb) {
+	        successCB = cb;
+	        return ajaxDeferred.promise();
+	    };
 
-	ajaxDeferred.promise().error = function(cb) {
-		ajaxDeferred.fail(function(errData) {
-			// 原本的錯誤
-			errData.newArgs = newArgs;
-			self.onError(errData);
-			cb(errData);
-		});
-		return ajaxDeferred.promise();
-	};
+		ajaxDeferred.promise().error = function(cb) {
+			errorCB = cb;
+			return ajaxDeferred.promise();
+		};
+	}())
+		
+	// complete和success 都進來這裡
+	ajaxDeferred.done(function(completeData){
 
-    ajaxDeferred.promise().success = function(cb) {
-        ajaxDeferred.done(function(data){
-            if(data.status !== 200) return;
-               
-            var responseObj = JSON.parse(data.responseText);
-        	responseObj.newArgs = newArgs;
+		self.onComplete(completeData);
 
-            cb(responseObj);
-        })
+		if(completeCB instanceof Function) completeCB(completeData);
 
-        return ajaxDeferred.promise();
-    };
+        if(successCB instanceof Function) {
+        	var responseObj = JSON.parse(completeData.responseText);
+    		responseObj.newArgs = newArgs;
+
+        	successCB(responseObj);
+        }
+    })
+
+	ajaxDeferred.fail(function(completeData) {
+
+		completeData.newArgs = newArgs;
+		self.onError(completeData);
+
+		if(successCB instanceof Function) successCB(completeData);
+	});
+
+
 	return ajaxDeferred.promise();
 }
 
@@ -648,21 +651,11 @@ QmiAjax.prototype = {
 		
 	onComplete: function(data){
 		// 舊的有在用 新的不再用
-		// if(s_load_show === false) {
-		// 	$('.ui-loader').hide();
-		// 	$(".ajax-screen-lock").hide();
-		// }
+		if(s_load_show === false) {
+			$('.ui-loader').hide();
+			$(".ajax-screen-lock").hide();
+		}
 
-		// // 有自己的判斷 所以直接return
-		// if(
-		// 	data.ajaxArgs.ajaxDo === true && // ajaxDo 是舊的方法預設帶的參數 
-		// 	data.ajaxArgs.hasOwnComplete === true // hasOwnComplete 是新的方法
-		// ) return;
-
-		// // 統一管理錯誤訊息
-		// if(data.status !== 200) {
-
-		// }
 	}
 
 }
