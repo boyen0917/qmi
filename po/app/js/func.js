@@ -1054,7 +1054,9 @@ detailLikeStringMake = function (this_event){
     var group = QmiGlobal.groups[this_gi];
     var me_pos = $.inArray(group.gu,epl);
     var guAll = group.guAll;
-    var me_gu = guAll[epl[me_pos]];
+    
+    var isMe = me_pos < 0 ? false : true;
+    
     var like_str = "";
 
     this_event.find(".st-reply-like-area").show();
@@ -1066,41 +1068,43 @@ detailLikeStringMake = function (this_event){
                 like_str = $.i18n.getString("FEED_BE_FIRST_LIKE");
                 break;
             //你 按讚
-            case ( typeof me_gu != "undefined" && epl.length == 1 ) :
+            case ( isMe === true && epl.length == 1) :
                 like_str = $.i18n.getString("FEED_CLICK_LIKE_SELF", $.i18n.getString("COMMON_YOU") );
                 break;
             //林小花 按讚
-            case ( !me_gu && epl.length == 1 ):
-                var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "unknown";
+            case ( epl.length == 1 ):
+                var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "";
                 like_str = $.i18n.getString("FEED_CLICK_LIKE", epl0 );
                 break;
+
             //你、林小花 按讚
             case ( epl.length == 2 ):
-                var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "unknown";
-                var epl1 = ( guAll.hasOwnProperty(epl[1]) && guAll[epl[1]] && guAll[epl[1]].nk ) ? guAll[epl[1]].nk.replaceOriEmojiCode() : "unknown";
-                if( typeof me_gu == "undefined" ){
-                    like_str = $.i18n.getString("FEED_CLICK_LIKE_2PEOPLE", 
-                        epl0, epl1 );
-                } else {
+                var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "";
+                var epl1 = ( guAll.hasOwnProperty(epl[1]) && guAll[epl[1]] && guAll[epl[1]].nk ) ? guAll[epl[1]].nk.replaceOriEmojiCode() : "";
+                if( isMe === true ){
                     like_str = $.i18n.getString("FEED_CLICK_LIKE_2PEOPLE", 
                         $.i18n.getString("COMMON_YOU"), 
                         (me_pos ? epl0 : epl1) 
                     );
+                } else {
+                    like_str = $.i18n.getString("FEED_CLICK_LIKE_2PEOPLE", 
+                        epl0, epl1 );
                 }
                 break;
+
             //林小花 及其他？個人按讚
             case ( epl.length > 2 ) :
-                if( typeof me_gu == "undefined" ){
-                    var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "unknown";
-                    like_str = $.i18n.getString("FEED_3PEOPLE_LIKE", epl0, (epl.length-1) );
-                } else {
+                if( isMe === true ){
                     if( 0==me_pos ){
-                        var epl1 = ( guAll.hasOwnProperty(epl[1]) && guAll[epl[1]] && guAll[epl[1]].nk ) ? guAll[epl[1]].nk.replaceOriEmojiCode() : "unknown";
+                        var epl1 = ( guAll.hasOwnProperty(epl[1]) && guAll[epl[1]] && guAll[epl[1]].nk ) ? guAll[epl[1]].nk.replaceOriEmojiCode() : "";
                         like_str = $.i18n.getString("FEED_YOU_AND_3PEOPLE_LIKE", $.i18n.getString("COMMON_YOU"), epl1, (epl.length-2) );
                     } else {
-                        var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "unknown";
+                        var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "";
                         like_str = $.i18n.getString("FEED_YOU_AND_3PEOPLE_LIKE", $.i18n.getString("COMMON_YOU"), epl0, (epl.length-2) );
                     }
+                } else {
+                    var epl0 = ( guAll.hasOwnProperty(epl[0]) && guAll[epl[0]] && guAll[epl[0]].nk ) ? guAll[epl[0]].nk.replaceOriEmojiCode() : "";
+                    like_str = $.i18n.getString("FEED_3PEOPLE_LIKE", epl0, (epl.length-1) );
                 }
                 break;
         }
@@ -8474,27 +8478,16 @@ eventDetailShow = function(thisEi){
         deferred = $.Deferred();
 
     $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
-        var this_event = $(this).find(".st-sub-box");
-        this_event.addClass("detail");
-        $(".timeline-detail").html(this_event).hide();
+        var thisEvent = $(this).find(".st-sub-box");
+        thisEvent.addClass("detail");
+        $(".timeline-detail").html(thisEvent).hide();
+        
         //單一動態詳細內容
-        getEventDetail(thisEi)
-
-        // var this_gi = this_ei.split("_")[0];
-        // var this_ti = this_ei.split("_")[1];
-
-        // //單一動態詳細內容
-        // var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei;
-        // var headers = {
-        //         "ui":ui,
-        //         "at":at, 
-        //         "li":lang
-        //             };
-        // var method = "get";
-        // return ajaxDo(api_name,headers,method,false);
+        var thisGi = thisEi.split("_")[0];
+        var thisTi = thisEi.split("_")[1];
 
         new QmiAjax({
-
+            apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/events/" + thisEi
         }).complete(function(data){
             if(data.status == 200){
                 var data_obj = $.parseJSON(data.responseText);
@@ -8507,7 +8500,7 @@ eventDetailShow = function(thisEi){
                         })
                     } else {
                         $.mobile.changePage("#page-timeline-detail", {transition: "slide"});
-                        timelineBlockMake(this_event,[data_obj.el[0]],false,true);
+                        timelineBlockMake(thisEvent,[data_obj.el[0]],false,true);
                     }
                 } catch(e){
                     errorReport(e);

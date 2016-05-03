@@ -5,8 +5,8 @@ debug_flag = false,
 
 gi = null,
 //HiCloud
-base_url = "https://apserver.mitake.com.tw/apiv1/";
-// base_url = "https://ap.qmi.emome.net/apiv1/";
+// base_url = "https://apserver.mitake.com.tw/apiv1/";
+base_url = "https://ap.qmi.emome.net/apiv1/";
 
 
 if(window.location.href.match(/^http:\/\/localhost|10.1.17.114/)) {
@@ -490,7 +490,9 @@ QmiAjax.prototype = {
 		}
 
 		// 預設公雲ui,at
-		newHeaders = { ui: QmiGlobal.auth.ui, at: QmiGlobal.auth.at, li: lang };
+		newHeaders.ui = QmiGlobal.auth.ui;
+		newHeaders.at = QmiGlobal.auth.at;
+		newHeaders.li = lang;
 
 		// 做私雲判斷
 		if(cloudData !== undefined) {
