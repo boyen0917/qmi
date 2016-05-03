@@ -23,14 +23,14 @@ body.ui-mobile-viewport, div.ui-mobile-viewport{
 }
 
 ::-webkit-scrollbar {
-      width: 10px;
-      height: 5px;	
+      /*width: 10px;*/
+      /*height: 5px;	*/
 }
 
 ::-webkit-scrollbar-thumb {
       background-color: rgba(17, 17, 17, 0.45);
-      opacity: 0.8;
-      border-radius: 8px;
+      /*opacity: 0.8;*/
+      /*border-radius: 8px;*/
 }
 
 
@@ -1405,6 +1405,8 @@ img.auo {
     background-color: transparent;
 }*/
 
+
+
 #page-group-main .gm-content > div:nth-child(1){
     position: absolute;
 	width: 100%;
@@ -1639,16 +1641,18 @@ img.auo {
 	background: rgb(242, 242, 242);
 	/*min-height: 800px;*/
 	height: 100%;
-	overflow-y: auto;
+	overflow: hidden;
 	position: relative;
 }
 
+.subpage-timeline:hover { overflow-y: scroll; }
+
 .subpage-timeline::-webkit-scrollbar{
-	width: 8px;
+	/*width: 8px;*/
 }
 
 .subpage-timeline::-webkit-scrollbar-thumb{
-	height: 240px;
+	/*height: 240px;*/
 }
 
 .st-navi-fixed {
