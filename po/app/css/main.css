@@ -7,9 +7,6 @@ body{
     font-size: 16px;
 }
 
-body.ui-mobile-viewport, div.ui-mobile-viewport{
-	overflow-y: hidden;
-}
 /* jquery mobile某些class會設text-shadow
 會造成windows有底色的字看起來糊糊的 */
 /*div, span, label, h3{
@@ -1454,6 +1451,9 @@ img.auo {
 	bottom: -2px;
 	z-index: 1000;
 }
+
+
+.header-menu::-webkit-scrollbar { display: none; }
 
 .header-menu{
 	padding: 0 7px;
