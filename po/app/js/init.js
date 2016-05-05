@@ -772,11 +772,11 @@ setDebug(debug_flag);
 function setDebug(isDebug) {
   if (isDebug) {
     window.cns = {
-      log: window.cns.log.bind(window.console, '%s: %s'),
-      error: window.cns.error.bind(window.console, 'error: %s'),
-      info: window.cns.info.bind(window.console, 'info: %s'),
-      warn: window.cns.warn.bind(window.console, 'warn: %s'),
-      debug: window.cns.debug.bind(window.console, 'debug: %s')
+      log: window.console.log.bind(window.console, '%s: %s'),
+      error: window.console.error.bind(window.console, 'error: %s'),
+      info: window.console.info.bind(window.console, 'info: %s'),
+      warn: window.console.warn.bind(window.console, 'warn: %s'),
+      debug: window.console.debug.bind(window.console, 'debug: %s')
     };
   } else {
     var __no_op = function() {};
