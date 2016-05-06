@@ -580,28 +580,22 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		} else if( $(".subpage-chatList").is(":visible") ){
 			$('.sm-small-area[data-sm-act="chat"]').trigger("click");
 		}
-		// sortRoomList();
 	}
 	
-	// if( !isMe && isShowAlert ){
-	// 	try{
-	// 		cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
-	// 		var cnTmp = data.cn||"";
-	// 		if( data.meta.ct>=login_time ){
-	// 			riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
-	// 				cns.debug(ciTmp);
-	// 				openChatWindow( giTmp, ciTmp );
-	// 			});
-	// 		} else{
-	// 			// cns.debug("chat msg muted, msg time", data.meta.ct);
-	// 			// cns.debug("chat msg muted, login tm", login_time);
-	// 		}
-	// 	} catch(e) {
-	// 		cns.debug( e.message );
-	// 	}
-	// } else {
-	// 	// cns.debug(groupData.gu, mem.gu, isShowAlert);
-	// }
+	if( !isMe && isShowAlert ){
+		try{
+			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
+			var cnTmp = data.cn||"";
+			if( data.meta.ct>=login_time ){
+				riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
+					cns.debug(ciTmp);
+					openChatWindow( giTmp, ciTmp );
+				});
+			}
+		} catch(e) {
+			cns.debug( e.message );
+		}
+	}
 }
 
 function sortRoomList(){

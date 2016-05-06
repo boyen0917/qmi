@@ -26,8 +26,6 @@ function initChatDB( onReady ){
 	}
 }
 function onReceivePollingChatMsg ( msgs ){
-	cns.debug("-----------------------");
-
 	//indexed from old to new (api chat is from new to old)
 
 	// 跑兩個回圈 把polling msgs的每一個msg 都存到db

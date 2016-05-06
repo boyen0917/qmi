@@ -7243,24 +7243,26 @@ pollingCmds = function(newPollingData){
                         }
                         break;
                     case 4: //someone join
-                    //聽說 加入當下 當然沒這團體 勢必要去拉combo 但其他msgs 如果有這團體 又會重複去拉combo 是不是其他項目沒有combo 就不要做動作
+
                         item.pm.isNewMem = true;
                         item.pm.onGetMemData = function(this_gi, memData){
-                            // 不顯示 怕人家煩
-                            // try{
-                            //     if( isShowNotification ){
-                            //         var title = memData.gn || g_Qmi_title;
-                            //         riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
-                            //             if( gi==this_gi ){
-                            //                 $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
-                            //             } else {
-                            //                 $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
-                            //             }
-                            //         });
-                            //     }
-                            // } catch(e){
-                            //     errorReport(e);
-                            // }
+                            // 官方帳號不顯示
+                            try{
+                                if( isShowNotification 
+                                    && QmiGlobal.groups[this_gi].isOfficial !== true
+                                ){
+                                    var title = memData.gn || g_Qmi_title;
+                                    riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
+                                        if( gi==this_gi ){
+                                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+                                        } else {
+                                            $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
+                                        }
+                                    });
+                                }
+                            } catch(e){
+                                errorReport(e);
+                            }
                         }
                         user_info_arr.push( item.pm );
                         if( gi == item.pm.gi ){
