@@ -23,19 +23,16 @@ setGroupInitial = function(new_gi,chk){
     //做團體列表、top event
     $.when(deferred.promise(),topEvent()).done(function(){
 
-        // s_load_show = false;
-
         // 團體ui active
-        $(".sm-group-list-area .sm-group-area[data-gu="+ gi +"]").addClass("active");
+        var defaultGroupDom = $(".sm-group-list-area .sm-group-area[data-gi="+ gi +"]");
+        defaultGroupDom.addClass("active");
 
-        //檢查官方帳號
-        initOfficialGroup( gi );
-        //重新設定功能選單
-        updateTab(gi);
-
-        // cns.debug("ui",JSON.stringify(QmiGlobal.groups));
-
-
+        try {
+            updatePollingCnts(defaultGroupDom.find(".sm-count"),"A5");    
+        } catch(e) {
+            console.log("initial updatePollingCnts error");
+        }
+        
         //動態消息
         var tmp = $(".sm-small-area:not(.setting):visible");
         if( tmp.length>0 ){
@@ -4641,7 +4638,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
 
     if(main_gu){
         this_gi = $("#page-group-main").data("main-gi");
-        this_ti = QmiGlobal.groups[this_gi].tl[1].ti;
+        this_ti = QmiGlobal.groups[this_gi].ti_feed;
     }
 
     var event_tp = $("#page-group-main").data("navi") || "00";

@@ -336,11 +336,7 @@ $(function(){
 	//更換團體
 	$(document).on("click",".sm-group-area.enable",function(){
 
-		
-		$(".sm-group-area")
-		.removeClass("active")
-		.removeClass("enable");
-
+		$(".sm-group-area").removeClass("active").removeClass("enable");
 		$(this).addClass("active");
 
 		//指定gi
@@ -348,7 +344,6 @@ $(function(){
 			//updatePollingCnts
         	updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 		}.bind(this));
-
 	});
 	
 	//----------------------------------- timeline ---------------------------------------------  

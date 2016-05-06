@@ -11,17 +11,16 @@ var ui,
 	//local測試 預設開啟console
 	debug_flag = false,
 
-	base_url = "https://apserver.mitake.com.tw/apiv1/";
-	// base_url = "https://ap.qmi.emome.net/apiv1/";
+	//HiCloud
+ 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
+	base_url = "https://ap.qmi.emome.net/apiv1/";
 
 
-	if(window.location.href.match(/^http:\/\/localhost|10.1.17.114/)) {
-		debug_flag = true;
-		// base_url = "https://capubliceim.mitake.com.tw/apiv1/";
-		// base_url = "https://apserver.mitake.com.tw/apiv1/";
-	}
-
-
+	// if(window.location.href.match(/^http:\/\/localhost|10.1.17.114/)) {
+	// 	debug_flag = true;
+	// 	// base_url = "https://capubliceim.mitake.com.tw/apiv1/";
+	// 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
+	// }
 
 var userLang = navigator.language || navigator.userLanguage; 
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
@@ -631,7 +630,7 @@ QmiAjax.prototype = {
 			// 聊天室關閉
 			if(window.location.href.match(/po\/app\/chat.html/)) window.close();
 
-			localStorage.removeItem("_loginData");
+			resetDB();
 			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
 
 			return;

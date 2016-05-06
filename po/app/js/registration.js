@@ -321,9 +321,8 @@ onCheckVersionDone = function(needUpdate){
         	QmiGlobal.auth = $.lStorage("_loginData");	
         }
         
-        var 
-        deferred = $.Deferred(),
-        group_list = [];
+        var deferred = $.Deferred(),
+        	group_list = [];
 
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
