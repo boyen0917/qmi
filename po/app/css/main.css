@@ -5301,7 +5301,7 @@ section.fileSharing img.v-arrow.asc {
 
 section.fileSharing section.list { 
 	font-size: 14px; 
-	height: 100vh;
+    height: calc( 100vh - 121px); 
 	overflow-y: scroll; 
 }
 section.fileSharing section.list .row {
