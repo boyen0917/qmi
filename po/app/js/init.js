@@ -13,13 +13,13 @@ var ui,
 
 	//HiCloud
  	// base_url = "https://apserver.mitake.com.tw/apiv1/";
-	base_url = "https://ap.qmi.emome.net/apiv1/";
+	// base_url = "https://ap.qmi.emome.net/apiv1/";
 
 
 	// if(window.location.href.match(/^http:\/\/localhost|10.1.17.114/)) {
 	// 	debug_flag = true;
-	// 	// base_url = "https://capubliceim.mitake.com.tw/apiv1/";
-	// 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
+		base_url = "https://capubliceim.mitake.com.tw/apiv1/";
+		// base_url = "https://apserver.mitake.com.tw/apiv1/";
 	// }
 
 var userLang = navigator.language || navigator.userLanguage; 
@@ -435,13 +435,16 @@ window.QmiAjax = function(args){
 			return ajaxDeferred.promise();
 		};
 	}())
-		
-	// complete和success 都進來這裡
-	ajaxDeferred.done(function(completeData){
-
+	
+	// complete來這裡
+	ajaxDeferred.always(function(completeData){
 		self.onComplete(completeData);
 
 		if(completeCB instanceof Function) completeCB(completeData);
+	});
+
+	// success 來這裡
+	ajaxDeferred.done(function(completeData){
 
         if(successCB instanceof Function) {
         	var responseObj = JSON.parse(completeData.responseText);
@@ -456,7 +459,7 @@ window.QmiAjax = function(args){
 		completeData.newArgs = newArgs;
 		self.onError(completeData);
 
-		if(successCB instanceof Function) successCB(completeData);
+		if(errorCB instanceof Function) errorCB(completeData);
 	});
 
 
