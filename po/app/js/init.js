@@ -243,8 +243,8 @@ window.QmiAjax = function(args){
 
 			// 判斷apiName有無包含私雲gi 有的話就給他私雲 
 			if(args.apiName !== undefined){
-
-				var apiGi = args.apiName.split("/").find(function(item){
+				// 排除有網址有？的狀況
+				var apiGi = args.apiName.split("?")[0].split("/").find(function(item){
 					return QmiGlobal.groups.hasOwnProperty(item)
 				});
 
