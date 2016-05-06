@@ -4641,7 +4641,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
 
     if(main_gu){
         this_gi = $("#page-group-main").data("main-gi");
-        this_ti = QmiGlobal.groups[this_gi].tl[1].ti;
+        this_ti = QmiGlobal.groups[this_gi].ti_feed;
     }
 
     var event_tp = $("#page-group-main").data("navi") || "00";

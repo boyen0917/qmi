@@ -232,8 +232,8 @@ FileSharing.prototype = {
 		var folderName = coverDom.find("input").val();
 		thisFile.fileDom.find("section.file-cover").trigger("click");
 		var deferred = $.Deferred();
-		$.when(new AjaxTransfer().execute({
-			url: "groups/" + gi + "/files/",
+		$.when(new QmiAjax({
+			apiName: "groups/" + gi + "/files/",
 			method: "post",
 			body: {
 				tp: 10,
@@ -244,8 +244,8 @@ FileSharing.prototype = {
 			}
 		})).then(function(data){
 			cns.debug("when data 1",data);
-			return (new AjaxTransfer().execute({
-				url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
+			return (new QmiAjax({
+				apiName: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 				method: "post",
 				body: {
 					meta: {
@@ -283,8 +283,8 @@ FileSharing.prototype = {
 	getList: function(){
 		var deferred = $.Deferred();
 		// 注意誰是this
-		new AjaxTransfer().execute({
-			url: "groups/" + gi + "/timelines/"+ this.ti +"/events",
+		new QmiAjax({
+			apiName: "groups/" + gi + "/timelines/"+ this.ti +"/events",
 			complete: function(data){
 				//確認完成
 				deferred.resolve();
@@ -311,8 +311,8 @@ FileSharing.prototype = {
 		return deferred.promise();
 	},
 	download: function(){
-		new AjaxTransfer().execute({
-			url: "groups/" + gi + "/timelines/" + this.ti + "/files/" + this.activeItemData.fi + "/dl",
+		new QmiAjax({
+			apiName: "groups/" + gi + "/timelines/" + this.ti + "/files/" + this.activeItemData.fi + "/dl",
 			method: "post",
 			complete: function(data){
 				if(data.status != 200) return false;
@@ -360,8 +360,15 @@ FileSharing.prototype = {
 		
 		var inputFileDom = thisFile.fileDom.find("input[type=file]");
 
+		// 開啓選擇檔案
 		inputFileDom.trigger("click");
+
+		// 關閉上傳
+		coverDom.hide();
+
+
 		inputFileDom.off().on('change',function(e){
+			coverDom.show();
 			var fileData = $(this)[0].files[0];
 			
 			//每次選擇完檔案 就reset input file
@@ -370,7 +377,6 @@ FileSharing.prototype = {
 			// 大於上傳限制
 			if(fileData.size > thisFile.uploadLimit) {
 				toastShow($.i18n.getString("FILESHARING_UPLOAD_OVERLIMIT"));
-				coverDom.trigger("click");
 				return false;
 			}
 
@@ -378,7 +384,6 @@ FileSharing.prototype = {
 				var thisItemObj = thisFile.fileItemArr[i];
 				if(thisItemObj.fn == fileData.name){
 					toastShow($.i18n.getString("FILESHARING_ERR_MSG"));
-					coverDom.trigger("click");
 					return false;
 				}
 			}
@@ -453,8 +458,8 @@ FileSharing.prototype = {
 
 		    	var tmpDeferred = MyDeferred();
 				// step1 取得上傳網址
-			    new AjaxTransfer().execute({
-					url: "groups/" + gi + "/files/",
+			    new QmiAjax({
+					apiName: "groups/" + gi + "/files/",
 					method: "post",
 					body: {
 						tp: fileTp,
@@ -491,8 +496,8 @@ FileSharing.prototype = {
 		    	thisFile.setUploadProgress(0.8);
 		    	var tmpDeferred = MyDeferred();
 		    	
-		    	new AjaxTransfer().execute({
-					url: "groups/" + gi + "/files/"+ fiApiData.fi +"/commit",
+		    	new QmiAjax({
+					apiName: "groups/" + gi + "/files/"+ fiApiData.fi +"/commit",
 					method: "put",
 					body: {
 				    	ti: thisFile.ti, 
@@ -513,8 +518,8 @@ FileSharing.prototype = {
 		    	
 		    	thisFile.setUploadProgress(0.05);
 
-		    	new AjaxTransfer().execute({
-					url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
+		    	new QmiAjax({
+					apiName: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 					method: "post",
 					body: {
 				    	meta: {
@@ -548,9 +553,7 @@ FileSharing.prototype = {
 				
 
 				setTimeout(function(){
-					coverDom.removeClass("disable").trigger("click").end()
-					.find("ul").show();
-
+					coverDom.removeClass("disable").trigger("click").find("ul").show();
 					progressSectionDom.hide()
 				},100);
 				
@@ -675,9 +678,9 @@ FileSharing.prototype = {
 		}
 
 		cns.debug("rename",body);
-		new AjaxTransfer().execute({
+		new QmiAjax({
 			// /groups/{gi}/timelines/{ti}/events/{ei}
-			url: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
+			apiName: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
 			method: "post",
 			body: body,
 			complete: function(data){
@@ -690,9 +693,9 @@ FileSharing.prototype = {
 		})
 	},
 	delete: function(){
-		new AjaxTransfer().execute({
+		new QmiAjax({
 			// /groups/{gi}/timelines/{ti}/events/{ei}
-			url: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
+			apiName: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
 			method: "delete",
 			complete: function(data){
 				
@@ -704,10 +707,6 @@ FileSharing.prototype = {
 				}
 			}.bind(this)
 		})
-	},
-	api: function(){
-		//tool.js
-		new AjaxTransfer().execute(this);
 	}
 }
 

@@ -313,6 +313,7 @@ parsePrivateGi = function( str ){
 }
 
 reLogin = function() {
+	resetDB();
 	document.location = "index.html";
 }
 
