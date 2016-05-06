@@ -435,13 +435,16 @@ window.QmiAjax = function(args){
 			return ajaxDeferred.promise();
 		};
 	}())
-		
-	// complete和success 都進來這裡
-	ajaxDeferred.done(function(completeData){
-
+	
+	// complete來這裡
+	ajaxDeferred.always(function(completeData){
 		self.onComplete(completeData);
 
 		if(completeCB instanceof Function) completeCB(completeData);
+	});
+
+	// success 來這裡
+	ajaxDeferred.done(function(completeData){
 
         if(successCB instanceof Function) {
         	var responseObj = JSON.parse(completeData.responseText);
@@ -456,7 +459,7 @@ window.QmiAjax = function(args){
 		completeData.newArgs = newArgs;
 		self.onError(completeData);
 
-		if(successCB instanceof Function) successCB(completeData);
+		if(errorCB instanceof Function) errorCB(completeData);
 	});
 
 
@@ -464,7 +467,7 @@ window.QmiAjax = function(args){
 }
 
 QmiAjax.prototype = {
-	expireTimer: 150 * 1000,//ms
+	expireTimer: 432000 * 1000, // ms, 五天  
 
 	authLock: (function(){
 		var isLock = false;

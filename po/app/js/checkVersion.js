@@ -102,19 +102,6 @@ $(function(){
 
     checkWebVersion = function( onDone ){
 
-    // 	if( (typeof clearCache != 'function')|| 'undefined'==lang ){
-    // 		cns.debug("clearCache",typeof clearCache, "lang", typeof lang );
-    // 		try{
-	   //  		var gui = require('nw.gui');
-	   //  		gui.App.clearCache();
-	   //  		gui.Window.get().reload();
-	   //  		cns.debug("update successed");
-	   //  		return true;
-				// // alert("clear cache 1 succ");
-	   //  	} catch(e){
-	   //  		cns.debug(e.stack);
-	   //  	}
-	   //  } else{
 	    	try{
 			    var versionData = $.lStorage("_ver");
 			    if( null==versionData || null==versionData.ver ){
