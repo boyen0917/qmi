@@ -15,14 +15,15 @@
 .subpage-chatList {
 	width: 100%;
 	display: none;
-	height: 100%;
+	height: calc( 100vh - 43px );
 	overflow-y: auto;
 }
 
 .subpage-chatList .loading{
 	width: 100%;
 	text-align: center;
-	margin-top: 50px;
+	position: absolute;
+	top: 50px;
 }
 .subpage-chatList .rows {
     background:#d0d0d0;

@@ -394,7 +394,7 @@ window.QmiAjax = function(args){
 						var completeData = reAuthObj.data;
 						completeData.ajaxArgs = newArgs;
 
-						// 這邊只有一個狀況 就是reAuth失敗
+						// reAuth失敗 或 ajax 失敗
 						if(reAuthObj.isSuccess === false || completeData.status !== 200) {
 							// 回傳失敗
 							ajaxDeferred.reject(completeData);
