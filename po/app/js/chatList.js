@@ -345,6 +345,7 @@ function openChatWindow ( giTmp, ci ){
 		windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
 		
 		windowList[ci].chatAuthData = {
+			gi: 		window.gi,
 			auth: 		window.QmiGlobal.auth,
 			groups: 	window.QmiGlobal.groups,
 			clouds: 	window.QmiGlobal.clouds,

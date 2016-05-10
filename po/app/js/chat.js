@@ -24,6 +24,7 @@ $(function(){
 	}
 
 	// 接收 主畫面的auth
+	window.gi = window.chatAuthData.gi;
 	QmiGlobal.auth = window.chatAuthData.auth;
 	QmiGlobal.groups = window.chatAuthData.groups;
 	QmiGlobal.clouds = window.chatAuthData.clouds;
@@ -34,7 +35,6 @@ $(function(){
 		g_room,	//chatRoom
 		ci,		//chatRoom id
 		g_cn,	//聊天室名字
-		gi,		//group id
 		g_group,//group
 		at,		//access token
 		g_isEndOfPage = false,	//是否在頁面底端
