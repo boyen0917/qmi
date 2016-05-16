@@ -17,6 +17,29 @@
 	display: none;
 	height: calc( 100vh - 43px );
 	overflow-y: auto;
+	background: #d0d0d0;
+}
+
+.subpage-chatList .top-chatList{
+	width: 94%;
+	overflow: hidden;
+    margin: 20px auto;
+    background: rgba(224, 255, 255, 0.42);
+    border-radius: 15px;
+    display: none;
+}
+
+
+.top-chatList h3 {
+	display: inline-block;
+	width: -webkit-calc( 100% - 77px );
+    vertical-align: top;
+    border-bottom: 1px solid rgba(51, 51, 51, 0.38);
+}
+
+.top-chatList .subpage-chatList-row{
+	background: transparent;
+	border-bottom: 0;
 }
 
 .subpage-chatList .loading{
@@ -25,6 +48,7 @@
 	position: absolute;
 	top: 50px;
 }
+
 .subpage-chatList .rows {
     background:#d0d0d0;
     display: block;

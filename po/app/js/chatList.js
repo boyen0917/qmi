@@ -70,6 +70,7 @@ function updateChatList( giTmp, extraCallBack ){
 	chatListDom.find(".coachmake").hide();
 	chatListDom.find(".loading").show();
 	chatListDom.find(".rows").html("");
+	chatListDom.find(".top-chatList").hide("");
 
 	var currentGroup = QmiGlobal.groups[giTmp];
 	if( !currentGroup )	return;
@@ -180,7 +181,7 @@ function updateChatList( giTmp, extraCallBack ){
 	show chat list data from local storage
 **/
 function showChatList(){
-
+	console.log("hehehe");
 	var groupData = QmiGlobal.groups[gi];
 	if( null==groupData ) return;
 	var chatList = groupData.chatAll;
@@ -189,69 +190,71 @@ function showChatList(){
 	var 
 	deferredPoolArr = [],
 	targetDiv = $(".subpage-chatList .rows");
+	topChatListDiv = $(".top-chatList .list");
 
 	if( Object.keys(chatList).length<=1 ){
 		targetDiv.hide();
 		$(".subpage-chatList .coachmake").fadeIn();
 		return;
 	}
-	$(".subpage-chatList .rows").html("");
-	targetDiv.hide();
+	targetDiv.html("");
+	topChatListDiv.html("");	
+
 	$(".subpage-chatList .coachmake").hide();
 
-	if( targetDiv ){
-		var tmp;
-		$.each(chatList,function(key,room){
-			//目前type0的全體聊天室無用
-			if( "0"!=room.tp ){
+		if( targetDiv ){
+			var tmp;
+			$.each(chatList,function(key,room){
+				//目前type0的全體聊天室無用
+				if( "0"!=room.tp ){
 
-				//全部做完 再做sort
-				var deferred = $.Deferred();
-				deferredPoolArr.push(deferred);
+					//全部做完 再做sort
+					var deferred = $.Deferred();
+					deferredPoolArr.push(deferred);
 
-				var chatRoomName=room.nk||"";
-				var imgSrc="";
-				if("1"==room.tp){
-					imgSrc="images/common/others/empty_img_personal_l.png";
-					//eg.cn="M00000DK0FS,M00000DJ00n"
-					var guTmp = room.other;
-					if( groupData.guAll.hasOwnProperty( guTmp ) ){
-						var mem = groupData.guAll[ guTmp ];
-						if( mem.auo ){
-							imgSrc = mem.auo;
+					var chatRoomName=room.nk||"";
+					var imgSrc="";
+					if("1"==room.tp){
+						imgSrc="images/common/others/empty_img_personal_l.png";
+						//eg.cn="M00000DK0FS,M00000DJ00n"
+						var guTmp = room.other;
+						if( groupData.guAll.hasOwnProperty( guTmp ) ){
+							var mem = groupData.guAll[ guTmp ];
+							if( mem.auo ){
+								imgSrc = mem.auo;
+							}
 						}
+						
+					} else {
+						imgSrc= room.cat || "images/common/others/empty_img_mother_l.png";
 					}
+
+					room["uiName"]=chatRoomName;
+					$(this).find(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
+					var table = $("<div class='subpage-chatList-row polling-cnt-cl' data-rid='"+room.ci+"' style='width:100%' data-polling-cnt='B7' data-ci='"+room.ci+"'></div>");
+					$(table).data("time", 0);
 					
-				} else {
-					imgSrc= room.cat || "images/common/others/empty_img_mother_l.png";
-				}
+					var row = $("<div class='tr'></div>");
+					table.append(row);
+					var td = $("<div class='td'></div>");
+					td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
+					if("1"==room.tp){
+						td.find("img").data("gi",gi).data("gu",guTmp).addClass("namecard");
+					}
+					row.append(td);
 
-				room["uiName"]=chatRoomName;
-				$(this).find(".cp-top-btn").attr("src","images/compose/compose_form_icon_check_none.png");
-				var table = $("<div class='subpage-chatList-row polling-cnt-cl' data-rid='"+room.ci+"' style='width:100%' data-polling-cnt='B7' data-ci='"+room.ci+"'></div>");
-				$(table).data("time", 0);
-				
-				var row = $("<div class='tr'></div>");
-				table.append(row);
-				var td = $("<div class='td'></div>");
-				td.append("<img class='aut st-user-pic' src=" + imgSrc + "></img>");
-				if("1"==room.tp){
-					td.find("img").data("gi",gi).data("gu",guTmp).addClass("namecard");
-				}
-				row.append(td);
+					td = $("<div class='td' data-id='"+room.ci+"'></div>");
 
-				td = $("<div class='td' data-id='"+room.ci+"'></div>");
+					var roomName = chatRoomName.replaceOriEmojiCode();
 
-				var roomName = chatRoomName.replaceOriEmojiCode();
+					if( room.hasOwnProperty("cpc") === true && room.cpc > 2)
+						roomName +=  " (" + room.cpc + ") ";
 
-				if( room.hasOwnProperty("cpc") === true && room.cpc > 2)
-					roomName +=  " (" + room.cpc + ") ";
+					td.append("<div class='name'>" + roomName + "</div>");
 
-				td.append("<div class='name'>" + roomName + "</div>");
-
-				var lastMsg = $("<div class='msg'></div>");
-				td.append(lastMsg);
-				row.append(td);
+					var lastMsg = $("<div class='msg'></div>");
+					td.append(lastMsg);
+					row.append(td);
 
 				td = $("<div class='td' align='right'></div>");
 				var lastTime = $("<div class='time'></div>");
@@ -260,7 +263,11 @@ function showChatList(){
 				td.append("<div class='drag'></div>");
 				row.append(td);
 
-				targetDiv.append(table);
+				if (room.it) {
+					topChatListDiv.append(table);
+				} else {
+					targetDiv.append(table);
+				}
 
 				//全部做完 再做sort
 				setLastMsg( gi, room.ci, table, false ).done(deferred.resolve);
@@ -268,7 +275,10 @@ function showChatList(){
 		});
 	
 		$.when.apply($,deferredPoolArr).done(function(){
-			targetDiv.show();
+			if (topChatListDiv.find(".subpage-chatList-row").length) {
+				$(".top-chatList").show();
+			}
+			// targetDiv.show();
 			sortRoomList();
 		})
 	}
@@ -348,7 +358,7 @@ function openChatWindow ( giTmp, ci ){
 			auth: 		window.QmiGlobal.auth,
 			groups: 	window.QmiGlobal.groups,
 			clouds: 	window.QmiGlobal.clouds,
-			cloudGiMap: window.QmiGlobal.cloudGiMap
+			cloudGiMap: window.QmiGlobal.cloudGiMap,
 		}
 
 	}
@@ -604,6 +614,17 @@ function sortRoomList(){
 		if( ct > 0 ){
 			$(this).find(".time").html( new Date(ct).toFormatString() );
 		}
+	});
+
+	$('.list').each(function(){
+	    var $this = $(this);
+	    var tmp = $this.find('.subpage-chatList-row').get().sort(function(a, b) {
+	        return $(b).data('time') - $(a).data('time');
+	    });
+	    // for( var i=0;i<tmp.length;i++){
+	    // 	cns.debug( $(tmp[i]).data("time") );
+	    // }
+	    $this.append(tmp);
 	});
 
 	$('.rows').each(function(){

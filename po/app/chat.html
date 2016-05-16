@@ -150,6 +150,8 @@
             <div class="ui-header fixed">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <div class="header-title">
+                    <span>編輯群組</span>
+                    <img src="images/navi/navi_icon_add_member.png">
                     <!-- <div class="page-title" data-textid="COMMON_EDIT">Edit</div> -->
                 </div>
                 <div class="edit-nextStep">
@@ -160,6 +162,64 @@
              
             <!-- BEGIN: Page Content -->
             <div class="ui-container">
+                <div class="chatroomSwitch chatRoomSetting">
+                    <div class="pushSwitch">
+                        推播
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="pushSwitch" >
+                            <label class="onoffswitch-label" for="pushSwitch">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="stickySwitch">
+                        置頂
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="stickySwitch">
+                            <label class="onoffswitch-label" for="stickySwitch">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="inviteSetting chatRoomSetting">
+                    <h4>聊天室資訊</h4>
+                    <div class="generalUserInviteSwitch">
+                        一般成員邀請權限
+                        <div class="onoffswitch">
+                            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="inviteSwitch">
+                            <label class="onoffswitch-label" for="inviteSwitch">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </div>            
+                </div>
+                <div class="adminSetting chatRoomSetting">
+                    <div>
+                        <a class="editChatRoom roomActionBtn">編輯</a>
+                        <a class="saveRoomEdit roomActionBtn">儲存</a>
+                        <div class="chatroomIntro">
+                            <div class="chatroomImage">
+                                <img class="groupImage" src="images/common/others/empty_img_mother_l.png">
+                            </div>
+                            <input class="file" type="file" style="display:none;" data-role="none"/>
+                            <input class="chatroomNameInput" data-textph-id="CHAT_CHATROOM_NAME_EMPTY" data-role="none" maxlength="20" readonly />
+                        </div>
+                        <div class="assignAdmin">
+                            <table class="adminTable">
+                                <tr>
+                                    <th class="memberName">成員名單</th>
+                                    <th class="adminCheckBox">管理員</th>
+                                </tr>
+                      
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
                 <div class="newChatDetail">
                     <table>
                         <tr>
@@ -188,11 +248,6 @@
                 <div class="preview-add" data-textid="COMMON_EDIT"></div>
             </div>
         </div>
-
-
-
-
-
         <!-- BEGIN: popup -->
         <div class="popup">
             <div class="popup-frame">

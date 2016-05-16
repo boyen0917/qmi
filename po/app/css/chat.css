@@ -193,7 +193,6 @@ body {
 	/* top: 40px; */
 	/*padding-top: 66px;*/
 	width: 100%;
-	
 	position: fixed;
 	top: 65px;
 	height: -webkit-calc( 100vh - 116px );
@@ -1000,6 +999,7 @@ body {
 	position: absolute;
 	width: 100%;
 	min-height: 100%;
+	background: rgb(208,208,208);
 }
 .page-back {
 	height: 40px;
@@ -1012,13 +1012,23 @@ body {
 	width: 30px;
 }
 .header-title{
-	text-align: center;
-	width: 50%;
-	margin: 9px auto -1px;
+	text-align: left;
+	width: 95%;
+	margin: 9px 0px;
 	height: 51px;
 	line-height: 44px;
 	font-size: 22px;
 }
+
+.header-title span{
+	margin-left: 10%;
+}
+
+.header-title img{
+	float: right;
+	cursor: pointer;
+}
+
 .header-title div{
 	display: inline-block;
 }
@@ -1575,4 +1585,211 @@ body {
 }
 .preview-add:hover{
     background-color: #3994E8;
+}
+
+.chatRoomSetting{
+	width: 94%;
+    margin: 0 auto;
+    margin-top: 15px;
+}
+
+.chatRoomSetting div{
+	line-height: 3;
+    padding-left: 17px;
+    background: white;
+}
+
+.assignAdmin {
+	margin-left: -15px;
+}
+
+.inviteSetting h4{
+	color: white;
+    margin-left: 1px;
+    height: 10px;
+}
+
+.pushSwitch {
+	border-bottom: 4px solid rgb(208,208,208);
+}
+
+.roomActionBtn {
+	float: right;
+	margin: -7px 15px 0 0;
+	cursor: pointer;
+	color: black;
+	height: 0px;
+}
+
+.saveRoomEdit {
+	display: none;
+	cursor: inherit;
+	color: grey;
+}
+
+.saveRoomEdit.ready{
+	cursor: pointer;
+	color: black;
+}
+
+.chatroomIntro{
+	padding-top: 9px;
+}
+
+.chatroomImage {
+	display: inline-block;
+	position: relative;
+    margin: 10px 0 0 -32px;
+    width: 65px;
+    text-align: center;
+}
+
+.chatroomImage.uploadImg {
+	cursor: pointer;
+}
+
+.chatroomImage.uploadImg::before{
+	content: "編輯";
+    position: absolute;
+    bottom: 17px;
+    width: 65px;
+    left: 18px;
+    background: rgba(111, 123, 152, 0.28);
+    opacity: 0.7;
+    height: 20px;
+    line-height: 23px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.chatroomImage:hover:before{
+	opacity: 1;
+}
+
+.chatroomIntro .groupImage {
+	width: 65px;
+    height: 65px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+	/*margin: 10px 0px 0px -32px;*/
+}
+
+
+.chatroomNameInput{
+	display: inline-block;
+    border: 0;
+    width: -webkit-calc( 100% - 88px );
+    vertical-align: 20px;
+    margin-left: 10px;
+    height: 26px;
+    padding-left: 10px;
+}
+
+input.editable{
+	border: 1px solid #dddddd;
+}
+
+.adminTable {
+	width: 97%;
+	white-space: nowrap;
+}
+
+.memberName {
+	text-align: left;
+	width: 82%;
+}
+
+td.memberName img{
+	width: 50px;
+ 	height: 50px;
+  	border-radius: 40px;
+  	margin-left: 12px;
+}
+
+td.memberName span{
+	vertical-align: top;
+  	margin-left: 20px;
+}
+
+.adminCheckBox input{
+	  width: 40px;
+}
+
+.adminCheckBox {
+	text-align: right;
+	vertical-align: top;
+	display: none;
+}
+
+
+/**************************************************************************  Swtich 開關按鈕 ***********************************************************************************/
+
+.onoffswitch {
+    position: relative; 
+    width: 43px;
+    float: right;
+    margin: 18px 10px 0 0;
+    -webkit-user-select:none; 
+    -moz-user-select:none; 
+    -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; 
+    overflow: hidden; 
+    cursor: pointer;
+    border-radius: 20px;
+}
+.onoffswitch-inner {
+    display: block; 
+    width: 200%; 
+    margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; 
+    float: left; 
+    width: 50%; 
+    height: 17px; 
+    padding: 0; 
+    line-height: 25px;
+    font-size: 14px; 
+    color: white; 
+    font-family: Trebuchet, Arial, sans-serif; 
+    font-weight: bold;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    content: "";
+    padding-left: 10px;
+    background-color: #B8DEFF; 
+    color: #FFFFFF;
+}
+.onoffswitch-inner:after {
+    content: "";
+    padding-right: 10px;
+    background-color: rgba(207, 214, 217, 0.36); 
+    color: #999999;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; 
+    width: 20px; 
+    margin: -3px;
+    background: #BAB3B3;
+    position: absolute; 
+    top: 0; 
+    bottom: 0;
+    right: 28px;
+    border-radius: 20px;
+    transition: all 0.3s ease-in 0s; 
+}
+#pushSwitch:checked + .onoffswitch-label .onoffswitch-inner, #stickySwitch:checked + .onoffswitch-label .onoffswitch-inner, #inviteSwitch:checked + .onoffswitch-label .onoffswitch-inner{
+    margin-left: 0;
+}
+#pushSwitch:checked + .onoffswitch-label .onoffswitch-switch, #stickySwitch:checked + .onoffswitch-label .onoffswitch-switch, #inviteSwitch:checked + .onoffswitch-label .onoffswitch-switch{
+    right: 0px; 
+    background-color: #5EB5FF; 
 }

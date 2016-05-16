@@ -1,3 +1,5 @@
+var gi;
+
 $(function(){
 	//load language
 	updateLanguage(lang);
@@ -34,7 +36,7 @@ $(function(){
 		g_room,	//chatRoom
 		ci,		//chatRoom id
 		g_cn,	//聊天室名字
-		gi,		//group id
+		// gi,		//group id
 		g_group,//group
 		at,		//access token
 		g_isEndOfPage = false,	//是否在頁面底端
@@ -429,6 +431,7 @@ $(function(){
 				$(".screen-lock").fadeOut();
 			}
 		});
+
 		$(".extra-content .btn:not(.disable)").off("click").click(function () {
 			var btn = $(this);
 			var type = btn.attr("data-type");
@@ -450,6 +453,20 @@ $(function(){
 			}
 			$("#header .extra-content").hide();
 			$(".screen-lock").hide();
+		});
+
+		$(".editChatRoom").off("click").click(function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			
+			$(".saveRoomEdit").show();
+			$(".chatroomNameInput").prop('readonly', false);
+			$(".chatroomImage").addClass("uploadImg");
+			$(".chatroomNameInput").addClass("editable");
+			$(".adminCheckBox").show(1000);
+			$(this).hide();
+
+			registerEditRoomEvent();				
 		});
 
 		$(document).on('mousedown', '.chat-msg-bubble-left, .chat-msg-bubble-right', function (e) {
@@ -604,7 +621,41 @@ $(function(){
 			}
 		});
 
-		registerEditRoomEvent();
+
+		$('.onoffswitch input[type=checkbox]').change(function(e) {
+			var ajaxData = {};
+			var switchName = e.target.id;
+			var isChecked = false;
+
+			ajaxData.method = "put";
+			// ajaxData.body = {};
+
+			if($(this).is(':checked')) {
+        		isChecked = true;
+    		}
+			switch (switchName) {
+				case "pushSwitch" :
+					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/notification";
+					ajaxData.body = {cs: isChecked};
+					QmiGlobal.groups[gi].chatAll[ci].cs = isChecked;
+					break;
+				case "stickySwitch":
+					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/top";
+					ajaxData.headers = {it: isChecked ? 1 : 0};
+					QmiGlobal.groups[gi].chatAll[ci].it = isChecked ? 1 : 0;
+					break;
+				case "inviteSwitch":
+					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/invite";
+					ajaxData.headers = {is: isChecked};
+					QmiGlobal.groups[gi].chatAll[ci].is = isChecked;
+					break;
+			}
+		    new QmiAjax(ajaxData).complete(function (data) {
+		    	console.log(data);
+		    });
+		});
+
+		// registerEditRoomEvent();
 
 		//apply nicescroll
 		var container = $("#container");
@@ -1932,22 +1983,48 @@ $(function(){
 	**/
 	function updateEditRoomPage(){
 		var page = $("#page-edit-preview");
+		var chatroomSwitch = $(".chatRoomSetting");
+		var editPage = $(".adminSetting");
 		//init
 		// var container = page.find(".newChatDetail-content.mem");
 		var input = page.find(".newChatDetail table .input");
+		var chatRoomData = $.userStorage()[gi].chatAll[ci];
+		var iCanInvite = chatRoomData.is;
+		var iAmAdmin = g_room.memList[gu].ad;
+
+		chatroomSwitch.find("#pushSwitch").attr("checked", chatRoomData.cs);
+		chatroomSwitch.find("#stickySwitch").attr("checked", Boolean(chatRoomData.it));
+		if (iAmAdmin) {
+			editPage.find(".editChatRoom").show();
+			editPage.find(".saveRoomEdit").hide().removeClass("ready");
+			editPage.find(".chatroomImage").removeClass("uploadImg").off("click");
+			editPage.find(".chatroomNameInput").prop('readonly', true).removeClass("editable");
+			editPage.find(".adminCheckBox").hide();
+			chatroomSwitch.find("#inviteSwitch").attr("checked", chatRoomData.is);
+		} else {
+			if (! iCanInvite) {
+				$(".header-title img").hide();
+			} 
+			$(".inviteSetting").hide();
+			editPage.find(".editChatRoom").hide();
+		}
+
+		
 		//set current group name
 		input.val( g_cn ).data("oriName",g_cn);
-
+		editPage.find(".chatroomNameInput").val(g_cn)
 		//set current mem
 		updateEditRoomMember(g_room.memList);
 
-		//img
+		// img
 		if(g_room.cat){
 			page.find(".newChatDetail .img img").attr("src", g_room.cat);
+			editPage.find(".groupImage").attr("src", g_room.cat);
 		}
 		
-		page.find(".edit-nextStep").removeClass("ready");
-		page.find(".newChatDetail .img img").removeData("file");
+		// page.find(".edit-nextStep").removeClass("ready");
+		// page.find(".newChatDetail .img img").removeData("file");
+
 		//bind event
 		// var tmp = $.i18n.getString(input.data("textid"));
 		// input.attr("placeholder", tmp);
@@ -1959,56 +2036,180 @@ $(function(){
 	}
 	function updateEditRoomMember( memList ){
 		var container = $("#page-edit-preview .newChatDetail-content.mem");
+		var memberContainer = $("#page-edit-preview .adminTable")
 		container.html("");
+		memberContainer.find("tr:gt(0)").remove();
 		$.each( memList , function(key, memTmp){
+
 			var mem = g_group.guAll[key];
 			var memDiv = $("<div class='row mem'></div>");
+			var memDiv1 = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + 
+				"<input type='checkbox'></td></tr>");
+			if (memTmp.ad) {
+				memDiv1 = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + 
+				"<input type='checkbox' checked></td></tr>");
+			}
+			var memberColumn = $("<td class='memberName'></td>");
 			if (mem.auo) {
 				memDiv.append("<img class='namecard' src='" + mem.auo + "'>");
 				memDiv.find("img").data("gu", key);
 				memDiv.find("img").data("gi", gi);
+				memberColumn.append("<img class='namecard' src='" + mem.auo + "'>");
+
 			} else {
 				memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
+				memberColumn.append("<img src='images/common/others/empty_img_personal_l.png'>");
 			}
 			memDiv.append("<span>" + mem.nk.replaceOriEmojiCode() + "</span>");
+			memberColumn.append("<span>" + mem.nk.replaceOriEmojiCode() + "</span>");
 			container.append(memDiv);
+			memDiv1.prepend(memberColumn);
+			memberContainer.append(memDiv1);
 		});
+		// $(".adminCheckBox input[type='checkbox']").bind("change", )
+		
 	}
 
 	/**
 	註冊編輯成員預覽頁面事件
 	**/
-	function registerEditRoomEvent(){
+	function registerEditRoomEvent() {
+
 		var page = $("#page-edit-preview");
+		var saveBtn = page.find(".saveRoomEdit");
+		var editBtn = page.find(".editChatRoom");
+
+		var currentRoomName = $(".chatroomNameInput").val();
+
+		var nameIsChanged = false;
+		var imageIsChanged = false;
+		var adminIsChanged = false;
+
+		page.find(".adminSetting .chatroomImage").off("click").click( function(e){
+			page.find(".adminSetting .file").trigger("click");
+		});
+
+		page.find(".adminSetting .file").change(function (e) {
+			changeRoomImage(e.target);
+			saveBtn.addClass("ready");
+			imageIsChanged = true;
+		});
+
+		page.find(".adminSetting .chatroomNameInput").keyup( function(){
+	    	var val = $(this).val();
+	    	if(val != currentRoomName && val.length){
+	    		saveBtn.addClass("ready");
+	    		nameIsChanged = true;
+	    	} else{
+	    		saveBtn.removeClass("ready");
+	    		nameIsChanged = false;
+	    	}
+	    	// checkIsReady();
+	    });
+
+	    page.find(".adminSetting input[type='checkbox']").change(function () {
+	    	saveBtn.addClass("ready");
+	    	adminIsChanged = true;
+	    });
+		   
+	    saveBtn.click(function (e) {
+	    	e.preventDefault();
+			e.stopPropagation();
+
+	    	var saveTasks = [];
+	    	if ($(this).hasClass("ready")) {
+	    		if (imageIsChanged) {
+					var file = $(".adminSetting .file")[0].files[0];
+					if(file){
+						var oriArr = [1280, 1280, 0.7];
+						var tmbArr = [160, 160, 0.4];
+						saveTasks.push(uploadChatAvatar(gi, file, ti_chat, 0, oriArr, tmbArr, pi));
+					} 
+	    		}
+
+	    		if (nameIsChanged) {
+	    			saveTasks.push(new QmiAjax({
+				        apiName: "/groups/" +gi + "/chats/" + ci,
+				        method: "put",
+				        body: {cn: $(".chatroomNameInput").val()},
+				    }));
+					console.log("nameIsChanged");
+	    		}
+
+	    		if (adminIsChanged) {
+	    			var adminCheckboxs = $(".adminCheckBox input");
+	    			var adminData = {el: [], dl: []};
+	    			adminCheckboxs.each(function (index, element) {
+	    				var memeberID = $(element).parent().attr("id").split("_")[1];
+	    				if ($(element).is(":checked")) {
+	    					adminData.el.push(memeberID);
+	    				} else {
+	    					adminData.dl.push(memeberID);
+	    				}
+	    			});
+	    			saveTasks.push(new QmiAjax({
+				        apiName: "/groups/" +gi + "/chats/" + ci + "/administrators",
+				        method: "put",
+				        body: adminData,
+				    }))
+	    			console.log(adminData);
+	    			console.log("adminIsChanged");
+	    		}
+
+	    		$.when.apply($, saveTasks).then(function () {
+	    			var resOfUploadImg = arguments[0];
+	    			
+	    			if (resOfUploadImg.tu && resOfUploadImg.ou) {
+	    				g_room.cat = resOfUploadImg.tu;
+						g_room.cao = resOfUploadImg.ou;
+	    			}
+
+	    			g_cn = $(".chatroomNameInput").val();
+	    			
+					getPermition(true);
+
+					// saveBtn.removeClass("ready");
+					// saveBtn.hide();
+					updateEditRoomPage();
+					checkIsSendEditDone(true);
+					// editBtn.show();
+				});
+	    	}
+	    })
+		// var page = $("#page-edit-preview");
 		
-		//修改成員
-		page.find(".preview-add").off("click").click( editMember );
+		// //修改成員
+		// page.find(".preview-add").off("click").click( editMember );
 
 		//修改聊天室圖片
 		page.find(".newChatDetail .img").off("click").click( function(){
 			page.find(".newChatDetail .file").trigger("click");
 		});
-		page.find(".newChatDetail .file").change( onEditRoomFileChange );
 
-		//完成
+		// page.find(".chatroomImage img").off("click").click( function(){
+		// 	page.find(".chatroomImage .file").trigger("click");
+		// });
+		// page.find(".newChatDetail .file").change( changeRoomImage );
+
+		// //完成
 		page.find(".edit-nextStep").off("click").click( onComfirmEditRoom );
 
-		//back confirm
-	    page.find('.page-back').off("click").click( function(e){
-	    	if( page.find(".edit-nextStep").hasClass("ready") ){
-		    	e.preventDefault();
-		    	e.stopPropagation();
+		// //back confirm
+	 //    page.find('.page-back').off("click").click( function(e){
+	 //    	if( page.find(".edit-nextStep").hasClass("ready") ){
+		//     	e.preventDefault();
+		//     	e.stopPropagation();
 
-		    	popupShowAdjust("",
-					$.i18n.getString("FEED_CONFIRM_DISCARD"),
-					$.i18n.getString("COMMON_OK"),
-	                $.i18n.getString("COMMON_CANCEL"),[function(){
-	                    $.popPage(false);
-	            	},null]
-	            );
+		//     	popupShowAdjust("",
+		// 			$.i18n.getString("FEED_CONFIRM_DISCARD"),
+		// 			$.i18n.getString("COMMON_OK"),
+	 //                $.i18n.getString("COMMON_CANCEL"),[function(){
+	 //                    $.popPage(false);
+	 //            	},null]
+	 //            );
 		        
-		    }
-	    });
+		//     }
+	 //    });
 
 	    //name input event
 	    page.find(".newChatDetail table .input").keyup( function(){
@@ -2031,19 +2232,17 @@ $(function(){
 	/**
 	修改聊天室圖片
 	**/
-	function onEditRoomFileChange(e) {
-		var input = $(this);
-		if (input.length>0 && input[0].files && input[0].files[0]) {
+	function changeRoomImage(target) {
+		var input = $(target);
+		if (input.length && input[0].files && input[0].files[0]) {
 			var imageType = /image.*/;
 			if (input[0].files[0].type.match(imageType)) {
 			    var reader = new FileReader();
 
 			    reader.onload = function (e) {
 					var page = $("#page-edit-preview");
-					var dom = page.find(".newChatDetail .img img");
+					var dom = page.find(".chatroomImage img");
 			        dom.attr('src', e.target.result);
-			    	dom.data("file", input[0].files[0] );
-			    	input.replaceWith(input.val('').clone(true));
 			    	checkIsReady();
 			    }
 
@@ -2056,14 +2255,14 @@ $(function(){
 				input.replaceWith(input.val('').clone(true));
 			}
 		} else {
-			input.replaceWith(input.val('').clone(true));
+			// input.replaceWith(input.val('').clone(true));
 		}
 	}
 
 	/**
 	完成修改聊天室, 送出資料
 	**/
-	function onComfirmEditRoom(e){
+	function onComfirmEditRoom(){
 		var comfirmDom = $(this);
 		if( !comfirmDom.hasClass("ready") ) return;
 		var isReady = false;
@@ -2165,10 +2364,10 @@ $(function(){
 	function checkIsSendEditDone(isReady){
 		if( !isReady ) return;
 
-		var comfirmDom = $("#page-edit-preview").find(".edit-nextStep");
-		comfirmDom.removeClass("ready");
-		comfirmDom.removeData("memEdited");
-		comfirmDom.removeData("nameEdited");
+		// var comfirmDom = $("#page-edit-preview").find(".edit-nextStep");
+		// comfirmDom.removeClass("ready");
+		// comfirmDom.removeData("memEdited");
+		// comfirmDom.removeData("nameEdited");
 		popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
 		//$.popPage();
 
@@ -2705,103 +2904,138 @@ $(function(){
 	/**
 	upload chat avatar 
 	**/
-	getChatAvatarUploadUrl = function(){
-		var api_name = "groups/" + gi + "/chats/" + ci + "/avatar";
-	    var headers = {
-	             "ui":ui,
-	             "at":at, 
-	             "li":lang
-	                 };
-	    var method = "put";
-	    return ajaxDo(api_name,headers,method,false,null);
+	getChatAvatarUploadUrl = function() {
+
+		return new QmiAjax({
+			apiName: "groups/" + gi + "/chats/" + ci + "/avatar",
+	        method: "put",
+	    });
+
+		// var api_name = "groups/" + gi + "/chats/" + ci + "/avatar";
+	 //    var headers = {
+	 //             "ui":ui,
+	 //             "at":at, 
+	 //             "li":lang
+	 //                 };
+	 //    var method = "put";
+	 //    return ajaxDo(api_name,headers,method,false,null);
 	};
 
-	uploadChatAvatarCommit = function(fi,si){
-		var api_name = "groups/" + gi + "/chats/" + ci + "/avatar/commit";
-	    var headers = {
-	             "ui":ui,
-	             "at":at, 
-	             "li":lang
-	                 };
-	    var method = "put";
+	uploadChatAvatarCommit = function(fi, si){
+		return new QmiAjax({
+			apiName: "groups/" + gi + "/chats/" + ci + "/avatar/commit",
+	        method: "put",
+	        body : {
+				fi: fi,
+				si: si,
+			}
+	    });
+		// var api_name = "groups/" + gi + "/chats/" + ci + "/avatar/commit";
+	 //    var headers = {
+	 //             "ui":ui,
+	 //             "at":at, 
+	 //             "li":lang
+	 //                 };
+	 //    var method = "put";
 
-	    var body = {
-			fi: fi,
-			si: si
-		};
-	    return ajaxDo(api_name,headers,method,false,body);
+	 //    var body = {
+		// 	fi: fi,
+		// 	si: si
+		// };
+	 //    return ajaxDo(api_name,headers,method,false,body);
 	}
 	/**
 	不知道為什麼這不跟一般團體用同一個取得上傳網址的ＡＰＩ...只好fork一份出來＝＝
 	**/
 	uploadChatAvatar = function(this_gi, file, ti, permission_id, ori_arr, tmb_arr, pi, callback){
-		
+		var deferred = $.Deferred();
 		var reader = new FileReader();
 		reader.onloadend = function() {
 			var tempImg = new Image();
 		    tempImg.src = reader.result;
 		    tempImg.onload = function(){
-		        var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
-		        var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
+		        var originImgobj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
+		        var thumbnailImgObj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
 
-				getChatAvatarUploadUrl(this_gi, ti, 1, pi).complete(function(data){
+				getChatAvatarUploadUrl(this_gi, ti, 1, pi).then(function(data) {
 		    		cns.debug("!");
 		    	
-					if(data.status == 200){
-						var s3url_result = $.parseJSON(data.responseText);
-						var fi = s3url_result.fi;
-				    	var s3_url = s3url_result.tu;
-				    	var s32_url = s3url_result.ou;
+					if(data.status == 200) {
+						var s3UrlResult = $.parseJSON(data.responseText);
+						var fi = s3UrlResult.fi;
+				    	var thumbnailUrl = s3UrlResult.tu;
+				    	var originUrl = s3UrlResult.ou;
 
-				    	//傳大圖
-				    	uploadImgToS3(s32_url,o_obj.blob).complete(function(data){
-				    		if(data.status == 200){
+				    	$.when(uploadImgToS3(originUrl, originImgobj.blob), 
+				    		uploadImgToS3(thumbnailUrl, thumbnailImgObj.blob)).then(function () {
 
-				    			//傳小圖 已經縮好囉
-					    		uploadImgToS3(s3_url,t_obj.blob).complete(function(data){
+	    					uploadChatAvatarCommit(fi, originImgobj.blob.size).then(function (data) { 
+								if(data.status == 200){
+			        				var commitResult = $.parseJSON(data.responseText);
+			        				var data = {
+			        					fi: fi,
+			        					tu: commitResult.tu,
+			        					ou: commitResult.ou
+			        				}
+									deferred.resolve(data);
+				                	// if(callback) callback(data);
+				                } else {
+				                	if(callback) callback();
+				                }
+							});
+							
+						});
 
-					        		if(data.status == 200){
-					        			var tempW = this.width;
-										var tempH = this.height;
+				   //  	//傳大圖
+				   //  	uploadImgToS3(originUrl,originImgobj.blob).complete(function(data){
+				   //  		if(data.status == 200){
+
+				   //  			//傳小圖 已經縮好囉
+					  //   		uploadImgToS3(thumbnailUrl,thumbnailImgObj.blob).complete(function(data){
+
+					  //       		if(data.status == 200){
+					  //       			var tempW = this.width;
+							// 			var tempH = this.height;
 										
-										//mime type
-										var md = {};
-					        			md.w = o_obj.w;
-					        			md.h = o_obj.h;
+							// 			//mime type
+							// 			var md = {};
+					  //       			md.w = o_obj.w;
+					  //       			md.h = o_obj.h;
 
-					        			uploadChatAvatarCommit(fi, o_obj.blob.size).complete(function(data){
-					        				if(data.status == 200){
-						        				var commit_result = $.parseJSON(data.responseText);
+					  //       			uploadChatAvatarCommit(fi, originImgobj.blob.size).complete(function(data){
+					  //       				if(data.status == 200){
+						 //        				var commit_result = $.parseJSON(data.responseText);
 
-						        				var data = {
-						        					fi:fi,
-						        					tu:commit_result.tu,
-						        					ou:commit_result.ou
-						        				}
-							                	if(callback) callback(data);
-							                } else {
-							                	if(callback) callback();
-							                }
-						                	return;
-					        			}); //end of uploadCommit
+						 //        				var data = {
+						 //        					fi:fi,
+						 //        					tu:commit_result.tu,
+						 //        					ou:commit_result.ou
+						 //        				}
+							//                 	if(callback) callback(data);
+							//                 } else {
+							//                 	if(callback) callback();
+							//                 }
+						 //                	return;
+					  //       			}); //end of uploadCommit
 
-					        		} else {
-										if(callback)	callback();
-									} //end of small uploadImgToS3 200
-					    		}); //end of small uploadImgToS3
+					  //       		} else {
+							// 			if(callback)	callback();
+							// 		} //end of small uploadImgToS3 200
+					  //   		}); //end of small uploadImgToS3
 
-				    		} else {
-								if(callback)	callback();
-							} //end of big uploadImgToS3 200
-			        	}); //end of big uploadImgToS3
+				   //  		} else {
+							// 	if(callback)	callback();
+							// } //end of big uploadImgToS3 200
+			    //     	}); //end of big uploadImgToS3
 					
 					} else{
-						if(callback)	callback();
+					 	if(callback)	callback();
 					} //end of getUrl 200
 				}); //end of getUrl
 			}
 		}
 		reader.readAsDataURL(file);
+		return deferred.promise();
 	}
 
 	function noMoreHistoryMsg() {
