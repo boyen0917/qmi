@@ -6852,14 +6852,12 @@ getPrivateGroupFromList = function( data, callback ){
 
 
 polling = function(){
-
     if(!$.lStorage("_pollingData")) 
         $.lStorage("_pollingData",{cnts: {},ts: {pt: new Date().getTime()}})
 
-    var 
-    pollingDeferred = $.Deferred(),
-    localPollingData = $.lStorage("_pollingData"),
-    publicPollingTime = localPollingData.ts.pt;
+    var pollingDeferred = $.Deferred(),
+        localPollingData = $.lStorage("_pollingData"),
+        publicPollingTime = localPollingData.ts.pt;
 
     new QmiAjax({
         url: base_url + "sys/polling?pt=" + publicPollingTime,
@@ -6896,6 +6894,7 @@ polling = function(){
                 //cmds api
                 pollingCmds(newPollingData).done(function(){
                     pollingDeferred.resolve({
+                        name: "success",
                         status: true,
                         interval: polling_interval
                     });
@@ -6905,6 +6904,7 @@ polling = function(){
         }else if(data.status == 401){
             //錯誤處理
             pollingDeferred.resolve({
+                name: "else401",
                 status: false,
                 stop: true
             });
@@ -6916,6 +6916,7 @@ polling = function(){
             cns.debug("polling err:",data);
             //失敗就少打
             pollingDeferred.resolve({
+                name: "else",
                 status: false,
                 interval: polling_interval*2
             });
@@ -6923,14 +6924,12 @@ polling = function(){
         }
     });
 
-
     pollingDeferred.done(function(resultObj){
-        if ( 
-            QmiGlobal.pollingOff === true
-            || resultObj.stop === true
-        ) {
-            // do nothing
+        // 表示polling有在更新
+        window.QmiPollingChk.cnt++;
 
+        if ( QmiGlobal.pollingOff === true || resultObj.stop === true) {
+            // do nothing
         } else {
             setTimeout(function(){
                 polling();
