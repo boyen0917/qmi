@@ -8,6 +8,7 @@ setGroupInitial = function(new_gi,chk){
     //sidemenu user
     setSmUserData(gi,gu,gn);
 
+
     //header 設定團體名稱
     $(".header-group-name div:eq(1)").html(gn);
     
@@ -19,7 +20,6 @@ setGroupInitial = function(new_gi,chk){
     else
         groupMenuListArea(true).always(function(){ deferred.resolve(); })
         
-
     //做團體列表、top event
     $.when(deferred.promise(),topEvent()).done(function(){
 
@@ -349,6 +349,7 @@ timelineChangeGroup = function (thisGi) {
         comboDeferred.resolve();
     }
 
+
     comboDeferred.done(function(){
         //指定gi
         setThisGroup(thisGi);
@@ -362,6 +363,9 @@ timelineChangeGroup = function (thisGi) {
         //置頂設定
         topEvent();
 
+        if (QmiGlobal.groups[thisGi].set && QmiGlobal.groups[thisGi].set.ccc) {
+            onRemoveChatDB(thisGi, QmiGlobal.groups[thisGi].set.ccc);
+        }
         //切換團體時, 選目前第一個選項
         var tmp = $(".sm-small-area:visible");
         if( tmp.length>0 ){
@@ -803,8 +807,6 @@ topEvent = function (){
                             i18Ttl = "FEED_REPORT";
                             break;
                     }
-
-
 
                     this_top_event.find(".st-top-event-r-ttl span").html($.i18n.getString(i18Ttl));
                     this_top_event.find(".st-top-event-r-ttl").append(val.meta.tt);
@@ -7312,6 +7314,13 @@ pollingCmds = function(newPollingData){
                     case 12://delete group
                         removeGroup( item.pm.gi );
                         break;
+
+                    case 52:
+                        QmiGlobal.groups[item.pm.gi].set.ccc = item.pm.gcc;
+                        if (item.pm.gcc > 0) {
+                            onRemoveChatDB(item.pm.gi, item.pm.gcc);
+                        }
+                        break;
                 }
             });
 
@@ -8678,6 +8687,52 @@ goToGroupMenu = function(){
     
     $.mobile.changePage("#page-group-menu");
 }
+
+// 啟動timer, 每天半夜12點去每個團體檢查和刪除indexDB內的聊天訊息
+function activateClearChatsTimer(){
+    var counter = -1;
+    var now = new Date();
+    var dueTime = new Date();
+    // dueTime.setDate(dueTime.getDay() + 2);
+    dueTime.setHours(00);
+    dueTime.setMinutes(00);
+    dueTime.setSeconds(00);
+
+    if (dueTime - now > 0) {
+        counter = dueTime - now;
+    } else {
+        counter = dueTime - now + 86400000;
+    }
+    console.log(counter);
+    var allGroupData = QmiGlobal.groups;
+    $.each(allGroupData, function (groupID, groupData){
+        if (groupData.set && groupData.set.ccc) {
+            onRemoveChatDB(groupID, groupData.set.ccc);
+        }
+    });
+
+    clearChatTimer = setTimeout(activateClearChatsTimer, counter);
+
+};
+
+// stopClearChatsTimer = function() {
+//     clearTimeout(clearChatTimer);
+// }
+
+// checkChatMsgExpired = function() {
+//     console.log("test12");
+
+//     stopClearChatsTimer();
+//     var groupData = QmiGlobal.groups[gi];
+//     console.log(groupData);
+//     if (groupData.set) {
+//         var clearChatCycle = groupData.set.ccc;
+//         if (clearChatCycle > 0) {
+//             console.log(clearChatCycle);
+//             activateClearChatsTimer();
+//         }
+//     }
+// }
 
 /*
           ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          

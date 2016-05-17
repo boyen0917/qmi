@@ -369,7 +369,7 @@ onCheckVersionDone = function(needUpdate){
             $.mobile.changePage(data.location);
             
 			//聊天室開啓DB
-	    	initChatDB(); 
+	    	initChatDB(activateClearChatsTimer); 
 			initChatCntDB(); 
 
 			//沒團體的情況
@@ -382,7 +382,7 @@ onCheckVersionDone = function(needUpdate){
 				polling();
 			}else{
 				//設定目前團體 執行polling()
-				setGroupInitial(QmiGlobal.auth.dgi).done(polling);
+				setGroupInitial(QmiGlobal.auth.dgi).done( polling );
 			}
         });
     }
