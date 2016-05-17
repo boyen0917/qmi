@@ -677,6 +677,135 @@ $(function(){
 
 		scrollToBottom();
 
+=======
+	registerEditRoomEvent();
+
+	//apply nicescroll
+	var container = $("#container");
+	// container.niceScroll({
+	// 	// styler:"fb",
+	// 	cursorcolor: "rgba(210, 210, 210, 0.8)",
+	// 	cursorwidth: '8',
+	// 	cursorborderradius: '10px',
+	// 	background: 'rgba(255,255,255,0)',
+	// 	cursorborder: "",
+	// 	boxzoom: false
+	// 	// zindex: 999
+	// 	// horizrailenabled: false,
+	// 	// ,autohidemode: "leave"
+	// });
+	// var niceScrollTmp = container.getNiceScroll()[0];
+	// niceScrollTmp.onDragToTop = onDragContainer;
+
+	
+
+	updateChat(null,true);
+	sendMsgRead(new Date().getTime())
+});
+
+/**
+              ███████╗██╗   ██╗███╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗          
+              ██╔════╝██║   ██║████╗  ██║██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║          
+    █████╗    █████╗  ██║   ██║██╔██╗ ██║██║        ██║   ██║██║   ██║██╔██╗ ██║    █████╗
+    ╚════╝    ██╔══╝  ██║   ██║██║╚██╗██║██║        ██║   ██║██║   ██║██║╚██╗██║    ╚════╝
+              ██║     ╚██████╔╝██║ ╚████║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║          
+              ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝          
+**/
+
+/**
+檢查目前位置, 離開底部時顯示回到底部button
+**/
+function updateChatContentPosition() {
+	var staus = (0 == g_extraInputStatus);
+	if ($(".input").data("h") != $(".input").innerHeight()
+		|| $(".input").data("staus") != staus) {
+		// cns.debug( $(".input").data("h"), $(".input").innerHeight() );
+		$(".input").data("h", $(".input").innerHeight());
+		$(".input").data("staus", staus);
+		var tmp = staus ? 200 : 0;
+		var footerHeight = $("#footer").height();
+		footerHeight -= tmp;
+		$("#chat-contents").stop().animate({marginBottom: footerHeight - 40}, 100);
+		$("#chat-toBottom").animate({bottom: Math.max(0, footerHeight + 10)}, 100);
+	}
+}
+
+/**
+高度改變時調整內容高度
+**/
+function resizeContent() {
+	var tmp = (0 == g_extraInputStatus) ? 200 : 0;
+	// cns.debug( $( window ).height(), $("#header").height(), $("#chat-loading").height());
+	$("#container").css("min-height",
+		$(window).height()
+		- $("#header").height()
+		- ($("#footer").height() - tmp)
+		+ $("#chat-loading").height()
+	);
+}
+
+/**
+聊天室DB初始化完成後callback
+**/
+function onChatDBInit() {
+	console.debug("-------- onChatDBInit ---------");
+	var today = new Date();
+	$("#chat-contents").html("<div class='firstMsg'></div>");
+	var timeTag = $("<div class='chat-date-tag'></div>");
+	// timeTag.addClass( today.customFormat("_#YYYY#_#MM#_#DD#") );
+	timeTag.data("time", today.getTime());
+	timeTag.html(getFormatTimeTag(today));
+	today.setHours(0);
+	today.setMinutes(0);
+	today.setSeconds(0);
+	var lastMsg = $("<div class='lastMsg'></div>");
+	lastMsg.data("time", today.getTime());
+	lastMsg.append(timeTag);
+	$("#chat-contents").append(lastMsg);
+	$("#chat-contents").append("<div class='tmpMsg'></div>");
+	getHistoryMsg( false );
+
+	scrollToBottom();
+
+	// var onItem = function (item) {
+ //  		// console.log('got item:', item.ct);
+
+ //  		var date = new Date().getTime();
+ //  		var onsuccess = function(result){
+	// 		if(result !== false){
+	// 		    console.log('deletion successful!');
+	// 		}
+	// 	}
+	// 	var onerror = function(error){
+	// 	  	console.log('Oh noes, sth went wrong!', error);
+	// 	}
+ //  		if(date > item.ct) {
+ //  			console.log(new Date(item.ct));
+ //  			// g_idb_chat_msgs.remove(item.ei, onsuccess, onerror)
+ //  		}
+	// };
+
+	// var onEnd = function (item) {
+ //  		console.log('All done.');
+	// };
+
+
+	// g_idb_chat_msgs.iterate(onItem, {
+	// 	index: 'gi_ci_ct',
+	// 	filterDuplicates: true,
+	// 	onEnd: onEnd
+	// });
+
+}
+
+/**
+show history chat contents
+**/
+function getHistoryMsg(bIsScrollToTop) {
+	if (g_isLoadHistoryMsgNow) {
+		cns.debug("!");
+		return;
+>>>>>>> Stashed changes
 	}
 
 	/**

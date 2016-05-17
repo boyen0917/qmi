@@ -153,6 +153,8 @@ function onChatReceiveMsg ( tmp_gi, tmp_ci, tmp_cn, msgs, callback ){
 			    ct: object.meta.ct,
 			    data: object
 			};
+
+			
 			//write msg to db
 			// if( !g_idb_chat_msgs.get(object.ei) ){
 				var tmp = g_idb_chat_msgs.put( node, function(eiTmp){
