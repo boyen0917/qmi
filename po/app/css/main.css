@@ -3143,6 +3143,7 @@ img.st-user-pic{
 .st-reply-content video, .st-reply-content audio {
 	display: none;
 	margin: 15px 5px;
+	max-width: 100%;
 }
 
 .st-reply-footer {
