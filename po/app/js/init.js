@@ -222,10 +222,16 @@ window.QmiGlobal = {
 // polling異常監控
 window.QmiPollingChk = {
 
+	flag: false, // 聊天室不開啓
+
 	cnt: 0, // 表示有在更新
 
 	// 5分鐘檢查一次polling死了沒
 	interval: setInterval(function() {
+
+		//  聊天室不開啓
+		if(window.QmiPollingChk.flag === false) return;
+
 		var oriNum = window.QmiPollingChk.cnt;
 
 		// 檢查 100秒內的cnt有沒有異常增加

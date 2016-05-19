@@ -6852,6 +6852,10 @@ getPrivateGroupFromList = function( data, callback ){
 
 
 polling = function(){
+
+    // 開啓polling檢查機制
+    if(window.QmiPollingChk.flag === false) window.QmiPollingChk.flag = true;
+
     if(!$.lStorage("_pollingData")) 
         $.lStorage("_pollingData",{cnts: {},ts: {pt: new Date().getTime()}})
 
