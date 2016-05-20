@@ -224,7 +224,7 @@ $(function(){
 		sendBtn.click(onClickSendChat);
 		var input = $("#footer .contents .input");
 		// input.autosize({append: "\n"});
-		input.off("keydown").off("keypress");
+		input.off("keydown").off("keyup");
 		// input.off("keydown").off("keypress");
 		// input.keydown(function(e){
 		//     if (e.keyCode == '8' || e.keyCode=='46'){	//backspace or delete
@@ -233,17 +233,17 @@ $(function(){
 		// });
 
 		//press enter to send text
-		input.keypress(function (e) {
+		input.keyup(function (e) {
 			if (e.keyCode == '13' && !e.shiftKey) {
 				onClickSendChat();
-
-				input.html("");
-				// return false;
 			}
 		});
 
 		//adjust typing area height
-		input.off("keydown").keydown(function () {
+		input.off("keydown").keydown(function (e) {
+			// 讓 enter 不會換行
+			if (e.keyCode == '13' && !e.shiftKey) e.preventDefault();
+
 			setTimeout(updateChatContentPosition, 50);
 		});
 
