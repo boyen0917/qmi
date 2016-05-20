@@ -30,6 +30,7 @@ $(function(){
 	QmiGlobal.groups = window.chatAuthData.groups;
 	QmiGlobal.clouds = window.chatAuthData.clouds;
 	QmiGlobal.cloudGiMap = window.chatAuthData.cloudGiMap;
+	QmiGlobal.operateChatList = window.chatList;
 
 
 	var ui,		//user id
@@ -455,20 +456,6 @@ $(function(){
 			$(".screen-lock").hide();
 		});
 
-		$(".editChatRoom").off("click").click(function (e) {
-			e.preventDefault();
-			e.stopPropagation();
-			
-			$(".saveRoomEdit").show();
-			$(".chatroomNameInput").prop('readonly', false);
-			$(".chatroomImage").addClass("uploadImg");
-			$(".chatroomNameInput").addClass("editable");
-			$(".adminCheckBox").show(1000);
-			$(this).hide();
-
-			registerEditRoomEvent();				
-		});
-
 		$(document).on('mousedown', '.chat-msg-bubble-left, .chat-msg-bubble-right', function (e) {
 			$(this).addClass("active");
 		});
@@ -621,6 +608,23 @@ $(function(){
 			}
 		});
 
+		$(".header-title img").off("click").click(function (e) {
+			editMember();		
+		});
+
+		$(".editChatRoom").off("click").click(function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			
+			$(".saveRoomEdit").show();
+			$(".chatroomNameInput").prop('readonly', false);
+			$(".chatroomImage").addClass("uploadImg");
+			$(".chatroomNameInput").addClass("editable");
+			$(".adminCheckBox").show(1000);
+			$(this).hide();
+
+			registerEditRoomEvent();				
+		});
 
 		$('.onoffswitch input[type=checkbox]').change(function(e) {
 			var ajaxData = {};
@@ -628,7 +632,6 @@ $(function(){
 			var isChecked = false;
 
 			ajaxData.method = "put";
-			// ajaxData.body = {};
 
 			if($(this).is(':checked')) {
         		isChecked = true;
@@ -637,21 +640,30 @@ $(function(){
 				case "pushSwitch" :
 					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/notification";
 					ajaxData.body = {cs: isChecked};
-					QmiGlobal.groups[gi].chatAll[ci].cs = isChecked;
+					g_room.cs = isChecked;
 					break;
 				case "stickySwitch":
 					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/top";
 					ajaxData.headers = {it: isChecked ? 1 : 0};
-					QmiGlobal.groups[gi].chatAll[ci].it = isChecked ? 1 : 0;
+					g_room.it = isChecked ? 1 : 0;
 					break;
 				case "inviteSwitch":
 					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/invite";
 					ajaxData.headers = {is: isChecked};
-					QmiGlobal.groups[gi].chatAll[ci].is = isChecked;
+					g_room.is = isChecked;
 					break;
 			}
 		    new QmiAjax(ajaxData).complete(function (data) {
-		    	console.log(data);
+		    	if(switchName == "stickySwitch"){
+		    		if (isChecked) {
+		    			QmiGlobal.operateChatList.roomAddTop(ci);
+		    		} else {
+		    			QmiGlobal.operateChatList.roomDeleteTop(ci);
+		    		}
+		    	}
+
+		    	popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+		    	// }
 		    });
 		});
 
@@ -662,6 +674,7 @@ $(function(){
 
 		updateChat();
 		sendMsgRead(new Date().getTime())
+
 	});
 
 	/**
@@ -975,7 +988,7 @@ $(function(){
 						}
 					}
 
-					if (isUpdatePermission) getPermition(true);
+					// if (isUpdatePermission) getPermition(true);
 
 					// isGetNewer 取時間點舊到新的訊息 只有polling需要 
 					if (isGetNewer) {
@@ -1897,16 +1910,27 @@ $(function(){
 			$.i18n.getString("CHAT_LEAVE_CONFIRM"),
 			$.i18n.getString("COMMON_OK"),
 			$.i18n.getString("COMMON_CANCEL"), [function () { //on ok
-				leaveRoomAPI(ci, function () {
-					var userData = $.userStorage();
+				var iAmAdmin = g_room.memList[gu].ad;
+				if (iAmAdmin) {
+					popupShowAdjust("你已是管理員了!!",
+						"請保留成員至少有一位是管理員，並將自己的權限取消!!",
+						"前往編輯",
+						$.i18n.getString("COMMON_CANCEL"), [function () {
+							showEditRoomPage();
+						}]
+					);
+				} else {
+					leaveRoomAPI(ci, function () {
+						var userData = $.userStorage();
+						g_group = userData[gi];
+						delete g_group.chatAll[ci];
 
-					g_group = userData[gi];
-					delete g_group.chatAll[ci];
-
-					$.userStorage(userData);
-					$('.sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
-					window.close();
-				});
+						$.userStorage(userData);
+						$('.sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
+						window.close();
+					});
+				}
+				
 			}]
 		);
 	}
@@ -1992,14 +2016,18 @@ $(function(){
 		var iCanInvite = chatRoomData.is;
 		var iAmAdmin = g_room.memList[gu].ad;
 
+		// 設定推播、置頂開關選項
 		chatroomSwitch.find("#pushSwitch").attr("checked", chatRoomData.cs);
 		chatroomSwitch.find("#stickySwitch").attr("checked", Boolean(chatRoomData.it));
+
+		// 將input的元件取消編輯的能力
+		editPage.find(".saveRoomEdit").hide().removeClass("ready");
+		editPage.find(".chatroomImage").removeClass("uploadImg").off("click");
+		editPage.find(".chatroomNameInput").prop('readonly', true).removeClass("editable");
+		editPage.find(".adminCheckBox").hide();
+
 		if (iAmAdmin) {
 			editPage.find(".editChatRoom").show();
-			editPage.find(".saveRoomEdit").hide().removeClass("ready");
-			editPage.find(".chatroomImage").removeClass("uploadImg").off("click");
-			editPage.find(".chatroomNameInput").prop('readonly', true).removeClass("editable");
-			editPage.find(".adminCheckBox").hide();
 			chatroomSwitch.find("#inviteSwitch").attr("checked", chatRoomData.is);
 		} else {
 			if (! iCanInvite) {
@@ -2009,7 +2037,6 @@ $(function(){
 			editPage.find(".editChatRoom").hide();
 		}
 
-		
 		//set current group name
 		input.val( g_cn ).data("oriName",g_cn);
 		editPage.find(".chatroomNameInput").val(g_cn)
@@ -2035,43 +2062,31 @@ $(function(){
 		// });
 	}
 	function updateEditRoomMember( memList ){
-		var container = $("#page-edit-preview .newChatDetail-content.mem");
 		var memberContainer = $("#page-edit-preview .adminTable")
-		container.html("");
 		memberContainer.find("tr:gt(0)").remove();
 		$.each( memList , function(key, memTmp){
 
 			var mem = g_group.guAll[key];
-			var memDiv = $("<div class='row mem'></div>");
-			var memDiv1 = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + 
-				"<input type='checkbox'></td></tr>");
+			var memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + "<input type='checkbox'></td></tr>");
 			if (memTmp.ad) {
-				memDiv1 = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + 
-				"<input type='checkbox' checked></td></tr>");
+				memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + "<input type='checkbox' checked></td></tr>");
 			}
 			var memberColumn = $("<td class='memberName'></td>");
 			if (mem.auo) {
-				memDiv.append("<img class='namecard' src='" + mem.auo + "'>");
-				memDiv.find("img").data("gu", key);
-				memDiv.find("img").data("gi", gi);
 				memberColumn.append("<img class='namecard' src='" + mem.auo + "'>");
-
 			} else {
-				memDiv.append("<img src='images/common/others/empty_img_personal_l.png'>");
 				memberColumn.append("<img src='images/common/others/empty_img_personal_l.png'>");
 			}
-			memDiv.append("<span>" + mem.nk.replaceOriEmojiCode() + "</span>");
 			memberColumn.append("<span>" + mem.nk.replaceOriEmojiCode() + "</span>");
-			container.append(memDiv);
-			memDiv1.prepend(memberColumn);
-			memberContainer.append(memDiv1);
+			memDiv.prepend(memberColumn);
+			memberContainer.append(memDiv);
 		});
 		// $(".adminCheckBox input[type='checkbox']").bind("change", )
 		
 	}
 
 	/**
-	註冊編輯成員預覽頁面事件
+	註冊編輯管理員頁面事件
 	**/
 	function registerEditRoomEvent() {
 
@@ -2142,8 +2157,10 @@ $(function(){
 	    			adminCheckboxs.each(function (index, element) {
 	    				var memeberID = $(element).parent().attr("id").split("_")[1];
 	    				if ($(element).is(":checked")) {
+	    					g_room.memList[memeberID].ad = 1;
 	    					adminData.el.push(memeberID);
 	    				} else {
+	    					g_room.memList[memeberID].ad = 0;
 	    					adminData.dl.push(memeberID);
 	    				}
 	    			});
@@ -2152,8 +2169,6 @@ $(function(){
 				        method: "put",
 				        body: adminData,
 				    }))
-	    			console.log(adminData);
-	    			console.log("adminIsChanged");
 	    		}
 
 	    		$.when.apply($, saveTasks).then(function () {
@@ -2166,13 +2181,20 @@ $(function(){
 
 	    			g_cn = $(".chatroomNameInput").val();
 	    			
-					getPermition(true);
+					if (imageIsChanged) {
+						QmiGlobal.operateChatList.roomUpdatePhoto(ci, resOfUploadImg.ou);
+		    		}
 
-					// saveBtn.removeClass("ready");
-					// saveBtn.hide();
+					if (nameIsChanged) {
+						QmiGlobal.operateChatList.roomRename(ci, g_cn);
+						g_room.cn = g_cn;
+						g_room.uiName = g_cn;
+						$("#header span.text").html(g_cn.replaceOriEmojiCode());
+					}
+
 					updateEditRoomPage();
-					checkIsSendEditDone(true);
-					// editBtn.show();
+					popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+
 				});
 	    	}
 	    })
@@ -2181,10 +2203,10 @@ $(function(){
 		// //修改成員
 		// page.find(".preview-add").off("click").click( editMember );
 
-		//修改聊天室圖片
-		page.find(".newChatDetail .img").off("click").click( function(){
-			page.find(".newChatDetail .file").trigger("click");
-		});
+		// //修改聊天室圖片
+		// page.find(".newChatDetail .img").off("click").click( function(){
+		// 	page.find(".newChatDetail .file").trigger("click");
+		// });
 
 		// page.find(".chatroomImage img").off("click").click( function(){
 		// 	page.find(".chatroomImage .file").trigger("click");
@@ -2192,7 +2214,7 @@ $(function(){
 		// page.find(".newChatDetail .file").change( changeRoomImage );
 
 		// //完成
-		page.find(".edit-nextStep").off("click").click( onComfirmEditRoom );
+		// page.find(".edit-nextStep").off("click").click( onComfirmEditRoom );
 
 		// //back confirm
 	 //    page.find('.page-back').off("click").click( function(e){
@@ -2212,21 +2234,21 @@ $(function(){
 	 //    });
 
 	    //name input event
-	    page.find(".newChatDetail table .input").keyup( function(){
-	    	var comfirmDom = page.find(".edit-nextStep");
-	    	var input = $(this);
-	    	var val = input.val();
-	    	if( val != input.data("oriName") ){
-	    		if(!val || val.length==0 ){
-	    			comfirmDom.data("nameEdited",false);
-	    		} else {
-	    			comfirmDom.data("nameEdited",true);
-	    		}
-	    	} else{
-	    		comfirmDom.removeData("nameEdited");
-	    	}
-	    	checkIsReady();
-	    });
+	    // page.find(".newChatDetail table .input").keyup( function(){
+	    // 	var comfirmDom = page.find(".edit-nextStep");
+	    // 	var input = $(this);
+	    // 	var val = input.val();
+	    // 	if( val != input.data("oriName") ){
+	    // 		if(!val || val.length==0 ){
+	    // 			comfirmDom.data("nameEdited",false);
+	    // 		} else {
+	    // 			comfirmDom.data("nameEdited",true);
+	    // 		}
+	    // 	} else{
+	    // 		comfirmDom.removeData("nameEdited");
+	    // 	}
+	    // 	checkIsReady();
+	    // });
 	}
 
 	/**
@@ -2295,7 +2317,6 @@ $(function(){
 			var memListString = btn.data("object_str");
 			var data = {};
 			data.cn = page.find(".newChatDetail table .input").val();
-			var isSendMem = false;
 			try {
 				cns.debug(memListString);
 				var memList = $.parseJSON(memListString);
@@ -2314,12 +2335,10 @@ $(function(){
 				}
 				if (addList.length > 0) {
 					data.add = {gul:addList};
-					isSendMem = true;
 				}
 
 				if (removeList.length > 0) {
 					data.del = {gul:removeList};
-					isSendMem = true;
 				}
 			} catch (e) {
 				cns.debug("[!]" + e.message);
@@ -2369,14 +2388,15 @@ $(function(){
 		// comfirmDom.removeData("memEdited");
 		// comfirmDom.removeData("nameEdited");
 		popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+
 		//$.popPage();
 
 		//叫主視窗更新聊天室列表
-		if (window.opener) {
-			var dom = $(window.opener.document).find("#recv-sync-chat-list");
-			dom.attr("data-gi",gi);
-			dom.trigger("click");
-		}
+		// if (window.opener) {
+		// 	var dom = $(window.opener.document).find("#recv-sync-chat-list");
+		// 	dom.attr("data-gi",gi);
+		// 	dom.trigger("click");
+		// }
 	}
 
 	/**
@@ -2403,7 +2423,6 @@ $(function(){
 				min_count: 1
 			});
 
-
 			$("#page-chat").addClass("transition");
 			showSelectMemPage($("#pagesContainer"), btn, function () {
 				}, function (isDone) {
@@ -2413,19 +2432,49 @@ $(function(){
 							cns.debug(memListString);
 							var memList = $.parseJSON(memListString);
 							memList[g_group.gu] = g_group.guAll[g_group.gu].nk;
-							var newMemlist = {};
-							for (var guTmp in memList) {
-								if( g_group.guAll.hasOwnProperty(guTmp) ){
-									newMemlist[guTmp] = g_group.guAll[guTmp];
+
+							var data = {add:{gul:[]}, del:{gul:[]}};
+			
+							var addList = [];
+							var removeList = [];
+							for (var gu in memList) {
+								if (!g_room.memList.hasOwnProperty(gu)) {
+									g_room.memList[gu] = {
+										ad: 0,
+										gu: gu
+									}
+									data.add.gul.push(gu);
 								}
 							}
-							updateEditRoomMember( newMemlist );
-							$("#page-edit-preview .edit-nextStep").data("memEdited", true);
-							checkIsReady();
+
+							for (var gu in g_room.memList) {
+								if (!memList.hasOwnProperty(gu)) {
+									delete g_room.memList[gu];
+									data.del.gul.push(gu);
+								}
+							}
+
+							var updateMemberAPI = new QmiAjax({
+						        apiName: "/groups/" +gi + "/chats/" + ci,
+						        method: "put",
+						        body: data,
+						    });
+							
+							updateMemberAPI.complete(function (dataTmp) {
+								var count = Object.keys(memList).length;
+								var newMemList = g_room.memList;
+								g_room.cpc = Object.keys(memList).length;
+								QmiGlobal.operateChatList.roomUpdateNumberOfMember(ci, count);
+								$("#header span.count").html("(" + count + ")");
+								updateChat();
+								updateEditRoomMember(newMemList);
+
+								popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+							});
+
 						} catch(e){
 							errorReport(e);
 						}
-						
 					}
 					setTimeout(function () {
 						// checkPagePosition();

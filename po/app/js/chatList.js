@@ -71,7 +71,7 @@ function updateChatList( giTmp, extraCallBack ){
 	chatListDom.find(".loading").show();
 	chatListDom.find(".rows").html("");
 	chatListDom.find(".top-chatList").hide("");
-
+	$(".top-chatList .list").html("");
 	var currentGroup = QmiGlobal.groups[giTmp];
 	if( !currentGroup )	return;
 
@@ -181,7 +181,6 @@ function updateChatList( giTmp, extraCallBack ){
 	show chat list data from local storage
 **/
 function showChatList(){
-	console.log("hehehe");
 	var groupData = QmiGlobal.groups[gi];
 	if( null==groupData ) return;
 	var chatList = groupData.chatAll;
@@ -359,8 +358,36 @@ function openChatWindow ( giTmp, ci ){
 			groups: 	window.QmiGlobal.groups,
 			clouds: 	window.QmiGlobal.clouds,
 			cloudGiMap: window.QmiGlobal.cloudGiMap,
-		}
+		};
+		windowList[ci].chatList = {
+			roomAddTop : function (chatroomId) {
+				var chatListDiv = $(".subpage-chatList");
+				var topListDom = $(".top-chatList .list");
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
+				chatroomDom.appendTo(topListDom);
+			},
+			roomDeleteTop : function (chatroomId) {
+				var chatListDiv = $(".subpage-chatList");
+				var unTopListDom = chatListDiv.find(".rows");
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
+				chatroomDom.appendTo(unTopListDom);
+			},
+			roomRename : function (chatroomId, newName) {
+				var chatroomDom = $(".subpage-chatList").find("[data-rid='" + chatroomId +"']");
+				var numberOfRoomMember = QmiGlobal.groups[gi].chatAll[chatroomId].cpc;
+				chatroomDom.find(".name").html(newName + " (" + numberOfRoomMember + ")");
+			},
+			roomUpdatePhoto : function (chatroomId, newImgUrl) {
+				var chatroomDom = $(".subpage-chatList").find("[data-rid='" + chatroomId +"']");
+				chatroomDom.find("img").attr("src", newImgUrl);
+			},
 
+			roomUpdateNumberOfMember : function (chatroomId, number) {
+				var chatroomDom = $(".subpage-chatList").find("[data-rid='" + chatroomId +"']");
+				var roomName = QmiGlobal.groups[gi].chatAll[chatroomId].cn;
+				chatroomDom.find(".name").html(roomName + " (" + number + ")");
+			}
+		}
 	}
 	windowList[ci].focus();
 }

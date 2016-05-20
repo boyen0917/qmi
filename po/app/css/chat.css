@@ -187,7 +187,7 @@ body {
 /* chat.js video will change this height when playing */
 .ui-container {
 	/*margin: 40px auto 0; */
-	overflow-y: scroll;
+	overflow-y: auto;
 	overflow-x: hidden;
 	/* padding: 70px 0; */
 	/* top: 40px; */
@@ -1113,7 +1113,7 @@ body {
 	width: 70%;
 	max-height: 100px;
 	text-overflow: ellipsis;
-	overflow: scroll;
+	overflow-y: auto;
 	min-height: 30px;
 	color: #4092ef;
 	position: relative;
@@ -1187,12 +1187,11 @@ body {
 	white-space: nowrap;
 }
 
-
 .obj-cell-area {
 	z-index: 1;
 	position: fixed;
 	width: 100%;
-	overflow: scroll;
+	overflow-y: auto;
 	height: 100%;
 	background: white;
 }
@@ -1510,7 +1509,7 @@ body {
 
 
 #page-edit-preview .ui-container {
-	height: -webkit-calc( 100vh - 135px );
+	height: -webkit-calc( 100vh - 70px );
 }
 #page-edit-preview .newChatDetail-header{
 	cursor: default;
@@ -1601,6 +1600,7 @@ body {
 
 .assignAdmin {
 	margin-left: -15px;
+	min-height: -webkit-calc(100vh - 304px);
 }
 
 .inviteSetting h4{
