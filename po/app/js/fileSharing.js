@@ -244,7 +244,8 @@ FileSharing.prototype = {
 			}
 		})).then(function(data){
 			cns.debug("when data 1",data);
-			return (new QmiAjax({
+			var dataObj = JSON.parse(data.responseText);
+			new QmiAjax({
 				apiName: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 				method: "post",
 				body: {
@@ -255,10 +256,10 @@ FileSharing.prototype = {
 					}, 
 					ml: [
 						{
-							fi: data.fi,
+							fi: dataObj.fi,
 							ftp: 1,
 							fn: folderName,
-							ln: { ti:data.ln.ti},
+							ln: { ti:dataObj.ln.ti},
 							tp: 26 
 						}
 					]
@@ -266,7 +267,7 @@ FileSharing.prototype = {
 				error: function(data){
 					deferred.reject({response:data,api:2});
 				}
-			})).then(function(data){
+			}).then(function(data){
 				deferred.resolve(data);
 			});
 		});
