@@ -14,14 +14,6 @@ var ui,
 	//HiCloud
  	base_url = "https://ap.qmi.emome.net/apiv1/";
 
-	//local測試 預設開啟console
-	debug_flag = false;
-	if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
-		debug_flag = true;
-		base_url = "https://qaap.qmi.emome.net/apiv1/";
-		// base_url = "https://apserver.mitake.com.tw/apiv1/";
-	};
-
  	// container riseNotification 一旦換網址就沒了
 
 var userLang = navigator.language || navigator.userLanguage; 
