@@ -63,8 +63,9 @@
 .contact-search .hintDiv .text{
 	vertical-align: middle;
 }
-.contact-search .content{
-}
+
+.contact-search .content{ line-height: 42px; }
+
 .contact-search .content .icon{
 	width: 28px;
     position: absolute;
