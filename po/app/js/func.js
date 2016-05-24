@@ -8,6 +8,7 @@ setGroupInitial = function(new_gi,chk){
     //sidemenu user
     setSmUserData(gi,gu,gn);
 
+
     //header 設定團體名稱
     $(".header-group-name div:eq(1)").html(gn);
     
@@ -19,7 +20,6 @@ setGroupInitial = function(new_gi,chk){
     else
         groupMenuListArea(true).always(function(){ deferred.resolve(); })
         
-
     //做團體列表、top event
     $.when(deferred.promise(),topEvent()).done(function(){
 
@@ -349,6 +349,7 @@ timelineChangeGroup = function (thisGi) {
         comboDeferred.resolve();
     }
 
+
     comboDeferred.done(function(){
         //指定gi
         setThisGroup(thisGi);
@@ -362,6 +363,9 @@ timelineChangeGroup = function (thisGi) {
         //置頂設定
         topEvent();
 
+        if (QmiGlobal.groups[thisGi].set && QmiGlobal.groups[thisGi].set.ccc) {
+            onRemoveChatDB(thisGi, QmiGlobal.groups[thisGi].set.ccc);
+        }
         //切換團體時, 選目前第一個選項
         var tmp = $(".sm-small-area:visible");
         if( tmp.length>0 ){
@@ -803,8 +807,6 @@ topEvent = function (){
                             i18Ttl = "FEED_REPORT";
                             break;
                     }
-
-
 
                     this_top_event.find(".st-top-event-r-ttl span").html($.i18n.getString(i18Ttl));
                     this_top_event.find(".st-top-event-r-ttl").append(val.meta.tt);
@@ -1434,14 +1436,18 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
                         break;
                     case 21:
                         var mainReplyText = this_content[0].firstChild.textContent;
-                        var findText = "///;" + val.u + ";///";
-                        var markTag = "<b name='" + val.u + "'>" + val.n + "</b>";
-                        mainReplyText = mainReplyText.replace(findText, markTag);
+                        if (typeof(mainReplyText) == 'string' && mainReplyText) {
+                            mainReplyText = mainReplyText.qmiTag(val);
+                        }
                         this_content[0].firstChild.textContent = "";
                         this_content.prepend(mainReplyText);
 
                         break;
                 }
+            });
+            
+            this_event.find("b").bind("click", function(e) {
+                userInfoShow(gi, $(e.target).attr("name"));
             });
 
             //已有的留言就不製作
@@ -5559,10 +5565,11 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 end_time_chk = true;
                 break;
             case 21:
+                var parseText = '';
                 var mainContext = this_event.find(target_div).html();
-                var findText = "///;" + val.u + ";///";
-                var markTag = "<b name='" + val.u + "'>" + val.n + "</b>";
-                mainContext = mainContext.replace(findText, markTag);
+                if (typeof(mainContext) == 'string') {
+                    mainContext = mainContext.qmiTag(val);
+                }
                 this_event.find(target_div).html(mainContext);
                 this_event.find(target_div + "-detail").html(mainContext);
 
@@ -5585,6 +5592,10 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 }
                 break;
         };
+
+        this_event.find("b").bind("click", function(e) {
+            userInfoShow(gi, $(e.target).attr("name"));
+        });
         
         //需要填入結束時間 以及 結束時間存在 就填入
         if(end_time_chk){
@@ -7315,6 +7326,13 @@ pollingCmds = function(newPollingData){
                     case 12://delete group
                         removeGroup( item.pm.gi );
                         break;
+
+                    case 52:
+                        QmiGlobal.groups[item.pm.gi].set.ccc = item.pm.gcc;
+                        if (item.pm.gcc > 0) {
+                            onRemoveChatDB(item.pm.gi, item.pm.gcc);
+                        }
+                        break;
                 }
             });
 
@@ -8681,6 +8699,52 @@ goToGroupMenu = function(){
     
     $.mobile.changePage("#page-group-menu");
 }
+
+// 啟動timer, 每天半夜12點去每個團體檢查和刪除indexDB內的聊天訊息
+function activateClearChatsTimer(){
+    var counter = -1;
+    var now = new Date();
+    var dueTime = new Date();
+    // dueTime.setDate(dueTime.getDay() + 2);
+    dueTime.setHours(00);
+    dueTime.setMinutes(00);
+    dueTime.setSeconds(00);
+
+    if (dueTime - now > 0) {
+        counter = dueTime - now;
+    } else {
+        counter = dueTime - now + 86400000;
+    }
+    console.log(counter);
+    var allGroupData = QmiGlobal.groups;
+    $.each(allGroupData, function (groupID, groupData){
+        if (groupData.set && groupData.set.ccc) {
+            onRemoveChatDB(groupID, groupData.set.ccc);
+        }
+    });
+
+    clearChatTimer = setTimeout(activateClearChatsTimer, counter);
+
+};
+
+// stopClearChatsTimer = function() {
+//     clearTimeout(clearChatTimer);
+// }
+
+// checkChatMsgExpired = function() {
+//     console.log("test12");
+
+//     stopClearChatsTimer();
+//     var groupData = QmiGlobal.groups[gi];
+//     console.log(groupData);
+//     if (groupData.set) {
+//         var clearChatCycle = groupData.set.ccc;
+//         if (clearChatCycle > 0) {
+//             console.log(clearChatCycle);
+//             activateClearChatsTimer();
+//         }
+//     }
+// }
 
 /*
           ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          

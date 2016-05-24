@@ -153,6 +153,8 @@ function onChatReceiveMsg ( tmp_gi, tmp_ci, tmp_cn, msgs, callback ){
 			    ct: object.meta.ct,
 			    data: object
 			};
+
+			
 			//write msg to db
 			// if( !g_idb_chat_msgs.get(object.ei) ){
 				var tmp = g_idb_chat_msgs.put( node, function(eiTmp){
@@ -248,4 +250,56 @@ function onReceivePollingChatCnt ( ccs ){
 			}
 		}
 	}
+}
+
+
+// 根據刪除的範圍和團體ID來刪除DB內的聊天記錄
+function onRemoveChatDB(groupID, days) {
+	// console.log(groupID);
+	// // var timestamop = QmiGlobal.groups[gi].set.ccc;
+	// var groupID = groupID || gi;
+	// var days = days || QmiGlobal.groups[gi].set.ccc;
+	// console.log(groupID);
+	// console.log(days);
+	
+	var onItem = function (item) {
+  		// console.log('got item:', item.ct);
+  		var date = new Date();
+  		date.setHours(00);
+  		date.setMinutes(00);
+  		date.setSeconds(00);
+  		var onsuccess = function(result){
+			if(result !== false){
+			    console.log('deletion successful!');
+			}
+		}
+		var onerror = function(error){
+		  	console.log('Oh noes, sth went wrong!', error);
+		}
+		
+		// if (groupID && days){
+		if(((date - item.ct) > (days * 86400000)) && (item.gi === groupID)) {
+  			console.log(item.ei);
+  			console.log(new Date(item.ct));
+  			g_idb_chat_msgs.remove(item.ei, onsuccess, onerror)
+  		}
+		// } else {
+		// 	var allGroupData = QmiGlobal.groups;
+		// 	for(var index in allGroupData){
+		// 		console.log
+		// 	}
+		// }
+		// console.log("ddwdwqqd");
+  		
+	};
+
+	var onEnd = function (item) {
+  		console.log('All done.');
+	};
+
+	g_idb_chat_msgs.iterate(onItem, {
+		index: 'gi_ci_ct',
+		filterDuplicates: true,
+		onEnd: onEnd
+	});
 }

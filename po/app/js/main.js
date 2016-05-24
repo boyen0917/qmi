@@ -5,7 +5,6 @@ $(function(){
 
 	var refreshChk = false;
 
-
 	$(".page-group-name").click(function(){
 		$(".cp-post").trigger("click");
 	});
