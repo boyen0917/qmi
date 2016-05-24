@@ -387,7 +387,6 @@ onCheckVersionDone = function(needUpdate){
         });
     }
 
-
 	getPrivateGroupList = function(p_data, callback){
     	//取得團體列表
         var api_name = "groups";
