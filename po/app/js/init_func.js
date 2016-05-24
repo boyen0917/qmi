@@ -82,6 +82,9 @@ $(function(){
                     //用在contact.js 不知道為何
                     if( thisGuObj.st === 0) inviteGuAll[thisGuObj.gu] = thisGuObj;
 
+                    if(thisGuObj.nk !== undefined)
+                        thisGuObj.nk = thisGuObj.nk._escape();
+
                     groupData.guAll[thisGuObj.gu] = thisGuObj;
                 }
                 groupData.inviteGuAll = inviteGuAll;

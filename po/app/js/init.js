@@ -17,10 +17,23 @@ var ui,
  	// base_url = "https://ap.qmi.emome.net/apiv1/";
  	base_url = "https://apserver.mitake.com.tw/apiv1/";
  	
- 	// container riseNotification 一旦換網址就沒了
+ 	// // container riseNotification 一旦換網址就沒了
 
 var userLang = navigator.language || navigator.userLanguage; 
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
+
+
+String.prototype._escape = function(){
+    return this.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+String.prototype.qmiTag = function (tagMember) {
+	var findText = "///;" + tagMember.u + ";///";
+	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
+
+	return this.replace(findText, markTag);
+}
+
 
 if( 0==userLang.indexOf("zh") ){
 	if( userLang=="zh_cn" ){
@@ -41,13 +54,6 @@ var content_limit = 400,
 	//部分跳頁不需要記錄
 	back_exception = false,
 	back_hash = false;
-
-String.prototype.qmiTag = function (tagMember) {
-	var findText = "///;" + tagMember.u + ";///";
-	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
-
-	return this.replace(findText, markTag);
-}
 
 
 //上一頁 預設

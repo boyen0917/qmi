@@ -408,21 +408,6 @@ onCheckVersionDone = function(needUpdate){
         });
     }
 
-    getPrivateGroupFromList = function( data, callback ){
-    	if( !data || data.length==0 ){
-    		if(callback) callback();
-    	}
-    	var cnt = 0;
-    	for( var i=0; i<data.length; i++ ){
-    		var p_data = data[i];
-	    	getPrivateGroupList(p_data ,function(res){
-	    		cnt++;
-	    		if(callback && cnt==data.length){
-	    			callback();
-	    		}
-	    	});
-	    }
-    }
 /*	
 
 
@@ -1127,7 +1112,7 @@ onCheckVersionDone = function(needUpdate){
 		if( logoClickCnt>=10 ){
 			logoClickCnt = 0;
 			if( clearCache() ){
-				alert("succ");
+				// alert("succ");
 			}
 		}
 	});
