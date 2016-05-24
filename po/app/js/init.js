@@ -42,6 +42,14 @@ var content_limit = 400,
 	back_exception = false,
 	back_hash = false;
 
+String.prototype.qmiTag = function (tagMember) {
+	var findText = "///;" + tagMember.u + ";///";
+	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
+
+	return this.replace(findText, markTag);
+}
+
+
 //上一頁 預設
 // $(document).data("page-history",[["login"],["#page-group-menu","團體列表"]]);
 $(document).data("page-history",[["",""]]);

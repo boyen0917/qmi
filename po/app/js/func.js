@@ -1436,14 +1436,18 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
                         break;
                     case 21:
                         var mainReplyText = this_content[0].firstChild.textContent;
-                        var findText = "///;" + val.u + ";///";
-                        var markTag = "<b name='" + val.u + "'>" + val.n + "</b>";
-                        mainReplyText = mainReplyText.replace(findText, markTag);
+                        if (typeof(mainReplyText) == 'string' && mainReplyText) {
+                            mainReplyText = mainReplyText.qmiTag(val);
+                        }
                         this_content[0].firstChild.textContent = "";
                         this_content.prepend(mainReplyText);
 
                         break;
                 }
+            });
+            
+            this_event.find("b").bind("click", function(e) {
+                userInfoShow(gi, $(e.target).attr("name"));
             });
 
             //已有的留言就不製作
@@ -5561,10 +5565,11 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 end_time_chk = true;
                 break;
             case 21:
+                var parseText = '';
                 var mainContext = this_event.find(target_div).html();
-                var findText = "///;" + val.u + ";///";
-                var markTag = "<b name='" + val.u + "'>" + val.n + "</b>";
-                mainContext = mainContext.replace(findText, markTag);
+                if (typeof(mainContext) == 'string') {
+                    mainContext = mainContext.qmiTag(val);
+                }
                 this_event.find(target_div).html(mainContext);
                 this_event.find(target_div + "-detail").html(mainContext);
 
@@ -5587,6 +5592,10 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 }
                 break;
         };
+
+        this_event.find("b").bind("click", function(e) {
+            userInfoShow(gi, $(e.target).attr("name"));
+        });
         
         //需要填入結束時間 以及 結束時間存在 就填入
         if(end_time_chk){

@@ -409,12 +409,19 @@ showAlertContent = function(data){
 			    var extra = $(tmpDiv).find(".al-extra");
 				extra.css("display","none");
 				if( boxData.nd.hasOwnProperty("ml") ){
+					var mainContext;
 					for( var j=0; j<boxData.nd.ml.length; j++){
-						if( boxData.nd.ml[j].tp==0 && boxData.nd.ml[j].c.length>0 ){
+						if( boxData.nd.ml[j].tp == 0 && boxData.nd.ml[j].c.length ){
+							mainContext = boxData.nd.ml[j].c.replaceOriEmojiCode();
 							extra.html( boxData.nd.ml[j].c.replaceOriEmojiCode() );
 							extra.css("display","");
-							break;
+							// break;
+						} else if (boxData.nd.ml[j].tp == 21) {
+							if (typeof(mainContext) == 'string' && mainContext) {
+								mainContext = mainContext.qmiTag(boxData.nd.ml[j]);
+							}
 						}
+						extra.html(mainContext);
 					}
 				}
 

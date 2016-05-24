@@ -613,96 +613,6 @@ $(function(){
 		sendMsgRead(new Date().getTime())
 	});
 
-	/**
-	              ███████╗██╗   ██╗███╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗          
-	              ██╔════╝██║   ██║████╗  ██║██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║          
-	    █████╗    █████╗  ██║   ██║██╔██╗ ██║██║        ██║   ██║██║   ██║██╔██╗ ██║    █████╗
-	    ╚════╝    ██╔══╝  ██║   ██║██║╚██╗██║██║        ██║   ██║██║   ██║██║╚██╗██║    ╚════╝
-	              ██║     ╚██████╔╝██║ ╚████║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║          
-	              ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝          
-	**/
-
-	/**
-	檢查目前位置, 離開底部時顯示回到底部button
-	**/
-	function updateChatContentPosition() {
-		var staus = (0 == g_extraInputStatus);
-		if ($(".input").data("h") != $(".input").innerHeight()
-			|| $(".input").data("staus") != staus) {
-			// cns.debug( $(".input").data("h"), $(".input").innerHeight() );
-			$(".input").data("h", $(".input").innerHeight());
-			$(".input").data("staus", staus);
-			var tmp = staus ? 200 : 0;
-			var footerHeight = $("#footer").height();
-			footerHeight -= tmp;
-			$("#chat-contents").stop().animate({marginBottom: footerHeight - 40}, 100);
-			$("#chat-toBottom").animate({bottom: Math.max(0, footerHeight + 10)}, 100);
-		}
-	}
-
-	/**
-	高度改變時調整內容高度
-	**/
-	function resizeContent() {
-		var tmp = (0 == g_extraInputStatus) ? 200 : 0;
-		// cns.debug( $( window ).height(), $("#header").height(), $("#chat-loading").height());
-		$("#container").css("min-height",
-			$(window).height()
-			- $("#header").height()
-			- ($("#footer").height() - tmp)
-			+ $("#chat-loading").height()
-		);
-	}
-
-	/**
-	聊天室DB初始化完成後callback
-	**/
-	function onChatDBInit() {
-		// cns.debug("-------- onChatDBInit ---------");
-		var today = new Date();
-		$("#chat-contents").html("<div class='firstMsg'></div>");
-		var timeTag = $("<div class='chat-date-tag'></div>");
-		// timeTag.addClass( today.customFormat("_#YYYY#_#MM#_#DD#") );
-		timeTag.data("time", today.getTime());
-		timeTag.html(getFormatTimeTag(today));
-		today.setHours(0);
-		today.setMinutes(0);
-		today.setSeconds(0);
-		var lastMsg = $("<div class='lastMsg'></div>");
-		lastMsg.data("time", today.getTime());
-		lastMsg.append(timeTag);
-		$("#chat-contents").append(lastMsg);
-		$("#chat-contents").append("<div class='tmpMsg'></div>");
-		// getHistoryMsg( false );
-
-		scrollToBottom();
-
-=======
-	registerEditRoomEvent();
-
-	//apply nicescroll
-	var container = $("#container");
-	// container.niceScroll({
-	// 	// styler:"fb",
-	// 	cursorcolor: "rgba(210, 210, 210, 0.8)",
-	// 	cursorwidth: '8',
-	// 	cursorborderradius: '10px',
-	// 	background: 'rgba(255,255,255,0)',
-	// 	cursorborder: "",
-	// 	boxzoom: false
-	// 	// zindex: 999
-	// 	// horizrailenabled: false,
-	// 	// ,autohidemode: "leave"
-	// });
-	// var niceScrollTmp = container.getNiceScroll()[0];
-	// niceScrollTmp.onDragToTop = onDragContainer;
-
-	
-
-	updateChat(null,true);
-	sendMsgRead(new Date().getTime())
-});
-
 /**
               ███████╗██╗   ██╗███╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗          
               ██╔════╝██║   ██║████╗  ██║██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║          
@@ -798,6 +708,8 @@ function onChatDBInit() {
 
 }
 
+
+
 /**
 show history chat contents
 **/
@@ -805,176 +717,166 @@ function getHistoryMsg(bIsScrollToTop) {
 	if (g_isLoadHistoryMsgNow) {
 		cns.debug("!");
 		return;
->>>>>>> Stashed changes
 	}
+	var container = $("#container");
+	// $("#container").off("scroll");
 
-	/**
-	show history chat contents
-	**/
-	function getHistoryMsg(bIsScrollToTop) {
-		if (g_isLoadHistoryMsgNow) {
-			cns.debug("!");
-			return;
-		}
-		var container = $("#container");
-		// $("#container").off("scroll");
+	g_isLoadHistoryMsgNow = true;
+	// cns.debug("g_isLoadHistoryMsgNow",g_isLoadHistoryMsgNow);
+	$("#chat-loading-grayArea").hide();
+	$("#chat-loading").show();
+	cns.debug("----- getHistoryMsg", bIsScrollToTop, " ------");
+	g_idb_chat_msgs.limit(function (list) {
+		var firstDayDiv = $("#chat-contents .chat-date-tag");
+		var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
+		setCurrentFocus( (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null );
+		
+		//add red border to fist dom to test current position
+		// $(".sdfsfg").removeClass("sdfsfg").css("border", "");
+		// g_currentScrollToDom.addClass("sdfsfg").css("border", "1px solid red");
 
-		g_isLoadHistoryMsgNow = true;
-		// cns.debug("g_isLoadHistoryMsgNow",g_isLoadHistoryMsgNow);
-		$("#chat-loading-grayArea").hide();
-		$("#chat-loading").show();
-		cns.debug("----- getHistoryMsg", bIsScrollToTop, " ------");
-		g_idb_chat_msgs.limit(function (list) {
-			var firstDayDiv = $("#chat-contents .chat-date-tag");
-			var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
-			setCurrentFocus( (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null );
-			
-			//add red border to fist dom to test current position
-			// $(".sdfsfg").removeClass("sdfsfg").css("border", "");
-			// g_currentScrollToDom.addClass("sdfsfg").css("border", "1px solid red");
-
-			//cns.debug("list:",JSON.stringify(list,null,2));
-			if (list.length > 0) {
-				//list is from near to far day
-				for (var i in list) {
-					if (null == list[i] || null == list[i].ei || g_msgs.indexOf(list[i].ei) >= 0) {
-						continue;
-					} else {
-						var object = list[i].data;
-						showMsg(object, null);
-					}
-				}
-				if (isUpdatePermission) getPermition(true);
-
-
-				if (bIsScrollToTop) {
-					g_isLoadHistoryMsgNow = false;
+		//cns.debug("list:",JSON.stringify(list,null,2));
+		if (list.length > 0) {
+			//list is from near to far day
+			for (var i in list) {
+				if (null == list[i] || null == list[i].ei || g_msgs.indexOf(list[i].ei) >= 0) {
+					continue;
 				} else {
-
+					var object = list[i].data;
+					showMsg(object, null);
 				}
-				showChatCnt();
 			}
+			if (isUpdatePermission) getPermition(true);
 
-			if (true==g_isFirstTimeLoading) {
+
+			if (bIsScrollToTop) {
 				g_isLoadHistoryMsgNow = false;
-				//first time loading finished,
-				// scroll to bottom
-				scrollToBottom( 0 );
-
-				$("#chat-loading").hide();
-				$("#chat-loading-grayArea").show();
-				g_isFirstTimeLoading=false;
-				// g_container.getNiceScroll()[0].wheelprevented = false;
 			} else {
 
-				//舊訊息從local撈 如果小於 就去server取
-				if (list.length < 20) {
-					updateChat(g_earliestDate.getTime(), false, g_currentScrollToDom);
-				} else {
-					g_isLoadHistoryMsgNow = false;
-					hideLoading();
-				}
 			}
-			// // cns.debug("---- end loading -----");
-		}, {
-			index: "gi_ci_ct",
-			keyRange: g_idb_chat_msgs.makeKeyRange({
-				upper: [gi, ci, g_earliestDate.getTime()],
-				lower: [gi, ci]
-				// only:18
-			}),
-			limit: 20,
-			order: "DESC",
-			onEnd: function (result) {
-				cns.debug("onEnd:", result.ci + " " + result.ct);
-			},
-			onError: function (result) {
-				cns.debug("onError:", result);
-			}
-		});
-
-	}
-	/**
-	紀錄讀取歷史訊息時, 目前最上方的dom
-	**/
-	function setCurrentFocus(dom){
-		if( dom ){
-			g_currentScrollToDom = dom;
-			// cns.debug("---- start lockCurrentFocusInterval -----",g_currentScrollToDom);
-			// lockCurrentFocusInterval = setInterval( function(){
-				// g_currentScrollToDom.scrollIntoView();
-			// }, lockCurrentFocusIntervalLength );
-			// g_container.getNiceScroll()[0].wheelprevented = true;
+			showChatCnt();
 		}
-	}
-	/**
-	隱藏讀取轉轉轉
-	**/
-	function hideLoading() {
-		if (!$("#page-chat").is(":visible")
-			|| $("#page-chat").hasClass("transition")
-			|| g_isEndOfHistory) return;
 
-		cns.debug("-- hideLoading start --", g_currentScrollToDom);
-		if (g_currentScrollToDom) {
+		if (true==g_isFirstTimeLoading) {
+			g_isLoadHistoryMsgNow = false;
+			//first time loading finished,
+			// scroll to bottom
+			scrollToBottom( 0 );
+
+			$("#chat-loading").hide();
+			$("#chat-loading-grayArea").show();
+			g_isFirstTimeLoading=false;
+			// g_container.getNiceScroll()[0].wheelprevented = false;
+		} else {
+
+			//舊訊息從local撈 如果小於 就去server取
+			if (list.length < 20) {
+				updateChat(g_earliestDate.getTime(), false, g_currentScrollToDom);
+			} else {
+				g_isLoadHistoryMsgNow = false;
+				hideLoading();
+			}
+		}
+		// // cns.debug("---- end loading -----");
+	}, {
+		index: "gi_ci_ct",
+		keyRange: g_idb_chat_msgs.makeKeyRange({
+			upper: [gi, ci, g_earliestDate.getTime()],
+			lower: [gi, ci]
+			// only:18
+		}),
+		limit: 20,
+		order: "DESC",
+		onEnd: function (result) {
+			cns.debug("onEnd:", result.ci + " " + result.ct);
+		},
+		onError: function (result) {
+			cns.debug("onError:", result);
+		}
+	});
+
+}
+/**
+紀錄讀取歷史訊息時, 目前最上方的dom
+**/
+function setCurrentFocus(dom){
+	if( dom ){
+		g_currentScrollToDom = dom;
+		// cns.debug("---- start lockCurrentFocusInterval -----",g_currentScrollToDom);
+		// lockCurrentFocusInterval = setInterval( function(){
+			// g_currentScrollToDom.scrollIntoView();
+		// }, lockCurrentFocusIntervalLength );
+		// g_container.getNiceScroll()[0].wheelprevented = true;
+	}
+}
+/**
+隱藏讀取轉轉轉
+**/
+function hideLoading() {
+	if (!$("#page-chat").is(":visible")
+		|| $("#page-chat").hasClass("transition")
+		|| g_isEndOfHistory) return;
+
+	cns.debug("-- hideLoading start --", g_currentScrollToDom);
+	if (g_currentScrollToDom) {
+		if (false == g_isEndOfHistory) {
+			$("#chat-loading-grayArea").show();
+		}
+		$("#chat-loading").hide();
+		g_currentScrollToDom.scrollIntoView({behavior: "smooth"});
+		g_currentScrollToDom = null;
+		// g_container.getNiceScroll()[0].wheelprevented = false;
+		// clearInterval( lockCurrentFocusInterval );
+
+		// cns.debug("---- end lockCurrentFocusInterval -----");
+
+	} else {
+		$("#chat-loading").stop().fadeOut(function () {
 			if (false == g_isEndOfHistory) {
 				$("#chat-loading-grayArea").show();
 			}
-			$("#chat-loading").hide();
-			g_currentScrollToDom.scrollIntoView({behavior: "smooth"});
-			g_currentScrollToDom = null;
-			// g_container.getNiceScroll()[0].wheelprevented = false;
-			// clearInterval( lockCurrentFocusInterval );
-
-			// cns.debug("---- end lockCurrentFocusInterval -----");
-
-		} else {
-			$("#chat-loading").stop().fadeOut(function () {
-				if (false == g_isEndOfHistory) {
-					$("#chat-loading-grayArea").show();
-				}
-				var loading = g_container.children("#chat-loading");
-				var posi = g_container.scrollTop();
-				if (posi <= loading.height()) {
-					var content = $("#chat-contents");
-					// if( content.length>0 ){
-					// 	content[0].scrollIntoView();
-					// }
-					g_container.scrollTop(content.offset().top);
-				}
-			});
-		}
-
-	}
-
-	/**
-	統一ajax function
-	**/
-	function op(url, type, data, delegate, errorDelegate) {
-		var result = ajaxDo(url, {
-			ui: ui,
-			at: at,
-			li: lang
-		}, type, false, data);
-		result.error(function (jqXHR, textStatus, errorThrown) {
-			// // cns.log(textStatus, errorThrown);
-			if (errorDelegate) errorDelegate();
+			var loading = g_container.children("#chat-loading");
+			var posi = g_container.scrollTop();
+			if (posi <= loading.height()) {
+				var content = $("#chat-contents");
+				// if( content.length>0 ){
+				// 	content[0].scrollIntoView();
+				// }
+				g_container.scrollTop(content.offset().top);
+			}
 		});
-		result.success(function (data, status, xhr) {
-			if (delegate) delegate(data, status, xhr);
-		});
-		
-		return result;
 	}
 
-	/**
-	捲動到頂
-	**/
-	function scrollToStart() {
-		if( !g_container ) g_container = $("#container");
-		g_container.stop(false, true).animate({scrollTop: 50}, 'fast');
-		// cns.debug(" -- scrollToBottom");
-	}
+}
+
+/**
+統一ajax function
+**/
+function op(url, type, data, delegate, errorDelegate) {
+	var result = ajaxDo(url, {
+		ui: ui,
+		at: at,
+		li: lang
+	}, type, false, data);
+	result.error(function (jqXHR, textStatus, errorThrown) {
+		// // cns.log(textStatus, errorThrown);
+		if (errorDelegate) errorDelegate();
+	});
+	result.success(function (data, status, xhr) {
+		if (delegate) delegate(data, status, xhr);
+	});
+	
+	return result;
+}
+
+/**
+捲動到頂
+**/
+function scrollToStart() {
+	if( !g_container ) g_container = $("#container");
+	g_container.stop(false, true).animate({scrollTop: 50}, 'fast');
+	// cns.debug(" -- scrollToBottom");
+}
 
 	/**
 	捲動到底
