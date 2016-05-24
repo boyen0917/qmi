@@ -218,7 +218,7 @@ $(function(){
 			$("#header .count").html("(" + g_room.memCount + ")");
 		} else {
 			$("#header .count").hide();
-			$(".extra-content .btn[data-type=edit]").hide();
+			// $(".extra-content .btn[data-type=edit]").hide();
 			$(".extra-content .btn[data-type=exit]").hide();
 		}
 
@@ -2067,9 +2067,11 @@ $(function(){
 		$.each( memList , function(key, memTmp){
 
 			var mem = g_group.guAll[key];
-			var memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + "<input type='checkbox'></td></tr>");
+			var memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + "<input type='checkbox' id='admin" + key + "'>"
+				+ "<label for='admin" + key + "'></label></td></tr>");
 			if (memTmp.ad) {
-				memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + "<input type='checkbox' checked></td></tr>");
+				memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + "<input type='checkbox' checked id='admin" + key + "'>"
+					+ "<label for='admin" + key + "'></label></td></tr>");
 			}
 			var memberColumn = $("<td class='memberName'></td>");
 			if (mem.auo) {
@@ -2126,13 +2128,17 @@ $(function(){
 	    	saveBtn.addClass("ready");
 	    	adminIsChanged = true;
 	    });
-		   
+		
 	    saveBtn.click(function (e) {
 	    	e.preventDefault();
 			e.stopPropagation();
-
+			
 	    	var saveTasks = [];
+	    	var tmpMemberList = JSON.parse(JSON.stringify(g_room.memList));
+
 	    	if ($(this).hasClass("ready")) {
+
+	    		// 聊天室圖片改變，加入上傳圖片API的任務
 	    		if (imageIsChanged) {
 					var file = $(".adminSetting .file")[0].files[0];
 					if(file){
@@ -2142,15 +2148,16 @@ $(function(){
 					} 
 	    		}
 
+	    		// 聊天室名稱改變，加入聊天室名稱修改API的任務
 	    		if (nameIsChanged) {
 	    			saveTasks.push(new QmiAjax({
 				        apiName: "/groups/" +gi + "/chats/" + ci,
 				        method: "put",
 				        body: {cn: $(".chatroomNameInput").val()},
 				    }));
-					console.log("nameIsChanged");
 	    		}
 
+	    		// 管理員變動，加入指派&取消管理員API的任務
 	    		if (adminIsChanged) {
 	    			var adminCheckboxs = $(".adminCheckBox input");
 	    			var adminData = {el: [], dl: []};
@@ -2195,6 +2202,10 @@ $(function(){
 					updateEditRoomPage();
 					popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
 
+				}).fail(function (errorMsg){
+					var errText = JSON.parse(errorMsg.responseText);
+					popupShowAdjust("", errText.rsp_msg);
+					g_room.memList = tmpMemberList;
 				});
 	    	}
 	    })

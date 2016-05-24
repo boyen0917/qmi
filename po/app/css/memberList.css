@@ -11,8 +11,8 @@
 .tabObj-content{
 	/*background: #d2d2d2;*/
 	width: 100%;
-	overflow-x: scroll;
-	overflow-y: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .tabObj-tab-area{
@@ -61,7 +61,7 @@
 .tabObj-cell-area{
 	width: 100%;
 	height: -webkit-calc( 100% - 121px );
-	overflow: scroll;
+	overflow-y: auto;
 	margin-top: 55px;
 	position: fixed;
 }
