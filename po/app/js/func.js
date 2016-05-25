@@ -203,52 +203,6 @@ getMeInvite = function(){
     });
 }
 
-getPrivateInviteData = function( invite_data ){
-    var api_name = "me/invitations";
-    var headers = {
-            ui: invite_data.ui,
-            at: invite_data.at,
-            li: lang
-        };
-    var method = "get";
-    ajaxDo(api_name,headers,method,true,null,null,null,invite_data.cl).complete(function(data){
-        if(data.status == 200){
-            var invite_result =$.parseJSON(data.responseText);
-            if( invite_result.gl.length == 0 ) {
-                return false;
-            }else{
-                var invite_area = $(".gm-invite-area");
-                if( invite_area.data("cnt") ){
-                    invite_area.data("cnt", invite_area.data("cnt")+invite_result.gl.length );
-                } else {
-                    invite_area.data("cnt", invite_result.gl.length );
-                }
-                $(".gmi-coachmake").hide();
-
-                $.each(invite_result.gl,function(i,val){
-                    $(".gmi-div-area").append($('<div>').load('layout/layout.html .gmi-div',function(){
-                        var this_invite = $(this).find(".gmi-div");
-                        this_invite._i18n();
-                        this_invite.data("invite-data",val);
-                        this_invite.data("pri-invite-data",invite_data);
-                        this_invite.find(".gmi-div-data div:eq(0)").html( $.i18n.getString("GROUP_GROUP_INVITATION", "<span>"+val.gn+"</span>") );
-                        this_invite.find(".gmi-div-data div:eq(1)").html( $.i18n.getString("GROUP_MEMBERS", "<span>"+val.cnt+"</sapn>") );
-
-                        if(val.aut){
-                            this_invite.find(".gmi-div-avatar .aut").attr("src",val.aut);
-                            // this_invite.find(".gmi-div-avatar .auo").attr("src",val.auo);
-                            this_invite.find(".group-pic").data("auo",val.auo);
-                            avatarPos(this_invite.find(".gmi-div-avatar .aut"),70);
-                        }
-
-                        this_invite.find(".gmi-div-desc-area").html(val.gd);
-
-                    }));
-                });
-            }
-        }
-    });
-}
 
 agreeMeInvite = function(inviteDom){
     //私雲之後再做
@@ -6845,32 +6799,18 @@ getPrivateGroupList = function(p_data, callback){
     });
 }
 
-getPrivateGroupFromList = function( data, callback ){
-    if( !data || data.length==0 ){
-        if(callback) callback();
-    }
-    var cnt = 0;
-    for( var i=0; i<data.length; i++ ){
-        var p_data = data[i];
-        getPrivateGroupList(p_data ,function(res){
-            cnt++;
-            if(callback && cnt==data.length){
-                callback();
-            }
-        });
-    }
-}
-
 
 polling = function(){
+
+    // 開啓polling檢查機制
+    if(window.QmiPollingChk.flag === false) window.QmiPollingChk.flag = true;
 
     if(!$.lStorage("_pollingData")) 
         $.lStorage("_pollingData",{cnts: {},ts: {pt: new Date().getTime()}})
 
-    var 
-    pollingDeferred = $.Deferred(),
-    localPollingData = $.lStorage("_pollingData"),
-    publicPollingTime = localPollingData.ts.pt;
+    var pollingDeferred = $.Deferred(),
+        localPollingData = $.lStorage("_pollingData"),
+        publicPollingTime = localPollingData.ts.pt;
 
     new QmiAjax({
         url: base_url + "sys/polling?pt=" + publicPollingTime,
@@ -6907,6 +6847,7 @@ polling = function(){
                 //cmds api
                 pollingCmds(newPollingData).done(function(){
                     pollingDeferred.resolve({
+                        name: "success",
                         status: true,
                         interval: polling_interval
                     });
@@ -6916,6 +6857,7 @@ polling = function(){
         }else if(data.status == 401){
             //錯誤處理
             pollingDeferred.resolve({
+                name: "else401",
                 status: false,
                 stop: true
             });
@@ -6927,6 +6869,7 @@ polling = function(){
             cns.debug("polling err:",data);
             //失敗就少打
             pollingDeferred.resolve({
+                name: "else",
                 status: false,
                 interval: polling_interval*2
             });
@@ -6934,14 +6877,12 @@ polling = function(){
         }
     });
 
-
     pollingDeferred.done(function(resultObj){
-        if ( 
-            QmiGlobal.pollingOff === true
-            || resultObj.stop === true
-        ) {
-            // do nothing
+        // 表示polling有在更新
+        window.QmiPollingChk.cnt++;
 
+        if ( QmiGlobal.pollingOff === true || resultObj.stop === true) {
+            // do nothing
         } else {
             setTimeout(function(){
                 polling();

@@ -1,3 +1,33 @@
+var ui,		//user id
+	g_room,	//chatRoom
+	ci,		//chatRoom id
+	g_cn,	//聊天室名字
+	g_group,//group
+	at,		//access token
+	g_isEndOfPage = false,	//是否在頁面底端
+	g_isEndOfPageTime = 0,	//捲動到底部過多久時間才會把卷到底的按鈕藏起來
+	g_needsRolling = false,	//是否要卷到頁面最下方？
+	g_msgs = [],			//目前已顯示的訊息ei array
+	g_latestDate = new Date(0),		//最新訊息時間(Date)
+	g_earliestDate = new Date(),	//最舊訊息時間(Date)
+	g_isLoadHistoryMsgNow = false,	//是否正在撈舊訊息
+	g_isEndOfHistory = false,	//是否已經沒有舊訊息
+	g_extraInputStatus = 0,		//其他輸入目前狀態(0:關閉, 2:sticker)
+	pi,		//舊的權限管理機制, 目前一律帶0, permission id for this chat room
+	ti_chat,
+	isUpdatePermission = false,		//目前權限改成用使用者列表控制//是否需要重新取得permission id
+	isGettingPermissionNow = false,	//是否正在取得權限
+	isShowUnreadAndReadTime = true,	//部分團體不顯示已未讀時間
+	window_focus = true,			//目前視窗是否focus中(node webkit only)
+	g_isReadPending = false,		//視窗focus時是否需要送已讀
+	g_tu,	//target user list, 帶給server用來做神奇的s3權限管理
+	g_isFirstTimeLoading = true,	//是否第一次進聊天室	
+	g_currentScrollToDom = null,	//捲動到最上方時會讀取舊訊息, 但視窗應停留在讀取前最後一筆訊息的dom, 用此變數暫存
+	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
+	lockCurrentFocusIntervalLength = 100;	//讓視窗停留在最後一筆的interval更新時間
+
+
+
 $(function(){
 	//load language
 	updateLanguage(lang);
@@ -24,41 +54,10 @@ $(function(){
 	}
 
 	// 接收 主畫面的auth
-	window.gi = window.chatAuthData.gi;
 	QmiGlobal.auth = window.chatAuthData.auth;
 	QmiGlobal.groups = window.chatAuthData.groups;
 	QmiGlobal.clouds = window.chatAuthData.clouds;
 	QmiGlobal.cloudGiMap = window.chatAuthData.cloudGiMap;
-
-
-	var ui,		//user id
-		g_room,	//chatRoom
-		ci,		//chatRoom id
-		g_cn,	//聊天室名字
-		g_group,//group
-		at,		//access token
-		g_isEndOfPage = false,	//是否在頁面底端
-		g_isEndOfPageTime = 0,	//捲動到底部過多久時間才會把卷到底的按鈕藏起來
-		g_needsRolling = false,	//是否要卷到頁面最下方？
-		g_msgs = [],			//目前已顯示的訊息ei array
-		g_latestDate = new Date(0),		//最新訊息時間(Date)
-		g_earliestDate = new Date(),	//最舊訊息時間(Date)
-		g_isLoadHistoryMsgNow = false,	//是否正在撈舊訊息
-		g_isEndOfHistory = false,	//是否已經沒有舊訊息
-		g_extraInputStatus = 0,		//其他輸入目前狀態(0:關閉, 2:sticker)
-		pi,		//舊的權限管理機制, 目前一律帶0, permission id for this chat room
-		ti_chat,
-		isUpdatePermission = false,		//目前權限改成用使用者列表控制//是否需要重新取得permission id
-		isGettingPermissionNow = false,	//是否正在取得權限
-		isShowUnreadAndReadTime = true,	//部分團體不顯示已未讀時間
-		window_focus = true,			//目前視窗是否focus中(node webkit only)
-		g_isReadPending = false,		//視窗focus時是否需要送已讀
-		g_tu,	//target user list, 帶給server用來做神奇的s3權限管理
-		g_isFirstTimeLoading = true,	//是否第一次進聊天室	
-		g_currentScrollToDom = null,	//捲動到最上方時會讀取舊訊息, 但視窗應停留在讀取前最後一筆訊息的dom, 用此變數暫存
-		lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
-		lockCurrentFocusIntervalLength = 100;	//讓視窗停留在最後一筆的interval更新時間
-
 
 
 	/**
@@ -236,15 +235,14 @@ $(function(){
 		//press enter to send text
 		input.keypress(function (e) {
 			if (e.keyCode == '13' && !e.shiftKey) {
+				// 讓 enter 不會換行
+				e.preventDefault();
 				onClickSendChat();
-
-				input.html("");
-				// return false;
 			}
 		});
 
 		//adjust typing area height
-		input.off("keydown").keydown(function () {
+		input.off("keydown").keydown(function (e) {
 			setTimeout(updateChatContentPosition, 50);
 		});
 
