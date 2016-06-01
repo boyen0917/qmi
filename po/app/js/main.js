@@ -12,7 +12,7 @@ $(function(){
 
 	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
 		//取舊資料
-		var feed_type = $("#page-group-main").data("navi") || "00";
+		var feed_type = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
 
 		//判斷沒資料的元件存在時 就不動作
@@ -22,6 +22,7 @@ $(function(){
 		var last_event = this_navi.find(".st-sub-box").last();
 		
 		if(last_show_event.length){
+
 			var bottom_height = $(window).scrollTop() + $(window).height();
 			var last_height = last_show_event.offset().top + last_show_event.height() + 25;
 
@@ -1261,7 +1262,6 @@ $(function(){
 		}
 
 	});
-
 
 	$(".cp-file").change(function(e) {
 

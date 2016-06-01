@@ -278,7 +278,6 @@ $(function(){
 
     updateTab = function(thisGi){
         var groupData = QmiGlobal.groups[thisGi];
-
         try{
             var tabHtml = '<div class="sm-small-area"><div class="sm-small-area-r"></div></div>';
 

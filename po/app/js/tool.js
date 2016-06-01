@@ -884,22 +884,33 @@ showGallery = function( this_gi, this_ti, gallery_arr, startIndex, title, isWate
     } else {
         gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
         $(document).data("gallery", gallery);
-        $(gallery.document).ready(function(){
-            setTimeout(function(){
-                gallery.ui = ui;
-                gallery.at = at;
-                gallery.lang = lang;
-                gallery.this_gi = this_gi;
-                gallery.this_ti = this_ti;
-                gallery.list = gallery_arr;
-                gallery.startIndex = startIndex;
-                gallery.title = title;
-                gallery.isWatermark = isWatermark;
-                gallery.watermarkText = watermarkText;
-                var dataDom = $(gallery.document).find(".dataDom");
-                dataDom.click();
-            },1000);
-        });
+
+        gallery.ui = ui;
+        gallery.at = at;
+        gallery.lang = lang;
+        gallery.this_gi = this_gi;
+        gallery.this_ti = this_ti;
+        gallery.list = gallery_arr;
+        gallery.startIndex = startIndex;
+        gallery.title = title;
+        gallery.isWatermark = isWatermark;
+        gallery.watermarkText = watermarkText;
+        // $(gallery.document).ready(function(){
+        //     setTimeout(function(){
+        //         gallery.ui = ui;
+        //         gallery.at = at;
+        //         gallery.lang = lang;
+        //         gallery.this_gi = this_gi;
+        //         gallery.this_ti = this_ti;
+        //         gallery.list = gallery_arr;
+        //         gallery.startIndex = startIndex;
+        //         gallery.title = title;
+        //         gallery.isWatermark = isWatermark;
+        //         gallery.watermarkText = watermarkText;
+        //         var dataDom = $(gallery.document).find(".dataDom");
+        //         dataDom.click();
+        //     },0);
+        // });
     }
 }
 

@@ -28,7 +28,7 @@ $(document).ready(function(){
 		mousescrollstep: 40
 		// horizrailenabled: false,
 		// ,autohidemode: "leave"
-	} );
+	});
 });
 
 // getBranchMemCnt = function(bl){
@@ -731,7 +731,7 @@ generateMemberGrid = function( memObject ){
 		}
 		//"<div class='img' style='background-image:url("+mem.aut+");'><div class='new' style='display:none;'>NEW</div></div>");
 		
-		var tmp = memContainer.find(".img.waitLoad:lt(30)");
+		var tmp = memContainer.find(".img.waitLoad:lt(108)");
 		$.each(tmp, function(index,domTmp){
 			var dom = $(domTmp);
 			dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
