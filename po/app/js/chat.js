@@ -876,627 +876,627 @@ function scrollToStart() {
 	// cns.debug(" -- scrollToBottom");
 }
 
-	/**
-	捲動到底
-	**/
-	function scrollToBottom( milisecond ) {
-		if( !g_container ) g_container = $("#container");
-		if( milisecond === undefined ) milisecond = 0;
+/**
+捲動到底
+**/
+function scrollToBottom( milisecond ) {
+	if( !g_container ) g_container = $("#container");
+	if( milisecond === undefined ) milisecond = 0;
 
-		g_container.stop(false, true).animate({scrollTop: $("#chat-contents").height()}, milisecond);
-		g_isEndOfPage = true;
-		// cns.debug(" -- scrollToBottom");
+	g_container.stop(false, true).animate({scrollTop: $("#chat-contents").height()}, milisecond);
+	g_isEndOfPage = true;
+	// cns.debug(" -- scrollToBottom");
+}
+
+/**
+檢查捲動位置
+**/
+function checkPagePosition() {
+	if (!$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition")) return;
+
+	var currentTime = new Date().getTime();
+	if (currentTime >= g_isEndOfPageTime) {
+		if (g_container.length > 0) {
+			var posi = g_container.scrollTop();
+			var height = g_container.height();
+			var docHeight = g_container[0].scrollHeight;
+			var isAtBottom = ((posi + height + 35) >= docHeight);
+			// cns.debug(isAtBottom, posi, height, docHeight);
+
+			if (isAtBottom) $("#chat-toBottom").fadeOut('fast');
+			else $("#chat-toBottom").fadeIn('fast');
+			g_isEndOfPage = isAtBottom;
+		}
+		g_isEndOfPageTime = currentTime + 1000;
+	}
+}
+
+function getMemberData(groupUI) {
+	if (!g_group["guAll"][groupUI])    return null;
+
+	return g_group["guAll"][groupUI];
+}
+
+function getMemberName(groupUI) {
+	var mem = getMemberData(groupUI);
+	if (null == mem)   return "unknown";
+	return mem.nk;
+}
+
+function updateChat(time, isGetNewer) {
+	var api = "groups/" + gi + "/chats/" + ci + "/messages";
+	if (time) {
+		api += "?ct=" + time;
+		if (true == isGetNewer) 
+			api += "&d=true";
+		else 
+			api += "&d=false";
 	}
 
-	/**
-	檢查捲動位置
-	**/
-	function checkPagePosition() {
-		if (!$("#page-chat").is(":visible") || $("#page-chat").hasClass("transition")) return;
-
-		var currentTime = new Date().getTime();
-		if (currentTime >= g_isEndOfPageTime) {
-			if (g_container.length > 0) {
-				var posi = g_container.scrollTop();
-				var height = g_container.height();
-				var docHeight = g_container[0].scrollHeight;
-				var isAtBottom = ((posi + height + 35) >= docHeight);
-				// cns.debug(isAtBottom, posi, height, docHeight);
-
-				if (isAtBottom) $("#chat-toBottom").fadeOut('fast');
-				else $("#chat-toBottom").fadeIn('fast');
-				g_isEndOfPage = isAtBottom;
+	op(api, "GET", "", function (data, status, xhr) {
+			g_group = $.userStorage()[gi];
+			g_room = g_group["chatAll"][ci];
+			if (null == g_room.lastCt){
+				g_room.lastCt = 0;
 			}
-			g_isEndOfPageTime = currentTime + 1000;
-		}
-	}
 
-	function getMemberData(groupUI) {
-		if (!g_group["guAll"][groupUI])    return null;
+			onChatReceiveMsg( gi, ci, g_room.uiName, data.el, function(){
+				var isEndOfPageTmp = g_isEndOfPage;
+				for (var i = (data.el.length - 1); i >= 0; i--) {
+					var object = data.el[i];
+					if (object.hasOwnProperty("meta")) {
 
-		return g_group["guAll"][groupUI];
-	}
+						if (object.meta.ct > g_room.lastCt) g_room.lastCt = object.meta.ct;
 
-	function getMemberName(groupUI) {
-		var mem = getMemberData(groupUI);
-		if (null == mem)   return "unknown";
-		return mem.nk;
-	}
-
-	function updateChat(time, isGetNewer) {
-		var api = "groups/" + gi + "/chats/" + ci + "/messages";
-		if (time) {
-			api += "?ct=" + time;
-			if (true == isGetNewer) 
-				api += "&d=true";
-			else 
-				api += "&d=false";
-		}
-
-		op(api, "GET", "", function (data, status, xhr) {
-				g_group = $.userStorage()[gi];
-				g_room = g_group["chatAll"][ci];
-				if (null == g_room.lastCt){
-					g_room.lastCt = 0;
+						//pass shown msgs
+						if (g_msgs.indexOf(object.ei) < 0) showMsg(object);
+					}
 				}
 
-				onChatReceiveMsg( gi, ci, g_room.uiName, data.el, function(){
-					var isEndOfPageTmp = g_isEndOfPage;
-					for (var i = (data.el.length - 1); i >= 0; i--) {
-						var object = data.el[i];
-						if (object.hasOwnProperty("meta")) {
+				if (isUpdatePermission) getPermition(true);
 
-							if (object.meta.ct > g_room.lastCt) g_room.lastCt = object.meta.ct;
+				// isGetNewer 取時間點舊到新的訊息 只有polling需要 
+				if (isGetNewer) {
 
-							//pass shown msgs
-							if (g_msgs.indexOf(object.ei) < 0) showMsg(object);
-						}
-					}
+					// 繼續取新訊息
+					if (data.el.length > 10) updateChat(g_room.lastCt, true);
 
-					if (isUpdatePermission) getPermition(true);
+					sendMsgRead();
 
-					// isGetNewer 取時間點舊到新的訊息 只有polling需要 
-					if (isGetNewer) {
+					if (isEndOfPageTmp) scrollToBottom();
 
-						// 繼續取新訊息
-						if (data.el.length > 10) updateChat(g_room.lastCt, true);
+				} else { 
 
-						sendMsgRead();
+					//getting old msgs
+					if( time !== undefined ) {
+						g_isLoadHistoryMsgNow = false;
 
-						if (isEndOfPageTmp) scrollToBottom();
+						//no more history
+						if (1 >= data.el.length) 
+							noMoreHistoryMsg();
+						else
+							hideLoading();
 
-					} else { 
-
-						//getting old msgs
-						if( time !== undefined ) {
-							g_isLoadHistoryMsgNow = false;
+					} else {
+						// 第一次進入 滾動至底
+						if (true==g_isFirstTimeLoading) {
+							g_isFirstTimeLoading=false;
+							
+							//hide loading
+							if (false == g_isEndOfHistory) {
+								$("#chat-loading").hide();
+								$("#chat-loading-grayArea").show();
+							}
 
 							//no more history
-							if (1 >= data.el.length) 
-								noMoreHistoryMsg();
-							else
-								hideLoading();
+							if (1 >= data.el.length) noMoreHistoryMsg();
 
-						} else {
-							// 第一次進入 滾動至底
-							if (true==g_isFirstTimeLoading) {
-								g_isFirstTimeLoading=false;
-								
-								//hide loading
-								if (false == g_isEndOfHistory) {
-									$("#chat-loading").hide();
-									$("#chat-loading-grayArea").show();
-								}
+							scrollToBottom();
+						} 
 
-								//no more history
-								if (1 >= data.el.length) noMoreHistoryMsg();
-
-								scrollToBottom();
-							} 
-
-							sendMsgRead();
-						}
-
-						showChatCnt();
+						sendMsgRead();
 					}
-				});
-			}, function () {
-					if (false == isGetNewer) {
-						popupShowAdjust("", $.i18n.getString("COMMON_CHECK_NETWORK"));
-						hideLoading();
-					}
-				}	//end of onerror function
-		);	//end of op
-	}	//end of updateChat
 
-	/**
-	顯示已讀數
-	**/
-	function showChatCnt() {
-		// cns.debug( JSON.stringify(userData) );
-		if( g_group == undefined ){
-			g_group = $.userStorage()[gi];
-			//登出
-			if(g_group === undefined) window.close();
-			g_room = g_group["chatAll"][ci];
-		}
-			
-
-		if (null == g_room || null == g_room.cnt ) return;
-
-		var 
-		list = g_room.cnt,
-		index = Object.keys(g_room.cnt).length - 1,
-		data = list[index],
-		cnt = data.cnt,
-		elements = $(".chat-cnt");
-
-		for (var i = 0; i < elements.length; i++) {
-			var dom = $(elements[i]);
-			if (dom.parents(".sys-msg").length > 0)    continue;
-			var time = dom.data("t");
-
-			while (data.ts < time && index >= 0) {
-				index--;
-				if (index >= 0) {
-					//dom.css("background", "red");
-					data = list[index];
+					showChatCnt();
 				}
-				cnt = data.cnt;
-			}
-
-			if (cnt > 0) {
-				if (1 == g_room.tp) dom.html($.i18n.getString("CHAT_READ"));
-				else dom.html($.i18n.getString("CHAT_N_READ", cnt));
-			} else {
-				dom.html("");
-			}
-
-			while (data.ts == time && index >= 0) {
-				index--;
-				if (index >= 0) {
-					//dom.css("background", "red");
-					data = list[index];
+			});
+		}, function () {
+				if (false == isGetNewer) {
+					popupShowAdjust("", $.i18n.getString("COMMON_CHECK_NETWORK"));
+					hideLoading();
 				}
-				cnt = data.cnt;
+			}	//end of onerror function
+	);	//end of op
+}	//end of updateChat
+
+/**
+顯示已讀數
+**/
+function showChatCnt() {
+	// cns.debug( JSON.stringify(userData) );
+	if( g_group == undefined ){
+		g_group = $.userStorage()[gi];
+		//登出
+		if(g_group === undefined) window.close();
+		g_room = g_group["chatAll"][ci];
+	}
+		
+
+	if (null == g_room || null == g_room.cnt ) return;
+
+	var 
+	list = g_room.cnt,
+	index = Object.keys(g_room.cnt).length - 1,
+	data = list[index],
+	cnt = data.cnt,
+	elements = $(".chat-cnt");
+
+	for (var i = 0; i < elements.length; i++) {
+		var dom = $(elements[i]);
+		if (dom.parents(".sys-msg").length > 0)    continue;
+		var time = dom.data("t");
+
+		while (data.ts < time && index >= 0) {
+			index--;
+			if (index >= 0) {
+				//dom.css("background", "red");
+				data = list[index];
 			}
+			cnt = data.cnt;
 		}
-	}
 
-	function getFormatTimeTag(date) {
-		return date.customFormat("#YYYY#/#M#/#D# #CD# #DDD#");
-	}
-
-	function getFormatMsgTimeTag(date) {
-		return date.customFormat("#hhh#:#mm#");
-	}
-
-	/**
-	show msg content
-	**/
-	function showMsg(object, bIsTmpSend) {
-		if (null == object) return;
-		bIsTmpSend = bIsTmpSend || false;
-
-		g_msgs.push(object.ei);
-		// cns.debug("list:",JSON.stringify(object,null,2));
-
-		var time = new Date(object.meta.ct);
-		var container = $("<div class='chat-msg'></div>");
-		container.data("time", object.meta.ct);
-		var szSearch = "#chat-contents ." + time.customFormat("_#YYYY#_#MM#_#DD#");
-		var div = $(szSearch);
-
-		if (div.length > 0 && div.next().length > 0) {
-			div = div.next();
+		if (cnt > 0) {
+			if (1 == g_room.tp) dom.html($.i18n.getString("CHAT_READ"));
+			else dom.html($.i18n.getString("CHAT_N_READ", cnt));
 		} else {
-			var timeTag = $("<div class='chat-date-tag'></div>");
-			timeTag.addClass(time.customFormat("_#YYYY#_#MM#_#DD#"));
-			timeTag.html(getFormatTimeTag(time));
-			timeTag.data("time", time.getTime());
+			dom.html("");
+		}
 
-			var allTimeTag = $("#chat-contents .chat-date-tag");
-			if (1 < allTimeTag.length) {
-				var bIsAdd = false;
-				for (var i = 0; i < allTimeTag.length - 1; i++) {
-					// cns.debug($(allTimeTag[i]).data("time"));
-					// cns.debug( time.getTime(), time.toString() );
-
-					if ($(allTimeTag[i]).data("time") > time.getTime()) {
-						// cns.debug("1", time);
-						$(allTimeTag[i]).before(timeTag);
-						bIsAdd = true;
-						break;
-					}
-				}
-				if (!bIsAdd) {
-					$("#chat-contents .lastMsg").before(timeTag);
-					// cns.debug("2", time);
-				}
-			} else {
-				$("#chat-contents .lastMsg").before(timeTag);
-				// cns.debug("3", time);
+		while (data.ts == time && index >= 0) {
+			index--;
+			if (index >= 0) {
+				//dom.css("background", "red");
+				data = list[index];
 			}
-			// if(time.getTime()<g_earliestDate){
-			// 	$("#chat-contents .firstMsg").after(timeTag);
-			// } else {
-			// 	$("#chat-contents .lastMsg").before(timeTag);
-			// }
-			div = $("<div></div>");
-			timeTag.after(div);
-
-			var lastTime = new Date($("#chat-contents .lastMsg").data("time"));
-			if (time.getTime() >= lastTime.getTime()) {
-				$("#chat-contents .lastMsg .chat-date-tag").css("display", "none");
-			}
+			cnt = data.cnt;
 		}
+	}
+}
 
-		if (time.getTime() < g_earliestDate) {
-			g_earliestDate = time;
-		}
-		if (time.getTime() > g_latestDate) {
-			g_latestDate = time;
-		}
+function getFormatTimeTag(date) {
+	return date.customFormat("#YYYY#/#M#/#D# #CD# #DDD#");
+}
 
-		var msgList = div.find(">div");
-		if (msgList.length > 0) {
+function getFormatMsgTimeTag(date) {
+	return date.customFormat("#hhh#:#mm#");
+}
+
+/**
+show msg content
+**/
+function showMsg(object, bIsTmpSend) {
+	if (null == object) return;
+	bIsTmpSend = bIsTmpSend || false;
+
+	g_msgs.push(object.ei);
+	// cns.debug("list:",JSON.stringify(object,null,2));
+
+	var time = new Date(object.meta.ct);
+	var container = $("<div class='chat-msg'></div>");
+	container.data("time", object.meta.ct);
+	var szSearch = "#chat-contents ." + time.customFormat("_#YYYY#_#MM#_#DD#");
+	var div = $(szSearch);
+
+	if (div.length > 0 && div.next().length > 0) {
+		div = div.next();
+	} else {
+		var timeTag = $("<div class='chat-date-tag'></div>");
+		timeTag.addClass(time.customFormat("_#YYYY#_#MM#_#DD#"));
+		timeTag.html(getFormatTimeTag(time));
+		timeTag.data("time", time.getTime());
+
+		var allTimeTag = $("#chat-contents .chat-date-tag");
+		if (1 < allTimeTag.length) {
 			var bIsAdd = false;
-			var i = 0;
-			var ctTmp = time.getTime();
-			for (; i < msgList.length; i++) {
-				if (ctTmp <= $(msgList[i]).data("time")) {
-					//若已為開頭, 或上方時間小於this
-					if (i == 0 || ctTmp >= $(msgList[i-1]).data("time") ) {
-						$(msgList[i]).before(container);
-						bIsAdd = true;
-						break;
-					 }
+			for (var i = 0; i < allTimeTag.length - 1; i++) {
+				// cns.debug($(allTimeTag[i]).data("time"));
+				// cns.debug( time.getTime(), time.toString() );
+
+				if ($(allTimeTag[i]).data("time") > time.getTime()) {
+					// cns.debug("1", time);
+					$(allTimeTag[i]).before(timeTag);
+					bIsAdd = true;
+					break;
 				}
 			}
 			if (!bIsAdd) {
-				$(msgList[i - 1]).after(container);
+				$("#chat-contents .lastMsg").before(timeTag);
+				// cns.debug("2", time);
 			}
 		} else {
-			div.append(container);
+			$("#chat-contents .lastMsg").before(timeTag);
+			// cns.debug("3", time);
 		}
+		// if(time.getTime()<g_earliestDate){
+		// 	$("#chat-contents .firstMsg").after(timeTag);
+		// } else {
+		// 	$("#chat-contents .lastMsg").before(timeTag);
+		// }
+		div = $("<div></div>");
+		timeTag.after(div);
 
-
-		//msg
-		var time = new Date(object.meta.ct);
-		if (null == object.ml || object.ml.length <= 0) return;
-		var msgData = object.ml[0];
-		var msgDiv;
-		var isMe = ( object.meta.gu == g_group.gu );
-		var unSend = object.hasOwnProperty("notSend");
-
-		//is me?
-		if (isMe) {
-			//right align
-			//time +(msg)
-			div = $("<div class='chat-msg-right'></div>");
-			container.append(div);
-
-			var table = $("<table></table>");
-			table.append($("<tr><td><div class='chat-cnt' data-t='" + time.getTime() + "'></div></td></tr>"));
-			var tr = $("<tr></tr>");
-			var td = $("<td></td>");
-			if (unSend) {
-				container.data("data", object);
-				var status = $("<div></div>");
-				table.find(".chat-cnt").hide();
-				if (bIsTmpSend) {
-					status.addClass('chat-msg-load');
-				}
-				else  status.addClass('chat-msg-load-error');
-				status.click(function () {
-					if ($(this).hasClass("chat-msg-load-error")) {
-						popupShowAdjust("", $.i18n.getString("CHAT_FAIL_SENDING_MSG"), true, true, [sendChat, container]);
-						$(".popup-confirm").html($.i18n.getString("CHAT_RESEND"));
-						$(".popup-cancel").html($.i18n.getString("COMMON_DELETE"));
-						$(".popup-cancel").off("click").click(function () {
-							var data = container.data("data");
-							if (data) {
-								g_idb_chat_msgs.remove(data.ei);
-							}
-							container.hide('slow', function () {
-								container.remove();
-							});
-							$(".popup-screen").hide();
-							$(".popup").hide();
-						});
-						$(".popup-screen").off("click").click(function () {
-							$(".popup-screen").hide();
-							$(".popup").hide();
-						});
-					}
-				});
-				td.append(status);
-			} else {
-				td.append("<div></div>");
-			}
-			td.append("<div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div>");
-			tr.append(td);
-			table.append(tr);
-
-			div.append(table);
-
-			msgDiv = $("<div></div>");
-			div.append(msgDiv);
-		} else {
-			//left align
-			var mem = getMemberData(object.meta.gu)
-
-			div = $("<div class='chat-msg-left'></div>");
-			container.append(div);
-
-			//left
-			var pic = $("<img class='aut'/>");	//left pic (auo for large pic)
-			if (mem.aut && mem.aut.length > 0) {
-				pic.attr("src", mem.aut);
-			} else {
-				pic.attr("src", "images/common/others/empty_img_personal_l.png");
-			}
-			div.append(pic);
-
-			//right
-			var subDiv = $("<div class='group'></div>");
-			subDiv.append("<div class='name'>" + mem.nk.replaceOriEmojiCode() + "</div>");	//name
-			msgDiv = $("<div class='msg-content'></div>");
-			subDiv.append(msgDiv);	//msg
-
-			table = $("<table></table>");
-			table.append( "<tr><td></td></tr>" );
-			table.append( "<tr><td><div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div></td></tr>" );
-			subDiv.append(table);
-
-			div.append(subDiv);	//right
+		var lastTime = new Date($("#chat-contents .lastMsg").data("time"));
+		if (time.getTime() >= lastTime.getTime()) {
+			$("#chat-contents .lastMsg .chat-date-tag").css("display", "none");
 		}
-
-		switch (msgData.tp) {
-			case 0: //text or other msg
-				if (isMe) {
-					msgDiv.addClass('chat-msg-bubble-right');
-				} else {
-					msgDiv.addClass('chat-msg-bubble-left');
-				}
-				msgDiv.html(htmlFormat(msgData.c));
-				break;
-			case 5:
-				msgDiv.addClass("msg-sticker");
-				if (isMe) {
-					msgDiv.addClass('right');
-				} else {
-					msgDiv.addClass('left');
-				}
-				var pic = $("<img>");
-				setStickerUrl(pic, msgData.c);
-				// var sticker_path = "sticker/" + msgData.c.split("_")[1] + "/" + msgData.c + ".png";
-				// pic.attr("src",sticker_path);
-				msgDiv.append(pic);
-				break;
-			case 6:
-				if (isMe) {
-					msgDiv.addClass('chat-msg-container-right');
-				} else {
-					msgDiv.addClass('chat-msg-container-left');
-				}
-				var pic = $("<img class='msg-img' style='width:150px;'>");
-				msgDiv.append(pic);
-				getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
-				break;
-			case 7:
-				if (isMe) {
-					msgDiv.addClass('chat-msg-container-right');
-				} else {
-					msgDiv.addClass('chat-msg-container-left');
-				}
-				var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
-				msgDiv.append(video);
-				getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
-				break;
-			case 8: //audio
-				if (isMe) {
-					msgDiv.addClass('chat-msg-bubble-right');
-				} else {
-					msgDiv.addClass('chat-msg-bubble-left');
-				}
-				var this_audio = $(
-					"<audio class='msg-audio' src='test' controls></audio>"
-				);
-				msgDiv.append(this_audio);
-				getChatS3file(this_audio, msgData.c, msgData.tp, ti_chat);
-				break;
-			case 9: //map
-				if (isMe) {
-					msgDiv.addClass('chat-msg-bubble-right');
-				} else {
-					msgDiv.addClass('chat-msg-bubble-left');
-				}
-				showMsgMap(msgData, msgDiv);
-				break;
-			case 22: //mem join/leave
-				msgDiv.addClass('content');
-				var textTmp = "";
-				try {
-					var memTmp = g_group.guAll[msgData.t];
-					if (1 == msgData.a) {
-						if (null == g_room.memList || g_room.memList.hasOwnProperty(memTmp.gu)) {
-							isUpdatePermission = true;
-						}
-						textTmp = $.i18n.getString("CHAT_SOMEONE_LEAVE", memTmp.nk);
-					} else {
-						if (null == g_room.memList || !g_room.memList.hasOwnProperty(memTmp.gu)) {
-							isUpdatePermission = true;
-						}
-						textTmp = $.i18n.getString("CHAT_SOMEONE_JOIN", memTmp.nk);
-					}
-
-				} catch (e) {
-					errorReport(e);
-				}
-				msgDiv.html(htmlFormat(textTmp));
-				if (isMe) msgDiv.parent().removeClass("chat-msg-right").addClass("sys-msg");
-				else {
-					var newParent = msgDiv.parent().parent().parent();
-					newParent.find(".chat-msg-left").remove();
-					var child = msgDiv.parent().detach();
-					child.addClass("sys-msg");
-					child.find(".name").remove();
-					child.append(child.find(".msg-content").detach());
-					newParent.append(child);
-				}
-				break;
-			case 23: //voip
-				if (isMe) {
-					msgDiv.parent().removeClass("chat-msg-right").addClass("sys-msg");
-					msgDiv.html("You've made a VOIP call.");
-				} else {
-					var newParent = msgDiv.parent().parent().parent();
-					newParent.find(".chat-msg-left").remove();
-					var child = msgDiv.parent().detach();
-					child.addClass("sys-msg");
-					child.find(".name").remove();
-					child.append(child.find(".msg-content").detach());
-					newParent.append(child);
-
-					msgDiv.html("You've missed a VOIP call, download Qmi on phone to receive it.");
-				}
-				break;
-			default: //text or other msg
-				if (isMe) {
-					msgDiv.addClass('chat-msg-bubble-right');
-				} else {
-					msgDiv.addClass('chat-msg-bubble-left');
-				}
-				msgDiv.html("&nbsp");
-				// msgDiv.html( msgData.tp+"<br/>"+msgData.c );
-				break;
-		}
-		cns.debug("showMsg finished");
-		return container;
 	}
 
-	function showMsgMap(msgData, container) {
-		var mapDiv = $("<div class='msg-map'></div>");
-		mapDiv.append("<div class='img'></div>");
-		mapDiv.append("<div class='text'>" + msgData.a + "</div>");
-		mapDiv.click(function () {
-			var gallery = window.open("layout/mapPreview.html", "", "width=800, height=800");
-			$(gallery.document).ready(function () {
-				setTimeout(function () {
-					gallery.msgData = msgData;
-					$(gallery.document).find("#dataDom").trigger("click");
-				}, 1500);
+	if (time.getTime() < g_earliestDate) {
+		g_earliestDate = time;
+	}
+	if (time.getTime() > g_latestDate) {
+		g_latestDate = time;
+	}
+
+	var msgList = div.find(">div");
+	if (msgList.length > 0) {
+		var bIsAdd = false;
+		var i = 0;
+		var ctTmp = time.getTime();
+		for (; i < msgList.length; i++) {
+			if (ctTmp <= $(msgList[i]).data("time")) {
+				//若已為開頭, 或上方時間小於this
+				if (i == 0 || ctTmp >= $(msgList[i-1]).data("time") ) {
+					$(msgList[i]).before(container);
+					bIsAdd = true;
+					break;
+				 }
+			}
+		}
+		if (!bIsAdd) {
+			$(msgList[i - 1]).after(container);
+		}
+	} else {
+		div.append(container);
+	}
+
+
+	//msg
+	var time = new Date(object.meta.ct);
+	if (null == object.ml || object.ml.length <= 0) return;
+	var msgData = object.ml[0];
+	var msgDiv;
+	var isMe = ( object.meta.gu == g_group.gu );
+	var unSend = object.hasOwnProperty("notSend");
+
+	//is me?
+	if (isMe) {
+		//right align
+		//time +(msg)
+		div = $("<div class='chat-msg-right'></div>");
+		container.append(div);
+
+		var table = $("<table></table>");
+		table.append($("<tr><td><div class='chat-cnt' data-t='" + time.getTime() + "'></div></td></tr>"));
+		var tr = $("<tr></tr>");
+		var td = $("<td></td>");
+		if (unSend) {
+			container.data("data", object);
+			var status = $("<div></div>");
+			table.find(".chat-cnt").hide();
+			if (bIsTmpSend) {
+				status.addClass('chat-msg-load');
+			}
+			else  status.addClass('chat-msg-load-error');
+			status.click(function () {
+				if ($(this).hasClass("chat-msg-load-error")) {
+					popupShowAdjust("", $.i18n.getString("CHAT_FAIL_SENDING_MSG"), true, true, [sendChat, container]);
+					$(".popup-confirm").html($.i18n.getString("CHAT_RESEND"));
+					$(".popup-cancel").html($.i18n.getString("COMMON_DELETE"));
+					$(".popup-cancel").off("click").click(function () {
+						var data = container.data("data");
+						if (data) {
+							g_idb_chat_msgs.remove(data.ei);
+						}
+						container.hide('slow', function () {
+							container.remove();
+						});
+						$(".popup-screen").hide();
+						$(".popup").hide();
+					});
+					$(".popup-screen").off("click").click(function () {
+						$(".popup-screen").hide();
+						$(".popup").hide();
+					});
+				}
 			});
-		});
-		container.append(mapDiv);
+			td.append(status);
+		} else {
+			td.append("<div></div>");
+		}
+		td.append("<div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div>");
+		tr.append(td);
+		table.append(tr);
+
+		div.append(table);
+
+		msgDiv = $("<div></div>");
+		div.append(msgDiv);
+	} else {
+		//left align
+		var mem = getMemberData(object.meta.gu)
+
+		div = $("<div class='chat-msg-left'></div>");
+		container.append(div);
+
+		//left
+		var pic = $("<img class='aut'/>");	//left pic (auo for large pic)
+		if (mem.aut && mem.aut.length > 0) {
+			pic.attr("src", mem.aut);
+		} else {
+			pic.attr("src", "images/common/others/empty_img_personal_l.png");
+		}
+		div.append(pic);
+
+		//right
+		var subDiv = $("<div class='group'></div>");
+		subDiv.append("<div class='name'>" + mem.nk.replaceOriEmojiCode() + "</div>");	//name
+		msgDiv = $("<div class='msg-content'></div>");
+		subDiv.append(msgDiv);	//msg
+
+		table = $("<table></table>");
+		table.append( "<tr><td></td></tr>" );
+		table.append( "<tr><td><div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div></td></tr>" );
+		subDiv.append(table);
+
+		div.append(subDiv);	//right
 	}
 
-	function showUnsendMsg(c, tp) {
-		var eiTmp = "{0}_{1}_{2}".format( randomHash(11), randomHash(11), randomHash(11));
-		var time = new Date().getTime();
-		var newData = {
-			ei: eiTmp,
-			meta: {
-				ct: time,
-				gu: g_group.gu
-			},
-			ml: [
-				{
-					c: c,
-					tp: tp
-				}
-			],
-			notSend: true
-		};
-		var node = {
-			gi: gi,
-			ci: ci,
-			ei: eiTmp,
-			ct: time,
-			data: newData
-		};
-		//write msg to db with pseudo id
-		var dom = showMsg(newData);
-		g_idb_chat_msgs.put(node);
-		return dom;
-	}
-
-	function sendChat(dom) {
-		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
-		var tmpData = dom.data("data");
-		if (null == tmpData)    return;
-		try {
-
-			switch (tmpData.ml[0].tp) {
-				case 0: //text
-				case 5: //sticker
-					sendMsgText(dom);
-					break;
-				case 6: //img
-					sendMsgImage(dom);
-					break;
-				case 7: //video
-					sendMsgVideo(dom);
-					break;
+	switch (msgData.tp) {
+		case 0: //text or other msg
+			if (isMe) {
+				msgDiv.addClass('chat-msg-bubble-right');
+			} else {
+				msgDiv.addClass('chat-msg-bubble-left');
 			}
-		} catch (e) {
-			errorReport(e);
+			msgDiv.html(htmlFormat(msgData.c));
+			break;
+		case 5:
+			msgDiv.addClass("msg-sticker");
+			if (isMe) {
+				msgDiv.addClass('right');
+			} else {
+				msgDiv.addClass('left');
+			}
+			var pic = $("<img>");
+			setStickerUrl(pic, msgData.c);
+			// var sticker_path = "sticker/" + msgData.c.split("_")[1] + "/" + msgData.c + ".png";
+			// pic.attr("src",sticker_path);
+			msgDiv.append(pic);
+			break;
+		case 6:
+			if (isMe) {
+				msgDiv.addClass('chat-msg-container-right');
+			} else {
+				msgDiv.addClass('chat-msg-container-left');
+			}
+			var pic = $("<img class='msg-img' style='width:150px;'>");
+			msgDiv.append(pic);
+			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
+			break;
+		case 7:
+			if (isMe) {
+				msgDiv.addClass('chat-msg-container-right');
+			} else {
+				msgDiv.addClass('chat-msg-container-left');
+			}
+			var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
+			msgDiv.append(video);
+			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
+			break;
+		case 8: //audio
+			if (isMe) {
+				msgDiv.addClass('chat-msg-bubble-right');
+			} else {
+				msgDiv.addClass('chat-msg-bubble-left');
+			}
+			var this_audio = $(
+				"<audio class='msg-audio' src='test' controls></audio>"
+			);
+			msgDiv.append(this_audio);
+			getChatS3file(this_audio, msgData.c, msgData.tp, ti_chat);
+			break;
+		case 9: //map
+			if (isMe) {
+				msgDiv.addClass('chat-msg-bubble-right');
+			} else {
+				msgDiv.addClass('chat-msg-bubble-left');
+			}
+			showMsgMap(msgData, msgDiv);
+			break;
+		case 22: //mem join/leave
+			msgDiv.addClass('content');
+			var textTmp = "";
+			try {
+				var memTmp = g_group.guAll[msgData.t];
+				if (1 == msgData.a) {
+					if (null == g_room.memList || g_room.memList.hasOwnProperty(memTmp.gu)) {
+						isUpdatePermission = true;
+					}
+					textTmp = $.i18n.getString("CHAT_SOMEONE_LEAVE", memTmp.nk);
+				} else {
+					if (null == g_room.memList || !g_room.memList.hasOwnProperty(memTmp.gu)) {
+						isUpdatePermission = true;
+					}
+					textTmp = $.i18n.getString("CHAT_SOMEONE_JOIN", memTmp.nk);
+				}
+
+			} catch (e) {
+				errorReport(e);
+			}
+			msgDiv.html(htmlFormat(textTmp));
+			if (isMe) msgDiv.parent().removeClass("chat-msg-right").addClass("sys-msg");
+			else {
+				var newParent = msgDiv.parent().parent().parent();
+				newParent.find(".chat-msg-left").remove();
+				var child = msgDiv.parent().detach();
+				child.addClass("sys-msg");
+				child.find(".name").remove();
+				child.append(child.find(".msg-content").detach());
+				newParent.append(child);
+			}
+			break;
+		case 23: //voip
+			if (isMe) {
+				msgDiv.parent().removeClass("chat-msg-right").addClass("sys-msg");
+				msgDiv.html("You've made a VOIP call.");
+			} else {
+				var newParent = msgDiv.parent().parent().parent();
+				newParent.find(".chat-msg-left").remove();
+				var child = msgDiv.parent().detach();
+				child.addClass("sys-msg");
+				child.find(".name").remove();
+				child.append(child.find(".msg-content").detach());
+				newParent.append(child);
+
+				msgDiv.html("You've missed a VOIP call, download Qmi on phone to receive it.");
+			}
+			break;
+		default: //text or other msg
+			if (isMe) {
+				msgDiv.addClass('chat-msg-bubble-right');
+			} else {
+				msgDiv.addClass('chat-msg-bubble-left');
+			}
+			msgDiv.html("&nbsp");
+			// msgDiv.html( msgData.tp+"<br/>"+msgData.c );
+			break;
+	}
+	cns.debug("showMsg finished");
+	return container;
+}
+
+function showMsgMap(msgData, container) {
+	var mapDiv = $("<div class='msg-map'></div>");
+	mapDiv.append("<div class='img'></div>");
+	mapDiv.append("<div class='text'>" + msgData.a + "</div>");
+	mapDiv.click(function () {
+		var gallery = window.open("layout/mapPreview.html", "", "width=800, height=800");
+		$(gallery.document).ready(function () {
+			setTimeout(function () {
+				gallery.msgData = msgData;
+				$(gallery.document).find("#dataDom").trigger("click");
+			}, 1500);
+		});
+	});
+	container.append(mapDiv);
+}
+
+function showUnsendMsg(c, tp) {
+	var eiTmp = "{0}_{1}_{2}".format( randomHash(11), randomHash(11), randomHash(11));
+	var time = new Date().getTime();
+	var newData = {
+		ei: eiTmp,
+		meta: {
+			ct: time,
+			gu: g_group.gu
+		},
+		ml: [
+			{
+				c: c,
+				tp: tp
+			}
+		],
+		notSend: true
+	};
+	var node = {
+		gi: gi,
+		ci: ci,
+		ei: eiTmp,
+		ct: time,
+		data: newData
+	};
+	//write msg to db with pseudo id
+	var dom = showMsg(newData);
+	g_idb_chat_msgs.put(node);
+	return dom;
+}
+
+function sendChat(dom) {
+	dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
+	var tmpData = dom.data("data");
+	if (null == tmpData)    return;
+	try {
+
+		switch (tmpData.ml[0].tp) {
+			case 0: //text
+			case 5: //sticker
+				sendMsgText(dom);
+				break;
+			case 6: //img
+				sendMsgImage(dom);
+				break;
+			case 7: //video
+				sendMsgVideo(dom);
+				break;
+		}
+	} catch (e) {
+		errorReport(e);
+		dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+	}
+}
+
+function sendMsgText(dom) {
+	var tmpData = dom.data("data");
+	cns.debug("send");	//, new Date(tmpData.meta.ct), new Date(tmpData.meta.ct)
+	var sendData = {
+		meta: {
+			lv: 2,
+			tp: 3
+		},
+		ml: tmpData.ml
+	};
+
+	scrollToBottom();
+	op("groups/" + gi + "/chats/" + ci + "/messages",
+		"POST",
+		sendData,
+		function (dd, status, xhr) {
+			//delete tmp sending data & msg dom
+			g_idb_chat_msgs.remove(tmpData.ei);
+			dom.css("opacity",0)
+
+			// cns.debug("recv", dd.ct, new Date(dd.ct));
+			//get new ei & show new msg dom
+			var newData = {
+				ei: dd.ei,
+				meta: {
+					gu: g_group.gu,
+					ct: dd.ct
+				},
+				ml: tmpData.ml
+			};
+
+			var node = {
+				gi: gi,
+				ci: ci,
+				ei: dd.ei,
+				ct: dd.ct,
+				data: newData
+			};
+
+			g_idb_chat_msgs.put(node, function(){
+				showMsg(newData);
+				dom.remove();
+				if( g_isEndOfPage === true ) scrollToBottom();
+			});
+
+		},
+		function () {
 			dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
 		}
-	}
-
-	function sendMsgText(dom) {
-		var tmpData = dom.data("data");
-		cns.debug("send");	//, new Date(tmpData.meta.ct), new Date(tmpData.meta.ct)
-		var sendData = {
-			meta: {
-				lv: 2,
-				tp: 3
-			},
-			ml: tmpData.ml
-		};
-
-		scrollToBottom();
-		op("groups/" + gi + "/chats/" + ci + "/messages",
-			"POST",
-			sendData,
-			function (dd, status, xhr) {
-				//delete tmp sending data & msg dom
-				g_idb_chat_msgs.remove(tmpData.ei);
-				dom.css("opacity",0)
-
-				// cns.debug("recv", dd.ct, new Date(dd.ct));
-				//get new ei & show new msg dom
-				var newData = {
-					ei: dd.ei,
-					meta: {
-						gu: g_group.gu,
-						ct: dd.ct
-					},
-					ml: tmpData.ml
-				};
-
-				var node = {
-					gi: gi,
-					ci: ci,
-					ei: dd.ei,
-					ct: dd.ct,
-					data: newData
-				};
-
-				g_idb_chat_msgs.put(node, function(){
-					showMsg(newData);
-					dom.remove();
-					if( g_isEndOfPage === true ) scrollToBottom();
-				});
-
-			},
-			function () {
-				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-			}
-		);
-	}
+	);
+}
 
 	function sendMsgImage(dom) {
 		var file = dom.data("file");
@@ -2858,6 +2858,5 @@ function scrollToStart() {
 			return window.opener.QmiGlobal.groups;
 		}
 	};
-
 
 })

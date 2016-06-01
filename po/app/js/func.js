@@ -373,24 +373,32 @@ timelineSwitch = function (act,reset,main){
 
 
     switch (act) {
+
         case "feeds":
-            $(".st-filter-action")
-            .find("[data-status='all']").show().addClass("st-filter-list-active").end()
-            .find("[data-navi='announcement']").show().end()
-            .find("[data-navi='feedback']").show().end()
-            .find("[data-navi='task']").show().end()
-            .find("[data-navi='feed-post']").hide().end()
-            .find("[data-navi='feed-public']").hide();
-            
+            // $(".st-filter-action")
+            // .find("[data-status='all']").show().addClass("st-filter-list-active").end()
+            // .find("[data-navi='announcement']").show().end()
+            // .find("[data-navi='feedback']").show().end()
+            // .find("[data-navi='task']").show().end()
+            // .find("[data-navi='feed-post']").hide().end()
+            // .find("[data-navi='feed-public']").hide();
+            var filterAction = $(".st-filter-action");
+            filterAction.filter(".st-filter-list-active").removeClass("st-filter-list-active");
+            // filterAction.filter("[data-status='all']").hide();
+            filterAction.filter("[data-navi='announcement']").show();
+            filterAction.filter("[data-navi='feedback']").show();
+            filterAction.filter("[data-navi='task']").show();
+            // filterAction.filter("[data-navi='feed-public']").hide();
+            // filterAction.filter("[data-navi='feed-post']").show().addClass("st-filter-list-active");
             $(".subpage-addressBook").hide();
             // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
 
             //filter all
-            var filterArea = $(".st-filter-area");
-            filterArea.data("filter","all");
-            filterArea.children(".st-filter-hide.right").show();
-            filterArea.children(".st-filter-hide.left").hide();
-            filterArea.scrollLeft(0);
+            // var filterArea = $(".st-filter-area");
+            // filterArea.data("filter","all");
+            // filterArea.children(".st-filter-hide.right").show();
+            // filterArea.children(".st-filter-hide.left").hide();
+            // filterArea.scrollLeft(0);
 
 
             //顯示新增貼文按鈕
@@ -1287,6 +1295,7 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
         var without_message = false;
         var reply_content;
         var ml_arr = [];
+        var mainReplyText;
 
         this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html .st-reply-content-area',function(){
             var this_load = $(this).find(".st-reply-content-area");
@@ -1303,7 +1312,8 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
                 //event種類 不同 讀取不同layout
                 switch(val.tp){
                     case 0:
-                        this_content.prepend(htmlFormat(val.c));
+                        this_content.find(".replyMsg").html(htmlFormat(val.c));
+                        mainReplyText = this_content.find(".replyMsg").html();
                         break;
                     case 1:
                         break;
@@ -1389,18 +1399,36 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
                         without_message = true;
                         break;
                     case 21:
-                        var mainReplyText = this_content[0].firstChild.textContent;
                         if (typeof(mainReplyText) == 'string' && mainReplyText) {
                             mainReplyText = mainReplyText.qmiTag(val);
                         }
-                        this_content[0].firstChild.textContent = "";
-                        this_content.prepend(mainReplyText);
-
                         break;
                 }
             });
+
+            var tagRegex = /\/{3};(\w+);\/{3}/g;
+
+            if (mainReplyText) {
+                var matchTagList = mainReplyText.match(tagRegex);
+
+                if (matchTagList != null) {
+                    $.each(matchTagList, function(index, tagText){
+                        var tagMemberID = tagText.replace(tagRegex, "$1");
+                        var memberList = QmiGlobal.groups[gi].guAll;
+                        if (memberList[tagMemberID]) {
+                            var tagObj = {
+                                u: tagMemberID,
+                                n: memberList[tagMemberID].nk
+                            }
+                            mainReplyText = mainReplyText.qmiTag(tagObj);
+                        }
+                    });
+                }
+                this_content.find(".replyMsg").html(mainReplyText);
+            }
             
-            this_event.find("b").bind("click", function(e) {
+            this_content.find("b").bind("click", function(e) {
+                console.log($(e.target).attr("name"));
                 userInfoShow(gi, $(e.target).attr("name"));
             });
 
@@ -2036,7 +2064,7 @@ bindVoteEvent = function (this_event){
         });
     });
 
-    this_event.find(".st-vote-detail-option .vote-set").click(function(){
+    this_event.find(".st-vote-detail-option .more").click(function(){
 
         var this_opt = $(this).parent();
         var this_ques = this_opt.parent();
@@ -4595,7 +4623,6 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
     main_gu = $("#page-group-main").data("main-gu"),
 
     deferred = $.Deferred();
-
     if(main_gu){
         this_gi = $("#page-group-main").data("main-gi");
         this_ti = QmiGlobal.groups[this_gi].ti_feed;
@@ -4621,7 +4648,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
             ui:ui,
             at:at, 
             li:lang,
-            tp: event_tp
+            tp: ("0" + event_tp).slice(-2)
     };
     var method = "get";
     var result = ajaxDo(api_name,headers,method,false);
@@ -4729,7 +4756,6 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
                         this_navi.find(".st-sub-box[data-idb=true]").remove();
 
                         timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
-
                         deferred.resolve({
                             desc:"main_gu exists",
                             status: true
@@ -4806,7 +4832,7 @@ idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr,callback){
 
 timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi){
     if(!detail){
-        var event_tp = $("#page-group-main").data("navi") || "00";
+        var event_tp = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
 
         if($("#page-group-main").data("main-gu")){
             var tmp = ".feed-subarea[data-feed=main]";
@@ -5069,6 +5095,7 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
 }
 
 timelineListWrite = function (ct_timer,is_top){
+
     var deferred = $.Deferred();
 
     // $(".st-filter-area").addClass("st-filter-lock");
@@ -5344,6 +5371,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
     var isApplyWatermark = false;
     var watermarkText = "--- ---";
+    var mainContext;
     $.each(ml,function(i,val){
         //結束時間檢查
         var end_time_chk = false;
@@ -5362,6 +5390,8 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 this_event.find(target_div).show();
                 this_event.find(target_div).html( c[0].replaceEmoji() );
                 this_event.find(target_div + "-detail").html(c[1]);
+                mainContext = this_event.find(target_div).html();
+
                 break;
             case 1://網址 寫在附檔區域中
                 if(val.c){
@@ -5519,14 +5549,9 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 end_time_chk = true;
                 break;
             case 21:
-                var parseText = '';
-                var mainContext = this_event.find(target_div).html();
-                if (typeof(mainContext) == 'string') {
+                if (typeof(mainContext) == 'string' && mainContext) {
                     mainContext = mainContext.qmiTag(val);
                 }
-                this_event.find(target_div).html(mainContext);
-                this_event.find(target_div + "-detail").html(mainContext);
-
                 break;
             case 27:
                 if( false==isApplyWatermark && 1==val.wm ){
@@ -5547,6 +5572,26 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 break;
         };
 
+        var tagRegex = /\/{3};(\w+);\/{3}/g;
+        if (mainContext) {
+            var matchTagList = mainContext.match(tagRegex);
+            if (matchTagList != null) {
+                $.each(matchTagList, function(index, tagText){
+                    var tagMemberID = tagText.replace(tagRegex, "$1");
+                    var memberList = QmiGlobal.groups[gi].guAll;
+                    if (memberList[tagMemberID]) {
+                        var tagObj = {
+                            u: tagMemberID,
+                            n: memberList[tagMemberID].nk
+                        }
+                        mainContext = mainContext.qmiTag(tagObj);
+                    }
+                });
+            }
+            this_event.find(target_div).html(mainContext);
+            this_event.find(target_div + "-detail").html(mainContext);
+        }
+            
         this_event.find("b").bind("click", function(e) {
             userInfoShow(gi, $(e.target).attr("name"));
         });
@@ -6693,8 +6738,11 @@ getGroupList = function(){
     return groupsDeferred.promise();
 }
 
+// 這不要刪啊
 getCloudToken = function(cloudObj,isReDo){
     var deferred = $.Deferred();
+
+    if(cloudObj.key === undefined) deferred.resolve(false);
 
     $.ajax({
         url: "https://" + cloudObj.cl + "/apiv1/cert",
@@ -6708,6 +6756,8 @@ getCloudToken = function(cloudObj,isReDo){
         type: "post",
         error: function(errData){
             cns.debug("cloud cl cert error",errData);
+
+            deferred.resolve(false);
         },
         success: function(apiData){
 
@@ -6819,6 +6869,11 @@ polling = function(){
         if(data.status == 200){
             var newPollingData = $.parseJSON(data.responseText);
             newPollingData.publicPollingTime = publicPollingTime;
+
+            // 錯誤排除 把不該存在公雲polling的私雲gi剔除
+            newPollingData.cnts.forEach(function(cntObj,i) {
+                if(QmiGlobal.cloudGiMap.hasOwnProperty(cntObj.gi)) newPollingData.cnts.splice(i,1);
+            });
 
             // 合併私雲polling 而且每個私雲polling 都要有自己的時間
             combineCloudPolling(newPollingData).done(function(pollingObj){
@@ -6947,14 +7002,11 @@ combineCloudPolling = function(newPollingData){
             var apiData = item.data;
             // 存polling time
             localPollingData.clTs[item.ci].pollingTime = apiData.ts.pt;
-            // cnts
-            newPollingData.cnts = newPollingData.cnts.concat(apiData.cnts);
-            // cmds
-            newPollingData.cmds = newPollingData.cmds.concat(apiData.cmds);
-            // msgs
-            newPollingData.msgs = newPollingData.msgs.concat(apiData.msgs);
-            // ccs
-            newPollingData.ccs = newPollingData.ccs.concat(apiData.ccs);
+
+            // 把私雲的這些項目加到公雲 統一處理
+            ["cnts", "cmds", "msgs", "ccs"].forEach(function(key){
+                newPollingData[key] = (newPollingData[key] || []).concat(apiData[key]);
+            });
 
             // gcnts 是公雲才有 不處理
         })
@@ -6983,12 +7035,12 @@ pollingCountsWrite = function(pollingData){
     if( cntsAllObj.hasOwnProperty( gi ) === true ) {
         var thisCntObj = cntsAllObj[gi];
 
-        ["A1","A2","A3","A4"].forEach(function(key){
+        ["A1", "A2", "A4"].forEach(function(key){
             var smCountA = $(".polling-cnt[data-polling-cnt="+ key +"] .sm-count").hide();
             if ( thisCntObj.hasOwnProperty(key) === true && thisCntObj[key] > 0 ) {
 
                 // 部分動態tab 如果是active 消除cnts
-                if( smCountA.parent().hasClass("active") === true && key != "A3"){
+                if( smCountA.parent().hasClass("active") === true){
                     updatePollingCnts( smCountA, key );
                 } else {
                     smCountA.show()
@@ -7000,6 +7052,8 @@ pollingCountsWrite = function(pollingData){
 
         // 有cl 就更新 聊天室列表的cnt
         if( thisCntObj.hasOwnProperty("cl") === false ) thisCntObj.cl = [] ;
+
+        var countA3 = 0; // 聊天室tab的cnt用加的
         thisCntObj.cl.forEach(function(obj){
             var tmpDiv = $(".sm-cl-count[data-ci=" + obj.ci + "]").hide();
             if (obj.B7 > 0) {
@@ -7009,8 +7063,15 @@ pollingCountsWrite = function(pollingData){
                 } else {
                     tmpDiv.html(countsFormat(obj.B7)).show();    
                 }
+
+                countA3 += obj.B7;
             }
         })
+
+        if(countA3 > 0) 
+            $(".polling-cnt[data-polling-cnt=A3] .sm-count").html(countsFormat(countA3)).show();
+        else
+            $(".polling-cnt[data-polling-cnt=A3] .sm-count").hide();
     }
 
     // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
@@ -8621,7 +8682,7 @@ showFeedboxNoContent = function( isShow ){
         $(".st-feebox-area-no-content").hide();
     } else {
         $(".st-feebox-area-no-content").show().removeClass("disabled");
-        $(".gm-content > div:eq(1)").getNiceScroll(0).doScrollTop(0, 500);
+        // $(".gm-content > div:eq(1)").getNiceScroll(0).doScrollTop(0, 500);
     }
 }
 
