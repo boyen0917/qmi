@@ -6693,8 +6693,11 @@ getGroupList = function(){
     return groupsDeferred.promise();
 }
 
+// 這不要刪啊
 getCloudToken = function(cloudObj,isReDo){
     var deferred = $.Deferred();
+
+    if(cloudObj.key === undefined) deferred.resolve(false);
 
     $.ajax({
         url: "https://" + cloudObj.cl + "/apiv1/cert",
@@ -6708,6 +6711,8 @@ getCloudToken = function(cloudObj,isReDo){
         type: "post",
         error: function(errData){
             cns.debug("cloud cl cert error",errData);
+
+            deferred.resolve(false);
         },
         success: function(apiData){
 
@@ -6819,6 +6824,11 @@ polling = function(){
         if(data.status == 200){
             var newPollingData = $.parseJSON(data.responseText);
             newPollingData.publicPollingTime = publicPollingTime;
+
+            // 錯誤排除 把不該存在公雲polling的私雲gi剔除
+            newPollingData.cnts.forEach(function(cntObj,i) {
+                if(QmiGlobal.cloudGiMap.hasOwnProperty(cntObj.gi)) newPollingData.cnts.splice(i,1);
+            });
 
             // 合併私雲polling 而且每個私雲polling 都要有自己的時間
             combineCloudPolling(newPollingData).done(function(pollingObj){
@@ -6947,14 +6957,11 @@ combineCloudPolling = function(newPollingData){
             var apiData = item.data;
             // 存polling time
             localPollingData.clTs[item.ci].pollingTime = apiData.ts.pt;
-            // cnts
-            newPollingData.cnts = newPollingData.cnts.concat(apiData.cnts);
-            // cmds
-            newPollingData.cmds = newPollingData.cmds.concat(apiData.cmds);
-            // msgs
-            newPollingData.msgs = newPollingData.msgs.concat(apiData.msgs);
-            // ccs
-            newPollingData.ccs = newPollingData.ccs.concat(apiData.ccs);
+
+            // 把私雲的這些項目加到公雲 統一處理
+            ["cnts", "cmds", "msgs", "ccs"].forEach(function(key){
+                newPollingData[key] = (newPollingData[key] || []).concat(apiData[key]);
+            });
 
             // gcnts 是公雲才有 不處理
         })
@@ -6983,12 +6990,12 @@ pollingCountsWrite = function(pollingData){
     if( cntsAllObj.hasOwnProperty( gi ) === true ) {
         var thisCntObj = cntsAllObj[gi];
 
-        ["A1","A2","A3","A4"].forEach(function(key){
+        ["A1", "A2", "A4"].forEach(function(key){
             var smCountA = $(".polling-cnt[data-polling-cnt="+ key +"] .sm-count").hide();
             if ( thisCntObj.hasOwnProperty(key) === true && thisCntObj[key] > 0 ) {
 
                 // 部分動態tab 如果是active 消除cnts
-                if( smCountA.parent().hasClass("active") === true && key != "A3"){
+                if( smCountA.parent().hasClass("active") === true){
                     updatePollingCnts( smCountA, key );
                 } else {
                     smCountA.show()
@@ -7000,6 +7007,8 @@ pollingCountsWrite = function(pollingData){
 
         // 有cl 就更新 聊天室列表的cnt
         if( thisCntObj.hasOwnProperty("cl") === false ) thisCntObj.cl = [] ;
+
+        var countA3 = 0; // 聊天室tab的cnt用加的
         thisCntObj.cl.forEach(function(obj){
             var tmpDiv = $(".sm-cl-count[data-ci=" + obj.ci + "]").hide();
             if (obj.B7 > 0) {
@@ -7009,8 +7018,15 @@ pollingCountsWrite = function(pollingData){
                 } else {
                     tmpDiv.html(countsFormat(obj.B7)).show();    
                 }
+
+                countA3 += obj.B7;
             }
         })
+
+        if(countA3 > 0) 
+            $(".polling-cnt[data-polling-cnt=A3] .sm-count").html(countsFormat(countA3)).show();
+        else
+            $(".polling-cnt[data-polling-cnt=A3] .sm-count").hide();
     }
 
     // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
