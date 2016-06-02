@@ -6750,7 +6750,7 @@ getCloudToken = function(cloudObj,isReDo){
         data: JSON.stringify({
             ui: cloudObj.ui , // private user id
             key: cloudObj.key,
-            tp: 0,  // device type
+            tp: 1,  // device type
             dn: QmiGlobal.device  // device name
         }),
         type: "post",
