@@ -685,8 +685,12 @@ $(function(){
 	});
 	
 	//留言ui調整
-	$(document).on("input",".st-reply-message-textarea textarea",function(){
+	$(document).on("input",".st-reply-message-textarea textarea",function(e){
 		var this_textarea = $(this);
+		// console.log(String.fromCharCode(e.keyCode));
+		// this_textarea.next().html(String.fromCharCode(e.keyCode));
+		// console.log(this_textarea.next().html());
+
 		if(this_textarea.height() > 40 && this_textarea.parent().hasClass("adjust")) {
 			this_textarea.parent().removeClass("adjust");
 			this_textarea.addClass("textarea-animated");
@@ -706,54 +710,183 @@ $(function(){
 			}
 		},201);
 	});
-	
-	// $(document).on("keyup focus",".st-reply-message-textarea textarea",function(e){
+
+	// $(document).on("keydown",".st-reply-message-textarea textarea",function(e){
 	// 	var this_textarea = $(this);
-	// 	var keyinText = this_textarea.val().slice(-1);
-	// 	var replyArea = this_textarea.parent();
-	// 	if(replyArea.find(".tag-list")){
-	// 		replyArea.find(".tag-list").remove();
-	// 	}
-	// 	// var tagMenuContainer = $(".st-reply-area").find(".tag-list");
-	// 	// tagMenuContainer.html("");
-
-	// 	if (this_textarea.val().search("@") != -1) {
-	// 		var markSignIndex = this_textarea.val().indexOf("@");
-	// 		var markText = this_textarea.val().substring(markSignIndex+1);
-	// 		var memberslist = QmiGlobal.groups[gi].guAll;
-	// 		var tagElements = ""
-	// 		for (var memberID in memberslist) {
-	// 			var memberMugshot = memberslist[memberID].aut || "images/common/others/empty_img_personal.png";
-	// 			var memberName = memberslist[memberID].nk;
-	// 			if ((memberName) 
-	// 				// && (markText.match(/[\u4E00-\u9FA5]/g))
-	// 				&& ((/^[^\s]/).test(markText))
-	// 				&& (memberName.search(new RegExp(markText, "i")) != -1)) {
-	// 				tagElements += "<li><a><img src='" + memberMugshot + "' />" + memberName + "</a></li>";
-	// 			}
-	// 		}
-
-	// 		if (tagElements.length) {
-	// 			// tagMenuContainer.show();
-	// 			replyArea.prepend($("<ul/>", {
-	// 				"class": "tag-list",
-	// 				html: tagElements
-	// 			}));
-
-	// 			$(".tag-list").find("li").bind("click", function(e) {
-
- //                    cns.log(e.target);
- //                });
-				
-	// 			// tagMenuContainer.html(tagElements);
-	// 		}else{
-	// 			// tagMenuContainer.html("");
-	// 			// tagMenuContainer.hide();
-	// 		}
-	// 	}
+	// 	console.log(String.fromCharCode(e.keyCode));
+	// 	this_textarea.next().html(this_textarea.next().html() + String.fromCharCode(e.keyCode));
+	// 	console.log(this_textarea.next().html());
 	// });
 
+	$(document).on("keyup click",".st-reply-message-textarea textarea",function(e){
+
+		var thisTextarea = $(this);
+		// var tagRegex = //
+		var replyDom = thisTextarea.parent();
+		var hideDivDom = thisTextarea.next();
+		var inputText = thisTextarea.val();
+		var cursorPosition = thisTextarea[0].selectionStart;
+		var preTextOfCursor = inputText.substring(0, cursorPosition);
+		// console.log(inputText);
+		console.log(preTextOfCursor);
+		if ( !thisTextarea.data("memberList")
+		  && !thisTextarea.data("markMembers")
+		  && !thisTextarea.data("divContent")) {
+			thisTextarea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+			thisTextarea.data("markMembers", {});
+			thisTextarea.data("divContent", "");
+		}
+		// console.log(cursorPosition);
+		// console.log(inputText[cursorPosition]);
+
+		if (preTextOfCursor.lastIndexOf("@") >= 0) {
+			var lastMarkPosition = preTextOfCursor.lastIndexOf("@");
+			if ((cursorPosition == inputText.length) || (inputText[cursorPosition].match(/\s/g))) {
+				var markText = preTextOfCursor.substring(lastMarkPosition + 1, cursorPosition);
+				console.log(markText);
+			}
+			
+			// console.log(inputText.substring(cursorPosition, cursorPosition+1));
+		}
+		
+
+
+		// var this_textarea = $(this);
+		// var cursorPosition = this_textarea[0].selectionStart;
+		// var nearMarkSignIndex = -1;
+		// var markText = "";
+		// // var markMember = []
+		// var replyArea = this_textarea.parent();
+		// var tagElements = "";
+
+
+		// if (! this_textarea.data("tagList") 
+		// 	&& ! this_textarea.data("afterMarkText")
+		// 	&& ! this_textarea.data("markMember")) {
+
+		// 	this_textarea.data("tagList", $.extend({}, QmiGlobal.groups[gi].guAll));
+		// 	this_textarea.data("afterMarkText", "");
+		// 	this_textarea.data("markMember", {});
+		// }
+
+		// var divContainerText = function () {
+		// 	var filterText = "";
+		// 	var filterText = this_textarea.val();
+		// 	var tagMembers = this_textarea.data("markMember");
+		// 	for(var memberID in tagMembers) {
+		// 		console.log(tagMembers[memberID]);
+		// 		var tagMemberReg = new RegExp(tagMembers[memberID], "i");
+		// 		if (tagMemberReg.test(filterText)) {
+		// 			filterText = filterText.replace(tagMembers[memberID], "<mark>" + 
+		// 				tagMembers[memberID] + "</mark> ");
+		// 			console.log(tagMembers[memberID]);
+		// 		}
+		// 	}
+
+		// 	if ((this_textarea.next().html()).slice(-7) === "</mark>") {
+		// 		filterText = filterText.replace(tagMembers[memberID], "");
+		// 	}
+
+		// 	console.log(filterText);
+		// 	// filterText = filterText.replace(/<\/mark>/g,' ');
+		// 	return filterText;
+		// }();
+		// console.log(divContainerText);
+		// this_textarea.next().html(divContainerText);
+
+
+		// if(replyArea.find(".tag-list")){
+		// 	replyArea.find(".tag-list").remove();
+		// }
+
+		// var markSignReg = /@/g;
+		// var match, matches = [];
+		// // console.log(cursorPosition);
+		// var range = Math.abs(cursorPosition - this_textarea.val().indexOf("@"));
+		// var cursorAfterChar = this_textarea.val().substring(cursorPosition, cursorPosition + 1);
+		// // console.log(cursorAfterChar);
+		// // console.log(cursorAfterChar.indexOf(" "));
+		// // console.log(cursorPosition === this_textarea.val().length);
+		// // console.log(cursorPosition === this_textarea.val().length || cursorAfterChar.indexOf(" ") >= 0);
+
+		// while ((match = markSignReg.exec(this_textarea.val())) != null) {
+		// 	if ((range >= Math.abs(cursorPosition - match.index)) 
+		// 		&& (cursorPosition > match.index)
+		// 		&& (cursorPosition === this_textarea.val().length 
+		// 			|| cursorAfterChar.indexOf(" ") >= 0)) {
+
+		// 		range = Math.abs(cursorPosition - match.index);
+		// 		nearMarkSignIndex = match.index;
+		// 	}
+		// 	// console.log(range);
+		// }
+		// // console.log(nearMarkSignIndex);
+
+		// if (nearMarkSignIndex != -1) {
+		// 	var memberslist = this_textarea.data("tagList");
+		// 	markText = this_textarea.val().substring(nearMarkSignIndex + 1, cursorPosition);
+		// 	console.log(markText);
+
+		// 	for (var memberID in memberslist) {
+		// 		var memberMugshot = memberslist[memberID].aut || 
+		// 			"images/common/others/empty_img_personal.png";
+		// 		var memberName = memberslist[memberID].nk;
+		// 		if ((memberName) 
+		// 			&& ((/^[^\s]$/).test(markText))
+		// 			&& (memberName.search(new RegExp(markText, "i")) != -1)) {
+
+		// 			tagElements += "<li id='" + memberID + "'><a><img src='" + memberMugshot + "' />" 
+		// 				+ memberName + "</a></li>";
+		// 		}
+		// 	}
+		// }
+
+		// if (tagElements.length) {
+		// 	replyArea.prepend($("<ul/>", {
+		// 		"class": "tag-list",
+		// 		html: tagElements
+		// 	}));
+
+		// 	$(".tag-list").find("li").bind("click", function (e) {
+		// 		if ($(e.target).is("li")) {
+		// 			var memberID = e.target.id;
+		// 		} else {
+		// 			var memberID = ($(e.target).parent().attr("id"));
+		// 		}
+				
+		// 		var memberName = (this_textarea.data("tagList")[memberID]).nk;
+		// 		var markSignIndex = this_textarea.val().lastIndexOf("@");
+	
+		// 		var convertedText = this_textarea.val().substring(0, markSignIndex) + memberName;
+		// 		// var highlightedText = this_textarea.val().replace("@" + markText,  "<mark>" + memberName + " </mark>");
+
+
+		// 		// if (this_textarea.data("afterMarkText").length) {
+		// 		// 	highlightedText = this_textarea.data("afterMarkText").replace("@" + markText,  "<mark>" + 
+		// 		// 		memberName + " </mark>");
+		// 		// }
+
+		// 		// var matchPattern = new RegExp(/@/, "g");
+		// 		// var highlightedText = this_textarea.val().replace(matchPattern, "<mark>" + memberName + "</mark>");
+
+		// 		// this_textarea.data("afterMarkText", highlightedText);
+		// 		// this_textarea.next().html(this_textarea.data("afterMarkText"));
+		// 		this_textarea.data("markMember")[memberID] = memberName;
+		// 		this_textarea.val(convertedText);
+
+		// 		delete this_textarea.data("tagList")[memberID];
+  //               replyArea.find(".tag-list").remove();
+  //               this_textarea.focus();
+  //               e.preventDefault();
+  //           });
+  //       }
+			
+	});
+
 	// $(document).on("focusout",".st-reply-message-textarea textarea",function(e){
+	// 	// var text = $(this).val();
+	// 	// var highlightedText = text.replace(/\n$/g, '\n\n').replace(/[A-Z].*?\b/g, '<mark>$&</mark>');
+	// 	// $(this).next().html(highlightedText);
 	// 	var this_textarea = $(this);
 	// 	var replyArea = this_textarea.parents(".st-reply-area");
 	// 	if (replyArea.find(".tag-list")) {

@@ -3223,6 +3223,7 @@ img.st-reply-message-attach {
 }
 
 .st-reply-message-textarea textarea {
+	background: transparent;
 	width: 100%;
 	border: 0px;
 	font-size: 15px;
@@ -3231,6 +3232,33 @@ img.st-reply-message-attach {
 	top: 6px;
 	left: 6px;
 	overflow-y: auto;
+	z-index: 2;
+
+}
+
+.st-reply-highlight-container{
+
+    height: 36px;
+    width: -webkit-calc( 100% - 178px );
+    position: absolute;
+    /*top: 10px;*/
+    top: 60px;
+    margin-left: 5px;
+    /*color: transparent;*/
+    white-space: pre-wrap;
+	word-wrap: break-word;
+    z-index: 1;
+
+}
+
+.st-reply-message-textarea textarea, .st-reply-highlight-container{
+	font: 14px 'Open Sans', serif;
+	letter-spacing: 1px;
+}
+
+mark{
+	/*color: transparent;*/
+
 }
 
 .st-reply-message-textarea textarea:focus{ outline:none } 
@@ -5377,8 +5405,7 @@ section.subpage-fileSharing{
 .tag-list {
 	/*display: none;*/
     width: 324px;
-    bottom: 31px;
-    left: 86px;
+    margin: -144px auto;
     position: absolute;
     height: 140px;
     overflow: scroll;
