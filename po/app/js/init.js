@@ -252,7 +252,6 @@ window.QmiPollingChk = {
 
 	// 5分鐘檢查一次polling死了沒
 	interval: setInterval(function() {
-
 		//  聊天室不開啓
 		if(window.QmiPollingChk.flag === false) return;
 
@@ -355,7 +354,6 @@ window.QmiAjax = function(args){
 			cns.log("reAuth lock!");
 			return reAuthInterval;
 		} else {
-			
 			// 檢查是否接近過期時間 先替換token
 			// ajaxArgs,cloudData
 
@@ -473,22 +471,20 @@ window.QmiAjax = function(args){
 	var completeCB,successCB,errorCB;
 
 	// 先搜集好callback 如果有呼叫 deferred完成後就執行
-	(function(){
-		ajaxDeferred.promise().complete = function(cb) {
-			completeCB = cb;
-			return ajaxDeferred.promise();
-		};
+	ajaxDeferred.promise().complete = function(cb) {
+		completeCB = cb;
+		return ajaxDeferred.promise();
+	};
 
-	    ajaxDeferred.promise().success = function(cb) {
-	        successCB = cb;
-	        return ajaxDeferred.promise();
-	    };
+    ajaxDeferred.promise().success = function(cb) {
+        successCB = cb;
+        return ajaxDeferred.promise();
+    };
 
-		ajaxDeferred.promise().error = function(cb) {
-			errorCB = cb;
-			return ajaxDeferred.promise();
-		};
-	}())
+	ajaxDeferred.promise().error = function(cb) {
+		errorCB = cb;
+		return ajaxDeferred.promise();
+	};
 	
 	// complete來這裡
 	ajaxDeferred.always(function(completeData){
@@ -511,8 +507,9 @@ window.QmiAjax = function(args){
 	ajaxDeferred.fail(function(completeData) {
 
 		completeData.newArgs = newArgs;
-		self.onError(completeData);
 
+		// 沒有error的時候才用預設
+		if(newArgs.error === undefined && errorCB === undefined) self.onError(completeData);
 		if(errorCB instanceof Function) errorCB(completeData);
 	});
 

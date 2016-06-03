@@ -936,6 +936,7 @@ topBarMake = function (top_area,top_msg_num,resize) {
 
     top_timer = setInterval(function(){
         top_area.find(".st-top-right-arrow").trigger("mouseup");
+        console.log("[!timer!] top_timer1");
     },top_timer_ms);
 
     //重設輪播
@@ -943,6 +944,7 @@ topBarMake = function (top_area,top_msg_num,resize) {
         clearInterval(top_timer);
         top_timer = setInterval(function(){
             top_area.find(".st-top-right-arrow").trigger("mouseup");
+            console.log("[!timer!] top_timer2");
         },top_timer_ms);
     });
 }
@@ -6871,7 +6873,7 @@ polling = function(){
             newPollingData.publicPollingTime = publicPollingTime;
 
             // 錯誤排除 把不該存在公雲polling的私雲gi剔除
-            newPollingData.cnts.forEach(function(cntObj,i) {
+            (newPollingData.cnts || []).forEach(function(cntObj,i) {
                 if(QmiGlobal.cloudGiMap.hasOwnProperty(cntObj.gi)) newPollingData.cnts.splice(i,1);
             });
 
