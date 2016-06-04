@@ -260,12 +260,6 @@ onCheckVersionDone = function(needUpdate){
 	});
 
 	login = function(phoneId,password,countrycode,isMail){
-		console.log("hey",{
-        		id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
-	            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
-	            dn: QmiGlobal.device,
-	            pw:toSha1Encode(password)
-        	});
 		isMail = isMail || false;
         s_load_show = true;
         
