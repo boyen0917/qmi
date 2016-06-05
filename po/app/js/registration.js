@@ -764,6 +764,7 @@ onCheckVersionDone = function(needUpdate){
                 vc: otpCode,
                 ud: $(document).data("device-token")
         	},
+        	errHide: true,
         	isLoadingShow: true,
         	method: "put",
         	error: function(jqXHR, textStatus, errorThrown) {

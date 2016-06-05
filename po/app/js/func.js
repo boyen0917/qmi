@@ -936,7 +936,6 @@ topBarMake = function (top_area,top_msg_num,resize) {
 
     top_timer = setInterval(function(){
         top_area.find(".st-top-right-arrow").trigger("mouseup");
-        console.log("[!timer!] top_timer1");
     },top_timer_ms);
 
     //重設輪播
@@ -6674,7 +6673,7 @@ getGroupList = function(){
     new QmiAjax({
         apiName: "groups"
     }).success(function(apiData){
-
+        window.testData = apiData;
         var 
         allGroupList = apiData.gl || [],
         allGlDeferred = $.Deferred();
@@ -6692,31 +6691,36 @@ getGroupList = function(){
                 var cloudGlDefArr = [];
                 // 取得每個私雲得團體列表
                 apiData.cl.forEach(function(cloudObj){
-                    // if(cloudObj)
-                    cloudGlDefArr.push(
-                        $.ajax({
-                            url: "https://" + cloudObj.cl + "/apiv1/groups",
-                            headers: {
-                                uui: ui,
-                                uat: at,
-                                ui: cloudObj.ui,
-                                at: cloudObj.nowAt,
-                                li: lang
-                            },
-                            type: "get"
-                        }).success(function(data){
-                            if(data.gl === undefined) return;
+                    
+                    if(cloudObj.nowAt === undefined) return;
 
-                            data.gl.forEach(function(groupObj){
-                                // 加入私雲gi 對照表
-                                QmiGlobal.cloudGiMap[groupObj.gi] = {
-                                    ci: cloudObj.ci,
-                                    cl: cloudObj.cl
-                                }
-                                allGroupList.push(groupObj)
-                            })
+                    var tempDeferred = $.Deferred();
+                    cloudGlDefArr.push(tempDeferred);
+
+                    $.ajax({
+                        url: "https://" + cloudObj.cl + "/apiv1/groups",
+                        headers: {
+                            uui: ui,
+                            uat: at,
+                            ui: cloudObj.ui,
+                            at: cloudObj.nowAt,
+                            li: lang
+                        },
+                        type: "get"
+                    }).success(function(data){
+                        if(data.gl === undefined) return;
+
+                        data.gl.forEach(function(groupObj){
+                            // 加入私雲gi 對照表
+                            QmiGlobal.cloudGiMap[groupObj.gi] = {
+                                ci: cloudObj.ci,
+                                cl: cloudObj.cl
+                            }
+                            allGroupList.push(groupObj)
                         })
-                    )
+                    }).complete(function() {
+                        tempDeferred.resolve(false);
+                    });
                 })
 
                 // 取得完成
@@ -6746,7 +6750,7 @@ getCloudToken = function(cloudObj,isReDo){
     var deferred = $.Deferred();
 
     if(cloudObj.key === undefined) {
-        deferred.resolve(123);   
+        deferred.resolve(false);   
     } else {
         $.ajax({
             url: "https://" + cloudObj.cl + "/apiv1/cert",
@@ -6830,28 +6834,6 @@ getCloudKey = function(cloudsArr){
         }
     });
     return deferred.promise();
-}
-
-getPrivateGroupList = function(p_data, callback){
-    cns.log("getPrivateGroupList");
-    //取得團體列表
-    var api_name = "groups";
-    var headers = {
-        "ui":p_data.ui,
-        "at":p_data.at,
-        "li":lang
-    };
-    var method = "get";
-    ajaxDo(api_name,headers,method,true,false,false,true,p_data.cl).complete(function(res){
-        if( res.status==200 ){
-            var parse_data = $.parseJSON(res.responseText);
-            var list = $.lStorage("_pri_group")||{};
-            list[p_data.ci] = p_data;
-            list[p_data.ci].tmp_groups = parse_data.gl;
-            $.lStorage("_pri_group", list);
-        }
-        if(callback) callback();
-    });
 }
 
 
@@ -7297,6 +7279,9 @@ pollingCmds = function(newPollingData){
                         if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
                     case 6://delete user info
+                        // 判斷是自己的話就移除團體
+                        if(QmiGlobal.groups[item.pm.gi].me === item.pm.gu) removeGroups(item.pm.gi);
+
                         item.pm.onGetMemData = function(this_gi, memData){
                             try{
                                 if( isShowNotification ){

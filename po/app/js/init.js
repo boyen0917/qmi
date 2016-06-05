@@ -14,8 +14,7 @@ var ui,
 	clearChatTimer,
 
 	//HiCloud
- 	base_url = "https://qmi7.mitake.com.tw/apiv1/";
- 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	base_url = "https://ap.qmi.emome.net/apiv1/";
  	
  	// // container riseNotification 一旦換網址就沒了
 
@@ -501,8 +500,7 @@ window.QmiAjax = function(args){
 
 		completeData.newArgs = newArgs;
 
-		// 沒有error的時候才用預設
-		if(newArgs.error === undefined && errorCB === undefined) self.onError(completeData);
+		self.onError(completeData);
 		if(errorCB instanceof Function) errorCB(completeData);
 	});
 
