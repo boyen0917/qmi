@@ -688,6 +688,8 @@ generateMemberGrid = function( memObject ){
 
 				//new > admin > normal
 				if( isNewMem(mem) ){
+					if( mem.ad==1 ) tmp.addClass("admin")
+						
 					tmp.addClass("new-mem");
 					var lastNewDom = memContainer.find(".new-mem");
 					if( lastNewDom.length>0 ){
@@ -696,7 +698,7 @@ generateMemberGrid = function( memObject ){
 						memContainer.prepend(tmp);
 					}
 					setNewMemTag( tmp );
-				} else if( mem.ad==1 ){	//is admin?
+				} else if( mem.ad==1 ){
 					tmp.addClass("admin");
 					var lastAdminDom = memContainer.find(".admin");
 					if( lastAdminDom.length>0 ){

@@ -508,8 +508,7 @@ window.QmiAjax = function(args){
 
 		completeData.newArgs = newArgs;
 
-		// 沒有error的時候才用預設
-		if(newArgs.error === undefined && errorCB === undefined) self.onError(completeData);
+		self.onError(completeData);
 		if(errorCB instanceof Function) errorCB(completeData);
 	});
 

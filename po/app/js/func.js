@@ -936,7 +936,6 @@ topBarMake = function (top_area,top_msg_num,resize) {
 
     top_timer = setInterval(function(){
         top_area.find(".st-top-right-arrow").trigger("mouseup");
-        console.log("[!timer!] top_timer1");
     },top_timer_ms);
 
     //重設輪播
@@ -6674,7 +6673,7 @@ getGroupList = function(){
     new QmiAjax({
         apiName: "groups"
     }).success(function(apiData){
-
+        window.testData = apiData;
         var 
         allGroupList = apiData.gl || [],
         allGlDeferred = $.Deferred();
@@ -6683,7 +6682,7 @@ getGroupList = function(){
         if(apiData.cl !== undefined && apiData.cl.length !== 0) {
             
             clTokenDefArr = apiData.cl.reduce(function(defArr,item){
-                defArr.push( getCloudToken(item) );
+                defArr.push( getCloudToken(item));
                 return defArr;
             },[]);
 
@@ -6692,30 +6691,36 @@ getGroupList = function(){
                 var cloudGlDefArr = [];
                 // 取得每個私雲得團體列表
                 apiData.cl.forEach(function(cloudObj){
-                    cloudGlDefArr.push(
-                        $.ajax({
-                            url: "https://" + cloudObj.cl + "/apiv1/groups",
-                            headers: {
-                                uui: ui,
-                                uat: at,
-                                ui: cloudObj.ui,
-                                at: cloudObj.nowAt,
-                                li: lang
-                            },
-                            type: "get"
-                        }).success(function(data){
-                            if(data.gl === undefined) return;
+                    
+                    if(cloudObj.nowAt === undefined) return;
 
-                            data.gl.forEach(function(groupObj){
-                                // 加入私雲gi 對照表
-                                QmiGlobal.cloudGiMap[groupObj.gi] = {
-                                    ci: cloudObj.ci,
-                                    cl: cloudObj.cl
-                                }
-                                allGroupList.push(groupObj)
-                            })
+                    var tempDeferred = $.Deferred();
+                    cloudGlDefArr.push(tempDeferred);
+
+                    $.ajax({
+                        url: "https://" + cloudObj.cl + "/apiv1/groups",
+                        headers: {
+                            uui: ui,
+                            uat: at,
+                            ui: cloudObj.ui,
+                            at: cloudObj.nowAt,
+                            li: lang
+                        },
+                        type: "get"
+                    }).success(function(data){
+                        if(data.gl === undefined) return;
+
+                        data.gl.forEach(function(groupObj){
+                            // 加入私雲gi 對照表
+                            QmiGlobal.cloudGiMap[groupObj.gi] = {
+                                ci: cloudObj.ci,
+                                cl: cloudObj.cl
+                            }
+                            allGroupList.push(groupObj)
                         })
-                    )
+                    }).complete(function() {
+                        tempDeferred.resolve(false);
+                    });
                 })
 
                 // 取得完成
@@ -6744,65 +6749,67 @@ getGroupList = function(){
 getCloudToken = function(cloudObj,isReDo){
     var deferred = $.Deferred();
 
-    if(cloudObj.key === undefined) deferred.resolve(false);
+    if(cloudObj.key === undefined) {
+        deferred.resolve(false);   
+    } else {
+        $.ajax({
+            url: "https://" + cloudObj.cl + "/apiv1/cert",
+            headers: { li: lang },
+            data: JSON.stringify({
+                ui: cloudObj.ui , // private user id
+                key: cloudObj.key,
+                tp: 1,  // device type
+                dn: QmiGlobal.device  // device name
+            }),
+            type: "post",
+            error: function(errData){
+                cns.debug("cloud cl cert error",errData);
 
-    $.ajax({
-        url: "https://" + cloudObj.cl + "/apiv1/cert",
-        headers: { li: lang },
-        data: JSON.stringify({
-            ui: cloudObj.ui , // private user id
-            key: cloudObj.key,
-            tp: 1,  // device type
-            dn: QmiGlobal.device  // device name
-        }),
-        type: "post",
-        error: function(errData){
-            cns.debug("cloud cl cert error",errData);
+                deferred.resolve(false);
+            },
+            success: function(apiData){
 
-            deferred.resolve(false);
-        },
-        success: function(apiData){
+                cns.debug("success",apiData);
 
-            cns.debug("success",apiData);
+                // http status 200:
+                // rsp code 406 為驗證的 Key 被串改…
+                // rsp code 401 為驗證的內容與請求者不符
+                // rsp code 418 Expired Time 逾時
+                switch ( apiData.rsp_code ){
 
-            // http status 200:
-            // rsp code 406 為驗證的 Key 被串改…
-            // rsp code 401 為驗證的內容與請求者不符
-            // rsp code 418 Expired Time 逾時
-            switch ( apiData.rsp_code ){
+                    case 200: //成功 繼續下一步
+                        // 存入 QmiGlobal.clouds
+                        QmiGlobal.clouds[cloudObj.ci] = cloudObj;
 
-                case 200: //成功 繼續下一步
-                    // 存入 QmiGlobal.clouds
-                    QmiGlobal.clouds[cloudObj.ci] = cloudObj;
+                        // 設定這次的私雲token
+                        QmiGlobal.clouds[cloudObj.ci].nowAt = apiData.at;
+                        QmiGlobal.clouds[cloudObj.ci].et = apiData.et;
 
-                    // 設定這次的私雲token
-                    QmiGlobal.clouds[cloudObj.ci].nowAt = apiData.at;
-                    QmiGlobal.clouds[cloudObj.ci].et = apiData.et;
+                        deferred.resolve(true);
 
-                    deferred.resolve(true);
-
-                    break;
-
-                case 418: // key 過期
-                    // 已經重做過了 不再繼續
-                    if(isReDo === true) {
-                        deferred.resolve(false);
                         break;
-                    }
 
-                    // 重新取key
-                    getCloudKey([cloudObj]).done(function(isSuccess){
-                        if(isSuccess === true)
-                            getCloudToken(cloudObj,true).done(deferred.resolve);
-                    })
+                    case 418: // key 過期
+                        // 已經重做過了 不再繼續
+                        if(isReDo === true) {
+                            deferred.resolve(false);
+                            break;
+                        }
 
-                    break;
-                // break;
-                default: // 不取這個私雲 去下一步
-                    deferred.resolve(false);
+                        // 重新取key
+                        getCloudKey([cloudObj]).done(function(isSuccess){
+                            if(isSuccess === true)
+                                getCloudToken(cloudObj,true).done(deferred.resolve);
+                        })
+
+                        break;
+                    // break;
+                    default: // 不取這個私雲 去下一步
+                        deferred.resolve(false);
+                }
             }
-        }
-    });
+        });
+    }
 
     return deferred.promise();
 }
@@ -6827,28 +6834,6 @@ getCloudKey = function(cloudsArr){
         }
     });
     return deferred.promise();
-}
-
-getPrivateGroupList = function(p_data, callback){
-    cns.log("getPrivateGroupList");
-    //取得團體列表
-    var api_name = "groups";
-    var headers = {
-        "ui":p_data.ui,
-        "at":p_data.at,
-        "li":lang
-    };
-    var method = "get";
-    ajaxDo(api_name,headers,method,true,false,false,true,p_data.cl).complete(function(res){
-        if( res.status==200 ){
-            var parse_data = $.parseJSON(res.responseText);
-            var list = $.lStorage("_pri_group")||{};
-            list[p_data.ci] = p_data;
-            list[p_data.ci].tmp_groups = parse_data.gl;
-            $.lStorage("_pri_group", list);
-        }
-        if(callback) callback();
-    });
 }
 
 
@@ -7168,17 +7153,22 @@ pollingCmds = function(newPollingData){
     groupListDeferred.done(function(){
 
         // 需要打combo的情況
-        newPollingData.cmds.forEach(function(item,i){
+        newPollingData.cmds.forEach(function(item,i){ // 後面有 bind([]) 用this來判斷是否重複
 
             var 
             comboDeferred = $.Deferred();
             insideDeferred = $.Deferred();
 
+            // 如果是自己被踢出團體了 不能打combo
+            if( item.tp === 6 && item.pm.gu === QmiGlobal.groups[item.pm.gi].me){
+                insideDeferred.resolve(false);    
+            }
+
             // 更新group info 強制打
-            if( item.tp === 10 ){
+            else if( item.tp === 10 ){
                 insideDeferred.resolve(true);    
             }
-            // 不重複的gi & 沒 guAll
+            // 不重複的gi & 沒guAll
             else if( 
                 item.tp !== 11                  &&  // 上面做過了
                 item.pm.gi !== undefined        &&  // tp 3 是告知有邀請 會沒有tp
@@ -7280,17 +7270,18 @@ pollingCmds = function(newPollingData){
                             }
                         }
                         user_info_arr.push( item.pm );
-                        if( gi == item.pm.gi ){
-                            isUpdateMemPage = true;
-                        }
+
+                        if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
                     case 5://edit user info
                         user_info_arr.push( item.pm );
-                        if( gi == item.pm.gi ){
-                            isUpdateMemPage = true;
-                        }
+                        
+                        if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
                     case 6://delete user info
+                        // 判斷是自己的話就移除團體
+                        if(QmiGlobal.groups[item.pm.gi].me === item.pm.gu) removeGroups(item.pm.gi);
+
                         item.pm.onGetMemData = function(this_gi, memData){
                             try{
                                 if( isShowNotification ){
@@ -7308,6 +7299,7 @@ pollingCmds = function(newPollingData){
                             }
                         }
 
+                        if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
                     case 7://branch edit
                         if( item.pm.gi !== undefined ) branch_info_arr.push( item.pm );
