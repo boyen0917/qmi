@@ -357,7 +357,7 @@ timelineSwitch = function (act,reset,main){
     gmHeader.find(".navi-alert").show();
 
     // navi的home active
-    $(".st-filter-area").andSelf()
+    $(".st-filter-area").hide().andSelf()
     .find(".st-filter-list-active").removeClass("st-filter-list-active").end()
     .find("[data-navi=home]").addClass("st-filter-list-active");
 
@@ -373,7 +373,6 @@ timelineSwitch = function (act,reset,main){
 
 
     switch (act) {
-
         case "feeds":
             // $(".st-filter-action")
             // .find("[data-status='all']").show().addClass("st-filter-list-active").end()
@@ -1107,12 +1106,14 @@ setOfficialGroup = function( this_gi ){
     }
 
     try{
+        //set tab
+        $(".header-menu").parent().show();
+
         if( !groupData.isOfficial ){
 
             //temp
             $(document).data("official",false);
-            //set tab
-            $(".header-menu").show();
+            
             //set filters
             $(".st-filter-area").show();
 
@@ -1169,8 +1170,6 @@ setOfficialGroup = function( this_gi ){
     } catch(e){
         errorReport(e);
     }
-
-
 }
 
 onClickOfficialGeneralChat = function( this_gi ){
@@ -1273,12 +1272,15 @@ eventContentDetail = function(this_event,e_data){
 
 
 //回覆 detail timeline message內容
-detailTimelineContentMake = function (this_event,e_data,reply_chk){
+detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailBox){
+
     var this_gi = this_event.data("event-id").split("_")[0];
     var this_ei = this_event.data("event-id");
 
     //event 自己的閱讀回覆讚好狀態
     var event_status = this_event.data("event-status");
+
+    var deferTasks = [];
 
     //event path
     this_event.data("event-path",this_ei);
@@ -1288,16 +1290,20 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
     
     //製作每個回覆
     var okCnt = 0;
+
     $.each(e_data,function(el_i,el){
         //0是發文 不重複製作
         // if(el_i == 0) return ;
+
+        var deferred = $.Deferred();
 
         var without_message = false;
         var reply_content;
         var ml_arr = [];
         var mainReplyText;
 
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html .st-reply-content-area',function(){
+        deferTasks.push(deferred);
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
 
@@ -1428,7 +1434,6 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
             }
             
             this_content.find("b").bind("click", function(e) {
-                console.log($(e.target).attr("name"));
                 userInfoShow(gi, $(e.target).attr("name"));
             });
 
@@ -1514,19 +1519,25 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
 
             this_event._i18n();
 
-
             var tmpData = getGroupCompetence(this_gi);
             if( false==tmpData.isAdmin && true==tmpData.isOfficial ){
                 // this_event.find(".st-read").hide();
                 this_event.find(".namecard").removeClass("namecard");
             }
+
+            deferred.resolve();
         }));
+        
+    });
+
+    $.when.apply($, deferTasks).then(function () {
+        triggerDetailBox.data("trigger", true);
     });
 }
 
 
 //動態消息 判斷關閉區域
-timelineDetailClose = function (this_event,tp){
+timelineDetailClose = function (this_event,tp, triggerDetailBox){
 
     var detail_data;
     //公告通報任務的detail 線要隱藏 
@@ -1571,10 +1582,12 @@ timelineDetailClose = function (this_event,tp){
     this_event.find(detail_data + "-detail").toggle();
     
     //開啟留言區域
-    if( this_event.find(".st-reply-all-content-area").data("show")==true ){
-       this_event.find(".st-reply-all-content-area").slideUp("",function(){
+    if( this_event.find(".st-reply-all-content-area").data("show") == true ){
+        triggerDetailBox.data("trigger", false);
+        this_event.find(".st-reply-all-content-area").slideUp("",function(){
             $(this).html("");
             this_event.find(".st-reply-like-area").toggle();
+            triggerDetailBox.data("trigger", true);
        }).data("show",false);
     }else{
         this_event.find(".st-reply-like-area").toggle();
@@ -6597,6 +6610,7 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
         this_textarea.val("").parent().addClass("adjust").removeClass("textarea-animated");
 
         setTimeout(function(){
+            clearReplyDomData(this_event);
             if(this_event.find(".st-reply-all-content-area").is(":visible")) {
                 replyReload(this_event);
             }else{
@@ -6610,12 +6624,6 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
 
 replyReload = function(this_event){
 
-    //重置
-    this_event.find(".st-reply-message-textarea textarea").val("");
-    this_event.find(".st-reply-message-img").data("id",null);
-    this_event.find(".st-reply-message-img").data("type",null);
-    this_event.find(".st-reply-message-img").data("file",null);
-    this_event.find(".st-reply-message-img").html("");  //清掉sticker預覽
     //把sticker欄收起來
     var stickerIcon = this_event.find(".st-reply-message-sticker");
     if( true==stickerIcon.data("open") ){
@@ -6640,6 +6648,15 @@ replyReload = function(this_event){
         }
     });
 };
+
+clearReplyDomData = function(this_event) {
+    //重置
+    this_event.find(".st-reply-message-textarea textarea").val("");
+    this_event.find(".st-reply-message-img").data("id",null);
+    this_event.find(".st-reply-message-img").data("type",null);
+    this_event.find(".st-reply-message-img").data("file",null);
+    this_event.find(".st-reply-message-img").html("");  //清掉sticker預覽
+}
 
 //timeline more
 zoomOut = function (target) {
