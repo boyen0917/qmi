@@ -6696,12 +6696,12 @@ zoomIn = function (target)
 getGroupList = function(){
     var groupsDeferred = $.Deferred();
 
-    if(window.groupZero !== true) {
-        groupsDeferred.resolve();
-        return groupsDeferred.promise();
-    }
+    // if(window.groupZero !== true) {
+    //     groupsDeferred.resolve();
+    //     return groupsDeferred.promise();
+    // }
 
-    window.groupZero = true;
+    // window.groupZero = true;
 
     new QmiAjax({
         apiName: "groups"
