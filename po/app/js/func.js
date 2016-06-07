@@ -7023,7 +7023,10 @@ polling = function(){
 
                 newPollingData.cmds.push({
                     tp: 54,
-                    gl: ["G000000105G"]
+                    pm: {
+                        gl: ["G000000105G"]    
+                    }
+                    
                 })
             }
 
