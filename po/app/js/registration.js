@@ -327,7 +327,7 @@ onCheckVersionDone = function(needUpdate){
         at = QmiGlobal.auth.at;
 
         //附上group list
-        getGroupList().done(function(groupList){
+        getGroupList().done(function(groupList = []){
 
         	// 取dgi的combo
             if( groupList.length>0 ){

@@ -297,40 +297,62 @@ timelineChangeGroup = function (thisGi) {
     var changeDeferred = $.Deferred(),
         comboDeferred = $.Deferred();
 
-    if(Object.keys(QmiGlobal.groups[thisGi].guAll).length == 0){
-        getGroupComboInit(thisGi).done( comboDeferred.resolve );
-    } else {
-        comboDeferred.resolve();
-    }
+    // 私雲轉移中
+    var timelineDom = $(".gm-content");
+    if(QmiGlobal.groups[thisGi].isRefreshing === true) {
+        $("#page-group-main .gm-header-right").hide();
+
+        timelineDom
+        .find(".refresh-lock").show().end()
+        .find(".gm-content-body").hide();
 
 
-    comboDeferred.done(function(){
-        //指定gi
-        setThisGroup(thisGi);
-
-        //sidemenu name
-        setSmUserData(gi,gu,gn);
-
-        //檢查官方帳號
-        initOfficialGroup( gi );
-
-        //置頂設定
-        topEvent();
-
-        if (QmiGlobal.groups[thisGi].set && QmiGlobal.groups[thisGi].set.ccc) {
-            onRemoveChatDB(thisGi, QmiGlobal.groups[thisGi].set.ccc);
-        }
-        //切換團體時, 選目前第一個選項
-        var tmp = $(".sm-small-area:visible");
-        if( tmp.length>0 ){
-            $(tmp[0]).addClass("active");
-            timelineSwitch( ( $( tmp[0] ).data("sm-act") || "feeds" ),true);
-        }else{
-            timelineSwitch("feeds",true);
-        }
+        $(".sm-group-area").addClass("enable");
 
         changeDeferred.resolve();
-    })
+
+    } else {
+        $("#page-group-main .gm-header-right").show();
+        timelineDom
+        .find(".refresh-lock").hide().end()
+        .find(".gm-header-right").show().end()
+        .find(".gm-content-body").show();
+
+        if(Object.keys(QmiGlobal.groups[thisGi].guAll).length == 0){
+            getGroupComboInit(thisGi).done( comboDeferred.resolve );
+        } else {
+            comboDeferred.resolve();
+        }
+
+
+        comboDeferred.done(function(){
+            //指定gi
+            setThisGroup(thisGi);
+
+            //sidemenu name
+            setSmUserData(gi,gu,gn);
+
+            //檢查官方帳號
+            initOfficialGroup( gi );
+
+            //置頂設定
+            topEvent();
+
+            if (QmiGlobal.groups[thisGi].set && QmiGlobal.groups[thisGi].set.ccc) {
+                onRemoveChatDB(thisGi, QmiGlobal.groups[thisGi].set.ccc);
+            }
+            //切換團體時, 選目前第一個選項
+            var tmp = $(".sm-small-area:visible");
+            if( tmp.length>0 ){
+                $(tmp[0]).addClass("active");
+                timelineSwitch( ( $( tmp[0] ).data("sm-act") || "feeds" ),true);
+            }else{
+                timelineSwitch("feeds",true);
+            }
+
+            changeDeferred.resolve();
+        })
+    }
         
     return changeDeferred.promise();
 }
@@ -4515,36 +4537,7 @@ groupMenuListArea = function (noApi){
         var icon_host = "<img src='images/sidemenu/icon_host.png'/>",
             listArea = $(".sm-group-list-area").html("");
 
-        $.each(QmiGlobal.groups,function(key,val){
-            if( key.indexOf("G")!=0 && key.indexOf(_pri_split_chat)!=0 ) return;
-            
-            var glt_img = "images/common/others/empty_img_all_l.png";
-            var glo_img = "images/common/others/empty_img_all_l.png";
-            if(val.aut) {
-                glt_img = val.aut;
-                glo_img = val.auo;
-            }
-
-            var data_gi_str = 'data-gi="' + val.gi + '" ';
-            var this_group = $(
-                '<div class="sm-group-area polling-cnt enable" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + val.me + '">' +
-                    '<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
-                    '<div class="sm-group-area-l group-pic">' +
-                        '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
-                    '</div>' +
-                    '<div class="sm-group-area-r polling-group-name" '+ data_gi_str+'>' + htmlFormat(val.gn) + '</div>' +
-                    '<div class="sm-count" style="display:none"></div>' +
-                '</div>'
-            );
-
-            this_group.find(".group-pic").data("auo",glo_img)
-            listArea.append(this_group);
-
-            //管理者圖示
-            if(val.ad != 1) this_group.find(".sm-icon-host").hide();
-
-            avatarPos(this_group.find(".sm-group-area-l img:eq(0)"));
-        });
+        $.each(QmiGlobal.groups,addSideMenuGroupUI.bind(listArea));
 
         if(Object.keys( QmiGlobal.groups ).length > 2) $(".sm-group-switch").show();
 
@@ -4556,6 +4549,39 @@ groupMenuListArea = function (noApi){
     });   
     
     return deferred.promise();
+}
+
+
+addSideMenuGroupUI = function(key,groupObj){
+    var listArea = this,
+        glt_img = "images/common/others/empty_img_all_l.png",
+        glo_img = "images/common/others/empty_img_all_l.png";
+
+    if(groupObj.aut) {
+        glt_img = groupObj.aut;
+        glo_img = groupObj.auo;
+    }
+
+    var data_gi_str = 'data-gi="' + groupObj.gi + '" ';
+    var this_group = $(
+        '<div class="sm-group-area polling-cnt enable" ' + data_gi_str + ' data-polling-cnt="A5" data-gu="' + groupObj.me + '">' +
+            '<img class="sm-icon-host" src="images/icon/icon_admin.png"/>' +
+            '<div class="sm-group-area-l group-pic">' +
+                '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
+            '</div>' +
+            '<div class="sm-group-area-r polling-group-name sm-group-content-style" '+ data_gi_str+'>' + 
+            '   <div>' + htmlFormat(groupObj.gn) + '</div>' + 
+            '   <div>' + $.i18n.getString("COMPOSE_N_MEMBERS", groupObj.cnt ) + '</div>' + 
+            '</div>' +
+            '<div class="sm-count" style="display:none"></div>' +
+        '</div>'
+    );
+
+    this_group.find(".group-pic").data("auo",glo_img);
+    listArea.append(this_group);
+
+    //管理者圖示
+    if(groupObj.ad != 1) this_group.find(".sm-icon-host").hide();
 }
 
 permissionControl = function(group_list){
@@ -6670,6 +6696,13 @@ zoomIn = function (target)
 getGroupList = function(){
     var groupsDeferred = $.Deferred();
 
+    if(window.groupZero !== true) {
+        groupsDeferred.resolve();
+        return groupsDeferred.promise();
+    }
+
+    window.groupZero = true;
+
     new QmiAjax({
         apiName: "groups"
     }).success(function(apiData){
@@ -6684,47 +6717,18 @@ getGroupList = function(){
             clTokenDefArr = apiData.cl.reduce(function(defArr,item){
                 defArr.push( getCloudToken(item));
                 return defArr;
-            },[]);
+            }, []);
 
             $.when.apply($,clTokenDefArr).done(function(){
 
                 var cloudGlDefArr = [];
                 // 取得每個私雲得團體列表
                 apiData.cl.forEach(function(cloudObj){
-                    
-                    if(cloudObj.nowAt === undefined) return;
-
-                    var tempDeferred = $.Deferred();
-                    cloudGlDefArr.push(tempDeferred);
-
-                    $.ajax({
-                        url: "https://" + cloudObj.cl + "/apiv1/groups",
-                        headers: {
-                            uui: ui,
-                            uat: at,
-                            ui: cloudObj.ui,
-                            at: cloudObj.nowAt,
-                            li: lang
-                        },
-                        type: "get"
-                    }).success(function(data){
-                        if(data.gl === undefined) return;
-
-                        data.gl.forEach(function(groupObj){
-                            // 加入私雲gi 對照表
-                            QmiGlobal.cloudGiMap[groupObj.gi] = {
-                                ci: cloudObj.ci,
-                                cl: cloudObj.cl
-                            }
-                            allGroupList.push(groupObj)
-                        })
-                    }).complete(function() {
-                        tempDeferred.resolve(false);
-                    });
+                    cloudGlDefArr.push(getCloudGroup(cloudObj,allGroupList));
                 })
 
                 // 取得完成
-                $.when.apply($,cloudGlDefArr).done(allGlDeferred.resolve)
+                $.when.apply($,cloudGlDefArr).done(allGlDeferred.resolve);
 
             }) // clTokenDefArr done
         } else {
@@ -6745,6 +6749,47 @@ getGroupList = function(){
     return groupsDeferred.promise();
 }
 
+getCloudGroup = function(cloudObj,allGroupList) {
+    var deferred = $.Deferred();
+
+    if(cloudObj.nowAt === undefined) {
+        deferred.resolve({isSuccess: false});
+    } else {
+
+        $.ajax({
+            url: "https://" + cloudObj.cl + "/apiv1/groups",
+            headers: {
+                uui: ui,
+                uat: at,
+                ui: cloudObj.ui,
+                at: cloudObj.nowAt,
+                li: lang
+            },
+            type: "get"
+        }).success(function(data){
+            
+            (data.gl || []).forEach(function(groupObj){
+                // 加入私雲gi 對照表
+                QmiGlobal.cloudGiMap[groupObj.gi] = {
+                    ci: cloudObj.ci,
+                    cl: cloudObj.cl
+                }
+                if(allGroupList !== undefined) allGroupList.push(groupObj)
+            })
+
+            deferred.resolve({
+                isSuccess: true,
+                cloudGl: data.gl
+            });
+        }).error(function() {
+            deferred.resolve({isSuccess:false});
+        });
+    }
+
+    return deferred.promise();
+
+}
+
 // 這不要刪啊
 getCloudToken = function(cloudObj,isReDo){
     var deferred = $.Deferred();
@@ -6763,7 +6808,23 @@ getCloudToken = function(cloudObj,isReDo){
             }),
             type: "post",
             error: function(errData){
-                cns.debug("cloud cl cert error",errData);
+                if(QmiGlobal.viewMap.hasOwnProperty("refresh_" + cloudObj.ci) === false) {
+                     var refreshDom = $('<div class="refresh-item">' +
+                        '<div>' + cloudObj.cn + '</div>' +
+                        '<div>' + $.i18n.getString("REFRESH_TEXT") + '</div>' +
+                    '<img src="images/refresh01.png"></div>');
+
+                    QmiGlobal.viewMap["refresh_" + cloudObj.ci] = {
+                        dom: refreshDom
+                    }
+
+                    $(".sm-group-list-area-refresh").show().append(refreshDom);
+
+                    refreshDom.click(cloudLoad.bind({
+                        refreshDom: refreshDom,
+                        cloudObj: cloudObj
+                    }));
+                }
 
                 deferred.resolve(false);
             },
@@ -6797,14 +6858,19 @@ getCloudToken = function(cloudObj,isReDo){
                         }
 
                         // 重新取key
-                        getCloudKey([cloudObj]).done(function(isSuccess){
-                            if(isSuccess === true)
+                        // {il: [{ci:xx,ui:xx},{ci:xx,ui:xx}]}
+                        getCloudKey({ il: [{
+                            ci: cloudObj.ci,
+                            ui: cloudObj.ui
+                        }]}).done(function(responseObj){
+                            if(responseObj.isSuccess === true)
+                                cloudObj.key = responseObj.key;
                                 getCloudToken(cloudObj,true).done(deferred.resolve);
                         })
 
                         break;
                     // break;
-                    default: // 不取這個私雲 去下一步
+                    default: // ?
                         deferred.resolve(false);
                 }
             }
@@ -6815,25 +6881,112 @@ getCloudToken = function(cloudObj,isReDo){
 }
 
 // 重新取得私雲key
-getCloudKey = function(cloudsArr){
+getCloudKey = function(cloudsKeyObj){
     var deferred = $.Deferred();
 
     new QmiAjax({
         apiName: "key",
-        data: JSON.stringify({il: cloudsArr}),
+        isPublicApi: true,
+        body: cloudsKeyObj,
+        method: "post",
         error: function(){
-            deferred.resolve(false);
+            deferred.resolve({isSuccess: false});
         },
         success: function(data){
-            cloudsArr.forEach(function(elem){
-                if(QmiGlobal.clouds[elem.ci] !== undefined){
-                    QmiGlobal.clouds[elem.ci].key = data.key;
-                } 
-            });
-            deferred.resolve(true);
+            deferred.resolve({isSuccess: true, key: data.il[0].key});
         }
     });
     return deferred.promise();
+}
+
+
+cloudLoad = function(){
+    var refreshDom = this.refreshDom,
+        cloudObj = this.cloudObj,
+        cloudLoadDeferred = $.Deferred();
+
+    if(refreshDom !== undefined) {
+        if(refreshDom.find("img").hasClass("rotate")) return;
+        refreshDom.find("img").addClass("rotate");
+    }
+    
+    getCloudToken(cloudObj).done(function(isSuccess){
+        var deferred = $.Deferred();
+        if(isSuccess === true) {
+
+            getCloudGroup(cloudObj).done(function(data) {
+                if(data.isSuccess === true) {
+                    // 先找出 新的gi
+                    var newGiArr = data.cloudGl.reduce(function(arr, currObj){
+                        if(QmiGlobal.groups.hasOwnProperty(currObj.gi) === false) arr.push(currObj.gi);
+                        return arr;
+                    },[])
+
+                    // 將group list 更新到 Global
+                    groupListToLStorage(data.cloudGl, true);
+
+                    // 打combo更新
+                    var comboDefArr = [];
+                    (data.cloudGl || []).forEach(function(cObj){
+                        comboDefArr.push(getGroupComboInit(cObj.gi));
+                    });
+
+                    // 等待combo全部完成
+                    $.when.apply($,comboDefArr).done(function() {
+                        var fail = false;
+
+                        Array.prototype.forEach.call(arguments,function(item) {
+                            if(item.status === false) fail = true;
+                        });
+
+                        // 全部都成功 才解除私雲移轉
+                        if(fail === false) {
+                            // 刪除屏蔽ui
+                            var cloudRefreshViewObj = QmiGlobal.viewMap["refresh_" + cloudObj.ci];
+                            if(cloudRefreshViewObj !== undefined) {
+                                setTimeout(function() { 
+                                    (cloudRefreshViewObj.dom || $.fn).remove();
+                                    delete cloudRefreshViewObj;
+                                },1000);
+                            }
+                                
+                            Array.prototype.forEach.call(arguments,function(item) {
+                                // 判斷是否為新團體
+                                // 解除屏蔽標記
+                                QmiGlobal.groups[item.thisGi].isRefreshing = false;
+
+                                // sidemenu 新增團體
+                                if(newGiArr.indexOf(item.thisGi) >= 0) addSideMenuGroupUI.call($(".sm-group-list-area"), 0, JSON.parse(item.data.responseText));
+
+                                cloudLoadDeferred.resolve(true);
+                            })
+                        } else {
+                            // 某個combo失敗
+                            deferred.resolve(false);
+                        }
+                    });
+                } else {
+                    // 私雲團體列表失敗
+                    deferred.resolve(false);
+                }
+            });
+        } else {
+            // 私雲token取得失敗
+            deferred.resolve(false);
+        }
+
+        deferred.done(function(isSuccess){
+            if(isSuccess === false) {
+                if(refreshDom !== undefined) setTimeout(function() {refreshDom.find("img").removeClass("rotate")},1000);
+
+                cloudLoadDeferred.resolve(true);
+            } else {
+                cloudLoadDeferred.resolve(false);
+            }
+        });
+    });
+
+    return cloudLoadDeferred.promise();
 }
 
 
@@ -6861,6 +7014,40 @@ polling = function(){
             (newPollingData.cnts || []).forEach(function(cntObj,i) {
                 if(QmiGlobal.cloudGiMap.hasOwnProperty(cntObj.gi)) newPollingData.cnts.splice(i,1);
             });
+
+            // 測試 私雲移轉
+            if(window.refresh54 === true && window.refresh54Flag !== true) {
+                window.refresh54Flag = true;
+                window.refresh55 = false;
+                window.refresh55Flag = false;
+
+                newPollingData.cmds.push({
+                    tp: 54,
+                    gl: ["G000000105G"]
+                })
+            }
+
+            // 測試 私雲移轉
+            if(window.refresh55 === true && window.refresh55Flag !== true) {
+                window.refresh55Flag = true;
+                window.refresh54 = false;
+                window.refresh54Flag = false;
+
+                newPollingData.cmds.push({
+                    "tp": 55,
+                    "pm": {
+                        "gl": ["G00000010BN"],
+                        "c_info": {
+                            "ci":"eim1",
+                            "cn":"AWS測試雲",
+                            "pin":"jvwtJLjvDXeJItcD7tjzhhvATieW1K3oNCDEF8jYKO4=",
+                            "cl":"caprivateeim1.mitake.com.tw",
+                            "ui":"U000000S0ET",
+                            "key":"NTxyprPh6aQo8OP3PFCiE4ZyL68pNLHHj6mCPMkyBJD24vn/R6nb9S7FdQtTzZnWOve1CKBb1m7i7pYap6mkm4miL6LcaWT4u6GeEhfuuk23vHnIxlvnV9SoBTJqsz9m"
+                        }
+                    }
+                })
+            }
 
             // 合併私雲polling 而且每個私雲polling 都要有自己的時間
             combineCloudPolling(newPollingData).done(function(pollingObj){
@@ -7068,6 +7255,10 @@ pollingCountsWrite = function(pollingData){
         thisQmiGroupObj = groupsData[thisGi];
 
         var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
+
+        // 移轉 隱藏polling
+        if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
+        
         if( thisCntObj.A5 > 0 && gi != thisGi){
             sort_arr.push([thisGi,thisCntObj.A5]);
             dom.html( countsFormat( thisCntObj.A5 ) ).show();
@@ -7134,6 +7325,8 @@ pollingCmds = function(newPollingData){
     // tp11 是新團體 或 gi不在 現有列表中 就要統一做一次取得團體列表
     for( var i = 0 ; i < newPollingData.cmds.length ; i++ ) {
         var item =  newPollingData.cmds[i];
+        item.pm = item.pm || {};
+
         if( 
             item.tp === 11 
             || (item.pm.gi !== undefined && QmiGlobal.groups[item.pm.gi] === undefined) 
@@ -7326,13 +7519,87 @@ pollingCmds = function(newPollingData){
                             onRemoveChatDB(item.pm.gi, item.pm.gcc);
                         }
                         break;
+
+                    case 54: // 私雲移轉 團體ui屏蔽
+                        (item.pm.gl || []).forEach(function(thisGi){
+                            QmiGlobal.groups[thisGi].isRefreshing = true;
+
+                            // 現在團體 要關閉
+                            if(thisGi === QmiGlobal.currentGi) timelineChangeGroup(thisGi); 
+
+                            // 關閉移轉團體所有聊天室
+                            (QmiGlobal.windowListCiMap[thisGi] || []).forEach(function(thisCi){
+                                windowList[thisCi].close();
+                            })
+
+                        })
+                        break;
+
+                    case 55: // 私雲移轉結束 驗證、團體combo後ui屏蔽開啓
+                        // "cmds": // Polling Commands 輪詢指令
+                        //   [
+                        //     {
+                        //       "tp": 55,
+                        //       "gl": [<group id1>, <group id2>, … <group idN>]
+                        //       "c_info": {
+                        //              "ci":  <Cloud ID>,
+                        //             "cn":  <Cloud Name>,
+                        //             "pin": <Pin>,
+                        //             "cl":  <Cloud URL>,
+                        //             "ui":  <Private User ID>,
+                        //             "key": <Key>
+                        //       }
+                        //   ]
+                        
+                        // getCloudToken cl ui key ci
+                        // 注意 這裡沒有使用到polling給的gl 預期他會跟54成對 若沒有就會有錯
+                        cloudLoad.call({ cloudObj: item.pm.c_info}).done(function(isSuccess){
+                            
+                            if(isSuccess === true) {
+                                // 現在團體 要開啟    
+                                if($(".refresh-lock").is(":visible") === true) timelineChangeGroup(gi); 
+
+                                // 無團體狀態 跳出alert
+                                new QmiGlobal.popup({
+                                    title: $.i18n.getString("REFRESH_ALERT_TITLE"),
+                                    desc: $.i18n.getString("REFRESH_ALERT_DESC"),
+                                    confirm: true,
+                                    cancel: true,
+                                    action: [function(){
+                                        $.mobile.changePage("#page-group-main");
+
+                                        // 找出第一個私雲團體即可
+                                        gi = function() {
+                                            var chk = false, firstGi;
+                                            Object.keys(QmiGlobal.cloudGiMap).forEach(function(cgi) {
+                                                // 找到第一個私雲團體即可
+                                                if(QmiGlobal.cloudGiMap[cgi].ci === item.pm.c_info.ci
+                                                    && chk === false) {
+                                                    chk = true;
+                                                    firstGi = cgi;
+                                                }
+                                            });
+                                            return firstGi;
+                                        }();
+
+                                        if(gi !== undefined) {
+                                            timelineChangeGroup(gi);
+                                        } else {
+                                            new QmiGlobal.popup({
+                                                desc: $.i18n.getString("COMMON_UNKNOWN_ERROR"),
+                                                confirm: true
+                                            })
+                                        }
+                                    }]
+                                });
+
+                            } 
+
+
+                        })
+                        break;
                 }
             });
-
-            // new group
-            if( newGroupArr.length > 0 ){
-                // cns.debug("polling~ create grouop");
-            }
 
 
             //將tp4,5,6 的user info都更新完 再更新polling時間

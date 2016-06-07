@@ -1,6 +1,6 @@
 $(function(){
 
-    groupListToLStorage = function(groupList){
+    groupListToLStorage = function(groupList,isAdd){
         var groups = QmiGlobal.groups,
             tmpGroupList = [];
 
@@ -32,6 +32,9 @@ $(function(){
                 $.extend(groups[gl_obj.gi],gl_obj)
             }
         }); 
+
+        // 私雲移轉 屬於額外添加團體
+        if(isAdd === true) return;
 
         // 剔除不存在的團體
         for(giKey in groups){

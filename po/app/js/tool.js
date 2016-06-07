@@ -1025,7 +1025,9 @@ updateGroupAllInfoDom = function( thisGi ){
 		//update name
 		var gn = htmlFormat( group.gn );
 		var gd = htmlFormat( group.gd );
-		$(".polling-group-name[data-gi="+thisGi+"]").html(gn);
+		$(".polling-group-name[data-gi="+thisGi+"]")
+		.find("div:nth-child(1)").html(gn).end()
+		.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", group.cnt));
 		$(".polling-group-description[data-gi="+thisGi+"]").html(gd);
 
 		if( gi==thisGi ){

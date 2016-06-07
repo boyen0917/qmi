@@ -211,17 +211,16 @@ var timeline_detail_exception = [
 
 window.QmiGlobal = {
 	// 之後取代 ui, at, gi, ... etc
-	current: { 
-		ui: "",
-		at: "",
-		gi: ""
-	}, 
+	currentGi: "",
 
 	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
 
 	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups 
 	clouds: {}, // 全部的私雲資料
 	cloudGiMap: {},
+
+	windowListCiMap: {},
+
 
 	// 聊天室 auth
 	auth: {},
@@ -233,6 +232,9 @@ window.QmiGlobal = {
 			return obj[Object.keys(obj)[0]];
 		}
 	},
+
+
+	viewMap: {}
 	
 };
 
@@ -320,7 +322,7 @@ window.QmiAjax = function(args){
 
 			// timeout: 30000,
 
-			type: args.method || "get"
+			type: (args.method  || args.type) || "get"
 		};
 	// end of var
 
