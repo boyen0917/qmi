@@ -6804,9 +6804,9 @@ getCloudToken = function(cloudObj,isReDo){
     } else {
         var tempKey = cloudObj.key;
         // 測試
-        // if(window.removeCKey !== true) {
-        //     tempKey = "";
-        // }
+        if(window.removeCKey === true) {
+            tempKey = "";
+        }
 
         $.ajax({
             url: "https://" + cloudObj.cl + "/apiv1/cert",
