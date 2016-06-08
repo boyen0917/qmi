@@ -1,11 +1,13 @@
 var FileSharing = function(){
-	this.mainTi = $.lStorage(ui)[gi].ti_file;
+	this.mainTi = QmiGlobal.groups[gi].ti_file;
 	this.listOrder = "append";
 	this.ti = this.mainTi;
 	this.activeItemData = "";
 
 	this.breadcrumb = [];
 	this.fileItemArr = [];
+
+	this.updateBreadcrumb();
 
 	this.init = function(){
 		this.reset();
@@ -18,7 +20,11 @@ var FileSharing = function(){
 FileSharing.prototype = {
 	fileDom: $("div.subpage-fileSharing section.fileSharing"),
 	bcArrow: '<img src="images/fileSharing/layer_arrow_icon@2x.png">',
+	// 200mb限制
+	uploadLimit: 200 * (1024*1024),
+
 	reset: function(){
+
 		this.fileDom.find("section.list").html("").end()
 		.find(".operator").hide();
 
@@ -31,17 +37,17 @@ FileSharing.prototype = {
 		//unbind self and all children
 		$("section.fileSharing,section.fileSharing *").off();
 
-		$("section.fileSharing span.breadcrumb").niceScroll({
-			cursorcolor:"rgba(210, 210, 210, 0.4)", 
-			cursorwidth: '5',
-			cursorborderradius: '10px',
-			background: 'rgba(255,255,255,0)',
-			cursorborder:"",
-			boxzoom:false,
-			zindex: 999,
-			scrollspeed: 90,
-			mousescrollstep: 40
-		});
+		// $("section.fileSharing span.breadcrumb").niceScroll({
+		// 	cursorcolor:"rgba(210, 210, 210, 0.4)", 
+		// 	cursorwidth: '5',
+		// 	cursorborderradius: '10px',
+		// 	background: 'rgba(255,255,255,0)',
+		// 	cursorborder:"",
+		// 	boxzoom:false,
+		// 	zindex: 999,
+		// 	scrollspeed: 90,
+		// 	mousescrollstep: 40
+		// });
 
 		thisFileDom.find(".home").click(function(){
 			thisFile.ti = thisFile.mainTi;
@@ -78,8 +84,12 @@ FileSharing.prototype = {
 		thisFileDom.find("div.top img.more").click(thisFile.showMore.bind(thisFile));
 		//檔案操作 delete download
 		thisFileDom.find("span.operator img").click(function(){
-			popupShowAdjust( "",$.i18n.getString("FILESHARING_DELETE_CONFIRM"),true,true,[thisFile[$(this).attr("name")].bind(thisFile)]);
-			// thisFile[$(this).attr("name")]();
+			var name = $(this).attr("name");
+			if( name === "delete"){
+				popupShowAdjust( "",$.i18n.getString("FILESHARING_DELETE_CONFIRM"),true,true,[thisFile.delete.bind(thisFile)]);
+			} else {
+				thisFile[name]();
+			}
 		});
 
 		//more
@@ -164,6 +174,7 @@ FileSharing.prototype = {
 
 			//只顯示三個
 			var last3Arr = this.breadcrumb.slice(-3);
+			
 			for(i=0;i<last3Arr.length;i++){
 				var thisBc = last3Arr[i];
 				var $thisPath = $("<span>").html(thisBc.fn);
@@ -221,8 +232,8 @@ FileSharing.prototype = {
 		var folderName = coverDom.find("input").val();
 		thisFile.fileDom.find("section.file-cover").trigger("click");
 		var deferred = $.Deferred();
-		$.when(new AjaxTransfer().execute({
-			url: "groups/" + gi + "/files/",
+		$.when(new QmiAjax({
+			apiName: "groups/" + gi + "/files/",
 			method: "post",
 			body: {
 				tp: 10,
@@ -232,9 +243,10 @@ FileSharing.prototype = {
 				deferred.reject({response:data,api:1});
 			}
 		})).then(function(data){
-			console.debug("when data 1",data);
-			return (new AjaxTransfer().execute({
-				url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
+			cns.debug("when data 1",data);
+			var dataObj = JSON.parse(data.responseText);
+			new QmiAjax({
+				apiName: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 				method: "post",
 				body: {
 					meta: {
@@ -244,10 +256,10 @@ FileSharing.prototype = {
 					}, 
 					ml: [
 						{
-							fi: data.fi,
+							fi: dataObj.fi,
 							ftp: 1,
 							fn: folderName,
-							ln: { ti:data.ln.ti},
+							ln: { ti:dataObj.ln.ti},
 							tp: 26 
 						}
 					]
@@ -255,7 +267,7 @@ FileSharing.prototype = {
 				error: function(data){
 					deferred.reject({response:data,api:2});
 				}
-			})).then(function(data){
+			}).then(function(data){
 				deferred.resolve(data);
 			});
 		});
@@ -272,8 +284,8 @@ FileSharing.prototype = {
 	getList: function(){
 		var deferred = $.Deferred();
 		// 注意誰是this
-		new AjaxTransfer().execute({
-			url: "groups/" + gi + "/timelines/"+ this.ti +"/events",
+		new QmiAjax({
+			apiName: "groups/" + gi + "/timelines/"+ this.ti +"/events",
 			complete: function(data){
 				//確認完成
 				deferred.resolve();
@@ -286,8 +298,7 @@ FileSharing.prototype = {
 				fiArr = this.fileItemArr;
 				// cns.debug("fileList",JSON.stringify(fileList,null,2));
 				for(i=0;i<fileList.length;i++) {
-					var itemObj = new FileItem(fileList[i]);
-					fiArr.push(itemObj);
+					fiArr.push(new FileItem(fileList[i]));
 				}
 				//排序 desc
 				fiArr.sort(function(a, b) {return b.meta.ct - a.meta.ct });
@@ -301,53 +312,72 @@ FileSharing.prototype = {
 		return deferred.promise();
 	},
 	download: function(){
-		new AjaxTransfer().execute({
-			url: "groups/" + gi + "/timelines/" + this.ti + "/files/" + this.activeItemData.fi + "/dl",
+		new QmiAjax({
+			apiName: "groups/" + gi + "/timelines/" + this.ti + "/files/" + this.activeItemData.fi + "/dl",
 			method: "post",
 			complete: function(data){
 				if(data.status != 200) return false;
+
+				cns.debug("dl data",data);
 				// alert("...");
 				var s3Data = JSON.parse(data.responseText);
 				if(typeof s3Data == "undefined") toastShow("檔案錯誤");
-				cns.debug("hoho",JSON.parse(data.responseText));
 				var dlData = JSON.parse(data.responseText);
 				var link = document.createElement('a');
 			    link.download = this.activeItemData.fn;
-			    link.href = dlData.s3;
-			    cns.debug("dlData.s3",dlData.s3);
+
+			    var dlUrl = dlData.s3;
+			    if( dlData.s32.length > 0 ) dlUrl = dlData.s32;
+
+			    link.href = dlUrl;
 			    link.click();
 
 			}.bind(this)
 		});
 	},
+
 	uploadFile: function(){
 		event.stopPropagation();
 		var thisFile = this;
 		var coverDom = thisFile.fileDom.find("section.file-cover");
 
-		if(thisFile.fileDom.find("div.progress-bar").length == 0){
+		window.fsObjj = thisFile;
+
+
+		if(thisFile.fileDom.find("section.progress-bar").length == 0){
 			var progressSectionDom = $('<section class="progress-bar"><div class="frame"><div class="progress"></div><div class="text">0%</div></div></section>');	
 			coverDom.append(progressSectionDom);
 
 			progressSectionDom.click(function(){event.stopPropagation()})
 		}else{
 			var progressSectionDom = thisFile.fileDom.find("section.progress-bar");
+
 		}
+
+		// reset
+		thisFile.setUploadProgress(0,true);
+
 		// return false;
 		
 		var inputFileDom = thisFile.fileDom.find("input[type=file]");
 
+		// 開啓選擇檔案
 		inputFileDom.trigger("click");
-		inputFileDom.off().on('change',function(e){
-			var fileData = $(this)[0].files[0];
 
+		// 關閉上傳
+		coverDom.hide();
+
+
+		inputFileDom.off().on('change',function(e){
+			coverDom.show();
+			var fileData = $(this)[0].files[0];
+			
 			//每次選擇完檔案 就reset input file
 			$(this).replaceWith( $(this).val('').clone( true ) );
 
-			// 大於100MB
-			if(fileData.size > 104857600) {
+			// 大於上傳限制
+			if(fileData.size > thisFile.uploadLimit) {
 				toastShow($.i18n.getString("FILESHARING_UPLOAD_OVERLIMIT"));
-				coverDom.trigger("click");
 				return false;
 			}
 
@@ -355,81 +385,142 @@ FileSharing.prototype = {
 				var thisItemObj = thisFile.fileItemArr[i];
 				if(thisItemObj.fn == fileData.name){
 					toastShow($.i18n.getString("FILESHARING_ERR_MSG"));
-					coverDom.trigger("click");
 					return false;
 				}
 			}
 
 			coverDom.addClass("disable");
 			thisFile.fileDom.find("section.file-cover ul").hide();
-			var tp = 0;
-			var contentType = " ";
 
+
+			progressSectionDom.show();
+
+			var 
+			fileTp = 0,
+			fiApiData = {},
+			s3DefArr = [], // pic -> s3 s32,  video -> s32(temporary) ,others -> s3 only
+		    uploadDeferred = $.Deferred(), // 上傳完成 deferred
+			fileOnloadDeferred = MyDeferred(); // 按順序完成的專用deferred
+			
 		    switch(true){
+
 		      case fileData.type.match("image") instanceof Array:
-		        tp = 1;
+		        fileTp = 1;
+
+		        thisFile.fileReader({
+		        	file: fileData,
+		        	tagName: "img",
+		        	onload: "onload"
+		        }).done(function(fileReaderData){
+		        	//大小圖都要縮圖
+	                var thumbnailImgObj = imgResizeByCanvas(fileReaderData,0,0,120,120,0.6);
+
+					s3DefArr = [{
+						s3: "s3",
+						contentType: " ",
+						file: thumbnailImgObj.blob
+					},{
+						s3: "s32",
+						contentType: " ",
+						file: fileData
+					}];
+
+	                fileOnloadDeferred.resolve();
+		        })
+
 		        break;
 		      case fileData.type.match("video") instanceof Array:
-		        tp = 2;
-		        contentType = "video/mp4";
+		        fileTp = 2;
+
+		        s3DefArr = [{
+					s3: "s32",
+					contentType: "video/mp4",
+					file: fileData
+				}];
+
+				fileOnloadDeferred.resolve();
+
 		        break;
+		     
+		      default:
+		        // contentType暫時通用 " "
+		      	s3DefArr.push({
+					s3: "s3",
+					contentType: " ",
+					file: fileData
+				})
+
+		      	fileOnloadDeferred.resolve();
 		    }
-		    progressSectionDom.show();
-		    var deferred = $.Deferred();
-		    var fiApiData = {};
-		    $.when(new AjaxTransfer().execute({
-				url: "groups/" + gi + "/files/",
-				method: "post",
-				body: {
-					tp: tp,
-					ti: thisFile.ti
-				},
-				error: function(data){
-					deferred.reject({response:data,api:1});
-				}
-			})).then(function(data){
-				console.debug("upload to s3 data",data);
-				fiApiData = data;
-				return ($.ajax({
-					url: data.s3,
-					type: 'PUT',
-					contentType: contentType,
-				 	data: fileData, 
-					processData: false,
-					error: function(data){
-						deferred.reject({response:data,api:"upload to s3"});
+
+		    // 完成上傳前準備 因為要取得檔案的onloaded
+		    fileOnloadDeferred.then(function(){
+		    	thisFile.setUploadProgress(0.05);
+
+		    	var tmpDeferred = MyDeferred();
+				// step1 取得上傳網址
+			    new QmiAjax({
+					apiName: "groups/" + gi + "/files/",
+					method: "post",
+					body: {
+						tp: fileTp,
+						ti: thisFile.ti
 					},
-					xhr: function() {
-						var progressDom = progressSectionDom.find(".progress");
-						var textDom = progressSectionDom.find(".text");
-						var xhr = new window.XMLHttpRequest();
-						xhr.upload.addEventListener('progress', function(e) {
-							if (e.lengthComputable) {
-							    progressDom.css('width', '' + (148 * e.loaded / e.total) + 'px');
-							    textDom.html(Math.round(100 * e.loaded / e.total) + "%");
-							}
-						});
-						return xhr;
-					}
-				}));
-			}).then(function(data){
-				return (new AjaxTransfer().execute({
-					url: "groups/" + gi + "/files/"+ fiApiData.fi +"/commit",
+					error: function(errData){
+						uploadDeferred.reject({response:errData,api:1});
+					},
+					success: tmpDeferred.resolve
+				});
+
+		    	return tmpDeferred;
+		    // step2 進行s3 上傳
+		    }).then(function(data){
+		    	thisFile.setUploadProgress(0.05);
+
+		    	var tmpDeferred = MyDeferred();
+		    	fiApiData = data;
+		    	
+		    	// s3DefArr
+		    	$.when.apply( {}, s3DefArr.map(function(item){
+
+		    		item.url = fiApiData[item.s3] ;
+		    		return thisFile.uploadToS3TmpDef(item)
+
+		    	})).done(tmpDeferred.resolve)
+		    	.fail(function(errData){
+		    		uploadDeferred.reject({response: errData,api:"upload to s3"});
+		    	})
+
+		    	return tmpDeferred;
+		    // commit 
+		    }).then(function(){
+		    	thisFile.setUploadProgress(0.8);
+		    	var tmpDeferred = MyDeferred();
+		    	
+		    	new QmiAjax({
+					apiName: "groups/" + gi + "/files/"+ fiApiData.fi +"/commit",
 					method: "put",
 					body: {
 				    	ti: thisFile.ti, 
-				    	tp: tp,
+				    	tp: fileTp,
 						mt: fileData.type || "text",
 						si: fileData.size,
 						md: {w:100,h:100,l:100}
 					},
-					error: function(data){
-						deferred.reject({response:data,api:"commit",});
-					}
-				}));
+					error: function(errData){
+						uploadDeferred.reject({response:errData,api:"commit",});
+					},
+					
+					success: tmpDeferred.resolve
+				})
+				return tmpDeferred;
+				
 		    }).then(function(data){
-		    	return (new AjaxTransfer().execute({
-					url: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
+		    	
+		    	thisFile.setUploadProgress(0.05);
+
+		    	new QmiAjax({
+					apiName: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 					method: "post",
 					body: {
 				    	meta: {
@@ -437,78 +528,164 @@ FileSharing.prototype = {
 							tp: "08",
 							lv: 1
 						}, 
-						ml: [
-						    {
-						    	fi: fiApiData.fi,
-						    	ftp: "0",
-						    	fn: fileData.name,
-						    	c: "It's a File",
-						    	si: fileData.size,
-						    	tp: 26
-							} 
-						]
+						ml: [{
+					    	fi: fiApiData.fi,
+					    	ftp: "0",
+					    	fn: fileData.name,
+					    	c: "It's a File",
+					    	si: fileData.size,
+					    	tp: 26 // ?
+						}]
 					},
-					error: function(data){
-						deferred.reject({response:data,api:"post 2"});
-					}
-				}));
-		    }).then(function(data){
-		    	deferred.resolve(data);
-		    });
+					error: function(errData){
+						uploadDeferred.reject({response: errData,api:"post file"});
+					},
+					success: uploadDeferred.resolve
+				})
+		    })
 
-		    deferred.done(function(data){
+
+		    uploadDeferred.done(function(data){
 				toastShow($.i18n.getString("FILESHARING_UPLOAD_SUCCESS"))
 			}).fail(function(data){
-				console.debug("error ",data);
+				cns.debug("error ",data);
 			}).always(function(){
-				coverDom.removeClass("disable").trigger("click").end()
-				.find("ul").show();
+				thisFile.setUploadProgress(0.05);
+				
 
-				progressSectionDom.hide();
+				setTimeout(function(){
+					coverDom.removeClass("disable").trigger("click").find("ul").show();
+					progressSectionDom.hide()
+				},100);
+				
 				thisFile.getList();
 			});
-		});
 
+		    
+		});// inputFileDom change 
 	},
+
+	fileReader: function(args){
+		var 
+		deferred = $.Deferred(),
+		reader = new FileReader();
+
+		reader.readAsDataURL(args.file);
+		reader.onloadend = function() {
+			var 
+			fileDom = document.createElement(args.tagName);
+			fileDom.src = reader.result;
+			fileDom[args.onload] = function(){
+				deferred.resolve(this);
+			}
+		}
+		return deferred.promise();
+	},
+
+	getVideoScreenshot: function(video){
+	  	var tempW = video.videoWidth;
+		var tempH = video.videoHeight;
+
+		var canvas = document.createElement('canvas');
+		canvas.width = tempW;
+		canvas.height = tempH;
+	  	canvas.getContext("2d").drawImage(video, 0, 0, tempW, tempH);
+
+		canvas.toDataURL("image/png")
+
+		var dataURL = canvas.toDataURL("image/png");
+
+		return dataURItoBlob(dataURL);
+	},
+
+	setUploadProgress: (function(){
+		originProgress = 0;
+
+		// 百分比, bool 累計, bool 從零開始
+	    return function( percentage, reset, increment ){
+
+	    	if( reset === true ) originProgress = 0;
+	    	// 累計
+	    	if( increment === undefined ) {
+	    		originProgress += percentage;
+	    		currentProgress = originProgress;
+	    	} else {
+	    		currentProgress = percentage + originProgress;	
+	    	}
+
+	    	$("section.fileSharing section.progress-bar")
+		    .find(".progress").css('width', '' + (148 * currentProgress) + 'px').end()
+		    .find(".text").html(Math.round( 100 * currentProgress) + "%" );
+	    }
+	})(),
+
+	uploadToS3TmpDef: function (options) {
+		var thisFile = this;
+
+		return $.ajax({
+			url: options.url,
+			type: 'PUT',
+			contentType: options.contentType,
+		 	data: options.file, 
+			processData: false,
+			xhr: function() {
+				var xhr = new window.XMLHttpRequest();
+				xhr.upload.addEventListener('progress', function(e) {
+					if( e.lengthComputable ) thisFile.setUploadProgress(( 0.8 * e.loaded / e.total ), false, true );
+				});
+				return xhr;
+			}
+		})
+	},
+
 	rename: function() {
 		this.showGeneralPopup($.i18n.getString("FILESHARING_RENAME"),"renameExecute");
 	},
 	renameExecute: function(name) {
-		var thisFile = this;
-		var oriFn = this.activeItemData.fn;
-		var newName = (this.activeItemData.ti === null) ? name + (oriFn.substring(oriFn.lastIndexOf("."))) : name;
-		var body = {
-				meta: {
-					tt: "",
-					tp: "08",
-					lv: 1
-				}, 
-				ml: [
-					{
-						fi: this.activeItemData.fi,
-						ftp: 0,
-						fn: newName,
-						si: 5566,
-						tp: 26 
-					}
-				]
-			};
+		cns.debug("active data",this.activeItemData);
+		var 
+		thisItem = this.activeItemData ,
+		newName = (thisItem.ti === null) ? name + (thisItem.fn.substring(thisItem.fn.lastIndexOf("."))) : name,
+
+		// 預設是檔案 下方再判斷是否為資料夾
+		body = {
+			meta: {
+				tt: "",
+				tp: "U8",
+				lv: 1
+			}, 
+			ml: [
+				{	
+					ftp: 0,
+					fi: thisItem.fi,
+					fn: newName,
+					si: thisItem.si ,
+					tp: 26 
+				}
+			]
+		};
+
 
 		//資料夾
-		if(this.activeItemData.ti !== null){
+		if( thisItem.meta.tp == "09"){
 			body.ml[0].ln = {
-				ti: this.activeItemData.ti
+				ti: thisItem.ti
 			};
-			body.meta.tp = "09";
+			body.meta.tp = "U9";
+			body.ml[0].ftp = 1;
+
+			delete body.ml[0].si;
+			
 		}
 
-		new AjaxTransfer().execute({
+		cns.debug("rename",body);
+		new QmiAjax({
 			// /groups/{gi}/timelines/{ti}/events/{ei}
-			url: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
+			apiName: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
 			method: "post",
 			body: body,
 			complete: function(data){
-				thisFile.fileDom.find("section.file-cover").trigger("click")
+				this.fileDom.find("section.file-cover").trigger("click")
 				this.getList();
 				if(data.status == 200) {
 					toastShow($.i18n.getString("USER_PROFILE_UPDATE_SUCC"));	
@@ -517,9 +694,9 @@ FileSharing.prototype = {
 		})
 	},
 	delete: function(){
-		new AjaxTransfer().execute({
+		new QmiAjax({
 			// /groups/{gi}/timelines/{ti}/events/{ei}
-			url: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
+			apiName: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
 			method: "delete",
 			complete: function(data){
 				
@@ -531,10 +708,6 @@ FileSharing.prototype = {
 				}
 			}.bind(this)
 		})
-	},
-	api: function(){
-		//tool.js
-		new AjaxTransfer().execute(this);
 	}
 }
 
@@ -622,7 +795,7 @@ FileItem.prototype = {
 			}else{
 				thisFileDom.find(".operator [name=download]").show();
 			}
-			// cns.debug("thisItemObj",thisItemObj);
+			cns.debug("thisItemObj",thisItemObj);
 			thisFileDom.find("div.row").removeClass("fs-active").end()
 			.find(".operator").show();
 			$(this).addClass("fs-active");

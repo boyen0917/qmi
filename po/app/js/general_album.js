@@ -27,7 +27,7 @@ initChatGallery = function(){
         +'<div class="text"></div></div>');
     try{
     	$(".al-category .title").html( $.i18n.getString("CHAT_TITLE") );
-	    var userData = $.lStorage(ui);
+	    var userData = QmiGlobal.groups;
 	    var group = userData[gi];
 	    var container = $(".al-category .container");
 	    container.html("");

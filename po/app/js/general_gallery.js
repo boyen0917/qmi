@@ -4,8 +4,9 @@ $(document).ready(function(){
 	cns.debug(ui);
 	cns.debug(list);
 	cns.debug(isLoaded);
-
-	if( false==isLoaded && null!=list){
+    $.i18n.loadByPath("../lan/" + lang + ".json");
+	
+	if( false==isLoaded){
 		cns.debug("trigger loading from gallary");
 		$(".dataDom").click();
 	}
@@ -127,27 +128,35 @@ moveLeft = function( isMove ){
 }
 
 getS3file = function(file_obj,target,tp, isWatermark, text){
-    //default
-    var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
-    var headers = {
-             "ui":ui,
-             "at":at, 
-             "li":lang,
-        };
-    var method = "get";
-    var result = ajaxDo(api_name,headers,method,false);
 
-    console.debug(api_name);
+	var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" 
+		+ this_ti;
+	var result = new QmiAjax({
+        apiName: api_name
+    })
+
+    // //default
+    // var api_name = "groups/" + this_gi + "/files/" + file_obj.c + "?pi=" + file_obj.p + "&ti=" + this_ti;
+    // var headers = {
+    //          "ui":ui,
+    //          "at":at, 
+    //          "li":lang,
+    //     };
+
+    // var method = "get";
+    // var result = ajaxDo(api_name,headers,method,false);
+
+    // cns.debug(api_name);
 
     result.complete(function(data){
         if(data.status != 200){
-        	console.debug("get s3 fail");
+        	cns.debug("get s3 fail");
         	return false;
         }
 
 		try{
-			console.debug(data.responseText);
-			console.debug("target",target, "tp",tp);
+			cns.debug(data.responseText);
+			cns.debug("target",target, "tp",tp);
 		} catch(e){
 			errorReport(e);
 		}
