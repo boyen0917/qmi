@@ -215,30 +215,28 @@ function initChatCntDB ( onReady ){
 
 /* save chat cnt into db */
 function onReceivePollingChatCnt ( ccs ){
-	var storage = QmiGlobal.groups;
+	var groups = QmiGlobal.groups;
 
 	//indexed from old to new (api chat is from new to old)
 	for( var ccsIndex=0; ccsIndex<ccs.length; ccsIndex++){
 		var data = ccs[ccsIndex];
-		if(data !== undefined) {
-			var giTmp = data.gi;
-			if( null==storage[giTmp] )	storage[giTmp] = {};
-			if( null==storage[giTmp].chatAll )	storage[giTmp].chatAll = {};
-			if( null==storage[giTmp].chatAll[data.ci] )	storage[giTmp].chatAll[data.ci] = {};
+		var giTmp = data.gi;
+		if( null==groups[giTmp] )	groups[giTmp] = {};
+		if( null==groups[giTmp].chatAll )	groups[giTmp].chatAll = {};
+		if( null==groups[giTmp].chatAll[data.ci] )	groups[giTmp].chatAll[data.ci] = {};
 
-			// data.cc.sort(function(a,b){
-			// 	if(a.key >= b.key )	return 1;
-			// 	return -1;
-			// });
+		// data.cc.sort(function(a,b){
+		// 	if(a.key >= b.key )	return 1;
+		// 	return -1;
+		// });
 
-			var cntContent = new Object();
-			for( var i=0; i<data.cc.length; i++){
-				// cns.debug( data.cc[i].ts, data.cc[i].cnt );
-				cntContent[i] = data.cc[i];
-			}
-			
-			storage[giTmp].chatAll[data.ci].cnt = cntContent;
+		var cntContent = new Object();
+		for( var i=0; i<data.cc.length; i++){
+			// cns.debug( data.cc[i].ts, data.cc[i].cnt );
+			cntContent[i] = data.cc[i];
 		}
+		
+		groups[giTmp].chatAll[data.ci].cnt = cntContent;
 	}
 	// cns.debug( JSON.stringify(QmiGlobal.groups) );
 
