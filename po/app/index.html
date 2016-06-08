@@ -478,9 +478,9 @@
                             </div>
                         </div>
                         <div class="sm-hr" data-textid="LEFT_SYSTEM_SETTING"></div>
-                        <div data-sm-act="system-setting" class="setting" name="system-setting">
+                        <div data-sm-act="system-setting" class="sm-small-area setting">
                            <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_setting_normal.png"/></div>
-                           <div class="sm-small-area-r" data-textid="SETTING_LOGOUT"><!-- 系統設定 --></div>
+                           <div class="sm-small-area-r" data-textid="LEFT_SYSTEM_SETTING"></div>
                         </div>
                     </div>
                 </div>
@@ -871,7 +871,71 @@
 
                     <!--------------------------------- 系統設定 -------------------------->
                         <div class="subpage-systemSetting main-subpage" style="display:none;">
-                            系統設定
+                              <div class="systemSetting-content">
+                                    <!-- 使用者資訊 -->
+                                    <div class="user-data-information">
+                                        <span class="system-title">Profile</span>
+                                        <div class="user-info">
+                                            <img class="setting-user-avatar" src="">
+                                            <input type="file" class="setting-avatar-file" data-role="none" accept="image/*">
+                                            <div class="username-content">
+                                                <label for="input-username">Username</label>
+                                                <input type="text" class="input-username" value="" data-role="none">
+                                            </div>
+                                             <div class="btn-content password-btn-content">
+                                                    <button data-role="none" class="password-popup">變更密碼</button>
+                                             </div>
+                                        </div>
+                                        <!--  <span class="system-title">Account</span> 
+                                         <div class="user-info">
+                                       
+                                         </div> -->
+                                         <div class="notification-setting">
+                                             <input type="checkbox"  name="notification" data-role="none"  class="notification-check">開啟通知
+                                         </div>
+                                         <div class="group-setting">
+                                              <span class="system-title">預設團體</span>
+                                              <select class="group-select" data-role="none" >
+                                                        
+                                              </select>
+                                         </div>
+                                         <div class="carousel-setting">
+                                             <span class="system-title">自動換頁</span>
+                                              <select class="carousel-time" data-role="none" >
+                                                      <option value="3000">三秒</option>
+                                                      <option value="5000">五秒</option>
+                                                      <option value="0">關閉</option>  
+                                              </select>  
+                                         </div>
+                                         <div class="system-version">
+                                            <span class="system-title">目前版本</span>
+                                            <span class="version-information"></span>
+                                             <!-- <div class="btn-content version-btn-content">
+                                                 <button data-role="none" class="check-version">檢查版本</button>
+                                             </div> -->
+                                         </div>
+                                         <div class="term_of_service">
+                                             <span class="system-title">服務條款</span>
+                                             <div class="btn-content term-btn-content">
+                                                 <button data-role="none" class="check-version term-service">詳細資訊</button>
+                                             </div>
+                                         </div>
+                                          <div class="right_to_privacy">
+                                             <span class="system-title">隱私政策</span>
+                                             <div class="btn-content term-btn-content">
+                                                 <button data-role="none" class="check-version right-privacy">詳細資訊</button>
+                                             </div>
+                                         </div>
+
+                                    </div>
+                            
+                              </div>
+                              <div class="bottom-btn">
+                                  <div class="btn-content">
+                                      <button data-role="none" class="save-btn system-setting-submit">save</button>
+                                  </div>
+                              </div>
+                   
                         </div>
 
                     <!--------------------------------- 團體關於 -------------------------->
