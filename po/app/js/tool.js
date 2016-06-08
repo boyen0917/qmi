@@ -1023,12 +1023,7 @@ updateGroupAllInfoDom = function( thisGi ){
 		}
 
 		//update name
-		var gn = htmlFormat( group.gn );
-		var gd = htmlFormat( group.gd );
-		$(".polling-group-name[data-gi="+thisGi+"]")
-		.find("div:nth-child(1)").html(gn).end()
-		.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", group.cnt));
-		$(".polling-group-description[data-gi="+thisGi+"]").html(gd);
+		updateSideMenuContent(group);
 
 		if( gi==thisGi ){
 			//update icon
@@ -1054,6 +1049,17 @@ updateGroupAllInfoDom = function( thisGi ){
 	} catch(e){
 		errorReport(e);
 	}
+}
+
+
+updateSideMenuContent = function(groupData) {
+	//update name
+	var gn = htmlFormat( groupData.gn );
+	var gd = htmlFormat( groupData.gd );
+	$(".polling-group-name[data-gi="+groupData.gi+"]")
+	.find("div:nth-child(1)").html(gn).end()
+	.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", groupData.cnt));
+	$(".polling-group-description[data-gi="+groupData.gi+"]").html(gd);
 }
 
 updateGroupIconDom = function( this_gi ){
