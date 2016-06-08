@@ -15,7 +15,7 @@ var ui,
 
 	
 	//HiCloud
- 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	base_url = "https://ap.qmi.emome.net/apiv1/";
 
  	// // container riseNotification 一旦換網址就沒了
 
@@ -124,7 +124,6 @@ var timeline_detail_exception = [
 
 	//timeline置頂millisecond
 	top_timer_ms = $.lStorage("_topTimeMs") || 5000;
-
 
 	//polling間距
 	polling_interval = 5000,

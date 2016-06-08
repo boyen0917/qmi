@@ -9020,13 +9020,6 @@ function activateClearChatsTimer(){
 
 };
 
-// stopClearChatsTimer = function() {
-//     clearTimeout(clearChatTimer);
-// }
-
-// checkChatMsgExpired = function() {
-//     console.log("test12");
-
 
 showFeedboxNoContent = function( isShow ){
     if( isShow ){
@@ -9102,9 +9095,6 @@ systemSetting = function(){
     });
 
     $('.version-information').text($.lStorage('_ver').ver);//系統資訊顯示
-    
-
-
 }
 
 
@@ -9191,9 +9181,6 @@ password_change_setting = function(){
                 }
             });
         }//空值判定
-
-    
-    
 }//密碼更新
 
 
@@ -9255,30 +9242,6 @@ $('.system-setting-submit').click(function(){
      }//使用者姓名空值判定
 });
 
-
-
-//反過來 點選四次 關閉
-supriseKey = function(){
-	var suprise = $(document).data("suprise") || 0;
-	if(suprise < 100){
-		if(suprise != 0 || suprise == 3) clearTimeout(suprise_timer);
-
-		if(suprise == 3){
-			$(document).data("suprise",100);
-			pollingInterval(true);
-			return false;
-		}
-		suprise++;
-		$(document).data("suprise",suprise);
-
-		
-		suprise_timer = setTimeout(function(){
-			$(document).data("suprise",0);
-		},300);
-	}else{
-		pollingInterval(true);
-	}
-};
 /*
           ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
           ██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔══██╗██╔════╝ ██╔════╝          
