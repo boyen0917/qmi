@@ -7419,8 +7419,14 @@ pollingCmds = function(newPollingData){
             comboDeferred = $.Deferred();
             insideDeferred = $.Deferred();
 
+            // item.tp = 6 會這樣
+            if(QmiGlobal.groups[item.pm.gi] === undefined) {
+                insideDeferred.resolve(false);
+            }
+
             // 如果是自己被踢出團體了 不能打combo
-            if( item.tp === 6 && item.pm.gu === QmiGlobal.groups[item.pm.gi].me){
+            else if( item.tp === 6 
+                && item.pm.gu === QmiGlobal.groups[item.pm.gi].me){
                 insideDeferred.resolve(false);    
             }
 
@@ -7509,6 +7515,9 @@ pollingCmds = function(newPollingData){
                     case 4: //someone join
 
                         item.pm.isNewMem = true;
+
+                        updateSideMenuContent(item.pm.gi);
+
                         item.pm.onGetMemData = function(this_gi, memData){
                             // 官方帳號不顯示
                             try{
@@ -7539,7 +7548,13 @@ pollingCmds = function(newPollingData){
                         break;
                     case 6://delete user info
                         // 判斷是自己的話就移除團體
-                        if(QmiGlobal.groups[item.pm.gi].me === item.pm.gu) removeGroups(item.pm.gi);
+                        if( QmiGlobal.groups[item.pm.gi] !== undefined
+                            && QmiGlobal.groups[item.pm.gi].me === item.pm.gu
+                        ){
+                            removeGroup(item.pm.gi);
+                        }
+
+                        updateSideMenuContent(item.pm.gi);
 
                         item.pm.onGetMemData = function(this_gi, memData){
                             try{
