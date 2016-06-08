@@ -5,12 +5,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title></title>
         <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
-        <link rel="stylesheet" href="css/main.css?ver=0.35" />
-        <link rel="stylesheet" href="css/chatList.css?ver=0.35" />
-        <link rel="stylesheet" href="css/alert.css?ver=0.35" />
-        <link rel="stylesheet" href="css/contact.css?ver=0.35" />
-        <link rel="stylesheet" href="css/general_album.css?ver=0.35" />
-        <link rel="stylesheet" href="css/setting.css?ver=0.35" />
+        <link rel="stylesheet" href="css/main.css" />
+        <link rel="stylesheet" href="css/chatList.css" />
+        <link rel="stylesheet" href="css/alert.css" />
+        <link rel="stylesheet" href="css/contact.css" />
+        <link rel="stylesheet" href="css/general_album.css" />
+        <link rel="stylesheet" href="css/setting.css" />
+
+
+    <!-- index -->
+        <link rel="stylesheet" href="css/registration.css" />
+        <link rel="stylesheet" href="plugins/jquery.selectbox/css/jquery.selectbox.css" />
+        <link rel="stylesheet" href="css/stickerArea.css"/>
+    <!-- index -->
+
+
         
         <script type="text/javascript" src='/assist/func_assistant.js'></script>
         <script src="js/ga.js"></script>
@@ -21,25 +30,41 @@
         
         <script src="js/jquery.plugin.js"></script>
         
-        <script type="text/javascript" src="js/init.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/init_func.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/tool.js?ver=0.35"></script>
+        <script type="text/javascript" src="js/init.js"></script>
+        <script type="text/javascript" src="js/init_func.js"></script>
+        <script type="text/javascript" src="js/tool.js"></script>
+
+
+
+    <!-- index -->
+        <script type="text/javascript" src="js/checkVersion.js"></script>
+        <script type="text/javascript" src="plugins/phoneformat/phone-format.js"></script>
+        <script type="text/javascript" src="js/registration.js"></script>
+    <!-- index -->
+
+
+
 
         <!-- IDBWrapper -->
         <script src="js/idb/idb.js"></script>
         <script src="js/idb/idbstore.js"></script>
         
-        <script type="text/javascript" src="js/general_album.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/contact.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/addressBook.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/setting.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/chatDB.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/func.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/main.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/chatList.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/alert.js?ver=0.35"></script>
-        <script type="text/javascript" src="js/stickerArea.js?ver=0.36"></script>
-        <link rel="stylesheet" href="css/stickerArea.css"/>
+        <script type="text/javascript" src="js/general_album.js"></script>
+        <script type="text/javascript" src="js/contact.js"></script>
+        <script type="text/javascript" src="js/addressBook.js"></script>
+        <script type="text/javascript" src="js/setting.js"></script>
+        <script type="text/javascript" src="js/chatDB.js"></script>
+        <script type="text/javascript" src="js/func.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript" src="js/chatList.js"></script>
+        <script type="text/javascript" src="js/alert.js"></script>
+        <script type="text/javascript" src="js/stickerArea.js"></script>
+        
+
+
+
+
+        <script src="plugins/jquery.selectbox/js/jquery.selectbox.min.js"></script>
         
         <!--<script id="google-map" src="https://maps.google.com/maps/api/js?sensor=false"></script>
         <script src="js/jquery.tinyMap.min.js"></script>-->
@@ -67,6 +92,269 @@
 
     </head>
     <body>
+        <div data-role="page" id="page-registration">
+            <div class="registration-content registration-bg">
+                <div class="registration-logo">
+                    <img src="images/registration/qmi_logo.png">
+                </div>
+                <!-- <div class="login-desc"> World's Largest Professional NetWork</div> -->
+                <div class="login-area">
+                    <div class="login-tab-area">
+                        <div class="login-tab active" data-type="phone">phone</div>
+                        <div class="login-tab" data-type="email">email</div>
+                    </div>
+                    <div class="login-landing">
+                        <div class="login-landing-account">
+                            <div class="login-ld-phone">
+                                <div class="login-ld-countrycode">
+                                    <select name="Country Code" data-role="none" tabindex="1">
+                                        <option SELECTED data-code="+886" value="TW" data-textid="LOGIN_COUNTRY_CODE_TAIWAN"></option>
+                                        <option data-code="+86" value="CN" data-textid="LOGIN_COUNTRY_CODE_CHINA"></option>
+                                        <option data-code="+852" value="HK" data-textid="LOGIN_COUNTRY_CODE_HONGKONG"></option>
+                                        <option data-code="+853" value="MO" data-textid="LOGIN_COUNTRY_CODE_MACAU"></option>
+                                        <option data-code="+1" value="US" data-textid="LOGIN_COUNTRY_CODE_US"></option>
+                                    </select>
+                                </div>
+                                <input type="text" maxlength="20" data-role="none" data-textph-id="LOGIN_ACCOUNT_PHONE" placeholder="請輸入手機">
+                            </div>
+                            <div class="login-ld-email">
+                                <input type="text" maxlength="99" data-role="none" data-textph-id="LOGIN_ACCOUNT_EMAIL" placeholder="請輸入Email">
+                            </div>
+                        </div>
+                        <div class="login-ld-password">
+                            <input type="password" maxlength="20" data-role="none" data-textph-id="LOGIN_PASSWORD" placeholder="請輸入密碼">  
+                            <img src="images/common/icon/compose_form_icon_check.png" style="display:none">  
+                        </div>
+                        <div class="login" data-textid="LANDING_PAGE_LOGIN"></div>
+                        <div class="login-ld-extra">
+                            <div class="login-option-area">
+                                <div class="login-remeber landpage">
+                                    <img src="images/registration/checkbox_none.png">
+                                    <div class="text" data-textid="LOGIN_REMEMBER_ACCOUNT">Remember Account</div>
+                                </div>
+                                <div class="login-auto landpage">
+                                    <img src="images/registration/checkbox_none.png">
+                                    <div class="text" data-textid="LOGIN_AUTO_LOGIN">Auto login</div>
+                                </div>
+                            </div>
+                            <div></div> <!-- class="login-ld-forget-pw" -->
+                        </div>
+                        <div class="register" data-textid="LANDING_PAGE_REGISTER"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="container_version">
+                <span class="container"></span>
+                <span class="web"></span>
+            </div>
+        </div>
+<!---------------------------------- page-login ------------------------------------>
+        <div data-role="page" id="page-login">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="LANDING_PAGE_LOGIN"></h3>
+            </div>
+            <div class="login-content">
+                <div class="login-default-area" style="">
+                    <div class="countrycode">
+                        <span data-textid="COMMON_COUNTRY_TAIWAN"></span>
+                        <span>+886</span>
+                        <img src="images/common/icon/icon_arrow_next.png"/>
+                    </div>
+                    <div class="login-phone">
+                        <input type="text" maxlength=10 data-role="none" data-textph-id="LOGIN_ACCOUNT"/>  
+                        <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
+                    </div>
+                    <div class="login-password">
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="LOGIN_PASSWORD"/>  
+                        <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
+                    </div>
+                </div>
+
+                <div class="login-remeber-area" style="display:none">
+                    <div class="login-user-pic">
+                        <div class="avatar-wrap">
+                            <img src="images/common/others/empty_img_personal_130x130.png" style="width: 103px;"/>
+                        </div>
+                        <img src="images/common/others/frame_130x130.png"/>
+                    </div>
+                    <div class="login-account">
+                        <span data-textid="LOGIN_SAVE_ACCOUNT_TITLE"></span><span></span>
+                    </div>
+                    <div class="login-remeber-password">
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="LOGIN_PASSWORD"/>  
+                    </div>
+                </div>
+                
+                <div class="login-forget-pw" style="display:none;" data-textid="LOGIN_FORGET_PASSWORD"></div>
+                <div class="login-option">
+                    <div class="login-remeber">
+                        <img src="images/common/icon/icon_check_gray.png">
+                        <div class="text" data-textid="LOGIN_REMEMBER_ACCOUNT"></div>
+                    </div>
+                </div>
+                <div class="login-option">
+                    <div class="login-auto">
+                        <img src="images/common/icon/icon_check_gray.png">
+                        <div class="text" data-textid="LOGIN_AUTO_LOGIN"></div>
+                    </div>
+                </div>
+
+                <!-- <div class="login-option">
+                    <div class="login-remeber">
+                        <img src="images/common/icon/icon_check_gray.png"/>
+                        <span>記住帳號</span>
+                    </div>
+                    <div class="login-forget-pw">
+                        忘記密碼？
+                    </div>
+                </div>
+                <div class="login-auto">
+                    <img src="images/common/icon/icon_check_gray.png"/>
+                    <span>自動登入</span>
+                </div> -->
+                 
+                 <div class="login-next" data-textid="LANDING_PAGE_LOGIN"></div>
+                 <div class="login-change login-change-ready" style="display:none" data-textid="LOGIN_SWITCH_ACCOUNT"></div>
+            </div>
+        </div>
+<!---------------------------------- page-register ------------------------------------>
+        <div data-role="page" id="page-register">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="REGISTER_ACCOUNT_REGITST_TITLE"></h3>
+            </div>
+            <div class="register-content">
+                <div class="register-area">
+                    <div class="countrycode">
+                        <!-- <span data-textid="COMMON_COUNTRY_TAIWAN">台灣</span>
+                        <span>+886</span>
+                        <img src="images/common/icon/icon_arrow_next.png"/> -->
+                        <div class="sbContainer">
+                            <select name="Country Code" data-role="none" tabindex="1">
+                                <option SELECTED data-code="+886" value="TW" data-textid="LOGIN_COUNTRY_CODE_TAIWAN"></option>
+                                <option data-code="+86" value="CN" data-textid="LOGIN_COUNTRY_CODE_CHINA"></option>
+                                <option data-code="+852" value="HK" data-textid="LOGIN_COUNTRY_CODE_HONGKONG"></option>
+                                <option data-code="+853" value="MO" data-textid="LOGIN_COUNTRY_CODE_MACAU"></option>
+                                <option data-code="+1" value="US" data-textid="LOGIN_COUNTRY_CODE_US"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="register-phone">
+                        <input type="text" maxlength=20 data-role="none" data-textph-id="LOGIN_ACCOUNT_PHONE"/>  
+                        <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
+                    </div>
+                    
+                </div>
+                
+                <div class="register-text">
+                    <img src="images/common/icon/icon_check_gray.png"/>
+                    <span></span>
+                </div>
+                 
+                 <div class="register-next" data-textid="COMMON_NEXT"></div>
+            </div>
+        </div>
+<!---------------------------------- page-register-otp ------------------------------------>
+        <div data-role="page" id="page-register-otp">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="REGISTER_ACCOUNT_REGITST_TITLE"></h3>
+            </div>
+            <div class="register-otp-content">
+                <div class="register-otp-desc-area">
+                     <span data-textid="REGISTER_AUTH_SMS_HAS_SENT"></span>
+                     <div></div>
+                </div>
+                <div class="register-otp-input">
+                    <input type="text" maxlength=4 data-role="none" data-textph-id="REGISTER_AUTH_ENTER_CODE"/>  
+                </div>
+                <div class="resend-otp" data-textid="REGISTER_AUTH_RESEND_CODE"></div>
+                <div class="register-otp-next" data-textid="COMMON_NEXT"></div>
+            </div>
+        </div>
+<!---------------------------------- page-password ------------------------------------>
+        <div data-role="page" id="page-password">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="REGISTER_PASSWORD_TITLE"></h3>
+            </div>
+            <div class="password-content">
+                <div class="password-setting-area">
+                    <div class="password-setting">
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="REGISTER_PASSWORD_PASSWORD_PLACEHOLDER"/>  
+                    </div>
+                    <div class="password-confirm">
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="REGISTER_PASSWORD_CONFIRM_PLACEHOLDER"/>  
+                    </div>
+                </div>
+                <div class="password-next" data-textid="COMMON_OK">COMMON_OK</div>
+            </div>
+        </div>
+
+<!---------------------------------- page-user-setting ------------------------------------>
+        <div data-role="page" id="page-user-setting">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="REGISTER_SETTING_TITLE"></h3>
+            </div>
+            <div class="setting-content">
+                <div class="setting-area">
+                    <div class="avatar-area">
+                        <img class="avatar-default" src="images/registration/registration_form_personalinfo_cam.png"/>
+                    </div>
+                    <input class="avatar-file" type="file" style="display:none;" data-role="none"/>
+                    <div class="setting-name-area">
+                        <div class="setting-first-name">
+                            <input type="text" maxlength=20 data-role="none" data-textph-id="REGISTER_SETTING_FIRST_NAME"/>  
+                        </div>
+                        <div class="setting-last-name">
+                            <input type="text" maxlength=20 data-role="none" data-textph-id="REGISTER_SETTING_LAST_NAME"/>  
+                        </div>
+                    </div>
+                    <div class="setting-birth" style="display:none;">
+                        <input type="text" maxlength=20 data-role="none" readonly data-textph-id="REGISTER_SETTING_BIRTHDAY"/>  
+                    </div>
+                    <input class="setting-birth-hidden" type="text" data-role="none" disabled="disabled"/>
+                </div>
+                    
+                <div class="setting-next" data-textid="COMMON_NEXT"></div>
+            </div>
+        </div>
+
+
+<!---------------------------------- 全域 ------------------------------------>        
+        <div class="toast">
+            <div></div>
+        </div>
+
+        <div class="popup">
+            <div class="popup-frame">
+                <div class="popup-title"></div>
+                <div class="popup-text" style="display:none"></div>
+                <div class="popup-confirm-area">
+                    <div class="popup-cancel" style="display:none" data-textid="COMMON_CANCEL"></div>
+                    <div class="popup-confirm" style="display:none" data-textid="COMMON_OK"></div>    
+                </div>
+                
+            </div>
+            <div class="popup-gap"></div>
+            <div class="popup-screen"></div>
+        </div>
+
+        <div class="ajax-screen-lock"></div>
+        <div class="version_update_lock">
+            <div data-textid="LANDING_PAGE_UPDATE"></div>
+        </div>
+        <div class="container_update_lock">
+            <a data-textid="LANDING_PAGE_UPDATE_CONTAINER_LOCK"></a>
+        </div>
+
+        <div id="page-back-chk"></div>
+        <div id="page-back-chk-pre"></div>
+        <div id="page-back-pre-title"></div>
+        
 <!---------------------------------- page-group-menu ------------------------------------>
         <div data-role="page" id="page-group-menu">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">

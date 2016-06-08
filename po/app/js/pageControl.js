@@ -1,7 +1,7 @@
 (function($) {
 
   var pageControl = {
-    animateInterval: 1000,
+    animateInterval: 300,
     history: [],
     currentID: null,
     changePage: function( id, onShow, onDone ) {

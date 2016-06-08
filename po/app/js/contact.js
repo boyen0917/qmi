@@ -28,8 +28,48 @@ $(document).ready(function(){
 		mousescrollstep: 40
 		// horizrailenabled: false,
 		// ,autohidemode: "leave"
-	} );
+	});
 });
+
+// getBranchMemCnt = function(bl){
+// 	var guAll = QmiGlobal.groups[gi].guAll;
+// 	var blAll = QmiGlobal.groups[gi].bl;
+// 	var blAllCntArr = [];
+// 	// for(i=0;i<Object.keys(guAll).length;i++){
+// 	// 	var guObj = guAll[Object.keys(guAll)[i]];
+// 	// 	if(guObj.bl !== "") {
+// 	// 		blAll
+// 	// 	}
+// 	// }
+
+// 	Object.keys(blAll).map(function(bl){
+// 		var blObj = blAll[bl];
+// 		// bn: "桑居都"
+// 		// cl: Array[2]
+// 		// cnt: 15
+// 		// lv: 3
+// 		// pi: "B000004j0EX"
+
+// 		Object.keys(blAll).map(function(gu){
+// 			var guObj = guAll[gu];
+// 			// auo: "https://project-o.s3.hicloud.net.tw/groups/G00000Yd0Fb/M0000FnN0BR/avatars/9999ef02-9224-4253-9bed-bf3fc10f24ce_o?Expires=1763708791&AWSAccessKeyId=SE41NTAxNDgyNDE0MjI2MDE4Mjg5MjM&Signature=P3yIO5CsOr8t0nhwQmoloQXqhdQ%3D"
+// 			// aut: "https://project-o.s3.hicloud.net.tw/groups/G00000Yd0Fb/M0000FnN0BR/avatars/9999ef02-9224-4253-9bed-bf3fc10f24ce_t?Expires=1763708791&AWSAccessKeyId=SE41NTAxNDgyNDE0MjI2MDE4Mjg5MjM&Signature=VWgqJZ3pYnf1XHBQITRmkATxzQY%3D"
+// 			// bl: ""
+// 			// gu: "M0000Fp7011"
+// 			// nk: "holger"
+// 			// pn: "+886919291236"
+// 			if(guObj.bl !== "" && guObj.bl.match(new RegExp(guObj.bl, "g"))) {
+// 				blObj.myCnt +=1
+// 			}
+// 		});
+
+// 	})
+
+
+
+
+// 	// return
+// }
 
 initContactList = function(){
 	//clear search result
@@ -101,6 +141,7 @@ initContactList = function(){
 	}
 
 	rowContainer.find(".row.branch").off("click").click( function(){
+		cns.debug("???");
 		showSubContactPage( "page-group-main", $(this).data("bi"), JSON.stringify([]) );
 	});
 
@@ -282,8 +323,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
-                +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
+                +'<div class="page-back " customize><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
@@ -438,10 +478,12 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	var memObject = {};
 	var count = 0;
 	$.each(guAllExsit,function(key,mem){
-		var id = mem.bl.substring(mem.bl.length-11,mem.bl.length);
-		if( id==bi ){
-			count++;
-			memObject[key] = mem;
+		for(i=0;i<mem.bl.split(",").length;i++){
+			[mem.bl.split(",")[i].split(".").last()]
+			if( mem.bl.split(",")[i].split(".").last() == bi ){
+				count++;
+				memObject[key] = mem;
+			}
 		}
 	});
 	var memContainer = generateMemberGrid(memObject);
@@ -522,7 +564,7 @@ showAllMemberPage = function(gn) {
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+                +'<div class="page-back " customize><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#page-group-main").after(page);
@@ -594,9 +636,9 @@ showAllMemberPage = function(gn) {
 
 switchListAndGrid = function( dom, subPageBottom ){
 	isList = !isList;
-	var userData = $.lStorage(ui);
+	var userData = QmiGlobal.groups;
 	userData.isMemberShowList = isList;
-	$.lStorage(ui,userData);
+	// *--* $.lStorage(ui,userData);
 
 	var mem = subPageBottom.find(".contact-mems");
 	var memList = subPageBottom.find(".contact-memLists");
@@ -622,7 +664,7 @@ generateMemberGrid = function( memObject ){
 	try{
 		var keys = Object.keys(memObject);
 		keys.sort( function(a, b){
-			// console.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
+			// cns.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
 			if (memObject[a].nk < memObject[b].nk)	return -1;
 			if (memObject[a].nk > memObject[b].nk)	return 1;
 			return 0;
@@ -646,6 +688,8 @@ generateMemberGrid = function( memObject ){
 
 				//new > admin > normal
 				if( isNewMem(mem) ){
+					if( mem.ad==1 ) tmp.addClass("admin")
+						
 					tmp.addClass("new-mem");
 					var lastNewDom = memContainer.find(".new-mem");
 					if( lastNewDom.length>0 ){
@@ -654,7 +698,7 @@ generateMemberGrid = function( memObject ){
 						memContainer.prepend(tmp);
 					}
 					setNewMemTag( tmp );
-				} else if( mem.ad==1 ){	//is admin?
+				} else if( mem.ad==1 ){
 					tmp.addClass("admin");
 					var lastAdminDom = memContainer.find(".admin");
 					if( lastAdminDom.length>0 ){
@@ -689,7 +733,7 @@ generateMemberGrid = function( memObject ){
 		}
 		//"<div class='img' style='background-image:url("+mem.aut+");'><div class='new' style='display:none;'>NEW</div></div>");
 		
-		var tmp = memContainer.find(".img.waitLoad:lt(30)");
+		var tmp = memContainer.find(".img.waitLoad:lt(108)");
 		$.each(tmp, function(index,domTmp){
 			var dom = $(domTmp);
 			dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
@@ -709,7 +753,7 @@ generateMemberList = function( memObject, favCallback ){
 	try{
 		var keys = Object.keys(memObject);
 		keys.sort( function(a, b){
-			// console.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
+			// cns.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
 			if (memObject[a].nk < memObject[b].nk)	return -1;
 			if (memObject[a].nk > memObject[b].nk)	return 1;
 			return 0;
@@ -718,7 +762,7 @@ generateMemberList = function( memObject, favCallback ){
 		for( var i=0; i<keys.length; i++){
 			var key = keys[i];
 			var mem = memObject[key];
-			// console.debug(mem.nk);
+			// cns.debug(mem.nk);
 			//favorite ver.
 			// var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
 			var tmp = $("<div class='row mem namecard'><div class='left'></div><div class='mid'></div><div class='right'>&nbsp</div></div>");
@@ -818,10 +862,10 @@ generateMemberList = function( memObject, favCallback ){
 		// 			var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
 		// 			cns.debug("add:",isAdded);
 		// 			thisTmp.toggleClass("active", isAdded);
-		// 			var data = $.lStorage(ui);
+		// 			var data = QmiGlobal.groups;
 		// 			data[gi].guAll[gu].fav = isAdded;
 		// 			guAll = data[gi].guAll;
-		// 			$.lStorage(ui, data);
+		// 			// *--* $.lStorage(ui, data);
 		// 		}
 		// 		if( favCallback ) favCallback();
 		// 	});
@@ -927,7 +971,7 @@ showMainContact = function(){
 initContactData = function(){
 	//get user data
 	if( typeof(ui)=='undefined' ) return;
-	var userData = $.lStorage(ui);
+	var userData = QmiGlobal.groups;
 	if( !userData )	return;
 	isList = (userData.isMemberShowList)?userData.isMemberShowList:false;
 
@@ -951,9 +995,12 @@ initContactData = function(){
 	$.each( guAll, function(key,obj){
 		if( obj && obj.st==1 ){
 			guAllExsit[key] = obj;
+		// }else {
+		// 	window.testMem = window.testMem || {}
+		// 	window.testMem[obj.nk] = obj;
 		}
 	});
-	// $.lStorage(ui, userData);
+	// // *--* $.lStorage(ui, userData);
 
 	//get new mem data
 	var currentTime = new Date().getTime();
@@ -997,7 +1044,7 @@ updateFavoritePage = function(){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+                +'<div class="page-back " customize><img src="images/navi/navi_icon_back.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#page-group-main").after(page);
@@ -1122,8 +1169,7 @@ showSubFavoritePage = function( fi ){
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-                // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
-                +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
+                +'<div class="page-back " customize><img src="images/common/icon/bt_close_activity.png"/></div>'
                 +'<h3 class="page-title">成員列表</h3>'
             +'</div><div class="subpage-contact"></div></div>');
 		$("#"+parentPageID).after(page);
@@ -1321,7 +1367,7 @@ showAddFavGroupBox = function( subPage ){
 							var tmp = $.parseJSON( data.responseText );
 							cns.debug( data.responseText );
 							var data = {};
-							var userData = $.lStorage(ui);
+							var userData = QmiGlobal.groups;
 							g_group = userData[gi];
 
 							//add fi to mem data
@@ -1334,7 +1380,7 @@ showAddFavGroupBox = function( subPage ){
 							fbl = g_group.fbl;
 							fbl[tmp.fi] = {cnt:memKeys.length, fn:name};
 							data[tmp.fi] = fbl[tmp.fi];
-							$.lStorage(ui, userData );
+							// *--* $.lStorage(ui, userData );
 
 							var branch = generateFavBranchList( data );
 							var rows = $("#page-contact_favorite .contact-rows");
@@ -1439,7 +1485,7 @@ showEditFavGroupBox = function( dom ){
 
 			ajaxDo(api_name,headers,"put",true,body).complete(function(data){
 				if(data.status == 200){
-					var userData = $.lStorage(ui);
+					var userData = QmiGlobal.groups;
 					g_group = userData[gi];
 
 					//add fi to mem data
@@ -1458,7 +1504,7 @@ showEditFavGroupBox = function( dom ){
 					//add fi data to fbl
 					fbl = g_group.fbl;
 					fbl[fi].cnt = memKeys.length;
-					$.lStorage(ui, userData );
+					// *--* $.lStorage(ui, userData );
 
 					initContactData();
 					dom.parent().fadeOut();
@@ -1522,7 +1568,7 @@ deleteFavGroup = function( dom ){
 		if(data.status == 200){
 			var tmp = $.parseJSON( data.responseText );
 			var data = {};
-			var userData = $.lStorage(ui);
+			var userData = QmiGlobal.groups;
 			g_group = userData[gi];
 
 			//-----
@@ -1543,7 +1589,7 @@ deleteFavGroup = function( dom ){
 			//remove fi from fbl
 			fbl = g_group.fbl;
 			delete fbl[fi];
-			$.lStorage(ui, userData );
+			// *--* $.lStorage(ui, userData );
 
 			initContactData();
 			showFavoritePage( true );
@@ -1605,13 +1651,13 @@ function updateInvitePending () {
 		var obj =$.parseJSON(data.responseText);
 		if( obj&&obj.hasOwnProperty("il") ) inviteGuAll = obj.il;
 
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		if( userData && gi ){
 			if( userData.hasOwnProperty(gi) ){
 				userData[gi].inviteGuAll = inviteGuAll;
 			}
 		}
-		$.lStorage(ui, userData);
+		// *--* $.lStorage(ui, userData);
 
 
 		var pendingAreaParent = $("#page-contact-addmem .ca-pending-area");

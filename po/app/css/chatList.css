@@ -15,12 +15,15 @@
 .subpage-chatList {
 	width: 100%;
 	display: none;
+	height: calc( 100vh - 43px );
+	overflow-y: auto;
 }
 
 .subpage-chatList .loading{
 	width: 100%;
 	text-align: center;
-	margin-top: 50px;
+	position: absolute;
+	top: 50px;
 }
 .subpage-chatList .rows {
     background:#d0d0d0;
@@ -36,6 +39,7 @@
     height: 100%;
     width: 100%;
     position: absolute;
+    top: 0;
 }
 .subpage-chatList .coachmake img{
 	width: 200px;
@@ -79,7 +83,7 @@
 }
 
 .subpage-chatList-row .name {
-	max-width: 220px;
+	/*max-width: 220px;*/
 	height: 26px;
 	color: #323537;
 	font-size: 18px;

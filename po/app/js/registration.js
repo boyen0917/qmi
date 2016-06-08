@@ -4,15 +4,21 @@ onCheckVersionDone = function(needUpdate){
 	}
 	clearBadgeLabel();
 
+	if($.lStorage("_loginAutoChk") === true) {
+		loginAction();
+	} else if( window.location.hash !== "") {
+		// window.location = "index.html";
+		$.mobile.changePage("")
+	}
+
 	//預設上一頁
-	$(document).data("page-history",[["#page-registration"]]);
+	// $(document).data("page-history",[["#page-group-menu"]]);
 	
 	//首頁大圖
 	$("#page-registration").css("height",$(window).height());
 	$(window).resize(function(){ 
 		$("#page-registration").css("height",$(window).height());
 	});
-
 
 	$(document).on("click",".login-ready",function(){
 		var isMail = false;
@@ -43,10 +49,10 @@ onCheckVersionDone = function(needUpdate){
 		var countryCodeDoms = $('#page-register .countrycode select');
 		countryCodeDoms.selectbox({
 			onOpen: function (inst) {
-				console.log("open"); //, inst
+				cns.log("open"); //, inst
 			},
 			onClose: function (inst) {
-				console.log("close"); //, inst
+				cns.log("close"); //, inst
 			},
 			onChange: function (val, inst) {
 				cns.debug(val, inst);
@@ -85,10 +91,10 @@ onCheckVersionDone = function(needUpdate){
 	var countryCodeDoms = $('.login-ld-countrycode select');
 	countryCodeDoms.selectbox({
 		onOpen: function (inst) {
-			console.log("open"); //, inst
+			cns.log("open"); //, inst
 		},
 		onClose: function (inst) {
-			console.log("close"); //, inst
+			cns.log("close"); //, inst
 		},
 		onChange: function (val, inst) {
 			countryCodeDoms.attr("data-val",val||"");
@@ -107,6 +113,9 @@ onCheckVersionDone = function(needUpdate){
 			cns.debug(targetCountryDom.text());
 		}
 	}
+
+	//調整
+	$(".login-ld-countrycode label.sbSelector").css("line-height","40px")
 
 /*
 
@@ -250,36 +259,44 @@ onCheckVersionDone = function(needUpdate){
 		
 	});
 
-	login = function(phone_id,password,countrycode,isMail){
+	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
-		var api_name = "login";
-        var headers = {
-            li:lang
-        };
-        var id = phone_id;
-        if( false==isMail ){
-        	id = countrycode + getInternationalPhoneNumber(countrycode, phone_id);
-        }
-        var body = {
-            id: id,
-            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
-            dn: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
-            pw:toSha1Encode(password)
-        };
-
         s_load_show = true;
-        var method = "post";
-        ajaxDo(api_name,headers,method,true,body).complete(function(data){
+        
+        new QmiAjax({
+        	apiName: "login",
+        	specifiedHeaders: {
+	            li:lang
+	        },
+        	body: {
+        		id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
+	            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
+	            dn: QmiGlobal.device,
+	            pw:toSha1Encode(password)
+        	},
+        	isLoadingShow: true,
+        	method: "post"
+        }).complete(function(data){
         	if(data.status == 200){
-        		var login_result = $.parseJSON(data.responseText);
+        		
+        		QmiGlobal.auth = $.parseJSON(data.responseText);
+        		
+        		//自動登入儲存 有_loginData 有_loginAutoChk 才代表有選自動登入
+                if($(".login-auto").data("chk")) {
+                	$.lStorage("_loginData",QmiGlobal.auth);
+                	$.lStorage("_loginAutoChk",true);
+                }else {
+                	localStorage.removeItem("_loginData");
+                	localStorage.removeItem("_loginAutoChk");
+                }
 
         		//判斷是否換帳號 換帳號就要清db
-        		if(!$.lStorage(login_result.ui)) resetDB();
+        		if(!$.lStorage(QmiGlobal.auth.ui)) resetDB();
 
     			//記錄帳號密碼
     			if($(".login-remeber").data("chk")){
 					var _loginRemeber = {};
-					_loginRemeber.phone = phone_id;
+					_loginRemeber.phone = phoneId;
 					_loginRemeber.isMail = isMail;
 					// _loginRemeber.password = password;
 					_loginRemeber.countrycode = countrycode;
@@ -288,104 +305,85 @@ onCheckVersionDone = function(needUpdate){
 					//沒打勾的話就清除local storage
 		    		localStorage.removeItem("_loginRemeber");
 				}
-				loginAction(login_result);
+				loginAction();
         	}
+        }).error(function(){
+        	window.errorTest = arguments;
+        	cns.debug("login error ",arguments)
         });
 	}
 
 	//初始化 
-    loginAction = function(login_result){
+    function loginAction (){
         //儲存登入資料 跳轉到timeline
-        login_result.page = "timeline";
-        $.lStorage("_loginData",login_result);
+        if($.lStorage("_loginData") !== false) {
+        	QmiGlobal.auth = $.lStorage("_loginData");	
+        }
+        
+        var deferred = $.Deferred(),
+        	group_list = [];
 
-        var deferred = $.Deferred();
+        ui = QmiGlobal.auth.ui;
+        at = QmiGlobal.auth.at;
 
         //附上group list
-        getGroupList(login_result.ui,login_result.at).complete(function(data){
-            if(data.status == 200){
+        getGroupList().done(function(groupList){
 
-                ui = login_result.ui;
-                at = login_result.at;
-
-                //自動登入儲存
-                if($(".login-auto").data("chk")) $.lStorage("_loginAutoChk",true);
-
-                var parse_data = $.parseJSON(data.responseText);
-                if( !parse_data ){
-                    console.debug("no group data");
-                    return;
+        	// 取dgi的combo
+            if( (groupList || []).length>0 ){
+            	//有dgi 但不存在列表裡
+                if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
+                	localStorage.removeItem("uiData");
+                	
+                    QmiGlobal.auth.dgi = groupList[0].gi;
+                    $.lStorage("_loginData",QmiGlobal.auth);
                 }
 
-                var private_group_list = parse_data.cl;
-                var group_list = parse_data.gl;
-                if(group_list && (group_list.length > 0||private_group_list.length>0) ){
-
-                    //有group
-
-                    $.lStorage("_groupList",group_list);
-
-                    getPrivateGroupFromList( private_group_list, function(){
-
-                        //將group list 更新到 lstorage ui
-                        groupListToLStorage();
-
-                        // 取dgi的combo
-                        if( login_result.dgi || group_list.length>0 ){
-                            if( null==login_result.dgi || login_result.dgi.length==0 ){
-                                login_result.dgi = group_list[0].gi;
-                                $.lStorage("_loginData",login_result);
-                            }
-                            if( login_result.dgi ){
-                                getGroupCombo(login_result.dgi,function(){
-                                    deferred.resolve({location:"main.html#page-group-main"});
-                                });
-                            } else {
-                                //沒group
-                                deferred.resolve({location:"main.html#page-group-menu"});
-                            }
-                        } else{
-                            //沒group
-                            deferred.resolve({location:"main.html#page-group-menu"});
-                        }
-                    });
-                }else{
-                    localStorage.removeItem("_groupList");
-                    //沒group
-                    deferred.resolve({location:"main.html#page-group-menu"});
-                    // document.location = "main.html#page-group-menu";
-                }
-            }else if(data.status == 401){
-
-                //取得group list 失敗 代表自動登入失敗了
-                deferred.resolve({fail:true});
+                getGroupComboInit(QmiGlobal.auth.dgi).done(function(resultObj){
+                	if( resultObj.status === false ){
+                		//發生錯誤 回首頁比較保險
+                		cns.debug("dgi combo error",resultObj);
+                		window.location = "index.html";
+                	} else {
+                		deferred.resolve({location:"#page-group-main"});
+                	}
+                });
+                
+            } else{
+                //沒group
+                deferred.resolve({location:"#page-group-menu"});
             }
+
         });
 
         deferred.done(function(data){
-            if(data.fail === true) {
-                //取得group list 失敗 代表自動登入失敗了
-                localStorage.removeItem("_loginData");
-                return false;
-            }
+
+        	s_load_show = false;
+        	$('.ui-loader').hide();
+			$(".ajax-screen-lock").hide();
 
             $.lStorage("refreshChk", false);
-            localStorage["uiData"] = JSON.stringify($.lStorage(ui));
-            document.location = data.location;    
+            localStorage["uiData"] = JSON.stringify(QmiGlobal.groups);
+            // document.location = data.location;    
+            $.mobile.changePage(data.location);
+            
+			//聊天室開啓DB
+	    	initChatDB(activateClearChatsTimer); 
+			initChatCntDB(); 
+
+			//沒團體的情況
+			if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
+				//關閉返回鍵
+				$("#page-group-menu .page-back").hide();
+				cns.debug("no group ");
+				
+				// 兩個選項都要執行polling()
+				polling();
+			}else{
+				//設定目前團體 執行polling()
+				setGroupInitial(QmiGlobal.auth.dgi).done( polling );
+			}
         });
-    }
-
-
-	getGroupList = function(ui,at,cl){
-    	//取得團體列表
-        var api_name = "groups";
-        var headers = {
-            "ui":ui,
-            "at":at,
-            "li":lang
-        };
-        var method = "get";
-        return ajaxDo(api_name,headers,method,true,false,false,true,cl);
     }
 
 	getPrivateGroupList = function(p_data, callback){
@@ -397,7 +395,7 @@ onCheckVersionDone = function(needUpdate){
             "li":lang
         };
         var method = "get";
-        ajaxDo(api_name,headers,method,true,false,false,true,p_data.cl).complete(function(res){
+        ajaxDo(api_name,headers,method,false,false,false,true,p_data.cl).complete(function(res){
         	if( res.status==200 ){
         		var parse_data = $.parseJSON(res.responseText);
 	    		var list = $.lStorage("_pri_group")||{};
@@ -409,21 +407,6 @@ onCheckVersionDone = function(needUpdate){
         });
     }
 
-    getPrivateGroupFromList = function( data, callback ){
-    	if( !data || data.length==0 ){
-    		if(callback) callback();
-    	}
-    	var cnt = 0;
-    	for( var i=0; i<data.length; i++ ){
-    		var p_data = data[i];
-	    	getPrivateGroupList(p_data ,function(res){
-	    		cnt++;
-	    		if(callback && cnt==data.length){
-	    			callback();
-	    		}
-	    	});
-	    }
-    }
 /*	
 
 
@@ -711,10 +694,10 @@ onCheckVersionDone = function(needUpdate){
 	registration = function(resend){
 		if(!resend){
 			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
-			if( newPhoneNumber.length>0 ){
-				var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + newPhoneNumber+"</label>";
-				popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
-			}
+			// if( newPhoneNumber.length>0 ){
+				// var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + newPhoneNumber+"</label>";
+				// popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
+			// }
 			// $(document).data("device-token",deviceTokenMake());
 			$(document).data("device-token","web-device");
 			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
@@ -768,43 +751,42 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 	activateStep1 = function(){
+
 		var otpCode = $(".register-otp-input input").val();
 
-		var api_name = "activation/step1";
-        var headers = {
-                 "li":lang,
-                     };
-        var method = "put";
-        var body = {
-                id: $(document).data("phone-id"),
-                tp: 0,
-                vc: $(".register-otp-input input").val(),
+		new QmiAjax({
+        	apiName: "activation/step1",
+        	specifiedHeaders: {
+	            li:lang
+	        },
+        	body: {
+        		id: $(document).data("phone-id"),
+                vc: otpCode,
                 ud: $(document).data("device-token")
-            }
-        cns.debug("activateStep1() 驗證 驗證碼前的 body:",JSON.stringify(body,null,2));
-        var result = ajaxDo(api_name,headers,method,true,body, null, true);
-
-        		
-	    result.error(function(jqXHR, textStatus, errorThrown) {
-	    	try{
-	    		//if(jqxhr.status == 400){
-					if(jqXHR.responseText){
-						var tmp = $.parseJSON(jqXHR.responseText);
-						if( 900==tmp.rsp_code ){
-			        		popupShowAdjust("",tmp.rsp_msg,true,true,[onRewriteRegitration,otpCode]);
-			        	} else {
-	    					popupShowAdjust("",tmp.rsp_msg,true);
-			        	}
-					}else{
-						cns.debug("errorResponse:",data);
-						return $.i18n.getString("COMMON_CHECK_NETWORK");
+        	},
+        	errHide: true,
+        	isLoadingShow: true,
+        	method: "put",
+        	error: function(jqXHR, textStatus, errorThrown) {
+		    	try{
+		    		if(jqXHR.status == 400){
+						if(jqXHR.responseText){
+							var tmp = $.parseJSON(jqXHR.responseText);
+							if( 900==tmp.rsp_code ){
+				        		popupShowAdjust("",tmp.rsp_msg,true,true,[onRewriteRegitration,otpCode]);
+				        	} else {
+		    					popupShowAdjust("",tmp.rsp_msg,true);
+				        	}
+						}else{
+							cns.debug("errorResponse:",data);
+							return $.i18n.getString("COMMON_CHECK_NETWORK");
+						}
 					}
-				//}
-	    	} catch(e){
-				cns.debug( e.message );
-			}
-	    });
-        result.complete(function(data){
+		    	} catch(e){
+					cns.debug( e.message );
+				}
+		    }
+        }).complete(function(data){
         	cns.debug("驗證 驗證碼後的 data:",data);
 
         	//清除db
@@ -826,19 +808,20 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 	onRewriteRegitration = function(otpCode){
-		var api_name = "activation/unbind";
-        var headers = {
-                 "li":lang,
-                     };
-        var method = "post";
-        var body = {
-            id: $(document).data("phone-id"),
-            ud: $(document).data("device-token"),
-            vc: otpCode
-        }
-        
-        var result = ajaxDo(api_name,headers,method,true,body);
-        result.complete(function(data){
+		new QmiAjax({
+        	apiName: "activation/unbind",
+        	specifiedHeaders: {
+	            li:lang
+	        },
+        	body: {
+        		id: $(document).data("phone-id"),
+	            ud: $(document).data("device-token"),
+	            vc: otpCode
+        	},
+        	isLoadingShow: true,
+        	method: "post"
+
+		}).complete(function(data){
         	
         	if(data.status == 200){
         		var data = $.parseJSON(data.responseText);
@@ -857,28 +840,28 @@ onCheckVersionDone = function(needUpdate){
 
 		$(document).data("password",$(".password-confirm input").val());
 
-		var api_name = "activation/step2";
-        var headers = {
-                 "li":lang,
-                     };
-        var method = "put";
-        var body = {
-                id: $(document).data("phone-id"),
+		new QmiAjax({
+        	apiName: "activation/step2",
+        	specifiedHeaders: {
+	            li:lang
+	        },
+        	body: {
+        		id: $(document).data("phone-id"),
                 tp: 1,//多裝置代碼 0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
                 ud: $(document).data("device-token"),
                 pw: toSha1Encode($(document).data("password"))
-            }
-        cns.debug("activateStep2() 變更密碼前的 body:",JSON.stringify(body,null,2));
-        var result = ajaxDo(api_name,headers,method,true,body);
-        result.complete(function(data){
+        	},
+        	isLoadingShow: true,
+        	method: "put"
+        	
+		}).complete(function(data){
         	cns.debug("變更密碼後的 data:",data);
         	if(data.status == 200){
         		var data = $.parseJSON(data.responseText);
         		//default
-        		$(document).data("ui",data.ui);
-        		$(document).data("at",data.at);
-        		cns.debug("變更密碼後的 ui:",$(document).data("ui"));
-        		cns.debug("變更密碼後的 at:",$(document).data("at"));
+        		
+        		QmiGlobal.auth = data;
+
         		$(".avatar-area img").addClass("avatar-default");
         		// popupShowAdjust("",data.rsp_msg,"hash+#page-user-setting");
         		popupShowAdjust("",data.rsp_msg,true,false,[changePageAfterPopUp,"#page-user-setting"]);
@@ -892,25 +875,20 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 	activateStep3 = function(first_name,last_name,birth){
-		var api_name = "activation/step3";
-        var headers = {
-        		ui: $(document).data("ui"),
-        		at: $(document).data("at"),
-                li: lang,
-            };
-        var method = "put";
-        //no bd now
-        var body = {
-                id: $(document).data("phone-id"),
+
+		new QmiAjax({
+        	apiName: "activation/step3",
+        	body: {
+        		id: $(document).data("phone-id"),
                 tp: 0,
                 ud: $(document).data("device-token"),
                 fn: first_name,
                 ln: last_name,
-                //bd: birth
-            }
-        cns.debug("step3 body:",body);
-        var result = ajaxDo(api_name,headers,method,true,body);
-        result.complete(function(data){
+        	},
+        	isLoadingShow: true,
+        	method: "put"
+        	
+		}).complete(function(data){
         	//loading icon off
 			s_load_show = false;
 			$('.ui-loader').hide();
@@ -926,8 +904,8 @@ onCheckVersionDone = function(needUpdate){
 
 				//儲存登入資料 跳轉到timeline
 				var _loginData = {
-					ui: $(document).data("ui"),
-					at: $(document).data("at")
+					"ui": QmiGlobal.auth.ui,
+					"at": QmiGlobal.auth.at
 				}
 
 				$.lStorage("_loginData",_loginData);
@@ -945,9 +923,9 @@ onCheckVersionDone = function(needUpdate){
 		var api_name = "me/avatar";
 
         var headers = {
-             "ui":$(document).data("ui"),
-             "at":$(document).data("at"), 
-             "li":lang
+            ui: QmiGlobal.auth.ui,
+			at: QmiGlobal.auth.at,
+            li:lang
         };
 
         var method = "put";
@@ -1003,8 +981,8 @@ onCheckVersionDone = function(needUpdate){
 											if(data.status == 200){
 												var api_name = "me/avatar/commit";
 							                    var headers = {
-							                        "ui":$(document).data("ui"),
-									                "at":$(document).data("at"), 
+							                        "ui": QmiGlobal.auth.ui,
+									                "at": QmiGlobal.auth.at, 
 									                "li":lang,
 							                    };
 							                    var method = "put";
@@ -1069,136 +1047,23 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 
-
- //    //對話框設定
- //    $(".popup-confirm").click(function(){
- //    	var todo = $(".popup-confirm").data("todo");
-
- //    	if(typeof todo == "string"){
- //    		var todo_type = todo.split("+")[0];
- //    		var todo_act = todo.split("+")[1];
-
- //   //  		cns.debug("todo_type:",todo_type);
-	// 		// cns.debug("todo_act:",todo_act);
-
-	// 		if(todo_type == "func"){
-	// 	    	switch(todo_act){
-	// 				case "registration":
-	// 					registration();
-	// 					break;
-	// 				case "toGroupMenu":
-	// 					toGroupMenu();
-	// 					break;
-	// 			}
-	//     	}else if(todo_type == "hash"){
-	//     		$.mobile.changePage(todo_act);
-	//     	}
- //    	}
-	// 	$(".popup-screen").trigger("close");
-	// });
-
-	// $(".popup-cancel").click(function(){
- //    	var todo = $(".popup-cancel").data("todo");
-
- //    	if(typeof todo == "string"){
- //    		var todo_type = todo.split("+")[0];
- //    		var todo_act = todo.split("+")[1];
-	// 		if(todo_type == "func"){
-
-	//     	}else if(todo_type == "hash"){
-	//     		$.mobile.changePage(todo_act);
-	//     	}
- //    	}
-	// 	$(".popup-screen").trigger("close");
-	// });
-
-
-	// $(".popup-screen").bind("close",function(){
-	//     $(".popup").hide();
-	//     $(".popup-screen").hide();
-	// });
-
-
 	toGroupMenu = function(){
 		//document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
 		$('.ui-loader').css("display","block");
 		$(".ajax-screen-lock").show();
-		loginAction($.lStorage("_loginData"));
-	}
-
-    //對話框設定
-	popupShowAdjust_bak = function (title,desc,confirm,cancel){
-
-		//default
-		$(".popup-confirm").html( $.i18n.getString("COMMON_OK") );
-		$(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
-
-		if(title){
-			$('.popup-title').html(title);
-		}else{
-			$('.popup-title').html("");
-		}
-	    if(desc){
-	    	$('.popup-text').show();
-	        $('.popup-text').html(desc);
-	    }else{
-	    	$('.popup-text').hide();
-	    }
-	    if(confirm){
-	    	$(".popup-confirm").data("todo","");
-	    	$(".popup-confirm").show();
-	    	$('.popup-cancel').removeClass("full-width");
-
-	    	if(typeof confirm == "string"){
-	    		if(confirm.split("+")[2]){
-	    			$(".popup-confirm").html(confirm.split("+")[2]);
-	    		}
-	    		$(".popup-confirm").data("todo",confirm);
-	    	}
-	    }else{
-	    	$(".popup-confirm").hide();
-	    	$('.popup-cancel').addClass("full-width");
-	    	
-	    }
-	    if(cancel){
-	    	$(".popup-cancel").show();
-	    	$('.popup-confirm').removeClass("full-width");
-	    	if(typeof cancel == "string"){
-	    		if(cancel.split("+")[2]){
-	    			$(".popup-cancel").html(cancel.split("+")[2]);
-	    		}
-	    		$(".popup-cancel").data("todo",cancel);
-	    	}
-	    }else{
-	    	$(".popup-cancel").hide();
-	    	$('.popup-confirm').addClass("full-width");
-	    }
-
-
-	    if(!confirm && !cancel){
-	    	setTimeout(function(){
-    			$(".popup-screen").trigger("close");
-    		},2000);
-	    }
-
-	    $(".popup-screen").show();
-	    $(".popup").show();
-
-	    $(".popup-frame").css("margin-left",0);
-	    $(".popup-frame").css("margin-left",($(document).width() - $(".popup-frame").width())/2);
-	    
+		loginAction();
 	}
 	
 	initLandPage = function(){
-		s_load_show = true;
-		if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
-			$('.ui-loader').css("display","block");
-			$(".ajax-screen-lock").show();
-			setTimeout( function(){
-				loginAction($.lStorage("_loginData"));
-				return false;
-			},1500);
-		}
+		// s_load_show = true;
+		// if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
+		// 	$('.ui-loader').css("display","block");
+		// 	$(".ajax-screen-lock").show();
+		// 	// setTimeout( function(){
+		// 		loginAction($.lStorage("_loginData"));
+		// 		return false;
+		// 	// },1500);
+		// }
 		
 		//若local storage 有記錄密碼 就顯示
 		var rememberData = $.lStorage("_loginRemeber");
@@ -1241,7 +1106,7 @@ onCheckVersionDone = function(needUpdate){
 		if( logoClickCnt>=10 ){
 			logoClickCnt = 0;
 			if( clearCache() ){
-				alert("succ");
+				// alert("succ");
 			}
 		}
 	});

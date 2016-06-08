@@ -2,7 +2,7 @@
 $(document).ready(function(){
 	$(".addressBook-refresh").off("click").on("click",function(e){
 		// AddressBook.showAddMemberPage();
-		AddressBook.initAddressBookList();
+		AddressBook.initAddressBookList(true);
 	});
 	$("#page-addressbook-addmem .ca-content-area").niceScroll( {
 		// styler:"fb",
@@ -37,22 +37,29 @@ var AddressBook = AddressBook || {
 	// var isKeyPress = false;
 
 
-	initAddressBookList: function(){
+	initAddressBookList: function(status){
+
+		if (status === undefined) 
+			status = false;
+		else 
+			status = true;
+
 		var instance = this;
 
-		var api_name = "groups/" + gi + "/contacts";
-		var headers = {
+		var 
+		api_name = "groups/" + gi + "/contacts",
+		headers = {
 			"ui":ui,
 			"at":at, 
 			"li":lang
 		};
 
-		ajaxDo(api_name,headers,"get",true).complete(function(data){
+		ajaxDo(api_name,headers,"get",status).complete(function(data){
 			if(data.status == 200){
 				var tmp = $.parseJSON( data.responseText );
 				
 				try{
-					instance.groupName = $.lStorage(ui)[gi].gn;
+					instance.groupName = QmiGlobal.groups[gi].gn;
 				} catch(e){
 					errorReport(e);
 				}
@@ -118,7 +125,7 @@ var AddressBook = AddressBook || {
 
 				//get branch data
 				if( !tmp.bl || tmp.bl.length<=0 ){
-					alert("no branch data");
+					// alert("no branch data");
 					return;
 				}
 				instance.bl = {};
@@ -439,8 +446,7 @@ var AddressBook = AddressBook || {
 		if( !page || page.length==0 ){
 			page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
 	            +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-	                // +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
-	                +'<div class="page-back"><img src="images/common/icon/bt_close_activity.png"/></div>'
+	                +'<div class="page-back" customize><img src="images/common/icon/bt_close_activity.png"/></div>'
 	                +'<h3 class="page-title">成員列表</h3>'
 	            +'</div><div class="subpage-addressBook"></div></div>');
 			$("#"+parentPageID).after(page);
@@ -681,7 +687,7 @@ var AddressBook = AddressBook || {
 		if( !page || page.length==0 ){
 			page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
 	            +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-	                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+	                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
 	                +'<h3 class="page-title">成員列表</h3>'
 	            +'</div><div class="subpage-addressBook"></div></div>');
 			$("#page-group-main").after(page);
@@ -754,9 +760,9 @@ var AddressBook = AddressBook || {
 	switchListAndGrid: function( dom, subPageBottom ){
 		var instance = this;
 		instance.isList = !instance.isList;
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		userData.isMemberShowList = instance.isList;
-		$.lStorage(ui,userData);
+		// *--* $.lStorage(ui,userData);
 
 		var mem = subPageBottom.find(".contact-mems");
 		var memList = subPageBottom.find(".contact-memLists");
@@ -1024,7 +1030,7 @@ var AddressBook = AddressBook || {
 		if( !page || page.length==0 ){
 			page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
 	            +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-	                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+	                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
 	                +'<h3 class="page-title">成員列表</h3>'
 	            +'</div><div class="subpage-addressBook"></div></div>');
 			$("#page-group-main").after(page);
@@ -1147,241 +1153,7 @@ var AddressBook = AddressBook || {
 	              ╚═╝  ╚═╝╚═════╝ ╚═════╝     ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝          
 
 	*/
-	// showAddMemberPage: function(){
-	// 	var instance = this;
-	// 	$.mobile.changePage("#page-addressbook-addmem");
-
-	// 	return;
-
-	// 	$("#page-addressbook-addmem .ca-list-area .cal-coachmake").show();
-	// 	$("#page-addressbook-addmem .ca-list-area .cal-div-area").hide();
-
-
-	// 	$("#page-addressbook-addmem .ca-nav-box").off("click").click( function(){
-	// 		var this_btn = $(this);
-	// 		if( this_btn.hasClass("ca-invite") ){
-	// 			$("#page-addressbook-addmem .ca-invite-area").show();
-	// 			$("#page-addressbook-addmem .ca-list-area").hide();
-	// 		} else {
-	// 			$("#page-addressbook-addmem .ca-invite-area").hide();
-	// 			$("#page-addressbook-addmem .ca-list-area").show();
-	// 			getInviteList();
-	// 		}
-	// 		$("#page-addressbook-addmem .ca-nav-active").removeClass("ca-nav-active");
-	// 		this_btn.addClass("ca-nav-active");
-	// 	});
-	// 	$("#page-addressbook-addmem .ca-invite").trigger("click");
-	// 	$("#page-addressbook-addmem .ca-invite-submit").off("click").click( instance.sendInvite );
-
-
-	// 	//render invite pending member list
-	// 	// instance.updateInvitePending();
-	// 	var api_name = "groups/" + gi + "/users?tp=1";
-	// 	var headers = {
-	// 	         "ui":ui,
-	// 	         "at":at, 
-	// 	         "li":lang,
-	// 	             };
-	// 	var method = "get";
-	// 	var result = ajaxDo(api_name,headers,method,false);
-	// 	result.complete(function(data){
-	// 		if(data.status != 200) return false;
-	// 		var obj =$.parseJSON(data.responseText).ul;
-	// 		instance.inviteGuAll = {};
-	// 		for( var i=0; i<obj.length; i++ ){
-	// 			var mem = obj[i];
-	// 			if( 0==mem.st ){
-	// 				instance.inviteGuAll[mem.gu] = mem;
-	// 			}
-	// 		}
-	// 		var userData = $.lStorage(ui);
-	// 		if( userData && gi ){
-	// 			if( userData.hasOwnProperty(gi) ){
-	// 				userData[gi].inviteGuAll = instance.inviteGuAll;
-	// 			}
-	// 		}
-	// 		$.lStorage(ui, userData);
-
-
-	// 		instance.updateInvitePending();
-	// 	});
-	// },
-
-	// updateInvitePending: function() {
-	// 	var instance = this;
-	// 	//render invite pending member list
-	// 	var pendingAreaParent = $("#page-addressbook-addmem .ca-pending-area");
-	// 	var pendingArea = pendingAreaParent.children(".list");
-	// 	var coachArea = pendingAreaParent.children(".coach").hide();
-	// 	pendingArea.html("").show();
-	// 	var noData = true;
-	// 	if( instance.inviteGuAll ){
-	// 		var template = $('<div class="row">'
-	// 				+'<div class="left"><img class="ab_namecard"/></div>'
-	// 				+'<div class="mid"><div class="name"></div><div class="phone"></div></div>'
-	// 				+'<div class="right"><img src="images/icon/icon_invite_mail.png"/></div>'
-	// 			+'</div>');
-	// 		$.each(instance.inviteGuAll, function(guTmp, mem){
-	// 			if( mem && mem.st==0 ){
-	// 				noData = false;
-	// 				var newRow = template.clone();
-	// 				//img
-	// 				newRow.find(".ab_namecard").data("gu",guTmp).data("gi",gi).attr("src",mem.aut||"images/common/others/empty_img_personal_l.png");
-	// 				//name
-	// 				newRow.find(".name").html( htmlFormat(mem.nk||"") );
-	// 				//phone
-	// 				newRow.find(".phone").text( mem.pn||"" );
-	// 				pendingArea.append(newRow);
-	// 			}
-	// 		});
-
-	// 	}
-	// 	if(noData){
-	// 		coachArea.show();
-	// 		pendingArea.hide();
-	// 	}
-	// },
-
-
-	// getInviteList: function(){
-	// 	var instance = this;
-	// 	var api_name = "groups/" + gi + "/invitations";
-	// 	var headers = {
-	// 	         "ui":ui,
-	// 	         "at":at, 
-	// 	         "li":lang,
-	// 	             };
-	// 	var method = "get";
-	// 	var result = ajaxDo(api_name,headers,method,false);
-	// 	result.complete(function(data){
-	// 		if(data.status != 200) return false;
-
-	// 		var obj =$.parseJSON(data.responseText);
-	// 		if( obj.il && obj.il.length<=0 ){
-	// 			$("#page-addressbook-addmem .ca-list-area .cal-coachmake").fadeIn();
-	// 			$("#page-addressbook-addmem .ca-list-area .cal-div-area").fadeOut();
-
-	// 		} else {
-	// 			var area = $("#page-addressbook-addmem .ca-list-area .cal-div-area");
-	// 			area.html("");
-
-	// 			for( var i=0; i<obj.il.length; i++){
-	// 				var data_info = obj.il[i];
-	// 				if( !data_info ) continue;
-	// 				// "ik": "+886935398692", or "abc@gmail.com"
-	// 			    // "tp": 0, or 1 // Invitation Type 0(Phone)、1(Email)
-	// 			    // "nk": "小瓶 "
-	// 			    // "auo": "http://s3.url/xxx", // Avatar Original URL
-	// 			    // "aut": "http://s3.url/xxx"  // Avatar Thumbnail URL
-	// 			    var row = $("<div class='cal-row'></div>");
-	// 			    row.append("<div class='photo'><img class='st-user-pic' src='images/common/others/empty_img_personal_l.png'/></div>");
-	// 			    row.append("<div class=info><div class='name'></div><div class='tel'></div></div>");
-	// 			    row.append("<div class='img'><img src='images/invitemembers/invitemembers_icon_reinvite.png'/></div>");
-	// 			    area.append( row );
-
-	// 			    if( data_info.aut ) row.find(".photo img").attr( "src", data_info.aut.replaceOriEmojiCode() );
-	// 			    if( data_info.nk ) row.find(".info .name").html( data_info.nk.replaceOriEmojiCode() );
-	// 			    if( data_info.ik && data_info.ik.length>0 ){
-	// 			    	if( data_info.tp==0 ){
-	// 			    		var tmp = data_info.ik.replace( /^(\+.{3})/, "0")
-	// 			    		row.find(".info .tel").html( tmp );
-	// 			    	} else {
-	// 			    		row.find(".info .tel").html( data_info.ik );
-	// 			    	}
-	// 			    }
-	// 			}
-
-	// 			$("#page-addressbook-addmem .ca-list-area .cal-coachmake").fadeOut();
-	// 			area.fadeIn();
-	// 		}
-	// 	});
-	// },
-
-	// sendInvite: function(){
-	// 	var instance = this;
-	// 	var nk = $(".cai-name input").val();
-	// 	if( !nk || nk.length==0 ){
-	// 		popupShowAdjust("", $.i18n.getString("INVITE_DISPLAY_NAME") );
-	// 		return;
-	// 	}
-	// 	var phone = $(".cai-num input").val();
-	// 	if( !phone || phone.length==0 ){
-	// 		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_NUMBER") );
-	// 		return;
-	// 	}
-	// 	if( phone.length<10 || phone.indexOf("0")!=0 ){
-	// 		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR") );
-	// 		return;
-	// 	}
-	// 	var area = $(".cai-area .area");
-	// 	phone = phone.replace(/^0/, area.html() );
-	// 	/* ----- TODO ------
-	// 		 國碼/email
-	// 		不同國別電話格式檢查
-	// 	   ----- TODO ------*/
-	// 	instance.sendInviteAPI( [{
-	// 			"pn": phone,
-	// 			"nk": nk
-	// 		}], function(data){
-	// 			if( data.status==200 ){
-	// 				// "ul":
-	// 				// [
-	// 				//   {
-	// 				//     "gu": "asdfas-awefnasdf", // Group User Id
-	// 				//     "ik": "+886912345678",  // Invitation Key
-	// 				//     "tp": 0,  // Invitation Type(0: Phone, 1: Email)
-	// 				//     "aj": true  // Already Joined Group ?
-	// 				//   }
-	// 				// ]
-	// 				try{
-	// 					var obj = $.parseJSON(data.responseText);
-	// 					/* ----- TODO ------
-	// 						如果已經邀過了...?
-	// 					   ----- TODO ------ */
-	// 					//mem already in group
-	// 					if( obj.ul[0].aj==true ){
-	// 						toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
-	// 					} else {
-	// 						toastShow( $.i18n.getString("INVITE_SUCC") );
-	// 						$(".cai-name input").val("");
-	// 						$(".cai-num input").val("");
-	// 					}
-	// 					//update inviting list
-	// 					if(!instance.inviteGuAll) instance.inviteGuAll = {};
-	// 					instance.inviteGuAll[obj.ul[0].gu] = {
-	// 						gu: obj.ul[0].gu,
-	// 						ik: obj.ul[0].ik,
-	// 						tp: obj.ul[0].tp,
-	// 						st: 0,
-	// 						nk: nk,
-	// 						pn: phone
-	// 					};
-	// 					instance.updateInvitePending();
-
-	// 				} catch(e){
-
-	// 				}
-	// 			} else {
-	// 				toastShow( $.i18n.getString("INVITE_FAIL") );
-	// 			}
-	// 	});
-	// },
-
-	// sendInviteAPI: function( list, callback ){
-	// 	var instance = this;
-	// 	var api_name = "groups/" + gi + "/invitations";
-	// 	var headers = {
-	// 	         "ui":ui,
-	// 	         "at":at, 
-	// 	         "li":lang,
-	// 	             };
-	// 	var body = { "ul":list };
-	// 	var method = "post";
-	// 	var result = ajaxDo(api_name,headers,method,false, body);
-	// 	result.complete(function(data){
-	// 		callback(data);
-	// 	});
-	// },
+	
 
 	/*
 	              ██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗          
@@ -1503,7 +1275,7 @@ var AddressBook = AddressBook || {
 	        		instance.userInfoAvatarPos($(".user-avatar .user-pic"));
 	        	}
 
-	        	// $.lStorage(ui,_groupList);
+	        	// // *--* $.lStorage(ui,_groupList);
 
                 // if(this_gu == gu) instance.showCustomInfo(user_data);
 
@@ -1649,11 +1421,11 @@ var AddressBook = AddressBook || {
             this_info._i18n();
 
     		//團體頭像
-    		// this_info.find(".group-avatar img").attr("src",$.lStorage(ui)[gi].aut);
+    		// this_info.find(".group-avatar img").attr("src",QmiGlobal.groups[gi].aut);
     		// avatarPos(this_info.find(".group-avatar img"),60);
 
     		//團體名稱
-    		// this_info.find(".group-name").html($.lStorage(ui)[gi].gn);
+    		// this_info.find(".group-name").html(QmiGlobal.groups[gi].gn);
 
     		//頭像
     		// if(user_data.aut){
@@ -1760,77 +1532,7 @@ var AddressBook = AddressBook || {
 
     	if(isNew){
 
-            // this_info.find(".user-avatar.me").click(function(){
-            //     this_info.find(".user-avatar-upload").trigger("click");
-            // });
-
-	    	// this_info.find(".user-avatar-bar.me .upload").click(function(){
-	    	// 	this_info.find(".user-avatar-upload").trigger("click");
-	    	// });
-
-	    	//檔案上傳
-	   //  	this_info.find(".user-avatar-upload").change(function() {
-	   //  		var imageType = /image.*/;
-		  //   	var file = $(this)[0].files[0];
-    //             if( !file ) return;
-		  //   	if (file.type.match(imageType)) {
-				// 	var reader = new FileReader();
-				// 	reader.onload = function(e) {
-				// 		//reset
-				// 		$(".user-avatar.me > img").remove();
-				// 		var new_img = $("<img style='opacity:1' src=\"images/common/others/empty_img_personal_xl.png\"/>")
-				// 		$(".user-avatar.me").prepend(new_img);
-
-				// 		var img = $(".user-avatar.me > img");
-				// 		//調整長寬
-				// 		instance.userInfoAvatarPos(img);
-				//         img.attr("src",reader.result);
-				        
-				//         //有更動即可按確定
-				//         // this_info.find(".user-info-submit").addClass("user-info-submit-ready");
-
-				//         //記錄更動
-				//         // this_info.data("avatar-chk",true);
-
-
-    //                     var ori_arr = [1280,1280,0.7];
-    //                     var tmb_arr = [120,120,0.6];
-    //                     var file = this_info.find(".user-avatar-upload")[0].files[0];
-    //                     var api_name = "groups/"+gi+"/users/"+gu+"/avatar";
-
-    //                     uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
-    //                         // 關閉load 圖示
-    //                         s_load_show = false;
-            
-    //                         if(chk) {
-    //                             //重置團體頭像、名稱的參數
-    //                             getGroupCombo(gi,function(){
-    //                                 //結束關閉
-    //                                 this_info.find(".user-info-close").trigger("mouseup");
-    //                                 toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );    
-    //                                 updateAllAvatarName(gi,gu);
-    //                                 // this_info.find(".user-avatar .user-pic").attr("src",auo);
-    //                                 // this_info.find(".user-avatar").data("auo",auo);
-    //                             });
-    //                         }else{
-    //                             $('.ui-loader').hide();
-    //                             $(".ajax-screen-lock").hide();
-
-    //                             //結束關閉
-    //                             this_info.find(".user-info-close").trigger("mouseup");
-    //                         }
-    //                     });
-				// 	}
-				// 	reader.readAsDataURL(file);
-				// }else{
-				// 	//clear input file
-		  //   		var this_file = $(this);
-		  //   		this_file.replaceWith( this_file = this_file.clone( true ) );
-
-				// 	//警語
-				// 	popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
-				// }
-	   //  	});
+  
 
 	    	this_info.find(".user-info-list input").bind("input",function(){
 	    		//有更動即可按確定
@@ -1925,10 +1627,10 @@ var AddressBook = AddressBook || {
         	//重置團體頭像、名稱的參數
         	if(data.status == 200){
         		//重置團體頭像、名稱 失敗也要重置
-        		// var _groupList = $.lStorage(ui);
+        		// var _groupList = QmiGlobal.groups;
         		// _groupList[gi].guAll[gu].nk = body.nk;
         		// _groupList[gi].guAll[gu].sl = body.sl;
-        		// $.lStorage(ui,_groupList);
+        		// // *--* $.lStorage(ui,_groupList);
         		s_load_show = false;
         		
         		// 關閉load 圖示
@@ -1996,10 +1698,10 @@ var AddressBook = AddressBook || {
         	//重置團體頭像、名稱的參數
         	if(data.status == 200){
         		//重置團體頭像、名稱 失敗也要重置
-        		// var _groupList = $.lStorage(ui);
+        		// var _groupList = QmiGlobal.groups;
         		// _groupList[gi].guAll[gu].nk = body.nk;
         		// _groupList[gi].guAll[gu].sl = body.sl;
-        		// $.lStorage(ui,_groupList);
+        		// // *--* $.lStorage(ui,_groupList);
         		s_load_show = false;
         		
         		// 關閉load 圖示
@@ -2181,7 +1883,7 @@ var AddressBook = AddressBook || {
 		if( !page || page.length==0 ){
 			page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
 	            +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
-	                +'<div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>'
+	                +'<div class="page-back" customize><img src="images/navi/navi_icon_back.png"/></div>'
 	                +'<h3 class="page-title">成員列表</h3>'
 	            +'</div><div class="subpage-addressBook"></div></div>');
 			$("#page-group-main").after(page);
