@@ -327,10 +327,10 @@ onCheckVersionDone = function(needUpdate){
         at = QmiGlobal.auth.at;
 
         //附上group list
-        getGroupList().done(function(groupList = []){
+        getGroupList().done(function(groupList){
 
         	// 取dgi的combo
-            if( groupList.length>0 ){
+            if( (groupList || []).length>0 ){
             	//有dgi 但不存在列表裡
                 if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
                 	localStorage.removeItem("uiData");
