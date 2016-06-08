@@ -244,7 +244,7 @@ function onReceivePollingChatCnt ( ccs ){
 	if( typeof(windowList)!='undefined' && null != windowList ){
 		for( var ccsIndex=0; ccsIndex<ccs.length; ccsIndex++){
 			var data = ccs[ccsIndex];
-			if( null != windowList[data.ci] 
+			if( windowList[data.ci] !== undefined
 				&& false==windowList[data.ci].closed ){
 				$(windowList[data.ci].document).find("button.pollingCnt").trigger("click");
 			}
