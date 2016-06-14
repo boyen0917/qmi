@@ -301,7 +301,8 @@ timelineChangeGroup = function (thisGi) {
     var timelineDom = $(".gm-content");
     if(QmiGlobal.groups[thisGi].isRefreshing === true) {
         // 還是要變換團體名稱 及 currentGi 解除屏蔽時要用
-        gi = currenGi = thisGi;
+        gi = QmiGlobal.currentGi = thisGi;
+
         $(".polling-group-name.currentGroup").html(QmiGlobal.groups[thisGi].gn);
 
         $("#page-group-main .gm-header-right").hide();
@@ -310,8 +311,12 @@ timelineChangeGroup = function (thisGi) {
         .find(".refresh-lock").show().end()
         .find(".gm-content-body").hide();
 
-
         $(".sm-group-area").addClass("enable");
+
+        // 關鈴鐺
+        if($(".alert-area-cover").is(":visible") === true) $(".alert-area-cover").trigger("click");
+        // 去timeline
+        $.mobile.changePage("#page-group-main");
 
         changeDeferred.resolve();
 

@@ -5415,6 +5415,13 @@ section.fileSharing section.progress-bar .frame .progress {
     left: 1px;
 }
 section.fileSharing section.progress-bar .frame .text { position: absolute; top: 0 ;left: 65px;}
+section.fileSharing section.progress-bar .frame .cancel { 
+	position: absolute; 
+	top: 0;
+	right: -50px;
+	font-size: 15px;
+	cursor: pointer;
+}
 
 section.subpage-fileSharing{
 	overflow-y: auto;
