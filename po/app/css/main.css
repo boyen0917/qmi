@@ -657,8 +657,8 @@ img.auo {
 
 .popup-screen,.ajax-screen-lock , .screen-lock , .compose-dnd{
 	display: none;
-	width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
 	left: 0;
 	top: 0;
 	background: black;

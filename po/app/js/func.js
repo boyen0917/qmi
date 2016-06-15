@@ -1,6 +1,7 @@
 
 setGroupInitial = function(new_gi,chk){
-    var deferred = $.Deferred();
+    var groupMenuDef = $.Deferred(),
+        allDoneDeferred = $.Deferred();
 
     //設定目前團體
     setThisGroup(new_gi);
@@ -11,17 +12,15 @@ setGroupInitial = function(new_gi,chk){
 
     //header 設定團體名稱
     $(".header-group-name div:eq(1)").html(gn);
-    
-    var deferred = $.Deferred();
 
     // chk是從同意邀請來的 不需要再做 groupMenuListArea
     if(chk === true) 
-        deferred.resolve();
+        groupMenuDef.resolve();
     else
-        groupMenuListArea(true).always(function(){ deferred.resolve(); })
+        groupMenuListArea(true).always(function(){ groupMenuDef.resolve(); })
         
     //做團體列表、top event
-    $.when(deferred.promise(),topEvent()).done(function(){
+    $.when(groupMenuDef.promise(),topEvent()).done(function(){
 
         // 團體ui active
         var defaultGroupDom = $(".sm-group-list-area .sm-group-area[data-gi="+ gi +"]");
@@ -35,18 +34,24 @@ setGroupInitial = function(new_gi,chk){
         
         //動態消息
         var tmp = $(".sm-small-area:not(.setting):visible");
-        if( tmp.length>0 ){
+    
+        // 定時重新整理 為了健康
+        if(QmiGlobal.isPeriodicallyReload === true) {
+            timelineSwitch(QmiGlobal.auth.prObj.param.act, QmiGlobal.auth.prObj.param.reset, QmiGlobal.auth.prObj.param.main);
+
+        } else if( tmp.length>0 ){
+
             $(tmp[0]).addClass("active");
             timelineSwitch( $(tmp[0]).data("sm-act") || "feeds",true);
-        }
-        else{
+
+        } else {
             timelineSwitch("feeds",true);
         }
 
-        deferred.resolve();
+        allDoneDeferred.resolve();
     });
 
-    return deferred.promise();
+    return allDoneDeferred.promise();
 }
 
 logout = function(){
@@ -367,7 +372,24 @@ timelineChangeGroup = function (thisGi) {
     return changeDeferred.promise();
 }
 
-timelineSwitch = function (act,reset,main){
+timelineSwitch = function (act,reset,main,noPR){
+
+    // 定期重新整理 選擇在這裡做
+    if(window.periodicallyReloadFlag === true && noPR !== true) {
+        // 設定當前gi
+        QmiGlobal.auth.prObj = {
+            gi: QmiGlobal.currentGi,
+            param: {
+                act: act,
+                reset: reset,
+                main: main
+            }
+        };
+
+        $.lStorage("_periodicallyReloadAuth", QmiGlobal.auth);
+        location.reload();
+        return;
+    }
 
     var 
     switchDeferred = $.Deferred(),
@@ -6745,8 +6767,6 @@ getGroupList = function(){
             allGlDeferred.resolve();
         }// end of if(apiData.cl exist)
 
-            
-
         allGlDeferred.done(function(){
             //將group list 更新到 lstorage ui
             if(allGroupList.length > 0)
@@ -6922,6 +6942,7 @@ addCloudReLoadView = function(cloudObj) {
 cloudLoad = function(){
     var refreshDom = this.refreshDom,
         cloudObj = this.cloudObj,
+        groupCnts = Object.keys(QmiGlobal.groups).length,
         cloudLoadDeferred = $.Deferred();
 
     if(refreshDom !== undefined) {
@@ -7014,7 +7035,7 @@ cloudLoad = function(){
             if($(".refresh-lock").is(":visible") === true) timelineChangeGroup(gi); 
 
             // 無團體 在建立團體頁面
-            if(Object.keys(QmiGlobal.groups).length < 1 && $("#page-group-menu").is(":visible")) {
+            if(groupCnts === 0 && $("#page-group-menu").is(":visible")) {
                 // 無團體狀態 跳出alert
                 new QmiGlobal.popup({
                     title: $.i18n.getString("REFRESH_ALERT_SUCCESS"),
@@ -7029,7 +7050,7 @@ cloudLoad = function(){
                             var chk = false, firstGi;
                             Object.keys(QmiGlobal.cloudGiMap).forEach(function(cgi) {
                                 // 找到第一個私雲團體即可
-                                if(QmiGlobal.cloudGiMap[cgi].ci === item.pm.c_info.ci
+                                if(QmiGlobal.cloudGiMap[cgi].ci === cloudObj.ci
                                     && chk === false) {
                                     chk = true;
                                     firstGi = cgi;
@@ -7057,6 +7078,19 @@ cloudLoad = function(){
 
 
 polling = function(){
+
+    // 計算重新讀取頁面的時間
+    if($.lStorage("_periodicallyReloadTimer") === false) {
+        $.lStorage("_periodicallyReloadTimer", new Date().getTime());
+
+    // 每12小時reload一次 12 * 60 * 60 * 1000
+    } else if(new Date().getTime() - $.lStorage("_periodicallyReloadTimer") > 43200000) {
+
+        window.periodicallyReloadFlag = true;
+        console.log("periodically reload");
+
+        $.lStorage("_periodicallyReloadTimer", new Date().getTime());
+    }
 
     // 開啓polling檢查機制
     if(window.QmiPollingChk.flag === false) window.QmiPollingChk.flag = true;
@@ -8469,7 +8503,7 @@ userInfoEvent = function(this_info,me){
     //個人主頁
     this_info.find(".action-main").off("click").click( function(){
         $.mobile.changePage("#page-group-main");
-        timelineSwitch("feeds",false,true);
+        timelineSwitch("feeds",false,true,true);
 
         //滾動至最上
         timelineScrollTop();

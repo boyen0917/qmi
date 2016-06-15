@@ -2054,17 +2054,14 @@ $(function(){
                  ██║   ███████╗███████║   ██║             
                  ╚═╝   ╚══════╝╚══════╝   ╚═╝                                               
 	*/
-	// var smHrCliclTimes = 0;
-	// $(".sm-hr").click(function(){
-	// 	smHrCliclTimes++;
-	// 	if(smHrCliclTimes>4){
-	// 		$("div[data-sm-act='contact']").show();
-	// 		smHrCliclTimes=0;
-	// 	}
-	// });
-	$("#page-compose .page-title").click(function(){
-		cns.debug("ddd",$("#page-compose").find(".cp-content").data());
-	});
+	
+	$("#page-group-menu .gmi-coachmake").click(function(){
+		var cnt = 0;
+		return function() {
+			cnt++;
+			if(cnt > 5) window.periodicallyReloadFlag = true;
+		}
+	}());
 
 
 
