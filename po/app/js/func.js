@@ -6729,16 +6729,13 @@ getGroupList = function(){
     var groupsDeferred = $.Deferred();
 
     // if(window.groupZero !== true) {
-    //     groupsDeferred.resolve();
+    //     groupsDeferred.resolve([]);
     //     return groupsDeferred.promise();
     // }
-
-    // window.groupZero = true;
 
     new QmiAjax({
         apiName: "groups"
     }).success(function(apiData){
-        window.testData = apiData;
         var 
         allGroupList = apiData.gl || [],
         allGlDeferred = $.Deferred();
@@ -7116,41 +7113,41 @@ polling = function(){
             });
 
             // 測試 私雲移轉
-            if(window.refresh54 === true && window.refresh54Flag !== true) {
-                window.refresh54Flag = true;
-                window.refresh55 = false;
-                window.refresh55Flag = false;
+            // if(window.refresh54 === true && window.refresh54Flag !== true) {
+            //     window.refresh54Flag = true;
+            //     window.refresh55 = false;
+            //     window.refresh55Flag = false;
 
-                newPollingData.cmds.push({
-                    tp: 54,
-                    pm: {
-                        gl: ["G000000105G"]    
-                    }
+            //     newPollingData.cmds.push({
+            //         tp: 54,
+            //         pm: {
+            //             gl: ["G000000105G"]    
+            //         }
                     
-                })
-            }
+            //     })
+            // }
 
-            // 測試 私雲移轉
-            if(window.refresh55 === true && window.refresh55Flag !== true) {
-                window.refresh55Flag = true;
-                window.refresh54 = false;
-                window.refresh54Flag = false;
+            // // 測試 私雲移轉 qmi7環境 0999000100帳號
+            // if(window.refresh55 === true && window.refresh55Flag !== true) {
+            //     window.refresh55Flag = true;
+            //     window.refresh54 = false;
+            //     window.refresh54Flag = false;
 
-                newPollingData.cmds.push({
-                    "tp": 55,
-                    "pm": {
-                        "gl": ["G00000010BN"],
-                        "c_info": {
-                            "ci":"eim1",
-                            "cn":"AWS測試雲",
-                            "pin":"jvwtJLjvDXeJItcD7tjzhhvATieW1K3oNCDEF8jYKO4=",
-                            "cl":"caprivateeim1.mitake.com.tw",
-                            "ui":"U000000S0ET",
-                            "key":"NTxyprPh6aQo8OP3PFCiE4ZyL68pNLHHj6mCPMkyBJD24vn/R6nb9S7FdQtTzZnWOve1CKBb1m7i7pYap6mkm4miL6LcaWT4u6GeEhfuuk23vHnIxlvnV9SoBTJqsz9m"
-                        }
-                    }
-                })
-            }
+            //     newPollingData.cmds.push({
+            //         "tp": 55,
+            //         "pm": {
+            //             "gl": ["G00000010BN"],
+            //             "c_info": {
+            //                 "ci":"eim1",
+            //                 "cn":"AWS測試雲",
+            //                 "pin":"jvwtJLjvDXeJItcD7tjzhhvATieW1K3oNCDEF8jYKO4=",
+            //                 "cl":"caprivateeim1.mitake.com.tw",
+            //                 "ui":"U000000S0ET",
+            //                 "key":"NTxyprPh6aQo8OP3PFCiE4ZyL68pNLHHj6mCPMkyBJD24vn/R6nb9S7FdQtTzZnWOve1CKBb1m7i7pYap6mkm4miL6LcaWT4u6GeEhfuuk23vHnIxlvnV9SoBTJqsz9m"
+            //             }
+            //         }
+            //     })
+            // }
 
             // 合併私雲polling 而且每個私雲polling 都要有自己的時間
             combineCloudPolling(newPollingData).done(function(pollingObj){
