@@ -6734,7 +6734,8 @@ getGroupList = function(){
     // }
 
     new QmiAjax({
-        apiName: "groups"
+        apiName: "groups",
+        isPublisApi: true
     }).success(function(apiData){
         var 
         allGroupList = apiData.gl || [],
@@ -7080,8 +7081,8 @@ polling = function(){
     if($.lStorage("_periodicallyReloadTimer") === false) {
         $.lStorage("_periodicallyReloadTimer", new Date().getTime());
 
-    // 每12小時reload一次 12 * 60 * 60 * 1000
-    } else if(new Date().getTime() - $.lStorage("_periodicallyReloadTimer") > 43200000) {
+    // 每8小時reload一次 8 * 60 * 60 * 1000
+    } else if(new Date().getTime() - $.lStorage("_periodicallyReloadTimer") > 28800000) {
 
         window.periodicallyReloadFlag = true;
         console.log("periodically reload");

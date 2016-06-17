@@ -309,7 +309,7 @@ img.auo {
 
 #page-group-menu {
 	background: white;
-	height: 100%;
+	height: calc(100vh - 57px);
 }
 
 .gm-nav {

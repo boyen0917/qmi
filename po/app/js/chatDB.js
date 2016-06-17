@@ -219,27 +219,18 @@ function onReceivePollingChatCnt ( ccs ){
 
 	//indexed from old to new (api chat is from new to old)
 	for( var ccsIndex=0; ccsIndex<ccs.length; ccsIndex++){
-		var data = ccs[ccsIndex];
+		var data = ccs[ccsIndex] || {};
 		var giTmp = data.gi;
-		if( null==groups[giTmp] )	groups[giTmp] = {};
-		if( null==groups[giTmp].chatAll )	groups[giTmp].chatAll = {};
-		if( null==groups[giTmp].chatAll[data.ci] )	groups[giTmp].chatAll[data.ci] = {};
-
-		// data.cc.sort(function(a,b){
-		// 	if(a.key >= b.key )	return 1;
-		// 	return -1;
-		// });
-
-		var cntContent = new Object();
-		for( var i=0; i<data.cc.length; i++){
-			// cns.debug( data.cc[i].ts, data.cc[i].cnt );
-			cntContent[i] = data.cc[i];
+		if(groups[giTmp] !== undefined && groups[giTmp].chatAll !== undefined && groups[giTmp].chatAll[data.ci] !== undefined)	{
+			
+			var cntContent = new Object();
+			for( var i=0; i<data.cc.length; i++){
+				// cns.debug( data.cc[i].ts, data.cc[i].cnt );
+				cntContent[i] = data.cc[i];
+			}
+			groups[giTmp].chatAll[data.ci].cnt = cntContent;
 		}
-		
-		groups[giTmp].chatAll[data.ci].cnt = cntContent;
 	}
-	// cns.debug( JSON.stringify(QmiGlobal.groups) );
-
 
 	if( typeof(windowList)!='undefined' && null != windowList ){
 		for( var ccsIndex=0; ccsIndex<ccs.length; ccsIndex++){
@@ -255,12 +246,6 @@ function onReceivePollingChatCnt ( ccs ){
 
 // 根據刪除的範圍和團體ID來刪除DB內的聊天記錄
 function onRemoveChatDB(groupID, days) {
-	// console.log(groupID);
-	// // var timestamop = QmiGlobal.groups[gi].set.ccc;
-	// var groupID = groupID || gi;
-	// var days = days || QmiGlobal.groups[gi].set.ccc;
-	// console.log(groupID);
-	// console.log(days);
 	
 	var onItem = function (item) {
   		// console.log('got item:', item.ct);

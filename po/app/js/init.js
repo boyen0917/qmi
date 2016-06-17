@@ -337,7 +337,7 @@ window.QmiAjax = function(args){
 
 
 	//before send
-	if(args.isLoadingShow === true) {
+	if(args.isLoadingShow === true || s_load_show === true) {
 		$(".ajax-screen-lock").show();
 		$('.ui-loader').css("display","block");
 	} 
@@ -691,7 +691,7 @@ QmiAjax.prototype = {
 	},
 		
 	onComplete: function(data){
-		// 舊的有在用 新的不再用
+		
 		if(s_load_show === false) {
 			$('.ui-loader').hide();
 			$(".ajax-screen-lock").hide();
