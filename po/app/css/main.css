@@ -1010,7 +1010,7 @@ img.auo {
 
 .sm-group-list-scroll-area {
     /*min-height: 123px;*/
-    height: -webkit-calc( 100% - 188px );
+    height: -webkit-calc( 100% - 164px );
 	overflow-x: hidden;
 	overflow-y: scroll;
 	padding-bottom: 5px;

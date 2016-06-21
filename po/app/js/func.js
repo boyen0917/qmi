@@ -84,6 +84,7 @@ chkBranch = function(){
 }
 
 createGroup = function (group_name,group_desc){
+    
     var api_name = "groups";
     var headers = {
         ui: ui,
@@ -376,7 +377,6 @@ timelineSwitch = function (act,reset,main){
         $("#page-group-main .switch-reset").html("");
     }
 
-
     // 關掉筆
     var groupMain = $("#page-group-main");
     var gmHeader = groupMain.find(".gm-header");
@@ -510,6 +510,7 @@ timelineSwitch = function (act,reset,main){
                     case "calendar":
                     case "help":
                     case "news":
+                    case "user-setting":
                     case "system-setting":
                       break;
                 }
@@ -541,7 +542,16 @@ timelineSwitch = function (act,reset,main){
         case "news":
             switchDeferred.resolve({ act: "news"});
           break;
+        case "user-setting":
+                
+              $("#page-group-main .main-subpage").hide();
+              $(".subpage-userInformation").show();
 
+              userInfoGetting();
+
+              switchDeferred.resolve({ act: "user-setting"});
+              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
+              break;  
         case "system-setting":
 
               $("#page-group-main .main-subpage").hide();

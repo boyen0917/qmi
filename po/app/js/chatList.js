@@ -864,7 +864,7 @@ function requestNewChatRoomApi(giTmp, cnTmp, gul, fl, callback, isOpenRoom){
 				    		groupTmp["chatAll"][result.ci].cn = text;
 				    		groupTmp["chatAll"][result.ci].uiName = text;
 				    	}
-				    	$.lStorage( ui, userData );
+					    	$.lStorage( ui, userData );
 				    }
 
 				    //打開聊天室
