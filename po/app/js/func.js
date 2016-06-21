@@ -8392,20 +8392,13 @@ userInfoEvent = function(this_info,me){
         
                         if(chk) {
                             //重置團體頭像、名稱的參數
-                            getGroupCombo(gi,function(){
-                                //結束關閉
-                                this_info.find(".user-info-close").trigger("mouseup");
+                            getGroupComboInit(gi).done(function(){
                                 toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );    
                                 updateAllAvatarName(gi,gu);
-                                // this_info.find(".user-avatar .user-pic").attr("src",auo);
-                                // this_info.find(".user-avatar").data("auo",auo);
                             });
                         }else{
                             $('.ui-loader').hide();
                             $(".ajax-screen-lock").hide();
-
-                            //結束關閉
-                            this_info.find(".user-info-close").trigger("mouseup");
                         }
                     });
                 }
