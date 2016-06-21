@@ -4,8 +4,18 @@ onCheckVersionDone = function(needUpdate){
 	}
 	clearBadgeLabel();
 
-	if($.lStorage("_loginAutoChk") === true) {
+	// 定時重新讀取 為了健康
+    if($.lStorage("_periodicallyReloadAuth") !== false) {
+    	QmiGlobal.auth = $.lStorage("_periodicallyReloadAuth");	
+    	localStorage.removeItem("_periodicallyReloadAuth");
+
+    	QmiGlobal.isPeriodicallyReload = true;
+
+    	loginAction();
+
+    } else if($.lStorage("_loginAutoChk") === true) {
 		loginAction();
+
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
 		$.mobile.changePage("")
@@ -315,10 +325,9 @@ onCheckVersionDone = function(needUpdate){
 
 	//初始化 
     function loginAction (){
-        //儲存登入資料 跳轉到timeline
-        if($.lStorage("_loginData") !== false) {
-        	QmiGlobal.auth = $.lStorage("_loginData");	
-        }
+
+    	//儲存登入資料 跳轉到timeline
+    	if ($.lStorage("_loginData") !== false && QmiGlobal.isPeriodicallyReload !== true) QmiGlobal.auth = $.lStorage("_loginData");
         
         var deferred = $.Deferred(),
         	group_list = [];
@@ -332,24 +341,33 @@ onCheckVersionDone = function(needUpdate){
 
         //附上group list
         getGroupList().done(function(groupList){
+        	var specifiedGi = QmiGlobal.auth.dgi;
 
         	// 取dgi的combo
-            if( (groupList || []).length>0 ){
+            if( (groupList || []).length > 0 ){
+
+            	// 定時重新整理 為了健康
+            	if(QmiGlobal.isPeriodicallyReload === true) {
+
+            		specifiedGi = QmiGlobal.auth.prObj.gi; 
+
             	//有dgi 但不存在列表裡
-                if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
+                } else if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
                 	localStorage.removeItem("uiData");
                 	
                     QmiGlobal.auth.dgi = groupList[0].gi;
                     $.lStorage("_loginData",QmiGlobal.auth);
+
+                    specifiedGi = QmiGlobal.auth.dgi;
                 }
 
-                getGroupComboInit(QmiGlobal.auth.dgi).done(function(resultObj){
+                getGroupComboInit(specifiedGi).done(function(resultObj){
                 	if( resultObj.status === false ){
                 		//發生錯誤 回首頁比較保險
                 		cns.debug("dgi combo error",resultObj);
                 		window.location = "index.html";
                 	} else {
-                		deferred.resolve({location:"#page-group-main"});
+                		deferred.resolve({dgi: specifiedGi, location:"#page-group-main"});
                 	}
                 });
                 
@@ -384,8 +402,9 @@ onCheckVersionDone = function(needUpdate){
 				// 兩個選項都要執行polling()
 				polling();
 			}else{
+
 				//設定目前團體 執行polling()
-				setGroupInitial(QmiGlobal.auth.dgi).done( polling );
+				setGroupInitial(data.dgi).done(polling);
 			}
         });
     }

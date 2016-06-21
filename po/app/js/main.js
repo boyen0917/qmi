@@ -170,8 +170,18 @@ $(function(){
 
 			var ori_arr = [1280,1280,0.7];
 			var tmb_arr = [120,120,0.6];
+
 			s_load_show = true;
-			createGroup(group_name,group_desc).complete(function(data){
+
+			new QmiAjax({
+				apiName: "groups",
+				isPublicApi: true,
+				method: "post",
+				body: {
+			        gn: group_name,
+			        gd: group_desc
+			    }
+			}).complete(function(data){
 	        	if(data.status == 200){
 	        		var deferred = $.Deferred();
 
@@ -197,26 +207,23 @@ $(function(){
 
 				            //combo
 				            getGroupComboInit(cg_result.gi,function(){
-				                // if(invite){
-				                //     toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );
-				                // }else{
+				            	s_load_show = false;
 
-				                	//設定目前團體
-        							setThisGroup(cg_result.gi);
+			                	//設定目前團體
+    							setThisGroup(cg_result.gi);
 
-				                    //sidemenu user
-				                    setSmUserData(gi,gu,gn);
+			                    //sidemenu user
+			                    setSmUserData(gi,gu,gn);
 
-				                    //top event
-				                    topEvent();
+			                    //top event
+			                    topEvent();
 
-				                    //重新設定功能選單
-				                    updateTab(gi);
+			                    //重新設定功能選單
+			                    updateTab(gi);
 
-				                    toastShow( $.i18n.getString("FEED_GROUP_CREATED") );
-				                    $.mobile.changePage("#page-group-main");
-				                    timelineSwitch("feeds", true);
-				                // }
+			                    toastShow( $.i18n.getString("FEED_GROUP_CREATED") );
+			                    $.mobile.changePage("#page-group-main");
+			                    timelineSwitch("feeds", true);
 				            });
 		        		}); // groupMenuListArea
 	        		})
@@ -2181,17 +2188,14 @@ $(function(){
                  ██║   ███████╗███████║   ██║             
                  ╚═╝   ╚══════╝╚══════╝   ╚═╝                                               
 	*/
-	// var smHrCliclTimes = 0;
-	// $(".sm-hr").click(function(){
-	// 	smHrCliclTimes++;
-	// 	if(smHrCliclTimes>4){
-	// 		$("div[data-sm-act='contact']").show();
-	// 		smHrCliclTimes=0;
-	// 	}
-	// });
-	$("#page-compose .page-title").click(function(){
-		cns.debug("ddd",$("#page-compose").find(".cp-content").data());
-	});
+	
+	$("#page-group-menu .gmi-coachmake").click(function(){
+		var cnt = 0;
+		return function() {
+			cnt++;
+			if(cnt > 5) window.periodicallyReloadFlag = true;
+		}
+	}());
 
 
 
