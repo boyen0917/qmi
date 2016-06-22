@@ -28,11 +28,9 @@ String.prototype._escape = function(){
 }
 
 String.prototype.qmiTag = function (tagMember) {
-	console.log("tagMember",tagMember);
 	var findText = "///;" + tagMember.u + ";///";
 	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
-
-	return this.replace(findText, markTag);
+	return this.replace("///;" + tagMember.u + ";///", "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>");
 }
 
 

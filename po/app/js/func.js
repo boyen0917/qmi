@@ -5445,26 +5445,19 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
                 (function() {
                     var tagRegex = /\/{3};(\w+);\/{3}/g,
-                        matchTagList = val.c.match(tagRegex),
+                        matchTagList = val.c.match(tagRegex);
 
-                        // 先檢查有無21
-                        tp21MapObj = (ml.reduce(function(obj,eventObj) { 
-                            if(eventObj.tp === 21) {
-                                obj[eventObj.u] = eventObj
-                                console.log("eventObj",eventObj);
-                                console.log("val.c",val.c);
-                                // 先替換一次
-                                val.c.qmiTag(eventObj);
-                            }; 
-                            return obj;
-                        }, {}));
+                    // 先檢查有無21 進行替換一次
+                    ml.forEach(function(eventObj) { 
+                        if(eventObj.tp !== 21) val.c = val.c.qmiTag(eventObj);
+                    });
 
                     // 抓漏網之魚 防止bug
                     (matchTagList || []).forEach(function(tagText) {
                         var tagId = tagText.replace(tagRegex, "$1");
                         if (QmiGlobal.groups[gi].guAll[tagId] === undefined) return;
 
-                        val.c.qmiTag({
+                        val.c = val.c.qmiTag({
                             u: tagId,
                             n: QmiGlobal.groups[gi].guAll[tagId].nk
                         });
