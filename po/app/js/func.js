@@ -1619,8 +1619,8 @@ timelineDetailClose = function (this_event,tp){
         conten_div = ".st-box2-more-desc";
     }
     //一般區域開關
-    this_event.find(conten_div).toggle();
-    this_event.find(conten_div + "-detail").toggle();   
+    this_event.find(conten_div).toggleClass("line-clamp");
+    // this_event.find(conten_div + "-detail").toggle();   
     //detail區域開關
     this_event.find(detail_data).toggle();
     this_event.find(detail_data + "-detail").toggle();
@@ -4602,7 +4602,7 @@ addSideMenuGroupUI = function(key,groupObj){
                 '<img class="aut polling-group-pic-t" src="' + glt_img + '" ' + data_gi_str + '>' +
             '</div>' +
             '<div class="sm-group-area-r polling-group-name sm-group-content-style" '+ data_gi_str+'>' + 
-            '   <div>' + htmlFormat(groupObj.gn) + '</div>' + 
+            '   <div>' + groupObj.gn._escape() + '</div>' + 
             '   <div>' + $.i18n.getString("COMPOSE_N_MEMBERS", groupObj.cnt ) + '</div>' + 
             '</div>' +
             '<div class="sm-count" style="display:none"></div>' +
@@ -5363,9 +5363,7 @@ mathAlignCenter = function (outer,inner){
 
 //拆成detail及timeline list版 並做 html entities 和 url a tag
 timelineContentFormat = function (c,limit,ei){
-    if(!c){
-        return false;
-    }
+    if(!c) return "";
 
     var result_str = [];
     
@@ -5425,12 +5423,10 @@ timelineContentFormat = function (c,limit,ei){
 timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     
     //需要記共有幾張圖片
-    var gallery_arr = [];
-    var audio_arr = [],video_arr = [];
+    var gallery_arr = [], audio_arr = [], video_arr = [],
+        isApplyWatermark = false,
+        watermarkText = "--- ---";
 
-    var isApplyWatermark = false;
-    var watermarkText = "--- ---";
-    var mainContext;
     $.each(ml,function(i,val){
         //結束時間檢查
         var end_time_chk = false;
@@ -5439,19 +5435,43 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
         if($.inArray(val.tp,not_attach_type_arr) < 0 && !this_event.find(".st-sub-box-2-attach-area").is(":visible")){
             this_event.find(".st-sub-box-2-attach-area").show();
         }
-        console.log("start3-----------start3",val.c,"end3---------end3");
-        //更改網址成連結 
-        var c = timelineContentFormat(val.c,content_limit);
+
         //內容格式
         switch(val.tp){
             case 0://文字
                 if(!val.c) break;
-                console.log("start-----------start",c[0],"end---------end");
-                this_event.find(target_div).show();
-                this_event.find(target_div).html( c[0].replaceEmoji() );
-                this_event.find(target_div + "-detail").html(c[1]);
-                console.log("start2-----------start2",this_event.find(target_div).html(),"end2---------end2");
-                mainContext = this_event.find(target_div).html();
+                //更改網址成連結 
+                val.c = htmlFormat(val.c);
+
+                (function() {
+                    var tagRegex = /\/{3};(\w+);\/{3}/g,
+                        matchTagList = val.c.match(tagRegex),
+
+                        // 先檢查有無21
+                        tp21MapObj = (ml.reduce(function(obj,eventObj) { 
+                            if(eventObj.tp === 21) {
+                                obj[eventObj.u] = eventObj
+                                console.log("eventObj",eventObj);
+                                console.log("val.c",val.c);
+                                // 先替換一次
+                                val.c.qmiTag(eventObj);
+                            }; 
+                            return obj;
+                        }, {}));
+
+                    // 抓漏網之魚 防止bug
+                    (matchTagList || []).forEach(function(tagText) {
+                        var tagId = tagText.replace(tagRegex, "$1");
+                        if (QmiGlobal.groups[gi].guAll[tagId] === undefined) return;
+
+                        val.c.qmiTag({
+                            u: tagId,
+                            n: QmiGlobal.groups[gi].guAll[tagId].nk
+                        });
+                    });
+                }());
+
+                this_event.find(target_div).html(val.c).show();
 
                 break;
             case 1://網址 寫在附檔區域中
@@ -5610,9 +5630,10 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 end_time_chk = true;
                 break;
             case 21:
-                if (typeof(mainContext) == 'string' && mainContext) {
-                    mainContext = mainContext.qmiTag(val);
-                }
+                // 為避免bug 直接在0 取代
+                // if (typeof(mainContext) == 'string' && mainContext) {
+                //     mainContext = mainContext.qmiTag(val);
+                // }
                 break;
             case 27:
                 if( false==isApplyWatermark && 1==val.wm ){
@@ -5633,26 +5654,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 break;
         };
 
-        var tagRegex = /\/{3};(\w+);\/{3}/g;
-        if (mainContext) {
-            var matchTagList = mainContext.match(tagRegex);
-            if (matchTagList != null) {
-                $.each(matchTagList, function(index, tagText){
-                    var tagMemberID = tagText.replace(tagRegex, "$1");
-                    var memberList = QmiGlobal.groups[gi].guAll;
-                    if (memberList[tagMemberID]) {
-                        var tagObj = {
-                            u: tagMemberID,
-                            n: memberList[tagMemberID].nk
-                        }
-                        mainContext = mainContext.qmiTag(tagObj);
-                    }
-                });
-            }
-            this_event.find(target_div).html(mainContext);
-            this_event.find(target_div + "-detail").html(mainContext);
-        }
-            
+        
         this_event.find("b").bind("click", function(e) {
             userInfoShow(gi, $(e.target).attr("name"));
         });

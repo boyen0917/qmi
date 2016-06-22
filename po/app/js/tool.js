@@ -267,18 +267,18 @@ toSha1Encode = function (string){
     return toBase64;
 }
 
-htmlFormat = function (str){
-    str = str.replace(/\n/g," \n ").split(" ");
-    $.each(str,function(i,val){
-        if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://'){
-            encode_val = "<a href=\"" + encodeHtmlEntity(val) + "\" target=\"_blank\">" + encodeHtmlEntity(val) + "</a>";
-        }else{
-            encode_val = encodeHtmlEntity(val);
-        }
-        if(encode_val) str.splice(i,1,encode_val);
+htmlFormat = function (str, isToCharCode){
+    var strArr = str._escape().replace(/\n/g," \n ").split(" ");
+    $.each(strArr,function(i,val){
+    	var newStr = (isToCharCode === true ? encodeHtmlEntity(val) : val) ;
+
+        if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://')
+            newStr = "<a href=\"" + newStr + "\" target=\"_blank\">" + newStr + "</a>";
+            
+        strArr.splice(i,1,newStr);
     });
 
-    return str.join(" ").replaceEmoji();
+    return strArr.join(" ").replaceEmoji();
 }
 
 //轉換html符號
@@ -1164,7 +1164,7 @@ updateGroupAllInfoDom = function( thisGi ){
 			}
 
 			//update name
-			$(".polling-group-name.currentGroup").html(htmlFormat(group.gn));
+			$(".polling-group-name.currentGroup").html(group.gn._escape());
 			$(".polling-group-description.currentGroup").html(htmlFormat(group.gd));
 		}
 		
@@ -1182,7 +1182,7 @@ updateSideMenuContent = function(thisGi) {
 	if(QmiGlobal.groups[thisGi] === undefined) return;
 	
 	var groupData = QmiGlobal.groups[thisGi],
-		gn = htmlFormat( groupData.gn ),
+		gn = groupData.gn._escape(),
 		gd = htmlFormat( groupData.gd );
 
 	$(".polling-group-name[data-gi="+thisGi+"]")
