@@ -2251,6 +2251,172 @@ composeContentMake = function (compose_title){
             });
         });
 
+        this_compose.find('.highlight-container').bind('keydown',function(e){
+
+            var thisTextArea = $(this);
+            var cursorPosition = getCaretPosition();
+            var currentNode = window.getSelection().anchorNode;
+            var parentNode = currentNode.parentNode;
+
+            if (e.keyCode == 8 || e.keyCode == 46) {
+                if (parentNode.nodeName == "MARK") {
+                    var markMemberID = $(parentNode).attr("id");
+                    var memberName = $(parentNode).attr("name");
+                    if (cursorPosition > 0 && parentNode.innerHTML == memberName) {
+                        
+                        thisTextArea.get(0).removeChild(parentNode);
+                        thisTextArea.data("memberList")[markMemberID] = {
+                            nk: memberName,
+                            aut: thisTextArea.data("markMembers")[markMemberID].mugshot,
+                        };
+                        delete thisTextArea.data("markMembers")[markMemberID];
+                    }
+                }
+            }
+        });
+
+        this_compose.find('.highlight-container').bind('keyup mouseup', function(e) {
+            var thisTextArea = $(this);
+            var element = thisTextArea.get(0);
+            var pureText = thisTextArea.text();
+            var htmlText = thisTextArea.html();
+            var replyDom = thisTextArea.parent();
+            var cursorPosition = getCaretPosition();
+            var preTextOfCursor = htmlText.substring(0, cursorPosition);
+            var selectionObj = window.getSelection();
+            var tagElements = "";
+
+            if ( !thisTextArea.data("memberList")
+              && !thisTextArea.data("markMembers")) {
+                thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+                thisTextArea.data("markMembers", {});
+            }
+
+            if (selectionObj.anchorNode.parentNode.nodeName == "MARK") {
+                var currentNode = selectionObj.anchorNode;
+                var parentNode = currentNode.parentNode
+                var tagName = $(parentNode).attr("name");
+                var tagId = $(parentNode).attr("id");
+                var range = document.createRange();
+                
+                if (currentNode.textContent.replace(/\n/g, "") != tagName ) {
+                    $(currentNode).unwrap();
+
+                    thisTextArea.data("memberList")[tagId] = {
+                        nk: tagName,
+                        aut: thisTextArea.data("markMembers")[tagId].mugshot,
+                    };
+
+                    delete thisTextArea.data("markMembers")[tagId];
+
+                    // var textNode = document.createTextNode(currentNode.innerHTML);
+                    if (currentNode.previousSibling.textContent == "\n") {
+                        range.setStart(currentNode, 0);
+                    } else {
+                        range.setStart(currentNode, cursorPosition);
+                    }
+                    range.collapse(true);
+                    selectionObj.removeAllRanges();
+                    selectionObj.addRange(range);
+                    
+                    // var textNode = document.createTextNode(currentNode.innerHTML);
+                    // if (selectionObj.rangeCount) {
+                    //     var range = selectionObj.getRangeAt(0);
+                    //     range.collapse(false);
+                    //     range.insertNode(textNode);
+                    //     range = range.cloneRange();
+                    //     range.selectNodeContents(textNode);
+                    //     range.collapse(false);
+                    //     selectionObj.removeAllRanges();
+                    //     selectionObj.addRange(range);
+                    // }
+                }
+
+            }
+
+            replyDom.find(".tag-list").remove();
+            replyDom.find(".tag-members-container").hide();
+
+            // 判斷caret前面的字串是否包含@ 
+            if (preTextOfCursor.lastIndexOf("@") >= 0) {
+
+                // 紀錄 @ 在字串的位置
+                var lastMarkPosition = preTextOfCursor.lastIndexOf("@");
+                // 取得 @ 到游標 之間的字串 
+                var markText = preTextOfCursor.substring(lastMarkPosition + 1, cursorPosition);
+
+                // cursor 滑鼠標誌的位置在最尾端， 或者cursor後面字串為空白
+                if ((cursorPosition == htmlText.length) || (htmlText[cursorPosition].match(/\s/g)) ||
+                    (htmlText.substring(cursorPosition, cursorPosition + 4)) == "<br>") {
+                    var memberslist = thisTextArea.data("memberList");
+                    for (var memberID in memberslist) {
+                        var memberMugshot = memberslist[memberID].aut || "images/common/others/empty_img_personal.png";
+                        var memberName = memberslist[memberID].nk ;
+                        var re = new RegExp(markText, "gi");
+                        if (memberName && markText && memberName.search(re) >= 0) {
+                            tagElements += "<li id='" + memberID + "'><a><img src='" + memberMugshot + 
+                                "' class='member-mugshot'/>" + memberName + "</a></li>";
+                        }
+                    }
+                }
+
+                // 打開選取成員的選單
+                if (tagElements.length) {
+                    replyDom.find(".tag-members-container").prepend($("<ul/>", {
+                        "class": "tag-list",
+                        html: tagElements
+                    })).show();
+
+                    // 點選其中之一成員的動作
+                    $(".tag-list").find("li").bind("click", function(e) {
+
+                        if ($(e.target).is("li")) {
+                            var memberID = e.target.id;
+                        } else {
+                            var memberID = ($(e.target).parent().attr("id"));
+                        }
+                        
+                        var memberName = (thisTextArea.data("memberList")[memberID]).nk;
+                        var mugshot = (thisTextArea.data("memberList")[memberID]).aut || 
+                            "images/common/others/empty_img_personal.png";
+
+                        //替換at加後面的字串為此成員的名字
+                        var replaceText = preTextOfCursor.substring(0, lastMarkPosition) 
+                            + preTextOfCursor.substring(lastMarkPosition, cursorPosition).replace("@" 
+                                + markText, " <mark id='" + memberID + "' name='" + memberName + "'>" 
+                                + memberName + "</mark> ")
+                            + htmlText.substring(cursorPosition, htmlText.length);
+
+                        thisTextArea.html(replaceText);
+                        thisTextArea.data("markMembers")[memberID] = {
+                            id : memberID,
+                            name : memberName,
+                            mugshot: mugshot,
+                        };
+
+                        // 刪除成員列表選單的成員
+                        delete thisTextArea.data("memberList")[memberID];
+                        replyDom.find(".tag-members-container").hide();
+
+                        // 設定選取完後游標位置
+                        var range = document.createRange();
+                        var markNode = thisTextArea.find("mark[name='" + memberName + "']");
+                        range.setStart(markNode[0].nextSibling, 1);
+                        selectionObj.removeAllRanges();
+                        selectionObj.addRange(range);
+                    });
+                }
+            }
+        });
+
+        this_compose.find('.highlight-container').bind('focusout', function(e){
+            var replyDom = $(this).parent();
+            if (replyDom.find(".tag-members-container:hover").length == 0) {
+                replyDom.find(".tag-members-container").hide();
+            }
+        })
+
+
         //datetimepicker
         if(init_datetimepicker){
             setDateTimePicker(this_compose);
@@ -4043,7 +4209,8 @@ composeVoteObjMake = function(this_compose,body){
 composeSend = function (this_compose){
     
     var ctp = this_compose.data("compose-tp");
-    var compose_content = this_compose.data("compose-content");
+    var composeContent = this_compose.data("compose-content").replace(/<br>/g, "\n");;
+    var tagMembers = this_compose.find(".cp-content-highlight").data("markMembers");
     var ml = this_compose.data("message-list").unique();
 
     //發佈上傳檢查
@@ -4060,6 +4227,20 @@ composeSend = function (this_compose){
     var empty_chk = false;
     var empty_msg;
 
+
+    if (Object.keys(tagMembers).length) {
+        for (var tagID in tagMembers) {
+            body.ml.push({
+                "u": tagID,
+                "n": tagMembers[tagID].name,
+                "tp": 21
+            });
+            composeContent = composeContent.replace('<mark id="' + tagID + '" name="' 
+                + tagMembers[tagID].name + '">' + tagMembers[tagID].name + "</mark>", "///;" 
+                + tagID + ";///");
+        }
+    
+    }
 
     //浮水印
     var isApplyWatermark = false;
@@ -4253,7 +4434,6 @@ composeSend = function (this_compose){
     var isWaitingPermission = false; //(this_compose.data("object_str") || this_compose.data("branch_str") );
     var sendingFileData = [];
 
-
     //貼文內容的類型 網址 附檔之類的 
     $.each(ml,function(i,mtp){
         var obj = {tp:mtp};
@@ -4261,7 +4441,7 @@ composeSend = function (this_compose){
         switch(mtp){
             //普通貼文
             case 0:
-                obj.c = compose_content;
+                obj.c = composeContent;
 
                 is_push = false;
                 body.ml.unshift(obj);
@@ -4380,6 +4560,9 @@ composeSend = function (this_compose){
                 });
                 
                 this_compose.data("body",body);
+                break;
+            case 21:
+
                 break;
         }
 
@@ -6486,15 +6669,31 @@ replySend = function(this_event){
         body.meta.tu = object_obj;
     }
 
-    var text = this_event.find(".st-reply-message-textarea textarea").val();
+    var text = this_event.find(".st-reply-highlight-container").html()
+                         .replace(/<br>/g, "\n");
+    var tagMembers = this_event.find(".st-reply-highlight-container").data("markMembers");
+    if (Object.keys(tagMembers).length) {
+        
+        for (var tagID in tagMembers) {
+            body.ml.push({
+                "u": tagID,
+                "n": tagMembers[tagID].name,
+                "tp": 21
+            });
+            text = text.replace('<mark id="' + tagID + '" name="' + tagMembers[tagID].name + '">' 
+                    + tagMembers[tagID].name + "</mark>", "///;" + tagID + ";///");
+        }
+    }
+
     if( text ){
-        body.ml.push({
+        body.ml.unshift({
             "c": text,
             "tp": 0
         });
     }
     var imgArea = this_event.find(".st-reply-message-img");
     var imgType = imgArea.data("type");
+
     switch( imgType ){
         case 5: //sticker
             var sticker = imgArea.data("id");
@@ -6573,6 +6772,7 @@ replySend = function(this_event){
             }
             break;
     }
+
     if( !isWaiting ){
         replyApi( this_event, this_gi, this_ti, this_ei, body );
     }
@@ -6604,6 +6804,10 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
                 if(this_event.find(".stickerArea").is(":visible")) this_event.find(".stickerArea").hide();
                 this_event.find(".st-sub-box-2").trigger("detailShow");
             }
+            this_event.find(".st-reply-highlight-container").html("");
+            this_event.find(".st-reply-highlight-container")
+                      .data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+            this_event.find(".st-reply-highlight-container").data("markMembers", {});
         },400);
     });
 }

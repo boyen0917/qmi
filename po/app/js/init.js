@@ -14,8 +14,8 @@ var ui,
 	clearChatTimer,
 
 	//HiCloud
- 	// base_url = "https://ap.qmi.emome.net/apiv1/";
- 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	base_url = "https://ap.qmi.emome.net/apiv1/";
+ 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
  	
  	// // container riseNotification 一旦換網址就沒了
 
@@ -33,7 +33,6 @@ String.prototype.qmiTag = function (tagMember) {
 
 	return this.replace(findText, markTag);
 }
-
 
 if( 0==userLang.indexOf("zh") ){
 	if( userLang=="zh_cn" ){
