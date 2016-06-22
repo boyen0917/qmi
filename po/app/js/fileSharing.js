@@ -345,7 +345,7 @@ FileSharing.prototype = {
 
 
 		if(thisFile.fileDom.find("section.progress-bar").length == 0){
-			var progressSectionDom = $('<section class="progress-bar"><div class="frame"><div class="progress"></div><div class="text">0%</div></div></section>');	
+			var progressSectionDom = $('<section class="progress-bar"><div class="frame"><div class="progress"></div><div class="text">0%</div><div class="cancel">取消</div></div></section>');	
 			coverDom.append(progressSectionDom);
 
 			progressSectionDom.click(function(){event.stopPropagation()})
@@ -622,7 +622,7 @@ FileSharing.prototype = {
 	uploadToS3TmpDef: function (options) {
 		var thisFile = this;
 
-		return $.ajax({
+		var thisAjax = $.ajax({
 			url: options.url,
 			type: 'PUT',
 			contentType: options.contentType,
@@ -635,7 +635,14 @@ FileSharing.prototype = {
 				});
 				return xhr;
 			}
-		})
+		});
+
+		$("section.fileSharing section.progress-bar .cancel").click(function() {
+			thisAjax.abort();
+			toastShow($.i18n.getString("FILESHARING_UPLOAD_FILE") + $.i18n.getString("COMMON_CANCEL"));
+		});
+
+		return thisAjax;
 	},
 
 	rename: function() {

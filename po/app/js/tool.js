@@ -1023,10 +1023,13 @@ updateGroupAllInfoDom = function( thisGi ){
 		}
 
 		//update name
-		var gn = htmlFormat( group.gn );
-		var gd = htmlFormat( group.gd );
-		$(".polling-group-name[data-gi="+thisGi+"]").html(gn);
-		$(".polling-group-description[data-gi="+thisGi+"]").html(gd);
+		updateSideMenuContent(thisGi);
+		// var gn = htmlFormat( group.gn );
+		// var gd = htmlFormat( group.gd );
+		// $(".polling-group-name[data-gi="+thisGi+"]")
+		// .find("div:nth-child(1)").html(gn).end()
+		// .find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", group.cnt));
+		// $(".polling-group-description[data-gi="+thisGi+"]").html(gd);
 
 		if( gi==thisGi ){
 			//update icon
@@ -1042,8 +1045,8 @@ updateGroupAllInfoDom = function( thisGi ){
 			}
 
 			//update name
-			$(".polling-group-name.currentGroup").html(gn);
-			$(".polling-group-description.currentGroup").html(gd);
+			$(".polling-group-name.currentGroup").html(htmlFormat(group.gn));
+			$(".polling-group-description.currentGroup").html(htmlFormat(group.gd));
 		}
 		
 		// 等於當前團體 再做更新ui tab
@@ -1052,6 +1055,21 @@ updateGroupAllInfoDom = function( thisGi ){
 	} catch(e){
 		errorReport(e);
 	}
+}
+
+
+updateSideMenuContent = function(thisGi) {
+	//update name
+	if(QmiGlobal.groups[thisGi] === undefined) return;
+	
+	var groupData = QmiGlobal.groups[thisGi],
+		gn = htmlFormat( groupData.gn ),
+		gd = htmlFormat( groupData.gd );
+
+	$(".polling-group-name[data-gi="+thisGi+"]")
+	.find("div:nth-child(1)").html(gn).end()
+	.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", groupData.cnt));
+	$(".polling-group-description[data-gi="+groupData.gi+"]").html(gd);
 }
 
 updateGroupIconDom = function( this_gi ){

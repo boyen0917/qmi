@@ -71,7 +71,7 @@
 
         <!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPgQLVIflX8fpeiaFxxojQiiQ0vUJwyJU&sensor=false"></script>
         <script src="js/jquery.tinyMap.min.js"></script>-->
-        <script language="javascript" src="https://webapi.amap.com/maps?v=1.3&key=test"></script>
+        
         
         <script src="js/sha/sha1.js"></script>
         <script src="js/sha/enc-base64-min.js"></script>
@@ -92,6 +92,8 @@
 
     </head>
     <body>
+        <script language="javascript" src="https://webapi.amap.com/maps?v=1.3&key=test"></script>
+        
         <div data-role="page" id="page-registration">
             <div class="registration-content registration-bg">
                 <div class="registration-logo">
@@ -458,12 +460,14 @@
                 <div class="gm-side-menu">
                     <div style="height:44px"></div>
                     <div class="gm-border">
-                        
                         <div class="sm-hr" data-textid="LEFT_GROUP"></div>
                         <div class="sm-loading"></div>
-                        <div class="sm-group-list-area">
-                          
+
+                        <div class="sm-group-list-scroll-area">
+                            <div class="sm-group-list-area-refresh"></div>
+                            <div class="sm-group-list-area"></div>
                         </div>
+
                         <div class="sm-group-cj">
                             <div class="hg-create sm-group-cj-btn">
                                 <img src="images/icon/icon_sidemenu_group_build.png"/>
@@ -483,6 +487,7 @@
                     </div>
                 </div>
                 <div class="gm-content">
+                    <div class="refresh-lock"><div data-textid="REFRESH_TEXT"></div></div>
                     <div class="gm-content-header">
                         <div class="gm-adjustment user-main-toggle"></div>
                         

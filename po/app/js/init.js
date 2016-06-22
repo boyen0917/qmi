@@ -13,10 +13,10 @@ var ui,
 
 	clearChatTimer,
 
+	
 	//HiCloud
- 	base_url = "https://ap.qmi.emome.net/apiv1/";
- 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
- 	
+ 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+
  	// // container riseNotification 一旦換網址就沒了
 
 var userLang = navigator.language || navigator.userLanguage; 
@@ -210,17 +210,16 @@ var timeline_detail_exception = [
 
 window.QmiGlobal = {
 	// 之後取代 ui, at, gi, ... etc
-	current: { 
-		ui: "",
-		at: "",
-		gi: ""
-	}, 
+	currentGi: "",
 
 	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
 
 	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups 
 	clouds: {}, // 全部的私雲資料
 	cloudGiMap: {},
+
+	windowListCiMap: {},
+
 
 	// 聊天室 auth
 	auth: {},
@@ -232,6 +231,9 @@ window.QmiGlobal = {
 			return obj[Object.keys(obj)[0]];
 		}
 	},
+
+
+	viewMap: {}
 	
 };
 
@@ -244,7 +246,6 @@ window.QmiPollingChk = {
 
 	// 5分鐘檢查一次polling死了沒
 	interval: setInterval(function() {
-
 		//  聊天室不開啓
 		if(window.QmiPollingChk.flag === false) return;
 
@@ -320,7 +321,7 @@ window.QmiAjax = function(args){
 
 			// timeout: 30000,
 
-			type: args.method || "get"
+			type: (args.method  || args.type) || "get"
 		};
 	// end of var
 
@@ -335,7 +336,7 @@ window.QmiAjax = function(args){
 
 
 	//before send
-	if(args.isLoadingShow === true) {
+	if(args.isLoadingShow === true || s_load_show === true) {
 		$(".ajax-screen-lock").show();
 		$('.ui-loader').css("display","block");
 	} 
@@ -347,7 +348,6 @@ window.QmiAjax = function(args){
 			cns.log("reAuth lock!");
 			return reAuthInterval;
 		} else {
-			
 			// 檢查是否接近過期時間 先替換token
 			// ajaxArgs,cloudData
 
@@ -465,22 +465,20 @@ window.QmiAjax = function(args){
 	var completeCB,successCB,errorCB;
 
 	// 先搜集好callback 如果有呼叫 deferred完成後就執行
-	(function(){
-		ajaxDeferred.promise().complete = function(cb) {
-			completeCB = cb;
-			return ajaxDeferred.promise();
-		};
+	ajaxDeferred.promise().complete = function(cb) {
+		completeCB = cb;
+		return ajaxDeferred.promise();
+	};
 
-	    ajaxDeferred.promise().success = function(cb) {
-	        successCB = cb;
-	        return ajaxDeferred.promise();
-	    };
+    ajaxDeferred.promise().success = function(cb) {
+        successCB = cb;
+        return ajaxDeferred.promise();
+    };
 
-		ajaxDeferred.promise().error = function(cb) {
-			errorCB = cb;
-			return ajaxDeferred.promise();
-		};
-	}())
+	ajaxDeferred.promise().error = function(cb) {
+		errorCB = cb;
+		return ajaxDeferred.promise();
+	};
 	
 	// complete來這裡
 	ajaxDeferred.always(function(completeData){
@@ -503,8 +501,8 @@ window.QmiAjax = function(args){
 	ajaxDeferred.fail(function(completeData) {
 
 		completeData.newArgs = newArgs;
-		self.onError(completeData);
 
+		self.onError(completeData);
 		if(errorCB instanceof Function) errorCB(completeData);
 	});
 
@@ -692,7 +690,7 @@ QmiAjax.prototype = {
 	},
 		
 	onComplete: function(data){
-		// 舊的有在用 新的不再用
+		
 		if(s_load_show === false) {
 			$('.ui-loader').hide();
 			$(".ajax-screen-lock").hide();

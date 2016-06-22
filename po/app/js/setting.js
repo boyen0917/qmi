@@ -175,52 +175,37 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
     });
 }
 
-function removeGroup( this_gi ){
-	$(".sm-group-area[data-gi="+this_gi+"]").remove();
-	var rmGroupGn = "unknown";
-	if( QmiGlobal.groups !== false && QmiGlobal.groups[this_gi] !== undefined && QmiGlobal.groups[this_gi].gn)
-		rmGroupGn = QmiGlobal.groups[this_gi].gn;
+function removeGroup( thisGi ){
+	$(".sm-group-area[data-gi="+thisGi+"]").remove();
+	if( QmiGlobal.groups[thisGi] !== undefined)
+		var rmGroupGn = QmiGlobal.groups[thisGi].gn;
 
-	if( gi==this_gi ){
+	if( gi==thisGi ){
 	    var otherGroup = $(".sm-group-area.enable");
 	    if( otherGroup.length>0 ){
 	    	$(otherGroup[0]).trigger("click");
 	    } else{
 	    	gi = null;
-	    	delete QmiGlobal.groups[this_gi];
-	    	
 	    	goToGroupMenu();
 	    }
+
+	    delete QmiGlobal.groups[thisGi];
 	}
 
     //remove group data
     try{
-    	
-    	//local storage
-		var userData = QmiGlobal.groups;
-		if( userData.hasOwnProperty(this_gi) ){
-			var groupDataTmp = userData[this_gi];
-			if( null!=groupDataTmp && null!=groupDataTmp.gn ){
-				gn = groupDataTmp.gn;
-			}
-			delete userData[this_gi];
-			// *--* $.lStorage(ui,userData);
-		}
-		
-		userData = QmiGlobal.groups;
-
 		//----- remove from idb -------
 		//chat
 		if( null==g_idb_chat_cnts ){
-			initChatCntDB( clearChatIDB(this_gi) );
+			initChatCntDB( clearChatIDB(thisGi) );
 		} else{
-			clearChatIDB(this_gi);
+			clearChatIDB(thisGi);
 		}
 		//timeline_events
 		// if( null!=idb_timeline_events ){
 		//  			clearTimelineIDB(this_gi);
 		//  		}
-		toastShow( $.i18n.getString("GROUP_X_DELETED",gn) );
+		if(rmGroupGn !== undefined) toastShow( $.i18n.getString("GROUP_X_DELETED", rmGroupGn) );
 
 	} catch(e){
 		errorReport(e);

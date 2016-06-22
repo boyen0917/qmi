@@ -341,6 +341,9 @@ function openChatWindow ( giTmp, ci ){
 			at: at
 		};
 
+		QmiGlobal.windowListCiMap[gi] = QmiGlobal.windowListCiMap[gi] || [];
+		QmiGlobal.windowListCiMap[gi].push(ci);
+
 		$.lStorage( "_chatRoom", data );
 		windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
 		
