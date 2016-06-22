@@ -610,6 +610,7 @@ $(function(){
 		updateChat();
 		sendMsgRead(new Date().getTime())
 	});
+	
 
 /**
               ███████╗██╗   ██╗███╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗          
