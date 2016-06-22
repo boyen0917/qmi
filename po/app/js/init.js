@@ -15,7 +15,7 @@ var ui,
 
 	
 	//HiCloud
- 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	base_url = "https://ap.qmi.emome.net/apiv1/";
 
  	// // container riseNotification 一旦換網址就沒了
 

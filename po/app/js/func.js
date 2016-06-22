@@ -5439,16 +5439,18 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
         if($.inArray(val.tp,not_attach_type_arr) < 0 && !this_event.find(".st-sub-box-2-attach-area").is(":visible")){
             this_event.find(".st-sub-box-2-attach-area").show();
         }
-        
+        console.log("start3-----------start3",val.c,"end3---------end3");
         //更改網址成連結 
         var c = timelineContentFormat(val.c,content_limit);
         //內容格式
         switch(val.tp){
             case 0://文字
                 if(!val.c) break;
+                console.log("start-----------start",c[0],"end---------end");
                 this_event.find(target_div).show();
                 this_event.find(target_div).html( c[0].replaceEmoji() );
                 this_event.find(target_div + "-detail").html(c[1]);
+                console.log("start2-----------start2",this_event.find(target_div).html(),"end2---------end2");
                 mainContext = this_event.find(target_div).html();
 
                 break;

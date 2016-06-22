@@ -362,7 +362,7 @@ updateLanguage = function( lanPath ){
 }
 
 
-uploadToS3 = function(file,api_name,ori_arr,tmb_arr,callback){
+uploadToS3Bak = function(file,api_name,ori_arr,tmb_arr,callback){
 	var result_msg = false;
 
     var headers = {
@@ -374,6 +374,125 @@ uploadToS3 = function(file,api_name,ori_arr,tmb_arr,callback){
 
     //上傳圖像強制開啟loading 圖示
     s_load_show = true;
+    var result = ajaxDo(api_name,headers,method,false);
+    result.complete(function(data){
+    	if(data.status == 200){
+    		var getS3_result =$.parseJSON(data.responseText);
+    		var fi = getS3_result.fi;
+    		var ou = getS3_result.ou;
+    		var tu = getS3_result.tu;
+
+			//大小圖都要縮圖
+			var reader = new FileReader();
+	        reader.onloadend = function() {
+	            var tempImg = new Image();
+	            tempImg.src = reader.result;
+	            tempImg.onload = function() {
+	                
+	                //大小圖都要縮圖
+	                var o_obj = imgResizeByCanvas(this,0,0,ori_arr[0],ori_arr[1],ori_arr[2]);
+	                var t_obj = imgResizeByCanvas(this,0,0,tmb_arr[0],tmb_arr[1],tmb_arr[2]);
+	                cns.debug("img",{
+	                	originImgObj: o_obj,
+	                	thumbnailImgObj: t_obj
+	                });
+	                //傳大圖
+	                $.ajax({
+						url: ou,
+						type: 'PUT',
+						contentType: " ",
+					 	data: o_obj.blob, 
+						processData: false,
+						complete: function(data) { 
+							if(data.status == 200){
+								//傳小圖
+				                $.ajax({
+									url: tu,
+									type: 'PUT',
+									contentType: " ",
+								 	data: t_obj.blob, 
+									processData: false,
+									complete: function(data) { 
+										if(data.status == 200){
+
+											api_name = api_name + "/commit";
+						                    var headers = {
+						                        ui: ui,
+									            at: at,
+									            li: lang
+						                    };
+						                    var method = "put";
+
+						                    var body = {
+						                      fi: fi,
+						                      si: o_obj.blob.size
+						                    }
+						                    ajaxDo(api_name,headers,method,true,body).complete(function(data){
+									        	//commit 成功
+									        	if(data.status == 200){
+									        		if(callback) callback(true);
+									        	}else{
+									        		//commit 失敗
+									        		if(callback) callback(false);
+									        	}
+						                    });
+										}else{
+											cns.debug("小圖上傳 錯誤");
+											if(callback) callback(false);
+										}
+								}});
+							}else{
+								cns.debug("大圖上傳 錯誤");
+								if(callback) callback(false);
+							}
+					}});
+	            }
+	        }
+	        reader.readAsDataURL(file);
+		}else{
+			cns.debug("取得s3網址 錯誤");
+			if(callback) callback(false);
+		}
+	});
+}
+
+
+uploadToS3 = function(uplaodObj){
+	// file,api_name,ori_arr,tmb_arr,callback
+	// uplaodObj = {
+	// 	fileArr: [file,file,file],
+	// 	apiName:,
+	// 	oriOpt: {
+	// 		w:,
+	// 		h:,
+	// 		s:
+	// 	},
+	// 	tmbOpt: {
+	// 		w:,
+	// 		h:,
+	// 		s:
+	// 	},
+	// 	loadShow:,
+	// };
+
+	// var updChainDef = MyDeferred(),
+	// 	updDefArr = [];
+
+	// (uploadObj.fileArr || []).forEach(function(fileObj) {
+	// 	var chainDef = MyDeferred();
+
+	// 	new QmiAjax({
+	// 		apiName: uplaodObj.apiName
+	// 	})
+
+
+
+	// 	updDefArr.push()
+
+	// });
+
+
+
     var result = ajaxDo(api_name,headers,method,false);
     result.complete(function(data){
     	if(data.status == 200){
