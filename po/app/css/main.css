@@ -3302,6 +3302,7 @@ img.st-reply-message-attach {
 
 .st-reply-highlight-container{
 	max-height: 200px;
+	overflow-x: hidden;
 	overflow-y: auto;
     width: 97%;
     position: relative;
@@ -3319,12 +3320,6 @@ img.st-reply-message-attach {
     content: "請輸入訊息";
     color: #bbb;
 }
-
-.st-reply-message-textarea textarea, .highlight-container{
-	font: 14px 'Open Sans', serif;
-	letter-spacing: 1px;
-}
-
 
 .st-reply-message-textarea textarea:focus{ outline:none } 
 .st-reply-message-send {-webkit-user-select: none;}
@@ -3520,7 +3515,6 @@ img.st-reply-message-attach {
 
 .cp-content-textarea{
     min-height: 80px;
-    line-height:80px;
     margin-bottom: 20px;
 }
 

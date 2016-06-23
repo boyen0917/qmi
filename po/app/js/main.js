@@ -748,24 +748,48 @@ $(function(){
 	$(document).on('keydown', ".st-reply-highlight-container", function(e){
 
         var thisTextArea = $(this);
+        var selectionObj = window.getSelection();
         var cursorPosition = getCaretPosition();
         var currentNode = window.getSelection().anchorNode;
         var parentNode = currentNode.parentNode;
+        var selectedText = selectionObj.toString();
 
-        // 在mark元素內，如果偵測退後鍵和delete鍵，將整個元件刪除
+        
     	if (e.keyCode == 8 || e.keyCode == 46) {
-            if (parentNode.nodeName == "MARK") {
-            	var markMemberID = $(parentNode).attr("id");
-                var memberName = $(parentNode).attr("name");
-            	if (cursorPosition > 0 && parentNode.innerHTML == memberName) {
-            		thisTextArea.get(0).removeChild(parentNode);
-	                thisTextArea.data("memberList")[markMemberID] = {
-						nk: memberName,
-						aut: thisTextArea.data("markMembers")[markMemberID].mugshot,
-					};
-	                delete thisTextArea.data("markMembers")[markMemberID];
-            	}
-            }
+    		if (selectedText) {
+    	// 		var range = selectionObj.getRangeAt(0);
+    	// 		var selectedMarkNodes = getSelectedMarkNodes(range);
+    	// 		$.each(selectedMarkNodes, function(i, node) {
+    	// 			var markMemberID = $(node).attr("id");
+     //            	var memberName = $(node).attr("name");
+
+    	// 			thisTextArea.data("memberList")[markMemberID] = {
+					// 	nk: memberName,
+					// 	aut: thisTextArea.data("markMembers")[markMemberID].mugshot,
+					// };
+					// delete thisTextArea.data("markMembers")[markMemberID];
+    	// 		});
+    		} else {
+    			// 在mark元素內，如果偵測退後鍵和delete鍵，將整個元件刪除
+    			if (parentNode.nodeName == "MARK") {
+	            	var markMemberID = $(parentNode).attr("id");
+	                var memberName = $(parentNode).attr("name");
+	            	if (cursorPosition > 0 && parentNode.innerHTML == memberName) {
+	            		thisTextArea.get(0).removeChild(parentNode);
+
+		                thisTextArea.data("memberList")[markMemberID] = {
+							nk: memberName,
+							aut: thisTextArea.data("markMembers")[markMemberID].mugshot,
+						};
+		                delete thisTextArea.data("markMembers")[markMemberID];
+	            	} 
+	            }
+    		}
+        } else if (e.keyCode == 13) {
+        	if (parentNode.nodeName == "MARK" && selectionObj.focusOffset == 0) {
+        		currentNode.parentElement.insertAdjacentHTML( 'beforeBegin', '\n' );
+        		return false;
+        	}
         }
     });
 
@@ -781,42 +805,48 @@ $(function(){
         var currentNode = selectionObj.anchorNode;
         var lastMarkPosition, tagElements = "";
 
+        delUncompleteMark(thisTextArea, cursorPosition);
+
         if ( !thisTextArea.data("memberList")
           && !thisTextArea.data("markMembers")) {
             thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
             thisTextArea.data("markMembers", {});
         }
 
-        if (currentNode.parentNode.nodeName == "MARK") {
-            var parentNode = currentNode.parentNode
-            var tagName = $(parentNode).attr("name");
-            var tagId = $(parentNode).attr("id");
-            var range = document.createRange();
-
-            // 假如mark內容的文字被改變，就unwrap變成純text
-            if (currentNode.textContent.replace(/\n/g, "") != tagName ) {
-            	$(currentNode).unwrap();
-
-                thisTextArea.data("memberList")[tagId] = {
-					nk: tagName,
-					aut: thisTextArea.data("markMembers")[tagId].mugshot,
-				};
-
-                delete thisTextArea.data("markMembers")[tagId];
-                
-                //上一個sibling元素里內容是換行字，游標設定在自己元素裡的第1個字
-                if (currentNode.previousSibling.textContent == "\n") {
-                    range.setStart(currentNode, 0);
-                } else {
-                	// 游標設定在當初focus的位置
-                	range.setStart(currentNode, cursorPosition);
-                }
-                range.collapse(true);
-                selectionObj.removeAllRanges();
-                selectionObj.addRange(range);
-            } 
-
+        if (! htmlText) {
+        	thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+            thisTextArea.data("markMembers", {});
         }
+
+    //     if (currentNode.parentNode.nodeName == "MARK") {
+    //         var parentNode = currentNode.parentNode
+    //         var tagName = $(parentNode).attr("name");
+    //         var tagId = $(parentNode).attr("id");
+    //         var range = document.createRange();
+
+    //         // 假如mark內容的文字被改變，就unwrap變成純text
+    //         if (currentNode.textContent.replace(/\n/g, "") != tagName ) {
+    //         	$(currentNode).unwrap();
+
+    //             thisTextArea.data("memberList")[tagId] = {
+				// 	nk: tagName,
+				// 	aut: thisTextArea.data("markMembers")[tagId].mugshot,
+				// };
+
+    //             delete thisTextArea.data("markMembers")[tagId];
+                
+    //             //上一個sibling元素里內容是換行字，游標設定在自己元素裡的第1個字
+    //             if (currentNode.previousSibling.textContent == "\n") {
+    //                 range.setStart(currentNode, 0);
+    //             } else {
+    //             	// 游標設定在當初focus的位置
+    //             	range.setStart(currentNode, cursorPosition);
+    //             }
+    //             range.collapse(true);
+    //             selectionObj.removeAllRanges();
+    //             selectionObj.addRange(range);
+    //         } 
+    //     }
 
         replyDom.find(".tag-list").remove();
         replyDom.find(".tag-members-container").hide();

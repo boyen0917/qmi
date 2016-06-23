@@ -2307,8 +2307,8 @@ composeContentMake = function (compose_title){
         });
 
         this_compose.find('.highlight-container').bind('keydown',function(e){
-
             var thisTextArea = $(this);
+            var selectionObj = window.getSelection();
             var cursorPosition = getCaretPosition();
             var currentNode = window.getSelection().anchorNode;
             var parentNode = currentNode.parentNode;
@@ -2327,6 +2327,11 @@ composeContentMake = function (compose_title){
                         delete thisTextArea.data("markMembers")[markMemberID];
                     }
                 }
+            } else if (e.keyCode == 13) {
+                if (parentNode.nodeName == "MARK" && selectionObj.focusOffset == 0) {
+                    currentNode.parentElement.insertAdjacentHTML( 'beforeBegin', '\n' );
+                    return false;
+                }
             }
         });
 
@@ -2341,53 +2346,47 @@ composeContentMake = function (compose_title){
             var selectionObj = window.getSelection();
             var tagElements = "";
 
+            delUncompleteMark(thisTextArea, cursorPosition);
+
             if ( !thisTextArea.data("memberList")
               && !thisTextArea.data("markMembers")) {
                 thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
                 thisTextArea.data("markMembers", {});
             }
 
-            if (selectionObj.anchorNode.parentNode.nodeName == "MARK") {
-                var currentNode = selectionObj.anchorNode;
-                var parentNode = currentNode.parentNode
-                var tagName = $(parentNode).attr("name");
-                var tagId = $(parentNode).attr("id");
-                var range = document.createRange();
-                
-                if (currentNode.textContent.replace(/\n/g, "") != tagName ) {
-                    $(currentNode).unwrap();
-
-                    thisTextArea.data("memberList")[tagId] = {
-                        nk: tagName,
-                        aut: thisTextArea.data("markMembers")[tagId].mugshot,
-                    };
-
-                    delete thisTextArea.data("markMembers")[tagId];
-
-                    // var textNode = document.createTextNode(currentNode.innerHTML);
-                    if (currentNode.previousSibling.textContent == "\n") {
-                        range.setStart(currentNode, 0);
-                    } else {
-                        range.setStart(currentNode, cursorPosition);
-                    }
-                    range.collapse(true);
-                    selectionObj.removeAllRanges();
-                    selectionObj.addRange(range);
-                    
-                    // var textNode = document.createTextNode(currentNode.innerHTML);
-                    // if (selectionObj.rangeCount) {
-                    //     var range = selectionObj.getRangeAt(0);
-                    //     range.collapse(false);
-                    //     range.insertNode(textNode);
-                    //     range = range.cloneRange();
-                    //     range.selectNodeContents(textNode);
-                    //     range.collapse(false);
-                    //     selectionObj.removeAllRanges();
-                    //     selectionObj.addRange(range);
-                    // }
-                }
-
+            if (!htmlText) {
+                thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+                thisTextArea.data("markMembers", {});
             }
+
+            // if (selectionObj.anchorNode.parentNode.nodeName == "MARK") {
+            //     var currentNode = selectionObj.anchorNode;
+            //     var parentNode = currentNode.parentNode
+            //     var tagName = $(parentNode).attr("name");
+            //     var tagId = $(parentNode).attr("id");
+            //     var range = document.createRange();
+                
+            //     if (currentNode.textContent.replace(/\n/g, "") != tagName ) {
+            //         $(currentNode).unwrap();
+
+            //         thisTextArea.data("memberList")[tagId] = {
+            //             nk: tagName,
+            //             aut: thisTextArea.data("markMembers")[tagId].mugshot,
+            //         };
+
+            //         delete thisTextArea.data("markMembers")[tagId];
+
+            //         // var textNode = document.createTextNode(currentNode.innerHTML);
+            //         if (currentNode.previousSibling.textContent == "\n") {
+            //             range.setStart(currentNode, 0);
+            //         } else {
+            //             range.setStart(currentNode, cursorPosition);
+            //         }
+            //         range.collapse(true);
+            //         selectionObj.removeAllRanges();
+            //         selectionObj.addRange(range);
+            //     }
+            // }
 
             replyDom.find(".tag-list").remove();
             replyDom.find(".tag-members-container").hide();
