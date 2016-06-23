@@ -6732,7 +6732,7 @@ getGroupList = function(){
 
     new QmiAjax({
         apiName: "groups",
-        isPublisApi: true
+        isPublicApi: true
     }).success(function(apiData){
         var 
         allGroupList = apiData.gl || [],
