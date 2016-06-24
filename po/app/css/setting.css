@@ -251,6 +251,87 @@
 	margin-top: 0px;
 }
 
+/* user menu content */
+.sm-person-info-area{
+	position: relative;
+	cursor: pointer;
+	height: 60px;
+}
+.sm-person-area-l{
+	float:left;
+	height: 40px;
+	width: 40px;
+	padding: 10px;
+}
+.sm-person-area-l img{
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 3px;
+}
+.sm-person-area-m{
+	float: left;
+    padding: 12px 0px 0px 3px;
+    outline: 0!important;
+    font-size: 14px;
+}
+.sm-person-area-m div:first-child{
+	width: 137px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    color: white;
+}
+.sm-person-area-m div:nth-child(2){
+	font-size: 11px;
+}
+.sm-person-area-r {
+	float: left;
+    height: 15px;
+    width: 15px;
+    padding: 25px 10px;
+}
+.sm-person-area-r img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+#systemPopup{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	z-index: 101;
+}
+.sm-person-info {
+	position: absolute;
+	left: 50px;
+	bottom: 60px;
+	width: 250px;
+	background: white;
+	border-radius: 3px;
+	box-shadow: 1px 1px 5px #ccc;
+}
+.sm-person-info .sm-info {
+	cursor: pointer;
+	font-size: 16px;
+	color: black;
+	font-weight: bold;
+	padding: 6px 14px;
+}
+.sm-person-info .sm-info-hr {
+	cursor: default;
+	font-size: 12px;
+	color: gray;
+	padding-top:10px;
+	padding-left: 10px;
+}
+.sm-person-info .sm-info:last-child {
+	color: #1E7FFB;
+	border-top: 1px solid #ccc;
+	margin-top: 5px;
+	padding: 8px 14px;
+}
+
 /*user-setting*/
 .subpage-userInformation.main-subpage{
   margin-top: 20px;
@@ -308,6 +389,10 @@
   	border-radius: 3px;
   	border: 1px solid #ccc;
   	background-color: #EFEEEE;
+}
+.user-btn-content{
+	text-align: center;
+	margin-top: 18px;
 }
 
 /*system-setting*/
@@ -377,10 +462,10 @@ ul.system-tab li.current-tab{
     margin-top: 9px;
 }
 
-.btn-content button{
+.btn-b{
 	width: 75px;
   	height: 35px;
-  	border-radius: 5px;
+  	border-radius: 3px;
   	border: 0;
   	color: white;
   	cursor: pointer;
@@ -388,6 +473,10 @@ ul.system-tab li.current-tab{
   	background: #32b3e4; 
   	font-weight: bold;
   	font-size: 12px;
+}
+
+.password-btn{
+    margin-top: -4px;
 }
 
 /*信箱電話更改*/
@@ -731,44 +820,57 @@ input[type=radio] {
 
 /* 使用者大頭照變更*/
 
-/*.user-avatar-confirm{
+.user-avatar-confirm{
 	width: 100%;
-	height:100%;
-	position:absolute;
-	z-index:1600;
-	overflow-y:scroll;
+	height: 100%;
+	position: absolute;
+	z-index: 1600;
+	overflow-y: scroll;
 	background-color: rgba(0, 0, 1, 0.6);
 	-webkit-transform-style: preserve-3d;
 	left: 0;
 	top: 0;
 	display: none; 
-	    
 }
 .avatar-content{
-	width: 350px;
-  	height: 385px;
+	width: 340px;
   	background: #fff;
-  	border-radius: 5px;
+  	border-radius: 3px;
   	overflow: hidden;
   	margin: 10% auto;
   	position: relative;
 }
 .avatar-preview{
-	margin: 15px auto;
-  	width: 319px;
-  	height: 300px;
+	margin: 20px auto;
+  	width: 300px;
+  	text-align: center;
+}
+#myCanvas{
+	border-radius: 3px;
+}
+#myCanvas1{
+	display: none;
+}
+.preview-image{
+	width: 150px;
+	height: 150px;
+	margin-top: 10px;
+	border-radius: 3px;
 }
 .user-headshot{
 	width: 100%;
-  height: 100%;
-  object-fit:cover;
+  	height: 100%;
+  	object-fit:cover;
 }
-
-
-*/
-
+.avatar-btn-content{
+	text-align: center;
+	margin: 15px 0;
+}
+.cancel-btn,.avatar-save{
+	margin: 0px 10px;
+}
 /*服務條款跟隱私政策*/
-.policy{
+/*.policy{
 	width: 100%;
 	height:100%;
 	position:absolute;
@@ -791,4 +893,4 @@ input[type=radio] {
   	height: 98%;
   	margin: 5vh auto;
 
-}
+}*/

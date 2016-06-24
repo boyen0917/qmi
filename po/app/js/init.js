@@ -13,7 +13,7 @@ var ui,
 
 	clearChatTimer,
 
-
+	dataURL,
 	//HiCloud
 	//base_url = "https://ap.qmi.emome.net/apiv1/";
 
@@ -129,7 +129,8 @@ var timeline_detail_exception = [
 
 
 	//timeline置頂millisecond
-	top_timer_ms = $.lStorage("_topTimeMs") || 5000;
+	//top_timer_ms = $.lStorage("_topTimeMs") || 5000;
+	top_timer_ms = 5000;
 
 	//polling間距
 	polling_interval = 5000,
@@ -239,26 +240,26 @@ window.QmiGlobal = {
 		}
 	},
 
-
 	viewMap: {},
 	systemPopup: {
-		htmla : '<section id="systemPopup"><div class="sm-person-info" style="display: block;">'+
-                    '<div class="sm-info-hr">帳號</div>'+
-                    '<div data-sm-act="user-setting" class="sm-info sm-small-area">個人資訊</div>'+
-                    '<div class="sm-info-hr">系統</div>'+
-                    '<div data-sm-act="system-setting" class="sm-info sm-small-area">設定</div>'+
-                    '<div class="sm-info">關於Qmi</div>'+
-                    '<div class="sm-info system-logout">登出</div>'+
-                '</div></section>',
+		html : '<section id="systemPopup">'+
+					'<div class="sm-person-info">'+
+	                    '<div class="sm-info-hr">帳號</div>'+
+	                    '<div data-sm-act="user-setting" class="sm-info sm-small-area">個人資訊</div>'+
+	                    '<div class="sm-info-hr">系統</div>'+
+	                    '<div data-sm-act="system-setting" class="sm-info sm-small-area">設定</div>'+
+	                    '<div class="sm-info">關於Qmi</div>'+
+	                    '<div class="sm-info system-logout">登出</div>'+
+	                '</div>'+
+               	'</section>',
         init : function(){
-        	var popup = $(this.htmla);
-        	$("body").append(popup);
+        	var sysPopup = $(this.html);
+        	$("body").append(sysPopup);
         	$("#systemPopup").click(function(){
         		$(".sm-person-area-r").find("img").toggle();
-        		$("#systemPopup").remove();
-        		popup.remove();
+        		sysPopup.remove();
         	});
-        	popup.find(".sm-info-hr").click(function(e) {
+        	sysPopup.find(".sm-info-hr").click(function(e) {
 	 			e.stopPropagation();
 			});
 			$(".sm-person-info").on("click",".system-logout",function(){
@@ -271,6 +272,50 @@ window.QmiGlobal = {
 				});
 			});
         }
+	},
+
+	avatarPopup: {
+		html :　'<div class="user-avatar-confirm">'+
+		               '<div class="avatar-content">'+
+		                   '<div class="avatar-preview">'+
+		                       //'<img class="user-headshot" src="">'+
+		                       '<canvas id="myCanvas" ></canvas>'+
+		                       '<canvas id="myCanvas1" ></canvas>'+
+		                       '<img class="preview-image" alt="預覽圖" src=""/>'+
+		                   '</div>'+
+		                   '<div class="avatar-btn-content">'+
+		                       '<button data-role="none" class="cancel-btn btn-b">取消</button>'+
+		                       '<button data-role="none" class="avatar-save btn-b">儲存</button>'+
+		                   '</div>'+
+		                '</div>'+                           
+		        '</div>',
+		init : function(){
+			var imgPopup = $(this.html);
+        	$("body").append(imgPopup); 
+        	$('.user-avatar-confirm').fadeIn();
+
+        	//儲存圖片
+        	$('.avatar-save').click(function(){
+        		// var reader = new FileReader();
+        		// var file_ori = $('.setting-avatar-file');
+        		// var image_file = file_ori[0].files[0];
+        		// reader.onload = function(e) {
+		             var img = $(".user-avatar-img");
+		             img.attr("src",dataURL);
+
+		        // }
+		        // reader.readAsDataURL(image_file);
+		        imgPopup.remove();
+		        $('input[type="file"]').val(null);
+        		$(".user-avatar-confirm").fadeOut();
+		    });
+        	//取消
+        	$('.cancel-btn').click(function(){
+        		imgPopup.remove();
+        		$('input[type="file"]').val(null);
+		        $(".user-avatar-confirm").fadeOut();
+		    });
+		}
 	}
 
 	// systemPopup: {

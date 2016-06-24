@@ -1,7 +1,4 @@
-
 //system setting 系統設定 個人跟團體資料顯示
-
-
 systemSetting = function(){
 
     var this_dgi = $.lStorage("_loginData").dgi;
@@ -20,6 +17,8 @@ systemSetting = function(){
     var systemGroup = $("#group-setting");
     //預設群組
     var me_dgi = QmiGlobal.auth.dgi;
+    //預設置頂自動換頁   
+    $("#carousel-setting").find("input[value='"+top_timer_ms+"']").attr('checked', true);
     var emptyAut = "images/common/others/empty_img_all_l.png";
     //$('input[name=second]:first').attr('checked', true);
     //$("input[name$='group']").attr("checked",me_de_gr);
@@ -122,9 +121,8 @@ $(document).ready(function(){
     var btnContent = $(".btn-content");
     var imgContent = $(".image-content");
 
-    btnContent.find('.userSetting-btn').click(function(){
+    $('.userSetting-btn').click(function(){
         userInfoUpdate();
-        //userImgUpdate();
     });
     // password送出
     btnContent.find('.password-btn').click(function(){
@@ -134,72 +132,168 @@ $(document).ready(function(){
         defaultGroupSetting();
     });
     btnContent.find('.carousel-btn').click(function(){
-        var carousel_time = $("input[name$='second']:checked").val();
-        alert(carousel_time);
+        //alert(top_timer_ms);
+        //var carousel_time = $("input[name$='second']:checked").val();
+        top_timer_ms = $("input[name$='second']:checked").val();
+        toastShow("變更成功");
         //$.lStorage('_topTimeMs',carousel_time);
     });
 
+    //變更使用者大頭貼
     imgContent.find('.user-avatar-img').click(function(){
         $('.setting-avatar-file').trigger("click");
     });
     imgContent.find('.camera-icon').click(function(){
         $('.setting-avatar-file').trigger("click");
     });
-    //選擇圖片
-    imgContent.find('.setting-avatar-file').change(function(){
-        var file_ori = $(this);
-        var imageType = /image.*/;
-
-        //每次選擇完檔案 就reset input file
-        //file_ori.replaceWith( file_ori.val('').clone( true ) );
-        var file = file_ori[0].files[0];
-        
-        if (file.type.match(imageType)) {
-            //是否存在圖片
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var img = $(".user-avatar-img");
-                //調整長寬
-                //img.load(function() {
-                //var w = img.width();
-                //var h = img.height();
-                //mathAvatarPos(img,w,h,120);
-                //});
-                console.log(file);
-                // uploadToS3(file,"/me/avatar",ori_arr,tmb_arr,function(chk){
-
-                // });
-
-
-                img.attr("src",reader.result);
-            }
-            reader.readAsDataURL(file);
-        } else {
-            popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
-        }
-    });
-});
-
-//更新使用者大頭貼
-userImgUpdate = function(){
-
     
-    new QmiAjax({
-        apiName: "/me/avatar",
-        method: "put"
-    }).success(function(data){
-        var getS3_url = data;
-        var fi = getS3_url.fi;
-        var ou = getS3_url.ou;
-        var tu = getS3_url.tu;
+        var canvas_x , canvas_y , mdown_x , mdown_y , mup_x , mup_y , rect_w , rect_h , n_img_w , n_img_h;
+        var paint = false;
+        var img = new Image();
+        var canvas , canvas1 , ctx , ctx1;
+        
+    imgContent.find('.setting-avatar-file').change(function(){
 
-        console.log(fi);
-        console.log(ou);
-        console.log(tu);
+        // var file_ori = $(this);
+        // var imageType = /image.*/;
 
+        // //每次選擇完檔案 就reset input file
+        // //file_ori.replaceWith( file_ori.val('').clone( true ) );
+        // var file = file_ori[0].files[0];
+        // var reader = new FileReader();
+        // if (file.type.match(imageType)) {
+        //     //是否存在圖片           
+        //     QmiGlobal.avatarPopup.init();
+        //     reader.onload = function(e) {
+        //         var img = $(".user-headshot");
+        //         img.attr("src",reader.result);
+        //     }
+        //     reader.readAsDataURL(file);
+        // } else {
+        //     popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
+        // }
+            var file_ori = $(this);
+            var imageType = /image.*/;
+            var image_file = file_ori[0].files[0];
+            var reader = new FileReader();  
+            if (image_file.type.match(imageType)){
+                QmiGlobal.avatarPopup.init();
+
+                canvas =  $('#myCanvas');
+                canvas1 =  $('#myCanvas1');
+                ctx = canvas[0].getContext("2d");
+                ctx1 = canvas1[0].getContext("2d");
+                //canvas mouse event 
+                canvas.mousedown(mouseDownHandler);
+                canvas.mouseup(mouseUpHandler);
+                canvas.mousemove(mouseMoveHandler);
+
+                reader.onload = function(e) {   
+                    img.onload = function(){    
+                    //canvas預設寬高為300
+                    canvas[0].width = 300; 
+                    canvas[0].height = 300;
+                    //等比例縮放
+                    //當(寬 > 高) > canvas寬 寬=canvas寬(canvas寬預設300) 高等比例縮放
+                    //當(寬 > 高) < canvas寬 寬高都設canvas預設寬高
+                    //當(寬 < 高) > canvas高 高=canvas高(canvas高預設300) 寬等比例縮放
+                    //當(寬 < 高) < canvas高 寬高都設canvas預設寬高
+                        if (img.width >= img.height) {
+                            if (img.width > canvas[0].width) {
+                                n_img_w = canvas[0].width;
+                                n_img_h = img.height*canvas[0].width/img.width;
+                                canvas[0].height = n_img_h;
+                            } else {
+                                n_img_w = canvas[0].width;
+                                n_img_h = canvas[0].height;
+                            }
+                        } else {
+                            if (img.height > canvas[0].height) {
+                                n_img_w = img.width*canvas[0].height/img.height;
+                                n_img_h = canvas[0].height;
+                                canvas[0].width = n_img_w;
+                            }else {
+                                n_img_w = canvas[0].width;
+                                n_img_h = canvas[0].height;
+                            }
+                        }
+                        draw();
+                    }       
+                    img.src = reader.result;
+                }
+            reader.readAsDataURL(image_file);
+            } else {
+                popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
+            }
     });
-}
+    
+    function draw(){
+            ctx.clearRect(0, 0, canvas[0].width, canvas[0].height);
+            ctx1.clearRect(0, 0, canvas1[0].width, canvas1[0].height);
+            ctx.globalAlpha = 0.4;
+            ctx.drawImage(img , 0 , 0 , n_img_w , n_img_h);   
+    }
+    function mouseMoveHandler(event){
+            // if(paint){
+            // console.log(" mousemove position "+event.clientX+" , "+event.clientY);
+            // }        
+    }
+    function mouseDownHandler(event){
+            draw();
+            mdown_x = event.clientX;
+            mdown_y = event.clientY;
+            console.log(" mousedown position "+mdown_x+" , "+mdown_y);
+            paint = true;
+    }   
+    function mouseUpHandler(event){
+            paint = false;
+            mup_x = event.clientX;
+            mup_y = event.clientY;
+            console.log(" mouseup position "+mup_x+" , "+mup_y);
 
+            //判斷滑鼠圈選圖片範圍起始點
+            var img_x , img_y;
+            //canvas坐標
+            var pos = canvas.offset();
+            w_canvas_x = pos.left; 
+            w_canvas_y = pos.top;
+            console.log(" canvas position "+w_canvas_x+" , "+w_canvas_y);
+
+            if(mup_x < mdown_x && mup_y < mdown_y){
+                img_x = mup_x;
+                img_y = mup_y;
+            } else if(mup_x > mdown_x && mup_y < mdown_y) {
+                img_x = mdown_x;
+                img_y = mup_y;
+            } else if(mup_x < mdown_x && mup_y > mdown_y) {
+                img_x = mup_x;
+                img_y = mdown_y;
+            } else {
+                img_x = mdown_x;
+                img_y = mdown_y;
+            }
+            rect_w = Math.abs(mup_x - mdown_x);
+            rect_h = Math.abs(mup_y - mdown_y);
+            console.log(" width "+rect_w + " height "+ rect_h);
+            var imgData = ctx.getImageData(img_x - w_canvas_x, img_y - w_canvas_y, rect_w, rect_h);
+            //console.log(data);
+            //選取到的圖片範圍調整其透明度
+            for (var i = 0; i < imgData.data.length; i += 4) {
+                //imgData.data[i+0] = 255; RGBA
+                //imgData.data[i+1] = 255;
+                //imgData.data[i+2] = 255;
+                imgData.data[i+3] = 255;
+            }
+
+            canvas1[0].width = rect_w;
+            canvas1[0].height = rect_h;
+            ctx1.clearRect(0, 0, canvas1[0].width, canvas1[0].height);
+            ctx1.putImageData(imgData,0,0);
+            ctx.putImageData(imgData,img_x - w_canvas_x,img_y - w_canvas_y);
+            dataURL = canvas1[0].toDataURL("image/jpeg");  
+            $(".preview-image").attr("src",dataURL);
+    }
+});
 
 //更新使用者名稱
 userInfoUpdate = function(){
@@ -222,23 +316,25 @@ userInfoUpdate = function(){
 // 變更密碼
 passwordChange = function(){
         //$("input[name$='user-edit-o-password']").val()
+        var pwSetting = $("#password-setting");
         var fill = true;//空值判定
+
         var old_password = {
-            "pw":toSha1Encode($("input[name$='user-edit-o-password']").val())
+            "pw":toSha1Encode(pwSetting.find("input[name$='o-password']").val())
         };
         var verify_password = {
-             "op":toSha1Encode($("input[name$='user-edit-o-password']").val()),
-             "up":toSha1Encode($("input[name$='user-edit-n-password']").val())
+             "op":toSha1Encode(pwSetting.find("input[name$='o-password']").val()),
+             "up":toSha1Encode(pwSetting.find("input[name$='n-password']").val())
         };
-        $(".input-password").each(
-            function(i,val){
-                if($(this).val() == "" || $(this).val() == $(this).attr("placeholder")){
+
+        pwSetting.find(".input-password").each(function(i,val){
+                if($(this).val() == ""){
                     fill = false;
-                    popupShowAdjust("欄位不能有空", "失敗" ,true);
+                    popupShowAdjust("欄位不能有空", "" ,true);
                     return false;
                 }
-        });//欄位空直確認
-        
+        });
+        //欄位空值判斷
         if(fill == true)
         {
             //驗證密碼是否正確
@@ -247,14 +343,11 @@ passwordChange = function(){
                 body : JSON.stringify(old_password),
                 method: "post"
             }).success(function(password_data){
-                if($("input[name$='user-edit-n-password']").val().length < 3){
-                    
-                        popupShowAdjust("新密碼請輸入至少三個字", "失敗" ,true);
+                if (pwSetting.find("input[name$='n-password']").val().length < 6){ 
+                        popupShowAdjust("新密碼請輸入至少六個字", "" ,true);
                         return false;
-                    }
-                    else if($("input[name$='user-edit-n-password']").val() == $("input[name$='user-edit-v-password']").val())
-                    {   
-                        //變更密碼 
+                }　else {
+                    if (pwSetting.find("input[name$='n-password']").val() == pwSetting.find("input[name$='v-password']").val()){
                         new QmiAjax({
                             apiName : "me/password",
                             body : JSON.stringify(verify_password),
@@ -264,35 +357,15 @@ passwordChange = function(){
                             console.debug(verify_data);
                             at = verify_data.at;
                         }).error(function(e){
-                            alert("error");
+                            popupShowAdjust(e.rsp_msg);
                         });
-                        // $.ajax({
-                        //     url:base_url+"me/password",
-                        //     headers:{
-                        //     "li":lang,
-                        //     "at":at,
-                        //     "ui":ui
-                        //     },
-                        //     type:"put",
-                        //     data:JSON.stringify(verify_password),
-                        //     success:function(verify_data){
-                        //         toastShow("發送成功");
-                        //         console.debug(verify_data);
-                        //          at = verify_data.at;
-                                 
-                        //     },
-                        //     error:function(e){
-                        //         alert("error");
-                        //     }
-                        // });//ajax密碼變更
+                    } else {
+                        popupShowAdjust("兩次密碼不符 請再輸入一次", "" ,true);
+                        pwSetting.find("input[name$='v-password']").val("");
                     }
-                    else
-                    {
-                        popupShowAdjust("請再輸一次新密碼", "失敗" ,true);
-                        $("input[name$='user-edit-v-password']").val("");
-                    }
+                }
             }).error(function(e){
-                    popupShowAdjust("原密碼有誤", "失敗" ,true);
+                    popupShowAdjust("原密碼有誤", "" ,true);
                     console.debug(e.responseText);
             });
             // $.ajax({
@@ -347,6 +420,7 @@ passwordChange = function(){
         }//空值判定
 }//密碼更新
 
+//更新預設團體
 defaultGroupSetting = function(){
     var new_dgi = $("input[name$='group']:checked").val()
     //alert($("input[name$='group']:checked").val());

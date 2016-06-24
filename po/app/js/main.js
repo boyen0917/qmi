@@ -250,7 +250,7 @@ $(function(){
 	});
 
 	//個人資訊選單
-	$(".sm-person-info").hide();
+	//$(".sm-person-info").hide();
 	$("#userInfo").click(function(e){
 		$(".sm-person-area-r").find("img").toggle();
 		//$(".sm-person-info").fadeToggle();
@@ -1902,21 +1902,21 @@ $(function(){
  //    });
 
 	// //儲存
-	//  $('.avatar-save').click(function(){
- //        var reader = new FileReader();
+	 // $('.avatar-save').click(function(){
+  //       var reader = new FileReader();
 
- //        var file_ori = $('.setting-avatar-file'); //圖片來源input file
+  //       var file_ori = $('.setting-avatar-file'); //圖片來源input file
 
- //        var image_file = file_ori[0].files[0];//當下選擇的檔案
+  //       var image_file = file_ori[0].files[0];//當下選擇的檔案
 
- //        reader.onload = function(e) {
- //                var img = $(".setting-user-avatar");
- //                img.attr("src",reader.result);
- //        }
+  //       reader.onload = function(e) {
+  //               var img = $(".setting-user-avatar");
+  //               img.attr("src",reader.result);
+  //       }
 
- //        reader.readAsDataURL(image_file);
- //        $(".user-avatar-confirm").fadeOut();
- //    });
+  //       reader.readAsDataURL(image_file);
+  //       $(".user-avatar-confirm").fadeOut();
+  //   });
 
 
 	// //選擇圖片
