@@ -279,7 +279,7 @@ window.QmiPollingChk = {
 }
 
 window.QmiAjax = function(args){
-
+	// body and method
 	var self = this,
 		ajaxDeferred = $.Deferred(),
 
@@ -713,12 +713,14 @@ g_Qmi_title = "Qmi";
 $("title").html(g_Qmi_title);
 
 MyDeferred = function  () {
-  var myResolve;
+  var myResolve, myReject;
   var myPromise = new Promise(function(resolve, reject){
     myResolve = resolve;
+    myReject = reject;
   });
 
   myPromise.resolve = myResolve;
+  myPromise.reject = myReject;
   return myPromise;
 }
 
@@ -818,7 +820,7 @@ errorResponse = function(data){
 setDebug(debug_flag);
 
 function setDebug(isDebug) {
-  if (isDebug) {
+  if (true) {
     window.cns = {
       log: window.console.log.bind(window.console, '%s: %s'),
       error: window.console.error.bind(window.console, 'error: %s'),

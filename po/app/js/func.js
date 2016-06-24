@@ -66,6 +66,12 @@ logout = function(){
     ajaxDo(api_name,headers,method,true).complete(function(data){
         // localStorage.removeItem("_loginAutoChk");
      //    localStorage.removeItem("_loginData");
+
+        // 關閉移轉團體所有聊天室
+        (Object.keys(windowList) || []).forEach(function(thisCi){
+            windowList[thisCi].close();
+        });
+
         resetDB();
         document.location = "index.html";
     });
@@ -6523,34 +6529,40 @@ getLinkYoutube = function (this_compose,url) {
 }
 
 
-replySend = function(this_event){
-    var this_ei = this_event.data("event-id");
-    var this_gi = this_ei.split("_")[0];
-    var this_ti = this_ei.split("_")[1];
-    var isWaiting = false;
+replySend = function(thisEvent){
+
+    var thisEi = thisEvent.data("event-id"),
+        thisGi = thisEi.split("_")[0],
+        thisTi = thisEi.split("_")[1],
+        isWaiting = false,
+        imgArea = thisEvent.find(".st-reply-message-img"),
+        replyFile = imgArea.data("file");
 
     var body = {
-        "meta" : {
-            "lv" : 1,
-            "tp" : "10"
+        meta : {
+            lv : 1,
+            tp : "10"
         },
-        "ml" : []
+        ml : []
     };
-    var object_obj = this_event.data("object_str");
+    var object_obj = thisEvent.data("object_str");
     if( object_obj ){
         object_obj = $.parseJSON( object_obj );
         body.meta.tu = object_obj;
     }
 
-    var text = this_event.find(".st-reply-message-textarea textarea").val();
+    var text = thisEvent.find(".st-reply-message-textarea textarea").val();
     if( text ){
         body.ml.push({
             "c": text,
             "tp": 0
         });
     }
-    var imgArea = this_event.find(".st-reply-message-img");
+
+
+
     var imgType = imgArea.data("type");
+
     switch( imgType ){
         case 5: //sticker
             var sticker = imgArea.data("id");
@@ -6561,76 +6573,89 @@ replySend = function(this_event){
                 });
             }
             break;
-        case 6: //img
+        case "image": //img
             isWaiting = true;
-            var file = this_event.find(".st-reply-message-img").data("file");
-            if( file ){
-
-                var ori_arr = [1280,1280,0.7];
-                var tmb_arr = [480,480,0.6];
-                //上傳類型
-                var imageType = /image.*/;
-
+            if( replyFile ){
                 //發佈上傳檢查
                 upload_chk = true;
                 
                 //開啟loading icon
                 s_load_show = true;
 
-                //先做permission id 
-                cns.debug("object str:",this_event.data("object_str"));
-                // if( this_event.data("object_str") ){
-                //     var obj = $.parseJSON( this_event.data("object_str") );
-                //     getFilePermissionId(this_gi, obj).complete( function(result){
-                //         if( result.status==200 ){
-                //             try{
-                //                 var pi = $.parseJSON(result.responseText).pi;
+                var pi = "0";
 
-                //                 uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
-                //                     body.ml.push({
-                //                         "c": data.fi,
-                //                         "p": pi,
-                //                         "tp": 6
-                //                     });
-                //                     replyApi( this_event, this_gi, this_ti, this_ei, body );
-                //                 });
-                //             } catch( e ){
-                //                 errorReport(e);
-                //             }
-                //         }
-                //     });
-                // }else{
-                    var pi = "0";
-                    uploadGroupImage(this_gi, file, this_ti, null, ori_arr, tmb_arr, pi, function(data){
-                        cns.debug("yooeeooeoeoeoeoe");
-                        try{
-                            //if fail uploading
-                            if(!data){
-                                toastShow( $.i18n.getString("COMMON_UPLOAD_FAIL") );
-                                //loading icon off
-                                s_load_show = false;
-                                $('.ui-loader').hide();
-                                //set sending flag false
-                                this_event.find(".st-reply-message-send").data("reply-chk",false);
-                                return;
-                            }
-                            body.ml.push({
-                                "c": data.fi,
-                                "p": pi,
-                                "tp": 6
-                            });
-                            replyApi( this_event, this_gi, this_ti, this_ei, body );
-                        } catch(e){
-                            // cns.debug("[!] replySend:"+e.message);
-                            errorReport(e);
+                // uploadGroupImage(thisGi, file, thisTi, null, ori_arr, tmb_arr, pi, function(data){
+                //     var rspObj = {
+                //         isSuccess: true,
+                //         data: data
+                //     }
+                qmiUploadFile({
+                    urlAjax: {
+                        apiName: "groups/" + thisGi + "/files",
+                        method: "post",
+                        body: {
+                            tp: 1,
+                            ti: thisTi,
+                            pi: 0,
+                            wm: 0,
                         }
-                    });
-                // }
+                    },
+                    tp: 1,
+                    hasFi: true,
+                    file: thisEvent.find(".st-reply-message-img img")[0],
+                    oriObj: {w: 1280, h: 1280, s: 0.7},
+                    tmbObj: {w: 480, h: 480, s: 0.6} // ;
+                }).done(function(rspObj) {
+                    try{
+                        //if fail uploading
+                        if(rspObj.isSuccess === false){
+                            toastShow( $.i18n.getString("COMMON_UPLOAD_FAIL") );
+                            //loading icon off
+                            s_load_show = false;
+                            $('.ui-loader').hide();
+                            $(".ajax-screen-lock").hide();
+                            //set sending flag false
+                            thisEvent.find(".st-reply-message-send").data("reply-chk",false);
+                            return;
+                        }
+
+                        body.ml.push({
+                            "c": rspObj.data.fi,
+                            "p": pi,
+                            "tp": 6
+                        });
+                        replyApi( thisEvent, thisGi, thisTi, thisEi, body );
+                    } catch(e){
+                        // cns.debug("[!] replySend:"+e.message);
+                        errorReport(e);
+                    }
+                });
             }
+            break;
+        case "video": console.log(333222);
+            qmiUploadFile({
+                urlAjax: {
+                    apiName: "groups/" + thisGi + "/files",
+                    method: "post",
+                    body: {
+                        tp: 2,
+                        ti: thisTi,
+                        pi: 0,
+                        wm: 0,
+                    }
+                },
+                tp: 2,
+                hasFi: true,
+                file: replyFile,
+                oriObj: {w: 1280, h: 1280, s: 0.9}
+            }).done(function(rspObj) {
+                console.log("rspObj",rspObj);
+            })
+
             break;
     }
     if( !isWaiting ){
-        replyApi( this_event, this_gi, this_ti, this_ei, body );
+        replyApi( thisEvent, thisGi, thisTi, thisEi, body );
     }
 }
 
@@ -8376,20 +8401,32 @@ userInfoEvent = function(this_info,me){
 
                     //記錄更動
                     // this_info.data("avatar-chk",true);
+                    s_load_show = true;
 
+                    // var ori_arr = [1280,1280,0.7];
+                    // var tmb_arr = [120,120,0.6];
+                    // var file = this_info.find(".user-avatar-upload")[0].files[0];
+                    // var api_name = "groups/"+gi+"/users/"+gu+"/avatar";
 
-                    var ori_arr = [1280,1280,0.7];
-                    var tmb_arr = [120,120,0.6];
-                    var file = this_info.find(".user-avatar-upload")[0].files[0];
-                    var api_name = "groups/"+gi+"/users/"+gu+"/avatar";
-
-                    uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
+                    qmiUploadFile({
+                        thisGi: gi,
+                        // thisTi: thisTi,
+                        urlAjax: {
+                            apiName: "groups/"+gi+"/users/"+gu+"/avatar",
+                            method: "put"
+                        },
+                        tp: 1,
+                        file: this_info.find(".user-avatar-upload")[0].files[0],
+                        oriObj: {w: 1280, h: 1280, s: 0.7},
+                        tmbObj: {w: 120, h: 120, s: 0.6} // ;
+                    }).done(function(data) {
                         // 關閉load 圖示
                         s_load_show = false;
         
-                        if(chk) {
+                        if(data.isSuccess === true) {
                             //重置團體頭像、名稱的參數
                             getGroupComboInit(gi).done(function(){
+                                console.log("djfskdjfldksf");
                                 toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );    
                                 updateAllAvatarName(gi,gu);
                             });
