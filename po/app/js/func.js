@@ -4575,7 +4575,7 @@ groupMenuListArea = function (noApi){
         var icon_host = "<img src='images/sidemenu/icon_host.png'/>",
             listArea = $(".sm-group-list-area").html("");
 
-        $.each(QmiGlobal.groups,addSideMenuGroupUI.bind(listArea));
+        $.each(QmiGlobal.groups, addSideMenuGroupUI.bind(listArea));
 
         if(Object.keys( QmiGlobal.groups ).length > 2) $(".sm-group-switch").show();
 
@@ -6677,6 +6677,10 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
         var this_textarea = this_event.find(".st-reply-message-textarea textarea");
         this_textarea.val("").parent().addClass("adjust").removeClass("textarea-animated");
 
+        //重置 清除附檔區
+        // this_event.find(".st-reply-message-textarea textarea").val("").end()
+        // .find(".st-reply-message-img").removeData().html("");
+
         setTimeout(function(){
             if(this_event.find(".st-reply-all-content-area").is(":visible")) {
                 replyReload(this_event);
@@ -6687,16 +6691,12 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
             }
         },400);
     });
+
 }
 
 replyReload = function(this_event){
 
-    //重置
-    this_event.find(".st-reply-message-textarea textarea").val("");
-    this_event.find(".st-reply-message-img").data("id",null);
-    this_event.find(".st-reply-message-img").data("type",null);
-    this_event.find(".st-reply-message-img").data("file",null);
-    this_event.find(".st-reply-message-img").html("");  //清掉sticker預覽
+    
     //把sticker欄收起來
     var stickerIcon = this_event.find(".st-reply-message-sticker");
     if( true==stickerIcon.data("open") ){

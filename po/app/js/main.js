@@ -756,7 +756,7 @@ $(function(){
 		}
 
 		$(this).data("reply-chk",true);
-
+		window.rr = this_event;
 		replySend(this_event);
 	});
 
