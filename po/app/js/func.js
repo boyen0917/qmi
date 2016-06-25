@@ -6534,36 +6534,36 @@ replySend = function(thisEvent){
     var thisEi = thisEvent.data("event-id"),
         thisGi = thisEi.split("_")[0],
         thisTi = thisEi.split("_")[1],
+        uploadDef = $.Deferred(),
         isWaiting = false,
+        eventTp, fileBody,
         imgArea = thisEvent.find(".st-reply-message-img"),
-        replyFile = imgArea.data("file");
-
-    var body = {
-        meta : {
-            lv : 1,
-            tp : "10"
-        },
-        ml : []
-    };
+        replyFile = imgArea.data("file"),
+        body = {
+            meta : {
+                lv : 1,
+                tp : "10"
+            },
+            ml : []
+        };
     var object_obj = thisEvent.data("object_str");
     if( object_obj ){
         object_obj = $.parseJSON( object_obj );
         body.meta.tu = object_obj;
     }
 
-    var text = thisEvent.find(".st-reply-message-textarea textarea").val();
-    if( text ){
-        body.ml.push({
-            "c": text,
-            "tp": 0
-        });
-    }
+    body.ml.push({
+        "c": thisEvent.find(".st-reply-message-textarea textarea").val(),
+        "tp": 0
+    });
 
+    var fileType = imgArea.data("type");
 
-
-    var imgType = imgArea.data("type");
-
-    switch( imgType ){
+    switch( fileType ){
+        case undefined: // 文字
+            eventTp = 0;
+            uploadDef.resolve({isSuccess: true});
+            break;
         case 5: //sticker
             var sticker = imgArea.data("id");
             if( sticker ){
@@ -6572,67 +6572,64 @@ replySend = function(thisEvent){
                     "tp": 5
                 });
             }
+
+            uploadDef.resolve({isSuccess: true});
             break;
         case "image": //img
-            isWaiting = true;
-            if( replyFile ){
-                //發佈上傳檢查
-                upload_chk = true;
-                
-                //開啟loading icon
-                s_load_show = true;
+            eventTp = 6;
+            //發佈上傳檢查
+            upload_chk = true;
+            //開啟loading icon
+            s_load_show = true;
 
-                var pi = "0";
+            var pi = "0";
 
-                // uploadGroupImage(thisGi, file, thisTi, null, ori_arr, tmb_arr, pi, function(data){
-                //     var rspObj = {
-                //         isSuccess: true,
-                //         data: data
-                //     }
-                qmiUploadFile({
-                    urlAjax: {
-                        apiName: "groups/" + thisGi + "/files",
-                        method: "post",
-                        body: {
-                            tp: 1,
-                            ti: thisTi,
-                            pi: 0,
-                            wm: 0,
-                        }
-                    },
-                    tp: 1,
-                    hasFi: true,
-                    file: thisEvent.find(".st-reply-message-img img")[0],
-                    oriObj: {w: 1280, h: 1280, s: 0.7},
-                    tmbObj: {w: 480, h: 480, s: 0.6} // ;
-                }).done(function(rspObj) {
-                    try{
-                        //if fail uploading
-                        if(rspObj.isSuccess === false){
-                            toastShow( $.i18n.getString("COMMON_UPLOAD_FAIL") );
-                            //loading icon off
-                            s_load_show = false;
-                            $('.ui-loader').hide();
-                            $(".ajax-screen-lock").hide();
-                            //set sending flag false
-                            thisEvent.find(".st-reply-message-send").data("reply-chk",false);
-                            return;
-                        }
+            fileBody = {
+                fiKey: "c",
+                p: 0,
+                tp: eventTp
+            };
 
-                        body.ml.push({
-                            "c": rspObj.data.fi,
-                            "p": pi,
-                            "tp": 6
-                        });
-                        replyApi( thisEvent, thisGi, thisTi, thisEi, body );
-                    } catch(e){
-                        // cns.debug("[!] replySend:"+e.message);
-                        errorReport(e);
+            // uploadGroupImage(thisGi, file, thisTi, null, ori_arr, tmb_arr, pi, function(data){
+            //     var rspObj = {
+            //         isSuccess: true,
+            //         data: data
+            //     }
+            qmiUploadFile({
+                urlAjax: {
+                    apiName: "groups/" + thisGi + "/files",
+                    method: "post",
+                    body: {
+                        tp: 1,
+                        ti: thisTi,
+                        pi: 0,
+                        wm: 0,
                     }
-                });
-            }
+                },
+                tp: 1,
+                hasFi: true,
+                file: thisEvent.find(".st-reply-message-img img")[0],
+                oriObj: {w: 1280, h: 1280, s: 0.7},
+                tmbObj: {w: 480, h: 480, s: 0.6} // ;
+            }).done(uploadDef.resolve);
             break;
-        case "video": console.log(333222);
+        case "video": 
+            isWaiting = true;
+
+            //發佈上傳檢查
+            upload_chk = true;
+            
+            //開啟loading icon
+            s_load_show = true;
+
+            eventTp = 7;
+
+            fileBody = {
+                fiKey: "c",
+                p: 0,
+                tp: eventTp
+            };
+
             qmiUploadFile({
                 urlAjax: {
                     apiName: "groups/" + thisGi + "/files",
@@ -6648,15 +6645,64 @@ replySend = function(thisEvent){
                 hasFi: true,
                 file: replyFile,
                 oriObj: {w: 1280, h: 1280, s: 0.9}
-            }).done(function(rspObj) {
-                console.log("rspObj",rspObj);
-            })
+            }).done(uploadDef.resolve)
+
+            break;
+
+        case "file": // 檔案上傳
+            eventTp = 26;
+            //發佈上傳檢查
+            upload_chk = true;
+            //開啟loading icon
+            s_load_show = true;
+
+            fileBody = {
+                ftp: 0,
+                fiKey: "fi",
+                fn: replyFile.name,
+                si: replyFile.size,
+                tp: 26
+            }
+
+            qmiUploadFile({
+                urlAjax: {
+                    apiName: "groups/" + thisGi + "/files",
+                    method: "post",
+                    body: {
+                        tp: 0,
+                        ti: thisTi,
+                        pi: 0,
+                        wm: 0,
+                    }
+                },
+                tp: 0,
+                hasFi: true,
+                file: replyFile,
+                oriObj: {w: 1280, h: 1280, s: 0.9}
+            }).done(uploadDef.resolve)
 
             break;
     }
-    if( !isWaiting ){
+
+    uploadDef.done(function(rspObj) {
+        //if fail uploading
+        if(rspObj.isSuccess === false){
+            toastShow( $.i18n.getString("COMMON_UPLOAD_FAIL") );
+            //loading icon off
+            s_load_show = false;
+            $('.ui-loader').hide();
+            $(".ajax-screen-lock").hide();
+            //set sending flag false
+            thisEvent.find(".st-reply-message-send").data("reply-chk",false);
+            return;
+
+        } else if(rspObj.data !== undefined) {
+            fileBody[fileBody.fiKey] = rspObj.data.fi;
+            body.ml.push(fileBody);
+        }
+        console.log("hey",thisEvent, thisGi, thisTi, thisEi, body);
         replyApi( thisEvent, thisGi, thisTi, thisEi, body );
-    }
+    })
 }
 
 replyApi = function(this_event, this_gi, this_ti, this_ei, body){
@@ -6678,8 +6724,8 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
         this_textarea.val("").parent().addClass("adjust").removeClass("textarea-animated");
 
         //重置 清除附檔區
-        // this_event.find(".st-reply-message-textarea textarea").val("").end()
-        // .find(".st-reply-message-img").removeData().html("");
+        this_event.find(".st-reply-message-textarea textarea").val("").end()
+        .find(".st-reply-message-img").removeData().html("");
 
         setTimeout(function(){
             if(this_event.find(".st-reply-all-content-area").is(":visible")) {
@@ -6848,10 +6894,6 @@ getCloudToken = function(cloudObj,isReDo){
         deferred.resolve(false);   
     } else {
         var tempKey = cloudObj.key;
-        // 測試
-        if(window.removeCKey === true) {
-            tempKey = "";
-        }
 
         $.ajax({
             url: "https://" + cloudObj.cl + "/apiv1/cert",

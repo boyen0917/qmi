@@ -516,6 +516,7 @@ qmiUploadFile = function(uploadObj){
 			}
 		}).success(function(data) {
 			data.fi = s3Obj.fi;
+			data.tp = uploadObj.tp;
 			chainDef.resolve({isSuccess: true, data: data})
 		}).error(chainDef.reject);
 
@@ -537,102 +538,93 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		tmbObj = uploadObj.tmbObj,
 		oriObj = uploadObj.oriObj;
 
-	// 檔案讀取deferred
-	// if(uploadObj.file instanceof HTMLElement) {
-	// 	fileDef.resolve(uploadObj.file);
-	// } else {
-	// 	var fileURL = URL.createObjectURL(file);
 
-	// 	fileDef.resolve(this) 
+	var uploadDef = $.Deferred(),
+		mediaLoadDef = $.Deferred(),
+		oriFile, tmbFile, mt, si, md, contentType,
+		paramObj = {
+			s3: { url: s3Obj.s3 || s3Obj.tu },
+			s32: { url: s3Obj.s32 || s3Obj.ou},
+		};
 
-		// var reader = new FileReader();
-		// reader.onloadend = function() {
-		// 	var tempImg = new Image();
-		// 	tempImg.src = reader.result;
-  //       	tempImg.onload = function() { 
-  //       		fileDef.resolve(this) 
-  //       	}; \
-		// };
-		// reader.readAsDataURL(uploadObj.file);
-	// }
+	switch(uploadObj.tp) {
+		case 0: // 其他類型 檔案上傳
+			paramObj.s3.file = uploadObj.file;
+			delete paramObj.s32;
 
-	// fileDef.done(function(file) {
+			contentType = " ";
 
-		var uploadDef = $.Deferred(),
-			mediaLoadDef = $.Deferred(),
-			oriFile, tmbFile, mt, si, md, contentType,
-			paramObj = {
-				s3: { url: s3Obj.s3 || s3Obj.tu },
-				s32: { url: s3Obj.s32 || s3Obj.ou},
-			};
+			// 傳給外部 commit 使用
+			mt = uploadObj.file.type || "text";
+			si = uploadObj.file.size;
+			md = {w:100,h:100,l:100};
 
-		switch(uploadObj.tp) {
-			case 1: // 圖
-				var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s),
-					tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
+			mediaLoadDef.resolve();
 
-				paramObj.s32.file = oFile.blob;
-				paramObj.s3.file = tFile.blob;
+			break;
+		case 1: // 圖
+			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s),
+				tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
 
-				contentType = " ";
+			paramObj.s32.file = oFile.blob;
+			paramObj.s3.file = tFile.blob;
 
-				// 傳給外部 commit 使用
-				mt = oFile.blob.type;
-				si = oFile.blob.size;
-				md = { w: oFile.w, h: oFile.h };
+			contentType = " ";
 
+			// 傳給外部 commit 使用
+			mt = oFile.blob.type;
+			si = oFile.blob.size;
+			md = { w: oFile.w, h: oFile.h };
+
+			mediaLoadDef.resolve();
+
+			break;
+		case 2: // 影 只要傳s32 timeline是這樣
+			paramObj.s32.file = uploadObj.file;
+			delete paramObj.s3;
+
+			contentType = "video/mp4";
+
+			// 傳給外部 commit 使用
+			mt = uploadObj.file.type;
+			si = uploadObj.file.size;
+
+			var video = document.createElement('video');
+			video.src = URL.createObjectURL(uploadObj.file);
+			video.onloadeddata = function() {
+				md = {l: video.duration * 1000};
 				mediaLoadDef.resolve();
+			}
 
-				break;
-			case 2: // 影 只要傳s32 timeline是這樣
-				paramObj.s32.file = uploadObj.file;
-				delete paramObj.s3;
+			
+			break;
+		default: 
+		console.log("00000");
+	}
 
-				contentType = "video/mp4";
-
-				// 傳給外部 commit 使用
-				mt = uploadObj.file.type;
-				si = uploadObj.file.size;
-
-				var video = document.createElement('video');
-				video.src = URL.createObjectURL(uploadObj.file);
-				video.onloadeddata = function() {
-					md = {l: video.duration * 1000};
-					mediaLoadDef.resolve();
-				}
-
-				
-				break;
-			default: // 檔案共享
-			console.log("00000");
-		}
-
-		mediaLoadDef.done(function() {
-			$.when.apply($, (Object.keys(paramObj).reduce(function(arr,key,i) {
-					arr[i] = $.ajax({
-						url: paramObj[key].url,
-						type: 'PUT',
-						contentType: contentType,
-					 	data: paramObj[key].file, 
-						processData: false
-					});
-					return arr;
-				},[]))
-			).done(function(data) {
-				allDef.resolve({status: 200, isSuccess: true, data: {
-					fi: s3Obj.fi,
-					mt: mt,
-					si:	si,
-					md:	md
-				}})
-			}).fail(function() {
-				// 上傳s3 失敗
-				allDef.resolve({status: 999, isSuccess: false, data: arguments});
-			});
-		})
-
-		
-	// })
+	mediaLoadDef.done(function() {
+		$.when.apply($, (Object.keys(paramObj).reduce(function(arr,key,i) {
+				arr[i] = $.ajax({
+					url: paramObj[key].url,
+					type: 'PUT',
+					contentType: contentType,
+				 	data: paramObj[key].file, 
+					processData: false
+				});
+				return arr;
+			},[]))
+		).done(function(data) {
+			allDef.resolve({status: 200, isSuccess: true, data: {
+				fi: s3Obj.fi,
+				mt: mt,
+				si:	si,
+				md:	md
+			}})
+		}).fail(function() {
+			// 上傳s3 失敗
+			allDef.resolve({status: 999, isSuccess: false, data: arguments});
+		});
+	})
 
 	return allDef.promise();
 } // end of qmiUploadS3

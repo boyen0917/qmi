@@ -3354,7 +3354,7 @@ img.st-reply-message-attach {
     max-width: 99%;
 	height: 98%;
 	object-fit: contain;
-	border: 1px solid #d2d2d2;
+	/*border: 1px solid #d2d2d2;*/
 }
 
 .st-reply-content img.sticker {

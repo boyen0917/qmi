@@ -680,7 +680,9 @@ $(function(){
 				break;
 
 			default:
-				console.log("else");
+				fileType = "file";
+				fileURL = "images/file_icon.png";
+				deferred.resolve(fileURL);
 		}
 
 		deferred.done(function(dataUrl) {
