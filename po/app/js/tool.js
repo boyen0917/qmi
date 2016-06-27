@@ -465,17 +465,9 @@ qmiUploadFile = function(uploadObj){
 	// USAGE: 
 	// qmiUploadFile({
 	// 	urlAjax: {
-	// 		apiName: "groups/" + thisGi + "/files",
-	// 		method: "post",
-	// 		body: {
-	// 			tp: 1,
-	// 			ti: thisTi,
-	// 			pi: 0,
-	// 			wm: 0 // 浮水印
-	// 		}
+	// 		apiName: "me/avatar",
+	// 		method: "put"
 	// 	},
-	// 	tp: 1,
-	//  hasFi: true,
 	// 	file: thisEvent.find(".st-reply-message-img img")[0],
 	// 	oriObj: {w: 1280, h: 1280, s: 0.7},
 	// 	tmbObj: {w: 480, h: 480, s: 0.6} // ;
