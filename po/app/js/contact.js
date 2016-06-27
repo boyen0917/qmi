@@ -1676,7 +1676,7 @@ function updateInvitePending () {
 				var mem = inviteGuAll[i];
 				var newRow = template.clone();
 				//name
-				newRow.find(".name").html( htmlFormat(mem.nk||"") );
+				newRow.find(".name").html( (mem.nk || "" )._escape() );
 				//phone
 				newRow.find(".phone").text( mem.ik||"" );
 				newRow.data("pn",mem.ik).data("nk",mem.nk).data("gi",gi);

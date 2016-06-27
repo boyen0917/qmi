@@ -15,7 +15,14 @@ var ui,
 
 	
 	//HiCloud
- 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	base_url = "https://ap.qmi.emome.net/apiv1/";
+
+	//local測試 預設開啟console
+	debug_flag = false;
+	if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
+		debug_flag = true;
+		base_url = "https://qaap.qmi.emome.net/apiv1/";
+	};
 
  	// // container riseNotification 一旦換網址就沒了
 
@@ -30,8 +37,7 @@ String.prototype._escape = function(){
 String.prototype.qmiTag = function (tagMember) {
 	var findText = "///;" + tagMember.u + ";///";
 	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
-
-	return this.replace(findText, markTag);
+	return this.replace("///;" + tagMember.u + ";///", "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>");
 }
 
 if( 0==userLang.indexOf("zh") ){
@@ -272,7 +278,7 @@ window.QmiPollingChk = {
 }
 
 window.QmiAjax = function(args){
-
+	// body and method
 	var self = this,
 		ajaxDeferred = $.Deferred(),
 
@@ -706,12 +712,14 @@ g_Qmi_title = "Qmi";
 $("title").html(g_Qmi_title);
 
 MyDeferred = function  () {
-  var myResolve;
+  var myResolve, myReject;
   var myPromise = new Promise(function(resolve, reject){
     myResolve = resolve;
+    myReject = reject;
   });
 
   myPromise.resolve = myResolve;
+  myPromise.reject = myReject;
   return myPromise;
 }
 
@@ -811,7 +819,7 @@ errorResponse = function(data){
 setDebug(debug_flag);
 
 function setDebug(isDebug) {
-  if (isDebug) {
+  if (true) {
     window.cns = {
       log: window.console.log.bind(window.console, '%s: %s'),
       error: window.console.error.bind(window.console, 'error: %s'),

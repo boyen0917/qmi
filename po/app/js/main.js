@@ -658,68 +658,98 @@ $(function(){
 
 	//圖片檔案處理
 	$(document).on('change','.st-reply-message-file',function(e){
-		var file_ori = $(this);
-		if(file_ori[0].files.length>1){
-			toastShow("圖檔最多限制1個");
-			//每次選擇完檔案 就reset input file
-			file_ori.replaceWith( file_ori.val('').clone( true ) );
-			return false;
-		}else{
-			var imageType = /image.*/;
-			$.each(file_ori[0].files,function(i,file){
+		var deferred = $.Deferred(),
+			inputFile = $(this),
+			file = $(this)[0].files[0],
+			matchArr = ["image", "video"],
 
-				if (file.type.match(imageType)) {
-					var this_grid =  file_ori.parent().find(".st-reply-message-img");
-					this_grid.data("type",6);
-					this_grid.html("<div class='img'><img/></div>");
+			fileType = matchArr.find(function(tp){
+				return file.type.match(new RegExp(tp, "g")) instanceof Array;
+			}),
 
-					this_grid.data("file",file);
+			fileURL = URL.createObjectURL(file);
 
-					var reader = new FileReader();
-					reader.onload = function(e) {
-						var img = this_grid.find("div img");
 
-				        img.attr("src",reader.result);
-				        img.css("border", "lightgray 1px solid");
-					}
+		switch(fileType) {
+			case "image":
+				deferred.resolve(fileURL);
+				break;
 
-					reader.readAsDataURL(file);
-				}else{
-					// this_grid.find("div").html('<span>file not supported</span>');
-				}
-			});
+			case "video":
+				getVideoImgUrl(file).done(deferred.resolve)				
+				break;
+
+			default:
+				fileType = "file";
+				fileURL = "images/file_icon.png";
+				deferred.resolve(fileURL);
 		}
+
+		deferred.done(function(dataUrl) {
+			inputFile.parent().find(".st-reply-message-img")
+			.data("file",file).data("type", fileType)
+			.html("<div class='img'><img src='" + dataUrl + "'/></div>");
+
+			//每次選擇完檔案 就reset input file
+			inputFile.replaceWith( inputFile.val('').clone( true ) );
+		});
+
+		return;
+		var file_ori = $(this);
+
+		var imageType = /image.*/;
+		$.each(file_ori[0].files,function(i,file){
+
+			if (file.type.match("image")) {
+				var this_grid =  file_ori.parent().find(".st-reply-message-img");
+				this_grid.data("type",6);
+				this_grid.html("<div class='img'><img/></div>");
+
+				this_grid.data("file",file);
+
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					var img = this_grid.find("div img");
+
+			        img.attr("src",reader.result);
+			        img.css("border", "lightgray 1px solid");
+				}
+
+				reader.readAsDataURL(file);
+			}
+		});
 
 		//每次選擇完檔案 就reset input file
 		file_ori.replaceWith( file_ori.val('').clone( true ) );
 	});
 	
-	//留言ui調整
-	$(document).on("input",".st-reply-message-textarea textarea",function(e){
-		var this_textarea = $(this);
-		// console.log(String.fromCharCode(e.keyCode));
-		// this_textarea.next().html(String.fromCharCode(e.keyCode));
-		// console.log(this_textarea.next().html());
+	// //留言ui調整
+	// $(document).on("input",".st-reply-message-textarea textarea",function(e){
+	// 	var this_textarea = $(this);
+	// 	// console.log(String.fromCharCode(e.keyCode));
+	// 	// this_textarea.next().html(String.fromCharCode(e.keyCode));
+	// 	// console.log(this_textarea.next().html());
 
-		if(this_textarea.height() > 40 && this_textarea.parent().hasClass("adjust")) {
-			this_textarea.parent().removeClass("adjust");
-			this_textarea.addClass("textarea-animated");
-			return false;
-		}
+	// 	if(this_textarea.height() > 40 && this_textarea.parent().hasClass("adjust")) {
+	// 		this_textarea.parent().removeClass("adjust");
+	// 		this_textarea.addClass("textarea-animated");
+	// 		return false;
+	// 	}
 
-		if(!this_textarea.val()){
-			this_textarea.parent().addClass("adjust");
-			this_textarea.removeClass("textarea-animated");
-			return false;
-		}
+	// 	if(!this_textarea.val()){
+	// 		this_textarea.parent().addClass("adjust");
+	// 		this_textarea.removeClass("textarea-animated");
+	// 		return false;
+	// 	}
 
-		setTimeout(function(){
-			if (this_textarea.height() < 40 && !this_textarea.parent().hasClass("adjust")) {
-				this_textarea.parent().addClass("adjust");
-				this_textarea.removeClass("textarea-animated");
-			}
-		},201);
-	});
+	// 	setTimeout(function(){
+	// 		if (this_textarea.height() < 40 && !this_textarea.parent().hasClass("adjust")) {
+	// 			this_textarea.parent().addClass("adjust");
+	// 			this_textarea.removeClass("textarea-animated");
+	// 		}
+	// 	},201);
+	// });
+
 
 	//留言ui調整
 	$(document).on("input mouseup",".st-reply-highlight-container",function(e){
@@ -930,7 +960,6 @@ $(function(){
 			replyDom.find(".tag-members-container").hide();
 		}
 	})
-
 
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){
