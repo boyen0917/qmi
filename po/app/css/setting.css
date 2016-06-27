@@ -843,14 +843,15 @@ input[type=radio] {
 .avatar-preview{
 	margin: 20px auto;
   	width: 300px;
+  	height: 300px;
   	text-align: center;
 }
-#myCanvas{
+/*#myCanvas{
 	border-radius: 3px;
 }
 #myCanvas1{
 	display: none;
-}
+}*/
 .preview-image{
 	width: 150px;
 	height: 150px;

@@ -18,6 +18,7 @@ systemSetting = function(){
     //預設群組
     var me_dgi = QmiGlobal.auth.dgi;
     //預設置頂自動換頁   
+
     $("#carousel-setting").find("input[value='"+top_timer_ms+"']").attr('checked', true);
     var emptyAut = "images/common/others/empty_img_all_l.png";
     //$('input[name=second]:first').attr('checked', true);
@@ -133,10 +134,12 @@ $(document).ready(function(){
     });
     btnContent.find('.carousel-btn').click(function(){
         //alert(top_timer_ms);
+        
         //var carousel_time = $("input[name$='second']:checked").val();
-        top_timer_ms = $("input[name$='second']:checked").val();
+        var carousel_time = $("input[name$='second']:checked").val();
+        top_timer_ms = carousel_time;
         toastShow("變更成功");
-        //$.lStorage('_topTimeMs',carousel_time);
+        $.lStorage('_topTimeMs',carousel_time);
     });
 
     //變更使用者大頭貼
@@ -146,153 +149,37 @@ $(document).ready(function(){
     imgContent.find('.camera-icon').click(function(){
         $('.setting-avatar-file').trigger("click");
     });
-    
-        var canvas_x , canvas_y , mdown_x , mdown_y , mup_x , mup_y , rect_w , rect_h , n_img_w , n_img_h;
-        var paint = false;
-        var img = new Image();
-        var canvas , canvas1 , ctx , ctx1;
-        
+    //選擇圖片
     imgContent.find('.setting-avatar-file').change(function(){
+        var file_ori = $(this);
+        var imageType = /image.*/;
 
-        // var file_ori = $(this);
-        // var imageType = /image.*/;
-
-        // //每次選擇完檔案 就reset input file
-        // //file_ori.replaceWith( file_ori.val('').clone( true ) );
-        // var file = file_ori[0].files[0];
-        // var reader = new FileReader();
-        // if (file.type.match(imageType)) {
-        //     //是否存在圖片           
-        //     QmiGlobal.avatarPopup.init();
-        //     reader.onload = function(e) {
-        //         var img = $(".user-headshot");
-        //         img.attr("src",reader.result);
-        //     }
-        //     reader.readAsDataURL(file);
-        // } else {
-        //     popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
-        // }
-            var file_ori = $(this);
-            var imageType = /image.*/;
-            var image_file = file_ori[0].files[0];
-            var reader = new FileReader();  
-            if (image_file.type.match(imageType)){
-                QmiGlobal.avatarPopup.init();
-
-                canvas =  $('#myCanvas');
-                canvas1 =  $('#myCanvas1');
-                ctx = canvas[0].getContext("2d");
-                ctx1 = canvas1[0].getContext("2d");
-                //canvas mouse event 
-                canvas.mousedown(mouseDownHandler);
-                canvas.mouseup(mouseUpHandler);
-                canvas.mousemove(mouseMoveHandler);
-
-                reader.onload = function(e) {   
-                    img.onload = function(){    
-                    //canvas預設寬高為300
-                    canvas[0].width = 300; 
-                    canvas[0].height = 300;
-                    //等比例縮放
-                    //當(寬 > 高) > canvas寬 寬=canvas寬(canvas寬預設300) 高等比例縮放
-                    //當(寬 > 高) < canvas寬 寬高都設canvas預設寬高
-                    //當(寬 < 高) > canvas高 高=canvas高(canvas高預設300) 寬等比例縮放
-                    //當(寬 < 高) < canvas高 寬高都設canvas預設寬高
-                        if (img.width >= img.height) {
-                            if (img.width > canvas[0].width) {
-                                n_img_w = canvas[0].width;
-                                n_img_h = img.height*canvas[0].width/img.width;
-                                canvas[0].height = n_img_h;
-                            } else {
-                                n_img_w = canvas[0].width;
-                                n_img_h = canvas[0].height;
-                            }
-                        } else {
-                            if (img.height > canvas[0].height) {
-                                n_img_w = img.width*canvas[0].height/img.height;
-                                n_img_h = canvas[0].height;
-                                canvas[0].width = n_img_w;
-                            }else {
-                                n_img_w = canvas[0].width;
-                                n_img_h = canvas[0].height;
-                            }
-                        }
-                        draw();
-                    }       
-                    img.src = reader.result;
-                }
-            reader.readAsDataURL(image_file);
-            } else {
-                popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
+        //每次選擇完檔案 就reset input file
+        //file_ori.replaceWith( file_ori.val('').clone( true ) );
+        var file = file_ori[0].files[0];
+        
+        if (file.type.match(imageType)) {
+            //是否存在圖片
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                var img = $(".user-headshot");
+                //調整長寬
+                //img.load(function() {
+                //var w = img.width();
+                //var h = img.height();
+                //mathAvatarPos(img,w,h,120);
+                //});
+                // uploadToS3(file,"/me/avatar",ori_arr,tmb_arr,function(chk){
+                // });
+                img.attr("src",reader.result);
             }
+            reader.readAsDataURL(file);
+            QmiGlobal.avatarPopup.init();
+            
+        } else {
+            popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
+        }
     });
-    
-    function draw(){
-            ctx.clearRect(0, 0, canvas[0].width, canvas[0].height);
-            ctx1.clearRect(0, 0, canvas1[0].width, canvas1[0].height);
-            ctx.globalAlpha = 0.4;
-            ctx.drawImage(img , 0 , 0 , n_img_w , n_img_h);   
-    }
-    function mouseMoveHandler(event){
-            // if(paint){
-            // console.log(" mousemove position "+event.clientX+" , "+event.clientY);
-            // }        
-    }
-    function mouseDownHandler(event){
-            draw();
-            mdown_x = event.clientX;
-            mdown_y = event.clientY;
-            console.log(" mousedown position "+mdown_x+" , "+mdown_y);
-            paint = true;
-    }   
-    function mouseUpHandler(event){
-            paint = false;
-            mup_x = event.clientX;
-            mup_y = event.clientY;
-            console.log(" mouseup position "+mup_x+" , "+mup_y);
-
-            //判斷滑鼠圈選圖片範圍起始點
-            var img_x , img_y;
-            //canvas坐標
-            var pos = canvas.offset();
-            w_canvas_x = pos.left; 
-            w_canvas_y = pos.top;
-            console.log(" canvas position "+w_canvas_x+" , "+w_canvas_y);
-
-            if(mup_x < mdown_x && mup_y < mdown_y){
-                img_x = mup_x;
-                img_y = mup_y;
-            } else if(mup_x > mdown_x && mup_y < mdown_y) {
-                img_x = mdown_x;
-                img_y = mup_y;
-            } else if(mup_x < mdown_x && mup_y > mdown_y) {
-                img_x = mup_x;
-                img_y = mdown_y;
-            } else {
-                img_x = mdown_x;
-                img_y = mdown_y;
-            }
-            rect_w = Math.abs(mup_x - mdown_x);
-            rect_h = Math.abs(mup_y - mdown_y);
-            console.log(" width "+rect_w + " height "+ rect_h);
-            var imgData = ctx.getImageData(img_x - w_canvas_x, img_y - w_canvas_y, rect_w, rect_h);
-            //console.log(data);
-            //選取到的圖片範圍調整其透明度
-            for (var i = 0; i < imgData.data.length; i += 4) {
-                //imgData.data[i+0] = 255; RGBA
-                //imgData.data[i+1] = 255;
-                //imgData.data[i+2] = 255;
-                imgData.data[i+3] = 255;
-            }
-
-            canvas1[0].width = rect_w;
-            canvas1[0].height = rect_h;
-            ctx1.clearRect(0, 0, canvas1[0].width, canvas1[0].height);
-            ctx1.putImageData(imgData,0,0);
-            ctx.putImageData(imgData,img_x - w_canvas_x,img_y - w_canvas_y);
-            dataURL = canvas1[0].toDataURL("image/jpeg");  
-            $(".preview-image").attr("src",dataURL);
-    }
 });
 
 //更新使用者名稱
