@@ -811,7 +811,7 @@ errorResponse = function(data){
 setDebug(debug_flag);
 
 function setDebug(isDebug) {
-  if (isDebug) {
+  if (true) {
     window.cns = {
       log: window.console.log.bind(window.console, '%s: %s'),
       error: window.console.error.bind(window.console, 'error: %s'),

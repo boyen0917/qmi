@@ -5442,6 +5442,8 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 if(!val.c) break;
                 //更改網址成連結 
                 val.c = htmlFormat(val.c);
+                if(this_event.data("event-id") === "G00002F00Eb_T0000GQG0Er_E000000C0G1")
+                    window.vc = val.c;
 
                 (function() {
                     var tagRegex = /\/{3};(\w+);\/{3}/g,
