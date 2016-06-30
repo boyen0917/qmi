@@ -87,10 +87,10 @@
 }
 .ga-header{
 	position: fixed;
-	height: 45px;
+	height: 50px;
 	width: -webkit-calc( 100% - 261px );
 	/*border-bottom: 1px solid rgb(57, 148, 232);*/
-	background: rgba(127,127,127,0.5);
+	background: linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 40%, rgba(255,255,255,0) 100%);
 	top: 44px;
 	padding-left: 5px;
 	padding-right: 5px;
@@ -102,12 +102,27 @@
 	height: 100%;
 }
 .ga-header-back img{
-	margin-top: 7px;
-	height: 30px;
-	width:30px;
+	margin-left: 5px;
+	margin-top: 5px;
+	height: 40px;
+	width:40px;
+	cursor: pointer;
 	object-fit: cover;
 }
-.ga-header-done{
+.ga-avatar-photo{
+	/*float: right;*/
+	/*display: inline-block;*/
+	margin-right: 15px;
+	margin-top: 5px;
+	width: 40px;
+	height: 100%;
+	object-fit: contain;
+	cursor: pointer;
+}
+.ga-group-avatar{
+	float: right;
+}
+/*.ga-header-done{
 	color: rgb(187, 187, 187);
 	cursor: default;
 	float: right;
@@ -117,7 +132,7 @@
 .ga-header-done.ready{
 	color: white;
 	cursor: pointer;
-}
+}*/
 
 .ga-content{
 	width: 100%;
@@ -125,8 +140,8 @@
 	height: 100%;
 	/*margin-top: 47px;*/
 	overflow-y: auto;
+	overflow-x: hidden;
 }
-
 .ga-avatar{
 	height: 360px;
 }
@@ -138,36 +153,37 @@
 	z-index: 0;
 	position: absolute;
 }*/
-
+.setting-group-avatar{
+	display: none;
+}
 .ga-avatar-img, .ga-avatar-img.default{
 	height: 370px;
 	object-fit: cover;
 	display: block;
 	margin: auto;
 }
-
 .ga-avatar-img.default {
 	width: 100%;
 }
-
-
 .ga-avatar-img.group-pic{
 	display: none;
 }
 .ga-header-bar{
 	position: absolute;
-	height: 30px;
-	top: 320px;
+	height: 60px;
 	width: -webkit-calc( 100% - 40px );
 	padding: 10px 20px;
 	white-space: nowrap;
+	text-align: center;
+	background-color: rgba(0,0,0,0.3);
 }
-@media screen and (min-width: 0px) and (max-width: 799px){
+@media screen and (min-width: 0px) and (max-width: 899px){
 	.ga-avatar, .ga-avatar-img, .ga-avatar-img.default{
-		height: 360px;
+		height: 350px;
+    	width: 100%;
 	}
 	.ga-header-bar{
-		top: 311px;
+		top: 270px;
 	}
 }
 @media screen and (min-width: 900px){
@@ -179,44 +195,69 @@
 	.ga-avatar-img, .ga-avatar-img.default{
 		height: 450px;
 		max-width: 650px;
-		margin-left: -webkit-calc( 50% - 325px );
+		/*margin-left: -webkit-calc( 50% - 325px );*/
 	}
 	.ga-header-bar{
-		top: 400px;
+		top: 370px;
 	}
 }
-
 .ga-header-bar.bgColor{
 	background: rgba(127,127,127,0.5);
 }
-.ga-avatar-name{
-	display: inline-block;
-	font-size: 24px;
-	/*width: 80%;*/
+.notadmin{
+	display: none;
+}
+.ga-gr-content{
+	margin-bottom: 5px;
+}
+.ga-gr-content.edit{
+	display: none;
+}
+.ga-group-name{
+	font-size: 20px;
+	display: inline;
 	color: white;
+	/*width: 80%;*/
 }
-.ga-avatar-photo{
-	/*display: inline-block;*/
-	float: right;
-	width: 30px;
-	height: 100%;
-	object-fit: contain;
-	/*margin-right: 10px;*/
-	cursor: pointer;
+.ga-icon{
+	position: relative;
+    left: 20px;
+    top: 3px;
+	width: 20px;
 }
-
+.ga-group-type-name{
+	display: inline-block;
+	margin-right: 30px;
+	color: #ccc;
+}
+.ga-group-id{
+	display: inline-block;
+	color: #ccc;
+}
 .ga-info{
-	margin: 15px;
+	margin: 35px 55px;
 }
 .ga-info-row{
-	height: 60px;
+	max-width: 600px;
+	margin: 0 auto;
+}
+.ga-info-row.edit{
+	display: none;
 }
 .ga-info-row .title{
-	line-height: 24px;
+	line-height: 30px;
 	height: 24px;
 	color: #7d8795;
+	margin-bottom: 10px;
+	display: inline;
 }
-.ga-info-row .content{
+.ga-group-des{
+	line-height: 24px;
+	color: #555;
+	min-height: 24px;
+	width: 100%;
+}
+/*.ga-info-row .content{
 	margin-left: 20px;
 	margin-right: 20px;
 	line-height: 24px;
@@ -224,12 +265,12 @@
 	border-bottom: 1px solid rgb(229,234,237);
 	min-height: 24px;
 	width: -webkit-calc( 100% - 40px);
-}
-.ga-info-row textarea.content, .ga-info-row input.content{
+	width: 100%;
+}*/
+/*.ga-info-row textarea.content, .ga-info-row input.content{
 	border-bottom: 1px solid rgb(229,234,237);
-	border-radius: 5px;
+	border-radius: 3px;
 	border: none;
-	/*padding: 5px;*/
 	resize: none;
 	overflow: auto;
 	font-size: 16px;
@@ -249,7 +290,7 @@
 	line-height: 18px;
 	height: 12px;
 	margin-top: 0px;
-}
+}*/
 
 /* user menu content */
 .sm-person-info-area{
@@ -309,7 +350,7 @@
 	width: 250px;
 	background: white;
 	border-radius: 3px;
-	box-shadow: 1px 1px 5px #ccc;
+	box-shadow: 1px 1px 3px #ccc;
 }
 .sm-person-info .sm-info {
 	cursor: pointer;

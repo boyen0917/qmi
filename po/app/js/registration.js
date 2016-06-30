@@ -334,8 +334,8 @@ onCheckVersionDone = function(needUpdate){
 
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
+        
         //個人頭像
-
         userInfoGetting();
        
 

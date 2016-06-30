@@ -1,3 +1,114 @@
+$(document).ready(function(){
+    
+    var btnContent = $(".btn-content");
+    var imgContent = $(".image-content");
+
+    $('.userSetting-btn').click(function(){
+        userInfoUpdate();
+    });
+    // password送出
+    btnContent.find('.password-btn').click(function(){
+        passwordChange(); 
+    });
+    // 預設團體送出
+    btnContent.find('.default-group-btn').click(function(){
+        defaultGroupSetting();
+    });
+    //預設置頂時間送出
+    btnContent.find('.carousel-btn').click(function(){
+        var carousel_time = $("input[name$='second']:checked").val();
+        top_timer_ms = carousel_time;
+        toastShow("變更成功");
+        $.lStorage('_topTimeMs',carousel_time);
+    });
+    //變更使用者大頭貼
+    imgContent.find('.user-avatar-img').click(function(){
+        $('.setting-avatar-file').trigger("click");
+    });
+    imgContent.find('.camera-icon').click(function(){
+        $('.setting-avatar-file').trigger("click");
+    });
+    //選擇圖片
+    imgContent.find('.setting-avatar-file').change(function(){
+
+        var file_ori = $(this);
+        var imageType = /image.*/;
+        var file = file_ori[0].files[0];
+        //每次選擇完檔案 就reset input file
+        //file_ori.replaceWith( file_ori.val('').clone( true ) );              
+        if (file.type.match(imageType)) {
+            //是否存在圖片
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = $(".user-headshot");
+                //調整長寬
+                //img.load(function() {
+                //var w = img.width();
+                //var h = img.height();
+                //mathAvatarPos(img,w,h,120);
+                //});
+                // uploadToS3(file,"/me/avatar",ori_arr,tmb_arr,function(chk){
+                // });
+                img.attr("src",reader.result);
+            }
+            reader.readAsDataURL(file);
+            QmiGlobal.avatarPopup.init();
+            
+        } else {
+            popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
+        }
+    });
+});
+
+//取得個人資訊*
+userInfoGetting = function(){
+
+    var userInfo = $("#userInfo");
+    var userInformation = $("#userInformation-page");
+    var emailSetting = $("#email-setting");
+
+    new QmiAjax({
+        apiName: "me"
+    }).success(function(data){
+        //console.debug("data",data);
+        //個人資訊 使用者名稱 頭像
+        userInformation.find(".user-avatar-img").attr('src',data.auo).end()//大頭照
+                       .find(".input-username").val(data.nk);//first name
+        //左下角個人資料 使用者名稱 手機 頭像
+        userInfo.find(".user-name").text(data.nk).end()
+                .find(".user-phone").text(data.pn).end()
+                .find(".user-avatar-setting").attr("src",data.aut);
+
+        emailSetting.find("input[name$='user-edit-phone']").val(data.pn);
+        
+    }).error(function(e){
+        console.debug(e.responseText);
+    });
+}
+
+//更新使用者名稱
+userInfoUpdate = function(){
+
+    var username_input = $('.input-username').val();
+    if(username_input == ""){
+        alert('姓名輸入框不可為空');
+    }
+    new QmiAjax({
+        apiName: "me",
+        method: "put",
+        body: {
+            "nk": username_input
+        }
+    }).success(function(data){
+
+        toastShow(data.rsp_msg);
+
+        $(".user-name").text(username_input); 
+    }).error(function(e){
+        console.debug(e.responseText);
+    });
+}
+
 //system setting 系統設定 個人跟團體資料顯示
 systemSetting = function(){
 
@@ -17,38 +128,34 @@ systemSetting = function(){
     var systemGroup = $("#group-setting");
     //預設群組
     var me_dgi = QmiGlobal.auth.dgi;
-    //預設置頂自動換頁   
 
+    //預設置頂自動換頁   
     $("#carousel-setting").find("input[value='"+top_timer_ms+"']").attr('checked', true);
+    
+    //預設團體圖片
     var emptyAut = "images/common/others/empty_img_all_l.png";
-    //$('input[name=second]:first').attr('checked', true);
-    //$("input[name$='group']").attr("checked",me_de_gr);
-    //default-group information
+
+    //預設團體
     new QmiAjax({
         apiName: "groups"
-    }).success(function(test_data){
-        
-        //console.debug("this-is-me",$.lStorage("_loginData"));
-        //$('.group-select').empty();
+    }).success(function(test_data){    
+
         systemGroup.find('.group-option').remove();
-        //console.debug(this_dgi);
+
         for(i=0 ;i<test_data.gl.length; i++){    
-            //var dr = $("<option value="+test_data.gl[i].gi+">"+test_data.gl[i].gn+"</option>");
             //產生團體列表
             var cr = $("<div class='group-option'><input id='"+test_data.gl[i].gi+"' data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'><label for='"+test_data.gl[i].gi+"' class='radiobtn'></label><img class='group-pic' data-gi='"+test_data.gl[i].gi+"' src='"+test_data.gl[i].aut+"'><label for='"+test_data.gl[i].gi+"' class='radiotext'>"+test_data.gl[i].gn+"</label></div>");
             systemGroup.find('.edit-defaultgroup-content').append(cr);
-            //判斷團體縮圖 如果沒有設定預設
+            //判斷團體縮圖 如果沒有設定預設圖片
             if(!test_data.gl[i].aut){
                 $(".group-pic[data-gi='"+test_data.gl[i].gi+"']").attr("src", emptyAut);
             }
-            //$('.group-select').append(dr);
-            //$('.group-select').val(this_dgi);
         } 
         //勾選預設群組
         systemGroup.find('#'+me_dgi).attr('checked', true);   
 
     }).error(function(e){
-        alert("error");
+        console.debug(e.responseText);
     });
 
     // var api_name = "groups";//url
@@ -90,116 +197,6 @@ systemSetting = function(){
     //$('.version-information').text($.lStorage('_ver').ver);//系統資訊顯示
 }
 
-//取得個人資訊*
-userInfoGetting = function(){
-
-    var userInfo = $("#userInfo");
-    var userInformation = $("#userInformation-page");
-    var emailSetting = $("#email-setting");
-
-    new QmiAjax({
-        apiName: "me"
-    }).success(function(data){
-        console.debug("data",data);
-
-        userInformation.find(".user-avatar-img").attr('src',data.auo).end()//大頭照
-                        .find(".input-username").val(data.nk);//first name
-
-        userInfo.find(".user-name").text(data.nk).end()
-                    .find(".user-phone").text(data.pn).end()
-                    .find(".user-avatar-setting").attr("src",data.aut);
-
-        emailSetting.find("input[name$='user-edit-phone']").val(data.pn);
-        
-    }).error(function(e){
-        alert("error");
-    });
-}
-
-$(document).ready(function(){
-    //使用者資料修改
-
-    var btnContent = $(".btn-content");
-    var imgContent = $(".image-content");
-
-    $('.userSetting-btn').click(function(){
-        userInfoUpdate();
-    });
-    // password送出
-    btnContent.find('.password-btn').click(function(){
-        passwordChange(); 
-    });
-    btnContent.find('.default-group-btn').click(function(){
-        defaultGroupSetting();
-    });
-    btnContent.find('.carousel-btn').click(function(){
-        //alert(top_timer_ms);
-        
-        //var carousel_time = $("input[name$='second']:checked").val();
-        var carousel_time = $("input[name$='second']:checked").val();
-        top_timer_ms = carousel_time;
-        toastShow("變更成功");
-        $.lStorage('_topTimeMs',carousel_time);
-    });
-
-    //變更使用者大頭貼
-    imgContent.find('.user-avatar-img').click(function(){
-        $('.setting-avatar-file').trigger("click");
-    });
-    imgContent.find('.camera-icon').click(function(){
-        $('.setting-avatar-file').trigger("click");
-    });
-    //選擇圖片
-    imgContent.find('.setting-avatar-file').change(function(){
-        var file_ori = $(this);
-        var imageType = /image.*/;
-
-        //每次選擇完檔案 就reset input file
-        //file_ori.replaceWith( file_ori.val('').clone( true ) );
-        var file = file_ori[0].files[0];
-        
-        if (file.type.match(imageType)) {
-            //是否存在圖片
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                var img = $(".user-headshot");
-                //調整長寬
-                //img.load(function() {
-                //var w = img.width();
-                //var h = img.height();
-                //mathAvatarPos(img,w,h,120);
-                //});
-                // uploadToS3(file,"/me/avatar",ori_arr,tmb_arr,function(chk){
-                // });
-                img.attr("src",reader.result);
-            }
-            reader.readAsDataURL(file);
-            QmiGlobal.avatarPopup.init();
-            
-        } else {
-            popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
-        }
-    });
-});
-
-//更新使用者名稱
-userInfoUpdate = function(){
-    var username_input = $('.input-username').val();
-    if(username_input == ""){
-        alert('姓名輸入框不可為空');
-    }
-    new QmiAjax({
-        apiName: "me",
-        method: "put",
-        body: {
-            "nk": username_input
-        }
-    }).success(function(data){
-        $(".user-name").text(username_input);
-        toastShow(data.rsp_msg);
-    });
-}
-
 // 變更密碼
 passwordChange = function(){
         //$("input[name$='user-edit-o-password']").val()
@@ -207,11 +204,11 @@ passwordChange = function(){
         var fill = true;//空值判定
 
         var old_password = {
-            "pw":toSha1Encode(pwSetting.find("input[name$='o-password']").val())
+            "pw" : toSha1Encode(pwSetting.find("input[name$='o-password']").val())
         };
         var verify_password = {
-             "op":toSha1Encode(pwSetting.find("input[name$='o-password']").val()),
-             "up":toSha1Encode(pwSetting.find("input[name$='n-password']").val())
+             "op" : toSha1Encode(pwSetting.find("input[name$='o-password']").val()),
+             "up" : toSha1Encode(pwSetting.find("input[name$='n-password']").val())
         };
 
         pwSetting.find(".input-password").each(function(i,val){
@@ -241,14 +238,17 @@ passwordChange = function(){
                             method : "put"
                         }).success(function(verify_data){
                             toastShow(verify_data.rsp_msg);
-                            console.debug(verify_data);
+                            //console.debug(verify_data);
+                            QmiGlobal.auth.at = verify_data.at;
                             at = verify_data.at;
+                            pwSetting.find(".input-password").val("");
                         }).error(function(e){
                             popupShowAdjust(e.rsp_msg);
                         });
                     } else {
                         popupShowAdjust("兩次密碼不符 請再輸入一次", "" ,true);
                         pwSetting.find("input[name$='v-password']").val("");
+                        //$.i18n.getString("LOGIN_FORGETPASSWD_NOT_MATCH")
                     }
                 }
             }).error(function(e){
@@ -315,6 +315,7 @@ defaultGroupSetting = function(){
         apiName : "groups/"+new_dgi+"/default",
         type: "put"
     }).success(function(data){
+
         toastShow(data.rsp_msg);
 
         QmiGlobal.auth.dgi = new_dgi;

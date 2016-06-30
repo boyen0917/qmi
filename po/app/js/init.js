@@ -15,6 +15,7 @@ var ui,
 
 
 	//HiCloud
+
 	//base_url = "https://ap.qmi.emome.net/apiv1/";
 
 
@@ -37,8 +38,7 @@ String.prototype._escape = function(){
 String.prototype.qmiTag = function (tagMember) {
 	var findText = "///;" + tagMember.u + ";///";
 	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
-
-	return this.replace(findText, markTag);
+	return this.replace("///;" + tagMember.u + ";///", "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>");
 }
 
 
@@ -256,14 +256,16 @@ window.QmiGlobal = {
         init : function(){
         	var sysPopup = $(this.html);
         	$("body").append(sysPopup);
-        	$("#systemPopup").click(function(){
+        	var systemPopup = $("#systemPopup");
+        	systemPopup.click(function(){
         		$(".sm-person-area-r").find("img").toggle();
         		sysPopup.remove();
         	});
         	sysPopup.find(".sm-info-hr").click(function(e) {
 	 			e.stopPropagation();
 			});
-			$(".sm-person-info").on("click",".system-logout",function(){
+			//登出
+			systemPopup.find(".system-logout").click(function(){
 				// popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
 				new QmiGlobal.popup({
 					desc: $.i18n.getString("SETTING_DO_LOGOUT"),
@@ -289,57 +291,47 @@ window.QmiGlobal = {
 		        '</div>',
 		init : function(){
 			var imgPopup = $(this.html);
-        	$("body").append(imgPopup); 
-        	$('.user-avatar-confirm').fadeIn();
+        	$("body").append(imgPopup);
+        	var userAvatar = $('.user-avatar-confirm');
+        	userAvatar.fadeIn();
         	//儲存圖片
-        	$('.avatar-save').click(function(){
+        	userAvatar.find('.avatar-save').click(function(){
+
+        		// USAGE: 
+				qmiUploadFile({
+					urlAjax: {
+						apiName: "me/avatar",
+						method: "put"
+					},
+					file: userAvatar.find(".user-headshot")[0],
+					oriObj: {w: 1280, h: 1280, s: 0.7},
+					tmbObj: {w: 480, h: 480, s: 0.6},
+					tp: 1 // ;
+				}).done(function(data) {
+					console.log("finish", data);
+					toastShow(data.data.rsp_msg);
+				});
+
         		var reader = new FileReader();
         		var file_ori = $('.setting-avatar-file');
         		var image_file = file_ori[0].files[0];
         		reader.onload = function(e) {
 		            var img = $(".user-avatar-img");
 		            img.attr("src",reader.result);
+		            $("#userInfo").find(".user-avatar-setting").attr("src",reader.result);
 		        }
-		        reader.readAsDataURL(image_file);
+		        reader.readAsDataURL(image_file);        
+
 		        imgPopup.remove();
-        		$(".user-avatar-confirm").fadeOut();
+        		userAvatar.fadeOut();
 		    });
         	//取消
         	$('.cancel-btn').click(function(){
         		imgPopup.remove();
-		        $(".user-avatar-confirm").fadeOut();
+		        userAvatar.fadeOut();
 		    });
 		}
 	}
-
-	// systemPopup: {
-	// 	html: '<section id="systemPopup"><div class="sm-person-info" style="display: block;">
- //                                    <div class="sm-info-hr">帳號</div>
- //                                    <div data-sm-act="user-setting" class="sm-info sm-small-area">個人資訊</div>
- //                                    <div class="sm-info-hr">系統</div>
- //                                    <div data-sm-act="system-setting" class="sm-info sm-small-area">設定</div>
- //                                    <div class="sm-info">關於Qmi</div>
- //                                    <div class="sm-info">登出</div>
- //                            </div></section>',
-
- //    	init: function() {
- //    		var popup = $(this.html);
- //    		$("body").append(popup);
-
- //    		$("#systemPopup").click(function() {
- //    			$("#systemPopup").remove()
- //    		});
-
-
-	// 		popup.find(".sm-person-info").click(function(e) {
-	// 			e.stopPropagation();
-
-
-	// 		})
-
- //    		popup.remove();
- //    	}
-	// }
 
 };
 
@@ -378,7 +370,7 @@ window.QmiPollingChk = {
 }
 
 window.QmiAjax = function(args){
-
+	// body and method
 	var self = this,
 		ajaxDeferred = $.Deferred(),
 
@@ -812,12 +804,14 @@ g_Qmi_title = "Qmi";
 $("title").html(g_Qmi_title);
 
 MyDeferred = function  () {
-  var myResolve;
+  var myResolve, myReject;
   var myPromise = new Promise(function(resolve, reject){
     myResolve = resolve;
+    myReject = reject;
   });
 
   myPromise.resolve = myResolve;
+  myPromise.reject = myReject;
   return myPromise;
 }
 
@@ -917,7 +911,7 @@ errorResponse = function(data){
 setDebug(debug_flag);
 
 function setDebug(isDebug) {
-  if (isDebug) {
+  if (true) {
     window.cns = {
       log: window.console.log.bind(window.console, '%s: %s'),
       error: window.console.error.bind(window.console, 'error: %s'),

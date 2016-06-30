@@ -986,12 +986,12 @@
                 </select> -->
                 <div class="edit-defaultgroup-content">
                     <div class="system-title">預設團體</div>
-                                                <!-- <div class='group-option'>
-                                                    <input data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'>
-                                                    <label for='' class='radiobtn'></label>
-                                                    <img src=''>
-                                                    <label for='' class='radiotext'>"+test_data.gl[i].gn+"</label>
-                                                </div> -->
+                        <!-- <div class='group-option'>
+                            <input data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'>
+                            <label for='' class='radiobtn'></label>
+                            <img src=''>
+                            <label for='' class='radiotext'>"+test_data.gl[i].gn+"</label>
+                        </div> -->
                 </div> 
                 <div class="btn-content">
                     <button class="default-group-btn btn-b" data-role="none">完成</button>
@@ -1059,39 +1059,70 @@
                                         <!-- <img class="ga-avatar-img default" src="images/common/others/name_card_nophoto_profile.png"/> -->
                                         <img class="ga-avatar-img polling-group-pic-o currentGroup"/>
                                         <img class="ga-avatar-img upload"/>
-                                        <div class="ga-header-bar">
+                                        <!-- <div class="ga-header-bar">
                                             <div class="ga-avatar-name general polling-group-name currentGroup"></div>
                                             <img class="ga-avatar-photo admin" src="images/common/icon/bt_camera_nornal.png"/>
+                                        </div> -->
+                                        <div class="ga-header-bar">
+                                                <div class="ga-gr-content view">
+                                                    <div class="ga-group-name">一般團體test12123131</div>
+                                                    <img id="icon-view-gname" class="ga-icon admin" src="images/icon/bt_personal_edit_activity.png">
+                                                </div>
+                                                <div class="ga-gr-content edit">
+                                                    <div class="ga-group-name">一般團體test12123131</div>
+                                                    <img id="icon-edit-gname" class="ga-icon edit" src="images/icon/icon_compose_post.png">
+                                                </div>
+                                                <div class="ga-group-type-name">一般團體</div>
+                                                <div class="ga-group-id">ID : 4498</div>  
                                         </div>
-                                        <input type="file" style="display:none" data-role="none">
+                                        <input type="file" class="setting-group-avatar" data-role="none" accept="image/*">
                                     </div>
-                                    <div class="ga-info view">
+
+                                    <div class="ga-info">
+                                        <div class="ga-info-row view" data-type="info">
+                                            <div class="title" data-textid="GROUP_ABOUT"></div>
+                                            <img id="icon-view-gdes" class="ga-icon admin" src="images/icon/bt_personal_edit_activity.png">
+                                            <div class="ga-group-des"></div>
+                                        </div>
+                                        <div class="ga-info-row edit" data-type="info">
+                                            <div class="title" data-textid="GROUP_ABOUT"></div>
+                                            <img id="icon-edit-gdes" class="ga-icon edit" src="images/icon/icon_compose_post.png">
+                                            <textarea class="ga-group-des content autoHeight" data-textph-id="GROUP_ABOUT_ALERT" maxLength="300" data-role="none"></textarea>
+                                        </div>
+                                    </div>
+                                   
+                                    <!-- <div class="ga-info view">
                                         <div class="ga-info-row admin" data-type="name">
                                             <div class="title" data-textid="GROUP_GROUP_NAME"></div>
                                             <div class="content polling-group-name currentGroup"></div>
                                         </div>
                                         <div class="ga-info-row" data-type="info">
                                             <div class="title" data-textid="GROUP_ABOUT"></div>
+                                            <img class="ga-icon-host" src="images/icon/icon_admin.png">
                                             <div class="content polling-group-description currentGroup"></div>
                                         </div>
-                                    </div>
-                                    <div class="ga-info edit">
+                                    </div> -->
+                                    <!-- <div class="ga-info edit">
                                         <div class="ga-info-row" data-type="name">
                                             <div class="title" data-textid="GROUP_GROUP_NAME"></div>
                                             <input class="content" data-textph-id="GROUP_NAME_LIMIT" data-role="none"/>
                                         </div>
                                         <div class="ga-info-row" data-type="info">
                                             <div class="title" data-textid="GROUP_ABOUT"></div>
+                                            <img class="ga-icon-host" src="images/icon/icon_admin.png">
                                             <textarea class="content autoHeight" data-textph-id="GROUP_ABOUT_ALERT" maxLength="300" data-role="none"></textarea>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div class="ga-header">
                                     <div class="ga-header-back">
                                         <img src="images/navi/navi_icon_back.png"/>
                                     </div>
                                     <div class="ga-header-title"></div>
-                                    <div class="ga-header-done" data-textid="COMMON_DONE"></div>
+                                    <div class="ga-group-avatar">
+                                        <img class="ga-avatar-photo admin" src="images/common/icon/bt_camera_nornal.png"/>
+                                    </div>
+                                    <!-- <div class="ga-header-done" data-textid="COMMON_DONE"></div> -->
                                 </div>
                             </div>
                         </div>
