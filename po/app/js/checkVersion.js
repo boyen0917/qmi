@@ -39,7 +39,7 @@ $(function(){
 
 		 			cns.debug( "old:", g_currentContainerVersion, "new:", getS3_result.av );
 			    	if( versionCompare(g_currentContainerVersion, getS3_result.av)>0 ){
-			    		console.debug("need update container ver");
+			    		cns.debug("need update container ver");
 			    		// $(".version_update_lock").fadeIn();
 			    		onDone(true);
 			    		popupShowAdjust(
@@ -48,13 +48,13 @@ $(function(){
 			    			$.i18n.getString("COMMON_OK"),null,[onClickDownload]);
 			    	} else {
 			    		onDone(false);
-			    		console.debug("latest container ver", g_currentContainerVersion);
+			    		cns.debug("latest container ver", g_currentContainerVersion);
 			    	}
 		    // 	}
 		    // });
     	} catch(e){
 			$("#container_version span.container").html("0.0.0");
-    		console.debug("ignore container ver", e.stack);
+    		cns.debug("ignore container ver", e.stack);
     		onDone(false);
     		// onDone(true);
     		// $(".container_update_lock").show();
@@ -92,29 +92,16 @@ $(function(){
 		}
 
     	link.attr("href",downloadPath).trigger("click");
-    	console.debug("download clicked");
+    	cns.debug("download clicked");
     	try{
 	    	require('nw.gui').App.quit();
 	    } catch(e){
-	    	console.debug(e.stack);
+	    	cns.debug(e.stack);
 	    }
     }
 
     checkWebVersion = function( onDone ){
 
-    // 	if( (typeof clearCache != 'function')|| 'undefined'==lang ){
-    // 		console.debug("clearCache",typeof clearCache, "lang", typeof lang );
-    // 		try{
-	   //  		var gui = require('nw.gui');
-	   //  		gui.App.clearCache();
-	   //  		gui.Window.get().reload();
-	   //  		console.debug("update successed");
-	   //  		return true;
-				// // alert("clear cache 1 succ");
-	   //  	} catch(e){
-	   //  		console.debug(e.stack);
-	   //  	}
-	   //  } else{
 	    	try{
 			    var versionData = $.lStorage("_ver");
 			    if( null==versionData || null==versionData.ver ){
@@ -122,25 +109,27 @@ $(function(){
 			    } else {
 			    	g_currentVersion = versionData.ver;
 			    }
-				$("#container_version span.web").html("("+g_currentVersion+")");
 
-	        	new AjaxTransfer().execute({
-	        		url: "sys/version?"+new Date().getTime(), //add current to prevent cache
-	        		headers: {
+
+				$("#container_version span.web").html("("+g_currentVersion+")");
+	        	new QmiAjax({
+	        		url: base_url + "sys/version?" + new Date().getTime(), //add current to prevent cache
+	        		noAuth: true,
+	        		specifiedHeaders: {
 		    			os: 2,
 						tp: 0,
 						av: g_currentVersion,
 						li: lang
 					},
 	        		method: "get",
-	        		err_hide: true
+	        		errHide: true
 	        	}).complete(function(data){
 		        	if(data.status == 200){
 		        		var getS3_result =$.parseJSON(data.responseText);
 
 				    	if( g_currentVersion != getS3_result.av && typeof(require)!="undefined" ){
 	        				g_currentVersion = getS3_result.av;
-				    		console.debug("update ver to ", g_currentVersion);
+				    		cns.debug("update ver to ", g_currentVersion);
 				    		$.lStorage("_ver",{ver:g_currentVersion});
 				    		$(".version_update_lock").fadeIn();
 				    		onDone(true);
@@ -152,25 +141,25 @@ $(function(){
 				    		}, 1000 );
 				    	} else {
 				    		onDone(false);
-				    		console.debug("latest ver", g_currentVersion, getS3_result.av);
+				    		cns.debug("latest ver", g_currentVersion, getS3_result.av);
 				    	}
 		        	} else {
-						console.debug("fail to get version");
+						cns.debug("fail to get version");
 						onDone(false);
 					}
 		        });
 		    } catch(e){
-		    	console.debug(e.stack);
+		    	cns.debug(e.stack);
 		    	try{
 		    		var gui = require('nw.gui');
 		    		gui.App.clearCache();
 		    		gui.Window.get().reload();
-		    		console.debug("update successed");
+		    		cns.debug("update successed");
 		    		onDone(false);
 		    		return true;
 					// alert("clear cache 1 succ");
 		    	} catch(e){
-		    		console.debug(e.stack);
+		    		cns.debug(e.stack);
 		    		onDone(false);
 		    	}
 		    }

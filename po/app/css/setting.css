@@ -87,10 +87,10 @@
 }
 .ga-header{
 	position: fixed;
-	height: 45px;
+	height: 50px;
 	width: -webkit-calc( 100% - 261px );
 	/*border-bottom: 1px solid rgb(57, 148, 232);*/
-	background: rgba(127,127,127,0.5);
+	background: linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 40%, rgba(255,255,255,0) 100%);
 	top: 44px;
 	padding-left: 5px;
 	padding-right: 5px;
@@ -102,12 +102,27 @@
 	height: 100%;
 }
 .ga-header-back img{
-	margin-top: 7px;
+	margin-left: 5px;
+	margin-top: 10px;
 	height: 30px;
 	width:30px;
+	cursor: pointer;
 	object-fit: cover;
 }
-.ga-header-done{
+.ga-avatar-photo{
+	/*float: right;*/
+	/*display: inline-block;*/
+	margin-right: 15px;
+	margin-top: 10px;
+	width: 30px;
+	height: 100%;
+	object-fit: contain;
+	cursor: pointer;
+}
+.ga-group-avatar{
+	float: right;
+}
+/*.ga-header-done{
 	color: rgb(187, 187, 187);
 	cursor: default;
 	float: right;
@@ -117,16 +132,16 @@
 .ga-header-done.ready{
 	color: white;
 	cursor: pointer;
-}
+}*/
 
 .ga-content{
 	width: 100%;
 	position: absolute;
 	height: 100%;
 	/*margin-top: 47px;*/
-	overflow-y: scroll;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
-
 .ga-avatar{
 	height: 360px;
 }
@@ -138,36 +153,37 @@
 	z-index: 0;
 	position: absolute;
 }*/
-
+.setting-group-avatar{
+	display: none;
+}
 .ga-avatar-img, .ga-avatar-img.default{
 	height: 370px;
 	object-fit: cover;
 	display: block;
 	margin: auto;
 }
-
 .ga-avatar-img.default {
 	width: 100%;
 }
-
-
 .ga-avatar-img.group-pic{
 	display: none;
 }
 .ga-header-bar{
 	position: absolute;
-	height: 30px;
-	top: 320px;
+	height: 60px;
 	width: -webkit-calc( 100% - 40px );
 	padding: 10px 20px;
 	white-space: nowrap;
+	text-align: center;
+	background-color: rgba(0,0,0,0.6);
 }
-@media screen and (min-width: 0px) and (max-width: 799px){
+@media screen and (min-width: 0px) and (max-width: 899px){
 	.ga-avatar, .ga-avatar-img, .ga-avatar-img.default{
-		height: 360px;
+		height: 350px;
+    	width: 100%;
 	}
 	.ga-header-bar{
-		top: 311px;
+		top: 270px;
 	}
 }
 @media screen and (min-width: 900px){
@@ -179,44 +195,96 @@
 	.ga-avatar-img, .ga-avatar-img.default{
 		height: 450px;
 		max-width: 650px;
-		margin-left: -webkit-calc( 50% - 325px );
+		/*margin-left: -webkit-calc( 50% - 325px );*/
 	}
 	.ga-header-bar{
-		top: 400px;
+		top: 370px;
 	}
 }
-
 .ga-header-bar.bgColor{
 	background: rgba(127,127,127,0.5);
 }
-.ga-avatar-name{
-	display: inline-block;
-	font-size: 24px;
-	/*width: 80%;*/
-	color: white;
+.notadmin{
+	display: none;
 }
-.ga-avatar-photo{
-	/*display: inline-block;*/
-	float: right;
-	width: 30px;
-	height: 100%;
-	object-fit: contain;
-	/*margin-right: 10px;*/
-	cursor: pointer;
+.ga-gr-content{
+	margin-bottom: 5px;
+}
+.ga-gr-content.edit{
+	display: none;
+}
+.ga-group-name{
+	font-size: 20px;
+	display: inline;
+	color: white;
+	width: 200px;
+	/*width: 80%;*/
+}
+input.ga-group-name{
+	color: white;
+	background-color: rgba(0,0,0,0);
+    border-radius: 3px;
+    padding: 3px;
+    text-align: center;
+    border-radius: 3px;
+	border-bottom: 1px solid #cccccc;
+	padding: 3px;
 }
 
+.ga-icon{
+	position: relative;
+    left: 20px;
+    top: 3px;
+	width: 20px;
+	cursor: pointer;
+}
+.ga-group-type-name{
+	display: inline-block;
+	margin-right: 30px;
+	color: #ccc;
+}
+.ga-group-id{
+	display: inline-block;
+	color: #ccc;
+}
 .ga-info{
-	margin: 15px;
+	margin: 35px 55px;
 }
 .ga-info-row{
-	height: 60px;
+	max-width: 600px;
+	margin: 0 auto;
+}
+.ga-info-row.edit{
+	display: none;
 }
 .ga-info-row .title{
-	line-height: 24px;
+	line-height: 30px;
 	height: 24px;
 	color: #7d8795;
+	margin-bottom: 10px;
+	display: inline;
 }
-.ga-info-row .content{
+.ga-group-des{
+	padding: 3px;
+	color: #555;
+	font-size: 14px;
+	line-height: 24px;
+    letter-spacing: 1px;
+    word-spacing: 2px;
+	min-height: 24px;
+	width: 100%;
+	word-wrap: break-word;
+}
+textarea.ga-group-des{
+	border: none;
+	resize: none;
+	height: 100px;
+	word-spacing: -2px;
+	border-radius: 3px;
+	border: 1px solid #cccccc;
+}
+
+/*.ga-info-row .content{
 	margin-left: 20px;
 	margin-right: 20px;
 	line-height: 24px;
@@ -224,12 +292,12 @@
 	border-bottom: 1px solid rgb(229,234,237);
 	min-height: 24px;
 	width: -webkit-calc( 100% - 40px);
-}
-.ga-info-row textarea.content, .ga-info-row input.content{
+	width: 100%;
+}*/
+/*.ga-info-row textarea.content, .ga-info-row input.content{
 	border-bottom: 1px solid rgb(229,234,237);
-	border-radius: 5px;
+	border-radius: 3px;
 	border: none;
-	/*padding: 5px;*/
 	resize: none;
 	overflow: auto;
 	font-size: 16px;
@@ -249,4 +317,653 @@
 	line-height: 18px;
 	height: 12px;
 	margin-top: 0px;
+}*/
+
+/* user menu content */
+.sm-person-info-area{
+	position: relative;
+	cursor: pointer;
+	height: 60px;
 }
+.sm-person-area-l{
+	float:left;
+	height: 40px;
+	width: 40px;
+	padding: 10px;
+}
+.sm-person-area-l img{
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 3px;
+}
+.sm-person-area-m{
+	float: left;
+    padding: 12px 0px 0px 3px;
+    outline: 0!important;
+    font-size: 14px;
+}
+.sm-person-area-m div:first-child{
+	width: 137px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    color: white;
+}
+.sm-person-area-m div:nth-child(2){
+	font-size: 11px;
+}
+.sm-person-area-r {
+	float: left;
+    height: 15px;
+    width: 15px;
+    padding: 25px 10px;
+}
+.sm-person-area-r img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+#systemPopup{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	z-index: 101;
+}
+.sm-person-info {
+	position: absolute;
+	left: 50px;
+	bottom: 60px;
+	width: 250px;
+	background: white;
+	border-radius: 3px;
+	box-shadow: 1px 1px 3px #ccc;
+}
+.sm-person-info .sm-info {
+	cursor: pointer;
+	font-size: 16px;
+	color: black;
+	font-weight: bold;
+	padding: 6px 14px;
+}
+.sm-person-info .sm-info-hr {
+	cursor: default;
+	font-size: 12px;
+	color: gray;
+	padding-top:10px;
+	padding-left: 10px;
+}
+.sm-person-info .sm-info:last-child {
+	color: #1E7FFB;
+	border-top: 1px solid #ccc;
+	margin-top: 5px;
+	padding: 8px 14px;
+}
+
+/*user-setting*/
+.subpage-userInformation.main-subpage{
+  margin-top: 20px;
+  padding: 30px;
+}
+.setting-avatar-file{
+	display: none;
+}
+.userSetting-content{
+	max-width: 600px;
+	height: 370px;  
+	background: white;
+	margin:0 auto;
+	color: #555; 
+	border:1px solid #ededed;
+	border-radius: 1px;
+	overflow-y: scroll;
+	box-shadow: 1px 1px 5px #ccc;
+}
+.image-content{
+	max-width: 150px;
+	margin: 30px auto;
+	position: relative;
+	cursor:pointer;
+}
+.user-avatar-img{
+	width: 150px;
+	height: 150px;
+	object-fit:cover;
+  	border-radius: 5px;	
+}
+.camera-icon{
+	width: 30px;
+	height: 30px;
+	right: 8px;
+	bottom: 10px;
+	position: absolute;
+}
+.username-content {
+	max-width: 240px;
+	margin: 10px auto;	
+  	text-align: center;
+}
+.username-content label{
+	display: block;
+	margin-bottom: 6px;
+	margin-left: 10px;
+	text-align: left;
+}
+.username-content input{
+	width: 200px;
+	height: 16px;
+  	padding: 10px;
+  	font-size: 14px;
+  	border-radius: 3px;
+  	border: 1px solid #ccc;
+  	background-color: #EFEEEE;
+}
+.user-btn-content{
+	text-align: center;
+	margin-top: 18px;
+}
+
+/*system-setting*/
+.subpage-systemSetting.main-subpage{
+	margin-top: 40px;
+  	padding: 10px;
+}
+.systemSetting-content{
+	max-width: 530px;
+	height: 100%;  
+	margin: 0 auto;
+}
+.tab-content-l{
+	max-width: 105px;
+    float: left;
+}
+.tab-content-r{
+	max-width: 380px;
+	float: left;
+	padding: 10px;
+	margin-left: 20px; 
+	background: white;
+    border: 1px solid #ededed;
+    border-radius: 3px;
+    box-shadow: 1px 1px 5px #ccc;
+	overflow-y: scroll;
+}
+
+ul.system-tab{
+	padding: 0;
+    margin: 0;
+    list-style: none;
+    text-shadow: 0px 0px 0px white;
+    color: #555;
+}
+
+ul.system-tab li{
+	font-size: 14px;
+	border-radius: 3px;
+	padding: 8px 10px;
+	cursor: pointer;
+}
+
+ul.system-tab li.current-tab{
+	background: #32b3e4;
+	color: white;
+}
+
+.system-tab-content{
+	width: 360px;
+	display: none;
+}
+
+.system-tab-content.current-tab{
+	display: inherit;
+}
+
+.system-title {
+	color: #555;
+  	font-size: 14px;
+}
+/*按鈕*/
+.btn-content{
+	float:right;
+	margin-right: 10px;
+    margin-left: 10px;
+    margin-top: 9px;
+}
+
+.btn-b{
+	width: 75px;
+  	height: 35px;
+  	border-radius: 3px;
+  	border: 0;
+  	color: white;
+  	cursor: pointer;
+  	outline: none;
+  	background: #32b3e4; 
+  	font-weight: bold;
+  	font-size: 12px;
+}
+
+.password-btn{
+    margin-top: -4px;
+}
+
+/*信箱電話更改*/
+.edit-phone-content{
+	border-bottom: 1px solid #ededed;
+	padding: 10px;
+}
+
+.edit-email-content{
+	padding: 10px;
+}
+
+.edit-phone-content input,.edit-email-content input{
+	width: 200px;
+	height: 12px;
+	margin: 10px 0;
+	padding: 10px;
+	border: 1px solid #ccc;
+	font-size: 14px;
+	background-color: #EFEEEE;
+}
+
+/*變更密碼*/
+.edit-password-content{
+	padding: 10px;
+}
+.edit-password-content input{
+	width: 316px;
+	height: 12px;
+	margin: 10px 0;
+	padding: 10px;
+	border: 1px solid #ccc;
+	font-size: 14px;
+	background-color: #EFEEEE;
+}
+
+.edit-defaultgroup-content{
+	height: 500px;
+	overflow-y: scroll; 
+	overflow-x: hidden;
+}
+
+/*系統通知*//*預設團體*//*自動換頁*/
+.notification-option,
+.group-option,
+.carousel-option{
+    height: 50px;
+	border-bottom: 1px solid #ededed;
+	padding: 10px;
+}
+
+/* Checkbox Button Style*/
+input[type=checkbox] {
+    display: none;
+}
+
+.switch{
+	position: relative;
+	display: inline-block;
+	width: 30px;
+    height: 10px;
+    float: right;
+    margin-top: 22px;
+    margin-right: 40px;
+}
+
+.slider{
+	position: absolute;
+	cursor: pointer;
+	top:0;
+	left: 0;
+	right:0;
+	bottom:0;
+	background-color: #ccc;
+	transition: .4s;
+	border-radius: 50px;
+}
+
+.slider:before{
+	position: absolute;
+	content:"";
+	width: 20px;
+	height: 20px;
+	left: -4px;
+	bottom: -4px;
+	background-color: white;
+	transition: .4s;
+	border-radius: 50px;
+	box-shadow: 1px 1px 5px #ccc;
+}
+
+.notification-option input:checked + .slider {
+	background-color: #B3D2F9;
+}
+
+.notification-option input:checked + .slider:before {
+	transform: translateX(20px);
+	background-color: #32b3e4;
+}
+
+.checkboxtext{
+	float: left;
+	cursor: pointer;
+    margin-top: 18px;
+    margin-left: 20px;
+    font-size: 14px;
+}
+
+/* Radio Button Style*/
+input[type=radio] {
+    display: none;
+}
+
+.radiobtn{
+	float:left;
+	display: inline-block;
+    cursor: pointer;
+    position: relative;
+}
+
+.radiobtn:before {
+	content: "";
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	position: absolute;
+	left: 15px;
+	bottom: -37px;
+	background: white;
+	border: 2px solid #32b3e4;
+	border-radius: 50%;
+}
+
+.group-option input[type=radio]:checked + .radiobtn:before,
+.carousel-option input[type=radio]:checked + .radiobtn:before {
+    content: "\2022";
+    color: #32b3e4;
+    font-size: 34px;
+    text-align: center;
+    line-height: 12px;
+}
+
+.group-option img{
+	float:left;
+	display: inline-block;
+	width: 40px;
+	height: 40px;
+	border-radius: 8px;
+	margin-left: 57px;
+    padding: 5px;
+}
+
+.radiotext{
+	float: left;
+	width: 180px;
+	cursor: pointer;
+    margin-top: 18px;
+    margin-left: 20px;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+    
+.radionoimgtext{
+	float: left;
+	cursor: pointer;
+    margin-top: 18px;
+    margin-left: 70px;
+    font-size: 14px;
+}
+
+
+/*
+.user-data-information {
+  width: 100%;
+  border-bottom: #EDEDED 1px solid;
+  background: white;
+  margin-top: 10px;
+}
+
+.bottom-btn{
+	width:500px;
+	height:50px;
+	margin:0 auto;
+	background: white;
+	border:2px solid #ededed;
+	border-radius:1px; 
+}
+
+.save-btn{
+	background:rgb(57, 148, 232); 
+}
+
+.user-setting{
+	width:100%;
+	background: white;
+	margin-top: 15px;
+	margin-bottom: 15px; 
+	border-top: #EDEDED 1px solid;
+  	border-bottom: #EDEDED 1px solid;
+}
+.list-title{
+	float:left; 
+}
+.list-btn{
+	float:right;
+	line-height:6;
+	height: 20px;
+}
+*/
+
+/*密碼變更*/
+/*.password-change-confirm{
+	width: 100%;
+	height:100%;
+	position:absolute;
+	z-index:1600;
+	overflow-y:scroll;
+	background-color: rgba(0, 0, 1, 0.6);
+	display: none; 
+}
+.password-change-content{
+	width: 500px;
+	height: 270px;
+  	background: white;
+  	margin: 17% auto;
+  	position: relative;
+  	border-radius: 6px;
+
+}
+.password-bottom-btn{
+	margin:20px auto;
+	background: white;
+	border-top:2px solid #EDEDED;
+	border-radius:1px;
+}
+.password-btn-content{
+	  margin-top: 33px;
+}
+
+.password-title{
+	color:white;
+	font-size: 20px;
+	margin-left: 11px;
+	float: left;
+}
+
+.password-setting{
+	 height:200px;
+	 line-height: 39px;
+}
+.password-setting ul{
+	  margin-left: 17px;
+  	  padding: 0;
+  	  line-height:43px;
+  	  margin-bottom: 0;
+  	  margin-top: 0;
+}
+.password-setting li{
+	list-style:none;
+	width: 97%;
+  	height: 51px;
+  	font-size: 14px;
+  	color:darkgray; 
+}
+.password-setting li input{
+	width: 281px;
+  	border-radius: 3px;
+  	height: 36px;
+  	background:white; 
+  	border: 1px solid;
+  	border-color: #dcdcdc;
+  	margin-top:5px;
+  	margin-left: 90px;
+  	padding-left: 10px; 
+  	outline: 0;
+
+}
+.input-password{
+	background: ghostwhite;
+}
+.password-submit{
+	width:200px;
+	height:40px;  
+	color:white;
+	background:rgb(57, 148, 232);
+	border-radius:3px;
+	margin-left: 30%;    
+}
+.password-popup{
+	background:rgb(57, 148, 232); 
+}*/
+
+/*預設團體設定*/
+/*.group-setting{
+	height:50px;
+	margin-top:18px; 
+	border-bottom: #EDEDED 1px solid;
+}
+.group-setting select{
+	width:320px;
+	height: 35px;
+  	margin-left: 32px;
+  	outline: 0;
+	-webkit-appearance: menulist-button;
+}*/
+
+/* 通知提醒*/
+/*.notification-setting{
+	height:50px;
+	margin-top:18px; 
+	border-bottom: #EDEDED 1px solid;
+}
+.notification-check{
+	margin-left: 20px;
+}*/
+
+/*自動換頁*/
+/*.carousel-setting{
+	height:50px;
+	margin-top:18px; 
+	border-bottom: #EDEDED 1px solid;
+}
+.carousel-setting select{
+	width:320px;
+	height: 35px;
+  	margin-left: 32px;
+  	outline: 0;
+	-webkit-appearance: menulist-button;
+}*/
+
+/*系統資訊*/
+/*.system-version ,.term_of_service,.right_to_privacy{
+	height:50px;
+	margin-top:18px; 
+	border-bottom: #EDEDED 1px solid;
+}
+.version-information{
+	margin-left: 38px;
+}
+.version-btn-content,.term-btn-content {
+  margin-top: -8px;
+}*/
+
+/* 使用者大頭照變更*/
+
+.user-avatar-confirm{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	z-index: 1600;
+	overflow-y: scroll;
+	background-color: rgba(0, 0, 1, 0.6);
+	-webkit-transform-style: preserve-3d;
+	left: 0;
+	top: 0;
+	display: none; 
+}
+.avatar-content{
+	width: 340px;
+  	background: #fff;
+  	border-radius: 3px;
+  	overflow: hidden;
+  	margin: 10% auto;
+  	position: relative;
+}
+.avatar-preview{
+	margin: 20px auto;
+  	width: 300px;
+  	height: 300px;
+  	text-align: center;
+}
+/*#myCanvas{
+	border-radius: 3px;
+}
+#myCanvas1{
+	display: none;
+}*/
+.preview-image{
+	width: 150px;
+	height: 150px;
+	margin-top: 10px;
+	border-radius: 3px;
+}
+.user-headshot{
+	width: 100%;
+  	height: 100%;
+  	object-fit:cover;
+}
+.avatar-btn-content{
+	text-align: center;
+	margin: 15px 0;
+}
+.cancel-btn,.avatar-save{
+	margin: 0px 10px;
+}
+/*服務條款跟隱私政策*/
+/*.policy{
+	width: 100%;
+	height:100%;
+	position:absolute;
+	z-index:1800;
+	overflow-y:scroll;
+	background-color: rgba(0, 0, 1, 0.6);
+	display: none; 
+}
+.policy-content{
+	width: 500px;
+	height: 600px;
+  	background: white;
+  	margin: 20px auto;
+  	position: relative;
+  	border-radius: 6px;
+}
+.policy-content iframe{
+	display: block;
+  	width: 450px;
+  	height: 98%;
+  	margin: 5vh auto;
+
+}*/

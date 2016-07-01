@@ -111,67 +111,97 @@ showAlertFromDB = function(){
         limit: 20,
         order: "DESC",
         onEnd: function(result){
-            // console.debug("onEnd:",result);
+            // cns.debug("onEnd:",result);
         },
         onError: function(result){
-            // console.debug("onError:",result);
+            // cns.debug("onError:",result);
         }
     });
 }
 
 //打ＡＰＩ更新通知
 updateAlert = function(){
-	if (typeof ui === 'undefined') return;
-	ajaxDo("notices", {
-	    "ui":ui,
-	    "at":at, 
-	    "li":lang,
-	    }, "get", false, null).complete(function(data){
-	    	if( data.status==200){
+	var noticeListArr = [],
+		noticeDefArr = [],
 
-	    		var returnData = $.parseJSON(data.responseText);
+		publicNoticeAjax = new QmiAjax({
+			apiName: "notices",
+			isPublicApi: true,
+			complete: function(data){
+				if(data.status !== 200) return;
 
-				idb_alert_events.getAll(function(DBData){
+				try {
+					noticeListArr = $.parseJSON(data.responseText).nl;
+				} catch(e) {
+					// do something..
+				}
+			}
+		});
 
-					var DBDataObj = {};
-		    		for( var i=0; i<DBData.length; i++){
-		    			if( DBData[i].isRead ){
-		    				DBDataObj[DBData[i].ei+"_"+DBData[i].ntp] = DBData[i].data;
-		    			}
-		    		}
+	// 公雲鈴鐺
+	noticeDefArr.push(publicNoticeAjax);
 
-		    		// var ary = [];
-		    		for( var i=0; i<returnData.nl.length; i++){
-		    			try{
-		    				//ct_ei_ntp
-		    				var obj = {
-								ei: returnData.nl[i].nd.ei,
-								ntp: returnData.nl[i].ntp,
-								ei_ntp: returnData.nl[i].nd.ei+"_"+returnData.nl[i].ntp,
-								data: returnData.nl[i]
-							};
-			    			var key = returnData.nl[i].nd.ei+"_"+returnData.nl[i].ntp;
-			    			//有已讀紀錄, 且ct相同, 表示為同一筆貼文或回文
-			    			if( DBDataObj.hasOwnProperty(key) ){
-			    				if( DBDataObj[key].nd.ct==returnData.nl[i].nd.ct ){
-			    					obj.isRead = true;
-			    					returnData.nl[i].isRead = true;
-			    				}
-			    			}
+	Object.keys(QmiGlobal.clouds).forEach(function(cloudId){
+		var ajaxDef = new QmiAjax({
+			apiName: "notices",
+			ci: cloudId,
+			complete: function(data){
+				if(data.status !== 200) return;
 
-			    			// ary.push(obj);
-			    			idb_alert_events.put(obj);
-			    		} catch(e){
-			    			errorReport(e);
-			    		}
-		    		}
+				try {
+					var resultNl = $.parseJSON(data.responseText).nl;
 
-		    		// idb_alert_events.putBatch(ary, null);
-	    			showAlertContent(returnData.nl);
-				});
+					// 私雲辨識用
+					resultNl.ci = cloudId;
+					noticeListArr.push.apply(noticeListArr,resultNl)
+				} catch(e) {
+					// do something..
+				}
+			}
+		});
+		noticeDefArr.push(ajaxDef);
+	});
 
-	    	}
-    });
+
+	$.when.apply($,noticeDefArr).done(function(){
+
+		idb_alert_events.getAll(function(DBData){
+
+			var DBDataObj = {};
+    		for( var i=0; i<DBData.length; i++){
+    			if( DBData[i].isRead ){
+    				DBDataObj[DBData[i].ei+"_"+DBData[i].ntp] = DBData[i].data;
+    			}
+    		}
+
+    		for( var i=0; i<noticeListArr.length; i++){
+    			try{
+    				//ct_ei_ntp
+    				var obj = {
+						ei: noticeListArr[i].nd.ei,
+						ntp: noticeListArr[i].ntp,
+						ei_ntp: noticeListArr[i].nd.ei+"_"+noticeListArr[i].ntp,
+						data: noticeListArr[i]
+					};
+	    			var key = noticeListArr[i].nd.ei+"_"+noticeListArr[i].ntp;
+	    			//有已讀紀錄, 且ct相同, 表示為同一筆貼文或回文
+	    			if( DBDataObj.hasOwnProperty(key) ){
+	    				if( DBDataObj[key].nd.ct==noticeListArr[i].nd.ct ){
+	    					obj.isRead = true;
+	    					noticeListArr[i].isRead = true;
+	    				}
+	    			}
+	    			// ary.push(obj);
+	    			idb_alert_events.put(obj);
+	    		} catch(e){
+	    			errorReport(e);
+	    		}
+    		}
+
+    		// idb_alert_events.putBatch(ary, null);
+			showAlertContent(noticeListArr);
+		});
+	});
 }
 
 //顯示資料
@@ -188,7 +218,7 @@ showAlertContent = function(data){
 		// var tmpContainer = $("<div></div>");
 		var tmpContainer = $(".alert-area .content");
 		tmpContainer.html("");
-		var userData = $.lStorage(ui);
+		var userData = QmiGlobal.groups;
 		if( null == userData )	return;
 
 		for(var i=0; i<data.length; i++){
@@ -379,12 +409,19 @@ showAlertContent = function(data){
 			    var extra = $(tmpDiv).find(".al-extra");
 				extra.css("display","none");
 				if( boxData.nd.hasOwnProperty("ml") ){
+					var mainContext;
 					for( var j=0; j<boxData.nd.ml.length; j++){
-						if( boxData.nd.ml[j].tp==0 && boxData.nd.ml[j].c.length>0 ){
+						if( boxData.nd.ml[j].tp == 0 && boxData.nd.ml[j].c.length ){
+							mainContext = boxData.nd.ml[j].c.replaceOriEmojiCode();
 							extra.html( boxData.nd.ml[j].c.replaceOriEmojiCode() );
 							extra.css("display","");
-							break;
+							// break;
+						} else if (boxData.nd.ml[j].tp == 21) {
+							if (typeof(mainContext) == 'string' && mainContext) {
+								mainContext = mainContext.qmiTag(boxData.nd.ml[j]);
+							}
 						}
+						extra.html(mainContext);
 					}
 				}
 
@@ -415,13 +452,13 @@ showAlertContent = function(data){
 
 					if( null==this_gi || null==this_ei ) return;
 
-					var group = $.lStorage(ui)[this_gi];
+					var group = QmiGlobal.groups[this_gi];
 					if( null==group ) return;
 
 					if( null==group.guAll || Object.keys(group.guAll).length == 0){
 						cns.debug("no guall",this_gi);
 						var this_alert = $(this);
-			        	setGroupAllUser(false,this_gi,function(){
+			        	getGroupComboInit(this_gi).done(function(){
 			        		this_alert.trigger("click");
 			        	});
 			        	return false;
@@ -431,10 +468,14 @@ showAlertContent = function(data){
 
 					$(".alert").removeClass("alert-click");
 		    		$(".alert-area").slideUp("fast",function(){
-		    			setTimeout(function(){
-			    			$.mobile.changePage("#page-timeline-detail", {transition: "slide"});
-							eventDetailShow(this_ei);	
-						},100);
+						eventDetailShow(this_ei).done(function(resultObj){
+							if(resultObj.isSuccess === false) {
+								new QmiGlobal.popup({
+									title: $.i18n.getString("USER_PROFILE_NO_DATA"),
+									desc: ""
+								})
+							}
+						});	
 		    		});
 				});
 

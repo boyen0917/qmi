@@ -1,15 +1,13 @@
 $(function(){
 
-    groupListToLStorage = function(){
-        var _uiGroupList = $.lStorage(ui) || {};
-        var oriGroupList = $.lStorage("_groupList") || $.lStorage(ui);
-        // 剔除不存在的團體
-        var tmp_groupList = [];
+    groupListToLStorage = function(groupList,isAdd){
+        var groups = QmiGlobal.groups,
+            tmpGroupList = [];
 
-        $.each($.lStorage("_groupList"),function(i,gl_obj){
-            tmp_groupList.push(gl_obj.gi);
+        $.each(groupList,function(i,gl_obj){
+            tmpGroupList.push(gl_obj.gi);
 
-            if(!$.lStorage(ui).hasOwnProperty(gl_obj.gi) ){
+            if( groups.hasOwnProperty(gl_obj.gi) === false ){
                 gl_obj.guAll = {};
                 gl_obj.gu = gl_obj.me;
 
@@ -29,70 +27,121 @@ $(function(){
                             break;
                     }
                 });
-                _uiGroupList[gl_obj.gi] = gl_obj;
+                groups[gl_obj.gi] = gl_obj;
             } else {
-                $.extend(_uiGroupList[gl_obj.gi],gl_obj)
+                $.extend(groups[gl_obj.gi],gl_obj)
             }
         }); 
 
-        //init private group
-        var pri_group_list = $.lStorage("_pri_group");
-        $.each(pri_group_list, function(i, p_cloud){
-            if( !p_cloud ) return;
-            if( !p_cloud.tmp_groups ){
-                pri_group_list[i].groups = [];
-                return;
-            }
-            var list = [];
-            $.each(p_cloud.tmp_groups,function(i,gl_obj){
-                list.push(gl_obj.gi);
-                gl_obj.ori_gi = gl_obj.gi;
-                gl_obj.gi = getPrivateGi( p_cloud.ci, gl_obj.gi );
-                if(!$.lStorage(ui).hasOwnProperty(gl_obj.gi) ){
-                    gl_obj.guAll = {};
-                    gl_obj.gu = gl_obj.me;
-                    gl_obj.ci = p_cloud.ci;
+        // 私雲移轉 屬於額外添加團體
+        if(isAdd === true) return;
 
-                    $.each(gl_obj.tl,function(i,val){
-                        switch(val.tp){
-                            case 1:
-                                gl_obj.ti_cal = val.ti;
-                                break;
-                            case 2:
-                                gl_obj.ti_feed = val.ti;
-                                break;
-                            case 3:
-                                gl_obj.ti_chat = val.ti;
-                                break;
-                            case 4:
-                                gl_obj.ti_file = val.ti;
-                                break;
-                        }
-                    });
-                    _uiGroupList[gl_obj.gi] = gl_obj;
-                } else {
-                    $.extend(_uiGroupList[gl_obj.gi],gl_obj)
-                }
-            });
-            delete pri_group_list[i].tmp_groups;
-            pri_group_list[i].groups = list;
-        });
-
-        //groupList 沒有的group 要從 _uiGroupList 剔除
-        for(this_gi in _uiGroupList){
-            if(tmp_groupList.indexOf(this_gi) === -1){
-                console.debug("delete group",_uiGroupList[this_gi])
-                delete _uiGroupList[this_gi];
+        // 剔除不存在的團體
+        for(giKey in groups){
+            if(tmpGroupList.indexOf(giKey) === -1){
+                cns.debug("delete group",groups[giKey])
+                delete groups[giKey];
             }
         }
+    }
 
-        $.lStorage("_pri_group",pri_group_list);
-        $.lStorage(ui,_uiGroupList);
+
+    getGroupComboInit = function(thisGi,callback){
+        var 
+        thisGi = thisGi || gi,
+        comboDeferred = $.Deferred();
+
+        new QmiAjax({
+            apiName: "groups/" + thisGi + "?tp=1" // tp1才能取得退出的成員
+        }).complete(function(data){
+            if(data.status == 200){
+                var comboData = $.parseJSON(data.responseText);
+
+                // QmiGlobal.groups -> QmiGlobal.groups 
+                // thisGi 不存在list中 重新加入 做tl hash-map
+                // if( QmiGlobal.groups.hasOwnProperty(thisGi) === false ) {
+                //     QmiGlobal.groups[comboData.gi] = comboData;
+                //     groupListToLStorage( [ comboData ] );
+                // }
+
+                var 
+                groupData = QmiGlobal.groups[thisGi],
+                ignoreKeys = ["ul","fl","bl","fbl","tl"],
+                inviteGuAll = {};
+
+                // 單一團體資訊的部分key 另外處理成hash-map
+                for( var key in comboData ){
+                    // ignore
+                    if( ignoreKeys.indexOf(key) < 0 ) {
+                        groupData[key] = comboData[key];    
+                    } else {
+                        delete groupData[key];
+                    }
+                }
+
+                // 製作guAll hash-map & inviteGuAll
+                for( var key in comboData.ul ){
+                    var thisGuObj = comboData.ul[key];
+                    //用在contact.js 不知道為何
+                    if( thisGuObj.st === 0) inviteGuAll[thisGuObj.gu] = thisGuObj;
+
+                    if(thisGuObj.nk !== undefined)
+                        thisGuObj.nk = thisGuObj.nk._escape();
+
+                    groupData.guAll[thisGuObj.gu] = thisGuObj;
+                }
+                groupData.inviteGuAll = inviteGuAll;
+
+                //官方帳號設定
+                initOfficialGroup( thisGi );
+
+                //初始化 重組群組資訊
+                setBranchList( thisGi , {
+                    bl:  comboData.bl,
+                    fbl: comboData.fbl
+                });
+
+                //設定功能選單
+                setTabList(thisGi);
+
+                if(callback) callback();
+
+                comboDeferred.resolve({
+                    status: true,
+                    thisGi: thisGi,
+                    data: data
+                });
+
+            }else{    
+                comboDeferred.resolve({
+                    status: false,
+                    thisGi: thisGi,
+                    data: data
+                });
+
+                //好像不該在這
+                groupSwitchEnable();
+            }
+        });
+
+        return comboDeferred.promise();
     }
 
     getGroupCombo = function(this_gi,callback,chk){
         var this_gi = this_gi || gi;
-        getGroupData(this_gi,false,1,true).complete(function(data){
+        // var err_show = err_show || false;
+        // var api_name = "groups/" + this_gi;
+        // if( tp ) api_name = api_name +"?tp=" +tp;
+        // var headers = {
+        //     "ui":ui,
+        //     "at":at,
+        //     "li":lang
+        // };
+        // var method = "get";
+        // getGroupData(this_gi,false,1,true)
+        new QmiAjax({
+            apiName: "groups/" + this_gi,
+        }).complete(function(data){
             if(data.status == 200){
                 var groupData = $.parseJSON(data.responseText);
 
@@ -116,22 +165,20 @@ $(function(){
                 if(callback) callback();
             }else{
                 //發生錯誤 以第一個團體為預設
-                if($.lStorage("_groupList")[0] !== undefined && $.lStorage("_groupList")[0].gi !== undefined && chk !== true) {
-                    var _loginData = $.lStorage("_loginData");
-                    if($.lStorage(ui)[_loginData.dgi] === undefined) {
-                        _loginData.dgi = $.lStorage("_groupList")[0].gi;
-                        $.lStorage("_loginData",_loginData);
-                    }
+                if(
+                    QmiGlobal.groups[0]     !== undefined && 
+                    QmiGlobal.groups[0].gi  !== undefined && 
+                    chk                   !== true 
+                ) {
+
+                    QmiGlobal.auth.dgi = QmiGlobal.groups[0].gi;
 
                     //帶true表示只再做一次
-                    getGroupCombo($.lStorage("_groupList")[0].gi,callback,true);
+                    getGroupCombo(QmiGlobal.groups[0].gi,callback,true);
 
                 } else {
                     groupSwitchEnable();    
                 }
-
-                
-                
             }
         });
     }
@@ -149,7 +196,7 @@ $(function(){
     }
 
     updateGuAll = function(this_gi,new_guAll) {
-        var _groupList = $.lStorage(ui);
+        var _groupList = QmiGlobal.groups;
         //先更新舊有資料 但不會取得新成員
         if(_groupList[this_gi].guAll){
             $.each(_groupList[this_gi].guAll,function(i,val){
@@ -174,19 +221,15 @@ $(function(){
         });
         _groupList[this_gi].inviteGuAll = inviteGuAll;
         _groupList[this_gi].guAll = new_guAll;
-        $.lStorage(ui,_groupList);
+        // *--* $.lStorage(ui,_groupList);
     }
 
-    setTabList = function(this_gi, groupData){
-        var isDataMissing = false;
-        if( null==groupData || null==groupData.set ) isDataMissing = true;
+    setTabList = function(thisGi, qmiGroupData){
+        var qmiGroupData = qmiGroupData || QmiGlobal.groups[thisGi];
 
-        //save data
-        var userData = $.lStorage(ui);
-        var group = userData[this_gi];
         //如果tp為c,d開頭為官方團體
-        if( true==group.isOfficial ){
-            group.tab = [
+        if( true==qmiGroupData.isOfficial ){
+            qmiGroupData.set.tab = [
                 { "tp": 0, "sw": false },
                 { "tp": 1, "sw": false },
                 { "tp": 2, "sw": true },
@@ -198,59 +241,25 @@ $(function(){
                 { "tp": 8, "sw": false },
                 { "tp": 9, "sw": false }
             ];
-            if( group.ad==1 ){
-                group.tab[6].sw = true;
-            }
-        } else{
-
-            if( !isDataMissing && groupData.set.tab ){
-                group.tab = groupData.set.tab;
-            } else {
-                group.tab = [
-                    { "tp": 0, "sw": false },
-                    { "tp": 1, "sw": false },
-                    { "tp": 2, "sw": true },
-                    { "tp": 3, "sw": true },
-                    { "tp": 4, "sw": false },
-                    { "tp": 5, "sw": false },
-                    { "tp": 6, "sw": true },
-                    { "tp": 7, "sw": true },
-                    { "tp": 8, "sw": false },
-                    { "tp": 9, "sw": false }
-                ];
-            }
+            if( qmiGroupData.ad==1 )
+                qmiGroupData.set.tab[6].sw = true;
         }
 
-        if( !isDataMissing && groupData.set.pen ){
-            group.pen = groupData.set.pen;
-        } else {
-            group.pen = [
-                { "tp": 0, "sw": true },
-                { "tp": 1, "sw": true },
-                { "tp": 2, "sw": true },
-                { "tp": 3, "sw": true },
-                { "tp": 4, "sw": true }
-            ];
-        }
-
-        userData[this_gi] = group;
-        window.g_uiData = userData;
-
-        updateTab( this_gi );
     }
 
 
-    setThisGroup = function(this_gi){
+    setThisGroup = function(thisGi){
         try{
-            var gl = $.lStorage(ui)[this_gi];
+            var groupData = QmiGlobal.groups[thisGi];
             
-            gi = this_gi;
-            gu = gl.me;
-            gn = htmlFormat(gl.gn);
+            QmiGlobal.currentGi = thisGi;
+            gi = thisGi;
+            gu = groupData.me;
+            gn = groupData.gn._escape();
 
-            ti_cal = gl.ti_cal;
-            ti_feed = gl.ti_feed;
-            ti_chat = gl.ti_chat;
+            ti_cal = groupData.ti_cal;
+            ti_feed = groupData.ti_feed;
+            ti_chat = groupData.ti_chat;
             
             //設定左側選單 gu
             $(".sm-user-area.namecard").data("gu",gu);
@@ -261,8 +270,8 @@ $(function(){
             //清除timeline無資料旗標
             $(".feed-subarea.no-data").removeClass("no-data");
 
-            //替換該團體的畫面
-            updateGroupAllInfoDom( this_gi );
+            //替換該團體的畫面 做完做updateTab
+            updateGroupAllInfoDom( thisGi );
 
         } catch(e){
             errorReport(e);
@@ -270,23 +279,15 @@ $(function(){
         }
     };
 
-    updateTab = function(this_gi){
-        var groupData;
-        try{
-            groupData = $.lStorage(ui)[this_gi];
-        } catch(e){
-            // cns.debug("[!] updateTab:" + e.message );
-            errorReport(e);
-            return;
-        }
-
+    updateTab = function(thisGi){
+        var groupData = QmiGlobal.groups[thisGi];
         try{
             var tabHtml = '<div class="sm-small-area"><div class="sm-small-area-r"></div></div>';
 
             //set tabs
             var menu = $(".header-menu").html("");
-            for( i=0;i<groupData.tab.length;i++ ){
-                var tabObj = groupData.tab[i];
+            for( i=0;i<groupData.set.tab.length;i++ ){
+                var tabObj = groupData.set.tab[i];
                 //switch off
                 if( tabObj.sw === false || typeof initTabMap[tabObj.tp] === "undefined") continue;
                 
@@ -316,7 +317,7 @@ $(function(){
         }
 
         //檢查團體設定裡有沒有開放的設定, 都沒有隱藏設定tab
-        if( false==initGroupSetting(this_gi) ){
+        if( false==initGroupSetting(thisGi) ){
             dom = menu.find(".sm-small-area[data-sm-act=groupSetting]");
             dom.hide();
         }
@@ -327,8 +328,8 @@ $(function(){
             //set pen
             var menu = $(".feed-compose-area").html("");
             var isPostData = false;
-            for( var i in groupData.pen ){
-                var penObj = groupData.pen[i];
+            for( var i in groupData.set.pen ){
+                var penObj = groupData.set.pen[i];
                 //switch關閉或是init沒設定這個tp 就跳過
                 if(penObj.switch === false || typeof initPenMap[penObj.tp] === "undefined") continue;
                 var penDom = $(penHtml);
@@ -365,7 +366,7 @@ $(function(){
     initGroupSetting = function(this_gi){
         // 如果是管理者的話顯示額外設定
         try{
-            var userData = $.lStorage(ui);
+            var userData = QmiGlobal.groups;
             var group = userData[this_gi];
             var hide = 0;
             if( 1==group.ad ){
@@ -373,7 +374,7 @@ $(function(){
                 $(".gs-row[data-type=info]").show();
             } else {
                 $(".gs-row[data-type=permission]").hide();
-                $(".gs-row[data-type=info]").hide();
+                //$(".gs-row[data-type=info]").hide();
                 hide+=2;
             }
 
@@ -400,12 +401,9 @@ $(function(){
         }
     }
 
-    initOfficialGroup = function( this_gi ){
-        var userData;
-        var groupData;
+    initOfficialGroup = function( thisGi ){
         try{
-            userData = $.lStorage(ui);
-            groupData = userData[this_gi];
+            var groupData = QmiGlobal.groups[thisGi];
         } catch(e){
             // cns.debug("[!] updateTab:" + e.message );
             errorReport(e);
@@ -416,11 +414,10 @@ $(function(){
             //如果tp為c,d開頭為官方團體
             var tp = groupData.tp.toLowerCase();
             groupData.isOfficial = ( tp.indexOf('c')==0 || tp.indexOf('d')==0 );
-            $.lStorage(ui,userData);
             
             //如果非admin, 沒有聊天室的話隨便找個admin預建聊天室
             if( groupData.isOfficial && groupData.ad!=1 ){
-                updateChatList(this_gi, function(){
+                updateChatList(thisGi, function(){
                     //remove illegal chat rooms
                     try {
                         if (groupData.chatAll && Object.keys(groupData.chatAll).length > 1) {
@@ -434,7 +431,6 @@ $(function(){
                                     }
                                 }
                             });
-                            $.lStorage(ui, userData);
                         }
                     } catch(e){
                         errorReport(e);
@@ -451,10 +447,10 @@ $(function(){
                             }
                         }
                         if( null!= target ) {
-                            cns.debug("[initOfficialGroup] create an official chat", this_gi, target.nk, target.gu);
-                            requestNewChatRoomApi(this_gi, target.nk, [{gu: target.gu}], null, null, false);
+                            cns.debug("[initOfficialGroup] create an official chat", thisGi, target.nk, target.gu);
+                            requestNewChatRoomApi(thisGi, target.nk, [{gu: target.gu}], null, null, false);
                         }
-                        else cns.debug("[initOfficialGroup] has no admin in official group", this_gi);
+                        else cns.debug("[initOfficialGroup] has no admin in official group", thisGi);
                     }
                 });
             }
@@ -472,7 +468,7 @@ $(function(){
         };
         var result = ajaxDo(apiName, headers, 'delete',true,null, null, true);
         result.error(function(jqXHR, textStatus, errorThrown) {
-            console.debug(1);
+            cns.debug(1);
             return;
         });
         result.complete( function(data) {

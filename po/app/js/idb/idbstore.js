@@ -238,7 +238,7 @@
     _insertIdCount: 0,
 
 
-    deferred: new MyDeferred(),
+    deferred: MyDeferred(),
 
     /**
      * Opens an IndexedDB; called by the constructor.
@@ -1101,7 +1101,7 @@
     },
 
     limit: function (onSuccess, options) {
-      this.deferred.done(function(success){
+      this.deferred.then(function(success){
         if(success === false) cns.debug("IDB錯誤");
 
         var result = [];
@@ -1114,7 +1114,7 @@
           onSuccess(result);
         }
         options.onError = function(item){
-          console.debug("error:",item);
+          cns.debug("error:",item);
           onSuccess(result);
         }
         return this.iterate(function (item,cursor) {

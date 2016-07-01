@@ -8,10 +8,11 @@
         
         <script type="text/javascript" src='/assist/func_assistant.js'></script>
         <script src="../../js/jquery.js"></script>
+        <script type="text/javascript" src="../../js/jquery.i18n.js"></script>
         <script src="../js/init.js"></script>
         <script src="../js/tool.js"></script>
         <script src="../js/general_gallery.js"></script>
-        <script type="text/javascript" src="../../js/jquery.i18n.js"></script>
+        
     </head>
     <script>
         var this_gi;
@@ -38,7 +39,11 @@
         function onDataDomClick(){
             isLoaded = true;
             picArea = $(".picArea");
+                        
             try{
+
+                QmiGlobal.auth.ui = window.ui;
+                QmiGlobal.auth.at = window.at;
                 console.debug("on data dom clicked");
                 console.debug("ui", ui, "at", at, "lang", lang);
                 console.debug("startIndex", startIndex);

@@ -63,8 +63,9 @@
 .contact-search .hintDiv .text{
 	vertical-align: middle;
 }
-.contact-search .content{
-}
+
+.contact-search .content{ line-height: 42px; }
+
 .contact-search .content .icon{
 	width: 28px;
     position: absolute;
@@ -344,10 +345,18 @@
 .contact-scroll{
 	position: fixed;
 	width: 100%;
-	overflow: scroll;
+	overflow-y: hidden;
 	height: 555px;
 	margin-top: 54px;
 	background-color: white;
+}
+
+.contact-scroll:hover{
+	overflow-y: auto;
+}
+
+.contact-scroll::-webkit-scrollbar-track{
+	background-color: transparent;
 }
 
 .contact-rows.top, .contact-searchResult{
@@ -356,7 +365,7 @@
 	top: 127px;
 	 background: white; 
 	/* border: black 1px solid; */
-	overflow: scroll;
+	overflow-y: auto;
 	/* max-height: 70%; */
 	height: -webkit-calc( 100% - 110px );
 	width: 100%;

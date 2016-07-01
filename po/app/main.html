@@ -4,17 +4,67 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title></title>
-
-
         <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
+        <link rel="stylesheet" href="css/main.css" />
+        <link rel="stylesheet" href="css/chatList.css" />
+        <link rel="stylesheet" href="css/alert.css" />
+        <link rel="stylesheet" href="css/contact.css" />
+        <link rel="stylesheet" href="css/general_album.css" />
+        <link rel="stylesheet" href="css/setting.css" />
+
+
+    <!-- index -->
+        <link rel="stylesheet" href="css/registration.css" />
+        <link rel="stylesheet" href="plugins/jquery.selectbox/css/jquery.selectbox.css" />
+        <link rel="stylesheet" href="css/stickerArea.css"/>
+    <!-- index -->
+
 
         
-        <script src='/assist/func_assistant.js'></script>
+        <script type="text/javascript" src='/assist/func_assistant.js'></script>
+        <script src="js/ga.js"></script>
 
-        <!--  -->
+        <script src="../js/jquery.js"></script>
+        <script src="../js/jquery.mobile-1.3.2.min.js"></script>
+        <script type="text/javascript" src="../js/jquery.i18n.js"></script>
+        
+        <script src="js/jquery.plugin.js"></script>
+        
+        <script type="text/javascript" src="js/init.js"></script>
+        <script type="text/javascript" src="js/init_func.js"></script>
+        <script type="text/javascript" src="js/tool.js"></script>
 
-        <link rel="stylesheet" href="build/style.css" />
-        <script type="text/javascript" src="build/app.min.js"></script>
+
+
+    <!-- index -->
+        <script type="text/javascript" src="js/checkVersion.js"></script>
+        <script type="text/javascript" src="plugins/phoneformat/phone-format.js"></script>
+        <script type="text/javascript" src="js/registration.js"></script>
+    <!-- index -->
+
+
+
+
+        <!-- IDBWrapper -->
+        <script src="js/idb/idb.js"></script>
+        <script src="js/idb/idbstore.js"></script>
+        
+        <script type="text/javascript" src="js/general_album.js"></script>
+        <script type="text/javascript" src="js/contact.js"></script>
+        <script type="text/javascript" src="js/addressBook.js"></script>
+        <script type="text/javascript" src="js/setting.js"></script>
+        <script type="text/javascript" src="js/chatDB.js"></script>
+        <script type="text/javascript" src="js/func.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript" src="js/chatList.js"></script>
+        <script type="text/javascript" src="js/alert.js"></script>
+        <script type="text/javascript" src="js/stickerArea.js"></script>
+        
+
+
+
+
+        <script src="plugins/jquery.selectbox/js/jquery.selectbox.min.js"></script>
         
         <!--<script id="google-map" src="https://maps.google.com/maps/api/js?sensor=false"></script>
         <script src="js/jquery.tinyMap.min.js"></script>-->
@@ -23,15 +73,288 @@
         <script src="js/jquery.tinyMap.min.js"></script>-->
         <script language="javascript" src="https://webapi.amap.com/maps?v=1.3&key=test"></script>
         
+        <script src="js/sha/sha1.js"></script>
+        <script src="js/sha/enc-base64-min.js"></script>
+        <script type="text/javascript" src="js/jquery.autosize.min.js"></script>
 
 
         <!-- jquery ui datepicker -->
         <link rel="stylesheet" type="text/css" href="datepicker/datetimepicker.css" />
+        <script src="datepicker/datetimepicker.js"></script>
 
-    
+        <!-- 圖庫呈現 flex slider  -->
+        <script src="flexslider/modernizr.js"></script>
+        <script defer src="flexslider/jquery.flexslider.js"></script>
+        
+        <!-- nice scroll  -->
+        <!-- <script src="http://areaaperta.com/nicescroll/js/jquery.nicescroll.min.js"></script> -->
+        <script src="plugins/nicescroll/jquery.nicescroll.js"></script>
 
     </head>
     <body>
+        <div data-role="page" id="page-registration">
+            <div class="registration-content registration-bg">
+                <div class="registration-logo">
+                    <img src="images/registration/qmi_logo.png">
+                </div>
+                <!-- <div class="login-desc"> World's Largest Professional NetWork</div> -->
+                <div class="login-area">
+                    <div class="login-tab-area">
+                        <div class="login-tab active" data-type="phone">phone</div>
+                        <div class="login-tab" data-type="email">email</div>
+                    </div>
+                    <div class="login-landing">
+                        <div class="login-landing-account">
+                            <div class="login-ld-phone">
+                                <div class="login-ld-countrycode">
+                                    <select name="Country Code" data-role="none" tabindex="1">
+                                        <option SELECTED data-code="+886" value="TW" data-textid="LOGIN_COUNTRY_CODE_TAIWAN"></option>
+                                        <option data-code="+86" value="CN" data-textid="LOGIN_COUNTRY_CODE_CHINA"></option>
+                                        <option data-code="+852" value="HK" data-textid="LOGIN_COUNTRY_CODE_HONGKONG"></option>
+                                        <option data-code="+853" value="MO" data-textid="LOGIN_COUNTRY_CODE_MACAU"></option>
+                                        <option data-code="+1" value="US" data-textid="LOGIN_COUNTRY_CODE_US"></option>
+                                    </select>
+                                </div>
+                                <input type="text" maxlength="20" data-role="none" data-textph-id="LOGIN_ACCOUNT_PHONE" placeholder="請輸入手機">
+                            </div>
+                            <div class="login-ld-email">
+                                <input type="text" maxlength="99" data-role="none" data-textph-id="LOGIN_ACCOUNT_EMAIL" placeholder="請輸入Email">
+                            </div>
+                        </div>
+                        <div class="login-ld-password">
+                            <input type="password" maxlength="20" data-role="none" data-textph-id="LOGIN_PASSWORD" placeholder="請輸入密碼">  
+                            <img src="images/common/icon/compose_form_icon_check.png" style="display:none">  
+                        </div>
+                        <div class="login" data-textid="LANDING_PAGE_LOGIN"></div>
+                        <div class="login-ld-extra">
+                            <div class="login-option-area">
+                                <div class="login-remeber landpage">
+                                    <img src="images/registration/checkbox_none.png">
+                                    <div class="text" data-textid="LOGIN_REMEMBER_ACCOUNT">Remember Account</div>
+                                </div>
+                                <div class="login-auto landpage">
+                                    <img src="images/registration/checkbox_none.png">
+                                    <div class="text" data-textid="LOGIN_AUTO_LOGIN">Auto login</div>
+                                </div>
+                            </div>
+                            <div></div> <!-- class="login-ld-forget-pw" -->
+                        </div>
+                        <div class="register" data-textid="LANDING_PAGE_REGISTER"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="container_version">
+                <span class="container"></span>
+                <span class="web"></span>
+            </div>
+        </div>
+<!---------------------------------- page-login ------------------------------------>
+        <div data-role="page" id="page-login">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="LANDING_PAGE_LOGIN"></h3>
+            </div>
+            <div class="login-content">
+                <div class="login-default-area" style="">
+                    <div class="countrycode">
+                        <span data-textid="COMMON_COUNTRY_TAIWAN"></span>
+                        <span>+886</span>
+                        <img src="images/common/icon/icon_arrow_next.png"/>
+                    </div>
+                    <div class="login-phone">
+                        <input type="text" maxlength=10 data-role="none" data-textph-id="LOGIN_ACCOUNT"/>  
+                        <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
+                    </div>
+                    <div class="login-password">
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="LOGIN_PASSWORD"/>  
+                        <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
+                    </div>
+                </div>
+
+                <div class="login-remeber-area" style="display:none">
+                    <div class="login-user-pic">
+                        <div class="avatar-wrap">
+                            <img src="images/common/others/empty_img_personal_130x130.png" style="width: 103px;"/>
+                        </div>
+                        <img src="images/common/others/frame_130x130.png"/>
+                    </div>
+                    <div class="login-account">
+                        <span data-textid="LOGIN_SAVE_ACCOUNT_TITLE"></span><span></span>
+                    </div>
+                    <div class="login-remeber-password">
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="LOGIN_PASSWORD"/>  
+                    </div>
+                </div>
+                
+                <div class="login-forget-pw" style="display:none;" data-textid="LOGIN_FORGET_PASSWORD"></div>
+                <div class="login-option">
+                    <div class="login-remeber">
+                        <img src="images/common/icon/icon_check_gray.png">
+                        <div class="text" data-textid="LOGIN_REMEMBER_ACCOUNT"></div>
+                    </div>
+                </div>
+                <div class="login-option">
+                    <div class="login-auto">
+                        <img src="images/common/icon/icon_check_gray.png">
+                        <div class="text" data-textid="LOGIN_AUTO_LOGIN"></div>
+                    </div>
+                </div>
+
+                <!-- <div class="login-option">
+                    <div class="login-remeber">
+                        <img src="images/common/icon/icon_check_gray.png"/>
+                        <span>記住帳號</span>
+                    </div>
+                    <div class="login-forget-pw">
+                        忘記密碼？
+                    </div>
+                </div>
+                <div class="login-auto">
+                    <img src="images/common/icon/icon_check_gray.png"/>
+                    <span>自動登入</span>
+                </div> -->
+                 
+                 <div class="login-next" data-textid="LANDING_PAGE_LOGIN"></div>
+                 <div class="login-change login-change-ready" style="display:none" data-textid="LOGIN_SWITCH_ACCOUNT"></div>
+            </div>
+        </div>
+<!---------------------------------- page-register ------------------------------------>
+        <div data-role="page" id="page-register">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="REGISTER_ACCOUNT_REGITST_TITLE"></h3>
+            </div>
+            <div class="register-content">
+                <div class="register-area">
+                    <div class="countrycode">
+                        <!-- <span data-textid="COMMON_COUNTRY_TAIWAN">台灣</span>
+                        <span>+886</span>
+                        <img src="images/common/icon/icon_arrow_next.png"/> -->
+                        <div class="sbContainer">
+                            <select name="Country Code" data-role="none" tabindex="1">
+                                <option SELECTED data-code="+886" value="TW" data-textid="LOGIN_COUNTRY_CODE_TAIWAN"></option>
+                                <option data-code="+86" value="CN" data-textid="LOGIN_COUNTRY_CODE_CHINA"></option>
+                                <option data-code="+852" value="HK" data-textid="LOGIN_COUNTRY_CODE_HONGKONG"></option>
+                                <option data-code="+853" value="MO" data-textid="LOGIN_COUNTRY_CODE_MACAU"></option>
+                                <option data-code="+1" value="US" data-textid="LOGIN_COUNTRY_CODE_US"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="register-phone">
+                        <input type="text" maxlength=20 data-role="none" data-textph-id="LOGIN_ACCOUNT_PHONE"/>  
+                        <img src="images/common/icon/compose_form_icon_check.png" style="display:none"/>  
+                    </div>
+                    
+                </div>
+                
+                <div class="register-text">
+                    <img src="images/common/icon/icon_check_gray.png"/>
+                    <span></span>
+                </div>
+                 
+                 <div class="register-next" data-textid="COMMON_NEXT"></div>
+            </div>
+        </div>
+<!---------------------------------- page-register-otp ------------------------------------>
+        <div data-role="page" id="page-register-otp">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="REGISTER_ACCOUNT_REGITST_TITLE"></h3>
+            </div>
+            <div class="register-otp-content">
+                <div class="register-otp-desc-area">
+                     <span data-textid="REGISTER_AUTH_SMS_HAS_SENT"></span>
+                     <div></div>
+                </div>
+                <div class="register-otp-input">
+                    <input type="text" maxlength=4 data-role="none" data-textph-id="REGISTER_AUTH_ENTER_CODE"/>  
+                </div>
+                <div class="resend-otp" data-textid="REGISTER_AUTH_RESEND_CODE"></div>
+                <div class="register-otp-next" data-textid="COMMON_NEXT"></div>
+            </div>
+        </div>
+<!---------------------------------- page-password ------------------------------------>
+        <div data-role="page" id="page-password">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="REGISTER_PASSWORD_TITLE"></h3>
+            </div>
+            <div class="password-content">
+                <div class="password-setting-area">
+                    <div class="password-setting">
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="REGISTER_PASSWORD_PASSWORD_PLACEHOLDER"/>  
+                    </div>
+                    <div class="password-confirm">
+                        <input type="password" maxlength=20 data-role="none" data-textph-id="REGISTER_PASSWORD_CONFIRM_PLACEHOLDER"/>  
+                    </div>
+                </div>
+                <div class="password-next" data-textid="COMMON_OK">COMMON_OK</div>
+            </div>
+        </div>
+
+<!---------------------------------- page-user-setting ------------------------------------>
+        <div data-role="page" id="page-user-setting">
+            <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
+            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
+                <h3 class="page-title" data-textid="REGISTER_SETTING_TITLE"></h3>
+            </div>
+            <div class="setting-content">
+                <div class="setting-area">
+                    <div class="avatar-area">
+                        <img class="avatar-default" src="images/registration/registration_form_personalinfo_cam.png"/>
+                    </div>
+                    <input class="avatar-file" type="file" style="display:none;" data-role="none"/>
+                    <div class="setting-name-area">
+                        <div class="setting-first-name">
+                            <input type="text" maxlength=20 data-role="none" data-textph-id="REGISTER_SETTING_FIRST_NAME"/>  
+                        </div>
+                        <div class="setting-last-name">
+                            <input type="text" maxlength=20 data-role="none" data-textph-id="REGISTER_SETTING_LAST_NAME"/>  
+                        </div>
+                    </div>
+                    <div class="setting-birth" style="display:none;">
+                        <input type="text" maxlength=20 data-role="none" readonly data-textph-id="REGISTER_SETTING_BIRTHDAY"/>  
+                    </div>
+                    <input class="setting-birth-hidden" type="text" data-role="none" disabled="disabled"/>
+                </div>
+                    
+                <div class="setting-next" data-textid="COMMON_NEXT"></div>
+            </div>
+        </div>
+
+
+<!---------------------------------- 全域 ------------------------------------>        
+        <div class="toast">
+            <div></div>
+        </div>
+
+        <div class="popup">
+            <div class="popup-frame">
+                <div class="popup-title"></div>
+                <div class="popup-text" style="display:none"></div>
+                <div class="popup-confirm-area">
+                    <div class="popup-cancel" style="display:none" data-textid="COMMON_CANCEL"></div>
+                    <div class="popup-confirm" style="display:none" data-textid="COMMON_OK"></div>    
+                </div>
+                
+            </div>
+            <div class="popup-gap"></div>
+            <div class="popup-screen"></div>
+        </div>
+
+        <div class="ajax-screen-lock"></div>
+        <div class="version_update_lock">
+            <div data-textid="LANDING_PAGE_UPDATE"></div>
+        </div>
+        <div class="container_update_lock">
+            <a data-textid="LANDING_PAGE_UPDATE_CONTAINER_LOCK"></a>
+        </div>
+
+        <div id="page-back-chk"></div>
+        <div id="page-back-chk-pre"></div>
+        <div id="page-back-pre-title"></div>
+        
 <!---------------------------------- page-group-menu ------------------------------------>
         <div data-role="page" id="page-group-menu">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -187,7 +510,7 @@
                         <div class="sm-hr" data-textid="LEFT_SYSTEM_SETTING"></div>
                         <div data-sm-act="system-setting" class="sm-small-area setting">
                            <div class="sm-small-area-l"><img src="images/icon/icon_timeline_tab_setting_normal.png"/></div>
-                           <div class="sm-small-area-r" data-textid="SETTING_LOGOUT"><!-- 系統設定 --></div>
+                           <div class="sm-small-area-r">系統設定</div>
                         </div>
                     </div>
                 </div>
@@ -262,15 +585,15 @@
                                     <div data-status="all" data-navi="feed-post" class="st-filter-action st-filter-list" style="display:none;">
                                         <span data-textid='FEED_ALL'></span>
                                     </div>
-                                    <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:;" data-polling-cnt="B2">
+                                    <div data-status="navi" data-navi="announcement" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B2">
                                         <span data-textid='FEED_BULLETIN'></span>
                                         <div class="sm-count" style="display:none;"></div>
                                     </div>
-                                    <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:;" data-polling-cnt="B3">
+                                    <div data-status="navi" data-navi="feedback" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B3">
                                         <span data-textid='FEED_REPORT'></span>
                                         <div class="sm-count" style="display:none;"></div>
                                     </div>
-                                    <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:;" data-polling-cnt="B4">
+                                    <div data-status="navi" data-navi="task" class="st-filter-action st-filter-list polling-cnt polling-local" style="display:none;" data-polling-cnt="B4">
                                         <span data-textid='FEED_MISSION'></span>
                                         <div class="sm-count" style="display:none;"></div>
                                     </div>
@@ -576,9 +899,73 @@
 
                     <!--------------------------------- 系統設定 -------------------------->
                         <div class="subpage-systemSetting main-subpage" style="display:none;">
-                            系統設定
-                        </div>
+                              <div class="systemSetting-content">
+                                    <!-- 使用者資訊 -->
+                                    <div class="user-data-information">
+                                        <span class="system-title">Profile</span>
+                                        <div class="user-info">
+                                            <img class="setting-user-avatar" src="">
+                                            <input type="file" class="setting-avatar-file" data-role="none" accept="image/*">
+                                            <div class="username-content">
+                                                <label for="input-username">Username</label>
+                                                <input type="text" class="input-username" value="" data-role="none">
+                                            </div>
+                                             <div class="btn-content password-btn-content">
+                                                    <button data-role="none" class="password-popup">變更密碼</button>
+                                             </div>
+                                        </div>
+                                        <!--  <span class="system-title">Account</span> 
+                                         <div class="user-info">
+                                       
+                                         </div> -->
+                                         <div class="notification-setting">
+                                             <input type="checkbox"  name="notification" data-role="none"  class="notification-check">開啟通知
+                                         </div>
+                                         <div class="group-setting">
+                                              <span class="system-title">預設團體</span>
+                                              <select class="group-select" data-role="none" >
+                                                        
+                                              </select>
+                                         </div>
+                                         <div class="carousel-setting">
+                                             <span class="system-title">自動換頁</span>
+                                              <select class="carousel-time" data-role="none" >
+                                                      <option value="3000">三秒</option>
+                                                      <option value="5000">五秒</option>
+                                                      <option value="0">關閉</option>  
+                                              </select>  
+                                         </div>
+                                         <div class="system-version">
+                                            <span class="system-title">目前版本</span>
+                                            <span class="version-information"></span>
+                                             <!-- <div class="btn-content version-btn-content">
+                                                 <button data-role="none" class="check-version">檢查版本</button>
+                                             </div> -->
+                                         </div>
+                                         <div class="term_of_service">
+                                             <span class="system-title">服務條款</span>
+                                             <div class="btn-content term-btn-content">
+                                                 <button data-role="none" class="check-version term-service">詳細資訊</button>
+                                             </div>
+                                         </div>
+                                          <div class="right_to_privacy">
+                                             <span class="system-title">隱私政策</span>
+                                             <div class="btn-content term-btn-content">
+                                                 <button data-role="none" class="check-version right-privacy">詳細資訊</button>
+                                             </div>
+                                         </div>
 
+                                    </div>
+                            
+                              </div>
+                              <div class="bottom-btn">
+                                  <div class="btn-content">
+                                      <button data-role="none" class="save-btn system-setting-submit">save</button>
+                                  </div>
+                              </div>
+                   
+                        </div> 
+               
                     <!--------------------------------- 團體關於 -------------------------->
                         <div class="subpage-groupAbout main-subpage">
                             <div class="ga-wrapper">
@@ -872,6 +1259,46 @@
         <div class="user-info-load-area">
             <div class="user"></div>
             <div class="me"></div>
+        </div>
+        <!-- 圖片預覽popup -->
+        <div class="user-avatar-confirm">
+               <div class="avatar-content">
+                   <div class="avatar-preview">
+                       <img class="user-headshot" src="">
+                   </div>
+                   <div class="preview-bottom-btn">
+                        <div class="btn-content">
+                            <button data-role="none" class="cancel-btn">cancel</button>
+                            <button data-role="none" class="save-btn avatar-save">save</button>
+                        </div>
+                   </div>
+                </div>                           
+        </div>
+        <!--  變更密碼 -->
+        <div class="password-change-confirm">
+            <div class="password-change-content">
+                <div class="password-setting">
+                    <span class="system-title">變更密碼</span>
+                    <ul>
+                        <li><input placeholder="輸入舊密碼" maxlength="25" class="old-password input-password" type="password" data-role="none" ></li>
+                        <li><input placeholder="輸入新密碼" maxlength="25" class="new-password input-password" type="password" data-role="none"></li>
+                        <li><input placeholder="請再次輸入新密碼" maxlength="25" class="verify-password input-password" type="password" data-role="none"> </li>
+                    </ul>
+                    <div class="password-bottom-btn">
+                        <div class="btn-content">
+                            <button data-role="none" class="password-cancel">cancel</button>
+                            <button data-role="none" class="password-submit">save</button>
+                        </div>    
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <!--  服務條款 跟 隱私政策 -->
+        <div class="policy">
+            <div class="policy-content">
+                <iframe></iframe>
+            </div>
         </div>
 
         <div class="toast fixed-initial">
