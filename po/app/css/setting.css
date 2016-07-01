@@ -103,9 +103,9 @@
 }
 .ga-header-back img{
 	margin-left: 5px;
-	margin-top: 5px;
-	height: 40px;
-	width:40px;
+	margin-top: 10px;
+	height: 30px;
+	width:30px;
 	cursor: pointer;
 	object-fit: cover;
 }
@@ -113,8 +113,8 @@
 	/*float: right;*/
 	/*display: inline-block;*/
 	margin-right: 15px;
-	margin-top: 5px;
-	width: 40px;
+	margin-top: 10px;
+	width: 30px;
 	height: 100%;
 	object-fit: contain;
 	cursor: pointer;
@@ -175,7 +175,7 @@
 	padding: 10px 20px;
 	white-space: nowrap;
 	text-align: center;
-	background-color: rgba(0,0,0,0.3);
+	background-color: rgba(0,0,0,0.6);
 }
 @media screen and (min-width: 0px) and (max-width: 899px){
 	.ga-avatar, .ga-avatar-img, .ga-avatar-img.default{
@@ -217,13 +217,26 @@
 	font-size: 20px;
 	display: inline;
 	color: white;
+	width: 200px;
 	/*width: 80%;*/
 }
+input.ga-group-name{
+	color: white;
+	background-color: rgba(0,0,0,0);
+    border-radius: 3px;
+    padding: 3px;
+    text-align: center;
+    border-radius: 3px;
+	border-bottom: 1px solid #cccccc;
+	padding: 3px;
+}
+
 .ga-icon{
 	position: relative;
     left: 20px;
     top: 3px;
 	width: 20px;
+	cursor: pointer;
 }
 .ga-group-type-name{
 	display: inline-block;
@@ -252,11 +265,25 @@
 	display: inline;
 }
 .ga-group-des{
-	line-height: 24px;
+	padding: 3px;
 	color: #555;
+	font-size: 14px;
+	line-height: 24px;
+    letter-spacing: 1px;
+    word-spacing: 2px;
 	min-height: 24px;
 	width: 100%;
+	word-wrap: break-word;
 }
+textarea.ga-group-des{
+	border: none;
+	resize: none;
+	height: 100px;
+	word-spacing: -2px;
+	border-radius: 3px;
+	border: 1px solid #cccccc;
+}
+
 /*.ga-info-row .content{
 	margin-left: 20px;
 	margin-right: 20px;
@@ -672,10 +699,14 @@ input[type=radio] {
 
 .radiotext{
 	float: left;
+	width: 180px;
 	cursor: pointer;
     margin-top: 18px;
     margin-left: 20px;
     font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
     
 .radionoimgtext{

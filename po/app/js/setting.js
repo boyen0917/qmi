@@ -25,7 +25,7 @@ $(document).ready( function(){
 		if( tmp ) $(tmp).show();
 		$(".subpage-groupAbout").data("lastPage",null);
 		$(".subpage-groupAbout").off("animate").animate(
-			{marginLeft: '100%'}, 100, function(){
+			{marginLeft: '100%'}, 500, function(){
 				$(".subpage-groupAbout").hide();
 		});
 	});
@@ -37,7 +37,7 @@ $(document).ready( function(){
 		$(".ga-avatar input").trigger("click");
 	});
 
-	//檔案上傳
+	//團體頭像上傳
 	$(document).on("change",".setting-group-avatar",function(e){
 		var input = $(this);
 		var imageType = /image.*/;
@@ -50,6 +50,7 @@ $(document).ready( function(){
 				//var img = imgs.filter(".upload");
 				//reset
 				imgs.attr("src",reader.result);
+				$("img[data-gi='"+gi+"']").attr("src",reader.result);
 				//img.show();
 		        
 		        //有更動即可按確定
@@ -63,11 +64,10 @@ $(document).ready( function(){
 
 			qmiUploadFile({
 				urlAjax: {
-
-					apiName: "groups/"+ +"/avatar",
+					apiName: "groups/"+ gi +"/avatar",
 					method: "put"
 				},
-				file: userAvatar.find(".user-headshot")[0],
+				file: $(".ga-avatar-img")[0],
 				oriObj: {w: 1280, h: 1280, s: 0.7},
 				tmbObj: {w: 480, h: 480, s: 0.6},
 				tp: 1 // ;
@@ -285,7 +285,7 @@ function clearTimelineIDB( this_gi, callback ){
          ╚═╝     ╚══════╝ ╚═╝  ╚═╝ ╚═╝     ╚═╝ ╚═╝ ╚══════╝ ╚══════╝ ╚═╝  ╚═════╝  ╚═╝  ╚═══╝          
                                                                                                     
 */
-
+//管理員列表
 function showUpdatePermissionPage(){
 	
 	//find current admins
@@ -340,6 +340,7 @@ function showUpdatePermissionPage(){
 		}
 	});
 }
+//更新管理員
 function requestUpdatePermission( this_gi, addList, delList, callback){
 	var api_name = "groups/"+this_gi+"/administrators";
     var headers = {
@@ -378,6 +379,8 @@ function showGroupInfoPage(){
 	var groupDescription = groupName;
 	var groupImg = null;
 	var groupId = null;
+	
+
 	try{
         var userData = QmiGlobal.groups;
         var group = userData[gi];
@@ -393,6 +396,7 @@ function showGroupInfoPage(){
     $(".ga-group-name").text(groupName);
     $(".ga-group-id").text("ID : " + groupId);
     $(".ga-group-des").text(groupDescription);
+    
 
     if (isAdmin){
     	$(".ga-avatar-photo").removeClass("notadmin");
@@ -402,26 +406,43 @@ function showGroupInfoPage(){
     	$(".ga-icon.admin").addClass("notadmin");
     }
 
-    $(".ga-gr-content.view").show();
-	$(".ga-gr-content.edit").hide();
-	$(".ga-info-row.view").show();
-	$(".ga-info-row.edit").hide();
+    var gaContent = $(".ga-content");
+	var inGroupName = $("input.ga-group-name");
+	var textGroupDes = $("textarea.ga-group-des");
+
+ 	gaContent.find(".ga-gr-content.view").show().end()
+ 			 .find(".ga-gr-content.edit").hide().end()
+ 			 .find(".ga-info-row.view").show().end()
+			 .find(".ga-info-row.edit").hide().end();
 
     $(document).on("click","#icon-view-gname", function(){
-		$(".ga-gr-content.view").hide();
-		$(".ga-gr-content.edit").show();
+    	gaContent.find(".ga-gr-content.view").hide().end()
+				 .find(".ga-gr-content.edit").show();
+    	setTimeout(function(){
+            inGroupName.focus();
+        }, 0);
+    	inGroupName.val(groupName);		
 	});
 	$(document).on("click","#icon-view-gdes", function(){
-		$(".ga-info-row.view").hide();
-		$(".ga-info-row.edit").show();
+		gaContent.find(".ga-info-row.view").hide().end()
+				 .find(".ga-info-row.edit").show();
+		setTimeout(function(){
+            textGroupDes.focus();
+        }, 0);	
+		textGroupDes.val(groupDescription);	
 	});
 	$(document).on("click","#icon-edit-gname", function(){
-		$(".ga-gr-content.view").show();
-		$(".ga-gr-content.edit").hide();
+		gaContent.find(".ga-gr-content.view").show().end()
+				 .find(".ga-gr-content.edit").hide();
+		gaContent.find(".ga-group-name").text(inGroupName.val());
+		getUpdateGroupInfoApi(gi, inGroupName.val(), "");	
 	});
 	$(document).on("click","#icon-edit-gdes", function(){
-		$(".ga-info-row.view").show();
-		$(".ga-info-row.edit").hide();
+		gaContent.find(".ga-info-row.view").show().end()
+				 .find(".ga-info-row.edit").hide();
+		gaContent.find(".ga-group-des").text(textGroupDes.val());
+		getUpdateGroupInfoApi(gi, "", textGroupDes.val());
+		
 	});
 	//admin
 	// var view = $(".ga-info.view");
@@ -468,7 +489,7 @@ function showGroupInfoPage(){
 		$(".subpage-groupAbout").css("margin-left","100%");
 		$(".subpage-groupAbout").show();
 		$(".subpage-groupAbout").off("animate").animate(
-			{marginLeft: '0%'}, 100, function(){
+			{marginLeft: '0%'}, 500, function(){
 				$(".subpage-groupSetting").hide();
 			    $(".subpage-contact").hide();
 			    $(".subpage-timeline").hide();
@@ -497,30 +518,30 @@ function showGroupInfoPage(){
     // $(".subpage-album").fadeOut();
 
 	//reset
-	var img = $(".ga-avatar-img");
-	img.filter(".upload").hide();
-	img.filter(".currentGroup").show();
-	resetGroupInfo();
+	// var img = $(".ga-avatar-img");
+	// img.filter(".upload").hide();
+	// img.filter(".currentGroup").show();
+	// resetGroupInfo();
 }
 
-function resetGroupInfo(){
+// function resetGroupInfo(){
 
-	$(".ga-header-done").removeClass("ready");
-	var input = $(".ga-avatar input");
-	input.replaceWith( input.clone(true) );
-	// $(".ga-avatar-img.currentGroup").show();
+// 	$(".ga-header-done").removeClass("ready");
+// 	var input = $(".ga-avatar input");
+// 	input.replaceWith( input.clone(true) );
+// 	// $(".ga-avatar-img.currentGroup").show();
 
-	var info = $(".ga-info");
-	var contents = info.filter(".edit .ga-info-row .content");
-	$.each( contents, function(i,dom){
-		var domTmp = $(dom);
-		domTmp.data("oriText", domTmp.val() );
-	});
+// 	var info = $(".ga-info");
+// 	var contents = info.filter(".edit .ga-info-row .content");
+// 	$.each( contents, function(i,dom){
+// 		var domTmp = $(dom);
+// 		domTmp.data("oriText", domTmp.val() );
+// 	});
 
-	info.filter(".view").show();
-	info.filter(".edit").hide();
+// 	info.filter(".view").show();
+// 	info.filter(".edit").hide();
 
-}
+// }
 
 // function checkGroupInfoChange(){
 // 	if( $(".ga-avatar input").hasClass("ready") 
@@ -589,16 +610,27 @@ function getUpdateGroupInfoApi( this_gi, newGn, newGd ){
 	//   "gd": "這是一個敘述"
 	// }
 
-	var api_name = "groups/"+this_gi;
-	var headers = {
-	        ui: ui,
-	        at: at,
-	        li: lang
-	             };
-	var method = "put";
+	// var api_name = "groups/"+this_gi;
+	// var headers = {
+	//         ui: ui,
+	//         at: at,
+	//         li: lang
+	//              };
+	// var method = "put";
+	// var body = {};
+	// if( newGn ) body.gn = newGn;
+	// if( newGd ) body.gd = newGd;
 	var body = {};
-	if( newGn ) body.gn = newGn;
-	if( newGd ) body.gd = newGd;
-	
-	return ajaxDo(api_name,headers,method,true,body);
+	if( newGn )	body.gn = newGn;
+	if( newGd )	body.gd = newGd;
+	// return ajaxDo(api_name,headers,method,true,body);
+	new QmiAjax({
+		apiName: "groups/" + this_gi,
+		type: "put",
+		body: body
+	}).success(function(data){
+		toastShow(data.rsp_msg);
+	}).error(function(e){
+        alert("error");
+    });
 }
