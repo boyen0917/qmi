@@ -112,6 +112,7 @@
     ]
 	String.prototype.replaceEmoji = function () {
 		// cns.debug( JSON.stringify(this) );
+		return this + "";
 		var tmpString = this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
 			var tmp = [];
 			var n = match.lastIndexOf(";&#");
@@ -143,6 +144,7 @@
 
 	//處理未轉成網頁表示的u+code
 	String.prototype.replaceOriEmojiCode = function(){
+		return this + "";
 		return this.replace( new RegExp( '([\u2B00-\u2BFF]\ufe0f|([\u2600-\u26FF])|([\u2700-\u27BF]$)|[\uD800-\uDBFF][\uDC00-\uDFFF])','g'), function(match, contents, offset, s){
 			var tmp = [];
 			tmp.push( match.charCodeAt(0) );

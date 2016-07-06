@@ -34,7 +34,7 @@ $(document).ready( function(){
 
 	//file upload
 	$(document).on("click",".ga-avatar-photo.admin",function(e){
-		$(".ga-avatar input").trigger("click");
+		$(".setting-group-avatar").trigger("click");
 	});
 
 	//團體頭像上傳
