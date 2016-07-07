@@ -583,7 +583,14 @@ $(function(){
 
 		var this_s32 = this_img_area.find(".auo").data("src");
 
-        showGallery( null, null, [{s32:this_s32}] );
+		new QmiGlobal.gallery({
+            photoList: [{s32:this_s32}],
+            currentImage : 0,
+            // isApplyWatermark : isApplyWatermark,
+            // watermarkText : watermarkText
+        })
+        // showGallery( null, null, [{s32:this_s32}] );
+        // showGallery( null, [{s32:this_s32}], 0);
 		// var gallery_str = '<li data-thumb="' + this_s32 + '"><img src="' + this_s32 + '" /></li>';
 
 		// var img = new Image();

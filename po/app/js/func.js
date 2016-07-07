@@ -1338,6 +1338,7 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
     var this_gi = this_event.data("event-id").split("_")[0];
     var this_ei = this_event.data("event-id");
 
+
     //event 自己的閱讀回覆讚好狀態
     var event_status = this_event.data("event-status");
 
@@ -1361,6 +1362,7 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
         this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html .st-reply-content-area',function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
+            var fileArea = this_load.find(".file");
 
             var targetTu = null;
             if(el.meta){
@@ -1463,6 +1465,20 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk){
                         if (typeof(mainReplyText) == 'string' && mainReplyText) {
                             mainReplyText = mainReplyText.qmiTag(val);
                         }
+                        break;
+                    case 26:
+                        getS3fileBackground(val, fileArea, 26, null , function(data){
+                            var linkElement = document.createElement("a");
+                            var fileIcon = document.createElement("img");
+                            var fileNameNode = document.createTextNode(val.fn);   
+                            fileIcon.src = 'images/timeline/otherfile_icon.png';
+                            linkElement.className = 'attach-file';
+                            linkElement.download = val.fn;
+                            linkElement.href = data.s3;
+                            linkElement.appendChild(fileIcon);
+                            linkElement.appendChild(fileNameNode);
+                            fileArea.append(linkElement);
+                        });
                         break;
                 }
             });
@@ -5614,6 +5630,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     var gallery_arr = [], audio_arr = [], video_arr = [],
         isApplyWatermark = false,
         watermarkText = "--- ---";
+        fileNum = 0;
 
     $.each(ml,function(i,val){
         //結束時間檢查
@@ -5816,6 +5833,22 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 //     mainContext = mainContext.qmiTag(val);
                 // }
                 break;
+            case 26:
+                this_event.find(".st-attach-file").show();
+                getS3fileBackground(val, this_event.find(".st-attach-file"), 26, null, function(data){
+                    var linkElement = document.createElement("a");
+                    var fileIcon = document.createElement("img");
+                    var fileNameNode = document.createTextNode(val.fn);   
+                    fileIcon.src = 'images/timeline/otherfile_icon.png';
+                    linkElement.className = 'attach-file';
+                    linkElement.download = val.fn;
+                    linkElement.href = data.s3;
+                    linkElement.appendChild(fileIcon);
+                    linkElement.appendChild(fileNameNode);
+                    this_event.find(".attach-file-list").append(linkElement);
+                });
+                fileNum += 1;
+                break;
             case 27:
                 if( false==isApplyWatermark && 1==val.wm ){
                     try{
@@ -5862,9 +5895,10 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     });
 
     //若有圖片 則呼叫函式處理
-    if(gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr, isApplyWatermark, watermarkText, tu);
-    if(audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
-    if(video_arr.length > 0) timelineVideoMake(this_event,video_arr);
+    if (gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr, isApplyWatermark, watermarkText, tu);
+    if (audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
+    if (video_arr.length > 0) timelineVideoMake(this_event,video_arr);
+    if (fileNum > 0) timelineFileMake(this_event, fileNum);
 
     this_event._i18n();
 
@@ -5898,6 +5932,37 @@ timelineVideoMake = function (this_event,video_arr){
         return false;
     });
 }
+
+timelineFileMake = function(thisEvent, fileNum) {
+
+    var expandDiv = thisEvent.find(".st-attach-file").children(".header");
+    var allDownLoadDiv = thisEvent.find(".st-attach-file").children(".footer");
+    var fileListDiv = thisEvent.find(".st-attach-file").children(".attach-file-list");
+
+    allDownLoadDiv.hide();
+
+    if (fileNum == 1) {
+        expandDiv.hide();
+    } else {
+        fileListDiv.hide();
+        expandDiv.append(document.createTextNode(" ( " + fileNum + " )"));
+
+        expandDiv.bind("click", function(e) {
+            fileListDiv.fadeToggle();
+            allDownLoadDiv.fadeToggle();
+            $(this).toggleClass("hidden");
+        });
+
+        allDownLoadDiv.bind("click", function(e) {
+            var fileLinks = fileListDiv.find("a");
+            e.preventDefault();
+            $.each(fileLinks, function(i, fileLink) {
+                fileLink.click();
+            });
+        });
+    }
+}
+
 
 timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermarkText, tu){
     // cns.debug(this_event.data("event-id")+"  "+"gallery:",gallery_arr);
@@ -5955,6 +6020,9 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
                 left.append(this_img);
             }
             else{
+                if (i == 4) {
+                    this_img.html("<h1>+ " + (Object.keys(gallery_arr).length - 5).toString() + "</h1>");
+                }
                 right.append(this_img);
             }
 
@@ -5970,7 +6038,7 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
                     gallery_arr[i].s32 = data.s32;
                     this_img.addClass("loaded");
                 });
-            }
+            } 
             if( i>=4 ) return false;
         });
     }
@@ -5980,14 +6048,32 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
 
     //點選開啟圖庫
     this_gallery.find(".st-attach-img-area").click(function(e){
-        e.stopPropagation();
+        // var targetImg = e.target.style.backgroundImage;
+        var targetImg = e.target;
+        if (targetImg.tagName === "H1") {
+            targetImg = e.target.parentElement;
+        }
+
+        var imageList = Array.prototype.slice.call(this_event[0].getElementsByClassName("st-slide-img"), 0);
+        var targetImgIndex = imageList.indexOf(targetImg);
+      
         var this_img_area = $(this);
         var this_ei = this_img_area.parents(".st-sub-box").data("event-id");
         var this_gi = this_ei.split("_")[0];
         var this_ti = this_ei.split("_")[1];
-        showGallery( this_gi, this_ti, gallery_arr, null, null, isApplyWatermark, watermarkText );
+        // showGallery( this_gi, this_ti, gallery_arr, null, null, isApplyWatermark, watermarkText );
+        // showGallery(this_ti, gallery_arr, targetImgIndex, isApplyWatermark, watermarkText);
+
+        new QmiGlobal.gallery({
+            gi: gi,
+            photoList: gallery_arr,
+            currentImage : targetImgIndex,
+            isApplyWatermark : isApplyWatermark,
+            watermarkText : watermarkText
+        })
     });
 }
+
 
 getS3file = function(file_obj,target,tp,size, tu){
     var this_ei = target.parents(".st-sub-box").data("event-id");
@@ -6044,9 +6130,10 @@ getS3fileBackground = function(file_obj,target,tp, tu, callback){
     var this_ei = target.parents(".st-sub-box").data("event-id");
     var this_gi = this_ei.split("_")[0];
     var this_ti = this_ei.split("_")[1];
+    var fileId = file_obj.c || file_obj.fi;
 
     //default
-    var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + file_obj.c + "/dl";
+    var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + fileId + "/dl";
     var headers = {
              "ui":ui,
              "at":at, 
@@ -6070,6 +6157,19 @@ getS3fileBackground = function(file_obj,target,tp, tu, callback){
                     break;
                 case 8://聲音
                     target.attr("src",obj.s3);
+                    break;
+                // case 26://檔案
+                //     var linkElement = document.createElement("a");
+                //     var fileIcon = document.createElement("img");
+                //     var fileNameNode = document.createTextNode(file_obj.fn);   
+                //     fileIcon.src = 'images/timeline/otherfile_icon.png';
+                //     linkElement.className = 'attach-file';
+                //     linkElement.download = file_obj.fn;
+                //     linkElement.href = obj.s3;
+                //     linkElement.appendChild(fileIcon);
+                //     linkElement.appendChild(fileNameNode);
+                //     target.append(linkElement);
+                    
                     break;
             }
             var image = new Image();
@@ -6734,10 +6834,10 @@ replySend = function(thisEvent){
         body.meta.tu = object_obj;
     }
 
-    var text = this_event.find(".st-reply-highlight-container").html()
+    var text = thisEvent.find(".st-reply-highlight-container").html()
                          .replace(/<br>/g, "\n");
-    var tagMembers = this_event.find(".st-reply-highlight-container").data("markMembers");
-    if (Object.keys(tagMembers).length) {
+    var tagMembers = thisEvent.find(".st-reply-highlight-container").data("markMembers");
+    if (tagMembers && Object.keys(tagMembers).length) {
         
         for (var tagID in tagMembers) {
             body.ml.push({
@@ -6750,14 +6850,12 @@ replySend = function(thisEvent){
         }
     }
 
-    if( text ){
-        body.ml.unshift({
-            "c": text,
-            "tp": 0
-        });
-    }
-    var imgArea = this_event.find(".st-reply-message-img");
-    var imgType = imgArea.data("type");
+    body.ml.unshift({
+        "c": text ,
+        "tp": 0
+    });
+    var imgArea = thisEvent.find(".st-reply-message-img");
+    // var imgType = imgArea.data("type");
 
     // switch( imgType ){
     // body.ml.push({
@@ -6892,9 +6990,9 @@ replySend = function(thisEvent){
             break;
     }
 
-    if( !isWaiting ){
-        replyApi( this_event, this_gi, this_ti, this_ei, body );
-    }
+    // if( !isWaiting ){
+    //     replyApi( thisEvent, thisGi, thisTi, thisEi, body );
+    // }
     uploadDef.done(function(rspObj) {
         //if fail uploading
         if(rspObj.isSuccess === false){
@@ -6917,6 +7015,7 @@ replySend = function(thisEvent){
 }
 
 replyApi = function(this_event, this_gi, this_ti, this_ei, body){
+    console.log(body);
     s_load_show = false;
     var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events?ep=" + this_ei;
 

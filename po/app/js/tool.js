@@ -545,7 +545,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			delete paramObj.s32;
 
 			contentType = " ";
-
 			// 傳給外部 commit 使用
 			mt = uploadObj.file.type || "text";
 			si = uploadObj.file.size;
@@ -1053,55 +1052,241 @@ setStickerUrl = function(dom, id){
 	}
 }
 
-showGallery = function( this_gi, this_ti, gallery_arr, startIndex, title, isWatermark, watermarkText ){
-	startIndex = startIndex || 0;
-    var gallery = $(document).data("gallery");
-    if( null != gallery && false==gallery.closed){
-        gallery.focus();
-        gallery.ui = ui;
-        gallery.at = at;
-        gallery.lang = lang;
-        gallery.this_gi = this_gi;
-        gallery.this_ti = this_ti;
-        gallery.list = gallery_arr;
-        gallery.startIndex = startIndex;
-        gallery.title = title;
-        gallery.isWatermark = isWatermark;
-        gallery.watermarkText = watermarkText;
-        var dataDom = $(gallery.document).find(".dataDom");
-        dataDom.click();
-    } else {
-        gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
-        $(document).data("gallery", gallery);
+QmiGlobal.gallery = function (data) {
 
-        gallery.ui = ui;
-        gallery.at = at;
-        gallery.lang = lang;
-        gallery.this_gi = this_gi;
-        gallery.this_ti = this_ti;
-        gallery.list = gallery_arr;
-        gallery.startIndex = startIndex;
-        gallery.title = title;
-        gallery.isWatermark = isWatermark;
-        gallery.watermarkText = watermarkText;
-        // $(gallery.document).ready(function(){
-        //     setTimeout(function(){
-        //         gallery.ui = ui;
-        //         gallery.at = at;
-        //         gallery.lang = lang;
-        //         gallery.this_gi = this_gi;
-        //         gallery.this_ti = this_ti;
-        //         gallery.list = gallery_arr;
-        //         gallery.startIndex = startIndex;
-        //         gallery.title = title;
-        //         gallery.isWatermark = isWatermark;
-        //         gallery.watermarkText = watermarkText;
-        //         var dataDom = $(gallery.document).find(".dataDom");
-        //         dataDom.click();
-        //     },0);
-        // });
+	this.photoList = data.photoList;
+	this.currentImage = data.currentImage;
+	this.isApplyWatermark = data.isApplyWatermark;
+	this.watermarkText = data.watermarkText;
+
+	this.container =  $("<div id='galleryModal'>"
+	        + "<div class='close'>×</div>"
+	        + "<figure class='gallery-contaniner'>"
+	        // + "<div class='gallery-content'>"
+	        + "<img class='currentImg'>"
+	        + "<figcaption id='caption'></figcaption>"
+	       	+ "<div class='preBtn arrowBtn'></div>"
+	        + "<div class='nextBtn arrowBtn'></div>"
+	        + "</figure></div>");
+	var leftArrow = this.container.find(".preBtn");
+	var caption = this.container.find("#caption");
+	var rightArrow = this.container.find(".nextBtn");
+	var closeBtn  = this.container.find(".close");
+	var imgElement = this.container.find("img");
+
+	imgElement.attr("src", this.photoList[this.currentImage].s32);
+	caption.html(this.currentImage + 1 + "/" + this.photoList.length);
+
+	closeBtn.on("click", this.close.bind(this));
+	leftArrow.on('click', this.showPreviousImage.bind(this));
+	rightArrow.on('click', this.showNextImage.bind(this));
+
+	$("body").append(this.container);
+
+	this.hasMultiImage = function () {
+		if (this.photoList.length == 1) {
+			return false;
+		} 
+		return true;
+    };
+
+    this.hideElements = function () {
+    	leftArrow.hide();
+    	rightArrow.hide();
+    	caption.hide();
     }
+
+    if (! this.hasMultiImage()) {
+    	this.hideElements();
+    } 
 }
+
+
+QmiGlobal.gallery.prototype = {
+	// container: $("<div id='galleryModal'>"
+ //        + "<div class='gallery-contaniner'>"
+ //        + "<span class='close'>×</span>"
+ //        + "<img class='currentImg'>"
+ //        + "<div class='preBtn arrowBtn'></div>"
+ //        + "<div class='nextBtn arrowBtn'></div>"
+ //        + "<div id='caption'></div>"
+ //        + "</div></div>"),
+
+	getImageUrl: function() {
+		return new QmiAjax({
+        	apiName: "groups/" + gi + "/files/" + this.photoList[this.currentImage].c 
+        		+ "?pi=" + this.photoList[this.currentImage].p + "&ti=" 
+        		+ QmiGlobal.groups[gi].ti_feed
+    	});
+	},
+
+	showPreviousImage: function(e) {
+		this.currentImage = (this.photoList.length + this.currentImage - 1) % (this.photoList.length);
+		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
+			this.getImageUrl().then(function (data) {
+				
+				if (this.isApplyWatermark) {
+					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
+						function (imgUrl) {
+							this.photoList[this.currentImage].s32 = imgUrl;
+							this.container.find("img").attr("src", imgUrl);
+						}.bind(this));
+				}
+
+				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
+				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+			}.bind(this));
+		}
+		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+		caption.html(this.currentImage + 1 + "/" + this.photoList.length);
+		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
+	},
+
+	showNextImage: function(e) {
+		this.currentImage = (this.currentImage + 1) % (this.photoList.length);
+		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
+			this.getImageUrl().then(function (data) {
+				if (this.isApplyWatermark) {
+					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
+						function (imgUrl) {
+							this.photoList[this.currentImage].s32 = imgUrl;
+							this.container.find("img").attr("src", imgUrl);
+						}.bind(this));
+				}
+				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
+				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+			}.bind(this));
+		}
+		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
+	},
+
+	close: function() {
+		this.container.remove();
+		delete this.photoList;
+		delete this.container;
+		// this = {};
+	},
+}
+
+// showGallery = function(timelineID, galleryList, targetImgIndex, isApplyWatermark, watermarkText){
+// 	var galleryModal = new QmiGlobal.gallery(timelineID, galleryList);
+
+// 	galleryModal.create();
+
+// 	if (! galleryModal.hasMultiImage) {
+// 		galleryModal.hideArrow();
+// 	}
+// }
+
+// 	$("body").append("<div id='galleryModal'>"
+//         + "<div class='gallery-contaniner'>"
+//         + "<span class='close'>×</span>"
+//         + "<img class='currentImg'>"
+//         + "<div class='preBtn arrowBtn'></div>"
+//         + "<div class='nextBtn arrowBtn'></div>"
+//         + "<div id='caption'></div>"
+//         + "</div></div>");
+
+// 	var galleryModal = $("#galleryModal");
+// 	var currentImgElement = galleryModal.find(".currentImg");
+// 	// var currentImgUrl = galleryList[targetImgIndex].s32;
+// 	var photoNum = galleryList.length;
+
+
+// 	currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+
+// 	if (photoNum == 1) {
+// 		galleryModal.find(".arrowBtn").hide();
+// 	}
+
+// 	galleryModal.find(".preBtn").bind("click", function(e) {
+// 		if (targetImgIndex == 0) {
+// 			targetImgIndex = photoNum-1;
+// 		} else {
+// 			targetImgIndex -= 1;
+// 		}
+// 		if (! galleryList[targetImgIndex].s32) {
+// 			getS32file(timelineID, galleryList[targetImgIndex]).then(function(data) {
+// 				galleryList[targetImgIndex].s32 = data.s32;
+// 				currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+// 			});
+// 		} else {
+// 			currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+// 		}
+// 	});
+
+
+// 	galleryModal.find(".nextBtn").bind("click", function(e) {
+// 		if (targetImgIndex == photoNum-1) {
+// 			targetImgIndex = 0;
+// 		} else {
+// 			targetImgIndex += 1;
+// 		}
+// 		console.log(targetImgIndex);
+// 		if (! galleryList[targetImgIndex].s32) {
+// 			getS32file(timelineID, galleryList[targetImgIndex]).then(function(data) {
+// 				galleryList[targetImgIndex].s32 = data.s32;
+// 				currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+// 			});
+// 		} else {
+// 			currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+// 		}
+// 	});
+
+// 	galleryModal.find(".close").bind("click", function(e) {
+// 		galleryModal.remove();
+// 	});
+
+	
+// 	startIndex = startIndex || 0;
+//     var gallery = $(document).data("gallery");
+//     if( null != gallery && false==gallery.closed){
+//         gallery.focus();
+//         gallery.ui = ui;
+//         gallery.at = at;
+//         gallery.lang = lang;
+//         gallery.this_gi = this_gi;
+//         gallery.this_ti = this_ti;
+//         gallery.list = gallery_arr;
+//         gallery.startIndex = startIndex;
+//         gallery.title = title;
+//         gallery.isWatermark = isWatermark;
+//         gallery.watermarkText = watermarkText;
+//         var dataDom = $(gallery.document).find(".dataDom");
+//         dataDom.click();
+//     } else {
+//         gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
+//         $(document).data("gallery", gallery);
+
+//         gallery.ui = ui;
+//         gallery.at = at;
+//         gallery.lang = lang;
+//         gallery.this_gi = this_gi;
+//         gallery.this_ti = this_ti;
+//         gallery.list = gallery_arr;
+//         gallery.startIndex = startIndex;
+//         gallery.title = title;
+//         gallery.isWatermark = isWatermark;
+//         gallery.watermarkText = watermarkText;
+//         // $(gallery.document).ready(function(){
+//         //     setTimeout(function(){
+//         //         gallery.ui = ui;
+//         //         gallery.at = at;
+//         //         gallery.lang = lang;
+//         //         gallery.this_gi = this_gi;
+//         //         gallery.this_ti = this_ti;
+//         //         gallery.list = gallery_arr;
+//         //         gallery.startIndex = startIndex;
+//         //         gallery.title = title;
+//         //         gallery.isWatermark = isWatermark;
+//         //         gallery.watermarkText = watermarkText;
+//         //         var dataDom = $(gallery.document).find(".dataDom");
+//         //         dataDom.click();
+//         //     },0);
+//         // });
+//     }
+// }
 
 showAlbumPage = function( this_gi, this_ti, this_gai, name ){
 	if( null== window ) return;
@@ -1421,6 +1606,34 @@ getGroupCompetence = function( this_gi ){
 		errorReport(e);
 	}
 	return tmp;
+}
+
+getS32file = function(thisTi, fileObj) {
+	var api_name = "groups/" + gi + "/files/" + fileObj.c + "?pi=" + fileObj.p + "&ti=" 
+		+ thisTi;
+	var result = new QmiAjax({
+        apiName: api_name
+    })
+    var deferred = $.Deferred();
+
+    result.complete(function(data){
+        if(data.status != 200){
+        	cns.debug("get s3 fail");
+        	return false;
+        }
+
+		try{
+			cns.debug(data.responseText);
+			cns.debug("target",target, "tp",tp);
+		} catch(e){
+			errorReport(e);
+		}
+
+        var obj =$.parseJSON(data.responseText);
+        deferred.resolve(obj);
+    });
+
+    return deferred.promise();
 }
 
 getS3FileNameWithExtension = function( s3Addr, type ){
