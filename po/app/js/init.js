@@ -233,7 +233,7 @@ window.QmiGlobal = {
 
 	// 聊天室 auth
 	auth: {},
-
+	me: {},
 	getObjectFirstItem: function(obj,last) {
 		if(last === true){
 			return obj[Object.keys(obj)[Object.keys(obj).length-1]];
@@ -320,6 +320,8 @@ window.QmiGlobal = {
 		            var img = $(".user-avatar-img");
 		            img.attr("src",reader.result);
 		            $("#userInfo").find(".user-avatar-setting").attr("src",reader.result);
+		            //QmiGlobal.me.aut = reader.result;
+		            
 		        }
 		        reader.readAsDataURL(image_file);        
 

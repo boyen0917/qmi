@@ -577,24 +577,24 @@ timelineSwitch = function (act,reset,main,noPR){
           break;
         case "user-setting":
                 
-              $("#page-group-main .main-subpage").hide();
-              $(".subpage-userInformation").show();
+            $("#page-group-main .main-subpage").hide();
+            $(".subpage-userInformation").show();
 
-              userInfoGetting();
-
-              switchDeferred.resolve({ act: "user-setting"});
+            userInfoSetting();
+            
+            switchDeferred.resolve({ act: "user-setting"});
               // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
-              break;  
+            break;  
         case "system-setting":
 
-              $("#page-group-main .main-subpage").hide();
-              $(".subpage-systemSetting").show();
+            $("#page-group-main .main-subpage").hide();
+            $(".subpage-systemSetting").show();
 
-              systemSetting();
+            systemSetting();
 
-              switchDeferred.resolve({ act: "system-setting"});
+            switchDeferred.resolve({ act: "system-setting"});
               // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
-              break;
+            break;
 
         case "fileSharing":
             $(".subpage-fileSharing").show();

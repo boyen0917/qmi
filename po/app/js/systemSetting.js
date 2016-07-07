@@ -60,27 +60,26 @@ $(document).ready(function(){
     });
 });
 
-//取得個人資訊*
-userInfoGetting = function(){
-
-    var userInfo = $("#userInfo");
+//user Info Setting
+userInfoSetting = function(){
     var userInformation = $("#userInformation-page");
     var emailSetting = $("#email-setting");
-
+    userInformation.find(".user-avatar-img").attr('src',QmiGlobal.me.auo).end()//大頭照
+                       .find(".input-username").val(QmiGlobal.me.nk);//first name
+        
+    emailSetting.find("input[name$='user-edit-phone']").val(QmiGlobal.me.pn);
+}
+//取得個人資訊
+userInfoGetting = function(){
+    var userInfo = $("#userInfo");
     new QmiAjax({
         apiName: "me"
     }).success(function(data){
-        //console.debug("data",data);
-        //個人資訊 使用者名稱 頭像
-        userInformation.find(".user-avatar-img").attr('src',data.auo).end()//大頭照
-                       .find(".input-username").val(data.nk);//first name
+        QmiGlobal.me = data;
         //左下角個人資料 使用者名稱 手機 頭像
         userInfo.find(".user-name").text(data.nk).end()
                 .find(".user-phone").text(data.pn).end()
                 .find(".user-avatar-setting").attr("src",data.aut);
-
-        emailSetting.find("input[name$='user-edit-phone']").val(data.pn);
-        
     }).error(function(e){
         console.debug(e.responseText);
     });
@@ -104,12 +103,13 @@ userInfoUpdate = function(){
         toastShow(data.rsp_msg);
 
         $(".user-name").text(username_input); 
+        QmiGlobal.me.nk = username_input;
     }).error(function(e){
         console.debug(e.responseText);
     });
 }
 
-//system setting 系統設定 個人跟團體資料顯示
+//system setting 
 systemSetting = function(){
 
     var this_dgi = $.lStorage("_loginData").dgi;
@@ -241,6 +241,9 @@ passwordChange = function(){
                             //console.debug(verify_data);
                             QmiGlobal.auth.at = verify_data.at;
                             at = verify_data.at;
+                            var user_login = $.lStorage("_loginData");
+                            user_login.at = verify_data.at;
+                            $.lStorage("_loginData",user_login);
                             pwSetting.find(".input-password").val("");
                         }).error(function(e){
                             popupShowAdjust(e.rsp_msg);

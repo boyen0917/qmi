@@ -920,7 +920,7 @@
                                             <li data-tab="notification-setting">系統通知</li>
                                             <li data-tab="group-setting">預設開啟團體</li>
                                             <li data-tab="carousel-setting">置頂自動換頁</li>
-                                            <li data-tab="join-setting">歸戶</li>  
+                                            <li data-tab="guihu-setting">歸戶</li>  
                                             <!-- <li data-tab="term_of_service">服務條款</li>
                                             <li data-tab="right_to_privacy">隱私政策</li>
                                             <li data-tab="system-version">系統版本</li> -->
@@ -930,16 +930,16 @@
                                         <div id="email-setting" class="system-tab-content current-tab">
                                             <div class="edit-phone-content">
                                                 <div class="system-title">手機號碼</div>
-                                                <input type="text" name="user-edit-phone" data-role="none">
+                                                <input type="text" name="user-edit-phone" data-role="none" disabled>
                                                 <div class="btn-content">
-                                                    <button class="btn-b" data-role="none">變更</button>
+                                                    <button class="btn-b" data-role="none" style="display:none">變更</button>
                                                 </div>
                                             </div>
                                             <div class="edit-email-content">
                                                 <div class="system-title">電子郵件</div>
-                                                <input type="email" name="user-edit-email" data-role="none">
+                                                <input type="email" name="user-edit-email" data-role="none" disabled>
                                                 <div class="btn-content">
-                                                    <button class="btn-b" data-role="none">綁定</button>
+                                                    <button class="btn-b" data-role="none" style="display:none">綁定</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -960,7 +960,7 @@
 
             <div id="notification-setting" class=" system-tab-content">
                 <div class="edit-notification-content">
-                    <div class="notification-option">
+                    <div class="notification-option" style="display:none">
                         <label class="checkboxtext" for="no-option">聲音</label>
                         <label class="switch">
                             <input id="no-option" data-role="none" type='checkbox'>
@@ -1002,7 +1002,7 @@
                 <div class="edit-carousel-content">
                     <div class="system-title">自動換頁</div>
                     <div class="carousel-option">
-                        <input id="option" data-role="none" type="radio" name="second" value="0">
+                        <input id="option" data-role="none" type="radio" name="second" value="1000000">
                         <label for="option" class='radiobtn'></label>
                         <label for='option' class='radionoimgtext'>關閉</label>
                     </div>
@@ -1022,8 +1022,14 @@
                 </div>             
             </div>
 
-            <div id="join-setting" class="system-tab-content">
-                <div class="system-title">歸戶</div>
+            <div id="guihu-setting" class="system-tab-content">
+                <div class="edit-guihu-content">
+                    <div class="system-title">歸戶</div>
+                    <div class="guihu-list">
+                        
+                    </div>
+                </div>
+
             </div>
                                         <!-- <div id="term_of_service" class="system-tab-content">
                                             <div class="system-title">服務條款</div>
