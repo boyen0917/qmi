@@ -17,11 +17,11 @@ var ui,
 
 	//HiCloud
 
-	//base_url = "https://ap.qmi.emome.net/apiv1/";
+	base_url = "https://ap.qmi.emome.net/apiv1/";
 
 
 	// aws 測試環境
- 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
 
 
 
@@ -246,16 +246,17 @@ window.QmiGlobal = {
 	systemPopup: {
 		html : '<section id="systemPopup">'+
 					'<div class="sm-person-info">'+
-	                    '<div class="sm-info-hr">帳號</div>'+
-	                    '<div data-sm-act="user-setting" class="sm-info sm-small-area">個人資訊</div>'+
-	                    '<div class="sm-info-hr">系統</div>'+
-	                    '<div data-sm-act="system-setting" class="sm-info sm-small-area">設定</div>'+
-	                    '<div class="sm-info">關於Qmi</div>'+
-	                    '<div class="sm-info system-logout">登出</div>'+
+	                    '<div class="sm-info-hr" data-textid="LOGIN_SAVE_ACCOUNT_TITLE"></div>'+
+	                    '<div data-sm-act="user-setting" class="sm-info sm-small-area" data-textid="PERSONAL_INFORMATION"></div>'+
+	                    '<div class="sm-info-hr" data-textid="SYSTEM"></div>'+
+	                    '<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'+
+	                    '<div class="sm-info" data-textid="ABOUT_QMI"></div>'+
+	                    '<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'+
 	                '</div>'+
                	'</section>',
         init : function(){
         	var sysPopup = $(this.html);
+        	sysPopup._i18n();
         	$("body").append(sysPopup);
         	var systemPopup = $("#systemPopup");
         	systemPopup.click(function(){
@@ -285,13 +286,14 @@ window.QmiGlobal = {
 		                       '<img class="user-headshot" src="">'+
 		                   '</div>'+
 		                   '<div class="avatar-btn-content">'+
-		                       '<button data-role="none" class="cancel-btn btn-b">取消</button>'+
-		                       '<button data-role="none" class="avatar-save btn-b">儲存</button>'+
+		                       '<button data-role="none" class="cancel-btn btn-b" data-textid="COMMON_CANCEL"></button>'+
+		                       '<button data-role="none" class="avatar-save btn-b" data-textid="COMMON_OK"></button>'+
 		                   '</div>'+
 		                '</div>'+                           
 		        '</div>',
 		init : function(){
 			var imgPopup = $(this.html);
+			imgPopup._i18n();
         	$("body").append(imgPopup);
         	var userAvatar = $('.user-avatar-confirm');
         	userAvatar.fadeIn();
@@ -321,7 +323,7 @@ window.QmiGlobal = {
 		            img.attr("src",reader.result);
 		            $("#userInfo").find(".user-avatar-setting").attr("src",reader.result);
 		            //QmiGlobal.me.aut = reader.result;
-		            
+
 		        }
 		        reader.readAsDataURL(image_file);        
 

@@ -900,11 +900,11 @@
                                     <input type="file" class="setting-avatar-file" data-role="none" accept="image/*">
                             </div>
                             <div class="username-content">
-                                <label for="input-username">姓名</label>
+                                <label for="input-username" data-textid="SETTING_PROFILE_NAME"></label>
                                 <input type="text" class="input-username" value="" data-role="none">
                             </div>
                             <div class="user-btn-content">
-                                <button class="userSetting-btn btn-b" data-role="none">完成</button>
+                                <button class="userSetting-btn btn-b" data-role="none" data-textid="FEED_FINISHED"></button>
                             </div>
                         </div>
                     </div>
@@ -915,122 +915,120 @@
                                     <!-- 使用者資訊 -->
                                     <div class="tab-content-l">
                                         <ul class="system-tab">
-                                            <li class="current-tab" data-tab="email-setting">帳號設定</li>
-                                            <li data-tab="password-setting">變更密碼</li>
-                                            <li data-tab="notification-setting">系統通知</li>
-                                            <li data-tab="group-setting">預設開啟團體</li>
-                                            <li data-tab="carousel-setting">置頂自動換頁</li>
-                                            <li data-tab="guihu-setting">歸戶</li>  
+                                            <li class="current-tab" data-tab="email-setting" data-textid="ACCOUNT_SET"></li>
+                                            <li data-tab="password-setting" data-textid="PASSWORD_SET"></li>
+                                            <li data-tab="notification-setting" data-textid="SYSTEM_SET"></li>
+                                            <li data-tab="group-setting" data-textid="DEFAULT_GROUP_SET"></li>
+                                            <li data-tab="carousel-setting" data-textid="TOP_PAGE_SET"></li>
+                                            <li data-tab="guihu-setting" data-textid="GUIHU"></li>  
                                             <!-- <li data-tab="term_of_service">服務條款</li>
                                             <li data-tab="right_to_privacy">隱私政策</li>
                                             <li data-tab="system-version">系統版本</li> -->
                                         </ul>
                                     </div>
                                     <div class="tab-content-r">
+                                        <!-- 帳號設定 -->
                                         <div id="email-setting" class="system-tab-content current-tab">
                                             <div class="edit-phone-content">
-                                                <div class="system-title">手機號碼</div>
+                                                <div class="system-title" data-textid="USER_PROFILE_PHONE"></div>
                                                 <input type="text" name="user-edit-phone" data-role="none" disabled>
                                                 <div class="btn-content">
-                                                    <button class="btn-b" data-role="none" style="display:none">變更</button>
+                                                    <button class="btn-b" data-role="none" data-textid="CHANGE" style="display:none"></button>
                                                 </div>
                                             </div>
                                             <div class="edit-email-content">
-                                                <div class="system-title">電子郵件</div>
+                                                <div class="system-title" data-textid="USER_PROFILE_EMAIL"></div>
                                                 <input type="email" name="user-edit-email" data-role="none" disabled>
                                                 <div class="btn-content">
-                                                    <button class="btn-b" data-role="none" style="display:none">綁定</button>
+                                                    <button class="btn-b" data-role="none" data-textid="CHANGE" style="display:none"></button>
                                                 </div>
                                             </div>
                                         </div>
+                                        <!-- 變更密碼 -->
+                                        <div id="password-setting" class="system-tab-content">
+                                            <div class="edit-password-content">
+                                                <div class="system-title" data-textid="ORIGIN_PASSWORD"></div>
+                                                <input data-role="none" maxlength="20" type="password" name="o-password" class="input-password">
+                                                <div class="system-title" data-textid="NEW_PASSWORD"></div>
+                                                <input data-role="none" maxlength="20" type="password" name="n-password" class="input-password">
+                                                <div class="system-title" data-textid="CONFIRM_NEW_PASSWORD"></div>
+                                                <input data-role="none" maxlength="20" type="password" name="v-password" class="input-password"> 
+                                            </div>
+                                            <div class="btn-content">
+                                                <button class="password-btn btn-b" data-role="none" data-textid="CHANGE"></button>
+                                            </div>
+                                        </div>
+                                        <!-- 系統通知 -->
+                                        <div id="notification-setting" class=" system-tab-content">
+                                            <div class="edit-notification-content">
+                                                <div class="notification-option" style="display:none">
+                                                    <label class="checkboxtext" for="no-option" data-textid="VOICE_SET"></label>
+                                                    <label class="switch">
+                                                        <input id="no-option" data-role="none" type='checkbox'>
+                                                        <div class="slider"></div>
+                                                    </label>
+                                                </div>
+                                                <div class="notification-option">
+                                                    <label class="checkboxtext" for="no-option1" data-textid="CHAT_SET"></label>
+                                                    <label class="switch">
+                                                        <input id="no-option1" data-role="none" type='checkbox'>
+                                                        <div class="slider"></div>
+                                                    </label>
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="btn-content">
+                                                <button class="btn-b" data-role="none" data-textid="FEED_FINISHED"></button>
+                                            </div>
+                                        </div>
+                                        <!-- 預設團體 -->
+                                        <div id="group-setting" class="system-tab-content">
+                                            <!-- <select class="group-select" data-role="none" >        
+                                            </select> -->
+                                            <div class="edit-defaultgroup-content">
+                                                    <!-- <div class='group-option'>
+                                                        <input data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'>
+                                                        <label for='' class='radiobtn'></label>
+                                                        <img src=''>
+                                                        <label for='' class='radiotext'>"+test_data.gl[i].gn+"</label>
+                                                    </div> -->
+                                            </div> 
+                                            <div class="btn-content">
+                                                <button class="default-group-btn btn-b" data-role="none" data-textid="FEED_FINISHED"></button>
+                                            </div>
+                                        </div>
+                                        <!-- 自動換頁 -->
+                                        <div id="carousel-setting" class="system-tab-content">
+                                            <div class="edit-carousel-content">
+                                                <div class="carousel-option">
+                                                    <input id="option" data-role="none" type="radio" name="second" value="1000000">
+                                                    <label for="option" class='radiobtn'></label>
+                                                    <label for='option' class='radionoimgtext' data-textid="CLOSE_SET"></label>
+                                                </div>
+                                                <div class="carousel-option">
+                                                    <input id="option1" data-role="none" type="radio" name="second" value="3000">
+                                                    <label for="option1" class='radiobtn'></label>
+                                                    <label for='option1' class='radionoimgtext' data-textid="THREE_SEC_SET"></label>
+                                                </div>
+                                                <div class="carousel-option">
+                                                    <input id="option2" data-role="none" type="radio" name="second" value="5000">
+                                                    <label for="option2" class='radiobtn'></label>
+                                                    <label for='option2' class='radionoimgtext' data-textid="FIVE_SEC_SET"></label>
+                                                </div>
+                                            </div>
+                                            <div class="btn-content">
+                                                <button class="carousel-btn btn-b" data-role="none" data-textid="FEED_FINISHED"></button>
+                                            </div>             
+                                        </div>
+                                        <!-- 歸戶 -->
+                                        <div id="guihu-setting" class="system-tab-content">
+                                            <div class="edit-guihu-content">
+                                                <div class="guihu-list">
+                                                    
+                                                </div>
+                                            </div>
 
-            <div id="password-setting" class="system-tab-content">
-                <div class="edit-password-content">
-                    <div class="system-title">原密碼</div>
-                    <input data-role="none" maxlength="20" type="password" name="o-password" class="input-password">
-                    <div class="system-title">新密碼</div>
-                    <input data-role="none" maxlength="20" type="password" name="n-password" class="input-password">
-                    <div class="system-title">確認新密碼</div>
-                    <input data-role="none" maxlength="20" type="password" name="v-password" class="input-password"> 
-                </div>
-                <div class="btn-content">
-                    <button class="password-btn btn-b" data-role="none">變更密碼</button>
-                </div>
-            </div>
-
-            <div id="notification-setting" class=" system-tab-content">
-                <div class="edit-notification-content">
-                    <div class="notification-option" style="display:none">
-                        <label class="checkboxtext" for="no-option">聲音</label>
-                        <label class="switch">
-                            <input id="no-option" data-role="none" type='checkbox'>
-                            <div class="slider"></div>
-                        </label>
-                    </div>
-                    <div class="notification-option">
-                        <label class="checkboxtext" for="no-option1">聊天訊息預覽</label>
-                        <label class="switch">
-                            <input id="no-option1" data-role="none" type='checkbox'>
-                            <div class="slider"></div>
-                        </label>
-                    </div>
-                    
-                </div>
-                <div class="btn-content">
-                    <button class="btn-b" data-role="none">完成</button>
-                </div>
-            </div>
-
-            <div id="group-setting" class="system-tab-content">
-                <!-- <select class="group-select" data-role="none" >        
-                </select> -->
-                <div class="edit-defaultgroup-content">
-                    <div class="system-title">預設團體</div>
-                        <!-- <div class='group-option'>
-                            <input data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'>
-                            <label for='' class='radiobtn'></label>
-                            <img src=''>
-                            <label for='' class='radiotext'>"+test_data.gl[i].gn+"</label>
-                        </div> -->
-                </div> 
-                <div class="btn-content">
-                    <button class="default-group-btn btn-b" data-role="none">完成</button>
-                </div>
-            </div>
-
-            <div id="carousel-setting" class="system-tab-content">
-                <div class="edit-carousel-content">
-                    <div class="system-title">自動換頁</div>
-                    <div class="carousel-option">
-                        <input id="option" data-role="none" type="radio" name="second" value="1000000">
-                        <label for="option" class='radiobtn'></label>
-                        <label for='option' class='radionoimgtext'>關閉</label>
-                    </div>
-                    <div class="carousel-option">
-                        <input id="option1" data-role="none" type="radio" name="second" value="3000">
-                        <label for="option1" class='radiobtn'></label>
-                        <label for='option1' class='radionoimgtext'>三秒</label>
-                    </div>
-                    <div class="carousel-option">
-                        <input id="option2" data-role="none" type="radio" name="second" value="5000">
-                        <label for="option2" class='radiobtn'></label>
-                        <label for='option2' class='radionoimgtext'>五秒</label>
-                    </div>
-                </div>
-                <div class="btn-content">
-                    <button class="carousel-btn btn-b" data-role="none">完成</button>
-                </div>             
-            </div>
-
-            <div id="guihu-setting" class="system-tab-content">
-                <div class="edit-guihu-content">
-                    <div class="system-title">歸戶</div>
-                    <div class="guihu-list">
-                        
-                    </div>
-                </div>
-
-            </div>
+                                        </div>
                                         <!-- <div id="term_of_service" class="system-tab-content">
                                             <div class="system-title">服務條款</div>
                                             <div class="btn-content">

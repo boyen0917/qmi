@@ -256,6 +256,7 @@ $(function(){
 		//$(".sm-person-info").fadeToggle();
 		
 		QmiGlobal.systemPopup.init();
+		
 	});
 	//系統選單 Tab 
 	$(".system-tab").on('click','li',function(){

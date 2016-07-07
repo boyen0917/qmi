@@ -215,9 +215,12 @@
 }
 .ga-group-name{
 	font-size: 20px;
-	display: inline;
+	display: inline-block;
 	color: white;
-	width: 200px;
+	max-width: 200px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 	/*width: 80%;*/
 }
 input.ga-group-name{
@@ -234,9 +237,12 @@ input.ga-group-name{
 .ga-icon{
 	position: relative;
     left: 20px;
-    top: 3px;
+    top: -3px;
 	width: 20px;
 	cursor: pointer;
+}
+#icon-view-gdes{
+	top:3px;
 }
 .ga-group-type-name{
 	display: inline-block;
@@ -560,7 +566,8 @@ ul.system-tab li.current-tab{
 .edit-phone-content input,.edit-email-content input{
 	width: 200px;
 	height: 12px;
-	margin: 10px 0;
+	margin-top: 5px;
+	margin-bottom: 10px;
 	padding: 10px;
 	border: 1px solid #ccc;
 	font-size: 14px;
@@ -574,7 +581,8 @@ ul.system-tab li.current-tab{
 .edit-password-content input{
 	width: 316px;
 	height: 12px;
-	margin: 10px 0;
+	margin-top: 5px;
+	margin-bottom: 10px;
 	padding: 10px;
 	border: 1px solid #ccc;
 	font-size: 14px;
@@ -699,7 +707,7 @@ input[type=radio] {
 
 .radiotext{
 	float: left;
-	width: 180px;
+	width: 170px;
 	cursor: pointer;
     margin-top: 18px;
     margin-left: 20px;
