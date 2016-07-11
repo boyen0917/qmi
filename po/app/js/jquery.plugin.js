@@ -111,6 +111,7 @@
     	'&#(99(8[4-9]|9[0-9])|10(0[0-9]{2}|1([0-6][0-9]|7[0-5])));'
     ]
 	String.prototype.replaceEmoji = function () {
+		return this + "";
 		// cns.debug( JSON.stringify(this) );
 		var tmpString = this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
 			var tmp = [];
@@ -143,6 +144,7 @@
 
 	//處理未轉成網頁表示的u+code
 	String.prototype.replaceOriEmojiCode = function(){
+		return this + "";
 		return this.replace( new RegExp( '([\u2B00-\u2BFF]\ufe0f|([\u2600-\u26FF])|([\u2700-\u27BF]$)|[\uD800-\uDBFF][\uDC00-\uDFFF])','g'), function(match, contents, offset, s){
 			var tmp = [];
 			tmp.push( match.charCodeAt(0) );
