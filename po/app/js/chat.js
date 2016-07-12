@@ -1286,7 +1286,6 @@ $(function(){
 
 			div.append(subDiv);	//right
 		}
-
 		switch (msgData.tp) {
 			case 0: //text or other msg
 				if (isMe) {
@@ -1396,6 +1395,31 @@ $(function(){
 
 					msgDiv.html("You've missed a VOIP call, download Qmi on phone to receive it.");
 				}
+				break;
+
+			case 28:
+				var invoker = g_group.guAll[msgData.i];
+				var targetUser = g_group.guAll[msgData.t];
+				var systemMsg = "";
+				if (msgData.a) {
+					systemMsg = invoker.nk + "   指派   " + targetUser.nk + "   為聊天室管理員";
+				} else {
+					systemMsg = invoker.nk + "   取消   " + targetUser.nk + "   聊天室管理員權限";
+				}
+
+				msgDiv.html(htmlFormat(systemMsg));
+				if (isMe) {
+					msgDiv.parent().removeClass("chat-msg-right").addClass("sys-msg");
+				} else {
+					var newParent = msgDiv.parent().parent().parent();
+					newParent.find(".chat-msg-left").remove();
+					var child = msgDiv.parent().detach();
+					child.addClass("sys-msg");
+					child.find(".name").remove();
+					child.append(child.find(".msg-content").detach());
+					newParent.append(child);
+				}
+				
 				break;
 			default: //text or other msg
 				if (isMe) {
@@ -2067,10 +2091,12 @@ $(function(){
 		$.each( memList , function(key, memTmp){
 
 			var mem = g_group.guAll[key];
-			var memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + "<input type='checkbox' id='admin" + key + "'>"
+			var memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" 
+				+ "<input type='checkbox' id='admin" + key + "'>"
 				+ "<label for='admin" + key + "'></label></td></tr>");
 			if (memTmp.ad) {
-				memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" + "<input type='checkbox' checked id='admin" + key + "'>"
+				memDiv = $("<tr class='row mem'><td class='adminCheckBox' id='checkbox_" + key + "'>" 
+					+ "<input type='checkbox' checked id='admin" + key + "'>"
 					+ "<label for='admin" + key + "'></label></td></tr>");
 			}
 			var memberColumn = $("<td class='memberName'></td>");
@@ -2102,6 +2128,8 @@ $(function(){
 		var imageIsChanged = false;
 		var adminIsChanged = false;
 
+		var assignAdmins = [], cancalAdmin = [];
+
 		page.find(".adminSetting .chatroomImage").off("click").click( function(e){
 			page.find(".adminSetting .file").trigger("click");
 		});
@@ -2112,7 +2140,7 @@ $(function(){
 			imageIsChanged = true;
 		});
 
-		page.find(".adminSetting .chatroomNameInput").keyup( function(){
+		page.find(".adminSetting .chatroomNameInput").off("keyup").keyup( function(){
 	    	var val = $(this).val();
 	    	if(val != currentRoomName && val.length){
 	    		saveBtn.addClass("ready");
@@ -2124,12 +2152,12 @@ $(function(){
 	    	// checkIsReady();
 	    });
 
-	    page.find(".adminSetting input[type='checkbox']").change(function () {
+	    page.find(".adminSetting input[type='checkbox']").off("change").change(function () {
 	    	saveBtn.addClass("ready");
 	    	adminIsChanged = true;
 	    });
 		
-	    saveBtn.click(function (e) {
+	    saveBtn.off("click").click(function (e) {
 	    	e.preventDefault();
 			e.stopPropagation();
 			
@@ -2163,25 +2191,35 @@ $(function(){
 	    			var adminData = {el: [], dl: []};
 	    			adminCheckboxs.each(function (index, element) {
 	    				var memeberID = $(element).parent().attr("id").split("_")[1];
-	    				if ($(element).is(":checked")) {
-	    					g_room.memList[memeberID].ad = 1;
-	    					adminData.el.push(memeberID);
-	    				} else {
-	    					g_room.memList[memeberID].ad = 0;
-	    					adminData.dl.push(memeberID);
+	    				var isAdmin = $(element).is(":checked") ? 1 : 0;
+	    				if (isAdmin != g_room.memList[memeberID].ad) {
+	    					g_room.memList[memeberID].ad = isAdmin;
+	    					if (isAdmin) {
+	    						adminData.el.push(memeberID);
+	    					} else {
+	    						adminData.dl.push(memeberID);
+	    					}
 	    				}
+	    				// if ($(element).is(":checked")) {
+	    				// 	g_room.memList[memeberID].ad = 1;
+	    				// 	adminData.el.push(memeberID);
+	    				// } else {
+	    				// 	g_room.memList[memeberID].ad = 0;
+	    				// 	adminData.dl.push(memeberID);
+	    				// }
 	    			});
 	    			saveTasks.push(new QmiAjax({
 				        apiName: "/groups/" +gi + "/chats/" + ci + "/administrators",
 				        method: "put",
 				        body: adminData,
-				    }))
+				    }));
+
 	    		}
 
 	    		$.when.apply($, saveTasks).then(function () {
 	    			var resOfUploadImg = arguments[0];
 	    			
-	    			if (resOfUploadImg.tu && resOfUploadImg.ou) {
+	    			if (resOfUploadImg.hasOwnProperty("tu") && resOfUploadImg.hasOwnProperty("ou")) {
 	    				g_room.cat = resOfUploadImg.tu;
 						g_room.cao = resOfUploadImg.ou;
 	    			}
@@ -2197,6 +2235,10 @@ $(function(){
 						g_room.cn = g_cn;
 						g_room.uiName = g_cn;
 						$("#header span.text").html(g_cn.replaceOriEmojiCode());
+					}
+
+					if (adminIsChanged) {
+						updateChat();
 					}
 
 					updateEditRoomPage();

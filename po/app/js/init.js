@@ -11,14 +11,34 @@ var ui,
 	//local測試 預設開啟console
 	debug_flag = false,
 
-	//HiCloud
- 	// base_url = "https://ap.qmi.emome.net/apiv1/";
- 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+	clearChatTimer,
 
- 	// container riseNotification 一旦換網址就沒了
+	
+	//HiCloud
+ 	base_url = "https://ap.qmi.emome.net/apiv1/";
+ 	
+	//local測試 預設開啟console
+	debug_flag = false;
+	if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
+		debug_flag = true;
+		base_url = "https://qaap.qmi.emome.net/apiv1/";
+	};
+
+ 	// // container riseNotification 一旦換網址就沒了
 
 var userLang = navigator.language || navigator.userLanguage; 
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
+
+
+String.prototype._escape = function(){
+    return this.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+String.prototype.qmiTag = function (tagMember) {
+	var findText = "///;" + tagMember.u + ";///";
+	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
+	return this.replace("///;" + tagMember.u + ";///", "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>");
+}
 
 if( 0==userLang.indexOf("zh") ){
 	if( userLang=="zh_cn" ){
@@ -39,6 +59,7 @@ var content_limit = 400,
 	//部分跳頁不需要記錄
 	back_exception = false,
 	back_hash = false;
+
 
 //上一頁 預設
 // $(document).data("page-history",[["login"],["#page-group-menu","團體列表"]]);
@@ -195,17 +216,16 @@ var timeline_detail_exception = [
 
 window.QmiGlobal = {
 	// 之後取代 ui, at, gi, ... etc
-	current: { 
-		ui: "",
-		at: "",
-		gi: ""
-	}, 
+	currentGi: "",
 
 	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
 
 	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups 
 	clouds: {}, // 全部的私雲資料
 	cloudGiMap: {},
+
+	windowListCiMap: {},
+
 
 	// 聊天室 auth
 	auth: {},
@@ -217,11 +237,48 @@ window.QmiGlobal = {
 			return obj[Object.keys(obj)[0]];
 		}
 	},
+
+
+	viewMap: {}
 	
 };
 
-window.QmiAjax = function(args){
+// polling異常監控
+window.QmiPollingChk = {
 
+	flag: false, // 聊天室不開啓
+
+	cnt: 0, // 表示有在更新
+
+	// 5分鐘檢查一次polling死了沒
+	interval: setInterval(function() {
+		//  聊天室不開啓
+		if(window.QmiPollingChk.flag === false) return;
+
+		var oriNum = window.QmiPollingChk.cnt;
+
+		// 檢查 100秒內的cnt有沒有異常增加
+		setTimeout(function(){
+			var diff = window.QmiPollingChk.cnt - oriNum;
+
+			// 嚴格來說 超過25次就不正常 30秒後重啟polling
+			// 沒增加表示停了 也重啟
+			if(diff > 25 || diff === 0) {
+				console.log("polling異常 30秒後重啟");
+
+				QmiGlobal.pollingOff = true;
+				setTimeout(function(){
+					console.log("30秒 重啟");
+					QmiGlobal.pollingOff = false;
+					polling();
+				}, 30000);
+			}
+		}, 100000);
+	}, 300000)
+}
+
+window.QmiAjax = function(args){
+	// body and method
 	var self = this,
 		ajaxDeferred = $.Deferred(),
 
@@ -268,9 +325,9 @@ window.QmiAjax = function(args){
 			// setHeaders: outerArgs,cloudData
 			headers: self.setHeaders(args, cloudData),
 
-			timeout: 30000,
+			// timeout: 30000,
 
-			type: args.method || "get"
+			type: (args.method  || args.type) || "get"
 		};
 	// end of var
 
@@ -285,7 +342,7 @@ window.QmiAjax = function(args){
 
 
 	//before send
-	if(args.isLoadingShow === true) {
+	if(args.isLoadingShow === true || s_load_show === true) {
 		$(".ajax-screen-lock").show();
 		$('.ui-loader').css("display","block");
 	} 
@@ -297,7 +354,6 @@ window.QmiAjax = function(args){
 			cns.log("reAuth lock!");
 			return reAuthInterval;
 		} else {
-			
 			// 檢查是否接近過期時間 先替換token
 			// ajaxArgs,cloudData
 
@@ -320,23 +376,24 @@ window.QmiAjax = function(args){
 
 				// 執行
 				$.ajax(newArgs).complete(function(apiData){
-
 					// deferred chain -> 這邊可以省略 也可精簡 之後做 用一個deferred做reauth跟重新執行ajax
 					// 1. 判斷是否reAuth
 					// 2. reAuth之後重做原本的ajax
 					// 3. 回到原本ajax的判斷
 					(function(){
 						// 1. 判斷是否reAuth
-						var responseObj = JSON.parse(apiData.responseText),
+						var rspCode = function(){
+								try {
+									return JSON.parse(apiData.responseText).rsp_code;
+								} catch(e) {
+									return 999; // unexpected syntax, parse error
+								}
+							}(),
 							reAuthDefChain = MyDeferred();
-
-						if(responseObj === undefined) {
-							// do something
-						}
 
 						// reAuth: token過期
 						if( apiData.status === 401 
-							&& responseObj.rsp_code === 601
+							&& rspCode === 601
 							&& args.noAuth !== true
 						) {
 							// 執行前 先看reAuth lock沒
@@ -414,22 +471,20 @@ window.QmiAjax = function(args){
 	var completeCB,successCB,errorCB;
 
 	// 先搜集好callback 如果有呼叫 deferred完成後就執行
-	(function(){
-		ajaxDeferred.promise().complete = function(cb) {
-			completeCB = cb;
-			return ajaxDeferred.promise();
-		};
+	ajaxDeferred.promise().complete = function(cb) {
+		completeCB = cb;
+		return ajaxDeferred.promise();
+	};
 
-	    ajaxDeferred.promise().success = function(cb) {
-	        successCB = cb;
-	        return ajaxDeferred.promise();
-	    };
+    ajaxDeferred.promise().success = function(cb) {
+        successCB = cb;
+        return ajaxDeferred.promise();
+    };
 
-		ajaxDeferred.promise().error = function(cb) {
-			errorCB = cb;
-			return ajaxDeferred.promise();
-		};
-	}())
+	ajaxDeferred.promise().error = function(cb) {
+		errorCB = cb;
+		return ajaxDeferred.promise();
+	};
 	
 	// complete來這裡
 	ajaxDeferred.always(function(completeData){
@@ -452,8 +507,8 @@ window.QmiAjax = function(args){
 	ajaxDeferred.fail(function(completeData) {
 
 		completeData.newArgs = newArgs;
-		self.onError(completeData);
 
+		self.onError(completeData);
 		if(errorCB instanceof Function) errorCB(completeData);
 	});
 
@@ -521,26 +576,18 @@ QmiAjax.prototype = {
 		var nowEt = (args.cloudData === undefined) ? QmiGlobal.auth.et : args.cloudData.et,
 			deferred = $.Deferred();
 
-		// cns.debug( (args.cloudData === undefined ? "公雲 " : "私雲 ") + (function(){
-		// 	var temp = args.url.substring(0,(args.url.lastIndexOf("/") + 1)-1);
-		// 	var start = temp.lastIndexOf("/") + 1;
-		// 	return args.url.substring(start);
-		// }()), (nowEt - ( new Date().getTime() )) / 1000 );
-
 		if(args.noAuth === true) {
 			// 不用auth
 			deferred.resolve({isSuccess: true});
 
 		} else if(nowEt - (new Date().getTime()) < this.expireTimer) {
-			// reAuth 結束
+			// reAuth
 			this.reAuth(args.cloudData).done(deferred.resolve);
 
 		} else {
-
 			// 還沒過期
 			deferred.resolve({isSuccess: true});
 		}
-
 		return deferred.promise();
 	},
 
@@ -603,18 +650,21 @@ QmiAjax.prototype = {
 	},
 
 	onError: function(errData){
-		var ajaxArgs = errData.newArgs;
+		var ajaxArgs = errData.newArgs,
+			isPolling = function(){
+				return (errData.newArgs.url.match(/sys\/polling/) instanceof Array)
+			}();
 
-		// 舊的有在用 新的不再用
 		s_load_show = false;
+
 		//polling錯誤不關閉 為了url parse
-		if(ajaxArgs.url.match(/sys\/polling/) === null){
+		if(isPolling === false){
 			$('.ui-loader').hide();
 			$(".ajax-screen-lock").hide();
 		}
 			
-		//不做錯誤顯示
-		if(ajaxArgs.errHide) return false;
+		//不做錯誤顯示 polling也不顯示
+		if(ajaxArgs.errHide || isPolling === true) return false;
 
 		//ajax逾時
 		if(errData.statusText == "timeout"){
@@ -646,7 +696,7 @@ QmiAjax.prototype = {
 	},
 		
 	onComplete: function(data){
-		// 舊的有在用 新的不再用
+		
 		if(s_load_show === false) {
 			$('.ui-loader').hide();
 			$(".ajax-screen-lock").hide();
@@ -662,12 +712,14 @@ g_Qmi_title = "Qmi";
 $("title").html(g_Qmi_title);
 
 MyDeferred = function  () {
-  var myResolve;
+  var myResolve, myReject;
   var myPromise = new Promise(function(resolve, reject){
     myResolve = resolve;
+    myReject = reject;
   });
 
   myPromise.resolve = myResolve;
+  myPromise.reject = myReject;
   return myPromise;
 }
 
@@ -767,7 +819,7 @@ errorResponse = function(data){
 setDebug(debug_flag);
 
 function setDebug(isDebug) {
-  if (isDebug) {
+  if (true) {
     window.cns = {
       log: window.console.log.bind(window.console, '%s: %s'),
       error: window.console.error.bind(window.console, 'error: %s'),
