@@ -37,7 +37,8 @@ String.prototype._escape = function(){
 String.prototype.qmiTag = function (tagMember) {
 	var findText = "///;" + tagMember.u + ";///";
 	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
-	return this.replace("///;" + tagMember.u + ";///", "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>");
+
+	return this.replace(findText, markTag);
 }
 
 if( 0==userLang.indexOf("zh") ){

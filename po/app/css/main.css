@@ -309,7 +309,7 @@ img.auo {
 
 #page-group-menu {
 	background: white;
-	height: 100%;
+	height: calc(100vh - 57px);
 }
 
 .gm-nav {
@@ -579,7 +579,7 @@ img.auo {
 	width: 100%;
 	text-align: center;
 	color: white;
-	z-index: 1700;
+	z-index: 1850;
 }
 
 .toast div {
@@ -657,8 +657,8 @@ img.auo {
 
 .popup-screen,.ajax-screen-lock , .screen-lock , .compose-dnd{
 	display: none;
-	width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
 	left: 0;
 	top: 0;
 	background: black;
@@ -989,15 +989,20 @@ img.auo {
 	/*border: 1px solid rgb(240,240,240);*/
 }
 
+.sm-group-area-r.sm-group-content-style div:nth-child(2) { font-size: 11px; }
+
 .sm-group-area-r {
-	padding: 24px 0px 0px 3px;
-	width: 50%;
-	height: 25px;
+	padding: 15px 0px 0px 3px;
+	outline: 0!important;
+	font-size: 14px;
+}
+
+.sm-group-area-r div:first-child {
+	width: 140px;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
-	outline: 0!important;
-	font-size: 14px;
+
 }
 
 .sm-group-area-l img {
@@ -1010,7 +1015,8 @@ img.auo {
 	margin: 20px 5px 0px 0px;
 }
 
-.sm-group-list-area {
+
+.sm-group-list-scroll-area {
     /*min-height: 123px;*/
     height: -webkit-calc( 100% - 188px );
 	overflow-x: hidden;
@@ -1018,9 +1024,9 @@ img.auo {
 	padding-bottom: 5px;
 }
 
-.sm-group-list-area::-webkit-scrollbar { width: 0 }
-.sm-group-list-area:hover::-webkit-scrollbar { width: 8px }
-.sm-group-list-area::-webkit-scrollbar-thumb { background-color: rgb(86, 85, 85); }
+.sm-group-list-scroll-area::-webkit-scrollbar { width: 0 }
+.sm-group-list-scroll-area:hover::-webkit-scrollbar { width: 8px }
+.sm-group-list-scroll-area::-webkit-scrollbar-thumb { background-color: rgb(86, 85, 85); }
 
 .sm-group-list-area-add {
     overflow: hidden;
@@ -1314,7 +1320,6 @@ img.auo {
 .gm-header-left {
 	width: 218px;
 	display: inline-block;
-	border-right: 1px solid rgba(255, 255, 255, 0.53);
 	padding: 0 15px;
 	float: left;
 	line-height: 30px;
@@ -1324,6 +1329,8 @@ img.auo {
 	width: -webkit-calc( 100% - 275px );
 	white-space: nowrap;
 	float: left;
+	border-left: 1px solid rgba(255, 255, 255, 0.53);
+    height: 32px;
 }
 .sm-group-name {
 	width: 100%;
@@ -1401,12 +1408,12 @@ img.auo {
 
 
 
-#page-group-main .gm-content > div:nth-child(1){
+#page-group-main .gm-content .gm-content-header {
     position: absolute;
 	width: 100%;
 	height: 43px;
 }
-#page-group-main .gm-content > div:nth-child(2){
+#page-group-main .gm-content .gm-content-body {
     overflow: hidden;
 	position: absolute;
 	width: 100%;
@@ -1415,20 +1422,61 @@ img.auo {
 }
 
 
-
-
-
-/*#page-group-main .gm-content > div:nth-child(2):hover{
-    overflow-y: auto;
-}*/
-
-/*#page-group-main .gm-content > div:nth-child(2)::-webkit-scrollbar-track{
-	background-color: transparent;
-}*/
-
-#page-group-main div[data-role=content]:hover {
-	/*position: absolute;*/
+.gm-content > .refresh-lock {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    background: rgba(10,10,10,0.8);
+    z-index: 100;
+    display: none;
 }
+
+.gm-content > .refresh-lock > div {
+    color: white;
+    margin: 40vh auto;
+    width: 300px;
+}
+
+
+
+.sm-group-list-area-refresh {
+    font-size: 15px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #555;
+    display: none;
+}
+
+.sm-group-list-area-refresh .refresh-item {
+    position: relative;
+    cursor: pointer;
+    padding: 15px;
+    font-size: 15px;
+    width: 220px;
+}
+
+.sm-group-list-area-refresh .refresh-item > div {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 195px;
+}
+
+.sm-group-list-area-refresh .refresh-item div:nth-child(2) {
+    font-size: 12px;
+}
+
+.sm-group-list-area-refresh .refresh-item img:last-child {
+    width: 27px;
+    position: absolute;
+    right: 10px;
+    top: 20px;
+}
+
+.sm-group-list-area-refresh .refresh-item img:last-child.rotate {
+	-webkit-animation: refresh 1s linear infinite;
+    animation: refresh 1s linear infinite;
+}
+
 
 #page-compose .stickerArea{
 	height: 200px;
@@ -3143,6 +3191,7 @@ img.st-user-pic{
 .st-reply-content video, .st-reply-content audio {
 	display: none;
 	margin: 15px 5px;
+	max-width: 100%;
 }
 
 .st-reply-footer {
@@ -3221,7 +3270,25 @@ img.st-reply-message-attach {
 	height: 36px;
 }
 
+.st-reply-message-textarea .tag-members-container {
+	display: none;
+	position: absolute;
+    margin: -217px auto;
+    width: -webkit-calc( 100% - 186px );
+    height: 200px;
+    padding: 5px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    box-shadow: 10px 5px 20px #555555;
+    background: white;
+}
+
+.tag-members-container img{
+	float: none;
+}
+
 .st-reply-message-textarea textarea {
+	background: transparent;
 	width: 100%;
 	border: 0px;
 	font-size: 15px;
@@ -3230,6 +3297,28 @@ img.st-reply-message-attach {
 	top: 6px;
 	left: 6px;
 	overflow-y: auto;
+	z-index: 2;
+}
+
+.st-reply-highlight-container{
+	max-height: 200px;
+	overflow-x: hidden;
+	overflow-y: auto;
+    width: 97%;
+    position: relative;
+    padding-top: 6px;
+    left: 7px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    z-index: 1;
+    outline: 0px;
+    cursor: text;
+}
+
+
+.st-reply-highlight-container[contentEditable=true]:empty:before {
+    content: "請輸入訊息";
+    color: #bbb;
 }
 
 .st-reply-message-textarea textarea:focus{ outline:none } 
@@ -3426,8 +3515,21 @@ img.st-reply-message-attach {
 
 .cp-content-textarea{
     min-height: 80px;
-    line-height:80px;
     margin-bottom: 20px;
+}
+
+
+.cp-content-textarea .tag-members-container{
+   	display: none;
+	position: absolute;
+    width: -webkit-calc( 100% - 290px );
+    margin: 0px 120px;
+    height: 200px;
+    padding: 5px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 10px 5px 20px #555555;
+    background: white;
 }
 
 .cp-attach-area {
@@ -3611,15 +3713,37 @@ img.st-reply-message-attach {
 }
 
 .cp-textarea-desc {
-    width: 75%;
+    width: calc(100% - 100px);
 	border: 0;
-	font-size: 15px;
 	resize:none;
 	position: relative;
 	top: 23px;
 	left: 4px;
 	max-height: -webkit-calc( 100vh - 224px );
+	font: 14px 'Open Sans', serif;
+	letter-spacing: 1px;
+	z-index: 2;
+	background-color: transparent;
 }
+
+.cp-content-highlight {
+	width: calc(100% - 100px);
+	max-height: 200px;
+	overflow-y: auto;
+    position: relative;
+    padding-top: 29px;
+    left: 7px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    outline: 0px;
+    cursor: text;
+}
+
+.cp-content-highlight:empty:before {
+  content: "內容描述";
+  color: #bbb;
+}
+
 .cp-content[data-type=announcement] .cp-textarea-desc,
 .cp-content[data-type=feedback] .cp-textarea-desc {
 	max-height: -webkit-calc( 100vh - 339px );
@@ -3630,7 +3754,7 @@ img.st-reply-message-attach {
 	max-height: 200px;
 }
 
-.cp-content-textarea img{
+.cp-content-textarea img:not(.member-mugshot){
     margin: auto 15px;
 	position: relative;
 	float: left;
@@ -5366,32 +5490,71 @@ section.fileSharing section.progress-bar .frame .progress {
     left: 1px;
 }
 section.fileSharing section.progress-bar .frame .text { position: absolute; top: 0 ;left: 65px;}
+section.fileSharing section.progress-bar .frame .cancel { 
+	position: absolute; 
+	top: 0;
+	right: -50px;
+	font-size: 15px;
+	cursor: pointer;
+}
 
 section.subpage-fileSharing{
 	overflow-y: auto;
 }
 
-/* ==========================下拉式選單========================================== */
+/* ======================================== tag 成員畫面 ===================================================== */
 
 .tag-list {
-	/*display: none;*/
-    width: 324px;
-    bottom: 31px;
-    left: 86px;
-    position: absolute;
-    height: 140px;
-    overflow: scroll;
-    background-color: beige;
+	list-style: none;
+    background-color: white;
     padding: 0;
-    color: #111;
-    list-style: none;
+    margin: 3px;
+    min-height: 190px;
+    width: 100%;
 }
 
-.tag-list img{
+.tag-list .member-mugshot{
 	width: 30px;
-	height: 30px;
+    height: 30px;
+    margin-top: 10px;
+    margin-right: 10px;
+    float: none;
+    vertical-align: bottom;
+}
+
+.tag-list li{
+	line-height: 25px;
+	cursor: pointer;
 }
 
 .tag-list li:hover{
-	background-color: yellow;
+	background-color: rgba(106, 163, 241, 0.29);
+}
+
+.tag-list a:hover{
+	color: black;
+}
+
+.highlight-container mark{
+	background: rgba(106, 163, 241, 0.29);
+}
+
+
+*[contenteditable="true"] {
+	display: inline-block;
+}
+
+@-webkit-keyframes refresh {
+    0%	{	
+    		-webkit-transform: rotate(0deg);
+    		transform: rotate(0deg);
+    	}
+    70%  {
+    		-webkit-transform: rotate(720deg);
+    		transform: rotate(720deg);
+    	}
+    100%  {
+    		-webkit-transform: rotate(900deg);
+    		transform: rotate(900deg);
+    	}
 }

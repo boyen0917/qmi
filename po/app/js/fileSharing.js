@@ -244,7 +244,8 @@ FileSharing.prototype = {
 			}
 		})).then(function(data){
 			cns.debug("when data 1",data);
-			return (new QmiAjax({
+			var dataObj = JSON.parse(data.responseText);
+			new QmiAjax({
 				apiName: "groups/" + gi + "/timelines/"+ thisFile.ti +"/events",
 				method: "post",
 				body: {
@@ -255,10 +256,10 @@ FileSharing.prototype = {
 					}, 
 					ml: [
 						{
-							fi: data.fi,
+							fi: dataObj.fi,
 							ftp: 1,
 							fn: folderName,
-							ln: { ti:data.ln.ti},
+							ln: { ti:dataObj.ln.ti},
 							tp: 26 
 						}
 					]
@@ -266,7 +267,7 @@ FileSharing.prototype = {
 				error: function(data){
 					deferred.reject({response:data,api:2});
 				}
-			})).then(function(data){
+			}).then(function(data){
 				deferred.resolve(data);
 			});
 		});
@@ -344,7 +345,7 @@ FileSharing.prototype = {
 
 
 		if(thisFile.fileDom.find("section.progress-bar").length == 0){
-			var progressSectionDom = $('<section class="progress-bar"><div class="frame"><div class="progress"></div><div class="text">0%</div></div></section>');	
+			var progressSectionDom = $('<section class="progress-bar"><div class="frame"><div class="progress"></div><div class="text">0%</div><div class="cancel">取消</div></div></section>');	
 			coverDom.append(progressSectionDom);
 
 			progressSectionDom.click(function(){event.stopPropagation()})
@@ -621,7 +622,7 @@ FileSharing.prototype = {
 	uploadToS3TmpDef: function (options) {
 		var thisFile = this;
 
-		return $.ajax({
+		var thisAjax = $.ajax({
 			url: options.url,
 			type: 'PUT',
 			contentType: options.contentType,
@@ -634,7 +635,14 @@ FileSharing.prototype = {
 				});
 				return xhr;
 			}
-		})
+		});
+
+		$("section.fileSharing section.progress-bar .cancel").click(function() {
+			thisAjax.abort();
+			toastShow($.i18n.getString("FILESHARING_UPLOAD_FILE") + $.i18n.getString("COMMON_CANCEL"));
+		});
+
+		return thisAjax;
 	},
 
 	rename: function() {

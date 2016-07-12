@@ -153,6 +153,8 @@ function onChatReceiveMsg ( tmp_gi, tmp_ci, tmp_cn, msgs, callback ){
 			    ct: object.meta.ct,
 			    data: object
 			};
+
+			
 			//write msg to db
 			// if( !g_idb_chat_msgs.get(object.ei) ){
 				var tmp = g_idb_chat_msgs.put( node, function(eiTmp){
@@ -213,39 +215,76 @@ function initChatCntDB ( onReady ){
 
 /* save chat cnt into db */
 function onReceivePollingChatCnt ( ccs ){
-	var storage = QmiGlobal.groups;
+	var groups = QmiGlobal.groups;
 
 	//indexed from old to new (api chat is from new to old)
 	for( var ccsIndex=0; ccsIndex<ccs.length; ccsIndex++){
-		var data = ccs[ccsIndex];
+		var data = ccs[ccsIndex] || {};
 		var giTmp = data.gi;
-		if( null==storage[giTmp] )	storage[giTmp] = {};
-		if( null==storage[giTmp].chatAll )	storage[giTmp].chatAll = {};
-		if( null==storage[giTmp].chatAll[data.ci] )	storage[giTmp].chatAll[data.ci] = {};
-
-		// data.cc.sort(function(a,b){
-		// 	if(a.key >= b.key )	return 1;
-		// 	return -1;
-		// });
-
-		var cntContent = new Object();
-		for( var i=0; i<data.cc.length; i++){
-			// cns.debug( data.cc[i].ts, data.cc[i].cnt );
-			cntContent[i] = data.cc[i];
+		if(groups[giTmp] !== undefined && groups[giTmp].chatAll !== undefined && groups[giTmp].chatAll[data.ci] !== undefined)	{
+			
+			var cntContent = new Object();
+			for( var i=0; i<data.cc.length; i++){
+				// cns.debug( data.cc[i].ts, data.cc[i].cnt );
+				cntContent[i] = data.cc[i];
+			}
+			groups[giTmp].chatAll[data.ci].cnt = cntContent;
 		}
-		
-		storage[giTmp].chatAll[data.ci].cnt = cntContent;
 	}
-	// cns.debug( JSON.stringify(QmiGlobal.groups) );
-
 
 	if( typeof(windowList)!='undefined' && null != windowList ){
 		for( var ccsIndex=0; ccsIndex<ccs.length; ccsIndex++){
-			var data = ccs[ccsIndex];
-			if( null != windowList[data.ci] 
+			var data = ccs[ccsIndex] || {};
+			if( windowList[data.ci] !== undefined
 				&& false==windowList[data.ci].closed ){
 				$(windowList[data.ci].document).find("button.pollingCnt").trigger("click");
 			}
 		}
 	}
+}
+
+
+// 根據刪除的範圍和團體ID來刪除DB內的聊天記錄
+function onRemoveChatDB(groupID, days) {
+	
+	var onItem = function (item) {
+  		// console.log('got item:', item.ct);
+  		var date = new Date();
+  		date.setHours(00);
+  		date.setMinutes(00);
+  		date.setSeconds(00);
+  		var onsuccess = function(result){
+			if(result !== false){
+			    console.log('deletion successful!');
+			}
+		}
+		var onerror = function(error){
+		  	console.log('Oh noes, sth went wrong!', error);
+		}
+		
+		// if (groupID && days){
+		if(((date - item.ct) > (days * 86400000)) && (item.gi === groupID)) {
+  			console.log(item.ei);
+  			console.log(new Date(item.ct));
+  			g_idb_chat_msgs.remove(item.ei, onsuccess, onerror)
+  		}
+		// } else {
+		// 	var allGroupData = QmiGlobal.groups;
+		// 	for(var index in allGroupData){
+		// 		console.log
+		// 	}
+		// }
+		// console.log("ddwdwqqd");
+  		
+	};
+
+	var onEnd = function (item) {
+  		console.log('All done.');
+	};
+
+	g_idb_chat_msgs.iterate(onItem, {
+		index: 'gi_ci_ct',
+		filterDuplicates: true,
+		onEnd: onEnd
+	});
 }

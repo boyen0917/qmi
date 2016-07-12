@@ -15,20 +15,20 @@ $(document).ready(function(){
 	$(document).on("click",".contact-add",function(e){
 		showAddMemberPage();
 	});
-	$("#page-contact-addmem .ca-content-area").niceScroll( {
-		// styler:"fb",
-		cursorcolor:"rgba(107, 107, 107,0.8)", 
-		cursorwidth: '10',
-		cursorborderradius: '10px',
-		background: 'rgba(255,255,255,0)',
-		cursorborder:"",
-		boxzoom:false,
-		zindex: 999,
-		scrollspeed: 90,
-		mousescrollstep: 40
-		// horizrailenabled: false,
-		// ,autohidemode: "leave"
-	} );
+	// $("#page-contact-addmem .ca-content-area").niceScroll( {
+	// 	// styler:"fb",
+	// 	cursorcolor:"rgba(107, 107, 107,0.8)", 
+	// 	cursorwidth: '10',
+	// 	cursorborderradius: '10px',
+	// 	background: 'rgba(255,255,255,0)',
+	// 	cursorborder:"",
+	// 	boxzoom:false,
+	// 	zindex: 999,
+	// 	scrollspeed: 90,
+	// 	mousescrollstep: 40
+	// 	// horizrailenabled: false,
+	// 	// ,autohidemode: "leave"
+	// });
 });
 
 // getBranchMemCnt = function(bl){
@@ -688,6 +688,8 @@ generateMemberGrid = function( memObject ){
 
 				//new > admin > normal
 				if( isNewMem(mem) ){
+					if( mem.ad==1 ) tmp.addClass("admin")
+						
 					tmp.addClass("new-mem");
 					var lastNewDom = memContainer.find(".new-mem");
 					if( lastNewDom.length>0 ){
@@ -696,7 +698,7 @@ generateMemberGrid = function( memObject ){
 						memContainer.prepend(tmp);
 					}
 					setNewMemTag( tmp );
-				} else if( mem.ad==1 ){	//is admin?
+				} else if( mem.ad==1 ){
 					tmp.addClass("admin");
 					var lastAdminDom = memContainer.find(".admin");
 					if( lastAdminDom.length>0 ){
@@ -731,7 +733,7 @@ generateMemberGrid = function( memObject ){
 		}
 		//"<div class='img' style='background-image:url("+mem.aut+");'><div class='new' style='display:none;'>NEW</div></div>");
 		
-		var tmp = memContainer.find(".img.waitLoad:lt(30)");
+		var tmp = memContainer.find(".img.waitLoad:lt(108)");
 		$.each(tmp, function(index,domTmp){
 			var dom = $(domTmp);
 			dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");

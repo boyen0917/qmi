@@ -4,8 +4,18 @@ onCheckVersionDone = function(needUpdate){
 	}
 	clearBadgeLabel();
 
-	if($.lStorage("_loginAutoChk") === true) {
+	// 定時重新讀取 為了健康
+    if($.lStorage("_periodicallyReloadAuth") !== false) {
+    	QmiGlobal.auth = $.lStorage("_periodicallyReloadAuth");	
+    	localStorage.removeItem("_periodicallyReloadAuth");
+
+    	QmiGlobal.isPeriodicallyReload = true;
+
+    	loginAction();
+
+    } else if($.lStorage("_loginAutoChk") === true) {
 		loginAction();
+
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
 		$.mobile.changePage("")
@@ -260,7 +270,6 @@ onCheckVersionDone = function(needUpdate){
 	});
 
 	login = function(phoneId,password,countrycode,isMail){
-
 		isMail = isMail || false;
         s_load_show = true;
         
@@ -316,10 +325,9 @@ onCheckVersionDone = function(needUpdate){
 
 	//初始化 
     function loginAction (){
-        //儲存登入資料 跳轉到timeline
-        if($.lStorage("_loginData") !== false) {
-        	QmiGlobal.auth = $.lStorage("_loginData");	
-        }
+
+    	//儲存登入資料 跳轉到timeline
+    	if ($.lStorage("_loginData") !== false && QmiGlobal.isPeriodicallyReload !== true) QmiGlobal.auth = $.lStorage("_loginData");
         
         var deferred = $.Deferred(),
         	group_list = [];
@@ -329,24 +337,33 @@ onCheckVersionDone = function(needUpdate){
 
         //附上group list
         getGroupList().done(function(groupList){
+        	var specifiedGi = QmiGlobal.auth.dgi;
 
         	// 取dgi的combo
-            if( groupList.length>0 ){
+            if( (groupList || []).length > 0 ){
+
+            	// 定時重新整理 為了健康
+            	if(QmiGlobal.isPeriodicallyReload === true) {
+
+            		specifiedGi = QmiGlobal.auth.prObj.gi; 
+
             	//有dgi 但不存在列表裡
-                if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
+                } else if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
                 	localStorage.removeItem("uiData");
                 	
                     QmiGlobal.auth.dgi = groupList[0].gi;
                     $.lStorage("_loginData",QmiGlobal.auth);
+
+                    specifiedGi = QmiGlobal.auth.dgi;
                 }
 
-                getGroupComboInit(QmiGlobal.auth.dgi).done(function(resultObj){
+                getGroupComboInit(specifiedGi).done(function(resultObj){
                 	if( resultObj.status === false ){
                 		//發生錯誤 回首頁比較保險
                 		cns.debug("dgi combo error",resultObj);
                 		window.location = "index.html";
                 	} else {
-                		deferred.resolve({location:"#page-group-main"});
+                		deferred.resolve({dgi: specifiedGi, location:"#page-group-main"});
                 	}
                 });
                 
@@ -369,7 +386,7 @@ onCheckVersionDone = function(needUpdate){
             $.mobile.changePage(data.location);
             
 			//聊天室開啓DB
-	    	initChatDB(); 
+	    	initChatDB(activateClearChatsTimer); 
 			initChatCntDB(); 
 
 			//沒團體的情況
@@ -381,12 +398,12 @@ onCheckVersionDone = function(needUpdate){
 				// 兩個選項都要執行polling()
 				polling();
 			}else{
+
 				//設定目前團體 執行polling()
-				setGroupInitial(QmiGlobal.auth.dgi).done(polling);
+				setGroupInitial(data.dgi).done(polling);
 			}
         });
     }
-
 
 	getPrivateGroupList = function(p_data, callback){
     	//取得團體列表
@@ -409,21 +426,6 @@ onCheckVersionDone = function(needUpdate){
         });
     }
 
-    getPrivateGroupFromList = function( data, callback ){
-    	if( !data || data.length==0 ){
-    		if(callback) callback();
-    	}
-    	var cnt = 0;
-    	for( var i=0; i<data.length; i++ ){
-    		var p_data = data[i];
-	    	getPrivateGroupList(p_data ,function(res){
-	    		cnt++;
-	    		if(callback && cnt==data.length){
-	    			callback();
-	    		}
-	    	});
-	    }
-    }
 /*	
 
 
@@ -768,43 +770,42 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 	activateStep1 = function(){
+
 		var otpCode = $(".register-otp-input input").val();
 
-		var api_name = "activation/step1";
-        var headers = {
-                 "li":lang,
-                     };
-        var method = "put";
-        var body = {
-                id: $(document).data("phone-id"),
-                tp: 0,
-                vc: $(".register-otp-input input").val(),
+		new QmiAjax({
+        	apiName: "activation/step1",
+        	specifiedHeaders: {
+	            li:lang
+	        },
+        	body: {
+        		id: $(document).data("phone-id"),
+                vc: otpCode,
                 ud: $(document).data("device-token")
-            }
-        cns.debug("activateStep1() 驗證 驗證碼前的 body:",JSON.stringify(body,null,2));
-        var result = ajaxDo(api_name,headers,method,true,body, null, true);
-
-        		
-	    result.error(function(jqXHR, textStatus, errorThrown) {
-	    	try{
-	    		//if(jqxhr.status == 400){
-					if(jqXHR.responseText){
-						var tmp = $.parseJSON(jqXHR.responseText);
-						if( 900==tmp.rsp_code ){
-			        		popupShowAdjust("",tmp.rsp_msg,true,true,[onRewriteRegitration,otpCode]);
-			        	} else {
-	    					popupShowAdjust("",tmp.rsp_msg,true);
-			        	}
-					}else{
-						cns.debug("errorResponse:",data);
-						return $.i18n.getString("COMMON_CHECK_NETWORK");
+        	},
+        	errHide: true,
+        	isLoadingShow: true,
+        	method: "put",
+        	error: function(jqXHR, textStatus, errorThrown) {
+		    	try{
+		    		if(jqXHR.status == 400){
+						if(jqXHR.responseText){
+							var tmp = $.parseJSON(jqXHR.responseText);
+							if( 900==tmp.rsp_code ){
+				        		popupShowAdjust("",tmp.rsp_msg,true,true,[onRewriteRegitration,otpCode]);
+				        	} else {
+		    					popupShowAdjust("",tmp.rsp_msg,true);
+				        	}
+						}else{
+							cns.debug("errorResponse:",data);
+							return $.i18n.getString("COMMON_CHECK_NETWORK");
+						}
 					}
-				//}
-	    	} catch(e){
-				cns.debug( e.message );
-			}
-	    });
-        result.complete(function(data){
+		    	} catch(e){
+					cns.debug( e.message );
+				}
+		    }
+        }).complete(function(data){
         	cns.debug("驗證 驗證碼後的 data:",data);
 
         	//清除db
@@ -826,19 +827,20 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 	onRewriteRegitration = function(otpCode){
-		var api_name = "activation/unbind";
-        var headers = {
-                 "li":lang,
-                     };
-        var method = "post";
-        var body = {
-            id: $(document).data("phone-id"),
-            ud: $(document).data("device-token"),
-            vc: otpCode
-        }
-        
-        var result = ajaxDo(api_name,headers,method,true,body);
-        result.complete(function(data){
+		new QmiAjax({
+        	apiName: "activation/unbind",
+        	specifiedHeaders: {
+	            li:lang
+	        },
+        	body: {
+        		id: $(document).data("phone-id"),
+	            ud: $(document).data("device-token"),
+	            vc: otpCode
+        	},
+        	isLoadingShow: true,
+        	method: "post"
+
+		}).complete(function(data){
         	
         	if(data.status == 200){
         		var data = $.parseJSON(data.responseText);
@@ -857,28 +859,28 @@ onCheckVersionDone = function(needUpdate){
 
 		$(document).data("password",$(".password-confirm input").val());
 
-		var api_name = "activation/step2";
-        var headers = {
-                 "li":lang,
-                     };
-        var method = "put";
-        var body = {
-                id: $(document).data("phone-id"),
+		new QmiAjax({
+        	apiName: "activation/step2",
+        	specifiedHeaders: {
+	            li:lang
+	        },
+        	body: {
+        		id: $(document).data("phone-id"),
                 tp: 1,//多裝置代碼 0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
                 ud: $(document).data("device-token"),
                 pw: toSha1Encode($(document).data("password"))
-            }
-        cns.debug("activateStep2() 變更密碼前的 body:",JSON.stringify(body,null,2));
-        var result = ajaxDo(api_name,headers,method,true,body);
-        result.complete(function(data){
+        	},
+        	isLoadingShow: true,
+        	method: "put"
+        	
+		}).complete(function(data){
         	cns.debug("變更密碼後的 data:",data);
         	if(data.status == 200){
         		var data = $.parseJSON(data.responseText);
         		//default
-        		$(document).data("ui",data.ui);
-        		$(document).data("at",data.at);
-        		cns.debug("變更密碼後的 ui:",$(document).data("ui"));
-        		cns.debug("變更密碼後的 at:",$(document).data("at"));
+        		
+        		QmiGlobal.auth = data;
+
         		$(".avatar-area img").addClass("avatar-default");
         		// popupShowAdjust("",data.rsp_msg,"hash+#page-user-setting");
         		popupShowAdjust("",data.rsp_msg,true,false,[changePageAfterPopUp,"#page-user-setting"]);
@@ -892,25 +894,20 @@ onCheckVersionDone = function(needUpdate){
 	}
 
 	activateStep3 = function(first_name,last_name,birth){
-		var api_name = "activation/step3";
-        var headers = {
-        		ui: $(document).data("ui"),
-        		at: $(document).data("at"),
-                li: lang,
-            };
-        var method = "put";
-        //no bd now
-        var body = {
-                id: $(document).data("phone-id"),
+
+		new QmiAjax({
+        	apiName: "activation/step3",
+        	body: {
+        		id: $(document).data("phone-id"),
                 tp: 0,
                 ud: $(document).data("device-token"),
                 fn: first_name,
                 ln: last_name,
-                //bd: birth
-            }
-        cns.debug("step3 body:",body);
-        var result = ajaxDo(api_name,headers,method,true,body);
-        result.complete(function(data){
+        	},
+        	isLoadingShow: true,
+        	method: "put"
+        	
+		}).complete(function(data){
         	//loading icon off
 			s_load_show = false;
 			$('.ui-loader').hide();
@@ -926,8 +923,8 @@ onCheckVersionDone = function(needUpdate){
 
 				//儲存登入資料 跳轉到timeline
 				var _loginData = {
-					ui: $(document).data("ui"),
-					at: $(document).data("at")
+					"ui": QmiGlobal.auth.ui,
+					"at": QmiGlobal.auth.at
 				}
 
 				$.lStorage("_loginData",_loginData);
@@ -945,9 +942,9 @@ onCheckVersionDone = function(needUpdate){
 		var api_name = "me/avatar";
 
         var headers = {
-             "ui":$(document).data("ui"),
-             "at":$(document).data("at"), 
-             "li":lang
+            ui: QmiGlobal.auth.ui,
+			at: QmiGlobal.auth.at,
+            li:lang
         };
 
         var method = "put";
@@ -1003,8 +1000,8 @@ onCheckVersionDone = function(needUpdate){
 											if(data.status == 200){
 												var api_name = "me/avatar/commit";
 							                    var headers = {
-							                        "ui":$(document).data("ui"),
-									                "at":$(document).data("at"), 
+							                        "ui": QmiGlobal.auth.ui,
+									                "at": QmiGlobal.auth.at, 
 									                "li":lang,
 							                    };
 							                    var method = "put";
@@ -1073,7 +1070,7 @@ onCheckVersionDone = function(needUpdate){
 		//document.location = "main.html?v"+ new Date().getRandomString() +"#page-group-menu";
 		$('.ui-loader').css("display","block");
 		$(".ajax-screen-lock").show();
-		loginAction($.lStorage("_loginData"));
+		loginAction();
 	}
 	
 	initLandPage = function(){
@@ -1128,7 +1125,7 @@ onCheckVersionDone = function(needUpdate){
 		if( logoClickCnt>=10 ){
 			logoClickCnt = 0;
 			if( clearCache() ){
-				alert("succ");
+				// alert("succ");
 			}
 		}
 	});

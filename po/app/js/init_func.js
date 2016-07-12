@@ -1,6 +1,6 @@
 $(function(){
 
-    groupListToLStorage = function(groupList){
+    groupListToLStorage = function(groupList,isAdd){
         var groups = QmiGlobal.groups,
             tmpGroupList = [];
 
@@ -32,6 +32,9 @@ $(function(){
                 $.extend(groups[gl_obj.gi],gl_obj)
             }
         }); 
+
+        // 私雲移轉 屬於額外添加團體
+        if(isAdd === true) return;
 
         // 剔除不存在的團體
         for(giKey in groups){
@@ -81,6 +84,9 @@ $(function(){
                     var thisGuObj = comboData.ul[key];
                     //用在contact.js 不知道為何
                     if( thisGuObj.st === 0) inviteGuAll[thisGuObj.gu] = thisGuObj;
+
+                    if(thisGuObj.nk !== undefined)
+                        thisGuObj.nk = thisGuObj.nk._escape();
 
                     groupData.guAll[thisGuObj.gu] = thisGuObj;
                 }
@@ -275,7 +281,6 @@ $(function(){
 
     updateTab = function(thisGi){
         var groupData = QmiGlobal.groups[thisGi];
-
         try{
             var tabHtml = '<div class="sm-small-area"><div class="sm-small-area-r"></div></div>';
 
