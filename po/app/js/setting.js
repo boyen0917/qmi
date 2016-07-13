@@ -38,43 +38,49 @@ $(document).ready( function(){
 	});
 
 	//團體頭像上傳
-	$(document).on("change",".setting-group-avatar",function(e){
-		var input = $(this);
+	$(document).on("change",".setting-group-avatar",function(){
+		var groupAvatar = $(".ga-avatar");
 		var imageType = /image.*/;
-		var file = $(this)[0].files[0];
+		var file_ori = $(".setting-group-avatar");
+		var file = file_ori[0].files[0];
 		if (file.type.match(imageType)) {
 			var reader = new FileReader();
 			reader.onload = function(e) {
-				var imgs = $(".ga-avatar-img");
+
+				$(".ga-avatar > img").remove();
+				var new_img = $("<img class='ga-avatar-img'/>");
+				groupAvatar.prepend(new_img);
+				var imgs = groupAvatar.find(".ga-avatar-img");
 				//imgs.hide();
 				//var img = imgs.filter(".upload");
 				//reset
 				imgs.attr("src",reader.result);
-				$("img[data-gi='"+gi+"']").attr("src",reader.result);
 				//img.show();
-		        
 		        //有更動即可按確定
 		        // this_info.find(".user-info-submit").addClass("user-info-submit-ready");
-
+		        
 		        // //記錄更動
 		        // this_info.data("avatar-chk",true);
 				//checkGroupInfoChange();
+
+				qmiUploadFile({
+					urlAjax: {
+						apiName: "groups/"+ gi +"/avatar",
+						method: "put"
+					},
+					file: groupAvatar.find(".ga-avatar-img")[0],
+					oriObj: {w: 1280, h: 1280, s: 0.7},
+					tmbObj: {w: 480, h: 480, s: 0.6},
+					tp: 1 // ;
+				}).done(function(data) {
+					console.log("finish", data);
+					$("img[data-gi='"+gi+"']").attr("src",data.data.tu);
+					toastShow(data.data.rsp_msg);
+				});
 			}
 			reader.readAsDataURL(file);
 
-			qmiUploadFile({
-				urlAjax: {
-					apiName: "groups/"+ gi +"/avatar",
-					method: "put"
-				},
-				file: $(".ga-avatar-img")[0],
-				oriObj: {w: 1280, h: 1280, s: 0.7},
-				tmbObj: {w: 480, h: 480, s: 0.6},
-				tp: 1 // ;
-			}).done(function(data) {
-				console.log("finish", data);
-				toastShow(data.data.rsp_msg);
-			});
+			groupAvatar.find('input[type="file"]').val(null);
 
 		}else{
 			//clear input file
@@ -432,10 +438,14 @@ function showGroupInfoPage(){
 		textGroupDes.val(groupDescription);	
 	});
 	$(document).on("click","#icon-edit-gname", function(){
-		gaContent.find(".ga-gr-content.view").show().end()
+		if(inGroupName.val() == ""){
+			popupShowAdjust("團體名稱不能為空");
+		}else{
+			gaContent.find(".ga-gr-content.view").show().end()
 				 .find(".ga-gr-content.edit").hide();
-		gaContent.find(".ga-group-name").text(inGroupName.val());
-		getUpdateGroupInfoApi(gi, inGroupName.val(), "");	
+			gaContent.find(".ga-group-name").text(inGroupName.val());
+			getUpdateGroupInfoApi(gi, inGroupName.val(), "");
+		}
 	});
 	$(document).on("click","#icon-edit-gdes", function(){
 		gaContent.find(".ga-info-row.view").show().end()
@@ -465,7 +475,11 @@ function showGroupInfoPage(){
 	// 	$(".subpage-groupAbout .general").show();
 	// 	$(".ga-header-bar").addClass("bgColor");
 	// }
-	
+	if(groupImg){
+		$(".ga-avatar-img").attr("src",groupImg);
+	} else{
+		$(".ga-avatar-img").attr("src","images/common/others/name_card_nophoto_profile.png");
+	}
 
 	// if( groupImg ){
 	// 	if( $(".ga-avatar-img.groupImg").attr("src")!=groupImg ){

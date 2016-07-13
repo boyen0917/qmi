@@ -21,7 +21,7 @@ var ui,
 
 
 	// aws 測試環境
- 	// base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	//base_url = "https://apserver.mitake.com.tw/apiv1/";
 
 
 
@@ -312,6 +312,8 @@ window.QmiGlobal = {
 					tp: 1 // ;
 				}).done(function(data) {
 					console.log("finish", data);
+					QmiGlobal.me.aut = data.data.tu;
+					$("#userInfo").find(".user-avatar-setting").attr("src",data.data.tu);
 					toastShow(data.data.rsp_msg);
 				});
 
@@ -321,21 +323,55 @@ window.QmiGlobal = {
         		reader.onload = function(e) {
 		            var img = $(".user-avatar-img");
 		            img.attr("src",reader.result);
-		            $("#userInfo").find(".user-avatar-setting").attr("src",reader.result);
-		            //QmiGlobal.me.aut = reader.result;
-
 		        }
 		        reader.readAsDataURL(image_file);        
-
 		        imgPopup.remove();
         		userAvatar.fadeOut();
+        		$('input[type="file"]').val(null);
 		    });
         	//取消
         	$('.cancel-btn').click(function(){
         		imgPopup.remove();
 		        userAvatar.fadeOut();
+		        $('input[type="file"]').val(null);
 		    });
 		}
+	},
+
+	guihu:{
+		html: '<div class="guihu-confirm">'+
+                    '<div class="edit-guihu-content">'+
+                        '<div class="guihu-title-content">'+
+                            '<div class="guihu-title"></div>'+
+                            '<div class="guihu-des"></div>'+
+                        '</div>'+
+                        '<div class="guihu-input-content">'+
+                            '<input type="text" data-role="none" placeholder="E-mail">'+
+                            '<input type="password" data-role="none" placeholder="Password">'+
+                        '</div>'+
+                        '<div class="guihu-btn-content">'+
+                            '<button class="guihu-cancel-btn btn-b" data-role="none">取消</button>'+
+                            '<button class="btn-b" data-role="none">確認</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>',
+        init: function(){
+        	var guihuPop = $(this.html);
+        	$("body").append(guihuPop);
+        	var editGuihu = $(".guihu-confirm");
+        	editGuihu.fadeIn();
+
+        	$(".guihu-cancel-btn").click(function(){
+        		guihuPop.remove();
+		        editGuihu.fadeOut();
+		    });
+		    $(".guihu-btn-content").on('click',".add-btn",function(){
+		    	
+		    });
+		    $(".guihu-btn-content").on('click',".save-btn",function(){
+		    	
+		    });
+        }
 	}
 
 };

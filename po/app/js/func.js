@@ -8483,6 +8483,7 @@ userInfoEvent = function(this_info,me){
                         tmbObj: {w: 120, h: 120, s: 0.6} // ;
                     }).done(function(data) {
                         // 關閉load 圖示
+                        console.log("finish", data);
                         s_load_show = false;
         
                         if(data.isSuccess === true) {
