@@ -59,6 +59,18 @@ $(document).ready(function(){
         }
     });
 
+    $(".guihu-add").click(function() {
+        QmiGlobal.guihu.init();
+        $(".guihu-title").text("新增LDAP帳號");
+        $(".guihu-des").text("請輸入你的LDAP帳號及密碼");
+        $(".guihu-btn-content").find("button:nth-child(2)").addClass("add-btn");
+    });
+    $(".guihu-cancel").click(function(){
+        QmiGlobal.guihu.init();
+        $(".guihu-title").text("解除綁定");
+        $(".guihu-des").text("解除綁定後，將解除帳號權限");
+        $(".guihu-btn-content").find("button:nth-child(2)").addClass("save-btn");
+    });
 });
 
 //user Info Setting
