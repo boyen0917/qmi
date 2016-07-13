@@ -255,7 +255,7 @@ $(function(){
             QmiGlobal.currentGi = thisGi;
             gi = thisGi;
             gu = groupData.me;
-            gn = htmlFormat(groupData.gn);
+            gn = groupData.gn._escape();
 
             ti_cal = groupData.ti_cal;
             ti_feed = groupData.ti_feed;

@@ -713,6 +713,28 @@ body {
 .chat-msg-bubble-right .msg-map .text, .chat-msg-bubble-right a:link, .chat-msg-bubble-right a:visited{
 	color: #fff283;
 }
+
+.chat-file {
+	min-width: 30em;
+	display: block;
+	height: 37px;
+	border: 1px solid #dddddd;
+	background-image: url(../images/chatroom/download_icon.png);
+	background-color: #99c6ff;
+	background-position: 97% 45%;
+	background-size: 28px 28px;
+	background-repeat: no-repeat;
+	border-radius: 12px;
+	padding: 8px 10px;
+	color: white;
+	text-decoration: none;
+	font-size: 14px;
+}
+
+.chat-file img{
+	vertical-align: text-bottom;
+  	padding-right: 3px;
+}
 /*.chat-msg-bubble-left.active, .chat-msg-bubble-right.active{
 	background-color: rgb(246,63,12);
 	border-color: transparent rgb(246,63,12);
@@ -1831,3 +1853,58 @@ td.memberName span{
     background-color: #5EB5FF; 
 }
 
+/* 圖片dialog */
+#galleryModal {
+    position: fixed; 
+    z-index: 2001; 
+    padding-top: 20px; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.9);
+}
+
+.gallery-contaniner {
+	height: 92%;
+    width: 90%;
+    margin: auto;
+    background: rgba(135, 191, 255, 0.95);
+}
+
+.galleryModal .close {
+	color: white;
+    font-size: xx-large;
+    position: relative;
+    cursor: pointer;
+    text-shadow: 2px 2px 2px #aaa;
+    text-align: right;
+}
+
+.galleryModal .arrowBtn {
+	background-repeat: no-repeat;
+    position: relative;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.galleryModal .preBtn {
+    background-image: url("../images/calendar/icon_calendar_arrow_red_end.png");
+    right: 30px;
+    bottom: 50%;
+}
+
+.galleryModal .nextBtn {
+    background-image: url("../images/calendar/icon_calendar_arrow_red_start.png");
+    left: 610px;
+    bottom: 55.5%;
+}
+
+.currentImg {
+	width: 100%;
+	height: 100%;
+	/*margin: 12px auto;*/
+	display: block;
+}

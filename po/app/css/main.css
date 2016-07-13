@@ -963,7 +963,7 @@ img.auo {
 
 .sm-group-area {
 	height: 60px;
-	width: 240px;
+	width: 250px;
 	display: -webkit-box;
 	position: relative;
 	cursor: pointer;
@@ -2160,7 +2160,7 @@ img.auo {
 	
 }
 
-.st-feedbox-area a:link,.st-feedbox-area a:active,.st-feedbox-area a:visited,.st-feedbox-area a:hover {
+.st-feedbox-area a:not(.attach-file):link,.st-feedbox-area a:not(.attach-file):active,.st-feedbox-area a:not(.attach-file):visited,.st-feedbox-area a:not(.attach-file):hover {
     color: cornflowerblue;
     text-decoration: none;
 }
@@ -2387,13 +2387,16 @@ img.st-user-pic{
     word-wrap: break-word;
 }
 
-.st-sub-box-2-content {
+.line-clamp {
 	word-break: break-word;
 	overflow: hidden;
 	display: -webkit-box;
 	-webkit-line-clamp: 4;
 	-webkit-box-orient: vertical;
 }
+
+.st-sub-box-2-content {}
+
 .st-sub-box-3 {
 	position:relative;
 	background: #eef0f2;
@@ -2622,7 +2625,7 @@ img.st-user-pic{
     margin-bottom: 10px;
 }
 
-.st-box2-more-desc,.st-box2-more-desc-detail,.st-box2-more-time,.st-box2-more-task-area,
+.st-box2-more-time,.st-box2-more-task-area,
 .st-task-vote-detail-count, .st-vote-detail-top, .st-vote-detail-option, .st-vote-send,
 .st-vote-detail-desc,.st-box2-bottom-block,.st-work-option {
     padding-bottom: 10px;
@@ -2632,16 +2635,15 @@ img.st-user-pic{
     cursor: default;
 }
 
-.st-box2-more-desc {
-    overflow: hidden;
-    color: #515356;
+.st-box2-more-desc { color: #515356; }
+/*    overflow: hidden;
+    
     max-height: 119px;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
-}
-
+*/
 .st-box2-more-time {
     margin: 15px 0;
 	height: 20px;
@@ -2949,6 +2951,67 @@ img.st-user-pic{
 	width: 100%;
 }
 
+#galleryModal {
+	/*display: none; */
+    position: fixed; 
+    z-index: 101; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.9);
+}
+
+.gallery-contaniner {
+	width: 90%;
+    height: 90%;
+    margin: auto;
+}
+
+#galleryModal .close {
+	color: white;
+	font-size: xx-large;
+	position: relative;
+	left: 93%;
+	cursor: pointer;
+	text-shadow: 2px 2px 2px #aaa;
+}
+
+#galleryModal .arrowBtn {
+	background-repeat: no-repeat;
+    position: relative;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+#galleryModal .preBtn {
+    background-image: url("../images/calendar/icon_calendar_arrow_red_end.png");
+    right: 0%;
+    bottom: 51.7%;
+}
+
+#galleryModal .nextBtn {
+    background-image: url("../images/calendar/icon_calendar_arrow_red_start.png");
+    left: 96%;
+    bottom: 55%;
+}
+
+#galleryModal #caption {
+    font-size: large;
+    color: white;
+    text-align: right;
+}
+
+.currentImg {
+	max-width: 100%;
+	height: 100%;
+	margin: 0px auto;
+	display: block;
+	object-fit: contain;
+}
+
 .st-slide-img {
 	position: relative;
 	/*border: 1px solid #d8d8d8;*/
@@ -2960,7 +3023,15 @@ img.st-user-pic{
 	background-size: 40px;
 	border: 1px solid #E4E4E4;
 	width: 100%;
+	color: white;
+  	text-align: -webkit-center;
+  	font-size: xx-large;
 }
+
+.st-slide-img h1{
+	margin-top: 24px;
+}
+
 .st-slide-img.loaded {
 	background-size: cover;
 }
@@ -3075,6 +3146,49 @@ img.st-user-pic{
 }
 .st-attach-audio audio{
 	width: 480px;
+}
+
+.st-attach-file .attach-file{
+	background: url(../images/timeline/download_icon.png) no-repeat #bdd2ed right;
+	background-position: 97% 50%;
+	background-size: 28px 28px;
+  	text-decoration: none;
+  	color: white; 
+  	font-size: 16px;
+  	width: 96%;
+  	display: inline-block;
+  	text-align: left;
+  	line-height: 2;
+  	padding: 8px 10px;
+}
+
+.st-attach-file img {
+	vertical-align: top;
+	padding-right: 5px;
+}
+
+.st-attach-file div{
+	color: white; 
+}
+
+.st-attach-file .header{
+	text-align: right;
+    background-image: url(../images/timeline/arrow_down.png);
+    background-color: #99c6ff;
+    background-repeat: no-repeat;
+    background-position: 98% 50%;
+    background-size: 30px 30px;
+    width: 88%;
+    padding: 10px 60px 10px 0px;
+}
+
+.st-attach-file .hidden{
+    background-image: url(../images/timeline/next_icon.png);
+}
+
+.st-attach-file .footer{
+	background: #3994eb;
+	padding: 10px;
 }
 
 .st-box2-feedback-area {
@@ -3192,6 +3306,24 @@ img.st-user-pic{
 	display: none;
 	margin: 15px 5px;
 	max-width: 100%;
+}
+
+.st-reply-content .attach-file {
+	background: url(../images/timeline/download_icon.png) no-repeat #bdd2ed right;
+	background-size: 28px 28px;
+  	background-position-x: 97%;
+	font-size: 14px;
+	width: 300px;
+	display: inline-block;
+	line-height: 2;
+	padding: 5px 10px;
+	color: white;
+  	text-decoration: none;
+}
+
+.st-reply-content .attach-file img {
+  	vertical-align: bottom;
+  	padding-right: 5px;
 }
 
 .st-reply-footer {
@@ -3392,7 +3524,7 @@ img.st-reply-message-attach {
     max-width: 99%;
 	height: 98%;
 	object-fit: contain;
-	border: 1px solid #d2d2d2;
+	/*border: 1px solid #d2d2d2;*/
 }
 
 .st-reply-content img.sticker {
