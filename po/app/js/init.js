@@ -336,7 +336,7 @@ window.QmiGlobal = {
 		        $('input[type="file"]').val(null);
 		    });
 		}
-	},
+	}
 
 	
 
