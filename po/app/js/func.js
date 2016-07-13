@@ -8478,14 +8478,13 @@ userInfoEvent = function(this_info,me){
                             method: "put"
                         },
                         tp: 1,
-                        file: this_info.find(".user-avatar-upload")[0].files[0],
+                        file: img[0],
                         oriObj: {w: 1280, h: 1280, s: 0.7},
                         tmbObj: {w: 120, h: 120, s: 0.6} // ;
                     }).done(function(data) {
                         // 關閉load 圖示
                         console.log("finish", data);
                         s_load_show = false;
-        
                         if(data.isSuccess === true) {
                             //重置團體頭像、名稱的參數
                             getGroupComboInit(gi).done(function(){
