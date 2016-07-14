@@ -452,7 +452,14 @@ function showGroupInfoPage(){
 				 .find(".ga-info-row.edit").hide();
 		gaContent.find(".ga-group-des").text(textGroupDes.val());
 		getUpdateGroupInfoApi(gi, "", textGroupDes.val());
-		
+	});
+	$(document).on("click",".ga-cancel-gname", function(){
+			gaContent.find(".ga-gr-content.view").show().end()
+				 .find(".ga-gr-content.edit").hide();
+	});
+	$(document).on("click",".ga-cancel-gdes", function(){
+		gaContent.find(".ga-info-row.view").show().end()
+				 .find(".ga-info-row.edit").hide();
 	});
 	//admin
 	// var view = $(".ga-info.view");

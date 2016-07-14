@@ -269,6 +269,9 @@ toSha1Encode = function (string){
 }
 
 htmlFormat = function (str, isToCharCode){
+	if(str.match(/\&\#\d+\;*/g)){
+    	str = str.replace(/\&\#/g,"&#38;&#35;");
+    } 
     var strArr = str._escape().replace(/\n/g," \n ").split(" ");
     $.each(strArr,function(i,val){
     	var newStr = (isToCharCode === true ? encodeHtmlEntity(val) : val) ;
