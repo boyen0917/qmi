@@ -452,7 +452,6 @@ function showGroupInfoPage(){
 				 .find(".ga-info-row.edit").hide();
 		gaContent.find(".ga-group-des").text(textGroupDes.val());
 		getUpdateGroupInfoApi(gi, "", textGroupDes.val());
-		
 	});
 	//admin
 	// var view = $(".ga-info.view");

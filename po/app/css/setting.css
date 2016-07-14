@@ -995,15 +995,37 @@ input[type=radio] {
 	padding: 15px;
 	margin-bottom: 10px;
 }
+.guihu-list span{
+	padding: 4px;
+	color: red;
+	font-size: 12px;
+	float: right;
+	visibility:hidden;
+}
+.guihu-attention{
+	width: 16px;
+    padding: 4px;
+    float: left;
+	visibility:hidden;
+}
 .guihu-account{
 	font-size: 14px;
-	margin-left: 20px;
+	margin-left: 10px;
 }
 .guihu-cancel{
-	width: 24px;
-	height: 24px;
+	width: 25px;
 	float: right;
 	cursor: pointer;
+}
+/*認證過期*/
+.auth-expired .guihu-attention{
+	visibility: visible;
+}
+.auth-expired span{
+	visibility: visible;
+}
+.auth-expired .guihu-account{
+	color: red;
 }
 
 .guihu-confirm{

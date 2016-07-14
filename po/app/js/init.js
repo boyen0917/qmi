@@ -366,10 +366,12 @@ window.QmiGlobal = {
 		        editGuihu.fadeOut();
 		    });
 		    $(".guihu-btn-content").on('click',".add-btn",function(){
-		    	
+		    	guihuPop.remove();
+		        editGuihu.fadeOut();
 		    });
 		    $(".guihu-btn-content").on('click',".save-btn",function(){
-		    	
+		    	guihuPop.remove();
+		        editGuihu.fadeOut();
 		    });
         }
 	}
