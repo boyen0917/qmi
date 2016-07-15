@@ -1203,6 +1203,7 @@ function showMsg(object, bIsTmpSend) {
 						});
 						$(".popup-screen").hide();
 						$(".popup").hide();
+						QmiGlobal.popup.prototype.removeE();
 					});
 					$(".popup-screen").off("click").click(function () {
 						$(".popup-screen").hide();

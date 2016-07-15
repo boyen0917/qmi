@@ -460,6 +460,7 @@ function showGroupInfoPage(){
 	$(document).on("click",".ga-cancel-gdes", function(){
 		gaContent.find(".ga-info-row.view").show().end()
 				 .find(".ga-info-row.edit").hide();
+
 	});
 	//admin
 	// var view = $(".ga-info.view");

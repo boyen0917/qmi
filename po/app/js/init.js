@@ -336,9 +336,45 @@ window.QmiGlobal = {
 		        $('input[type="file"]').val(null);
 		    });
 		}
-	}
+	},
 
-	
+	guihu:{
+		html: '<div class="guihu-confirm">'+
+                    '<div class="edit-guihu-content">'+
+                        '<div class="guihu-title-content">'+
+                            '<div class="guihu-title"></div>'+
+                            '<div class="guihu-des"></div>'+
+                        '</div>'+
+                        '<div class="guihu-input-content">'+
+                            '<input type="text" data-role="none" placeholder="E-mail">'+
+                            '<input type="password" data-role="none" placeholder="Password">'+
+                        '</div>'+
+                        '<div class="guihu-btn-content">'+
+                            '<button class="guihu-cancel-btn btn-b" data-role="none">取消</button>'+
+                            '<button class="btn-b" data-role="none">確認</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>',
+        init: function(){
+        	var guihuPop = $(this.html);
+        	$("body").append(guihuPop);
+        	var editGuihu = $(".guihu-confirm");
+        	editGuihu.fadeIn();
+
+        	$(".guihu-cancel-btn").click(function(){
+        		guihuPop.remove();
+		        editGuihu.fadeOut();
+		    });
+		    $(".guihu-btn-content").on('click',".add-btn",function(){
+		    	guihuPop.remove();
+		        editGuihu.fadeOut();
+		    });
+		    $(".guihu-btn-content").on('click',".save-btn",function(){
+		    	guihuPop.remove();
+		        editGuihu.fadeOut();
+		    });
+        }
+	}
 
 };
 
