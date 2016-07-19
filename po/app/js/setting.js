@@ -416,12 +416,22 @@ function showGroupInfoPage(){
 	var inGroupName = $("input.ga-group-name");
 	var textGroupDes = $("textarea.ga-group-des");
 
- 	gaContent.find(".ga-gr-content.view").show().end()
- 			 .find(".ga-gr-content.edit").hide().end()
- 			 .find(".ga-info-row.view").show().end()
-			 .find(".ga-info-row.edit").hide().end();
+	var contentViewshow = function(){
+		gaContent.find(".ga-gr-content.view").show().end()
+				 .find(".ga-gr-content.edit").hide();
+	};
+	var rowViewshow = function(){
+		gaContent.find(".ga-info-row.view").show().end()
+				 .find(".ga-info-row.edit").hide();
+	};
+	//contentViewshow();
+	//rowViewshow();
+ 	// gaContent.find(".ga-gr-content.view").show().end()
+ 	// 		 .find(".ga-gr-content.edit").hide().end()
+ 	// 		 .find(".ga-info-row.view").show().end()
+		// 	 .find(".ga-info-row.edit").hide().end();
 
-    $(document).on("click","#icon-view-gname", function(){
+    gaContent.on("click","#icon-view-gname", function(){
     	gaContent.find(".ga-gr-content.view").hide().end()
 				 .find(".ga-gr-content.edit").show();
     	setTimeout(function(){
@@ -429,7 +439,7 @@ function showGroupInfoPage(){
         }, 0);
     	inGroupName.val(groupName);		
 	});
-	$(document).on("click","#icon-view-gdes", function(){
+	gaContent.on("click","#icon-view-gdes", function(){
 		gaContent.find(".ga-info-row.view").hide().end()
 				 .find(".ga-info-row.edit").show();
 		setTimeout(function(){
@@ -437,31 +447,28 @@ function showGroupInfoPage(){
         }, 0);	
 		textGroupDes.val(groupDescription);	
 	});
-	$(document).on("click","#icon-edit-gname", function(){
+	gaContent.on("click","#icon-edit-gname", function(){
 		if(inGroupName.val() == ""){
 			popupShowAdjust("團體名稱不能為空");
 		}else{
-			gaContent.find(".ga-gr-content.view").show().end()
-				 .find(".ga-gr-content.edit").hide();
+			contentViewshow();
 			gaContent.find(".ga-group-name").text(inGroupName.val());
 			getUpdateGroupInfoApi(gi, inGroupName.val(), "");
 		}
 	});
-	$(document).on("click","#icon-edit-gdes", function(){
-		gaContent.find(".ga-info-row.view").show().end()
-				 .find(".ga-info-row.edit").hide();
+	gaContent.on("click","#icon-edit-gdes", function(){
+		rowViewshow();
 		gaContent.find(".ga-group-des").text(textGroupDes.val());
 		getUpdateGroupInfoApi(gi, "", textGroupDes.val());
 	});
-	$(document).on("click",".ga-cancel-gname", function(){
-			gaContent.find(".ga-gr-content.view").show().end()
-				 .find(".ga-gr-content.edit").hide();
+	gaContent.on("click",".ga-cancel-gname", function(){
+		contentViewshow();
 	});
-	$(document).on("click",".ga-cancel-gdes", function(){
-		gaContent.find(".ga-info-row.view").show().end()
-				 .find(".ga-info-row.edit").hide();
+	gaContent.on("click",".ga-cancel-gdes", function(){
+		rowViewshow();
+	});
 
-	});
+	
 	//admin
 	// var view = $(".ga-info.view");
 	// view.show();

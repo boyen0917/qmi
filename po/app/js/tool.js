@@ -488,7 +488,6 @@ qmiUploadFile = function(uploadObj){
 		var chainDef = MyDeferred();
 		// 取得上傳網址
 		new QmiAjax(uploadObj.urlAjax).complete(chainDef.resolve)
-
 		return chainDef;
 	}()).then(function(s3Obj) {
 		var chainDef = MyDeferred();

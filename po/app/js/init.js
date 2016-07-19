@@ -13,7 +13,8 @@ var ui,
 	debug_flag = false,
 
 	clearChatTimer,
-
+	
+	isShowNotification = true,
 
 	//HiCloud
 
@@ -131,7 +132,7 @@ var timeline_detail_exception = [
 
 	//timeline置頂millisecond
 	
-	top_timer_ms = $.lStorage("_topTimeMs") || 5000;
+	top_timer_ms = $.lStorage("_topTimeMs") || 5000,
 	//top_timer_ms = 5000;
 
 	//polling間距

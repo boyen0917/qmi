@@ -10,6 +10,17 @@ $(document).ready(function(){
     btnContent.find('.password-btn').click(function(){
         passwordChange(); 
     });
+    // 預設系統通知
+    btnContent.find('.notification-btn').click(function(){
+        if ($('#no-option1').is(":checked"))
+        {
+            isShowNotification = true;
+        }else{
+            isShowNotification = false;
+        }
+        toastShow("變更成功");
+        console.log(isShowNotification);
+    });
     // 預設團體送出
     btnContent.find('.default-group-btn').click(function(){
         defaultGroupSetting();
@@ -59,29 +70,15 @@ $(document).ready(function(){
         }
     });
 
-
-    $(".guihu-add").click(function() {
-        QmiGlobal.guihu.init();
-        $(".guihu-title").text($.i18n.getString("ADD_LDAP"));
-        $(".guihu-des").text($.i18n.getString("ADD_LDAP_DES"));
-        $(".guihu-btn-content").find("button:nth-child(2)").addClass("add-btn");
-    });
-    $(".guihu-cancel").click(function(){
-        QmiGlobal.guihu.init();
-        $(".guihu-title").text($.i18n.getString("REMOVE_LDAP"));
-        $(".guihu-des").text($.i18n.getString("REMOVE_LDAP_DES"));
-        $(".guihu-btn-content").find("button:nth-child(2)").addClass("save-btn");
-    });
 });
 
 //user Info Setting
 userInfoSetting = function(){
     var userInformation = $("#userInformation-page");
-    var emailSetting = $("#email-setting");
+    
     userInformation.find(".user-avatar-img").attr('src',QmiGlobal.me.aut).end()//大頭照
                        .find(".input-username").val(QmiGlobal.me.nk);//first name
-        
-    emailSetting.find("input[name$='user-edit-phone']").val(QmiGlobal.me.pn);
+    
 }
 //取得個人資訊
 userInfoGetting = function(){
@@ -140,10 +137,15 @@ systemSetting = function(){
     //gu 現在團體 你自己的id
     //ui 
     //at
+    var emailSetting = $("#email-setting");
+    emailSetting.find("input[name$='user-edit-phone']").val(QmiGlobal.me.pn);
+    emailSetting.find("input[name$='user-edit-email']").val(QmiGlobal.me.em);
+
     var systemGroup = $("#group-setting");
+    //預設系統通知
+    $("#no-option1").attr('checked', isShowNotification);
     //預設群組
     var me_dgi = QmiGlobal.auth.dgi;
-
     //預設置頂自動換頁   
     $("#carousel-setting").find("input[value='"+top_timer_ms+"']").attr('checked', true);
     
