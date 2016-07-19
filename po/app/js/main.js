@@ -1167,29 +1167,30 @@ $(function(){
 
 
 	//為了排除複製 滑鼠按下少於0.1秒 判斷為click  暫時不做 
-	$(document).on("mousedown",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3 .st-response",function(e){
+	$(document).on("mousedown",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3",function(e){
 		var this_event = $(this);
-
-		this_event.data("trigger",true);
-		setTimeout(function(){
-			this_event.data("trigger",false);
-		},300);
-			
-		
+		if (this_event.data("trigger") === undefined){
+			this_event.data("trigger",true);
+		}
+		// this_event.data("trigger",true);
+		// setTimeout(function(){
+		// 	this_event.data("trigger",false);
+		// },100);
 	});
 
 	$(document).on("mouseup",".st-sub-box-1, .st-sub-box-2",function(e){
 		if($(this).data("trigger")) $(this).trigger("detailShow");
 	});
 
-	$(document).on("mouseup",".st-sub-box-3 .st-response",function(e){
-		if($(this).data("trigger")) $(this).parent().trigger("detailShow");
+	$(document).on("mouseup", ".st-response", function(e){
+		
+		if($(this).parent().data("trigger")) $(this).parent().trigger("detailShow");
 	});
 
 	//detail view
-	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3",function(){
+	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3", function(e){
+		var triggerDetailBox = $(this);
 		var this_event = $(this).parent();
-
 		//detail頁面 離去
 		if(this_event.data("detail-page")) return false;
 
@@ -1212,20 +1213,25 @@ $(function(){
 			//顯示隱藏發佈對象detail
 			this_event.find(".st-sub-box-1-footer").addClass("hideOverflow");
 		}else{
+			
 			this_event.data("switch-chk",true);
 			this_event.find(".st-reply-message-bg").css("border",0);
 			//顯示隱藏發佈對象detail
 			this_event.find(".st-sub-box-1-footer").removeClass("hideOverflow");
 		}
 
+
 		//動態消息 判斷detail關閉區域
-		var detail_chk = timelineDetailClose(this_event,tp);
-		
+		var detail_chk = timelineDetailClose(this_event,tp, triggerDetailBox);
+
+
 		//重置
 		if(!detail_chk){
 			this_event.find(".st-vote-all-ques-area").html("");
 			return false;
 		}
+
+		triggerDetailBox.data("trigger", false);
 		
 		//此則動態的按贊狀況
 		getThisTimelinePart(this_event,1,function(data){
@@ -1255,7 +1261,7 @@ $(function(){
         	eventContentDetail(this_event,e_data);
         	
     		//detail timeline message內容
-			detailTimelineContentMake(this_event,e_data);
+			detailTimelineContentMake(this_event, e_data, null, triggerDetailBox);
 
 			timelineUpdateTime();
 		});
