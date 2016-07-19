@@ -7928,9 +7928,9 @@ pollingCmds = function(newPollingData){
                 currentPollingCt = pollingDataTmp.ts.pt;
             }
             //登入5分鐘前的polling可show
-            // if( (currentPollingCt+300000) < login_time ){
-            //     isShowNotification = false;
-            // }
+            if( (currentPollingCt+300000) < login_time ){
+                isShowNotification = false;
+            }
 
             // 等等要剔除這次打過combo的tp4,5,6 避免重複api -> arguments是array-like Object
             var exceptArr = Array.prototype.map.call(arguments,function(item){ return item.thisGi; })
