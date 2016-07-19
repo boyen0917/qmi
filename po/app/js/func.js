@@ -7076,7 +7076,6 @@ replyReload = function(this_event){
         stickerIcon.trigger("click");
     }
 
-
     //重設任務完成狀態
     eventStatusWrite(this_event);
 
