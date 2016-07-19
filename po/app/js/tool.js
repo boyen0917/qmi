@@ -31,7 +31,7 @@ QmiGlobal.popup = function(args){
 	self.jqHtml = $(this.html);
 
 	self.jqHtml.find(".popup-confirm").html( $.i18n.getString("COMMON_OK") ).end()
-	.find(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
+				.find(".popup-cancel").html( $.i18n.getString("COMMON_CANCEL") );
 
 	if( args.confirm !== false && args.confirm !== undefined ) self.jqHtml.find(".popup-confirm").show();
 	if( args.cancel  !== false && args.cancel  !== undefined ) self.jqHtml.find(".popup-cancel").show();
@@ -47,7 +47,8 @@ QmiGlobal.popup = function(args){
 	//沒有按鈕 自動消失
 	if( args.confirm === undefined && args.cancel === undefined) {
 		setTimeout(function(){
-			self.remove();
+			self.jqHtml.remove();
+			self.removeE();
 		},1500);
 	}
 
@@ -56,12 +57,14 @@ QmiGlobal.popup = function(args){
 		if(args.confirm !== undefined && args.action !== undefined) {
 			args.action[0].apply({},[args.action[1]]);
 		}
-		self.remove();
+		self.jqHtml.remove();
+		self.removeE();
 	})
 
 	//取消
 	self.jqHtml.find(".popup-cancel").click(function(){
-		self.remove();
+		self.jqHtml.remove();
+		self.removeE();
 	})
 
 	$("body")
@@ -70,8 +73,8 @@ QmiGlobal.popup = function(args){
 }
 
 QmiGlobal.popup.prototype = {
-	remove: function(){
-		this.jqHtml.remove();
+	removeE: function(){
+		//this.jqHtml.remove();
 		$("body").removeClass("screen-lock");
 
 		QmiGlobal.scrollController.enableScroll();
@@ -269,6 +272,9 @@ toSha1Encode = function (string){
 }
 
 htmlFormat = function (str, isToCharCode){
+	if(str.match(/\&\#\d+\;*/g)){
+    	str = str.replace(/\&\#/g,"&#38;&#35;");
+    } 
     var strArr = str._escape().replace(/\n/g," \n ").split(" ");
     $.each(strArr,function(i,val){
     	var newStr = (isToCharCode === true ? encodeHtmlEntity(val) : val) ;
@@ -474,7 +480,7 @@ qmiUploadFile = function(uploadObj){
 	// }).done(function(data) {
 	// 	console.log("finish", data);
 	// });
-
+	
 	var allDoneDef = $.Deferred(),
 		s3ResponseObj;
 
@@ -482,7 +488,6 @@ qmiUploadFile = function(uploadObj){
 		var chainDef = MyDeferred();
 		// 取得上傳網址
 		new QmiAjax(uploadObj.urlAjax).complete(chainDef.resolve)
-
 		return chainDef;
 	}()).then(function(s3Obj) {
 		var chainDef = MyDeferred();

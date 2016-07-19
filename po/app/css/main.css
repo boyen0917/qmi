@@ -854,27 +854,19 @@ img.auo {
 	width: auto;
 }
 
-.gm-border [name=system-setting] { cursor: pointer; height: 50px;}
-
-.gm-border [name=system-setting] .sm-small-area-l {
-    display: inline-block;
-    margin-right: 30px; 
-    position: relative;
-    top: 12px;
-    left: 10px;
-}
-
-.gm-border [name=system-setting] .sm-small-area-l img { width: 28px; }
-
-.gm-border [name=system-setting] .sm-small-area-r {
-    display: inline-block;
-    position: relative;
-    top: 5px;
-}
 .gm-border .sm-small-area .sm-count {
 	right: 5px;
 	top: 10px;
 }
+
+.gm-side-menu div[data-sm-act=system-setting] .sm-small-area-l img { width: 25px; vertical-align: middle;}
+.gm-side-menu div[data-sm-act=system-setting] > div { 
+	display: inline-block; 
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.gm-side-menu div[data-sm-act=system-setting] .sm-small-area-l { padding: 14px; }
 
 .sm-count {
 	font-size: 12px;
@@ -1018,7 +1010,7 @@ img.auo {
 
 .sm-group-list-scroll-area {
     /*min-height: 123px;*/
-    height: -webkit-calc( 100% - 188px );
+    height: -webkit-calc( 100% - 164px );
 	overflow-x: hidden;
 	overflow-y: scroll;
 	padding-bottom: 5px;

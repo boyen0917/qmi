@@ -380,7 +380,7 @@ $(function(){
                 $(".gs-row[data-type=info]").show();
             } else {
                 $(".gs-row[data-type=permission]").hide();
-                $(".gs-row[data-type=info]").hide();
+                //$(".gs-row[data-type=info]").hide();
                 hide+=2;
             }
 

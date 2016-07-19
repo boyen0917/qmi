@@ -125,8 +125,10 @@ $(function(){
 		var file_ori = $(this);
 		var imageType = /image.*/;
 
+
 		//每次選擇完檔案 就reset input file
 		// file_ori.replaceWith( file_ori.val('').clone( true ) );
+
 		var file = file_ori[0].files[0];
 
 		if (file.type.match(imageType)) {
@@ -247,6 +249,24 @@ $(function(){
 		agreeMeInvite($(this).parents(".gmi-div"));
 	});
 
+	//個人資訊選單
+	//$(".sm-person-info").hide();
+	$("#userInfo").click(function(e){
+		$(".sm-person-area-r").find("img").toggle();
+		//$(".sm-person-info").fadeToggle();
+		
+		QmiGlobal.systemPopup.init();
+		
+	});
+	//系統選單 Tab 
+	$(".system-tab").on('click','li',function(){
+        var tab_id = $(this).attr('data-tab');
+        //console.log("tab is "+tab_id);
+        $('ul.system-tab li').removeClass('current-tab');
+        $('.system-tab-content').removeClass('current-tab');
+        $(this).addClass('current-tab');
+        $("#"+tab_id).addClass('current-tab');
+    });
 	//----------------------------------- 小幫手 ---------------------------------------------
 
 	//小幫手 創建團體
@@ -329,16 +349,16 @@ $(function(){
 		
 	});
 
-	//登出 暫時
-	$(".gm-side-menu").on("click","[name=system-setting]",function(){
-		// popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
-		new QmiGlobal.popup({
-			desc: $.i18n.getString("SETTING_DO_LOGOUT"),
-			confirm: true,
-			cancel: true,
-			action: [logout]
-		});
-	});
+	// 登出 暫時
+	// $(".sm-person-info").on("click",".system-logout",function(){
+	// 	// popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
+	// 	new QmiGlobal.popup({
+	// 		desc: $.i18n.getString("SETTING_DO_LOGOUT"),
+	// 		confirm: true,
+	// 		cancel: true,
+	// 		action: [logout]
+	// 	});
+	// });
 	
 	//更換團體
 	$(document).on("click",".sm-group-area.enable",function(){
@@ -2066,6 +2086,114 @@ $(function(){
 		this_media.append(download_img);
 		this_media.unbind("mouseleave").mouseleave(function(){download_img.remove()});
 	});
+
+
+
+	//-----------------------------------  system setting  ----------------------------------- 
+	
+	// 圖片變更
+
+	// $('.setting-user-avatar').click(function(){
+	// 	$('.setting-avatar-file').trigger("click");
+	// });
+
+	// //大頭照預覽取消
+	//  $('.cancel-btn').click(function(){
+ //        $(".user-avatar-confirm").fadeOut();
+ //    });
+
+	// //儲存
+	 // $('.avatar-save').click(function(){
+  //       var reader = new FileReader();
+
+  //       var file_ori = $('.setting-avatar-file'); //圖片來源input file
+
+  //       var image_file = file_ori[0].files[0];//當下選擇的檔案
+
+  //       reader.onload = function(e) {
+  //               var img = $(".setting-user-avatar");
+  //               img.attr("src",reader.result);
+  //       }
+
+  //       reader.readAsDataURL(image_file);
+  //       $(".user-avatar-confirm").fadeOut();
+  //   });
+
+
+	// //選擇圖片
+	// $('.setting-avatar-file').change(function(){
+ //        var file_ori = $(this);
+ //        var imageType = /image.*/;
+
+ //        //每次選擇完檔案 就reset input file
+ //        // file_ori.replaceWith( file_ori.val('').clone( true ) );
+ //        var file = file_ori[0].files[0];
+
+ //        if (file) {
+ //            //是否存在圖片
+ //            $(".avatar-preview").data("chk",true);
+
+ //            var reader = new FileReader();
+ //            reader.onload = function(e) {
+ //                var img = $(".user-headshot");
+
+ //                //調整長寬
+ //                // img.load(function() {
+ //                //  var w = img.width();
+ //          //           var h = img.height();
+ //    //              mathAvatarPos(img,w,h,120);
+ //          //       });
+ //                img.attr("src",reader.result);
+ //            }
+ //            reader.readAsDataURL(file);
+ //            $('.user-avatar-confirm').fadeIn();
+
+ //        }else{
+ //        	// 沒有圖片的時候
+ //            $(".avatar-preview").data("chk",false);
+ //        }
+
+ //    });
+
+
+	// //password設定出現
+	// $('.password-popup').click(function(){
+	// 	$('.password-change-confirm').fadeIn();
+	// });
+	// //popup頁面消失
+
+	// $('.password-cancel').click(function(){
+	// 	$('.password-change-confirm').fadeOut();
+	// 	$('.input-password').val("");
+	// });
+
+	//自動換頁
+	
+
+	// $('.carousel-time').change(function(){
+	// 	 var carousel_time = $(this).val();
+	// 	 $.lStorage('_topTimeMs',carousel_time);
+		
+	// }); 
+	
+	$(document).on('click','.term-service',function(){
+		var policy_url = "https://eimweb.mitake.com.tw/user_agreement.html";
+		$('.policy').fadeIn();
+		$('.policy-content').find("iframe").attr("src",policy_url);
+
+	});
+
+	$('.right-privacy').click(function(){
+		var policy_url = "https://eimweb.mitake.com.tw/privacy_policy.html";
+		$('.policy').fadeIn();
+		$('.policy-content').find("iframe").attr("src",policy_url);
+
+	});
+
+	$('.policy-content').click(function(){
+		$('.policy').fadeOut();
+	});
+
 	
 	/*
 	               ██████╗  ███████╗ ███████╗ ██╗  ██████╗ ██╗  █████╗  ██╗               

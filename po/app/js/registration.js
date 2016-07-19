@@ -334,7 +334,10 @@ onCheckVersionDone = function(needUpdate){
 
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
-
+        
+        //get me api
+        userInfoGetting();
+       
         //附上group list
         getGroupList().done(function(groupList){
         	var specifiedGi = QmiGlobal.auth.dgi;

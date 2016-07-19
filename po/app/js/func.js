@@ -95,6 +95,7 @@ chkBranch = function(){
 }
 
 createGroup = function (group_name,group_desc){
+    
     var api_name = "groups";
     var headers = {
         ui: ui,
@@ -409,7 +410,6 @@ timelineSwitch = function (act,reset,main,noPR){
         $("#page-group-main .switch-reset").html("");
     }
 
-
     // 關掉筆
     var groupMain = $("#page-group-main");
     var gmHeader = groupMain.find(".gm-header");
@@ -542,11 +542,11 @@ timelineSwitch = function (act,reset,main,noPR){
                     case "calendar":
                     case "help":
                     case "news":
+                    case "user-setting":
                     case "system-setting":
                       break;
                 }
             } else {
-
                 //-- switch sub pages --
                 $(".subpage-chatList").show();
 
@@ -574,6 +574,26 @@ timelineSwitch = function (act,reset,main,noPR){
         case "news":
             switchDeferred.resolve({ act: "news"});
           break;
+        case "user-setting":
+                
+            $("#page-group-main .main-subpage").hide();
+            $(".subpage-userInformation").show();
+
+            userInfoSetting();
+            
+            switchDeferred.resolve({ act: "user-setting"});
+              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
+            break;  
+        case "system-setting":
+
+            $("#page-group-main .main-subpage").hide();
+            $(".subpage-systemSetting").show();
+
+            systemSetting();
+
+            switchDeferred.resolve({ act: "system-setting"});
+              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
+            break;
 
         case "fileSharing":
             $(".subpage-fileSharing").show();
@@ -7901,17 +7921,16 @@ pollingCmds = function(newPollingData){
             
             var pollingDataTmp = $.lStorage("_pollingData"),
                 currentPollingCt = 9999999999999,
-                isShowNotification = true;
+                
                 newGroupArr = [];
 
             if(pollingDataTmp){
                 currentPollingCt = pollingDataTmp.ts.pt;
             }
-            
             //登入5分鐘前的polling可show
-            if( (currentPollingCt+300000) < login_time ){
-                isShowNotification = false;
-            }
+            // if( (currentPollingCt+300000) < login_time ){
+            //     isShowNotification = false;
+            // }
 
             // 等等要剔除這次打過combo的tp4,5,6 避免重複api -> arguments是array-like Object
             var exceptArr = Array.prototype.map.call(arguments,function(item){ return item.thisGi; })
@@ -8793,13 +8812,13 @@ userInfoEvent = function(this_info,me){
                             method: "put"
                         },
                         tp: 1,
-                        file: this_info.find(".user-avatar-upload")[0].files[0],
+                        file: img[0],
                         oriObj: {w: 1280, h: 1280, s: 0.7},
                         tmbObj: {w: 120, h: 120, s: 0.6} // ;
                     }).done(function(data) {
                         // 關閉load 圖示
+                        console.log("finish", data);
                         s_load_show = false;
-        
                         if(data.isSuccess === true) {
                             //重置團體頭像、名稱的參數
                             getGroupComboInit(gi).done(function(){
@@ -9466,24 +9485,15 @@ function activateClearChatsTimer(){
 
 };
 
-// stopClearChatsTimer = function() {
-//     clearTimeout(clearChatTimer);
-// }
 
-// checkChatMsgExpired = function() {
-//     console.log("test12");
-
-//     stopClearChatsTimer();
-//     var groupData = QmiGlobal.groups[gi];
-//     console.log(groupData);
-//     if (groupData.set) {
-//         var clearChatCycle = groupData.set.ccc;
-//         if (clearChatCycle > 0) {
-//             console.log(clearChatCycle);
-//             activateClearChatsTimer();
-//         }
-//     }
-// }
+showFeedboxNoContent = function( isShow ){
+    if( isShow ){
+        $(".st-feebox-area-no-content").hide();
+    } else {
+        $(".st-feebox-area-no-content").show().removeClass("disabled");
+        $(".gm-content > div:eq(1)").getNiceScroll(0).doScrollTop(0, 500);
+    }
+}
 
 /*
           ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
