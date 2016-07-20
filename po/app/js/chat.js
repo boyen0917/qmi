@@ -1839,7 +1839,14 @@ function sendMsgText(dom) {
 						img.attr("src", obj.s3);
 						//點擊跳出大圖
 						img.click(function () {
-							showGallery(null, [{s32: obj.s32}], 0);
+							new QmiGlobal.gallery({
+					            gi: gi,
+					            photoList: [{s32: obj.s32}],
+					            currentImage : 0,
+					            isApplyWatermark : false,
+					            watermarkText : ""
+					        });
+							// showGallery(null, [{s32: obj.s32}], 0);
 							// 	var imgO = new Image();
 							// 	var gallery_str = "<img src=" + obj.s32 + " />";
 							// 	imgO.onload = function() {

@@ -716,7 +716,7 @@ body {
 }
 
 .chat-file {
-	min-width: 30em;
+	min-width: 16em;
 	display: block;
 	height: 37px;
 	border: 1px solid #dddddd;
@@ -1620,13 +1620,13 @@ body {
     background: rgba(135, 191, 255, 0.95);
 }
 
-.galleryModal .close {
+#galleryModal .close {
 	color: white;
-    font-size: xx-large;
-    position: relative;
-    cursor: pointer;
-    text-shadow: 2px 2px 2px #aaa;
-    text-align: right;
+	font-size: xx-large;
+	position: relative;
+	left: 93%;
+	cursor: pointer;
+	text-shadow: 2px 2px 2px #aaa;
 }
 
 .galleryModal .arrowBtn {
