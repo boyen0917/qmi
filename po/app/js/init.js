@@ -13,12 +13,11 @@ var ui,
 	debug_flag = false,
 
 	clearChatTimer,
-	isShowNotification = $.lStorage("_notification") || true,
+	isShowNotification = true,
 
 	//HiCloud
 
 	base_url = "https://ap.qmi.emome.net/apiv1/";
-
 
 	// aws 測試環境
  	//base_url = "https://apserver.mitake.com.tw/apiv1/";

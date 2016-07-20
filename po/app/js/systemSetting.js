@@ -19,7 +19,6 @@ $(document).ready(function(){
             isShowNotification = false;
         }
         toastShow("變更成功");
-        $.lStorage('_notification',isShowNotification);  
     });
     // 預設團體送出
     btnContent.find('.default-group-btn').click(function(){
@@ -156,7 +155,6 @@ systemSetting = function(){
     //密碼
     $("#password-setting").find(".input-password").val("");
     //預設系統通知
-    console.log(isShowNotification);
     $("#no-option1").attr('checked', isShowNotification);
     //預設團體
     var me_dgi = QmiGlobal.auth.dgi;
