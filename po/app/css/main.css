@@ -688,7 +688,7 @@ img.auo {
 }
 
 .compose-dnd {
-	position: absolute;
+	position: fixed;
 	background: rgb(57, 148, 232);
 	opacity: 0.3;
 	z-index: 1700;

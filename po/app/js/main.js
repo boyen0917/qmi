@@ -1256,6 +1256,7 @@ $(function(){
 		var imageType = /image.*/;
 		var videoType = /video.mp4/;
 		var isMp4AlertShown = false;
+		console.log("file_ori", file_ori);
 		$.each(file_ori[0].files,function(i,file){
 			if( file.type.match(imageType)){
 				imgList.push(file);
@@ -1291,7 +1292,7 @@ $(function(){
 				
 			// 	//流水號
 				var ai = this_compose.data("upload-ai");
-				this_compose.data("upload-obj").push = file;
+				this_compose.data("upload-obj")[ai] = file;
 				this_compose.data("upload-ai",ai+1)
 			});
 
@@ -1403,7 +1404,7 @@ $(function(){
 		}
 
 		//每次選擇完檔案 就reset input file
-		file_ori.replaceWith( file_ori.val('').clone( true ) );
+		// file_ori.replaceWith( file_ori.val('').clone( true ) );
 	});
 
 	$(document).on("dragover",".timeline-dnd,.compose-dnd,.user-info-load-area .me",function(e){
