@@ -528,7 +528,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		tmbObj = uploadObj.tmbObj,
 		oriObj = uploadObj.oriObj;
 
-
 	var uploadDef = $.Deferred(),
 		mediaLoadDef = $.Deferred(),
 		oriFile, tmbFile, mt, si, md, contentType,
@@ -587,7 +586,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			}
 			break;
 		default: 
-		console.log("00000");
 	}
 
 	mediaLoadDef.done(function() {

@@ -1281,7 +1281,7 @@ $(function(){
 
 			var limit_chk = false;
 			// var upload_arr = this_compose.data("upload-arr");
-
+			// 取消上傳9張限制
 			$.each(imgList,function(i,file){
 				if(!file || !file.type) return;
 				if(Object.keys(this_compose.data("upload-obj")).length == 9 ){
@@ -1289,9 +1289,9 @@ $(function(){
 					return false;
 				}
 				
-				//流水號
+			// 	//流水號
 				var ai = this_compose.data("upload-ai");
-				this_compose.data("upload-obj")[ai] = file;
+				this_compose.data("upload-obj").push = file;
 				this_compose.data("upload-ai",ai+1)
 			});
 
@@ -1353,10 +1353,10 @@ $(function(){
 
 			$.each(videoList,function(i,file){
 				if(!file||!file.type) return;
-				if(Object.keys(this_compose.data("upload-video")).length == 1 ){
-					limit_chk = true;
-					return false;
-				}
+				// if(Object.keys(this_compose.data("upload-video")).length == 1 ){
+				// 	limit_chk = true;
+				// 	return false;
+				// }
 				
 				//流水號
 				var ai = this_compose.data("upload-ai");

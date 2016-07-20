@@ -490,7 +490,6 @@ window.QmiAjax = function(args){
 	// complete來這裡
 	ajaxDeferred.always(function(completeData){
 		self.onComplete(completeData);
-		console.log(completeData);
 		if(completeCB instanceof Function) completeCB(completeData);
 	});
 
