@@ -3451,8 +3451,9 @@ img.st-reply-message-attach {
 
 .cp-content{
 	background: rgb(208,208,208);
-    width: 100%;
-    display:table;
+    /*width: 100%;
+    display:table;*/
+    width: 100vw;
 }
 
 .cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-work-area,.cp-vote-area-test,.cp-time-area,.cp-vote-type-area{
