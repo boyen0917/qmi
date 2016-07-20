@@ -8605,6 +8605,7 @@ userInfoEvent = function(this_info,me){
 
         var this_gu = this_info.data("this-info-gu");
         var this_gi = this_info.data("this-info-gi");
+        var emptyAut = "images/common/others/empty_img_all_l.png";
         //結束關閉
         this_info.find(".user-info-close").trigger("mouseup");
         //主頁背景
@@ -8613,7 +8614,10 @@ userInfoEvent = function(this_info,me){
             $(".gm-user-main-area .background").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
             $(".gm-user-main-area .name").html(_thisGroupList.guAll[this_gu].nk);
             $(".gm-user-main-area .group .pic").css("background","url(" + _thisGroupList.aut + ")");
-            $(".gm-user-main-area .group .name").html(_thisGroupList.gn);
+            $(".gm-user-main-area .group .name").html(_thisGroupList.gn._escape());
+            if(!_thisGroupList.aut){
+                $(".gm-user-main-area .group .pic").css("background","url(" + emptyAut + ")");
+            }
         });
 
         if($(".alert-area").is(":visible")){
