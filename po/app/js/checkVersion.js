@@ -22,39 +22,23 @@ $(function(){
 			}
 			$("#container_version span.container").html(g_currentContainerVersion);
 
-	  //   	var api_name = "sys/version";
-	  //   	var headers = {
-	  //   		os: 2,
-			// 	tp: 1,
-			// 	av: g_currentContainerVersion,
-			// 	li: lang
-			// };
-			// var method = "get";
-	  //   	var result = ajaxDo(api_name,headers,method,false);
-	  //       result.complete(function(data){
-		 //    	if(data.status == 200){
-		 //    		var getS3_result =$.parseJSON(data.responseText);
+ 			var getS3_result = {av:g_newContainerVersion};
 
-		 			var getS3_result = {av:g_newContainerVersion};
-
-		 			cns.debug( "old:", g_currentContainerVersion, "new:", getS3_result.av );
-			    	if( versionCompare(g_currentContainerVersion, getS3_result.av)>0 ){
-			    		cns.debug("need update container ver");
-			    		// $(".version_update_lock").fadeIn();
-			    		onDone(true);
-			    		popupShowAdjust(
-			    			$.i18n.getString("LANDING_PAGE_UPDATE_CONTAINER_TITLE"),	//"Need update container version"
-			    			$.i18n.getString("LANDING_PAGE_UPDATE_CONTAINER_DESCRIPTION"),	//"Please click ok to download newest container version.",
-			    			$.i18n.getString("COMMON_OK"),null,[onClickDownload]);
-			    	} else {
-			    		onDone(false);
-			    		cns.debug("latest container ver", g_currentContainerVersion);
-			    	}
-		    // 	}
-		    // });
+ 			cns.debug( "old:", g_currentContainerVersion, "new:", getS3_result.av );
+	    	if( versionCompare(g_currentContainerVersion, getS3_result.av)>0 ){
+	    		cns.debug("need update container ver");
+	    		// $(".version_update_lock").fadeIn();
+	    		onDone(true);
+	    		popupShowAdjust(
+	    			$.i18n.getString("LANDING_PAGE_UPDATE_CONTAINER_TITLE"),	//"Need update container version"
+	    			$.i18n.getString("LANDING_PAGE_UPDATE_CONTAINER_DESCRIPTION"),	//"Please click ok to download newest container version.",
+	    			$.i18n.getString("COMMON_OK"),null,[onClickDownload]);
+	    	} else {
+	    		onDone(false);
+	    		cns.debug("latest container ver", g_currentContainerVersion);
+	    	}
     	} catch(e){
 			$("#container_version span.container").html("0.0.0");
-    		cns.debug("ignore container ver", e.stack);
     		onDone(false);
     		// onDone(true);
     		// $(".container_update_lock").show();
