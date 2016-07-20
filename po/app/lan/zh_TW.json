@@ -344,7 +344,6 @@
 	"SYSTEM" : "系統",
 	"ABOUT_QMI" : "關於Qmi",
 
-	"ACCOUNT_SET" : "帳號設定",
 	"PASSWORD_SET" : "變更密碼",
 	"SYSTEM_SET" : "系統通知",
 	"DEFAULT_GROUP_SET" : "預設開啟團體",
@@ -358,8 +357,8 @@
 	"VOICE_SET" : "聲音",
 	"CHAT_SET" : "聊天訊息預覽",
 	"CLOSE_SET" : "關閉",
-	"THREE_SEC_SET" : "三秒",
-	"FIVE_SEC_SET" : "五秒",
+	"THREE_SEC_SET" : "3秒",
+	"FIVE_SEC_SET" : "5秒",
 
 	"BIND_LDAP" : "綁定LDAP",
 	"BIND_ACCOUNT" : "已綁定帳號",

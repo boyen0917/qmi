@@ -196,8 +196,8 @@ getMeInvite = function(){
                         var inviteDom = $(this).find(".gmi-div");
                         inviteDom._i18n();
                         inviteDom.data("invite-data",item);
-                        inviteDom.find(".gmi-div-data div:eq(0)").html( $.i18n.getString("GROUP_GROUP_INVITATION", "<span>"+item.gn+"</span>") );
-                        inviteDom.find(".gmi-div-data div:eq(1)").html( $.i18n.getString("GROUP_MEMBERS", "<span>"+item.cnt+"</sapn>") );
+                        inviteDom.find(".gmi-div-data div:eq(0)").html( $.i18n.getString("GROUP_GROUP_INVITATION", "<span>"+item.gn._escape()+"</span>") );
+                        inviteDom.find(".gmi-div-data div:eq(1)").html( $.i18n.getString("GROUP_MEMBERS", "<span>"+item.cnt._escape()+"</sapn>") );
 
                         if(item.aut){
                             inviteDom.find(".gmi-div-avatar .aut").attr("src",item.aut);
@@ -423,7 +423,7 @@ timelineSwitch = function (act,reset,main,noPR){
 
     //關閉所有subpage
     $("#page-group-main .main-subpage").hide();    
-    
+    $(".gm-content-header").hide();
     //desktop 版的chrome scrollbar 會被吃掉 這算 activate
     // var scrollDom = $("#page-group-main .gm-content > div:nth-child(2)");
     // scrollDom.css("overflow-y","hidden");
@@ -579,7 +579,10 @@ timelineSwitch = function (act,reset,main,noPR){
                 
             $("#page-group-main .main-subpage").hide();
             $(".subpage-userInformation").show();
-
+            //header
+            $(".gm-content-header").show();
+            $(".setting-header-content>img").attr("src","images/avatar.png");
+            $(".setting-header-content>div").text($.i18n.getString("PERSONAL_INFORMATION"));
             userInfoSetting();
             
             switchDeferred.resolve({ act: "user-setting"});
@@ -589,7 +592,10 @@ timelineSwitch = function (act,reset,main,noPR){
 
             $("#page-group-main .main-subpage").hide();
             $(".subpage-systemSetting").show();
-
+            //header
+            $(".gm-content-header").show();
+            $(".setting-header-content>img").attr("src","images/settings.png");
+            $(".setting-header-content>div").text($.i18n.getString("LEFT_SYSTEM_SETTING"));
             systemSetting();
 
             switchDeferred.resolve({ act: "system-setting"});
@@ -7592,11 +7598,14 @@ pollingCmds = function(newPollingData){
             if(pollingDataTmp){
                 currentPollingCt = pollingDataTmp.ts.pt;
             }
-            //登入5分鐘前的polling可show
-            // if( (currentPollingCt+300000) < login_time ){
-            //     isShowNotification = false;
-            // }
 
+            //console.log("currentPollingCt : ",currentPollingCt);
+            //console.log("login_time : ",login_time);
+            //登入5分鐘前的polling可show
+            if( (currentPollingCt+300000) < login_time ){
+                isShowNotification = false;
+            }
+            //console.log("isShowNotification : ",isShowNotification);
             // 等等要剔除這次打過combo的tp4,5,6 避免重複api -> arguments是array-like Object
             var exceptArr = Array.prototype.map.call(arguments,function(item){ return item.thisGi; })
 
@@ -8337,7 +8346,7 @@ meInfoShow = function(user_data){
         avatarPos(this_info.find(".group-avatar img"),60);
 
         //團體名稱
-        this_info.find(".group-name").html(QmiGlobal.groups[gi].gn);
+        this_info.find(".group-name").html(QmiGlobal.groups[gi].gn._escape());
 
         //頭像
         if(user_data.aut){

@@ -321,5 +321,38 @@
 	"ADDRESSBOOK_ADD" : "新增自定联络人",
 	"ADDRESSBOOK_CUSTOM" : "自定联络人",
 
-	"FILESHARING_TITLE" : "档案分享"
+	"FILESHARING_TITLE" : "档案分享",
+
+
+
+
+
+	"PERSONAL_INFORMATION" : "个人资讯",
+	"SYSTEM" : "系統",
+	"ABOUT_QMI" : "关于 Qmi",
+
+	"PASSWORD_SET" : "变更密码",
+	"SYSTEM_SET" : "系统通知",
+	"DEFAULT_GROUP_SET" : "预设开启团体",
+	"TOP_PAGE_SET" : "置顶自动换页",
+	"GUIHU" : "歸戶",
+
+	"ORIGIN_PASSWORD" : "原密码",
+	"NEW_PASSWORD" : "新密码",
+	"CONFIRM_NEW_PASSWORD" : "确认新密码",
+	"CHANGE" : "变更",
+	"VOICE_SET" : "聲音",
+	"CHAT_SET" : "聊天讯息預覽",
+	"CLOSE_SET" : "关闭",
+	"THREE_SEC_SET" : "3秒",
+	"FIVE_SEC_SET" : "5秒",
+
+	"BIND_LDAP" : "綁定LDAP",
+	"BIND_ACCOUNT" : "已綁定帳號",
+	"GUIHU_EXPIRED" : "認證過期",
+	"ADD_LDAP" : "新增LDAP帳號",
+	"ADD_LDAP_DES" : "請輸入你的LDAP帳號及密碼",
+	"REMOVE_LDAP" : "解除綁定",
+	"REMOVE_LDAP_DES" : "解除綁定後，將解除帳號權限"
+
 }

@@ -563,7 +563,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			var msgDom = table.find(".msg");
 			var timeDom = table.find(".time");
 
-			if(msgDom)	msgDom.html( text.replaceOriEmojiCode() );
+			if(msgDom)	msgDom.html( text._escape().replaceOriEmojiCode() );
 			// cns.debug( new Date(data.meta.ct).toFormatString() );
 			if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString(false) );
 			if( false==isRoomOpen ){

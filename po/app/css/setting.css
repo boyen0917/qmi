@@ -412,6 +412,7 @@ textarea.ga-group-des:focus{
 .subpage-userInformation.main-subpage{
   margin-top: 20px;
   padding: 30px;
+  z-index: 1000;
 }
 .setting-avatar-file{
 	display: none;
@@ -592,7 +593,7 @@ ul.system-tab li.current-tab{
 }
 
 .edit-defaultgroup-content{
-	height: 500px;
+	height: 350px;
 	overflow-y: scroll; 
 	overflow-x: hidden;
 }

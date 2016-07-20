@@ -334,5 +334,34 @@
 	"FILESHARING_DELETE_CONFIRM" : "Are you sure to delete this file ?",
 	"FILESHARING_DELETE_OK" : "delete successful",
 	"FILESHARING_HOME" : "home",
-	"COMMON_UNKNOWN_ERROR" : "unknown error"
+	"COMMON_UNKNOWN_ERROR" : "unknown error",
+
+	"PERSONAL_INFORMATION" : "Profile",
+	"SYSTEM" : "System",
+	"ABOUT_QMI" : "About Qmi",
+
+	"PASSWORD_SET" : "Change Password",
+	"SYSTEM_SET" : "Notifications",
+	"DEFAULT_GROUP_SET" : "Default Login Group",
+	"TOP_PAGE_SET" : "Top Slide Show",
+	"GUIHU" : "歸戶",
+
+	"ORIGIN_PASSWORD" : "Current Password",
+	"NEW_PASSWORD" : "New Password",
+	"CONFIRM_NEW_PASSWORD" : "Confirm Password",
+	"CHANGE" : "Change",
+	"VOICE_SET" : "Voice",
+	"CHAT_SET" : "Messages Preview",
+	"CLOSE_SET" : "Off",
+	"THREE_SEC_SET" : "3 seconds",
+	"FIVE_SEC_SET" : "5 seconds",
+
+	"BIND_LDAP" : "綁定LDAP",
+	"BIND_ACCOUNT" : "已綁定帳號",
+	"GUIHU_EXPIRED" : "認證過期",
+	"ADD_LDAP" : "新增LDAP帳號",
+	"ADD_LDAP_DES" : "請輸入你的LDAP帳號及密碼",
+	"REMOVE_LDAP" : "解除綁定",
+	"REMOVE_LDAP_DES" : "解除綁定後，將解除帳號權限"
+
 }
