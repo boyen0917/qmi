@@ -158,8 +158,8 @@ reLogin = function() {
 imgResizeByCanvas = function(img,x,y,max_w,max_h,quality){
 	var MAX_WIDTH = max_w;
 	var MAX_HEIGHT = max_h;
-	var tempW = img.width;
-	var tempH = img.height;
+	var tempW = img.naturalWidth;
+	var tempH = img.naturalHeight;
 	if (tempW > tempH) {
 		if (tempW > MAX_WIDTH) {
 			tempH *= MAX_WIDTH / tempW;
@@ -175,6 +175,7 @@ imgResizeByCanvas = function(img,x,y,max_w,max_h,quality){
 	var canvas = document.createElement('canvas');
 	canvas.width = tempW;
 	canvas.height = tempH;
+	
 	canvas.getContext("2d").drawImage(img, x, y, tempW, tempH);
 	var dataURL = canvas.toDataURL("image/png",quality);
 	var img_obj = {
@@ -456,6 +457,166 @@ uploadToS3 = function(file,api_name,ori_arr,tmb_arr,callback){
 	});
 }
 
+qmiUploadFile = function(uploadObj){
+	// tp 1: 圖片 2: 影片
+
+	// USAGE: 
+	// qmiUploadFile({
+	// 	urlAjax: {
+	// 		apiName: "me/avatar",
+	// 		method: "put"
+	// 	},
+	// 	file: thisEvent.find(".st-reply-message-img img")[0],
+	// 	oriObj: {w: 1280, h: 1280, s: 0.7},
+	// 	tmbObj: {w: 480, h: 480, s: 0.6} // ;
+	// }).done(function(data) {
+	// 	console.log("finish", data);
+	// });
+
+	var allDoneDef = $.Deferred(),
+		s3ResponseObj;
+
+	(function() {
+		var chainDef = MyDeferred();
+		// 取得上傳網址
+		new QmiAjax(uploadObj.urlAjax).complete(chainDef.resolve)
+
+		return chainDef;
+	}()).then(function(s3Obj) {
+		var chainDef = MyDeferred();
+		
+		qmiUploadS3(uploadObj, s3Obj).done(chainDef.resolve);
+		return chainDef;
+	}, chainDefError.bind("get url fail")).then(function(responseObj) {
+		var chainDef = MyDeferred(),
+			s3Obj = responseObj.data;
+
+		// commit
+		new QmiAjax({
+			apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
+			method: "put",
+			body: {
+				fi: s3Obj.fi,
+				ti: (uploadObj.urlAjax.body || {}).ti,
+				pi: 0, // 再確認
+				tp: uploadObj.tp,
+				mt: s3Obj.mt,
+				si: s3Obj.si,
+				md: s3Obj.md
+			}
+		}).success(function(data) {
+			data.fi = s3Obj.fi;
+			data.tp = uploadObj.tp;
+			chainDef.resolve({isSuccess: true, data: data})
+		}).error(chainDef.reject);
+
+		return chainDef;
+	}, chainDefError.bind("qmi upload s3 fail"))
+	.then(allDoneDef.resolve, chainDefError.bind("qmi upload commit fail"));
+
+	return allDoneDef.promise();
+
+	function chainDefError(data) {
+		allDoneDef.resolve({isSuccess: false, data: data, msg: this})
+	}
+}
+
+
+// 做 s3 上傳
+qmiUploadS3 = function(uploadObj,s3Obj) {
+	var allDef = $.Deferred(),
+		tmbObj = uploadObj.tmbObj,
+		oriObj = uploadObj.oriObj;
+
+
+	var uploadDef = $.Deferred(),
+		mediaLoadDef = $.Deferred(),
+		oriFile, tmbFile, mt, si, md, contentType,
+		paramObj = {
+			s3: { url: s3Obj.s3 || s3Obj.tu },
+			s32: { url: s3Obj.s32 || s3Obj.ou},
+		};
+
+	switch(uploadObj.tp) {
+		case 0: // 其他類型 檔案上傳
+			paramObj.s3.file = uploadObj.file;
+			delete paramObj.s32;
+
+			contentType = " ";
+
+			// 傳給外部 commit 使用
+			mt = uploadObj.file.type || "text";
+			si = uploadObj.file.size;
+			md = {w:100,h:100,l:100};
+
+			mediaLoadDef.resolve();
+
+			break;
+		case 1: // 圖
+			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s),
+				tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
+
+			paramObj.s32.file = oFile.blob;
+			paramObj.s3.file = tFile.blob;
+
+			contentType = " ";
+
+			// 傳給外部 commit 使用
+			mt = oFile.blob.type;
+			si = oFile.blob.size;
+			md = { w: oFile.w, h: oFile.h };
+
+			mediaLoadDef.resolve();
+
+			break;
+		case 2: // 影 只要傳s32 timeline是這樣
+			paramObj.s32.file = uploadObj.file;
+			delete paramObj.s3;
+
+			contentType = "video/mp4";
+
+			// 傳給外部 commit 使用
+			mt = uploadObj.file.type;
+			si = uploadObj.file.size;
+
+			var video = document.createElement('video');
+			video.src = URL.createObjectURL(uploadObj.file);
+			video.onloadeddata = function() {
+				md = {l: video.duration * 1000};
+				mediaLoadDef.resolve();
+			}
+			break;
+		default: 
+		console.log("00000");
+	}
+
+	mediaLoadDef.done(function() {
+		$.when.apply($, (Object.keys(paramObj).reduce(function(arr,key,i) {
+				arr[i] = $.ajax({
+					url: paramObj[key].url,
+					type: 'PUT',
+					contentType: contentType,
+				 	data: paramObj[key].file, 
+					processData: false
+				});
+				return arr;
+			},[]))
+		).done(function(data) {
+			allDef.resolve({status: 200, isSuccess: true, data: {
+				fi: s3Obj.fi,
+				mt: mt,
+				si:	si,
+				md:	md
+			}})
+		}).fail(function() {
+			// 上傳s3 失敗
+			allDef.resolve({status: 999, isSuccess: false, data: arguments});
+		});
+	})
+
+	return allDef.promise();
+} // end of qmiUploadS3
+
 resetDB = function(){
 	clearBadgeLabel();
 	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
@@ -713,6 +874,28 @@ uploadGroupVideo = function(this_gi, file, video, ti, permission_id, ori_arr, tm
 			if(callback)	callback();
 		} //end of getUrl 200
 	}); //end of getUrl
+}
+
+
+getVideoImgUrl = function(file) {
+	var deferred = $.Deferred(),
+		fileURL = URL.createObjectURL(file);
+
+
+	var video = document.createElement('video');
+	video.src = fileURL;
+
+	video.onloadeddata = function() {
+		var canvas = document.createElement('canvas');
+		canvas.width = video.videoWidth;
+		canvas.height = video.videoHeight;
+
+		var context = canvas.getContext('2d');
+        canvas.getContext('2d').drawImage( video, 0, 0, video.videoWidth, video.videoHeight);
+ 
+		deferred.resolve(canvas.toDataURL());
+	}
+	return deferred.promise();
 }
 
 getVideoThumbnail = function( videoDom, x,y,max_w,max_h,quality ) {

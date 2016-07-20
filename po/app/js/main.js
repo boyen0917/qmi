@@ -658,37 +658,66 @@ $(function(){
 
 	//圖片檔案處理
 	$(document).on('change','.st-reply-message-file',function(e){
-		var file_ori = $(this);
-		if(file_ori[0].files.length>1){
-			toastShow("圖檔最多限制1個");
-			//每次選擇完檔案 就reset input file
-			file_ori.replaceWith( file_ori.val('').clone( true ) );
-			return false;
-		}else{
-			var imageType = /image.*/;
-			$.each(file_ori[0].files,function(i,file){
+		var deferred = $.Deferred(),
+			inputFile = $(this),
+			file = $(this)[0].files[0],
+			matchArr = ["image", "video"],
 
-				if (file.type.match(imageType)) {
-					var this_grid =  file_ori.parent().find(".st-reply-message-img");
-					this_grid.data("type",6);
-					this_grid.html("<div class='img'><img/></div>");
+			fileType = matchArr.find(function(tp){
+				return file.type.match(new RegExp(tp, "g")) instanceof Array;
+			}),
 
-					this_grid.data("file",file);
+			fileURL = URL.createObjectURL(file);
 
-					var reader = new FileReader();
-					reader.onload = function(e) {
-						var img = this_grid.find("div img");
 
-				        img.attr("src",reader.result);
-				        img.css("border", "lightgray 1px solid");
-					}
+		switch(fileType) {
+			case "image":
+				deferred.resolve(fileURL);
+				break;
 
-					reader.readAsDataURL(file);
-				}else{
-					// this_grid.find("div").html('<span>file not supported</span>');
-				}
-			});
+			case "video":
+				getVideoImgUrl(file).done(deferred.resolve)				
+				break;
+
+			default:
+				fileType = "file";
+				fileURL = "images/file_icon.png";
+				deferred.resolve(fileURL);
 		}
+
+		deferred.done(function(dataUrl) {
+			inputFile.parent().find(".st-reply-message-img")
+			.data("file",file).data("type", fileType)
+			.html("<div class='img'><img src='" + dataUrl + "'/></div>");
+
+			//每次選擇完檔案 就reset input file
+			inputFile.replaceWith( inputFile.val('').clone( true ) );
+		});
+
+		return;
+		var file_ori = $(this);
+
+		var imageType = /image.*/;
+		$.each(file_ori[0].files,function(i,file){
+
+			if (file.type.match("image")) {
+				var this_grid =  file_ori.parent().find(".st-reply-message-img");
+				this_grid.data("type",6);
+				this_grid.html("<div class='img'><img/></div>");
+
+				this_grid.data("file",file);
+
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					var img = this_grid.find("div img");
+
+			        img.attr("src",reader.result);
+			        img.css("border", "lightgray 1px solid");
+				}
+
+				reader.readAsDataURL(file);
+			}
+		});
 
 		//每次選擇完檔案 就reset input file
 		file_ori.replaceWith( file_ori.val('').clone( true ) );
@@ -716,62 +745,6 @@ $(function(){
 			}
 		},201);
 	});
-	
-	// $(document).on("keyup focus",".st-reply-message-textarea textarea",function(e){
-	// 	var this_textarea = $(this);
-	// 	var keyinText = this_textarea.val().slice(-1);
-	// 	var replyArea = this_textarea.parent();
-	// 	if(replyArea.find(".tag-list")){
-	// 		replyArea.find(".tag-list").remove();
-	// 	}
-	// 	// var tagMenuContainer = $(".st-reply-area").find(".tag-list");
-	// 	// tagMenuContainer.html("");
-
-	// 	if (this_textarea.val().search("@") != -1) {
-	// 		var markSignIndex = this_textarea.val().indexOf("@");
-	// 		var markText = this_textarea.val().substring(markSignIndex+1);
-	// 		var memberslist = QmiGlobal.groups[gi].guAll;
-	// 		var tagElements = ""
-	// 		for (var memberID in memberslist) {
-	// 			var memberMugshot = memberslist[memberID].aut || "images/common/others/empty_img_personal.png";
-	// 			var memberName = memberslist[memberID].nk;
-	// 			if ((memberName) 
-	// 				// && (markText.match(/[\u4E00-\u9FA5]/g))
-	// 				&& ((/^[^\s]/).test(markText))
-	// 				&& (memberName.search(new RegExp(markText, "i")) != -1)) {
-	// 				tagElements += "<li><a><img src='" + memberMugshot + "' />" + memberName + "</a></li>";
-	// 			}
-	// 		}
-
-	// 		if (tagElements.length) {
-	// 			// tagMenuContainer.show();
-	// 			replyArea.prepend($("<ul/>", {
-	// 				"class": "tag-list",
-	// 				html: tagElements
-	// 			}));
-
-	// 			$(".tag-list").find("li").bind("click", function(e) {
-
- //                    cns.log(e.target);
- //                });
-				
-	// 			// tagMenuContainer.html(tagElements);
-	// 		}else{
-	// 			// tagMenuContainer.html("");
-	// 			// tagMenuContainer.hide();
-	// 		}
-	// 	}
-	// });
-
-	// $(document).on("focusout",".st-reply-message-textarea textarea",function(e){
-	// 	var this_textarea = $(this);
-	// 	var replyArea = this_textarea.parents(".st-reply-area");
-	// 	if (replyArea.find(".tag-list")) {
-	// 		if ($('.tag-list li:hover').length == 0) {
-	// 			replyArea.find(".tag-list").remove();
-	// 		}
-	// 	}
-	// });
 
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){
