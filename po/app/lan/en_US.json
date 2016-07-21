@@ -231,6 +231,7 @@
 	"CHAT_SOMEONE_SEND_VOICE"					: "%@ sent a voice message.",
 	"CHAT_SOMEONE_SEND_LOCATION"					: "%@ sent a location.",
 	"CHAT_SOMEONE_SEND_VIDEO"	: "%@ sent a video.",
+	"CHAT_SOMEONE_SEND_FILE"	: "%@ sent a file.",
 	"CHAT_NO_MORE_MSG" : "No more past message.",
 	"CHAT_LEAVE" : "Leave",
 	"CHAT_INVITE" : "Invite",

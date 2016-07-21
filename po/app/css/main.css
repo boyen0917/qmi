@@ -3159,6 +3159,10 @@ img.st-user-pic{
 	padding-right: 5px;
 }
 
+.st-attach-file span {
+	margin-left: 20px;
+}
+
 .st-attach-file div{
 	color: white; 
 }
@@ -3301,21 +3305,32 @@ img.st-user-pic{
 }
 
 .st-reply-content .attach-file {
-	background: url(../images/timeline/download_icon.png) no-repeat #bdd2ed right;
-	background-size: 28px 28px;
-  	background-position-x: 97%;
 	font-size: 14px;
 	width: 300px;
 	display: inline-block;
 	line-height: 2;
 	padding: 5px 10px;
-	color: white;
+	color: #aaa;
   	text-decoration: none;
+  	border: 1px solid #dddddd;
 }
 
 .st-reply-content .attach-file img {
   	vertical-align: bottom;
-  	padding-right: 5px;
+  	padding: 2px 5px 0px 5px;
+}
+
+.st-reply-content .attach-file span {
+  	margin-left: 20px;
+}
+
+.st-reply-content .download-icon {
+    background: url(../images/timeline/download_icon.png) no-repeat #bdd2ed center;
+    background-size: 20px 20px;
+    float: right;
+    width: 32px;
+    height: 30px;
+    cursor: pointer;
 }
 
 .st-reply-footer {
@@ -3475,6 +3490,37 @@ img.st-reply-message-attach {
 	background: rgb(239,239,239);
 	cursor: default;
 }
+
+.st-reply-message-img .attach-file {
+	background: white;
+    background-position: 97% 50%;
+    background-size: 28px 28px;
+    text-decoration: none;
+    color: #666;
+    font-size: 16px;
+    display: block;
+    text-align: left;
+    line-height: 2;
+    padding: 8px 10px;
+}
+
+.st-reply-message-img .file-icon{
+	vertical-align: bottom;
+    height: 32px;
+    padding-right: 5px;
+}
+
+.st-reply-message-img .attach-file span{
+	margin-left: 20px;
+}
+
+.st-reply-message-img .file-cancel{
+	vertical-align: super;
+    height: 20px;
+    width: 20px;
+    margin-left: 22px;
+}
+
 .st-reply-message-img .img{
 	padding: 6px 0;
 	/* background: rgb(239,239,239); */

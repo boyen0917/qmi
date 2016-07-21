@@ -678,6 +678,16 @@ $(function(){
 		cns.debug( tmp.data("type") );
 	});
 
+	$(document).on('click','.st-reply-message-img .file-cancel',function(){
+		var tmp = $(this).parent().parent();
+		tmp.html("");
+		cns.debug( tmp.data("type") );
+		tmp.removeData("type");
+		tmp.removeData("id");
+		tmp.removeData("file");
+		cns.debug( tmp.data("type") );
+	});
+
 	//圖片
 	$(document).on('click','.st-reply-message-attach',function(){
 		$(this).siblings(".st-reply-message-file").trigger("click");
@@ -696,7 +706,6 @@ $(function(){
 
 			fileURL = URL.createObjectURL(file);
 
-
 		switch(fileType) {
 			case "image":
 				deferred.resolve(fileURL);
@@ -713,9 +722,18 @@ $(function(){
 		}
 
 		deferred.done(function(dataUrl) {
+			var previewInput = "<div class='img'><img src='" + dataUrl + "'/></div>";
+
+			if (fileType == "file") {
+				previewInput = "<div class='attach-file'><img class='file-icon'" 
+					+ "src='images/timeline/otherfile_icon.png' >" + file.name 
+					+ "<span>" + file.size.toFileSize() + "</span>"
+					+ "<img class='file-cancel' src='images/common/icon/icon_compose_close.png'></div>";
+			}
+
 			inputFile.parent().find(".st-reply-message-img")
 			.data("file",file).data("type", fileType)
-			.html("<div class='img'><img src='" + dataUrl + "'/></div>");
+			.html(previewInput);
 
 			//每次選擇完檔案 就reset input file
 			inputFile.replaceWith( inputFile.val('').clone( true ) );

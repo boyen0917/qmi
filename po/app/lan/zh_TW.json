@@ -230,6 +230,7 @@
 	"CHAT_SOMEONE_SEND_VOICE"					: "%@ 傳送了語音訊息",
 	"CHAT_SOMEONE_SEND_LOCATION"					: "%@ 傳送了位置",
 	"CHAT_SOMEONE_SEND_VIDEO"	: "%@ 傳送了影片",
+	"CHAT_SOMEONE_SEND_FILE"	: "%@ 傳送了檔案",
 	"CHAT_NO_MORE_MSG" : "已無舊訊息",
 	"CHAT_LEAVE" : "離開",
 	"CHAT_INVITE" : "邀請",

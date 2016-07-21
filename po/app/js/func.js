@@ -1496,13 +1496,20 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailB
                         getS3fileBackground(val, fileArea, 26, null , function(data){
                             var linkElement = document.createElement("a");
                             var fileIcon = document.createElement("img");
-                            var fileNameNode = document.createTextNode(val.fn);   
+                            var fileNameNode = document.createTextNode(val.fn);
+                            var fileSizeSpan = document.createElement("span");
+                            var downloadIcon = document.createElement("div")   
                             fileIcon.src = 'images/timeline/otherfile_icon.png';
+                            fileSizeSpan.textContent = (val.si).toFileSize();
+                            downloadIcon.textContent = " ";
                             linkElement.className = 'attach-file';
+                            downloadIcon.className = 'download-icon'
                             linkElement.download = val.fn;
                             linkElement.href = data.s3;
                             linkElement.appendChild(fileIcon);
                             linkElement.appendChild(fileNameNode);
+                            linkElement.appendChild(fileSizeSpan);
+                            linkElement.appendChild(downloadIcon);
                             fileArea.append(linkElement);
                         });
                         break;
@@ -5871,13 +5878,16 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 getS3fileBackground(val, this_event.find(".st-attach-file"), 26, null, function(data){
                     var linkElement = document.createElement("a");
                     var fileIcon = document.createElement("img");
-                    var fileNameNode = document.createTextNode(val.fn);   
+                    var fileNameNode = document.createTextNode(val.fn);
+                    var fileSizeSpan = document.createElement("span");  
                     fileIcon.src = 'images/timeline/otherfile_icon.png';
+                    fileSizeSpan.textContent = (val.si).toFileSize();
                     linkElement.className = 'attach-file';
                     linkElement.download = val.fn;
                     linkElement.href = data.s3;
                     linkElement.appendChild(fileIcon);
                     linkElement.appendChild(fileNameNode);
+                    linkElement.appendChild(fileSizeSpan);
                     this_event.find(".attach-file-list").append(linkElement);
                 });
                 fileNum += 1;
