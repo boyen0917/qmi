@@ -1407,18 +1407,18 @@ img.auo {
 	z-index: 101;
 	background-color: white;
 }
-#page-group-main .gm-content .gm-content-header .setting-header-content{
+.setting-header-content{
 	position: absolute;
 	top: 0;
 	left: 0;
 }
-#page-group-main .gm-content .gm-content-header .setting-header-content>img{
+.setting-header-content .setting-icon{
 	width: 25px;
 	float: left;
 	padding: 10px;
     margin-left: 8px;
 }
-#page-group-main .gm-content .gm-content-header .setting-header-content>div{
+.setting-header-content .setting-title{
 	display: inline-block;
 	padding: 12px;
 }

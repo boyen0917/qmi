@@ -249,7 +249,7 @@ window.QmiGlobal = {
 	                    '<div data-sm-act="user-setting" class="sm-info sm-small-area" data-textid="PERSONAL_INFORMATION"></div>'+
 	                    '<div class="sm-info-hr" data-textid="SYSTEM"></div>'+
 	                    '<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'+
-	                    '<div class="sm-info" data-textid="ABOUT_QMI"></div>'+
+	                    // '<div class="sm-info" data-textid="ABOUT_QMI"></div>'+
 	                    '<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'+
 	                '</div>'+
                	'</section>',

@@ -422,8 +422,10 @@ timelineSwitch = function (act,reset,main,noPR){
     .find("[data-navi=home]").addClass("st-filter-list-active");
 
     //關閉所有subpage
-    $("#page-group-main .main-subpage").hide();    
-    $(".gm-content-header").hide();
+    $("  .main-subpage").hide();   
+
+    var gmConHeader = $(".gm-content-header");
+    gmConHeader.hide();
     //desktop 版的chrome scrollbar 會被吃掉 這算 activate
     // var scrollDom = $("#page-group-main .gm-content > div:nth-child(2)");
     // scrollDom.css("overflow-y","hidden");
@@ -577,31 +579,28 @@ timelineSwitch = function (act,reset,main,noPR){
           break;
         case "user-setting":
                 
-            $("#page-group-main .main-subpage").hide();
             $(".subpage-userInformation").show();
             //header
-            $(".gm-content-header").show();
-            $(".setting-header-content>img").attr("src","images/avatar.png");
-            $(".setting-header-content>div").text($.i18n.getString("PERSONAL_INFORMATION"));
+            gmConHeader.show();
+            gmConHeader.find(".setting-icon").attr("src","images/avatar.png");
+            gmConHeader.find(".setting-title").text($.i18n.getString("PERSONAL_INFORMATION"));
+            
             userInfoSetting();
             
             switchDeferred.resolve({ act: "user-setting"});
-              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
             break;  
         case "system-setting":
 
-            $("#page-group-main .main-subpage").hide();
             $(".subpage-systemSetting").show();
             //header
-            $(".gm-content-header").show();
-            $(".setting-header-content>img").attr("src","images/settings.png");
-            $(".setting-header-content>div").text($.i18n.getString("LEFT_SYSTEM_SETTING"));
+            gmConHeader.show();
+            gmConHeader.find(".setting-icon").attr("src","images/settings.png");
+            gmConHeader.find(".setting-title").text($.i18n.getString("LEFT_SYSTEM_SETTING"));
+            
             systemSetting();
 
             switchDeferred.resolve({ act: "system-setting"});
-              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
             break;
-
         case "fileSharing":
             $(".subpage-fileSharing").show();
             page_title = $.i18n.getString("GROUPSETTING_TITLE");
