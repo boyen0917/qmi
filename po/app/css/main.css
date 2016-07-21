@@ -3537,6 +3537,7 @@ img.st-reply-message-attach {
     height: 20px;
     width: 20px;
     margin-left: 22px;
+    cursor: pointer;
 }
 
 .st-reply-message-img .img{
