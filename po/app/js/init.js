@@ -13,7 +13,6 @@ var ui,
 	debug_flag = false,
 
 	clearChatTimer,
-	
 	isShowNotification = true,
 
 	//HiCloud
@@ -255,7 +254,7 @@ window.QmiGlobal = {
 	                    '<div data-sm-act="user-setting" class="sm-info sm-small-area" data-textid="PERSONAL_INFORMATION"></div>'+
 	                    '<div class="sm-info-hr" data-textid="SYSTEM"></div>'+
 	                    '<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'+
-	                    '<div class="sm-info" data-textid="ABOUT_QMI"></div>'+
+	                    // '<div class="sm-info" data-textid="ABOUT_QMI"></div>'+
 	                    '<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'+
 	                '</div>'+
                	'</section>',
@@ -304,19 +303,21 @@ window.QmiGlobal = {
         	userAvatar.fadeIn();
         	//儲存圖片
         	userAvatar.find('.avatar-save').click(function(){
-
+        		//https://ap.qmi.emome.net/apiv1/
         		// USAGE: 
 				qmiUploadFile({
 					urlAjax: {
 						apiName: "me/avatar",
 						method: "put"
 					},
+					isPublicApi: true,
 					file: userAvatar.find(".user-headshot")[0],
 					oriObj: {w: 1280, h: 1280, s: 0.7},
 					tmbObj: {w: 480, h: 480, s: 0.6},
 					tp: 1 // ;
 				}).done(function(data) {
 					console.log("finish", data);
+					QmiGlobal.me.auo = data.data.ou;
 					QmiGlobal.me.aut = data.data.tu;
 					$("#userInfo").find(".user-avatar-setting").attr("src",data.data.tu);
 					toastShow(data.data.rsp_msg);

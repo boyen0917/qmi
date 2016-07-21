@@ -19,7 +19,6 @@ $(document).ready(function(){
             isShowNotification = false;
         }
         toastShow("變更成功");
-        console.log(isShowNotification);
     });
     // 預設團體送出
     btnContent.find('.default-group-btn').click(function(){
@@ -83,14 +82,22 @@ userInfoSetting = function(){
 //取得個人資訊
 userInfoGetting = function(){
     var userInfo = $("#userInfo");
+    var emptyUserAvt = "images/common/others/empty_img_personal_l.png";
     new QmiAjax({
-        apiName: "me"
+        apiName: "me",
+        isPublicApi: true
     }).success(function(data){
         QmiGlobal.me = data;
         //左下角個人資料 使用者名稱 手機 頭像
+
         userInfo.find(".user-name").text(data.nk).end()
                 .find(".user-phone").text(data.pn).end()
                 .find(".user-avatar-setting").attr("src",data.aut);
+    if(!data.aut){
+            userInfo.find(".user-avatar-setting").attr("src",emptyUserAvt);
+            QmiGlobal.me.aut = emptyUserAvt;
+            QmiGlobal.me.auo = emptyUserAvt;
+        }
     }).error(function(e){
         console.debug(e.responseText);
     });
@@ -108,7 +115,8 @@ userInfoUpdate = function(){
             method: "put",
             body: {
                 "nk": username_input
-            }
+            },
+            isPublicApi: true
         }).success(function(data){
 
             toastShow(data.rsp_msg);
@@ -137,31 +145,35 @@ systemSetting = function(){
     //gu 現在團體 你自己的id
     //ui 
     //at
+
+    var systemGroup = $("#group-setting");
+
+    //系統設定初始化
     var emailSetting = $("#email-setting");
     emailSetting.find("input[name$='user-edit-phone']").val(QmiGlobal.me.pn);
     emailSetting.find("input[name$='user-edit-email']").val(QmiGlobal.me.em);
-
-    var systemGroup = $("#group-setting");
+    //密碼
+    $("#password-setting").find(".input-password").val("");
     //預設系統通知
     $("#no-option1").attr('checked', isShowNotification);
-    //預設群組
+    //預設團體
     var me_dgi = QmiGlobal.auth.dgi;
     //預設置頂自動換頁   
     $("#carousel-setting").find("input[value='"+top_timer_ms+"']").attr('checked', true);
-    
     //預設團體圖片
     var emptyAut = "images/common/others/empty_img_all_l.png";
 
-    //預設團體
+    //抓取團體
     new QmiAjax({
-        apiName: "groups"
+        apiName: "groups",
+        isPublicApi: true
     }).success(function(test_data){    
 
         systemGroup.find('.group-option').remove();
 
         for(i=0 ;i<test_data.gl.length; i++){    
             //產生團體列表
-            var cr = $("<div class='group-option'><input id='"+test_data.gl[i].gi+"' data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'><label for='"+test_data.gl[i].gi+"' class='radiobtn'></label><img class='group-pic' data-gi='"+test_data.gl[i].gi+"' src='"+test_data.gl[i].aut+"'><label for='"+test_data.gl[i].gi+"' class='radiotext'>"+test_data.gl[i].gn+"</label></div>");
+            var cr = $("<div class='group-option'><input id='"+test_data.gl[i].gi+"' data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'><label for='"+test_data.gl[i].gi+"' class='radiobtn'></label><img class='group-pic' data-gi='"+test_data.gl[i].gi+"' src='"+test_data.gl[i].aut+"'><label for='"+test_data.gl[i].gi+"' class='radiotext'>"+test_data.gl[i].gn._escape()+"</label></div>");
             systemGroup.find('.edit-defaultgroup-content').append(cr);
             //判斷團體縮圖 如果沒有設定預設圖片
             if(!test_data.gl[i].aut){
@@ -242,7 +254,8 @@ passwordChange = function(){
             new QmiAjax({
                 apiName : "me/password/auth",
                 body : JSON.stringify(old_password),
-                method: "post"
+                method: "post",
+                isPublicApi: true
             }).success(function(password_data){
                 if (pwSetting.find("input[name$='n-password']").val().length < 6){ 
                         popupShowAdjust("新密碼請輸入至少六個字", "" ,true);
@@ -252,7 +265,8 @@ passwordChange = function(){
                         new QmiAjax({
                             apiName : "me/password",
                             body : JSON.stringify(verify_password),
-                            method : "put"
+                            method : "put",
+                            isPublicApi: true
                         }).success(function(verify_data){
                             toastShow(verify_data.rsp_msg);
                             //console.debug(verify_data);

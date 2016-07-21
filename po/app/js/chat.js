@@ -199,8 +199,8 @@ $(function(){
 		getPermition();
 
 		//header 設定團體名稱
-		$("#header .title .text").html(g_cn.replaceOriEmojiCode());
-		$("#header .subTitle").html(g_group.gn.replaceOriEmojiCode());
+		$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
+		$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
 
 		var tmpMemCount = (g_room.memList) ? Object.keys(g_room.memList).length : 0;
 		if (tmpMemCount != g_room.memCount) {

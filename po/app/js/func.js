@@ -196,8 +196,8 @@ getMeInvite = function(){
                         var inviteDom = $(this).find(".gmi-div");
                         inviteDom._i18n();
                         inviteDom.data("invite-data",item);
-                        inviteDom.find(".gmi-div-data div:eq(0)").html( $.i18n.getString("GROUP_GROUP_INVITATION", "<span>"+item.gn+"</span>") );
-                        inviteDom.find(".gmi-div-data div:eq(1)").html( $.i18n.getString("GROUP_MEMBERS", "<span>"+item.cnt+"</sapn>") );
+                        inviteDom.find(".gmi-div-data div:eq(0)").html( $.i18n.getString("GROUP_GROUP_INVITATION", "<span>"+item.gn._escape()+"</span>") );
+                        inviteDom.find(".gmi-div-data div:eq(1)").html( $.i18n.getString("GROUP_MEMBERS", "<span>"+item.cnt._escape()+"</sapn>") );
 
                         if(item.aut){
                             inviteDom.find(".gmi-div-avatar .aut").attr("src",item.aut);
@@ -422,8 +422,10 @@ timelineSwitch = function (act,reset,main,noPR){
     .find("[data-navi=home]").addClass("st-filter-list-active");
 
     //關閉所有subpage
-    $("#page-group-main .main-subpage").hide();    
-    
+    $("  .main-subpage").hide();   
+
+    var gmConHeader = $(".gm-content-header");
+    gmConHeader.hide();
     //desktop 版的chrome scrollbar 會被吃掉 這算 activate
     // var scrollDom = $("#page-group-main .gm-content > div:nth-child(2)");
     // scrollDom.css("overflow-y","hidden");
@@ -576,25 +578,28 @@ timelineSwitch = function (act,reset,main,noPR){
           break;
         case "user-setting":
                 
-            $("#page-group-main .main-subpage").hide();
             $(".subpage-userInformation").show();
-
+            //header
+            gmConHeader.show();
+            gmConHeader.find(".setting-icon").attr("src","images/avatar.png");
+            gmConHeader.find(".setting-title").text($.i18n.getString("PERSONAL_INFORMATION"));
+            
             userInfoSetting();
             
             switchDeferred.resolve({ act: "user-setting"});
-              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
             break;  
         case "system-setting":
 
-            $("#page-group-main .main-subpage").hide();
             $(".subpage-systemSetting").show();
-
+            //header
+            gmConHeader.show();
+            gmConHeader.find(".setting-icon").attr("src","images/settings.png");
+            gmConHeader.find(".setting-title").text($.i18n.getString("LEFT_SYSTEM_SETTING"));
+            
             systemSetting();
 
             switchDeferred.resolve({ act: "system-setting"});
-              // popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
             break;
-
         case "fileSharing":
             $(".subpage-fileSharing").show();
             page_title = $.i18n.getString("GROUPSETTING_TITLE");
@@ -7937,11 +7942,13 @@ pollingCmds = function(newPollingData){
             if(pollingDataTmp){
                 currentPollingCt = pollingDataTmp.ts.pt;
             }
+
             //登入5分鐘前的polling可show
             if( (currentPollingCt+300000) < login_time ){
                 isShowNotification = false;
             }
 
+            //console.log("isShowNotification : ",isShowNotification);
             // 等等要剔除這次打過combo的tp4,5,6 避免重複api -> arguments是array-like Object
             var exceptArr = Array.prototype.map.call(arguments,function(item){ return item.thisGi; })
 
@@ -8682,7 +8689,7 @@ meInfoShow = function(user_data){
         avatarPos(this_info.find(".group-avatar img"),60);
 
         //團體名稱
-        this_info.find(".group-name").html(QmiGlobal.groups[gi].gn);
+        this_info.find(".group-name").html(QmiGlobal.groups[gi].gn._escape());
 
         //頭像
         if(user_data.aut){
@@ -8941,6 +8948,7 @@ userInfoEvent = function(this_info,me){
 
         var this_gu = this_info.data("this-info-gu");
         var this_gi = this_info.data("this-info-gi");
+        var emptyAut = "images/common/others/empty_img_all_l.png";
         //結束關閉
         this_info.find(".user-info-close").trigger("mouseup");
         //主頁背景
@@ -8949,7 +8957,10 @@ userInfoEvent = function(this_info,me){
             $(".gm-user-main-area .background").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
             $(".gm-user-main-area .name").html(_thisGroupList.guAll[this_gu].nk);
             $(".gm-user-main-area .group .pic").css("background","url(" + _thisGroupList.aut + ")");
-            $(".gm-user-main-area .group .name").html(_thisGroupList.gn);
+            $(".gm-user-main-area .group .name").html(_thisGroupList.gn._escape());
+            if(!_thisGroupList.aut){
+                $(".gm-user-main-area .group .pic").css("background","url(" + emptyAut + ")");
+            }
         });
 
         if($(".alert-area").is(":visible")){

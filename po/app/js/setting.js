@@ -192,7 +192,7 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
 function removeGroup( thisGi ){
 	$(".sm-group-area[data-gi="+thisGi+"]").remove();
 	if( QmiGlobal.groups[thisGi] !== undefined)
-		var rmGroupGn = QmiGlobal.groups[thisGi].gn;
+		var rmGroupGn = QmiGlobal.groups[thisGi].gn._escape();
 
 	if( gi==thisGi ){
 	    var otherGroup = $(".sm-group-area.enable");
