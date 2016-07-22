@@ -13,8 +13,7 @@ var ui,
 	debug_flag = false,
 
 	clearChatTimer,
-	isShowNotification = true,
-
+	
 	//HiCloud
 
 	base_url = "https://ap.qmi.emome.net/apiv1/";
@@ -127,9 +126,9 @@ var timeline_detail_exception = [
 	max_h = 500,
 	quality = 0.5,
 
-
+	//設置聊天訊息預覽
+	set_notification = true,
 	//timeline置頂millisecond
-	
 	top_timer_ms = $.lStorage("_topTimeMs") || 5000,
 	//top_timer_ms = 5000;
 

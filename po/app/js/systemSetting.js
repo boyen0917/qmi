@@ -14,9 +14,11 @@ $(document).ready(function(){
     btnContent.find('.notification-btn').click(function(){
         if ($('#no-option1').is(":checked"))
         {
-            isShowNotification = true;
+            set_notification = true;
+            $.lStorage("_setnoti","100");
         }else{
-            isShowNotification = false;
+            set_notification = false;
+            $.lStorage("_setnoti","300");
         }
         toastShow("變更成功");
     });
@@ -155,7 +157,12 @@ systemSetting = function(){
     //密碼
     $("#password-setting").find(".input-password").val("");
     //預設系統通知
-    $("#no-option1").attr('checked', isShowNotification);
+    if($.lStorage("_setnoti")==100){
+        set_notification = true;
+    }else if($.lStorage("_setnoti")==300){
+        set_notification = false;
+    }
+    $("#no-option1").attr('checked', set_notification);
     //預設團體
     var me_dgi = QmiGlobal.auth.dgi;
     //預設置頂自動換頁   

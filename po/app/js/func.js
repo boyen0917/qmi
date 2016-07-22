@@ -7591,20 +7591,24 @@ pollingCmds = function(newPollingData){
             
             var pollingDataTmp = $.lStorage("_pollingData"),
                 currentPollingCt = 9999999999999,
-                
+                isShowNotification = true,
                 newGroupArr = [];
 
             if(pollingDataTmp){
                 currentPollingCt = pollingDataTmp.ts.pt;
             }
 
-            //console.log("currentPollingCt : ",currentPollingCt);
-            //console.log("login_time : ",login_time);
+            if(set_notification) {
+                isShowNotification = true;
+            } else {
+                isShowNotification = false;
+            }
+
             //登入5分鐘前的polling可show
             if( (currentPollingCt+300000) < login_time ){
                 isShowNotification = false;
             }
-            //console.log("isShowNotification : ",isShowNotification);
+            
             // 等等要剔除這次打過combo的tp4,5,6 避免重複api -> arguments是array-like Object
             var exceptArr = Array.prototype.map.call(arguments,function(item){ return item.thisGi; })
 
