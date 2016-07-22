@@ -170,29 +170,50 @@ systemSetting = function(){
     //預設團體圖片
     var emptyAut = "images/common/others/empty_img_all_l.png";
 
-    //抓取團體
-    new QmiAjax({
-        apiName: "groups",
-        isPublicApi: true
-    }).success(function(test_data){    
+    //團體列表
+    systemGroup.find('.group-option').remove();
+    //公私雲團體
+    var groupid = Object.keys(group_data);
+    //私雲團體
+    var prigroupid = Object.keys(QmiGlobal.cloudGiMap);
+    for(var i = 0 ;i < groupid.length; i++){    
+        //產生團體列表
+        var cr = $("<div class='group-option'><input id='"+ groupid[i] +"' data-role='none' name='group' type='radio' value='"+ groupid[i] +"'><label for='"+ groupid[i] +"' class='radiobtn'></label><img class='group-pic' data-gi='"+ groupid[i] +"' src='"+ group_data[groupid[i]].aut +"'><label for='"+ groupid[i] +"' class='radiotext'>"+ group_data[groupid[i]].gn._escape() +"</label></div>");
+        systemGroup.find('.edit-defaultgroup-content').append(cr);
+        //判斷團體縮圖 如果沒有設定預設圖片
+        if(!group_data[groupid[i]].aut){
+            $(".group-pic[data-gi='"+ groupid[i] +"']").attr("src", emptyAut);
+        }
+    } 
+    //移除私雲團體
+    for(var j = 0;j < prigroupid.length;j++){
+        systemGroup.find('#'+prigroupid[j]).parent().remove();
+    }   
+    //勾選預設群組
+    systemGroup.find('#'+me_dgi).attr('checked', true);
 
-        systemGroup.find('.group-option').remove();
+    // new QmiAjax({
+    //     apiName: "groups",
+    //     isPublicApi: true
+    // }).success(function(test_data){    
 
-        for(i=0 ;i<test_data.gl.length; i++){    
-            //產生團體列表
-            var cr = $("<div class='group-option'><input id='"+test_data.gl[i].gi+"' data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'><label for='"+test_data.gl[i].gi+"' class='radiobtn'></label><img class='group-pic' data-gi='"+test_data.gl[i].gi+"' src='"+test_data.gl[i].aut+"'><label for='"+test_data.gl[i].gi+"' class='radiotext'>"+test_data.gl[i].gn._escape()+"</label></div>");
-            systemGroup.find('.edit-defaultgroup-content').append(cr);
-            //判斷團體縮圖 如果沒有設定預設圖片
-            if(!test_data.gl[i].aut){
-                $(".group-pic[data-gi='"+test_data.gl[i].gi+"']").attr("src", emptyAut);
-            }
-        } 
-        //勾選預設群組
-        systemGroup.find('#'+me_dgi).attr('checked', true);   
+    //     systemGroup.find('.group-option').remove();
 
-    }).error(function(e){
-        console.debug(e.responseText);
-    });
+    //     for(i=0 ;i<test_data.gl.length; i++){    
+    //         //產生團體列表
+    //         var cr = $("<div class='group-option'><input id='"+test_data.gl[i].gi+"' data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'><label for='"+test_data.gl[i].gi+"' class='radiobtn'></label><img class='group-pic' data-gi='"+test_data.gl[i].gi+"' src='"+test_data.gl[i].aut+"'><label for='"+test_data.gl[i].gi+"' class='radiotext'>"+test_data.gl[i].gn._escape()+"</label></div>");
+    //         systemGroup.find('.edit-defaultgroup-content').append(cr);
+    //         //判斷團體縮圖 如果沒有設定預設圖片
+    //         if(!test_data.gl[i].aut){
+    //             $(".group-pic[data-gi='"+test_data.gl[i].gi+"']").attr("src", emptyAut);
+    //         }
+    //     } 
+    //     //勾選預設群組
+    //     systemGroup.find('#'+me_dgi).attr('checked', true);   
+
+    // }).error(function(e){
+    //     console.debug(e.responseText);
+    // });
 
     // var api_name = "groups";//url
     // var headers = {
