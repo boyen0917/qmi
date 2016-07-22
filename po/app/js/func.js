@@ -1499,14 +1499,18 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailB
                         break;
                     case 26:
                         getS3fileBackground(val, fileArea, 26, null , function(data){
+                            var fileName = val.fn.split(".")[0];
+                            var format = val.fn.split(".")[1];
+                            if (fileName.length > 15) {
+                                fileName = fileName.substring(0, 10) + "....";
+                            }
                             var linkElement = document.createElement("a");
                             var fileIcon = document.createElement("img");
-                            var fileNameNode = document.createTextNode(val.fn);
+                            var fileNameNode = document.createTextNode(fileName + " - " + format);
                             var fileSizeSpan = document.createElement("span");
                             var downloadIcon = document.createElement("div")   
                             fileIcon.src = 'images/timeline/otherfile_icon.png';
                             fileSizeSpan.textContent = (val.si).toFileSize();
-                            downloadIcon.textContent = " ";
                             linkElement.className = 'attach-file';
                             downloadIcon.className = 'download-icon'
                             linkElement.download = val.fn;
@@ -1640,7 +1644,9 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailB
     });
 
     $.when.apply($, deferTasks).then(function () {
-        triggerDetailBox.data("trigger", true);
+        if(triggerDetailBox) {
+            triggerDetailBox.data("trigger", true);
+        }
     });
 }
 
