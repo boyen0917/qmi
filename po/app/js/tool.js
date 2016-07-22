@@ -618,8 +618,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			}})
 		}).fail(function() {
 			// 上傳s3 失敗
-			console.log(arguments);
-			console.log("上傳s3 失敗");
 			allDef.resolve({status: 999, isSuccess: false, data: arguments});
 		});
 	})
