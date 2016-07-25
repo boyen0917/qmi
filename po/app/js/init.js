@@ -8,18 +8,26 @@ var ui,
 	//語言
 	lang = "en_US",
 
+
 	//local測試 預設開啟console
 	debug_flag = false,
 
 	clearChatTimer,
+	isShowNotification = true,
 
-	
 	//HiCloud
- 	base_url = "https://ap.qmi.emome.net/apiv1/";
+ 	base_url = "https://apserver.mitake.com.tw/apiv1/",
+ 	
+	//local測試 預設開啟console
+	debug_flag = false;
+	if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
+		debug_flag = true;
+		base_url = "https://qaap.qmi.emome.net/apiv1/";
+	};
 
  	// // container riseNotification 一旦換網址就沒了
 
-var userLang = navigator.language || navigator.userLanguage; 
+var userLang = navigator.language || navigator.userLanguage;
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
 
 
@@ -33,6 +41,11 @@ String.prototype.qmiTag = function (tagMember) {
 	return this.replace("///;" + tagMember.u + ";///", "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>");
 }
 
+Number.prototype.toFileSize = function () {
+	var unitIndex = Math.floor( Math.log(this) / Math.log(1024) );
+    return (this / Math.pow(1024, unitIndex)).toFixed(2) * unitIndex + ' ' 
+    	+ ['B', 'kB', 'MB', 'GB', 'TB'][unitIndex];
+}
 
 if( 0==userLang.indexOf("zh") ){
 	if( userLang=="zh_cn" ){
@@ -56,7 +69,6 @@ var content_limit = 400,
 
 
 //上一頁 預設
-// $(document).data("page-history",[["login"],["#page-group-menu","團體列表"]]);
 $(document).data("page-history",[["",""]]);
 
 
@@ -68,7 +80,7 @@ if( window.parent && window.parent.login_time ){
 	login_time = new Date().getTime();
 }
 
-	
+
 	//timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [
 		".st-sub-box-2-content-detail a",
@@ -112,7 +124,7 @@ var timeline_detail_exception = [
 	//圖片上傳限制
 	img_total = 9,
 
-	//附檔區域開啓的type id 
+	//附檔區域開啓的type id
 	attach_mtp_arr = [1,6],
 
 	//縮圖寬高
@@ -122,7 +134,9 @@ var timeline_detail_exception = [
 
 
 	//timeline置頂millisecond
-	top_timer_ms = 5000,
+	
+	top_timer_ms = $.lStorage("_topTimeMs") || 5000,
+	//top_timer_ms = 5000;
 
 	//polling間距
 	polling_interval = 5000,
@@ -132,42 +146,42 @@ var timeline_detail_exception = [
 
 	//tab對照表
 	initTabMap = {
-		0:{	
+		0:{
 			act: "feed-public",
 			textId: "LEFT_FEED_GROUP"
 		},
-		1:{	
+		1:{
 			act: "feed-post",
 			textId: "LEFT_FEED_MEMBER"
 		},
-		2:{	
+		2:{
 			act: "feeds",
 			textId: "LEFT_FEED",
 			class: ["polling-cnt","polling-local"],
 			pollingType: "A1"
 		},
-		3:{	
+		3:{
 			act: "chat",
 			textId: "LEFT_CHAT",
 			class: ["polling-cnt","polling-local"],
 			pollingType: "A3"
 		},
-		6:{	
+		6:{
 			act: "memberslist",
 			textId: "LEFT_MEMBER",
 			class: ["polling-cnt","polling-local"],
 			pollingType: "A2"
 		},
-		7:{	
+		7:{
 			act: "groupSetting",
 			textId: "GROUPSETTING_TITLE"
 		},
-		9:{	
+		9:{
 			act: "addressBook",
 			textId: "ADDRESSBOOK_TITLE"
 		}
 		,
-		10:{	
+		10:{
 			act: "fileSharing",
 			textId: "FILESHARING_TITLE"
 		}
@@ -175,32 +189,32 @@ var timeline_detail_exception = [
 
 	//pen對照表
 	initPenMap = {
-		0:{	
+		0:{
 			fcBox: "announcement",
 			textId: "FEED_BULLETIN",
 			imgNm: "bulletin"
 		},
-		1:{	
+		1:{
 			fcBox: "feedback",
 			textId: "FEED_REPORT",
 			imgNm: "report"
 		},
-		2:{	
+		2:{
 			fcBox: "work",
 			textId: "FEED_TASK",
 			imgNm: "task"
 		},
-		3:{	
+		3:{
 			fcBox: "vote",
 			textId: "FEED_VOTE",
 			imgNm: "vote"
 		},
-		4:{	
+		4:{
 			fcBox: "check",
 			textId: "FEED_LOCATION",
 			imgNm: "location"
 		},
-		5:{	
+		5:{
 			fcBox: "post",
 			textId: "FEED_POST",
 			imgNm: "post"
@@ -214,7 +228,7 @@ window.QmiGlobal = {
 
 	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
 
-	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups 
+	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups
 	clouds: {}, // 全部的私雲資料
 	cloudGiMap: {},
 
@@ -223,18 +237,151 @@ window.QmiGlobal = {
 
 	// 聊天室 auth
 	auth: {},
-
+	me: {},
 	getObjectFirstItem: function(obj,last) {
-		if(last === true){ 
+		if(last === true){
 			return obj[Object.keys(obj)[Object.keys(obj).length-1]];
 		} else 	{
 			return obj[Object.keys(obj)[0]];
 		}
 	},
 
+	viewMap: {},
+	systemPopup: {
+		html : '<section id="systemPopup">'+
+					'<div class="sm-person-info">'+
+	                    '<div class="sm-info-hr" data-textid="LOGIN_SAVE_ACCOUNT_TITLE"></div>'+
+	                    '<div data-sm-act="user-setting" class="sm-info sm-small-area" data-textid="PERSONAL_INFORMATION"></div>'+
+	                    '<div class="sm-info-hr" data-textid="SYSTEM"></div>'+
+	                    '<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'+
+	                    // '<div class="sm-info" data-textid="ABOUT_QMI"></div>'+
+	                    '<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'+
+	                '</div>'+
+               	'</section>',
+        init : function(){
+        	var sysPopup = $(this.html);
+        	sysPopup._i18n();
+        	$("body").append(sysPopup);
+        	var systemPopup = $("#systemPopup");
+        	systemPopup.click(function(){
+        		$(".sm-person-area-r").find("img").toggle();
+        		sysPopup.remove();
+        	});
+        	sysPopup.find(".sm-info-hr").click(function(e) {
+	 			e.stopPropagation();
+			});
+			//登出
+			systemPopup.find(".system-logout").click(function(){
+				// popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("SETTING_DO_LOGOUT"),
+					confirm: true,
+					cancel: true,
+					action: [logout]
+				});
+			});
+        }
+	},
 
-	viewMap: {}
-	
+	avatarPopup: {
+		html :　'<div class="user-avatar-confirm">'+
+		               '<div class="avatar-content">'+
+		                   '<div class="avatar-preview">'+
+		                       '<img class="user-headshot" src="">'+
+		                   '</div>'+
+		                   '<div class="avatar-btn-content">'+
+		                       '<button data-role="none" class="cancel-btn btn-b" data-textid="COMMON_CANCEL"></button>'+
+		                       '<button data-role="none" class="avatar-save btn-b" data-textid="COMMON_OK"></button>'+
+		                   '</div>'+
+		                '</div>'+                           
+		        '</div>',
+		init : function(){
+			var imgPopup = $(this.html);
+			imgPopup._i18n();
+        	$("body").append(imgPopup);
+        	var userAvatar = $('.user-avatar-confirm');
+        	userAvatar.fadeIn();
+        	//儲存圖片
+        	userAvatar.find('.avatar-save').click(function(){
+        		//https://ap.qmi.emome.net/apiv1/
+        		// USAGE: 
+				qmiUploadFile({
+					urlAjax: {
+						apiName: "me/avatar",
+						method: "put"
+					},
+					isPublicApi: true,
+					file: userAvatar.find(".user-headshot")[0],
+					oriObj: {w: 1280, h: 1280, s: 0.7},
+					tmbObj: {w: 480, h: 480, s: 0.6},
+					tp: 1 // ;
+				}).done(function(data) {
+					console.log("finish", data);
+					QmiGlobal.me.auo = data.data.ou;
+					QmiGlobal.me.aut = data.data.tu;
+					$("#userInfo").find(".user-avatar-setting").attr("src",data.data.tu);
+					toastShow(data.data.rsp_msg);
+				});
+
+        		var reader = new FileReader();
+        		var file_ori = $('.setting-avatar-file');
+        		var image_file = file_ori[0].files[0];
+        		reader.onload = function(e) {
+		            var img = $(".user-avatar-img");
+		            img.attr("src",reader.result);
+		        }
+		        reader.readAsDataURL(image_file);        
+		        imgPopup.remove();
+        		userAvatar.fadeOut();
+        		$('input[type="file"]').val(null);
+		    });
+        	//取消
+        	$('.cancel-btn').click(function(){
+        		imgPopup.remove();
+		        userAvatar.fadeOut();
+		        $('input[type="file"]').val(null);
+		    });
+		}
+	},
+
+	guihu:{
+		html: '<div class="guihu-confirm">'+
+                    '<div class="edit-guihu-content">'+
+                        '<div class="guihu-title-content">'+
+                            '<div class="guihu-title"></div>'+
+                            '<div class="guihu-des"></div>'+
+                        '</div>'+
+                        '<div class="guihu-input-content">'+
+                            '<input type="text" data-role="none" placeholder="E-mail">'+
+                            '<input type="password" data-role="none" placeholder="Password">'+
+                        '</div>'+
+                        '<div class="guihu-btn-content">'+
+                            '<button class="guihu-cancel-btn btn-b" data-role="none">取消</button>'+
+                            '<button class="btn-b" data-role="none">確認</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>',
+        init: function(){
+        	var guihuPop = $(this.html);
+        	$("body").append(guihuPop);
+        	var editGuihu = $(".guihu-confirm");
+        	editGuihu.fadeIn();
+
+        	$(".guihu-cancel-btn").click(function(){
+        		guihuPop.remove();
+		        editGuihu.fadeOut();
+		    });
+		    $(".guihu-btn-content").on('click',".add-btn",function(){
+		    	guihuPop.remove();
+		        editGuihu.fadeOut();
+		    });
+		    $(".guihu-btn-content").on('click',".save-btn",function(){
+		    	guihuPop.remove();
+		        editGuihu.fadeOut();
+		    });
+        }
+	}
+
 };
 
 // polling異常監控
@@ -272,22 +419,22 @@ window.QmiPollingChk = {
 }
 
 window.QmiAjax = function(args){
-
+	// body and method
 	var self = this,
 		ajaxDeferred = $.Deferred(),
 
-		// 判斷私雲api 
+		// 判斷私雲api
 		cloudData = (function(){
-		
+
 			// 有指定url 加上不要私雲 最優先 ex: 公雲polling
-			if(args.isPublicApi === true) 
+			if(args.isPublicApi === true)
 				return undefined;
 
 			// 有指定ci 直接給他私雲
-			if(args.ci !== undefined) 
+			if(args.ci !== undefined)
 				return QmiGlobal.clouds[args.ci];
 
-			// 判斷apiName有無包含私雲gi 有的話就給他私雲 
+			// 判斷apiName有無包含私雲gi 有的話就給他私雲
 			if(args.apiName !== undefined){
 				// 排除有網址有？的狀況
 				var apiGi = args.apiName.split("?")[0].split("/").find(function(item){
@@ -295,7 +442,7 @@ window.QmiAjax = function(args){
 				});
 
 				// api 包含 group id 而且 在私雲內 回傳私雲 否則回傳undefined 不往下做
-				if(apiGi !== undefined) 
+				if(apiGi !== undefined)
 					return QmiGlobal.cloudGiMap.hasOwnProperty(apiGi) ? QmiGlobal.clouds[ QmiGlobal.cloudGiMap[apiGi].ci ] : undefined;
 			}
 
@@ -307,7 +454,7 @@ window.QmiAjax = function(args){
 
 		newArgs = {
 			url: (function(){
-				// 指定url 
+				// 指定url
 				if(args.url !== undefined) return args.url;
 
 				// undefined 表示 不符合私雲條件 給公雲
@@ -339,7 +486,7 @@ window.QmiAjax = function(args){
 	if(args.isLoadingShow === true || s_load_show === true) {
 		$(".ajax-screen-lock").show();
 		$('.ui-loader').css("display","block");
-	} 
+	}
 
 	// 執行前 先看reAuth lock沒
 	var reAuthTimer = setInterval(function reAuthInterval(){
@@ -386,7 +533,7 @@ window.QmiAjax = function(args){
 							reAuthDefChain = MyDeferred();
 
 						// reAuth: token過期
-						if( apiData.status === 401 
+						if( apiData.status === 401
 							&& rspCode === 601
 							&& args.noAuth !== true
 						) {
@@ -400,7 +547,7 @@ window.QmiAjax = function(args){
 									clearInterval(reAuthTimer2);
 								}
 							}(),500);
-							
+
 
 						} else {
 							reAuthDefChain.resolve({
@@ -426,7 +573,7 @@ window.QmiAjax = function(args){
 
 							// setHeaders: outerArgs,cloudData
 							newArgs.headers = self.setHeaders(args, cloudData);
-						
+
 							$.ajax(newArgs).complete(function(newData){
 								reAuthDefChain.resolve({
 									isSuccess: true,
@@ -451,12 +598,12 @@ window.QmiAjax = function(args){
 							// 回傳失敗
 							ajaxDeferred.reject(completeData);
 							return;
-						} 
+						}
 
 						ajaxDeferred.resolve(completeData);
-					}) // end of reAuthDef 
-				})// end of ajax 
-			})// end of expireChk 
+					}) // end of reAuthDef
+				})// end of ajax
+			})// end of expireChk
 
 			clearInterval(reAuthTimer);
 		} // authLock chk
@@ -479,7 +626,7 @@ window.QmiAjax = function(args){
 		errorCB = cb;
 		return ajaxDeferred.promise();
 	};
-	
+
 	// complete來這裡
 	ajaxDeferred.always(function(completeData){
 		self.onComplete(completeData);
@@ -511,7 +658,7 @@ window.QmiAjax = function(args){
 }
 
 QmiAjax.prototype = {
-	expireTimer: 432000 * 1000, // ms, 五天  
+	expireTimer: 432000 * 1000, // ms, 五天
 
 	authLock: (function(){
 		var isLock = false;
@@ -539,7 +686,7 @@ QmiAjax.prototype = {
 
 	// 初始設定 以及 reAuth 會用到
 	setHeaders: function(outerArgs,cloudData){
-		// 指定headers 
+		// 指定headers
 		if(outerArgs.specifiedHeaders !== undefined) return outerArgs.specifiedHeaders;
 
 		var newHeaders = {};
@@ -616,7 +763,7 @@ QmiAjax.prototype = {
 		    success: function(apiData){
 		    	// 重新設定at
 		    	if(
-		    		cloudData !== undefined 
+		    		cloudData !== undefined
 		    		&& QmiGlobal.clouds[cloudData.ci] !== undefined
 		    	) {
 		    		// 私雲
@@ -627,7 +774,7 @@ QmiAjax.prototype = {
 		    		QmiGlobal.auth.at = at = apiData.at;
 		    		QmiGlobal.auth.et = apiData.et;
 		    	}
-		        
+
 		        deferred.resolve({
 		        	isSuccess: true,
 		        	data: apiData,
@@ -639,7 +786,7 @@ QmiAjax.prototype = {
 		    	self.authLock.set(false);
 		    }
 		}) // end of reAuth ajax
-		
+
 		return deferred.promise();
 	},
 
@@ -656,7 +803,7 @@ QmiAjax.prototype = {
 			$('.ui-loader').hide();
 			$(".ajax-screen-lock").hide();
 		}
-			
+
 		//不做錯誤顯示 polling也不顯示
 		if(ajaxArgs.errHide || isPolling === true) return false;
 
@@ -685,10 +832,10 @@ QmiAjax.prototype = {
 			popupShowAdjust("",errorResponse(errData),true);
 		}else{
 			//預設
-			toastShow(errorResponse(errData));	
+			toastShow(errorResponse(errData));
 		}
 	},
-		
+
 	onComplete: function(data){
 		
 		if(s_load_show === false) {
@@ -698,22 +845,26 @@ QmiAjax.prototype = {
 
 	}
 
-}
+} // end of QmiAjax
 
 //title
 
 g_Qmi_title = "Qmi";
 $("title").html(g_Qmi_title);
 
+
 MyDeferred = function  () {
-  var myResolve;
+  var myResolve, myReject;
   var myPromise = new Promise(function(resolve, reject){
     myResolve = resolve;
+    myReject = reject;
   });
 
   myPromise.resolve = myResolve;
+  myPromise.reject = myReject;
   return myPromise;
 }
+
 
 
 
@@ -787,7 +938,7 @@ $(document).on("click","a",function(e){
 		if( isNode ){
             var gui = require('nw.gui');
             gui.Shell.openExternal($(this).attr("href"));
-			return false;        	
+			return false;
         }
 	}
 });
@@ -807,7 +958,7 @@ errorResponse = function(data){
 	}
 }
 
-//debug control 
+//debug control
 setDebug(debug_flag);
 
 function setDebug(isDebug) {
@@ -831,3 +982,4 @@ function setDebug(isDebug) {
     }
   }
 }
+

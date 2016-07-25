@@ -286,6 +286,8 @@ $(function(){
 
             //set tabs
             var menu = $(".header-menu").html("");
+            menu.parent().hide();
+            
             for( i=0;i<groupData.set.tab.length;i++ ){
                 var tabObj = groupData.set.tab[i];
                 //switch off
@@ -312,6 +314,10 @@ $(function(){
                     nameDom.html( $.i18n.getString(initTabMap[tabObj.tp].textId) );
                 }
             }
+
+            // if (groupData.isOfficial) {
+            //     menu.hide();
+            // }
         } catch(e){
             errorReport(e);
         }
@@ -374,7 +380,7 @@ $(function(){
                 $(".gs-row[data-type=info]").show();
             } else {
                 $(".gs-row[data-type=permission]").hide();
-                $(".gs-row[data-type=info]").hide();
+                //$(".gs-row[data-type=info]").hide();
                 hide+=2;
             }
 

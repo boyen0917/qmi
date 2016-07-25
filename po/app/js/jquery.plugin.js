@@ -113,6 +113,7 @@
 	String.prototype.replaceEmoji = function () {
 		return this + "";
 		// cns.debug( JSON.stringify(this) );
+		return this + "";
 		var tmpString = this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){
 			var tmp = [];
 			var n = match.lastIndexOf(";&#");

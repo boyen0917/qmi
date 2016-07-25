@@ -547,6 +547,9 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 				text = $.i18n.getString("CHAT_VOIP_GET_CALL", name );
 			}
 			break;
+		case 26:
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_FILE", name);
+			break;
 		default:
 			try{
 				text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c:"";
@@ -563,7 +566,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			var msgDom = table.find(".msg");
 			var timeDom = table.find(".time");
 
-			if(msgDom)	msgDom.html( text.replaceOriEmojiCode() );
+			if(msgDom)	msgDom.html( text._escape().replaceOriEmojiCode() );
 			// cns.debug( new Date(data.meta.ct).toFormatString() );
 			if(timeDom)	timeDom.html( new Date(data.meta.ct).toFormatString(false) );
 			if( false==isRoomOpen ){
@@ -864,7 +867,7 @@ function requestNewChatRoomApi(giTmp, cnTmp, gul, fl, callback, isOpenRoom){
 				    		groupTmp["chatAll"][result.ci].cn = text;
 				    		groupTmp["chatAll"][result.ci].uiName = text;
 				    	}
-				    	$.lStorage( ui, userData );
+					    	$.lStorage( ui, userData );
 				    }
 
 				    //打開聊天室
