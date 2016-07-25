@@ -16,10 +16,10 @@ var ui,
 	
 	//HiCloud
 
-	//base_url = "https://ap.qmi.emome.net/apiv1/";
+	base_url = "https://ap.qmi.emome.net/apiv1/";
 
 	// aws 測試環境
- 	base_url = "https://apserver.mitake.com.tw/apiv1/";
+ 	//base_url = "https://apserver.mitake.com.tw/apiv1/";
 
 
 
