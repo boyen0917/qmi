@@ -1521,7 +1521,7 @@ $(function(){
 		var imageType = /image.*/;
 		var videoType = /video.mp4/;
 		var isMp4AlertShown = false;
-		console.log("file_ori", file_ori);
+
 		$.each(file_ori[0].files,function(i,file){
 			if( file.type.match(imageType)){
 				imgList.push(file);
@@ -1680,6 +1680,8 @@ $(function(){
 		e.preventDefault();
         e.stopPropagation();
         $(this).hide();
+
+
         
         var target_input = $(this).parents(".st-sub-box").find(".st-reply-message-file");
         if($(this).hasClass("compose-dnd")) target_input = $(".cp-file");
@@ -1690,6 +1692,7 @@ $(function(){
 
         if(e.originalEvent.dataTransfer){
             if(e.originalEvent.dataTransfer.files.length > 0) {
+            	console.log("shit");
                 /*UPLOAD FILES HERE*/
 				// target_input[0].files = e.originalEvent.dataTransfer.files;
 				target_input[0].files[target_input[0].files.length] = e.originalEvent.dataTransfer.files;
