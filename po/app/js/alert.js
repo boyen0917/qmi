@@ -274,7 +274,7 @@ showAlertContent = function(data){
 
 				//群組名
 				tmp = $(tmpDiv).find(".al-post-group");
-				if( tmp ) tmp.html( group.gn.replaceOriEmojiCode() );
+				if( tmp ) tmp.html( group.gn._escape().replaceOriEmojiCode() );
 				// cns.debug( htmlFormat(group.gn) );
 
 				if(boxData.ntp==1){ //貼文
