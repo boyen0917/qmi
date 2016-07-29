@@ -218,6 +218,16 @@ getVideoBlob = function(videoDom, x,y,max_w,max_h,quality){
 	
 }
 
+fileSizeTransfer = function (si){
+	if(si < 900) 
+		return Math.round(si*10)/10+" byte";
+
+	if((si/1024) < 900)
+		return Math.round(si/1024*10)/10+" kb";
+	
+	return Math.round(si/1024/1024*10)/10+" mb";
+}
+
 
 //調整個人頭像
 avatarPos = function (ori_img,x){

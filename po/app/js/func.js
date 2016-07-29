@@ -2222,6 +2222,7 @@ composeContentMake = function (compose_title){
         //圖片上傳物件及流水號
         this_compose.data("upload-obj",{});
         this_compose.data("upload-video",{});
+        this_compose.data("upload-file",{});
         this_compose.data("upload-ai",0);
         this_compose.data("body",{});
 

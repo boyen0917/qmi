@@ -21,6 +21,7 @@ body{
 
 ::-webkit-scrollbar {
       width: 8px;
+      height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -3644,6 +3645,9 @@ img.st-reply-message-attach {
     font-size: 12px;
 }
 
+
+#page-compose { background: rgb(208,208,208) }
+
 .cp-post ,.obj-done {
 	position: absolute;
 	right: 0;
@@ -3678,8 +3682,7 @@ img.st-reply-message-attach {
 
 .cp-content{
 	background: rgb(208,208,208);
-    width: 100%;
-    display:table;
+    width: 100vw;
 }
 
 .cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-work-area,.cp-vote-area-test,.cp-time-area,.cp-vote-type-area{
@@ -3722,7 +3725,17 @@ img.st-reply-message-attach {
 }
 
 .cp-attach-area {
+	position: relative;
 	padding: 20px 0;
+}
+
+.cp-attach-area .top-border-hide {
+	position: absolute;
+	top: 1px;
+	height: 20px;
+	width: 100%;
+	z-index: 1;
+	background: white;
 }
 
 .cp-sticker-area .sticker{
@@ -3756,17 +3769,23 @@ img.st-reply-message-attach {
 
 
 .cp-file-img-area, .cp-file-video-area {
+	position: relative;
 	margin-left: 5px;
 	overflow: hidden;
-	padding-top: 15px;
+	padding-top: 50px;
+	white-space: nowrap;
+	margin-bottom: 10px;
 }
+
+.cp-file-img-area:hover { margin-bottom: 2px; overflow-x: scroll; }
 
 .cp-grid {
 	width: 100px;
 	position: relative;
 	margin: 0 15px 15px 0;
-	float: left;
+	display: inline-block;
 	border: 1px solid #d2d2d2;
+	vertical-align: top;
 }
 
 .cp-grid div {
@@ -3784,11 +3803,15 @@ img.st-reply-message-attach {
 }
 
 .cp-grid img:nth-child(1) {
-	/*width: 100px;*/
+	width: 100px;
 	display: block;
+	object-fit: cover;
+	height: 100px;
 }
+
 .cp-file-video-area{
 	min-height: 100px;
+	border-top: 1px solid #d2d2d2;
 }
 .cp-file-video-area.topBorder{
 	border-top: 1px solid #d2d2d2;
@@ -3802,27 +3825,7 @@ img.st-reply-message-attach {
 	left: 0;
 	width: 100%;
 	height: 20px;
-	/*background-size: auto 50%;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	z-index: 3;*/
 }
-/*.cp-file-video-area .cp-grid:before{
-	content: "";
-	background-image: url("../images/chatroom/chat_message_status_icon_video.png");
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-size: auto 50%;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	z-index: 3;
-}
-.cp-file-video-area .cp-grid:hover:before{
-	background-image: url("../images/chatroom/chat_message_status_icon_video_click.png");
-}*/
 .cp-grid video{
 	/*max-width: 100%;*/
 	max-height: 100%;
@@ -3834,9 +3837,57 @@ img.st-reply-message-attach {
 	top: -11px;
 	width: 25px;
 	z-index: 10;
+	cursor: pointer;
 }
 
+.cp-file-img-area:before, .cp-file-video-area:before, .cp-file-else-area:before {
+	content: attr(type);
+	position: absolute;
+	top: 10px;
+	left: 0;
+	width: 60px;
+	height: 22px;
+	background: #ddd;
+	color: white;
+	text-align: center;
+	border-radius: 3px;
+}
 
+.cp-file-else-area {   
+	position: relative;
+ 	border-top: 1px solid #ddd;
+  	padding-top: 40px;
+}
+
+.cp-file-area .file-row {
+	position: relative;
+    margin: 5px;
+    padding: 5px;
+    height: 30px;
+}
+
+.cp-file-area .file-row .grid-cancel{ top: 10px; right: -20px;}
+
+.cp-file-area .file-row span {
+	vertical-align: top;
+	line-height: 33px;
+	margin-right: 20px;
+	position: relative;
+}
+
+.cp-file-area .file-row img:first-child { border-radius: 3px; width: 33px; }
+.cp-file-area .file-row span:nth-child(2) {   left: 10px; font-size: 16px; }
+.cp-file-area .file-row span:nth-child(3) {   top: 1px; font-size: 13px; }
+
+.cp-file-area .content {
+    min-width: 200px;
+    display: inline-block;
+    color: #888;
+    max-height: 200px;
+    padding-right: 20px;
+    overflow: hidden;
+}
+.cp-file-area .content:hover { overflow-y: scroll;  }
 
 .cp-textarea-title{
 	width: 80%;
@@ -3960,7 +4011,7 @@ img.st-reply-message-attach {
 
 .cp-addfile {
 	float: left;
-	width: 33.3%;
+	width: 25%;
 	text-align: center;
 	padding-top: 10px;
 	cursor: pointer;

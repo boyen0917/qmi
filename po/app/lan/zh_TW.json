@@ -130,6 +130,10 @@
 	"COMPOSE_PARSE_ERROR" : "網址內容取得失敗",
 	"COMPOSE_DISCARD": "即將捨棄這則貼文？",
 
+	"COMPOSE_FOOTER_IMAGE": "圖檔",
+	"COMPOSE_FOOTER_VIDEO": "影片",
+	"COMPOSE_FOOTER_FILE": "檔案",
+
 	"MEMBER_ALL" : "全部",
 	"MEMBER_X_GROUP_NO_MEMBER": "%@目前沒有成員",
 	"MEMBER_CREATE_CUSTOMIZE_GROUP" : "新增自定群組",

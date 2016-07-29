@@ -131,6 +131,10 @@
 	"COMPOSE_PARSE_ERROR" : "Oops,can not get the result of this URL",
 	"COMPOSE_DISCARD": "Discard this post?",
 
+	"COMPOSE_FOOTER_IMAGE": "Image",
+	"COMPOSE_FOOTER_VIDEO": "Video",
+	"COMPOSE_FOOTER_FILE": "File",
+
 	"MEMBER_ALL" : "All",
 	"MEMBER_X_GROUP_NO_MEMBER": "No member in sub group %@ now.",
 	"MEMBER_CREATE_CUSTOMIZE_GROUP" : "New customize group",

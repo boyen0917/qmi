@@ -839,13 +839,5 @@ FileItem.prototype = {
 			return n.length == 1 ? "0"+n : n;
 	    }
 	},
-	fileSizeTrans: function (si){
-		if(si < 900) 
-			return Math.round(si*10)/10+" byte";
-
-		if((si/1024) < 900)
-			return Math.round(si/1024*10)/10+" kb";
-		
-		return Math.round(si/1024/1024*10)/10+" mb";
-	}
+	fileSizeTrans: fileSizeTransfer
 }

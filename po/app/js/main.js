@@ -1455,17 +1455,13 @@ $(function(){
 
 			case "video":
 				$(".cp-file").data("img",false).attr("accept", "video/mp4").trigger("click");
-				target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
-				setTimeout(function(){
-					target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
-				},100);
 				break;
 			case "img":	//附影像
 				$(".cp-file").data("img",true).attr("accept", "image/*").trigger("click");
-				target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
-				setTimeout(function(){
-					target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
-				},100);
+				break;
+
+			case "file":	//附影像
+				$(".cp-file").data("img",false).trigger("click");
 				break;
 
 			case "sticker":	//附貼圖
@@ -1517,10 +1513,19 @@ $(function(){
 		var this_compose = composePage.find(".cp-content");
 		var videoList = [];
 		var imgList = [];
+		var fileList = [];
 		var file_ori = $(this);
 		var imageType = /image.*/;
 		var videoType = /video.mp4/;
 		var isMp4AlertShown = false;
+
+		// 預設各個副檔案的title
+		if(composePage.find(".cp-file-img-area").attr("type") === undefined) {
+			composePage.find(".cp-file-area > div").each(function(i, item) {
+				$(item).attr("type", $.i18n.getString("COMPOSE_FOOTER_" + $(item).attr("name")));
+			})
+		} 
+			
 
 		$.each(file_ori[0].files,function(i,file){
 			if( file.type.match(imageType)){
@@ -1530,6 +1535,9 @@ $(function(){
 			} else if( !isMp4AlertShown && file.type.match(/video.*/) ){
 				isMp4AlertShown = true;
 				toastShow( $.i18n.getString("COMMON_NOT_MP4") );
+			} else {
+				// 上傳檔案
+				fileList.push(file)
 			}
 		});
 
@@ -1541,21 +1549,13 @@ $(function(){
 			imageArea.html("").show();
 			
 			var videoArea = this_compose.find(".cp-file-video-area");
-			if( videoArea.is(":visible") ){
-				videoArea.addClass("topBorder");
-			}
 
 			var limit_chk = false;
 			// var upload_arr = this_compose.data("upload-arr");
 			// 取消上傳9張限制
 			$.each(imgList,function(i,file){
 				if(!file || !file.type) return;
-				// if(Object.keys(this_compose.data("upload-obj")).length == 9 ){
-				// 	limit_chk = true;
-				// 	return false;
-				// }
-				
-			// 	//流水號
+				//流水號
 				var ai = this_compose.data("upload-ai");
 				this_compose.data("upload-obj")[ai] = file;
 				this_compose.data("upload-ai",ai+1)
@@ -1573,34 +1573,22 @@ $(function(){
 				//編號 方便刪除
 				this_grid.data("file-num",i);
 
-				// if (file.type.match(imageType)) {
+				//有圖片就push進 compose message list
+				if($.inArray(6,this_compose.data("message-list")) < 0){
+					this_compose.data("message-list").push(6);
 
-					//有圖片就push進 compose message list
-					if($.inArray(6,this_compose.data("message-list")) < 0){
-						this_compose.data("message-list").push(6);
+					//附檔區域存在附檔
+					this_compose.data("attach",true);
+				}
 
-						//附檔區域存在附檔
-						this_compose.data("attach",true);
-					}
-
-					var reader = new FileReader();
-					reader.onload = function(e) {
-						var img = this_grid.find("div img");
-
-						//調整長寬
-						img.load(function() {
-							var w = img.width();
-				            var h = img.height();
-	        				mathAvatarPos(img,w,h,100);
-				        });
-				        img.attr("src",reader.result);
-					}
-					reader.readAsDataURL(file);	
-				// }else{
-				// 	this_grid.find("div").html('<span>file not supported</span>');
-				// }
+				var reader = new FileReader();
+				reader.onload = function(e) {
+			        this_grid.find("div img").attr("src",reader.result);
+				}
+				reader.readAsDataURL(file);	
 			});
 		}
+
 		if( videoList.length>0 ){
 
 			var composePage = $("#page-compose");
@@ -1610,9 +1598,6 @@ $(function(){
 			this_compose.find(".cp-file-area").show();
 			var videoArea = this_compose.find(".cp-file-video-area");
 			videoArea.html("").show();
-			if( this_compose.find(".cp-file-img-area").is(":visible") ){
-				videoArea.addClass("topBorder");
-			}
 
 			var limit_chk = false;
 			// var upload_arr = this_compose.data("upload-arr");
@@ -1668,8 +1653,50 @@ $(function(){
 			});
 		}
 
+		if( fileList.length>0 ){
+
+			composePage.find(".cp-attach-area").show();
+			composePage.find(".cp-file-area").show();
+			var fileArea = composePage.find(".cp-file-else-area");
+			fileArea.show();
+
+			var fileContentArea = fileArea.find(".content");
+			fileContentArea.html("");
+			
+			$.each(fileList,function(i,file){
+				if(!file || !file.type) return;
+				//流水號
+				var ai = this_compose.data("upload-ai");
+				this_compose.data("upload-file")[ai] = file;
+				this_compose.data("upload-ai",ai+1)
+			});
+
+			$.each(this_compose.data("upload-file"),function(i,file){
+				console.log("im file ",file);
+				var fileRow =  $('<div class="file-row">' +
+                    '    <img src="images/compose/icon_file.png">' +
+                    '    <span>'+ file.name +'</span>' +
+                    '    <span>'+ fileSizeTransfer(file.size) +'</span>' +
+                    '    <img class="grid-cancel" src="images/common/icon/icon_compose_close.png">' +
+                    '</div>');
+
+				fileContentArea.append(fileRow);
+				
+				//編號 方便刪除
+				fileRow.data("file-num",i);
+
+				//有圖片就push進 compose message list
+				if($.inArray(26, this_compose.data("message-list")) < 0){
+					this_compose.data("message-list").push(26);
+					//附檔區域存在附檔
+					this_compose.data("attach",true);
+				}
+
+			});
+		}
+
 		//每次選擇完檔案 就reset input file
-		// file_ori.replaceWith( file_ori.val('').clone( true ) );
+		file_ori.replaceWith( file_ori.val('').clone( true ) );
 	});
 
 	$(document).on("dragover",".timeline-dnd,.compose-dnd,.user-info-load-area .me",function(e){
@@ -1680,8 +1707,6 @@ $(function(){
 		e.preventDefault();
         e.stopPropagation();
         $(this).hide();
-
-
         
         var target_input = $(this).parents(".st-sub-box").find(".st-reply-message-file");
         if($(this).hasClass("compose-dnd")) target_input = $(".cp-file");
@@ -1691,11 +1716,10 @@ $(function(){
         }
 
         if(e.originalEvent.dataTransfer){
-            if(e.originalEvent.dataTransfer.files.length > 0) {
-            	console.log("shit");
+            if(e.originalEvent.dataTransfer.files.length) {
                 /*UPLOAD FILES HERE*/
-				// target_input[0].files = e.originalEvent.dataTransfer.files;
-				target_input[0].files[target_input[0].files.length] = e.originalEvent.dataTransfer.files;
+				target_input[0].files = e.originalEvent.dataTransfer.files;
+				// target_input[0].files[target_input[0].files.length] = e.originalEvent.dataTransfer.files;
             }
         }
 	});
@@ -1730,7 +1754,7 @@ $(function(){
 		composeCheckMessageList();
 	});
 
-	$(document).on("click",".cp-grid .grid-cancel",function(e){
+	$(document).on("click",".cp-file-area .grid-cancel",function(e){
 		var this_compose = $(document).find(".cp-content");
 		var this_grid = $(this).parent();
 		var file_num = this_grid.data("file-num");
@@ -1745,19 +1769,17 @@ $(function(){
 
 				this_cancel.attr("src","images/common/icon/icon_compose_close.png");
 				this_cancel.remove();
-				this_grid.hide('fast', function(){ 
+				this_grid.hide("fast", function(){ 
 					this_grid.remove(); 
 
 					//圖檔區沒東西了 就剔除message list
 					if(area.html() == ""){
 						area.hide();
-						area.siblings(".cp-file-video-area").removeClass("topBorder");
 						this_compose.data("message-list").splice($.inArray(6,this_compose.data("message-list")),1);
-
 						composeCheckMessageList();
 					}
 				});
-			} else {
+			} else if(area.hasClass("cp-file-video-area")) {
 				//刪除upload arr
 				delete this_compose.data("upload-video")[file_num];
 
@@ -1768,9 +1790,24 @@ $(function(){
 
 					//圖檔區沒東西了 就剔除message list
 					if( area.html() == ""){
-						area.hide().removeClass("topBorder");
+						area.hide();
 						this_compose.data("message-list").splice($.inArray(7,this_compose.data("message-list")),1);
+						composeCheckMessageList();
+					}
+				});
+			} else {
+				//刪除upload arr
+				delete this_compose.data("upload-file")[file_num];
 
+				this_cancel.attr("src","images/common/icon/icon_compose_close.png");
+				this_cancel.remove();
+				this_grid.hide('fast', function(){ 
+					this_grid.remove(); 
+
+					//圖檔區沒東西了 就剔除message list
+					if( area.html() == ""){
+						area.parent().hide();
+						this_compose.data("message-list").splice($.inArray(7,this_compose.data("message-list")),1);
 						composeCheckMessageList();
 					}
 				});
