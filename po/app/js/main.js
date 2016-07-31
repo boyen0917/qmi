@@ -1454,14 +1454,14 @@ $(function(){
 		switch(add_type){
 
 			case "video":
-				$(".cp-file").data("img",false).attr("accept", "video/mp4").trigger("click");
+				$(".cp-file").attr("accept", "video/mp4").trigger("click");
 				break;
 			case "img":	//附影像
-				$(".cp-file").data("img",true).attr("accept", "image/*").trigger("click");
+				$(".cp-file").attr("accept", "image/*").trigger("click");
 				break;
 
 			case "file":	//附影像
-				$(".cp-file").data("img",false).trigger("click");
+				$(".cp-file").data("file",true).attr("accept", false).trigger("click");
 				break;
 
 			case "sticker":	//附貼圖
@@ -1528,11 +1528,17 @@ $(function(){
 			
 
 		$.each(file_ori[0].files,function(i,file){
+			// 點擊迴紋針上傳 直接push進fileList
+			if(file_ori.data("file") === true) {
+				fileList.push(file);
+				return;
+			}
+
 			if( file.type.match(imageType)){
 				imgList.push(file);
 			} else if( file.type.match(videoType)){
 				videoList.push(file);
-			} else if( !isMp4AlertShown && file.type.match(/video.*/) ){
+			} else if( !isMp4AlertShown && file.type.match(/video.*/)){
 				isMp4AlertShown = true;
 				toastShow( $.i18n.getString("COMMON_NOT_MP4") );
 			} else {
@@ -1540,6 +1546,8 @@ $(function(){
 				fileList.push(file)
 			}
 		});
+
+		file_ori.data("file", false);
 
 		if( imgList.length>0 ){
 
@@ -1593,46 +1601,32 @@ $(function(){
 
 			var composePage = $("#page-compose");
 			var this_compose = composePage.find(".cp-content");
-
-			this_compose.find(".cp-attach-area").show();
-			this_compose.find(".cp-file-area").show();
 			var videoArea = this_compose.find(".cp-file-video-area");
-			videoArea.html("").show();
 
 			var limit_chk = false;
 			// var upload_arr = this_compose.data("upload-arr");
 
-			$.each(videoList,function(i,file){
-				if(!file||!file.type) return;
-				if(Object.keys(this_compose.data("upload-video")).length == 1 ){
-					limit_chk = true;
-					return false;
-				}
-				
-				//流水號
-				var ai = this_compose.data("upload-ai");
-				this_compose.data("upload-video")[ai] = file;
-				this_compose.data("upload-ai",ai+1)
-			});
-
-			if(limit_chk){
+			if(videoList.length > 1) {
 				toastShow( $.i18n.getString("COMMON_SEND_VIDEO_LIMIT",1) );
-				// return false;
-			}
+			} else {
+				var file = videoList[0];
 
-			$.each(this_compose.data("upload-video"),function(i,file){
-				var this_grid =  $('<div class="cp-grid"><div><video data-file-num="'+i+'"/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
-				
-				//編號 方便刪除
-				this_grid.data("file-num",i);
-				videoArea.append(this_grid);
-
-				// if( !file.type.match(videoType) ){
-				// 	this_grid.find("div").html('<span>'+$.i18n.getString("COMMON_NOT_MP4")+'</span>');
-				// } else
-				if(file.size > 50000000){ //max 50mb
-					this_grid.find("div").html('<span>'+$.i18n.getString("COMMON_EXCEED_FILE_SIZE")+'</span>');
+				if(file.size > 200 * 1024 * 1024){ //max 200mb
+					toastShow($.i18n.getString("COMMON_EXCEED_FILE_SIZE"));
 				} else {
+					//流水號
+					var ai = this_compose.data("upload-ai");
+					this_compose.data("upload-video")[ai] = file;
+					this_compose.data("upload-ai",ai+1);
+
+					this_compose.find(".cp-attach-area").show();
+					this_compose.find(".cp-file-area").show();
+					videoArea.html("").show();
+					var this_grid =  $('<div class="cp-grid"><div><video data-file-num="'+i+'"/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
+				
+					//編號 方便刪除
+					this_grid.data("file-num", ai);
+					videoArea.append(this_grid);
 
 					//有圖片就push進 compose message list
 					if($.inArray(7,this_compose.data("message-list")) < 0){
@@ -1650,7 +1644,8 @@ $(function(){
 						videoTag.parent().addClass("error");
 					});
 				}
-			});
+
+			}
 		}
 
 		if( fileList.length>0 ){
@@ -1709,7 +1704,10 @@ $(function(){
         $(this).hide();
         
         var target_input = $(this).parents(".st-sub-box").find(".st-reply-message-file");
-        if($(this).hasClass("compose-dnd")) target_input = $(".cp-file");
+        if($(this).hasClass("compose-dnd")) {
+        	target_input = $(".cp-file");
+        	target_input.data("file", false);
+        }
         if($(this).hasClass("me")) {
         	target_input = $(this).find(".user-avatar-bar.me input");
         	$(this).show();

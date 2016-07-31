@@ -4683,8 +4683,10 @@ composeSend = function (this_compose){
                 
                 this_compose.data("body",body);
                 break;
-            case 21:
-
+            case 26:
+                // 檔案上傳
+                is_push = false;
+                
                 break;
         }
 

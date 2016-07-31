@@ -1502,7 +1502,7 @@ img.auo {
 	height: 44px;
 	background: url("../images/compose/compose_form_addfile_bg.png") repeat-x;
 	/*display: inline-block;*/
-	width: 100%;
+	width: 100vw;
 	border-bottom: 1px solid rgb(218,218,218);
 	position: fixed;
 	bottom: -2px;
@@ -3646,7 +3646,7 @@ img.st-reply-message-attach {
 }
 
 
-#page-compose { background: rgb(208,208,208) }
+#page-compose { background: rgb(208,208,208); width: 100vw; }
 
 .cp-post ,.obj-done {
 	position: absolute;
@@ -3680,10 +3680,7 @@ img.st-reply-message-attach {
 	top: 3px;
 }
 
-.cp-content{
-	background: rgb(208,208,208);
-    width: 100vw;
-}
+.cp-content{ width: 100vw; }
 
 .cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-work-area,.cp-vote-area-test,.cp-time-area,.cp-vote-type-area{
     background: white;
@@ -3856,7 +3853,7 @@ img.st-reply-message-attach {
 .cp-file-else-area {   
 	position: relative;
  	border-top: 1px solid #ddd;
-  	padding-top: 40px;
+  	padding-top: 45px;
 }
 
 .cp-file-area .file-row {
@@ -3883,7 +3880,7 @@ img.st-reply-message-attach {
     min-width: 200px;
     display: inline-block;
     color: #888;
-    max-height: 200px;
+    max-height: 275px;
     padding-right: 20px;
     overflow: hidden;
 }
