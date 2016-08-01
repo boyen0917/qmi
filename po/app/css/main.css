@@ -5697,7 +5697,9 @@ section.fileSharing .file-cover .general .input-area{
     border-bottom: 1px solid #d2d2d2;
 }
 
-section.fileSharing section.progress-bar {
+section.fileSharing section.progress-bar,
+#compose-progressbar
+{
     height: 100vh;
     background-color: rgba(50,50,50,0.7);
     position: absolute;
@@ -5705,7 +5707,9 @@ section.fileSharing section.progress-bar {
     display: none;
 }
 
-section.fileSharing section.progress-bar .frame {
+section.fileSharing section.progress-bar .frame ,
+#compose-progressbar .container
+{
     width: 150px;
     height: 10px;
     background: rgb(210, 210, 210);
@@ -5717,7 +5721,9 @@ section.fileSharing section.progress-bar .frame {
     font-size: 14px;
     position: relative;
 }
-section.fileSharing section.progress-bar .frame .progress {
+section.fileSharing section.progress-bar .frame .progress ,
+#compose-progressbar .bar
+{
     width: 0px;
     height: 8px;
     background: #54ACEB;
@@ -5727,13 +5733,27 @@ section.fileSharing section.progress-bar .frame .progress {
     left: 1px;
 }
 section.fileSharing section.progress-bar .frame .text { position: absolute; top: 0 ;left: 65px;}
-section.fileSharing section.progress-bar .frame .cancel { 
+section.fileSharing section.progress-bar .frame .cancel ,#compose-progressbar button
+{ 
 	position: absolute; 
 	top: 0;
-	right: -50px;
+	left: 160px;
 	font-size: 15px;
 	cursor: pointer;
 }
+
+#compose-progressbar { z-index: 10 }
+#compose-progressbar button:focus { outline: none; }
+#compose-progressbar button {
+	top: -7px;
+    color: white;
+    border: 0;
+    background: transparent;
+    white-space: nowrap;
+}
+
+#compose-progressbar .cnt { position: relative; top: 10px;}
+#compose-progressbar span.curr:before {content: attr(num);}
 
 section.subpage-fileSharing{
 	overflow-y: auto;

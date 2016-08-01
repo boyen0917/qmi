@@ -1556,30 +1556,28 @@ $(function(){
 			var imageArea = composePage.find(".cp-file-img-area");
 			imageArea.html("").show();
 			
-			var videoArea = this_compose.find(".cp-file-video-area");
-
-			var limit_chk = false;
-			// var upload_arr = this_compose.data("upload-arr");
-			// 取消上傳9張限制
 			$.each(imgList,function(i,file){
 				if(!file || !file.type) return;
 				//流水號
 				var ai = this_compose.data("upload-ai");
-				this_compose.data("upload-obj")[ai] = file;
+				this_compose.data("upload-obj")[ai] = {file: file};
 				this_compose.data("upload-ai",ai+1)
 			});
-
-			if(limit_chk){
-				toastShow( $.i18n.getString("COMMON_SEND_PHOTO_LIMIT",9) );
-				// return false;
-			}
-
-			$.each(this_compose.data("upload-obj"),function(i,file){
+			
+			$.each(this_compose.data("upload-obj"),function(i, obj){
 				var this_grid =  $('<div class="cp-grid"><div><img/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
 				$(".cp-file-img-area").append(this_grid);
-				
+
 				//編號 方便刪除
 				this_grid.data("file-num",i);
+
+				
+				// 存回
+				var elem = this_grid.find("div img");
+				this_compose.data("upload-obj")[i] = {
+					file: obj.file,
+					elem: elem[0]
+				}
 
 				//有圖片就push進 compose message list
 				if($.inArray(6,this_compose.data("message-list")) < 0){
@@ -1591,9 +1589,9 @@ $(function(){
 
 				var reader = new FileReader();
 				reader.onload = function(e) {
-			        this_grid.find("div img").attr("src",reader.result);
+			        elem.attr("src",reader.result);
 				}
-				reader.readAsDataURL(file);	
+				reader.readAsDataURL(obj.file);	
 			});
 		}
 
