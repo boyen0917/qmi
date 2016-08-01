@@ -4632,6 +4632,14 @@ composeSend = function (this_compose){
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
+
+                        if(resObj.isSuccess === false) return;
+
+                        body.ml.push({
+                            fi: resObj.data.fi,
+                            p: 0,
+                            tp: 6
+                        });
                     });
                 });
                     
@@ -4661,6 +4669,14 @@ composeSend = function (this_compose){
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
+
+                        if(resObj.isSuccess === false) return;
+
+                        body.ml.push({
+                            fi: resObj.data.fi,
+                            p: 0,
+                            tp: 7
+                        });
                     });
                 });
                     
@@ -4690,6 +4706,16 @@ composeSend = function (this_compose){
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
+
+                        if(resObj.isSuccess === true) {
+                            body.ml.push({
+                                ftp: 0,
+                                fi: resObj.data.fi,
+                                fn: resObj.data.file.name,
+                                si: resObj.data.file.size,
+                                tp: 26
+                            });
+                        }
                     });
                 });
                 break;
@@ -4706,7 +4732,7 @@ composeSend = function (this_compose){
         console.log("uploadDefArr done", arguments);
         setTimeout(progressBarObj.close, 500)
         
-        // composeSendApi(body);
+        composeSendApi(body);
     // 取消
     }).fail(function() {
         progressBarObj.close();

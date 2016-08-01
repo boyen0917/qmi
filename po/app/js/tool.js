@@ -522,6 +522,7 @@ qmiUploadFile = function(uploadObj){
 		}).success(function(data) {
 			data.fi = s3Obj.fi;
 			data.tp = uploadObj.tp;
+			data.file = uploadObj.file;
 			chainDef.resolve({isSuccess: true, data: data})
 		}).error(chainDef.reject);
 
