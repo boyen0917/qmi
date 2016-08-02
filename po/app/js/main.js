@@ -725,8 +725,13 @@ $(function(){
 			var previewInput = "<div class='img'><img src='" + dataUrl + "'/></div>";
 
 			if (fileType == "file") {
+				var fileName = file.name.split(".")[0];
+                var format = file.name.split(".")[1];
+                if (fileName.length > 15) {
+                    fileName = fileName.substring(0, 10) + "....";
+                }
 				previewInput = "<div class='attach-file'><img class='file-icon'" 
-					+ "src='images/timeline/otherfile_icon.png' >" + file.name 
+					+ "src='images/timeline/otherfile_icon.png' >" + (fileName + " - " + format) 
 					+ "<span>" + file.size.toFileSize() + "</span>"
 					+ "<img class='file-cancel' src='images/common/icon/icon_compose_close.png'></div>";
 			}

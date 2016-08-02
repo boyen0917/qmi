@@ -492,7 +492,7 @@ qmiUploadFile = function(uploadObj){
 	}()).then(function(s3Obj) {
 		var chainDef = MyDeferred();
 		
-		qmiUploadS3(uploadObj, s3Obj).done(chainDef.resolve);
+		qmiUploadS3(uploadObj, s3Obj).done(chainDef.resolve).fail(chainDef.reject);
 		return chainDef;
 	}, chainDefError.bind("get url fail")).then(function(responseObj) {
 		var chainDef = MyDeferred(),
@@ -524,7 +524,7 @@ qmiUploadFile = function(uploadObj){
 	return allDoneDef.promise();
 
 	function chainDefError(data) {
-		allDoneDef.resolve({isSuccess: false, data: data, msg: this})
+		allDoneDef.reject({isSuccess: false, data: data, msg: this})
 	}
 }
 
@@ -605,7 +605,20 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 					type: 'PUT',
 					contentType: contentType,
 				 	data: paramObj[key].file, 
-					processData: false
+					processData: false,
+					xhr : uploadObj.progressBar || false,
+					// xhr: function() {
+					// 	uploadXhr = new window.XMLHttpRequest();
+
+					// 	uploadXhr.upload.addEventListener("progress", function(evt){
+					//       	if (evt.lengthComputable) {
+					//         	$(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
+					// 	      	$(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
+					//       	}
+					//     }, false);
+
+					//     return uploadXhr;
+					// }
 				});
 				return arr;
 			},[]))
@@ -618,7 +631,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			}})
 		}).fail(function() {
 			// 上傳s3 失敗
-			allDef.resolve({status: 999, isSuccess: false, data: arguments});
+			allDef.reject({status: 999, isSuccess: false, data: arguments});
 		});
 	})
 
@@ -1072,15 +1085,17 @@ QmiGlobal.gallery = function (data) {
 	        + "<figcaption id='caption'></figcaption>"
 	       	+ "<div class='preBtn arrowBtn'></div>"
 	        + "<div class='nextBtn arrowBtn'></div>"
-	        + "</figure></div>");
+	        + "<a class='download-link' href='"+ this.photoList[this.currentImage].s32
+	        + "' ><div></div></a></figure></div>");
 	var leftArrow = this.container.find(".preBtn");
 	var caption = this.container.find("#caption");
 	var rightArrow = this.container.find(".nextBtn");
 	var closeBtn  = this.container.find(".close");
 	var imgElement = this.container.find("img");
-
+	var downloadDom = this.container.find(".download-link");
 	imgElement.attr("src", this.photoList[this.currentImage].s32);
 	caption.html(this.currentImage + 1 + "/" + this.photoList.length);
+	downloadDom.attr("download", getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6 ));
 
 	closeBtn.on("click", this.close.bind(this));
 	leftArrow.on('click', this.showPreviousImage.bind(this));
@@ -1108,15 +1123,6 @@ QmiGlobal.gallery = function (data) {
 
 
 QmiGlobal.gallery.prototype = {
-	// container: $("<div id='galleryModal'>"
- //        + "<div class='gallery-contaniner'>"
- //        + "<span class='close'>×</span>"
- //        + "<img class='currentImg'>"
- //        + "<div class='preBtn arrowBtn'></div>"
- //        + "<div class='nextBtn arrowBtn'></div>"
- //        + "<div id='caption'></div>"
- //        + "</div></div>"),
-
 	getImageUrl: function() {
 		return new QmiAjax({
         	apiName: "groups/" + gi + "/files/" + this.photoList[this.currentImage].c 
@@ -1140,10 +1146,15 @@ QmiGlobal.gallery.prototype = {
 
 				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
 				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+				this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
+				this.container.find(".download-link").attr("download",
+					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
 			}.bind(this));
 		}
 		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-		caption.html(this.currentImage + 1 + "/" + this.photoList.length);
+		this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
+		this.container.find(".download-link").attr("download",
+					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
 		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
 	},
 
@@ -1160,9 +1171,15 @@ QmiGlobal.gallery.prototype = {
 				}
 				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
 				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+				this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
+				this.container.find(".download-link").attr("download",
+					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
 			}.bind(this));
 		}
 		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+		this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
+		this.container.find(".download-link").attr("download",
+					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
 		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
 	},
 
@@ -1170,128 +1187,8 @@ QmiGlobal.gallery.prototype = {
 		this.container.remove();
 		delete this.photoList;
 		delete this.container;
-		// this = {};
 	},
 }
-
-// showGallery = function(timelineID, galleryList, targetImgIndex, isApplyWatermark, watermarkText){
-// 	var galleryModal = new QmiGlobal.gallery(timelineID, galleryList);
-
-// 	galleryModal.create();
-
-// 	if (! galleryModal.hasMultiImage) {
-// 		galleryModal.hideArrow();
-// 	}
-// }
-
-// 	$("body").append("<div id='galleryModal'>"
-//         + "<div class='gallery-contaniner'>"
-//         + "<span class='close'>×</span>"
-//         + "<img class='currentImg'>"
-//         + "<div class='preBtn arrowBtn'></div>"
-//         + "<div class='nextBtn arrowBtn'></div>"
-//         + "<div id='caption'></div>"
-//         + "</div></div>");
-
-// 	var galleryModal = $("#galleryModal");
-// 	var currentImgElement = galleryModal.find(".currentImg");
-// 	// var currentImgUrl = galleryList[targetImgIndex].s32;
-// 	var photoNum = galleryList.length;
-
-
-// 	currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-
-// 	if (photoNum == 1) {
-// 		galleryModal.find(".arrowBtn").hide();
-// 	}
-
-// 	galleryModal.find(".preBtn").bind("click", function(e) {
-// 		if (targetImgIndex == 0) {
-// 			targetImgIndex = photoNum-1;
-// 		} else {
-// 			targetImgIndex -= 1;
-// 		}
-// 		if (! galleryList[targetImgIndex].s32) {
-// 			getS32file(timelineID, galleryList[targetImgIndex]).then(function(data) {
-// 				galleryList[targetImgIndex].s32 = data.s32;
-// 				currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-// 			});
-// 		} else {
-// 			currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-// 		}
-// 	});
-
-
-// 	galleryModal.find(".nextBtn").bind("click", function(e) {
-// 		if (targetImgIndex == photoNum-1) {
-// 			targetImgIndex = 0;
-// 		} else {
-// 			targetImgIndex += 1;
-// 		}
-// 		console.log(targetImgIndex);
-// 		if (! galleryList[targetImgIndex].s32) {
-// 			getS32file(timelineID, galleryList[targetImgIndex]).then(function(data) {
-// 				galleryList[targetImgIndex].s32 = data.s32;
-// 				currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-// 			});
-// 		} else {
-// 			currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-// 		}
-// 	});
-
-// 	galleryModal.find(".close").bind("click", function(e) {
-// 		galleryModal.remove();
-// 	});
-
-	
-// 	startIndex = startIndex || 0;
-//     var gallery = $(document).data("gallery");
-//     if( null != gallery && false==gallery.closed){
-//         gallery.focus();
-//         gallery.ui = ui;
-//         gallery.at = at;
-//         gallery.lang = lang;
-//         gallery.this_gi = this_gi;
-//         gallery.this_ti = this_ti;
-//         gallery.list = gallery_arr;
-//         gallery.startIndex = startIndex;
-//         gallery.title = title;
-//         gallery.isWatermark = isWatermark;
-//         gallery.watermarkText = watermarkText;
-//         var dataDom = $(gallery.document).find(".dataDom");
-//         dataDom.click();
-//     } else {
-//         gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
-//         $(document).data("gallery", gallery);
-
-//         gallery.ui = ui;
-//         gallery.at = at;
-//         gallery.lang = lang;
-//         gallery.this_gi = this_gi;
-//         gallery.this_ti = this_ti;
-//         gallery.list = gallery_arr;
-//         gallery.startIndex = startIndex;
-//         gallery.title = title;
-//         gallery.isWatermark = isWatermark;
-//         gallery.watermarkText = watermarkText;
-//         // $(gallery.document).ready(function(){
-//         //     setTimeout(function(){
-//         //         gallery.ui = ui;
-//         //         gallery.at = at;
-//         //         gallery.lang = lang;
-//         //         gallery.this_gi = this_gi;
-//         //         gallery.this_ti = this_ti;
-//         //         gallery.list = gallery_arr;
-//         //         gallery.startIndex = startIndex;
-//         //         gallery.title = title;
-//         //         gallery.isWatermark = isWatermark;
-//         //         gallery.watermarkText = watermarkText;
-//         //         var dataDom = $(gallery.document).find(".dataDom");
-//         //         dataDom.click();
-//         //     },0);
-//         // });
-//     }
-// }
 
 showAlbumPage = function( this_gi, this_ti, this_gai, name ){
 	if( null== window ) return;
@@ -2062,3 +1959,4 @@ myWait = function(variable,type){
 
   return deferred.promise();
 }
+

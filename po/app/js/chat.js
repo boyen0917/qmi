@@ -318,100 +318,98 @@ $(function(){
 					});
 				} else {
 					scrollToBottom();
-					var this_grid = showUnsendMsg("", 26, file.name);
+					var this_grid = showUnsendMsg("", 26, file.name, file.size);
+					this_grid.data("file-num", i).data("file", file);
+
+					sendMsgFile(this_grid);
+					// var uploadXhr;
+					
+					// this_grid.data("file-num", i).data("file", file)
+					// 		 .find(".chat-msg-load-error")
+					// 		 .removeClass("chat-msg-load-error").addClass("chat-msg-load");
+
+					// this_grid.find(".chat-file").after("<div class='progress-container'><progress " 
+					// 	+ " class='chat-upload-progress' value='0' ></progress><span class='upload-percent'>"
+					// 	+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
+
+					// this_grid.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+					// 	uploadXhr.abort();
+					// });
+
+					// qmiUploadFile({
+		   //              urlAjax: {
+		   //                  apiName: "groups/" + gi + "/files",
+		   //                  method: "post",
+		   //                  body: {
+		   //                      tp: 0,
+		   //                      ti: ti_chat,
+		   //                      pi: 0,
+		   //                      wm: 0,
+		   //                  }
+		   //              },
+		   //              tp: 0,
+		   //              hasFi: true,
+		   //              progressBar: function () {
+		   //              	uploadXhr = new window.XMLHttpRequest();
+					// 		uploadXhr.upload.addEventListener("progress", function(evt){
+					// 	      	if (evt.lengthComputable) {
+					// 	        	this_grid.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
+					// 		      	this_grid.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
+					// 	      	}
+					// 	    }, false);
+
+					// 	    return uploadXhr;
+		   //              },
+		   //              file: file,
+		   //              oriObj: {w: 1280, h: 1280, s: 0.9}
+		   //          }).done(function(response){
+		   //          	console.log(response);
+		   //          	// var this_grid = showUnsendMsg(response.data.fi, 26, file.name);
+		   //          	var chatData = this_grid.data("data");
+		   //          	var currentTime = new Date().getTime();
 						
-					this_grid.data("file-num", i).data("file", file)
-					.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
-
-					qmiUploadFile({
-		                urlAjax: {
-		                    apiName: "groups/" + gi + "/files",
-		                    method: "post",
-		                    body: {
-		                        tp: 0,
-		                        ti: ti_chat,
-		                        pi: 0,
-		                        wm: 0,
-		                    }
-		                },
-		                tp: 0,
-		                hasFi: true,
-		                file: file,
-		                oriObj: {w: 1280, h: 1280, s: 0.9}
-		            }).done(function(response){
-		            	// var this_grid = showUnsendMsg(response.data.fi, 26, file.name);
-		            	var chatData = this_grid.data("data");
-		            	var currentTime = new Date().getTime();
-						
-						this_grid.data("file-num", i);
-						this_grid.data("file", file);
+					// 	this_grid.data("file-num", i);
+					// 	this_grid.data("file", file);
 
 
-						g_idb_chat_msgs.remove(chatData.ei);
+					// 	g_idb_chat_msgs.remove(chatData.ei);
 
-						// tmpData.ml[0].c = data.fi;
-						// tmpData.ml[0].p = pi;
-						// //add new data to db & show
-						var newData = {
-							ei: chatData.ei,
-							meta: {
-								gu: g_group.gu,
-								ct: currentTime
-							},
-							ml: [
-								{
-									tp: 26,
-									c: response.data.fi,
-									fn: file.name
-								}
-							],
-							notSend: true
-						};
+					// 	// tmpData.ml[0].c = data.fi;
+					// 	// tmpData.ml[0].p = pi;
+					// 	// //add new data to db & show
+					// 	var newData = {
+					// 		ei: chatData.ei,
+					// 		meta: {
+					// 			gu: g_group.gu,
+					// 			ct: currentTime
+					// 		},
+					// 		ml: [
+					// 			{
+					// 				tp: 26,
+					// 				c: response.data.fi,
+					// 				si: file.size,
+					// 				fn: file.name
+					// 			}
+					// 		],
+					// 		notSend: true
+					// 	};
 
-						var node = {
-							gi: gi,
-							ci: ci,
-							ei: chatData.ei,
-							ct: currentTime,
-							data: newData
-						};
-						this_grid.data("data", newData);
-						//update db
-						g_idb_chat_msgs.put(node, function(){
-							sendMsgText(this_grid);
-						});
-
-						// console.log(this_grid.data("data"));
-
-						// var newData = {
-						// 	ei: chatData.ei,
-						// 	meta: {
-						// 		gu: g_group.gu,
-						// 		ct: currentTime
-						// 	},
-						// 	ml: [{
-						// 		c: response.data.fi,
-						// 		tp: 26,
-						// 		fn: file.name
-						// 	}]
-						// };
-
-						// var node = {
-						// 	gi: gi,
-						// 	ci: ci,
-						// 	ei: chatData.ei,
-						// 	ct: currentTime,
-						// 	data: newData
-						// };
-
-						// g_idb_chat_msgs.put(node, function(){
-						// 	console.log(newData);
-						// 	showMsg(newData);
-						// 	this_grid.remove();
-						// 	if( g_isEndOfPage === true ) scrollToBottom();
-						// });
-
-		            });
+					// 	var node = {
+					// 		gi: gi,
+					// 		ci: ci,
+					// 		ei: chatData.ei,
+					// 		ct: currentTime,
+					// 		data: newData
+					// 	};
+					// 	this_grid.data("data", newData);
+					// 	//update db
+					// 	g_idb_chat_msgs.put(node, function(){
+					// 		sendMsgText(this_grid);
+					// 	});
+		   //          }).fail(function(data) {
+		   //          	this_grid.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+		   //          	this_grid.find(".progress-container").remove();
+		   //          });
 
 					// this_grid.find("div").html('<span>file not supported</span>');
 					// popupShowAdjust("",
@@ -1262,6 +1260,7 @@ function showMsg(object, bIsTmpSend) {
 	var time = new Date(object.meta.ct);
 	if (null == object.ml || object.ml.length <= 0) return;
 	var msgData = object.ml[0];
+	var chatFailContainer;
 	var msgDiv;
 	var isMe = ( object.meta.gu == g_group.gu );
 	var unSend = object.hasOwnProperty("notSend");
@@ -1284,31 +1283,53 @@ function showMsg(object, bIsTmpSend) {
 			if (bIsTmpSend) {
 				status.addClass('chat-msg-load');
 			}
-			else  status.addClass('chat-msg-load-error');
-			status.click(function () {
-				if ($(this).hasClass("chat-msg-load-error")) {
-					popupShowAdjust("", $.i18n.getString("CHAT_FAIL_SENDING_MSG"), true, true, [sendChat, container]);
-					$(".popup-confirm").html($.i18n.getString("CHAT_RESEND"));
-					$(".popup-cancel").html($.i18n.getString("COMMON_DELETE"));
-					$(".popup-cancel").off("click").click(function () {
-						var data = container.data("data");
-						if (data) {
-							g_idb_chat_msgs.remove(data.ei);
-						}
-						container.hide('slow', function () {
-							container.remove();
-						});
-						$(".popup-screen").hide();
-						$(".popup").hide();
-						QmiGlobal.popup.prototype.removeE();
+			else {
+				chatFailContainer = $("<div class='chat-fail-status'><a class='chat-resend'>"
+					+ "重送</a> | <a class='chat-remove'>刪除</a></div>");
+
+				chatFailContainer.find(".chat-resend").click(function (e) {
+					e.stopPropagation();
+					sendChat(container);
+				});
+
+				chatFailContainer.find(".chat-remove").click(function (e) {
+					e.stopPropagation();
+
+					var data = container.data("data");
+					if (data) {
+						g_idb_chat_msgs.remove(data.ei);
+					}
+
+					container.hide('slow', function () {
+						container.remove();
 					});
-					$(".popup-screen").off("click").click(function () {
-						$(".popup-screen").hide();
-						$(".popup").hide();
-					});
-				}
-			});
-			td.append(status);
+				});
+				// status.addClass('chat-msg-load-error');
+				// td.append(status);
+			}
+			// status.click(function () {
+			// 	if ($(this).hasClass("chat-msg-load-error")) {
+			// 		popupShowAdjust("", $.i18n.getString("CHAT_FAIL_SENDING_MSG"), true, true, [sendChat, container]);
+			// 		$(".popup-confirm").html($.i18n.getString("CHAT_RESEND"));
+			// 		$(".popup-cancel").html($.i18n.getString("COMMON_DELETE"));
+			// 		$(".popup-cancel").off("click").click(function () {
+			// 			var data = container.data("data");
+			// 			if (data) {
+			// 				g_idb_chat_msgs.remove(data.ei);
+			// 			}
+			// 			container.hide('slow', function () {
+			// 				container.remove();
+			// 			});
+			// 			$(".popup-screen").hide();
+			// 			$(".popup").hide();
+			// 			QmiGlobal.popup.prototype.removeE();
+			// 		});
+			// 		$(".popup-screen").off("click").click(function () {
+			// 			$(".popup-screen").hide();
+			// 			$(".popup").hide();
+			// 		});
+			// 	}
+			// });
 		} else {
 			td.append("<div></div>");
 		}
@@ -1320,6 +1341,7 @@ function showMsg(object, bIsTmpSend) {
 
 		msgDiv = $("<div></div>");
 		div.append(msgDiv);
+		div.append(chatFailContainer);
 	} else {
 		//left align
 		var mem = getMemberData(object.meta.gu)
@@ -1466,10 +1488,11 @@ function showMsg(object, bIsTmpSend) {
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			console.log(msgData);
-			var fileDom = $("<a class='chat-file' download='" + msgData.fn 
-				+ "'><img src='images/timeline/otherfile_icon.png'>"
-				+ msgData.fn + "</a>");
+			var fileSize = msgData.si ? msgData.si.toFileSize() : "0 bytes";
+			var fileDom = $("<div class='chat-file'>" + "<p class='name'>" + msgData.fn 
+				+ "</p><p>副檔名 : " + msgData.fn.split(".")[msgData.fn.split(".").length - 1] 
+				+ "</p><p clas>檔案大小 : " + fileSize  + "</p><a class='download-link' download='" 
+				+ msgData.fn + "'>下載</a></div>");
 			msgDiv.append(fileDom);
 			getChatS3file(fileDom, msgData.c, msgData.tp, ti_chat);
 			break;
@@ -1503,7 +1526,7 @@ function showMsgMap(msgData, container) {
 	container.append(mapDiv);
 }
 
-function showUnsendMsg(c, tp, fn) {
+function showUnsendMsg(c, tp, fn, size) {
 	var eiTmp = "{0}_{1}_{2}".format( randomHash(11), randomHash(11), randomHash(11));
 	var time = new Date().getTime();
 	var newData = {
@@ -1516,7 +1539,8 @@ function showUnsendMsg(c, tp, fn) {
 			{
 				c: c,
 				tp: tp,
-				fn: fn
+				fn: fn,
+				si: size
 			}
 		],
 		notSend: true
@@ -1550,6 +1574,9 @@ function sendChat(dom) {
 				break;
 			case 7: //video
 				sendMsgVideo(dom);
+				break;
+			case 26: //file
+				sendMsgFile(dom);
 				break;
 		}
 	} catch (e) {
@@ -1744,6 +1771,110 @@ function sendMsgText(dom) {
 		// }
 	}
 
+	function sendMsgFile(dom) {
+		var file = dom.data("file");
+		var tmpData = dom.data("data");
+		var uploadXhr;
+		if (null == file) {
+			setTimeout(function () {
+				popupShowAdjust("",
+					$.i18n.getString("CHAT_UPLOAD_FILE_MISSING"),
+					$.i18n.getString("COMMON_OK"),
+					"", [function () { //on ok
+						g_idb_chat_msgs.remove(tmpData.ei);
+						dom.hide('slow', function () {
+							dom.remove();
+						});
+					}]
+				);
+			}, 500);
+			return;
+		}
+
+		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
+
+		dom.find(".chat-file").after("<div class='progress-container'><progress class='" 
+			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>"
+			+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
+
+		dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+			uploadXhr.abort();
+		});
+
+		dom.find(".chat-fail-status").hide();
+
+		qmiUploadFile({
+            urlAjax: {
+                apiName: "groups/" + gi + "/files",
+                method: "post",
+                body: {
+                    tp: 0,
+                    ti: ti_chat,
+                    pi: 0,
+                    wm: 0,
+                }
+            },
+            tp: 0,
+            hasFi: true,
+            progressBar: function () {
+            	uploadXhr = new window.XMLHttpRequest();
+				uploadXhr.upload.addEventListener("progress", function(evt){
+			      	if (evt.lengthComputable) {
+			        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
+				      	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
+			      	}
+			    }, false);
+
+			    return uploadXhr;
+            },
+            file: file,
+            oriObj: {w: 1280, h: 1280, s: 0.9}
+        }).done(function(response){
+        	// var this_grid = showUnsendMsg(response.data.fi, 26, file.name);
+        	var chatData = dom.data("data");
+        	var currentTime = new Date().getTime();
+			
+			g_idb_chat_msgs.remove(chatData.ei);
+
+			// tmpData.ml[0].c = data.fi;
+			// tmpData.ml[0].p = pi;
+			// //add new data to db & show
+			var newData = {
+				ei: chatData.ei,
+				meta: {
+					gu: g_group.gu,
+					ct: currentTime
+				},
+				ml: [
+					{
+						tp: 26,
+						c: response.data.fi,
+						si: file.size,
+						fn: file.name
+					}
+				],
+				notSend: true
+			};
+
+			var node = {
+				gi: gi,
+				ci: ci,
+				ei: chatData.ei,
+				ct: currentTime,
+				data: newData
+			};
+			dom.data("data", newData);
+			//update db
+			g_idb_chat_msgs.put(node, function(){
+				sendMsgText(dom);
+			});
+        }).fail(function(data) {
+        	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+        	dom.find(".chat-fail-status").show();
+        	dom.find(".progress-container").remove();
+        });
+	}
+
 	/**
 	處理按下送出或enter送出事件
 	**/
@@ -1792,6 +1923,7 @@ function sendMsgText(dom) {
 			```
 	**/
 	getChatS3file = function (target, file_c, tp, this_ti, this_tu) {
+
 		this_ti = this_ti || ti;
 		if (!file_c || file_c.length == 0) {
 			cns.debug("null file,", "file_c:", file_c, "tp", tp
@@ -1878,7 +2010,7 @@ function sendMsgText(dom) {
 						break;
 
 					case 26://檔案
-						target.attr("href", obj.s3);
+						target.find(".download-link").attr("href", obj.s3).show();
 						break;
 				}
 			} else {

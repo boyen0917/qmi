@@ -715,15 +715,26 @@ body {
 	color: #fff283;
 }
 
+.chat-fail-status{
+	margin-right: 10px;
+	color: #887C7C;
+}
+
+.chat-fail-status a {
+	margin-top: 12px;
+	text-decoration: none;
+	color: #887C7C;
+	cursor: pointer;
+	font-size: 14px;
+	padding: 0px 6px;
+}
+
 .chat-file {
-	min-width: 16em;
+	min-width: 13em;
 	display: block;
-	height: 37px;
+	max-height: 100px;
 	border: 1px solid #dddddd;
-	background-image: url(../images/chatroom/download_icon.png);
-	background-color: #99c6ff;
-	background-position: 97% 45%;
-	background-size: 28px 28px;
+	background-color: rgba(41, 87, 171, 0.23);
 	background-repeat: no-repeat;
 	border-radius: 12px;
 	padding: 8px 10px;
@@ -735,6 +746,66 @@ body {
 .chat-file img{
 	vertical-align: text-bottom;
   	padding-right: 3px;
+}
+
+.chat-file .download-link{
+	display: none;
+	float: right;
+  	margin-top: 12px;
+  	text-decoration: none;
+  	color: #3893E0;
+  	cursor: pointer;
+}
+
+.chat-file p{
+	margin: 0px 0px 2px 0px;
+	color: rgb(89, 87, 87);
+  	font-weight: 600;
+}
+
+.chat-file p.name{
+	color: rgb(29, 106, 129);
+	font-size: 16px;
+	font-weight: bolder;
+}
+
+.progress-container{
+	text-align: right;
+}
+
+.chat-upload-progress {
+	margin-left: 8px;
+	/*background-color: #d2d2d2;*/
+	width: 60%;
+	height: 7px;
+	border-radius: 10px;
+}
+
+.chat-upload-progress::-webkit-progress-bar {
+	background-color: rgba(58, 38, 38, 0.21);
+	border-radius: 8px;
+}
+
+.chat-upload-progress::-webkit-progress-value {
+	background-color: rgb(24, 215, 49);
+	border-radius: 8px;
+}
+
+.upload-percent {
+	margin-left: 10px;
+  	vertical-align: sub;
+}
+
+.chat-upload-progress-cancel {
+	background-color: transparent;
+	color: red;
+	border: 0;
+	font-size: 16px;
+	margin-left: 10px;
+	width: 18px;
+	padding: 0;
+	vertical-align: middle;
+	cursor: pointer;
 }
 /*.chat-msg-bubble-left.active, .chat-msg-bubble-right.active{
 	background-color: rgb(246,63,12);

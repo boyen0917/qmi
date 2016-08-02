@@ -16,8 +16,8 @@ var ui,
 	isShowNotification = true,
 
 	//HiCloud
+ 	// base_url = "https://ap.qmi.emome.net/apiv1/",
  	base_url = "https://apserver.mitake.com.tw/apiv1/",
- 	
 	//local測試 預設開啟console
 	debug_flag = false;
 	if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
@@ -43,7 +43,7 @@ String.prototype.qmiTag = function (tagMember) {
 
 Number.prototype.toFileSize = function () {
 	var unitIndex = Math.floor( Math.log(this) / Math.log(1024) );
-    return (this / Math.pow(1024, unitIndex)).toFixed(2) * unitIndex + ' ' 
+    return (this / Math.pow(1024, unitIndex)).toFixed(2) + ' ' 
     	+ ['B', 'kB', 'MB', 'GB', 'TB'][unitIndex];
 }
 

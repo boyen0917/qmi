@@ -1644,9 +1644,7 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailB
     });
 
     $.when.apply($, deferTasks).then(function () {
-        if(triggerDetailBox) {
-            triggerDetailBox.data("trigger", true);
-        }
+        triggerDetailBox.data("trigger", true);
     });
 }
 
@@ -6075,7 +6073,9 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
             }
             else{
                 if (i == 4) {
-                    this_img.html("<h1>+ " + (Object.keys(gallery_arr).length - 5).toString() + "</h1>");
+                    if (Object.keys(gallery_arr).length > 5) {
+                        this_img.html("<h1>+ " + (Object.keys(gallery_arr).length - 5).toString() + "</h1>");
+                    }
                 }
                 right.append(this_img);
             }
@@ -7139,7 +7139,7 @@ clearReplyDomData = function(this_event) {
     //重置
     this_event.find(".st-reply-message-textarea textarea").val("");
     this_event.find(".st-reply-message-img").data("id",null);
-    this_event.find(".st-reply-message-img").data("type",null);
+    // this_event.find(".st-reply-message-img").data("type",null);
     this_event.find(".st-reply-message-img").data("file",null);
     this_event.find(".st-reply-message-img").html("");  //清掉sticker預覽
 }

@@ -3011,7 +3011,21 @@ img.st-user-pic{
 #galleryModal #caption {
     font-size: large;
     color: white;
-    text-align: right;
+    text-align: center;
+    margin-top: 10px;
+}
+
+#galleryModal:hover a div {
+  	content: "";
+  	width: 50px;
+  	height: 50px;
+  	background-image: url("../images/dl.png");
+  	background-size: contain;
+  	position: absolute;
+ 	right: 90px;
+  	bottom: 60px;
+  	cursor: pointer;
+  	opacity: 0.8;
 }
 
 .currentImg {
@@ -3537,11 +3551,12 @@ img.st-reply-message-attach {
 }
 
 .st-reply-message-img .file-cancel{
-	vertical-align: super;
-    height: 20px;
-    width: 20px;
-    margin-left: 22px;
-    cursor: pointer;
+  	vertical-align: text-top;
+  	height: 20px;
+  	width: 20px;
+  	margin-left: 22px;
+  	cursor: pointer;
+  	margin-top: -1px;
 }
 
 .st-reply-message-img .img{
