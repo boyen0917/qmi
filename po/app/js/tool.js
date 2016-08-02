@@ -1171,9 +1171,13 @@ QmiGlobal.gallery.prototype = {
 	},
 
 	close: function() {
-		this.container.remove();
-		delete this.photoList;
-		delete this.container;
+		var self = this;
+		self.container.fadeOut(300, function() {
+			self.remove();
+			delete self.photoList;
+			delete self.container;
+		})
+		
 		// this = {};
 	},
 }

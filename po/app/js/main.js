@@ -1438,6 +1438,11 @@ $(function(){
 		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
 	})
 
+	// 8-2-16 阻止拖拉橫移
+	$(".subpage-timeline.main-subpage").on("scroll", function(){
+		$(this).scrollLeft(0)
+	})
+
 	
 	//貼文-下方附檔功能bar
 	$(".cp-addfile").click(function(){

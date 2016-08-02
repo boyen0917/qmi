@@ -2970,23 +2970,27 @@ img.st-user-pic{
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
     background-color: rgba(0,0,0,0.9);
 }
 
 .gallery-contaniner {
 	width: 90%;
-    height: 90%;
-    margin: auto;
+    height: 80%;
+    margin: 8% auto;
 }
 
 #galleryModal .close {
 	color: white;
-	font-size: xx-large;
-	position: relative;
-	left: 93%;
-	cursor: pointer;
-	text-shadow: 2px 2px 2px #aaa;
+    font-size: xx-large;
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    text-shadow: 1px 1px 2px #ddd;
+    width: 15%;
+    height: 15%;
+    text-align: center;
+    line-height: 13vh;
 }
 
 #galleryModal .arrowBtn {
@@ -3013,6 +3017,9 @@ img.st-user-pic{
     font-size: large;
     color: white;
     text-align: right;
+    position: absolute;
+    right: 5%;
+    bottom: 2%;
 }
 
 .currentImg {
