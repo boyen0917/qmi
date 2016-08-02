@@ -16,8 +16,8 @@ var ui,
 	isShowNotification = true,
 
 	//HiCloud
- 	// base_url = "https://ap.qmi.emome.net/apiv1/",
- 	base_url = "https://apserver.mitake.com.tw/apiv1/",
+ 	base_url = "https://ap.qmi.emome.net/apiv1/",
+ 	// base_url = "https://apserver.mitake.com.tw/apiv1/",
 	//local測試 預設開啟console
 	debug_flag = false;
 	if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
