@@ -4636,7 +4636,7 @@ composeSend = function (this_compose){
                         if(resObj.isSuccess === false) return;
 
                         body.ml.push({
-                            fi: resObj.data.fi,
+                            c: resObj.data.fi,
                             p: 0,
                             tp: 6
                         });
@@ -4673,7 +4673,7 @@ composeSend = function (this_compose){
                         if(resObj.isSuccess === false) return;
 
                         body.ml.push({
-                            fi: resObj.data.fi,
+                            c: resObj.data.fi,
                             p: 0,
                             tp: 7
                         });
@@ -4729,10 +4729,10 @@ composeSend = function (this_compose){
     progressBarObj.init();
 
     $.when.apply($, uploadDefArr).done(function() {
-        console.log("uploadDefArr done", arguments);
-        setTimeout(progressBarObj.close, 500)
-        
-        composeSendApi(body);
+        setTimeout(function() {
+            progressBarObj.close(); 
+            composeSendApi(body);
+        }, 500);
     // 取消
     }).fail(function() {
         progressBarObj.close();
@@ -4741,11 +4741,12 @@ composeSend = function (this_compose){
     function composeProgressBar() {
         return {
             init: function() {
+                if(uploadTotalCnt === 0) return;
                 $("#compose-progressbar").remove();
                 $("body").append($("<section>", {
                     id: "compose-progressbar",
                     style: "display: block",
-                    html: "<div class='container'><div class='bar'></div>" + 
+                    html: "<div class='container'><div class='title'>"+ $.i18n.getString("FILESHARING_UPLOADING") +"</div><div class='bar'></div>" + 
                             "<button>"+ $.i18n.getString("COMMON_CANCEL") +"</button>" + 
                             "<div class='cnt'><span class='curr' num='0'></span> / <span class='total'>"+ uploadTotalCnt +"</span></div></div>"
                 }));
@@ -4758,6 +4759,8 @@ composeSend = function (this_compose){
             },
 
             add: function() {
+                if(uploadTotalCnt === 0) return;
+
                 uploadCurrCnt++;
                 $("#compose-progressbar")
                 .find("span.curr").attr("num", uploadCurrCnt).end()
@@ -4765,6 +4768,7 @@ composeSend = function (this_compose){
             },
 
             close: function() {
+                if(uploadTotalCnt === 0) return;
                 $("#compose-progressbar").remove();
             }
         }

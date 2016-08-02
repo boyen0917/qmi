@@ -339,6 +339,7 @@
 	"FILESHARING_DELETE_CONFIRM" : "Are you sure to delete this file ?",
 	"FILESHARING_DELETE_OK" : "delete successful",
 	"FILESHARING_HOME" : "home",
+	"FILESHARING_UPLOADING" : "uploading..",
 	"COMMON_UNKNOWN_ERROR" : "unknown error",
 
 	"PERSONAL_INFORMATION" : "Profile",
@@ -349,7 +350,7 @@
 	"SYSTEM_SET" : "Notifications",
 	"DEFAULT_GROUP_SET" : "Default Login Group",
 	"TOP_PAGE_SET" : "Top Slide Show",
-	"GUIHU" : "歸戶",
+	"GUIHU" : "LDAP Account Binding",
 
 	"ORIGIN_PASSWORD" : "Current Password",
 	"NEW_PASSWORD" : "New Password",

@@ -2965,7 +2965,7 @@ img.st-user-pic{
 #galleryModal {
 	/*display: none; */
     position: fixed; 
-    z-index: 101; 
+    z-index: 1010; 
     left: 0;
     top: 0;
     width: 100%;
@@ -3428,22 +3428,7 @@ img.st-reply-message-attach {
 	height: 36px;
 }
 
-.st-reply-message-textarea .tag-members-container {
-	display: none;
-	position: absolute;
-    margin: -217px auto;
-    width: -webkit-calc( 100% - 186px );
-    height: 200px;
-    padding: 5px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    box-shadow: 10px 5px 20px #555555;
-    background: white;
-}
-
-.tag-members-container img{
-	float: none;
-}
+.st-reply-message-textarea.adjust .tag-members-container { bottom: 60px; margin: 0;}
 
 .st-reply-message-textarea textarea {
 	background: transparent;
@@ -3705,20 +3690,17 @@ img.st-reply-message-attach {
 .cp-content-textarea{
     min-height: 80px;
     margin-bottom: 20px;
+    padding: 15px 0;
 }
 
 
-.cp-content-textarea .tag-members-container{
+.cp-content-textarea .tag-members-container, .st-reply-message-textarea .tag-members-container{
    	display: none;
 	position: absolute;
-    width: -webkit-calc( 100% - 290px );
-    margin: 0px 120px;
-    height: 200px;
-    padding: 5px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    box-shadow: 10px 5px 20px #555555;
+    width: 300px;
+    box-shadow: 1px 1px 10px 2px #bbb;
     background: white;
+    margin: 0px 120px;
 }
 
 .cp-attach-area {
@@ -3968,7 +3950,8 @@ img.st-reply-message-attach {
 	max-height: 200px;
 	overflow-y: auto;
     position: relative;
-    padding-top: 29px;
+    margin-bottom: 25px;
+    top: 25px;
     left: 7px;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -5742,7 +5725,14 @@ section.fileSharing section.progress-bar .frame .cancel ,#compose-progressbar bu
 	cursor: pointer;
 }
 
-#compose-progressbar { z-index: 10 }
+#compose-progressbar { z-index: 1010 }
+#compose-progressbar .title { 
+	position: absolute;
+    bottom: 20px;
+    white-space: nowrap;
+    width: 100%;
+}
+
 #compose-progressbar button:focus { outline: none; }
 #compose-progressbar button {
 	top: -7px;
@@ -5761,34 +5751,40 @@ section.subpage-fileSharing{
 
 /* ======================================== tag 成員畫面 ===================================================== */
 
-.tag-list {
-	list-style: none;
-    background-color: white;
-    padding: 0;
-    margin: 3px;
-    min-height: 190px;
-    width: 100%;
+div.tag-members-container ul.tag-list {
+	padding: 0px;
+    margin: 0;
+    width: 299px;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.tag-list .member-mugshot{
-	width: 30px;
-    height: 30px;
-    margin-top: 10px;
+div.tag-members-container ul.tag-list .member-mugshot{
+	width: 40px;
+    height: 40px;
     margin-right: 10px;
     float: none;
-    vertical-align: bottom;
+    vertical-align: middle;
 }
 
-.tag-list li{
-	line-height: 25px;
+div.tag-members-container ul.tag-list li{
 	cursor: pointer;
+    white-space: nowrap;
+    width: 290px;
+    text-overflow: ellipsis;
+    height: 50px;
+    padding-right: 15px;
+    overflow: hidden;
 }
 
-.tag-list li:hover{
+div.tag-members-container ul.tag-list a { line-height: 45px;padding-left: 5px;}
+
+div.tag-members-container ul.tag-list li:hover{
 	background-color: rgba(106, 163, 241, 0.29);
 }
 
-.tag-list a:hover{
+div.tag-members-container ul.tag-list a:hover{
 	color: black;
 }
 

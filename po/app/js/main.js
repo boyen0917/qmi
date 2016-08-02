@@ -1383,17 +1383,6 @@ $(function(){
 			},1000);
 			return false;
 		}
-
-		//網址截取 預備判斷 **此功能取消**
-		// if(this_compose.data("parse-error")) {
-		// 	$('.ui-loader').css("display","block");
-		// 	$(".ajax-screen-lock").show();
-		// 	cns.debug("parse url again");
-		// 	this_compose.data("url-chk",false);
-		// 	this_compose.data("parse-resend",true);
-		// 	this_compose.find('.cp-textarea-desc').trigger("input");
-		// 	return false;
-		// }
  			
 		this_compose.data("compose-content",$('.cp-content-highlight').html());
 		this_compose.data("compose-title",$('.cp-textarea-title').val());
@@ -1442,6 +1431,12 @@ $(function(){
  		});
 		if(empty_chk) composeSend(this_compose);   
 	});
+
+	// 偵測貼上事件 避免html 換成text文本
+	$("#page-compose").on("paste", ".cp-content-highlight", function(e){
+		e.preventDefault();
+		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
+	})
 
 	
 	//貼文-下方附檔功能bar
@@ -1620,7 +1615,7 @@ $(function(){
 					this_compose.find(".cp-attach-area").show();
 					this_compose.find(".cp-file-area").show();
 					videoArea.html("").show();
-					var this_grid =  $('<div class="cp-grid"><div><video data-file-num="'+i+'"/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
+					var this_grid =  $('<div class="cp-grid"><div><video data-file-num="'+ai+'"/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
 				
 					//編號 方便刪除
 					this_grid.data("file-num", ai);
@@ -1633,7 +1628,7 @@ $(function(){
 						//附檔區域存在附檔
 						this_compose.data("attach",true);
 					}
-					renderVideoFile(file, videoArea.find('video[data-file-num="'+i+'"]'), function (videoTag) {
+					renderVideoFile(file, videoArea.find('video[data-file-num="'+ai+'"]'), function (videoTag) {
 						videoTag.parent().addClass("loaded");
 						if( videoTag.width() > 100 ){
 							videoTag.css("margin-left",-(videoTag.width()-100)*0.5);

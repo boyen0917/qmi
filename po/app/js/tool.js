@@ -1069,7 +1069,7 @@ QmiGlobal.gallery = function (data) {
 	this.isApplyWatermark = data.isApplyWatermark;
 	this.watermarkText = data.watermarkText;
 
-	this.container =  $("<div id='galleryModal'>"
+	this.container =  $("<div id='galleryModal' style='display:none;'>"
 	        + "<div class='close'>×</div>"
 	        + "<figure class='gallery-contaniner'>"
 	        // + "<div class='gallery-content'>"
@@ -1092,6 +1092,7 @@ QmiGlobal.gallery = function (data) {
 	rightArrow.on('click', this.showNextImage.bind(this));
 
 	$("body").append(this.container);
+	this.container.fadeIn();
 
 	this.hasMultiImage = function () {
 		if (this.photoList.length == 1) {

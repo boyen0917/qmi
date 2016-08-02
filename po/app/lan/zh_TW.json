@@ -337,7 +337,9 @@
 	"FILESHARING_DELETE_CONFIRM" : "確定刪除此檔案?",
 	"FILESHARING_DELETE_OK" : "刪除成功",
 	"FILESHARING_HOME" : "首頁",
+	"FILESHARING_UPLOADING" : "檔案上傳中",
 	"COMMON_UNKNOWN_ERROR" : "未知錯誤",
+
 
 	"REFRESH_RELOAD" : "讀取失敗，請稍後再試",
 	"REFRESH_TEXT" : "私雲轉移中 此團體暫時無法操作",
