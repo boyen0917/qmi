@@ -4729,9 +4729,14 @@ composeSend = function (this_compose){
     progressBarObj.init();
 
     $.when.apply($, uploadDefArr).done(function() {
+        // 有一個失敗就不傳
+        var errorFlag = false;
+        Array.prototype.forEach.call(arguments, function(resObj) {
+            if(resObj.isSuccess === false) errorFlag = true;
+        })
         setTimeout(function() {
             progressBarObj.close(); 
-            composeSendApi(body);
+            if(errorFlag === false) composeSendApi(body);
         }, 500);
     // 取消
     }).fail(function() {
@@ -4764,7 +4769,7 @@ composeSend = function (this_compose){
                 uploadCurrCnt++;
                 $("#compose-progressbar")
                 .find("span.curr").attr("num", uploadCurrCnt).end()
-                .find(".bar").css("width", (100*(uploadCurrCnt/uploadTotalCnt)-1)+"%");
+                .find(".bar").css("width", (100*(uploadCurrCnt/uploadTotalCnt)-1.5)+"%");
             },
 
             close: function() {
