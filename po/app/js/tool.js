@@ -892,22 +892,20 @@ uploadGroupVideo = function(this_gi, file, video, ti, permission_id, ori_arr, tm
 
 getVideoImgUrl = function(file) {
 	var deferred = $.Deferred(),
-		fileURL = URL.createObjectURL(file);
+		fileURL = URL.createObjectURL(file),
+		video = document.createElement('video');
 
-
-	var video = document.createElement('video');
 	video.src = fileURL;
 
 	video.onloadeddata = function() {
 		var canvas = document.createElement('canvas');
 		canvas.width = video.videoWidth;
 		canvas.height = video.videoHeight;
+		canvas.getContext('2d').drawImage( video, 0, 0, video.videoWidth, video.videoHeight);
 
-		var context = canvas.getContext('2d');
-        canvas.getContext('2d').drawImage( video, 0, 0, video.videoWidth, video.videoHeight);
- 
-		deferred.resolve(canvas.toDataURL());
+		deferred.resolve(canvas.toDataURL())
 	}
+
 	return deferred.promise();
 }
 
@@ -1112,14 +1110,6 @@ QmiGlobal.gallery = function (data) {
 
 
 QmiGlobal.gallery.prototype = {
-	// container: $("<div id='galleryModal'>"
- //        + "<div class='gallery-contaniner'>"
- //        + "<span class='close'>×</span>"
- //        + "<img class='currentImg'>"
- //        + "<div class='preBtn arrowBtn'></div>"
- //        + "<div class='nextBtn arrowBtn'></div>"
- //        + "<div id='caption'></div>"
- //        + "</div></div>"),
 
 	getImageUrl: function() {
 		return new QmiAjax({
@@ -1173,7 +1163,7 @@ QmiGlobal.gallery.prototype = {
 	close: function() {
 		var self = this;
 		self.container.fadeOut(300, function() {
-			self.remove();
+			self.container.remove();
 			delete self.photoList;
 			delete self.container;
 		})
@@ -1693,24 +1683,6 @@ renderVideoFile = function(file, videoTag, onload, onError){
 				videoTag.addClass("error");
 				if(onError) onError(videoTag);
 			}
-			// var timer = 0;
-			// video.addEventListener('progress', function (e) {
-			//     if (this.buffered.length > 0) {
-
-			//         if (timer != 0) {
-			//             clearTimeout(timer);
-			//         }
-
-			//         timer = setTimeout(function () {
-			//         	var loadPercent = parseInt(video.buffered.end(0) / video.duration * 100);
-			//             if( loadPercent== 100 ) {
-			//                 if( onload ) onload(videoTag);
-			//                 clearTimeout(timer);
-			//             };          
-			//         }, 1500);
-
-			//     }
-			// }, false); 
 		} else {
 			if(onload) onload(videoTag);
 		}

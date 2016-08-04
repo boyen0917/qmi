@@ -249,11 +249,12 @@
 	"CHAT_UPLOAD_FILE_MISSING" : "上傳檔案遺失, 請重新上傳",
 	"CHAT_SCROLL_UP_TO_UPDATE" : "上捲更新...",
 
-	"NOTICES_TITLE"						: "新通知",
-	"NOTICES_POST"						: "發佈",
-	"NOTICES_RESPONSE"						: "回覆",
-	"NOTICES_UPLOAD_FILE"						: "並上傳了檔案",
-	"NOTICES_RESPONSER_NUM"					: "及其他%ld個人",
+	"NOTICES_TITLE"			: "新通知",
+	"NOTICES_POST"			: "發佈",
+	"NOTICES_RESPONSE"		: "回覆",
+	"NOTICES_UPLOAD_FILE"	: "並上傳了檔案",
+	"NOTICES_RESPONSER_NUM"	: "及其他%ld個人",
+	"NOTICES_NOMSG_BRIAN"	: "沒有訊息",
 
 	"LEFT_FEED" : "動態消息",
 	"LEFT_GROUP" : "團體",

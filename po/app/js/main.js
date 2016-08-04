@@ -671,11 +671,9 @@ $(function(){
 	$(document).on('click','.st-reply-message-img .img',function(){
 		var tmp = $(this).parent();
 		tmp.html("");
-		cns.debug( tmp.data("type") );
 		tmp.removeData("type");
 		tmp.removeData("id");
 		tmp.removeData("file");
-		cns.debug( tmp.data("type") );
 	});
 
 	$(document).on('click','.st-reply-message-img .file-cancel',function(){
@@ -695,10 +693,16 @@ $(function(){
 
 	//圖片檔案處理
 	$(document).on('change','.st-reply-message-file',function(e){
+		var file = $(this)[0].files[0];
+		if(file.size > 200 * 1024 * 1024){ //max 200mb
+			toastShow($.i18n.getString("COMMON_EXCEED_FILE_SIZE"));
+			return;
+		}
+
 		var deferred = $.Deferred(),
 			inputFile = $(this),
-			file = $(this)[0].files[0],
 			matchArr = ["image", "video"],
+			vdoDefaultFlag = false,
 
 			fileType = matchArr.find(function(tp){
 				return file.type.match(new RegExp(tp, "g")) instanceof Array;
@@ -712,7 +716,17 @@ $(function(){
 				break;
 
 			case "video":
-				getVideoImgUrl(file).done(deferred.resolve)				
+				getVideoImgUrl(file).done(function(vdoUrl) {
+					// 判斷有無圖片
+					var img = document.createElement("img");
+					img.src = vdoUrl;
+					img.onerror = function() { 
+						vdoDefaultFlag = true;
+						deferred.resolve("images/vdo_default.png");
+					}
+					img.onload = function() { deferred.resolve(vdoUrl) }
+
+				})				
 				break;
 
 			default:
@@ -722,12 +736,13 @@ $(function(){
 		}
 
 		deferred.done(function(dataUrl) {
-			var previewInput = "<div class='img'><img src='" + dataUrl + "'/></div>";
+			var previewInput = "<div class='img'><img "+ (vdoDefaultFlag ? "class='vdo-default'" : "")  +" src='" + dataUrl + "'/></div>";
 
-			if (fileType == "file") {
+			if (fileType === "file") {
 				previewInput = "<div class='attach-file'><img class='file-icon'" 
-					+ "src='images/timeline/otherfile_icon.png' >" + file.name 
-					+ "<span>" + file.size.toFileSize() + "</span>"
+					+ "src='images/timeline/otherfile_icon.png'><span class='ellipsis'>" 
+					+ file.name
+					+ "</span><span>" + file.size.toFileSize() + "</span>"
 					+ "<img class='file-cancel' src='images/common/icon/icon_compose_close.png'></div>";
 			}
 
@@ -739,61 +754,9 @@ $(function(){
 			inputFile.replaceWith( inputFile.val('').clone( true ) );
 		});
 
-		return;
-		var file_ori = $(this);
-
-		var imageType = /image.*/;
-		$.each(file_ori[0].files,function(i,file){
-
-			if (file.type.match("image")) {
-				var this_grid =  file_ori.parent().find(".st-reply-message-img");
-				this_grid.data("type",6);
-				this_grid.html("<div class='img'><img/></div>");
-
-				this_grid.data("file",file);
-
-				var reader = new FileReader();
-				reader.onload = function(e) {
-					var img = this_grid.find("div img");
-
-			        img.attr("src",reader.result);
-			        img.css("border", "lightgray 1px solid");
-				}
-
-				reader.readAsDataURL(file);
-			}
-		});
-
-		//每次選擇完檔案 就reset input file
-		file_ori.replaceWith( file_ori.val('').clone( true ) );
+		
 	});
 	
-	// //留言ui調整
-	// $(document).on("input",".st-reply-message-textarea textarea",function(e){
-	// 	var this_textarea = $(this);
-	// 	// console.log(String.fromCharCode(e.keyCode));
-	// 	// this_textarea.next().html(String.fromCharCode(e.keyCode));
-	// 	// console.log(this_textarea.next().html());
-
-	// 	if(this_textarea.height() > 40 && this_textarea.parent().hasClass("adjust")) {
-	// 		this_textarea.parent().removeClass("adjust");
-	// 		this_textarea.addClass("textarea-animated");
-	// 		return false;
-	// 	}
-
-	// 	if(!this_textarea.val()){
-	// 		this_textarea.parent().addClass("adjust");
-	// 		this_textarea.removeClass("textarea-animated");
-	// 		return false;
-	// 	}
-
-	// 	setTimeout(function(){
-	// 		if (this_textarea.height() < 40 && !this_textarea.parent().hasClass("adjust")) {
-	// 			this_textarea.parent().addClass("adjust");
-	// 			this_textarea.removeClass("textarea-animated");
-	// 		}
-	// 	},201);
-	// });
 
 
 	//留言ui調整
@@ -1641,6 +1604,18 @@ $(function(){
 					}, function (videoTag) {
 						videoTag.parent().addClass("error");
 					});
+
+					// getVideoImgUrl(file).done(function(vdoUrl) {
+					// 	// 判斷有無圖片
+					// 	var img = document.createElement("img");
+					// 	img.src = vdoUrl;
+					// 	img.onerror = function() { 
+					// 		vdoDefaultFlag = true;
+					// 		deferred.resolve("images/vdo_default.png");
+					// 	}
+					// 	img.onload = function() { deferred.resolve(vdoUrl) }
+
+					// })
 				}
 
 			}

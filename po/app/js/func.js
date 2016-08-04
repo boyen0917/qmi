@@ -1358,7 +1358,7 @@ eventContentDetail = function(this_event,e_data){
 
 
 //回覆 detail timeline message內容
-detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailBox){
+detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDetailBox){
 
     var this_gi = this_event.data("event-id").split("_")[0];
     var this_ei = this_event.data("event-id");
@@ -1640,7 +1640,7 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailB
     });
 
     $.when.apply($, deferTasks).then(function () {
-        triggerDetailBox.data("trigger", true);
+        if(triggerDetailBox !== undefined) triggerDetailBox.data("trigger", true);
     });
 }
 

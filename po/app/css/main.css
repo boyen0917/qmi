@@ -2975,22 +2975,29 @@ img.st-user-pic{
 
 .gallery-contaniner {
 	width: 90%;
-    height: 80%;
-    margin: 8% auto;
+    height: 90%;
+    margin: 3% auto;
 }
 
 #galleryModal .close {
 	color: white;
-    font-size: xx-large;
-    position: absolute;
+    font-size: 25px;
+    position: fixed;
     right: 0;
     top: 0;
     cursor: pointer;
-    text-shadow: 1px 1px 2px #ddd;
-    width: 15%;
-    height: 15%;
+    width: 60px;
+    height: 60px;
     text-align: center;
-    line-height: 13vh;
+    line-height: 45px;
+    z-index: 1;
+}
+
+#galleryModal figure.gallery-contaniner.original-size {
+	width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: scroll;
 }
 
 #galleryModal .arrowBtn {
@@ -3525,6 +3532,14 @@ img.st-reply-message-attach {
 	margin-left: 20px;
 }
 
+.st-reply-message-img .attach-file span.ellipsis{
+    width: 250px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
+
 .st-reply-message-img .file-cancel{
 	vertical-align: super;
     height: 20px;
@@ -3542,6 +3557,7 @@ img.st-reply-message-attach {
 	position: relative;
 }
 .st-reply-message-img .img:after {
+	position: relative;
 	background-image: url("../images/common/icon/icon_compose_close.png");
 	display: inline-block;
 	width: 27px;
@@ -3636,6 +3652,8 @@ img.st-reply-message-attach {
 #page-announcement-post div[data-role=header] h3 > div, #page-timeline-detail div[data-role=header] h3 > div{
     font-size: 12px;
 }
+
+#page-timeline-detail {padding: 0!important;height: 100vh; overflow: hidden;}
 
 
 #page-compose { background: rgb(208,208,208); width: 100vw; }
@@ -5231,8 +5249,12 @@ div.user-info-submit-ready:active {
 	height: 10px;
 }
 
-.timeline-detail {
-	margin: 15px 10px;
+#page-timeline-detail .padding-top { height: 57px; }
+#page-timeline-detail .timeline-detail {
+	height: calc(100vh - 57px);
+    width: 100vw;
+    overflow: scroll;
+    padding-top: 10px;
 }
 
 .detail-title {
@@ -5798,6 +5820,10 @@ div.tag-members-container ul.tag-list a:hover{
 .highlight-container mark{
 	background: rgba(106, 163, 241, 0.29);
 }
+
+
+img.vdo-default { position: relative; width: 100px; }
+img.vdo-default:before {}
 
 
 *[contenteditable="true"] {
