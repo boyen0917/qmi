@@ -71,6 +71,19 @@ $(document).ready(function(){
         }
     });
 
+    // $(".guihu-add").click(function() {
+    //     QmiGlobal.guihu.init();
+    //     $(".guihu-title").text($.i18n.getString("ADD_LDAP"));
+    //     $(".guihu-des").text($.i18n.getString("ADD_LDAP_DES"));
+    //     $(".guihu-btn-content").find("button:nth-child(2)").addClass("add-btn");
+    // });
+    // $(".guihu-cancel").click(function(){
+    //     QmiGlobal.guihu.init();
+    //     $(".guihu-title").text($.i18n.getString("REMOVE_LDAP"));
+    //     $(".guihu-des").text($.i18n.getString("REMOVE_LDAP_DES"));
+    //     $(".guihu-btn-content").find("button:nth-child(2)").addClass("save-btn");
+    // });
+
 });
 
 //user Info Setting

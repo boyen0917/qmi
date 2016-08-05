@@ -424,8 +424,8 @@ function showGroupInfoPage(){
 		gaContent.find(".ga-info-row.view").show().end()
 				 .find(".ga-info-row.edit").hide();
 	};
-	//contentViewshow();
-	//rowViewshow();
+	contentViewshow();
+	rowViewshow();
  	// gaContent.find(".ga-gr-content.view").show().end()
  	// 		 .find(".ga-gr-content.edit").hide().end()
  	// 		 .find(".ga-info-row.view").show().end()
