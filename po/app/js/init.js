@@ -15,14 +15,14 @@ var ui,
 	clearChatTimer,
 	
 	//HiCloud
-
-	base_url = "https://ap.qmi.emome.net/apiv1/";
-
-	// aws 測試環境
- 	//base_url = "https://apserver.mitake.com.tw/apiv1/";
-
-
-
+ 	base_url = "https://ap.qmi.emome.net/apiv1/",
+ 	
+	//local測試 預設開啟console
+	debug_flag = false;
+	if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
+		debug_flag = true;
+		base_url = "https://qaap.qmi.emome.net/apiv1/";
+	};
 
  	// // container riseNotification 一旦換網址就沒了
 
@@ -40,6 +40,11 @@ String.prototype.qmiTag = function (tagMember) {
 	return this.replace("///;" + tagMember.u + ";///", "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>");
 }
 
+Number.prototype.toFileSize = function () {
+	var unitIndex = Math.floor( Math.log(this) / Math.log(1024) );
+    return (this / Math.pow(1024, unitIndex)).toFixed(2) * unitIndex + ' ' 
+    	+ ['B', 'kB', 'MB', 'GB', 'TB'][unitIndex];
+}
 
 if( 0==userLang.indexOf("zh") ){
 	if( userLang=="zh_cn" ){
@@ -624,7 +629,6 @@ window.QmiAjax = function(args){
 	// complete來這裡
 	ajaxDeferred.always(function(completeData){
 		self.onComplete(completeData);
-
 		if(completeCB instanceof Function) completeCB(completeData);
 	});
 

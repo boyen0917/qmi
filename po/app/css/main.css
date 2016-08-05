@@ -21,6 +21,7 @@ body{
 
 ::-webkit-scrollbar {
       width: 8px;
+      height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -688,7 +689,7 @@ img.auo {
 }
 
 .compose-dnd {
-	position: absolute;
+	position: fixed;
 	background: rgb(57, 148, 232);
 	opacity: 0.3;
 	z-index: 1700;
@@ -1501,7 +1502,7 @@ img.auo {
 	height: 44px;
 	background: url("../images/compose/compose_form_addfile_bg.png") repeat-x;
 	/*display: inline-block;*/
-	width: 100%;
+	width: 100vw;
 	border-bottom: 1px solid rgb(218,218,218);
 	position: fixed;
 	bottom: -2px;
@@ -2170,7 +2171,7 @@ img.auo {
 	
 }
 
-.st-feedbox-area a:link,.st-feedbox-area a:active,.st-feedbox-area a:visited,.st-feedbox-area a:hover {
+.st-feedbox-area a:not(.attach-file):link,.st-feedbox-area a:not(.attach-file):active,.st-feedbox-area a:not(.attach-file):visited,.st-feedbox-area a:not(.attach-file):hover {
     color: cornflowerblue;
     text-decoration: none;
 }
@@ -2961,6 +2962,81 @@ img.st-user-pic{
 	width: 100%;
 }
 
+#galleryModal {
+	/*display: none; */
+    position: fixed; 
+    z-index: 1010; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+}
+
+.gallery-contaniner {
+	width: 90%;
+    height: 90%;
+    margin: 3% auto;
+}
+
+#galleryModal .close {
+	color: white;
+    font-size: 25px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    line-height: 45px;
+    z-index: 1;
+}
+
+#galleryModal figure.gallery-contaniner.original-size {
+	width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: scroll;
+}
+
+#galleryModal .arrowBtn {
+	background-repeat: no-repeat;
+    position: relative;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+#galleryModal .preBtn {
+    background-image: url("../images/calendar/icon_calendar_arrow_red_end.png");
+    right: 0%;
+    bottom: 51.7%;
+}
+
+#galleryModal .nextBtn {
+    background-image: url("../images/calendar/icon_calendar_arrow_red_start.png");
+    left: 96%;
+    bottom: 55%;
+}
+
+#galleryModal #caption {
+    font-size: large;
+    color: white;
+    text-align: right;
+    position: absolute;
+    right: 5%;
+    bottom: 2%;
+}
+
+.currentImg {
+	max-width: 100%;
+	height: 100%;
+	margin: 0px auto;
+	display: block;
+	object-fit: contain;
+}
+
 .st-slide-img {
 	position: relative;
 	/*border: 1px solid #d8d8d8;*/
@@ -2972,7 +3048,15 @@ img.st-user-pic{
 	background-size: 40px;
 	border: 1px solid #E4E4E4;
 	width: 100%;
+	color: white;
+  	text-align: -webkit-center;
+  	font-size: xx-large;
 }
+
+.st-slide-img h1{
+	margin-top: 24px;
+}
+
 .st-slide-img.loaded {
 	background-size: cover;
 }
@@ -3087,6 +3171,53 @@ img.st-user-pic{
 }
 .st-attach-audio audio{
 	width: 480px;
+}
+
+.st-attach-file .attach-file{
+	background: url(../images/timeline/download_icon.png) no-repeat #bdd2ed right;
+	background-position: 97% 50%;
+	background-size: 28px 28px;
+  	text-decoration: none;
+  	color: white; 
+  	font-size: 16px;
+  	width: 96%;
+  	display: inline-block;
+  	text-align: left;
+  	line-height: 2;
+  	padding: 8px 10px;
+}
+
+.st-attach-file img {
+	vertical-align: top;
+	padding-right: 5px;
+}
+
+.st-attach-file span {
+	margin-left: 20px;
+}
+
+.st-attach-file div{
+	color: white; 
+}
+
+.st-attach-file .header{
+	text-align: right;
+    background-image: url(../images/timeline/arrow_down.png);
+    background-color: #99c6ff;
+    background-repeat: no-repeat;
+    background-position: 98% 50%;
+    background-size: 30px 30px;
+    width: 88%;
+    padding: 10px 60px 10px 0px;
+}
+
+.st-attach-file .hidden{
+    background-image: url(../images/timeline/next_icon.png);
+}
+
+.st-attach-file .footer{
+	background: #3994eb;
+	padding: 10px;
 }
 
 .st-box2-feedback-area {
@@ -3206,6 +3337,35 @@ img.st-user-pic{
 	max-width: 100%;
 }
 
+.st-reply-content .attach-file {
+	font-size: 14px;
+	width: 300px;
+	display: inline-block;
+	line-height: 2;
+	padding: 5px 10px;
+	color: #aaa;
+  	text-decoration: none;
+  	border: 1px solid #dddddd;
+}
+
+.st-reply-content .attach-file img {
+  	vertical-align: bottom;
+  	padding: 2px 5px 0px 5px;
+}
+
+.st-reply-content .attach-file span {
+  	margin-left: 20px;
+}
+
+.st-reply-content .download-icon {
+    background: url(../images/timeline/download_icon.png) no-repeat #bdd2ed center;
+    background-size: 20px 20px;
+    float: right;
+    width: 32px;
+    height: 30px;
+    cursor: pointer;
+}
+
 .st-reply-footer {
 	color: #777;
 	font-size: 14px;
@@ -3282,7 +3442,10 @@ img.st-reply-message-attach {
 	height: 36px;
 }
 
+.st-reply-message-textarea.adjust .tag-members-container { bottom: 60px; margin: 0;}
+
 .st-reply-message-textarea textarea {
+	background: transparent;
 	width: 100%;
 	border: 0px;
 	font-size: 15px;
@@ -3291,6 +3454,28 @@ img.st-reply-message-attach {
 	top: 6px;
 	left: 6px;
 	overflow-y: auto;
+	z-index: 2;
+}
+
+.st-reply-highlight-container{
+	max-height: 200px;
+	overflow-x: hidden;
+	overflow-y: auto;
+    width: 97%;
+    position: relative;
+    padding-top: 6px;
+    left: 7px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    z-index: 1;
+    outline: 0px;
+    cursor: text;
+}
+
+
+.st-reply-highlight-container[contentEditable=true]:empty:before {
+    content: "請輸入訊息";
+    color: #bbb;
 }
 
 .st-reply-message-textarea textarea:focus{ outline:none } 
@@ -3323,6 +3508,46 @@ img.st-reply-message-attach {
 	background: rgb(239,239,239);
 	cursor: default;
 }
+
+.st-reply-message-img .attach-file {
+	background: white;
+    background-position: 97% 50%;
+    background-size: 28px 28px;
+    text-decoration: none;
+    color: #666;
+    font-size: 16px;
+    display: block;
+    text-align: left;
+    line-height: 2;
+    padding: 8px 10px;
+}
+
+.st-reply-message-img .file-icon{
+	vertical-align: bottom;
+    height: 32px;
+    padding-right: 5px;
+}
+
+.st-reply-message-img .attach-file span{
+	margin-left: 20px;
+}
+
+.st-reply-message-img .attach-file span.ellipsis{
+    width: 250px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
+
+.st-reply-message-img .file-cancel{
+	vertical-align: super;
+    height: 20px;
+    width: 20px;
+    margin-left: 22px;
+    cursor: pointer;
+}
+
 .st-reply-message-img .img{
 	padding: 6px 0;
 	/* background: rgb(239,239,239); */
@@ -3332,6 +3557,7 @@ img.st-reply-message-attach {
 	position: relative;
 }
 .st-reply-message-img .img:after {
+	position: relative;
 	background-image: url("../images/common/icon/icon_compose_close.png");
 	display: inline-block;
 	width: 27px;
@@ -3427,6 +3653,11 @@ img.st-reply-message-attach {
     font-size: 12px;
 }
 
+#page-timeline-detail {padding: 0!important;height: 100vh; overflow: hidden;}
+
+
+#page-compose { background: rgb(208,208,208); width: 100vw; }
+
 .cp-post ,.obj-done {
 	position: absolute;
 	right: 0;
@@ -3459,11 +3690,7 @@ img.st-reply-message-attach {
 	top: 3px;
 }
 
-.cp-content{
-	background: rgb(208,208,208);
-    width: 100%;
-    display:table;
-}
+.cp-content{ width: 100vw; }
 
 .cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-work-area,.cp-vote-area-test,.cp-time-area,.cp-vote-type-area{
     background: white;
@@ -3487,12 +3714,32 @@ img.st-reply-message-attach {
 
 .cp-content-textarea{
     min-height: 80px;
-    line-height:80px;
     margin-bottom: 20px;
+    padding: 15px 0;
+}
+
+
+.cp-content-textarea .tag-members-container, .st-reply-message-textarea .tag-members-container{
+   	display: none;
+	position: absolute;
+    width: 300px;
+    box-shadow: 1px 1px 10px 2px #bbb;
+    background: white;
+    margin: 0px 120px;
 }
 
 .cp-attach-area {
+	position: relative;
 	padding: 20px 0;
+}
+
+.cp-attach-area .top-border-hide {
+	position: absolute;
+	top: 1px;
+	height: 20px;
+	width: 100%;
+	z-index: 1;
+	background: white;
 }
 
 .cp-sticker-area .sticker{
@@ -3526,17 +3773,23 @@ img.st-reply-message-attach {
 
 
 .cp-file-img-area, .cp-file-video-area {
+	position: relative;
 	margin-left: 5px;
 	overflow: hidden;
-	padding-top: 15px;
+	padding-top: 50px;
+	white-space: nowrap;
+	margin-bottom: 10px;
 }
+
+.cp-file-img-area:hover { margin-bottom: 2px; overflow-x: scroll; }
 
 .cp-grid {
 	width: 100px;
 	position: relative;
 	margin: 0 15px 15px 0;
-	float: left;
+	display: inline-block;
 	border: 1px solid #d2d2d2;
+	vertical-align: top;
 }
 
 .cp-grid div {
@@ -3554,11 +3807,15 @@ img.st-reply-message-attach {
 }
 
 .cp-grid img:nth-child(1) {
-	/*width: 100px;*/
+	width: 100px;
 	display: block;
+	object-fit: cover;
+	height: 100px;
 }
+
 .cp-file-video-area{
 	min-height: 100px;
+	border-top: 1px solid #d2d2d2;
 }
 .cp-file-video-area.topBorder{
 	border-top: 1px solid #d2d2d2;
@@ -3572,27 +3829,7 @@ img.st-reply-message-attach {
 	left: 0;
 	width: 100%;
 	height: 20px;
-	/*background-size: auto 50%;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	z-index: 3;*/
 }
-/*.cp-file-video-area .cp-grid:before{
-	content: "";
-	background-image: url("../images/chatroom/chat_message_status_icon_video.png");
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-size: auto 50%;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	z-index: 3;
-}
-.cp-file-video-area .cp-grid:hover:before{
-	background-image: url("../images/chatroom/chat_message_status_icon_video_click.png");
-}*/
 .cp-grid video{
 	/*max-width: 100%;*/
 	max-height: 100%;
@@ -3604,9 +3841,57 @@ img.st-reply-message-attach {
 	top: -11px;
 	width: 25px;
 	z-index: 10;
+	cursor: pointer;
 }
 
+.cp-file-img-area:before, .cp-file-video-area:before, .cp-file-else-area:before {
+	content: attr(type);
+	position: absolute;
+	top: 10px;
+	left: 0;
+	width: 60px;
+	height: 22px;
+	background: #ddd;
+	color: white;
+	text-align: center;
+	border-radius: 3px;
+}
 
+.cp-file-else-area {   
+	position: relative;
+ 	border-top: 1px solid #ddd;
+  	padding-top: 45px;
+}
+
+.cp-file-area .file-row {
+	position: relative;
+    margin: 5px;
+    padding: 5px;
+    height: 30px;
+}
+
+.cp-file-area .file-row .grid-cancel{ top: 10px; right: -20px;}
+
+.cp-file-area .file-row span {
+	vertical-align: top;
+	line-height: 33px;
+	margin-right: 20px;
+	position: relative;
+}
+
+.cp-file-area .file-row img:first-child { border-radius: 3px; width: 33px; }
+.cp-file-area .file-row span:nth-child(2) {   left: 10px; font-size: 16px; }
+.cp-file-area .file-row span:nth-child(3) {   top: 1px; font-size: 13px; }
+
+.cp-file-area .content {
+    min-width: 200px;
+    display: inline-block;
+    color: #888;
+    max-height: 275px;
+    padding-right: 20px;
+    overflow: hidden;
+}
+.cp-file-area .content:hover { overflow-y: scroll;  }
 
 .cp-textarea-title{
 	width: 80%;
@@ -3672,15 +3957,38 @@ img.st-reply-message-attach {
 }
 
 .cp-textarea-desc {
-    width: 75%;
+    width: calc(100% - 100px);
 	border: 0;
-	font-size: 15px;
 	resize:none;
 	position: relative;
 	top: 23px;
 	left: 4px;
 	max-height: -webkit-calc( 100vh - 224px );
+	font: 14px 'Open Sans', serif;
+	letter-spacing: 1px;
+	z-index: 2;
+	background-color: transparent;
 }
+
+.cp-content-highlight {
+	width: calc(100% - 100px);
+	max-height: 200px;
+	overflow-y: auto;
+    position: relative;
+    margin-bottom: 25px;
+    top: 25px;
+    left: 7px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    outline: 0px;
+    cursor: text;
+}
+
+.cp-content-highlight:empty:before {
+  content: "內容描述";
+  color: #bbb;
+}
+
 .cp-content[data-type=announcement] .cp-textarea-desc,
 .cp-content[data-type=feedback] .cp-textarea-desc {
 	max-height: -webkit-calc( 100vh - 339px );
@@ -3691,7 +3999,7 @@ img.st-reply-message-attach {
 	max-height: 200px;
 }
 
-.cp-content-textarea img{
+.cp-content-textarea img:not(.member-mugshot){
     margin: auto 15px;
 	position: relative;
 	float: left;
@@ -3708,7 +4016,7 @@ img.st-reply-message-attach {
 
 .cp-addfile {
 	float: left;
-	width: 33.3%;
+	width: 25%;
 	text-align: center;
 	padding-top: 10px;
 	cursor: pointer;
@@ -4941,8 +5249,12 @@ div.user-info-submit-ready:active {
 	height: 10px;
 }
 
-.timeline-detail {
-	margin: 15px 10px;
+#page-timeline-detail .padding-top { height: 57px; }
+#page-timeline-detail .timeline-detail {
+	height: calc(100vh - 57px);
+    width: 100vw;
+    overflow: scroll;
+    padding-top: 10px;
 }
 
 .detail-title {
@@ -5397,7 +5709,9 @@ section.fileSharing .file-cover .general .input-area{
     border-bottom: 1px solid #d2d2d2;
 }
 
-section.fileSharing section.progress-bar {
+section.fileSharing section.progress-bar,
+#compose-progressbar
+{
     height: 100vh;
     background-color: rgba(50,50,50,0.7);
     position: absolute;
@@ -5405,7 +5719,9 @@ section.fileSharing section.progress-bar {
     display: none;
 }
 
-section.fileSharing section.progress-bar .frame {
+section.fileSharing section.progress-bar .frame ,
+#compose-progressbar .container
+{
     width: 150px;
     height: 10px;
     background: rgb(210, 210, 210);
@@ -5417,7 +5733,9 @@ section.fileSharing section.progress-bar .frame {
     font-size: 14px;
     position: relative;
 }
-section.fileSharing section.progress-bar .frame .progress {
+section.fileSharing section.progress-bar .frame .progress ,
+#compose-progressbar .bar
+{
     width: 0px;
     height: 8px;
     background: #54ACEB;
@@ -5427,44 +5745,90 @@ section.fileSharing section.progress-bar .frame .progress {
     left: 1px;
 }
 section.fileSharing section.progress-bar .frame .text { position: absolute; top: 0 ;left: 65px;}
-section.fileSharing section.progress-bar .frame .cancel { 
+section.fileSharing section.progress-bar .frame .cancel ,#compose-progressbar button
+{ 
 	position: absolute; 
 	top: 0;
-	right: -50px;
+	left: 160px;
 	font-size: 15px;
 	cursor: pointer;
 }
+
+#compose-progressbar { z-index: 1010 }
+#compose-progressbar .title { 
+	position: absolute;
+    bottom: 20px;
+    white-space: nowrap;
+    width: 100%;
+}
+
+#compose-progressbar button:focus { outline: none; }
+#compose-progressbar button {
+	top: -7px;
+    color: white;
+    border: 0;
+    background: transparent;
+    white-space: nowrap;
+}
+
+#compose-progressbar .cnt { position: relative; top: 10px;}
+#compose-progressbar span.curr:before {content: attr(num);}
 
 section.subpage-fileSharing{
 	overflow-y: auto;
 }
 
-/* ==========================下拉式選單========================================== */
+/* ======================================== tag 成員畫面 ===================================================== */
 
-.tag-list {
-	/*display: none;*/
-    width: 324px;
-    bottom: 31px;
-    left: 86px;
-    position: absolute;
-    height: 140px;
-    overflow: scroll;
-    background-color: beige;
-    padding: 0;
-    color: #111;
-    list-style: none;
+div.tag-members-container ul.tag-list {
+	padding: 0px;
+    margin: 0;
+    width: 299px;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.tag-list img{
-	width: 30px;
-	height: 30px;
+div.tag-members-container ul.tag-list .member-mugshot{
+	width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    float: none;
+    vertical-align: middle;
 }
 
-.tag-list li:hover{
-	background-color: yellow;
+div.tag-members-container ul.tag-list li{
+	cursor: pointer;
+    white-space: nowrap;
+    width: 290px;
+    text-overflow: ellipsis;
+    height: 50px;
+    padding-right: 15px;
+    overflow: hidden;
+}
+
+div.tag-members-container ul.tag-list a { line-height: 45px;padding-left: 5px;}
+
+div.tag-members-container ul.tag-list li:hover{
+	background-color: rgba(106, 163, 241, 0.29);
+}
+
+div.tag-members-container ul.tag-list a:hover{
+	color: black;
+}
+
+.highlight-container mark{
+	background: rgba(106, 163, 241, 0.29);
 }
 
 
+img.vdo-default { position: relative; width: 100px; }
+img.vdo-default:before {}
+
+
+*[contenteditable="true"] {
+	display: inline-block;
+}
 
 @-webkit-keyframes refresh {
     0%	{	
@@ -5480,4 +5844,3 @@ section.subpage-fileSharing{
     		transform: rotate(900deg);
     	}
 }
-

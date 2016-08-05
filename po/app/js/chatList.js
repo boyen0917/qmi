@@ -547,6 +547,9 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 				text = $.i18n.getString("CHAT_VOIP_GET_CALL", name );
 			}
 			break;
+		case 26:
+			text = $.i18n.getString("CHAT_SOMEONE_SEND_FILE", name);
+			break;
 		default:
 			try{
 				text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c:"";

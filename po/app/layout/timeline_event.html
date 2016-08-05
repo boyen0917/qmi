@@ -34,12 +34,14 @@
         </div>
     </div>
     <div class="st-sub-box-2" data-st-cnt="">
-        <div class="st-sub-box-2-content line-clamp"></div>
-  	    <div class="st-sub-box-2-more">
-  			<div class="st-box2-more-category"></div>
-  			<div class="st-box2-more-title"></div>
-  			<div class="st-box2-more-desc line-clamp"></div>
-  			<div class="st-box2-more-time" style="display:none;">
+        <div class="st-sub-box-2-content line-clamp" style="display:none"></div>
+        <div class="st-sub-box-2-content-detail" style="display:none"></div>
+	    <div class="st-sub-box-2-more">
+			<div class="st-box2-more-category"></div>
+			<div class="st-box2-more-title"></div>
+			<div class="st-box2-more-desc line-clamp" style="display:none;"></div>
+			<div class="st-box2-more-desc-detail" style="display:none;"></div>
+			<div class="st-box2-more-time" style="display:none;">
 				<img src="images/task/timeline_task_icon_clock.png"/>
 				<label data-textid="FEED_CLOSE_TIME"></label>
 				<span></span>
@@ -87,6 +89,16 @@
           </tr>
         </table>
       </div>
+
+      <!-- <div id='galleryModal'>
+        <div class="gallery-contaniner">
+          <span class='close'>×</span>
+          <img class='currentImg'>
+          <div class="preBtn arrowBtn"></div> 
+          <div class="nextBtn arrowBtn"></div>
+          <div id='caption'></div>
+        </div>
+      </div> -->
          
       <div class="st-attach-google-map" style="display:none;"></div>
       <div id="amap" class="st-attach-amap-map" style="display:none;"></div>
@@ -94,6 +106,11 @@
       <div class="st-attach-audio" style="display:none;"></div>
       <div class="st-attach-video play" style="display:none;">
         <div></div>
+      </div>
+      <div class="st-attach-file" style="display:none;">
+        <div class="header hidden">附加檔案</div>
+        <div class="attach-file-list"></div>
+        <div class="footer">全部下載</div>
       </div>
         </div>
     </div>
@@ -118,10 +135,13 @@
         <div class="st-reply-message-area" data-movement="0" data-animate-chk="true">
           <div class="st-reply-message-bg">
             <img class="st-reply-message-attach" src="images/chatroom/chat_textbar_icon_add.png"/>
-            <input class="st-reply-message-file" type="file" style="display:none;" data-role="none"/>
+            <input class="st-reply-message-file" type="file" multiple style="display:none;" data-role="none"/>
             <img class="st-reply-message-sticker" src="images/chatroom/chat_textbar_icon_emoticon.png"/>
             <div class="st-reply-message-textarea adjust">
-                <textarea data-role="none" data-textph-id="FEED_SAY_SOMETHING"></textarea>
+                <div class="tag-members-container"></div>
+                <!-- <textarea data-role="none" data-textph-id="FEED_SAY_SOMETHING"></textarea> -->
+                <div class="st-reply-highlight-container highlight-container" contenteditable=true ></div>
+
                 <div class="st-reply-message-send" data-textid="COMMON_SUBMIT"></div>
             </div>
             <div class="st-reply-message-img"></div>
@@ -157,6 +177,7 @@
           </div>
           <video controls></video>
           <audio controls></audio>
+          <div class="file"></div>
         </div>
         <div class="st-reply-footer">
             <span class="st-reply-footer-time"></span>&nbsp;&nbsp;

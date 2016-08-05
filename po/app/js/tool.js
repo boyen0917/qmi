@@ -218,6 +218,16 @@ getVideoBlob = function(videoDom, x,y,max_w,max_h,quality){
 	
 }
 
+fileSizeTransfer = function (si){
+	if(si < 900) 
+		return Math.round(si*10)/10+" byte";
+
+	if((si/1024) < 900)
+		return Math.round(si/1024*10)/10+" kb";
+	
+	return Math.round(si/1024/1024*10)/10+" mb";
+}
+
 
 //調整個人頭像
 avatarPos = function (ori_img,x){
@@ -285,7 +295,7 @@ htmlFormat = function (str, isToCharCode){
         strArr.splice(i,1,newStr);
     });
 
-    return strArr.join(" ").replaceEmoji();
+    return strArr.join(" ").replaceEmoji().replace(/\n/g, "<br/>");
 }
 
 //轉換html符號
@@ -463,8 +473,6 @@ uploadToS3 = function(file,api_name,ori_arr,tmb_arr,callback){
 	});
 }
 
-
-
 qmiUploadFile = function(uploadObj){
 	// tp 1: 圖片 2: 影片
 
@@ -514,6 +522,7 @@ qmiUploadFile = function(uploadObj){
 		}).success(function(data) {
 			data.fi = s3Obj.fi;
 			data.tp = uploadObj.tp;
+			data.file = uploadObj.file;
 			chainDef.resolve({isSuccess: true, data: data})
 		}).error(chainDef.reject);
 
@@ -535,7 +544,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		tmbObj = uploadObj.tmbObj,
 		oriObj = uploadObj.oriObj;
 
-
 	var uploadDef = $.Deferred(),
 		mediaLoadDef = $.Deferred(),
 		oriFile, tmbFile, mt, si, md, contentType,
@@ -550,7 +558,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			delete paramObj.s32;
 
 			contentType = " ";
-
 			// 傳給外部 commit 使用
 			mt = uploadObj.file.type || "text";
 			si = uploadObj.file.size;
@@ -592,11 +599,8 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				md = {l: video.duration * 1000};
 				mediaLoadDef.resolve();
 			}
-
-			
 			break;
 		default: 
-		console.log("00000");
 	}
 
 	mediaLoadDef.done(function() {
@@ -625,8 +629,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 	return allDef.promise();
 } // end of qmiUploadS3
-
-
 
 resetDB = function(){
 	clearBadgeLabel();
@@ -890,22 +892,20 @@ uploadGroupVideo = function(this_gi, file, video, ti, permission_id, ori_arr, tm
 
 getVideoImgUrl = function(file) {
 	var deferred = $.Deferred(),
-		fileURL = URL.createObjectURL(file);
+		fileURL = URL.createObjectURL(file),
+		video = document.createElement('video');
 
-
-	var video = document.createElement('video');
 	video.src = fileURL;
 
 	video.onloadeddata = function() {
 		var canvas = document.createElement('canvas');
 		canvas.width = video.videoWidth;
 		canvas.height = video.videoHeight;
+		canvas.getContext('2d').drawImage( video, 0, 0, video.videoWidth, video.videoHeight);
 
-		var context = canvas.getContext('2d');
-        canvas.getContext('2d').drawImage( video, 0, 0, video.videoWidth, video.videoHeight);
- 
-		deferred.resolve(canvas.toDataURL());
+		deferred.resolve(canvas.toDataURL())
 	}
+
 	return deferred.promise();
 }
 
@@ -1058,55 +1058,238 @@ setStickerUrl = function(dom, id){
 	}
 }
 
-showGallery = function( this_gi, this_ti, gallery_arr, startIndex, title, isWatermark, watermarkText ){
-	startIndex = startIndex || 0;
-    var gallery = $(document).data("gallery");
-    if( null != gallery && false==gallery.closed){
-        gallery.focus();
-        gallery.ui = ui;
-        gallery.at = at;
-        gallery.lang = lang;
-        gallery.this_gi = this_gi;
-        gallery.this_ti = this_ti;
-        gallery.list = gallery_arr;
-        gallery.startIndex = startIndex;
-        gallery.title = title;
-        gallery.isWatermark = isWatermark;
-        gallery.watermarkText = watermarkText;
-        var dataDom = $(gallery.document).find(".dataDom");
-        dataDom.click();
-    } else {
-        gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
-        $(document).data("gallery", gallery);
+QmiGlobal.gallery = function (data) {
 
-        gallery.ui = ui;
-        gallery.at = at;
-        gallery.lang = lang;
-        gallery.this_gi = this_gi;
-        gallery.this_ti = this_ti;
-        gallery.list = gallery_arr;
-        gallery.startIndex = startIndex;
-        gallery.title = title;
-        gallery.isWatermark = isWatermark;
-        gallery.watermarkText = watermarkText;
-        // $(gallery.document).ready(function(){
-        //     setTimeout(function(){
-        //         gallery.ui = ui;
-        //         gallery.at = at;
-        //         gallery.lang = lang;
-        //         gallery.this_gi = this_gi;
-        //         gallery.this_ti = this_ti;
-        //         gallery.list = gallery_arr;
-        //         gallery.startIndex = startIndex;
-        //         gallery.title = title;
-        //         gallery.isWatermark = isWatermark;
-        //         gallery.watermarkText = watermarkText;
-        //         var dataDom = $(gallery.document).find(".dataDom");
-        //         dataDom.click();
-        //     },0);
-        // });
+	this.photoList = data.photoList;
+	this.currentImage = data.currentImage;
+	this.isApplyWatermark = data.isApplyWatermark;
+	this.watermarkText = data.watermarkText;
+
+	this.container =  $("<div id='galleryModal' style='display:none;'>"
+	        + "<div class='close'>×</div>"
+	        + "<figure class='gallery-contaniner'>"
+	        // + "<div class='gallery-content'>"
+	        + "<img class='currentImg'>"
+	        + "<figcaption id='caption'></figcaption>"
+	       	+ "<div class='preBtn arrowBtn'></div>"
+	        + "<div class='nextBtn arrowBtn'></div>"
+	        + "</figure></div>");
+	var leftArrow = this.container.find(".preBtn");
+	var caption = this.container.find("#caption");
+	var rightArrow = this.container.find(".nextBtn");
+	var closeBtn  = this.container.find(".close");
+	var imgElement = this.container.find("img");
+
+	imgElement.attr("src", this.photoList[this.currentImage].s32);
+	caption.html(this.currentImage + 1 + "/" + this.photoList.length);
+
+	closeBtn.on("click", this.close.bind(this));
+	leftArrow.on('click', this.showPreviousImage.bind(this));
+	rightArrow.on('click', this.showNextImage.bind(this));
+
+	$("body").append(this.container);
+	this.container.fadeIn();
+
+	this.hasMultiImage = function () {
+		if (this.photoList.length == 1) {
+			return false;
+		} 
+		return true;
+    };
+
+    this.hideElements = function () {
+    	leftArrow.hide();
+    	rightArrow.hide();
+    	caption.hide();
     }
+
+    if (! this.hasMultiImage()) {
+    	this.hideElements();
+    } 
 }
+
+
+QmiGlobal.gallery.prototype = {
+
+	getImageUrl: function() {
+		return new QmiAjax({
+        	apiName: "groups/" + gi + "/files/" + this.photoList[this.currentImage].c 
+        		+ "?pi=" + this.photoList[this.currentImage].p + "&ti=" 
+        		+ QmiGlobal.groups[gi].ti_feed
+    	});
+	},
+
+	showPreviousImage: function(e) {
+		this.currentImage = (this.photoList.length + this.currentImage - 1) % (this.photoList.length);
+		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
+			this.getImageUrl().then(function (data) {
+				
+				if (this.isApplyWatermark) {
+					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
+						function (imgUrl) {
+							this.photoList[this.currentImage].s32 = imgUrl;
+							this.container.find("img").attr("src", imgUrl);
+						}.bind(this));
+				}
+
+				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
+				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+			}.bind(this));
+		}
+		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+		caption.html(this.currentImage + 1 + "/" + this.photoList.length);
+		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
+	},
+
+	showNextImage: function(e) {
+		this.currentImage = (this.currentImage + 1) % (this.photoList.length);
+		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
+			this.getImageUrl().then(function (data) {
+				if (this.isApplyWatermark) {
+					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
+						function (imgUrl) {
+							this.photoList[this.currentImage].s32 = imgUrl;
+							this.container.find("img").attr("src", imgUrl);
+						}.bind(this));
+				}
+				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
+				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+			}.bind(this));
+		}
+		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
+	},
+
+	close: function() {
+		var self = this;
+		self.container.fadeOut(300, function() {
+			self.container.remove();
+			delete self.photoList;
+			delete self.container;
+		})
+		
+		// this = {};
+	},
+}
+
+// showGallery = function(timelineID, galleryList, targetImgIndex, isApplyWatermark, watermarkText){
+// 	var galleryModal = new QmiGlobal.gallery(timelineID, galleryList);
+
+// 	galleryModal.create();
+
+// 	if (! galleryModal.hasMultiImage) {
+// 		galleryModal.hideArrow();
+// 	}
+// }
+
+// 	$("body").append("<div id='galleryModal'>"
+//         + "<div class='gallery-contaniner'>"
+//         + "<span class='close'>×</span>"
+//         + "<img class='currentImg'>"
+//         + "<div class='preBtn arrowBtn'></div>"
+//         + "<div class='nextBtn arrowBtn'></div>"
+//         + "<div id='caption'></div>"
+//         + "</div></div>");
+
+// 	var galleryModal = $("#galleryModal");
+// 	var currentImgElement = galleryModal.find(".currentImg");
+// 	// var currentImgUrl = galleryList[targetImgIndex].s32;
+// 	var photoNum = galleryList.length;
+
+
+// 	currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+
+// 	if (photoNum == 1) {
+// 		galleryModal.find(".arrowBtn").hide();
+// 	}
+
+// 	galleryModal.find(".preBtn").bind("click", function(e) {
+// 		if (targetImgIndex == 0) {
+// 			targetImgIndex = photoNum-1;
+// 		} else {
+// 			targetImgIndex -= 1;
+// 		}
+// 		if (! galleryList[targetImgIndex].s32) {
+// 			getS32file(timelineID, galleryList[targetImgIndex]).then(function(data) {
+// 				galleryList[targetImgIndex].s32 = data.s32;
+// 				currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+// 			});
+// 		} else {
+// 			currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+// 		}
+// 	});
+
+
+// 	galleryModal.find(".nextBtn").bind("click", function(e) {
+// 		if (targetImgIndex == photoNum-1) {
+// 			targetImgIndex = 0;
+// 		} else {
+// 			targetImgIndex += 1;
+// 		}
+// 		console.log(targetImgIndex);
+// 		if (! galleryList[targetImgIndex].s32) {
+// 			getS32file(timelineID, galleryList[targetImgIndex]).then(function(data) {
+// 				galleryList[targetImgIndex].s32 = data.s32;
+// 				currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+// 			});
+// 		} else {
+// 			currentImgElement.attr("src", galleryList[targetImgIndex].s32);
+// 		}
+// 	});
+
+// 	galleryModal.find(".close").bind("click", function(e) {
+// 		galleryModal.remove();
+// 	});
+
+	
+// 	startIndex = startIndex || 0;
+//     var gallery = $(document).data("gallery");
+//     if( null != gallery && false==gallery.closed){
+//         gallery.focus();
+//         gallery.ui = ui;
+//         gallery.at = at;
+//         gallery.lang = lang;
+//         gallery.this_gi = this_gi;
+//         gallery.this_ti = this_ti;
+//         gallery.list = gallery_arr;
+//         gallery.startIndex = startIndex;
+//         gallery.title = title;
+//         gallery.isWatermark = isWatermark;
+//         gallery.watermarkText = watermarkText;
+//         var dataDom = $(gallery.document).find(".dataDom");
+//         dataDom.click();
+//     } else {
+//         gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
+//         $(document).data("gallery", gallery);
+
+//         gallery.ui = ui;
+//         gallery.at = at;
+//         gallery.lang = lang;
+//         gallery.this_gi = this_gi;
+//         gallery.this_ti = this_ti;
+//         gallery.list = gallery_arr;
+//         gallery.startIndex = startIndex;
+//         gallery.title = title;
+//         gallery.isWatermark = isWatermark;
+//         gallery.watermarkText = watermarkText;
+//         // $(gallery.document).ready(function(){
+//         //     setTimeout(function(){
+//         //         gallery.ui = ui;
+//         //         gallery.at = at;
+//         //         gallery.lang = lang;
+//         //         gallery.this_gi = this_gi;
+//         //         gallery.this_ti = this_ti;
+//         //         gallery.list = gallery_arr;
+//         //         gallery.startIndex = startIndex;
+//         //         gallery.title = title;
+//         //         gallery.isWatermark = isWatermark;
+//         //         gallery.watermarkText = watermarkText;
+//         //         var dataDom = $(gallery.document).find(".dataDom");
+//         //         dataDom.click();
+//         //     },0);
+//         // });
+//     }
+// }
 
 showAlbumPage = function( this_gi, this_ti, this_gai, name ){
 	if( null== window ) return;
@@ -1428,6 +1611,34 @@ getGroupCompetence = function( this_gi ){
 	return tmp;
 }
 
+getS32file = function(thisTi, fileObj) {
+	var api_name = "groups/" + gi + "/files/" + fileObj.c + "?pi=" + fileObj.p + "&ti=" 
+		+ thisTi;
+	var result = new QmiAjax({
+        apiName: api_name
+    })
+    var deferred = $.Deferred();
+
+    result.complete(function(data){
+        if(data.status != 200){
+        	cns.debug("get s3 fail");
+        	return false;
+        }
+
+		try{
+			cns.debug(data.responseText);
+			cns.debug("target",target, "tp",tp);
+		} catch(e){
+			errorReport(e);
+		}
+
+        var obj =$.parseJSON(data.responseText);
+        deferred.resolve(obj);
+    });
+
+    return deferred.promise();
+}
+
 getS3FileNameWithExtension = function( s3Addr, type ){
     var szFileName = "qmi_file";
 	if( s3Addr ){
@@ -1472,24 +1683,6 @@ renderVideoFile = function(file, videoTag, onload, onError){
 				videoTag.addClass("error");
 				if(onError) onError(videoTag);
 			}
-			// var timer = 0;
-			// video.addEventListener('progress', function (e) {
-			//     if (this.buffered.length > 0) {
-
-			//         if (timer != 0) {
-			//             clearTimeout(timer);
-			//         }
-
-			//         timer = setTimeout(function () {
-			//         	var loadPercent = parseInt(video.buffered.end(0) / video.duration * 100);
-			//             if( loadPercent== 100 ) {
-			//                 if( onload ) onload(videoTag);
-			//                 clearTimeout(timer);
-			//             };          
-			//         }, 1500);
-
-			//     }
-			// }, false); 
 		} else {
 			if(onload) onload(videoTag);
 		}

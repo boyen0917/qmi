@@ -317,11 +317,107 @@ $(function(){
 						parent.find(".download").remove();
 					});
 				} else {
+					scrollToBottom();
+					var this_grid = showUnsendMsg("", 26, file.name);
+						
+					this_grid.data("file-num", i).data("file", file)
+					.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
+
+					qmiUploadFile({
+		                urlAjax: {
+		                    apiName: "groups/" + gi + "/files",
+		                    method: "post",
+		                    body: {
+		                        tp: 0,
+		                        ti: ti_chat,
+		                        pi: 0,
+		                        wm: 0,
+		                    }
+		                },
+		                tp: 0,
+		                hasFi: true,
+		                file: file,
+		                oriObj: {w: 1280, h: 1280, s: 0.9}
+		            }).done(function(response){
+		            	// var this_grid = showUnsendMsg(response.data.fi, 26, file.name);
+		            	var chatData = this_grid.data("data");
+		            	var currentTime = new Date().getTime();
+						
+						this_grid.data("file-num", i);
+						this_grid.data("file", file);
+
+
+						g_idb_chat_msgs.remove(chatData.ei);
+
+						// tmpData.ml[0].c = data.fi;
+						// tmpData.ml[0].p = pi;
+						// //add new data to db & show
+						var newData = {
+							ei: chatData.ei,
+							meta: {
+								gu: g_group.gu,
+								ct: currentTime
+							},
+							ml: [
+								{
+									tp: 26,
+									c: response.data.fi,
+									fn: file.name
+								}
+							],
+							notSend: true
+						};
+
+						var node = {
+							gi: gi,
+							ci: ci,
+							ei: chatData.ei,
+							ct: currentTime,
+							data: newData
+						};
+						this_grid.data("data", newData);
+						//update db
+						g_idb_chat_msgs.put(node, function(){
+							sendMsgText(this_grid);
+						});
+
+						// console.log(this_grid.data("data"));
+
+						// var newData = {
+						// 	ei: chatData.ei,
+						// 	meta: {
+						// 		gu: g_group.gu,
+						// 		ct: currentTime
+						// 	},
+						// 	ml: [{
+						// 		c: response.data.fi,
+						// 		tp: 26,
+						// 		fn: file.name
+						// 	}]
+						// };
+
+						// var node = {
+						// 	gi: gi,
+						// 	ci: ci,
+						// 	ei: chatData.ei,
+						// 	ct: currentTime,
+						// 	data: newData
+						// };
+
+						// g_idb_chat_msgs.put(node, function(){
+						// 	console.log(newData);
+						// 	showMsg(newData);
+						// 	this_grid.remove();
+						// 	if( g_isEndOfPage === true ) scrollToBottom();
+						// });
+
+		            });
+
 					// this_grid.find("div").html('<span>file not supported</span>');
-					popupShowAdjust("",
-						$.i18n.getString("COMMON_NOT_MP4_NOR_IMAGE"),
-						$.i18n.getString("COMMON_OK")
-					);
+					// popupShowAdjust("",
+					// 	$.i18n.getString("COMMON_NOT_MP4_NOR_IMAGE"),
+					// 	$.i18n.getString("COMMON_OK")
+					// );
 				}
 			});
 
@@ -610,6 +706,7 @@ $(function(){
 		updateChat();
 		sendMsgRead(new Date().getTime())
 	});
+	
 
 /**
               ███████╗██╗   ██╗███╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗          
@@ -1363,6 +1460,19 @@ function showMsg(object, bIsTmpSend) {
 				msgDiv.html("You've missed a VOIP call, download Qmi on phone to receive it.");
 			}
 			break;
+		case 26:
+			if (isMe) {
+				msgDiv.addClass('chat-msg-container-right');
+			} else {
+				msgDiv.addClass('chat-msg-container-left');
+			}
+			console.log(msgData);
+			var fileDom = $("<a class='chat-file' download='" + msgData.fn 
+				+ "'><img src='images/timeline/otherfile_icon.png'>"
+				+ msgData.fn + "</a>");
+			msgDiv.append(fileDom);
+			getChatS3file(fileDom, msgData.c, msgData.tp, ti_chat);
+			break;
 		default: //text or other msg
 			if (isMe) {
 				msgDiv.addClass('chat-msg-bubble-right');
@@ -1393,7 +1503,7 @@ function showMsgMap(msgData, container) {
 	container.append(mapDiv);
 }
 
-function showUnsendMsg(c, tp) {
+function showUnsendMsg(c, tp, fn) {
 	var eiTmp = "{0}_{1}_{2}".format( randomHash(11), randomHash(11), randomHash(11));
 	var time = new Date().getTime();
 	var newData = {
@@ -1405,7 +1515,8 @@ function showUnsendMsg(c, tp) {
 		ml: [
 			{
 				c: c,
-				tp: tp
+				tp: tp,
+				fn: fn
 			}
 		],
 		notSend: true
@@ -1687,6 +1798,7 @@ function sendMsgText(dom) {
 				, "this_ti:", this_ti, "g_tu", g_tu);
 			return;
 		}
+		console.log("deff");
 		//default
 		var api_name = "groups/" + gi + "/chats/" + this_ti + "/files/" + file_c + "/dl";
 		var headers = {
@@ -1727,7 +1839,14 @@ function sendMsgText(dom) {
 						img.attr("src", obj.s3);
 						//點擊跳出大圖
 						img.click(function () {
-							showGallery(null, null, [{s32: obj.s32}]);
+							new QmiGlobal.gallery({
+					            gi: gi,
+					            photoList: [{s32: obj.s32}],
+					            currentImage : 0,
+					            isApplyWatermark : false,
+					            watermarkText : ""
+					        });
+							// showGallery(null, [{s32: obj.s32}], 0);
 							// 	var imgO = new Image();
 							// 	var gallery_str = "<img src=" + obj.s32 + " />";
 							// 	imgO.onload = function() {
@@ -1756,6 +1875,10 @@ function sendMsgText(dom) {
 						break;
 					case 8://聲音
 						target.attr("src", obj.s3);
+						break;
+
+					case 26://檔案
+						target.attr("href", obj.s3);
 						break;
 				}
 			} else {
