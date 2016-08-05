@@ -246,7 +246,7 @@ window.QmiGlobal = {
 		}
 	},
 
-	viewMap: {},
+	viewMap: {}, // cloud reload
 	systemPopup: {
 		html : '<section id="systemPopup">'+
 					'<div class="sm-person-info">'+
@@ -283,104 +283,7 @@ window.QmiGlobal = {
         }
 	},
 
-	avatarPopup: {
-		html :　'<div class="user-avatar-confirm">'+
-		               '<div class="avatar-content">'+
-		                   '<div class="avatar-preview">'+
-		                       '<img class="user-headshot" src="">'+
-		                   '</div>'+
-		                   '<div class="avatar-btn-content">'+
-		                       '<button data-role="none" class="cancel-btn btn-b" data-textid="COMMON_CANCEL"></button>'+
-		                       '<button data-role="none" class="avatar-save btn-b" data-textid="COMMON_OK"></button>'+
-		                   '</div>'+
-		                '</div>'+                           
-		        '</div>',
-		init : function(){
-			var imgPopup = $(this.html);
-			imgPopup._i18n();
-        	$("body").append(imgPopup);
-        	var userAvatar = $('.user-avatar-confirm');
-        	userAvatar.fadeIn();
-        	//儲存圖片
-        	userAvatar.find('.avatar-save').click(function(){
-        		//https://ap.qmi.emome.net/apiv1/
-        		// USAGE: 
-				qmiUploadFile({
-					urlAjax: {
-						apiName: "me/avatar",
-						method: "put"
-					},
-					isPublicApi: true,
-					file: userAvatar.find(".user-headshot")[0],
-					oriObj: {w: 1280, h: 1280, s: 0.7},
-					tmbObj: {w: 480, h: 480, s: 0.6},
-					tp: 1 // ;
-				}).done(function(data) {
-					console.log("finish", data);
-					QmiGlobal.me.auo = data.data.ou;
-					QmiGlobal.me.aut = data.data.tu;
-					$("#userInfo").find(".user-avatar-setting").attr("src",data.data.tu);
-					toastShow(data.data.rsp_msg);
-				});
-
-        		var reader = new FileReader();
-        		var file_ori = $('.setting-avatar-file');
-        		var image_file = file_ori[0].files[0];
-        		reader.onload = function(e) {
-		            var img = $(".user-avatar-img");
-		            img.attr("src",reader.result);
-		        }
-		        reader.readAsDataURL(image_file);        
-		        imgPopup.remove();
-        		userAvatar.fadeOut();
-        		$('input[type="file"]').val(null);
-		    });
-        	//取消
-        	$('.cancel-btn').click(function(){
-        		imgPopup.remove();
-		        userAvatar.fadeOut();
-		        $('input[type="file"]').val(null);
-		    });
-		}
-	},
-
-	guihu:{
-		html: '<div class="guihu-confirm">'+
-                    '<div class="edit-guihu-content">'+
-                        '<div class="guihu-title-content">'+
-                            '<div class="guihu-title"></div>'+
-                            '<div class="guihu-des"></div>'+
-                        '</div>'+
-                        '<div class="guihu-input-content">'+
-                            '<input type="text" data-role="none" placeholder="E-mail">'+
-                            '<input type="password" data-role="none" placeholder="Password">'+
-                        '</div>'+
-                        '<div class="guihu-btn-content">'+
-                            '<button class="guihu-cancel-btn btn-b" data-role="none">取消</button>'+
-                            '<button class="btn-b" data-role="none">確認</button>'+
-                        '</div>'+
-                    '</div>'+
-                '</div>',
-        init: function(){
-        	var guihuPop = $(this.html);
-        	$("body").append(guihuPop);
-        	var editGuihu = $(".guihu-confirm");
-        	editGuihu.fadeIn();
-
-        	$(".guihu-cancel-btn").click(function(){
-        		guihuPop.remove();
-		        editGuihu.fadeOut();
-		    });
-		    $(".guihu-btn-content").on('click',".add-btn",function(){
-		    	guihuPop.remove();
-		        editGuihu.fadeOut();
-		    });
-		    $(".guihu-btn-content").on('click',".save-btn",function(){
-		    	guihuPop.remove();
-		        editGuihu.fadeOut();
-		    });
-        }
-	}
+	
 
 };
 
