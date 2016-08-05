@@ -1358,7 +1358,7 @@ eventContentDetail = function(this_event,e_data){
 
 
 //回覆 detail timeline message內容
-detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailBox){
+detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDetailBox){
 
     var this_gi = this_event.data("event-id").split("_")[0];
     var this_ei = this_event.data("event-id");
@@ -1644,7 +1644,7 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailB
     });
 
     $.when.apply($, deferTasks).then(function () {
-        triggerDetailBox.data("trigger", true);
+        if(triggerDetailBox !== undefined) triggerDetailBox.data("trigger", true);
     });
 }
 
@@ -2226,6 +2226,7 @@ composeContentMake = function (compose_title){
         //圖片上傳物件及流水號
         this_compose.data("upload-obj",{});
         this_compose.data("upload-video",{});
+        this_compose.data("upload-file",{});
         this_compose.data("upload-ai",0);
         this_compose.data("body",{});
 
@@ -4338,8 +4339,6 @@ composeSend = function (this_compose){
     var tagMembers = this_compose.find(".cp-content-highlight").data("markMembers");
     var ml = this_compose.data("message-list").unique();
 
-    //發佈上傳檢查
-    var upload_chk = false;
     var body = {
             meta : {
                 lv : 1,
@@ -4559,6 +4558,13 @@ composeSend = function (this_compose){
     var isWaitingPermission = false; //(this_compose.data("object_str") || this_compose.data("branch_str") );
     var sendingFileData = [];
 
+    // 檔案上傳 統一處理
+    var uploadDefArr = [],
+        uploadAllDoneDef = $.Deferred(),
+        uploadUrl = "groups/" + gi + "/files",
+        uploadTotalCnt = 0, uploadCurrCnt = 0,
+        progressBarObj = composeProgressBar();
+
     //貼文內容的類型 網址 附檔之類的 
     $.each(ml,function(i,mtp){
         var obj = {tp:mtp};
@@ -4603,91 +4609,119 @@ composeSend = function (this_compose){
                     is_push = false;
                 }
                 break;
-            //圖片上傳
+            // 圖檔
             case 6:
-                //上傳檔案有自己的玩法
                 is_push = false;
 
-                //上傳類型
-                var mineType = /image.*/;
+                Object.keys(this_compose.data("upload-obj") || {}).forEach(function(key) {
+                    uploadTotalCnt++;
 
-                //發佈上傳檢查
-                upload_chk = true;
-                var total = Object.keys(this_compose.data("upload-obj")).length;
+                    var tmpDef = $.Deferred();
+                    uploadDefArr.push(tmpDef);
+                    qmiUploadFile({
+                        urlAjax: {
+                            apiName: uploadUrl,
+                            method: "post",
+                            body: {
+                                tp: 1,
+                                ti: ti_feed,
+                                pi: 0
+                            }
+                        },
+                        tp: 1,
+                        hasFi: true,
+                        file: this_compose.data("upload-obj")[key].elem,
+                        oriObj: {w: 1280, h: 1280, s: 0.7},
+                        tmbObj: {w: 480, h: 480, s: 0.6} // ;
+                    }).done(function(resObj) {
+                        progressBarObj.add();
+                        tmpDef.resolve(resObj);
 
-                var cnt = 0
-                //每次上傳都歸零
-                this_compose.data("uploaded-num",0);
-                this_compose.data("uploaded-total",total);
-                this_compose.data("uploaded-err",[]);
-                this_compose.data("img-compose-arr",[]);
+                        if(resObj.isSuccess === false) return;
 
-                //開啟loading icon
-                s_load_show = true;
-
-                //上傳附檔
-                $.each(this_compose.data("upload-obj"),function(i,file){
-                    if( isWaitingPermission ){
-                        sendingFileData.push({
-                            file: file,
-                            mineType: mineType,
-                            cnt: cnt,
-                            total: total,
-                            type: 6
+                        body.ml.push({
+                            c: resObj.data.fi,
+                            p: 0,
+                            tp: 6
                         });
-                    }else{
-                        uploadImg(file,mineType,cnt,total,6,0,isApplyWatermark);
-                        cnt++;
-                    }
+                    });
                 });
-                
-                this_compose.data("body",body);
+                    
                 break;
-            //影片上傳
+            // 影片
             case 7:
-                //上傳檔案有自己的玩法
                 is_push = false;
+                Object.keys(this_compose.data("upload-video") || {}).forEach(function(key) {
+                    uploadTotalCnt++;
 
-                //上傳類型
-                var mineType = /video.mp4/;
+                    var tmpDef = $.Deferred();
+                    uploadDefArr.push(tmpDef);
+                    qmiUploadFile({
+                        urlAjax: {
+                            apiName: uploadUrl,
+                            method: "post",
+                            body: {
+                                tp: 2,
+                                ti: ti_feed,
+                                pi: 0
+                            }
+                        },
+                        tp: 2,
+                        hasFi: true,
+                        file: this_compose.data("upload-video")[key],
+                        oriObj: {w: 1280, h: 1280, s: 0.9}
+                    }).done(function(resObj) {
+                        progressBarObj.add();
+                        tmpDef.resolve(resObj);
 
-                //發佈上傳檢查
-                upload_chk = true;
-                var total = Object.keys(this_compose.data("upload-video")).length;
+                        if(resObj.isSuccess === false) return;
 
-                //每次上傳都歸零
-                this_compose.data("uploaded-vid-num",0);
-                this_compose.data("uploaded-vid-total",total);
-                this_compose.data("uploaded-vid-err",[]);
-                this_compose.data("video-compose-arr",[]);
-
-                //開啟loading icon
-                s_load_show = true;
-
-                //上傳附檔
-                $.each(this_compose.data("upload-video"),function(i,file){
-                    var video = this_compose.find('video[data-file-num='+i+']');
-                    if( isWaitingPermission ){
-                        sendingFileData.push({
-                            file: file,
-                            mineType: mineType,
-                            type: 7,
-                            cnt: i,
-                            total: total,
-                            videoDom: video
+                        body.ml.push({
+                            c: resObj.data.fi,
+                            p: 0,
+                            tp: 7
                         });
-                    }else{
-                        if(video.length>0){
-                            uploadVideo(file, video, i, total, 7, 0);
-                            cnt++;
-                        }
-                    }
+                    });
                 });
-                
-                this_compose.data("body",body);
+                    
                 break;
-            case 21:
+            case 26:
+                is_push = false;
+                // 檔案上傳
+                Object.keys(this_compose.data("upload-file") || {}).forEach(function(key) {
+                    uploadTotalCnt++;
 
+                    var tmpDef = $.Deferred();
+                    uploadDefArr.push(tmpDef);
+                    qmiUploadFile({
+                        urlAjax: {
+                            apiName: uploadUrl,
+                            method: "post",
+                            body: {
+                                tp: 0,
+                                ti: ti_feed,
+                                pi: 0
+                            }
+                        },
+                        tp: 0,
+                        hasFi: true,
+                        file: this_compose.data("upload-file")[key],
+                        oriObj: {w: 1280, h: 1280, s: 0.9}
+                    }).done(function(resObj) {
+                        progressBarObj.add();
+                        tmpDef.resolve(resObj);
+
+                        if(resObj.isSuccess === true) {
+                            body.ml.push({
+                                ftp: 0,
+                                fi: resObj.data.fi,
+                                fn: resObj.data.file.name,
+                                si: resObj.data.file.size,
+                                tp: 26
+                            });
+                        }
+                    });
+                });
                 break;
         }
 
@@ -4695,40 +4729,62 @@ composeSend = function (this_compose){
         if(is_push) body.ml.push(obj);
     });
 
-    // 若有副件要上傳取得permission id
-    if( isWaitingPermission ){
-        cns.debug(this_compose.data("object_str"), this_compose.data("branch_str"))
-        getFilePermissionIdWithTarget(gi, this_compose.data("object_str"), this_compose.data("branch_str")).complete(function(data){
-            if(data.status == 200){
-                var pi_result = $.parseJSON(data.responseText);
-            
-                //每次上傳都歸零
-                this_compose.data("uploaded-num",0);
-                this_compose.data("uploaded-err",[]);
-                this_compose.data("img-compose-arr",[]);
+    // 進度條
+    progressBarObj.init();
 
-                for(var i=0; i<sendingFileData.length;i++){
-                    var obj = sendingFileData[i];
-                    switch( obj.type ){
-                        case 6:
-                            uploadImg( obj.file, obj.mineType, i, obj.total, obj.type, pi_result.pi,isApplyWatermark);
-                            break;
-                        case 7:
-                            uploadVideo( obj.file, obj.videoDom, i, obj.total, 7, pi_result.pi);
-                            break;
-                    }
-                }
+    $.when.apply($, uploadDefArr).done(function() {
+        // 有一個失敗就不傳
+        var errorFlag = false;
+        Array.prototype.forEach.call(arguments, function(resObj) {
+            if(resObj.isSuccess === false) errorFlag = true;
+        })
+        setTimeout(function() {
+            progressBarObj.close(); 
+            if(errorFlag === false) composeSendApi(body);
+        }, 500);
+    // 取消
+    }).fail(function() {
+        progressBarObj.close();
+    })
+
+    function composeProgressBar() {
+        return {
+            init: function() {
+                if(uploadTotalCnt === 0) return;
+                $("#compose-progressbar").remove();
+                $("body").append($("<section>", {
+                    id: "compose-progressbar",
+                    style: "display: block",
+                    html: "<div class='container'><div class='title'>"+ $.i18n.getString("FILESHARING_UPLOADING") +"</div><div class='bar'></div>" + 
+                            "<button>"+ $.i18n.getString("COMMON_CANCEL") +"</button>" + 
+                            "<div class='cnt'><span class='curr' num='0'></span> / <span class='total'>"+ uploadTotalCnt +"</span></div></div>"
+                }));
+
+                $("#compose-progressbar button").click(function() {
+                    uploadDefArr.forEach(function(item) {
+                        item.reject();
+                    })
+                })
+            },
+
+            add: function() {
+                if(uploadTotalCnt === 0) return;
+
+                uploadCurrCnt++;
+                $("#compose-progressbar")
+                .find("span.curr").attr("num", uploadCurrCnt).end()
+                .find(".bar").css("width", (100*(uploadCurrCnt/uploadTotalCnt)-1.5)+"%");
+            },
+
+            close: function() {
+                if(uploadTotalCnt === 0) return;
+                $("#compose-progressbar").remove();
             }
-        });
+        }
     }
-
-    if(!upload_chk){
-        composeSendApi(body);
-    }
-    
-    cns.debug("good job",body);
-    // return false;
 }
+
+
 
 composeSendApi = function(body){
     var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events";
@@ -5696,6 +5752,8 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 if(!val.c) break;
                 //更改網址成連結 
                 val.c = htmlFormat(val.c);
+                if(this_event.data("event-id") === "G00002F00Eb_T0000GQG0Er_E000000C0G1")
+                    window.vc = val.c;
 
                 (function() {
                     var tagRegex = /\/{3};(\w+);\/{3}/g,
@@ -6010,31 +6068,39 @@ timelineFileMake = function(thisEvent, fileNum) {
         allDownLoadDiv.bind("click", function(e) {
             var fileLinks = fileListDiv.find("a");
             var fileIndex = 0;
-            var https = require('https'),
-                fs = require('fs');
             e.preventDefault();
 
-            var downloadFile = function(callback){
-                console.log(fileLinks);
-                if(fileIndex < fileLinks.length) {
-                    var fileLink = fileLinks[fileIndex];
-                    console.log(fileLink);
-                    var file = fs.createWriteStream("C:/Users/sam/AppData/Local/Qmi/Downloads/" + fileLink["download"]);
-                    console.log(fileLink["href"]);
-                    var request = https.get(fileLink["href"], function(response) {
-                        response.pipe(file);
-                        fileIndex += 1;
-                        downloadFile(callback);
-                    });
-                } else {
-                    callback();
-                }
-                
-            }
+            try {
+                var https = require('https'),
+                    fs = require('fs'),
+                    path = require('path')
+                    __dirname = path.dirname(process.execPath);
 
-            downloadFile(function() {
-                console.log("download finishes");
-            });
+                var downloadFile = function(callback){
+                    if(fileIndex < fileLinks.length) {
+                        var fileLink = fileLinks[fileIndex];
+                        var file = fs.createWriteStream(__dirname + "/" + fileLink["download"]);
+                        var request = https.get(fileLink["href"], function(response) {
+                            response.pipe(file);
+                            fileIndex += 1;
+                            downloadFile(callback);
+                        });
+                    } else {
+                        callback();
+                    }
+                }
+
+                downloadFile(function() {
+                    console.log("download finishes");
+                });
+            } catch(e){
+                $.each(fileLinks, function(i, fileLink) {
+                    fileLink.click();
+                });
+            }
+           
+
+            
 
             // var file = fs.createWriteStream("C:/Users/sam/AppData/Local/Qmi/Downloads/33455.jpg");
             // var request = https.get("https://project-o.s3.hicloud.net.tw/groups/G00002Aa0GQ/0/5ff373ff-a42a-4183-ba59-3bdd1cbc1bf6_o?Expires=1785494657&AWSAccessKeyId=SE41NTAxNDgyNDE0MjI2MDE4Mjg5MjM&Signature=%2FuvyHosaMg3Q5wuh16Y4hTZp1lA%3D", function(response) {

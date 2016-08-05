@@ -131,6 +131,10 @@
 	"COMPOSE_PARSE_ERROR" : "Oops,can not get the result of this URL",
 	"COMPOSE_DISCARD": "Discard this post?",
 
+	"COMPOSE_FOOTER_IMAGE": "Image",
+	"COMPOSE_FOOTER_VIDEO": "Video",
+	"COMPOSE_FOOTER_FILE": "File",
+
 	"MEMBER_ALL" : "All",
 	"MEMBER_X_GROUP_NO_MEMBER": "No member in sub group %@ now.",
 	"MEMBER_CREATE_CUSTOMIZE_GROUP" : "New customize group",
@@ -251,6 +255,7 @@
 	"NOTICES_RESPONSE"						: "Response",
 	"NOTICES_UPLOAD_FILE"						: "and upload file",
 	"NOTICES_RESPONSER_NUM"					: "and %ld other people",
+	"NOTICES_NOMSG_BRIAN"				: "no message",
 
 	"LEFT_FEED" : "News Feeds",
 	"LEFT_GROUP" : "Group",
@@ -335,6 +340,7 @@
 	"FILESHARING_DELETE_CONFIRM" : "Are you sure to delete this file ?",
 	"FILESHARING_DELETE_OK" : "delete successful",
 	"FILESHARING_HOME" : "home",
+	"FILESHARING_UPLOADING" : "uploading..",
 	"COMMON_UNKNOWN_ERROR" : "unknown error",
 
 	"PERSONAL_INFORMATION" : "Profile",
@@ -345,7 +351,7 @@
 	"SYSTEM_SET" : "Notifications",
 	"DEFAULT_GROUP_SET" : "Default Login Group",
 	"TOP_PAGE_SET" : "Top Slide Show",
-	"GUIHU" : "歸戶",
+	"GUIHU" : "LDAP Account Binding",
 
 	"ORIGIN_PASSWORD" : "Current Password",
 	"NEW_PASSWORD" : "New Password",

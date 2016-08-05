@@ -130,6 +130,10 @@
 	"COMPOSE_PARSE_ERROR" : "網址內容取得失敗",
 	"COMPOSE_DISCARD": "即將捨棄這則貼文？",
 
+	"COMPOSE_FOOTER_IMAGE": "圖檔",
+	"COMPOSE_FOOTER_VIDEO": "影片",
+	"COMPOSE_FOOTER_FILE": "檔案",
+
 	"MEMBER_ALL" : "全部",
 	"MEMBER_X_GROUP_NO_MEMBER": "%@目前沒有成員",
 	"MEMBER_CREATE_CUSTOMIZE_GROUP" : "新增自定群組",
@@ -245,11 +249,12 @@
 	"CHAT_UPLOAD_FILE_MISSING" : "上傳檔案遺失, 請重新上傳",
 	"CHAT_SCROLL_UP_TO_UPDATE" : "上捲更新...",
 
-	"NOTICES_TITLE"						: "新通知",
-	"NOTICES_POST"						: "發佈",
-	"NOTICES_RESPONSE"						: "回覆",
-	"NOTICES_UPLOAD_FILE"						: "並上傳了檔案",
-	"NOTICES_RESPONSER_NUM"					: "及其他%ld個人",
+	"NOTICES_TITLE"			: "新通知",
+	"NOTICES_POST"			: "發佈",
+	"NOTICES_RESPONSE"		: "回覆",
+	"NOTICES_UPLOAD_FILE"	: "並上傳了檔案",
+	"NOTICES_RESPONSER_NUM"	: "及其他%ld個人",
+	"NOTICES_NOMSG_BRIAN"	: "沒有訊息",
 
 	"LEFT_FEED" : "動態消息",
 	"LEFT_GROUP" : "團體",
@@ -333,7 +338,9 @@
 	"FILESHARING_DELETE_CONFIRM" : "確定刪除此檔案?",
 	"FILESHARING_DELETE_OK" : "刪除成功",
 	"FILESHARING_HOME" : "首頁",
+	"FILESHARING_UPLOADING" : "檔案上傳中",
 	"COMMON_UNKNOWN_ERROR" : "未知錯誤",
+
 
 	"REFRESH_RELOAD" : "讀取失敗，請稍後再試",
 	"REFRESH_TEXT" : "私雲轉移中 此團體暫時無法操作",

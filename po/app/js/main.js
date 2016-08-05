@@ -671,11 +671,9 @@ $(function(){
 	$(document).on('click','.st-reply-message-img .img',function(){
 		var tmp = $(this).parent();
 		tmp.html("");
-		cns.debug( tmp.data("type") );
 		tmp.removeData("type");
 		tmp.removeData("id");
 		tmp.removeData("file");
-		cns.debug( tmp.data("type") );
 	});
 
 	$(document).on('click','.st-reply-message-img .file-cancel',function(){
@@ -695,16 +693,22 @@ $(function(){
 
 	//圖片檔案處理
 	$(document).on('change','.st-reply-message-file',function(e){
+		var file = $(this)[0].files[0];
+		if(file.size > 200 * 1024 * 1024){ //max 200mb
+			toastShow($.i18n.getString("COMMON_EXCEED_FILE_SIZE"));
+			return;
+		}
+
 		var deferred = $.Deferred(),
 			inputFile = $(this),
-			file = $(this)[0].files[0],
 			matchArr = ["image", "video"],
+			vdoDefaultFlag = false,
 
 			fileType = matchArr.find(function(tp){
 				return file.type.match(new RegExp(tp, "g")) instanceof Array;
 			}),
-
 			fileURL = URL.createObjectURL(file);
+
 
 		switch(fileType) {
 			case "image":
@@ -712,7 +716,17 @@ $(function(){
 				break;
 
 			case "video":
-				getVideoImgUrl(file).done(deferred.resolve)				
+				getVideoImgUrl(file).done(function(vdoUrl) {
+					// 判斷有無圖片
+					var img = document.createElement("img");
+					img.src = vdoUrl;
+					img.onerror = function() { 
+						vdoDefaultFlag = true;
+						deferred.resolve("images/vdo_default.png");
+					}
+					img.onload = function() { deferred.resolve(vdoUrl) }
+
+				})				
 				break;
 
 			default:
@@ -722,16 +736,17 @@ $(function(){
 		}
 
 		deferred.done(function(dataUrl) {
-			var previewInput = "<div class='img'><img src='" + dataUrl + "'/></div>";
+			var previewInput = "<div class='img'><img "+ (vdoDefaultFlag ? "class='vdo-default'" : "")  +" src='" + dataUrl + "'/></div>";
 
 			if (fileType == "file") {
 				var fileName = file.name.split(".")[0];
+				var fileIcon = getMatchIcon(file.type);
                 var format = file.name.split(".")[1];
                 if (fileName.length > 15) {
-                    fileName = fileName.substring(0, 10) + "....";
+                    fileName = fileName.substring(0, 15) + "....";
                 }
 				previewInput = "<div class='attach-file'><img class='file-icon'" 
-					+ "src='images/timeline/otherfile_icon.png' >" + (fileName + " - " + format) 
+					+ "src='" + fileIcon+ "' >" + (fileName + " - " + format) 
 					+ "<span>" + file.size.toFileSize() + "</span>"
 					+ "<img class='file-cancel' src='images/common/icon/icon_compose_close.png'></div>";
 			}
@@ -744,61 +759,9 @@ $(function(){
 			inputFile.replaceWith( inputFile.val('').clone( true ) );
 		});
 
-		return;
-		var file_ori = $(this);
-
-		var imageType = /image.*/;
-		$.each(file_ori[0].files,function(i,file){
-
-			if (file.type.match("image")) {
-				var this_grid =  file_ori.parent().find(".st-reply-message-img");
-				this_grid.data("type",6);
-				this_grid.html("<div class='img'><img/></div>");
-
-				this_grid.data("file",file);
-
-				var reader = new FileReader();
-				reader.onload = function(e) {
-					var img = this_grid.find("div img");
-
-			        img.attr("src",reader.result);
-			        img.css("border", "lightgray 1px solid");
-				}
-
-				reader.readAsDataURL(file);
-			}
-		});
-
-		//每次選擇完檔案 就reset input file
-		file_ori.replaceWith( file_ori.val('').clone( true ) );
+		
 	});
 	
-	// //留言ui調整
-	// $(document).on("input",".st-reply-message-textarea textarea",function(e){
-	// 	var this_textarea = $(this);
-	// 	// console.log(String.fromCharCode(e.keyCode));
-	// 	// this_textarea.next().html(String.fromCharCode(e.keyCode));
-	// 	// console.log(this_textarea.next().html());
-
-	// 	if(this_textarea.height() > 40 && this_textarea.parent().hasClass("adjust")) {
-	// 		this_textarea.parent().removeClass("adjust");
-	// 		this_textarea.addClass("textarea-animated");
-	// 		return false;
-	// 	}
-
-	// 	if(!this_textarea.val()){
-	// 		this_textarea.parent().addClass("adjust");
-	// 		this_textarea.removeClass("textarea-animated");
-	// 		return false;
-	// 	}
-
-	// 	setTimeout(function(){
-	// 		if (this_textarea.height() < 40 && !this_textarea.parent().hasClass("adjust")) {
-	// 			this_textarea.parent().addClass("adjust");
-	// 			this_textarea.removeClass("textarea-animated");
-	// 		}
-	// 	},201);
-	// });
 
 
 	//留言ui調整
@@ -1388,17 +1351,6 @@ $(function(){
 			},1000);
 			return false;
 		}
-
-		//網址截取 預備判斷 **此功能取消**
-		// if(this_compose.data("parse-error")) {
-		// 	$('.ui-loader').css("display","block");
-		// 	$(".ajax-screen-lock").show();
-		// 	cns.debug("parse url again");
-		// 	this_compose.data("url-chk",false);
-		// 	this_compose.data("parse-resend",true);
-		// 	this_compose.find('.cp-textarea-desc').trigger("input");
-		// 	return false;
-		// }
  			
 		this_compose.data("compose-content",$('.cp-content-highlight').html());
 		this_compose.data("compose-title",$('.cp-textarea-title').val());
@@ -1448,6 +1400,17 @@ $(function(){
 		if(empty_chk) composeSend(this_compose);   
 	});
 
+	// 偵測貼上事件 避免html 換成text文本
+	$("#page-compose").on("paste", ".cp-content-highlight", function(e){
+		e.preventDefault();
+		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
+	})
+
+	// 8-2-16 阻止拖拉橫移
+	$(".subpage-timeline.main-subpage").on("scroll", function(){
+		$(this).scrollLeft(0)
+	})
+
 	
 	//貼文-下方附檔功能bar
 	$(".cp-addfile").click(function(){
@@ -1459,18 +1422,14 @@ $(function(){
 		switch(add_type){
 
 			case "video":
-				$(".cp-file").data("img",false).attr("accept", "video/mp4").trigger("click");
-				target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
-				setTimeout(function(){
-					target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
-				},100);
+				$(".cp-file").attr("accept", "video/mp4").trigger("click");
 				break;
 			case "img":	//附影像
-				$(".cp-file").data("img",true).attr("accept", "image/*").trigger("click");
-				target.find("img").attr("src",img_url+target.data("cp-addfile")+"_visit.png");
-				setTimeout(function(){
-					target.find("img").attr("src",img_url+target.data("cp-addfile")+".png");
-				},100);
+				$(".cp-file").attr("accept", "image/*").trigger("click");
+				break;
+
+			case "file":	//附影像
+				$(".cp-file").data("file",true).attr("accept", false).trigger("click");
 				break;
 
 			case "sticker":	//附貼圖
@@ -1522,20 +1481,41 @@ $(function(){
 		var this_compose = composePage.find(".cp-content");
 		var videoList = [];
 		var imgList = [];
+		var fileList = [];
 		var file_ori = $(this);
 		var imageType = /image.*/;
 		var videoType = /video.mp4/;
 		var isMp4AlertShown = false;
+
+		// 預設各個副檔案的title
+		if(composePage.find(".cp-file-img-area").attr("type") === undefined) {
+			composePage.find(".cp-file-area > div").each(function(i, item) {
+				$(item).attr("type", $.i18n.getString("COMPOSE_FOOTER_" + $(item).attr("name")));
+			})
+		} 
+			
+
 		$.each(file_ori[0].files,function(i,file){
+			// 點擊迴紋針上傳 直接push進fileList
+			if(file_ori.data("file") === true) {
+				fileList.push(file);
+				return;
+			}
+
 			if( file.type.match(imageType)){
 				imgList.push(file);
 			} else if( file.type.match(videoType)){
 				videoList.push(file);
-			} else if( !isMp4AlertShown && file.type.match(/video.*/) ){
+			} else if( !isMp4AlertShown && file.type.match(/video.*/)){
 				isMp4AlertShown = true;
 				toastShow( $.i18n.getString("COMMON_NOT_MP4") );
+			} else {
+				// 上傳檔案
+				fileList.push(file)
 			}
 		});
+
+		file_ori.data("file", false);
 
 		if( imgList.length>0 ){
 
@@ -1544,114 +1524,75 @@ $(function(){
 			var imageArea = composePage.find(".cp-file-img-area");
 			imageArea.html("").show();
 			
-			var videoArea = this_compose.find(".cp-file-video-area");
-			if( videoArea.is(":visible") ){
-				videoArea.addClass("topBorder");
-			}
-
-			var limit_chk = false;
-			// var upload_arr = this_compose.data("upload-arr");
-
 			$.each(imgList,function(i,file){
 				if(!file || !file.type) return;
-				if(Object.keys(this_compose.data("upload-obj")).length == 9 ){
-					limit_chk = true;
-					return false;
-				}
-				
 				//流水號
 				var ai = this_compose.data("upload-ai");
-				this_compose.data("upload-obj")[ai] = file;
+				this_compose.data("upload-obj")[ai] = {file: file};
 				this_compose.data("upload-ai",ai+1)
 			});
-
-			if(limit_chk){
-				toastShow( $.i18n.getString("COMMON_SEND_PHOTO_LIMIT",9) );
-				// return false;
-			}
-
-			$.each(this_compose.data("upload-obj"),function(i,file){
+			
+			$.each(this_compose.data("upload-obj"),function(i, obj){
 				var this_grid =  $('<div class="cp-grid"><div><img/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
 				$(".cp-file-img-area").append(this_grid);
-				
+
 				//編號 方便刪除
 				this_grid.data("file-num",i);
 
-				// if (file.type.match(imageType)) {
+				
+				// 存回
+				var elem = this_grid.find("div img");
+				this_compose.data("upload-obj")[i] = {
+					file: obj.file,
+					elem: elem[0]
+				}
 
-					//有圖片就push進 compose message list
-					if($.inArray(6,this_compose.data("message-list")) < 0){
-						this_compose.data("message-list").push(6);
+				//有圖片就push進 compose message list
+				if($.inArray(6,this_compose.data("message-list")) < 0){
+					this_compose.data("message-list").push(6);
 
-						//附檔區域存在附檔
-						this_compose.data("attach",true);
-					}
+					//附檔區域存在附檔
+					this_compose.data("attach",true);
+				}
 
-					var reader = new FileReader();
-					reader.onload = function(e) {
-						var img = this_grid.find("div img");
-
-						//調整長寬
-						img.load(function() {
-							var w = img.width();
-				            var h = img.height();
-	        				mathAvatarPos(img,w,h,100);
-				        });
-				        img.attr("src",reader.result);
-					}
-					reader.readAsDataURL(file);	
-				// }else{
-				// 	this_grid.find("div").html('<span>file not supported</span>');
-				// }
+				var reader = new FileReader();
+				reader.onload = function(e) {
+			        elem.attr("src",reader.result);
+				}
+				reader.readAsDataURL(obj.file);	
 			});
 		}
+
 		if( videoList.length>0 ){
 
 			var composePage = $("#page-compose");
 			var this_compose = composePage.find(".cp-content");
-
-			this_compose.find(".cp-attach-area").show();
-			this_compose.find(".cp-file-area").show();
 			var videoArea = this_compose.find(".cp-file-video-area");
-			videoArea.html("").show();
-			if( this_compose.find(".cp-file-img-area").is(":visible") ){
-				videoArea.addClass("topBorder");
-			}
 
 			var limit_chk = false;
 			// var upload_arr = this_compose.data("upload-arr");
 
-			$.each(videoList,function(i,file){
-				if(!file||!file.type) return;
-				if(Object.keys(this_compose.data("upload-video")).length == 1 ){
-					limit_chk = true;
-					return false;
-				}
-				
-				//流水號
-				var ai = this_compose.data("upload-ai");
-				this_compose.data("upload-video")[ai] = file;
-				this_compose.data("upload-ai",ai+1)
-			});
-
-			if(limit_chk){
+			if(videoList.length > 1) {
 				toastShow( $.i18n.getString("COMMON_SEND_VIDEO_LIMIT",1) );
-				// return false;
-			}
+			} else {
+				var file = videoList[0];
 
-			$.each(this_compose.data("upload-video"),function(i,file){
-				var this_grid =  $('<div class="cp-grid"><div><video data-file-num="'+i+'"/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
-				
-				//編號 方便刪除
-				this_grid.data("file-num",i);
-				videoArea.append(this_grid);
-
-				// if( !file.type.match(videoType) ){
-				// 	this_grid.find("div").html('<span>'+$.i18n.getString("COMMON_NOT_MP4")+'</span>');
-				// } else
-				if(file.size > 50000000){ //max 50mb
-					this_grid.find("div").html('<span>'+$.i18n.getString("COMMON_EXCEED_FILE_SIZE")+'</span>');
+				if(file.size > 200 * 1024 * 1024){ //max 200mb
+					toastShow($.i18n.getString("COMMON_EXCEED_FILE_SIZE"));
 				} else {
+					//流水號
+					var ai = this_compose.data("upload-ai");
+					this_compose.data("upload-video")[ai] = file;
+					this_compose.data("upload-ai",ai+1);
+
+					this_compose.find(".cp-attach-area").show();
+					this_compose.find(".cp-file-area").show();
+					videoArea.html("").show();
+					var this_grid =  $('<div class="cp-grid"><div><video data-file-num="'+ai+'"/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
+				
+					//編號 方便刪除
+					this_grid.data("file-num", ai);
+					videoArea.append(this_grid);
 
 					//有圖片就push進 compose message list
 					if($.inArray(7,this_compose.data("message-list")) < 0){
@@ -1660,7 +1601,7 @@ $(function(){
 						//附檔區域存在附檔
 						this_compose.data("attach",true);
 					}
-					renderVideoFile(file, videoArea.find('video[data-file-num="'+i+'"]'), function (videoTag) {
+					renderVideoFile(file, videoArea.find('video[data-file-num="'+ai+'"]'), function (videoTag) {
 						videoTag.parent().addClass("loaded");
 						if( videoTag.width() > 100 ){
 							videoTag.css("margin-left",-(videoTag.width()-100)*0.5);
@@ -1668,7 +1609,62 @@ $(function(){
 					}, function (videoTag) {
 						videoTag.parent().addClass("error");
 					});
+
+					// getVideoImgUrl(file).done(function(vdoUrl) {
+					// 	// 判斷有無圖片
+					// 	var img = document.createElement("img");
+					// 	img.src = vdoUrl;
+					// 	img.onerror = function() { 
+					// 		vdoDefaultFlag = true;
+					// 		deferred.resolve("images/vdo_default.png");
+					// 	}
+					// 	img.onload = function() { deferred.resolve(vdoUrl) }
+
+					// })
 				}
+
+			}
+		}
+
+		if( fileList.length>0 ){
+
+			composePage.find(".cp-attach-area").show();
+			composePage.find(".cp-file-area").show();
+			var fileArea = composePage.find(".cp-file-else-area");
+			fileArea.show();
+
+			var fileContentArea = fileArea.find(".content");
+			fileContentArea.html("");
+			
+			$.each(fileList,function(i,file){
+				if(!file || !file.type) return;
+				//流水號
+				var ai = this_compose.data("upload-ai");
+				this_compose.data("upload-file")[ai] = file;
+				this_compose.data("upload-ai",ai+1)
+			});
+
+			$.each(this_compose.data("upload-file"),function(i,file){
+				console.log("im file ",file);
+				var fileRow =  $('<div class="file-row">' +
+                    '    <img src="images/compose/icon_file.png">' +
+                    '    <span>'+ file.name +'</span>' +
+                    '    <span>'+ fileSizeTransfer(file.size) +'</span>' +
+                    '    <img class="grid-cancel" src="images/common/icon/icon_compose_close.png">' +
+                    '</div>');
+
+				fileContentArea.append(fileRow);
+				
+				//編號 方便刪除
+				fileRow.data("file-num",i);
+
+				//有圖片就push進 compose message list
+				if($.inArray(26, this_compose.data("message-list")) < 0){
+					this_compose.data("message-list").push(26);
+					//附檔區域存在附檔
+					this_compose.data("attach",true);
+				}
+
 			});
 		}
 
@@ -1686,7 +1682,10 @@ $(function(){
         $(this).hide();
         
         var target_input = $(this).parents(".st-sub-box").find(".st-reply-message-file");
-        if($(this).hasClass("compose-dnd")) target_input = $(".cp-file");
+        if($(this).hasClass("compose-dnd")) {
+        	target_input = $(".cp-file");
+        	target_input.data("file", false);
+        }
         if($(this).hasClass("me")) {
         	target_input = $(this).find(".user-avatar-bar.me input");
         	$(this).show();
@@ -1696,6 +1695,7 @@ $(function(){
             if(e.originalEvent.dataTransfer.files.length) {
                 /*UPLOAD FILES HERE*/
 				target_input[0].files = e.originalEvent.dataTransfer.files;
+				// target_input[0].files[target_input[0].files.length] = e.originalEvent.dataTransfer.files;
             }
         }
 	});
@@ -1730,7 +1730,7 @@ $(function(){
 		composeCheckMessageList();
 	});
 
-	$(document).on("click",".cp-grid .grid-cancel",function(e){
+	$(document).on("click",".cp-file-area .grid-cancel",function(e){
 		var this_compose = $(document).find(".cp-content");
 		var this_grid = $(this).parent();
 		var file_num = this_grid.data("file-num");
@@ -1745,19 +1745,17 @@ $(function(){
 
 				this_cancel.attr("src","images/common/icon/icon_compose_close.png");
 				this_cancel.remove();
-				this_grid.hide('fast', function(){ 
+				this_grid.hide("fast", function(){ 
 					this_grid.remove(); 
 
 					//圖檔區沒東西了 就剔除message list
 					if(area.html() == ""){
 						area.hide();
-						area.siblings(".cp-file-video-area").removeClass("topBorder");
 						this_compose.data("message-list").splice($.inArray(6,this_compose.data("message-list")),1);
-
 						composeCheckMessageList();
 					}
 				});
-			} else {
+			} else if(area.hasClass("cp-file-video-area")) {
 				//刪除upload arr
 				delete this_compose.data("upload-video")[file_num];
 
@@ -1768,9 +1766,24 @@ $(function(){
 
 					//圖檔區沒東西了 就剔除message list
 					if( area.html() == ""){
-						area.hide().removeClass("topBorder");
+						area.hide();
 						this_compose.data("message-list").splice($.inArray(7,this_compose.data("message-list")),1);
+						composeCheckMessageList();
+					}
+				});
+			} else {
+				//刪除upload arr
+				delete this_compose.data("upload-file")[file_num];
 
+				this_cancel.attr("src","images/common/icon/icon_compose_close.png");
+				this_cancel.remove();
+				this_grid.hide('fast', function(){ 
+					this_grid.remove(); 
+
+					//圖檔區沒東西了 就剔除message list
+					if( area.html() == ""){
+						area.parent().hide();
+						this_compose.data("message-list").splice($.inArray(7,this_compose.data("message-list")),1);
 						composeCheckMessageList();
 					}
 				});

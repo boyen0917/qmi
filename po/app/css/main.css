@@ -21,6 +21,7 @@ body{
 
 ::-webkit-scrollbar {
       width: 8px;
+      height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -688,7 +689,7 @@ img.auo {
 }
 
 .compose-dnd {
-	position: absolute;
+	position: fixed;
 	background: rgb(57, 148, 232);
 	opacity: 0.3;
 	z-index: 1700;
@@ -1501,7 +1502,7 @@ img.auo {
 	height: 44px;
 	background: url("../images/compose/compose_form_addfile_bg.png") repeat-x;
 	/*display: inline-block;*/
-	width: 100%;
+	width: 100vw;
 	border-bottom: 1px solid rgb(218,218,218);
 	position: fixed;
 	bottom: -2px;
@@ -2964,28 +2965,39 @@ img.st-user-pic{
 #galleryModal {
 	/*display: none; */
     position: fixed; 
-    z-index: 101; 
+    z-index: 1010; 
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
     background-color: rgba(0,0,0,0.9);
 }
 
 .gallery-contaniner {
 	width: 90%;
     height: 90%;
-    margin: auto;
+    margin: 3% auto;
 }
 
 #galleryModal .close {
 	color: white;
-	font-size: xx-large;
-	position: relative;
-	left: 93%;
-	cursor: pointer;
-	text-shadow: 2px 2px 2px #aaa;
+    font-size: 25px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    line-height: 45px;
+    z-index: 1;
+}
+
+#galleryModal figure.gallery-contaniner.original-size {
+	width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: scroll;
 }
 
 #galleryModal .arrowBtn {
@@ -3026,6 +3038,12 @@ img.st-user-pic{
   	bottom: 60px;
   	cursor: pointer;
   	opacity: 0.8;
+/*=======
+    text-align: right;
+    position: absolute;
+    right: 5%;
+    bottom: 2%;
+>>>>>>> d04147bcc608092e0e5229ec3d11f4cf1fdd256a*/
 }
 
 .currentImg {
@@ -3445,22 +3463,7 @@ img.st-reply-message-attach {
 	height: 36px;
 }
 
-.st-reply-message-textarea .tag-members-container {
-	display: none;
-	position: absolute;
-    margin: -217px auto;
-    width: -webkit-calc( 100% - 186px );
-    height: 200px;
-    padding: 5px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    box-shadow: 10px 5px 20px #555555;
-    background: white;
-}
-
-.tag-members-container img{
-	float: none;
-}
+.st-reply-message-textarea.adjust .tag-members-container { bottom: 60px; margin: 0;}
 
 .st-reply-message-textarea textarea {
 	background: transparent;
@@ -3550,6 +3553,14 @@ img.st-reply-message-attach {
 	margin-left: 20px;
 }
 
+.st-reply-message-img .attach-file span.ellipsis{
+    width: 250px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
+
 .st-reply-message-img .file-cancel{
   	vertical-align: text-top;
   	height: 20px;
@@ -3568,6 +3579,7 @@ img.st-reply-message-attach {
 	position: relative;
 }
 .st-reply-message-img .img:after {
+	position: relative;
 	background-image: url("../images/common/icon/icon_compose_close.png");
 	display: inline-block;
 	width: 27px;
@@ -3663,6 +3675,11 @@ img.st-reply-message-attach {
     font-size: 12px;
 }
 
+#page-timeline-detail {padding: 0!important;height: 100vh; overflow: hidden;}
+
+
+#page-compose { background: rgb(208,208,208); width: 100vw; }
+
 .cp-post ,.obj-done {
 	position: absolute;
 	right: 0;
@@ -3695,11 +3712,7 @@ img.st-reply-message-attach {
 	top: 3px;
 }
 
-.cp-content{
-	background: rgb(208,208,208);
-    width: 100%;
-    display:table;
-}
+.cp-content{ width: 100vw; }
 
 .cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-work-area,.cp-vote-area-test,.cp-time-area,.cp-vote-type-area{
     background: white;
@@ -3724,24 +3737,31 @@ img.st-reply-message-attach {
 .cp-content-textarea{
     min-height: 80px;
     margin-bottom: 20px;
+    padding: 15px 0;
 }
 
 
-.cp-content-textarea .tag-members-container{
+.cp-content-textarea .tag-members-container, .st-reply-message-textarea .tag-members-container{
    	display: none;
 	position: absolute;
-    width: -webkit-calc( 100% - 290px );
-    margin: 0px 120px;
-    height: 200px;
-    padding: 5px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    box-shadow: 10px 5px 20px #555555;
+    width: 300px;
+    box-shadow: 1px 1px 10px 2px #bbb;
     background: white;
+    margin: 0px 120px;
 }
 
 .cp-attach-area {
+	position: relative;
 	padding: 20px 0;
+}
+
+.cp-attach-area .top-border-hide {
+	position: absolute;
+	top: 1px;
+	height: 20px;
+	width: 100%;
+	z-index: 1;
+	background: white;
 }
 
 .cp-sticker-area .sticker{
@@ -3775,17 +3795,23 @@ img.st-reply-message-attach {
 
 
 .cp-file-img-area, .cp-file-video-area {
+	position: relative;
 	margin-left: 5px;
 	overflow: hidden;
-	padding-top: 15px;
+	padding-top: 50px;
+	white-space: nowrap;
+	margin-bottom: 10px;
 }
+
+.cp-file-img-area:hover { margin-bottom: 2px; overflow-x: scroll; }
 
 .cp-grid {
 	width: 100px;
 	position: relative;
 	margin: 0 15px 15px 0;
-	float: left;
+	display: inline-block;
 	border: 1px solid #d2d2d2;
+	vertical-align: top;
 }
 
 .cp-grid div {
@@ -3803,11 +3829,15 @@ img.st-reply-message-attach {
 }
 
 .cp-grid img:nth-child(1) {
-	/*width: 100px;*/
+	width: 100px;
 	display: block;
+	object-fit: cover;
+	height: 100px;
 }
+
 .cp-file-video-area{
 	min-height: 100px;
+	border-top: 1px solid #d2d2d2;
 }
 .cp-file-video-area.topBorder{
 	border-top: 1px solid #d2d2d2;
@@ -3821,27 +3851,7 @@ img.st-reply-message-attach {
 	left: 0;
 	width: 100%;
 	height: 20px;
-	/*background-size: auto 50%;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	z-index: 3;*/
 }
-/*.cp-file-video-area .cp-grid:before{
-	content: "";
-	background-image: url("../images/chatroom/chat_message_status_icon_video.png");
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-size: auto 50%;
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	z-index: 3;
-}
-.cp-file-video-area .cp-grid:hover:before{
-	background-image: url("../images/chatroom/chat_message_status_icon_video_click.png");
-}*/
 .cp-grid video{
 	/*max-width: 100%;*/
 	max-height: 100%;
@@ -3853,9 +3863,57 @@ img.st-reply-message-attach {
 	top: -11px;
 	width: 25px;
 	z-index: 10;
+	cursor: pointer;
 }
 
+.cp-file-img-area:before, .cp-file-video-area:before, .cp-file-else-area:before {
+	content: attr(type);
+	position: absolute;
+	top: 10px;
+	left: 0;
+	width: 60px;
+	height: 22px;
+	background: #ddd;
+	color: white;
+	text-align: center;
+	border-radius: 3px;
+}
 
+.cp-file-else-area {   
+	position: relative;
+ 	border-top: 1px solid #ddd;
+  	padding-top: 45px;
+}
+
+.cp-file-area .file-row {
+	position: relative;
+    margin: 5px;
+    padding: 5px;
+    height: 30px;
+}
+
+.cp-file-area .file-row .grid-cancel{ top: 10px; right: -20px;}
+
+.cp-file-area .file-row span {
+	vertical-align: top;
+	line-height: 33px;
+	margin-right: 20px;
+	position: relative;
+}
+
+.cp-file-area .file-row img:first-child { border-radius: 3px; width: 33px; }
+.cp-file-area .file-row span:nth-child(2) {   left: 10px; font-size: 16px; }
+.cp-file-area .file-row span:nth-child(3) {   top: 1px; font-size: 13px; }
+
+.cp-file-area .content {
+    min-width: 200px;
+    display: inline-block;
+    color: #888;
+    max-height: 275px;
+    padding-right: 20px;
+    overflow: hidden;
+}
+.cp-file-area .content:hover { overflow-y: scroll;  }
 
 .cp-textarea-title{
 	width: 80%;
@@ -3939,7 +3997,8 @@ img.st-reply-message-attach {
 	max-height: 200px;
 	overflow-y: auto;
     position: relative;
-    padding-top: 29px;
+    margin-bottom: 25px;
+    top: 25px;
     left: 7px;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -3979,7 +4038,7 @@ img.st-reply-message-attach {
 
 .cp-addfile {
 	float: left;
-	width: 33.3%;
+	width: 25%;
 	text-align: center;
 	padding-top: 10px;
 	cursor: pointer;
@@ -5212,8 +5271,12 @@ div.user-info-submit-ready:active {
 	height: 10px;
 }
 
-.timeline-detail {
-	margin: 15px 10px;
+#page-timeline-detail .padding-top { height: 57px; }
+#page-timeline-detail .timeline-detail {
+	height: calc(100vh - 57px);
+    width: 100vw;
+    overflow: scroll;
+    padding-top: 10px;
 }
 
 .detail-title {
@@ -5668,7 +5731,9 @@ section.fileSharing .file-cover .general .input-area{
     border-bottom: 1px solid #d2d2d2;
 }
 
-section.fileSharing section.progress-bar {
+section.fileSharing section.progress-bar,
+#compose-progressbar
+{
     height: 100vh;
     background-color: rgba(50,50,50,0.7);
     position: absolute;
@@ -5676,7 +5741,9 @@ section.fileSharing section.progress-bar {
     display: none;
 }
 
-section.fileSharing section.progress-bar .frame {
+section.fileSharing section.progress-bar .frame ,
+#compose-progressbar .container
+{
     width: 150px;
     height: 10px;
     background: rgb(210, 210, 210);
@@ -5688,7 +5755,9 @@ section.fileSharing section.progress-bar .frame {
     font-size: 14px;
     position: relative;
 }
-section.fileSharing section.progress-bar .frame .progress {
+section.fileSharing section.progress-bar .frame .progress ,
+#compose-progressbar .bar
+{
     width: 0px;
     height: 8px;
     background: #54ACEB;
@@ -5698,13 +5767,34 @@ section.fileSharing section.progress-bar .frame .progress {
     left: 1px;
 }
 section.fileSharing section.progress-bar .frame .text { position: absolute; top: 0 ;left: 65px;}
-section.fileSharing section.progress-bar .frame .cancel { 
+section.fileSharing section.progress-bar .frame .cancel ,#compose-progressbar button
+{ 
 	position: absolute; 
 	top: 0;
-	right: -50px;
+	left: 160px;
 	font-size: 15px;
 	cursor: pointer;
 }
+
+#compose-progressbar { z-index: 1010 }
+#compose-progressbar .title { 
+	position: absolute;
+    bottom: 20px;
+    white-space: nowrap;
+    width: 100%;
+}
+
+#compose-progressbar button:focus { outline: none; }
+#compose-progressbar button {
+	top: -7px;
+    color: white;
+    border: 0;
+    background: transparent;
+    white-space: nowrap;
+}
+
+#compose-progressbar .cnt { position: relative; top: 10px;}
+#compose-progressbar span.curr:before {content: attr(num);}
 
 section.subpage-fileSharing{
 	overflow-y: auto;
@@ -5712,40 +5802,50 @@ section.subpage-fileSharing{
 
 /* ======================================== tag 成員畫面 ===================================================== */
 
-.tag-list {
-	list-style: none;
-    background-color: white;
-    padding: 0;
-    margin: 3px;
-    min-height: 190px;
-    width: 100%;
+div.tag-members-container ul.tag-list {
+	padding: 0px;
+    margin: 0;
+    width: 299px;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.tag-list .member-mugshot{
-	width: 30px;
-    height: 30px;
-    margin-top: 10px;
+div.tag-members-container ul.tag-list .member-mugshot{
+	width: 40px;
+    height: 40px;
     margin-right: 10px;
     float: none;
-    vertical-align: bottom;
+    vertical-align: middle;
 }
 
-.tag-list li{
-	line-height: 25px;
+div.tag-members-container ul.tag-list li{
 	cursor: pointer;
+    white-space: nowrap;
+    width: 290px;
+    text-overflow: ellipsis;
+    height: 50px;
+    padding-right: 15px;
+    overflow: hidden;
 }
 
-.tag-list li:hover{
+div.tag-members-container ul.tag-list a { line-height: 45px;padding-left: 5px;}
+
+div.tag-members-container ul.tag-list li:hover{
 	background-color: rgba(106, 163, 241, 0.29);
 }
 
-.tag-list a:hover{
+div.tag-members-container ul.tag-list a:hover{
 	color: black;
 }
 
 .highlight-container mark{
 	background: rgba(106, 163, 241, 0.29);
 }
+
+
+img.vdo-default { position: relative; width: 100px; }
+img.vdo-default:before {}
 
 
 *[contenteditable="true"] {

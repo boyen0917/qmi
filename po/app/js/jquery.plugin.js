@@ -111,6 +111,7 @@
     	'&#(99(8[4-9]|9[0-9])|10(0[0-9]{2}|1([0-6][0-9]|7[0-5])));'
     ]
 	String.prototype.replaceEmoji = function () {
+		return this + "";
 		// cns.debug( JSON.stringify(this) );
 		return this + "";
 		var tmpString = this.replace( new RegExp( emojiRange.join('|'), 'g'), function(match, contents, offset, s){

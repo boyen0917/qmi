@@ -218,6 +218,30 @@ getVideoBlob = function(videoDom, x,y,max_w,max_h,quality){
 	
 }
 
+fileSizeTransfer = function (si){
+	if(si < 900) 
+		return Math.round(si*10)/10+" byte";
+
+	if((si/1024) < 900)
+		return Math.round(si/1024*10)/10+" kb";
+	
+	return Math.round(si/1024/1024*10)/10+" mb";
+}
+
+getMatchIcon = function (fileType) {
+	var iconPath;
+	console.log(fileType);
+	switch (fileType) {
+		case "application/pdf":
+			iconPath = 'images/fileSharing/pdf_icon.png';
+			break;
+		default:
+			iconPath = 'images/timeline/otherfile_icon.png';
+
+	}
+
+	return iconPath;
+}
 
 //調整個人頭像
 avatarPos = function (ori_img,x){
@@ -285,7 +309,7 @@ htmlFormat = function (str, isToCharCode){
         strArr.splice(i,1,newStr);
     });
 
-    return strArr.join(" ").replaceEmoji();
+    return strArr.join(" ").replaceEmoji().replace(/\n/g, "<br/>");
 }
 
 //轉換html符號
@@ -463,8 +487,6 @@ uploadToS3 = function(file,api_name,ori_arr,tmb_arr,callback){
 	});
 }
 
-
-
 qmiUploadFile = function(uploadObj){
 	// tp 1: 圖片 2: 影片
 
@@ -514,6 +536,7 @@ qmiUploadFile = function(uploadObj){
 		}).success(function(data) {
 			data.fi = s3Obj.fi;
 			data.tp = uploadObj.tp;
+			data.file = uploadObj.file;
 			chainDef.resolve({isSuccess: true, data: data})
 		}).error(chainDef.reject);
 
@@ -534,7 +557,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	var allDef = $.Deferred(),
 		tmbObj = uploadObj.tmbObj,
 		oriObj = uploadObj.oriObj;
-
 
 	var uploadDef = $.Deferred(),
 		mediaLoadDef = $.Deferred(),
@@ -591,11 +613,8 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				md = {l: video.duration * 1000};
 				mediaLoadDef.resolve();
 			}
-
-			
 			break;
 		default: 
-		console.log("00000");
 	}
 
 	mediaLoadDef.done(function() {
@@ -622,14 +641,16 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			}})
 		}).fail(function() {
 			// 上傳s3 失敗
+// <<<<<<< HEAD
 			allDef.reject({status: 999, isSuccess: false, data: arguments});
+// =======
+// 			allDef.resolve({status: 999, isSuccess: false, data: arguments});
+// >>>>>>> d04147bcc608092e0e5229ec3d11f4cf1fdd256a
 		});
 	})
 
 	return allDef.promise();
 } // end of qmiUploadS3
-
-
 
 resetDB = function(){
 	clearBadgeLabel();
@@ -893,22 +914,20 @@ uploadGroupVideo = function(this_gi, file, video, ti, permission_id, ori_arr, tm
 
 getVideoImgUrl = function(file) {
 	var deferred = $.Deferred(),
-		fileURL = URL.createObjectURL(file);
+		fileURL = URL.createObjectURL(file),
+		video = document.createElement('video');
 
-
-	var video = document.createElement('video');
 	video.src = fileURL;
 
 	video.onloadeddata = function() {
 		var canvas = document.createElement('canvas');
 		canvas.width = video.videoWidth;
 		canvas.height = video.videoHeight;
+		canvas.getContext('2d').drawImage( video, 0, 0, video.videoWidth, video.videoHeight);
 
-		var context = canvas.getContext('2d');
-        canvas.getContext('2d').drawImage( video, 0, 0, video.videoWidth, video.videoHeight);
- 
-		deferred.resolve(canvas.toDataURL());
+		deferred.resolve(canvas.toDataURL())
 	}
+
 	return deferred.promise();
 }
 
@@ -1068,7 +1087,7 @@ QmiGlobal.gallery = function (data) {
 	this.isApplyWatermark = data.isApplyWatermark;
 	this.watermarkText = data.watermarkText;
 
-	this.container =  $("<div id='galleryModal'>"
+	this.container =  $("<div id='galleryModal' style='display:none;'>"
 	        + "<div class='close'>×</div>"
 	        + "<figure class='gallery-contaniner'>"
 	        // + "<div class='gallery-content'>"
@@ -1093,6 +1112,7 @@ QmiGlobal.gallery = function (data) {
 	rightArrow.on('click', this.showNextImage.bind(this));
 
 	$("body").append(this.container);
+	this.container.fadeIn();
 
 	this.hasMultiImage = function () {
 		if (this.photoList.length == 1) {
@@ -1114,6 +1134,7 @@ QmiGlobal.gallery = function (data) {
 
 
 QmiGlobal.gallery.prototype = {
+
 	getImageUrl: function() {
 		return new QmiAjax({
         	apiName: "groups/" + gi + "/files/" + this.photoList[this.currentImage].c 
@@ -1175,9 +1196,12 @@ QmiGlobal.gallery.prototype = {
 	},
 
 	close: function() {
-		this.container.remove();
-		delete this.photoList;
-		delete this.container;
+		var self = this;
+		self.container.fadeOut(300, function() {
+			self.container.remove();
+			delete self.photoList;
+			delete self.container;
+		})
 	},
 }
 
@@ -1573,24 +1597,6 @@ renderVideoFile = function(file, videoTag, onload, onError){
 				videoTag.addClass("error");
 				if(onError) onError(videoTag);
 			}
-			// var timer = 0;
-			// video.addEventListener('progress', function (e) {
-			//     if (this.buffered.length > 0) {
-
-			//         if (timer != 0) {
-			//             clearTimeout(timer);
-			//         }
-
-			//         timer = setTimeout(function () {
-			//         	var loadPercent = parseInt(video.buffered.end(0) / video.duration * 100);
-			//             if( loadPercent== 100 ) {
-			//                 if( onload ) onload(videoTag);
-			//                 clearTimeout(timer);
-			//             };          
-			//         }, 1500);
-
-			//     }
-			// }, false); 
 		} else {
 			if(onload) onload(videoTag);
 		}
