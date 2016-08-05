@@ -1500,9 +1500,9 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailB
                     case 26:
                         getS3fileBackground(val, fileArea, 26, null , function(data){
                             var fileName = val.fn.split(".")[0];
-                            var format = val.fn.split(".")[1];
+                            var format = val.fn.split(".")[val.fn.split(".").length - 1];
                             if (fileName.length > 15) {
-                                fileName = fileName.substring(0, 10) + "....";
+                                fileName = fileName.substring(0, 15) + "....";
                             }
                             var linkElement = document.createElement("a");
                             var fileIcon = document.createElement("img");
@@ -1510,7 +1510,7 @@ detailTimelineContentMake = function (this_event,e_data,reply_chk,triggerDetailB
                             var fileSizeSpan = document.createElement("span");
                             var downloadIcon = document.createElement("div")   
                             fileIcon.src = 'images/timeline/otherfile_icon.png';
-                            fileSizeSpan.textContent = (val.si).toFileSize();
+                            fileSizeSpan.textContent = val.si ? val.si.toFileSize() : "0 bytes";
                             linkElement.className = 'attach-file';
                             downloadIcon.className = 'download-icon'
                             linkElement.download = val.fn;
@@ -5885,12 +5885,14 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
             case 26:
                 this_event.find(".st-attach-file").show();
                 getS3fileBackground(val, this_event.find(".st-attach-file"), 26, null, function(data){
+                    var fileName = (val.fn.length > 15) ? (val.fn.substring(0, 15) + "....") : val.fn;
+                    var format = val.fn.split(".")[val.fn.split(".").length - 1];
                     var linkElement = document.createElement("a");
                     var fileIcon = document.createElement("img");
-                    var fileNameNode = document.createTextNode(val.fn);
+                    var fileNameNode = document.createTextNode(fileName + " - " + format);
                     var fileSizeSpan = document.createElement("span");  
                     fileIcon.src = 'images/timeline/otherfile_icon.png';
-                    fileSizeSpan.textContent = (val.si).toFileSize();
+                    fileSizeSpan.textContent = val.si ? val.si.toFileSize() : "0 bytes";
                     linkElement.className = 'attach-file';
                     linkElement.download = val.fn;
                     linkElement.href = data.s3;
@@ -6007,10 +6009,44 @@ timelineFileMake = function(thisEvent, fileNum) {
 
         allDownLoadDiv.bind("click", function(e) {
             var fileLinks = fileListDiv.find("a");
+            var fileIndex = 0;
+            var https = require('https'),
+                fs = require('fs');
             e.preventDefault();
-            $.each(fileLinks, function(i, fileLink) {
-                fileLink.click();
+
+            var downloadFile = function(callback){
+                console.log(fileLinks);
+                if(fileIndex < fileLinks.length) {
+                    var fileLink = fileLinks[fileIndex];
+                    console.log(fileLink);
+                    var file = fs.createWriteStream("C:/Users/sam/AppData/Local/Qmi/Downloads/" + fileLink["download"]);
+                    console.log(fileLink["href"]);
+                    var request = https.get(fileLink["href"], function(response) {
+                        response.pipe(file);
+                        fileIndex += 1;
+                        downloadFile(callback);
+                    });
+                } else {
+                    callback();
+                }
+                
+            }
+
+            downloadFile(function() {
+                console.log("download finishes");
             });
+
+            // var file = fs.createWriteStream("C:/Users/sam/AppData/Local/Qmi/Downloads/33455.jpg");
+            // var request = https.get("https://project-o.s3.hicloud.net.tw/groups/G00002Aa0GQ/0/5ff373ff-a42a-4183-ba59-3bdd1cbc1bf6_o?Expires=1785494657&AWSAccessKeyId=SE41NTAxNDgyNDE0MjI2MDE4Mjg5MjM&Signature=%2FuvyHosaMg3Q5wuh16Y4hTZp1lA%3D", function(response) {
+            //   response.pipe(file);
+            // });
+            // $.each(fileLinks, function(i, fileLink) {
+                
+                
+            //     // fileLink.click();
+            // });
+
+            
         });
     }
 }

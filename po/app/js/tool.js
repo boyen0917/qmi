@@ -599,33 +599,21 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	}
 
 	mediaLoadDef.done(function() {
-		console.log("bbbb1");
 
 		$.when.apply($, (Object.keys(paramObj).reduce(function(arr,key,i) {
-				arr[i] = $.ajax({
+				var ajaxArgs = {
 					url: paramObj[key].url,
 					type: 'PUT',
 					contentType: contentType,
 				 	data: paramObj[key].file, 
 					processData: false,
-					xhr : uploadObj.progressBar || false,
-					// xhr: function() {
-					// 	uploadXhr = new window.XMLHttpRequest();
-
-					// 	uploadXhr.upload.addEventListener("progress", function(evt){
-					//       	if (evt.lengthComputable) {
-					//         	$(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
-					// 	      	$(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
-					//       	}
-					//     }, false);
-
-					//     return uploadXhr;
-					// }
-				});
+				}
+				
+				if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar;
+				arr[i] = $.ajax(ajaxArgs);
 				return arr;
 			},[]))
 		).done(function(data) {
-			console.log("bbbb2");
 			allDef.resolve({status: 200, isSuccess: true, data: {
 				fi: s3Obj.fi,
 				mt: mt,
@@ -635,7 +623,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		}).fail(function() {
 			// 上傳s3 失敗
 			allDef.reject({status: 999, isSuccess: false, data: arguments});
-			console.log("bbbb3");
 		});
 	})
 

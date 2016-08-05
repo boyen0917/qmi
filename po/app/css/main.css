@@ -2567,7 +2567,7 @@ img.st-user-pic{
 .st-sub-box-2-attach-area {
 	background: white;
 	/*border-top: 1px solid #d3e0e6;*/
-	margin: 10px -13px 0;
+	margin: 10px -13px -14px;
 	text-align: center;
 	position: relative;
 }
@@ -3012,7 +3012,7 @@ img.st-user-pic{
     font-size: large;
     color: white;
     text-align: center;
-    margin-top: 10px;
+    margin-top: 7px;
 }
 
 #galleryModal:hover a div {
