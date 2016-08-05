@@ -1490,7 +1490,7 @@ function showMsg(object, bIsTmpSend) {
 			}
 			var fileSize = msgData.si ? msgData.si.toFileSize() : "0 bytes";
 			var fileDom = $("<div class='chat-file'>" + "<p class='name'>" + msgData.fn 
-				+ "</p><p>副檔名 : " + msgData.fn.split(".")[msgData.fn.split(".").length - 1] 
+				+ "</p><p>副檔名 : " + msgData.fn.split(".").pop() 
 				+ "</p><p clas>檔案大小 : " + fileSize  + "</p><a class='download-link' download='" 
 				+ msgData.fn + "'>下載</a></div>");
 			msgDiv.append(fileDom);

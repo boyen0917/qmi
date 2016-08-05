@@ -709,6 +709,8 @@ $(function(){
 			}),
 			fileURL = URL.createObjectURL(file);
 
+		console.log(file.name);
+
 
 		switch(fileType) {
 			case "image":
@@ -740,7 +742,7 @@ $(function(){
 
 			if (fileType == "file") {
 				var fileName = file.name.split(".")[0];
-				var fileIcon = getMatchIcon(file.type);
+				var fileIcon = getMatchIcon(file.name);
                 var format = file.name.split(".")[1];
                 if (fileName.length > 15) {
                     fileName = fileName.substring(0, 15) + "....";
@@ -1645,9 +1647,8 @@ $(function(){
 			});
 
 			$.each(this_compose.data("upload-file"),function(i,file){
-				console.log("im file ",file);
 				var fileRow =  $('<div class="file-row">' +
-                    '    <img src="images/compose/icon_file.png">' +
+                    '    <img src="' + getMatchIcon(file.name) + '">' +
                     '    <span>'+ file.name +'</span>' +
                     '    <span>'+ fileSizeTransfer(file.size) +'</span>' +
                     '    <img class="grid-cancel" src="images/common/icon/icon_compose_close.png">' +

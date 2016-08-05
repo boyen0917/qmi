@@ -228,19 +228,38 @@ fileSizeTransfer = function (si){
 	return Math.round(si/1024/1024*10)/10+" mb";
 }
 
-getMatchIcon = function (fileType) {
-	var iconPath;
-	console.log(fileType);
-	switch (fileType) {
-		case "application/pdf":
-			iconPath = 'images/fileSharing/pdf_icon.png';
-			break;
-		default:
-			iconPath = 'images/timeline/otherfile_icon.png';
-
+getMatchIcon = function (fileName) {
+	var fileExt = fileName.split(".").pop();
+	var dictOfFileIconPath = {
+		default : 'images/timeline/otherfile_icon.png',
+		bmp : 'images/fileSharing/photo_icon.png',
+		jpg : 'images/fileSharing/photo_icon.png',
+		png : 'images/fileSharing/photo_icon.png',
+		gif : 'images/fileSharing/photo_icon.png',
+		pdf : 'images/fileSharing/pdf_icon.png',
+		csv : 'images/fileSharing/excel_icon.png',
+		xls : 'images/fileSharing/excel_icon.png',
+		xlsx : 'images/fileSharing/excel_icon.png',
+		ppt : 'images/fileSharing/ppt_icon.png',
+		pptx : 'images/fileSharing/ppt_icon.png',
+		doc : 'images/fileSharing/word_icon.png',
+		docx : 'images/fileSharing/word_icon.png',
+		mp3 : 'images/fileSharing/audio_icon.png',
+		wav : 'images/fileSharing/audio_icon.png',
+		wma : 'images/fileSharing/audio_icon.png',
+		mp4 : 'images/fileSharing/video_icon.png', 
+		flv : 'images/fileSharing/video_icon.png', 
+		mov : 'images/fileSharing/video_icon.png', 
+		wmv : 'images/fileSharing/video_icon.png', 
+		mpg : 'images/fileSharing/video_icon.png', 
+		avi : 'images/fileSharing/video_icon.png', 
 	}
 
-	return iconPath;
+	if (dictOfFileIconPath[fileExt]) {
+		return dictOfFileIconPath[fileExt];
+	} else {
+		return dictOfFileIconPath['default'];
+	}
 }
 
 //調整個人頭像

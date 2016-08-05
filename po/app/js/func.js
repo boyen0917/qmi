@@ -1500,7 +1500,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                     case 26:
                         getS3fileBackground(val, fileArea, 26, null , function(data){
                             var fileName = val.fn.split(".")[0];
-                            var format = val.fn.split(".")[val.fn.split(".").length - 1];
+                            var format = val.fn.split(".").pop();
                             if (fileName.length > 15) {
                                 fileName = fileName.substring(0, 15) + "....";
                             }
@@ -1509,7 +1509,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                             var fileNameNode = document.createTextNode(fileName + " - " + format);
                             var fileSizeSpan = document.createElement("span");
                             var downloadIcon = document.createElement("div")   
-                            fileIcon.src = 'images/timeline/otherfile_icon.png';
+                            fileIcon.src = getMatchIcon(val.fn);
                             fileSizeSpan.textContent = val.si ? val.si.toFileSize() : "0 bytes";
                             linkElement.className = 'attach-file';
                             downloadIcon.className = 'download-icon'
@@ -5944,12 +5944,12 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 this_event.find(".st-attach-file").show();
                 getS3fileBackground(val, this_event.find(".st-attach-file"), 26, null, function(data){
                     var fileName = (val.fn.length > 15) ? (val.fn.substring(0, 15) + "....") : val.fn;
-                    var format = val.fn.split(".")[val.fn.split(".").length - 1];
+                    var format = val.fn.split(".").pop();
                     var linkElement = document.createElement("a");
                     var fileIcon = document.createElement("img");
                     var fileNameNode = document.createTextNode(fileName + " - " + format);
                     var fileSizeSpan = document.createElement("span");  
-                    fileIcon.src = 'images/timeline/otherfile_icon.png';
+                    fileIcon.src = getMatchIcon(val.fn);
                     fileSizeSpan.textContent = val.si ? val.si.toFileSize() : "0 bytes";
                     linkElement.className = 'attach-file';
                     linkElement.download = val.fn;
