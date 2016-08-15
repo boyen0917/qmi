@@ -1,5 +1,4 @@
 onCheckVersionDone = function(needUpdate){
-
 	if( needUpdate ){
 		return;
 	}

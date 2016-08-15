@@ -35,10 +35,14 @@ function onReceivePollingChatMsg ( msgs ){
 		var 
 		thisGi = roomObj.gi,
 		thisCi = roomObj.ci;
+		console.log("123",roomObj);
 		// brian 存每筆訊息
 		roomObj.el.forEach( function(msgObj,i){
 			msgObj.cn = roomObj.cn;
-
+			
+			if(msgObj.ml[0].tp == 22){
+				updateChatList(thisGi);
+			}
 			if(msgObj.hasOwnProperty("meta")){
 
 				//add to db
@@ -137,7 +141,6 @@ function onChatReceiveMsg ( tmp_gi, tmp_ci, tmp_cn, msgs, callback ){
 		if(callback)	callback();
 		return;
 	}
-
 	//indexed from old to new (api chat is from new to old)
 	var cnt = 0;
 	for( var i=0; i<msgs.length; i++){

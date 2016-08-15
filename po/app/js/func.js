@@ -8127,7 +8127,7 @@ pollingCmds = function(newPollingData){
                     case 12://delete group
                         removeGroup( item.pm.gi );
                         break;
-
+                        
                     case 52:
                         QmiGlobal.groups[item.pm.gi].set.ccc = item.pm.gcc;
                         if (item.pm.gcc > 0) {
