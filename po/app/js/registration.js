@@ -309,17 +309,24 @@ onCheckVersionDone = function(needUpdate){
         	method: "post"
         }).complete(function(data){
         	if(data.status == 200){
-        		
-        		QmiGlobal.auth = $.parseJSON(data.responseText);
-        		
-        		//自動登入儲存 有_loginData 有_loginAutoChk 才代表有選自動登入
-                if($(".login-auto").data("chk")) {
-                	$.lStorage("_loginData",QmiGlobal.auth);
-                	$.lStorage("_loginAutoChk",true);
-                }else {
-                	localStorage.removeItem("_loginData");
-                	localStorage.removeItem("_loginAutoChk");
-                }
+
+        		var dataObj = $.parseJSON(data.responseText);
+
+				QmiGlobal.auth = dataObj;
+
+        		// SSO 登入
+        		if(dataObj.rsp_code === 104) {
+        			QmiGlobal.ssoLogin({
+        				url: dataObj.url,
+        				ci: dataObj.ci,
+        				uui: dataObj.uui,
+        				pin: dataObj.pin,
+        				id: body.id,
+        				pw: password,
+        			}).done(loginDef.resolve);
+        		} else {
+        			loginDef.resolve({isSso:false});
+        		}
 
         		//判斷是否換帳號 換帳號就要清db
         		if(!$.lStorage(QmiGlobal.auth.ui)) resetDB();
@@ -393,7 +400,14 @@ onCheckVersionDone = function(needUpdate){
                 }
 
                 getGroupComboInit(specifiedGi).done(function(resultObj){
+
                 	if( resultObj.status === false ){
+                		//sso 取消
+                		if(resultObj.data.isReAuthCancel === true){
+                			cns.debug("sso reAuth 取消");	
+                			return;
+                		}
+
                 		//發生錯誤 回首頁比較保險
                 		cns.debug("dgi combo error",resultObj);
                 		window.location = "index.html";
@@ -442,25 +456,68 @@ onCheckVersionDone = function(needUpdate){
         });
     }
 
-	getPrivateGroupList = function(p_data, callback){
-    	//取得團體列表
-        var api_name = "groups";
-        var headers = {
-            "ui":p_data.ui,
-            "at":p_data.at,
-            "li":lang
-        };
-        var method = "get";
-        ajaxDo(api_name,headers,method,false,false,false,true,p_data.cl).complete(function(res){
-        	if( res.status==200 ){
-        		var parse_data = $.parseJSON(res.responseText);
-	    		var list = $.lStorage("_pri_group")||{};
-	    		list[p_data.ci] = p_data;
-	    		list[p_data.ci].tmp_groups = parse_data.gl;
-	    		$.lStorage("_pri_group", list);
-	    	}
-	    	if(callback) callback();
+
+    // LDAP SSO
+    QmiGlobal.ssoLogin = function(ssoObj) {
+    	var deferred = $.Deferred();
+    	// sso 登入
+		new QmiAjax({
+            url: "https://" + ssoObj.url + "/apiv1/sso/"+ ssoObj.ci +"/login",
+            specifiedHeaders: { li: lang },
+            body: {
+			   id: ssoObj.id,
+			   tp: "1",
+			   dn: QmiGlobal.device,    
+			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, ssoObj.id.substring(0,16)),
+			   uui: ssoObj.uui
+			},
+            method: "post",
+            error: function(errData){
+                deferred.resolve({
+                	isSuccess: false,
+                	data: errData
+                });
+            }
+        }).done(function(rspData) {
+        	try { 
+        		var ssoKey = JSON.parse(rspData.responseText).key;
+        	} catch(e) { 
+        		var ssoKey = ""; 
+        	}
+        	new QmiAjax({
+	        	apiName: "cert",
+	        	isPublic: true,
+		        specifiedHeaders: {
+		            li:lang
+		        },
+	        	body: {
+				  ui: ssoObj.uui,
+				  key: ssoKey,
+				  tp: "1",
+				  dn: QmiGlobal.device,
+				  ci: ssoObj.ci
+				},
+	        	method: "post",
+	        	error: function(errData){
+	                deferred.resolve({
+	                	isSuccess: false,
+	                	data: errData
+	                });
+	            }
+	        }).done(function(data){
+	        	var dataObj = JSON.parse(data.responseText);
+	        	console.log("cert done", dataObj);
+	        	QmiGlobal.auth.ui = dataObj.ui;
+	        	QmiGlobal.auth.at = dataObj.at;
+	        	QmiGlobal.auth.et = dataObj.et;
+
+				deferred.resolve({
+					isSuccess: true
+				});
+	        });
         });
+
+        return deferred.promise();
     }
 
 /*	

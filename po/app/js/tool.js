@@ -48,7 +48,7 @@ QmiGlobal.popup = function(args){
 	if( args.confirm === undefined && args.cancel === undefined) {
 		setTimeout(function(){
 			self.jqHtml.remove();
-			self.removeE();
+			self.remove();
 		},1500);
 	}
 
@@ -58,13 +58,13 @@ QmiGlobal.popup = function(args){
 			args.action[0].apply({},[args.action[1]]);
 		}
 		self.jqHtml.remove();
-		self.removeE();
+		self.remove();
 	})
 
 	//取消
 	self.jqHtml.find(".popup-cancel").click(function(){
 		self.jqHtml.remove();
-		self.removeE();
+		self.remove();
 	})
 
 	$("body")
@@ -73,24 +73,24 @@ QmiGlobal.popup = function(args){
 }
 
 QmiGlobal.popup.prototype = {
-	removeE: function(){
+	remove: function(){
 		//this.jqHtml.remove();
 		$("body").removeClass("screen-lock");
 
 		QmiGlobal.scrollController.enableScroll();
 	},
-	html: 
-		'<div class="popup">' +
-        '    <div class="popup-frame">' +
-        '        <div class="popup-title"></div>' +
-        '        <div class="popup-text" style="display:none"></div>' +
-        '        <div class="popup-confirm-area">' +
-        '            <div class="popup-cancel" style="display:none"></div>' +
-        '            <div class="popup-confirm" style="display:none"></div>   ' + 
-        '        </div>' +
-        '    </div>' +
-        '    <div class="popup-gap"></div>' +
-        '</div>'
+	
+	html:'<div class="popup">'
+        + '<div class="popup-frame">'
+        + '    <div class="popup-title"></div>'
+        + '    <div class="popup-text" style="display:none"></div>'
+        + '    <div class="popup-confirm-area">'
+        + '        <div class="popup-cancel" style="display:none"></div>'
+        + '        <div class="popup-confirm" style="display:none"></div>   ' 
+        + '    </div>'
+        + '</div>'
+        + '<div class="popup-gap"></div>'
+        + '</div>'
 }
 
 
@@ -353,6 +353,30 @@ toSha1Encode = function (string){
 	var hash = CryptoJS.SHA1(string);
     var toBase64 = hash.toString(CryptoJS.enc.Base64);
     return toBase64;
+}
+
+// ldap密碼加密
+QmiGlobal.aesCrypto = {
+	enc: function(msg, key) {
+		return CryptoJS.AES.encrypt(
+			msg, 
+			CryptoJS.enc.Utf8.parse(key), 
+			{ 
+		        mode: CryptoJS.mode.ECB,
+		        padding: CryptoJS.pad.Pkcs7
+		    }
+	    ).toString();
+	},
+	dec: function(aesStr, key) {
+		return CryptoJS.AES.decrypt(
+			aesStr, 
+			CryptoJS.enc.Utf8.parse(key), 
+			{ 
+			    mode: CryptoJS.mode.ECB,
+			    padding: CryptoJS.pad.Pkcs7
+			}
+		).toString(CryptoJS.enc.Utf8);
+	}
 }
 
 htmlFormat = function (str, isToCharCode){

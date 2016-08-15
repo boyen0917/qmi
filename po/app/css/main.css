@@ -1,8 +1,8 @@
 /* z-index 區域最高100 全域遮罩1000  全域遮罩上的元件1100 */
 
 body{
-    font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC",arial,sans-serif;
-    /*-webkit-font-smoothing: antialiased;*/
+    font-family: "Lucida Grande",Tahoma,Verdana,Arial,sans-serif,"微軟正黑體","蘋果儷中黑","儷黑 Pro","新細明體";
+    -webkit-font-smoothing: antialiased;
     font-weight: normal;
     font-size: 16px;
 }
@@ -5599,12 +5599,12 @@ img.vdo-default:before {}
     width: 280px;
     height: 440px;
     margin: calc(50vh - 250px) auto;
+
     color: #999;
     padding: 20px;
     box-sizing: border-box;
     text-align: center;
 }
-
 
 #view-auth-manually .icon-shield {
     position: relative;
@@ -5794,6 +5794,7 @@ img.vdo-default:before {}
     background: white;
     box-shadow: 1px 1px 10px white;
 }
+#auth-manually-ui .footer:before {position: absolute;content: url(../images/icon/icon_ldap_cross.png);left: -14px;}
 
 *[contenteditable="true"] {
 	display: inline-block;

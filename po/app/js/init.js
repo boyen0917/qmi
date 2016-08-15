@@ -640,7 +640,15 @@ QmiAjax.prototype = {
 	expireChk: function(args) {
 		// 執行前 先檢查是否接近過期時間 先替換token
 		var nowEt = (args.cloudData === undefined) ? QmiGlobal.auth.et : args.cloudData.et,
-			deferred = $.Deferred();
+			deferred = $.Deferred(),
+
+			// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
+			isExpired = function() {
+				if((args.cloudData || {}).tp === 1) {
+					return true;//args.cloudData.et - (new Date().getTime()) < 0;
+				} else
+					return nowEt - (new Date().getTime()) < this.expireTimer
+			}.call(this);
 
 		if(args.noAuth === true) {
 			// 不用auth
@@ -662,56 +670,67 @@ QmiAjax.prototype = {
 			deferred = $.Deferred();
 
 		// auth lock
-		cns.log("reAuth starts");
-		self.authLock.set(true);
+		cns.log("reAuth starts", apiName);
+		
+		// reAuth Lock
+		QmiGlobal.reAuthLockDef = $.Deferred();
 
-		$.ajax({
-		    url: (function(){
-				if(cloudData === undefined) {
-					return base_url + "auth";
-				} else {
-					return "https://" + cloudData.cl + "/apiv1/auth";
-				}
-			})(),
+		// 需要輸入密碼
+		if((cloudData || {}).tp === 1) {
+			// console.log("此私雲需要輸入密碼");
+			QmiGlobal.reAuthManually.init({
+				reAuthDef: deferred,
+				cloudData: cloudData
+			});
 
-		    headers: self.setHeaders({},cloudData),
-		    type: "put",
-		    error: function(errData){
-		        cns.debug("reAuth error",errData);
-		        deferred.resolve({
-		        	isSuccess: false,
-		        	data: errData,
-		        	isReAuth: true
-		        });
-		    },
+		} else {
 
-		    success: function(apiData){
-		    	// 重新設定at
-		    	if(
-		    		cloudData !== undefined
-		    		&& QmiGlobal.clouds[cloudData.ci] !== undefined
-		    	) {
-		    		// 私雲
-		    		QmiGlobal.clouds[cloudData.ci].nowAt = at = apiData.at;
-		    		QmiGlobal.clouds[cloudData.ci].et = apiData.et;
-		    	} else {
-		    		// 公雲
-		    		QmiGlobal.auth.at = at = apiData.at;
-		    		QmiGlobal.auth.et = apiData.et;
-		    	}
+			$.ajax({
+			    url: (function(){
+					if(cloudData === undefined) {
+						return base_url + "auth";
+					} else {
+						return "https://" + cloudData.cl + "/apiv1/auth";
+					}
+				})(),
 
-		        deferred.resolve({
-		        	isSuccess: true,
-		        	data: apiData,
-		        	isReAuth: true
-		        });
-		    },
-		    complete: function(){
-		    	cns.log("reAuth done and unlock");
-		    	self.authLock.set(false);
-		    }
-		}) // end of reAuth ajax
+			    headers: self.setHeaders({},cloudData),
+			    type: "put",
+			    error: function(errData){
+			        deferred.resolve({
+			        	isSuccess: false,
+			        	data: errData,
+			        	isReAuth: true
+			        });
+			    },
 
+			    success: function(apiData){
+			    	// 重新設定at
+			    	if(
+			    		cloudData !== undefined
+			    		&& QmiGlobal.clouds[cloudData.ci] !== undefined
+			    	) {
+			    		// 私雲
+			    		QmiGlobal.clouds[cloudData.ci].nowAt = at = apiData.at;
+			    		QmiGlobal.clouds[cloudData.ci].et = apiData.et;
+			    	} else {
+			    		// 公雲
+			    		QmiGlobal.auth.at = at = apiData.at;
+			    		QmiGlobal.auth.et = apiData.et;
+			    	}
+			        deferred.resolve({
+			        	isSuccess: true,
+			        	data: apiData,
+			        	isReAuth: true
+			        });
+			    },
+			    complete: function(){
+			    	cns.log("reAuth done and unlock", apiName);
+			    	QmiGlobal.reAuthLockDef.resolve();
+			    }
+			}) // end of reAuth ajax
+
+		}
 		return deferred.promise();
 	},
 
@@ -729,8 +748,8 @@ QmiAjax.prototype = {
 			$(".ajax-screen-lock").hide();
 		}
 
-		//不做錯誤顯示 polling也不顯示
-		if(ajaxArgs.errHide || isPolling === true) return false;
+		//不做錯誤顯示 polling也不顯示 isReAuthCancel 手動輸入密碼的私雲重新頁面 按取消就不顯示錯誤訊息
+		if(ajaxArgs.errHide || isPolling === true || errData.isReAuthCancel === true) return false;
 
 		//ajax逾時
 		if(errData.statusText == "timeout"){
@@ -771,8 +790,168 @@ QmiAjax.prototype = {
 
 //title
 
-g_Qmi_title = "Qmi";
-$("title").html(g_Qmi_title);
+// reAuthManuallyUI
+QmiGlobal.reAuthManually = {
+	isExist: false,
+
+	id: "auth-manually-ui",
+
+	viewMap: {},
+
+	hasAjaxLoad: false,
+
+	reAuthDef: {}, // QmiAjax裡面的reAuth deferred 還在等待完成
+
+	handleEvent: function() {
+		// 防連點 start
+		var closureObj = {};
+		return function(event) {
+			//禁止連點
+			if(preventMultiClick(event) === false) return;
+
+			var self = this;
+			// all event here
+			switch(event.type) {
+				case "click":
+					switch(event.target) {
+						case self.viewMap["submit"]:
+							self.submit();
+							break;
+
+						case self.viewMap["cancel"]:
+							self.reAuthDef.resolve({
+								isSuccess: false,
+								isSso: true,
+								isReAuth: true,
+								data: {
+									isReAuthCancel: true
+								}
+							})
+							self.remove();
+							break;
+					}
+					break;
+			}// all event switch
+		}
+
+		function preventMultiClick(event) {
+			event.stopPropagation();
+
+			//禁止連點
+			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) return false;
+			// 記錄連點資訊
+			if(event.type === "click") closureObj.lastView = event.target, closureObj.lastClickTime = new Date().getTime();
+			return true;
+		}
+	}(),
+
+	html: function() {
+		return "<div class='container'>"
+		+ "<div class='title1'>" + $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") + "</div>"
+		+ "<div class='title2'>" + $.i18n.getString("ACCOUNT_BINDING_ENTER_LDAP_PASSWORD") + "</div>"
+        + "<div class='input-wrap email'><input viewId='email' class='email' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_EMAIL") +"'></div>"
+        + "<div class='input-wrap password'><input viewId='password' class='password' type='password' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_PASSWORD") +"'></div>"
+        + "<div class='action'>"
+        + "<span class='cancel' viewId='cancel'>" + $.i18n.getString("ACCOUNT_BINDING_CANCEL") + "</span>"
+        + "<span class='submit' viewId='submit'>" + $.i18n.getString("ACCOUNT_BINDING_DONE") + "</span>"
+        + "</div><div class='footer'>" + $.i18n.getString("ACCOUNT_BINDING_UNBIND_LDAP") + "</div>"
+        + "</div>";
+    },
+    init: function(argObj) {
+    	var self = this;
+
+    	// 關閉原本的ajax load 圖示
+    	if($(".ajax-screen-lock").is(":visible")) {
+    		self.hasAjaxLoad = true;
+    		$(".ajax-screen-lock").hide();
+			$('.ui-loader').hide();
+    	}
+
+    	self.reAuthDef = argObj.reAuthDef;
+    	self.cloudData = argObj.cloudData;
+
+    	if(self.isExist) $("#" + self.id).remove();
+
+    	var selfView = self.viewMap["selfView"] = $("<section>", {
+	        id: self.id,
+	        html: self.html()
+	    });
+
+    	$("body").append(selfView);
+    	selfView.fadeIn(100);
+
+    	self.viewMap["selfView"] = selfView;
+
+    	viewSubscriber([
+    		{ viewId: "submit", eventList: ["click"] },
+    		{ viewId: "cancel", eventList: ["click"] },
+    	])
+
+    	function viewSubscriber(scbArr) {
+    		var selfView = self.viewMap["selfView"];
+    		scbArr.forEach(function(scbObj) {
+    			self.viewMap[scbObj.viewId] = selfView.find("[viewId="+ scbObj.viewId +"]")[0]
+    			scbObj.eventList.forEach(function(eventName) {
+    				self.viewMap[scbObj.viewId].addEventListener(eventName, self);
+    			})
+    		});
+    	}
+    },
+
+    submit: function() {
+    	var self = this,
+    		selfView = self.viewMap["selfView"],
+    		ssoId = selfView.find("input.email").val(),
+    		ssoPw = selfView.find("input.password").val();
+
+    	if(ssoId === "" || ssoPw === "") return;
+
+    	selfView.find(".container").addClass("loading");
+
+    	QmiGlobal.ssoLogin({
+			url: self.cloudData.cl,
+			ci: self.cloudData.ci,
+			uui: self.cloudData.ui,
+			pin: self.cloudData.pin,
+			id: selfView.find("input.email").val(),
+			pw: selfView.find("input.password").val(),
+		}).done(function(rspData){
+			selfView.find(".container").removeClass("loading");
+
+			if(rspData.isSuccess === false) {
+				console.log("login fail", rspData);
+			} else {
+				self.remove();
+
+				// reAuth 結束
+				self.reAuthDef.resolve({
+					isSuccess: true,
+					isSso: true,
+					isReAuth: true
+				})
+			}
+		})
+    },
+
+    remove: function() {
+
+    	var self = this;
+    	$(self.viewMap["selfView"]).fadeOut(100, function() {
+    		$(this).remove();
+
+    // 		if(self.hasAjaxLoad === true) {
+    // 			self.hasAjaxLoad = false;
+
+    // 			$(".ajax-screen-lock").show();
+				// $('.ui-loader').css("display","block");
+    // 		}
+    	});
+
+    	// 解除lock
+    	console.log("unlock");
+    	QmiGlobal.reAuthLockDef.resolve();
+    },
+}
 
 
 MyDeferred = function  () {
