@@ -228,6 +228,39 @@ fileSizeTransfer = function (si){
 	return Math.round(si/1024/1024*10)/10+" mb";
 }
 
+getMatchIcon = function (fileName) {
+	var fileExt = fileName.split(".").pop();
+	var dictOfFileIconPath = {
+		default : 'otherfile_icon.png',
+		bmp : 'photo_icon.png',
+		jpg : 'photo_icon.png',
+		png : 'photo_icon.png',
+		gif : 'photo_icon.png',
+		pdf : 'pdf_icon.png',
+		csv : 'excel_icon.png',
+		xls : 'excel_icon.png',
+		xlsx : 'excel_icon.png',
+		ppt : 'ppt_icon.png',
+		pptx : 'ppt_icon.png',
+		doc : 'word_icon.png',
+		docx : 'word_icon.png',
+		mp3 : 'audio_icon.png',
+		wav : 'audio_icon.png',
+		wma : 'audio_icon.png',
+		mp4 : 'video_icon.png', 
+		flv : 'video_icon.png', 
+		mov : 'video_icon.png', 
+		wmv : 'video_icon.png', 
+		mpg : 'video_icon.png', 
+		avi : 'video_icon.png', 
+	}
+
+	if (dictOfFileIconPath[fileExt]) {
+		return dictOfFileIconPath[fileExt];
+	} else {
+		return dictOfFileIconPath['default'];
+	}
+}
 
 //調整個人頭像
 avatarPos = function (ori_img,x){
@@ -500,7 +533,7 @@ qmiUploadFile = function(uploadObj){
 	}()).then(function(s3Obj) {
 		var chainDef = MyDeferred();
 		
-		qmiUploadS3(uploadObj, s3Obj).done(chainDef.resolve);
+		qmiUploadS3(uploadObj, s3Obj).done(chainDef.resolve).fail(chainDef.reject);
 		return chainDef;
 	}, chainDefError.bind("get url fail")).then(function(responseObj) {
 		var chainDef = MyDeferred(),
@@ -533,7 +566,7 @@ qmiUploadFile = function(uploadObj){
 	return allDoneDef.promise();
 
 	function chainDefError(data) {
-		allDoneDef.resolve({isSuccess: false, data: data, msg: this})
+		allDoneDef.reject({isSuccess: false, data: data, msg: this})
 	}
 }
 
@@ -604,14 +637,18 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	}
 
 	mediaLoadDef.done(function() {
+
 		$.when.apply($, (Object.keys(paramObj).reduce(function(arr,key,i) {
-				arr[i] = $.ajax({
+				var ajaxArgs = {
 					url: paramObj[key].url,
 					type: 'PUT',
 					contentType: contentType,
 				 	data: paramObj[key].file, 
-					processData: false
-				});
+					processData: false,
+				}
+				
+				if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar;
+				arr[i] = $.ajax(ajaxArgs);
 				return arr;
 			},[]))
 		).done(function(data) {
@@ -623,7 +660,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			}})
 		}).fail(function() {
 			// 上傳s3 失敗
-			allDef.resolve({status: 999, isSuccess: false, data: arguments});
+			allDef.reject({status: 999, isSuccess: false, data: arguments});
 		});
 	})
 
@@ -1073,15 +1110,17 @@ QmiGlobal.gallery = function (data) {
 	        + "<figcaption id='caption'></figcaption>"
 	       	+ "<div class='preBtn arrowBtn'></div>"
 	        + "<div class='nextBtn arrowBtn'></div>"
-	        + "</figure></div>");
+	        + "<a class='download-link' href='"+ this.photoList[this.currentImage].s32
+	        + "' ><div></div></a></figure></div>");
 	var leftArrow = this.container.find(".preBtn");
 	var caption = this.container.find("#caption");
 	var rightArrow = this.container.find(".nextBtn");
 	var closeBtn  = this.container.find(".close");
 	var imgElement = this.container.find("img");
-
+	var downloadDom = this.container.find(".download-link");
 	imgElement.attr("src", this.photoList[this.currentImage].s32);
 	caption.html(this.currentImage + 1 + "/" + this.photoList.length);
+	downloadDom.attr("download", getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6 ));
 
 	closeBtn.on("click", this.close.bind(this));
 	leftArrow.on('click', this.showPreviousImage.bind(this));
@@ -1134,10 +1173,15 @@ QmiGlobal.gallery.prototype = {
 
 				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
 				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+				this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
+				this.container.find(".download-link").attr("download",
+					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
 			}.bind(this));
 		}
 		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-		caption.html(this.currentImage + 1 + "/" + this.photoList.length);
+		this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
+		this.container.find(".download-link").attr("download",
+					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
 		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
 	},
 
@@ -1154,9 +1198,15 @@ QmiGlobal.gallery.prototype = {
 				}
 				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
 				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+				this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
+				this.container.find(".download-link").attr("download",
+					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
 			}.bind(this));
 		}
 		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
+		this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
+		this.container.find(".download-link").attr("download",
+					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
 		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
 	},
 
@@ -1167,129 +1217,8 @@ QmiGlobal.gallery.prototype = {
 			delete self.photoList;
 			delete self.container;
 		})
-		
-		// this = {};
 	},
 }
-
-// showGallery = function(timelineID, galleryList, targetImgIndex, isApplyWatermark, watermarkText){
-// 	var galleryModal = new QmiGlobal.gallery(timelineID, galleryList);
-
-// 	galleryModal.create();
-
-// 	if (! galleryModal.hasMultiImage) {
-// 		galleryModal.hideArrow();
-// 	}
-// }
-
-// 	$("body").append("<div id='galleryModal'>"
-//         + "<div class='gallery-contaniner'>"
-//         + "<span class='close'>×</span>"
-//         + "<img class='currentImg'>"
-//         + "<div class='preBtn arrowBtn'></div>"
-//         + "<div class='nextBtn arrowBtn'></div>"
-//         + "<div id='caption'></div>"
-//         + "</div></div>");
-
-// 	var galleryModal = $("#galleryModal");
-// 	var currentImgElement = galleryModal.find(".currentImg");
-// 	// var currentImgUrl = galleryList[targetImgIndex].s32;
-// 	var photoNum = galleryList.length;
-
-
-// 	currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-
-// 	if (photoNum == 1) {
-// 		galleryModal.find(".arrowBtn").hide();
-// 	}
-
-// 	galleryModal.find(".preBtn").bind("click", function(e) {
-// 		if (targetImgIndex == 0) {
-// 			targetImgIndex = photoNum-1;
-// 		} else {
-// 			targetImgIndex -= 1;
-// 		}
-// 		if (! galleryList[targetImgIndex].s32) {
-// 			getS32file(timelineID, galleryList[targetImgIndex]).then(function(data) {
-// 				galleryList[targetImgIndex].s32 = data.s32;
-// 				currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-// 			});
-// 		} else {
-// 			currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-// 		}
-// 	});
-
-
-// 	galleryModal.find(".nextBtn").bind("click", function(e) {
-// 		if (targetImgIndex == photoNum-1) {
-// 			targetImgIndex = 0;
-// 		} else {
-// 			targetImgIndex += 1;
-// 		}
-// 		console.log(targetImgIndex);
-// 		if (! galleryList[targetImgIndex].s32) {
-// 			getS32file(timelineID, galleryList[targetImgIndex]).then(function(data) {
-// 				galleryList[targetImgIndex].s32 = data.s32;
-// 				currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-// 			});
-// 		} else {
-// 			currentImgElement.attr("src", galleryList[targetImgIndex].s32);
-// 		}
-// 	});
-
-// 	galleryModal.find(".close").bind("click", function(e) {
-// 		galleryModal.remove();
-// 	});
-
-	
-// 	startIndex = startIndex || 0;
-//     var gallery = $(document).data("gallery");
-//     if( null != gallery && false==gallery.closed){
-//         gallery.focus();
-//         gallery.ui = ui;
-//         gallery.at = at;
-//         gallery.lang = lang;
-//         gallery.this_gi = this_gi;
-//         gallery.this_ti = this_ti;
-//         gallery.list = gallery_arr;
-//         gallery.startIndex = startIndex;
-//         gallery.title = title;
-//         gallery.isWatermark = isWatermark;
-//         gallery.watermarkText = watermarkText;
-//         var dataDom = $(gallery.document).find(".dataDom");
-//         dataDom.click();
-//     } else {
-//         gallery = window.open("layout/general_gallery.html", "", "width=480, height=730");
-//         $(document).data("gallery", gallery);
-
-//         gallery.ui = ui;
-//         gallery.at = at;
-//         gallery.lang = lang;
-//         gallery.this_gi = this_gi;
-//         gallery.this_ti = this_ti;
-//         gallery.list = gallery_arr;
-//         gallery.startIndex = startIndex;
-//         gallery.title = title;
-//         gallery.isWatermark = isWatermark;
-//         gallery.watermarkText = watermarkText;
-//         // $(gallery.document).ready(function(){
-//         //     setTimeout(function(){
-//         //         gallery.ui = ui;
-//         //         gallery.at = at;
-//         //         gallery.lang = lang;
-//         //         gallery.this_gi = this_gi;
-//         //         gallery.this_ti = this_ti;
-//         //         gallery.list = gallery_arr;
-//         //         gallery.startIndex = startIndex;
-//         //         gallery.title = title;
-//         //         gallery.isWatermark = isWatermark;
-//         //         gallery.watermarkText = watermarkText;
-//         //         var dataDom = $(gallery.document).find(".dataDom");
-//         //         dataDom.click();
-//         //     },0);
-//         // });
-//     }
-// }
 
 showAlbumPage = function( this_gi, this_ti, this_gai, name ){
 	if( null== window ) return;
@@ -2042,3 +1971,4 @@ myWait = function(variable,type){
 
   return deferred.promise();
 }
+

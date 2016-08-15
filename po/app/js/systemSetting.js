@@ -2,6 +2,7 @@ $(document).ready(function(){
     
     var btnContent = $(".btn-content");
     var imgContent = $(".image-content");
+    
 
     $('.userSetting-btn').click(function(){
         userInfoUpdate();
@@ -52,19 +53,10 @@ $(document).ready(function(){
             //是否存在圖片
             var reader = new FileReader();
             reader.onload = function(e) {
-                var img = $(".user-headshot");
-                //調整長寬
-                //img.load(function() {
-                //var w = img.width();
-                //var h = img.height();
-                //mathAvatarPos(img,w,h,120);
-                //});
-                // uploadToS3(file,"/me/avatar",ori_arr,tmb_arr,function(chk){
-                // });
-                img.attr("src",reader.result);
+                $(".user-headshot").attr("src",reader.result);
             }
             reader.readAsDataURL(file);
-            QmiGlobal.avatarPopup.init();
+            avatarPopup();
             
         } else {
             popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
@@ -85,6 +77,102 @@ $(document).ready(function(){
     // });
 
 });
+
+function avatarPopup() {
+    var html =　'<div class="user-avatar-confirm">'+
+           '<div class="avatar-content">'+
+               '<div class="avatar-preview">'+
+                   '<img class="user-headshot" src="">'+
+               '</div>'+
+               '<div class="avatar-btn-content">'+
+                   '<button data-role="none" class="cancel-btn btn-b" data-textid="COMMON_CANCEL"></button>'+
+                   '<button data-role="none" class="avatar-save btn-b" data-textid="COMMON_OK"></button>'+
+               '</div>'+
+            '</div>'+                           
+    '</div>';
+    
+    var imgPopup = $(this.html);
+    imgPopup._i18n();
+    $("body").append(imgPopup);
+    var userAvatar = $('.user-avatar-confirm');
+    userAvatar.fadeIn();
+    //儲存圖片
+    userAvatar.find('.avatar-save').click(function(){
+        //https://ap.qmi.emome.net/apiv1/
+        // USAGE: 
+        qmiUploadFile({
+            urlAjax: {
+                apiName: "me/avatar",
+                method: "put"
+            },
+            isPublicApi: true,
+            file: userAvatar.find(".user-headshot")[0],
+            oriObj: {w: 1280, h: 1280, s: 0.7},
+            tmbObj: {w: 480, h: 480, s: 0.6},
+            tp: 1 // ;
+        }).done(function(data) {
+            console.log("finish", data);
+            QmiGlobal.me.auo = data.data.ou;
+            QmiGlobal.me.aut = data.data.tu;
+            $("#userInfo").find(".user-avatar-setting").attr("src",data.data.tu);
+            toastShow(data.data.rsp_msg);
+        });
+
+        var reader = new FileReader();
+        var file_ori = $('.setting-avatar-file');
+        var image_file = file_ori[0].files[0];
+        reader.onload = function(e) {
+            var img = $(".user-avatar-img");
+            img.attr("src",reader.result);
+        }
+        reader.readAsDataURL(image_file);        
+        imgPopup.remove();
+        userAvatar.fadeOut();
+        $('input[type="file"]').val(null);
+    });
+    //取消
+    $('.cancel-btn').click(function(){
+        imgPopup.remove();
+        userAvatar.fadeOut();
+        $('input[type="file"]').val(null);
+    });
+}
+
+function guihu(){
+    var html = '<div class="guihu-confirm">'+
+        '<div class="edit-guihu-content">'+
+            '<div class="guihu-title-content">'+
+                '<div class="guihu-title"></div>'+
+                '<div class="guihu-des"></div>'+
+            '</div>'+
+            '<div class="guihu-input-content">'+
+                '<input type="text" data-role="none" placeholder="E-mail">'+
+                '<input type="password" data-role="none" placeholder="Password">'+
+            '</div>'+
+            '<div class="guihu-btn-content">'+
+                '<button class="guihu-cancel-btn btn-b" data-role="none">取消</button>'+
+                '<button class="btn-b" data-role="none">確認</button>'+
+            '</div>'+
+        '</div>'+
+    '</div>';
+    var guihuPop = $(html);
+    $("body").append(guihuPop);
+    var editGuihu = $(".guihu-confirm");
+    editGuihu.fadeIn();
+
+    $(".guihu-cancel-btn").click(function(){
+        guihuPop.remove();
+        editGuihu.fadeOut();
+    });
+    $(".guihu-btn-content").on('click',".add-btn",function(){
+        guihuPop.remove();
+        editGuihu.fadeOut();
+    });
+    $(".guihu-btn-content").on('click',".save-btn",function(){
+        guihuPop.remove();
+        editGuihu.fadeOut();
+    });
+}
 
 //user Info Setting
 userInfoSetting = function(){
@@ -228,43 +316,6 @@ systemSetting = function(){
     //     console.debug(e.responseText);
     // });
 
-    // var api_name = "groups";//url
-    // var headers = {
-    //     "ui":ui,
-    //     "at":at, 
-    //     "li":lang,
-    // };
-    // var method = "get";
-    // ajaxDo(api_name,headers,method,false).success(function(test_data){
-    //     console.debug("this-is-me",$.lStorage("_loginData"));
-    //     $('.group-select').empty();   
-    //     console.debug(this_dgi);
-    //     for(i=0 ;i<test_data.gl.length; i++){
-    //         var cr = $("<option value="+test_data.gl[i].gi+">"+test_data.gl[i].gn+"</option>");
-    //         $('.group-select').append(cr);
-    //         $('.group-select').val(this_dgi);
-    //     }
-    // }).error(function(e){
-    //     alert("error");
-    // });
-
-    //user-data-information
-    // var api_name2 = "me";//url
-    // var headers = {
-    //     "ui":ui,
-    //     "at":at, 
-    //     "li":lang,
-    // };
-    // var method = "get";
-    // ajaxDo(api_name2,headers,method,false).success(function(data){
-    //     console.debug("data",data);
-    //     $(".setting-user-avatar").attr('src',data.auo);//大頭照
-    //     $(".input-username").val(data.nk);//first name    
-    // }).error(function(e){
-    //     alert("error");
-    // });
-
-    //$('.version-information').text($.lStorage('_ver').ver);//系統資訊顯示
 }
 
 // 變更密碼
@@ -298,8 +349,8 @@ passwordChange = function(){
                 method: "post",
                 isPublicApi: true
             }).success(function(password_data){
-                if (pwSetting.find("input[name$='n-password']").val().length < 6){ 
-                        popupShowAdjust("新密碼請輸入至少六個字", "" ,true);
+                if (pwSetting.find("input[name$='n-password']").val().length < 8){ 
+                        popupShowAdjust("新密碼請輸入至少八個字", "" ,true);
                         return false;
                 }　else {
                     if (pwSetting.find("input[name$='n-password']").val() == pwSetting.find("input[name$='v-password']").val()){
@@ -330,55 +381,6 @@ passwordChange = function(){
                     popupShowAdjust("原密碼有誤", "" ,true);
                     console.debug(e.responseText);
             });
-            // $.ajax({
-            //     url:base_url+"me/password/auth",
-            //     headers:{
-            //         "li":lang,
-            //         "at":at,
-            //         "ui":ui
-            //     },
-            //     data:JSON.stringify(old_password),
-            //     type:"post",
-            //     success:function(password_data){
-                                    
-            //         if($("input[name$='user-edit-n-password']").val().length < 3){
-                    
-            //             popupShowAdjust("新密碼請輸入至少三個字", "失敗" ,true);
-            //             return false;
-            //         }
-            //         else if($("input[name$='user-edit-n-password']").val() == $("input[name$='user-edit-v-password']").val())
-            //         {
-            //             $.ajax({
-            //                 url:base_url+"me/password",
-            //                 headers:{
-            //                 "li":lang,
-            //                 "at":at,
-            //                 "ui":ui
-            //                 },
-            //                 type:"put",
-            //                 data:JSON.stringify(verify_password),
-            //                 success:function(verify_data){
-            //                     toastShow("發送成功");
-            //                     console.debug(verify_data);
-            //                      at = verify_data.at;
-                                 
-            //                 },
-            //                 error:function(e){
-            //                     alert("error");
-            //                 }
-            //             });//ajax密碼變更
-            //         }
-            //         else
-            //         {
-            //             popupShowAdjust("請再輸一次新密碼", "失敗" ,true);
-            //             $("input[name$='user-edit-v-password']").val("");
-            //         }
-            //     },
-            //     error:function(e){
-            //         popupShowAdjust("原密碼有誤", "失敗" ,true);
-            //         console.debug(e.responseText);
-            //     }
-            // });
         }//空值判定
 }//密碼更新
 
@@ -402,59 +404,3 @@ defaultGroupSetting = function(){
         alert("error");
     });
 }
-
-// 系統設定（使用者名稱跟預設團體變更送出）
-// $('.system-setting-submit').click(function(){
-//     // toastShow("發送成功");
-//     // popupShowAdjust("", "失敗" ,true);
-
-//     var username_input = $('.input-username').val();
-    
-//     if(username_input == ""){
-//         alert('姓名輸入框不可為空');
-//     }
-//     else{
-//         var body = {
-//             "fn":$.lStorage('_loginData').fn,
-//             "ln":$.lStorage('_loginData').ln,
-//             "nk":username_input,
-//             "bd":$.lStorage('_loginData').bd
-//         };
-
-//         headers = {
-//             "li":lang,
-//             "at":at,
-//             "ui":ui
-//         };
-
-//         ajaxDo("me",headers,"put",false,body)
-//         .complete(function(user_data){
-//             //success
-//             console.debug('user_data',user_data);
-//             var new_dgi = $('.group-select option:checked').val();
-
-//             console.debug(new_dgi);
-//             $.ajax({
-//                 url:base_url+"groups/"+new_dgi+"/default",
-//                 headers:{
-//                     "li":lang,
-//                     "at":at,
-//                     "ui":ui
-//                 },
-//                 type:"put",
-//                 complete:function(e){
-//                     toastShow("發送成功");
-
-//                     var user_login = $.lStorage("_loginData");
-//                     user_login.dgi = new_dgi;//變更的預設團體id
-//                     $.lStorage('_loginData',user_login);//上傳local storage
-//                 }
-//             });//顯示預設團體
-//         });
-
-//         //自動換頁
-//          var carousel_time = $('.carousel-time').val();
-//          $.lStorage('_topTimeMs',carousel_time);
-
-//      }//使用者姓名空值判定
-// });

@@ -33,7 +33,7 @@
 	"REGISTER_AUTH_SMS_HAS_SENT" :	"A verification code was sent to your phone.",
 	"REGISTER_AUTH_RESEND_CODE" :	"Resend Verification Code",
 	"REGISTER_PASSWORD_TITLE" :	"Password Setting",
-	"REGISTER_PASSWORD_PASSWORD_PLACEHOLDER" :	"6 to 20 digits or characters",
+	"REGISTER_PASSWORD_PASSWORD_PLACEHOLDER" :	"8 to 20 digits or characters",
 	"REGISTER_PASSWORD_CONFIRM_PLACEHOLDER" :	"Confirm Password",
 	"REGISTER_SETTING_TITLE" :	"Account Setting",
 	"REGISTER_SETTING_LAST_NAME" :	"Last Name",
@@ -255,7 +255,7 @@
 	"NOTICES_RESPONSE"						: "Response",
 	"NOTICES_UPLOAD_FILE"						: "and upload file",
 	"NOTICES_RESPONSER_NUM"					: "and %ld other people",
-	"NOTICES_NOMSG_BRIAN"				: "no message",
+	"NOTICES_NOMSG_WEB"				: "no message",
 
 	"LEFT_FEED" : "News Feeds",
 	"LEFT_GROUP" : "Group",

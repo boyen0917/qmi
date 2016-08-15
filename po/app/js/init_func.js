@@ -56,7 +56,6 @@ $(function(){
         }).complete(function(data){
             if(data.status == 200){
                 var comboData = $.parseJSON(data.responseText);
-
                 // QmiGlobal.groups -> QmiGlobal.groups 
                 // thisGi 不存在list中 重新加入 做tl hash-map
                 // if( QmiGlobal.groups.hasOwnProperty(thisGi) === false ) {
@@ -79,6 +78,7 @@ $(function(){
                     }
                 }
 
+                if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
                 // 製作guAll hash-map & inviteGuAll
                 for( var key in comboData.ul ){
                     var thisGuObj = comboData.ul[key];

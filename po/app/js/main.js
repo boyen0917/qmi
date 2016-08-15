@@ -707,8 +707,10 @@ $(function(){
 			fileType = matchArr.find(function(tp){
 				return file.type.match(new RegExp(tp, "g")) instanceof Array;
 			}),
-
 			fileURL = URL.createObjectURL(file);
+
+		console.log(file.name);
+
 
 		switch(fileType) {
 			case "image":
@@ -738,11 +740,16 @@ $(function(){
 		deferred.done(function(dataUrl) {
 			var previewInput = "<div class='img'><img "+ (vdoDefaultFlag ? "class='vdo-default'" : "")  +" src='" + dataUrl + "'/></div>";
 
-			if (fileType === "file") {
+			if (fileType == "file") {
+				var fileName = file.name.split(".")[0];
+				var fileIcon = getMatchIcon(file.name);
+                var format = file.name.split(".")[1];
+                if (fileName.length > 15) {
+                    fileName = fileName.substring(0, 15) + "....";
+                }
 				previewInput = "<div class='attach-file'><img class='file-icon'" 
-					+ "src='images/timeline/otherfile_icon.png'><span class='ellipsis'>" 
-					+ file.name
-					+ "</span><span>" + file.size.toFileSize() + "</span>"
+					+ "src='images/fileSharing/" + fileIcon+ "' >" + (fileName + " - " + format) 
+					+ "<span>" + file.size.toFileSize() + "</span>"
 					+ "<img class='file-cancel' src='images/common/icon/icon_compose_close.png'></div>";
 			}
 
@@ -1472,15 +1479,15 @@ $(function(){
 
 	$(".cp-file").change(function(e) {
 
-		var composePage = $("#page-compose");
-		var this_compose = composePage.find(".cp-content");
-		var videoList = [];
-		var imgList = [];
-		var fileList = [];
-		var file_ori = $(this);
-		var imageType = /image.*/;
-		var videoType = /video.mp4/;
-		var isMp4AlertShown = false;
+		var composePage = $("#page-compose"),
+			this_compose = composePage.find(".cp-content"),
+			videoList = [],
+			imgList = [],
+			fileList = [],
+			file_ori = $(this),
+			imageType = /image.*/,
+			videoType = /video.mp4/,
+			isMp4AlertShown = false;
 
 		// 預設各個副檔案的title
 		if(composePage.find(".cp-file-img-area").attr("type") === undefined) {
@@ -1583,7 +1590,7 @@ $(function(){
 					this_compose.find(".cp-attach-area").show();
 					this_compose.find(".cp-file-area").show();
 					videoArea.html("").show();
-					var this_grid =  $('<div class="cp-grid"><div><video data-file-num="'+ai+'"/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
+					var this_grid =  $('<div class="cp-grid"><div><img class="vdo-poster"></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
 				
 					//編號 方便刪除
 					this_grid.data("file-num", ai);
@@ -1592,37 +1599,25 @@ $(function(){
 					//有圖片就push進 compose message list
 					if($.inArray(7,this_compose.data("message-list")) < 0){
 						this_compose.data("message-list").push(7);
-
 						//附檔區域存在附檔
 						this_compose.data("attach",true);
 					}
-					renderVideoFile(file, videoArea.find('video[data-file-num="'+ai+'"]'), function (videoTag) {
-						videoTag.parent().addClass("loaded");
-						if( videoTag.width() > 100 ){
-							videoTag.css("margin-left",-(videoTag.width()-100)*0.5);
+
+					getVideoImgUrl(file).done(function(vdoUrl) {
+						// 判斷有無圖片
+						var img = videoArea.find('.vdo-poster')[0];
+						img.src = vdoUrl;
+						img.onerror = function() { 
+							img.src = "images/vdo_default.png";
 						}
-					}, function (videoTag) {
-						videoTag.parent().addClass("error");
-					});
-
-					// getVideoImgUrl(file).done(function(vdoUrl) {
-					// 	// 判斷有無圖片
-					// 	var img = document.createElement("img");
-					// 	img.src = vdoUrl;
-					// 	img.onerror = function() { 
-					// 		vdoDefaultFlag = true;
-					// 		deferred.resolve("images/vdo_default.png");
-					// 	}
-					// 	img.onload = function() { deferred.resolve(vdoUrl) }
-
-					// })
+					})
 				}
 
 			}
 		}
 
 		if( fileList.length>0 ){
-
+			console.log("yo",fileList);
 			composePage.find(".cp-attach-area").show();
 			composePage.find(".cp-file-area").show();
 			var fileArea = composePage.find(".cp-file-else-area");
@@ -1632,7 +1627,7 @@ $(function(){
 			fileContentArea.html("");
 			
 			$.each(fileList,function(i,file){
-				if(!file || !file.type) return;
+				if(!file) return;
 				//流水號
 				var ai = this_compose.data("upload-ai");
 				this_compose.data("upload-file")[ai] = file;
@@ -1640,9 +1635,8 @@ $(function(){
 			});
 
 			$.each(this_compose.data("upload-file"),function(i,file){
-				console.log("im file ",file);
 				var fileRow =  $('<div class="file-row">' +
-                    '    <img src="images/compose/icon_file.png">' +
+                    '    <img src="images/fileSharing/' + getMatchIcon(file.name) + '">' +
                     '    <span>'+ file.name +'</span>' +
                     '    <span>'+ fileSizeTransfer(file.size) +'</span>' +
                     '    <img class="grid-cancel" src="images/common/icon/icon_compose_close.png">' +

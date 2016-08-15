@@ -2568,7 +2568,7 @@ img.st-user-pic{
 .st-sub-box-2-attach-area {
 	background: white;
 	/*border-top: 1px solid #d3e0e6;*/
-	margin: 10px -13px 0;
+	margin: 10px -13px -14px;
 	text-align: center;
 	position: relative;
 }
@@ -3023,10 +3023,27 @@ img.st-user-pic{
 #galleryModal #caption {
     font-size: large;
     color: white;
+    text-align: center;
+    margin-top: 7px;
+}
+
+#galleryModal:hover a div {
+  	content: "";
+  	width: 50px;
+  	height: 50px;
+  	background-image: url("../images/dl.png");
+  	background-size: contain;
+  	position: absolute;
+ 	right: 90px;
+  	bottom: 60px;
+  	cursor: pointer;
+  	opacity: 0.8;
+/*=======
     text-align: right;
     position: absolute;
     right: 5%;
     bottom: 2%;
+>>>>>>> d04147bcc608092e0e5229ec3d11f4cf1fdd256a*/
 }
 
 .currentImg {
@@ -3339,18 +3356,22 @@ img.st-user-pic{
 
 .st-reply-content .attach-file {
 	font-size: 14px;
-	width: 300px;
+	width: -webkit-calc( 100% + 16px );
+	height: 37px;
 	display: inline-block;
 	line-height: 2;
-	padding: 5px 10px;
-	color: #aaa;
-  	text-decoration: none;
+  	margin: 10px 0px;
+  	padding: 0px 0px 0px 0px;
+  	color: #aaa;
+ 	text-decoration: none;
   	border: 1px solid #dddddd;
 }
 
 .st-reply-content .attach-file img {
-  	vertical-align: bottom;
-  	padding: 2px 5px 0px 5px;
+  	vertical-align: middle;
+  	padding: 1px 5px 5px 5px;
+  	width: 34px;
+  	height: 34px;
 }
 
 .st-reply-content .attach-file span {
@@ -3359,11 +3380,11 @@ img.st-user-pic{
 
 .st-reply-content .download-icon {
     background: url(../images/timeline/download_icon.png) no-repeat #bdd2ed center;
-    background-size: 20px 20px;
-    float: right;
-    width: 32px;
-    height: 30px;
-    cursor: pointer;
+  	background-size: 20px 20px;
+  	float: right;
+  	width: 42px;
+  	height: 37px;
+  	cursor: pointer;
 }
 
 .st-reply-footer {
@@ -3541,11 +3562,12 @@ img.st-reply-message-attach {
 }
 
 .st-reply-message-img .file-cancel{
-	vertical-align: super;
-    height: 20px;
-    width: 20px;
-    margin-left: 22px;
-    cursor: pointer;
+  	vertical-align: text-top;
+  	height: 20px;
+  	width: 20px;
+  	margin-left: 22px;
+  	cursor: pointer;
+  	margin-top: -1px;
 }
 
 .st-reply-message-img .img{
