@@ -207,8 +207,7 @@ updateAlert = function(){
 //顯示資料
 showAlertContent = function(data){
 	if(!data||data.length==0){
-		$(".alert-area .content").html("");
-		cns.debug("no alert data");
+		$(".alert-area .content").html("<div class='no-msg'>"+ $.i18n.getString("NOTICES_NOMSG_WEB") +"</div>");
 		return;
 	}
 	// cns.debug("showAlertContent");

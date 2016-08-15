@@ -562,7 +562,7 @@ onCheckVersionDone = function(needUpdate){
 		var p1 = $(".password-setting input").val();
 		var p2 = $(".password-confirm input").val();
 		if( p1 && p2 
-			&& (p1.length>=6 && p1.length<=20)
+			&& (p1.length>=8 && p1.length<=20)
 			&& p1==p2
 		){
 			$(".password-next").addClass("password-next-ready");

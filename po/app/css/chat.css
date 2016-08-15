@@ -286,7 +286,7 @@ body {
 .chat-msg-left .group .name{
 	font-size: 13px;
 	margin-bottom: 3px;
-	color: #495470;
+	color: rgb(8, 63, 79);
 	font-weight: bolder;
 }
 .chat-msg-right, .chat-msg-left, .sys-msg{
@@ -744,7 +744,7 @@ body {
 	display: block;
 	max-height: 100px;
 	border: 1px solid #dddddd;
-	background-color: rgba(41, 87, 171, 0.23);
+	background-color: rgb(75,124,219);
 	background-repeat: no-repeat;
 	border-radius: 12px;
 	padding: 8px 10px;
@@ -769,12 +769,12 @@ body {
 
 .chat-file p{
 	margin: 0px 0px 2px 0px;
-	color: rgb(89, 87, 87);
+	color: rgb(53, 38, 38);
   	font-weight: 600;
 }
 
 .chat-file p.name{
-	color: rgb(29, 106, 129);
+	color: rgb(8, 63, 79);
 	font-size: 16px;
 	font-weight: bolder;
 }

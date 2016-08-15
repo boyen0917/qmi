@@ -231,28 +231,28 @@ fileSizeTransfer = function (si){
 getMatchIcon = function (fileName) {
 	var fileExt = fileName.split(".").pop();
 	var dictOfFileIconPath = {
-		default : 'images/timeline/otherfile_icon.png',
-		bmp : 'images/fileSharing/photo_icon.png',
-		jpg : 'images/fileSharing/photo_icon.png',
-		png : 'images/fileSharing/photo_icon.png',
-		gif : 'images/fileSharing/photo_icon.png',
-		pdf : 'images/fileSharing/pdf_icon.png',
-		csv : 'images/fileSharing/excel_icon.png',
-		xls : 'images/fileSharing/excel_icon.png',
-		xlsx : 'images/fileSharing/excel_icon.png',
-		ppt : 'images/fileSharing/ppt_icon.png',
-		pptx : 'images/fileSharing/ppt_icon.png',
-		doc : 'images/fileSharing/word_icon.png',
-		docx : 'images/fileSharing/word_icon.png',
-		mp3 : 'images/fileSharing/audio_icon.png',
-		wav : 'images/fileSharing/audio_icon.png',
-		wma : 'images/fileSharing/audio_icon.png',
-		mp4 : 'images/fileSharing/video_icon.png', 
-		flv : 'images/fileSharing/video_icon.png', 
-		mov : 'images/fileSharing/video_icon.png', 
-		wmv : 'images/fileSharing/video_icon.png', 
-		mpg : 'images/fileSharing/video_icon.png', 
-		avi : 'images/fileSharing/video_icon.png', 
+		default : 'otherfile_icon.png',
+		bmp : 'photo_icon.png',
+		jpg : 'photo_icon.png',
+		png : 'photo_icon.png',
+		gif : 'photo_icon.png',
+		pdf : 'pdf_icon.png',
+		csv : 'excel_icon.png',
+		xls : 'excel_icon.png',
+		xlsx : 'excel_icon.png',
+		ppt : 'ppt_icon.png',
+		pptx : 'ppt_icon.png',
+		doc : 'word_icon.png',
+		docx : 'word_icon.png',
+		mp3 : 'audio_icon.png',
+		wav : 'audio_icon.png',
+		wma : 'audio_icon.png',
+		mp4 : 'video_icon.png', 
+		flv : 'video_icon.png', 
+		mov : 'video_icon.png', 
+		wmv : 'video_icon.png', 
+		mpg : 'video_icon.png', 
+		avi : 'video_icon.png', 
 	}
 
 	if (dictOfFileIconPath[fileExt]) {
@@ -660,11 +660,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			}})
 		}).fail(function() {
 			// 上傳s3 失敗
-// <<<<<<< HEAD
 			allDef.reject({status: 999, isSuccess: false, data: arguments});
-// =======
-// 			allDef.resolve({status: 999, isSuccess: false, data: arguments});
-// >>>>>>> d04147bcc608092e0e5229ec3d11f4cf1fdd256a
 		});
 	})
 
