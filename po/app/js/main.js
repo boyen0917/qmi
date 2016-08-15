@@ -1071,7 +1071,7 @@ $(function(){
 			        var data = this_event.data("event-val");
 			        var text = null;
 			        try{
-			        	text = data.ml[0].c.replace(/<br\s*[\/]?>/gi, "\n");
+			        	text = data.ml[0].c;
 					} catch(e) {
 						errorReport(e);
 				    }
