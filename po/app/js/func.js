@@ -55,15 +55,26 @@ setGroupInitial = function(new_gi,chk){
 }
 
 logout = function(){
-    var api_name = "logout";
-    var headers = {
-        ui: ui,
-        at: at,
-        li: lang
-    };
-    var method = "delete";
+    new QmiAjax({
+        apiName: "logout",
+        isPublicApi: true,
+        noAuth: true,
+        errHide: true,
+        method: "delete"
+    }).done(function(data){
 
-    ajaxDo(api_name,headers,method,true).complete(function(data){
+    // var api_name = "logout";
+    // var headers = {
+    //     ui: ui,
+    //     at: at,
+    //     li: lang
+    // };
+    // var method = "delete";
+
+    // ajaxDo(api_name,headers,method,true).complete(function(data){
+        // localStorage.removeItem("_loginAutoChk");
+     //    localStorage.removeItem("_loginData");
+
         // 關閉移轉團體所有聊天室
         (Object.keys(windowList) || []).forEach(function(thisCi){
             windowList[thisCi].close();

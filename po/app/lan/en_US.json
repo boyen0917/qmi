@@ -414,6 +414,9 @@
 	"ACCOUNT_BINDING_DISCONNECT_QMI_ACCOUNT_CONFIRM" :	"You won't be able to access this account after disconnect it.",
 	"ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION" :	"Account Recertification",
 	"ACCOUNT_BINDING_ENTER_LDAP_PASSWORD" :	"Please enter your LDAP password",
+
+	"WEBONLY_AUTH_LOADING" : "authenticating...",
+	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
 	
 	"WEBONLY_PUSH" : "notifications",
 	"WEBONLY_SAVE" : "submit",

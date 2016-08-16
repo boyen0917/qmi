@@ -197,8 +197,10 @@ userInfoGetting = function(){
     }).success(function(data){
         QmiGlobal.me = data;
         //左下角個人資料 使用者名稱 手機 頭像
+        var account = QmiGlobal.auth.isSso ? data.em: data.pn;
+
         userInfo.find(".user-name").text(data.nk).end()
-                .find(".user-phone").text(data.pn).end()
+                .find(".user-account").text(account).end()
                 .find(".user-avatar-setting").attr("src",data.aut);
     if(!data.aut){
             userInfo.find(".user-avatar-setting").attr("src",emptyUserAvt);

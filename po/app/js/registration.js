@@ -308,21 +308,29 @@ onCheckVersionDone = function(needUpdate){
         	isLoadingShow: true,
         	method: "post"
         }).complete(function(data){
+        	var loginDef = $.Deferred();
         	if(data.status == 200){
 
         		var dataObj = $.parseJSON(data.responseText);
+
+        		// 判斷此次登入帳號與上次不同再刪除DB
+        		if($.lStorage("_loginId") !== body.id) resetDB();
+
+        		//記錄此次登入帳號
+        		$.lStorage("_loginId",body.id);
 
 				QmiGlobal.auth = dataObj;
 
         		// SSO 登入
         		if(dataObj.rsp_code === 104) {
+        			QmiGlobal.auth.isSso = true;
         			QmiGlobal.ssoLogin({
         				url: dataObj.url,
-        				ci: dataObj.ci,
+        				ci:  dataObj.ci,
         				uui: dataObj.uui,
         				pin: dataObj.pin,
-        				id: body.id,
-        				pw: password,
+        				id:  body.id,
+        				pw:  password,
         			}).done(loginDef.resolve);
         		} else {
         			loginDef.resolve({isSso:false});
@@ -487,6 +495,7 @@ onCheckVersionDone = function(needUpdate){
         	new QmiAjax({
 	        	apiName: "cert",
 	        	isPublic: true,
+	        	isSso: true,
 		        specifiedHeaders: {
 		            li:lang
 		        },
@@ -516,7 +525,6 @@ onCheckVersionDone = function(needUpdate){
 				});
 	        });
         });
-
         return deferred.promise();
     }
 
