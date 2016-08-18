@@ -399,9 +399,10 @@ function showGroupInfoPage(){
         errorReport(e);
     }
 
-    $(".ga-group-name").text(groupName);
-    $(".ga-group-id").text("ID : " + groupId);
-    $(".ga-group-des").text(groupDescription);
+
+    $(".ga-group-name").html(groupName._escape());
+    $(".ga-group-id").html("ID : " + groupId);
+    $(".ga-group-des").html(groupDescription._escape().replace(/\n/g,"<br />"));
     
 
     if (isAdmin){
@@ -452,13 +453,13 @@ function showGroupInfoPage(){
 			popupShowAdjust("團體名稱不能為空");
 		}else{
 			contentViewshow();
-			gaContent.find(".ga-group-name").text(inGroupName.val());
+			gaContent.find(".ga-group-name").html(inGroupName.val());
 			getUpdateGroupInfoApi(gi, inGroupName.val(), "");
 		}
 	});
 	gaContent.on("click","#icon-edit-gdes", function(){
 		rowViewshow();
-		gaContent.find(".ga-group-des").text(textGroupDes.val());
+		gaContent.find(".ga-group-des").html(textGroupDes.val()._escape().replace(/\n/g,"<br />"));
 		getUpdateGroupInfoApi(gi, "", textGroupDes.val());
 	});
 	gaContent.on("click",".ga-cancel-gname", function(){

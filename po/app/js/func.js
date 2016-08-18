@@ -5364,6 +5364,7 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
         this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
         this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
 
+        
         var category;
         var title = $.i18n.getString("FEED_POST");
         switch(tp){
@@ -5374,6 +5375,7 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
             //公告
             case 1:
                 category = title = $.i18n.getString("FEED_BULLETIN");
+                 
                 break;
             //通報
             case 2:
@@ -5433,6 +5435,33 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
                 this_event.find(".st-box2-more-title").html( val.meta.tt.replaceOriEmojiCode() );
             }
         }
+
+        // 公告禁止按讚留言 0:全開 1:能讚不留 2:不讚能留 3:全關
+        (function() {
+            var thisEventGi = this_event.data("event-id").split("_")[0];
+            var ann_on_off = QmiGlobal.groups[thisEventGi].set.s24;
+
+            if(tp == 1){
+                if(ann_on_off == 1){
+                    this_event.find(".st-reply-message-area").hide();
+                    this_event.find(".st-sub-box-3").append("<div class='off-reply'></div>");
+                } else if(ann_on_off == 2){
+                    this_event.find(".st-sub-box-3").append("<div class='off-like'></div>");
+                } else if(ann_on_off == 3){
+                   this_event.find(".st-reply-message-area").hide();
+                   this_event.find(".st-sub-box-3").append("<div class='off-like'></div>");
+                   this_event.find(".st-sub-box-3").append("<div class='off-reply'></div>");
+                }
+            }
+            this_event.find(".st-sub-box-3 .off-like").click(function(){
+                popupShowAdjust("公告暫不開放按讚","",true);
+            });
+            this_event.find(".st-sub-box-3 .off-reply").click(function(){
+                popupShowAdjust("公告暫不開放留言","",true);
+            });
+        })()
+
+
         
         //tp = 0 是普通貼文 在content區填內容 其餘都在more desc填
         var target_div = ".st-box2-more-desc";
@@ -8050,10 +8079,10 @@ pollingCmds = function(newPollingData){
             if(pollingDataTmp){
                 currentPollingCt = pollingDataTmp.ts.pt;
             }
-
-            if(set_notification) {
+            //判斷聊天訊息預覽開關
+            if($.lStorage("_setnoti")==100 || set_notification == true){
                 isShowNotification = true;
-            } else {
+            } else if($.lStorage("_setnoti")==300 || set_notification == false){
                 isShowNotification = false;
             }
 
@@ -8166,6 +8195,8 @@ pollingCmds = function(newPollingData){
                         // 上面打過combo 更新過了
                         if( gi == item.pm.gi ){
                             var tmp = $(".sm-small-area:visible");
+                            var grouptmp = $(".sm-group-area[data-gi="+gi+"]");
+                            grouptmp.trigger("click");
                             if(tmp.length>0){
                                 $(tmp[0]).trigger("click");
                             }

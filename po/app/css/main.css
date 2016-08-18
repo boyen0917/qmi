@@ -2417,6 +2417,17 @@ img.st-user-pic{
 	cursor: default;
 }
 
+.st-sub-box-3 .off-like,.st-sub-box-3 .off-reply{
+	position: absolute;
+    left: 20px;
+    width: 50px;
+    height: 30px;
+	cursor: pointer;
+}
+.st-sub-box-3 .off-reply{
+	margin-left: calc(8% + 40px);
+}
+
 .st-sub-box-3 img {
 	position: relative;
     margin: 0 5px;

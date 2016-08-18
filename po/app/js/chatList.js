@@ -588,12 +588,17 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			$('.sm-small-area[data-sm-act="chat"]').trigger("click");
 		}
 	}
-	
-	if( !isMe && isShowAlert ){
+	//判斷聊天訊息預覽開關
+	if($.lStorage("_setnoti")==100 || set_notification == true){
+        set_notification = true;
+    } else if($.lStorage("_setnoti")==300 || set_notification == false){
+        set_notification = false;
+    }
+	if( !isMe && isShowAlert && set_notification){
 		try{
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			var cnTmp = data.cn||"";
-			if( data.meta.ct>=login_time ){
+			if( data.meta.ct>=login_time){
 				riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
 					cns.debug(ciTmp);
 					openChatWindow( giTmp, ciTmp );
