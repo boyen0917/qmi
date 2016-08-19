@@ -273,44 +273,6 @@ window.QmiGlobal = {
 
 };
 
-QmiGlobal.systemPopup = {
-	html : '<section id="systemPopup">'+
-			'<div class="sm-person-info">'+
-                '<div class="sm-info-hr" data-textid="LOGIN_SAVE_ACCOUNT_TITLE"></div>'+
-                '<div data-sm-act="user-setting" class="sm-info sm-small-area" data-textid="PERSONAL_INFORMATION"></div>'+
-                '<div class="line"></div>'+
-                '<div class="sm-info-hr" data-textid="SYSTEM"></div>'+
-                '<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'+
-                '<div data-sm-act="system-ldap" class="sm-info sm-small-area" data-textid="ACCOUNT_BINDING_BINDING_NEW_ACCOUNT"></div>'+
-                '<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'+
-            '</div>'+
-       	'</section>',
-    init : function(){
-    	var sysPopup = $(this.html);
-    	sysPopup._i18n();
-
-    	$("body").append(sysPopup);
-
-    	sysPopup.click(function(){
-    		$(".sm-person-area-r").find("img").toggle();
-    		sysPopup.remove();
-    	});
-    	sysPopup.find(".sm-info-hr").click(function(e) {
- 			e.stopPropagation();
-		});
-		//登出
-		sysPopup.find(".system-logout").click(function(){
-			// popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
-			new QmiGlobal.popup({
-				desc: $.i18n.getString("SETTING_DO_LOGOUT"),
-				confirm: true,
-				cancel: true,
-				action: [logout]
-			});
-		});
-    }
-},
-
 // polling異常監控
 window.QmiPollingChk = {
 
@@ -798,14 +760,21 @@ QmiGlobal.eventDispatcher = {
 			var self = this;
 
 			Object.keys(self.viewMap).forEach(function(viewId) {
-				if(event.target !== self.viewMap[viewId].elem) return;
-				window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId));
+				// event currentTarget -> event綁定的對象
+
+				// jqElem 是arr 每個elem都比對
+				var jqElem = self.viewMap[viewId].jqElem, length = jqElem.length;
+				for(var i=0; i<length; i++) {
+					if(event.currentTarget === jqElem[i]) {
+						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {})[event.type]}}));
+						return;
+					}
+				}
 			});
-			
 		}
 
 		function preventMultiClick(event) {
-			event.stopPropagation();
+			// event.stopPropagation();
 			//禁止連點
 			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) return false;
 			// 記錄連點資訊
@@ -817,148 +786,32 @@ QmiGlobal.eventDispatcher = {
 	viewEventSubscriber: function(veArr, handler) {
 		var self = this;
 		veArr.forEach(function(veObj) {
-			// 重複事件 刪除舊的
-			if(self.viewMap[veObj.viewId] !== undefined) delete self.viewMap[veObj.viewId];
-
-			self.viewMap[veObj.viewId] = veObj;
-			veObj.eventArr.forEach(function(customEvent) {
-				window.addEventListener(customEvent.split(":")[0], self);
-				window.addEventListener(customEvent, handler);
+			var viewId = handler.id+"-"+veObj.veId;
+			self.viewMap[viewId] = veObj;
+			veObj.eventArr.forEach(function(eventType) {
+				// jqElem 是arr 每個elem都掛上事件監聽
+				Array.prototype.forEach.call(veObj.jqElem, function(elem) {
+					elem.addEventListener(eventType, self);
+				})
+				window.addEventListener(eventType+":"+viewId, handler);
 			});
 		})
 	}
 }
 
-// testObj
-QmiGlobal.viewTest = {
-	init: function() {
-		// html.....
-		var self = this;
-		var selfView = $("<section>", {
-	        id: self.id,
-	        html: self.html()
-	    });
-
-		$("#"+self.id).remove();
-    	$("body").append(selfView.show());
-
-    	QmiGlobal.eventDispatcher.viewEventSubscriber([
-    		{
-    			viewId: "auth-email", 
-    			elem: selfView.find("input.email")[0], 
-    			eventArr: ["click:auth-email", "input:auth-email"]
-    		}, {
-    			viewId: "auth-submit", 
-    			elem: selfView.find("span.submit")[0], 
-    			eventArr: ["click:auth-submit"]
-    		}
-    	], self);
-	},
-
-	handleEvent: function(event) {
-		switch(event.type){
-            case 'click:auth-email':
-            	console.log("1", event.type);
-                break;
-            case 'click:auth-submit':
-				console.log("2", event.type);
-                break;
-            case 'input:auth-email':
-            	console.log("3", event.type);
-                break;
-        }
-	},
-
-	id: "auth-manually-ui",
-	html: function() {
-		return "<div class='container'>"
-		+ "<div class='title1'>" + $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") + "</div>"
-		+ "<div class='title2'>" + $.i18n.getString("ACCOUNT_BINDING_ENTER_LDAP_PASSWORD") + "</div>"
-        + "<div class='input-wrap email'><input viewId='email' class='email' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_EMAIL") +"'></div>"
-        + "<div class='input-wrap password'><input viewId='password' class='password' type='password' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_PASSWORD") +"'></div>"
-        + "<div class='action'>"
-        + "<span class='cancel' viewId='cancel'>" + $.i18n.getString("ACCOUNT_BINDING_CANCEL") + "</span>"
-        + "<span class='submit' viewId='submit'>" + $.i18n.getString("ACCOUNT_BINDING_DONE") + "</span>"
-        + "</div><div class='footer'>" + $.i18n.getString("ACCOUNT_BINDING_UNBIND_LDAP") + "</div>"
-        + "</div>";
-    }
-}
-
-
-//-----------------------------------------
-
 
 // reAuthManuallyUI
 QmiGlobal.reAuthManually = {
+
 	isExist: false,
 
-	id: "auth-manually-ui",
-
-	viewMap: {},
+	id: "view-auth-manually",
 
 	hasAjaxLoad: false,
 
 	reAuthDef: {}, // QmiAjax裡面的reAuth deferred 還在等待完成
 
-	handleEvent: function() {
-		// 防連點 start
-		var closureObj = {};
-		return function(event) {
-			//禁止連點
-			if(preventMultiClick(event) === false) return;
-
-			var self = this;
-			// all event here
-			switch(event.type) {
-				case "click":
-					switch(event.target) {
-						case self.viewMap["submit"]:
-							self.submit();
-							break;
-
-						case self.viewMap["cancel"]:
-							// sso 用戶敢按取消就登出
-							if(QmiGlobal.auth.isSso) logout();
-
-							self.reAuthDef.resolve({
-								isSuccess: false,
-								isSso: true,
-								isReAuth: true,
-								data: {
-									isReAuthCancel: true
-								}
-							})
-							self.remove();
-							break;
-					}
-					break;
-			}// all event switch
-		}
-
-		function preventMultiClick(event) {
-			event.stopPropagation();
-
-			//禁止連點
-			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) return false;
-			// 記錄連點資訊
-			if(event.type === "click") closureObj.lastView = event.target, closureObj.lastClickTime = new Date().getTime();
-			return true;
-		}
-	}(),
-
-	html: function() {
-		return "<div class='container'>"
-		+ "<div class='title1'>" + $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") + "</div>"
-		+ "<div class='title2'>" + $.i18n.getString("ACCOUNT_BINDING_ENTER_LDAP_PASSWORD") + "</div>"
-        + "<div class='input-wrap email'><input viewId='email' class='email' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_EMAIL") +"'></div>"
-        + "<div class='input-wrap password'><input viewId='password' class='password' type='password' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_PASSWORD") +"'></div>"
-        + "<div class='action'>"
-        + "<span class='cancel' viewId='cancel'>" + $.i18n.getString("ACCOUNT_BINDING_CANCEL") + "</span>"
-        + "<span class='submit' viewId='submit'>" + $.i18n.getString("ACCOUNT_BINDING_DONE") + "</span>"
-        + "</div><div class='footer'>" + $.i18n.getString("ACCOUNT_BINDING_UNBIND_LDAP") + "</div>"
-        + "</div>";
-    },
-    init: function(argObj) {
+	init: function(argObj) {
     	var self = this;
 
     	// 關閉原本的ajax load 圖示
@@ -971,44 +824,78 @@ QmiGlobal.reAuthManually = {
     	self.reAuthDef = argObj.reAuthDef;
     	self.cloudData = argObj.cloudData;
 
-    	if(self.isExist) $("#" + self.id).remove();
+    	$("#" + self.id).remove();
 
-    	var selfView = self.viewMap["selfView"] = $("<section>", {
+    	self.view = $("<section>", {
 	        id: self.id,
 	        html: self.html()
 	    });
 
-    	$("body").append(selfView);
-    	selfView.fadeIn(100);
+    	$("body").append(self.view);
+    	self.view.fadeIn(100);
 
-    	self.viewMap["selfView"] = selfView;
+    	QmiGlobal.eventDispatcher.viewEventSubscriber([
+    		{
+    			veId: "cancel", 
+    			jqElem: self.view.find("span.cancel"), 
+    			eventArr: ["click"],
+    		}, {
+    			veId: "submit", 
+    			jqElem: self.view.find("span.submit"), 
+    			eventArr: ["click"],
+    		}
+    	], self);
+    },
 
-    	viewSubscriber([
-    		{ viewId: "submit", eventList: ["click"] },
-    		{ viewId: "cancel", eventList: ["click"] },
-    	])
+    // custom event
+	handleEvent: function() {
+		var self = this;
+		// event.type -> click:view-auth-manually-submit
+		var eventCase = event.type.split(":"+self.id).join("");
+		switch(eventCase) {
+			case "click-submit":
+				self.submit();
+				break;
 
-    	function viewSubscriber(scbArr) {
-    		var selfView = self.viewMap["selfView"];
-    		scbArr.forEach(function(scbObj) {
-    			self.viewMap[scbObj.viewId] = selfView.find("[viewId="+ scbObj.viewId +"]")[0]
-    			scbObj.eventList.forEach(function(eventName) {
-    				self.viewMap[scbObj.viewId].addEventListener(eventName, self);
-    			})
-    		});
-    	}
+			case "click-cancel":
+				// sso 用戶敢按取消就登出
+				if(QmiGlobal.auth.isSso) logout();
+
+				self.reAuthDef.resolve({
+					isSuccess: false,
+					isSso: true,
+					isReAuth: true,
+					data: {
+						isReAuthCancel: true
+					}
+				})
+				self.remove();
+				break;
+		}
+	},
+
+	html: function() {
+		return "<div class='container'>"
+		+ "<div class='title1'>" + $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") + "</div>"
+		+ "<div class='title2'>" + $.i18n.getString("ACCOUNT_BINDING_ENTER_LDAP_PASSWORD") + "</div>"
+        + "<div class='input-wrap email'><input viewId='email' class='email' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_EMAIL") +"'></div>"
+        + "<div class='input-wrap password'><input viewId='password' class='password' type='password' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_PASSWORD") +"'></div>"
+        + "<div class='action'>"
+        + "<span class='cancel' viewId='cancel'>" + $.i18n.getString("ACCOUNT_BINDING_CANCEL") + "</span>"
+        + "<span class='submit' viewId='submit'>" + $.i18n.getString("ACCOUNT_BINDING_DONE") + "</span>"
+        + "</div><div class='footer'>" + $.i18n.getString("ACCOUNT_BINDING_UNBIND_LDAP") + "</div>"
+        + "</div>";
     },
 
     submit: function() {
     	var self = this,
-    		selfView = self.viewMap["selfView"],
-    		ssoId = selfView.find("input.email").val(),
-    		ssoPw = selfView.find("input.password").val(),
+    		ssoId = self.view.find("input.email").val(),
+    		ssoPw = self.view.find("input.password").val(),
     		cData = self.cloudData;
 
     	if(ssoId === "" || ssoPw === "") return;
 
-    	selfView.find(".container")
+    	self.view.find(".container")
     	.attr("msg", $.i18n.getString("WEBONLY_AUTH_LOADING"))
     	.addClass("loading");
 
@@ -1016,9 +903,9 @@ QmiGlobal.reAuthManually = {
 			url: "https://"+ cData.cl +"/apiv1/sso/"+ cData.ci +"/auth",
 			headers: {li: lang},
 			data: JSON.stringify({
-				id: selfView.find("input.email").val(),
+				id: self.view.find("input.email").val(),
 			    dn: QmiGlobal.device,
-			    pw: QmiGlobal.aesCrypto.enc(selfView.find("input.password").val(), selfView.find("input.email").val().substring(0,16)),
+			    pw: QmiGlobal.aesCrypto.enc(self.view.find("input.password").val(), self.view.find("input.email").val().substring(0,16)),
 			}),
 			type: "put",
 		}).complete(function(data){
@@ -1032,7 +919,7 @@ QmiGlobal.reAuthManually = {
 			if(data.status !== 200 || newAuth === false) {
 				console.log("login fail", data);
 
-				selfView.find(".container").removeClass("loading").end()
+				self.view.find(".container").removeClass("loading").end()
 				.find("input.email").val("")
 				.find("input.password").val("");
 
@@ -1044,7 +931,7 @@ QmiGlobal.reAuthManually = {
 
 				// reAuth 結束
 				setTimeout(function() {
-					selfView.find(".container").attr("msg", $.i18n.getString("WEBONLY_AUTH_SUCCESS"));
+					self.view.find(".container").attr("msg", $.i18n.getString("WEBONLY_AUTH_SUCCESS"));
 				}, 1000)
 				
 
@@ -1063,10 +950,85 @@ QmiGlobal.reAuthManually = {
 
     remove: function() {
     	var self = this;
-    	$(self.viewMap["selfView"]).fadeOut(100, function() { $(self.viewMap["selfView"]).remove()});
+    	self.view.fadeOut(100, function() { self.view.remove()});
     	// 解除lock
     	QmiGlobal.reAuthLockDef.resolve();
     },
+}
+
+
+QmiGlobal.systemPopup = {
+	id: "view-system-popup",
+
+    init : function(){
+    	var self = this;
+
+    	self.view = $("<section>", {
+	        id: self.id,
+	        html: self.html()
+	    });
+
+	    self.view._i18n();
+
+    	$("body").append(self.view);
+    	self.view.fadeIn(100);
+    	
+    	QmiGlobal.eventDispatcher.viewEventSubscriber([
+    		{
+    			veId: "close", 
+    			jqElem: self.view, 
+    			eventArr: ["click"],
+    		}, {
+    			veId: "ldapSetting", 
+    			jqElem: self.view.find("[data-sm-act=system-ldapSetting]"), 
+    			eventArr: ["click"],
+    		}, {
+    			veId: "logout", 
+    			jqElem: self.view.find("div.system-logout"), 
+    			eventArr: ["click"],
+    		}
+    	], self);
+    },
+
+    handleEvent: function() {
+    	var self = this;
+		// event.type -> click:view-auth-manually-submit
+		var eventCase = event.type.split(":"+self.id).join("");
+		switch(eventCase) {
+			case "click-close":
+				$("#userInfo .sm-person-area-r").find("img").toggle();
+    			self.view.remove();
+				break;
+
+			case "click-ldapSetting":
+				// func.js  timelineSwitch  system-ldap-setting
+				// QmiGlobal.ldapSetting.init();
+
+    			self.view.remove();
+				break;
+
+			case "click-logout":
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("SETTING_DO_LOGOUT"),
+					confirm: true,
+					cancel: true,
+					action: [logout]
+				});
+				break;
+		}
+    },
+
+    html: function() {
+    	return '<div class="sm-person-info">'
+        + 	'<div class="sm-info-hr" data-textid="LOGIN_SAVE_ACCOUNT_TITLE"></div>'
+        + 	'<div data-sm-act="user-setting" class="sm-info sm-small-area" data-textid="PERSONAL_INFORMATION"></div>'
+        + 	'<div class="line"></div>'
+        + 	'<div class="sm-info-hr" data-textid="SYSTEM"></div>'
+        + 	'<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'
+        + 	'<div data-sm-act="system-ldapSetting" class="sm-info sm-small-area" data-textid="'+ (QmiGlobal.auth.isSso ? "ACCOUNT_BINDING_BIND_QMI_ACCOUNT" : "ACCOUNT_BINDING_BINDING_NEW_ACCOUNT" )+'"></div>'
+        + 	'<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'
+        + '</div>';
+    }
 }
 
 

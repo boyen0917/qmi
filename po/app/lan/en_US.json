@@ -417,6 +417,9 @@
 
 	"WEBONLY_AUTH_LOADING" : "authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
+	"WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT" : "Click to create binding account",
+	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA1" : "No Qmi Account Binded",
+	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA2" : "Login Qmi account to bind your LDAP account.",
 	
 	"WEBONLY_PUSH" : "notifications",
 	"WEBONLY_SAVE" : "submit",

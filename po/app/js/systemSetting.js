@@ -441,3 +441,146 @@ defaultGroupSetting = function(){
         popupShowAdjust("error");
     });
 }
+
+
+
+// ldap
+
+QmiGlobal.ldapSetting = {
+    id: "view-ldap-setting",
+    init: function() {
+        var self = this;
+
+        self.view = $("<section>", {
+            id: self.id,
+            class: "subpage-ldapSetting main-subpage",
+            html: self.html()
+        });
+
+        if($("#view-ldap-setting").length !== 0) $("#view-ldap-setting").remove();
+        $("#page-group-main .subpage-ldapSetting").append(self.view);
+
+
+        // 取得列表
+        new QmiAjax({
+            apiName: "me/sso",
+            isPublicApi: true,
+        }).done(function(rspData) {
+            console.log("get list", rspData);
+        });
+
+
+        QmiGlobal.eventDispatcher.viewEventSubscriber([
+            {
+                veId: "goto", 
+                jqElem: self.view.find("[target]"), 
+                eventArr: ["click"]
+            },{
+                veId: "create-ready", 
+                jqElem: self.view.find(".ldap-create .input-block input"), 
+                eventArr: ["input"],
+            },{
+                veId: "create-submit", 
+                jqElem: self.view.find(".ldap-create button.submit"), 
+                eventArr: ["click"],
+            },{
+                veId: "create-cancel", 
+                jqElem: self.view.find(".ldap-create button.cancel"), 
+                eventArr: ["click"],
+            }
+        ], self);
+
+    },
+
+    handleEvent: function() {
+        var self = this;
+        var targetElem = event.detail.elem;
+
+        // event.type -> click:view-auth-manually-submit
+        var eventCase = event.type.split(":"+self.id).join("");
+        switch(eventCase) {
+            case "click-goto":
+                var pageName = $(targetElem).attr("target");
+
+                // sso登入 不去綁定帳號頁面
+                if(self.isSso && pageName === "ldap-create") return;
+
+                self.changePage(pageName);
+                break;
+
+            case "input-create-ready":
+                var chk = false;
+                self.view.find(".ldap-create input").each(function(i, elem) {
+                    if(elem.value === "") chk = true;
+                })
+                var submitElem = self.view.find(".ldap-create button.submit");
+                if(chk === false) submitElem.addClass("ready");
+                else submitElem.removeClass("ready")
+
+                break;
+
+            case "click-create-submit":
+                if($(targetElem).hasClass("ready")) self.submit();
+
+                break;
+
+            case "click-create-cancel":
+                self.changePage("ldap-list")
+                break;
+        }
+    },
+
+    submit: function() {
+        console.log("submit");
+        var self = this;
+        // step 1
+        new QmiAjax({
+            apiName: "me/sso/step1",
+            isPublicApi: true,
+            method: "post",
+            body: {
+                id: self.view.find(".ldap-create .input-block.email input").val()
+            }
+        }).done(function(rspData) {
+            console.log("yooo", rspData);
+        })
+        
+    },
+
+    changePage: function(pageName) {
+        var self = this;
+        self.view.find("[role=page]").hide().end()
+        .find("." + pageName + "[role=page]").fadeIn(100);
+        console.log("changePage", "." + pageName + "[role=page]");
+    },
+
+    strMap: {
+        // 0 是公雲; 1是 sso
+        add: ["ACCOUNT_BINDING_BINDING_NEW_ACCOUNT", "ACCOUNT_BINDING_BIND_QMI_ACCOUNT"],
+        noData1: ["ACCOUNT_BINDING_PRESS_TO_BIND_LDAP_ACCOUNT", "WEBONLY_ACCOUNT_BINDING_SSO_NODATA1"],
+        noData2: ["WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT", "WEBONLY_ACCOUNT_BINDING_SSO_NODATA2"]
+    },
+
+    html: function() {
+        var str = this.strMap, isSso = QmiGlobal.auth.isSso || false;
+        return "<section class='content'>"
+        + "<section class='ldap-list' role='page'>"
+        + "    <div class='ldap-add' target='ldap-create'>+ "+ $.i18n.getString(str.add[+isSso]) +"</div>"
+        + "    <div class='no-data' target='ldap-create'><div>"+ $.i18n.getString(str.noData1[+isSso]) +"</div><div>"+ $.i18n.getString(str.noData2[+isSso]) +"</div></div>"
+        + "    <div class='list'>"
+        // + "    <div class='expired' err-msg='認證過期'><span>peter334@mitake.com.tw</span><img src='images/ldap/icon_delete_email_gray.png'></div>"
+        + "    </div>"
+        + "</section>"
+        + "<section class='ldap-create' role='page'>"
+        + "    <section class='icon-shield add'></section>"
+        + "    <div class='title1'>"+ $.i18n.getString("ACCOUNT_BINDING_BINDING_NEW_ACCOUNT") +"</div>"
+        + "    <div class='title2'>"+ $.i18n.getString("ACCOUNT_BINDING_ENTER_ACCOUNT_PASSWORD") +"</div>"
+        + "    <section class='create-form'>"
+        + "    <div class='input-block email'><input placeholder='email'></div>"
+        + "    <div class='input-block password'><input placeholder='password' type='password'></div>"
+        + "    <div class='submit-block'>"
+        + "    <button class='cancel'>"+ $.i18n.getString("ACCOUNT_BINDING_CANCEL") +"</button>"
+        + "    <button class='submit'>"+ $.i18n.getString("ACCOUNT_BINDING_DONE") +"</button></div>"
+        + "</section></section>";
+    }
+}

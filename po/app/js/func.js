@@ -416,12 +416,11 @@ timelineSwitch = function (act,reset,main,noPR){
         $.lStorage("_periodicallyReloadAuth", QmiGlobal.auth);
         location.reload();
         return;
-    }
+    } 
 
-    var 
-    switchDeferred = $.Deferred(),
-    page_title = $.i18n.getString("LEFT_FEED"),
-    oriAct = $("#page-group-main").data("currentAct");
+    var switchDeferred = $.Deferred(),
+        page_title = $.i18n.getString("LEFT_FEED"),
+        oriAct = $("#page-group-main").data("currentAct");
 
     $("#page-group-main").data("currentAct",act);
     //reset 
@@ -437,19 +436,19 @@ timelineSwitch = function (act,reset,main,noPR){
     gmHeader.find(".navi-alert").show();
 
     // navi的home active
-    $(".st-filter-area").hide().andSelf()
+    groupMain.find(".st-filter-area").hide().andSelf()
     .find(".st-filter-list-active").removeClass("st-filter-list-active").end()
     .find("[data-navi=home]").addClass("st-filter-list-active");
 
     //關閉所有subpage
-    $("  .main-subpage").hide();   
+    groupMain.find(".main-subpage").hide();   
 
-    var gmConHeader = $(".gm-content-header");
+    var gmConHeader = groupMain.find(".gm-content-header");
     gmConHeader.hide();
-    
+
     switch (act) {
         case "feeds":
-            var filterAction = $(".st-filter-action");
+            var filterAction = groupMain.find(".st-filter-action");
             filterAction.filter(".st-filter-list-active").removeClass("st-filter-list-active");
             filterAction.filter("[data-navi='announcement']").show();
             filterAction.filter("[data-navi='feedback']").show();
@@ -459,15 +458,15 @@ timelineSwitch = function (act,reset,main,noPR){
             //顯示新增貼文按鈕
             gmHeader.find(".feed-compose").show();
 
-            $("#page-group-main .subpage-timeline").show().scrollTop(0);
+            groupMain.find(".subpage-timeline").show();
 
             //polling 數字重寫
             pollingCountsWrite();
 
             // 使用已隱藏的舊的方式 來做timeline切換
-            if( $(".st-filter-area").hasClass("st-filter-lock") === false ){
+            if( groupMain.find(".st-filter-area").hasClass("st-filter-lock") === false ){
                 //將選項存入
-                $("#page-group-main").data("navi",0);
+                groupMain.data("navi",0);
 
                 timelineListWrite().done(function(result){
                     switchDeferred.resolve({ act: "main"});
@@ -478,7 +477,7 @@ timelineSwitch = function (act,reset,main,noPR){
           break;
         case "memberslist": 
             switchDeferred.resolve({ act: "memberslist"});
-            $(".subpage-contact").show();
+            groupMain.find(".subpage-contact").show();
             
             //藏新增貼文按鈕, 新增聊天室按鈕
             gmHeader.find(".feed-compose").hide();
@@ -501,7 +500,7 @@ timelineSwitch = function (act,reset,main,noPR){
         case "addressBook":
 
             //show page
-            $(".subpage-addressBook").show();
+            groupMain.find(".subpage-addressBook").show();
             //show add btn
             // gmHeader.find(".addressBook-add").show();
             gmHeader.find(".addressBook-refresh").show();
@@ -522,16 +521,16 @@ timelineSwitch = function (act,reset,main,noPR){
                     case "feed-post":
                         break;
                     case "feed-public":
-                        $(".subpage-timeline").show();
+                        groupMain.find(".subpage-timeline").show();
                         break;
                     case "memberslist":
                         $(".subpage-contact").show();
                         break;
                     case "album":
-                        $(".subpage-album").show();
+                        groupMain.find(".subpage-album").show();
                         break;
                     case "groupSetting":
-                        $(".subpage-groupSetting").show();
+                        groupMain.find(".subpage-groupSetting").show();
                         break;
                     case "calendar":
                     case "help":
@@ -542,6 +541,8 @@ timelineSwitch = function (act,reset,main,noPR){
                 }
             } else {
                 //-- switch sub pages --
+                groupMain.find(".subpage-chatList").show();
+
                 page_title = $.i18n.getString("CHAT_TITLE");
 
                 initChatList();
@@ -568,11 +569,13 @@ timelineSwitch = function (act,reset,main,noPR){
           break;
         case "user-setting":
                 
-            $(".subpage-userInformation").show();
+            groupMain.find(".subpage-userInformation").show();
             //header
-            gmConHeader.show();
-            gmConHeader.find(".setting-icon").attr("src","images/avatar.png");
-            gmConHeader.find(".setting-title").text($.i18n.getString("PERSONAL_INFORMATION"));
+            gmConHeader.show()
+            .find("section.system-setting-header").show().end()
+            .find("section.ldap-setting-header").hide().end()
+            .find(".setting-icon").attr("src","images/avatar.png").end()
+            .find(".setting-title").text($.i18n.getString("PERSONAL_INFORMATION"));
             
             userInfoSetting();
             
@@ -580,25 +583,22 @@ timelineSwitch = function (act,reset,main,noPR){
             break;  
         case "system-setting":
 
-            $(".subpage-systemSetting").show();
+            groupMain.find(".subpage-systemSetting").show();
             //header
-            gmConHeader.show();
-            gmConHeader.find(".setting-icon").attr("src","images/settings.png");
-            gmConHeader.find(".setting-title").text($.i18n.getString("LEFT_SYSTEM_SETTING"));
+            gmConHeader.show()
+            .find("section.system-setting-header").show().end()
+            .find("section.ldap-setting-header").hide().end()
+            .find(".setting-icon").attr("src","images/settings.png").end()
+            .find(".setting-title").text($.i18n.getString("LEFT_SYSTEM_SETTING"));
             
             systemSetting();
 
             switchDeferred.resolve({ act: "system-setting"});
             break;
         case "fileSharing":
-            $(".subpage-fileSharing").show();
+            groupMain.find(".subpage-fileSharing").show();
             page_title = $.i18n.getString("GROUPSETTING_TITLE");
-            // var groupData = QmiGlobal.groups[gi];
-            // cns.debug("ti",groupData.ti_file);
-            // if(typeof groupData.ti_file == "undefined") {
-            //     alert("沒共享");
-            //     return false;
-            // }
+
             loadScript("js/fileSharing.js").done(function(){
 
                 switchDeferred.resolve({ act: "fileSharing"});
@@ -616,8 +616,8 @@ timelineSwitch = function (act,reset,main,noPR){
             break;
         
         case "feed-post":
-            var filterAction = $(".st-filter-action");
-            $(".st-navi-area").data("currentHome", "feed-post");
+            var filterAction = groupMain.find(".st-filter-action");
+            groupMain.find(".st-navi-area").data("currentHome", "feed-post");
             filterAction.filter(".st-filter-list-active").removeClass("st-filter-list-active");
             filterAction.filter("[data-status='all']").hide();
             filterAction.filter("[data-navi='announcement']").hide();
@@ -629,16 +629,15 @@ timelineSwitch = function (act,reset,main,noPR){
             // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
 
             //filter all
-            var filterArea = $(".st-filter-area");
+            var filterArea = groupMain.find(".st-filter-area");
             filterArea.data("filter","all");
             filterArea.children(".st-filter-hide").hide();
             filterArea.scrollLeft(0);
 
             //點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
-            // if(!main)
-                $(".st-navi-subarea[data-st-navi=feed-post]").trigger("click");
+            groupMain.find(".st-navi-subarea[data-st-navi=feed-post]").trigger("click");
 
-            $(".subpage-timeline").show();
+            groupMain.find(".subpage-timeline").show();
             gmHeader.find(".page-title").html(page_title);
 
             //顯示新增貼文按鈕, 藏新增聊天室按鈕
@@ -648,50 +647,48 @@ timelineSwitch = function (act,reset,main,noPR){
             if($.lStorage("_pollingData"))
                 pollingCountsWrite();
 
-            updatePollingCnts( $(".sm-small-area[data-sm-act=feeds]").find(".sm-count"), "A1" );
+            updatePollingCnts( groupMain.find(".sm-small-area[data-sm-act=feeds]").find(".sm-count"), "A1" );
             updatePollingCnts( filterAction.filter("[data-status=all]").find(".sm-count"), "B1" );
 
             switchDeferred.resolve({ act: "feed-post"});
           break;
         case "feed-public":
-            $(".st-navi-area").data("currentHome", "feed-public");
-            $(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
-            $(".st-filter-action[data-status='all']").hide();
-            $(".st-filter-action[data-navi='announcement']").show();
-            $(".st-filter-action[data-navi='feedback']").show();
-            $(".st-filter-action[data-navi='task']").show();
-            $(".st-filter-action[data-navi='feed-post']").hide();
-            $(".st-filter-action[data-navi='feed-public']").show().addClass("st-filter-list-active");
-            // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
+            groupMain.find(".st-navi-area").data("currentHome", "feed-public").end()
+            .find(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active").end()
+            .find(".st-filter-action[data-status='all']").hide().end()
+            .find(".st-filter-action[data-navi='announcement']").show().end()
+            .find(".st-filter-action[data-navi='feedback']").show().end()
+            .find(".st-filter-action[data-navi='task']").show().end()
+            .find(".st-filter-action[data-navi='feed-post']").hide().end()
+            .find(".st-filter-action[data-navi='feed-public']").show().addClass("st-filter-list-active");
 
             //filter all
-            var filterArea = $(".st-filter-area");
+            var filterArea = groupMain.find(".st-filter-area");
             filterArea.data("filter","all");
             filterArea.children(".st-filter-hide.right").show();
             filterArea.children(".st-filter-hide.left").hide();
             filterArea.scrollLeft(0);
 
             //點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
-            // if(!main)
-                $(".st-navi-subarea[data-st-navi=feed-public]").trigger("click");
+            groupMain.find(".st-navi-subarea[data-st-navi=feed-public]").trigger("click");
 
-            $(".subpage-timeline").show();
+            groupMain.find(".subpage-timeline").show();
             gmHeader.find(".page-title").html(page_title);
 
             //顯示新增貼文按鈕, 藏新增聊天室按鈕
             gmHeader.find(".feed-compose").show();
 
             //polling 數字重寫
-            if($.lStorage("_pollingData"))
-                pollingCountsWrite();
-            updatePollingCnts( $(".sm-small-area[data-sm-act=feeds]").find(".sm-count"), "A1" );
-            updatePollingCnts( $(".st-filter-action[data-status=all]").find(".sm-count"), "B1" );
+            if($.lStorage("_pollingData")) pollingCountsWrite();
+
+            updatePollingCnts( groupMain.find(".sm-small-area[data-sm-act=feeds]").find(".sm-count"), "A1" );
+            updatePollingCnts( groupMain.find(".st-filter-action[data-status=all]").find(".sm-count"), "B1" );
 
             switchDeferred.resolve({ act: "feed-public"});
           break;
         case "album":
             //-- switch sub pages --
-            $(".subpage-album").show();
+            groupMain.find(".subpage-album").show();
 
             page_title = $.i18n.getString("COMMON_ALBUM");
 
@@ -709,7 +706,7 @@ timelineSwitch = function (act,reset,main,noPR){
           break;
         case "groupSetting":
             
-            $(".subpage-groupSetting").show();
+            groupMain.find(".subpage-groupSetting").show();
             
             //藏新增貼文按鈕, 新增聊天室按鈕
             gmHeader.find(".feed-compose").hide();
@@ -720,6 +717,21 @@ timelineSwitch = function (act,reset,main,noPR){
             //initGroupSetting(gi);
             switchDeferred.resolve({ act: "groupSetting"});
             break;
+
+        case "system-ldapSetting":
+            groupMain.find(".subpage-ldapSetting").show();
+
+            var titleStr = QmiGlobal.auth.isSso ? "ACCOUNT_BINDING_BIND_QMI_ACCOUNT" : "ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT";
+            gmConHeader.show()
+            .find("section.system-setting-header").hide().end()
+            .find("section.ldap-setting-header").html($.i18n.getString(titleStr)).show();
+
+
+            QmiGlobal.ldapSetting.init();
+
+
+            switchDeferred.resolve({ act: "system-ldapSetting"});
+            break;
     }
 
     switchDeferred.done(function(result){
@@ -728,8 +740,8 @@ timelineSwitch = function (act,reset,main,noPR){
         groupSwitchEnable();
 
         //關閉筆功能
-        if($(".feed-compose-area").is(":visible")){
-            $(".feed-compose").trigger("click");
+        if(groupMain.find(".feed-compose-area").is(":visible")){
+            groupMain.find(".feed-compose").trigger("click");
         }
 
         setOfficialGroup(gi);

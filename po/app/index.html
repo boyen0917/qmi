@@ -518,11 +518,14 @@
                 <div class="gm-content">
                     <div class="refresh-lock"><div data-textid="REFRESH_TEXT"></div></div>
                     <div class="gm-content-header">
-                        <div class="gm-adjustment user-main-toggle"></div>
-                        <div class="setting-header-content">
-                            <img class="setting-icon" src="">
-                            <div class="setting-title"></div>
-                        </div>     
+                        <section class="system-setting-header">
+                            <div class="gm-adjustment user-main-toggle"></div>
+                            <div class="setting-header-content">
+                                <img class="setting-icon" src="">
+                                <div class="setting-title"></div>
+                            </div>     
+                        </section>
+                        <section class="ldap-setting-header" style="display:none;"></section>
                     </div>
                     <div class="gm-content-body">
                     <!------------------------------- 動態消息 ---------------------------->
@@ -1007,12 +1010,6 @@
                                             <!-- <select class="group-select" data-role="none" >        
                                             </select> -->
                                             <div class="edit-defaultgroup-content">
-                                                    <!-- <div class='group-option'>
-                                                        <input data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'>
-                                                        <label for='' class='radiobtn'></label>
-                                                        <img src=''>
-                                                        <label for='' class='radiotext'>"+test_data.gl[i].gn+"</label>
-                                                    </div> -->
                                             </div> 
                                             <div class="btn-content">
                                                 <button class="default-group-btn btn-b" data-role="none" data-textid="FEED_FINISHED"></button>
@@ -1100,28 +1097,6 @@
                                         </div>
                                     </div>
                                    
-                                    <!-- <div class="ga-info view">
-                                        <div class="ga-info-row admin" data-type="name">
-                                            <div class="title" data-textid="GROUP_GROUP_NAME"></div>
-                                            <div class="content polling-group-name currentGroup"></div>
-                                        </div>
-                                        <div class="ga-info-row" data-type="info">
-                                            <div class="title" data-textid="GROUP_ABOUT"></div>
-                                            <img class="ga-icon-host" src="images/icon/icon_admin.png">
-                                            <div class="content polling-group-description currentGroup"></div>
-                                        </div>
-                                    </div> -->
-                                    <!-- <div class="ga-info edit">
-                                        <div class="ga-info-row" data-type="name">
-                                            <div class="title" data-textid="GROUP_GROUP_NAME"></div>
-                                            <input class="content" data-textph-id="GROUP_NAME_LIMIT" data-role="none"/>
-                                        </div>
-                                        <div class="ga-info-row" data-type="info">
-                                            <div class="title" data-textid="GROUP_ABOUT"></div>
-                                            <img class="ga-icon-host" src="images/icon/icon_admin.png">
-                                            <textarea class="content autoHeight" data-textph-id="GROUP_ABOUT_ALERT" maxLength="300" data-role="none"></textarea>
-                                        </div>
-                                    </div> -->
                                 </div>
                                 <div class="ga-header">
                                     <div class="ga-header-back">
@@ -1134,7 +1109,11 @@
                                     <!-- <div class="ga-header-done" data-textid="COMMON_DONE"></div> -->
                                 </div>
                             </div>
-                        </div>
+                        </div><!-- 團體關於 -->
+
+                         <!--------------------- 系統設定 ------------------>
+                        <div class="subpage-ldapSetting main-subpage" style="display:none;">
+                        </div><!-- 系統設定 -->
 
                     </div>
                 </div>

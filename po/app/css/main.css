@@ -5,6 +5,7 @@ body{
     -webkit-font-smoothing: antialiased;
     font-weight: normal;
     font-size: 16px;
+    text-shadow: 0px 0px 0px white;
 }
 
 /* jquery mobile某些class會設text-shadow
@@ -604,6 +605,7 @@ img.auo {
   height: 100%;
   background: rgba(0,0,0,0.85);
   z-index: 1901;
+  top: 0;
 }
 
 .popup-frame {
@@ -1324,7 +1326,7 @@ img.auo {
 	-webkit-box-shadow: 0px 0px 12px 0px rgba(50, 50, 50, 0.37);
 }
 .gm-header-left {
-	width: 218px;
+	width: 219px;
 	display: inline-block;
 	padding: 0 15px;
 	float: left;
@@ -1421,6 +1423,7 @@ img.auo {
 	height: 45px;
 	z-index: 101;
 	background-color: white;
+	display: none;
 }
 .setting-header-content{
 	position: absolute;
@@ -5695,6 +5698,7 @@ img.vdo-default:before {}
 #view-auth-manually .action .submit {right: 0;}
 #view-auth-manually .action .submit.ready {background: #21ca82;}
 
+
 #view-auth-manually .footer {
     color: #e24e54;
     font-size: 11px;
@@ -5704,7 +5708,6 @@ img.vdo-default:before {}
     cursor: pointer;
 }
 #view-auth-manually .footer:before {position: absolute;content: url(../images/icon/icon_ldap_cross.png);left: -14px;}
-
 
 #module-server-selector {
     position: absolute;
