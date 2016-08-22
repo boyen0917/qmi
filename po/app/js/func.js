@@ -2580,7 +2580,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
     $(".obj-cell-area").html("");
 
     //工作
-    var obj_data;
+    var obj_data,branch_data;
     var isShowBranch = false;
     var isShowSelf = false;
     var isShowAll = true;
@@ -2631,6 +2631,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
         obj_data = this_compose_obj.data("object_str");
     }else{
         obj_data = this_compose.data("object_str");
+        branch_data = this_compose.data("branch_str"); 
     }
 
     $(".obj-content").data("selected-branch",{});
@@ -2773,6 +2774,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
 
         //團體rows
         $.each(bl,function(key,bl_obj){
+
             //第一層顯示開關
             if(1==bl_obj.lv){
                 var tmp = $("<div class='subgroup-row'></div>");
@@ -2859,7 +2861,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
             updateSelectedObj();
         });
     }
-
+    
 
     //----- 加入成員列表 ------
     
@@ -2929,10 +2931,16 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
 
     //已經有內容 就製作已選的樣式
     cns.debug("obj_data:",obj_data);
-    if(obj_data){
+    cns.debug("obj_data:",branch_data);
+
+    if(obj_data || branch_data){
         obj_data = $.parseJSON(obj_data);
-        if(Object.keys(obj_data).length){
+        branch_data = $.parseJSON(branch_data);
+
+        if(Object.keys(obj_data).length || Object.keys(branch_data).length){
             $(".obj-content").data("selected-obj",obj_data);
+            $(".obj-content").data("selected-branch",branch_data);
+
             $(document).find(".obj-cell").each(function(i,val){
                 var this_cell = $(this);
                 //有被選擇過 存在obj_data中
@@ -2941,6 +2949,9 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
                     this_cell.find(".obj-cell-chk .img").addClass("chk");
                     // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
                     // this_cell.find(".img").addClass("chk");
+                }else if($.inArray(this_cell.data("bl"),Object.keys(branch_data)) >= 0){ 
+                    this_cell.data("chk",true);
+                    this_cell.find(".obj-cell-chk .img").addClass("chk");
                 }else{
                     this_cell.data("chk",false);
                     this_cell.find(".obj-cell-chk .img").removeClass("chk");
@@ -2956,7 +2967,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
         //reset
         $(".obj-content").data("selected-obj",{});  
     }
-
+    
     //避免重複綁定事件 先解除
     $(document).off('click', '.obj-cell.mem');
     $(document).on("click",".obj-cell.mem",function(){
@@ -3023,13 +3034,23 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
         
         //其餘發佈對象是復選
         //是否點選
-        if(this_cell.data("chk")){
+        if(this_cell.data("chk") && this_cell.parent().prev().find(".obj-cell.subgroup").data("chk")){
+            //第二層是否點選
             this_cell.data("chk",false);
             this_cell.find(".obj-cell-chk .img").removeClass("chk");
             // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
-            
             delete selected_obj[this_cell.data("bl")];
+            //第一層是否點選
+            this_cell.parent().prev().find(".obj-cell.subgroup").data("chk",false);
+            this_cell.parent().prev().find(".obj-cell.subgroup").find(".obj-cell-chk .img").removeClass("chk");
+            delete selected_obj[this_cell.parent().prev().find(".obj-cell.subgroup").data("bl")];
             
+        }else if(this_cell.data("chk") && !this_cell.parent().prev().find(".obj-cell.subgroup").data("chk")){
+            this_cell.data("chk",false);
+            this_cell.find(".obj-cell-chk .img").removeClass("chk");
+            // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
+            delete selected_obj[this_cell.data("bl")];
+
         }else{
             this_cell.data("chk",true);
             this_cell.find(".obj-cell-chk .img").addClass("chk");
@@ -3060,7 +3081,6 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
             this_cell.data("chk",false);
             this_cell.find(".obj-cell-chk .img").removeClass("chk");
             // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
-            
             delete selected_obj[this_cell.data("bl")];
 
             //deselect sub-branches if all sub r selected
@@ -3083,29 +3103,36 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
             this_cell.data("chk",true);
             this_cell.find(".obj-cell-chk .img").addClass("chk");
             // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
-            
             if( this_cell.data("bl-name") ){
                 selected_obj[this_cell.data("bl")] = this_cell.data("bl-name");
             }
 
             //select sub-branches if all sub r not selected
             var sublist = this_cell.parent().next().find(".obj-cell.branch");
-            var allChkFalse = true;
+            // var allChkFalse = true;
+            // sublist.each( function(){
+            //     if( true == $(this).data("chk") ){
+            //         allChkFalse = false;
+            //         return false;
+            //     }
+            // });
+            // if( allChkFalse ){
+            //     console.log("test3");
+            //     sublist.each( function(){
+            //         $(this).data("chk",true);
+            //         $(this).find(".obj-cell-chk .img").addClass("chk");
+            //         if( $(this).data("bl-name") ){
+            //             selected_obj[$(this).data("bl")] = $(this).data("bl-name");
+            //         }
+            //     });
+            // }
             sublist.each( function(){
-                if( true == $(this).data("chk") ){
-                    allChkFalse = false;
-                    return false;
+                $(this).data("chk",true);
+                $(this).find(".obj-cell-chk .img").addClass("chk");
+                if( $(this).data("bl-name") ){
+                    selected_obj[$(this).data("bl")] = $(this).data("bl-name");
                 }
-            });
-            if( allChkFalse ){
-                sublist.each( function(){
-                    $(this).data("chk",true);
-                    $(this).find(".obj-cell-chk .img").addClass("chk");
-                    if( $(this).data("bl-name") ){
-                        selected_obj[$(this).data("bl")] = $(this).data("bl-name");
-                    }
-                });
-            }
+            });            
         }
 
         //存回
@@ -3238,9 +3265,8 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
     $(".obj-done").unbind("click");
     $(".obj-done").click(function(){
 
-        var obj_length = Object.keys($(".obj-content").data("selected-obj")).length
-            +Object.keys($(".obj-content").data("selected-branch") ).length +Object.keys($(".obj-content").data("selected-fav") ).length;
-
+        var obj_length = Object.keys($(".obj-content").data("selected-obj")).length + Object.keys($(".obj-content").data("selected-fav") ).length;
+        var branch_length = Object.keys($(".obj-content").data("selected-branch") ).length;
         //工作
         if(this_compose_obj.parent().hasClass("cp-work-item")){
             var target = ".cp-work-item-object span:eq(" + this_compose_obj.parents(".cp-work-item").data("work-index") + ")";
@@ -3260,9 +3286,13 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
             this_compose_obj.data("object_str",obj_str);
         }else{
             //其餘發佈對象
-            if(obj_length != 0){
+            if(obj_length != 0 && branch_length == 0){  //無群組有選人
                 $(".cp-content-object span").html( $.i18n.getString("GROUP_MEMBERS",obj_length) );
-            }else{
+            }else if(obj_length == 0 && branch_length != 0){ //有群組無選人
+                $(".cp-content-object span").html( $.i18n.getString("GROUP_COUNTS",branch_length) );
+            }else if(obj_length != 0 && branch_length != 0){ //有群組有選人
+                $(".cp-content-object span").html( $.i18n.getString("GROUP_COUNTS",branch_length) + $.i18n.getString("GROUP_AND") + $.i18n.getString("GROUP_MEMBERS",obj_length));
+            }else{  //皆無
                 $(".cp-content-object span").html("");
             }
             
