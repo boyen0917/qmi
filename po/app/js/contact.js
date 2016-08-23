@@ -1872,6 +1872,7 @@ function sendInvite(){
 						nk: nk,
 						pn: phone
 					};
+					showMainContact();
 					updateInvitePending();
 
 				} catch(e){

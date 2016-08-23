@@ -8049,9 +8049,6 @@ pollingCmds = function(newPollingData){
 
         // 需要打combo的情況
         newPollingData.cmds.forEach(function(item,i){ // 後面有 bind([]) 用this來判斷是否重複
-            if(item.tp === 54 || item.tp === 55) {
-                cns.debug("私雲移轉",item)
-            }
 
             var 
             comboDeferred = $.Deferred();
@@ -8065,9 +8062,9 @@ pollingCmds = function(newPollingData){
             // 如果是自己被踢出團體了 不能打combo
             else if( item.tp === 6 
                 && item.pm.gu === QmiGlobal.groups[item.pm.gi].me){
-                insideDeferred.resolve(false);    
+                insideDeferred.resolve(false);  
             }
-
+            
             // 更新group info 強制打
             else if( item.tp === 10 ){
                 insideDeferred.resolve(true);    
@@ -8080,8 +8077,13 @@ pollingCmds = function(newPollingData){
                 ( QmiGlobal.groups[item.pm.gi] === undefined || Object.keys( QmiGlobal.groups[item.pm.gi].guAll ).length === 0 )
             ){
                 insideDeferred.resolve(true);
-            } else {
-                // 不用做combo
+            } 
+            //有人加入或退出團體(因為當前團體)
+            else if ( item.tp === 6 || item.tp === 4){
+                insideDeferred.resolve(true);  
+            } 
+            // 不用做combo
+            else {
                 insideDeferred.resolve(false);
             }
 
@@ -8215,7 +8217,7 @@ pollingCmds = function(newPollingData){
                                 errorReport(e);
                             }
                         }
-
+                        user_info_arr.push( item.pm );
                         if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
                     case 7://branch edit
@@ -8736,6 +8738,8 @@ userInfoDataShow = function(this_gi,this_info,user_data, isAdmin, me) {
     if( user_data.st==2 ){
         this_info.find(".user-info-list-area").hide();
         this_info.find(".user-info-leave-area").show();
+        this_info.find(".user-info-delete").hide();
+        this_info.find(".fav").hide();
     } else {
         this_info.find(".user-info-list-area").show();
         this_info.find(".user-info-leave-area").hide();
