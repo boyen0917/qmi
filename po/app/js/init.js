@@ -908,7 +908,8 @@ QmiGlobal.module.reAuthManually = {
 	},
 
 	html: function() {
-		return "<div class='container'>"
+		return "<div class='container '>"
+		+ "<section class='icon-shield'></section>"
 		+ "<div class='title1'>" + $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") + "</div>"
 		+ "<div class='title2'>" + $.i18n.getString("ACCOUNT_BINDING_ENTER_LDAP_PASSWORD") + "</div>"
         + "<div class='input-wrap email'><input viewId='email' class='email' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_EMAIL") +"'></div>"
@@ -916,7 +917,6 @@ QmiGlobal.module.reAuthManually = {
         + "<div class='action'>"
         + "<span class='cancel' viewId='cancel'>" + $.i18n.getString("ACCOUNT_BINDING_CANCEL") + "</span>"
         + "<span class='submit' viewId='submit'>" + $.i18n.getString("ACCOUNT_BINDING_DONE") + "</span>"
-        + "</div><div class='footer'>" + $.i18n.getString("ACCOUNT_BINDING_UNBIND_LDAP") + "</div>"
         + "</div>";
     },
 

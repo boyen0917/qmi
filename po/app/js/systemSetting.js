@@ -463,6 +463,7 @@ QmiGlobal.module.ldapSetting = {
         if($("#view-ldap-setting").length !== 0) $("#view-ldap-setting").remove();
         $("#page-group-main .subpage-ldapSetting").append(self.view);
 
+        self.currPage = "ldap-list";
         self.getList().done(function() {
             QmiGlobal.eventDispatcher.subscriber([
                 {
@@ -504,7 +505,10 @@ QmiGlobal.module.ldapSetting = {
                 // sso登入 不去綁定帳號頁面
                 if(self.isSso && pageName === "ldap-edit") return;
 
-                if(pageName === "ldap-edit") self.view.find(pageName).attr("ldap-type", "add");
+                if(pageName === "ldap-edit") {
+                    self.clearForm();
+                    self.view.find(".ldap-edit").attr("ldap-type", "add");
+                }
 
                 self.changePage(pageName);
                 break;
@@ -542,11 +546,11 @@ QmiGlobal.module.ldapSetting = {
                     accountDom = target.parent();
 
                 if(target.hasClass("unbind-img")) {
-                    self.changePage("ldap-edit");
-
                     self.view.find(".ldap-edit")
                     .attr("ldap-type", "delete")
                     .find(".input-block.email input").val(accountDom.data("cloud-data").id);
+
+                    self.changePage("ldap-edit");
                 }
                 break;
         }
@@ -557,6 +561,8 @@ QmiGlobal.module.ldapSetting = {
         var getListDef = $.Deferred();
 
         if(self.currPage !== "ldap-list") return;
+
+        self.view.find(".ldap-list .index[has-data]").hide();
 
         // 取得列表
         new QmiAjax({
@@ -576,8 +582,6 @@ QmiGlobal.module.ldapSetting = {
                 container.append(account);
                 account.data("cloud-data", item);
             });
-
-            self.view.find(".ldap-list .index[has-data]").hide();
             self.view.find(".ldap-list .index[has-data="+ !!ldapList.length +"]").show();
 
         }).error(function(errData) {
@@ -753,27 +757,45 @@ QmiGlobal.module.ldapSetting = {
                 dn: QmiGlobal.device,
                 ci: ldapData.ci
             }
-        }).done(function(rspObj) {
-
+        }).success(function(rspObj) {
             msgShowDef.done(function(){
                 // 更新團體列表
                 self.changePage("ldap-list");
-                groupMenuListArea();
-                toastShow(rspObj.rsp_msg)
+                groupMenuListArea().done(function() {
+
+                    if(QmiGlobal.groups.length === 0) {
+                        gi === null;
+                        $.mobile.changePage("#page-group-menu");
+
+                    // 當前團體不存在了 去預設團體或第一團體
+                    } else if(QmiGlobal.groups[gi] === undefined) {
+                        var toGi = QmiGlobal.dgi;
+                        if(QmiGlobal.groups[toGi] === undefined || toGi === undefined) toGi = Object.keys(QmiGlobal.groups)[0];
+
+                        timelineChangeGroup(toGi);
+                    }
+                    
+                    self.view.removeClass("cover");
+                    toastShow(rspObj.rsp_msg);
+                });
+                
             });
             
-        }).fail(function(failData) {
+        }).error(function(failData) {
+            console.log("delete fail", failData);
             try {
                 var errMsg = JSON.parse(failData.errData.responseText).rsp_msg;
             } catch(e) {
                 var errMsg = $.i18n.getString("COMMON_UNKNOWN_ERROR");
             }
 
-            msgShowDef.done(function(){toastShow(errMsg)});
-        }).always(function() {
+            msgShowDef.done(function(){
+                toastShow(errMsg);
+                self.view.removeClass("cover");
+            });
+        }).complete(function() {
             setTimeout(function() {
                 msgShowDef.resolve();
-                self.view.removeClass("cover");
             }, 1000);
         })
     },
@@ -791,23 +813,22 @@ QmiGlobal.module.ldapSetting = {
         var self = this;
         self.currPage = pageName;
 
-        self.view.find("[role=page]").hide().end()
-        .find("." + pageName + "[role=page]").fadeIn(100);
-        console.log("pageName", pageName);
-
         switch(pageName) {
             case "ldap-list":
                 self.getList();
                 break;
             case "ldap-edit":
-                self.clearForm();
                 
                 // title                
                 var editPageDom = self.view.find(".ldap-edit");
-                editPageDom.find(".title.one").hide().end()
-                .find(".title.one."+editPageDom.attr("ldap-type")).show();
+                editPageDom.find(".title.one").attr("style", "display:none").end()
+                .find(".title.one."+editPageDom.attr("ldap-type")).attr("style", "display:block");
                 break;
         }
+
+        self.view.find("[role=page]").hide().end()
+        .find("." + pageName + "[role=page]").fadeIn(100);
+        console.log("pageName", pageName);
     },
 
     strMap: {

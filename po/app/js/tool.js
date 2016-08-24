@@ -427,7 +427,7 @@ secondsToTime = function (secs)
 }
 
 toastShow = function(desc){
-	if($(".toast").css("opacity") !== "0") return;
+	if($(".toast").css("opacity") !== "0" || (desc || "").length === 0) return;
 
 	$(".toast div").html(desc);
 	$(".toast").css("bottom","0px");
