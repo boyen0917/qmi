@@ -2931,9 +2931,9 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
 
     //已經有內容 就製作已選的樣式
     cns.debug("obj_data:",obj_data);
-    cns.debug("obj_data:",branch_data);
-
-    if(obj_data || branch_data){
+    cns.debug("branch_data:",branch_data);
+    //因為事件共用(指派管理員、貼文發布對象、建立聊天室對象)所以無branch_data照舊寫在else if
+    if(obj_data && branch_data){
         obj_data = $.parseJSON(obj_data);
         branch_data = $.parseJSON(branch_data);
 
@@ -2949,24 +2949,66 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
                     this_cell.find(".obj-cell-chk .img").addClass("chk");
                     // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
                     // this_cell.find(".img").addClass("chk");
-                }else if($.inArray(this_cell.data("bl"),Object.keys(branch_data)) >= 0){ 
+                }else if($.inArray(this_cell.data("bl"),Object.keys(branch_data)) >= 0){
                     this_cell.data("chk",true);
                     this_cell.find(".obj-cell-chk .img").addClass("chk");
                 }else{
                     this_cell.data("chk",false);
                     this_cell.find(".obj-cell-chk .img").removeClass("chk");
-                    // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
-                    // this_cell.find(".img").removeClass("chk");
                 }
             });
+            updateSelectedObj();
+        }    
+    }else if(obj_data){
+        obj_data = $.parseJSON(obj_data);
 
+        if(Object.keys(obj_data).length){
+            $(".obj-content").data("selected-obj",obj_data);
+
+            $(document).find(".obj-cell").each(function(i,val){
+                var this_cell = $(this);
+                //有被選擇過 存在obj_data中
+                if($.inArray(this_cell.data("gu"),Object.keys(obj_data)) >= 0){
+                    this_cell.data("chk",true);
+                    this_cell.find(".obj-cell-chk .img").addClass("chk");
+                    // this_cell.find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round_check.png");
+                    // this_cell.find(".img").addClass("chk");
+                }else{
+                    this_cell.data("chk",false);
+                    this_cell.find(".obj-cell-chk .img").removeClass("chk");
+                }
+            });
             updateSelectedObj();
         }
-            
     }else{
         //reset
-        $(".obj-content").data("selected-obj",{});  
+        $(".obj-content").data("selected-obj",{});
+        $(".obj-content").data("selected-branch",{});  
     }
+
+    // if(branch_data){
+    //     branch_data = $.parseJSON(branch_data);
+    //     if(Object.keys(branch_data).length){
+    //         $(".obj-content").data("selected-branch",branch_data);
+    //     }
+    //     $(document).find(".obj-cell.branch").each(function(i,val){
+
+    //         var this_cell = $(this);
+    //         if($.inArray(this_cell.data("bl"),Object.keys(branch_data)) >= 0){ 
+    //             this_cell.data("chk",true);
+    //             this_cell.find(".obj-cell-chk .img").addClass("chk");
+    //         }else{
+    //             this_cell.data("chk",false);
+    //             this_cell.find(".obj-cell-chk .img").removeClass("chk");
+    //         }
+    //     });
+
+    //     updateSelectedObj();
+        
+    // }else{
+    //     //reset
+    //     $(".obj-content").data("selected-branch",{});  
+    // }
     
     //避免重複綁定事件 先解除
     $(document).off('click', '.obj-cell.mem');
