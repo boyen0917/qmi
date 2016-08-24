@@ -342,6 +342,8 @@ function deleteRoom ( deleteRow ){
 }
 
 function openChatWindow ( giTmp, ci ){
+	var chatListDiv = $(".subpage-chatList");
+	var topListDom = $(".top-chatList");
 	clearChatListCnt( giTmp, ci );
 	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
 		// windowList[ci].focus();
@@ -368,29 +370,31 @@ function openChatWindow ( giTmp, ci ){
 		};
 		windowList[ci].chatList = {
 			roomAddTop : function (chatroomId) {
-				var chatListDiv = $(".subpage-chatList");
-				var topListDom = $(".top-chatList .list");
 				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
-				chatroomDom.appendTo(topListDom);
+				topListDom.find(".list").append(chatroomDom);
+				topListDom.show();
 			},
 			roomDeleteTop : function (chatroomId) {
-				var chatListDiv = $(".subpage-chatList");
 				var unTopListDom = chatListDiv.find(".rows");
-				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
+				var chatroomDom = topListDom.find("[data-rid='" + chatroomId +"']");
 				chatroomDom.appendTo(unTopListDom);
+
+				if (topListDom.find(".subpage-chatList-row").length == 0) {
+					topListDom.hide();
+				}
 			},
 			roomRename : function (chatroomId, newName) {
-				var chatroomDom = $(".subpage-chatList").find("[data-rid='" + chatroomId +"']");
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
 				var numberOfRoomMember = QmiGlobal.groups[gi].chatAll[chatroomId].cpc;
 				chatroomDom.find(".name").html(newName + " (" + numberOfRoomMember + ")");
 			},
 			roomUpdatePhoto : function (chatroomId, newImgUrl) {
-				var chatroomDom = $(".subpage-chatList").find("[data-rid='" + chatroomId +"']");
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
 				chatroomDom.find("img").attr("src", newImgUrl);
 			},
 
 			roomUpdateNumberOfMember : function (chatroomId, number) {
-				var chatroomDom = $(".subpage-chatList").find("[data-rid='" + chatroomId +"']");
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
 				var roomName = QmiGlobal.groups[gi].chatAll[chatroomId].cn;
 				chatroomDom.find(".name").html(roomName + " (" + number + ")");
 			}
