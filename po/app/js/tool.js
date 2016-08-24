@@ -1370,7 +1370,15 @@ updateSideMenuContent = function(thisGi) {
 	
 	var groupData = QmiGlobal.groups[thisGi],
 		gn = groupData.gn._escape(),
-		gd = htmlFormat( groupData.gd );
+		gd = htmlFormat( groupData.gd ),
+		ad = groupData.ad;
+	//管理員圖示
+	var tmp = $(".sm-group-area[data-gi="+thisGi+"]");
+    if(ad == 1){
+        tmp.find(".sm-icon-host").show();
+    } else{
+        tmp.find(".sm-icon-host").hide();
+    }
 
 	$(".polling-group-name[data-gi="+thisGi+"]")
 	.find("div:nth-child(1)").html(gn).end()

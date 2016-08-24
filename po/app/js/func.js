@@ -8121,7 +8121,7 @@ pollingCmds = function(newPollingData){
                 insideDeferred.resolve(true);
             } 
             //有人加入或退出團體(因為當前團體)
-            else if ( item.tp === 6 || item.tp === 4){
+            else if ( item.tp === 6 || item.tp === 5 || item.tp === 4){
                 insideDeferred.resolve(true);  
             } 
             // 不用做combo
@@ -8230,6 +8230,8 @@ pollingCmds = function(newPollingData){
                         break;
                     case 5://edit user info
                         user_info_arr.push( item.pm );
+
+                        updateSideMenuContent(item.pm.gi);
                         
                         if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
