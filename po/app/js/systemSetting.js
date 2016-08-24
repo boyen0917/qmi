@@ -801,31 +801,38 @@ QmiGlobal.module.ldapSetting = {
                 break;
             case "ldap-edit":
                 self.clearForm();
+                
+                // title                
+                var editPageDom = self.view.find(".ldap-edit");
+                editPageDom.find(".title.one").hide().end()
+                .find(".title.one."+editPageDom.attr("ldap-type")).show();
                 break;
-            
         }
-
     },
 
     strMap: {
         // 0 是公雲; 1是 sso
         add: ["ACCOUNT_BINDING_BINDING_NEW_ACCOUNT", "ACCOUNT_BINDING_BIND_QMI_ACCOUNT"],
         noData1: ["ACCOUNT_BINDING_PRESS_TO_BIND_LDAP_ACCOUNT", "WEBONLY_ACCOUNT_BINDING_SSO_NODATA1"],
-        noData2: ["WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT", "WEBONLY_ACCOUNT_BINDING_SSO_NODATA2"]
+        noData2: ["WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT", "WEBONLY_ACCOUNT_BINDING_SSO_NODATA2"],
+        write: function(type) {
+            return $.i18n.getString(this[type][+(QmiGlobal.auth.isSso || false)]);
+        }
     },
 
     html: function() {
-        var str = this.strMap, isSso = QmiGlobal.auth.isSso || false;
         return "<section class='content'>"
         + "<section class='ldap-list' role='page'>"
-        + "    <div class='ldap-add' target='ldap-edit'>+ "+ $.i18n.getString(str.add[+isSso]) +"</div>"
-        + "    <div class='no-data index' target='ldap-edit' has-data='false'><div>"+ $.i18n.getString(str.noData1[+isSso]) +"</div><div>"+ $.i18n.getString(str.noData2[+isSso]) +"</div></div>"
+        + "    <div class='ldap-add' target='ldap-edit'>+ "+ this.strMap.write("add") +"</div>"
+        + "    <div class='no-data index' target='ldap-edit' has-data='false'><div>"+ this.strMap.write("noData1") +"</div><div>"+ this.strMap.write("noData2") +"</div></div>"
         + "    <div class='list index' has-data='true'></div>"
         + "</section>"
         + "<section class='ldap-edit' role='page' ldap-type='add'>"
         + "    <section class='icon-shield'></section>"
-        + "    <div class='title one' content='新增LDAP帳號'></div>"
-        + "    <div class='title two' content='請輸入你的LDAP帳號及密碼'></div>"
+        + "    <div class='title one add' content='"+ $.i18n.getString("ACCOUNT_BINDING_BINDING_NEW_ACCOUNT") +"'></div>"
+        + "    <div class='title one check' content='"+ $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") +"'></div>"
+        + "    <div class='title one delete' content='"+ $.i18n.getString("ACCOUNT_BINDING_DISCONNECT_ACCOUNT") +"'></div>"
+        + "    <div class='title two' content='"+ $.i18n.getString("ACCOUNT_BINDING_ENTER_ACCOUNT_PASSWORD") +"'></div>"
         + "    <section class='edit-form'>"
         + "    <div class='input-block email'><input placeholder='email'></div>"
         + "    <div class='input-block password'><input placeholder='password' type='password'></div>"
