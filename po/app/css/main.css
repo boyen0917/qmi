@@ -887,15 +887,16 @@ img.auo {
 .header-menu .sm-count{
 	position: relative;
     background: #f31e80;
-    line-height: 17px;
-    height: 18px;
-    width: 17px;
+    line-height: 23px;
+    height: 24px;
+    width: 24px;
     border-radius: 13px;
-    margin-right: -19px;
-    bottom: 10px;
+    margin-right: -16px;
+    bottom: 8px;
     font-size: 12px;
     overflow: visible;
     padding-right: 1px;
+    margin-left: 4px;
 }
 
 .sm-hr {

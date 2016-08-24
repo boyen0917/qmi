@@ -4181,7 +4181,6 @@ composeVoteQuesMake = function(this_compose){
         this_ques.find(".cp-vote-add-opt").click(function(){
 
             var opt_total = this_ques.data("opt-total");
-
             cns.debug("opt total:",this_ques.data("opt-total"));
 
             opt_total += 1;
@@ -4251,7 +4250,7 @@ composeVoteEvent = function(this_compose){
     });
 
     //刪除一個投票項目
-    $(document).on("click",".cp-vote-opt img",function(){
+    $(document).off("click",".cp-vote-opt img").on("click",".cp-vote-opt img",function(){
         var this_ques = $(this).parents(".cp-vote-ques-area");
         var this_opt = $(this).parent();
 
