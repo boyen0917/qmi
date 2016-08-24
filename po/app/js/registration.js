@@ -164,7 +164,7 @@ onCheckVersionDone = function(needUpdate){
 			var phoneInput = $(".login-ld-phone input");
 			var countryInput = $(".login-ld-countrycode select");
 			var phoneObj = getPhoneNumberObject( phoneInput.val(), countryInput.attr("data-val") );
-			if( phoneObj.isValid && pwdInput.val().length >= 8 ){
+			if( phoneObj.isValid && pwdInput.val().length >= 6 ){
 				$("#page-registration .login").addClass("login-ready");
 
 				countrycode = "+"+phoneObj.country_code;
@@ -181,7 +181,7 @@ onCheckVersionDone = function(needUpdate){
 			if( email && email.length>3 ){
 				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,'');
 				
-				if(pwdInput.val().length >= 8 && isMailCheck.length == 0 ){
+				if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
 					$("#page-registration .login").addClass("login-ready");
 				}else{
 					$("#page-registration .login").removeClass("login-ready");

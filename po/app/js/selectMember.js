@@ -101,14 +101,14 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
     var isShowFavBranch = true;
     var min_count = 0;
     if( option ){
-        if( null!=option.isShowBranch ) isShowBranch = option.isShowBranch;
-        if( null!=option.isShowSelf ) isShowSelf = option.isShowSelf;
-        if( null!=option.isShowAll ) isShowAll = option.isShowAll;
-        if( null!=option.isShowFav ) isShowFav = option.isShowFav;
-        if( null!=option.isSingleSelect ) isSingleSelect = option.isSingleSelect;
-        if( null!=option.isShowFavBranch ) isShowFavBranch = option.isShowFavBranch;
-        if( null!=option.min_count ) min_count = option.min_count;
-        if( null!=option.title ) {
+        if(null != option.isShowBranch) isShowBranch = option.isShowBranch;
+        if(null != option.isShowSelf) isShowSelf = option.isShowSelf;
+        if(null != option.isShowAll) isShowAll = option.isShowAll;
+        if(null != option.isShowFav) isShowFav = option.isShowFav;
+        if(null != option.isSingleSelect) isSingleSelect = option.isSingleSelect;
+        if(null != option.isShowFavBranch) isShowFavBranch = option.isShowFavBranch;
+        if(null != option.min_count) min_count = option.min_count;
+        if(null != option.title) {
             $(".header-title .text").html( option.title );
         }
     }

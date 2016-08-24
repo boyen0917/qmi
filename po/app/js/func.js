@@ -6080,7 +6080,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 break;
         };
 
-        
+
         this_event.find("b").bind("click", function(e) {
             userInfoShow(gi, $(e.target).attr("name"));
         });
@@ -9152,6 +9152,7 @@ userInfoEvent = function(this_info,me){
             },null]);
         });
     }
+
 
     //click fav
     this_info.find(".user-avatar-bar-favorite .fav").mouseup(function(){

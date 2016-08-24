@@ -70,7 +70,8 @@ function updateChatList( giTmp, extraCallBack ){
 	chatListDom.find(".coachmake").hide();
 	chatListDom.find(".loading").show();
 	chatListDom.find(".rows").html("");
-
+	chatListDom.find(".top-chatList").hide("");
+	$(".top-chatList .list").html("");
 	var currentGroup = QmiGlobal.groups[giTmp];
 	if( !currentGroup )	return;
 
@@ -180,7 +181,6 @@ function updateChatList( giTmp, extraCallBack ){
 	show chat list data from local storage
 **/
 function showChatList(){
-
 	var groupData = QmiGlobal.groups[gi];
 	if( null==groupData ) return;
 	var chatList = groupData.chatAll;
@@ -189,20 +189,22 @@ function showChatList(){
 	var 
 	deferredPoolArr = [],
 	targetDiv = $(".subpage-chatList .rows");
+	topChatListDiv = $(".top-chatList .list");
 
 	if( Object.keys(chatList).length<=1 ){
 		targetDiv.hide();
 		$(".subpage-chatList .coachmake").fadeIn();
 		return;
 	}
-	$(".subpage-chatList .rows").html("");
-	targetDiv.hide();
+	targetDiv.html("");
+	topChatListDiv.html("");	
+
 	$(".subpage-chatList .coachmake").hide();
 
 	if( targetDiv ){
 		var tmp;
 		$.each(chatList,function(key,room){
-			//目前type0的全體聊天室無用
+				//目前type0的全體聊天室無用
 			if( "0"!=room.tp ){
 
 				//全部做完 再做sort
@@ -244,8 +246,11 @@ function showChatList(){
 
 				var roomName = chatRoomName.replaceOriEmojiCode();
 
-				if( room.hasOwnProperty("cpc") === true)
+
+
+				if( room.hasOwnProperty("cpc") === true && room.cpc > 2)
 					roomName +=  " (" + room.cpc + ") ";
+
 
 				td.append("<div class='name'>" + roomName + "</div>");
 
@@ -260,7 +265,11 @@ function showChatList(){
 				td.append("<div class='drag'></div>");
 				row.append(td);
 
-				targetDiv.append(table);
+				if (room.it) {
+					topChatListDiv.append(table);
+				} else {
+					targetDiv.append(table);
+				}
 
 				//全部做完 再做sort
 				setLastMsg( gi, room.ci, table, false ).done(deferred.resolve);
@@ -268,7 +277,10 @@ function showChatList(){
 		});
 	
 		$.when.apply($,deferredPoolArr).done(function(){
-			targetDiv.show();
+			if (topChatListDiv.find(".subpage-chatList-row").length) {
+				$(".top-chatList").show();
+			}
+			// targetDiv.show();
 			sortRoomList();
 		})
 	}
@@ -352,9 +364,37 @@ function openChatWindow ( giTmp, ci ){
 			auth: 		window.QmiGlobal.auth,
 			groups: 	window.QmiGlobal.groups,
 			clouds: 	window.QmiGlobal.clouds,
-			cloudGiMap: window.QmiGlobal.cloudGiMap
-		}
+			cloudGiMap: window.QmiGlobal.cloudGiMap,
+		};
+		windowList[ci].chatList = {
+			roomAddTop : function (chatroomId) {
+				var chatListDiv = $(".subpage-chatList");
+				var topListDom = $(".top-chatList .list");
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
+				chatroomDom.appendTo(topListDom);
+			},
+			roomDeleteTop : function (chatroomId) {
+				var chatListDiv = $(".subpage-chatList");
+				var unTopListDom = chatListDiv.find(".rows");
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
+				chatroomDom.appendTo(unTopListDom);
+			},
+			roomRename : function (chatroomId, newName) {
+				var chatroomDom = $(".subpage-chatList").find("[data-rid='" + chatroomId +"']");
+				var numberOfRoomMember = QmiGlobal.groups[gi].chatAll[chatroomId].cpc;
+				chatroomDom.find(".name").html(newName + " (" + numberOfRoomMember + ")");
+			},
+			roomUpdatePhoto : function (chatroomId, newImgUrl) {
+				var chatroomDom = $(".subpage-chatList").find("[data-rid='" + chatroomId +"']");
+				chatroomDom.find("img").attr("src", newImgUrl);
+			},
 
+			roomUpdateNumberOfMember : function (chatroomId, number) {
+				var chatroomDom = $(".subpage-chatList").find("[data-rid='" + chatroomId +"']");
+				var roomName = QmiGlobal.groups[gi].chatAll[chatroomId].cn;
+				chatroomDom.find(".name").html(roomName + " (" + number + ")");
+			}
+		}
 	}
 	windowList[ci].focus();
 }
@@ -616,6 +656,17 @@ function sortRoomList(){
 		if( ct > 0 ){
 			$(this).find(".time").html( new Date(ct).toFormatString() );
 		}
+	});
+
+	$('.list').each(function(){
+	    var $this = $(this);
+	    var tmp = $this.find('.subpage-chatList-row').get().sort(function(a, b) {
+	        return $(b).data('time') - $(a).data('time');
+	    });
+	    // for( var i=0;i<tmp.length;i++){
+	    // 	cns.debug( $(tmp[i]).data("time") );
+	    // }
+	    $this.append(tmp);
 	});
 
 	$('.rows').each(function(){
