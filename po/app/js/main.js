@@ -260,7 +260,7 @@ $(function(){
 		$(".sm-person-area-r").find("img").toggle();
 		//$(".sm-person-info").fadeToggle();
 		
-		QmiGlobal.systemPopup.init();
+		QmiGlobal.module.systemPopup.init();
 		
 	});
 	//系統選單 Tab 

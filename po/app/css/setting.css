@@ -1003,16 +1003,17 @@ input[type=radio] {
 #view-ldap-setting section.content, #view-ldap-setting section[role=page] { height: 100%;}
 
 #view-ldap-setting .ldap-add {
+    box-sizing: border-box;
     width: 60%;
     max-width: 500px;
-    height: 25px;
+    height: 30px;
     border: 1px solid rgb(221, 221, 221);
-    line-height: 26px;
+    line-height: 30px;
     text-align: center;
     margin: 50px auto 0;
-    font-size: 13px;
+    font-size: 14px;
     box-shadow: 0 0px 0px 0.2px #ccc;
-    color: rgb(129, 158, 237);
+    color: rgb(106, 138, 224);
     background: white;
     cursor: pointer;
 }
@@ -1046,14 +1047,21 @@ input[type=radio] {
     left: 0;
 }
 
-#view-ldap-setting section.icon-shield.add:before {background: url(../images/ldap/icon_add_ldap.png); background-size: 100%;}
-#view-ldap-setting section.icon-shield.check:before {background: url(../images/ldap/icon_add_ldap.png); background-size: 100%;}
-#view-ldap-setting section.icon-shield.delete:before {background: url(../images/ldap/icon_add_ldap.png); background-size: 100%;}
+#view-ldap-setting section.ldap-edit[ldap-type=add] section.icon-shield:before {background: url(../images/ldap/icon_add_ldap.png); background-size: 100%;}
+#view-ldap-setting section.ldap-edit[ldap-type=check] section.icon-shield:before {background: url(../images/ldap/icon_check_LDAP.png); background-size: 100%;}
+#view-ldap-setting section.ldap-edit[ldap-type=delete] section.icon-shield:before {background: url(../images/ldap/icon_delete_LDAP.png); background-size: 100%;}
 
-#view-ldap-setting .title1 {text-align: center; font-size: 20px; color: #6f87bb;}
-#view-ldap-setting .title2 {text-align: center;	font-size: 14px; color: #888;}
+#view-ldap-setting .title1 {position: relative; text-align: center; font-size: 20px; color: #6f87bb;}
+#view-ldap-setting .title2 {position: relative; text-align: center;	font-size: 14px; color: #888;}
 
-#view-ldap-setting section.create-form {
+#view-ldap-setting .title1:before {position: absolute;}
+#view-ldap-setting .title2:before {position: absolute;}
+#view-ldap-setting section.ldap-edit[ldap-type=add] .title:before {content: attr(content);}
+#view-ldap-setting section.ldap-edit[ldap-type=check] .title:before {content: attr(content);}
+#view-ldap-setting section.ldap-edit[ldap-type=delete] .title:before {content: attr(content);}
+
+
+#view-ldap-setting section.edit-form {
     width: 50%;
     max-width: 500px;
     min-width: 300px;
@@ -1084,6 +1092,9 @@ input[type=radio] {
 #view-ldap-setting .input-block.email:before {background: url(../images/ldap/icon_LDAP_email.png); background-size: 100%;}
 #view-ldap-setting .input-block.password:before {background: url(../images/ldap/icon_LDAP_password.png); background-size: 100%;}
 
+#view-ldap-setting section.ldap-edit[ldap-type=check] .input-block.email:before {background: url(../images/ldap/icon_LDAP_email_green.png); background-size: 100%;}
+#view-ldap-setting section.ldap-edit[ldap-type=check] .input-block.password:before {background: url(../images/ldap/icon_LDAP_password_green.png); background-size: 100%;}
+
 #view-ldap-setting .input-block input {
     height: 35px;
     background: transparent;
@@ -1097,7 +1108,8 @@ input[type=radio] {
     position: relative;
 }
 
-#view-ldap-setting .create-form button {
+#view-ldap-setting .ldap-edit {overflow: auto;}
+#view-ldap-setting .edit-form button {
     background: #ccc;
     border: 0;
     border-radius: 5px;
@@ -1109,11 +1121,11 @@ input[type=radio] {
     position: absolute;
 }
 
-#view-ldap-setting .create-form button.cancel {left: 0}
-#view-ldap-setting .create-form button.submit {right: 0}
-#view-ldap-setting .create-form button:focus {outline: none;}
+#view-ldap-setting .edit-form button.cancel {left: 0}
+#view-ldap-setting .edit-form button.submit {right: 0}
+#view-ldap-setting .edit-form button:focus {outline: none;}
 
-#view-ldap-setting .create-form button.submit.ready {background: #809bd4;}
+#view-ldap-setting .edit-form button.submit.ready {background: #809bd4;}
 #view-ldap-setting .list {
 	display: none;
     width: 70%;
@@ -1132,13 +1144,17 @@ input[type=radio] {
     color: #666;
 }
 
-#view-ldap-setting .list > div img {
+#view-ldap-setting .list span.unbind-img {
     width: 30px;
+    height: 30px;
     position: absolute;
     right: 0;
     top: 11px;
     cursor: pointer;
 }
+
+#view-ldap-setting .list > div span.unbind-img {background: url("../images/ldap/icon_delete_email_gray.png"); background-size: 100%;}
+#view-ldap-setting .list > div.expired span.unbind-img {background: url("../images/ldap/icon_delete_email_red.png"); background-size: 100%;}
 
 #view-ldap-setting .list > div.expired:before {
     content: "";
@@ -1172,3 +1188,15 @@ input[type=radio] {
 }
 
 #view-ldap-setting .list > div.expired {color: #e66161;}
+
+#view-ldap-setting.cover:before.back {
+    content: url(../images/spinner.gif);
+    z-index: 1;
+    transition: 0.5s;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: rgba(255,255,255,0.9);
+    line-height: 95vh;
+    text-align: center;
+}

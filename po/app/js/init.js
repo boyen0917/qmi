@@ -251,12 +251,19 @@ window.QmiGlobal = {
 	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
 
 	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups
+
 	clouds: {}, // 全部的私雲資料
 	cloudGiMap: {},
 
+	ldapClouds: {}, // ldap雲資訊
+
 	windowListCiMap: {},
 
-	module: {},
+	module: {}, // 模組
+
+	reAuthLockDef: {},
+
+	rspCode401: false,
 
 	// 聊天室 auth
 	auth: {},
@@ -509,12 +516,19 @@ window.QmiAjax = function(args){
 
 	// success 來這裡
 	ajaxDeferred.done(function(completeData){
-
         if(successCB instanceof Function) {
-        	var responseObj = JSON.parse(completeData.responseText);
-    		responseObj.newArgs = newArgs;
-
-        	successCB(responseObj);
+        	try {
+        		var responseObj = JSON.parse(completeData.responseText);
+        		responseObj.newArgs = newArgs;
+        		successCB(responseObj);
+        	} catch(e) {
+        		console.log("ajax done catch error", e);
+        		if(errorCB instanceof Function) {
+        			completeData.errMsg = "parse error";
+        			errorCB(completeData);
+        		}
+        		return;
+        	}
         }
     })
 
@@ -630,7 +644,7 @@ QmiAjax.prototype = {
 		// 需要輸入密碼
 		if((cloudData || {}).tp === 1) {
 			// console.log("此私雲需要輸入密碼");
-			QmiGlobal.reAuthManually.init({
+			QmiGlobal.module.reAuthManually.init({
 				reAuthDef: deferred,
 				cloudData: cloudData
 			});
@@ -701,7 +715,7 @@ QmiAjax.prototype = {
 		}
 
 		//不做錯誤顯示 polling也不顯示 isReAuthCancel 手動輸入密碼的私雲重新頁面 按取消就不顯示錯誤訊息
-		if(ajaxArgs.errHide || isPolling === true || errData.isReAuthCancel === true) return false;
+		if(ajaxArgs.errHide || ajaxArgs.noErr || isPolling || errData.isReAuthCancel === true) return false;
 
 		//ajax逾時
 		if(errData.statusText == "timeout"){
@@ -766,7 +780,7 @@ QmiGlobal.eventDispatcher = {
 				var jqElem = self.viewMap[viewId].jqElem, length = jqElem.length;
 				for(var i=0; i<length; i++) {
 					if(event.currentTarget === jqElem[i]) {
-						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {})[event.type]}}));
+						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {})[event.type], target: event.target}}));
 						return;
 					}
 				}
@@ -783,25 +797,44 @@ QmiGlobal.eventDispatcher = {
 		}
 	}(),
 
-	viewEventSubscriber: function(veArr, handler) {
+	subscriber: function(veArr, handler, isClean) {
 		var self = this;
+
+		// 清除已存在的view
+		if(isClean) self.cleaner(handler.id);
+
 		veArr.forEach(function(veObj) {
-			var viewId = handler.id+"-"+veObj.veId;
+			var viewId = handler.id+":"+veObj.veId;
 			self.viewMap[viewId] = veObj;
 			veObj.eventArr.forEach(function(eventType) {
 				// jqElem 是arr 每個elem都掛上事件監聽
 				Array.prototype.forEach.call(veObj.jqElem, function(elem) {
 					elem.addEventListener(eventType, self);
-				})
+				});
 				window.addEventListener(eventType+":"+viewId, handler);
 			});
+		})
+	},
+
+	cleaner: function(moduleId) {
+		var self = this;
+
+		Object.keys(self.viewMap).forEach(function(viewId) {
+			if(viewId.split(":")[0] === moduleId) {
+				delete self.viewMap[viewId];
+
+				// remove event listener
+				// window.removeEventListener("click:view-ldap-setting:list-delete", QmiGlobal.module.ldapSetting)
+			}
+
+			
 		})
 	}
 }
 
 
 // reAuthManuallyUI
-QmiGlobal.reAuthManually = {
+QmiGlobal.module.reAuthManually = {
 
 	isExist: false,
 
@@ -834,7 +867,7 @@ QmiGlobal.reAuthManually = {
     	$("body").append(self.view);
     	self.view.fadeIn(100);
 
-    	QmiGlobal.eventDispatcher.viewEventSubscriber([
+    	QmiGlobal.eventDispatcher.subscriber([
     		{
     			veId: "cancel", 
     			jqElem: self.view.find("span.cancel"), 
@@ -844,7 +877,7 @@ QmiGlobal.reAuthManually = {
     			jqElem: self.view.find("span.submit"), 
     			eventArr: ["click"],
     		}
-    	], self);
+    	], self, true);
     },
 
     // custom event
@@ -853,11 +886,11 @@ QmiGlobal.reAuthManually = {
 		// event.type -> click:view-auth-manually-submit
 		var eventCase = event.type.split(":"+self.id).join("");
 		switch(eventCase) {
-			case "click-submit":
+			case "click:submit":
 				self.submit();
 				break;
 
-			case "click-cancel":
+			case "click:cancel":
 				// sso 用戶敢按取消就登出
 				if(QmiGlobal.auth.isSso) logout();
 
@@ -957,7 +990,7 @@ QmiGlobal.reAuthManually = {
 }
 
 
-QmiGlobal.systemPopup = {
+QmiGlobal.module.systemPopup = {
 	id: "view-system-popup",
 
     init : function(){
@@ -973,7 +1006,7 @@ QmiGlobal.systemPopup = {
     	$("body").append(self.view);
     	self.view.fadeIn(100);
     	
-    	QmiGlobal.eventDispatcher.viewEventSubscriber([
+    	QmiGlobal.eventDispatcher.subscriber([
     		{
     			veId: "close", 
     			jqElem: self.view, 
@@ -987,7 +1020,7 @@ QmiGlobal.systemPopup = {
     			jqElem: self.view.find("div.system-logout"), 
     			eventArr: ["click"],
     		}
-    	], self);
+    	], self, true);
     },
 
     handleEvent: function() {
@@ -995,19 +1028,19 @@ QmiGlobal.systemPopup = {
 		// event.type -> click:view-auth-manually-submit
 		var eventCase = event.type.split(":"+self.id).join("");
 		switch(eventCase) {
-			case "click-close":
+			case "click:close":
 				$("#userInfo .sm-person-area-r").find("img").toggle();
     			self.view.remove();
 				break;
 
-			case "click-ldapSetting":
+			case "click:ldapSetting":
 				// func.js  timelineSwitch  system-ldap-setting
 				// QmiGlobal.ldapSetting.init();
 
     			self.view.remove();
 				break;
 
-			case "click-logout":
+			case "click:logout":
 				new QmiGlobal.popup({
 					desc: $.i18n.getString("SETTING_DO_LOGOUT"),
 					confirm: true,

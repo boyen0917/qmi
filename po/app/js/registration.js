@@ -468,6 +468,9 @@ onCheckVersionDone = function(needUpdate){
     // LDAP SSO
     QmiGlobal.ssoLogin = function(ssoObj) {
     	var deferred = $.Deferred();
+    	console.log("ssoObj.pw", ssoObj.pw);
+    	console.log("ssoObj.id", ssoObj.id.substring(0,16));
+    	console.log("QmiGlobal.device", QmiGlobal.device);
     	// sso 登入
 		new QmiAjax({
             url: "https://" + ssoObj.url + "/apiv1/sso/"+ ssoObj.ci +"/login",

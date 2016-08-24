@@ -445,9 +445,11 @@ defaultGroupSetting = function(){
 
 
 // ldap
-
-QmiGlobal.ldapSetting = {
+QmiGlobal.module.ldapSetting = {
     id: "view-ldap-setting",
+
+    currPage: "ldap-list",
+
     init: function() {
         var self = this;
 
@@ -457,101 +459,352 @@ QmiGlobal.ldapSetting = {
             html: self.html()
         });
 
+
         if($("#view-ldap-setting").length !== 0) $("#view-ldap-setting").remove();
         $("#page-group-main .subpage-ldapSetting").append(self.view);
 
-
-        // 取得列表
-        new QmiAjax({
-            apiName: "me/sso",
-            isPublicApi: true,
-        }).done(function(rspData) {
-            console.log("get list", rspData);
+        self.getList().done(function() {
+            QmiGlobal.eventDispatcher.subscriber([
+                {
+                    veId: "goto", 
+                    jqElem: self.view.find("[target]"), 
+                    eventArr: ["click"]
+                },{
+                    veId: "create-ready", 
+                    jqElem: self.view.find(".ldap-edit .input-block input"), 
+                    eventArr: ["input"],
+                },{
+                    veId: "create-submit", 
+                    jqElem: self.view.find(".ldap-edit button.submit"), 
+                    eventArr: ["click"],
+                },{
+                    veId: "create-cancel", 
+                    jqElem: self.view.find(".ldap-edit button.cancel"), 
+                    eventArr: ["click"],
+                },{
+                    veId: "list-delete", 
+                    jqElem: self.view.find(".ldap-list .list"), 
+                    eventArr: ["click"],
+                }
+            ], self, true);
         });
-
-
-        QmiGlobal.eventDispatcher.viewEventSubscriber([
-            {
-                veId: "goto", 
-                jqElem: self.view.find("[target]"), 
-                eventArr: ["click"]
-            },{
-                veId: "create-ready", 
-                jqElem: self.view.find(".ldap-create .input-block input"), 
-                eventArr: ["input"],
-            },{
-                veId: "create-submit", 
-                jqElem: self.view.find(".ldap-create button.submit"), 
-                eventArr: ["click"],
-            },{
-                veId: "create-cancel", 
-                jqElem: self.view.find(".ldap-create button.cancel"), 
-                eventArr: ["click"],
-            }
-        ], self);
-
+        
     },
 
     handleEvent: function() {
         var self = this;
-        var targetElem = event.detail.elem;
+        var targetDom = $(event.detail.elem);
 
         // event.type -> click:view-auth-manually-submit
         var eventCase = event.type.split(":"+self.id).join("");
         switch(eventCase) {
-            case "click-goto":
-                var pageName = $(targetElem).attr("target");
+            case "click:goto":
+                var pageName = targetDom.attr("target");
 
                 // sso登入 不去綁定帳號頁面
-                if(self.isSso && pageName === "ldap-create") return;
+                if(self.isSso && pageName === "ldap-edit") return;
+
+                if(pageName === "ldap-edit") self.view.find(pageName).attr("ldap-type", "add");
 
                 self.changePage(pageName);
                 break;
 
-            case "input-create-ready":
+            case "input:create-ready":
                 var chk = false;
-                self.view.find(".ldap-create input").each(function(i, elem) {
+                self.view.find(".ldap-edit input").each(function(i, elem) {
                     if(elem.value === "") chk = true;
                 })
-                var submitElem = self.view.find(".ldap-create button.submit");
+                var submitElem = self.view.find(".ldap-edit button.submit");
                 if(chk === false) submitElem.addClass("ready");
                 else submitElem.removeClass("ready")
 
                 break;
 
-            case "click-create-submit":
-                if($(targetElem).hasClass("ready")) self.submit();
+            case "click:create-submit":
+                if(targetDom.hasClass("ready") === false) return;
+
+                self.inputAccount = self.view.find(".ldap-edit .input-block.email input").val();
+                self.inputPassword = self.view.find(".ldap-edit .input-block.password input").val();
+
+                var method = self.view.find(".ldap-edit").attr("ldap-type");
+                self[method]();
 
                 break;
 
-            case "click-create-cancel":
-                self.changePage("ldap-list")
+            case "click:create-cancel":
+                self.changePage("ldap-list");
+
+                break;
+
+            // 解除綁定
+            case "click:list-delete":
+                var target = $(event.detail.target),
+                    accountDom = target.parent();
+
+                if(target.hasClass("unbind-img")) {
+                    self.changePage("ldap-edit");
+
+                    self.view.find(".ldap-edit")
+                    .attr("ldap-type", "delete")
+                    .find(".input-block.email input").val(accountDom.data("cloud-data").id);
+                }
                 break;
         }
     },
 
-    submit: function() {
-        console.log("submit");
+    getList: function(isReload) {
         var self = this;
+        var getListDef = $.Deferred();
+
+        if(self.currPage !== "ldap-list") return;
+
+        // 取得列表
+        new QmiAjax({
+            apiName: "me/sso",
+            noErr: true,
+            isPublicApi: true,
+        }).success(function(rspObj) {
+            var ldapList = rspObj.cl || [];
+            var container = self.view.find(".ldap-list .list");
+            container.html("");
+
+            ldapList.forEach(function(item) {
+                var account = $("<div err-msg='"+ $.i18n.getString("ACCOUNT_BINDING_AUTHORIZATION_EXPIRED") +"'>"
+                     + "<span>"+ item.id +"</span><span class='unbind-img'></span>"
+                     + "</div>");
+
+                container.append(account);
+                account.data("cloud-data", item);
+            });
+
+            self.view.find(".ldap-list .index[has-data]").hide();
+            self.view.find(".ldap-list .index[has-data="+ !!ldapList.length +"]").show();
+
+        }).error(function(errData) {
+            console.log("get list error", errData);
+        }).complete(getListDef.resolve);
+
+        return getListDef.promise();
+    },
+
+    add: function() {
+        var self = this,
+            ssoAccount = self.inputAccount,
+            ssoPassword = self.inputPassword,
+            thisSsoCi,
+            msgShowDef = $.Deferred(),
+            submitCompleteDef = $.Deferred();
+
+        self.view.addClass("cover");
+
+        var chainDef = MyDeferred();
+
         // step 1
         new QmiAjax({
             apiName: "me/sso/step1",
             isPublicApi: true,
+            errHide: true,
             method: "post",
-            body: {
-                id: self.view.find(".ldap-create .input-block.email input").val()
-            }
+            body: {id: ssoAccount}
         }).done(function(rspData) {
-            console.log("yooo", rspData);
-        })
+            try {
+                var rspObj = JSON.parse(rspData.responseText);
+
+                if(rspObj.tp !== 2) {
+                    submitCompleteDef.reject(errObjInit(rspData, "not valid user"));
+                    chainDef.resolve(); // step2 會 return;
+                } else {
+                    chainDef.resolve(rspObj);    
+                }
+            } catch(e) {
+                chainDef.reject(errObjInit(errData, "step1 parse error"));
+            }
+
+        }).fail(chainDef.reject);
+
+        chainDef.then(function(step1Data) {
+            var chainDef2 = MyDeferred();
+            // step2
+            thisSsoCi = step1Data.ci;
+
+            var password = QmiGlobal.aesCrypto.enc(
+                ssoPassword, 
+                ssoAccount.substring(0,16)
+            );
+
+            new QmiAjax({
+                url: "https://" + step1Data.url + "/apiv1/me/sso/step2",
+                specifiedHeaders: {li: lang},
+                errHide: true,
+                method: "post",
+                body: {
+                    id: ssoAccount,
+                    dn: QmiGlobal.device,
+                    pw: password,
+                    ci: thisSsoCi
+                }
+            }).done(function(rspData) {
+                try {
+                    chainDef2.resolve(JSON.parse(rspData.responseText));
+                } catch(e) {
+                    chainDef2.reject(errObjInit(errData, "step2 parse error"));
+                }
+            }).fail(chainDef2.reject);
+
+            return chainDef2;
+
+        // step1 error 
+        }, function(errData) {submitCompleteDef.reject(errObjInit(errData, "step1 error"))})
+        .then(function(step2Data) {
+            if(step2Data === undefined) return;
+            // step3
+            new QmiAjax({
+                apiName: "me/sso/step3",
+                errHide: true,
+                method: "post",
+                body: {
+                    id: ssoAccount,
+                    key: step2Data.key,
+                    ci: thisSsoCi
+                }
+            }).done(function(rspData) {
+                try {
+                    submitCompleteDef.resolve(JSON.parse(rspData.responseText));
+                } catch(e) {
+                    submitCompleteDef.reject(errObjInit(errData, "step3 parse error"));
+                }
+            }).fail(function(errData) {
+                submitCompleteDef.reject(errObjInit(errData, "step3 error"))
+            });
+
+        // step2 error
+        }, function(errData) {submitCompleteDef.reject(errObjInit(errData, "step2 error"))})
+
+        var resultMsg = "";
+
+        submitCompleteDef.done(function(rspObj) {
+                
+            msgShowDef.done(function(){
+                // 更新團體列表
+                self.changePage("ldap-list");
+                groupMenuListArea();
+                toastShow(rspObj.rsp_msg)
+            });
+            
+
+        }).fail(function(failData) {
+            try {
+                var errMsg = JSON.parse(failData.errData.responseText).rsp_msg;
+            } catch(e) {
+                var errMsg = $.i18n.getString("COMMON_UNKNOWN_ERROR");
+            }
+
+            this.clearForm();
+            msgShowDef.done(function(){toastShow(errMsg)});
+        }).always(function() {
+            setTimeout(function() {
+                msgShowDef.resolve();
+                self.view.removeClass("cover");
+            }, 1000);
+        });
+
         
+
+        function errObjInit(errData, msg) {
+            return {
+                isSuccess: false,
+                errData: errData,
+                msg: msg
+            }
+        }
+    },
+
+    delete: function() {
+        var self = this, ldapCi;
+        // 判斷帳號是否存在ldapClouds中
+        Object.keys(QmiGlobal.ldapClouds).forEach(function(thisCi) {
+            if(QmiGlobal.ldapClouds[thisCi].id === self.inputAccount) ldapCi = thisCi;
+        });
+
+        var ldapData = QmiGlobal.ldapClouds[ldapCi];
+        // if(ldapCi === undefined) {
+        //     toastShow(desc)
+        // }
+        var msgShowDef = $.Deferred();
+        self.view.addClass("cover");
+
+        new QmiAjax({
+            url: "https://" + ldapData.cl + "/apiv1/me/sso/",
+            specifiedHeaders: {
+                li: lang,
+                uui: QmiGlobal.auth.ui,
+                uat: QmiGlobal.auth.at,
+                ui: ldapData.ui,
+                at: ldapData.nowAt
+            },
+            errHide: true,
+            method: "put",
+            body: {
+                id: self.inputAccount,
+                pw: QmiGlobal.aesCrypto.enc(
+                    self.inputPassword, 
+                    self.inputAccount.substring(0,16)
+                ),
+                dn: QmiGlobal.device,
+                ci: ldapData.ci
+            }
+        }).done(function(rspObj) {
+
+            msgShowDef.done(function(){
+                // 更新團體列表
+                self.changePage("ldap-list");
+                groupMenuListArea();
+                toastShow(rspObj.rsp_msg)
+            });
+            
+        }).fail(function(failData) {
+            try {
+                var errMsg = JSON.parse(failData.errData.responseText).rsp_msg;
+            } catch(e) {
+                var errMsg = $.i18n.getString("COMMON_UNKNOWN_ERROR");
+            }
+
+            msgShowDef.done(function(){toastShow(errMsg)});
+        }).always(function() {
+            setTimeout(function() {
+                msgShowDef.resolve();
+                self.view.removeClass("cover");
+            }, 1000);
+        })
+    },
+
+    clearForm: function() {
+        var self = this;
+        self.view.find(".ldap-edit .input-block.email input").val("");
+        self.view.find(".ldap-edit .input-block.password input").val("");
+
+        self.inputAccount = "";
+        self.inputPassword = "";
     },
 
     changePage: function(pageName) {
         var self = this;
+        self.currPage = pageName;
+
         self.view.find("[role=page]").hide().end()
         .find("." + pageName + "[role=page]").fadeIn(100);
-        console.log("changePage", "." + pageName + "[role=page]");
+        console.log("pageName", pageName);
+
+        switch(pageName) {
+            case "ldap-list":
+                self.getList();
+                break;
+            case "ldap-edit":
+                self.clearForm();
+                break;
+            
+        }
+
     },
 
     strMap: {
@@ -565,17 +818,15 @@ QmiGlobal.ldapSetting = {
         var str = this.strMap, isSso = QmiGlobal.auth.isSso || false;
         return "<section class='content'>"
         + "<section class='ldap-list' role='page'>"
-        + "    <div class='ldap-add' target='ldap-create'>+ "+ $.i18n.getString(str.add[+isSso]) +"</div>"
-        + "    <div class='no-data' target='ldap-create'><div>"+ $.i18n.getString(str.noData1[+isSso]) +"</div><div>"+ $.i18n.getString(str.noData2[+isSso]) +"</div></div>"
-        + "    <div class='list'>"
-        // + "    <div class='expired' err-msg='認證過期'><span>peter334@mitake.com.tw</span><img src='images/ldap/icon_delete_email_gray.png'></div>"
-        + "    </div>"
+        + "    <div class='ldap-add' target='ldap-edit'>+ "+ $.i18n.getString(str.add[+isSso]) +"</div>"
+        + "    <div class='no-data index' target='ldap-edit' has-data='false'><div>"+ $.i18n.getString(str.noData1[+isSso]) +"</div><div>"+ $.i18n.getString(str.noData2[+isSso]) +"</div></div>"
+        + "    <div class='list index' has-data='true'></div>"
         + "</section>"
-        + "<section class='ldap-create' role='page'>"
-        + "    <section class='icon-shield add'></section>"
-        + "    <div class='title1'>"+ $.i18n.getString("ACCOUNT_BINDING_BINDING_NEW_ACCOUNT") +"</div>"
-        + "    <div class='title2'>"+ $.i18n.getString("ACCOUNT_BINDING_ENTER_ACCOUNT_PASSWORD") +"</div>"
-        + "    <section class='create-form'>"
+        + "<section class='ldap-edit' role='page' ldap-type='add'>"
+        + "    <section class='icon-shield'></section>"
+        + "    <div class='title one' content='新增LDAP帳號'></div>"
+        + "    <div class='title two' content='請輸入你的LDAP帳號及密碼'></div>"
+        + "    <section class='edit-form'>"
         + "    <div class='input-block email'><input placeholder='email'></div>"
         + "    <div class='input-block password'><input placeholder='password' type='password'></div>"
         + "    <div class='submit-block'>"

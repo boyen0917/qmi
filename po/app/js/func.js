@@ -727,7 +727,7 @@ timelineSwitch = function (act,reset,main,noPR){
             .find("section.ldap-setting-header").html($.i18n.getString(titleStr)).show();
 
 
-            QmiGlobal.ldapSetting.init();
+            QmiGlobal.module.ldapSetting.init();
 
 
             switchDeferred.resolve({ act: "system-ldapSetting"});
@@ -7469,23 +7469,24 @@ zoomIn = function (target)
 getGroupList = function(){
     var groupsDeferred = $.Deferred();
 
-    // if(window.groupZero !== true) {
-    //     groupsDeferred.resolve([]);
-    //     return groupsDeferred.promise();
-    // }
-
     new QmiAjax({
         apiName: "groups",
         isPublicApi: true
     }).success(function(apiData){
-        var 
-        allGroupList = apiData.gl || [],
-        allGlDeferred = $.Deferred();
-        clTokenDefArr = [];
+        var allGroupList = apiData.gl || [],
+            allGlDeferred = $.Deferred(),
+            cloudListArr = (apiData.cl || []),
+            clTokenDefArr = [];
 
-        if(apiData.cl !== undefined && apiData.cl.length !== 0) {
+        // 加入ldap團體列表
+        (apiData.ol || []).forEach(function(ldapCloud) {
+            QmiGlobal.ldapClouds[ldapCloud.ci] = ldapCloud;
+            cloudListArr[cloudListArr.length] = ldapCloud;
+        });
+
+        if(cloudListArr.length !== 0) {
             
-            clTokenDefArr = apiData.cl.reduce(function(defArr,item){
+            clTokenDefArr = cloudListArr.reduce(function(defArr,item){
                 defArr.push( getCloudToken(item));
                 return defArr;
             }, []);
@@ -7494,7 +7495,7 @@ getGroupList = function(){
 
                 var cloudGlDefArr = [];
                 // 取得每個私雲得團體列表
-                apiData.cl.forEach(function(cloudObj){
+                cloudListArr.forEach(function(cloudObj){
                     cloudGlDefArr.push(getCloudGroup(cloudObj,allGroupList));
                 })
 
