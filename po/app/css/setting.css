@@ -1188,7 +1188,7 @@ input[type=radio] {
     white-space: nowrap;
 }
 
-#view-ldap-setting .list > div.expired {color: #e66161;}
+#view-ldap-setting .list > div.expired {color: #e66161; cursor: pointer;}
 
 #view-ldap-setting.cover:before.back {
     content: url(../images/spinner.gif);

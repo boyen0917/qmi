@@ -365,16 +365,19 @@ $(function(){
 	// 	});
 	// });
 	
-	//更換團體
+	//更換團體 sm-group-area有兩個地方有綁定事件
 	$(document).on("click",".sm-group-area.enable",function(){
-
+		var self = this;
 		$(".sm-group-area").removeClass("active").removeClass("enable");
-		$(this).addClass("active");
+		// $(self).addClass("active");
 
 		//指定gi
 		timelineChangeGroup($(this).attr("data-gi")).done(function(){
+			// 保險起見再active一次
+			$(self).addClass("active");
 			// 移轉 
-        	if(QmiGlobal.groups[$(this).attr("data-gi")].isRefreshing === true) return;
+			var groupObj = QmiGlobal.groups[$(this).attr("data-gi")];
+        	if(groupObj.isRefreshing || groupObj.isReAuthUILock) return;
 
 			//updatePollingCnts
         	updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));

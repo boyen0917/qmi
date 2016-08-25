@@ -318,7 +318,7 @@ timelineChangeGroup = function (thisGi) {
 
     // 私雲轉移中
     var timelineDom = $(".gm-content");
-    if(QmiGlobal.groups[thisGi].isRefreshing === true) {
+    if(QmiGlobal.groups[thisGi].isRefreshing || QmiGlobal.groups[thisGi].isReAuthUILock) {
         // 還是要變換團體名稱 及 currentGi 解除屏蔽時要用
         gi = QmiGlobal.currentGi = thisGi;
 
@@ -329,6 +329,9 @@ timelineChangeGroup = function (thisGi) {
         timelineDom
         .find(".refresh-lock").show().end()
         .find(".gm-content-body").hide();
+
+        if(QmiGlobal.groups[thisGi].isReAuthUILock) timelineDom.find(".refresh-lock > div").hide();
+        else timelineDom.find(".refresh-lock > div").show();
 
         $(".sm-group-area").addClass("enable");
 
@@ -354,7 +357,15 @@ timelineChangeGroup = function (thisGi) {
         }
 
 
-        comboDeferred.done(function(){
+        comboDeferred.done(function(rspObj){
+            if((rspObj || {}).isSuccess === false 
+                || QmiGlobal.groups[thisGi].isRefreshing
+                || QmiGlobal.groups[thisGi].isReAuthUILock
+            ) {
+                // 再做一次 才會有屏蔽的ui效果
+                // timelineChangeGroup(thisGi);
+                return;
+            }
             //指定gi
             setThisGroup(thisGi);
 
@@ -5027,6 +5038,7 @@ addSideMenuGroupUI = function(key,groupObj){
             '   <div>' + $.i18n.getString("COMPOSE_N_MEMBERS", groupObj.cnt ) + '</div>' + 
             '</div>' +
             '<div class="sm-count" style="display:none"></div>' +
+            '<span class="auth-lock-text">認證過期</span>' +
         '</div>'
     );
 

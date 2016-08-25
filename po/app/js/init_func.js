@@ -114,6 +114,7 @@ $(function(){
 
             }else{    
                 comboDeferred.resolve({
+                    isSuccess: false,
                     status: false,
                     thisGi: thisGi,
                     data: data
@@ -214,7 +215,7 @@ $(function(){
             //清除timeline無資料旗標
             $(".feed-subarea.no-data").removeClass("no-data");
 
-            //替換該團體的畫面 做完做updateTab
+            //替換該團體的畫面 裡面會做updateTab 打api
             updateGroupAllInfoDom( thisGi );
 
         } catch(e){

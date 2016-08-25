@@ -459,6 +459,11 @@ QmiGlobal.module.ldapSetting = {
             html: self.html()
         });
 
+        // 防止 reAuthUILock
+        $("#page-group-main .gm-content").find(".refresh-lock").hide().end()
+        .find(".gm-header-right").show().end()
+        .find(".gm-content-body").show();
+
 
         if($("#view-ldap-setting").length !== 0) $("#view-ldap-setting").remove();
         $("#page-group-main .subpage-ldapSetting").append(self.view);
@@ -483,7 +488,7 @@ QmiGlobal.module.ldapSetting = {
                     jqElem: self.view.find(".ldap-edit button.cancel"), 
                     eventArr: ["click"],
                 },{
-                    veId: "list-delete", 
+                    veId: "list-action", 
                     jqElem: self.view.find(".ldap-list .list"), 
                     eventArr: ["click"],
                 }
@@ -541,11 +546,24 @@ QmiGlobal.module.ldapSetting = {
                 break;
 
             // 解除綁定
-            case "click:list-delete":
-                var target = $(event.detail.target),
-                    accountDom = target.parent();
+            case "click:list-action":
+                var targetDom = $(event.detail.target),
+                    accountDom = targetDom.parent();
 
-                if(target.hasClass("unbind-img")) {
+                console.log("targetDom", targetDom);
+                console.log("accountDom", accountDom);
+                // 重新驗證
+                if( (accountDom.hasClass("expired") || targetDom.hasClass("expired"))
+                    && targetDom.hasClass("unbind-img") === false
+                ) {
+                    self.clearForm();
+                    self.view.find(".ldap-edit").attr("ldap-type", "check")
+                    .find(".input-block.email input").val((accountDom.data("cloud-data") || targetDom.data("cloud-data")).id);
+
+                    self.changePage("ldap-edit");
+
+                // 點選刪除
+                } else if(targetDom.hasClass("unbind-img")) {
                     self.view.find(".ldap-edit")
                     .attr("ldap-type", "delete")
                     .find(".input-block.email input").val(accountDom.data("cloud-data").id);
@@ -571,11 +589,15 @@ QmiGlobal.module.ldapSetting = {
             isPublicApi: true,
         }).success(function(rspObj) {
             var ldapList = rspObj.cl || [];
+            var expireObj = {};
+
+            if(rspObj.tp === 2) expireObj = self.expireChk(ldapList);
+
             var container = self.view.find(".ldap-list .list");
             container.html("");
 
             ldapList.forEach(function(item) {
-                var account = $("<div err-msg='"+ $.i18n.getString("ACCOUNT_BINDING_AUTHORIZATION_EXPIRED") +"'>"
+                var account = $("<div "+ (expireObj[item.ci] ? "class='expired'" : "") +" err-msg='"+ $.i18n.getString("ACCOUNT_BINDING_AUTHORIZATION_EXPIRED") +"'>"
                      + "<span>"+ item.id +"</span><span class='unbind-img'></span>"
                      + "</div>");
 
@@ -589,6 +611,24 @@ QmiGlobal.module.ldapSetting = {
         }).complete(getListDef.resolve);
 
         return getListDef.promise();
+    },
+
+    expireChk: function(ldapList) {
+        var self = this;
+        var expireObj = {};
+
+        ldapList.forEach(function(ldapData) {
+            var cloudData = QmiGlobal.clouds[ldapData.ci];
+            if(cloudData === undefined) return;
+            // 判斷過期;
+            if(cloudData.et - (new Date().getTime()) < 0) {
+                expireObj[cloudData.ci] = true;
+
+                // 順便做lock
+                QmiGlobal.module.reAuthUILock.lock(cloudData);
+            }
+        });
+        return expireObj;
     },
 
     add: function() {
@@ -703,7 +743,7 @@ QmiGlobal.module.ldapSetting = {
                 var errMsg = $.i18n.getString("COMMON_UNKNOWN_ERROR");
             }
 
-            this.clearForm();
+            self.clearForm();
             msgShowDef.done(function(){toastShow(errMsg)});
         }).always(function() {
             setTimeout(function() {
@@ -721,6 +761,66 @@ QmiGlobal.module.ldapSetting = {
                 msg: msg
             }
         }
+    },
+
+    check: function() {
+        var self = this;
+        var msgShowDef = $.Deferred();
+
+        var self = this, ldapCi;
+        // 判斷帳號是否存在ldapClouds中
+        Object.keys(QmiGlobal.ldapClouds).forEach(function(thisCi) {
+            if(QmiGlobal.ldapClouds[thisCi].id === self.inputAccount) ldapCi = thisCi;
+        });
+
+        var ldapData = QmiGlobal.ldapClouds[ldapCi];
+
+        self.view.addClass("cover");
+
+        new QmiAjax({
+            url: "https://"+ ldapData.cl +"/apiv1/sso/"+ ldapData.ci +"/auth",
+            specifiedHeaders: {li: lang},
+            method: "put",
+            errHide: true,
+            body: {
+                id: self.inputAccount,
+                dn: QmiGlobal.device,
+                pw: QmiGlobal.aesCrypto.enc(self.inputPassword, self.inputAccount.substring(0,16))
+            }
+        }).success(function(authObj) {
+            console.log("success", authObj);
+            // 設定新at , et
+            QmiGlobal.clouds[ldapData.ci].at = authObj.at;
+            QmiGlobal.clouds[ldapData.ci].et = authObj.et;
+
+            QmiGlobal.module.reAuthUILock.unlock(ldapData);
+
+            msgShowDef.done(function(){
+                self.changePage("ldap-list");
+
+                self.view.removeClass("cover");
+                toastShow(authObj.rsp_msg);
+            });
+
+        }).error(function(rspData) {
+            console.log("error", rspObj);
+            try {
+                var errMsg = JSON.parse(rspData.errData.responseText).rsp_msg;
+            } catch(e) {
+                var errMsg = $.i18n.getString("COMMON_UNKNOWN_ERROR");
+            }
+
+            msgShowDef.done(function(){
+                toastShow(errMsg);
+                self.view.removeClass("cover");
+            });
+
+        }).complete(function() {
+            setTimeout(function() {
+                msgShowDef.resolve();
+            }, 1000);
+        })
+
     },
 
     delete: function() {
@@ -782,7 +882,6 @@ QmiGlobal.module.ldapSetting = {
             });
             
         }).error(function(failData) {
-            console.log("delete fail", failData);
             try {
                 var errMsg = JSON.parse(failData.errData.responseText).rsp_msg;
             } catch(e) {

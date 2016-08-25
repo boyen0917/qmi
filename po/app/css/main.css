@@ -986,6 +986,7 @@ img.auo {
 	width: 20px;
 	top: 38px;
 	left: 40px;
+	z-index: 10;
 }
 
 .sm-group-area-l {
@@ -994,7 +995,29 @@ img.auo {
 	margin: 10px;
 	width: 40px;
 	border-radius: 8px;
-	/*border: 1px solid rgb(240,240,240);*/
+	position: relative;
+}
+
+.sm-group-area-l.group-pic.auth-lock:before {
+    content: "";
+    position: absolute;
+    height: 30px;
+    width: 30px;
+    background: url(../images/ldap/icon_approvement.png);
+    background-size: 100%;
+    left: 5px;
+    top: 5px;
+    z-index: 10;
+}
+
+.sm-group-area-l.group-pic.auth-lock:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(50,50,50,0.5);
+    top: 0;
+    left: 0;
 }
 
 .sm-group-area-r.sm-group-content-style div:nth-child(2) { font-size: 11px; }
@@ -1019,8 +1042,21 @@ img.auo {
 	object-fit: cover;
 }
 
-.sm-group-area .sm-count {
-	margin: 20px 5px 0px 0px;
+.sm-group-area .sm-count {margin: 20px 5px 0px 0px;}
+.sm-group-area.active span.auth-lock-text {background: #141414;}
+.sm-group-area span.auth-lock-text {
+    position: absolute;
+    width: 53px;
+    background: #2a2a2a;
+    color: #e04848;
+    font-size: 12px;
+    height: 30px;
+    line-height: 30px;
+    top: 18px;
+    right: 4px;
+    text-align: center;
+    display: none;
+    letter-spacing: -1px;
 }
 
 
@@ -1455,7 +1491,7 @@ img.auo {
     width: 100%;
     height: 100vh;
     background: rgba(10,10,10,0.8);
-    z-index: 100;
+    z-index: 110;
     display: none;
 }
 
@@ -5602,7 +5638,6 @@ img.vdo-default:before {}
     width: 280px;
     height: 440px;
     margin: calc(50vh - 250px) auto;
-
     color: #999;
     padding: 20px;
     box-sizing: border-box;
@@ -5697,7 +5732,6 @@ img.vdo-default:before {}
 #view-auth-manually .action .cancel {left: 0;}
 #view-auth-manually .action .submit {right: 0;}
 #view-auth-manually .action .submit.ready {background: #21ca82;}
-
 
 #view-auth-manually .footer {
     color: #e24e54;

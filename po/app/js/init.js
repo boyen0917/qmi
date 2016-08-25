@@ -635,15 +635,32 @@ QmiAjax.prototype = {
 		var self = this,
 			deferred = $.Deferred();
 
+
+		// 先檢查是否按取消
+		try { if(QmiGlobal.clouds[cloudData.ci].isReAuthCancel === true) {
+			deferred.resolve({
+				isSuccess: false,
+				isSso: true,
+				isReAuth: true,
+				data: {isCancel: true}
+			})
+
+			return deferred.promise();
+		}} catch(e) {}// do nothing 
+
 		// auth lock
 		cns.log("reAuth starts", apiName);
 		
-		// reAuth Lock
+		// reAuth Lock 設定前先解除之前的pending
+		// if(QmiGlobal.reAuthLockDef.then instanceof Function) QmiGlobal.reAuthLockDef.resolve();
 		QmiGlobal.reAuthLockDef = $.Deferred();
 
 		// 需要輸入密碼
 		if((cloudData || {}).tp === 1) {
 			// console.log("此私雲需要輸入密碼");
+			// 把這私雲的所有團體 加上lock
+			QmiGlobal.module.reAuthUILock.lock(cloudData);
+
 			QmiGlobal.module.reAuthManually.init({
 				reAuthDef: deferred,
 				cloudData: cloudData
@@ -714,8 +731,8 @@ QmiAjax.prototype = {
 			$(".ajax-screen-lock").hide();
 		}
 
-		//不做錯誤顯示 polling也不顯示 isReAuthCancel 手動輸入密碼的私雲重新頁面 按取消就不顯示錯誤訊息
-		if(ajaxArgs.errHide || ajaxArgs.noErr || isPolling || errData.isReAuthCancel === true) return false;
+		//不做錯誤顯示 polling也不顯示 isCancel 手動輸入密碼的私雲重新頁面 按取消就不顯示錯誤訊息
+		if(ajaxArgs.errHide || ajaxArgs.noErr || isPolling || errData.isCancel === true) return false;
 
 		//ajax逾時
 		if(errData.statusText == "timeout"){
@@ -754,7 +771,31 @@ QmiAjax.prototype = {
 
 } // end of QmiAjax
 
-//title
+QmiGlobal.module.reAuthUILock = {
+	currDataObj: {},
+	lock: function(cloudData) {
+		var groupListArea = $("#page-group-main .sm-group-list-area");
+		Object.keys(QmiGlobal.cloudGiMap).forEach(function(cgi) {
+			if(QmiGlobal.cloudGiMap[cgi].ci !== cloudData.ci) return;
+			QmiGlobal.groups[cgi].isReAuthUILock = true;
+
+			var groupDom = groupListArea.find(".sm-group-area[data-gi="+cgi+"]");
+			groupDom.find(".sm-group-area-l").addClass("auth-lock").end()
+			.find("span.auth-lock-text").show();
+ 		});
+	},
+	unlock: function(cloudData) {
+		var groupListArea = $("#page-group-main .sm-group-list-area");
+		Object.keys(QmiGlobal.cloudGiMap).forEach(function(cgi) {
+			if(QmiGlobal.cloudGiMap[cgi].ci !== cloudData.ci) return;
+			QmiGlobal.groups[cgi].isReAuthUILock = false;
+
+			var groupDom = groupListArea.find(".sm-group-area[data-gi="+cgi+"]");
+			groupDom.find(".sm-group-area-l").removeClass("auth-lock").end()
+			.find("span.auth-lock-text").hide();
+ 		});
+	}
+}
 
 //-----------------------------------------
 
@@ -892,15 +933,26 @@ QmiGlobal.module.reAuthManually = {
 
 			case "click:cancel":
 				// sso 用戶敢按取消就登出
-				if(QmiGlobal.auth.isSso) logout();
-
+				if(QmiGlobal.auth.isSso) {
+					logout();
+				} else {
+					// 打開timeline lock
+					// 從QmiAjax的reAuth 做 lock了
+					// 在私雲加入cancel chk 讓其他api停止動作
+					QmiGlobal.clouds[self.cloudData.ci].isReAuthCancel = true;
+					// 避免重複顯示認證頁面 3秒後解開 但要注意polling是否觸發認證畫面
+					console.log("計算兩秒");
+					setTimeout(function() {console.log("解開");QmiGlobal.clouds[self.cloudData.ci].isReAuthCancel = false}, 2000);
+					
+					// 所以要再點一次timelineChangeGroup 做lock的ui顯示
+					timelineChangeGroup(gi)
+				}
+				// reAuthDef from QmiAjax 
 				self.reAuthDef.resolve({
 					isSuccess: false,
 					isSso: true,
 					isReAuth: true,
-					data: {
-						isReAuthCancel: true
-					}
+					data: {isCancel: true}
 				})
 				self.remove();
 				break;
@@ -928,9 +980,7 @@ QmiGlobal.module.reAuthManually = {
 
     	if(ssoId === "" || ssoPw === "") return;
 
-    	self.view.find(".container")
-    	.attr("msg", $.i18n.getString("WEBONLY_AUTH_LOADING"))
-    	.addClass("loading");
+    	self.view.find(".container").addClass("loading");
 
     	$.ajax({
 			url: "https://"+ cData.cl +"/apiv1/sso/"+ cData.ci +"/auth",
@@ -950,10 +1000,9 @@ QmiGlobal.module.reAuthManually = {
 			}
 
 			if(data.status !== 200 || newAuth === false) {
-				console.log("login fail", data);
 
 				self.view.find(".container").removeClass("loading").end()
-				.find("input.email").val("")
+				.find("input.email").val("").end()
 				.find("input.password").val("");
 
 				toastShow($.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"));
@@ -961,6 +1010,11 @@ QmiGlobal.module.reAuthManually = {
 				// 設定新at , et
 				QmiGlobal.clouds[cData.ci].at = newAuth.at;
 				QmiGlobal.clouds[cData.ci].et = newAuth.et;
+
+				QmiGlobal.module.reAuthUILock.unlock(self.cloudData);
+
+				// 重新執行timelineChangeGroup 讓畫面開啟
+				timelineChangeGroup(gi);
 
 				// reAuth 結束
 				setTimeout(function() {
