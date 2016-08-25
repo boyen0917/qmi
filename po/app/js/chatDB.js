@@ -40,9 +40,9 @@ function onReceivePollingChatMsg ( msgs ){
 		roomObj.el.forEach( function(msgObj,i){
 			msgObj.cn = roomObj.cn;
 			
-			if(msgObj.ml[0].tp == 22){
-				updateChatList(thisGi);
-			}
+			// if(msgObj.ml[0].tp == 22){
+			// 	updateChatList(thisGi);
+			// }
 			if(msgObj.hasOwnProperty("meta")){
 
 				//add to db
