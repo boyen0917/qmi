@@ -15,7 +15,7 @@ var ui,
 	clearChatTimer,
 	
 	//HiCloud
- 	base_url = "https://ap.qmi.emome.net/apiv1/",
+ 	base_url = "https://qmi17.mitake.com.tw/apiv1/",
  	// base_url = "https://apserver.mitake.com.tw/apiv1/",
 
  	
