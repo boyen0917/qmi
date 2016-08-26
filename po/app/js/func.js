@@ -63,18 +63,6 @@ logout = function(){
         method: "delete"
     }).done(function(data){
 
-    // var api_name = "logout";
-    // var headers = {
-    //     ui: ui,
-    //     at: at,
-    //     li: lang
-    // };
-    // var method = "delete";
-
-    // ajaxDo(api_name,headers,method,true).complete(function(data){
-        // localStorage.removeItem("_loginAutoChk");
-     //    localStorage.removeItem("_loginData");
-
         // 關閉移轉團體所有聊天室
         (Object.keys(windowList) || []).forEach(function(thisCi){
             windowList[thisCi].close();
@@ -589,7 +577,12 @@ timelineSwitch = function (act,reset,main,noPR){
             .find(".setting-title").text($.i18n.getString("PERSONAL_INFORMATION"));
             
             userInfoSetting();
-            
+
+            // 個人設定、系統設定都要打開refresh-lock 
+            $("#page-group-main .gm-content").find(".refresh-lock").hide().end()
+            .find(".gm-header-right").show().end()
+            .find(".gm-content-body").show();
+
             switchDeferred.resolve({ act: "user-setting"});
             break;  
         case "system-setting":
@@ -601,6 +594,11 @@ timelineSwitch = function (act,reset,main,noPR){
             .find("section.ldap-setting-header").hide().end()
             .find(".setting-icon").attr("src","images/settings.png").end()
             .find(".setting-title").text($.i18n.getString("LEFT_SYSTEM_SETTING"));
+            
+            // 個人設定、系統設定都要打開refresh-lock 
+            $("#page-group-main .gm-content").find(".refresh-lock").hide().end()
+            .find(".gm-header-right").show().end()
+            .find(".gm-content-body").show();
             
             systemSetting();
 

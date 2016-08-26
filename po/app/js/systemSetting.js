@@ -508,7 +508,7 @@ QmiGlobal.module.ldapSetting = {
                 var pageName = targetDom.attr("target");
 
                 // sso登入 不去綁定帳號頁面
-                if(self.isSso && pageName === "ldap-edit") return;
+                if(QmiGlobal.auth.isSso && pageName === "ldap-edit") return;
 
                 if(pageName === "ldap-edit") {
                     self.clearForm();
@@ -550,13 +550,12 @@ QmiGlobal.module.ldapSetting = {
                 var targetDom = $(event.detail.target),
                     accountDom = targetDom.parent();
 
-                console.log("targetDom", targetDom);
-                console.log("accountDom", accountDom);
+                self.clearForm();
+
                 // 重新驗證
                 if( (accountDom.hasClass("expired") || targetDom.hasClass("expired"))
                     && targetDom.hasClass("unbind-img") === false
                 ) {
-                    self.clearForm();
                     self.view.find(".ldap-edit").attr("ldap-type", "check")
                     .find(".input-block.email input").val((accountDom.data("cloud-data") || targetDom.data("cloud-data")).id);
 
@@ -564,9 +563,11 @@ QmiGlobal.module.ldapSetting = {
 
                 // 點選刪除
                 } else if(targetDom.hasClass("unbind-img")) {
-                    self.view.find(".ldap-edit")
-                    .attr("ldap-type", "delete")
-                    .find(".input-block.email input").val(accountDom.data("cloud-data").id);
+                    self.view.find(".ldap-edit").attr("ldap-type", "delete")
+                    .find("div.input-block.email input").val(accountDom.data("cloud-data").id);
+
+                    if(QmiGlobal.auth.isSso)
+                        self.view.find("section.ldap-edit div.title.two").attr("pi", accountDom.data("cloud-data").pi);
 
                     self.changePage("ldap-edit");
                 }
@@ -592,13 +593,17 @@ QmiGlobal.module.ldapSetting = {
             var expireObj = {};
 
             if(rspObj.tp === 2) expireObj = self.expireChk(ldapList);
+            if(rspObj.tp === 1) {
+                self.view.find(".ldap-add").hide();
+                ldapList = [rspObj];
+            } else self.view.find(".ldap-add").show();
 
             var container = self.view.find(".ldap-list .list");
             container.html("");
 
             ldapList.forEach(function(item) {
                 var account = $("<div "+ (expireObj[item.ci] ? "class='expired'" : "") +" err-msg='"+ $.i18n.getString("ACCOUNT_BINDING_AUTHORIZATION_EXPIRED") +"'>"
-                     + "<span>"+ item.id +"</span><span class='unbind-img'></span>"
+                     + "<span>"+ (QmiGlobal.auth.isSso ? item.pi : item.id) +"</span><span class='unbind-img'></span>"
                      + "</div>");
 
                 container.append(account);
@@ -752,8 +757,6 @@ QmiGlobal.module.ldapSetting = {
             }, 1000);
         });
 
-        
-
         function errObjInit(errData, msg) {
             return {
                 isSuccess: false,
@@ -826,11 +829,15 @@ QmiGlobal.module.ldapSetting = {
     delete: function() {
         var self = this, ldapCi;
         // 判斷帳號是否存在ldapClouds中
-        Object.keys(QmiGlobal.ldapClouds).forEach(function(thisCi) {
-            if(QmiGlobal.ldapClouds[thisCi].id === self.inputAccount) ldapCi = thisCi;
-        });
-
-        var ldapData = QmiGlobal.ldapClouds[ldapCi];
+        if(QmiGlobal.auth.isSso) {
+            var ldapData = QmiGlobal.clouds[Object.keys(QmiGlobal.clouds)[0]];
+        } else {
+            Object.keys(QmiGlobal.ldapClouds).forEach(function(thisCi) {
+                if(QmiGlobal.ldapClouds[thisCi].id === self.inputAccount) ldapCi = thisCi;
+            });
+            var ldapData = QmiGlobal.ldapClouds[ldapCi];
+        }
+            
         // if(ldapCi === undefined) {
         //     toastShow(desc)
         // }
@@ -906,6 +913,9 @@ QmiGlobal.module.ldapSetting = {
 
         self.inputAccount = "";
         self.inputPassword = "";
+
+        if(QmiGlobal.auth.isSso) 
+            self.view.find("section.ldap-edit div.title.two").attr("pi", "");
     },
 
     changePage: function(pageName) {
@@ -917,7 +927,6 @@ QmiGlobal.module.ldapSetting = {
                 self.getList();
                 break;
             case "ldap-edit":
-                
                 // title                
                 var editPageDom = self.view.find(".ldap-edit");
                 editPageDom.find(".title.one").attr("style", "display:none").end()
@@ -927,7 +936,6 @@ QmiGlobal.module.ldapSetting = {
 
         self.view.find("[role=page]").hide().end()
         .find("." + pageName + "[role=page]").fadeIn(100);
-        console.log("pageName", pageName);
     },
 
     strMap: {
@@ -952,7 +960,12 @@ QmiGlobal.module.ldapSetting = {
         + "    <div class='title one add' content='"+ $.i18n.getString("ACCOUNT_BINDING_BINDING_NEW_ACCOUNT") +"'></div>"
         + "    <div class='title one check' content='"+ $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") +"'></div>"
         + "    <div class='title one delete' content='"+ $.i18n.getString("ACCOUNT_BINDING_DISCONNECT_ACCOUNT") +"'></div>"
-        + "    <div class='title two' content='"+ $.i18n.getString("ACCOUNT_BINDING_ENTER_ACCOUNT_PASSWORD") +"'></div>"
+        +   (function() {
+                var string = "ACCOUNT_BINDING_ENTER_ACCOUNT_PASSWORD";
+                if(QmiGlobal.auth.isSso) string = "ACCOUNT_BINDING_DISCONNECT_QMI_ACCOUNT_CONFIRM";
+                
+                return "<div class='title two' content='"+ $.i18n.getString(string) +"'></div>";
+            })()
         + "    <section class='edit-form'>"
         + "    <div class='input-block email'><input placeholder='email'></div>"
         + "    <div class='input-block password'><input placeholder='password' type='password'></div>"

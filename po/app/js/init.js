@@ -885,6 +885,11 @@ QmiGlobal.module.reAuthManually = {
 
 	reAuthDef: {}, // QmiAjax裡面的reAuth deferred 還在等待完成
 
+	getView: function(veId) {
+		var viewId = this.id +":"+ veId;
+		return QmiGlobal.eventDispatcher.viewMap[viewId].jqElem;
+	},
+
 	init: function(argObj) {
     	var self = this;
 
@@ -917,6 +922,10 @@ QmiGlobal.module.reAuthManually = {
     			veId: "submit", 
     			jqElem: self.view.find("span.submit"), 
     			eventArr: ["click"],
+    		}, {
+    			veId: "input", 
+    			jqElem: self.view.find("div.input-wrap input"), 
+    			eventArr: ["input"],
     		}
     	], self, true);
     },
@@ -940,9 +949,8 @@ QmiGlobal.module.reAuthManually = {
 					// 從QmiAjax的reAuth 做 lock了
 					// 在私雲加入cancel chk 讓其他api停止動作
 					QmiGlobal.clouds[self.cloudData.ci].isReAuthCancel = true;
-					// 避免重複顯示認證頁面 3秒後解開 但要注意polling是否觸發認證畫面
-					console.log("計算兩秒");
-					setTimeout(function() {console.log("解開");QmiGlobal.clouds[self.cloudData.ci].isReAuthCancel = false}, 2000);
+					// 避免重複顯示認證頁面 2秒後解開 但要注意polling是否觸發認證畫面
+					setTimeout(function() {QmiGlobal.clouds[self.cloudData.ci].isReAuthCancel = false}, 2000);
 					
 					// 所以要再點一次timelineChangeGroup 做lock的ui顯示
 					timelineChangeGroup(gi)
@@ -955,6 +963,19 @@ QmiGlobal.module.reAuthManually = {
 					data: {isCancel: true}
 				})
 				self.remove();
+				break;
+
+			case "input:input":
+				var submitDom = self.view.find("div.action span[viewid=submit]");
+	    		self.ssoId = self.getView("input")[0].value;
+	    		self.ssoPw = self.getView("input")[1].value;
+	    		
+
+		    	if(self.ssoId === "" || self.ssoPw === "") {
+		    		submitDom.removeClass("ready");
+		    		return;
+		    	} else submitDom.addClass("ready");
+
 				break;
 		}
 	},
@@ -974,11 +995,10 @@ QmiGlobal.module.reAuthManually = {
 
     submit: function() {
     	var self = this,
-    		ssoId = self.view.find("input.email").val(),
-    		ssoPw = self.view.find("input.password").val(),
+    		submitDom = self.getView("submit"),
     		cData = self.cloudData;
 
-    	if(ssoId === "" || ssoPw === "") return;
+    	if(submitDom.hasClass("ready") === false) return;
 
     	self.view.find(".container").addClass("loading");
 
@@ -986,9 +1006,9 @@ QmiGlobal.module.reAuthManually = {
 			url: "https://"+ cData.cl +"/apiv1/sso/"+ cData.ci +"/auth",
 			headers: {li: lang},
 			data: JSON.stringify({
-				id: self.view.find("input.email").val(),
+				id: self.ssoId,
 			    dn: QmiGlobal.device,
-			    pw: QmiGlobal.aesCrypto.enc(self.view.find("input.password").val(), self.view.find("input.email").val().substring(0,16)),
+			    pw: QmiGlobal.aesCrypto.enc(self.ssoPw, self.ssoId.substring(0,16)),
 			}),
 			type: "put",
 		}).complete(function(data){
@@ -1001,9 +1021,9 @@ QmiGlobal.module.reAuthManually = {
 
 			if(data.status !== 200 || newAuth === false) {
 
-				self.view.find(".container").removeClass("loading").end()
-				.find("input.email").val("").end()
-				.find("input.password").val("");
+				self.view.find(".container").removeClass("loading");
+
+				self.getView("input").val("");
 
 				toastShow($.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"));
 			} else {
@@ -1084,14 +1104,11 @@ QmiGlobal.module.systemPopup = {
 		switch(eventCase) {
 			case "click:close":
 				$("#userInfo .sm-person-area-r").find("img").toggle();
-    			self.view.remove();
 				break;
 
 			case "click:ldapSetting":
 				// func.js  timelineSwitch  system-ldap-setting
 				// QmiGlobal.ldapSetting.init();
-
-    			self.view.remove();
 				break;
 
 			case "click:logout":
@@ -1103,6 +1120,7 @@ QmiGlobal.module.systemPopup = {
 				});
 				break;
 		}
+		self.view.remove();
     },
 
     html: function() {
