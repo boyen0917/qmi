@@ -461,6 +461,7 @@ function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
 
 		getDBMsg(giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ).done(deferred.resolve);
 	} else {
+
 		deferred.resolve();
 	}
 

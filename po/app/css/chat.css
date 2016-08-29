@@ -457,6 +457,10 @@ body {
 	max-width: 76%;
 }
 
+.chat-msg-container-left .chat-file {
+	background-color: #72DAFD;
+}
+
 .chat-msg-container-left .download-link{
 	float: left;
 }
