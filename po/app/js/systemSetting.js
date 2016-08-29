@@ -91,7 +91,7 @@ function avatarPopup() {
             '</div>'+                           
     '</div>';
     
-    var imgPopup = $(this.html);
+    var imgPopup = $(html);
     imgPopup._i18n();
     $("body").append(imgPopup);
     var userAvatar = $('.user-avatar-confirm');
