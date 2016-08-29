@@ -9,6 +9,17 @@ onCheckVersionDone = function(needUpdate){
     	QmiGlobal.auth = $.lStorage("_periodicallyReloadAuth");	
     	localStorage.removeItem("_periodicallyReloadAuth");
 
+    	test = $.lStorage("test");
+    	$.each(test,function(key,value){
+            if(!value.closed){
+
+				openChatWindow(value.gi,value.ci);
+
+				//$('.sm-small-area[data-sm-act="chat"]').trigger("click");
+            }
+        });
+    	localStorage.removeItem("test");
+
     	QmiGlobal.isPeriodicallyReload = true;
 
     	loginAction();

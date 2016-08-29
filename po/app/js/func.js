@@ -383,6 +383,17 @@ timelineSwitch = function (act,reset,main,noPR){
 
     // 定期重新整理 選擇在這裡做
     if(window.periodicallyReloadFlag === true && noPR !== true) {
+        
+        var wl = {};
+        $.each(windowList,function(key,value){
+            wl[key] = {
+                closed : value.closed,
+                gi : value.gi,
+                ci : value.ci,
+                ui : value.ui,
+                at : value.at
+            }
+        });
         // 設定當前gi
         QmiGlobal.auth.prObj = {
             gi: QmiGlobal.currentGi,
@@ -392,7 +403,7 @@ timelineSwitch = function (act,reset,main,noPR){
                 main: main
             }
         };
-
+        $.lStorage("test",wl);
         $.lStorage("_periodicallyReloadAuth", QmiGlobal.auth);
         location.reload();
         return;

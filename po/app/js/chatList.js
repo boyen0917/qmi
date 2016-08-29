@@ -1,6 +1,6 @@
 // $(function(){ 
 // });
-
+var test;
 var windowList = {};
 var sortRoomListTimeout = 700;
 
@@ -320,6 +320,7 @@ function showChatList(){
 
 function deleteRoom ( deleteRow ){
 	var ci = deleteRow.data("id");
+	console.log(ci);
 	var api_name = "groups/"+ gi +"/chats/"+ci;
 
 	var headers = {
@@ -334,6 +335,7 @@ function deleteRoom ( deleteRow ){
 			//delete room succ
 			updateChatList(gi);
 			toastShow( $.i18n.getString("CHAT_DELETE_CHATROOM_SUCC") );
+			windowList[ci].close();
 		} else {
 			//delete room fail
 			toastShow( $.i18n.getString("CHAT_DELETE_CHATROOM_FAIL") );
@@ -342,9 +344,10 @@ function deleteRoom ( deleteRow ){
 }
 
 function openChatWindow ( giTmp, ci ){
+
 	var chatListDiv = $(".subpage-chatList");
 	var topListDom = $(".top-chatList");
-	clearChatListCnt( giTmp, ci );
+	
 	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
 		// windowList[ci].focus();
 	} else {
@@ -359,7 +362,13 @@ function openChatWindow ( giTmp, ci ){
 		QmiGlobal.windowListCiMap[gi].push(ci);
 
 		$.lStorage( "_chatRoom", data );
-		windowList[ci] = window.open("chat.html", "_blank", "width=400, height=600");
+
+		if($.lStorage("test")){
+			windowList[ci] = window.open("", ci , "width=400, height=600");
+		}else{
+			clearChatListCnt( giTmp, ci );
+			windowList[ci] = window.open("chat.html", ci , "width=400, height=600");
+		}
 		
 		windowList[ci].chatAuthData = {
 			gi: 		window.gi,
@@ -368,6 +377,7 @@ function openChatWindow ( giTmp, ci ){
 			clouds: 	window.QmiGlobal.clouds,
 			cloudGiMap: window.QmiGlobal.cloudGiMap,
 		};
+
 		windowList[ci].chatList = {
 			roomAddTop : function (chatroomId) {
 				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
@@ -399,6 +409,11 @@ function openChatWindow ( giTmp, ci ){
 				chatroomDom.find(".name").html(roomName + " (" + number + ")");
 			}
 		}
+
+		//$.lStorage( "_chatAuthData", windowList[ci].chatAuthData );
+		//$.lStorage( "_chatList", windowList[ci].chatList);
+		//$.lStorage("groupci" , JSON.stringify(ci));
+
 	}
 	windowList[ci].focus();
 }
