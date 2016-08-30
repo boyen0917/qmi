@@ -588,6 +588,9 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			break;
 		case 1: // 圖
+			console.log(uploadObj);
+			console.log(oriObj);
+			console.log(tmbObj);
 			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s),
 				tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
 
@@ -617,7 +620,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			var video = document.createElement('video');
 			video.src = URL.createObjectURL(uploadObj.file);
 			video.onloadeddata = function() {
-				md = {l: video.duration * 1000};
+				md = {l: Math.floor(video.duration * 1000)};
 				mediaLoadDef.resolve();
 			}
 			break;

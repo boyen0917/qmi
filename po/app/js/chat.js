@@ -295,6 +295,7 @@ $(function(){
 
 				if (file.type.match(imageType)) {
 					var this_grid = showUnsendMsg("", 6);
+					console.log(this_grid.html());
 					scrollToBottom();
 
 					//編號 方便刪除
@@ -327,10 +328,15 @@ $(function(){
 
 					renderVideoFile(file, this_grid.find("div video"), function (videoTag) {
 						var parent = videoTag.parents(".msg-video");
-						parent.addClass("loaded");
+						
 						parent.find(".length").html(secondsToTime(videoTag[0].duration));
 						parent.find(".download").remove();
-						sendMsgVideo(this_grid);
+
+						if (! parent.hasClass("loaded")) {
+							parent.addClass("loaded");
+							sendMsgVideo(this_grid);
+						}
+						
 					}, function (videoTag) {
 						var parent = videoTag.parents(".msg-video");
 						parent.addClass("error");
@@ -342,100 +348,6 @@ $(function(){
 					this_grid.data("file-num", i).data("file", file);
 
 					sendMsgFile(this_grid);
-					// var uploadXhr;
-					
-					// this_grid.data("file-num", i).data("file", file)
-					// 		 .find(".chat-msg-load-error")
-					// 		 .removeClass("chat-msg-load-error").addClass("chat-msg-load");
-
-					// this_grid.find(".chat-file").after("<div class='progress-container'><progress " 
-					// 	+ " class='chat-upload-progress' value='0' ></progress><span class='upload-percent'>"
-					// 	+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
-
-					// this_grid.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-					// 	uploadXhr.abort();
-					// });
-
-					// qmiUploadFile({
-		   //              urlAjax: {
-		   //                  apiName: "groups/" + gi + "/files",
-		   //                  method: "post",
-		   //                  body: {
-		   //                      tp: 0,
-		   //                      ti: ti_chat,
-		   //                      pi: 0,
-		   //                      wm: 0,
-		   //                  }
-		   //              },
-		   //              tp: 0,
-		   //              hasFi: true,
-		   //              progressBar: function () {
-		   //              	uploadXhr = new window.XMLHttpRequest();
-					// 		uploadXhr.upload.addEventListener("progress", function(evt){
-					// 	      	if (evt.lengthComputable) {
-					// 	        	this_grid.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
-					// 		      	this_grid.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
-					// 	      	}
-					// 	    }, false);
-
-					// 	    return uploadXhr;
-		   //              },
-		   //              file: file,
-		   //              oriObj: {w: 1280, h: 1280, s: 0.9}
-		   //          }).done(function(response){
-		   //          	console.log(response);
-		   //          	// var this_grid = showUnsendMsg(response.data.fi, 26, file.name);
-		   //          	var chatData = this_grid.data("data");
-		   //          	var currentTime = new Date().getTime();
-						
-					// 	this_grid.data("file-num", i);
-					// 	this_grid.data("file", file);
-
-
-					// 	g_idb_chat_msgs.remove(chatData.ei);
-
-					// 	// tmpData.ml[0].c = data.fi;
-					// 	// tmpData.ml[0].p = pi;
-					// 	// //add new data to db & show
-					// 	var newData = {
-					// 		ei: chatData.ei,
-					// 		meta: {
-					// 			gu: g_group.gu,
-					// 			ct: currentTime
-					// 		},
-					// 		ml: [
-					// 			{
-					// 				tp: 26,
-					// 				c: response.data.fi,
-					// 				si: file.size,
-					// 				fn: file.name
-					// 			}
-					// 		],
-					// 		notSend: true
-					// 	};
-
-					// 	var node = {
-					// 		gi: gi,
-					// 		ci: ci,
-					// 		ei: chatData.ei,
-					// 		ct: currentTime,
-					// 		data: newData
-					// 	};
-					// 	this_grid.data("data", newData);
-					// 	//update db
-					// 	g_idb_chat_msgs.put(node, function(){
-					// 		sendMsgText(this_grid);
-					// 	});
-		   //          }).fail(function(data) {
-		   //          	this_grid.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-		   //          	this_grid.find(".progress-container").remove();
-		   //          });
-
-					// this_grid.find("div").html('<span>file not supported</span>');
-					// popupShowAdjust("",
-					// 	$.i18n.getString("COMMON_NOT_MP4_NOR_IMAGE"),
-					// 	$.i18n.getString("COMMON_OK")
-					// );
 				}
 			});
 
