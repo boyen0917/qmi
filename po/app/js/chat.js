@@ -1683,12 +1683,49 @@ function sendMsgText(dom) {
 
 		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
 
-		uploadGroupImage(gi, file, ti_chat, 0, ori_arr, tmb_arr, pi, function (data) {
-			if (data) {
+		dom.find(".msg-img").after("<div class='progress-container'><progress class='" 
+			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>"
+			+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
+
+		dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+			uploadXhr.abort();
+		});
+
+		dom.find(".chat-fail-status").hide();
+
+		qmiUploadFile({
+            urlAjax: {
+                apiName: "groups/" + gi + "/files",
+                method: "post",
+                body: {
+                    tp: 1,
+                    ti: ti_chat,
+                    pi: 0,
+                    wm: 0,
+                }
+            },
+            tp: 1,
+            hasFi: true,
+            progressBar: function () {
+            	uploadXhr = new window.XMLHttpRequest();
+				uploadXhr.upload.addEventListener("progress", function(evt){
+			      	if (evt.lengthComputable) {
+			        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
+				      	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
+			      	}
+			    }, false);
+
+			    return uploadXhr;
+            },
+            file: dom.find("div img")[0],
+            oriObj: {w: 1280, h: 1280, s: 0.7},
+            tmbObj: {w: 480, h: 480, s: 0.6}
+        }).done(function(response){
+    		if (response.data) {
 				//delete old data
 				g_idb_chat_msgs.remove(tmpData.ei);
 
-				tmpData.ml[0].c = data.fi;
+				tmpData.ml[0].c = response.data.fi;
 				tmpData.ml[0].p = pi;
 				//add new data to db & show
 				var newData = {
@@ -1700,7 +1737,7 @@ function sendMsgText(dom) {
 					ml: [
 						{
 							tp: tmpData.ml[0].tp,
-							c: data.fi,
+							c: response.data.fi,
 							p: pi
 						}
 					],
@@ -1719,10 +1756,53 @@ function sendMsgText(dom) {
 				g_idb_chat_msgs.put(node, function(){
 					sendMsgText(dom);
 				});
-			} else {
-				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
 			}
-		});
+        }).fail(function(data) {
+        	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+        	dom.find(".chat-fail-status").show();
+        	dom.find(".progress-container").remove();
+        });
+
+		// uploadGroupImage(gi, file, ti_chat, 0, ori_arr, tmb_arr, pi, function (data) {
+		// 	if (data) {
+		// 		//delete old data
+		// 		g_idb_chat_msgs.remove(tmpData.ei);
+
+		// 		tmpData.ml[0].c = data.fi;
+		// 		tmpData.ml[0].p = pi;
+		// 		//add new data to db & show
+		// 		var newData = {
+		// 			ei: tmpData.ei,
+		// 			meta: {
+		// 				gu: g_group.gu,
+		// 				ct: tmpData.ct
+		// 			},
+		// 			ml: [
+		// 				{
+		// 					tp: tmpData.ml[0].tp,
+		// 					c: data.fi,
+		// 					p: pi
+		// 				}
+		// 			],
+		// 			notSend: true
+		// 		};
+
+		// 		var node = {
+		// 			gi: gi,
+		// 			ci: ci,
+		// 			ei: newData.ei,
+		// 			ct: newData.ct,
+		// 			data: newData
+		// 		};
+		// 		dom.data("data", tmpData);
+		// 		//update db
+		// 		g_idb_chat_msgs.put(node, function(){
+		// 			sendMsgText(dom);
+		// 		});
+		// 	} else {
+		// 		dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+		// 	}
+		// });
 		// }
 	}
 	function sendMsgVideo(dom) {
@@ -1914,6 +1994,7 @@ function sendMsgText(dom) {
 		// inputDom.val("").trigger('autosize.resize');
 
 		var dom = showUnsendMsg(msg, 0);
+		dom.find(".chat-fail-status").hide();
 		sendChat(dom);
 	}
 
