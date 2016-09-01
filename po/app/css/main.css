@@ -1018,7 +1018,7 @@ img.auo {
 
 .sm-group-list-scroll-area {
     /*min-height: 123px;*/
-    height: -webkit-calc( 100% - 164px );
+    height: -webkit-calc( 100% - 120px );
 	overflow-x: hidden;
 	overflow-y: scroll;
 	padding-bottom: 5px;
@@ -5446,7 +5446,7 @@ div.user-info-submit-ready:active {
 	cursor: pointer;
 }
 .st-official-tab-row:nth-child(1){
-	width: 100%%;
+	width: 100%;
 	height: 44px;
 	line-height: 44px;
 	background-color: rgb(249,249,249);
@@ -5461,7 +5461,7 @@ div.user-info-submit-ready:active {
 	line-height: 29px;
 }
 .admin .st-official-tab-row:nth-child(1) .st-official-tab{
-	width: 32.8%;
+	width: 24%;
 }
 .admin .st-official-tab-row:nth-child(2) .st-official-tab{
 	width: 50%;

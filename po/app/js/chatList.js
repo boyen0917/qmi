@@ -56,6 +56,9 @@ initChatList = function(){
 	$(".chatList-add").off("click");
 	$(".chatList-add").on("click", function(){
 		$(".chatList-add").data("object_str","");
+		if(currentGroup.isOfficial){
+			$(".chatList-add").data("offical","add");
+		}
 		showNewRoomPage();
 	});
 
@@ -244,9 +247,22 @@ function showChatList(){
 
 				td = $("<div class='td' data-id='"+room.ci+"'></div>");
 
-				var roomName = chatRoomName.replaceOriEmojiCode();
-
-
+				//官方帳號聊天室名字修改
+				if(true == groupData.isOfficial){
+					if(groupData.ad != 1){
+						//var roomName = groupData.gn.replaceOriEmojiCode();
+					}else{
+						if(room.tp == 1){
+							var roomName = chatRoomName.replaceOriEmojiCode();
+						}else if(room.tp == 2 && room["uiName"] == groupData.me){
+							var roomName = groupData.gn.replaceOriEmojiCode();
+						}else{
+							var roomName = groupData.guAll[chatRoomName].nk.replaceOriEmojiCode();
+						}
+					}
+				}else{
+					var roomName = chatRoomName.replaceOriEmojiCode();
+				}
 
 				if( room.hasOwnProperty("cpc") === true && room.cpc > 2)
 					roomName +=  " (" + room.cpc + ") ";

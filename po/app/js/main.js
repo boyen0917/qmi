@@ -2236,7 +2236,7 @@ $(function(){
 				showGroupInfoPage();
 				break;
 			case "chat":
-				// $(".sm-small-area[data-sm-act=chat]").trigger("click");
+				$(".sm-small-area[data-sm-act=chat]").trigger("click");
 				break;
 			case "setting":
 				$(".sm-small-area[data-sm-act=groupSetting]").trigger("click");

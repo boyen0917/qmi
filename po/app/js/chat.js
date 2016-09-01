@@ -149,9 +149,6 @@ $(function(){
 			return;
 		}
 
-		if (g_group.ad != 1 && true == g_group.isOfficial) {
-			$(".extra").hide();
-		}
 		isShowUnreadAndReadTime = true;
 		if (g_group.set && null != g_group.set.s8) {
 			if (g_group.set.s8 == 1 || g_group.set.s8 == 3) {
@@ -197,25 +194,42 @@ $(function(){
 		ti_chat = ci;
 
 		getPermition();
+		//官方帳號
+		if(true == g_group.isOfficial){
+			$(".extra").hide();
+			//非管理員
+			if(g_group.ad != 1){
+				$("#header .title .text").html(g_group.gn._escape().replaceOriEmojiCode());
+			}else{
+				if(g_room.tp == 1){
+					$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
+					$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
+				}else if(g_room.tp == 2 && g_cn == g_group.me){
+					$("#header .title .text").html(g_group.gn._escape().replaceOriEmojiCode());
+				}else{
+					$("#header .title .text").html(g_group.guAll[g_cn].nk._escape().replaceOriEmojiCode());
+					$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
+				}
+				
+			}
+		}else{
+			$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
+			$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
 
-		//header 設定團體名稱
-		$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
-		$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
-
-		var tmpMemCount = (g_room.memList) ? Object.keys(g_room.memList).length : 0;
-		if (tmpMemCount != g_room.memCount) {
-			cns.debug("mem count not fit, updated.");
-			g_room.memCount = tmpMemCount;
-			$.userStorage(userData);
-		}
-
-		if (g_room.memCount > 2) {
-			$("#header .count").show();
-			$("#header .count").html("(" + g_room.memCount + ")");
-		} else {
-			$("#header .count").hide();
-			// $(".extra-content .btn[data-type=edit]").hide();
-			$(".extra-content .btn[data-type=exit]").hide();
+			var tmpMemCount = (g_room.memList) ? Object.keys(g_room.memList).length : 0;
+			if (tmpMemCount != g_room.memCount) {
+				cns.debug("mem count not fit, updated.");
+				g_room.memCount = tmpMemCount;
+				$.userStorage(userData);
+			}
+			if (g_room.memCount > 2) {
+				$("#header .count").show();
+				$("#header .count").html("(" + g_room.memCount + ")");
+			} else {
+				$("#header .count").hide();
+				// $(".extra-content .btn[data-type=edit]").hide();
+				$(".extra-content .btn[data-type=exit]").hide();
+			}
 		}
 
 		//- click "send" to send msg
@@ -587,6 +601,10 @@ $(function(){
 				}
 			);
 		});
+		//官方帳號非管理員不能點擊header
+		if(true == g_group.isOfficial && g_group.ad != 1){
+			$("#header .title .text, #header .title .count").unbind("click");
+		}
 
 		//點擊已讀數顯示已未讀成員及時間
 		$(document).on("click", ".chat-cnt", function () {
@@ -2135,8 +2153,13 @@ function sendMsgText(dom) {
 						}
 						g_room.memCount = data.ul.length;
 						if (g_room.cpc !== undefined) {
-							$("#header .count").show();
-							$("#header .count").html("(" + g_room.cpc + ")");
+							if(userData[gi].isOfficial){
+								$("#header .count").hide();
+							}else{
+								$("#header .count").show();
+								$("#header .count").html("(" + g_room.cpc + ")");
+							}
+							
 							$(".extra-content .btn[data-type=edit]").show();
 							$(".extra-content .btn[data-type=exit]").show();
 						} else {

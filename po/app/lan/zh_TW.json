@@ -370,6 +370,8 @@
 	"CLOSE_SET" : "關閉",
 	"THREE_SEC_SET" : "3秒",
 	"FIVE_SEC_SET" : "5秒",
+	"GENERAL_GROUP" : "一般團體",
+	"OFFICAL_GROUP" : "官方帳號",
 
 	"BIND_LDAP" : "綁定LDAP",
 	"BIND_ACCOUNT" : "已綁定帳號",

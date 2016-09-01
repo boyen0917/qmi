@@ -398,8 +398,11 @@ function showGroupInfoPage(){
     } catch(e){
         errorReport(e);
     }
-
-
+    if(group.isOfficial){
+    	$(".ga-group-type-name").html($.i18n.getString("OFFICAL_GROUP"));
+    }else{
+    	$(".ga-group-type-name").html($.i18n.getString("GENERAL_GROUP"));
+    }
     $(".ga-group-name").html(groupName._escape());
     $(".ga-group-id").html("ID : " + groupId);
     $(".ga-group-des").html(groupDescription._escape().replace(/\n/g,"<br />"));

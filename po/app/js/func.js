@@ -355,7 +355,7 @@ timelineChangeGroup = function (thisGi) {
             setSmUserData(gi,gu,gn);
 
             //檢查官方帳號
-            initOfficialGroup( gi );
+            //initOfficialGroup( gi );
 
             //置頂設定
             topEvent();
@@ -533,13 +533,14 @@ timelineSwitch = function (act,reset,main,noPR){
             switchDeferred.resolve({ act: "addressBook"});
             break;
         case "chat":
-            
-            //offical general
+            //offical general 官方帳號非管理員
             if( onClickOfficialGeneralChat(gi) ){
+                groupMain.find(".subpage-timeline").show();
                 groupMain.data("currentAct",oriAct);
                 switch(oriAct){
                     case "feeds":
                     case "feed-post":
+                        break;
                     case "feed-public":
                         $(".subpage-timeline").show();
                         break;
@@ -561,8 +562,7 @@ timelineSwitch = function (act,reset,main,noPR){
                 }
             } else {
                 //-- switch sub pages --
-                $(".subpage-chatList").show();
-
+                groupMain.find(".subpage-chatList").show();
                 page_title = $.i18n.getString("CHAT_TITLE");
 
                 initChatList();
@@ -1247,7 +1247,7 @@ setOfficialGroup = function( this_gi ){
         //temp
         $(document).data("official",true);
         $("#page-group-main .header-menu [data-sm-act]:not([data-sm-act=feeds])").hide();
-        $(".feed-compose.header-icon._2").hide();
+        //$(".feed-compose.header-icon._2").hide();
 
         //admin
         if( groupData.ad==1 ){
@@ -1276,7 +1276,7 @@ onClickOfficialGeneralChat = function( this_gi ){
             if( null!=groupData.chatAll ){
                 for( var ci in groupData.chatAll ){
                     var room = groupData.chatAll[ci];
-                    if( room.tp==1 ){
+                    if( room.tp==2 ){
                         openChatWindow ( this_gi, ci );
                         return true;
                     }
@@ -2997,6 +2997,13 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
         $(".obj-content").data("selected-branch",{});  
     }
 
+    //官方帳號團體新增聊天室成員列表不顯示全選選項 
+    //this_compose.data("offical")==="add"這行是來判斷是否為新增聊天室成員列表
+    //與設定的指派管理員的成員列表不同
+    if(group.isOfficial && this_compose.data("offical")==="add"){
+        $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
+        memSubTitle.unbind("click");
+    }
     // if(branch_data){
     //     branch_data = $.parseJSON(branch_data);
     //     if(Object.keys(branch_data).length){
@@ -3034,8 +3041,8 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
         var selected_obj = $(".obj-content").data("selected-obj");
         // cns.debug("selected_obj:",selected_obj);
         
-        //工作是單選
-        if(this_compose_obj.parent().hasClass("cp-work-item")){
+        //工作是單選 或 官方團體新增聊天室，成員列表是單選
+        if(this_compose_obj.parent().hasClass("cp-work-item") || (group.isOfficial && this_compose.data("offical")==="add")){
             cns.debug("work");
             //全部清除
             // $(document).find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
@@ -3400,6 +3407,10 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
             $(this).html("");
             $(".obj-cell-area hr").show();
             $(".obj-cell-subTitle .obj-cell-subTitle-chk").show();
+            //官方團體不顯示全選選項
+            if(group.isOfficial){
+                $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
+            }
             return;
         }
         search = search.toLowerCase();
@@ -4959,7 +4970,9 @@ groupMenuListArea = function (noApi){
         //管理者圖示
         var icon_host = "<img src='images/sidemenu/icon_host.png'/>",
             listArea = $(".sm-group-list-area").html("");
-
+            listArea.append($('<div class="sm-hr sm-general-group">'+$.i18n.getString("GENERAL_GROUP")+'</div>'));
+            listArea.append($('<div class="sm-hr sm-offical-group">'+$.i18n.getString("OFFICAL_GROUP")+'</div>'));
+            listArea.append($('<div class="sm-footer"></div>'));
         $.each(QmiGlobal.groups, addSideMenuGroupUI.bind(listArea));
 
         if(Object.keys( QmiGlobal.groups ).length > 2) $(".sm-group-switch").show();
@@ -5001,8 +5014,14 @@ addSideMenuGroupUI = function(key,groupObj){
     );
 
     this_group.find(".group-pic").data("auo",glo_img);
-    listArea.append(this_group);
-
+    //判斷官方團體一般團體
+    var tp = groupObj.tp.toLowerCase();
+    if(tp.indexOf('c')==0 || tp.indexOf('d')==0){
+        $(".sm-footer").before(this_group);
+    }else{
+        $(".sm-offical-group").before(this_group);
+    }
+    //listArea.append(this_group);
     //管理者圖示
     if(groupObj.ad != 1) this_group.find(".sm-icon-host").hide();
 }
@@ -8038,7 +8057,14 @@ pollingCountsWrite = function(pollingData){
     sort_arr.forEach(function(obj){
         var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
         sortedGroup.detach();
-        $(".sm-group-list-area").prepend(sortedGroup);
+
+        var tp = QmiGlobal.groups[obj[0]].tp.toLowerCase();
+        if(tp.indexOf('c')==0 || tp.indexOf('d')==0){
+            $(".sm-offical-group").after(sortedGroup);
+        }else{
+            $(".sm-general-group").after(sortedGroup);
+        }
+        //$(".sm-group-list-area").prepend(sortedGroup);
     })
 
 

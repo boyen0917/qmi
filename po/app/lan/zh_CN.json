@@ -349,6 +349,8 @@
 	"CLOSE_SET" : "关闭",
 	"THREE_SEC_SET" : "3秒",
 	"FIVE_SEC_SET" : "5秒",
+	"GENERAL_GROUP" : "一般团体",
+	"OFFICAL_GROUP" : "官方帐号",
 
 	"BIND_LDAP" : "綁定LDAP",
 	"BIND_ACCOUNT" : "已綁定帳號",
