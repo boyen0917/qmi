@@ -2152,6 +2152,7 @@ function sendMsgText(dom) {
 							g_room.memList[data.ul[i].gu] = data.ul[i];
 						}
 						g_room.memCount = data.ul.length;
+						g_room.cpc = data.ul.length;
 						if (g_room.cpc !== undefined) {
 							if(userData[gi].isOfficial){
 								$("#header .count").hide();
@@ -2163,6 +2164,7 @@ function sendMsgText(dom) {
 							$(".extra-content .btn[data-type=edit]").show();
 							$(".extra-content .btn[data-type=exit]").show();
 						} else {
+							console.log("fuck");
 							$("#header .count").hide();
 							$(".extra-content .btn[data-type=edit]").hide();
 							$(".extra-content .btn[data-type=exit]").hide();

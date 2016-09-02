@@ -8321,9 +8321,19 @@ pollingCmds = function(newPollingData){
                     case 12://delete group
                         removeGroup( item.pm.gi );
                         break;
-                    case 41:
+                    case 41://聊天室邀請或踢除別人
+                        updateChatList(item.pm.gi);
+                        break;
+                    case 45://被別人踢出聊天室
+                        var grouptmp = QmiGlobal.groups[item.pm.gi];
+                        popupShowAdjust("團體 "+grouptmp.gn,grouptmp.guAll[item.pm.gu].nk+" 已將你退出 "+grouptmp.chatAll[item.pm.ti].cn+" 聊天室",true,false,[function(){
+                            if(windowList[item.pm.ti] && !windowList[item.pm.ti].closed){
+                                windowList[item.pm.ti].close();
+                            }
+                        },null]);
                         updateChatList(item.pm.gi);
                         break;    
+
                     case 52:
                         QmiGlobal.groups[item.pm.gi].set.ccc = item.pm.gcc;
                         if (item.pm.gcc > 0) {

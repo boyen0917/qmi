@@ -264,7 +264,7 @@ function showChatList(){
 					var roomName = chatRoomName.replaceOriEmojiCode();
 				}
 
-				if( room.hasOwnProperty("cpc") === true && room.cpc > 2)
+				if( room.hasOwnProperty("cpc") === true && room.cpc >= 2)
 					roomName +=  " (" + room.cpc + ") ";
 
 
