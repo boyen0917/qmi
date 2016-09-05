@@ -14,19 +14,26 @@ var ui,
 
 	clearChatTimer,
 	
-	//HiCloud
- 	base_url = "https://qmi17.mitake.com.tw/apiv1/",
- 	// base_url = "https://apserver.mitake.com.tw/apiv1/",
-
- 	
 	//local測試 預設開啟console
 	debug_flag = false;
-	if(window.location.href.match(/^https:\/\/qawp.qmi.emome.net/)) {
-		debug_flag = true;
-		base_url = "https://qaap.qmi.emome.net/apiv1/";
-	};
 
- 	// // container riseNotification 一旦換網址就沒了
+
+var base_url = function() {
+	switch(true) {
+		case match("qawp.qmi.emome.net"):
+			return "https://qaap.qmi.emome.net/apiv1/";
+			break;
+		case match("qmi17.mitake.com.tw"):
+			return "https://qmi17.mitake.com.tw/apiv1/";
+			break;
+		default:
+			return "https://ap.qmi.emome.net/apiv1/";
+	}
+	function match(domain) {
+		var regDomain = new RegExp("^https:\/\/"+ domain, 'g');
+		return !!window.location.href.match(regDomain);
+	}
+}();
 
 var userLang = navigator.language || navigator.userLanguage;
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
