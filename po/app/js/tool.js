@@ -1104,12 +1104,12 @@ QmiGlobal.gallery = function (data) {
 
 	this.container =  $("<div id='galleryModal' style='display:none;'>"
 	        + "<div class='close'>×</div>"
+	       	+ "<div class='preBtn arrowBtn'><div class='draw'></div></div>"
+	        + "<div class='nextBtn arrowBtn'><div class='draw'></div></div>"
 	        + "<figure class='gallery-contaniner'>"
 	        // + "<div class='gallery-content'>"
 	        + "<img class='currentImg'>"
 	        + "<figcaption id='caption'></figcaption>"
-	       	+ "<div class='preBtn arrowBtn'></div>"
-	        + "<div class='nextBtn arrowBtn'></div>"
 	        + "<a class='download-link' href='"+ this.photoList[this.currentImage].s32
 	        + "' ><div></div></a></figure></div>");
 	var leftArrow = this.container.find(".preBtn");
@@ -1125,6 +1125,46 @@ QmiGlobal.gallery = function (data) {
 	closeBtn.on("click", this.close.bind(this));
 	leftArrow.on('click', this.showPreviousImage.bind(this));
 	rightArrow.on('click', this.showNextImage.bind(this));
+
+	// Brian ZoomIn
+	this.zoomObj = {
+		dom: this.container.find(".img-container"),
+		reset: function() {
+			var container = this.dom;
+			container.removeClass("zoomOut").find(".currentImg").removeClass("zoomIn");
+			container.find(".currentImg").attr("style", "");
+		},
+		init: function() {
+			var self = this;
+			self.dom.click(function() {
+				var container = $(this),
+					img = container.find(".currentImg"),
+					hZoomIn = img.height()*2, wZoomIn = img.width()*2;
+
+				container.toggleClass("zoomOut").find(".currentImg").toggleClass("zoomIn");
+				
+				if(container.hasClass("zoomOut") === false) {
+					self.reset();
+				} else {
+
+					img.height(hZoomIn).width(wZoomIn);
+					img.width()/2 - window.innerWidth*0.55
+					container.scrollLeft(img.width()/2 - window.innerWidth*0.55)
+					.scrollTop(img.height()/2 - window.innerHeight*0.55);
+
+					var hDiff = container.height() - img.height(),
+						wDiff = container.width() - img.width();
+
+					if(hDiff > 0) { img.css("margin-top", hDiff/2) }
+					if(wDiff > 0) { img.css("margin-left", wDiff/2) }
+				}
+
+					
+			})
+		}
+	}
+	this.zoomObj.init();
+	// end of Brian ZoomIn
 
 	$("body").append(this.container);
 	this.container.fadeIn();
@@ -1186,6 +1226,8 @@ QmiGlobal.gallery.prototype = {
 	},
 
 	showNextImage: function(e) {
+		this.zoomObj.reset();
+
 		this.currentImage = (this.currentImage + 1) % (this.photoList.length);
 		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
 			this.getImageUrl().then(function (data) {

@@ -7961,7 +7961,7 @@ pollingCountsWrite = function(pollingData){
                     updatePollingCnts( smCountA, key );
                 } else {
                     smCountA.show()
-                    .html( countsFormat( thisCntObj[key] ) )
+                    .html(countsFormat(thisCntObj[key], smCountA))
                     .data("gi",gi);
                 }
             }
@@ -7978,17 +7978,18 @@ pollingCountsWrite = function(pollingData){
                 if( windowList.hasOwnProperty( obj.ci ) && windowList[obj.ci].closed === false ) {
                     updatePollingCnts( $("div.polling-cnt-cl[data-ci="+ obj.ci +"]").find(".sm-cl-count"),"B7");
                 } else {
-                    tmpDiv.html(countsFormat(obj.B7)).show();    
+                    tmpDiv.html(countsFormat(obj.B7, tmpDiv)).show();    
                 }
 
                 countA3 += obj.B7;
             }
         })
 
+        var countA3Dom = $(".polling-cnt[data-polling-cnt=A3] .sm-count");
         if(countA3 > 0) 
-            $(".polling-cnt[data-polling-cnt=A3] .sm-count").html(countsFormat(countA3)).show();
+            countA3Dom.html(countsFormat(countA3, countA3Dom)).show();
         else
-            $(".polling-cnt[data-polling-cnt=A3] .sm-count").hide();
+            countA3Dom.hide();
     }
 
     // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
@@ -8004,7 +8005,7 @@ pollingCountsWrite = function(pollingData){
         
         if( thisCntObj.A5 > 0 && gi != thisGi){
             sort_arr.push([thisGi,thisCntObj.A5]);
-            dom.html( countsFormat( thisCntObj.A5 ) ).show();
+            dom.html(countsFormat( thisCntObj.A5, dom)).show();
         }
 
         // 無cl 或 未有此gi 就不做
@@ -8395,8 +8396,14 @@ pollingUpdate = function(newPollingData){
     }
 }
 
-countsFormat = function(num){
-    return num > 99 ? "99+" : num;
+countsFormat = function(num, badgeDom){
+    badgeDom.removeClass("over99");
+    var newNum = num;
+    if(num > 99) {
+        badgeDom.addClass("over99");
+        newNum = "99+"
+    }
+    return newNum;
 }
 
 updatePollingCnts = function(countDom,cntType){

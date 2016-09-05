@@ -885,11 +885,11 @@ img.auo {
     padding-left: 1px;
 }
 .header-menu .sm-count{
-	position: relative;
+    position: relative;
     background: #f31e80;
-    line-height: 23px;
-    height: 24px;
-    width: 24px;
+    line-height: 20px;
+    height: 20px;
+    width: 20px;
     border-radius: 13px;
     margin-right: -16px;
     bottom: 8px;
@@ -898,6 +898,12 @@ img.auo {
     padding-right: 1px;
     margin-left: 4px;
 }
+
+.sm-count.over99 {
+	font-size: 10px;
+	line-height: 21.5px;
+    height: 21px;
+    width: 22px;}
 
 .sm-hr {
 	height: 41px;
@@ -2985,10 +2991,22 @@ img.st-user-pic{
     background-color: rgba(0,0,0,0.9);
 }
 
-.gallery-contaniner {
-	width: 90%;
+#galleryModal .gallery-contaniner {
+    width: 90%;
     height: 90%;
     margin: 3% auto;
+    position: relative;
+    overflow: hidden;
+}
+
+#galleryModal .gallery-contaniner:before {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background: black;
+    right: 0;
+    bottom: 0;
 }
 
 #galleryModal .close {
@@ -3012,6 +3030,23 @@ img.st-user-pic{
     overflow: scroll;
 }
 
+#galleryModal figure.gallery-contaniner .img-container {
+    width: 90vw;
+    height: 90vh;
+	cursor: -webkit-zoom-in; 
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#galleryModal figure.gallery-contaniner .img-container.zoomOut {
+	cursor: -webkit-zoom-out; 
+	overflow: scroll;
+	display: block; 
+	text-align: left;
+}
+
+#galleryModal .arrowBtn:hover {opacity: 1;}
 #galleryModal .arrowBtn {
 	background-repeat: no-repeat;
     position: relative;
@@ -3033,10 +3068,10 @@ img.st-user-pic{
 }
 
 #galleryModal #caption {
-    font-size: large;
-    color: white;
-    text-align: center;
-    margin-top: 7px;
+	position: fixed;
+	bottom: 20px;
+	left: calc(50% - 13px);
+	color: white;
 }
 
 #galleryModal:hover a div {
@@ -3050,20 +3085,17 @@ img.st-user-pic{
   	bottom: 60px;
   	cursor: pointer;
   	opacity: 0.8;
-/*=======
-    text-align: right;
-    position: absolute;
-    right: 5%;
-    bottom: 2%;
->>>>>>> d04147bcc608092e0e5229ec3d11f4cf1fdd256a*/
 }
 
-.currentImg {
-	max-width: 100%;
-	height: 100%;
-	margin: 0px auto;
-	display: block;
-	object-fit: contain;
+#galleryModal .currentImg {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#galleryModal .currentImg.zoomIn {
+    max-width: 200%;
+    max-height: 200%;
 }
 
 .st-slide-img {
