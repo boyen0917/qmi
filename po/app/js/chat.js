@@ -2164,7 +2164,6 @@ function sendMsgText(dom) {
 							$(".extra-content .btn[data-type=edit]").show();
 							$(".extra-content .btn[data-type=exit]").show();
 						} else {
-							console.log("fuck");
 							$("#header .count").hide();
 							$(".extra-content .btn[data-type=edit]").hide();
 							$(".extra-content .btn[data-type=exit]").hide();

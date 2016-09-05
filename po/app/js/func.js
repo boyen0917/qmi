@@ -386,12 +386,13 @@ timelineSwitch = function (act,reset,main,noPR){
         
         var wl = {};
         $.each(windowList,function(key,value){
-            wl[key] = {
-                closed : value.closed,
-                gi : value.gi,
-                ci : value.ci,
-                ui : value.ui,
-                at : value.at
+            if(!value.closed){
+                if(wl[value.gi] == undefined){
+                    wl[value.gi] = {};
+                    wl[value.gi][key] = QmiGlobal.groups[value.gi].chatAll[value.ci];
+                }else{
+                    wl[value.gi][key] = QmiGlobal.groups[value.gi].chatAll[value.ci];
+                }
             }
         });
         // 設定當前gi
@@ -403,7 +404,8 @@ timelineSwitch = function (act,reset,main,noPR){
                 main: main
             }
         };
-        $.lStorage("test",wl);
+
+        $.lStorage("groupChat",wl);
         $.lStorage("_periodicallyReloadAuth", QmiGlobal.auth);
         location.reload();
         return;
@@ -8051,18 +8053,18 @@ pollingCountsWrite = function(pollingData){
 
     })
 
-
     //排序
     sort_arr.sort(function(a, b) {return a[1] - b[1]});
     sort_arr.forEach(function(obj){
         var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
         sortedGroup.detach();
-
         var tp = QmiGlobal.groups[obj[0]].tp.toLowerCase();
-        if(tp.indexOf('c')==0 || tp.indexOf('d')==0){
-            $(".sm-offical-group").after(sortedGroup);
-        }else{
-            $(".sm-general-group").after(sortedGroup);
+        if(tp){
+            if(tp.indexOf('c')==0 || tp.indexOf('d')==0){
+                $(".sm-offical-group").after(sortedGroup);
+            }else{
+                $(".sm-general-group").after(sortedGroup);
+            }
         }
         //$(".sm-group-list-area").prepend(sortedGroup);
     })

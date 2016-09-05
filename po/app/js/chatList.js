@@ -1,6 +1,6 @@
 // $(function(){ 
 // });
-var test;
+var groupChat;
 var windowList = {};
 var sortRoomListTimeout = 700;
 
@@ -77,7 +77,6 @@ function updateChatList( giTmp, extraCallBack ){
 	$(".top-chatList .list").html("");
 	var currentGroup = QmiGlobal.groups[giTmp];
 	if( !currentGroup )	return;
-
 	//取得聊天室列表
 	var api_name = "groups/"+ giTmp +"/chats";
 
@@ -363,7 +362,7 @@ function openChatWindow ( giTmp, ci ){
 
 	var chatListDiv = $(".subpage-chatList");
 	var topListDom = $(".top-chatList");
-	
+	clearChatListCnt( giTmp, ci );
 	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
 		// windowList[ci].focus();
 	} else {
@@ -379,10 +378,9 @@ function openChatWindow ( giTmp, ci ){
 
 		$.lStorage( "_chatRoom", data );
 
-		if($.lStorage("test")){
+		if($.lStorage("groupChat")){
 			windowList[ci] = window.open("", ci , "width=400, height=600");
 		}else{
-			clearChatListCnt( giTmp, ci );
 			windowList[ci] = window.open("chat.html", ci , "width=400, height=600");
 		}
 		

@@ -8,17 +8,7 @@ onCheckVersionDone = function(needUpdate){
     if($.lStorage("_periodicallyReloadAuth") !== false) {
     	QmiGlobal.auth = $.lStorage("_periodicallyReloadAuth");	
     	localStorage.removeItem("_periodicallyReloadAuth");
-
-    	test = $.lStorage("test");
-    	$.each(test,function(key,value){
-            if(!value.closed){
-
-				openChatWindow(value.gi,value.ci);
-
-				//$('.sm-small-area[data-sm-act="chat"]').trigger("click");
-            }
-        });
-    	localStorage.removeItem("test");
+    	
 
     	QmiGlobal.isPeriodicallyReload = true;
 
@@ -31,7 +21,6 @@ onCheckVersionDone = function(needUpdate){
 		// window.location = "index.html";
 		$.mobile.changePage("")
 	}
-
 	//預設上一頁
 	// $(document).data("page-history",[["#page-group-menu"]]);
 	
@@ -352,7 +341,18 @@ onCheckVersionDone = function(needUpdate){
         //附上group list
         getGroupList().done(function(groupList){
         	var specifiedGi = QmiGlobal.auth.dgi;
-
+        	if($.lStorage("groupChat")){
+        		groupChat = $.lStorage("groupChat");
+		    	$.each(groupChat,function(key,value){
+		    		getGroupComboInit(key);
+		    		QmiGlobal.groups[key].chatAll = value;
+		    		$.each(value,function(ci,item){
+		    			openChatWindow(key,ci);
+		    		})
+		        });
+		    	localStorage.removeItem("groupChat");
+        	}
+        	
         	// 取dgi的combo
             if( (groupList || []).length > 0 ){
 
