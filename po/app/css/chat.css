@@ -971,6 +971,7 @@ body {
 	text-shadow: none;
 	overflow: auto;
 	margin: 0 auto;
+	background: black;
 }
 
 .popup-title {
@@ -1943,9 +1944,18 @@ td.memberName span{
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0,0,0,0.9);
+    -webkit-user-select: none; 
 }
+
+#galleryModal .gallery-contaniner {
+    width: 90%;
+    height: 90%;
+    margin: 3% auto;
+    position: relative;
+    overflow: hidden;
+}
+
 
 #galleryModal .close {
 	color: white;
@@ -2000,55 +2010,73 @@ td.memberName span{
 #galleryModal .arrowBtn .draw:before {
 	content: "";
 	position: absolute;
-    right: 5vw;
-    top: 2vh;
-	cursor: pointer;
-	text-shadow: 1px 1px 2px #ddd;
+	border: 1px solid white;
+	height: 0px;
+	width: 20px;
+	border-radius: 10px;
 }
 
-.galleryModal .arrowBtn {
-	background-repeat: no-repeat;
-    position: relative;
-    width: 30px;
-    height: 30px;
+#galleryModal .arrowBtn .draw:after {
+	content: "";
+	position: absolute;
+	border: 1px solid white;
+	height: 0px;
+	width: 20px;
+	border-radius: 10px;
+}
+
+#galleryModal .preBtn {left: 5px;}
+#galleryModal .preBtn .draw {
+  width: 1px;
+  background: rgb(134, 134, 134);
+  height: 4px;
+  position: relative;
+  top: 25vh;
+  left: 10px;
+}
+#galleryModal .preBtn .draw:before {left: -7px; top: -7px; transform: rotateZ(300deg);}
+#galleryModal .preBtn .draw:after {left: -7px; top: 10px; transform: rotateZ(60deg);}
+
+#galleryModal .nextBtn {right: -5px;}
+#galleryModal .nextBtn .draw {
+  width: 1px;
+  background: rgb(134, 134, 134);
+  height: 4px;
+  position: relative;
+  top: 25vh;
+  left: 30px;
+}
+#galleryModal .nextBtn .draw:before {right: -7px; top: -7px; transform: rotateZ(60deg);}
+#galleryModal .nextBtn .draw:after {right: -7px; top: 10px; transform: rotateZ(300deg);}
+
+#galleryModal #caption {
+	position: fixed;
+	bottom: 20px;
+	left: calc(50% - 13px);
+	color: white;
+}
+
+#galleryModal .gallery-contaniner:hover a div {
+    content: "";
+    width: 50px;
+    height: 50px;
+    background-image: url("../images/dl.png");
+    background-size: contain;
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
     cursor: pointer;
+    opacity: 0.8;
+    z-index: 1;
 }
 
-.galleryModal .preBtn {
-    background-image: url("../images/calendar/icon_calendar_arrow_red_end.png");
-    right: 30px;
-    bottom: 50%;
+#galleryModal .currentImg {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
 }
 
-.galleryModal .nextBtn {
-    background-image: url("../images/calendar/icon_calendar_arrow_red_start.png");
-    left: 610px;
-    bottom: 55.5%;
-}
-
-.galleryModal .nextBtn {
-    background-image: url("../images/calendar/icon_calendar_arrow_red_start.png");
-    left: 610px;
-    bottom: 55.5%;
-}
-
-.gallery-contaniner:hover a div {
-  	content: "";
-  	width: 50px;
-  	height: 50px;
-  	background-image: url("../images/dl.png");
-  	background-size: contain;
-  	position: absolute;
- 	right: 20px;
-  	bottom: 60px;
-  	cursor: pointer;
-  	opacity: 0.8;
-}
-
-.currentImg {
-	width: 100%;
-	height: 100%;
-	/*margin: 12px auto;*/
-	display: block;
-	object-fit: contain;
+#galleryModal .currentImg.zoomIn {
+    max-width: 200%;
+    max-height: 200%;
 }

@@ -612,6 +612,7 @@ img.auo {
 	text-shadow: none;
 	overflow: auto;
 	margin: 0 auto;
+	background: black;
 }
 
 .popup-title {
