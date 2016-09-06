@@ -9799,15 +9799,6 @@ function activateClearChatsTimer(){
 };
 
 
-showFeedboxNoContent = function( isShow ){
-    if( isShow ){
-        $(".st-feebox-area-no-content").hide();
-    } else {
-        $(".st-feebox-area-no-content").show().removeClass("disabled");
-        $(".gm-content > div:eq(1)").getNiceScroll(0).doScrollTop(0, 500);
-    }
-}
-
 /*
           ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
           ██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔══██╗██╔════╝ ██╔════╝          
