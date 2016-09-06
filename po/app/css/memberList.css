@@ -64,6 +64,7 @@
 	overflow-y: auto;
 	margin-top: 55px;
 	position: fixed;
+	background: white;
 }
 
 .obj-cell-page.current {

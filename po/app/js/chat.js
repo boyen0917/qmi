@@ -3052,6 +3052,8 @@ function sendMsgText(dom) {
 		}
 
 		chat.addClass("transition").addClass("loadRead");
+		setTimeout(function() {chat.removeClass("loadRead");},1000);
+		
 		$(".screen-lock").show();
 
 		var onPageLoad = function () {
