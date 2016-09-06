@@ -12,9 +12,13 @@ $(function(){
 
 	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
 		//取舊資料
-		var feed_type = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
+		var feed_type = $("#page-group-main").data("navi");
+		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
+		if (feed_type != "main") {
+			feed_type = ("0" + feed_type).slice(-2) || "00";
+		}
+		// var feed_type = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
-
 		//判斷沒資料的元件存在時 就不動作
 		if( this_navi.hasClass("no-data") ) return;	
 		
@@ -29,6 +33,7 @@ $(function(){
 			// cns.debug("this_navi:",{name:this_navi.selector,data:this_navi.data("scroll-chk")});
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
 		    if(bottom_height && bottom_height >= last_height && !this_navi.data("scroll-chk")){
+				console.log("CCCCC@@222");
 		    	//避免重複
 		    	this_navi.data("scroll-chk",true);
 		    	cns.debug("last event ct:",this_navi.data("last-ct"));
