@@ -4726,6 +4726,7 @@ composeSend = function (this_compose){
                         tp: 1,
                         hasFi: true,
                         file: this_compose.data("upload-obj")[key].elem,
+                        fileName: this_compose.data("upload-obj")[key].file.name,
                         oriObj: {w: 1280, h: 1280, s: 0.7},
                         tmbObj: {w: 480, h: 480, s: 0.6} // ;
                     }).done(function(resObj) {
@@ -4764,6 +4765,7 @@ composeSend = function (this_compose){
                         tp: 2,
                         hasFi: true,
                         file: this_compose.data("upload-video")[key],
+                        fileName: this_compose.data("upload-video")[key].name,
                         oriObj: {w: 1280, h: 1280, s: 0.9}
                     }).done(function(resObj) {
                         progressBarObj.add();
@@ -4801,8 +4803,10 @@ composeSend = function (this_compose){
                         tp: 0,
                         hasFi: true,
                         file: this_compose.data("upload-file")[key],
+                        fileName: this_compose.data("upload-file")[key].name,
                         oriObj: {w: 1280, h: 1280, s: 0.9}
                     }).done(function(resObj) {
+                        console.log(11111);
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
 
@@ -4829,13 +4833,22 @@ composeSend = function (this_compose){
 
     $.when.apply($, uploadDefArr).done(function() {
         // 有一個失敗就不傳
-        var errorFlag = false;
+        var errFileNameArr = [];
         Array.prototype.forEach.call(arguments, function(resObj) {
-            if(resObj.isSuccess === false) errorFlag = true;
+            if(resObj.isSuccess === false) errFileNameArr.push(resObj.errFileName)
         })
         setTimeout(function() {
             progressBarObj.close(); 
-            if(errorFlag === false) composeSendApi(body);
+            if(errFileNameArr.length > 0) {
+                new QmiGlobal.popup({
+                    title: $.i18n.getString("COMMON_UPLOAD_FAIL"),
+                    desc: errFileNameArr.slice(0,2).join("<br/>"),
+                    confirm: true
+                })
+                return;
+            }
+
+            composeSendApi(body);
         }, 500);
     // 取消
     }).fail(function() {

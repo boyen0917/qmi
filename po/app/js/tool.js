@@ -508,19 +508,6 @@ uploadToS3 = function(file,api_name,ori_arr,tmb_arr,callback){
 
 qmiUploadFile = function(uploadObj){
 	// tp 1: 圖片 2: 影片
-
-	// USAGE: 
-	// qmiUploadFile({
-	// 	urlAjax: {
-	// 		apiName: "me/avatar",
-	// 		method: "put"
-	// 	},
-	// 	file: thisEvent.find(".st-reply-message-img img")[0],
-	// 	oriObj: {w: 1280, h: 1280, s: 0.7},
-	// 	tmbObj: {w: 480, h: 480, s: 0.6} // ;
-	// }).done(function(data) {
-	// 	console.log("finish", data);
-	// });
 	
 	var allDoneDef = $.Deferred(),
 		s3ResponseObj;
@@ -544,6 +531,7 @@ qmiUploadFile = function(uploadObj){
 			apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
 			method: "put",
 			body: {
+				// fi: uploadObj.tp === 2 ? "" : s3Obj.fi,
 				fi: s3Obj.fi,
 				ti: (uploadObj.urlAjax.body || {}).ti,
 				pi: 0, // 再確認
@@ -566,7 +554,7 @@ qmiUploadFile = function(uploadObj){
 	return allDoneDef.promise();
 
 	function chainDefError(data) {
-		allDoneDef.reject({isSuccess: false, data: data, msg: this})
+		allDoneDef.resolve({isSuccess: false, data: data, msg: this, errFileName: uploadObj.fileName})
 	}
 }
 
@@ -595,7 +583,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			mt = uploadObj.file.type || "text";
 			si = uploadObj.file.size;
 			md = {w:100,h:100,l:100};
-
+	
 			mediaLoadDef.resolve();
 
 			break;
@@ -1148,7 +1136,7 @@ QmiGlobal.gallery = function (data) {
 				} else {
 
 					img.height(hZoomIn).width(wZoomIn);
-					img.width()/2 - window.innerWidth*0.55
+					img.width()/2 - window.innerWidth*0.55;
 					container.scrollLeft(img.width()/2 - window.innerWidth*0.55)
 					.scrollTop(img.height()/2 - window.innerHeight*0.55);
 
@@ -1372,12 +1360,6 @@ updateGroupAllInfoDom = function( thisGi ){
 
 		//update name
 		updateSideMenuContent(thisGi);
-		// var gn = htmlFormat( group.gn );
-		// var gd = htmlFormat( group.gd );
-		// $(".polling-group-name[data-gi="+thisGi+"]")
-		// .find("div:nth-child(1)").html(gn).end()
-		// .find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", group.cnt));
-		// $(".polling-group-description[data-gi="+thisGi+"]").html(gd);
 
 		if( gi==thisGi ){
 			//update icon
