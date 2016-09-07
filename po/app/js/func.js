@@ -2365,12 +2365,11 @@ composeContentMake = function (compose_title){
         });
 
         //url parse
-        this_compose.find('.cp-textarea-desc').bind('input',function(){
+        this_compose.find('.highlight-container').bind('input',function(){
             //有東西就不作了
             if(this_compose.data("url-chk")) return false;
-
             //先將換行符號換成<br/>加空格 再以空格切出陣列
-            var url_chk = this_compose.find('.cp-textarea-desc').val().replace(/\n|\r/g," <br/> ").split(' ');
+            var url_chk = $(this).text().replace(/\n|\r/g," <br/> ").split(' ');
             
             $.each(url_chk,function(i,val){
                 if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://' || val.substring(0, 4) == 'www.'){
