@@ -259,6 +259,12 @@ $(function(){
 		input.off("keydown").keydown(function (e) {
 			setTimeout(updateChatContentPosition, 50);
 		});
+		
+		// 偵測貼上事件 避免html 換成text文本
+		input.on("paste",function(e){
+			e.preventDefault();
+			document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
+		})
 
 		$(".input").data("h", $(".input").innerHeight());
 

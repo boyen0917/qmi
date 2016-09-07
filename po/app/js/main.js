@@ -976,6 +976,12 @@ $(function(){
 		}
 	})
 
+	// 偵測貼上事件 避免html 換成text文本
+	$(document).on("paste",".st-reply-highlight-container",function(e){
+		e.preventDefault();
+		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
+	})
+
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){
 		var this_event = $(this).parents(".st-sub-box");
@@ -991,6 +997,7 @@ $(function(){
 		replySend(this_event);
 	});
 
+	
 
 	//文章區塊 編輯按鈕
 	$(document).on('click','.st-sub-box-more-btn',function(e){
