@@ -3055,25 +3055,6 @@ img.st-user-pic{
 	height: 50vh;
 	cursor: pointer;
 	opacity: 0.5;
-	transition: 0.3s;
-}
-
-#galleryModal .arrowBtn .draw:before {
-	content: "";
-	position: absolute;
-	border: 1px solid white;
-	height: 0px;
-	width: 20px;
-	border-radius: 10px;
-}
-
-#galleryModal .arrowBtn .draw:after {
-	content: "";
-	position: absolute;
-	border: 1px solid white;
-	height: 0px;
-	width: 20px;
-	border-radius: 10px;
 }
 
 #galleryModal .preBtn {left: 5px;}
@@ -3085,8 +3066,29 @@ img.st-user-pic{
   top: 25vh;
   left: 10px;
 }
-#galleryModal .preBtn .draw:before {left: -7px; top: -7px; transform: rotateZ(300deg);}
-#galleryModal .preBtn .draw:after {left: -7px; top: 10px; transform: rotateZ(60deg);}
+#galleryModal .preBtn .draw:before {
+	content: "";
+	position: absolute;
+	border: 1px solid white;
+	height: 0px;
+	width: 20px;
+	border-radius: 10px;
+	left: -7px; 
+	top: -7px; 
+	transform: rotateZ(300deg);
+}
+
+#galleryModal .preBtn .draw:after {
+	content: "";
+	position: absolute;
+	border: 1px solid white;
+	height: 0px;
+	width: 20px;
+	border-radius: 10px;
+	left: -7px; 
+	top: 10px; 
+	transform: rotateZ(60deg);
+}
 
 #galleryModal .nextBtn {right: -5px;}
 #galleryModal .nextBtn .draw {
@@ -3097,8 +3099,29 @@ img.st-user-pic{
   top: 25vh;
   left: 30px;
 }
-#galleryModal .nextBtn .draw:before {right: -7px; top: -7px; transform: rotateZ(60deg);}
-#galleryModal .nextBtn .draw:after {right: -7px; top: 10px; transform: rotateZ(300deg);}
+#galleryModal .nextBtn .draw:before {
+	content: "";
+	position: absolute;
+	border: 1px solid white;
+	height: 0px;
+	width: 20px;
+	border-radius: 10px;
+	right: -7px; 
+	top: -7px; 
+	transform: rotateZ(60deg);
+}
+
+#galleryModal .nextBtn .draw:after {
+	content: "";
+	position: absolute;
+	border: 1px solid white;
+	height: 0px;
+	width: 20px;
+	border-radius: 10px;
+	right: -7px; 
+	top: 10px; 
+	transform: rotateZ(300deg);
+}
 
 #galleryModal #caption {
 	position: fixed;

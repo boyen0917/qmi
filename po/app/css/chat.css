@@ -2005,13 +2005,12 @@ td.memberName span{
 
 #galleryModal .arrowBtn:hover {opacity: 1;}
 #galleryModal .arrowBtn {
-    position: fixed;
-    bottom: 25vh;
-    width: 50px;
-    height: 50vh;
-    cursor: pointer;
-    opacity: 0.5;
-    transition: 0.3s;
+	position: fixed;
+	bottom: 25vh;
+	width: 50px;
+	height: 50vh;
+	cursor: pointer;
+	opacity: 0.5;
 }
 
 #galleryModal .arrowBtn .draw:before {
