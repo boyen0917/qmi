@@ -4992,7 +4992,17 @@ groupMenuListArea = function (noApi){
 
         if(Object.keys( QmiGlobal.groups ).length > 2) $(".sm-group-switch").show();
 
-        // if(Object.keys( QmiGlobal.groups ).length === 0) $.mobile.changePage("#page-group-menu");
+        // 判斷無官方帳號團體就關閉標題
+        (function() {
+            var hasOfficialGroup = false;
+            Object.keys(QmiGlobal.groups).forEach(function(tempGi) {
+                var tempGroupObj = QmiGlobal.groups[tempGi],
+                    type = tempGroupObj.tp.toLowerCase();
+                if(!type.indexOf("c") || !type.indexOf("d")) hasOfficialGroup = true;
+            });
+            if(!hasOfficialGroup) listArea.find(".sm-offical-group").hide();
+        }())
+        
         //設定調整團體頭像
         $(document).data("group-avatar",true);
 
