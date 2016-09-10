@@ -64,16 +64,12 @@ logout = function(){
     var method = "delete";
 
     ajaxDo(api_name,headers,method,true).complete(function(data){
-        // localStorage.removeItem("_loginAutoChk");
-     //    localStorage.removeItem("_loginData");
-
         // 關閉移轉團體所有聊天室
         (Object.keys(windowList) || []).forEach(function(thisCi){
             windowList[thisCi].close();
         });
-
-        resetDB();
-        document.location = "index.html";
+        
+        reLogin();
     });
 }
 

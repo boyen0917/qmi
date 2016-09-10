@@ -728,9 +728,8 @@ QmiAjax.prototype = {
 			// 聊天室關閉
 			if(window.location.href.match(/po\/app\/chat.html/)) window.close();
 
-			resetDB();
+			QmiGlobal.rspCode401 = true;
 			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
-
 			return;
 		}
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
