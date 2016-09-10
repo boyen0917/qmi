@@ -435,48 +435,20 @@ timelineSwitch = function (act,reset,main,noPR){
 
     var gmConHeader = $(".gm-content-header");
     gmConHeader.hide();
-    //desktop 版的chrome scrollbar 會被吃掉 這算 activate
-    // var scrollDom = $("#page-group-main .gm-content > div:nth-child(2)");
-    // scrollDom.css("overflow-y","hidden");
-    // setTimeout(function(){
-    //     scrollDom.css("overflow-y","scroll");
-    // },10);
-
-
+    
     switch (act) {
         case "feeds":
-            // $(".st-filter-action")
-            // .find("[data-status='all']").show().addClass("st-filter-list-active").end()
-            // .find("[data-navi='announcement']").show().end()
-            // .find("[data-navi='feedback']").show().end()
-            // .find("[data-navi='task']").show().end()
-            // .find("[data-navi='feed-post']").hide().end()
-            // .find("[data-navi='feed-public']").hide();
             var filterAction = $(".st-filter-action");
             filterAction.filter(".st-filter-list-active").removeClass("st-filter-list-active");
-            // filterAction.filter("[data-status='all']").hide();
             filterAction.filter("[data-navi='announcement']").show();
             filterAction.filter("[data-navi='feedback']").show();
             filterAction.filter("[data-navi='task']").show();
-            // filterAction.filter("[data-navi='feed-public']").hide();
-            // filterAction.filter("[data-navi='feed-post']").show().addClass("st-filter-list-active");
             $(".subpage-addressBook").hide();
-            // $(".st-filter-main span").html( $.i18n.getString("FEED_ALL") );
-
-            //filter all
-            // var filterArea = $(".st-filter-area");
-            // filterArea.data("filter","all");
-            // filterArea.children(".st-filter-hide.right").show();
-            // filterArea.children(".st-filter-hide.left").hide();
-            // filterArea.scrollLeft(0);
-
 
             //顯示新增貼文按鈕
             gmHeader.find(".feed-compose").show();
 
-            // $("#page-group-main .main-subpage:not(.subpage-timeline)").hide();
-            $(".subpage-timeline").show();
-
+            $("#page-group-main .subpage-timeline").show().scrollTop(0);
 
             //polling 數字重寫
             pollingCountsWrite();
@@ -492,7 +464,6 @@ timelineSwitch = function (act,reset,main,noPR){
                 });
             }   
             
-
           break;
         case "memberslist": 
             switchDeferred.resolve({ act: "memberslist"});
