@@ -2242,13 +2242,26 @@ function sendMsgText(dom) {
 			$.i18n.getString("COMMON_CANCEL"), [function () { //on ok
 				var iAmAdmin = g_room.memList[gu].ad;
 				if (iAmAdmin) {
-					popupShowAdjust("你已是管理員了!!",
-						"請保留成員至少有一位是管理員，並將自己的權限取消!!",
-						"前往編輯",
-						$.i18n.getString("COMMON_CANCEL"), [function () {
-							showEditRoomPage();
-						}]
-					);
+					if (g_room.cpc == 1) { //只剩下自己，可以退出
+						leaveRoomAPI(ci, function () {
+							var userData = $.userStorage();
+							g_group = userData[gi];
+							delete g_group.chatAll[ci];
+
+							$.userStorage(userData);
+							$('.sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
+							window.close();
+						});
+					} else {
+						popupShowAdjust("你已是管理員了!!",
+							"請保留成員至少有一位是管理員，並將自己的權限取消!!",
+							"前往編輯",
+							$.i18n.getString("COMMON_CANCEL"), [function () {
+								showEditRoomPage();
+							}]
+						);
+					}
+
 				} else {
 					leaveRoomAPI(ci, function () {
 						var userData = $.userStorage();
