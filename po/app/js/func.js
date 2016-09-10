@@ -6186,7 +6186,7 @@ timelineAudioMake = function (this_event,audio_arr){
 timelineVideoMake = function (this_event,video_arr){
     $.each(video_arr,function(i,val){
         var this_video = $(
-            '<video class="download"></video>'
+            '<video class="download" preload="none"></video>'
         );
         this_event.find(".st-attach-video").prepend(this_video);
         getS3file(val,this_video,7);

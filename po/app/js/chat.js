@@ -1408,7 +1408,7 @@ function showMsg(object, bIsTmpSend) {
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
+			var video = $("<div class='msg-video'><div class='videoContainer'><video preload='none'><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
 			msgDiv.append(video);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
