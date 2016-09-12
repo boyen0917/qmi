@@ -5916,9 +5916,11 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 this_event.find(".st-sub-box-2-attach-area").show();
 
                 if(val.i) {
+                    console.log(val.i);
                     this_event.find(".st-attach-url-img").show();
                     this_event.find(".st-attach-url-img img").attr("src",val.i).error(function(){
-                        $(this).attr("src","images/common/icon/icon_noPhoto.png");
+                        //$(this).attr("src","images/common/icon/icon_noPhoto.png");
+                        $(this).parent().remove();
                     });
                 }
                 this_event.find(".st-attach-url-title").html(val.t);
@@ -6879,7 +6881,16 @@ getLinkMeta = function (this_compose,url) {
             if( data.image && data.image.url ){
                 if( Array.isArray(data.image.url) ){
                     if(data.image.url.length>0){
-                        result.img = data.image.url[0];
+                        console.log(data.image.url);
+                        data.image.url.forEach(function(url){
+                            var img = new Image();
+                            if(url.match(/^https?:\/\/.*\.(?:jpeg|jpg|png)$/) == null){
+                                data.image.url = $.grep(data.image.url,function(val){
+                                    return val != url;
+                                })
+                            }
+                        });
+                        result.img = data.image.url[0];       
                     }
                 } else {
                     result.img = data.image.url;
