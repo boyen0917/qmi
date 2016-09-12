@@ -488,18 +488,19 @@ body {
 	max-height: 120px;
 	height: 120px;
 	content: "X";
+	float: right;
 }
 .msg-video:not(.loaded){
 	margin-bottom: 10px;
 }
 .msg-video:not(.loaded):before{
-	position: absolute;
+/*	position: absolute;
 	width: 123%;
 	content: "";
-	border-top: 2px solid dimgrey;
+	border-top: 2px solid dimgrey;*/
 	-webkit-transform: rotate(37deg) translate(13px,45px);  
 	/*background-image: url(../images/st_bottom_loading.gif);*/
-	z-index: 11;
+	/*z-index: 11;*/
 }
 .msg-video.loaded{
 	cursor: pointer;

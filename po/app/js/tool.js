@@ -1636,11 +1636,11 @@ getQRCodeFileNameWithExtension = function( addr ){
 renderVideoFile = function(file, videoTag, onload, onError){
 	var reader = new FileReader();
 	reader.onload = function(event){
-		videoTag.addClass("loaded");
+		// videoTag.addClass("loaded");
 		if( videoTag.length>0 ){
 			var video = videoTag[0];
 			video.oncanplay = function(event){
-				videoTag.addClass("loaded");
+				// videoTag.addClass("loaded");
 				if(onload) onload(videoTag);
 			}
 			video.onerror = function(event){

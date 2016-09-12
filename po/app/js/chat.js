@@ -295,7 +295,6 @@ $(function(){
 
 				if (file.type.match(imageType)) {
 					var this_grid = showUnsendMsg("", 6);
-					console.log(this_grid.html());
 					scrollToBottom();
 
 					//編號 方便刪除
@@ -325,17 +324,14 @@ $(function(){
 					//編號 方便刪除
 					this_grid.data("file-num", i);
 					this_grid.data("file", file);
-
+					this_grid.find(".chat-fail-status").hide();
 					renderVideoFile(file, this_grid.find("div video"), function (videoTag) {
 						var parent = videoTag.parents(".msg-video");
-						
+						parent.find("video").attr("preload", "none");
 						parent.find(".length").html(secondsToTime(videoTag[0].duration));
 						parent.find(".download").remove();
 
-						if (! parent.hasClass("loaded")) {
-							parent.addClass("loaded");
-							sendMsgVideo(this_grid);
-						}
+						sendMsgVideo(this_grid);
 						
 					}, function (videoTag) {
 						var parent = videoTag.parents(".msg-video");
@@ -1408,7 +1404,7 @@ function showMsg(object, bIsTmpSend) {
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			var video = $("<div class='msg-video'><div class='videoContainer'><video preload='none'><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
+			var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
 			msgDiv.append(video);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
@@ -1662,6 +1658,7 @@ function sendMsgText(dom) {
 	function sendMsgImage(dom) {
 		var file = dom.data("file");
 		var tmpData = dom.data("data");
+		var uploadXhr;
 		if (null == file) {
 			setTimeout(function () {
 				popupShowAdjust("",
@@ -1721,7 +1718,7 @@ function sendMsgText(dom) {
             oriObj: {w: 1280, h: 1280, s: 0.7},
             tmbObj: {w: 480, h: 480, s: 0.6}
         }).done(function(response){
-    		if (response.data) {
+    		if (response.isSuccess) {
 				//delete old data
 				g_idb_chat_msgs.remove(tmpData.ei);
 
@@ -1756,14 +1753,117 @@ function sendMsgText(dom) {
 				g_idb_chat_msgs.put(node, function(){
 					sendMsgText(dom);
 				});
+			} else {
+				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+	        	dom.find(".chat-fail-status").show();
+	        	dom.find(".progress-container").remove();
 			}
-        }).fail(function(data) {
-        	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-        	dom.find(".chat-fail-status").show();
-        	dom.find(".progress-container").remove();
+        });
+	}
+	function sendMsgVideo(dom) {
+		var file = dom.data("file");
+		var tmpData = dom.data("data");
+		var uploadXhr;
+		if (null == file) {
+			setTimeout(function () {
+				popupShowAdjust("",
+					$.i18n.getString("CHAT_UPLOAD_FILE_MISSING"),
+					$.i18n.getString("COMMON_OK"),
+					"", [function () { //on ok
+						g_idb_chat_msgs.remove(tmpData.ei);
+						dom.hide('slow', function () {
+							dom.remove();
+						});
+					}]
+				);
+			}, 500);
+			return;
+		}
+		var video = dom.find("video");
+
+		var ori_arr = [1280, 1280, 0.9];
+		var tmb_arr = [160, 160, 0.4];
+
+		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
+
+		dom.find(".msg-video").after("<div class='progress-container'><progress class='" 
+			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>"
+			+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
+
+		dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+			uploadXhr.abort();
+		});
+
+		qmiUploadFile({
+            urlAjax: {
+                apiName: "groups/" + gi + "/files",
+                method: "post",
+                body: {
+                    tp: 2,
+                    ti: ti_chat,
+                    pi: 0
+                }
+            },
+            tp: 2,
+            hasFi: true,
+            progressBar: function () {
+            	uploadXhr = new window.XMLHttpRequest();
+				uploadXhr.upload.addEventListener("progress", function(evt){
+			      	if (evt.lengthComputable) {
+			        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
+				      	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
+			      	}
+			    }, false);
+
+			    return uploadXhr;
+            },
+            file: file,
+            fileName: file.name,
+            oriObj: {w: 1280, h: 1280, s: 0.9}
+        }).done(function(response) {
+        	if (response.isSuccess) {
+	        	//delete old data
+	            g_idb_chat_msgs.remove(tmpData.ei);
+
+	            tmpData.ml[0].c = response.data.fi;
+				tmpData.ml[0].p = pi;
+				//add new data to db & show
+				var newData = {
+					ei: tmpData.ei,
+					meta: {
+						gu: g_group.gu,
+						ct: tmpData.ct
+					},
+					ml: [
+						{
+							tp: tmpData.ml[0].tp,
+							c: response.data.fi,
+							p: pi
+						}
+					],
+					notSend: true
+				};
+
+				var node = {
+					gi: gi,
+					ci: ci,
+					ei: newData.ei,
+					ct: newData.ct,
+					data: newData
+				};
+				dom.data("data", tmpData);
+				//update db
+				g_idb_chat_msgs.put(node, function(){
+					sendMsgText(dom);
+				});
+			} else {
+				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+	        	dom.find(".chat-fail-status").show();
+	        	dom.find(".progress-container").remove();
+			}
         });
 
-		// uploadGroupImage(gi, file, ti_chat, 0, ori_arr, tmb_arr, pi, function (data) {
+		// uploadGroupVideo(gi, file, video, ti_chat, 0, ori_arr, tmb_arr, pi, function (data) {
 		// 	if (data) {
 		// 		//delete old data
 		// 		g_idb_chat_msgs.remove(tmpData.ei);
@@ -1803,73 +1903,6 @@ function sendMsgText(dom) {
 		// 		dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
 		// 	}
 		// });
-		// }
-	}
-	function sendMsgVideo(dom) {
-		var file = dom.data("file");
-		var tmpData = dom.data("data");
-		if (null == file) {
-			setTimeout(function () {
-				popupShowAdjust("",
-					$.i18n.getString("CHAT_UPLOAD_FILE_MISSING"),
-					$.i18n.getString("COMMON_OK"),
-					"", [function () { //on ok
-						g_idb_chat_msgs.remove(tmpData.ei);
-						dom.hide('slow', function () {
-							dom.remove();
-						});
-					}]
-				);
-			}, 500);
-			return;
-		}
-		var video = dom.find("video");
-
-		var ori_arr = [1280, 1280, 0.9];
-		var tmb_arr = [160, 160, 0.4];
-
-		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
-
-		uploadGroupVideo(gi, file, video, ti_chat, 0, ori_arr, tmb_arr, pi, function (data) {
-			if (data) {
-				//delete old data
-				g_idb_chat_msgs.remove(tmpData.ei);
-
-				tmpData.ml[0].c = data.fi;
-				tmpData.ml[0].p = pi;
-				//add new data to db & show
-				var newData = {
-					ei: tmpData.ei,
-					meta: {
-						gu: g_group.gu,
-						ct: tmpData.ct
-					},
-					ml: [
-						{
-							tp: tmpData.ml[0].tp,
-							c: data.fi,
-							p: pi
-						}
-					],
-					notSend: true
-				};
-
-				var node = {
-					gi: gi,
-					ci: ci,
-					ei: newData.ei,
-					ct: newData.ct,
-					data: newData
-				};
-				dom.data("data", tmpData);
-				//update db
-				g_idb_chat_msgs.put(node, function(){
-					sendMsgText(dom);
-				});
-			} else {
-				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-			}
-		});
 		// }
 	}
 
@@ -1932,48 +1965,51 @@ function sendMsgText(dom) {
             file: file,
             oriObj: {w: 1280, h: 1280, s: 0.9}
         }).done(function(response){
-        	// var this_grid = showUnsendMsg(response.data.fi, 26, file.name);
-        	var chatData = dom.data("data");
-        	var currentTime = new Date().getTime();
-			
-			g_idb_chat_msgs.remove(chatData.ei);
 
-			// tmpData.ml[0].c = data.fi;
-			// tmpData.ml[0].p = pi;
-			// //add new data to db & show
-			var newData = {
-				ei: chatData.ei,
-				meta: {
-					gu: g_group.gu,
-					ct: currentTime
-				},
-				ml: [
-					{
-						tp: 26,
-						c: response.data.fi,
-						si: file.size,
-						fn: file.name
-					}
-				],
-				notSend: true
-			};
+        	if (response.isSuccess) {
+        		// var this_grid = showUnsendMsg(response.data.fi, 26, file.name);
+	        	var chatData = dom.data("data");
+	        	var currentTime = new Date().getTime();
+				
+				g_idb_chat_msgs.remove(chatData.ei);
 
-			var node = {
-				gi: gi,
-				ci: ci,
-				ei: chatData.ei,
-				ct: currentTime,
-				data: newData
-			};
-			dom.data("data", newData);
-			//update db
-			g_idb_chat_msgs.put(node, function(){
-				sendMsgText(dom);
-			});
-        }).fail(function(data) {
-        	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-        	dom.find(".chat-fail-status").show();
-        	dom.find(".progress-container").remove();
+				// tmpData.ml[0].c = data.fi;
+				// tmpData.ml[0].p = pi;
+				// //add new data to db & show
+				var newData = {
+					ei: chatData.ei,
+					meta: {
+						gu: g_group.gu,
+						ct: currentTime
+					},
+					ml: [
+						{
+							tp: 26,
+							c: response.data.fi,
+							si: file.size,
+							fn: file.name
+						}
+					],
+					notSend: true
+				};
+
+				var node = {
+					gi: gi,
+					ci: ci,
+					ei: chatData.ei,
+					ct: currentTime,
+					data: newData
+				};
+				dom.data("data", newData);
+				//update db
+				g_idb_chat_msgs.put(node, function(){
+					sendMsgText(dom);
+				});
+        	} else {
+        		dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+	        	dom.find(".chat-fail-status").show();
+	        	dom.find(".progress-container").remove();
+        	}
         });
 	}
 
@@ -2102,6 +2138,7 @@ function sendMsgText(dom) {
 							parent.addClass("loaded");
 							parent.find(".length").html(secondsToTime(videoTag[0].duration));
 							parent.find(".download").attr("href", videoTag.attr("src"));
+							parent.find("video").attr("preload", "none");
 						}, function (videoTag) {
 							var parent = videoTag.parents(".msg-video");
 							parent.addClass("error");
