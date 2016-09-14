@@ -1639,10 +1639,10 @@ renderVideoFile = function(file, videoTag, onload, onError){
 		// videoTag.addClass("loaded");
 		if( videoTag.length>0 ){
 			var video = videoTag[0];
-			video.oncanplay = function(event){
+			// video.oncanplay = function(event){
 				// videoTag.addClass("loaded");
 				if(onload) onload(videoTag);
-			}
+			// }
 			video.onerror = function(event){
 				videoTag.addClass("error");
 				if(onError) onError(videoTag);
@@ -1662,10 +1662,10 @@ renderVideoFile = function(file, videoTag, onload, onError){
 
 renderVideoUrl = function(url, videoTag, onload, onError){
 	if( videoTag.length>0 ){
-		videoTag[0].oncanplay = function(event){
-			videoTag.addClass("loaded");
+		// videoTag[0].oncanplay = function(event){
+			// videoTag.addClass("loaded");
 			if(onload) onload(videoTag);
-		}
+		// }
 		videoTag[0].onerror = function(event){
 			videoTag.addClass("error");
 			if(onError) onError(videoTag);

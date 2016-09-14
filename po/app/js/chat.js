@@ -60,6 +60,7 @@ $(function(){
 	QmiGlobal.cloudGiMap = window.chatAuthData.cloudGiMap;
 	QmiGlobal.operateChatList = window.chatList;
 
+
 	/**
 	              ███████╗███████╗████████╗██╗   ██╗██████╗           
 	              ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗          
@@ -237,14 +238,7 @@ $(function(){
 		sendBtn.off("click");
 		sendBtn.click(onClickSendChat);
 		var input = $("#footer .contents .input");
-		// input.autosize({append: "\n"});
 		input.off("keydown").off("keypress");
-		// input.off("keydown").off("keypress");
-		// input.keydown(function(e){
-		//     if (e.keyCode == '8' || e.keyCode=='46'){	//backspace or delete
-		//     	setTimeout(updateChatContentPosition,50);
-		//     }
-		// });
 
 		//press enter to send text
 		input.keypress(function (e) {
@@ -282,6 +276,7 @@ $(function(){
 		$(".input-other").off("click").click(function () {
 			$(".cp-file").trigger("click");
 		});
+
 		$(".cp-file").change(function (e) {
 			var file_ori = $(this);
 			if (file_ori[0].files.length > 9) {
@@ -310,13 +305,15 @@ $(function(){
 							var w = img.width();
 							var h = img.height();
 							mathAvatarPos(img, w, h, 100);
+
+							sendMsgImage(this_grid);
 						});
 
 						img.attr("src", reader.result);
-					}
 
+					}
 					reader.readAsDataURL(file);
-					sendMsgImage(this_grid);
+					
 				} else if (file.type.match(videoType)) {
 					var this_grid = showUnsendMsg("", 7);
 					scrollToBottom();
@@ -327,8 +324,7 @@ $(function(){
 					this_grid.find(".chat-fail-status").hide();
 					renderVideoFile(file, this_grid.find("div video"), function (videoTag) {
 						var parent = videoTag.parents(".msg-video");
-						parent.find("video").attr("preload", "none");
-						parent.find(".length").html(secondsToTime(videoTag[0].duration));
+						parent.find(".length").html("--:--");
 						parent.find(".download").remove();
 
 						sendMsgVideo(this_grid);
@@ -369,13 +365,11 @@ $(function(){
 				g_extraInputStatus = 2;
 				$(this).addClass("active");
 			}
-			// cns.debug("emoji: ", g_extraInputStatus);
 		});
 		// resizeContent();
 
 		//load msg when scroll to top
 		g_container = $("#container");
-		// g_container.on("mousewheel", onScrollContainer);
 		g_container.scroll(onScrollContainer);
 		$("html, body").scroll(onScrollBody);
 
@@ -588,10 +582,6 @@ $(function(){
 					footer.animate({bottom: "-205px"});
 
 					g_container.css("top", "65px").css("height", "-webkit-calc( 100vh - 116px )").scrollTop(oriOffset);
-					// g_container.animate({top:"65px",height:"-=116"},function(){
-					// 	g_container.css("height","-webkit-calc( 100vh - 116px )");
-					// 	g_container.scrollTop(oriOffset);
-					// });
 				}
 				video.onpause = function () {
 					$(this).parents(".msg-video").addClass("pause");
@@ -601,19 +591,6 @@ $(function(){
 				}
 			}
 		});
-		// $(document).on("click",".msg-video.playing .stopBtn", function(){
-		// 	var thisTag = $(this);
-		// 	var parent = thisTag.parent();
-		// 	var videoTag = parent.find("video");
-		// 	if( videoTag.length>0 ){
-		// 		parent.removeClass("playing");
-		// 		videoTag.prop("controls",false);
-		// 		var video = videoTag[0];
-		//          	video.pause();
-		//          	video.currentTime = video.duration-0.1;
-		// 	}
-		// 	thisTag.remove();
-		// });
 
 		//點擊播放中的影片結束播放
 		$(document).on("click", ".msg-video.loaded.playing", function () {
@@ -748,7 +725,6 @@ function onChatDBInit() {
 	var today = new Date();
 	$("#chat-contents").html("<div class='firstMsg'></div>");
 	var timeTag = $("<div class='chat-date-tag'></div>");
-	// timeTag.addClass( today.customFormat("_#YYYY#_#MM#_#DD#") );
 	timeTag.data("time", today.getTime());
 	timeTag.html(getFormatTimeTag(today));
 	today.setHours(0);
@@ -763,35 +739,6 @@ function onChatDBInit() {
 
 	scrollToBottom();
 
-	// var onItem = function (item) {
- //  		// console.log('got item:', item.ct);
-
- //  		var date = new Date().getTime();
- //  		var onsuccess = function(result){
-	// 		if(result !== false){
-	// 		    console.log('deletion successful!');
-	// 		}
-	// 	}
-	// 	var onerror = function(error){
-	// 	  	console.log('Oh noes, sth went wrong!', error);
-	// 	}
- //  		if(date > item.ct) {
- //  			console.log(new Date(item.ct));
- //  			// g_idb_chat_msgs.remove(item.ei, onsuccess, onerror)
- //  		}
-	// };
-
-	// var onEnd = function (item) {
- //  		console.log('All done.');
-	// };
-
-
-	// g_idb_chat_msgs.iterate(onItem, {
-	// 	index: 'gi_ci_ct',
-	// 	filterDuplicates: true,
-	// 	onEnd: onEnd
-	// });
-
 }
 
 
@@ -805,23 +752,18 @@ function getHistoryMsg(bIsScrollToTop) {
 		return;
 	}
 	var container = $("#container");
-	// $("#container").off("scroll");
 
 	g_isLoadHistoryMsgNow = true;
 	// cns.debug("g_isLoadHistoryMsgNow",g_isLoadHistoryMsgNow);
 	$("#chat-loading-grayArea").hide();
 	$("#chat-loading").show();
-	cns.debug("----- getHistoryMsg", bIsScrollToTop, " ------");
+	
 	g_idb_chat_msgs.limit(function (list) {
+		console.log("list", list);
 		var firstDayDiv = $("#chat-contents .chat-date-tag");
 		var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
 		setCurrentFocus( (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null );
 		
-		//add red border to fist dom to test current position
-		// $(".sdfsfg").removeClass("sdfsfg").css("border", "");
-		// g_currentScrollToDom.addClass("sdfsfg").css("border", "1px solid red");
-
-		//cns.debug("list:",JSON.stringify(list,null,2));
 		if (list.length > 0) {
 			//list is from near to far day
 			for (var i in list) {
@@ -833,13 +775,8 @@ function getHistoryMsg(bIsScrollToTop) {
 				}
 			}
 			if (isUpdatePermission) getPermition(true);
+			if (bIsScrollToTop) g_isLoadHistoryMsgNow = false;
 
-
-			if (bIsScrollToTop) {
-				g_isLoadHistoryMsgNow = false;
-			} else {
-
-			}
 			showChatCnt();
 		}
 
@@ -852,7 +789,6 @@ function getHistoryMsg(bIsScrollToTop) {
 			$("#chat-loading").hide();
 			$("#chat-loading-grayArea").show();
 			g_isFirstTimeLoading=false;
-			// g_container.getNiceScroll()[0].wheelprevented = false;
 		} else {
 
 			//舊訊息從local撈 如果小於 就去server取
@@ -863,7 +799,6 @@ function getHistoryMsg(bIsScrollToTop) {
 				hideLoading();
 			}
 		}
-		// // cns.debug("---- end loading -----");
 	}, {
 		index: "gi_ci_ct",
 		keyRange: g_idb_chat_msgs.makeKeyRange({
@@ -886,14 +821,7 @@ function getHistoryMsg(bIsScrollToTop) {
 紀錄讀取歷史訊息時, 目前最上方的dom
 **/
 function setCurrentFocus(dom){
-	if( dom ){
-		g_currentScrollToDom = dom;
-		// cns.debug("---- start lockCurrentFocusInterval -----",g_currentScrollToDom);
-		// lockCurrentFocusInterval = setInterval( function(){
-			// g_currentScrollToDom.scrollIntoView();
-		// }, lockCurrentFocusIntervalLength );
-		// g_container.getNiceScroll()[0].wheelprevented = true;
-	}
+	if( dom ) g_currentScrollToDom = dom;
 }
 /**
 隱藏讀取轉轉轉
@@ -911,10 +839,6 @@ function hideLoading() {
 		$("#chat-loading").hide();
 		g_currentScrollToDom.scrollIntoView({behavior: "smooth"});
 		g_currentScrollToDom = null;
-		// g_container.getNiceScroll()[0].wheelprevented = false;
-		// clearInterval( lockCurrentFocusInterval );
-
-		// cns.debug("---- end lockCurrentFocusInterval -----");
 
 	} else {
 		$("#chat-loading").stop().fadeOut(function () {
@@ -925,9 +849,6 @@ function hideLoading() {
 			var posi = g_container.scrollTop();
 			if (posi <= loading.height()) {
 				var content = $("#chat-contents");
-				// if( content.length>0 ){
-				// 	content[0].scrollIntoView();
-				// }
 				g_container.scrollTop(content.offset().top);
 			}
 		});
@@ -1010,7 +931,7 @@ function getMemberName(groupUI) {
 	if (null == mem)   return "unknown";
 	return mem.nk;
 }
-
+window.uc = updateChat;
 function updateChat(time, isGetNewer) {
 	var api = "groups/" + gi + "/chats/" + ci + "/messages";
 	if (time) {
@@ -1022,6 +943,7 @@ function updateChat(time, isGetNewer) {
 	}
 
 	op(api, "GET", "", function (data, status, xhr) {
+		console.log("updateChat", data);
 			g_group = $.userStorage()[gi];
 			g_room = g_group["chatAll"][ci];
 			if (null == g_room.lastCt){
@@ -1282,6 +1204,7 @@ function showMsg(object, bIsTmpSend) {
 
 				chatFailContainer.find(".chat-resend").click(function (e) {
 					e.stopPropagation();
+					// chatFailContainer.hide();
 					sendChat(container);
 				});
 
@@ -1293,36 +1216,13 @@ function showMsg(object, bIsTmpSend) {
 						g_idb_chat_msgs.remove(data.ei);
 					}
 
-					container.hide('slow', function () {
+					container.fadeOut(function () {
 						container.remove();
 					});
 				});
 				// status.addClass('chat-msg-load-error');
 				// td.append(status);
 			}
-			// status.click(function () {
-			// 	if ($(this).hasClass("chat-msg-load-error")) {
-			// 		popupShowAdjust("", $.i18n.getString("CHAT_FAIL_SENDING_MSG"), true, true, [sendChat, container]);
-			// 		$(".popup-confirm").html($.i18n.getString("CHAT_RESEND"));
-			// 		$(".popup-cancel").html($.i18n.getString("COMMON_DELETE"));
-			// 		$(".popup-cancel").off("click").click(function () {
-			// 			var data = container.data("data");
-			// 			if (data) {
-			// 				g_idb_chat_msgs.remove(data.ei);
-			// 			}
-			// 			container.hide('slow', function () {
-			// 				container.remove();
-			// 			});
-			// 			$(".popup-screen").hide();
-			// 			$(".popup").hide();
-			// 			QmiGlobal.popup.prototype.removeE();
-			// 		});
-			// 		$(".popup-screen").off("click").click(function () {
-			// 			$(".popup-screen").hide();
-			// 			$(".popup").hide();
-			// 		});
-			// 	}
-			// });
 		} else {
 			td.append("<div></div>");
 		}
@@ -1394,7 +1294,7 @@ function showMsg(object, bIsTmpSend) {
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			var pic = $("<img class='msg-img' style='width:150px;'>");
+			var pic = $("<img class='msg-img' style='width: 150px;'>");
 			msgDiv.append(pic);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
@@ -1404,7 +1304,7 @@ function showMsg(object, bIsTmpSend) {
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			var video = $("<div class='msg-video'><div class='videoContainer'><video><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
+			var video = $("<div class='msg-video'><div class='videoContainer'><video preload='none'><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
 			msgDiv.append(video);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
@@ -1524,7 +1424,6 @@ function showMsg(object, bIsTmpSend) {
 			// msgDiv.html( msgData.tp+"<br/>"+msgData.c );
 			break;
 	}
-	cns.debug("showMsg finished");
 	return container;
 }
 
@@ -1664,9 +1563,9 @@ function sendMsgText(dom) {
 				popupShowAdjust("",
 					$.i18n.getString("CHAT_UPLOAD_FILE_MISSING"),
 					$.i18n.getString("COMMON_OK"),
-					"", [function () { //on ok
+					false, [function () { //on ok
 						g_idb_chat_msgs.remove(tmpData.ei);
-						dom.hide('slow', function () {
+						dom.fadeOut(function () {
 							dom.remove();
 						});
 					}]
@@ -1681,7 +1580,7 @@ function sendMsgText(dom) {
 		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
 
 		dom.find(".msg-img").after("<div class='progress-container'><progress class='" 
-			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>"
+			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>0%"
 			+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
 
 		dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
@@ -1689,7 +1588,6 @@ function sendMsgText(dom) {
 		});
 
 		dom.find(".chat-fail-status").hide();
-
 		qmiUploadFile({
             urlAjax: {
                 apiName: "groups/" + gi + "/files",
@@ -1769,9 +1667,9 @@ function sendMsgText(dom) {
 				popupShowAdjust("",
 					$.i18n.getString("CHAT_UPLOAD_FILE_MISSING"),
 					$.i18n.getString("COMMON_OK"),
-					"", [function () { //on ok
+					false, [function () { //on ok
 						g_idb_chat_msgs.remove(tmpData.ei);
-						dom.hide('slow', function () {
+						dom.fadeOut(function () {
 							dom.remove();
 						});
 					}]
@@ -1787,7 +1685,7 @@ function sendMsgText(dom) {
 		dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
 
 		dom.find(".msg-video").after("<div class='progress-container'><progress class='" 
-			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>"
+			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>0%"
 			+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
 
 		dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
@@ -1862,48 +1760,6 @@ function sendMsgText(dom) {
 	        	dom.find(".progress-container").remove();
 			}
         });
-
-		// uploadGroupVideo(gi, file, video, ti_chat, 0, ori_arr, tmb_arr, pi, function (data) {
-		// 	if (data) {
-		// 		//delete old data
-		// 		g_idb_chat_msgs.remove(tmpData.ei);
-
-		// 		tmpData.ml[0].c = data.fi;
-		// 		tmpData.ml[0].p = pi;
-		// 		//add new data to db & show
-		// 		var newData = {
-		// 			ei: tmpData.ei,
-		// 			meta: {
-		// 				gu: g_group.gu,
-		// 				ct: tmpData.ct
-		// 			},
-		// 			ml: [
-		// 				{
-		// 					tp: tmpData.ml[0].tp,
-		// 					c: data.fi,
-		// 					p: pi
-		// 				}
-		// 			],
-		// 			notSend: true
-		// 		};
-
-		// 		var node = {
-		// 			gi: gi,
-		// 			ci: ci,
-		// 			ei: newData.ei,
-		// 			ct: newData.ct,
-		// 			data: newData
-		// 		};
-		// 		dom.data("data", tmpData);
-		// 		//update db
-		// 		g_idb_chat_msgs.put(node, function(){
-		// 			sendMsgText(dom);
-		// 		});
-		// 	} else {
-		// 		dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-		// 	}
-		// });
-		// }
 	}
 
 	function sendMsgFile(dom) {
@@ -1917,7 +1773,7 @@ function sendMsgText(dom) {
 					$.i18n.getString("COMMON_OK"),
 					"", [function () { //on ok
 						g_idb_chat_msgs.remove(tmpData.ei);
-						dom.hide('slow', function () {
+						dom.fadeOut(function () {
 							dom.remove();
 						});
 					}]
@@ -2069,7 +1925,6 @@ function sendMsgText(dom) {
 				, "this_ti:", this_ti, "g_tu", g_tu);
 			return;
 		}
-		console.log("deff");
 		//default
 		var api_name = "groups/" + gi + "/chats/" + this_ti + "/files/" + file_c + "/dl";
 		var headers = {
@@ -2117,28 +1972,15 @@ function sendMsgText(dom) {
 					            isApplyWatermark : false,
 					            watermarkText : ""
 					        });
-							// showGallery(null, [{s32: obj.s32}], 0);
-							// 	var imgO = new Image();
-							// 	var gallery_str = "<img src=" + obj.s32 + " />";
-							// 	imgO.onload = function() {
-							// 		var gallery = window.open("layout/chat_gallery.html", "", "width=" + (this.width+30) + ", height=" + (this.height+25));
-							//     	$(gallery.document).ready(function(){
-							// 			setTimeout(function(){
-							// 				var this_slide = $(gallery.document).find(".pic");
-							// 				this_slide.html( gallery_str );
-							// 			},300);
-							// 		});
-							//     }
-							// 	imgO.src = obj.s32;
 						});
 						break;
 					case 7://video
 						renderVideoUrl(obj.s32, target.find("video"), function (videoTag) {
 							var parent = videoTag.parents(".msg-video");
-							parent.addClass("loaded");
-							parent.find(".length").html(secondsToTime(videoTag[0].duration));
+							parent.addClass("loaded");console.log("????");
+							parent.find(".length").html(secondsToTime(Math.floor(obj.md.l/1000)));
 							parent.find(".download").attr("href", videoTag.attr("src"));
-							parent.find("video").attr("preload", "none");
+							// parent.find("video").attr("preload", "none");
 						}, function (videoTag) {
 							var parent = videoTag.parents(".msg-video");
 							parent.addClass("error");
@@ -2607,57 +2449,6 @@ function sendMsgText(dom) {
 				});
 	    	}
 	    })
-		// var page = $("#page-edit-preview");
-		
-		// //修改成員
-		// page.find(".preview-add").off("click").click( editMember );
-
-		// //修改聊天室圖片
-		// page.find(".newChatDetail .img").off("click").click( function(){
-		// 	page.find(".newChatDetail .file").trigger("click");
-		// });
-
-		// page.find(".chatroomImage img").off("click").click( function(){
-		// 	page.find(".chatroomImage .file").trigger("click");
-		// });
-		// page.find(".newChatDetail .file").change( changeRoomImage );
-
-		// //完成
-		// page.find(".edit-nextStep").off("click").click( onComfirmEditRoom );
-
-		// //back confirm
-	 //    page.find('.page-back').off("click").click( function(e){
-	 //    	if( page.find(".edit-nextStep").hasClass("ready") ){
-		//     	e.preventDefault();
-		//     	e.stopPropagation();
-
-		//     	popupShowAdjust("",
-		// 			$.i18n.getString("FEED_CONFIRM_DISCARD"),
-		// 			$.i18n.getString("COMMON_OK"),
-	 //                $.i18n.getString("COMMON_CANCEL"),[function(){
-	 //                    $.popPage(false);
-	 //            	},null]
-	 //            );
-		        
-		//     }
-	 //    });
-
-	    //name input event
-	    // page.find(".newChatDetail table .input").keyup( function(){
-	    // 	var comfirmDom = page.find(".edit-nextStep");
-	    // 	var input = $(this);
-	    // 	var val = input.val();
-	    // 	if( val != input.data("oriName") ){
-	    // 		if(!val || val.length==0 ){
-	    // 			comfirmDom.data("nameEdited",false);
-	    // 		} else {
-	    // 			comfirmDom.data("nameEdited",true);
-	    // 		}
-	    // 	} else{
-	    // 		comfirmDom.removeData("nameEdited");
-	    // 	}
-	    // 	checkIsReady();
-	    // });
 	}
 
 	/**
@@ -3445,48 +3236,6 @@ function sendMsgText(dom) {
 							});
 							
 						});
-
-				   //  	//傳大圖
-				   //  	uploadImgToS3(originUrl,originImgobj.blob).complete(function(data){
-				   //  		if(data.status == 200){
-
-				   //  			//傳小圖 已經縮好囉
-					  //   		uploadImgToS3(thumbnailUrl,thumbnailImgObj.blob).complete(function(data){
-
-					  //       		if(data.status == 200){
-					  //       			var tempW = this.width;
-							// 			var tempH = this.height;
-										
-							// 			//mime type
-							// 			var md = {};
-					  //       			md.w = o_obj.w;
-					  //       			md.h = o_obj.h;
-
-					  //       			uploadChatAvatarCommit(fi, originImgobj.blob.size).complete(function(data){
-					  //       				if(data.status == 200){
-						 //        				var commit_result = $.parseJSON(data.responseText);
-
-						 //        				var data = {
-						 //        					fi:fi,
-						 //        					tu:commit_result.tu,
-						 //        					ou:commit_result.ou
-						 //        				}
-							//                 	if(callback) callback(data);
-							//                 } else {
-							//                 	if(callback) callback();
-							//                 }
-						 //                	return;
-					  //       			}); //end of uploadCommit
-
-					  //       		} else {
-							// 			if(callback)	callback();
-							// 		} //end of small uploadImgToS3 200
-					  //   		}); //end of small uploadImgToS3
-
-				   //  		} else {
-							// 	if(callback)	callback();
-							// } //end of big uploadImgToS3 200
-			    //     	}); //end of big uploadImgToS3
 					
 					} else{
 					 	if(callback)	callback();
