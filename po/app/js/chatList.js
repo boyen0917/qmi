@@ -297,9 +297,17 @@ function showChatList(){
 			}
 			// targetDiv.show();
 			sortRoomList();
+			var groupsClCnts = $.lStorage("_pollingData").cnts;
+			if(groupsClCnts[gi].hasOwnProperty("cl")){
+				groupsClCnts[gi].cl.forEach(function(obj){
+					var tmpDiv = $(".sm-cl-count[data-ci=" + obj.ci + "]").hide();
+					if(obj.B7 > 0){
+						tmpDiv.html(countsFormat(obj.B7, tmpDiv)).show();
+					}
+				});
+			}
 		})
 	}
-
 
 	$(".subpage-chatList-row .td:nth-child(2)").off("click");
 	$(".subpage-chatList-row .td:nth-child(2)").on("click", function(){
