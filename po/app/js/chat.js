@@ -205,7 +205,7 @@ $(function(){
 				if(g_room.tp == 1){
 					$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
 					$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
-				}else if(g_room.tp == 2 && g_cn == g_group.me){
+				}else if(g_room.tp == 2 && g_cn == g_group.me || g_group.guAll[g_cn] === undefined){
 					$("#header .title .text").html(g_group.gn._escape().replaceOriEmojiCode());
 				}else{
 					$("#header .title .text").html(g_group.guAll[g_cn].nk._escape().replaceOriEmojiCode());

@@ -248,12 +248,10 @@ function showChatList(){
 
 				//官方帳號聊天室名字修改
 				if(true == groupData.isOfficial){
-					if(groupData.ad != 1){
-						//var roomName = groupData.gn.replaceOriEmojiCode();
-					}else{
+					if(groupData.ad == 1){
 						if(room.tp == 1){
 							var roomName = chatRoomName.replaceOriEmojiCode();
-						}else if(room.tp == 2 && room["uiName"] == groupData.me){
+						}else if(room.tp == 2 && room["uiName"] == groupData.me || groupData.guAll[chatRoomName]=== undefined){
 							var roomName = groupData.gn.replaceOriEmojiCode();
 						}else{
 							var roomName = groupData.guAll[chatRoomName].nk.replaceOriEmojiCode();
