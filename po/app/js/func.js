@@ -2750,7 +2750,6 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
             '<div class="select">'+$.i18n.getString("COMMON_SELECT_ALL")+'</div></div>' );
         memSubTitle.append( "<div class='text'>"+$.i18n.getString("COMPOSE_SUBGROUP")+"</div>" );
         $(".obj-cell-area").append(memSubTitle);
-
         //團體rows
         $.each(bl,function(key,bl_obj){
 
@@ -2843,14 +2842,12 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
     
 
     //----- 加入成員列表 ------
-    
     //標題bar
     var memSubTitle = $("<div class='obj-cell-subTitle mem'></div>");
     if(!this_compose_obj.parent().hasClass("cp-work-item")){ //show群組的話show全選圈圈
         memSubTitle.append( '<div class="obj-cell-subTitle-chk">'+
             '<div class="img"></div>'+
             '<div class="select">'+$.i18n.getString("COMMON_SELECT_ALL")+'</div></div>' );
-    
         //mem全選
         memSubTitle.click( function(){
             //搜尋中關閉全選
@@ -2898,12 +2895,14 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
     }
     memSubTitle.append( "<div class='text'>"+$.i18n.getString("COMMON_MEMBER")+"</div>" );
     $(".obj-cell-area").append(memSubTitle);
-    
 
     //成員rows
     $.each(guAll,function(i,gu_obj){
         if( false==isShowSelf && i==group.gu ) return;
         if( false==isShowLeftMem && gu_obj.st!=1 ) return;
+
+        if(group.isOfficial && this_compose.data("offical")==="add" && group.guAll[group.gu].abl == "" && gu_obj.ad !=1) return;
+        // if(group.isOfficial && group.guAll[group.gu].abl == "" && gu_obj.ad !=1 ) return;
         var this_obj = getMemObjectRow(gu_obj, bl);
         $(".obj-cell-area").append(this_obj);
     });
@@ -2915,7 +2914,6 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
     if(obj_data && branch_data){
         obj_data = $.parseJSON(obj_data);
         branch_data = $.parseJSON(branch_data);
-
         if(Object.keys(obj_data).length || Object.keys(branch_data).length){
             $(".obj-content").data("selected-obj",obj_data);
             $(".obj-content").data("selected-branch",branch_data);
