@@ -37,11 +37,16 @@ var base_url = function() {
 
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {
+
 	if($.lStorage("_selectedServerUrl") === false || $.lStorage("_selectedServerUrl") === default_url) return;
 	base_url = $.lStorage("_selectedServerUrl");
 	
 	if($("#module-server-selector-url").length === 0) $("body").append(QmiGlobal.module.serverSelector.urlHtml());		
 	$("#module-server-selector-url").html(base_url);
+
+	// 更改網址 清db
+	if($.lStorage("_lastBaseUrl") !== false && $.lStorage("_lastBaseUrl") !== base_url) resetDB();
+	$.lStorage("_lastBaseUrl", base_url);
 })
 
 
@@ -841,6 +846,10 @@ QmiGlobal.module.serverSelector = {
 					$("#module-server-selector-url").html("");
 					localStorage.removeItem("_selectedServerUrl");
 				} else $.lStorage("_selectedServerUrl", newUrl);
+
+				// 改完刪資料庫
+				resetDB();
+
 				self.remove();
 				break;
 		}

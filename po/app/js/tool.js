@@ -664,13 +664,21 @@ resetDB = function(){
 	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 	if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 	if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
+	// var exceptionItemArr = [
+	// 	"_ver",
+	// 	"_loginRemeber",
+	// 	"_lastBaseUrl",
+	// ];
+
 	var verTmp = localStorage["_ver"];
 	var loginRememberTmp = localStorage["_loginRemeber"];
+	var lastBaseUrlTmp = localStorage["_lastBaseUrl"];
 
 	localStorage.clear();
 
 	if(verTmp) localStorage["_ver"] = verTmp;
 	if(loginRememberTmp) localStorage["_loginRemeber"] = loginRememberTmp;
+	if(lastBaseUrlTmp) localStorage["_lastBaseUrl"] = lastBaseUrlTmp;
 }
 
 getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){
