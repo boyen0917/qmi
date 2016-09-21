@@ -5949,6 +5949,197 @@ img.vdo-default { position: relative; width: 100px; }
 img.vdo-default:before {}
 
 
+#view-auth-manually {
+    height: 100vh;
+    position: absolute;
+    width: 100vw;
+    display: none; 
+    background: rgba(100,100,100,0.7);
+    z-index: 1820;
+}
+
+#view-auth-manually .container {
+    position: relative;
+    background: white;
+    width: 280px;
+    height: 440px;
+    margin: calc(50vh - 250px) auto;
+    color: #999;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+
+#view-auth-manually .icon-shield {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 40px auto 15px;
+}
+
+#view-auth-manually .icon-shield:before {
+    content: "";
+    position: absolute;
+    background: url(../images/ldap/icon_check_LDAP.png);
+    background-size: 100%;
+    width: 100px;
+    height: 100px;
+    left: 0;
+}
+
+
+#view-auth-manually .container.loading:before {
+    content: "";
+    position: absolute;
+    top: 170px;
+    left: 120px;
+    width: 30px;
+    height: 30px;
+    z-index: 11;
+    background: url(../images/spinner.gif);
+    color: #5f5e5e;
+    background-size: 100%;
+}
+
+#view-auth-manually .container.loading:after {
+    background: rgba(255,255,255,0.95);
+    z-index: 10;
+    position: absolute;
+    content: "";
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+#view-auth-manually .title1 { color: #1bb774; font-size: 18px; }
+#view-auth-manually .title2 { font-size: 12px; margin-bottom: 40px;}
+
+#view-auth-manually .input-wrap {
+    width: 185px;
+    border-bottom: 1px solid #ddd;
+    height: 35px;
+    margin: 0 0 15px 40px;
+    padding-left: 5px;
+    box-sizing: border-box;
+    position: relative;
+    line-height: 40px;
+}
+
+#view-auth-manually .input-wrap:before {content: ""; position: absolute;left: -30px;top: 7px; width: 28px; height: 28px;}
+#view-auth-manually .input-wrap.email:before { background: url(../images/ldap/icon_LDAP_email_green.png); background-size: 100%;}
+#view-auth-manually .input-wrap.password:before { background: url(../images/ldap/icon_LDAP_password_green.png); background-size: 100%;}
+
+#view-auth-manually input {
+	width: 100%;
+    height: 15px;
+    color: #555;
+    font-size: 14px;
+}
+
+#view-auth-manually .action {
+    margin: 40px auto 0;
+    width: 200px;
+    position: relative;
+    font-size: 15px;
+}
+
+#view-auth-manually .action > span {
+	position: absolute; 
+	cursor: pointer;
+	color: white;
+    background: #ccc;
+    width: 80px;
+    height: 25px;
+    border-radius: 5px;
+    line-height: 25px;
+    font-size: 13px;
+}
+#view-auth-manually .action .cancel {left: 0;}
+#view-auth-manually .action .submit {right: 0;}
+#view-auth-manually .action .submit.ready {background: #21ca82;}
+
+#view-auth-manually .footer {
+    color: #e24e54;
+    font-size: 11px;
+    margin: 170px auto 0;
+    position: relative;
+    width: 80px;
+    cursor: pointer;
+}
+#view-auth-manually .footer:before {position: absolute;content: url(../images/icon/icon_ldap_cross.png);left: -14px;}
+
+
+#module-server-selector {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(100,100,100,0.8);
+}
+
+#module-server-selector section {
+    background: white;
+    margin: 20vh auto;
+    width: 350px;
+    height: 50vh;
+    border-radius: 3px;
+    position: relative;
+}
+
+#module-server-selector ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    height: calc(100% - 50px);
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#module-server-selector ul li:hover {background: aliceblue;}
+#module-server-selector ul li {
+    height: 40px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+#module-server-selector ul li div:first-child {
+    font-size: 13px;
+    color: #888;
+}
+
+#module-server-selector > section > div {
+    position: absolute;
+    bottom: 0;
+    height: 50px;
+    border-top: 1px solid #ddd;
+    width: 100%;
+}
+
+#module-server-selector input {
+    background: transparent;
+    border-bottom: 1px solid #ddd;
+    width: 90%;
+}
+
+#module-server-selector li.active input {color: white;}
+#module-server-selector ul li.active {background: #51acf9; color: white;}
+
+#module-server-selector button {
+    display: block;
+    margin: 10px auto;
+    height: 30px;
+    width: 70px;
+    font-size: 15px;
+    border: 0;
+    background: #51acf9;
+    color: white;
+    font-weight: 600;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+
 *[contenteditable="true"] {
 	display: inline-block;
 }
@@ -5967,3 +6158,5 @@ img.vdo-default:before {}
     		transform: rotate(900deg);
     	}
 }
+
+
