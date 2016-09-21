@@ -784,6 +784,16 @@ QmiGlobal.module.serverSelector = {
 
 		self.view = $("#module-server-selector");
 
+		var chk = false
+		$.each(self.view.find("li"), function(i,liDom) {
+			if($(liDom).find("> div:last-child").text() === base_url) {
+				chk = true;
+				$(liDom).addClass("selected");
+			}
+		});
+
+		if(chk === false) self.view.find("li:last-child").addClass("selected").val(base_url);
+
 		QmiGlobal.eventDispatcher.subscriber([
 			{
     			veId: "item", 
@@ -811,7 +821,7 @@ QmiGlobal.module.serverSelector = {
 				
 				var newUrl = self.view.find("li.active > div:last-child").html();
 				if(self.view.find("li.active input").length > 0) newUrl = self.view.find("li.active input").val();
-				
+				console.log("shit");
 				$("#module-server-selector-url").html(self.view.find("li.active").html());
 
 				self.remove();
@@ -851,8 +861,9 @@ $(document).on("click", "#container_version", function() {
 		cnts++;
 		console.log(cnts);
 		if(cnts < 5) return;
-		if(prompt('輸入密碼') === "86136982") QmiGlobal.module.serverSelector.init()
-		else alert("錯誤");
+		// if(prompt('輸入密碼') === "86136982") 
+		QmiGlobal.module.serverSelector.init();
+		// else alert("錯誤");
 	}
 }());
 

@@ -6094,6 +6094,18 @@ img.vdo-default:before {}
     height: calc(100% - 50px);
     overflow-y: scroll;
     overflow-x: hidden;
+    font-size: 14px;
+}
+
+#module-server-selector ul li.selected:after {
+    content: "";
+    background: url(../images/icon-tick.png);
+    width: 30px;
+    height: 30px;
+    right: 10px;
+    position: absolute;
+    top: 15px;
+    background-size: cover;
 }
 
 #module-server-selector ul li:hover {background: aliceblue;}
@@ -6101,6 +6113,7 @@ img.vdo-default:before {}
     height: 40px;
     padding: 10px;
     cursor: pointer;
+    position: relative;
 }
 
 #module-server-selector ul li div:first-child {
@@ -6122,8 +6135,7 @@ img.vdo-default:before {}
     width: 90%;
 }
 
-#module-server-selector li.active input {color: white;}
-#module-server-selector ul li.active {background: #51acf9; color: white;}
+#module-server-selector ul li.active {background: aliceblue;}
 
 #module-server-selector button {
     display: block;
