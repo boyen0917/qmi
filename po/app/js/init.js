@@ -17,7 +17,7 @@ var ui,
 	//local測試 預設開啟console
 	debug_flag = false;
 
-
+var default_url = "https://ap.qmi.emome.net/apiv1/";
 var base_url = function() {
 	switch(true) {
 		case match("qawp.qmi.emome.net"):
@@ -34,6 +34,16 @@ var base_url = function() {
 		return !!window.location.href.match(regDomain);
 	}
 }();
+
+// 判斷更改網址 不要上到正式版
+$(document).ready(function() {
+	if($.lStorage("_selectedServerUrl") === false || $.lStorage("_selectedServerUrl") === default_url) return;
+	base_url = $.lStorage("_selectedServerUrl");
+	
+	if($("#module-server-selector-url").length === 0) $("body").append(QmiGlobal.module.serverSelector.urlHtml());		
+	$("#module-server-selector-url").html(base_url);
+})
+
 
 var userLang = navigator.language || navigator.userLanguage;
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
@@ -792,7 +802,7 @@ QmiGlobal.module.serverSelector = {
 			}
 		});
 
-		if(chk === false) self.view.find("li:last-child").addClass("selected").val(base_url);
+		if(chk === false) self.view.find("li:last-child").addClass("selected").find("input").val(base_url);
 
 		QmiGlobal.eventDispatcher.subscriber([
 			{
@@ -816,14 +826,21 @@ QmiGlobal.module.serverSelector = {
 				$(thisElem).addClass("active");
 				break;
 			case "click:submit":
-				self.urlView = $("#module-server-selector-url");
-				if($("#module-server-selector-url").length === 0) $("body").append(self.html());
+
+				if($("#module-server-selector-url").length === 0) $("body").append(self.urlHtml());
 				
 				var newUrl = self.view.find("li.active > div:last-child").html();
-				if(self.view.find("li.active input").length > 0) newUrl = self.view.find("li.active input").val();
-				console.log("shit");
-				$("#module-server-selector-url").html(self.view.find("li.active").html());
+				var inputDom = self.view.find("li.active input");
+				if(inputDom.length > 0) newUrl = inputDom.val() === "" ? default_url : inputDom.val();
 
+				$("#module-server-selector-url").html(newUrl);
+
+				newUrl += "/apiv1/";
+				base_url = newUrl;
+				if(newUrl === default_url) {
+					$("#module-server-selector-url").html("");
+					localStorage.removeItem("_selectedServerUrl");
+				} else $.lStorage("_selectedServerUrl", newUrl);
 				self.remove();
 				break;
 		}
@@ -838,10 +855,10 @@ QmiGlobal.module.serverSelector = {
 		+ "<section>"
 		+ "<ul>"+ (function() {
 				return [
-					"正式環境$https://ap.qmi.emome.net/apiv1/",
-					"QA$https://qaap.qmi.emome.net/apiv1/",
-					"AWS$https://apserver.mitake.com.tw/apiv1/",
-					"TEST$https://qmi17.mitake.com.tw/apiv1/",
+					"正式環境$https://ap.qmi.emome.net",
+					"QA$https://qaap.qmi.emome.net",
+					"AWS$https://apserver.mitake.com.tw",
+					"TEST$https://qmi17.mitake.com.tw",
 					"自訂$<input placeholder='輸入網址'>"
 				].reduce(function(str, curr) {
 					return str += "<li><div>"+ curr.split("$")[0] +"</div><div>"+ curr.split("$")[1] + "</div></>";
@@ -859,12 +876,9 @@ $(document).on("click", "#container_version", function() {
 	return function() {
 		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
 		cnts++;
-		console.log(cnts);
 		if(cnts < 5) return;
-		// if(prompt('輸入密碼') === "86136982") 
-		QmiGlobal.module.serverSelector.init();
-		// else alert("錯誤");
-	}
+		if(prompt('輸入密碼') === "86136982") QmiGlobal.module.serverSelector.init();
+		else alert("錯誤");}
 }());
 
 

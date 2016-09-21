@@ -6151,6 +6151,13 @@ img.vdo-default:before {}
     cursor: pointer;
 }
 
+#module-server-selector-url {
+    position: fixed;
+    bottom: 0;
+    opacity: 0.5;
+    background: white;
+    box-shadow: 1px 1px 10px white;
+}
 
 *[contenteditable="true"] {
 	display: inline-block;
