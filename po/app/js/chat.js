@@ -26,8 +26,6 @@ var ui,		//user id
 	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
 	lockCurrentFocusIntervalLength = 100;	//讓視窗停留在最後一筆的interval更新時間
 
-
-
 $(function(){
 	//load language
 	updateLanguage(lang);
@@ -685,6 +683,141 @@ $(function(){
               ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝          
 **/
 
+
+function audioplay(target,src){
+	var self = this;
+	self.audiohtml = $(this.html);
+	target.append(self.audiohtml);
+
+	var mytrack = self.audiohtml.find("#mytrack");
+	mytrack.attr("src",src);
+	var playbutton = self.audiohtml.find("#audio-play");
+	var audioVolume = self.audiohtml.find("#audio-volume");
+	var audioTime = self.audiohtml.find("#audio-time");
+	var audioProgress = self.audiohtml.find("#audio-progress");
+	var audioBar = self.audiohtml.find("#audio-bar");
+
+	if(target.hasClass('chat-msg-bubble-right')){
+		self.playUrl = "url('images/chatroom/qicon_chatroom_playself@2x.png')";
+		self.pauseUrl = "url('images/chatroom/qicon_chatroom_pauseself@2x.png')";
+		self.muteUrl = "url('images/chatroom/qicon_chatroom_speakerself01@2x.png')";
+		self.unmuteUrl = "url('images/chatroom/qicon_chatroom_speakerself04@2x.png')";
+		audioTime.css("color","white");
+	}else{
+		self.playUrl = "url('images/chatroom/qicon_chatroom_play@2x.png')";
+		self.pauseUrl = "url('images/chatroom/qicon_chatroom_pause@2x.png')";
+		self.muteUrl = "url('images/chatroom/qicon_chatroom_speaker01@2x.png')";
+		self.unmuteUrl = "url('images/chatroom/qicon_chatroom_speaker04@2x.png')";
+	}
+
+	self.audioObj = {
+		init: function(){	//初始化
+			playbutton.css("background-image",self.playUrl);
+			audioVolume.css("background-image",self.unmuteUrl);
+			mytrack[0].muted = false;
+			mytrack[0].currentTime = 0;
+			audioProgress.hide();
+			audioBar[0].style.width = 0;
+			mytrack.bind("loadedmetadata",function(){
+				var duration = mytrack[0].duration;
+				var audiominutes = parseInt(duration/60);
+				var audioseconds = parseInt(duration%60);
+				audioTime.text(self.addZero(audiominutes) + " : " + self.addZero(audioseconds));
+			});
+			clearInterval(self.updateTime);
+		}
+	}
+	
+	self.audioObj.init();
+
+	playbutton.on('click',self.playOrPause.bind(self));
+	audioVolume.on('click',self.muteOrUnmute.bind(self));
+	audioProgress.on('click',self.updateBar.bind(self));
+
+}
+
+audioplay.prototype = {
+	playOrPause: function(){
+		var self = this;
+		var mytrack = self.audiohtml.find("#mytrack")[0];
+		var playbutton = self.audiohtml.find("#audio-play")[0];
+		var audioVolume = self.audiohtml.find("#audio-volume");
+		var audioTime = self.audiohtml.find("#audio-time")[0];
+		var barSize = 140;
+		var audioProgress = self.audiohtml.find("#audio-progress");
+		var audioBar = self.audiohtml.find("#audio-bar")[0];
+		var updateTime;
+		audioProgress.show();
+
+		if(!mytrack.paused && !mytrack.ended){	//暫停
+			mytrack.pause();
+			playbutton.style.backgroundImage = self.playUrl;
+			clearInterval(self.updateTime);
+		}else{	//播放
+			mytrack.play();
+			playbutton.style.backgroundImage = self.pauseUrl;
+			self.updateTime = setInterval(function(){
+				if(!mytrack.ended) {
+				  	var playminutes = parseInt(mytrack.currentTime/60);
+				  	var playseconds = parseInt(mytrack.currentTime%60);
+				  	audioTime.innerHTML = self.addZero(playminutes) + " : " + self.addZero(playseconds);
+
+				  	var size = parseInt(mytrack.currentTime*barSize/mytrack.duration);
+				  	audioBar.style.width = size + "px";
+				}else {
+				  	self.audioObj.init();
+				}
+			},500);
+		}
+	},
+	muteOrUnmute: function(){
+		var self = this;
+		var mytrack = self.audiohtml.find("#mytrack")[0];
+		var audioVolume = self.audiohtml.find("#audio-volume");
+		if(mytrack.muted == true) {
+	  		mytrack.muted = false;
+	  		audioVolume[0].style.backgroundImage = self.unmuteUrl;
+		}else {
+	  		mytrack.muted = true;
+	  		audioVolume[0].style.backgroundImage = self.muteUrl;
+		}
+	},
+	updateBar: function(e){
+		var mytrack = this.audiohtml.find("#mytrack")[0];
+		var barSize = 140;
+		var audioProgress = this.audiohtml.find("#audio-progress");
+		var audioBar = this.audiohtml.find("#audio-bar")[0];
+		if(!mytrack.ended) {
+	  		console.log(e.pageX);
+	  		console.log(audioProgress[0].offsetLeft);
+	  		var mouseX = e.pageX - audioProgress[0].offsetLeft;
+	  		//var newtime = mouseX * mytrack.duration / barSize;
+	  		var newTime = (mouseX / audioProgress.width()) / mytrack.duration;
+	  		mytrack.currentTime = newTime;
+	  		console.log(newTime);
+	  		audioBar.style.width = mouseX + "px";
+		}
+	},
+	addZero: function(num){
+      	if(num < 10) {
+        	return '0' + num;
+      	}else {
+        	return num;
+      	}
+    },
+    html: '<div id="audioplayer">'+
+		        '<audio id="mytrack" src="" controls></audio>'+
+		        '<div class="audio-content">'+
+		          	'<div id="audio-time">00 : 00</div>'+
+		          	'<div id="audio-play"></div>'+
+		          	'<div id="audio-volume"></div>'+
+		        '</div>'+
+		        '<div id="audio-progress">'+
+		          	'<div id="audio-bar"></div>'+
+		        '</div>'+
+		    '</div>'
+}
+
 /**
 檢查目前位置, 離開底部時顯示回到底部button
 **/
@@ -1314,11 +1447,11 @@ function showMsg(object, bIsTmpSend) {
 			} else {
 				msgDiv.addClass('chat-msg-bubble-left');
 			}
-			var this_audio = $(
-				"<audio class='msg-audio' src='test' controls></audio>"
-			);
-			msgDiv.append(this_audio);
-			getChatS3file(this_audio, msgData.c, msgData.tp, ti_chat);
+			// var this_audio = $(
+			//         '<audio src="" controls></audio>'
+			// );
+			// msgDiv.append(this_audio);
+			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
 		case 9: //map
 			if (isMe) {
@@ -1988,8 +2121,9 @@ function sendMsgText(dom) {
 							parent.find(".download").remove();
 						});
 						break;
-					case 8://聲音
-						target.attr("src", obj.s3);
+					case 8://audio
+						//target.attr("src", obj.s3);
+						new audioplay(target,obj.s3);
 						break;
 
 					case 26://檔案

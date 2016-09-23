@@ -438,6 +438,60 @@ body {
  	cursor: pointer;
  }
 
+/*-------------- Audio ----------------*/
+
+#mytrack{
+  	display: none;
+}
+#audioplayer{
+	width: 140px;
+	/*white-space: normal;*/
+	background: rgba(0,0,0,0);
+	border-radius: 10px;
+	padding: 2px 5px;
+}
+#audio-time{
+	display: inline-block; 
+	vertical-align: top;
+	margin-top: 5px;
+	padding: 0 10px;
+	color: #585b6c;
+}
+#audio-play{
+	display: inline-block; 
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+	/*background-image: url("../images/chatroom/chatroom_play.png");*/
+	background-size: 28px 28px;
+	background-repeat: no-repeat;
+}
+
+#audio-volume{
+	display: inline-block; 
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+	/*background-image: url("../images/chatroom/chatroom_unmute.png");*/
+	background-size: 28px 28px;
+	background-repeat: no-repeat;
+}
+#audio-progress{
+  	position: relative;
+  	width: 140px;
+	height: 5px;
+	background: #585b6c;
+	border-radius: 5px;
+  	cursor: pointer;
+}
+#audio-bar{
+	position: absolute;
+	width: 0px;
+	height: 100%;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	background: #aaffaa;
+}
 
 /*-------------- 影片start ----------------*/
 
