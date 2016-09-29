@@ -181,11 +181,13 @@ imgResizeByCanvas = function(img,x,y,max_w,max_h,quality){
 	canvas.height = tempH;
 	
 	canvas.getContext("2d").drawImage(img, x, y, tempW, tempH);
-	var dataURL = canvas.toDataURL("image/png",quality);
+	var dataURL = canvas.toDataURL("image/jpeg",quality);
+
 	var img_obj = {
 		w: Math.floor(tempW),
 		h: Math.floor(tempH),
-		blob: dataURItoBlob(dataURL)
+		blob: dataURItoBlob(dataURL),
+		ori: img
 	}
 	return img_obj;
 }
@@ -217,6 +219,44 @@ getVideoBlob = function(videoDom, x,y,max_w,max_h,quality){
 		blob: dataURItoBlob( videoDom.attr("src") )
 	}
 	
+}
+
+//寫入exif
+writeExif = function(exifinfo,imageSrc){
+	var deferred = $.Deferred();
+	console.log("data:",imageSrc);
+	console.log("exif:",exifinfo);
+	var dataURL;
+	var img = new Image();
+	
+	img.onload = function () {
+		var canvas = document.createElement('canvas');
+		canvas.width = this.naturalWidth;
+		canvas.height = this.naturalHeight;
+		canvas.getContext("2d").drawImage(img,0,0);
+		dataURL = canvas.toDataURL("image/jpeg");
+		var exif = {},
+    		gps = {};
+		exif[piexif.ExifIFD.DateTimeOriginal] = exifinfo.DateTimeOriginal;
+		exif[piexif.ExifIFD.DateTimeDigitized] = exifinfo.DateTimeDigitized;
+		gps[piexif.GPSIFD.GPSLatitudeRef] = exifinfo.GPSLatitudeRef;
+    	gps[piexif.GPSIFD.GPSLatitude] = exifinfo.GPSLatitude;
+    	gps[piexif.GPSIFD.GPSLongitudeRef] = exifinfo.GPSLongitudeRef;
+    	gps[piexif.GPSIFD.GPSLongitude] = exifinfo.GPSLongitude;
+		var piexifObj = {"Exif":exif, "GPS":gps};
+		var exifStr = piexif.dump(piexifObj);
+		dataURL = piexif.insert(exifStr, dataURL);
+		deferred.resolve(dataURL);
+	}
+	img.src = imageSrc;
+	return deferred.promise();
+}
+
+//轉換exif經緯度
+toDecimal = function (number) {
+	if(number === undefined) return;
+    return number[0].numerator + number[1].numerator /
+       (60 * number[1].denominator) + number[2].numerator / (3600 * number[2].denominator);
 }
 
 fileSizeTransfer = function (si){
@@ -525,13 +565,9 @@ qmiUploadFile = function(uploadObj){
 		return chainDef;
 	}, chainDefError.bind("get url fail")).then(function(responseObj) {
 		var chainDef = MyDeferred(),
-			s3Obj = responseObj.data;
-
-		// commit
-		new QmiAjax({
-			apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
-			method: "put",
-			body: {
+			s3Obj = responseObj.data,
+			exifObj = {},
+			body = {
 				// fi: uploadObj.tp === 2 ? "" : s3Obj.fi,
 				fi: s3Obj.fi,
 				ti: (uploadObj.urlAjax.body || {}).ti,
@@ -540,7 +576,30 @@ qmiUploadFile = function(uploadObj){
 				mt: s3Obj.mt,
 				si: s3Obj.si,
 				md: s3Obj.md
+			};
+			console.log(s3Obj.oriFile);
+			if(s3Obj.oriFile){
+				EXIF.getData(s3Obj.oriFile, function(){
+					exifObj = EXIF.getAllTags(this);
+					console.log("exif: ",exifObj);
+					if(!$.isEmptyObject(exifObj)){
+						body.exif = {
+							"DateTimeOriginal": exifObj.DateTimeOriginal || "",
+							"DateTimeDigitized": exifObj.DateTimeDigitized || "",
+							"LatitudeRef": exifObj.GPSLatitudeRef || "", //緯度
+							"Latitude": toDecimal(exifObj.GPSLatitude) || "", 
+							"LongitudeRef": exifObj.GPSLongitudeRef || "", //經度
+							"Longitude": toDecimal(exifObj.GPSLongitude) || "" 
+						}
+					}
+				});
 			}
+			console.log("body: ",body);
+		// commit
+		new QmiAjax({
+			apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
+			method: "put",
+			body: body
 		}).success(function(data) {
 			data.fi = s3Obj.fi;
 			data.tp = uploadObj.tp;
@@ -604,6 +663,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			mt = oFile.blob.type;
 			si = oFile.blob.size;
 			md = { w: oFile.w, h: oFile.h };
+			oriFile = oFile.ori;
 
 			mediaLoadDef.resolve();
 
@@ -648,7 +708,8 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				fi: s3Obj.fi,
 				mt: mt,
 				si:	si,
-				md:	md
+				md:	md,
+				oriFile: oriFile
 			}})
 		}).fail(function() {
 			// 上傳s3 失敗
