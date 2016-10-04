@@ -256,6 +256,7 @@ window.QmiGlobal = {
 
 	windowListCiMap: {},
 
+	module: {},
 
 	// 聊天室 auth
 	auth: {},
@@ -786,6 +787,81 @@ MyDeferred = function  () {
   myPromise.resolve = myResolve;
   myPromise.reject = myReject;
   return myPromise;
+}
+
+
+// ----------- Module ---------------
+
+QmiGlobal.eventDispatcher = {
+
+	viewMap: {},
+
+	handleEvent: function() {
+		// 防連點 start
+		var closureObj = {};
+		return function(event) {
+			//禁止連點
+			if(preventMultiClick(event) === false) return;
+
+			var self = this;
+
+			Object.keys(self.viewMap).forEach(function(viewId) {
+				// event currentTarget -> event綁定的對象
+
+				// jqElem 是arr 每個elem都比對
+				var jqElem = self.viewMap[viewId].jqElem, length = jqElem.length;
+				for(var i=0; i<length; i++) {
+					if(event.currentTarget === jqElem[i]) {
+						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {})[event.type], target: event.target}}));
+						return;
+					}
+				}
+			});
+		}
+
+		function preventMultiClick(event) {
+			// event.stopPropagation();
+			//禁止連點
+			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) return false;
+			// 記錄連點資訊
+			if(event.type === "click") closureObj.lastView = event.target, closureObj.lastClickTime = new Date().getTime();
+			return true;
+		}
+	}(),
+
+	subscriber: function(veArr, handler, isClean) {
+		var self = this;
+
+		// 清除已存在的view
+		if(isClean) self.cleaner(handler.id);
+
+		veArr.forEach(function(veObj) {
+			var viewId = handler.id+":"+veObj.veId;
+			self.viewMap[viewId] = veObj;
+			veObj.eventArr.forEach(function(eventType) {
+				// jqElem 是arr 每個elem都掛上事件監聽
+				Array.prototype.forEach.call(veObj.jqElem, function(elem) {
+					elem.addEventListener(eventType, self);
+				});
+				window.addEventListener(eventType+":"+viewId, handler);
+			});
+		})
+	},
+
+	cleaner: function(moduleId) {
+		var self = this;
+
+		Object.keys(self.viewMap).forEach(function(viewId) {
+			if(viewId.split(":")[0] === moduleId) {
+				delete self.viewMap[viewId];
+
+				// remove event listener
+				// window.removeEventListener("click:view-ldap-setting:list-delete", QmiGlobal.module.ldapSetting)
+			}
+
+			
+		})
+	}
 }
 
 QmiGlobal.module.serverSelector = {
