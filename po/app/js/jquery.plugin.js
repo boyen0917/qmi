@@ -35,15 +35,17 @@
 			}
     	} else {
 			if(value || value === false){
-				if(typeof(value) == "object"){
-					value = JSON.stringify(value);
-		    	}
+				if(typeof(value) == "object") value = JSON.stringify(value);
+				
 				localStorage[key] = value;
 			}else{
-				if(!localStorage[key]){
-					return false;
+				if(!localStorage[key]) return false;
+
+				try {
+					return $.parseJSON(localStorage[key]);
+				} catch(e) {
+					return localStorage[key];
 				}
-				return $.parseJSON(localStorage[key])
 			}
 		}
     };
