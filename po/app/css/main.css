@@ -3455,6 +3455,36 @@ img.st-user-pic{
 	max-width: 100%;
 }
 
+.st-reply-content .video-area.play {
+	position: relative;
+}
+
+.st-reply-content .video-area.play video{
+	background: black;
+	object-fit: cover;
+	max-width: 300px;
+	height: 150px;
+}
+
+.st-reply-content .video-area.play div,.st-reply-content .video-area.play div:active{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 300px;
+	height: 150px;
+	margin-top: 15px;
+	background-size: 40px 40px;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+.st-reply-content .video-area.play div {
+	background-image: url("../images/icon/icon_video_play_56x56_click.png");
+}
+.st-reply-content .video-area.play div:hover {
+	background-image: url("../images/icon/icon_video_play_56x56.png");
+}
+
 .st-reply-content .attach-file {
 	font-size: 14px;
 	width: -webkit-calc( 100% + 16px );
@@ -3629,8 +3659,50 @@ img.st-reply-message-attach {
 .st-reply-message-img{
 	background: rgb(239,239,239);
 	cursor: default;
+	position: relative;
 }
 
+.file-load{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background: rgb(57, 148, 232);
+	z-index: 2;
+	text-align: center;
+}
+.file-load .file-content{
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+#load-progress{
+	position: relative;
+	display: inline-block;
+	width: 100px;
+	height: 8px;
+	background: #585b6c;
+	border-radius: 5px;
+}
+#load-bar{
+	position: absolute;
+	height: 100%;
+	background: #80ff5d;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+#load-font{
+  	position: absolute;
+	top: -18px;
+	left: 45px;
+	color: white;
+}
+#load-cancel{
+	position: relative;
+	display: inline-block;
+	margin-left: 10px;
+	cursor: pointer;
+	color: white;
+}
 .st-reply-message-img .attach-file {
 	background: white;
     background-position: 97% 50%;
@@ -3698,7 +3770,7 @@ img.st-reply-message-attach {
 	/*max-height: 100%;*/
 	/*min-height: 80px;*/
 	object-fit: contain;
-	max-height: 150px;
+	height: 100px;
 }
 
 .st-reply-content .au-area {

@@ -693,6 +693,13 @@ $(function(){
 
 	//圖片
 	$(document).on('click','.st-reply-message-attach',function(){
+		var stickerIcon = $(this).siblings(".st-reply-message-sticker");
+		var stickerArea = stickerIcon.parents(".st-sub-box").find(".stickerArea");
+		if( "t"==stickerIcon.attr("data-open") ){
+			stickerIcon.attr("data-open", "");
+			stickerArea.hide();
+			stickerIcon.attr("src", "images/chatroom/chat_textbar_icon_emoticon.png");
+		} 
 		$(this).siblings(".st-reply-message-file").trigger("click");
 	});
 
@@ -2282,7 +2289,7 @@ $(function(){
 		}
 	});
 
-	$(document).on("click",".st-attach-video.play div",function(e){
+	$(document).on("click",".st-attach-video.play div,.video-area.play div",function(e){
 		var tmp = $(this).prev('video');
 		if( tmp.length>0 ){
 			tmp[0].play();

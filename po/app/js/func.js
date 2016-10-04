@@ -1401,6 +1401,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                         getS3file(val,this_content,val.tp,280,targetTu);
                         break;
                     case 7://影片
+                        this_content.find(".video-area").addClass("play");
                         getS3file(val,this_content.find("video"),val.tp,280,targetTu);
                         break;
                     case 8://聲音
@@ -7087,14 +7088,15 @@ getLinkYoutube = function (this_compose,url) {
 
 
 replySend = function(thisEvent){
-
     var thisEi = thisEvent.data("event-id"),
         thisGi = thisEi.split("_")[0],
         thisTi = thisEi.split("_")[1],
         uploadDef = $.Deferred(),
         isWaiting = false,
         eventTp, fileBody,
+        f_load_show = fileLoadShow(),
         imgArea = thisEvent.find(".st-reply-message-img"),
+        messageArea = thisEvent.find(".st-reply-message-area"),
         replyFile = imgArea.data("file"),
         body = {
             meta : {
@@ -7129,7 +7131,7 @@ replySend = function(thisEvent){
         "c": text ,
         "tp": 0
     });
-    var imgArea = thisEvent.find(".st-reply-message-img");
+
     // var imgType = imgArea.data("type");
 
     // switch( imgType ){
@@ -7161,7 +7163,8 @@ replySend = function(thisEvent){
             //發佈上傳檢查
             upload_chk = true;
             //開啟loading icon
-            s_load_show = true;
+            //s_load_show = false;
+            f_load_show.init(messageArea);
 
             var pi = "0";
 
@@ -7191,7 +7194,8 @@ replySend = function(thisEvent){
                 hasFi: true,
                 file: thisEvent.find(".st-reply-message-img img")[0],
                 oriObj: {w: 1280, h: 1280, s: 0.7},
-                tmbObj: {w: 480, h: 480, s: 0.6} // ;
+                tmbObj: {w: 480, h: 480, s: 0.6}, // ;
+                progressBar: f_load_show.progressBar
             }).done(uploadDef.resolve);
             break;
         case "video": 
@@ -7201,7 +7205,8 @@ replySend = function(thisEvent){
             upload_chk = true;
             
             //開啟loading icon
-            s_load_show = true;
+            //s_load_show = false;
+            f_load_show.init(messageArea);
 
             eventTp = 7;
 
@@ -7225,7 +7230,8 @@ replySend = function(thisEvent){
                 tp: 2,
                 hasFi: true,
                 file: replyFile,
-                oriObj: {w: 1280, h: 1280, s: 0.9}
+                oriObj: {w: 1280, h: 1280, s: 0.9},
+                progressBar: f_load_show.progressBar
             }).done(uploadDef.resolve)
 
             break;
@@ -7235,7 +7241,8 @@ replySend = function(thisEvent){
             //發佈上傳檢查
             upload_chk = true;
             //開啟loading icon
-            s_load_show = true;
+            //s_load_show = false;
+            f_load_show.init(messageArea);
 
             fileBody = {
                 ftp: 0,
@@ -7259,7 +7266,8 @@ replySend = function(thisEvent){
                 tp: 0,
                 hasFi: true,
                 file: replyFile,
-                oriObj: {w: 1280, h: 1280, s: 0.9}
+                oriObj: {w: 1280, h: 1280, s: 0.9},
+                progressBar: f_load_show.progressBar
             }).done(uploadDef.resolve)
 
             break;
@@ -7269,9 +7277,13 @@ replySend = function(thisEvent){
     //     replyApi( thisEvent, thisGi, thisTi, thisEi, body );
     // }
     uploadDef.done(function(rspObj) {
+        console.log(rspObj);
+        $(".file-load").remove();
         //if fail uploading
         if(rspObj.isSuccess === false){
-            toastShow( $.i18n.getString("COMMON_UPLOAD_FAIL") );
+            if(!messageArea.data("cancelupload")){
+                toastShow( $.i18n.getString("COMMON_UPLOAD_FAIL") );
+            }
             //loading icon off
             s_load_show = false;
             $('.ui-loader').hide();
@@ -7281,12 +7293,50 @@ replySend = function(thisEvent){
             return;
 
         } else if(rspObj.data !== undefined) {
+            imgArea.show();
             fileBody[fileBody.fiKey] = rspObj.data.fi;
             body.ml.push(fileBody);
         }
         console.log("hey",thisEvent, thisGi, thisTi, thisEi, body);
         replyApi( thisEvent, thisGi, thisTi, thisEi, body );
     })
+}
+
+fileLoadShow = function(){
+    var uploadXhr;
+    return {
+            init: function(elem){
+                $(".file-load").remove();
+                elem.data("cancelupload",false);
+                elem.find('.st-reply-message-img').hide();
+                elem.prepend($('<div class="file-load">'+
+                                    '<div class="file-content">'+
+                                      '<div id="load-progress">'+
+                                        '<div id="load-bar"></div>'+
+                                        '<div id="load-font"></div>'+
+                                      '</div>'+
+                                      '<div id="load-cancel">取消</div>'+
+                                    '</div>'+
+                                '</div>'));
+                $("#load-cancel").click(function(){
+                    elem.find('.st-reply-message-img').show();
+                    $(".file-load").remove();
+                    elem.data("cancelupload",true);
+                    uploadXhr.abort();
+                });
+            },
+            progressBar: function () {
+                uploadXhr = new window.XMLHttpRequest();
+                uploadXhr.upload.addEventListener("progress", function(evt){
+                    if (evt.lengthComputable) {
+                        // console.log(Math.floor((evt.loaded / evt.total) * 100) + '%');
+                        $("#load-bar").css("width",Math.floor((evt.loaded / evt.total) * 100) + '%');
+                        $("#load-font").html(Math.floor((evt.loaded / evt.total) * 100) + '%');
+                    }
+                }, false);
+                return uploadXhr;
+            }
+    }
 }
 
 replyApi = function(this_event, this_gi, this_ti, this_ei, body){
