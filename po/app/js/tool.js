@@ -672,13 +672,13 @@ resetDB = function(){
 
 	var verTmp = localStorage["_ver"];
 	var loginRememberTmp = localStorage["_loginRemeber"];
-	var lastBaseUrlTmp = localStorage["_lastBaseUrl"];
+	var urlTmp = localStorage["_selectedServerUrl"];
 
 	localStorage.clear();
 
 	if(verTmp) localStorage["_ver"] = verTmp;
 	if(loginRememberTmp) localStorage["_loginRemeber"] = loginRememberTmp;
-	if(lastBaseUrlTmp) localStorage["_lastBaseUrl"] = lastBaseUrlTmp;
+	if(urlTmp) localStorage["_selectedServerUrl"] = urlTmp;
 }
 
 getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){

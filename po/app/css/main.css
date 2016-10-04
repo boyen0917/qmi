@@ -6085,6 +6085,7 @@ img.vdo-default:before {}
     height: 50vh;
     border-radius: 3px;
     position: relative;
+    padding: 15px 0;
 }
 
 #module-server-selector ul {
@@ -6097,7 +6098,7 @@ img.vdo-default:before {}
     font-size: 14px;
 }
 
-#module-server-selector ul li.selected:after {
+#module-server-selector ul li.active:after {
     content: "";
     background: url(../images/icon-tick.png);
     width: 30px;
@@ -6111,7 +6112,7 @@ img.vdo-default:before {}
 #module-server-selector ul li:hover {background: aliceblue;}
 #module-server-selector ul li {
     height: 40px;
-    padding: 10px;
+    padding: 10px 20px;
     cursor: pointer;
     position: relative;
 }
@@ -6135,7 +6136,7 @@ img.vdo-default:before {}
     width: 90%;
 }
 
-#module-server-selector ul li.active {background: aliceblue;}
+#module-server-selector ul li.selected {background: aliceblue;}
 
 #module-server-selector button {
     display: block;

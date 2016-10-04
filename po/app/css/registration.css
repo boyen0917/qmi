@@ -510,6 +510,7 @@ input.setting-birth-hidden {
 	padding: 5px;
 	color: lightgray;
 	font-size: 14px;
+	-webkit-user-select: none;
 }
 
 

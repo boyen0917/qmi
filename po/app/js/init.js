@@ -801,13 +801,13 @@ QmiGlobal.module.serverSelector = {
 
 		var chk = false
 		$.each(self.view.find("li"), function(i,liDom) {
-			if($(liDom).find("> div:last-child").text() === base_url) {
+			if($(liDom).find("> div:last-child").text() + "/apiv1/" === base_url) {
 				chk = true;
-				$(liDom).addClass("selected");
+				$(liDom).addClass("selected").addClass("active");
 			}
 		});
 
-		if(chk === false) self.view.find("li:last-child").addClass("selected").find("input").val(base_url);
+		if(chk === false) self.view.find("li:last-child").addClass("selected").addClass("active").find("input").val(base_url.split("/apiv1")[0]);
 
 		QmiGlobal.eventDispatcher.subscriber([
 			{
@@ -843,9 +843,13 @@ QmiGlobal.module.serverSelector = {
 				newUrl += "/apiv1/";
 				base_url = newUrl;
 				if(newUrl === default_url) {
+					console.log("456");
 					$("#module-server-selector-url").html("");
 					localStorage.removeItem("_selectedServerUrl");
-				} else $.lStorage("_selectedServerUrl", newUrl);
+				} else {
+					console.log("123");
+					$.lStorage("_selectedServerUrl", newUrl);
+				}
 
 				// 改完刪資料庫
 				resetDB();
