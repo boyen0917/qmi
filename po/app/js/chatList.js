@@ -399,6 +399,7 @@ function openChatWindow ( giTmp, ci ){
 		};
 
 		windowList[ci].chatList = {
+
 			roomAddTop : function (chatroomId) {
 				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
 				topListDom.find(".list").append(chatroomDom);
@@ -691,32 +692,28 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 }
 
 function sortRoomList(){
-	$('.subpage-chatList-row').each(function(){
+
+	var chatListDom = $("#page-group-main");
+	chatListDom.find('.subpage-chatList-row').each(function(){
 		var ct = $(this).data("time");
 		if( ct > 0 ){
 			$(this).find(".time").html( new Date(ct).toFormatString() );
 		}
 	});
 
-	$('.list').each(function(){
+	chatListDom.find('.top-chatList .list').each(function(){
 	    var $this = $(this);
 	    var tmp = $this.find('.subpage-chatList-row').get().sort(function(a, b) {
 	        return $(b).data('time') - $(a).data('time');
 	    });
-	    // for( var i=0;i<tmp.length;i++){
-	    // 	cns.debug( $(tmp[i]).data("time") );
-	    // }
 	    $this.append(tmp);
 	});
 
-	$('.rows').each(function(){
+	chatListDom.find('.subpage-chatList .rows').each(function(){
 	    var $this = $(this);
 	    var tmp = $this.find('.subpage-chatList-row').get().sort(function(a, b) {
 	        return $(b).data('time') - $(a).data('time');
 	    });
-	    // for( var i=0;i<tmp.length;i++){
-	    // 	cns.debug( $(tmp[i]).data("time") );
-	    // }
 	    $this.append(tmp);
 	});
 }

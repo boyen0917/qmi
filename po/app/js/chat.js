@@ -1476,6 +1476,7 @@ function showUnsendMsg(c, tp, fn, size) {
 }
 
 function sendChat(dom) {
+
 	dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
 	var tmpData = dom.data("data");
 	if (null == tmpData)    return;

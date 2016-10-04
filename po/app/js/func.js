@@ -8425,6 +8425,7 @@ pollingUpdate = function(newPollingData){
 
     //更新聊天內容
     if(newPollingData.msgs && newPollingData.msgs.length>0){
+        setTimeout(sortRoomList, 100);
         onReceivePollingChatMsg(newPollingData.msgs);
     }
 
