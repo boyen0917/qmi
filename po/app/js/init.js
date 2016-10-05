@@ -27,7 +27,7 @@ var base_url = function() {
 			return "https://qmi17.mitake.com.tw/apiv1/";
 			break;
 		default:
-			return "https://apserver.mitake.com.tw/apiv1/";
+			return "https://ap.qmi.emome.net/apiv1/";
 	}
 	function match(domain) {
 		var regDomain = new RegExp("^https:\/\/"+ domain, 'g');
@@ -37,7 +37,7 @@ var base_url = function() {
 
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {
-
+	
 	if($.lStorage("_selectedServerUrl") === false || $.lStorage("_selectedServerUrl") === default_url) return;
 	base_url = $.lStorage("_selectedServerUrl");
 	
