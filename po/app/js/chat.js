@@ -24,12 +24,12 @@ var ui,		//user id
 	g_isFirstTimeLoading = true,	//是否第一次進聊天室	
 	g_currentScrollToDom = null,	//捲動到最上方時會讀取舊訊息, 但視窗應停留在讀取前最後一筆訊息的dom, 用此變數暫存
 	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
-	lockCurrentFocusIntervalLength = 100;	//讓視窗停留在最後一筆的interval更新時間
+	lockCurrentFocusIntervalLength = 100,//讓視窗停留在最後一筆的interval更新時間
+	g_lastmsgTime;	
 
 $(function(){
 	//load language
 	updateLanguage(lang);
-
 	//驗證失敗 請重新登入
 	if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) {
 		
@@ -505,7 +505,7 @@ $(function(){
 				}, function (isDone) {
 					window.actChk = false;
 
-					// scrollToBottom();
+
 					setTimeout(function () {
 						checkPagePosition();
 						$("#page-chat").removeClass("transition");
@@ -675,12 +675,11 @@ $(function(){
 
 		//apply nicescroll
 		var container = $("#container");
-
 		updateChat();
+		
 		sendMsgRead(new Date().getTime())
 
 	});
-	
 
 /**
               ███████╗██╗   ██╗███╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗          
@@ -877,12 +876,8 @@ function onChatDBInit() {
 	$("#chat-contents").append(lastMsg);
 	$("#chat-contents").append("<div class='tmpMsg'></div>");
 	getHistoryMsg( false );
-
-	scrollToBottom();
-
+	scrollToBottom(9);
 }
-
-
 
 /**
 show history chat contents
@@ -920,18 +915,26 @@ function getHistoryMsg(bIsScrollToTop) {
 
 			showChatCnt();
 		}
-
 		if (true==g_isFirstTimeLoading) {
+
 			g_isLoadHistoryMsgNow = false;
 			//first time loading finished,
 			// scroll to bottom
-			scrollToBottom( 0 );
-
+			if(g_lastmsgTime == 0){
+				console.log("test");
+				scrollToBottom();
+			}
+			container.find(".chat-msg").each(function(index, el) {
+				if($(el).data().time === g_lastmsgTime){
+					console.log("history");
+					$(el)[0].scrollIntoView();
+				}
+			});
+			
 			$("#chat-loading").hide();
 			$("#chat-loading-grayArea").show();
 			g_isFirstTimeLoading=false;
 		} else {
-
 			//舊訊息從local撈 如果小於 就去server取
 			if (list.length < 20) {
 				updateChat(g_earliestDate.getTime(), false, g_currentScrollToDom);
@@ -1023,7 +1026,7 @@ function op(url, type, data, delegate, errorDelegate) {
 function scrollToStart() {
 	if( !g_container ) g_container = $("#container");
 	g_container.stop(false, true).animate({scrollTop: 50}, 'fast');
-	// cns.debug(" -- scrollToBottom");
+
 }
 
 /**
@@ -1035,7 +1038,7 @@ function scrollToBottom( milisecond ) {
 
 	g_container.stop(false, true).animate({scrollTop: $("#chat-contents").height()}, milisecond);
 	g_isEndOfPage = true;
-	// cns.debug(" -- scrollToBottom");
+
 }
 
 /**
@@ -1074,6 +1077,7 @@ function getMemberName(groupUI) {
 }
 window.uc = updateChat;
 function updateChat(time, isGetNewer) {
+	
 	var api = "groups/" + gi + "/chats/" + ci + "/messages";
 	if (time) {
 		api += "?ct=" + time;
@@ -1084,13 +1088,16 @@ function updateChat(time, isGetNewer) {
 	}
 
 	op(api, "GET", "", function (data, status, xhr) {
-		console.log("updateChat", data);
+			console.log("updateChat", data);
 			g_group = $.userStorage()[gi];
 			g_room = g_group["chatAll"][ci];
 			if (null == g_room.lastCt){
 				g_room.lastCt = 0;
+				g_lastmsgTime = 0;
+			}else{
+				g_lastmsgTime = g_room.lastCt;
 			}
-
+			console.log("ori",g_lastmsgTime);
 			onChatReceiveMsg( gi, ci, g_room.uiName, data.el, function(){
 				var isEndOfPageTmp = g_isEndOfPage;
 				for (var i = (data.el.length - 1); i >= 0; i--) {
@@ -1098,14 +1105,13 @@ function updateChat(time, isGetNewer) {
 					if (object.hasOwnProperty("meta")) {
 
 						if (object.meta.ct > g_room.lastCt) g_room.lastCt = object.meta.ct;
-
+						
 						//pass shown msgs
 						if (g_msgs.indexOf(object.ei) < 0) showMsg(object);
 					}
 				}
 
 				if (isUpdatePermission) getPermition(true);
-
 				// isGetNewer 取時間點舊到新的訊息 只有polling需要 
 				if (isGetNewer) {
 
@@ -1131,18 +1137,21 @@ function updateChat(time, isGetNewer) {
 					} else {
 						// 第一次進入 滾動至底
 						if (true==g_isFirstTimeLoading) {
-							g_isFirstTimeLoading=false;
-							
+							//no more history
+							if (1 >= data.el.length) noMoreHistoryMsg();
+
+							scrollToBottom();
+							container.find(".chat-msg").each(function(index, el) {
+								if($(el).data().time === g_lastmsgTime){
+									$(el)[0].scrollIntoView();
+								}
+							});
 							//hide loading
 							if (false == g_isEndOfHistory) {
 								$("#chat-loading").hide();
 								$("#chat-loading-grayArea").show();
 							}
-
-							//no more history
-							if (1 >= data.el.length) noMoreHistoryMsg();
-
-							scrollToBottom();
+							g_isFirstTimeLoading=false;
 						} 
 
 						sendMsgRead();
@@ -1158,6 +1167,7 @@ function updateChat(time, isGetNewer) {
 				}
 			}	//end of onerror function
 	);	//end of op
+	
 }	//end of updateChat
 
 /**
@@ -2859,7 +2869,7 @@ function sendMsgText(dom) {
 			showSelectMemPage($("#pagesContainer"), btn, function () {
 					// $("#page-chat").removeClass("transition");
 				}, function (isDone) {
-					// scrollToBottom();
+
 					if (isDone) {
 						//on select done
 						// send add mem to room api
@@ -2905,7 +2915,7 @@ function sendMsgText(dom) {
 							cns.debug(e.message);
 						}
 					}
-					// scrollToBottom();
+
 					setTimeout(function () {
 						// checkPagePosition();
 						$("#page-chat").removeClass("transition");
@@ -3068,9 +3078,9 @@ function sendMsgText(dom) {
 			$(".screen-lock").hide();
 		};
 		var onDone = function (isDone) {
-			// scrollToBottom();
+
 			$("#page-chat").removeClass("transition");
-			// scrollToBottom();
+
 			setTimeout(function () {
 				// checkPagePosition();
 			}, 200);
