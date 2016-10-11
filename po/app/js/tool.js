@@ -2076,3 +2076,177 @@ myWait = function(variable,type){
   return deferred.promise();
 }
 
+QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
+	this.locateSite = [];
+	this.map = {};
+	var map, allMemberNum, allTargetMember, reporterData;
+	var taskFinisherData = thisTimeline.data("taskFinisherData") || [];
+	var memberList = QmiGlobal.groups[gi].guAll;
+	var reporterNum = data[0].meta.tct;
+	var reporterIndex = 0;
+	var slideWidth, slideHeight, sliderUlWidth;
+
+	// 查看這篇文章是否有發布對象，沒有就代入團體所有人人數
+	(function () {
+		if (data[0].meta.tu && data[0].meta.tu.gul) {
+			allMemberNum = data[0].meta.tu.gul.length;
+			allTargetMember = data[0].meta.tu.gul;
+		}
+		else {
+			allMemberNum = QmiGlobal.groups[gi].cnt;
+			allTargetMember = QmiGlobal.groups[gi].guAll;
+		}
+	})()
+	
+	this.container =  $("<div id='memberLocateModal' style='display:none;'>" + 
+							"<div class='return-block'>" +
+								"<div class='close'></div>" +
+							"</div>" + 
+							"<div class='tab-area'>" +
+								"<div class='tab-option active' value='reported'>" +
+									"已回報 <span>(" + reporterNum + ")</span>" +
+						  		"</div>" +  
+								"<div class='tab-option' value='unreport'>" +
+									"未回報 <span>(" + (allMemberNum - reporterNum) + ")</span>" + 
+						  		"</div>" + 
+							"</div>" +
+							"<div class='tab-content' value='reported'>" +
+								"<div class='reporter-slider'>" + 
+									"<div class='left-arrow arrowBtn'></div>" +
+									"<div class='right-arrow arrowBtn'></div>" +
+									"<ul class='reporter-list'></ul>" +
+								"</div>" + 
+								"<div class='modal-google-map' style='display:none'></div>" +
+					        	"<div class='modal-amap' style='display:none'></div>" +
+					        "</div>" +
+					        "<div class='tab-content' value='unreport' style='display:none'>" +
+					        	"<ul class='unreporter-list'></ul>" + 
+					        "</div>" +
+				        "</div>");
+
+	var closeBtn = this.container.find(".close");
+	var tabArea = this.container.find(".tab-option");
+	// var leftArrow = this.container.find(".left-arrow");
+	var arrowBtn = this.container.find(".arrowBtn");
+
+	closeBtn.on("click", this.close.bind(this));
+	tabArea.on("click", this.switchView.bind(this));
+	arrowBtn.on("click", this.changeReporter.bind(this));
+	// rightArrow.on("click", this.changeReporter.bind(this));
+
+	this.init = function () {
+		try { 
+	        this.container.find(".modal-google-map").show().tinyMap({
+	            center: {x: 23.464896, y: 120.9747843},
+	            zoomControl: 0,
+	            mapTypeControl: 0,
+	            scaleControl: 0,
+	            scrollwheel: 0,
+	            zoom: 16,
+	        });
+	        
+	    } catch(e) {
+	    	cns.debug("google 失敗 換高德上");
+	    	var amapNumber = "amap-" + new Date().getRandomString();
+	        this.container.find(".modal-google-map").hide();
+	        this.container.find(".modal-amap").show().attr("id",amapNumber);
+	        this.map = new AMap.Map(amapNumber,{
+	            rotateEnable:true,
+	            dragEnable:true,
+	            zoomEnable:true,
+	            zoom:7,
+	            maxZoom: 20,
+	            center: [120.9747843, 23.464896]
+	        });
+	    }
+
+	    if (taskFinisherData.length > 0) {
+	    	var slideCount = taskFinisherData.length;
+	    	
+	    	$.each(taskFinisherData, function (i, taskFinisher) {
+	    		var locationData = taskFinisher.ml[0];
+	    		var memberImageUrl = memberList[taskFinisher.meta.gu].aut;
+	    		var finishTime = new Date(taskFinisher.meta.ct);
+	    		var finishTimeFormat = finishTime.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#");
+	    		var liElement = $("<li class='reporter-li'><img src='" + memberImageUrl
+	    			+ "'><div class='finisher-info'><p class='finisher-name'>" + memberList[taskFinisher.meta.gu].nk
+	    			+ "</p><p class='finish-time'>" + finishTimeFormat + "</p>"
+	    			+ "<p class='locate-address'>" + locationData.a + "</p></div></li>");
+
+	    		this.locateSite[i] = new AMap.Marker({
+    				map : map,
+    				icon : memberImageUrl,
+    				position : [locationData.lng, locationData.lat],                    
+                }); 
+
+	    		// liElement.click(function (e) {
+	    		// 	var circle = new AMap.Circle({
+				   //      center: new AMap.LngLat(locationData.lng, locationData.lat),
+				   //      radius: 200, 
+				   //      strokeOpacity: 1, 
+				   //      strokeWeight: 0.2, 
+				   //      fillColor: "#4098ef", 
+				   //      fillOpacity: 0.35,
+				   //  });
+       //              circle.setMap(map);
+       //             	map.setCenter(marker[i].getPosition());
+       //             	map.setZoom(15);
+	    		// });
+	    		this.container.find(".reporter-list").append(liElement);
+	    	}.bind(this));
+
+	    	this.container.find(".reporter-list li")[0].click();
+	    	slideWidth = this.container.find(".reporter-list li").width();
+	    	slideHeight = this.container.find(".reporter-list li").height();
+	    	sliderUlWidth = slideCount * slideWidth;
+
+	    	this.container.find(".reporter-slider").css({ width: slideWidth, height: slideHeight });
+	    	this.container.find(".reporter-list").css({ width: sliderUlWidth});
+	    } else {
+	    	this.container.find(".reporter-list").hide();
+	    }
+	}.bind(this)
+
+	// this.changeReporter = function () {
+	// 	console.log("mjidqdq");
+	// 	// this.container.find(".reporter-list").animate({
+ //  //           left: + slideWidth
+ //  //       }, 200, function () {
+ //  //           // $('#slider ul li:last-child').prependTo('#slider ul');
+ //  //           // $('#slider ul').css('left', '');
+ //  //       });
+	// }.bind(this);
+
+	$("body").append(this.container);
+	this.container.fadeIn(1000);
+	this.init();
+}
+
+QmiGlobal.MemberLocateModal.prototype = {
+	close: function() {
+		this.container.fadeOut(300, function() {
+			this.container.remove();
+			delete this.container;
+		}.bind(this))
+	},
+
+	switchView : function (e) {
+		var target = $(e.target);
+		if (! target.hasClass("active")) {
+			this.container.find(".tab-option").removeClass("active");
+			target.addClass("active"); 
+
+			this.container.find(".tab-content").hide();
+			this.container.find(".tab-content[value='" + target.attr("value") + "']").show();
+		}
+	},
+
+	changeReporter : function () {
+		this.container.find(".reporter-list").animate({
+            left: + 500
+        }, 200, function () {
+            // $('#slider ul li:last-child').prependTo('#slider ul');
+            // $('#slider ul').css('left', '');
+        });
+	}
+}
