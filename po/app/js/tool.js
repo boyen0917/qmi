@@ -2076,3 +2076,236 @@ myWait = function(variable,type){
   return deferred.promise();
 }
 
+QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
+	this.locateSite = [];
+	this.map = {};
+	this.reporterIndex = 0;
+	var map, allMemberNum, allTargetMember, unreportList = {};
+	var taskFinisherData = thisTimeline.data("taskFinisherData") || [];
+	var memberList = QmiGlobal.groups[gi].guAll;
+	var reporterNum = data[0].meta.tct;
+	var reporterIndex = 0;
+	var slideWidth, slideHeight, sliderUlWidth;
+
+	// 查看這篇文章是否有發布對象，沒有就代入團體所有人人數
+	(function () {
+		if (data[0].meta.tu && data[0].meta.tu.gul) {
+			allMemberNum = data[0].meta.tu.gul.length;
+			allTargetMember = data[0].meta.tu.gul;
+		}
+		else {
+			allMemberNum = QmiGlobal.groups[gi].cnt;
+			allTargetMember = Object.assign({}, QmiGlobal.groups[gi].guAll);
+		}
+	})()
+	
+	this.container =  $("<div id='memberLocateModal' style='display:none;'>" + 
+							"<div class='return-block'>" +
+								"<div class='close'></div>" +
+							"</div>" + 
+							"<div class='tab-area'>" +
+								"<div class='tab-option active' value='reported'>" +
+									"已回報 <span>(" + reporterNum + ")</span>" +
+						  		"</div>" +  
+								"<div class='tab-option' value='unreport'>" +
+									"未回報 <span>(" + (allMemberNum - reporterNum) + ")</span>" + 
+						  		"</div>" + 
+							"</div>" +
+							"<div class='tab-content' value='reported'>" +
+								"<div class='reporter-slider'>" + 
+									"<div class='left-arrow arrowBtn'></div>" +
+									"<div class='right-arrow arrowBtn'></div>" +
+									"<ul class='reporter-list'></ul>" +
+								"</div>" + 
+								"<div class='modal-google-map' style='display:none'></div>" +
+					        	"<div class='modal-amap' style='display:none'></div>" +
+					        "</div>" +
+					        "<div class='tab-content' value='unreport' style='display:none'>" +
+					        	"<ul class='unreporter-list'></ul>" + 
+					        "</div>" +
+				        "</div>");
+
+	var closeBtn = this.container.find(".close");
+	var tabArea = this.container.find(".tab-option");
+	var arrowBtn = this.container.find(".arrowBtn");
+
+	closeBtn.on("click", this.close.bind(this)); // 關閉視窗
+	tabArea.on("click", this.switchView.bind(this)); // 已訂位和未定位的的切換
+	arrowBtn.on("click", this.changeReporter.bind(this)); //切換定位成員
+
+	this.init = function () {
+		// 預載google map
+		try { 
+	        this.container.find(".modal-google-map").show().tinyMap({
+	            center: {x: 23.464896, y: 120.9747843},
+	            zoomControl: 0,
+	            mapTypeControl: 0,
+	            scaleControl: 0,
+	            scrollwheel: 0,
+	            zoom: 16,
+	        });
+	        
+	    } catch(e) { //沒有股溝妹，就預載高賽地圖
+	    	cns.debug("google 失敗 換高德上");
+	    	var amapNumber = "amap-" + new Date().getRandomString();
+	        this.container.find(".modal-google-map").hide();
+	        this.container.find(".modal-amap").show().attr("id",amapNumber);
+	        this.map = new AMap.Map(amapNumber,{
+	            rotateEnable:true,
+	            dragEnable:true,
+	            zoomEnable:true,
+	            zoom:7,
+	            maxZoom: 20,
+	            center: [120.9747843, 23.464896]
+	        });
+	    }
+
+	    if (taskFinisherData.length > 0) {
+	    	var slideCount = taskFinisherData.length;
+
+	    	// 已定位成員畫面製作
+	    	$.each(taskFinisherData, function (i, taskFinisher) {
+
+	    		var locationData = taskFinisher.ml[0];
+	    		var memberImageUrl = memberList[taskFinisher.meta.gu].aut || "images/common/others/empty_img_personal_l.png";
+	    		var finishTime = new Date(taskFinisher.meta.ct);
+	    		var finishTimeFormat = finishTime.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#");
+	    		var liElement = $("<li class='reporter-li'><img src='" + memberImageUrl
+	    			+ "'><div class='finisher-info'><p class='finisher-name'>" 
+	    			+ memberList[taskFinisher.meta.gu].nk + "</p><p class='finish-time'>"
+	    			+ finishTimeFormat + "</p><p class='locate-address'>" + locationData.a 
+	    			+ "</p></div></li>");
+
+	    		liElement.attr("data-gu", taskFinisher.meta.gu);
+	    		// 點擊頭像跳出個人主頁視窗
+	    		liElement.find("img").off("click").on("click", function(e) {
+	    			console.log( $(e.target).parent().attr("data-gu"));
+	    			var target = $(e.target);
+	    			userInfoShow(gi, target.parent().attr("data-gu"));
+	    		});
+
+	    		// 定位的成員，marker設置
+	    		this.locateSite[i] = new AMap.Marker({
+    				map : this.map,
+    				position : [locationData.lng, locationData.lat],
+    				icon: new AMap.Icon({            
+            			size: new AMap.Size(35, 35),
+            			image: memberImageUrl,
+            			// imageOffset: new AMap.Pixel(0, -60)
+        			})                  
+                }); 
+
+	    		this.container.find(".reporter-list").append(liElement);
+
+	    		delete allTargetMember[taskFinisher.meta.gu];
+	    	}.bind(this));
+
+	    	this.map.setCenter(this.locateSite[0].getPosition());
+	    	this.map.setZoom(17);
+
+	    	this.container.find(".reporter-list li")[0].click();
+	    	slideWidth = this.container.find(".reporter-list li").width();
+	    	slideHeight = this.container.find(".reporter-list li").height();
+	    	sliderUlWidth = slideCount * slideWidth;
+
+	    	this.container.find(".reporter-slider").css({ width: slideWidth, height: slideHeight });
+
+	    	if (slideCount == 1) {
+	    		this.container.find(".reporter-list").css({ width: sliderUlWidth});
+	    		this.container.find(".arrowBtn").hide();
+	    	} else {
+	    		this.container.find(".reporter-list").css({ width: sliderUlWidth, marginLeft: - slideWidth});
+	    	}
+	    	
+	    	this.container.find(".reporter-list li:last-child").prependTo(this.container.find(".reporter-list"))
+	    } else {
+	    	this.container.find(".reporter-list").hide();
+	    	this.map.setZoom(7);
+	    }
+	    unreportList = allTargetMember;
+
+	    // 成員列表如是陣列，轉成object的格式，gu當key
+	    if (allTargetMember.constructor == Array) {
+	    	unreportList = {};
+	    	$.each(allTargetMember, function(i, targetMember) {
+	    		unreportList[targetMember.gu] = memberList[targetMember.gu];
+	    	});
+	    }
+
+	    // 未定位成員畫面製作
+	    if (Object.keys(unreportList).length > 0) {
+	    	for (var memberID in unreportList) {
+	    		if (typeof(unreportList[memberID]) === 'object' 
+	    				&& unreportList[memberID].st == 1) {
+
+	    			var memberImageUrl = unreportList[memberID].aut || "images/common/others/empty_img_personal_l.png";
+		    		var liElement = $("<li class='unreporter-li'><img src='" + memberImageUrl
+		    			+ "'><div class='unfinisher-name'>" + unreportList[memberID].nk
+		    			+ "</div></li>");
+		    		liElement.attr("data-gu", memberID);
+	    			// 點擊頭像跳出個人主頁視窗
+		    		liElement.find("img").off("click").on("click", function(e) {
+		    			var target = $(e.target);
+		    			userInfoShow(gi, target.parent().attr("data-gu"));
+		    		});
+
+		    		this.container.find(".unreporter-list").append(liElement);
+	    		}
+	    	}
+    	}
+	}.bind(this)
+
+	$("body").append(this.container);
+	this.container.fadeIn(1000);
+	this.init();
+}
+
+QmiGlobal.MemberLocateModal.prototype = {
+	close: function() {
+		this.container.fadeOut(300, function() {
+			this.container.remove();
+			delete this.container;
+		}.bind(this))
+	},
+
+	switchView : function (e) {
+		var target = $(e.target);
+		if (! target.hasClass("active")) {
+			this.container.find(".tab-option").removeClass("active");
+			target.addClass("active"); 
+
+			this.container.find(".tab-content").hide();
+			this.container.find(".tab-content[value='" + target.attr("value") + "']").show();
+		}
+	},
+
+	changeReporter : function (e) {
+		var target =  e.target;
+		var sliderList = this.container.find(".reporter-list");
+		var reporterNum = sliderList.find("li").length;
+		var circle;
+		
+		if (target.classList[0] == "left-arrow") {
+			sliderList.animate({
+	            left: + 550
+	        }, 200, function () {
+	        	sliderList.find('li:last-child').prependTo(sliderList);
+	            sliderList.css('left', '');
+	        });
+	        this.reporterIndex = (this.reporterIndex - 1 + reporterNum) % reporterNum
+		} else if (target.classList[0] == "right-arrow") {
+			this.container.find(".reporter-list").animate({
+	            left: - 550
+	        }, 200, function () {
+	            sliderList.find('li:first-child').appendTo(sliderList);
+	            sliderList.css('left', '');
+	        });
+
+	        this.reporterIndex = (this.reporterIndex + 1) % reporterNum;
+		}
+
+		this.map.setCenter(this.locateSite[this.reporterIndex].getPosition());
+	    this.map.setZoom(17);
+	}
+}
+

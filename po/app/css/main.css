@@ -2662,7 +2662,7 @@ img.st-user-pic{
 
 .st-box2-more-time,.st-box2-more-task-area,
 .st-task-vote-detail-count, .st-vote-detail-top, .st-vote-detail-option, .st-vote-send,
-.st-vote-detail-desc,.st-box2-bottom-block,.st-work-option {
+.st-vote-detail-desc,.st-box2-bottom-block,.st-work-option, .st-location-send {
     padding-bottom: 10px;
 }
 
@@ -2757,13 +2757,13 @@ img.st-user-pic{
 }
 
 
-.st-vote-send,.st-vote-send-blue {
+.st-vote-send,.st-vote-send-blue, .st-location-send {
 	color: white;
 	text-align: center;
 	font-size: 20px;
 }
 
-.st-vote-send {
+.st-vote-send, .st-location-send {
     background: rgb(179,192,199);
     border: 1px solid rgb(177,188,199);
     padding: 10px;
@@ -2898,6 +2898,34 @@ img.st-user-pic{
 	padding: 10px;
 }
 
+.st-locate-status {
+	padding: 12px 0 10px 20px;
+    background: #eef0f2;
+    background-image: url('../images/common/icon/icon_arrow_next_blue.png');
+    background-repeat: no-repeat;
+    background-position: 99% 50%;
+    background-size: 20px 20px;
+    margin-bottom: 20px;
+}
+
+.location-reported-number, .my-report-address {
+	color : #4092ef;
+}
+
+.report-status-text {
+	margin-right: 35px;
+    float: right;
+    line-height: 17px;
+    color: #4092ef;
+    font-weight: 700;
+}
+
+.my-report-address {
+	margin-bottom: 10px;
+    padding-left: 20px;
+    letter-spacing: 0.65px;
+}
+
 .st-attach-url {
 	background: #f8f8f8;
 	width: 480px;
@@ -2909,7 +2937,7 @@ img.st-user-pic{
 }
 
 
-.st-attach-url-img,.st-attach-google-map,.st-attach-amap-map {
+.st-attach-url-img,.st-attach-google-map,.st-attach-amap-map, .st-google-map, .st-gausai-map {
     margin: auto;
     width: 100%;
 }
@@ -2955,7 +2983,7 @@ img.st-user-pic{
 	color: #565656;
 }
 
-.st-attach-google-map,.st-attach-amap-map{
+.st-attach-google-map,.st-attach-amap-map, .st-google-map, .st-gausai-map{
     height:200px;
     max-width:480px;
     border:1px solid #e4e4e4;	
@@ -2986,7 +3014,7 @@ img.st-user-pic{
 	width: 100%;
 }
 
-#galleryModal {
+#galleryModal, #memberLocateModal {
     position: fixed; 
     z-index: 1010; 
     left: 0;
@@ -6256,4 +6284,221 @@ img.vdo-default:before {}
     	}
 }
 
+#memberLocateModal .return-block {
+    min-height: 55px;
+    background-color: rgb(57, 148, 232);
+}
+
+#memberLocateModal .close {
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    background-image: url("../images/navi/navi_icon_back.png");
+    background-size: 35px 35px;
+    background-repeat: no-repeat;
+    background-position: 50% 75%;
+}
+
+#memberLocateModal .tab-option {
+    min-width: 200px;
+    display: inline-block;
+    background: rgb(210, 228, 237);
+    text-align: center;
+    line-height: 55px;
+    height: 55px;
+    border-bottom: white 1px solid;
+    width: 50%;
+    cursor: pointer;
+}
+
+#memberLocateModal .tab-option.active {
+	background: rgb(156, 221, 255);
+}
+
+#memberLocateModal .arrowBtn {
+	position: absolute;
+    top: 2.5em;
+    display: inline-block;
+	z-index: 2;
+}
+
+
+#memberLocateModal .left-arrow {
+    left: 20px
+}
+
+#memberLocateModal .left-arrow:before {
+    content: "";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-left: 0.3em solid #ccc;
+    border-bottom: 0.3em solid #ccc;
+    transform: rotate(45deg);
+    margin-right: 0.5em;
+    cursor: pointer;
+}
+
+#memberLocateModal .right-arrow {
+    right: 10px;
+}
+
+#memberLocateModal .right-arrow:before {
+    content: "";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-top: 0.3em solid #ccc;
+    border-right: 0.3em solid #ccc;
+    transform: rotate(45deg);
+    margin-right: 0.5em;
+    cursor: pointer;
+}
+
+#memberLocateModal .left-arrow:hover:before, #memberLocateModal .right-arrow:hover:before{
+    border-color: #aaa;
+}
+
+#memberLocateModal .tab-content {
+   	height: 100%
+}
+
+#memberLocateModal .reporter-slider {
+    position: absolute;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+}
+
+#memberLocateModal ul {
+	list-style: none;
+}
+
+#memberLocateModal .reporter-list {
+	position: relative;
+    text-align: center;
+    /*background: white;*/
+    height: 100px;
+    z-index: 1;
+    opacity: 0.9;
+    padding: 0px;
+    margin: 0;
+  	padding: 0;
+}
+
+#memberLocateModal .reporter-li {
+	width: 550px;
+    height: 90px;
+    padding: 5px;
+    position: relative;
+    background: white;
+    display: block;
+    float: left;
+    margin: 0;
+  	padding: 0;
+}
+
+#memberLocateModal .reporter-li .finisher-info{
+	display: inline-block;
+    margin-left: 12px;
+}
+
+#memberLocateModal .reporter-li img{
+	width: 85px;
+    height: 85px;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+#memberLocateModal .reporter-li p{
+	margin-bottom: 6px;
+    margin-top: 0;
+    text-align: left;
+    font-size: 14px;
+}
+
+#memberLocateModal p.finisher-name{
+	font-weight: bold;
+	font-size: 18px;
+}
+
+
+#memberLocateModal p.finish-time:before{
+	content: "";
+    display: inline-block;
+    width: 30px;
+    height: 20px;
+    background-image: url("../images/task/timeline_task_icon_clock.png");
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    vertical-align: text-bottom;
+}
+
+#memberLocateModal p.finish-time, #memberLocateModal p.locate-address{
+    margin-left: -1px;
+}
+
+#memberLocateModal p.locate-address:before {
+	content: "";
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+	background-image: url("../images/task/timeline_task_icon_checkin_direction.png");
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+}
+
+#memberLocateModal .modal-amap {
+	margin: auto;
+    width: 100%;
+    height: 100%;
+    /*max-width:480px;*/
+    border:1px solid #e4e4e4;
+}
+
+#memberLocateModal .amap-icon {
+	border: 3px solid rgba(111, 172, 213, 0.36);
+	display: inline;
+}
+
+#memberLocateModal .amap-icon img {
+	width: 35px;
+	height: 35px;
+}
+
+#memberLocateModal .amap-marker:after {
+	position: absolute;
+    left: 0;
+    top: 40px;
+    content: '';
+    height: 0px;
+    border-style: solid;
+    border-width: 9px 9px 0px 9px;
+    border-color: rgba(111, 172, 213, 0.36) transparent transparent;
+}
+
+#memberLocateModal .unreporter-list {
+	width: 100%;
+	height: 100%;
+	background: white;
+	padding: 0;
+    margin: 0;
+}
+
+#memberLocateModal .unreporter-li img{
+	width: 50px;
+    height: 50px;
+    padding: 15px;
+    vertical-align: middle;
+    overflow-y: auto;
+    cursor: pointer;
+}
+
+#memberLocateModal div.unfinisher-name {
+	display: inline-block;
+}
 
