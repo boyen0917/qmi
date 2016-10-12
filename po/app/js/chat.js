@@ -199,21 +199,31 @@ $(function(){
 			//非管理員
 			if(g_group.ad != 1){
 				$("#header .title .text").html(g_group.gn._escape().replaceOriEmojiCode());
+				//set window title
+				$(document).find("title").text(g_group.gn._escape().replaceOriEmojiCode() + " - Qmi");
 			}else{
 				if(g_room.tp == 1){
 					$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
 					$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
+					//set window title
+					$(document).find("title").text(g_cn._escape().replaceOriEmojiCode() + " - Qmi");
 				}else if(g_room.tp == 2 && g_cn == g_group.me || g_group.guAll[g_cn] === undefined){
 					$("#header .title .text").html(g_group.gn._escape().replaceOriEmojiCode());
+					//set window title
+					$(document).find("title").text(g_group.gn._escape().replaceOriEmojiCode() + " - Qmi");
 				}else{
 					$("#header .title .text").html(g_group.guAll[g_cn].nk._escape().replaceOriEmojiCode());
 					$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
+					//set window title
+					$(document).find("title").text(g_group.guAll[g_cn].nk._escape().replaceOriEmojiCode() + " - Qmi");
 				}
 				
 			}
 		}else{
 			$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
 			$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
+			//set window title
+			$(document).find("title").text(g_cn + " - Qmi");
 
 			var tmpMemCount = (g_room.memList) ? Object.keys(g_room.memList).length : 0;
 			if (tmpMemCount != g_room.memCount) {
@@ -260,8 +270,6 @@ $(function(){
 
 		$(".input").data("h", $(".input").innerHeight());
 
-		//set window title
-		$(document).find("title").text(g_cn + " - Qmi");
 
 		//scroll to bottom when click the to-bottom button
 		$("#chat-toBottom").off("click");
