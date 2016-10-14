@@ -2128,7 +2128,9 @@ function sendMsgText(dom) {
 					case 7://video
 						renderVideoUrl(obj.s32, target.find("video"), function (videoTag) {
 							var parent = videoTag.parents(".msg-video");
-							parent.addClass("loaded");console.log("????");
+
+							parent.addClass("loaded");
+
 							parent.find(".length").html(secondsToTime(Math.floor(obj.md.l/1000)));
 							parent.find(".download").attr("href", videoTag.attr("src"));
 							// parent.find("video").attr("preload", "none");

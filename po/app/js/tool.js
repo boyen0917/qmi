@@ -2079,7 +2079,8 @@ myWait = function(variable,type){
 QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	this.locateSite = [];
 	this.map = {};
-	var map, allMemberNum, allTargetMember, reporterData;
+	this.reporterIndex = 0;
+	var map, allMemberNum, allTargetMember, unreportList = {};
 	var taskFinisherData = thisTimeline.data("taskFinisherData") || [];
 	var memberList = QmiGlobal.groups[gi].guAll;
 	var reporterNum = data[0].meta.tct;
@@ -2094,7 +2095,7 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 		}
 		else {
 			allMemberNum = QmiGlobal.groups[gi].cnt;
-			allTargetMember = QmiGlobal.groups[gi].guAll;
+			allTargetMember = Object.assign({}, QmiGlobal.groups[gi].guAll);
 		}
 	})()
 	
@@ -2126,13 +2127,11 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 
 	var closeBtn = this.container.find(".close");
 	var tabArea = this.container.find(".tab-option");
-	// var leftArrow = this.container.find(".left-arrow");
 	var arrowBtn = this.container.find(".arrowBtn");
 
 	closeBtn.on("click", this.close.bind(this));
 	tabArea.on("click", this.switchView.bind(this));
 	arrowBtn.on("click", this.changeReporter.bind(this));
-	// rightArrow.on("click", this.changeReporter.bind(this));
 
 	this.init = function () {
 		try { 
@@ -2162,38 +2161,38 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 
 	    if (taskFinisherData.length > 0) {
 	    	var slideCount = taskFinisherData.length;
-	    	
 	    	$.each(taskFinisherData, function (i, taskFinisher) {
+
+	    		console.log(memberList[taskFinisher.meta.gu].nk);
 	    		var locationData = taskFinisher.ml[0];
-	    		var memberImageUrl = memberList[taskFinisher.meta.gu].aut;
+	    		var memberImageUrl = memberList[taskFinisher.meta.gu].aut || "images/common/others/empty_img_personal_l.png";
 	    		var finishTime = new Date(taskFinisher.meta.ct);
 	    		var finishTimeFormat = finishTime.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#");
 	    		var liElement = $("<li class='reporter-li'><img src='" + memberImageUrl
-	    			+ "'><div class='finisher-info'><p class='finisher-name'>" + memberList[taskFinisher.meta.gu].nk
-	    			+ "</p><p class='finish-time'>" + finishTimeFormat + "</p>"
-	    			+ "<p class='locate-address'>" + locationData.a + "</p></div></li>");
+	    			+ "'><div class='finisher-info'><p class='finisher-name'>" 
+	    			+ memberList[taskFinisher.meta.gu].nk + "</p><p class='finish-time'>"
+	    			+ finishTimeFormat + "</p><p class='locate-address'>" + locationData.a 
+	    			+ "</p></div></li>");
 
 	    		this.locateSite[i] = new AMap.Marker({
-    				map : map,
-    				icon : memberImageUrl,
-    				position : [locationData.lng, locationData.lat],                    
+    				map : this.map,
+    				position : [locationData.lng, locationData.lat],
+    				icon: new AMap.Icon({            
+            			size: new AMap.Size(35, 35),
+            			image: memberImageUrl,
+            			// imageOffset: new AMap.Pixel(0, -60)
+        			})                  
                 }); 
 
-	    		// liElement.click(function (e) {
-	    		// 	var circle = new AMap.Circle({
-				   //      center: new AMap.LngLat(locationData.lng, locationData.lat),
-				   //      radius: 200, 
-				   //      strokeOpacity: 1, 
-				   //      strokeWeight: 0.2, 
-				   //      fillColor: "#4098ef", 
-				   //      fillOpacity: 0.35,
-				   //  });
-       //              circle.setMap(map);
-       //             	map.setCenter(marker[i].getPosition());
-       //             	map.setZoom(15);
-	    		// });
 	    		this.container.find(".reporter-list").append(liElement);
+
+	    		delete allTargetMember[taskFinisher.meta.gu];
 	    	}.bind(this));
+
+			this.locateSite[0].G.zIndex = 101;
+
+	    	this.map.setCenter(this.locateSite[0].getPosition());
+	    	this.map.setZoom(17);
 
 	    	this.container.find(".reporter-list li")[0].click();
 	    	slideWidth = this.container.find(".reporter-list li").width();
@@ -2201,21 +2200,51 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	    	sliderUlWidth = slideCount * slideWidth;
 
 	    	this.container.find(".reporter-slider").css({ width: slideWidth, height: slideHeight });
-	    	this.container.find(".reporter-list").css({ width: sliderUlWidth});
+
+	    	if (slideCount == 1) {
+	    		this.container.find(".reporter-list").css({ width: sliderUlWidth});
+	    		this.container.find(".arrowBtn").hide();
+	    	} else {
+	    		this.container.find(".reporter-list").css({ width: sliderUlWidth, marginLeft: - slideWidth});
+	    	}
+	    	
+	    	this.container.find(".reporter-list li:last-child").prependTo(this.container.find(".reporter-list"))
 	    } else {
 	    	this.container.find(".reporter-list").hide();
+	    	this.map.setZoom(7);
 	    }
-	}.bind(this)
+	    unreportList = allTargetMember;
 
-	// this.changeReporter = function () {
-	// 	console.log("mjidqdq");
-	// 	// this.container.find(".reporter-list").animate({
- //  //           left: + slideWidth
- //  //       }, 200, function () {
- //  //           // $('#slider ul li:last-child').prependTo('#slider ul');
- //  //           // $('#slider ul').css('left', '');
- //  //       });
-	// }.bind(this);
+	    // 成員列表如是陣列，轉成object的格式，gu當key
+	    if (allTargetMember.constructor == Array) {
+	    	unreportList = {};
+	    	$.each(allTargetMember, function(i, targetMember) {
+	    		unreportList[targetMember.gu] = memberList[targetMember.gu];
+	    	});
+	    }
+
+	    if (Object.keys(unreportList).length > 0) {
+	    	console.log(unreportList);
+	    	for (var memberID in unreportList) {
+	    		if (typeof(unreportList[memberID]) === 'object' 
+	    				&& unreportList[memberID].st == 1) {
+	    			console.log(memberID);
+	    			var memberImageUrl = unreportList[memberID].aut || "images/common/others/empty_img_personal_l.png";
+		    		var liElement = $("<li class='unreporter-li'><img src='" + memberImageUrl
+		    			+ "'><div class='unfinisher-name'>" + unreportList[memberID].nk
+		    			+ "</div></li>");
+
+		    		liElement.find("img").off("click").on("click", function(e) {
+		    			e.stopPropagation();
+		    			console.log(gi);
+		    			userInfoShow(gi, memberID);
+		    		});
+
+		    		this.container.find(".unreporter-list").append(liElement);
+	    		}
+	    	}
+    	}
+	}.bind(this)
 
 	$("body").append(this.container);
 	this.container.fadeIn(1000);
@@ -2241,12 +2270,47 @@ QmiGlobal.MemberLocateModal.prototype = {
 		}
 	},
 
-	changeReporter : function () {
-		this.container.find(".reporter-list").animate({
-            left: + 500
-        }, 200, function () {
-            // $('#slider ul li:last-child').prependTo('#slider ul');
-            // $('#slider ul').css('left', '');
-        });
+	changeReporter : function (e) {
+		var target =  e.target;
+		var sliderList = this.container.find(".reporter-list");
+		var reporterNum = sliderList.find("li").length;
+		var circle;
+		
+		this.locateSite[this.reporterIndex].G.zIndex = 100;
+
+		if (target.classList[0] == "left-arrow") {
+			sliderList.animate({
+	            left: + 550
+	        }, 200, function () {
+	        	sliderList.find('li:last-child').prependTo(sliderList);
+	            sliderList.css('left', '');
+	        });
+	        this.reporterIndex = (this.reporterIndex - 1 + reporterNum) % reporterNum
+		} else if (target.classList[0] == "right-arrow") {
+			this.container.find(".reporter-list").animate({
+	            left: - 550
+	        }, 200, function () {
+	            sliderList.find('li:first-child').appendTo(sliderList);
+	            sliderList.css('left', '');
+	        });
+
+	        this.reporterIndex = (this.reporterIndex + 1) % reporterNum;
+		}
+
+
+		// circle = new AMap.Circle({
+	 //        center: new AMap.LngLat(this.locateSite[this.reporterIndex].getPosition().lng,
+	 //        			this.locateSite[this.reporterIndex].getPosition().lat),
+	 //        radius: 50, 
+	 //        strokeOpacity: 1, 
+	 //        strokeWeight: 0.2, 
+	 //        fillColor: "#4098ef", 
+	 //        fillOpacity: 0.35,
+	 //    });
+  //       circle.setMap(this.map);
+		this.locateSite[this.reporterIndex].G.zIndex = 101;
+		this.map.setCenter(this.locateSite[this.reporterIndex].getPosition());
+	    this.map.setZoom(17);
 	}
 }
+
