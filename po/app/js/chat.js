@@ -327,6 +327,7 @@ $(function(){
 					this_grid.data("file-num", i);
 					this_grid.data("file", file);
 					this_grid.find(".chat-fail-status").hide();
+
 					renderVideoFile(file, this_grid.find("div video"), function (videoTag) {
 						var parent = videoTag.parents(".msg-video");
 						parent.find(".length").html("--:--");
@@ -339,6 +340,7 @@ $(function(){
 						parent.addClass("error");
 						parent.find(".download").remove();
 					});
+
 				} else {
 					scrollToBottom();
 					var this_grid = showUnsendMsg("", 26, file.name, file.size);

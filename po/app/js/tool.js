@@ -2163,7 +2163,6 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	    	var slideCount = taskFinisherData.length;
 	    	$.each(taskFinisherData, function (i, taskFinisher) {
 
-	    		console.log(memberList[taskFinisher.meta.gu].nk);
 	    		var locationData = taskFinisher.ml[0];
 	    		var memberImageUrl = memberList[taskFinisher.meta.gu].aut || "images/common/others/empty_img_personal_l.png";
 	    		var finishTime = new Date(taskFinisher.meta.ct);
@@ -2188,8 +2187,6 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 
 	    		delete allTargetMember[taskFinisher.meta.gu];
 	    	}.bind(this));
-
-			this.locateSite[0].G.zIndex = 101;
 
 	    	this.map.setCenter(this.locateSite[0].getPosition());
 	    	this.map.setZoom(17);
@@ -2228,16 +2225,15 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	    	for (var memberID in unreportList) {
 	    		if (typeof(unreportList[memberID]) === 'object' 
 	    				&& unreportList[memberID].st == 1) {
-	    			console.log(memberID);
+
 	    			var memberImageUrl = unreportList[memberID].aut || "images/common/others/empty_img_personal_l.png";
 		    		var liElement = $("<li class='unreporter-li'><img src='" + memberImageUrl
 		    			+ "'><div class='unfinisher-name'>" + unreportList[memberID].nk
 		    			+ "</div></li>");
-
+		    		liElement.attr("gu", memberID);
 		    		liElement.find("img").off("click").on("click", function(e) {
-		    			e.stopPropagation();
-		    			console.log(gi);
-		    			userInfoShow(gi, memberID);
+		    			var target = $(e.target);
+		    			userInfoShow(gi, target.parent().attr("gu"));
 		    		});
 
 		    		this.container.find(".unreporter-list").append(liElement);
@@ -2297,18 +2293,6 @@ QmiGlobal.MemberLocateModal.prototype = {
 	        this.reporterIndex = (this.reporterIndex + 1) % reporterNum;
 		}
 
-
-		// circle = new AMap.Circle({
-	 //        center: new AMap.LngLat(this.locateSite[this.reporterIndex].getPosition().lng,
-	 //        			this.locateSite[this.reporterIndex].getPosition().lat),
-	 //        radius: 50, 
-	 //        strokeOpacity: 1, 
-	 //        strokeWeight: 0.2, 
-	 //        fillColor: "#4098ef", 
-	 //        fillOpacity: 0.35,
-	 //    });
-  //       circle.setMap(this.map);
-		this.locateSite[this.reporterIndex].G.zIndex = 101;
 		this.map.setCenter(this.locateSite[this.reporterIndex].getPosition());
 	    this.map.setZoom(17);
 	}
