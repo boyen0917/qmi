@@ -24,8 +24,7 @@ var ui,		//user id
 	g_isFirstTimeLoading = true,	//是否第一次進聊天室	
 	g_currentScrollToDom = null,	//捲動到最上方時會讀取舊訊息, 但視窗應停留在讀取前最後一筆訊息的dom, 用此變數暫存
 	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
-	lockCurrentFocusIntervalLength = 100,//讓視窗停留在最後一筆的interval更新時間
-	g_lastmsgTime;	
+	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
 $(function(){
 	//load language
@@ -876,7 +875,7 @@ function onChatDBInit() {
 	$("#chat-contents").append(lastMsg);
 	$("#chat-contents").append("<div class='tmpMsg'></div>");
 	getHistoryMsg( false );
-	scrollToBottom(9);
+	scrollToBottom();
 }
 
 /**
@@ -920,13 +919,10 @@ function getHistoryMsg(bIsScrollToTop) {
 			g_isLoadHistoryMsgNow = false;
 			//first time loading finished,
 			// scroll to bottom
-			if(g_lastmsgTime == 0){
-				console.log("test");
-				scrollToBottom();
-			}
+			
+			scrollToBottom();
 			container.find(".chat-msg").each(function(index, el) {
-				if($(el).data().time === g_lastmsgTime){
-					console.log("history");
+				if($(el).data().time === g_room.lastCt){
 					$(el)[0].scrollIntoView();
 				}
 			});
@@ -1086,31 +1082,34 @@ function updateChat(time, isGetNewer) {
 		else 
 			api += "&d=false";
 	}
+	var g_lastmsgTime = $.lStorage("lastMsgCt") || {};
 
 	op(api, "GET", "", function (data, status, xhr) {
 			console.log("updateChat", data);
 			g_group = $.userStorage()[gi];
 			g_room = g_group["chatAll"][ci];
-			if (null == g_room.lastCt){
-				g_room.lastCt = 0;
-				g_lastmsgTime = 0;
-			}else{
-				g_lastmsgTime = g_room.lastCt;
+
+			if(null == g_room.lastCt){
+				if(g_lastmsgTime[ci] == undefined){
+					g_lastmsgTime[ci] = { ct : 0};
+				}
+				g_room.lastCt = g_lastmsgTime[ci].ct;
 			}
-			console.log("ori",g_lastmsgTime);
 			onChatReceiveMsg( gi, ci, g_room.uiName, data.el, function(){
 				var isEndOfPageTmp = g_isEndOfPage;
 				for (var i = (data.el.length - 1); i >= 0; i--) {
 					var object = data.el[i];
 					if (object.hasOwnProperty("meta")) {
 
-						if (object.meta.ct > g_room.lastCt) g_room.lastCt = object.meta.ct;
-						
+						if (object.meta.ct > g_room.lastCt)	g_room.lastCt = object.meta.ct;
 						//pass shown msgs
 						if (g_msgs.indexOf(object.ei) < 0) showMsg(object);
 					}
 				}
-
+				g_lastmsgTime[ci] = {
+						"ct" : g_room.lastCt
+				}
+				$.lStorage("lastMsgCt",g_lastmsgTime);
 				if (isUpdatePermission) getPermition(true);
 				// isGetNewer 取時間點舊到新的訊息 只有polling需要 
 				if (isGetNewer) {
@@ -1142,7 +1141,7 @@ function updateChat(time, isGetNewer) {
 
 							scrollToBottom();
 							container.find(".chat-msg").each(function(index, el) {
-								if($(el).data().time === g_lastmsgTime){
+								if($(el).data().time === g_room.lastCt){
 									$(el)[0].scrollIntoView();
 								}
 							});
