@@ -366,6 +366,8 @@
 	"FIVE_SEC_SET" : "5 seconds",
 	"GENERAL_GROUP" : "general group",
 	"OFFICAL_GROUP" : "offical group",
+	"PRIVACY_POLICY" : "Privacy Policy",
+	"USER_AGREEMENT" : "Term of Use",
 
 	"BIND_LDAP" : "綁定LDAP",
 	"BIND_ACCOUNT" : "已綁定帳號",
