@@ -1997,7 +1997,7 @@ function initQRCodePage(){
 	ajaxDo(api_name,headers,"get",true).complete(function(data){
 		if(data.status == 200){
 			var rps = $.parseJSON(data.responseText);
-			if(!rps || rps.rsp_code<0 ){
+			if(!rps || !rps.rsp_success){
 				imgContainer.find('img').hide();
 				imgContainer.addClass("disabled");
 				return;
