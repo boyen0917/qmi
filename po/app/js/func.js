@@ -9311,6 +9311,7 @@ userInfoEvent = function(this_info,me){
             $(".st-feedbox-area div[data-feed=main]").html("");
             $(".st-feedbox-area").show();
             $(".feed-subarea").hide();
+            $("#page-group-main").find(".st-filter-area").hide();
             $("#page-group-main").data("main-gu",this_gu);
             $("#page-group-main").data("main-gi",this_gi);
             $("#page-group-main").data("navi","main");
