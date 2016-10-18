@@ -545,15 +545,22 @@ ul.system-tab li.current-tab{
   	border-radius: 3px;
   	border: 0;
   	color: white;
-  	cursor: pointer;
+  	/*cursor: pointer;*/
   	outline: none;
   	background: #32b3e4; 
   	font-weight: bold;
   	font-size: 12px;
+  	opacity: 0.2;
 }
 
 .password-btn{
     margin-top: -4px;
+}
+
+.password-btn.ready{
+    cursor: pointer;
+    background: #32b3e4; 
+    opacity: 1;
 }
 
 /*信箱電話更改*/

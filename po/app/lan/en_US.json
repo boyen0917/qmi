@@ -373,6 +373,9 @@
 	"ADD_LDAP" : "新增LDAP帳號",
 	"ADD_LDAP_DES" : "請輸入你的LDAP帳號及密碼",
 	"REMOVE_LDAP" : "解除綁定",
-	"REMOVE_LDAP_DES" : "解除綁定後，將解除帳號權限"
+	"REMOVE_LDAP_DES" : "解除綁定後，將解除帳號權限",
 
+	"SETTING_OLD_PASSWORD" : "Current Password",
+	"SETTING_NEW_PASSWORD" : "New Password(at least 8 digits)",
+	"SETTING_CONFIRM_PASSWORD" : "Confirm Password"
 }
