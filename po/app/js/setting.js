@@ -183,7 +183,9 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
     ajaxDo(api_name,headers,method,true,body).complete(function(data){
     	if(data.status == 200){
     		removeGroup( this_gi );
-
+	        (QmiGlobal.windowListCiMap[this_gi] || []).forEach(function(thisCi){
+                windowList[thisCi].close();
+            })
 	        if( callback ) callback();
     	}
     });
