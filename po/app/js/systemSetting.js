@@ -2,14 +2,22 @@ $(document).ready(function(){
     
     var btnContent = $(".btn-content");
     var imgContent = $(".image-content");
+    var tabContent = $(".tab-content-r");
     
 
     $('.userSetting-btn').click(function(){
         userInfoUpdate();
     });
+
+    tabContent.find('.input-password').bind('input', function (e) {
+        passwordValidate(e);
+    });
+
     // password送出
     btnContent.find('.password-btn').click(function(){
-        passwordChange(); 
+        if ($(this).hasClass("ready")) {
+            passwordChange(); 
+        };
     });
     // 預設系統通知
     btnContent.find('.notification-btn').click(function(){
@@ -318,11 +326,46 @@ systemSetting = function(){
 
 }
 
+passwordValidate = function (e) {
+    var pwSetting = $("#password-setting");
+    var inputTarget = $(e.target);
+    var notAllEmpty = true;
+    var newPwdIsValid = true;
+
+    pwSetting.find(".input-password").each(function(i,val){
+        if($(this).val() == ""){
+            notAllEmpty = false;
+        }
+    });
+
+    switch (inputTarget.attr("name")) {
+        case "n-password" :
+            console.log(inputTarget);
+            console.log(inputTarget.siblings("input[name='v-password']"));
+            if (inputTarget.val().length < 8 && inputTarget.siblings("input[name='v-password']").length < 8) {
+                newPwdIsValid = false;
+            }
+            break;
+
+        case "v-password" :
+            if (inputTarget.val().length < 8 && inputTarget.siblings("input[name='n-password']").length < 8) {
+                newPwdIsValid = false;
+            }
+            break;
+    }
+
+    if (notAllEmpty && newPwdIsValid) {
+        pwSetting.find('.password-btn').addClass('ready');
+    } else {
+        pwSetting.find('.password-btn').removeClass('ready');
+    }
+}
+
 // 變更密碼
 passwordChange = function(){
         //$("input[name$='user-edit-o-password']").val()
         var pwSetting = $("#password-setting");
-        var fill = true;//空值判定
+        // var fill = true;//空值判定
 
         var old_password = {
             "pw" : toSha1Encode(pwSetting.find("input[name$='o-password']").val())
@@ -332,56 +375,59 @@ passwordChange = function(){
              "up" : toSha1Encode(pwSetting.find("input[name$='n-password']").val())
         };
 
-        pwSetting.find(".input-password").each(function(i,val){
-                if($(this).val() == ""){
-                    fill = false;
-                    popupShowAdjust("欄位不能有空", "" ,true);
-                    return false;
-                }
-        });
+        // pwSetting.find(".input-password").each(function(i,val){
+        //         if($(this).val() == ""){
+        //             fill = false;
+        //             popupShowAdjust("欄位不能有空", "" ,true);
+        //             return false;
+        //         }
+        // });
         //欄位空值判斷
-        if(fill == true)
-        {
-            //驗證密碼是否正確
-            new QmiAjax({
-                apiName : "me/password/auth",
-                body : JSON.stringify(old_password),
-                method: "post",
-                isPublicApi: true
-            }).success(function(password_data){
-                if (pwSetting.find("input[name$='n-password']").val().length < 8){ 
-                        popupShowAdjust("新密碼請輸入至少八個字", "" ,true);
-                        return false;
-                }　else {
-                    if (pwSetting.find("input[name$='n-password']").val() == pwSetting.find("input[name$='v-password']").val()){
-                        new QmiAjax({
-                            apiName : "me/password",
-                            body : JSON.stringify(verify_password),
-                            method : "put",
-                            isPublicApi: true
-                        }).success(function(verify_data){
-                            toastShow(verify_data.rsp_msg);
-                            //console.debug(verify_data);
-                            QmiGlobal.auth.at = verify_data.at;
-                            at = verify_data.at;
-                            var user_login = $.lStorage("_loginData");
-                            user_login.at = verify_data.at;
-                            $.lStorage("_loginData",user_login);
-                            pwSetting.find(".input-password").val("");
-                        }).error(function(e){
-                            popupShowAdjust(e.rsp_msg);
-                        });
-                    } else {
-                        popupShowAdjust("兩次密碼不符 請再輸入一次", "" ,true);
-                        pwSetting.find("input[name$='v-password']").val("");
-                        //$.i18n.getString("LOGIN_FORGETPASSWD_NOT_MATCH")
-                    }
-                }
-            }).error(function(e){
-                    popupShowAdjust("原密碼有誤", "" ,true);
-                    console.debug(e.responseText);
-            });
-        }//空值判定
+        // if(fill == true)
+        // {
+
+        //驗證密碼是否正確
+        new QmiAjax({
+            apiName : "me/password/auth",
+            body : JSON.stringify(old_password),
+            method: "post",
+            isPublicApi: true
+        }).success(function(password_data){
+            // if (pwSetting.find("input[name$='n-password']").val().length < 8){ 
+            //         popupShowAdjust("新密碼請輸入至少八個字", "" ,true);
+            //         return false;
+            // }　else {
+            if (pwSetting.find("input[name$='n-password']").val() == pwSetting.find("input[name$='v-password']").val()){
+                new QmiAjax({
+                    apiName : "me/password",
+                    body : JSON.stringify(verify_password),
+                    method : "put",
+                    isPublicApi: true
+                }).success(function(verify_data){
+                    toastShow(verify_data.rsp_msg);
+                    //console.debug(verify_data);
+                    QmiGlobal.auth.at = verify_data.at;
+                    at = verify_data.at;
+                    var user_login = $.lStorage("_loginData");
+                    user_login.at = verify_data.at;
+                    $.lStorage("_loginData",user_login);
+                    pwSetting.find(".input-password").val("");
+                    pwSetting.find('.password-btn').removeClass('ready');
+                }).error(function(e){
+                    popupShowAdjust(e.rsp_msg);
+                });
+            } else {
+                popupShowAdjust("兩次密碼不符 請再輸入一次", "" ,true);
+                pwSetting.find("input[name$='v-password']").val("");
+                pwSetting.find('.password-btn').removeClass('ready');
+                //$.i18n.getString("LOGIN_FORGETPASSWD_NOT_MATCH")
+            }
+            // }
+        }).error(function(e){
+                popupShowAdjust("原密碼有誤", "" ,true);
+                console.debug(e.responseText);
+        });
+    // }//空值判定
 }//密碼更新
 
 //更新預設團體

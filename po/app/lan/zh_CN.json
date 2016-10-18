@@ -351,6 +351,8 @@
 	"FIVE_SEC_SET" : "5秒",
 	"GENERAL_GROUP" : "一般团体",
 	"OFFICAL_GROUP" : "官方帐号",
+	"PRIVACY_POLICY" : "隐私政策",
+	"USER_AGREEMENT" : "使用条款",
 
 	"BIND_LDAP" : "綁定LDAP",
 	"BIND_ACCOUNT" : "已綁定帳號",
@@ -358,6 +360,9 @@
 	"ADD_LDAP" : "新增LDAP帳號",
 	"ADD_LDAP_DES" : "請輸入你的LDAP帳號及密碼",
 	"REMOVE_LDAP" : "解除綁定",
-	"REMOVE_LDAP_DES" : "解除綁定後，將解除帳號權限"
+	"REMOVE_LDAP_DES" : "解除綁定後，將解除帳號權限",
 
+	"SETTING_OLD_PASSWORD" : "请输入原本的密码",
+	"SETTING_NEW_PASSWORD" : "请输入新密码(至少8码)",
+	"SETTING_CONFIRM_PASSWORD" : "请再次输入新密码"
 }

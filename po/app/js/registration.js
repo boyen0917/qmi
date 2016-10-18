@@ -455,8 +455,16 @@ onCheckVersionDone = function(needUpdate){
 */	
 
 
-	$("#page-register .register-text span").html( $.i18n.getString("REGISTER_ACCOUNT_POLICY", "<a href='http://webdev.cloud.mitake.com.tw/user_agreement.html' target='_blank'>", "</a>", "<a href='http://webdev.cloud.mitake.com.tw/privacy_policy.html' target='_blank'>", "</a>") );
+	$("#page-register .register-text span").html( $.i18n.getString("REGISTER_ACCOUNT_POLICY", "<div class='register-policy user-agreement'>", "</div>", "<div class='register-policy privacy-policy'>", "</div>") );
 	
+	$(".user-agreement").on("click",function(e){
+		window.open("user_agreement.html", "" , "width=600, height=600");
+	});
+
+	$(".privacy-policy").on("click",function(e){
+		window.open("privacy_policy.html", "" , "width=600, height=600");
+	});
+
 	$(document).on("click", "#page-register .register-text img", function(){
 		var img = $(this);
 		var next = $(".register-next");

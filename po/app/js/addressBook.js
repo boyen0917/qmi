@@ -124,10 +124,10 @@ var AddressBook = AddressBook || {
 
 
 				//get branch data
-				if( !tmp.bl || tmp.bl.length<=0 ){
-					// alert("no branch data");
-					return;
-				}
+				// if( !tmp.bl || tmp.bl.length<=0 ){
+				// 	// alert("no branch data");
+				// 	return;
+				// }
 				instance.bl = {};
 
         		$.each(tmp.bl,function(i,val){
@@ -214,15 +214,16 @@ var AddressBook = AddressBook || {
 		}
 
 		//add row custom
-		var tmp = $("<div class='row custom'><div class='left'></div><div class='right'></div></div>");
-		var left = tmp.find(".left");
-		left.append("<div class='name'>"+$.i18n.getString("ADDRESSBOOK_CUSTOM")+"</div>");
-		left.append("<div class='detail mem'>"+$.i18n.getString("COMPOSE_N_MEMBERS",(instance.customCnt)?instance.customCnt:0 )+"</div>");
-		
-		tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
-		tmp.off("click").click( {instance:instance}, instance.showCustomPage );
-		rowContainer.append(tmp);
-
+		if (!QmiGlobal.cloudGiMap[gi] == undefined) {
+			var tmp = $("<div class='row custom'><div class='left'></div><div class='right'></div></div>");
+			var left = tmp.find(".left");
+			left.append("<div class='name'>"+$.i18n.getString("ADDRESSBOOK_CUSTOM")+"</div>");
+			left.append("<div class='detail mem'>"+$.i18n.getString("COMPOSE_N_MEMBERS",(instance.customCnt)?instance.customCnt:0 )+"</div>");
+			
+			tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
+			tmp.off("click").click( {instance:instance}, instance.showCustomPage );
+			rowContainer.append(tmp);
+		}
 
 		//add row favorite
 		var tmp = $("<div class='row favorite'><div class='left'></div><div class='right'></div></div>");

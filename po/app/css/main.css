@@ -206,7 +206,12 @@ img.auo {
 
 .register-text{ margin: auto;width: 300px; }
 .register-text span { position: relative; top: 2px; }
-
+.register-policy{
+	display: inline-block;
+	border-bottom: 1px solid blue;
+	color: blue;
+	cursor: pointer;
+}
 #register-next,#pw-send {
     margin-top: 88%;
 }

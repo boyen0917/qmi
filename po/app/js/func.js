@@ -6831,7 +6831,7 @@ getLinkMeta = function (this_compose,url) {
         deferred = $.Deferred();
 
         // setTimeout(function(){
-        require('open-graph')( encodeURI(url), function(err, data){
+        parseurl( encodeURI(url), function(err, data){
             deferred.resolve(err, data);
         });
         // },2000);
@@ -6881,15 +6881,6 @@ getLinkMeta = function (this_compose,url) {
             if( data.image && data.image.url ){
                 if( Array.isArray(data.image.url) ){
                     if(data.image.url.length>0){
-                        console.log(data.image.url);
-                        data.image.url.forEach(function(url){
-                            var img = new Image();
-                            if(url.match(/^https?:\/\/.*\.(?:jpeg|jpg|png)$/) == null){
-                                data.image.url = $.grep(data.image.url,function(val){
-                                    return val != url;
-                                })
-                            }
-                        });
                         result.img = data.image.url[0];       
                     }
                 } else {
@@ -9311,6 +9302,7 @@ userInfoEvent = function(this_info,me){
             $(".st-feedbox-area div[data-feed=main]").html("");
             $(".st-feedbox-area").show();
             $(".feed-subarea").hide();
+            $("#page-group-main").find(".st-filter-area").hide();
             $("#page-group-main").data("main-gu",this_gu);
             $("#page-group-main").data("main-gi",this_gi);
             $("#page-group-main").data("navi","main");

@@ -545,15 +545,22 @@ ul.system-tab li.current-tab{
   	border-radius: 3px;
   	border: 0;
   	color: white;
-  	cursor: pointer;
+  	/*cursor: pointer;*/
   	outline: none;
   	background: #32b3e4; 
   	font-weight: bold;
   	font-size: 12px;
+  	opacity: 0.2;
 }
 
 .password-btn{
     margin-top: -4px;
+}
+
+.password-btn.ready{
+    cursor: pointer;
+    background: #32b3e4; 
+    opacity: 1;
 }
 
 /*信箱電話更改*/
@@ -601,7 +608,8 @@ ul.system-tab li.current-tab{
 /*系統通知*//*預設團體*//*自動換頁*/
 .notification-option,
 .group-option,
-.carousel-option{
+.carousel-option,
+.st-info-option{
     height: 50px;
 	border-bottom: 1px solid #ededed;
 	padding: 10px;
@@ -728,6 +736,11 @@ input[type=radio] {
     font-size: 14px;
 }
 
+.stinfotext{
+	cursor: pointer;
+	padding: 20px;
+    font-size: 14px;
+}
 
 /*
 .user-data-information {
