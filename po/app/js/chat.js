@@ -195,9 +195,10 @@ $(function(){
 		getPermition();
 		//官方帳號
 		if(true == g_group.isOfficial){
-			$(".extra").hide();
+			// $(".extra").hide();
 			//非管理員
 			if(g_group.ad != 1){
+				$(".extra").hide();
 				$("#header .title .text").html(g_group.gn._escape().replaceOriEmojiCode());
 			}else{
 				if(g_room.tp == 1){
@@ -209,8 +210,22 @@ $(function(){
 					$("#header .title .text").html(g_group.guAll[g_cn].nk._escape().replaceOriEmojiCode());
 					$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
 				}
-				
 			}
+			// 群組聊天室，顯示成員數量
+			if (g_room.cpc > 2) {
+				$("#header .count").show();
+				$("#header .count").html("(" + g_room.cpc + ")");
+			} else { 
+				// 單人聊天室，隱藏成員數量
+				if (g_room.tp == 1) {
+					$("#header .count").hide();
+				} else { // 群組聊天室，顯示成員數量(中間有人退出，變2人)
+					$("#header .count").html("(" + g_room.memCount + ")");
+					$("#header .count").show();
+				}
+			}
+			$(".extra-content .btn[data-type=invite]").hide();
+			$(".extra-content .btn[data-type=exit]").hide();
 		}else{
 			$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
 			$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
@@ -224,10 +239,19 @@ $(function(){
 			if (g_room.memCount > 2) {
 				$("#header .count").show();
 				$("#header .count").html("(" + g_room.memCount + ")");
-			} else {
-				$("#header .count").hide();
-				// $(".extra-content .btn[data-type=edit]").hide();
-				$(".extra-content .btn[data-type=exit]").hide();
+			} else { 
+				// 單人聊天室，隱藏成員數量、離開和編輯
+				if (g_room.tp == 1 || g_room.cpc == undefined) {
+					$("#header .count").hide();
+					$(".extra-content .btn[data-type=edit]").hide();
+					$(".extra-content .btn[data-type=exit]").hide();
+				} else { // 群組聊天室，顯示成員數量、離開和編輯(中間有人退出，變2人)
+					$("#header .count").html("(" + g_room.memCount + ")");
+					$("#header .count").show();
+					$(".extra-content .btn[data-type=edit]").show();
+					$(".extra-content .btn[data-type=exit]").show();
+				}
+				
 			}
 		}
 
@@ -616,7 +640,10 @@ $(function(){
 			$(".chatroomNameInput").prop('readonly', false);
 			$(".chatroomImage").addClass("uploadImg");
 			$(".chatroomNameInput").addClass("editable");
-			$(".adminCheckBox").show(1000);
+			if (! g_group.isOfficial) {
+				$(".adminCheckBox").show(1000);
+			}
+			
 			$(this).hide();
 
 			registerEditRoomEvent();				
@@ -2167,15 +2194,29 @@ function sendMsgText(dom) {
 						g_room.memCount = data.ul.length;
 						g_room.cpc = data.ul.length;
 						if (g_room.cpc !== undefined) {
-							if(userData[gi].isOfficial){
-								$("#header .count").hide();
-							}else{
+							// if(userData[gi].isOfficial){
+
+							// 群組聊天室，顯示成員數量
+							if (g_room.cpc > 2) {
 								$("#header .count").show();
 								$("#header .count").html("(" + g_room.cpc + ")");
+							} else { 
+								// 單人聊天室，隱藏成員數量
+								if (g_room.tp == 1) {
+									$("#header .count").hide();
+								} else { // 群組聊天室，顯示成員數量(中間有人退出，變2人)
+									$("#header .count").html("(" + g_room.memCount + ")");
+									$("#header .count").show();
+								}
 							}
+								// $("#header .count").hide();
+							// }else{
+							// 	$("#header .count").show();
+							// 	$("#header .count").html("(" + g_room.cpc + ")");
+							// }
 							
-							$(".extra-content .btn[data-type=edit]").show();
-							$(".extra-content .btn[data-type=exit]").show();
+							// $(".extra-content .btn[data-type=edit]").show();
+							// $(".extra-content .btn[data-type=exit]").show();
 						} else {
 							$("#header .count").hide();
 							$(".extra-content .btn[data-type=edit]").hide();
@@ -2383,17 +2424,43 @@ function sendMsgText(dom) {
 		editPage.find(".chatroomNameInput").prop('readonly', true).removeClass("editable");
 		editPage.find(".adminCheckBox").hide();
 
+
 		if (iAmAdmin) {
 			editPage.find(".editChatRoom").show();
 			chatroomSwitch.find("#inviteSwitch").attr("checked", chatRoomData.is);
+
+			$(".header-title img").show();
+
+			if (g_group.isOfficial) page.find(".inviteSetting").hide();
 		} else {
+			if (g_group.isOfficial) {
+				// 官方帳號管理者建立聊天室，聊天室權限ad是0，故判斷團體ad
+				// if (g_group.ad == 1) {
+				var exitNormalMem = false;
+				for (var memberID in g_group.guAll) {
+					if (g_group.guAll[memberID].ad == 2) {
+						exitNormalMem = true;
+					}
+				}
+
+				if (exitNormalMem) {
+					editPage.find(".editChatRoom").hide();
+				} else {
+					editPage.find(".editChatRoom").show();
+				}
+				
+			} else {
+				editPage.find(".editChatRoom").hide();
+			}
+			// 自己沒有邀請成員權限，就隱藏自己加入/退出成員的選項
 			if (! iCanInvite) {
 				$(".header-title img").hide();
-			} 
-			$(".inviteSetting").hide();
-			editPage.find(".editChatRoom").hide();
+			}
+			
+			page.find(".inviteSetting").hide();
 		}
 
+		
 		//set current group name
 		input.val( g_cn ).data("oriName",g_cn);
 		editPage.find(".chatroomNameInput").val(g_cn)
