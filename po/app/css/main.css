@@ -6410,6 +6410,7 @@ img.vdo-default:before {}
 	width: 85px;
     height: 85px;
     vertical-align: top;
+    cursor: pointer;
 }
 
 #memberLocateModal .reporter-li p{

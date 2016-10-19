@@ -2129,11 +2129,12 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	var tabArea = this.container.find(".tab-option");
 	var arrowBtn = this.container.find(".arrowBtn");
 
-	closeBtn.on("click", this.close.bind(this));
-	tabArea.on("click", this.switchView.bind(this));
-	arrowBtn.on("click", this.changeReporter.bind(this));
+	closeBtn.on("click", this.close.bind(this)); // 關閉視窗
+	tabArea.on("click", this.switchView.bind(this)); // 已訂位和未定位的的切換
+	arrowBtn.on("click", this.changeReporter.bind(this)); //切換定位成員
 
 	this.init = function () {
+		// 預載google map
 		try { 
 	        this.container.find(".modal-google-map").show().tinyMap({
 	            center: {x: 23.464896, y: 120.9747843},
@@ -2144,7 +2145,7 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	            zoom: 16,
 	        });
 	        
-	    } catch(e) {
+	    } catch(e) { //沒有股溝妹，就預載高賽地圖
 	    	cns.debug("google 失敗 換高德上");
 	    	var amapNumber = "amap-" + new Date().getRandomString();
 	        this.container.find(".modal-google-map").hide();
@@ -2161,6 +2162,8 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 
 	    if (taskFinisherData.length > 0) {
 	    	var slideCount = taskFinisherData.length;
+
+	    	// 已定位成員畫面製作
 	    	$.each(taskFinisherData, function (i, taskFinisher) {
 
 	    		var locationData = taskFinisher.ml[0];
@@ -2173,6 +2176,15 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	    			+ finishTimeFormat + "</p><p class='locate-address'>" + locationData.a 
 	    			+ "</p></div></li>");
 
+	    		liElement.attr("data-gu", taskFinisher.meta.gu);
+	    		// 點擊頭像跳出個人主頁視窗
+	    		liElement.find("img").off("click").on("click", function(e) {
+	    			console.log( $(e.target).parent().attr("data-gu"));
+	    			var target = $(e.target);
+	    			userInfoShow(gi, target.parent().attr("data-gu"));
+	    		});
+
+	    		// 定位的成員，marker設置
 	    		this.locateSite[i] = new AMap.Marker({
     				map : this.map,
     				position : [locationData.lng, locationData.lat],
@@ -2220,8 +2232,8 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	    	});
 	    }
 
+	    // 未定位成員畫面製作
 	    if (Object.keys(unreportList).length > 0) {
-	    	console.log(unreportList);
 	    	for (var memberID in unreportList) {
 	    		if (typeof(unreportList[memberID]) === 'object' 
 	    				&& unreportList[memberID].st == 1) {
@@ -2230,10 +2242,11 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 		    		var liElement = $("<li class='unreporter-li'><img src='" + memberImageUrl
 		    			+ "'><div class='unfinisher-name'>" + unreportList[memberID].nk
 		    			+ "</div></li>");
-		    		liElement.attr("gu", memberID);
+		    		liElement.attr("data-gu", memberID);
+	    			// 點擊頭像跳出個人主頁視窗
 		    		liElement.find("img").off("click").on("click", function(e) {
 		    			var target = $(e.target);
-		    			userInfoShow(gi, target.parent().attr("gu"));
+		    			userInfoShow(gi, target.parent().attr("data-gu"));
 		    		});
 
 		    		this.container.find(".unreporter-list").append(liElement);
@@ -2272,8 +2285,6 @@ QmiGlobal.MemberLocateModal.prototype = {
 		var reporterNum = sliderList.find("li").length;
 		var circle;
 		
-		this.locateSite[this.reporterIndex].G.zIndex = 100;
-
 		if (target.classList[0] == "left-arrow") {
 			sliderList.animate({
 	            left: + 550
