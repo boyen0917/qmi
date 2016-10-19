@@ -2406,7 +2406,7 @@ function sendMsgText(dom) {
 	function updateEditRoomPage(){
 		var page = $("#page-edit-preview");
 		var chatroomSwitch = $(".chatRoomSetting");
-		var editPage = $(".adminSetting");
+		var editPage = page.find(".adminSetting");
 		//init
 		// var container = page.find(".newChatDetail-content.mem");
 		var input = page.find(".newChatDetail table .input");
@@ -2431,22 +2431,14 @@ function sendMsgText(dom) {
 
 			$(".header-title img").show();
 
+			// 官方帳號有聊天室權限的成員，將邀請成員開關關掉
 			if (g_group.isOfficial) page.find(".inviteSetting").hide();
 		} else {
 			if (g_group.isOfficial) {
-				// 官方帳號管理者建立聊天室，聊天室權限ad是0，故判斷團體ad
-				// if (g_group.ad == 1) {
-				var exitNormalMem = false;
-				for (var memberID in g_group.guAll) {
-					if (g_group.guAll[memberID].ad == 2) {
-						exitNormalMem = true;
-					}
-				}
-
-				if (exitNormalMem) {
-					editPage.find(".editChatRoom").hide();
-				} else {
-					editPage.find(".editChatRoom").show();
+				
+				// // 單人聊天室，隱藏所有編輯畫面
+				if (g_room.cpc == 2) {
+					editPage.hide();
 				}
 				
 			} else {
