@@ -208,8 +208,8 @@ img.auo {
 .register-text span { position: relative; top: 2px; }
 .register-policy{
 	display: inline-block;
-	border-bottom: 1px solid blue;
-	color: blue;
+	border-bottom: 1px solid rgb(126, 176, 234);
+	color: rgb(101, 166, 241);
 	cursor: pointer;
 }
 #register-next,#pw-send {
@@ -3671,43 +3671,50 @@ img.st-reply-message-attach {
 	width: 100%;
 	height: 100%;
 	position: absolute;
-	background: rgb(57, 148, 232);
+	background: rgb(244, 244, 244);
 	z-index: 2;
 	text-align: center;
 }
 .file-load .file-content{
 	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
+	top: 17px;
+	font-size: 12px;
+	color: #888;
 }
-#load-progress{
-	position: relative;
-	display: inline-block;
-	width: 100px;
-	height: 8px;
-	background: #585b6c;
-	border-radius: 5px;
+
+.file-load .file-content:before {
+  content: attr(percent);
+  position: absolute;
+  top: -10px;
+  left: calc(50% - 15px);
 }
-#load-bar{
-	position: absolute;
-	height: 100%;
-	background: #80ff5d;
-	border-top-left-radius: 5px;
-	border-bottom-left-radius: 5px;
+
+#load-progress {
+  position: relative;
+  display: inline-block;
+  width: 100px;
+  height: 5px;
+  background: #D2D2D2;
+  border-radius: 5px;
+  overflow: hidden;
 }
-#load-font{
-  	position: absolute;
-	top: -18px;
-	left: 45px;
-	color: white;
+
+#load-bar {
+  position: absolute;
+  height: 100%;
+  background: #6CB6FA;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
-#load-cancel{
-	position: relative;
-	display: inline-block;
-	margin-left: 10px;
-	cursor: pointer;
-	color: white;
+
+#load-cancel {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  left: 15px;
+  top: 1px;
 }
+
 .st-reply-message-img .attach-file {
 	background: white;
     background-position: 97% 50%;
