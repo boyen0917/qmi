@@ -67,115 +67,117 @@ initChatList = function(){
 	updateChatList(gi);
 }
 
-function updateChatList( giTmp, extraCallBack ){
-	var chatListDom = $(".subpage-chatList");
-	//預設開啟loading, 關閉rows & coachmark
-	chatListDom.find(".coachmake").hide();
-	chatListDom.find(".loading").show();
-	chatListDom.find(".rows").html("");
-	chatListDom.find(".top-chatList").hide("");
-	$(".top-chatList .list").html("");
+function getChatListApi(giTmp) {
+	var deferred = $.Deferred();
+
 	var currentGroup = QmiGlobal.groups[giTmp];
-	if( !currentGroup )	return;
-	//取得聊天室列表
-	var api_name = "groups/"+ giTmp +"/chats";
 
-	var headers = {
-	        ui:ui,
-	        at:at, 
-	        li:lang
-	};
-	var method = "get";
-	var result = ajaxDo(api_name,headers,method,false);
-	result.complete(function(data){
-		if(data.status == 200){
-			chatListDom.find(".loading").hide();
-			try{
-				var epl = $.parseJSON(data.responseText);
-				if(typeof epl != "undefined"){
-					//update chat list
-					var tmp = {};
-					var isCheckOri = ( currentGroup.hasOwnProperty("chatAll") );
-					var list = [];
-					$.each(epl.cl,function(key,newRoom){
-						if( newRoom.cm && "object"==typeof(newRoom.cm) ){
-							list.push({
-								gi: giTmp,
-								ci: newRoom.ci,
-								ei: newRoom.cm.ei,
-							    ct: newRoom.cm.meta.ct,
-							    data: newRoom.cm
-							});
-						}
-						if( isCheckOri ){
-							if( currentGroup["chatAll"].hasOwnProperty(newRoom.ci) ){
-								var oriRoom = currentGroup["chatAll"][newRoom.ci];
-								for( var propertyKey in oriRoom ){
-									if( !newRoom.hasOwnProperty(propertyKey) ){
-										newRoom[propertyKey] = oriRoom[propertyKey];
-									}
-								}
-							}
-						}
+	new QmiAjax({
+        apiName: "groups/"+ giTmp +"/chats",
+    }).success(function(rspData) {
 
-						//init name
-						if( null==newRoom.cn ){
-							newRoom.cn = "";
-							newRoom.nk = "";
-						} else if("1"==newRoom.tp){
-							try{
-								var split = newRoom.cn.split(",");
-								var me = currentGroup.gu;
-								newRoom.memList = {};
-								for( var i=0; i<split.length; i++ ){
-									newRoom.memList[ split[i] ] = {gu:split[i]};
-									if( split[i]!= me ){
-										if( currentGroup.guAll.hasOwnProperty( split[i] ) ){
-											var mem = currentGroup.guAll[ split[i] ];
-											newRoom.nk = mem.nk;
-											newRoom.other = split[i];
-										}
-									}
-								}
-							} catch(e){
-								errorReport(e);
-								newRoom.cn = "";
-							}
-						} else{
-							newRoom.nk = newRoom.cn;
-						}
+		var chatRoomListArr = (rspData || {cl: []}).cl;
+		//update chat list
+		var tmpChatAllObj = {};
+		var isCheckOri = ( currentGroup.hasOwnProperty("chatAll") );
+		var list = [];
+		var putDefPoolArr = [];
 
-						tmp[newRoom.ci] = newRoom;
-					});
-					currentGroup.chatAll = tmp;
+		$.each(chatRoomListArr, function(key,newRoom){
+			if(Object.keys(newRoom.cm || {}).length > 0) {
+				var def = $.Deferred();
+				var roomObj = {
+					gi: giTmp,
+					ci: newRoom.ci,
+					ei: newRoom.cm.ei,
+				    ct: newRoom.cm.meta.ct,
+				    data: newRoom.cm
+				};
 
-
-			    	if(list.length>0){
-				    	var cnt=0;
-				    	for( var i=0; i<list.length; i++ ){
-							g_idb_chat_msgs.put( list[i], function(){
-								cnt++;
-								if( cnt>=list.length ){
-									if( gi==giTmp ){
-										showChatList();
-									}
-								}
-							});
-				    	}
-				    } else if( gi==giTmp&&epl.cl.length>1){
-				    	showChatList();
-				    } else {
-				    	//no list, show coachmark
-						chatListDom.find("rows").hide();
-						chatListDom.find(".coachmake").fadeIn();
-				    }
-			    }
-			} catch (e){
-				errorReport(e);
+				list.push(roomObj);
+				putDefPoolArr.push(def)
+				// db
+				g_idb_chat_msgs.put(roomObj, def.resolve);
 			}
-		}
-		if(extraCallBack)	extraCallBack();
+
+			var chatAllChk = currentGroup.chatAll && currentGroup.chatAll.hasOwnProperty(newRoom.ci);
+			if(chatAllChk){
+				var oriRoom = currentGroup.chatAll[newRoom.ci];
+				for( var propertyKey in oriRoom ){
+					if( !newRoom.hasOwnProperty(propertyKey) )
+						newRoom[propertyKey] = oriRoom[propertyKey];
+				}
+			}
+
+			//init name
+			if( null==newRoom.cn ){
+				newRoom.cn = "";
+				newRoom.nk = "";
+			} else if("1"==newRoom.tp){
+				try{
+					var split = newRoom.cn.split(",");
+					var me = currentGroup.gu;
+					newRoom.memList = {};
+					for( var i=0; i<split.length; i++ ){
+						newRoom.memList[ split[i] ] = {gu:split[i]};
+						if( split[i]!= me ){
+							if( currentGroup.guAll.hasOwnProperty( split[i] ) ){
+								var mem = currentGroup.guAll[ split[i] ];
+								newRoom.nk = mem.nk;
+								newRoom.other = split[i];
+							}
+						}
+					}
+				} catch(e){
+					errorReport(e);
+					newRoom.cn = "";
+				}
+			} else{
+				newRoom.nk = newRoom.cn;
+			}
+
+			tmpChatAllObj[newRoom.ci] = newRoom;
+		});
+
+		currentGroup.chatAll = tmpChatAllObj;
+
+		$.when.apply($, putDefPoolArr).done(function() {
+			deferred.resolve({isSuccess: true, roomArr: list});
+		})
+	}).error(function(errData) {
+		deferred.reject({isSuccess: false, roomArr: []});
 	});
+
+	return deferred.promise();
+}
+
+function updateChatList( giTmp, extraCallBack ){
+	
+	if(QmiGlobal.groups[giTmp] === undefined )	return;
+
+	//取得聊天室列表api
+	getChatListApi(giTmp).done(function(rspObj) {
+		if(gi !== giTmp) return;
+
+		var chatListDom = $(".subpage-chatList");
+		//預設開啟loading, 關閉rows & coachmark
+		chatListDom.find(".coachmake").hide();
+		chatListDom.find(".loading").show();
+		chatListDom.find(".rows").html("");
+		chatListDom.find(".top-chatList").hide("");
+		$(".top-chatList .list").html("");
+		chatListDom.find(".loading").hide();
+
+		if(rspObj.isSuccess && rspObj.roomArr.length > 0) 
+			showChatList();
+		else 
+			chatListDom.find("rows").hide().end()
+			.find(".coachmake").fadeIn();
+
+		if(extraCallBack)	extraCallBack();
+	})
+
+
 }
 
 /**
