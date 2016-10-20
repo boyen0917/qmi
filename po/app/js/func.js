@@ -6822,153 +6822,139 @@ putEventStatus = function (target_obj,etp,est,callback){
     });
     
 }
+
+
 //parse 網址
 getLinkMeta = function (this_compose,url) {
-    try{
-        var 
+    var parseUrl = window.parseUrl || null,
         // 超過時間就不做 不然會被靠北
         timeLimit = 5000,//ms
         deferred = $.Deferred();
 
-        // setTimeout(function(){
-        parseurl( encodeURI(url), function(err, data){
-            deferred.resolve(err, data);
+    if(parseUrl === null)
+        deferred.reject({
+            msg: '非桌機版'
         });
-        // },2000);
+    else
+        parseUrl( encodeURI(url), deferred.resolve); 
 
-        var timer = setTimeout(function(){
-            deferred.reject();
-        }, timeLimit);
-
-        deferred
-        .done(function(err, data){
-            cns.debug("done",data);
-
-            var result = {};
-            var tmp_img,tmp_desc;
-
-            var yqlHtml = $(".cp-ta-yql").html();
-
-            //loading圖示隱藏
-            $(".cp-attach-area .url-loading").hide();
-
-            //error存在 或 result null 就跳出
-            if( !data || err ) {
-                //沒內容也算結束吧 讓它可以送出 
-                this_compose.data("parse-waiting",false);
-
-                toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
-                return false;
-            }
-
-            //title
-            if( Array.isArray(data.title) ){
-                if( data.title.length>0 ){
-                    result.title = data.title[0];
-                }
-            } else {
-                result.title = data.title;
-            }
-            //description
-            if( Array.isArray(data.description) ){
-                if( data.description.length>0 ){
-                    result.description = data.description[0];
-                }
-            } else {
-                result.description = data.description;
-            }
-            //image
-            if( data.image && data.image.url ){
-                if( Array.isArray(data.image.url) ){
-                    if(data.image.url.length>0){
-                        result.img = data.image.url[0];       
-                    }
-                } else {
-                    result.img = data.image.url;
-                }
-            }
-
-            cns.debug(result.title, result.description, result.img );
-
-
-            if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
-                this_compose.data("message-list").push(2);
-                var tmp = getYoutubeThumbnail( url );
-                if(tmp) result.img = tmp;
-            }else{
-                this_compose.data("message-list").push(1);
-            }
-
-            if(result.title || result.description || result.img){
-                //按送出重新截取網站內容 不用顯示在畫面
-                if(this_compose.data("parse-resend")) {
-                    this_compose.data("parse-resend",false);
-                    $(".cp-post").trigger("click");
-                }else{
-                    cns.debug("url:",result);
-                    if(result.title) $(".cp-yql-title").html(result.title);
-                    if(result.description) $(".cp-yql-desc").html(result.description.substring(0,200));
-                    if(result.img){
-                        var img = $("<img src='" + result.img + "'/>");
-                        $(".cp-yql-img").show().append(img);
-                        img.error( function(){
-                            $(this).parent().hide();
-                            $(this).remove();
-                            cns.debug("img preview failed.");
-                        });
-                    }
-                    $(".cp-ta-yql").fadeIn();
-                }
-            }
-            
-            result.url = url;
-            this_compose.data("url-content",result);
-
-            //網址讀取結束
-            this_compose.data("parse-waiting",false);
-
-            //關閉副檔區
-            composeCheckMessageList();
-            
-            //關閉事件
-            $(".cp-ta-yql > img").off().click(function(){
-
-                $(".cp-ta-yql").html(yqlHtml).fadeOut();
-                this_compose.data("url-chk",false).data("url-content",false);
-
-                //message list pop
-                var mlArr = this_compose.data("message-list");
-                for(key in mlArr){
-                    if(mlArr[key] == 1 || mlArr[key] == 2){
-                        mlArr.splice(key,1);
-                    }
-                }
-
-                this_compose.data("message-list",mlArr);
-
-                //判斷關閉副檔區
-                composeCheckMessageList();
-            });
-            
+    var timer = setTimeout(function() {
+        deferred.reject({
+            msg: 'timeout'
         })
-        .fail(function(){
-            cns.debug("fail");
+    }, timeLimit);
 
-            //網址讀取結束
+    deferred.done(function(err, data){
+
+        var result = {};
+        var tmp_img,tmp_desc;
+
+        var yqlHtml = $(".cp-ta-yql").html();
+
+        //loading圖示隱藏
+        $(".cp-attach-area .url-loading").hide();
+
+        //error存在 或 result null 就跳出
+        if( !data || err ) {
+            //沒內容也算結束吧 讓它可以送出 
             this_compose.data("parse-waiting",false);
-            // this_compose.data("parse-error",true);
-            this_compose.data("parse-resend",false);
-            //錯誤訊息
-            // toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
 
-            $(".cp-attach-area .url-loading").hide();
+            toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
+            return false;
+        }
 
+        //title
+        if( Array.isArray(data.title) ){
+            if( data.title.length>0 ){
+                result.title = data.title[0];
+            }
+        } else {
+            result.title = data.title;
+        }
+        //description
+        if( Array.isArray(data.description) ){
+            if( data.description.length>0 ){
+                result.description = data.description[0];
+            }
+        } else {
+            result.description = data.description;
+        }
+        //image
+        if( data.image && data.image.url ){
+            if( Array.isArray(data.image.url) ){
+                if(data.image.url.length>0){
+                    result.img = data.image.url[0];       
+                }
+            } else {
+                result.img = data.image.url;
+            }
+        }
+
+        cns.debug(result.title, result.description, result.img );
+
+
+        if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
+            this_compose.data("message-list").push(2);
+            var tmp = getYoutubeThumbnail( url );
+            if(tmp) result.img = tmp;
+        }else{
+            this_compose.data("message-list").push(1);
+        }
+
+        if(result.title || result.description || result.img){
+            //按送出重新截取網站內容 不用顯示在畫面
+            if(this_compose.data("parse-resend")) {
+                this_compose.data("parse-resend",false);
+                $(".cp-post").trigger("click");
+            }else{
+                cns.debug("url:",result);
+                if(result.title) $(".cp-yql-title").html(result.title);
+                if(result.description) $(".cp-yql-desc").html(result.description.substring(0,200));
+                if(result.img){
+                    var img = $("<img src='" + result.img + "'/>");
+                    $(".cp-yql-img").show().append(img);
+                    img.error( function(){
+                        $(this).parent().hide();
+                        $(this).remove();
+                        cns.debug("img preview failed.");
+                    });
+                }
+                $(".cp-ta-yql").fadeIn();
+            }
+        }
+        
+        result.url = url;
+        this_compose.data("url-content",result);
+
+        //網址讀取結束
+        this_compose.data("parse-waiting",false);
+
+        //關閉副檔區
+        composeCheckMessageList();
+        
+        //關閉事件
+        $(".cp-ta-yql > img").off().click(function(){
+
+            $(".cp-ta-yql").html(yqlHtml).fadeOut();
+            this_compose.data("url-chk",false).data("url-content",false);
+
+            //message list pop
+            var mlArr = this_compose.data("message-list");
+            for(key in mlArr){
+                if(mlArr[key] == 1 || mlArr[key] == 2){
+                    mlArr.splice(key,1);
+                }
+            }
+
+            this_compose.data("message-list",mlArr);
+
+            //判斷關閉副檔區
             composeCheckMessageList();
         });
+        
+    }).fail(function(errData){
+        cns.debug("fail", errData);
 
-     } catch(e){
-
-        //保險
         //網址讀取結束
         this_compose.data("parse-waiting",false);
         // this_compose.data("parse-error",true);
@@ -6976,9 +6962,8 @@ getLinkMeta = function (this_compose,url) {
 
         $(".cp-attach-area .url-loading").hide();
 
-        //關閉副檔區
         composeCheckMessageList();
-    }
+    });
 }
 
 getJsonFromUrl = function(url) {
@@ -7134,14 +7119,6 @@ replySend = function(thisEvent){
         "tp": 0
     });
 
-    // var imgType = imgArea.data("type");
-
-    // switch( imgType ){
-    // body.ml.push({
-    //     "c": thisEvent.find(".st-reply-message-textarea textarea").val(),
-    //     "tp": 0
-    // });
-
     var fileType = imgArea.data("type");
 
     switch( fileType ){
@@ -7275,12 +7252,9 @@ replySend = function(thisEvent){
             break;
     }
 
-    // if( !isWaiting ){
-    //     replyApi( thisEvent, thisGi, thisTi, thisEi, body );
-    // }
     uploadDef.done(function(rspObj) {
-        console.log(rspObj);
         $(".file-load").remove();
+
         //if fail uploading
         if(rspObj.isSuccess === false){
             if(!messageArea.data("cancelupload")){
@@ -7299,50 +7273,50 @@ replySend = function(thisEvent){
             fileBody[fileBody.fiKey] = rspObj.data.fi;
             body.ml.push(fileBody);
         }
-        console.log("hey",thisEvent, thisGi, thisTi, thisEi, body);
         replyApi( thisEvent, thisGi, thisTi, thisEi, body );
     })
 }
 
 fileLoadShow = function(){
-    var uploadXhr;
+    var uploadXhr, barDom, percentDom;
     return {
-            init: function(elem){
-                $(".file-load").remove();
-                elem.data("cancelupload",false);
-                elem.find('.st-reply-message-img').hide();
-                elem.prepend($('<div class="file-load">'+
-                                    '<div class="file-content">'+
-                                      '<div id="load-progress">'+
-                                        '<div id="load-bar"></div>'+
-                                        '<div id="load-font"></div>'+
-                                      '</div>'+
-                                      '<div id="load-cancel">取消</div>'+
-                                    '</div>'+
-                                '</div>'));
-                $("#load-cancel").click(function(){
-                    elem.find('.st-reply-message-img').show();
-                    $(".file-load").remove();
-                    elem.data("cancelupload",true);
-                    uploadXhr.abort();
-                });
-            },
-            progressBar: function () {
-                uploadXhr = new window.XMLHttpRequest();
-                uploadXhr.upload.addEventListener("progress", function(evt){
-                    if (evt.lengthComputable) {
-                        // console.log(Math.floor((evt.loaded / evt.total) * 100) + '%');
-                        $("#load-bar").css("width",Math.floor((evt.loaded / evt.total) * 100) + '%');
-                        $("#load-font").html(Math.floor((evt.loaded / evt.total) * 100) + '%');
-                    }
-                }, false);
-                return uploadXhr;
-            }
+        init: function(elem){
+            elem.find(".file-load").remove();
+
+            var loadDom = $('<div class="file-load">'
+            + '<div class="file-content">'
+              + '<div id="load-progress"><div id="load-bar"></div></div>'
+              + '<div id="load-cancel">取消</div>'
+            + '</div></div>');
+
+            elem.data("cancelupload",false);
+            elem.find('.st-reply-message-img').hide();
+            elem.prepend(loadDom);
+
+            barDom = loadDom.find('#load-bar');
+            percentDom = loadDom.find('.file-content');
+
+            $("#load-cancel").click(function(){
+                elem.find('.st-reply-message-img').show();
+                loadDom.remove();
+                elem.data("cancelupload",true);
+                uploadXhr.abort();
+            });
+        },
+        progressBar: function () {
+            uploadXhr = new window.XMLHttpRequest();
+            uploadXhr.upload.addEventListener("progress", function(evt){
+                if (evt.lengthComputable) {
+                    barDom.css("width",Math.floor((evt.loaded / evt.total) * 100) + '%');
+                    percentDom.attr('percent', Math.floor((evt.loaded / evt.total) * 100) + '%');
+                }
+            }, false);
+            return uploadXhr;
+        }
     }
 }
 
 replyApi = function(this_event, this_gi, this_ti, this_ei, body){
-    console.log(body);
     s_load_show = false;
     var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/events?ep=" + this_ei;
 
@@ -9057,6 +9031,7 @@ meInfoShow = function(user_data){
 }
 
 userInfoEvent = function(this_info,me){
+    var groupMainDom = $("#page-group-main");
     this_info.unbind();
     
     this_info.find(".user-avatar").click(function(){
@@ -9271,14 +9246,15 @@ userInfoEvent = function(this_info,me){
         //結束關閉
         this_info.find(".user-info-close").trigger("mouseup");
         //主頁背景
-        $(".gm-user-main-area").fadeIn("fast",function(){
+        var userDom = groupMainDom.find(".gm-user-main-area");
+        userDom.fadeIn("fast",function(){
             var _thisGroupList = QmiGlobal.groups[this_gi];
-            $(".gm-user-main-area .background").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
-            $(".gm-user-main-area .name").html(_thisGroupList.guAll[this_gu].nk);
-            $(".gm-user-main-area .group .pic").css("background","url(" + _thisGroupList.aut + ")");
-            $(".gm-user-main-area .group .name").html(_thisGroupList.gn._escape());
+            userDom.find(".background").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
+            userDom.find(".name").html(_thisGroupList.guAll[this_gu].nk);
+            userDom.find(".group .pic").css("background","url(" + _thisGroupList.aut + ")");
+            userDom.find(".group .name").html(_thisGroupList.gn._escape());
             if(!_thisGroupList.aut){
-                $(".gm-user-main-area .group .pic").css("background","url(" + emptyAut + ")");
+                $userDom.find(".group .pic").css("background","url(" + emptyAut + ")");
             }
         });
 
@@ -9299,14 +9275,16 @@ userInfoEvent = function(this_info,me){
             //滾動至最上
             timelineScrollTop();
 
-            $(".st-feedbox-area div[data-feed=main]").html("");
-            $(".st-feedbox-area").show();
-            $(".feed-subarea").hide();
-            $("#page-group-main").find(".st-filter-area").hide();
-            $("#page-group-main").data("main-gu",this_gu);
-            $("#page-group-main").data("main-gi",this_gi);
-            $("#page-group-main").data("navi","main");
-            $(".st-filter-area").data("filter","all");
+            groupMainDom.find(".st-feedbox-area div[data-feed=main]").html("");
+            groupMainDom.find(".st-feedbox-area").show();
+            groupMainDom.find(".feed-subarea").hide();
+            groupMainDom.find(".st-filter-area").data("filter","all").hide();
+            
+            groupMainDom
+            .data("main-gu",this_gu)
+            .data("main-gi",this_gi)
+            .data("navi","main");
+            
             timelineListWrite();
         },200);
     });

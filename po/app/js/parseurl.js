@@ -1,4 +1,11 @@
 (function(){
+	// parseUrl
+	var require = window.require || null;
+    
+    if(require === null) {
+        console.error("非桌機版");
+        return;
+    }
 
 	var request = require('request'),
 		http = require('http'),
@@ -13,7 +20,7 @@
 	var paramRegExp = /; *([!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+) */g;
 	var typeRegExp = /^[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+\/[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+$/;
 
-	parseurl = function(url, cb, options){
+	parseUrl = function(url, cb, options){
 		getHTML(url, function(err, html){
 
 			if (err) return cb(err);
@@ -32,8 +39,8 @@
 			}
 		});
 	}
-
-	getHTML = function(url, cb){
+	
+	var getHTML = function(url, cb){
 		// console.log(navigator.userAgent);
 		var purl = require('url').parse(url);
 		if (!purl.protocol)
@@ -44,7 +51,6 @@
 			: http;
 		
 		url = require('url').format(purl);
-
 		request({
 			url: url,
 			headers:{
@@ -64,7 +70,7 @@
 		})
 	}
 
-	parseHTML = function(html, options){
+	var parseHTML = function(html, options){
 
 		options = options || {};
 		var domparser = new DOMParser().parseFromString(html, "text/html");
