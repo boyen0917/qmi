@@ -127,62 +127,6 @@ $(function(){
         return comboDeferred.promise();
     }
 
-    getGroupCombo = function(this_gi,callback,chk){
-        var this_gi = this_gi || gi;
-        // var err_show = err_show || false;
-        // var api_name = "groups/" + this_gi;
-        // if( tp ) api_name = api_name +"?tp=" +tp;
-        // var headers = {
-        //     "ui":ui,
-        //     "at":at,
-        //     "li":lang
-        // };
-        // var method = "get";
-        // getGroupData(this_gi,false,1,true)
-        new QmiAjax({
-            apiName: "groups/" + this_gi,
-        }).complete(function(data){
-            if(data.status == 200){
-                var groupData = $.parseJSON(data.responseText);
-
-                //切換團體時, 若原團體A1有cnt, 新團體A1無cnt, A1的cnt會留著
-                clearGroupPollingCnt();
-
-                //取得單一團體的所有詳細內容 更新到local storage
-                //更新團體資訊
-                setGroupAttributes( this_gi, groupData );
-
-                initOfficialGroup( this_gi );
-
-                //更新user info
-                setGroupUser( this_gi, groupData );
-
-                //設定群組資訊
-                setBranchList(this_gi, groupData);
-                //設定功能選單
-                setTabList(this_gi, groupData);
-
-                if(callback) callback();
-            }else{
-                //發生錯誤 以第一個團體為預設
-                if(
-                    QmiGlobal.groups[0]     !== undefined && 
-                    QmiGlobal.groups[0].gi  !== undefined && 
-                    chk                   !== true 
-                ) {
-
-                    QmiGlobal.auth.dgi = QmiGlobal.groups[0].gi;
-
-                    //帶true表示只再做一次
-                    getGroupCombo(QmiGlobal.groups[0].gi,callback,true);
-
-                } else {
-                    groupSwitchEnable();    
-                }
-            }
-        });
-    }
-
     setGroupUser = function( this_gi, data ){
         var data_group_user = data.ul;
         var new_group_user = {};
