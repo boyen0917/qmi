@@ -158,13 +158,9 @@
             <div class="ui-header fixed">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <div class="header-title">
-                    <span>編輯群組</span>
+                    <span data-textid="COMMON_EDIT"></span>
                     <img src="images/navi/navi_icon_add_member.png">
-                    <!-- <div class="page-title" data-textid="COMMON_EDIT">Edit</div> -->
                 </div>
-                <!-- <div class="edit-nextStep">
-                    <span data-textid="COMMON_DONE"></span>
-                </div> -->
             </div>
             <!-- END: Sticky Header -->
              
@@ -172,7 +168,7 @@
             <div class="ui-container">
                 <div class="chatroomSwitch chatRoomSetting">
                     <div class="pushSwitch">
-                        推播
+                        <span data-textid="WEBONLY_PUSH"></span>
                         <div class="onoffswitch">
                             <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="pushSwitch" >
                             <label class="onoffswitch-label" for="pushSwitch">
@@ -182,7 +178,7 @@
                         </div>
                     </div>
                     <div class="stickySwitch">
-                        置頂
+                        <span data-textid="FEED_TOP"></span>
                         <div class="onoffswitch">
                             <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="stickySwitch">
                             <label class="onoffswitch-label" for="stickySwitch">
@@ -193,9 +189,9 @@
                     </div>
                 </div>
                 <div class="inviteSetting chatRoomSetting">
-                    <h4>聊天室資訊</h4>
+                    <h4 data-textid="WEBONLY_CHATROOM_INFO"></h4>
                     <div class="generalUserInviteSwitch">
-                        一般成員邀請權限
+                        <span data-textid="WEBONLY_INVITE_PERMISSION"></span>
                         <div class="onoffswitch">
                             <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="inviteSwitch">
                             <label class="onoffswitch-label" for="inviteSwitch">
@@ -207,8 +203,8 @@
                 </div>
                 <div class="adminSetting chatRoomSetting">
                     <div>
-                        <a class="editChatRoom roomActionBtn">編輯</a>
-                        <a class="saveRoomEdit roomActionBtn">儲存</a>
+                        <a class="editChatRoom roomActionBtn" data-textid="COMMON_EDIT"></a>
+                        <a class="saveRoomEdit roomActionBtn" data-textid="WEBONLY_SAVE"></a>
                         <div class="chatroomIntro">
                             <div class="chatroomImage">
                                 <img class="groupImage" src="images/common/others/empty_img_mother_l.png">
@@ -219,8 +215,8 @@
                         <div class="assignAdmin">
                             <table class="adminTable">
                                 <tr>
-                                    <th class="memberName">成員名單</th>
-                                    <th class="adminCheckBox">管理員</th>
+                                    <th class="memberName" data-textid="WEBONLY_MEMBERLIST"></th>
+                                    <th class="adminCheckBox" data-textid="WEBONLY_ADMINISTRATOR"></th>
                                 </tr>
                       
                             </table>

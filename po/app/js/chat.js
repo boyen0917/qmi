@@ -26,6 +26,7 @@ var ui,		//user id
 	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
 	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
+
 $(function(){
 	//load language
 	updateLanguage(lang);
@@ -241,7 +242,6 @@ $(function(){
 
 			var tmpMemCount = (g_room.memList) ? Object.keys(g_room.memList).length : 0;
 			if (tmpMemCount != g_room.memCount) {
-				cns.debug("mem count not fit, updated.");
 				g_room.memCount = tmpMemCount;
 				$.userStorage(userData);
 			}
@@ -249,10 +249,10 @@ $(function(){
 				$("#header .count").show();
 				$("#header .count").html("(" + g_room.memCount + ")");
 			} else { 
+
 				// 單人聊天室，隱藏成員數量、離開和編輯
 				if (g_room.tp == 1 || g_room.cpc == undefined) {
 					$("#header .count").hide();
-					$(".extra-content .btn[data-type=edit]").hide();
 					$(".extra-content .btn[data-type=exit]").hide();
 				} else { // 群組聊天室，顯示成員數量、離開和編輯(中間有人退出，變2人)
 					$("#header .count").html("(" + g_room.memCount + ")");
@@ -704,10 +704,6 @@ $(function(){
 		    });
 		});
 
-		// registerEditRoomEvent();
-
-		//apply nicescroll
-		var container = $("#container");
 		updateChat();
 		
 		sendMsgRead(new Date().getTime())
@@ -1174,7 +1170,7 @@ function updateChat(time, isGetNewer) {
 							if (1 >= data.el.length) noMoreHistoryMsg();
 
 							scrollToBottom();
-							container.find(".chat-msg").each(function(index, el) {
+							$("#container").find(".chat-msg").each(function(index, el) {
 								if($(el).data().time === g_room.lastCt){
 									$(el)[0].scrollIntoView();
 								}
@@ -2217,35 +2213,23 @@ function sendMsgText(dom) {
 						}
 						g_room.memCount = data.ul.length;
 						g_room.cpc = data.ul.length;
-						if (g_room.cpc !== undefined) {
-							// if(userData[gi].isOfficial){
 
-							// 群組聊天室，顯示成員數量
-							if (g_room.cpc > 2) {
+
+						// 群組聊天室，顯示成員數量
+						if (g_room.cpc > 2) {
+							$("#header .count").show();
+							$("#header .count").html("(" + g_room.cpc + ")");
+						} else { 
+							// 單人聊天室，隱藏成員數量
+							if (g_room.tp == 1) {
+								$("#header .count").hide();
+							} else { // 群組聊天室，顯示成員數量(中間有人退出，變2人)
+								$("#header .count").html("(" + g_room.memCount + ")");
 								$("#header .count").show();
-								$("#header .count").html("(" + g_room.cpc + ")");
-							} else { 
-								// 單人聊天室，隱藏成員數量
-								if (g_room.tp == 1) {
-									$("#header .count").hide();
-								} else { // 群組聊天室，顯示成員數量(中間有人退出，變2人)
-									$("#header .count").html("(" + g_room.memCount + ")");
-									$("#header .count").show();
-								}
 							}
-								// $("#header .count").hide();
-							// }else{
-							// 	$("#header .count").show();
-							// 	$("#header .count").html("(" + g_room.cpc + ")");
-							// }
-							
-							// $(".extra-content .btn[data-type=edit]").show();
-							// $(".extra-content .btn[data-type=exit]").show();
-						} else {
-							$("#header .count").hide();
-							$(".extra-content .btn[data-type=edit]").hide();
-							$(".extra-content .btn[data-type=exit]").hide();
 						}
+
+
 						$.userStorage(userData);
 
 						checkMemberLeft();
