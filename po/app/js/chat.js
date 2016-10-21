@@ -463,6 +463,13 @@ $(function(){
 			}
 		});
 		$("#header .extra").off("click").click(function () {
+			// 官方帳號 直接edit
+			if(true == g_group.isOfficial) {
+				$(".extra-content .btn[data-type=edit]").trigger("click");
+				return;
+			}
+
+
 			var tmp = $("#header .extra-content");
 			if ("none" == tmp.css("display")) {
 				tmp.slideDown();
