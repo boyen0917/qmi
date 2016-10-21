@@ -553,7 +553,7 @@ onCheckVersionDone = function(needUpdate){
 			$(this).removeClass("register-otp-input-style");
 		}
 
-		if($(this).val().length == 4){
+		if($(this).val().length == 6){
 			$(".register-otp-next").addClass("register-otp-next-ready");
 		}else{
 			$(".register-otp-next").removeClass("register-otp-next-ready");

@@ -216,6 +216,7 @@
 	"COMMON_EXCEED_FILE_SIZE" : "超過檔案大小限制",
 	"COMMON_NOT_MP4_NOR_IMAGE" : "檔案格式必須為MP4或圖片",
 	"COMMON_NOT_IMAGE" : "檔案格式必須為圖片",
+
 	"COMMON_FILE_NOT_EXIST_WEB" : "檔案格式必須為圖片",
 	
 	"CHAT_TITLE"							: "聊天",
@@ -385,6 +386,12 @@
 
 	"SETTING_OLD_PASSWORD" : "請輸入原本的密碼",
 	"SETTING_NEW_PASSWORD" : "請輸入新密碼(至少8碼)",
-	"SETTING_CONFIRM_PASSWORD" : "請再次輸入新密碼"
+	"SETTING_CONFIRM_PASSWORD" : "請再次輸入新密碼",
 
+	"WEBONLY_PUSH" : "推播",
+	"WEBONLY_SAVE" : "儲存",
+	"WEBONLY_MEMBERLIST" : "成員名單",
+	"WEBONLY_ADMINISTRATOR" : "管理員",
+	"WEBONLY_CHATROOM_INFO" : "聊天室資訊",
+	"WEBONLY_INVITE_PERMISSION" : "一般成員邀請權限"
 }

@@ -379,5 +379,12 @@
 
 	"SETTING_OLD_PASSWORD" : "Current Password",
 	"SETTING_NEW_PASSWORD" : "New Password(at least 8 digits)",
-	"SETTING_CONFIRM_PASSWORD" : "Confirm Password"
+	"SETTING_CONFIRM_PASSWORD" : "Confirm Password",
+
+	"WEBONLY_PUSH" : "notifications",
+	"WEBONLY_SAVE" : "submit",
+	"WEBONLY_MEMBERLIST" : "member list",
+	"WEBONLY_ADMINISTRATOR" : "administrators",
+	"WEBONLY_CHATROOM_INFO" : "chatroom infomation",
+	"WEBONLY_INVITE_PERMISSION" : "inviting's permissions for members"
 }
