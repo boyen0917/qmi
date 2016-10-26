@@ -4731,7 +4731,13 @@ composeSend = function (this_compose){
                         hasFi: true,
                         file: this_compose.data("upload-video")[key],
                         fileName: this_compose.data("upload-video")[key].name,
-                        oriObj: {w: 1280, h: 1280, s: 0.9}
+                        oriObj: {w: 1280, h: 1280, s: 0.9},
+                        setAbortFfmpegCmdEvent : function (ffmpegCmd) {
+                            $("#compose-progressbar button").off("click").on("click", function(e) {
+                                ffmpegCmd.kill();
+                                progressBarObj.close();
+                            });
+                        },
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
@@ -7096,10 +7102,10 @@ replySend = function(thisEvent){
         uploadDef = $.Deferred(),
         isWaiting = false,
         eventTp, fileBody,
-        f_load_show = fileLoadShow(),
         imgArea = thisEvent.find(".st-reply-message-img"),
         messageArea = thisEvent.find(".st-reply-message-area"),
         replyFile = imgArea.data("file"),
+        f_load_show = fileLoadShow(messageArea),
         body = {
             meta : {
                 lv : 1,
@@ -7166,7 +7172,7 @@ replySend = function(thisEvent){
             upload_chk = true;
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init(messageArea);
+            f_load_show.init();
 
             var pi = "0";
 
@@ -7208,7 +7214,7 @@ replySend = function(thisEvent){
             
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init(messageArea);
+            f_load_show.init();
 
             eventTp = 7;
 
@@ -7233,7 +7239,30 @@ replySend = function(thisEvent){
                 hasFi: true,
                 file: replyFile,
                 oriObj: {w: 1280, h: 1280, s: 0.9},
-                progressBar: f_load_show.progressBar
+                progressBar: f_load_show.progressBar,
+                setAbortFfmpegCmdEvent : function (ffmpegCmd) {
+                    console.log($("#load-cancel"));
+                    $("#load-cancel").off("click").on("click", function(e) {
+                        // dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+                        // dom.find(".chat-fail-status").show();
+                        // dom.find(".progress-container").remove();
+                        console.log("encode cancel");
+                        console.log(messageArea.data());
+                        thisEvent.find(".st-reply-message-send").data("reply-chk",false);
+
+                        messageArea.find('.st-reply-message-img').show();
+                        messageArea.find(".file-load").remove();
+                        messageArea.data("cancelupload", true);
+
+                        ffmpegCmd.kill();
+                    });
+                },
+                updateCompressionProgress: function (percent) {
+                    $("#load-bar").css("width", percent + '%');
+                    $("#load-font").html(percent + '%');
+                    // messageArea.find(".chat-upload-progress").attr("max", 100).attr("value", percent);
+                    // dom.find(".upload-percent").html(percent + '%');
+                },
             }).done(uploadDef.resolve)
 
             break;
@@ -7244,7 +7273,7 @@ replySend = function(thisEvent){
             upload_chk = true;
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init(messageArea);
+            f_load_show.init();
 
             fileBody = {
                 ftp: 0,
@@ -7304,10 +7333,10 @@ replySend = function(thisEvent){
     })
 }
 
-fileLoadShow = function(){
+fileLoadShow = function(elem){
     var uploadXhr;
     return {
-            init: function(elem){
+            init: function(){
                 $(".file-load").remove();
                 elem.data("cancelupload",false);
                 elem.find('.st-reply-message-img').hide();
@@ -7320,20 +7349,31 @@ fileLoadShow = function(){
                                       '<div id="load-cancel">取消</div>'+
                                     '</div>'+
                                 '</div>'));
-                $("#load-cancel").click(function(){
+                // $("#load-cancel").click(function(){
+                //     elem.find('.st-reply-message-img').show();
+                //     $(".file-load").remove();
+                //     elem.data("cancelupload",true);
+                //     uploadXhr.abort();
+                // });
+            },
+            progressBar: function () {
+                uploadXhr = new window.XMLHttpRequest();
+
+                $("#load-cancel").off("click").on("click", function(e) {
+                    console.log("upload cancel")
                     elem.find('.st-reply-message-img').show();
                     $(".file-load").remove();
                     elem.data("cancelupload",true);
                     uploadXhr.abort();
                 });
-            },
-            progressBar: function () {
-                uploadXhr = new window.XMLHttpRequest();
+
                 uploadXhr.upload.addEventListener("progress", function(evt){
                     if (evt.lengthComputable) {
+                        $("#load-bar").css("width", (50 + Math.floor((evt.loaded / evt.total) * 50)) + '%');
+                        $("#load-font").html(50 + Math.floor((evt.loaded / evt.total) * 50) + '%');
                         // console.log(Math.floor((evt.loaded / evt.total) * 100) + '%');
-                        $("#load-bar").css("width",Math.floor((evt.loaded / evt.total) * 100) + '%');
-                        $("#load-font").html(Math.floor((evt.loaded / evt.total) * 100) + '%');
+                        // $("#load-bar").css("width",Math.floor((evt.loaded / evt.total) * 100) + '%');
+                        // $("#load-font").html(Math.floor((evt.loaded / evt.total) * 100) + '%');
                     }
                 }, false);
                 return uploadXhr;

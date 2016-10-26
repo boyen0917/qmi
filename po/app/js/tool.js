@@ -669,21 +669,53 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			break;
 		case 2: // 影 只要傳s32 timeline是這樣
+
 			paramObj.s32.file = uploadObj.file;
 			delete paramObj.s3;
-
 			contentType = "video/mp4";
 
-			// 傳給外部 commit 使用
-			mt = uploadObj.file.type;
-			si = uploadObj.file.size;
+			// uploadObj.compress().done(function (uploadFile) {
+			// 	paramObj.s32.file = uploadFile;
 
-			var video = document.createElement('video');
-			video.src = URL.createObjectURL(uploadObj.file);
-			video.onloadeddata = function() {
-				md = {l: Math.floor(video.duration * 1000)};
-				mediaLoadDef.resolve();
-			}
+				// mt = uploadObj.file.type;
+				// si = uploadObj.file.size;
+
+				// var video = document.createElement('video');
+				// video.src = URL.createObjectURL(uploadObj.file);
+				// video.onloadeddata = function() {
+				// 	md = {l: Math.floor(video.duration * 1000)};
+				// 	mediaLoadDef.resolve();
+				// }
+			// });
+
+			zipVideoFile(uploadObj).done(function (uploadFile) {
+				paramObj.s32.file = uploadFile;
+
+				// 傳給外部 commit 使用
+				mt = uploadFile.type;
+				si = uploadFile.size;
+
+				var video = document.createElement('video');
+				video.src = URL.createObjectURL(uploadObj.file);
+				video.onloadeddata = function() {
+					md = {l: Math.floor(video.duration * 1000)};
+					mediaLoadDef.resolve();
+				}
+			}).fail(function () { // 壓縮失敗
+				paramObj.s32.file = uploadObj.file;
+
+				// 傳給外部 commit 使用
+				mt = uploadObj.file.type;
+				si = uploadObj.file.size;
+
+				var video = document.createElement('video');
+				video.src = URL.createObjectURL(uploadObj.file);
+				video.onloadeddata = function() {
+					md = {l: Math.floor(video.duration * 1000)};
+					mediaLoadDef.resolve();
+				}
+			});
+			
 			break;
 		default: 
 	}
@@ -2076,3 +2108,78 @@ myWait = function(variable,type){
   return deferred.promise();
 }
 
+zipVideoFile = function (videoObj) {
+	var transferBlobDef = $.Deferred();
+
+	try {
+		var ffmpeg = require('fluent-ffmpeg');
+		var fs = require('fs');
+    	var path = require('path');
+    	var nwDir = path.dirname(process.execPath); //node webkit 根目錄
+	    var outputPath = nwDir + '/video/outputfile.mp4'; //輸出影片檔案
+	    var command = ffmpeg(videoObj.file.path); 
+
+    	var duration, //轉檔總時間 
+	    	seconds,　//目前進行的時間
+	       	percent; //轉檔百分比;
+
+	       	zipVideoActionDef = $.Deferred();
+
+	    if (!fs.existsSync(nwDir + '/video')) {
+	    	fs.mkdirSync(nwDir + '/video');
+		}
+
+		command.setFfmpegPath(nwDir + '/bin/ffmpeg');
+
+	    command.size('640x320')
+	    	.outputOptions('-crf 24')
+	    	.outputOptions('-c:a copy')
+	     	.on('start', function(commandLine) {
+	     		if (videoObj.setAbortFfmpegCmdEvent) {
+	     			videoObj.setAbortFfmpegCmdEvent(command);
+	     		}
+	            console.log('Spawned Ffmpeg with command: ' + commandLine);
+	        })
+	        .on('stderr', function(stderrLine) {
+	        	var match;
+	        	console.log(stderrLine);
+	        	// 找出ffmpeg回傳的duration，再轉換成秒數
+	            if (stderrLine.trim().startsWith('Duration')) {
+	                match = stderrLine.trim().match(/Duration:\s\d\d\:\d\d:\d\d/).toString().split('Duration:').slice(1).toString().split(':');
+	                duration = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
+	            } else if (stderrLine.trim().indexOf('size=') > 0 ) {
+	            	// 找出ffmpeg回傳的目前執行的時間，再轉換成秒數，並更新進度條狀態
+	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
+	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
+	                percent = ((seconds / duration) * 50).toFixed();
+
+	                if (videoObj.updateCompressionProgress) {
+	               	 	videoObj.updateCompressionProgress(percent);
+	                }
+	            }
+	        })
+	        .on('error', function(err, stdout, stderr) {
+	            console.log('Cannot process video ' + err.message);
+	            zipVideoActionDef.reject('Cannot process video: ' + err.message);
+	        })
+	        .on('end', function(stdout) {
+	        	console.log('finish');
+	            zipVideoActionDef.resolve();
+	        }).saveToFile(outputPath);
+
+	        zipVideoActionDef.done(function () {
+		        fs.readFile(outputPath, function(err, data) {
+		            var byteArray = new Uint8Array(data);
+		            var blob = new Blob([byteArray], {type: 'application/octet-binary'});
+		            blob.name = videoObj.file.name;
+		            transferBlobDef.resolve(blob);
+		        });
+		    }).fail(function (errorMsg) {
+		    	console.log(errorMsg);
+		    });
+	} catch (e) {
+		transferBlobDef.reject();
+	}
+	
+    return transferBlobDef.promise();
+}
