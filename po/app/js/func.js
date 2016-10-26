@@ -6836,7 +6836,7 @@ getLinkMeta = function (this_compose,url) {
             msg: '非桌機版'
         });
     else
-        parseUrl( encodeURI(url), deferred.resolve); 
+        parseUrl( url, deferred.resolve); 
 
     var timer = setTimeout(function() {
         deferred.reject({
@@ -6883,6 +6883,7 @@ getLinkMeta = function (this_compose,url) {
         if( data.image && data.image.url ){
             if( Array.isArray(data.image.url) ){
                 if(data.image.url.length>0){
+                    console.log(data.image.url);
                     result.img = data.image.url[0];       
                 }
             } else {
