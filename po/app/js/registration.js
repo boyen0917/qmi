@@ -403,6 +403,8 @@ onCheckVersionDone = function(needUpdate){
 	    	initChatDB(activateClearChatsTimer); 
 			initChatCntDB(); 
 
+			updateAlert();
+
 			//沒團體的情況
 			if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
 				//關閉返回鍵
