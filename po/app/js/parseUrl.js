@@ -30,7 +30,6 @@
 			var obj = parsecharset(tmp.attr('content'));
 
 			if(obj && obj.parameters && obj.parameters.charset && obj.parameters.charset.toLowerCase() == 'big5'){
-				console.log("use open-graph");
 				require("open-graph")( url, function(err, data){
 					cb(null, data);
 		        });
@@ -41,7 +40,6 @@
 	}
 	
 	var getHTML = function(url, cb){
-		// console.log(navigator.userAgent);
 		var purl = require('url').parse(url);
 		if (!purl.protocol)
 			purl = require('url').parse("http://"+url);
@@ -157,12 +155,10 @@
 			var imgTags = $html.find('img');
 			imgTags.each(function() {
 				var element = $(this);
-				console.log(element);
 				var propertyAttr = element[0].src || element[0].dataset.src;
 				if(propertyAttr&&propertyAttr.length>0)	meta.image.url.push(propertyAttr);
 			});
 		}
-		// console.log("meta: ", meta);
 		return meta;
 
 	}
