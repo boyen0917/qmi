@@ -31,7 +31,7 @@
 
 			if(obj && obj.parameters && obj.parameters.charset && obj.parameters.charset.toLowerCase() == 'big5'){
 				console.log("use open-graph");
-				require("open-graph")( encodeURI(url), function(err, data){
+				require("open-graph")( url, function(err, data){
 					cb(null, data);
 		        });
 			}else{
@@ -45,10 +45,6 @@
 		var purl = require('url').parse(url);
 		if (!purl.protocol)
 			purl = require('url').parse("http://"+url);
-		
-		var httpModule = purl.protocol === 'https:'
-			? https
-			: http;
 		
 		url = require('url').format(purl);
 		request({
@@ -161,7 +157,8 @@
 			var imgTags = $html.find('img');
 			imgTags.each(function() {
 				var element = $(this);
-				var propertyAttr = element.attr("src");
+				console.log(element);
+				var propertyAttr = element[0].src || element[0].dataset.src;
 				if(propertyAttr&&propertyAttr.length>0)	meta.image.url.push(propertyAttr);
 			});
 		}
