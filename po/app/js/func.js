@@ -7330,7 +7330,6 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
     var result = ajaxDo(api_name,headers,method,false,body);
     result.complete(function(data){
         //重新讀取detail
-        this_event.find(".st-reply-message-send").data("reply-chk",false);
         var this_textarea = this_event.find(".st-reply-message-textarea textarea");
         this_textarea.val("").parent().addClass("adjust").removeClass("textarea-animated");
 
@@ -7339,6 +7338,7 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
         .find(".st-reply-message-img").removeData().html("");
 
         setTimeout(function(){
+            this_event.find(".st-reply-message-send").data("reply-chk",false);
             clearReplyDomData(this_event);
             if(this_event.find(".st-reply-all-content-area").is(":visible")) {
                 replyReload(this_event);
