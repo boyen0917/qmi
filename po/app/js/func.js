@@ -5455,7 +5455,6 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
         this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
         this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
 
-        
         var category;
         var title = $.i18n.getString("FEED_POST");
         switch(tp){
@@ -8235,6 +8234,7 @@ pollingCmds = function(newPollingData){
                             idbPutTimelineEvent("",false,polling_arr);
                         }
 
+                        updateAlert();
                         //  ("",false,polling_arr);
                         break;
                     case 3://invite

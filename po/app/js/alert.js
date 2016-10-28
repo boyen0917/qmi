@@ -87,7 +87,7 @@ showAlertBox = function(){
 		updatePollingCnts( $("<div></div>"), "G3" );
 	}
     		
-	updateAlert();
+	// updateAlert();
 	$(".alert").addClass("alert-click");
 	$(".alert-area").slideDown();
 	$(".alert-area-cover").show();
