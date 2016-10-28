@@ -1,57 +1,67 @@
 $(document).ready(function(){
-    
-    var btnContent = $(".btn-content");
+
     var imgContent = $(".image-content");
     var tabContent = $(".tab-content-r");
-    
+    var userContent = $(".userSetting-content");
 
-    $('.userSetting-btn').click(function(){
-        userInfoUpdate();
-    });
-
-    tabContent.find('.input-password').bind('input', function (e) {
+    //系統設定事件
+    tabContent.bind('input','.input-password', function (e) {
         passwordValidate(e);
-    });
-
-    // password送出
-    btnContent.find('.password-btn').click(function(){
-        if ($(this).hasClass("ready")) {
-            passwordChange(); 
-        };
-    });
-    // 預設系統通知
-    btnContent.find('.notification-btn').click(function(){
-        if ($('#no-option1').is(":checked"))
-        {
-            set_notification = true;
-            $.lStorage("_setnoti","100");
-        }else{
-            set_notification = false;
-            $.lStorage("_setnoti","300");
+    }).on('click','.password-btn.ready',function(){// 變更密碼
+            passwordChange();
+            $(this).removeClass('ready');
+    }).on('change','#no-option1',function() {// 是否有變更
+        tabContent.find('.notification-btn').toggleClass('ready');
+    }).on('click','.notification-btn.ready',function(){// 預設系統通知
+            if ($('#no-option1').is(":checked")) {
+                set_notification = true;
+                $.lStorage("_setnoti","100");
+            } else {
+                set_notification = false;
+                $.lStorage("_setnoti","300");
+            }
+            toastShow("變更成功");
+            $(this).removeClass('ready');
+    }).on('change','input[type="radio"][name="group"]',function() {// 是否有變更
+        tabContent.find('.default-group-btn').addClass('ready');
+        if(tabContent.find('#'+QmiGlobal.auth.dgi).attr('checked')){
+            tabContent.find(".default-group-btn").removeClass('ready');
         }
-        toastShow("變更成功");
-    });
-    // 預設團體送出
-    btnContent.find('.default-group-btn').click(function(){
+    }).on('click','.default-group-btn.ready',function(){// 預設團體
         defaultGroupSetting();
-    });
-    //預設置頂時間送出
-    btnContent.find('.carousel-btn').click(function(){
+        $(this).removeClass('ready');
+    }).on('change','input[type="radio"][name="second"]',function() {// 是否有變更
+        tabContent.find('.carousel-btn').addClass('ready');
+        if(tabContent.find("input[value='"+top_timer_ms+"']").attr('checked')){
+            tabContent.find(".carousel-btn").removeClass('ready');
+        }
+    }).on('click','.carousel-btn.ready',function(){// 預設置頂時間
         var carousel_time = $("input[name$='second']:checked").val();
         top_timer_ms = carousel_time;
         toastShow("變更成功");
         $.lStorage('_topTimeMs',carousel_time);
+        $(this).removeClass('ready');
     });
-    //變更使用者大頭貼
-    imgContent.find('.user-avatar-img').click(function(){
-        $('.setting-avatar-file').trigger("click");
-    });
-    imgContent.find('.camera-icon').click(function(){
-        $('.setting-avatar-file').trigger("click");
-    });
-    //選擇圖片
-    imgContent.find('.setting-avatar-file').change(function(){
 
+    //變更個人資訊送出
+    userContent.on('click','.userSetting-btn.ready',function(){
+        userInfoUpdate();
+        $(this).removeClass('ready');
+    }).on('input','.input-username',function(){
+        userContent.find('.userSetting-btn').addClass('ready');
+        if(userContent.find(".input-username").val() == QmiGlobal.me.nk){
+            userContent.find(".userSetting-btn").removeClass('ready');
+        }else if(userContent.find(".input-username").val() == ""){
+            userContent.find(".userSetting-btn").removeClass('ready');
+        }
+    });
+
+    //變更使用者大頭貼
+    imgContent.on('click','.user-avatar-img',function(){
+        $('.setting-avatar-file').trigger("click");
+    }).on('click','.camera-icon',function(){
+        $('.setting-avatar-file').trigger("click");
+    }).on('change','.setting-avatar-file',function(){// 選擇圖片
         var file_ori = $(this);
         var imageType = /image.*/;
         var file = file_ori[0].files[0];
@@ -65,25 +75,10 @@ $(document).ready(function(){
             }
             reader.readAsDataURL(file);
             avatarPopup();
-            
         } else {
             popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
         }
     });
-
-    // $(".guihu-add").click(function() {
-    //     QmiGlobal.guihu.init();
-    //     $(".guihu-title").text($.i18n.getString("ADD_LDAP"));
-    //     $(".guihu-des").text($.i18n.getString("ADD_LDAP_DES"));
-    //     $(".guihu-btn-content").find("button:nth-child(2)").addClass("add-btn");
-    // });
-    // $(".guihu-cancel").click(function(){
-    //     QmiGlobal.guihu.init();
-    //     $(".guihu-title").text($.i18n.getString("REMOVE_LDAP"));
-    //     $(".guihu-des").text($.i18n.getString("REMOVE_LDAP_DES"));
-    //     $(".guihu-btn-content").find("button:nth-child(2)").addClass("save-btn");
-    // });
-
 });
 
 function avatarPopup() {
@@ -184,14 +179,16 @@ function guihu(){
 
 //user Info Setting
 userInfoSetting = function(){
+
+    $(".userSetting-btn").removeClass("ready");
     var userInformation = $("#userInformation-page");
-    
     userInformation.find(".user-avatar-img").attr('src',QmiGlobal.me.aut).end()//大頭照
                        .find(".input-username").val(QmiGlobal.me.nk);//first name
-    
 }
+
 //取得個人資訊
 userInfoGetting = function(){
+
     var userInfo = $("#userInfo");
     var emptyUserAvt = "images/common/others/empty_img_personal_l.png";
     new QmiAjax({
@@ -200,7 +197,6 @@ userInfoGetting = function(){
     }).success(function(data){
         QmiGlobal.me = data;
         //左下角個人資料 使用者名稱 手機 頭像
-
         userInfo.find(".user-name").text(data.nk).end()
                 .find(".user-phone").text(data.pn).end()
                 .find(".user-avatar-setting").attr("src",data.aut);
@@ -216,28 +212,22 @@ userInfoGetting = function(){
 
 //更新使用者名稱
 userInfoUpdate = function(){
-
+    
     var username_input = $('.input-username').val();
-    if(username_input == ""){
-        alert('姓名輸入框不可為空');
-    }else {
-        new QmiAjax({
-            apiName: "me",
-            method: "put",
-            body: {
-                "nk": username_input
-            },
-            isPublicApi: true
-        }).success(function(data){
-
-            toastShow(data.rsp_msg);
-
-            $(".user-name").text(username_input); 
-            QmiGlobal.me.nk = username_input;
-        }).error(function(e){
-            console.debug(e.responseText);
-        });
-    }
+    new QmiAjax({
+        apiName: "me",
+        method: "put",
+        body: {
+            "nk": username_input
+        },
+        isPublicApi: true
+    }).success(function(data){
+        toastShow(data.rsp_msg);
+        $(".user-name").text(username_input); 
+        QmiGlobal.me.nk = username_input;
+    }).error(function(e){
+        console.debug(e.responseText);
+    });
 }
 
 //system setting 
@@ -258,7 +248,7 @@ systemSetting = function(){
     //at
 
     var systemGroup = $("#group-setting");
-
+    $(".notification-btn,.default-group-btn,.carousel-btn").removeClass("ready");
     //系統設定初始化
     var emailSetting = $("#email-setting");
     emailSetting.find("input[name$='user-edit-phone']").val(QmiGlobal.me.pn);
@@ -433,7 +423,6 @@ passwordChange = function(){
 //更新預設團體
 defaultGroupSetting = function(){
     var new_dgi = $("input[name$='group']:checked").val()
-    //alert($("input[name$='group']:checked").val());
     new QmiAjax({
         apiName : "groups/"+new_dgi+"/default",
         type: "put"
@@ -447,6 +436,6 @@ defaultGroupSetting = function(){
         $.lStorage('_loginData',user_login);//上傳local storage
 
     }).error(function(e){
-        alert("error");
+        popupShowAdjust("error");
     });
 }
