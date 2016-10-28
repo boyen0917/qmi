@@ -720,9 +720,8 @@ $(function(){
 				return file.type.match(new RegExp(tp, "g")) instanceof Array;
 			}),
 			fileURL = URL.createObjectURL(file);
-
+		
 		console.log(file.name);
-
 
 		switch(fileType) {
 			case "image":

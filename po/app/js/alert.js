@@ -5,8 +5,8 @@ $(function(){
 	initAlertDB();
 	// updateAlert();
 
-	$(".navi-alert").click(function(){
-		$(".navi-alert").removeClass("new");
+	$("#page-group-main .navi-alert").click(function(){
+		$(this).removeClass("new");
 		clearBadgeLabel();
 
 		if($(".alert-area").is(":visible")){
@@ -87,10 +87,12 @@ showAlertBox = function(){
 		updatePollingCnts( $("<div></div>"), "G3" );
 	}
     		
-	updateAlert();
+	// updateAlert();
 	$(".alert").addClass("alert-click");
-	$(".alert-area").slideDown();
-	$(".alert-area-cover").show();
+
+	$("#view-alert").slideDown().find(".content").scrollTop(0);
+	$("#view-alert-cover").show();
+
 	setTimeout(function(){
 		$(".alert").addClass("alert-visit");
 	},100);
@@ -432,6 +434,8 @@ showAlertContent = function(data){
 						$(this).find(".al-subbox").data("stop",false);
 						return false;	
 					} 
+
+					$(this).find(".al-subbox").addClass("isRead");
 
 					var this_gi = $(this).data("gi");
 					var this_ei = $(this).data("ei");

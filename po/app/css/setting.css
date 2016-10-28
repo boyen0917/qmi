@@ -557,7 +557,12 @@ ul.system-tab li.current-tab{
     margin-top: -4px;
 }
 
-.password-btn.ready{
+.password-btn.ready,
+.notification-btn.ready,
+.default-group-btn.ready,
+.carousel-btn.ready,
+.userSetting-btn.ready
+{
     cursor: pointer;
     background: #32b3e4; 
     opacity: 1;
@@ -964,6 +969,8 @@ input[type=radio] {
 }
 .cancel-btn, .avatar-save{
 	margin: 0px 20px;
+	opacity: 1;
+	cursor: pointer;
 }
 /*服務條款跟隱私政策*/
 /*.policy{

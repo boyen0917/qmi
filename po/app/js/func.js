@@ -5455,7 +5455,6 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
         this_event.find(".st-sub-box-3 div:eq(1)").html(val.meta.pct);
         this_event.find(".st-sub-box-3 div:eq(2)").html(val.meta.rct);
 
-        
         var category;
         var title = $.i18n.getString("FEED_POST");
         switch(tp){
@@ -7331,7 +7330,6 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
     var result = ajaxDo(api_name,headers,method,false,body);
     result.complete(function(data){
         //重新讀取detail
-        this_event.find(".st-reply-message-send").data("reply-chk",false);
         var this_textarea = this_event.find(".st-reply-message-textarea textarea");
         this_textarea.val("").parent().addClass("adjust").removeClass("textarea-animated");
 
@@ -7340,6 +7338,7 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
         .find(".st-reply-message-img").removeData().html("");
 
         setTimeout(function(){
+            this_event.find(".st-reply-message-send").data("reply-chk",false);
             clearReplyDomData(this_event);
             if(this_event.find(".st-reply-all-content-area").is(":visible")) {
                 replyReload(this_event);
@@ -8235,6 +8234,7 @@ pollingCmds = function(newPollingData){
                             idbPutTimelineEvent("",false,polling_arr);
                         }
 
+                        updateAlert();
                         //  ("",false,polling_arr);
                         break;
                     case 3://invite
