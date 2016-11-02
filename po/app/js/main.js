@@ -995,6 +995,8 @@ $(function(){
 
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){
+		console.log("reply_send");
+		console.log($(this).data("reply-chk"));
 		var this_event = $(this).parents(".st-sub-box");
 		var text = this_event.find(".st-reply-highlight-container").text();
 		var sticker = this_event.find(".st-reply-message-img").data("type");
@@ -1005,6 +1007,7 @@ $(function(){
 		}
 
 		$(this).data("reply-chk",true);
+		
 		replySend(this_event);
 	});
 

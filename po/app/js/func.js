@@ -4731,7 +4731,13 @@ composeSend = function (this_compose){
                         hasFi: true,
                         file: this_compose.data("upload-video")[key],
                         fileName: this_compose.data("upload-video")[key].name,
-                        oriObj: {w: 1280, h: 1280, s: 0.9}
+                        oriObj: {w: 1280, h: 1280, s: 0.9},
+                        setAbortFfmpegCmdEvent : function (ffmpegCmd) {
+                            $("#compose-progressbar button").off("click").on("click", function(e) {
+                                ffmpegCmd.kill();
+                                progressBarObj.close();
+                            });
+                        },
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
@@ -7081,10 +7087,10 @@ replySend = function(thisEvent){
         uploadDef = $.Deferred(),
         isWaiting = false,
         eventTp, fileBody,
-        f_load_show = fileLoadShow(),
         imgArea = thisEvent.find(".st-reply-message-img"),
         messageArea = thisEvent.find(".st-reply-message-area"),
         replyFile = imgArea.data("file"),
+        f_load_show = fileLoadShow(messageArea),
         body = {
             meta : {
                 lv : 1,
@@ -7143,7 +7149,7 @@ replySend = function(thisEvent){
             upload_chk = true;
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init(messageArea);
+            f_load_show.init();
 
             var pi = "0";
 
@@ -7185,7 +7191,7 @@ replySend = function(thisEvent){
             
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init(messageArea);
+            f_load_show.init();
 
             eventTp = 7;
 
@@ -7210,7 +7216,30 @@ replySend = function(thisEvent){
                 hasFi: true,
                 file: replyFile,
                 oriObj: {w: 1280, h: 1280, s: 0.9},
-                progressBar: f_load_show.progressBar
+                progressBar: f_load_show.progressBar,
+                setAbortFfmpegCmdEvent : function (ffmpegCmd) {
+                    console.log($("#load-cancel"));
+                    $("#load-cancel").off("click").on("click", function(e) {
+                        // dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+                        // dom.find(".chat-fail-status").show();
+                        // dom.find(".progress-container").remove();
+                        console.log("encode cancel");
+                        console.log(messageArea.data());
+                        thisEvent.find(".st-reply-message-send").data("reply-chk",false);
+
+                        messageArea.find('.st-reply-message-img').show();
+                        messageArea.find(".file-load").remove();
+                        messageArea.data("cancelupload", true);
+
+                        ffmpegCmd.kill();
+                    });
+                },
+                updateCompressionProgress: function (percent) {
+                    $("#load-bar").css("width", percent + '%');
+                    $("#load-font").html(percent + '%');
+                    // messageArea.find(".chat-upload-progress").attr("max", 100).attr("value", percent);
+                    // dom.find(".upload-percent").html(percent + '%');
+                },
             }).done(uploadDef.resolve)
 
             break;
@@ -7221,7 +7250,7 @@ replySend = function(thisEvent){
             upload_chk = true;
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init(messageArea);
+            f_load_show.init();
 
             fileBody = {
                 ftp: 0,
@@ -7281,20 +7310,19 @@ fileLoadShow = function(){
     var uploadXhr, barDom, percentDom;
     return {
         init: function(elem){
-            elem.find(".file-load").remove();
 
+            elem.data("cancelupload",false)
+            .find(".file-load").remove().end()
+            .find('.st-reply-message-img').hide();
+            
             var loadDom = $('<div class="file-load">'
             + '<div class="file-content">'
               + '<div id="load-progress"><div id="load-bar"></div></div>'
               + '<div id="load-cancel">取消</div>'
             + '</div></div>');
 
-            elem.data("cancelupload",false);
-            elem.find('.st-reply-message-img').hide();
             elem.prepend(loadDom);
 
-            barDom = loadDom.find('#load-bar');
-            percentDom = loadDom.find('.file-content');
 
             $("#load-cancel").click(function(){
                 elem.find('.st-reply-message-img').show();
@@ -7303,12 +7331,14 @@ fileLoadShow = function(){
                 uploadXhr.abort();
             });
         },
+
         progressBar: function () {
             uploadXhr = new window.XMLHttpRequest();
+
             uploadXhr.upload.addEventListener("progress", function(evt){
                 if (evt.lengthComputable) {
-                    barDom.css("width",Math.floor((evt.loaded / evt.total) * 100) + '%');
-                    percentDom.attr('percent', Math.floor((evt.loaded / evt.total) * 100) + '%');
+                    barDom.css("width", 50 + Math.floor((evt.loaded / evt.total) * 50) + '%');
+                    percentDom.attr("percent", 50 + Math.floor((evt.loaded / evt.total) * 50) + '%');
                 }
             }, false);
             return uploadXhr;
