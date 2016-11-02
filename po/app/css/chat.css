@@ -251,6 +251,7 @@ body {
 	border-radius: 8px;
     border:1px solid #abbabf;
     object-fit: cover;
+    cursor: pointer;
 }
 /* other's msg right(name, msg, time) */
 .chat-msg-left .group{
@@ -1032,7 +1033,7 @@ body {
 }
 
 .screen-lock {
-	position: absolute;
+	position: fixed;
 	background: #000;
 	opacity: 0.8;
 	z-index: 1700;

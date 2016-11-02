@@ -4777,7 +4777,6 @@ composeSend = function (this_compose){
                         fileName: this_compose.data("upload-file")[key].name,
                         oriObj: {w: 1280, h: 1280, s: 0.9}
                     }).done(function(resObj) {
-                        console.log(11111);
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
 
@@ -6881,15 +6880,15 @@ getLinkMeta = function (this_compose,url) {
             if( data.description.length>0 ){
                 result.description = data.description[0];
             }
-        } else {
-            result.description = data.description;
-        }
-        //image
-        if( data.image && data.image.url ){
-            if( Array.isArray(data.image.url) ){
-                if(data.image.url.length>0){
-                    console.log(data.image.url);
-                    result.img = data.image.url[0];       
+            //image
+            if( data.image && data.image.url ){
+                if( Array.isArray(data.image.url) ){
+                    if(data.image.url.length>0){
+                        console.log(data.image.url);
+                        result.img = data.image.url[0];       
+                    }
+                } else {
+                    result.img = data.image.url;
                 }
             } else {
                 result.img = data.image.url;
@@ -6897,7 +6896,6 @@ getLinkMeta = function (this_compose,url) {
         }
 
         cns.debug(result.title, result.description, result.img );
-
 
         if(url.match(/youtube.com|youtu.be|m.youtube.com/)){
             this_compose.data("message-list").push(2);
@@ -8101,9 +8099,9 @@ pollingCountsWrite = function(pollingData){
     sort_arr.forEach(function(obj){
         var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
         sortedGroup.detach();
-        var tp = QmiGlobal.groups[obj[0]].tp.toLowerCase();
-        if(tp){
-            if(tp.indexOf('c')==0 || tp.indexOf('d')==0){
+        var gp = QmiGlobal.groups[obj[0]];
+        if(gp && gp.tp.toLowerCase()){
+            if(gp.tp.indexOf('c')==0 || gp.tp.indexOf('d')==0){
                 $(".sm-offical-group").after(sortedGroup);
             }else{
                 $(".sm-general-group").after(sortedGroup);
@@ -8319,11 +8317,31 @@ pollingCmds = function(newPollingData){
                         if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
                     case 6://delete user info
-                        // 判斷是自己的話就移除團體
-                        if( QmiGlobal.groups[item.pm.gi] !== undefined
-                            && QmiGlobal.groups[item.pm.gi].me === item.pm.gu
-                        ){
-                            removeGroup(item.pm.gi);
+                        
+                        if( QmiGlobal.groups[item.pm.gi] !== undefined) {
+                            if(QmiGlobal.groups[item.pm.gi].me === item.pm.gu) { // 判斷是自己的話就移除團體
+                                removeGroup(item.pm.gi);
+                                (QmiGlobal.windowListCiMap[item.pm.gi] || []).forEach(function(thisCi){
+                                    if(!windowList[thisCi].closed) {
+                                        windowList[thisCi].popupShowAdjust('',$.i18n.getString("GROUPSETTING_LEAVE_GROUP"),true,false,[function(){
+                                                windowList[thisCi].close();
+                                        }]);
+                                    }
+                                })
+                            }else {
+                                $.each(windowList, function(index, val) {
+                                    if(!windowList[index].closed && val.g_room.memList[item.pm.gu]) {
+                                        if(val.g_room.tp == 1) {
+                                            windowList[index].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false,[function(){
+                                                windowList[val.ci].close();
+                                            }]);
+                                        }else {
+                                            windowList[val.ci].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false);
+                                        }
+                                        updateChatList(item.pm.gi);
+                                    }
+                                });
+                            }
                         }
 
                         updateSideMenuContent(item.pm.gi);
@@ -8801,7 +8819,6 @@ userInfoShow = function(this_gi,this_gu){
 
     $(".screen-lock").show();
     $(".user-info-load-area").fadeIn("fast");
-    
     $(".user-info-load-area .user").load('layout/layout.html .user-info-load',function(){
         var this_info = $(this).find(".user-info-load");
         this_info._i18n();
@@ -8821,6 +8838,11 @@ userInfoShow = function(this_gi,this_gu){
             $(".user-info-load-area .me").removeClass("backface-visibility");
             this_info.find(".action-edit").hide();
             this_info.find(".action-chat").off("click").click( function(){
+                if(window.mainPageObj !== undefined) {
+                    mainPageObj.createChat(this_gi,this_gu);
+
+                    return;
+                }
                 requestNewChatRoomApi(this_gi, "", [{gu:this_gu}], function(data){
                 });
             });
@@ -9163,7 +9185,6 @@ userInfoEvent = function(this_info,me){
                         if(data.isSuccess === true) {
                             //重置團體頭像、名稱的參數
                             getGroupComboInit(gi).done(function(){
-                                console.log("djfskdjfldksf");
                                 toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );    
                                 updateAllAvatarName(gi,gu);
                             });
@@ -9265,9 +9286,19 @@ userInfoEvent = function(this_info,me){
 
     //個人主頁
     this_info.find(".action-main").off("click").click( function(){
+        if(window.mainPageObj !== undefined) {
+            mainPageObj.userTimeline(this_info.data("this-info-gi"),this_info);
+
+            return;
+        }
         $.mobile.changePage("#page-group-main");
         timelineSwitch("feeds",false,true,true);
-
+        personalHomePage(this_info);
+    });
+}
+//切換至個人主頁
+personalHomePage = function(this_info){
+        
         //滾動至最上
         timelineScrollTop();
 
@@ -9318,7 +9349,6 @@ userInfoEvent = function(this_info,me){
             
             timelineListWrite();
         },200);
-    });
 }
 
 userInfoSend = function(this_info){

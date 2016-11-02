@@ -49,14 +49,14 @@ eg.var list = [
     }
 ]
 
-showObjectTabShow( "G000001", "聊天室已未讀", list, function(){
+showChatObjectTabShow( "G000001", "聊天室已未讀", list, function(){
         alert("page loaded");
     }, function(){
         alert("on back to parent page");
     }
 );
 **/
-showObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
+showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
     var page = $("#page-tab-object");
 
     //title
