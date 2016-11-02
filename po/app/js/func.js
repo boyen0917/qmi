@@ -9084,7 +9084,7 @@ meInfoShow = function(user_data){
 }
 
 userInfoEvent = function(this_info,me){
-    var groupMainDom = $("#page-group-main");
+    
     this_info.unbind();
     
     this_info.find(".user-avatar").click(function(){
@@ -9298,6 +9298,7 @@ userInfoEvent = function(this_info,me){
 }
 //切換至個人主頁
 personalHomePage = function(this_info){
+        var groupMainDom = $("#page-group-main");
         
         //滾動至最上
         timelineScrollTop();
