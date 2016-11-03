@@ -749,10 +749,8 @@ QmiAjax.prototype = {
 			return;
 		}
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
-		//eim 登入網址沒有index.html
-		if(args.ajaxMsg === true || !window.location.href.match(/.html/) || window.location.href.match(/index.html/)){
+		if(args.ajaxMsg === true){
 			ajax_msg = false;
-			console.log(errorResponse(errData));
 			popupShowAdjust("",errorResponse(errData),true);
 		}else{
 			//預設
