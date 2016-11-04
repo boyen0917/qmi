@@ -411,17 +411,18 @@ function openChatWindow ( giTmp, ci ){
 
 		windowList[ci].mainPageObj = {
 			//聊天室個人名片聊天
-			createChat: function(gi,gu) {
-				requestNewChatRoomApi( gi, "", [{gu:gu}], function(data){
+			createChat: function(this_gi,this_gu) {
+				requestNewChatRoomApi( this_gi, "", [{gu:this_gu}], function(data){
 			    });
 			},
+			
 			//聊天室個人名片切換至個人主頁
-			userTimeline: function(gi,this_info) {
+			userTimeline: function(this_gi,this_info) {
 				$(".sm-group-area").removeClass("active").removeClass("enable");
-				$(".sm-group-area[data-gi='"+gi+"']").addClass("active");
-				timelineChangeGroup(gi).done(function() {
+				$(".sm-group-area[data-gi='"+this_gi+"']").addClass("active");
+				timelineChangeGroup(this_gi).done(function() {
 					personalHomePage(this_info);
-				})
+				});
 			},
 
 			chatList: {

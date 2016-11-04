@@ -1894,77 +1894,6 @@ $(function(){
 	    }
 	});
 
-	$(document).on("mousedown",".user-info-close",function(){
-		$(this).attr("src","images/common/icon/bt_close_activity.png");
-	});
-	$(document).on("mouseup",".user-info-close",function(){
-		//調整
-		$("#page-group-main .gm-content").removeAttr("style");
-		//歸位
-		$(window).scrollTop($(document).data("namecard-pos"));
-
-		//翻面特殊處理
-		if($(".user-info-load-area .me").hasClass("adjust")){
-			$(".user-info-load-area").addClass("transition1s");
-            $(".user-info-load-area").addClass("user-info-flip");
-            $(".user-info-load-area .me").removeClass("adjust");
-		}
-
-		$("body").removeClass("user-info-adjust");
-
-		//reset
-		$(".user-info-load-area > div").html("");
-
-		$(".screen-lock").fadeOut();
-		$(this).attr("src","images/common/icon/bt_close_normal.png");
-		$(".user-info-load-area").fadeOut("fast",function(){
-			$(".user-info-load-area").removeClass("user-info-flip");
-			$(".user-info-load-area .user").show();
-		});
-
-	});
-	$(document).on("click",".user-info-load-area",function(e){
-		var target = event.target || event.srcElement;
-		cns.debug(target);
-		target = $(target);
-		if( target.hasClass("user-info-load-area") ){
-			$(this).hide();
-			$(".screen-lock").hide();
-		}
-		else if( target.hasClass("user") || target.hasClass("rotate.adjust") ){
-			var tmp = target.parent();
-			if( tmp.length>0 && tmp[0]==this ){
-				$(".user-info-close").trigger("mouseup");
-			}
-		}
-	});
-
-	$(document).on("mouseup",".user-info-back",function(e){
-		// $(".me-info-load user-avatar > ")
-		$(".user-info-load-area").addClass("user-info-flip");
-        $(".user-info-load-area .me").removeClass("adjust");
-
-		setTimeout(function(){
-	        $(".user-info-load-area").addClass("transition1s");
-
-			$(".user-info-load-area").removeClass("user-info-flip");
-
-			$(".user-info-load , .me-info-load").stop().animate({
-				opacity:0
-			},400);
-			setTimeout(function(){
-				$(".user-info-load-area .me").addClass("backface-visibility");
-				$(document).find(".user-info-load-area .user").show();
-				$(".user-info-load , .me-info-load").stop().animate({
-					opacity:1
-				},400);
-			},400);
-        },100);
-
-		e.stopPropagation();
-		e.preventDefault();
-	});
-
 	//----------------------------------- chatroom ---------------------------------------------
 	$(".chatroom-addstate-top-btn").click(function(){
 		$(".chatroom-addstate-top-area").slideToggle();
@@ -2088,24 +2017,6 @@ $(function(){
 		$(this).find(".sm-cl-count").hide();
 		updatePollingCnts( $(this).find(".sm-cl-count"),$(this).data("polling-cnt"));
 	});	
-
-	$(document).on("mouseup",".namecard",function(e){
-		e.stopPropagation();
-		//temp
-		if($(document).data("official") == true) return false;
-
-		$(document).data("namecard-pos",$(window).scrollTop());
-		$(window).scrollTop(0);
-		// $(".user-info-load-area").css("top",$(window).scrollTop());
-		// $(".screen-lock").css("top",$(window).scrollTop());
-
-		//調整
-		$("#page-group-main .gm-content").css("overflow","initial");
-
-		//鈴鐺頁面不動作
-		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);
-		userInfoShow($(this).data("gi"),$(this).data("gu"));
-	});
 
 	$(document).on("mouseup",".ab_namecard",function(e){
 		e.stopPropagation();
