@@ -19,6 +19,7 @@
 
 	var paramRegExp = /; *([!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+) */g;
 	var typeRegExp = /^[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+\/[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+$/;
+	var purl;
 
 	parseUrl = function(url, cb, options){
 		getHTML(url, function(err, html){
@@ -40,19 +41,16 @@
 	}
 	
 	var getHTML = function(url, cb){
-		var purl = require('url').parse(url);
+		purl = require('url').parse(url);
 		if (!purl.protocol)
 			purl = require('url').parse("http://"+url);
-		
 		url = require('url').format(purl);
 		request({
 			url: url,
 			headers:{
 				'User-Agent': navigator.userAgent
 			},
-			encoding: 'utf8',
-			gzip: true,
-			jar: true
+			encoding: 'utf8'
 		},function(err, res, body){
 			if (err) return cb(err);
 			
@@ -155,10 +153,16 @@
 			var imgTags = $html.find('img');
 			imgTags.each(function() {
 				var element = $(this);
-				var propertyAttr = element[0].src || element[0].dataset.src;
-				if(propertyAttr&&propertyAttr.length>0)	meta.image.url.push(propertyAttr);
+				$.each(element[0].attributes, function(index, val) {
+					if(val.nodeName == "src" && val.nodeValue !== "") {
+							meta.image.url.push(val.nodeValue);
+					}
+				});
+				// var propertyAttr = element[0].src || element[0].dataset.src;
+				// if(propertyAttr&&propertyAttr.length>0)	meta.image.url.push(propertyAttr);
 			});
 		}
+
 		return meta;
 
 	}
@@ -202,5 +206,38 @@
 		this.parameters = Object.create(null);
 		this.type = type;
 	}
-	
+
+	rel_to_abs = function(imgurl){
+	    /* Only accept commonly trusted protocols:
+	     * Only data-image URLs are accepted, Exotic flavours (escaped slash,
+	     * html-entitied characters) are not supported to keep the function fast */
+		if(/^(https?|file|ftps?|mailto|javascript|data:image\/[^;]{2,9};):/i.test(imgurl))
+		    return imgurl; //Url is already absolute
+		    
+		    
+		    if(purl.host.indexOf("google.com") !== -1)
+				return purl.protocol + "//" + purl.host + "/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png";
+
+		    if(imgurl.substring(0,2) == "//")
+		        return purl.protocol + imgurl;
+		    else if(imgurl.charAt(0) == "/")
+		        return purl.protocol + "//" + purl.host + imgurl;
+		    else if(imgurl.substring(0,2) == "./")
+		        imgurl = "." + imgurl;
+		    else if(/^\s*$/.test(imgurl))
+		        return ""; //Empty = Return nothing
+		    else if(imgurl.substring(0,3) == "../")
+		    	imgurl = imgurl;
+		    else imgurl = "/" + imgurl;
+
+			imgurl = purl.protocol + "//" + purl.host + imgurl;
+		    var i=0;
+		    while(/\/\.\.\//.test(imgurl = imgurl.replace(/[^\/]+\/+\.\.\//g,"")));
+
+		    /* Escape certain characters to prevent XSS */
+		    imgurl = imgurl.replace(/\.$/,"").replace(/\/\./g,"").replace(/"/g,"%22")
+		            .replace(/'/g,"%27").replace(/</g,"%3C").replace(/>/g,"%3E");
+		    return imgurl;
+		}
+
 })();
