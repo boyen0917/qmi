@@ -1219,6 +1219,8 @@ QmiGlobal.gallery = function (data) {
     leftArrow.on('click', this.showPreviousImage.bind(this));
     rightArrow.on('click', this.showNextImage.bind(this));
 
+    this.container.find("a.download-link").click(function(e) {e.stopPropagation();});
+
     // Brian ZoomIn
     this.zoomObj = {
         dom: this.container.find(".img-container"),
