@@ -7880,7 +7880,7 @@ polling = function(){
             });
 
             localStorage.removeItem("_loginData");
-            popupShowAdjust("",$.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);
+            popupShowAdjust("",$.i18n.getString("WEBONLY_LOGOUT_BY_ANOTHER_DEVICE"),true,false,[reLogin]);
             return false;
         }else{
             cns.debug("polling err:",data);

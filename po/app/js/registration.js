@@ -11,11 +11,24 @@ onCheckVersionDone = function(needUpdate){
     	
 
     	QmiGlobal.isPeriodicallyReload = true;
-
-    	loginAction();
+		
+		loginAction();
 
     } else if($.lStorage("_loginAutoChk") === true) {
-		loginAction();
+
+    	// 檢查auth
+    	new QmiAjax({
+			apiName: "auth",
+			method: "put",
+			errHide: true
+		}).complete(function(data){
+			if(data.status === 401) {
+				resetDB();
+				window.location = "index.html";
+			} else {
+				loginAction();
+			}
+		});
 
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
