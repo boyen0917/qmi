@@ -307,6 +307,7 @@ function showChatList(){
 			}
 			// targetDiv.show();
 			sortRoomList();
+
 			var groupsClCnts = $.lStorage("_pollingData").cnts;
 			if(groupsClCnts[gi].hasOwnProperty("cl")){
 				groupsClCnts[gi].cl.forEach(function(obj){
@@ -316,6 +317,8 @@ function showChatList(){
 					}
 				});
 			}
+
+			$("#page-group-main .subpage-chatList").show();
 		})
 	}
 

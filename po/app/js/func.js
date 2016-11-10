@@ -531,7 +531,6 @@ timelineSwitch = function (act,reset,main,noPR){
                 }
             } else {
                 //-- switch sub pages --
-                groupMain.find(".subpage-chatList").show();
                 page_title = $.i18n.getString("CHAT_TITLE");
 
                 initChatList();

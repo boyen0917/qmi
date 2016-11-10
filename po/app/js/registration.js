@@ -16,9 +16,17 @@ onCheckVersionDone = function(needUpdate){
 
     } else if($.lStorage("_loginAutoChk") === true) {
 
+    	ui = $.lStorage("_loginData").ui;
+    	at = $.lStorage("_loginData").at;
+
     	// 檢查auth
     	new QmiAjax({
-			apiName: "auth",
+			apiName: "me",
+			specifiedHeaders: {
+				ui: $.lStorage("_loginData").ui,
+				at: $.lStorage("_loginData").at,
+				li: lang
+			},
 			method: "put",
 			errHide: true
 		}).complete(function(data){
