@@ -2334,25 +2334,50 @@ composeContentMake = function (compose_title){
         //url parse
         this_compose.find('.highlight-container').bind('input',function(){
             //有東西就不作了
+            var inputText = $(this).text();
             if(this_compose.data("url-chk")) return false;
             //先將換行符號換成<br/>加空格 再以空格切出陣列
-            var url_chk = $(this).text().replace(/\n|\r/g," <br/> ").split(' ');
+            var url_chk = inputText.replace(/\n|\r/g,"|<br/>|").split('|');
+            var regexUrl = /^(((http|https):\/\/)|(www\.))+[-a-zA-Z0-9:%_\+.~#?&//=]+\s$/;
+            var regexWrap = /(((http|https):\/\/)|(www\.))+[-a-zA-Z0-9:%_\+.~#?&//=]+(\n|\r){2}$/;
             
+            if(inputText.match(regexWrap)){
+                var result = regexWrap.exec(inputText);
+                this_compose.data("parse-waiting",true).data("url-chk",true);
+                if(!this_compose.data("parse-resend")) $(".cp-attach-area").show().find(".url-loading").css("display","block");
+                getLinkMeta(this_compose,result[0]);
+            }
+
             $.each(url_chk,function(i,val){
-                if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://' || val.substring(0, 4) == 'www.'){
-                    this_compose.data("parse-error",false);
-                    this_compose.data("url-chk",true);
-
+                if(val.match(regexUrl)){
+                // if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://' || val.substring(0, 4) == 'www.'){
+                    // this_compose.data("parse-error",false);
                     //送出判斷 等到網址內容取得成功 再送出
-                    this_compose.data("parse-waiting",true);
+                    this_compose.data("parse-waiting",true).data("url-chk",true);
                     if(!this_compose.data("parse-resend")) $(".cp-attach-area").show().find(".url-loading").css("display","block");
-
                     getLinkMeta(this_compose,val);
                     return false;
                 }else{
                     //暫時
                     //this_compose.find(".cp-attach-area").hide();
                     // this_compose.find(".cp-ta-yql").hide();
+                }
+            });
+        });
+
+        this_compose.find('.highlight-container').bind('paste',function(e){
+            e.preventDefault();
+            //先將換行符號換成<br/>加| 再以|切出陣列
+            var url_chk = e.originalEvent.clipboardData.getData('text').replace(/\n|\r/g,"|<br/>|").split('|');
+            var regexUrl = /^(((http|https):\/\/)|(www\.))+[-a-zA-Z0-9:%_\+.~#?&//=]+/;
+            $.each(url_chk,function(i,val){
+                if(val.match(regexUrl)){
+                    if(!this_compose.data("url-chk")){
+                        //送出判斷 等到網址內容取得成功 再送出
+                        this_compose.data("parse-waiting",true).data("url-chk",true);
+                        if(!this_compose.data("parse-resend")) $(".cp-attach-area").show().find(".url-loading").css("display","block");
+                        getLinkMeta(this_compose,val);
+                    }
                 }
             });
         });
@@ -5919,15 +5944,21 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 this_event.find(".st-sub-box-2-attach-area").show();
 
                 if(val.i) {
-                    console.log(val.i);
                     this_event.find(".st-attach-url-img").show();
-                    this_event.find(".st-attach-url-img img").attr("src",val.i).error(function(){
+                    this_event.find(".st-attach-url-img img").attr("src",val.i).load(function(){
+                        if($(this)[0].naturalWidth < 480 && $(this)[0].naturalHeight < 200){
+                            $(this).css("object-fit","contain");
+                        }
+                    }).error(function(){
                         //$(this).attr("src","images/common/icon/icon_noPhoto.png");
                         $(this).parent().remove();
                     });
                 }
                 this_event.find(".st-attach-url-title").html(val.t);
                 this_event.find(".st-attach-url-desc").html(val.d);
+                if(val.c.substring(0, 4) == 'www.'){
+                    val.c = "http://"+val.c;
+                }
                 this_event.find(".st-attach-url-link").attr("href", val.c);
 
                 break;
@@ -6839,7 +6870,7 @@ getLinkMeta = function (this_compose,url) {
             msg: '非桌機版'
         });
     else
-        parseUrl( url, deferred.resolve); 
+        parseUrl( url, deferred.resolve);
 
     var timer = setTimeout(function() {
         deferred.reject({
@@ -6856,41 +6887,42 @@ getLinkMeta = function (this_compose,url) {
 
         //loading圖示隱藏
         $(".cp-attach-area .url-loading").hide();
-
+        console.log(data);
         //error存在 或 result null 就跳出
-        if( !data || err ) {
+        if( err ) {
             //沒內容也算結束吧 讓它可以送出 
-            this_compose.data("parse-waiting",false);
-
+            this_compose.data("parse-waiting",false).data("url-chk",false);
             toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
             return false;
+        } else if(data.title && data.title.length==0 && data.description && data.description.length==0 && data.image && data.image.url.length==0){
+            this_compose.data("parse-waiting",false).data("url-chk",false);
+            return false;
         }
-
+        
         //title
         if( Array.isArray(data.title) ){
             if( data.title.length>0 ){
                 result.title = data.title[0];
             }
         } else {
-            result.title = data.title;
+            result.title = data.title || data.site_name;
         }
         //description
         if( Array.isArray(data.description) ){
             if( data.description.length>0 ){
                 result.description = data.description[0];
             }
-            //image
-            if( data.image && data.image.url ){
-                if( Array.isArray(data.image.url) ){
-                    if(data.image.url.length>0){
-                        console.log(data.image.url);
-                        result.img = data.image.url[0];       
-                    }
-                } else {
-                    result.img = data.image.url;
+        } else {
+            result.description = data.description;
+        }
+        //image
+        if( data.image && data.image.url ){
+            if( Array.isArray(data.image.url) ){
+                if(data.image.url.length>0){
+                    result.img = rel_to_abs(data.image.url[0]);       
                 }
             } else {
-                result.img = data.image.url;
+                result.img = rel_to_abs(data.image.url);
             }
         }
 
@@ -6925,8 +6957,13 @@ getLinkMeta = function (this_compose,url) {
                 $(".cp-ta-yql").fadeIn();
             }
         }
+
+        if(data.url) {
+            result.url = data.url
+        } else {
+            result.url = url;
+        }
         
-        result.url = url;
         this_compose.data("url-content",result);
 
         //網址讀取結束
@@ -6959,7 +6996,7 @@ getLinkMeta = function (this_compose,url) {
         cns.debug("fail", errData);
 
         //網址讀取結束
-        this_compose.data("parse-waiting",false);
+        this_compose.data("parse-waiting",false).data("url-chk",false);
         // this_compose.data("parse-error",true);
         this_compose.data("parse-resend",false);
 
