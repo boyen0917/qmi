@@ -51,7 +51,8 @@ onCheckVersionDone = function(needUpdate){
 		$("#page-registration").css("height",$(window).height());
 	});
 
-	$(document).on("click",".login-ready",function(){
+	$(document).on("click",".login-ready:not(.login-waiting)",function(){
+
 		var isMail = false;
 		var phone_id = "";
 		var phoneInput = $(".login-ld-phone input");
@@ -63,6 +64,7 @@ onCheckVersionDone = function(needUpdate){
 		}
 		var password = $(".login-ld-password input").val();
 
+		$(this).addClass("login-waiting");
 		//登入
 		login(phone_id,password,countrycode,isMail);
 		
@@ -275,7 +277,8 @@ onCheckVersionDone = function(needUpdate){
 		},400);
 	});
 
-	$(document).on("click",".login-next-ready",function(){
+	$(document).on("click",".login-next-ready:not(.login-waiting)",function(){
+
 		if($.lStorage("_loginRemeber") && !$(".login-change").data("chk")){
 			var phone_id = $.lStorage("_loginRemeber").phone;
 			var password = $(".login-remeber-password input").val();
@@ -292,20 +295,21 @@ onCheckVersionDone = function(needUpdate){
 
 	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
-        s_load_show = true;
+        // s_load_show = true;
+
+        var bodyData = {
+    		id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
+            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
+            dn: QmiGlobal.device,
+            pw:toSha1Encode(password)
+    	};
         
         new QmiAjax({
         	apiName: "login",
         	specifiedHeaders: {
 	            li:lang
 	        },
-        	body: {
-        		id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
-	            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
-	            dn: QmiGlobal.device,
-	            pw:toSha1Encode(password)
-        	},
-        	isLoadingShow: true,
+        	body: bodyData,
         	method: "post"
         }).complete(function(data){
         	var loginDef = $.Deferred();
@@ -314,28 +318,35 @@ onCheckVersionDone = function(needUpdate){
         		var dataObj = $.parseJSON(data.responseText);
 
         		// 判斷此次登入帳號與上次不同再刪除DB
-        		if($.lStorage("_loginId") !== body.id) resetDB();
+        		if($.lStorage("_loginId") !== bodyData.id) resetDB();
 
         		//記錄此次登入帳號
-        		$.lStorage("_loginId",body.id);
+        		$.lStorage("_loginId",bodyData.id);
 
 				QmiGlobal.auth = dataObj;
 
         		// SSO 登入
         		if(dataObj.rsp_code === 104) {
         			QmiGlobal.auth.isSso = true;
-        			QmiGlobal.ssoLogin({
-        				url: dataObj.url,
-        				ci:  dataObj.ci,
-        				uui: dataObj.uui,
-        				pin: dataObj.pin,
-        				id:  body.id,
-        				pw:  password,
-        			}).done(loginDef.resolve);
-        		} else {
-        			loginDef.resolve({isSso:false});
-        		}
+        			dataObj.id = bodyData.id;
+        			dataObj.pw = password;
 
+        			QmiGlobal.ssoLogin(dataObj).done(loginDef.resolve);
+        		} else {
+        			loginDef.resolve({isSso:false, isSuccess: true});
+        		}
+        	} else {
+        		loginDef.resolve({isSso:false, isSuccess: false});
+        	}
+
+        	loginDef.done(function(rspData) {
+        		
+        		console.log("yo", rspData);
+        		if(rspData.isSuccess === false) {
+        			$("#page-registration .login").removeClass("login-waiting");	
+        			return;
+        		}
+        			
         		//判斷是否換帳號 換帳號就要清db
         		if(!$.lStorage(QmiGlobal.auth.ui)) resetDB();
 
@@ -352,7 +363,8 @@ onCheckVersionDone = function(needUpdate){
 		    		localStorage.removeItem("_loginRemeber");
 				}
 				loginAction();
-        	}
+        	});
+
         }).error(function(){
         	window.errorTest = arguments;
         	cns.debug("login error ",arguments)
@@ -468,12 +480,9 @@ onCheckVersionDone = function(needUpdate){
     // LDAP SSO
     QmiGlobal.ssoLogin = function(ssoObj) {
     	var deferred = $.Deferred();
-    	console.log("ssoObj.pw", ssoObj.pw);
-    	console.log("ssoObj.id", ssoObj.id.substring(0,16));
-    	console.log("QmiGlobal.device", QmiGlobal.device);
     	// sso 登入
 		new QmiAjax({
-            url: "https://" + ssoObj.url + "/apiv1/sso/"+ ssoObj.ci +"/login",
+            url: "https://" + ssoObj.url + "/apiv1/sso/clouds/"+ ssoObj.cdi +"/companies/"+ ssoObj.ci +"/login",
             specifiedHeaders: { li: lang },
             body: {
 			   id: ssoObj.id,

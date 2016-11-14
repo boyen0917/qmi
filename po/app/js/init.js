@@ -35,6 +35,8 @@ var base_url = function() {
 	}
 }();
 
+base_url = "https://qmi15.mitake.com.tw/apiv1/";
+
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {
 	
