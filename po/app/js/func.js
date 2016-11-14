@@ -7983,12 +7983,14 @@ combineCloudPolling = function(newPollingData){
 
 
 pollingCountsWrite = function(pollingData){
+    
+    // init.js 判斷pollingData是否錯誤
+    changeAccountChk();
 
-    var 
-    pollingData = ( pollingData       == undefined ? $.lStorage("_pollingData") : pollingData       ),
-    cntsAllObj  = ( pollingData.cnts  == undefined ? {}                         : pollingData.cnts  ),
-    gcnts       = ( pollingData.gcnts == undefined ? { G1: 0, G3: 0 }           : pollingData.gcnts ),
-    groupsData  =   QmiGlobal.groups,
+    var pollingData = ( pollingData       == undefined ? $.lStorage("_pollingData") : pollingData       ),
+        cntsAllObj  = ( pollingData.cnts  == undefined ? {}                         : pollingData.cnts  ),
+        gcnts       = ( pollingData.gcnts == undefined ? { G1: 0, G3: 0 }           : pollingData.gcnts ),
+        groupsData  =   QmiGlobal.groups,
 
     //排序用
     sort_arr = [];
@@ -8071,9 +8073,9 @@ pollingCountsWrite = function(pollingData){
     sort_arr.forEach(function(obj){
         var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
         sortedGroup.detach();
-        var tp = QmiGlobal.groups[obj[0]].tp.toLowerCase();
-        if(tp){
-            if(tp.indexOf('c')==0 || tp.indexOf('d')==0){
+        var gp = QmiGlobal.groups[obj[0]];
+        if(gp && gp.tp.toLowerCase()){
+            if(gp.tp.indexOf('c')==0 || gp.tp.indexOf('d')==0){
                 $(".sm-offical-group").after(sortedGroup);
             }else{
                 $(".sm-general-group").after(sortedGroup);
@@ -8081,7 +8083,6 @@ pollingCountsWrite = function(pollingData){
         }
         //$(".sm-group-list-area").prepend(sortedGroup);
     })
-
 
     //邀請 若是在團體邀請頁面時 則不寫入
     if(gcnts.G1 > 0){
@@ -8443,6 +8444,7 @@ pollingCmds = function(newPollingData){
 
     return allCmdsDoneDeferred.promise();
 }
+
 
 pollingUpdate = function(newPollingData){
     
