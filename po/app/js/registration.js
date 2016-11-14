@@ -272,7 +272,7 @@ onCheckVersionDone = function(needUpdate){
 	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
         s_load_show = true;
-        
+
         new QmiAjax({
         	apiName: "login",
         	specifiedHeaders: {
@@ -288,7 +288,7 @@ onCheckVersionDone = function(needUpdate){
         	method: "post"
         }).complete(function(data){
         	if(data.status == 200){
-        		
+
         		QmiGlobal.auth = $.parseJSON(data.responseText);
         		
         		//自動登入儲存 有_loginData 有_loginAutoChk 才代表有選自動登入
@@ -301,8 +301,9 @@ onCheckVersionDone = function(needUpdate){
                 }
 
         		//判斷是否換帳號 換帳號就要清db
-        		if(!$.lStorage(QmiGlobal.auth.ui)) resetDB();
+        		changeAccountToResetDB(phoneId);
 
+        		
     			//記錄帳號密碼
     			if($(".login-remeber").data("chk")){
 					var _loginRemeber = {};
@@ -321,6 +322,14 @@ onCheckVersionDone = function(needUpdate){
         	window.errorTest = arguments;
         	cns.debug("login error ",arguments)
         });
+	}
+
+	function changeAccountToResetDB(phoneId) {
+		var lastId = $.lStorage("_lastLoginAccount") || null;
+		if(lastId !== phoneId && lastId !== null) 
+
+		// 紀錄上次登入帳號
+		$.lStorage("_lastLoginAccount", phoneId);
 	}
 
 	//初始化 
