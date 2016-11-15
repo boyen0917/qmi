@@ -8047,12 +8047,14 @@ combineCloudPolling = function(newPollingData){
 
 
 pollingCountsWrite = function(pollingData){
+    
+    // init.js 判斷pollingData是否錯誤
+    changeAccountChk();
 
-    var 
-    pollingData = ( pollingData       == undefined ? $.lStorage("_pollingData") : pollingData       ),
-    cntsAllObj  = ( pollingData.cnts  == undefined ? {}                         : pollingData.cnts  ),
-    gcnts       = ( pollingData.gcnts == undefined ? { G1: 0, G3: 0 }           : pollingData.gcnts ),
-    groupsData  =   QmiGlobal.groups,
+    var pollingData = ( pollingData       == undefined ? $.lStorage("_pollingData") : pollingData       ),
+        cntsAllObj  = ( pollingData.cnts  == undefined ? {}                         : pollingData.cnts  ),
+        gcnts       = ( pollingData.gcnts == undefined ? { G1: 0, G3: 0 }           : pollingData.gcnts ),
+        groupsData  =   QmiGlobal.groups,
 
     //排序用
     sort_arr = [];
@@ -8145,7 +8147,6 @@ pollingCountsWrite = function(pollingData){
         }
         //$(".sm-group-list-area").prepend(sortedGroup);
     })
-
 
     //邀請 若是在團體邀請頁面時 則不寫入
     if(gcnts.G1 > 0){
@@ -8527,6 +8528,7 @@ pollingCmds = function(newPollingData){
 
     return allCmdsDoneDeferred.promise();
 }
+
 
 pollingUpdate = function(newPollingData){
     
