@@ -170,9 +170,13 @@ function updateChatList( giTmp, extraCallBack ){
 
 		if(rspObj.isSuccess && rspObj.roomArr.length > 0) 
 			showChatList();
-		else 
+		else {
 			chatListDom.find("rows").hide().end()
 			.find(".coachmake").fadeIn();
+
+			$("#page-group-main .subpage-chatList").show();
+		}
+			
 
 		if(extraCallBack)	extraCallBack();
 	})
@@ -195,17 +199,17 @@ function showChatList(){
 	targetDiv = $(".subpage-chatList .rows");
 	topChatListDiv = $(".top-chatList .list");
 	
-	var romm = 0;
+	var roomsCnt = 0;
 	$.each(QmiGlobal.groups[gi].chatAll, function(index, val) {
 		if(val.st === undefined){
-			romm = Object.keys(chatList).length;
+			roomsCnt = Object.keys(chatList).length;
 			return false;
 		}
 		else if(val.st == 0){
-			romm ++;
+			roomsCnt ++;
 		}
 	});
-	if( romm<=1 ){
+	if( roomsCnt<=1 ){
 		targetDiv.hide();
 		$(".subpage-chatList .coachmake").fadeIn();
 		return;
