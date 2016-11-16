@@ -7145,9 +7145,8 @@ replySend = function(thisEvent){
         object_obj = $.parseJSON( object_obj );
         body.meta.tu = object_obj;
     }
-
     var text = thisEvent.find(".st-reply-highlight-container").html()
-                         .replace(/<br>/g, "\n");
+                         .replace(/<br>/g, "\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
     var tagMembers = thisEvent.find(".st-reply-highlight-container").data("markMembers");
     if (tagMembers && Object.keys(tagMembers).length) {
         

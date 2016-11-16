@@ -193,30 +193,34 @@ $(function(){
 		ti_chat = ci;
 
 		getPermition();
+
+		var groupGn = g_group.gn._escape();
+		var groupCn = g_cn._escape();
+
 		//官方帳號
 		if(true == g_group.isOfficial){
 			// $(".extra").hide();
 			//非管理員
 			if(g_group.ad != 1){
 				$(".extra").hide();
-				$("#header .title .text").html(g_group.gn._escape().replaceOriEmojiCode());
+				$("#header .title .text").html(groupGn);
 				//set window title
-				$(document).find("title").text(g_group.gn._escape().replaceOriEmojiCode() + " - Qmi");
+				$(document).find("title").html(groupGn + " - Qmi");
 			}else{
 				if(g_room.tp == 1){
-					$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
-					$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
+					$("#header .title .text").html(groupCn);
+					$("#header .subTitle").html(groupGn);
 					//set window title
-					$(document).find("title").text(g_cn._escape().replaceOriEmojiCode() + " - Qmi");
+					$(document).find("title").html(groupCn + " - Qmi");
 				}else if(g_room.tp == 2 && g_cn == g_group.me || g_group.guAll[g_cn] === undefined){
-					$("#header .title .text").html(g_group.gn._escape().replaceOriEmojiCode());
+					$("#header .title .text").html(groupGn);
 					//set window title
-					$(document).find("title").text(g_group.gn._escape().replaceOriEmojiCode() + " - Qmi");
+					$(document).find("title").html(groupGn + " - Qmi");
 				}else{
-					$("#header .title .text").html(g_group.guAll[g_cn].nk._escape().replaceOriEmojiCode());
-					$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
+					$("#header .title .text").html(g_group.guAll[g_cn].nk._escape());
+					$("#header .subTitle").html(groupGn);
 					//set window title
-					$(document).find("title").text(g_group.guAll[g_cn].nk._escape().replaceOriEmojiCode() + " - Qmi");
+					$(document).find("title").html(g_group.guAll[g_cn].nk._escape() + " - Qmi");
 				}
 			}
 			// 群組聊天室，顯示成員數量
@@ -235,10 +239,10 @@ $(function(){
 			$(".extra-content .btn[data-type=invite]").hide();
 			$(".extra-content .btn[data-type=exit]").hide();
 		}else{
-			$("#header .title .text").html(g_cn._escape().replaceOriEmojiCode());
-			$("#header .subTitle").html(g_group.gn._escape().replaceOriEmojiCode());
+			$("#header .title .text").html(groupCn);
+			$("#header .subTitle").html(groupGn);
 			//set window title
-			$(document).find("title").text(g_cn + " - Qmi");
+			$(document).find("title").html(groupCn + " - Qmi");
 
 			var tmpMemCount = (g_room.memList) ? Object.keys(g_room.memList).length : 0;
 			if (tmpMemCount != g_room.memCount) {
@@ -288,7 +292,7 @@ $(function(){
 		// 偵測貼上事件 避免html 換成text文本
 		input.on("paste",function(e){
 			e.preventDefault();
-			document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
+			document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text')._escape());
 		})
 
 		$(".input").data("h", $(".input").innerHeight());
@@ -2071,7 +2075,7 @@ function sendMsgText(dom) {
 	function onClickSendChat() {
 		var inputDom = $("#footer .contents .input");
 		// var text = inputDom.val();
-		var text = inputDom[0].innerText;
+		var text = inputDom.html().replace(/<br>/g, "\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 		inputDom.html("");
 		if (text.length <= 0) return;
 		updateChatContentPosition();

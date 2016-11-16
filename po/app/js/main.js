@@ -984,7 +984,7 @@ $(function(){
 	// 偵測貼上事件 避免html 換成text文本
 	$(document).on("paste",".st-reply-highlight-container",function(e){
 		e.preventDefault();
-		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
+		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text')._escape());
 	})
 
 	//留言送出
@@ -1370,7 +1370,7 @@ $(function(){
 			return false;
 		}
  			
-		this_compose.data("compose-content",$('.cp-content-highlight').html());
+		this_compose.data("compose-content",$('.cp-content-highlight').html().replace(/&lt;/g,'<').replace(/&gt;/g,'>'));
 		this_compose.data("compose-title",$('.cp-textarea-title').val());
 
 		var ctp = this_compose.data("compose-tp");
@@ -1421,7 +1421,7 @@ $(function(){
 	// 偵測貼上事件 避免html 換成text文本
 	$("#page-compose").on("paste", ".cp-content-highlight", function(e){
 		e.preventDefault();
-		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
+		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text')._escape());
 	})
 
 	// 8-2-16 阻止拖拉橫移
