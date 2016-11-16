@@ -304,7 +304,7 @@ timelineChangeGroup = function (thisGi) {
 
     var changeDeferred = $.Deferred(),
         comboDeferred = $.Deferred();
-
+        
     // 私雲轉移中
     var timelineDom = $(".gm-content");
     if(QmiGlobal.groups[thisGi].isRefreshing === true) {
@@ -367,6 +367,14 @@ timelineChangeGroup = function (thisGi) {
             }else{
                 timelineSwitch("feeds",true);
             }
+
+            // 移轉判斷
+
+            if(QmiGlobal.groups[thisGi].isRefreshing === true) return;
+
+            //updatePollingCnts
+            var smGroupDom = $("#page-group-main .sm-group-area[data-gi="+ thisGi +"]");
+            updatePollingCnts(smGroupDom.find(".sm-count"), smGroupDom.data("polling-cnt"));
 
             changeDeferred.resolve();
         })
@@ -8048,9 +8056,6 @@ combineCloudPolling = function(newPollingData){
 
 pollingCountsWrite = function(pollingData){
     
-    // init.js 判斷pollingData是否錯誤
-    changeAccountChk();
-
     var pollingData = ( pollingData       == undefined ? $.lStorage("_pollingData") : pollingData       ),
         cntsAllObj  = ( pollingData.cnts  == undefined ? {}                         : pollingData.cnts  ),
         gcnts       = ( pollingData.gcnts == undefined ? { G1: 0, G3: 0 }           : pollingData.gcnts ),
