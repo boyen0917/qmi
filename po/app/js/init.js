@@ -852,23 +852,6 @@ $(document).on("click","a",function(e){
 });
 
 
-// 2016/11/14
-// 登出不清db判斷錯誤 導致換帳號登入時 _pollingData沒清空 會有別帳號的團體 以至發生錯誤
-function changeAccountChk() {
-	// 先看是否檢查過了
-	if($.lStorage("_changeAccountChk")) return;
-	$.lStorage("_changeAccountChk", true);
-
-    if($.lStorage("_pollingData") === null) return;
-    var flag = false;    
-    var pcGroups = $.lStorage("_pollingData").cnts || {};
-    Object.keys(pcGroups).forEach(function(thisGi) {
-        if(QmiGlobal.groups[thisGi] === undefined) flag = true;
-    });
-    if(flag) resetDB();
-}
-
-
 errorResponse = function(data){
 	try{
 		if(data && data.responseText && data.responseText.length>0 ){
