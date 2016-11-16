@@ -373,7 +373,7 @@ timelineChangeGroup = function (thisGi) {
             if(QmiGlobal.groups[thisGi].isRefreshing === true) return;
 
             //updatePollingCnts
-            var smGroupDom = $("#page-group-main .sm-group-area[data-gi="+ thisGi +"] .sm-count");
+            var smGroupDom = $("#page-group-main .sm-group-area[data-gi="+ thisGi +"]");
             updatePollingCnts(smGroupDom.find(".sm-count"), smGroupDom.data("polling-cnt"));
 
             changeDeferred.resolve();
