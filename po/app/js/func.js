@@ -304,7 +304,7 @@ timelineChangeGroup = function (thisGi) {
 
     var changeDeferred = $.Deferred(),
         comboDeferred = $.Deferred();
-
+        
     // 私雲轉移中
     var timelineDom = $(".gm-content");
     if(QmiGlobal.groups[thisGi].isRefreshing === true) {
@@ -367,6 +367,14 @@ timelineChangeGroup = function (thisGi) {
             }else{
                 timelineSwitch("feeds",true);
             }
+
+            // 移轉判斷
+
+            if(QmiGlobal.groups[thisGi].isRefreshing === true) return;
+
+            //updatePollingCnts
+            var smGroupDom = $("#page-group-main .sm-group-area[data-gi="+ thisGi +"] .sm-count");
+            updatePollingCnts(smGroupDom.find(".sm-count"), smGroupDom.data("polling-cnt"));
 
             changeDeferred.resolve();
         })

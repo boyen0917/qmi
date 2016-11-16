@@ -372,13 +372,7 @@ $(function(){
 		$(this).addClass("active");
 
 		//指定gi
-		timelineChangeGroup($(this).attr("data-gi")).done(function(){
-			// 移轉 
-        	if(QmiGlobal.groups[$(this).attr("data-gi")].isRefreshing === true) return;
-
-			//updatePollingCnts
-        	updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
-		}.bind(this));
+		timelineChangeGroup($(this).attr("data-gi"));
 	});
 	
 	//----------------------------------- timeline ---------------------------------------------  
