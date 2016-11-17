@@ -311,6 +311,8 @@ $(function(){
             //cns.debug("[!] setTabList(set pen): " + e.message);
             errorReport(e);
         }
+
+        $("#page-group-main .gm-header-right").show();
     }
 
     initGroupSetting = function(this_gi){

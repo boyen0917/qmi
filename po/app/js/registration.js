@@ -326,7 +326,7 @@ onCheckVersionDone = function(needUpdate){
 
 	function changeAccountToResetDB(phoneId) {
 		var lastId = $.lStorage("_lastLoginAccount") || null;
-		if(lastId !== phoneId && lastId !== null) 
+		if(lastId !== phoneId && lastId !== null) resetDB();
 
 		// 紀錄上次登入帳號
 		$.lStorage("_lastLoginAccount", phoneId);
