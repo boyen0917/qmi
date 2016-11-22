@@ -1,0 +1,280 @@
+
+#StickerStoreModal {
+    position: fixed; 
+    z-index: 1010; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(51, 51, 51, 0.74);
+    -webkit-user-select: none; 
+    display: none;
+}
+
+#StickerStoreModal .container {
+    width: 700px;
+    height: 800px;
+    margin: 60px auto;
+    position: relative;
+    overflow: hidden;
+    background: white;
+}
+
+#StickerStoreModal ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#StickerStoreModal ul li.tab-link {
+    float: left;
+    width: 214px;
+    text-align: center;
+    padding: 18px 0px;
+    transition: 0.5s;
+    cursor: pointer;
+    border: 1px solid rgba(170, 170, 170, 0.59)
+}
+
+#StickerStoreModal ul li.active {
+    background: rgb(57, 148, 232);
+    color: white;
+}
+
+#StickerStoreModal .close {
+    display: inline-block;
+    font-size: 24px;
+    text-align: center;
+    width: 50px;
+    color: rgba(128, 128, 128, 0.6);
+    line-height: 2.4;
+    cursor: pointer;
+}
+
+#StickerStoreModal .sticker-package-detail{
+    display: none;
+}
+
+#StickerStoreModal .edit-sort{
+    width: 200px;
+    float: right;
+    padding-right: 20px;
+    text-align: right;
+    margin-top: 10px;
+    cursor: pointer;
+    display: none;
+}
+
+#StickerStoreModal .edit-status {
+    width: 200px;
+    float: right;
+    display: none;
+}
+
+#StickerStoreModal .edit-sort{
+    width: 200px;
+    float: right;
+    padding-right: 20px;
+    text-align: right;
+    margin-top: 10px;
+    cursor: pointer;
+    display: none;
+}
+
+#StickerStoreModal .page-home{
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    /*height: 100%;*/
+}
+
+#StickerStoreModal .main-content{
+    height: 800px;
+    overflow-y: auto;
+
+}
+
+#StickerStoreModal .sticker-package-block{
+    display: inline-block;
+    width: 345px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.6);
+    border-right: 1px solid rgba(128, 128, 128, 0.6);
+}
+
+#StickerStoreModal .sticker-package-block:active{
+    background-color: rgba(128, 128, 128, 0.6);
+}
+
+#StickerStoreModal .sticker-package-block .intro{
+    display: inline-block;
+    margin-left: 3px;
+}
+
+#StickerStoreModal .sticker-package-block img{
+    width: 100px;
+    height: 100px;
+    padding: 12px 5px;
+    vertical-align: -24px;
+    margin-top: 8px;
+}
+
+#StickerStoreModal .sticker-package-block p{
+    margin: 0;
+    font-size: 13px;
+    cursor: default;
+}
+
+#StickerStoreModal .sticker-package-block p.status{
+    color: red;
+    font-weight: bolder;
+    font-size: 14px;
+}
+
+#StickerStoreModal .sticker-package-block p.name{
+    color: #555;
+    font-weight: bolder;
+}
+
+#StickerStoreModal .sticker-package-block p.author{
+    color: rgba(102, 102, 102, 0.74);
+}
+
+
+#StickerStoreModal .sticker-package-block progress{
+    width: 126px;
+    height: 10px;
+    visibility: hidden;
+}
+
+
+#StickerStoreModal .sticker-package-block .download-progress::-webkit-progress-bar {
+    background-color: rgba(58, 38, 38, 0.21);
+    border-radius: 8px;
+}
+
+#StickerStoreModal .sticker-package-block .download-progress::-webkit-progress-value {
+    background-color: rgb(24, 215, 49);
+    border-radius: 8px;
+}
+
+#StickerStoreModal .sticker-package-block button{
+    font-size: 12px;
+    float: right;
+    margin-right: 18px;
+    margin-top: 60px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    padding: 6px 12px;
+    min-width: 62px;
+}
+
+#StickerStoreModal .sticker-package-block button.download{
+    color: rgb(230,230,230);
+    background-color: rgb(57, 148, 232);
+    cursor: pointer;
+}
+
+#StickerStoreModal .sticker-package-block button.download-done{
+    background: white;
+    color: grey;
+}
+
+#StickerStoreModal .sticker-package-block button.remove{
+    background: rgba(243, 30, 30, 0.55);
+    color: #e0e0e0;
+    cursor: pointer;
+}
+
+#StickerStoreModal .sticker-package-detail .main-sticker {
+    padding: 15px 0px 10px 0px;
+    margin-left: 15px;
+    width: -webkit-calc( 100% - 30px );
+    border-bottom: 1px solid #aaa;
+}
+
+#StickerStoreModal .sticker-package-detail .return {
+    background-image: url("../images/compose_form_checkin_icon_arrow.png");
+    background-repeat: no-repeat;
+    cursor: pointer;
+    width: 60px;
+    padding: 5px;
+    text-align: right;
+    margin-top: 20px;
+    margin-left: 10px;
+}
+
+#StickerStoreModal .sticker-package-detail img.main-img {
+    width: 100px;
+    height: 100px;
+}
+
+#StickerStoreModal .main-sticker .intro{
+    display: inline-block;
+    margin-left: 30px;
+    vertical-align: 30px;
+}
+
+#StickerStoreModal .main-sticker p{
+    margin: 0;
+    font-size: 15px;
+}
+
+#StickerStoreModal .main-sticker p.name{
+    color: #555;
+    font-weight: bolder;
+}
+
+#StickerStoreModal .main-sticker p.author{
+    color: rgba(102, 102, 102, 0.74);
+}
+
+#StickerStoreModal .main-sticker button{
+    font-size: 13px;
+    float: right;
+    margin-right: 10px;
+    margin-top: 30px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    padding: 5px 13px;
+}
+
+#StickerStoreModal .main-sticker button.download{
+    color: rgb(230,230,230);
+    background-color: rgb(57, 148, 232);
+    cursor: pointer;
+}
+
+#StickerStoreModal .sticker-img-list {
+    padding-top: 10px;
+    margin-left: 18px;
+    cursor: pointer;
+    height: 530px;
+    overflow-y: auto;
+}
+
+#StickerStoreModal .sticker-img-list div.img-content{
+    display: inline-block;
+    text-align: center;
+    width: 160px;
+    height: 125px;
+}
+
+#StickerStoreModal .sticker-img-list img{
+    width: 100px;
+    height: 100px;
+    padding: 4px;
+    cursor: pointer;
+    vertical-align: top;
+    transition: 0.4s
+}
+
+#StickerStoreModal .sticker-img-list img.enlarge{
+    width: 140px;
+    height: 130px;
+    opacity: 1;
+}
+
+#StickerStoreModal .sticker-img-list img.reduce-opacity{
+    opacity: 0.4;
+}
+

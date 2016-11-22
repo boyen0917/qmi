@@ -93,6 +93,13 @@ var initStickerArea= {
 	    	}
 	    });
 	    var callbackTmp = function(){
+
+	    	var stickerSetDom = $("<div class='sticker-shop'></div>");
+
+	    	stickerSetDom.off("click").on("click", function () {
+	    		stickerSetDom.StickerStore();
+	    	});
+
 	    	thisTmp.isUpdated = true;
 	    	for( var key in thisTmp.splDict ){
 	    		var obj = thisTmp.splDict[key];
@@ -107,6 +114,8 @@ var initStickerArea= {
 	    		// var localObj = thisTmp.dict[key];
 	    		thisTmp.showImg(dom, key, obj );
 	    	}
+
+	    	catagory.append(stickerSetDom);
 
 	    	$(dom).find(".cata").off("click").click( function(){
 	    		var type = $(this).data("type");
@@ -424,7 +433,7 @@ var initStickerArea= {
 	},
 	getStickerListApi: function(){
         return (new QmiAjax({
-        	apiName: "sticker_packages",
+        	apiName: "me/sticker_packages",
         	isPublicApi: true
         }))
 	},
@@ -592,7 +601,7 @@ var initStickerArea= {
 			dom.attr("src",path);
 		});
 	},
-	syncSticker: function( targetSpi ){
+	syncSticker: function( targetSpi ) {
 		var thisTmp = this;
 		//no any dom yet, return
 		if( !thisTmp.domList || thisTmp.domList.length<=0 ) return;

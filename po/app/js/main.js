@@ -268,9 +268,14 @@ $(function(){
         var tab_id = $(this).attr('data-tab');
         //console.log("tab is "+tab_id);
         $('ul.system-tab li').removeClass('current-tab');
-        $('.system-tab-content').removeClass('current-tab');
         $(this).addClass('current-tab');
-        $("#"+tab_id).addClass('current-tab');
+        
+        if (tab_id == "sticker-center") {
+        	$(this).StickerStore();
+        } else {
+        	$('.system-tab-content').removeClass('current-tab');
+        	$("#"+tab_id).addClass('current-tab');
+        }
     });
 	//----------------------------------- 小幫手 ---------------------------------------------
 
