@@ -7132,7 +7132,7 @@ replySend = function(thisEvent){
         imgArea = thisEvent.find(".st-reply-message-img"),
         messageArea = thisEvent.find(".st-reply-message-area"),
         replyFile = imgArea.data("file"),
-        f_load_show = fileLoadShow(messageArea),
+        f_load_show = fileLoadShow(),
         body = {
             meta : {
                 lv : 1,
@@ -7191,7 +7191,7 @@ replySend = function(thisEvent){
             upload_chk = true;
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init();
+            f_load_show.init(messageArea);
 
             var pi = "0";
 
@@ -7233,7 +7233,7 @@ replySend = function(thisEvent){
             
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init();
+            f_load_show.init(messageArea);
 
             eventTp = 7;
 
@@ -7260,8 +7260,7 @@ replySend = function(thisEvent){
                 oriObj: {w: 1280, h: 1280, s: 0.9},
                 progressBar: f_load_show.progressBar,
                 setAbortFfmpegCmdEvent : function (ffmpegCmd) {
-                    console.log($("#load-cancel"));
-                    $("#load-cancel").off("click").on("click", function(e) {
+                    $(".load-cancel").off("click").on("click", function(e) {
                         // dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
                         // dom.find(".chat-fail-status").show();
                         // dom.find(".progress-container").remove();
@@ -7277,8 +7276,8 @@ replySend = function(thisEvent){
                     });
                 },
                 updateCompressionProgress: function (percent) {
-                    $("#load-bar").css("width", percent + '%');
-                    $("#load-font").html(percent + '%');
+                    $(".load-bar").css("width", percent + '%');
+                    $(".file-content").attr("percent", percent + '%');
                     // messageArea.find(".chat-upload-progress").attr("max", 100).attr("value", percent);
                     // dom.find(".upload-percent").html(percent + '%');
                 },
@@ -7292,7 +7291,7 @@ replySend = function(thisEvent){
             upload_chk = true;
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init();
+            f_load_show.init(messageArea);
 
             fileBody = {
                 ftp: 0,
@@ -7359,14 +7358,15 @@ fileLoadShow = function(){
             
             var loadDom = $('<div class="file-load">'
             + '<div class="file-content">'
-              + '<div id="load-progress"><div id="load-bar"></div></div>'
-              + '<div id="load-cancel">取消</div>'
+              + '<div class="load-progress"><div class="load-bar"></div></div>'
+              + '<div class="load-cancel">取消</div>'
             + '</div></div>');
 
             elem.prepend(loadDom);
+            barDom = loadDom.find('.load-bar');
+            percentDom = loadDom.find('.file-content');
 
-
-            $("#load-cancel").click(function(){
+            loadDom.find(".load-cancel").click(function(){
                 elem.find('.st-reply-message-img').show();
                 loadDom.remove();
                 elem.data("cancelupload",true);
