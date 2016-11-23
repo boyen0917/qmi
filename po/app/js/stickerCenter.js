@@ -9,11 +9,13 @@ function StickerStoreView() {
 	this.container = $(this.htmlText);
 	this.defaultOrder = [];
 	this.orderByUser = [];
+	this.latestTime;
 
 	// 切換貼圖示集、未下載和已下載tab
 	this.container.find("ul li").off("click").on("click", function (e) {
 		this.currentTab = $(e.target).data("href");
 		this.container.find("li.active").removeClass("active");
+		this.container.find(".sticker-shop").show();
 		this.container.find(".sticker-package-detail").hide();
 
 		$(e.target).addClass("active");
@@ -29,6 +31,15 @@ function StickerStoreView() {
 				this.showDoneDownloadStickers();
 				break;
 		}
+	}.bind(this));
+
+	this.container.find(".page-home").off("scroll").on("scroll", function (e) {
+		var mainPage = e.target;
+		// console.log($(mainPage)[0].scrollHeight);
+		// console.log($(mainPage).scrollTop())
+		if($(mainPage).scrollTop() + $(mainPage).height() > $(mainPage)[0].scrollHeight - 250) {
+            this.getLastestPackages(this.latestTime);
+        }
 	}.bind(this));
 
 	// 關閉貼圖中心事件
@@ -92,24 +103,23 @@ StickerStoreView.prototype = {
 					"</div>" +
 				"</div>",
 
-	// setUserStickerOrder : function () {
-	// 	var selfSticker = $.lStorage("_sticker");
-
-	// 	if (typeof(selfSticker) == "object") {
-	// 		this.defaultOrder = Object.keys(selfSticker);
-	// 		console.log(this.defaultOrder);
-	// 	}
-	// },
-
 	// 取得最近15包貼圖套件，並加在貼圖中心畫面上
 	getLastestPackages : function (time) {
 		var self = this;
+		time = time || "";
 		new QmiAjax({
-        	apiName: "sticker_packages/latest/"
+        	apiName: "sticker_packages/latest/?ct=" + time
     	}).then(function (data) {
 
     		var stickerData = $.parseJSON(data.responseText);
 			if (data.status == 200) {
+
+				if (stickerData.spl.length > 0) {
+					self.latestTime = stickerData.spl[stickerData.spl.length -1].ct;
+				} else {
+					self.container.find(".page-home").unbind("scroll");
+				}
+
     			$.each(stickerData.spl, function (i, stickerPackageObj) {
     				var stickerPackage = new StickerPackage(stickerPackageObj);
     				var stickerBlock = stickerPackage.html;
@@ -119,10 +129,12 @@ StickerStoreView.prototype = {
     					if (target.tagName == "BUTTON") {
     						if ($(target).hasClass("download")) {
     							stickerPackage.download().then(function () {
-    								self.defaultOrder.push(stickerPackage.packageId);
+    								self.orderByUser.push(stickerPackage.packageId);
     							});
+    							
     						} else if ($(target).hasClass("remove")) {
     							stickerPackage.remove();
+    							self.orderByUser.splice(self.orderByUser.indexOf(stickerPackage.packageId), 1)
     						}
     					} else {
     						self.container.find(".main-content").hide();
@@ -130,7 +142,6 @@ StickerStoreView.prototype = {
     						self.showSingleStickerDetail(stickerPackage);
     					}
     				});
-
 
     				stickerBlock[0].addEventListener("dragstart", function(dragEvent) {
 
@@ -153,17 +164,11 @@ StickerStoreView.prototype = {
 						var swapTargetID = dropEvent.dataTransfer.getData("text");
 						var swapTarget = self.container.find(".sticker-package-block[data-spi='" + swapTargetID + "']" );
 
-						// self.orderByUser = (self.orderByUser.length == 0) ? self.defaultOrder : self.orderByUser;
 						if ($(dropEvent.target).hasClass("sticker-package-block")) {
 							dropTarget = $(dropEvent.target);
 						} else {
 							dropTarget = $(dropEvent.target).parents(".sticker-package-block");
 						}
-
-						// temp = self.orderByUser[self.orderByUser.indexOf(swapTargetID)];
-						// self.orderByUser[self.orderByUser.indexOf(swapTargetID)] = dropTarget.data("spi");
-						// console.log(self.orderByUser.indexOf(dropTarget.data("spi")));
-						// self.orderByUser[self.orderByUser.indexOf(dropTarget.data("spi"))] = temp;
 				
 						swapTarget.before(tempBlock);
 						dropTarget.before(swapTarget)
@@ -188,6 +193,9 @@ StickerStoreView.prototype = {
 		this.container.find(".sticker-package-block").show();
 		this.container.find(".sticker-package-block.download-done button.remove")
 					  .removeClass("remove").addClass("download-done").text("已下載");
+
+
+		console.log(this.defaultOrder);
 
 		$.each(this.defaultOrder, function (i, stickerID) {
 			var stickerPackage = this.container.find(".sticker-package-block[data-spi='" + stickerID + "']");
@@ -414,6 +422,7 @@ StickerPackage.prototype = {
 	switchDoneStatus : function () {
 		this.html.removeClass("download-none");
 		this.html.addClass("download-done");
+		this.html.hide();
 	},
 
 	swtichNoneStatus : function () {

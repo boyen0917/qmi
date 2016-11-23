@@ -433,7 +433,7 @@ var initStickerArea= {
 	},
 	getStickerListApi: function(){
         return (new QmiAjax({
-        	apiName: "me/sticker_packages",
+        	apiName: "sticker_packages",
         	isPublicApi: true
         }))
 	},

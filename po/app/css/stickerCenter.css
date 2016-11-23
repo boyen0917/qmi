@@ -13,8 +13,8 @@
 
 #StickerStoreModal .container {
     width: 700px;
-    height: 800px;
-    margin: 60px auto;
+    height: 672px;
+    margin: 18px auto;
     position: relative;
     overflow: hidden;
     background: white;
@@ -85,14 +85,15 @@
     overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
-    /*height: 100%;*/
+    height: 537px;
+    padding-bottom: 44px;
 }
 
-#StickerStoreModal .main-content{
-    height: 800px;
+/*#StickerStoreModal .main-content{
+    height: 570px;
     overflow-y: auto;
 
-}
+}*/
 
 #StickerStoreModal .sticker-package-block{
     display: inline-block;
@@ -111,10 +112,10 @@
 }
 
 #StickerStoreModal .sticker-package-block img{
-    width: 100px;
-    height: 100px;
-    padding: 12px 5px;
-    vertical-align: -24px;
+    width: 90px;
+    height: 90px;
+    padding: 10px 5px;
+    vertical-align: -15px;
     margin-top: 8px;
 }
 
@@ -248,8 +249,8 @@
     padding-top: 10px;
     margin-left: 18px;
     cursor: pointer;
-    height: 530px;
-    overflow-y: auto;
+   /* height: 530px;
+    overflow-y: auto;*/
 }
 
 #StickerStoreModal .sticker-img-list div.img-content{
