@@ -2075,14 +2075,14 @@ function sendMsgText(dom) {
 	function onClickSendChat() {
 		var inputDom = $("#footer .contents .input");
 		// var text = inputDom.val();
-		var text = inputDom.html().replace(/<br>/g, "\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+		var text = inputDom.html().replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 		inputDom.html("");
 		if (text.length <= 0) return;
 		updateChatContentPosition();
 
 		// updateChatContentPosition();
 
-		var msg = text.replace(/<br>/g, "\n");
+		var msg = text.replace(/<br\s*\/?>/g,"\n");
 		// inputDom.val("").trigger('autosize.resize');
 
 		var dom = showUnsendMsg(msg, 0);

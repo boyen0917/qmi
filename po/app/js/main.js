@@ -1083,11 +1083,11 @@ $(function(){
 				// 	break;
 				case "copyword":
 					//get content (title & attachment excluded)
-			        // var data = this_event.data("event-val");
+					// var data = this_event.data("event-val");
 			        var text = null;
 			        try{
-			        	// text = data.ml[0].c;
-			        	text = this_event.find('.st-sub-box-2-content')[0].innerText;
+						// text = data.ml[0].c;
+			        	text = this_event.find(".st-sub-box-2-content")[0].innerText || this_event.find(".st-box2-more-title")[0].innerText + "\n"+ this_event.find(".st-box2-more-desc")[0].innerText;
 					} catch(e) {
 						errorReport(e);
 				    }

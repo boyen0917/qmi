@@ -4427,7 +4427,7 @@ composeVoteObjMake = function(this_compose,body){
 composeSend = function (this_compose){
     
     var ctp = this_compose.data("compose-tp");
-    var composeContent = this_compose.data("compose-content").replace(/<br>/g, "\n");;
+    var composeContent = this_compose.data("compose-content").replace(/<br\s*\/?>/g,"\n");
     var tagMembers = this_compose.find(".cp-content-highlight").data("markMembers");
     var ml = this_compose.data("message-list").unique();
 
@@ -5901,7 +5901,6 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
         if($.inArray(val.tp,not_attach_type_arr) < 0 && !this_event.find(".st-sub-box-2-attach-area").is(":visible")){
             this_event.find(".st-sub-box-2-attach-area").show();
         }
-
         //內容格式
         switch(val.tp){
             case 0://文字
@@ -5931,7 +5930,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                         });
                     });
                 }());
-
+                
                 this_event.find(target_div).html(val.c).show();
 
                 break;
@@ -7146,7 +7145,7 @@ replySend = function(thisEvent){
         body.meta.tu = object_obj;
     }
     var text = thisEvent.find(".st-reply-highlight-container").html()
-                         .replace(/<br>/g, "\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+                         .replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
     var tagMembers = thisEvent.find(".st-reply-highlight-container").data("markMembers");
     if (tagMembers && Object.keys(tagMembers).length) {
         
