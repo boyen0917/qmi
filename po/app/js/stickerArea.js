@@ -138,7 +138,6 @@ var initStickerArea= {
 	    	});
 	    	$(dom).find(".cata:eq(1)").trigger("click");
 	    };
-
 		if( thisTmp.isUpdated ) callbackTmp();
 	    else thisTmp.load( callbackTmp );
 	},

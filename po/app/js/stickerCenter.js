@@ -1,7 +1,6 @@
 $.fn.StickerStore = function () {
 	var stickerStoreView =  new StickerStoreView();
 	stickerStoreView.getLastestPackages();
-	// stickerStoreView.setUserStickerOrder()
 }
 
 function StickerStoreView() {
@@ -10,6 +9,8 @@ function StickerStoreView() {
 	this.defaultOrder = [];
 	this.orderByUser = [];
 	this.latestTime;
+	
+	this.ableLoadMoreStricker = true; 
 
 	// 切換貼圖示集、未下載和已下載tab
 	this.container.find("ul li").off("click").on("click", function (e) {
@@ -33,14 +34,7 @@ function StickerStoreView() {
 		}
 	}.bind(this));
 
-	this.container.find(".page-home").off("scroll").on("scroll", function (e) {
-		var mainPage = e.target;
-		// console.log($(mainPage)[0].scrollHeight);
-		// console.log($(mainPage).scrollTop())
-		if($(mainPage).scrollTop() + $(mainPage).height() > $(mainPage)[0].scrollHeight - 250) {
-            this.getLastestPackages(this.latestTime);
-        }
-	}.bind(this));
+	this.container.find(".page-home").bind("scroll", this.loadMore.bind(this));
 
 	// 關閉貼圖中心事件
 	this.container.find(".close").off("click").on("click", function (e) {
@@ -106,6 +100,7 @@ StickerStoreView.prototype = {
 	// 取得最近15包貼圖套件，並加在貼圖中心畫面上
 	getLastestPackages : function (time) {
 		var self = this;
+		var loadDeferred = $.Deferred();
 		time = time || "";
 		new QmiAjax({
         	apiName: "sticker_packages/latest/?ct=" + time
@@ -118,6 +113,8 @@ StickerStoreView.prototype = {
 					self.latestTime = stickerData.spl[stickerData.spl.length -1].ct;
 				} else {
 					self.container.find(".page-home").unbind("scroll");
+					self.container.find(".page-home").css("overflow", "auto");
+					self.ableLoadMoreStricker = false;
 				}
 
     			$.each(stickerData.spl, function (i, stickerPackageObj) {
@@ -130,6 +127,7 @@ StickerStoreView.prototype = {
     						if ($(target).hasClass("download")) {
     							stickerPackage.download().then(function () {
     								self.orderByUser.push(stickerPackage.packageId);
+    								stickerPackage.saveLocalStorage();
     							});
     							
     						} else if ($(target).hasClass("remove")) {
@@ -173,18 +171,30 @@ StickerStoreView.prototype = {
 						swapTarget.before(tempBlock);
 						dropTarget.before(swapTarget)
 						tempBlock.after(dropTarget).remove();
-
-						// console.log(self.orderByUser);
 					});
 
 					self.defaultOrder.push(stickerPackageObj.spi);
     				self.container.find(".sticker-shop").append(stickerBlock);
+
+    				loadDeferred.resolve();
     			});
 
     		} else {
     			console.log(data.responseText.rsp_msg)		
     		}
     	});
+
+    	return loadDeferred.promise();
+	},
+
+	loadMore : function (e) {
+		var mainPage = e.target;
+		if($(mainPage).scrollTop() + $(mainPage).height() > $(mainPage)[0].scrollHeight - 100) {
+			$(mainPage).css("overflow", "hidden");
+            this.getLastestPackages(this.latestTime).done(function () {
+            	$(mainPage).css("overflow", "auto");
+            });
+        }
 	},
 
 	// 貼圖市集顯示所有貼圖
@@ -193,9 +203,6 @@ StickerStoreView.prototype = {
 		this.container.find(".sticker-package-block").show();
 		this.container.find(".sticker-package-block.download-done button.remove")
 					  .removeClass("remove").addClass("download-done").text("已下載");
-
-
-		console.log(this.defaultOrder);
 
 		$.each(this.defaultOrder, function (i, stickerID) {
 			var stickerPackage = this.container.find(".sticker-package-block[data-spi='" + stickerID + "']");
@@ -230,6 +237,7 @@ StickerStoreView.prototype = {
 
 	// 顯示單一貼圖詳細內容
 	showSingleStickerDetail : function (sticker) {
+		this.container.find(".page-home").unbind("scroll");
 		var stickerDetailView = this.container.find(".sticker-package-detail");
 
 		new QmiAjax({
@@ -272,6 +280,8 @@ StickerStoreView.prototype = {
 	},
 
 	returnHomePage : function () {
+		if (this.ableLoadMoreStricker) this.container.find(".page-home").bind("scroll", this.loadMore.bind(this));
+		
 		this.container.find(".sticker-package-detail").hide();
 		this.container.find(".main-content").fadeIn(800);
 		if (this.currentTab == "already-download-stickers") {
@@ -312,6 +322,10 @@ function StickerPackage (data) {
 	var swapTarget;
 
 	this.packageId = data.spi;
+	this.mainStickerUrl = data.l;
+	this.name = data.na;
+	this.author = data.au;
+	this.stickerList = [];
 	this.html = $("<div class='sticker-package-block' data-spi='" + data.spi + "'>" +
 					"<img src= '" + data.l + "'>" + 
 					"<div class='intro'>" +
@@ -372,6 +386,8 @@ StickerPackage.prototype = {
 					stickerBlock.find("progress").css("visibility", "hidden"); 
 				}, 500);
 
+				self.stickerList = downloadData.sl;
+
 				deferred.resolve();
 			}
 		});
@@ -430,4 +446,18 @@ StickerPackage.prototype = {
 		this.html.addClass("download-none");
 		this.html.hide();
 	},
+
+	saveLocalStorage : function () {
+		var stickerPackList = $.lStorage("_sticker") || {};
+
+		stickerPackList[this.packageId] = {
+			sl : this.stickerList,
+			au : this.author,
+			na : this.name,
+			spi : this.packageId,
+			l : this.mainStickerUrl
+		}
+
+		$.lStorage("_sticker", stickerPackList)
+	}
 }
