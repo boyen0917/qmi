@@ -127,11 +127,12 @@ StickerStoreView.prototype = {
     						if ($(target).hasClass("download")) {
     							stickerPackage.download().then(function () {
     								self.orderByUser.push(stickerPackage.packageId);
-    								stickerPackage.saveLocalStorage();
+    								stickerPackage.saveDataToLocal();
     							});
     							
     						} else if ($(target).hasClass("remove")) {
     							stickerPackage.remove();
+    							stickerPackage.removeLocalData();
     							self.orderByUser.splice(self.orderByUser.indexOf(stickerPackage.packageId), 1)
     						}
     					} else {
@@ -447,7 +448,7 @@ StickerPackage.prototype = {
 		this.html.hide();
 	},
 
-	saveLocalStorage : function () {
+	saveDataToLocal : function () {
 		var stickerPackList = $.lStorage("_sticker") || {};
 
 		stickerPackList[this.packageId] = {
@@ -458,6 +459,13 @@ StickerPackage.prototype = {
 			l : this.mainStickerUrl
 		}
 
+		$.lStorage("_sticker", stickerPackList)
+	},
+
+	removeLocalData : function () {
+		var stickerPackList = $.lStorage("_sticker") || {};
+
+		delete stickerPackList[this.packageId];
 		$.lStorage("_sticker", stickerPackList)
 	}
 }
