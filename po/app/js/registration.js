@@ -464,12 +464,9 @@ onCheckVersionDone = function(needUpdate){
 			if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
 				//關閉返回鍵
 				$("#page-group-menu .page-back").hide();
-				cns.debug("no group ");
-				
 				// 兩個選項都要執行polling()
 				polling();
 			}else{
-
 				//設定目前團體 執行polling()
 				setGroupInitial(data.dgi).done(polling);
 			}
@@ -506,6 +503,7 @@ onCheckVersionDone = function(needUpdate){
         	}
         	new QmiAjax({
 	        	apiName: "cert",
+	        	apiVer: "apiv2",
 	        	isPublic: true,
 	        	isSso: true,
 		        specifiedHeaders: {
@@ -516,7 +514,8 @@ onCheckVersionDone = function(needUpdate){
 				  key: ssoKey,
 				  tp: "1",
 				  dn: QmiGlobal.device,
-				  ci: ssoObj.ci
+				  ci: ssoObj.ci,
+				  cdi: ssoObj.cdi
 				},
 	        	method: "post",
 	        	error: function(errData){

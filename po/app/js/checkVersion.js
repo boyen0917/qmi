@@ -97,7 +97,7 @@ $(function(){
 
 				$("#container_version span.web").html("("+g_currentVersion+")");
 	        	new QmiAjax({
-	        		url: base_url + "sys/version?" + new Date().getTime(), //add current to prevent cache
+	        		url: base_url + "apiv1/sys/version?" + new Date().getTime(), //add current to prevent cache
 	        		noAuth: true,
 	        		specifiedHeaders: {
 		    			os: 2,

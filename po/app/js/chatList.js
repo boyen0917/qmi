@@ -408,8 +408,8 @@ function openChatWindow ( giTmp, ci ){
 			gi: 		window.gi,
 			auth: 		window.QmiGlobal.auth,
 			groups: 	window.QmiGlobal.groups,
-			clouds: 	window.QmiGlobal.clouds,
-			cloudGiMap: window.QmiGlobal.cloudGiMap,
+			companies: 	window.QmiGlobal.companies,
+			companyGiMap: window.QmiGlobal.companyGiMap,
 		};
 
 		windowList[ci].mainPageObj = {

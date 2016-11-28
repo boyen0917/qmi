@@ -129,17 +129,17 @@ getMeInvite = function(){
             // 有私雲的話 要loop解決 1.token 2.邀請函
             if(clFlag !== false) {
                 
-                var cloudTokenInvDefArr = [],  // 未知的cl token deferred
+                var companyTokenInvDefArr = [],  // 未知的cl token deferred
                     clInvitationDefArr = [$.Deferred()]; // 解出各cl有多少團體邀請的deferred ,預設第一個deferred 是為了第二個when
 
                 // 沒token再取token 然後再做 invitation 
                 allInvitationsObj.cl.forEach(function(item,i){
                     var tempDeferred = $.Deferred();
-                    cloudTokenInvDefArr[i] = $.Deferred();
+                    companyTokenInvDefArr[i] = $.Deferred();
 
                     // 沒有存過的ci 才去取token
-                    if(QmiGlobal.clouds.hasOwnProperty(item.ci) === false)
-                        getCloudToken(item).done(tempDeferred.resolve);
+                    if(QmiGlobal.companies.hasOwnProperty(item.ci) === false)
+                        getCompanyToken(item).done(tempDeferred.resolve);
                     else
                         tempDeferred.resolve();
 
@@ -152,23 +152,23 @@ getMeInvite = function(){
                                 if(data.gl === undefined || data.gl.length === 0) return;
 
                                 // 把ci補進去團體列表 作為私雲的辨識
-                                var cloudGroupList = data.gl.map(function(cItem){
+                                var companyGroupList = data.gl.map(function(cItem){
                                     cItem.ci = item.ci
                                     return cItem;
                                 });
                                 // [obj,obj] -> 不能 concat
-                                allInvArr.push.apply(allInvArr,cloudGroupList);
+                                allInvArr.push.apply(allInvArr,companyGroupList);
                             },
                             complete: function(){
                                 // invitation完成
-                                cloudTokenInvDefArr[i].resolve();
+                                companyTokenInvDefArr[i].resolve();
                             }
                         })
                     });
                 }); 
 
                 // token & invitation 都完成
-                $.when.apply($,cloudTokenInvDefArr).done(allInvitationDef.resolve);
+                $.when.apply($,companyTokenInvDefArr).done(allInvitationDef.resolve);
             } else {
                 allInvitationDef.resolve();
             }
@@ -205,7 +205,7 @@ getMeInvite = function(){
 
                     }));
                 }); // end of forEach
-            }); // end of cloudInvitationDef
+            }); // end of companyInvitationDef
         }
     });
 }
@@ -7481,36 +7481,43 @@ getGroupList = function(){
 
     new QmiAjax({
         apiName: "groups",
+        apiVer: "apiv2",
         isPublicApi: true
     }).success(function(apiData){
         var allGroupList = apiData.gl || [],
-            allGlDeferred = $.Deferred(),
-            cloudListArr = (apiData.cl || []),
-            clTokenDefArr = [];
+            cloudCompanyArr = (apiData.ccl || []),
+            companyListArr = (apiData.cl || []),
+            clTokenDefArr = [],
+            allGlDeferred = $.Deferred();
 
-        // 加入ldap團體列表
-        (apiData.ol || []).forEach(function(ldapCloud) {
-            QmiGlobal.ldapClouds[ldapCloud.ci] = ldapCloud;
-            cloudListArr[cloudListArr.length] = ldapCloud;
+        // cloud & company map
+        (apiData.ccl || []).forEach(function(item) {
+            QmiGlobal.cloudCompanyMap[item.cdi] = item;
         });
 
-        if(cloudListArr.length !== 0) {
+        // 加入ldap團體列表
+        (apiData.ol || []).forEach(function(ldapObj) {
+            QmiGlobal.ldapCompanies[ldapObj.ci] = ldapObj;
+            companyListArr[companyListArr.length] = ldapObj;
+        });
+
+        if(companyListArr.length !== 0) {
             
-            clTokenDefArr = cloudListArr.reduce(function(defArr,item){
-                defArr.push( getCloudToken(item));
+            clTokenDefArr = companyListArr.reduce(function(defArr,item){
+                defArr.push( getCompanyToken(item));
                 return defArr;
             }, []);
 
             $.when.apply($,clTokenDefArr).done(function(){
 
-                var cloudGlDefArr = [];
+                var companyGlDefArr = [];
                 // 取得每個私雲得團體列表
-                cloudListArr.forEach(function(cloudObj){
-                    cloudGlDefArr.push(getCloudGroup(cloudObj,allGroupList));
+                companyListArr.forEach(function(companyObj){
+                    companyGlDefArr.push(getCloudGroup(companyObj,allGroupList));
                 })
 
                 // 取得完成
-                $.when.apply($,cloudGlDefArr).done(allGlDeferred.resolve);
+                $.when.apply($,companyGlDefArr).done(allGlDeferred.resolve);
 
             }) // clTokenDefArr done
         } else {
@@ -7529,20 +7536,20 @@ getGroupList = function(){
     return groupsDeferred.promise();
 }
 
-getCloudGroup = function(cloudObj,allGroupList) {
+getCloudGroup = function(companyObj,allGroupList) {
     var deferred = $.Deferred();
 
-    if(cloudObj.nowAt === undefined) {
+    if(companyObj.nowAt === undefined) {
         deferred.resolve({isSuccess: false});
     } else {
 
         $.ajax({
-            url: "https://" + cloudObj.cl + "/apiv1/groups",
+            url: "https://" + companyObj.cl + "/apiv1/groups",
             headers: {
                 uui: ui,
                 uat: at,
-                ui: cloudObj.ui,
-                at: cloudObj.nowAt,
+                ui: companyObj.ui,
+                at: companyObj.nowAt,
                 li: lang
             },
             type: "get"
@@ -7550,16 +7557,16 @@ getCloudGroup = function(cloudObj,allGroupList) {
             
             (data.gl || []).forEach(function(groupObj){
                 // 加入私雲gi 對照表
-                QmiGlobal.cloudGiMap[groupObj.gi] = {
-                    ci: cloudObj.ci,
-                    cl: cloudObj.cl
+                QmiGlobal.companyGiMap[groupObj.gi] = {
+                    ci: companyObj.ci,
+                    cl: companyObj.cl
                 }
                 if(allGroupList !== undefined) allGroupList.push(groupObj)
             })
 
             deferred.resolve({
                 isSuccess: true,
-                cloudGl: data.gl || []
+                companyGl: data.gl || []
             });
         }).error(function() {
             deferred.resolve({isSuccess:false});
@@ -7571,26 +7578,31 @@ getCloudGroup = function(cloudObj,allGroupList) {
 }
 
 // 這不要刪啊
-getCloudToken = function(cloudObj,isReDo){
+getCompanyToken = function(companyObj,isReDo){
     var deferred = $.Deferred();
 
-    if(cloudObj.key === undefined) {
+    // ctp為 是否需要做cert 的判斷 1是要 0是不要 -> 公雲的company不需要cert
+    if(companyObj.ctp !== 1) {
+        deferred.resolve(true);
+    } else if(companyObj.key === undefined) {
         deferred.resolve(false);   
     } else {
-        var tempKey = cloudObj.key;
+        var tempKey = companyObj.key;
 
         $.ajax({
-            url: "https://" + cloudObj.cl + "/apiv1/cert",
+            url: "https://" + companyObj.cl + "/apiv2/cert",
             headers: { li: lang },
             data: JSON.stringify({
-                ui: cloudObj.ui , // private user id
+                ui: companyObj.ui , // private user id
                 key: tempKey,
                 tp: 1,  // device type
-                dn: QmiGlobal.device  // device name
+                dn: QmiGlobal.device,  // device name
+                ci: companyObj.ci,
+                cdi: companyObj.cdi
             }),
             type: "post",
             error: function(errData){
-                addCloudReLoadView(cloudObj);
+                addCloudReLoadView(companyObj);
 
                 deferred.resolve(false);
             },
@@ -7605,12 +7617,15 @@ getCloudToken = function(cloudObj,isReDo){
                 switch ( apiData.rsp_code ){
 
                     case 200: //成功 繼續下一步
-                        // 存入 QmiGlobal.clouds
-                        QmiGlobal.clouds[cloudObj.ci] = cloudObj;
+                        // 存入 QmiGlobal.companies
+                        QmiGlobal.companies[companyObj.ci] = companyObj;
 
                         // 設定這次的私雲token
-                        QmiGlobal.clouds[cloudObj.ci].nowAt = apiData.at;
-                        QmiGlobal.clouds[cloudObj.ci].et = apiData.et;
+                        QmiGlobal.companies[companyObj.ci].nowAt = apiData.at;
+                        QmiGlobal.companies[companyObj.ci].et = apiData.et;
+
+//!!!!!!!!!!!!!!!!!!!!!! 測試用!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        // QmiGlobal.companies[companyObj.ci].tp = 0;
 
                         deferred.resolve(true);
 
@@ -7625,13 +7640,15 @@ getCloudToken = function(cloudObj,isReDo){
 
                         // 重新取key
                         // {il: [{ci:xx,ui:xx},{ci:xx,ui:xx}]}
-                        getCloudKey({ il: [{
-                            ci: cloudObj.ci,
-                            ui: cloudObj.ui
-                        }]}).done(function(responseObj){
-                            if(responseObj.isSuccess === true)
-                                cloudObj.key = responseObj.key;
-                                getCloudToken(cloudObj,true).done(deferred.resolve);
+                        getCompanyKey({ il: [{
+                            cdi: companyObj.cdi,
+                            ci: companyObj.ci,
+                            ui: companyObj.ui
+                        }]}).done(function(rspObj){
+                            if(rspObj.isSuccess === true) {
+                                companyObj.key = rspObj.key;
+                                getCompanyToken(companyObj,true).done(deferred.resolve);
+                            } else deferred.resolve(false);
                         })
 
                         break;
@@ -7647,13 +7664,14 @@ getCloudToken = function(cloudObj,isReDo){
 }
 
 // 重新取得私雲key
-getCloudKey = function(cloudsKeyObj){
+getCompanyKey = function(companiesKeyObj){
     var deferred = $.Deferred();
 
     new QmiAjax({
         apiName: "key",
+        apiVer: "apiv2",
         isPublicApi: true,
-        body: cloudsKeyObj,
+        body: companiesKeyObj,
         method: "post",
         error: function(){
             deferred.resolve({isSuccess: false});
@@ -7666,54 +7684,54 @@ getCloudKey = function(cloudsKeyObj){
 }
 
 
-addCloudReLoadView = function(cloudObj) {
-    if(QmiGlobal.viewMap.hasOwnProperty("refresh_" + cloudObj.ci) === false) {
+addCloudReLoadView = function(companyObj) {
+    if(QmiGlobal.viewMap.hasOwnProperty("refresh_" + companyObj.ci) === false) {
          var refreshDom = $('<div class="refresh-item">' +
-            '<div>' + cloudObj.cn + '</div>' +
+            '<div>' + companyObj.cn + '</div>' +
             '<div>' + $.i18n.getString("REFRESH_TEXT") + '</div>' +
         '<img src="images/refresh01.png"></div>');
 
-        QmiGlobal.viewMap["refresh_" + cloudObj.ci] = { dom: refreshDom }
+        QmiGlobal.viewMap["refresh_" + companyObj.ci] = { dom: refreshDom }
 
         $(".sm-group-list-area-refresh").show().append(refreshDom);
 
-        refreshDom.click(cloudLoad.bind({
+        refreshDom.click(companyLoad.bind({
             refreshDom: refreshDom,
-            cloudObj: cloudObj
+            companyObj: companyObj
         }));
     }
 }
 
 
-cloudLoad = function(){
+companyLoad = function(){
     var refreshDom = this.refreshDom,
-        cloudObj = this.cloudObj,
+        companyObj = this.companyObj,
         groupCnts = Object.keys(QmiGlobal.groups).length,
-        cloudLoadDeferred = $.Deferred();
+        companyLoadDeferred = $.Deferred();
 
     if(refreshDom !== undefined) {
         if(refreshDom.find("img").hasClass("rotate")) return;
         refreshDom.find("img").addClass("rotate");
     }
     
-    getCloudToken(cloudObj).done(function(isSuccess){
+    getCompanyToken(companyObj).done(function(isSuccess){
         var tokenDeferred = $.Deferred();
         if(isSuccess === true) {
 
-            getCloudGroup(cloudObj).done(function(data) {
+            getCloudGroup(companyObj).done(function(data) {
                 if(data.isSuccess === true) {
                     // 先找出 新的gi
-                    var newGiArr = data.cloudGl.reduce(function(arr, currObj){
+                    var newGiArr = data.companyGl.reduce(function(arr, currObj){
                         if(QmiGlobal.groups.hasOwnProperty(currObj.gi) === false) arr.push(currObj.gi);
                         return arr;
                     },[])
 
                     // 將group list 更新到 Global
-                    groupListToLStorage(data.cloudGl, true);
+                    groupListToLStorage(data.companyGl, true);
 
                     // 打combo更新
                     var comboDefArr = [];
-                    data.cloudGl.forEach(function(cObj){
+                    data.companyGl.forEach(function(cObj){
                         comboDefArr.push(getGroupComboInit(cObj.gi));
                     });
 
@@ -7729,11 +7747,11 @@ cloudLoad = function(){
                         // 全部都成功 才解除私雲移轉
                         if(fail === false) {
                             // 刪除屏蔽ui
-                            var cloudRefreshViewObj = QmiGlobal.viewMap["refresh_" + cloudObj.ci];
-                            if(cloudRefreshViewObj !== undefined) {
+                            var companyRefreshViewObj = QmiGlobal.viewMap["refresh_" + companyObj.ci];
+                            if(companyRefreshViewObj !== undefined) {
                                 setTimeout(function() { 
-                                    (cloudRefreshViewObj.dom || $.fn).remove();
-                                    delete cloudRefreshViewObj;
+                                    (companyRefreshViewObj.dom || $.fn).remove();
+                                    delete companyRefreshViewObj;
                                 },1000);
                                 setTimeout(function() { toastShow($.i18n.getString("REFRESH_ALERT_SUCCESS"))},500)
                             }
@@ -7746,7 +7764,7 @@ cloudLoad = function(){
                                 // sidemenu 新增團體
                                 if(newGiArr.indexOf(item.thisGi) >= 0) addSideMenuGroupUI.call($(".sm-group-list-area"), 0, JSON.parse(item.data.responseText));
 
-                                // cloudLoadDeferred.resolve(true);
+                                // companyLoadDeferred.resolve(true);
                             })
 
                             tokenDeferred.resolve(true);
@@ -7772,7 +7790,7 @@ cloudLoad = function(){
                     setTimeout(function() { toastShow($.i18n.getString("REFRESH_TEXT"))},500);
                 } else {
                     // 表示取的私雲失敗 加入重讀取UI
-                    addCloudReLoadView(cloudObj);
+                    addCloudReLoadView(companyObj);
                 }
                 return;
             }
@@ -7794,9 +7812,9 @@ cloudLoad = function(){
                         // 找出第一個私雲團體即可
                         gi = function() {
                             var chk = false, firstGi;
-                            Object.keys(QmiGlobal.cloudGiMap).forEach(function(cgi) {
+                            Object.keys(QmiGlobal.companyGiMap).forEach(function(cgi) {
                                 // 找到第一個私雲團體即可
-                                if(QmiGlobal.cloudGiMap[cgi].ci === cloudObj.ci
+                                if(QmiGlobal.companyGiMap[cgi].ci === companyObj.ci
                                     && chk === false) {
                                     chk = true;
                                     firstGi = cgi;
@@ -7849,7 +7867,7 @@ polling = function(){
         publicPollingTime = localPollingData.ts.pt;
 
     new QmiAjax({
-        url: base_url + "sys/polling?pt=" + publicPollingTime,
+        apiName: "sys/polling?pt=" + publicPollingTime,
         isPublicApi: true
     }).complete(function(data){
         if(data.status == 200){
@@ -7858,7 +7876,7 @@ polling = function(){
 
             // 錯誤排除 把不該存在公雲polling的私雲gi剔除
             (newPollingData.cnts || []).forEach(function(cntObj,i) {
-                if(QmiGlobal.cloudGiMap.hasOwnProperty(cntObj.gi)) newPollingData.cnts.splice(i,1);
+                if(QmiGlobal.companyGiMap.hasOwnProperty(cntObj.gi)) newPollingData.cnts.splice(i,1);
             });
 
             // 測試 私雲移轉
@@ -7972,7 +7990,7 @@ polling = function(){
 combineCloudPolling = function(newPollingData){
     var combineDeferred = $.Deferred(),
         localPollingData = $.lStorage("_pollingData"),
-        cloudPollingDefArr = [];
+        companyPollingDefArr = [];
     
     // 私雲時間存local
     if(localPollingData.clTs === undefined) localPollingData.clTs = {};
@@ -7980,7 +7998,7 @@ combineCloudPolling = function(newPollingData){
     // 先將私雲polling加進來
     newPollingData.cmds.filter(function(item){
         // 有存過的ci 才去取polling
-        return  (item.tp === 51 && QmiGlobal.clouds.hasOwnProperty(item.pm.ci) === true);
+        return  (item.tp === 51 && QmiGlobal.companies.hasOwnProperty(item.pm.ci) === true);
     }).forEach(function(item){
 
         // 設定這個私雲的pollingTime
@@ -7993,29 +8011,29 @@ combineCloudPolling = function(newPollingData){
             }
         }
 
-        var cloudPollingDef = $.Deferred();
+        var companyPollingDef = $.Deferred();
         new QmiAjax({
             apiName: "sys/polling?pt=" + localPollingData.clTs[item.pm.ci].pollingTime,
             ci: item.pm.ci,
             success: function(data){
-                cloudPollingDef.resolve({
+                companyPollingDef.resolve({
                     ci: item.pm.ci,
                     data: data,
                     isSuccess: true
                 });
             },
             error: function(data){
-                cloudPollingDef.resolve({
+                companyPollingDef.resolve({
                     ci: item.pm.ci,
                     data: data,
                     isSuccess: false
                 });
             }
         });
-        cloudPollingDefArr.push(cloudPollingDef) // new QmiAjax ; cloudPollingDefArr.push
+        companyPollingDefArr.push(companyPollingDef) // new QmiAjax ; companyPollingDefArr.push
     });
 
-    $.when.apply($,cloudPollingDefArr).done(function(){
+    $.when.apply($,companyPollingDefArr).done(function(){
         // 設定arguments(array-like object)
         Array.prototype.forEach.call(arguments,function(item){
             if(item.isSuccess === false) return;
@@ -8469,9 +8487,9 @@ pollingCmds = function(newPollingData){
                         //       }
                         //   ]
                         
-                        // getCloudToken cl ui key ci
+                        // getCompanyToken cl ui key ci
                         // 注意 這裡沒有使用到polling給的gl 預期他會跟54成對 若沒有就會有錯
-                        cloudLoad.call({cloudObj: item.pm.c_info})
+                        companyLoad.call({companyObj: item.pm.c_info})
                         break;
                 }
             });

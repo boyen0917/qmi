@@ -143,10 +143,10 @@ updateAlert = function(){
 	// 公雲鈴鐺
 	noticeDefArr.push(publicNoticeAjax);
 
-	Object.keys(QmiGlobal.clouds).forEach(function(cloudId){
+	Object.keys(QmiGlobal.companies).forEach(function(companyId){
 		var ajaxDef = new QmiAjax({
 			apiName: "notices",
-			ci: cloudId,
+			ci: companyId,
 			complete: function(data){
 				if(data.status !== 200) return;
 
@@ -154,7 +154,7 @@ updateAlert = function(){
 					var resultNl = $.parseJSON(data.responseText).nl;
 
 					// 私雲辨識用
-					resultNl.ci = cloudId;
+					resultNl.ci = companyId;
 					noticeListArr.push.apply(noticeListArr,resultNl)
 				} catch(e) {
 					// do something..

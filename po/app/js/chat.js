@@ -54,8 +54,8 @@ $(function(){
 	// 接收 主畫面的auth
 	QmiGlobal.auth = window.chatAuthData.auth;
 	QmiGlobal.groups = window.chatAuthData.groups;
-	QmiGlobal.clouds = window.chatAuthData.clouds;
-	QmiGlobal.cloudGiMap = window.chatAuthData.cloudGiMap;
+	QmiGlobal.companies = window.chatAuthData.companies;
+	QmiGlobal.companyGiMap = window.chatAuthData.companyGiMap;
 	QmiGlobal.operateChatList = window.mainPageObj.chatList;
 
 

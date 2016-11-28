@@ -17,17 +17,17 @@ var ui,
 	//local測試 預設開啟console
 	debug_flag = false;
 
-var default_url = "https://ap.qmi.emome.net/apiv1/";
+var default_url = "https://ap.qmi.emome.net/";
 var base_url = function() {
 	switch(true) {
 		case match("qawp.qmi.emome.net"):
-			return "https://qaap.qmi.emome.net/apiv1/";
+			return "https://qaap.qmi.emome.net/";
 			break;
 		case match("qmi17.mitake.com.tw"):
-			return "https://qmi17.mitake.com.tw/apiv1/";
+			return "https://qmi17.mitake.com.tw/";
 			break;
 		default:
-			return "https://ap.qmi.emome.net/apiv1/";
+			return "https://ap.qmi.emome.net/";
 	}
 	function match(domain) {
 		var regDomain = new RegExp("^https:\/\/"+ domain, 'g');
@@ -35,7 +35,7 @@ var base_url = function() {
 	}
 }();
 
-base_url = "https://qmi15.mitake.com.tw/apiv1/";
+base_url = "https://qmi15.mitake.com.tw/";
 
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {
@@ -254,10 +254,12 @@ window.QmiGlobal = {
 
 	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups
 
-	clouds: {}, // 全部的私雲資料
-	cloudGiMap: {},
+	companies: {}, // 全部的company資料
+	companyGiMap: {},
 
-	ldapClouds: {}, // ldap雲資訊
+	cloudCompanyMap: {}, // ldap雲資訊
+
+	ldapCompanies: {}, // ldap雲資訊
 
 	windowListCiMap: {},
 
@@ -318,11 +320,15 @@ window.QmiPollingChk = {
 
 window.QmiAjax = function(args){
 	// body and method
-	var self = this,
-		ajaxDeferred = $.Deferred(),
+	var self = this;
+
+	// api版本 預設apiv1
+	self.apiVer = args.apiVer || "apiv1";
+
+	var	ajaxDeferred = $.Deferred(),
 
 		// 判斷私雲api
-		cloudData = (function(){
+		companyData = (function(){
 
 			// 有指定url 加上不要私雲 最優先 ex: 公雲polling
 			if(args.isPublicApi === true)
@@ -330,7 +336,7 @@ window.QmiAjax = function(args){
 
 			// 有指定ci 直接給他私雲
 			if(args.ci !== undefined)
-				return QmiGlobal.clouds[args.ci];
+				return QmiGlobal.companies[args.ci];
 
 			// 判斷apiName有無包含私雲gi 有的話就給他私雲
 			if(args.apiName !== undefined){
@@ -341,28 +347,28 @@ window.QmiAjax = function(args){
 
 				// api 包含 group id 而且 在私雲內 回傳私雲 否則回傳undefined 不往下做
 				if(apiGi !== undefined)
-					return QmiGlobal.cloudGiMap.hasOwnProperty(apiGi) ? QmiGlobal.clouds[ QmiGlobal.cloudGiMap[apiGi].ci ] : undefined;
+					return QmiGlobal.companyGiMap.hasOwnProperty(apiGi) ? QmiGlobal.companies[ QmiGlobal.companyGiMap[apiGi].ci ] : undefined;
 			}
 
 			// 最後判斷 現在團體是私雲團體 就做私雲
-			if(QmiGlobal.cloudGiMap[gi] !== undefined)
-				return QmiGlobal.clouds[ QmiGlobal.cloudGiMap[gi].ci ];
+			if(QmiGlobal.companyGiMap[gi] !== undefined)
+				return QmiGlobal.companies[ QmiGlobal.companyGiMap[gi].ci ];
 
 		}()),
 
 		newArgs = {
 			url: (function(){
 				// 指定url
-				if(args.url !== undefined) return args.url;
+				if(args.url) return args.url;
 
 				// undefined 表示 不符合私雲條件 給公雲
-				if(cloudData === undefined)
-					return base_url + args.apiName;
+				if(companyData)
+					return "https://" + companyData.cl +"/"+ self.apiVer +"/"+ args.apiName;
 				else
-					return "https://" + cloudData.cl + "/apiv1/" + args.apiName;
+					return base_url + self.apiVer +"/"+ args.apiName;
 			}()),
-			// setHeaders: outerArgs,cloudData
-			headers: self.setHeaders(args, cloudData),
+			// setHeaders: outerArgs,companyData
+			headers: self.setHeaders(args, companyData),
 
 			// timeout: 30000,
 
@@ -394,7 +400,7 @@ window.QmiAjax = function(args){
 		self.expireChk({
 			url: newArgs.url,
 			noAuth: args.noAuth,
-			cloudData: cloudData
+			companyData: companyData
 		}).done(ajaxExecute)
 	})
 
@@ -405,8 +411,8 @@ window.QmiAjax = function(args){
 			return;
 		}
 		// 有經過reAuth 更新headers
-		// setHeaders: outerArgs,cloudData
-		newArgs.headers = self.setHeaders(args, cloudData);
+		// setHeaders: outerArgs,companyData
+		newArgs.headers = self.setHeaders(args, companyData);
 
 		// 執行
 		$.ajax(newArgs).complete(function(apiData){
@@ -425,14 +431,21 @@ window.QmiAjax = function(args){
 					}(),
 					reAuthDefChain = MyDeferred();
 
+				// 601: 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
+				// 603: 私雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新拉取/groups取的新的key進行私雲驗證登入
+				// 604: 私雲Token錯誤, 請重新拉取/groups取的新的key進行私雲驗證登入
+				// 605: 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+				// 606: 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+
 				// reAuth: token過期
 				if( apiData.status === 401
-					&& rspCode === 601
+					&& rspCode !== 602
 					&& args.noAuth !== true
 				) {
+
 					// 執行前 先看reAuth lock沒
 					$.when(QmiGlobal.reAuthLockDef).done(function(){
-						self.reAuth(cloudData).done(reAuthDefChain.resolve);
+						self.reAuth(companyData, rspCode).done(reAuthDefChain.resolve);
 					});
 
 
@@ -458,8 +471,8 @@ window.QmiAjax = function(args){
 
 					// 重新取得token成功 換掉at後 重新做ajax
 
-					// setHeaders: outerArgs,cloudData
-					newArgs.headers = self.setHeaders(args, cloudData);
+					// setHeaders: outerArgs,companyData
+					newArgs.headers = self.setHeaders(args, companyData);
 
 					$.ajax(newArgs).complete(function(newData){
 						reAuthDefChain.resolve({
@@ -574,7 +587,7 @@ QmiAjax.prototype = {
 	})(),
 
 	// 初始設定 以及 reAuth 會用到
-	setHeaders: function(outerArgs,cloudData){
+	setHeaders: function(outerArgs,companyData){
 		// 指定headers
 		if(outerArgs.specifiedHeaders !== undefined) return outerArgs.specifiedHeaders;
 
@@ -591,11 +604,11 @@ QmiAjax.prototype = {
 		newHeaders.li = lang;
 
 		// 做私雲判斷
-		if(cloudData !== undefined) {
+		if(companyData !== undefined) {
 			newHeaders.uui = newHeaders.ui;
 			newHeaders.uat = newHeaders.at;
-			newHeaders.ui = cloudData.ui;
-			newHeaders.at = cloudData.nowAt;
+			newHeaders.ui = companyData.ui;
+			newHeaders.at = companyData.nowAt;
 		}
 
 		return newHeaders;
@@ -603,16 +616,16 @@ QmiAjax.prototype = {
 
 	expireChk: function(args) {
 		// 重新取得私雲
-		args.cloudData = QmiGlobal.clouds[(args.cloudData || {}).ci];
+		args.companyData = QmiGlobal.companies[(args.companyData || {}).ci];
 
 		// 執行前 先檢查是否接近過期時間 先替換token
-		var nowEt = (args.cloudData === undefined) ? QmiGlobal.auth.et : args.cloudData.et,
+		var nowEt = (args.companyData === undefined) ? QmiGlobal.auth.et : args.companyData.et,
 			deferred = $.Deferred(),
 
 			// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
 			isExpired = function() {
 				// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
-				if((args.cloudData || {}).tp === 1) return args.cloudData.et - (new Date().getTime()) < 0;
+				if((args.companyData || {}).tp === 1) return args.companyData.et - (new Date().getTime()) < 0;
 				// 過期檢查 提前幾天檢查
 				else return nowEt - (new Date().getTime()) < this.expireTimer
 			}.call(this);
@@ -624,7 +637,7 @@ QmiAjax.prototype = {
 		} else if(isExpired) {
 			console.log("token Expire!!!");
 			// reAuth
-			this.reAuth(args.cloudData).done(deferred.resolve);
+			this.reAuth(args.companyData).done(deferred.resolve);
 
 		} else {
 			// 還沒過期
@@ -633,89 +646,143 @@ QmiAjax.prototype = {
 		return deferred.promise();
 	},
 
-	reAuth: function(cloudData){
+	reAuth: function(companyData, rspCode){
 		var self = this,
 			deferred = $.Deferred();
 
-
 		// 先檢查是否按取消
-		try { if(QmiGlobal.clouds[cloudData.ci].isReAuthCancel === true) {
-			deferred.resolve({
-				isSuccess: false,
-				isSso: true,
-				isReAuth: true,
-				data: {isCancel: true}
-			})
+		try { 
+			if(QmiGlobal.companies[companyData.ci].isReAuthCancel === true) {
+				deferred.resolve({
+					isSuccess: false,
+					isSso: true,
+					isReAuth: true,
+					data: {isCancel: true}
+				})
+				return deferred.promise();
+			}
+		} catch(e) {}// do nothing 
 
-			return deferred.promise();
-		}} catch(e) {}// do nothing 
-
-		// auth lock
-		cns.log("reAuth starts", apiName);
-		
 		// reAuth Lock 設定前先解除之前的pending
 		// if(QmiGlobal.reAuthLockDef.then instanceof Function) QmiGlobal.reAuthLockDef.resolve();
 		QmiGlobal.reAuthLockDef = $.Deferred();
 
 		// 需要輸入密碼
-		if((cloudData || {}).tp === 1) {
+		if((companyData || {}).tp === 1) {
 			// console.log("此私雲需要輸入密碼");
 			// 把這私雲的所有團體 加上lock
-			QmiGlobal.module.reAuthUILock.lock(cloudData);
+			QmiGlobal.module.reAuthUILock.lock(companyData);
 
 			QmiGlobal.module.reAuthManually.init({
 				reAuthDef: deferred,
-				cloudData: cloudData
+				companyData: companyData
 			});
 
 		} else {
-
-			$.ajax({
-			    url: (function(){
-					if(cloudData === undefined) {
-						return base_url + "auth";
-					} else {
-						return "https://" + cloudData.cl + "/apiv1/auth";
-					}
-				})(),
-
-			    headers: self.setHeaders({},cloudData),
-			    type: "put",
-			    error: function(errData){
-			        deferred.resolve({
-			        	isSuccess: false,
-			        	data: errData,
-			        	isReAuth: true
-			        });
-			    },
-
-			    success: function(apiData){
-			    	// 重新設定at
-			    	if(
-			    		cloudData !== undefined
-			    		&& QmiGlobal.clouds[cloudData.ci] !== undefined
-			    	) {
-			    		// 私雲
-			    		QmiGlobal.clouds[cloudData.ci].nowAt = at = apiData.at;
-			    		QmiGlobal.clouds[cloudData.ci].et = apiData.et;
-			    	} else {
-			    		// 公雲
-			    		QmiGlobal.auth.at = at = apiData.at;
-			    		QmiGlobal.auth.et = apiData.et;
-			    	}
-			        deferred.resolve({
-			        	isSuccess: true,
-			        	data: apiData,
-			        	isReAuth: true
-			        });
-			    },
-			    complete: function(){
-			    	cns.log("reAuth done and unlock", apiName);
-			    	QmiGlobal.reAuthLockDef.resolve();
-			    }
-			}) // end of reAuth ajax
+			// 如果有帶rspCode 表示et沒過期 打了api卻回傳401
+			self.doAuth(companyData, rspCode).done(deferred.resolve);
 
 		}
+
+		// reAuth結束
+		deferred.done(QmiGlobal.reAuthLockDef.resolve)
+		return deferred.promise();
+	},
+
+	doAuth: function(companyData, rspCode) {
+		var self = this;
+		var deferred = $.Deferred();
+		
+		// 601: 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
+		// 603: 私雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新拉取/groups取的新的key進行私雲驗證登入
+		// 604: 私雲Token錯誤, 請重新拉取/groups取的新的key進行私雲驗證登入
+		// 605: 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+		// 606: 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+
+		switch(rspCode) {
+			case 601:
+				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
+			case 603:
+				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
+			case 604: // token 驗證失敗 一般私雲重新取key 做cert
+				getCompanyKey({ il: [{
+                    cdi: companyData.cdi,
+                    ci: companyData.ci,
+                    ui: companyData.ui
+                }]}).done(function(rspObj){
+                    if(rspObj.isSuccess === true) {
+                    	companyData.key = rspObj.key;
+                        getCompanyToken(companyData,true).done(deferred.resolve);
+                    } else deferred.resolve({
+                    	isSuccess: false,
+                    	data: rspObj,
+		        		isReAuth: true
+                    });
+                })
+				break;
+			case 605:
+				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
+			case 606:
+				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
+			default:
+				self.autoUpdateAuth(companyData).done(deferred.resolve);
+		}
+	},
+
+
+	autoUpdateAuth: function(companyData) {
+		var self = this;
+		var deferred = $.Deferred();
+
+		$.ajax({
+		    url: (function(){
+				if(companyData === undefined) {
+					return base_url + "auth";
+				} else {
+					return "https://" + companyData.cl + "/apiv1/auth";
+				}
+			})(),
+
+		    headers: self.setHeaders({},companyData),
+		    type: "put",
+		    error: function(errData){
+
+		    	// et過期 自動更新 但要強制驗證:
+		    	// do something
+
+		        deferred.resolve({
+		        	isSuccess: false,
+		        	data: errData,
+		        	isReAuth: true
+		        });
+		    },
+
+		    success: function(apiData){
+		    	// 重新設定at
+		    	if(
+		    		companyData !== undefined
+		    		&& QmiGlobal.companies[companyData.ci] !== undefined
+		    	) {
+		    		// 私雲
+		    		QmiGlobal.companies[companyData.ci].nowAt = at = apiData.at;
+		    		QmiGlobal.companies[companyData.ci].et = apiData.et;
+		    	} else {
+		    		// 公雲
+		    		QmiGlobal.auth.at = at = apiData.at;
+		    		QmiGlobal.auth.et = apiData.et;
+		    	}
+		        deferred.resolve({
+		        	isSuccess: true,
+		        	data: apiData,
+		        	isReAuth: true
+		        });
+		    }
+		}) // end of reAuth ajax
+		
 		return deferred.promise();
 	},
 
@@ -734,7 +801,7 @@ QmiAjax.prototype = {
 		}
 
 		//不做錯誤顯示 polling也不顯示 isCancel 手動輸入密碼的私雲重新頁面 按取消就不顯示錯誤訊息
-		if(ajaxArgs.errHide || ajaxArgs.noErr || isPolling || errData.isCancel === true) return false;
+		if(ajaxArgs.errHide || ajaxArgs.noErr || isPolling || errData.isCancel === true) return;
 
 		//ajax逾時
 		if(errData.statusText == "timeout"){
@@ -775,10 +842,10 @@ QmiAjax.prototype = {
 
 QmiGlobal.module.reAuthUILock = {
 	currDataObj: {},
-	lock: function(cloudData) {
+	lock: function(companyData) {
 		var groupListArea = $("#page-group-main .sm-group-list-area");
-		Object.keys(QmiGlobal.cloudGiMap).forEach(function(cgi) {
-			if(QmiGlobal.cloudGiMap[cgi].ci !== cloudData.ci) return;
+		Object.keys(QmiGlobal.companyGiMap).forEach(function(cgi) {
+			if(QmiGlobal.companyGiMap[cgi].ci !== companyData.ci) return;
 			QmiGlobal.groups[cgi].isReAuthUILock = true;
 
 			var groupDom = groupListArea.find(".sm-group-area[data-gi="+cgi+"]");
@@ -786,10 +853,10 @@ QmiGlobal.module.reAuthUILock = {
 			.find("span.auth-lock-text").show();
  		});
 	},
-	unlock: function(cloudData) {
+	unlock: function(companyData) {
 		var groupListArea = $("#page-group-main .sm-group-list-area");
-		Object.keys(QmiGlobal.cloudGiMap).forEach(function(cgi) {
-			if(QmiGlobal.cloudGiMap[cgi].ci !== cloudData.ci) return;
+		Object.keys(QmiGlobal.companyGiMap).forEach(function(cgi) {
+			if(QmiGlobal.companyGiMap[cgi].ci !== companyData.ci) return;
 			QmiGlobal.groups[cgi].isReAuthUILock = false;
 
 			var groupDom = groupListArea.find(".sm-group-area[data-gi="+cgi+"]");
@@ -903,7 +970,7 @@ QmiGlobal.module.reAuthManually = {
     	}
 
     	self.reAuthDef = argObj.reAuthDef;
-    	self.cloudData = argObj.cloudData;
+    	self.companyData = argObj.companyData;
 
     	$("#" + self.id).remove();
 
@@ -950,9 +1017,9 @@ QmiGlobal.module.reAuthManually = {
 					// 打開timeline lock
 					// 從QmiAjax的reAuth 做 lock了
 					// 在私雲加入cancel chk 讓其他api停止動作
-					QmiGlobal.clouds[self.cloudData.ci].isReAuthCancel = true;
+					QmiGlobal.companies[self.companyData.ci].isReAuthCancel = true;
 					// 避免重複顯示認證頁面 2秒後解開 但要注意polling是否觸發認證畫面
-					setTimeout(function() {QmiGlobal.clouds[self.cloudData.ci].isReAuthCancel = false}, 2000);
+					setTimeout(function() {QmiGlobal.companies[self.companyData.ci].isReAuthCancel = false}, 2000);
 					
 					// 所以要再點一次timelineChangeGroup 做lock的ui顯示
 					timelineChangeGroup(gi)
@@ -998,19 +1065,20 @@ QmiGlobal.module.reAuthManually = {
     submit: function() {
     	var self = this,
     		submitDom = self.getView("submit"),
-    		cData = self.cloudData;
+    		cData = self.companyData;
 
     	if(submitDom.hasClass("ready") === false) return;
 
     	self.view.find(".container").addClass("loading");
 
     	$.ajax({
-			url: "https://"+ cData.cl +"/apiv1/sso/"+ cData.ci +"/auth",
+			url: "https://"+ cData.cl +"/apiv1/sso/clouds/"+ cData.cdi +"/companies/"+ cData.ci +"/auth",
 			headers: {li: lang},
 			data: JSON.stringify({
 				id: self.ssoId,
 			    dn: QmiGlobal.device,
 			    pw: QmiGlobal.aesCrypto.enc(self.ssoPw, self.ssoId.substring(0,16)),
+			    at: cData.nowAt
 			}),
 			type: "put",
 		}).complete(function(data){
@@ -1030,10 +1098,10 @@ QmiGlobal.module.reAuthManually = {
 				toastShow($.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"));
 			} else {
 				// 設定新at , et
-				QmiGlobal.clouds[cData.ci].at = newAuth.at;
-				QmiGlobal.clouds[cData.ci].et = newAuth.et;
+				QmiGlobal.companies[cData.ci].at = newAuth.at;
+				QmiGlobal.companies[cData.ci].et = newAuth.et;
 
-				QmiGlobal.module.reAuthUILock.unlock(self.cloudData);
+				QmiGlobal.module.reAuthUILock.unlock(self.companyData);
 
 				// 重新執行timelineChangeGroup 讓畫面開啟
 				timelineChangeGroup(gi);

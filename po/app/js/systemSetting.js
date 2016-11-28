@@ -236,14 +236,8 @@ userInfoUpdate = function(){
 systemSetting = function(){
 
     var this_dgi = $.lStorage("_loginData").dgi;
-    console.debug("this_dgi",this_dgi);
-
     var group_data = $.lStorage(ui);
-    console.debug("group_data",group_data);
-
     var this_goup_data = group_data[gi];
-    console.debug("this_goup_data",this_goup_data);
-
     //gi 現在團體id
     //gu 現在團體 你自己的id
     //ui 
@@ -276,7 +270,7 @@ systemSetting = function(){
     //公私雲團體
     var groupid = Object.keys(group_data);
     //私雲團體
-    var prigroupid = Object.keys(QmiGlobal.cloudGiMap);
+    var prigroupid = Object.keys(QmiGlobal.companyGiMap);
     for(var i = 0 ;i < groupid.length; i++){    
         //產生團體列表
         var cr = $("<div class='group-option'><input id='"+ groupid[i] +"' data-role='none' name='group' type='radio' value='"+ groupid[i] +"'><label for='"+ groupid[i] +"' class='radiobtn'></label><img class='group-pic' data-gi='"+ groupid[i] +"' src='"+ group_data[groupid[i]].aut +"'><label for='"+ groupid[i] +"' class='radiotext'>"+ group_data[groupid[i]].gn._escape() +"</label></div>");
@@ -292,30 +286,6 @@ systemSetting = function(){
     }   
     //勾選預設群組
     systemGroup.find('#'+me_dgi).attr('checked', true);
-
-    // new QmiAjax({
-    //     apiName: "groups",
-    //     isPublicApi: true
-    // }).success(function(test_data){    
-
-    //     systemGroup.find('.group-option').remove();
-
-    //     for(i=0 ;i<test_data.gl.length; i++){    
-    //         //產生團體列表
-    //         var cr = $("<div class='group-option'><input id='"+test_data.gl[i].gi+"' data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'><label for='"+test_data.gl[i].gi+"' class='radiobtn'></label><img class='group-pic' data-gi='"+test_data.gl[i].gi+"' src='"+test_data.gl[i].aut+"'><label for='"+test_data.gl[i].gi+"' class='radiotext'>"+test_data.gl[i].gn._escape()+"</label></div>");
-    //         systemGroup.find('.edit-defaultgroup-content').append(cr);
-    //         //判斷團體縮圖 如果沒有設定預設圖片
-    //         if(!test_data.gl[i].aut){
-    //             $(".group-pic[data-gi='"+test_data.gl[i].gi+"']").attr("src", emptyAut);
-    //         }
-    //     } 
-    //     //勾選預設群組
-    //     systemGroup.find('#'+me_dgi).attr('checked', true);   
-
-    // }).error(function(e){
-    //     console.debug(e.responseText);
-    // });
-
 }
 
 passwordValidate = function (e) {
@@ -367,17 +337,6 @@ passwordChange = function(){
              "up" : toSha1Encode(pwSetting.find("input[name$='n-password']").val())
         };
 
-        // pwSetting.find(".input-password").each(function(i,val){
-        //         if($(this).val() == ""){
-        //             fill = false;
-        //             popupShowAdjust("欄位不能有空", "" ,true);
-        //             return false;
-        //         }
-        // });
-        //欄位空值判斷
-        // if(fill == true)
-        // {
-
         //驗證密碼是否正確
         new QmiAjax({
             apiName : "me/password/auth",
@@ -385,10 +344,6 @@ passwordChange = function(){
             method: "post",
             isPublicApi: true
         }).success(function(password_data){
-            // if (pwSetting.find("input[name$='n-password']").val().length < 8){ 
-            //         popupShowAdjust("新密碼請輸入至少八個字", "" ,true);
-            //         return false;
-            // }　else {
             if (pwSetting.find("input[name$='n-password']").val() == pwSetting.find("input[name$='v-password']").val()){
                 new QmiAjax({
                     apiName : "me/password",
@@ -557,17 +512,17 @@ QmiGlobal.module.ldapSetting = {
                     && targetDom.hasClass("unbind-img") === false
                 ) {
                     self.view.find(".ldap-edit").attr("ldap-type", "check")
-                    .find(".input-block.email input").val((accountDom.data("cloud-data") || targetDom.data("cloud-data")).id);
+                    .find(".input-block.email input").val((accountDom.data("company-data") || targetDom.data("company-data")).id);
 
                     self.changePage("ldap-edit");
 
                 // 點選刪除
                 } else if(targetDom.hasClass("unbind-img")) {
                     self.view.find(".ldap-edit").attr("ldap-type", "delete")
-                    .find("div.input-block.email input").val(accountDom.data("cloud-data").id);
+                    .find("div.input-block.email input").val(accountDom.data("company-data").id);
 
                     if(QmiGlobal.auth.isSso)
-                        self.view.find("section.ldap-edit div.title.two").attr("pi", accountDom.data("cloud-data").pi);
+                        self.view.find("section.ldap-edit div.title.two").attr("pi", accountDom.data("company-data").pi);
 
                     self.changePage("ldap-edit");
                 }
@@ -607,7 +562,7 @@ QmiGlobal.module.ldapSetting = {
                      + "</div>");
 
                 container.append(account);
-                account.data("cloud-data", item);
+                account.data("company-data", item);
             });
             self.view.find(".ldap-list .index[has-data="+ !!ldapList.length +"]").show();
 
@@ -623,14 +578,14 @@ QmiGlobal.module.ldapSetting = {
         var expireObj = {};
 
         ldapList.forEach(function(ldapData) {
-            var cloudData = QmiGlobal.clouds[ldapData.ci];
-            if(cloudData === undefined) return;
+            var companyData = QmiGlobal.companies[ldapData.ci];
+            if(companyData === undefined) return;
             // 判斷過期;
-            if(cloudData.et - (new Date().getTime()) < 0) {
-                expireObj[cloudData.ci] = true;
+            if(companyData.et - (new Date().getTime()) < 0) {
+                expireObj[companyData.ci] = true;
 
                 // 順便做lock
-                QmiGlobal.module.reAuthUILock.lock(cloudData);
+                QmiGlobal.module.reAuthUILock.lock(companyData);
             }
         });
         return expireObj;
@@ -640,7 +595,7 @@ QmiGlobal.module.ldapSetting = {
         var self = this,
             ssoAccount = self.inputAccount,
             ssoPassword = self.inputPassword,
-            thisSsoCi,
+            ssoData,
             msgShowDef = $.Deferred(),
             submitCompleteDef = $.Deferred();
 
@@ -671,18 +626,18 @@ QmiGlobal.module.ldapSetting = {
 
         }).fail(chainDef.reject);
 
-        chainDef.then(function(step1Data) {
+        chainDef.then(function(rspData) {
             var chainDef2 = MyDeferred();
-            // step2
-            thisSsoCi = step1Data.ci;
 
             var password = QmiGlobal.aesCrypto.enc(
                 ssoPassword, 
                 ssoAccount.substring(0,16)
             );
 
+            ssoData = rspData;
+
             new QmiAjax({
-                url: "https://" + step1Data.url + "/apiv1/me/sso/step2",
+                url: "https://" + ssoData.url + "/apiv1/me/sso/step2",
                 specifiedHeaders: {li: lang},
                 errHide: true,
                 method: "post",
@@ -690,7 +645,8 @@ QmiGlobal.module.ldapSetting = {
                     id: ssoAccount,
                     dn: QmiGlobal.device,
                     pw: password,
-                    ci: thisSsoCi
+                    ci: ssoData.ci,
+                    cdi: ssoData.cdi
                 }
             }).done(function(rspData) {
                 try {
@@ -714,7 +670,8 @@ QmiGlobal.module.ldapSetting = {
                 body: {
                     id: ssoAccount,
                     key: step2Data.key,
-                    ci: thisSsoCi
+                    ci: ssoData.ci,
+                    cdi: ssoData.cdi
                 }
             }).done(function(rspData) {
                 try {
@@ -771,12 +728,12 @@ QmiGlobal.module.ldapSetting = {
         var msgShowDef = $.Deferred();
 
         var self = this, ldapCi;
-        // 判斷帳號是否存在ldapClouds中
-        Object.keys(QmiGlobal.ldapClouds).forEach(function(thisCi) {
-            if(QmiGlobal.ldapClouds[thisCi].id === self.inputAccount) ldapCi = thisCi;
+        // 判斷帳號是否存在ldapCompanies中
+        Object.keys(QmiGlobal.ldapCompanies).forEach(function(thisCi) {
+            if(QmiGlobal.ldapCompanies[thisCi].id === self.inputAccount) ldapCi = thisCi;
         });
 
-        var ldapData = QmiGlobal.ldapClouds[ldapCi];
+        var ldapData = QmiGlobal.ldapCompanies[ldapCi];
 
         self.view.addClass("cover");
 
@@ -793,8 +750,8 @@ QmiGlobal.module.ldapSetting = {
         }).success(function(authObj) {
             console.log("success", authObj);
             // 設定新at , et
-            QmiGlobal.clouds[ldapData.ci].at = authObj.at;
-            QmiGlobal.clouds[ldapData.ci].et = authObj.et;
+            QmiGlobal.companies[ldapData.ci].at = authObj.at;
+            QmiGlobal.companies[ldapData.ci].et = authObj.et;
 
             QmiGlobal.module.reAuthUILock.unlock(ldapData);
 
@@ -828,14 +785,14 @@ QmiGlobal.module.ldapSetting = {
 
     delete: function() {
         var self = this, ldapCi;
-        // 判斷帳號是否存在ldapClouds中
+        // 判斷帳號是否存在ldapCompanies中
         if(QmiGlobal.auth.isSso) {
-            var ldapData = QmiGlobal.clouds[Object.keys(QmiGlobal.clouds)[0]];
+            var ldapData = QmiGlobal.companies[Object.keys(QmiGlobal.companies)[0]];
         } else {
-            Object.keys(QmiGlobal.ldapClouds).forEach(function(thisCi) {
-                if(QmiGlobal.ldapClouds[thisCi].id === self.inputAccount) ldapCi = thisCi;
+            Object.keys(QmiGlobal.ldapCompanies).forEach(function(thisCi) {
+                if(QmiGlobal.ldapCompanies[thisCi].id === self.inputAccount) ldapCi = thisCi;
             });
-            var ldapData = QmiGlobal.ldapClouds[ldapCi];
+            var ldapData = QmiGlobal.ldapCompanies[ldapCi];
         }
             
         // if(ldapCi === undefined) {
@@ -862,7 +819,8 @@ QmiGlobal.module.ldapSetting = {
                     self.inputAccount.substring(0,16)
                 ),
                 dn: QmiGlobal.device,
-                ci: ldapData.ci
+                ci: ldapData.ci,
+                cdi: ldapData.cdi
             }
         }).success(function(rspObj) {
             msgShowDef.done(function(){
