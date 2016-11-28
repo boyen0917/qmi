@@ -1556,6 +1556,7 @@ body {
 
 .newChatDetail-content{
 	min-height: 20px;
+	background-color: white;
 }
 
 .newChatDetail-content .row{
