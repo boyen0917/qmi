@@ -247,6 +247,8 @@ var timeline_detail_exception = [
 
 
 window.QmiGlobal = {
+// !!!!! 測試 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	
+	pollingOff: true,
 	// 之後取代 ui, at, gi, ... etc
 	currentGi: "",
 
@@ -410,50 +412,37 @@ window.QmiAjax = function(args){
 			ajaxDeferred.reject(chk.data);
 			return;
 		}
+
 		// 有經過reAuth 更新headers
 		// setHeaders: outerArgs,companyData
 		newArgs.headers = self.setHeaders(args, companyData);
 
 		// 執行
-		$.ajax(newArgs).complete(function(apiData){
+		$.ajax(newArgs).complete(function(rspData){
 			// deferred chain -> 這邊可以省略 也可精簡 之後做 用一個deferred做reauth跟重新執行ajax
 			// 1. 判斷是否reAuth
 			// 2. reAuth之後重做原本的ajax
 			// 3. 回到原本ajax的判斷
+
 			(function(){
-				// 1. 判斷是否reAuth
-				var rspCode = function(){
-						try {
-							return JSON.parse(apiData.responseText).rsp_code;
-						} catch(e) {
-							return 999; // unexpected syntax, parse error
-						}
-					}(),
-					reAuthDefChain = MyDeferred();
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!! 測試 !!!!!!!!!!!!!!!!!!!!!!!!
+				if(window.testAuth) rspData.status = 401;
 
-				// 601: 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
-				// 603: 私雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新拉取/groups取的新的key進行私雲驗證登入
-				// 604: 私雲Token錯誤, 請重新拉取/groups取的新的key進行私雲驗證登入
-				// 605: 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
-				// 606: 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
-
+				var reAuthDefChain = MyDeferred();
 				// reAuth: token過期
-				if( apiData.status === 401
-					&& rspCode !== 602
+				if( rspData.status === 401
 					&& args.noAuth !== true
 				) {
-
 					// 執行前 先看reAuth lock沒
 					$.when(QmiGlobal.reAuthLockDef).done(function(){
-						self.reAuth(companyData, rspCode).done(reAuthDefChain.resolve);
+						self.reAuth(companyData, rspData).done(reAuthDefChain.resolve);
 					});
-
 
 				} else {
 					reAuthDefChain.resolve({
 						isReAuth: false,
 						isSuccess: true,
-						data: apiData
+						data: rspData
 					});
 				}
 
@@ -484,6 +473,9 @@ window.QmiAjax = function(args){
 				} else {
 					// auth 再度發生錯誤 就傳入self.reAuth的錯誤內容
 					reAuthDefChain.resolve(resultObj);
+
+					// auth 再度發生錯誤 關閉company所屬團體的ui
+					if(companyData) QmiGlobal.module.reAuthUILock.lock(companyData);
 				}
 
 				return reAuthDefChain;
@@ -646,7 +638,7 @@ QmiAjax.prototype = {
 		return deferred.promise();
 	},
 
-	reAuth: function(companyData, rspCode){
+	reAuth: function(companyData, rspData){
 		var self = this,
 			deferred = $.Deferred();
 
@@ -667,70 +659,113 @@ QmiAjax.prototype = {
 		// if(QmiGlobal.reAuthLockDef.then instanceof Function) QmiGlobal.reAuthLockDef.resolve();
 		QmiGlobal.reAuthLockDef = $.Deferred();
 
-		// 需要輸入密碼
-		if((companyData || {}).tp === 1) {
-			// console.log("此私雲需要輸入密碼");
-			// 把這私雲的所有團體 加上lock
-			QmiGlobal.module.reAuthUILock.lock(companyData);
-
-			QmiGlobal.module.reAuthManually.init({
-				reAuthDef: deferred,
-				companyData: companyData
-			});
-
-		} else {
-			// 如果有帶rspCode 表示et沒過期 打了api卻回傳401
-			self.doAuth(companyData, rspCode).done(deferred.resolve);
-
-		}
+		// 如果有帶rspData 表示et沒過期 打了api卻回傳401
+		self.doAuth(companyData, rspData).done(deferred.resolve);
 
 		// reAuth結束
 		deferred.done(QmiGlobal.reAuthLockDef.resolve)
 		return deferred.promise();
 	},
 
-	doAuth: function(companyData, rspCode) {
+	doAuth: function(companyData, rspData) {
 		var self = this;
 		var deferred = $.Deferred();
-		
+
+		var rspCode = function() {
+			try {
+				return JSON.parse(rspData.responseText).rsp_code;
+			} catch(e) {
+				return {rsp_code: 999, rsp_msg: "parse error"};
+			}
+		}();
+
+
+// !!!!!!!!!!!!!!! 測試 !!!!!!!!!!!!!!!!!
+		rspCode = window.testAuth || rspCode;		
 		// 601: 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
+		// 602: 公雲Token錯誤, 根據之前的流程, 將強制登入app
 		// 603: 私雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新拉取/groups取的新的key進行私雲驗證登入
 		// 604: 私雲Token錯誤, 請重新拉取/groups取的新的key進行私雲驗證登入
 		// 605: 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 		// 606: 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 
 		switch(rspCode) {
-			case 601:
-				QmiGlobal.module.reAuthUILock.lock(companyData);
+			case 601: // 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
+				authUpdate();
 				break;
-			case 603:
-				QmiGlobal.module.reAuthUILock.lock(companyData);
+			case 602: // 公雲Token錯誤, 根據之前的流程, 將強制登入app
+				deferred.resolve({
+                	isSuccess: false,
+                	data: rspData,
+	        		isReAuth: true
+                });
+				break;
+			case 603: // 私雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新拉取/groups取的新的key進行私雲驗證登入
+				authUpdate();
 				break;
 			case 604: // token 驗證失敗 一般私雲重新取key 做cert
-				getCompanyKey({ il: [{
-                    cdi: companyData.cdi,
-                    ci: companyData.ci,
-                    ui: companyData.ui
-                }]}).done(function(rspObj){
-                    if(rspObj.isSuccess === true) {
-                    	companyData.key = rspObj.key;
-                        getCompanyToken(companyData,true).done(deferred.resolve);
-                    } else deferred.resolve({
-                    	isSuccess: false,
-                    	data: rspObj,
-		        		isReAuth: true
-                    });
-                })
+				authCompanyKey();
 				break;
-			case 605:
-				QmiGlobal.module.reAuthUILock.lock(companyData);
+			case 605: // 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+				authUpdate();
 				break;
-			case 606:
-				QmiGlobal.module.reAuthUILock.lock(companyData);
+			case 606: // 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+				authUpdate();
 				break;
 			default:
-				self.autoUpdateAuth(companyData).done(deferred.resolve);
+				// 沒帶rspCode 表示是expire time過期
+				authUpdate();
 		}
+
+		function authUpdate() {
+			// 需要輸入密碼
+			if((companyData || {}).tp === 1) 
+				authUpdateManually();
+			else 
+				authUpdateAutomatically();
+			
+		}
+
+		function authUpdateAutomatically() { 
+			self.autoUpdateAuth(companyData).done(deferred.resolve);
+		}
+
+		function authUpdateManually() { 
+			// 這情況最有可能就是tp=0 但後台已經將強制驗證選項設為1了
+			companyData.tp = 1;
+
+			QmiGlobal.module.reAuthUILock.lock(companyData);
+
+			QmiGlobal.module.reAuthManually.init({
+				reAuthDef: deferred,
+				companyData: companyData
+			});
+		}
+
+		function authCompanyKey() {
+			getCompanyKey({ il: [{
+                cdi: companyData.cdi,
+                ci: companyData.ci,
+                ui: companyData.ui
+            }]}).done(function(rspObj){
+                if(rspObj.isSuccess === true) {
+                	companyData.key = rspObj.key;
+                    getCompanyToken(companyData,true).done(function(isSuccess) {
+                    	deferred.resolve({
+                    		isSuccess: isSuccess,
+			        		isReAuth: true
+                    	})
+                    });
+                } else deferred.resolve({
+                	isSuccess: false,
+                	data: rspObj,
+                	msg: "get company's token fail",
+	        		isReAuth: true
+                });
+            })
+		}
+
+		return deferred.promise();
 	},
 
 
@@ -741,7 +776,7 @@ QmiAjax.prototype = {
 		$.ajax({
 		    url: (function(){
 				if(companyData === undefined) {
-					return base_url + "auth";
+					return base_url + "apiv1/auth";
 				} else {
 					return "https://" + companyData.cl + "/apiv1/auth";
 				}
