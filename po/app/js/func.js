@@ -137,6 +137,9 @@ getMeInvite = function(){
                     var tempDeferred = $.Deferred();
                     companyTokenInvDefArr[i] = $.Deferred();
 
+                    // 邀請函回來的一定要cert 幫他加入ctp 1
+                    item.ctp = 1;
+
                     // 沒有存過的ci 才去取token
                     if(QmiGlobal.companies.hasOwnProperty(item.ci) === false)
                         getCompanyToken(item).done(tempDeferred.resolve);
@@ -192,7 +195,7 @@ getMeInvite = function(){
                         inviteDom._i18n();
                         inviteDom.data("invite-data",item);
                         inviteDom.find(".gmi-div-data div:eq(0)").html( $.i18n.getString("GROUP_GROUP_INVITATION", "<span>"+item.gn._escape()+"</span>") );
-                        inviteDom.find(".gmi-div-data div:eq(1)").html( $.i18n.getString("GROUP_MEMBERS", "<span>"+item.cnt._escape()+"</sapn>") );
+                        inviteDom.find(".gmi-div-data div:eq(1)").html( $.i18n.getString("GROUP_MEMBERS", "<span>"+item.cnt+"</sapn>") );
 
                         if(item.aut){
                             inviteDom.find(".gmi-div-avatar .aut").attr("src",item.aut);

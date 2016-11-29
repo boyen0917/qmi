@@ -35,7 +35,7 @@ var base_url = function() {
 	}
 }();
 
-base_url = "https://qmi15.mitake.com.tw/";
+// base_url = "https://qmi15.mitake.com.tw/";
 
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {
@@ -247,8 +247,6 @@ var timeline_detail_exception = [
 
 
 window.QmiGlobal = {
-// !!!!! 測試 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	
-	pollingOff: true,
 	// 之後取代 ui, at, gi, ... etc
 	currentGi: "",
 
@@ -425,8 +423,6 @@ window.QmiAjax = function(args){
 			// 3. 回到原本ajax的判斷
 
 			(function(){
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!! 測試 !!!!!!!!!!!!!!!!!!!!!!!!
-				if(window.testAuth) rspData.status = 401;
 
 				var reAuthDefChain = MyDeferred();
 				// reAuth: token過期
@@ -680,8 +676,6 @@ QmiAjax.prototype = {
 		}();
 
 
-// !!!!!!!!!!!!!!! 測試 !!!!!!!!!!!!!!!!!
-		rspCode = window.testAuth || rspCode;		
 		// 601: 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
 		// 602: 公雲Token錯誤, 根據之前的流程, 將強制登入app
 		// 603: 私雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新拉取/groups取的新的key進行私雲驗證登入
@@ -1431,9 +1425,10 @@ $(document).on("click", "#container_version", function() {
 		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
 		cnts++;
 		if(cnts < 5) return;
-		if(prompt('輸入密碼') === "86136982") QmiGlobal.module.serverSelector.init();
-		else alert("錯誤");}
-}());
+		var promt = prompt('輸入密碼');
+		if( promt === "86136982") QmiGlobal.module.serverSelector.init();
+		else return;
+}}());
 
 
 //上一頁功能
