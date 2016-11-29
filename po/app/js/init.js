@@ -1375,14 +1375,12 @@ QmiGlobal.module.serverSelector = {
 
 				$("#module-server-selector-url").html(newUrl);
 
-				newUrl += "/apiv1/";
+				newUrl += "/";
 				base_url = newUrl;
 				if(newUrl === default_url) {
-					console.log("456");
 					$("#module-server-selector-url").html("");
 					localStorage.removeItem("_selectedServerUrl");
 				} else {
-					console.log("123");
 					$.lStorage("_selectedServerUrl", newUrl);
 				}
 

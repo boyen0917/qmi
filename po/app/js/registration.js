@@ -341,7 +341,6 @@ onCheckVersionDone = function(needUpdate){
 
         	loginDef.done(function(rspData) {
         		
-        		console.log("yo", rspData);
         		if(rspData.isSuccess === false) {
         			$("#page-registration .login").removeClass("login-waiting");	
         			return;
@@ -387,7 +386,13 @@ onCheckVersionDone = function(needUpdate){
         userInfoGetting();
        
         //附上group list
-        getGroupList().done(function(groupList){
+        getGroupList().done(function(rspData){
+        	if(rspData.isSuccess === false) {
+        		deferred.reject(rspData)
+        		return;
+        	}
+
+        	var groupList = rspData.gl;
         	var specifiedGi = QmiGlobal.auth.dgi;
         	if($.lStorage("groupChat")){
         		groupChat = $.lStorage("groupChat");
@@ -470,6 +475,8 @@ onCheckVersionDone = function(needUpdate){
 				//設定目前團體 執行polling()
 				setGroupInitial(data.dgi).done(polling);
 			}
+        }).fail(function(errData) {
+        	$("#page-registration .login").removeClass("login-waiting");
         });
     }
 

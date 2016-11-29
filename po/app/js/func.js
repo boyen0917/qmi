@@ -7532,8 +7532,10 @@ getGroupList = function(){
             if(allGroupList.length > 0)
                 groupListToLStorage(allGroupList);
 
-            groupsDeferred.resolve(allGroupList);
+            groupsDeferred.resolve({isSuccess: true, gl: allGroupList});
         });
+    }).error(function(rspData) {
+        groupsDeferred.resolve({isSuccess: false, data: rspData});
     })
 
     return groupsDeferred.promise();
