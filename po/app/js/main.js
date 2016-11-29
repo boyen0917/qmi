@@ -649,8 +649,8 @@ $(function(){
 			stickerArea.hide();
 			stickerIcon.attr("src", "images/chatroom/chat_textbar_icon_emoticon.png");
 		} else {
-			if( true!=stickerArea.data("isCreate") ){
-				stickerArea.data("isCreate", true);
+			// if( true!=stickerArea.data("isCreate") ){
+			// 	stickerArea.data("isCreate", true);
 				initStickerArea.init(stickerArea, function(id){
 					//on sitcker selected
 					cns.debug(id);
@@ -668,7 +668,7 @@ $(function(){
 					});
 					cns.debug("1");
 				});
-			}
+			// }
 
 			$('.st-reply-message-sticker[data-open="t"]').trigger("click");
 			stickerIcon.attr("data-open", "t");

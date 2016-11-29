@@ -36,6 +36,12 @@
     border: 1px solid rgba(170, 170, 170, 0.59)
 }
 
+#StickerStoreModal ul li.disabled {
+    background: rgba(208, 208, 208, 0.38);
+    color: rgba(128, 128, 128, 0.61);
+    pointer-events: none;
+}
+
 #StickerStoreModal ul li.active {
     background: rgb(57, 148, 232);
     color: white;
@@ -59,26 +65,32 @@
     width: 200px;
     float: right;
     padding-right: 20px;
+    padding-bottom: 5px;
     text-align: right;
-    margin-top: 10px;
+    margin-top: 5px;
     cursor: pointer;
+    color: black;
+    font-size: 14px;
     display: none;
 }
 
 #StickerStoreModal .edit-status {
-    width: 200px;
+    width: 90px;
     float: right;
+    margin-top: 5px; 
+    padding-bottom: 5px;
+    font-size :  14px;
     display: none;
 }
 
-#StickerStoreModal .edit-sort{
-    width: 200px;
-    float: right;
-    padding-right: 20px;
-    text-align: right;
-    margin-top: 10px;
+#StickerStoreModal .edit-status button{
+    background-color: transparent;
+    border: 0px;
     cursor: pointer;
-    display: none;
+}
+
+#StickerStoreModal .edit-status button.cancel{
+    color: rgb(128, 128, 128);
 }
 
 #StickerStoreModal .page-home{
@@ -102,10 +114,10 @@
     border-right: 1px solid rgba(128, 128, 128, 0.6);
 }
 
-#StickerStoreModal .sticker-package-block:active{
+/*#StickerStoreModal .sticker-package-block:active{
     background-color: rgba(128, 128, 128, 0.6);
 }
-
+*/
 #StickerStoreModal .sticker-package-block .intro{
     display: inline-block;
     margin-left: 3px;
@@ -242,6 +254,17 @@
 #StickerStoreModal .main-sticker button.download{
     color: rgb(230,230,230);
     background-color: rgb(57, 148, 232);
+    cursor: pointer;
+}
+
+#StickerStoreModal .main-sticker button.download-done{
+    background: white;
+    color: grey;
+}
+
+#StickerStoreModal .main-sticker button.remove{
+    background: rgba(243, 30, 30, 0.55);
+    color: #e0e0e0;
     cursor: pointer;
 }
 
