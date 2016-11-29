@@ -6385,7 +6385,7 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
         // showGallery(this_ti, gallery_arr, targetImgIndex, isApplyWatermark, watermarkText);
 
         new QmiGlobal.gallery({
-            gi: gi,
+            gi: this_gi,
             photoList: gallery_arr,
             currentImage : targetImgIndex,
             isApplyWatermark : isApplyWatermark,
@@ -8674,8 +8674,7 @@ updateAddressbookFavoriteStatusApi = function( this_gi, al, dl ){
 }
 
 eventDetailShow = function(thisEi){
-    var this_gi = thisEi.split("_")[0],
-        deferred = $.Deferred();
+    var deferred = $.Deferred();
 
     $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
         var thisEvent = $(this).find(".st-sub-box");
