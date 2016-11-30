@@ -202,7 +202,7 @@ onCheckVersionDone = function(needUpdate){
 			var emailInput = $(".login-ld-email input");
 			var email = emailInput.val();
 			if( email && email.length>3 ){
-				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,'');
+				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,5}$/,'');
 				
 				if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
 					$("#page-registration .login").addClass("login-ready");
@@ -533,7 +533,6 @@ onCheckVersionDone = function(needUpdate){
 	            }
 	        }).done(function(data){
 	        	var dataObj = JSON.parse(data.responseText);
-	        	console.log("cert done", dataObj);
 	        	QmiGlobal.auth.ui = dataObj.ui;
 	        	QmiGlobal.auth.at = dataObj.at;
 	        	QmiGlobal.auth.et = dataObj.et;

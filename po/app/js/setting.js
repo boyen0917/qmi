@@ -107,6 +107,8 @@ $(document).ready( function(){
 	    e.stopPropagation();
 	        
 	    $(".ga-avatar input")[0].files = e.originalEvent.dataTransfer.files;
+	});
+
 	
 });
 
@@ -425,50 +427,12 @@ function showGroupInfoPage(){
 	});
 
 	
-	//admin
-	// var view = $(".ga-info.view");
-	// view.show();
-	// $(".ga-info.edit").hide();
-
-	// if( isAdmin ){
-	// 	view.addClass("admin");
-	// 	$(".ga-avatar").addClass("admin");
-	// 	$(".subpage-groupAbout .admin").show();
-	// 	$(".subpage-groupAbout .general").hide();
-	// 	$(".ga-header-bar").removeClass("bgColor");
-
-	// 	$(".ga-info.edit .ga-info-row[data-type='name'] .content").val( groupName );
-	// 	$(".ga-info.edit .ga-info-row[data-type='info'] .content").val( groupDescription );
-	// } else {
-	// 	view.removeClass("admin");
-	// 	$(".ga-avatar").removeClass("admin");
-	// 	$(".subpage-groupAbout .admin").hide();
-	// 	$(".subpage-groupAbout .general").show();
-	// 	$(".ga-header-bar").addClass("bgColor");
-	// }
 	if(groupImg){
 		$(".ga-avatar-img").attr("src",groupImg);
 	} else{
 		$(".ga-avatar-img").attr("src","images/common/others/name_card_nophoto_profile.png");
 	}
 
-	// if( groupImg ){
-	// 	if( $(".ga-avatar-img.groupImg").attr("src")!=groupImg ){
-	// 		$(".ga-avatar-img.default").hide();
-	// 		$(".ga-avatar-img.groupImg").show();
-	// 	} else {
-	// 		$(".ga-avatar-img.default").show();
-	// 		$(".ga-avatar-img.groupImg").hide();
-	// 		$(".ga-avatar-img.groupImg").off("load").load( function(){
-	// 			$(".ga-avatar-img.default").fadeOut();
-	// 			$(this).fadeIn();
-	// 		});
-	// 		$(".ga-avatar-img.groupImg").attr("src",groupImg);
-	// 	}
-	// } else {
-	// 	$(".ga-avatar-img.default").show();
-	// 	$(".ga-avatar-img.groupImg").hide();
-	// }
 
 	// if( $(".subpage-groupSetting").is(":visible") ){
 		$(".subpage-groupAbout").css("margin-left","100%");
@@ -496,119 +460,14 @@ function showGroupInfoPage(){
 		} else if( $(".subpage-groupSetting").is(":visible") ){
 			$(".subpage-groupAbout").data("lastPage", ".subpage-groupSetting");
 		}
-	// }
-    // $(".subpage-contact").fadeOut();
-    // $(".subpage-timeline").fadeOut();
-    // $(".subpage-chatList").fadeOut();
-    // $(".subpage-album").fadeOut();
-
-	//reset
-	// var img = $(".ga-avatar-img");
-	// img.filter(".upload").hide();
-	// img.filter(".currentGroup").show();
-	// resetGroupInfo();
 }
 
-// function resetGroupInfo(){
-
-// 	$(".ga-header-done").removeClass("ready");
-// 	var input = $(".ga-avatar input");
-// 	input.replaceWith( input.clone(true) );
-// 	// $(".ga-avatar-img.currentGroup").show();
-
-// 	var info = $(".ga-info");
-// 	var contents = info.filter(".edit .ga-info-row .content");
-// 	$.each( contents, function(i,dom){
-// 		var domTmp = $(dom);
-// 		domTmp.data("oriText", domTmp.val() );
-// 	});
-
-// 	info.filter(".view").show();
-// 	info.filter(".edit").hide();
-
-// }
-
-// function checkGroupInfoChange(){
-// 	if( $(".ga-avatar input").hasClass("ready") 
-// 		|| $(".ga-info.edit .ga-info-row .content.ready").length>0 ){
-// 		$(".ga-header-done").addClass("ready");
-// 	} else {
-// 		$(".ga-header-done").removeClass("ready");
-// 	}
-// }
-
-
-// 需要defer改寫
-// function requestUpdateGroupInfo( this_gi, newGn, newGd, file, callback){
-	
-// 	var isReady = false;
-// 	//如果更新資料
-// 	if( null!=newGn || null!=newGd ){
-// 		getUpdateGroupInfoApi(this_gi, newGn, newGd).complete(function(data){
-// 	    	if(data.status == 200){
-// 	    		if( isReady ){
-// 	    			getGroupComboInit( this_gi ).done( function(){
-// 	    				updateGroupAllInfoDom( this_gi );
-// 		    			if(callback) callback();
-// 		    			s_load_show = false;
-// 		    		});
-// 	    		}
-// 	    		isReady = true;
-// 	    	}
-// 	    });
-// 	} else isReady = true;
-
-//     //如果更新頭像
-//     if( file ){
-// 		var ori_arr = [1280,1280,0.7];
-// 		var tmb_arr = [120,120,0.6];
-
-// 	    var api_name = "groups/" + this_gi + "/avatar"
-
-// 	    uploadToS3(file,api_name,ori_arr,tmb_arr,function(chk){
-// 	    	if(!chk) {
-// 	    		toastShow( $.i18n.getString("GROUP_AVATAR_UPLOAD_ALERT") ); //團體頭像上傳失敗
-// 	    	}
-
-// 	    	if( isReady ){
-// 				var img = $(".ga-avatar-img");
-// 				img.filter(".currentGroup").load(function(){
-// 					$(this).show().off("load");
-// 					img.filter(".upload").hide();
-// 				});
-// 	    		getGroupComboInit( this_gi ).done( function(){
-// 	    			updateGroupAllInfoDom( this_gi );
-// 	    			if(callback) callback();
-// 	    			s_load_show = false;
-// 	    		});
-// 	    	}
-// 	    	isReady = true;
-// 	    });
-//     } else isReady = true;
-// }
 
 function getUpdateGroupInfoApi( this_gi, newGn, newGd ){
-	//PUT /groups/{gi}{?tp} 
-	//tp=??
-	//{
-	//   "gn": "四竹資訊",
-	//   "gd": "這是一個敘述"
-	// }
-
-	// var api_name = "groups/"+this_gi;
-	// var headers = {
-	//         ui: ui,
-	//         at: at,
-	//         li: lang
-	//              };
-	// var method = "put";
-	// var body = {};
-	// if( newGn ) body.gn = newGn;
-	// if( newGd ) body.gd = newGd;
+	
 	var body = {};
 	if( newGn )	body.gn = newGn;
 	if( newGd )	body.gd = newGd;
-	// return ajaxDo(api_name,headers,method,true,body);
 	new QmiAjax({
 		apiName: "groups/" + this_gi,
 		type: "put",

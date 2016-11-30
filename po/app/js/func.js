@@ -7588,6 +7588,11 @@ getCompanyToken = function(companyData,isReDo){
 
     // ctp為 是否需要做cert 的判斷 1是要 0是不要 -> 公雲的company不需要cert
     if(companyData.ctp !== 1) {
+        // 與公雲相同
+        companyData.nowAt = QmiGlobal.auth.at;
+        companyData.et = 9999999999999;
+        QmiGlobal.companies[companyData.ci] = companyData;
+
         deferred.resolve(true);
     } else if(companyData.ctp === undefined) {
         deferred.resolve(false);   
@@ -7613,8 +7618,6 @@ getCompanyToken = function(companyData,isReDo){
             },
             success: function(apiData){
 
-                cns.debug("success",apiData);
-
                 // http status 200:
                 // rsp code 406 為驗證的 Key 被串改…
                 // rsp code 401 為驗證的內容與請求者不符
@@ -7623,7 +7626,7 @@ getCompanyToken = function(companyData,isReDo){
 
                     case 200: //成功 繼續下一步
                         // 存入 QmiGlobal.companies
-                        QmiGlobal.companies[companyData.ci] = companyData;
+                        QmiGlobal.companies[companyData.ci] = companyData.data;
 
                         // 設定這次的私雲token
                         QmiGlobal.companies[companyData.ci].nowAt = apiData.at;
@@ -7844,7 +7847,7 @@ companyLoad = function(loadData){
 }
 
 
-polling = function(){
+polling = function(){ 
 
     // 計算重新讀取頁面的時間
     if($.lStorage("_periodicallyReloadTimer") === false) {
@@ -8518,29 +8521,37 @@ pollingCmds = function(newPollingData){
     return allCmdsDoneDeferred.promise();
 
 
-
     function cmdsArrangement() {
         var arrangementDef = $.Deferred();
         var groupListUpdateFlag = false; // tp 4,11 表示有新的gi 就先做groups
 
         // cmds 分組 需要取最後一個 其餘捨棄
         var cmdsClassifyArr = [
-            [53, 56], //company加入退出
-            [57]
+            {tp: [53, 56], temp: {}}, //company加入退出
+            {tp: [57], temp: {}} // company更改驗證tp
         ];
         var companyTmpArr = []; // 53, 56取最後一個就好
-
         
-        newPollingData.cmds.forEach(function(item, i) {
+        newPollingData.cmds.forEach(function(item, i, pArr) {
             item.pm = item.pm || {};
 
             // tp11 是新團體 或 gi不在 現有列表中 就要統一做一次取得團體列表
             if( item.tp === 11 || !QmiGlobal.groups[(item.pm || {}).gi] )
                 groupListUpdateFlag = true;
 
-            // 更新 company加入退出狀態 tp 53,56
-            cmdsSorting(item, i);
-        })
+            cmdsClassifyArr.forEach(function(ccObj) {
+                ccObj.tp.forEach(function(cctp) {
+                    if(item.tp !== cctp) return;
+
+                    pArr.splice(i, 1);
+                    ccObj.temp = (ccObj.temp.ct || 0) > item.ct ? ccObj.temp : item;
+                })
+            });
+        });
+
+        cmdsClassifyArr.forEach(function(ccObj) {
+            newPollingData.cmds.push(ccObj.temp);
+        });
         
         if(newPollingData.cmds.length > 0)
             newPollingData.cmds[newPollingData.cmds.length] = companyTmpObj; 
@@ -8551,15 +8562,6 @@ pollingCmds = function(newPollingData){
             arrangementDef.resolve();
 
         return arrangementDef.promise();
-    }
-
-    function companySort(item, i) {
-        if(item.tp !== 53 || item.tp !== 56) return;
-
-        // 砍掉 最後再加回去
-        newPollingData.cmds.splice(i, 1);
-        
-        if(companyTmpObj) companyTmpObj = companyTmpObj.ct > item.ct ? companyTmpObj : item;
     }
 }
 
