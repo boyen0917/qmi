@@ -107,52 +107,6 @@ $(document).ready( function(){
 	    e.stopPropagation();
 	        
 	    $(".ga-avatar input")[0].files = e.originalEvent.dataTransfer.files;
-	});
-
-	//--------------- group name & description ---------
-	// $(document).on("input",".ga-info.edit .ga-info-row .content",function(e){
-	// 	var content = $(this);
-	// 	if( content.val() 
-	// 		&& content.val().length>0 
-	// 		&& content.data("oriText") != content.val() ){
-	// 		content.addClass("ready");
-	// 	} else {
-	// 		content.removeClass("ready");
-	// 	}
-	// 	checkGroupInfoChange();
-	// });
-	// $(document).on("keydown keyup",".ga-info.edit .ga-info-row .autoHeight",function(e){
-	// 	$(this).height('0px').height($(this).prop("scrollHeight")+"px");
-	// });
-
-	//---------- on done ---------------
-	// $(document).on("click",".ga-header-done.ready", function(e){
-	// 	var edit = $(".ga-info.edit");
-	// 	var newGn = null;
-	// 	var newGd = null;
-	// 	var updateDom = edit.find(".ga-info-row .content");
-	// 	$.each( updateDom, function(i,domTmp){
-	// 		var dom = $(domTmp);
-	// 		var type = dom.parent().data("type");
-	// 		switch( type ){
-	// 			case "name":
-	// 				if(dom.hasClass("ready")) newGn = dom.val();
-	// 				else newGn = dom.data("oriText");
-	// 				break;
-	// 			case "info":
-	// 				if(dom.hasClass("ready")) newGd = dom.val();
-	// 				else newGd = dom.data("oriText");
-	// 				break;
-	// 		}
-	// 	});
-	// 	var file = null;
-	// 	var input = $(".ga-avatar input.ready");
-	// 	if( input.length> 0 ){
-	// 		file = input[0].files[0];
-	// 	}
-	// 	requestUpdateGroupInfo( gi, newGn, newGd, file, resetGroupInfo );
-	// });
-
 	
 });
 
@@ -167,10 +121,6 @@ $(document).ready( function(){
 */
 
 function requestLeaveGroup( this_gi, this_gu, callback ){
-	// PUT /groups/{gi}/users/{gu}/status
-	// {
-	//   "st": 1 // 1(正常)、2(已退出)
-	// }
 	var api_name = "groups/"+this_gi+"/users/"+this_gu+"/status";
     var headers = {
             ui: ui,

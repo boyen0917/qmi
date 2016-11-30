@@ -8181,50 +8181,29 @@ pollingCountsWrite = function(pollingData){
 
 //polling 事件 newPollingData
 pollingCmds = function(newPollingData){
-    var 
-    newCmdsArr = [],
-    user_info_arr = [],// 存tp4,5,6
-    branch_info_arr = [],
-    isUpdateMemPage = false,
-    onGetMemDataCallback = null,
-    comboDeferredPoolArr = [],
-    pollingDeferredPoolArr = [
-        $.Deferred(),   // tp4,5,6 更新成員資訊
-        $.Deferred()    // branchlist 更新
-    ],
+    var newCmdsArr = [],
+        user_info_arr = [],// 存tp4,5,6
+        branch_info_arr = [],
+        isUpdateMemPage = false,
+        onGetMemDataCallback = null,
+        comboDeferredPoolArr = [],
+        pollingDeferredPoolArr = [
+            $.Deferred(),   // tp4,5,6 更新成員資訊
+            $.Deferred()    // branchlist 更新
+        ],
 
-    allCmdsDoneDeferred = $.Deferred(),
+        allCmdsDoneDeferred = $.Deferred(),
 
-    groupListUpdateFlag = false; // tp 4,11 表示有新的gi 就先做groups
 
-    // 是否先取得團體列表的deferred
-    var groupListDeferred = $.Deferred();
+        // 是否先取得團體列表的deferred
+        groupListDeferred = $.Deferred();
 
-    // tp11 是新團體 或 gi不在 現有列表中 就要統一做一次取得團體列表
-    for( var i = 0 ; i < newPollingData.cmds.length ; i++ ) {
-        var item =  newPollingData.cmds[i];
-        item.pm = item.pm || {};
 
-        if( 
-            item.tp === 11 
-            || (item.pm.gi !== undefined && QmiGlobal.groups[item.pm.gi] === undefined) 
-        ) {
-            groupListUpdateFlag = true;
-            break;
-        }
-    }
 
-    if( groupListUpdateFlag === true ) {
-        groupMenuListArea().done( groupListDeferred.resolve );
-    } else {
-        groupListDeferred.resolve();
-    }
-
-    // combo、groupList 處理完 -> 因為selectbox include的 jquery 1.7.2 導致鏈的deferred不能用
-    groupListDeferred.done(function(){
+    cmdsArrangement().done(function(){
 
         // 需要打combo的情況
-        newPollingData.cmds.forEach(function(item,i){ // 後面有 bind([]) 用this來判斷是否重複
+        newPollingData.cmds.forEach(function(item, i, arr){ // 後面有 bind([]) 用this來判斷是否重複
 
             var 
             comboDeferred = $.Deferred();
@@ -8537,6 +8516,51 @@ pollingCmds = function(newPollingData){
     })
 
     return allCmdsDoneDeferred.promise();
+
+
+
+    function cmdsArrangement() {
+        var arrangementDef = $.Deferred();
+        var groupListUpdateFlag = false; // tp 4,11 表示有新的gi 就先做groups
+
+        // cmds 分組 需要取最後一個 其餘捨棄
+        var cmdsClassifyArr = [
+            [53, 56], //company加入退出
+            [57]
+        ];
+        var companyTmpArr = []; // 53, 56取最後一個就好
+
+        
+        newPollingData.cmds.forEach(function(item, i) {
+            item.pm = item.pm || {};
+
+            // tp11 是新團體 或 gi不在 現有列表中 就要統一做一次取得團體列表
+            if( item.tp === 11 || !QmiGlobal.groups[(item.pm || {}).gi] )
+                groupListUpdateFlag = true;
+
+            // 更新 company加入退出狀態 tp 53,56
+            cmdsSorting(item, i);
+        })
+        
+        if(newPollingData.cmds.length > 0)
+            newPollingData.cmds[newPollingData.cmds.length] = companyTmpObj; 
+
+        if(groupListUpdateFlag) 
+            groupMenuListArea().done(arrangementDef.resolve);
+        else 
+            arrangementDef.resolve();
+
+        return arrangementDef.promise();
+    }
+
+    function companySort(item, i) {
+        if(item.tp !== 53 || item.tp !== 56) return;
+
+        // 砍掉 最後再加回去
+        newPollingData.cmds.splice(i, 1);
+        
+        if(companyTmpObj) companyTmpObj = companyTmpObj.ct > item.ct ? companyTmpObj : item;
+    }
 }
 
 pollingUpdate = function(newPollingData){
