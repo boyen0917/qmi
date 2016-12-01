@@ -2209,3 +2209,9 @@ zipVideoFile = function (videoObj) {
 	
     return transferBlobDef.promise();
 }
+
+function setPolling(ts) {
+	var pp = $.lStorage("_pollingData");
+	pp.ts.pt = ts;
+	$.lStorage("_pollingData", pp);
+};

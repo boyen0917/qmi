@@ -247,26 +247,22 @@ var timeline_detail_exception = [
 
 
 window.QmiGlobal = {
+
+	pollingOff: true,
+
 	// 之後取代 ui, at, gi, ... etc
 	currentGi: "",
 
-	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")),
+	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")) || navigator.userAgent,
 
 	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups
-
 	companies: {}, // 全部的company資料
 	companyGiMap: {},
-
 	cloudCompanyMap: {}, // ldap雲資訊
-
 	ldapCompanies: {}, // ldap雲資訊
-
 	windowListCiMap: {},
-
 	module: {}, // 模組
-
 	reAuthLockDef: {},
-
 	rspCode401: false,
 
 	// 聊天室 auth
@@ -375,6 +371,12 @@ window.QmiAjax = function(args){
 			type: (args.method  || args.type) || "get"
 		};
 	// end of var
+
+	// 判斷companyData ctp === 0 要替換公雲at給他
+	if((companyData || {}).ctp === 0) {
+		companyData.nowAt = QmiGlobal.auth.at;
+		companyData.et = 9999999999999;
+	}
 
 	// 不是get 再加入body
 	if(newArgs.type !== "get") newArgs.data = (typeof args.body === "string") ? args.body : JSON.stringify(args.body);
@@ -651,9 +653,9 @@ QmiAjax.prototype = {
 			}
 		} catch(e) {}// do nothing 
 
-		// reAuth Lock 設定前先解除之前的pending
-		// if(QmiGlobal.reAuthLockDef.then instanceof Function) QmiGlobal.reAuthLockDef.resolve();
-		QmiGlobal.reAuthLockDef = $.Deferred();
+		// reAuth Lock 如果已經是deferred 就不重新指定
+		if(!QmiGlobal.reAuthLockDef.then instanceof Function) 
+			QmiGlobal.reAuthLockDef = $.Deferred();
 
 		// 如果有帶rspData 表示et沒過期 打了api卻回傳401
 		self.doAuth(companyData, rspData).done(deferred.resolve);

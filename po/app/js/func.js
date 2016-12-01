@@ -7554,7 +7554,7 @@ getCompanyGroup = function(companyData,allGroupList) {
                 uui: ui,
                 uat: at,
                 ui: companyData.ui,
-                at: companyData.nowAt,
+                at: companyData.ctp === 0 ? QmiGlobal.auth.at : companyData.nowAt,
                 li: lang
             },
             type: "get"
@@ -7584,18 +7584,22 @@ getCompanyGroup = function(companyData,allGroupList) {
 
 // 這不要刪啊
 getCompanyToken = function(companyData,isReDo){
-    var deferred = $.Deferred();
+    QmiGlobal.reAuthLockDef = $.Deferred();
+
+    // 需要輸入密碼
+    if(companyData.tp === 1) {
+        QmiGlobal.module.reAuthUILock.lock(companyData);
+
+        QmiGlobal.module.reAuthManually.init({
+            reAuthDef: QmiGlobal.reAuthLockDef,
+            companyData: companyData
+        });
 
     // ctp為 是否需要做cert 的判斷 1是要 0是不要 -> 公雲的company不需要cert
-    if(companyData.ctp !== 1) {
-        // 與公雲相同
-        companyData.nowAt = QmiGlobal.auth.at;
-        companyData.et = 9999999999999;
-        QmiGlobal.companies[companyData.ci] = companyData;
-
-        deferred.resolve(true);
+    } else if(companyData.ctp !== 1) {
+        QmiGlobal.reAuthLockDef.resolve(true);
     } else if(companyData.ctp === undefined) {
-        deferred.resolve(false);   
+        QmiGlobal.reAuthLockDef.resolve(false);   
     } else {
         var tempKey = companyData.key;
 
@@ -7614,7 +7618,7 @@ getCompanyToken = function(companyData,isReDo){
             error: function(errData){
                 addCloudReLoadView(companyData);
 
-                deferred.resolve(false);
+                QmiGlobal.reAuthLockDef.resolve(false);
             },
             success: function(apiData){
 
@@ -7626,19 +7630,19 @@ getCompanyToken = function(companyData,isReDo){
 
                     case 200: //成功 繼續下一步
                         // 存入 QmiGlobal.companies
-                        QmiGlobal.companies[companyData.ci] = companyData.data;
+                        QmiGlobal.companies[companyData.ci] = companyData;
 
                         // 設定這次的私雲token
                         QmiGlobal.companies[companyData.ci].nowAt = apiData.at;
                         QmiGlobal.companies[companyData.ci].et = apiData.et;
 
-                        deferred.resolve(true);
+                        QmiGlobal.reAuthLockDef.resolve(true);
                         break;
 
                     case 418: // key 過期
                         // 已經重做過了 不再繼續
                         if(isReDo === true) {
-                            deferred.resolve(false);
+                            QmiGlobal.reAuthLockDef.resolve(false);
                             break;
                         }
 
@@ -7651,20 +7655,20 @@ getCompanyToken = function(companyData,isReDo){
                         }]}).done(function(rspObj){
                             if(rspObj.isSuccess === true) {
                                 companyData.key = rspObj.key;
-                                getCompanyToken(companyData,true).done(deferred.resolve);
-                            } else deferred.resolve(false);
+                                getCompanyToken(companyData,true).done(QmiGlobal.reAuthLockDef.resolve);
+                            } else QmiGlobal.reAuthLockDef.resolve(false);
                         })
 
                         break;
                     // break;
                     default: // ?
-                        deferred.resolve(false);
+                        QmiGlobal.reAuthLockDef.resolve(false);
                 }
             }
         });
     }
 
-    return deferred.promise();
+    return QmiGlobal.reAuthLockDef.promise();
 }
 
 // 重新取得私雲key
@@ -7719,6 +7723,9 @@ companyLoad = function(loadData){
         if(refreshDom.find("img").hasClass("rotate")) return;
         refreshDom.find("img").addClass("rotate");
     }
+
+    // 已存在 就不用讀取
+    if(QmiGlobal.companies[companyData.ci]) return;
     
     getCompanyToken(companyData).done(function(isSuccess){
         var tokenDeferred = $.Deferred();
@@ -8202,18 +8209,17 @@ pollingCmds = function(newPollingData){
         groupListDeferred = $.Deferred();
 
 
-
+    // 先分類 取各組的最後一筆即可
     cmdsArrangement().done(function(){
 
         // 需要打combo的情況
         newPollingData.cmds.forEach(function(item, i, arr){ // 後面有 bind([]) 用this來判斷是否重複
 
-            var 
-            comboDeferred = $.Deferred();
-            insideDeferred = $.Deferred();
+            var comboDeferred = $.Deferred();
+                insideDeferred = $.Deferred();
 
             // item.tp = 6 會這樣
-            if(QmiGlobal.groups[item.pm.gi] === undefined) {
+            if(QmiGlobal.groups[(item.pm || {}).gi] === undefined) {
                 insideDeferred.resolve(false);
             }
 
@@ -8469,6 +8475,28 @@ pollingCmds = function(newPollingData){
                     case 56: // ldap 解除綁定
                         removeCompany(item.pm);
                         break;
+
+                    case 57: // ldap 變更驗證形式及期限 都強制做一次cert
+                        // {
+                        //   "tp": 57,                    //Token管理機制改為可以透過Put /auth取得新的Token
+                        //   "pm": { 
+                        //     "cdi": "c00000010Dx",      //CloudID
+                        //     "ci": "N000000106t",       //CompanyID
+                        //     "id": "cowman@mitake.com.tw",   //
+                        //     "pin": "pco1nTKiIt/eJyLEMm/fCVOj0iDLkfemGnEQp34PVTg=",   //Company Pin
+                        //     "url": "qmi16.mitake.com.tw",   //Company URL
+                        //     "et": 1478165724593,       //Token的比較時間 (目前時間+設定的Token有效時間)
+                        //     "tp": 1                    //此PollingType下都是1
+                        //   }
+                        // }
+                        var newData = item.pm || {};
+                        var companyData = QmiGlobal.companies[newData.ci];
+                        if(!companyData) break;
+
+                        companyData.tp = newData.tp;
+
+                        getCompanyToken(companyData);
+                        break;
                 }
             });
 
@@ -8527,35 +8555,36 @@ pollingCmds = function(newPollingData){
 
         // cmds 分組 需要取最後一個 其餘捨棄
         var cmdsClassifyArr = [
-            {tp: [53, 56], temp: {}}, //company加入退出
-            {tp: [57], temp: {}} // company更改驗證tp
+            {tp: [53, 56], temp: {}},   //company加入退出
+            {tp: [57], temp: {}}        // company更改驗證tp
         ];
-        var companyTmpArr = []; // 53, 56取最後一個就好
-        
-        newPollingData.cmds.forEach(function(item, i, pArr) {
+
+        newPollingData.cmds = newPollingData.cmds.reduce(function(arr, item) {
             item.pm = item.pm || {};
+            var deleteFlag = true;
 
             // tp11 是新團體 或 gi不在 現有列表中 就要統一做一次取得團體列表
             if( item.tp === 11 || !QmiGlobal.groups[(item.pm || {}).gi] )
                 groupListUpdateFlag = true;
 
+            // 取各組的ct最大值
             cmdsClassifyArr.forEach(function(ccObj) {
                 ccObj.tp.forEach(function(cctp) {
-                    if(item.tp !== cctp) return;
-
-                    pArr.splice(i, 1);
-                    ccObj.temp = (ccObj.temp.ct || 0) > item.ct ? ccObj.temp : item;
+                    if(item.tp === cctp) {
+                        deleteFlag = false;
+                        ccObj.temp = (ccObj.temp.ct || 0) > item.ct ? ccObj.temp : item;
+                    }
                 })
             });
-        });
 
+            if(deleteFlag) arr.push(item);
+            return arr;
+        }, []);
+        
         cmdsClassifyArr.forEach(function(ccObj) {
-            newPollingData.cmds.push(ccObj.temp);
+            if(ccObj.temp.tp) newPollingData.cmds.push(ccObj.temp);
         });
         
-        if(newPollingData.cmds.length > 0)
-            newPollingData.cmds[newPollingData.cmds.length] = companyTmpObj; 
-
         if(groupListUpdateFlag) 
             groupMenuListArea().done(arrangementDef.resolve);
         else 

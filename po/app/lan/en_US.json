@@ -346,7 +346,7 @@
 	"COMMON_UNKNOWN_ERROR" : "unknown error",
 
 	"REFRESH_RELOAD" : "reading failed, please try later",
-	"REFRESH_TEXT" : "cloud data transfering, please try later",
+	"REFRESH_TEXT" : "reading failed, please try later",
 	"REFRESH_ALERT_SUCCESS" : "cloud data transfer completed",
 	"REFRESH_ALERT_CONFIRM" : "press enter to default group",
 
