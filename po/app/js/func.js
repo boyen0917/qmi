@@ -457,7 +457,8 @@ timelineSwitch = function (act,reset,main,noPR){
             gmHeader.find(".feed-compose").show();
 
             $("#page-group-main .subpage-timeline").show().scrollTop(0);
-
+            //一開始都回到全部的文章的分類
+            $(".st-filter-area").data("filter","all");
             //polling 數字重寫
             pollingCountsWrite();
 
