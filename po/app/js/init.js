@@ -17,23 +17,8 @@ var ui,
 	//local測試 預設開啟console
 	debug_flag = false;
 
-var default_url = "https://ap.qmi.emome.net/";
-var base_url = function() {
-	switch(true) {
-		case match("qawp.qmi.emome.net"):
-			return "https://qaap.qmi.emome.net/";
-			break;
-		case match("qmi17.mitake.com.tw"):
-			return "https://qmi17.mitake.com.tw/";
-			break;
-		default:
-			return "https://ap.qmi.emome.net/";
-	}
-	function match(domain) {
-		var regDomain = new RegExp("^https:\/\/"+ domain, 'g');
-		return !!window.location.href.match(regDomain);
-	}
-}();
+var default_url = "https://qmi17.mitake.com.tw/";
+var base_url =  "https://qmi17.mitake.com.tw/";
 
 
 var userLang = navigator.language || navigator.userLanguage;
