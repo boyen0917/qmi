@@ -48,7 +48,7 @@ QmiGlobal.popup = function(args){
 	if( args.confirm === undefined && args.cancel === undefined) {
 		setTimeout(function(){
 			self.jqHtml.remove();
-			self.removeE();
+			self.remove();
 		},1500);
 	}
 
@@ -58,13 +58,13 @@ QmiGlobal.popup = function(args){
 			args.action[0].apply({},[args.action[1]]);
 		}
 		self.jqHtml.remove();
-		self.removeE();
+		self.remove();
 	})
 
 	//取消
 	self.jqHtml.find(".popup-cancel").click(function(){
 		self.jqHtml.remove();
-		self.removeE();
+		self.remove();
 	})
 
 	$("body")
@@ -73,24 +73,24 @@ QmiGlobal.popup = function(args){
 }
 
 QmiGlobal.popup.prototype = {
-	removeE: function(){
+	remove: function(){
 		//this.jqHtml.remove();
 		$("body").removeClass("screen-lock");
 
 		QmiGlobal.scrollController.enableScroll();
 	},
-	html: 
-		'<div class="popup">' +
-        '    <div class="popup-frame">' +
-        '        <div class="popup-title"></div>' +
-        '        <div class="popup-text" style="display:none"></div>' +
-        '        <div class="popup-confirm-area">' +
-        '            <div class="popup-cancel" style="display:none"></div>' +
-        '            <div class="popup-confirm" style="display:none"></div>   ' + 
-        '        </div>' +
-        '    </div>' +
-        '    <div class="popup-gap"></div>' +
-        '</div>'
+	
+	html:'<div class="popup">'
+        + '<div class="popup-frame">'
+        + '    <div class="popup-title"></div>'
+        + '    <div class="popup-text" style="display:none"></div>'
+        + '    <div class="popup-confirm-area">'
+        + '        <div class="popup-cancel" style="display:none"></div>'
+        + '        <div class="popup-confirm" style="display:none"></div>   ' 
+        + '    </div>'
+        + '</div>'
+        + '<div class="popup-gap"></div>'
+        + '</div>'
 }
 
 
@@ -355,6 +355,30 @@ toSha1Encode = function (string){
     return toBase64;
 }
 
+// ldap密碼加密
+QmiGlobal.aesCrypto = {
+	enc: function(msg, key) {
+		return CryptoJS.AES.encrypt(
+			msg, 
+			CryptoJS.enc.Utf8.parse(key), 
+			{ 
+		        mode: CryptoJS.mode.ECB,
+		        padding: CryptoJS.pad.Pkcs7
+		    }
+	    ).toString();
+	},
+	dec: function(aesStr, key) {
+		return CryptoJS.AES.decrypt(
+			aesStr, 
+			CryptoJS.enc.Utf8.parse(key), 
+			{ 
+			    mode: CryptoJS.mode.ECB,
+			    padding: CryptoJS.pad.Pkcs7
+			}
+		).toString(CryptoJS.enc.Utf8);
+	}
+}
+
 htmlFormat = function (str, isToCharCode){
 	if(str.match(/\&\#\d+\;*/g)){
     	str = str.replace(/\&\#/g,"&#38;&#35;");
@@ -403,7 +427,7 @@ secondsToTime = function (secs)
 }
 
 toastShow = function(desc){
-	if($(".toast").css("opacity") !== "0") return;
+	if($(".toast").css("opacity") !== "0" || (desc || "").length === 0) return;
 
 	$(".toast div").html(desc);
 	$(".toast").css("bottom","0px");
@@ -669,21 +693,53 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			break;
 		case 2: // 影 只要傳s32 timeline是這樣
+
 			paramObj.s32.file = uploadObj.file;
 			delete paramObj.s3;
-
 			contentType = "video/mp4";
 
-			// 傳給外部 commit 使用
-			mt = uploadObj.file.type;
-			si = uploadObj.file.size;
+			// uploadObj.compress().done(function (uploadFile) {
+			// 	paramObj.s32.file = uploadFile;
 
-			var video = document.createElement('video');
-			video.src = URL.createObjectURL(uploadObj.file);
-			video.onloadeddata = function() {
-				md = {l: Math.floor(video.duration * 1000)};
-				mediaLoadDef.resolve();
-			}
+				// mt = uploadObj.file.type;
+				// si = uploadObj.file.size;
+
+				// var video = document.createElement('video');
+				// video.src = URL.createObjectURL(uploadObj.file);
+				// video.onloadeddata = function() {
+				// 	md = {l: Math.floor(video.duration * 1000)};
+				// 	mediaLoadDef.resolve();
+				// }
+			// });
+
+			zipVideoFile(uploadObj).done(function (uploadFile) {
+				paramObj.s32.file = uploadFile;
+
+				// 傳給外部 commit 使用
+				mt = uploadFile.type;
+				si = uploadFile.size;
+
+				var video = document.createElement('video');
+				video.src = URL.createObjectURL(uploadObj.file);
+				video.onloadeddata = function() {
+					md = {l: Math.floor(video.duration * 1000)};
+					mediaLoadDef.resolve();
+				}
+			}).fail(function () { // 壓縮失敗
+				paramObj.s32.file = uploadObj.file;
+
+				// 傳給外部 commit 使用
+				mt = uploadObj.file.type;
+				si = uploadObj.file.size;
+
+				var video = document.createElement('video');
+				video.src = URL.createObjectURL(uploadObj.file);
+				video.onloadeddata = function() {
+					md = {l: Math.floor(video.duration * 1000)};
+					mediaLoadDef.resolve();
+				}
+			});
+			
 			break;
 		default: 
 	}
@@ -1188,6 +1244,8 @@ QmiGlobal.gallery = function (data) {
     closeBtn.on("click", this.close.bind(this));
     leftArrow.on('click', this.showPreviousImage.bind(this));
     rightArrow.on('click', this.showNextImage.bind(this));
+
+    this.container.find("a.download-link").click(function(e) {e.stopPropagation();});
 
     // Brian ZoomIn
     this.zoomObj = {
@@ -2078,3 +2136,84 @@ myWait = function(variable,type){
   return deferred.promise();
 }
 
+zipVideoFile = function (videoObj) {
+	var transferBlobDef = $.Deferred();
+
+	try {
+		var ffmpeg = require('fluent-ffmpeg');
+		var fs = require('fs');
+    	var path = require('path');
+    	var nwDir = path.dirname(process.execPath); //node webkit 根目錄
+	    var outputPath = nwDir + '/video/outputfile.mp4'; //輸出影片檔案
+	    var command = ffmpeg(videoObj.file.path); 
+
+    	var duration, //轉檔總時間 
+	    	seconds,　//目前進行的時間
+	       	percent; //轉檔百分比;
+
+	       	zipVideoActionDef = $.Deferred();
+
+	    if (!fs.existsSync(nwDir + '/video')) {
+	    	fs.mkdirSync(nwDir + '/video');
+		}
+
+		command.setFfmpegPath(nwDir + '/bin/ffmpeg');
+
+	    command.size('640x320')
+	    	.outputOptions('-crf 24')
+	    	.outputOptions('-c:a copy')
+	     	.on('start', function(commandLine) {
+	     		if (videoObj.setAbortFfmpegCmdEvent) {
+	     			videoObj.setAbortFfmpegCmdEvent(command);
+	     		}
+	            console.log('Spawned Ffmpeg with command: ' + commandLine);
+	        })
+	        .on('stderr', function(stderrLine) {
+	        	var match;
+	        	console.log(stderrLine);
+	        	// 找出ffmpeg回傳的duration，再轉換成秒數
+	            if (stderrLine.trim().startsWith('Duration')) {
+	                match = stderrLine.trim().match(/Duration:\s\d\d\:\d\d:\d\d/).toString().split('Duration:').slice(1).toString().split(':');
+	                duration = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
+	            } else if (stderrLine.trim().indexOf('size=') > 0 ) {
+	            	// 找出ffmpeg回傳的目前執行的時間，再轉換成秒數，並更新進度條狀態
+	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
+	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
+	                percent = ((seconds / duration) * 50).toFixed();
+
+	                if (videoObj.updateCompressionProgress) {
+	               	 	videoObj.updateCompressionProgress(percent);
+	                }
+	            }
+	        })
+	        .on('error', function(err, stdout, stderr) {
+	            console.log('Cannot process video ' + err.message);
+	            zipVideoActionDef.reject('Cannot process video: ' + err.message);
+	        })
+	        .on('end', function(stdout) {
+	        	console.log('finish');
+	            zipVideoActionDef.resolve();
+	        }).saveToFile(outputPath);
+
+	        zipVideoActionDef.done(function () {
+		        fs.readFile(outputPath, function(err, data) {
+		            var byteArray = new Uint8Array(data);
+		            var blob = new Blob([byteArray], {type: 'application/octet-binary'});
+		            blob.name = videoObj.file.name;
+		            transferBlobDef.resolve(blob);
+		        });
+		    }).fail(function (errorMsg) {
+		    	console.log(errorMsg);
+		    });
+	} catch (e) {
+		transferBlobDef.reject();
+	}
+	
+    return transferBlobDef.promise();
+}
+
+function setPolling(ts) {
+	var pp = $.lStorage("_pollingData");
+	pp.ts.pt = ts;
+	$.lStorage("_pollingData", pp);
+};

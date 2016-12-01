@@ -372,40 +372,49 @@ textarea.ga-group-des:focus{
 	height: 100%;
 	object-fit: cover;
 }
-#systemPopup{
+#view-system-popup {
 	position: relative;
 	width: 100%;
 	height: 100%;
-	z-index: 101;
+	z-index: 1001;
 }
-.sm-person-info {
+
+#view-system-popup .line {
+    border-top: 1px solid #ccc;
+    height: 1px;
+    width: 160px;
+    margin: 10px auto 2px;
+    box-sizing: border-box;
+}
+
+#view-system-popup .sm-person-info {
 	position: absolute;
-	left: 50px;
+	left: 110px;
 	bottom: 60px;
-	width: 250px;
+	width: 180px;
 	background: white;
-	border-radius: 3px;
-	box-shadow: 1px 1px 3px #ccc;
+	border-radius: 5px;
+	box-shadow: 0.5px 2px 5px 0px #888;
 }
-.sm-person-info .sm-info {
+#view-system-popup .sm-person-info .sm-info {
 	cursor: pointer;
-	font-size: 16px;
-	color: black;
-	font-weight: bold;
-	padding: 6px 14px;
+    font-size: 16px;
+    color: #444;
+    padding: 0 20px;
+    margin-top: 5px;
 }
-.sm-person-info .sm-info-hr {
+#view-system-popup .sm-person-info .sm-info-hr {
 	cursor: default;
-	font-size: 12px;
+	font-size: 13px;
 	color: gray;
-	padding-top:10px;
-	padding-left: 10px;
+	padding-top: 7px;
+	padding-left: 20px;
 }
-.sm-person-info .sm-info:last-child {
+#view-system-popup .sm-person-info .sm-info:last-child {
 	color: #1E7FFB;
 	border-top: 1px solid #ccc;
-	margin-top: 5px;
-	padding: 8px 14px;
+	margin-top: 15px;
+	padding: 8px 20px;
 }
 
 /*user-setting*/
@@ -972,145 +981,233 @@ input[type=radio] {
 	opacity: 1;
 	cursor: pointer;
 }
-/*服務條款跟隱私政策*/
-/*.policy{
-	width: 100%;
-	height:100%;
-	position:absolute;
-	z-index:1800;
-	overflow-y:scroll;
-	background-color: rgba(0, 0, 1, 0.6);
-	display: none; 
-}
-.policy-content{
-	width: 500px;
-	height: 600px;
-  	background: white;
-  	margin: 20px auto;
-  	position: relative;
-  	border-radius: 6px;
-}
-.policy-content iframe{
-	display: block;
-  	width: 450px;
-  	height: 98%;
-  	margin: 5vh auto;
-
-}*/
-
-.guihu-title-bar{
-	height: 40px;
-	margin-bottom: 40px;
-}
-.guihu-title-bar label{
-	position: relative;
-	top: 5px;
-}
-.guihu-add{
-	float: right;
-	width: 25px;
-    height: 25px;
-    margin-top: 3px;
-	cursor: pointer;
-}
-.guihu-content .system-title{
-	margin-bottom: 10px;
-	margin-left: 5px;
-}
-.guihu-list{
-	border-bottom: 1px solid #ededed;
-	padding: 15px;
-	margin-bottom: 10px;
-}
-.guihu-list span{
-	padding: 4px;
-	color: red;
-	font-size: 12px;
-	float: right;
-	visibility:hidden;
-}
-.guihu-attention{
-	width: 16px;
-    padding: 4px;
-    float: left;
-	visibility:hidden;
-}
-.guihu-account{
-	font-size: 14px;
-	margin-left: 10px;
-}
-.guihu-cancel{
-	width: 25px;
-	float: right;
-	cursor: pointer;
-}
-/*認證過期*/
-.auth-expired .guihu-attention{
-	visibility: visible;
-}
-.auth-expired span{
-	visibility: visible;
-}
-.auth-expired .guihu-account{
-	color: red;
-}
-
-.guihu-confirm{
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	z-index: 1600;
-	overflow-y: scroll;
-	background-color: rgba(0, 0, 1, 0.6);
-	left: 0;
-	top: 0;
-	display: none; 
-}
-.edit-guihu-content{
-	width: 300px;
-	height: 400px;
-	position: relative;
-  	background: #fff;
-  	border-radius: 3px;
-  	overflow: hidden;
-  	margin: 20% auto;
-  	padding: 25px 20px 0 20px;
-
-}
-.guihu-title-content{
-	color: #555;
-	margin-bottom: 60px;
-}
-.guihu-des{
-	margin-top: 10px;
-	font-size: 14px;
-}
-.guihu-input-content{
-	
-}
-.guihu-input-content input{
-	min-width: 250px;
-    height: 12px;
-    padding: 15px 0px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #32b3e4;
-}
-.guihu-input-content input[type="text"]{
-	background: url(../images/icon/e-mail-icon.png) no-repeat 7px 13px;
-	padding-left: 44px;
-}
-.guihu-input-content input[type="password"]{
-	background: url(../images/icon/password-icon.png) no-repeat 7px 13px;
-	padding-left: 44px;
-}
 
 
-.guihu-btn-content{
-	margin-top: 40px;
-	text-align: center;
+#view-ldap-setting {
+	background: #f8f9fa;
+    width: 100%;
+    min-width: 400px;
+    height: -webkit-calc( 100vh - 43px );
+    position: relative;
 }
 
-.guihu-cancel-btn, .add-btn, .save-btn{
-	margin: 0 20px;
+#view-ldap-setting section[role=page]:not(:first-child) { display: none;}
+#page-group-main .ldap-setting-header {
+    background: rgb(57, 148, 232);
+    height: 100%;
+    box-sizing: border-box;
+    color: white;
+    padding: 10px 20px;
 }
+
+#view-ldap-setting section.content, #view-ldap-setting section[role=page] { height: 100%;}
+
+#view-ldap-setting .ldap-add {
+    box-sizing: border-box;
+    width: 60%;
+    max-width: 500px;
+    height: 30px;
+    border: 1px solid rgb(221, 221, 221);
+    line-height: 30px;
+    text-align: center;
+    margin: 50px auto 0;
+    font-size: 14px;
+    box-shadow: 0 0px 0px 0.2px #ccc;
+    color: rgb(106, 138, 224);
+    background: white;
+    cursor: pointer;
+}
+
+#view-ldap-setting .no-data {
+    text-align: center;
+    color: #bbb;
+    letter-spacing: 1px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 50%;
+    margin: 30vh auto 0;
+}
+#view-ldap-setting .no-data div:last-child {font-size: 13px;}
+
+#view-ldap-setting section.icon-shield {
+    width: 110px;
+    height: 110px;
+    margin: 15vh auto 20px;
+    position: relative;
+    text-align: center;
+}
+
+#view-ldap-setting section.icon-shield:before {
+    content: "";
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    left: 0;
+}
+
+#view-ldap-setting section.ldap-edit[ldap-type=add] section.icon-shield:before {background: url(../images/ldap/icon_add_ldap.png); background-size: 100%;}
+#view-ldap-setting section.ldap-edit[ldap-type=check] section.icon-shield:before {background: url(../images/ldap/icon_check_LDAP.png); background-size: 100%;}
+#view-ldap-setting section.ldap-edit[ldap-type=delete] section.icon-shield:before {background: url(../images/ldap/icon_delete_LDAP.png); background-size: 100%;}
+
+
+#view-ldap-setting .title.one {font-size: 20px; color: #6f87bb; height: 30px;}
+#view-ldap-setting .title.two {font-size: 14px; color: #888;}
+
+#view-ldap-setting .title:before {position: absolute; width: 100%; text-align: center;}
+#view-ldap-setting section.ldap-edit[ldap-type=add] .title:before {content: attr(content);}
+#view-ldap-setting section.ldap-edit[ldap-type=check] .title:before {content: attr(content);}
+#view-ldap-setting section.ldap-edit[ldap-type=delete] .title:before {content: attr(content);}
+#view-ldap-setting section.ldap-edit[ldap-type=delete] .title:after {
+    content: attr(pi);
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    margin-top: 22px;
+    color: #809bd4;
+    font-size: 13px;
+}
+
+#view-ldap-setting section.edit-form {
+    width: 50%;
+    max-width: 400px;
+    min-width: 300px;
+    margin: 70px auto;
+    text-align: center;
+}
+
+#view-ldap-setting .input-block {
+    text-align: left;
+    box-sizing: border-box;
+    padding-left: 50px;
+    position: relative;
+	height: 50px;
+    margin: 20px 0;
+}
+
+#view-ldap-setting .input-block:before {
+    content: "";
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    left: 0;
+    top: 0;
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+#view-ldap-setting .input-block.email:before {background: url(../images/ldap/icon_LDAP_email.png); background-size: 100%;}
+#view-ldap-setting .input-block.password:before {background: url(../images/ldap/icon_LDAP_password.png); background-size: 100%;}
+
+#view-ldap-setting section.ldap-edit[ldap-type=check] .input-block.email:before {background: url(../images/ldap/icon_LDAP_email_green.png); background-size: 100%;}
+#view-ldap-setting section.ldap-edit[ldap-type=check] .input-block.password:before {background: url(../images/ldap/icon_LDAP_password_green.png); background-size: 100%;}
+
+#view-ldap-setting .input-block input {
+    height: 35px;
+    background: transparent;
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+}
+
+#view-ldap-setting .submit-block {
+    width: 80%;
+    margin: 35px auto;
+    position: relative;
+}
+
+#view-ldap-setting .ldap-edit {overflow: auto;}
+#view-ldap-setting .edit-form button {
+    background: #ccc;
+    border: 0;
+    border-radius: 5px;
+    color: white;
+    width: 90px;
+    height: 30px;
+    font-size: 15px;
+    cursor: pointer;
+    position: absolute;
+}
+
+#view-ldap-setting .edit-form button.cancel {left: 0}
+#view-ldap-setting .edit-form button.submit {right: 0}
+#view-ldap-setting .edit-form button:focus {outline: none;}
+
+#view-ldap-setting .ldap-edit:not([ldap-type=check]) .edit-form button.submit.ready {background: #809bd4;}
+#view-ldap-setting .ldap-edit[ldap-type=check] .edit-form button.submit.ready {background: #21ca82;}
+#view-ldap-setting .list {
+	display: none;
+    width: 70%;
+    max-width: 500px;
+    margin: 30px auto;
+}
+
+#view-ldap-setting .list > div {
+    border-bottom: 1px solid #bbb;
+    height: 50px;
+    line-height: 52px;
+    padding-left: 40px;
+    position: relative;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    color: #666;
+}
+
+#view-ldap-setting .list span.unbind-img {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    right: 0;
+    top: 11px;
+    cursor: pointer;
+}
+
+#view-ldap-setting .list > div span.unbind-img {background: url("../images/ldap/icon_delete_email_gray.png"); background-size: 100%;}
+#view-ldap-setting .list > div.expired span.unbind-img {background: url("../images/ldap/icon_delete_email_red.png"); background-size: 100%;}
+
+#view-ldap-setting .list > div.expired:before {
+    content: "";
+    position: absolute;
+    background: url(../images/ldap/icon_approvement.png);
+    top: 16px;
+    left: 10px;
+    height: 20px;
+    width: 20px;
+    background-size: 100%;
+}
+
+#view-ldap-setting .list > div.expired:after {
+    content: attr(err-msg);
+    position: absolute;
+    right: 30px;
+    top: 0px;
+    background: #f8f9fa;
+    height: 40px;
+    width: 60px;
+    text-align: center;
+    box-shadow: -7px 5px 17px 1px #f8f9fa;
+}
+
+#view-ldap-setting .list > div span {
+    width: 85%;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#view-ldap-setting .list > div.expired {color: #e66161; cursor: pointer;}
+
+#view-ldap-setting.cover:before.back {
+    content: url(../images/spinner.gif);
+    z-index: 1;
+    transition: 0.5s;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: rgba(255,255,255,0.9);
+    line-height: 95vh;
+    text-align: center;
+}
+
 

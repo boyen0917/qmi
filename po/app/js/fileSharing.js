@@ -37,18 +37,6 @@ FileSharing.prototype = {
 		//unbind self and all children
 		$("section.fileSharing,section.fileSharing *").off();
 
-		// $("section.fileSharing span.breadcrumb").niceScroll({
-		// 	cursorcolor:"rgba(210, 210, 210, 0.4)", 
-		// 	cursorwidth: '5',
-		// 	cursorborderradius: '10px',
-		// 	background: 'rgba(255,255,255,0)',
-		// 	cursorborder:"",
-		// 	boxzoom:false,
-		// 	zindex: 999,
-		// 	scrollspeed: 90,
-		// 	mousescrollstep: 40
-		// });
-
 		thisFileDom.find(".home").click(function(){
 			thisFile.ti = thisFile.mainTi;
 			thisFile.getList().done(thisFile.updateBreadcrumb.bind(thisFile));
@@ -701,20 +689,25 @@ FileSharing.prototype = {
 		})
 	},
 	delete: function(){
+		var self = this;
 		new QmiAjax({
-			// /groups/{gi}/timelines/{ti}/events/{ei}
 			apiName: "groups/" + gi + "/timelines/"+ this.ti +"/events/"+ this.activeItemData.ei,
 			method: "delete",
-			complete: function(data){
-				
-				if(data.status == 200) {
-					this.getList().done(function(){
-						toastShow($.i18n.getString("FILESHARING_DELETE_OK"));	
-					});
-					
-				}
-			}.bind(this)
-		})
+			errHide: true
+			
+		}).success(function() {
+			self.getList().done(function(){
+				toastShow($.i18n.getString("FILESHARING_DELETE_OK"));	
+			});
+		}).error(function(errData) {
+			try {
+				var msg = JSON.parse(errData.responseText).rsp_msg;
+			} catch(e) {
+				var msg = $.i18n.getString("CHAT_DELETE_CHATROOM_FAIL");
+			}
+
+			toastShow(msg);
+		});
 	}
 }
 

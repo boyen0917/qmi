@@ -74,6 +74,7 @@
 
 .login {
 	background: rgb(86,113,133);
+	position: relative;
 }
 
 .login:active {
@@ -518,46 +519,46 @@ input.setting-birth-hidden {
 /* ----- new landpage style -------*/
 
 
-.login-area{
+#page-registration .login-area{
 	width: 398px;
 	margin-right: auto;
 	margin-left: auto;
 	background-color: rgba(255,255,255,0.7);
 	border: 1px solid rgb(230,230,230);
 }
-.login-landing{
+#page-registration .login-landing{
 	padding: 26px 20px 20px 20px;
 }
-.login-landing .register{
+#page-registration .login-landing .register{
 	margin-bottom: 0;
 }
-.login-tab-area{
+#page-registration .login-tab-area{
 	width: 100%;
 	height: 60px;
 	line-height: 60px;
 }
-.login-tab{
+#page-registration .login-tab{
 	width: 198px;
 	display: inline-block;
 	float: left;
 	color: #3e8feb;
 	font-size: 18px;
 }
-.login-tab[data-type=phone]{
+#page-registration .login-tab[data-type=phone]{
 	border-right: 1px solid rgb(230,230,230);
 }
-.login-tab:not(.active){
+#page-registration .login-tab:not(.active){
 	border-bottom: 1px solid rgb(230,230,230);
 	color: #96abc2;
 }
-.login-ld-phone, .login-option-area{
+#page-registration .login-ld-phone, #page-registration .login-option-area{
 	height: 40px;
 	white-space: nowrap; 
 }
-.login-option-area{
+#page-registration .login-option-area{
 	width: 50%;
 }
-.login-ld-countrycode {
+#page-registration .login-ld-countrycode {
 	width: 40%;
 	height: 100%;
 	overflow: visible;
@@ -569,7 +570,7 @@ input.setting-birth-hidden {
 	text-align: left;
 	margin-right: 10px;
 }
-.login-ld-countrycode select{
+#page-registration .login-ld-countrycode select{
 	border-radius: 0;
 	color: #9BA0AA;
 	font-weight: bold;
@@ -586,17 +587,17 @@ input.setting-birth-hidden {
 	line-height: 36px;
 	font-size: 12px;
 }
-.login-ld-countrycode .sbHolder{
+#page-registration .login-ld-countrycode .sbHolder{
 	font-size: 12px;
 }
 
-.login-ld-email, .login-ld-password{
+#page-registration .login-ld-email, .login-ld-password{
 	height: 40px;
 	/*height: 36px;
 	line-height: 36px;
 	width: auto;*/
 }
-.login-ld-phone input, .login-ld-email input, .login-ld-password input{
+#page-registration .login-ld-phone input, .login-ld-email input, .login-ld-password input{
 	height: 38px;
 	line-height: 38px;
 	text-align: left;
@@ -605,90 +606,121 @@ input.setting-birth-hidden {
 	width: -webkit-calc( 100% - 22px );
 	font-size: 14px;
 }
-.login-ld-phone input{
+#page-registration .login-ld-phone input{
 	display: inline-block;
 	width: -webkit-calc( 60% - 36px );
 	vertical-align: top;
 }
-.login-ld-email input{
+#page-registration .login-ld-email input{
 	width: -webkit-calc( 100% - 23px );
 }
-.login-ld-email{
+#page-registration .login-ld-email{
 	display: none;
 }
 
-.login-ld-extra{
+#page-registration .login-ld-extra{
 	width: 100%;
 	height: 50px;
 }
-.login-ld-extra > div{
+#page-registration .login-ld-extra > div{
 	width: 49%;
 	display: inline-block;
 	vertical-align: top;
 }
-.login-ld-extra .login-ld-forget-pw{
+#page-registration .login-ld-extra .login-ld-forget-pw{
 	text-align: right;
 }
-.login-option-area > div{
+#page-registration .login-option-area > div{
 	line-height: 24px;
 	width: 100%;
 	font-size: 14px;
 	color: #4092ef;
 	display: block;
 }
-.login-option-area > div div{
+#page-registration .login-option-area > div div{
 	display: inline-block;
 }
-.login-option-area .login-auto{
+#page-registration .login-option-area .login-auto{
 	/*text-align: right;*/
 }
-.login-option-area .login-remeber{
+#page-registration .login-option-area .login-remeber{
 	/*text-align: left;*/
 }
 
 
-.login-area .login{
+#page-registration .login-area .login{
 	color: white;
 	background-color: #4092ef;
 	opacity: 0.8;
 	cursor: default;
 }
-.login-area .login.login-ready{
+#page-registration .login-area .login.login-ready{
 	opacity: 1;
 	background-color: #4092ef;
 	cursor: pointer;
 }
-.login-area .login.login-ready:hover{
-	background-color: #197ae8;
-}
-.login-area .register{
+#page-registration .login-area .register{
 	color: rgb(109,137,150);
 	background-color: #F0F9FE;
 	opacity: 1;
 }
-.login-area .register:hover{
+#page-registration .login-area .register:hover{
 	/*color: black;*/
 	background-color: #C6e7fa;
 }
-.login-ld-password, .login-area .login, .login-area .register{
+#page-registration .login-ld-password, .login-area .login, .login-area .register{
 	margin-top: 12px;
 }
-.login-area .login, .login-area .register{
+#page-registration .login-area .login, .login-area .register{
 	width: 100%;
 }
 
-.login-ld-countrycode select, .sbHolder, .login-ld-phone input, .login-ld-email input, .login-ld-password input{
+#page-registration .login-ld-countrycode select, .sbHolder, .login-ld-phone input, .login-ld-email input, .login-ld-password input{
 	border-radius: 3px;
 	border: 1px solid rgb(230,230,230);
 	margin-left: 0;
 	margin-right: 0;
 }
 
-.login-ld-forget-pw{
+#page-registration .login-ld-forget-pw{
 	width: 100%;
 	color: #E92663;
 	font-size: 14px;
 }
-.login-ld-forget-pw:hover{
+#page-registration .login-ld-forget-pw:hover{
 	text-decoration: underline;
+}
+
+#page-registration .login-waiting:before {
+	content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 82, 236, 0.25);
+    border-top-color: #0052ec;
+    border-radius: 50%;
+    left: 169px;
+    top: 6px;
+    line-height: 30px;
+    z-index: 10;
+    animation: simple-rotate 0.8s linear infinite;
+}
+
+#page-registration .login-waiting:after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 30px;
+    left: 130px;
+    top: 6px;
+    background: #3e8fed;
+}
+
+@-webkit-keyframes simple-rotate {
+	0%	{
+	    	transform: rotate(0);
+		}
+	100% {
+	    	transform: rotate(360deg);
+		}    
 }

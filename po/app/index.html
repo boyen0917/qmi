@@ -6,12 +6,12 @@
         <title></title>
         <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css" />
         <link rel="stylesheet" href="css/main.css" />
+        <link rel="stylesheet" href="css/nameCard.css">
         <link rel="stylesheet" href="css/chatList.css" />
         <link rel="stylesheet" href="css/alert.css" />
         <link rel="stylesheet" href="css/contact.css" />
         <link rel="stylesheet" href="css/general_album.css" />
         <link rel="stylesheet" href="css/setting.css" />
-
 
     <!-- index -->
         <link rel="stylesheet" href="css/registration.css" />
@@ -59,6 +59,7 @@
         <script type="text/javascript" src="js/chatDB.js"></script>
         <script type="text/javascript" src="js/func.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript" src="js/nameCard.js"></script>
         <script type="text/javascript" src="js/chatList.js"></script>
         <script type="text/javascript" src="js/alert.js"></script>
         <script type="text/javascript" src="js/stickerArea.js"></script>
@@ -73,6 +74,9 @@
         
         
         <script src="js/sha/sha1.js"></script>
+        <script src="js/aesCrypto/aes.js"></script>
+        <script src="js/aesCrypto/mode-ecb-min.js"></script>
+        
         <script src="js/sha/enc-base64-min.js"></script>
         <script type="text/javascript" src="js/jquery.autosize.min.js"></script>
 
@@ -497,7 +501,7 @@
                             </div>
                             <div class="sm-person-area-m">
                                 <div class="user-name"></div>
-                                <div class="user-phone"></div>
+                                <div class="user-account"></div>
                             </div>
                             <div class="sm-person-area-r">
                                 <img src="images/icon/icon_arrow_down.png"/>
@@ -517,11 +521,14 @@
                 <div class="gm-content">
                     <div class="refresh-lock"><div data-textid="REFRESH_TEXT"></div></div>
                     <div class="gm-content-header">
-                        <div class="gm-adjustment user-main-toggle"></div>
-                        <div class="setting-header-content">
-                            <img class="setting-icon" src="">
-                            <div class="setting-title"></div>
-                        </div>     
+                        <section class="system-setting-header">
+                            <div class="gm-adjustment user-main-toggle"></div>
+                            <div class="setting-header-content">
+                                <img class="setting-icon" src="">
+                                <div class="setting-title"></div>
+                            </div>     
+                        </section>
+                        <section class="ldap-setting-header" style="display:none;"></section>
                     </div>
                     <div class="gm-content-body">
                     <!------------------------------- 動態消息 ---------------------------->
@@ -943,6 +950,7 @@
                                             <li data-tab="group-setting" data-textid="DEFAULT_GROUP_SET"></li>
                                             <li data-tab="carousel-setting" data-textid="TOP_PAGE_SET"></li>
                                             <li data-tab="system-information" data-textid="ABOUT_QMI"></li>
+
                                         </ul>
                                     </div>
                                     <div class="tab-content-r">
@@ -1005,12 +1013,6 @@
                                             <!-- <select class="group-select" data-role="none" >        
                                             </select> -->
                                             <div class="edit-defaultgroup-content">
-                                                    <!-- <div class='group-option'>
-                                                        <input data-role='none' name='group' type='radio' value='"+test_data.gl[i].gi+"'>
-                                                        <label for='' class='radiobtn'></label>
-                                                        <img src=''>
-                                                        <label for='' class='radiotext'>"+test_data.gl[i].gn+"</label>
-                                                    </div> -->
                                             </div> 
                                             <div class="btn-content">
                                                 <button class="default-group-btn btn-b" data-role="none" data-textid="FEED_FINISHED"></button>
@@ -1049,6 +1051,7 @@
                                                     <div class="privacy-policy stinfotext" data-textid="PRIVACY_POLICY"></div>
                                                 </div>
                                             </div> 
+
                                         </div>
                                     </div>    
                                 </div>
@@ -1097,28 +1100,6 @@
                                         </div>
                                     </div>
                                    
-                                    <!-- <div class="ga-info view">
-                                        <div class="ga-info-row admin" data-type="name">
-                                            <div class="title" data-textid="GROUP_GROUP_NAME"></div>
-                                            <div class="content polling-group-name currentGroup"></div>
-                                        </div>
-                                        <div class="ga-info-row" data-type="info">
-                                            <div class="title" data-textid="GROUP_ABOUT"></div>
-                                            <img class="ga-icon-host" src="images/icon/icon_admin.png">
-                                            <div class="content polling-group-description currentGroup"></div>
-                                        </div>
-                                    </div> -->
-                                    <!-- <div class="ga-info edit">
-                                        <div class="ga-info-row" data-type="name">
-                                            <div class="title" data-textid="GROUP_GROUP_NAME"></div>
-                                            <input class="content" data-textph-id="GROUP_NAME_LIMIT" data-role="none"/>
-                                        </div>
-                                        <div class="ga-info-row" data-type="info">
-                                            <div class="title" data-textid="GROUP_ABOUT"></div>
-                                            <img class="ga-icon-host" src="images/icon/icon_admin.png">
-                                            <textarea class="content autoHeight" data-textph-id="GROUP_ABOUT_ALERT" maxLength="300" data-role="none"></textarea>
-                                        </div>
-                                    </div> -->
                                 </div>
                                 <div class="ga-header">
                                     <div class="ga-header-back">
@@ -1131,7 +1112,11 @@
                                     <!-- <div class="ga-header-done" data-textid="COMMON_DONE"></div> -->
                                 </div>
                             </div>
-                        </div>
+                        </div><!-- 團體關於 -->
+
+                         <!--------------------- 系統設定 ------------------>
+                        <div class="subpage-ldapSetting main-subpage" style="display:none;">
+                        </div><!-- 系統設定 -->
 
                     </div>
                 </div>

@@ -345,6 +345,12 @@
 	"FILESHARING_UPLOADING" : "uploading..",
 	"COMMON_UNKNOWN_ERROR" : "unknown error",
 
+	"REFRESH_RELOAD" : "reading failed, please try later",
+	"REFRESH_TEXT" : "reading failed, please try later",
+	"REFRESH_ALERT_SUCCESS" : "cloud data transfer completed",
+	"REFRESH_ALERT_CONFIRM" : "press enter to default group",
+
+
 	"PERSONAL_INFORMATION" : "Profile",
 	"SYSTEM" : "System",
 	"ABOUT_QMI" : "About Qmi",
@@ -377,10 +383,44 @@
 	"REMOVE_LDAP" : "解除綁定",
 	"REMOVE_LDAP_DES" : "解除綁定後，將解除帳號權限",
 
+
 	"SETTING_OLD_PASSWORD" : "Current Password",
 	"SETTING_NEW_PASSWORD" : "New Password(at least 8 digits)",
 	"SETTING_CONFIRM_PASSWORD" : "Confirm Password",
 
+
+	"ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT" :	"Binding LDAP Account",
+	"ACCOUNT_BINDING_PRESS_TO_BIND_LDAP_ACCOUNT" :	"Press to bind LDAP account",
+	"ACCOUNT_BINDING_BINDING_NEW_ACCOUNT" :	"Binding new account",
+	"ACCOUNT_BINDING_ENTER_ACCOUNT_PASSWORD" :	"Enter LDAP Account and Password",
+	"ACCOUNT_BINDING_EMAIL" :	"Email",
+	"ACCOUNT_BINDING_PASSWORD" :	"Password",
+	"ACCOUNT_BINDING_DONE" :	"Done",
+	"ACCOUNT_BINDING_CANCEL" :	"Cancel",
+	"ACCOUNT_BINDING_AUTHORIZATION_EXPIRED" :	"Authorization Expired",
+	"ACCOUNT_BINDING_AUTHORIZATION_COMPLETED" :	"Authorization Completed",
+	"ACCOUNT_BINDING_WRONG_PASSWORD" :	"Wrong password",
+	"ACCOUNT_BINDING_LOGIN_LIMIT_REACHED" :	"Login request limit reached, please try again in 60 seconds.",
+	"ACCOUNT_BINDING_UNBIND_LDAP" :	"Unbind LDAP Account",
+	"ACCOUNT_BINDING_UNBIND_LDAP_CONFIRM" :	"Press Unbind to disconnect %@.",
+	"ACCOUNT_BINDING_ACCOUNT_DISCONNECTED" :	"Account Disconnected",
+	"ACCOUNT_BINDING_POOR_CONNECTION" :	"Poor connection, please try again later.",
+	"ACCOUNT_BINDING_BINDED_ACCOUNT" :	"Binded Account",
+	"ACCOUNT_BINDING_DISCONNECT_ACCOUNT" :	"Disconnect Account",
+	"ACCOUNT_BINDING_DISCONNCET_LDAP_CONFIRM" :	"You won't be able to access this account after disconnect it.",
+	"ACCOUNT_BINDING_REQUEST_AUTHORIZATION" :	"Request authorization?",
+	"ACCOUNT_BINDING_BIND_QMI_ACCOUNT" :	"Bind Your Qmi Account",
+	"ACCOUNT_BINDING_NO_QMI_ACCOUNT_BINDED" :	"No Qmi Account Binded Login Qmi account to bind your LDAP account.",
+	"ACCOUNT_BINDING_DISCONNECT_QMI_ACCOUNT_CONFIRM" :	"You won't be able to access this account after disconnect it.",
+	"ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION" :	"Account Recertification",
+	"ACCOUNT_BINDING_ENTER_LDAP_PASSWORD" :	"Please enter your LDAP password",
+
+	"WEBONLY_AUTH_LOADING" : "authenticating...",
+	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
+	"WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT" : "Click to create binding account",
+	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA1" : "No Qmi Account Binded",
+	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA2" : "Login Qmi account to bind your LDAP account.",
+	
 	"WEBONLY_PUSH" : "notifications",
 	"WEBONLY_SAVE" : "submit",
 	"WEBONLY_MEMBERLIST" : "member list",

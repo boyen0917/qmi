@@ -56,17 +56,9 @@ $(function(){
         }).complete(function(data){
             if(data.status == 200){
                 var comboData = $.parseJSON(data.responseText);
-                // QmiGlobal.groups -> QmiGlobal.groups 
-                // thisGi 不存在list中 重新加入 做tl hash-map
-                // if( QmiGlobal.groups.hasOwnProperty(thisGi) === false ) {
-                //     QmiGlobal.groups[comboData.gi] = comboData;
-                //     groupListToLStorage( [ comboData ] );
-                // }
-
-                var 
-                groupData = QmiGlobal.groups[thisGi],
-                ignoreKeys = ["ul","fl","bl","fbl","tl"],
-                inviteGuAll = {};
+                var groupData = QmiGlobal.groups[thisGi];
+                var ignoreKeys = ["ul","fl","bl","fbl","tl"];
+                var inviteGuAll = {};
 
                 // 單一團體資訊的部分key 另外處理成hash-map
                 for( var key in comboData ){
@@ -114,6 +106,7 @@ $(function(){
 
             }else{    
                 comboDeferred.resolve({
+                    isSuccess: false,
                     status: false,
                     thisGi: thisGi,
                     data: data
@@ -214,7 +207,7 @@ $(function(){
             //清除timeline無資料旗標
             $(".feed-subarea.no-data").removeClass("no-data");
 
-            //替換該團體的畫面 做完做updateTab
+            //替換該團體的畫面 裡面會做updateTab 打api
             updateGroupAllInfoDom( thisGi );
 
         } catch(e){

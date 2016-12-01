@@ -11,11 +11,32 @@ onCheckVersionDone = function(needUpdate){
     	
 
     	QmiGlobal.isPeriodicallyReload = true;
-
-    	loginAction();
+		
+		loginAction();
 
     } else if($.lStorage("_loginAutoChk") === true) {
-		loginAction();
+
+    	ui = $.lStorage("_loginData").ui;
+    	at = $.lStorage("_loginData").at;
+
+    	// 檢查auth
+    	new QmiAjax({
+			apiName: "me",
+			specifiedHeaders: {
+				ui: $.lStorage("_loginData").ui,
+				at: $.lStorage("_loginData").at,
+				li: lang
+			},
+			method: "put",
+			errHide: true
+		}).complete(function(data){
+			if(data.status === 401) {
+				resetDB();
+				window.location = "index.html";
+			} else {
+				loginAction();
+			}
+		});
 
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
@@ -30,7 +51,8 @@ onCheckVersionDone = function(needUpdate){
 		$("#page-registration").css("height",$(window).height());
 	});
 
-	$(document).on("click",".login-ready",function(){
+	$(document).on("click",".login-ready:not(.login-waiting)",function(){
+
 		var isMail = false;
 		var phone_id = "";
 		var phoneInput = $(".login-ld-phone input");
@@ -42,6 +64,7 @@ onCheckVersionDone = function(needUpdate){
 		}
 		var password = $(".login-ld-password input").val();
 
+		$(this).addClass("login-waiting");
 		//登入
 		login(phone_id,password,countrycode,isMail);
 		
@@ -179,7 +202,7 @@ onCheckVersionDone = function(needUpdate){
 			var emailInput = $(".login-ld-email input");
 			var email = emailInput.val();
 			if( email && email.length>3 ){
-				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,'');
+				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,5}$/,'');
 				
 				if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
 					$("#page-registration .login").addClass("login-ready");
@@ -254,7 +277,8 @@ onCheckVersionDone = function(needUpdate){
 		},400);
 	});
 
-	$(document).on("click",".login-next-ready",function(){
+	$(document).on("click",".login-next-ready:not(.login-waiting)",function(){
+
 		if($.lStorage("_loginRemeber") && !$(".login-change").data("chk")){
 			var phone_id = $.lStorage("_loginRemeber").phone;
 			var password = $(".login-remeber-password input").val();
@@ -271,35 +295,56 @@ onCheckVersionDone = function(needUpdate){
 
 	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
-        s_load_show = true;
 
+        var bodyData = {
+    		id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
+            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
+            dn: QmiGlobal.device,
+            pw:toSha1Encode(password)
+    	};
+        
         new QmiAjax({
         	apiName: "login",
         	specifiedHeaders: {
 	            li:lang
 	        },
-        	body: {
-        		id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
-	            tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
-	            dn: QmiGlobal.device,
-	            pw:toSha1Encode(password)
-        	},
-        	isLoadingShow: true,
+        	body: bodyData,
         	method: "post"
         }).complete(function(data){
+        	var loginDef = $.Deferred();
         	if(data.status == 200){
 
-        		QmiGlobal.auth = $.parseJSON(data.responseText);
-        		
-        		//自動登入儲存 有_loginData 有_loginAutoChk 才代表有選自動登入
-                if($(".login-auto").data("chk")) {
-                	$.lStorage("_loginData",QmiGlobal.auth);
-                	$.lStorage("_loginAutoChk",true);
-                }else {
-                	localStorage.removeItem("_loginData");
-                	localStorage.removeItem("_loginAutoChk");
-                }
+        		var dataObj = $.parseJSON(data.responseText);
 
+        		// 判斷此次登入帳號與上次不同再刪除DB
+        		if($.lStorage("_loginId") !== bodyData.id) resetDB();
+
+        		//記錄此次登入帳號
+        		$.lStorage("_loginId",bodyData.id);
+
+				QmiGlobal.auth = dataObj;
+
+        		// SSO 登入
+        		if(dataObj.rsp_code === 104) {
+        			QmiGlobal.auth.isSso = true;
+        			dataObj.id = bodyData.id;
+        			dataObj.pw = password;
+
+        			QmiGlobal.ssoLogin(dataObj).done(loginDef.resolve);
+        		} else {
+        			loginDef.resolve({isSso:false, isSuccess: true});
+        		}
+        	} else {
+        		loginDef.resolve({isSso:false, isSuccess: false});
+        	}
+
+        	loginDef.done(function(rspData) {
+        		
+        		if(rspData.isSuccess === false) {
+        			$("#page-registration .login").removeClass("login-waiting");	
+        			return;
+        		}
+        			
         		//判斷是否換帳號 換帳號就要清db
         		changeAccountToResetDB(phoneId);
 
@@ -317,7 +362,8 @@ onCheckVersionDone = function(needUpdate){
 		    		localStorage.removeItem("_loginRemeber");
 				}
 				loginAction();
-        	}
+        	});
+
         }).error(function(){
         	window.errorTest = arguments;
         	cns.debug("login error ",arguments)
@@ -348,7 +394,13 @@ onCheckVersionDone = function(needUpdate){
         userInfoGetting();
        
         //附上group list
-        getGroupList().done(function(groupList){
+        getGroupList().done(function(rspData){
+        	if(rspData.isSuccess === false) {
+        		deferred.reject(rspData)
+        		return;
+        	}
+
+        	var groupList = rspData.gl;
         	var specifiedGi = QmiGlobal.auth.dgi;
         	if($.lStorage("groupChat")){
         		groupChat = $.lStorage("groupChat");
@@ -381,7 +433,14 @@ onCheckVersionDone = function(needUpdate){
                 }
 
                 getGroupComboInit(specifiedGi).done(function(resultObj){
+
                 	if( resultObj.status === false ){
+                		//sso 取消
+                		if(resultObj.data.isReAuthCancel === true){
+                			cns.debug("sso reAuth 取消");	
+                			return;
+                		}
+
                 		//發生錯誤 回首頁比較保險
                 		cns.debug("dgi combo error",resultObj);
                 		window.location = "index.html";
@@ -418,37 +477,80 @@ onCheckVersionDone = function(needUpdate){
 			if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
 				//關閉返回鍵
 				$("#page-group-menu .page-back").hide();
-				cns.debug("no group ");
-				
 				// 兩個選項都要執行polling()
 				polling();
 			}else{
-
 				//設定目前團體 執行polling()
 				setGroupInitial(data.dgi).done(polling);
 			}
+        }).fail(function(errData) {
+        	$("#page-registration .login").removeClass("login-waiting");
         });
     }
 
-	getPrivateGroupList = function(p_data, callback){
-    	//取得團體列表
-        var api_name = "groups";
-        var headers = {
-            "ui":p_data.ui,
-            "at":p_data.at,
-            "li":lang
-        };
-        var method = "get";
-        ajaxDo(api_name,headers,method,false,false,false,true,p_data.cl).complete(function(res){
-        	if( res.status==200 ){
-        		var parse_data = $.parseJSON(res.responseText);
-	    		var list = $.lStorage("_pri_group")||{};
-	    		list[p_data.ci] = p_data;
-	    		list[p_data.ci].tmp_groups = parse_data.gl;
-	    		$.lStorage("_pri_group", list);
-	    	}
-	    	if(callback) callback();
+
+    // LDAP SSO
+    QmiGlobal.ssoLogin = function(ssoObj) {
+    	var deferred = $.Deferred();
+    	// sso 登入
+		new QmiAjax({
+            url: "https://" + ssoObj.url + "/apiv1/sso/clouds/"+ ssoObj.cdi +"/companies/"+ ssoObj.ci +"/login",
+            specifiedHeaders: { li: lang },
+            body: {
+			   id: ssoObj.id,
+			   tp: "1",
+			   dn: QmiGlobal.device,    
+			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, ssoObj.id.substring(0,16)),
+			   uui: ssoObj.uui
+			},
+            method: "post",
+            error: function(errData){
+                deferred.resolve({
+                	isSuccess: false,
+                	data: errData
+                });
+            }
+        }).done(function(rspData) {
+        	try { 
+        		var ssoKey = JSON.parse(rspData.responseText).key;
+        	} catch(e) { 
+        		var ssoKey = ""; 
+        	}
+        	new QmiAjax({
+	        	apiName: "cert",
+	        	apiVer: "apiv2",
+	        	isPublic: true,
+	        	isSso: true,
+		        specifiedHeaders: {
+		            li:lang
+		        },
+	        	body: {
+				  ui: ssoObj.uui,
+				  key: ssoKey,
+				  tp: "1",
+				  dn: QmiGlobal.device,
+				  ci: ssoObj.ci,
+				  cdi: ssoObj.cdi
+				},
+	        	method: "post",
+	        	error: function(errData){
+	                deferred.resolve({
+	                	isSuccess: false,
+	                	data: errData
+	                });
+	            }
+	        }).done(function(data){
+	        	var dataObj = JSON.parse(data.responseText);
+	        	QmiGlobal.auth.ui = dataObj.ui;
+	        	QmiGlobal.auth.at = dataObj.at;
+	        	QmiGlobal.auth.et = dataObj.et;
+
+				deferred.resolve({
+					isSuccess: true
+				});
+	        });
         });
+        return deferred.promise();
     }
 
 /*	

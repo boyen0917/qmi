@@ -214,7 +214,7 @@ var AddressBook = AddressBook || {
 		}
 
 		//add row custom
-		if (!QmiGlobal.cloudGiMap[gi] == undefined) {
+		if (!QmiGlobal.companyGiMap[gi] == undefined) {
 			var tmp = $("<div class='row custom'><div class='left'></div><div class='right'></div></div>");
 			var left = tmp.find(".left");
 			left.append("<div class='name'>"+$.i18n.getString("ADDRESSBOOK_CUSTOM")+"</div>");

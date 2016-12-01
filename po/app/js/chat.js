@@ -54,9 +54,9 @@ $(function(){
 	// 接收 主畫面的auth
 	QmiGlobal.auth = window.chatAuthData.auth;
 	QmiGlobal.groups = window.chatAuthData.groups;
-	QmiGlobal.clouds = window.chatAuthData.clouds;
-	QmiGlobal.cloudGiMap = window.chatAuthData.cloudGiMap;
-	QmiGlobal.operateChatList = window.chatList;
+	QmiGlobal.companies = window.chatAuthData.companies;
+	QmiGlobal.companyGiMap = window.chatAuthData.companyGiMap;
+	QmiGlobal.operateChatList = window.mainPageObj.chatList;
 
 
 	/**
@@ -474,6 +474,7 @@ $(function(){
 			if ("none" == tmp.css("display")) {
 				tmp.slideDown();
 				$(".screen-lock").fadeIn();
+				$(".screen-lock").css("z-index",1700);
 			} else {
 				tmp.slideUp();
 				$(".screen-lock").fadeOut();
@@ -508,6 +509,9 @@ $(function(){
 		});
 		$(document).on('blur mouseleave', '.chat-msg-bubble-left.active, .chat-msg-bubble-right.active', function (e) {
 			$(this).removeClass("active");
+		});
+		$(document).on("mouseup",".namecard",function(e){
+			$(".screen-lock").css("z-index",2000);
 		});
 
 		//點擊標題顯示聊天室成員
@@ -1168,13 +1172,8 @@ function updateChat(time, isGetNewer) {
 						if (true==g_isFirstTimeLoading) {
 							//no more history
 							if (1 >= data.el.length) noMoreHistoryMsg();
-
 							scrollToBottom();
-							$("#container").find(".chat-msg").each(function(index, el) {
-								if($(el).data().time === g_room.lastCt){
-									$(el)[0].scrollIntoView();
-								}
-							});
+							
 							//hide loading
 							if (false == g_isEndOfHistory) {
 								$("#chat-loading").hide();
@@ -1270,10 +1269,10 @@ function showMsg(object, bIsTmpSend) {
 
 	g_msgs.push(object.ei);
 	// cns.debug("list:",JSON.stringify(object,null,2));
-
 	var time = new Date(object.meta.ct);
 	var container = $("<div class='chat-msg'></div>");
 	container.data("time", object.meta.ct);
+
 	var szSearch = "#chat-contents ." + time.customFormat("_#YYYY#_#MM#_#DD#");
 	var div = $(szSearch);
 
@@ -1429,8 +1428,9 @@ function showMsg(object, bIsTmpSend) {
 		} else {
 			pic.attr("src", "images/common/others/empty_img_personal_l.png");
 		}
-
 		div.append(pic);
+
+		div.find(".aut").data("gi",gi).data("gu",object.meta.gu).addClass("namecard");
 
 		//right
 		var subDiv = $("<div class='group'></div>");
@@ -1869,10 +1869,6 @@ function sendMsgText(dom) {
 			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>0%"
 			+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
 
-		dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-			uploadXhr.abort();
-		});
-
 		qmiUploadFile({
             urlAjax: {
                 apiName: "groups/" + gi + "/files",
@@ -1885,12 +1881,31 @@ function sendMsgText(dom) {
             },
             tp: 2,
             hasFi: true,
+            progressBarDom: dom.find(".progress-container"),
+            setAbortFfmpegCmdEvent : function (ffmpegCmd) {
+            	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+	            	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+	        		dom.find(".chat-fail-status").show();
+	        		dom.find(".progress-container").remove();
+
+	        		ffmpegCmd.kill();
+	        	});
+            },
+            updateCompressionProgress: function (percent) {
+            	dom.find(".chat-upload-progress").attr("max", 100).attr("value", percent);
+				dom.find(".upload-percent").html(percent + '%');
+            },
             progressBar: function () {
             	uploadXhr = new window.XMLHttpRequest();
+
+            	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+            		console.log("upload cancel")
+					uploadXhr.abort();
+				});
 				uploadXhr.upload.addEventListener("progress", function(evt){
 			      	if (evt.lengthComputable) {
-			        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
-				      	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
+			        	dom.find(".chat-upload-progress").attr("max", 100).attr("value", 50 + Math.floor((evt.loaded / evt.total) * 50));
+				      	dom.find(".upload-percent").html(50 + Math.floor((evt.loaded / evt.total) * 50) + '%');
 			      	}
 			    }, false);
 
@@ -3157,7 +3172,7 @@ function sendMsgText(dom) {
 				dataReadyCnt++;
 				if (isPageReady && dataReadyCnt > 1) {
 					$(".screen-lock").hide();
-					showObjectTabShow(gi, title, list, onPageLoad, onDone);
+					showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
 				}
 			} catch (e) {
 				errorReport(e);
@@ -3179,7 +3194,7 @@ function sendMsgText(dom) {
 					dataReadyCnt++;
 					if (isPageReady && dataReadyCnt > 1) {
 						$(".screen-lock").hide();
-						showObjectTabShow(gi, title, list, onPageLoad, onDone);
+						showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
 					}
 				} catch (e) {
 					errorReport(e);
@@ -3192,14 +3207,14 @@ function sendMsgText(dom) {
 			dataReadyCnt++;
 			if (isPageReady && dataReadyCnt > 1) {
 				$(".screen-lock").hide();
-				showObjectTabShow(gi, title, list, onPageLoad, onDone);
+				showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
 			}
 		}
 		loadObjectTabPage($("#pagesContainer"), function () {
 			isPageReady = true;
 			if (dataReadyCnt > 1) {
 				$(".screen-lock").hide();
-				showObjectTabShow(gi, title, list, null, onDone);
+				showChatObjectTabShow(gi, title, list, null, onDone);
 			}
 		});
 	}
