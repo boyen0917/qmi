@@ -8067,7 +8067,7 @@ combineCloudPolling = function(newPollingData){
 
             // 把私雲的這些項目加到公雲 統一處理
             ["cnts", "cmds", "msgs", "ccs"].forEach(function(key){
-                newPollingData[key] = (newPollingData[key] || []).concat(apiData[key]);
+                newPollingData[key] = (newPollingData[key] || []).concat((apiData[key] || []));
             });
 
             // gcnts 是公雲才有 不處理
