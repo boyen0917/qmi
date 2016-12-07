@@ -577,11 +577,9 @@ qmiUploadFile = function(uploadObj){
 				si: s3Obj.si,
 				md: s3Obj.md
 			};
-			console.log(s3Obj.oriFile);
 			if(s3Obj.oriFile){
 				EXIF.getData(s3Obj.oriFile, function(){
 					exifObj = EXIF.getAllTags(this);
-					console.log("exif: ",exifObj);
 					if(!$.isEmptyObject(exifObj)){
 						body.exif = {
 							"DateTimeOriginal": exifObj.DateTimeOriginal || "",
@@ -594,7 +592,6 @@ qmiUploadFile = function(uploadObj){
 					}
 				});
 			}
-			console.log("body: ",body);
 		// commit
 		new QmiAjax({
 			apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
@@ -648,9 +645,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			break;
 		case 1: // 圖
-			console.log(uploadObj);
-			console.log(oriObj);
-			console.log(tmbObj);
 			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s),
 				tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
 
