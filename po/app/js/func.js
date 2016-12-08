@@ -7551,8 +7551,8 @@ getCompanyGroup = function(companyData,allGroupList) {
         $.ajax({
             url: "https://" + companyData.cl + "/apiv1/companies/"+ companyData.ci +"/groups",
             headers: {
-                uui: ui,
-                uat: at,
+                uui: QmiGlobal.auth.ui,
+                uat: QmiGlobal.auth.at,
                 ui: companyData.ui,
                 at: companyData.ctp === 0 ? QmiGlobal.auth.at : companyData.nowAt,
                 li: lang
@@ -7584,22 +7584,24 @@ getCompanyGroup = function(companyData,allGroupList) {
 
 // 這不要刪啊
 getCompanyToken = function(companyData,isReDo){
-    QmiGlobal.reAuthLockDef = $.Deferred();
+    // 以防萬一 重複打了同個company的auth
+    if(isCompanyAuthDefResolved()) companyData.reAuthDef = $.Deferred();
+    var ctDeferred = companyData.reAuthDef;
 
     // 需要輸入密碼
-    if(companyData.tp === 1) {
+    if(companyData.passwordTp === 1) {
         QmiGlobal.module.reAuthUILock.lock(companyData);
 
         QmiGlobal.module.reAuthManually.init({
-            reAuthDef: QmiGlobal.reAuthLockDef,
+            reAuthDef: ctDeferred,
             companyData: companyData
         });
 
     // ctp為 是否需要做cert 的判斷 1是要 0是不要 -> 公雲的company不需要cert
     } else if(companyData.ctp !== 1) {
-        QmiGlobal.reAuthLockDef.resolve(true);
+        ctDeferred.resolve(true);
     } else if(companyData.ctp === undefined) {
-        QmiGlobal.reAuthLockDef.resolve(false);   
+        ctDeferred.resolve(false);   
     } else {
         var tempKey = companyData.key;
 
@@ -7618,7 +7620,7 @@ getCompanyToken = function(companyData,isReDo){
             error: function(errData){
                 addCloudReLoadView(companyData);
 
-                QmiGlobal.reAuthLockDef.resolve(false);
+                ctDeferred.resolve(false);
             },
             success: function(apiData){
 
@@ -7636,13 +7638,13 @@ getCompanyToken = function(companyData,isReDo){
                         QmiGlobal.companies[companyData.ci].nowAt = apiData.at;
                         QmiGlobal.companies[companyData.ci].et = apiData.et;
 
-                        QmiGlobal.reAuthLockDef.resolve(true);
+                        ctDeferred.resolve(true);
                         break;
 
                     case 418: // key 過期
                         // 已經重做過了 不再繼續
                         if(isReDo === true) {
-                            QmiGlobal.reAuthLockDef.resolve(false);
+                            ctDeferred.resolve(false);
                             break;
                         }
 
@@ -7655,20 +7657,27 @@ getCompanyToken = function(companyData,isReDo){
                         }]}).done(function(rspObj){
                             if(rspObj.isSuccess === true) {
                                 companyData.key = rspObj.key;
-                                getCompanyToken(companyData,true).done(QmiGlobal.reAuthLockDef.resolve);
-                            } else QmiGlobal.reAuthLockDef.resolve(false);
+                                getCompanyToken(companyData,true).done(ctDeferred.resolve);
+                            } else ctDeferred.resolve(false);
                         })
 
                         break;
                     // break;
                     default: // ?
-                        QmiGlobal.reAuthLockDef.resolve(false);
+                        ctDeferred.resolve(false);
                 }
             }
         });
     }
 
-    return QmiGlobal.reAuthLockDef.promise();
+    return ctDeferred.promise();
+
+    function isCompanyAuthDefResolved() {
+        if(!companyData.reAuthDef) return true;
+        if(!companyData.reAuthDef.state instanceof Function) return true;
+        if(!companyData.reAuthDef.state() === "pending") return true;
+        return false;
+    } 
 }
 
 // 重新取得私雲key
@@ -8493,7 +8502,7 @@ pollingCmds = function(newPollingData){
                         var companyData = QmiGlobal.companies[newData.ci];
                         if(!companyData) break;
 
-                        companyData.tp = newData.tp;
+                        companyData.passwordTp = newData.tp;
 
                         getCompanyToken(companyData);
                         break;

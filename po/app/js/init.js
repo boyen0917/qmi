@@ -262,7 +262,6 @@ window.QmiGlobal = {
 	ldapCompanies: {}, // ldap雲資訊
 	windowListCiMap: {},
 	module: {}, // 模組
-	reAuthLockDef: {},
 	rspCode401: false,
 
 	// 聊天室 auth
@@ -395,10 +394,14 @@ window.QmiAjax = function(args){
 		$(".ajax-screen-lock").show();
 		$('.ui-loader').css("display","block");
 	}
+
+
+	// 各個私雲都有各自reAuthDeferred
+	var reAuthDeferred = (companyData || {}).reAuthDef;
 	
 	// 執行前 先看reAuth lock沒  若是SSO reAuth 就直接執行
 	if(args.isSsoReAuth === true) ajaxExecute({isSuccess: true})
-	else $.when(QmiGlobal.reAuthLockDef).done(function(){
+	else $.when(reAuthDeferred).done(function(){
 		self.expireChk({
 			url: newArgs.url,
 			noAuth: args.noAuth,
@@ -432,7 +435,7 @@ window.QmiAjax = function(args){
 					&& args.noAuth !== true
 				) {
 					// 執行前 先看reAuth lock沒
-					$.when(QmiGlobal.reAuthLockDef).done(function(){
+					$.when(reAuthDeferred).done(function(){
 						self.reAuth(companyData, rspData).done(reAuthDefChain.resolve);
 					});
 
@@ -654,14 +657,13 @@ QmiAjax.prototype = {
 		} catch(e) {}// do nothing 
 
 		// reAuth Lock 如果已經是deferred 就不重新指定
-		if(!QmiGlobal.reAuthLockDef.then instanceof Function) 
-			QmiGlobal.reAuthLockDef = $.Deferred();
+		if(!companyData.reAuthDef) companyData.reAuthef = $.Deferred();
 
 		// 如果有帶rspData 表示et沒過期 打了api卻回傳401
 		self.doAuth(companyData, rspData).done(deferred.resolve);
 
 		// reAuth結束
-		deferred.done(QmiGlobal.reAuthLockDef.resolve)
+		deferred.done(companyData.reAuthDef.resolve)
 		return deferred.promise();
 	},
 
@@ -715,7 +717,7 @@ QmiAjax.prototype = {
 
 		function authUpdate() {
 			// 需要輸入密碼
-			if((companyData || {}).tp === 1) 
+			if((companyData || {}).passwordTp === 1) 
 				authUpdateManually();
 			else 
 				authUpdateAutomatically();
@@ -728,7 +730,7 @@ QmiAjax.prototype = {
 
 		function authUpdateManually() { 
 			// 這情況最有可能就是tp=0 但後台已經將強制驗證選項設為1了
-			companyData.tp = 1;
+			companyData.passwordTp = 1;
 
 			QmiGlobal.module.reAuthUILock.lock(companyData);
 
@@ -799,7 +801,7 @@ QmiAjax.prototype = {
 		    		&& QmiGlobal.companies[companyData.ci] !== undefined
 		    	) {
 		    		// 私雲
-		    		QmiGlobal.companies[companyData.ci].nowAt = at = apiData.at;
+		    		QmiGlobal.companies[companyData.ci].nowAt = apiData.at;
 		    		QmiGlobal.companies[companyData.ci].et = apiData.et;
 		    	} else {
 		    		// 公雲
@@ -1159,8 +1161,6 @@ QmiGlobal.module.reAuthManually = {
     remove: function() {
     	var self = this;
     	self.view.fadeOut(100, function() { self.view.remove()});
-    	// 解除lock
-    	QmiGlobal.reAuthLockDef.resolve();
     },
 }
 
