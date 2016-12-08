@@ -710,6 +710,12 @@ QmiAjax.prototype = {
 			case 606: // 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 				authUpdate();
 				break;
+			case 607:
+				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
+			case 608:
+				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
 			default:
 				// 沒帶rspCode 表示是expire time過期
 				authUpdate();
