@@ -367,21 +367,21 @@ timelineChangeGroup = function (thisGi) {
             //initOfficialGroup( gi );
 
             //置頂設定
-            topEvent();
+            topEvent().done(function() {
+                if (QmiGlobal.groups[thisGi].set && QmiGlobal.groups[thisGi].set.ccc) {
+                    onRemoveChatDB(thisGi, QmiGlobal.groups[thisGi].set.ccc);
+                }
+                //切換團體時, 選目前第一個選項
+                var tmp = $(".sm-small-area:visible");
+                if( tmp.length>0 ){
+                    $(tmp[0]).addClass("active");
+                    timelineSwitch( ( $( tmp[0] ).data("sm-act") || "feeds" ),true);
+                }else{
+                    timelineSwitch("feeds",true);
+                }
 
-            if (QmiGlobal.groups[thisGi].set && QmiGlobal.groups[thisGi].set.ccc) {
-                onRemoveChatDB(thisGi, QmiGlobal.groups[thisGi].set.ccc);
-            }
-            //切換團體時, 選目前第一個選項
-            var tmp = $(".sm-small-area:visible");
-            if( tmp.length>0 ){
-                $(tmp[0]).addClass("active");
-                timelineSwitch( ( $( tmp[0] ).data("sm-act") || "feeds" ),true);
-            }else{
-                timelineSwitch("feeds",true);
-            }
-
-            changeDeferred.resolve();
+                changeDeferred.resolve();
+            });
         })
     }
         
@@ -7618,7 +7618,7 @@ getCompanyToken = function(companyData,isReDo){
             }),
             type: "post",
             error: function(errData){
-                addCloudReLoadView(companyData);
+                addCompanyReLoadView(companyData);
 
                 ctDeferred.resolve(false);
             },
@@ -7637,6 +7637,9 @@ getCompanyToken = function(companyData,isReDo){
                         // 設定這次的私雲token
                         QmiGlobal.companies[companyData.ci].nowAt = apiData.at;
                         QmiGlobal.companies[companyData.ci].et = apiData.et;
+
+                        // 驗證形式
+                        QmiGlobal.companies[companyData.ci].passwordTp = apiData.tp;
 
                         ctDeferred.resolve(true);
                         break;
@@ -7675,7 +7678,7 @@ getCompanyToken = function(companyData,isReDo){
     function isCompanyAuthDefResolved() {
         if(!companyData.reAuthDef) return true;
         if(!companyData.reAuthDef.state instanceof Function) return true;
-        if(!companyData.reAuthDef.state() === "pending") return true;
+        if(companyData.reAuthDef.state() !== "pending") return true;
         return false;
     } 
 }
@@ -7701,7 +7704,7 @@ getCompanyKey = function(companiesKeyObj){
 }
 
 
-addCloudReLoadView = function(companyData) {
+addCompanyReLoadView = function(companyData) {
     if(QmiGlobal.viewMap.hasOwnProperty("refresh_" + companyData.ci) === false) {
          var refreshDom = $('<div class="refresh-item">' +
             '<div>' + companyData.cn + '</div>' +
@@ -7812,7 +7815,7 @@ companyLoad = function(loadData){
                     setTimeout(function() { toastShow($.i18n.getString("REFRESH_TEXT"))},500);
                 } else {
                     // 表示取的私雲失敗 加入重讀取UI
-                    addCloudReLoadView(companyData);
+                    addCompanyReLoadView(companyData);
                 }
                 return;
             }
@@ -8573,7 +8576,7 @@ pollingCmds = function(newPollingData){
             var deleteFlag = true;
 
             // tp11 是新團體 或 gi不在 現有列表中 就要統一做一次取得團體列表
-            if( item.tp === 11 || !QmiGlobal.groups[(item.pm || {}).gi] )
+            if(item.tp === 11 || isGiNotExist(item.pm.gi))
                 groupListUpdateFlag = true;
 
             // 取各組的ct最大值
@@ -8600,6 +8603,12 @@ pollingCmds = function(newPollingData){
             arrangementDef.resolve();
 
         return arrangementDef.promise();
+    }
+
+    function isGiNotExist(thisGi) {
+        if(!thisGi) return false;
+        if(QmiGlobal.groups[thisGi]) return false;
+        return true;
     }
 }
 
