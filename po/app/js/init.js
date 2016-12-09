@@ -217,8 +217,6 @@ var timeline_detail_exception = [
 
 window.QmiGlobal = {
 
-	pollingOff: true,
-
 	// 之後取代 ui, at, gi, ... etc
 	currentGi: "",
 
