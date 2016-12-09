@@ -347,8 +347,8 @@
 
 
 	"REFRESH_RELOAD" : "讀取失敗，請稍後再試",
-	"REFRESH_TEXT" : "私雲取得失敗 請稍後再試",
-	"REFRESH_ALERT_SUCCESS" : "私雲移轉完成",
+	"REFRESH_TEXT" : "企業資訊取得失敗 請稍後再試",
+	"REFRESH_ALERT_SUCCESS" : "企業資訊取得完成",
 	"REFRESH_ALERT_CONFIRM" : "按確定可立即前往預設團體",
 
 

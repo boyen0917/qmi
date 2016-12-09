@@ -231,7 +231,6 @@ window.QmiGlobal = {
 	ldapCompanies: {}, // ldap雲資訊
 	windowListCiMap: {},
 	module: {}, // 模組
-	reAuthLockDef: {},
 	rspCode401: false,
 
 	// 聊天室 auth
@@ -245,8 +244,19 @@ window.QmiGlobal = {
 		}
 	},
 
-	viewMap: {} // cloud reload
+	viewMap: {}, // cloud reload
 
+
+	ajaxLoadingUI: {
+		show: function() {
+			$('.ui-loader').show();
+			$(".ajax-screen-lock").show();
+		},
+		hide: function() {
+			$('.ui-loader').hide();
+			$(".ajax-screen-lock").hide();
+		}
+	} 
 };
 
 // polling異常監控
@@ -364,10 +374,14 @@ window.QmiAjax = function(args){
 		$(".ajax-screen-lock").show();
 		$('.ui-loader').css("display","block");
 	}
+
+
+	// 各個私雲都有各自reAuthDeferred
+	var reAuthDeferred = (companyData || {}).reAuthDef;
 	
 	// 執行前 先看reAuth lock沒  若是SSO reAuth 就直接執行
 	if(args.isSsoReAuth === true) ajaxExecute({isSuccess: true})
-	else $.when(QmiGlobal.reAuthLockDef).done(function(){
+	else $.when(reAuthDeferred).done(function(){
 		self.expireChk({
 			url: newArgs.url,
 			noAuth: args.noAuth,
@@ -401,7 +415,7 @@ window.QmiAjax = function(args){
 					&& args.noAuth !== true
 				) {
 					// 執行前 先看reAuth lock沒
-					$.when(QmiGlobal.reAuthLockDef).done(function(){
+					$.when(reAuthDeferred).done(function(){
 						self.reAuth(companyData, rspData).done(reAuthDefChain.resolve);
 					});
 
@@ -609,6 +623,8 @@ QmiAjax.prototype = {
 		var self = this,
 			deferred = $.Deferred();
 
+		companyData = companyData || {};
+
 		// 先檢查是否按取消
 		try { 
 			if(QmiGlobal.companies[companyData.ci].isReAuthCancel === true) {
@@ -623,14 +639,13 @@ QmiAjax.prototype = {
 		} catch(e) {}// do nothing 
 
 		// reAuth Lock 如果已經是deferred 就不重新指定
-		if(!QmiGlobal.reAuthLockDef.then instanceof Function) 
-			QmiGlobal.reAuthLockDef = $.Deferred();
+		if(!companyData.reAuthDef) companyData.reAuthDef = $.Deferred();
 
 		// 如果有帶rspData 表示et沒過期 打了api卻回傳401
 		self.doAuth(companyData, rspData).done(deferred.resolve);
 
 		// reAuth結束
-		deferred.done(QmiGlobal.reAuthLockDef.resolve)
+		deferred.done(companyData.reAuthDef.resolve)
 		return deferred.promise();
 	},
 
@@ -642,7 +657,7 @@ QmiAjax.prototype = {
 			try {
 				return JSON.parse(rspData.responseText).rsp_code;
 			} catch(e) {
-				return {rsp_code: 999, rsp_msg: "parse error"};
+				return 999;
 			}
 		}();
 
@@ -677,14 +692,20 @@ QmiAjax.prototype = {
 			case 606: // 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 				authUpdate();
 				break;
-			default:
+			case 607:
+				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
+			case 608:
+				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
+			case undefined:
 				// 沒帶rspCode 表示是expire time過期
 				authUpdate();
 		}
 
 		function authUpdate() {
 			// 需要輸入密碼
-			if((companyData || {}).tp === 1) 
+			if((companyData || {}).passwordTp === 1) 
 				authUpdateManually();
 			else 
 				authUpdateAutomatically();
@@ -697,7 +718,7 @@ QmiAjax.prototype = {
 
 		function authUpdateManually() { 
 			// 這情況最有可能就是tp=0 但後台已經將強制驗證選項設為1了
-			companyData.tp = 1;
+			companyData.passwordTp = 1;
 
 			QmiGlobal.module.reAuthUILock.lock(companyData);
 
@@ -768,7 +789,7 @@ QmiAjax.prototype = {
 		    		&& QmiGlobal.companies[companyData.ci] !== undefined
 		    	) {
 		    		// 私雲
-		    		QmiGlobal.companies[companyData.ci].nowAt = at = apiData.at;
+		    		QmiGlobal.companies[companyData.ci].nowAt = apiData.at;
 		    		QmiGlobal.companies[companyData.ci].et = apiData.et;
 		    	} else {
 		    		// 公雲
@@ -796,8 +817,7 @@ QmiAjax.prototype = {
 
 		//polling錯誤不關閉 為了url parse
 		if(isPolling === false){
-			$('.ui-loader').hide();
-			$(".ajax-screen-lock").hide();
+			QmiGlobal.ajaxLoadingUI.hide();
 		}
 
 		//不做錯誤顯示 polling也不顯示 isCancel 手動輸入密碼的私雲重新頁面 按取消就不顯示錯誤訊息
@@ -831,10 +851,7 @@ QmiAjax.prototype = {
 
 	onComplete: function(data){
 		
-		if(s_load_show === false) {
-			$('.ui-loader').hide();
-			$(".ajax-screen-lock").hide();
-		}
+		if(s_load_show === false) QmiGlobal.ajaxLoadingUI.hide();
 
 	}
 
@@ -965,8 +982,7 @@ QmiGlobal.module.reAuthManually = {
     	// 關閉原本的ajax load 圖示
     	if($(".ajax-screen-lock").is(":visible")) {
     		self.hasAjaxLoad = true;
-    		$(".ajax-screen-lock").hide();
-			$('.ui-loader').hide();
+    		QmiGlobal.ajaxLoadingUI.hide();
     	}
 
     	self.reAuthDef = argObj.reAuthDef;
@@ -1128,8 +1144,6 @@ QmiGlobal.module.reAuthManually = {
     remove: function() {
     	var self = this;
     	self.view.fadeOut(100, function() { self.view.remove()});
-    	// 解除lock
-    	QmiGlobal.reAuthLockDef.resolve();
     },
 }
 

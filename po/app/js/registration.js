@@ -380,9 +380,6 @@ onCheckVersionDone = function(needUpdate){
 
 	//初始化 
     function loginAction (){
-
-    	//儲存登入資料 跳轉到timeline
-    	if ($.lStorage("_loginData") !== false && QmiGlobal.isPeriodicallyReload !== true) QmiGlobal.auth = $.lStorage("_loginData");
         
         var deferred = $.Deferred(),
         	group_list = [];
@@ -459,8 +456,7 @@ onCheckVersionDone = function(needUpdate){
         deferred.done(function(data){
 
         	s_load_show = false;
-        	$('.ui-loader').hide();
-			$(".ajax-screen-lock").hide();
+        	QmiGlobal.ajaxLoadingUI.hide();
 
             $.lStorage("refreshChk", false);
             localStorage["uiData"] = JSON.stringify(QmiGlobal.groups);
@@ -545,9 +541,15 @@ onCheckVersionDone = function(needUpdate){
 	        	QmiGlobal.auth.at = dataObj.at;
 	        	QmiGlobal.auth.et = dataObj.et;
 
-				deferred.resolve({
-					isSuccess: true
-				});
+	        	// 先存起來
+	        	QmiGlobal.auth.ssoPasswordTp = dataObj.tp;
+
+	        	// // sso 初始值
+	        	// QmiGlobal.companies[QmiGlobal.auth.ci] = QmiGlobal.auth;
+	        	// QmiGlobal.companies[QmiGlobal.auth.ci].nowAt = dataObj.at;
+          		// QmiGlobal.companies[QmiGlobal.auth.ci].passwordTp = dataObj.tp;
+
+				deferred.resolve({isSuccess: true});
 	        });
         });
         return deferred.promise();
@@ -880,8 +882,7 @@ onCheckVersionDone = function(needUpdate){
         		//popupShowAdjust("","驗證碼已重新送出");
 				if(data.status == 200){
 	                s_load_show = false;
-	                $('.ui-loader').hide();
-	                $(".ajax-screen-lock").hide();
+	                QmiGlobal.ajaxLoadingUI.hide();
 	        		toastShow( $.i18n.getString("REGISTER_AUTH_SMS_HAS_SENT") );
         		}
 			}else if(data.status == 200){

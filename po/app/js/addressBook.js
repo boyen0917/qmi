@@ -1635,8 +1635,7 @@ var AddressBook = AddressBook || {
         		s_load_show = false;
         		
         		// 關閉load 圖示
-        		$('.ui-loader').hide();
-				$(".ajax-screen-lock").hide();
+        		QmiGlobal.ajaxLoadingUI.hide();
 
                 //重置團體頭像、名稱的參數
                 // getGroupCombo(gi,function(){
@@ -1706,8 +1705,7 @@ var AddressBook = AddressBook || {
         		s_load_show = false;
         		
         		// 關閉load 圖示
-        		$('.ui-loader').hide();
-				$(".ajax-screen-lock").hide();
+        		QmiGlobal.ajaxLoadingUI.hide();
 
                 //重置團體頭像、名稱的參數
                 // getGroupCombo(gi,function(){
@@ -1757,8 +1755,7 @@ var AddressBook = AddressBook || {
         		s_load_show = false;
         		
         		// 關閉load 圖示
-        		$('.ui-loader').hide();
-				$(".ajax-screen-lock").hide();
+        		QmiGlobal.ajaxLoadingUI.hide();
 
 		        if( instance.ucl.hasOwnProperty(ci) ){
 		        	delete instance.ucl[ci];
