@@ -665,6 +665,7 @@ QmiGlobal.module.ldapSetting = {
             // step3
             new QmiAjax({
                 apiName: "me/sso/step3",
+                isPublicApi: true,
                 errHide: true,
                 method: "post",
                 body: {
