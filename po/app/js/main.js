@@ -212,8 +212,6 @@ $(function(){
 
 				            //combo
 				            getGroupComboInit(cg_result.gi,function(){
-				            	s_load_show = false;
-
 			                	//設定目前團體
     							setThisGroup(cg_result.gi);
 
@@ -232,6 +230,8 @@ $(function(){
 				            });
 		        		}); // groupMenuListArea
 	        		})
+	        	} else {
+	        		s_load_show = false;
 	        	}
 	        });
 		}

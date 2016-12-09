@@ -7065,8 +7065,7 @@ getLinkYoutube = function (this_compose,url) {
                 timeout: 5000,
                 complete: function(){
                     s_load_show = false;
-                    $('.ui-loader').hide();
-                    $(".ajax-screen-lock").hide();
+                    QmiGlobal.ajaxLoadingUI.hide();
                     
                     //loading圖示隱藏
                     $(".cp-attach-area .url-loading").hide();
@@ -7324,8 +7323,7 @@ replySend = function(thisEvent){
             }
             //loading icon off
             s_load_show = false;
-            $('.ui-loader').hide();
-            $(".ajax-screen-lock").hide();
+            QmiGlobal.ajaxLoadingUI.hide();
             //set sending flag false
             thisEvent.find(".st-reply-message-send").data("reply-chk",false);
             return;
@@ -7599,6 +7597,14 @@ getCompanyToken = function(companyData,isReDo){
 
     // ctp為 是否需要做cert 的判斷 1是要 0是不要 -> 公雲的company不需要cert
     } else if(companyData.ctp !== 1) {
+        setCompanyData(companyData, {
+            at: QmiGlobal.auth.at,
+            et: QmiGlobal.auth.et,
+            tp: QmiGlobal.auth.ssoPasswordTp ? QmiGlobal.auth.ssoPasswordTp : QmiGlobal.auth.at
+        })
+        // 存入公雲company
+        QmiGlobal.companies[companyData.ci] = companyData;
+
         ctDeferred.resolve(true);
     } else if(companyData.ctp === undefined) {
         ctDeferred.resolve(false);   
@@ -7632,15 +7638,7 @@ getCompanyToken = function(companyData,isReDo){
 
                     case 200: //成功 繼續下一步
                         // 存入 QmiGlobal.companies
-                        QmiGlobal.companies[companyData.ci] = companyData;
-
-                        // 設定這次的私雲token
-                        QmiGlobal.companies[companyData.ci].nowAt = apiData.at;
-                        QmiGlobal.companies[companyData.ci].et = apiData.et;
-
-                        // 驗證形式
-                        QmiGlobal.companies[companyData.ci].passwordTp = apiData.tp;
-
+                        setCompanyData(companyData, apiData);
                         ctDeferred.resolve(true);
                         break;
 
@@ -7674,6 +7672,18 @@ getCompanyToken = function(companyData,isReDo){
     }
 
     return ctDeferred.promise();
+
+    function setCompanyData(companyData, authData) {
+        // 存入 QmiGlobal.companies
+        QmiGlobal.companies[companyData.ci] = companyData;
+
+        // 設定這次的私雲token
+        QmiGlobal.companies[companyData.ci].nowAt = authData.at;
+        QmiGlobal.companies[companyData.ci].et = authData.et;
+
+        // 驗證形式
+        QmiGlobal.companies[companyData.ci].passwordTp = authData.tp;
+    }
 
     function isCompanyAuthDefResolved() {
         if(!companyData.reAuthDef) return true;

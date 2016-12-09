@@ -692,10 +692,7 @@
 	                                toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );    
 	                                updateAllAvatarName(gi,gu);
 	                            });
-	                        }else{
-	                            $('.ui-loader').hide();
-	                            $(".ajax-screen-lock").hide();
-	                        }
+	                        } else QmiGlobal.ajaxLoadingUI.hide();
 	                    });
 	                }
 	                reader.readAsDataURL(file);
@@ -929,8 +926,7 @@
 	                s_load_show = false;
 	                
 	                // 關閉load 圖示
-	                $('.ui-loader').hide();
-	                $(".ajax-screen-lock").hide();
+	                QmiGlobal.ajaxLoadingUI.hide();
 
 	                //重置團體頭像、名稱的參數
 	                getGroupCombo(gi,function(){
@@ -967,8 +963,7 @@
 	        s_load_show = false;
 	        
 	        // 關閉load 圖示
-	        $('.ui-loader').hide();
-	        $(".ajax-screen-lock").hide();
+	        QmiGlobal.ajaxLoadingUI.hide();
 	        //重置團體頭像、名稱的參數
 	        if(data.status == 200){
 	            //重置團體頭像、名稱 失敗也要重置

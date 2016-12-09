@@ -275,8 +275,19 @@ window.QmiGlobal = {
 		}
 	},
 
-	viewMap: {} // cloud reload
+	viewMap: {}, // cloud reload
 
+
+	ajaxLoadingUI: {
+		show: function() {
+			$('.ui-loader').show();
+			$(".ajax-screen-lock").show();
+		},
+		hide: function() {
+			$('.ui-loader').hide();
+			$(".ajax-screen-lock").hide();
+		}
+	} 
 };
 
 // polling異常監控
@@ -643,6 +654,8 @@ QmiAjax.prototype = {
 		var self = this,
 			deferred = $.Deferred();
 
+		companyData = companyData || {};
+
 		// 先檢查是否按取消
 		try { 
 			if(QmiGlobal.companies[companyData.ci].isReAuthCancel === true) {
@@ -657,7 +670,7 @@ QmiAjax.prototype = {
 		} catch(e) {}// do nothing 
 
 		// reAuth Lock 如果已經是deferred 就不重新指定
-		if(!companyData.reAuthDef) companyData.reAuthef = $.Deferred();
+		if(!companyData.reAuthDef) companyData.reAuthDef = $.Deferred();
 
 		// 如果有帶rspData 表示et沒過期 打了api卻回傳401
 		self.doAuth(companyData, rspData).done(deferred.resolve);
@@ -675,7 +688,7 @@ QmiAjax.prototype = {
 			try {
 				return JSON.parse(rspData.responseText).rsp_code;
 			} catch(e) {
-				return {rsp_code: 999, rsp_msg: "parse error"};
+				return 999;
 			}
 		}();
 
@@ -716,7 +729,7 @@ QmiAjax.prototype = {
 			case 608:
 				QmiGlobal.module.reAuthUILock.lock(companyData);
 				break;
-			default:
+			case undefined:
 				// 沒帶rspCode 表示是expire time過期
 				authUpdate();
 		}
@@ -835,8 +848,7 @@ QmiAjax.prototype = {
 
 		//polling錯誤不關閉 為了url parse
 		if(isPolling === false){
-			$('.ui-loader').hide();
-			$(".ajax-screen-lock").hide();
+			QmiGlobal.ajaxLoadingUI.hide();
 		}
 
 		//不做錯誤顯示 polling也不顯示 isCancel 手動輸入密碼的私雲重新頁面 按取消就不顯示錯誤訊息
@@ -870,10 +882,7 @@ QmiAjax.prototype = {
 
 	onComplete: function(data){
 		
-		if(s_load_show === false) {
-			$('.ui-loader').hide();
-			$(".ajax-screen-lock").hide();
-		}
+		if(s_load_show === false) QmiGlobal.ajaxLoadingUI.hide();
 
 	}
 
@@ -1004,8 +1013,7 @@ QmiGlobal.module.reAuthManually = {
     	// 關閉原本的ajax load 圖示
     	if($(".ajax-screen-lock").is(":visible")) {
     		self.hasAjaxLoad = true;
-    		$(".ajax-screen-lock").hide();
-			$('.ui-loader').hide();
+    		QmiGlobal.ajaxLoadingUI.hide();
     	}
 
     	self.reAuthDef = argObj.reAuthDef;
