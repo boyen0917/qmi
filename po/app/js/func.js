@@ -341,22 +341,15 @@ timelineChangeGroup = function (thisGi) {
         .find(".gm-header-right").show().end()
         .find(".gm-content-body").show();
 
-        if(Object.keys(QmiGlobal.groups[thisGi].guAll).length == 0){
+        if(Object.keys(QmiGlobal.groups[thisGi].guAll).length == 0)
             getGroupComboInit(thisGi).done( comboDeferred.resolve );
-        } else {
+        else
             comboDeferred.resolve();
-        }
 
 
         comboDeferred.done(function(rspObj){
-            if((rspObj || {}).isSuccess === false 
-                || QmiGlobal.groups[thisGi].isRefreshing
-                || QmiGlobal.groups[thisGi].isReAuthUILock
-            ) {
-                // 再做一次 才會有屏蔽的ui效果
-                // timelineChangeGroup(thisGi);
-                return;
-            }
+            if(isUILock()) return;
+
             //指定gi
             setThisGroup(thisGi);
 
@@ -382,9 +375,15 @@ timelineChangeGroup = function (thisGi) {
 
                 changeDeferred.resolve();
             });
+
+            function isUILock() {
+                if((rspObj || {}).isSuccess === false) return true;
+                if(QmiGlobal.groups[thisGi].isRefreshing) return true;
+                if(QmiGlobal.groups[thisGi].isReAuthUILock) return true;
+                return false;
+            }
         })
     }
-        
     return changeDeferred.promise();
 }
 

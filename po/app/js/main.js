@@ -289,81 +289,45 @@ $(function(){
 	});
 
 	//更換動態
-	$(document).on("click",".sm-small-area,.sm-group-area.enable",function(){
+	$(document).on("click",".sm-small-area",function(){
 
 		$(".sm-group-list-area").removeAttr("data-unlock");
 		var target = $(this);
 
-		if($(this).hasClass("sm-group-area")){
-			//滾動至最上面
-			timelineScrollTop();
+		if($(".st-filter-area").hasClass("st-filter-lock")) return;
+		//滾動至最上面
+		timelineScrollTop();
 
-			//取消主頁
-			timelineMainClose();
+		//取消主頁
+		timelineMainClose();
 
-			target = $(".sm-small-area[data-sm-act=feeds]");
-		}else{
-			// $(".polling-local .sm-count").hide();
-
-			if( $(".st-filter-area").hasClass("st-filter-lock") ){
-				// cns.debug("-------------");
-				// cns.debug("-------------");
-				// cns.debug("-------------");
-				// cns.debug("lock .sm-small-area,.sm-group-area");
-				// cns.debug("-------------");
-				// cns.debug("-------------");
-				// cns.debug("-------------");
-				return;
-			}
-			//滾動至最上面
-			timelineScrollTop();
-
-			//取消主頁
-			timelineMainClose();
-
-			//check pens
-			//如果該tab的筆功能都沒開的話, 直接把筆hide起來
-			var act = target.data("sm-act");
-			var menu = $(".feed-compose-area");
-			$(".feed-compose").show();
-			switch( act ){
-				case "feed-post": //貼文only
-					if( menu.find(".fc-area-subbox.active[data-fc-box=post]").length<=0 ){
-						$(".feed-compose").hide();
-					}
-					break;
-				case "feed-public": //團體動態, 貼文不開
-					if( menu.find(".fc-area-subbox.active:not([data-fc-box=post])").length<=0 ){
-						$(".feed-compose").hide();
-					}
-					break;
-				default: //一般&其他?, 筆有的都開
-					if( menu.find(".fc-area-subbox.active").length<=0 ){
-						$(".feed-compose").hide();
-					}
-					break;
-			}
-
-			$(".sm-small-area.active").removeClass("active");
-			timelineSwitch(target.data("sm-act"));
-			$(this).addClass("active");
+		//check pens
+		//如果該tab的筆功能都沒開的話, 直接把筆hide起來
+		var act = target.data("sm-act");
+		var menu = $(".feed-compose-area");
+		var composeDom = $(".feed-compose");
+		composeDom.show();
+		switch( act ){
+			case "feed-post": //貼文only
+				if( menu.find(".fc-area-subbox.active[data-fc-box=post]").length<=0 )
+					composeDom.hide();
+				break;
+			case "feed-public": //團體動態, 貼文不開
+				if( menu.find(".fc-area-subbox.active:not([data-fc-box=post])").length<=0 )
+					composeDom.hide();
+				break;
+			default: //一般&其他?, 筆有的都開
+				if( menu.find(".fc-area-subbox.active").length<=0 )
+					composeDom.hide();
+				break;
 		}
 
-		target.addClass("sm-click-bg");
-		// target.find(".sm-small-area-l img").attr("src",icon_default + target.data("sm-act") + "_activity.png");
-		
-	});
+		$(".sm-small-area.active").removeClass("active");
+		timelineSwitch(target.data("sm-act"));
+		$(this).addClass("active");
 
-	// 登出 暫時
-	// $(".sm-person-info").on("click",".system-logout",function(){
-	// 	// popupShowAdjust("",$.i18n.getString("SETTING_DO_LOGOUT"),true,true,[logout]);
-	// 	new QmiGlobal.popup({
-	// 		desc: $.i18n.getString("SETTING_DO_LOGOUT"),
-	// 		confirm: true,
-	// 		cancel: true,
-	// 		action: [logout]
-	// 	});
-	// });
+		target.addClass("sm-click-bg");
+	});
 	
 	//更換團體 sm-group-area有兩個地方有綁定事件
 	$(document).on("click",".sm-group-area.enable",function(){
@@ -373,6 +337,13 @@ $(function(){
 
 		//指定gi
 		timelineChangeGroup($(this).attr("data-gi")).done(function(){
+
+			//滾動至最上面
+			timelineScrollTop();
+
+			//取消主頁
+			timelineMainClose();
+
 			// 保險起見再active一次
 			$(self).addClass("active");
 			// 移轉 

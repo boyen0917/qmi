@@ -277,6 +277,25 @@ window.QmiGlobal = {
 
 	viewMap: {}, // cloud reload
 
+	authCode: function() {
+		var rspCode, level = 1;
+		return {
+			set: function(code) {
+				rspCode = code;
+			},
+			get: function(code) {
+				return rspCode;
+			},
+
+			setLevel: function(lv) {
+				level = lv;
+			},
+			getLevel: function() {
+				return level;
+			}
+		}
+
+	}(),
 
 	ajaxLoadingUI: {
 		show: function() {
@@ -437,6 +456,13 @@ window.QmiAjax = function(args){
 			// 1. 判斷是否reAuth
 			// 2. reAuth之後重做原本的ajax
 			// 3. 回到原本ajax的判斷
+
+			if(QmiGlobal.authCode.get()) {
+				rspData.status = 401;
+				rspData.responseText = JSON.stringify({
+					rsp_code: QmiGlobal.authCode.get()
+				})
+			}
 
 			(function(){
 
@@ -612,7 +638,7 @@ QmiAjax.prototype = {
 			newHeaders.uui = newHeaders.ui;
 			newHeaders.uat = newHeaders.at;
 			newHeaders.ui = companyData.ui;
-			newHeaders.at = companyData.nowAt;
+			newHeaders.at = companyData !== QmiGlobal.auth ? companyData.nowAt : companyData.at;
 		}
 
 		return newHeaders;
@@ -654,7 +680,8 @@ QmiAjax.prototype = {
 		var self = this,
 			deferred = $.Deferred();
 
-		companyData = companyData || {};
+
+		companyData = companyData || QmiGlobal.auth;
 
 		// 先檢查是否按取消
 		try { 
@@ -684,14 +711,17 @@ QmiAjax.prototype = {
 		var self = this;
 		var deferred = $.Deferred();
 
+		
 		var rspCode = function() {
 			try {
-				return JSON.parse(rspData.responseText).rsp_code;
+				if(rspData instanceof Object) 
+					return JSON.parse(rspData.responseText).rsp_code;
+				else 
+					return undefined;
 			} catch(e) {
 				return 999;
 			}
 		}();
-
 
 		// 601: 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
 		// 602: 公雲Token錯誤, 根據之前的流程, 將強制登入app
@@ -748,9 +778,7 @@ QmiAjax.prototype = {
 		}
 
 		function authUpdateManually() { 
-			// 這情況最有可能就是tp=0 但後台已經將強制驗證選項設為1了
-			companyData.passwordTp = 1;
-
+			
 			QmiGlobal.module.reAuthUILock.lock(companyData);
 
 			QmiGlobal.module.reAuthManually.init({
@@ -792,7 +820,7 @@ QmiAjax.prototype = {
 
 		$.ajax({
 		    url: (function(){
-				if(companyData === undefined) {
+				if(companyData.cl === undefined) {
 					return base_url + "apiv1/auth";
 				} else {
 					return "https://" + companyData.cl + "/apiv1/auth";
@@ -816,7 +844,7 @@ QmiAjax.prototype = {
 		    success: function(apiData){
 		    	// 重新設定at
 		    	if(
-		    		companyData !== undefined
+		    		companyData !== QmiGlobal.auth
 		    		&& QmiGlobal.companies[companyData.ci] !== undefined
 		    	) {
 		    		// 私雲
@@ -1101,7 +1129,7 @@ QmiGlobal.module.reAuthManually = {
 		+ "<section class='icon-shield'></section>"
 		+ "<div class='title1'>" + $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") + "</div>"
 		+ "<div class='title2'>" + $.i18n.getString("ACCOUNT_BINDING_ENTER_LDAP_PASSWORD") + "</div>"
-        + "<div class='input-wrap email'><input viewId='email' class='email' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_EMAIL") +"'></div>"
+        + "<div class='input-wrap email'><input viewId='email' class='email' value=\""+ this.companyData.id +"\" readonly ></div>"
         + "<div class='input-wrap password'><input viewId='password' class='password' type='password' placeholder='"+ $.i18n.getString("ACCOUNT_BINDING_PASSWORD") +"'></div>"
         + "<div class='action'>"
         + "<span class='cancel' viewId='cancel'>" + $.i18n.getString("ACCOUNT_BINDING_CANCEL") + "</span>"
