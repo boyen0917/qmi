@@ -7593,17 +7593,13 @@ getCompanyToken = function(companyData,isReDo){
             reAuthDef: ctDeferred,
             companyData: companyData
         });
-
     // ctp為 是否需要做cert 的判斷 1是要 0是不要 -> 公雲的company不需要cert
-    } else if(companyData.ctp !== 1) {
+    } else if(companyData.ctp === 0) {
         setCompanyData(companyData, {
             at: QmiGlobal.auth.at,
             et: QmiGlobal.auth.et,
-            tp: QmiGlobal.auth.ssoPasswordTp ? QmiGlobal.auth.ssoPasswordTp : QmiGlobal.auth.at
+            tp: QmiGlobal.auth.passwordTp ? QmiGlobal.auth.passwordTp : QmiGlobal.auth.at
         })
-        // 存入公雲company
-        QmiGlobal.companies[companyData.ci] = companyData;
-
         ctDeferred.resolve(true);
     } else if(companyData.ctp === undefined) {
         ctDeferred.resolve(false);   
@@ -7675,11 +7671,9 @@ getCompanyToken = function(companyData,isReDo){
     function setCompanyData(companyData, authData) {
         // 存入 QmiGlobal.companies
         QmiGlobal.companies[companyData.ci] = companyData;
-
         // 設定這次的私雲token
         QmiGlobal.companies[companyData.ci].nowAt = authData.at;
         QmiGlobal.companies[companyData.ci].et = authData.et;
-
         // 驗證形式
         QmiGlobal.companies[companyData.ci].passwordTp = authData.tp;
     }

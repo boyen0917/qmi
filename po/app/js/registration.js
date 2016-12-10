@@ -534,7 +534,7 @@ onCheckVersionDone = function(needUpdate){
 	        	QmiGlobal.auth.et = dataObj.et;
 
 	        	// 先存起來
-	        	QmiGlobal.auth.ssoPasswordTp = dataObj.tp;
+	        	QmiGlobal.auth.passwordTp = dataObj.tp;
 
 	        	// // sso 初始值
 	        	// QmiGlobal.companies[QmiGlobal.auth.ci] = QmiGlobal.auth;
