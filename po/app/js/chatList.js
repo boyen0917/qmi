@@ -39,26 +39,11 @@ initChatList = function(){
 
 	//----- set title -------
 	var currentGroup = QmiGlobal.groups[gi];
-	// var parent = $("#page-group-main").find(".gm-header");
-	// if( parent ){
-		//set title & sub-title
-		// var tmp = parent.find(".page-title");
-		// if( tmp ){
-		// 	tmp.html( $.i18n.getString("CHAT_TITLE") );
-		// 	if( currentGroup )	tmp.next().html( currentGroup.gn );
-		// }
-		//set add icon
-		// parent.find(".feed-compose").hide();
-		// parent.find(".chatList-add").show();
-	// }
-	
 	//set add member button
 	$(".chatList-add").off("click");
 	$(".chatList-add").on("click", function(){
 		$(".chatList-add").data("object_str","");
-		if(currentGroup.isOfficial){
-			$(".chatList-add").data("offical","add");
-		}
+		if(currentGroup.isOfficial) $(".chatList-add").data("offical","add");
 		showNewRoomPage();
 	});
 
@@ -160,12 +145,6 @@ function updateChatList( giTmp, extraCallBack ){
 		if(gi !== giTmp) return;
 
 		var chatListDom = $(".subpage-chatList");
-		//預設開啟loading, 關閉rows & coachmark
-		chatListDom.find(".coachmake").hide();
-		chatListDom.find(".loading").show();
-		chatListDom.find(".rows").html("");
-		chatListDom.find(".top-chatList").hide("");
-		$(".top-chatList .list").html("");
 		chatListDom.find(".loading").hide();
 
 		if(rspObj.isSuccess && rspObj.roomArr.length > 0) 
@@ -190,10 +169,9 @@ function showChatList(){
 	var chatList = groupData.chatAll;
 	if( null==chatList ) return;
 
-	var 
-	deferredPoolArr = [],
-	targetDiv = $(".subpage-chatList .rows");
-	topChatListDiv = $(".top-chatList .list");
+	var deferredPoolArr = [],
+		targetDiv = $(".subpage-chatList .rows");
+		topChatListDiv = $(".top-chatList .list");
 	
 	var romm = 0;
 	$.each(QmiGlobal.groups[gi].chatAll, function(index, val) {

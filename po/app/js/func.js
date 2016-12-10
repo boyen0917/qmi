@@ -513,6 +513,15 @@ timelineSwitch = function (act,reset,main,noPR){
             switchDeferred.resolve({ act: "addressBook"});
             break;
         case "chat":
+            groupMain.find(".subpage-chatList").show();
+            
+            var chatListDom = $(".subpage-chatList");
+            //預設開啟loading, 關閉rows & coachmark
+            chatListDom.find(".coachmake").hide();
+            chatListDom.find(".rows").html("");
+            chatListDom.find(".top-chatList").hide();
+            chatListDom.find(".top-chatList .list").html("");
+
             //offical general 官方帳號非管理員
             if( onClickOfficialGeneralChat(gi) ){
                 groupMain.find(".subpage-timeline").show();
@@ -541,9 +550,6 @@ timelineSwitch = function (act,reset,main,noPR){
                       break;
                 }
             } else {
-                //-- switch sub pages --
-                groupMain.find(".subpage-chatList").show();
-
                 page_title = $.i18n.getString("CHAT_TITLE");
 
                 initChatList();

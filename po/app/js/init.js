@@ -778,7 +778,7 @@ QmiAjax.prototype = {
 		}
 
 		function authUpdateManually() { 
-			
+
 			QmiGlobal.module.reAuthUILock.lock(companyData);
 
 			QmiGlobal.module.reAuthManually.init({
@@ -1222,6 +1222,9 @@ QmiGlobal.module.systemPopup = {
 
     	$("body").append(self.view);
     	self.view.fadeIn(100);
+
+    	// 防止loading覆蓋
+    	QmiGlobal.ajaxLoadingUI.hide();
     	
     	QmiGlobal.eventDispatcher.subscriber([
     		{

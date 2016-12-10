@@ -1685,16 +1685,23 @@ $(function(){
         }
 	});
 
-	$(document).on("dragover",".st-sub-box,#page-compose",function(e){
+	$(document).on("dragover", ".st-sub-box, #page-compose", function() {
 		var this_target = $(this);
-		if(this_target.hasClass("st-sub-box") && !this_target.find(".timeline-dnd").is(":visible")){
-			this_target.find(".timeline-dnd").show().css("height",this_target.height());
-		}else{
+
+		// 自動偵測解除dnd藍色背景
+		console.log("dnd timer", this_target.data("dnd-timer"));
+		// clearTimeout(this_target.data("dnd-timer"));
+		// this_target.data("dnd-timer", setTimeout(function() {
+		// 	this_target.find(".timeline-dnd").hide();
+		// }, 1000));
+
+		if(this_target.hasClass("st-sub-box") && !this_target.find(".timeline-dnd").is(":visible"))
+			this_target.find(".timeline-dnd").show().css("height",this_target.height()+5);
+		else
 			$(".compose-dnd").show();	
-		}
 	});
 
-	$(document).on("dragleave",".timeline-dnd,.compose-dnd",function(){
+	$(document).on("dragleave",".timeline-dnd, .compose-dnd",function(){
 		$(this).hide();
 	});
 

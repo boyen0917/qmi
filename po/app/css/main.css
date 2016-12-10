@@ -3818,9 +3818,7 @@ img.st-reply-message-attach {
 	margin-top: -8px;
 }
 .st-reply-message-img img{
-	max-width: 100%;
-	/*max-height: 100%;*/
-	/*min-height: 80px;*/
+	max-width: 150px;
 	object-fit: contain;
 	height: 100px;
 }
