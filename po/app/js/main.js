@@ -1675,25 +1675,21 @@ $(function(){
         	target_input = $(this).find(".user-avatar-bar.me input");
         	$(this).show();
         }
-
-        if(e.originalEvent.dataTransfer){
-            if(e.originalEvent.dataTransfer.files.length) {
-                /*UPLOAD FILES HERE*/
-				target_input[0].files = e.originalEvent.dataTransfer.files;
-				// target_input[0].files[target_input[0].files.length] = e.originalEvent.dataTransfer.files;
-            }
-        }
+        
+        /*UPLOAD FILES HERE*/
+        if(!e.originalEvent.dataTransfer) return;
+        if((e.originalEvent.dataTransfer.files || []).length === 0) return;
+        
+		target_input[0].files = e.originalEvent.dataTransfer.files;
 	});
 
 	$(document).on("dragover", ".st-sub-box, #page-compose", function() {
 		var this_target = $(this);
 
 		// 自動偵測解除dnd藍色背景
-		console.log("dnd timer", this_target.data("dnd-timer"));
-		// clearTimeout(this_target.data("dnd-timer"));
-		// this_target.data("dnd-timer", setTimeout(function() {
-		// 	this_target.find(".timeline-dnd").hide();
-		// }, 1000));
+		this_target.off("mouseleave").mouseleave(function() {
+			this_target.find(".timeline-dnd").hide();
+		});
 
 		if(this_target.hasClass("st-sub-box") && !this_target.find(".timeline-dnd").is(":visible"))
 			this_target.find(".timeline-dnd").show().css("height",this_target.height()+5);
@@ -1702,7 +1698,7 @@ $(function(){
 	});
 
 	$(document).on("dragleave",".timeline-dnd, .compose-dnd",function(){
-		$(this).hide();
+		$(this).off("mouseleave").hide();
 	});
 
 	//貼文-點選貼圖時取消貼圖

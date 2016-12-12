@@ -191,7 +191,7 @@ userInfoGetting = function(){
 
     var userInfo = $("#userInfo");
     var emptyUserAvt = "images/common/others/empty_img_personal_l.png";
-    new QmiAjax({
+    return new QmiAjax({
         apiName: "me",
         isPublicApi: true
     }).success(function(data){

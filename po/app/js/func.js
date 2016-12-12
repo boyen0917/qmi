@@ -7127,7 +7127,7 @@ replySend = function(thisEvent){
         imgArea = thisEvent.find(".st-reply-message-img"),
         messageArea = thisEvent.find(".st-reply-message-area"),
         replyFile = imgArea.data("file"),
-        f_load_show = fileLoadShow(messageArea),
+        f_load_show = fileLoadShow(),
         body = {
             meta : {
                 lv : 1,
@@ -7380,7 +7380,7 @@ fileLoadShow = function(){
             return uploadXhr;
         }
     }
-}
+}();
 
 replyApi = function(this_event, this_gi, this_ti, this_ei, body){
     s_load_show = false;
@@ -7913,43 +7913,6 @@ polling = function(){
                 if(QmiGlobal.companyGiMap.hasOwnProperty(cntObj.gi)) newPollingData.cnts.splice(i,1);
             });
 
-            // 測試 私雲移轉
-            // if(window.refresh54 === true && window.refresh54Flag !== true) {
-            //     window.refresh54Flag = true;
-            //     window.refresh55 = false;
-            //     window.refresh55Flag = false;
-
-            //     newPollingData.cmds.push({
-            //         tp: 54,
-            //         pm: {
-            //             gl: ["G000000105G"]    
-            //         }
-                    
-            //     })
-            // }
-
-            // // 測試 私雲移轉 qmi7環境 0999000100帳號
-            // if(window.refresh55 === true && window.refresh55Flag !== true) {
-            //     window.refresh55Flag = true;
-            //     window.refresh54 = false;
-            //     window.refresh54Flag = false;
-
-            //     newPollingData.cmds.push({
-            //         "tp": 55,
-            //         "pm": {
-            //             "gl": ["G00000010BN"],
-            //             "c_info": {
-            //                 "ci":"eim1",
-            //                 "cn":"AWS測試雲",
-            //                 "pin":"jvwtJLjvDXeJItcD7tjzhhvATieW1K3oNCDEF8jYKO4=",
-            //                 "cl":"caprivateeim1.mitake.com.tw",
-            //                 "ui":"U000000S0ET",
-            //                 "key":"NTxyprPh6aQo8OP3PFCiE4ZyL68pNLHHj6mCPMkyBJD24vn/R6nb9S7FdQtTzZnWOve1CKBb1m7i7pYap6mkm4miL6LcaWT4u6GeEhfuuk23vHnIxlvnV9SoBTJqsz9m"
-            //             }
-            //         }
-            //     })
-            // }
-
             // 合併私雲polling 而且每個私雲polling 都要有自己的時間
             combineCloudPolling(newPollingData).done(function(pollingObj){
 
@@ -8239,8 +8202,13 @@ pollingCmds = function(newPollingData){
             var comboDeferred = $.Deferred();
                 insideDeferred = $.Deferred();
 
+            // 不重複的gi)
+            if(this.indexOf(item.pm.gi) >= 0) {
+                insideDeferred.resolve(false);
+            }
+            
             // item.tp = 6 會這樣
-            if(QmiGlobal.groups[(item.pm || {}).gi] === undefined) {
+            else if(QmiGlobal.groups[(item.pm || {}).gi] === undefined) {
                 insideDeferred.resolve(false);
             }
 
@@ -8258,7 +8226,6 @@ pollingCmds = function(newPollingData){
             else if( 
                 item.tp !== 11                  &&  // 上面做過了
                 item.pm.gi !== undefined        &&  // tp 3 是告知有邀請 會沒有tp
-                this.indexOf(item.pm.gi) < 0    &&  // 不重複的gi
                 ( QmiGlobal.groups[item.pm.gi] === undefined || Object.keys( QmiGlobal.groups[item.pm.gi].guAll ).length === 0 )
             ){
                 insideDeferred.resolve(true);

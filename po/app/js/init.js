@@ -653,12 +653,7 @@ QmiAjax.prototype = {
 			deferred = $.Deferred(),
 
 			// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
-			isExpired = function() {
-				// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
-				if((args.companyData || {}).tp === 1) return args.companyData.et - (new Date().getTime()) < 0;
-				// 過期檢查 提前幾天檢查
-				else return nowEt - (new Date().getTime()) < this.expireTimer
-			}.call(this);
+			isExpired = isExpired(this.expireTimer);
 
 		if(args.noAuth === true) {
 			// 不用auth
@@ -674,6 +669,22 @@ QmiAjax.prototype = {
 			deferred.resolve({isSuccess: true});
 		}
 		return deferred.promise();
+
+			
+
+		function isExpired(expireTimer) {
+			var currTime = new Date().getTime();
+			// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
+			if(isLdapCompanyOrSSOLogin()) return (nowEt - currTime) < 0;
+			// 過期檢查 提前幾天檢查
+			else return (nowEt - currTime) < expireTimer
+
+			function isLdapCompanyOrSSOLogin() {
+				if((args.companyData || {}).tp === 1) return true;
+				if(QmiGlobal.auth.isSso)  return true;
+				return false; 
+			} 
+		}
 	},
 
 	reAuth: function(companyData, rspData){
