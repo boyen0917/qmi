@@ -7659,6 +7659,10 @@ getCompanyToken = function(companyData,isReDo){
         QmiGlobal.companies[companyData.ci].et = authData.et;
         // 驗證形式
         QmiGlobal.companies[companyData.ci].passwordTp = authData.tp;
+
+        if(QmiGlobal.auth.isSso) 
+            QmiGlobal.companies[companyData.ci].id = QmiGlobal.auth.id;
+
     }
 
     function isCompanyAuthDefResolved() {
