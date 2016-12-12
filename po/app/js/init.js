@@ -48,7 +48,6 @@ $(document).ready(function() {
 	if($.lStorage("_lastBaseUrl") !== false && $.lStorage("_lastBaseUrl") !== base_url) resetDB();
 	$.lStorage("_lastBaseUrl", base_url);
 })
->>>>>>> feature_company
 
 var userLang = navigator.language || navigator.userLanguage;
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
@@ -650,7 +649,7 @@ QmiAjax.prototype = {
 			deferred = $.Deferred(),
 
 			// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
-			isExpired = isExpired(this.expireTimer);
+			isExpired = isExpired(this.expireTimer, this.ldapExpireTimer);
 
 		if(args.noAuth === true) {
 			// 不用auth
@@ -669,7 +668,7 @@ QmiAjax.prototype = {
 
 			
 
-		function isExpired(expireTimer) {
+		function isExpired(expireTimer, ldapExpireTimer) {
 			var currTime = new Date().getTime();
 			// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
 			if(isLdapCompanyOrSSOLogin()) return (nowEt - currTime) < ldapExpireTimer;
