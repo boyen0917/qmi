@@ -7568,9 +7568,7 @@ getGroupList = function(){
 
         allGlDeferred.done(function(){
             //將group list 更新到 lstorage ui
-            if(allGroupList.length > 0)
-                groupListToLStorage(allGroupList);
-
+            groupListToLStorage(allGroupList);
             groupsDeferred.resolve({isSuccess: true, gl: allGroupList});
         });
     }).error(function(rspData) {

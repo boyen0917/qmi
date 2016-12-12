@@ -840,7 +840,7 @@ QmiGlobal.module.ldapSetting = {
                 self.changePage("ldap-list");
                 groupMenuListArea().done(function() {
 
-                    if(QmiGlobal.groups.length === 0) {
+                    if(Object.keys(QmiGlobal.groups).length === 0) {
                         gi === null;
                         $.mobile.changePage("#page-group-menu");
 
