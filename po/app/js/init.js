@@ -35,11 +35,9 @@ var base_url = function() {
 	}
 }();
 
-// base_url = "https://qmi15.mitake.com.tw/";
 
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {
-	
 	if($.lStorage("_selectedServerUrl") === false || $.lStorage("_selectedServerUrl") === default_url) return;
 	base_url = $.lStorage("_selectedServerUrl");
 	
@@ -50,7 +48,6 @@ $(document).ready(function() {
 	if($.lStorage("_lastBaseUrl") !== false && $.lStorage("_lastBaseUrl") !== base_url) resetDB();
 	$.lStorage("_lastBaseUrl", base_url);
 })
-
 
 var userLang = navigator.language || navigator.userLanguage;
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
@@ -1486,7 +1483,6 @@ $(document).on("click", "#container_version", function() {
 		if( promt === "86136982") QmiGlobal.module.serverSelector.init();
 		else return;
 }}());
-
 
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){

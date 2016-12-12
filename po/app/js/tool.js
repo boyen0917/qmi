@@ -604,11 +604,9 @@ qmiUploadFile = function(uploadObj){
 				si: s3Obj.si,
 				md: s3Obj.md
 			};
-			console.log(s3Obj.oriFile);
 			if(s3Obj.oriFile){
 				EXIF.getData(s3Obj.oriFile, function(){
 					exifObj = EXIF.getAllTags(this);
-					console.log("exif: ",exifObj);
 					if(!$.isEmptyObject(exifObj)){
 						body.exif = {
 							"DateTimeOriginal": exifObj.DateTimeOriginal || "",
@@ -621,7 +619,6 @@ qmiUploadFile = function(uploadObj){
 					}
 				});
 			}
-			console.log("body: ",body);
 		// commit
 		new QmiAjax({
 			apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
@@ -675,9 +672,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			break;
 		case 1: // 圖
-			console.log(uploadObj);
-			console.log(oriObj);
-			console.log(tmbObj);
 			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s),
 				tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
 
@@ -784,21 +778,23 @@ resetDB = function(){
 	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 	if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 	if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
-	// var exceptionItemArr = [
-	// 	"_ver",
-	// 	"_loginRemeber",
-	// 	"_lastBaseUrl",
-	// ];
 
-	var verTmp = localStorage["_ver"];
-	var loginRememberTmp = localStorage["_loginRemeber"];
-	var urlTmp = localStorage["_selectedServerUrl"];
+	var exceptionObj = {};
+	var exceptionItemArr = [
+		"_ver",
+		"_loginRemeber",
+		"_lastBaseUrl"
+	];
+
+	exceptionItemArr.forEach(function(lsStr) {
+		if(localStorage[lsStr]) exceptionObj[lsStr] = localStorage[lsStr];
+	});
 
 	localStorage.clear();
 
-	if(verTmp) localStorage["_ver"] = verTmp;
-	if(loginRememberTmp) localStorage["_loginRemeber"] = loginRememberTmp;
-	if(urlTmp) localStorage["_selectedServerUrl"] = urlTmp;
+	Object.keys(exceptionObj).forEach(function(key) {
+		$.lStorage(key, exceptionObj[key]);
+	});
 }
 
 getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){

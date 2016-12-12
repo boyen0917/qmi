@@ -1580,9 +1580,12 @@ $(function(){
 				} else {
 					//流水號
 					var ai = this_compose.data("upload-ai");
-					this_compose.data("upload-video")[ai] = file;
 					this_compose.data("upload-ai",ai+1);
-
+					if(Object.keys(this_compose.data("upload-video")).length > 0){	//代表已經有影片了
+						ai = Object.keys(this_compose.data("upload-video"))[0];	//影片的ai編號
+					}
+					this_compose.data("upload-video")[ai] = file;
+					
 					this_compose.find(".cp-attach-area").show();
 					this_compose.find(".cp-file-area").show();
 					videoArea.html("").show();
