@@ -1281,8 +1281,8 @@ setOfficialGroup = function( this_gi ){
 
 onClickOfficialGeneralChat = function( this_gi ){
     try{
-        var groupData = QmiGlobal.groups[this_gi];
-        if( isOfficialGroup(groupData) && groupData.ad!=1 ){
+        var groupData = QmiGlobal.groups[this_gi] || {};
+        if( groupData.isOfficial && groupData.ad!=1 ){
             if( null!=groupData.chatAll ){
                 for( var ci in groupData.chatAll ){
                     var room = groupData.chatAll[ci];
@@ -1300,14 +1300,6 @@ onClickOfficialGeneralChat = function( this_gi ){
     return false;
 }
 
-isOfficialGroup = function( group ){
-    if( !group) return false;
-    if( group.isOfficial ) return true;
-    if( !group.tp ) return false;
-    var tp = group.tp.toLowerCase();
-    if( tp.indexOf('c')==0 || tp.indexOf('d')==0 ) return true;
-    return false;
-}
 /*
 
 ########  ######## ########  ##       ##    ##    ########  ######## ########    ###    #### ##       
@@ -2725,41 +2717,6 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
         }
 
         if( isShowFavBranch ){
-            //  add fbl in to memfold
-            // for( var fi in fbl ){
-            //     var fb_obj = fbl[fi];
-            //     var this_obj = $(
-            //         '<div class="subgroup-parent">'+
-            //             '<div class="obj-cell fav-branch _2" data-gu="'+fi+'">'+
-            //                 '<div class="obj-cell-chk">'+
-            //                     '<div class="img"></div>'+
-            //                 '</div>' +
-            //                 '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
-            //                 '<div class="obj-cell-subgroup-data">' + 
-            //                      '<div class="obj-user-name">' + fb_obj.fn.replaceOriEmojiCode() + '</div>' +
-            //                      '<div class="obj-user-title">'+
-            //                 '</div></div>'+
-            //             '</div>'+
-            //             '<div class="obj-cell-arrow"></div>'+
-            //         '</div>'
-            //     );
-
-            //     this_obj.data("fi",fi);
-            //     this_obj.data("fn",fb_obj.fn);
-            //     memfold.append(this_obj);
-
-            //     var fblFold = $('<div></div>');
-            //     fblFold.css("display","none")
-            //     memfold.append(fblFold);
-            //     for( var gu in guAll ){
-            //         var memTmp = guAll[gu];
-            //         if( memTmp .fbl.indexOf(fi)<0 ) continue;
-            //         var fblMemRow = getMemObjectRow(memTmp, bl);
-            //         fblFold.append(fblMemRow);
-            //     }
-            //     fblFold.find(".obj-cell.mem").addClass("_3");
-            // }
-            // tmp.append( memfold );
 
             //  add fbl in to memfold
             for( var fi in fbl ){
@@ -3730,18 +3687,8 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
         case 0:
         case 9:
             //s9=1or3無法看已未讀列表
-            var isShowUnreadAndTime = true;
-            try{
-                var group = QmiGlobal.groups[this_gi];
-                if( group.set.s9==1 || group.set.s9==3){
-                    // toastShow( $.i18n.getString("FEED_READ_LIST_DISABLED") );
-                    // return;
-                    isShowUnreadAndTime = false;
-                }
-            } catch(e){
-                errorReport(e);
-                return;
-            }
+            var isShowUnreadAndTime = false;
+            if( (QmiGlobal.groups[this_gi] || {}).ptp === 1) isShowUnreadAndTime = true;
 
             var isReady = false;
             //get read
@@ -5032,9 +4979,7 @@ groupMenuListArea = function (noApi){
         (function() {
             var hasOfficialGroup = false;
             Object.keys(QmiGlobal.groups).forEach(function(tempGi) {
-                var tempGroupObj = QmiGlobal.groups[tempGi],
-                    type = tempGroupObj.tp.toLowerCase();
-                if(!type.indexOf("c") || !type.indexOf("d")) hasOfficialGroup = true;
+                if(QmiGlobal.groups[tempGi].isOfficial) hasOfficialGroup = true;
             });
             if(!hasOfficialGroup) listArea.find(".sm-offical-group").hide();
         }())
@@ -5077,13 +5022,11 @@ addSideMenuGroupUI = function(key,groupObj){
 
     this_group.find(".group-pic").data("auo",glo_img);
     //判斷官方團體一般團體
-    var tp = groupObj.tp.toLowerCase();
-    if(tp.indexOf('c')==0 || tp.indexOf('d')==0){
+    if(groupObj.isOfficial)
         $(".sm-footer").before(this_group);
-    }else{
+    else
         $(".sm-offical-group").before(this_group);
-    }
-    //listArea.append(this_group);
+
     //管理者圖示
     if(groupObj.ad != 1) this_group.find(".sm-icon-host").hide();
 }
@@ -8179,15 +8122,16 @@ pollingCountsWrite = function(pollingData){
     sort_arr.forEach(function(obj){
         var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
         sortedGroup.detach();
-        var gp = QmiGlobal.groups[obj[0]];
-        if(gp && gp.tp){
-            if(gp.tp.toLowerCase().indexOf('c')==0 || gp.tp.toLowerCase().indexOf('d')==0){
-                $(".sm-offical-group").after(sortedGroup);
-            }else{
-                $(".sm-general-group").after(sortedGroup);
-            }
-        }
-        //$(".sm-group-list-area").prepend(sortedGroup);
+
+        // 官方帳號判斷
+        try {
+            if(QmiGlobal.groups[obj[0]].isOfficial)
+                var targetDom = $(".sm-offical-group");
+            else
+                var targetDom = $(".sm-general-group");
+
+            targetDom.after(sortedGroup);
+        } catch(e) { /* do nothing */}
     })
 
     //邀請 若是在團體邀請頁面時 則不寫入
