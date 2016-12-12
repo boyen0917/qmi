@@ -8453,8 +8453,8 @@ pollingCmds = function(newPollingData){
                         updateChatList(item.pm.gi);
                         break;
                     case 45://被別人踢出聊天室
-                        var grouptmp = QmiGlobal.groups[item.pm.gi];
-                        popupShowAdjust("團體 "+grouptmp.gn,grouptmp.guAll[item.pm.gu].nk+" 已將你退出 "+grouptmp.chatAll[item.pm.ti].cn+" 聊天室",true,false,[function(){
+                        var groupTmp = QmiGlobal.groups[item.pm.gi];
+                        popupShowAdjust("團體 "+groupTmp.gn,groupTmp.guAll[item.pm.gu].nk+" 已將你退出 "+groupTmp.chatAll[item.pm.ti].cn+" 聊天室",true,false,[function(){
                             if(windowList[item.pm.ti] && !windowList[item.pm.ti].closed){
                                 windowList[item.pm.ti].close();
                             }

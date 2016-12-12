@@ -56,7 +56,7 @@ $(function(){
 	QmiGlobal.groups = window.chatAuthData.groups;
 	QmiGlobal.companies = window.chatAuthData.companies;
 	QmiGlobal.companyGiMap = window.chatAuthData.companyGiMap;
-	QmiGlobal.operateChatList = window.mainPageObj.chatList;
+	QmiGlobal.operateChatList = window.chatList;
 
 
 	/**
