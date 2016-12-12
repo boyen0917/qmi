@@ -8176,15 +8176,14 @@ pollingCountsWrite = function(pollingData){
         })
 
     })
-
     //排序
     sort_arr.sort(function(a, b) {return a[1] - b[1]});
     sort_arr.forEach(function(obj){
         var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
         sortedGroup.detach();
         var gp = QmiGlobal.groups[obj[0]];
-        if(gp && gp.tp.toLowerCase()){
-            if(gp.tp.indexOf('c')==0 || gp.tp.indexOf('d')==0){
+        if(gp && gp.tp){
+            if(gp.tp.toLowerCase().indexOf('c')==0 || gp.tp.toLowerCase().indexOf('d')==0){
                 $(".sm-offical-group").after(sortedGroup);
             }else{
                 $(".sm-general-group").after(sortedGroup);
