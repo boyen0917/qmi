@@ -7416,7 +7416,7 @@ fileLoadShow = function(){
             return uploadXhr;
         }
     }
-}();
+};
 
 replyApi = function(this_event, this_gi, this_ti, this_ei, body){
     s_load_show = false;
