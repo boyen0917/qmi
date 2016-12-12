@@ -99,7 +99,7 @@
 
     </head>
     <body>
-        <script language="javascript" src="https://webapi.amap.com/maps?v=1.3&key=test"></script>
+        <script language="javascript" src="https://webapi.amap.com/maps?v=1.3&key=test" async></script>
         
         <div data-role="page" id="page-registration">
             <div class="registration-content registration-bg">
@@ -290,7 +290,6 @@
 <!---------------------------------- page-password ------------------------------------>
         <div data-role="page" id="page-password">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <h3 class="page-title" data-textid="REGISTER_PASSWORD_TITLE"></h3>
             </div>
             <div class="password-content">
@@ -309,7 +308,6 @@
 <!---------------------------------- page-user-setting ------------------------------------>
         <div data-role="page" id="page-user-setting">
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
-            <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <h3 class="page-title" data-textid="REGISTER_SETTING_TITLE"></h3>
             </div>
             <div class="setting-content">
@@ -338,32 +336,10 @@
 
 
 <!---------------------------------- 全域 ------------------------------------>        
-        <div class="toast">
-            <div></div>
-        </div>
-
-        <!-- <div class="popup">
-            <div class="popup-frame">
-                <div class="popup-title"></div>
-                <div class="popup-text" style="display:none"></div>
-                <div class="popup-confirm-area">
-                    <div class="popup-cancel" style="display:none" data-textid="COMMON_CANCEL"></div>
-                    <div class="popup-confirm" style="display:none" data-textid="COMMON_OK"></div>    
-                </div>
-                
-            </div>
-            <div class="popup-gap"></div>
-            <div class="popup-screen"></div>
-        </div> -->
-
+        <div class="toast"><div></div></div>
         <div class="ajax-screen-lock"></div>
-        <div class="version_update_lock">
-            <div data-textid="LANDING_PAGE_UPDATE"></div>
-        </div>
-        <div class="container_update_lock">
-            <a data-textid="LANDING_PAGE_UPDATE_CONTAINER_LOCK"></a>
-        </div>
-
+        <div class="version_update_lock"><div data-textid="LANDING_PAGE_UPDATE"></div></div>
+        <div class="container_update_lock"><a data-textid="LANDING_PAGE_UPDATE_CONTAINER_LOCK"></a></div>
         <div id="page-back-chk"></div>
         <div id="page-back-chk-pre"></div>
         <div id="page-back-pre-title"></div>

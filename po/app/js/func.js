@@ -341,22 +341,15 @@ timelineChangeGroup = function (thisGi) {
         .find(".gm-header-right").show().end()
         .find(".gm-content-body").show();
 
-        if(Object.keys(QmiGlobal.groups[thisGi].guAll).length == 0){
+        if(Object.keys(QmiGlobal.groups[thisGi].guAll).length == 0)
             getGroupComboInit(thisGi).done( comboDeferred.resolve );
-        } else {
+        else
             comboDeferred.resolve();
-        }
 
 
         comboDeferred.done(function(rspObj){
-            if((rspObj || {}).isSuccess === false 
-                || QmiGlobal.groups[thisGi].isRefreshing
-                || QmiGlobal.groups[thisGi].isReAuthUILock
-            ) {
-                // 再做一次 才會有屏蔽的ui效果
-                // timelineChangeGroup(thisGi);
-                return;
-            }
+            if(isUILock()) return;
+
             //指定gi
             setThisGroup(thisGi);
 
@@ -380,22 +373,17 @@ timelineChangeGroup = function (thisGi) {
                     timelineSwitch("feeds",true);
                 }
 
-// <<<<<<< HEAD
-//             // 移轉判斷
-
-//             if(QmiGlobal.groups[thisGi].isRefreshing === true) return;
-
-//             //updatePollingCnts
-//             var smGroupDom = $("#page-group-main .sm-group-area[data-gi="+ thisGi +"]");
-//             updatePollingCnts(smGroupDom.find(".sm-count"), smGroupDom.data("polling-cnt"));
-
-//             changeDeferred.resolve();
-// =======
                 changeDeferred.resolve();
             });
+
+            function isUILock() {
+                if((rspObj || {}).isSuccess === false) return true;
+                if(QmiGlobal.groups[thisGi].isRefreshing) return true;
+                if(QmiGlobal.groups[thisGi].isReAuthUILock) return true;
+                return false;
+            }
         })
     }
-        
     return changeDeferred.promise();
 }
 
@@ -471,7 +459,9 @@ timelineSwitch = function (act,reset,main,noPR){
             //顯示新增貼文按鈕
             gmHeader.find(".feed-compose").show();
 
-            groupMain.find(".subpage-timeline").show();
+            groupMain.find(".subpage-timeline").show().scrollTop(0);
+            //一開始都回到全部的文章的分類
+            groupMain.find(".st-filter-area").data("filter","all");
 
             //polling 數字重寫
             pollingCountsWrite();
@@ -525,6 +515,15 @@ timelineSwitch = function (act,reset,main,noPR){
             switchDeferred.resolve({ act: "addressBook"});
             break;
         case "chat":
+            groupMain.find(".subpage-chatList").show();
+            
+            var chatListDom = $(".subpage-chatList");
+            //預設開啟loading, 關閉rows & coachmark
+            chatListDom.find(".coachmake").hide();
+            chatListDom.find(".rows").html("");
+            chatListDom.find(".top-chatList").hide();
+            chatListDom.find(".top-chatList .list").html("");
+
             //offical general 官方帳號非管理員
             if( onClickOfficialGeneralChat(gi) ){
                 groupMain.find(".subpage-timeline").show();
@@ -553,9 +552,6 @@ timelineSwitch = function (act,reset,main,noPR){
                       break;
                 }
             } else {
-                //-- switch sub pages --
-                groupMain.find(".subpage-chatList").show();
-
                 page_title = $.i18n.getString("CHAT_TITLE");
 
                 initChatList();
@@ -1462,6 +1458,9 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                         workContentMake(this_event,val.li);
                         break;
                     case 13:
+
+                        without_message = true;
+
                         if(reply_chk) break;
 
                         //工作回覆
@@ -1483,9 +1482,6 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                                 }
                             }
                         });
-
-                        without_message = true;
-
                         break;
                     case 14:
                         if(reply_chk) break;
@@ -2380,25 +2376,50 @@ composeContentMake = function (compose_title){
         //url parse
         this_compose.find('.highlight-container').bind('input',function(){
             //有東西就不作了
+            var inputText = $(this).text();
             if(this_compose.data("url-chk")) return false;
             //先將換行符號換成<br/>加空格 再以空格切出陣列
-            var url_chk = $(this).text().replace(/\n|\r/g," <br/> ").split(' ');
+            var url_chk = inputText.replace(/\n|\r/g,"|<br/>|").split('|');
+            var regexUrl = /^(((http|https):\/\/)|(www\.))+[-a-zA-Z0-9:%_\+.~#?&//=]+\s$/;
+            var regexWrap = /(((http|https):\/\/)|(www\.))+[-a-zA-Z0-9:%_\+.~#?&//=]+(\n|\r){2}$/;
             
+            if(inputText.match(regexWrap)){
+                var result = regexWrap.exec(inputText);
+                this_compose.data("parse-waiting",true).data("url-chk",true);
+                if(!this_compose.data("parse-resend")) $(".cp-attach-area").show().find(".url-loading").css("display","block");
+                getLinkMeta(this_compose,result[0]);
+            }
+
             $.each(url_chk,function(i,val){
-                if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://' || val.substring(0, 4) == 'www.'){
-                    this_compose.data("parse-error",false);
-                    this_compose.data("url-chk",true);
-
+                if(val.match(regexUrl)){
+                // if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://' || val.substring(0, 4) == 'www.'){
+                    // this_compose.data("parse-error",false);
                     //送出判斷 等到網址內容取得成功 再送出
-                    this_compose.data("parse-waiting",true);
+                    this_compose.data("parse-waiting",true).data("url-chk",true);
                     if(!this_compose.data("parse-resend")) $(".cp-attach-area").show().find(".url-loading").css("display","block");
-
                     getLinkMeta(this_compose,val);
                     return false;
                 }else{
                     //暫時
                     //this_compose.find(".cp-attach-area").hide();
                     // this_compose.find(".cp-ta-yql").hide();
+                }
+            });
+        });
+
+        this_compose.find('.highlight-container').bind('paste',function(e){
+            e.preventDefault();
+            //先將換行符號換成<br/>加| 再以|切出陣列
+            var url_chk = e.originalEvent.clipboardData.getData('text').replace(/\n|\r/g,"|<br/>|").split('|');
+            var regexUrl = /^(((http|https):\/\/)|(www\.))+[-a-zA-Z0-9:%_\+.~#?&//=]+/;
+            $.each(url_chk,function(i,val){
+                if(val.match(regexUrl)){
+                    if(!this_compose.data("url-chk")){
+                        //送出判斷 等到網址內容取得成功 再送出
+                        this_compose.data("parse-waiting",true).data("url-chk",true);
+                        if(!this_compose.data("parse-resend")) $(".cp-attach-area").show().find(".url-loading").css("display","block");
+                        getLinkMeta(this_compose,val);
+                    }
                 }
             });
         });
@@ -4440,7 +4461,7 @@ composeVoteObjMake = function(this_compose,body){
 composeSend = function (this_compose){
     
     var ctp = this_compose.data("compose-tp");
-    var composeContent = this_compose.data("compose-content").replace(/<br>/g, "\n");;
+    var composeContent = this_compose.data("compose-content").replace(/<br\s*\/?>/g,"\n");
     var tagMembers = this_compose.find(".cp-content-highlight").data("markMembers");
     var ml = this_compose.data("message-list").unique();
 
@@ -5915,7 +5936,6 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
         if($.inArray(val.tp,not_attach_type_arr) < 0 && !this_event.find(".st-sub-box-2-attach-area").is(":visible")){
             this_event.find(".st-sub-box-2-attach-area").show();
         }
-
         //內容格式
         switch(val.tp){
             case 0://文字
@@ -5945,7 +5965,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                         });
                     });
                 }());
-
+                
                 this_event.find(target_div).html(val.c).show();
 
                 break;
@@ -5966,15 +5986,21 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 this_event.find(".st-sub-box-2-attach-area").show();
 
                 if(val.i) {
-                    console.log(val.i);
                     this_event.find(".st-attach-url-img").show();
-                    this_event.find(".st-attach-url-img img").attr("src",val.i).error(function(){
+                    this_event.find(".st-attach-url-img img").attr("src",val.i).load(function(){
+                        if($(this)[0].naturalWidth < 480 && $(this)[0].naturalHeight < 200){
+                            $(this).css("object-fit","contain");
+                        }
+                    }).error(function(){
                         //$(this).attr("src","images/common/icon/icon_noPhoto.png");
                         $(this).parent().remove();
                     });
                 }
                 this_event.find(".st-attach-url-title").html(val.t);
                 this_event.find(".st-attach-url-desc").html(val.d);
+                if(val.c.substring(0, 4) == 'www.'){
+                    val.c = "http://"+val.c;
+                }
                 this_event.find(".st-attach-url-link").attr("href", val.c);
 
                 break;
@@ -6393,7 +6419,7 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
         // showGallery(this_ti, gallery_arr, targetImgIndex, isApplyWatermark, watermarkText);
 
         new QmiGlobal.gallery({
-            gi: gi,
+            gi: this_gi,
             photoList: gallery_arr,
             currentImage : targetImgIndex,
             isApplyWatermark : isApplyWatermark,
@@ -6886,7 +6912,7 @@ getLinkMeta = function (this_compose,url) {
             msg: '非桌機版'
         });
     else
-        parseUrl( url, deferred.resolve); 
+        parseUrl( url, deferred.resolve);
 
     var timer = setTimeout(function() {
         deferred.reject({
@@ -6903,41 +6929,42 @@ getLinkMeta = function (this_compose,url) {
 
         //loading圖示隱藏
         $(".cp-attach-area .url-loading").hide();
-
+        console.log(data);
         //error存在 或 result null 就跳出
-        if( !data || err ) {
+        if( err ) {
             //沒內容也算結束吧 讓它可以送出 
-            this_compose.data("parse-waiting",false);
-
+            this_compose.data("parse-waiting",false).data("url-chk",false);
             toastShow( $.i18n.getString("COMPOSE_PARSE_ERROR") );
             return false;
+        } else if(data.title && data.title.length==0 && data.description && data.description.length==0 && data.image && data.image.url.length==0){
+            this_compose.data("parse-waiting",false).data("url-chk",false);
+            return false;
         }
-
+        
         //title
         if( Array.isArray(data.title) ){
             if( data.title.length>0 ){
                 result.title = data.title[0];
             }
         } else {
-            result.title = data.title;
+            result.title = data.title || data.site_name;
         }
         //description
         if( Array.isArray(data.description) ){
             if( data.description.length>0 ){
                 result.description = data.description[0];
             }
-            //image
-            if( data.image && data.image.url ){
-                if( Array.isArray(data.image.url) ){
-                    if(data.image.url.length>0){
-                        console.log(data.image.url);
-                        result.img = data.image.url[0];       
-                    }
-                } else {
-                    result.img = data.image.url;
+        } else {
+            result.description = data.description;
+        }
+        //image
+        if( data.image && data.image.url ){
+            if( Array.isArray(data.image.url) ){
+                if(data.image.url.length>0){
+                    result.img = rel_to_abs(data.image.url[0]);       
                 }
             } else {
-                result.img = data.image.url;
+                result.img = rel_to_abs(data.image.url);
             }
         }
 
@@ -6972,8 +6999,13 @@ getLinkMeta = function (this_compose,url) {
                 $(".cp-ta-yql").fadeIn();
             }
         }
+
+        if(data.url) {
+            result.url = data.url
+        } else {
+            result.url = url;
+        }
         
-        result.url = url;
         this_compose.data("url-content",result);
 
         //網址讀取結束
@@ -7006,7 +7038,7 @@ getLinkMeta = function (this_compose,url) {
         cns.debug("fail", errData);
 
         //網址讀取結束
-        this_compose.data("parse-waiting",false);
+        this_compose.data("parse-waiting",false).data("url-chk",false);
         // this_compose.data("parse-error",true);
         this_compose.data("parse-resend",false);
 
@@ -7133,7 +7165,7 @@ replySend = function(thisEvent){
         imgArea = thisEvent.find(".st-reply-message-img"),
         messageArea = thisEvent.find(".st-reply-message-area"),
         replyFile = imgArea.data("file"),
-        f_load_show = fileLoadShow(messageArea),
+        f_load_show = fileLoadShow(),
         body = {
             meta : {
                 lv : 1,
@@ -7146,9 +7178,8 @@ replySend = function(thisEvent){
         object_obj = $.parseJSON( object_obj );
         body.meta.tu = object_obj;
     }
-
     var text = thisEvent.find(".st-reply-highlight-container").html()
-                         .replace(/<br>/g, "\n");
+                         .replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
     var tagMembers = thisEvent.find(".st-reply-highlight-container").data("markMembers");
     if (tagMembers && Object.keys(tagMembers).length) {
         
@@ -7192,7 +7223,7 @@ replySend = function(thisEvent){
             upload_chk = true;
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init();
+            f_load_show.init(messageArea);
 
             var pi = "0";
 
@@ -7234,7 +7265,7 @@ replySend = function(thisEvent){
             
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init();
+            f_load_show.init(messageArea);
 
             eventTp = 7;
 
@@ -7261,8 +7292,7 @@ replySend = function(thisEvent){
                 oriObj: {w: 1280, h: 1280, s: 0.9},
                 progressBar: f_load_show.progressBar,
                 setAbortFfmpegCmdEvent : function (ffmpegCmd) {
-                    console.log($("#load-cancel"));
-                    $("#load-cancel").off("click").on("click", function(e) {
+                    $(".load-cancel").off("click").on("click", function(e) {
                         // dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
                         // dom.find(".chat-fail-status").show();
                         // dom.find(".progress-container").remove();
@@ -7278,8 +7308,8 @@ replySend = function(thisEvent){
                     });
                 },
                 updateCompressionProgress: function (percent) {
-                    $("#load-bar").css("width", percent + '%');
-                    $("#load-font").html(percent + '%');
+                    $(".load-bar").css("width", percent + '%');
+                    $(".file-content").attr("percent", percent + '%');
                     // messageArea.find(".chat-upload-progress").attr("max", 100).attr("value", percent);
                     // dom.find(".upload-percent").html(percent + '%');
                 },
@@ -7293,7 +7323,7 @@ replySend = function(thisEvent){
             upload_chk = true;
             //開啟loading icon
             //s_load_show = false;
-            f_load_show.init();
+            f_load_show.init(messageArea);
 
             fileBody = {
                 ftp: 0,
@@ -7320,7 +7350,6 @@ replySend = function(thisEvent){
                 oriObj: {w: 1280, h: 1280, s: 0.9},
                 progressBar: f_load_show.progressBar
             }).done(uploadDef.resolve)
-
             break;
     }
 
@@ -7359,14 +7388,15 @@ fileLoadShow = function(){
             
             var loadDom = $('<div class="file-load">'
             + '<div class="file-content">'
-              + '<div id="load-progress"><div id="load-bar"></div></div>'
-              + '<div id="load-cancel">取消</div>'
+              + '<div class="load-progress"><div class="load-bar"></div></div>'
+              + '<div class="load-cancel">取消</div>'
             + '</div></div>');
 
             elem.prepend(loadDom);
+            barDom = loadDom.find('.load-bar');
+            percentDom = loadDom.find('.file-content');
 
-
-            $("#load-cancel").click(function(){
+            loadDom.find(".load-cancel").click(function(){
                 elem.find('.st-reply-message-img').show();
                 loadDom.remove();
                 elem.data("cancelupload",true);
@@ -7386,7 +7416,7 @@ fileLoadShow = function(){
             return uploadXhr;
         }
     }
-}
+};
 
 replyApi = function(this_event, this_gi, this_ti, this_ei, body){
     s_load_show = false;
@@ -7538,9 +7568,7 @@ getGroupList = function(){
 
         allGlDeferred.done(function(){
             //將group list 更新到 lstorage ui
-            if(allGroupList.length > 0)
-                groupListToLStorage(allGroupList);
-
+            groupListToLStorage(allGroupList);
             groupsDeferred.resolve({isSuccess: true, gl: allGroupList});
         });
     }).error(function(rspData) {
@@ -7605,17 +7633,13 @@ getCompanyToken = function(companyData,isReDo){
             reAuthDef: ctDeferred,
             companyData: companyData
         });
-
     // ctp為 是否需要做cert 的判斷 1是要 0是不要 -> 公雲的company不需要cert
-    } else if(companyData.ctp !== 1) {
+    } else if(companyData.ctp === 0) {
         setCompanyData(companyData, {
             at: QmiGlobal.auth.at,
             et: QmiGlobal.auth.et,
-            tp: QmiGlobal.auth.ssoPasswordTp ? QmiGlobal.auth.ssoPasswordTp : QmiGlobal.auth.at
+            tp: QmiGlobal.auth.passwordTp ? QmiGlobal.auth.passwordTp : QmiGlobal.auth.at
         })
-        // 存入公雲company
-        QmiGlobal.companies[companyData.ci] = companyData;
-
         ctDeferred.resolve(true);
     } else if(companyData.ctp === undefined) {
         ctDeferred.resolve(false);   
@@ -7687,11 +7711,9 @@ getCompanyToken = function(companyData,isReDo){
     function setCompanyData(companyData, authData) {
         // 存入 QmiGlobal.companies
         QmiGlobal.companies[companyData.ci] = companyData;
-
         // 設定這次的私雲token
         QmiGlobal.companies[companyData.ci].nowAt = authData.at;
         QmiGlobal.companies[companyData.ci].et = authData.et;
-
         // 驗證形式
         QmiGlobal.companies[companyData.ci].passwordTp = authData.tp;
     }
@@ -7925,43 +7947,6 @@ polling = function(){
                 if(QmiGlobal.companyGiMap.hasOwnProperty(cntObj.gi)) newPollingData.cnts.splice(i,1);
             });
 
-            // 測試 私雲移轉
-            // if(window.refresh54 === true && window.refresh54Flag !== true) {
-            //     window.refresh54Flag = true;
-            //     window.refresh55 = false;
-            //     window.refresh55Flag = false;
-
-            //     newPollingData.cmds.push({
-            //         tp: 54,
-            //         pm: {
-            //             gl: ["G000000105G"]    
-            //         }
-                    
-            //     })
-            // }
-
-            // // 測試 私雲移轉 qmi7環境 0999000100帳號
-            // if(window.refresh55 === true && window.refresh55Flag !== true) {
-            //     window.refresh55Flag = true;
-            //     window.refresh54 = false;
-            //     window.refresh54Flag = false;
-
-            //     newPollingData.cmds.push({
-            //         "tp": 55,
-            //         "pm": {
-            //             "gl": ["G00000010BN"],
-            //             "c_info": {
-            //                 "ci":"eim1",
-            //                 "cn":"AWS測試雲",
-            //                 "pin":"jvwtJLjvDXeJItcD7tjzhhvATieW1K3oNCDEF8jYKO4=",
-            //                 "cl":"caprivateeim1.mitake.com.tw",
-            //                 "ui":"U000000S0ET",
-            //                 "key":"NTxyprPh6aQo8OP3PFCiE4ZyL68pNLHHj6mCPMkyBJD24vn/R6nb9S7FdQtTzZnWOve1CKBb1m7i7pYap6mkm4miL6LcaWT4u6GeEhfuuk23vHnIxlvnV9SoBTJqsz9m"
-            //             }
-            //         }
-            //     })
-            // }
-
             // 合併私雲polling 而且每個私雲polling 都要有自己的時間
             combineCloudPolling(newPollingData).done(function(pollingObj){
 
@@ -8189,15 +8174,14 @@ pollingCountsWrite = function(pollingData){
         })
 
     })
-
     //排序
     sort_arr.sort(function(a, b) {return a[1] - b[1]});
     sort_arr.forEach(function(obj){
         var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
         sortedGroup.detach();
         var gp = QmiGlobal.groups[obj[0]];
-        if(gp && gp.tp.toLowerCase()){
-            if(gp.tp.indexOf('c')==0 || gp.tp.indexOf('d')==0){
+        if(gp && gp.tp){
+            if(gp.tp.toLowerCase().indexOf('c')==0 || gp.tp.toLowerCase().indexOf('d')==0){
                 $(".sm-offical-group").after(sortedGroup);
             }else{
                 $(".sm-general-group").after(sortedGroup);
@@ -8249,8 +8233,13 @@ pollingCmds = function(newPollingData){
             var comboDeferred = $.Deferred();
                 insideDeferred = $.Deferred();
 
+            // 不重複的gi)
+            if(this.indexOf(item.pm.gi) >= 0) {
+                insideDeferred.resolve(false);
+            }
+            
             // item.tp = 6 會這樣
-            if(QmiGlobal.groups[(item.pm || {}).gi] === undefined) {
+            else if(QmiGlobal.groups[(item.pm || {}).gi] === undefined) {
                 insideDeferred.resolve(false);
             }
 
@@ -8268,7 +8257,6 @@ pollingCmds = function(newPollingData){
             else if( 
                 item.tp !== 11                  &&  // 上面做過了
                 item.pm.gi !== undefined        &&  // tp 3 是告知有邀請 會沒有tp
-                this.indexOf(item.pm.gi) < 0    &&  // 不重複的gi
                 ( QmiGlobal.groups[item.pm.gi] === undefined || Object.keys( QmiGlobal.groups[item.pm.gi].guAll ).length === 0 )
             ){
                 insideDeferred.resolve(true);
@@ -8462,8 +8450,8 @@ pollingCmds = function(newPollingData){
                         updateChatList(item.pm.gi);
                         break;
                     case 45://被別人踢出聊天室
-                        var grouptmp = QmiGlobal.groups[item.pm.gi];
-                        popupShowAdjust("團體 "+grouptmp.gn,grouptmp.guAll[item.pm.gu].nk+" 已將你退出 "+grouptmp.chatAll[item.pm.ti].cn+" 聊天室",true,false,[function(){
+                        var groupTmp = QmiGlobal.groups[item.pm.gi];
+                        popupShowAdjust("團體 "+groupTmp.gn,groupTmp.guAll[item.pm.gu].nk+" 已將你退出 "+groupTmp.chatAll[item.pm.ti].cn+" 聊天室",true,false,[function(){
                             if(windowList[item.pm.ti] && !windowList[item.pm.ti].closed){
                                 windowList[item.pm.ti].close();
                             }
@@ -8771,8 +8759,7 @@ updateAddressbookFavoriteStatusApi = function( this_gi, al, dl ){
 }
 
 eventDetailShow = function(thisEi){
-    var this_gi = thisEi.split("_")[0],
-        deferred = $.Deferred();
+    var deferred = $.Deferred();
 
     $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
         var thisEvent = $(this).find(".st-sub-box");

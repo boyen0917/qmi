@@ -3,7 +3,7 @@
 var groupChat;
 var windowList = {};
 var sortRoomListTimeout = 700;
-
+var namecardCreateRoom = false;
 $(document).ready(function(){
 	//add new chat done, refresh list
 	$(".chatList-add-done").on("click", function(){
@@ -39,26 +39,11 @@ initChatList = function(){
 
 	//----- set title -------
 	var currentGroup = QmiGlobal.groups[gi];
-	// var parent = $("#page-group-main").find(".gm-header");
-	// if( parent ){
-		//set title & sub-title
-		// var tmp = parent.find(".page-title");
-		// if( tmp ){
-		// 	tmp.html( $.i18n.getString("CHAT_TITLE") );
-		// 	if( currentGroup )	tmp.next().html( currentGroup.gn );
-		// }
-		//set add icon
-		// parent.find(".feed-compose").hide();
-		// parent.find(".chatList-add").show();
-	// }
-	
 	//set add member button
 	$(".chatList-add").off("click");
 	$(".chatList-add").on("click", function(){
 		$(".chatList-add").data("object_str","");
-		if(currentGroup.isOfficial){
-			$(".chatList-add").data("offical","add");
-		}
+		if(currentGroup.isOfficial) $(".chatList-add").data("offical","add");
 		showNewRoomPage();
 	});
 
@@ -75,7 +60,6 @@ function getChatListApi(giTmp) {
 	new QmiAjax({
         apiName: "groups/"+ giTmp +"/chats",
     }).success(function(rspData) {
-
 		var chatRoomListArr = (rspData || {cl: []}).cl;
 		//update chat list
 		var tmpChatAllObj = {};
@@ -157,22 +141,39 @@ function updateChatList( giTmp, extraCallBack ){
 
 	//取得聊天室列表api
 	getChatListApi(giTmp).done(function(rspObj) {
-		if(gi !== giTmp) return;
+		if(gi !== giTmp && !namecardCreateRoom) return;
 
 		var chatListDom = $(".subpage-chatList");
-		//預設開啟loading, 關閉rows & coachmark
-		chatListDom.find(".coachmake").hide();
-		chatListDom.find(".loading").show();
-		chatListDom.find(".rows").html("");
-		chatListDom.find(".top-chatList").hide("");
-		$(".top-chatList .list").html("");
 		chatListDom.find(".loading").hide();
 
-		if(rspObj.isSuccess && rspObj.roomArr.length > 0) 
+
+		var groupData = QmiGlobal.groups[giTmp];
+		if( null==groupData ) return;
+		var chatList = groupData.chatAll;
+		if( null==chatList ) return;
+		var roomsCnt = 0;
+		$.each(chatList, function(index, val) {
+			if(val.st === undefined){
+				roomsCnt = Object.keys(chatList).length;
+				return false;
+			}
+			else if(val.st == 0){
+				roomsCnt ++;
+			}
+		});
+
+		if(rspObj.isSuccess && rspObj.roomArr.length > 0 && roomsCnt > 1) 
 			showChatList();
-		else 
+		else if(rspObj.isSuccess && roomsCnt > 1) {
+			showChatList();
+		} else {
 			chatListDom.find("rows").hide().end()
 			.find(".coachmake").fadeIn();
+			if($("#page-group-main").data("currentAct")=="chat"){
+				$("#page-group-main .subpage-chatList").show();
+			}
+		}
+			
 
 		if(extraCallBack)	extraCallBack();
 	})
@@ -190,28 +191,12 @@ function showChatList(){
 	var chatList = groupData.chatAll;
 	if( null==chatList ) return;
 
-	var 
-	deferredPoolArr = [],
-	targetDiv = $(".subpage-chatList .rows");
-	topChatListDiv = $(".top-chatList .list");
+	var deferredPoolArr = [],
+		targetDiv = $(".subpage-chatList .rows");
+		topChatListDiv = $(".top-chatList .list");
 	
-	var romm = 0;
-	$.each(QmiGlobal.groups[gi].chatAll, function(index, val) {
-		if(val.st === undefined){
-			romm = Object.keys(chatList).length;
-			return false;
-		}
-		else if(val.st == 0){
-			romm ++;
-		}
-	});
-	if( romm<=1 ){
-		targetDiv.hide();
-		$(".subpage-chatList .coachmake").fadeIn();
-		return;
-	}
 	targetDiv.html("");
-	topChatListDiv.html("");	
+	topChatListDiv.html("");
 	targetDiv.show();
 	$(".subpage-chatList .coachmake").hide();
 
@@ -318,7 +303,9 @@ function showChatList(){
 				});
 			}
 
-			$("#page-group-main .subpage-chatList").show();
+			if($("#page-group-main").data("currentAct")=="chat"){
+				$("#page-group-main .subpage-chatList").show();
+			}
 		})
 	}
 
@@ -414,50 +401,50 @@ function openChatWindow ( giTmp, ci ){
 
 		windowList[ci].mainPageObj = {
 			//聊天室個人名片聊天
-			createChat: function(this_gi,this_gu) {
-				requestNewChatRoomApi( this_gi, "", [{gu:this_gu}], function(data){
-			    });
+			createChat: function(thisGi,thisGu) {
+				namecardCreateRoom = true;
+				requestNewChatRoomApi( thisGi, "", [{gu:thisGu}]);
 			},
 			
 			//聊天室個人名片切換至個人主頁
-			userTimeline: function(this_gi,this_info) {
+			userTimeline: function(thisGi,thisInfo) {
 				$(".sm-group-area").removeClass("active").removeClass("enable");
-				$(".sm-group-area[data-gi='"+this_gi+"']").addClass("active");
-				timelineChangeGroup(this_gi).done(function() {
-					personalHomePage(this_info);
+				$(".sm-group-area[data-gi='"+thisGi+"']").addClass("active");
+				timelineChangeGroup(thisGi).done(function() {
+					personalHomePage(thisInfo);
 				});
+			}
+		}
+
+		windowList[ci].chatList = {
+			roomAddTop : function (chatroomId) {
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
+				topListDom.find(".list").append(chatroomDom);
+				topListDom.show();
+			},
+			roomDeleteTop : function (chatroomId) {
+				var unTopListDom = chatListDiv.find(".rows");
+				var chatroomDom = topListDom.find("[data-rid='" + chatroomId +"']");
+				chatroomDom.appendTo(unTopListDom);
+
+				if (topListDom.find(".subpage-chatList-row").length == 0) {
+					topListDom.hide();
+				}
+			},
+			roomRename : function (chatroomId, newName) {
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
+				var numberOfRoomMember = QmiGlobal.groups[gi].chatAll[chatroomId].cpc;
+				chatroomDom.find(".name").html(newName + " (" + numberOfRoomMember + ")");
+			},
+			roomUpdatePhoto : function (chatroomId, newImgUrl) {
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
+				chatroomDom.find("img").attr("src", newImgUrl);
 			},
 
-			chatList: {
-				roomAddTop : function (chatroomId) {
-					var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
-					topListDom.find(".list").append(chatroomDom);
-					topListDom.show();
-				},
-				roomDeleteTop : function (chatroomId) {
-					var unTopListDom = chatListDiv.find(".rows");
-					var chatroomDom = topListDom.find("[data-rid='" + chatroomId +"']");
-					chatroomDom.appendTo(unTopListDom);
-
-					if (topListDom.find(".subpage-chatList-row").length == 0) {
-						topListDom.hide();
-					}
-				},
-				roomRename : function (chatroomId, newName) {
-					var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
-					var numberOfRoomMember = QmiGlobal.groups[gi].chatAll[chatroomId].cpc;
-					chatroomDom.find(".name").html(newName + " (" + numberOfRoomMember + ")");
-				},
-				roomUpdatePhoto : function (chatroomId, newImgUrl) {
-					var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
-					chatroomDom.find("img").attr("src", newImgUrl);
-				},
-
-				roomUpdateNumberOfMember : function (chatroomId, number) {
-					var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
-					var roomName = QmiGlobal.groups[gi].chatAll[chatroomId].cn;
-					chatroomDom.find(".name").html(roomName + " (" + number + ")");
-				}
+			roomUpdateNumberOfMember : function (chatroomId, number) {
+				var chatroomDom = chatListDiv.find("[data-rid='" + chatroomId +"']");
+				var roomName = QmiGlobal.groups[gi].chatAll[chatroomId].cn;
+				chatroomDom.find(".name").html(roomName + " (" + number + ")");
 			}
 		}
 
@@ -965,6 +952,7 @@ function requestNewChatRoomApi(giTmp, cnTmp, gul, fl, callback, isOpenRoom){
     		var result = $.parseJSON(data.responseText);
     		// cns.debug(result);
     		updateChatList( giTmp, function(){
+    			namecardCreateRoom = false;
     			if(result.ci){
     				//還沒有聊過天的話server聊天室列表不會有這個聊天室
     				var userData = $.lStorage( ui );
@@ -991,7 +979,6 @@ function requestNewChatRoomApi(giTmp, cnTmp, gul, fl, callback, isOpenRoom){
 				    	}
 					    	$.lStorage( ui, userData );
 				    }
-
 				    //打開聊天室
 				    if( isOpenRoom ){
 		    			setTimeout( function(){

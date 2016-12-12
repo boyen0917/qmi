@@ -24,10 +24,11 @@ if (!Array.prototype.find) {
 }
 
 QmiGlobal.popup = function(args){
-
 	QmiGlobal.scrollController.disableScroll();
 
 	var self = this;
+
+	self.deferred = $.Deferred();
 	self.jqHtml = $(this.html);
 
 	self.jqHtml.find(".popup-confirm").html( $.i18n.getString("COMMON_OK") ).end()
@@ -58,7 +59,7 @@ QmiGlobal.popup = function(args){
 			args.action[0].apply({},[args.action[1]]);
 		}
 		self.jqHtml.remove();
-		self.remove();
+		self.remove(true);
 	})
 
 	//取消
@@ -70,13 +71,15 @@ QmiGlobal.popup = function(args){
 	$("body")
 	.find("div.popup").remove().end()
 	.append(self.jqHtml.show());
+
+	return self.deferred.promise();
 }
 
 QmiGlobal.popup.prototype = {
-	remove: function(){
-		//this.jqHtml.remove();
-		$("body").removeClass("screen-lock");
+	remove: function(isConfirm){
+		this.deferred.resolve(isConfirm);
 
+		$("body").removeClass("screen-lock");
 		QmiGlobal.scrollController.enableScroll();
 	},
 	
@@ -601,11 +604,9 @@ qmiUploadFile = function(uploadObj){
 				si: s3Obj.si,
 				md: s3Obj.md
 			};
-			console.log(s3Obj.oriFile);
 			if(s3Obj.oriFile){
 				EXIF.getData(s3Obj.oriFile, function(){
 					exifObj = EXIF.getAllTags(this);
-					console.log("exif: ",exifObj);
 					if(!$.isEmptyObject(exifObj)){
 						body.exif = {
 							"DateTimeOriginal": exifObj.DateTimeOriginal || "",
@@ -618,7 +619,6 @@ qmiUploadFile = function(uploadObj){
 					}
 				});
 			}
-			console.log("body: ",body);
 		// commit
 		new QmiAjax({
 			apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
@@ -672,9 +672,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			break;
 		case 1: // 圖
-			console.log(uploadObj);
-			console.log(oriObj);
-			console.log(tmbObj);
 			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s),
 				tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
 
@@ -1215,7 +1212,7 @@ setStickerUrl = function(dom, id){
 }
 
 QmiGlobal.gallery = function (data) {
-
+	this.gi = data.gi;
     this.photoList = data.photoList;
     this.currentImage = data.currentImage;
     this.isApplyWatermark = data.isApplyWatermark;
@@ -1310,9 +1307,9 @@ QmiGlobal.gallery.prototype = {
 
 	getImageUrl: function() {
 		return new QmiAjax({
-        	apiName: "groups/" + gi + "/files/" + this.photoList[this.currentImage].c 
+        	apiName: "groups/" + this.gi + "/files/" + this.photoList[this.currentImage].c 
         		+ "?pi=" + this.photoList[this.currentImage].p + "&ti=" 
-        		+ QmiGlobal.groups[gi].ti_feed
+        		+ QmiGlobal.groups[this.gi].ti_feed
     	});
 	},
 
@@ -1350,6 +1347,7 @@ QmiGlobal.gallery.prototype = {
 
 		this.currentImage = (this.currentImage + 1) % (this.photoList.length);
 		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
+
 			this.getImageUrl().then(function (data) {
 				if (this.isApplyWatermark) {
 					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
@@ -1526,7 +1524,7 @@ updateSideMenuContent = function(thisGi) {
 	
 	var groupData = QmiGlobal.groups[thisGi],
 		gn = groupData.gn._escape(),
-		gd = htmlFormat( groupData.gd ),
+		gd = groupData.gd._escape(),
 		ad = groupData.ad;
 	//管理員圖示
 	var tmp = $(".sm-group-area[data-gi="+thisGi+"]");
