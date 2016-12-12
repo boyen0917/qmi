@@ -459,7 +459,9 @@ timelineSwitch = function (act,reset,main,noPR){
             //顯示新增貼文按鈕
             gmHeader.find(".feed-compose").show();
 
-            groupMain.find(".subpage-timeline").show();
+            groupMain.find(".subpage-timeline").show().scrollTop(0);
+            //一開始都回到全部的文章的分類
+            groupMain.find(".st-filter-area").data("filter","all");
 
             //polling 數字重寫
             pollingCountsWrite();
