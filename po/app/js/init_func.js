@@ -319,23 +319,17 @@ $(function(){
                 $(".gs-row[data-type=info]").show();
             } else {
                 $(".gs-row[data-type=permission]").hide();
-                //$(".gs-row[data-type=info]").hide();
                 hide+=2;
             }
 
             //離開團體開關
             //據說是其他平台還沒實作, 取消此規則**目前僅免費團體及官方帳號可自由退出**
-            // if( group.tp=="A1" || group.tp.indexOf("C")==0 ){
-                if( group.set && (group.set.s11==0 || group.set.s11==2) ){
-                    $(".gs-leave").show();
-                } else{
-                    $(".gs-leave").hide();
-                    hide+=1;
-                }
-            // } else {
-            //     $(".gs-leave").hide();
-            //     hide+=1;
-            // }
+            if( group.set && (group.set.s11==0 || group.set.s11==2) ){
+                $(".gs-leave").show();
+            } else{
+                $(".gs-leave").hide();
+                hide+=1;
+            }
 
             if( hide>=3 ){
                 return false;
@@ -357,8 +351,7 @@ $(function(){
 
         try{
             //如果tp為c,d開頭為官方團體
-            var tp = groupData.tp.toLowerCase();
-            groupData.isOfficial = ( tp.indexOf('c')==0 || tp.indexOf('d')==0 );
+            groupData.isOfficial = (groupData.ntp === 2);
             
             //如果非admin, 沒有聊天室的話隨便找個admin預建聊天室
             if( groupData.isOfficial && groupData.ad!=1 ){

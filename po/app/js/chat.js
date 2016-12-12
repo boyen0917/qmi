@@ -148,12 +148,12 @@ $(function(){
 			return;
 		}
 
-		isShowUnreadAndReadTime = true;
-		if (g_group.set && null != g_group.set.s8) {
-			if (g_group.set.s8 == 1 || g_group.set.s8 == 3) {
-				isShowUnreadAndReadTime = false;
-			}
-		}
+		// 付費團體
+		if (g_group.ptp === 1) 
+			isShowUnreadAndReadTime = true;
+		else
+			isShowUnreadAndReadTime = false;
+
 		g_room = g_group["chatAll"][ci];
 
 		initChatDB(onChatDBInit);
