@@ -484,8 +484,10 @@ onCheckVersionDone = function(needUpdate){
 				//設定目前團體 執行polling()
 				setGroupInitial(data.dgi).done(polling);
 			}
-        }).fail(function(errData) {
-        	$("#page-registration .login").removeClass("login-waiting");
+        }).always(function() {
+        	setTimeout(function() {
+        		$("#page-registration .login").removeClass("login-waiting");
+        	}, 1000);
         });
     }
 

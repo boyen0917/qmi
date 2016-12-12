@@ -8,7 +8,6 @@ var ui,
 	//語言
 	lang = "en_US",
 
-
 	//local測試 預設開啟console
 	debug_flag = false,
 
@@ -35,6 +34,7 @@ var base_url = function() {
 	}
 }();
 
+var base_url = "https://qmi17.mitake.com.tw/";
 
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {
@@ -244,8 +244,6 @@ var timeline_detail_exception = [
 
 
 window.QmiGlobal = {
-
-	pollingOff: true,
 
 	// 之後取代 ui, at, gi, ... etc
 	currentGi: "",
