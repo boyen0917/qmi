@@ -964,7 +964,7 @@ $(function(){
 	// 偵測貼上事件 避免html 換成text文本
 	$(document).on("paste",".st-reply-highlight-container",function(e){
 		e.preventDefault();
-		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
+		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text')._escape());
 	})
 
 	//留言送出
@@ -1063,11 +1063,11 @@ $(function(){
 				// 	break;
 				case "copyword":
 					//get content (title & attachment excluded)
-			        // var data = this_event.data("event-val");
+					// var data = this_event.data("event-val");
 			        var text = null;
 			        try{
-			        	// text = data.ml[0].c;
-			        	text = this_event.find('.st-sub-box-2-content')[0].innerText;
+						// text = data.ml[0].c;
+			        	text = this_event.find(".st-sub-box-2-content")[0].innerText || this_event.find(".st-box2-more-title")[0].innerText + "\n"+ this_event.find(".st-box2-more-desc")[0].innerText;
 					} catch(e) {
 						errorReport(e);
 				    }
@@ -1350,7 +1350,7 @@ $(function(){
 			return false;
 		}
  			
-		this_compose.data("compose-content",$('.cp-content-highlight').html());
+		this_compose.data("compose-content",$('.cp-content-highlight').html().replace(/&lt;/g,'<').replace(/&gt;/g,'>'));
 		this_compose.data("compose-title",$('.cp-textarea-title').val());
 
 		var ctp = this_compose.data("compose-tp");
@@ -1401,7 +1401,7 @@ $(function(){
 	// 偵測貼上事件 避免html 換成text文本
 	$("#page-compose").on("paste", ".cp-content-highlight", function(e){
 		e.preventDefault();
-		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text'));
+		document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text')._escape());
 	})
 
 	// 8-2-16 阻止拖拉橫移

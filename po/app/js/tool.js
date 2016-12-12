@@ -1524,7 +1524,7 @@ updateSideMenuContent = function(thisGi) {
 	
 	var groupData = QmiGlobal.groups[thisGi],
 		gn = groupData.gn._escape(),
-		gd = htmlFormat( groupData.gd ),
+		gd = groupData.gd._escape(),
 		ad = groupData.ad;
 	//管理員圖示
 	var tmp = $(".sm-group-area[data-gi="+thisGi+"]");

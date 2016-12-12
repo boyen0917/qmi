@@ -907,6 +907,8 @@ body {
     overflow-y: auto;
     padding: 3px 10px 3px;
     line-height: 25px;
+    white-space: pre-wrap;
+  	word-wrap: break-word;
 }
 #footer .contents .input:active,#footer .contents .input:focus-no{
 	box-shadow: 0 0 3px 2px rgba(57, 148, 232,0.5);
