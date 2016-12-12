@@ -1212,7 +1212,7 @@ setStickerUrl = function(dom, id){
 }
 
 QmiGlobal.gallery = function (data) {
-
+	this.gi = data.gi;
     this.photoList = data.photoList;
     this.currentImage = data.currentImage;
     this.isApplyWatermark = data.isApplyWatermark;
@@ -1307,9 +1307,9 @@ QmiGlobal.gallery.prototype = {
 
 	getImageUrl: function() {
 		return new QmiAjax({
-        	apiName: "groups/" + gi + "/files/" + this.photoList[this.currentImage].c 
+        	apiName: "groups/" + this.gi + "/files/" + this.photoList[this.currentImage].c 
         		+ "?pi=" + this.photoList[this.currentImage].p + "&ti=" 
-        		+ QmiGlobal.groups[gi].ti_feed
+        		+ QmiGlobal.groups[this.gi].ti_feed
     	});
 	},
 
@@ -1347,6 +1347,7 @@ QmiGlobal.gallery.prototype = {
 
 		this.currentImage = (this.currentImage + 1) % (this.photoList.length);
 		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
+
 			this.getImageUrl().then(function (data) {
 				if (this.isApplyWatermark) {
 					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
