@@ -1458,6 +1458,9 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                         workContentMake(this_event,val.li);
                         break;
                     case 13:
+
+                        without_message = true;
+
                         if(reply_chk) break;
 
                         //工作回覆
@@ -1479,9 +1482,6 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                                 }
                             }
                         });
-
-                        without_message = true;
-
                         break;
                     case 14:
                         if(reply_chk) break;
