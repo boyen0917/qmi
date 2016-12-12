@@ -585,7 +585,8 @@ window.QmiAjax = function(args){
 }
 
 QmiAjax.prototype = {
-	expireTimer: 432000 * 1000, // ms, 五天
+	expireTimer: 5 * 86400 * 1000, // ms, 五天
+	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
 	authLock: (function(){
 		var isLock = false;
@@ -670,7 +671,7 @@ QmiAjax.prototype = {
 		function isExpired(expireTimer) {
 			var currTime = new Date().getTime();
 			// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
-			if(isLdapCompanyOrSSOLogin()) return (nowEt - currTime) < 0;
+			if(isLdapCompanyOrSSOLogin()) return (nowEt - currTime) < ldapExpireTimer;
 			// 過期檢查 提前幾天檢查
 			else return (nowEt - currTime) < expireTimer
 
