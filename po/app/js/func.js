@@ -7314,7 +7314,6 @@ replySend = function(thisEvent){
                 oriObj: {w: 1280, h: 1280, s: 0.9},
                 progressBar: f_load_show.progressBar
             }).done(uploadDef.resolve)
-
             break;
     }
 

@@ -680,7 +680,8 @@ QmiAjax.prototype = {
 			else return (nowEt - currTime) < expireTimer
 
 			function isLdapCompanyOrSSOLogin() {
-				if((args.companyData || {}).tp === 1) return true;
+				// ldap company
+				if((args.companyData || {}).passwordTp === 1) return true;
 				if(QmiGlobal.auth.isSso)  return true;
 				return false; 
 			} 

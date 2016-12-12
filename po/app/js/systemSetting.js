@@ -583,7 +583,6 @@ QmiGlobal.module.ldapSetting = {
             // 判斷過期;
             if(companyData.et - (new Date().getTime()) < 0) {
                 expireObj[companyData.ci] = true;
-
                 // 順便做lock
                 QmiGlobal.module.reAuthUILock.lock(companyData);
             }
@@ -613,12 +612,24 @@ QmiGlobal.module.ldapSetting = {
         }).done(function(rspData) {
             try {
                 var rspObj = JSON.parse(rspData.responseText);
-
-                if(rspObj.tp !== 2) {
-                    submitCompleteDef.reject(errObjInit(rspData, "not valid user"));
-                    chainDef.resolve(); // step2 會 return;
-                } else {
-                    chainDef.resolve(rspObj);    
+                switch(rspObj.tp) {
+                    case 1: // 已被綁定 詢問後繼續綁定
+                        new QmiGlobal.popup({
+                            desc: rspObj.rsp_msg,
+                            cancel: true,
+                            confirm: true
+                        }).done(function(isConfirm) {
+                            if(!isConfirm) return;
+                            chainDef.resolve(rspObj);
+                        })
+                        
+                        break;
+                    case 2: // 可以綁定
+                        chainDef.resolve(rspObj); 
+                        break;
+                    default: // 驗證失敗？
+                        submitCompleteDef.reject(errObjInit(rspData, "not valid user"));
+                        chainDef.resolve(); // step2 會 catch error
                 }
             } catch(e) {
                 chainDef.reject(errObjInit(errData, "step1 parse error"));

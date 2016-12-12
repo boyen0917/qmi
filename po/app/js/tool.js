@@ -24,10 +24,11 @@ if (!Array.prototype.find) {
 }
 
 QmiGlobal.popup = function(args){
-
 	QmiGlobal.scrollController.disableScroll();
 
 	var self = this;
+
+	self.deferred = $.Deferred();
 	self.jqHtml = $(this.html);
 
 	self.jqHtml.find(".popup-confirm").html( $.i18n.getString("COMMON_OK") ).end()
@@ -58,7 +59,7 @@ QmiGlobal.popup = function(args){
 			args.action[0].apply({},[args.action[1]]);
 		}
 		self.jqHtml.remove();
-		self.remove();
+		self.remove(true);
 	})
 
 	//取消
@@ -70,13 +71,15 @@ QmiGlobal.popup = function(args){
 	$("body")
 	.find("div.popup").remove().end()
 	.append(self.jqHtml.show());
+
+	return self.deferred.promise();
 }
 
 QmiGlobal.popup.prototype = {
-	remove: function(){
-		//this.jqHtml.remove();
-		$("body").removeClass("screen-lock");
+	remove: function(isConfirm){
+		this.deferred.resolve(isConfirm);
 
+		$("body").removeClass("screen-lock");
 		QmiGlobal.scrollController.enableScroll();
 	},
 	
