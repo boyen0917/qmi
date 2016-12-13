@@ -202,7 +202,8 @@ userInfoGetting = function(){
         userInfo.find(".user-name").text(data.nk).end()
                 .find(".user-account").text(account).end()
                 .find(".user-avatar-setting").attr("src",data.aut);
-    if(!data.aut){
+        if(data.nk === "") userInfo.find(".user-name").html("&nbsp;")
+        if(!data.aut){
             userInfo.find(".user-avatar-setting").attr("src",emptyUserAvt);
             QmiGlobal.me.aut = emptyUserAvt;
             QmiGlobal.me.auo = emptyUserAvt;

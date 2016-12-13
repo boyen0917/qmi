@@ -331,8 +331,11 @@ timelineChangeGroup = function (thisGi) {
         // 去timeline
         $.mobile.changePage("#page-group-main");
 
-        changeDeferred.resolve();
+        QmiGlobal.module.reAuthManually.init({
+            companyData: QmiGlobal.companies[(QmiGlobal.companyGiMap[gi] || {}).ci]
+        });
 
+        changeDeferred.resolve();
     } else {
         $("#page-group-main .gm-header-right").show();
 
@@ -7565,7 +7568,9 @@ getCompanyGroup = function(companyData,allGroupList) {
 // 這不要刪啊
 getCompanyToken = function(companyData,isReDo){
     // 以防萬一 重複打了同個company的auth
-    if(isCompanyAuthDefResolved()) companyData.reAuthDef = $.Deferred();
+    if(QmiGlobal.isDefResolved(companyData.reAuthDef)) 
+        companyData.reAuthDef = $.Deferred();
+
     var ctDeferred = companyData.reAuthDef;
 
     // 需要輸入密碼
@@ -7664,13 +7669,6 @@ getCompanyToken = function(companyData,isReDo){
             QmiGlobal.companies[companyData.ci].id = QmiGlobal.auth.id;
 
     }
-
-    function isCompanyAuthDefResolved() {
-        if(!companyData.reAuthDef) return true;
-        if(!companyData.reAuthDef.state instanceof Function) return true;
-        if(companyData.reAuthDef.state() !== "pending") return true;
-        return false;
-    } 
 }
 
 // 重新取得私雲key

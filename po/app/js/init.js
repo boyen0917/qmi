@@ -301,7 +301,14 @@ window.QmiGlobal = {
 			$('.ui-loader').hide();
 			$(".ajax-screen-lock").hide();
 		}
-	} 
+	},
+
+	isDefResolved: function(def) {
+        if(!def) return true;
+        if(!def.state instanceof Function) return true;
+        if(def.state() !== "pending") return true;
+        return false;
+    } 
 };
 
 // polling異常監控
@@ -688,24 +695,24 @@ QmiAjax.prototype = {
 		var self = this,
 			deferred = $.Deferred();
 
-
 		companyData = companyData || QmiGlobal.auth;
 
 		// 先檢查是否按取消
-		try { 
-			if(QmiGlobal.companies[companyData.ci].isReAuthCancel === true) {
-				deferred.resolve({
-					isSuccess: false,
-					isSso: true,
-					isReAuth: true,
-					data: {isCancel: true}
-				})
-				return deferred.promise();
-			}
-		} catch(e) {}// do nothing 
+		// try { 
+		// 	if(QmiGlobal.companies[companyData.ci].isReAuthCancel === true) {
+		// 		deferred.resolve({
+		// 			isSuccess: false,
+		// 			isSso: true,
+		// 			isReAuth: true,
+		// 			data: {isCancel: true}
+		// 		})
+		// 		return deferred.promise();
+		// 	}
+		// } catch(e) {}// do nothing 
 
 		// reAuth Lock 如果已經是deferred 就不重新指定
-		if(!companyData.reAuthDef) companyData.reAuthDef = $.Deferred();
+		if(QmiGlobal.isDefResolved(companyData.reAuthDef)) 
+        	companyData.reAuthDef = $.Deferred();
 
 		// 如果有帶rspData 表示et沒過期 打了api卻回傳401
 		self.doAuth(companyData, rspData).done(deferred.resolve);
@@ -1052,8 +1059,13 @@ QmiGlobal.module.reAuthManually = {
     		QmiGlobal.ajaxLoadingUI.hide();
     	}
 
-    	self.reAuthDef = argObj.reAuthDef;
+    	self.reAuthDef = argObj.reAuthDef || $.Deferred();
     	self.companyData = argObj.companyData;
+
+    	if(!self.companyData) {
+    		console.error("reAuthManually格式錯誤");
+    		return;
+    	} else if(self.isExist) return;
 
     	$("#" + self.id).remove();
 
@@ -1064,6 +1076,8 @@ QmiGlobal.module.reAuthManually = {
 
     	$("body").append(self.view);
     	self.view.fadeIn(100);
+
+    	self.isExist = true;
 
     	QmiGlobal.eventDispatcher.subscriber([
     		{
@@ -1080,6 +1094,8 @@ QmiGlobal.module.reAuthManually = {
     			eventArr: ["input"],
     		}
     	], self, true);
+
+    	return self.reAuthDef.promise();
     },
 
     // custom event
@@ -1102,7 +1118,7 @@ QmiGlobal.module.reAuthManually = {
 					// 在私雲加入cancel chk 讓其他api停止動作
 					QmiGlobal.companies[self.companyData.ci].isReAuthCancel = true;
 					// 避免重複顯示認證頁面 2秒後解開 但要注意polling是否觸發認證畫面
-					setTimeout(function() {QmiGlobal.companies[self.companyData.ci].isReAuthCancel = false}, 2000);
+					// setTimeout(function() {QmiGlobal.companies[self.companyData.ci].isReAuthCancel = false}, 2000);
 					
 					// 所以要再點一次timelineChangeGroup 做lock的ui顯示
 					timelineChangeGroup(gi)
@@ -1152,6 +1168,8 @@ QmiGlobal.module.reAuthManually = {
 
     	if(submitDom.hasClass("ready") === false) return;
 
+    	QmiGlobal.companies[self.companyData.ci].isReAuthCancel = false;
+
     	self.view.find(".container").addClass("loading");
 
     	$.ajax({
@@ -1176,9 +1194,9 @@ QmiGlobal.module.reAuthManually = {
 
 				self.view.find(".container").removeClass("loading");
 
-				self.getView("input").val("");
+				self.getView("input")[1].value = "";
 
-				toastShow($.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"));
+				toastShow(newAuth.rsp_msg);
 			} else {
 				// 設定新at , et
 				QmiGlobal.companies[cData.ci].at = newAuth.at;
@@ -1186,30 +1204,31 @@ QmiGlobal.module.reAuthManually = {
 
 				QmiGlobal.module.reAuthUILock.unlock(self.companyData);
 
-				// 重新執行timelineChangeGroup 讓畫面開啟
-				timelineChangeGroup(gi);
-
 				// reAuth 結束
 				setTimeout(function() {
 					self.view.find(".container").attr("msg", $.i18n.getString("WEBONLY_AUTH_SUCCESS"));
-				}, 1000)
-				
+				}, 300)
 
 				// reAuth 結束
 				setTimeout(function() {
 					self.remove();
+
+					// 重新執行timelineChangeGroup 讓畫面開啟
+					timelineChangeGroup(gi);
+
 					self.reAuthDef.resolve({
 						isSuccess: true,
 						isSso: true,
 						isReAuth: true
 					})
-				}, 1500);
+				}, 500);
 			}
 		})
     },
 
     remove: function() {
     	var self = this;
+    	self.isExist = false;
     	self.view.fadeOut(100, function() { self.view.remove()});
     },
 }
