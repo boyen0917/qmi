@@ -664,7 +664,7 @@ QmiGlobal.module.ldapSetting = {
                 try {
                     chainDef2.resolve(JSON.parse(rspData.responseText));
                 } catch(e) {
-                    chainDef2.reject(errObjInit(errData, "step2 parse error"));
+                    chainDef2.reject(errObjInit(rspData, "step2 parse error"));
                 }
             }).fail(chainDef2.reject);
 
@@ -673,7 +673,12 @@ QmiGlobal.module.ldapSetting = {
         // step1 error 
         }, function(errData) {submitCompleteDef.reject(errObjInit(errData, "step1 error"))})
         .then(function(step2Data) {
-            if(step2Data === undefined) return;
+            if(step2Data === undefined || step2Data.key === undefined) {
+                submitCompleteDef.reject(errObjInit({
+                    responseText: JSON.stringify(step2Data)
+                }));
+                return;
+            }
             // step3
             new QmiAjax({
                 apiName: "me/sso/step3",

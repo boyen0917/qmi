@@ -7724,8 +7724,8 @@ companyLoad = function(loadData){
         refreshDom.find("img").addClass("rotate");
     }
 
-    // 已存在 就不用讀取
-    if(QmiGlobal.companies[companyData.ci]) return;
+    // 已存在 重新取得key -> cert
+    // if(QmiGlobal.companies[companyData.ci]) return;
     
     getCompanyToken(companyData).done(function(isSuccess){
         var tokenDeferred = $.Deferred();
@@ -8165,10 +8165,8 @@ pollingCmds = function(newPollingData){
 
         allCmdsDoneDeferred = $.Deferred(),
 
-
         // 是否先取得團體列表的deferred
         groupListDeferred = $.Deferred();
-
 
     // 先分類 取各組的最後一筆即可
     cmdsArrangement().done(function(){
@@ -8413,7 +8411,11 @@ pollingCmds = function(newPollingData){
                         break;
 
                     case 53: // 歸戶 有新ldap company加入 提供ldap資訊
-                        companyLoad({companyData: (item.pm || {}).o_info});
+                        var companyData = (item.pm || {}).o_info;
+                        if(!companyData) return;
+                        companyData.passwordTp = companyData.tp;
+                        
+                        companyLoad({companyData: companyData});
                         break;
 
                     case 54: // 私雲移轉 團體ui屏蔽
@@ -8506,7 +8508,7 @@ pollingCmds = function(newPollingData){
     })// groupList deferred done
 
     // 全部 cmds 處理完
-    $.when.apply($,pollingDeferredPoolArr).done(function(){
+    $.when.apply($, pollingDeferredPoolArr).done(function(){
         pollingUpdate(newPollingData);
         allCmdsDoneDeferred.resolve();
     })
@@ -8913,7 +8915,9 @@ goToGroupMenu = function(){
 
 function removeCompany(companyData) {
 
-    Object.keys((QmiGlobal.companies[companyData.ci] || {})).forEach(removeGroup);
+    Object.keys(QmiGlobal.companyGiMap).forEach(function(thisGi) {
+        if(QmiGlobal.companyGiMap[thisGi].ci === companyData.ci) removeGroup(thisGi);
+    });
     delete QmiGlobal.companies[companyData.ci];
 
 }
