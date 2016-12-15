@@ -289,7 +289,6 @@ window.QmiGlobal = {
 				return level;
 			}
 		}
-
 	}(),
 
 	ajaxLoadingUI: {
@@ -697,19 +696,6 @@ QmiAjax.prototype = {
 
 		companyData = companyData || QmiGlobal.auth;
 
-		// 先檢查是否按取消
-		// try { 
-		// 	if(QmiGlobal.companies[companyData.ci].isReAuthCancel === true) {
-		// 		deferred.resolve({
-		// 			isSuccess: false,
-		// 			isSso: true,
-		// 			isReAuth: true,
-		// 			data: {isCancel: true}
-		// 		})
-		// 		return deferred.promise();
-		// 	}
-		// } catch(e) {}// do nothing 
-
 		// reAuth Lock 如果已經是deferred 就不重新指定
 		if(QmiGlobal.isDefResolved(companyData.reAuthDef)) 
         	companyData.reAuthDef = $.Deferred();
@@ -932,27 +918,35 @@ QmiAjax.prototype = {
 } // end of QmiAjax
 
 QmiGlobal.module.reAuthUILock = {
-	currDataObj: {},
 	lock: function(companyData) {
-		var groupListArea = $("#page-group-main .sm-group-list-area");
-		Object.keys(QmiGlobal.companyGiMap).forEach(function(cgi) {
-			if(QmiGlobal.companyGiMap[cgi].ci !== companyData.ci) return;
-			QmiGlobal.groups[cgi].isReAuthUILock = true;
-
-			var groupDom = groupListArea.find(".sm-group-area[data-gi="+cgi+"]");
-			groupDom.find(".sm-group-area-l").addClass("auth-lock").end()
-			.find("span.auth-lock-text").show();
- 		});
+		if(!companyData) return;
+		companyData.isReAuthCancel = false;
+		this.action({
+			companyData: companyData,
+			classStatus: "addClass",
+			textStatus: "show"
+		});
 	},
 	unlock: function(companyData) {
+		if(!companyData) return;
+		companyData.isReAuthCancel = false;
+		this.action({
+			companyData: companyData,
+			classStatus: "removeClass",
+			textStatus: "hide"
+		});
+	},
+	action: function(actionData) {
+		var companyData = actionData.companyData;
 		var groupListArea = $("#page-group-main .sm-group-list-area");
 		Object.keys(QmiGlobal.companyGiMap).forEach(function(cgi) {
 			if(QmiGlobal.companyGiMap[cgi].ci !== companyData.ci) return;
-			QmiGlobal.groups[cgi].isReAuthUILock = false;
+			if(!QmiGlobal.groups[cgi]) return; // 還未取得團體
+			QmiGlobal.groups[cgi].isReAuthUILock = actionData.isReAuthUILock;
 
 			var groupDom = groupListArea.find(".sm-group-area[data-gi="+cgi+"]");
-			groupDom.find(".sm-group-area-l").removeClass("auth-lock").end()
-			.find("span.auth-lock-text").hide();
+			groupDom.find(".sm-group-area-l")[actionData.classStatus]("auth-lock").end()
+			.find("span.auth-lock-text")[actionData.textStatus]();
  		});
 	}
 }
@@ -1116,11 +1110,9 @@ QmiGlobal.module.reAuthManually = {
 					// 打開timeline lock
 					// 從QmiAjax的reAuth 做 lock了
 					// 在私雲加入cancel chk 讓其他api停止動作
-					QmiGlobal.companies[self.companyData.ci].isReAuthCancel = true;
-					// 避免重複顯示認證頁面 2秒後解開 但要注意polling是否觸發認證畫面
-					// setTimeout(function() {QmiGlobal.companies[self.companyData.ci].isReAuthCancel = false}, 2000);
+					(QmiGlobal.companies[self.companyData.ci] || {}).isReAuthCancel = true;
 					
-					// 所以要再點一次timelineChangeGroup 做lock的ui顯示
+					// 要再點一次timelineChangeGroup 做lock的ui顯示
 					timelineChangeGroup(gi)
 				}
 				// reAuthDef from QmiAjax 
@@ -1137,7 +1129,6 @@ QmiGlobal.module.reAuthManually = {
 				var submitDom = self.view.find("div.action span[viewid=submit]");
 	    		self.ssoId = self.getView("input")[0].value;
 	    		self.ssoPw = self.getView("input")[1].value;
-	    		
 
 		    	if(self.ssoId === "" || self.ssoPw === "") {
 		    		submitDom.removeClass("ready");

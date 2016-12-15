@@ -314,10 +314,11 @@ onCheckVersionDone = function(needUpdate){
         	if(data.status == 200){
 
         		var dataObj = $.parseJSON(data.responseText);
+				
+        		//
 
         		// 判斷此次登入帳號與上次不同再刪除DB
         		if($.lStorage("_loginId") !== bodyData.id) resetDB();
-
 
         		//記錄此次登入帳號
         		$.lStorage("_loginId",bodyData.id);
@@ -351,9 +352,11 @@ onCheckVersionDone = function(needUpdate){
         			return;
         		}
         			
-        		//判斷是否換帳號 換帳號就要清db
+        		// 判斷是否換帳號 換帳號就要清db
         		changeAccountToResetDB(phoneId);
 
+        		// 登入清除polling
+        		localStorage.removeItem("_pollingData");
         		
     			//記錄帳號密碼
     			if($(".login-remeber").data("chk")){

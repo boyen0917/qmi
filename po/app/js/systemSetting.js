@@ -622,8 +622,7 @@ QmiGlobal.module.ldapSetting = {
                         }).done(function(isConfirm) {
                             if(!isConfirm) return;
                             chainDef.resolve(rspObj);
-                        })
-                        
+                        });
                         break;
                     case 2: // 可以綁定
                         chainDef.resolve(rspObj); 
@@ -864,9 +863,9 @@ QmiGlobal.module.ldapSetting = {
                 
             });
             
-        }).error(function(failData) {
+        }).error(function(errData) {
             try {
-                var errMsg = JSON.parse(failData.errData.responseText).rsp_msg;
+                var errMsg = JSON.parse(errData.responseText).rsp_msg;
             } catch(e) {
                 var errMsg = $.i18n.getString("COMMON_UNKNOWN_ERROR");
             }
