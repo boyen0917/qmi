@@ -7575,8 +7575,11 @@ getCompanyToken = function(companyData, optionsObj){
         companyData.reAuthDef = $.Deferred();
         var ctDeferred = companyData.reAuthDef;
 
+        // 直接做cert
+        if(optionsObj.isDoCert) {
+            doCert(ctDeferred);
         // 需要輸入密碼
-        if(companyData.passwordTp === 1 && !optionsObj.pollingCmd53) {
+        } else if(companyData.passwordTp === 1) {
             QmiGlobal.module.reAuthUILock.lock(companyData);
 
             QmiGlobal.module.reAuthManually.init({
@@ -7593,69 +7596,72 @@ getCompanyToken = function(companyData, optionsObj){
             ctDeferred.resolve(true);
         } else if(companyData.ctp === undefined) {
             ctDeferred.resolve(false);   
-        } else {
-            $.ajax({
-                url: "https://" + companyData.cl + "/apiv2/cert",
-                headers: { li: lang },
-                data: JSON.stringify({
-                    ui: companyData.ui , // private user id
-                    key: companyData.key,
-                    tp: 1,  // device type
-                    dn: QmiGlobal.device,  // device name
-                    ci: companyData.ci,
-                    cdi: companyData.cdi
-                }),
-                type: "post"
-            }).success(function(apiData){
-                // http status 200:
-                // rsp code 406 為驗證的 Key 被串改…
-                // rsp code 401 為驗證的內容與請求者不符
-                // rsp code 418 Expired Time 逾時
-                switch ( apiData.rsp_code ){
-                    case 200: //成功 繼續下一步
-                        // 存入 QmiGlobal.companies
-                        setCompanyData(companyData, apiData);
-                        ctDeferred.resolve(true);
-                        break;
-                    case 418: // key 過期
-                        // 已經重做過了 不再繼續
-                        if(isRedo) {
-                            ctDeferred.resolve(false);
-                            break;
-                        }
-                        // 重新取key
-                        // {il: [{ci:xx,ui:xx},{ci:xx,ui:xx}]}
-                        getCompanyKey({ il: [{
-                            cdi: companyData.cdi,
-                            ci: companyData.ci,
-                            ui: companyData.ui
-                        }]}).done(function(rspObj){
-                            if(rspObj.isSuccess === true) {
-                                companyData.key = rspObj.key;
-                                getCompanyToken(companyData, {isRedo: true}).done(ctDeferred.resolve);
-                            } else ctDeferred.resolve(false);
-                        })
-                        break;
-                    // break;
-                    default: // ?
-                        ctDeferred.resolve(false);
-                }
-            }).error(function(errData){
-                if(isCompanyRefresh) addCompanyReLoadView(companyData);
-                ctDeferred.resolve(false);
-            });
-        }
+
+        } else doCert(ctDeferred);
 
         ctDeferred.done(function(isSuccess) {
             var method = "lock";
             if(isSuccess) method = "unlock";
 
             QmiGlobal.module.reAuthUILock[method](companyData);
-            tokenDeferred.resolve();
+            tokenDeferred.resolve(isSuccess);
         });
     });
 
     return tokenDeferred.promise();
+
+    function doCert(ctDeferred) {
+        $.ajax({
+            url: "https://" + companyData.cl + "/apiv2/cert",
+            headers: { li: lang },
+            data: JSON.stringify({
+                ui: companyData.ui , // private user id
+                key: companyData.key,
+                tp: 1,  // device type
+                dn: QmiGlobal.device,  // device name
+                ci: companyData.ci,
+                cdi: companyData.cdi
+            }),
+            type: "post"
+        }).success(function(apiData){
+            // http status 200:
+            // rsp code 406 為驗證的 Key 被串改…
+            // rsp code 401 為驗證的內容與請求者不符
+            // rsp code 418 Expired Time 逾時
+            switch ( apiData.rsp_code ){
+                case 200: //成功 繼續下一步
+                    // 存入 QmiGlobal.companies
+                    setCompanyData(companyData, apiData);
+                    ctDeferred.resolve(true);
+                    break;
+                case 418: // key 過期
+                    // 已經重做過了 不再繼續
+                    if(isRedo) {
+                        ctDeferred.resolve(false);
+                        break;
+                    }
+                    // 重新取key
+                    // {il: [{ci:xx,ui:xx},{ci:xx,ui:xx}]}
+                    getCompanyKey({ il: [{
+                        cdi: companyData.cdi,
+                        ci: companyData.ci,
+                        ui: companyData.ui
+                    }]}).done(function(rspObj){
+                        if(rspObj.isSuccess === true) {
+                            companyData.key = rspObj.key;
+                            getCompanyToken(companyData, {isRedo: true}).done(ctDeferred.resolve);
+                        } else ctDeferred.resolve(false);
+                    })
+                    break;
+                // break;
+                default: // ?
+                    ctDeferred.resolve(false);
+            }
+        }).error(function(errData){
+            if(isCompanyRefresh) addCompanyReLoadView(companyData);
+            ctDeferred.resolve(false);
+        });
+    }
 
     function setCompanyData(companyData, authData) {
         
@@ -7721,14 +7727,14 @@ companyLoad = function(loadData){
         groupCnts = Object.keys(QmiGlobal.groups).length,
         companyLoadDeferred = $.Deferred();
 
-    var isCompanyRefresh = !!refreshDom || loadData.isCompanyRefresh;
+    var isCompanyRefresh = !!refreshDom || !!loadData.isCompanyRefresh;
 
-    if(isCompanyRefresh) {
+    if(refreshDom) {
         if(refreshDom.find("img").hasClass("rotate")) return;
         refreshDom.find("img").addClass("rotate");
     }
 
-    getCompanyToken(companyData).done(function(isSuccess){
+    getCompanyToken(companyData, {isDoCert: loadData.isDoCert || false}).done(function(isSuccess){
         var tokenDeferred = $.Deferred();
         if(isSuccess === true) {
 
@@ -8400,7 +8406,6 @@ pollingCmds = function(newPollingData){
                         var cmd53Def = $.Deferred();
                         var companyData;
                         cmdEachDefArr.push(cmd53Def);
-
                         
                         if(QmiGlobal.companies[newData.ci]) {
                             companyData = QmiGlobal.companies[newData.ci];
@@ -8414,7 +8419,7 @@ pollingCmds = function(newPollingData){
                             }]}).done(function(rspObj){
                                 if(rspObj.isSuccess === true) {
                                     companyData.key = rspObj.key;
-                                    getCompanyToken(companyData, {isRedo: true, pollingCmd53: true})
+                                    getCompanyToken(companyData, {isRedo: true, isDoCert: true})
                                     .done(cmd53Def.resolve);
                                 } else {
                                     QmiGlobal.module.reAuthUILock.lock(companyData)
@@ -8423,7 +8428,8 @@ pollingCmds = function(newPollingData){
                             })
                         } else {
                             companyData = newData;
-                            companyLoad({companyData: companyData}).done(function() {
+                            companyData.passwordTp = newData.tp;
+                            companyLoad({companyData: companyData, isCompanyRefresh: true, isDoCert: true}).done(function() {
                                 cmd53Def.resolve()
                             });
                         }
