@@ -74,6 +74,9 @@ function StickerStoreView() {
 
 StickerStoreView.prototype = {
 	htmlText : "<div id='StickerStoreModal'>" +
+					"<div class='close-area'>" + 
+						"<img class='close' src='images/sticker_center/symbols-qicon_cancle.png'>" +
+					"</div>" + 
 				  	"<div class='container'>" + 
 					  	"<div class='page-header'>" + 
 						  "<ul class='tab'>" +
@@ -81,7 +84,6 @@ StickerStoreView.prototype = {
 							"<li class='tab-link' data-href='non-download-stickers'>未下載</li>" + 
 							"<li class='tab-link' data-href='already-download-stickers'>已下載</li>" +
 						  "</ul>" +
-					  	  "<div class='close'>X</div>" +
 						"</div>" +
 					   	"<div class='advertisement'></div>" +
 					   	"<div class='edit edit-sort'>編輯排序</div>" +
@@ -226,7 +228,7 @@ StickerStoreView.prototype = {
 		this.container.find(".sticker-package-block").show();
 		// this.container.find(".sticker-package-block.download-done").attr("draggable", false);
 		this.container.find(".sticker-package-block.download-done button.remove")
-					  .removeClass("remove").addClass("download-done").text("已下載");
+					  .removeClass("remove").addClass("download-done")
 
 		$.each(this.defaultOrder, function (i, stickerID) {
 			var stickerPackage = this.container.find(".sticker-package-block[data-spi='" + stickerID + "']");
@@ -250,7 +252,7 @@ StickerStoreView.prototype = {
 		this.container.find(".sticker-package-block.download-none").hide();
 		this.container.find(".sticker-package-block.download-done").show();
 		this.container.find(".sticker-package-block.download-done button")
-					  .removeAttr("class").addClass("remove").text("刪除");
+					  .removeAttr("class").addClass("remove");
 
 		this.rearrange();
 	},
@@ -286,7 +288,7 @@ StickerStoreView.prototype = {
  							sticker.download().then(function () {
  								$(e.target).removeClass("download")
 										   .addClass("download-done")
-										   .text("已下載");
+										   
  								sticker.saveDataToLocal();
  								if (self.currentTab == 'non-download-stickers') {
 									sticker.html.hide();
@@ -299,7 +301,7 @@ StickerStoreView.prototype = {
  							sticker.remove().then(function () {
  								$(e.target).removeClass("remove")
 										   .addClass("download")
-										   .text("下載");
+										   
  								sticker.removeLocalData();
  								self.orderByUser.splice(self.orderByUser.indexOf(sticker.packageId), 1);
  								self.returnHomePage();
@@ -366,7 +368,8 @@ StickerStoreView.prototype = {
 		// this.container.find(".sticker-package-block.download-done").bind("dragstart");
 		this.container.find(".sticker-package-block.download-done").attr("draggable", true);
 		this.container.find(".sticker-package-block.download-done").on("click", this.preventClick);
-		this.container.find(".sticker-package-block.download-done button").css("visibility", "hidden");
+		this.container.find(".sticker-package-block.download-done button")
+					  .removeClass("remove").addClass("edit-move");
 		$(this.container.find("li.tab-link")[0]).addClass("disabled");
 		$(this.container.find("li.tab-link")[1]).addClass("disabled");
 	},
@@ -378,7 +381,8 @@ StickerStoreView.prototype = {
 		this.container.find(".edit-sort").show();
 		this.container.find(".sticker-package-block.download-done").attr("draggable", false);
 		this.container.find(".sticker-package-block.download-done").off("click", this.preventClick);
-		this.container.find(".sticker-package-block.download-done button").css("visibility", "visible");
+		this.container.find(".sticker-package-block.download-done button")
+					  .removeClass("edit-move").addClass("remove");
 		$(this.container.find("li.tab-link")[0]).removeClass("disabled");
 		$(this.container.find("li.tab-link")[1]).removeClass("disabled");
 	},
@@ -432,10 +436,10 @@ function StickerPackage (data) {
 
 	if (typeof(selfSticker) == "object" && selfSticker.hasOwnProperty(data.spi)) {
 		this.html.addClass("download-done");
-		this.html.find("button").attr("class", "download-done").text("已下載");
+		this.html.find("button").attr("class", "download-done");
 	} else {
 		this.html.addClass("download-none");
-		this.html.find("button").attr("class", "download").text("下載");
+		this.html.find("button").attr("class", "download");
 	} 
 }
 
@@ -472,7 +476,6 @@ StickerPackage.prototype = {
 				self.switchDoneStatus();
 				stickerBlock.find("button").removeClass("download")
 										   .addClass("download-done")
-										   .text("已下載");
 				setTimeout( function() {
 					stickerBlock.find("progress").css("visibility", "hidden"); 
 				}, 500);
@@ -518,7 +521,6 @@ StickerPackage.prototype = {
 				self.swtichNoneStatus();
 				stickerBlock.find("button").removeClass("remove")
 										   .addClass("download")
-										   .text("下載");
 
 				setTimeout( function () {
 					stickerBlock.find("progress").css("visibility", "hidden"); 
