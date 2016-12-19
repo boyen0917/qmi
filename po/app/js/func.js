@@ -7531,16 +7531,9 @@ getCompanyGroup = function(companyData,allGroupList) {
         deferred.resolve({isSuccess: false});
     } else {
 
-        $.ajax({
-            url: "https://" + companyData.cl + "/apiv1/companies/"+ companyData.ci +"/groups",
-            headers: {
-                uui: QmiGlobal.auth.ui,
-                uat: QmiGlobal.auth.at,
-                ui: companyData.ui,
-                at: companyData.ctp === 0 ? QmiGlobal.auth.at : companyData.nowAt,
-                li: lang
-            },
-            type: "get"
+        new QmiAjax({
+            apiName: "companies/"+ companyData.ci +"/groups",
+            ci: companyData.ci
         }).success(function(data){
             
             (data.gl || []).forEach(function(groupObj){
@@ -7997,21 +7990,19 @@ combineCloudPolling = function(newPollingData){
         var companyPollingDef = $.Deferred();
         new QmiAjax({
             apiName: "sys/polling?pt=" + localPollingData.clTs[item.pm.ci].pollingTime,
-            ci: item.pm.ci,
-            success: function(data){
-                companyPollingDef.resolve({
-                    ci: item.pm.ci,
-                    data: data,
-                    isSuccess: true
-                });
-            },
-            error: function(data){
-                companyPollingDef.resolve({
-                    ci: item.pm.ci,
-                    data: data,
-                    isSuccess: false
-                });
-            }
+            ci: item.pm.ci
+        }).success(function(data){
+            companyPollingDef.resolve({
+                ci: item.pm.ci,
+                data: data,
+                isSuccess: true
+            });
+        }).error(function(data){
+            companyPollingDef.resolve({
+                ci: item.pm.ci,
+                data: data,
+                isSuccess: false
+            });
         });
         companyPollingDefArr.push(companyPollingDef) // new QmiAjax ; companyPollingDefArr.push
     });
@@ -8940,16 +8931,13 @@ function activateClearChatsTimer(){
     } else {
         counter = dueTime - now + 86400000;
     }
-    console.log(counter);
     var allGroupData = QmiGlobal.groups;
     $.each(allGroupData, function (groupID, groupData){
         if (groupData.set && groupData.set.ccc) {
             onRemoveChatDB(groupID, groupData.set.ccc);
         }
     });
-
     clearChatTimer = setTimeout(activateClearChatsTimer, counter);
-
 };
 
 

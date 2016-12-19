@@ -302,6 +302,25 @@ window.QmiGlobal = {
 		}
 	},
 
+	chainDeferred: function(firstDef) {
+		var thenDefArr = [firstDef];
+		return {
+			then: function(argFun) {
+				var thisDeferred = $.Deferred();
+				var currDefIndex = thenDefArr.length;
+				var lastDefIndex = currDefIndex - 1;
+				thenDefArr[currDefIndex] = thisDeferred;
+				thenDefArr[lastDefIndex].done(function() {
+					if(!argFun instanceof Function) return;
+					var argFunResult = argFun();// || {done: function() {}};
+					if(argFunResult instanceof Object) 
+						(argFunResult.done || function() {})(thisDeferred.resolve);
+				});
+				return this;
+			}
+		}
+	},
+
 	isDefResolved: function(def) {
         if(!def) return true;
         if(!def.state instanceof Function) return true;
@@ -713,16 +732,18 @@ QmiAjax.prototype = {
 		var deferred = $.Deferred();
 
 		
-		var rspCode = function() {
+		var rspObj = function() {
 			try {
-				if(rspData instanceof Object) 
-					return JSON.parse(rspData.responseText).rsp_code;
-				else 
-					return undefined;
+				if(rspData)
+					return JSON.parse(rspData.responseText);
+				else
+					return {rsp_code: 9999};
 			} catch(e) {
-				return 999;
+				return {rsp_code: 999, rsp_msg: "parse error"};
 			}
 		}();
+
+		var rspCode = rspObj.rsp_code;
 
 		// 601: 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
 		// 602: 公雲Token錯誤, 根據之前的流程, 將強制登入app
@@ -735,7 +756,13 @@ QmiAjax.prototype = {
 			case 601: // 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
 				authUpdate();
 				break;
-			case 602: // 公雲Token錯誤, 根據之前的流程, 將強制登入app
+			case 602: // 公雲Token錯誤, 根據之前的流程, 將強制登出
+				new QmiGlobal.popup({
+					desc: rspObj.rsp_msg,
+					confirm: true,
+					action: [logout]
+				});
+
 				deferred.resolve({
                 	isSuccess: false,
                 	data: rspData,
@@ -760,9 +787,15 @@ QmiAjax.prototype = {
 			case 608:
 				QmiGlobal.module.reAuthUILock.lock(companyData);
 				break;
-			case undefined:
+			case 9999:
 				// 沒帶rspCode 表示是expire time過期
 				authUpdate();
+				break;
+			default:
+				deferred.resolve({
+                	isSuccess: false,
+	        		isReAuth: true
+                });
 		}
 
 		function authUpdate() {
@@ -779,9 +812,7 @@ QmiAjax.prototype = {
 		}
 
 		function authUpdateManually() { 
-
 			QmiGlobal.module.reAuthUILock.lock(companyData);
-
 			QmiGlobal.module.reAuthManually.init({
 				reAuthDef: deferred,
 				companyData: companyData
@@ -920,8 +951,9 @@ QmiAjax.prototype = {
 QmiGlobal.module.reAuthUILock = {
 	lock: function(companyData) {
 		if(!companyData) return;
-		companyData.isReAuthCancel = false;
+		companyData.isReAuthCancel = true;
 		this.action({
+			isReAuthUILock: true,
 			companyData: companyData,
 			classStatus: "addClass",
 			textStatus: "show"
@@ -931,6 +963,7 @@ QmiGlobal.module.reAuthUILock = {
 		if(!companyData) return;
 		companyData.isReAuthCancel = false;
 		this.action({
+			isReAuthUILock: false,
 			companyData: companyData,
 			classStatus: "removeClass",
 			textStatus: "hide"
@@ -1163,8 +1196,10 @@ QmiGlobal.module.reAuthManually = {
 
     	self.view.find(".container").addClass("loading");
 
+    	// 這邊如果用QmiAjax 會因為reAuthDef pending而無法執行
     	$.ajax({
 			url: "https://"+ cData.cl +"/apiv1/sso/clouds/"+ cData.cdi +"/companies/"+ cData.ci +"/auth",
+			ci: cData.ci,
 			headers: {li: lang},
 			data: JSON.stringify({
 				id: self.ssoId,
@@ -1174,46 +1209,51 @@ QmiGlobal.module.reAuthManually = {
 			}),
 			type: "put",
 		}).complete(function(data){
-
+			var newAuth = false;
 			try {
 				var newAuth = JSON.parse(data.responseText);
-			} catch(e) {
-				var newAuth = false;
-			}
+			} catch(e) {}
 
 			if(data.status !== 200 || newAuth === false) {
-
 				self.view.find(".container").removeClass("loading");
-
 				self.getView("input")[1].value = "";
-
 				toastShow(newAuth.rsp_msg);
-			} else {
-				// 設定新at , et
-				QmiGlobal.companies[cData.ci].at = newAuth.at;
-				QmiGlobal.companies[cData.ci].et = newAuth.et;
 
+				return;
+			}
+
+			// 設定新at , et
+			QmiGlobal.companies[cData.ci].at = newAuth.at;
+			QmiGlobal.companies[cData.ci].et = newAuth.et;
+
+			// 先解company reAuthDef
+			self.reAuthDef.resolve({
+				isSuccess: true,
+				isSso: true,
+				isReAuth: true
+			})
+
+			// 重新取得所有團體
+			QmiGlobal.chainDeferred(getCompanyGroup(cData)).then(function() {
+				return function() {
+					return getMultiGroupCombo(Object.keys(QmiGlobal.companyGiMap).reduce(function(arr, currGi) {
+						if(QmiGlobal.companyGiMap[currGi].ci === cData.ci) arr.push(currGi);
+						return arr;
+					}, []));
+				}
+			}()).then(function() {
 				QmiGlobal.module.reAuthUILock.unlock(self.companyData);
-
 				// reAuth 結束
 				setTimeout(function() {
 					self.view.find(".container").attr("msg", $.i18n.getString("WEBONLY_AUTH_SUCCESS"));
 				}, 300)
-
 				// reAuth 結束
 				setTimeout(function() {
 					self.remove();
-
 					// 重新執行timelineChangeGroup 讓畫面開啟
 					timelineChangeGroup(gi);
-
-					self.reAuthDef.resolve({
-						isSuccess: true,
-						isSso: true,
-						isReAuth: true
-					})
 				}, 500);
-			}
+			}); // end of chainDeferred
 		})
     },
 

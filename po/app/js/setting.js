@@ -156,10 +156,9 @@ function removeGroup(thisGi, isFromCompany){
 	    	gi = null;
 	    	goToGroupMenu();
 	    }
-
-	    delete QmiGlobal.groups[thisGi];
 	}
 
+	delete QmiGlobal.groups[thisGi];
     //remove group data
     try{
 		//----- remove from idb -------
