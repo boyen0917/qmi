@@ -648,6 +648,13 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		case 26:
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_FILE", name);
 			break;
+		case 231: //群組通話
+			if(isMe){
+				text = $.i18n.getString("CHAT_GROUP_VOIP_MAKE_CALL" );
+			} else {
+				text = $.i18n.getString("CHAT_GROUP_VOIP_GET_CALL", name );
+			}
+			break;
 		default:
 			try{
 				text = (data.ml[0].c&&data.ml[0].c.length>0)?data.ml[0].c:"";
