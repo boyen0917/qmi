@@ -45,11 +45,17 @@ $(function(){
         }
     }
 
+    getMultiGroupCombo = function(giArr) {
+        return $.when.apply($, giArr.map(function(thisGi) {
+            return getGroupComboInit(thisGi);
+        })).done(function() {
+            giArr.forEach(updateGroupAllInfoDom)
+        });
+    }
 
     getGroupComboInit = function(thisGi,callback){
-        var 
-        thisGi = thisGi || gi,
-        comboDeferred = $.Deferred();
+        var thisGi = thisGi || gi;
+        var comboDeferred = $.Deferred();
 
         new QmiAjax({
             apiName: "groups/" + thisGi + "?tp=1" // tp1才能取得退出的成員

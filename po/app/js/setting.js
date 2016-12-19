@@ -143,7 +143,7 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
     });
 }
 
-function removeGroup( thisGi ){
+function removeGroup(thisGi, isFromCompany){
 	$(".sm-group-area[data-gi="+thisGi+"]").remove();
 	if( QmiGlobal.groups[thisGi] !== undefined)
 		var rmGroupGn = QmiGlobal.groups[thisGi].gn._escape();
@@ -156,10 +156,9 @@ function removeGroup( thisGi ){
 	    	gi = null;
 	    	goToGroupMenu();
 	    }
-
-	    delete QmiGlobal.groups[thisGi];
 	}
 
+	delete QmiGlobal.groups[thisGi];
     //remove group data
     try{
 		//----- remove from idb -------
@@ -173,7 +172,7 @@ function removeGroup( thisGi ){
 		// if( null!=idb_timeline_events ){
 		//  			clearTimelineIDB(this_gi);
 		//  		}
-		if(rmGroupGn !== undefined) toastShow( $.i18n.getString("GROUP_X_DELETED", rmGroupGn) );
+		if(rmGroupGn !== undefined && !isFromCompany) toastShow( $.i18n.getString("GROUP_X_DELETED", rmGroupGn) );
 
 	} catch(e){
 		errorReport(e);

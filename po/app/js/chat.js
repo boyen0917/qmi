@@ -47,7 +47,6 @@ $(function(){
 				}]
 			});
 		})
-
 		return;
 	}
 
@@ -1597,7 +1596,14 @@ function showMsg(object, bIsTmpSend) {
 				newParent.append(child);
 			}
 			break;
-
+		case 231: //群組通話
+			if (isMe) {
+				msgDiv.addClass('chat-msg-bubble-right');
+			} else {
+				msgDiv.addClass('chat-msg-bubble-left');
+			}
+			msgDiv.html($.i18n.getString("CHAT_GROUP_CALL"));
+			break;
 		default: //text or other msg
 			if (isMe) {
 				msgDiv.addClass('chat-msg-bubble-right');
