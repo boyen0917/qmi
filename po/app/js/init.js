@@ -1156,12 +1156,12 @@ QmiGlobal.module.reAuthManually = {
 					timelineChangeGroup(gi)
 				}
 				// reAuthDef from QmiAjax 
-				self.reAuthDef.resolve({
-					isSuccess: false,
-					isSso: true,
-					isReAuth: true,
-					data: {isCancel: true}
-				})
+				// self.reAuthDef.resolve({
+				// 	isSuccess: false,
+				// 	isSso: true,
+				// 	isReAuth: true,
+				// 	data: {isCancel: true}
+				// })
 				self.remove();
 				break;
 
