@@ -1693,7 +1693,7 @@ getGroupCompetence = function( this_gi ){
 		if( groupData.ad==1 ){
 			tmp.isAdmin = true;
 		}
-		if( groupData.isOfficial ){
+		if( groupData.ntp === 2 ){
 			tmp.isOfficial = groupData.isOfficial;
 		}
 	} catch(e){
