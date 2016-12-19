@@ -1222,7 +1222,7 @@ setOfficialGroup = function( this_gi ){
         //set tab
         $(".header-menu").parent().show();
 
-        if( !groupData.isOfficial ){
+        if( groupData.ntp !== 2 ){
 
             //temp
             $(document).data("official",false);
@@ -1288,7 +1288,7 @@ setOfficialGroup = function( this_gi ){
 onClickOfficialGeneralChat = function( this_gi ){
     try{
         var groupData = QmiGlobal.groups[this_gi] || {};
-        if( groupData.isOfficial && groupData.ad!=1 ){
+        if( groupData.ntp === 2 && groupData.ad!=1 ){
             if( null!=groupData.chatAll ){
                 for( var ci in groupData.chatAll ){
                     var room = groupData.chatAll[ci];
@@ -2931,7 +2931,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
         if( false==isShowSelf && i==group.gu ) return;
         if( false==isShowLeftMem && gu_obj.st!=1 ) return;
 
-        if(group.isOfficial && this_compose.data("offical")==="add" && group.guAll[group.gu].abl == "" && gu_obj.ad !=1) return;
+        if(group.ntp === 2 && this_compose.data("offical")==="add" && group.guAll[group.gu].abl == "" && gu_obj.ad !=1) return;
         // if(group.isOfficial && group.guAll[group.gu].abl == "" && gu_obj.ad !=1 ) return;
         var this_obj = getMemObjectRow(gu_obj, bl);
         $(".obj-cell-area").append(this_obj);
@@ -2996,7 +2996,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
     //官方帳號團體新增聊天室成員列表不顯示全選選項 
     //this_compose.data("offical")==="add"這行是來判斷是否為新增聊天室成員列表
     //與設定的指派管理員的成員列表不同
-    if(group.isOfficial && this_compose.data("offical")==="add"){
+    if(group.ntp === 2 && this_compose.data("offical")==="add"){
         $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
         memSubTitle.unbind("click");
     }
@@ -3038,7 +3038,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
         // cns.debug("selected_obj:",selected_obj);
         
         //工作是單選 或 官方團體新增聊天室，成員列表是單選
-        if(this_compose_obj.parent().hasClass("cp-work-item") || (group.isOfficial && this_compose.data("offical")==="add")){
+        if(this_compose_obj.parent().hasClass("cp-work-item") || (group.ntp === 2 && this_compose.data("offical")==="add")){
             cns.debug("work");
             //全部清除
             // $(document).find(".obj-cell-chk img").attr("src","images/common/icon/icon_check_round.png");
@@ -3404,7 +3404,7 @@ composeObjectShowDelegate = function( this_compose, this_compose_obj, option, on
             $(".obj-cell-area hr").show();
             $(".obj-cell-subTitle .obj-cell-subTitle-chk").show();
             //官方團體不顯示全選選項
-            if(group.isOfficial){
+            if(group.ntp === 2){
                 $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
             }
             return;
@@ -3744,7 +3744,7 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
             var isShowNamecard = true;
             try{
                 var group = QmiGlobal.groups[this_gi];
-                if( group.isOfficial && 1!=group.ad ){
+                if( group.ntp === 2 && 1!=group.ad ){
                     isShowNamecard = false;
                 }
             } catch(e){
@@ -4960,15 +4960,11 @@ setSidemenuHeader = function (new_gi){
 }
 
 groupMenuListArea = function (noApi){
-    var 
-    noApiDeferred = $.Deferred(),
-    deferred = $.Deferred();
+    var noApiDeferred = $.Deferred();
+    var deferred = $.Deferred();
 
-    if( noApi === true ) 
-        noApiDeferred.resolve();
-    else {
-        getGroupList().done(noApiDeferred.resolve);   
-    }
+    if(noApi) noApiDeferred.resolve();
+    else getGroupList().done(noApiDeferred.resolve);   
 
     noApiDeferred.done(function(data){
         //管理者圖示
@@ -4985,7 +4981,7 @@ groupMenuListArea = function (noApi){
         (function() {
             var hasOfficialGroup = false;
             Object.keys(QmiGlobal.groups).forEach(function(tempGi) {
-                if(QmiGlobal.groups[tempGi].isOfficial) hasOfficialGroup = true;
+                if(QmiGlobal.groups[tempGi].ntp === 2) hasOfficialGroup = true;
             });
             if(!hasOfficialGroup) listArea.find(".sm-offical-group").hide();
         }())
@@ -5028,7 +5024,7 @@ addSideMenuGroupUI = function(key,groupObj){
 
     this_group.find(".group-pic").data("auo",glo_img);
     //判斷官方團體一般團體
-    if(groupObj.isOfficial)
+    if(groupObj.ntp === 2)
         $(".sm-footer").before(this_group);
     else
         $(".sm-offical-group").before(this_group);
@@ -8128,7 +8124,7 @@ pollingCountsWrite = function(pollingData){
 
         // 官方帳號判斷
         try {
-            if(QmiGlobal.groups[obj[0]].isOfficial)
+            if(QmiGlobal.groups[obj[0]].ntp === 2)
                 var targetDom = $(".sm-offical-group");
             else
                 var targetDom = $(".sm-general-group");
@@ -8278,7 +8274,7 @@ pollingCmds = function(newPollingData){
                             // 官方帳號不顯示
                             try{
                                 if( isShowNotification 
-                                    && QmiGlobal.groups[this_gi].isOfficial !== true
+                                    && QmiGlobal.groups[this_gi].ntp !== 2
                                 ){
                                     var title = memData.gn || g_Qmi_title;
                                     riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){

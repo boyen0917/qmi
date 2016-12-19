@@ -197,7 +197,7 @@ $(function(){
 		var groupCn = g_cn._escape();
 
 		//官方帳號
-		if(true == g_group.isOfficial){
+		if(g_group.ntp === 2){
 			// $(".extra").hide();
 			//非管理員
 			if(g_group.ad != 1){
@@ -467,7 +467,7 @@ $(function(){
 		});
 		$("#header .extra").off("click").click(function () {
 			// 官方帳號 直接edit
-			if(true == g_group.isOfficial) {
+			if(g_group.ntp === 2) {
 				$(".extra-content .btn[data-type=edit]").trigger("click");
 				return;
 			}
@@ -553,7 +553,7 @@ $(function(){
 			);
 		});
 		//官方帳號非管理員不能點擊header
-		if(true == g_group.isOfficial && g_group.ad != 1){
+		if(g_group.ntp === 2 && g_group.ad != 1){
 			$("#header .title .text, #header .title .count").unbind("click");
 		}
 
@@ -661,7 +661,7 @@ $(function(){
 			$(".chatroomNameInput").prop('readonly', false);
 			$(".chatroomImage").addClass("uploadImg");
 			$(".chatroomNameInput").addClass("editable");
-			if (! g_group.isOfficial) {
+			if (g_group.ntp !== 2) {
 				$(".adminCheckBox").show(1000);
 			}
 			
@@ -1596,14 +1596,7 @@ function showMsg(object, bIsTmpSend) {
 				newParent.append(child);
 			}
 			break;
-		case 231: //群組通話
-			if (isMe) {
-				msgDiv.addClass('chat-msg-bubble-right');
-			} else {
-				msgDiv.addClass('chat-msg-bubble-left');
-			}
-			msgDiv.html($.i18n.getString("CHAT_GROUP_CALL"));
-			break;
+
 		default: //text or other msg
 			if (isMe) {
 				msgDiv.addClass('chat-msg-bubble-right');
@@ -2465,9 +2458,9 @@ function sendMsgText(dom) {
 			$(".header-title img").show();
 
 			// 官方帳號有聊天室權限的成員，將邀請成員開關關掉
-			if (g_group.isOfficial) page.find(".inviteSetting").hide();
+			if (g_group.ntp === 2) page.find(".inviteSetting").hide();
 		} else {
-			if (g_group.isOfficial) {
+			if (g_group.ntp === 2) {
 				
 				// // 單人聊天室，隱藏所有編輯畫面
 				if (g_room.cpc == 2) {
