@@ -470,10 +470,8 @@ QmiGlobal.module.ldapSetting = {
                     self.clearForm();
                     self.view.find(".ldap-edit").attr("ldap-type", "add");
                 }
-
                 self.changePage(pageName);
                 break;
-
             case "input:create-ready":
                 var chk = false;
                 self.view.find(".ldap-edit input").each(function(i, elem) {
@@ -622,8 +620,7 @@ QmiGlobal.module.ldapSetting = {
                         }).done(function(isConfirm) {
                             if(!isConfirm) return;
                             chainDef.resolve(rspObj);
-                        })
-                        
+                        });
                         break;
                     case 2: // 可以綁定
                         chainDef.resolve(rspObj); 
@@ -819,6 +816,9 @@ QmiGlobal.module.ldapSetting = {
         var msgShowDef = $.Deferred();
         self.view.addClass("cover");
 
+        if(!QmiGlobal.isDefResolved(QmiGlobal.companies[ldapCi].reAuthDef))
+            QmiGlobal.companies[ldapCi].reAuthDef.resolve({isSuccess: false})
+
         new QmiAjax({
             url: "https://" + ldapData.cl + "/apiv1/me/sso/",
             specifiedHeaders: {
@@ -864,9 +864,9 @@ QmiGlobal.module.ldapSetting = {
                 
             });
             
-        }).error(function(failData) {
+        }).error(function(errData) {
             try {
-                var errMsg = JSON.parse(failData.errData.responseText).rsp_msg;
+                var errMsg = JSON.parse(errData.responseText).rsp_msg;
             } catch(e) {
                 var errMsg = $.i18n.getString("COMMON_UNKNOWN_ERROR");
             }
@@ -889,6 +889,8 @@ QmiGlobal.module.ldapSetting = {
 
         self.inputAccount = "";
         self.inputPassword = "";
+
+        self.view.find(".ldap-edit button.submit").removeClass("ready")
 
         if(QmiGlobal.auth.isSso) 
             self.view.find("section.ldap-edit div.title.two").attr("pi", "");
