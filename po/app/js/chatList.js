@@ -43,7 +43,7 @@ initChatList = function(){
 	$(".chatList-add").off("click");
 	$(".chatList-add").on("click", function(){
 		$(".chatList-add").data("object_str","");
-		if(currentGroup.isOfficial) $(".chatList-add").data("offical","add");
+		if(currentGroup.ntp === 2) $(".chatList-add").data("offical","add");
 		showNewRoomPage();
 	});
 
@@ -244,7 +244,7 @@ function showChatList(){
 				td = $("<div class='td' data-id='"+room.ci+"'></div>");
 
 				//官方帳號聊天室名字修改
-				if(true == groupData.isOfficial){
+				if(groupData.ntp === 2){
 					if(groupData.ad == 1){
 						if(room.tp == 1){
 							var roomName = chatRoomName.replaceOriEmojiCode();

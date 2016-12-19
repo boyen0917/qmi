@@ -171,7 +171,7 @@ $(function(){
         var qmiGroupData = qmiGroupData || QmiGlobal.groups[thisGi];
 
         //如果tp為c,d開頭為官方團體
-        if( true==qmiGroupData.isOfficial ){
+        if( qmiGroupData.ntp === 2 ){
             qmiGroupData.set.tab = [
                 { "tp": 0, "sw": false },
                 { "tp": 1, "sw": false },
@@ -360,7 +360,7 @@ $(function(){
             groupData.isOfficial = (groupData.ntp === 2);
             
             //如果非admin, 沒有聊天室的話隨便找個admin預建聊天室
-            if( groupData.isOfficial && groupData.ad!=1 ){
+            if( groupData.ntp === 2 && groupData.ad!=1 ){
                 updateChatList(thisGi, function(){
                     //remove illegal chat rooms
                     try {

@@ -351,7 +351,7 @@ function showGroupInfoPage(){
     } catch(e){
         errorReport(e);
     }
-    if(group.isOfficial){
+    if(group.ntp === 2){
     	$(".ga-group-type-name").html($.i18n.getString("OFFICAL_GROUP"));
     }else{
     	$(".ga-group-type-name").html($.i18n.getString("GENERAL_GROUP"));

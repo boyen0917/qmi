@@ -922,6 +922,8 @@ img.auo {
 	background: rgb(86, 85, 85);
 }
 
+#page-group-main .sm-hr:not(:first-child) {margin-top: 10px;}
+
 .sm-loading {
 	display: none;
     width: 15px;
