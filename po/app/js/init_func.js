@@ -48,7 +48,9 @@ $(function(){
     getMultiGroupCombo = function(giArr) {
         return $.when.apply($, giArr.map(function(thisGi) {
             return getGroupComboInit(thisGi);
-        }));
+        })).done(function() {
+            giArr.forEach(updateGroupAllInfoDom)
+        });
     }
 
     getGroupComboInit = function(thisGi,callback){

@@ -331,9 +331,12 @@ timelineChangeGroup = function (thisGi) {
         // 去timeline
         $.mobile.changePage("#page-group-main");
 
-        QmiGlobal.module.reAuthManually.init({
-            companyData: QmiGlobal.companies[(QmiGlobal.companyGiMap[gi] || {}).ci]
-        });
+        var companyData = QmiGlobal.companies[(QmiGlobal.companyGiMap[gi] || {}).ci];
+        if(companyData)
+            QmiGlobal.module.reAuthManually.init({
+                companyData: companyData,
+                reAuthDef: companyData.reAuthDef
+            });
 
         changeDeferred.resolve();
     } else {

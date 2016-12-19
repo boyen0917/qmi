@@ -281,7 +281,6 @@ window.QmiGlobal = {
 			get: function(code) {
 				return rspCode;
 			},
-
 			setLevel: function(lv) {
 				level = lv;
 			},
@@ -302,6 +301,14 @@ window.QmiGlobal = {
 		}
 	},
 
+	getActivedUserNum: function(thisGi) {
+		if(!QmiGlobal.groups[thisGi]) return 0;
+		return Object.keys((QmiGlobal.groups[thisGi].guAll || {})).reduce(function(total, currGi) {
+			if(QmiGlobal.groups[thisGi].guAll[currGi].st === 1) total++;
+			return total;
+		}, 0);
+	},
+
 	chainDeferred: function(firstDef) {
 		var thenDefArr = [firstDef];
 		return {
@@ -310,9 +317,9 @@ window.QmiGlobal = {
 				var currDefIndex = thenDefArr.length;
 				var lastDefIndex = currDefIndex - 1;
 				thenDefArr[currDefIndex] = thisDeferred;
-				thenDefArr[lastDefIndex].done(function() {
+				$.when(thenDefArr[lastDefIndex]).done(function(rspData) {
 					if(!argFun instanceof Function) return;
-					var argFunResult = argFun();// || {done: function() {}};
+					var argFunResult = argFun(rspData);
 					if(argFunResult instanceof Object) 
 						(argFunResult.done || function() {})(thisDeferred.resolve);
 				});
@@ -1239,7 +1246,7 @@ QmiGlobal.module.reAuthManually = {
 					return getMultiGroupCombo(Object.keys(QmiGlobal.companyGiMap).reduce(function(arr, currGi) {
 						if(QmiGlobal.companyGiMap[currGi].ci === cData.ci) arr.push(currGi);
 						return arr;
-					}, []));
+					}, []), true); // 第二參數 是要更新左側選單資訊
 				}
 			}()).then(function() {
 				QmiGlobal.module.reAuthUILock.unlock(self.companyData);

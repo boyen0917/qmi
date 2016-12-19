@@ -382,7 +382,6 @@ onCheckVersionDone = function(needUpdate){
 	function changeAccountToResetDB(phoneId) {
 		var lastId = $.lStorage("_lastLoginAccount") || null;
 		if(lastId !== phoneId && lastId !== null) resetDB();
-
 		// 紀錄上次登入帳號
 		$.lStorage("_lastLoginAccount", phoneId);
 	}
@@ -390,86 +389,94 @@ onCheckVersionDone = function(needUpdate){
 	//初始化 
     function loginAction (){
         
-        var deferred = $.Deferred(),
-        	group_list = [];
-
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
-        
-        //get me api
-        userInfoGetting().done(function() {
-        	//附上group list
-	        getGroupList().done(function(rspData){
-	        	if(rspData.isSuccess === false) {
-	        		deferred.reject(rspData)
-	        		return;
-	        	}
 
-	        	var groupList = rspData.gl;
-	        	var specifiedGi = QmiGlobal.auth.dgi;
-	        	if($.lStorage("groupChat")){
-	        		groupChat = $.lStorage("groupChat");
-			    	$.each(groupChat,function(key,value){
-			    		getGroupComboInit(key);
-			    		QmiGlobal.groups[key].chatAll = value;
-			    		$.each(value,function(ci,item){
-			    			openChatWindow(key,ci);
-			    		})
-			        });
-			    	localStorage.removeItem("groupChat");
-	        	}
-	        	
-	        	// 取dgi的combo
-	            if( (groupList || []).length > 0 ){
+        QmiGlobal.chainDeferred().then(function() {
+        	return userInfoGetting();
+        }).then(function() {
+        	return getGroupList();
+        }).then(function(rspData) {
+        	var deferred = $.Deferred();
+        	var group_list = [];
 
-	            	// 定時重新整理 為了健康
-	            	if(QmiGlobal.isPeriodicallyReload === true) {
+        	if(rspData.isSuccess === false) {
+        		deferred.resolve(rspData)
+        		return;
+        	}
 
-	            		specifiedGi = QmiGlobal.auth.prObj.gi; 
+        	// 非同步沒關係
+        	getMultiGroupCombo(Object.keys(QmiGlobal.groups), true);
 
-	            	//有dgi 但不存在列表裡
-	                } else if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
-	                	localStorage.removeItem("uiData");
-	                	
-	                    QmiGlobal.auth.dgi = groupList[0].gi;
-	                    $.lStorage("_loginData",QmiGlobal.auth);
+        	var groupList = rspData.gl;
+        	var specifiedGi = QmiGlobal.auth.dgi;
+        	if($.lStorage("groupChat")){
+        		groupChat = $.lStorage("groupChat");
+		    	$.each(groupChat,function(key,value){
+		    		getGroupComboInit(key);
+		    		QmiGlobal.groups[key].chatAll = value;
+		    		$.each(value,function(ci,item){
+		    			openChatWindow(key,ci);
+		    		})
+		        });
+		    	localStorage.removeItem("groupChat");
+        	}
+        	
+        	// 取dgi的combo
+            if( (groupList || []).length > 0 ){
 
-	                    specifiedGi = QmiGlobal.auth.dgi;
-	                }
+            	// 定時重新整理 為了健康
+            	if(QmiGlobal.isPeriodicallyReload === true) {
 
-	                getGroupComboInit(specifiedGi).done(function(resultObj){
+            		specifiedGi = QmiGlobal.auth.prObj.gi; 
 
-	                	if( resultObj.status === false ){
-	                		//sso 取消
-	                		if(resultObj.data.isReAuthCancel === true){
-	                			cns.debug("sso reAuth 取消");	
-	                			return;
-	                		}
+            	//有dgi 但不存在列表裡
+                } else if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
+                	localStorage.removeItem("uiData");
+                	
+                    QmiGlobal.auth.dgi = groupList[0].gi;
+                    $.lStorage("_loginData",QmiGlobal.auth);
 
-	                		//發生錯誤 回首頁比較保險
-	                		cns.debug("dgi combo error",resultObj);
-	                		window.location = "index.html";
-	                	} else {
-	                		deferred.resolve({dgi: specifiedGi, location:"#page-group-main"});
-	                	}
-	                });
-	                
-	            } else{
-	                //沒group
-	                deferred.resolve({location:"#page-group-menu"});
-	            }
-	        });
-        });
+                    specifiedGi = QmiGlobal.auth.dgi;
+                }
 
-        deferred.done(function(data){
+                getGroupComboInit(specifiedGi).done(function(resultObj){
 
+                	if( resultObj.status === false ){
+                		//sso 取消
+                		if(resultObj.data.isReAuthCancel === true){
+                			cns.debug("sso reAuth 取消");	
+                			return;
+                		}
+
+                		//發生錯誤 回首頁比較保險
+                		cns.debug("dgi combo error",resultObj);
+                		window.location = "index.html";
+                	} else {
+                		deferred.resolve({dgi: specifiedGi, location:"#page-group-main"});
+                	}
+                });
+                
+            } else{
+                //沒group
+                deferred.resolve({location:"#page-group-menu"});
+            }
+
+            return deferred.promise();
+        }).then(function(rspData){
         	s_load_show = false;
         	QmiGlobal.ajaxLoadingUI.hide();
 
+        	setTimeout(function() {
+        		$("#page-registration .login").removeClass("login-waiting");
+        	}, 1000);
+
+        	// return
+        	if(rspData.isSuccess === false) return;
+
             $.lStorage("refreshChk", false);
             localStorage["uiData"] = JSON.stringify(QmiGlobal.groups);
-            // document.location = data.location;    
-            $.mobile.changePage(data.location);
+            $.mobile.changePage(rspData.location);
             
 			//聊天室開啓DB
 	    	initChatDB(activateClearChatsTimer); 
@@ -485,12 +492,8 @@ onCheckVersionDone = function(needUpdate){
 				polling();
 			}else{
 				//設定目前團體 執行polling()
-				setGroupInitial(data.dgi).done(polling);
+				setGroupInitial(rspData.dgi).done(polling);
 			}
-        }).always(function() {
-        	setTimeout(function() {
-        		$("#page-registration .login").removeClass("login-waiting");
-        	}, 1000);
         });
     }
 
