@@ -1536,7 +1536,7 @@ updateSideMenuContent = function(thisGi) {
 
 	$(".polling-group-name[data-gi="+thisGi+"]")
 	.find("div:nth-child(1)").html(gn).end()
-	.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", groupData.cnt));
+	.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", QmiGlobal.getActivedUserNum(thisGi)));
 	$(".polling-group-description[data-gi="+groupData.gi+"]").html(gd);
 }
 
