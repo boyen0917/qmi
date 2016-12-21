@@ -7463,7 +7463,7 @@ zoomIn = function (target)
 }
 
 
-getGroupList = function(){
+getGroupList = function(isFromLogin){
     var groupsDeferred = $.Deferred();
 
     new QmiAjax({
@@ -7500,6 +7500,11 @@ getGroupList = function(){
                 var companyGlDefArr = [];
                 // 取得每個私雲得團體列表
                 companyListArr.forEach(function(companyData){
+                    // 登入時若發現ldap過期 不跳出密碼輸入
+                    if(isFromLoginAndLdapExpired(companyData)) {
+                        addCompanyReLoadView(companyData);
+                        return;
+                    }
                     companyGlDefArr.push(getCompanyGroup(companyData,allGroupList));
                 })
 
@@ -7521,20 +7526,25 @@ getGroupList = function(){
     })
 
     return groupsDeferred.promise();
+
+    function isFromLoginAndLdapExpired(companyData) {
+        if(!isFromLogin) return false;
+        if(!companyData) return false;
+        if(companyData.et - (new Date().getTime()) < QmiGlobal.ldapExpireTimer) return true;
+        return false;
+    }
 }
 
-getCompanyGroup = function(companyData,allGroupList) {
+getCompanyGroup = function(companyData, allGroupList) {
     var deferred = $.Deferred();
 
     if(companyData.nowAt === undefined) {
         deferred.resolve({isSuccess: false});
     } else {
-
         new QmiAjax({
             apiName: "companies/"+ companyData.ci +"/groups",
             ci: companyData.ci
         }).success(function(data){
-            
             (data.gl || []).forEach(function(groupObj){
                 // 加入私雲gi 對照表
                 QmiGlobal.companyGiMap[groupObj.gi] = {
@@ -7542,7 +7552,7 @@ getCompanyGroup = function(companyData,allGroupList) {
                     cl: companyData.cl
                 }
                 if(allGroupList !== undefined) allGroupList.push(groupObj)
-            })
+            });
 
             deferred.resolve({
                 isSuccess: true,
@@ -7593,6 +7603,7 @@ getCompanyToken = function(companyData, optionsObj){
 
         ctDeferred.done(function(isSuccess) {
             var method = "lock";
+            if(isSuccess instanceof Object) isSuccess = isSuccess.isSuccess;
             if(isSuccess) method = "unlock";
 
             QmiGlobal.module.reAuthUILock[method](companyData);
@@ -7704,10 +7715,20 @@ addCompanyReLoadView = function(companyData) {
         $(".sm-group-list-area-refresh").show().append(refreshDom);
 
         refreshDom.click(function() {
-            companyLoad({
-                refreshDom: refreshDom,
-                companyData: companyData
-            })
+            // var deferred = $.Deferred();
+            // if(QmiGlobal.ldapCompanies[companyData.ci])
+            //     QmiGlobal.module.reAuthManually.init({
+            //         companyData: companyData,
+            //         reAuthDef: deferred
+            //     })
+            // else deferred.resolve();
+
+            // deferred.done(function() {
+                companyLoad({
+                    refreshDom: refreshDom,
+                    companyData: companyData
+                })
+            // });
         });
     }
 }
@@ -7731,7 +7752,7 @@ companyLoad = function(loadData){
         if(isSuccess === true) {
 
             getCompanyGroup(companyData).done(function(data) {
-                if(data.isSuccess === true) {
+                if(data.isSuccess) {
                     // 先找出 新的gi
                     var newGiArr = data.companyGl.reduce(function(arr, currObj){
                         if(QmiGlobal.groups.hasOwnProperty(currObj.gi) === false) arr.push(currObj.gi);

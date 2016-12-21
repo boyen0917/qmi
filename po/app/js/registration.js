@@ -392,10 +392,12 @@ onCheckVersionDone = function(needUpdate){
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
 
+    	var isFromLogin = true;
+
         QmiGlobal.chainDeferred().then(function() {
         	return userInfoGetting();
         }).then(function() {
-        	return getGroupList();
+        	return getGroupList(isFromLogin);
         }).then(function(rspData) {
         	var deferred = $.Deferred();
         	var group_list = [];
@@ -482,7 +484,7 @@ onCheckVersionDone = function(needUpdate){
 	    	initChatDB(activateClearChatsTimer); 
 			initChatCntDB(); 
 
-			updateAlert();
+			updateAlert(isFromLogin);
 
 			//沒團體的情況
 			if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){

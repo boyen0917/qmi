@@ -122,7 +122,7 @@ showAlertFromDB = function(){
 }
 
 //打ＡＰＩ更新通知
-updateAlert = function(){
+updateAlert = function(isFromLogin){
 	var noticeListArr = [],
 		noticeDefArr = [],
 
@@ -143,7 +143,10 @@ updateAlert = function(){
 	// 公雲鈴鐺
 	noticeDefArr.push(publicNoticeAjax);
 
-	Object.keys(QmiGlobal.companies).forEach(function(companyId){
+	Object.keys(QmiGlobal.companies).reduce(function(arr, currCi) {
+		if(!isFromLoginAndLdapExpired(QmiGlobal.companies[currCi])) arr.push(currCi);
+		return arr;
+	}, []).forEach(function(companyId){
 		var ajaxDef = new QmiAjax({
 			apiName: "notices",
 			ci: companyId,
@@ -204,6 +207,13 @@ updateAlert = function(){
 			showAlertContent(noticeListArr);
 		});
 	});
+
+	function isFromLoginAndLdapExpired(companyData) {
+        if(!isFromLogin) return false;
+        if(!companyData) return false;
+        if(companyData.et - (new Date().getTime()) < QmiGlobal.ldapExpireTimer) return true;
+        return false;
+    }
 }
 
 //顯示資料
