@@ -5866,7 +5866,6 @@ timelineContentFormat = function (c,limit,ei){
 
 
 timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
-    
     //需要記共有幾張圖片
     var gallery_arr = [], audio_arr = [], video_arr = [],
         isApplyWatermark = false,
@@ -5896,7 +5895,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
                     // 先檢查有無21 進行替換一次
                     ml.forEach(function(eventObj) { 
-                        if(eventObj.tp !== 21) val.c = val.c.qmiTag(eventObj);
+                        if(eventObj.tp == 21) val.c = val.c.qmiTag(eventObj);
                     });
 
                     // 抓漏網之魚 防止bug
@@ -6124,8 +6123,10 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
         };
 
 
-        this_event.find("b").bind("click", function(e) {
-            userInfoShow(gi, $(e.target).attr("name"));
+        this_event.find("b").off("click").on("click", function(e) {
+            var groupId = this_event.data("event-id").split("_")[0] || gi;
+            console.log(groupId);
+            userInfoShow(groupId, $(e.target).attr("name"));
         });
         
         //需要填入結束時間 以及 結束時間存在 就填入
