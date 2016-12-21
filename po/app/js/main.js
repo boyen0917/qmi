@@ -333,16 +333,14 @@ $(function(){
 	$(document).on("click",".sm-group-area.enable",function(){
 		var self = this;
 		$(".sm-group-area").removeClass("active").removeClass("enable");
-		// $(self).addClass("active");
-
+		//取消主頁
+		timelineMainClose();
+		
 		//指定gi
 		timelineChangeGroup($(this).attr("data-gi")).done(function(){
 
 			//滾動至最上面
 			timelineScrollTop();
-
-			//取消主頁
-			timelineMainClose();
 
 			// 保險起見再active一次
 			$(self).addClass("active");

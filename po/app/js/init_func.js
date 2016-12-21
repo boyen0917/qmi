@@ -224,15 +224,19 @@ $(function(){
 
     updateTab = function(thisGi){
         var groupData = QmiGlobal.groups[thisGi];
-        try{
+        // try{
             var tabHtml = '<div class="sm-small-area"><div class="sm-small-area-r"></div></div>';
 
             //set tabs
             var menu = $(".header-menu").html("");
             menu.parent().hide();
+
+            var setObj = groupData.ntp === 2 ? {
+                tab: [{sw: true, tp: 2}]
+            } : groupData.set;
             
-            for( i=0;i<groupData.set.tab.length;i++ ){
-                var tabObj = groupData.set.tab[i];
+            for( i=0; i<setObj.tab.length; i++ ){
+                var tabObj = setObj.tab[i];
                 //switch off
                 if( tabObj.sw === false || typeof initTabMap[tabObj.tp] === "undefined") continue;
                 
@@ -258,12 +262,12 @@ $(function(){
                 }
             }
 
-            // if (groupData.isOfficial) {
+            // if (groupData.ntp === 2) {
             //     menu.hide();
             // }
-        } catch(e){
-            errorReport(e);
-        }
+        // } catch(e){
+        //     errorReport(e);
+        // }
 
         //檢查團體設定裡有沒有開放的設定, 都沒有隱藏設定tab
         if( false==initGroupSetting(thisGi) ){
