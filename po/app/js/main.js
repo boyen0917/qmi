@@ -289,45 +289,51 @@ $(function(){
 	});
 
 	//更換動態
-	$(document).on("click",".sm-small-area",function(){
-
-		$(".sm-group-list-area").removeAttr("data-unlock");
-		var target = $(this);
-
-		if($(".st-filter-area").hasClass("st-filter-lock")) return;
-		//滾動至最上面
-		timelineScrollTop();
-
-		//取消主頁
-		timelineMainClose();
-
-		//check pens
-		//如果該tab的筆功能都沒開的話, 直接把筆hide起來
-		var act = target.data("sm-act");
-		var menu = $(".feed-compose-area");
-		var composeDom = $(".feed-compose");
-		composeDom.show();
-		switch( act ){
-			case "feed-post": //貼文only
-				if( menu.find(".fc-area-subbox.active[data-fc-box=post]").length<=0 )
-					composeDom.hide();
-				break;
-			case "feed-public": //團體動態, 貼文不開
-				if( menu.find(".fc-area-subbox.active:not([data-fc-box=post])").length<=0 )
-					composeDom.hide();
-				break;
-			default: //一般&其他?, 筆有的都開
-				if( menu.find(".fc-area-subbox.active").length<=0 )
-					composeDom.hide();
-				break;
-		}
-
-		$(".sm-small-area.active").removeClass("active");
-		timelineSwitch(target.data("sm-act"));
-		$(this).addClass("active");
-
-		target.addClass("sm-click-bg");
+	$(document).on("click",".sm-small-area", function() {
+		clickTimelineTab({
+			tabDom: $(this),
+			action: $(this).data("sm-act")
+		});
 	});
+	// $(document).on("click",".sm-small-area",function(){
+
+	// 	$(".sm-group-list-area").removeAttr("data-unlock");
+	// 	var target = $(this);
+
+	// 	if($(".st-filter-area").hasClass("st-filter-lock")) return;
+	// 	//滾動至最上面
+	// 	timelineScrollTop();
+
+	// 	//取消主頁
+	// 	timelineMainClose();
+
+	// 	//check pens
+	// 	//如果該tab的筆功能都沒開的話, 直接把筆hide起來
+	// 	var act = target.data("sm-act");
+	// 	var menu = $(".feed-compose-area");
+	// 	var composeDom = $(".feed-compose");
+	// 	composeDom.show();
+	// 	switch( act ){
+	// 		case "feed-post": //貼文only
+	// 			if( menu.find(".fc-area-subbox.active[data-fc-box=post]").length<=0 )
+	// 				composeDom.hide();
+	// 			break;
+	// 		case "feed-public": //團體動態, 貼文不開
+	// 			if( menu.find(".fc-area-subbox.active:not([data-fc-box=post])").length<=0 )
+	// 				composeDom.hide();
+	// 			break;
+	// 		default: //一般&其他?, 筆有的都開
+	// 			if( menu.find(".fc-area-subbox.active").length<=0 )
+	// 				composeDom.hide();
+	// 			break;
+	// 	}
+
+	// 	$(".sm-small-area.active").removeClass("active");
+	// 	timelineSwitch(target.data("sm-act"));
+	// 	$(this).addClass("active");
+
+	// 	target.addClass("sm-click-bg");
+	// });
 	
 	//更換團體 sm-group-area有兩個地方有綁定事件
 	$(document).on("click",".sm-group-area.enable",function(){
@@ -2147,10 +2153,12 @@ $(function(){
 				showGroupInfoPage();
 				break;
 			case "chat":
-				$(".sm-small-area[data-sm-act=chat]").trigger("click");
+				clickTimelineTab({action: "chat"});
+				// $(".sm-small-area[data-sm-act=chat]").trigger("click");
 				break;
 			case "setting":
-				$(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
+				clickTimelineTab({action: "groupSetting"});
+				// $(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
 				break;
 			case "invite":
 				$(".contact-add").trigger("click");
@@ -2170,13 +2178,15 @@ $(function(){
 				showGroupInfoPage();
 				break;
 			case "chat":
-				$(".sm-small-area[data-sm-act=chat]").trigger("click");
+				clickTimelineTab({action: "chat"});
+				// $(".sm-small-area[data-sm-act=chat]").trigger("click");
 				break;
 			case "cnt":
 				cns.debug("cnt");
 				break;
 			case "setting":
-				$(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
+				clickTimelineTab({action: "groupSetting"});
+				// $(".sm-small-area[data-sm-act=groupSetting]").trigger("click");
 				break;
 		}
 	});

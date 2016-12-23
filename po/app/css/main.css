@@ -5157,7 +5157,7 @@ input.cp-datetimepicker-end {
 	font-size: 14px;
 	white-space: nowrap;
 	overflow-x: auto;
-	width: 100%;
+    width: calc(100vw - 250px);
 	z-index: 10;
 	/*height: 140px;*/
 	overflow-y: hidden;
