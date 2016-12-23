@@ -13,7 +13,7 @@
 
 var g_idb_chat_msgs;	//訊息idb
 function initChatDB( onReady ){
-	if( null == g_idb_chat_msgs ){
+	if(!g_idb_chat_msgs ){
 		g_idb_chat_msgs = new IDBStore({
 		    dbVersion: 2,
 		    storeName: 'chat_msgs',

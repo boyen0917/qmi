@@ -46,7 +46,7 @@ initChatList = function(){
 		if(currentGroup.ntp === 2) $(".chatList-add").data("offical","add");
 		showNewRoomPage();
 	});
-
+	
 	//---- get chat list -----
 	//clear old contect
 	updateChatList(gi);
@@ -66,7 +66,6 @@ function getChatListApi(giTmp) {
 		var isCheckOri = ( currentGroup.hasOwnProperty("chatAll") );
 		var list = [];
 		var putDefPoolArr = [];
-
 		$.each(chatRoomListArr, function(key,newRoom){
 			if(Object.keys(newRoom.cm || {}).length > 0) {
 				var def = $.Deferred();

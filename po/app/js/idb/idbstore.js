@@ -301,7 +301,6 @@
           this.onError(new Error('Something is wrong with the IndexedDB implementation in this browser. Please upgrade your browser.'));
           return;
         }
-
         var emptyTransaction = this.db.transaction([this.storeName], this.consts.READ_ONLY);
         this.store = emptyTransaction.objectStore(this.storeName);
 
