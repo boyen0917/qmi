@@ -481,7 +481,7 @@ timelineSwitch = function (act,reset,main,noPR){
                     switchDeferred.resolve({ act: "main"});
                     timelineScrollTop();
                 });
-            }   
+            } else switchDeferred.resolve({ act: "main"});
             
           break;
         case "memberslist": 
@@ -1236,26 +1236,6 @@ setOfficialGroup = function( this_gi ){
             $(".sm-small-area[data-sm-act=chat]").removeClass("official-general");
             return;
         }
-
-
-        //-- set tabs --
-        // var menu = $(".header-menu");
-        // menu.find(".sm-small-area").hide();
-
-        // //feed
-        // var dom = menu.find(".sm-small-area[data-sm-act=feeds]");
-        // dom.show();
-        // dom.detach();
-        // menu.append( dom );
-        // // dom.addClass("active");
-        // // var nameDom = dom.find("div");
-        // // nameDom.html( $.i18n.getString(nameDom.attr("data-textid")) );
-
-        // //chat
-        // dom = menu.find(".sm-small-area[data-sm-act=chat]");
-        // dom.detach();
-        // dom.show();
-        // menu.append( dom );
 
         //set filters
         $(".st-filter-area").hide();
@@ -8767,9 +8747,9 @@ eventDetailShow = function(thisEi){
 
 timelineMainClose = function(){
     $("#page-group-main").data("main-gu",false);
-    $(".user-main-toggle").show();
     $(".gm-user-main-area").hide();
     $(".st-feedbox-area div[data-feed=main]").html("");
+    $(".user-main-toggle").show();
 }
 
 timelineScrollTop = function(){
@@ -8961,6 +8941,25 @@ function activateClearChatsTimer(){
     clearChatTimer = setTimeout(activateClearChatsTimer, counter);
 };
 
+
+
+
+function clickTimelineTab(argObj) {
+    $(".sm-group-list-area").removeAttr("data-unlock");
+    var action = argObj.action
+
+    if($(".st-filter-area").hasClass("st-filter-lock")) return;
+    //滾動至最上面
+    timelineScrollTop();
+    //取消主頁
+    timelineMainClose();
+
+    timelineSwitch(action);
+
+    $(".sm-small-area.active").removeClass("active");
+    if(!argObj.tabDom) return;
+    argObj.tabDom.addClass("active").addClass("sm-click-bg");
+}
 
 /*
           ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
