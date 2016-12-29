@@ -1506,7 +1506,6 @@ img.auo {
 
 .sm-group-list-area-refresh {
     font-size: 15px;
-    margin-bottom: 5px;
     border-bottom: 1px solid #555;
     display: none;
 }
@@ -5158,7 +5157,7 @@ input.cp-datetimepicker-end {
 	font-size: 14px;
 	white-space: nowrap;
 	overflow-x: auto;
-	width: 100%;
+    width: calc(100vw - 250px);
 	z-index: 10;
 	/*height: 140px;*/
 	overflow-y: hidden;

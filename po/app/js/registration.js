@@ -392,10 +392,12 @@ onCheckVersionDone = function(needUpdate){
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
 
+    	var isFromLogin = true;
+
         QmiGlobal.chainDeferred().then(function() {
         	return userInfoGetting();
         }).then(function() {
-        	return getGroupList();
+        	return getGroupList(isFromLogin);
         }).then(function(rspData) {
         	var deferred = $.Deferred();
         	var group_list = [];
@@ -404,9 +406,6 @@ onCheckVersionDone = function(needUpdate){
         		deferred.resolve(rspData)
         		return;
         	}
-
-        	// 非同步沒關係
-        	getMultiGroupCombo(Object.keys(QmiGlobal.groups), true);
 
         	var groupList = rspData.gl;
         	var specifiedGi = QmiGlobal.auth.dgi;
@@ -479,21 +478,32 @@ onCheckVersionDone = function(needUpdate){
             $.mobile.changePage(rspData.location);
             
 			//聊天室開啓DB
-	    	initChatDB(activateClearChatsTimer); 
-			initChatCntDB(); 
+			QmiGlobal.chainDeferred().then(function() {
+				var deferred = $.Deferred();
+				initChatDB(deferred.resolve); 
+		    	return deferred.promise();
+			}).then(function() {
+				
+				// 非同步沒關係
+        		getMultiGroupCombo(Object.keys(QmiGlobal.groups), true);
 
-			updateAlert();
+		    	activateClearChatsTimer();
 
-			//沒團體的情況
-			if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
-				//關閉返回鍵
-				$("#page-group-menu .page-back").hide();
-				// 兩個選項都要執行polling()
-				polling();
-			}else{
-				//設定目前團體 執行polling()
-				setGroupInitial(rspData.dgi).done(polling);
-			}
+		    	initChatCntDB(); 
+
+				updateAlert(isFromLogin);
+
+				//沒團體的情況
+				if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
+					//關閉返回鍵
+					$("#page-group-menu .page-back").hide();
+					// 兩個選項都要執行polling()
+					polling();
+				}else{
+					//設定目前團體 執行polling()
+					setGroupInitial(rspData.dgi).done(polling);
+				}
+			});
         });
     }
 
