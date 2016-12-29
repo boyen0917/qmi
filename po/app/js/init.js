@@ -259,6 +259,10 @@ window.QmiGlobal = {
 	module: {}, // 模組
 	rspCode401: false,
 
+
+	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
+	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
+
 	// 聊天室 auth
 	auth: {},
 	me: {},
@@ -299,6 +303,15 @@ window.QmiGlobal = {
 			$('.ui-loader').hide();
 			$(".ajax-screen-lock").hide();
 		}
+	},
+
+	isCompanyLoaded: function(thisCi) {
+		var chkArr = Object.keys(QmiGlobal.companyGiMap).reduce(function(arr, currGi) {
+			if(QmiGlobal.companyGiMap[currGi].ci === thisCi) arr.push(currGi)
+			return arr;
+		}, []);
+
+		return !!chkArr.length;
 	},
 
 	getActivedUserNum: function(thisGi) {
@@ -469,7 +482,12 @@ window.QmiAjax = function(args){
 	function ajaxExecute(chk) {
 		// 發生錯誤
 		if(chk.isSuccess === false) {
-			ajaxDeferred.reject(chk.data);
+			ajaxDeferred.reject({
+				status: 9999,
+				isSuccess: false,
+				data: chk.data,
+				isCancel: chk.isCancel
+			});
 			return;
 		}
 
@@ -492,7 +510,6 @@ window.QmiAjax = function(args){
 			}
 
 			(function(){
-
 				var reAuthDefChain = MyDeferred();
 				// reAuth: token過期
 				if( rspData.status === 401
@@ -502,7 +519,6 @@ window.QmiAjax = function(args){
 					$.when(reAuthDeferred).done(function(){
 						self.reAuth(companyData, rspData).done(reAuthDefChain.resolve);
 					});
-
 				} else {
 					reAuthDefChain.resolve({
 						isReAuth: false,
@@ -510,21 +526,15 @@ window.QmiAjax = function(args){
 						data: rspData
 					});
 				}
-
 				return reAuthDefChain;
 			})().then(function(resultObj){
 				// 2. reAuth之後重做原本的ajax
-
 				var reAuthDefChain = MyDeferred();
-
 				if(resultObj.isReAuth === false) {
 					// 不用reAuth 直接進行
 					reAuthDefChain.resolve(resultObj);
-
 				} else if(resultObj.isSuccess === true){
-
 					// 重新取得token成功 換掉at後 重新做ajax
-
 					// setHeaders: outerArgs,companyData
 					newArgs.headers = self.setHeaders(args, companyData);
 
@@ -534,11 +544,9 @@ window.QmiAjax = function(args){
 							data: newData
 						});
 					})
-
 				} else {
 					// auth 再度發生錯誤 就傳入self.reAuth的錯誤內容
 					reAuthDefChain.resolve(resultObj);
-
 					// auth 再度發生錯誤 關閉company所屬團體的ui
 					if(companyData) QmiGlobal.module.reAuthUILock.lock(companyData);
 				}
@@ -546,7 +554,6 @@ window.QmiAjax = function(args){
 				return reAuthDefChain;
 			}).then(function(reAuthObj){
 				// 3. 做原本ajax的判斷
-
 				var completeData = reAuthObj.data;
 				completeData.ajaxArgs = newArgs;
 
@@ -617,8 +624,6 @@ window.QmiAjax = function(args){
 }
 
 QmiAjax.prototype = {
-	expireTimer: 5 * 86400 * 1000, // ms, 五天
-	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
 	authLock: (function(){
 		var isLock = false;
@@ -677,17 +682,14 @@ QmiAjax.prototype = {
 		args.companyData = QmiGlobal.companies[(args.companyData || {}).ci];
 
 		// 執行前 先檢查是否接近過期時間 先替換token
-		var nowEt = (args.companyData === undefined) ? QmiGlobal.auth.et : args.companyData.et,
-			deferred = $.Deferred(),
-
-			// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
-			isExpired = isExpired(this.expireTimer, this.ldapExpireTimer);
+		var nowEt = (args.companyData === undefined) ? QmiGlobal.auth.et : args.companyData.et;
+		var deferred = $.Deferred();
 
 		if(args.noAuth === true) {
 			// 不用auth
 			deferred.resolve({isSuccess: true});
 
-		} else if(isExpired) {
+		} else if(isExpired()) {
 			console.log("token Expire!!!");
 			// reAuth
 			this.reAuth(args.companyData).done(deferred.resolve);
@@ -700,12 +702,12 @@ QmiAjax.prototype = {
 
 			
 
-		function isExpired(expireTimer, ldapExpireTimer) {
+		function isExpired() {
 			var currTime = new Date().getTime();
 			// tp1 是需要輸入密碼的私雲 expire時間直接就是私雲提供的時間 et
-			if(isLdapCompanyOrSSOLogin()) return (nowEt - currTime) < ldapExpireTimer;
+			if(isLdapCompanyOrSSOLogin()) return (nowEt - currTime) < QmiGlobal.ldapExpireTimer;
 			// 過期檢查 提前幾天檢查
-			else return (nowEt - currTime) < expireTimer
+			else return (nowEt - currTime) < QmiGlobal.ajaxExpireTimer;
 
 			function isLdapCompanyOrSSOLogin() {
 				// ldap company
@@ -1152,6 +1154,12 @@ QmiGlobal.module.reAuthManually = {
 					// 在私雲加入cancel chk 讓其他api停止動作
 					(QmiGlobal.companies[self.companyData.ci] || {}).isReAuthCancel = true;
 					
+					// 取消api
+					self.reAuthDef.resolve({
+						isSuccess: false,
+						isCancel: true
+					})
+
 					// 要再點一次timelineChangeGroup 做lock的ui顯示
 					timelineChangeGroup(gi)
 				}
@@ -1238,7 +1246,12 @@ QmiGlobal.module.reAuthManually = {
 				isSuccess: true,
 				isSso: true,
 				isReAuth: true
-			})
+			});
+
+			if(!QmiGlobal.isCompanyLoaded(cData.ci)) {
+				closeUI();
+				return;
+			}
 
 			// 重新取得所有團體
 			QmiGlobal.chainDeferred(getCompanyGroup(cData)).then(function() {
@@ -1248,20 +1261,23 @@ QmiGlobal.module.reAuthManually = {
 						return arr;
 					}, []), true); // 第二參數 是要更新左側選單資訊
 				}
-			}()).then(function() {
-				QmiGlobal.module.reAuthUILock.unlock(self.companyData);
-				// reAuth 結束
-				setTimeout(function() {
-					self.view.find(".container").attr("msg", $.i18n.getString("WEBONLY_AUTH_SUCCESS"));
-				}, 300)
-				// reAuth 結束
-				setTimeout(function() {
-					self.remove();
-					// 重新執行timelineChangeGroup 讓畫面開啟
-					timelineChangeGroup(gi);
-				}, 500);
-			}); // end of chainDeferred
-		})
+			}()).then(closeUI); // end of chainDeferred
+
+		});
+
+		function closeUI() {
+			QmiGlobal.module.reAuthUILock.unlock(self.companyData);
+			// reAuth 結束
+			setTimeout(function() {
+				self.view.find(".container").attr("msg", $.i18n.getString("WEBONLY_AUTH_SUCCESS"));
+			}, 300)
+			// reAuth 結束
+			setTimeout(function() {
+				self.remove();
+				// 重新執行timelineChangeGroup 讓畫面開啟
+				timelineChangeGroup(gi);
+			}, 500);
+		}
     },
 
     remove: function() {

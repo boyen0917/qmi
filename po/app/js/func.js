@@ -481,7 +481,7 @@ timelineSwitch = function (act,reset,main,noPR){
                     switchDeferred.resolve({ act: "main"});
                     timelineScrollTop();
                 });
-            }   
+            } else switchDeferred.resolve({ act: "main"});
             
           break;
         case "memberslist": 
@@ -1236,26 +1236,6 @@ setOfficialGroup = function( this_gi ){
             $(".sm-small-area[data-sm-act=chat]").removeClass("official-general");
             return;
         }
-
-
-        //-- set tabs --
-        // var menu = $(".header-menu");
-        // menu.find(".sm-small-area").hide();
-
-        // //feed
-        // var dom = menu.find(".sm-small-area[data-sm-act=feeds]");
-        // dom.show();
-        // dom.detach();
-        // menu.append( dom );
-        // // dom.addClass("active");
-        // // var nameDom = dom.find("div");
-        // // nameDom.html( $.i18n.getString(nameDom.attr("data-textid")) );
-
-        // //chat
-        // dom = menu.find(".sm-small-area[data-sm-act=chat]");
-        // dom.detach();
-        // dom.show();
-        // menu.append( dom );
 
         //set filters
         $(".st-filter-area").hide();
@@ -5866,7 +5846,6 @@ timelineContentFormat = function (c,limit,ei){
 
 
 timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
-    
     //需要記共有幾張圖片
     var gallery_arr = [], audio_arr = [], video_arr = [],
         isApplyWatermark = false,
@@ -5896,7 +5875,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
                     // 先檢查有無21 進行替換一次
                     ml.forEach(function(eventObj) { 
-                        if(eventObj.tp !== 21) val.c = val.c.qmiTag(eventObj);
+                        if(eventObj.tp == 21) val.c = val.c.qmiTag(eventObj);
                     });
 
                     // 抓漏網之魚 防止bug
@@ -6124,8 +6103,10 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
         };
 
 
-        this_event.find("b").bind("click", function(e) {
-            userInfoShow(gi, $(e.target).attr("name"));
+        this_event.find("b").off("click").on("click", function(e) {
+            var groupId = this_event.data("event-id").split("_")[0] || gi;
+            console.log(groupId);
+            userInfoShow(groupId, $(e.target).attr("name"));
         });
         
         //需要填入結束時間 以及 結束時間存在 就填入
@@ -7463,7 +7444,7 @@ zoomIn = function (target)
 }
 
 
-getGroupList = function(){
+getGroupList = function(isFromLogin){
     var groupsDeferred = $.Deferred();
 
     new QmiAjax({
@@ -7500,6 +7481,11 @@ getGroupList = function(){
                 var companyGlDefArr = [];
                 // 取得每個私雲得團體列表
                 companyListArr.forEach(function(companyData){
+                    // 登入時若發現ldap過期 不跳出密碼輸入
+                    if(isFromLoginAndLdapExpired(companyData)) {
+                        addCompanyReLoadView(companyData);
+                        return;
+                    }
                     companyGlDefArr.push(getCompanyGroup(companyData,allGroupList));
                 })
 
@@ -7521,20 +7507,25 @@ getGroupList = function(){
     })
 
     return groupsDeferred.promise();
+
+    function isFromLoginAndLdapExpired(companyData) {
+        if(!isFromLogin) return false;
+        if(!companyData) return false;
+        if(companyData.et - (new Date().getTime()) < QmiGlobal.ldapExpireTimer) return true;
+        return false;
+    }
 }
 
-getCompanyGroup = function(companyData,allGroupList) {
+getCompanyGroup = function(companyData, allGroupList) {
     var deferred = $.Deferred();
 
     if(companyData.nowAt === undefined) {
         deferred.resolve({isSuccess: false});
     } else {
-
         new QmiAjax({
             apiName: "companies/"+ companyData.ci +"/groups",
             ci: companyData.ci
         }).success(function(data){
-            
             (data.gl || []).forEach(function(groupObj){
                 // 加入私雲gi 對照表
                 QmiGlobal.companyGiMap[groupObj.gi] = {
@@ -7542,7 +7533,7 @@ getCompanyGroup = function(companyData,allGroupList) {
                     cl: companyData.cl
                 }
                 if(allGroupList !== undefined) allGroupList.push(groupObj)
-            })
+            });
 
             deferred.resolve({
                 isSuccess: true,
@@ -7593,6 +7584,7 @@ getCompanyToken = function(companyData, optionsObj){
 
         ctDeferred.done(function(isSuccess) {
             var method = "lock";
+            if(isSuccess instanceof Object) isSuccess = isSuccess.isSuccess;
             if(isSuccess) method = "unlock";
 
             QmiGlobal.module.reAuthUILock[method](companyData);
@@ -7704,10 +7696,20 @@ addCompanyReLoadView = function(companyData) {
         $(".sm-group-list-area-refresh").show().append(refreshDom);
 
         refreshDom.click(function() {
-            companyLoad({
-                refreshDom: refreshDom,
-                companyData: companyData
-            })
+            // var deferred = $.Deferred();
+            // if(QmiGlobal.ldapCompanies[companyData.ci])
+            //     QmiGlobal.module.reAuthManually.init({
+            //         companyData: companyData,
+            //         reAuthDef: deferred
+            //     })
+            // else deferred.resolve();
+
+            // deferred.done(function() {
+                companyLoad({
+                    refreshDom: refreshDom,
+                    companyData: companyData
+                })
+            // });
         });
     }
 }
@@ -7731,7 +7733,7 @@ companyLoad = function(loadData){
         if(isSuccess === true) {
 
             getCompanyGroup(companyData).done(function(data) {
-                if(data.isSuccess === true) {
+                if(data.isSuccess) {
                     // 先找出 新的gi
                     var newGiArr = data.companyGl.reduce(function(arr, currObj){
                         if(QmiGlobal.groups.hasOwnProperty(currObj.gi) === false) arr.push(currObj.gi);
@@ -8745,9 +8747,9 @@ eventDetailShow = function(thisEi){
 
 timelineMainClose = function(){
     $("#page-group-main").data("main-gu",false);
-    $(".user-main-toggle").show();
     $(".gm-user-main-area").hide();
     $(".st-feedbox-area div[data-feed=main]").html("");
+    $(".user-main-toggle").show();
 }
 
 timelineScrollTop = function(){
@@ -8939,6 +8941,25 @@ function activateClearChatsTimer(){
     clearChatTimer = setTimeout(activateClearChatsTimer, counter);
 };
 
+
+
+
+function clickTimelineTab(argObj) {
+    $(".sm-group-list-area").removeAttr("data-unlock");
+    var action = argObj.action
+
+    if($(".st-filter-area").hasClass("st-filter-lock")) return;
+    //滾動至最上面
+    timelineScrollTop();
+    //取消主頁
+    timelineMainClose();
+
+    timelineSwitch(action);
+
+    $(".sm-small-area.active").removeClass("active");
+    if(!argObj.tabDom) return;
+    argObj.tabDom.addClass("active").addClass("sm-click-bg");
+}
 
 /*
           ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
