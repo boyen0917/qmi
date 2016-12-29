@@ -8951,34 +8951,12 @@ function clickTimelineTab(argObj) {
     if($(".st-filter-area").hasClass("st-filter-lock")) return;
     //滾動至最上面
     timelineScrollTop();
-
     //取消主頁
     timelineMainClose();
 
     timelineSwitch(action);
 
-    //check pens
-    //如果該tab的筆功能都沒開的話, 直接把筆hide起來
-    var menu = $(".feed-compose-area");
-    var composeDom = $(".feed-compose");
-    composeDom.show();
-    switch( action ){
-        case "feed-post": //貼文only
-            if( menu.find(".fc-area-subbox.active[data-fc-box=post]").length<=0 )
-                composeDom.hide();
-            break;
-        case "feed-public": //團體動態, 貼文不開
-            if( menu.find(".fc-area-subbox.active:not([data-fc-box=post])").length<=0 )
-                composeDom.hide();
-            break;
-        default: //一般&其他?, 筆有的都開
-            if( menu.find(".fc-area-subbox.active").length<=0 )
-                composeDom.hide();
-            break;
-    }
-
     $(".sm-small-area.active").removeClass("active");
-    
     if(!argObj.tabDom) return;
     argObj.tabDom.addClass("active").addClass("sm-click-bg");
 }
