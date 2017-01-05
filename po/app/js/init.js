@@ -346,7 +346,50 @@ window.QmiGlobal = {
         if(!def.state instanceof Function) return true;
         if(def.state() !== "pending") return true;
         return false;
-    } 
+    },
+	
+	appReload: function() {
+	    var flag = false;
+	    var periodTime = 8 * 60 * 60 * 1000; // 每8小時reload一次
+	    // 計算重新讀取頁面的時間
+	    if($.lStorage("_periodicallyReloadTimer") === false) setTimer();
+
+	    return {
+	        chk: function() {
+	            if(new Date().getTime() - $.lStorage("_periodicallyReloadTimer") > periodTime) {
+	                flag = true;
+	            }
+	        },
+
+	        do: function(argsObj) {
+	            if(!argsObj) return;
+	            if(flag === false && !argsObj.isReloadDirectly) return;
+
+	            var wl = {};
+	            $.each(windowList,function(key,value){try {
+	                if(value.closed) return;
+	                wl[value.gi] = wl[value.gi] || {};
+	                wl[value.gi][key] = QmiGlobal.groups[value.gi].chatAll[value.ci];
+	            } catch(e) {}});
+
+	            // 設定當前gi
+	            QmiGlobal.auth.appReloadObj = {
+	                gi: QmiGlobal.currentGi,
+	                param: argsObj
+	            };
+
+	            $.lStorage("groupChat", wl);
+	            $.lStorage("_appReloadAuth", QmiGlobal.auth);
+	            setTimer();
+	            
+	            location.reload();
+	        }
+	    }
+
+	    function setTimer(){
+	        $.lStorage("_periodicallyReloadTimer", new Date().getTime());
+	    }
+	}()
 };
 
 // polling異常監控

@@ -4,15 +4,13 @@ onCheckVersionDone = function(needUpdate){
 	}
 	clearBadgeLabel();
 
-	// 定時重新讀取 為了健康
-    if($.lStorage("_periodicallyReloadAuth") !== false) {
-    	QmiGlobal.auth = $.lStorage("_periodicallyReloadAuth");	
-    	localStorage.removeItem("_periodicallyReloadAuth");
+	// 定時重新讀取
+    if($.lStorage("_appReloadAuth") !== false) {
+    	QmiGlobal.auth = $.lStorage("_appReloadAuth");	
+    	localStorage.removeItem("_appReloadAuth");
     	
-
-    	QmiGlobal.isPeriodicallyReload = true;
-		
-		loginAction();
+    	QmiGlobal.isAppReload = true;
+    	loginAction();
 
     } else if($.lStorage("_loginAutoChk") === true) {
 
@@ -388,6 +386,9 @@ onCheckVersionDone = function(needUpdate){
 
 	//初始化 
     function loginAction (){
+
+    	//儲存登入資料 跳轉到timeline
+    	if ($.lStorage("_loginData") !== false && QmiGlobal.isAppReload !== true) QmiGlobal.auth = $.lStorage("_loginData");
         
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
@@ -425,9 +426,9 @@ onCheckVersionDone = function(needUpdate){
             if( (groupList || []).length > 0 ){
 
             	// 定時重新整理 為了健康
-            	if(QmiGlobal.isPeriodicallyReload === true) {
+            	if(QmiGlobal.isAppReload === true) {
 
-            		specifiedGi = QmiGlobal.auth.prObj.gi; 
+            		specifiedGi = QmiGlobal.auth.appReloadObj.gi; 
 
             	//有dgi 但不存在列表裡
                 } else if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
