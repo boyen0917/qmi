@@ -16,7 +16,7 @@ var ui,
 	//local測試 預設開啟console
 	debug_flag = false;
 
-var default_url = "https://qmi17.mitake.com.tw/";
+var default_url = "https://ap.qmi.emome.net/";
 var base_url = function() {
 	switch(true) {
 		case match("qawp.qmi.emome.net"):
@@ -36,17 +36,10 @@ var base_url = function() {
 
 var base_url = "https://qmi17.mitake.com.tw/";
 
-// 判斷更改網址 不要上到正式版
-$(document).ready(function() {
-	if($.lStorage("_selectedServerUrl") === false || $.lStorage("_selectedServerUrl") === default_url) return;
-	base_url = $.lStorage("_selectedServerUrl");
-	
-	if($("#module-server-selector-url").length === 0) $("body").append(QmiGlobal.module.serverSelector.urlHtml());		
-	$("#module-server-selector-url").html(base_url);
 
-	// 更改網址 清db
-	if($.lStorage("_lastBaseUrl") !== false && $.lStorage("_lastBaseUrl") !== base_url) resetDB();
-	$.lStorage("_lastBaseUrl", base_url);
+$(document).ready(function() {
+	try { QmiGlobal.init(); } 
+	catch(e) { cns.log("QmiGlobal.init error") }
 })
 
 var userLang = navigator.language || navigator.userLanguage;
@@ -266,6 +259,26 @@ window.QmiGlobal = {
 	// 聊天室 auth
 	auth: {},
 	me: {},
+
+	// after document ready
+	init: function() { 
+		//設定語言, 還沒登入先用瀏覽器的語言設定
+		updateLanguage(lang);
+		onCheckVersionDone();
+
+		// window.onfocus = function() {
+		// 	console.log("ggg");
+		// 	if(QmiGlobal.isOnfocusAlreadyExist) return;
+		// 	QmiGlobal.isOnfocusAlreadyExist = true;
+
+		// 	alert("shit");
+		// };
+
+
+		// // 測試環境 選擇server
+		// QmiGlobal.module.serverSelector.showCurrUrl();
+	},
+
 	getObjectFirstItem: function(obj,last) {
 		if(last === true){
 			return obj[Object.keys(obj)[Object.keys(obj).length-1]];
@@ -391,6 +404,8 @@ window.QmiGlobal = {
 	    }
 	}()
 };
+
+
 
 // polling異常監控
 window.QmiPollingChk = {
@@ -1497,8 +1512,22 @@ QmiGlobal.eventDispatcher = {
 QmiGlobal.module.serverSelector = {
 	id: "view-server-selector",
 
+	showCurrUrl: function() {
+		if($.lStorage("_selectedServerUrl") === false || $.lStorage("_selectedServerUrl") === default_url) return;
+		base_url = $.lStorage("_selectedServerUrl");
+		
+		if($("#module-server-selector-url").length === 0) $("body").append(QmiGlobal.module.serverSelector.urlHtml());		
+		$("#module-server-selector-url").html(base_url);
+
+		// 更改網址 清db
+		if($.lStorage("_lastBaseUrl") !== false && $.lStorage("_lastBaseUrl") !== base_url) resetDB();
+		$.lStorage("_lastBaseUrl", base_url);
+	},
+
 	init: function() {
 		var self = this;
+
+
 
 		if($("#module-server-selector").length !== 0) $("#module-server-selector").remove();
 		$("body").append(self.html())
@@ -1712,4 +1741,3 @@ function setDebug(isDebug) {
     }
   }
 }
-
