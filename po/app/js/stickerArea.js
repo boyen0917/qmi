@@ -111,13 +111,17 @@ var initStickerArea= {
 	    		var cataBtn = $("<div class='cata'></div>");
 	    		// var imgPath = thisTmp.path+key+"/{0}.png";
 	    		var img = $("<img/>");
-	    		img.attr("src", obj.l );
-	    		cataBtn.append(img);
-	    		cataBtn.data("type", key );
-	    		catagory.append(cataBtn);
 
-	    		// var localObj = thisTmp.dict[key];
-	    		thisTmp.showImg(dom, key, obj );
+	    		if (obj.hasOwnProperty("list")) {
+	    			img.attr("src", obj.l );
+		    		cataBtn.append(img);
+		    		cataBtn.data("type", key );
+		    		catagory.append(cataBtn);
+
+		    		// var localObj = thisTmp.dict[key];
+		    		thisTmp.showImg(dom, key, obj );
+	    		}
+	    		
 	    	}
 
 	    	catagory.append(stickerSetDom);
@@ -131,17 +135,14 @@ var initStickerArea= {
 	    			stickerData = $.lStorage("_sticker")[type].list;
 	    		}
 
-	    		if (stickerData.length > 8) {
+	    		if (Array.isArray(stickerData) && stickerData.length > 8) {
 	    			$(dom).find(".imgArea .left").show();
 	    			$(dom).find(".imgArea .right").show();
 	    		} else {
 	    			$(dom).find(".imgArea .left").hide();
 	    			$(dom).find(".imgArea .right").hide();
 	    		}
-	    		// else {
-	    		// 	$(dom).find(".imgArea .left").hide();
-	    		// 	$(dom).find(".imgArea .right").hide();
-	    		// }
+	    		
 	    		cns.debug( type );
 	    		$(dom).find(".mid").data("type", type);
 

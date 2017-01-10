@@ -434,7 +434,9 @@ function StickerPackage (data) {
 					"<button></button>" +
 				"</div>");
 
-	if (typeof(selfSticker) == "object" && selfSticker.hasOwnProperty(data.spi)) {
+	if (typeof(selfSticker) == "object" 
+		&& selfSticker.hasOwnProperty(data.spi)
+		&& selfSticker[data.spi].list) {
 		this.html.addClass("download-done");
 		this.html.find("button").attr("class", "download-done");
 	} else {
