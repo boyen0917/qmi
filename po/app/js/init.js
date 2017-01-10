@@ -1436,20 +1436,6 @@ QmiGlobal.eventDispatcher = {
 	}
 }
 
-
-
-// 選擇server
-$(document).on("click", "#container_version", function() {
-	var cnts = 0;
-	return function() {
-		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
-		cnts++;
-		if(cnts < 5) return;
-		var promt = prompt('輸入密碼');
-		if( promt === "86136982") QmiGlobal.module.serverSelector.init();
-		else return;
-}}());
-
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){
 	var hash = window.location.hash;
