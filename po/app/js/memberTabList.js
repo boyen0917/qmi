@@ -116,11 +116,13 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
             var userData = $.userStorage();
             var guAll = userData[gi].guAll;
             var bl = userData[gi].bl;
+            var myID = userData[gi].me;
+            console.log(myID)
             for(var i=0;i<data.ml.length; i++ ){
                 var gu = data.ml[i].gu;
                 var rt = data.ml[i].rt;
                 if( !gu ) continue;
-                if( !guAll.hasOwnProperty(gu) ) continue;
+                if( !guAll.hasOwnProperty(gu) || gu === myID) continue;
                 var mem = guAll[gu];
                 var this_obj = $(
                     '<div class="obj-cell mem" data-gu="'+gu+'">' +
