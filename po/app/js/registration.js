@@ -406,8 +406,8 @@ onCheckVersionDone = function(needUpdate){
         	var group_list = [];
 
         	if(rspData.isSuccess === false) {
-        		deferred.resolve(rspData)
-        		return;
+        		deferred.resolve(rspData);
+        		return deferred.promise();
         	}
 
         	var groupList = rspData.gl;
