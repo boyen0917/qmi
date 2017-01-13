@@ -366,7 +366,6 @@ $(function(){
             //如果tp為c,d開頭為官方團體
             var tp = groupData.tp.toLowerCase();
             groupData.isOfficial = ( tp.indexOf('c')==0 || tp.indexOf('d')==0 );
-            
             //如果非admin, 沒有聊天室的話隨便找個admin預建聊天室
             if( groupData.isOfficial && groupData.ad!=1 ){
                 updateChatList(thisGi, function(){

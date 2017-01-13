@@ -330,7 +330,6 @@ timelineChangeGroup = function (thisGi) {
 
     } else {
         $("#page-group-main .gm-header-right").show();
-
         timelineDom
         .find(".refresh-lock").hide().end()
         .find(".gm-header-right").show().end()
