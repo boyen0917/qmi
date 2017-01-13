@@ -13,10 +13,12 @@ $(function(){
 	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi");
+		if ($("#page-group-main").data("main-gu")) feed_type = "main";
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
 		if (feed_type != "main") {
 			feed_type = ("0" + feed_type).slice(-2) || "00";
 		}
+		console.log(feed_type)
 		// var feed_type = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
 		//判斷沒資料的元件存在時 就不動作
@@ -390,10 +392,16 @@ $(function(){
 		// var img_dir = "images/timeline/timeline_tab_icon_";
 		// var subareas = $(".st-navi-area [data-st-navi-group=navi]");
 		var this_subarea = $(this);
+		var mainPage = $("#page-group-main");
 		// subareas.find("div").removeClass("color-white");
-
 		//將選項存入
-		$("#page-group-main").data("navi",this_subarea.data("tp"));
+		mainPage.data("navi",this_subarea.data("tp"));
+
+		if (mainPage.data("main-gu")) {
+			mainPage.find(".feed-subarea[data-feed=main]").html("");
+			mainPage.find(".st-feedbox-area-bottom > img").show();
+            mainPage.find(".st-feedbox-area-bottom > div").hide();
+		}
 
 		// var event_tp = $("#page-group-main").data("navi") || "00";
 
@@ -465,9 +473,10 @@ $(function(){
 		// });
 
 		var filter_status = $(this).data("status");
-
+		console.log(filter_status);
+		console.log($(this).data("navi"))
 		//過濾發文類型
-		if(filter_status == "navi" || filter_status == "all"){
+		if(filter_status == "navi" || filter_status == "all") {
         	navi_area.filter("[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	// return false;
 		} else {

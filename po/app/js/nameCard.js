@@ -847,7 +847,7 @@
 	            groupMainDom.find(".st-feedbox-area div[data-feed=main]").html("");
 	            groupMainDom.find(".st-feedbox-area").show();
 	            groupMainDom.find(".feed-subarea").hide();
-	            groupMainDom.find(".st-filter-area").data("filter","all").hide();
+	            // groupMainDom.find(".st-filter-area").data("filter","all");
 	            
 	            groupMainDom
 	            .data("main-gu",this_gu)

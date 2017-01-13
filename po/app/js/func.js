@@ -5112,6 +5112,7 @@ permissionControl = function(group_list){
 //動態消息列表
 //先從資料庫拉資料 另外也同時從server拉資料存資料庫 再重寫
 idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
+    console.log("why")
     var 
     polling_arr = polling_arr || [],
     this_gi = polling_arr[0] || gi,
@@ -5132,7 +5133,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
     }
 
     if(main_gu){
-        event_tp = "00";
+        // event_tp = "00";
         if(api_name.match(/\?/)){
             api_name = api_name + "&gu=" + main_gu;
         }else{
@@ -5197,6 +5198,23 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
             }
 
             if(main_gu){
+
+                //資料個數少於這個數量 表示沒東西了
+                if(timeline_list.length < 10){
+                    //沒資料的確認 加入no data 
+                    $(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
+                    //關閉timeline loading 開啟沒資料圖示
+                    setTimeout(function(){
+                        $(".st-feedbox-area-bottom > img").hide();
+                        $(".st-feedbox-area-bottom > div").show();
+                    },2000);
+                }
+                // else{
+                //     //開啟timeline loading 關閉沒資料圖示 下拉更新除外
+                //     $(".st-feedbox-area-bottom > img").show();
+                //     $(".st-feedbox-area-bottom > div").hide();
+                // }
+
                 $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
                     timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
 
@@ -5207,7 +5225,6 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
                     });
                 });
             } else {
-
             // 移除idb
             // idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
                 $(".st-filter-area").removeClass("st-filter-lock");
@@ -5229,6 +5246,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
                 // }
 
                 if(polling_arr.length == 0){
+
                     //資料個數少於這個數量 表示沒東西了
                     if(timeline_list.length < 10){
                         //沒資料的確認 加入no data 
@@ -5329,7 +5347,6 @@ idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr,callback){
 timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi){
     if(!detail){
         var event_tp = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
-
         if($("#page-group-main").data("main-gu")){
             var tmp = ".feed-subarea[data-feed=main]";
             var ori_selector = $(".feed-subarea[data-feed=main]");
@@ -5625,12 +5642,13 @@ timelineListWrite = function (ct_timer,is_top){
     // $(".st-filter-area").addClass("st-filter-lock");
     //判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
     if(!ct_timer && !is_top){
-        var event_tp = $("#page-group-main").data("navi") || "00";
+        var event_tp = "0" + $("#page-group-main").data("navi") || "00";
         var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
         //隱藏其他類別
         $(".feed-subarea").hide();
-        selector.show();
+
+        if (!$("#page-group-main").data("main-gu")) selector.show();
         //load_chk 避免沒資料的
         selector.append("<p class='load-chk'></p>");
     }
