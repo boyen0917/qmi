@@ -36,12 +36,6 @@ var base_url = function() {
 
 var base_url = "https://qmi17.mitake.com.tw/";
 
-
-$(document).ready(function() {
-	try { QmiGlobal.init(); } 
-	catch(e) { cns.log("QmiGlobal.init error") }
-})
-
 var userLang = navigator.language || navigator.userLanguage;
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
 
@@ -239,8 +233,12 @@ var timeline_detail_exception = [
 window.QmiGlobal = {
 	// document ready below
 	initReady: function() {
+		//設定語言, 還沒登入先用瀏覽器的語言設定
+		updateLanguage(lang);
+
 		// App update version onfocus
-		appOnFocusEvent();
+		QmiGlobal.module.appVersion.init();
+		
 	},
 
 	// 之後取代 ui, at, gi, ... etc
@@ -265,20 +263,14 @@ window.QmiGlobal = {
 	auth: {},
 	me: {},
 
+	//version
+	appVer: null,
+
 	// after document ready
 	init: function() { 
 		//設定語言, 還沒登入先用瀏覽器的語言設定
 		updateLanguage(lang);
 		onCheckVersionDone();
-
-		// window.onfocus = function() {
-		// 	console.log("ggg");
-		// 	if(QmiGlobal.isOnfocusAlreadyExist) return;
-		// 	QmiGlobal.isOnfocusAlreadyExist = true;
-
-		// 	alert("shit");
-		// };
-
 
 		// // 測試環境 選擇server
 		// QmiGlobal.module.serverSelector.showCurrUrl();
@@ -1033,16 +1025,6 @@ MyDeferred = function() {
   myPromise.reject = myReject;
   return myPromise;
 }
-
-function appOnFocusEvent() {try {
-	var appGUI = require('nw.gui');
-	var appWindow = appGUI.Window.get();
-
-	appWindow.on("focus", function() {
-		QmiGlobal.module.appVesion.init();
-	});
-
-} catch(e) {errorReport(e);}}
 
 
 

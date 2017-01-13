@@ -482,19 +482,20 @@ input.setting-birth-hidden {
 	display: none;
 }
 .version_update_lock div, .container_update_lock a{
-	width: 300px;
-	height: 50px;
-	opacity: 1;
-	margin-right: auto;
-	margin-left: auto;
-	margin-top: -webkit-calc( 50vh - 50px );
-	text-align: center;
-	line-height: 50px;
-	background: rgba(255,255,255,0.8);
-	border-radius: 15px;
-	display: block;
-	text-decoration: none;
-	color: black;
+    width: 300px;
+    height: 50px;
+    opacity: 1;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: -webkit-calc( 50vh - 50px );
+    text-align: center;
+    line-height: 53px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 5px;
+    display: block;
+    text-decoration: none;
+    color: #5c5c5c;
+    font-size: 14px;
 }
 .container_update_lock a{
 	background: rgb(255,255,255);

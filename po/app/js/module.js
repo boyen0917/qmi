@@ -406,50 +406,79 @@ QmiGlobal.module.systemPopup = {
 }
 
 
-QmiGlobal.module.appVesion = {
-	init: function() {
+QmiGlobal.module.appVersion = {
 
+	init: function() {
+		var self = this;
+		self.isFirstInit = !QmiGlobal.appVer;
+
+		self.chk().done(function(rspData) {
+			self.appOnFocusEvent();
+
+    		var rspObj = $.parseJSON(rspData.responseText);
+    		console.log("rspObj", rspObj);
+
+    		QmiGlobal.appVer = rspObj.av;
+
+    		if(self.isFirstInit) {
+    			console.log("first~");
+    			return;
+    		}
+
+    		switch(rspObj.ut) {
+    			case 0: // 手動更新
+    				self.updateOptional();
+    				break;
+    			case 1: // 強制更新
+    				self.updateOptional();
+    				break; // 不用更新
+    			case 2:
+    				break;
+    		}
+
+			    	// if( g_currentVersion != rspObj.av && typeof(require)!="undefined" ){
+					// QmiGlobal.appVer = rspObj.av;
+		   //  		$.lStorage("_ver",{ver:g_currentVersion});
+		   //  		$(".version_update_lock").fadeIn();
+
+		   //  		setTimeout( function(){
+		   //  			if( false==clearCache() ){
+		   //  				//if error clear cache
+		   //  				$(".version_update_lock").hide();
+		   //  			}
+		   //  		}, 1000 );
+
+		}).fail(function(rspData) {
+			console.log("err", rspData);
+		});
 	},
 
 	chk: function() {
-		new QmiAjax({
-    		apiName: "sys/version?",
+		return (new QmiAjax({
+    		apiName: "sys/version",
     		isPublic: true,
     		noAuth: true,
     		specifiedHeaders: {
     			os: 2,
 				tp: 0,
-				av: g_currentVersion,
+				av: QmiGlobal.appVer || "1.0.0",
 				li: lang
 			},
     		method: "get",
     		errHide: true
-    	}).complete(function(data){
-        	if(data.status == 200){
-        		var getS3_result =$.parseJSON(data.responseText);
+    	}))
+	},
 
-		    	if( g_currentVersion != getS3_result.av && typeof(require)!="undefined" ){
-    				g_currentVersion = getS3_result.av;
-		    		cns.debug("update ver to ", g_currentVersion);
-		    		$.lStorage("_ver",{ver:g_currentVersion});
-		    		$(".version_update_lock").fadeIn();
-		    		onDone(true);
-		    		setTimeout( function(){
-		    			if( false==clearCache() ){
-		    				//if error clear cache
-		    				$(".version_update_lock").hide();
-		    			}
-		    		}, 1000 );
-		    	} else {
-		    		onDone(false);
-		    		cns.debug("latest ver", g_currentVersion, getS3_result.av);
-		    	}
-        	} else {
-				cns.debug("fail to get version");
-				onDone(false);
-			}
-        });
-	}
+	appOnFocusEvent: function() {try {
+		var appGUI = require('nw.gui');
+		var appWindow = appGUI.Window.get();
+
+		appWindow.on("focus", function() {
+			console.log("shit");
+			// QmiGlobal.module.appVesion.init();
+		});
+
+	} catch(e) {errorReport(e);}}
 }
 
 

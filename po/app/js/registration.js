@@ -387,8 +387,6 @@ onCheckVersionDone = function(needUpdate){
 	//初始化 
     function loginAction (){
 
-    	QmiGlobal.appVersionControler.init();
-
     	//儲存登入資料 跳轉到timeline
     	if ($.lStorage("_loginData") !== false && QmiGlobal.isAppReload !== true) QmiGlobal.auth = $.lStorage("_loginData");
         
