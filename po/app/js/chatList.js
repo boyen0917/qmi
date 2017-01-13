@@ -152,7 +152,6 @@ function getChatListApi(giTmp) {
 }
 
 function updateChatList( giTmp, extraCallBack ){
-	
 	if(QmiGlobal.groups[giTmp] === undefined )	return;
 
 	//取得聊天室列表api
@@ -173,7 +172,6 @@ function updateChatList( giTmp, extraCallBack ){
 		else {
 			chatListDom.find("rows").hide().end()
 			.find(".coachmake").fadeIn();
-
 			$("#page-group-main .subpage-chatList").show();
 		}
 			

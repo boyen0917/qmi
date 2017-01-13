@@ -1719,6 +1719,7 @@ img.auo {
     overflow-y: scroll;
     position: relative;
     width: calc(100vw - 250px);
+    z-index: 2;
 }
 
 
