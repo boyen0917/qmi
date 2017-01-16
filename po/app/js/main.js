@@ -10,7 +10,7 @@ $(function(){
 	});
 
 
-	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
+	$("#page-group-main .subpage-timeline.main-subpage").bind('scroll', function(){
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi");
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
