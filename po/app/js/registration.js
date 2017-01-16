@@ -404,7 +404,7 @@ onCheckVersionDone = function(needUpdate){
 
         	if(rspData.isSuccess === false) {
         		deferred.resolve(rspData)
-        		return;
+        		return deferred.promise();
         	}
 
         	var groupList = rspData.gl;
