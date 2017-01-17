@@ -1894,21 +1894,6 @@ function sendInviteAPI( this_gi, list, callback ){
 
 	//private cloud, add uui & uat
 	var url;
-	try{
-		if( this_gi.indexOf(_pri_split_chat)==0 ){
-			var parse = parsePrivateGi(this_gi);
-			var pri_cloud = $.lStorage("_pri_group")[parse.ci];
-			headers.uui = ui;
-			headers.uat = at;
-			headers.ui = pri_cloud.ui;
-			headers.at = pri_cloud.at;
-			url = pri_cloud.cl;
-			api_name = "groups/" + parse.gi + "/invitations";
-		}
-	} catch(e){
-		errorReport(e);
-	}
-
 	var body = { "ul":list };
 	var method = "post";
 	var result = ajaxDo(api_name,headers,method,false, body, null, null, url);
