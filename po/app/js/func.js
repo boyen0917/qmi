@@ -7966,39 +7966,49 @@ polling = function(){
 
 combineCloudPolling = function(newPollingData){
     var combineDeferred = $.Deferred(),
-        localPollingData = $.lStorage("_pollingData"),
         companyPollingDefArr = [];
     
-    // 私雲時間存local
-    if(localPollingData.clTs === undefined) localPollingData.clTs = {};
-
     // 先將私雲polling加進來
-    newPollingData.cmds.filter(function(item){
+    var newCmdsArr = newPollingData.cmds.filter(function(item){
         // 有存過的ci 才去取polling
         return  (item.tp === 51 && QmiGlobal.companies.hasOwnProperty(item.pm.ci) === true);
-    }).forEach(function(item){
+    })
+
+    // 加入需要重打的polling ; reDoCompanyPollingMap存有要重打的私雲資訊 
+    // 把他轉成array再加入不重複的新的polling 51
+    Object.keys(QmiGlobal.reDoCompanyPollingMap).map(function(thisCi) {
+        return QmiGlobal.reDoCompanyPollingMap[thisCi];
+    }).concat(newCmdsArr.reduce(function(arr, cmdObj) {
+        if(!QmiGlobal.reDoCompanyPollingMap[cmdObj.pm.ci]) arr.push(cmdObj)
+        return arr;
+    }, [])).forEach(function(item){
 
         // 設定這個私雲的pollingTime
-
-        // localPollingData.clTs[item.pm.ci]不使用變數取代 才能直接存取 
-        // 各個cloud的polling時間預設值 存到物件中
-        if(localPollingData.clTs[item.pm.ci] === undefined || localPollingData.clTs[item.pm.ci].pollingTime === undefined) {
-            localPollingData.clTs[item.pm.ci] = {
-                pollingTime: newPollingData.publicPollingTime
-            }
-        }
-
         var companyPollingDef = $.Deferred();
         new QmiAjax({
-            apiName: "sys/polling?pt=" + localPollingData.clTs[item.pm.ci].pollingTime,
+            apiName: "sys/polling?pt=" + item.pm.pt,
             ci: item.pm.ci
         }).success(function(data){
+            
             companyPollingDef.resolve({
                 ci: item.pm.ci,
                 data: data,
                 isSuccess: true
             });
+
+            // 成功而且時間不再前進 就清除pollingTime
+            var reDoObj = QmiGlobal.reDoCompanyPollingMap[item.pm.ci];
+            if(reDoObj && reDoObj.pm.pt === data.ts.pt)
+                delete QmiGlobal.reDoCompanyPollingMap[item.pm.ci];
+            else {
+                item.pm.pt = data.ts.pt;
+                QmiGlobal.reDoCompanyPollingMap[item.pm.ci] = item;
+            }
+
         }).error(function(data){
+            // 失敗就存起來下次繼續打
+            QmiGlobal.reDoCompanyPollingMap[item.pm.ci] = item;
+
             companyPollingDef.resolve({
                 ci: item.pm.ci,
                 data: data,
@@ -8013,11 +8023,7 @@ combineCloudPolling = function(newPollingData){
         Array.prototype.forEach.call(arguments,function(item){
             if(item.isSuccess === false) return;
 
-            // localPollingData -> 存好每個私雲的時間預設值
-
             var apiData = item.data;
-            // 存polling time
-            localPollingData.clTs[item.ci].pollingTime = apiData.ts.pt;
 
             // 把私雲的這些項目加到公雲 統一處理
             ["cnts", "cmds", "msgs", "ccs"].forEach(function(key){
@@ -8028,7 +8034,6 @@ combineCloudPolling = function(newPollingData){
         })
         // 每個私雲的polling時間都更新完成 return 物件
         combineDeferred.resolve({
-            localPollingData: localPollingData,
             newPollingData: newPollingData
         });
     })
@@ -8227,6 +8232,7 @@ pollingCmds = function(newPollingData){
             var isShowNotification = true;
             var newGroupArr = [];
             var cmdEachDefArr = [];
+            var isDoUpdateAlert = false;
 
             if(pollingDataTmp) currentPollingCt = pollingDataTmp.ts.pt;
 
@@ -8253,7 +8259,13 @@ pollingCmds = function(newPollingData){
                             polling_arr = false;
                             idbPutTimelineEvent("",false,polling_arr);
                         }
-                        updateAlert();
+
+                        // 做一次
+                        if(isDoUpdateAlert === false) {
+                            isDoUpdateAlert = true;    
+                            updateAlert();
+                        }
+                        
                         break;
                     case 3://invite
                         if( $("#page-group-menu").is(":visible") && false==$("#page-group-main").is(":visible"))
@@ -8512,9 +8524,13 @@ pollingCmds = function(newPollingData){
 
         // cmds 分組 需要取最後一個 其餘捨棄
         var cmdsClassifyArr = [
-            {tp: [53, 56], tempObj: {}, idFlag: "ci"}, // company加入退出 並根據ci分類
-            {tp: [57], tempObj: {}, idFlag: "ci"} // company更改驗證tp 並根據ci分類
-        ];
+            {tp: [4, 6],    idFlag: "gu"}, // 加入、退出成員 同一gu取最後一個
+            {tp: [53, 56],  idFlag: "ci"}, // company加入退出 並根據ci分類
+            {tp: [57],      idFlag: "ci"} // company更改驗證tp 並根據ci分類
+        ].map(function(item) {
+                item.tempObj = {}; // 預設存儲物件
+                return item;
+        });
 
         newPollingData.cmds = newPollingData.cmds.reduce(function(arr, item) {
             item.pm = item.pm || {};
@@ -8529,7 +8545,7 @@ pollingCmds = function(newPollingData){
                 ccObj.tp.forEach(function(cctp) {
                     if(item.tp !== cctp) return;
                     passFlag = false; // 把存在cmdsClassifyArr的所有tp先挑除
-
+                    
                     // 需要根據id再分類
                     var key = "only";
                     if(item.pm[ccObj.idFlag]) key = ccObj.idFlag;

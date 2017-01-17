@@ -224,50 +224,42 @@ $(function(){
 
     updateTab = function(thisGi){
         var groupData = QmiGlobal.groups[thisGi];
-        // try{
-            var tabHtml = '<div class="sm-small-area"><div class="sm-small-area-r"></div></div>';
+        var tabHtml = '<div class="sm-small-area"><div class="sm-small-area-r"></div></div>';
 
-            //set tabs
-            var menu = $(".header-menu").html("");
-            menu.parent().hide();
+        //set tabs
+        var menu = $(".header-menu").html("");
+        menu.parent().hide();
 
-            var setObj = groupData.ntp === 2 ? {
-                tab: [{sw: true, tp: 2}]
-            } : groupData.set;
+        var setObj = groupData.ntp === 2 ? {
+            tab: [{sw: true, tp: 2}]
+        } : groupData.set;
+        
+        for( i=0; i<setObj.tab.length; i++ ){
+            var tabObj = setObj.tab[i];
+            //switch off
+            if( tabObj.sw === false || typeof initTabMap[tabObj.tp] === "undefined") continue;
             
-            for( i=0; i<setObj.tab.length; i++ ){
-                var tabObj = setObj.tab[i];
-                //switch off
-                if( tabObj.sw === false || typeof initTabMap[tabObj.tp] === "undefined") continue;
-                
-                var tabDom = $(tabHtml);
-                tabDom.attr("data-sm-act",initTabMap[tabObj.tp].act);
-                //tab 對照表 init.js
-                //initTabMap
-                if(initTabMap[tabObj.tp].hasOwnProperty("class")){
-                    for(j=0;j<initTabMap[tabObj.tp].class.length;j++){
-                        tabDom.addClass(initTabMap[tabObj.tp].class[j]);    
-                    }
-                    tabDom.attr("data-polling-cnt",initTabMap[tabObj.tp].pollingType)
-                    .append('<div class="sm-count" style="display:none;"></div>');
+            var tabDom = $(tabHtml);
+            tabDom.attr("data-sm-act",initTabMap[tabObj.tp].act);
+            //tab 對照表 init.js
+            //initTabMap
+            if(initTabMap[tabObj.tp].hasOwnProperty("class")){
+                for(j=0;j<initTabMap[tabObj.tp].class.length;j++){
+                    tabDom.addClass(initTabMap[tabObj.tp].class[j]);    
                 }
-                menu.append( tabDom );
-
-                //set name
-                var nameDom = tabDom.find(".sm-small-area-r");
-                if( tabObj.nm && tabObj.nm.length>0 ){
-                    nameDom.html( tabObj.nm );
-                } else {
-                    nameDom.html( $.i18n.getString(initTabMap[tabObj.tp].textId) );
-                }
+                tabDom.attr("data-polling-cnt",initTabMap[tabObj.tp].pollingType)
+                .append('<div class="sm-count" style="display:none;"></div>');
             }
+            menu.append( tabDom );
 
-            // if (groupData.ntp === 2) {
-            //     menu.hide();
-            // }
-        // } catch(e){
-        //     errorReport(e);
-        // }
+            //set name
+            var nameDom = tabDom.find(".sm-small-area-r");
+            if( tabObj.nm && tabObj.nm.length>0 ){
+                nameDom.html( tabObj.nm );
+            } else {
+                nameDom.html( $.i18n.getString(initTabMap[tabObj.tp].textId) );
+            }
+        }
 
         //檢查團體設定裡有沒有開放的設定, 都沒有隱藏設定tab
         if( false==initGroupSetting(thisGi) ){
@@ -284,7 +276,7 @@ $(function(){
             for( var i in groupData.set.pen ){
                 var penObj = groupData.set.pen[i];
                 //switch關閉或是init沒設定這個tp 就跳過
-                if(penObj.switch === false || typeof initPenMap[penObj.tp] === "undefined") continue;
+                if(penObj.sw === false || typeof initPenMap[penObj.tp] === "undefined") continue;
                 var penDom = $(penHtml);
 
                 if(penObj.tp == 5) isPostData = true;

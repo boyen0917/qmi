@@ -248,7 +248,7 @@ window.QmiGlobal = {
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
-	// 聊天室 auth
+	reDoCompanyPollingMap: {}, // 需要重打的私雲polling資訊 {ci:xx, pt:xx}, ...
 	auth: {},
 	me: {},
 	getObjectFirstItem: function(obj,last) {
