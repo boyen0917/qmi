@@ -8232,6 +8232,7 @@ pollingCmds = function(newPollingData){
             var isShowNotification = true;
             var newGroupArr = [];
             var cmdEachDefArr = [];
+            var isDoUpdateAlert = false;
 
             if(pollingDataTmp) currentPollingCt = pollingDataTmp.ts.pt;
 
@@ -8258,7 +8259,13 @@ pollingCmds = function(newPollingData){
                             polling_arr = false;
                             idbPutTimelineEvent("",false,polling_arr);
                         }
-                        updateAlert();
+
+                        // 做一次
+                        if(isDoUpdateAlert === false) {
+                            isDoUpdateAlert = true;    
+                            updateAlert();
+                        }
+                        
                         break;
                     case 3://invite
                         if( $("#page-group-menu").is(":visible") && false==$("#page-group-main").is(":visible"))
@@ -8517,9 +8524,13 @@ pollingCmds = function(newPollingData){
 
         // cmds 分組 需要取最後一個 其餘捨棄
         var cmdsClassifyArr = [
-            {tp: [53, 56], tempObj: {}, idFlag: "ci"}, // company加入退出 並根據ci分類
-            {tp: [57], tempObj: {}, idFlag: "ci"} // company更改驗證tp 並根據ci分類
-        ];
+            {tp: [4, 6],    idFlag: "gu"}, // 加入、退出成員 同一gu取最後一個
+            {tp: [53, 56],  idFlag: "ci"}, // company加入退出 並根據ci分類
+            {tp: [57],      idFlag: "ci"} // company更改驗證tp 並根據ci分類
+        ].map(function(item) {
+                item.tempObj = {}; // 預設存儲物件
+                return item;
+        });
 
         newPollingData.cmds = newPollingData.cmds.reduce(function(arr, item) {
             item.pm = item.pm || {};
@@ -8534,7 +8545,7 @@ pollingCmds = function(newPollingData){
                 ccObj.tp.forEach(function(cctp) {
                     if(item.tp !== cctp) return;
                     passFlag = false; // 把存在cmdsClassifyArr的所有tp先挑除
-
+                    
                     // 需要根據id再分類
                     var key = "only";
                     if(item.pm[ccObj.idFlag]) key = ccObj.idFlag;
