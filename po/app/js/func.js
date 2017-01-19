@@ -443,6 +443,7 @@ timelineSwitch = function (act,reset,main,noPR){
     var gmConHeader = $(".gm-content-header");
     gmConHeader.hide();
     
+    console.log(act);
     switch (act) {
         case "feeds":
             var filterAction = $(".st-filter-action");
@@ -450,6 +451,7 @@ timelineSwitch = function (act,reset,main,noPR){
             filterAction.filter("[data-navi='announcement']").show();
             filterAction.filter("[data-navi='feedback']").show();
             filterAction.filter("[data-navi='task']").show();
+            filterAction.filter("[data-navi='personal-info']").hide();
             $(".subpage-addressBook").hide();
 
             //顯示新增貼文按鈕
@@ -653,6 +655,7 @@ timelineSwitch = function (act,reset,main,noPR){
             $(".st-navi-area").data("currentHome", "feed-public");
             $(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active");
             $(".st-filter-action[data-status='all']").hide();
+            $(".st-filter-action[data-navi='personal-info']").hide();
             $(".st-filter-action[data-navi='announcement']").show();
             $(".st-filter-action[data-navi='feedback']").show();
             $(".st-filter-action[data-navi='task']").show();
@@ -5111,7 +5114,7 @@ permissionControl = function(group_list){
 //動態消息列表
 //先從資料庫拉資料 另外也同時從server拉資料存資料庫 再重寫
 idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
-    console.log("why")
+    console.log("ffefefe");
     var 
     polling_arr = polling_arr || [],
     this_gi = polling_arr[0] || gi,
@@ -5346,6 +5349,7 @@ idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr,callback){
 timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi){
     if(!detail){
         var event_tp = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
+        console.log(event_tp);
         if($("#page-group-main").data("main-gu")){
             var tmp = ".feed-subarea[data-feed=main]";
             var ori_selector = $(".feed-subarea[data-feed=main]");
@@ -5635,7 +5639,6 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
 }
 
 timelineListWrite = function (ct_timer,is_top){
-
     var deferred = $.Deferred();
 
     // $(".st-filter-area").addClass("st-filter-lock");

@@ -394,7 +394,7 @@
 	                if(isMe) meInfoShow(user_data);
 
 	                userInfoDataShow(this_gi,this_info,user_data,(1==_groupList[this_gi].ad) );
-	                userInfoEvent(this_info);
+	                userInfoEvent(this_info, user_data);
 	            }else{
 	                this_info.data("avatar-chk",false);
 	                $(".screen-lock").fadeOut("fast");
@@ -577,7 +577,7 @@
 	            }
 	        });
 
-	        userInfoEvent(this_info,true);
+	        userInfoEvent(this_info, user_data, true);
 
 	        // this_info.data("avatar-chk",false);
 	        // $(".screen-lock").fadeOut("fast");
@@ -587,11 +587,10 @@
 	    });
 	}
 
-	userInfoEvent = function(this_info,me){
+	userInfoEvent = function(thisInfo, userData, me){
+	    thisInfo.unbind();
 	    
-	    this_info.unbind();
-	    
-	    this_info.find(".user-avatar").click(function(){
+	    thisInfo.find(".user-avatar").click(function(){
 	        var this_src = $(this).find(".user-pic").attr("src");
 	        if(!this_src) return false;
 
@@ -627,14 +626,14 @@
 	    }); 
 
 
-	    this_info.find(".user-avatar-bar:not(.me)").click(function(e){
+	    thisInfo.find(".user-avatar-bar:not(.me)").click(function(e){
 	        e.stopPropagation();
 	    });
 
 	    if(me){
 
-	        this_info.find(".user-avatar.me").click(function(){
-	            this_info.find(".user-avatar-upload").trigger("click");
+	        thisInfo.find(".user-avatar.me").click(function(){
+	            thisInfo.find(".user-avatar-upload").trigger("click");
 	        });
 
 	        // this_info.find(".user-avatar-bar.me .upload").click(function(){
@@ -642,7 +641,7 @@
 	        // });
 
 	        //檔案上傳
-	        this_info.find(".user-avatar-upload").change(function() {
+	        thisInfo.find(".user-avatar-upload").change(function() {
 	            var imageType = /image.*/;
 	            var file = $(this)[0].files[0];
 	            if( !file ) return;
@@ -710,16 +709,16 @@
 	        });
 	        
 	        //資料開放設定
-	        this_info.find(".me-info-status").click(function(){
+	        thisInfo.find(".me-info-status").click(function(){
 	            $(this).parent().siblings(".me-info-status-switch").toggle();
 	        });
-	        this_info.find(".me-info-status-switch div").click(function(){
+	        thisInfo.find(".me-info-status-switch div").click(function(){
 	            var isPrivate = $(this).data("type")=="private";
 	            var parentDom = $(this).parent();
 	            var type = parentDom.data("type");
 
-	            var input = this_info.find(".user-info-list ."+type);
-	            var statusText = this_info.find(".me-info-status."+type+" .status-text")
+	            var input = thisInfo.find(".user-info-list ."+type);
+	            var statusText = thisInfo.find(".me-info-status."+type+" .status-text")
 
 	            var oriIsPrivate = statusText.data("val");
 	            cns.debug(isPrivate, oriIsPrivate, type);
@@ -732,26 +731,26 @@
 	                    statusText.text( $.i18n.getString("COMMON_PUBLIC") ).data("val", false);
 	                }
 	                //有更動即可按確定
-	                this_info.find(".user-info-submit").addClass("user-info-submit-ready");
+	                thisInfo.find(".user-info-submit").addClass("user-info-submit-ready");
 	            }
 	            
 	            parentDom.hide();
 	        });
 
-	        this_info.find(".user-info-list input").bind("input",function(){
+	        thisInfo.find(".user-info-list input").bind("input",function(){
 	            //有更動即可按確定
-	            this_info.find(".user-info-submit").addClass("user-info-submit-ready");
+	            thisInfo.find(".user-info-submit").addClass("user-info-submit-ready");
 	        });
 
 	        //更改資料 送出
 	        $(document).off("click",".user-info-submit-ready");
 	        $(document).on("click",".user-info-submit-ready",function(){
-	            userInfoSend(this_info);
+	            userInfoSend(thisInfo);
 	            //結束關閉
-	            this_info.find(".user-info-close").trigger("mouseup");
+	            thisInfo.find(".user-info-close").trigger("mouseup");
 	        });
 	    }else{
-	        this_info.find(".action-edit").click(function(){
+	        thisInfo.find(".action-edit").click(function(){
 	            $(".user-info-load-area").addClass("user-info-flip");
 	            $(".user-info-load , .me-info-load").stop().animate({
 	                opacity:0
@@ -773,58 +772,61 @@
 	        });
 
 	        //刪除成員
-	        this_info.find(".user-info-delete").click(function(){
+	        thisInfo.find(".user-info-delete").click(function(){
 	            popupShowAdjust(
 	                $.i18n.getString("USER_PROFILE_DELETE_MEMBER_CONFIRM"),
 	                $.i18n.getString("USER_PROFILE_DELETE_MEMBER_DESC"),
 	                $.i18n.getString("COMMON_OK"),
 	                $.i18n.getString("COMMON_CANCEL"),[function(){
-	                    userInfoDelete(this_info);
+	                    userInfoDelete(thisInfo);
 	            },null]);
 	        });
 	    }
 
 
 	    //click fav
-	    this_info.find(".user-avatar-bar-favorite .fav").mouseup(function(){
+	    thisInfo.find(".user-avatar-bar-favorite .fav").mouseup(function(){
 	        clickUserInfoFavorite( $(this) );
 	    });
 
 	    //個人主頁
-	    this_info.find(".action-main").off("click").click( function(){
+	    thisInfo.find(".action-main").off("click").click( function(){
 	        if(window.mainPageObj !== undefined) {
-	            mainPageObj.userTimeline(this_info.data("this-info-gi"),this_info);
+	            mainPageObj.userTimeline(thisInfo.data("this-info-gi"),thisInfo);
 
 	            return;
 	        }
-	        personalHomePage(this_info);
+	        personalHomePage(thisInfo, userData);
 	        $.mobile.changePage("#page-group-main");
 	        timelineSwitch("feeds",false,true,true);
 	    });
 	}
 	//切換至個人主頁
-	personalHomePage = function(this_info){
+	personalHomePage = function(thisInfo, userData){
+			console.log(userData)
 	        var groupMainDom = $("#page-group-main");
 	        
 	        //滾動至最上
 	        timelineScrollTop();
 
-	        var this_gu = this_info.data("this-info-gu");
-	        var this_gi = this_info.data("this-info-gi");
+	        var this_gu = thisInfo.data("this-info-gu");
+	        var this_gi = thisInfo.data("this-info-gi");
+
 	        var emptyAut = "images/common/others/empty_img_all_l.png";
 	        //結束關閉
-	        this_info.find(".user-info-close").trigger("mouseup");
+	        thisInfo.find(".user-info-close").trigger("mouseup");
 	        //主頁背景
 	        var userDom = groupMainDom.find(".gm-user-main-area");
 	        userDom.fadeIn("fast",function(){
 	            var _thisGroupList = QmiGlobal.groups[this_gi];
-	            userDom.find(".background").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
-	            userDom.find(".name").html(_thisGroupList.guAll[this_gu].nk);
-	            userDom.find(".group .pic").css("background","url(" + _thisGroupList.aut + ")");
-	            userDom.find(".group .name").html(_thisGroupList.gn._escape());
-	            if(!_thisGroupList.aut){
-	                userDom.find(".group .pic").css("background","url(" + emptyAut + ")");
-	            }
+	            userDom.find(".background").css("background","url('images/common/others/timeline_kv1_android.png') no-repeat");
+	            userDom.find(".user h3").html(userData.nk);
+	            userDom.find(".user .pic").attr("src", userData.auo || "images/common/others/empty_img_personal_xl.png");
+	            // userDom.find(".user .pic").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
+	            userDom.find(".user .description").html(userData.sl);
+	            // if(!_thisGroupList.aut){
+	            //     userDom.find(".group .pic").css("background","url(" + emptyAut + ")");
+	            // }
 	        });
 
 	        if($(".alert-area").is(":visible")){
@@ -847,6 +849,7 @@
 	            groupMainDom.find(".st-feedbox-area div[data-feed=main]").html("");
 	            groupMainDom.find(".st-feedbox-area").show();
 	            groupMainDom.find(".feed-subarea").hide();
+	            groupMainDom.find(".st-filter-action").filter("[data-navi='personal-info']").show();
 	            // groupMainDom.find(".st-filter-area").data("filter","all");
 	            
 	            groupMainDom

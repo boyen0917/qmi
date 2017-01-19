@@ -42,6 +42,7 @@
 
 	"FEED_ALL" : "全部",
 	"FEED_MISSION" : "任務",
+	"FEED_PERSONAL" : "個人",
 	"FEED_BULLETIN"			:"公告",
 	"FEED_REPORT"			:"通報",
 	"FEED_POST"				:"貼文",

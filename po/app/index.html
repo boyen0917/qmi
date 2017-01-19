@@ -530,11 +530,24 @@
                     <div class="subpage-timeline main-subpage">
                         <div class="gm-user-main-area" style="display:none">
                             <div class="background">
-                                <div class="name"></div>
+                                <!-- <div class="name"></div> -->
                             </div>
-                            <div class="group">
-                                <div class="pic"></div>
-                                <div class="name"></div>
+                            <div class="user">
+                                <div class="header">
+                                    <h3 contenteditable="false"></h3>  
+                                    <div class="edit-status">
+                                        <a data-textid='WEBONLY_SAVE'></a>
+                                        <a data-textid='COMMON_CANCEL'></a>
+                                    </div>
+                                </div>
+                                <div class="user-pic">
+                                    <img class="pic" />
+                                </div>
+                                <div class="description"></div>
+                                <div class="interaction">
+                                    <img src='images/common/icon/qicon_chatroom.png' />
+                                    <img src='images/common/icon/qicon_favorite.png' />
+                                </div>
                             </div>
                         </div>
                         <div class="st-navi-area">
@@ -580,10 +593,16 @@
                                 <img src="images/icon/icon_arrow_right.png"/>
                             </div> -->
                             <div class="st-filter-hide left">&nbsp&nbsp<</div>
+
+                            <div data-status="person" data-navi="personal-info" class="st-filter-action st-filter-list" style="display:none;">
+                                <span data-textid='FEED_PERSONAL'></span>
+                            </div>
                             <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide st-filter-list-active polling-cnt polling-local" data-polling-cnt="B1">
                                 <span data-textid='FEED_ALL'></span>
                                 <div class="sm-count" style="display:none;"></div>
                             </div>
+
+                            
                             <!-- <div class="st-filter-other"> -->
                                 <div data-status="all" data-navi="feed-public" class="st-filter-action st-filter-list" style="display:none;">
                                     <span data-textid='FEED_ALL'></span>
@@ -684,6 +703,9 @@
                         <select id="type-trans">
                             <option value="te-example4"></option>
                         </select>
+                        <div class="st-personal-area">
+                            
+                        </div>
                         <div class="st-feedbox-area">
                             <div class="st-feebox-area-no-content" style="display:none">
                                 <img src="images/coachmake/logo_nomessage.png"/>

@@ -10,7 +10,7 @@ $(function(){
 	});
 
 
-	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
+	$("#page-group-main .subpage-timeline.main-subpage").on('scroll', function(){
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi");
 		if ($("#page-group-main").data("main-gu")) feed_type = "main";
@@ -379,6 +379,7 @@ $(function(){
 	
 	//----------------------------------- timeline ---------------------------------------------  
 	$(".st-navi-subarea").click(function(){
+
 		if( $(".st-filter-area").hasClass("st-filter-lock") ){
 			// cns.debug("-------------");
 			// cns.debug("-------------");
@@ -396,7 +397,7 @@ $(function(){
 		// subareas.find("div").removeClass("color-white");
 		//將選項存入
 		mainPage.data("navi",this_subarea.data("tp"));
-
+		console.log(mainPage.data("main-gu"))
 		if (mainPage.data("main-gu")) {
 			mainPage.find(".feed-subarea[data-feed=main]").html("");
 			mainPage.find(".st-feedbox-area-bottom > img").show();
@@ -479,6 +480,8 @@ $(function(){
 		if(filter_status == "navi" || filter_status == "all") {
         	navi_area.filter("[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	// return false;
+		} else if (filter_status == "person") {
+			$("#page-group-main").find(".st-feedbox-area-bottom").children("img").hide();
 		} else {
 			//檢查目前的首頁是哪頁(動態消息/團體消息/成員消息)
 			var currentHome = $(".st-navi-area").data("currentHome") || "home";
