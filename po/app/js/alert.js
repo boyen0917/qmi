@@ -440,7 +440,6 @@ showAlertContent = function(data){
 					var this_gi = $(this).data("gi");
 					var this_ei = $(this).data("ei");
 					var this_ntp = $(this).data("ntp");
-					
 					var DBKey = this_ei+"_"+this_ntp;
 					idb_alert_events.get(DBKey, function(data){
 						if(!data){

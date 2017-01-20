@@ -814,6 +814,7 @@ $(document).on("pagebeforeshow",function(event,ui){
 
 
 $(document).on("click",".page-back",function(){
+	console.log("page-back");
 
 	if( window.location.href.match(/chat.html/) !== null ) return false;
 
