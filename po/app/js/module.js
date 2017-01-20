@@ -407,12 +407,30 @@ QmiGlobal.module.systemPopup = {
 
 
 QmiGlobal.module.appVersion = {
+	authChk: function(rspData) {
+		var deferred = $.Deferred();
+		switch(rspData.status) {
+			case 200:
+				deferred.resolve(rspData);
+
+				break;
+			case 401:
+				resetDB();
+				window.location = "index.html";
+				break;
+			default:
+				deferred.reject(rspData);
+				break;
+		}
+		return deferred.promise();
+	},
 
 	init: function() {
 		var self = this;
+		var deferred = $.Deferred();
 		self.isFirstInit = !QmiGlobal.appVer;
 
-		self.chk().done(function(rspData) {
+		self.apiSysVersion().done(function(rspData) {
 			self.appOnFocusEvent();
 
     		var rspObj = $.parseJSON(rspData.responseText);
@@ -430,7 +448,7 @@ QmiGlobal.module.appVersion = {
     				self.updateOptional();
     				break;
     			case 1: // 強制更新
-    				self.updateOptional();
+    				self.updateForced();
     				break; // 不用更新
     			case 2:
     				break;
@@ -450,11 +468,15 @@ QmiGlobal.module.appVersion = {
 
 		}).fail(function(rspData) {
 			console.log("err", rspData);
-		});
+		}).always(deferred.resolve);
+
+		return deferred.promise();
 	},
 
-	chk: function() {
-		return (new QmiAjax({
+	apiSysVersion: function() {
+		var self = this;
+		var deferred = $.Deferred();
+		new QmiAjax({
     		apiName: "sys/version",
     		isPublic: true,
     		noAuth: true,
@@ -466,7 +488,10 @@ QmiGlobal.module.appVersion = {
 			},
     		method: "get",
     		errHide: true
-    	}))
+    	}).complete(function(rspData) {
+    		self.authChk(rspData).done(deferred.resolve)
+    	});
+    	return deferred.promise();
 	},
 
 	appOnFocusEvent: function() {try {

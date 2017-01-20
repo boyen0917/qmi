@@ -1,7 +1,5 @@
-onCheckVersionDone = function(needUpdate){
-	if( needUpdate ){
-		return;
-	}
+appInitial = function(needUpdate){
+	if( needUpdate ) return;
 	clearBadgeLabel();
 
 	// 定時重新讀取
@@ -15,32 +13,31 @@ onCheckVersionDone = function(needUpdate){
     } else if($.lStorage("_loginAutoChk") === true) {
 
     	QmiGlobal.auth = $.lStorage("_loginData");
-
+    	loginAction();
+    	
     	// 檢查auth
-    	new QmiAjax({
-			apiName: "me",
-			specifiedHeaders: {
-				ui: QmiGlobal.auth.ui,
-				at: QmiGlobal.auth.at,
-				li: lang
-			},
-			method: "get",
-			errHide: true
-		}).complete(function(data){
-			if(data.status === 401) {
-				resetDB();
-				window.location = "index.html";
-			} else {
-				loginAction();
-			}
-		});
+  //   	new QmiAjax({
+		// 	apiName: "me",
+		// 	specifiedHeaders: {
+		// 		ui: QmiGlobal.auth.ui,
+		// 		at: QmiGlobal.auth.at,
+		// 		li: lang
+		// 	},
+		// 	method: "get",
+		// 	errHide: true
+		// }).complete(function(data){
+		// 	if(data.status === 401) {
+		// 		resetDB();
+		// 		window.location = "index.html";
+		// 	} else {
+		// 		loginAction();
+		// 	}
+		// });
 
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
 		$.mobile.changePage("")
 	}
-	//預設上一頁
-	// $(document).data("page-history",[["#page-group-menu"]]);
 	
 	//首頁大圖
 	$("#page-registration").css("height",$(window).height());
@@ -566,11 +563,6 @@ onCheckVersionDone = function(needUpdate){
 
 	        	// 先存起來
 	        	QmiGlobal.auth.passwordTp = dataObj.tp;
-
-	        	// // sso 初始值
-	        	// QmiGlobal.companies[QmiGlobal.auth.ci] = QmiGlobal.auth;
-	        	// QmiGlobal.companies[QmiGlobal.auth.ci].nowAt = dataObj.at;
-          		// QmiGlobal.companies[QmiGlobal.auth.ci].passwordTp = dataObj.tp;
 
 				deferred.resolve({isSuccess: true});
 	        });

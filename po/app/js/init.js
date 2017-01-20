@@ -34,7 +34,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://qaap.qmi.emome.net/";
 
 var userLang = navigator.language || navigator.userLanguage;
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
@@ -231,14 +231,23 @@ var timeline_detail_exception = [
 
 
 window.QmiGlobal = {
-	// document ready below
+	// 在下方 document ready之後 initReady
 	initReady: function() {
-		//設定語言, 還沒登入先用瀏覽器的語言設定
-		updateLanguage(lang);
+		var initDefArr = [
+			QmiGlobal.module.appVersion.init(), // 檢查版本
+		];
 
-		// App update version onfocus
-		QmiGlobal.module.appVersion.init();
-		
+
+		$.when.apply($, initDefArr).done(function() {
+			//設定語言, 還沒登入先用瀏覽器的語言設定
+			updateLanguage(lang);
+
+			// 初始動作 registration
+			appInitial();
+
+			// // 測試環境 選擇server
+			// QmiGlobal.module.serverSelector.showCurrUrl();
+		});
 	},
 
 	// 之後取代 ui, at, gi, ... etc
@@ -265,16 +274,6 @@ window.QmiGlobal = {
 
 	//version
 	appVer: null,
-
-	// after document ready
-	init: function() { 
-		//設定語言, 還沒登入先用瀏覽器的語言設定
-		updateLanguage(lang);
-		onCheckVersionDone();
-
-		// // 測試環境 選擇server
-		// QmiGlobal.module.serverSelector.showCurrUrl();
-	},
 
 	getObjectFirstItem: function(obj,last) {
 		if(last === true){
@@ -1009,10 +1008,7 @@ QmiAjax.prototype = {
 		if(s_load_show === false) QmiGlobal.ajaxLoadingUI.hide();
 
 	}
-
 } // end of QmiAjax
-
-
 
 MyDeferred = function() {
   var myResolve, myReject;
