@@ -174,9 +174,8 @@ updateAlert = function(isFromLogin){
 
 			var DBDataObj = {};
     		for( var i=0; i<DBData.length; i++){
-    			if( DBData[i].isRead ){
+    			if( DBData[i].isRead )
     				DBDataObj[DBData[i].ei+"_"+DBData[i].ntp] = DBData[i].data;
-    			}
     		}
 
     		for( var i=0; i<noticeListArr.length; i++){
@@ -204,7 +203,8 @@ updateAlert = function(isFromLogin){
     		}
 
     		// idb_alert_events.putBatch(ary, null);
-			showAlertContent(noticeListArr);
+			// showAlertContent(noticeListArr);
+			showAlertFromDB();
 		});
 	});
 
