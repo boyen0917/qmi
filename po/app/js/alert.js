@@ -203,8 +203,16 @@ updateAlert = function(isFromLogin){
 	    		}
     		}
 
-    		// idb_alert_events.putBatch(ary, null);
-			showAlertContent(noticeListArr);
+    		// 暫時處理重複公雲付費團體重複ei問題
+			showAlertContent(function() {
+				var obj = noticeListArr.reduce(function(obj, curr) {
+					obj[curr.nd.ei] = curr;
+					return obj;
+				}, {});
+				return Object.keys(obj).map(function(currEi) {
+					return obj[currEi];
+				});
+			}());
 		});
 	});
 
