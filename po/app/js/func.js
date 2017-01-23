@@ -317,8 +317,7 @@ timelineChangeGroup = function (thisGi) {
 
         $("#page-group-main .gm-header-right").hide();
 
-        timelineDom
-        .find(".refresh-lock").show().end()
+        timelineDom.find(".refresh-lock").show().end()
         .find(".gm-content-body").hide();
 
         if(QmiGlobal.groups[thisGi].isReAuthUILock) timelineDom.find(".refresh-lock > div").hide();
@@ -362,9 +361,6 @@ timelineChangeGroup = function (thisGi) {
             //sidemenu name
             setSmUserData(gi,gu,gn);
 
-            //檢查官方帳號
-            //initOfficialGroup( gi );
-
             //置頂設定
             topEvent().done(function() {
                 if (QmiGlobal.groups[thisGi].set && QmiGlobal.groups[thisGi].set.ccc) {
@@ -381,6 +377,9 @@ timelineChangeGroup = function (thisGi) {
 
                 changeDeferred.resolve();
             });
+
+            //切換團體時可以寫入新的counts
+            pollingCountsWrite();
 
             function isUILock() {
                 if((rspObj || {}).isSuccess === false) return true;
@@ -666,7 +665,7 @@ timelineSwitch = function (act,reset,main,noPR){
             gmHeader.find(".feed-compose").show();
 
             //polling 數字重寫
-            // if($.lStorage("_pollingData")) pollingCountsWrite();
+            if($.lStorage("_pollingData")) pollingCountsWrite();
 
             updatePollingCnts( groupMain.find(".sm-small-area[data-sm-act=feeds]").find(".sm-count"), "A1" );
             updatePollingCnts( filterAction.filter("[data-status=all]").find(".sm-count"), "B1" );
@@ -700,7 +699,7 @@ timelineSwitch = function (act,reset,main,noPR){
             gmHeader.find(".feed-compose").show();
 
             //polling 數字重寫
-            // if($.lStorage("_pollingData")) pollingCountsWrite();
+            if($.lStorage("_pollingData")) pollingCountsWrite();
 
             updatePollingCnts( groupMain.find(".sm-small-area[data-sm-act=feeds]").find(".sm-count"), "A1" );
             updatePollingCnts( groupMain.find(".st-filter-action[data-status=all]").find(".sm-count"), "B1" );
@@ -8071,10 +8070,6 @@ combineCloudPolling = function(newPollingData){
 
 
 pollingCountsWrite = function(pollingData, aa){
-    console.log("幹 出來講", {
-        pollingData: pollingData,
-        aa: aa
-    });
     var pollingData = pollingData || $.lStorage("_pollingData");
     var cntsAllObj  = pollingData.cnts || {};
     var gcnts       = pollingData.gcnts || { G1: 0, G3: 0 };
@@ -8641,6 +8636,7 @@ countsFormat = function(num, badgeDom){
 }
 
 updatePollingCnts = function(countDom,cntType){
+
     var thisGi = countDom.data("gi") || gi,
         isPublicApi = false,
         body = {
