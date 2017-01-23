@@ -173,7 +173,6 @@ updateAlert = function(isFromLogin){
 		idb_alert_events.getAll(function(DBData){
 
 			var DBDataObj = {};
-			var dbNoticeListArr = [];
     		for( var i=0; i<DBData.length; i++){
     			if( DBData[i].isRead )
     				DBDataObj[DBData[i].ei+"_"+DBData[i].ntp] = DBData[i].data;
@@ -198,15 +197,21 @@ updateAlert = function(isFromLogin){
 	    			}
 	    			// ary.push(obj);
 	    			idb_alert_events.put(obj);
-
-	    			dbNoticeListArr.push(DBData[i].data);
 	    		} catch(e){
 	    			errorReport(e);
 	    		}
     		}
 
-    		// idb_alert_events.putBatch(ary, null);
-			showAlertContent(dbNoticeListArr);
+    		// 暫時處理重複公雲付費團體重複ei問題
+			showAlertContent(function() {
+				var obj = noticeListArr.reduce(function(obj, curr) {
+					obj[curr.nd.ei] = curr;
+					return obj;
+				}, {});
+				return Object.keys(obj).map(function(currEi) {
+					return obj[currEi];
+				});
+			}());
 		});
 	});
 
