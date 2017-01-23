@@ -2680,6 +2680,11 @@ img.st-user-pic{
     -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
 */
+
+.st-box2-more-desc { 
+	cursor: pointer;
+}
+
 .st-box2-more-time {
     margin: 15px 0;
 	height: 20px;
