@@ -474,9 +474,7 @@ QmiGlobal.module.appVersion = {
 	},
 
 	apiSysVersion: function() {
-		var self = this;
-		var deferred = $.Deferred();
-		new QmiAjax({
+		return new QmiAjax({
     		apiName: "sys/version",
     		isPublic: true,
     		noAuth: true,
@@ -488,10 +486,7 @@ QmiGlobal.module.appVersion = {
 			},
     		method: "get",
     		errHide: true
-    	}).complete(function(rspData) {
-    		self.authChk(rspData).done(deferred.resolve)
     	});
-    	return deferred.promise();
 	},
 
 	appOnFocusEvent: function() {try {

@@ -61,7 +61,7 @@ logout = function(){
         noAuth: true,
         errHide: true,
         method: "delete"
-    }).done(function(data){
+    }).complete(function(){
 
         // 關閉移轉團體所有聊天室
         (Object.keys(windowList) || []).forEach(function(thisCi){

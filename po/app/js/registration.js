@@ -7,32 +7,13 @@ appInitial = function(needUpdate){
     	QmiGlobal.auth = $.lStorage("_appReloadAuth");	
     	localStorage.removeItem("_appReloadAuth");
     	
-    	QmiGlobal.isAppReload = true;
     	loginAction();
 
     } else if($.lStorage("_loginAutoChk") === true) {
 
     	QmiGlobal.auth = $.lStorage("_loginData");
     	loginAction();
-    	
-    	// 檢查auth
-  //   	new QmiAjax({
-		// 	apiName: "me",
-		// 	specifiedHeaders: {
-		// 		ui: QmiGlobal.auth.ui,
-		// 		at: QmiGlobal.auth.at,
-		// 		li: lang
-		// 	},
-		// 	method: "get",
-		// 	errHide: true
-		// }).complete(function(data){
-		// 	if(data.status === 401) {
-		// 		resetDB();
-		// 		window.location = "index.html";
-		// 	} else {
-		// 		loginAction();
-		// 	}
-		// });
+  
 
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
@@ -310,8 +291,6 @@ appInitial = function(needUpdate){
 
         		var dataObj = $.parseJSON(data.responseText);
 				
-        		//
-
         		// 判斷此次登入帳號與上次不同再刪除DB
         		if($.lStorage("_loginId") !== bodyData.id) resetDB();
 
@@ -324,6 +303,9 @@ appInitial = function(needUpdate){
                 if($(".login-auto").data("chk")) {
                 	$.lStorage("_loginData", QmiGlobal.auth);
                 	$.lStorage("_loginAutoChk", true);
+                } else {
+                	$.lStorage("_loginData", false);
+                	$.lStorage("_loginAutoChk", false);
                 }
 
         		// SSO 登入
@@ -384,9 +366,6 @@ appInitial = function(needUpdate){
 	//初始化 
     function loginAction (){
 
-    	//儲存登入資料 跳轉到timeline
-    	if ($.lStorage("_loginData") !== false && QmiGlobal.isAppReload !== true) QmiGlobal.auth = $.lStorage("_loginData");
-        
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
 

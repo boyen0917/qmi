@@ -173,6 +173,7 @@ updateAlert = function(isFromLogin){
 		idb_alert_events.getAll(function(DBData){
 
 			var DBDataObj = {};
+			var dbNoticeListArr = [];
     		for( var i=0; i<DBData.length; i++){
     			if( DBData[i].isRead )
     				DBDataObj[DBData[i].ei+"_"+DBData[i].ntp] = DBData[i].data;
@@ -197,14 +198,15 @@ updateAlert = function(isFromLogin){
 	    			}
 	    			// ary.push(obj);
 	    			idb_alert_events.put(obj);
+
+	    			dbNoticeListArr.push(DBData[i].data);
 	    		} catch(e){
 	    			errorReport(e);
 	    		}
     		}
 
     		// idb_alert_events.putBatch(ary, null);
-			// showAlertContent(noticeListArr);
-			showAlertFromDB();
+			showAlertContent(dbNoticeListArr);
 		});
 	});
 
