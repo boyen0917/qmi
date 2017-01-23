@@ -1070,16 +1070,9 @@ QmiGlobal.eventDispatcher = {
 
 	cleaner: function(moduleId) {
 		var self = this;
-
 		Object.keys(self.viewMap).forEach(function(viewId) {
-			if(viewId.split(":")[0] === moduleId) {
+			if(viewId.split(":")[0] === moduleId) 
 				delete self.viewMap[viewId];
-
-				// remove event listener
-				// window.removeEventListener("click:view-ldap-setting:list-delete", QmiGlobal.module.ldapSetting)
-			}
-
-			
 		})
 	}
 }
@@ -1253,6 +1246,7 @@ QmiGlobal.module.reAuthManually = {
 			}
 
 			// 設定新at , et
+			QmiGlobal.companies[cData.ci].nowAt = newAuth.at;
 			QmiGlobal.companies[cData.ci].at = newAuth.at;
 			QmiGlobal.companies[cData.ci].et = newAuth.et;
 
