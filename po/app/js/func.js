@@ -469,9 +469,6 @@ timelineSwitch = function (act,reset,main,noPR){
             //一開始都回到全部的文章的分類
             groupMain.find(".st-filter-area").data("filter","all");
 
-            //polling 數字重寫
-            pollingCountsWrite();
-
             // 使用已隱藏的舊的方式 來做timeline切換
             if( groupMain.find(".st-filter-area").hasClass("st-filter-lock") === false ){
                 //將選項存入
@@ -669,8 +666,7 @@ timelineSwitch = function (act,reset,main,noPR){
             gmHeader.find(".feed-compose").show();
 
             //polling 數字重寫
-            if($.lStorage("_pollingData"))
-                pollingCountsWrite();
+            // if($.lStorage("_pollingData")) pollingCountsWrite();
 
             updatePollingCnts( groupMain.find(".sm-small-area[data-sm-act=feeds]").find(".sm-count"), "A1" );
             updatePollingCnts( filterAction.filter("[data-status=all]").find(".sm-count"), "B1" );
@@ -704,7 +700,7 @@ timelineSwitch = function (act,reset,main,noPR){
             gmHeader.find(".feed-compose").show();
 
             //polling 數字重寫
-            if($.lStorage("_pollingData")) pollingCountsWrite();
+            // if($.lStorage("_pollingData")) pollingCountsWrite();
 
             updatePollingCnts( groupMain.find(".sm-small-area[data-sm-act=feeds]").find(".sm-count"), "A1" );
             updatePollingCnts( groupMain.find(".st-filter-action[data-status=all]").find(".sm-count"), "B1" );
@@ -7985,21 +7981,8 @@ polling = function(){
 combineCloudPolling = function(newPollingData){
     var combineDeferred = $.Deferred(),
         companyPollingDefArr = [];
-    
-    // 先將私雲polling加進來
-    var newCmdsArr = newPollingData.cmds.filter(function(item){
-        // 有存過的ci 才去取polling
-        return  (item.tp === 51 && QmiGlobal.companies.hasOwnProperty(item.pm.ci) === true);
-    })
 
-    // 加入需要重打的polling ; reDoCompanyPollingMap存有要重打的私雲資訊 
-    // 把他轉成array再加入不重複的新的polling 51
-    Object.keys(QmiGlobal.reDoCompanyPollingMap).map(function(thisCi) {
-        return QmiGlobal.reDoCompanyPollingMap[thisCi];
-    }).concat(newCmdsArr.reduce(function(arr, cmdObj) {
-        if(!QmiGlobal.reDoCompanyPollingMap[cmdObj.pm.ci]) arr.push(cmdObj)
-        return arr;
-    }, [])).forEach(function(item){
+    getPollingArr().forEach(function(item){
 
         // 設定這個私雲的pollingTime
         var companyPollingDef = $.Deferred();
@@ -8056,19 +8039,49 @@ combineCloudPolling = function(newPollingData){
         });
     })
     return combineDeferred.promise();
+
+
+    function getPollingArr() {
+        // 第一次polling需要打全部的私雲
+        if(QmiGlobal.isFirstPolling) {
+            QmiGlobal.isFirstPolling = false; // disable
+            return Object.keys(QmiGlobal.companies).map(function(currCi) {
+                return {
+                    pm:{ci: currCi, pt: 9999999999999}
+                }
+            });
+        }
+
+        // 先將私雲polling加進來
+        var newCmdsArr = newPollingData.cmds.filter(function(item){
+            // 有存過的ci 才去取polling
+            return  (item.tp === 51 && QmiGlobal.companies.hasOwnProperty(item.pm.ci) === true);
+        })
+
+        // 加入需要重打的polling ; reDoCompanyPollingMap存有要重打的私雲資訊 
+        // 把他轉成array再加入不重複的新的polling 51
+        return Object.keys(QmiGlobal.reDoCompanyPollingMap).map(function(thisCi) {
+            return QmiGlobal.reDoCompanyPollingMap[thisCi];
+        }).concat(newCmdsArr.reduce(function(arr, cmdObj) {
+            if(!QmiGlobal.reDoCompanyPollingMap[cmdObj.pm.ci]) arr.push(cmdObj)
+            return arr;
+        }, []));
+    }
 }
 
 
-pollingCountsWrite = function(pollingData){
+pollingCountsWrite = function(pollingData, aa){
+    console.log("幹 出來講", {
+        pollingData: pollingData,
+        aa: aa
+    });
+    var pollingData = pollingData || $.lStorage("_pollingData");
+    var cntsAllObj  = pollingData.cnts || {};
+    var gcnts       = pollingData.gcnts || { G1: 0, G3: 0 };
+    var groupsData  = QmiGlobal.groups;
+    var sort_arr = []; //排序用
+
     
-    var pollingData = ( pollingData       == undefined ? $.lStorage("_pollingData") : pollingData       ),
-        cntsAllObj  = ( pollingData.cnts  == undefined ? {}                         : pollingData.cnts  ),
-        gcnts       = ( pollingData.gcnts == undefined ? { G1: 0, G3: 0 }           : pollingData.gcnts ),
-        groupsData  =   QmiGlobal.groups,
-
-    //排序用
-    sort_arr = [];
-
     // 先將當前團體的 cnts 更新在 ui 中
     if( cntsAllObj.hasOwnProperty( gi ) === true ) {
         var thisCntObj = cntsAllObj[gi];

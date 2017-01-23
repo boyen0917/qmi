@@ -259,11 +259,12 @@ window.QmiGlobal = {
 	module: {}, // 模組
 	rspCode401: false,
 
-
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
+	isFirstPolling: true, // 第一次polling要打所有私雲
 	reDoCompanyPollingMap: {}, // 需要重打的私雲polling資訊 {ci:xx, pt:xx}, ...
+
 	auth: {},
 	me: {},
 	getObjectFirstItem: function(obj,last) {
