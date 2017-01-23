@@ -740,7 +740,6 @@ QmiAjax.prototype = {
 		var self = this;
 		var deferred = $.Deferred();
 
-		
 		var rspObj = function() {
 			try {
 				if(rspData)
@@ -786,14 +785,22 @@ QmiAjax.prototype = {
 				break;
 			case 605: // 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 				if(QmiGlobal.auth.isSso) {
-					relogin();
+					new QmiGlobal.popup({
+						desc: rspObj.rsp_msg,
+						confirm: true,
+						action: [reLogin]
+					});
 					return;
 				}
 				authUpdate();
 				break;
 			case 606: // 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 				if(QmiGlobal.auth.isSso) {
-					relogin();
+					new QmiGlobal.popup({
+						desc: rspObj.rsp_msg,
+						confirm: true,
+						action: [reLogin]
+					});
 					return;
 				}
 				authUpdate();
