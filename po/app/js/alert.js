@@ -203,8 +203,16 @@ updateAlert = function(isFromLogin){
 	    		}
     		}
 
-    		// idb_alert_events.putBatch(ary, null);
-			showAlertContent(noticeListArr);
+    		// 暫時處理重複公雲付費團體重複ei問題
+			showAlertContent(function() {
+				var obj = noticeListArr.reduce(function(obj, curr) {
+					obj[curr.nd.ei] = curr;
+					return obj;
+				}, {});
+				return Object.keys(obj).map(function(currEi) {
+					return obj[currEi];
+				});
+			}());
 		});
 	});
 
@@ -450,7 +458,6 @@ showAlertContent = function(data){
 					var this_gi = $(this).data("gi");
 					var this_ei = $(this).data("ei");
 					var this_ntp = $(this).data("ntp");
-					
 					var DBKey = this_ei+"_"+this_ntp;
 					idb_alert_events.get(DBKey, function(data){
 						if(!data){

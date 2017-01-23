@@ -829,8 +829,10 @@ $(function(){
 
     $(document).on('keyup mouseup', ".st-reply-highlight-container", function(e){
     	var thisTextArea = $(this);
+    	var timelineDetailPage = $("#page-timeline-detail");
+    	var groupID = (timelineDetailPage.is(':visible')) 
+    		? timelineDetailPage.find(".st-sub-box").data("event-id").split("_")[0] : gi;
         var element = thisTextArea.get(0);
-        var pureText = thisTextArea.text();
         var htmlText = thisTextArea.html();
         var replyDom = thisTextArea.parent();
         var cursorPosition = getCaretPosition();
@@ -843,12 +845,12 @@ $(function(){
 
         if ( !thisTextArea.data("memberList")
           && !thisTextArea.data("markMembers")) {
-            thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+            thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[groupID].guAll));
             thisTextArea.data("markMembers", {});
         }
 
         if (! htmlText) {
-        	thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+        	thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[groupID].guAll));
             thisTextArea.data("markMembers", {});
         }
 
