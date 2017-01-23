@@ -562,6 +562,8 @@ onCheckVersionDone = function(needUpdate){
 	        	QmiGlobal.auth.ui = dataObj.ui;
 	        	QmiGlobal.auth.at = dataObj.at;
 	        	QmiGlobal.auth.et = dataObj.et;
+	        	// 保險用
+	        	QmiGlobal.auth.cl = ssoObj.url;
 
 	        	// 先存起來
 	        	QmiGlobal.auth.passwordTp = dataObj.tp;
