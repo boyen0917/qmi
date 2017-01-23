@@ -1566,7 +1566,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
             }
             
             this_content.find("b").bind("click", function(e) {
-                userInfoShow(gi, $(e.target).attr("name"));
+                userInfoShow(this_gi, $(e.target).attr("name"));
             });
 
             //已有的留言就不製作
@@ -6124,7 +6124,6 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
         this_event.find("b").off("click").on("click", function(e) {
             var groupId = this_event.data("event-id").split("_")[0] || gi;
-            console.log(groupId);
             userInfoShow(groupId, $(e.target).attr("name"));
         });
         
