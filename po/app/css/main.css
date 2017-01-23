@@ -1365,6 +1365,30 @@ img.auo {
 	position: relative;
 }
 
+.gm-user-main-area .background.me{
+	cursor: pointer;
+}
+
+.gm-user-main-area .background.me:hover {
+	opacity: 0.8;
+}
+
+.gm-user-main-area .background.me::before {
+	content: "";
+    width: 35px;
+    height: 35px;
+    display: inline-block;
+    background: url("../images/common/icon/qicon_picedit.png");
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-color: rgba(210, 210, 210, 0.72);
+    background-position: 50%;
+    background-position-x: 50%;
+    background-position-y: 50%;
+    margin: 8px;
+	cursor: pointer;
+}
+
 .gm-user-main-area .background .name {
 	position: absolute;
 	bottom: 8%;
@@ -1406,7 +1430,7 @@ img.auo {
     left: 0;
 }
 
-.gm-user-main-area .user .user-pic::before {
+.gm-user-main-area .user .user-pic.me::before {
 	content: "編輯";
     position: absolute;
     bottom: 0px;
@@ -1430,7 +1454,7 @@ img.auo {
     object-fit: cover;
 }
 
-.gm-user-main-area .user .user-pic:hover::before {
+.gm-user-main-area .user .user-pic.me:hover::before {
     background: rgba(102, 102, 102, 0.72);
 }
 

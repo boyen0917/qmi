@@ -10,15 +10,13 @@ $(function(){
 	});
 
 
-	$("#page-group-main .subpage-timeline.main-subpage").on('scroll', function(){
+	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi");
-		if ($("#page-group-main").data("main-gu")) feed_type = "main";
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
 		if (feed_type != "main") {
 			feed_type = ("0" + feed_type).slice(-2) || "00";
 		}
-		console.log(feed_type)
 		// var feed_type = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
 		//判斷沒資料的元件存在時 就不動作
@@ -379,7 +377,6 @@ $(function(){
 	
 	//----------------------------------- timeline ---------------------------------------------  
 	$(".st-navi-subarea").click(function(){
-
 		if( $(".st-filter-area").hasClass("st-filter-lock") ){
 			// cns.debug("-------------");
 			// cns.debug("-------------");
@@ -393,16 +390,10 @@ $(function(){
 		// var img_dir = "images/timeline/timeline_tab_icon_";
 		// var subareas = $(".st-navi-area [data-st-navi-group=navi]");
 		var this_subarea = $(this);
-		var mainPage = $("#page-group-main");
 		// subareas.find("div").removeClass("color-white");
+
 		//將選項存入
-		mainPage.data("navi",this_subarea.data("tp"));
-		console.log(mainPage.data("main-gu"))
-		if (mainPage.data("main-gu")) {
-			mainPage.find(".feed-subarea[data-feed=main]").html("");
-			mainPage.find(".st-feedbox-area-bottom > img").show();
-            mainPage.find(".st-feedbox-area-bottom > div").hide();
-		}
+		$("#page-group-main").data("navi",this_subarea.data("tp"));
 
 		// var event_tp = $("#page-group-main").data("navi") || "00";
 
@@ -474,14 +465,11 @@ $(function(){
 		// });
 
 		var filter_status = $(this).data("status");
-		console.log(filter_status);
-		console.log($(this).data("navi"))
+
 		//過濾發文類型
-		if(filter_status == "navi" || filter_status == "all") {
+		if(filter_status == "navi" || filter_status == "all"){
         	navi_area.filter("[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	// return false;
-		} else if (filter_status == "person") {
-			$("#page-group-main").find(".st-feedbox-area-bottom").children("img").hide();
 		} else {
 			//檢查目前的首頁是哪頁(動態消息/團體消息/成員消息)
 			var currentHome = $(".st-navi-area").data("currentHome") || "home";
@@ -727,7 +715,6 @@ $(function(){
 			}),
 			fileURL = URL.createObjectURL(file);
 		
-		console.log(file.name);
 
 		switch(fileType) {
 			case "image":
@@ -857,8 +844,10 @@ $(function(){
 
     $(document).on('keyup mouseup', ".st-reply-highlight-container", function(e){
     	var thisTextArea = $(this);
+    	var timelineDetailPage = $("#page-timeline-detail");
+    	var groupID = (timelineDetailPage.is(':visible')) 
+    		? timelineDetailPage.find(".st-sub-box").data("event-id").split("_")[0] : gi;
         var element = thisTextArea.get(0);
-        var pureText = thisTextArea.text();
         var htmlText = thisTextArea.html();
         var replyDom = thisTextArea.parent();
         var cursorPosition = getCaretPosition();
@@ -871,12 +860,12 @@ $(function(){
 
         if ( !thisTextArea.data("memberList")
           && !thisTextArea.data("markMembers")) {
-            thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+            thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[groupID].guAll));
             thisTextArea.data("markMembers", {});
         }
 
         if (! htmlText) {
-        	thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+        	thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[groupID].guAll));
             thisTextArea.data("markMembers", {});
         }
 

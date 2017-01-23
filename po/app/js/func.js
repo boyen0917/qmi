@@ -451,6 +451,9 @@ timelineSwitch = function (act,reset,main,noPR){
             filterAction.filter("[data-navi='announcement']").show();
             filterAction.filter("[data-navi='feedback']").show();
             filterAction.filter("[data-navi='task']").show();
+            filterAction.filter("[data-navi='home']").show().addClass("st-filter-list-active");
+            filterAction.filter("[data-navi='feed-public']").hide();
+            filterAction.filter("[data-navi='feed-post']").hide();
             filterAction.filter("[data-navi='personal-info']").hide();
             $(".subpage-addressBook").hide();
 
@@ -5353,6 +5356,8 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
         if($("#page-group-main").data("main-gu")){
             var tmp = ".feed-subarea[data-feed=main]";
             var ori_selector = $(".feed-subarea[data-feed=main]");
+
+            ori_selector.html("");
         } else {
             var tmp = ".feed-subarea[data-feed=" + event_tp + "]";
             var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
@@ -5380,7 +5385,6 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
     var selector = $(".timeline-detail");
     var method = "html";
     var visibleEventCnt = 0;
-
     //製作timeline
     $.each(timeline_list,function(i,val){
         if(null==val) return;

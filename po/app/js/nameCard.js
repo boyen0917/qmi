@@ -802,63 +802,77 @@
 	    });
 	}
 	//切換至個人主頁
-	personalHomePage = function(thisInfo, userData){
-			console.log(userData)
-	        var groupMainDom = $("#page-group-main");
-	        
-	        //滾動至最上
-	        timelineScrollTop();
+	personalHomePage = function(thisInfo, userData) {
+        var groupMainDom = $("#page-group-main");
+        
+        //滾動至最上
+        timelineScrollTop();
 
-	        var this_gu = thisInfo.data("this-info-gu");
-	        var this_gi = thisInfo.data("this-info-gi");
+        var this_gu = thisInfo.data("this-info-gu");
+        var this_gi = thisInfo.data("this-info-gi");
 
-	        var emptyAut = "images/common/others/empty_img_all_l.png";
-	        //結束關閉
-	        thisInfo.find(".user-info-close").trigger("mouseup");
-	        //主頁背景
-	        var userDom = groupMainDom.find(".gm-user-main-area");
-	        userDom.fadeIn("fast",function(){
-	            var _thisGroupList = QmiGlobal.groups[this_gi];
-	            userDom.find(".background").css("background","url('images/common/others/timeline_kv1_android.png') no-repeat");
-	            userDom.find(".user h3").html(userData.nk);
-	            userDom.find(".user .pic").attr("src", userData.auo || "images/common/others/empty_img_personal_xl.png");
-	            // userDom.find(".user .pic").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
-	            userDom.find(".user .description").html(userData.sl);
-	            // if(!_thisGroupList.aut){
-	            //     userDom.find(".group .pic").css("background","url(" + emptyAut + ")");
-	            // }
-	        });
+        var emptyAut = "images/common/others/empty_img_all_l.png";
+        //結束關閉
+        thisInfo.find(".user-info-close").trigger("mouseup");
+        //主頁背景
+        var userDom = groupMainDom.find(".gm-user-main-area");
+        userDom.fadeIn("fast",function(){
+            var _thisGroupList = QmiGlobal.groups[this_gi];
+            $(this).find(".background").removeClass("me").css("background","url('images/common/others/timeline_kv1_android.png') no-repeat").end()
+            	   .find(".user h3").attr("contentEditable", false).html(userData.nk).end()
+            	   .find(".user .user-pic").removeClass("me").end()
+            	   .find(".user .pic").attr("src", userData.auo || "images/common/others/empty_img_personal_xl.png").end()
+            // userDom.find(".user .pic").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
+            	   .find(".user .description").html(userData.sl);
 
-	        if($(".alert-area").is(":visible")){
-	            $(".alert").removeClass("alert-visit");
-	            $(".alert-area-cover").hide();
-	            $(".alert").removeClass("alert-click");
-	            $(".alert-area").hide();
-	        }
 
-	        //不隱藏header
-	        $(".user-main-toggle:not(.gm-header)").hide();
-	        $(".gm-user-main-area").show();
-	        $(".st-feedbox-area").hide();
-	        $(".sm-small-area.active").removeClass("active");
 
-	        setTimeout(function(){
-	            //滾動至最上
-	            timelineScrollTop();
+            if (gu == this_gu) {
+            	$(this).find(".background").addClass("me").end()
+            		   .find(".user h3").attr("contentEditable", true).end()
+            		   .find(".user .user-pic").addClass("me").end()
+            		   .find(".user .description").addClass("me").end()
+            		   .find(".user .interaction").hide();
+            }
 
-	            groupMainDom.find(".st-feedbox-area div[data-feed=main]").html("");
-	            groupMainDom.find(".st-feedbox-area").show();
-	            groupMainDom.find(".feed-subarea").hide();
-	            groupMainDom.find(".st-filter-action").filter("[data-navi='personal-info']").show();
-	            // groupMainDom.find(".st-filter-area").data("filter","all");
-	            
-	            groupMainDom
-	            .data("main-gu",this_gu)
-	            .data("main-gi",this_gi)
-	            .data("navi","main");
-	            
-	            timelineListWrite();
-	        },500);
+            $(this).find(".background").on("click", function () {
+            	console.log("hi background");
+            });
+            // if(!_thisGroupList.aut){
+            //     userDom.find(".group .pic").css("background","url(" + emptyAut + ")");
+            // }
+        });
+
+        if($(".alert-area").is(":visible")){
+            $(".alert").removeClass("alert-visit");
+            $(".alert-area-cover").hide();
+            $(".alert").removeClass("alert-click");
+            $(".alert-area").hide();
+        }
+
+        //不隱藏header
+        $(".user-main-toggle:not(.gm-header)").hide();
+        $(".gm-user-main-area").show();
+        $(".st-feedbox-area").hide();
+        $(".sm-small-area.active").removeClass("active");
+
+        setTimeout(function(){
+            //滾動至最上
+            timelineScrollTop();
+
+            groupMainDom.find(".st-feedbox-area div[data-feed=main]").html("");
+            groupMainDom.find(".st-feedbox-area").show();
+            groupMainDom.find(".feed-subarea").hide();
+            groupMainDom.find(".st-filter-action").filter("[data-navi='personal-info']").show();
+            // groupMainDom.find(".st-filter-area").data("filter","all");
+            
+            groupMainDom
+            .data("main-gu",this_gu)
+            .data("main-gi",this_gi)
+            .data("navi","main");
+            
+            timelineListWrite();
+        },500);
 	}
 
 	userInfoSend = function(this_info){
