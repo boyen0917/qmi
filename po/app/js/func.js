@@ -822,7 +822,7 @@ topEventApi = function(){
     return ajaxDo(api_name,headers,method,false);
 }
 
-topEvent = function (){
+topEvent = function () {
     var deferred = $.Deferred();
     var top_area = $(
         '<div class="st-top-area">'+
@@ -860,9 +860,12 @@ topEvent = function (){
             //default 關閉
             $(".st-top-event-default").hide();
 
-            $.each(top_events_arr,function(i,val){
+            $.each(top_events_arr,function(i,val) {
+                // val.c = val.c.qmiTag(eventObj);
                 top_area.find(".st-top-event-set").append($('<div class="st-top-event">').load('layout/layout.html .st-top-event-load',function(){
                     var this_top_event = $(this);
+                    var tagRegex = /\/{3};(\w+);\/{3}/g;
+
                     this_top_event.find(".st-top-event-load")._i18n();
                     this_top_event.data("data-obj",val);
                     this_top_event.data("pos",i);
@@ -883,7 +886,23 @@ topEvent = function (){
 
                     this_top_event.find(".st-top-event-r-ttl span").html($.i18n.getString(i18Ttl));
                     this_top_event.find(".st-top-event-r-ttl").append(val.meta.tt);
-                    this_top_event.find(".st-top-event-r-content").html(val.ml[0].c);
+                    
+                    if (val.ml.length > 0 && val.ml[0].hasOwnProperty("c")) {
+                        var matchTagList = val.ml[0].c.match(tagRegex);
+
+                        // 抓漏網之魚 防止bug
+                        (matchTagList || []).forEach(function(tagText) {
+                            var tagId = tagText.replace(tagRegex, "$1");
+                            if (QmiGlobal.groups[gi].guAll[tagId] === undefined) return;
+
+                            val.ml[0].c = val.ml[0].c.qmiTag({
+                                u: tagId,
+                                n: QmiGlobal.groups[gi].guAll[tagId].nk
+                            });
+                        });
+
+                        this_top_event.find(".st-top-event-r-content").html(val.ml[0].c);
+                    }
 
                     //用戶名稱 時間
                     setTopEventUserName(this_top_event,val.meta.gu);
