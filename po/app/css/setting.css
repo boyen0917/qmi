@@ -619,13 +619,22 @@ ul.system-tab li.current-tab{
 	overflow-x: hidden;
 }
 
+#system-information .st-info-option:not(:last-child) {border-bottom: 1px solid #ededed;}
+#system-information .version-no:after {
+    content: attr(version);
+    position: absolute;
+    top: 21px;
+    right: 40px;
+    /* height: 30px; */
+    /* width: 30px; */
+    color: #888;
+}
 /*系統通知*//*預設團體*//*自動換頁*/
 .notification-option,
 .group-option,
 .carousel-option,
 .st-info-option{
     height: 50px;
-	border-bottom: 1px solid #ededed;
 	padding: 10px;
 }
 
@@ -751,6 +760,7 @@ input[type=radio] {
 }
 
 .stinfotext{
+    position: relative;
 	cursor: pointer;
 	padding: 20px;
     font-size: 14px;

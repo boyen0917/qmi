@@ -245,6 +245,8 @@ var timeline_detail_exception = [
 
 window.QmiGlobal = {
 
+	appVer: "1.7.0.12",
+
 	// 之後取代 ui, at, gi, ... etc
 	currentGi: "",
 
@@ -349,6 +351,11 @@ window.QmiGlobal = {
         return false;
     } 
 };
+
+// 暫時寫入版本號
+$(document).ready(function() {
+	$("#app-version").attr("version", QmiGlobal.appVer);
+})
 
 // polling異常監控
 window.QmiPollingChk = {
@@ -803,7 +810,7 @@ QmiAjax.prototype = {
 			case 605: // 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 				if(QmiGlobal.auth.isSso) {
 					new QmiGlobal.popup({
-						desc: rspObj.rsp_msg,
+						desc: $.i18n.getString("WEBONLY_LOGOUT_BY_ANOTHER_DEVICE"),
 						confirm: true,
 						action: [reLogin]
 					});
@@ -814,7 +821,7 @@ QmiAjax.prototype = {
 			case 606: // 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 				if(QmiGlobal.auth.isSso) {
 					new QmiGlobal.popup({
-						desc: rspObj.rsp_msg,
+						desc: $.i18n.getString("WEBONLY_LOGOUT_BY_ANOTHER_DEVICE"),
 						confirm: true,
 						action: [reLogin]
 					});
