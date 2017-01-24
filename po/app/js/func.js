@@ -7709,20 +7709,10 @@ addCompanyReLoadView = function(companyData) {
         $(".sm-group-list-area-refresh").show().append(refreshDom);
 
         refreshDom.click(function() {
-            // var deferred = $.Deferred();
-            // if(QmiGlobal.ldapCompanies[companyData.ci])
-            //     QmiGlobal.module.reAuthManually.init({
-            //         companyData: companyData,
-            //         reAuthDef: deferred
-            //     })
-            // else deferred.resolve();
-
-            // deferred.done(function() {
-                companyLoad({
-                    refreshDom: refreshDom,
-                    companyData: companyData
-                })
-            // });
+            companyLoad({
+                refreshDom: refreshDom,
+                companyData: companyData
+            })
         });
     }
 }
@@ -7765,11 +7755,15 @@ companyLoad = function(loadData){
                     // 等待combo全部完成
                     $.when.apply($,comboDefArr).done(function() {
                         var fail = false;
-
                         // 全部都成功
                         Array.prototype.forEach.call(arguments,function(item) {
                             if(item.status === false) fail = true;
                         });
+
+                        // 加入reDoPolling 重新打私雲polling做initial
+                        QmiGlobal.reDoCompanyPollingMap[companyData.ci] = {
+                            pm: {ci: companyData.ci, pt: 9999999999999}
+                        }
 
                         // 全部都成功 才解除私雲移轉
                         if(fail === false) {
@@ -7793,20 +7787,14 @@ companyLoad = function(loadData){
                             })
 
                             tokenDeferred.resolve(true);
-                        } else {
-                            // 某個combo失敗
-                            tokenDeferred.resolve(false);
-                        }
+                        // 某個combo失敗
+                        } else tokenDeferred.resolve(false);
                     });
-                } else {
-                    // 私雲團體列表失敗
-                    tokenDeferred.resolve(false);
-                }
+                // 私雲團體列表失敗
+                } else tokenDeferred.resolve(false);
             });
-        } else {
-            // 私雲token取得失敗
-            tokenDeferred.resolve(false);
-        }
+        // 私雲token取得失敗
+        } else tokenDeferred.resolve(false);
 
         tokenDeferred.done(function(isSuccess){
             if(isSuccess === false) {
@@ -7907,7 +7895,7 @@ polling = function(){
             });
 
             // 合併私雲polling 而且每個私雲polling 都要有自己的時間
-            combineCloudPolling(newPollingData).done(function(pollingObj){
+            combineCompanyPolling(newPollingData).done(function(pollingObj){
 
                 var newPollingData = pollingObj.newPollingData,
                     tmp_cnts = newPollingData.cnts || [];
@@ -7977,7 +7965,7 @@ polling = function(){
     })
 }
 
-combineCloudPolling = function(newPollingData){
+combineCompanyPolling = function(newPollingData){
     var combineDeferred = $.Deferred(),
         companyPollingDefArr = [];
 
@@ -7987,6 +7975,7 @@ combineCloudPolling = function(newPollingData){
         var companyPollingDef = $.Deferred();
         new QmiAjax({
             apiName: "sys/polling?pt=" + item.pm.pt,
+            isPolling: true,
             ci: item.pm.ci
         }).success(function(data){
             
@@ -8000,7 +7989,8 @@ combineCloudPolling = function(newPollingData){
             var reDoObj = QmiGlobal.reDoCompanyPollingMap[item.pm.ci];
             if(reDoObj && reDoObj.pm.pt === data.ts.pt)
                 delete QmiGlobal.reDoCompanyPollingMap[item.pm.ci];
-            else {
+            // 9999999999999 是第一次登入所帶入 不存
+            else if(item.pm.pt !== 9999999999999) {
                 item.pm.pt = data.ts.pt;
                 QmiGlobal.reDoCompanyPollingMap[item.pm.ci] = item;
             }
@@ -8044,27 +8034,39 @@ combineCloudPolling = function(newPollingData){
         // 第一次polling需要打全部的私雲
         if(QmiGlobal.isFirstPolling) {
             QmiGlobal.isFirstPolling = false; // disable
-            return Object.keys(QmiGlobal.companies).map(function(currCi) {
-                return {
-                    pm:{ci: currCi, pt: 9999999999999}
+            return Object.keys(QmiGlobal.companies).reduce(function(arr, currCi) {
+                // ldap初次登入若過期不打
+                if(!isLdapAndTokenExpired(currCi)) {
+                    arr.push({
+                        pm:{ci: currCi, pt: 9999999999999}
+                    });
                 }
-            });
+                return arr
+            }, []);
+
+            function isLdapAndTokenExpired(currCi) {
+                var cpnObj = QmiGlobal.companies[currCi] || {};
+                if(cpnObj.passwordTp !== 1) return false;
+                if((cpnObj.et - (new Date().getTime())) < QmiGlobal.ldapExpireTimer) return true;
+                return false;
+            }
+        } else {
+
+            // 先將私雲polling加進來
+            var newCmdsArr = newPollingData.cmds.filter(function(item){
+                // 有存過的ci 才去取polling
+                return  (item.tp === 51 && QmiGlobal.companies.hasOwnProperty(item.pm.ci) === true);
+            })
+
+            // 加入需要重打的polling ; reDoCompanyPollingMap存有要重打的私雲資訊 
+            // 把他轉成array再加入不重複的新的polling 51
+            return Object.keys(QmiGlobal.reDoCompanyPollingMap).map(function(thisCi) {
+                return QmiGlobal.reDoCompanyPollingMap[thisCi];
+            }).concat(newCmdsArr.reduce(function(arr, cmdObj) {
+                if(!QmiGlobal.reDoCompanyPollingMap[cmdObj.pm.ci]) arr.push(cmdObj)
+                return arr;
+            }, []));
         }
-
-        // 先將私雲polling加進來
-        var newCmdsArr = newPollingData.cmds.filter(function(item){
-            // 有存過的ci 才去取polling
-            return  (item.tp === 51 && QmiGlobal.companies.hasOwnProperty(item.pm.ci) === true);
-        })
-
-        // 加入需要重打的polling ; reDoCompanyPollingMap存有要重打的私雲資訊 
-        // 把他轉成array再加入不重複的新的polling 51
-        return Object.keys(QmiGlobal.reDoCompanyPollingMap).map(function(thisCi) {
-            return QmiGlobal.reDoCompanyPollingMap[thisCi];
-        }).concat(newCmdsArr.reduce(function(arr, cmdObj) {
-            if(!QmiGlobal.reDoCompanyPollingMap[cmdObj.pm.ci]) arr.push(cmdObj)
-            return arr;
-        }, []));
     }
 }
 
