@@ -476,19 +476,23 @@ window.QmiAjax = function(args){
 		self.expireChk({
 			url: newArgs.url,
 			noAuth: args.noAuth,
-			companyData: companyData
+			companyData: companyData,
+			isPolling: args.isPolling
 		}).done(ajaxExecute)
 	})
 
 	function ajaxExecute(chk) {
 		// 發生錯誤
 		if(chk.isSuccess === false) {
-			ajaxDeferred.reject({
-				status: 9999,
-				isSuccess: false,
-				data: chk.data,
-				isCancel: chk.isCancel
-			});
+			// setTimeout是讓 ajaxDeferred.promise.success、error 先觸發
+			setTimeout(function() {
+				ajaxDeferred.reject({
+					status: 9999,
+					isSuccess: false,
+					data: chk.data,
+					isCancel: chk.isCancel
+				});
+			}, 100);
 			return;
 		}
 
@@ -692,8 +696,14 @@ QmiAjax.prototype = {
 
 		} else if(isExpired()) {
 			console.log("token Expire!!!");
-			// reAuth
-			this.reAuth(args.companyData).done(deferred.resolve);
+
+			if(isPollingAndLdapCanceled()) 
+				deferred.resolve({
+					isSuccess: false,
+					isCancel: true
+				})
+			else 
+				this.reAuth(args.companyData).done(deferred.resolve);
 
 		} else {
 			// 還沒過期
@@ -717,12 +727,18 @@ QmiAjax.prototype = {
 				return false; 
 			} 
 		}
+
+		function isPollingAndLdapCanceled() {
+			if(!args.companyData) return false;
+			if(!args.isPolling) return false;
+			if(args.companyData.isReAuthCancel) return true;
+			return false;
+		}
 	},
 
 	reAuth: function(companyData, rspData){
-		var self = this,
-			deferred = $.Deferred();
-
+		var self = this;
+		var deferred = $.Deferred();
 		companyData = companyData || QmiGlobal.auth;
 
 		// reAuth Lock 如果已經是deferred 就不重新指定
