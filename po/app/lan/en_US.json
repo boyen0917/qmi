@@ -431,4 +431,5 @@
 	"WEBONLY_CHATROOM_INFO" : "chatroom infomation",
 	"WEBONLY_INVITE_PERMISSION" : "inviting's permissions for members",
 	"WEBONLY_LOGOUT_BY_ANOTHER_DEVICE" : "Your account login from another device"
+	"WEBONLY_VERSION_NO" : "Version"
 }
