@@ -302,7 +302,8 @@ function showChatList(){
 				});
 			}
 
-			if($("#page-group-main").data("currentAct")=="chat"){
+			// 預防在別頁顯示聊天室列表畫面
+			if ($("#page-group-main .sm-small-area.active").data("sm-act") == "chat") {
 				$("#page-group-main .subpage-chatList").show();
 			}
 		})
@@ -475,7 +476,7 @@ function clearChatListCnt( giTmp, ciTmp ){
 function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
 	var 
 	deferred = $.Deferred(),
-	groupTmp = QmiGlobal.groups[giTmp];
+	groupTmp = QmiGlobal.groups[giTmp] || {};
 
 	if( null==isRoomOpen ) isRoomOpen = false;
 

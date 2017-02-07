@@ -1,78 +1,4 @@
 
-QmiGlobal.eventDispatcher = {
-
-	viewMap: {},
-
-	handleEvent: function() {
-		// 防連點 start
-		var closureObj = {};
-		return function(event) {
-			//禁止連點
-			if(preventMultiClick(event) === false) return;
-
-			var self = this;
-
-			Object.keys(self.viewMap).forEach(function(viewId) {
-				// event currentTarget -> event綁定的對象
-
-				// jqElem 是arr 每個elem都比對
-				var jqElem = self.viewMap[viewId].jqElem, length = jqElem.length;
-				for(var i=0; i<length; i++) {
-					if(event.currentTarget === jqElem[i]) {
-						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {})[event.type], target: event.target}}));
-						return;
-					}
-				}
-			});
-		}
-
-		function preventMultiClick(event) {
-			// event.stopPropagation();
-			//禁止連點
-			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) return false;
-			// 記錄連點資訊
-			if(event.type === "click") closureObj.lastView = event.target, closureObj.lastClickTime = new Date().getTime();
-			return true;
-		}
-	}(),
-
-	subscriber: function(veArr, handler, isClean) {
-		var self = this;
-
-		// 清除已存在的view
-		if(isClean) self.cleaner(handler.id);
-
-		veArr.forEach(function(veObj) {
-			var viewId = handler.id+":"+veObj.veId;
-			self.viewMap[viewId] = veObj;
-			veObj.eventArr.forEach(function(eventType) {
-				// jqElem 是arr 每個elem都掛上事件監聽
-				Array.prototype.forEach.call(veObj.jqElem, function(elem) {
-					elem.addEventListener(eventType, self);
-				});
-				window.addEventListener(eventType+":"+viewId, handler);
-			});
-		})
-	},
-
-	cleaner: function(moduleId) {
-		var self = this;
-
-		Object.keys(self.viewMap).forEach(function(viewId) {
-			if(viewId.split(":")[0] === moduleId) {
-				delete self.viewMap[viewId];
-
-				// remove event listener
-				// window.removeEventListener("click:view-ldap-setting:list-delete", QmiGlobal.module.ldapSetting)
-			}
-
-			
-		})
-	}
-}
-
-
-
 QmiGlobal.module.reAuthUILock = {
 	lock: function(companyData) {
 		if(!companyData) return;
@@ -430,20 +356,29 @@ QmiGlobal.module.appVersion = {
 		var deferred = $.Deferred();
 		self.isFirstInit = !QmiGlobal.appVer;
 
-		self.apiSysVersion().done(function(rspData) {
+		self.apiSysVersion().success(function(rspData) {
 			self.appOnFocusEvent();
+    		self.data = rspData;
 
-    		var rspObj = $.parseJSON(rspData.responseText);
-    		console.log("rspObj", rspObj);
+    		self.chk();
+    		
+    		// 寫入版本號
+			$("#app-version").attr("version", QmiGlobal.appVer);
 
-    		QmiGlobal.appVer = rspObj.av;
+		}).error(function(rspData) {
+			console.log("err", rspData);
+		}).complete(deferred.resolve);
 
-    		if(self.isFirstInit) {
-    			console.log("first~");
-    			return;
-    		}
+		return deferred.promise();
+	},
 
-    		switch(rspObj.ut) {
+	chk: function() {
+		var self = this;
+
+		// 無更新
+		if(self.data.av === QmiGlobal.appVer) {
+		} else {
+			switch(self.data.ut) {
     			case 0: // 手動更新
     				self.updateOptional();
     				break;
@@ -453,29 +388,13 @@ QmiGlobal.module.appVersion = {
     			case 2:
     				break;
     		}
-
-			    	// if( g_currentVersion != rspObj.av && typeof(require)!="undefined" ){
-					// QmiGlobal.appVer = rspObj.av;
-		   //  		$.lStorage("_ver",{ver:g_currentVersion});
-		   //  		$(".version_update_lock").fadeIn();
-
-		   //  		setTimeout( function(){
-		   //  			if( false==clearCache() ){
-		   //  				//if error clear cache
-		   //  				$(".version_update_lock").hide();
-		   //  			}
-		   //  		}, 1000 );
-
-		}).fail(function(rspData) {
-			console.log("err", rspData);
-		}).always(deferred.resolve);
-
-		return deferred.promise();
+		}
 	},
 
 	apiSysVersion: function() {
 		return new QmiAjax({
     		apiName: "sys/version",
+    		timeout: 5000,
     		isPublic: true,
     		noAuth: true,
     		specifiedHeaders: {
@@ -487,6 +406,14 @@ QmiGlobal.module.appVersion = {
     		method: "get",
     		errHide: true
     	});
+	},
+
+	updateOptional: function() {
+
+	},
+
+	updateForced: function() {
+
 	},
 
 	appOnFocusEvent: function() {try {
@@ -593,4 +520,77 @@ QmiGlobal.module.serverSelector = {
 		+ "</section></section>"
 	},
 	urlHtml: function() {return "<div id='module-server-selector-url'></div>"}
+}
+
+
+QmiGlobal.eventDispatcher = {
+
+	viewMap: {},
+
+	handleEvent: function() {
+		// 防連點 start
+		var closureObj = {};
+		return function(event) {
+			//禁止連點
+			if(preventMultiClick(event) === false) return;
+
+			var self = this;
+
+			Object.keys(self.viewMap).forEach(function(viewId) {
+				// event currentTarget -> event綁定的對象
+
+				// jqElem 是arr 每個elem都比對
+				var jqElem = self.viewMap[viewId].jqElem, length = jqElem.length;
+				for(var i=0; i<length; i++) {
+					if(event.currentTarget === jqElem[i]) {
+						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {})[event.type], target: event.target}}));
+						return;
+					}
+				}
+			});
+		}
+
+		function preventMultiClick(event) {
+			// event.stopPropagation();
+			//禁止連點
+			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) return false;
+			// 記錄連點資訊
+			if(event.type === "click") closureObj.lastView = event.target, closureObj.lastClickTime = new Date().getTime();
+			return true;
+		}
+	}(),
+
+	subscriber: function(veArr, handler, isClean) {
+		var self = this;
+
+		// 清除已存在的view
+		if(isClean) self.cleaner(handler.id);
+
+		veArr.forEach(function(veObj) {
+			var viewId = handler.id+":"+veObj.veId;
+			self.viewMap[viewId] = veObj;
+			veObj.eventArr.forEach(function(eventType) {
+				// jqElem 是arr 每個elem都掛上事件監聽
+				Array.prototype.forEach.call(veObj.jqElem, function(elem) {
+					elem.addEventListener(eventType, self);
+				});
+				window.addEventListener(eventType+":"+viewId, handler);
+			});
+		})
+	},
+
+	cleaner: function(moduleId) {
+		var self = this;
+
+		Object.keys(self.viewMap).forEach(function(viewId) {
+			if(viewId.split(":")[0] === moduleId) {
+				delete self.viewMap[viewId];
+
+				// remove event listener
+				// window.removeEventListener("click:view-ldap-setting:list-delete", QmiGlobal.module.ldapSetting)
+			}
+
+			
+		})
+	}
 }

@@ -209,22 +209,20 @@
 	}
 
 	getMultipleUserInfo = function(user_info_arr,update_chk,load_show_chk,onAllDone){
-
-	    var 
-	    new_user_info_obj = {},
-	    new_user_info_arr = [],
-	    _groupList = QmiGlobal.groups;
+		var new_user_info_obj = {};
+	    var new_user_info_arr = [];
 	    
 	    for( var i=0; i<user_info_arr.length; i++){
 	        var tmpObj = user_info_arr[i];
 	        new_user_info_obj[tmpObj.gu] = tmpObj;
-	        if( _groupList.hasOwnProperty(tmpObj.gi) ){
+	        if(QmiGlobal.groups.hasOwnProperty(tmpObj.gi) ){
 	            new_user_info_arr.push({
 	                gu: tmpObj.gu,
 	                gi: tmpObj.gi
 	            });
 	        }
 	    }
+	    if(new_user_info_arr.length === 0) return;
 
 	    var load_show_chk = load_show_chk || false;
 	    var onAllDone = onAllDone || false;

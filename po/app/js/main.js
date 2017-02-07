@@ -10,7 +10,7 @@ $(function(){
 	});
 
 
-	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
+	$("#page-group-main .subpage-timeline.main-subpage").bind('scroll', function(){
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi");
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
@@ -829,8 +829,10 @@ $(function(){
 
     $(document).on('keyup mouseup', ".st-reply-highlight-container", function(e){
     	var thisTextArea = $(this);
+    	var timelineDetailPage = $("#page-timeline-detail");
+    	var groupID = (timelineDetailPage.is(':visible')) 
+    		? timelineDetailPage.find(".st-sub-box").data("event-id").split("_")[0] : gi;
         var element = thisTextArea.get(0);
-        var pureText = thisTextArea.text();
         var htmlText = thisTextArea.html();
         var replyDom = thisTextArea.parent();
         var cursorPosition = getCaretPosition();
@@ -843,12 +845,12 @@ $(function(){
 
         if ( !thisTextArea.data("memberList")
           && !thisTextArea.data("markMembers")) {
-            thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+            thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[groupID].guAll));
             thisTextArea.data("markMembers", {});
         }
 
         if (! htmlText) {
-        	thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+        	thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[groupID].guAll));
             thisTextArea.data("markMembers", {});
         }
 

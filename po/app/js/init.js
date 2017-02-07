@@ -34,7 +34,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qaap.qmi.emome.net/";
+var base_url = "https://qmi17.mitake.com.tw/";
 
 var userLang = navigator.language || navigator.userLanguage;
 	userLang = userLang.replace(/-/g,"_").toLowerCase();
@@ -231,6 +231,9 @@ var timeline_detail_exception = [
 
 
 window.QmiGlobal = {
+
+	appVer: $.lStorage("_ver") || "1.7.0",
+
 	// 在下方 document ready之後 initReady
 	initReady: function() {
 		var initDefArr = [
@@ -264,16 +267,17 @@ window.QmiGlobal = {
 	module: {}, // 模組
 	rspCode401: false,
 
-
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
-	// 聊天室 auth
+	isFirstPolling: true, // 第一次polling要打所有私雲
+	reDoCompanyPollingMap: {}, // 需要重打的私雲polling資訊 {ci:xx, pt:xx}, ...
+
 	auth: {},
 	me: {},
 
-	//version
-	appVer: null,
+	emptyGrpPicStr: "images/common/others/empty_img_all_l.png",
+	emptyUsrPicStr: "images/common/others/empty_img_personal_l.png",
 
 	getObjectFirstItem: function(obj,last) {
 		if(last === true){
@@ -403,6 +407,7 @@ window.QmiGlobal = {
 
 $(document).ready(QmiGlobal.initReady);
 
+
 // polling異常監控
 window.QmiPollingChk = {
 
@@ -529,19 +534,23 @@ window.QmiAjax = function(args){
 		self.expireChk({
 			url: newArgs.url,
 			noAuth: args.noAuth,
-			companyData: companyData
+			companyData: companyData,
+			isPolling: args.isPolling
 		}).done(ajaxExecute)
 	})
 
 	function ajaxExecute(chk) {
 		// 發生錯誤
 		if(chk.isSuccess === false) {
-			ajaxDeferred.reject({
-				status: 9999,
-				isSuccess: false,
-				data: chk.data,
-				isCancel: chk.isCancel
-			});
+			// setTimeout是讓 ajaxDeferred.promise.success、error 先觸發
+			setTimeout(function() {
+				ajaxDeferred.reject({
+					status: 9999,
+					isSuccess: false,
+					data: chk.data,
+					isCancel: chk.isCancel
+				});
+			}, 100);
 			return;
 		}
 
@@ -745,8 +754,14 @@ QmiAjax.prototype = {
 
 		} else if(isExpired()) {
 			console.log("token Expire!!!");
-			// reAuth
-			this.reAuth(args.companyData).done(deferred.resolve);
+
+			if(isPollingAndLdapCanceled()) 
+				deferred.resolve({
+					isSuccess: false,
+					isCancel: true
+				})
+			else 
+				this.reAuth(args.companyData).done(deferred.resolve);
 
 		} else {
 			// 還沒過期
@@ -770,12 +785,18 @@ QmiAjax.prototype = {
 				return false; 
 			} 
 		}
+
+		function isPollingAndLdapCanceled() {
+			if(!args.companyData) return false;
+			if(!args.isPolling) return false;
+			if(args.companyData.isReAuthCancel) return true;
+			return false;
+		}
 	},
 
 	reAuth: function(companyData, rspData){
-		var self = this,
-			deferred = $.Deferred();
-
+		var self = this;
+		var deferred = $.Deferred();
 		companyData = companyData || QmiGlobal.auth;
 
 		// reAuth Lock 如果已經是deferred 就不重新指定
@@ -794,7 +815,6 @@ QmiAjax.prototype = {
 		var self = this;
 		var deferred = $.Deferred();
 
-		
 		var rspObj = function() {
 			try {
 				if(rspData)
@@ -839,9 +859,25 @@ QmiAjax.prototype = {
 				authCompanyKey();
 				break;
 			case 605: // 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+				if(QmiGlobal.auth.isSso) {
+					new QmiGlobal.popup({
+						desc: $.i18n.getString("WEBONLY_LOGOUT_BY_ANOTHER_DEVICE"),
+						confirm: true,
+						action: [reLogin]
+					});
+					return;
+				}
 				authUpdate();
 				break;
 			case 606: // 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+				if(QmiGlobal.auth.isSso) {
+					new QmiGlobal.popup({
+						desc: $.i18n.getString("WEBONLY_LOGOUT_BY_ANOTHER_DEVICE"),
+						confirm: true,
+						action: [reLogin]
+					});
+					return;
+				}
 				authUpdate();
 				break;
 			case 607:
@@ -1075,6 +1111,7 @@ $(document).on("pagebeforeshow",function(event,ui){
 
 
 $(document).on("click",".page-back",function(){
+	console.log("page-back");
 
 	if( window.location.href.match(/chat.html/) !== null ) return false;
 

@@ -237,12 +237,8 @@ userInfoUpdate = function(){
 systemSetting = function(){
 
     var this_dgi = $.lStorage("_loginData").dgi;
-    var group_data = $.lStorage(ui);
+    var group_data = QmiGlobal.groups;
     var this_goup_data = group_data[gi];
-    //gi 現在團體id
-    //gu 現在團體 你自己的id
-    //ui 
-    //at
 
     var systemGroup = $("#group-setting");
     $(".notification-btn,.default-group-btn,.carousel-btn").removeClass("ready");
@@ -263,28 +259,23 @@ systemSetting = function(){
     var me_dgi = QmiGlobal.auth.dgi;
     //預設置頂自動換頁   
     $("#carousel-setting").find("input[value='"+top_timer_ms+"']").attr('checked', true);
-    //預設團體圖片
-    var emptyAut = "images/common/others/empty_img_all_l.png";
 
     //團體列表
     systemGroup.find('.group-option').remove();
-    //公私雲團體
-    var groupid = Object.keys(group_data);
-    //私雲團體
-    var prigroupid = Object.keys(QmiGlobal.companyGiMap);
-    for(var i = 0 ;i < groupid.length; i++){    
+
+    Object.keys(QmiGlobal.groups).forEach(function(currGi) {
+        var currGrpObj = QmiGlobal.groups[currGi];
+        var groupOptionHtmlStr = 
+            "<div class='group-option'>"+ 
+                "<input id='"+ currGi +"' data-role='none' name='group' type='radio' value='"+ currGi +"'>"+ 
+                "<label for='"+ currGi +"' class='radiobtn'></label>"+ 
+                "<img class='group-pic' data-gi='"+ currGi +"' src='"+ (currGrpObj.aut || QmiGlobal.emptyGrpPicStr) +"'>"+ 
+                "<label for='"+ currGi +"' class='radiotext'>"+ currGrpObj.gn._escape() +"</label>"+ 
+            "</div>";
         //產生團體列表
-        var cr = $("<div class='group-option'><input id='"+ groupid[i] +"' data-role='none' name='group' type='radio' value='"+ groupid[i] +"'><label for='"+ groupid[i] +"' class='radiobtn'></label><img class='group-pic' data-gi='"+ groupid[i] +"' src='"+ group_data[groupid[i]].aut +"'><label for='"+ groupid[i] +"' class='radiotext'>"+ group_data[groupid[i]].gn._escape() +"</label></div>");
-        systemGroup.find('.edit-defaultgroup-content').append(cr);
-        //判斷團體縮圖 如果沒有設定預設圖片
-        if(!group_data[groupid[i]].aut){
-            $(".group-pic[data-gi='"+ groupid[i] +"']").attr("src", emptyAut);
-        }
-    } 
-    //移除私雲團體
-    for(var j = 0;j < prigroupid.length;j++){
-        systemGroup.find('#'+prigroupid[j]).parent().remove();
-    }   
+        systemGroup.find('.edit-defaultgroup-content').append(groupOptionHtmlStr);
+    });
+
     //勾選預設群組
     systemGroup.find('#'+me_dgi).attr('checked', true);
 }
@@ -383,7 +374,8 @@ defaultGroupSetting = function(){
     var new_dgi = $("input[name$='group']:checked").val()
     new QmiAjax({
         apiName : "groups/"+new_dgi+"/default",
-        type: "put"
+        isPublicApi: true,
+        method: "put"
     }).success(function(data){
 
         toastShow(data.rsp_msg);
