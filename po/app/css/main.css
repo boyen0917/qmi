@@ -1357,13 +1357,7 @@ img.auo {
 
 .gm-adjustment { height: 43px; }
 
-.gm-user-main-area .background {
-	width: calc( 100vw - 250px );
-	height: 250px;
-	background-size: cover !important;
-	background-position: center !important;
-	position: relative;
-}
+
 
 .gm-user-main-area .background.me{
 	cursor: pointer;
@@ -1378,7 +1372,8 @@ img.auo {
     width: 35px;
     height: 35px;
     display: inline-block;
-    background: url("../images/common/icon/qicon_picedit.png");
+    position: absolute;
+    background: url("../images/namecard/qicon_picedit.png");
     background-size: 30px 30px;
     background-repeat: no-repeat;
     background-color: rgba(210, 210, 210, 0.72);
@@ -1389,13 +1384,13 @@ img.auo {
 	cursor: pointer;
 }
 
-.gm-user-main-area .background .name {
-	position: absolute;
-	bottom: 8%;
-	left: 5%;
-	font-size: 25px;
-	color: white;
-	text-shadow: 0px 0px 7px rgba(150, 150, 150, 1);
+.gm-user-main-area .background img{
+	width: calc( 100vw - 250px );
+    height: 251px;
+}
+
+.gm-user-main-area .setting-user-image {
+	display: none;
 }
 
 .gm-user-main-area .user {
@@ -1414,14 +1409,35 @@ img.auo {
 .gm-user-main-area .header h3 {
 	margin-left: 6em;
     line-height: 0;
-    width: 134px;
+    width: 265px;
     display: inline-block;
 }
 
-.gm-user-main-area .user .edit-status {
-	visibility: hidden;
+.gm-user-main-area .header .edit-pen {
+	background: url("../images/namecard/qicon_edit.png");
+	display: inline-block;
+    background-size: 28px;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    margin-top: 5px;
+    vertical-align: middle;
+}
+
+.gm-user-main-area .user .edit-decision {
+	/*visibility: hidden;*/
 	float: right;
-    margin-right: 14px;
+    margin-right: 20px;
+}
+
+.gm-user-main-area .edit-decision span{
+	margin-left: 12px;
+	cursor: pointer;
+}
+
+.gm-user-main-area .edit-decision span.save{
+	color: #4092ef;
 }
 
 .gm-user-main-area .user .user-pic {
@@ -1458,22 +1474,83 @@ img.auo {
     background: rgba(102, 102, 102, 0.72);
 }
 
-.gm-user-main-area .user .description {
+.gm-user-main-area .user .slogan {
 	position: absolute;
-    left: 7em;
-    margin-top: 49px;
+    left: 6.6em;
+    padding-left: 5px;
+    width: 300px;
+    margin-top: 22px;
     color: rgba(102, 102, 102, 0.87);
+    height: 44px;
+}
+
+.gm-user-main-area .user .slogan.me {
+    border-bottom: 1px solid #666;
+}
+/*
+.gm-user-main-area .user .edit-slogan-pen {
+	background: url("../images/namecard/qicon_edit.png");
+	display: inline-block;
+    background-size: 28px;
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    margin-top: 5px;
+    vertical-align: middle;
+}
+*/
+.gm-user-main-area .user [contenteditable]:focus {
+    outline: 0px solid transparent;
 }
 
 .gm-user-main-area .user .interaction {
 	position: absolute;
     right: 16px;
-    margin-top: 18px;
+    /*margin-top: 18px;*/
 }
 
 .gm-user-main-area .interaction img{
 	margin-left: 18px;
-	cursor: pointer;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+
+#page-group-main .st-personal-area {
+    display: none;
+    margin-top: 10px;
+}
+
+
+#page-group-main .st-personal-area, .other-info-row {
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    padding-top: 7px;
+    line-height: 2;
+}
+
+#page-group-main .other-info-row div {
+   display: inline-block;
+}
+
+#page-group-main .other-info-row .contact {
+    padding-left: 30px;
+    vertical-align: top;
+}
+
+#page-group-main .other-info-row img {
+    width: 42px;
+    height: 42px;
+    margin-left: 20px;
+}
+
+#page-group-main .other-info-row p {
+   	margin-top: -6px;
+    margin-bottom: 0px; 
+    color: rgba(128, 128, 128, 0.82); 
+    font-size: 12px; 
 }
 
 #page-group-main .gm-content {
@@ -5895,3 +5972,78 @@ img.vdo-default:before {}
 }
 
 
+/**************************************************************************  Swtich 開關按鈕 ***********************************************************************************/
+
+.onoffswitch {
+    position: relative;
+    width: 43px;
+    float: right;
+    margin: 15px 25px 0 0;
+    -webkit-user-select:none; 
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; 
+    overflow: hidden; 
+    cursor: pointer;
+    border-radius: 20px;
+}
+.onoffswitch-inner {
+    display: block; 
+    width: 200%; 
+    margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; 
+    float: left; 
+    width: 50%; 
+    height: 17px; 
+    padding: 0; 
+    line-height: 25px;
+    font-size: 14px; 
+    color: white; 
+    font-family: Trebuchet, Arial, sans-serif; 
+    font-weight: bold;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    content: "";
+    padding-left: 10px;
+    background-color: #B8DEFF; 
+    color: #FFFFFF;
+}
+.onoffswitch-inner:after {
+    content: "";
+    padding-right: 10px;
+    background-color: rgba(207, 214, 217, 0.36); 
+    color: #999999;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; 
+    width: 20px; 
+    margin: -3px;
+    background: #BAB3B3;
+    position: absolute; 
+    top: 0; 
+    bottom: 0;
+    right: 28px;
+    border-radius: 20px;
+    transition: all 0.3s ease-in 0s; 
+}
+
+#birthOnOff:checked + .onoffswitch-label .onoffswitch-inner, 
+#emailOnOff:checked + .onoffswitch-label .onoffswitch-inner, 
+#mobileOnOff:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+
+#birthOnOff:checked + .onoffswitch-label .onoffswitch-switch, 
+#emailOnOff:checked + .onoffswitch-label .onoffswitch-switch, 
+#mobileOnOff:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px; 
+    background-color: #5EB5FF; 
+}

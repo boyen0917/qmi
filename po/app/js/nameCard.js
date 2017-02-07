@@ -107,7 +107,7 @@
 
 	                groupMenuListArea().done(function(){
 	                    $.mobile.changePage("#page-group-main");
-	                    timelineSwitch("feeds", true);
+	                    timelineSwitch("feed", true);
 	                });
 
 	            } else {
@@ -315,7 +315,6 @@
 	}
 
 	userInfoShow = function(this_gi,this_gu){
-    
 	    if(!this_gu) return false;
 	    var this_gi = this_gi || gi;
 
@@ -798,7 +797,7 @@
 	        }
 	        personalHomePage(thisInfo, userData);
 	        $.mobile.changePage("#page-group-main");
-	        timelineSwitch("feeds",false,true,true);
+	        timelineSwitch("person",false,true,true);
 	    });
 	}
 	//切換至個人主頁
@@ -816,32 +815,215 @@
         thisInfo.find(".user-info-close").trigger("mouseup");
         //主頁背景
         var userDom = groupMainDom.find(".gm-user-main-area");
+        var userIsAdmin = (QmiGlobal.groups[gi].ad == 1) ? true : false;
+        var userInfoArea = groupMainDom.find(".st-personal-area");
+        var userTitle = (userData.bl && userData.bl != "") ? userData.bl : $.i18n.getString("USER_PROFILE_NO_DATA");
+        var userBirth = (userData.bd && userData.bd != "") ? userData.bd : $.i18n.getString("USER_PROFILE_NO_DATA");
+        var userEmail = (userData.em && userData.em != "") ? userData.em : $.i18n.getString("USER_PROFILE_NO_DATA");
+        var extension = (userData.ext && userData.ext != "") ? userData.ext : $.i18n.getString("USER_PROFILE_NO_DATA");
+        var userMobile = (userData.pn1 && userData.pn1 != "") ? userData.pn1 : $.i18n.getString("USER_PROFILE_NO_DATA");
+        var mvpn = (userData.mv && userData.mv != "") ? userData.ext : $.i18n.getString("USER_PROFILE_NO_DATA");
+
+        userBirth = (userIsAdmin || !userData.mkb || gu == this_gu) ? userBirth : "******";
+        userEmail = (userIsAdmin || !userData.mke || gu == this_gu) ? userEmail : "******";
+        userMobile = (userIsAdmin || !userData.mkp || gu == this_gu) ? userMobile 
+        	+ "<p>" + $.i18n.getString("USER_PROFILE_PHONE") + "</p>"  : "******";
+
         userDom.fadeIn("fast",function(){
             var _thisGroupList = QmiGlobal.groups[this_gi];
-            $(this).find(".background").removeClass("me").css("background","url('images/common/others/timeline_kv1_android.png') no-repeat").end()
-            	   .find(".user h3").attr("contentEditable", false).html(userData.nk).end()
+            var type;
+            var isFavUser = QmiGlobal.groups[gi].guAll[this_gu].fav;
+
+            $(this).find(".background").removeClass("me").find("img")
+            	   .attr("src", userData.put || "images/common/others/timeline_kv1_android.png").end().end()
+            	   .find(".user h3").text(userData.nk).end()
+            	   .find(".user .edit-pen").hide().end()
+            	   .find(".edit-decision").css("visibility", "hidden").end()
             	   .find(".user .user-pic").removeClass("me").end()
             	   .find(".user .pic").attr("src", userData.auo || "images/common/others/empty_img_personal_xl.png").end()
-            // userDom.find(".user .pic").css("background","url(" + _thisGroupList.guAll[this_gu].auo + ")");
-            	   .find(".user .description").html(userData.sl);
-
-
+            	   .find(".user .slogan").text(userData.sl).end()
+            	   .find(".user .interaction").show().end()
+            	   .find(".interaction .favorite").attr("src", isFavUser ? "images/namecard/qicon_favorite_actived.png" : "images/namecard/qicon_favorite.png")
+            	   .find(".onoffswitch").hide();
 
             if (gu == this_gu) {
             	$(this).find(".background").addClass("me").end()
-            		   .find(".user h3").attr("contentEditable", true).end()
+            		   .find(".user .edit-pen").show().end()
             		   .find(".user .user-pic").addClass("me").end()
-            		   .find(".user .description").addClass("me").end()
-            		   .find(".user .interaction").hide();
+            		   // .find(".user .slogan").addClass("me").end()
+            		   .find(".user .interaction").hide().end()
+            		   .find(".onoffswitch").show();
             }
 
-            $(this).find(".background").on("click", function () {
-            	console.log("hi background");
+            $(this).find(".background").off("click").on("click", function () {
+            	if ($(this).hasClass("me")) {
+            		$(this).siblings(".setting-user-image").trigger("click");
+            		type = "cover";
+            	}
             });
-            // if(!_thisGroupList.aut){
-            //     userDom.find(".group .pic").css("background","url(" + emptyAut + ")");
-            // }
+
+            $(this).find(".user-pic").off("click").on("click", function () {
+            	if ($(this).hasClass("me")) {
+            		userDom.find(".setting-user-image").trigger("click");
+            		type = "avatar";
+            	}
+            });
+
+            $(this).find(".user .edit-pen").off("click").on("click", function (e) {
+            	var nameInput = $(this).find(".user h3").get(0);
+            	var range = document.createRange();
+            	var sel = window.getSelection();
+
+            	$(this).find(".user h3").attr("contentEditable", true).end()
+            		   .find(".user .slogan").addClass("me").attr("contentEditable", true).end()
+            		   .find(".user .edit-decision").css("visibility", "visible");
+            	$(e.target).hide();
+
+            	range.selectNodeContents(nameInput);
+        		range.collapse(false);
+        		sel.removeAllRanges();
+        		sel.addRange(range);
+            }.bind(this));
+
+            $(this).find(".edit-decision .save").off("click").on("click", function (e) {
+            	console.log(userDom.find(".user h3").text());
+				var userObj = {
+					gu : userData.gu,
+					info : {
+						nk : userDom.find(".user h3").text(),
+						sl : userDom.find(".user .slogan").text(),
+						mkb : userData.mkb,
+						mke : userData.mke,
+						mkp : userData.mkp,
+					}
+				};
+
+				updateUserInfo(userObj).done(function (completeMsg) {
+			    	userDom.find(".user h3").attr("contentEditable", false).end()
+            		   	   .find(".user .slogan").removeClass("me").attr("contentEditable", false).end()
+            		   	   .find(".user .edit-decision").css("visibility", "hidden").end()
+            		   	   .find(".user .edit-pen").show();
+
+			    	toastShow(completeMsg);
+			    }).fail(function (failMsg) {
+			    	toastShow(failMsg);
+			    });
+            	
+            });
+
+            $(this).find(".edit-decision .cancel").off("click").on("click", function () {
+            	$(this).find(".user h3").attr("contentEditable", false).end()
+            		   .find(".user .slogan").removeClass("me").attr("contentEditable", false).end()
+            		   .find(".user .edit-decision").css("visibility", "hidden").end()
+            		   .find(".user .edit-pen").show();
+            }.bind(this));
+
+            $(this).find(".setting-user-image").off("change").on("change", function () {
+            	var inputFile = $(this);
+            	var file = inputFile[0].files[0];
+            	var reader = new FileReader();
+            	var apiName = "groups/" + gi + "/users/" + this_gu + "/page";
+
+            	if (type == "cover") {
+            		var imageElement = userDom.find(".background img");
+            	} else {
+            		var imageElement = userDom.find(".user-pic img");
+            		apiName = "groups/" + gi + "/users/" + this_gu + "/avatar";
+				}
+		        reader.onload = function(e) {
+		            imageElement.attr("src",reader.result);
+		        }
+		        reader.readAsDataURL(file);
+	        	qmiUploadFile({
+	                urlAjax: {
+			            apiName: apiName,
+			            method: "put"
+			        },
+			        isPublicApi: true,
+			        file: imageElement[0],
+			        oriObj: {w: 1280, h: 1280, s: 0.7},
+			        tmbObj: {w: 480, h: 480, s: 0.6},
+			        tp: 1 // ;
+	            }).done(function(resObj) {
+	            	if (resObj.isSuccess) toastShow($.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+	                else toastShow($.i18n.getString("COMMON_UPLOAD_FAIL"));
+	            });
+            });
+
+            $(this).find(".interaction .chat").off("click").on("click", function () {
+            	requestNewChatRoomApi( this_gi, "", [{gu:this_gu}], function(data){
+			    });
+            });
+
+            $(this).find(".interaction .favorite").off("click").on("click", function () {
+            	var isFav = QmiGlobal.groups[gi].guAll[this_gu].fav;
+            	var favIcon = $(this);
+            	var ajaxData = {
+					apiName : "/groups/" + gi + "/favorite_users/",
+					method : "put",
+					isPublicApi : true,
+					body : {}
+				};
+
+				if (!isFav) ajaxData.body.al = [this_gu];
+				else ajaxData.body.dl = [this_gu];
+
+            	new QmiAjax(ajaxData).complete(function (data) {
+            		if (data.status == 200) {
+            			QmiGlobal.groups[gi].guAll[this_gu].fav = !isFav;
+            			favIcon.attr("src", !isFav ? "images/namecard/qicon_favorite_actived.png" : "images/namecard/qicon_favorite.png")
+            		}
+			    	toastShow($.parseJSON(data.responseText).rsp_msg);
+			    });
+            });
         });
+
+        userInfoArea.find(".job-title").html(userTitle).end()
+        			.find(".birth").html(userBirth).end()
+        			.find(".email").html(userEmail).end()
+        			.find(".phone").html(extension + "<p>" + $.i18n.getString("USER_PROFILE_EXTENSION") + "</p>").end()
+        			.find(".mobile").html(userMobile).end()
+        			.find(".mvpn").html(mvpn + "<p>" + $.i18n.getString("USER_PROFILE_MVPN") + "</p>").end()
+        			.find(".onoffswitch").hide();
+
+        if (gu == this_gu) {
+        	userInfoArea.find(".onoffswitch").show().end()
+        				.find("#birthOnOff").attr("checked", !userData.mkb).end()
+        				.find("#emailOnOff").attr("checked", !userData.mke).end()
+        				.find("#mobileOnOff").attr("checked", !userData.mkp);
+
+        	userInfoArea.find('.onoffswitch input[type=checkbox]').change(function(e) {
+
+				var userObj = {
+					gu : userData.gu,
+					info : {
+						nk : userData.nk,
+						sl : userData.sl,
+						mkb : userData.mkb,
+						mke : userData.mke,
+						mkp : userData.mkp,
+					}
+				};
+				var switchName = e.target.id;
+
+				switch (switchName) {
+					case "birthOnOff" :
+						userObj.info.mkb = !$(this).is(':checked');
+						break;
+					case "emailOnOff":
+						userObj.info.mke = !$(this).is(':checked');
+						break;
+					case "mobileOnOff":
+						userObj.info.mkp = !$(this).is(':checked');
+						break;
+				}
+			    updateUserInfo(userObj).done(function (completeMsg) {
+			    	toastShow(completeMsg);
+			    }).fail(function (failMsg) {
+			    	toastShow(failMsg);
+			    });
+			});
+        }
 
         if($(".alert-area").is(":visible")){
             $(".alert").removeClass("alert-visit");
@@ -861,18 +1043,40 @@
             timelineScrollTop();
 
             groupMainDom.find(".st-feedbox-area div[data-feed=main]").html("");
-            groupMainDom.find(".st-feedbox-area").show();
+            // groupMainDom.find(".st-feedbox-area").hide();
             groupMainDom.find(".feed-subarea").hide();
-            groupMainDom.find(".st-filter-action").filter("[data-navi='personal-info']").show();
+            groupMainDom.find(".st-filter-action").filter("[data-navi='personal-info']")
+            			.show().addClass("st-filter-list-active");
             // groupMainDom.find(".st-filter-area").data("filter","all");
-            
+            userInfoArea.show();
             groupMainDom
             .data("main-gu",this_gu)
             .data("main-gi",this_gi)
             .data("navi","main");
             
+            console.log($("#page-group-main").data("navi"));
+            console.log(groupMainDom.data("navi"));
             timelineListWrite();
         },500);
+	}
+
+	updateUserInfo = function (userObj) {
+		console.log(userObj);
+		var ajaxData = {
+			apiName : "/groups/" + gi + "/users/" + userObj.gu,
+			method : "put",
+			isPublicApi : true,
+			body : userObj.info
+		};
+
+		var deferred = $.Deferred();
+
+		new QmiAjax(ajaxData).complete(function (data) {
+			if (data.status == 200) deferred.resolve($.parseJSON(data.responseText).rsp_msg);
+	    	else deferred.reject($.i18n.getString("COMMON_UPLOAD_FAIL"));
+	    });
+
+	    return deferred.promise();
 	}
 
 	userInfoSend = function(this_info){

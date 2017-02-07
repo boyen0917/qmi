@@ -455,20 +455,21 @@ timelineSwitch = function (act,reset,main,noPR){
             filterAction.filter("[data-navi='feed-public']").hide();
             filterAction.filter("[data-navi='feed-post']").hide();
             filterAction.filter("[data-navi='personal-info']").hide();
+            filterAction.parent().data("filter", "all");
             $(".subpage-addressBook").hide();
 
             //顯示新增貼文按鈕
             gmHeader.find(".feed-compose").show();
-
-            $("#page-group-main .subpage-timeline").show().scrollTop(0);
-
+            groupMain.find(".st-feedbox-area").show();
+            groupMain.find(".subpage-timeline").show().scrollTop(0);
+            groupMain.find(".st-personal-area").hide();
             //polling 數字重寫
             pollingCountsWrite();
 
             // 使用已隱藏的舊的方式 來做timeline切換
             if( $(".st-filter-area").hasClass("st-filter-lock") === false ){
                 //將選項存入
-                $("#page-group-main").data("navi",0);
+                groupMain.data("navi",0);
 
                 timelineListWrite().done(function(result){
                     switchDeferred.resolve({ act: "main"});
@@ -614,8 +615,7 @@ timelineSwitch = function (act,reset,main,noPR){
                 fsObj.getList();
             });
             //initGroupSetting(gi);
-            break;
-        
+            break;  
         case "feed-post":
             var filterAction = $(".st-filter-action");
             $(".st-navi-area").data("currentHome", "feed-post");
@@ -639,7 +639,10 @@ timelineSwitch = function (act,reset,main,noPR){
             // if(!main)
                 $(".st-navi-subarea[data-st-navi=feed-post]").trigger("click");
 
-            $(".subpage-timeline").show();
+            groupMain.find(".st-feedbox-area").show();
+            groupMain.find(".subpage-timeline").show();
+            groupMain.find(".st-personal-area").hide();
+
             gmHeader.find(".page-title").html(page_title);
 
             //顯示新增貼文按鈕, 藏新增聊天室按鈕
@@ -677,11 +680,14 @@ timelineSwitch = function (act,reset,main,noPR){
             // if(!main)
                 $(".st-navi-subarea[data-st-navi=feed-public]").trigger("click");
 
-            $(".subpage-timeline").show();
             gmHeader.find(".page-title").html(page_title);
 
             //顯示新增貼文按鈕, 藏新增聊天室按鈕
             gmHeader.find(".feed-compose").show();
+
+            groupMain.find(".st-feedbox-area").show();
+            groupMain.find(".subpage-timeline").show();
+            groupMain.find(".st-personal-area").hide();
 
             //polling 數字重寫
             if($.lStorage("_pollingData"))
@@ -721,6 +727,27 @@ timelineSwitch = function (act,reset,main,noPR){
 
             //initGroupSetting(gi);
             switchDeferred.resolve({ act: "groupSetting"});
+            break;
+        case "person":
+            groupMain.find(".st-filter-area").show();
+            groupMain.find(".st-filter-action")
+                     .filter(".st-filter-list-active").removeClass("st-filter-list-active").end()
+                     .filter("[data-navi='announcement']").show().end()
+                     .filter("[data-navi='feedback']").hide().end()
+                     .filter("[data-navi='task']").show().end()
+                     .filter("[data-navi='home']").show().end()
+                     .filter("[data-navi='feed-public']").hide().end()
+                     .filter("[data-navi='feed-post']").hide();
+                     
+            //顯示新增貼文按鈕
+            gmHeader.find(".feed-compose").show();
+
+            groupMain.find(".subpage-timeline").show().end()
+                     // .find(".st-filter-area").data("filter","all")
+                     .children(".st-filter-hide.right").show().end()
+                     .children(".st-filter-hide.left").hide().end()
+                     .scrollLeft(0);
+            
             break;
     }
 
@@ -5117,7 +5144,6 @@ permissionControl = function(group_list){
 //動態消息列表
 //先從資料庫拉資料 另外也同時從server拉資料存資料庫 再重寫
 idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
-    console.log("ffefefe");
     var 
     polling_arr = polling_arr || [],
     this_gi = polling_arr[0] || gi,
@@ -5193,7 +5219,6 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
 
             
         } else {
-
             //transform gi to private gi
             for( var i=0; i<timeline_list.length; i++ ){
                 //ei:"G000000109N_T00000020BF_E000000107H"
@@ -5214,11 +5239,11 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
                         $(".st-feedbox-area-bottom > div").show();
                     },2000);
                 }
-                // else{
-                //     //開啟timeline loading 關閉沒資料圖示 下拉更新除外
-                //     $(".st-feedbox-area-bottom > img").show();
-                //     $(".st-feedbox-area-bottom > div").hide();
-                // }
+                else{
+                    //開啟timeline loading 關閉沒資料圖示 下拉更新除外
+                    $(".st-feedbox-area-bottom > img").show();
+                    $(".st-feedbox-area-bottom > div").hide();
+                }
 
                 $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
                     timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
@@ -5352,12 +5377,12 @@ idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr,callback){
 timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi){
     if(!detail){
         var event_tp = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
-        console.log(event_tp);
+        // console.log(event_tp);
         if($("#page-group-main").data("main-gu")){
             var tmp = ".feed-subarea[data-feed=main]";
             var ori_selector = $(".feed-subarea[data-feed=main]");
 
-            ori_selector.html("");
+            // ori_selector.html("");
         } else {
             var tmp = ".feed-subarea[data-feed=" + event_tp + "]";
             var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
@@ -5788,7 +5813,7 @@ eventStatusWrite = function(this_event,this_es_obj){
     }
 }
 
-eventFilter = function(this_event,filter){
+eventFilter = function(this_event,filter) {
     var filter = filter || "all";
     
     if(filter == "navi"){
