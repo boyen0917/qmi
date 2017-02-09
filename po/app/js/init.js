@@ -232,7 +232,7 @@ var timeline_detail_exception = [
 
 window.QmiGlobal = {
 
-	appVer: $.lStorage("_ver") || "1.7.0",
+	appVer: $.lStorage("_ver").ver || "1.7.0",
 
 	// 在下方 document ready之後 initReady
 	initReady: function() {
@@ -395,7 +395,8 @@ window.QmiGlobal = {
 	            $.lStorage("_appReloadAuth", QmiGlobal.auth);
 	            setTimer();
 	            
-	            location.reload();
+	            // location.reload();
+	            clearCache();
 	        }
 	    }
 

@@ -350,7 +350,7 @@
 
 
 	"REFRESH_RELOAD" : "讀取失敗，請稍後再試",
-	"REFRESH_TEXT" : "企業資訊取得失敗 請稍後再試",
+	"REFRESH_TEXT" : "企業資訊更新 請重新驗證",
 	"REFRESH_ALERT_SUCCESS" : "企業資訊取得完成",
 	"REFRESH_ALERT_CONFIRM" : "按確定可立即前往預設團體",
 
@@ -431,5 +431,10 @@
 	"WEBONLY_CHATROOM_INFO" : "聊天室資訊",
 	"WEBONLY_INVITE_PERMISSION" : "一般成員邀請權限",
 	"WEBONLY_LOGOUT_BY_ANOTHER_DEVICE" : "你的帳號於其他裝置登入",
-	"WEBONLY_VERSION_NO" : "版本"
+	"WEBONLY_VERSION_CHK" : "檢查更新",
+	"WEBONLY_VERSION_NO" : "版本",
+
+	"WEBONLY_APPVERSION_00" : "有新版本，將自動更新資料。",
+	"WEBONLY_APPVERSION_01" : "有新版本安裝程式，是否下載安裝？"
+
 }

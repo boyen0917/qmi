@@ -333,59 +333,118 @@ QmiGlobal.module.systemPopup = {
 
 
 QmiGlobal.module.appVersion = {
-	authChk: function(rspData) {
-		var deferred = $.Deferred();
-		switch(rspData.status) {
-			case 200:
-				deferred.resolve(rspData);
 
-				break;
-			case 401:
-				resetDB();
-				window.location = "index.html";
-				break;
-			default:
-				deferred.reject(rspData);
-				break;
-		}
-		return deferred.promise();
-	},
-
-	init: function() {
+	init: function(isUserClick) {
 		var self = this;
 		var deferred = $.Deferred();
 		self.isFirstInit = !QmiGlobal.appVer;
 
+		// 正在執行中
+		if(self.loadingUI.isLoading()) return;
+		if(isUserClick) self.loadingUI.on();
 		self.apiSysVersion().success(function(rspData) {
 			self.appOnFocusEvent();
     		self.data = rspData;
+    		// 版本相同 不更新
+    		// if(QmiGlobal.appVer === rspData.av) rspData.ut = 2;
+
+    		// 替換成最新版本
+    		QmiGlobal.appVer = rspData.av;
+    		$.lStorage("_ver", {ver: QmiGlobal.appVer});
+
+    		self.switchStr = "" + rspData.ut + +(rspData.uu === "null");
 
     		self.chk();
     		
     		// 寫入版本號
+    		$("#app-version").attr("ver-chk", $.i18n.getString("WEBONLY_VERSION_CHK"));
 			$("#app-version").attr("version", QmiGlobal.appVer);
 
 		}).error(function(rspData) {
 			console.log("err", rspData);
-		}).complete(deferred.resolve);
+		}).complete(function() {
+			if(isUserClick) self.loadingUI.off();
+			deferred.resolve();
+		});
+
+		// 綁定事件
+		$("#app-version").off().click(function() {
+			self.init(true);
+		});
 
 		return deferred.promise();
 	},
 
+	loadingUI: function() {
+		var isLoading = false;
+		return {
+			on: function() {
+				isLoading = true;
+				$("#app-version").append("<div class=\"loading\"><img src=\"images/loading2.gif\"></div>")
+			},
+			off: function() {
+				setTimeout(function() {
+					isLoading = false;
+					$("#app-version div.loading").remove();
+				}, 1000);
+				
+			},
+			isLoading: function() {
+				return isLoading;
+			}
+		}
+	}(),
+
+	
 	chk: function() {
 		var self = this;
-
+		console.log(self);
 		// 無更新
 		if(self.data.av === QmiGlobal.appVer) {
 		} else {
-			switch(self.data.ut) {
-    			case 0: // 手動更新
-    				self.updateOptional();
+			switch(self.SwitchStr) {
+    			case "00": // 手動更新 桌機無更新
+
+    				// 
+
+    				// 文案：「有新版本，將自動更新資料。」
+					// 按鈕：「確定」
+					// 規格：情境一只能選擇「確定」，並自動更新網頁資料。
+
+					// new QmiGlobal.popup({
+					// 	desc: $.i18n.getString("WEBONLY_APPVERSION_00"),
+					// 	confirm: true,
+					// 	action: [logout]
+					// });
+
+    				// self.updateOptional();
     				break;
-    			case 1: // 強制更新
-    				self.updateForced();
-    				break; // 不用更新
-    			case 2:
+    			case "01": // 手動更新 桌機有更新 
+    				// 文案：「有新版本安裝程式，是否下載安裝？」
+					// 按鈕：「下載」、「取消」
+					// 規格：
+					// 「下載」 => 自動下載新的安裝檔，客戶自行決定是否點擊安裝。
+					// 「取消」 => 取消則下次檢查更新時重新詢問是否下載。
+    				
+
+
+    				// self.updateForced();
+    				break;
+    			case "10": // 強制更新 桌機無更新
+    				// 文案：「有新版本，將自動更新資料。」
+					// 按鈕：「確定」
+					// 規格：情境一只能選擇「確定」，並自動更新網頁資料。
+
+
+
+    				break;
+    			case "11": // 強制更新 桌機有更新
+    				// 文案：「有新版本安裝程式，下載後請重新安裝。」
+					// 按鈕：「下載」
+					// 規格：
+					// 「下載」 => 自動下載新的安裝檔，客戶自行決定是否點擊安裝，若無安裝，下次登入仍會跳出強制下載頁面無法使用。
+
+
     				break;
     		}
 		}
@@ -409,11 +468,11 @@ QmiGlobal.module.appVersion = {
 	},
 
 	updateOptional: function() {
-
+		var self = this;
 	},
 
 	updateForced: function() {
-
+		console.log("yo");
 	},
 
 	appOnFocusEvent: function() {try {

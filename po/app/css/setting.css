@@ -620,15 +620,40 @@ ul.system-tab li.current-tab{
 }
 
 #system-information .st-info-option:not(:last-child) {border-bottom: 1px solid #ededed;}
+#system-information .version-no:before {
+    content: attr(ver-chk);
+    position: absolute;
+    top: 20px;
+    right: -10px;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    padding: 2px 5px;
+    height: 13px;
+    font-size: 12px;
+    line-height: 13px;
+    background: ghostwhite;
+    color: #555;
+    cursor: pointer;
+}
 #system-information .version-no:after {
     content: attr(version);
     position: absolute;
     top: 21px;
-    right: 40px;
-    /* height: 30px; */
-    /* width: 30px; */
+    right: 65px;
     color: #888;
 }
+
+#app-version div.loading {
+    position: absolute;
+    top: 17px;
+    right: -25px;
+    background: white;
+    width: 80px;
+    text-align: center;
+}
+
+#app-version div.loading img {width: 20px;}
+
 /*系統通知*//*預設團體*//*自動換頁*/
 .notification-option,
 .group-option,
