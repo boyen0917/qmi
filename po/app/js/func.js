@@ -1425,7 +1425,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                         break;
                     case 13:
                         if(reply_chk) break;
-
+                        console.log(val);
                         //工作回覆
                         this_event.find(".st-work-option").each(function(ml_i,ml_val){
                             var this_work = $(this);
@@ -1710,10 +1710,13 @@ workContentMake = function (this_event,li){
     //自己的工作放在最前面
     var rest_li = [];
     var me_arr = [];
+    var _groupList = QmiGlobal.groups;
+    var thisGi = this_event.data("event-id").split("_")[0];
+    var thisGu = _groupList[thisGi].me;
     $.each(li,function(i,val){
         var temp_arr = val.u.split(",");
 
-        if($.inArray(gu,temp_arr) >= 0){
+        if($.inArray(thisGu, temp_arr) >= 0){
             val.m = true;
             me_arr.push(val);
         }else{
@@ -1721,12 +1724,14 @@ workContentMake = function (this_event,li){
         }
     });
     var new_li = me_arr.concat(rest_li);
-    var _groupList = QmiGlobal.groups;
     //重置
     this_event.find(".st-task-work-detail").html("");
     cns.debug("new_li:",new_li);
     $.each(new_li,function(i,val){
-        var this_work = $('<div class="st-work-option" data-item-index="' + val.k + '"><img class="check" src="images/common/icon/icon_check_round_white.png"><span>' + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' + _groupList[gi].guAll[val.u].nk + '</span></div></div>');
+        var this_work = $('<div class="st-work-option" data-item-index="' + val.k 
+            + '"><img class="check" src="images/common/icon/icon_check_round_white.png"><span>' 
+            + val.d + '</span><div class="st-work-option-tu"><img src="images/common/icon/icon_work_member_gray.png"/><span>' 
+            + _groupList[thisGi].guAll[val.u].nk + '</span></div></div>');
         this_event.find(".st-task-work-detail").append(this_work);
         if(val.m) {
             this_work.data("mine",true);
@@ -1742,11 +1747,12 @@ workContentMake = function (this_event,li){
 
 bindWorkEvent = function (this_event){
     this_event.find(".st-work-option").click(function(){
-
         var this_work = $(this);
         var fin = false;
         var mine_total = this_event.find(".work-mine-chk").length;
         var mine_finished_total = this_event.find(".work-mine-finished").length;
+        var tiFeed = this_event.data("event-id").split("_")[1];
+        var thisGi = this_event.data("event-id").split("_")[0];
 
         //不是自己的工作 或是結束時間到了 就不能點選
         if(!this_work.data("mine") || this_event.data("task-over")) return false;
@@ -1760,7 +1766,7 @@ bindWorkEvent = function (this_event){
             if(mine_finished_total == mine_total-1) fin = true;
         }
 
-        var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
+        var api_name = "groups/" + thisGi + "/timelines/" + tiFeed + "/events?ep=" + this_event.data("event-id");
 
         var headers = {
                  "ui":ui,
@@ -1906,6 +1912,8 @@ voteTypeSetting = function (this_event,vote_obj){
 voteResultMake = function (this_event){
     var vote_obj = this_event.data("vote-result");
     var all_ques = this_event.find(".st-vote-ques-area");
+    var thisGi = this_event.data("event-id").split("_")[0],
+        thisGu = QmiGlobal.groups[thisGi].me;
     //設定投票人數
     this_event.find(".st-task-vote-detail-count").show();
     this_event.find(".st-task-vote-detail-count span:first").html(Object.keys(vote_obj).length + "人已投票");
@@ -1937,7 +1945,7 @@ voteResultMake = function (this_event){
                                 this_opt.data("member-list",member_list);
                                 
                                 //自己投的 要打勾
-                                if(ans_gu == gu){
+                                if(ans_gu == thisGu){
                                     //已投過票數加一
                                     var n = this_ques.data("multi-count")*1;
                                     this_ques.data("multi-count",n+1)
@@ -2083,6 +2091,10 @@ bindVoteEvent = function (this_event){
         //綁過不要再綁 會重複執行
         this_event.data("vote-bind-chk",true);
 
+
+        var thisTimelineID = this_event.data("event-id").split("_")[1];
+        var thisGroup = this_event.data("event-id").split("_")[0];
+
         //沒藍色表示不給送出
         if(!$(this).hasClass("st-vote-send-blue")){
             return false;
@@ -2140,7 +2152,10 @@ bindVoteEvent = function (this_event){
             },
             "ml" : [reply_obj]
         };
-        var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events?ep=" + this_event.data("event-id");
+
+
+        var api_name = "groups/" + thisGroup + "/timelines/" + thisTimelineID + "/events?ep=" 
+            + this_event.data("event-id");
 
         var headers = {
                  "ui":ui,
