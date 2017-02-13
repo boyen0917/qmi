@@ -3,6 +3,7 @@
 	var require = window.require || null;
     
     if(require === null) {
+    	QmiGlobal.isDesktop = false;
         console.error("非桌機版");
         return;
     }

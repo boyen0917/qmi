@@ -435,6 +435,6 @@
 	"WEBONLY_VERSION_NO" : "Version",
 
 	"WEBONLY_APPVERSION_00" : "Update automatically..",
-	"WEBONLY_APPVERSION_01" : "There is a new version available, Update now?"
-
+	"WEBONLY_APPVERSION_01" : "There is a new version available, Update now?",
+	"WEBONLY_IS_LATEST_VERSION" : "You already have the latest version of Qmi"
 }

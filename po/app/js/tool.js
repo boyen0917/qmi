@@ -64,6 +64,9 @@ QmiGlobal.popup = function(args){
 
 	//取消
 	self.jqHtml.find(".popup-cancel").click(function(){
+		if(args.cancel !== undefined && args.cancelAction !== undefined)
+			args.cancelAction();
+
 		self.jqHtml.remove();
 		self.remove();
 	})
@@ -2058,19 +2061,8 @@ clearCache = function(){
 		return true;
 		// alert("clear cache 1 succ");
 	} catch(e){
+		location.reload();
 		cns.debug(e.stack);
-//  		alert(e.stack);
-		// alert("clear cache 1 fail");
-
-  //   	try{
-		// 	var path = require('nw.gui').App.dataPath;
-	 //    	var fs = require('fs');
-		// 	deleteFolderRecursive(fs, path);
-		// 	alert("clear cache 2 succ");
-		// } catch(e){
-		// 	alert(e.stack);
-		// 	alert("clear cache 2 fail");
-		// }
 	}
 	return false;
 }

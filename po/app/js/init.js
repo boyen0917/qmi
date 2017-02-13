@@ -240,8 +240,11 @@ window.QmiGlobal = {
 			QmiGlobal.module.appVersion.init(), // 檢查版本
 		];
 
-
 		$.when.apply($, initDefArr).done(function() {
+
+			// 寫入版本號
+			$("#app-version").attr("ver-chk", $.i18n.getString("WEBONLY_VERSION_CHK"));
+
 			//設定語言, 還沒登入先用瀏覽器的語言設定
 			updateLanguage(lang);
 
@@ -257,6 +260,8 @@ window.QmiGlobal = {
 	currentGi: "",
 
 	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")) || navigator.userAgent,
+
+	isDesktop: true,
 
 	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups
 	companies: {}, // 全部的company資料
@@ -376,6 +381,11 @@ window.QmiGlobal = {
 
 	        do: function(argsObj) {
 	            if(!argsObj) return;
+	            if(!QmiGlobal.auth.at) {
+	            	location.reload();
+	            	return;
+	            }
+
 	            if(flag === false && !argsObj.isReloadDirectly) return;
 
 	            var wl = {};
