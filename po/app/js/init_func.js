@@ -65,6 +65,8 @@ $(function(){
                 var groupData = QmiGlobal.groups[thisGi];
                 var ignoreKeys = ["ul","fl","bl","fbl","tl"];
                 var inviteGuAll = {};
+                // var isLoadUserFinish = false;
+                // var nextUserId = "";
 
                 // 單一團體資訊的部分key 另外處理成hash-map
                 for( var key in comboData ){
@@ -76,39 +78,42 @@ $(function(){
                     }
                 }
 
-                if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
-                // 製作guAll hash-map & inviteGuAll
-                for( var key in comboData.ul ){
-                    var thisGuObj = comboData.ul[key];
-                    //用在contact.js 不知道為何
-                    if( thisGuObj.st === 0) inviteGuAll[thisGuObj.gu] = thisGuObj;
+                getGroupAllMembers(thisGi).done(function(groupMemberList) {
+                    comboData.ul = groupMemberList;
+                    if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
+                    // 製作guAll hash-map & inviteGuAll
+                    for( var key in comboData.ul ){
+                        var thisGuObj = comboData.ul[key];
+                        //用在contact.js 不知道為何
+                        if( thisGuObj.st === 0) inviteGuAll[thisGuObj.gu] = thisGuObj;
 
-                    if(thisGuObj.nk !== undefined)
-                        thisGuObj.nk = thisGuObj.nk._escape();
+                        if(thisGuObj.nk !== undefined)
+                            thisGuObj.nk = thisGuObj.nk._escape();
 
-                    groupData.guAll[thisGuObj.gu] = thisGuObj;
-                }
-                groupData.inviteGuAll = inviteGuAll;
+                        groupData.guAll[thisGuObj.gu] = thisGuObj;
+                    }
+                    groupData.inviteGuAll = inviteGuAll;
 
-                //官方帳號設定
-                initOfficialGroup( thisGi );
+                    //官方帳號設定
+                    initOfficialGroup( thisGi );
 
-                //初始化 重組群組資訊
-                setBranchList( thisGi , {
-                    bl:  comboData.bl,
-                    fbl: comboData.fbl
-                });
+                    //初始化 重組群組資訊
+                    setBranchList( thisGi , {
+                        bl:  comboData.bl,
+                        fbl: comboData.fbl
+                    });
 
-                //設定功能選單
-                setTabList(thisGi);
+                    //設定功能選單
+                    setTabList(thisGi);
 
-                if(callback) callback();
+                    if(callback) callback();
 
-                comboDeferred.resolve({
-                    status: true,
-                    thisGi: thisGi,
-                    data: data
-                });
+                    comboDeferred.resolve({
+                        status: true,
+                        thisGi: thisGi,
+                        data: data
+                    });
+                })
 
             }else{    
                 comboDeferred.resolve({
@@ -124,6 +129,36 @@ $(function(){
         });
 
         return comboDeferred.promise();
+    }
+
+    getGroupAllMembers = function(thisGi) {
+        var userList = [];
+        var getMemberListDef = $.Deferred();
+
+        var getMembers = function(nextUserId) {
+            var deferred = $.Deferred();
+            var ajaxData = {
+                apiName: "groups/" + thisGi + "/users",
+                apiVer: "apiv2",
+            }
+
+            nextUserId = nextUserId || "";
+            if (nextUserId != "") ajaxData.apiName = ajaxData.apiName + "?gu=" + nextUserId;
+
+            new QmiAjax(ajaxData).success(function(data) {
+                if (Array.isArray(data.ul) && data.ul.length > 0) {
+                    userList = userList.concat(data.ul);
+                    nextUserId = data.ul[data.ul.length - 1].gu;
+                    getMembers(nextUserId)
+                } else {
+                    getMemberListDef.resolve(userList);
+                }
+            });
+        }
+
+        getMembers();
+
+        return getMemberListDef.promise();
     }
 
     setGroupUser = function( this_gi, data ){

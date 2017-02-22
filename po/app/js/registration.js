@@ -483,9 +483,12 @@ onCheckVersionDone = function(needUpdate){
 				initChatDB(deferred.resolve); 
 		    	return deferred.promise();
 			}).then(function() {
-				
 				// 非同步沒關係
-        		getMultiGroupCombo(Object.keys(QmiGlobal.groups), true);
+				var allGroups = Object.keys(QmiGlobal.groups);
+
+				// 預設團體打過了，從陣列移除掉
+				allGroups.splice(allGroups.indexOf(QmiGlobal.auth.dgi), 1)
+        		getMultiGroupCombo(allGroups, true);
 
 		    	activateClearChatsTimer();
 
