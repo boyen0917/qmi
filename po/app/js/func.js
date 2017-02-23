@@ -7658,6 +7658,7 @@ getCompanyKey = function(companiesKeyObj){
         isPublicApi: true,
         body: companiesKeyObj,
         method: "post",
+        noErr: true,
         error: function(){
             deferred.resolve({isSuccess: false});
         },

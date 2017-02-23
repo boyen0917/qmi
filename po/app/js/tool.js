@@ -477,9 +477,14 @@ changePageAfterPopUp = function(page){
 //================================== language ===========================
 
 updateLanguage = function( lanPath ){
+	lanPath = lanPath || lang;
+	var deferred = $.Deferred();
 	$.i18n.load(lanPath, function(){
 		$('body')._i18n();
+		deferred.resolve();
 	});
+
+	return deferred.promise();
 }
 
 

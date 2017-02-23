@@ -232,21 +232,64 @@ var timeline_detail_exception = [
 
 window.QmiGlobal = {
 
-	appVer: $.lStorage("_ver").ver || "1.7.0",
+	// 這是web版號 另有桌機版號 module.js deskTopVersion
+	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
+	appVer: "1.7.0",
+
+	// 檢查是否為聊天室
+	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
+
+	// 桌機版設定
+	nwGui: function() {
+		try {
+			return require('nw.gui')
+		} catch(e) {
+			console.error("非桌機版")
+			return null;
+		};
+	}(),
+
+	// app的資料的預設值
+	defaultAppQmiData: {
+		listenerMap: {
+			onFocus: function() {
+				QmiGlobal.module.appVersion.init()
+			}
+		}
+	},
+
+	getAppWin: function() {
+		if(QmiGlobal.nwGui === null) return {};
+		return QmiGlobal.nwGui.Window.get();
+	},
+
+
+	nwVer: function() {
+		try {
+			return require("nw.gui").App.manifest.version;
+		} catch(e) {}
+
+		return null
+	}(),
 
 	// 在下方 document ready之後 initReady
 	initReady: function() {
 		var initDefArr = [
-			QmiGlobal.module.appVersion.init(), // 檢查版本
+    		updateLanguage()
 		];
 
 		$.when.apply($, initDefArr).done(function() {
 
+			// nwjs的變數
+			QmiGlobal.getAppWin().qmiData = QmiGlobal.getAppWin().qmiData || QmiGlobal.defaultAppQmiData;
+			setAppOnFocusEvent(true);
+
 			// 寫入版本號
 			$("#app-version").attr("ver-chk", $.i18n.getString("WEBONLY_VERSION_CHK"));
+			$("#app-version").attr("version", QmiGlobal.appVer);
 
 			//設定語言, 還沒登入先用瀏覽器的語言設定
-			updateLanguage(lang);
+			// updateLanguage(lang);
 
 			// 初始動作 registration
 			appInitial();
@@ -254,14 +297,22 @@ window.QmiGlobal = {
 			// // 測試環境 選擇server
 			// QmiGlobal.module.serverSelector.showCurrUrl();
 		});
+
+		function setAppOnFocusEvent(isExec) {
+			try {
+				QmiGlobal.getAppWin().removeListener("focus", QmiGlobal.getAppWin().qmiData.listenerMap.onFocus);
+				QmiGlobal.getAppWin().qmiData.listenerMap.onFocus = QmiGlobal.defaultAppQmiData.listenerMap.onFocus;
+				QmiGlobal.getAppWin().on("focus", QmiGlobal.getAppWin().qmiData.listenerMap.onFocus);
+
+				if(isExec) QmiGlobal.module.appVersion.init();
+			} catch(e) {errorReport(e)}
+		}
 	},
 
 	// 之後取代 ui, at, gi, ... etc
 	currentGi: "",
 
 	device: navigator.userAgent.substring(navigator.userAgent.indexOf("(")+1,navigator.userAgent.indexOf(")")) || navigator.userAgent,
-
-	isDesktop: true,
 
 	groups: {}, // 全部的公私雲團體資料 QmiGlobal.groups
 	companies: {}, // 全部的company資料
@@ -1034,7 +1085,7 @@ QmiAjax.prototype = {
 		//logout~
 		if(errData.status == 401){
 			// 聊天室關閉
-			if(window.location.href.match(/po\/app\/chat.html/)) window.close();
+			if(QmiGlobal.isChatRoom) window.close();
 
 			QmiGlobal.rspCode401 = true;
 			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
@@ -1122,9 +1173,8 @@ $(document).on("pagebeforeshow",function(event,ui){
 
 
 $(document).on("click",".page-back",function(){
-	console.log("page-back");
-
-	if( window.location.href.match(/chat.html/) !== null ) return false;
+	// chatroom自己有判斷
+	if(QmiGlobal.isChatRoom) return;
 
 	if( this.hasAttribute("customize") ) return false;
 

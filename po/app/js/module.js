@@ -335,36 +335,50 @@ QmiGlobal.module.systemPopup = {
 QmiGlobal.module.appVersion = {
 
 	init: function(isUserClick) {
+		// 聊天室不需要
+		if(QmiGlobal.isChatRoom) return;
 
 		var self = this;
 		var deferred = $.Deferred();
-		self.isFirstInit = !QmiGlobal.appVer;
 
+		self.isUserClick = isUserClick;
+		self.isFirstInit = !QmiGlobal.appVer;
 		// 正在執行中
 		if(self.loadingUI.isLoading()) return;
+		
 		if(isUserClick) self.loadingUI.on();
 		self.apiSysVersion().success(function(rspData) {
 			// try { require; } catch(e) {console.log("!!!!!!!!!"); return;}
 
-			self.appOnFocusEvent();
+			// self.appOnFocusEvent();
     		self.data = rspData;
 
-    		// 版本相同 不更新
+    		// 檢查Web版本 版本相同 不更新
     		if(QmiGlobal.appVer === rspData.av) rspData.ut = 2;
 
-    		//測試
-    		rspData.ut = 1; // 0 手動; 1 強制
-    		rspData.uu = "null";
 
+    		// 檢查桌機版本 先確認有url 再判斷下載網址
+    		var isDeskTopOldVersion = false;
+    		try {
+    			if(rspData.uu !== "null") {
+					// < 0 表示舊版本 要提示下載
+					if(self.compare(QmiGlobal.nwVer, rspData.av) < 0) {
+						isDeskTopOldVersion = true;
+					}
+	    		}
+    		} catch(e) {};
+	    		
 
-    		// 替換成最新版本
-    		QmiGlobal.appVer = rspData.av;
-    		$.lStorage("_ver", {ver: QmiGlobal.appVer});
-    		$("#app-version").attr("version", QmiGlobal.appVer);
-
-    		self.switchStr = "" + rspData.ut + +(rspData.uu !== "null");
-
-    		self.chk();
+    		// 設定版本更新類別
+    		self.switchStr = "" + rspData.ut + +isDeskTopOldVersion;
+    		
+    		// 感覺比較好
+    		if(isUserClick)
+	    		setTimeout(function() {
+	    			self.update();
+	    		}, 300)
+	    	else
+	    		self.update();
 
 		}).error(function(rspData) {
 			console.log("err", rspData);
@@ -399,94 +413,124 @@ QmiGlobal.module.appVersion = {
 	}(),
 
 	
-	chk: function() {
+	update: function() {
 		var self = this;
-		console.log(self);
-		// 無更新
-		// if(self.data.av === QmiGlobal.appVer) {
-		// } else {
-			switch(self.switchStr) {
-    			case "00": // 手動更新 桌機無更新
-    				// 文案：「有新版本，將自動更新資料。」
-					// 按鈕：「確定」
-					// 規格：情境一只能選擇「確定」，並自動更新網頁資料。
-					new QmiGlobal.popup({
-						desc: $.i18n.getString("WEBONLY_APPVERSION_00"),
-						confirm: true,
-						action: [function() {
-							QmiGlobal.appReload.do({act: "feeds", isReloadDirectly: true})
-						}]
-					});	
 
-    				// self.updateOptional();
-    				break;
-    			case "01": // 手動更新 桌機有更新 
-    				// 文案：「有新版本安裝程式，是否下載安裝？」
-					// 按鈕：「下載」、「取消」
-					// 規格：
-					// 「下載」 => 自動下載新的安裝檔，客戶自行決定是否點擊安裝。
-					// 「取消」 => 取消則下次檢查更新時重新詢問是否下載。
-    				new QmiGlobal.popup({
-						desc: $.i18n.getString("WEBONLY_APPVERSION_01"),
-						confirm: true,
-						cancel: true,
-						action: [function() {
-							var filename = "mac";
-							// windows
-							if(process.execPath.indexOf("C:\\") === 0) filename = "win";
-							
-							window.location = self.data.uu + "/"+ filename +".zip";
-							
-							QmiGlobal.appReload.do({act: "feeds", isReloadDirectly: true});
-						}],
-						cancelAction: function() {
-							QmiGlobal.appReload.do({act: "feeds", isReloadDirectly: true});
-						}
-					});
+		// 是否已點選過下載
+		if(isDownloaded()) return;
 
+		switch(self.switchStr) {
+			case "00": // 手動更新 桌機無更新
+				// 文案：「有新版本，將自動更新資料。」
+				// 按鈕：「確定」
+				// 規格：情境一只能選擇「確定」，並自動更新網頁資料。
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("WEBONLY_APPVERSION_00"),
+					confirm: true,
+					action: [reload]
+				});	
 
-    				// self.updateForced();
-    				break;
-    			case "10": // 強制更新 桌機無更新
-    				// 文案：「有新版本，將自動更新資料。」
-					// 按鈕：「確定」
-					// 規格：情境一只能選擇「確定」，並自動更新網頁資料。
-					new QmiGlobal.popup({
-						desc: $.i18n.getString("WEBONLY_APPVERSION_00"),
-						confirm: true,
-						action: [function() {
-							QmiGlobal.appReload.do({act: "feeds", isReloadDirectly: true})
-						}]
-					});
+				// self.updateOptional();
+				break;
+			case "01": // 手動更新 桌機有更新 
+				// 文案：「有新版本安裝程式，是否下載安裝？」
+				// 按鈕：「下載」、「取消」
+				// 規格：
+				// 「下載」 => 自動下載新的安裝檔，客戶自行決定是否點擊安裝。
+				// 「取消」 => 取消則下次檢查更新時重新詢問是否下載。
 
-    				break;
-    			case "11": // 強制更新 桌機有更新
-    				// 文案：「有新版本安裝程式，下載後請重新安裝。」
-					// 按鈕：「下載」
-					// 規格：
-					// 「下載」 => 自動下載新的安裝檔，客戶自行決定是否點擊安裝，若無安裝，下次登入仍會跳出強制下載頁面無法使用。
+				// 桌機版要有正確版號
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("WEBONLY_APPVERSION_01"),
+					confirm: true,
+					cancel: true,
+					action: [nwDownload.bind(self, true)],
+					cancelAction: function() {
+						setDownloadTimer();
+						QmiGlobal.appReload.do({act: "feeds", isReloadDirectly: true});
+					}
+				});
+				break;
+			case "10": // 強制更新 桌機無更新
+				// 文案：「有新版本，將自動更新資料。」
+				// 按鈕：「確定」
+				// 規格：情境一只能選擇「確定」，並自動更新網頁資料。
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("WEBONLY_APPVERSION_00"),
+					confirm: true,
+					action: [reload]
+				});
 
-					new QmiGlobal.popup({
-						desc: $.i18n.getString("WEBONLY_APPVERSION_01"),
-						confirm: true,
-						action: [function() {
-							var filename = "mac";
-							// windows
-							if(process.execPath.indexOf("C:\\") === 0) filename = "win";
-							
-							window.location = self.data.uu + "/"+ filename +".zip";
-						}]
-					});
+				break;
+			case "11" : // 強制更新 桌機有更新
+				// 文案：「有新版本安裝程式，下載後請重新安裝。」
+				// 按鈕：「下載」
+				// 規格：
+				// 「下載」 => 自動下載新的安裝檔，客戶自行決定是否點擊安裝，若無安裝，下次登入仍會跳出強制下載頁面無法使用。
 
-    				break;
-    			default: 
-    				if(!self.loadingUI.isLoading()) return;
-    				setTimeout(function() {
-    					toastShow($.i18n.getString("WEBONLY_IS_LATEST_VERSION"));
-    				}, 1000);
-    				break;
-    		}
-		// }
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("WEBONLY_APPVERSION_01"),
+					confirm: true,
+					action: [nwDownload.bind(self, true)]
+				});
+
+				break;
+			case "21":
+
+				// 桌機版需要更新
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("WEBONLY_APPVERSION_01"),
+					confirm: true,
+					cancel: true,
+					action: [nwDownload],
+					cancelAction: function() {
+						setDownloadTimer();
+					}
+				});
+				break;
+			default: 
+				if(!self.loadingUI.isLoading()) return;
+				setTimeout(function() {
+					toastShow($.i18n.getString("WEBONLY_IS_LATEST_VERSION"));
+				}, 1000);
+				break;
+		}
+
+		function reload() {
+			setDownloadTimer();
+			QmiGlobal.appReload.do({act: "feeds", isReloadDirectly: true});
+		}
+
+		function nwDownload(isReload) {
+			setDownloadTimer();
+			var filename = "mac";
+			// windows
+			if(process.execPath.indexOf("C:\\") === 0) filename = "win";
+
+			var link=document.createElement('a');
+		   	document.body.appendChild(link);
+		   	link.href= self.data.uu + "/"+ filename +".zip";
+		   	link.click();
+		   	document.body.removeChild(link);
+
+		   	if(isReload) setTimeout(reload, 1000);
+		}
+
+		function isDownloaded() {
+			// 預設最小值
+			QmiGlobal.getAppWin().qmiData.downloadTimer = QmiGlobal.getAppWin().qmiData.downloadTimer || 0;
+			if(self.isUserClick) return false;
+
+			// 超過一天 就顯示download
+			if(new Date().getTime() - QmiGlobal.getAppWin().qmiData.downloadTimer > (24 * 60 * 60 * 1000)) {
+				return false;
+			}
+			return true;
+		}
+
+		function setDownloadTimer() {
+			QmiGlobal.getAppWin().qmiData.downloadTimer = new Date().getTime();
+		}
 	},
 
 	apiSysVersion: function() {
@@ -506,24 +550,28 @@ QmiGlobal.module.appVersion = {
     	});
 	},
 
-	updateOptional: function() {
-		var self = this;
-	},
+	compare: function compare(a, b) {
+	    if (a === b) return 0;
 
-	updateForced: function() {
-		console.log("yo");
-	},
+	    var a_components = a.split(".");
+	    var b_components = b.split(".");
 
-	appOnFocusEvent: function() {try {
-		var appGUI = require('nw.gui');
-		var appWindow = appGUI.Window.get();
+	    var len = Math.min(a_components.length, b_components.length);
 
-		appWindow.on("focus", function() {
-			console.log("shit");
-			// QmiGlobal.module.appVesion.init();
-		});
+	    // loop while the components are equal
+	    for (var i = 0; i < len; i++) {
+	        // A bigger than B
+	        if (parseInt(a_components[i]) > parseInt(b_components[i])) return 1;
+	        // B bigger than A
+	        if (parseInt(a_components[i]) < parseInt(b_components[i])) return -1;
+	    }
 
-	} catch(e) {errorReport(e);}}
+	    // If one's a prefix of the other, the longer one is greater.
+	    if (a_components.length > b_components.length) return 1;
+	    if (a_components.length < b_components.length) return -1;
+	    return 0; // Otherwise they are the same. 
+	}
+
 }
 
 

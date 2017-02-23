@@ -1,7 +1,7 @@
 $(function(){  
 
 	//load language
-	updateLanguage( lang );
+	// updateLanguage( lang );
 
 	var refreshChk = false;
 
