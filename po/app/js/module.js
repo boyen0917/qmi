@@ -335,27 +335,33 @@ QmiGlobal.module.systemPopup = {
 QmiGlobal.module.appVersion = {
 
 	init: function(isUserClick) {
-		// 聊天室不需要
-		if(QmiGlobal.isChatRoom) return;
-
 		var self = this;
 		var deferred = $.Deferred();
 
+		// 非桌機版
+		if(QmiGlobal.nwGui === null) {
+			deferred.resolve();
+			return deferred.promise();
+		}
+
+		// 點選檢查更新 要跳過不更新的判斷
 		self.isUserClick = isUserClick;
-		self.isFirstInit = !QmiGlobal.appVer;
-		// 正在執行中
-		if(self.loadingUI.isLoading()) return;
+
+		// 綁定事件
+		$("#app-version").off().click(function() {
+			self.init(true);
+		});
+
+		// 不需要執行的判斷
+		if(isNoNeedToCheckAndUpdate()) return;
 		
 		if(isUserClick) self.loadingUI.on();
 		self.apiSysVersion().success(function(rspData) {
-			// try { require; } catch(e) {console.log("!!!!!!!!!"); return;}
-
-			// self.appOnFocusEvent();
+    		
     		self.data = rspData;
 
     		// 檢查Web版本 版本相同 不更新
     		if(QmiGlobal.appVer === rspData.av) rspData.ut = 2;
-
 
     		// 檢查桌機版本 先確認有url 再判斷下載網址
     		var isDeskTopOldVersion = false;
@@ -367,7 +373,6 @@ QmiGlobal.module.appVersion = {
 					}
 	    		}
     		} catch(e) {};
-	    		
 
     		// 設定版本更新類別
     		self.switchStr = "" + rspData.ut + +isDeskTopOldVersion;
@@ -387,12 +392,32 @@ QmiGlobal.module.appVersion = {
 			deferred.resolve();
 		});
 
-		// 綁定事件
-		$("#app-version").off().click(function() {
-			self.init(true);
-		});
-
 		return deferred.promise();
+
+		function isDownloaded() {
+			// 預設最小值
+			QmiGlobal.getAppWin().qmiData.downloadTimer = QmiGlobal.getAppWin().qmiData.downloadTimer || 0;
+			if(self.isUserClick) return false;
+
+			// 超過一天 就顯示download
+			if(new Date().getTime() - QmiGlobal.getAppWin().qmiData.downloadTimer > (24 * 60 * 60 * 1000)) {
+				return false;
+			}
+			return true;
+		}
+
+		function isNoNeedToCheckAndUpdate() {
+			// 聊天室不需要
+			if(QmiGlobal.isChatRoom) return true;
+
+			// 已點選過下載
+			if(isDownloaded()) return true;
+
+			// 正在執行中
+			if(self.loadingUI.isLoading()) return true;
+
+			return false;
+		}
 	},
 
 	loadingUI: function() {
@@ -415,9 +440,6 @@ QmiGlobal.module.appVersion = {
 	
 	update: function() {
 		var self = this;
-
-		// 是否已點選過下載
-		if(isDownloaded()) return;
 
 		switch(self.switchStr) {
 			case "00": // 手動更新 桌機無更新
@@ -516,18 +538,6 @@ QmiGlobal.module.appVersion = {
 		   	if(isReload) setTimeout(reload, 1000);
 		}
 
-		function isDownloaded() {
-			// 預設最小值
-			QmiGlobal.getAppWin().qmiData.downloadTimer = QmiGlobal.getAppWin().qmiData.downloadTimer || 0;
-			if(self.isUserClick) return false;
-
-			// 超過一天 就顯示download
-			if(new Date().getTime() - QmiGlobal.getAppWin().qmiData.downloadTimer > (24 * 60 * 60 * 1000)) {
-				return false;
-			}
-			return true;
-		}
-
 		function setDownloadTimer() {
 			QmiGlobal.getAppWin().qmiData.downloadTimer = new Date().getTime();
 		}
@@ -550,7 +560,8 @@ QmiGlobal.module.appVersion = {
     	});
 	},
 
-	compare: function compare(a, b) {
+	compare: function(a, b) {
+		if(!a || !b) return 0;
 	    if (a === b) return 0;
 
 	    var a_components = a.split(".");
