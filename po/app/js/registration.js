@@ -487,7 +487,7 @@ onCheckVersionDone = function(needUpdate){
 				var allGroups = Object.keys(QmiGlobal.groups);
 
 				// 預設團體打過了，從陣列移除掉
-				allGroups.splice(allGroups.indexOf(QmiGlobal.auth.dgi), 1)
+				// allGroups.splice(allGroups.indexOf(QmiGlobal.auth.dgi), 1)
         		getMultiGroupCombo(allGroups, true);
 
 		    	activateClearChatsTimer();

@@ -78,8 +78,8 @@ $(function(){
                     }
                 }
 
-                getGroupAllMembers(thisGi).done(function(groupMemberList) {
-                    comboData.ul = groupMemberList;
+                // getGroupAllMembers(thisGi).done(function(groupMemberList) {
+                //     comboData.ul = groupMemberList;
                     if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
                     // 製作guAll hash-map & inviteGuAll
                     for( var key in comboData.ul ){
@@ -113,7 +113,7 @@ $(function(){
                         thisGi: thisGi,
                         data: data
                     });
-                })
+                // })
 
             }else{    
                 comboDeferred.resolve({

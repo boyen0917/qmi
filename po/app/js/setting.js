@@ -252,6 +252,7 @@ function showUpdatePermissionPage(){
 	try{
         var userDataTmp = QmiGlobal.groups;
         var guAllTmp = userDataTmp[gi].guAll;
+
         for( var gu in guAllTmp ){
         	var mem = guAllTmp[gu];
         	if( 1==mem.st ){
