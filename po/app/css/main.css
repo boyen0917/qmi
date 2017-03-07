@@ -4867,6 +4867,14 @@ input.cp-datetimepicker-end {
 	width: -webkit-calc( 90% - 65px );
 }
 
+.subgroup-row .obj-cell-arrow {
+	display: none;
+}
+
+.subgroup-row .folder {
+	display: none;
+}
+
 .subgroup-parent {
 	width: 100%;
 	height: 80px;
