@@ -1,7 +1,6 @@
 ObjectDelegateView = {
 	mainPage : "",
 	mainContainer : "",
-	// title : "",
 	searchElement : "",
 	selectListArea : "",
 	allMemberChkbox : {},
@@ -9,6 +8,7 @@ ObjectDelegateView = {
 	selectMembers : {},
 	selectedBranchs : {},
 	selectedFavorites : {},
+	selectNum : 0,
 	favParentRow : {},
 	memberRows : [],
 	branchRows : [],
@@ -20,13 +20,11 @@ ObjectDelegateView = {
 		this.mainPage = $("#page-object");
 		this.mainContainer = this.mainPage.find(".obj-cell-area");
 		this.selectNumElement = this.mainPage.find(".header-cp-object span:eq(1)");
-		this.searchElement = this.mainPage.find(".obj-selected");
-		this.selectListArea = this.searchElement.find(".list .text");
-		this.mainPage.find(".obj-content").show().end()
-					 .find(".obj-coach-noMember").hide().end()
-					 .find(".obj-done").show();
-
-		this.mainContainer.html("");
+		this.searchArea = this.mainPage.find(".obj-selected");
+		this.searchInput = this.searchArea.find(".list .search");
+		this.selectListArea = this.searchArea.find(".list .text");
+		this.clearButton = this.searchArea.find(".clear");
+		this.finishButton = this.mainPage.find(".obj-done");
 		this.allMemberChkbox = {};
 		this.allBranchChxbox = {};
 		this.selectMembers = {};
@@ -36,23 +34,31 @@ ObjectDelegateView = {
 		this.branchRows = [];
 		this.isSelectedAllBranch = false;
 		this.isSelectedAllMember = false;
-
-		this.isMultiCheck = option.isMultiCheck;
-		this.visibleMems = option.visibleMems;
-		this.checkedMems = option.checkedMems;
+		this.singleCheck = option.singleCheck;
+		this.visibleMembers = option.visibleMembers;
+		this.searchList = this.visibleMembers;
+		this.visibleMemNum = 0;
+		this.checkedMems = option.checkedMems || {};
 		this.checkedBranches = option.checkedBranches;
-
 		this.selectNumElement.html(Object.keys(this.checkedMems).length);
-
+		this.mainPage.find(".obj-content").show().end()
+					 .find(".obj-coach-noMember").hide().end()
+					 .find(".obj-done").show();
+		this.mainContainer.html("");
+		this.bindEvent();
 		return this;
 	},
 
 	setHeight : function() {
-		var padding_top = this.searchElement.outerHeight();
+		var padding_top = this.searchArea.outerHeight();
 		this.mainContainer.css("padding-top", padding_top)
     					  .css("height", $(window).height() - 57 - padding_top);
 
     	return this;
+	},
+
+	bindEvent : function () {
+		this.searchInput.off("input").on("input", this.searchMatchRow.bind(this));
 	},
 
 	showNoMember : function() {
@@ -71,6 +77,7 @@ ObjectDelegateView = {
 				// rowElement.bindEvent(this.toggleFavSubRows.bind(this));
 				break;
 			case "Member" :
+				rowElement.bindEvent(this.checkThisMember.bind(this));
 				this.memberRows.push(rowElement);
 				break;
 			case "ParentBranch" :
@@ -93,12 +100,24 @@ ObjectDelegateView = {
 		if (type == "ParentBranch") this.mainContainer.append("<hr color='#F3F3F3'>");
 	},
 
+	makeMemberList : function () {
+		var groupAllMembers = QmiGlobal.groups[gi].guAll;
+		var loadMemberList = this.visibleMembers.slice(this.visibleMemNum, this.visibleMemNum + 500);
+		if (this.visibleMemNum + 500 > this.visibleMembers.length - 1) {
+            loadMemberList = this.visibleMembers.slice(this.visibleMemNum);
+            this.visibleMemNum = this.visibleMembers.length;
+        }
+        $.each(loadMemberList, function(i, gu) {
+            this.addRowElement("Member", {thisMember : groupAllMembers[gu], isSubRow : false});
+        }.bind(this));
+
+        this.visibleMemNum += 500;
+	},
+
 	addFavoriteSubRow : function (type, rowData = {}) {
 		var rowElement = ObjectCell.factory(type, rowData);
-		// console.log(this.favParentRow);
 		this.favParentRow.html.find(".obj-cell-arrow").css("display", "inline-block").end()
 							  .find(".folder").append(rowElement.html);
-
 	},
 
 	selectAllBranch : function (type, rowData = {}) {
@@ -111,13 +130,56 @@ ObjectDelegateView = {
 
 	selectAllMember : function () {
 		this.isSelectedAllMember = !this.isSelectedAllMember;
+		// this.checkedMems = this.isSelectedAllMember ?  : {};
+		// this.selectNumber = this.isSelectedAllMember ? this.visibleMemNum : 0;
 
 		this.memberRows.forEach(function(memberRow) {
 			memberRow.checked(this.isSelectedAllMember);
 		}.bind(this));
 	},
-}
 
+	checkThisMember : function (thisMemberRow) {
+		// console.log(this.checkedMems);
+		if (this.singleCheck) {
+			this.checkedMems = {};
+			this.checkedMems[thisMemberRow.groupUserId] = thisMemberRow.name;
+			this.memberRows.forEach(function(memberRow) {
+				memberRow.checked(false);
+			}.bind(this));
+		} else {
+			if (thisMemberRow.isChecked) delete this.checkedMems[thisMemberRow.groupUserId];
+			else this.checkedMems[thisMemberRow.groupUserId] = thisMemberRow.name;
+		}
+	},
+
+	searchMatchRow : function (e) {
+		var target = $(e.target);
+		var searchText = target.html();
+
+		if (searchText.length > 0) {
+			this.mainContainer.find(".obj-cell-arrow").addClass("open").end()
+							  .find(".folder").show().end()
+							  .find(".obj-content").addClass("on-search").end()
+							  .find("hr").hide().end()
+							  .find(".obj-cell-subTitle-chk").hide();
+
+			this.memberRows.forEach(function(memberRow) {
+				// memberRow.remove();
+			}.bind(this));
+
+		} else {
+			this.mainContainer.find(".obj-cell-arrow").removeClass("open").end()
+							  .find(".folder").hide().end()
+							  .find(".obj-content").removeClass("on-search").end()
+							  .find("hr").show().end()
+							  .find(".obj-cell-subTitle-chk").show();
+		}
+	},
+
+	updateStatus : function () {
+		this.selectNumElement.html(Object.keys(this.checkedMems).length);
+	}
+}
 
 function ObjectCell () {};
 
@@ -126,7 +188,6 @@ ObjectCell.prototype = {
 		this.html.find(".img").toggleClass("chk");
 		this.isChecked = !this.isChecked;
 	},
-
 	checked : function (isCheckedAll) {
 		if (isCheckedAll) {
 			this.html.find(".img").addClass("chk");
@@ -137,18 +198,20 @@ ObjectCell.prototype = {
 		}
 	},
 
-	bindEvent : function (method) {
+	bindEvent : function (doEvenFun) {
 		var objCell = this;
 		objCell.html.off("click").on("click", function (){
+			doEvenFun(objCell);
 			$(this).find(".img").toggleClass("chk");
 			objCell.isChecked = !objCell.isChecked;
-			method();
+			ObjectDelegateView.updateStatus();
 		});
 	},
 
-	// hide : function () {
-	// 	this.html.
-	// }
+	remove : function () {
+		console.log(this);
+		this.html.remove();
+	}
 }
 
 ObjectCell.factory = function (type, rowData) {
@@ -194,12 +257,13 @@ ObjectCell.Favorite = function () {
 ObjectCell.ParentBranch = function (rowData) {
 	var thisBranch = rowData.thisBranch;
 	var allBranchData = rowData.bl;
+	this.name = thisBranch.bn.replaceOriEmojiCode();
 	this.bi = thisBranch.bi;
 	this.html = $("<div class='subgroup-row'><div class='subgroup-parent'>"
 		+ "<div class='obj-cell subgroup branch' data-bl='" + thisBranch.bi + "'>"
 		+ "<div class='obj-cell-chk'><div class='img'></div></div>" 
 		+ "<div class='obj-cell-user-pic'><img src='images/common/others/select_empty_all_photo.png' style='width:60px'/>"
-		+ "</div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" + thisBranch.bn.replaceOriEmojiCode() 
+		+ "</div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" + this.name 
 		+ "</div></div></div><div class='obj-cell-arrow'></div></div><div class='folder'></div></div>");
 
 	this.html.find(".obj-cell-arrow").off("click").click(function(e) {
@@ -270,14 +334,14 @@ ObjectCell.Member = function (rowData) {
 	var memberImg = (thisMember.aut) ? thisMember.aut : "images/common/others/empty_img_personal_xl.png";
 	var addChkWord = (thisMember.chk || rowData.isSelectedAll) ? "chk" : "";
 	this.groupUserId = thisMember.gu;
-	this.name = thisMember.nk;
+	this.name = thisMember.nk.replaceOriEmojiCode();
 	this.html = $('<div class="obj-cell ' + ((rowData.isSubRow) ? "_2" : "") + ' mem" data-gu="' + thisMember.gu+'">' +
            '<div class="obj-cell-chk"><div class="img ' + addChkWord + '"></div></div>' +
            '<div class="obj-cell-user-pic namecard" data-gu="' + thisMember.gu + '">' + 
            	    '<img src="' + memberImg + '" style="width:60px"/></div>' +
-           '<div class="obj-cell-user-data">' + 
-                '<div class="obj-user-name">' + thisMember.nk.replaceOriEmojiCode() + '</div>' +
-                '<div class="obj-user-title"></div>' +
+           '<div class="obj-cell-user-data ' + ((thisMember.bn && thisMember.bn.length > 0) ? "extra" : "") +'">' + 
+                '<div class="obj-user-name">' + this.name + '</div>' +
+                '<div class="obj-user-title">' + ((thisMember.bn) ? thisMember.bn : "") + '</div>' +
         '</div>');
 
 	this.isChecked = false;

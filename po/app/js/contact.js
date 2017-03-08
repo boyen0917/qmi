@@ -150,24 +150,7 @@ onSearchInput = function(e){
 		$(".subpage-contact .contact-rows").show();
 		return;
 	}
-
-	//for chinese...enter for comfirm chinese triggers no event
-	// if( e.keyCode == '13' || e.keyCode == '8' || e.keyCode == '46'){
-	// 	if( input.val() != input.data("searchText") ){
-	// 		isKeyPress = true;
-	// 	}
-	// }
-
-	//check complete chinese typing
-	// if( !isKeyPress ){
-	// 	cns.debug("(",input.val(),")");
-	// 	return;
-	// }
-	// isKeyPress = false;
 	
-	//return if no text changed
-	// if( input.data("searchText")==str ) return;
-	// input.data("searchText", str);
 	cns.debug(str);
 
 	//hide ori rows

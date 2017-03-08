@@ -2621,20 +2621,20 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
     $.mobile.changePage("#page-object", {transition: "slide"});
 
     //no one to select, show coachmark & return
-    if((isShowSelf && group.cnt <= 0) || ( !isShowSelf && group.cnt <= 1) ){
+    if ((isShowSelf && group.cnt <= 0) || ( !isShowSelf && group.cnt <= 1) ) {
         objectDelegateView.showNoMember();
         return;
     } 
     //工作
-    if( null== option ){
-        if(thisComposeObj.parent().hasClass("cp-work-item")){
+    if ( null== option ) {
+        if(thisComposeObj.parent().hasClass("cp-work-item")) {
             //工作發佈對象
             isShowBranch = false;
             isShowSelf = true;
             isShowAll = false;
-            isShowFav = true;
+            isShowFav = false;
             isShowFavBranch = false;
-        }else{
+        } else {
             //其餘發佈對象
             isShowBranch = true;
             isShowSelf = true;
@@ -2649,9 +2649,9 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         isShowLeftMem = (null==option.isShowLeftMem) ? isShowLeftMem : option.isShowLeftMem;
     }
 
-    if(thisComposeObj.parent().hasClass("cp-work-item")){
+    if (thisComposeObj.parent().hasClass("cp-work-item")) {
         objData = $.parseJSON(thisCompose.data("object_str"));
-    }else{
+    } else {
         objData = $.parseJSON(thisCompose.data("object_str"));
         branchData = $.parseJSON(thisCompose.data("branch_str")); 
     }
@@ -2661,12 +2661,31 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         if( !isShowLeftMem && guAll[gu].st != 1 ) return false;
         if( group.ntp === 2 && thisCompose.data("offical") === "add" && guAll[group.gu].abl == "" && guAll[gu].ad != 1) return false;
 
+        var branchID = guAll[gu].bl;
+        var extraContent = "";
+
+        guAll[gu].chk = false;
+        if( branchID && branchID.length>0 ){
+            var branchPath = branchID.split(".");
+            if( branchPath && branchPath.length > 0 ){
+                branchID = branchPath[branchPath.length-1];
+                if( bl.hasOwnProperty(branchID) ){
+                    extraContent = bl[branchID].bn;
+                }
+            }
+        }
+
+        if (objData && Object.keys(objData).length) {
+            if (guAll[gu].ad == 1 || Object.keys(objData).indexOf(guAll[gu].gu) > -1) guAll[gu].chk = true;
+        }
+        guAll[gu].bn = extraContent;
+
         return true;
     });
 
     var viewOption = {
-        isMultiCheck : (group.ntp === 2 && this_compose.data("offical")==="add") || isForWork,
-        visibleMems : visibleMemList,
+        singleCheck : (group.ntp === 2 && thisCompose.data("offical")==="add") || isForWork,
+        visibleMembers : visibleMemList,
         checkedMems : objData,
         checkedBranches : branchData,
     }
@@ -2677,7 +2696,7 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
     // $(".obj-content").data("selected-obj",{});
     // $(".obj-content").data("selected-fav",{});
     // $(".obj-content").data("isBack", isBack );
-    updateSelectedObj();
+    // updateSelectedObj();
 
     //----- 全選 ------
     if( isShowAll ) objectDelegateView.addRowElement("ClearAll");
@@ -2746,24 +2765,6 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
                 // $(".obj-cell-area").append('<hr color="#F3F3F3">');
             }
         });
-
-        // $(".obj-cell-area .obj-cell-arrow").off("click").click( function(e){
-        //     if( $(".obj-content").hasClass("on-search") ){
-        //         $(this).prev().trigger("click");
-        //         e.stopPropagation();
-        //         return;
-        //     }
-
-        //     var dom = $(this).parent().next();
-        //     if( $(this).hasClass("open") ){
-        //         $(this).removeClass("open");
-        //         dom.slideUp();
-        //     } else {
-        //         $(this).addClass("open");
-        //         dom.slideDown();
-        //     }
-        // });
-
 
         //branch全選
         // memSubTitle.off("click").click( function(){
@@ -2877,76 +2878,42 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
     else objectDelegateView.addRowElement("SelectAllTitle", {type: "mem", isDisplayedChkbox : false});
 
 
-
+    objectDelegateView.makeMemberList();
     // memSubTitle.append( "<div class='text'>"+$.i18n.getString("COMMON_MEMBER")+"</div>" );
     // $(".obj-cell-area").append(memSubTitle);
 
-    var makeMemberList = function () {
+    // var makeMemberList = function () {
 
-        // memlist = memList || guList;
-        var loadMemberList = visibleMemList.slice(loadMemberNum, loadMemberNum + 500);
+    //     // memlist = memList || guList;
+    //     var loadMemberList = visibleMemList.slice(loadMemberNum, loadMemberNum + 500);
 
-        if (loadMemberNum + 500 > visibleMemList.length - 1) {
-            loadMemberList = visibleMemList.slice(loadMemberNum);
-            loadMemberNum = visibleMemList.length;
-        }
+    //     if (loadMemberNum + 500 > visibleMemList.length - 1) {
+    //         loadMemberList = visibleMemList.slice(loadMemberNum);
+    //         loadMemberNum = visibleMemList.length;
+    //     }
 
-        $.each(loadMemberList, function(i, gu) {
-            var branchID = guAll[gu].bl;
-            var extraContent = "";
-            if( false == isShowSelf && gu == group.gu ) return;
-            if( false == isShowLeftMem && guAll[gu].st != 1 ) return;
-            if(group.ntp === 2 && this_compose.data("offical") === "add" && guAll[group.gu].abl == "" && guAll[gu].ad != 1) return;
+    //     $.each(loadMemberList, function(i, gu) {
+    //         objectDelegateView.addRowElement("Member", {thisMember : guAll[gu], isSubRow : false});
+    //     });
 
-            guAll[gu].chk = false;
-            if( branchID && branchID.length>0 ){
-                var branchPath = branchID.split(".");
-                if( branchPath && branchPath.length>0 ){
-                    branchID = branchPath[branchPath.length-1];
-                    if( bl.hasOwnProperty(branchID) ){
-                        extraContent = bl[branchID].bn;
-                    }
-                }
-            }
+    //     if (! $("#page-object").find(".obj-cell-subTitle.mem").data("chk")) {
+    //         $(".obj-content").data("selected-obj", objData);
+    //     }
 
-            // 團體指派管理員或是發文對象
-            if (objData && Object.keys(objData).length) {
-                if (guAll[gu].ad == 1 || Object.keys(objData).indexOf(guAll[gu].gu) > -1) guAll[gu].chk = true;
-            }
-            guAll[gu].bn = extraContent;
-            objectDelegateView.addRowElement("Member", {thisMember : guAll[gu], isSubRow : false});
-            // var thisObj = getMemObjectRow(guAll[gu], bl);
-            // if(objData) {
-            //     if(guAll[gu].ad == 1 || $("#page-object").find(".obj-cell-subTitle.mem").data("chk")) {
-            //         thisObj.data("chk",true);
-            //         thisObj.find(".obj-cell-chk .img").addClass("chk");
-            //     } else {
-            //         thisObj.data("chk",false);
-            //         thisObj.find(".obj-cell-chk .img").removeClass("chk");
-            //     }
-            // }
+    //     updateSelectedObj();
 
-            // $(".obj-cell-area").append(thisObj);
-        });
+    //     loadMemberNum += 500;
+    // };
 
-        if (! $("#page-object").find(".obj-cell-subTitle.mem").data("chk")) {
-            $(".obj-content").data("selected-obj", objData);
-        }
+    // $(".obj-cell-area").unbind("scroll").bind("scroll", function () {
+    //     if ($(this).scrollTop() + $(this).height() > $(this)[0].scrollHeight * 0.95) {
+    //         if (loadMemberNum < searchList.length) {
+    //             makeMemberList();
+    //         }
+    //     }
+    // });
 
-        updateSelectedObj();
-
-        loadMemberNum += 500;
-    };
-
-    $(".obj-cell-area").unbind("scroll").bind("scroll", function () {
-        if ($(this).scrollTop() + $(this).height() > $(this)[0].scrollHeight * 0.95) {
-            if (loadMemberNum < searchList.length) {
-                makeMemberList();
-            }
-        }
-    });
-
-    makeMemberList();
+    // makeMemberList();
     // //成員rows
     // $.each(guList, function(i,gu_obj){
     //     if( false==isShowSelf && i==group.gu ) return;
@@ -3383,88 +3350,88 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         $(".obj-selected .list .search").html("").trigger("input");
         $(".obj-cell-area").scrollTop(0);
     });
-    $(".obj-selected .list .search").off("input").on("input", function(){
-        //更新搜尋結果
-        var search = $(this).html();
-        var matchMemList = [];
+//     $(".obj-selected .list .search").off("input").on("input", function(){
+//         //更新搜尋結果
+//         var search = $(this).html();
+//         var matchMemList = [];
 
-        $(".obj-cell").remove();
+//         $(".obj-cell").remove();
 
-        loadMemberNum = 0;
-        // var rows = $(".obj-cell");
-        if( search.length<=0 ){
-            searchList = guList;
-            // rows.show();
-            $(".obj-cell-arrow.open").removeClass("open");
-            $(".subgroup-parent").next().hide();
-            $(".obj-cell-arrow").css("opacity","1");
+//         loadMemberNum = 0;
+//         // var rows = $(".obj-cell");
+//         if( search.length<=0 ){
+//             searchList = guList;
+//             // rows.show();
+//             $(".obj-cell-arrow.open").removeClass("open");
+//             $(".subgroup-parent").next().hide();
+//             $(".obj-cell-arrow").css("opacity","1");
 
-            $(".obj-content").removeClass("on-search");
-            $(".obj-cell").show();
-            $(".subgroup-parent").show();
-            $(".subgroup-row.fav-parent").show();
-            $(this).html("");
-            $(".obj-cell-area hr").show();
-            $(".obj-cell-subTitle .obj-cell-subTitle-chk").show();
-            //官方團體不顯示全選選項
-            if(group.ntp === 2){
-                $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
-            }
+//             $(".obj-content").removeClass("on-search");
+//             $(".obj-cell").show();
+//             $(".subgroup-parent").show();
+//             $(".subgroup-row.fav-parent").show();
+//             $(this).html("");
+//             $(".obj-cell-area hr").show();
+//             $(".obj-cell-subTitle .obj-cell-subTitle-chk").show();
+//             //官方團體不顯示全選選項
+//             if(group.ntp === 2){
+//                 $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
+//             }
 
-            makeMemberList();
-            return;
-        }
-        search = search.toLowerCase();
+//             makeMemberList();
+//             return;
+//         }
+//         search = search.toLowerCase();
 
-        $(".obj-cell-area hr").hide();
-        $(".subgroup-parent").hide();
-        $(".subgroup-parent").next().show();
-        $(".obj-cell-arrow").css("opacity","0");
-        $(".obj-content").addClass("on-search");
-        $(".subgroup-row.fav-parent").hide();
-        $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
-        if( $(".obj-content").hasClass("on-search") ) {
-            console.log(guList.length);
-            searchList = [];
-            guList.forEach(function(memId) {
-                var memberData = guAll[memId];
-                if(memberData.nk == null){
-                    cns.debug( JSON.stringify(memberData) );
-                } else {
-                    if( memberData.nk.toLowerCase().indexOf(search) >= 0 ){
-                        searchList.push(memId);
-                        // memCount++;
-                    }   
-                }
-            });
+//         $(".obj-cell-area hr").hide();
+//         $(".subgroup-parent").hide();
+//         $(".subgroup-parent").next().show();
+//         $(".obj-cell-arrow").css("opacity","0");
+//         $(".obj-content").addClass("on-search");
+//         $(".subgroup-row.fav-parent").hide();
+//         $(".obj-cell-subTitle .obj-cell-subTitle-chk").hide();
+//         if( $(".obj-content").hasClass("on-search") ) {
+//             console.log(guList.length);
+//             searchList = [];
+//             guList.forEach(function(memId) {
+//                 var memberData = guAll[memId];
+//                 if(memberData.nk == null){
+//                     cns.debug( JSON.stringify(memberData) );
+//                 } else {
+//                     if( memberData.nk.toLowerCase().indexOf(search) >= 0 ){
+//                         searchList.push(memId);
+//                         // memCount++;
+//                     }   
+//                 }
+//             });
 
-            makeMemberList();
-            // rows.each( function( index, rowElement ){
-            //     var row = $(rowElement);
-            //     if( row.hasClass("self") 
-            //         || row.hasClass("all") 
-            //         || row.hasClass("fav") ){
-            //         row.hide();
-            //         return;
-            //     }
-            //     var parent = row.parents(".subgroup-parent");
-            //     var name = row.find(".obj-user-name").text();
-            //     var title = row.find(".obj-user-title").text();
-            //     if( (name && name.toLowerCase().indexOf(search)>=0) 
-            //         || (title && title.toLowerCase().indexOf(search)>=0) ){
-            //         parent.show();
-            //         row.show();
-            //         return;
-            //     }
-            //     if( parent.length>0 ){
-            //         parent.hide();
-            //     } else {
-            //         row.hide();
-            //     }
+//             makeMemberList();
+//             // rows.each( function( index, rowElement ){
+//             //     var row = $(rowElement);
+//             //     if( row.hasClass("self") 
+//             //         || row.hasClass("all") 
+//             //         || row.hasClass("fav") ){
+//             //         row.hide();
+//             //         return;
+//             //     }
+//             //     var parent = row.parents(".subgroup-parent");
+//             //     var name = row.find(".obj-user-name").text();
+//             //     var title = row.find(".obj-user-title").text();
+//             //     if( (name && name.toLowerCase().indexOf(search)>=0) 
+//             //         || (title && title.toLowerCase().indexOf(search)>=0) ){
+//             //         parent.show();
+//             //         row.show();
+//             //         return;
+//             //     }
+//             //     if( parent.length>0 ){
+//             //         parent.hide();
+//             //     } else {
+//             //         row.hide();
+//             //     }
                 
-            // });
-        }
-    });
+//             // });
+//         }
+//     });
 }
 
 updateSelectedObj = function(){

@@ -135,17 +135,14 @@ $(function(){
         var userList = [];
         var getMemberListDef = $.Deferred();
 
-        var getMembers = function(nextUserId) {
+        var getMembers = (function(nextUserId) {
             var deferred = $.Deferred();
-            var ajaxData = {
-                apiName: "groups/" + thisGi + "/users",
-                apiVer: "apiv2",
-            }
-
             nextUserId = nextUserId || "";
-            if (nextUserId != "") ajaxData.apiName = ajaxData.apiName + "?gu=" + nextUserId;
 
-            new QmiAjax(ajaxData).success(function(data) {
+            new QmiAjax({
+                apiName: "groups/" + thisGi + "/users?gu=" + nextUserId,
+                apiVer: "apiv2",
+            }).success(function(data) {
                 if (Array.isArray(data.ul) && data.ul.length > 0) {
                     userList = userList.concat(data.ul);
                     nextUserId = data.ul[data.ul.length - 1].gu;
@@ -154,9 +151,9 @@ $(function(){
                     getMemberListDef.resolve(userList);
                 }
             });
-        }
+        })();
 
-        getMembers();
+        // getMembers();
 
         return getMemberListDef.promise();
     }
