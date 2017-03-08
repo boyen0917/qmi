@@ -2513,13 +2513,16 @@ composeContentMake = function (compose_title){
                 if ((cursorPosition == htmlText.length) || (htmlText[cursorPosition].match(/\s/g)) ||
                     (htmlText.substring(cursorPosition, cursorPosition + 4)) == "<br>") {
                     var memberslist = thisTextArea.data("memberList");
-                    for (var memberID in memberslist) {
-                        var memberMugshot = memberslist[memberID].aut || "images/common/others/empty_img_personal.png";
-                        var memberName = memberslist[memberID].nk ;
-                        var re = new RegExp(markText, "gi");
-                        if (memberName && markText && memberName.search(re) >= 0) {
-                            tagElements += "<li id='" + memberID + "'><a><img src='" + memberMugshot + 
-                                "' class='member-mugshot'/>" + memberName + "</a></li>";
+                    for (var key in memberslist) {
+                        var memberObj = memberslist[key];
+                        if (memberObj.st == 1) {
+                            var memberMugshot = memberObj.aut || "images/common/others/empty_img_personal.png";
+                            var memberName = memberObj.nk ;
+                            var re = new RegExp(markText, "gi");
+                            if (memberName && markText && memberName.search(re) >= 0) {
+                                tagElements += "<li id='" + key + "'><a><img src='" + memberMugshot + 
+                                    "' class='member-mugshot'/>" + memberName + "</a></li>";
+                            }
                         }
                     }
                 }
@@ -7462,7 +7465,7 @@ getGroupList = function(isFromLogin){
 
     new QmiAjax({
         apiName: "groups",
-        apiVer: "apiv2",
+        // apiVer: "apiv2",
         isPublicApi: true
     }).success(function(apiData){
         var allGroupList = apiData.gl || [],
