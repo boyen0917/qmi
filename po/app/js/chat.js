@@ -378,9 +378,15 @@ $(function(){
 
 		//emoji input event
 		$(".input-emoji").off("click").click(function () {
+			var emojiIcon = $(this);
 			if (0 == g_extraInputStatus) {
+				//init sticker area
+				initStickerArea.init($(".stickerArea"), sendSticker, function() {
+					emojiIcon.click();
+				});
 				g_extraInputStatus = 2;
 				$("#footer").animate({bottom: 0}, 'fast');
+
 				// $("#chat-contents").animate({marginBottom:200},'fast');
 				updateChatContentPosition();
 				$(this).addClass("active");
@@ -416,7 +422,7 @@ $(function(){
 		}, 300);
 
 		//init sticker area
-		initStickerArea.init($(".stickerArea"), sendSticker);
+		// initStickerArea.init($(".stickerArea"), sendSticker);
 
 		//sticker change sync events
 		$("#send-sync-sticker-signal").off("click").click(function () {
@@ -707,6 +713,10 @@ $(function(){
 		    	// }
 		    });
 		});
+
+		// $("#page-chat").find(".sticker-shop").off("click").on("click", function() {
+
+		// });
 
 		updateChat();
 		

@@ -11,7 +11,7 @@ var initStickerArea= {
 	domList: [],
 	loadStash:[],
 	isInit: false,
-	init: function( dom, onSelect ){
+	init: function( dom, onSelect, clickShopFun){
 		var thisTmp = this;
 		thisTmp.domList.push(dom);
 		dom.data("callback",onSelect);
@@ -97,14 +97,15 @@ var initStickerArea= {
 	    	var stickerSetDom = $("<div class='sticker-shop'></div>");
 
 	    	stickerSetDom.off("click").on("click", function () {
-	    		dom.siblings(".st-reply-message-area")
-	    		   .find("img.st-reply-message-sticker")
-	    		   .trigger("click");
+
+	    		if (clickShopFun) clickShopFun();
+	    		// dom.siblings(".st-reply-message-area")
+	    		//    .find("img.st-reply-message-sticker")
+	    		//    .trigger("click");
 	    		stickerSetDom.StickerStore();
 	    	});
 
 	    	thisTmp.splDict = $.lStorage("_sticker") || {};
-
 	    	thisTmp.isUpdated = true;
 	    	for( var key in thisTmp.splDict ){
 	    		var obj = thisTmp.splDict[key];

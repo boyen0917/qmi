@@ -667,6 +667,9 @@ $(function(){
 						initStickerArea.showHistory( dom.parent() );
 					});
 					cns.debug("1");
+				}, function () {
+					console.log("heyhhey")
+					stickerIcon.click();
 				});
 			// }
 
@@ -1492,6 +1495,8 @@ $(function(){
 								initStickerArea.showHistory( dom.parent() );
 							});
 							cns.debug("2");
+						}, function () {
+							target.click();
 						});
 					}
 
