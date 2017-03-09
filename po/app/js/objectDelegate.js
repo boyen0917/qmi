@@ -30,13 +30,16 @@ ObjectDelegateView = {
 		this.selectMembers = {};
 		this.selectedBranchs = {};
 		this.favParentRow = {};
+		this.favMemberRows = [];
+		this.favBranchRows = [];
 		this.memberRows = [];
 		this.branchRows = [];
 		this.isSelectedAllBranch = false;
 		this.isSelectedAllMember = false;
+		this.groupAllMembers = QmiGlobal.groups[gi].guAll;
 		this.singleCheck = option.singleCheck;
 		this.visibleMembers = option.visibleMembers;
-		this.searchList = this.visibleMembers;
+		this.matchList = this.visibleMembers;
 		this.visibleMemNum = 0;
 		this.checkedMems = option.checkedMems || {};
 		this.checkedBranches = option.checkedBranches;
@@ -101,14 +104,17 @@ ObjectDelegateView = {
 	},
 
 	makeMemberList : function () {
-		var groupAllMembers = QmiGlobal.groups[gi].guAll;
-		var loadMemberList = this.visibleMembers.slice(this.visibleMemNum, this.visibleMemNum + 500);
-		if (this.visibleMemNum + 500 > this.visibleMembers.length - 1) {
-            loadMemberList = this.visibleMembers.slice(this.visibleMemNum);
-            this.visibleMemNum = this.visibleMembers.length;
+		// var groupAllMembers = QmiGlobal.groups[gi].guAll;
+		var loadMemberList = this.matchList.slice(this.visibleMemNum, this.visibleMemNum + 500);
+
+		// 剩餘未顯示的成員不到500人
+		if (this.visibleMemNum + 500 > this.matchList.length - 1) {
+            loadMemberList = this.matchList.slice(this.visibleMemNum);
+            this.visibleMemNum = this.matchList.length;
         }
+
         $.each(loadMemberList, function(i, gu) {
-            this.addRowElement("Member", {thisMember : groupAllMembers[gu], isSubRow : false});
+            this.addRowElement("Member", {thisMember : this.groupAllMembers[gu], isSubRow : false});
         }.bind(this));
 
         this.visibleMemNum += 500;
@@ -116,6 +122,14 @@ ObjectDelegateView = {
 
 	addFavoriteSubRow : function (type, rowData = {}) {
 		var rowElement = ObjectCell.factory(type, rowData);
+		switch (type) {
+			case "Member" :
+				rowElement.bindEvent(this.checkThisMember.bind(this));
+				break;
+			case "Branch" :
+				this.branchRows.push(rowElement);
+				break;
+		}
 		this.favParentRow.html.find(".obj-cell-arrow").css("display", "inline-block").end()
 							  .find(".folder").append(rowElement.html);
 	},
@@ -130,8 +144,6 @@ ObjectDelegateView = {
 
 	selectAllMember : function () {
 		this.isSelectedAllMember = !this.isSelectedAllMember;
-		// this.checkedMems = this.isSelectedAllMember ?  : {};
-		// this.selectNumber = this.isSelectedAllMember ? this.visibleMemNum : 0;
 
 		this.memberRows.forEach(function(memberRow) {
 			memberRow.checked(this.isSelectedAllMember);
@@ -139,45 +151,84 @@ ObjectDelegateView = {
 	},
 
 	checkThisMember : function (thisMemberRow) {
-		// console.log(this.checkedMems);
+		// 單選其他，取消其他勾選
 		if (this.singleCheck) {
 			this.checkedMems = {};
 			this.checkedMems[thisMemberRow.groupUserId] = thisMemberRow.name;
 			this.memberRows.forEach(function(memberRow) {
 				memberRow.checked(false);
 			}.bind(this));
-		} else {
+		} else { //複選
 			if (thisMemberRow.isChecked) delete this.checkedMems[thisMemberRow.groupUserId];
 			else this.checkedMems[thisMemberRow.groupUserId] = thisMemberRow.name;
 		}
 	},
 
+	deleteAllMemRows : function () {
+		this.memberRows.forEach(function(memberRow) {
+			memberRow.remove();
+		}.bind(this));
+
+		this.memberRows = [];
+	},
+
 	searchMatchRow : function (e) {
 		var target = $(e.target);
 		var searchText = target.html();
+		this.visibleMemNum = 0;
 
 		if (searchText.length > 0) {
+			this.matchList = [];
+			
 			this.mainContainer.find(".obj-cell-arrow").addClass("open").end()
 							  .find(".folder").show().end()
 							  .find(".obj-content").addClass("on-search").end()
 							  .find("hr").hide().end()
 							  .find(".obj-cell-subTitle-chk").hide();
 
-			this.memberRows.forEach(function(memberRow) {
-				// memberRow.remove();
+			this.favParentRow.html.hide();
+
+			//搜尋符合的群組
+			this.branchRows.forEach(function(row) {
+				if (row.name.toLowerCase().indexOf(searchText) > -1) row.html.show();
+				else row.html.hide();
+			});
+
+			this.visibleMembers.forEach(function(memId) {
+				var memberData = this.groupAllMembers[memId];
+				if (memberData.nk.toLowerCase().indexOf(searchText) > -1
+					|| memberData.bn.toLowerCase().indexOf(searchText) > -1) {
+					this.matchList.push(memId);
+				}
 			}.bind(this));
 
 		} else {
+			
+			this.matchList = this.visibleMembers;
 			this.mainContainer.find(".obj-cell-arrow").removeClass("open").end()
 							  .find(".folder").hide().end()
 							  .find(".obj-content").removeClass("on-search").end()
 							  .find("hr").show().end()
 							  .find(".obj-cell-subTitle-chk").show();
+
+			this.favParentRow.html.show();
+
+			this.branchRows.forEach(function(row) {
+				row.html.show();
+			});
 		}
+
+		this.deleteAllMemRows();
+		this.makeMemberList();
 	},
 
 	updateStatus : function () {
 		this.selectNumElement.html(Object.keys(this.checkedMems).length);
+		if (Object.keys(this.checkedMems).length == this.visibleMembers.length) {
+			this.allMemberChkbox.html.find(".img").addClass("chk");
+		} else {
+			this.allMemberChkbox.html.find(".img").removeClass("chk");
+		}
 	}
 }
 
@@ -209,7 +260,7 @@ ObjectCell.prototype = {
 	},
 
 	remove : function () {
-		console.log(this);
+		// console.log(this);
 		this.html.remove();
 	}
 }
@@ -343,6 +394,7 @@ ObjectCell.Member = function (rowData) {
                 '<div class="obj-user-name">' + this.name + '</div>' +
                 '<div class="obj-user-title">' + ((thisMember.bn) ? thisMember.bn : "") + '</div>' +
         '</div>');
+	this.isSubRow = rowData.isSubRow;
 
-	this.isChecked = false;
+	this.isChecked = (thisMember.chk || rowData.isSelectedAll);
 }
