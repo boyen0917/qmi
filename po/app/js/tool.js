@@ -2136,7 +2136,6 @@ myWait = function(variable,type){
 
 zipVideoFile = function (videoObj) {
 	var transferBlobDef = $.Deferred();
-
 	try {
 		var ffmpeg = require('fluent-ffmpeg');
 		var fs = require('fs');

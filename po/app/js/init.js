@@ -1,22 +1,16 @@
-var ui,
-	at,
-	//國碼
-	countrycode = "+886",
-
-	gi,
-
-	//語言
-	lang = "en_US",
-
-	//local測試 預設開啟console
-	debug_flag = false,
-
-	clearChatTimer,
-
-	//local測試 預設開啟console
-	debug_flag = false;
-
+var ui;
+var at;
+var gi;
+var countrycode = "+886";	//國碼
+var lang = "en_US";			//語言
+var debug_flag = false;		//local測試 預設開啟console
+var clearChatTimer;
 var default_url = "https://qmi17.mitake.com.tw/";
+var back_exception = false;	//部分跳頁不需要記錄
+
+var userLang = navigator.language || navigator.userLanguage;
+userLang = userLang.replace(/-/g,"_").toLowerCase();
+
 var base_url = function() {
 	switch(true) {
 		case match("qawp.qmi.emome.net"):
@@ -34,7 +28,117 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://ap.qmi.emome.net/";
+
+
+//timeline裏面點擊不做展開收合的區域
+var timeline_detail_exception = [
+	".st-sub-box-2-content-detail a",
+	".st-sub-box-2-more-desc-detail a",
+	".st-box2-more-task-area-detail",
+	".audio-play",
+	".st-sub-box-more-btn",
+	".st-more-close",
+	".st-user-pic",
+	".st-sub-box-more",
+	".st-sub-box-2-attach-area"
+];
+
+//timeline內容 判斷不開啓附檔區域的type ;1是網址 但要另外判斷
+var not_attach_type_arr = [0,1,12,13,14,15];
+	
+var load_show = false;		//顯示loading 圖示 的參數
+var s_load_show = false;	//特別的
+var compose_timer = false;	//發佈計時器
+var max_w = 500; 			//縮圖寬高
+var max_h = 500;			//縮圖寬高
+var quality = 0.5;			//縮圖寬高
+
+//設置聊天訊息預覽
+var set_notification = $.lStorage("_setnoti") || true;
+
+//timeline置頂millisecond
+var top_timer_ms = $.lStorage("_topTimeMs") || 5000;
+
+var polling_interval = 5000;			//polling間距
+
+
+//tab對照表
+var initTabMap = {
+	0:{
+		act: "feed-public",
+		textId: "LEFT_FEED_GROUP"
+	},
+	1:{
+		act: "feed-post",
+		textId: "LEFT_FEED_MEMBER"
+	},
+	2:{
+		act: "feeds",
+		textId: "LEFT_FEED",
+		class: ["polling-cnt","polling-local"],
+		pollingType: "A1"
+	},
+	3:{
+		act: "chat",
+		textId: "LEFT_CHAT",
+		class: ["polling-cnt","polling-local"],
+		pollingType: "A3"
+	},
+	6:{
+		act: "memberslist",
+		textId: "LEFT_MEMBER",
+		class: ["polling-cnt","polling-local"],
+		pollingType: "A2"
+	},
+	7:{
+		act: "groupSetting",
+		textId: "GROUPSETTING_TITLE"
+	},
+	9:{
+		act: "addressBook",
+		textId: "ADDRESSBOOK_TITLE"
+	}
+	,
+	10:{
+		act: "fileSharing",
+		textId: "FILESHARING_TITLE"
+	}
+};
+
+//pen對照表
+var initPenMap = {
+	0:{
+		fcBox: "announcement",
+		textId: "FEED_BULLETIN",
+		imgNm: "bulletin"
+	},
+	1:{
+		fcBox: "feedback",
+		textId: "FEED_REPORT",
+		imgNm: "report"
+	},
+	2:{
+		fcBox: "work",
+		textId: "FEED_TASK",
+		imgNm: "task"
+	},
+	3:{
+		fcBox: "vote",
+		textId: "FEED_VOTE",
+		imgNm: "vote"
+	},
+	4:{
+		fcBox: "check",
+		textId: "FEED_LOCATION",
+		imgNm: "location"
+	},
+	5:{
+		fcBox: "post",
+		textId: "FEED_POST",
+		imgNm: "post"
+	}
+};
 
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {
@@ -47,10 +151,7 @@ $(document).ready(function() {
 	// 更改網址 清db
 	if($.lStorage("_lastBaseUrl") !== false && $.lStorage("_lastBaseUrl") !== base_url) resetDB();
 	$.lStorage("_lastBaseUrl", base_url);
-})
-
-var userLang = navigator.language || navigator.userLanguage;
-	userLang = userLang.replace(/-/g,"_").toLowerCase();
+});
 
 String.prototype._escape = function(){
     return this.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -76,23 +177,9 @@ if( 0==userLang.indexOf("zh") ){
 	}
 }
 
-	//動態消息的字數限制
-var content_limit = 400,
-
-	//計算螢幕長寬以維持比例
-	proportion = 1.7,
-
-	//上一頁按鈕不需要記錄
-	back_button = false,
-	//部分跳頁不需要記錄
-	back_exception = false,
-	back_hash = false;
-
 
 //上一頁 預設
 $(document).data("page-history",[["",""]]);
-
-
 
 //登入時間
 if( window.parent && window.parent.login_time ){
@@ -100,147 +187,6 @@ if( window.parent && window.parent.login_time ){
 } else {
 	login_time = new Date().getTime();
 }
-
-
-	//timeline裏面點擊不做展開收合的區域
-var timeline_detail_exception = [
-		".st-sub-box-2-content-detail a",
-		".st-sub-box-2-more-desc-detail a",
-		".st-box2-more-task-area-detail",
-		".audio-play",
-		".st-sub-box-more-btn",
-		".st-more-close",
-		".st-user-pic",
-		".st-sub-box-more",
-		".st-sub-box-2-attach-area"
-	],
-
-	//timeline內容 判斷不開啓附檔區域的type ;1是網址 但要另外判斷
-	not_attach_type_arr = [0,1,12,13,14,15],
-
-	//顯示loading 圖示 的參數
-	load_show = false,
-
-	//特別的
-	s_load_show = false,
-
-	//ajax 提示訊息選擇
-	ajax_msg = false,
-
-	//預設使用者大頭照
-	no_pic = "images/common/others/empty_img_personal_xl.png",
-
-	//預設使用者大頭照 size
-	avatar_size = 60,
-
-	//ajax 使用次數
-	ajax_count = 0,
-
-	//timeline圖片移動距離
-	gallery_movement = 360,
-
-	//發佈計時器
-	compose_timer = false,
-
-	//圖片上傳限制
-	img_total = 9,
-
-	//附檔區域開啓的type id
-	attach_mtp_arr = [1,6],
-
-	//縮圖寬高
-	max_w = 500,
-	max_h = 500,
-	quality = 0.5,
-
-	//設置聊天訊息預覽
-	set_notification = $.lStorage("_setnoti") || true,
-	//timeline置頂millisecond
-	top_timer_ms = $.lStorage("_topTimeMs") || 5000,
-	//top_timer_ms = 5000;
-
-	//polling間距
-	polling_interval = 5000,
-
-	//更新鈴鐺間距
-	update_alert_interval = 10000,
-
-	//tab對照表
-	initTabMap = {
-		0:{
-			act: "feed-public",
-			textId: "LEFT_FEED_GROUP"
-		},
-		1:{
-			act: "feed-post",
-			textId: "LEFT_FEED_MEMBER"
-		},
-		2:{
-			act: "feeds",
-			textId: "LEFT_FEED",
-			class: ["polling-cnt","polling-local"],
-			pollingType: "A1"
-		},
-		3:{
-			act: "chat",
-			textId: "LEFT_CHAT",
-			class: ["polling-cnt","polling-local"],
-			pollingType: "A3"
-		},
-		6:{
-			act: "memberslist",
-			textId: "LEFT_MEMBER",
-			class: ["polling-cnt","polling-local"],
-			pollingType: "A2"
-		},
-		7:{
-			act: "groupSetting",
-			textId: "GROUPSETTING_TITLE"
-		},
-		9:{
-			act: "addressBook",
-			textId: "ADDRESSBOOK_TITLE"
-		}
-		,
-		10:{
-			act: "fileSharing",
-			textId: "FILESHARING_TITLE"
-		}
-	},
-
-	//pen對照表
-	initPenMap = {
-		0:{
-			fcBox: "announcement",
-			textId: "FEED_BULLETIN",
-			imgNm: "bulletin"
-		},
-		1:{
-			fcBox: "feedback",
-			textId: "FEED_REPORT",
-			imgNm: "report"
-		},
-		2:{
-			fcBox: "work",
-			textId: "FEED_TASK",
-			imgNm: "task"
-		},
-		3:{
-			fcBox: "vote",
-			textId: "FEED_VOTE",
-			imgNm: "vote"
-		},
-		4:{
-			fcBox: "check",
-			textId: "FEED_LOCATION",
-			imgNm: "location"
-		},
-		5:{
-			fcBox: "post",
-			textId: "FEED_POST",
-			imgNm: "post"
-		}
-	};
 
 
 window.QmiGlobal = {
@@ -980,7 +926,6 @@ QmiAjax.prototype = {
 		}
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
 		if(args.ajaxMsg === true){
-			ajax_msg = false;
 			popupShowAdjust("",errorResponse(errData),true);
 		}else{
 			//預設
