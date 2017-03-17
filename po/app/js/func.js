@@ -3710,7 +3710,7 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
         case 9:
             //s9=1or3無法看已未讀列表
             var isShowUnreadAndTime = false;
-            if( (QmiGlobal.groups[this_gi] || {}).ptp === 0) isShowUnreadAndTime = true;
+            if( (QmiGlobal.groups[this_gi] || {}).ptp === 1) isShowUnreadAndTime = true;
 
             var isReady = false;
             //get read
@@ -3846,10 +3846,10 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
     tabArea.next().html("");
     $("#page-tab-object").find(".tab").click(function(){
         var tab = $(this);
-        // if( false==tab.data("clickable") ){
-        //     popupShowAdjust( $.i18n.getString("COMMON_PAID_FEATURE_TITLE"), $.i18n.getString("COMMON_PAID_FEATURE_CONTENT") );
-        //     return;
-        // }
+        if( false==tab.data("clickable") ){
+            popupShowAdjust( $.i18n.getString("COMMON_PAID_FEATURE_TITLE"), $.i18n.getString("COMMON_PAID_FEATURE_CONTENT") );
+            return;
+        }
 
         $(window).scrollTop(0);
         $("body").addClass("user-info-adjust");
