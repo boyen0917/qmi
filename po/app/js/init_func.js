@@ -58,7 +58,8 @@ $(function(){
         var comboDeferred = $.Deferred();
 
         new QmiAjax({
-            apiName: "groups/" + thisGi + "?tp=1" // tp1才能取得退出的成員
+            apiName: "groups/" + thisGi + "?tp=1", // tp1才能取得退出的成員
+            apiVer: "apiv1",
         }).complete(function(data){
             if(data.status == 200){
                 var comboData = $.parseJSON(data.responseText);
@@ -135,14 +136,15 @@ $(function(){
         var userList = [];
         var getMemberListDef = $.Deferred();
 
-        var getMembers = (function(nextUserId) {
-            var deferred = $.Deferred();
+        var getMembers = function (nextUserId) {
             nextUserId = nextUserId || "";
-
-            new QmiAjax({
-                apiName: "groups/" + thisGi + "/users?gu=" + nextUserId,
+            var ajaxData = {
+                apiName: "groups/" + thisGi + "/users",
                 apiVer: "apiv2",
-            }).success(function(data) {
+            }
+            if (nextUserId != "") ajaxData.apiName = ajaxData.apiName + "?gu=" + nextUserId;
+
+            new QmiAjax(ajaxData).success(function(data) {
                 if (Array.isArray(data.ul) && data.ul.length > 0) {
                     userList = userList.concat(data.ul);
                     nextUserId = data.ul[data.ul.length - 1].gu;
@@ -150,10 +152,12 @@ $(function(){
                 } else {
                     getMemberListDef.resolve(userList);
                 }
+            }).fail(function() {
+                getMemberListDef.reject();
             });
-        })();
+        };
 
-        // getMembers();
+        getMembers();
 
         return getMemberListDef.promise();
     }

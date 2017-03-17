@@ -249,15 +249,17 @@ function showUpdatePermissionPage(){
 	
 	//find current admins
 	var list = {};
+	var userDataTmp = QmiGlobal.groups;
+    var guAllTmp = userDataTmp[gi].guAll;
 	try{
-        var userDataTmp = QmiGlobal.groups;
-        var guAllTmp = userDataTmp[gi].guAll;
-
         for( var gu in guAllTmp ){
         	var mem = guAllTmp[gu];
+
+        	// mem.chk = false;
         	if( 1==mem.st ){
 	        	if( 1==mem.ad ){
 	        		list[gu] = mem.nk;
+	        		// mem.chk = true;
 	        	}
         	}
         }
@@ -277,6 +279,7 @@ function showUpdatePermissionPage(){
 	dom.data("object_str",JSON.stringify(list) );
 	composeObjectShowDelegate( dom, dom, option, function(){
 		try{
+			// console.log("DDDEE");
 			var newList = $.parseJSON( dom.data("object_str") );
 
 			var addList = [];
@@ -284,13 +287,17 @@ function showUpdatePermissionPage(){
 
 			for( var gu in newList ){
 				if( !list.hasOwnProperty(gu) ){
+					// 因改權限後會打combo api，如果是大團體撈成員必須一段時間，故趕在沒打之前先改local
+					guAllTmp[gu].ad = 1; 
 					addList.push(gu);
 				}
 			}
 
 			for( var gu in list ){
 				if( !newList.hasOwnProperty(gu) ){
+					guAllTmp[gu].ad = 2; 
 					delList.push(gu);
+
 				}
 			}
 
