@@ -3160,6 +3160,7 @@ function sendMsgText(dom) {
 		var isPageReady = false;
 		var list = [];
 		var title = "";
+		var loadPageDefer = $.Deferred();
 
 		//get read
 		list.push({title: $.i18n.getString("FEED_READ"), ml: null});
@@ -3172,54 +3173,70 @@ function sendMsgText(dom) {
 					}
 				}
 				list[0].ml = parseData;
-				dataReadyCnt++;
+
+				if (isShowUnreadAndReadTime) {
+                    list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
+                    list[1].ml = getUnreadUserList(parseData);
+                } else {
+                    list.push({title: $.i18n.getString("FEED_UNREAD"), clickable:false});
+                }
+
+				// dataReadyCnt++;
 				if (isPageReady && dataReadyCnt > 1) {
 					$(".screen-lock").hide();
 					showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
 				}
+
+				dataReadyCnt ++;
+
+				loadPageDefer.resolve();
 			} catch (e) {
 				errorReport(e);
 				chat.removeClass("loadRead");
 				$(".screen-lock").hide();
+				loadDefer.reject();
 			}
 		});
 
-		//get unread
-		if (isShowUnreadAndReadTime) {
-			list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-
-
-			getChatReadUnreadApi(gi, ci, rt, 2).complete(function (data) {
-				if (data.status != 200) return false;
-				try {
-					list[1].ml = $.parseJSON(data.responseText).gul;
-
-					dataReadyCnt++;
-					if (isPageReady && dataReadyCnt > 1) {
-						$(".screen-lock").hide();
-						showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
-					}
-				} catch (e) {
-					errorReport(e);
-					chat.removeClass("loadRead");
+		$.when(loadPageDefer).done(function () {
+			loadObjectTabPage($("#pagesContainer"), function () {
+				isPageReady = true;
+				if (dataReadyCnt > 0) {
 					$(".screen-lock").hide();
+					showChatObjectTabShow(gi, title, list, null, onDone);
 				}
 			});
-		} else {
-			list.push({title: $.i18n.getString("FEED_UNREAD"), clickable: false});
-			dataReadyCnt++;
-			if (isPageReady && dataReadyCnt > 1) {
-				$(".screen-lock").hide();
-				showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
-			}
-		}
-		loadObjectTabPage($("#pagesContainer"), function () {
-			isPageReady = true;
-			if (dataReadyCnt > 1) {
-				$(".screen-lock").hide();
-				showChatObjectTabShow(gi, title, list, null, onDone);
-			}
 		});
+		//get unread
+		// if (isShowUnreadAndReadTime) {
+		// 	list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
+
+
+		// 	getChatReadUnreadApi(gi, ci, rt, 2).complete(function (data) {
+		// 		if (data.status != 200) return false;
+		// 		try {
+		// 			list[1].ml = $.parseJSON(data.responseText).gul;
+
+		// 			dataReadyCnt++;
+		// 			if (isPageReady && dataReadyCnt > 1) {
+		// 				$(".screen-lock").hide();
+		// 				showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
+		// 			}
+		// 		} catch (e) {
+		// 			errorReport(e);
+		// 			chat.removeClass("loadRead");
+		// 			$(".screen-lock").hide();
+		// 		}
+		// 	});
+		// } else {
+		// 	list.push({title: $.i18n.getString("FEED_UNREAD"), clickable: false});
+		// 	dataReadyCnt++;
+		// 	if (isPageReady && dataReadyCnt > 1) {
+		// 		$(".screen-lock").hide();
+		// 		showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
+		// 	}
+		// }
+		
 	}
 
 	/**
