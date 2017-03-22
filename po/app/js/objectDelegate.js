@@ -52,9 +52,9 @@ ObjectDelegateView = {
 	},
 
 	setHeight : function() {
-		var padding_top = this.searchArea.outerHeight();
-		this.mainContainer.css("padding-top", padding_top)
-    					  .css("height", $(window).height() - 57 - padding_top);
+		var paddingTop = this.searchArea.outerHeight();
+		this.mainContainer.css("padding-top", paddingTop)
+    					  .css("height", $(window).height() - 57 - paddingTop);
 
     	return this;
 	},
@@ -112,7 +112,8 @@ ObjectDelegateView = {
 
 	loadMoreMemRow : function (e) {
 		var container = $(e.target);
-		if (container.scrollTop() + container.height() > container[0].scrollHeight - 110) {
+		var topAreaHeight = this.searchArea.outerHeight() + 58;
+		if (container.scrollTop() + container.height() > container[0].scrollHeight - topAreaHeight) {
 		    if (this.visibleMemNum < this.matchList.length) {
 		        this.makeMemberList();
 		    }

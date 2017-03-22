@@ -2215,3 +2215,12 @@ function setPolling(ts) {
 	pp.ts.pt = ts;
 	$.lStorage("_pollingData", pp);
 };
+
+sortMembers = function (userList) {
+	// 先名字排列，再依據新成員>管理者>一般成員來排列
+	return userList.sort( function(a, b){
+		if (guAllExsit[a].nk < guAllExsit[b].nk) return -1;
+		if (guAllExsit[a].nk > guAllExsit[b].nk) return 1;
+		return 0;
+	});
+}

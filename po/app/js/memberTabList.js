@@ -117,7 +117,7 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
             var guAll = userData[gi].guAll;
             var bl = userData[gi].bl;
             var myID = userData[gi].me;
-            console.log(myID)
+            
             for(var i=0;i<data.ml.length; i++ ){
                 var gu = data.ml[i].gu;
                 var rt = data.ml[i].rt;

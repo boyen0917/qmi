@@ -592,20 +592,16 @@ showAllMemberPage = function(gn) {
 sortMembers = function (memberIdList) {
 	var newMemberArr = [],
 		adminMemberArr = [],
-		memberListArr = [];
+		normalMemberListArr = [];
 
 	// 先名字排列，再依據新成員>管理者>一般成員來排列
-	memberIdList.sort( function(a, b){
-		if (guAllExsit[a].nk < guAllExsit[b].nk) return -1;
-		if (guAllExsit[a].nk > guAllExsit[b].nk) return 1;
-		return 0;
-	}).forEach( function(memId){
+	memberIdList.forEach( function(memId){
 		if (isNewMem(guAllExsit[memId])) newMemberArr.push(memId);
 		else if (guAllExsit[memId].ad == 1) adminMemberArr.push(memId);
-		else memberListArr.push(memId);
+		else normalMemberListArr.push(memId);
 	});
 
-	return newMemberArr.concat(adminMemberArr, memberListArr);
+	return newMemberArr.concat(adminMemberArr, normalMemberListArr);
 }
 
 switchListAndGrid = function( dom, subPageBottom, memberKeyList){

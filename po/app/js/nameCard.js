@@ -112,7 +112,7 @@
 
 	            } else {
 	                cns.debug("[getUserInfo] no group data, getting..",this_user_info.gi);
-	                getGroupCombo(this_user_info.gi, function(){
+	                getGroupComboInit(this_user_info.gi, function(){
 	                    getUserInfo(user_info_arr, update_chk, load_show_chk,onAllDone);
 	                });
 	                return;
@@ -927,7 +927,7 @@
 	                QmiGlobal.ajaxLoadingUI.hide();
 
 	                //重置團體頭像、名稱的參數
-	                getGroupCombo(gi,function(){
+	                getGroupComboInit(gi,function(){
 	                    updateAllAvatarName(gi,gu);    
 	                    toastShow( $.i18n.getString("USER_PROFILE_UPDATE_SUCC") );
 	                });
