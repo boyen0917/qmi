@@ -1,43 +1,27 @@
 ObjectDelegateView = {
-	mainPage : "",
-	mainContainer : "",
-	searchElement : "",
-	selectListArea : "",
-	allMemberChkbox : {},
-	allBranchChxbox : {},
-	// selectMembers : {},
-	// selectedBranchs : {},
-	selectedFavorites : {},
-	selectNum : 0,
-	favParentRow : {},
-	memberRows : [],
-	branchRows : [],
-	
-	isSelectedAllBranch : false,
-	isSelectedAllMember : false,
-
 	init : function(option) {
-		this.mainPage = $("#page-object");
+		this.mainPage = option.mainPage;
+		this.finishButton = option.headerBtn;
+		this.selectNumElement = option.selectNumElement;
 		this.mainContainer = this.mainPage.find(".obj-cell-area");
-		this.selectNumElement = this.mainPage.find(".header-cp-object span:eq(1)");
 		this.searchArea = this.mainPage.find(".obj-selected");
 		this.searchInput = this.searchArea.find(".list .search");
 		this.selectListArea = this.searchArea.find(".list .text");
 		this.clearButton = this.searchArea.find(".clear");
-		this.finishButton = this.mainPage.find(".obj-done");
 		this.pageBackButton = this.mainPage.find(".page-back");
+
 		this.allMemberChkbox = {};
 		this.allBranchChxbox = {};
-		// this.selectMembers = {};
-		// this.selectedBranchs = {};
 		this.defaultRow = {};
 		this.favParentRow = {};
 		this.favMemberRows = [];
 		this.favBranchRows = [];
 		this.memberRows = [];
 		this.branchRows = [];
+
 		this.isSelectedAllBranch = false;
 		this.isSelectedAllMember = false;
+
 		this.group = QmiGlobal.groups[gi];
 		this.groupAllMembers = $.extend(true, {}, QmiGlobal.groups[gi].guAll);
 		this.compose = option.thisCompose;
@@ -46,11 +30,13 @@ ObjectDelegateView = {
 		this.isBack = option.isBack;
 		this.singleCheck = option.singleCheck;
 		this.visibleMembers = option.visibleMembers;
-		this.matchList = this.visibleMembers;
 		this.visibleMemNum = 0;
+		this.minSelectNum = option.minSelectNum;
 		this.checkedMems = option.checkedMems;
 		this.checkedBranches = option.checkedBranches || {};
 		this.checkedFavorites = option.checkedFavorites || {};
+
+		this.matchList = this.visibleMembers;
 
 		this.selectNumElement.html(Object.keys(this.checkedMems).length);
 		this.mainPage.find(".obj-content").show().end()
@@ -58,6 +44,7 @@ ObjectDelegateView = {
 					 .find(".obj-done").show();
 		this.mainContainer.html("");
 		this.searchInput.html("");
+		this.selectListArea.html("");
 
 		this.bindEvent();
 
@@ -71,13 +58,23 @@ ObjectDelegateView = {
 
     	return this;
 	},
+
 	bindEvent : function () {
 		this.mainContainer.off("scroll").on("scroll", this.loadMoreMemRow.bind(this));
 		this.searchInput.off("input").on("input", this.searchMatchRow.bind(this));
+		this.searchArea.off("click").on("click", this.focusSearchArea.bind(this));
 		this.finishButton.off("click").on("click", this.clickDone.bind(this));
 		this.clearButton.off("click").on("click", this.clearAllCheckRows.bind(this));
+		this.selectListArea.off("click").on("click", "span", this.searchCheckedRow.bind(this));
 	},
-	clickDone : function () {
+
+	focusSearchArea : function () {
+		this.searchInput.focus();
+	},
+
+	clickDone : function (e) {
+		if ($(e.target).hasClass("disable")) return;
+
 		var checkedMemNum = Object.keys(this.checkedMems).length;
 		var checkedBranchNum = Object.keys(this.checkedBranches).length + Object.keys(this.checkedFavorites).length;
 		if (this.composeObj.parent().hasClass("cp-work-item")) {
@@ -110,7 +107,7 @@ ObjectDelegateView = {
 		}
 
 		if (this.isBack) this.pageBackButton.trigger("click");
-		if (this.onDone) this.onDone();
+		if (this.onDone) this.onDone(true);
 	},
 
 	loadMoreMemRow : function (e) {
@@ -124,8 +121,16 @@ ObjectDelegateView = {
 
 	showNoMember : function() {
 		this.mainPage.find(".obj-content").hide().end()
-        			 .find(".obj-coach-noMember").show().end()
-        			 .find(".obj-done").hide();
+        			 .find(".obj-coach-noMember").show().end();
+
+        this.finishButton.hide();
+	}, 
+
+	searchCheckedRow : function(e) {
+		e.stopPropagation();
+
+		var searchTag = $(e.target);
+		this.searchInput.html(searchTag.text()).trigger("input");
 	}, 
 
 	addRowElement : function (type, rowData = {}) {
@@ -168,14 +173,14 @@ ObjectDelegateView = {
 	},
 
 	makeMemberList : function () {
-		var loadMemberList = this.matchList.slice(this.visibleMemNum, this.visibleMemNum + 10);
+		var loadMemberList = this.matchList.slice(this.visibleMemNum, this.visibleMemNum + 200);
 
 		// 剩餘未顯示的成員不到10人
-		if (this.visibleMemNum + 10 > this.matchList.length - 1) {
+		if (this.visibleMemNum + 200 > this.matchList.length - 1) {
             loadMemberList = this.matchList.slice(this.visibleMemNum);
             this.visibleMemNum = this.matchList.length;
         } else {
-        	this.visibleMemNum += 10;
+        	this.visibleMemNum += 200;
         }
 
         $.each(loadMemberList, function(i, gu) {
@@ -226,8 +231,6 @@ ObjectDelegateView = {
 	selectAllMember : function () {
 		this.isSelectedAllMember = !this.isSelectedAllMember;
 		this.checkedMems = {};
-
-		// if (! $.isEmptyObject(this.defaultRow)) this.defaultRow.checked(false);
 
 		this.favMemberRows.forEach(function (memberRow) {
 			memberRow.checked(this.isSelectedAllMember);
@@ -355,14 +358,14 @@ ObjectDelegateView = {
 
 	searchMatchRow : function (e) {
 		var target = $(e.target);
-		var searchText = target.text();
+		var searchText = target.text().toLowerCase();
 		this.visibleMemNum = 0;
 		if (searchText.length > 0) {
 			this.matchList = [];
-			
+			this.mainPage.find(".obj-content").addClass("on-search");
 			this.mainContainer.find(".obj-cell-arrow").addClass("open").end()
 							  .find(".folder").show().end()
-							  .find(".obj-content").addClass("on-search").end()
+							  // .find(".obj-content").addClass("on-search").end()
 							  .find("hr").hide().end()
 							  .find(".obj-cell-subTitle-chk").hide();
 
@@ -384,9 +387,11 @@ ObjectDelegateView = {
 
 		} else {
 			this.matchList = this.visibleMembers;
+
+			this.mainPage.find(".obj-content").removeClass("on-search");
 			this.mainContainer.find(".obj-cell-arrow").removeClass("open").end()
 							  .find(".folder").hide().end()
-							  .find(".obj-content").removeClass("on-search").end()
+							  // .find(".obj-content").removeClass("on-search").end()
 							  .find("hr").show().end()
 							  .find(".obj-cell-subTitle-chk").show();
 
@@ -406,11 +411,20 @@ ObjectDelegateView = {
 		var totalNum = Object.keys(this.checkedMems).length + Object.keys(this.checkedBranches).length
 			+ Object.keys(this.checkedFavorites).length;
 
+		var allCheckRowData = Object.assign({}, this.checkedFavorites, this.checkedBranches, this.checkedMems);
+
 		// 檢查我的最愛欄位底下子欄位是否全部都有勾選
 		var isAllFavRowChecked = allFavRow.every(function (favRow) {
 			return favRow.isChecked;
 		});
 
+		this.selectListArea.html("");
+
+		// 超過最少點取數量，才能按完成或下一步
+		if (totalNum >= this.minSelectNum) this.finishButton.removeClass("disable");
+		else this.finishButton.addClass("disable");
+
+		// 預設全選判斷
 		if (!$.isEmptyObject(this.defaultRow)) {
 			if (totalNum > 0) this.defaultRow.checked(false);
 			else this.defaultRow.checked(true);
@@ -449,6 +463,17 @@ ObjectDelegateView = {
 			this.isSelectedAllMember = false;
 			this.allMemberChkbox.html.find(".img").removeClass("chk");
 		}
+
+		// 搜尋列加上選擇對象的Tag
+		$.each(allCheckRowData, function (key, rowName) {
+			this.selectListArea.append("<span>" + rowName.replaceOriEmojiCode() + "</span>");
+		}.bind(this));
+
+		if (this.mainPage.find(".obj-content").hasClass("on-search")) {
+			this.searchInput.html("").trigger("input").focus();
+		}
+
+		this.setHeight();
 	}
 }
 
@@ -520,7 +545,6 @@ ObjectCell.factory = function (type, rowData) {
 }
 
 ObjectCell.Default = function (rowData) {
-	console.log(rowData.isObjExist);
 	this.html = $("<div class='obj-cell all'><div class='obj-cell-chk'><div class='img " + ((rowData.isObjExist) ? "" : "chk") 
 		+ "'></div></div><div class='obj-cell-user-pic'><img src='images/common/others/select_empty_all_photo.png' " 
 		+ "style='width:60px'/></div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" 
@@ -539,7 +563,7 @@ ObjectCell.Favorite = function () {
 
 	this.isSelectAll = false;
 	this.isFavorite = true;
-	this.html.find(".obj-cell-arrow").off("click").click( function(e){
+	this.html.find(".obj-cell-arrow").off("click").click( function(e) {
 		e.preventDefault();
 		e.stopPropagation();
         $(this).toggleClass("open");

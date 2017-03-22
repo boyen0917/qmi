@@ -71,28 +71,17 @@ showSelectMemPage = function( parentDom, dataDom, onPageChanged, onDone, isBackW
 /**
 private function
 **/
-showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBackWhenDone ){
-    if( null==isBackWhenDone ) isBackWhenDone = true;
-    $(".header-title div:eq(1)").html(0);
-
-    //設定高
-    var padding_top = $(".obj-selected").outerHeight();
-    $(".obj-cell-area").css("padding-top",padding_top);
-    $(".obj-cell-area").css("height",$(window).height()-57-padding_top);
-
-    // var this_compose = $(this);
-    $.changePage("#page-selectMem", onPageChanged, onDone);
-
+showSelectMemPageDelegate = function( thisCompose, onPageChanged, onDone, isBackWhenDone ) {
     var uiData = $.userStorage();
     var group = uiData[gi];
     var guAll = group.guAll;
     var bl = group.bl;
     var fbl = group.fbl;
+    var guList = Object.keys(guAll) || [];
 
-    $(".obj-cell-area").html("");
-
-    var obj_data = this_compose.data("object_str");
-    var option = this_compose.data("object_opt");
+    var objData = $.parseJSON(thisCompose.data("object_str")) || {};
+    var excludeList = [];
+    var option = thisCompose.data("object_opt");
     var isShowBranch = false;
     var isShowSelf = false;
     var isShowAll = true;
@@ -100,6 +89,10 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
     var isSingleSelect = false;
     var isShowFavBranch = true;
     var min_count = 0;
+    var cnt = 0;
+
+    $.changePage("#page-selectMem", onPageChanged, onDone);
+
     if( option ){
         if(null != option.isShowBranch) isShowBranch = option.isShowBranch;
         if(null != option.isShowSelf) isShowSelf = option.isShowSelf;
@@ -108,110 +101,158 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
         if(null != option.isSingleSelect) isSingleSelect = option.isSingleSelect;
         if(null != option.isShowFavBranch) isShowFavBranch = option.isShowFavBranch;
         if(null != option.min_count) min_count = option.min_count;
-        if(null != option.title) {
-            $(".header-title .text").html( option.title );
-        }
     }
 
-    var excludeList = [];
+
+    if( null==isBackWhenDone ) isBackWhenDone = true;
+    // $(".header-title div:eq(1)").html(0);
+
+    //設定高
+    // var padding_top = $(".obj-selected").outerHeight();
+    // $(".obj-cell-area").css("padding-top",padding_top);
+    // $(".obj-cell-area").css("height",$(window).height()-57-padding_top);
+
+    // var this_compose = $(this);
+
+
     try{
-        excludeList = $.parseJSON( this_compose.data("exclude_str") );
+        excludeList = $.parseJSON(thisCompose.data("exclude_str"));
     } catch(e){
         cns.debug( e.message );
     }
 
-    //check cnt
-    var guList = Object.keys(guAll);
-    var cnt = 0;
-    $.each(guAll,function(i,gu_obj){
-        //踢除離開或未加入的成員
-        if( gu_obj.st!=1 ){
-            if( excludeList.indexOf(i)<=0 ){
-                excludeList.push(i);
+    console.log(excludeList)
+
+    var visibleMemList = guList.filter(function(gu) {
+        var userObj = guAll[gu];
+        if (userObj.st != 1) return false;
+        if (excludeList.indexOf(gu) > -1) return false;
+        if( false==isShowSelf && gu==group.gu ) return false;
+
+        var branchID = userObj.bl;
+        var extraContent = "";
+
+        if( branchID && branchID.length > 0 ){
+            var branchPath = branchID.split(".");
+            if( branchPath && branchPath.length > 0 ){
+                branchID = branchPath[branchPath.length-1];
+                if( bl.hasOwnProperty(branchID) ){
+                    extraContent = bl[branchID].bn;
+                }
             }
-            return;
         }
-        if( excludeList.indexOf(i)>=0 ) return;
-        if( false==isShowSelf && i==group.gu ) return;
+
+        userObj.bn = extraContent;
         cnt++;
+
+        return true;
     });
-    if( null==guList || cnt<=0 ){
-        //no one to select
-        //show coachmark & return
-        $("#page-selectMem .ui-container").hide();
-        $("#page-selectMem .obj-coach-noMember").show()._i18n();
-        $(".page-next").hide();
+
+    var viewOption = {
+        mainPage : $("#page-selectMem"),
+        headerBtn : $("#page-selectMem").find(".page-next"),
+        selectNumElement : $("#page-selectMem").find(".header-title div:eq(1)"),
+        thisCompose : thisCompose,
+        thisComposeObj : thisCompose,
+        onDone : onDone,
+        isBack : isBackWhenDone,
+        singleCheck : isSingleSelect,
+        visibleMembers : visibleMemList,
+        checkedMems : objData,
+        minSelectNum : 1,
+        // checkedBranches : branchData,
+        // checkedFavorites : favoriteData,
+    }
+
+    ObjectDelegateView.init(viewOption).setHeight();
+
+    if( null==guList || cnt <= 0 ){
+        ObjectDelegateView.showNoMember();
         return;
     } 
-    $("#page-selectMem .ui-container").show();
-    $("#page-selectMem .obj-coach-noMember").hide();
-    $(".page-next").show();
+    // $.each(guAll,function(i,gu_obj){
+    //     //踢除離開或未加入的成員
+    //     if( gu_obj.st!=1 ){
+    //         if( excludeList.indexOf(i)<=0 ){
+    //             excludeList.push(i);
+    //         }
+    //         return;
+    //     }
+    //     if( excludeList.indexOf(i)>=0 ) return;
+    //     if( false==isShowSelf && i==group.gu ) return;
+    //     cnt++;
+    // });
+    
+    // $("#page-selectMem .ui-container").show();
+    // $("#page-selectMem .obj-coach-noMember").hide();
+    // $(".page-next").show();
 
 
 
-    $(".page-next").data("min_count",min_count);
-    if( isSingleSelect ) isShowAll = false;
+    // $(".page-next").data("min_count",min_count);
+    // if( isSingleSelect ) isShowAll = false;
 
     // $("#page-selectMem .ui-container").data("selected-branch",{});
     // $("#page-selectMem .ui-container").data("selected-obj",{});
     // $("#page-selectMem .ui-container").data("selected-fav",{});
     // updateSelectedObj();
     
-    // //----- 自己 -------
-    // if( isShowSelf ){
-    //     var cell = $("<div class='obj-cell self'>"+
-    //         '<div class="obj-cell-chk"><div class="img"></div></div>' +
-    //         '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_personal_photo.png" style="width:60px"/></div>' +
-    //         '<div class="obj-cell-subgroup-data">' + 
-    //             '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELF") + '</div></div>');
-    //     $(".obj-cell-area").append(cell);
-    //     cell.off("click").click( function(){
-    //         clearMeAndAllSelect();
-    //         clearMemAndBranchAll();
-    //         if( !$(this).data("chk") ){
-    //             $(this).data("chk",true);
-    //             $(this).find(".img").addClass("chk");
-    //             //set only me select
-    //             var uiData = $.userStorage();
-    //             var guTmp = uiData[gi].gu;
-    //             var gn = uiData[gi].guAll[gu].nk;
-    //             var obj = {};
-    //             obj[guTmp] = gn;
-    //             $("#page-selectMem .ui-container").data("selected-branch",{});
-    //             $("#page-selectMem .ui-container").data("selected-obj",obj);
-                
-    //             //deselect group&mem "select all"
-    //             $(".obj-cell-subTitle").data("chk",false);
-    //             //deselect all branch
-    //             $(".obj-cell-area").find(".obj-cell.branch").each(function(){
-    //                 var this_cell = $(this);
-    //                 this_cell.data("chk",false);
-    //                 this_cell.find(".obj-cell-chk .img").removeClass("chk");
-    //             });
-    //             //deselect all mem
-    //             $(".obj-cell-area").find(".obj-cell.mem").each(function(){
-    //                 var this_cell = $(this);
-    //                 this_cell.data("chk",false);
-    //                 this_cell.find(".obj-cell-chk .img").removeClass("chk");
-    //             });
-    //         }
-    //         updateSelectedObj();
-    //     });
-    // }
+    //----- 全選 ------
+    if( isShowAll ) ObjectDelegateView.addRowElement("Default", {isObjExist : (Object.keys(objData).length > 0) ? true : false });
+    if( isShowFav && (group.favCnt > 0 || Object.keys(fbl).length > 0)) {
+        ObjectDelegateView.addRowElement("Favorite");
 
-    // //----- 全選 ------
-    // if( isShowAll ){
-    //     var cell = $("<div class='obj-cell all'>"+
-    //         '<div class="obj-cell-chk"><div class="img"></div></div>' +
-    //         '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
-    //         '<div class="obj-cell-subgroup-data">' + 
-    //             '<div class="obj-user-name">' + $.i18n.getString("COMMON_SELECT_ALL") + '</div></div>');
-    //     $(".obj-cell-area").append(cell);
-    //     cell.data("chk",true);
-    //     cell.find(".img").addClass("chk");
-    //     cell.off("click").click( selectTargetAll );
-    // }
+        visibleMemList.forEach(function(gu) {
+            var guObj = guAll[gu];
+            if (guObj.fav) {
+                ObjectDelegateView.addFavoriteSubRow("Member", {thisMember : guObj, isSubRow : true});
+            }
+        });
 
+
+        if( isShowFavBranch ){
+            for( var fi in fbl ){
+                var fbObj = fbl[fi];
+                fbObj.fi = fi;
+                // fbObj.chk = false;
+                // if (favoriteData && Object.keys(favoriteData).length) {
+                //     if (favoriteData[fi] != undefined ) fbObj.chk = true;
+                // }
+                ObjectDelegateView.addFavoriteSubRow("FavBranch", {thisFavBranchObj : fbObj, isSubRow : true});
+            }
+        }
+    }
+
+    //----- 團體列表 ------
+    if( !isSingleSelect && bl && isShowBranch && Object.keys(bl).length>0 ) {
+        var parentBranches = [];
+        ObjectDelegateView.addRowElement("SelectAllTitle", {type : "group", isDisplayedChkbox : true});
+
+        //團體rows
+        $.each(bl, function(key, branchObj){
+
+            branchObj.chk = false;
+            branchObj.bi = key;
+            if (branchData && Object.keys(branchData).length) {
+                if (branchData[key] != undefined ) branchObj.chk = true;
+            }
+
+            //第一層顯示開關
+            if (1 == branchObj.lv) {
+                parentBranches.push(key);
+            }
+        });
+
+        parentBranches.forEach(function (branchKey) {
+            ObjectDelegateView.addRowElement("ParentBranch", {thisBranch : bl[branchKey], bl: bl});
+        });
+    }
+
+    if (!isSingleSelect) ObjectDelegateView.addRowElement("SelectAllTitle", {type : "mem", isDisplayedChkbox : true});
+    else ObjectDelegateView.addRowElement("SelectAllTitle", {type: "mem", isDisplayedChkbox : false});
+
+    ObjectDelegateView.makeMemberList();
+    ObjectDelegateView.updateStatus();
     // //----- 我的最愛 ------
     // if( isShowFav ){
     //     var tmp = $("<div class='subgroup-row fav-parent'></div>");
@@ -482,7 +523,7 @@ showSelectMemPageDelegate = function( this_compose, onPageChanged, onDone, isBac
     // });
 
     //已經有內容 就製作已選的樣式
-    console.debug("obj_data:",obj_data);
+    console.debug("obj_data:",objData);
     // if(obj_data){
     //     obj_data = $.parseJSON(obj_data);
     //     try{

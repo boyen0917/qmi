@@ -2615,16 +2615,9 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         fbl = group.fbl,
         guList = Object.keys(guAll) || [];
 
-    var searchList = guList;
-    var loadMemberNum = 0;
 
     $.mobile.changePage("#page-object", {transition: "slide"});
 
-    //no one to select, show coachmark & return
-    if ((isShowSelf && group.cnt <= 0) || ( !isShowSelf && group.cnt <= 1) ) {
-        objectDelegateView.showNoMember();
-        return;
-    } 
     //工作
     if ( null== option ) {
         if(thisComposeObj.parent().hasClass("cp-work-item")) {
@@ -2657,9 +2650,6 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         favoriteData = $.parseJSON(thisCompose.data("favorite_str")); 
     }
 
-    // if( !isShowSelf && gu == group.gu ) {
-    //     guList.splice(guList.indexOf(group.gu), 1);
-    // }
     var visibleMemList = guList.filter(function(gu) {
         var userObj = guAll[gu];
         if( !isShowSelf && gu == group.gu ) return false; 
@@ -2679,17 +2669,15 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
             }
         }
 
-        // if (objData && Object.keys(objData).length) {
-        //     if (objData[userObj.gu] != undefined) userObj.chk = true;
-        //     // if (Object.keys(objData).indexOf(userObj.gu) > -1) userObj.chk = true;
-        // }
-        // console.log("CCDDD");
         userObj.bn = extraContent;
 
         return true;
     });
 
     var viewOption = {
+        mainPage : $("#page-object"),
+        headerBtn : $("#page-object").find(".obj-done"),
+        selectNumElement : $("#page-object").find(".header-cp-object span:eq(1)"),
         thisCompose : thisCompose,
         thisComposeObj : thisComposeObj,
         onDone : onDone,
@@ -2699,31 +2687,27 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         checkedMems : objData,
         checkedBranches : branchData,
         checkedFavorites : favoriteData,
+        minSelectNum : 0,
     }
 
     objectDelegateView.init(viewOption).setHeight();
 
-    // $(".obj-content").data("selected-branch",{});
-    // $(".obj-content").data("selected-obj",{});
-    // $(".obj-content").data("selected-fav",{});
-    // $(".obj-content").data("isBack", isBack );
-    // updateSelectedObj();
+    //no one to select, show coachmark & return
+    if ((isShowSelf && group.cnt <= 0) || ( !isShowSelf && group.cnt <= 1) ) {
+        objectDelegateView.showNoMember();
+        return;
+    } 
 
     //----- 全選 ------
     if( isShowAll ) objectDelegateView.addRowElement("Default", {isObjExist : (Object.keys(objData).length > 0) ? true : false });
-        // cell.off("click").click( selectTargetAll );
 
     //----- 我的最愛 ------
     if( isShowFav && (group.favCnt > 0 || Object.keys(fbl).length > 0)){
         objectDelegateView.addRowElement("Favorite");
 
         visibleMemList.forEach(function(gu) {
-            // console.log("jsjs")
             var guObj = guAll[gu];
-            // console.log(guObj);
             if (guObj.fav) {
-                 // console.log(guObj);
-                // if (Object.keys(objData).length && objData[guObj.gu] != undefined ) guObj.chk = true;
                 objectDelegateView.addFavoriteSubRow("Member", {thisMember : guObj, isSubRow : true});
             }
         });        
@@ -2745,14 +2729,7 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
     if( bl && isShowBranch && Object.keys(bl).length > 0 ) {
         var parentBranches = [];
         objectDelegateView.addRowElement("SelectAllTitle", {type : "group", isDisplayedChkbox : true});
-        // $(".obj-content").data("selected-branch",{});
-        // //標題bar
-        // var memSubTitle = $("<div class='obj-cell-subTitle group' data-chk='false'></div>");
-        // memSubTitle.append( '<div class="obj-cell-subTitle-chk">'+
-        //     '<div class="img"></div>'+
-        //     '<div class="select">'+$.i18n.getString("COMMON_SELECT_ALL")+'</div></div>' );
-        // memSubTitle.append( "<div class='text'>"+$.i18n.getString("COMPOSE_SUBGROUP")+"</div>" );
-        // $(".obj-cell-area").append(memSubTitle);
+
         //團體rows
         $.each(bl, function(key, branchObj){
 
@@ -3366,18 +3343,18 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
     //     $(".obj-selected .search").focus();
     //     e.stopPropagation();
     // });
-    $(".obj-selected").off("click").click(function(e){
-        $(".obj-selected .search").focus();
-    });
-    $(document).on("click", ".obj-selected .list .text span", function(e){
-        $(".obj-selected .list .search").html( $(this).text() ).trigger("input");
-        $(".obj-cell-area").scrollTop(0);
-        e.stopPropagation();
-    });
-    $(document).on("click", ".on-search .obj-cell, .on-search .subgroup-parent", function(){
-        $(".obj-selected .list .search").html("").trigger("input");
-        $(".obj-cell-area").scrollTop(0);
-    });
+    // $(".obj-selected").off("click").click(function(e){
+    //     $(".obj-selected .search").focus();
+    // });
+    // $(document).on("click", ".obj-selected .list .text span", function(e){
+    //     $(".obj-selected .list .search").html( $(this).text() ).trigger("input");
+    //     $(".obj-cell-area").scrollTop(0);
+    //     e.stopPropagation();
+    // });
+    // $(document).on("click", ".on-search .obj-cell, .on-search .subgroup-parent", function(){
+    //     $(".obj-selected .list .search").html("").trigger("input");
+    //     $(".obj-cell-area").scrollTop(0);
+    // });
 //     $(".obj-selected .list .search").off("input").on("input", function(){
 //         //更新搜尋結果
 //         var search = $(this).html();
@@ -3462,8 +3439,7 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
 //     });
 }
 
-updateSelectedObj = function(){
-    console.log("selectObj")
+updateSelectedObj = function() {
     var len = 0;
     var cnt = 0;
     var branch = $(".obj-content").data("selected-branch");
