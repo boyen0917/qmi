@@ -7460,7 +7460,7 @@ getGroupList = function(isFromLogin){
 
     new QmiAjax({
         apiName: "groups",
-        // apiVer: "apiv2",
+        apiVer: "apiv2",
         isPublicApi: true
     }).success(function(apiData){
         var allGroupList = apiData.gl || [],

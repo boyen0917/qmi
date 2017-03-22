@@ -4747,6 +4747,12 @@ input.cp-datetimepicker-end {
 	
 }
 
+#page-object .bottom {
+	width: 99%;
+	text-align: center;
+	z-index: 2;
+	display: none;
+}
 
 /* content */
 .obj-content {

@@ -3,7 +3,8 @@ ObjectDelegateView = {
 		this.mainPage = option.mainPage;
 		this.finishButton = option.headerBtn;
 		this.selectNumElement = option.selectNumElement;
-		this.mainContainer = this.mainPage.find(".obj-cell-area");
+		this.mainContainer = this.mainPage.find(".obj-cell-container");
+		this.loadingCircle = this.mainPage.find(".bottom");
 		this.searchArea = this.mainPage.find(".obj-selected");
 		this.searchInput = this.searchArea.find(".list .search");
 		this.selectListArea = this.searchArea.find(".list .text");
@@ -53,14 +54,14 @@ ObjectDelegateView = {
 
 	setHeight : function() {
 		var padding_top = this.searchArea.outerHeight();
-		this.mainContainer.css("padding-top", padding_top)
+		this.mainContainer.parent().css("padding-top", padding_top)
     					  .css("height", $(window).height() - 57 - padding_top);
 
     	return this;
 	},
 
 	bindEvent : function () {
-		this.mainContainer.off("scroll").on("scroll", this.loadMoreMemRow.bind(this));
+		this.mainContainer.parent().off("scroll").on("scroll", this.loadMoreMemRow.bind(this));
 		this.searchInput.off("input").on("input", this.searchMatchRow.bind(this));
 		this.searchArea.off("click").on("click", this.focusSearchArea.bind(this));
 		this.finishButton.off("click").on("click", this.clickDone.bind(this));
@@ -112,9 +113,14 @@ ObjectDelegateView = {
 
 	loadMoreMemRow : function (e) {
 		var container = $(e.target);
-		if (container.scrollTop() + container.height() > container[0].scrollHeight - 110) {
+		var topAreaHeight = this.searchArea.outerHeight() + 10;
+		if (container.scrollTop() + container.height() > container[0].scrollHeight - topAreaHeight) {
 		    if (this.visibleMemNum < this.matchList.length) {
-		        this.makeMemberList();
+
+		    	setTimeout(function(){
+					this.makeMemberList();
+
+				}.bind(this), 100);
 		    }
 		}
 	},
@@ -179,8 +185,10 @@ ObjectDelegateView = {
 		if (this.visibleMemNum + 200 > this.matchList.length - 1) {
             loadMemberList = this.matchList.slice(this.visibleMemNum);
             this.visibleMemNum = this.matchList.length;
+            this.loadingCircle.hide();
         } else {
         	this.visibleMemNum += 200;
+        	this.loadingCircle.show();
         }
 
         $.each(loadMemberList, function(i, gu) {
@@ -465,9 +473,9 @@ ObjectDelegateView = {
 		}
 
 		// 搜尋列加上選擇對象的Tag
-		$.each(allCheckRowData, function (key, rowName) {
-			this.selectListArea.append("<span>" + rowName.replaceOriEmojiCode() + "</span>");
-		}.bind(this));
+		// $.each(allCheckRowData, function (key, rowName) {
+		// 	this.selectListArea.append("<span>" + rowName.replaceOriEmojiCode() + "</span>");
+		// }.bind(this));
 
 		if (this.mainPage.find(".obj-content").hasClass("on-search")) {
 			this.searchInput.html("").trigger("input").focus();
@@ -681,21 +689,4 @@ ObjectCell.Member = function (rowData) {
 	this.isSubRow = rowData.isSubRow;
 	this.isSelectAll = false;
 	this.isChecked = (thisMember.chk || rowData.isSelectedAll);
-}
-
-function getBranchName(userObj) {
-	var branchList = QmiGlobal.groups[gi].bl;
-	var branchID = userObj.bl;
-    var extraContent = "";
-	if( branchID && branchID.length>0 ){
-        var branchPath = branchID.split(".");
-        if( branchPath && branchPath.length > 0 ){
-            branchID = branchPath[branchPath.length-1];
-            if( branchList.hasOwnProperty(branchID) ){
-                extraContent = branchList[branchID].bn;
-            }
-        }
-    }
-
-    return extraContent;
 }
