@@ -203,7 +203,8 @@ onCheckVersionDone = function(needUpdate){
 			if( email && email.length>3 ){
 				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,5}$/,'');
 				
-				if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
+				// if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
+				if(pwdInput.val().length >= 6){
 					$("#page-registration .login").addClass("login-ready");
 				}else{
 					$("#page-registration .login").removeClass("login-ready");
@@ -332,7 +333,7 @@ onCheckVersionDone = function(needUpdate){
                 }
 
         		// SSO 登入
-        		if(dataObj.rsp_code === 104) {
+        		if(dataObj.rsp_code === 104 || dataObj.rsp_code === 105) {
         			QmiGlobal.auth.isSso = true;
         			dataObj.id = bodyData.id;
         			dataObj.pw = password;
@@ -513,6 +514,8 @@ onCheckVersionDone = function(needUpdate){
     // LDAP SSO
     QmiGlobal.ssoLogin = function(ssoObj) {
     	var deferred = $.Deferred();
+    	var encodeStr = QmiGlobal.aesCrypto.enc(ssoObj.pw, ssoObj.id + "_" + QmiGlobal.device);
+
     	// sso 登入
 		new QmiAjax({
             url: "https://" + ssoObj.url + "/apiv1/sso/clouds/"+ ssoObj.cdi +"/companies/"+ ssoObj.ci +"/login",
@@ -521,7 +524,7 @@ onCheckVersionDone = function(needUpdate){
 			   id: ssoObj.id,
 			   tp: "1",
 			   dn: QmiGlobal.device,    
-			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, ssoObj.id.substring(0,16)),
+			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, (ssoObj.id + "_" + QmiGlobal.device).substring(0, 16)),
 			   uui: ssoObj.uui
 			},
             method: "post",

@@ -2215,3 +2215,19 @@ function setPolling(ts) {
 	pp.ts.pt = ts;
 	$.lStorage("_pollingData", pp);
 };
+
+
+function QmiDialog (dialogData) {
+	this.header = dialogData.header;
+	this.content = dialogData.content;
+	this.footer = dialog.footer;
+}
+
+QmiDialog.prototype.handleClose = function () {
+
+}
+
+// function companyAccount () {
+// 	var pwInpt = "<input class=''>"
+// 	var pwAgainInput = "<input class=''>"
+// }
