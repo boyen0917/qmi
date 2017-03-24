@@ -58,7 +58,7 @@ $(function(){
         var comboDeferred = $.Deferred();
 
         new QmiAjax({
-            apiName: "groups/" + thisGi + "?tp=1", // tp1才能取得退出的成員
+            apiName: "groups/" + thisGi + "?tv=29", // tp1才能取得退出的成員
             apiVer: "apiv1",
         }).complete(function(data){
             if(data.status == 200){
@@ -79,8 +79,8 @@ $(function(){
                     }
                 }
 
-                // getGroupAllMembers(thisGi).done(function(groupMemberList) {
-                //     comboData.ul = groupMemberList;
+                getGroupAllMembers(thisGi).done(function(groupMemberList) {
+                    comboData.ul = groupMemberList;
                     if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
                     // 製作guAll hash-map & inviteGuAll
                     for( var key in comboData.ul ){
@@ -114,7 +114,14 @@ $(function(){
                         thisGi: thisGi,
                         data: data
                     });
-                // })
+                }).fail(function () {
+                    comboDeferred.resolve({
+                        isSuccess: false,
+                        status: false,
+                        thisGi: thisGi,
+                        data: data
+                    });
+                });
 
             }else{    
                 comboDeferred.resolve({
