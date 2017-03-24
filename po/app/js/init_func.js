@@ -58,7 +58,7 @@ $(function(){
         var comboDeferred = $.Deferred();
 
         new QmiAjax({
-            apiName: "groups/" + thisGi + "?tp=1", // tp1才能取得退出的成員
+            apiName: "groups/" + thisGi + "?tv=29", // tp1才能取得退出的成員
             apiVer: "apiv1",
         }).complete(function(data){
             if(data.status == 200){
