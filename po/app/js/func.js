@@ -865,21 +865,7 @@ topEvent = function () {
                     this_top_event.data("data-obj",val);
                     this_top_event.data("pos",i);
 
-                    var i18Ttl = "FEED_MISSION";
-                    //標題 內容
-                    switch(val.meta.tp){
-                        case "00":
-                            i18Ttl = "FEED_POST";
-                            break;
-                        case "01":
-                            i18Ttl = "FEED_BULLETIN";
-                            break;
-                        case "02":
-                            i18Ttl = "FEED_REPORT";
-                            break;
-                    }
-
-                    this_top_event.find(".st-top-event-r-ttl span").html($.i18n.getString(i18Ttl));
+                    this_top_event.find(".st-top-event-r-ttl span").html(getEventTypeText(val.meta.tp));
                     this_top_event.find(".st-top-event-r-ttl").append(val.meta.tt);
                     
                     if (val.ml.length > 0 && val.ml[0].hasOwnProperty("c")) {
