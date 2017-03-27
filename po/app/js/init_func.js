@@ -122,7 +122,14 @@ $(function(){
                         thisGi: thisGi,
                         data: data
                     });
-                })
+                }).fail(function () {
+                    comboDeferred.resolve({
+                        isSuccess: false,
+                        status: false,
+                        thisGi: thisGi,
+                        data: data
+                    });
+                });
 
             }else{    
                 comboDeferred.resolve({
