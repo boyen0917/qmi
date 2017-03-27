@@ -418,6 +418,17 @@
 	"ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION" :	"Account Recertification",
 	"ACCOUNT_BINDING_ENTER_LDAP_PASSWORD" :	"Please enter your LDAP password",
 
+	"ENTERPRISE_ACCOUNT_PASSWORD_SETTING" :	"Password Setting",
+	"ENTERPRISE_ACCOUNT_FIRSTTIME_RESET" :	"Set a new password for your account.",
+	"ENTERPRISE_ACCOUNT_SET_PASSWORD" :	"Password (8 - 20 digits)",
+	"ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN" : "Confirm Password",
+	"ENTERPRISE_ACCOUNT_DONE" : "Done",
+	"ENTERPRISE_ACCOUNT_SECURITY_NOTICE" : "Security Notice",
+	"ENTERPRISE_ACCOUNT_IGNORE" : "Ignore",
+	"ENTERPRISE_ACCOUNT_CHANGE_PASSWORD" : "Update",
+	"ENTERPRISE_ACCOUNT_LAST_TIME" : "Last time you changed password:",
+	"ENTERPRISE_ACCOUNT_REMIND" : "Please update password regularly.",
+
 	"WEBONLY_AUTH_LOADING" : "authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
 	"WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT" : "Click to create binding account",
@@ -432,15 +443,4 @@
 	"WEBONLY_INVITE_PERMISSION" : "inviting's permissions for members",
 	"WEBONLY_LOGOUT_BY_ANOTHER_DEVICE" : "Your account login from another device",
 	"WEBONLY_VERSION_NO" : "Version",
-
-	"ENTERPRISE_ACCOUNT_PASSWORD_SETTING" :	"Password Setting",
-	"ENTERPRISE_ACCOUNT_FIRSTTIME_RESET" :	"Set a new password for your account.",
-	"ENTERPRISE_ACCOUNT_SET_PASSWORD" :	"Password (8 - 20 digits)",
-	"ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN" : "Confirm Password",
-	"ENTERPRISE_ACCOUNT_DONE" : "Done",
-	"ENTERPRISE_ACCOUNT_SECURITY_NOTICE" : "Security Notice",
-	"ENTERPRISE_ACCOUNT_IGNORE" : "Ignore",
-	"ENTERPRISE_ACCOUNT_CHANGE_PASSWORD" : "Update",
-	"ENTERPRISE_ACCOUNT_LAST_TIME" : "Last time you changed password:",
-	"ENTERPRISE_ACCOUNT_REMIND" : "Please update password regularly."
 }
