@@ -1,7 +1,7 @@
 
 #StickerStoreModal {
     position: fixed; 
-    z-index: 2000; 
+    z-index: 1820; 
     left: 0;
     top: 0;
     width: 100%;
@@ -183,6 +183,7 @@
     background-repeat: no-repeat;
 }
 
+#StickerStoreModal button:focus{outline: none;}
 #StickerStoreModal .sticker-package-block button.download{
     background-image: url(../images/sticker_center/symbols-qicon_download.png);
     cursor: pointer;

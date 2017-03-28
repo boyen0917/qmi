@@ -138,7 +138,8 @@ ObjectDelegateView = {
 		this.searchInput.html(searchTag.text()).trigger("input");
 	}, 
 
-	addRowElement : function (type, rowData = {}) {
+	addRowElement : function (type, rowData) {
+		rowData = rowData || {};
 		rowData.isSelectedAll = this.isSelectedAllMember;
 		var rowElement = ObjectCell.factory(type, rowData);
 
@@ -201,7 +202,8 @@ ObjectDelegateView = {
         }.bind(this));
 	},
 
-	addFavoriteSubRow : function (type, rowData = {}) {
+	addFavoriteSubRow : function (type, rowData) {
+		rowData = rowData || {};
 		rowData.isSelectedAll = this.isSelectedAllMember;
 		var rowElement = ObjectCell.factory(type, rowData);
 		switch (type) {

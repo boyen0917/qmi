@@ -80,7 +80,7 @@ StickerStoreView.prototype = {
 				  	"<div class='container'>" + 
 					  	"<div class='page-header'>" + 
 						  "<ul class='tab'>" +
-							"<li class='tab-link active' data-href='all-stickers'>貼圖示集</li>" +
+							"<li class='tab-link active' data-href='all-stickers'>貼圖市集</li>" +
 							"<li class='tab-link' data-href='non-download-stickers'>未下載</li>" + 
 							"<li class='tab-link' data-href='already-download-stickers'>已下載</li>" +
 						  "</ul>" +
@@ -328,14 +328,14 @@ StickerStoreView.prototype = {
     			console.log(data.responseText.rsp_msg);
     		}
 
-    		stickerDetailView.fadeIn(800);
+    		stickerDetailView.fadeIn(500);
     	});
 	},
 
 	returnHomePage : function () {
 		// if (this.ableLoadMoreStricker) this.container.find(".page-home").bind("scroll", this.loadMore.bind(this));
 		this.container.find(".sticker-package-detail").hide();
-		this.container.find(".main-content").fadeIn(800);
+		this.container.find(".main-content").fadeIn(500);
 		if (this.currentTab == "already-download-stickers" && this.orderByUser.length > 1) {
 			this.container.find(".edit-sort").show();
 		}
@@ -346,14 +346,14 @@ StickerStoreView.prototype = {
 		if (self.isUpdateOrder) {
 			popupShowAdjust("尚未儲存排序，是否關閉?", "", "是", "否",
 				[function () {
-					self.container.fadeOut(1000, function() {
+					self.container.fadeOut(300, function() {
 						self.container.remove();
 						delete self.container;
 					});
 				}]
 			);
 		} else {
-			self.container.fadeOut(1000, function() {
+			self.container.fadeOut(300, function() {
 				self.container.remove();
 				delete self.container;
 			});
@@ -476,16 +476,16 @@ StickerPackage.prototype = {
 
 			if (data.status == 200) {
 				self.switchDoneStatus();
-				stickerBlock.find("button").removeClass("download")
-										   .addClass("download-done")
-				setTimeout( function() {
-					stickerBlock.find("progress").css("visibility", "hidden"); 
-				}, 500);
-
+				stickerBlock.find("button").removeClass("download").addClass("download-done")
 				self.stickerList = downloadData.sl;
 
 				deferred.resolve();
+			} else {
+				toastShow($.i18n.getString("REFRESH_RELOAD"));
 			}
+			setTimeout( function() {
+				stickerBlock.find("progress").css("visibility", "hidden"); 
+			}, 500);
 		});
 
 		return deferred.promise();

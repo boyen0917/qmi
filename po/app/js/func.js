@@ -734,7 +734,8 @@ timelineSwitch = function (act, reset, main, noAppReload){
 
 
             switchDeferred.resolve({ act: "system-ldapSetting"});
-
+            
+            break;
         case "person":
             groupMain.find(".st-filter-area").show();
             groupMain.find(".st-filter-action")

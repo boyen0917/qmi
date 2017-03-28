@@ -1515,11 +1515,10 @@ updateGroupAllInfoDom = function( thisGi ){
 			//update name
 			$(".polling-group-name.currentGroup").html(group.gn._escape());
 			$(".polling-group-description.currentGroup").html(htmlFormat(group.gd));
+
+			// 等於當前團體 再做更新ui tab
+    		updateTab( thisGi );
 		}
-		
-		// 等於當前團體 再做更新ui tab
-    	updateTab( thisGi );
-    	
 	} catch(e){
 		errorReport(e);
 	}
