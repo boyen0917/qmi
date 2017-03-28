@@ -5,7 +5,7 @@ var countrycode = "+886";	//國碼
 var lang = "en_US";			//語言
 var debug_flag = false;		//local測試 預設開啟console
 var clearChatTimer;
-var default_url = "https://qmi17.mitake.com.tw/";
+var default_url = "https://ap.qmi.emome.net/";
 var back_exception = false;	//部分跳頁不需要記錄
 
 var userLang = navigator.language || navigator.userLanguage;
@@ -1428,111 +1428,6 @@ QmiGlobal.eventDispatcher = {
 		})
 	}
 }
-
-QmiGlobal.module.serverSelector = {
-	id: "view-server-selector",
-
-	init: function() {
-		var self = this;
-
-		if($("#module-server-selector").length !== 0) $("#module-server-selector").remove();
-		$("body").append(self.html())
-
-		self.view = $("#module-server-selector");
-
-		var chk = false
-		$.each(self.view.find("li"), function(i,liDom) {
-			if($(liDom).find("> div:last-child").text() + "/apiv1/" === base_url) {
-				chk = true;
-				$(liDom).addClass("selected").addClass("active");
-			}
-		});
-
-		if(chk === false) self.view.find("li:last-child").addClass("selected").addClass("active").find("input").val(base_url.split("/apiv1")[0]);
-
-		QmiGlobal.eventDispatcher.subscriber([
-			{
-    			veId: "item", 
-    			jqElem: self.view.find("li"), 
-    			eventArr: ["click"]
-    		},{
-    			veId: "submit", 
-    			jqElem: self.view.find("button"), 
-    			eventArr: ["click"]
-    		}
-		], self, true);
-	},
-
-	handleEvent: function() {
-		var self = this;
-		var thisElem = event.detail.elem;
-		switch(event.type.split(":"+self.id).join("")) {
-			case "click:item":
-				self.view.find("li").removeClass("active");
-				$(thisElem).addClass("active");
-				break;
-			case "click:submit":
-
-				if($("#module-server-selector-url").length === 0) $("body").append(self.urlHtml());
-				
-				var newUrl = self.view.find("li.active > div:last-child").html();
-				var inputDom = self.view.find("li.active input");
-				if(inputDom.length > 0) newUrl = inputDom.val() === "" ? default_url : inputDom.val();
-
-				$("#module-server-selector-url").html(newUrl);
-
-				newUrl += "/";
-				base_url = newUrl;
-				if(newUrl === default_url) {
-					$("#module-server-selector-url").html("");
-					localStorage.removeItem("_selectedServerUrl");
-				} else {
-					$.lStorage("_selectedServerUrl", newUrl);
-				}
-
-				// 改完刪資料庫
-				resetDB();
-
-				self.remove();
-				break;
-		}
-	},
-
-	remove: function() {
-		this.view.remove();
-	},
-
-	html: function() {
-		return "<section id='module-server-selector'>"
-		+ "<section>"
-		+ "<ul>"+ (function() {
-				return [
-					"正式環境$https://ap.qmi.emome.net",
-					"QA$https://qaap.qmi.emome.net",
-					"AWS$https://apserver.mitake.com.tw",
-					"TEST$https://qmi17.mitake.com.tw",
-					"自訂$<input placeholder='輸入網址'>"
-				].reduce(function(str, curr) {
-					return str += "<li><div>"+ curr.split("$")[0] +"</div><div>"+ curr.split("$")[1] + "</div></>";
-				}, "");
-			})() +"</ul>"
-			+ "<div><button>"+ $.i18n.getString("COMMON_OK") +"</button></div>"
-		+ "</section></section>"
-	},
-	urlHtml: function() {return "<div id='module-server-selector-url'></div>"}
-}
-
-// 選擇server
-$(document).on("click", "#container_version", function() {
-	var cnts = 0;
-	return function() {
-		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
-		cnts++;
-		if(cnts < 5) return;
-		var promt = prompt('輸入密碼');
-		if( promt === "86136982") QmiGlobal.module.serverSelector.init();
-		else return;
-}}());
 
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){
