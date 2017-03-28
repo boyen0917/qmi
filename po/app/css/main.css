@@ -5868,3 +5868,97 @@ img.vdo-default:before {}
     		transform: rotate(900deg);
     	}
 }
+
+#popupDialog {
+	position: fixed;
+	background-color: rgba(128, 128, 128, 0.53);
+	width: 100%;
+	height: 100%;
+	display: none;
+}
+
+#popupDialog .container{
+	margin: 25px auto;
+    width: 400px;
+    background: white;
+    text-align: center;
+    height: 630px;
+}
+
+#popupDialog .container .header {
+	padding-top: 30px;
+}
+
+#popupDialog .container .header img {
+	width: 120px;
+	height: 120px;
+}
+
+#popupDialog .container .header h2 {
+	color: #15BF72;
+    margin-bottom: 6px;
+    margin-top: 6px;
+}
+
+#popupDialog .container .header p {
+	margin-top: 0px;
+	margin-bottom: 0px;
+    color: rgba(102, 102, 102, 0.87);
+}
+
+#popupDialog .container .header .alert p:not(:nth-child(3)) {
+	visibility: hidden;
+}
+
+#popupDialog .container .content {
+	margin-top: 20px;
+}
+
+#popupDialog .container .content .input-column {
+	display: inline-block;
+    width: 350px;
+    margin-bottom: 30px;
+}
+
+#popupDialog .container .content .input-column:before {
+	content: "";
+    background-image: url(../images/registration/symbols-password.png);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: 0px;
+    width: 40px;
+    height: 40px;
+    float: left;
+}
+
+#popupDialog .container .content input {
+	float: left;
+    width: 280px;
+    border-bottom: 1px solid #ccc;
+    margin-top: 10px;
+    margin-left: 5px;
+    padding-bottom: 10px;
+    padding-left: 8px;
+    font-size: 16px;
+    letter-spacing: 15px;
+}
+
+#popupDialog .container .footer button {
+	min-width: 90px;
+    background-color: #ccc;
+    border: 0px;
+    border-radius: 5px;
+    padding: 6px 0px;
+    color: white;
+}
+
+#popupDialog .container .footer button.enable {
+    background-color: #15BF72;
+    cursor: pointer;
+}
+
+#popupDialog .container .content input::-webkit-input-placeholder {
+	font-size: 16px;
+	letter-spacing: initial;
+}
+

@@ -293,6 +293,18 @@ onCheckVersionDone = function(needUpdate){
 		
 	});
 
+
+	$("#popupDialog").find(".input-column input").off("input").on("input", function () {
+		var passwordInput = $(this).val();
+		var anotherPasswordInput = $(this).parent().siblings().find("input").val();
+
+		if (passwordInput.length >= 8 && anotherPasswordInput.length >= 8) {
+			$("#popupDialog").find(".confirm").addClass("enable");
+		} else {
+			$("#popupDialog").find(".confirm").removeClass("enable");
+		}
+	});
+
 	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
 
@@ -488,7 +500,7 @@ onCheckVersionDone = function(needUpdate){
 				var allGroups = Object.keys(QmiGlobal.groups);
 
 				// 預設團體打過了，從陣列移除掉
-				// allGroups.splice(allGroups.indexOf(QmiGlobal.auth.dgi), 1)
+				allGroups.splice(allGroups.indexOf(QmiGlobal.auth.dgi), 1)
         		getMultiGroupCombo(allGroups, true);
 
 		    	activateClearChatsTimer();
@@ -535,52 +547,94 @@ onCheckVersionDone = function(needUpdate){
                 });
             }
         }).done(function(rspData) {
+        	var rspObj = JSON.parse(rspData.responseText);
         	try { 
-        		var ssoKey = JSON.parse(rspData.responseText).key;
+        		var ssoKey = rspObj.key;
         	} catch(e) { 
         		var ssoKey = ""; 
         	}
-        	new QmiAjax({
-	        	apiName: "cert",
-	        	apiVer: "apiv2",
-	        	isPublic: true,
-	        	isSso: true,
-		        specifiedHeaders: {
-		            li:lang
-		        },
-	        	body: {
-				  ui: ssoObj.uui,
-				  key: ssoKey,
-				  tp: "1",
-				  dn: QmiGlobal.device,
-				  ci: ssoObj.ci,
-				  cdi: ssoObj.cdi
-				},
-	        	method: "post",
-	        	error: function(errData){
-	                deferred.resolve({
-	                	isSuccess: false,
-	                	data: errData
-	                });
-	            }
-	        }).done(function(data){
-	        	var dataObj = JSON.parse(data.responseText);
-	        	QmiGlobal.auth.ui = dataObj.ui;
-	        	QmiGlobal.auth.at = dataObj.at;
-	        	QmiGlobal.auth.et = dataObj.et;
-	        	// 保險用
-	        	QmiGlobal.auth.cl = ssoObj.url;
 
-	        	// 先存起來
-	        	QmiGlobal.auth.passwordTp = dataObj.tp;
+        	if (rspObj.rsp_code == 106) {
+        		// console.log("dwkkooo");
+        		$("#popupDialog").fadeIn();
 
-	        	// // sso 初始值
-	        	// QmiGlobal.companies[QmiGlobal.auth.ci] = QmiGlobal.auth;
-	        	// QmiGlobal.companies[QmiGlobal.auth.ci].nowAt = dataObj.at;
-          		// QmiGlobal.companies[QmiGlobal.auth.ci].passwordTp = dataObj.tp;
+        		popupDialog.create({
+        			header: "<div class='alert'><img src='images/common/icon/icon_check_gray.png'>";
+        				+ "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") +"</h2><p>" 
+        				+ $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p>"
+        				+ $.i18n.getString("ENTERPRISE_ACCOUNT_LAST_TIME") +"</p>"
+        				+ $.i18n.getString("ENTERPRISE_ACCOUNT_REMIND") +"</p></div>",
 
-				deferred.resolve({isSuccess: true});
-	        });
+    				inputType : [{
+    					type : "password"
+    					className : "password"
+    					placeholder : 
+    				},{
+    					type : "password"
+    					className : "password-again"
+    					placeholder : 
+    				}]
+
+    				buttons : {
+    					confirm : {
+    						text : 
+    					}
+    				}
+
+        		}).open();
+
+        		// var dialog = new QmiDialog({
+        		// 	header : "<div class='alert'><img src='images/common/icon/icon_check_gray.png'>" 
+        		// 		+ "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") +"</h2><p>" 
+        		// 		+ $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p></div>",
+
+        		// 	content : "<div><input data-textph-id='ENTERPRISE_ACCOUNT_SET_PASSWORD' />" 
+        		// 		+ "</div>"
+        		// })
+        	} else {
+        		new QmiAjax({
+		        	apiName: "cert",
+		        	apiVer: "apiv2",
+		        	isPublic: true,
+		        	isSso: true,
+			        specifiedHeaders: {
+			            li:lang
+			        },
+		        	body: {
+					  ui: ssoObj.uui,
+					  key: ssoKey,
+					  tp: "1",
+					  dn: QmiGlobal.device,
+					  ci: ssoObj.ci,
+					  cdi: ssoObj.cdi
+					},
+		        	method: "post",
+		        	error: function(errData){
+		                deferred.resolve({
+		                	isSuccess: false,
+		                	data: errData
+		                });
+		            }
+		        }).done(function(data){
+		        	var dataObj = JSON.parse(data.responseText);
+		        	QmiGlobal.auth.ui = dataObj.ui;
+		        	QmiGlobal.auth.at = dataObj.at;
+		        	QmiGlobal.auth.et = dataObj.et;
+		        	// 保險用
+		        	QmiGlobal.auth.cl = ssoObj.url;
+
+		        	// 先存起來
+		        	QmiGlobal.auth.passwordTp = dataObj.tp;
+
+		        	// // sso 初始值
+		        	// QmiGlobal.companies[QmiGlobal.auth.ci] = QmiGlobal.auth;
+		        	// QmiGlobal.companies[QmiGlobal.auth.ci].nowAt = dataObj.at;
+	          		// QmiGlobal.companies[QmiGlobal.auth.ci].passwordTp = dataObj.tp;
+
+					deferred.resolve({isSuccess: true});
+		        });
+        	}
+        	
         });
         return deferred.promise();
     }

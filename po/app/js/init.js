@@ -35,7 +35,7 @@ var base_url = function() {
 }();
 
 // var base_url = "https://ap.qmi.emome.net/";
-var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://qmi15.mitake.com.tw/";
 
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {

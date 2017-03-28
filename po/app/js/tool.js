@@ -2217,16 +2217,18 @@ function setPolling(ts) {
 };
 
 
-function QmiDialog (dialogData) {
-	this.header = dialogData.header;
-	this.content = dialogData.content;
-	this.footer = dialog.footer;
+// function Dialog (dialogData) {
+// 	this.html = "<div id='popupDialog'><div class='container'><div class='header'>" + dialogData.header + "</div>" 
+// 		+ "<div class='content'>" + dialogData.content + "</div>" + 
+// 		+ "</div></div>"
+// }
+
+// QmiDialog.prototype = {
+// 	// html : "<div></div>"
+// }
+QmiGlobal.Dialog = {
+	
 }
-
-QmiDialog.prototype.handleClose = function () {
-
-}
-
 // function companyAccount () {
 // 	var pwInpt = "<input class=''>"
 // 	var pwAgainInput = "<input class=''>"

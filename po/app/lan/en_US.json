@@ -420,7 +420,7 @@
 
 	"ENTERPRISE_ACCOUNT_PASSWORD_SETTING" :	"Password Setting",
 	"ENTERPRISE_ACCOUNT_FIRSTTIME_RESET" :	"Set a new password for your account.",
-	"ENTERPRISE_ACCOUNT_SET_PASSWORD" :	"Password (8 - 20 digits)",
+	"ENTERPRISE_ACCOUNT_SET_PASSWORD" :	"Password (8 - 10 digits)",
 	"ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN" : "Confirm Password",
 	"ENTERPRISE_ACCOUNT_DONE" : "Done",
 	"ENTERPRISE_ACCOUNT_SECURITY_NOTICE" : "Security Notice",
