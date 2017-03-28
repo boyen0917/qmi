@@ -1,8 +1,8 @@
-
-.stickerArea{
-	background: url("../images/chatroom/chat_attach_bg.png");
-	background-repeat:repeat-x: 
+.stickerArea {
+    background: url("../images/chatroom/chat_attach_bg.png");
+    background-repeat: repeat-x:
 }
+
 
 /*
               ██╗███╗   ███╗ ██████╗  █████╗ ██████╗ ███████╗ █████╗           
@@ -13,78 +13,87 @@
               ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝          
                                                                                
 */
-.stickerArea .imgArea{
-	height: 72%;
-	padding-top: 0.5%;
-	width: 100%;
+
+.stickerArea .imgArea {
+    height: 72%;
+    padding-top: 0.5%;
+    width: 100%;
 }
 
-.stickerArea .imgArea > .left{
-	width: 7%;
-	height: 100%;
-	display: inline-block;
-	background-image: url("../images/icon_arrow_prev_darkblue.png");
-	background-position: center center;
+.stickerArea .imgArea > .left {
+    width: 7%;
+    height: 100%;
+    display: inline-block;
+    background-image: url("../images/icon_arrow_prev_darkblue.png");
+    background-position: center center;
     background-repeat: no-repeat;
-	background-size:25px auto;
-	
-}
-.stickerArea .imgArea > .left:hover{
-	background-image: url("../images/icon_arrow_prev_blue.png");
-	background-position: center center;
-    background-repeat: no-repeat;
-	background-size:27px auto;
+    background-size: 25px auto;
 }
 
-.stickerArea .imgArea .mid{
-	width: 86%;
-	height: 100%;
-	display: inline-block;
-	overflow: hidden;
-}
-.stickerArea .imgArea .mid .group{
-	height: 100%;
-	float: left;
-	width: 100%;
-}
-.stickerArea .imgArea .mid .group .page{
-	height: 100%;
-	display: inline-block;
-	float: left;
-}
-.stickerArea .imgArea .mid .group .page .row{
-	width: 100%;
-	height: 50%;
-}
-.stickerArea .imgArea .mid .group .page .row div{
-	width: 25%;
-	height: 100%;
-	text-align: center;
-	display: inline-block;
-}
-.stickerArea .imgArea .mid .group .page .row div img{
-	height: 100%;
-}
-.stickerArea .imgArea .mid .group .page .row div img.error{
-	padding: 10%;
-	height: 80%;
+.stickerArea .imgArea > .left:hover {
+    background-image: url("../images/icon_arrow_prev_blue.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 27px auto;
 }
 
-.stickerArea .imgArea > .right{
-	width: 25px;
-	height: 100%;
-	display: inline-block;
-	background-image: url("../images/common/icon/icon_arrow_next_darkblue.png");
-	background-position: center center;
-    background-repeat: no-repeat;
-	background-size:100% auto;
+.stickerArea .imgArea .mid {
+    width: 86%;
+    height: 100%;
+    display: inline-block;
+    overflow: hidden;
 }
-.stickerArea .imgArea > .right:hover{
-	background-image: url("../images/common/icon/icon_arrow_next_blue.png");
-	background-position: center center;
-    background-repeat: no-repeat;
-	background-size:27px auto;
+
+.stickerArea .imgArea .mid .group {
+    height: 100%;
+    float: left;
+    width: 100%;
 }
+
+.stickerArea .imgArea .mid .group .page {
+    height: 100%;
+    display: inline-block;
+    float: left;
+}
+
+.stickerArea .imgArea .mid .group .page .row {
+    width: 100%;
+    height: 50%;
+}
+
+.stickerArea .imgArea .mid .group .page .row div {
+    width: 25%;
+    height: 100%;
+    text-align: center;
+    display: inline-block;
+}
+
+.stickerArea .imgArea .mid .group .page .row div img {
+    height: 100%;
+}
+
+.stickerArea .imgArea .mid .group .page .row div img.error {
+    padding: 10%;
+    height: 80%;
+}
+
+.stickerArea .imgArea > .right {
+    width: 25px;
+    height: 100%;
+    display: inline-block;
+    background-image: url("../images/common/icon/icon_arrow_next_darkblue.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+}
+
+.stickerArea .imgArea > .right:hover {
+    background-image: url("../images/common/icon/icon_arrow_next_blue.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 27px auto;
+}
+
 
 /*
               ██████╗  ██████╗ ██╗    ██╗███╗   ██╗██╗      ██████╗  █████╗ ██████╗           
@@ -95,53 +104,64 @@
               ╚═════╝  ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝           
 
 */
-.stickerArea .imgArea .mid .group .downloadArea{
-	margin-top:5px;
-	cursor: default;
+
+.stickerArea .imgArea .mid .group .downloadArea {
+    margin-top: 5px;
+    cursor: default;
 }
-.stickerArea .imgArea .mid .group .downloadArea .info{
-	width: 100%;
-	height: 110px;
+
+.stickerArea .imgArea .mid .group .downloadArea .info {
+    width: 100%;
+    height: 110px;
 }
-.stickerArea .imgArea .mid .group .downloadArea .info .left{
-	width:35%;
-	height: 100%;
-	display: inline-block;
-	vertical-align: middle;
+
+.stickerArea .imgArea .mid .group .downloadArea .info .left {
+    width: 35%;
+    height: 100%;
+    display: inline-block;
+    vertical-align: middle;
 }
-.stickerArea .imgArea .mid .group .downloadArea .info .left img{
-	width: 80%;
-	height: 80%;
-	object-fit: contain;
-	margin-top: 10%;
-	margin-left: 10%;
+
+.stickerArea .imgArea .mid .group .downloadArea .info .left img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    margin-top: 10%;
+    margin-left: 10%;
 }
-.stickerArea .imgArea .mid .group .downloadArea .info .right{
-	width:65%;
-	display: inline-block;
-	vertical-align: middle;
+
+.stickerArea .imgArea .mid .group .downloadArea .info .right {
+    width: 65%;
+    display: inline-block;
+    vertical-align: middle;
 }
-.stickerArea .imgArea .mid .group .downloadArea .info .right > div{
-	line-height: 24px;
+
+.stickerArea .imgArea .mid .group .downloadArea .info .right > div {
+    line-height: 24px;
 }
-.stickerArea .imgArea .mid .group .downloadArea .info .right .name{
-	font-size: 16px;
+
+.stickerArea .imgArea .mid .group .downloadArea .info .right .name {
+    font-size: 16px;
 }
-.stickerArea .imgArea .mid .group .downloadArea .info .right .price{
-	color: rgb(115,162,244);
-	font-size: 14px;
+
+.stickerArea .imgArea .mid .group .downloadArea .info .right .price {
+    color: rgb(115, 162, 244);
+    font-size: 14px;
 }
-.stickerArea .imgArea .mid .group .downloadArea .download{
-	width:130px;
-	height: 30px;
-	line-height: 30px;
-	text-align: center;
-	background-color: rgb(115,162,244);
-	color: white;
-	margin-right: auto;
-	margin-left: auto;
-	cursor: pointer;
+
+.stickerArea .imgArea .mid .group .downloadArea .download {
+    width: 130px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: rgb(115, 162, 244);
+    color: white;
+    margin-right: auto;
+    margin-left: auto;
+    cursor: pointer;
 }
+
+
 /*
               ██████╗  █████╗  ██████╗ ███████╗ █████╗ ██████╗ ███████╗ █████╗       
               ██╔══██╗██╔══██╗██╔════╝ ██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗      
@@ -151,25 +171,30 @@
               ╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝      
                                                                                      
 */
-.stickerArea .pageArea{
-	width: 100%;
-	height: 5.8%;	/*border有點厚度, 少個幾%否則內容會被推出去*/
-	text-align: center;
-	line-height: 6%;
+
+.stickerArea .pageArea {
+    width: 100%;
+    height: 5.8%;
+    /*border有點厚度, 少個幾%否則內容會被推出去*/
+    text-align: center;
+    line-height: 6%;
 }
-.stickerArea .pageArea .dot{
-	height: 6px;
-	width: 6px;
-	border-radius: 3px;
-	background: white;
-	display: inline-block;
-	margin-right: 6px;
-	vertical-align: middle;
-	border-style: none;
+
+.stickerArea .pageArea .dot {
+    height: 6px;
+    width: 6px;
+    border-radius: 3px;
+    background: white;
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: middle;
+    border-style: none;
 }
-.stickerArea .pageArea .dot.active{
-	background: rgb(106,173,224);
+
+.stickerArea .pageArea .dot.active {
+    background: rgb(106, 173, 224);
 }
+
 
 /*
                ██████╗ █████╗ ████████╗ █████╗  ██████╗  ██████╗ ██████╗ ██╗   ██╗     
@@ -180,97 +205,120 @@
                ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝        
                                                                                        
 */
-.stickerArea .catagory{
-	width: 100%;
-	height: 19%;
-	background: rgb(206, 226, 237);
-	border-style: solid;
-	border-width: 1px 0 0 0;
-	border-color: rgb(168, 218,247);
-	white-space: nowrap;
-	overflow-x: hidden;
-	overflow-y: hidden;
-}
-.stickerArea .catagory .cataBtn{
-	display: inline-block;
-	width: 40px;
-	height: 40px;
-	background-repeat: no-repeat;
-	background-size: 70% 70%;
-	background-position: 50% 50%;
-	/*background-image: url("../images/arrow2.png");*/
-	position: absolute;
-	/*-webkit-box-shadow: 0px 3px 14px 0px rgba(50, 50, 50, 0.36);*/
-}
-.stickerArea .catagory .cataBtn.left{
-	left: 0;
-	background-image: url("../images/icon_arrow_prev_darkblue.png");
-}
-.stickerArea .catagory .cataBtn.right{
-	background-image: url("../images/common/icon/icon_arrow_next_darkblue.png");
-	right: 0;
-}
-.stickerArea .catagory .cataBtn:hover{
-	background-size: 75% 75%;
+
+.stickerArea .catagory {
+    width: 100%;
+    height: 19%;
+    background: rgb(206, 226, 237);
+    border-style: solid;
+    border-width: 1px 0 0 0;
+    border-color: rgb(168, 218, 247);
+    white-space: nowrap;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
-.stickerArea .catagory .content{
-	width: -webkit-calc( 100% - 80px );
-	height: 39px;
-	display: inline-block;
-	margin-left: 40px;
-	white-space: nowrap;
-	overflow: hidden;
-}
-.stickerArea .catagory .cata.history{
-	display: inline-block;
-	width: 40px;
-	height: 100%;
-	background-image: url("../images/chatroom/chat_sticker_icon_history.png");
-	background-position: center center;
-	background-color: rgb(168, 218,247);
+.stickerArea .catagory .cataBtn {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
     background-repeat: no-repeat;
-	background-size:80%;
-	/*float: left;*/
+    background-size: 70% 70%;
+    background-position: 50% 50%;
+    /*background-image: url("../images/arrow2.png");*/
+    position: absolute;
+    /*-webkit-box-shadow: 0px 3px 14px 0px rgba(50, 50, 50, 0.36);*/
 }
 
-.stickerArea .catagory .cata.history:hover{
-	background-image: url("../images/chatroom/chat_sticker_icon_history_click.png");
-	width: 40px;
-	height: 100%;
-	background-position: center center;
-	background-size:80%;
+.stickerArea .catagory .cataBtn.left {
+    left: 0;
+    background-image: url("../images/icon_arrow_prev_darkblue.png");
+}
+
+.stickerArea .catagory .cataBtn.right {
+    background-image: url("../images/common/icon/icon_arrow_next_darkblue.png");
+    right: 0;
+}
+
+.stickerArea .catagory .cataBtn:hover {
+    background-size: 75% 75%;
+}
+
+.stickerArea .catagory .content {
+    width: -webkit-calc( 100% - 80px);
+    height: 39px;
+    display: inline-block;
+    margin-left: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.stickerArea .catagory .cata.history {
+    display: inline-block;
+    width: 40px;
+    height: 100%;
+    background-image: url("../images/chatroom/chat_sticker_icon_history.png");
+    background-position: center center;
+    background-color: rgb(168, 218, 247);
+    background-repeat: no-repeat;
+    background-size: 80%;
+    /*float: left;*/
+}
+
+.stickerArea .catagory .cata.history:hover {
+    background-image: url("../images/chatroom/chat_sticker_icon_history_click.png");
+    width: 40px;
+    height: 100%;
+    background-position: center center;
+    background-size: 80%;
     background-repeat: no-repeat;
 }
 
-.stickerArea .catagory .cata{
-	width: 45px;
-	height: 100%;
-	display: inline-block;
-	background-size:cover;
-	/*float: left;*/
-	border-style: solid;
-	border-width: 0 1px 0 0;
-	border-color: rgb(168, 218,247);
-}
-.stickerArea .catagory .cata:hover, .stickerArea .catagory .cata.active:not(.history){
-	background: rgb(229, 243,252);
-	background-size:cover;
+.stickerArea .catagory .cata {
+    width: 45px;
+    height: 100%;
+    display: inline-block;
+    background-size: cover;
+    /*float: left;*/
+    border-style: solid;
+    border-width: 0 1px 0 0;
+    border-color: rgb(168, 218, 247);
+    cursor: pointer;
 }
 
-.stickerArea .catagory .cata img{
-	padding: 5%;
-	width: 90%;
-	height: 90%;
-	object-fit: contain;
+.stickerArea .catagory .cata:hover,
+.stickerArea .catagory .cata.active:not(.history) {
+    background: rgb(229, 243, 252);
+    background-size: cover;
 }
 
-.stickerArea .catagory .cata.act{
-	background: rgb(229, 243,252);
+.stickerArea .catagory .cata img {
+    padding: 5%;
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
 }
-.imgArea{
-	width:86%;
-	height:100%;
-	display:inline-block;
-	overflow:hidden; 
+
+.stickerArea .catagory .cata.act {
+    background: rgb(229, 243, 252);
+}
+
+.stickerArea .catagory .sticker-shop {
+    display: inline-block;
+    width: 40px;
+    height: 100%;
+    background-image: url("../images/chatroom/chat_sticker_icon_emotions_sticker_setting.png");
+    background-position: center center;
+    background-color: rgb(242, 242, 242);
+    background-repeat: no-repeat;
+    background-size: 80%;
+    cursor: pointer;
+    /*float: left;*/
+}
+
+.imgArea {
+    width: 86%;
+    height: 100%;
+    display: inline-block;
+    overflow: hidden;
 }

@@ -378,7 +378,8 @@
 	"OFFICAL_GROUP" : "offical group",
 	"PRIVACY_POLICY" : "Privacy Policy",
 	"USER_AGREEMENT" : "Term of Use",
-
+	"STICKER_CENTER" : "Sticker Shop",
+	
 	"BIND_LDAP" : "綁定LDAP",
 	"BIND_ACCOUNT" : "已綁定帳號",
 	"GUIHU_EXPIRED" : "認證過期",

@@ -268,9 +268,14 @@ $(function(){
         var tab_id = $(this).attr('data-tab');
         //console.log("tab is "+tab_id);
         $('ul.system-tab li').removeClass('current-tab');
-        $('.system-tab-content').removeClass('current-tab');
         $(this).addClass('current-tab');
-        $("#"+tab_id).addClass('current-tab');
+        
+        if (tab_id == "sticker-center") {
+        	$(this).StickerStore();
+        } else {
+        	$('.system-tab-content').removeClass('current-tab');
+        	$("#"+tab_id).addClass('current-tab');
+        }
     });
 	//----------------------------------- 小幫手 ---------------------------------------------
 
@@ -635,8 +640,8 @@ $(function(){
 			stickerArea.hide();
 			stickerIcon.attr("src", "images/chatroom/chat_textbar_icon_emoticon.png");
 		} else {
-			if( true!=stickerArea.data("isCreate") ){
-				stickerArea.data("isCreate", true);
+			// if( true!=stickerArea.data("isCreate") ){
+			// 	stickerArea.data("isCreate", true);
 				initStickerArea.init(stickerArea, function(id){
 					//on sitcker selected
 					cns.debug(id);
@@ -653,8 +658,11 @@ $(function(){
 						initStickerArea.showHistory( dom.parent() );
 					});
 					cns.debug("1");
+				}, function () {
+					console.log("heyhhey")
+					stickerIcon.click();
 				});
-			}
+			// }
 
 			$('.st-reply-message-sticker[data-open="t"]').trigger("click");
 			stickerIcon.attr("data-open", "t");
@@ -1482,6 +1490,8 @@ $(function(){
 								initStickerArea.showHistory( dom.parent() );
 							});
 							cns.debug("2");
+						}, function () {
+							target.click();
 						});
 					}
 

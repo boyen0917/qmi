@@ -2487,7 +2487,7 @@ composeContentMake = function (compose_title){
             var preTextOfCursor = htmlText.substring(0, cursorPosition);
             var selectionObj = window.getSelection();
             var tagElements = "";
-
+            
             delUncompleteMark(thisTextArea, cursorPosition);
 
             if ( !thisTextArea.data("memberList")
