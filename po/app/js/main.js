@@ -1,7 +1,7 @@
 $(function(){  
 
 	//load language
-	updateLanguage( lang );
+	// updateLanguage( lang );
 
 	var refreshChk = false;
 
@@ -2354,23 +2354,5 @@ $(function(){
 			}
 		}
 	});
-	/*
-              ████████╗███████╗███████╗████████╗          
-              ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝          
-    █████╗       ██║   █████╗  ███████╗   ██║       █████╗
-    ╚════╝       ██║   ██╔══╝  ╚════██║   ██║       ╚════╝
-                 ██║   ███████╗███████║   ██║             
-                 ╚═╝   ╚══════╝╚══════╝   ╚═╝                                               
-	*/
-	
-	$("#page-group-menu .gmi-coachmake").click(function(){
-		var cnt = 0;
-		return function() {
-			cnt++;
-			if(cnt > 5) window.periodicallyReloadFlag = true;
-		}
-	}());
-
-
 
 });  

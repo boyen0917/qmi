@@ -33,6 +33,7 @@
   	
 
     loadByPath: function(lang_path) {
+      var deferred = $.Deferred();
       var this_i18n = this;
       $.get(lang_path,function(load_dict){
 
@@ -41,8 +42,10 @@
         } else {
           this_i18n.dict = load_dict;
         }
+
+        deferred.resolve();
       });
-      
+      return deferred.promise();
     },
 
     load: function(lang, callback) {

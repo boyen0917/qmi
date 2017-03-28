@@ -1,48 +1,24 @@
-onCheckVersionDone = function(needUpdate){
-	if( needUpdate ){
-		return;
-	}
+appInitial = function(needUpdate){
+	if( needUpdate ) return;
 	clearBadgeLabel();
 
-	// 定時重新讀取 為了健康
-    if($.lStorage("_periodicallyReloadAuth") !== false) {
-    	QmiGlobal.auth = $.lStorage("_periodicallyReloadAuth");	
-    	localStorage.removeItem("_periodicallyReloadAuth");
+	// 定時重新讀取
+    if($.lStorage("_appReloadAuth") !== false) {
+    	QmiGlobal.auth = $.lStorage("_appReloadAuth");	
+    	localStorage.removeItem("_appReloadAuth");
     	
-
-    	QmiGlobal.isPeriodicallyReload = true;
-		
-		loginAction();
+    	loginAction();
 
     } else if($.lStorage("_loginAutoChk") === true) {
 
     	QmiGlobal.auth = $.lStorage("_loginData");
-
-    	// 檢查auth
-    	new QmiAjax({
-			apiName: "me",
-			specifiedHeaders: {
-				ui: QmiGlobal.auth.ui,
-				at: QmiGlobal.auth.at,
-				li: lang
-			},
-			method: "get",
-			errHide: true
-		}).complete(function(data){
-			if(data.status === 401) {
-				resetDB();
-				window.location = "index.html";
-			} else {
-				loginAction();
-			}
-		});
+    	loginAction();
+  
 
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
 		$.mobile.changePage("")
 	}
-	//預設上一頁
-	// $(document).data("page-history",[["#page-group-menu"]]);
 	
 	//首頁大圖
 	$("#page-registration").css("height",$(window).height());
@@ -315,8 +291,6 @@ onCheckVersionDone = function(needUpdate){
 
         		var dataObj = $.parseJSON(data.responseText);
 				
-        		//
-
         		// 判斷此次登入帳號與上次不同再刪除DB
         		if($.lStorage("_loginId") !== bodyData.id) resetDB();
 
@@ -329,6 +303,9 @@ onCheckVersionDone = function(needUpdate){
                 if($(".login-auto").data("chk")) {
                 	$.lStorage("_loginData", QmiGlobal.auth);
                 	$.lStorage("_loginAutoChk", true);
+                } else {
+                	$.lStorage("_loginData", false);
+                	$.lStorage("_loginAutoChk", false);
                 }
 
         		// SSO 登入
@@ -388,7 +365,7 @@ onCheckVersionDone = function(needUpdate){
 
 	//初始化 
     function loginAction (){
-        
+
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
 
@@ -403,7 +380,7 @@ onCheckVersionDone = function(needUpdate){
         	var group_list = [];
 
         	if(rspData.isSuccess === false) {
-        		deferred.resolve(rspData)
+        		deferred.resolve(rspData);
         		return deferred.promise();
         	}
 
@@ -425,9 +402,9 @@ onCheckVersionDone = function(needUpdate){
             if( (groupList || []).length > 0 ){
 
             	// 定時重新整理 為了健康
-            	if(QmiGlobal.isPeriodicallyReload === true) {
+            	if(QmiGlobal.isAppReload === true) {
 
-            		specifiedGi = QmiGlobal.auth.prObj.gi; 
+            		specifiedGi = QmiGlobal.auth.appReloadObj.gi; 
 
             	//有dgi 但不存在列表裡
                 } else if( QmiGlobal.auth.dgi === undefined || QmiGlobal.groups[QmiGlobal.auth.dgi] === undefined ){
@@ -570,11 +547,6 @@ onCheckVersionDone = function(needUpdate){
 
 	        	// 先存起來
 	        	QmiGlobal.auth.passwordTp = dataObj.tp;
-
-	        	// // sso 初始值
-	        	// QmiGlobal.companies[QmiGlobal.auth.ci] = QmiGlobal.auth;
-	        	// QmiGlobal.companies[QmiGlobal.auth.ci].nowAt = dataObj.at;
-          		// QmiGlobal.companies[QmiGlobal.auth.ci].passwordTp = dataObj.tp;
 
 				deferred.resolve({isSuccess: true});
 	        });
@@ -1294,11 +1266,3 @@ onCheckVersionDone = function(needUpdate){
 	});
 }
 
-
-$(function(){
-
-	//設定語言, 還沒登入先用瀏覽器的語言設定
-	updateLanguage( lang );
-
-	checkVersion( onCheckVersionDone );
-});

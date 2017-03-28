@@ -432,6 +432,11 @@
 	"WEBONLY_ADMINISTRATOR" : "administrators",
 	"WEBONLY_CHATROOM_INFO" : "chatroom infomation",
 	"WEBONLY_INVITE_PERMISSION" : "inviting's permissions for members",
-	"WEBONLY_LOGOUT_BY_ANOTHER_DEVICE" : "Your account login from another device"
-	"WEBONLY_VERSION_NO" : "Version"
+	"WEBONLY_LOGOUT_BY_ANOTHER_DEVICE" : "Your account login from another device",
+	"WEBONLY_VERSION_CHK" : "update",
+	"WEBONLY_VERSION_NO" : "Version",
+
+	"WEBONLY_APPVERSION_00" : "Update automatically..",
+	"WEBONLY_APPVERSION_01" : "There is a new version available, Update now?",
+	"WEBONLY_IS_LATEST_VERSION" : "You already have the latest version of Qmi"
 }

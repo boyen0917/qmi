@@ -26,10 +26,14 @@ var ui,		//user id
 	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
 	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
+// 配合init裡面有這個初始化的 function
+var appInitial = function() {
+	// do nothing
+};
 
 $(function(){
 	//load language
-	updateLanguage(lang);
+	// updateLanguage(lang);
 	//驗證失敗 請重新登入
 	if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) {
 		
@@ -2166,21 +2170,33 @@ function sendMsgText(dom) {
 							//重設 style
 							img.removeAttr("style");
 							img.css("background-image", "none");
-
 						});
 
 						//小圖
-						img.attr("src", obj.s3);
+						img.attr("src", picUrl);
+						
 						//點擊跳出大圖
 						img.click(function () {
 							new QmiGlobal.gallery({
 					            gi: gi,
-					            photoList: [{s32: obj.s32}],
-					            currentImage : 0,
-					            isApplyWatermark : false,
-					            watermarkText : ""
+					            photoList: [{s32: picUrl}],
+					            currentImage : 0
 					        });
 						});
+
+						// 浮水印加在這
+						// var watermarkText = QmiGlobal.groups[gi].gn + " " + QmiGlobal.groups[gi].guAll[gu].nk;
+						// getWatermarkImage(watermarkText, obj.s3, 1, function(picUrl) {
+						// 	img.attr("src", picUrl);
+						// 	//點擊跳出大圖
+						// 	img.click(function () {
+						// 		new QmiGlobal.gallery({
+						//             gi: gi,
+						//             photoList: [{s32: picUrl}],
+						//             currentImage : 0
+						//         });
+						// 	});
+						// })
 						break;
 					case 7://video
 						renderVideoUrl(obj.s32, target.find("video"), function (videoTag) {

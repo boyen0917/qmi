@@ -61,7 +61,7 @@ logout = function(){
         noAuth: true,
         errHide: true,
         method: "delete"
-    }).done(function(data){
+    }).complete(function(){
 
         // 關閉移轉團體所有聊天室
         (Object.keys(windowList) || []).forEach(function(thisCi){
@@ -391,37 +391,9 @@ timelineChangeGroup = function (thisGi) {
     return changeDeferred.promise();
 }
 
-timelineSwitch = function (act,reset,main,noPR){
-
-    // 定期重新整理 選擇在這裡做
-    if(window.periodicallyReloadFlag === true && noPR !== true) {
-        
-        var wl = {};
-        $.each(windowList,function(key,value){
-            if(!value.closed){
-                if(wl[value.gi] == undefined){
-                    wl[value.gi] = {};
-                    wl[value.gi][key] = QmiGlobal.groups[value.gi].chatAll[value.ci];
-                }else{
-                    wl[value.gi][key] = QmiGlobal.groups[value.gi].chatAll[value.ci];
-                }
-            }
-        });
-        // 設定當前gi
-        QmiGlobal.auth.prObj = {
-            gi: QmiGlobal.currentGi,
-            param: {
-                act: act,
-                reset: reset,
-                main: main
-            }
-        };
-
-        $.lStorage("groupChat",wl);
-        $.lStorage("_periodicallyReloadAuth", QmiGlobal.auth);
-        location.reload();
-        return;
-    } 
+timelineSwitch = function (act, reset, main, noAppReload){
+    // app 重新整理
+    if(!noAppReload) QmiGlobal.appReload.do({act: act, reset: reset, main: main});
 
     var switchDeferred = $.Deferred(),
         page_title = $.i18n.getString("LEFT_FEED"),
@@ -604,7 +576,7 @@ timelineSwitch = function (act,reset,main,noPR){
             switchDeferred.resolve({ act: "user-setting"});
             break;  
         case "system-setting":
-
+            
             groupMain.find(".subpage-systemSetting").show();
             //header
             gmConHeader.show()
@@ -619,7 +591,7 @@ timelineSwitch = function (act,reset,main,noPR){
             .find(".gm-content-body").show();
             
             systemSetting();
-
+            
             switchDeferred.resolve({ act: "system-setting"});
             break;
         case "fileSharing":
@@ -7762,6 +7734,7 @@ getCompanyKey = function(companiesKeyObj){
         isPublicApi: true,
         body: companiesKeyObj,
         method: "post",
+        noErr: true,
         error: function(){
             deferred.resolve({isSuccess: false});
         },
@@ -7936,16 +7909,8 @@ companyLoad = function(loadData){
 
 
 polling = function(){ 
-
-    // 計算重新讀取頁面的時間
-    if($.lStorage("_periodicallyReloadTimer") === false) {
-        $.lStorage("_periodicallyReloadTimer", new Date().getTime());
-
-    // 每8小時reload一次 8 * 60 * 60 * 1000
-    } else if(new Date().getTime() - $.lStorage("_periodicallyReloadTimer") > 28800000) {
-        window.periodicallyReloadFlag = true;
-        $.lStorage("_periodicallyReloadTimer", new Date().getTime());
-    }
+    // 重整檢查
+    QmiGlobal.appReload.chk();
 
     // 開啓polling檢查機制
     if(window.QmiPollingChk.flag === false) window.QmiPollingChk.flag = true;

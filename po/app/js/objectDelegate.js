@@ -112,7 +112,7 @@ ObjectDelegateView = {
 
 	loadMoreMemRow : function (e) {
 		var container = $(e.target);
-		var topAreaHeight = this.searchArea.outerHeight() + 10;
+		var topAreaHeight = this.searchArea.outerHeight() + 58;
 		if (container.scrollTop() + container.height() > container[0].scrollHeight - topAreaHeight) {
 		    if (this.visibleMemNum < this.matchList.length) {
 
