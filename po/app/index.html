@@ -67,13 +67,8 @@
         <script type="text/javascript" src="js/systemSetting.js"></script>
         <script type="text/javascript" src="js/parseUrl.js"></script>
         <script type="text/javascript" src="js/stickerCenter.js"></script>
-        <!--<script id="google-map" src="https://maps.google.com/maps/api/js?sensor=false"></script>
-        <script src="js/jquery.tinyMap.min.js"></script>-->
+        <script type="text/javascript" src="js/objectDelegate.js"></script>
 
-        <!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPgQLVIflX8fpeiaFxxojQiiQ0vUJwyJU&sensor=false"></script>
-        <script src="js/jquery.tinyMap.min.js"></script>-->
-        
-        
         <script src="js/sha/sha1.js"></script>
         <script src="js/aesCrypto/aes.js"></script>
         <script src="js/aesCrypto/mode-ecb-min.js"></script>
@@ -821,6 +816,7 @@
                                 <div class="container">
                                     <div class="noResult" style="display:none;" data-textid="MEMBER_SEARCH_NO_RESULT"></div>
                                     <div class="memTitle" data-textid="COMMON_MEMBER"></div>
+                                    <div class="contact-memLists"></div>
                                     <div class="branchTitle" data-textid="COMPOSE_SUBGROUP"></div>
                                 </div>
                             </div>
@@ -1275,9 +1271,14 @@
                     <div class="clear"></div>
                 </div>
                 <div class="obj-cell-area">
-                
+                    <div class="obj-cell-container"></div>
+                    <div class="bottom">
+                        <img src="images/st_bottom_loading.gif">
+                    </div>
                 </div>
+                
             </div>
+
             <div class="obj-coach-noMember">
                 <div class="container">
                     <img src="images/coachmake/logo_status_object.png">

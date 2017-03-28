@@ -7,6 +7,7 @@ var isList = true;
 var g_group;
 var g_contactWaitLoadImgs;
 var g_newMemList;
+var sortedMemIdList;
 // var isKeyPress = false;
 
 $(document).ready(function(){
@@ -15,61 +16,7 @@ $(document).ready(function(){
 	$(document).on("click",".contact-add",function(e){
 		showAddMemberPage();
 	});
-	// $("#page-contact-addmem .ca-content-area").niceScroll( {
-	// 	// styler:"fb",
-	// 	cursorcolor:"rgba(107, 107, 107,0.8)", 
-	// 	cursorwidth: '10',
-	// 	cursorborderradius: '10px',
-	// 	background: 'rgba(255,255,255,0)',
-	// 	cursorborder:"",
-	// 	boxzoom:false,
-	// 	zindex: 999,
-	// 	scrollspeed: 90,
-	// 	mousescrollstep: 40
-	// 	// horizrailenabled: false,
-	// 	// ,autohidemode: "leave"
-	// });
 });
-
-// getBranchMemCnt = function(bl){
-// 	var guAll = QmiGlobal.groups[gi].guAll;
-// 	var blAll = QmiGlobal.groups[gi].bl;
-// 	var blAllCntArr = [];
-// 	// for(i=0;i<Object.keys(guAll).length;i++){
-// 	// 	var guObj = guAll[Object.keys(guAll)[i]];
-// 	// 	if(guObj.bl !== "") {
-// 	// 		blAll
-// 	// 	}
-// 	// }
-
-// 	Object.keys(blAll).map(function(bl){
-// 		var blObj = blAll[bl];
-// 		// bn: "桑居都"
-// 		// cl: Array[2]
-// 		// cnt: 15
-// 		// lv: 3
-// 		// pi: "B000004j0EX"
-
-// 		Object.keys(blAll).map(function(gu){
-// 			var guObj = guAll[gu];
-// 			// auo: "https://project-o.s3.hicloud.net.tw/groups/G00000Yd0Fb/M0000FnN0BR/avatars/9999ef02-9224-4253-9bed-bf3fc10f24ce_o?Expires=1763708791&AWSAccessKeyId=SE41NTAxNDgyNDE0MjI2MDE4Mjg5MjM&Signature=P3yIO5CsOr8t0nhwQmoloQXqhdQ%3D"
-// 			// aut: "https://project-o.s3.hicloud.net.tw/groups/G00000Yd0Fb/M0000FnN0BR/avatars/9999ef02-9224-4253-9bed-bf3fc10f24ce_t?Expires=1763708791&AWSAccessKeyId=SE41NTAxNDgyNDE0MjI2MDE4Mjg5MjM&Signature=VWgqJZ3pYnf1XHBQITRmkATxzQY%3D"
-// 			// bl: ""
-// 			// gu: "M0000Fp7011"
-// 			// nk: "holger"
-// 			// pn: "+886919291236"
-// 			if(guObj.bl !== "" && guObj.bl.match(new RegExp(guObj.bl, "g"))) {
-// 				blObj.myCnt +=1
-// 			}
-// 		});
-
-// 	})
-
-
-
-
-// 	// return
-// }
 
 initContactList = function(){
 	//clear search result
@@ -191,6 +138,7 @@ deactiveSearch = function(){
 
 onSearchInput = function(e){
 	var input = $(this);
+	var resultContainer = $(".subpage-contact .contact-searchResult");
 	if( input.val().indexOf("\n") >= 0 ){
 		input.val( input.val().replace("/\n/g","") );
 	}
@@ -198,35 +146,18 @@ onSearchInput = function(e){
 
 	//if no search text, show ori rows
 	if( !str || str.length==0 ){
-		$(".contact-searchResult").hide();
+		resultContainer.hide();
 		$(".subpage-contact .contact-rows").show();
 		return;
 	}
-
-	//for chinese...enter for comfirm chinese triggers no event
-	// if( e.keyCode == '13' || e.keyCode == '8' || e.keyCode == '46'){
-	// 	if( input.val() != input.data("searchText") ){
-	// 		isKeyPress = true;
-	// 	}
-	// }
-
-	//check complete chinese typing
-	// if( !isKeyPress ){
-	// 	cns.debug("(",input.val(),")");
-	// 	return;
-	// }
-	// isKeyPress = false;
 	
-	//return if no text changed
-	if( input.data("searchText")==str ) return;
-	input.data("searchText", str);
 	cns.debug(str);
 
 	//hide ori rows
 	var contact = $(".subpage-contact .contact-rows");
 	var searchResult = $(".subpage-contact .contact-searchResult");
 	if( !str || str.length==0 ){
-		$(".contact-searchResult").hide();
+		resultContainer.hide();
 		$(".subpage-contact .contact-rows").show();
 		return;
 	}
@@ -241,19 +172,33 @@ onSearchInput = function(e){
 	str = str.toLowerCase();
 
 	//search mem
-	var memObject = {};
+	var matchMemList = [];
 	var memCount = 0;
-	for( var key in guAllExsit ){
-		var mem = guAllExsit[key];
-		if( null==mem.nk ){
+
+	sortedMemIdList.forEach(function (memId) {
+		var memberData = guAllExsit[memId];
+		if(memberData.nk == null){
 			cns.debug( JSON.stringify(mem) );
 		} else {
-			if( mem.nk.toLowerCase().indexOf(str)>=0 ){
-				memObject[key] = mem;
+			if( memberData.nk.toLowerCase().indexOf(str)>=0 ){
+				matchMemList.push(memId);
 				memCount++;
 			}	
 		}
-	}
+
+	});
+	// for( var key in guAllExsit ){
+	// 	var mem = guAllExsit[key];
+	// 	if( null==mem.nk ){
+	// 		cns.debug( JSON.stringify(mem) );
+	// 	} else {
+	// 		if( mem.nk.toLowerCase().indexOf(str)>=0 ){
+	// 			matchMemList.push(key);
+	// 			memCount++;
+	// 		}	
+	// 	}
+	// }
+
 
 	//search bl
 	var branchList = [];
@@ -265,36 +210,37 @@ onSearchInput = function(e){
 	}
 	var branchCount = branchList.length;
 	
-	var memTitle = $(".contact-searchResult .memTitle");
-	var branchTitle = $(".contact-searchResult .branchTitle");
+	var memTitle = resultContainer.find(".memTitle");
+	var branchTitle = resultContainer.find(".branchTitle");
 
 	if( branchCount==0 && memCount==0 ){
-		$(".contact-searchResult .noResult").show();
+		resultContainer.find(".noResult").show();
 		memTitle.hide();
 		branchTitle.hide();
-		$(".contact-searchResult .contact-memLists").hide();
-		$(".contact-searchResult .contact-rows").hide();
+		resultContainer.find(".contact-memLists").hide();
+		resultContainer.find(".contact-rows").hide();
 		return;
 	}
 
-	$(".contact-searchResult .noResult").hide();
+	resultContainer.find(".noResult").hide();
 
 	if( memCount>0 ){
 		memTitle.show();
-		var memListContainer = $(".contact-searchResult .contact-memLists");
-		if( memListContainer && memListContainer.length>0 ){
-			memListContainer.remove();
-		}
-		memListContainer = generateMemberList(memObject);
-		memTitle.after(memListContainer);
-		setOnMemListScroll();
+		var memListContainer = resultContainer.find(".contact-memLists");
+		
+		// if( memListContainer && memListContainer.length>0 ){
+		// 	memListContainer.remove();
+		// }
+		memListContainer.removeData().html(generateMemberList(matchMemList, resultContainer)).show();
+		// memTitle.after(memListContainer);
+		setOnMemListScroll(matchMemList, resultContainer);
 	} else {
 		memTitle.hide();
 	}
 
 	if( branchCount>0 ){
 		branchTitle.show();
-		var branchListContainer = $(".contact-searchResult .contact-rows");
+		var branchListContainer = resultContainer.find(".contact-rows");
 		if( branchListContainer && branchListContainer.length>0 ){
 			branchListContainer.remove();
 		}
@@ -368,10 +314,6 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	title.append(nameArea);
 	title.append("<div class='btn'></div>");
 	subPage.append(title);
-
-	title.find(".btn").off("click").click( function(){
-		switchListAndGrid( $(this), subPageBottom );
-	});
 
 	//sub branch list
 	cns.debug( parentLevel );
@@ -470,9 +412,13 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 
 	//mem-title
 	var subTitle = $("<div class='contact-mems-title'></div>");
+	var subGridPageContent = $("<div class='contact-mems'></div>");
+	var subRowPageContent = $("<div class='contact-memLists'></div>");
 	subTitle.append( '<div class="count">'+0+'</div>');
 	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
 	subPageBottom.append(subTitle);
+	subPageBottom.append(subGridPageContent);
+	subPageBottom.append(subRowPageContent);
 	
 	//mem
 	var memObject = {};
@@ -486,23 +432,28 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 			}
 		}
 	});
-	var memContainer = generateMemberGrid(memObject);
-	subPageBottom.append(memContainer);
-	var memListContainer = generateMemberList(memObject);
-	subPageBottom.append(memListContainer);
+	var memContainer = generateMemberGrid(Object.keys(memObject), page);
+	var memListContainer = generateMemberList(Object.keys(memObject), page);
+	subGridPageContent.html(memContainer);
+	subRowPageContent.html(memListContainer);
+
+	title.find(".btn").off("click").click( function(){
+		switchListAndGrid( $(this), subPageBottom, Object.keys(memObject) );
+	});
+
 	if( isList ){
 		title.find(".btn").addClass("list");
-		memContainer.css("display","none");
-		setOnMemListScroll();
+		subGridPageContent.css("display","none");
+		setOnMemListScroll(Object.keys(memObject), page.find(".contact-scroll"));
 	} else {
-		memListContainer.css("display","none");
-		setOnMemGridScroll();
+		subRowPageContent.css("display","none");
+		setOnMemGridScroll(Object.keys(memObject), page.find(".contact-scroll"));
 	}
 
 	if( 0==count ){
 		subTitle.hide();
-		memListContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", data.bn)+"</div>");
-		memContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", data.bn)+"</div>");
+		subRowPageContent.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", data.bn)+"</div>");
+		subGridPageContent.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", data.bn)+"</div>");
 	} else {
 		subTitle.find(".count").html(count);
 	}
@@ -598,34 +549,38 @@ showAllMemberPage = function(gn) {
 	// 	title.find(".arrow").toggleClass("open");
 	// });
 	title.find(".btn").off("click").click( function(){
-		switchListAndGrid( $(this), subPageBottom );
+		switchListAndGrid( $(this), subPageBottom, sortedMemIdList);
 	});
 
 	//mem-title
 	var subTitle = $("<div class='contact-mems-title'></div>");
+	var subGridPageContent = $("<div class='contact-mems'></div>");
+	var subRowPageContent = $("<div class='contact-memLists'></div>");
 	subTitle.append( '<div class="count">'+0+'</div>');
 	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
 	subPageBottom.append(subTitle);
-	
+	subPageBottom.append(subGridPageContent);
+	subPageBottom.append(subRowPageContent);
 	//mem
 	var count = Object.keys(guAllExsit).length;
-	var memContainer = generateMemberGrid(guAllExsit);
-	subPageBottom.append(memContainer);
-	var memListContainer = generateMemberList(guAllExsit);
-	subPageBottom.append(memListContainer);
+	var memContainer = generateMemberGrid(sortedMemIdList);
+	var memListContainer = generateMemberList(sortedMemIdList);
+	subGridPageContent.html(memContainer);
+	subRowPageContent.html(memListContainer);
+
 	if( isList ){
 		title.find(".btn").addClass("list");
-		memContainer.css("display","none");
-		setOnMemListScroll();
+		subGridPageContent.css("display","none");
+		setOnMemListScroll(sortedMemIdList);
 	} else {
-		memListContainer.css("display","none");
-		setOnMemGridScroll();
+		subRowPageContent.css("display","none");
+		setOnMemGridScroll(sortedMemIdList);
 	}
 
 	if( 0==count ){
 		subTitle.hide();
-		memContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", gn)+"</div>");
-		memListContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", gn)+"</div>");
+		subGridPageContent.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", gn)+"</div>");
+		subRowPageContent.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", gn)+"</div>");
 	} else {
 		subTitle.find(".count").html(count);
 	}
@@ -634,7 +589,27 @@ showAllMemberPage = function(gn) {
 	$.mobile.changePage("#"+pageID, { transition: "slide"});
 }
 
-switchListAndGrid = function( dom, subPageBottom ){
+sortMembers = function (memberIdList) {
+	var newMemberArr = [],
+		adminMemberArr = [],
+		memberListArr = [];
+
+	// 先名字排列，再依據新成員>管理者>一般成員來排列
+	memberIdList.sort( function(a, b){
+		if (guAllExsit[a].nk < guAllExsit[b].nk) return -1;
+		if (guAllExsit[a].nk > guAllExsit[b].nk) return 1;
+		return 0;
+	}).forEach( function(memId){
+		if (isNewMem(guAllExsit[memId])) newMemberArr.push(memId);
+		else if (guAllExsit[memId].ad == 1) adminMemberArr.push(memId);
+		else memberListArr.push(memId);
+	});
+
+	return newMemberArr.concat(adminMemberArr, memberListArr);
+}
+
+switchListAndGrid = function( dom, subPageBottom, memberKeyList){
+	console.log(subPageBottom);
 	isList = !isList;
 	var userData = QmiGlobal.groups;
 	userData.isMemberShowList = isList;
@@ -647,240 +622,97 @@ switchListAndGrid = function( dom, subPageBottom ){
 			memList.show(0);
 		});
 		dom.addClass("list");
-		setOnMemListScroll();
+		setOnMemListScroll(memberKeyList, subPageBottom);
 		updateNewMemTag( memList );
 	} else {
 		memList.fadeOut('fast', function(){
 			mem.show(0);
 		});
 		dom.removeClass("list");
-		setOnMemGridScroll();
+		setOnMemGridScroll(memberKeyList, subPageBottom);
 		updateNewMemTag( mem );
 	}
 }
 
-generateMemberGrid = function( memObject ){
-	var memContainer = $("<div class='contact-mems'></div>");
+generateMemberGrid = function( memberKeyList, memContainer ){
+	var memContainer = memContainer || $("#page-contact_all");
+	var memObject = guAllExsit;
+	var memberListHtml = "";
+	var memberIndex = memContainer.find(".contact-mems").data("memberIndex") || 0,
+		endMemberIndex = memberIndex + 500;
+
 	try{
-		var keys = Object.keys(memObject);
-		keys.sort( function(a, b){
-			// cns.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
-			if (memObject[a].nk < memObject[b].nk)	return -1;
-			if (memObject[a].nk > memObject[b].nk)	return 1;
-			return 0;
-		});
-		// $.each(memObject,function(key,mem){
-		for( var i=0; i<keys.length; i++){
-			var key = keys[i];
-			var mem = memObject[key];
-			if( null== mem ){
-				cns.debug(key);
-			} else {
-				var tmp = $("<div class='mem namecard'></div>");
-				if( mem.aut && mem.aut.length>0 ){
-					tmp.append("<div class='img waitLoad' data-url='"+mem.aut+"'><div class='new' style='display:none;'>NEW</div></div>");
-				} else {
-					tmp.append("<div class='img'><div class='new' style='display:none;'>NEW</div></div>");
-				}
-				// cns.debug(key, mem.nk);
-				tmp.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
-				tmp.data("gu",key);
-
-				//new > admin > normal
-				if( isNewMem(mem) ){
-					if( mem.ad==1 ) tmp.addClass("admin")
-						
-					tmp.addClass("new-mem");
-					var lastNewDom = memContainer.find(".new-mem");
-					if( lastNewDom.length>0 ){
-						$(lastNewDom[lastNewDom.length-1]).after(tmp);
-					} else {
-						memContainer.prepend(tmp);
-					}
-					setNewMemTag( tmp );
-				} else if( mem.ad==1 ){
-					tmp.addClass("admin");
-					var lastAdminDom = memContainer.find(".admin");
-					if( lastAdminDom.length>0 ){
-						$(lastAdminDom[lastAdminDom.length-1]).after(tmp);
-					} else {
-						var lastNewDom = memContainer.find(".new-mem");
-						if( lastNewDom.length>0 ){
-							$(lastNewDom[lastNewDom.length-1]).after(tmp);
-						} else {
-							memContainer.prepend(tmp);
-						}
-					}
-				} else {
-					memContainer.append(tmp);
-				}
-				// if( g_newMemList.hasOwnProperty(mem.gu) ){
-				// 	tmp.find(".new").show();
-				// 	tmp.click( function(){
-				// 		if( g_newMemList.hasOwnProperty(mem.gu) ){
-				// 			delete g_newMemList[mem.gu];
-				// 			var tmpMemList = $.lStorage("_newMemList");
-				// 			tmpMemList[gi] = g_newMemList;
-				// 			$.lStorage("_newMemList",tmpMemList);
-				// 		}
-				// 		$(this).find(".new").hide();
-				// 		$(this).unbind("click");
-				// 	});
-				// }
-
-			}
-		// });
+		if (endMemberIndex > memberKeyList.length - 1) {
+			var loadMemberList = memberKeyList.slice(memberIndex);
+			endMemberIndex = memberKeyList.length;
+		} else {
+			var loadMemberList = memberKeyList.slice(memberIndex, endMemberIndex);
 		}
-		//"<div class='img' style='background-image:url("+mem.aut+");'><div class='new' style='display:none;'>NEW</div></div>");
-		
-		var tmp = memContainer.find(".img.waitLoad:lt(108)");
-		$.each(tmp, function(index,domTmp){
-			var dom = $(domTmp);
-			dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
-		});
-		g_contactWaitLoadImgs = memContainer.find(".img.waitLoad");
+		memberListHtml = loadMemberList.reduce(function(memberHtml, memberId) {
+			var memberData = memObject[memberId];
+			var imgUrl = ( memberData.aut && memberData.aut.length>0 ) ? memberData.aut : "images/common/others/empty_img_personal_l.png";
+
+			var memberElementStr = "<div class='mem namecard " + ((memberData.ad == 1) ? "admin " : " ") 
+				+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu + "'>"
+				+ "<img data-url='" + imgUrl + "' src='" + imgUrl + "'>"
+				+ "<div class='name'>" + memberData.nk.replaceOriEmojiCode()+"</div>"
+				+ "</div>";
+
+			return memberHtml + memberElementStr;	
+		}, "");
+
+		memContainer.find(".contact-mems").data("memberIndex", endMemberIndex);
+
+		// var tmp = memContainer.find(".img.waitLoad:lt(108)");
+		// $.each(tmp, function(index,domTmp){
+		// 	var dom = $(domTmp);
+		// 	// dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
+		// });
+		// g_contactWaitLoadImgs = memContainer.find(".img.waitLoad");
 	} catch(e){
 		errorReport(e);
 	}
 
-	return memContainer;
+	return memberListHtml;
 }
 
-
-generateMemberList = function( memObject, favCallback ){
-	var memContainer = $("<div class='contact-memLists'></div>");
+generateMemberList = function( memberKeyList, memContainer, favCallback ){
+	memContainer = memContainer || $("#page-contact_all");
+	var memObject = guAllExsit;
+	var memberListHtml = "";
+	var memberIndex = memContainer.find('.contact-memLists').data("memberIndex") || 0,
+		endMemberIndex = memberIndex + 500;
 	var count = 0;
 	try{
-		var keys = Object.keys(memObject);
-		keys.sort( function(a, b){
-			// cns.debug(memObject[a].nk, memObject[b].nk, memObject[a].nk < memObject[b].nk);
-			if (memObject[a].nk < memObject[b].nk)	return -1;
-			if (memObject[a].nk > memObject[b].nk)	return 1;
-			return 0;
-		});
-		// $.each(memObject,function(key,mem){
-		for( var i=0; i<keys.length; i++){
-			var key = keys[i];
-			var mem = memObject[key];
-			// cns.debug(mem.nk);
-			//favorite ver.
-			// var tmp = $("<div class='row mem'><div class='left namecard'></div><div class='mid namecard'></div><div class='right'></div></div>");
-			var tmp = $("<div class='row mem namecard'><div class='left'></div><div class='mid'></div><div class='right'>&nbsp</div></div>");
-			//pic
-			var left = tmp.find(".left");
-			if( mem.aut && mem.aut.length>0 ){
-				// left.append("<div class='img' style='background-image:url("+mem.aut+")'><div class='new' style='display:none;'>NEW</div></div>");
-				left.append("<div class='img waitLoad' data-url='"+mem.aut+"'><div class='new' style='display:none;'>NEW</div></div>");
-			} else {
-				left.append("<div class='img'></div>");
-			}
-			//name, (職稱), detail
-			var mid = tmp.find(".mid");
-			mid.append("<div class='name'>"+mem.nk.replaceOriEmojiCode()+"</div>");
-			
-			//暫時用部門取代職稱
-			var posi = "";
-			try{
-				posi = bl[mem.bl.split(",")[0].split(".")[0]].bn;
-			} catch( e ){
-				// cns.debug( e.message );
-			}
-			var tmpRow = $("<div class='detail'>"+posi+"</div>");
-			if(posi.length==0) tmpRow.css("display","none");
-			mid.append(tmpRow);
-			
-			var sl = (mem.sl)? mem.sl : "";
-			tmpRow = $("<div class='detail'>"+sl+"</div>");
-			if(sl.length==0) tmpRow.css("display","none");
-			mid.append(tmpRow);
-			if( !posi || posi.length==0 ){
-				mid.find(".detail:last-child").addClass("twoLine");
-			}
-
-			//favorite disabled, remove '.namecard' of .right before enable this
-			////favorite
-			// var right = tmp.find(".right");
-			// var fav = $("<div class='fav'></div>");
-			// if( mem && true==mem.fav ){
-			// 	right.addClass("active", true);
-			// }
-			// right.append(fav);
-
-			// right.data("gu",key);
-			// left.data("gu",key);
-			// mid.data("gu",key);
-			tmp.data("gu",key)
-
-
-			if( isNewMem(mem) ){
-				tmp.addClass("new-mem");
-				var lastNewDom = memContainer.find(".new-mem");
-				if( lastNewDom.length>0 ){
-					$(lastNewDom[lastNewDom.length-1]).after(tmp);
-				} else {
-					memContainer.prepend(tmp);
-				}
-				setNewMemTag( tmp );
-			} else if( mem.ad==1 ){	//is admin?
-				tmp.addClass("admin");
-				var lastAdminDom = memContainer.find(".admin");
-				if( lastAdminDom.length>0 ){
-					$(lastAdminDom[lastAdminDom.length-1]).after(tmp);
-				} else {
-					var lastNewDom = memContainer.find(".new-mem");
-					if( lastNewDom.length>0 ){
-						$(lastNewDom[lastNewDom.length-1]).after(tmp);
-					} else {
-						memContainer.prepend(tmp);
-					}
-				}
-			} else {
-				memContainer.append(tmp);
-			}
-		// });
+		if (endMemberIndex > memberKeyList.length - 1) {
+			var loadMemberList = memberKeyList.slice(memberIndex);
+			endMemberIndex = memberKeyList.length;
+		} else {
+			var loadMemberList = memberKeyList.slice(memberIndex, endMemberIndex);
 		}
 
-		////favorite click(disabled)
-		// memContainer.find(".right").off("click").click( function(){
-		// 	var thisTmp = $(this);
-		// 	if( thisTmp.hasClass("sending") ) return;
-		// 	thisTmp.addClass("sending");
-		// 	var gu = thisTmp.data("gu");
-		// 	cns.debug(gu);
-		// 	if( !gu ) return;
+		memberListHtml = loadMemberList.reduce(function(memberHtml, memberId) {
+			var memberData = memObject[memberId];
+			var imgUrl = ( memberData.aut && memberData.aut.length>0 ) ? memberData.aut : "images/common/others/empty_img_personal_l.png";
 
-		// 	var api_name = "groups/" + gi + "/users/" + gu + "/favorite";
-		//     var headers = {
-		//              "ui":ui,
-		//              "at":at, 
-		//              "li":lang,
-		//                  };
-		// 	ajaxDo(api_name,headers,"put",true,null).complete(function(data){
-		// 		thisTmp.removeClass("sending");
-		// 		if(data.status == 200){
-		// 			//save to db
-		// 			var isAdded = (700==$.parseJSON(data.responseText).rsp_code);
-		// 			cns.debug("add:",isAdded);
-		// 			thisTmp.toggleClass("active", isAdded);
-		// 			var data = QmiGlobal.groups;
-		// 			data[gi].guAll[gu].fav = isAdded;
-		// 			guAll = data[gi].guAll;
-		// 			// *--* $.lStorage(ui, data);
-		// 		}
-		// 		if( favCallback ) favCallback();
-		// 	});
-		// });
+			var memberElementStr = "<div class='row mem namecard " + ((memberData.ad == 1) ? "admin " : " ")
+			 	+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu 
+			 	+ "' ><div class='left'><img data-url='" + imgUrl + "' src='" + imgUrl 
+			 	+ "' /></div><div class='mid'><div class='name'>" + memberData.nk.replaceOriEmojiCode() 
+			 	+ "</div><div class='detail'>" + ((memberData.bl == "") ? "" : bl[memberData.bl.split(",")[0].split(".")[0]].bn)
+				+ "</div><div class='detail " + ((memberData.bl == "") ? "twoLine" : "") +"'>" 
+				+ ((memberData.sl == "") ? memberData.sl : "") + "</div></div><div class='right'>&nbsp</div></div>";
 
-		var tmp = memContainer.find(".img.waitLoad:lt(8)");
-		$.each(tmp, function(index,domTmp){
-			var dom = $(domTmp);
-			dom.css("background-image","url("+dom.attr("data-url")+")").removeClass("waitLoad").removeAttr("data-url");
-		});
+			return memberHtml + memberElementStr;	
+		}, "");
+
+		memContainer.find('.contact-memLists').data("memberIndex", endMemberIndex);
+
 	} catch(e){
 		errorReport(e);
 	}
 
-	return memContainer;
+	return memberListHtml;
 }
 isNewMem = function(mem){
 	return g_newMemList.hasOwnProperty(mem.gu);
@@ -902,43 +734,47 @@ updateNewMemTag = function( dom ){
 	});
 }
 
-setOnMemGridScroll = function(){
-	var memContainer = $(".contact-scroll");
-	g_contactWaitLoadImgs = memContainer.find(".contact-mems .img.waitLoad");
-	memContainer.unbind("scroll").scroll(function(){
-		if( null==g_contactWaitLoadImgs) return;
-		var height = $(this).height()+128;
-		// cns.debug();
-		// cns.debug($(this).scrollTop(), $(this).attr("data-url"));
-		for( var i=g_contactWaitLoadImgs.length-1; i>=0; i-- ){
-			var tmpDom = $(g_contactWaitLoadImgs[i]);
-			// tmpDom.html( tmpDom.offset().top );
-			if( tmpDom.offset().top <height ){
-				tmpDom.css("background-image","url("+tmpDom.attr("data-url")+")");
-				tmpDom.removeAttr("data-url").removeClass("waitLoad");
-				g_contactWaitLoadImgs.splice(i,1);
+setOnMemGridScroll = function (memberKeyList, memContainer){
+	var memContainer = memContainer || $("#page-contact_all .contact-scroll");
+	console.log(memContainer);
+	// g_contactWaitLoadImgs = memContainer.find(".contact-mems .img.waitLoad");
+	memContainer.unbind("scroll").scroll(function() {
+		console.log("grid");
+		var memberIndex = memContainer.find(".contact-mems").data("memberIndex");
+		if ($(this).scrollTop() + $(this).height() > $(this)[0].scrollHeight - 200) {
+			if (memberIndex <= memberKeyList.length - 1) {
+				memContainer.find(".contact-mems").append(generateMemberGrid(memberKeyList, memContainer));
 			}
 		}
+		// $("#page-contact_all").find(".contact-scroll").append(generateMemberGrid(guAllExsit));
+		// cns.debug();
+		// cns.debug($(this).scrollTop(), $(this).attr("data-url"));
+		// for( var i=g_contactWaitLoadImgs.length-1; i>=0; i-- ){
+		// 	var tmpDom = $(g_contactWaitLoadImgs[i]);
+		// 	// tmpDom.html( tmpDom.offset().top );
+		// 	if( tmpDom.offset().top <height ){
+		// 		tmpDom.css("background-image","url("+tmpDom.attr("data-url")+")");
+		// 		tmpDom.removeAttr("data-url").removeClass("waitLoad");
+		// 		g_contactWaitLoadImgs.splice(i,1);
+		// 	}
+		// }
 	});
 }
-setOnMemListScroll = function(){
-	var memContainer = $(".contact-scroll, .subpage-contact .contact-searchResult");
-	g_contactWaitLoadImgs = memContainer.find(".contact-memLists .img.waitLoad");
+setOnMemListScroll = function(memberKeyList, memContainer) {
+	memContainer = memContainer || $("#page-contact_all .contact-scroll");
+	console.log(memContainer);
+	// var memContainer = $("#page-contact_all .contact-scroll, .subpage-contact .contact-searchResult");
+	// g_contactWaitLoadImgs = memContainer.find(".contact-memLists .img.waitLoad");
 
-	memContainer.unbind("scroll").scroll(function(){
-		if( null==g_contactWaitLoadImgs) return;
-		var height = $(this).height()+99;
-		// cns.debug();
-		// cns.debug($(this).scrollTop(), $(this).attr("data-url"));
-		for( var i=g_contactWaitLoadImgs.length-1; i>=0; i-- ){
-			var tmpDom = $(g_contactWaitLoadImgs[i]);
-			// tmpDom.html( tmpDom.offset().top );
-			if( tmpDom.offset().top <height ){
-				tmpDom.css("background-image","url("+tmpDom.attr("data-url")+")");
-				tmpDom.removeAttr("data-url").removeClass("waitLoad");
-				g_contactWaitLoadImgs.splice(i,1);
+	memContainer.unbind("scroll").scroll(function() {
+		var memberIndex = memContainer.find(".contact-memLists").data("memberIndex");
+		if ($(this).scrollTop() + $(this).height() > $(this)[0].scrollHeight - 200) {
+			if (memberIndex <= memberKeyList.length - 1) {
+				memContainer.find(".contact-memLists").append(generateMemberList(memberKeyList, memContainer));
 			}
 		}
+		// if( null==g_contactWaitLoadImgs) return;
+		// var height = $(this).height()+99;
 	});
 }
 
@@ -1016,6 +852,8 @@ initContactData = function(){
     } else {
     	g_newMemList = {};
     }
+
+	sortedMemIdList = sortMembers(Object.keys(guAllExsit));
 }
 
 /*
@@ -1111,9 +949,13 @@ updateFavoritePage = function(){
 
 	//mem-title
 	var subTitle = $("<div class='contact-mems-title'></div>");
+	var subGridPageContent = $("<div class='contact-mems'></div>");
+	var subRowPageContent = $("<div class='contact-memLists'></div>");
 	subTitle.append( '<div class="count">'+0+'</div>');
 	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
 	subPageBottom.append(subTitle);
+	subPageBottom.append(subGridPageContent);
+	subPageBottom.append(subRowPageContent);
 	
 	//mem
 	var memObject = {};
@@ -1124,23 +966,24 @@ updateFavoritePage = function(){
 			memObject[key] = mem;
 		}
 	});
-	var memContainer = generateMemberGrid(memObject);
-	subPageBottom.append(memContainer);
-	var memListContainer = generateMemberList(memObject, showFavoritePage);
-	subPageBottom.append(memListContainer);
+	var memContainer = generateMemberGrid(Object.keys(memObject), page);
+	var memListContainer = generateMemberList(Object.keys(memObject), page, showFavoritePage);
+	subGridPageContent.html(memContainer);
+	subRowPageContent.html(memListContainer);
+
 	if( isList ){
 		title.find(".btn").addClass("list");
-		memContainer.css("display","none");
+		subGridPageContent.css("display","none");
 		setOnMemListScroll();
 	} else {
-		memListContainer.css("display","none");
+		subRowPageContent.css("display","none");
 		setOnMemGridScroll();
 	}
 
 	if( 0==count ){
 		subTitle.hide();
-		memContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", $.i18n.getString("COMMON_FAVORIATE"))+"</div>");
-		memListContainer.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", $.i18n.getString("COMMON_FAVORIATE"))+"</div>");
+		subGridPageContent.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", $.i18n.getString("COMMON_FAVORIATE"))+"</div>");
+		subRowPageContent.append("<div class='noMem'>"+$.i18n.getString("MEMBER_X_GROUP_NO_MEMBER", $.i18n.getString("COMMON_FAVORIATE"))+"</div>");
 	} else {
 		subTitle.find(".count").html(count);
 	}
@@ -1193,10 +1036,6 @@ showSubFavoritePage = function( fi ){
 	title.append("<div class='btn'></div>");
 	subPage.append(title);
 
-	title.find(".btn").off("click").click( function(){
-		switchListAndGrid( $(this), subPageBottom );
-	});
-
 	//---- extra ------
 	var extra = $("<div class='contact-extra'></div>");
 	subPage.append(extra);
@@ -1214,9 +1053,13 @@ showSubFavoritePage = function( fi ){
 
 	//mem-title
 	var subTitle = $("<div class='contact-mems-title'></div>");
+	var subGridPageContent = $("<div class='contact-mems'></div>");
+	var subRowPageContent = $("<div class='contact-memLists'></div>");
 	subTitle.append( '<div class="count">'+0+'</div>');
 	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
 	subPageBottom.append(subTitle);
+	subPageBottom.append(subGridPageContent);
+	subPageBottom.append(subRowPageContent);
 	
 	//mem
 	var memObject = {};
@@ -1234,17 +1077,22 @@ showSubFavoritePage = function( fi ){
 			}
 		}
 	});
-    var memContainer = generateMemberGrid(memObject);
-	subPageBottom.append(memContainer);
-	var memListContainer = generateMemberList(memObject);
-	subPageBottom.append(memListContainer);
+    var memContainer = generateMemberGrid(Object.keys(memObject), page);
+	var memListContainer = generateMemberList(Object.keys(memObject), page);
+	subGridPageContent.html(memContainer);
+	subRowPageContent.html(memListContainer);
+
+	title.find(".btn").off("click").click( function(){
+		switchListAndGrid( $(this), subPageBottom, Object.keys(memObject));
+	});
+
 	if( isList ){
 		title.find(".btn").addClass("list");
-		memContainer.css("display","none");
-		setOnMemListScroll();
+		subGridPageContent.css("display","none");
+		setOnMemListScroll(Object.keys(memObject), page.find(".contact-scroll"));
 	} else {
-		memListContainer.css("display","none");
-		setOnMemGridScroll();
+		subRowPageContent.css("display","none");
+		setOnMemGridScroll(Object.keys(memObject), page.find(".contact-scroll"));
 	}
 
 	if( 0==count ){

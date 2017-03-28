@@ -4902,6 +4902,12 @@ input.cp-datetimepicker-end {
 	
 }
 
+#page-object .bottom {
+	width: 99%;
+	text-align: center;
+	z-index: 2;
+	display: none;
+}
 
 /* content */
 .obj-content {
@@ -5020,6 +5026,14 @@ input.cp-datetimepicker-end {
 }
 .obj-cell.fav-branch{
 	width: -webkit-calc( 90% - 65px );
+}
+
+.subgroup-row .obj-cell-arrow {
+	display: none;
+}
+
+.subgroup-row .folder {
+	display: none;
 }
 
 .subgroup-parent {

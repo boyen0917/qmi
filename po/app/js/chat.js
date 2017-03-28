@@ -548,7 +548,6 @@ $(function(){
 				}, function (isDone) {
 					window.actChk = false;
 
-
 					setTimeout(function () {
 						checkPagePosition();
 						$("#page-chat").removeClass("transition");
@@ -2257,6 +2256,12 @@ function sendMsgText(dom) {
 							}
 						}
 
+						if (g_room.memList[gu].ad == 1) {
+							$(".extra-content .btn[data-type=invite]").show();
+						} else {
+							if (g_room.is) $(".extra-content .btn[data-type=invite]").show();
+							else $(".extra-content .btn[data-type=invite]").hide();
+						}
 
 						$.userStorage(userData);
 
@@ -2839,7 +2844,7 @@ function sendMsgText(dom) {
 			var btn = $(".extra-content .btn[data-type='edit']");
 			var tmpList = {};
 			for (var gu in g_room.memList) {
-				tmpList[gu] = g_group.guAll[gu].nk;
+				if (gu != g_group.gu) tmpList[gu] = g_group.guAll[gu].nk;
 			}
 
 			btn.data("exclude_str", JSON.stringify([g_group.gu]));
@@ -2932,7 +2937,7 @@ function sendMsgText(dom) {
 				tmpList.push(gu);
 			}
 			btn.data("exclude_str", JSON.stringify(tmpList));
-			btn.data("object_str", "");
+			btn.data("object_str", "{}");
 			btn.data("object_opt", {
 				isShowBranch: false,
 				isShowSelf: false,
@@ -2951,6 +2956,8 @@ function sendMsgText(dom) {
 						//on select done
 						// send add mem to room api
 						var memListString = btn.data("object_str");
+						var favListString = btn.data("favorite_str");
+
 						//單人聊天室的話變成創新聊天室流程
 						if (g_room.tp == 1) {
 							try {
@@ -2978,11 +2985,19 @@ function sendMsgText(dom) {
 						try {
 							cns.debug(memListString);
 							var memList = $.parseJSON(memListString);
+							var favObjs = $.parseJSON(favListString);
 							var newList = [];
+							var favList = [];
 							for (var guTmp in memList) {
-								newList.push( guTmp);
+								newList.push(guTmp);
 							}
-							editMemInRoomAPI(ci, {add:{gul:newList}}, function (data) {
+
+							for (var favID in favObjs) {
+								favList.push(favID);
+							}
+
+
+							editMemInRoomAPI(ci, {add:{gul:newList, fl: favList}}, function (data) {
 								// if( data.status==200){
 								getPermition(true);
 								updateChat();
