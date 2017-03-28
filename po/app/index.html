@@ -511,12 +511,31 @@
                         
                     <div class="subpage-timeline main-subpage">
                         <div class="gm-user-main-area" style="display:none">
+
                             <div class="background">
-                                <div class="name"></div>
+                                <img />
                             </div>
-                            <div class="group">
-                                <div class="pic"></div>
-                                <div class="name"></div>
+                            
+                                <!-- <div class="name"></div> -->
+                            <input type="file" class="setting-user-image" data-role="none" accept="image/*">
+                            <div class="user">
+                                <div class="header">
+                                    <h3 contenteditable="false"></h3>
+                                    <div class='edit-pen'></div>  
+                                    <div class="edit-decision">
+                                        <span class="save" data-textid='WEBONLY_SAVE'></span>
+                                        <span class="cancel" data-textid='COMMON_CANCEL'></span>
+                                    </div>
+                                </div>
+                                <div class="user-pic">
+                                    <img class="pic" />
+                                </div>
+                                <input type="file" class="setting-user-avatar" data-role="none" accept="image/*">
+                                <div class="slogan" contenteditable="false"></div>
+                                <div class="interaction">
+                                    <img class="chat" src='images/namecard/qicon_chatroom.png' />
+                                    <img class="favorite" src='images/namecard/qicon_favorite.png' />
+                                </div>
                             </div>
                         </div>
                         <div class="st-navi-area">
@@ -562,10 +581,17 @@
                                 <img src="images/icon/icon_arrow_right.png"/>
                             </div> -->
                             <div class="st-filter-hide left">&nbsp&nbsp<</div>
+
+                            <div data-status="person" data-navi="personal-info" class="st-filter-action st-filter-list" style="display:none;">
+                                <span data-textid='FEED_PERSONAL'></span>
+                            </div>
+
                             <div data-status="all" data-navi="home" class="st-filter-action st-filter-list st-filter-main-hide st-filter-list-active polling-cnt polling-local" data-polling-cnt="B1">
                                 <span data-textid='FEED_ALL'></span>
                                 <div class="sm-count" style="display:none;"></div>
                             </div>
+
+                            
                             <!-- <div class="st-filter-other"> -->
                                 <div data-status="all" data-navi="feed-public" class="st-filter-action st-filter-list" style="display:none;">
                                     <span data-textid='FEED_ALL'></span>
@@ -666,11 +692,86 @@
                         <select id="type-trans">
                             <option value="te-example4"></option>
                         </select>
+                        <div class="st-personal-area">
+                          <div class='other-info-row'>
+                            <img src='images/namecard/qicon_info_jobtitle.png' />
+                            <div class="job-title contact"></div>
+                            <!-- <div class="onoffswitch">
+                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="jobTitlePublicOnOff" >
+                                <label class="onoffswitch-label" for="jobTitlePublicOnOff">
+                                    <span class="onoffswitch-inner"></span>
+                                    <span class="onoffswitch-switch"></span>
+                                </label>
+                            </div>  -->
+                          </div>  
+                          <div class='other-info-row'>
+                            <img src='images/namecard/qicon_info_birth.png' />
+                            <div class="birth contact"></div>
+                            <div class="onoffswitch">
+                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="birthOnOff" data-role="none">
+                                <label class="onoffswitch-label" for="birthOnOff">
+                                    <span class="onoffswitch-inner"></span>
+                                    <span class="onoffswitch-switch"></span>
+                                </label>
+                            </div> 
+                          </div>
+                          <div class='other-info-row'>
+                            <img src='images/namecard/qicon_info_email.png' />
+                            <div class="email contact"></div>
+                            <div class="onoffswitch">
+                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="emailOnOff" data-role="none">
+                                <label class="onoffswitch-label" for="emailOnOff">
+                                    <span class="onoffswitch-inner"></span>
+                                    <span class="onoffswitch-switch"></span>
+                                </label>
+                            </div> 
+                          </div>
+                          <div class='other-info-row'>
+                            <img src='images/namecard/qicon_info_phone.png' />
+                            <div class="phone contact">
+                            </div>
+                            <!-- <div class="onoffswitch">
+                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="phonePublicOnOff" >
+                                <label class="onoffswitch-label" for="phonePublicOnOff">
+                                    <span class="onoffswitch-inner"></span>
+                                    <span class="onoffswitch-switch"></span>
+                                </label>
+                            </div>  -->
+                          </div>  
+                          <div class='other-info-row'>
+                            <img src='images/namecard/qicon_info_mobile.png' />
+                            <div class="mobile contact">
+                                
+                            </div>
+                            <div class="onoffswitch">
+                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="mobileOnOff" data-role="none">
+                                <label class="onoffswitch-label" for="mobileOnOff">
+                                    <span class="onoffswitch-inner"></span>
+                                    <span class="onoffswitch-switch"></span>
+                                </label>
+                            </div>
+                          </div>
+                          <div class='other-info-row'>
+                            <img src='images/namecard/qicon_info_net.png' />
+                            <div class="mvpn contact">
+                            </div>
+                            <!-- <div class="onoffswitch">
+                                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="sipPublicOnOff" >
+                                <label class="onoffswitch-label" for="sipPublicOnOff">
+                                    <span class="onoffswitch-inner"></span>
+                                    <span class="onoffswitch-switch"></span>
+                                </label>
+                            </div>  -->
+                          </div>      
+
+                        </div>
                         <div class="st-feedbox-area">
                             <div class="st-feebox-area-no-content" style="display:none">
                                 <img src="images/coachmake/logo_nomessage.png"/>
                                 <div data-textid='COMMON_SCROLL_DOWN_UPDATE'></div>
                             </div>
+
+                            <div class="personal-info-area"></div>
                             <div class="st-feebox-area-container">
                                 <div class="st-feebox-area-inner-container">
                                     <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>

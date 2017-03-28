@@ -10,15 +10,15 @@ $(function(){
 	});
 
 
-	$("#page-group-main .subpage-timeline.main-subpage").bind('scroll', function(){
+	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi");
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
 		if (feed_type != "main") {
 			feed_type = ("0" + feed_type).slice(-2) || "00";
 		}
-		// var feed_type = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+		// var this_navi = $(".feed-subarea:visible");
 		//判斷沒資料的元件存在時 就不動作
 		if( this_navi.hasClass("no-data") ) return;	
 		
@@ -422,7 +422,8 @@ $(function(){
 
 	$(".st-filter-action").click(function(){
 		var filter_action = $(this);
-		var navi_area = $(".st-navi-subarea");
+		var groupMainPage = $("#page-group-main");
+		var navi_area = groupMainPage.find(".st-navi-subarea");
 		var parent = $(this).parent();
 		if( parent.hasClass("lock") ){
 			return;
@@ -449,18 +450,24 @@ $(function(){
 		// });
 
 		var filter_status = $(this).data("status");
-
+		console.log(filter_status);
 		//過濾發文類型
 		if(filter_status == "navi" || filter_status == "all"){
+			groupMainPage.find(".st-personal-area").hide();
         	navi_area.filter("[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	// return false;
+		} else if (filter_status == "person") {
+			groupMainPage.find(".st-feedbox-area").hide();
+			groupMainPage.find(".st-personal-area").show();
+			return ;
 		} else {
 			//檢查目前的首頁是哪頁(動態消息/團體消息/成員消息)
 			var currentHome = $(".st-navi-area").data("currentHome") || "home";
+			groupMainPage.find(".st-personal-area").hide();
 			navi_area.filter("[data-st-navi="+currentHome+"]").trigger("click");
 		}
 
-		var event_tp = $("#page-group-main").data("navi") || "00";
+		var event_tp = groupMainPage.data("navi") || "00";
 		var event_area = $(".feed-subarea[data-feed=" + event_tp + "]");
 		var this_events = event_area.find(".st-sub-box");
 
@@ -472,7 +479,13 @@ $(function(){
 		//記錄
 		$(".st-filter-area").data("filter",filter_status);
 		event_area.data("filter-name",$(this).find("span").html());
+
+		if(groupMainPage.data("main-gu")) {
+			groupMainPage.find(".feed-subarea[data-feed=main]").html("");
+		}
 		
+		groupMainPage.find(".st-feedbox-area-bottom > img").show();
+		groupMainPage.find(".st-feedbox-area-bottom > div").hide();
 		//已讀未讀
 		var cnt = 0;
 		this_events.each(function(i,val){
@@ -699,7 +712,6 @@ $(function(){
 			}),
 			fileURL = URL.createObjectURL(file);
 		
-		console.log(file.name);
 
 		switch(fileType) {
 			case "image":

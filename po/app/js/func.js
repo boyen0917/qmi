@@ -340,7 +340,6 @@ timelineChangeGroup = function (thisGi) {
         changeDeferred.resolve();
     } else {
         $("#page-group-main .gm-header-right").show();
-
         timelineDom
         .find(".refresh-lock").hide().end()
         .find(".gm-header-right").show().end()
@@ -459,14 +458,21 @@ timelineSwitch = function (act,reset,main,noPR){
             filterAction.filter("[data-navi='announcement']").show();
             filterAction.filter("[data-navi='feedback']").show();
             filterAction.filter("[data-navi='task']").show();
+            filterAction.filter("[data-navi='home']").show().addClass("st-filter-list-active");
+            filterAction.filter("[data-navi='feed-public']").hide();
+            filterAction.filter("[data-navi='feed-post']").hide();
+            filterAction.filter("[data-navi='personal-info']").hide();
+            filterAction.parent().data("filter", "all");
             $(".subpage-addressBook").hide();
 
             //顯示新增貼文按鈕
             gmHeader.find(".feed-compose").show();
-
+            groupMain.find(".st-feedbox-area").show();
             groupMain.find(".subpage-timeline").show().scrollTop(0);
-            //一開始都回到全部的文章的分類
-            groupMain.find(".st-filter-area").data("filter","all");
+            groupMain.find(".st-personal-area").hide();
+            
+            //polling 數字重寫
+            pollingCountsWrite();
 
             // 使用已隱藏的舊的方式 來做timeline切換
             if( groupMain.find(".st-filter-area").hasClass("st-filter-lock") === false ){
@@ -634,8 +640,7 @@ timelineSwitch = function (act,reset,main,noPR){
                 fsObj.getList();
             });
             //initGroupSetting(gi);
-            break;
-        
+            break;  
         case "feed-post":
             var filterAction = groupMain.find(".st-filter-action");
             groupMain.find(".st-navi-area").data("currentHome", "feed-post");
@@ -658,7 +663,10 @@ timelineSwitch = function (act,reset,main,noPR){
             //點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
             groupMain.find(".st-navi-subarea[data-st-navi=feed-post]").trigger("click");
 
+            groupMain.find(".st-feedbox-area").show();
             groupMain.find(".subpage-timeline").show();
+            groupMain.find(".st-personal-area").hide();
+
             gmHeader.find(".page-title").html(page_title);
 
             //顯示新增貼文按鈕, 藏新增聊天室按鈕
@@ -673,9 +681,11 @@ timelineSwitch = function (act,reset,main,noPR){
             switchDeferred.resolve({ act: "feed-post"});
           break;
         case "feed-public":
+
             groupMain.find(".st-navi-area").data("currentHome", "feed-public").end()
             .find(".st-filter-action.st-filter-list-active").removeClass("st-filter-list-active").end()
             .find(".st-filter-action[data-status='all']").hide().end()
+            .find(".st-filter-action[data-navi='personal-info']").hide().end()
             .find(".st-filter-action[data-navi='announcement']").show().end()
             .find(".st-filter-action[data-navi='feedback']").show().end()
             .find(".st-filter-action[data-navi='task']").show().end()
@@ -692,12 +702,13 @@ timelineSwitch = function (act,reset,main,noPR){
             //點選 全部 的用意是 既可寫入timeline 也可以讓navi回到 "全部" 的樣式
             groupMain.find(".st-navi-subarea[data-st-navi=feed-public]").trigger("click");
 
+            groupMain.find(".st-feedbox-area").show();
             groupMain.find(".subpage-timeline").show();
+            groupMain.find(".st-personal-area").hide();
+
             gmHeader.find(".page-title").html(page_title);
-
-            //顯示新增貼文按鈕, 藏新增聊天室按鈕
-            gmHeader.find(".feed-compose").show();
-
+            gmHeader.find(".feed-compose").show(); //顯示新增貼文按鈕, 藏新增聊天室按鈕
+            
             //polling 數字重寫
             if($.lStorage("_pollingData")) pollingCountsWrite();
 
@@ -751,6 +762,26 @@ timelineSwitch = function (act,reset,main,noPR){
 
 
             switchDeferred.resolve({ act: "system-ldapSetting"});
+
+        case "person":
+            groupMain.find(".st-filter-area").show();
+            groupMain.find(".st-filter-action")
+                     .filter(".st-filter-list-active").removeClass("st-filter-list-active").end()
+                     .filter("[data-navi='announcement']").show().end()
+                     .filter("[data-navi='feedback']").hide().end()
+                     .filter("[data-navi='task']").show().end()
+                     .filter("[data-navi='home']").show().end()
+                     .filter("[data-navi='feed-public']").hide().end()
+                     .filter("[data-navi='feed-post']").hide();
+                     
+            //顯示新增貼文按鈕
+            gmHeader.find(".feed-compose").show();
+
+            groupMain.find(".subpage-timeline").show().end()
+                     // .find(".st-filter-area").data("filter","all")
+                     .children(".st-filter-hide.right").show().end()
+                     .children(".st-filter-hide.left").hide().end()
+                     .scrollLeft(0);
             break;
     }
 
@@ -5092,7 +5123,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
     }
 
     if(main_gu){
-        event_tp = "00";
+        // event_tp = "00";
         if(api_name.match(/\?/)){
             api_name = api_name + "&gu=" + main_gu;
         }else{
@@ -5147,7 +5178,6 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
 
             
         } else {
-
             //transform gi to private gi
             for( var i=0; i<timeline_list.length; i++ ){
                 //ei:"G000000109N_T00000020BF_E000000107H"
@@ -5157,6 +5187,23 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
             }
 
             if(main_gu){
+
+                //資料個數少於這個數量 表示沒東西了
+                if(timeline_list.length < 10){
+                    //沒資料的確認 加入no data 
+                    $(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
+                    //關閉timeline loading 開啟沒資料圖示
+                    setTimeout(function(){
+                        $(".st-feedbox-area-bottom > img").hide();
+                        $(".st-feedbox-area-bottom > div").show();
+                    },2000);
+                }
+                else{
+                    //開啟timeline loading 關閉沒資料圖示 下拉更新除外
+                    $(".st-feedbox-area-bottom > img").show();
+                    $(".st-feedbox-area-bottom > div").hide();
+                }
+
                 $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
                     timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
 
@@ -5167,7 +5214,6 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
                     });
                 });
             } else {
-
             // 移除idb
             // idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
                 $(".st-filter-area").removeClass("st-filter-lock");
@@ -5189,6 +5235,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
                 // }
 
                 if(polling_arr.length == 0){
+
                     //資料個數少於這個數量 表示沒東西了
                     if(timeline_list.length < 10){
                         //沒資料的確認 加入no data 
@@ -5289,10 +5336,12 @@ idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr,callback){
 timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi){
     if(!detail){
         var event_tp = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
-
+        // console.log(event_tp);
         if($("#page-group-main").data("main-gu")){
             var tmp = ".feed-subarea[data-feed=main]";
             var ori_selector = $(".feed-subarea[data-feed=main]");
+
+            // ori_selector.html("");
         } else {
             var tmp = ".feed-subarea[data-feed=" + event_tp + "]";
             var ori_selector = $(".feed-subarea[data-feed=" + event_tp + "]");
@@ -5320,7 +5369,6 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
     var selector = $(".timeline-detail");
     var method = "html";
     var visibleEventCnt = 0;
-
     //製作timeline
     $.each(timeline_list,function(i,val){
         if(null==val) return;
@@ -5579,18 +5627,18 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
 }
 
 timelineListWrite = function (ct_timer,is_top){
-
     var deferred = $.Deferred();
 
     // $(".st-filter-area").addClass("st-filter-lock");
     //判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
     if(!ct_timer && !is_top){
-        var event_tp = $("#page-group-main").data("navi") || "00";
+        var event_tp = "0" + $("#page-group-main").data("navi") || "00";
         var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
         //隱藏其他類別
         $(".feed-subarea").hide();
-        selector.show();
+
+        if (!$("#page-group-main").data("main-gu")) selector.show();
         //load_chk 避免沒資料的
         selector.append("<p class='load-chk'></p>");
     }
@@ -5724,7 +5772,7 @@ eventStatusWrite = function(this_event,this_es_obj){
     }
 }
 
-eventFilter = function(this_event,filter){
+eventFilter = function(this_event,filter) {
     var filter = filter || "all";
     
     if(filter == "navi"){

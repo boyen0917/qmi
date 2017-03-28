@@ -43,6 +43,7 @@
 
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
+	"FEED_PERSONAL" : "Personal",
 	"FEED_BULLETIN"			:"Bulletin",
 	"FEED_REPORT"			:"Report",
 	"FEED_POST"				:"Post",

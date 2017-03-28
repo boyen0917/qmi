@@ -57,6 +57,8 @@
 
 .user .user-info-list-area {
 	display: none;
+	position: relative;
+    z-index: 10;
 }
 
 @media all and (max-width: 5000px) {
