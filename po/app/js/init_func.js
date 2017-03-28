@@ -79,7 +79,15 @@ $(function(){
 
                 getGroupAllMembers(thisGi).done(function(groupMemberList) {
                     comboData.ul = groupMemberList;
+                    groupData.guAll = {};
                     if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
+
+                    comboData.ul.sort(function (a, b) {
+                        if (a.nk < b.nk) return -1;
+                        if (a.nk > b.nk) return 1;
+                        return 0;
+                    });
+
                     // 製作guAll hash-map & inviteGuAll
                     for( var key in comboData.ul ){
                         var thisGuObj = comboData.ul[key];

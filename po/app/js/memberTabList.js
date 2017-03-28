@@ -123,6 +123,7 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
             loadMemList.forEach(function (member) {
                 var gu = member.gu;
                 var rt = member.rt;
+
                 var mem = guAll[gu];
 
                 if( !gu ) return;

@@ -152,7 +152,7 @@
 	"MEMBER_CUSTOMIZE_GROUP_NO_MEMBER" : "目前群組內沒有成員會自動刪除群組, 您確定嗎?",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_SUCC" : "刪除群組成功",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_FAIL" : "刪除群組失敗",
-	"MEMBER_SEARCH_NO_RESULT" : "搜尋沒有結果.. O_Q",
+	"MEMBER_SEARCH_NO_RESULT" : "搜尋沒有結果.. ",
 
 	"INVITE_TITLE" : "邀請成員",
 	"INVITE_INVITED_MEMBER" : "邀請中的成員",

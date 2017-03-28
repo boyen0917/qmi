@@ -148,7 +148,7 @@
 	"MEMBER_CUSTOMIZE_GROUP_NO_MEMBER" : "目前群组内没有成员会自动删除群组, 您确定吗?",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_SUCC" : "删除群组成功",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_FAIL" : "删除群组失败",
-	"MEMBER_SEARCH_NO_RESULT" : "搜寻没有结果.. O_Q",
+	"MEMBER_SEARCH_NO_RESULT" : "搜寻没有结果..",
 
 	"INVITE_TITLE" : "邀请成员",
 	"INVITE_INVITED_MEMBER" : "邀请中的成员",

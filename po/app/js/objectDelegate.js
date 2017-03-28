@@ -56,7 +56,6 @@ ObjectDelegateView = {
 		var padding_top = this.searchArea.outerHeight();
 		this.mainContainer.parent().css("padding-top", padding_top)
     					  .css("height", $(window).height() - 57 - padding_top);
-
     	return this;
 	},
 

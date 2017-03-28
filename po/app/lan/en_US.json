@@ -153,7 +153,7 @@
 	"MEMBER_CUSTOMIZE_GROUP_NO_MEMBER" : "We will delete this sub group for there is no member in it. Are you sure?",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_SUCC" : "Delete Group Successed.",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_FAIL" : "Delete Group failed.",
-	"MEMBER_SEARCH_NO_RESULT" : "No result.. O_Q",
+	"MEMBER_SEARCH_NO_RESULT" : "No result.. ",
 
 	"INVITE_TITLE" : "Invitation",
 	"INVITE_INVITED_MEMBER" : "Invited Members",
