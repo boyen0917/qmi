@@ -139,7 +139,6 @@ var initPenMap = {
 	}
 };
 
-<<<<<<< HEAD
 // 判斷更改網址 不要上到正式版
 $(document).ready(function() {
 	if($.lStorage("_selectedServerUrl") === false || $.lStorage("_selectedServerUrl") === default_url) return;
@@ -152,10 +151,6 @@ $(document).ready(function() {
 	if($.lStorage("_lastBaseUrl") !== false && $.lStorage("_lastBaseUrl") !== base_url) resetDB();
 	$.lStorage("_lastBaseUrl", base_url);
 });
-=======
-var userLang = navigator.language || navigator.userLanguage;
-	userLang = userLang.replace(/-/g,"_").toLowerCase();
->>>>>>> feature_3527
 
 String.prototype._escape = function(){
     return this.replace(/</g, "&lt;").replace(/>/g, "&gt;");
