@@ -113,7 +113,7 @@ $(function(){
                         data: data
                     });
                 }).fail(function () {
-                     comboDeferred.resolve({
+                    comboDeferred.resolve({
                         isSuccess: false,
                         status: false,
                         thisGi: thisGi,
