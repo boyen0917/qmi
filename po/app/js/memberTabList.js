@@ -60,7 +60,7 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
     var page = $("#page-tab-object");
 
     //title
-    page.find(".header-cp-object").html( title?title:"" );
+    page.find(".header-cp-object").html(title ? title : "" );
 
     //tabs
     var length = list.length;
@@ -88,7 +88,7 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
 
     //generate page when click
     tabArea.next().html("");
-    $(document).find("#page-tab-object .tab").click(function(){
+    page.find(".tab").click(function(){
         var tab = $(this);
         if( false==tab.data("clickable") ){
             popupShowAdjust( $.i18n.getString("COMMON_PAID_FEATURE_TITLE"), $.i18n.getString("COMMON_PAID_FEATURE_CONTENT") );
@@ -99,34 +99,38 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
         $("body").addClass("user-info-adjust");
         setTimeout(function(){
             $("body").removeClass("user-info-adjust");
-        },100);
+        }, 100);
 
         var index = tab.data("id");
         var cell = cellArea.find("._"+index);
+        var userData = $.userStorage();
+        var guAll = userData[gi].guAll;
+        var listData = tab.data("obj").ml;
+        var bl = userData[gi].bl;
+        var myID = userData[gi].me;
 
         $("#page-tab-object .tab").removeClass("current");
         tab.addClass("current");
 
-        if( cell.length<=0 ){
-            var data = tab.data("obj");
-            cell = $("<div class='obj-cell-page _"+index+"'></div>");
-            cellArea.append( cell );
+        var makeMemberList = function () {
+            var currentMembum = cellArea.find("._" + index + " .obj-cell").length;
+            var loadMemList = listData.slice(currentMembum, currentMembum + 100);
 
-            //gen mem
-            var userData = $.userStorage();
-            var guAll = userData[gi].guAll;
-            var bl = userData[gi].bl;
-            var myID = userData[gi].me;
-            console.log(myID)
-            for(var i=0;i<data.ml.length; i++ ){
-                var gu = data.ml[i].gu;
-                var rt = data.ml[i].rt;
-                if( !gu ) continue;
-                if( !guAll.hasOwnProperty(gu) || gu === myID) continue;
+            if (currentMembum + 100 > listData.length - 1) {
+                loadMemList = listData.slice(currentMembum);
+            } 
+
+            loadMemList.forEach(function (member) {
+                var gu = member.gu;
+                var rt = member.rt;
                 var mem = guAll[gu];
+
+                if( !gu ) return;
+                if( !guAll.hasOwnProperty(gu) || gu === myID) return;
+
                 var this_obj = $(
                     '<div class="obj-cell mem" data-gu="'+gu+'">' +
-                        '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
+                        '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
                         '<div class="obj-cell-time"></div>' +
                         '<div class="obj-cell-user-data">' + 
                             '<div class="obj-user-name">' + mem.nk.replaceOriEmojiCode() + '</div>' +
@@ -136,9 +140,9 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
 
                 var branchID = mem.bl;
                 var extraContent = "";  //mem.em;
-                if( branchID && branchID.length>0 ){
+                if( branchID && branchID.length > 0 ){
                     var branchPath = branchID.split(".");
-                    if( branchPath && branchPath.length>0 ){
+                    if( branchPath && branchPath.length > 0 ){
                         branchID = branchPath[branchPath.length-1];
                         if( bl.hasOwnProperty(branchID) ){
                             extraContent = bl[branchID].bn;
@@ -161,16 +165,33 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
                 }
                 this_obj.find(".obj-cell-user-pic.namecard").data("gu",mem.gu);
 
-                this_obj.data("gu",mem.gu);
-                this_obj.data("gu-name",mem.nk);
-                cell.append(this_obj);
-            }
+                this_obj.data("gu", mem.gu);
+                this_obj.data("gu-name", mem.nk);
+                cellArea.find("._"+index).append(this_obj);
+            });
         }
+
+        if( cell.length <= 0 ){
+            cell = $("<div class='obj-cell-page _"+index+"'></div>");
+            cellArea.append( cell );
+
+            makeMemberList();
+        }
+        
         $("#page-tab-object .obj-cell-page.current").hide().removeClass("current");
         cell.show().addClass("current");
+
+        console.log(page.find(".obj-cell-page.current"));
+        page.find(".obj-cell-page.current").off("scroll").on("scroll", function (e) {
+            var container = $(e.target);
+            if (container.scrollTop() + container.height() > container[0].scrollHeight - 20) {
+                if (container.find(" .obj-cell").length < listData.length) {
+                    makeMemberList();
+                }
+            }
+        });
     }); 
     tabArea.find(".tab:nth-child(1)").trigger("click");
 
-    // $.mobile.changePage("#page-tab-object", {transition: "slide"});
     $.changePage("#page-tab-object", onPageChanged, onDone);
 }

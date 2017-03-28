@@ -3727,8 +3727,8 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
 
             var isReady = false;
             //get read
-            list.push( {title:$.i18n.getString("FEED_READ"),ml:null} );
-            getThisTimelinePart( this_event, 0,function(data){
+            list.push( {title:$.i18n.getString("FEED_READ"), ml: null});
+            getThisTimelinePart( this_event, 0, function (data) {
                 try{
                     var parseData = $.parseJSON( data.responseText ).epl;
                     if( false==isShowUnreadAndTime ){
@@ -3737,38 +3737,44 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                         }
                     }
                     list[0].ml = parseData;
-                    if(isReady){
-                        showObjectTabShow(this_gi, title, list, onDone);
+                    if (isShowUnreadAndTime) {
+                        list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
+                        list[1].ml = getUnreadUserList(parseData);
                     } else {
-                        isReady = true;
+                        list.push({title:$.i18n.getString("FEED_UNREAD"), clickable:false});
                     }
+                    // if(isReady){
+                    showObjectTabShow(this_gi, title, list, onDone);
+                    // } else {
+                    //     isReady = true;
+                    // }
                 } catch(e) {
                     errorReport(e);
                 }
             });
             //get unread
-            if( isShowUnreadAndTime ){
-                list.push( {title:$.i18n.getString("FEED_UNREAD"),ml:null} );
-                getThisTimelinePart( this_event, 9,function(data){
-                    try{
-                        list[1].ml = $.parseJSON( data.responseText ).epl;
-                        if(isReady){
-                            showObjectTabShow(this_gi, title, list, onDone);
-                        } else {
-                            isReady = true;
-                        }
-                    } catch(e) {
-                        errorReport(e);
-                    }
-                });
-            } else {
-                list.push( {title:$.i18n.getString("FEED_UNREAD"),clickable:false} );
-                if(isReady){
-                    showObjectTabShow(this_gi, title, list, onDone);
-                }
-                isReady = true;
-            }
-            break;
+            // if( isShowUnreadAndTime ){
+            //     list.push( {title:$.i18n.getString("FEED_UNREAD"),ml:null} );
+            //     getThisTimelinePart( this_event, 9, function(data){
+            //         try{
+            //             list[1].ml = $.parseJSON( data.responseText ).epl;
+            //             if(isReady){
+            //                 showObjectTabShow(this_gi, title, list, onDone);
+            //             } else {
+            //                 isReady = true;
+            //             }
+            //         } catch(e) {
+            //             errorReport(e);
+            //         }
+            //    });
+            // } else {
+            //     list.push( {title:$.i18n.getString("FEED_UNREAD"),clickable:false} );
+            //     if (isReady) {
+            //         showObjectTabShow(this_gi, title, list, onDone);
+            //     }
+            //     isReady = true;
+            // }
+            // break;
         case 1:
             var isShowNamecard = true;
             try{
@@ -3825,7 +3831,7 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
     if( null== isShowNamecard ) isShowNamecard = true;
 
     //title
-    page.find(".header-cp-object").html( title?title:"" );
+    page.find(".header-cp-object").html(title ? title : "");
 
     //tabs
     var length = list.length;
@@ -3857,9 +3863,10 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
 
     //generate page when click
     tabArea.next().html("");
-    $(document).find("#page-tab-object .tab").click(function(){
+    page.find(".tab").click(function() {
         var tab = $(this);
-        if( false==tab.data("clickable") ){
+
+        if ( false==tab.data("clickable") ) {
             popupShowAdjust( $.i18n.getString("COMMON_PAID_FEATURE_TITLE"), $.i18n.getString("COMMON_PAID_FEATURE_CONTENT") );
             return;
         }
@@ -3868,27 +3875,29 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
         $("body").addClass("user-info-adjust");
         setTimeout(function(){
             $("body").removeClass("user-info-adjust");
-        },100);
+        }, 100);
 
         var index = tab.data("id");
         var cell = cellArea.find("._"+index);
+        var listData = tab.data("obj").ml;
+        var guAll = QmiGlobal.groups[giTmp].guAll;
+        var bl = QmiGlobal.groups[giTmp].bl;
+
 
         $("#page-tab-object .tab").removeClass("current");
         tab.addClass("current");
 
-        if( cell.length<=0 ){
-            var data = tab.data("obj");
-            cell = $("<div class='obj-cell-page _"+index+"'></div>");
-            cellArea.append( cell );
+        var makeMemberList = function () {
+            var currentMembum = cellArea.find("._" + index + " .obj-cell").length;
+            var loadMemList = listData.slice(currentMembum, currentMembum + 100);
 
-            //gen mem
-            var guAll = QmiGlobal.groups[giTmp].guAll;
-            var bl = QmiGlobal.groups[giTmp].bl;
-            for(var i=0;i<data.ml.length; i++ ){
-                var gu = data.ml[i].gu;
-                var rt = data.ml[i].rt;
-                if( !gu ) continue;
-                if( !guAll.hasOwnProperty(gu) ) continue;
+            if (currentMembum + 100 > listData.length - 1) {
+                loadMemList = listData.slice(currentMembum);
+            } 
+
+            loadMemList.forEach(function (member) {
+                var gu = member.gu;
+                var rt = member.rt;
                 var mem = guAll[gu];
                 var this_obj = $(
                     '<div class="obj-cell mem" data-gu="'+gu+'">' +
@@ -3903,9 +3912,9 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
 
                 var branchID = mem.bl;
                 var extraContent = "";  //mem.em;
-                if( branchID && branchID.length>0 ){
+                if( branchID && branchID.length > 0 ){
                     var branchPath = branchID.split(".");
-                    if( branchPath && branchPath.length>0 ){
+                    if( branchPath && branchPath.length > 0 ){
                         branchID = branchPath[branchPath.length-1];
                         if( bl.hasOwnProperty(branchID) ){
                             extraContent = bl[branchID].bn;
@@ -3930,11 +3939,28 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
 
                 this_obj.data("gu",mem.gu);
                 this_obj.data("gu-name",mem.nk);
-                cell.append(this_obj);
-            }
+                cellArea.find("._"+index).append(this_obj);
+            });
         }
-        $("#page-tab-object .obj-cell-page.current").hide().removeClass("current");
+
+        if( cell.length<=0 ){
+            cell = $("<div class='obj-cell-page _"+index+"'></div>");
+            cellArea.append( cell );
+
+            makeMemberList();
+        }
+        
+        page.find(".obj-cell-page.current").hide().removeClass("current");
         cell.show().addClass("current");
+
+        page.find(".obj-cell-page.current").off("scroll").on("scroll", function (e) {
+            var container = $(e.target);
+            if (container.scrollTop() + container.height() > container[0].scrollHeight - 20) {
+                if (container.find(" .obj-cell").length < listData.length) {
+                    makeMemberList();
+                }
+            }
+        });
     }); 
     tabArea.find(".tab:nth-child(1)").trigger("click");
 

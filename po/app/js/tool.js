@@ -2214,3 +2214,19 @@ function setPolling(ts) {
 	pp.ts.pt = ts;
 	$.lStorage("_pollingData", pp);
 };
+
+function getUnreadUserList(readUserList) {
+	var groupMembers = QmiGlobal.groups[gi].guAll;
+	var readUserIdList = readUserList.map(function(readUser) {
+		return readUser.gu;
+	});
+
+	return Object.keys(groupMembers).reduce(function (unreaderlist, key) {
+		if (key != "undefined" && groupMembers[key].st == 1) {
+			if (readUserIdList.indexOf(key) < 0) {
+				unreaderlist.push({gu: key});
+			} 
+		}
+		return unreaderlist;
+	}, []);
+}
