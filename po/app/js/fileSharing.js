@@ -613,6 +613,7 @@ FileSharing.prototype = {
 		var thisAjax = $.ajax({
 			url: options.url,
 			type: 'PUT',
+			timeout: 0,
 			contentType: options.contentType,
 		 	data: options.file, 
 			processData: false,
