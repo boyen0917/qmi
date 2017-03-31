@@ -7889,11 +7889,6 @@ polling = function(){
             var newPollingData = $.parseJSON(data.responseText);
             newPollingData.publicPollingTime = publicPollingTime;
 
-            // 錯誤排除 把不該存在公雲polling的私雲gi剔除
-            (newPollingData.cnts || []).forEach(function(cntObj,i) {
-                if(QmiGlobal.companyGiMap.hasOwnProperty(cntObj.gi)) newPollingData.cnts.splice(i,1);
-            });
-
             // 合併私雲polling 而且每個私雲polling 都要有自己的時間
             combineCompanyPolling(newPollingData).done(function(pollingObj){
 
@@ -7962,7 +7957,8 @@ polling = function(){
                 polling();
             },resultObj.interval);
         }
-    })
+    });
+    return pollingDeferred;
 }
 
 combineCompanyPolling = function(newPollingData){
@@ -8035,13 +8031,15 @@ combineCompanyPolling = function(newPollingData){
         if(QmiGlobal.isFirstPolling) {
             QmiGlobal.isFirstPolling = false; // disable
             return Object.keys(QmiGlobal.companies).reduce(function(arr, currCi) {
+                // 公雲company不打
+                if(QmiGlobal.companies[currCi].ctp === 0) return arr;
                 // ldap初次登入若過期不打
                 if(!isLdapAndTokenExpired(currCi)) {
                     arr.push({
                         pm:{ci: currCi, pt: 9999999999999}
                     });
                 }
-                return arr
+                return arr;
             }, []);
 
             function isLdapAndTokenExpired(currCi) {
