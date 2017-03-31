@@ -271,7 +271,11 @@ systemSetting = function(){
     //公私雲團體
     var groupid = Object.keys(group_data);
     //私雲團體
-    var prigroupid = Object.keys(QmiGlobal.companyGiMap);
+    var prigroupid = Object.keys(QmiGlobal.companyGiMap).reduce(function(arr, currGi) {
+        var currCi = (QmiGlobal.companyGiMap[currGi] || {}).ci;
+        if((QmiGlobal.companies[currCi] || {}).ctp === 0) return arr;
+        return arr.concat([currGi]);
+    }, []);
     for(var i = 0 ;i < groupid.length; i++){    
         //產生團體列表
         var cr = $("<div class='group-option'><input id='"+ groupid[i] +"' data-role='none' name='group' type='radio' value='"+ groupid[i] +"'><label for='"+ groupid[i] +"' class='radiobtn'></label><img class='group-pic' data-gi='"+ groupid[i] +"' src='"+ group_data[groupid[i]].aut +"'><label for='"+ groupid[i] +"' class='radiotext'>"+ group_data[groupid[i]].gn._escape() +"</label></div>");
