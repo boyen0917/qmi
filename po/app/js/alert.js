@@ -144,8 +144,11 @@ updateAlert = function(isFromLogin){
 	noticeDefArr.push(publicNoticeAjax);
 
 	Object.keys(QmiGlobal.companies).reduce(function(arr, currCi) {
-		if(!isFromLoginAndLdapExpired(QmiGlobal.companies[currCi])) arr.push(currCi);
-		return arr;
+		var companyObj = QmiGlobal.companies[currCi];
+		// 公雲鈴鐺不打
+		if(companyObj.ctp === 0) return arr;
+		if(isFromLoginAndLdapExpired()) return arr;
+		return arr.concat([currCi]);
 	}, []).forEach(function(companyId){
 		var ajaxDef = new QmiAjax({
 			apiName: "notices",
@@ -203,16 +206,7 @@ updateAlert = function(isFromLogin){
 	    		}
     		}
 
-    		// 暫時處理重複公雲付費團體重複ei問題
-			showAlertContent(function() {
-				var obj = noticeListArr.reduce(function(obj, curr) {
-					obj[curr.nd.ei] = curr;
-					return obj;
-				}, {});
-				return Object.keys(obj).map(function(currEi) {
-					return obj[currEi];
-				});
-			}());
+			showAlertContent(noticeListArr);
 		});
 	});
 
