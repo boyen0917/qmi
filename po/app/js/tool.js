@@ -695,20 +695,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			delete paramObj.s3;
 			contentType = "video/mp4";
 
-			// uploadObj.compress().done(function (uploadFile) {
-			// 	paramObj.s32.file = uploadFile;
-
-				// mt = uploadObj.file.type;
-				// si = uploadObj.file.size;
-
-				// var video = document.createElement('video');
-				// video.src = URL.createObjectURL(uploadObj.file);
-				// video.onloadeddata = function() {
-				// 	md = {l: Math.floor(video.duration * 1000)};
-				// 	mediaLoadDef.resolve();
-				// }
-			// });
-
 			zipVideoFile(uploadObj).done(function (uploadFile) {
 				paramObj.s32.file = uploadFile;
 
@@ -747,6 +733,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				var ajaxArgs = {
 					url: paramObj[key].url,
 					type: 'PUT',
+					timeout: 0,
 					contentType: contentType,
 				 	data: paramObj[key].file, 
 					processData: false,
