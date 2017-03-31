@@ -7348,8 +7348,8 @@ fileLoadShow = function(){
 
             uploadXhr.upload.addEventListener("progress", function(evt){
                 if (evt.lengthComputable) {
-                    barDom.css("width", 50 + Math.floor((evt.loaded / evt.total) * 50) + '%');
-                    percentDom.attr("percent", 50 + Math.floor((evt.loaded / evt.total) * 50) + '%');
+                    barDom.css("width", Math.floor((evt.loaded / evt.total) * 100) + '%');
+                    percentDom.attr("percent", Math.floor((evt.loaded / evt.total) * 100) + '%');
                 }
             }, false);
             return uploadXhr;
