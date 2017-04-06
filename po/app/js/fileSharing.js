@@ -609,10 +609,10 @@ FileSharing.prototype = {
 
 	uploadToS3TmpDef: function (options) {
 		var thisFile = this;
-
 		var thisAjax = $.ajax({
 			url: options.url,
 			type: 'PUT',
+			timeout: 0,
 			contentType: options.contentType,
 		 	data: options.file, 
 			processData: false,
@@ -627,6 +627,7 @@ FileSharing.prototype = {
 
 		$("section.fileSharing section.progress-bar .cancel").click(function() {
 			thisAjax.abort();
+			thisFile.fileDom.find("section.progress-bar").hide();
 			toastShow($.i18n.getString("FILESHARING_UPLOAD_FILE") + $.i18n.getString("COMMON_CANCEL"));
 		});
 
