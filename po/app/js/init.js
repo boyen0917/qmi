@@ -226,9 +226,7 @@ window.QmiGlobal = {
 	nwVer: function() {
 		try {
 			return require("nw.gui").App.manifest.version;
-		} catch(e) {}
-
-		return null
+		} catch(e) {return "web"}
 	}(),
 
 	// 在下方 document ready之後 initReady
@@ -271,6 +269,9 @@ window.QmiGlobal = {
 		}
 
 		function setVersion() {
+			// 登入頁顯示桌機版號
+			$("#container_version").text(QmiGlobal.nwVer +"("+ QmiGlobal.appVer + ")");
+
 			// 不等於1 表示桌機版號沒有大於web版號 不做事
 			if(QmiGlobal.module.appVersion.compare(QmiGlobal.nwVer, QmiGlobal.appVer) !== 1) return;
 
