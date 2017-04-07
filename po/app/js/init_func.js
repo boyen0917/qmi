@@ -1,14 +1,15 @@
 $(function(){
 
-    groupListToLStorage = function(groupList,isAdd){
-        var groups = QmiGlobal.groups,
-            tmpGroupList = [];
+    groupListToLStorage = function(groupList, isAdd){
+        var groups = QmiGlobal.groups;
+        var tmpGroupList = [];
 
-        $.each(groupList,function(i,gl_obj){
+        $.each(groupList, function(i, gl_obj){
             tmpGroupList.push(gl_obj.gi);
 
             if( groups.hasOwnProperty(gl_obj.gi) === false ){
                 gl_obj.guAll = {};
+                gl_obj.newData = {};
                 gl_obj.gu = gl_obj.me;
 
                 $.each(gl_obj.tl,function(i,val){
@@ -27,6 +28,7 @@ $(function(){
                             break;
                     }
                 });
+
                 groups[gl_obj.gi] = gl_obj;
             } else {
                 $.extend(groups[gl_obj.gi],gl_obj)
@@ -38,10 +40,7 @@ $(function(){
 
         // 剔除不存在的團體
         for(giKey in groups){
-            if(tmpGroupList.indexOf(giKey) === -1){
-                cns.debug("delete group",groups[giKey])
-                delete groups[giKey];
-            }
+            if(tmpGroupList.indexOf(giKey) === -1) delete groups[giKey];
         }
     }
 
@@ -105,6 +104,9 @@ $(function(){
                     //官方帳號設定
                     initOfficialGroup( thisGi );
 
+                    // 設定按讚留言浮水印開關
+                    setSwitch(thisGi);
+
                     //初始化 重組群組資訊
                     setBranchList( thisGi , {
                         bl:  comboData.bl,
@@ -144,6 +146,26 @@ $(function(){
         });
 
         return comboDeferred.promise();
+
+        function setSwitch(thisGi) {
+            var triObj = QmiGlobal.groups[thisGi].set.tri;
+            var resultObj = {};
+            var liArr = triObj.li.toString(2).split("").reverse();
+            var reArr = triObj.re.toString(2).split("").reverse();
+            // 後台：公告0 貼文1 工作2 通報3 投票4 成員5
+            // 桌機：貼文0 公告1 通報2 工作3 投票4 地點5
+            var mapArr = [1, 0, 3, 2, 4, 5];
+            resultObj.li = mapArr.map(function(index) {
+                return liArr[index] || "0";
+            });
+            resultObj.re = mapArr.map(function(index) {
+                return reArr[index] || "0";
+            });
+            resultObj.wa = mapArr.map(function(index) {
+                return triObj.wa[index];
+            });
+            QmiGlobal.groups[thisGi].newData.sw = resultObj;
+        }
     }
 
     getGroupAllMembers = function(thisGi) {

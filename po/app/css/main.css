@@ -4097,6 +4097,8 @@ img.st-reply-message-attach {
 
 .cp-content{ width: 100vw; }
 
+#page-compose .cp-content-box.cp-content-watermark {cursor: pointer;}
+
 .cp-content-box,.cp-content-textarea,.cp-attach-area, .cp-vote-area,.cp-work-area,.cp-vote-area-test,.cp-time-area,.cp-vote-type-area{
     background: white;
 	width: 95%;

@@ -514,6 +514,15 @@ $(function(){
 
 	$(document).on('click','.st-sub-box-3 .st-like',function(){
 		var this_event = $(this).parents(".st-sub-box");
+
+		// 檢查可否按讚
+		if(!QmiGlobal.method.isSettingAllowed({
+			gi: QmiGlobal.currentGi,
+			tp: 0, // 按讚是0
+			eventTp: this_event.data("event-val").meta.tp
+		})) return;
+
+
 		//api結束前 不能按
 		if(this_event.data("like-lock")) return false;
 		this_event.data("like-lock",true);
@@ -564,6 +573,13 @@ $(function(){
 
 		var this_event = $(this).parents('.st-reply-content-area');
 
+		// 檢查可否按讚
+		if(!QmiGlobal.method.isSettingAllowed({
+			gi: QmiGlobal.currentGi,
+			tp: 0, // 按讚是0
+			eventTp: this_event.parents("div.st-sub-box").data("event-val").meta.tp
+		})) return;
+
 		//api結束前 不能按
 		if(this_event.data("like-lock")) return false;
 		this_event.data("like-lock",true);
@@ -577,11 +593,6 @@ $(function(){
 		if( $(this).data("like")== false ){
 			est = 1;
 		}
-		/*
-		if( $(this).html().length == 1){
-			est = 1;
-		}
-		*/
 
 		//更新狀態 參數
 		var target_obj = {};
@@ -998,9 +1009,15 @@ $(function(){
 
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){
-		console.log("reply_send");
-		console.log($(this).data("reply-chk"));
 		var this_event = $(this).parents(".st-sub-box");
+
+		// 檢查可否留言
+		if(!QmiGlobal.method.isSettingAllowed({
+			gi: QmiGlobal.currentGi,
+			tp: 1, // 留言是0
+			eventTp: this_event.data("event-val").meta.tp
+		})) return;
+
 		var text = this_event.find(".st-reply-highlight-container").text();
 		var sticker = this_event.find(".st-reply-message-img").data("type");
 		if(!text && !sticker) return false;
