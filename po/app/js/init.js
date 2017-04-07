@@ -193,7 +193,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整
-	appVer: "1.7.0",
+	appVer: "2.0.0.1",
 
 	// 檢查是否為聊天室
 	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
