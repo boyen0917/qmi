@@ -599,7 +599,7 @@ QmiGlobal.module.serverSelector = {
 
 		var chk = false
 		$.each(self.view.find("li"), function(i,liDom) {
-			if($(liDom).find("> div:last-child").text() + "/apiv1/" === base_url) {
+			if($(liDom).find("> div:last-child").text() + "/" === base_url) {
 				chk = true;
 				$(liDom).addClass("selected").addClass("active");
 			}
@@ -667,7 +667,7 @@ QmiGlobal.module.serverSelector = {
 					"正式環境$https://ap.qmi.emome.net",
 					"QA$https://qaap.qmi.emome.net",
 					"AWS$https://apserver.mitake.com.tw",
-					"TEST$https://qmi17.mitake.com.tw",
+					"qmi17$https://qmi17.mitake.com.tw",
 					"自訂$<input placeholder='輸入網址'>"
 				].reduce(function(str, curr) {
 					return str += "<li><div>"+ curr.split("$")[0] +"</div><div>"+ curr.split("$")[1] + "</div></>";

@@ -1121,8 +1121,7 @@ $(document).on("click", "#container_version", function() {
 		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
 		cnts++;
 		if(cnts < 5) return;
-		if( prompt('輸入密碼') === "86136982") 
-			QmiGlobal.module.serverSelector.init();
+		QmiGlobal.module.serverSelector.init();
 }}());
 
 //上一頁功能
