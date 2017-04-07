@@ -2550,7 +2550,9 @@ composeContentMake = function (compose_title){
         switch(swTp) {
             case 1: // 強制開啟
                 composeDom.find(".cp-content-watermark").click();
-                composeDom.find(".cp-content-watermark").unbind("click");
+                composeDom.find(".cp-content-watermark").unbind("click").click(function() {
+                    toastShow($.i18n.getString("WEBONLY_WATERMARK_FORCED"));
+                });
                 break;
             case 2: // 預設開啟
                 composeDom.find(".cp-content-watermark").click();
