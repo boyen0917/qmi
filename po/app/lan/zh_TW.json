@@ -438,6 +438,9 @@
 
 	"WEBONLY_APPVERSION_00" : "有新版本，將自動更新資料。",
 	"WEBONLY_APPVERSION_01" : "有新版本安裝程式，是否下載安裝？",
-	"WEBONLY_IS_LATEST_VERSION" : "已更新到最新版本"
+	"WEBONLY_IS_LATEST_VERSION" : "已更新到最新版本",
+
+	"WEBONLY_FORBIDDEN_FEATURE" : "管理者已關閉此功能",
+	"WEBONLY_WATERMARK_FORCED" : "預設使用浮水印"
 
 }

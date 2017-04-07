@@ -2233,6 +2233,7 @@ composeContentMake = function (compose_title){
     $('.cp-content-load').html($('<div>').load('layout/compose.html .cp-content',function(){
 
         var this_compose = $(this).find(".cp-content");
+        var ctp = 0;
         this_compose._i18n();
 
         //設定 重複送出檢查
@@ -2279,35 +2280,10 @@ composeContentMake = function (compose_title){
             case "announcement": 
                 ctp = 1;
                 show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt , .cp-content-top";
-                
-                //watermark
-                try{
-                    var tmpGroup = QmiGlobal.groups[gi];
-                    cns.debug(tmpGroup.tp);
-                    if( tmpGroup.tp!="A1" ){
-                        show_area += ", .cp-content-watermark";
-                    }
-                }
-                catch(e){
-                    errorReport(e);
-                }
-                
                 break;
             case "feedback":
                 ctp = 2;
                 show_area = ".cp-content-title ,.cp-content-object, .cp-content-apt";
-                
-                //watermark
-                try{
-                    var tmpGroup = QmiGlobal.groups[gi];
-                    cns.debug(tmpGroup.tp);
-                    if( tmpGroup.tp!="A1" ){
-                        show_area += ", .cp-content-watermark";
-                    }
-                }
-                catch(e){
-                    errorReport(e);
-                }
                 break;
             case "work"://cp-work-area
                 ctp = 3;
@@ -2338,6 +2314,10 @@ composeContentMake = function (compose_title){
                 break;
         }
 
+        //watermark
+        setWatermark({dom: this_compose, ctp: ctp});
+        
+
         //發佈對象
         composeObjectShow(this_compose);
 
@@ -2359,16 +2339,7 @@ composeContentMake = function (compose_title){
                 this_compose.data("cp-top",true);
             }
         });
-        //浮水印
-        this_compose.find(".cp-content-watermark").click(function(){
-            if(this_compose.data("cp-watermark")){
-                $(this).find(".cp-watermark-btn").attr("src","images/compose/compose_form_icon_check_none.png");
-                this_compose.data("cp-watermark",false);
-            }else{
-                $(this).find(".cp-watermark-btn").attr("src","images/compose/compose_form_icon_check.png");
-                this_compose.data("cp-watermark",true);
-            }
-        });
+        
 
         //url parse
         this_compose.find('.highlight-container').bind('input',function(){
@@ -2389,17 +2360,9 @@ composeContentMake = function (compose_title){
 
             $.each(url_chk,function(i,val){
                 if(val.match(regexUrl)){
-                // if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://' || val.substring(0, 4) == 'www.'){
-                    // this_compose.data("parse-error",false);
-                    //送出判斷 等到網址內容取得成功 再送出
                     this_compose.data("parse-waiting",true).data("url-chk",true);
                     if(!this_compose.data("parse-resend")) $(".cp-attach-area").show().find(".url-loading").css("display","block");
                     getLinkMeta(this_compose,val);
-                    return false;
-                }else{
-                    //暫時
-                    //this_compose.find(".cp-attach-area").hide();
-                    // this_compose.find(".cp-ta-yql").hide();
                 }
             });
         });
@@ -2473,35 +2436,6 @@ composeContentMake = function (compose_title){
                 thisTextArea.data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
                 thisTextArea.data("markMembers", {});
             }
-
-            // if (selectionObj.anchorNode.parentNode.nodeName == "MARK") {
-            //     var currentNode = selectionObj.anchorNode;
-            //     var parentNode = currentNode.parentNode
-            //     var tagName = $(parentNode).attr("name");
-            //     var tagId = $(parentNode).attr("id");
-            //     var range = document.createRange();
-                
-            //     if (currentNode.textContent.replace(/\n/g, "") != tagName ) {
-            //         $(currentNode).unwrap();
-
-            //         thisTextArea.data("memberList")[tagId] = {
-            //             nk: tagName,
-            //             aut: thisTextArea.data("markMembers")[tagId].mugshot,
-            //         };
-
-            //         delete thisTextArea.data("markMembers")[tagId];
-
-            //         // var textNode = document.createTextNode(currentNode.innerHTML);
-            //         if (currentNode.previousSibling.textContent == "\n") {
-            //             range.setStart(currentNode, 0);
-            //         } else {
-            //             range.setStart(currentNode, cursorPosition);
-            //         }
-            //         range.collapse(true);
-            //         selectionObj.removeAllRanges();
-            //         selectionObj.addRange(range);
-            //     }
-            // }
 
             replyDom.find(".tag-list").remove();
             replyDom.find(".tag-members-container").hide();
@@ -2594,6 +2528,37 @@ composeContentMake = function (compose_title){
             setDateTimePicker(this_compose);
         }
     }));
+
+    function setWatermark(argObj) {
+        var composeDom = argObj.dom;
+        if(QmiGlobal.groups[QmiGlobal.currentGi].ptp === 1) composeDom.find(".cp-content-watermark").show();
+        else return;
+
+        //浮水印
+        composeDom.find(".cp-content-watermark").click(function(){
+            if(composeDom.data("cp-watermark")){
+                $(this).find(".cp-watermark-btn").attr("src","images/compose/compose_form_icon_check_none.png");
+                composeDom.data("cp-watermark",false);
+            }else{
+                $(this).find(".cp-watermark-btn").attr("src","images/compose/compose_form_icon_check.png");
+                composeDom.data("cp-watermark",true);
+            }
+        });
+
+        // 浮水印顯示狀況
+        var swTp = QmiGlobal.groups[QmiGlobal.currentGi].newData.sw.wa[argObj.ctp];
+        switch(swTp) {
+            case 1: // 強制開啟
+                composeDom.find(".cp-content-watermark").click();
+                composeDom.find(".cp-content-watermark").unbind("click").click(function() {
+                    toastShow($.i18n.getString("WEBONLY_WATERMARK_FORCED"));
+                });
+                break;
+            case 2: // 預設開啟
+                composeDom.find(".cp-content-watermark").click();
+                break;
+        }
+    }
 }
 
 composeObjectShow = function(this_compose){

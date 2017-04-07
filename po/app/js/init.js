@@ -291,6 +291,7 @@ window.QmiGlobal = {
 	ldapCompanies: {}, // ldap雲資訊
 	windowListCiMap: {},
 	module: {}, // 模組
+	method: {}, // 公用函數
 	rspCode401: false,
 
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
@@ -1076,6 +1077,27 @@ QmiAjax.prototype = {
 
 	}
 } // end of QmiAjax
+
+// 開關、浮水印檢查
+QmiGlobal.method.isSettingAllowed = function(argObj) {
+	var type = argObj.tp;
+	var typeArr = ["li", "re", "wa"];
+	var swObj = QmiGlobal.groups[argObj.gi].newData.sw;
+	var result = true;
+
+	switch(argObj.tp) {
+		case 2:
+			result = 3;
+			break;
+		default:
+			result = !!+swObj[typeArr[argObj.tp]][argObj.eventTp.substring(1)];
+	}
+
+	if(result === false) toastShow($.i18n.getString("WEBONLY_FORBIDDEN_FEATURE"));
+	return result;
+}	
+
+
 
 MyDeferred = function() {
   var myResolve, myReject;
