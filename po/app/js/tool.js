@@ -2216,20 +2216,74 @@ function setPolling(ts) {
 	$.lStorage("_pollingData", pp);
 };
 
+QmiGlobal.PopupDialog = {
+	container: $("<div id='popupDialog'><div class='container'><div class='close'>"
+		+ "<button>×</button></div><div class='header'></div><div class='content'>" 
+		+ "</div><div class='footer'></div></div></div>"),
 
-// function Dialog (dialogData) {
-// 	this.html = "<div id='popupDialog'><div class='container'><div class='header'>" + dialogData.header + "</div>" 
-// 		+ "<div class='content'>" + dialogData.content + "</div>" + 
-// 		+ "</div></div>"
-// }
+	create: function (option) {
+		var inputData = option.input || [];
+		var buttons = option.buttons || {};
 
-// QmiDialog.prototype = {
-// 	// html : "<div></div>"
-// }
-QmiGlobal.Dialog = {
-	
+		this.container.find(".close button").off("click").on("click", this.close.bind(this));
+		this.container.find(".header").html("").append(option.header);
+		this.container.find(".content").html("");
+		this.container.find(".footer").html("");
+
+		inputData.forEach(function(tagObj) {
+			var htmlElement;
+			switch (tagObj.type) {
+				case "password" :
+					htmlElement = $("<div class='" + tagObj.className + "'><input type='" + tagObj.type 
+						+ "' placeholder='" + $.i18n.getString(tagObj.hint)  + "' maxlength='" 
+						+ tagObj.maxLength + "'>");
+
+					htmlElement.off(tagObj.eventType).on(tagObj.eventType, tagObj.eventFun); 
+					break;
+				
+			}
+			this.container.find(".content").append(htmlElement);
+		}.bind(this));
+
+		if (option.errMsg) {
+			this.container.find(".content").append("<div class='" + option.errMsg.className + "'>" 
+				+ $.i18n.getString(option.errMsg.text) + "</div>");
+		}
+
+		$.each(buttons, function (key, btnObj) {
+			var btnElement;
+
+			btnElement = $("<button class='" + btnObj.className + "'>" 
+				+ $.i18n.getString(btnObj.text) + "</button>");
+			btnElement.off(btnObj.eventType).on(btnObj.eventType, btnObj.eventFun); 
+
+			this.container.find(".footer").append(btnElement)
+		}.bind(this));
+
+		$("body").append(this.container);
+
+		return this;
+	},
+
+	open: function () {
+		this.container.fadeIn(500);
+	},
+
+	close: function () {
+		var self = this;
+		self.container.fadeOut(300, function() {
+			self.container.remove();
+		})
+	}
 }
-// function companyAccount () {
-// 	var pwInpt = "<input class=''>"
-// 	var pwAgainInput = "<input class=''>"
-// }
+
+function checkPasswordAreMatch (elementData, enableBtnName) {
+	var inputColumns = $("#popupDialog").find(".input-password input");
+	var isColunmsMatchFormat = Array.prototype.every.call(inputColumns, function (input) {
+		if (input.parentNode.className.indexOf("old-password") > -1) return input.value.length > 0;
+		else return input.value.length >= 8;
+	});
+
+	if (isColunmsMatchFormat) $("#popupDialog").find("." + enableBtnName).addClass("enable");
+	else $("#popupDialog").find("." + enableBtnName).removeClass("enable");
+}

@@ -5875,18 +5875,37 @@ img.vdo-default:before {}
 	width: 100%;
 	height: 100%;
 	display: none;
+	z-index: 1000;
 }
 
 #popupDialog .container{
 	margin: 25px auto;
-    width: 400px;
+    width: 360px;
     background: white;
     text-align: center;
-    height: 630px;
+    height: 592px;
+}
+
+#popupDialog .container .close{
+	height: 36px;
+}
+
+#popupDialog .container .close button{
+	background-color: transparent;
+    border: 0;
+    font-size: 30px;
+    color: #ccc;
+    float: right;
+    cursor: pointer;
+    outline: none;
 }
 
 #popupDialog .container .header {
-	padding-top: 30px;
+	padding-top: 20px;
+}
+
+#popupDialog .container .header .alert {
+	height: 234px;
 }
 
 #popupDialog .container .header img {
@@ -5906,50 +5925,61 @@ img.vdo-default:before {}
     color: rgba(102, 102, 102, 0.87);
 }
 
-#popupDialog .container .header .alert p:not(:nth-child(3)) {
+/*#popupDialog .container .header .alert p:not(:nth-child(3)) {
 	visibility: hidden;
-}
+}*/
 
-#popupDialog .container .content {
-	margin-top: 20px;
-}
-
-#popupDialog .container .content .input-column {
+#popupDialog .container .content .input-password {
 	display: inline-block;
-    width: 350px;
-    margin-bottom: 30px;
+    width: 270px;
+    margin-top: 20px;
+    margin-left: 8px;
 }
 
-#popupDialog .container .content .input-column:before {
+#popupDialog .container .content .input-password:before {
 	content: "";
     background-image: url(../images/registration/symbols-password.png);
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: 0px;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     float: left;
 }
 
 #popupDialog .container .content input {
 	float: left;
-    width: 280px;
+    width: 214px;
     border-bottom: 1px solid #ccc;
-    margin-top: 10px;
+    margin-top: 2px;
     margin-left: 5px;
-    padding-bottom: 10px;
+    padding-bottom: 6px;
     padding-left: 8px;
-    font-size: 16px;
+    font-size: 18px;
     letter-spacing: 15px;
 }
 
+#popupDialog .container .content .error-message {
+	color: #F1617A;
+    font-size: 14px;
+    margin-right: 20px;
+    margin-top: 2px;
+    opacity: 0;
+}
+
+#popupDialog .container .footer {
+	margin-top: 40px;
+}
+
 #popupDialog .container .footer button {
-	min-width: 90px;
+	min-width: 94px;
     background-color: #ccc;
     border: 0px;
     border-radius: 5px;
-    padding: 6px 0px;
+    padding: 7px 0px;
     color: white;
+    margin: 0px 28px;
+    outline: none;
 }
 
 #popupDialog .container .footer button.enable {
@@ -5958,7 +5988,8 @@ img.vdo-default:before {}
 }
 
 #popupDialog .container .content input::-webkit-input-placeholder {
-	font-size: 16px;
+	font-size: 14px;
 	letter-spacing: initial;
+	color: #ddd;
 }
 

@@ -294,16 +294,16 @@ onCheckVersionDone = function(needUpdate){
 	});
 
 
-	$("#popupDialog").find(".input-column input").off("input").on("input", function () {
-		var passwordInput = $(this).val();
-		var anotherPasswordInput = $(this).parent().siblings().find("input").val();
+	// $("#popupDialog").find(".input-column input").off("input").on("input", function () {
+	// 	var passwordInput = $(this).val();
+	// 	var anotherPasswordInput = $(this).parent().siblings().find("input").val();
 
-		if (passwordInput.length >= 8 && anotherPasswordInput.length >= 8) {
-			$("#popupDialog").find(".confirm").addClass("enable");
-		} else {
-			$("#popupDialog").find(".confirm").removeClass("enable");
-		}
-	});
+	// 	if (passwordInput.length >= 8 && anotherPasswordInput.length >= 8) {
+	// 		$("#popupDialog").find(".confirm").addClass("enable");
+	// 	} else {
+	// 		$("#popupDialog").find(".confirm").removeClass("enable");
+	// 	}
+	// });
 
 	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
@@ -554,43 +554,11 @@ onCheckVersionDone = function(needUpdate){
         		var ssoKey = ""; 
         	}
 
+        	ssoObj.key = ssoKey;
+
         	if (rspObj.rsp_code == 106) {
-        		// console.log("dwkkooo");
-        		$("#popupDialog").fadeIn();
-
-        		popupDialog.create({
-        			header: "<div class='alert'><img src='images/common/icon/icon_check_gray.png'>";
-        				+ "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") +"</h2><p>" 
-        				+ $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p>"
-        				+ $.i18n.getString("ENTERPRISE_ACCOUNT_LAST_TIME") +"</p>"
-        				+ $.i18n.getString("ENTERPRISE_ACCOUNT_REMIND") +"</p></div>",
-
-    				inputType : [{
-    					type : "password"
-    					className : "password"
-    					placeholder : 
-    				},{
-    					type : "password"
-    					className : "password-again"
-    					placeholder : 
-    				}]
-
-    				buttons : {
-    					confirm : {
-    						text : 
-    					}
-    				}
-
-        		}).open();
-
-        		// var dialog = new QmiDialog({
-        		// 	header : "<div class='alert'><img src='images/common/icon/icon_check_gray.png'>" 
-        		// 		+ "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") +"</h2><p>" 
-        		// 		+ $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p></div>",
-
-        		// 	content : "<div><input data-textph-id='ENTERPRISE_ACCOUNT_SET_PASSWORD' />" 
-        		// 		+ "</div>"
-        		// })
+        		$("#page-registration .login").removeClass("login-waiting");
+        		setFirstCommpanyAccountPassword(ssoObj);
         	} else {
         		new QmiAjax({
 		        	apiName: "cert",
@@ -638,6 +606,78 @@ onCheckVersionDone = function(needUpdate){
         });
         return deferred.promise();
     }
+
+    function setFirstCommpanyAccountPassword(ssoData) {
+
+    	var deferred = $.Deferred();
+    	QmiGlobal.PopupDialog.create({
+			header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
+				+ "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") + "</h2><p>" 
+				+ $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p>",
+
+			input: [{
+				type: "password",
+				className: "input-password password",
+				hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD",
+				maxLength : 10,
+				eventType: "input",
+				eventFun: function (e) {
+					checkPasswordAreMatch(e, "confirm");
+				}
+			},{
+				type: "password",
+				className: "input-password password-again",
+				hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN",
+				maxLength : 10,
+				eventType: "input",
+				eventFun: function (e) {
+					checkPasswordAreMatch(e, "confirm");
+				}
+			}],
+			errMsg: {
+	            text: "ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH",
+	            className: "error-message"
+	        },
+			buttons: {
+				confirm: {
+					text : "ENTERPRISE_ACCOUNT_DONE",
+					className: "confirm",
+					eventType : "click",
+					eventFun : function (callback) {
+						var firstPwInput = $("#popupDialog").find(".password input").val();
+						var secondPwInput = $("#popupDialog").find(".password-again input").val();
+
+						if (firstPwInput !== secondPwInput) {
+							$("#popupDialog").find(".error-message").css("opacity", 1);
+						} else {
+							$("#popupDialog").find(".error-message").css("opacity", 0);
+							new QmiAjax({
+					        	url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password_first",
+					        	method: "put",
+					        	specifiedHeaders: { li: lang },
+					        	body: {
+								    id : ssoData.id,
+								    key : ssoData.key,
+								    np : QmiGlobal.aesCrypto.enc(firstPwInput, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+								    dn : QmiGlobal.device,
+								    uui : ssoData.uui,
+								}
+					        }).done(function(rspData) {
+					        	var rspObj = JSON.parse(rspData.responseText);
+					        	if (rspData.status == 200) {
+                                    toastShow(rspObj.rsp_msg);
+                                    QmiGlobal.PopupDialog.close();
+                                }
+					        });
+						}
+					}
+				}
+			}
+		}).open();
+
+		deferred.promise();
+    }
+
 
 /*	
 

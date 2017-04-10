@@ -8502,6 +8502,15 @@ pollingCmds = function(newPollingData){
                             cmd57Def.resolve();
                         });
                         break;
+
+                    case 58:
+                        var pollingData = item.pm || {};
+                        resetCompanyAccountPassword({
+                            id: pollingData.id, 
+                            ci: pollingData.ci,
+                            url: $.lStorage("_loginData").url,
+                        });
+                        break;
                 }
 
             }); // end of newPollingData.cmds forEach
@@ -8985,7 +8994,96 @@ function activateClearChatsTimer(){
 };
 
 
+function resetCompanyAccountPassword(ssoData) {
+    var time = new Date();
+    time.setMonth(time.getMonth() - 3);
 
+    QmiGlobal.PopupDialog.create({
+        header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
+            + "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_SECURITY_NOTICE") + "</h2><p>" 
+            + $.i18n.getString("ENTERPRISE_ACCOUNT_LAST_TIME") + "</p><p>" + time.getFullYear() + "." 
+            + ("0" + (time.getMonth() + 1)).slice(-2) + "." + ("0" + time.getDate()).slice(-2) + "</p><p>"
+            + $.i18n.getString("ENTERPRISE_ACCOUNT_REMIND") +"</p></div>",
+
+        input: [{
+            type: "password",
+            className: "input-password old-password",
+            hint: "ENTERPRISE_ACCOUNT_SET_ORIGIN_PASSWORD",
+            maxLength : 30,
+            eventType: "input",
+            eventFun: function (e) {
+                checkPasswordAreMatch(e, "update");
+            }
+        },{
+            type: "password",
+            className: "input-password new-password",
+            hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD",
+            maxLength : 10,
+            eventType: "input",
+            eventFun: function (e) {
+                checkPasswordAreMatch(e, "update");
+            }
+        },{
+            type: "password",
+            className: "input-password new-password-again",
+            hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN",
+            maxLength : 10,
+            eventType: "input",
+            eventFun: function (e) {
+                checkPasswordAreMatch(e, "update");
+            }
+        }],
+        errMsg: {
+            text: "ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH",
+            className: "error-message"
+        },
+        buttons: {
+            cancel: {
+                text : "ENTERPRISE_ACCOUNT_IGNORE",
+                className: "ignore",
+                eventType : "click",
+                eventFun : function (callback) {
+                    QmiGlobal.PopupDialog.close();
+                }
+            },
+            confirm: {
+                text : "ENTERPRISE_ACCOUNT_CHANGE_PASSWORD",
+                className: "update",
+                eventType : "click",
+                eventFun : function (callback) {
+                    var dialog = $("#popupDialog");
+
+                    if ($(this).hasClass("enable")) {
+                        var oldPassword = dialog.find(".old-password input").val();
+                        var firstNewPassword = dialog.find(".new-password input").val();
+                        var secondNewPassword = dialog.find(".new-password-again input").val();
+
+                        if (firstNewPassword !== secondNewPassword) {
+                            dialog.find(".error-message").css("opacity", 1);
+                        } else {
+                            dialog.find(".error-message").css("opacity", 0);
+                            new QmiAjax({
+                                url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password",
+                                method: "put",
+                                body: {
+                                    id: ssoData.id,
+                                    dn: QmiGlobal.device,
+                                    op: QmiGlobal.aesCrypto.enc(oldPassword, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+                                    np: QmiGlobal.aesCrypto.enc(firstNewPassword, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+                                }
+                            }).done(function(rspData) {
+                                if (rspData.status == 200) {
+                                    QmiGlobal.PopupDialog.close();
+                                    toastShow($.i18n.getString("ENTERPRISE_ACCOUNT_CHANGE_PASSWORD_SUCCESS"));
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }).open();
+}
 
 function clickTimelineTab(argObj) {
     $(".sm-group-list-area").removeAttr("data-unlock");

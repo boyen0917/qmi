@@ -420,14 +420,17 @@
 
 	"ENTERPRISE_ACCOUNT_PASSWORD_SETTING" :	"Password Setting",
 	"ENTERPRISE_ACCOUNT_FIRSTTIME_RESET" :	"Set a new password for your account.",
+	"ENTERPRISE_ACCOUNT_SET_ORIGIN_PASSWORD" :	"Current Password",
 	"ENTERPRISE_ACCOUNT_SET_PASSWORD" :	"Password (8 - 10 digits)",
 	"ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN" : "Confirm Password",
 	"ENTERPRISE_ACCOUNT_DONE" : "Done",
 	"ENTERPRISE_ACCOUNT_SECURITY_NOTICE" : "Security Notice",
 	"ENTERPRISE_ACCOUNT_IGNORE" : "Ignore",
 	"ENTERPRISE_ACCOUNT_CHANGE_PASSWORD" : "Update",
-	"ENTERPRISE_ACCOUNT_LAST_TIME" : "Last time you changed password:",
+	"ENTERPRISE_ACCOUNT_CHANGE_PASSWORD_SUCCESS" : "Update Password Successfully",
+	"ENTERPRISE_ACCOUNT_LAST_TIME" : "Last time you changed password",
 	"ENTERPRISE_ACCOUNT_REMIND" : "Please update password regularly.",
+	"ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH" : "Passwords don't match",
 
 	"WEBONLY_AUTH_LOADING" : "authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
