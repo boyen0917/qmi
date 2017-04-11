@@ -4408,6 +4408,7 @@ composeSend = function (this_compose){
     var composeContent = this_compose.data("compose-content").replace(/<br\s*\/?>/g,"\n");
     var tagMembers = this_compose.find(".cp-content-highlight").data("markMembers");
     var ml = this_compose.data("message-list").unique();
+    var tmpElement = document.createElement("div");
 
     var body = {
             meta : {
@@ -4435,6 +4436,8 @@ composeSend = function (this_compose){
         }
     
     }
+
+    tmpElement.innerHTML = composeContent;
 
     //浮水印
     var isApplyWatermark = false;
@@ -4642,7 +4645,7 @@ composeSend = function (this_compose){
         switch(mtp){
             //普通貼文
             case 0:
-                obj.c = composeContent;
+                obj.c = tmpElement.textContent;
 
                 is_push = false;
                 body.ml.unshift(obj);
@@ -7132,8 +7135,10 @@ replySend = function(thisEvent){
         body.meta.tu = object_obj;
     }
     var text = thisEvent.find(".st-reply-highlight-container").html()
-                         .replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+                         // .replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
     var tagMembers = thisEvent.find(".st-reply-highlight-container").data("markMembers");
+    var tmpElement = document.createElement("div");
+
     if (tagMembers && Object.keys(tagMembers).length) {
         
         for (var tagID in tagMembers) {
@@ -7147,8 +7152,10 @@ replySend = function(thisEvent){
         }
     }
 
+    tmpElement.innerHTML = text;
+
     body.ml.unshift({
-        "c": text ,
+        "c": tmpElement.textContent,
         "tp": 0
     });
 
@@ -7402,7 +7409,7 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
                 if(this_event.find(".stickerArea").is(":visible")) this_event.find(".stickerArea").hide();
                 this_event.find(".st-sub-box-2").trigger("detailShow");
             }
-            this_event.find(".st-reply-highlight-container").html("");
+            this_event.find(".st-reply-highlight-container").empty();
             this_event.find(".st-reply-highlight-container")
                       .data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
             this_event.find(".st-reply-highlight-container").data("markMembers", {});
