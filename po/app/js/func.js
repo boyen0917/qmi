@@ -8996,7 +8996,7 @@ function activateClearChatsTimer(){
 
 function resetCompanyAccountPassword(ssoData) {
     var time = new Date();
-    time.setMonth(time.getMonth() - 3);
+    time.setDate(time.getDate() - 30);
 
     QmiGlobal.PopupDialog.create({
         header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"

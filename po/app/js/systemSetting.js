@@ -9,7 +9,7 @@ $(document).ready(function(){
         passwordValidate(e);
     }).on('click','.password-btn.ready',function(){// 變更密碼
             passwordChange();
-            $(this).removeClass('ready');
+            // $(this).removeClass('ready');
     }).on('change','#no-option1',function() {// 是否有變更
         tabContent.find('.notification-btn').toggleClass('ready');
     }).on('click','.notification-btn.ready',function(){// 預設系統通知
@@ -328,53 +328,132 @@ passwordValidate = function (e) {
 passwordChange = function(){
         //$("input[name$='user-edit-o-password']").val()
         var pwSetting = $("#password-setting");
-        // var fill = true;//空值判定
+        var authData = QmiGlobal.auth;
+        // var deferred = $.Deferred();
+        var oldPassword = pwSetting.find("input[name$='o-password']").val(),
+            firstNewPassword = pwSetting.find("input[name$='n-password']").val(),
+            secondNewPassword = pwSetting.find("input[name$='v-password']").val()
 
-        var old_password = {
-            "pw" : toSha1Encode(pwSetting.find("input[name$='o-password']").val())
-        };
-        var verify_password = {
-             "op" : toSha1Encode(pwSetting.find("input[name$='o-password']").val()),
-             "up" : toSha1Encode(pwSetting.find("input[name$='n-password']").val())
-        };
-
-        //驗證密碼是否正確
-        new QmiAjax({
-            apiName : "me/password/auth",
-            body : JSON.stringify(old_password),
-            method: "post",
-            isPublicApi: true
-        }).success(function(password_data){
-            if (pwSetting.find("input[name$='n-password']").val() == pwSetting.find("input[name$='v-password']").val()){
+        //驗證前後新密碼是否一致
+        if (firstNewPassword == secondNewPassword) {
+            // 企業帳號改密碼
+            if (authData && authData.isSso && authData.rsp_code === 105) {
                 new QmiAjax({
-                    apiName : "me/password",
-                    body : JSON.stringify(verify_password),
-                    method : "put",
-                    isPublicApi: true
-                }).success(function(verify_data){
-                    toastShow(verify_data.rsp_msg);
-                    //console.debug(verify_data);
-                    QmiGlobal.auth.at = verify_data.at;
-                    at = verify_data.at;
-                    var user_login = $.lStorage("_loginData");
-                    user_login.at = verify_data.at;
-                    $.lStorage("_loginData",user_login);
-                    pwSetting.find(".input-password").val("");
-                    pwSetting.find('.password-btn').removeClass('ready');
-                }).error(function(e){
-                    popupShowAdjust(e.rsp_msg);
+                    url: "https://" + authData.url + "/apiv1/company_accounts/" + authData.ci + "/users/password",
+                    method: "put",
+                    body: {
+                        id: authData.id,
+                        dn: QmiGlobal.device,
+                        op: QmiGlobal.aesCrypto.enc(oldPassword, (authData.id + "_" + QmiGlobal.device).substring(0, 16)),
+                        np: QmiGlobal.aesCrypto.enc(firstNewPassword, (authData.id + "_" + QmiGlobal.device).substring(0, 16)),
+                    }
+                }).done(function(rspData) {
+                    if (rspData.status == 200) {
+                        QmiGlobal.PopupDialog.close();
+                        toastShow($.i18n.getString("ENTERPRISE_ACCOUNT_CHANGE_PASSWORD_SUCCESS"));
+                        pwSetting.find(".input-password").val("");
+                        pwSetting.find('.password-btn').removeClass('ready');
+                    }
                 });
-            } else {
-                popupShowAdjust("兩次密碼不符 請再輸入一次", "" ,true);
-                pwSetting.find("input[name$='v-password']").val("");
-                pwSetting.find('.password-btn').removeClass('ready');
-                //$.i18n.getString("LOGIN_FORGETPASSWD_NOT_MATCH")
+
+            } else { // 一般帳號改密碼
+                var user_login = $.lStorage("_loginData");
+
+                new QmiAjax({
+                    apiName : "me/password/auth",
+                    body : JSON.stringify({
+                        "pw" : toSha1Encode(oldPassword)
+                    }),
+                    method: "post",
+                    isPublicApi: true
+                }).success(function(password_data) {
+
+                    new QmiAjax({
+                        apiName : "me/password",
+                        body : JSON.stringify({
+                            "op" : toSha1Encode(pwSetting.find("input[name$='o-password']").val()),
+                            "up" : toSha1Encode(pwSetting.find("input[name$='n-password']").val())
+                        }),
+                        method : "put",
+                        isPublicApi: true
+                    }).success(function(verify_data) {
+                        toastShow(verify_data.rsp_msg);
+                        QmiGlobal.auth.at = verify_data.at;
+                        at = verify_data.at;
+                        user_login.at = verify_data.at;
+                        $.lStorage("_loginData", user_login);
+                        pwSetting.find(".input-password").val("");
+                        pwSetting.find('.password-btn').removeClass('ready');
+                    }).error(function(e) {
+                        popupShowAdjust(e.rsp_msg);
+                    });
+                }).error(function(e){
+                    // popupShowAdjust("原密碼有誤", "" ,true);
+                    console.debug(e.responseText);
+                });
             }
-            // }
-        }).error(function(e){
-                popupShowAdjust("原密碼有誤", "" ,true);
-                console.debug(e.responseText);
-        });
+        } else {
+            popupShowAdjust("兩次密碼不符 請再輸入一次", "" ,true);
+            pwSetting.find("input[name$='v-password']").val("");
+            pwSetting.find('.password-btn').removeClass('ready');
+        }
+
+        // if (authData && authData.rsp_code === 100) {
+        //     //驗證密碼是否正確
+        //     new QmiAjax({
+        //         apiName : "me/password/auth",
+        //         body : JSON.stringify({
+        //             "pw" : toSha1Encode(pwSetting.find("input[name$='o-password']").val())
+        //         }),
+        //         method: "post",
+        //         isPublicApi: true
+        //     }).success(function(password_data){
+        //         if (pwSetting.find("input[name$='n-password']").val() == pwSetting.find("input[name$='v-password']").val()){
+        //             new QmiAjax({
+        //                 apiName : "me/password",
+        //                 body : JSON.stringify({
+        //                     "op" : toSha1Encode(pwSetting.find("input[name$='o-password']").val()),
+        //                     "up" : toSha1Encode(pwSetting.find("input[name$='n-password']").val())
+        //                 }),
+        //                 method : "put",
+        //                 isPublicApi: true
+        //             }).success(function(verify_data){
+        //                 toastShow(verify_data.rsp_msg);
+        //                 //console.debug(verify_data);
+        //                 QmiGlobal.auth.at = verify_data.at;
+        //                 at = verify_data.at;
+        //                 var user_login = $.lStorage("_loginData");
+        //                 user_login.at = verify_data.at;
+        //                 $.lStorage("_loginData",user_login);
+        //                 pwSetting.find(".input-password").val("");
+        //                 pwSetting.find('.password-btn').removeClass('ready');
+        //             }).error(function(e){
+        //                 popupShowAdjust(e.rsp_msg);
+        //             });
+        //         } else {
+        //             popupShowAdjust("兩次密碼不符 請再輸入一次", "" ,true);
+        //             pwSetting.find("input[name$='v-password']").val("");
+        //             pwSetting.find('.password-btn').removeClass('ready');
+        //             //$.i18n.getString("LOGIN_FORGETPASSWD_NOT_MATCH")
+        //         }
+        //         // }
+        //     }).error(function(e){
+        //             popupShowAdjust("原密碼有誤", "" ,true);
+        //             console.debug(e.responseText);
+        //     });
+        // } else {
+
+        // }
+
+        // var old_password = {
+        //     "pw" : toSha1Encode(pwSetting.find("input[name$='o-password']").val())
+        // };
+        // var verify_password = {
+        //      "op" : toSha1Encode(pwSetting.find("input[name$='o-password']").val()),
+        //      "up" : toSha1Encode(pwSetting.find("input[name$='n-password']").val())
+        // };
+
+        
     // }//空值判定
 }//密碼更新
 
