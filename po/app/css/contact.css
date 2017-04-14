@@ -225,7 +225,7 @@
 
 .contact-extra .btn{
 	display: inline-block;
-	width: 130px;
+	width: 33%;
 	height: 75px;
 	cursor: pointer;
 }
@@ -240,12 +240,15 @@
 	background-position: center;
 	background-size: contain;
 }
+.contact-extra .btn.editFavMembers .img{
+	background-image: url("../images/common/icon/icon_calendar_set_edit.png");
+}
 .contact-extra .btn.addGroup .img{
 	background-image: url("../images/common/icon/icon_members_addgroup.png");
 }
 .contact-extra .btn.editGroup .img{
-	/*background-image: url("../images/common/icon/icon_members_edit_group.png");*/
-	background-image: url("../images/common/icon/icon_members_edit_group_disbale.png");
+	background-image: url("../images/common/icon/icon_members_edit_group.png");
+	/*background-image: url("../images/common/icon/icon_members_edit_group_disbale.png");*/
 }
 .contact-extra .btn.editMem .img{
 	background-image: url("../images/common/icon/icon_members_edit_member.png");

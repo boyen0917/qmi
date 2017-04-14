@@ -787,7 +787,6 @@
 	    thisInfo.find(".action-main").off("click").click( function(){
 	        if(window.mainPageObj !== undefined) {
 	            mainPageObj.userTimeline(thisInfo.data("this-info-gi"),thisInfo);
-
 	            return;
 	        }
 	        personalHomePage(thisInfo, userData);

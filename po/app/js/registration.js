@@ -451,7 +451,7 @@ appInitial = function(needUpdate){
         	if(rspData.isSuccess === false) return;
 
             $.lStorage("refreshChk", false);
-            localStorage["uiData"] = JSON.stringify(QmiGlobal.groups);
+            // localStorage["uiData"] = JSON.stringify(QmiGlobal.groups);
             $.mobile.changePage(rspData.location);
             
 			//聊天室開啓DB
