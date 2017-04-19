@@ -41,6 +41,12 @@
 	"REGISTER_SETTING_BIRTHDAY" :	"Birthday",
 	"REGISTER_SUCC" : "Register Successed.",
 
+	"REGISTRATION_NOTE1"	:	"I agree to Qmi's",
+	"REGISTRATION_NOTE2"	:	"And",
+	"REGISTRATION_USE"		:	"Term of Use",
+	"REGISTRATION_LICENSE"	:	"﻿Privacy Policy.",
+
+
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
 	"FEED_PERSONAL" : "Personal",

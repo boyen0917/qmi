@@ -11,6 +11,11 @@ var back_exception = false;	//部分跳頁不需要記錄
 var userLang = navigator.language || navigator.userLanguage;
 userLang = userLang.replace(/-/g,"_").toLowerCase();
 
+if( 0 == userLang.indexOf("zh") ) {
+	if( userLang=="zh_cn" ) lang = "zh_CN";
+	else lang = "zh_TW";	
+}
+
 var base_url = function() {
 	switch(true) {
 		case match("qawp.qmi.emome.net"):
@@ -166,14 +171,6 @@ Number.prototype.toFileSize = function () {
 	var unitIndex = Math.floor( Math.log(this) / Math.log(1024) );
     return (this / Math.pow(1024, unitIndex)).toFixed(2) + ' ' 
     	+ ['B', 'kB', 'MB', 'GB', 'TB'][unitIndex];
-}
-
-if( 0==userLang.indexOf("zh") ){
-	if( userLang=="zh_cn" ){
-		lang = "zh_CN";
-	} else {
-		lang = "zh_TW";
-	}
 }
 
 
