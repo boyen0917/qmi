@@ -474,9 +474,9 @@ ObjectDelegateView = {
 		}
 
 		// 搜尋列加上選擇對象的Tag
-		// $.each(allCheckRowData, function (key, rowName) {
-		// 	this.selectListArea.append("<span>" + rowName.replaceOriEmojiCode() + "</span>");
-		// }.bind(this));
+		$.each(allCheckRowData, function (key, rowName) {
+			this.selectListArea.append("<span>" + rowName.replaceOriEmojiCode() + "</span>");
+		}.bind(this));
 
 		if (this.mainPage.find(".obj-content").hasClass("on-search")) {
 			this.searchInput.html("").trigger("input").focus();

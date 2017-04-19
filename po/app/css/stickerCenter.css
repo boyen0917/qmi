@@ -110,7 +110,7 @@
 
 #StickerStoreModal .sticker-package-block{
     display: inline-block;
-    width: 330px;
+    width: 335px;
     padding-left: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid rgba(128, 128, 128, 0.6);
@@ -173,7 +173,7 @@
 
 #StickerStoreModal .sticker-package-block button {
     float: right;
-    margin-right: 18px;
+    margin-right: 10px;
     margin-top: 47px;
     border-color: transparent;
     min-width: 42px;

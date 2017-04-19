@@ -6,13 +6,13 @@ $.fn.StickerStore = function () {
 
 function StickerStoreView() {
 	this.currentTab = "sticker-shop";
-	this.container = $(this.htmlText);
+	this.container = $(this.html());
 	this.defaultOrder = [];
 	this.orderByUser = [];
 	this.isUpdateOrder = false;
 	this.isEditMode = false;
 	this.latestTime;
-	
+
 	// 切換貼圖示集、未下載和已下載tab
 	this.container.find("ul li").on("click", function (e) {
 		var prevTab = this.container.find("li.active").data("href");
@@ -73,37 +73,39 @@ function StickerStoreView() {
 }
 
 StickerStoreView.prototype = {
-	htmlText : "<div id='StickerStoreModal'>" +
-					"<div class='close-area'>" + 
-						"<img class='close' src='images/sticker_center/symbols-qicon_cancle.png'>" +
-					"</div>" + 
-				  	"<div class='container'>" + 
-					  	"<div class='page-header'>" + 
-						  "<ul class='tab'>" +
-							"<li class='tab-link active' data-href='all-stickers'>貼圖市集</li>" +
-							"<li class='tab-link' data-href='non-download-stickers'>未下載</li>" + 
-							"<li class='tab-link' data-href='already-download-stickers'>已下載</li>" +
-						  "</ul>" +
-						"</div>" +
-					   	"<div class='advertisement'></div>" +
-					   	"<div class='edit edit-sort'>編輯排序</div>" +
-					   	"<div class='edit edit-status'>" + 
-					   		"<button class='cancel'>取消</button>" + 
-					   		"<button class='save'>儲存 </button>" + 
-					   	"</div>" +
-						"<div class='page-home'>" + 
-						  "<div class='main-content sticker-shop'></div>" +
-						  // "<div class='tab-content non-download-sticker'></div>" +
-						  // "<div class='tab-content download-sticker'></div>" +
-						  "<div class='sticker-package-detail'>" + 
-						    "<div class='return'>返回</div>" +
-						    "<div class='main-sticker'></div>" + 
-						    "<div class='sticker-img-list'></div>" +
-						  "<div>" +
-					    "</div>" +
-					  "</div>" +
-					"</div>" +
-				"</div>",
+	html : function (time) {
+		return "<div id='StickerStoreModal'>" +
+			"<div class='close-area'>" + 
+				"<img class='close' src='images/sticker_center/symbols-qicon_cancle.png'>" +
+			"</div>" + 
+		  	"<div class='container'>" + 
+			  	"<div class='page-header'>" + 
+				  "<ul class='tab'>" +
+					"<li class='tab-link active' data-href='all-stickers'>" + $.i18n.getString("STICKER_CENTER") + "</li>" +
+					"<li class='tab-link' data-href='non-download-stickers'>" + $.i18n.getString("STICKER_NOT_DOWNLOAD") + "</li>" + 
+					"<li class='tab-link' data-href='already-download-stickers'>" + $.i18n.getString("STICKER_DOWNLOAD_FINISH") + "</li>" +
+				  "</ul>" +
+				"</div>" +
+			   	"<div class='advertisement'></div>" +
+			   	"<div class='edit edit-sort'>編輯排序</div>" +
+			   	"<div class='edit edit-status'>" + 
+			   		"<button class='cancel'>取消</button>" + 
+			   		"<button class='save'>儲存 </button>" + 
+			   	"</div>" +
+				"<div class='page-home'>" + 
+				  "<div class='main-content sticker-shop'></div>" +
+				  // "<div class='tab-content non-download-sticker'></div>" +
+				  // "<div class='tab-content download-sticker'></div>" +
+				  "<div class='sticker-package-detail'>" + 
+				    "<div class='return'>返回</div>" +
+				    "<div class='main-sticker'></div>" + 
+				    "<div class='sticker-img-list'></div>" +
+				  "<div>" +
+			    "</div>" +
+			  "</div>" +
+			"</div>" +
+		"</div>"
+	},
 
 	// 取得最近15包貼圖套件，並加在貼圖中心畫面上
 	getLastestPackages : function (time) {
