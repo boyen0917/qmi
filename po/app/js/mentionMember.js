@@ -2,21 +2,32 @@
 function getCaretPosition(element) {
     if (window.getSelection && window.getSelection().getRangeAt) {
         var range = window.getSelection().getRangeAt(0);
+        var tmpElement = document.createElement("div");
         var selectedObj = window.getSelection();
+        var textBeforeCaret = range.startContainer.textContent.substring(0, range.startOffset);
         var rangeCount = 0;
         var childNodes = selectedObj.anchorNode.parentNode.childNodes;
+
+        tmpElement.textContent = textBeforeCaret;
+        rangeCount += tmpElement.innerHTML.length;
         
         for (var i = 0; i < childNodes.length; i++) {
             if (childNodes[i] == selectedObj.anchorNode) {
                 break;
             }
-            if (childNodes[i].outerHTML)
+            if (childNodes[i].outerHTML) {
+                // console.log("dwdwkkk");
                 rangeCount += childNodes[i].outerHTML.length;
+            }
             else if (childNodes[i].nodeType == 3) {
-                rangeCount += childNodes[i].textContent.length;
+                tmpElement.textContent = childNodes[i].textContent;
+                rangeCount += tmpElement.innerHTML.length;
+                // rangeCount += childNodes[i].textContent.length;
             }
         }
-        return range.startOffset + rangeCount;
+
+        return rangeCount;
+        // return range.startOffset + rangeCount;
     }
 
     return -1;
