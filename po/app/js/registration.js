@@ -426,8 +426,7 @@ appInitial = function(needUpdate){
                 		}
 
                 		//發生錯誤 回首頁比較保險
-                		cns.debug("dgi combo error",resultObj);
-                		window.location = "index.html";
+                		reLogin();
                 	} else {
                 		deferred.resolve({dgi: specifiedGi, location:"#page-group-main"});
                 	}
