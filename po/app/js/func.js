@@ -6049,12 +6049,14 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                     });
                     
                 } catch(e) {
-
                     try {
                         cns.debug("google 失敗 換高德上",val.lat+":"+val.lng);
                         this_event.find(".st-attach-google-map").hide();
                         this_event.find(".st-attach-amap-map").show();
                         var id_str = "amap-" + new Date().getRandomString();
+                        // 寫地址
+                        if(val.a.length) this_event.find(".map-addr").text(val.a).show();
+
                         this_event.find(".st-attach-amap-map").attr("id",id_str);
                         var mapObj = new AMap.Map(id_str,{
                             rotateEnable:false,

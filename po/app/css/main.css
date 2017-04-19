@@ -3155,10 +3155,26 @@ img.st-user-pic{
 	color: #565656;
 }
 
+.map-addr {
+    text-align: left;
+    position: relative;
+    left: 35px;
+    top: 7px;
+    font-size: 13px;
+}
+
+.map-addr:before {
+    content: url(../images/task/timeline_task_icon_task_checkin.png);
+    position: absolute;
+    top: -6px;
+    left: -25px;
+}
+
 .st-attach-google-map,.st-attach-amap-map{
     height:200px;
     max-width:480px;
     border:1px solid #e4e4e4;	
+    margin: 10px;
 }
 
 .st-attach-sticker {
