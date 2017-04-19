@@ -40,6 +40,12 @@
 	"REGISTER_SETTING_BIRTHDAY" :	"生日",
 	"REGISTER_SUCC" : "註冊成功",
 
+	"REGISTRATION_NOTE1" : "註冊帳號代表您已同意",
+	"REGISTRATION_NOTE2" : "及",
+	"REGISTRATION_USE" : "使用條款",
+
+	"REGISTRATION_LICENSE" : "隱私政策",
+
 	"FEED_ALL" : "全部",
 	"FEED_MISSION" : "任務",
 	"FEED_PERSONAL" : "個人",
