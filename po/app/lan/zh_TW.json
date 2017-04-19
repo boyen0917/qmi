@@ -40,8 +40,15 @@
 	"REGISTER_SETTING_BIRTHDAY" :	"生日",
 	"REGISTER_SUCC" : "註冊成功",
 
+	"REGISTRATION_NOTE1" : "註冊帳號代表您已同意",
+	"REGISTRATION_NOTE2" : "及",
+	"REGISTRATION_USE" : "使用條款",
+
+	"REGISTRATION_LICENSE" : "隱私政策",
+
 	"FEED_ALL" : "全部",
 	"FEED_MISSION" : "任務",
+	"FEED_PERSONAL" : "個人",
 	"FEED_BULLETIN"			:"公告",
 	"FEED_REPORT"			:"通報",
 	"FEED_POST"				:"貼文",
@@ -136,6 +143,7 @@
 
 	"MEMBER_ALL" : "全部",
 	"MEMBER_X_GROUP_NO_MEMBER": "%@目前沒有成員",
+	"MEMBER_FAVORITE_EDIT_BRANCH" : "編輯我的最愛",
 	"MEMBER_CREATE_CUSTOMIZE_GROUP" : "新增自定群組",
 	"MEMBER_CREATE" : "新增",
 	"MEMBER_CUSTOMIZE_GROUP_NAME": "群組名稱",
@@ -151,7 +159,7 @@
 	"MEMBER_CUSTOMIZE_GROUP_NO_MEMBER" : "目前群組內沒有成員會自動刪除群組, 您確定嗎?",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_SUCC" : "刪除群組成功",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_FAIL" : "刪除群組失敗",
-	"MEMBER_SEARCH_NO_RESULT" : "搜尋沒有結果.. O_Q",
+	"MEMBER_SEARCH_NO_RESULT" : "搜尋沒有結果.. ",
 
 	"INVITE_TITLE" : "邀請成員",
 	"INVITE_INVITED_MEMBER" : "邀請中的成員",
@@ -350,7 +358,7 @@
 
 
 	"REFRESH_RELOAD" : "讀取失敗，請稍後再試",
-	"REFRESH_TEXT" : "企業資訊取得失敗 請稍後再試",
+	"REFRESH_TEXT" : "企業資訊更新 請重新驗證",
 	"REFRESH_ALERT_SUCCESS" : "企業資訊取得完成",
 	"REFRESH_ALERT_CONFIRM" : "按確定可立即前往預設團體",
 
@@ -378,6 +386,7 @@
 	"OFFICAL_GROUP" : "官方帳號",
 	"PRIVACY_POLICY" : "隱私政策",
 	"USER_AGREEMENT" : "使用條款",
+	"STICKER_CENTER" : "貼圖中心",
 
 	"BIND_LDAP" : "綁定LDAP",
 	"BIND_ACCOUNT" : "已綁定帳號",
@@ -417,6 +426,9 @@
 	"ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION" :	"定期安全認證",
 	"ACCOUNT_BINDING_ENTER_LDAP_PASSWORD" :	"請輸入您的 LDAP 密碼",
 
+	"STICKER_NOT_DOWNLOAD" : "未下載",
+	"STICKER_DOWNLOAD_FINISH" : "已下載",
+	"STICKER_CENTER" : "貼圖中心",
 
 	"WEBONLY_AUTH_LOADING" : "驗證中...",
 	"WEBONLY_AUTH_SUCCESS" : "驗證成功",
@@ -431,5 +443,13 @@
 	"WEBONLY_CHATROOM_INFO" : "聊天室資訊",
 	"WEBONLY_INVITE_PERMISSION" : "一般成員邀請權限",
 	"WEBONLY_LOGOUT_BY_ANOTHER_DEVICE" : "你的帳號於其他裝置登入",
-	"WEBONLY_VERSION_NO" : "版本"
+	"WEBONLY_VERSION_CHK" : "檢查更新",
+	"WEBONLY_VERSION_NO" : "版本",
+
+	"WEBONLY_APPVERSION_00" : "有新版本，將自動更新資料。",
+	"WEBONLY_APPVERSION_01" : "有新版本安裝程式，是否下載安裝？",
+	"WEBONLY_IS_LATEST_VERSION" : "已更新到最新版本",
+
+	"WEBONLY_FORBIDDEN_FEATURE" : "管理者已關閉此功能",
+	"WEBONLY_WATERMARK_FORCED" : "預設使用浮水印"
 }

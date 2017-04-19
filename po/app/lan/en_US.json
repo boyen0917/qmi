@@ -41,8 +41,15 @@
 	"REGISTER_SETTING_BIRTHDAY" :	"Birthday",
 	"REGISTER_SUCC" : "Register Successed.",
 
+	"REGISTRATION_NOTE1"	:	"I agree to Qmi's",
+	"REGISTRATION_NOTE2"	:	"And",
+	"REGISTRATION_USE"		:	"Term of Use",
+	"REGISTRATION_LICENSE"	:	"﻿Privacy Policy.",
+
+
 	"FEED_ALL" : "All",
 	"FEED_MISSION" : "Mission",
+	"FEED_PERSONAL" : "Personal",
 	"FEED_BULLETIN"			:"Bulletin",
 	"FEED_REPORT"			:"Report",
 	"FEED_POST"				:"Post",
@@ -137,6 +144,7 @@
 
 	"MEMBER_ALL" : "All",
 	"MEMBER_X_GROUP_NO_MEMBER": "No member in sub group %@ now.",
+	"MEMBER_FAVORITE_EDIT_BRANCH" : "Edit my favorite",
 	"MEMBER_CREATE_CUSTOMIZE_GROUP" : "New customize group",
 	"MEMBER_CREATE" : "Create",
 	"MEMBER_CUSTOMIZE_GROUP_NAME": "Customize group name",
@@ -152,7 +160,7 @@
 	"MEMBER_CUSTOMIZE_GROUP_NO_MEMBER" : "We will delete this sub group for there is no member in it. Are you sure?",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_SUCC" : "Delete Group Successed.",
 	"MEMBER_DELETE_CUSTOMIZE_GROUP_FAIL" : "Delete Group failed.",
-	"MEMBER_SEARCH_NO_RESULT" : "No result.. O_Q",
+	"MEMBER_SEARCH_NO_RESULT" : "No result.. ",
 
 	"INVITE_TITLE" : "Invitation",
 	"INVITE_INVITED_MEMBER" : "Invited Members",
@@ -377,7 +385,8 @@
 	"OFFICAL_GROUP" : "offical group",
 	"PRIVACY_POLICY" : "Privacy Policy",
 	"USER_AGREEMENT" : "Term of Use",
-
+	"STICKER_CENTER" : "Sticker Shop",
+	
 	"BIND_LDAP" : "綁定LDAP",
 	"BIND_ACCOUNT" : "已綁定帳號",
 	"GUIHU_EXPIRED" : "認證過期",
@@ -418,6 +427,10 @@
 	"ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION" :	"Account Recertification",
 	"ACCOUNT_BINDING_ENTER_LDAP_PASSWORD" :	"Please enter your LDAP password",
 
+	"STICKER_NOT_DOWNLOAD" : "Not downloaded",
+	"STICKER_DOWNLOAD_FINISH" : "Done",
+	"STICKER_CENTER" : "Sticker Shop",
+
 	"WEBONLY_AUTH_LOADING" : "authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
 	"WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT" : "Click to create binding account",
@@ -430,6 +443,14 @@
 	"WEBONLY_ADMINISTRATOR" : "administrators",
 	"WEBONLY_CHATROOM_INFO" : "chatroom infomation",
 	"WEBONLY_INVITE_PERMISSION" : "inviting's permissions for members",
-	"WEBONLY_LOGOUT_BY_ANOTHER_DEVICE" : "Your account login from another device"
-	"WEBONLY_VERSION_NO" : "Version"
+	"WEBONLY_LOGOUT_BY_ANOTHER_DEVICE" : "Your account login from another device",
+	"WEBONLY_VERSION_CHK" : "update",
+	"WEBONLY_VERSION_NO" : "Version",
+
+	"WEBONLY_APPVERSION_00" : "Update automatically..",
+	"WEBONLY_APPVERSION_01" : "There is a new version available, Update now?",
+	"WEBONLY_IS_LATEST_VERSION" : "You already have the latest version of Qmi",
+
+	"WEBONLY_FORBIDDEN_FEATURE" : "Administrator has closed this feature",
+	"WEBONLY_WATERMARK_FORCED" : "Forced to use watermark"
 }

@@ -1177,6 +1177,12 @@ body {
 	
 }
 
+#page-selectMem .bottom {
+	width: 99%;
+	text-align: center;
+	z-index: 2;
+	display: none;
+}
 
 /* content */
 .obj-selected{

@@ -26,10 +26,14 @@ var ui,		//user id
 	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
 	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
+// 配合init裡面有這個初始化的 function
+var appInitial = function() {
+	// do nothing
+};
 
 $(function(){
 	//load language
-	updateLanguage(lang);
+	// updateLanguage(lang);
 	//驗證失敗 請重新登入
 	if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) {
 		
@@ -381,9 +385,15 @@ $(function(){
 
 		//emoji input event
 		$(".input-emoji").off("click").click(function () {
+			var emojiIcon = $(this);
 			if (0 == g_extraInputStatus) {
+				//init sticker area
+				initStickerArea.init($(".stickerArea"), sendSticker, function() {
+					emojiIcon.click();
+				});
 				g_extraInputStatus = 2;
 				$("#footer").animate({bottom: 0}, 'fast');
+
 				// $("#chat-contents").animate({marginBottom:200},'fast');
 				updateChatContentPosition();
 				$(this).addClass("active");
@@ -419,7 +429,7 @@ $(function(){
 		}, 300);
 
 		//init sticker area
-		initStickerArea.init($(".stickerArea"), sendSticker);
+		// initStickerArea.init($(".stickerArea"), sendSticker);
 
 		//sticker change sync events
 		$("#send-sync-sticker-signal").off("click").click(function () {
@@ -541,7 +551,6 @@ $(function(){
 					cns.debug("on page change done");
 				}, function (isDone) {
 					window.actChk = false;
-
 
 					setTimeout(function () {
 						checkPagePosition();
@@ -710,6 +719,10 @@ $(function(){
 		    	// }
 		    });
 		});
+
+		// $("#page-chat").find(".sticker-shop").off("click").on("click", function() {
+
+		// });
 
 		updateChat();
 		
@@ -2157,21 +2170,33 @@ function sendMsgText(dom) {
 							//重設 style
 							img.removeAttr("style");
 							img.css("background-image", "none");
-
 						});
 
 						//小圖
-						img.attr("src", obj.s3);
+						img.attr("src", picUrl);
+						
 						//點擊跳出大圖
 						img.click(function () {
 							new QmiGlobal.gallery({
 					            gi: gi,
-					            photoList: [{s32: obj.s32}],
-					            currentImage : 0,
-					            isApplyWatermark : false,
-					            watermarkText : ""
+					            photoList: [{s32: picUrl}],
+					            currentImage : 0
 					        });
 						});
+
+						// 浮水印加在這
+						// var watermarkText = QmiGlobal.groups[gi].gn + " " + QmiGlobal.groups[gi].guAll[gu].nk;
+						// getWatermarkImage(watermarkText, obj.s3, 1, function(picUrl) {
+						// 	img.attr("src", picUrl);
+						// 	//點擊跳出大圖
+						// 	img.click(function () {
+						// 		new QmiGlobal.gallery({
+						//             gi: gi,
+						//             photoList: [{s32: picUrl}],
+						//             currentImage : 0
+						//         });
+						// 	});
+						// })
 						break;
 					case 7://video
 						renderVideoUrl(obj.s32, target.find("video"), function (videoTag) {
@@ -2247,6 +2272,12 @@ function sendMsgText(dom) {
 							}
 						}
 
+						if (g_room.memList[gu].ad == 1) {
+							$(".extra-content .btn[data-type=invite]").show();
+						} else {
+							if (g_room.is) $(".extra-content .btn[data-type=invite]").show();
+							else $(".extra-content .btn[data-type=invite]").hide();
+						}
 
 						$.userStorage(userData);
 
@@ -2829,7 +2860,7 @@ function sendMsgText(dom) {
 			var btn = $(".extra-content .btn[data-type='edit']");
 			var tmpList = {};
 			for (var gu in g_room.memList) {
-				tmpList[gu] = g_group.guAll[gu].nk;
+				if (gu != g_group.gu) tmpList[gu] = g_group.guAll[gu].nk;
 			}
 
 			btn.data("exclude_str", JSON.stringify([g_group.gu]));
@@ -2922,7 +2953,7 @@ function sendMsgText(dom) {
 				tmpList.push(gu);
 			}
 			btn.data("exclude_str", JSON.stringify(tmpList));
-			btn.data("object_str", "");
+			btn.data("object_str", "{}");
 			btn.data("object_opt", {
 				isShowBranch: false,
 				isShowSelf: false,
@@ -2941,6 +2972,8 @@ function sendMsgText(dom) {
 						//on select done
 						// send add mem to room api
 						var memListString = btn.data("object_str");
+						var favListString = btn.data("favorite_str");
+
 						//單人聊天室的話變成創新聊天室流程
 						if (g_room.tp == 1) {
 							try {
@@ -2968,11 +3001,19 @@ function sendMsgText(dom) {
 						try {
 							cns.debug(memListString);
 							var memList = $.parseJSON(memListString);
+							var favObjs = $.parseJSON(favListString);
 							var newList = [];
+							var favList = [];
 							for (var guTmp in memList) {
-								newList.push( guTmp);
+								newList.push(guTmp);
 							}
-							editMemInRoomAPI(ci, {add:{gul:newList}}, function (data) {
+
+							for (var favID in favObjs) {
+								favList.push(favID);
+							}
+
+
+							editMemInRoomAPI(ci, {add:{gul:newList, fl: favList}}, function (data) {
 								// if( data.status==200){
 								getPermition(true);
 								updateChat();
@@ -3160,6 +3201,7 @@ function sendMsgText(dom) {
 		var isPageReady = false;
 		var list = [];
 		var title = "";
+		var loadPageDefer = $.Deferred();
 
 		//get read
 		list.push({title: $.i18n.getString("FEED_READ"), ml: null});
@@ -3172,54 +3214,70 @@ function sendMsgText(dom) {
 					}
 				}
 				list[0].ml = parseData;
-				dataReadyCnt++;
+
+				if (isShowUnreadAndReadTime) {
+                    list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
+                    list[1].ml = getUnreadUserList(parseData);
+                } else {
+                    list.push({title: $.i18n.getString("FEED_UNREAD"), clickable:false});
+                }
+
+				// dataReadyCnt++;
 				if (isPageReady && dataReadyCnt > 1) {
 					$(".screen-lock").hide();
 					showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
 				}
+
+				dataReadyCnt ++;
+
+				loadPageDefer.resolve();
 			} catch (e) {
 				errorReport(e);
 				chat.removeClass("loadRead");
 				$(".screen-lock").hide();
+				loadDefer.reject();
 			}
 		});
 
-		//get unread
-		if (isShowUnreadAndReadTime) {
-			list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-
-
-			getChatReadUnreadApi(gi, ci, rt, 2).complete(function (data) {
-				if (data.status != 200) return false;
-				try {
-					list[1].ml = $.parseJSON(data.responseText).gul;
-
-					dataReadyCnt++;
-					if (isPageReady && dataReadyCnt > 1) {
-						$(".screen-lock").hide();
-						showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
-					}
-				} catch (e) {
-					errorReport(e);
-					chat.removeClass("loadRead");
+		$.when(loadPageDefer).done(function () {
+			loadObjectTabPage($("#pagesContainer"), function () {
+				isPageReady = true;
+				if (dataReadyCnt > 0) {
 					$(".screen-lock").hide();
+					showChatObjectTabShow(gi, title, list, null, onDone);
 				}
 			});
-		} else {
-			list.push({title: $.i18n.getString("FEED_UNREAD"), clickable: false});
-			dataReadyCnt++;
-			if (isPageReady && dataReadyCnt > 1) {
-				$(".screen-lock").hide();
-				showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
-			}
-		}
-		loadObjectTabPage($("#pagesContainer"), function () {
-			isPageReady = true;
-			if (dataReadyCnt > 1) {
-				$(".screen-lock").hide();
-				showChatObjectTabShow(gi, title, list, null, onDone);
-			}
 		});
+		//get unread
+		// if (isShowUnreadAndReadTime) {
+		// 	list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
+
+
+		// 	getChatReadUnreadApi(gi, ci, rt, 2).complete(function (data) {
+		// 		if (data.status != 200) return false;
+		// 		try {
+		// 			list[1].ml = $.parseJSON(data.responseText).gul;
+
+		// 			dataReadyCnt++;
+		// 			if (isPageReady && dataReadyCnt > 1) {
+		// 				$(".screen-lock").hide();
+		// 				showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
+		// 			}
+		// 		} catch (e) {
+		// 			errorReport(e);
+		// 			chat.removeClass("loadRead");
+		// 			$(".screen-lock").hide();
+		// 		}
+		// 	});
+		// } else {
+		// 	list.push({title: $.i18n.getString("FEED_UNREAD"), clickable: false});
+		// 	dataReadyCnt++;
+		// 	if (isPageReady && dataReadyCnt > 1) {
+		// 		$(".screen-lock").hide();
+		// 		showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
+		// 	}
+		// }
+		
 	}
 
 	/**

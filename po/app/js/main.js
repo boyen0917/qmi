@@ -1,7 +1,7 @@
 $(function(){  
 
 	//load language
-	updateLanguage( lang );
+	// updateLanguage( lang );
 
 	var refreshChk = false;
 
@@ -10,15 +10,15 @@ $(function(){
 	});
 
 
-	$("#page-group-main .subpage-timeline.main-subpage").bind('scroll', function(){
+	$(".feed-subarea ").bind('mousewheel DOMMouseScroll', function(){
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi");
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
 		if (feed_type != "main") {
 			feed_type = ("0" + feed_type).slice(-2) || "00";
 		}
-		// var feed_type = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+		// var this_navi = $(".feed-subarea:visible");
 		//判斷沒資料的元件存在時 就不動作
 		if( this_navi.hasClass("no-data") ) return;	
 		
@@ -268,9 +268,14 @@ $(function(){
         var tab_id = $(this).attr('data-tab');
         //console.log("tab is "+tab_id);
         $('ul.system-tab li').removeClass('current-tab');
-        $('.system-tab-content').removeClass('current-tab');
         $(this).addClass('current-tab');
-        $("#"+tab_id).addClass('current-tab');
+        
+        if (tab_id == "sticker-center") {
+        	$(this).StickerStore();
+        } else {
+        	$('.system-tab-content').removeClass('current-tab');
+        	$("#"+tab_id).addClass('current-tab');
+        }
     });
 	//----------------------------------- 小幫手 ---------------------------------------------
 
@@ -422,7 +427,8 @@ $(function(){
 
 	$(".st-filter-action").click(function(){
 		var filter_action = $(this);
-		var navi_area = $(".st-navi-subarea");
+		var groupMainPage = $("#page-group-main");
+		var navi_area = groupMainPage.find(".st-navi-subarea");
 		var parent = $(this).parent();
 		if( parent.hasClass("lock") ){
 			return;
@@ -449,18 +455,24 @@ $(function(){
 		// });
 
 		var filter_status = $(this).data("status");
-
+		console.log(filter_status);
 		//過濾發文類型
 		if(filter_status == "navi" || filter_status == "all"){
+			groupMainPage.find(".st-personal-area").hide();
         	navi_area.filter("[data-st-navi="+ $(this).data("navi") +"]").trigger("click");
         	// return false;
+		} else if (filter_status == "person") {
+			groupMainPage.find(".st-feedbox-area").hide();
+			groupMainPage.find(".st-personal-area").show();
+			return ;
 		} else {
 			//檢查目前的首頁是哪頁(動態消息/團體消息/成員消息)
 			var currentHome = $(".st-navi-area").data("currentHome") || "home";
+			groupMainPage.find(".st-personal-area").hide();
 			navi_area.filter("[data-st-navi="+currentHome+"]").trigger("click");
 		}
 
-		var event_tp = $("#page-group-main").data("navi") || "00";
+		var event_tp = groupMainPage.data("navi") || "00";
 		var event_area = $(".feed-subarea[data-feed=" + event_tp + "]");
 		var this_events = event_area.find(".st-sub-box");
 
@@ -472,7 +484,13 @@ $(function(){
 		//記錄
 		$(".st-filter-area").data("filter",filter_status);
 		event_area.data("filter-name",$(this).find("span").html());
+
+		if(groupMainPage.data("main-gu")) {
+			groupMainPage.find(".feed-subarea[data-feed=main]").html("");
+		}
 		
+		groupMainPage.find(".st-feedbox-area-bottom > img").show();
+		groupMainPage.find(".st-feedbox-area-bottom > div").hide();
 		//已讀未讀
 		var cnt = 0;
 		this_events.each(function(i,val){
@@ -496,6 +514,15 @@ $(function(){
 
 	$(document).on('click','.st-sub-box-3 .st-like',function(){
 		var this_event = $(this).parents(".st-sub-box");
+
+		// 檢查可否按讚
+		if(!QmiGlobal.method.isSettingAllowed({
+			gi: QmiGlobal.currentGi,
+			tp: 0, // 按讚是0
+			eventTp: this_event.data("event-val").meta.tp
+		})) return;
+
+
 		//api結束前 不能按
 		if(this_event.data("like-lock")) return false;
 		this_event.data("like-lock",true);
@@ -546,6 +573,13 @@ $(function(){
 
 		var this_event = $(this).parents('.st-reply-content-area');
 
+		// 檢查可否按讚
+		if(!QmiGlobal.method.isSettingAllowed({
+			gi: QmiGlobal.currentGi,
+			tp: 0, // 按讚是0
+			eventTp: this_event.parents("div.st-sub-box").data("event-val").meta.tp
+		})) return;
+
 		//api結束前 不能按
 		if(this_event.data("like-lock")) return false;
 		this_event.data("like-lock",true);
@@ -559,11 +593,6 @@ $(function(){
 		if( $(this).data("like")== false ){
 			est = 1;
 		}
-		/*
-		if( $(this).html().length == 1){
-			est = 1;
-		}
-		*/
 
 		//更新狀態 參數
 		var target_obj = {};
@@ -622,8 +651,8 @@ $(function(){
 			stickerArea.hide();
 			stickerIcon.attr("src", "images/chatroom/chat_textbar_icon_emoticon.png");
 		} else {
-			if( true!=stickerArea.data("isCreate") ){
-				stickerArea.data("isCreate", true);
+			// if( true!=stickerArea.data("isCreate") ){
+			// 	stickerArea.data("isCreate", true);
 				initStickerArea.init(stickerArea, function(id){
 					//on sitcker selected
 					cns.debug(id);
@@ -640,8 +669,11 @@ $(function(){
 						initStickerArea.showHistory( dom.parent() );
 					});
 					cns.debug("1");
+				}, function () {
+					console.log("heyhhey")
+					stickerIcon.click();
 				});
-			}
+			// }
 
 			$('.st-reply-message-sticker[data-open="t"]').trigger("click");
 			stickerIcon.attr("data-open", "t");
@@ -699,7 +731,6 @@ $(function(){
 			}),
 			fileURL = URL.createObjectURL(file);
 		
-		console.log(file.name);
 
 		switch(fileType) {
 			case "image":
@@ -900,14 +931,17 @@ $(function(){
                 (htmlText.substring(cursorPosition, cursorPosition + 4)) == "<br>") {
                 var memberslist = thisTextArea.data("memberList");
 
-                for (var memberID in memberslist) {
-                    var memberMugshot = memberslist[memberID].aut || "images/common/others/empty_img_personal.png";
-                    var memberName = memberslist[memberID].nk ;
-                    var re = new RegExp(markText, "gi");
-                    if (memberName && markText && memberName.search(re) >= 0) {
-                        tagElements += "<li id='" + memberID + "'><a><img src='" + memberMugshot + 
-                            "' class='member-mugshot'/>" + memberName + "</a></li>";
-                    }
+                for (var key in memberslist) {
+                	var memberObj = memberslist[key];
+                	if (memberObj.st == 1) {
+                		var memberMugshot = memberObj.aut || "images/common/others/empty_img_personal.png";
+	                    var memberName = memberObj.nk ;
+	                    var re = new RegExp(markText, "gi");
+	                    if (memberName && markText && memberName.search(re) >= 0) {
+	                        tagElements += "<li id='" + key + "'><a><img src='" + memberMugshot + 
+	                            "' class='member-mugshot'/>" + memberName + "</a></li>";
+	                    }
+                	}
                 }
             }
 
@@ -975,9 +1009,15 @@ $(function(){
 
 	//留言送出
 	$(document).on('click','.st-reply-message-send',function(){
-		console.log("reply_send");
-		console.log($(this).data("reply-chk"));
 		var this_event = $(this).parents(".st-sub-box");
+
+		// 檢查可否留言
+		if(!QmiGlobal.method.isSettingAllowed({
+			gi: QmiGlobal.currentGi,
+			tp: 1, // 留言是0
+			eventTp: this_event.data("event-val").meta.tp
+		})) return;
+
 		var text = this_event.find(".st-reply-highlight-container").text();
 		var sticker = this_event.find(".st-reply-message-img").data("type");
 		if(!text && !sticker) return false;
@@ -1467,6 +1507,8 @@ $(function(){
 								initStickerArea.showHistory( dom.parent() );
 							});
 							cns.debug("2");
+						}, function () {
+							target.click();
 						});
 					}
 
@@ -2329,23 +2371,5 @@ $(function(){
 			}
 		}
 	});
-	/*
-              ████████╗███████╗███████╗████████╗          
-              ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝          
-    █████╗       ██║   █████╗  ███████╗   ██║       █████╗
-    ╚════╝       ██║   ██╔══╝  ╚════██║   ██║       ╚════╝
-                 ██║   ███████╗███████║   ██║             
-                 ╚═╝   ╚══════╝╚══════╝   ╚═╝                                               
-	*/
-	
-	$("#page-group-menu .gmi-coachmake").click(function(){
-		var cnt = 0;
-		return function() {
-			cnt++;
-			if(cnt > 5) window.periodicallyReloadFlag = true;
-		}
-	}());
-
-
 
 });  

@@ -64,6 +64,9 @@ QmiGlobal.popup = function(args){
 
 	//取消
 	self.jqHtml.find(".popup-cancel").click(function(){
+		if(args.cancel !== undefined && args.cancelAction !== undefined)
+			args.cancelAction();
+
 		self.jqHtml.remove();
 		self.remove();
 	})
@@ -474,9 +477,14 @@ changePageAfterPopUp = function(page){
 //================================== language ===========================
 
 updateLanguage = function( lanPath ){
+	lanPath = lanPath || lang;
+	var deferred = $.Deferred();
 	$.i18n.load(lanPath, function(){
 		$('body')._i18n();
+		deferred.resolve();
 	});
+
+	return deferred.promise();
 }
 
 
@@ -1494,11 +1502,10 @@ updateGroupAllInfoDom = function( thisGi ){
 			//update name
 			$(".polling-group-name.currentGroup").html(group.gn._escape());
 			$(".polling-group-description.currentGroup").html(htmlFormat(group.gd));
+
+			// 等於當前團體 再做更新ui tab
+    		updateTab( thisGi );
 		}
-		
-		// 等於當前團體 再做更新ui tab
-    	updateTab( thisGi );
-    	
 	} catch(e){
 		errorReport(e);
 	}
@@ -2045,19 +2052,8 @@ clearCache = function(){
 		return true;
 		// alert("clear cache 1 succ");
 	} catch(e){
+		location.reload();
 		cns.debug(e.stack);
-//  		alert(e.stack);
-		// alert("clear cache 1 fail");
-
-  //   	try{
-		// 	var path = require('nw.gui').App.dataPath;
-	 //    	var fs = require('fs');
-		// 	deleteFolderRecursive(fs, path);
-		// 	alert("clear cache 2 succ");
-		// } catch(e){
-		// 	alert(e.stack);
-		// 	alert("clear cache 2 fail");
-		// }
 	}
 	return false;
 }
@@ -2123,7 +2119,6 @@ myWait = function(variable,type){
 
 zipVideoFile = function (videoObj) {
 	var transferBlobDef = $.Deferred();
-
 	try {
 		var ffmpeg = require('fluent-ffmpeg');
 		var fs = require('fs');
@@ -2202,3 +2197,19 @@ function setPolling(ts) {
 	pp.ts.pt = ts;
 	$.lStorage("_pollingData", pp);
 };
+
+function getUnreadUserList(readUserList) {
+	var groupMembers = QmiGlobal.groups[gi].guAll;
+	var readUserIdList = readUserList.map(function(readUser) {
+		return readUser.gu;
+	});
+
+	return Object.keys(groupMembers).reduce(function (unreaderlist, key) {
+		if (key != "undefined" && groupMembers[key].st == 1) {
+			if (readUserIdList.indexOf(key) < 0) {
+				unreaderlist.push({gu: key});
+			} 
+		}
+		return unreaderlist;
+	}, []);
+}

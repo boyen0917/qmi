@@ -61,7 +61,7 @@
 .tabObj-cell-area{
 	width: 100%;
 	height: -webkit-calc( 100% - 121px );
-	overflow-y: auto;
+	/*overflow-y: auto;*/
 	margin-top: 55px;
 	position: fixed;
 	background: white;
@@ -76,7 +76,8 @@
 	height: -webkit-calc( 100% - 57px );
 }
 .tabObj-cell-area.noTitle .obj-cell-page.current{
-	height: -webkit-calc( 100% - 57px );
+	height: -webkit-calc( 100% - 7px );
+	overflow-y: auto;
 }
 
 .tabObj-cell-area .obj-cell{

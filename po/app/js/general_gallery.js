@@ -4,7 +4,6 @@ $(document).ready(function(){
 	cns.debug(ui);
 	cns.debug(list);
 	cns.debug(isLoaded);
-    $.i18n.loadByPath("../lan/" + lang + ".json");
 	
 	if( false==isLoaded){
 		cns.debug("trigger loading from gallary");

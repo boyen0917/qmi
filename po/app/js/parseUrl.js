@@ -1,11 +1,7 @@
 (function(){
 	// parseUrl
-	var require = window.require || null;
     
-    if(require === null) {
-        console.error("非桌機版");
-        return;
-    }
+    if(QmiGlobal.nwGui === null) return
 
 	var request = require('request'),
 		http = require('http'),
