@@ -821,6 +821,7 @@ $(function(){
 
         
     	if (e.keyCode == 8 || e.keyCode == 46) {
+    		console.log("backspace")
     		if (selectedText) {
     	// 		var range = selectionObj.getRangeAt(0);
     	// 		var selectedMarkNodes = getSelectedMarkNodes(range);
@@ -839,13 +840,11 @@ $(function(){
     			if (parentNode.nodeName == "MARK") {
 	            	var markMemberID = $(parentNode).attr("id");
 	                var memberName = $(parentNode).attr("name");
+
 	            	if (cursorPosition > 0 && parentNode.innerHTML == memberName) {
 	            		thisTextArea.get(0).removeChild(parentNode);
 
-		                thisTextArea.data("memberList")[markMemberID] = {
-							nk: memberName,
-							aut: thisTextArea.data("markMembers")[markMemberID].mugshot,
-						};
+		                thisTextArea.data("memberList")[markMemberID] = thisTextArea.data("markMembers")[markMemberID];
 		                delete thisTextArea.data("markMembers")[markMemberID];
 	            	} 
 	            }
@@ -930,7 +929,6 @@ $(function(){
             if ((cursorPosition == htmlText.length) || (htmlText[cursorPosition].match(/\s/g)) ||
                 (htmlText.substring(cursorPosition, cursorPosition + 4)) == "<br>") {
                 var memberslist = thisTextArea.data("memberList");
-
                 for (var key in memberslist) {
                 	var memberObj = memberslist[key];
                 	if (memberObj.st == 1) {
@@ -938,8 +936,8 @@ $(function(){
 	                    var memberName = memberObj.nk ;
 	                    var re = new RegExp(markText, "gi");
 	                    if (memberName && markText && memberName.search(re) >= 0) {
-	                        tagElements += "<li id='" + key + "'><a><img src='" + memberMugshot + 
-	                            "' class='member-mugshot'/>" + memberName + "</a></li>";
+	                        tagElements += "<li id='" + key + "'><img src='" + memberMugshot + 
+	                            "' class='member-mugshot'/>" + memberName + "</li>";
 	                    }
                 	}
                 }
@@ -975,8 +973,9 @@ $(function(){
                     thisTextArea.html(replaceText);
                     thisTextArea.data("markMembers")[memberID] = {
                         id : memberID,
-                        name : memberName,
-                        mugshot: mugshot,
+                        nk : memberName,
+                        aut: mugshot,
+                        st: 1,
                     };
 
                     // 刪除成員列表選單的成員

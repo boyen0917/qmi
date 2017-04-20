@@ -2398,10 +2398,7 @@ composeContentMake = function (compose_title){
                     if (cursorPosition > 0 && parentNode.innerHTML == memberName) {
                         
                         thisTextArea.get(0).removeChild(parentNode);
-                        thisTextArea.data("memberList")[markMemberID] = {
-                            nk: memberName,
-                            aut: thisTextArea.data("markMembers")[markMemberID].mugshot,
-                        };
+                        thisTextArea.data("memberList")[markMemberID] = thisTextArea.data("markMembers")[markMemberID];
                         delete thisTextArea.data("markMembers")[markMemberID];
                     }
                 }
@@ -2459,8 +2456,8 @@ composeContentMake = function (compose_title){
                             var memberName = memberObj.nk ;
                             var re = new RegExp(markText, "gi");
                             if (memberName && markText && memberName.search(re) >= 0) {
-                                tagElements += "<li id='" + key + "'><a><img src='" + memberMugshot + 
-                                    "' class='member-mugshot'/>" + memberName + "</a></li>";
+                                tagElements += "<li id='" + key + "'><img src='" + memberMugshot + 
+                                    "' class='member-mugshot'/>" + memberName + "</li>";
                             }
                         }
                     }
@@ -2496,8 +2493,9 @@ composeContentMake = function (compose_title){
                         thisTextArea.html(replaceText);
                         thisTextArea.data("markMembers")[memberID] = {
                             id : memberID,
-                            name : memberName,
-                            mugshot: mugshot,
+                            nk : memberName,
+                            aut: mugshot,
+                            st: 1,
                         };
 
                         // 刪除成員列表選單的成員
@@ -4427,11 +4425,11 @@ composeSend = function (this_compose){
         for (var tagID in tagMembers) {
             body.ml.push({
                 "u": tagID,
-                "n": tagMembers[tagID].name,
+                "n": tagMembers[tagID].nk,
                 "tp": 21
             });
             composeContent = composeContent.replace('<mark id="' + tagID + '" name="' 
-                + tagMembers[tagID].name + '">' + tagMembers[tagID].name + "</mark>", "///;" 
+                + tagMembers[tagID].nk + '">' + tagMembers[tagID].nk + "</mark>", "///;" 
                 + tagID + ";///");
         }
     
@@ -7146,11 +7144,11 @@ replySend = function(thisEvent){
         for (var tagID in tagMembers) {
             body.ml.push({
                 "u": tagID,
-                "n": tagMembers[tagID].name,
+                "n": tagMembers[tagID].nk,
                 "tp": 21
             });
-            text = text.replace('<mark id="' + tagID + '" name="' + tagMembers[tagID].name + '">' 
-                    + tagMembers[tagID].name + "</mark>", "///;" + tagID + ";///");
+            text = text.replace('<mark id="' + tagID + '" name="' + tagMembers[tagID].nk + '">' 
+                    + tagMembers[tagID].nk + "</mark>", "///;" + tagID + ";///");
         }
     }
 
