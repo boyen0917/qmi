@@ -98,11 +98,14 @@ var initStickerArea= {
 
 	    	stickerSetDom.off("click").on("click", function () {
 
+	    		// 點擊貼圖中心icon的後續動作
 	    		if (clickShopFun) clickShopFun();
+
+	    		// 視窗不是聊天室，就不要在此視窗打開貼圖中心
+	    		if (!window.ci) stickerSetDom.StickerStore();
 	    		// dom.siblings(".st-reply-message-area")
 	    		//    .find("img.st-reply-message-sticker")
 	    		//    .trigger("click");
-	    		stickerSetDom.StickerStore();
 	    	});
 
 	    	thisTmp.splDict = $.lStorage("_sticker") || {};
