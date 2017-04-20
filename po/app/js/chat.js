@@ -392,7 +392,7 @@ $(function(){
 				initStickerArea.init($(".stickerArea"), sendSticker, function() {
 					emojiIcon.click();
 					QmiGlobal.openStickerShopOnMainView();
-
+					window.opener.QmiGlobal.getAppWin().focus();
 				});
 				g_extraInputStatus = 2;
 				$("#footer").animate({bottom: 0}, 'fast');
