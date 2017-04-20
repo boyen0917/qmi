@@ -445,6 +445,11 @@ function openChatWindow ( giTmp, ci ){
 			}
 		}
 
+		windowList[ci].openStickerShop = function () {
+			$.fn.StickerStore();
+			return;
+		}
+
 		//$.lStorage( "_chatAuthData", windowList[ci].chatAuthData );
 		//$.lStorage( "_chatList", windowList[ci].chatList);
 		//$.lStorage("groupci" , JSON.stringify(ci));

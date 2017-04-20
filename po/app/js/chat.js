@@ -60,6 +60,7 @@ $(function(){
 	QmiGlobal.companies = window.chatAuthData.companies;
 	QmiGlobal.companyGiMap = window.chatAuthData.companyGiMap;
 	QmiGlobal.operateChatList = window.chatList;
+	QmiGlobal.openStickerShopOnMainView = window.openStickerShop;
 
 
 	/**
@@ -390,6 +391,8 @@ $(function(){
 				//init sticker area
 				initStickerArea.init($(".stickerArea"), sendSticker, function() {
 					emojiIcon.click();
+					QmiGlobal.openStickerShopOnMainView();
+
 				});
 				g_extraInputStatus = 2;
 				$("#footer").animate({bottom: 0}, 'fast');
