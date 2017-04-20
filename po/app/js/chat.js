@@ -2152,7 +2152,7 @@ function sendMsgText(dom) {
 			};
 		}
 
-		var result = ajaxDo(api_name, headers, method, false, body);
+		var result = ajaxDo(api_name, headers, method, false, body, false, true);
 		result.complete(function (data) {
 			if (data.status != 200) return false;
 

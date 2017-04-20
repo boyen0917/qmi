@@ -1393,7 +1393,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         var mainReplyText;
 
         deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html .st-reply-content-area', function(){
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v1.8.0.0 .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
@@ -1840,7 +1840,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v1.8.0.0 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -6452,7 +6452,7 @@ getS3fileBackground = function(file_obj,target,tp, tu, callback){
              "li":lang,
                  };
     var method = "post";
-    var result = ajaxDo(api_name,headers,method,false, tu);
+    var result = ajaxDo(api_name,headers,method,false, tu, false, true);
     result.complete(function(data){
         if(data.status != 200) return false;
 
@@ -6510,7 +6510,7 @@ getS3fileBackgroundWatermark = function(file_obj,target,tp, text, tu, callback){
              "li":lang,
                  };
     var method = "post";
-    var result = ajaxDo(api_name,headers,method,false,tu);
+    var result = ajaxDo(api_name,headers,method,false,tu, false, true);
     result.complete(function(data){
         if(data.status != 200){
             target.addClass("loadError");
