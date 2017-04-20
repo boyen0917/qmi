@@ -95,10 +95,7 @@ function delUncompleteMark(element, caretPosition) {
                 everUnwrapMark = true;
                 $(markElement.firstChild).unwrap();
 
-                element.data("memberList")[markMemberID] = {
-                    nk: markName,
-                    aut: element.data("markMembers")[markMemberID].mugshot,
-                };
+                element.data("memberList")[markMemberID] = element.data("markMembers")[markMemberID];
                 delete element.data("markMembers")[markMemberID];
             }
         });
