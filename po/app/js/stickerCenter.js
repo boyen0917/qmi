@@ -1,7 +1,10 @@
 $.fn.StickerStore = function () {
-	var stickerStoreView =  new StickerStoreView();
-	stickerStoreView.getLastestPackages();
-	stickerStoreView.getSequence();
+	console.log("QQQ");
+	if ($("#StickerStoreModal").length == 0) {
+		var stickerStoreView =  new StickerStoreView();
+		stickerStoreView.getLastestPackages();
+		stickerStoreView.getSequence();
+	}
 }
 
 function StickerStoreView() {
