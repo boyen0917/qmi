@@ -109,8 +109,8 @@
 }
 
 #StickerStoreModal .sticker-package-block{
-    display: inline-block;
-    width: 335px;
+    /*display: inline-block;*/
+    /*width: 335px;*/
     padding-left: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid rgba(128, 128, 128, 0.6);
