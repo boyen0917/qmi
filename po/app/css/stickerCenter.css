@@ -130,6 +130,7 @@
     margin-top: 8px;
     background-color: rgba(219, 232, 241, 0.42);
     border-radius: 8px;
+    object-fit: contain;
 }
 
 #StickerStoreModal .sticker-package-block p{
@@ -300,7 +301,8 @@
     padding: 4px;
     cursor: pointer;
     vertical-align: top;
-    transition: 0.4s
+    transition: 0.4s;
+    object-fit: contain;
 }
 
 #StickerStoreModal .sticker-img-list img.enlarge{

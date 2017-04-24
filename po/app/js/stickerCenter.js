@@ -502,7 +502,7 @@ StickerPackage.prototype = {
 		stickerBlock.find("progress").css("visibility", "visible");
 
 		var ajaxArgs = {
-			url: base_url + "me/sticker_packages/" + self.packageId,
+			url: base_url + "apiv1/me/sticker_packages/" + self.packageId,
 			
 			headers : {
 				ui : ui,
