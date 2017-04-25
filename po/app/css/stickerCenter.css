@@ -109,8 +109,8 @@
 }
 
 #StickerStoreModal .sticker-package-block{
-    display: inline-block;
-    width: 335px;
+    /*display: inline-block;*/
+    /*width: 335px;*/
     padding-left: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid rgba(128, 128, 128, 0.6);
@@ -130,6 +130,7 @@
     margin-top: 8px;
     background-color: rgba(219, 232, 241, 0.42);
     border-radius: 8px;
+    object-fit: contain;
 }
 
 #StickerStoreModal .sticker-package-block p{
@@ -179,7 +180,7 @@
     min-width: 42px;
     height: 60px;
     background-color: transparent;
-    background-size: 40px 33px;
+    background-size: 40px 40px;
     background-repeat: no-repeat;
 }
 
@@ -300,7 +301,8 @@
     padding: 4px;
     cursor: pointer;
     vertical-align: top;
-    transition: 0.4s
+    transition: 0.4s;
+    object-fit: contain;
 }
 
 #StickerStoreModal .sticker-img-list img.enlarge{

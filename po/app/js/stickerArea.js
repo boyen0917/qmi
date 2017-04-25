@@ -170,7 +170,6 @@ var initStickerArea= {
 	    else thisTmp.load( callbackTmp );
 	},
 	showImg: function(dom, type, dataObj, path){
-		console.log(dataObj)
 		var thisTmp = this;
 		var content = $(dom).find(".mid .group."+type);
 		if( null==content || content.length <= 0 ){
