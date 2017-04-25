@@ -7364,13 +7364,15 @@ fileLoadShow = function(){
             });
         },
 
-        progressBar: function () {
+        progressBar: function (basePct) {
+            basePct = basePct || 0;
             uploadXhr = new window.XMLHttpRequest();
 
             uploadXhr.upload.addEventListener("progress", function(evt){
+                var pctStr = (Math.floor((evt.loaded / evt.total) * (100 - basePct))) + basePct + '%';
                 if (evt.lengthComputable) {
-                    barDom.css("width", Math.floor((evt.loaded / evt.total) * 100) + '%');
-                    percentDom.attr("percent", Math.floor((evt.loaded / evt.total) * 100) + '%');
+                    barDom.css("width", pctStr);
+                    percentDom.attr("percent", pctStr);
                 }
             }, false);
             return uploadXhr;

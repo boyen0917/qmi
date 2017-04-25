@@ -706,6 +706,9 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			zipVideoFile(uploadObj).done(function (uploadFile) {
 				paramObj.s32.file = uploadFile;
 
+				// 壓縮60 上傳40
+				uploadObj.basePct = 60;
+
 				// 傳給外部 commit 使用
 				mt = uploadFile.type;
 				si = uploadFile.size;
@@ -747,7 +750,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 					processData: false,
 				}
 				
-				if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar;
+				if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar.bind(null, uploadObj.basePct);
 				arr[i] = $.ajax(ajaxArgs);
 				return arr;
 			},[]))
@@ -2159,7 +2162,7 @@ zipVideoFile = function (videoObj) {
 	            	// 找出ffmpeg回傳的目前執行的時間，再轉換成秒數，並更新進度條狀態
 	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
 	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
-	                percent = ((seconds / duration) * 50).toFixed();
+	                percent = ((seconds / duration) * 60).toFixed();
 
 	                if (videoObj.updateCompressionProgress) {
 	               	 	videoObj.updateCompressionProgress(percent);
