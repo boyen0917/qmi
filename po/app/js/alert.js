@@ -129,6 +129,7 @@ updateAlert = function(isFromLogin){
 		publicNoticeAjax = new QmiAjax({
 			apiName: "notices",
 			isPublicApi: true,
+			errhide: true,
 			complete: function(data){
 				if(data.status !== 200) return;
 

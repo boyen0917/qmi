@@ -1393,7 +1393,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         var mainReplyText;
 
         deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html .st-reply-content-area', function(){
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v1.8.0.4 .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
@@ -1840,7 +1840,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v1.8.0.4 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -2398,10 +2398,7 @@ composeContentMake = function (compose_title){
                     if (cursorPosition > 0 && parentNode.innerHTML == memberName) {
                         
                         thisTextArea.get(0).removeChild(parentNode);
-                        thisTextArea.data("memberList")[markMemberID] = {
-                            nk: memberName,
-                            aut: thisTextArea.data("markMembers")[markMemberID].mugshot,
-                        };
+                        thisTextArea.data("memberList")[markMemberID] = thisTextArea.data("markMembers")[markMemberID];
                         delete thisTextArea.data("markMembers")[markMemberID];
                     }
                 }
@@ -2459,8 +2456,8 @@ composeContentMake = function (compose_title){
                             var memberName = memberObj.nk ;
                             var re = new RegExp(markText, "gi");
                             if (memberName && markText && memberName.search(re) >= 0) {
-                                tagElements += "<li id='" + key + "'><a><img src='" + memberMugshot + 
-                                    "' class='member-mugshot'/>" + memberName + "</a></li>";
+                                tagElements += "<li id='" + key + "'><img src='" + memberMugshot + 
+                                    "' class='member-mugshot'/>" + memberName + "</li>";
                             }
                         }
                     }
@@ -2496,8 +2493,9 @@ composeContentMake = function (compose_title){
                         thisTextArea.html(replaceText);
                         thisTextArea.data("markMembers")[memberID] = {
                             id : memberID,
-                            name : memberName,
-                            mugshot: mugshot,
+                            nk : memberName,
+                            aut: mugshot,
+                            st: 1,
                         };
 
                         // 刪除成員列表選單的成員
@@ -4427,11 +4425,11 @@ composeSend = function (this_compose){
         for (var tagID in tagMembers) {
             body.ml.push({
                 "u": tagID,
-                "n": tagMembers[tagID].name,
+                "n": tagMembers[tagID].nk,
                 "tp": 21
             });
             composeContent = composeContent.replace('<mark id="' + tagID + '" name="' 
-                + tagMembers[tagID].name + '">' + tagMembers[tagID].name + "</mark>", "///;" 
+                + tagMembers[tagID].nk + '">' + tagMembers[tagID].nk + "</mark>", "///;" 
                 + tagID + ";///");
         }
     
@@ -6452,7 +6450,7 @@ getS3fileBackground = function(file_obj,target,tp, tu, callback){
              "li":lang,
                  };
     var method = "post";
-    var result = ajaxDo(api_name,headers,method,false, tu);
+    var result = ajaxDo(api_name,headers,method,false, tu, false, true);
     result.complete(function(data){
         if(data.status != 200) return false;
 
@@ -6510,7 +6508,7 @@ getS3fileBackgroundWatermark = function(file_obj,target,tp, text, tu, callback){
              "li":lang,
                  };
     var method = "post";
-    var result = ajaxDo(api_name,headers,method,false,tu);
+    var result = ajaxDo(api_name,headers,method,false,tu, false, true);
     result.complete(function(data){
         if(data.status != 200){
             target.addClass("loadError");
@@ -7146,11 +7144,11 @@ replySend = function(thisEvent){
         for (var tagID in tagMembers) {
             body.ml.push({
                 "u": tagID,
-                "n": tagMembers[tagID].name,
+                "n": tagMembers[tagID].nk,
                 "tp": 21
             });
-            text = text.replace('<mark id="' + tagID + '" name="' + tagMembers[tagID].name + '">' 
-                    + tagMembers[tagID].name + "</mark>", "///;" + tagID + ";///");
+            text = text.replace('<mark id="' + tagID + '" name="' + tagMembers[tagID].nk + '">' 
+                    + tagMembers[tagID].nk + "</mark>", "///;" + tagID + ";///");
         }
     }
 
@@ -7366,13 +7364,15 @@ fileLoadShow = function(){
             });
         },
 
-        progressBar: function () {
+        progressBar: function (basePct) {
+            basePct = basePct || 0;
             uploadXhr = new window.XMLHttpRequest();
 
             uploadXhr.upload.addEventListener("progress", function(evt){
+                var pctStr = (Math.floor((evt.loaded / evt.total) * (100 - basePct))) + basePct + '%';
                 if (evt.lengthComputable) {
-                    barDom.css("width", Math.floor((evt.loaded / evt.total) * 100) + '%');
-                    percentDom.attr("percent", Math.floor((evt.loaded / evt.total) * 100) + '%');
+                    barDom.css("width", pctStr);
+                    percentDom.attr("percent", pctStr);
                 }
             }, false);
             return uploadXhr;

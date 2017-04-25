@@ -5802,12 +5802,13 @@ div.tag-members-container ul.tag-list li{
     white-space: nowrap;
     width: 290px;
     text-overflow: ellipsis;
-    height: 50px;
     padding-right: 15px;
     overflow: hidden;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
-div.tag-members-container ul.tag-list a { line-height: 45px;padding-left: 5px;}
+div.tag-members-container ul.tag-list img {padding-left: 5px;}
 
 div.tag-members-container ul.tag-list li:hover{
 	background-color: rgba(106, 163, 241, 0.29);

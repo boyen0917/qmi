@@ -60,6 +60,7 @@ $(function(){
 	QmiGlobal.companies = window.chatAuthData.companies;
 	QmiGlobal.companyGiMap = window.chatAuthData.companyGiMap;
 	QmiGlobal.operateChatList = window.chatList;
+	QmiGlobal.openStickerShopOnMainView = window.openStickerShop;
 
 
 	/**
@@ -390,6 +391,8 @@ $(function(){
 				//init sticker area
 				initStickerArea.init($(".stickerArea"), sendSticker, function() {
 					emojiIcon.click();
+					QmiGlobal.openStickerShopOnMainView();
+					window.opener.QmiGlobal.getAppWin().focus();
 				});
 				g_extraInputStatus = 2;
 				$("#footer").animate({bottom: 0}, 'fast');
@@ -2152,7 +2155,7 @@ function sendMsgText(dom) {
 			};
 		}
 
-		var result = ajaxDo(api_name, headers, method, false, body);
+		var result = ajaxDo(api_name, headers, method, false, body, false, true);
 		result.complete(function (data) {
 			if (data.status != 200) return false;
 

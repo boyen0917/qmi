@@ -1,7 +1,10 @@
 $.fn.StickerStore = function () {
-	var stickerStoreView =  new StickerStoreView();
-	stickerStoreView.getLastestPackages();
-	stickerStoreView.getSequence();
+	console.log("QQQ");
+	if ($("#StickerStoreModal").length == 0) {
+		var stickerStoreView =  new StickerStoreView();
+		stickerStoreView.getLastestPackages();
+		stickerStoreView.getSequence();
+	}
 }
 
 function StickerStoreView() {
@@ -151,6 +154,7 @@ StickerStoreView.prototype = {
 	bindEvent : function (stickerPackage) {
 		var self = this;
     	var stickerBlock = stickerPackage.html;
+    	var dragStartPosY;
 
 		stickerBlock.on("click", function (e) {
 			var target = e.target;
@@ -180,6 +184,7 @@ StickerStoreView.prototype = {
 		});
 
 		stickerBlock[0].addEventListener("dragstart", function(dragEvent) {
+			dragStartPosY = dragEvent.pageY;
 			var dragTarget;
 			if ($(dragEvent.target).hasClass("sticker-package-block")) {
 				dragTarget = $(dragEvent.target);
@@ -188,6 +193,10 @@ StickerStoreView.prototype = {
 			}
 
 			dragEvent.dataTransfer.setData("text", dragTarget.data("spi"));
+		});
+
+		stickerBlock[0].addEventListener("drag", function(event) {
+		    $(".page-home").scrollTop($(".page-home").scrollTop() + (event.pageY - dragStartPosY) - 100);
 		});
 
 		stickerBlock[0].addEventListener("drop", function(dropEvent) {
@@ -270,7 +279,6 @@ StickerStoreView.prototype = {
     	}).then(function (data) {
     		var detailData = $.parseJSON(data.responseText);
     		var stickerListHtml = "";
-    		console.log(sticker.download)
 
     		if (data.status == 200) {
     			stickerDetailView.find(".main-sticker")
@@ -456,7 +464,7 @@ StickerPackage.prototype = {
 		stickerBlock.find("progress").css("visibility", "visible");
 
 		var ajaxArgs = {
-			url: base_url + "sticker_packages/" + self.packageId + "/download",
+			url: base_url + "apiv1/sticker_packages/" + self.packageId + "/download",
 			
 			headers : {
 				ui : ui,
@@ -501,7 +509,7 @@ StickerPackage.prototype = {
 		stickerBlock.find("progress").css("visibility", "visible");
 
 		var ajaxArgs = {
-			url: base_url + "me/sticker_packages/" + self.packageId,
+			url: base_url + "apiv1/me/sticker_packages/" + self.packageId,
 			
 			headers : {
 				ui : ui,
