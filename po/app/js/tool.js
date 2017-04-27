@@ -712,6 +712,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 				var video = document.createElement('video');
 				video.src = URL.createObjectURL(uploadObj.file);
+				console.log(video.duration);
 				video.onloadeddata = function() {
 					md = {l: Math.floor(video.duration * 1000)};
 					mediaLoadDef.resolve();
@@ -2124,68 +2125,93 @@ zipVideoFile = function (videoObj) {
 		var fs = require('fs');
     	var path = require('path');
     	var nwDir = path.dirname(process.execPath); //node webkit 根目錄
-	    var outputPath = nwDir + '/video/outputfile.mp4'; //輸出影片檔案
-	    var command = ffmpeg(videoObj.file.path); 
+	    // var outputPath = nwDir + '/video/outputfile.mp4'; //輸出影片檔案
+	    var command = ffmpeg(videoObj.file.path);
+	    var outputBuffer;
 
     	var duration, //轉檔總時間 
 	    	seconds,　//目前進行的時間
 	       	percent; //轉檔百分比;
 
 	       	zipVideoActionDef = $.Deferred();
+	       	getDurationDef = $.Deferred();
 
-	    if (!fs.existsSync(nwDir + '/video')) {
-	    	fs.mkdirSync(nwDir + '/video');
-		}
 
-		command.setFfmpegPath(nwDir + '/bin/ffmpeg');
 
-	    command.size('640x320')
-	    	.outputOptions('-crf 24')
-	    	.outputOptions('-c:a copy')
-	     	.on('start', function(commandLine) {
-	     		if (videoObj.setAbortFfmpegCmdEvent) {
-	     			videoObj.setAbortFfmpegCmdEvent(command);
-	     		}
-	            console.log('Spawned Ffmpeg with command: ' + commandLine);
-	        })
-	        .on('stderr', function(stderrLine) {
-	        	var match;
-	        	console.log(stderrLine);
-	        	// 找出ffmpeg回傳的duration，再轉換成秒數
-	            if (stderrLine.trim().startsWith('Duration')) {
-	                match = stderrLine.trim().match(/Duration:\s\d\d\:\d\d:\d\d/).toString().split('Duration:').slice(1).toString().split(':');
-	                duration = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
-	            } else if (stderrLine.trim().indexOf('size=') > 0 ) {
-	            	// 找出ffmpeg回傳的目前執行的時間，再轉換成秒數，並更新進度條狀態
-	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
-	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
-	                percent = ((seconds / duration) * 50).toFixed();
+	    command.setFfmpegPath(nwDir + '/bin/ffmpeg');
+	    command.setFfprobePath(nwDir + '/bin/ffprobe');
+	 //    if (!fs.existsSync(nwDir + '/video')) {
+	 //    	fs.mkdirSync(nwDir + '/video');
+		// }
+		
+		command.ffprobe(function(err, inputInfo) {
+			console.log(inputInfo);
+		    getDurationDef.resolve(inputInfo.format.duration);
+		});
 
-	                if (videoObj.updateCompressionProgress) {
-	               	 	videoObj.updateCompressionProgress(percent);
-	                }
-	            }
-	        })
-	        .on('error', function(err, stdout, stderr) {
-	            console.log('Cannot process video ' + err.message);
-	            zipVideoActionDef.reject('Cannot process video: ' + err.message);
-	        })
-	        .on('end', function(stdout) {
-	        	console.log('finish');
-	            zipVideoActionDef.resolve();
-	        }).saveToFile(outputPath);
+		$.when(getDurationDef).done(function(duration) {
+			command.videoCodec('libvpx')
+			  	.audioCodec('libvorbis')
+			  	.duration(duration)
+			  	.size('640x320')
+			  	.outputFormat('webm')
+			  	.on('start', function(commandLine) {
+	     			if (videoObj.setAbortFfmpegCmdEvent) {
+	     				videoObj.setAbortFfmpegCmdEvent(command);
+	     			}
+	            	console.log('Spawned Ffmpeg with command: ' + commandLine);
+	          	})
+			  	.on('stderr', function(stderrLine) {
+			  		var match;
+	        		console.log(stderrLine);
+		        	// 找出ffmpeg回傳的duration，再轉換成秒數
+		            if (stderrLine.trim().startsWith('Duration')) {
+		                match = stderrLine.trim().match(/Duration:\s\d\d\:\d\d:\d\d/).toString().split('Duration:').slice(1).toString().split(':');
+		                duration = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
+		            } else if (stderrLine.trim().indexOf('size=') > 0 ) {
+		            	// 找出ffmpeg回傳的目前執行的時間，再轉換成秒數，並更新進度條狀態
+		                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
+		                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
+		                percent = ((seconds / duration) * 50).toFixed();
 
-	        zipVideoActionDef.done(function () {
-		        fs.readFile(outputPath, function(err, data) {
-		            var byteArray = new Uint8Array(data);
-		            var blob = new Blob([byteArray], {type: 'application/octet-binary'});
-		            blob.name = videoObj.file.name;
-		            transferBlobDef.resolve(blob);
-		        });
-		    }).fail(function (errorMsg) {
-		    	console.log(errorMsg);
-		    });
+		                if (videoObj.updateCompressionProgress) {
+		               	 	videoObj.updateCompressionProgress(percent);
+		                }
+		            }
+			  	})
+			  	.on('error', function(err) {
+			    	console.log('An error occurred: ' + err.message);
+			    	zipVideoActionDef.reject('Cannot process video: ' + err.message);
+			  	})
+			  	.on('end', function() {
+				    console.log('finish');
+			        zipVideoActionDef.resolve();
+			  	})
+			  	.pipe().on('data', function(chunk) { // 輸出串流回來的buffer
+		        	if (outputBuffer === undefined) {
+		        		outputBuffer = chunk;
+		        	} else {
+		        		//  原本的buffer跟新回傳來的buffer 合併merge; 
+		        		var tmp = new Uint8Array(outputBuffer.byteLength + chunk.byteLength);
+		        		tmp.set(new Uint8Array(outputBuffer), 0);
+	  					tmp.set(new Uint8Array(chunk), outputBuffer.byteLength);
+	  					outputBuffer = tmp.buffer;
+		        	}
+	  				console.log('ffmpeg just wrote ' + chunk.length + ' bytes');
+				});
+		});
+
+        zipVideoActionDef.done(function () {
+	        // fs.readFile(outputPath, function(err, data) {
+	        //     var byteArray = new Uint8Array(data);
+            var blob = new Blob([outputBuffer], {type: 'application/octet-binary'});
+            blob.name = videoObj.file.name.split(".")[0] + ".webm";
+            transferBlobDef.resolve(blob);
+	    }).fail(function (errorMsg) {
+	    	console.log(errorMsg);
+	    });
 	} catch (e) {
+		console.log(e);
 		transferBlobDef.reject();
 	}
 	
