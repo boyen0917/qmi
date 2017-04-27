@@ -2080,7 +2080,7 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	this.locateSite = [];
 	this.map = {};
 	this.reporterIndex = 0;
-	var map, allMemberNum, allTargetMember, unreportList = {};
+	var map, allMemberNum, allTargetMember = {}, unreportList = {};
 	var taskFinisherData = thisTimeline.data("taskFinisherData") || [];
 	var memberList = QmiGlobal.groups[gi].guAll;
 	var reporterNum = data[0].meta.tct;
@@ -2167,12 +2167,13 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	    	$.each(taskFinisherData, function (i, taskFinisher) {
 
 	    		var locationData = taskFinisher.ml[0];
-	    		var memberImageUrl = memberList[taskFinisher.meta.gu].aut || "images/common/others/empty_img_personal_l.png";
+	    		var finisherGu = taskFinisher.meta.gu;
+	    		var memberImageUrl = memberList[finisherGu].aut || "images/common/others/empty_img_personal_l.png";
 	    		var finishTime = new Date(taskFinisher.meta.ct);
 	    		var finishTimeFormat = finishTime.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#");
 	    		var liElement = $("<li class='reporter-li'><img src='" + memberImageUrl
 	    			+ "'><div class='finisher-info'><p class='finisher-name'>" 
-	    			+ memberList[taskFinisher.meta.gu].nk + "</p><p class='finish-time'>"
+	    			+ memberList[finisherGu].nk + "</p><p class='finish-time'>"
 	    			+ finishTimeFormat + "</p><p class='locate-address'>" + locationData.a 
 	    			+ "</p></div></li>");
 
@@ -2197,7 +2198,11 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 
 	    		this.container.find(".reporter-list").append(liElement);
 
-	    		delete allTargetMember[taskFinisher.meta.gu];
+	    		if (allTargetMember.constructor == Array) {
+	    			allTargetMember.splice(allTargetMember.indexOf(finisherGu), 1);
+	    		} else {
+	    			delete allTargetMember[finisherGu];
+	    		}
 	    	}.bind(this));
 
 	    	this.map.setCenter(this.locateSite[0].getPosition());
