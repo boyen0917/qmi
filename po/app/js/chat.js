@@ -2176,13 +2176,13 @@ function sendMsgText(dom) {
 						});
 
 						//小圖
-						img.attr("src", picUrl);
+						img.attr("src", obj.s3);
 						
 						//點擊跳出大圖
 						img.click(function () {
 							new QmiGlobal.gallery({
 					            gi: gi,
-					            photoList: [{s32: picUrl}],
+					            photoList: [{s32: obj.s32}],
 					            currentImage : 0
 					        });
 						});
