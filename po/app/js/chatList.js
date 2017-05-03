@@ -385,7 +385,7 @@ function openChatWindow ( giTmp, ci ){
 		if($.lStorage("groupChat")){
 			windowList[ci] = window.open("", ci , "width=400, height=600");
 		}else{
-			windowList[ci] = window.open("chat.html?v1.8.0.4", ci , "width=400, height=600");
+			windowList[ci] = window.open("chat.html?v1.8.0.5", ci , "width=400, height=600");
 		}
 		
 		windowList[ci].chatAuthData = {
