@@ -2216,3 +2216,18 @@ function getUnreadUserList(readUserList) {
 		return unreaderlist;
 	}, []);
 }
+
+function riseNotification (icon, title, description, onClickCallback) {
+	try{
+		var notification = new window.Notification(title, {
+			body: description,
+			icon: icon === undefined? "resource/images/default.png": icon
+		});
+		if (onClickCallback === undefined){
+		}else{
+			notification.addEventListener("click", onClickCallback);
+		}
+	}catch(e){
+		console.log("Notification doesn't be supported.");
+	}
+}
