@@ -4407,7 +4407,6 @@ composeSend = function (this_compose){
     var tagMembers = this_compose.find(".cp-content-highlight").data("markMembers");
     var ml = this_compose.data("message-list").unique();
     var tmpElement = document.createElement("div");
-
     var body = {
             meta : {
                 lv : 1,
@@ -4436,18 +4435,6 @@ composeSend = function (this_compose){
     }
 
     tmpElement.innerHTML = composeContent;
-
-    //浮水印
-    var isApplyWatermark = false;
-    if(this_compose.data("cp-watermark")){
-        isApplyWatermark = true;
-
-        var ml_obj = {
-            wm : 1,
-            tp : 27
-        }
-        body.ml.push(ml_obj);
-    }
 
     //任務 投票之類的 因為是可預測的 又是單一的ml 就在這邊處理
     switch(ctp){
@@ -4683,6 +4670,16 @@ composeSend = function (this_compose){
             // 圖檔
             case 6:
                 is_push = false;
+
+                //浮水印
+                if(this_compose.data("cp-watermark")){
+                    var ml_obj = {
+                        wm: 1,
+                        ar: -1,
+                        tp: 27
+                    }
+                    body.ml.push(ml_obj);
+                }
 
                 Object.keys(this_compose.data("upload-obj") || {}).forEach(function(key) {
                     uploadTotalCnt++;
