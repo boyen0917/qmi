@@ -35,6 +35,9 @@ var base_url = function() {
 	}
 }();
 
+var base_url = "https://qmi17.mitake.com.tw/";
+
+
 // 先檢查是否為桌機版
 var nwGui = function() {
 	try {
@@ -44,7 +47,6 @@ var nwGui = function() {
 		return null;
 	};
 }();
-
 
 window.QmiGlobal = {
 
@@ -1152,6 +1154,16 @@ MyDeferred = function() {
   myPromise.reject = myReject;
   return myPromise;
 }
+
+// 選擇server
+$(document).on("click", "#container_version", function() {
+	var cnts = 0;
+	return function() {
+		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
+		cnts++;
+		if(cnts < 5) return;
+		QmiGlobal.module.serverSelector.init();
+}}());
 
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){
