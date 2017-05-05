@@ -2086,18 +2086,18 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	var reporterNum = data[0].meta.tct;
 	var reporterIndex = 0;
 	var slideWidth, slideHeight, sliderUlWidth;
-
 	// 查看這篇文章是否有發布對象，沒有就代入團體所有人人數
 	(function () {
 		if (data[0].meta.tu && data[0].meta.tu.gul) {
 			allMemberNum = data[0].meta.tu.gul.length;
-			allTargetMember = data[0].meta.tu.gul;
-		}
-		else {
+			allTargetMember = data[0].meta.tu.gul.concat();
+		} else {
 			allMemberNum = QmiGlobal.groups[gi].cnt;
 			allTargetMember = Object.assign({}, QmiGlobal.groups[gi].guAll);
 		}
 	})()
+
+	console.log(allMemberNum);
 	
 	this.container =  $("<div id='memberLocateModal' style='display:none;'>" + 
 							"<div class='return-block'>" +
@@ -2274,7 +2274,8 @@ QmiGlobal.MemberLocateModal.prototype = {
 	},
 
 	switchView : function (e) {
-		var target = $(e.target);
+		var target = $(e.delegateTarget);
+		
 		if (! target.hasClass("active")) {
 			this.container.find(".tab-option").removeClass("active");
 			target.addClass("active"); 

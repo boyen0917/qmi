@@ -6411,6 +6411,7 @@ img.vdo-default:before {}
     height: 85px;
     vertical-align: top;
     cursor: pointer;
+    object-fit: cover;
 }
 
 #memberLocateModal .reporter-li p{
@@ -6497,6 +6498,7 @@ img.vdo-default:before {}
     vertical-align: middle;
     overflow-y: auto;
     cursor: pointer;
+    object-fit: cover;
 }
 
 #memberLocateModal div.unfinisher-name {
