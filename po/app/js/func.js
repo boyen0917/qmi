@@ -1346,6 +1346,10 @@ eventContentDetail = function(this_event,e_data){
          }
          break;
      case 5:
+            this_event.find(".st-task-locate-detail").show();
+            this_event.find(".st-locate-status").off("click").on("click", function (e) {
+                new QmiGlobal.MemberLocateModal(e_data, this_event);
+            });
          break;
      case 6:
          break;
@@ -1365,12 +1369,16 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
 
     var this_gi = this_event.data("event-id").split("_")[0];
     var this_ei = this_event.data("event-id");
-
+    
 
     //event 自己的閱讀回覆讚好狀態
     var event_status = this_event.data("event-status");
 
     var deferTasks = [];
+
+    // 存完成定位的成員
+    var taskFinisherData = [];
+
 
     //event path
     this_event.data("event-path",this_ei);
@@ -1386,7 +1394,6 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         // if(el_i == 0) return ;
 
         var deferred = $.Deferred();
-
         var without_message = false;
         var reply_content;
         var ml_arr = [];
@@ -1493,8 +1500,56 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
 
                         return false;
                         break;
+                    case 17:
+                        var reportedNumber = el.meta.tct;
+                        this_event.find(".st-locate-status").show();
+                        this_event.find(".location-reported-number").html(reportedNumber);
+                        if (targetTu.tu) {
+                            this_event.find(".all-number").html(targetTu.tu.gul.length);
+                        } else {
+                            this_event.find(".all-number").html(QmiGlobal.groups[gi].cnt);
+                        }
+                        break;
                     case 18:
                         without_message = true;
+                        this_event.find(".my-report-address").html(val.a);
+                        try {
+                            this_event.find(".st-google-map").show();
+                            this_event.find(".st-google-map").tinyMap({
+                                 center: {x: val.lat, y: val.lng},
+                                 zoomControl: 0,
+                                 mapTypeControl: 0,
+                                 scaleControl: 0,
+                                 scrollwheel: 0,
+                                 zoom: 16,
+                                 marker: [
+                                     {addr: [val.lat, val.lng], text: val.a}
+                                 ]
+                            });
+                            
+                        } catch(e) {
+                            var amapNumber = "amap-" + new Date().getRandomString();
+                            this_event.find(".st-google-map").hide();
+                            this_event.find(".st-gausai-map").show().attr("id",amapNumber);
+                            var mapObj = new AMap.Map(amapNumber,{
+                                rotateEnable:false,
+                                dragEnable:true,
+                                zoomEnable:false,
+                                //二维地图显示视口
+                                view: new AMap.View2D({
+                                    center:new AMap.LngLat(val.lng,val.lat),//地图中心点
+                                    zoom:15 //地图显示的缩放级别
+                                })
+                            });
+
+                            var marker=new AMap.Marker({                    
+                                position:new AMap.LngLat(val.lng,val.lat)  
+                            });  
+                            marker.setMap(mapObj);
+                        }
+                        
+                        taskFinisherData.push(el);
+
                         break;
                     case 21:
                         if (typeof(mainReplyText) == 'string' && mainReplyText) {
@@ -1647,6 +1702,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         
     });
 
+    this_event.data("taskFinisherData", taskFinisherData);
     $.when.apply($, deferTasks).then(function () {
         if(triggerDetailBox !== undefined) triggerDetailBox.data("trigger", true);
     });
@@ -1680,8 +1736,8 @@ timelineDetailClose = function (this_event,tp, triggerDetailBox){
         case 5:
             //bottom_block = true;
             detail_data = ".st-box2-more-task-area";
-            this_event.find(detail_data).toggle();
-            this_event.find(detail_data + "-detail").toggle();
+            // this_event.find(detail_data).toggle();
+            // this_event.find(detail_data + "-detail").toggle();
             break;
     }
 
@@ -5532,11 +5588,11 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
                 category = $.i18n.getString("FEED_LOCATION");
                 title = $.i18n.getString("FEED_LOCATION");
                 //任務狀態
-                this_event.find(".st-box2-more-task-area").hide();
+                this_event.find(".st-box2-more-task-area").show();
                 this_event.find(".st-box2-more-time").show();
                 this_event.find(".st-task-status-area").show();
                 //任務預設的文字
-                this_event.find(".st-task-status").html( $.i18n.getString("COMMON_CONSTRUCTION") ); //FEED_NOT_REPORTED
+                this_event.find(".st-task-status").html( $.i18n.getString("FEED_NOT_REPORTED") ); //FEED_NOT_REPORTED
                 break;
         };
 
@@ -6147,11 +6203,13 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
                 var d = new Date();
                 if(val.e < d.getTime()){
-                    this_event.find(".st-task-status").html( $.i18n.getString("FEED_CLOSED") ); //"已結束");
-                    this_event.find(".st-vote-send").html( $.i18n.getString("FEED_CLOSED") ); //"已結束");
+                    this_event.find(".st-task-status").html( $.i18n.getString("FEED_CLOSED") ); //"已結束";
+                    this_event.find(".st-vote-send").html( $.i18n.getString("FEED_CLOSED") ); //"已結束";
+                    // this_event.find(".st-location-send").html( $.i18n.getString("FEED_CLOSED") ); //"已結束";
                     this_event.data("task-over",true);
                 }else{
-                    this_event.find(".st-vote-send").html( $.i18n.getString("COMMON_SUBMIT") ); //"已結束"    
+                    this_event.find(".st-vote-send").html( $.i18n.getString("COMMON_SUBMIT") ); //"送出" 
+                    // this_event.find(".st-location-send").html( $.i18n.getString("COMMON_SUBMIT") ); //"送出"
                 }
             }else{
                 var time_format = $.i18n.getString("FEED_CLOSE_TIME_NO_LIMIT"); //"無結束時間";

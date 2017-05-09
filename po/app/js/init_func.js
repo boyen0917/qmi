@@ -78,9 +78,14 @@ $(function(){
                 }
 
                 getGroupAllMembers(thisGi).done(function(groupMemberList) {
+                    console.log(thisGi);
+                    console.log(groupMemberList.length);
                     comboData.ul = groupMemberList;
                     groupData.guAll = {};
-                    if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
+                    if (comboData.fl) {
+                        comboData.ul = comboData.ul.concat(comboData.fl);
+                        console.log(comboData.fl);
+                    }
 
                     comboData.ul.sort(function (a, b) {
                         if (a.nk < b.nk) return -1;
@@ -89,16 +94,16 @@ $(function(){
                     });
 
                     // 製作guAll hash-map & inviteGuAll
-                    for( var key in comboData.ul ){
-                        var thisGuObj = comboData.ul[key];
+                    comboData.ul.forEach(function(user) {
                         //用在contact.js 不知道為何
-                        if( thisGuObj.st === 0) inviteGuAll[thisGuObj.gu] = thisGuObj;
+                        if( user.st === 0) inviteGuAll[user.gu] = user;
 
-                        if(thisGuObj.nk !== undefined)
-                            thisGuObj.nk = thisGuObj.nk._escape();
+                        if(user.nk !== undefined)
+                            user.nk = user.nk._escape();
 
-                        groupData.guAll[thisGuObj.gu] = thisGuObj;
-                    }
+                        groupData.guAll[user.gu] = user;
+                    });
+
                     groupData.inviteGuAll = inviteGuAll;
 
                     //官方帳號設定
@@ -176,19 +181,20 @@ $(function(){
             nextUserId = nextUserId || "";
             var ajaxData = {
                 apiName: "groups/" + thisGi + "/users",
-                apiVer: "apiv2",
+                apiVer: "apiv1",
             }
             if (nextUserId != "") ajaxData.apiName = ajaxData.apiName + "?gu=" + nextUserId;
 
             new QmiAjax(ajaxData).success(function(data) {
-                if (Array.isArray(data.ul) && data.ul.length > 0) {
+                // if (Array.isArray(data.ul) && data.ul.length > 0) {
                     userList = userList.concat(data.ul);
-                    nextUserId = data.ul[data.ul.length - 1].gu;
-                    getMembers(nextUserId)
-                } else {
+                    // nextUserId = data.ul[data.ul.length - 1].gu;
+                    // getMembers(nextUserId)
+                // } else {
                     getMemberListDef.resolve(userList);
-                }
+                // }
             }).fail(function() {
+                console.log("憨慢啦~")
                 getMemberListDef.reject();
             });
         };

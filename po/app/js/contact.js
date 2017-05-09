@@ -567,6 +567,8 @@ showAllMemberPage = function(gn) {
 	var memListContainer = generateMemberList(sortedMemIdList);
 	subGridPageContent.html(memContainer);
 	subRowPageContent.html(memListContainer);
+	// subGridPageContent.append("<div class='bottom'><img src='images/st_bottom_loading.gif'></div>");
+	// subRowPageContent.append("<div class='bottom'><img src='images/st_bottom_loading.gif'></div>");
 
 	if( isList ){
 		title.find(".btn").addClass("list");
@@ -614,14 +616,14 @@ switchListAndGrid = function( dom, subPageBottom, memberKeyList){
 	var mem = subPageBottom.find(".contact-mems");
 	var memList = subPageBottom.find(".contact-memLists");
 	if( isList ){
-		mem.fadeOut('fast', function(){
+		mem.hide('fast', function(){
 			memList.show(0);
 		});
 		dom.addClass("list");
 		setOnMemListScroll(memberKeyList, subPageBottom);
 		updateNewMemTag( memList );
 	} else {
-		memList.fadeOut('fast', function(){
+		memList.hide('fast', function(){
 			mem.show(0);
 		});
 		dom.removeClass("list");
