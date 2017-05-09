@@ -358,6 +358,12 @@
 	overflow-y: auto;
 }
 
+.subpage-contact .loading-circle {
+	text-align: center;
+	padding: 5px 0px;
+	display: none;
+}
+
 .contact-scroll::-webkit-scrollbar-track{
 	background-color: transparent;
 }

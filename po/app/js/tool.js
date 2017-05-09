@@ -2308,6 +2308,7 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	        });
 	    }
 
+	    console.log()
 	    if (taskFinisherData.length > 0) {
 	    	var slideCount = taskFinisherData.length;
 
@@ -2375,13 +2376,14 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 	    	this.container.find(".reporter-list").hide();
 	    	this.map.setZoom(7);
 	    }
-	    this.unreportList = Object.keys(allTargetMember);
 
 	    // 成員列表如是陣列，轉成object的格式，gu當key
 	    if (allTargetMember.constructor == Array) {
 	    	$.each(allTargetMember, function(i, targetMember) {
 	    		this.unreportList.push(targetMember.gu);
-	    	});
+	    	}.bind(this));
+	    } else {
+	    	this.unreportList = Object.keys(allTargetMember);
 	    }
 
 	    this.makeUnfinishUserRows();
@@ -2417,7 +2419,6 @@ QmiGlobal.MemberLocateModal.prototype = {
 		var target =  e.target;
 		var sliderList = this.container.find(".reporter-list");
 		var reporterNum = sliderList.find("li").length;
-		var circle;
 		
 		if (target.classList[0] == "left-arrow") {
 			sliderList.animate({
@@ -2449,8 +2450,10 @@ QmiGlobal.MemberLocateModal.prototype = {
 			loadMemberList = [];
 
 		if (loadMemberNum + 500 > this.unreportList.length) {
+			this.container.find(".bottom").hide();
 			loadMemberList = this.unreportList.slice(loadMemberNum);
 		} else {
+		    this.container.find(".bottom").show();
 			loadMemberList = this.unreportList.slice(loadMemberNum, loadMemberNum + 500)
 		}
 
@@ -2478,38 +2481,10 @@ QmiGlobal.MemberLocateModal.prototype = {
 		var loadMemberNum = container.find("li").length;
 		if (container.scrollTop() + container.height() >= container[0].scrollHeight - 20) {
 		    if (loadMemberNum < this.unreportList.length) {
-		    	this.container.find(".bottom").show();
 		    	setTimeout(function(){
 					this.makeUnfinishUserRows();
-				}.bind(this), 300);
-		    } else {
-				this.container.find(".bottom").hide();
-		    }
+				}.bind(this), 500);
+		    } 
 		}
-		// var unfinishUserList = this.container.find(".unreporter-list");
-		// 	loadMemberNum = unfinishUserList.find("li").length;
-
-		// // 未定位成員畫面製作
-	 //    if (Object.keys(this.unreportList).length > 0) {
-	    	// for (var memberID in this.unreportList) {
-	    	// 	if (typeof(this.unreportList[memberID]) === 'object' 
-	    	// 			&& this.unreportList[memberID].st == 1 && index < 200) {
-
-	    	// 		var memberImageUrl = this.unreportList[memberID].aut || "images/common/others/empty_img_personal_l.png";
-		    // 		var liElement = $("<li class='unreporter-li'><img src='" + memberImageUrl
-		    // 			+ "'><div class='unfinisher-name'>" + this.unreportList[memberID].nk
-		    // 			+ "</div></li>");
-		    // 		liElement.attr("data-gu", memberID);
-	    	// 		// 點擊頭像跳出個人主頁視窗
-		    // 		liElement.find("img").off("click").on("click", function(e) {
-		    // 			var target = $(e.target);
-		    // 			userInfoShow(gi, target.parent().attr("data-gu"));
-		    // 		});
-
-		    // 		unfinishUserList.append(liElement);
-
-		    // 		index++;
-	    	// 	}
-	    	// }
 	}
 }

@@ -6308,6 +6308,7 @@ img.vdo-default:before {}
 #memberLocateModal .unreporter-list .bottom {
 	text-align: center;
 	padding: 5px 0px;
+	display: none;
 }
 
 /**************************************************************************  Swtich 開關按鈕 ***********************************************************************************/

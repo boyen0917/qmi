@@ -181,20 +181,20 @@ $(function(){
             nextUserId = nextUserId || "";
             var ajaxData = {
                 apiName: "groups/" + thisGi + "/users",
-                apiVer: "apiv1",
+                apiVer: "apiv2",
             }
             if (nextUserId != "") ajaxData.apiName = ajaxData.apiName + "?gu=" + nextUserId;
 
             new QmiAjax(ajaxData).success(function(data) {
-                // if (Array.isArray(data.ul) && data.ul.length > 0) {
+                if (Array.isArray(data.ul) && data.ul.length > 0) {
                     userList = userList.concat(data.ul);
-                    // nextUserId = data.ul[data.ul.length - 1].gu;
-                    // getMembers(nextUserId)
-                // } else {
+                    nextUserId = data.ul[data.ul.length - 1].gu;
+                    getMembers(nextUserId)
+                } else {
                     getMemberListDef.resolve(userList);
-                // }
+                }
             }).fail(function() {
-                console.log("憨慢啦~")
+                getMembers(nextUserId);
                 getMemberListDef.reject();
             });
         };
