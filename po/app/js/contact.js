@@ -554,7 +554,7 @@ showAllMemberPage = function(gn) {
 
 	//mem-title
 	var subTitle = $("<div class='contact-mems-title'></div>");
-	var subGridPageContent = $("<div class='contact-mems'></div>");
+	var subGridPageContent = $("<div class='contact-mems'><div class='bottom'><img src='images/st_bottom_loading.gif'></div></div>");
 	var subRowPageContent = $("<div class='contact-memLists'></div>");
 	subTitle.append( '<div class="count">'+0+'</div>');
 	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
@@ -565,7 +565,7 @@ showAllMemberPage = function(gn) {
 	var count = Object.keys(guAllExsit).length;
 	var memContainer = generateMemberGrid(sortedMemIdList);
 	var memListContainer = generateMemberList(sortedMemIdList);
-	subGridPageContent.html(memContainer);
+	subGridPageContent.find(".bottom").before(memContainer);
 	subRowPageContent.html(memListContainer);
 	// subGridPageContent.append("<div class='bottom'><img src='images/st_bottom_loading.gif'></div>");
 	// subRowPageContent.append("<div class='bottom'><img src='images/st_bottom_loading.gif'></div>");
