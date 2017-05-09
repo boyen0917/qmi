@@ -2153,70 +2153,54 @@ zipVideoFile = function (videoObj) {
 
 		$.when(getDurationDef).done(function(duration) {
 			command.videoCodec('libvpx')
-			  	.audioCodec('libvorbis')
-			  	.duration(duration)
-			  	.size('640x320')
-			  	.outputFormat('webm')
-			  	.on('start', function(commandLine) {
-	     			if (videoObj.setAbortFfmpegCmdEvent) {
-	     				videoObj.setAbortFfmpegCmdEvent(command);
-	     			}
-	            	console.log('Spawned Ffmpeg with command: ' + commandLine);
-	          	})
-			  	.on('stderr', function(stderrLine) {
-			  		var match;
-	        		console.log(stderrLine);
-		        	// 找出ffmpeg回傳的duration，再轉換成秒數
-		            if (stderrLine.trim().startsWith('Duration')) {
-		                match = stderrLine.trim().match(/Duration:\s\d\d\:\d\d:\d\d/).toString().split('Duration:').slice(1).toString().split(':');
-		                duration = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
-		            } else if (stderrLine.trim().indexOf('size=') > 0 ) {
-		            	// 找出ffmpeg回傳的目前執行的時間，再轉換成秒數，並更新進度條狀態
-		                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
-		                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
-		                percent = ((seconds / duration) * 50).toFixed();
+		  	.audioCodec('libvorbis')
+		  	.duration(duration).size('640x320')
+		  	.outputFormat('webm')
+		  	.on('start', function(commandLine) {
+     			if (videoObj.setAbortFfmpegCmdEvent)
+     				videoObj.setAbortFfmpegCmdEvent(command);
+          	}).on('stderr', function(stderrLine) {
+		  		var match;
+	        	// 找出ffmpeg回傳的duration，再轉換成秒數
+	            if (stderrLine.trim().startsWith('Duration')) {
+	                match = stderrLine.trim().match(/Duration:\s\d\d\:\d\d:\d\d/).toString().split('Duration:').slice(1).toString().split(':');
+	                duration = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
+	            } else if (stderrLine.trim().indexOf('size=') > 0 ) {
+	            	// 找出ffmpeg回傳的目前執行的時間，再轉換成秒數，並更新進度條狀態
+	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
+	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
+	                percent = ((seconds / duration) * 50).toFixed();
 
-		                if (videoObj.updateCompressionProgress) {
-		               	 	videoObj.updateCompressionProgress(percent);
-		                }
-		            }
-			  	})
-			  	.on('error', function(err) {
-			    	console.log('An error occurred: ' + err.message);
-			    	zipVideoActionDef.reject('Cannot process video: ' + err.message);
-			  	})
-			  	.on('end', function() {
-				    console.log('finish');
-			        zipVideoActionDef.resolve();
-			  	})
-			  	.pipe().on('data', function(chunk) { // 輸出串流回來的buffer
-			  		window.ab = window.ab || [];
-			  		window.ab.push(chunk);
-		        	if (outputBuffer === undefined) {
-		        		outputBuffer = chunk;
-		        		
-		        	} else {
+	                if (videoObj.updateCompressionProgress)
+	               	 	videoObj.updateCompressionProgress(percent);
+	            }
+		  	}).on('error', function(err) {
+		    	zipVideoActionDef.reject('Cannot process video: ' + err.message);
 
-		        		// new Uint8Array(outputBuffer)
-		        		//  原本的buffer跟新回傳來的buffer 合併merge;
-		        		// var currInt8Arr = new Uint8Array(chunk);
-		        		window.qq = outputBuffer;
+		  	}).on('end', zipVideoActionDef.resolve)
 
+		  	.pipe().on('data', function(chunk) { // 輸出串流回來的buffer
+	        	if (outputBuffer === undefined) {
+	        		outputBuffer = chunk;
+	        	} else {
+	        		// new Uint8Array(outputBuffer)
+	        		//  原本的buffer跟新回傳來的buffer 合併merge;
+	        		var prevInt8Arr = new Uint8Array(outputBuffer);
+	        		var currInt8Arr = new Uint8Array(chunk);
+	        		var totalByteLength = prevInt8Arr.byteLength + currInt8Arr.byteLength;
+	        		var totalInt8Arr = new Uint8Array(totalByteLength);
+	        		totalInt8Arr.set(prevInt8Arr, 0);
+	        		totalInt8Arr.set(currInt8Arr, prevInt8Arr.byteLength);
 
-
-		        		var tmp = new Uint8Array(outputBuffer.byteLength + chunk.byteLength);
-		        		tmp.set(outputBuffer, 0);
-	  					tmp.set(new Uint8Array(chunk), outputBuffer.byteLength);
-	  					outputBuffer = tmp.buffer;
-		        	}
-	  				console.log('ffmpeg just wrote ' + chunk.length + ' bytes');
-				});
+	        		outputBuffer = totalInt8Arr;
+	        	}
+			});
 		});
 
         zipVideoActionDef.done(function () {
 	        // fs.readFile(outputPath, function(err, data) {
 	        //     var byteArray = new Uint8Array(data);
-            var blob = new Blob([outputBuffer], {type: 'application/octet-binary'});
+            var blob = new Blob([outputBuffer.buffer], {type: 'application/octet-binary'});
             blob.name = videoObj.file.name.split(".")[0] + ".webm";
             transferBlobDef.resolve(blob);
 	    }).fail(function (errorMsg) {
