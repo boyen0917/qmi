@@ -1402,7 +1402,7 @@ function showMsg(object, bIsTmpSend) {
 
 				chatFailContainer.find(".chat-resend").click(function (e) {
 					e.stopPropagation();
-					// chatFailContainer.hide();
+					chatFailContainer.hide();
 					sendChat(container);
 				});
 
