@@ -1507,7 +1507,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                         if (targetTu.tu) {
                             this_event.find(".all-number").html(targetTu.tu.gul.length);
                         } else {
-                            this_event.find(".all-number").html(QmiGlobal.groups[gi].cnt);
+                            this_event.find(".all-number").html(QmiGlobal.groups[this_gi].cnt);
                         }
                         break;
                     case 18:
@@ -3819,7 +3819,7 @@ timelineShowResponseLikeDelegate = function( this_event, type, onDone ){
 showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
     var page = $("#page-tab-object");
     if( null== isShowNamecard ) isShowNamecard = true;
-
+    
     //title
     page.find(".header-cp-object").html(title ? title : "");
 

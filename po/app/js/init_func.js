@@ -82,10 +82,7 @@ $(function(){
                     console.log(groupMemberList.length);
                     comboData.ul = groupMemberList;
                     groupData.guAll = {};
-                    if (comboData.fl) {
-                        comboData.ul = comboData.ul.concat(comboData.fl);
-                        console.log(comboData.fl);
-                    }
+                    if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
 
                     comboData.ul.sort(function (a, b) {
                         if (a.nk < b.nk) return -1;
@@ -182,19 +179,21 @@ $(function(){
             var ajaxData = {
                 apiName: "groups/" + thisGi + "/users",
                 apiVer: "apiv2",
+                // data : {
+                //     tp:1
+                // }
             }
             if (nextUserId != "") ajaxData.apiName = ajaxData.apiName + "?gu=" + nextUserId;
 
             new QmiAjax(ajaxData).success(function(data) {
-                if (Array.isArray(data.ul) && data.ul.length > 0) {
-                    userList = userList.concat(data.ul);
+                userList = userList.concat(data.ul);
+                if (Array.isArray(data.ul) && data.ul.length == 1000) {
                     nextUserId = data.ul[data.ul.length - 1].gu;
-                    getMembers(nextUserId)
+                    getMembers(nextUserId);
                 } else {
                     getMemberListDef.resolve(userList);
                 }
             }).fail(function() {
-                getMembers(nextUserId);
                 getMemberListDef.reject();
             });
         };

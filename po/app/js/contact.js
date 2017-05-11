@@ -610,7 +610,6 @@ sortMembers = function (memberIdList) {
 }
 
 switchListAndGrid = function( dom, subPageBottom, memberKeyList){
-	console.log(subPageBottom);
 	isList = !isList;
 	var userData = QmiGlobal.groups;
 	userData.isMemberShowList = isList;
@@ -618,15 +617,15 @@ switchListAndGrid = function( dom, subPageBottom, memberKeyList){
 
 	var mem = subPageBottom.find(".contact-mems");
 	var memList = subPageBottom.find(".contact-memLists");
-	if( isList ){
-		mem.hide('fast', function(){
+	if( isList ) {
+		mem.fadeOut('fast', function(){
 			memList.show(0);
 		});
 		dom.addClass("list");
 		setOnMemListScroll(memberKeyList, subPageBottom);
 		updateNewMemTag( memList );
 	} else {
-		memList.hide('fast', function(){
+		memList.fadeOut('fast', function(){
 			mem.show(0);
 		});
 		dom.removeClass("list");
@@ -640,16 +639,16 @@ generateMemberGrid = function( memberKeyList, memContainer ){
 	var memObject = guAllExsit;
 	var memberListHtml = "";
 	var memberIndex = memContainer.find(".contact-mems").data("memberIndex") || 0,
-		endMemberIndex = memberIndex + 30;
+		endMemberIndex = memberIndex + 500;
 
 	try{
 		if (endMemberIndex > memberKeyList.length - 1) {
 			var loadMemberList = memberKeyList.slice(memberIndex);
 			endMemberIndex = memberKeyList.length;
-			memContainer.find(".loading-circle").hide();
+			memContainer.find(".contact-mems .loading-circle").hide();
 		} else {
 			var loadMemberList = memberKeyList.slice(memberIndex, endMemberIndex);
-			memContainer.find(".loading-circle").show();
+			memContainer.find(".contact-mems .loading-circle").show();
 		}
 		memberListHtml = loadMemberList.reduce(function(memberHtml, memberId) {
 			var memberData = memObject[memberId];
@@ -684,16 +683,16 @@ generateMemberList = function( memberKeyList, memContainer, favCallback ){
 	var memObject = guAllExsit;
 	var memberListHtml = "";
 	var memberIndex = memContainer.find('.contact-memLists').data("memberIndex") || 0,
-		endMemberIndex = memberIndex + 30;
+		endMemberIndex = memberIndex + 500;
 	var count = 0;
 	try{
 		if (endMemberIndex > memberKeyList.length - 1) {
 			var loadMemberList = memberKeyList.slice(memberIndex);
 			endMemberIndex = memberKeyList.length;
-			memContainer.find(".loading-circle").hide();
+			memContainer.find(".contact-memLists .loading-circle").hide();
 		} else {
 			var loadMemberList = memberKeyList.slice(memberIndex, endMemberIndex);
-			memContainer.find(".loading-circle").show();
+			memContainer.find(".contact-memLists .loading-circle").show();
 		}
 
 		memberListHtml = loadMemberList.reduce(function(memberHtml, memberId) {
@@ -745,7 +744,7 @@ setOnMemGridScroll = function (memberKeyList, memContainer){
 	memContainer.unbind("scroll").scroll(function() {
 		console.log("grid");
 		var memberIndex = memContainer.find(".contact-mems").data("memberIndex");
-		if ($(this).scrollTop() + $(this).height() >= $(this)[0].scrollHeight) {
+		if ($(this).scrollTop() + $(this).height() >= $(this)[0].scrollHeight - 100) {
 			if (memberIndex <= memberKeyList.length - 1) {
 				setTimeout(function() {
 					memContainer.find(".contact-mems .loading-circle").before(generateMemberGrid(memberKeyList, memContainer));
@@ -957,9 +956,7 @@ updateFavoritePage = function(){
 	// 	subbranchList.slideToggle();
 	// 	title.find(".arrow").toggleClass("open");
 	// });
-	title.find(".btn").off("click").click( function(){
-		switchListAndGrid( $(this), subPageBottom );
-	});
+	
 	title.find(".btnExtra").off("click").click( function(){
 		extra.fadeToggle('fast');
 	});
@@ -987,6 +984,10 @@ updateFavoritePage = function(){
 	var memListContainer = generateMemberList(Object.keys(memObject), page, showFavoritePage);
 	subGridPageContent.find(".loading-circle").before(memContainer);
 	subRowPageContent.find(".loading-circle").before(memListContainer);
+
+	title.find(".btn").off("click").click( function(){
+		switchListAndGrid( $(this), subPageBottom, Object.keys(memObject));
+	});
 
 	if( isList ){
 		title.find(".btn").addClass("list");
@@ -1422,11 +1423,13 @@ deleteFavGroup = function( dom ){
 		"at":at, 
 		"li":lang
 	};
-	ajaxDo(api_name,headers,"delete",true,null).complete(function(data){
+	ajaxDo(api_name,headers,"delete",true,null).complete(function(data) {
 		if(data.status == 200){
 			var tmp = $.parseJSON( data.responseText );
 			var data = {};
 			var userData = QmiGlobal.groups;
+			var fav = $(".subpage-contact .row.favorite");
+			var favBranchCnt = 0;
 			g_group = userData[gi];
 
 			//-----
@@ -1447,6 +1450,14 @@ deleteFavGroup = function( dom ){
 			//remove fi from fbl
 			fbl = g_group.fbl;
 			delete fbl[fi];
+
+			favBranchCnt = Object.keys(fbl).length;
+
+			if (favBranchCnt > 0) {
+				fav.find(".detail:eq(1)").text($.i18n.getString("COMPOSE_N_SUBGROUP", favBranchCnt));
+			} else {
+				fav.find(".detail:eq(1)").hide();
+			}
 			// *--* $.lStorage(ui, userData );
 
 			initContactData();
@@ -1527,17 +1538,19 @@ addFavGroup = function (container, input) {
 
 				//update subpage-contact
 				var fav = $(".subpage-contact .row.favorite");
-				if( fav.length>0 ){
+				if( fav.length > 0 ) {
+					// if (branchCntDiv == 0) fav.find(".left").append("<div class='detail branch'>"+$.i18n.getString("COMPOSE_N_SUBGROUP", branchCount)+"</div>");
+					console.log("QQRR");
 					var branchCntDiv = fav.find(".detail:eq(1)");
 					var branchCount = Object.keys(fbl).length;
-					if(branchCount<=0) branchCntDiv.hide();
-					else{
+					if (branchCount <= 0) {
+						branchCntDiv.hide();
+					} else {
 						var text = $.i18n.getString("COMPOSE_N_SUBGROUP", branchCount);
-						if( branchCntDiv.length>0 ){
-							branchCntDiv.text( text );
-						}
-						else{
-							fav.find("left").append("<div class='detail'>"+text+"</div>");
+						if( branchCntDiv.length > 0 ) {
+							branchCntDiv.text(text).show();
+						} else {
+							fav.find(".left").append("<div class='detail'>"+text+"</div>");
 						}
 					}
 				}
