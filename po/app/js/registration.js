@@ -516,7 +516,7 @@ appInitial = function(needUpdate){
         	new QmiAjax({
 	        	apiName: "cert",
 	        	apiVer: "apiv2",
-	        	isPublic: true,
+	        	isPublicApi: true,
 	        	isSso: true,
 		        specifiedHeaders: {
 		            li:lang
