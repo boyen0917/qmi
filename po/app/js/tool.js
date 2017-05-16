@@ -706,8 +706,8 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			zipVideoFile(uploadObj).done(function (uploadFile) {
 				paramObj.s32.file = uploadFile;
 
-				// 壓縮60 上傳40
-				uploadObj.basePct = 60;
+				// 壓縮80 上傳20
+				uploadObj.basePct = 80;
 
 				// 傳給外部 commit 使用
 				mt = uploadFile.type;
@@ -2128,30 +2128,35 @@ zipVideoFile = function (videoObj) {
 		var fs = require('fs');
     	var path = require('path');
     	var nwDir = path.dirname(process.execPath); //node webkit 根目錄
-	    // var outputPath = nwDir + '/video/outputfile.mp4'; //輸出影片檔案
 	    var command = ffmpeg(videoObj.file.path);
 	    var outputBuffer;
 
-    	var duration, //轉檔總時間 
-	    	seconds,　//目前進行的時間
-	       	percent; //轉檔百分比;
-
-	       	zipVideoActionDef = $.Deferred();
-	       	getDurationDef = $.Deferred();
-
+    	var duration; //轉檔總時間 
+    	var seconds;　//目前進行的時間
+       	var percent; //轉檔百分比;
+       	var zipVideoActionDef = $.Deferred();
+       	var getDurationDef = $.Deferred();
 
 	    command.setFfmpegPath(nwDir + '/bin/ffmpeg');
 	    command.setFfprobePath(nwDir + '/bin/ffprobe');
-	 //    if (!fs.existsSync(nwDir + '/video')) {
-	 //    	fs.mkdirSync(nwDir + '/video');
-		// }
 		
 		command.ffprobe(function(err, inputInfo) {
-			console.log(inputInfo);
-		    getDurationDef.resolve(inputInfo.format.duration);
+			// 非h264影片無法播放 需要進行轉檔
+			try {
+				if(inputInfo.streams[0].codec_name !== "h264")
+					getDurationDef.resolve(inputInfo.format.duration);
+				else
+					reject();
+			} catch(e) {reject();}
+
+			function reject() {
+				getDurationDef.reject();
+		    	transferBlobDef.reject();	
+			}
 		});
 
 		$.when(getDurationDef).done(function(duration) {
+			// toastShow("此影片格式不支援 正在進行影片轉檔 如不需要請按取消");
 			command.videoCodec('libvpx')
 		  	.audioCodec('libvorbis')
 		  	.duration(duration).size('640x320')
@@ -2169,7 +2174,7 @@ zipVideoFile = function (videoObj) {
 	            	// 找出ffmpeg回傳的目前執行的時間，再轉換成秒數，並更新進度條狀態
 	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
 	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
-	                percent = ((seconds / duration) * 50).toFixed();
+	                percent = ((seconds / duration) * 80).toFixed();
 
 	                if (videoObj.updateCompressionProgress)
 	               	 	videoObj.updateCompressionProgress(percent);
@@ -2198,8 +2203,6 @@ zipVideoFile = function (videoObj) {
 		});
 
         zipVideoActionDef.done(function () {
-	        // fs.readFile(outputPath, function(err, data) {
-	        //     var byteArray = new Uint8Array(data);
             var blob = new Blob([outputBuffer.buffer], {type: 'application/octet-binary'});
             blob.name = videoObj.file.name.split(".")[0] + ".webm";
             transferBlobDef.resolve(blob);
