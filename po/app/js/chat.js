@@ -261,7 +261,7 @@ $(function(){
 				// 單人聊天室，隱藏成員數量、離開和編輯
 				if (g_room.tp == 1 || g_room.cpc == undefined) {
 					$("#header .count").hide();
-					$(".extra-content .btn[data-type=exit]").hide();
+					// $(".extra-content .btn[data-type=exit]").hide();
 				} else { // 群組聊天室，顯示成員數量、離開和編輯(中間有人退出，變2人)
 					$("#header .count").html("(" + g_room.memCount + ")");
 					$("#header .count").show();
@@ -2093,6 +2093,7 @@ function sendMsgText(dom) {
 		var text = inputDom.html().replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 		inputDom.html("");
 		if (text.length <= 0) return;
+		console.log(g_room);
 		updateChatContentPosition();
 
 		// updateChatContentPosition();
