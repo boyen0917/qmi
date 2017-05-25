@@ -267,6 +267,7 @@
 	"NOTICES_UPLOAD_FILE"						: "and upload file",
 	"NOTICES_RESPONSER_NUM"					: "and %ld other people",
 	"NOTICES_NOMSG_WEB"				: "no message",
+	"NOTICES_MENTION_YOU" : "mention you",
 
 	"LEFT_FEED" : "News Feeds",
 	"LEFT_GROUP" : "Group",
