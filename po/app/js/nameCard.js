@@ -415,34 +415,30 @@
 	    }
 
 	    var this_gi = this_gi || gi;
-
-	    var method = "html";
-	    if(me){
-	        method = "val";
-	    }
-
-	    var avatar_bar_arr = ["nk","sl","bd","bl","ti"];
-	    var img_arr = ["em","pn","pn1","ext","mv"];
+	    var avatar_bar_arr = ["nk", "sl", "bd", "bl", "ti"];
+	    var img_arr = ["em", "pn", "pn1", "ext", "mv", "spn", "spn2"];
 	    var selector;
-
 	    for( item in user_data){
-	        if(user_data[item].length > 0){
-	            if(item == "bd" && me){
+	    	var method = "html";
+		    if (me) method = "val";
+		  
+	        if (user_data[item].length > 0) {
+	            if (item == "bd" && me) {
 	                user_data[item] = user_data[item].substring(0,4) + "/" + user_data[item].substring(4,6) + "/" + user_data[item].substring(6);
 	            }
 
-	            if($.inArray(item,avatar_bar_arr) >= 0) {
+	            if ($.inArray(item,avatar_bar_arr) >= 0) {
 	                selector = this_info.find(".user-avatar-bar");
-	            }else{
+	            } else {
 	                selector = this_info.find(".user-info-list");
 	            }
 
-	            if(!me && item == "bd") {
+	            if (!me && item == "bd") {
 	                user_data.bd = user_data.bd.substring(4,6) + "." + user_data.bd.substring(6,8);
 	                method = "append";
 	            }
 
-	            if(item == "bl"){
+	            if (item == "bl") {
 	                try{
 	                    var bi_arr = user_data.bl.split(",")[0].split(".");
 	                    var bn = "";
@@ -450,9 +446,7 @@
 	                    var test = selector.find(".bl");
 	                    test.show();
 	                    test = test[0];
-	                    // $(test).css("font-family", selector.find(".bl").css("font-family") );
-	                    // $(test).css("font-size", "12px" );
-	                    // $(test).css("line-height", "12px" );
+
 	                    var isClipped = false;
 	                    for( var i=bi_arr.length-1; i>=0; i-- ){
 	                        var bi = bi_arr[i];
@@ -486,9 +480,9 @@
 	                }
 	            }
 
+	            console.log(method);
+	            console.log(item);
 	            selector.find("."+item)[method](user_data[item]).show();
-
-
 
 	            if(!me && $.inArray(item,img_arr) >= 0) {
 	                var this_img = selector.find("img."+item);
@@ -509,11 +503,10 @@
 	        }else{
 	            this_info.find(".user-avatar-bar .user-name").addClass("hidden");
 	        }
-	    } else{
+	    } else {
 	        this_info.find(".user-avatar-bar .user-name").addClass("hidden");
 	    }
-
-
+ 
 	    if( user_data.st==2 ){
 	        this_info.find(".action, .sl, .bd, .bl").hide();
 	    }
@@ -546,7 +539,6 @@
 	            userInfoAvatarPos(this_info.find(".user-avatar.me > img"));
 	            // $(".user-avatar .default").removeClass("default");
 	        }
-
 	        // this_info.find(".user-info-list input").val("暫無資料");
 	        for( item in user_data){
 	            if(user_data[item]){
@@ -816,7 +808,9 @@
         var userEmail = (userData.em && userData.em != "") ? userData.em : $.i18n.getString("USER_PROFILE_NO_DATA");
         var extension = (userData.ext && userData.ext != "") ? userData.ext : $.i18n.getString("USER_PROFILE_NO_DATA");
         var userMobile = (userData.pn1 && userData.pn1 != "") ? userData.pn1 : $.i18n.getString("USER_PROFILE_NO_DATA");
-        var mvpn = (userData.mv && userData.mv != "") ? userData.ext : $.i18n.getString("USER_PROFILE_NO_DATA");
+        var mvpn = (userData.mv && userData.mv != "") ? userData.mv : $.i18n.getString("USER_PROFILE_NO_DATA");
+        var sipMobile = (userData.spn && userData.spn != "") ? userData.spn : $.i18n.getString("USER_PROFILE_NO_DATA");
+        var sipDesktop = (userData.spn2 && userData.spn2 != "") ? userData.spn2 : $.i18n.getString("USER_PROFILE_NO_DATA");
 
         userBirth = (userIsAdmin || !userData.mkb || gu == this_gu) ? userBirth : "******";
         userEmail = (userIsAdmin || !userData.mke || gu == this_gu) ? userEmail : "******";
@@ -902,7 +896,6 @@
 			    }).fail(function (failMsg) {
 			    	toastShow(failMsg);
 			    });
-            	
             });
 
             $(this).find(".edit-decision .cancel").off("click").on("click", function () {
@@ -978,6 +971,8 @@
         			.find(".phone").html(extension + "<p>" + $.i18n.getString("USER_PROFILE_EXTENSION") + "</p>").end()
         			.find(".mobile").html(userMobile).end()
         			.find(".mvpn").html(mvpn + "<p>" + $.i18n.getString("USER_PROFILE_MVPN") + "</p>").end()
+        			.find(".sip-mobile").html(sipMobile + "<p>" + $.i18n.getString("USER_PROFILE_SIP_NUMBER1") + "</p>").end()
+        			.find(".sip-desktop").html(sipDesktop + "<p>" + $.i18n.getString("USER_PROFILE_SIP_NUMBER2") + "</p>").end()
         			.find(".onoffswitch").hide();
 
         if (gu == this_gu) {

@@ -1204,7 +1204,7 @@ var AddressBook = AddressBook || {
 
 	},
 
-	userInfoShow: function(this_gi,this_gu){
+	userInfoShow: function(this_gi, this_gu){
 		var instance = this;
     	
         if(!this_gu) return false;
