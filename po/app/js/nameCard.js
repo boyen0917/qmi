@@ -480,8 +480,6 @@
 	                }
 	            }
 
-	            console.log(method);
-	            console.log(item);
 	            selector.find("."+item)[method](user_data[item]).show();
 
 	            if(!me && $.inArray(item,img_arr) >= 0) {
@@ -803,7 +801,9 @@
         var userDom = groupMainDom.find(".gm-user-main-area");
         var userIsAdmin = (QmiGlobal.groups[gi].ad == 1) ? true : false;
         var userInfoArea = groupMainDom.find(".st-personal-area");
-        var userTitle = (userData.bl && userData.bl != "") ? userData.bl : $.i18n.getString("USER_PROFILE_NO_DATA");
+        var userBranch = (userData.bl && userData.bl != "") ? userData.bl : "";
+        var userTitle = (userData.ti && userData.ti != "") ? userData.ti : "";
+        // var userJobTitle = ((userBranch + userTitle).length > 0) ? (userBranch + "<br>" + userTitle) : $.i18n.getString("USER_PROFILE_NO_DATA");
         var userBirth = (userData.bd && userData.bd != "") ? userData.bd : $.i18n.getString("USER_PROFILE_NO_DATA");
         var userEmail = (userData.em && userData.em != "") ? userData.em : $.i18n.getString("USER_PROFILE_NO_DATA");
         var extension = (userData.ext && userData.ext != "") ? userData.ext : $.i18n.getString("USER_PROFILE_NO_DATA");
@@ -965,8 +965,17 @@
             });
         });
 
-        userInfoArea.find(".job-title").html(userTitle).end()
-        			.find(".birth").html(userBirth).end()
+		if ((userBranch + userTitle).length > 0) {
+			if (userBranch.length == 0) {
+				userInfoArea.find(".job-title").html(userTitle);
+			} else {
+				userInfoArea.find(".job-title").html(userBranch + "<br>" + userTitle);
+			}
+		} else {
+			userInfoArea.find(".job-title").html($.i18n.getString("USER_PROFILE_NO_DATA"));
+		}
+
+        userInfoArea.find(".birth").html(userBirth).end()
         			.find(".email").html(userEmail).end()
         			.find(".phone").html(extension + "<p>" + $.i18n.getString("USER_PROFILE_EXTENSION") + "</p>").end()
         			.find(".mobile").html(userMobile).end()
@@ -996,7 +1005,7 @@
 				var switchName = e.target.id;
 
 				switch (switchName) {
-					case "birthOnOff" :
+					case "birthOnOff":
 						userObj.info.mkb = !$(this).is(':checked');
 						break;
 					case "emailOnOff":
@@ -1006,6 +1015,7 @@
 						userObj.info.mkp = !$(this).is(':checked');
 						break;
 				}
+				
 			    updateUserInfo(userObj).done(function (completeMsg) {
 			    	toastShow(completeMsg);
 			    }).fail(function (failMsg) {
