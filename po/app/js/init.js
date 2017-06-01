@@ -142,19 +142,6 @@ var initPenMap = {
 	}
 };
 
-// 判斷更改網址 不要上到正式版
-$(document).ready(function() {
-	if($.lStorage("_selectedServerUrl") === false || $.lStorage("_selectedServerUrl") === default_url) return;
-	base_url = $.lStorage("_selectedServerUrl");
-	
-	if($("#module-server-selector-url").length === 0) $("body").append(QmiGlobal.module.serverSelector.urlHtml());		
-	$("#module-server-selector-url").html(base_url);
-
-	// 更改網址 清db
-	if($.lStorage("_lastBaseUrl") !== false && $.lStorage("_lastBaseUrl") !== base_url) resetDB();
-	$.lStorage("_lastBaseUrl", base_url);
-});
-
 String.prototype._escape = function(){
     return this.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -188,7 +175,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整
-	appVer: "1.8.0.4",
+	appVer: "1.8.1.0",
 
 	// 檢查是否為聊天室
 	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
@@ -248,9 +235,6 @@ window.QmiGlobal = {
 
 			// 初始動作 registration
 			appInitial();
-
-			// // 測試環境 選擇server
-			// QmiGlobal.module.serverSelector.showCurrUrl();
 		});
 
 		function setAppOnFocusEvent(isExec) {
@@ -1107,8 +1091,6 @@ MyDeferred = function() {
   return myPromise;
 }
 
-
-
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){
 	var hash = window.location.hash;
@@ -1221,4 +1203,30 @@ function setDebug(isDebug) {
       debug: __no_op
     }
   }
+}
+
+
+if (typeof Object.assign != 'function') {
+  Object.assign = function (target, varArgs) { // .length of function is 2
+    'use strict';
+    if (target == null) { // TypeError if undefined or null
+      throw new TypeError('Cannot convert undefined or null to object');
+    }
+
+    var to = Object(target);
+
+    for (var index = 1; index < arguments.length; index++) {
+      var nextSource = arguments[index];
+
+      if (nextSource != null) { // Skip over if undefined or null
+        for (var nextKey in nextSource) {
+          // Avoid bugs when hasOwnProperty is shadowed
+          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+            to[nextKey] = nextSource[nextKey];
+          }
+        }
+      }
+    }
+    return to;
+  };
 }
