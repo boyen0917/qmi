@@ -103,7 +103,7 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
 
         var index = tab.data("id");
         var cell = cellArea.find("._"+index);
-        var userData = $.userStorage();
+        var userData = QmiGlobal.groups;
         var guAll = userData[gi].guAll;
         var listData = tab.data("obj").ml;
         var bl = userData[gi].bl;
