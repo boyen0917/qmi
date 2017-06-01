@@ -1,8 +1,10 @@
 (function(){
 
-	$(document).on("mouseup",".namecard",function(e){
+	$(document).on("mouseup",".namecard",function(e) { 
 		e.stopPropagation();
-		//temp
+		
+		var userData = QmiGlobal.groups[gi].guAll[$(this).data("gu")] || {};
+
 		if($(document).data("official") == true) return false;
 
 		$(document).data("namecard-pos",$(window).scrollTop());
@@ -15,7 +17,9 @@
 
 		//鈴鐺頁面不動作
 		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);
-		userInfoShow($(this).data("gi"),$(this).data("gu"));
+		if (userData.ad > 0 && userData.st > 0) { 
+			userInfoShow($(this).data("gi"), $(this).data("gu"));
+		}
 	});
 
 	$(document).on("mousedown",".user-info-close",function(){

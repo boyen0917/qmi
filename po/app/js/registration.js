@@ -426,7 +426,7 @@ appInitial = function(needUpdate){
                 		}
 
                 		//發生錯誤 回首頁比較保險
-                		relogin();
+                		reLogin();
                 	} else {
                 		deferred.resolve({dgi: specifiedGi, location:"#page-group-main"});
                 	}
