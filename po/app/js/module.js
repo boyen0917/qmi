@@ -547,7 +547,7 @@ QmiGlobal.module.appVersion = {
 		return new QmiAjax({
     		apiName: "sys/version",
     		timeout: 5000,
-    		isPublic: true,
+    		isPublicApi: true,
     		noAuth: true,
     		specifiedHeaders: {
     			os: 2,

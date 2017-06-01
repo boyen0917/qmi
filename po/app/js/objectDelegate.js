@@ -582,20 +582,21 @@ ObjectCell.Favorite = function () {
 }
 
 ObjectCell.ParentBranch = function (rowData) {
+	var self = this;
 	var thisBranch = rowData.thisBranch;
 	var allBranchData = rowData.bl;
-	this.name = thisBranch.bn.replaceOriEmojiCode();
-	this.id = thisBranch.bi;
-	this.html = $("<div class='subgroup-row'><div class='subgroup-parent'>"
+	self.name = thisBranch.bn.replaceOriEmojiCode();
+	self.id = thisBranch.bi;
+	self.html = $("<div class='subgroup-row'><div class='subgroup-parent'>"
 		+ "<div class='obj-cell subgroup branch' data-bl='" + thisBranch.bi + "'>"
 		+ "<div class='obj-cell-chk'><div class='img " + ((thisBranch.chk) ? "chk" : "") + "'></div></div>" 
 		+ "<div class='obj-cell-user-pic'><img src='images/common/others/select_empty_all_photo.png' style='width:60px'/>"
 		+ "</div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" + this.name 
 		+ "</div></div></div><div class='obj-cell-arrow'></div></div><div class='folder'></div></div>");
-	this.isSelectAll = false;
-	this.childBranch = [];
+	self.isSelectAll = false;
+	self.childBranch = [];
 
-	this.html.find(".obj-cell-arrow").off("click").click(function(e) {
+	self.html.find(".obj-cell-arrow").off("click").click(function(e) {
 		e.stopPropagation();
 		
         var dom = $(this).parent().next();
@@ -606,19 +607,27 @@ ObjectCell.ParentBranch = function (rowData) {
 
     if (thisBranch.cl.length > 0) {
     	this.html.find(".obj-cell-arrow").css("display", "inline-block");
-    	thisBranch.cl.forEach(function (branchID) {
-            var branchData = allBranchData[branchID];
-    		var childBranchRow = ObjectCell.factory("ChildBranch", {thisBranch: branchData, isSubRow : true});
-    		childBranchRow.parent = this;
-    		this.childBranch.push(childBranchRow);
-    		ObjectDelegateView.branchRows.push(childBranchRow);
-    		childBranchRow.bindEvent(ObjectDelegateView.checkThisBranch.bind(ObjectDelegateView));
-    		this.html.find(".folder").append(childBranchRow.html);
-            // objectDelegateView.addSubBranchRow("ChildBranch", {thisBranch: branchData, parentID: this.bl});
-        }.bind(this));
+        recursive(thisBranch.cl);
 	}
 
-	this.isChecked = thisBranch.chk;
+	self.isChecked = thisBranch.chk;
+
+	function recursive(cldArr) {
+		cldArr.forEach(function(bi) {
+			if(allBranchData[bi].cl.length > 0) recursive(allBranchData[bi].cl);
+			setChildBranch(bi);
+		})
+	}
+
+	function setChildBranch(branchID) {
+        var branchData = allBranchData[branchID];
+		var childBranchRow = ObjectCell.factory("ChildBranch", {thisBranch: branchData, isSubRow : true});
+		childBranchRow.parent = self;
+		self.childBranch.push(childBranchRow);
+		ObjectDelegateView.branchRows.push(childBranchRow);
+		childBranchRow.bindEvent(ObjectDelegateView.checkThisBranch.bind(ObjectDelegateView));
+		self.html.find(".folder").append(childBranchRow.html);
+    }
 }
 
 // 全選欄位
