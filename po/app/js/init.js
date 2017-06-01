@@ -33,8 +33,6 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
-
 //timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [
 	".st-sub-box-2-content-detail a",
@@ -144,19 +142,6 @@ var initPenMap = {
 	}
 };
 
-// 判斷更改網址 不要上到正式版
-$(document).ready(function() {
-	if($.lStorage("_selectedServerUrl") === false || $.lStorage("_selectedServerUrl") === default_url) return;
-	base_url = $.lStorage("_selectedServerUrl");
-	
-	if($("#module-server-selector-url").length === 0) $("body").append(QmiGlobal.module.serverSelector.urlHtml());		
-	$("#module-server-selector-url").html(base_url);
-
-	// 更改網址 清db
-	if($.lStorage("_lastBaseUrl") !== false && $.lStorage("_lastBaseUrl") !== base_url) resetDB();
-	$.lStorage("_lastBaseUrl", base_url);
-});
-
 String.prototype._escape = function(){
     return this.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -250,9 +235,6 @@ window.QmiGlobal = {
 
 			// 初始動作 registration
 			appInitial();
-
-			// // 測試環境 選擇server
-			// QmiGlobal.module.serverSelector.showCurrUrl();
 		});
 
 		function setAppOnFocusEvent(isExec) {
@@ -1108,16 +1090,6 @@ MyDeferred = function() {
   myPromise.reject = myReject;
   return myPromise;
 }
-
-// 選擇server
-$(document).on("click", "#container_version", function() {
-	var cnts = 0;
-	return function() {
-		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
-		cnts++;
-		if(cnts < 5) return;
-		QmiGlobal.module.serverSelector.init();
-}}());
 
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){
