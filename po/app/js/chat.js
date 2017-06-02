@@ -2093,6 +2093,7 @@ function sendMsgText(dom) {
 		var text = inputDom.html().replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 		inputDom.html("");
 		if (text.length <= 0) return;
+		console.log(g_room);
 		updateChatContentPosition();
 
 		// updateChatContentPosition();
@@ -2246,6 +2247,7 @@ function sendMsgText(dom) {
 				//GET /groups/{gi}/chats/{ci}/users
 				op("groups/" + gi + "/chats/" + ci + "/users",
 					"get", null, function (data, status, xhr) {
+						console.log(data);
 						//取得權限
 						var sendData = {
 							ti: ti_chat,
@@ -3051,29 +3053,36 @@ function sendMsgText(dom) {
 	**/
 	function checkMemberLeft() {
 		try {
+			$("#footer").show();
+			$("#chat-leaveGroup").hide();
+
 			if (g_room.tp == 1 && null != g_room.memList) {
-				for (var guTmp in g_room.memList) {
-					if (guTmp != g_group.gu) {
-						if (g_group.guAll.hasOwnProperty(guTmp)) {
-							var mem = g_group.guAll[guTmp];
-							if (mem.st == 2) {
-								$("#footer").hide();
-								$("#chat-leaveGroup").html(
-									$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (mem.nk || "").replaceOriEmojiCode())
-								).show();
-								return;
-							}
-							break;
-						}
-					}
+				if (g_room.st == 1) {
+					$("#footer").hide();
+					$("#chat-leaveGroup").html(
+						$.i18n.getString("CHAT_SOMEONE_LEAVE", (g_room.uiName || "").replaceOriEmojiCode())
+					).show();
 				}
+				// for (var guTmp in g_room.memList) {
+				// 	if (guTmp != g_group.gu) {
+				// 		if (g_group.guAll.hasOwnProperty(guTmp)) {
+				// 			var mem = g_group.guAll[guTmp];
+				// 			// 對方已離開或是聊天室已經無效
+				// 			if (mem.st == 2 || g_room.st == 1) {
+				// 				$("#footer").hide();
+				// 				$("#chat-leaveGroup").html(
+				// 					$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (mem.nk || "").replaceOriEmojiCode())
+				// 				).show();
+				// 				return;
+				// 			}
+				// 			break;
+				// 		}
+				// 	}
+				// }
 			}
 		} catch (e) {
 			errorReport(e);
 		}
-
-		$("#footer").show();
-		$("#chat-leaveGroup").hide();
 	}
 
 	/**

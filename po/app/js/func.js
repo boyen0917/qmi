@@ -8241,7 +8241,7 @@ pollingCmds = function(newPollingData){
                 insideDeferred.resolve(true);    
             }
             // 不重複的gi & 沒guAll
-            else if( 
+            else if ( 
                 item.tp !== 11                  &&  // 上面做過了
                 item.pm.gi !== undefined        &&  // tp 3 是告知有邀請 會沒有tp
                 ( QmiGlobal.groups[item.pm.gi] === undefined || Object.keys( QmiGlobal.groups[item.pm.gi].guAll ).length === 0 )

@@ -160,7 +160,7 @@ function updateChatList( giTmp, extraCallBack ){
 			}
 		});
 
-		if(rspObj.isSuccess && rspObj.roomArr.length > 0 && roomsCnt > 1) 
+		if(rspObj.isSuccess && rspObj.roomArr.length > 0 && roomsCnt > 0) 
 			showChatList();
 		else if(rspObj.isSuccess && roomsCnt > 1) {
 			showChatList();
@@ -200,7 +200,7 @@ function showChatList(){
 		var tmp;
 		$.each(chatList,function(key,room){
 				//目前type0的全體聊天室無用 st=1為廢棄聊天室 不顯示在列表
-			if( "0"!=room.tp && room.st!=1){
+			if( "0"!=room.tp){
 
 				//全部做完 再做sort
 				var deferred = $.Deferred();
