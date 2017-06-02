@@ -119,7 +119,7 @@ ObjectDelegateView = {
 		    	setTimeout(function(){
 					this.makeMemberList();
 
-				}.bind(this), 100);
+				}.bind(this), 500);
 		    }
 		}
 	},
