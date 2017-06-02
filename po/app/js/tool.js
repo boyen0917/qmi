@@ -2532,7 +2532,9 @@ QmiGlobal.MemberLocateModal.prototype = {
 		    	setTimeout(function(){
 					this.makeUnfinishUserRows();
 				}.bind(this), 500);
-		    } 
+		    } else {
+		    	this.container.find(".bottom").hide();
+		    }
 		}
 	}
 }

@@ -1063,7 +1063,7 @@ img.auo {
     /*min-height: 123px;*/
     height: -webkit-calc( 100% - 120px );
 	overflow-x: hidden;
-	overflow-y: scroll;
+	overflow-y: auto;
 	padding-bottom: 5px;
 }
 

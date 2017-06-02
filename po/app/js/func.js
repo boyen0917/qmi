@@ -2685,7 +2685,9 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         var branchID = userObj.bl;
         var extraContent = "";
 
-        // userObj.chk = false;
+        // if (objData.hasOwnProperty(gu)) userObj.chk = true;
+        // else userObj.chk = false;
+
         if( branchID && branchID.length > 0 ){
             var branchPath = branchID.split(".");
             if( branchPath && branchPath.length > 0 ){
@@ -3819,7 +3821,7 @@ timelineShowResponseLikeDelegate = function( this_event, type, onDone ){
 showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
     var page = $("#page-tab-object");
     if( null== isShowNamecard ) isShowNamecard = true;
-    
+
     //title
     page.find(".header-cp-object").html(title ? title : "");
 
