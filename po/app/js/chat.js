@@ -261,7 +261,7 @@ $(function(){
 				// 單人聊天室，隱藏成員數量、離開和編輯
 				if (g_room.tp == 1 || g_room.cpc == undefined) {
 					$("#header .count").hide();
-					// $(".extra-content .btn[data-type=exit]").hide();
+					$(".extra-content .btn[data-type=exit]").hide();
 				} else { // 群組聊天室，顯示成員數量、離開和編輯(中間有人退出，變2人)
 					$("#header .count").html("(" + g_room.memCount + ")");
 					$("#header .count").show();
@@ -2247,6 +2247,7 @@ function sendMsgText(dom) {
 				//GET /groups/{gi}/chats/{ci}/users
 				op("groups/" + gi + "/chats/" + ci + "/users",
 					"get", null, function (data, status, xhr) {
+						console.log(data);
 						//取得權限
 						var sendData = {
 							ti: ti_chat,
@@ -3052,29 +3053,36 @@ function sendMsgText(dom) {
 	**/
 	function checkMemberLeft() {
 		try {
+			$("#footer").show();
+			$("#chat-leaveGroup").hide();
+
 			if (g_room.tp == 1 && null != g_room.memList) {
-				for (var guTmp in g_room.memList) {
-					if (guTmp != g_group.gu) {
-						if (g_group.guAll.hasOwnProperty(guTmp)) {
-							var mem = g_group.guAll[guTmp];
-							if (mem.st == 2) {
-								$("#footer").hide();
-								$("#chat-leaveGroup").html(
-									$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (mem.nk || "").replaceOriEmojiCode())
-								).show();
-								return;
-							}
-							break;
-						}
-					}
+				if (g_room.st == 1) {
+					$("#footer").hide();
+					$("#chat-leaveGroup").html(
+						$.i18n.getString("CHAT_SOMEONE_LEAVE", (g_room.uiName || "").replaceOriEmojiCode())
+					).show();
 				}
+				// for (var guTmp in g_room.memList) {
+				// 	if (guTmp != g_group.gu) {
+				// 		if (g_group.guAll.hasOwnProperty(guTmp)) {
+				// 			var mem = g_group.guAll[guTmp];
+				// 			// 對方已離開或是聊天室已經無效
+				// 			if (mem.st == 2 || g_room.st == 1) {
+				// 				$("#footer").hide();
+				// 				$("#chat-leaveGroup").html(
+				// 					$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (mem.nk || "").replaceOriEmojiCode())
+				// 				).show();
+				// 				return;
+				// 			}
+				// 			break;
+				// 		}
+				// 	}
+				// }
 			}
 		} catch (e) {
 			errorReport(e);
 		}
-
-		$("#footer").show();
-		$("#chat-leaveGroup").hide();
 	}
 
 	/**
