@@ -96,7 +96,7 @@ initContactList = function(){
 	var searchBar = $(".contact-search .content");
 	var searchBarInput = searchBar.find(".input");
 	searchBarInput.data("searchText","");
-	searchBarInput.off("keyup").keyup( onSearchInput );
+	searchBarInput.off("input").on("input", onSearchInput );
 	// searchBarInput.off("keypress").keypress( function(){
 	// 	isKeyPress = true;
 	// });
@@ -177,28 +177,13 @@ onSearchInput = function(e){
 
 	sortedMemIdList.forEach(function (memId) {
 		var memberData = guAllExsit[memId];
-		if(memberData.nk == null){
-			cns.debug( JSON.stringify(mem) );
-		} else {
-			if( memberData.nk.toLowerCase().indexOf(str)>=0 ){
-				matchMemList.push(memId);
-				memCount++;
-			}	
-		}
-
+		if( memberData.nk.toLowerCase().indexOf(str) >= 0
+			|| (memberData.bl.length > 0 && bl[memberData.bl.split(",")[0].split(".")[0]].bn.toLowerCase().indexOf(str) >= 0)
+			|| memberData.ti.toLowerCase().indexOf(str) >= 0){
+			matchMemList.push(memId);
+			memCount++;
+		}	
 	});
-	// for( var key in guAllExsit ){
-	// 	var mem = guAllExsit[key];
-	// 	if( null==mem.nk ){
-	// 		cns.debug( JSON.stringify(mem) );
-	// 	} else {
-	// 		if( mem.nk.toLowerCase().indexOf(str)>=0 ){
-	// 			matchMemList.push(key);
-	// 			memCount++;
-	// 		}	
-	// 	}
-	// }
-
 
 	//search bl
 	var branchList = [];
@@ -696,8 +681,8 @@ generateMemberList = function( memberKeyList, memContainer, favCallback ){
 			 	+ "' ><div class='left'><img data-url='" + imgUrl + "' src='" + imgUrl 
 			 	+ "' /></div><div class='mid'><div class='name'>" + memberData.nk.replaceOriEmojiCode() 
 			 	+ "</div><div class='detail'>" + ((memberData.bl == "") ? "" : bl[memberData.bl.split(",")[0].split(".")[0]].bn)
-				+ "</div><div class='detail " + ((memberData.bl == "") ? "twoLine" : "") +"'>" 
-				+ ((memberData.sl == "") ? memberData.sl : "") + "</div></div><div class='right'>&nbsp</div></div>";
+				+ "</div><div class='detail " + ((memberData.ti == "") ? "twoLine" : "") +"'>" 
+				+ ((memberData.ti == "") ? "" : memberData.ti) + "</div></div><div class='right'>&nbsp</div></div>";
 
 			return memberHtml + memberElementStr;	
 		}, "");
