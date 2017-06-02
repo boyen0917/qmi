@@ -2224,13 +2224,13 @@ function setPolling(ts) {
 };
 
 function getUnreadUserList(readUserList) {
-	var groupMembers = QmiGlobal.groups[gi].guAll;
+	var thisMemberMap = g_room.memList;
 	var readUserIdList = readUserList.map(function(readUser) {
 		return readUser.gu;
 	});
 
-	return Object.keys(groupMembers).reduce(function (unreaderlist, key) {
-		if (key != "undefined" && groupMembers[key].st == 1) {
+	return Object.keys(thisMemberMap).reduce(function (unreaderlist, key) {
+		if (key != "undefined" && QmiGlobal.groups[gi].guAll[key].st == 1) {
 			if (readUserIdList.indexOf(key) < 0) {
 				unreaderlist.push({gu: key});
 			} 
