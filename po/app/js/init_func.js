@@ -44,12 +44,13 @@ $(function(){
         }
     }
 
-    getMultiGroupCombo = function(giArr) {
+    getMultiGroupCombo = function(giArr, isFromLogin) {
         return $.when.apply($, giArr.map(function(thisGi) {
             return getGroupComboInit(thisGi);
         })).done(function() {
             // 初始化排除了當前團體 這邊加回來 做更新
             giArr.concat([gi]).forEach(updateSideMenuContent);
+            updateAlert(isFromLogin);
         });
     }
 

@@ -470,7 +470,7 @@ appInitial = function(needUpdate){
 
 		    	initChatCntDB(); 
 
-				updateAlert(isFromLogin);
+				// updateAlert(isFromLogin);
 
 				//沒團體的情況
 				if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){

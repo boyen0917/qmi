@@ -8514,6 +8514,11 @@ pollingCmds = function(newPollingData){
                             cmd57Def.resolve();
                         });
                         break;
+
+                    case 59: 
+                        console.log("my cow");
+
+                        break;
                 }
 
             }); // end of newPollingData.cmds forEach

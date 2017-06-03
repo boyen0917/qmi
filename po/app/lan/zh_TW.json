@@ -268,6 +268,7 @@
 	"NOTICES_UPLOAD_FILE"	: "並上傳了檔案",
 	"NOTICES_RESPONSER_NUM"	: "及其他%ld個人",
 	"NOTICES_NOMSG_WEB"	: "沒有訊息",
+	"NOTICES_MENTION_YOU" : "提到了你",
 
 	"LEFT_FEED" : "動態消息",
 	"LEFT_GROUP" : "團體",
