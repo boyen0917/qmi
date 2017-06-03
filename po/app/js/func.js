@@ -8089,7 +8089,6 @@ pollingCountsWrite = function(pollingData, aa){
     var groupsData  = QmiGlobal.groups;
     var sort_arr = []; //排序用
 
-    
     // 先將當前團體的 cnts 更新在 ui 中
     if( cntsAllObj.hasOwnProperty( gi ) === true ) {
         var thisCntObj = cntsAllObj[gi];
