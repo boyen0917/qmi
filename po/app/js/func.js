@@ -8144,9 +8144,11 @@ pollingCountsWrite = function(pollingData, aa){
         // 移轉 隱藏polling
         if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
         
-        if( thisCntObj.A5 > 0 && gi != thisGi){
+        if( (thisCntObj.A1 > 0 || thisCntObj.A3 > 0)){
+        // if( thisCntObj.A5 > 0 && gi != thisGi){
             sort_arr.push([thisGi,thisCntObj.A5]);
-            dom.html(countsFormat( thisCntObj.A5, dom)).show();
+            dom.html(countsFormat( ((thisCntObj.A1 < 0) ? 0 : thisCntObj.A1) + thisCntObj.A3, dom)).show();
+            // dom.html(countsFormat( thisCntObj.A5, dom)).show();
         }
 
         // 無cl 或 未有此gi 就不做
