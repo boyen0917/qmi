@@ -3220,7 +3220,7 @@ function sendMsgText(dom) {
 
 				if (isShowUnreadAndReadTime) {
                     list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-                    list[1].ml = getUnreadUserList(parseData);
+                    list[1].ml = getUnreadUserList(g_room.memList, parseData);
                 } else {
                     list.push({title: $.i18n.getString("FEED_UNREAD"), clickable:false});
                 }
