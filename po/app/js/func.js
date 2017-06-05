@@ -3832,15 +3832,14 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
             var currentMembum = cellArea.find("._" + index + " .obj-cell").length;
             var loadMemList = listData.slice(currentMembum, currentMembum + 100);
 
-            if (currentMembum + 100 > listData.length - 1) {
+            if (currentMembum + 100 > listData.length - 1)
                 loadMemList = listData.slice(currentMembum);
-            } 
 
             loadMemList.forEach(function (member) {
-                // if(!member) return;
                 var gu = member.gu;
                 var rt = member.rt;
                 var mem = guAll[gu];
+                if(!mem) return;
                 var this_obj = $(
                     '<div class="obj-cell mem" data-gu="'+gu+'">' +
                         '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
