@@ -3682,7 +3682,6 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                         if (objectData.bl) {
                             $.each(groupAllMembers, function (id, member) {
                                 objectData.bl.forEach(function (obj) {
-                                    console.log(member);
                                     if (member.st > 0 && member.bl.indexOf(obj.bi) > -1) {
                                         targetUsers[id] = member;
                                     }
@@ -3698,7 +3697,7 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                                 }
                             });
                         }
-                    } else { 發布對象是全部 
+                    } else { // 發布對象是全部 
                         targetUsers = groupAllMembers;
                     }
 
@@ -3717,29 +3716,6 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                     errorReport(e);
                 }
             });
-            //get unread
-            // if( isShowUnreadAndTime ){
-            //     list.push( {title:$.i18n.getString("FEED_UNREAD"),ml:null} );
-            //     getThisTimelinePart( this_event, 9, function(data){
-            //         try{
-            //             list[1].ml = $.parseJSON( data.responseText ).epl;
-            //             if(isReady){
-            //                 showObjectTabShow(this_gi, title, list, onDone);
-            //             } else {
-            //                 isReady = true;
-            //             }
-            //         } catch(e) {
-            //             errorReport(e);
-            //         }
-            //    });
-            // } else {
-            //     list.push( {title:$.i18n.getString("FEED_UNREAD"),clickable:false} );
-            //     if (isReady) {
-            //         showObjectTabShow(this_gi, title, list, onDone);
-            //     }
-            //     isReady = true;
-            // }
-            // break;
         case 1:
             var isShowNamecard = true;
             try{
@@ -3861,6 +3837,7 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
             } 
 
             loadMemList.forEach(function (member) {
+                // if(!member) return;
                 var gu = member.gu;
                 var rt = member.rt;
                 var mem = guAll[gu];
