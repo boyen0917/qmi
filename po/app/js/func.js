@@ -3715,6 +3715,8 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
         case 9:
             //s9=1or3無法看已未讀列表
             var isShowUnreadAndTime = false;
+            var targetUsers = {};
+            var groupAllMembers = QmiGlobal.groups[gi].guAll || {};
             if( (QmiGlobal.groups[this_gi] || {}).ptp === 1) isShowUnreadAndTime = true;
 
             var isReady = false;
@@ -3729,9 +3731,38 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                         }
                     }
                     list[0].ml = parseData;
+
+                    // 有發布對象的話
+                    if (this_event.data("object_str")) {
+                        var objectData = $.parseJSON(this_event.data("object_str"));
+
+                        // 發布對象是部門, 找出部門的成員
+                        if (objectData.bl) {
+                            $.each(groupAllMembers, function (id, member) {
+                                objectData.bl.forEach(function (obj) {
+                                    console.log(member);
+                                    if (member.st > 0 && member.bl.indexOf(obj.bi) > -1) {
+                                        targetUsers[id] = member;
+                                    }
+                                });
+                            });
+                        }
+                        // 發布對象是成員 
+                        if (objectData.gul) {
+                            objectData.gul.forEach(function (obj) {
+                                if (!targetUsers.hasOwnProperty(obj.gu) 
+                                    && groupAllMembers.hasOwnProperty(obj.gu)) {
+                                    targetUsers[obj.gu] = groupAllMembers[obj.gu];
+                                }
+                            });
+                        }
+                    } else { 發布對象是全部 
+                        targetUsers = groupAllMembers;
+                    }
+
                     if (isShowUnreadAndTime) {
                         list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-                        list[1].ml = getUnreadUserList(parseData);
+                        list[1].ml = getUnreadUserList(targetUsers, parseData);
                     } else {
                         list.push({title:$.i18n.getString("FEED_UNREAD"), clickable:false});
                     }
