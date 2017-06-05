@@ -2254,6 +2254,7 @@ function riseNotification (icon, title, description, onClickCallback) {
 	}
 }
 
+
 QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
   	this.locateSite = [];
 	this.map = {};
@@ -2536,5 +2537,22 @@ QmiGlobal.MemberLocateModal.prototype = {
 		    	this.container.find(".bottom").hide();
 		    }
 		}
+
+QmiGlobal.showNotification = function(argObj) {
+	console.log("showNo", argObj);
+	try{
+		if(isChatroomCloseNotification()) return;
+		var notification = new window.Notification(argObj.title, {
+			body: argObj.text,
+			icon: argObj.icon === undefined? "resource/images/default.png": argObj.icon
+		});
+		if (typeof argObj.callback === "function")
+			notification.addEventListener("click", argObj.callback);
+
+	}catch(e){console.log("Notification doesn't be supported.");}
+
+	function checkChatroomIsShowNotification() {
+		if(!argObj.ci) return false;
+		return !QmiGlobal.groups[argObj.gi].chatAll[argObj.ci].cs;
 	}
 }
