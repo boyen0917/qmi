@@ -200,6 +200,10 @@ img.default {
 	outline: none;
 }
 
+.user-info-list-area input.nk:disabled {
+	background-color: white;
+}
+
 .user-info-list-area input::-webkit-input-placeholder {
 	color: black;
 }

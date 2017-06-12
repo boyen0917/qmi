@@ -488,8 +488,6 @@
 
 	            selector.find("."+item)[method](user_data[item]).show();
 
-
-
 	            if(!me && $.inArray(item,img_arr) >= 0) {
 	                var this_img = selector.find("img."+item);
 	                this_img.attr("src","images/icon/bt_" + this_img.data("name") + "_normal.png");
@@ -519,9 +517,14 @@
 	    }
 	}
 
-	meInfoShow = function(user_data){
+	meInfoShow = function(user_data) {
 	    var this_gi = gi;
 	    var this_gu = gu;
+
+	    var groupSettingData = QmiGlobal.groups[this_gi].set || {};
+	    var modifyNameSwitch = (groupSettingData.bss || []).find(function(obj) {
+	    	return obj.no == 0;
+	    });
 
 	    $(".screen-lock").show();
 	    $(".user-info-load-area").fadeIn("fast");
@@ -546,6 +549,10 @@
 	            userInfoAvatarPos(this_info.find(".user-avatar.me > img"));
 	            // $(".user-avatar .default").removeClass("default");
 	        }
+
+	        if (modifyNameSwitch && modifyNameSwitch.st != 2) {
+	        	this_info.find(".user-info-list input.nk").prop('disabled', true);
+	    	}
 
 	        // this_info.find(".user-info-list input").val("暫無資料");
 	        for( item in user_data){
@@ -827,6 +834,10 @@
             var _thisGroupList = QmiGlobal.groups[this_gi];
             var type;
             var isFavUser = QmiGlobal.groups[gi].guAll[this_gu].fav;
+            var groupSettingData = QmiGlobal.groups[this_gi].set || {};
+		    var modifyNameSwitch = (groupSettingData.bss || []).find(function(obj) {
+		    	return obj.no == 0;
+		    });
 
             $(this).find(".background").removeClass("me").find("img")
             	   .attr("src", userData.put || "images/common/others/timeline_kv1_android.png").end().end()
@@ -868,15 +879,20 @@
             	var range = document.createRange();
             	var sel = window.getSelection();
 
-            	$(this).find(".user h3").attr("contentEditable", true).end()
-            		   .find(".user .slogan").addClass("me").attr("contentEditable", true).end()
+            	if (modifyNameSwitch && modifyNameSwitch.st == 2) {
+	        		$(this).find(".user h3").attr("contentEditable", true);
+	        		range.selectNodeContents(nameInput);
+	        		range.collapse(false);
+	        		sel.removeAllRanges();
+	        		sel.addRange(range);
+	    		} 
+
+            	// $(this).find(".user h3").attr("contentEditable", true).end()
+            	$(this).find(".user .slogan").addClass("me").attr("contentEditable", true).end()
             		   .find(".user .edit-decision").css("visibility", "visible");
+            	
             	$(e.target).hide();
 
-            	range.selectNodeContents(nameInput);
-        		range.collapse(false);
-        		sel.removeAllRanges();
-        		sel.addRange(range);
             }.bind(this));
 
             $(this).find(".edit-decision .save").off("click").on("click", function (e) {
@@ -906,8 +922,8 @@
             });
 
             $(this).find(".edit-decision .cancel").off("click").on("click", function () {
-            	$(this).find(".user h3").attr("contentEditable", false).end()
-            		   .find(".user .slogan").removeClass("me").attr("contentEditable", false).end()
+            	$(this).find(".user h3").attr("contentEditable", false).html(userData.nk).end()
+            		   .find(".user .slogan").removeClass("me").attr("contentEditable", false).html(userData.sl).end()
             		   .find(".user .edit-decision").css("visibility", "hidden").end()
             		   .find(".user .edit-pen").show();
             }.bind(this));
