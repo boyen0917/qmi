@@ -8088,6 +8088,7 @@ pollingCountsWrite = function(pollingData, aa){
     var gcnts       = pollingData.gcnts || { G1: 0, G3: 0 };
     var groupsData  = QmiGlobal.groups;
     var sort_arr = []; //排序用
+    // var getNoticesDefer = $.Deferred();
 
     // 先將當前團體的 cnts 更新在 ui 中
     if( cntsAllObj.hasOwnProperty( gi ) === true ) {
@@ -8133,52 +8134,67 @@ pollingCountsWrite = function(pollingData, aa){
             countA3Dom.hide();
     }
 
-    // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
+    // idb_alert_events.getAll(function(noticeList){
+    //     getNoticesDefer.resolve(noticeList);
+    // })
 
-    Object.keys(cntsAllObj).forEach(function(thisGi){
-        var thisCntObj = cntsAllObj[thisGi],
-        thisQmiGroupObj = groupsData[thisGi];
+    // getNoticesDefer.done(function(noticeList) {
+        // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
+        Object.keys(cntsAllObj).forEach(function(thisGi){
+            var thisCntObj = cntsAllObj[thisGi],
+            thisQmiGroupObj = groupsData[thisGi];
 
-        var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
+            var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
+            // var thisGroupUnreadEvents = noticeList.filter(function(notice) {
+            //     return ((notice.ei || "").split("_")[0] == thisGi) 
+            //             && (notice.data)
+            //             && (notice.data.nd) 
+            //             && (notice.data.nd.st === 0);
+            // });
 
-        // 移轉 隱藏polling
-        if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
-        
-        if( (thisCntObj.A1 > 0 || thisCntObj.A3 > 0)){
-        // if( thisCntObj.A5 > 0 && gi != thisGi){
-            sort_arr.push([thisGi,thisCntObj.A5]);
-            dom.html(countsFormat( ((thisCntObj.A1 < 0) ? 0 : thisCntObj.A1) + thisCntObj.A3, dom)).show();
-            // dom.html(countsFormat( thisCntObj.A5, dom)).show();
-        }
+            // console.log(thisGroupUnreadEvents);
+            // 移轉 隱藏polling
+            if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
-        // 無cl 或 未有此gi 就不做
-        if( thisCntObj.hasOwnProperty("cl") === false ||
-            thisQmiGroupObj === undefined ||
-            thisQmiGroupObj.hasOwnProperty("chatAll") === false 
-        ) return ;
+            if((thisCntObj.A1 > 0 || thisCntObj.A3 > 0)){
+            // if( thisCntObj.A5 > 0 && gi != thisGi){
+                sort_arr.push([thisGi,thisCntObj.A1 + thisCntObj.A3]);
+                dom.html(countsFormat( ((thisCntObj.A1 < 0) ? 0 : thisCntObj.A1) + thisCntObj.A3, dom)).show();
+                // dom.html(countsFormat( thisCntObj.A5, dom)).show();
+            }
 
-        thisCntObj.cl.forEach(function(clObj){
-            if( thisQmiGroupObj.chatAll.hasOwnProperty( clObj.ci ) === true ) 
-                thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
+            // 無cl 或 未有此gi 就不做
+            if( thisCntObj.hasOwnProperty("cl") === false ||
+                thisQmiGroupObj === undefined ||
+                thisQmiGroupObj.hasOwnProperty("chatAll") === false 
+            ) return ;
+
+            thisCntObj.cl.forEach(function(clObj){
+                if( thisQmiGroupObj.chatAll.hasOwnProperty( clObj.ci ) === true ) 
+                    thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
+            })
+
         })
 
-    })
-    //排序
-    sort_arr.sort(function(a, b) {return a[1] - b[1]});
-    sort_arr.forEach(function(obj){
-        var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
-        sortedGroup.detach();
+        //排序
+        sort_arr.sort(function(a, b) {return a[1] - b[1]});
+        sort_arr.forEach(function(obj){
+            var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
+            sortedGroup.detach();
 
-        // 官方帳號判斷
-        try {
-            if(QmiGlobal.groups[obj[0]].ntp === 2)
-                var targetDom = $(".sm-offical-group");
-            else
-                var targetDom = $(".sm-general-group");
+            // 官方帳號判斷
+            try {
+                if(QmiGlobal.groups[obj[0]].ntp === 2)
+                    var targetDom = $(".sm-offical-group");
+                else
+                    var targetDom = $(".sm-general-group");
 
-            targetDom.after(sortedGroup);
-        } catch(e) { /* do nothing */}
-    })
+                targetDom.after(sortedGroup);
+            } catch(e) { /* do nothing */}
+        })
+    // });
+    
+
 
     //邀請 若是在團體邀請頁面時 則不寫入
     if(gcnts.G1 > 0){
