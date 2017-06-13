@@ -261,6 +261,11 @@
 	"CHAT_CHATROOM_MEMBER_EMPTY" : "請選擇聊天室對象",
 	"CHAT_UPLOAD_FILE_MISSING" : "上傳檔案遺失, 請重新上傳",
 	"CHAT_SCROLL_UP_TO_UPDATE" : "上捲更新...",
+	"CHAT_CHATROOM_SOMEONE_ASSIGN_ADMIN" : "%@ 指派 %@ 為聊天室管理員",
+	"CHAT_CHATROOM_SOMEONE_DEMOTE_SOMEONE" : "%@ 取消 %@ 聊天室管理員權限",
+	"CHAT_SELF_ALREADY_ADMIN" : "你已是管理員了!!",
+	"CHAT_EXIT_CHATROOM_FAIL" : "請保留成員至少有一位是管理員，並將自己的權限取消!!",
+	"CHAT_EDIT_CHATROOM" : "前往編輯",
 
 	"NOTICES_TITLE"			: "新通知",
 	"NOTICES_POST"			: "發佈",
