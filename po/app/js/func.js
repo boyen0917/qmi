@@ -8096,15 +8096,22 @@ pollingCountsWrite = function(pollingData, aa){
 
         ["A1", "A2", "A4"].forEach(function(key){
             var smCountA = $(".polling-cnt[data-polling-cnt="+ key +"] .sm-count").hide();
+
             if ( thisCntObj.hasOwnProperty(key) === true && thisCntObj[key] > 0 ) {
 
-                // 部分動態tab 如果是active 消除cnts
-                if( smCountA.parent().hasClass("active") === true){
-                    updatePollingCnts( smCountA, key );
-                } else {
+                if (key == "A1") {
                     smCountA.show()
                     .html(countsFormat(thisCntObj[key], smCountA))
                     .data("gi",gi);
+                } else {
+                    // 部分動態tab 如果是active 消除cnts
+                    if( smCountA.parent().hasClass("active") === true){
+                        updatePollingCnts( smCountA, key );
+                    } else {
+                        smCountA.show()
+                        .html(countsFormat(thisCntObj[key], smCountA))
+                        .data("gi",gi);
+                    }
                 }
             }
         });
@@ -8156,11 +8163,13 @@ pollingCountsWrite = function(pollingData, aa){
             // 移轉 隱藏polling
             if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
-            if((thisCntObj.A1 > 0 || thisCntObj.A3 > 0)){
+            // if((thisCntObj.A1 > 0 || thisCntObj.A3 > 0)){
+            if ( thisCntObj.A5 > 0) {
             // if( thisCntObj.A5 > 0 && gi != thisGi){
-                sort_arr.push([thisGi,thisCntObj.A1 + thisCntObj.A3]);
-                dom.html(countsFormat( ((thisCntObj.A1 < 0) ? 0 : thisCntObj.A1) + thisCntObj.A3, dom)).show();
-                // dom.html(countsFormat( thisCntObj.A5, dom)).show();
+                // sort_arr.push([thisGi,thisCntObj.A1 + thisCntObj.A3]);
+                sort_arr.push([thisGi,thisCntObj.A5]);
+                // dom.html(countsFormat( ((thisCntObj.A1 < 0) ? 0 : thisCntObj.A1) + thisCntObj.A3, dom)).show();
+                dom.html(countsFormat(((thisCntObj.A5 < 0) ? 0 : thisCntObj.A5), dom)).show();
             }
 
             // 無cl 或 未有此gi 就不做
