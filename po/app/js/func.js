@@ -5160,7 +5160,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
             for( var i=0; i<timeline_list.length; i++ ){
                 //ei:"G000000109N_T00000020BF_E000000107H"
                 var split = timeline_list[i].ei.split("_");
-                split[0] = gi;
+                split[0] = this_gi;
                 timeline_list[i].ei = split.join("_");
             }
 

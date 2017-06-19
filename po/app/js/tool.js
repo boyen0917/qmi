@@ -2253,3 +2253,8 @@ function riseNotification (icon, title, description, onClickCallback) {
 		console.log("Notification doesn't be supported.");
 	}
 }
+
+function getFullName(userData) {
+	return (userData.nk2 && userData.nk2 != "") 
+		? userData.nk + " (" + userData.nk2 + ")" : userData.nk;
+}

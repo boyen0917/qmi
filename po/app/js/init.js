@@ -33,7 +33,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://ap.qmi.emome.net/";
 
 //timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [

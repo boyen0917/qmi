@@ -486,7 +486,14 @@
 	                }
 	            }
 
-	            selector.find("."+item)[method](user_data[item]).show();
+	            if (item = "nk") {
+	            	selector.find("."+item)[method]((
+	            		(user_data.nk2 && user_data.nk2.length > 0) 
+	            			? user_data[item] + " (" + user_data.nk2 + ")" 
+	            			: user_data[item] ))
+	            } else {
+	            	selector.find("."+item)[method](user_data[item]).show();
+	            }
 
 	            if(!me && $.inArray(item,img_arr) >= 0) {
 	                var this_img = selector.find("img."+item);
@@ -494,6 +501,10 @@
 	            }
 	        }
 	    }
+
+	    // if (user_Data.hasOwnProperty("nk2") && user_data.nk2.length > 0) {
+	    // 	selector.find()
+	    // }
 
 	    var nkTmp = this_info.find(".user-avatar-bar .nk").html();
 	    if( nkTmp && nkTmp.length>0 ) this_info.find(".user-avatar-bar .nk").html( nkTmp.replaceOriEmojiCode() );
@@ -512,7 +523,7 @@
 	    }
 
 
-	    if( user_data.st==2 ){
+	    if (user_data.st == 2) {
 	        this_info.find(".action, .sl, .bd, .bl").hide();
 	    }
 	}
@@ -804,6 +815,7 @@
 	//切換至個人主頁
 	personalHomePage = function(thisInfo, userData) {
         var groupMainDom = $("#page-group-main");
+        console.log(userData);
         
         //滾動至最上
         timelineScrollTop();
@@ -833,7 +845,7 @@
         userDom.fadeIn("fast",function(){
             var _thisGroupList = QmiGlobal.groups[this_gi];
             var type;
-            var isFavUser = QmiGlobal.groups[gi].guAll[this_gu].fav;
+            var isFavUser = QmiGlobal.groups[this_gi].guAll[this_gu].fav;
             var groupSettingData = QmiGlobal.groups[this_gi].set || {};
 		    var modifyNameSwitch = (groupSettingData.bss || []).find(function(obj) {
 		    	return obj.no == 0;
@@ -841,7 +853,8 @@
 
             $(this).find(".background").removeClass("me").find("img")
             	   .attr("src", userData.put || "images/common/others/timeline_kv1_android.png").end().end()
-            	   .find(".user h3").text(userData.nk).end()
+            	   .find(".user h3").text(getFullName(userData)).end()
+            	   .find(".user .edit-full-name").hide().end()
             	   .find(".user .edit-pen").hide().end()
             	   .find(".edit-decision").css("visibility", "hidden").end()
             	   .find(".user .user-pic").removeClass("me").end()
@@ -853,6 +866,7 @@
 
             if (gu == this_gu) {
             	$(this).find(".background").addClass("me").end()
+            		   .find(".user input.name").prop("disabled", true).end()
             		   .find(".user .edit-pen").show().end()
             		   .find(".user .user-pic").addClass("me").end()
             		   // .find(".user .slogan").addClass("me").end()
@@ -875,19 +889,17 @@
             });
 
             $(this).find(".user .edit-pen").off("click").on("click", function (e) {
-            	var nameInput = $(this).find(".user h3").get(0);
-            	var range = document.createRange();
-            	var sel = window.getSelection();
+            	$(this).find(".user .edit-full-name").show().end()
+            		.find(".user input.name").val(userData.nk).end()
+            		.find(".user input.nickname").val(userData.nk2).end()
+            		.find(".user h3").hide();
 
             	if (modifyNameSwitch && modifyNameSwitch.st == 2) {
-	        		$(this).find(".user h3").attr("contentEditable", true);
-	        		range.selectNodeContents(nameInput);
-	        		range.collapse(false);
-	        		sel.removeAllRanges();
-	        		sel.addRange(range);
-	    		} 
+            		$(this).find(".user input.name").prop("disabled", false).focus();
+	    		} else {
+	    			$(this).find(".user input.nickname").focus();
+	    		}
 
-            	// $(this).find(".user h3").attr("contentEditable", true).end()
             	$(this).find(".user .slogan").addClass("me").attr("contentEditable", true).end()
             		   .find(".user .edit-decision").css("visibility", "visible");
             	
@@ -896,11 +908,11 @@
             }.bind(this));
 
             $(this).find(".edit-decision .save").off("click").on("click", function (e) {
-            	console.log(userDom.find(".user h3").text());
 				var userObj = {
 					gu : userData.gu,
 					info : {
-						nk : userDom.find(".user h3").text(),
+						nk : userDom.find(".user input.name").val(),
+						nk2 : userDom.find(".user input.nickname").val(),
 						sl : userDom.find(".user .slogan").text(),
 						mkb : userData.mkb,
 						mke : userData.mke,
@@ -909,7 +921,8 @@
 				};
 
 				updateUserInfo(userObj).done(function (completeMsg) {
-			    	userDom.find(".user h3").attr("contentEditable", false).end()
+			    	userDom.find(".user h3").html(getFullName(userObj.info)).show().end()
+			    		   .find(".user .edit-full-name").hide().end()
             		   	   .find(".user .slogan").removeClass("me").attr("contentEditable", false).end()
             		   	   .find(".user .edit-decision").css("visibility", "hidden").end()
             		   	   .find(".user .edit-pen").show();
@@ -922,7 +935,8 @@
             });
 
             $(this).find(".edit-decision .cancel").off("click").on("click", function () {
-            	$(this).find(".user h3").attr("contentEditable", false).html(userData.nk).end()
+            	$(this).find(".user h3").html(getFullName(userData)).show().end()
+            		   .find(".user .edit-full-name").hide().end()
             		   .find(".user .slogan").removeClass("me").attr("contentEditable", false).html(userData.sl).end()
             		   .find(".user .edit-decision").css("visibility", "hidden").end()
             		   .find(".user .edit-pen").show();
@@ -1066,7 +1080,7 @@
             
             console.log($("#page-group-main").data("navi"));
             console.log(groupMainDom.data("navi"));
-            timelineListWrite();
+            // timelineListWrite();
         },500);
 	}
 
@@ -1106,7 +1120,8 @@
 	    };
 
 	    var body = {
-	      nk: new_name, // Nickname
+	      nk: new_name, // name
+	      nk2: this_info.find(".user-info-list .nk2").val(), //nickname
 	      sl: this_info.find(".user-info-list .sl").val(), // Slogan
 	      mke: this_info.find(".me-info-status.em .status-text").data("val"),
 	      mkp: this_info.find(".me-info-status.pn1 .status-text").data("val"),
