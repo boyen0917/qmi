@@ -8212,7 +8212,7 @@ pollingCountsWrite = function(pollingData, aa){
     if(gcnts.G2 > 0){
         //最新消息
     }
-    if(gcnts.G3 > 0){
+    if(gcnts.G3 >= 0){
         //鈴鐺
         if( typeof(showNewAlertIcon)!='undefined' ) showNewAlertIcon( gcnts.G3 );
     }
