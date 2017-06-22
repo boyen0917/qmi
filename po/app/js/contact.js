@@ -179,7 +179,8 @@ onSearchInput = function(e){
 		var memberData = guAllExsit[memId];
 		if( memberData.nk.toLowerCase().indexOf(str) >= 0
 			|| (memberData.bl.length > 0 && bl[memberData.bl.split(",")[0].split(".")[0]].bn.toLowerCase().indexOf(str) >= 0)
-			|| memberData.ti.toLowerCase().indexOf(str) >= 0){
+			|| memberData.ti.toLowerCase().indexOf(str) >= 0
+			|| memberData.nk2.toLowerCase().indexOf(str) >= 0){
 			matchMemList.push(memId);
 			memCount++;
 		}	
@@ -636,8 +637,8 @@ generateMemberGrid = function( memberKeyList, memContainer ){
 			var memberElementStr = "<div class='mem namecard " + ((memberData.ad == 1) ? "admin " : " ") 
 				+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu + "'>"
 				+ "<img data-url='" + imgUrl + "' src='" + imgUrl + "'>"
-				+ "<div class='name'>" + memberData.nk.replaceOriEmojiCode()+"</div>"
-				+ "</div>";
+				+ "<div class='name'>" + memberData.nk.replaceOriEmojiCode() + " (" 
+				+ memberData.nk2.replaceOriEmojiCode() + ")</div></div>";
 
 			return memberHtml + memberElementStr;	
 		}, "");
@@ -680,7 +681,8 @@ generateMemberList = function( memberKeyList, memContainer, favCallback ){
 			 	+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu 
 			 	+ "' ><div class='left'><img data-url='" + imgUrl + "' src='" + imgUrl 
 			 	+ "' /></div><div class='mid'><div class='name'>" + memberData.nk.replaceOriEmojiCode() 
-			 	+ "</div><div class='detail'>" + ((memberData.bl == "") ? "" : bl[memberData.bl.split(",")[0].split(".")[0]].bn)
+			 	+ " (" + memberData.nk2.replaceOriEmojiCode() + ")</div><div class='detail'>" 
+			 	+ ((memberData.bl == "") ? "" : bl[memberData.bl.split(",")[0].split(".")[0]].bn)
 				+ "</div><div class='detail " + ((memberData.ti == "") ? "twoLine" : "") +"'>" 
 				+ ((memberData.ti == "") ? "" : memberData.ti) + "</div></div><div class='right'>&nbsp</div></div>";
 
