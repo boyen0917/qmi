@@ -25,7 +25,7 @@ var base_url = function() {
 			return "https://qmi17.mitake.com.tw/";
 			break;
 		default:
-			return "https://qmi17.mitake.com.tw/";
+			return "https://ap.qmi.emome.net/";
 	}
 	function match(domain) {
 		var regDomain = new RegExp("^https:\/\/"+ domain, 'g');
@@ -33,7 +33,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://ap.qmi.emome.net/";
+var base_url = "https://qmi17.mitake.com.tw/";
 
 //timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [
