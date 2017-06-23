@@ -730,7 +730,7 @@ appInitial = function(needUpdate){
 			var time_format = time.toLocaleDateString();
         	$(".setting-birth input").val(time_format);
 
-        	if($(".setting-first-name input").val() && $(".setting-last-name input").val()){
+        	if($(".setting-full-name input").val().length > 0){
 				$(".setting-next").addClass("setting-next-ready");
 			}else{
 				$(".setting-next").removeClass("setting-next-ready");
@@ -781,13 +781,12 @@ appInitial = function(needUpdate){
     });
 
 
-    $(".setting-first-name input,.setting-last-name input").bind("input",function(){
-		if($(".setting-first-name input").val() 
-			&& $(".setting-last-name input").val()  
+    $(".setting-full-name input").bind("input",function(){
+		if ($(".setting-full-name input").val().length > 0
 			// && $(".setting-birth input").val()
-		){
+		) {
 			$(".setting-next").addClass("setting-next-ready");
-		}else{
+		} else {
 			$(".setting-next").removeClass("setting-next-ready");
 		}
 	});
@@ -804,12 +803,11 @@ appInitial = function(needUpdate){
     	if(!$(".avatar-area img").hasClass("avatar-default")){
     		avatarToS3($(".avatar-file")[0].files[0]);
     	}else{
-    		var first_name = $(".setting-first-name input").val();
-	    	var last_name = $(".setting-last-name input").val();
+    		var fullName = $(".setting-full-name input").val();
 	    	var birth = $(".setting-birth-hidden").val()*1000;
 
 	    	//姓名暫時先顛倒
-	    	activateStep3(last_name,first_name,birth);
+	    	activateStep3(fullName, birth);
     	}
     });
 
@@ -1027,7 +1025,7 @@ appInitial = function(needUpdate){
         });
 	}
 
-	activateStep3 = function(first_name,last_name,birth){
+	activateStep3 = function(fullName, birth){
 
 		new QmiAjax({
         	apiName: "activation/step3",
@@ -1035,8 +1033,7 @@ appInitial = function(needUpdate){
         		id: $(document).data("phone-id"),
                 tp: 0,
                 ud: $(document).data("device-token"),
-                fn: first_name,
-                ln: last_name,
+                nk: fullName,
         	},
         	isLoadingShow: true,
         	method: "put"
@@ -1153,11 +1150,10 @@ appInitial = function(needUpdate){
 							                    	if(data.status == 200){
 
 							                    		//大小圖上傳完畢 再做註冊步驟3
-							                    		var first_name = $(".setting-first-name input").val();
-												    	var last_name = $(".setting-last-name input").val();
+							                    		var fullName = $(".setting-full-name input").val();
 												    	var birth = $(".setting-birth-hidden").val()*1000;
 
-												    	activateStep3(first_name,last_name,birth);
+												    	activateStep3(fullName, birth);
 
 							                    	}else{
 							                    		//commit 失敗
