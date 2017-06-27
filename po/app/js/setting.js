@@ -159,6 +159,13 @@ function removeGroup(thisGi, isFromCompany){
 	}
 
 	delete QmiGlobal.groups[thisGi];
+
+	if (Object.keys( QmiGlobal.groups ).length == 2) {
+        $.mobile.changePage("#page-group-menu");
+        $("#page-group-menu .page-back").hide();
+        if (QmiGlobal.auth.isSso) $(".no-group-lock").show();
+    }   
+
     //remove group data
     try{
 		//----- remove from idb -------
