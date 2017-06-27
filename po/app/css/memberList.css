@@ -75,7 +75,7 @@
 	margin-top: 0px;
 	height: -webkit-calc( 100% - 57px );
 }
-.tabObj-cell-area.noTitle .obj-cell-page.current{
+.tabObj-cell-area .obj-cell-page.current{
 	height: -webkit-calc( 100% - 7px );
 	overflow-y: auto;
 }
