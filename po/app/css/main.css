@@ -5312,7 +5312,7 @@ input.cp-datetimepicker-end {
 }
 
 .obj-cell-page.current {
-	height: -webkit-calc( 100% - 114px );
+	height: -webkit-calc( 100% - 104px );
 	background: white;
 	position: fixed;
 	width: 100%;
