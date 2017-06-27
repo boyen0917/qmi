@@ -3698,7 +3698,7 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                                 }
                             });
                         }
-                    } else { 發布對象是全部 
+                    } else { //發布對象是全部 
                         targetUsers = groupAllMembers;
                     }
 
