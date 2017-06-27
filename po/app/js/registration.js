@@ -412,7 +412,7 @@ appInitial = function(needUpdate){
         	}
         	
         	// 取dgi的combo
-            if( (groupList || []).length > 2 ){
+            if( (groupList || []).length > 0 ){
 
             	// 定時重新整理 為了健康
             	if(QmiGlobal.isAppReload === true) {

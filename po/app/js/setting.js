@@ -160,7 +160,7 @@ function removeGroup(thisGi, isFromCompany){
 
 	delete QmiGlobal.groups[thisGi];
 
-	if (Object.keys( QmiGlobal.groups ).length == 2) {
+	if (Object.keys( QmiGlobal.groups ).length == 0) {
         $.mobile.changePage("#page-group-menu");
         $("#page-group-menu .page-back").hide();
         if (QmiGlobal.auth.isSso) $(".no-group-lock").show();

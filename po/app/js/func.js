@@ -4966,7 +4966,7 @@ groupMenuListArea = function (noApi){
 
         if(Object.keys( QmiGlobal.groups ).length > 2) $(".sm-group-switch").show();
 
-        if (Object.keys( QmiGlobal.groups ).length == 3) {
+        if (Object.keys( QmiGlobal.groups ).length == 1) {
             $(".no-group-lock").hide();
             $.mobile.changePage("#page-group-main");
 
@@ -8339,13 +8339,21 @@ pollingCmds = function(newPollingData){
                                     && QmiGlobal.groups[this_gi].ntp !== 2
                                 ){
                                     var title = memData.gn || g_Qmi_title;
-                                    riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
-                                        if( gi==this_gi ){
-                                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
-                                        } else {
-                                            $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
-                                        }
-                                    });
+
+                                    if (memData.gu == QmiGlobal.groups[this_gi].me) {
+                                        toastShow($.i18n.getString("GROUP_X_JOIN_GROUP", $.i18n.getString("COMMON_YOU")) + title);
+                                    } else {
+                                        riseNotification( null, title, 
+                                            $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), 
+                                            function(){
+                                                if( gi==this_gi ){
+                                                    $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+                                                } else {
+                                                    $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
+                                                }
+                                            }
+                                        );
+                                    }
                                 }
                             } catch(e){
                                 errorReport(e);
