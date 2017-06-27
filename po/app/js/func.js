@@ -3658,7 +3658,7 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
             //s9=1or3無法看已未讀列表
             var isShowUnreadAndTime = false;
             var targetUsers = {};
-            var groupAllMembers = QmiGlobal.groups[gi].guAll || {};
+            var groupAllMembers = QmiGlobal.groups[this_gi].guAll || {};
             if( (QmiGlobal.groups[this_gi] || {}).ptp === 1) isShowUnreadAndTime = true;
 
             var isReady = false;
@@ -3698,13 +3698,13 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                                 }
                             });
                         }
-                    } else { 發布對象是全部 
+                    } else { //發布對象是全部 
                         targetUsers = groupAllMembers;
                     }
 
                     if (isShowUnreadAndTime) {
                         list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-                        list[1].ml = getUnreadUserList(targetUsers, parseData);
+                        list[1].ml = getUnreadUserList(targetUsers, parseData, this_gi);
                     } else {
                         list.push({title:$.i18n.getString("FEED_UNREAD"), clickable:false});
                     }
@@ -3739,7 +3739,7 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
             //     }
             //     isReady = true;
             // }
-            // break;
+            break;
         case 1:
             var isShowNamecard = true;
             try{
