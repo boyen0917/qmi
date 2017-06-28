@@ -8542,17 +8542,18 @@ pollingCmds = function(newPollingData){
                         });
                         break;
 
-                    case 61: // 後台管理者加入企業帳號進入團體
-                        // console.log(Object.keys((QmiGlobal.groups || {})).length)
-                        // // 本來無團體，解鎖
-                        // if (Object.keys((QmiGlobal.groups || {})).length == 2) {
-                        //     console.log("lala");
-                        //     $(".no-group-lock").none();
-                        //     $.mobile.changePage("#page-group-main");
-                        // }
-                        // if (item.pm && item.pm.gi && !(QmiGlobal.groups || {}).hasOwnProperty(item.pm.gi)) {
+                    case 60:
+                        if (QmiGlobal.auth.isSso) {
+                            new QmiGlobal.popup({
+                                desc: (item.pm || {}).msg,
+                                confirm: true,
+                                action: [reLogin]
+                            });
+                            return;
+                        }
+                        break;
+                    case 61:
 
-                        // }   
                         break;
                 }
 

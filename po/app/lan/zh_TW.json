@@ -445,7 +445,7 @@
 	"ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH" : "密碼不一致，請重新輸入。",
 
 	"GROUPLIST_NO_GROUPS" : "尚未加入任何團體",
-	"GROUPLIST_NO_GROUPS_ASK_ADMIN" : "待管理者將您加入團體後，即可開始使用Qmi",
+	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "Go get an invitation from group admin and start using Qmi!",
 
 	"WEBONLY_AUTH_LOADING" : "驗證中...",
 	"WEBONLY_AUTH_SUCCESS" : "驗證成功",
