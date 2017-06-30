@@ -445,7 +445,7 @@
 	"ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH" : "Passwords don't match",
 
 	"GROUPLIST_NO_GROUPS" : "You don't have any group yet",
-	"GROUPLIST_NO_GROUPS_ASK_ADMIN" : "Ask administrator to add you for Qmi Start",
+	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "Go get an invitation from group admin and start using Qmi!",
 
 	"WEBONLY_AUTH_LOADING" : "authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",

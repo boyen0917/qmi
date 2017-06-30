@@ -704,22 +704,26 @@ img.auo {
 
 .no-group-lock .content{
 	background-color: white;
-    width: 440px;
+    width: 420px;
     height: 260px;
     margin-right: auto;
     margin-left: auto;
-    margin-top: 34vh;
+    margin-top: 32vh;
     text-align: center;
     border-radius: 8px;
+    padding: 5px 0px;
 }
 
 .no-group-lock .content h3{
 	color: red;
     margin-top: 0;
+    margin-bottom: 8px;
 }
 
 .no-group-lock .content span{
 	color: grey;
+	display: inline-block;
+    width: 195px;
 }
 
 .compose-dnd {
