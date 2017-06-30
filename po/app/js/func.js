@@ -8087,6 +8087,7 @@ pollingCountsWrite = function(pollingData, aa){
     var cntsAllObj  = pollingData.cnts || {};
     var gcnts       = pollingData.gcnts || { G1: 0, G3: 0 };
     var groupsData  = QmiGlobal.groups;
+    var appBadgeNumber = 0;
     var sort_arr = []; //排序用
     // var getNoticesDefer = $.Deferred();
 
@@ -8172,6 +8173,8 @@ pollingCountsWrite = function(pollingData, aa){
                 dom.html(countsFormat(((thisCntObj.A5 < 0) ? 0 : thisCntObj.A5), dom)).show();
             }
 
+            appBadgeNumber += thisCntObj.A5;
+
             // 無cl 或 未有此gi 就不做
             if( thisCntObj.hasOwnProperty("cl") === false ||
                 thisQmiGroupObj === undefined ||
@@ -8212,10 +8215,13 @@ pollingCountsWrite = function(pollingData, aa){
     if(gcnts.G2 > 0){
         //最新消息
     }
-    if(gcnts.G3 >= 0){
+    if(gcnts.G3 > 0){
         //鈴鐺
         if( typeof(showNewAlertIcon)!='undefined' ) showNewAlertIcon( gcnts.G3 );
     }
+
+    if (appBadgeNumber > 0) setBadgeLabel(appBadgeNumber.toString());
+    else clearBadgeLabel();
         
 }
 

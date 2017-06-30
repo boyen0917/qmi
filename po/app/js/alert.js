@@ -6,7 +6,7 @@ $(function(){
 	// updateAlert();
 
 	$("#page-group-main .navi-alert").click(function(){
-		// $(this).removeClass("new");
+		$(this).removeClass("new");
 		// clearBadgeLabel();
 
 		if($(".alert-area").is(":visible")){
@@ -45,27 +45,24 @@ initAlertDB = function(){
 }
 
 showNewAlertIcon = function( cnt ){
-	if( cnt > 0 ){
-		//大於0程式icon和鈴鐺旁邊顯示數字
-		$(".navi-alert").addClass("new").attr("data-count", cnt);
-		setBadgeLabel( cnt.toString() );
+	if( cnt != lastCnt ){
+
+		lastCnt = cnt;
 
 		//關閉的話只顯示new icon
 		//若鈴鐺已開啟, 程式icon不更新數量, 並直接通知server已讀, 並卷回最上面
-		
-		if( $(".alert-area").is(":visible") ){ //開啟的話直接更新
-			
+		if( !$(".alert-area").is(":visible") ){
+			$(".navi-alert").addClass("new");
+
+			// setBadgeLabel( cnt.toString() );
+		} else { //開啟的話直接更新
 			$(".alert-area").scrollTop(0);
-			// if( typeof(updatePollingCnts)!= 'undefined' ){
-			// 	lastCnt = 0;
-			// 	updatePollingCnts( $("<div></div>"), "G3" );
-			// }
+			if( typeof(updatePollingCnts)!= 'undefined' ){
+				lastCnt = 0;
+				updatePollingCnts( $("<div></div>"), "G3" );
+			}
 			updateAlert();
-		} 
-		
-	} else {
-		$(".navi-alert").removeClass("new");
-		clearBadgeLabel();
+		}
 	}
 
 }
@@ -85,10 +82,10 @@ hideAlertBox = function(detail){
 
 //show通知區
 showAlertBox = function(){
-	// if( typeof(updatePollingCnts)!= 'undefined' ){
-	// 	lastCnt = 0;
-	// 	updatePollingCnts( $("<div></div>"), "G3" );
-	// }
+	if( typeof(updatePollingCnts)!= 'undefined' ){
+		lastCnt = 0;
+		updatePollingCnts( $("<div></div>"), "G3" );
+	}
     		
 	// updateAlert();
 	$(".alert").addClass("alert-click");
