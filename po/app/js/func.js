@@ -8150,7 +8150,8 @@ pollingCountsWrite = function(pollingData, aa){
         // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
         Object.keys(cntsAllObj).forEach(function(thisGi){
             var thisCntObj = cntsAllObj[thisGi],
-            thisQmiGroupObj = groupsData[thisGi];
+            thisQmiGroupObj = groupsData[thisGi],
+            groupBadgeNumber = 0;
 
             var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
             // var thisGroupUnreadEvents = noticeList.filter(function(notice) {
@@ -8164,16 +8165,15 @@ pollingCountsWrite = function(pollingData, aa){
             // 移轉 隱藏polling
             if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
-            // if((thisCntObj.A1 > 0 || thisCntObj.A3 > 0)){
-            if ( thisCntObj.A5 > 0) {
-            // if( thisCntObj.A5 > 0 && gi != thisGi){
-                // sort_arr.push([thisGi,thisCntObj.A1 + thisCntObj.A3]);
-                sort_arr.push([thisGi,thisCntObj.A5]);
-                // dom.html(countsFormat( ((thisCntObj.A1 < 0) ? 0 : thisCntObj.A1) + thisCntObj.A3, dom)).show();
-                dom.html(countsFormat(((thisCntObj.A5 < 0) ? 0 : thisCntObj.A5), dom)).show();
-            }
+            if ( thisCntObj.A2 > 0 || thisCntObj.A5 > 0) {
+                groupBadgeNumber = ((thisCntObj.A2 < 0) ? 0 : thisCntObj.A2) 
+                    + ((thisCntObj.A5 < 0) ? 0 : thisCntObj.A5);
 
-            appBadgeNumber += thisCntObj.A5;
+                sort_arr.push([thisGi,thisCntObj.A5]);
+                dom.html(countsFormat(groupBadgeNumber, dom)).show();
+
+                appBadgeNumber += groupBadgeNumber;
+            }
 
             // 無cl 或 未有此gi 就不做
             if( thisCntObj.hasOwnProperty("cl") === false ||
