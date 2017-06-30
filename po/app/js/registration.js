@@ -6,7 +6,7 @@ appInitial = function(needUpdate){
     if($.lStorage("_appReloadAuth") !== false) {
     	QmiGlobal.auth = $.lStorage("_appReloadAuth");	
     	localStorage.removeItem("_appReloadAuth");
-    	
+    	QmiGlobal.isAppReload = true;
     	loginAction();
 
     } else if($.lStorage("_loginAutoChk") === true) {

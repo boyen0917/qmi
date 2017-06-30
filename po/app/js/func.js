@@ -36,8 +36,9 @@ setGroupInitial = function(new_gi,chk){
         var tmp = $(".sm-small-area:not(.setting):visible");
     
         // 定時重新整理 為了健康
-        if(QmiGlobal.isPeriodicallyReload === true) {
-            timelineSwitch(QmiGlobal.auth.prObj.param.act, QmiGlobal.auth.prObj.param.reset, QmiGlobal.auth.prObj.param.main);
+        if(QmiGlobal.isAppReload === true) {
+            var param = QmiGlobal.auth.appReloadObj.param;
+            timelineSwitch(param.act, param.reset, param.main, true);// noAppReload = true;
 
         } else if( tmp.length>0 ){
 
