@@ -2378,7 +2378,7 @@ $(function(){
 		return function() {
 			cnt++;
 			if(cnt >= 5) {
-				QmiGlobal.appReload.do({isReloadDirectly: true});
+				QmiGlobal.appReload.do({act: "feeds", isReloadDirectly: true});
 				return;
 			} else if(cnt === 1) {
 				clearTimeout(timer);

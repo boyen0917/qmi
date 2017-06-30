@@ -409,8 +409,7 @@ window.QmiGlobal = {
 	            
 	            // location.reload();
 	            clearCache();
-	        },
-	        getFlag: function() {return flag;}
+	        }
 	    }
 
 	    function setTimer(){
