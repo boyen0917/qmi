@@ -175,10 +175,10 @@ $(function(){
         var getMembers = function (nextUserId) {
             nextUserId = nextUserId || "";
             var ajaxData = {
-                apiName: "groups/" + thisGi + "/users",
+                apiName: "groups/" + thisGi + "/users?tp=1",
                 apiVer: "apiv2",
             }
-            if (nextUserId != "") ajaxData.apiName = ajaxData.apiName + "?gu=" + nextUserId;
+            if (nextUserId != "") ajaxData.apiName = ajaxData.apiName + "&gu=" + nextUserId;
 
             new QmiAjax(ajaxData).success(function(data) {
                 if (Array.isArray(data.ul) && data.ul.length > 0) {

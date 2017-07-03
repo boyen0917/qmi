@@ -3215,7 +3215,12 @@ function sendMsgText(dom) {
 					for (var i = 0; i < parseData.length; i++) {
 						delete parseData[i].rt;
 					}
+				} else{
+					parseData.sort(function(a, b) {
+						return b.rt - a.rt;
+					});
 				}
+
 				list[0].ml = parseData;
 
 				if (isShowUnreadAndReadTime) {

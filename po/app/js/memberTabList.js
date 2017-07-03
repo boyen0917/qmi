@@ -78,13 +78,9 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
         tab.data("clickable", (null==object.clickable)?true:(object.clickable) );
         tabArea.append(tab);
     });
-    // if( list.length<=1 ){
-    //     tabArea.hide();
-    //     cellArea.addClass("noTitle");
-    // } else {
-        tabArea.show();
-        cellArea.removeClass("noTitle");
-    // }
+
+    tabArea.show();
+    cellArea.removeClass("noTitle");
 
     //generate page when click
     tabArea.next().html("");
@@ -116,7 +112,7 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
             var currentMembum = cellArea.find("._" + index + " .obj-cell").length;
             var loadMemList = listData.slice(currentMembum, currentMembum + 100);
 
-            if (currentMembum + 100 > listData.length - 1) {
+            if (currentMembum + 100 > listData.length - 1) { // 減一原因不把自己算進去
                 loadMemList = listData.slice(currentMembum);
             } 
 
@@ -158,8 +154,6 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
                 var object_img = this_obj.find(".obj-cell-user-pic img");
                 if(mem.aut) {
                     object_img.attr("src",mem.aut);
-                    //object_img.removeAttr("style");
-                    // avatarPos(object_img);
                 }
                 if( rt ) {
                     this_obj.find(".obj-cell-time").html( new Date(rt).toFormatString() );
@@ -186,7 +180,7 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
         page.find(".obj-cell-page.current").off("scroll").on("scroll", function (e) {
             var container = $(e.target);
             if (container.scrollTop() + container.height() > container[0].scrollHeight - 20) {
-                if (container.find(" .obj-cell").length < listData.length) {
+                if (container.find(" .obj-cell").length < listData.length - 1) {
                     makeMemberList();
                 }
             }
