@@ -2252,3 +2252,9 @@ function riseNotification (icon, title, description, onClickCallback) {
 		console.log("Notification doesn't be supported.");
 	}
 }
+
+function emojiImgError(image) {
+	$(image).replaceWith(function() {
+    	return $(image).prop('alt');
+  	});
+}
