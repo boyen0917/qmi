@@ -6,7 +6,7 @@ appInitial = function(needUpdate){
     if($.lStorage("_appReloadAuth") !== false) {
     	QmiGlobal.auth = $.lStorage("_appReloadAuth");	
     	localStorage.removeItem("_appReloadAuth");
-    	
+    	QmiGlobal.isAppReload = true;
     	loginAction();
 
     } else if($.lStorage("_loginAutoChk") === true) {
@@ -291,12 +291,6 @@ appInitial = function(needUpdate){
 
         		var dataObj = $.parseJSON(data.responseText);
 				
-        		// 判斷此次登入帳號與上次不同再刪除DB
-        		if($.lStorage("_loginId") !== bodyData.id) resetDB();
-
-        		//記錄此次登入帳號
-        		$.lStorage("_loginId",bodyData.id);
-
 				QmiGlobal.auth = dataObj;
 
 				//自動登入儲存 有_loginData 有_loginAutoChk 才代表有選自動登入
@@ -332,9 +326,6 @@ appInitial = function(needUpdate){
         		// 判斷是否換帳號 換帳號就要清db
         		changeAccountToResetDB(phoneId);
 
-        		// 登入清除polling
-        		localStorage.removeItem("_pollingData");
-        		
     			//記錄帳號密碼
     			if($(".login-remeber").data("chk")){
 					var _loginRemeber = {};

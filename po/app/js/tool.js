@@ -794,6 +794,7 @@ resetDB = function(){
 	Object.keys(exceptionObj).forEach(function(key) {
 		$.lStorage(key, exceptionObj[key]);
 	});
+	
 }
 
 getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){

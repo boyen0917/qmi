@@ -2371,4 +2371,22 @@ $(function(){
 		}
 	});
 
+	// 手動點選重整
+	$("div#page-group-main div.gm-header-left").click(function() {
+		var cnt = 0;
+		var timer = null;
+		return function() {
+			cnt++;
+			if(cnt >= 5) {
+				QmiGlobal.appReload.do({act: "feeds", isReloadDirectly: true});
+				return;
+			} else if(cnt === 1) {
+				clearTimeout(timer);
+				timer = setTimeout(function() {
+					cnt = 0;
+				}, 1000);
+			}
+		}
+	}());
+
 });  
