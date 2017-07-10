@@ -928,6 +928,9 @@
             		   	   .find(".user .edit-decision").css("visibility", "hidden").end()
             		   	   .find(".user .edit-pen").show();
 
+            		userData.nk = userObj.info.nk;
+            		userData.nk2 = userObj.info.nk2;
+
 			    	toastShow(completeMsg);
 			    }).fail(function (failMsg) {
 			    	toastShow(failMsg);
