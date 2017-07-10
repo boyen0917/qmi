@@ -33,8 +33,6 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
-
 //timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [
 	".st-sub-box-2-content-detail a",
@@ -177,7 +175,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整
-	appVer: "1.8.2.1",
+	appVer: "1.8.3.0",
 
 	// 檢查是否為聊天室
 	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
@@ -1092,16 +1090,6 @@ MyDeferred = function() {
   myPromise.reject = myReject;
   return myPromise;
 }
-
-// 選擇server
-$(document).on("click", "#container_version", function() {
-	var cnts = 0;
-	return function() {
-		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
-		cnts++;
-		if(cnts < 5) return;
-		QmiGlobal.module.serverSelector.init();
-}}());
 
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){

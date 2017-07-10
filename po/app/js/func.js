@@ -36,8 +36,9 @@ setGroupInitial = function(new_gi,chk){
         var tmp = $(".sm-small-area:not(.setting):visible");
     
         // 定時重新整理 為了健康
-        if(QmiGlobal.isPeriodicallyReload === true) {
-            timelineSwitch(QmiGlobal.auth.prObj.param.act, QmiGlobal.auth.prObj.param.reset, QmiGlobal.auth.prObj.param.main);
+        if(QmiGlobal.isAppReload === true) {
+            var param = QmiGlobal.auth.appReloadObj.param;
+            timelineSwitch(param.act, param.reset, param.main, true);// noAppReload = true;
 
         } else if( tmp.length>0 ){
 
@@ -1400,7 +1401,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         var mainReplyText;
 
         deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v1.8.2.1 .st-reply-content-area', function(){
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v1.8.3.0 .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
@@ -1896,7 +1897,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v1.8.2.1 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v1.8.3.0 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -3716,7 +3717,7 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
             //s9=1or3無法看已未讀列表
             var isShowUnreadAndTime = false;
             var targetUsers = {};
-            var groupAllMembers = QmiGlobal.groups[gi].guAll || {};
+            var groupAllMembers = QmiGlobal.groups[this_gi].guAll || {};
             if( (QmiGlobal.groups[this_gi] || {}).ptp === 1) isShowUnreadAndTime = true;
 
             var isReady = false;
@@ -3740,7 +3741,6 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                         if (objectData.bl) {
                             $.each(groupAllMembers, function (id, member) {
                                 objectData.bl.forEach(function (obj) {
-                                    console.log(member);
                                     if (member.st > 0 && member.bl.indexOf(obj.bi) > -1) {
                                         targetUsers[id] = member;
                                     }
@@ -3756,13 +3756,13 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                                 }
                             });
                         }
-                    } else { 發布對象是全部 
+                    } else { //發布對象是全部 
                         targetUsers = groupAllMembers;
                     }
 
                     if (isShowUnreadAndTime) {
                         list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-                        list[1].ml = getUnreadUserList(targetUsers, parseData);
+                        list[1].ml = getUnreadUserList(targetUsers, parseData, this_gi);
                     } else {
                         list.push({title:$.i18n.getString("FEED_UNREAD"), clickable:false});
                     }
@@ -3775,29 +3775,8 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                     errorReport(e);
                 }
             });
-            //get unread
-            // if( isShowUnreadAndTime ){
-            //     list.push( {title:$.i18n.getString("FEED_UNREAD"),ml:null} );
-            //     getThisTimelinePart( this_event, 9, function(data){
-            //         try{
-            //             list[1].ml = $.parseJSON( data.responseText ).epl;
-            //             if(isReady){
-            //                 showObjectTabShow(this_gi, title, list, onDone);
-            //             } else {
-            //                 isReady = true;
-            //             }
-            //         } catch(e) {
-            //             errorReport(e);
-            //         }
-            //    });
-            // } else {
-            //     list.push( {title:$.i18n.getString("FEED_UNREAD"),clickable:false} );
-            //     if (isReady) {
-            //         showObjectTabShow(this_gi, title, list, onDone);
-            //     }
-            //     isReady = true;
-            // }
-            // break;
+
+            break;
         case 1:
             var isShowNamecard = true;
             try{
@@ -3914,14 +3893,14 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
             var currentMembum = cellArea.find("._" + index + " .obj-cell").length;
             var loadMemList = listData.slice(currentMembum, currentMembum + 100);
 
-            if (currentMembum + 100 > listData.length - 1) {
+            if (currentMembum + 100 > listData.length - 1)
                 loadMemList = listData.slice(currentMembum);
-            } 
 
             loadMemList.forEach(function (member) {
                 var gu = member.gu;
                 var rt = member.rt;
                 var mem = guAll[gu];
+                if(!mem) return;
                 var this_obj = $(
                     '<div class="obj-cell mem" data-gu="'+gu+'">' +
                         '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +

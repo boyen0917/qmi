@@ -1366,7 +1366,18 @@ img.auo {
 	padding: 0 15px;
 	float: left;
 	line-height: 30px;
+	position: relative;
 }
+
+div#page-group-main div.gm-header-left:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 44px;
+    left: 0;
+    top: -7px;
+}
+
 .gm-header-right{
 	display: inline-block;
 	width: -webkit-calc( 100% - 275px );
@@ -5340,7 +5351,7 @@ input.cp-datetimepicker-end {
 }
 
 .obj-cell-page.current {
-	height: -webkit-calc( 100% - 114px );
+	height: -webkit-calc( 100% - 104px );
 	background: white;
 	position: fixed;
 	width: 100%;
