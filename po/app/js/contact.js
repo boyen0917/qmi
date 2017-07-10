@@ -643,8 +643,9 @@ generateMemberGrid = function( memberKeyList, memContainer ){
 			var memberElementStr = "<div class='mem namecard " + ((memberData.ad == 1) ? "admin " : " ") 
 				+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu + "'>"
 				+ "<img data-url='" + imgUrl + "' src='" + imgUrl + "'>"
-				+ "<div class='name'>" + memberData.nk.replaceOriEmojiCode() + " (" 
-				+ memberData.nk2.replaceOriEmojiCode() + ")</div></div>";
+				+ "<div class='name'>" + memberData.nk.replaceOriEmojiCode() 
+				+ ((memberData.nk2.length > 0) ? " (" + memberData.nk2.replaceOriEmojiCode() + ")" : "")
+				+ "</div></div>";
 
 			return memberHtml + memberElementStr;	
 		}, "");
@@ -688,9 +689,9 @@ generateMemberList = function( memberKeyList, memContainer, favCallback ){
 			var memberElementStr = "<div class='row mem namecard " + ((memberData.ad == 1) ? "admin " : " ")
 			 	+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu 
 			 	+ "' ><div class='left'><img data-url='" + imgUrl + "' src='" + imgUrl 
-			 	+ "' /></div><div class='mid'><div class='name'>" + memberData.nk.replaceOriEmojiCode() 
-			 	+ " (" + memberData.nk2.replaceOriEmojiCode() + ")</div><div class='detail'>" 
-			 	+ ((memberData.bl == "") ? "" : bl[memberData.bl.split(",")[0].split(".")[0]].bn)
+			 	+ "' /></div><div class='mid'><div class='name'>" + memberData.nk.replaceOriEmojiCode()
+			 	+ ((memberData.nk2.length > 0) ? " (" + memberData.nk2.replaceOriEmojiCode() + ")" : "")
+			 	+ "</div><div class='detail'>" + ((memberData.bl == "") ? "" : bl[memberData.bl.split(",")[0].split(".")[0]].bn)
 				+ "</div><div class='detail " + ((memberData.ti == "") ? "twoLine" : "") +"'>" 
 				+ ((memberData.ti == "") ? "" : memberData.ti) + "</div></div><div class='right'>&nbsp</div></div>";
 
