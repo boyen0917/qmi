@@ -1592,14 +1592,16 @@ function showMsg(object, bIsTmpSend) {
 			getChatS3file(fileDom, msgData.c, msgData.tp, ti_chat);
 			break;
 		case 28:
-			var invoker = g_group.guAll[msgData.i];
-			var targetUser = g_group.guAll[msgData.t];
+			var invoker = (g_group.guAll[msgData.i] || {}).nk;
+			var targetUser = (g_group.guAll[msgData.t] || {}).nk;
 			var systemMsg = "";
 			if (msgData.a) {
-				systemMsg = invoker.nk + "   指派   " + targetUser.nk + "   為聊天室管理員";
+				systemMsg = $.i18n.getString("CHAT_CHATROOM_SOMEONE_ASSIGN_ADMIN", invoker, targetUser);
 			} else {
-				systemMsg = invoker.nk + "   取消   " + targetUser.nk + "   聊天室管理員權限";
+				systemMsg = $.i18n.getString("CHAT_CHATROOM_SOMEONE_DEMOTE_SOMEONE", invoker, targetUser);
 			}
+
+			isUpdatePermission = true;
 
 			msgDiv.html(htmlFormat(systemMsg));
 			if (isMe) {
@@ -2374,9 +2376,9 @@ function sendMsgText(dom) {
 							window.close();
 						});
 					} else {
-						popupShowAdjust("你已是管理員了!!",
-							"請保留成員至少有一位是管理員，並將自己的權限取消!!",
-							"前往編輯",
+						popupShowAdjust($.i18n.getString("CHAT_SELF_ALREADY_ADMIN"),
+							$.i18n.getString("CHAT_EXIT_CHATROOM_FAIL"),
+							$.i18n.getString("CHAT_EDIT_CHATROOM"),
 							$.i18n.getString("COMMON_CANCEL"), [function () {
 								showEditRoomPage();
 							}]
@@ -2520,8 +2522,8 @@ function sendMsgText(dom) {
 
 		
 		//set current group name
-		input.val( g_cn ).data("oriName",g_cn);
-		editPage.find(".chatroomNameInput").val(g_cn)
+		input.val( g_cn ).data("oriName", g_room.uiName);
+		editPage.find(".chatroomNameInput").val(g_room.uiName)
 		//set current mem
 		updateEditRoomMember(g_room.memList);
 

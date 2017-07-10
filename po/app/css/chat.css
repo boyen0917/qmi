@@ -1758,6 +1758,7 @@ body {
     height: 65px;
     border: 1px solid #dddddd;
     border-radius: 10px;
+    object-fit: cover;
 	/*margin: 10px 0px 0px -32px;*/
 }
 

@@ -120,6 +120,12 @@ function getChatListApi(giTmp) {
 			}
 
 			tmpChatAllObj[newRoom.ci] = newRoom;
+
+			// 更新聊天室視窗資料;
+			if (windowList.hasOwnProperty([newRoom.ci])
+				&& typeof(windowList[newRoom.ci]) === "object") {
+				windowList[newRoom.ci].g_room = newRoom;
+			}
 		});
 
 		currentGroup.chatAll = tmpChatAllObj;
