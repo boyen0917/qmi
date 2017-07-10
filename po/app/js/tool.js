@@ -1489,7 +1489,7 @@ updateGroupAllInfoDom = function( thisGi ){
 		}
 
 		//update name
-		updateSideMenuContent(thisGi);
+		// updateSideMenuContent(thisGi);
 
 		if( gi==thisGi ){
 			//update icon
@@ -2537,6 +2537,7 @@ QmiGlobal.MemberLocateModal.prototype = {
 		    }
 		}
 	}
+}
 
 function emojiImgError(image) {
 	$(image).replaceWith(function() {

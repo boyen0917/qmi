@@ -9,8 +9,7 @@ $(function(){
 		$(".cp-post").trigger("click");
 	});
 
-
-	$("#page-group-main .subpage-timeline.main-subpage").bind('scroll', function(){
+	$("#page-group-main .subpage-timeline.main-subpage").bind('scroll', function() {
 		//取舊資料
 		var feed_type = $("#page-group-main").data("navi");
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
@@ -360,7 +359,7 @@ $(function(){
         	if(groupObj.isRefreshing || groupObj.isReAuthUILock) return;
 
 			//updatePollingCnts
-        	updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
+        	// updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 		}.bind(this));
 	});
 	
@@ -2017,7 +2016,9 @@ $(function(){
 		// 尚未與許更換團體
 		if( thisDom.hasClass("sm-group-area") && !thisDom.hasClass("enable") ) return;
 		// 聊天室不做清cnt動作
-		if( thisDom.data("polling-cnt") === "A3" ) return;
+		if( thisDom.data("polling-cnt") === "A1" 
+			|| thisDom.data("polling-cnt") === "A3" 
+			|| thisDom.data("polling-cnt") === "A5") return;
 		
 		thisDom.find(".sm-count").hide();
 		updatePollingCnts(thisDom.find(".sm-count"),thisDom.data("polling-cnt"));

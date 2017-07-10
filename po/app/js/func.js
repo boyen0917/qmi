@@ -8157,24 +8157,32 @@ pollingCountsWrite = function(pollingData, aa){
     var cntsAllObj  = pollingData.cnts || {};
     var gcnts       = pollingData.gcnts || { G1: 0, G3: 0 };
     var groupsData  = QmiGlobal.groups;
+    var appBadgeNumber = 0;
     var sort_arr = []; //排序用
+    // var getNoticesDefer = $.Deferred();
 
-    
     // 先將當前團體的 cnts 更新在 ui 中
     if( cntsAllObj.hasOwnProperty( gi ) === true ) {
         var thisCntObj = cntsAllObj[gi];
 
         ["A1", "A2", "A4"].forEach(function(key){
             var smCountA = $(".polling-cnt[data-polling-cnt="+ key +"] .sm-count").hide();
+
             if ( thisCntObj.hasOwnProperty(key) === true && thisCntObj[key] > 0 ) {
 
-                // 部分動態tab 如果是active 消除cnts
-                if( smCountA.parent().hasClass("active") === true){
-                    updatePollingCnts( smCountA, key );
-                } else {
+                if (key == "A1") {
                     smCountA.show()
                     .html(countsFormat(thisCntObj[key], smCountA))
                     .data("gi",gi);
+                } else {
+                    // 部分動態tab 如果是active 消除cnts
+                    if( smCountA.parent().hasClass("active") === true){
+                        updatePollingCnts( smCountA, key );
+                    } else {
+                        smCountA.show()
+                        .html(countsFormat(thisCntObj[key], smCountA))
+                        .data("gi",gi);
+                    }
                 }
             }
         });
@@ -8204,50 +8212,71 @@ pollingCountsWrite = function(pollingData, aa){
             countA3Dom.hide();
     }
 
-    // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
+    // idb_alert_events.getAll(function(noticeList){
+    //     getNoticesDefer.resolve(noticeList);
+    // })
 
-    Object.keys(cntsAllObj).forEach(function(thisGi){
-        var thisCntObj = cntsAllObj[thisGi],
-        thisQmiGroupObj = groupsData[thisGi];
+    // getNoticesDefer.done(function(noticeList) {
+        // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
+        Object.keys(cntsAllObj).forEach(function(thisGi){
+            var thisCntObj = cntsAllObj[thisGi],
+            thisQmiGroupObj = groupsData[thisGi],
+            groupBadgeNumber = 0;
 
-        var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
+            var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
+            // var thisGroupUnreadEvents = noticeList.filter(function(notice) {
+            //     return ((notice.ei || "").split("_")[0] == thisGi) 
+            //             && (notice.data)
+            //             && (notice.data.nd) 
+            //             && (notice.data.nd.st === 0);
+            // });
 
-        // 移轉 隱藏polling
-        if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
-        
-        if( thisCntObj.A5 > 0 && gi != thisGi){
-            sort_arr.push([thisGi,thisCntObj.A5]);
-            dom.html(countsFormat( thisCntObj.A5, dom)).show();
-        }
+            // console.log(thisGroupUnreadEvents);
+            // 移轉 隱藏polling
+            if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
-        // 無cl 或 未有此gi 就不做
-        if( thisCntObj.hasOwnProperty("cl") === false ||
-            thisQmiGroupObj === undefined ||
-            thisQmiGroupObj.hasOwnProperty("chatAll") === false 
-        ) return ;
+            if ( thisCntObj.A2 > 0 || thisCntObj.A5 > 0) {
+                groupBadgeNumber = ((thisCntObj.A2 < 0) ? 0 : thisCntObj.A2) 
+                    + ((thisCntObj.A5 < 0) ? 0 : thisCntObj.A5);
 
-        thisCntObj.cl.forEach(function(clObj){
-            if( thisQmiGroupObj.chatAll.hasOwnProperty( clObj.ci ) === true ) 
-                thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
+                sort_arr.push([thisGi,thisCntObj.A5]);
+                dom.html(countsFormat(groupBadgeNumber, dom)).show();
+
+                appBadgeNumber += groupBadgeNumber;
+            }
+
+            // 無cl 或 未有此gi 就不做
+            if( thisCntObj.hasOwnProperty("cl") === false ||
+                thisQmiGroupObj === undefined ||
+                thisQmiGroupObj.hasOwnProperty("chatAll") === false 
+            ) return ;
+
+            thisCntObj.cl.forEach(function(clObj){
+                if( thisQmiGroupObj.chatAll.hasOwnProperty( clObj.ci ) === true ) 
+                    thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
+            })
+
         })
 
-    })
-    //排序
-    sort_arr.sort(function(a, b) {return a[1] - b[1]});
-    sort_arr.forEach(function(obj){
-        var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
-        sortedGroup.detach();
+        //排序
+        sort_arr.sort(function(a, b) {return a[1] - b[1]});
+        sort_arr.forEach(function(obj){
+            var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
+            sortedGroup.detach();
 
-        // 官方帳號判斷
-        try {
-            if(QmiGlobal.groups[obj[0]].ntp === 2)
-                var targetDom = $(".sm-offical-group");
-            else
-                var targetDom = $(".sm-general-group");
+            // 官方帳號判斷
+            try {
+                if(QmiGlobal.groups[obj[0]].ntp === 2)
+                    var targetDom = $(".sm-offical-group");
+                else
+                    var targetDom = $(".sm-general-group");
 
-            targetDom.after(sortedGroup);
-        } catch(e) { /* do nothing */}
-    })
+                targetDom.after(sortedGroup);
+            } catch(e) { /* do nothing */}
+        })
+    // });
+    
+
 
     //邀請 若是在團體邀請頁面時 則不寫入
     if(gcnts.G1 > 0){
@@ -8260,6 +8289,9 @@ pollingCountsWrite = function(pollingData, aa){
         //鈴鐺
         if( typeof(showNewAlertIcon)!='undefined' ) showNewAlertIcon( gcnts.G3 );
     }
+
+    if (appBadgeNumber > 0) setBadgeLabel(appBadgeNumber.toString());
+    else clearBadgeLabel();
         
 }
 
@@ -8584,6 +8616,11 @@ pollingCmds = function(newPollingData){
                         getCompanyToken(companyData).done(function() {
                             cmd57Def.resolve();
                         });
+                        break;
+
+                    case 59: 
+                        console.log("my cow");
+
                         break;
                 }
 

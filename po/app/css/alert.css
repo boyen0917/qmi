@@ -200,6 +200,11 @@
 	line-height: 23px;
 	color: rgb(171, 178, 185);
 }
+
+#view-alert .al-content .mention-text {
+	display: none;
+}
+ 
 .al-content .icon{
 	width: 23px;
 	height: 23px;
