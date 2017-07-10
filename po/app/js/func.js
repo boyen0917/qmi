@@ -5021,7 +5021,7 @@ groupMenuListArea = function (noApi){
     var deferred = $.Deferred();
 
     if(noApi) noApiDeferred.resolve();
-    else getGroupList().done(noApiDeferred.resolve);   
+    else getGroupList().done(noApiDeferred.resolve);
 
     noApiDeferred.done(function(data){
         //管理者圖示
@@ -5033,6 +5033,15 @@ groupMenuListArea = function (noApi){
         $.each(QmiGlobal.groups, addSideMenuGroupUI.bind(listArea));
 
         if(Object.keys( QmiGlobal.groups ).length > 2) $(".sm-group-switch").show();
+
+        if (Object.keys( QmiGlobal.groups ).length == 1) {
+            $(".no-group-lock").hide();
+            $.mobile.changePage("#page-group-main");
+
+            $("#page-group-menu .page-back").show();
+
+            setGroupInitial(Object.keys(QmiGlobal.groups)[0], true);
+        }   
 
         // 判斷無官方帳號團體就關閉標題
         (function() {
@@ -8432,13 +8441,21 @@ pollingCmds = function(newPollingData){
                                     && QmiGlobal.groups[this_gi].ntp !== 2
                                 ){
                                     var title = memData.gn || g_Qmi_title;
-                                    riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
-                                        if( gi==this_gi ){
-                                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
-                                        } else {
-                                            $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
-                                        }
-                                    });
+
+                                    if (memData.gu == QmiGlobal.groups[this_gi].me) {
+                                        toastShow($.i18n.getString("GROUP_X_JOIN_GROUP", $.i18n.getString("COMMON_YOU")) + title);
+                                    } else {
+                                        riseNotification( null, title, 
+                                            $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), 
+                                            function(){
+                                                if( gi==this_gi ){
+                                                    $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+                                                } else {
+                                                    $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
+                                                }
+                                            }
+                                        );
+                                    }
                                 }
                             } catch(e){
                                 errorReport(e);
@@ -8468,6 +8485,7 @@ pollingCmds = function(newPollingData){
                                     }
                                 })
                             }else {
+                                user_info_arr.push( item.pm );
                                 $.each(windowList, function(index, val) {
                                     if(!windowList[index].closed && val.g_room.memList[item.pm.gu]) {
                                         if(val.g_room.tp == 1) {
@@ -8501,7 +8519,6 @@ pollingCmds = function(newPollingData){
                                 errorReport(e);
                             }
                         }
-                        user_info_arr.push( item.pm );
                         if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
                     case 7://branch edit
@@ -8618,13 +8635,31 @@ pollingCmds = function(newPollingData){
                         });
                         break;
 
-                    case 59: 
-                        console.log("my cow");
+                    case 58:
+                        var pollingData = item.pm || {};
+                        resetCompanyAccountPassword({
+                            id: pollingData.id, 
+                            ci: pollingData.ci,
+                            url: $.lStorage("_loginData").url,
+                        });
+                        break;
+
+                    case 60:
+                        if (QmiGlobal.auth.isSso) {
+                            new QmiGlobal.popup({
+                                desc: (item.pm || {}).msg,
+                                confirm: true,
+                                action: [reLogin]
+                            });
+                            return;
+                        }
+                        break;
+                    case 61:
 
                         break;
                 }
 
-            }); // end of newPollingData.cmds forEach
+            }); // end of newPollingData.cmds forEach 
 
             //將tp4,5,6 的user info都更新完 再更新polling時間
             if(user_info_arr.length > 0){
@@ -9105,7 +9140,96 @@ function activateClearChatsTimer(){
 };
 
 
+function resetCompanyAccountPassword(ssoData) {
+    var time = new Date();
+    time.setDate(time.getDate() - 30);
 
+    QmiGlobal.PopupDialog.create({
+        header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
+            + "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_SECURITY_NOTICE") + "</h2><p>" 
+            + $.i18n.getString("ENTERPRISE_ACCOUNT_LAST_TIME") + "</p><p>" + time.getFullYear() + "." 
+            + ("0" + (time.getMonth() + 1)).slice(-2) + "." + ("0" + time.getDate()).slice(-2) + "</p><p>"
+            + $.i18n.getString("ENTERPRISE_ACCOUNT_REMIND") +"</p></div>",
+
+        input: [{
+            type: "password",
+            className: "input-password old-password",
+            hint: "ENTERPRISE_ACCOUNT_SET_ORIGIN_PASSWORD",
+            maxLength : 30,
+            eventType: "input",
+            eventFun: function (e) {
+                checkPasswordAreMatch(e, "update");
+            }
+        },{
+            type: "password",
+            className: "input-password new-password",
+            hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD",
+            maxLength : 10,
+            eventType: "input",
+            eventFun: function (e) {
+                checkPasswordAreMatch(e, "update");
+            }
+        },{
+            type: "password",
+            className: "input-password new-password-again",
+            hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN",
+            maxLength : 10,
+            eventType: "input",
+            eventFun: function (e) {
+                checkPasswordAreMatch(e, "update");
+            }
+        }],
+        errMsg: {
+            text: "ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH",
+            className: "error-message"
+        },
+        buttons: {
+            cancel: {
+                text : "ENTERPRISE_ACCOUNT_IGNORE",
+                className: "ignore",
+                eventType : "click",
+                eventFun : function (callback) {
+                    QmiGlobal.PopupDialog.close();
+                }
+            },
+            confirm: {
+                text : "ENTERPRISE_ACCOUNT_CHANGE_PASSWORD",
+                className: "update",
+                eventType : "click",
+                eventFun : function (callback) {
+                    var dialog = $("#popupDialog");
+
+                    if ($(this).hasClass("enable")) {
+                        var oldPassword = dialog.find(".old-password input").val();
+                        var firstNewPassword = dialog.find(".new-password input").val();
+                        var secondNewPassword = dialog.find(".new-password-again input").val();
+
+                        if (firstNewPassword !== secondNewPassword) {
+                            dialog.find(".error-message").css("opacity", 1);
+                        } else {
+                            dialog.find(".error-message").css("opacity", 0);
+                            new QmiAjax({
+                                url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password",
+                                method: "put",
+                                body: {
+                                    id: ssoData.id,
+                                    dn: QmiGlobal.device,
+                                    op: QmiGlobal.aesCrypto.enc(oldPassword, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+                                    np: QmiGlobal.aesCrypto.enc(firstNewPassword, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+                                }
+                            }).done(function(rspData) {
+                                if (rspData.status == 200) {
+                                    QmiGlobal.PopupDialog.close();
+                                    toastShow($.i18n.getString("ENTERPRISE_ACCOUNT_CHANGE_PASSWORD_SUCCESS"));
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }).open();
+}
 
 function clickTimelineTab(argObj) {
     $(".sm-group-list-area").removeAttr("data-unlock");
