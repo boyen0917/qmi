@@ -2616,3 +2616,8 @@ function checkPasswordAreMatch (elementData, enableBtnName) {
 	if (isColunmsMatchFormat) $("#popupDialog").find("." + enableBtnName).addClass("enable");
 	else $("#popupDialog").find("." + enableBtnName).removeClass("enable");
 }
+
+function getFullName(userData) {
+	return (userData.nk2 && userData.nk2 != "") 
+		? userData.nk + " (" + userData.nk2 + ")" : userData.nk;
+}

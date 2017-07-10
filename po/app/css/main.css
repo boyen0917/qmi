@@ -1488,10 +1488,28 @@ div#page-group-main div.gm-header-left:before {
 }
 
 .gm-user-main-area .header h3 {
-	margin-left: 6em;
+	margin-left: 5.8em;
     line-height: 0;
     width: 265px;
     display: inline-block;
+}
+
+.gm-user-main-area .header .edit-full-name {
+	margin-left: 6.6em;
+	min-width: 300px;
+	max-width: 350px;
+	display: none;
+	float: left;
+}
+
+.gm-user-main-area .header .edit-full-name input {
+	background-color: transparent;
+    width: 100px;
+    border-bottom: 1px solid #666;
+    padding: 4px;
+    margin-right: 10px;
+    font-size: 16px;
+    color: rgba(102, 102, 102, 0.87);
 }
 
 .gm-user-main-area .header .edit-pen {

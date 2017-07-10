@@ -149,6 +149,7 @@
 	"MEMBER_CREATE" : "Create",
 	"MEMBER_CUSTOMIZE_GROUP_NAME": "Customize group name",
 	"MEMBER_ENTER_CUSTOMIZE_GROUP_NAME" : "Please enter customize group name",
+	"MEMBER_CUSTOMIZE_GROUP_MEMBER_EMPTY" : "Please select customize group member",
 	"MEMBER_CREATE_CUSTOMIZE_SUCC" : "Create customize group succ.",
 	"MEMBER_CREATE_CUSTOMIZE_FAIL" : "Create customize group fail.",
 	"MEMBER_EDIT_CUSTOMIZE_GROUP_NAME" : "Edit group name",
@@ -313,6 +314,7 @@
 	"GROUP_X_LEAVE_GROUP" : "%@ left group.",
 
 	"SETTING_PROFILE_NAME" : "Name",
+	"SETTING_PROFILE_NICKNAME" : "NICKNAME",
 	"SETTING_PROFILE_BIRTHDAY" : "Birthday",
 	"USER_PROFILE_MOOD" : "Signature",
 	"USER_PROFILE_BRANCHE" : "Branch",
