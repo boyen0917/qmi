@@ -398,20 +398,16 @@ input {
 }
 
 .setting-area {
-	width: 300px;
-	background: white;
 	margin: 50px auto;
-	border-radius: 3px;
-	box-shadow: 0px 6px 10px -6px #d2d2d2;
-	height: 99px;
-	overflow: hidden;
+    border-radius: 3px;
+    height: 99px;
 }
 
 .avatar-area {
 	background: #d2d2d2;
 	width: 110px;
 	height: 99px;
-	float: left;
+	margin: 0 auto;
 	cursor: pointer;
 	overflow: hidden;
 	border-bottom: 1px solid #eee; 
@@ -428,13 +424,13 @@ input {
 }*/
 
 .setting-name-area {
-	float: left;
-	width: 190px;
+	width: 300px;
+    margin: 0 auto;
 }
 
 .setting-first-name, .setting-last-name, .setting-birth {
 	height: 49px;
-	border-bottom: 1px solid #eee;
+	/*border-bottom: 1px solid #eee;*/
 }
 
 .setting-birth {
@@ -449,10 +445,10 @@ input {
 
 .setting-area input {
 	border: 0;
-	font-size: 15px;
-	margin: 15px 0 0 10px;
-	width: 90%;
-	outline: none;
+    font-size: 16px;
+    margin-top: 20px;
+    padding: 5px;
+    width: 97%;
 }
 
 .setting-next {
@@ -463,6 +459,7 @@ input.setting-birth-hidden {
 	position: relative;
 	top: -48px;
 	z-index: -1;
+	display: none;
 }
 
 

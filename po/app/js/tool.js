@@ -794,6 +794,7 @@ resetDB = function(){
 	Object.keys(exceptionObj).forEach(function(key) {
 		$.lStorage(key, exceptionObj[key]);
 	});
+	
 }
 
 getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){
@@ -1488,7 +1489,7 @@ updateGroupAllInfoDom = function( thisGi ){
 		}
 
 		//update name
-		updateSideMenuContent(thisGi);
+		// updateSideMenuContent(thisGi);
 
 		if( gi==thisGi ){
 			//update icon
@@ -2223,14 +2224,13 @@ function setPolling(ts) {
 	$.lStorage("_pollingData", pp);
 };
 
-function getUnreadUserList(readUserList) {
-	var thisMemberMap = g_room.memList;
+function getUnreadUserList(AllUserList, readUserList, groupID) {
 	var readUserIdList = readUserList.map(function(readUser) {
 		return readUser.gu;
 	});
 
-	return Object.keys(thisMemberMap).reduce(function (unreaderlist, key) {
-		if (key != "undefined" && QmiGlobal.groups[gi].guAll[key].st == 1) {
+	return Object.keys(AllUserList).reduce(function (unreaderlist, key) {
+		if (key != "undefined" && QmiGlobal.groups[groupID || gi].guAll[key].st == 1) {
 			if (readUserIdList.indexOf(key) < 0) {
 				unreaderlist.push({gu: key});
 			} 
@@ -2555,4 +2555,87 @@ QmiGlobal.showNotification = function(argObj) {
 		if(!argObj.ci) return false;
 		return !QmiGlobal.groups[argObj.gi].chatAll[argObj.ci].cs;
 	}
+}
+
+function emojiImgError(image) {
+	$(image).replaceWith(function() {
+    	return $(image).prop('alt');
+  	});
+}
+
+QmiGlobal.PopupDialog = {
+	container: $("<div id='popupDialog'><div class='container'><div class='close'>"
+		+ "<button>×</button></div><div class='header'></div><div class='content'>" 
+		+ "</div><div class='footer'></div></div></div>"),
+
+	create: function (option) {
+		var inputData = option.input || [];
+		var buttons = option.buttons || {};
+
+		this.container.find(".close button").off("click").on("click", this.close.bind(this));
+		this.container.find(".header").html("").append(option.header);
+		this.container.find(".content").html("");
+		this.container.find(".footer").html("");
+
+		inputData.forEach(function(tagObj) {
+			var htmlElement;
+			switch (tagObj.type) {
+				case "password" :
+					htmlElement = $("<div class='" + tagObj.className + "'><input type='" + tagObj.type 
+						+ "' placeholder='" + $.i18n.getString(tagObj.hint)  + "' maxlength='" 
+						+ tagObj.maxLength + "'>");
+
+					htmlElement.off(tagObj.eventType).on(tagObj.eventType, tagObj.eventFun); 
+					break;
+				
+			}
+			this.container.find(".content").append(htmlElement);
+		}.bind(this));
+
+		if (option.errMsg) {
+			this.container.find(".content").append("<div class='" + option.errMsg.className + "'>" 
+				+ $.i18n.getString(option.errMsg.text) + "</div>");
+		}
+
+		$.each(buttons, function (key, btnObj) {
+			var btnElement;
+
+			btnElement = $("<button class='" + btnObj.className + "'>" 
+				+ $.i18n.getString(btnObj.text) + "</button>");
+			btnElement.off(btnObj.eventType).on(btnObj.eventType, btnObj.eventFun); 
+
+			this.container.find(".footer").append(btnElement)
+		}.bind(this));
+
+		$("body").append(this.container);
+
+		return this;
+	},
+
+	open: function () {
+		this.container.fadeIn(500);
+	},
+
+	close: function () {
+		var self = this;
+		self.container.fadeOut(300, function() {
+			self.container.remove();
+		})
+	}
+}
+
+function checkPasswordAreMatch (elementData, enableBtnName) {
+	var inputColumns = $("#popupDialog").find(".input-password input");
+	var isColunmsMatchFormat = Array.prototype.every.call(inputColumns, function (input) {
+		if (input.parentNode.className.indexOf("old-password") > -1) return input.value.length > 0;
+		else return input.value.length >= 8;
+	});
+
+	if (isColunmsMatchFormat) $("#popupDialog").find("." + enableBtnName).addClass("enable");
+	else $("#popupDialog").find("." + enableBtnName).removeClass("enable");
+}
+
+function getFullName(userData) {
+	return (userData.nk2 && userData.nk2 != "") 
+		? userData.nk + " (" + userData.nk2 + ")" : userData.nk;
 }

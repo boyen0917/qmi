@@ -120,6 +120,12 @@ function getChatListApi(giTmp) {
 			}
 
 			tmpChatAllObj[newRoom.ci] = newRoom;
+
+			// 更新聊天室視窗資料;
+			if (windowList.hasOwnProperty([newRoom.ci])
+				&& typeof(windowList[newRoom.ci]) === "object") {
+				windowList[newRoom.ci].g_room = newRoom;
+			}
 		});
 
 		currentGroup.chatAll = tmpChatAllObj;
@@ -385,7 +391,7 @@ function openChatWindow ( giTmp, ci ){
 		if($.lStorage("groupChat")){
 			windowList[ci] = window.open("", ci , "width=400, height=600");
 		}else{
-			windowList[ci] = window.open("chat.html?v1.8.2.1", ci , "width=400, height=600");
+			windowList[ci] = window.open("chat.html?v1.8.3.0", ci , "width=400, height=600");
 		}
 		
 		windowList[ci].chatAuthData = {

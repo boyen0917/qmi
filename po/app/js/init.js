@@ -177,7 +177,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整
-	appVer: "1.8.2.1",
+	appVer: "2.0.0.1",
 
 	// 檢查是否為聊天室
 	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
@@ -885,7 +885,7 @@ QmiAjax.prototype = {
 				authUpdate();
 				break;
 			case 606: // 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
-				if(QmiGlobal.auth.isSso) {
+				if (QmiGlobal.auth.isSso) {
 					new QmiGlobal.popup({
 						desc: $.i18n.getString("WEBONLY_LOGOUT_BY_ANOTHER_DEVICE"),
 						confirm: true,
@@ -900,6 +900,16 @@ QmiAjax.prototype = {
 				break;
 			case 608:
 				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
+			case 609:
+				if(QmiGlobal.auth.isSso) {
+					new QmiGlobal.popup({
+						desc: rspObj.rsp_msg,
+						confirm: true,
+						action: [reLogin]
+					});
+					return;
+				}
 				break;
 			case 9999:
 				// 沒帶rspCode 表示是expire time過期

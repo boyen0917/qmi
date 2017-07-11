@@ -36,8 +36,9 @@ setGroupInitial = function(new_gi,chk){
         var tmp = $(".sm-small-area:not(.setting):visible");
     
         // 定時重新整理 為了健康
-        if(QmiGlobal.isPeriodicallyReload === true) {
-            timelineSwitch(QmiGlobal.auth.prObj.param.act, QmiGlobal.auth.prObj.param.reset, QmiGlobal.auth.prObj.param.main);
+        if(QmiGlobal.isAppReload === true) {
+            var param = QmiGlobal.auth.appReloadObj.param;
+            timelineSwitch(param.act, param.reset, param.main, true);// noAppReload = true;
 
         } else if( tmp.length>0 ){
 
@@ -1400,7 +1401,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         var mainReplyText;
 
         deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v1.8.2.1 .st-reply-content-area', function(){
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v1.8.3.0 .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
@@ -1896,7 +1897,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v1.8.2.1 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v1.8.3.0 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -3715,6 +3716,8 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
         case 9:
             //s9=1or3無法看已未讀列表
             var isShowUnreadAndTime = false;
+            var targetUsers = {};
+            var groupAllMembers = QmiGlobal.groups[this_gi].guAll || {};
             if( (QmiGlobal.groups[this_gi] || {}).ptp === 1) isShowUnreadAndTime = true;
 
             var isReady = false;
@@ -3729,9 +3732,37 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                         }
                     }
                     list[0].ml = parseData;
+
+                    // 有發布對象的話
+                    if (this_event.data("object_str")) {
+                        var objectData = $.parseJSON(this_event.data("object_str"));
+
+                        // 發布對象是部門, 找出部門的成員
+                        if (objectData.bl) {
+                            $.each(groupAllMembers, function (id, member) {
+                                objectData.bl.forEach(function (obj) {
+                                    if (member.st > 0 && member.bl.indexOf(obj.bi) > -1) {
+                                        targetUsers[id] = member;
+                                    }
+                                });
+                            });
+                        }
+                        // 發布對象是成員 
+                        if (objectData.gul) {
+                            objectData.gul.forEach(function (obj) {
+                                if (!targetUsers.hasOwnProperty(obj.gu) 
+                                    && groupAllMembers.hasOwnProperty(obj.gu)) {
+                                    targetUsers[obj.gu] = groupAllMembers[obj.gu];
+                                }
+                            });
+                        }
+                    } else { //發布對象是全部 
+                        targetUsers = groupAllMembers;
+                    }
+
                     if (isShowUnreadAndTime) {
                         list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-                        list[1].ml = getUnreadUserList(parseData);
+                        list[1].ml = getUnreadUserList(targetUsers, parseData, this_gi);
                     } else {
                         list.push({title:$.i18n.getString("FEED_UNREAD"), clickable:false});
                     }
@@ -3744,29 +3775,8 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                     errorReport(e);
                 }
             });
-            //get unread
-            // if( isShowUnreadAndTime ){
-            //     list.push( {title:$.i18n.getString("FEED_UNREAD"),ml:null} );
-            //     getThisTimelinePart( this_event, 9, function(data){
-            //         try{
-            //             list[1].ml = $.parseJSON( data.responseText ).epl;
-            //             if(isReady){
-            //                 showObjectTabShow(this_gi, title, list, onDone);
-            //             } else {
-            //                 isReady = true;
-            //             }
-            //         } catch(e) {
-            //             errorReport(e);
-            //         }
-            //    });
-            // } else {
-            //     list.push( {title:$.i18n.getString("FEED_UNREAD"),clickable:false} );
-            //     if (isReady) {
-            //         showObjectTabShow(this_gi, title, list, onDone);
-            //     }
-            //     isReady = true;
-            // }
-            // break;
+
+            break;
         case 1:
             var isShowNamecard = true;
             try{
@@ -3883,14 +3893,14 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
             var currentMembum = cellArea.find("._" + index + " .obj-cell").length;
             var loadMemList = listData.slice(currentMembum, currentMembum + 100);
 
-            if (currentMembum + 100 > listData.length - 1) {
+            if (currentMembum + 100 > listData.length - 1)
                 loadMemList = listData.slice(currentMembum);
-            } 
 
             loadMemList.forEach(function (member) {
                 var gu = member.gu;
                 var rt = member.rt;
                 var mem = guAll[gu];
+                if(!mem) return;
                 var this_obj = $(
                     '<div class="obj-cell mem" data-gu="'+gu+'">' +
                         '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
@@ -5011,7 +5021,7 @@ groupMenuListArea = function (noApi){
     var deferred = $.Deferred();
 
     if(noApi) noApiDeferred.resolve();
-    else getGroupList().done(noApiDeferred.resolve);   
+    else getGroupList().done(noApiDeferred.resolve);
 
     noApiDeferred.done(function(data){
         //管理者圖示
@@ -5023,6 +5033,15 @@ groupMenuListArea = function (noApi){
         $.each(QmiGlobal.groups, addSideMenuGroupUI.bind(listArea));
 
         if(Object.keys( QmiGlobal.groups ).length > 2) $(".sm-group-switch").show();
+
+        if (Object.keys( QmiGlobal.groups ).length == 1) {
+            $(".no-group-lock").hide();
+            $.mobile.changePage("#page-group-main");
+
+            $("#page-group-menu .page-back").show();
+
+            setGroupInitial(Object.keys(QmiGlobal.groups)[0], true);
+        }   
 
         // 判斷無官方帳號團體就關閉標題
         (function() {
@@ -5218,7 +5237,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
             for( var i=0; i<timeline_list.length; i++ ){
                 //ei:"G000000109N_T00000020BF_E000000107H"
                 var split = timeline_list[i].ei.split("_");
-                split[0] = gi;
+                split[0] = this_gi;
                 timeline_list[i].ei = split.join("_");
             }
 
@@ -8147,24 +8166,32 @@ pollingCountsWrite = function(pollingData, aa){
     var cntsAllObj  = pollingData.cnts || {};
     var gcnts       = pollingData.gcnts || { G1: 0, G3: 0 };
     var groupsData  = QmiGlobal.groups;
+    var appBadgeNumber = 0;
     var sort_arr = []; //排序用
+    // var getNoticesDefer = $.Deferred();
 
-    
     // 先將當前團體的 cnts 更新在 ui 中
     if( cntsAllObj.hasOwnProperty( gi ) === true ) {
         var thisCntObj = cntsAllObj[gi];
 
         ["A1", "A2", "A4"].forEach(function(key){
             var smCountA = $(".polling-cnt[data-polling-cnt="+ key +"] .sm-count").hide();
+
             if ( thisCntObj.hasOwnProperty(key) === true && thisCntObj[key] > 0 ) {
 
-                // 部分動態tab 如果是active 消除cnts
-                if( smCountA.parent().hasClass("active") === true){
-                    updatePollingCnts( smCountA, key );
-                } else {
+                if (key == "A1") {
                     smCountA.show()
                     .html(countsFormat(thisCntObj[key], smCountA))
                     .data("gi",gi);
+                } else {
+                    // 部分動態tab 如果是active 消除cnts
+                    if( smCountA.parent().hasClass("active") === true){
+                        updatePollingCnts( smCountA, key );
+                    } else {
+                        smCountA.show()
+                        .html(countsFormat(thisCntObj[key], smCountA))
+                        .data("gi",gi);
+                    }
                 }
             }
         });
@@ -8194,50 +8221,71 @@ pollingCountsWrite = function(pollingData, aa){
             countA3Dom.hide();
     }
 
-    // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
+    // idb_alert_events.getAll(function(noticeList){
+    //     getNoticesDefer.resolve(noticeList);
+    // })
 
-    Object.keys(cntsAllObj).forEach(function(thisGi){
-        var thisCntObj = cntsAllObj[thisGi],
-        thisQmiGroupObj = groupsData[thisGi];
+    // getNoticesDefer.done(function(noticeList) {
+        // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
+        Object.keys(cntsAllObj).forEach(function(thisGi){
+            var thisCntObj = cntsAllObj[thisGi],
+            thisQmiGroupObj = groupsData[thisGi],
+            groupBadgeNumber = 0;
 
-        var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
+            var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
+            // var thisGroupUnreadEvents = noticeList.filter(function(notice) {
+            //     return ((notice.ei || "").split("_")[0] == thisGi) 
+            //             && (notice.data)
+            //             && (notice.data.nd) 
+            //             && (notice.data.nd.st === 0);
+            // });
 
-        // 移轉 隱藏polling
-        if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
-        
-        if( thisCntObj.A5 > 0 && gi != thisGi){
-            sort_arr.push([thisGi,thisCntObj.A5]);
-            dom.html(countsFormat( thisCntObj.A5, dom)).show();
-        }
+            // console.log(thisGroupUnreadEvents);
+            // 移轉 隱藏polling
+            if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
-        // 無cl 或 未有此gi 就不做
-        if( thisCntObj.hasOwnProperty("cl") === false ||
-            thisQmiGroupObj === undefined ||
-            thisQmiGroupObj.hasOwnProperty("chatAll") === false 
-        ) return ;
+            if ( thisCntObj.A2 > 0 || thisCntObj.A5 > 0) {
+                groupBadgeNumber = ((thisCntObj.A2 < 0) ? 0 : thisCntObj.A2) 
+                    + ((thisCntObj.A5 < 0) ? 0 : thisCntObj.A5);
 
-        thisCntObj.cl.forEach(function(clObj){
-            if( thisQmiGroupObj.chatAll.hasOwnProperty( clObj.ci ) === true ) 
-                thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
+                sort_arr.push([thisGi,thisCntObj.A5]);
+                dom.html(countsFormat(groupBadgeNumber, dom)).show();
+
+                appBadgeNumber += groupBadgeNumber;
+            }
+
+            // 無cl 或 未有此gi 就不做
+            if( thisCntObj.hasOwnProperty("cl") === false ||
+                thisQmiGroupObj === undefined ||
+                thisQmiGroupObj.hasOwnProperty("chatAll") === false 
+            ) return ;
+
+            thisCntObj.cl.forEach(function(clObj){
+                if( thisQmiGroupObj.chatAll.hasOwnProperty( clObj.ci ) === true ) 
+                    thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
+            })
+
         })
 
-    })
-    //排序
-    sort_arr.sort(function(a, b) {return a[1] - b[1]});
-    sort_arr.forEach(function(obj){
-        var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
-        sortedGroup.detach();
+        //排序
+        sort_arr.sort(function(a, b) {return a[1] - b[1]});
+        sort_arr.forEach(function(obj){
+            var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
+            sortedGroup.detach();
 
-        // 官方帳號判斷
-        try {
-            if(QmiGlobal.groups[obj[0]].ntp === 2)
-                var targetDom = $(".sm-offical-group");
-            else
-                var targetDom = $(".sm-general-group");
+            // 官方帳號判斷
+            try {
+                if(QmiGlobal.groups[obj[0]].ntp === 2)
+                    var targetDom = $(".sm-offical-group");
+                else
+                    var targetDom = $(".sm-general-group");
 
-            targetDom.after(sortedGroup);
-        } catch(e) { /* do nothing */}
-    })
+                targetDom.after(sortedGroup);
+            } catch(e) { /* do nothing */}
+        })
+    // });
+    
+
 
     //邀請 若是在團體邀請頁面時 則不寫入
     if(gcnts.G1 > 0){
@@ -8250,6 +8298,9 @@ pollingCountsWrite = function(pollingData, aa){
         //鈴鐺
         if( typeof(showNewAlertIcon)!='undefined' ) showNewAlertIcon( gcnts.G3 );
     }
+
+    if (appBadgeNumber > 0) setBadgeLabel(appBadgeNumber.toString());
+    else clearBadgeLabel();
         
 }
 
@@ -8390,13 +8441,21 @@ pollingCmds = function(newPollingData){
                                     && QmiGlobal.groups[this_gi].ntp !== 2
                                 ){
                                     var title = memData.gn || g_Qmi_title;
-                                    riseNotification( null, title, $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), function(){
-                                        if( gi==this_gi ){
-                                            $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
-                                        } else {
-                                            $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
-                                        }
-                                    });
+
+                                    if (memData.gu == QmiGlobal.groups[this_gi].me) {
+                                        toastShow($.i18n.getString("GROUP_X_JOIN_GROUP", $.i18n.getString("COMMON_YOU")) + title);
+                                    } else {
+                                        riseNotification( null, title, 
+                                            $.i18n.getString("GROUP_X_JOIN_GROUP", memData.nk), 
+                                            function(){
+                                                if( gi==this_gi ){
+                                                    $(".sm-small-area[data-sm-act=memberslist]").trigger("click");
+                                                } else {
+                                                    $(".sm-group-area[data-gi="+this_gi+"]").trigger("click");
+                                                }
+                                            }
+                                        );
+                                    }
                                 }
                             } catch(e){
                                 errorReport(e);
@@ -8426,6 +8485,7 @@ pollingCmds = function(newPollingData){
                                     }
                                 })
                             }else {
+                                user_info_arr.push( item.pm );
                                 $.each(windowList, function(index, val) {
                                     if(!windowList[index].closed && val.g_room.memList[item.pm.gu]) {
                                         if(val.g_room.tp == 1) {
@@ -8459,7 +8519,6 @@ pollingCmds = function(newPollingData){
                                 errorReport(e);
                             }
                         }
-                        user_info_arr.push( item.pm );
                         if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
                     case 7://branch edit
@@ -8575,9 +8634,32 @@ pollingCmds = function(newPollingData){
                             cmd57Def.resolve();
                         });
                         break;
+
+                    case 58:
+                        var pollingData = item.pm || {};
+                        resetCompanyAccountPassword({
+                            id: pollingData.id, 
+                            ci: pollingData.ci,
+                            url: $.lStorage("_loginData").url,
+                        });
+                        break;
+
+                    case 60:
+                        if (QmiGlobal.auth.isSso) {
+                            new QmiGlobal.popup({
+                                desc: (item.pm || {}).msg,
+                                confirm: true,
+                                action: [reLogin]
+                            });
+                            return;
+                        }
+                        break;
+                    case 61:
+
+                        break;
                 }
 
-            }); // end of newPollingData.cmds forEach
+            }); // end of newPollingData.cmds forEach 
 
             //將tp4,5,6 的user info都更新完 再更新polling時間
             if(user_info_arr.length > 0){
@@ -9058,7 +9140,96 @@ function activateClearChatsTimer(){
 };
 
 
+function resetCompanyAccountPassword(ssoData) {
+    var time = new Date();
+    time.setDate(time.getDate() - 30);
 
+    QmiGlobal.PopupDialog.create({
+        header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
+            + "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_SECURITY_NOTICE") + "</h2><p>" 
+            + $.i18n.getString("ENTERPRISE_ACCOUNT_LAST_TIME") + "</p><p>" + time.getFullYear() + "." 
+            + ("0" + (time.getMonth() + 1)).slice(-2) + "." + ("0" + time.getDate()).slice(-2) + "</p><p>"
+            + $.i18n.getString("ENTERPRISE_ACCOUNT_REMIND") +"</p></div>",
+
+        input: [{
+            type: "password",
+            className: "input-password old-password",
+            hint: "ENTERPRISE_ACCOUNT_SET_ORIGIN_PASSWORD",
+            maxLength : 30,
+            eventType: "input",
+            eventFun: function (e) {
+                checkPasswordAreMatch(e, "update");
+            }
+        },{
+            type: "password",
+            className: "input-password new-password",
+            hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD",
+            maxLength : 10,
+            eventType: "input",
+            eventFun: function (e) {
+                checkPasswordAreMatch(e, "update");
+            }
+        },{
+            type: "password",
+            className: "input-password new-password-again",
+            hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN",
+            maxLength : 10,
+            eventType: "input",
+            eventFun: function (e) {
+                checkPasswordAreMatch(e, "update");
+            }
+        }],
+        errMsg: {
+            text: "ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH",
+            className: "error-message"
+        },
+        buttons: {
+            cancel: {
+                text : "ENTERPRISE_ACCOUNT_IGNORE",
+                className: "ignore",
+                eventType : "click",
+                eventFun : function (callback) {
+                    QmiGlobal.PopupDialog.close();
+                }
+            },
+            confirm: {
+                text : "ENTERPRISE_ACCOUNT_CHANGE_PASSWORD",
+                className: "update",
+                eventType : "click",
+                eventFun : function (callback) {
+                    var dialog = $("#popupDialog");
+
+                    if ($(this).hasClass("enable")) {
+                        var oldPassword = dialog.find(".old-password input").val();
+                        var firstNewPassword = dialog.find(".new-password input").val();
+                        var secondNewPassword = dialog.find(".new-password-again input").val();
+
+                        if (firstNewPassword !== secondNewPassword) {
+                            dialog.find(".error-message").css("opacity", 1);
+                        } else {
+                            dialog.find(".error-message").css("opacity", 0);
+                            new QmiAjax({
+                                url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password",
+                                method: "put",
+                                body: {
+                                    id: ssoData.id,
+                                    dn: QmiGlobal.device,
+                                    op: QmiGlobal.aesCrypto.enc(oldPassword, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+                                    np: QmiGlobal.aesCrypto.enc(firstNewPassword, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+                                }
+                            }).done(function(rspData) {
+                                if (rspData.status == 200) {
+                                    QmiGlobal.PopupDialog.close();
+                                    toastShow($.i18n.getString("ENTERPRISE_ACCOUNT_CHANGE_PASSWORD_SUCCESS"));
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }).open();
+}
 
 function clickTimelineTab(argObj) {
     $(".sm-group-list-area").removeAttr("data-unlock");
