@@ -2254,6 +2254,7 @@ function riseNotification (icon, title, description, onClickCallback) {
 	}
 }
 
+
 QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
   	this.locateSite = [];
 	this.map = {};
@@ -2536,6 +2537,28 @@ QmiGlobal.MemberLocateModal.prototype = {
 		    	this.container.find(".bottom").hide();
 		    }
 		}
+	}
+}
+
+QmiGlobal.showNotification = function(argObj) {
+	try{
+		if(isChatroomCloseNotification()) return;
+		var notification = new window.Notification(argObj.title, {
+			body: argObj.text,
+			icon: argObj.icon === undefined? "resource/images/default.png": argObj.icon
+		});
+		if (typeof argObj.callback === "function")
+			notification.addEventListener("click", argObj.callback);
+
+	}catch(e){console.error("Notification is not supported.", e);}
+
+	function isChatroomCloseNotification() {
+		if(!argObj.ci) return false;
+		var chatAll = QmiGlobal.groups[argObj.gi].chatAll || {};
+		// 不存在的聊天室 不可跳出通知
+		if(!chatAll[argObj.ci]) return true;
+		if((chatAll[argObj.ci] || {}).cs === true) return false;
+		return true;
 	}
 }
 

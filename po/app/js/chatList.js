@@ -486,9 +486,8 @@ function clearChatListCnt( giTmp, ciTmp ){
 }
 
 function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
-	var 
-	deferred = $.Deferred(),
-	groupTmp = QmiGlobal.groups[giTmp] || {};
+	var deferred = $.Deferred();
+	var groupTmp = QmiGlobal.groups[giTmp] || {};
 
 	if( null==isRoomOpen ) isRoomOpen = false;
 
@@ -716,10 +715,22 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			var cnTmp = data.cn||"";
 			if( data.meta.ct>=login_time){
-				riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
-					cns.debug(ciTmp);
-					openChatWindow( giTmp, ciTmp );
-				});
+				
+				try {QmiGlobal.showNotification ({
+					title: mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")",
+					text: text,
+					gi: giTmp,
+					ci: ciTmp,
+					callback: function(){
+						openChatWindow( giTmp, ciTmp );
+					}});
+				} catch(e) {
+					console.log("123232", e);
+					// 原始
+					riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
+						openChatWindow( giTmp, ciTmp );
+					});
+				}
 			}
 		} catch(e) {
 			cns.debug( e.message );

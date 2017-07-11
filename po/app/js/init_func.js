@@ -54,98 +54,95 @@ $(function(){
         });
     }
 
-    getGroupComboInit = function(thisGi,callback){
+    getGroupComboInit = function(thisGi, callback){
         var thisGi = thisGi || gi;
         var comboDeferred = $.Deferred();
 
-        new QmiAjax({
-            apiName: "groups/" + thisGi + "?tv=29", // tp1才能取得退出的成員
-            apiVer: "apiv1",
-        }).complete(function(data){
-            if(data.status == 200){
-                var comboData = $.parseJSON(data.responseText);
-                var groupData = QmiGlobal.groups[thisGi];
-                var ignoreKeys = ["ul","fl","bl","fbl","tl"];
-                var inviteGuAll = {};
+        $.when(
+            // group combo without users
+            new QmiAjax({
+                apiName: "groups/" + thisGi + "?tv=29",
+                apiVer: "apiv1",
+            }),
+            // group chatroom
+            getChatListApi(thisGi)
+        ).done(function() {
+            var comboRawData = arguments[0];
+            var comboData = $.parseJSON(comboRawData.responseText);
+            var groupData = QmiGlobal.groups[thisGi];
+            var ignoreKeys = ["ul","fl","bl","fbl","tl"];
+            var inviteGuAll = {};
 
-                // 單一團體資訊的部分key 另外處理成hash-map
-                for( var key in comboData ){
-                    // ignore
-                    if( ignoreKeys.indexOf(key) < 0 ) {
-                        groupData[key] = comboData[key];    
-                    } else {
-                        delete groupData[key];
-                    }
+            // 單一團體資訊的部分key 另外處理成hash-map
+            for( var key in comboData ){
+                // ignore
+                if( ignoreKeys.indexOf(key) < 0 ) {
+                    groupData[key] = comboData[key];    
+                } else {
+                    delete groupData[key];
                 }
+            }
 
-                getGroupAllMembers(thisGi).done(function(groupMemberList) {
-                    console.log(thisGi);
-                    console.log(groupMemberList.length);
-                    comboData.ul = groupMemberList;
-                    groupData.guAll = {};
-                    if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
+            getGroupAllMembers(thisGi).done(function(groupMemberList) {
+                comboData.ul = groupMemberList;
+                groupData.guAll = {};
+                if (comboData.fl) comboData.ul = comboData.ul.concat(comboData.fl);
 
-                    comboData.ul.sort(function (a, b) {
-                        if (a.nk < b.nk) return -1;
-                        if (a.nk > b.nk) return 1;
-                        return 0;
-                    });
-
-                    // 製作guAll hash-map & inviteGuAll
-                    comboData.ul.forEach(function(user) {
-                        //用在contact.js 不知道為何
-                        if( user.st === 0) inviteGuAll[user.gu] = user;
-
-                        if(user.nk !== undefined)
-                            user.nk = user.nk._escape();
-
-                        groupData.guAll[user.gu] = user;
-                    });
-
-                    groupData.inviteGuAll = inviteGuAll;
-
-                    //官方帳號設定
-                    initOfficialGroup( thisGi );
-
-                    // 設定按讚留言浮水印開關
-                    setSwitch(thisGi);
-
-                    //初始化 重組群組資訊
-                    setBranchList( thisGi , {
-                        bl:  comboData.bl,
-                        fbl: comboData.fbl
-                    });
-
-                    //設定功能選單
-                    setTabList(thisGi);
-
-                    if(callback) callback();
-
-                    comboDeferred.resolve({
-                        status: true,
-                        thisGi: thisGi,
-                        data: data
-                    });
-                }).fail(function () {
-                    comboDeferred.resolve({
-                        isSuccess: false,
-                        status: false,
-                        thisGi: thisGi,
-                        data: data
-                    });
+                comboData.ul.sort(function (a, b) {
+                    if (a.nk < b.nk) return -1;
+                    if (a.nk > b.nk) return 1;
+                    return 0;
                 });
 
-            } else {    
+                // 製作guAll hash-map & inviteGuAll
+                comboData.ul.forEach(function(user) {
+                    //用在contact.js 不知道為何
+                    if( user.st === 0) inviteGuAll[user.gu] = user;
+
+                    if(user.nk !== undefined)
+                        user.nk = user.nk._escape();
+
+                    groupData.guAll[user.gu] = user;
+                });
+
+                groupData.inviteGuAll = inviteGuAll;
+
+                //官方帳號設定
+                initOfficialGroup( thisGi );
+
+                // 設定按讚留言浮水印開關
+                setSwitch(thisGi);
+
+                //初始化 重組群組資訊
+                setBranchList( thisGi , {
+                    bl:  comboData.bl,
+                    fbl: comboData.fbl
+                });
+
+                //設定功能選單
+                setTabList(thisGi);
+
+                if(callback) callback();
+
+                comboDeferred.resolve({
+                    status: true,
+                    thisGi: thisGi,
+                    data: comboRawData
+                });
+            }).fail(function () {
                 comboDeferred.resolve({
                     isSuccess: false,
                     status: false,
                     thisGi: thisGi,
-                    data: data
+                    data: {}
                 });
-
-                //好像不該在這
-                groupSwitchEnable();
-            }
+            });
+        }).fail(function() {
+            comboDeferred.resolve({
+                isSuccess: false,
+                status: false,
+                thisGi: thisGi,
+            });
         });
 
         return comboDeferred.promise();
