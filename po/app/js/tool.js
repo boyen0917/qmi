@@ -2537,6 +2537,8 @@ QmiGlobal.MemberLocateModal.prototype = {
 		    	this.container.find(".bottom").hide();
 		    }
 		}
+	}
+}
 
 QmiGlobal.showNotification = function(argObj) {
 	console.log("showNo", argObj);
