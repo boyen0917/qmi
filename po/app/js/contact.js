@@ -183,7 +183,7 @@ onSearchInput = function(e){
 		if( memberData.nk.toLowerCase().indexOf(str) >= 0
 			|| (memberData.bl.length > 0 && bl[memberData.bl.split(",")[0].split(".")[0]].bn.toLowerCase().indexOf(str) >= 0)
 			|| memberData.ti.toLowerCase().indexOf(str) >= 0
-			|| memberData.nk2.toLowerCase().indexOf(str) >= 0){
+			|| (memberData.nk2 || "").toLowerCase().indexOf(str) >= 0){
 			matchMemList.push(memId);
 			memCount++;
 		}	
