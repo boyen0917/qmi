@@ -8245,8 +8245,8 @@ pollingCountsWrite = function(pollingData, aa){
             if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
             if ( thisCntObj.A2 > 0 || thisCntObj.A5 > 0) {
-                groupBadgeNumber = ((thisCntObj.A2 < 0) ? 0 : thisCntObj.A2) 
-                    + ((thisCntObj.A5 < 0) ? 0 : thisCntObj.A5);
+                groupBadgeNumber = ((thisCntObj.A2) ? thisCntObj.A2 : 0) 
+                    + ((thisCntObj.A5) ? thisCntObj.A5 : 0);
 
                 sort_arr.push([thisGi,thisCntObj.A5]);
                 dom.html(countsFormat(groupBadgeNumber, dom)).show();
