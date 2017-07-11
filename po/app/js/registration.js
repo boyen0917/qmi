@@ -378,6 +378,11 @@ appInitial = function(needUpdate){
         QmiGlobal.chainDeferred().then(function() {
         	return userInfoGetting();
         }).then(function() {
+        	// 開啟chatDB
+			var deferred = $.Deferred();
+			initChatDB(deferred.resolve); 
+	    	return deferred.promise();
+		}).then(function() {
         	return getGroupList(isFromLogin);
         }).then(function(rspData) {
         	var deferred = $.Deferred();
@@ -459,10 +464,6 @@ appInitial = function(needUpdate){
             
 			//聊天室開啓DB
 			QmiGlobal.chainDeferred().then(function() {
-				var deferred = $.Deferred();
-				initChatDB(deferred.resolve); 
-		    	return deferred.promise();
-			}).then(function() {
 				// 非同步沒關係
 				var allGroups = Object.keys(QmiGlobal.groups);
 

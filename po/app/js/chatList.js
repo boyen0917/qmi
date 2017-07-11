@@ -726,6 +726,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 						openChatWindow( giTmp, ciTmp );
 					}});
 				} catch(e) {
+					console.log("123232", e);
 					// 原始
 					riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
 						openChatWindow( giTmp, ciTmp );

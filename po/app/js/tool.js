@@ -2551,11 +2551,13 @@ QmiGlobal.showNotification = function(argObj) {
 		if (typeof argObj.callback === "function")
 			notification.addEventListener("click", argObj.callback);
 
-	}catch(e){console.log("Notification doesn't be supported.");}
+	}catch(e){console.error("Notification doesn't be supported.", e);}
 
-	function checkChatroomIsShowNotification() {
+	function isChatroomCloseNotification() {
 		if(!argObj.ci) return false;
-		return !QmiGlobal.groups[argObj.gi].chatAll[argObj.ci].cs;
+		var chatAll = QmiGlobal.groups[argObj.gi].chatAll || {};
+		if((chatAll[argObj.ci] || {}).cs === true) return false;
+		return true;
 	}
 }
 
