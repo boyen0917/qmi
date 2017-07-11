@@ -486,9 +486,8 @@ function clearChatListCnt( giTmp, ciTmp ){
 }
 
 function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
-	var 
-	deferred = $.Deferred(),
-	groupTmp = QmiGlobal.groups[giTmp] || {};
+	var deferred = $.Deferred();
+	var groupTmp = QmiGlobal.groups[giTmp] || {};
 
 	if( null==isRoomOpen ) isRoomOpen = false;
 

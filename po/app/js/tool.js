@@ -2541,7 +2541,6 @@ QmiGlobal.MemberLocateModal.prototype = {
 }
 
 QmiGlobal.showNotification = function(argObj) {
-	console.log("showNo", argObj);
 	try{
 		if(isChatroomCloseNotification()) return;
 		var notification = new window.Notification(argObj.title, {
@@ -2551,11 +2550,13 @@ QmiGlobal.showNotification = function(argObj) {
 		if (typeof argObj.callback === "function")
 			notification.addEventListener("click", argObj.callback);
 
-	}catch(e){console.error("Notification doesn't be supported.", e);}
+	}catch(e){console.error("Notification is not supported.", e);}
 
 	function isChatroomCloseNotification() {
 		if(!argObj.ci) return false;
 		var chatAll = QmiGlobal.groups[argObj.gi].chatAll || {};
+		// 不存在的聊天室 不可跳出通知
+		if(!chatAll[argObj.ci]) return true;
 		if((chatAll[argObj.ci] || {}).cs === true) return false;
 		return true;
 	}
