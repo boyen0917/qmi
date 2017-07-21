@@ -376,6 +376,7 @@ window.QmiGlobal = {
 
 	    return {
 	        chk: function() {
+	        	if($.lStorage("_periodicallyReloadTimer") === false) setTimer();
 	            if(new Date().getTime() - $.lStorage("_periodicallyReloadTimer") > periodTime) {
 	                flag = true;
 	            }
