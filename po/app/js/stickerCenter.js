@@ -116,7 +116,8 @@ StickerStoreView.prototype = {
 		var loadDeferred = $.Deferred();
 		time = time || "";
 		new QmiAjax({
-        	apiName: "sticker_packages/latest/?ct=" + time
+        	apiName: "sticker_packages/latest/?ct=" + time,
+        	isPublicApi: true
     	}).then(function (data) {
 
     		var stickerData = $.parseJSON(data.responseText);
@@ -275,7 +276,8 @@ StickerStoreView.prototype = {
 		var self = this;
 
 		new QmiAjax({
-        	apiName: "sticker_packages/" + sticker.packageId + "/detail"
+        	apiName: "sticker_packages/" + sticker.packageId + "/detail",
+        	isPublicApi: true
     	}).then(function (data) {
     		var detailData = $.parseJSON(data.responseText);
     		var stickerListHtml = "";
