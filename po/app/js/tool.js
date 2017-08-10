@@ -158,8 +158,9 @@ ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_h
 }
 
 
-reLogin = function() {
-	resetDB();
+reLogin = function(options) {
+	localStorage.removeItem("_loginAutoChk");
+	resetDB(options);
 	document.location = "index.html";
 }
 
@@ -697,7 +698,8 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		case 2: // 影 只要傳s32 timeline是這樣
 
 			paramObj.s32.file = uploadObj.file;
-			delete paramObj.s3;
+
+			// delete paramObj.s3;
 			contentType = "video/mp4";
 
 			zipVideoFile(uploadObj).done(function (uploadFile) {
@@ -711,9 +713,12 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				si = uploadFile.size;
 
 				var video = document.createElement('video');
-				video.src = URL.createObjectURL(uploadObj.file);
-				console.log(video.duration);
+				video.src = URL.createObjectURL(uploadFile);
+
 				video.onloadeddata = function() {
+					var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
+					
+					paramObj.s3.file = thumbnailVideo.blob;
 					md = {l: Math.floor(video.duration * 1000)};
 					mediaLoadDef.resolve();
 				}
@@ -726,8 +731,12 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 				var video = document.createElement('video');
 				video.src = URL.createObjectURL(uploadObj.file);
+
 				video.onloadeddata = function() {
+					var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
+
 					md = {l: Math.floor(video.duration * 1000)};
+					paramObj.s3.file = thumbnailVideo.blob;
 					mediaLoadDef.resolve();
 				}
 			});
@@ -769,27 +778,26 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	return allDef.promise();
 } // end of qmiUploadS3
 
-resetDB = function(){
+resetDB = function(options){
+	options = options || {};
 	clearBadgeLabel();
 	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 	if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 	if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
 
-	var exceptionObj = {};
-	var exceptionItemArr = [
-		"_ver",
-		"_loginRemeber",
-		"_lastBaseUrl"
-	];
-
-	exceptionItemArr.forEach(function(lsStr) {
-		if(localStorage[lsStr]) exceptionObj[lsStr] = localStorage[lsStr];
-	});
+	var excepObj = QmiGlobal.resetDBExceptionArr.reduce(function(obj, curr) {
+		obj[curr] = localStorage[curr];
+		return obj;
+	}, {});
 
 	localStorage.clear();
 
-	Object.keys(exceptionObj).forEach(function(key) {
-		$.lStorage(key, exceptionObj[key]);
+	Object.keys(excepObj).forEach(function(key) {
+		$.lStorage(key, excepObj[key]);
+	});
+
+	(options.removeItemArr || []).forEach(function(str) {
+		localStorage.removeItem(str);
 	});
 	
 }
@@ -2120,7 +2128,10 @@ zipVideoFile = function (videoObj) {
 		var ffmpeg = require('fluent-ffmpeg');
 		var fs = require('fs');
     	var path = require('path');
+    	var spawn = require('child_process').spawn;
+    	var tmpDir = process.cwd();
     	var nwDir = path.dirname(process.execPath); //node webkit 根目錄
+    	var outputPath = tmpDir + '/video/output.mp4'
 	    var command = ffmpeg(videoObj.file.path);
 	    var outputBuffer;
 
@@ -2130,6 +2141,10 @@ zipVideoFile = function (videoObj) {
        	var zipVideoActionDef = $.Deferred();
        	var getDurationDef = $.Deferred();
 
+       	if (!fs.existsSync(tmpDir + '/video')) {
+       		fs.mkdirSync(tmpDir + '/video/');
+       	}
+
 	    command.setFfmpegPath(nwDir + '/bin/ffmpeg');
 	    command.setFfprobePath(nwDir + '/bin/ffprobe');
 		
@@ -2137,24 +2152,31 @@ zipVideoFile = function (videoObj) {
 			// 非h264影片無法播放 需要進行轉檔
 			try {
 				// if(inputInfo.streams[0].codec_name !== "h264")
-					getDurationDef.resolve(inputInfo.format.duration);
+				getDurationDef.resolve(inputInfo.format.duration);
 				// else
 					// reject();
 			} catch(e) {reject();}
 
 			function reject() {
 				getDurationDef.reject();
-		    	transferBlobDef.reject();	
+		    	transferBlobDef.reject();
 			}
 		});
 
 		$.when(getDurationDef).done(function(duration) {
 			// toastShow("此影片格式不支援 正在進行影片轉檔 如不需要請按取消");
-			command.videoCodec('libvpx')
-		  	.audioCodec('libvorbis')
-		  	.duration(duration)
-		  	.size('640x360')
-		  	.outputFormat('webm')
+			command
+			// .duration(duration)
+   			.videoCodec('libx264')
+   			.size('640x480')
+			.outputOptions('-c:a copy')
+			.outputOptions('-r 30')
+			.outputOptions('-refs 2')
+			.outputOptions('-crf 28')
+			.outputOptions('-preset:v veryfast')
+			.outputOptions('-vbr 4')
+			.outputOptions('-x264opts keyint=25')
+			.outputOptions('-profile:v baseline')
 		  	.on('start', function(commandLine) {
      			if (videoObj.setAbortFfmpegCmdEvent)
      				videoObj.setAbortFfmpegCmdEvent(command);
@@ -2169,7 +2191,7 @@ zipVideoFile = function (videoObj) {
 	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
 	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
 	                percent = ((seconds / duration) * 80).toFixed();
-
+	                console.log(percent);
 	                if (videoObj.updateCompressionProgress)
 	               	 	videoObj.updateCompressionProgress(percent);
 	            }
@@ -2177,31 +2199,42 @@ zipVideoFile = function (videoObj) {
 		  	}).on('error', function(err) {
 		    	zipVideoActionDef.reject('Cannot process video: ' + err.message);
 
-		  	}).on('end', zipVideoActionDef.resolve)
+		  	}).on('end', function () {
+		  		zipVideoActionDef.resolve();
+		  	})
+		  	.save(outputPath)
 
-		  	.pipe().on('data', function(chunk) { // 輸出串流回來的buffer
-	        	if (outputBuffer === undefined) {
-	        		outputBuffer = chunk;
-	        	} else {
-	        		// new Uint8Array(outputBuffer)
-	        		//  原本的buffer跟新回傳來的buffer 合併merge;
-	        		var prevInt8Arr = new Uint8Array(outputBuffer);
-	        		var currInt8Arr = new Uint8Array(chunk);
-	        		var totalByteLength = prevInt8Arr.byteLength + currInt8Arr.byteLength;
-	        		var totalInt8Arr = new Uint8Array(totalByteLength);
-	        		totalInt8Arr.set(prevInt8Arr, 0);
-	        		totalInt8Arr.set(currInt8Arr, prevInt8Arr.byteLength);
+		 //  	.pipe().on('data', function(chunk) { // 輸出串流回來的buffer
+		 //  		console.log("QQWWW")
+	  //       	if (outputBuffer === undefined) {
+	  //       		outputBuffer = chunk;
+	  //       	} else {
+	  //       		//  原本的buffer跟新回傳來的buffer 合併merge;
+	  //       		var prevInt8Arr = new Uint8Array(outputBuffer);
+	  //       		var currInt8Arr = new Uint8Array(chunk);
+	  //       		var totalByteLength = prevInt8Arr.byteLength + currInt8Arr.byteLength;
+	  //       		var totalInt8Arr = new Uint8Array(totalByteLength);
+	  //       		totalInt8Arr.set(prevInt8Arr, 0);
+	  //       		totalInt8Arr.set(currInt8Arr, prevInt8Arr.byteLength);
 
-	        		outputBuffer = totalInt8Arr;
-	        	}
-	        	console.log("percent", percent);
-			});
+	  //       		outputBuffer = totalInt8Arr;
+	  //       	}
+	  //       	console.log("percent", percent);
+			// });
 		});
 
         zipVideoActionDef.done(function () {
-            var blob = new Blob([outputBuffer.buffer], {type: 'application/octet-binary'});
-            blob.name = videoObj.file.name.split(".")[0] + ".webm";
-            transferBlobDef.resolve(blob);
+        	fs.readFile(outputPath, function(err, data) {
+        		var byteArray = new Uint8Array(data);
+        		var blob = new Blob([byteArray], {type: 'application/octet-binary'});
+        		blob.name = videoObj.file.name;
+        		transferBlobDef.resolve(blob);
+
+        		fs.unlinkSync(outputPath);
+        	});
+            // var blob = new Blob([outputBuffer.buffer], {type: 'application/octet-binary'});
+            // blob.name = videoObj.file.name.split(".")[0] + ".mp4";
+            // transferBlobDef.resolve(blob);
 	    }).fail(function (errorMsg) {
 	    	console.log(errorMsg);
 	    });

@@ -181,6 +181,8 @@ window.QmiGlobal = {
 	// initReady裡面做調整
 	appVer: "2.0.0.2",
 
+	title: "Qmi",
+
 	// 檢查是否為聊天室
 	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
 
@@ -292,8 +294,10 @@ window.QmiGlobal = {
 
 	resetDBExceptionArr: [
 		"_ver",
+		"_appReloadAuth",
 		"_lastLoginAccount",
 		"_loginAutoChk",
+		"_loginData",
 		"_loginRemeber",
 		"_lastBaseUrl",
 		"_sticker"

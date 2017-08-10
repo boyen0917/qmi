@@ -1,15 +1,12 @@
 appInitial = function(needUpdate){
 	if( needUpdate ) return;
-	clearBadgeLabel();
+	resetDB();
 
 	// 定時重新讀取
     if($.lStorage("_appReloadAuth")) {
     	QmiGlobal.auth = $.lStorage("_appReloadAuth");	
     	localStorage.removeItem("_appReloadAuth");
     	
-    	// polling也清空才對
-    	localStorage.removeItem("_pollingData");
-
     	QmiGlobal.isAppReload = true;
     	loginAction();
 
@@ -367,7 +364,7 @@ appInitial = function(needUpdate){
 	function changeAccountToResetDB(phoneId) {
 		var lastId = $.lStorage("_lastLoginAccount") || null;
 		if(lastId !== phoneId && lastId !== null) 
-			resetDB({isAll: true});
+			resetDB({removeItemArr: ["_sticker"]});
 
 		// 紀錄上次登入帳號
 		$.lStorage("_lastLoginAccount", phoneId);
@@ -503,7 +500,7 @@ appInitial = function(needUpdate){
     // LDAP SSO
     QmiGlobal.ssoLogin = function(ssoObj) {
     	var deferred = $.Deferred();
-    	var encodeStr = QmiGlobal.aesCrypto.enc(ssoObj.pw, ssoObj.id + "_" + QmiGlobal.device);
+    	var webSsoDeviceStr = "web_sso_device";
 
     	// sso 登入
 		new QmiAjax({
@@ -512,8 +509,8 @@ appInitial = function(needUpdate){
             body: {
 			   id: ssoObj.id,
 			   tp: "1",
-			   dn: QmiGlobal.device,    
-			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, (ssoObj.id + "_" + QmiGlobal.device).substring(0, 16)),
+			   dn: webSsoDeviceStr,    
+			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, (ssoObj.id +"_"+ webSsoDeviceStr).substring(0,16)),
 			   uui: ssoObj.uui
 			},
             method: "post",
@@ -1041,7 +1038,7 @@ appInitial = function(needUpdate){
 		    }
         }).complete(function(data){
         	//清除db
-        	resetDB({isAll: true});
+        	resetDB({removeItemArr: ["_sticker"]});
 
         	$(".register-otp-input input").val("");
 
@@ -1300,16 +1297,6 @@ appInitial = function(needUpdate){
 	}
 	
 	initLandPage = function(){
-		// s_load_show = true;
-		// if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
-		// 	$('.ui-loader').css("display","block");
-		// 	$(".ajax-screen-lock").show();
-		// 	// setTimeout( function(){
-		// 		loginAction($.lStorage("_loginData"));
-		// 		return false;
-		// 	// },1500);
-		// }
-		
 		//若local storage 有記錄密碼 就顯示
 		var rememberData = $.lStorage("_loginRemeber");
 		if( rememberData ){

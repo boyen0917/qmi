@@ -1927,8 +1927,8 @@ function sendMsgText(dom) {
 				});
 				uploadXhr.upload.addEventListener("progress", function(evt){
 			      	if (evt.lengthComputable) {
-			        	dom.find(".chat-upload-progress").attr("max", 100).attr("value", 50 + Math.floor((evt.loaded / evt.total) * 50));
-				      	dom.find(".upload-percent").html(50 + Math.floor((evt.loaded / evt.total) * 50) + '%');
+			        	dom.find(".chat-upload-progress").attr("max", 100).attr("value", 80 + Math.floor((evt.loaded / evt.total) * 20));
+				      	dom.find(".upload-percent").html(80 + Math.floor((evt.loaded / evt.total) * 20) + '%');
 			      	}
 			    }, false);
 
