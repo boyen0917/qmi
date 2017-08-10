@@ -179,6 +179,8 @@ window.QmiGlobal = {
 	// initReady裡面做調整
 	appVer: "1.8.4.1",
 
+	title: "Qmi",
+
 	// 檢查是否為聊天室
 	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
 

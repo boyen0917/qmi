@@ -1738,11 +1738,6 @@ function getInviteList(){
 			for( var i=0; i<obj.il.length; i++){
 				var data_info = obj.il[i];
 				if( !data_info ) continue;
-				// "ik": "+886935398692", or "abc@gmail.com"
-			    // "tp": 0, or 1 // Invitation Type 0(Phone)、1(Email)
-			    // "nk": "小瓶 "
-			    // "auo": "http://s3.url/xxx", // Avatar Original URL
-			    // "aut": "http://s3.url/xxx"  // Avatar Thumbnail URL
 			    var row = $("<div class='cal-row'></div>");
 			    row.append("<div class='photo'><img class='st-user-pic' src='images/common/others/empty_img_personal_l.png'/></div>");
 			    row.append("<div class=info><div class='name'></div><div class='tel'></div></div>");

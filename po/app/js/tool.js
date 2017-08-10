@@ -2255,3 +2255,8 @@ function emojiImgError(image) {
     	return $(image).prop('alt');
   	});
 }
+
+function getFullName(userData) {
+	return (userData.nk2 && userData.nk2 != "") 
+		? userData.nk + " (" + userData.nk2 + ")" : userData.nk;
+}
