@@ -230,8 +230,6 @@ getVideoBlob = function(videoDom, x,y,max_w,max_h,quality){
 //寫入exif
 writeExif = function(exifinfo,imageSrc){
 	var deferred = $.Deferred();
-	console.log("data:",imageSrc);
-	console.log("exif:",exifinfo);
 	var dataURL;
 	var img = new Image();
 	
@@ -1787,18 +1785,13 @@ renderVideoFile = function(file, videoTag, onload, onError){
 }
 
 renderVideoUrl = function(url, videoTag, onload, onError){
-	if( videoTag.length>0 ){
-		// videoTag[0].oncanplay = function(event){
-			// videoTag.addClass("loaded");
-			if(onload) onload(videoTag);
-		// }
-		videoTag[0].onerror = function(event){
-			videoTag.addClass("error");
-			if(onError) onError(videoTag);
-		}
-    
-		videoTag.attr("src", url);
+	if( videoTag.length === 0 ) return;
+	videoTag[0].onerror = function(event){
+		videoTag.addClass("error");
+		if(onError) onError(videoTag);
 	}
+	videoTag.attr("src", url);
+	if(onload) onload(videoTag);
 }
 
 function drawCanvasImageBg( ctx, img, x, y, w, h ){
@@ -2144,10 +2137,10 @@ zipVideoFile = function (videoObj) {
 		command.ffprobe(function(err, inputInfo) {
 			// 非h264影片無法播放 需要進行轉檔
 			try {
-				if(inputInfo.streams[0].codec_name !== "h264")
+				// if(inputInfo.streams[0].codec_name !== "h264")
 					getDurationDef.resolve(inputInfo.format.duration);
-				else
-					reject();
+				// else
+					// reject();
 			} catch(e) {reject();}
 
 			function reject() {
@@ -2160,7 +2153,8 @@ zipVideoFile = function (videoObj) {
 			// toastShow("此影片格式不支援 正在進行影片轉檔 如不需要請按取消");
 			command.videoCodec('libvpx')
 		  	.audioCodec('libvorbis')
-		  	.duration(duration).size('640x320')
+		  	.duration(duration)
+		  	.size('640x360')
 		  	.outputFormat('webm')
 		  	.on('start', function(commandLine) {
      			if (videoObj.setAbortFfmpegCmdEvent)
@@ -2180,6 +2174,7 @@ zipVideoFile = function (videoObj) {
 	                if (videoObj.updateCompressionProgress)
 	               	 	videoObj.updateCompressionProgress(percent);
 	            }
+
 		  	}).on('error', function(err) {
 		    	zipVideoActionDef.reject('Cannot process video: ' + err.message);
 
@@ -2200,6 +2195,7 @@ zipVideoFile = function (videoObj) {
 
 	        		outputBuffer = totalInt8Arr;
 	        	}
+	        	console.log("percent", percent);
 			});
 		});
 

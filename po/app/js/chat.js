@@ -648,8 +648,8 @@ $(function(){
 		});
 
 		//點擊播放中的影片結束播放
-		$(document).on("click", ".msg-video.loaded.playing", function () {
-			var thisTag = $(this);
+		$(document).on("click", ".msg-video.loaded.playing > img.bt-close", function () {
+			var thisTag = $(this).parent();
 			var videoTag = thisTag.find("video");
 			if (videoTag.length > 0) {
 				thisTag.removeClass("playing");
@@ -1503,7 +1503,7 @@ function showMsg(object, bIsTmpSend) {
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			var video = $("<div class='msg-video'><div class='videoContainer'><video preload='none'><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
+			var video = $("<div class='msg-video'><div class='videoContainer'><video preload='none'><source type='video/mp4'></video></div><div class='info'><div class='play'></div><div class='length'></div></div><img class=\"bt-close\" src=\"images/common/icon/bt_close_normal.png\"><a class=\"bt-download\" download><img src='images/dl.png'/></a></div>");
 			msgDiv.append(video);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
@@ -2204,18 +2204,16 @@ function sendMsgText(dom) {
 					case 7://video
 						renderVideoUrl(obj.s32, target.find("video"), function (videoTag) {
 							var parent = videoTag.parents(".msg-video");
-							parent.addClass("loaded");console.log("????");
+							parent.addClass("loaded");
 							parent.find(".length").html(secondsToTime(Math.floor(obj.md.l/1000)));
-							parent.find(".download").attr("href", videoTag.attr("src"));
-							// parent.find("video").attr("preload", "none");
+							parent.find("a.bt-download").attr("href", videoTag.attr("src"));
 						}, function (videoTag) {
 							var parent = videoTag.parents(".msg-video");
 							parent.addClass("error");
-							parent.find(".download").remove();
+							parent.find("a.bt-download").remove();
 						});
 						break;
 					case 8://audio
-						//target.attr("src", obj.s3);
 						new audioplay(target,obj.s3);
 						break;
 
