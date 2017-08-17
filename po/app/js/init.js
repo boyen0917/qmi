@@ -288,13 +288,14 @@ window.QmiGlobal = {
 	emptyGrpPicStr: "images/common/others/empty_img_all_l.png",
 	emptyUsrPicStr: "images/common/others/empty_img_personal_l.png",
 
-	getObjectFirstItem: function(obj,last) {
-		if(last === true){
-			return obj[Object.keys(obj)[Object.keys(obj).length-1]];
-		} else 	{
-			return obj[Object.keys(obj)[0]];
-		}
-	},
+	resetDBExceptionArr: [
+		"_ver",
+		"_lastLoginAccount",
+		"_loginAutoChk",
+		"_loginRemeber",
+		"_lastBaseUrl",
+		"_sticker"
+	],
 
 	viewMap: {}, // cloud reload
 
