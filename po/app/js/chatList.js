@@ -141,7 +141,7 @@ function getChatListApi(giTmp) {
 }
 
 function updateChatList( giTmp, extraCallBack ){
-	if(QmiGlobal.groups[giTmp] === undefined )	return;
+	if(!QmiGlobal.groups[giTmp]) return;
 
 	//取得聊天室列表api
 	getChatListApi(giTmp).done(function(rspObj) {

@@ -424,6 +424,7 @@
 	margin-right: 7px;
 	margin-bottom: 10px;
 	cursor: pointer;
+	position: relative;
 }
 
 .contact-mems .mem img{
@@ -448,9 +449,10 @@
 	margin-left: 70px;
 	margin-top: 51px;
 	position: absolute;
+    z-index: 1;
 }
 
-.contact-mems .mem.new-mem:before {
+.contact-mems .mem.new-mem:after {
     height: 15px;
     width: 71px;
     background-color: #f31e80;
@@ -464,6 +466,7 @@
     margin-top: 56px;
     margin-left: 13px;
     font-size: 12px;
+    top: 0;
 }
 
 .contact-memLists .mem.admin .left:before {

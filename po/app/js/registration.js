@@ -3,9 +3,13 @@ appInitial = function(needUpdate){
 	clearBadgeLabel();
 
 	// 定時重新讀取
-    if($.lStorage("_appReloadAuth") !== false) {
+    if($.lStorage("_appReloadAuth")) {
     	QmiGlobal.auth = $.lStorage("_appReloadAuth");	
     	localStorage.removeItem("_appReloadAuth");
+    	
+    	// polling也清空才對
+    	localStorage.removeItem("_pollingData");
+
     	QmiGlobal.isAppReload = true;
     	loginAction();
 
@@ -362,7 +366,9 @@ appInitial = function(needUpdate){
 
 	function changeAccountToResetDB(phoneId) {
 		var lastId = $.lStorage("_lastLoginAccount") || null;
-		if(lastId !== phoneId && lastId !== null) resetDB();
+		if(lastId !== phoneId && lastId !== null) 
+			resetDB({isAll: true});
+
 		// 紀錄上次登入帳號
 		$.lStorage("_lastLoginAccount", phoneId);
 	}
@@ -1034,23 +1040,17 @@ appInitial = function(needUpdate){
 				}
 		    }
         }).complete(function(data){
-        	cns.debug("驗證 驗證碼後的 data:",data);
-
         	//清除db
-        	resetDB();
+        	resetDB({isAll: true});
+
         	$(".register-otp-input input").val("");
 
         	$(".register-otp-input input").trigger("input");
         	$(".resend-otp").addClass("resend-otp-ready");
 
-        	if(data.status == 200){
-        		cns.debug("跳到 #page-password");//"hash+#page-password"
-        		popupShowAdjust("",$.parseJSON(data.responseText).rsp_msg,true,false,[changePageAfterPopUp,"#page-password"]);
-        	}else{
-        		// var parseJSON = $.parseJSON(data.responseText);
-        		// $(".register-otp-input input").val("");
-        		
-        	}
+        	if(data.status !== 200) return;
+        	
+    		popupShowAdjust("",$.parseJSON(data.responseText).rsp_msg,true,false,[changePageAfterPopUp,"#page-password"]);
         });
 	}
 

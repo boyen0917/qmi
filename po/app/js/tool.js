@@ -159,8 +159,7 @@ ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_h
 
 
 reLogin = function() {
-	localStorage.removeItem("_loginAutoChk");
-	localStorage.removeItem("_loginData");
+	resetDB();
 	document.location = "index.html";
 }
 
