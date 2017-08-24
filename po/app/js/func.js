@@ -7978,7 +7978,7 @@ polling = function(){
         } else {
             setTimeout(function(){
                 polling();
-            },resultObj.interval);
+            }, resultObj.interval);
         }
     });
     return pollingDeferred;
@@ -8236,8 +8236,10 @@ pollingCmds = function(newPollingData){
             // 如果是自己被踢出團體了 不能打combo
             // 自己被踢出團體 加到leavedGiArr 會合併到exceptArr
             // 必須一個一個去判斷 所以擺第一個
+            // 直接先做離開團體
             if( item.tp === 6 
                 && item.pm.gu === (QmiGlobal.groups[item.pm.gi] || {}).me){
+                pollingLeaveGroup(item.pm.gi);
                 leavedGiArr.push(item.pm.gi);
                 insideDeferred.resolve(false);  
             }
@@ -8272,7 +8274,8 @@ pollingCmds = function(newPollingData){
             insideDeferred.done(function(status){
                 if( status === false ) return;
                 comboDeferredPoolArr.push(comboDeferred);
-                getGroupComboInit( item.pm.gi ).done(function(result){
+                getGroupComboInit(item.pm.gi).done(function(result){
+                    if(leavedGiArr.indexOf(item.pm.gi) < 0) leavedGiArr.push(item.pm.gi);
                     comboDeferred.resolve(result);
                 });
             })
@@ -8373,30 +8376,19 @@ pollingCmds = function(newPollingData){
                         break;
                     case 6://delete user info
                         
-                        if( QmiGlobal.groups[item.pm.gi] !== undefined) {
-                            if(QmiGlobal.groups[item.pm.gi].me === item.pm.gu) { // 判斷是自己的話就移除團體
-                                removeGroup(item.pm.gi);
-                                (QmiGlobal.windowListCiMap[item.pm.gi] || []).forEach(function(thisCi){
-                                    if(!windowList[thisCi].closed) {
-                                        windowList[thisCi].popupShowAdjust('',$.i18n.getString("GROUPSETTING_LEAVE_GROUP"),true,false,[function(){
-                                                windowList[thisCi].close();
+                        if(QmiGlobal.groups[item.pm.gi]) {
+                            $.each(windowList, function(index, val) {
+                                if(!windowList[index].closed && val.g_room.memList[item.pm.gu]) {
+                                    if(val.g_room.tp == 1) {
+                                        windowList[index].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false,[function(){
+                                            windowList[val.ci].close();
                                         }]);
+                                    }else {
+                                        windowList[val.ci].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false);
                                     }
-                                })
-                            }else {
-                                $.each(windowList, function(index, val) {
-                                    if(!windowList[index].closed && val.g_room.memList[item.pm.gu]) {
-                                        if(val.g_room.tp == 1) {
-                                            windowList[index].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false,[function(){
-                                                windowList[val.ci].close();
-                                            }]);
-                                        }else {
-                                            windowList[val.ci].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false);
-                                        }
-                                        updateChatList(item.pm.gi);
-                                    }
-                                });
-                            }
+                                    updateChatList(item.pm.gi);
+                                }
+                            });
                         }
 
                         updateSideMenuContent(item.pm.gi);
@@ -8631,6 +8623,16 @@ pollingCmds = function(newPollingData){
         if(!thisGi) return false;
         if(QmiGlobal.groups[thisGi]) return false;
         return true;
+    }
+
+    function pollingLeaveGroup(thisGi) {
+        removeGroup(thisGi);
+        (QmiGlobal.windowListCiMap[thisGi] || []).forEach(function(thisCi){
+            if(windowList[thisCi].closed) return;
+            windowList[thisCi].popupShowAdjust('',$.i18n.getString("GROUPSETTING_LEAVE_GROUP"),true,false,[function(){
+                windowList[thisCi].close();
+            }]);
+        })
     }
 }
 

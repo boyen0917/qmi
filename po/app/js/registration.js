@@ -3,9 +3,13 @@ appInitial = function(needUpdate){
 	clearBadgeLabel();
 
 	// 定時重新讀取
-    if($.lStorage("_appReloadAuth") !== false) {
+    if($.lStorage("_appReloadAuth")) {
     	QmiGlobal.auth = $.lStorage("_appReloadAuth");	
     	localStorage.removeItem("_appReloadAuth");
+    	
+    	// polling也清空才對
+    	localStorage.removeItem("_pollingData");
+
     	QmiGlobal.isAppReload = true;
     	loginAction();
 
