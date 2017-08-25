@@ -7978,7 +7978,7 @@ polling = function(){
         } else {
             setTimeout(function(){
                 polling();
-            },resultObj.interval);
+            }, resultObj.interval);
         }
     });
     return pollingDeferred;
@@ -8205,22 +8205,23 @@ pollingCountsWrite = function(pollingData, aa){
 
 //polling 事件 newPollingData
 pollingCmds = function(newPollingData){
-    var newCmdsArr = [],
-        user_info_arr = [],// 存tp4,5,6
-        branch_info_arr = [],
-        isUpdateMemPage = false,
-        onGetMemDataCallback = null,
-        comboDeferredPoolArr = [],
-        pollingDeferredPoolArr = [
+    var newCmdsArr = [];
+    var user_info_arr = [];// 存tp4,5,6
+    var leavedGiArr = []; // tp6 gu == me 自己離開團體
+    var branch_info_arr = [];
+    var isUpdateMemPage = false;
+    var onGetMemDataCallback = null;
+    var comboDeferredPoolArr = [];
+    var pollingDeferredPoolArr = [
             $.Deferred(),   // tp4,5,6 更新成員資訊
             $.Deferred(),   // branchlist 更新
             $.Deferred()    // cmdsArrangement
-        ],
+        ];
 
-        allCmdsDoneDeferred = $.Deferred(),
+    var allCmdsDoneDeferred = $.Deferred();
 
         // 是否先取得團體列表的deferred
-        groupListDeferred = $.Deferred();
+    var groupListDeferred = $.Deferred();
 
     // 先分類 取各組的最後一筆即可
     cmdsArrangement().done(function(){
@@ -8232,18 +8233,23 @@ pollingCmds = function(newPollingData){
             var comboDeferred = $.Deferred();
             var insideDeferred = $.Deferred();
 
+            // 如果是自己被踢出團體了 不能打combo
+            // 自己被踢出團體 加到leavedGiArr 會合併到exceptArr
+            // 必須一個一個去判斷 所以擺第一個
+            // 直接先做離開團體
+            if( item.tp === 6 
+                && item.pm.gu === (QmiGlobal.groups[item.pm.gi] || {}).me){
+                pollingLeaveGroup(item.pm.gi);
+                leavedGiArr.push(item.pm.gi);
+                insideDeferred.resolve(false);  
+            }
+
             // 不重複的gi)
-            if(this.indexOf(item.pm.gi) >= 0) insideDeferred.resolve(false);
+            else if(this.indexOf(item.pm.gi) >= 0) insideDeferred.resolve(false);
             
             // item.tp = 6 會這樣
             else if(QmiGlobal.groups[(item.pm || {}).gi] === undefined) {
                 insideDeferred.resolve(false);
-            }
-
-            // 如果是自己被踢出團體了 不能打combo
-            else if( item.tp === 6 
-                && item.pm.gu === QmiGlobal.groups[item.pm.gi].me){
-                insideDeferred.resolve(false);  
             }
             
             // 更新group info 強制打
@@ -8268,7 +8274,8 @@ pollingCmds = function(newPollingData){
             insideDeferred.done(function(status){
                 if( status === false ) return;
                 comboDeferredPoolArr.push(comboDeferred);
-                getGroupComboInit( item.pm.gi ).done(function(result){
+                getGroupComboInit(item.pm.gi).done(function(result){
+                    if(leavedGiArr.indexOf(item.pm.gi) < 0) leavedGiArr.push(item.pm.gi);
                     comboDeferred.resolve(result);
                 });
             })
@@ -8295,12 +8302,16 @@ pollingCmds = function(newPollingData){
                 isShowNotification = false;
 
             // 等等要剔除這次打過combo的tp4,5,6 避免重複api -> arguments是array-like Object
-            var exceptArr = Array.prototype.map.call(arguments,function(item){ return item.thisGi; })
+            var exceptArr = Array.prototype.map.call(arguments,function(item) {return item.thisGi; });
 
             newPollingData.cmds.forEach(function(item){
+                // 首先判斷如果有離開團體 就不要做了
+                // tp = 6 還是要做 才會有離開團體的動作
+                if(leavedGiArr.indexOf(item.pm.gi) >= 0 && item.tp !== 6) return;
 
+                // 剛做過的4, 5, 6
                 if((item.tp == 4 || item.tp == 5 || item.tp == 6) 
-                && exceptArr.indexOf(item.pm.gi) > 0) return;
+                && exceptArr.indexOf(item.pm.gi) >= 0) return;
 
                 switch(item.tp){
                     case 1://timeline list
@@ -8373,30 +8384,19 @@ pollingCmds = function(newPollingData){
                         break;
                     case 6://delete user info
                         
-                        if( QmiGlobal.groups[item.pm.gi] !== undefined) {
-                            if(QmiGlobal.groups[item.pm.gi].me === item.pm.gu) { // 判斷是自己的話就移除團體
-                                removeGroup(item.pm.gi);
-                                (QmiGlobal.windowListCiMap[item.pm.gi] || []).forEach(function(thisCi){
-                                    if(!windowList[thisCi].closed) {
-                                        windowList[thisCi].popupShowAdjust('',$.i18n.getString("GROUPSETTING_LEAVE_GROUP"),true,false,[function(){
-                                                windowList[thisCi].close();
+                        if(QmiGlobal.groups[item.pm.gi]) {
+                            $.each(windowList, function(index, val) {
+                                if(!windowList[index].closed && val.g_room.memList[item.pm.gu]) {
+                                    if(val.g_room.tp == 1) {
+                                        windowList[index].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false,[function(){
+                                            windowList[val.ci].close();
                                         }]);
+                                    }else {
+                                        windowList[val.ci].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false);
                                     }
-                                })
-                            }else {
-                                $.each(windowList, function(index, val) {
-                                    if(!windowList[index].closed && val.g_room.memList[item.pm.gu]) {
-                                        if(val.g_room.tp == 1) {
-                                            windowList[index].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false,[function(){
-                                                windowList[val.ci].close();
-                                            }]);
-                                        }else {
-                                            windowList[val.ci].popupShowAdjust('',$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (QmiGlobal.groups[item.pm.gi].guAll[item.pm.gu].nk || "").replaceOriEmojiCode()),true,false);
-                                        }
-                                        updateChatList(item.pm.gi);
-                                    }
-                                });
-                            }
+                                    updateChatList(item.pm.gi);
+                                }
+                            });
                         }
 
                         updateSideMenuContent(item.pm.gi);
@@ -8440,12 +8440,9 @@ pollingCmds = function(newPollingData){
                         updateChatList(item.pm.gi);
                         break;
                     case 45://被別人踢出聊天室
-                        var groupTmp = QmiGlobal.groups[item.pm.gi];
-                        popupShowAdjust("團體 "+groupTmp.gn,groupTmp.guAll[item.pm.gu].nk+" 已將你退出 "+groupTmp.chatAll[item.pm.ti].cn+" 聊天室",true,false,[function(){
-                            if(windowList[item.pm.ti] && !windowList[item.pm.ti].closed){
-                                windowList[item.pm.ti].close();
-                            }
-                        },null]);
+                        if(windowList[item.pm.ti] && !windowList[item.pm.ti].closed)
+                            windowList[item.pm.ti].close();
+
                         updateChatList(item.pm.gi);
                         break;    
 
@@ -8630,6 +8627,16 @@ pollingCmds = function(newPollingData){
         if(!thisGi) return false;
         if(QmiGlobal.groups[thisGi]) return false;
         return true;
+    }
+
+    function pollingLeaveGroup(thisGi) {
+        removeGroup(thisGi);
+        (QmiGlobal.windowListCiMap[thisGi] || []).forEach(function(thisCi){
+            if(windowList[thisCi].closed) return;
+            windowList[thisCi].popupShowAdjust('',$.i18n.getString("GROUPSETTING_LEAVE_GROUP"),true,false,[function(){
+                windowList[thisCi].close();
+            }]);
+        })
     }
 }
 
