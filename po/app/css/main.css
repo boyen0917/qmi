@@ -1590,6 +1590,7 @@ div#page-group-main div.gm-header-left:before {
 #page-group-main .other-info-row .contact {
     padding-left: 30px;
     vertical-align: top;
+    white-space: pre-line;
 }
 
 #page-group-main .other-info-row img {
