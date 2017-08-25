@@ -158,8 +158,9 @@ ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_h
 }
 
 
-reLogin = function() {
-	resetDB();
+reLogin = function(options) {
+	localStorage.removeItem("_loginAutoChk");
+	resetDB(options);
 	document.location = "index.html";
 }
 
@@ -769,27 +770,26 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	return allDef.promise();
 } // end of qmiUploadS3
 
-resetDB = function(){
+resetDB = function(options){
+	options = options || {};
 	clearBadgeLabel();
 	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 	if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 	if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
 
-	var exceptionObj = {};
-	var exceptionItemArr = [
-		"_ver",
-		"_loginRemeber",
-		"_lastBaseUrl"
-	];
-
-	exceptionItemArr.forEach(function(lsStr) {
-		if(localStorage[lsStr]) exceptionObj[lsStr] = localStorage[lsStr];
-	});
+	var excepObj = QmiGlobal.resetDBExceptionArr.reduce(function(obj, curr) {
+		obj[curr] = localStorage[curr];
+		return obj;
+	}, {});
 
 	localStorage.clear();
 
-	Object.keys(exceptionObj).forEach(function(key) {
-		$.lStorage(key, exceptionObj[key]);
+	Object.keys(excepObj).forEach(function(key) {
+		$.lStorage(key, excepObj[key]);
+	});
+
+	(options.removeItemArr || []).forEach(function(str) {
+		localStorage.removeItem(str);
 	});
 	
 }

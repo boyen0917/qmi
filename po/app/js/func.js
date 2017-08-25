@@ -68,6 +68,10 @@ logout = function(){
         (Object.keys(windowList) || []).forEach(function(thisCi){
             windowList[thisCi].close();
         });
+
+        try {
+            QmiGlobal.nwGui.App.clearCache();
+        } catch(e) {}
         
         reLogin();
     });
