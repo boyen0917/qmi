@@ -467,7 +467,7 @@
 
 	            selector.find("."+item)[method](user_data[item]).show();
 
-	            if (item = "nk") {
+	            if (item == "nk") {
 	                selector.find("."+item)[method]((
 	                    (user_data.nk2 && user_data.nk2.length > 0) 
 	                        ? user_data[item] + " (" + user_data.nk2 + ")" 
