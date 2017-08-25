@@ -292,8 +292,10 @@ window.QmiGlobal = {
 
 	resetDBExceptionArr: [
 		"_ver",
+		"_appReloadAuth",
 		"_lastLoginAccount",
 		"_loginAutoChk",
+		"_loginData",
 		"_loginRemeber",
 		"_lastBaseUrl",
 		"_sticker"

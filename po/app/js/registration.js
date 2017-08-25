@@ -1,15 +1,12 @@
 appInitial = function(needUpdate){
 	if( needUpdate ) return;
-	clearBadgeLabel();
+	resetDB();
 
 	// 定時重新讀取
     if($.lStorage("_appReloadAuth")) {
     	QmiGlobal.auth = $.lStorage("_appReloadAuth");	
     	localStorage.removeItem("_appReloadAuth");
     	
-    	// polling也清空才對
-    	localStorage.removeItem("_pollingData");
-
     	QmiGlobal.isAppReload = true;
     	loginAction();
 
@@ -354,7 +351,7 @@ appInitial = function(needUpdate){
 	function changeAccountToResetDB(phoneId) {
 		var lastId = $.lStorage("_lastLoginAccount") || null;
 		if(lastId !== phoneId && lastId !== null) 
-			resetDB({isAll: true});
+			resetDB({removeItemArr: ["_sticker"]});
 
 		// 紀錄上次登入帳號
 		$.lStorage("_lastLoginAccount", phoneId);
@@ -938,7 +935,7 @@ appInitial = function(needUpdate){
 		    }
         }).complete(function(data){
         	//清除db
-        	resetDB({isAll: true});
+        	resetDB({removeItemArr: ["_sticker"]});
 
         	$(".register-otp-input input").val("");
 
@@ -1199,16 +1196,6 @@ appInitial = function(needUpdate){
 	}
 	
 	initLandPage = function(){
-		// s_load_show = true;
-		// if($.lStorage("_loginData") && $.lStorage("_loginAutoChk")){
-		// 	$('.ui-loader').css("display","block");
-		// 	$(".ajax-screen-lock").show();
-		// 	// setTimeout( function(){
-		// 		loginAction($.lStorage("_loginData"));
-		// 		return false;
-		// 	// },1500);
-		// }
-		
 		//若local storage 有記錄密碼 就顯示
 		var rememberData = $.lStorage("_loginRemeber");
 		if( rememberData ){
