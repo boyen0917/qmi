@@ -483,6 +483,7 @@ appInitial = function(needUpdate){
     // LDAP SSO
     QmiGlobal.ssoLogin = function(ssoObj) {
     	var deferred = $.Deferred();
+    	var webSsoDeviceStr = "web_sso_device";
     	// sso 登入
 		new QmiAjax({
             url: "https://" + ssoObj.url + "/apiv1/sso/clouds/"+ ssoObj.cdi +"/companies/"+ ssoObj.ci +"/login",
@@ -490,8 +491,8 @@ appInitial = function(needUpdate){
             body: {
 			   id: ssoObj.id,
 			   tp: "1",
-			   dn: QmiGlobal.device,    
-			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, (ssoObj.id +"_"+ QmiGlobal.device).substring(0,16)),
+			   dn: webSsoDeviceStr,    
+			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, (ssoObj.id +"_"+ webSsoDeviceStr).substring(0,16)),
 			   uui: ssoObj.uui
 			},
             method: "post",
