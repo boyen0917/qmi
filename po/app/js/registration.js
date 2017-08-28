@@ -491,7 +491,7 @@ appInitial = function(needUpdate){
 			   id: ssoObj.id,
 			   tp: "1",
 			   dn: QmiGlobal.device,    
-			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, ssoObj.id.substring(0,16)),
+			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, (ssoObj.id +"_"+ QmiGlobal.device).substring(0,16)),
 			   uui: ssoObj.uui
 			},
             method: "post",
