@@ -2167,11 +2167,17 @@ zipVideoFile = function (videoObj) {
 		$.when(getDurationDef).done(function(duration) {
 			// toastShow("此影片格式不支援 正在進行影片轉檔 如不需要請按取消");
 			command
+			// .duration(duration)
    			.videoCodec('libx264')
    			.size('640x480')
 			.outputOptions('-c:a copy')
-			.outputOptions('-crf 22')
+			.outputOptions('-r 30')
+			.outputOptions('-refs 2')
+			.outputOptions('-crf 28')
+			.outputOptions('-preset:v veryfast')
+			.outputOptions('-vbr 4')
 			.outputOptions('-x264opts keyint=25')
+			.outputOptions('-profile:v baseline')
 		  	.on('start', function(commandLine) {
      			if (videoObj.setAbortFfmpegCmdEvent)
      				videoObj.setAbortFfmpegCmdEvent(command);
@@ -2194,7 +2200,9 @@ zipVideoFile = function (videoObj) {
 		  	}).on('error', function(err) {
 		    	zipVideoActionDef.reject('Cannot process video: ' + err.message);
 
-		  	}).on('end', zipVideoActionDef.resolve)
+		  	}).on('end', function () {
+		  		zipVideoActionDef.resolve();
+		  	})
 		  	.save(outputPath)
 
 		 //  	.pipe().on('data', function(chunk) { // 輸出串流回來的buffer
@@ -2222,6 +2230,8 @@ zipVideoFile = function (videoObj) {
         		var blob = new Blob([byteArray], {type: 'application/octet-binary'});
         		blob.name = videoObj.file.name;
         		transferBlobDef.resolve(blob);
+
+        		fs.unlinkSync(outputPath);
         	});
             // var blob = new Blob([outputBuffer.buffer], {type: 'application/octet-binary'});
             // blob.name = videoObj.file.name.split(".")[0] + ".mp4";
