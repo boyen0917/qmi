@@ -2174,7 +2174,6 @@ zipVideoFile = function (videoObj) {
 			.outputOptions('-refs 2')
 			.outputOptions('-crf 28')
 			.outputOptions('-preset:v veryfast')
-			.outputOptions('-vbr 4')
 			.outputOptions('-x264opts keyint=25')
 			.outputOptions('-profile:v baseline')
 		  	.on('start', function(commandLine) {
