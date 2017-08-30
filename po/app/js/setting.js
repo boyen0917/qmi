@@ -480,14 +480,21 @@ function showGroupInfoPage(){
 function getUpdateGroupInfoApi( this_gi, newGn, newGd ){
 	
 	var body = {};
-	if( newGn )	body.gn = newGn;
-	if( newGd )	body.gd = newGd;
+	var updateGroup = QmiGlobal.groups[this_gi] || {};
+	body.gn = newGn ? newGn : updateGroup.gn;
+	body.gd = newGd ? newGd : updateGroup.gd;
 	new QmiAjax({
 		apiName: "groups/" + this_gi,
 		type: "put",
 		body: body
 	}).success(function(data){
+		var sideMenuGroup = $("#page-group-main div.sm-group-area-r[data-gi='" + this_gi + "']");
 		toastShow(data.rsp_msg);
+		updateGroup.gn = newGn ? newGn : updateGroup.gn;
+		updateGroup.gd = newGd ? newGd : updateGroup.gd;
+		if (sideMenuGroup.length > 0) {
+			sideMenuGroup.children("div").eq(0).html(updateGroup.gn);
+		}
 	}).error(function(e){
         alert("error");
     });
