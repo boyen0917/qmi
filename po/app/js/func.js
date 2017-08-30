@@ -4773,7 +4773,8 @@ composeSend = function (this_compose){
                         file: this_compose.data("upload-obj")[key].elem,
                         fileName: this_compose.data("upload-obj")[key].file.name,
                         oriObj: {w: 1280, h: 1280, s: 0.7},
-                        tmbObj: {w: 480, h: 480, s: 0.6} // ;
+                        tmbObj: {w: 480, h: 480, s: 0.6},
+                        progressBar: progressBarObj.xhr
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
@@ -4818,6 +4819,7 @@ composeSend = function (this_compose){
                                 progressBarObj.close();
                             });
                         },
+                        progressBar: progressBarObj.xhr
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
@@ -4855,7 +4857,8 @@ composeSend = function (this_compose){
                         hasFi: true,
                         file: this_compose.data("upload-file")[key],
                         fileName: this_compose.data("upload-file")[key].name,
-                        oriObj: {w: 1280, h: 1280, s: 0.9}
+                        oriObj: {w: 1280, h: 1280, s: 0.9},
+                        progressBar: progressBarObj.xhr
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
@@ -4906,6 +4909,7 @@ composeSend = function (this_compose){
     })
 
     function composeProgressBar() {
+        var multiUploadProgress = {total: 0, loaded: 0, arr: []};
         return {
             init: function() {
                 if(uploadTotalCnt === 0) return;
@@ -4923,6 +4927,23 @@ composeSend = function (this_compose){
                         item.reject();
                     })
                 })
+            },
+
+            xhr: function () {
+                var barDom = $("#compose-progressbar div.bar");
+                uploadXhr = new window.XMLHttpRequest();
+                uploadXhr.upload.addEventListener("progress", function(evt){
+                    console.log("evt", evt);
+                    console.log("et", evt.total);
+                    console.log("el", evt.loaded);
+                    multiUploadProgress.total += evt.total;
+                    multiUploadProgress.loaded += evt.loaded;
+                    var pctStr = Math.round((multiUploadProgress.loaded / multiUploadProgress.total) * 100) + '%';
+                    console.log("pctStr", pctStr)
+                    console.log("pro", {tt: multiUploadProgress.total, ll: multiUploadProgress.loaded})
+
+                }, false);
+                return uploadXhr;
             },
 
             add: function() {
