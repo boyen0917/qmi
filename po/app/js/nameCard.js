@@ -422,6 +422,7 @@
 
 	            if (!me && item == "bd") {
 	                user_data.bd = user_data.bd.substring(4,6) + "." + user_data.bd.substring(6,8);
+	                
 	                method = "append";
 	            }
 
@@ -466,8 +467,6 @@
 	                    continue;
 	                }
 	            }
-
-	            selector.find("."+item)[method](user_data[item]).show();
 
 	            if (item == "nk") {
 	                selector.find("."+item)[method]((
@@ -1007,16 +1006,13 @@
 	                    .find("#emailOnOff").attr("checked", !userData.mke).end()
 	                    .find("#mobileOnOff").attr("checked", !userData.mkp);
 
-	        userInfoArea.find('.onoffswitch input[type=checkbox]').change(function(e) {
+	        userInfoArea.find('.onoffswitch input[type=checkbox]').off('change').on('change', function(e) {
 
 	            var userObj = {
 	                gu : userData.gu,
 	                info : {
 	                    nk : userData.nk,
 	                    sl : userData.sl,
-	                    mkb : userData.mkb,
-	                    mke : userData.mke,
-	                    mkp : userData.mkp,
 	                }
 	            };
 	            var switchName = e.target.id;
@@ -1077,7 +1073,6 @@
 	}
 
 	updateUserInfo = function (userObj) {
-	    console.log(userObj);
 	    var ajaxData = {
 	        apiName : "/groups/" + gi + "/users/" + userObj.gu,
 	        method : "put",
@@ -1122,7 +1117,7 @@
 	      ext: this_info.find(".user-info-list .et").val(),
 	      ti: this_info.find(".user-info-list .ti").val(),
 	      mv: this_info.find(".user-info-list .mv").val(),
-	      em: this_info.find(".user-info-list .em").val()
+	      // em: this_info.find(".user-info-list .em").val() //無法進行修改E-Mail，先不送
 	    }
 
 	    var method = "put";
