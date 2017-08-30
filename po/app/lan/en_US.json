@@ -328,6 +328,8 @@
 	"USER_PROFILE_PHONE" : "Phone",
 	"USER_PROFILE_EMAIL" : "E-Mail",
 	"USER_PROFILE_MVPN" : "MVPN",
+	"USER_PROFILE_SIP_NUMBER1" : "SIP phone number",
+	"USER_PROFILE_SIP_NUMBER2" : "SIP phone number2",
 	"USER_PROFILE_HOMEPAGE" : "Homepage",
 	"USER_PROFILE_EMPTY_NAME" : "Please enter your name.",
 	"USER_PROFILE_UPDATE_SUCC" : "Update successed.",
