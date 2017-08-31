@@ -4821,6 +4821,7 @@ composeSend = function (this_compose){
                                 progressBarObj.close();
                             });
                         },
+                        progressBarObj: progressBarObj,
                         progressBar: progressBarObj.xhr,
                         vdoDone: progressBarObj.vdoDone
                     }).done(function(resObj) {
@@ -4897,7 +4898,8 @@ composeSend = function (this_compose){
         var errFileNameArr = [];
         Array.prototype.forEach.call(arguments, function(resObj) {
             if(resObj.isSuccess === false) errFileNameArr.push(resObj.errFileName)
-        })
+        });
+
         setTimeout(function() {
             progressBarObj.close(); 
             if(errFileNameArr.length > 0) {
@@ -4910,7 +4912,7 @@ composeSend = function (this_compose){
             }
 
             composeSendApi(body);
-        }, 500);
+        }, 1000);
     // 取消
     }).fail(function() {
         progressBarObj.close();
@@ -4919,6 +4921,7 @@ composeSend = function (this_compose){
     function composeProgressBar() {
         var vdoCompressDeferred = $.Deferred();
         var basePct = 0;
+        var barDom;
         var multiUploadProgress = {
             map: {}, length: 0,
             getTotal: function() {
@@ -4934,7 +4937,7 @@ composeSend = function (this_compose){
                 if(uploadTotalCnt === 0) return;
 
                 $("#compose-progressbar").remove();
-                self.barDom = $("<section>", {
+                barDom = $("<section>", {
                     id: "compose-progressbar",
                     style: "display: block",
                     html: "<div class='container'><div class='title'>"+ $.i18n.getString("FILESHARING_UPLOADING") +"</div><div class='bar'></div>" + 
@@ -4942,17 +4945,13 @@ composeSend = function (this_compose){
                             "<div class='cnt'><span class='curr' num='0'></span> / <span class='total'>"+ uploadTotalCnt +"</span></div></div>"
                 });
 
-                $("body").append(self.barDom);
+                $("body").append(barDom);
 
-                self.barDom.find("button").click(function() {
+                barDom.find("button").click(function() {
                     uploadDefArr.forEach(function(item) {
                         item.reject();
                     })
                 })
-            },
-
-            set: function(length) {
-                self.barDom.find(".bar")
             },
 
             setBasePct: function(pct) {
@@ -4966,27 +4965,26 @@ composeSend = function (this_compose){
 
             xhr: function () {
                 var self = this;
-                var barDom = $("#compose-progressbar div.bar");
                 var xhrId = new Date().getTime();
-
+                console.log("???1");
                 uploadXhr = new window.XMLHttpRequest();
                 uploadXhr.upload.addEventListener("progress", function(evt){
-                    
+                    console.log("???2");
                     multiUploadProgress.map[xhrId] = multiUploadProgress.map[xhrId] || {};
                     multiUploadProgress.map[xhrId].total = evt.total;
 
                     // 先等壓縮結束
                     vdoCompressDeferred.done(function() {
+                        console.log("???3");
                         setTimeout(function() {
                             var diff = evt.loaded - (multiUploadProgress.map[xhrId].loaded || 0);
                             if(diff < 0) return;
                             multiUploadProgress.length += diff;
                             multiUploadProgress.map[xhrId].loaded = evt.loaded;
-                            var pctStr = getPct(multiUploadProgress.length / multiUploadProgress.getTotal()) + '%';
-
-                            console.log("pctStr", pctStr)
-                            console.log("multiUploadProgress", JSON.parse(JSON.stringify(multiUploadProgress)))
-                        }, Math.floor(Math.random()*10) * 100);
+                            var pct = getPct(multiUploadProgress.length / multiUploadProgress.getTotal());
+                            // self.set(pct);
+                            barDom.find(".bar").css("width", (Math.floor(pct*(100-basePct)/100)+basePct-1.5)+"%");
+                        }, 500);
                     });
                         
                 }, false);
@@ -4997,12 +4995,18 @@ composeSend = function (this_compose){
                 }
             },
 
+            set: function(length) {
+                barDom.find(".bar").css("width", (Math.floor((length || 0)*(100-basePct)/100)+basePct-1.5)+"%");
+            },
+
             add: function() {
-                var self = this;
                 if(uploadTotalCnt === 0) return;
 
                 uploadCurrCnt++;
-                self.barDom.find("span.curr").attr("num", uploadCurrCnt);
+                setTimeout(function() {
+                    barDom.find("span.curr").attr("num", uploadCurrCnt);
+                }, 500);
+                
             },
 
             close: function() {

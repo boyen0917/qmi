@@ -702,6 +702,10 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			// delete paramObj.s3;
 			contentType = "video/mp4";
 
+			uploadObj.updateCompressionProgress = function(length) {
+
+			}
+
 			zipVideoFile(uploadObj).done(function (uploadFile) {
 
 				uploadObj.vdoDone();
@@ -749,7 +753,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	}
 
 	mediaLoadDef.done(function() {
-
 		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
 			var ajaxArgs = {
 				url: paramObj[key].url,
@@ -760,7 +763,10 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				processData: false,
 			}
 			
-			if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar.bind(null, uploadObj.basePct);
+			if (uploadObj.progressBar) ajaxArgs.xhr = function() {
+				window.gg = arguments;
+				uploadObj.progressBar(uploadObj.basePct);
+			}
 			arr[i] = $.ajax(ajaxArgs);
 			return arr;
 		},[])).done(function(data) {
