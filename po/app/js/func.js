@@ -4689,11 +4689,12 @@ composeSend = function (this_compose){
     var sendingFileData = [];
 
     // 檔案上傳 統一處理
-    var uploadDefArr = [],
-        uploadAllDoneDef = $.Deferred(),
-        uploadUrl = "groups/" + gi + "/files",
-        uploadTotalCnt = 0, uploadCurrCnt = 0,
-        progressBarObj = composeProgressBar();
+    var uploadDefArr = [];
+    var uploadAllDoneDef = $.Deferred();
+    var uploadUrl = "groups/" + gi + "/files";
+    var uploadTotalCnt = 0, uploadCurrCnt = 0;
+    var progressBarObj = composeProgressBar();
+    var isVdoExist = false;
 
     //貼文內容的類型 網址 附檔之類的 
     $.each(ml,function(i,mtp){
@@ -4793,6 +4794,7 @@ composeSend = function (this_compose){
             // 影片
             case 7:
                 is_push = false;
+                isVdoExist = true;
                 Object.keys(this_compose.data("upload-video") || {}).forEach(function(key) {
                     uploadTotalCnt++;
 
@@ -4819,7 +4821,8 @@ composeSend = function (this_compose){
                                 progressBarObj.close();
                             });
                         },
-                        progressBar: progressBarObj.xhr
+                        progressBar: progressBarObj.xhr,
+                        vdoDone: progressBarObj.vdoDone
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
@@ -4881,6 +4884,11 @@ composeSend = function (this_compose){
         if(is_push) body.ml.push(obj);
     });
 
+    if(isVdoExist) 
+        progressBarObj.setBasePct(QmiGlobal.vdoCompressBasePct);
+    else
+        progressBarObj.vdoDone();
+
     // 進度條
     progressBarObj.init();
 
@@ -4909,50 +4917,92 @@ composeSend = function (this_compose){
     })
 
     function composeProgressBar() {
-        var multiUploadProgress = {total: 0, loaded: 0, arr: []};
+        var vdoCompressDeferred = $.Deferred();
+        var basePct = 0;
+        var multiUploadProgress = {
+            map: {}, length: 0,
+            getTotal: function() {
+                var self = this;
+                return Object.keys(self.map).reduce(function(total, currId) {
+                    return total += self.map[currId].total;
+                }, 0);
+            }
+        };
         return {
             init: function() {
+                var self = this;
                 if(uploadTotalCnt === 0) return;
+
                 $("#compose-progressbar").remove();
-                $("body").append($("<section>", {
+                self.barDom = $("<section>", {
                     id: "compose-progressbar",
                     style: "display: block",
                     html: "<div class='container'><div class='title'>"+ $.i18n.getString("FILESHARING_UPLOADING") +"</div><div class='bar'></div>" + 
                             "<button>"+ $.i18n.getString("COMMON_CANCEL") +"</button>" + 
                             "<div class='cnt'><span class='curr' num='0'></span> / <span class='total'>"+ uploadTotalCnt +"</span></div></div>"
-                }));
+                });
 
-                $("#compose-progressbar button").click(function() {
+                $("body").append(self.barDom);
+
+                self.barDom.find("button").click(function() {
                     uploadDefArr.forEach(function(item) {
                         item.reject();
                     })
                 })
             },
 
+            set: function(length) {
+                self.barDom.find(".bar")
+            },
+
+            setBasePct: function(pct) {
+                basePct = pct;
+            },
+
+            vdoDone: function() {
+                console.log("compress done");
+                vdoCompressDeferred.resolve();
+            },
+
             xhr: function () {
+                var self = this;
                 var barDom = $("#compose-progressbar div.bar");
+                var xhrId = new Date().getTime();
+
                 uploadXhr = new window.XMLHttpRequest();
                 uploadXhr.upload.addEventListener("progress", function(evt){
-                    console.log("evt", evt);
-                    console.log("et", evt.total);
-                    console.log("el", evt.loaded);
-                    multiUploadProgress.total += evt.total;
-                    multiUploadProgress.loaded += evt.loaded;
-                    var pctStr = Math.round((multiUploadProgress.loaded / multiUploadProgress.total) * 100) + '%';
-                    console.log("pctStr", pctStr)
-                    console.log("pro", {tt: multiUploadProgress.total, ll: multiUploadProgress.loaded})
+                    
+                    multiUploadProgress.map[xhrId] = multiUploadProgress.map[xhrId] || {};
+                    multiUploadProgress.map[xhrId].total = evt.total;
 
+                    // 先等壓縮結束
+                    vdoCompressDeferred.done(function() {
+                        setTimeout(function() {
+                            var diff = evt.loaded - (multiUploadProgress.map[xhrId].loaded || 0);
+                            if(diff < 0) return;
+                            multiUploadProgress.length += diff;
+                            multiUploadProgress.map[xhrId].loaded = evt.loaded;
+                            var pctStr = getPct(multiUploadProgress.length / multiUploadProgress.getTotal()) + '%';
+
+                            console.log("pctStr", pctStr)
+                            console.log("multiUploadProgress", JSON.parse(JSON.stringify(multiUploadProgress)))
+                        }, Math.floor(Math.random()*10) * 100);
+                    });
+                        
                 }, false);
                 return uploadXhr;
+
+                function getPct(pct) {
+                    return Math.floor(pct*100)
+                }
             },
 
             add: function() {
+                var self = this;
                 if(uploadTotalCnt === 0) return;
 
                 uploadCurrCnt++;
-                $("#compose-progressbar")
-                .find("span.curr").attr("num", uploadCurrCnt).end()
-                .find(".bar").css("width", (100*(uploadCurrCnt/uploadTotalCnt)-1.5)+"%");
+                self.barDom.find("span.curr").attr("num", uploadCurrCnt);
             },
 
             close: function() {
@@ -7294,11 +7344,6 @@ replySend = function(thisEvent){
                 tp: eventTp
             };
 
-            // uploadGroupImage(thisGi, file, thisTi, null, ori_arr, tmb_arr, pi, function(data){
-            //     var rspObj = {
-            //         isSuccess: true,
-            //         data: data
-            //     }
             qmiUploadFile({
                 urlAjax: {
                     apiName: "groups/" + thisGi + "/files",
@@ -7371,8 +7416,6 @@ replySend = function(thisEvent){
                 updateCompressionProgress: function (percent) {
                     $(".load-bar").css("width", percent + '%');
                     $(".file-content").attr("percent", percent + '%');
-                    // messageArea.find(".chat-upload-progress").attr("max", 100).attr("value", percent);
-                    // dom.find(".upload-percent").html(percent + '%');
                 },
             }).done(uploadDef.resolve)
 

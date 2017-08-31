@@ -703,10 +703,13 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			contentType = "video/mp4";
 
 			zipVideoFile(uploadObj).done(function (uploadFile) {
+
+				uploadObj.vdoDone();
+
 				paramObj.s32.file = uploadFile;
 
 				// 壓縮80 上傳20
-				uploadObj.basePct = 80;
+				uploadObj.basePct = QmiGlobal.vdoCompressBasePct;
 
 				// 傳給外部 commit 使用
 				mt = uploadFile.type;
@@ -747,21 +750,20 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 	mediaLoadDef.done(function() {
 
-		$.when.apply($, (Object.keys(paramObj).reduce(function(arr,key,i) {
-				var ajaxArgs = {
-					url: paramObj[key].url,
-					type: 'PUT',
-					timeout: 0,
-					contentType: contentType,
-				 	data: paramObj[key].file, 
-					processData: false,
-				}
-				
-				if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar.bind(null, uploadObj.basePct);
-				arr[i] = $.ajax(ajaxArgs);
-				return arr;
-			},[]))
-		).done(function(data) {
+		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
+			var ajaxArgs = {
+				url: paramObj[key].url,
+				type: 'PUT',
+				timeout: 0,
+				contentType: contentType,
+			 	data: paramObj[key].file, 
+				processData: false,
+			}
+			
+			if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar.bind(null, uploadObj.basePct);
+			arr[i] = $.ajax(ajaxArgs);
+			return arr;
+		},[])).done(function(data) {
 			allDef.resolve({status: 200, isSuccess: true, data: {
 				fi: s3Obj.fi,
 				mt: mt,
@@ -2202,24 +2204,6 @@ zipVideoFile = function (videoObj) {
 		  		zipVideoActionDef.resolve();
 		  	})
 		  	.save(outputPath)
-
-		 //  	.pipe().on('data', function(chunk) { // 輸出串流回來的buffer
-		 //  		console.log("QQWWW")
-	  //       	if (outputBuffer === undefined) {
-	  //       		outputBuffer = chunk;
-	  //       	} else {
-	  //       		//  原本的buffer跟新回傳來的buffer 合併merge;
-	  //       		var prevInt8Arr = new Uint8Array(outputBuffer);
-	  //       		var currInt8Arr = new Uint8Array(chunk);
-	  //       		var totalByteLength = prevInt8Arr.byteLength + currInt8Arr.byteLength;
-	  //       		var totalInt8Arr = new Uint8Array(totalByteLength);
-	  //       		totalInt8Arr.set(prevInt8Arr, 0);
-	  //       		totalInt8Arr.set(currInt8Arr, prevInt8Arr.byteLength);
-
-	  //       		outputBuffer = totalInt8Arr;
-	  //       	}
-	  //       	console.log("percent", percent);
-			// });
 		});
 
         zipVideoActionDef.done(function () {
@@ -2231,9 +2215,6 @@ zipVideoFile = function (videoObj) {
 
         		fs.unlinkSync(outputPath);
         	});
-            // var blob = new Blob([outputBuffer.buffer], {type: 'application/octet-binary'});
-            // blob.name = videoObj.file.name.split(".")[0] + ".mp4";
-            // transferBlobDef.resolve(blob);
 	    }).fail(function (errorMsg) {
 	    	console.log(errorMsg);
 	    });
