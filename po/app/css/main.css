@@ -705,13 +705,13 @@ img.auo {
 .no-group-lock .content{
 	background-color: white;
     width: 420px;
-    height: 260px;
     margin-right: auto;
     margin-left: auto;
     margin-top: 32vh;
+    padding-top: 5px;
+    padding-bottom: 25px;
     text-align: center;
     border-radius: 8px;
-    padding: 5px 0px;
 }
 
 .no-group-lock .content h3{
@@ -722,8 +722,18 @@ img.auo {
 
 .no-group-lock .content span{
 	color: grey;
-	display: inline-block;
-    width: 195px;
+}
+
+.no-group-lock .content button{
+	padding: 8px 50px;
+    background-color: rgb(57, 148, 232);
+    margin-top: 24px;
+    border-radius: 3px;
+    border: 0px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    outline: 0px;
 }
 
 .compose-dnd {

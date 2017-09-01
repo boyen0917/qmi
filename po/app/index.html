@@ -371,6 +371,12 @@
                 <img src="images/groupmenu/qicon_noinvite.png">
                 <h3 data-textid="GROUPLIST_NO_GROUPS"></h3>
                 <span data-textid="EMPTY_COMPANYACCOUNT_NO_GROUP"></span>
+                <button data-textid="SETTING_LOGOUT" onclick="new QmiGlobal.popup({
+                    desc: $.i18n.getString('SETTING_DO_LOGOUT'),
+                    confirm: true,
+                    cancel: true,
+                    action: [logout]
+                })"></button>
             </div>
         </div>
         <div id="page-back-chk"></div>
