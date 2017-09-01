@@ -651,17 +651,16 @@ qmiUploadFile = function(uploadObj){
 
 // 做 s3 上傳
 qmiUploadS3 = function(uploadObj,s3Obj) {
-	var allDef = $.Deferred(),
-		tmbObj = uploadObj.tmbObj,
-		oriObj = uploadObj.oriObj;
-
-	var uploadDef = $.Deferred(),
-		mediaLoadDef = $.Deferred(),
-		oriFile, tmbFile, mt, si, md, contentType,
-		paramObj = {
-			s3: { url: s3Obj.s3 || s3Obj.tu },
-			s32: { url: s3Obj.s32 || s3Obj.ou},
-		};
+	var allDef = $.Deferred();
+	var tmbObj = uploadObj.tmbObj;
+	var oriObj = uploadObj.oriObj;
+	var uploadDef = $.Deferred();
+	var mediaLoadDef = $.Deferred();
+	var oriFile, tmbFile, mt, si, md, contentType;
+	var paramObj = {
+		s3: { url: s3Obj.s3 || s3Obj.tu },
+		s32: { url: s3Obj.s32 || s3Obj.ou}
+	};
 
 	switch(uploadObj.tp) {
 		case 0: // 其他類型 檔案上傳
@@ -678,8 +677,8 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			break;
 		case 1: // 圖
-			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s),
-				tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
+			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s);
+			var tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
 
 			paramObj.s32.file = oFile.blob;
 			paramObj.s3.file = tFile.blob;
@@ -703,12 +702,27 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			contentType = "video/mp4";
 
 			uploadObj.updateCompressionProgress = function(length) {
-
+				console.log("compress", length)
+				uploadObj.progressBar.set(length);
 			}
 
-			zipVideoFile(uploadObj).done(function (uploadFile) {
+			$.when(
+				zipVideoFile(uploadObj), 
+				// 取得截圖
+				function() {
+					var video = document.createElement('video');
+					video.src = URL.createObjectURL(uploadObj.file);
 
-				uploadObj.vdoDone();
+					video.onloadeddata = function() {
+						console.log("load video finished");
+						var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
+						md = {l: Math.floor(video.duration * 1000)};
+						paramObj.s3.file = thumbnailVideo.blob;
+					}
+				}()
+			).done(function (uploadFile) {
+				console.log("zip finished");
+				uploadObj.progressBar.vdoCompressDefer.resolve(true);
 
 				paramObj.s32.file = uploadFile;
 
@@ -719,40 +733,29 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				mt = uploadFile.type;
 				si = uploadFile.size;
 
-				var video = document.createElement('video');
-				video.src = URL.createObjectURL(uploadFile);
-
-				video.onloadeddata = function() {
-					var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
-					
-					paramObj.s3.file = thumbnailVideo.blob;
-					md = {l: Math.floor(video.duration * 1000)};
-					mediaLoadDef.resolve();
-				}
+				mediaLoadDef.resolve();
 			}).fail(function () { // 壓縮失敗
 				paramObj.s32.file = uploadObj.file;
 
 				// 傳給外部 commit 使用
 				mt = uploadObj.file.type;
 				si = uploadObj.file.size;
-
-				var video = document.createElement('video');
-				video.src = URL.createObjectURL(uploadObj.file);
-
-				video.onloadeddata = function() {
-					var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
-
-					md = {l: Math.floor(video.duration * 1000)};
-					paramObj.s3.file = thumbnailVideo.blob;
-					mediaLoadDef.resolve();
-				}
 			});
 			
 			break;
 		default: 
 	}
+	
+	(function() {
+		var chainDef = MyDeferred();
+		uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);
 
-	mediaLoadDef.done(function() {
+		return chainDef;
+	}()).then(function() {
+		var chainDef = MyDeferred();
+		mediaLoadDef.done(chainDef.resolve);
+		return chainDef;
+	}()).then(function() {
 		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
 			var ajaxArgs = {
 				url: paramObj[key].url,
@@ -763,10 +766,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				processData: false,
 			}
 			
-			if (uploadObj.progressBar) ajaxArgs.xhr = function() {
-				window.gg = arguments;
-				uploadObj.progressBar(uploadObj.basePct);
-			}
+			if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar.xhr.bind(null, uploadObj.basePct);
 			arr[i] = $.ajax(ajaxArgs);
 			return arr;
 		},[])).done(function(data) {
@@ -2198,7 +2198,7 @@ zipVideoFile = function (videoObj) {
 	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
 	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
 	                percent = ((seconds / duration) * 80).toFixed();
-	                console.log(percent);
+	                
 	                if (videoObj.updateCompressionProgress)
 	               	 	videoObj.updateCompressionProgress(percent);
 	            }
@@ -2218,9 +2218,10 @@ zipVideoFile = function (videoObj) {
         		var blob = new Blob([byteArray], {type: 'application/octet-binary'});
         		blob.name = videoObj.file.name;
         		transferBlobDef.resolve(blob);
-
+        		
         		fs.unlinkSync(outputPath);
         	});
+
 	    }).fail(function (errorMsg) {
 	    	console.log(errorMsg);
 	    });

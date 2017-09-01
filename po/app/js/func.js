@@ -4695,6 +4695,8 @@ composeSend = function (this_compose){
     var uploadTotalCnt = 0, uploadCurrCnt = 0;
     var progressBarObj = composeProgressBar();
     var isVdoExist = false;
+    // 預設有影片 等待壓縮完再上傳其他的-> vdoCompressDef
+    var vdoCompressDefer = $.Deferred();
 
     //貼文內容的類型 網址 附檔之類的 
     $.each(ml,function(i,mtp){
@@ -4775,7 +4777,7 @@ composeSend = function (this_compose){
                         fileName: this_compose.data("upload-obj")[key].file.name,
                         oriObj: {w: 1280, h: 1280, s: 0.7},
                         tmbObj: {w: 480, h: 480, s: 0.6},
-                        progressBar: progressBarObj.xhr
+                        progressBar: progressBarObj
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
@@ -4821,9 +4823,7 @@ composeSend = function (this_compose){
                                 progressBarObj.close();
                             });
                         },
-                        progressBarObj: progressBarObj,
-                        progressBar: progressBarObj.xhr,
-                        vdoDone: progressBarObj.vdoDone
+                        progressBar: progressBarObj,
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
@@ -4862,7 +4862,7 @@ composeSend = function (this_compose){
                         file: this_compose.data("upload-file")[key],
                         fileName: this_compose.data("upload-file")[key].name,
                         oriObj: {w: 1280, h: 1280, s: 0.9},
-                        progressBar: progressBarObj.xhr
+                        progressBar: progressBarObj
                     }).done(function(resObj) {
                         progressBarObj.add();
                         tmpDef.resolve(resObj);
@@ -4885,10 +4885,7 @@ composeSend = function (this_compose){
         if(is_push) body.ml.push(obj);
     });
 
-    if(isVdoExist) 
-        progressBarObj.setBasePct(QmiGlobal.vdoCompressBasePct);
-    else
-        progressBarObj.vdoDone();
+    if(!isVdoExist) progressBarObj.vdoCompressDefer.resolve(false);
 
     // 進度條
     progressBarObj.init();
@@ -4919,7 +4916,7 @@ composeSend = function (this_compose){
     })
 
     function composeProgressBar() {
-        var vdoCompressDeferred = $.Deferred();
+        var vdoCompressDefer = $.Deferred();
         var basePct = 0;
         var barDom;
         var multiUploadProgress = {
@@ -4954,36 +4951,37 @@ composeSend = function (this_compose){
                 })
             },
 
-            setBasePct: function(pct) {
-                basePct = pct;
-            },
+            setBasePct: setProgressBarBasePct,
 
-            vdoDone: function() {
-                console.log("compress done");
-                vdoCompressDeferred.resolve();
+            vdoCompressDefer: vdoCompressDefer,
+
+            vdoDone: function(isVdoUploaded) {
+                if(isVdoUploaded)
+                    setProgressBarBasePct(QmiGlobal.vdoCompressBasePct);
+
+                vdoCompressDefer.resolve();
             },
 
             xhr: function () {
                 var self = this;
                 var xhrId = new Date().getTime();
-                console.log("???1");
-                uploadXhr = new window.XMLHttpRequest();
+                var uploadXhr = new window.XMLHttpRequest();
+                
                 uploadXhr.upload.addEventListener("progress", function(evt){
-                    console.log("???2");
                     multiUploadProgress.map[xhrId] = multiUploadProgress.map[xhrId] || {};
                     multiUploadProgress.map[xhrId].total = evt.total;
-
                     // 先等壓縮結束
-                    vdoCompressDeferred.done(function() {
-                        console.log("???3");
+                    vdoCompressDefer.done(function(isVdoUploaded) {
+                        if(isVdoUploaded)
+                            setProgressBarBasePct(QmiGlobal.vdoCompressBasePct);
+                        
                         setTimeout(function() {
                             var diff = evt.loaded - (multiUploadProgress.map[xhrId].loaded || 0);
                             if(diff < 0) return;
                             multiUploadProgress.length += diff;
                             multiUploadProgress.map[xhrId].loaded = evt.loaded;
                             var pct = getPct(multiUploadProgress.length / multiUploadProgress.getTotal());
-                            // self.set(pct);
-                            barDom.find(".bar").css("width", (Math.floor(pct*(100-basePct)/100)+basePct-1.5)+"%");
+                            setProgressBarLength(pct);
                         }, 500);
                     });
                         
@@ -4995,24 +4993,30 @@ composeSend = function (this_compose){
                 }
             },
 
-            set: function(length) {
-                barDom.find(".bar").css("width", (Math.floor((length || 0)*(100-basePct)/100)+basePct-1.5)+"%");
-            },
+            set: setProgressBarLength,
 
             add: function() {
                 if(uploadTotalCnt === 0) return;
 
                 uploadCurrCnt++;
+                // 先等壓縮結束
                 setTimeout(function() {
                     barDom.find("span.curr").attr("num", uploadCurrCnt);
-                }, 500);
-                
+                }, Math.random()*100 * 5);
             },
 
             close: function() {
                 if(uploadTotalCnt === 0) return;
                 $("#compose-progressbar").remove();
             }
+        }
+
+        function setProgressBarLength(length) {
+            barDom.find(".bar").css("width", (Math.floor((length || 0)*(100-basePct)/100)+basePct-1.5)+"%");
+            console.log("progress", length, "width: "+ barDom.find(".bar").css("width"));
+        }
+        function setProgressBarBasePct(pct) {
+            basePct = pct;
         }
     }
 }
