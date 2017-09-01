@@ -4692,11 +4692,32 @@ composeSend = function (this_compose){
     var uploadDefArr = [];
     var uploadAllDoneDef = $.Deferred();
     var uploadUrl = "groups/" + gi + "/files";
-    var uploadTotalCnt = 0, uploadCurrCnt = 0;
-    var progressBarObj = composeProgressBar();
+    var uploadTotalCnt = 0;
+    // var progressBarObj = composeProgressBar();
+    var progressBarObj = new ProgressBarCntr(function() {
+        var self = this;
+        if(self.filesCnt.get() === 0) return;
+
+        $("#compose-progressbar").remove();
+        self.barDom.set($("<section>", {
+            id: "compose-progressbar",
+            style: "display: block",
+            html: "<div class='container'><div class='title'>"+ $.i18n.getString("FILESHARING_UPLOADING") +"</div><div class='bar'></div>" + 
+                    "<button>"+ $.i18n.getString("COMMON_CANCEL") +"</button>" + 
+                    "<div class='cnt'><span class='curr' num='0'></span> / <span class='total'>"+ uploadTotalCnt +"</span></div></div>"
+        }));
+
+
+        $("body").append(self.barDom.get());
+
+        self.barDom.get().find("button").click(function() {
+            uploadDefArr.forEach(function(item) {
+                item.reject();
+            })
+        })
+    });
+    
     var isVdoExist = false;
-    // 預設有影片 等待壓縮完再上傳其他的-> vdoCompressDef
-    var vdoCompressDefer = $.Deferred();
 
     //貼文內容的類型 網址 附檔之類的 
     $.each(ml,function(i,mtp){
@@ -4884,7 +4905,8 @@ composeSend = function (this_compose){
         //會有順序問題 因為ios只會照ml順序排 所以必須設定順序
         if(is_push) body.ml.push(obj);
     });
-
+    
+    progressBarObj.filesCnt.set(uploadTotalCnt);
     if(!isVdoExist) progressBarObj.vdoCompressDefer.resolve(false);
 
     // 進度條
@@ -4915,112 +4937,8 @@ composeSend = function (this_compose){
         progressBarObj.close();
     })
 
-    function composeProgressBar() {
-        var vdoCompressDefer = $.Deferred();
-        var basePct = 0;
-        var barDom;
-        var multiUploadProgress = {
-            map: {}, length: 0,
-            getTotal: function() {
-                var self = this;
-                return Object.keys(self.map).reduce(function(total, currId) {
-                    return total += self.map[currId].total;
-                }, 0);
-            }
-        };
-        return {
-            init: function() {
-                var self = this;
-                if(uploadTotalCnt === 0) return;
-
-                $("#compose-progressbar").remove();
-                barDom = $("<section>", {
-                    id: "compose-progressbar",
-                    style: "display: block",
-                    html: "<div class='container'><div class='title'>"+ $.i18n.getString("FILESHARING_UPLOADING") +"</div><div class='bar'></div>" + 
-                            "<button>"+ $.i18n.getString("COMMON_CANCEL") +"</button>" + 
-                            "<div class='cnt'><span class='curr' num='0'></span> / <span class='total'>"+ uploadTotalCnt +"</span></div></div>"
-                });
-
-                $("body").append(barDom);
-
-                barDom.find("button").click(function() {
-                    uploadDefArr.forEach(function(item) {
-                        item.reject();
-                    })
-                })
-            },
-
-            setBasePct: setProgressBarBasePct,
-
-            vdoCompressDefer: vdoCompressDefer,
-
-            vdoDone: function(isVdoUploaded) {
-                if(isVdoUploaded)
-                    setProgressBarBasePct(QmiGlobal.vdoCompressBasePct);
-
-                vdoCompressDefer.resolve();
-            },
-
-            xhr: function () {
-                var self = this;
-                var xhrId = new Date().getTime();
-                var uploadXhr = new window.XMLHttpRequest();
-                
-                uploadXhr.upload.addEventListener("progress", function(evt){
-                    multiUploadProgress.map[xhrId] = multiUploadProgress.map[xhrId] || {};
-                    multiUploadProgress.map[xhrId].total = evt.total;
-                    // 先等壓縮結束
-                    vdoCompressDefer.done(function(isVdoUploaded) {
-                        if(isVdoUploaded)
-                            setProgressBarBasePct(QmiGlobal.vdoCompressBasePct);
-                        
-                        setTimeout(function() {
-                            var diff = evt.loaded - (multiUploadProgress.map[xhrId].loaded || 0);
-                            if(diff < 0) return;
-                            multiUploadProgress.length += diff;
-                            multiUploadProgress.map[xhrId].loaded = evt.loaded;
-                            var pct = getPct(multiUploadProgress.length / multiUploadProgress.getTotal());
-                            setProgressBarLength(pct);
-                        }, 500);
-                    });
-                        
-                }, false);
-                return uploadXhr;
-
-                function getPct(pct) {
-                    return Math.floor(pct*100)
-                }
-            },
-
-            set: setProgressBarLength,
-
-            add: function() {
-                if(uploadTotalCnt === 0) return;
-
-                uploadCurrCnt++;
-                // 先等壓縮結束
-                setTimeout(function() {
-                    barDom.find("span.curr").attr("num", uploadCurrCnt);
-                }, Math.random()*100 * 5);
-            },
-
-            close: function() {
-                if(uploadTotalCnt === 0) return;
-                $("#compose-progressbar").remove();
-            }
-        }
-
-        function setProgressBarLength(length) {
-            barDom.find(".bar").css("width", (Math.floor((length || 0)*(100-basePct)/100)+basePct-1.5)+"%");
-            console.log("progress", length, "width: "+ barDom.find(".bar").css("width"));
-        }
-        function setProgressBarBasePct(pct) {
-            basePct = pct;
-        }
-    }
+    
 }
-
 
 
 composeSendApi = function(body){
@@ -7271,23 +7189,46 @@ getLinkYoutube = function (this_compose,url) {
 
 
 replySend = function(thisEvent){
-    var thisEi = thisEvent.data("event-id"),
-        thisGi = thisEi.split("_")[0],
-        thisTi = thisEi.split("_")[1],
-        uploadDef = $.Deferred(),
-        isWaiting = false,
-        eventTp, fileBody,
-        imgArea = thisEvent.find(".st-reply-message-img"),
-        messageArea = thisEvent.find(".st-reply-message-area"),
-        replyFile = imgArea.data("file"),
-        f_load_show = fileLoadShow(),
-        body = {
-            meta : {
-                lv : 1,
-                tp : "10"
-            },
-            ml : []
-        };
+    var thisEi = thisEvent.data("event-id");
+    var thisGi = thisEi.split("_")[0];
+    var thisTi = thisEi.split("_")[1];
+    var uploadDef = $.Deferred();
+    var isWaiting = false;
+    var eventTp, fileBody;
+    var imgArea = thisEvent.find(".st-reply-message-img");
+    var replyFile = imgArea.data("file");
+    var f_load_show = new ProgressBarCntr(function(){
+        var self = this;
+        self.vdoCompressDefer.resolve(false);
+
+        var elem = thisEvent.find(".st-reply-message-area");
+        elem.data("cancelupload",false)
+        .find(".file-load").remove().end()
+        .find('.st-reply-message-img').hide();
+        
+
+        self.barDom.set($('<div class="file-load">'
+        + '<div class="file-content">'
+          + '<div class="load-progress"><div class="load-bar"></div></div>'
+          + '<div class="load-cancel">取消</div>'
+        + '</div></div>'));
+
+        elem.prepend(self.barDom.get());
+        barDom = self.barDom.get().find('.load-bar');
+        percentDom = self.barDom.get().find('.file-content');
+
+        self.barDom.get().find(".load-cancel").click(function(){
+            elem.find('.st-reply-message-img').show();
+            self.barDom.get().remove();
+            elem.data("cancelupload",true);
+            uploadXhr.abort();
+        });
+    });
+
+    f_load_show.init();
+
+    var body = {meta: {lv : 1, tp: "10"}, ml: []};
+
     var object_obj = thisEvent.data("object_str");
     if( object_obj ){
         object_obj = $.parseJSON( object_obj );
@@ -7340,9 +7281,6 @@ replySend = function(thisEvent){
             eventTp = 6;
             //發佈上傳檢查
             upload_chk = true;
-            //開啟loading icon
-            //s_load_show = false;
-            f_load_show.init(messageArea);
 
             var pi = "0";
 
@@ -7368,7 +7306,7 @@ replySend = function(thisEvent){
                 file: thisEvent.find(".st-reply-message-img img")[0],
                 oriObj: {w: 1280, h: 1280, s: 0.7},
                 tmbObj: {w: 480, h: 480, s: 0.6}, // ;
-                progressBar: f_load_show.progressBar
+                progressBar: f_load_show
             }).done(uploadDef.resolve);
             break;
         case "video": 
@@ -7376,10 +7314,6 @@ replySend = function(thisEvent){
 
             //發佈上傳檢查
             upload_chk = true;
-            
-            //開啟loading icon
-            //s_load_show = false;
-            f_load_show.init(messageArea);
 
             eventTp = 7;
 
@@ -7404,7 +7338,7 @@ replySend = function(thisEvent){
                 hasFi: true,
                 file: replyFile,
                 oriObj: {w: 1280, h: 1280, s: 0.9},
-                progressBar: f_load_show.progressBar,
+                progressBar: f_load_show,
                 setAbortFfmpegCmdEvent : function (ffmpegCmd) {
                     $(".load-cancel").off("click").on("click", function(e) {
                         // dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
@@ -7433,9 +7367,6 @@ replySend = function(thisEvent){
             eventTp = 26;
             //發佈上傳檢查
             upload_chk = true;
-            //開啟loading icon
-            //s_load_show = false;
-            f_load_show.init(messageArea);
 
             fileBody = {
                 ftp: 0,
@@ -7460,7 +7391,7 @@ replySend = function(thisEvent){
                 hasFi: true,
                 file: replyFile,
                 oriObj: {w: 1280, h: 1280, s: 0.9},
-                progressBar: f_load_show.progressBar
+                progressBar: f_load_show
             }).done(uploadDef.resolve)
             break;
     }
@@ -7487,6 +7418,98 @@ replySend = function(thisEvent){
         }
         replyApi( thisEvent, thisGi, thisTi, thisEi, body );
     })
+}
+
+ProgressBarCntr = function(init) {
+    var self = this;
+    var vdoCompressDefer = $.Deferred();
+    var basePct = 0;
+    var currCnt = 0;
+    var multiUploadProgress = {
+        map: {}, length: 0,
+        getTotal: function() {
+            var self = this;
+            return Object.keys(self.map).reduce(function(total, currId) {
+                return total += self.map[currId].total;
+            }, 0);
+        }
+    };
+    
+    self.init = init;
+
+    self.filesCnt = function() {
+        var cnt = 0;
+        return {
+            get: function() {return cnt;},
+            set: function(n) {cnt = n;}
+        }
+    }();
+
+    self.barDom = function() {
+        var barDom = 0;
+        return {
+            get: function() {return barDom;},
+            set: function(dom) {barDom = dom;}
+        }
+    }();
+
+    self.setBasePct = setProgressBarBasePct;
+
+    self.vdoCompressDefer = vdoCompressDefer;
+
+    self.xhr = function () {
+        var xhrId = new Date().getTime();
+        var uploadXhr = new window.XMLHttpRequest();
+        console.log("yo4");
+        uploadXhr.upload.addEventListener("progress", function(evt){
+            multiUploadProgress.map[xhrId] = multiUploadProgress.map[xhrId] || {};
+            multiUploadProgress.map[xhrId].total = evt.total;
+            // 先等壓縮結束
+            vdoCompressDefer.done(function(isVdoUploaded) {
+                if(isVdoUploaded)
+                    setProgressBarBasePct(QmiGlobal.vdoCompressBasePct);
+                
+                setTimeout(function() {
+                    var diff = evt.loaded - (multiUploadProgress.map[xhrId].loaded || 0);
+                    if(diff < 0) return;
+                    multiUploadProgress.length += diff;
+                    multiUploadProgress.map[xhrId].loaded = evt.loaded;
+                    var pct = getPct(multiUploadProgress.length / multiUploadProgress.getTotal());
+                    setProgressBarLength(pct);
+                }, 500);
+            });
+                
+        }, false);
+        return uploadXhr;
+
+        function getPct(pct) {
+            return Math.floor(pct*100)
+        }
+    };
+
+    self.set = setProgressBarLength;
+
+    self.add = function() {
+        if(self.filesCnt.get() === 0) return;
+        currCnt++;
+        // 先等壓縮結束
+        setTimeout(function() {
+            self.barDom.get().find("span.curr").attr("num", currCnt);
+        }, Math.random()*100 * 5);
+    };
+
+    self.close = function() {
+        if(self.filesCnt.get() === 0) return;
+        $("#compose-progressbar").remove();
+    };
+
+    function setProgressBarLength(length) {
+        self.barDom.get().find(".bar").css("width", (Math.floor((length || 0)*(100-basePct)/100)+basePct-1.5)+"%");
+        console.log("progress", length, "width: "+ Math.floor(+(self.barDom.get().find(".bar").css("width").replace(/px/, ""))/148*100)+ "%");
+    }
+    function setProgressBarBasePct(pct) {
+        basePct = pct;
+    }
 }
 
 fileLoadShow = function(){

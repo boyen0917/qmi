@@ -582,9 +582,8 @@ uploadToS3 = function(file,api_name,ori_arr,tmb_arr,callback){
 
 qmiUploadFile = function(uploadObj){
 	// tp 1: 圖片 2: 影片
-	
-	var allDoneDef = $.Deferred(),
-		s3ResponseObj;
+	var allDoneDef = $.Deferred();
+	var s3ResponseObj;
 
 	(function() {
 		var chainDef = MyDeferred();
@@ -593,7 +592,7 @@ qmiUploadFile = function(uploadObj){
 		return chainDef;
 	}()).then(function(s3Obj) {
 		var chainDef = MyDeferred();
-		
+
 		qmiUploadS3(uploadObj, s3Obj).done(chainDef.resolve).fail(chainDef.reject);
 		return chainDef;
 	}, chainDefError.bind("get url fail")).then(function(responseObj) {
@@ -661,7 +660,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		s3: { url: s3Obj.s3 || s3Obj.tu },
 		s32: { url: s3Obj.s32 || s3Obj.ou}
 	};
-
+	console.log("yo0");
 	switch(uploadObj.tp) {
 		case 0: // 其他類型 檔案上傳
 			paramObj.s3.file = uploadObj.file;
@@ -702,7 +701,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			contentType = "video/mp4";
 
 			uploadObj.updateCompressionProgress = function(length) {
-				console.log("compress", length)
 				uploadObj.progressBar.set(length);
 			}
 
@@ -749,13 +747,15 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	(function() {
 		var chainDef = MyDeferred();
 		uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);
-
+		console.log("yo1");
 		return chainDef;
 	}()).then(function() {
+		console.log("yo2");
 		var chainDef = MyDeferred();
 		mediaLoadDef.done(chainDef.resolve);
 		return chainDef;
 	}()).then(function() {
+		console.log("yo3");
 		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
 			var ajaxArgs = {
 				url: paramObj[key].url,
