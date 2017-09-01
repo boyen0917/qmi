@@ -384,17 +384,28 @@ QmiGlobal.aesCrypto = {
 }
 
 htmlFormat = function (str, isToCharCode){
+	var urlRegex = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
 	if(str.match(/\&\#\d+\;*/g)){
-    	str = str.replace(/\&\#/g,"&#38;&#35;");
-    } 
+		str = str.replace(/\&\#/g,"&#38;&#35;");
+  	} 
     var strArr = str._escape().replace(/\n/g," \n ").split(" ");
     $.each(strArr,function(i,val){
     	var newStr = (isToCharCode === true ? encodeHtmlEntity(val) : val) ;
-
-        if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://')
-            newStr = "<a href=\"" + newStr + "\" target=\"_blank\">" + newStr + "</a>";
-            
-        strArr.splice(i,1,newStr);
+    	
+    	if(val.match(urlRegex)) {
+			newStr = val.replace(urlRegex, function (match) {
+				if (match.substring(0, 7) == 'http://' || match.substring(0, 8) == 'https://') {
+					return "<a href=\"" + match + "\" target=\"_blank\">" + match + "</a>";
+				} else {
+					return "<a href=\"http://" + match + "\" target=\"_blank\">" + match + "</a>";
+				}
+			})
+    	}
+    			
+        // if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://')
+        //     newStr = "<a href=\"" + newStr + "\" target=\"_blank\">" + newStr + "</a>";
+        
+      	strArr.splice(i,1,newStr);
     });
 
     return strArr.join(" ").replaceEmoji().replace(/\n/g, "<br/>");
