@@ -280,6 +280,8 @@ window.QmiGlobal = {
 	method: {}, // 公用函數
 	rspCode401: false,
 
+	vdoCompressBasePct: 80, // 壓縮預設比例
+
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
