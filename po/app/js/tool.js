@@ -660,7 +660,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		s3: { url: s3Obj.s3 || s3Obj.tu },
 		s32: { url: s3Obj.s32 || s3Obj.ou}
 	};
-	console.log("yo0");
+
 	switch(uploadObj.tp) {
 		case 0: // 其他類型 檔案上傳
 			paramObj.s3.file = uploadObj.file;
@@ -747,15 +747,12 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	(function() {
 		var chainDef = MyDeferred();
 		uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);
-		console.log("yo1");
 		return chainDef;
 	}()).then(function() {
-		console.log("yo2");
 		var chainDef = MyDeferred();
 		mediaLoadDef.done(chainDef.resolve);
 		return chainDef;
 	}()).then(function() {
-		console.log("yo3");
 		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
 			var ajaxArgs = {
 				url: paramObj[key].url,
@@ -770,13 +767,16 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			arr[i] = $.ajax(ajaxArgs);
 			return arr;
 		},[])).done(function(data) {
-			allDef.resolve({status: 200, isSuccess: true, data: {
-				fi: s3Obj.fi,
-				mt: mt,
-				si:	si,
-				md:	md,
-				oriFile: oriFile
-			}})
+			setTimeout(function() {
+				allDef.resolve({status: 200, isSuccess: true, data: {
+					fi: s3Obj.fi,
+					mt: mt,
+					si:	si,
+					md:	md,
+					oriFile: oriFile
+				}})
+			}, 1000);
+				
 		}).fail(function() {
 			// 上傳s3 失敗
 			allDef.reject({status: 999, isSuccess: false, data: arguments});

@@ -4010,7 +4010,7 @@ img.st-reply-message-attach {
   overflow: hidden;
 }
 
-.load-bar {
+div.st-reply-message-area div.file-load .bar {
   position: absolute;
   height: 100%;
   background: #6CB6FA;
