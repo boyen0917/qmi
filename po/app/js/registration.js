@@ -532,7 +532,7 @@ appInitial = function(needUpdate){
 
         	if (rspObj.rsp_code == 106) {
         		$("#page-registration .login").removeClass("login-waiting");
-        		setFirstCommpanyAccountPassword(ssoObj);
+        		setFirstCompanyAccountPassword(ssoObj);
         	} else {
         		new QmiAjax({
 		        	apiName: "cert",
@@ -568,6 +568,11 @@ appInitial = function(needUpdate){
 		        	// 先存起來
 		        	QmiGlobal.auth.passwordTp = dataObj.tp;
 
+		        	// 存入QmiGlobal.auth的ui和at，需要reload時才不會打api失敗
+		        	if($(".login-auto").data("chk")) {
+	                	$.lStorage("_loginData", QmiGlobal.auth);
+	                }
+
 		        	// // sso 初始值
 		        	// QmiGlobal.companies[QmiGlobal.auth.ci] = QmiGlobal.auth;
 		        	// QmiGlobal.companies[QmiGlobal.auth.ci].nowAt = dataObj.at;
@@ -580,7 +585,7 @@ appInitial = function(needUpdate){
         return deferred.promise();
     }
 
-    function setFirstCommpanyAccountPassword(ssoData) {
+    function setFirstCompanyAccountPassword(ssoData) {
 
     	var deferred = $.Deferred();
     	QmiGlobal.PopupDialog.create({
@@ -636,10 +641,20 @@ appInitial = function(needUpdate){
 								    uui : ssoData.uui,
 								}
 					        }).done(function(rspData) {
+					        	console.log(ssoData)
 					        	var rspObj = JSON.parse(rspData.responseText);
 					        	if (rspData.status == 200) {
-                                    toastShow(rspObj.rsp_msg);
+					        		// popupShowAdjust(
+					        		// 	null, 
+					        		// 	rspObj.rsp_msg, 
+					        		// 	$.i18n.getString("LANDING_PAGE_LOGIN"), 
+					        		// 	true, 
+					        		// 	[login.bind(this, ssoData.id, firstPwInput, countrycode, true)]
+					        		// );
                                     QmiGlobal.PopupDialog.close();
+
+                                    // 修改成功直接登入首頁
+                                    login(ssoData.id, firstPwInput, countrycode, true);
                                 }
 					        });
 						}
