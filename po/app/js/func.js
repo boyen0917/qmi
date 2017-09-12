@@ -1,4 +1,3 @@
-
 setGroupInitial = function(new_gi,chk){
     var groupMenuDef = $.Deferred();
     var allDoneDeferred = $.Deferred();
@@ -53,28 +52,6 @@ setGroupInitial = function(new_gi,chk){
     });
 
     return allDoneDeferred.promise();
-}
-
-logout = function(){
-    new QmiAjax({
-        apiName: "logout",
-        isPublicApi: true,
-        noAuth: true,
-        errHide: true,
-        method: "delete"
-    }).complete(function(){
-
-        // 關閉移轉團體所有聊天室
-        (Object.keys(windowList) || []).forEach(function(thisCi){
-            windowList[thisCi].close();
-        });
-
-        try {
-            QmiGlobal.nwGui.App.clearCache();
-        } catch(e) {}
-        
-        reLogin();
-    });
 }
 
 chkBranch = function(){

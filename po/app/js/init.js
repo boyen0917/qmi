@@ -219,6 +219,13 @@ window.QmiGlobal = {
 
 	// 在下方 document ready之後 initReady
 	initReady: function() {
+
+		// 檢查聊天室不得進首頁
+		if(window.opener && !window.isChatRoom) {
+			window.close();
+			return;
+		}
+
 		var initDefArr = [
     		updateLanguage()
 		];
@@ -999,6 +1006,8 @@ QmiAjax.prototype = {
 
 		    	// et過期 自動更新 但要強制驗證:
 		    	// do something
+		    	// 重新取得卻 發生錯誤 回首頁
+		    	reLogin();
 
 		        deferred.resolve({
 		        	isSuccess: false,
