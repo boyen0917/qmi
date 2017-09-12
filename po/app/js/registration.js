@@ -285,6 +285,11 @@ appInitial = function(needUpdate){
 	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
 
+		// 清空資料
+		resetDB();
+		// 預防錯誤發生
+		QmiGlobal.auth = {};
+
         var bodyData = {
     		id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
             tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)

@@ -159,6 +159,11 @@ ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_h
 
 
 reLogin = function(options) {
+	if(QmiGlobal.isChatRoom) {
+		window.close();
+		return;
+	}
+
 	localStorage.removeItem("_loginAutoChk");
 	resetDB(options);
 	document.location = "index.html";
@@ -819,6 +824,29 @@ resetDB = function(options){
 		localStorage.removeItem(str);
 	});
 	
+}
+
+logout = function(){
+
+    new QmiAjax({
+        apiName: "logout",
+        isPublicApi: true,
+        noAuth: true,
+        errHide: true,
+        method: "delete"
+    }).complete(function(){
+
+        try {
+        	// 關閉移轉團體所有聊天室
+	        (Object.keys(windowList) || []).forEach(function(thisCi){
+	            windowList[thisCi].close();
+	        });
+
+            QmiGlobal.nwGui.App.clearCache();
+        } catch(e) {}
+        
+        reLogin();
+    });
 }
 
 getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){

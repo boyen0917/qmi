@@ -26,9 +26,12 @@ var ui,		//user id
 	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
 	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
+var isChatRoom = true;
+
 // 配合init裡面有這個初始化的 function
 var appInitial = function() {
-	// do nothing
+	// 1min檢查一次聊天室
+	setTimeout(checkAuthPeriodically, 60000);
 };
 
 $(function(){
@@ -3569,5 +3572,35 @@ function sendMsgText(dom) {
 			return window.opener.QmiGlobal.groups;
 		}
 	};
-
 })
+
+var checkAuthPeriodically = function() {
+	var chk = false;
+	return function() {
+		try {
+			if(isAuthOrOpenrNotExist()) {
+				chk = true;
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),
+					confirm: true,
+					action: [function(){
+						if(window.opener === null) 
+							reLogin();
+						else
+							window.close();
+					}]
+				});
+			}
+		} catch(e) {window.close()};
+
+		// 一分鐘檢查一次
+		if(!chk) setTimeout(checkAuthPeriodically, 60000);
+
+		function isAuthOrOpenrNotExist() {
+			if(!window.opener) return true;
+			if(!QmiGlobal.auth) return true;
+			if(Object.keys(QmiGlobal.auth || {}).length === 0) return true; 
+			return false;
+		}
+	}
+}()
