@@ -353,6 +353,7 @@ function showGroupInfoPage(){
 	var groupDescription = groupName;
 	var groupImg = null;
 	var groupId = null;
+	var groupInfoDom = $("#page-group-main div.subpage-groupAbout");
 	
 
 	try{
@@ -367,26 +368,26 @@ function showGroupInfoPage(){
         errorReport(e);
     }
     if(group.ntp === 2){
-    	$(".ga-group-type-name").html($.i18n.getString("OFFICAL_GROUP"));
+    	groupInfoDom.find(".ga-group-type-name").html($.i18n.getString("OFFICAL_GROUP"));
     }else{
-    	$(".ga-group-type-name").html($.i18n.getString("GENERAL_GROUP"));
+    	groupInfoDom.find(".ga-group-type-name").html($.i18n.getString("GENERAL_GROUP"));
     }
-    $(".ga-group-name").html(groupName._escape());
-    $(".ga-group-id").html("ID : " + groupId);
-    $(".ga-group-des").html(groupDescription._escape().replace(/\n/g,"<br />"));
+    groupInfoDom.find(".ga-group-name").html(groupName._escape());
+    groupInfoDom.find(".ga-group-id").html("ID : " + groupId.substring(groupId.length-4));
+    groupInfoDom.find(".ga-group-des").html(groupDescription._escape().replace(/\n/g,"<br />"));
     
 
     if (isAdmin){
-    	$(".ga-avatar-photo").removeClass("notadmin");
-    	$(".ga-icon.admin").removeClass("notadmin");
+    	groupInfoDom.find(".ga-avatar-photo").removeClass("notadmin");
+    	groupInfoDom.find(".ga-icon.admin").removeClass("notadmin");
     } else {
-    	$(".ga-avatar-photo").addClass("notadmin");
-    	$(".ga-icon.admin").addClass("notadmin");
+    	groupInfoDom.find(".ga-avatar-photo").addClass("notadmin");
+    	groupInfoDom.find(".ga-icon.admin").addClass("notadmin");
     }
 
-    var gaContent = $(".ga-content");
-	var inGroupName = $("input.ga-group-name");
-	var textGroupDes = $("textarea.ga-group-des");
+    var gaContent = groupInfoDom.find(".ga-content");
+	var inGroupName = groupInfoDom.find("input.ga-group-name");
+	var textGroupDes = groupInfoDom.find("textarea.ga-group-des");
 
 	var contentViewshow = function(){
 		gaContent.find(".ga-gr-content.view").show().end()
