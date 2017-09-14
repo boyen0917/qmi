@@ -7588,76 +7588,63 @@ pollingCountsWrite = function(pollingData, aa){
             countA3Dom.hide();
     }
 
-    // idb_alert_events.getAll(function(noticeList){
-    //     getNoticesDefer.resolve(noticeList);
-    // })
+    // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
+    Object.keys(cntsAllObj).forEach(function(thisGi){
+        var thisCntObj = cntsAllObj[thisGi],
+        thisQmiGroupObj = groupsData[thisGi],
+        groupBadgeNumber = 0;
 
-    // getNoticesDefer.done(function(noticeList) {
-        // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
-        Object.keys(cntsAllObj).forEach(function(thisGi){
-            var thisCntObj = cntsAllObj[thisGi],
-            thisQmiGroupObj = groupsData[thisGi],
-            groupBadgeNumber = 0;
+        var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
 
-            var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
+        // 移轉 隱藏polling
+        if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
-            // 移轉 隱藏polling
-            if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
+        if ( thisCntObj.A2 > 0 || thisCntObj.A5 > 0) {
+            groupBadgeNumber = ((thisCntObj.A2) ? thisCntObj.A2 : 0) 
+                + ((thisCntObj.A5) ? thisCntObj.A5 : 0);
 
-            if ( thisCntObj.A2 > 0 || thisCntObj.A5 > 0) {
-                groupBadgeNumber = ((thisCntObj.A2) ? thisCntObj.A2 : 0) 
-                    + ((thisCntObj.A5) ? thisCntObj.A5 : 0);
+            sort_arr.push([thisGi,thisCntObj.A5]);
+            dom.html(countsFormat(groupBadgeNumber, dom)).show();
 
-                sort_arr.push([thisGi,thisCntObj.A5]);
-                dom.html(countsFormat(groupBadgeNumber, dom)).show();
+            appBadgeNumber += groupBadgeNumber;
+        }
 
-                appBadgeNumber += groupBadgeNumber;
-            }
+        // 無cl 或 未有此gi 就不做
+        if( thisCntObj.hasOwnProperty("cl") === false ||
+            thisQmiGroupObj === undefined ||
+            thisQmiGroupObj.hasOwnProperty("chatAll") === false 
+        ) return ;
 
-            // 無cl 或 未有此gi 就不做
-            if( thisCntObj.hasOwnProperty("cl") === false ||
-                thisQmiGroupObj === undefined ||
-                thisQmiGroupObj.hasOwnProperty("chatAll") === false 
-            ) return ;
-
-            thisCntObj.cl.forEach(function(clObj){
-                if( thisQmiGroupObj.chatAll.hasOwnProperty( clObj.ci ) === true ) 
-                    thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
-            })
-
+        thisCntObj.cl.forEach(function(clObj){
+            if( thisQmiGroupObj.chatAll.hasOwnProperty( clObj.ci ) === true ) 
+                thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
         })
 
-        //排序
-        sort_arr.sort(function(a, b) {return a[1] - b[1]});
-        sort_arr.forEach(function(obj){
-            var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
-            sortedGroup.detach();
+    })
 
-            // 官方帳號判斷
-            try {
-                if(QmiGlobal.groups[obj[0]].ntp === 2)
-                    var targetDom = $(".sm-offical-group");
-                else
-                    var targetDom = $(".sm-general-group");
+    //排序
+    sort_arr.sort(function(a, b) {return a[1] - b[1]});
+    sort_arr.forEach(function(obj){
+        var sortedGroup = $(".sm-group-list-area .sm-group-area[data-gi="+ obj[0] +"]")
+        sortedGroup.detach();
 
-                targetDom.after(sortedGroup);
-            } catch(e) { /* do nothing */}
-        })
-    // });
-    
+        // 官方帳號判斷
+        try {
+            if(QmiGlobal.groups[obj[0]].ntp === 2)
+                var targetDom = $(".sm-offical-group");
+            else
+                var targetDom = $(".sm-general-group");
 
+            targetDom.after(sortedGroup);
+        } catch(e) { /* do nothing */}
+    });
 
     //邀請 若是在團體邀請頁面時 則不寫入
-    if(gcnts.G1 > 0){
-        $(".hg-invite .sm-count").html(gcnts.G1).show();
-    }
-    if(gcnts.G2 > 0){
-        //最新消息
-    }
-    if(gcnts.G3 > 0){
-        //鈴鐺
-        if( typeof(showNewAlertIcon)!='undefined' ) showNewAlertIcon( gcnts.G3 );
-    }
+    if(gcnts.G1 > 0) $(".hg-invite .sm-count").html(gcnts.G1).show();
+
+    //G2最新消息
+
+    // G3鈴鐺 在cmds tp1顯示
 
     if (appBadgeNumber > 0) setBadgeLabel(appBadgeNumber.toString());
     else clearBadgeLabel();
@@ -7782,9 +7769,22 @@ pollingCmds = function(newPollingData){
                         }
 
                         // 做一次
-                        if(isDoUpdateAlert === false) {
-                            isDoUpdateAlert = true;    
-                            updateAlert();
+                        if(isDoUpdateAlert) break;
+
+                        try {
+                            // 20170914規則：有tp1 才亮起鈴鐺紅點 但要排除自己發的文
+                            if(isNotPostBySelf()) {
+                                $(".navi-alert").addClass("new");
+                                updatePollingCnts( $("<div>"), "G3" );
+                            }
+                        } catch(e) {}
+
+                        isDoUpdateAlert = true;    
+                        updateAlert();
+
+                        function isNotPostBySelf() {
+                            if(item.pm.userID !== ui) return true;
+                            return false;
                         }
                         
                         break;
