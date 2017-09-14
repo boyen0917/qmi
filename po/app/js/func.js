@@ -7771,12 +7771,21 @@ pollingCmds = function(newPollingData){
                         // 做一次
                         if(isDoUpdateAlert) break;
 
-                        // 20170914規則：有tp1 才亮起鈴鐺紅點
-                        $(".navi-alert").addClass("new");
-                        updatePollingCnts( $("<div>"), "G3" );
+                        try {
+                            // 20170914規則：有tp1 才亮起鈴鐺紅點 但要排除自己發的文
+                            if(isNotPostBySelf()) {
+                                $(".navi-alert").addClass("new");
+                                updatePollingCnts( $("<div>"), "G3" );
+                            }
+                        } catch(e) {}
 
                         isDoUpdateAlert = true;    
                         updateAlert();
+
+                        function isNotPostBySelf() {
+                            if(item.pm.userID !== ui) return true;
+                            return false;
+                        }
                         
                         break;
                     case 3://invite

@@ -8,10 +8,6 @@ $(function(){
 	$("#page-group-main .navi-alert").click(function(){
 		$(this).removeClass("new");
 		
-		// 20170914規則：有tp1 才亮起鈴鐺紅點
-		hideAlertBox();
-        return;
-
 		if($(".alert-area").is(":visible")) 
 			hideAlertBox();
 		else 
