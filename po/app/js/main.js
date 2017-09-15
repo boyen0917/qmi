@@ -783,8 +783,6 @@ $(function(){
 		
 	});
 	
-
-
 	//留言ui調整
 	$(document).on("input mouseup",".st-reply-highlight-container",function(e){
 		var thisTextArea = $(this);
@@ -856,6 +854,15 @@ $(function(){
         }
     });
 
+	$(document).on("compositionupdate",".st-reply-highlight-container",function(e){
+		this.textIsComposing = true;
+	});
+
+	$(document).on("compositionend",".st-reply-highlight-container",function(e){
+		this.textIsComposing = false;
+        $(this).trigger("keyup");
+	});
+
     $(document).on('keyup mouseup', ".st-reply-highlight-container", function(e){
     	var thisTextArea = $(this);
     	var timelineDetailPage = $("#page-timeline-detail");
@@ -869,6 +876,13 @@ $(function(){
         var selectionObj = window.getSelection();
         var currentNode = selectionObj.anchorNode;
         var lastMarkPosition, tagElements = "";
+
+        var selection = saveSelection(thisTextArea[0]);
+
+        if (!this.textIsComposing) {
+            thisTextArea.html(htmlText.replaceHashTag());
+            restoreSelection(thisTextArea[0], selection);
+        }
 
         delUncompleteMark(thisTextArea, cursorPosition);
 

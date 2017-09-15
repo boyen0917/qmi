@@ -880,6 +880,8 @@ topEvent = function () {
                     if (val.ml.length > 0 && val.ml[0].hasOwnProperty("c")) {
                         var matchTagList = val.ml[0].c.match(tagRegex);
 
+                        val.ml[0].c = val.ml[0].c.replaceHashTag();
+
                         // 抓漏網之魚 防止bug
                         (matchTagList || []).forEach(function(tagText) {
                             var tagId = tagText.replace(tagRegex, "$1");
@@ -1586,6 +1588,12 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                             fileArea.append(linkElement);
                         });
                         break;
+
+                    case 29:
+                        if (typeof(mainReplyText) == 'string' && mainReplyText) {
+                            mainReplyText = mainReplyText.replaceHashTag();
+                        }
+                        break;
                 }
             });
 
@@ -1611,7 +1619,9 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
             }
             
             this_content.find("b").bind("click", function(e) {
-                userInfoShow(this_gi, $(e.target).attr("name"));
+                if ($(e.target).attr("name")) {
+                    userInfoShow(this_gi, $(e.target).attr("name"));
+                }
             });
 
             //已有的留言就不製作
@@ -2406,11 +2416,13 @@ composeContentMake = function (compose_title){
         this_compose.find('.highlight-container').bind('input',function(){
             //有東西就不作了
             var inputText = $(this).text();
+
             if(this_compose.data("url-chk")) return false;
             //先將換行符號換成<br/>加空格 再以空格切出陣列
             var url_chk = inputText.replace(/\n|\r/g,"|<br/>|").split('|');
             var regexUrl = /^(((http|https):\/\/)|(www\.))+[-a-zA-Z0-9:%_\+.~#?&//=]+\s$/;
             var regexWrap = /(((http|https):\/\/)|(www\.))+[-a-zA-Z0-9:%_\+.~#?&//=]+(\n|\r){2}$/;
+            var hashtagRegex = /\W(\#[a-zA-Z]+\b)(?!;)/g;
             
             if(inputText.match(regexWrap)){
                 var result = regexWrap.exec(inputText);
@@ -2468,7 +2480,17 @@ composeContentMake = function (compose_title){
                     currentNode.parentElement.insertAdjacentHTML( 'beforeBegin', '\n' );
                     return false;
                 }
-            }
+            } 
+        });
+
+
+        this_compose.find('.highlight-container').bind('compositionupdate', function(e) {
+            this.textIsComposing = true;
+        });
+
+        this_compose.find('.highlight-container').bind('compositionend', function(e) {
+            this.textIsComposing = false;
+            $(this).trigger("keyup");
         });
 
         this_compose.find('.highlight-container').bind('keyup mouseup', function(e) {
@@ -2477,12 +2499,20 @@ composeContentMake = function (compose_title){
             var pureText = thisTextArea.text();
             var htmlText = thisTextArea.html();
             var replyDom = thisTextArea.parent();
-            var cursorPosition = getCaretPosition();
-            var preTextOfCursor = htmlText.substring(0, cursorPosition);
-            var selectionObj = window.getSelection();
-            var tagElements = "";
+            var cursorPos = getCaretPosition();
+            var preTextOfCursor = htmlText.substring(0, cursorPos);
             
-            delUncompleteMark(thisTextArea, cursorPosition);
+            var tagElements = "", replaceText = "";
+
+            var selectionObj = window.getSelection();
+            var selection = saveSelection(thisTextArea[0]);
+
+            if (!this.textIsComposing) {
+                thisTextArea.html(htmlText.replaceHashTag());
+                restoreSelection(thisTextArea[0], selection);
+            }
+
+            delUncompleteMark(thisTextArea, cursorPos);
 
             if ( !thisTextArea.data("memberList")
               && !thisTextArea.data("markMembers")) {
@@ -2498,17 +2528,17 @@ composeContentMake = function (compose_title){
             replyDom.find(".tag-list").remove();
             replyDom.find(".tag-members-container").hide();
 
-            // 判斷caret前面的字串是否包含@ 
+            //判斷caret前面的字串是否包含@ 
             if (preTextOfCursor.lastIndexOf("@") >= 0) {
 
                 // 紀錄 @ 在字串的位置
                 var lastMarkPosition = preTextOfCursor.lastIndexOf("@");
                 // 取得 @ 到游標 之間的字串 
-                var markText = preTextOfCursor.substring(lastMarkPosition + 1, cursorPosition);
+                var markText = preTextOfCursor.substring(lastMarkPosition + 1, cursorPos);
 
                 // cursor 滑鼠標誌的位置在最尾端， 或者cursor後面字串為空白
-                if ((cursorPosition == htmlText.length) || (htmlText[cursorPosition].match(/\s/g)) ||
-                    (htmlText.substring(cursorPosition, cursorPosition + 4)) == "<br>") {
+                if ((cursorPos == htmlText.length) || (htmlText[cursorPos].match(/\s/g)) ||
+                    (htmlText.substring(cursorPos, cursorPos + 4)) == "<br>") {
                     var memberslist = thisTextArea.data("memberList");
                     for (var key in memberslist) {
                         var memberObj = memberslist[key];
@@ -2546,10 +2576,10 @@ composeContentMake = function (compose_title){
 
                         //替換at加後面的字串為此成員的名字
                         var replaceText = preTextOfCursor.substring(0, lastMarkPosition) 
-                            + preTextOfCursor.substring(lastMarkPosition, cursorPosition).replace("@" 
+                            + preTextOfCursor.substring(lastMarkPosition, cursorPos).replace("@" 
                                 + markText, " <mark id='" + memberID + "' name='" + memberName + "'>" 
                                 + memberName + "</mark> ")
-                            + htmlText.substring(cursorPosition, htmlText.length);
+                            + htmlText.substring(cursorPos, htmlText.length);
 
                         thisTextArea.html(replaceText);
                         thisTextArea.data("markMembers")[memberID] = {
@@ -3800,7 +3830,9 @@ composeVoteObjMake = function(this_compose,body){
 composeSend = function (this_compose){
     
     var ctp = this_compose.data("compose-tp");
-    var composeContent = this_compose.data("compose-content").replace(/<br\s*\/?>/g,"\n");
+    var composeContent = this_compose.data("compose-content")
+                            .replace(/<br\s*\/?>/g, "\n")
+                            .replace(/<\/?b>/g, "");
     var tagMembers = this_compose.find(".cp-content-highlight").data("markMembers");
     var ml = this_compose.data("message-list").unique();
     var tmpElement = document.createElement("div");
@@ -3816,7 +3848,6 @@ composeSend = function (this_compose){
     var empty_chk = false;
     var empty_msg;
 
-
     if (Object.keys(tagMembers).length) {
         for (var tagID in tagMembers) {
             body.ml.push({
@@ -3829,6 +3860,17 @@ composeSend = function (this_compose){
                 + tagID + ";///");
         }
     
+    }
+
+    if (composeContent.hasHashTagText()) {
+        var hashtagList = composeContent.extractHashTag();
+
+        hashtagList.forEach(function(hashtag) {
+            body.ml.push({
+                "k": hashtag,
+                "tp": 29
+            });
+        });
     }
 
     tmpElement.innerHTML = composeContent;
@@ -4005,7 +4047,6 @@ composeSend = function (this_compose){
         popupShowAdjust("",empty_msg,true);
         return false;
     }
-    
 
     // 內容狀態 會有很多ml內容組成
 
@@ -5307,7 +5348,8 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                     // 先檢查有無21 進行替換一次
                     ml.forEach(function(eventObj) { 
                         if(eventObj.tp == 21) val.c = val.c.qmiTag(eventObj);
-                    });
+                        // if(eventObj.tp == 29) val.c = val.c.replaceHashTag();
+                     });
 
                     // 抓漏網之魚 防止bug
                     (matchTagList || []).forEach(function(tagText) {
@@ -5319,6 +5361,9 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                             n: QmiGlobal.groups[gi].guAll[tagId].nk
                         });
                     });
+
+                    // 有無都去換hashtag
+                    val.c = val.c.replaceHashTag();
                 }());
                 
                 this_event.find(target_div).html(val.c).show();
@@ -5538,7 +5583,10 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
         this_event.find("b").off("click").on("click", function(e) {
             var groupId = this_event.data("event-id").split("_")[0] || gi;
-            userInfoShow(groupId, $(e.target).attr("name"));
+
+            if ($(e.target).attr("name")) {
+                userInfoShow(groupId, $(e.target).attr("name"));
+            }
         });
         
         //需要填入結束時間 以及 結束時間存在 就填入
@@ -6581,6 +6629,17 @@ replySend = function(thisEvent){
             text = text.replace('<mark id="' + tagID + '" name="' + tagMembers[tagID].nk + '">' 
                     + tagMembers[tagID].nk + "</mark>", "///;" + tagID + ";///");
         }
+    }
+
+    if (text.hasHashTagText()) {
+        var hashtagList = text.extractHashTag();
+
+        hashtagList.forEach(function(hashtag) {
+            body.ml.push({
+                "k": hashtag,
+                "tp": 29
+            });
+        });
     }
 
     tmpElement.innerHTML = text;
