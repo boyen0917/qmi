@@ -264,8 +264,14 @@
 	}
 
 	String.prototype.replaceHashTag = function () {
-		return this
+
+		// 避免跟標記成員tag衝突
+		if ((/(<b name='\w+'>([^<]*)<\/b>)/g).test(this)) {
+			return this.replace().replace(hashTagRegex, "$1<b>$2$3</b>");
+		} else {
+			return this
 				.replace(/<\/?b>/g, '')
 				.replace(hashTagRegex, "$1<b>$2$3</b>");
+		}
 	}
 })(jQuery);
