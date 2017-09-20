@@ -3839,16 +3839,14 @@ composeSend = function (this_compose){
     
     }
 
-    if (composeContent.hasHashTagText()) {
-        var hashtagList = composeContent.extractHashTag();
+    var hashtagList = composeContent.extractHashTag();
 
-        hashtagList.forEach(function(hashtag) {
-            body.ml.push({
-                "k": hashtag,
-                "tp": 29
-            });
+    hashtagList.forEach(function(hashtag) {
+        body.ml.push({
+            "k": hashtag,
+            "tp": 29
         });
-    }
+    });
 
     tmpElement.innerHTML = composeContent;
 
@@ -6608,16 +6606,14 @@ replySend = function(thisEvent){
         }
     }
 
-    if (text.hasHashTagText()) {
-        var hashtagList = text.extractHashTag();
+    var hashtagList = text.extractHashTag();
 
-        hashtagList.forEach(function(hashtag) {
-            body.ml.push({
-                "k": hashtag,
-                "tp": 29
-            });
+    hashtagList.forEach(function(hashtag) {
+        body.ml.push({
+            "k": hashtag,
+            "tp": 29
         });
-    }
+    });
 
     tmpElement.innerHTML = text;
 
