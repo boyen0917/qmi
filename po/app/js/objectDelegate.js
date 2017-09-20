@@ -66,6 +66,7 @@ ObjectDelegateView = {
 		this.finishButton.off("click").on("click", this.clickDone.bind(this));
 		this.clearButton.off("click").on("click", this.clearAllCheckRows.bind(this));
 		this.selectListArea.off("click").on("click", "span", this.searchCheckedRow.bind(this));
+		this.searchArea.children(".list").off("scroll").on("scroll", this.loadMoreMemLabels.bind(this));
 	},
 
 	focusSearchArea : function () {
@@ -116,10 +117,9 @@ ObjectDelegateView = {
 		if (container.scrollTop() + container.height() > container[0].scrollHeight - topAreaHeight) {
 		    if (this.visibleMemNum < this.matchList.length) {
 
-		    	setTimeout(function(){
+		    	setTimeout(function() {
 					this.makeMemberList();
-
-				}.bind(this), 100);
+				}.bind(this), 500);
 		    }
 		}
 	},
@@ -135,7 +135,9 @@ ObjectDelegateView = {
 		e.stopPropagation();
 
 		var searchTag = $(e.target);
-		this.searchInput.html(searchTag.text()).trigger("input");
+		if (searchTag.text() != $.i18n.getString("COMMON_ALL_MEMBERS")) {
+			this.searchInput.html(searchTag.text()).trigger("input");
+		}
 	}, 
 
 	addRowElement : function (type, rowData) {
@@ -179,23 +181,23 @@ ObjectDelegateView = {
 	},
 
 	makeMemberList : function () {
-		var loadMemberList = this.matchList.slice(this.visibleMemNum, this.visibleMemNum + 200);
-
-		// 剩餘未顯示的成員不到10人
-		if (this.visibleMemNum + 200 > this.matchList.length - 1) {
+		var loadMemberList = this.matchList.slice(this.visibleMemNum, this.visibleMemNum + 500);
+		var checkedObjNum = Object.keys(this.checkedMems).length;
+		// 剩餘未顯示的成員不到500人
+		if (this.visibleMemNum + 500 > this.matchList.length - 1) {
             loadMemberList = this.matchList.slice(this.visibleMemNum);
             this.visibleMemNum = this.matchList.length;
             this.loadingCircle.hide();
         } else {
-        	this.visibleMemNum += 200;
+        	this.visibleMemNum += 500;
         	this.loadingCircle.show();
         }
 
         $.each(loadMemberList, function(i, gu) {
         	var memberObj = this.groupAllMembers[gu];
-        	memberObj.chk = false;
-        	if (Object.keys(this.checkedMems).length) {
-           		if (this.checkedMems[memberObj.gu] != undefined) memberObj.chk = true;
+        	if (checkedObjNum > 0) {
+	         	if (this.checkedMems[memberObj.gu] != undefined) memberObj.chk = true;
+	         	else memberObj.chk = false;
         	}
 
             this.addRowElement("Member", {thisMember : memberObj, isSubRow : false});
@@ -420,14 +422,14 @@ ObjectDelegateView = {
 		var totalNum = Object.keys(this.checkedMems).length + Object.keys(this.checkedBranches).length
 			+ Object.keys(this.checkedFavorites).length;
 
-		var allCheckRowData = Object.assign({}, this.checkedFavorites, this.checkedBranches, this.checkedMems);
+		var allCheckRowData = Object.assign({}, this.checkedFavorites, this.checkedBranches);
 
 		// 檢查我的最愛欄位底下子欄位是否全部都有勾選
 		var isAllFavRowChecked = allFavRow.every(function (favRow) {
 			return favRow.isChecked;
 		});
 
-		this.selectListArea.html("");
+		this.selectListArea.find("span").remove();
 
 		// 超過最少點取數量，才能按完成或下一步
 		if (totalNum >= this.minSelectNum) this.finishButton.removeClass("disable");
@@ -473,17 +475,51 @@ ObjectDelegateView = {
 			this.allMemberChkbox.html.find(".img").removeClass("chk");
 		}
 
-		// 搜尋列加上選擇對象的Tag
-		$.each(allCheckRowData, function (key, rowName) {
-			this.selectListArea.append("<span>" + rowName.replaceOriEmojiCode() + "</span>");
-		}.bind(this));
+		if (Object.keys(this.checkedMems).length == this.visibleMembers.length) {
+			this.selectListArea.append("<span>" + $.i18n.getString("COMMON_ALL_MEMBERS") + "</span>");
+		} else {
+			// 搜尋列加上選擇對象的Tag
+			$.each(allCheckRowData, function (key, rowName) {
+				this.selectListArea.append("<span>" + rowName.replaceOriEmojiCode() + "</span>");
+			}.bind(this));
 
+			if(Object.keys(this.checkedMems).length > 0) this.makeMemLabels();
+		}
+	
 		if (this.mainPage.find(".obj-content").hasClass("on-search")) {
 			this.searchInput.html("").trigger("input").focus();
 		}
 
 		this.setHeight();
+	},
+
+	makeMemLabels : function () {
+		var curLabelNum = this.selectListArea.find("span.mem").length;
+		if (curLabelNum + 1000 > Object.keys(this.checkedMems).length) {
+			var loadLabelList = Object.keys(this.checkedMems).slice(curLabelNum); 
+		} else {
+			var loadLabelList = Object.keys(this.checkedMems).slice(curLabelNum, curLabelNum + 1000);
+		}
+
+		// 搜尋列加上選擇對象的Tag
+		$.each(loadLabelList, function (index, memId) {
+			this.selectListArea.append("<span class='mem'>" + this.checkedMems[memId].replaceOriEmojiCode() + "</span>");
+		}.bind(this));
+	},
+
+	loadMoreMemLabels : function (e) {
+		var container = $(e.target);
+		
+		if (container.scrollTop() + container.height() >= container[0].scrollHeight) {
+		    var curLabelNum = this.selectListArea.find("span.mem").length;
+		    if (curLabelNum < Object.keys(this.checkedMems).length && curLabelNum >= 1000) {
+		    	setTimeout(function() {
+		    		this.makeMemLabels();	
+		    	}.bind(this));
+		    }
+		}
 	}
+
 }
 
 function ObjectCell () {};

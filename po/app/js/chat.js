@@ -26,9 +26,12 @@ var ui,		//user id
 	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
 	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
+var isChatRoom = true;
+
 // 配合init裡面有這個初始化的 function
 var appInitial = function() {
-	// do nothing
+	// 1min檢查一次聊天室
+	setTimeout(checkAuthPeriodically, 60000);
 };
 
 $(function(){
@@ -261,7 +264,7 @@ $(function(){
 				// 單人聊天室，隱藏成員數量、離開和編輯
 				if (g_room.tp == 1 || g_room.cpc == undefined) {
 					$("#header .count").hide();
-					$(".extra-content .btn[data-type=exit]").hide();
+					// $(".extra-content .btn[data-type=exit]").hide();
 				} else { // 群組聊天室，顯示成員數量、離開和編輯(中間有人退出，變2人)
 					$("#header .count").html("(" + g_room.memCount + ")");
 					$("#header .count").show();
@@ -359,6 +362,7 @@ $(function(){
 					this_grid.data("file-num", i);
 					this_grid.data("file", file);
 					this_grid.find(".chat-fail-status").hide();
+
 					renderVideoFile(file, this_grid.find("div video"), function (videoTag) {
 						var parent = videoTag.parents(".msg-video");
 						parent.find(".length").html("--:--");
@@ -371,6 +375,7 @@ $(function(){
 						parent.addClass("error");
 						parent.find(".download").remove();
 					});
+
 				} else {
 					scrollToBottom();
 					var this_grid = showUnsendMsg("", 26, file.name, file.size);
@@ -1590,14 +1595,16 @@ function showMsg(object, bIsTmpSend) {
 			getChatS3file(fileDom, msgData.c, msgData.tp, ti_chat);
 			break;
 		case 28:
-			var invoker = g_group.guAll[msgData.i];
-			var targetUser = g_group.guAll[msgData.t];
+			var invoker = (g_group.guAll[msgData.i] || {}).nk;
+			var targetUser = (g_group.guAll[msgData.t] || {}).nk;
 			var systemMsg = "";
 			if (msgData.a) {
-				systemMsg = invoker.nk + "   指派   " + targetUser.nk + "   為聊天室管理員";
+				systemMsg = $.i18n.getString("CHAT_CHATROOM_SOMEONE_ASSIGN_ADMIN", invoker, targetUser);
 			} else {
-				systemMsg = invoker.nk + "   取消   " + targetUser.nk + "   聊天室管理員權限";
+				systemMsg = $.i18n.getString("CHAT_CHATROOM_SOMEONE_DEMOTE_SOMEONE", invoker, targetUser);
 			}
+
+			isUpdatePermission = true;
 
 			msgDiv.html(htmlFormat(systemMsg));
 			if (isMe) {
@@ -2093,6 +2100,7 @@ function sendMsgText(dom) {
 		var text = inputDom.html().replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 		inputDom.html("");
 		if (text.length <= 0) return;
+		console.log(g_room);
 		updateChatContentPosition();
 
 		// updateChatContentPosition();
@@ -2244,6 +2252,7 @@ function sendMsgText(dom) {
 				//GET /groups/{gi}/chats/{ci}/users
 				op("groups/" + gi + "/chats/" + ci + "/users",
 					"get", null, function (data, status, xhr) {
+						console.log(data);
 						//取得權限
 						var sendData = {
 							ti: ti_chat,
@@ -2366,9 +2375,9 @@ function sendMsgText(dom) {
 							window.close();
 						});
 					} else {
-						popupShowAdjust("你已是管理員了!!",
-							"請保留成員至少有一位是管理員，並將自己的權限取消!!",
-							"前往編輯",
+						popupShowAdjust($.i18n.getString("CHAT_SELF_ALREADY_ADMIN"),
+							$.i18n.getString("CHAT_EXIT_CHATROOM_FAIL"),
+							$.i18n.getString("CHAT_EDIT_CHATROOM"),
 							$.i18n.getString("COMMON_CANCEL"), [function () {
 								showEditRoomPage();
 							}]
@@ -2512,8 +2521,8 @@ function sendMsgText(dom) {
 
 		
 		//set current group name
-		input.val( g_cn ).data("oriName",g_cn);
-		editPage.find(".chatroomNameInput").val(g_cn)
+		input.val( g_cn ).data("oriName", g_room.uiName);
+		editPage.find(".chatroomNameInput").val(g_room.uiName)
 		//set current mem
 		updateEditRoomMember(g_room.memList);
 
@@ -3049,29 +3058,36 @@ function sendMsgText(dom) {
 	**/
 	function checkMemberLeft() {
 		try {
+			$("#footer").show();
+			$("#chat-leaveGroup").hide();
+
 			if (g_room.tp == 1 && null != g_room.memList) {
-				for (var guTmp in g_room.memList) {
-					if (guTmp != g_group.gu) {
-						if (g_group.guAll.hasOwnProperty(guTmp)) {
-							var mem = g_group.guAll[guTmp];
-							if (mem.st == 2) {
-								$("#footer").hide();
-								$("#chat-leaveGroup").html(
-									$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (mem.nk || "").replaceOriEmojiCode())
-								).show();
-								return;
-							}
-							break;
-						}
-					}
+				if (g_room.st == 1) {
+					$("#footer").hide();
+					$("#chat-leaveGroup").html(
+						$.i18n.getString("CHAT_SOMEONE_LEAVE", (g_room.uiName || "").replaceOriEmojiCode())
+					).show();
 				}
+				// for (var guTmp in g_room.memList) {
+				// 	if (guTmp != g_group.gu) {
+				// 		if (g_group.guAll.hasOwnProperty(guTmp)) {
+				// 			var mem = g_group.guAll[guTmp];
+				// 			// 對方已離開或是聊天室已經無效
+				// 			if (mem.st == 2 || g_room.st == 1) {
+				// 				$("#footer").hide();
+				// 				$("#chat-leaveGroup").html(
+				// 					$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (mem.nk || "").replaceOriEmojiCode())
+				// 				).show();
+				// 				return;
+				// 			}
+				// 			break;
+				// 		}
+				// 	}
+				// }
 			}
 		} catch (e) {
 			errorReport(e);
 		}
-
-		$("#footer").show();
-		$("#chat-leaveGroup").hide();
 	}
 
 	/**
@@ -3556,5 +3572,35 @@ function sendMsgText(dom) {
 			return window.opener.QmiGlobal.groups;
 		}
 	};
-
 })
+
+var checkAuthPeriodically = function() {
+	var chk = false;
+	return function() {
+		try {
+			if(isAuthOrOpenrNotExist()) {
+				chk = true;
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),
+					confirm: true,
+					action: [function(){
+						if(window.opener === null) 
+							reLogin();
+						else
+							window.close();
+					}]
+				});
+			}
+		} catch(e) {window.close()};
+
+		// 一分鐘檢查一次
+		if(!chk) setTimeout(checkAuthPeriodically, 60000);
+
+		function isAuthOrOpenrNotExist() {
+			if(!window.opener) return true;
+			if(!QmiGlobal.auth) return true;
+			if(Object.keys(QmiGlobal.auth || {}).length === 0) return true; 
+			return false;
+		}
+	}
+}()

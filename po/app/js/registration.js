@@ -66,6 +66,7 @@ appInitial = function(needUpdate){
 			onChange: function (val, inst) {
 				cns.debug(val, inst);
 				countryCodeDoms.attr("data-val",val);
+				console.log(countryCodeDoms.find("option[value='"+val+"']").attr('data-code'))
 				var text = countryCodeDoms.find("option[value='"+val+"']").text() || "";
 				countryCodeDoms.attr("data-text",text);
 				if( "undefined"!=typeof(checkRegisterPhone) ) checkRegisterPhone();
@@ -161,12 +162,16 @@ appInitial = function(needUpdate){
 		if( "phone" == activeTab.attr("data-type") ){
 			var pwdInput = $(".login-ld-password input");
 			var phoneInput = $(".login-ld-phone input");
-			var countryInput = $(".login-ld-countrycode select");
-			var phoneObj = getPhoneNumberObject( phoneInput.val(), countryInput.attr("data-val") );
-			if( phoneObj.isValid && pwdInput.val().length >= 6 ){
+			var countryInput = $(".login-ld-countrycode option:selected");
+			
+			// 拿掉手機驗證
+			//var phoneObj = getPhoneNumberObject( phoneInput.val(), countryInput.attr("data-val") );
+			// if( phoneObj.isValid && pwdInput.val().length >= 6 ){
+			
+			if (pwdInput.val().length >= 6 && phoneInput.val() >= 4){
 				$("#page-registration .login").addClass("login-ready");
 
-				countrycode = "+"+phoneObj.country_code;
+				countrycode = countryInput.attr('data-code');
 				var loginData = $.lStorage("_loginRemeber");
 				loginData.countrycode = countrycode;
 				$.lStorage("_loginRemeber", loginData);
@@ -180,7 +185,8 @@ appInitial = function(needUpdate){
 			if( email && email.length>3 ){
 				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,5}$/,'');
 				
-				if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
+				// if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
+				if(pwdInput.val().length >= 6){
 					$("#page-registration .login").addClass("login-ready");
 				}else{
 					$("#page-registration .login").removeClass("login-ready");
@@ -269,11 +275,29 @@ appInitial = function(needUpdate){
 		
 	});
 
+
+	// $("#popupDialog").find(".input-column input").off("input").on("input", function () {
+	// 	var passwordInput = $(this).val();
+	// 	var anotherPasswordInput = $(this).parent().siblings().find("input").val();
+
+	// 	if (passwordInput.length >= 8 && anotherPasswordInput.length >= 8) {
+	// 		$("#popupDialog").find(".confirm").addClass("enable");
+	// 	} else {
+	// 		$("#popupDialog").find(".confirm").removeClass("enable");
+	// 	}
+	// });
+
 	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
 
+		// 清空資料
+		resetDB();
+		// 預防錯誤發生
+		QmiGlobal.auth = {};
+
         var bodyData = {
-    		id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
+    		// id: (isMail == false) ? countrycode + getInternationalPhoneNumber(countrycode, phoneId) : phoneId,
+            id: (isMail == false) ? countrycode + phoneId.replace(/^0/, "") : phoneId,
             tp: 1,//0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
             dn: QmiGlobal.device,
             pw:toSha1Encode(password)
@@ -304,7 +328,7 @@ appInitial = function(needUpdate){
                 }
 
         		// SSO 登入
-        		if(dataObj.rsp_code === 104) {
+        		if(dataObj.rsp_code === 104 || dataObj.rsp_code === 105) {
         			QmiGlobal.auth.isSso = true;
         			dataObj.id = bodyData.id;
         			dataObj.pw = password;
@@ -368,6 +392,11 @@ appInitial = function(needUpdate){
         QmiGlobal.chainDeferred().then(function() {
         	return userInfoGetting();
         }).then(function() {
+        	// 開啟chatDB
+			var deferred = $.Deferred();
+			initChatDB(deferred.resolve); 
+	    	return deferred.promise();
+		}).then(function() {
         	return getGroupList(isFromLogin);
         }).then(function(rspData) {
         	var deferred = $.Deferred();
@@ -449,15 +478,12 @@ appInitial = function(needUpdate){
             
 			//聊天室開啓DB
 			QmiGlobal.chainDeferred().then(function() {
-				var deferred = $.Deferred();
-				initChatDB(deferred.resolve); 
-		    	return deferred.promise();
-			}).then(function() {
 				// 非同步沒關係
 				var allGroups = Object.keys(QmiGlobal.groups);
 
 				// 預設團體打過了，從陣列移除掉
 				allGroups.splice(allGroups.indexOf(QmiGlobal.auth.dgi), 1);
+
         		getMultiGroupCombo(allGroups, true);
 
 		    	activateClearChatsTimer();
@@ -465,13 +491,15 @@ appInitial = function(needUpdate){
 		    	initChatCntDB(); 
 
 				updateAlert(isFromLogin);
-
+				
 				//沒團體的情況
 				if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
 					//關閉返回鍵
 					$("#page-group-menu .page-back").hide();
 					// 兩個選項都要執行polling()
 					polling();
+
+					if (QmiGlobal.auth.isSso) $(".no-group-lock").show();
 				}else{
 					//設定目前團體 執行polling()
 					setGroupInitial(rspData.dgi).done(polling);
@@ -484,6 +512,7 @@ appInitial = function(needUpdate){
     QmiGlobal.ssoLogin = function(ssoObj) {
     	var deferred = $.Deferred();
     	var webSsoDeviceStr = "web_sso_device";
+
     	// sso 登入
 		new QmiAjax({
             url: "https://" + ssoObj.url + "/apiv1/sso/clouds/"+ ssoObj.cdi +"/companies/"+ ssoObj.ci +"/login",
@@ -503,50 +532,151 @@ appInitial = function(needUpdate){
                 });
             }
         }).done(function(rspData) {
+        	var rspObj = JSON.parse(rspData.responseText);
         	try { 
-        		var ssoKey = JSON.parse(rspData.responseText).key;
+        		var ssoKey = rspObj.key;
         	} catch(e) { 
         		var ssoKey = ""; 
         	}
-        	new QmiAjax({
-	        	apiName: "cert",
-	        	apiVer: "apiv2",
-	        	isPublicApi: true,
-	        	isSso: true,
-		        specifiedHeaders: {
-		            li:lang
-		        },
-	        	body: {
-				  ui: ssoObj.uui,
-				  key: ssoKey,
-				  tp: "1",
-				  dn: QmiGlobal.device,
-				  ci: ssoObj.ci,
-				  cdi: ssoObj.cdi
-				},
-	        	method: "post",
-	        	error: function(errData){
-	                deferred.resolve({
-	                	isSuccess: false,
-	                	data: errData
-	                });
-	            }
-	        }).done(function(data){
-	        	var dataObj = JSON.parse(data.responseText);
-	        	QmiGlobal.auth.ui = dataObj.ui;
-	        	QmiGlobal.auth.at = dataObj.at;
-	        	QmiGlobal.auth.et = dataObj.et;
-	        	// 保險用
-	        	QmiGlobal.auth.cl = ssoObj.url;
 
-	        	// 先存起來
-	        	QmiGlobal.auth.passwordTp = dataObj.tp;
+        	ssoObj.key = ssoKey;
 
-				deferred.resolve({isSuccess: true});
-	        });
+        	if (rspObj.rsp_code == 106) {
+        		$("#page-registration .login").removeClass("login-waiting");
+        		setFirstCompanyAccountPassword(ssoObj);
+        	} else {
+        		new QmiAjax({
+		        	apiName: "cert",
+		        	apiVer: "apiv2",
+		        	isPublic: true,
+		        	isSso: true,
+			        specifiedHeaders: {
+			            li:lang
+			        },
+		        	body: {
+					  ui: ssoObj.uui,
+					  key: ssoKey,
+					  tp: "1",
+					  dn: QmiGlobal.device,
+					  ci: ssoObj.ci,
+					  cdi: ssoObj.cdi
+					},
+		        	method: "post",
+		        	error: function(errData){
+		                deferred.resolve({
+		                	isSuccess: false,
+		                	data: errData
+		                });
+		            }
+		        }).done(function(data){
+		        	var dataObj = JSON.parse(data.responseText);
+		        	QmiGlobal.auth.ui = dataObj.ui;
+		        	QmiGlobal.auth.at = dataObj.at;
+		        	QmiGlobal.auth.et = dataObj.et;
+		        	// 保險用
+		        	QmiGlobal.auth.cl = ssoObj.url;
+
+		        	// 先存起來
+		        	QmiGlobal.auth.passwordTp = dataObj.tp;
+
+		        	// 存入QmiGlobal.auth的ui和at，需要reload時才不會打api失敗
+		        	if($(".login-auto").data("chk")) {
+	                	$.lStorage("_loginData", QmiGlobal.auth);
+	                }
+
+		        	// // sso 初始值
+		        	// QmiGlobal.companies[QmiGlobal.auth.ci] = QmiGlobal.auth;
+		        	// QmiGlobal.companies[QmiGlobal.auth.ci].nowAt = dataObj.at;
+	          		// QmiGlobal.companies[QmiGlobal.auth.ci].passwordTp = dataObj.tp;
+
+					deferred.resolve({isSuccess: true});
+		        });
+        	}
         });
         return deferred.promise();
     }
+
+    function setFirstCompanyAccountPassword(ssoData) {
+
+    	var deferred = $.Deferred();
+    	QmiGlobal.PopupDialog.create({
+			header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
+				+ "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") + "</h2><p>" 
+				+ $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p>",
+
+			input: [{
+				type: "password",
+				className: "input-password password",
+				hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD",
+				maxLength : 10,
+				eventType: "input",
+				eventFun: function (e) {
+					checkPasswordAreMatch(e, "confirm");
+				}
+			},{
+				type: "password",
+				className: "input-password password-again",
+				hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN",
+				maxLength : 10,
+				eventType: "input",
+				eventFun: function (e) {
+					checkPasswordAreMatch(e, "confirm");
+				}
+			}],
+			errMsg: {
+	            text: "ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH",
+	            className: "error-message"
+	        },
+			buttons: {
+				confirm: {
+					text : "ENTERPRISE_ACCOUNT_DONE",
+					className: "confirm",
+					eventType : "click",
+					eventFun : function (callback) {
+						var firstPwInput = $("#popupDialog").find(".password input").val();
+						var secondPwInput = $("#popupDialog").find(".password-again input").val();
+
+						if (firstPwInput !== secondPwInput) {
+							$("#popupDialog").find(".error-message").css("opacity", 1);
+						} else {
+							$("#popupDialog").find(".error-message").css("opacity", 0);
+							new QmiAjax({
+					        	url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password_first",
+					        	method: "put",
+					        	specifiedHeaders: { li: lang },
+					        	body: {
+								    id : ssoData.id,
+								    key : ssoData.key,
+								    np : QmiGlobal.aesCrypto.enc(firstPwInput, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+								    dn : QmiGlobal.device,
+								    uui : ssoData.uui,
+								}
+					        }).done(function(rspData) {
+					        	console.log(ssoData)
+					        	var rspObj = JSON.parse(rspData.responseText);
+					        	if (rspData.status == 200) {
+					        		// popupShowAdjust(
+					        		// 	null, 
+					        		// 	rspObj.rsp_msg, 
+					        		// 	$.i18n.getString("LANDING_PAGE_LOGIN"), 
+					        		// 	true, 
+					        		// 	[login.bind(this, ssoData.id, firstPwInput, countrycode, true)]
+					        		// );
+                                    QmiGlobal.PopupDialog.close();
+
+                                    // 修改成功直接登入首頁
+                                    login(ssoData.id, firstPwInput, countrycode, true);
+                                }
+					        });
+						}
+					}
+				}
+			}
+		}).open();
+
+		deferred.promise();
+    }
+
 
 /*	
 
@@ -592,28 +722,29 @@ appInitial = function(needUpdate){
 	});
 
 	checkRegisterPhone = function(){
-		var this_dom = $(".register-phone input");
+		var thisDom = $(".register-phone input");
 		cns.debug("[checkRegisterPhone]");
-		this_dom.val(this_dom.val().replace(/[^-_0-9]/g,''));
-		var this_register = this_dom.parent();
+		thisDom.val(thisDom.val().replace(/[^-_0-9]/g,''));
+		var this_register = thisDom.parent();
 		var countryCodeDoms = $('#page-register .countrycode select');
 		var tmpCountryCode = countryCodeDoms.attr("data-val");
 
-		var phoneObj = getPhoneNumberObject( this_dom.val(), tmpCountryCode );
-		if( phoneObj.isValid ){
-			countryCodeDoms.attr("data-countryCode", "+"+phoneObj.country_code);
-			countryCodeDoms.attr("data-nationalNum", phoneObj.national_number);
-			this_register.find("img").show();
-			$(".register-next").data("textChk", true );
+		// 拿掉手機驗證
+		// var phoneObj = getPhoneNumberObject( this_dom.val(), tmpCountryCode );
+		// if( phoneObj.isValid ){
+		countryCodeDoms.attr("data-countryCode", countryCodeDoms.find("option:selected").attr("data-code"));
+		countryCodeDoms.attr("data-nationalNum", thisDom.val());
+		this_register.find("img").show();
+		$(".register-next").data("textChk", true );
 
-			if( true==$(".register-next").data("chk") ){
-				$(".register-next").addClass("register-next-ready");
-			}
-		} else {
-			this_register.find("img").hide();
-			$(".register-next").data("textChk", false );
-			$(".register-next").removeClass("register-next-ready");
+		if( true==$(".register-next").data("chk") ){
+			$(".register-next").addClass("register-next-ready");
 		}
+		// } else {
+		// 	this_register.find("img").hide();
+		// 	$(".register-next").data("textChk", false );
+		// 	$(".register-next").removeClass("register-next-ready");
+		// }
 	};
 	$(".register-phone input").bind("input",checkRegisterPhone );
 
@@ -725,7 +856,7 @@ appInitial = function(needUpdate){
 			var time_format = time.toLocaleDateString();
         	$(".setting-birth input").val(time_format);
 
-        	if($(".setting-first-name input").val() && $(".setting-last-name input").val()){
+        	if($(".setting-full-name input").val().length > 0){
 				$(".setting-next").addClass("setting-next-ready");
 			}else{
 				$(".setting-next").removeClass("setting-next-ready");
@@ -776,13 +907,12 @@ appInitial = function(needUpdate){
     });
 
 
-    $(".setting-first-name input,.setting-last-name input").bind("input",function(){
-		if($(".setting-first-name input").val() 
-			&& $(".setting-last-name input").val()  
+    $(".setting-full-name input").bind("input",function(){
+		if ($(".setting-full-name input").val().length > 0
 			// && $(".setting-birth input").val()
-		){
+		) {
 			$(".setting-next").addClass("setting-next-ready");
-		}else{
+		} else {
 			$(".setting-next").removeClass("setting-next-ready");
 		}
 	});
@@ -799,12 +929,11 @@ appInitial = function(needUpdate){
     	if(!$(".avatar-area img").hasClass("avatar-default")){
     		avatarToS3($(".avatar-file")[0].files[0]);
     	}else{
-    		var first_name = $(".setting-first-name input").val();
-	    	var last_name = $(".setting-last-name input").val();
+    		var fullName = $(".setting-full-name input").val();
 	    	var birth = $(".setting-birth-hidden").val()*1000;
 
 	    	//姓名暫時先顛倒
-	    	activateStep3(last_name,first_name,birth);
+	    	activateStep3(fullName, birth);
     	}
     });
 
@@ -842,15 +971,16 @@ appInitial = function(needUpdate){
 
 	registration = function(resend){
 		if(!resend){
-			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
+			// var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
 			// if( newPhoneNumber.length>0 ){
 				// var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + newPhoneNumber+"</label>";
 				// popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
 			// }
 			// $(document).data("device-token",deviceTokenMake());
+			var phoneNumber = $(".register-phone input").val();
+
 			$(document).data("device-token","web-device");
-			var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
-			$(document).data("phone-id", countrycode + newPhoneNumber );	
+			$(document).data("phone-id", countrycode + phoneNumber.replace(/^0/, ""));	
 		}
 		
         var api_name = "registration";
@@ -1016,7 +1146,7 @@ appInitial = function(needUpdate){
         });
 	}
 
-	activateStep3 = function(first_name,last_name,birth){
+	activateStep3 = function(fullName, birth){
 
 		new QmiAjax({
         	apiName: "activation/step3",
@@ -1024,8 +1154,7 @@ appInitial = function(needUpdate){
         		id: $(document).data("phone-id"),
                 tp: 0,
                 ud: $(document).data("device-token"),
-                fn: first_name,
-                ln: last_name,
+                nk: fullName,
         	},
         	isLoadingShow: true,
         	method: "put"
@@ -1142,11 +1271,10 @@ appInitial = function(needUpdate){
 							                    	if(data.status == 200){
 
 							                    		//大小圖上傳完畢 再做註冊步驟3
-							                    		var first_name = $(".setting-first-name input").val();
-												    	var last_name = $(".setting-last-name input").val();
+							                    		var fullName = $(".setting-full-name input").val();
 												    	var birth = $(".setting-birth-hidden").val()*1000;
 
-												    	activateStep3(first_name,last_name,birth);
+												    	activateStep3(fullName, birth);
 
 							                    	}else{
 							                    		//commit 失敗

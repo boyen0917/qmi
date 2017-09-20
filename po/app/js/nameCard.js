@@ -1,8 +1,10 @@
 (function(){
 
-	$(document).on("mouseup",".namecard",function(e){
+	$(document).on("mouseup",".namecard",function(e) { 
 		e.stopPropagation();
-		//temp
+		
+		var userData = QmiGlobal.groups[gi].guAll[$(this).data("gu")] || {};
+
 		if($(document).data("official") == true) return false;
 
 		$(document).data("namecard-pos",$(window).scrollTop());
@@ -15,7 +17,9 @@
 
 		//鈴鐺頁面不動作
 		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);
-		userInfoShow($(this).data("gi"),$(this).data("gu"));
+		if (userData.ad > 0 && userData.st > 0) { 
+			userInfoShow($(this).data("gi"), $(this).data("gu"));
+		}
 	});
 
 	$(document).on("mousedown",".user-info-close",function(){
@@ -398,11 +402,9 @@
 	    }
 
 	    var this_gi = this_gi || gi;
-
-	    var avatar_bar_arr = ["nk","sl","bd","bl","ti"];
-	    var img_arr = ["em","pn","pn1","ext","mv"];
+	    var avatar_bar_arr = ["nk", "sl", "bd", "bl", "ti"];
+	    var img_arr = ["em", "pn", "pn1", "ext", "mv", "spn", "spn2"];
 	    var selector;
-
 	    for( item in user_data){
             var method = "html";
             if (me) method = "val";
@@ -412,18 +414,19 @@
 	                user_data[item] = user_data[item].substring(0,4) + "/" + user_data[item].substring(4,6) + "/" + user_data[item].substring(6);
 	            }
 
-	            if($.inArray(item,avatar_bar_arr) >= 0) {
+	            if ($.inArray(item,avatar_bar_arr) >= 0) {
 	                selector = this_info.find(".user-avatar-bar");
-	            }else{
+	            } else {
 	                selector = this_info.find(".user-info-list");
 	            }
 
-	            if(!me && item == "bd") {
+	            if (!me && item == "bd") {
 	                user_data.bd = user_data.bd.substring(4,6) + "." + user_data.bd.substring(6,8);
+	                
 	                method = "append";
 	            }
 
-	            if(item == "bl"){
+	            if (item == "bl") {
 	                try{
 	                	var bn = "";
 	                	var branchList = QmiGlobal.groups[this_gi].bl;
@@ -465,8 +468,6 @@
 	                }
 	            }
 
-	            selector.find("."+item)[method](user_data[item]).show();
-
 	            if (item == "nk") {
 	                selector.find("."+item)[method]((
 	                    (user_data.nk2 && user_data.nk2.length > 0) 
@@ -495,17 +496,16 @@
 	        }else{
 	            this_info.find(".user-avatar-bar .user-name").addClass("hidden");
 	        }
-	    } else{
+	    } else {
 	        this_info.find(".user-avatar-bar .user-name").addClass("hidden");
 	    }
 
-
-	    if( user_data.st==2 ){
+	    if (user_data.st == 2) {
 	        this_info.find(".action, .sl, .bd, .bl").hide();
 	    }
 	}
 
-	meInfoShow = function(user_data){
+	meInfoShow = function(user_data) {
 	    var this_gi = gi;
 	    var this_gu = gu;
 
@@ -787,7 +787,6 @@
 	}
 	//切換至個人主頁
 	personalHomePage = function(thisInfo, userData) {
-
 	    var groupMainDom = $("#page-group-main");
 	    console.log(userData);
 	    
@@ -952,7 +951,6 @@
 	                if (resObj.isSuccess) toastShow($.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
 	                else toastShow($.i18n.getString("COMMON_UPLOAD_FAIL"));
 	            });
-
 	        });
 
 	        $(this).find(".interaction .chat").off("click").on("click", function () {
@@ -1008,7 +1006,7 @@
 	                    .find("#emailOnOff").attr("checked", !userData.mke).end()
 	                    .find("#mobileOnOff").attr("checked", !userData.mkp);
 
-	        userInfoArea.find('.onoffswitch input[type=checkbox]').change(function(e) {
+	        userInfoArea.find('.onoffswitch input[type=checkbox]').off('change').on('change', function(e) {
 
 	            var userObj = {
 	                gu : userData.gu,
@@ -1078,7 +1076,6 @@
 	}
 
 	updateUserInfo = function (userObj) {
-	    console.log(userObj);
 	    var ajaxData = {
 	        apiName : "/groups/" + gi + "/users/" + userObj.gu,
 	        method : "put",
@@ -1113,7 +1110,8 @@
 	    };
 
 	    var body = {
-	      nk: new_name, // Nickname
+	      nk: new_name, // name
+	      nk2: this_info.find(".user-info-list .nk2").val(), //nickname
 	      sl: this_info.find(".user-info-list .sl").val(), // Slogan
 	      mke: this_info.find(".me-info-status.em .status-text").data("val"),
 	      mkp: this_info.find(".me-info-status.pn1 .status-text").data("val"),
@@ -1122,7 +1120,7 @@
 	      ext: this_info.find(".user-info-list .et").val(),
 	      ti: this_info.find(".user-info-list .ti").val(),
 	      mv: this_info.find(".user-info-list .mv").val(),
-	      em: this_info.find(".user-info-list .em").val()
+	      // em: this_info.find(".user-info-list .em").val() //無法進行修改E-Mail，先不送
 	    }
 
 	    var method = "put";

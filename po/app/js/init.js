@@ -1,4 +1,4 @@
-// appVer "1.8.4.2"
+// version 2.0.0.5
 
 var ui;
 var at;
@@ -34,6 +34,8 @@ var base_url = function() {
 		return !!window.location.href.match(regDomain);
 	}
 }();
+
+var base_url = "https://qmi17.mitake.com.tw/";
 
 //timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [
@@ -177,7 +179,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整
-	appVer: "1.8.4.2",
+	appVer: "2.0.0.5",
 
 	title: "Qmi",
 
@@ -217,6 +219,13 @@ window.QmiGlobal = {
 
 	// 在下方 document ready之後 initReady
 	initReady: function() {
+
+		// 檢查聊天室不得進首頁
+		// if(window.opener && !window.isChatRoom) {
+		// 	window.close();
+		// 	return;
+		// }
+
 		var initDefArr = [
     		updateLanguage()
 		];
@@ -277,6 +286,8 @@ window.QmiGlobal = {
 	module: {}, // 模組
 	method: {}, // 公用函數
 	rspCode401: false,
+
+	vdoCompressBasePct: 80, // 壓縮預設比例
 
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
@@ -891,7 +902,7 @@ QmiAjax.prototype = {
 				authUpdate();
 				break;
 			case 606: // 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
-				if(QmiGlobal.auth.isSso) {
+				if (QmiGlobal.auth.isSso) {
 					new QmiGlobal.popup({
 						desc: $.i18n.getString("WEBONLY_LOGOUT_BY_ANOTHER_DEVICE"),
 						confirm: true,
@@ -906,6 +917,16 @@ QmiAjax.prototype = {
 				break;
 			case 608:
 				QmiGlobal.module.reAuthUILock.lock(companyData);
+				break;
+			case 609:
+				if(QmiGlobal.auth.isSso) {
+					new QmiGlobal.popup({
+						desc: rspObj.rsp_msg,
+						confirm: true,
+						action: [reLogin]
+					});
+					return;
+				}
 				break;
 			case 9999:
 				// 沒帶rspCode 表示是expire time過期
@@ -985,6 +1006,8 @@ QmiAjax.prototype = {
 
 		    	// et過期 自動更新 但要強制驗證:
 		    	// do something
+		    	// 重新取得卻 發生錯誤 回首頁
+		    	reLogin();
 
 		        deferred.resolve({
 		        	isSuccess: false,
@@ -1098,6 +1121,16 @@ MyDeferred = function() {
   myPromise.reject = myReject;
   return myPromise;
 }
+
+// 選擇server
+$(document).on("click", "#container_version", function() {
+	var cnts = 0;
+	return function() {
+		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
+		cnts++;
+		if(cnts < 5) return;
+		QmiGlobal.module.serverSelector.init();
+}}());
 
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){

@@ -8,6 +8,9 @@ var g_group;
 var g_contactWaitLoadImgs;
 var g_newMemList;
 var sortedMemIdList;
+var gridPageHtmlText = "<div class='contact-mems'><div class='loading-circle'><img src='images/st_bottom_loading.gif'></div></div>";
+var rowPageHtmlText = "<div class='contact-memLists'><div class='loading-circle'><img src='images/st_bottom_loading.gif'></div></div>";
+
 // var isKeyPress = false;
 
 $(document).ready(function(){
@@ -96,7 +99,7 @@ initContactList = function(){
 	var searchBar = $(".contact-search .content");
 	var searchBarInput = searchBar.find(".input");
 	searchBarInput.data("searchText","");
-	searchBarInput.off("keyup").keyup( onSearchInput );
+	searchBarInput.off("input").on("input", onSearchInput );
 	// searchBarInput.off("keypress").keypress( function(){
 	// 	isKeyPress = true;
 	// });
@@ -177,28 +180,14 @@ onSearchInput = function(e){
 
 	sortedMemIdList.forEach(function (memId) {
 		var memberData = guAllExsit[memId];
-		if(memberData.nk == null){
-			cns.debug( JSON.stringify(mem) );
-		} else {
-			if( memberData.nk.toLowerCase().indexOf(str)>=0 ){
-				matchMemList.push(memId);
-				memCount++;
-			}	
-		}
-
+		if( memberData.nk.toLowerCase().indexOf(str) >= 0
+			|| (memberData.bl.length > 0 && bl[memberData.bl.split(",")[0].split(".")[0]].bn.toLowerCase().indexOf(str) >= 0)
+			|| memberData.ti.toLowerCase().indexOf(str) >= 0
+			|| (memberData.nk2 || "").toLowerCase().indexOf(str) >= 0){
+			matchMemList.push(memId);
+			memCount++;
+		}	
 	});
-	// for( var key in guAllExsit ){
-	// 	var mem = guAllExsit[key];
-	// 	if( null==mem.nk ){
-	// 		cns.debug( JSON.stringify(mem) );
-	// 	} else {
-	// 		if( mem.nk.toLowerCase().indexOf(str)>=0 ){
-	// 			matchMemList.push(key);
-	// 			memCount++;
-	// 		}	
-	// 	}
-	// }
-
 
 	//search bl
 	var branchList = [];
@@ -412,8 +401,8 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 
 	//mem-title
 	var subTitle = $("<div class='contact-mems-title'></div>");
-	var subGridPageContent = $("<div class='contact-mems'></div>");
-	var subRowPageContent = $("<div class='contact-memLists'></div>");
+	var subGridPageContent = $(gridPageHtmlText);
+	var subRowPageContent = $(rowPageHtmlText);
 	subTitle.append( '<div class="count">'+0+'</div>');
 	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
 	subPageBottom.append(subTitle);
@@ -434,8 +423,8 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	});
 	var memContainer = generateMemberGrid(Object.keys(memObject), page);
 	var memListContainer = generateMemberList(Object.keys(memObject), page);
-	subGridPageContent.html(memContainer);
-	subRowPageContent.html(memListContainer);
+	subGridPageContent.find(".loading-circle").before(memContainer);
+	subRowPageContent.find(".loading-circle").before(memListContainer);
 
 	title.find(".btn").off("click").click( function(){
 		switchListAndGrid( $(this), subPageBottom, Object.keys(memObject) );
@@ -554,8 +543,8 @@ showAllMemberPage = function(gn) {
 
 	//mem-title
 	var subTitle = $("<div class='contact-mems-title'></div>");
-	var subGridPageContent = $("<div class='contact-mems'></div>");
-	var subRowPageContent = $("<div class='contact-memLists'></div>");
+	var subGridPageContent = $(gridPageHtmlText);
+	var subRowPageContent = $(rowPageHtmlText);
 	subTitle.append( '<div class="count">'+0+'</div>');
 	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
 	subPageBottom.append(subTitle);
@@ -565,8 +554,10 @@ showAllMemberPage = function(gn) {
 	var count = Object.keys(guAllExsit).length;
 	var memContainer = generateMemberGrid(sortedMemIdList);
 	var memListContainer = generateMemberList(sortedMemIdList);
-	subGridPageContent.html(memContainer);
-	subRowPageContent.html(memListContainer);
+	subGridPageContent.find(".loading-circle").before(memContainer);
+	subRowPageContent.find(".loading-circle").before(memListContainer);
+	// subGridPageContent.append("<div class='bottom'><img src='images/st_bottom_loading.gif'></div>");
+	// subRowPageContent.append("<div class='bottom'><img src='images/st_bottom_loading.gif'></div>");
 
 	if( isList ){
 		title.find(".btn").addClass("list");
@@ -605,7 +596,6 @@ sortMembers = function (memberIdList) {
 }
 
 switchListAndGrid = function( dom, subPageBottom, memberKeyList){
-	console.log(subPageBottom);
 	isList = !isList;
 	var userData = QmiGlobal.groups;
 	userData.isMemberShowList = isList;
@@ -613,7 +603,7 @@ switchListAndGrid = function( dom, subPageBottom, memberKeyList){
 
 	var mem = subPageBottom.find(".contact-mems");
 	var memList = subPageBottom.find(".contact-memLists");
-	if( isList ){
+	if( isList ) {
 		mem.fadeOut('fast', function(){
 			memList.show(0);
 		});
@@ -641,8 +631,10 @@ generateMemberGrid = function( memberKeyList, memContainer ){
 		if (endMemberIndex > memberKeyList.length - 1) {
 			var loadMemberList = memberKeyList.slice(memberIndex);
 			endMemberIndex = memberKeyList.length;
+			memContainer.find(".contact-mems .loading-circle").hide();
 		} else {
 			var loadMemberList = memberKeyList.slice(memberIndex, endMemberIndex);
+			memContainer.find(".contact-mems .loading-circle").show();
 		}
 		memberListHtml = loadMemberList.reduce(function(memberHtml, memberId) {
 			var memberData = memObject[memberId];
@@ -651,8 +643,9 @@ generateMemberGrid = function( memberKeyList, memContainer ){
 			var memberElementStr = "<div class='mem namecard " + ((memberData.ad == 1) ? "admin " : " ") 
 				+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu + "'>"
 				+ "<img data-url='" + imgUrl + "' src='" + imgUrl + "'>"
-				+ "<div class='name'>" + memberData.nk.replaceOriEmojiCode()+"</div>"
-				+ "</div>";
+				+ "<div class='name'>" + memberData.nk.replaceOriEmojiCode() 
+				+ ((memberData.nk2) ? " (" + memberData.nk2.replaceOriEmojiCode() + ")" : "")
+				+ "</div></div>";
 
 			return memberHtml + memberElementStr;	
 		}, "");
@@ -683,8 +676,10 @@ generateMemberList = function( memberKeyList, memContainer, favCallback ){
 		if (endMemberIndex > memberKeyList.length - 1) {
 			var loadMemberList = memberKeyList.slice(memberIndex);
 			endMemberIndex = memberKeyList.length;
+			memContainer.find(".contact-memLists .loading-circle").hide();
 		} else {
 			var loadMemberList = memberKeyList.slice(memberIndex, endMemberIndex);
+			memContainer.find(".contact-memLists .loading-circle").show();
 		}
 
 		memberListHtml = loadMemberList.reduce(function(memberHtml, memberId) {
@@ -694,10 +689,11 @@ generateMemberList = function( memberKeyList, memContainer, favCallback ){
 			var memberElementStr = "<div class='row mem namecard " + ((memberData.ad == 1) ? "admin " : " ")
 			 	+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu 
 			 	+ "' ><div class='left'><img data-url='" + imgUrl + "' src='" + imgUrl 
-			 	+ "' /></div><div class='mid'><div class='name'>" + memberData.nk.replaceOriEmojiCode() 
+			 	+ "' /></div><div class='mid'><div class='name'>" + memberData.nk.replaceOriEmojiCode()
+			 	+ ((memberData.nk2) ? " (" + memberData.nk2.replaceOriEmojiCode() + ")" : "")
 			 	+ "</div><div class='detail'>" + ((memberData.bl == "") ? "" : bl[memberData.bl.split(",")[0].split(".")[0]].bn)
-				+ "</div><div class='detail " + ((memberData.bl == "") ? "twoLine" : "") +"'>" 
-				+ ((memberData.sl == "") ? memberData.sl : "") + "</div></div><div class='right'>&nbsp</div></div>";
+				+ "</div><div class='detail " + ((memberData.ti == "") ? "twoLine" : "") +"'>" 
+				+ ((memberData.ti == "") ? "" : memberData.ti) + "</div></div><div class='right'>&nbsp</div></div>";
 
 			return memberHtml + memberElementStr;	
 		}, "");
@@ -732,45 +728,31 @@ updateNewMemTag = function( dom ){
 
 setOnMemGridScroll = function (memberKeyList, memContainer){
 	var memContainer = memContainer || $("#page-contact_all .contact-scroll");
-	console.log(memContainer);
 	// g_contactWaitLoadImgs = memContainer.find(".contact-mems .img.waitLoad");
 	memContainer.unbind("scroll").scroll(function() {
 		console.log("grid");
 		var memberIndex = memContainer.find(".contact-mems").data("memberIndex");
-		if ($(this).scrollTop() + $(this).height() > $(this)[0].scrollHeight - 200) {
+		if ($(this).scrollTop() + $(this).height() >= $(this)[0].scrollHeight - 100) {
 			if (memberIndex <= memberKeyList.length - 1) {
-				memContainer.find(".contact-mems").append(generateMemberGrid(memberKeyList, memContainer));
+				setTimeout(function() {
+					memContainer.find(".contact-mems .loading-circle").before(generateMemberGrid(memberKeyList, memContainer));
+				}, 500);
 			}
 		}
-		// $("#page-contact_all").find(".contact-scroll").append(generateMemberGrid(guAllExsit));
-		// cns.debug();
-		// cns.debug($(this).scrollTop(), $(this).attr("data-url"));
-		// for( var i=g_contactWaitLoadImgs.length-1; i>=0; i-- ){
-		// 	var tmpDom = $(g_contactWaitLoadImgs[i]);
-		// 	// tmpDom.html( tmpDom.offset().top );
-		// 	if( tmpDom.offset().top <height ){
-		// 		tmpDom.css("background-image","url("+tmpDom.attr("data-url")+")");
-		// 		tmpDom.removeAttr("data-url").removeClass("waitLoad");
-		// 		g_contactWaitLoadImgs.splice(i,1);
-		// 	}
-		// }
 	});
 }
 setOnMemListScroll = function(memberKeyList, memContainer) {
 	memContainer = memContainer || $("#page-contact_all .contact-scroll");
 	console.log(memContainer);
-	// var memContainer = $("#page-contact_all .contact-scroll, .subpage-contact .contact-searchResult");
-	// g_contactWaitLoadImgs = memContainer.find(".contact-memLists .img.waitLoad");
-
 	memContainer.unbind("scroll").scroll(function() {
 		var memberIndex = memContainer.find(".contact-memLists").data("memberIndex");
-		if ($(this).scrollTop() + $(this).height() > $(this)[0].scrollHeight - 200) {
+		if ($(this).scrollTop() + $(this).height() >= $(this)[0].scrollHeight) {
 			if (memberIndex <= memberKeyList.length - 1) {
-				memContainer.find(".contact-memLists").append(generateMemberList(memberKeyList, memContainer));
+				setTimeout(function() {
+					memContainer.find(".contact-memLists .loading-circle").before(generateMemberList(memberKeyList, memContainer));
+				}, 500);
 			}
 		}
-		// if( null==g_contactWaitLoadImgs) return;
-		// var height = $(this).height()+99;
 	});
 }
 
@@ -962,17 +944,15 @@ updateFavoritePage = function(){
 	// 	subbranchList.slideToggle();
 	// 	title.find(".arrow").toggleClass("open");
 	// });
-	title.find(".btn").off("click").click( function(){
-		switchListAndGrid( $(this), subPageBottom );
-	});
+	
 	title.find(".btnExtra").off("click").click( function(){
 		extra.fadeToggle('fast');
 	});
 
 	//mem-title
 	var subTitle = $("<div class='contact-mems-title'></div>");
-	var subGridPageContent = $("<div class='contact-mems'></div>");
-	var subRowPageContent = $("<div class='contact-memLists'></div>");
+	var subGridPageContent = $(gridPageHtmlText);
+	var subRowPageContent = $(rowPageHtmlText);
 	subTitle.append( '<div class="count">'+0+'</div>');
 	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
 	subPageBottom.append(subTitle);
@@ -990,16 +970,20 @@ updateFavoritePage = function(){
 	});
 	var memContainer = generateMemberGrid(Object.keys(memObject), page);
 	var memListContainer = generateMemberList(Object.keys(memObject), page, showFavoritePage);
-	subGridPageContent.html(memContainer);
-	subRowPageContent.html(memListContainer);
+	subGridPageContent.find(".loading-circle").before(memContainer);
+	subRowPageContent.find(".loading-circle").before(memListContainer);
+
+	title.find(".btn").off("click").click( function(){
+		switchListAndGrid( $(this), subPageBottom, Object.keys(memObject));
+	});
 
 	if( isList ){
 		title.find(".btn").addClass("list");
 		subGridPageContent.css("display","none");
-		setOnMemListScroll();
+		setOnMemListScroll(Object.keys(memObject), page.find(".contact-scroll"));
 	} else {
 		subRowPageContent.css("display","none");
-		setOnMemGridScroll();
+		setOnMemGridScroll(Object.keys(memObject), page.find(".contact-scroll"));
 	}
 
 	if( 0==count ){
@@ -1075,8 +1059,8 @@ showSubFavoritePage = function( fi ){
 
 	//mem-title
 	var subTitle = $("<div class='contact-mems-title'></div>");
-	var subGridPageContent = $("<div class='contact-mems'></div>");
-	var subRowPageContent = $("<div class='contact-memLists'></div>");
+	var subGridPageContent = $(gridPageHtmlText);
+	var subRowPageContent = $(rowPageHtmlText);
 	subTitle.append( '<div class="count">'+0+'</div>');
 	subTitle.append( '<div class="text">'+$.i18n.getString("COMPOSE_N_MEMBERS", "")+'</div>');
 	subPageBottom.append(subTitle);
@@ -1101,10 +1085,10 @@ showSubFavoritePage = function( fi ){
 	});
     var memContainer = generateMemberGrid(Object.keys(memObject), page);
 	var memListContainer = generateMemberList(Object.keys(memObject), page);
-	subGridPageContent.html(memContainer);
-	subRowPageContent.html(memListContainer);
+	subGridPageContent.find(".loading-circle").before(memContainer);
+	subRowPageContent.find(".loading-circle").before(memListContainer);
 
-	title.find(".btn").off("click").click( function(){
+	title.find(".btn").off("click").click( function() {
 		switchListAndGrid( $(this), subPageBottom, Object.keys(memObject));
 	});
 
@@ -1294,7 +1278,8 @@ showEditFavGroupBox = function( dom ) {
 		isShowBranch:false,
 		isShowAll:false,
 		isShowFav:true,
-		isShowSelf:true
+		isShowSelf:true,
+		isBack:false,
 	};
 	composeObjectShowDelegate( dom, dom, option, function(){
 		var obj = dom.data("object_str");
@@ -1427,11 +1412,13 @@ deleteFavGroup = function( dom ){
 		"at":at, 
 		"li":lang
 	};
-	ajaxDo(api_name,headers,"delete",true,null).complete(function(data){
+	ajaxDo(api_name,headers,"delete",true,null).complete(function(data) {
 		if(data.status == 200){
 			var tmp = $.parseJSON( data.responseText );
 			var data = {};
 			var userData = QmiGlobal.groups;
+			var fav = $(".subpage-contact .row.favorite");
+			var favBranchCnt = 0;
 			g_group = userData[gi];
 
 			//-----
@@ -1452,6 +1439,14 @@ deleteFavGroup = function( dom ){
 			//remove fi from fbl
 			fbl = g_group.fbl;
 			delete fbl[fi];
+
+			favBranchCnt = Object.keys(fbl).length;
+
+			if (favBranchCnt > 0) {
+				fav.find(".detail:eq(1)").text($.i18n.getString("COMPOSE_N_SUBGROUP", favBranchCnt));
+			} else {
+				fav.find(".detail:eq(1)").hide();
+			}
 			// *--* $.lStorage(ui, userData );
 
 			initContactData();
@@ -1470,86 +1465,97 @@ addFavGroup = function (container, input) {
 		toastShow( $.i18n.getString("MEMBER_ENTER_CUSTOMIZE_GROUP_NAME") );
 		return;
 	}
-	cns.debug( "create", name );
+	// cns.debug( "create", name );
 	// container.fadeOut();
 	var option = {
 		isShowBranch:false,
 		isShowAll:false,
-		isShowFav:true
+		isShowFav:true,
+		isBack:false
 	};
 	composeObjectShowDelegate( create, create, option, function(){
 		var obj = create.data("object_str");
-		cns.debug( obj );
-		// cns.debug( create.data("branch_str") );
-
-		var api_name = "groups/" + gi + "/favorites";
-		var headers = {
-			"ui":ui,
-			"at":at, 
-			"li":lang
-		};
 		var memObject = $.parseJSON(obj);
 		var memKeys = Object.keys(memObject);
-		var body = {
-		  "fn": name, // Favorite Branch Name
-		  "gul": memKeys
-		};
 
-		ajaxDo(api_name, headers,"post",true,body).complete(function(data){
-			if(data.status == 200){
-				var tmp = $.parseJSON( data.responseText );
-				cns.debug( data.responseText );
-				var data = {};
-				var userData = QmiGlobal.groups;
-				g_group = userData[gi];
+		if (memKeys.length == 0) {
+			toastShow($.i18n.getString("MEMBER_CUSTOMIZE_GROUP_MEMBER_EMPTY"))
+		} else {
+			cns.debug(obj);
+			// cns.debug( create.data("branch_str") );
 
-				//add fi to mem data
-				guAll = g_group.guAll;
-				for(var key in memObject){
-					guAll[key].fbl.push(tmp.fi);
-				}
+			var api_name = "groups/" + gi + "/favorites";
+			var headers = {
+				"ui":ui,
+				"at":at, 
+				"li":lang
+			};
+			var memObject = $.parseJSON(obj);
+			var memKeys = Object.keys(memObject);
+			var body = {
+			  "fn": name, // Favorite Branch Name
+			  "gul": memKeys
+			};
 
-				//add fi data to fbl
-				fbl = g_group.fbl;
-				fbl[tmp.fi] = {cnt:memKeys.length, fn:name};
-				data[tmp.fi] = fbl[tmp.fi];
-				// *--* $.lStorage(ui, userData );
+			ajaxDo(api_name, headers,"post",true,body).complete(function(data){
+				if(data.status == 200){
 
-				var branch = generateFavBranchList( data );
-				var rows = $("#page-contact_favorite .contact-rows");
-				if( rows.length>0 ){
-					branch.find(".row").appendTo( rows );
-				} else {
-					branch.appendTo("#page-contact_favorite .contact-scroll");
-				}
-				container.fadeOut();
+					// $.mobile.changePage("#page-contact_favorite");
+					var tmp = $.parseJSON( data.responseText );
+					cns.debug( data.responseText );
+					var data = {};
+					var userData = QmiGlobal.groups;
+					g_group = userData[gi];
 
-				initContactData();
+					//add fi to mem data
+					guAll = g_group.guAll;
+					for(var key in memObject){
+						guAll[key].fbl.push(tmp.fi);
+					}
 
-				toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_SUCC") );
-				input.val("");
-				create.data("object_str", "");
+					//add fi data to fbl
+					fbl = g_group.fbl;
+					fbl[tmp.fi] = {cnt:memKeys.length, fn:name};
+					data[tmp.fi] = fbl[tmp.fi];
+					// *--* $.lStorage(ui, userData );
 
-				//update subpage-contact
-				var fav = $(".subpage-contact .row.favorite");
-				if( fav.length>0 ){
-					var branchCntDiv = fav.find(".detail:eq(1)");
-					var branchCount = Object.keys(fbl).length;
-					if(branchCount<=0) branchCntDiv.hide();
-					else{
-						var text = $.i18n.getString("COMPOSE_N_SUBGROUP", branchCount);
-						if( branchCntDiv.length>0 ){
-							branchCntDiv.text( text );
-						}
+					// var branch = generateFavBranchList( data );
+					// var rows = $("#page-contact_favorite .contact-rows");
+					// if( rows.length>0 ){
+					// 	branch.find(".row").appendTo( rows );
+					// } else {
+					// 	branch.appendTo("#page-contact_favorite .contact-scroll");
+					// }
+					container.fadeOut();
+
+					initContactData();
+
+					toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_SUCC") );
+					input.val("");
+					create.data("object_str", "");
+
+					//update subpage-contact
+					var fav = $(".subpage-contact .row.favorite");
+					if( fav.length>0 ){
+						var branchCntDiv = fav.find(".detail:eq(1)");
+						var branchCount = Object.keys(fbl).length;
+						if(branchCount<=0) branchCntDiv.hide();
 						else{
-							fav.find("left").append("<div class='detail'>"+text+"</div>");
+							var text = $.i18n.getString("COMPOSE_N_SUBGROUP", branchCount);
+							if( branchCntDiv.length>0 ){
+								branchCntDiv.text( text );
+							}
+							else{
+								fav.find("left").append("<div class='detail'>"+text+"</div>");
+							}
 						}
 					}
+					showFavoritePage();
+				} else {
+					toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_FAIL") );
 				}
-			} else {
-				toastShow( $.i18n.getString("MEMBER_CREATE_CUSTOMIZE_FAIL") );
-			}
-		});
+			});
+		}
 	});
 }
 
@@ -1563,9 +1569,13 @@ addFavGroup = function (container, input) {
 
 */
 function showAddMemberPage(){
+	var mainPage = document.getElementById("page-contact-addmem");
+
 	$.mobile.changePage("#page-contact-addmem");
 	$("#page-contact-addmem .ca-list-area .cal-coachmake").show();
 	$("#page-contact-addmem .ca-list-area .cal-div-area").hide();
+
+	var countrycodeSelect = $('#page-contact-addmem .invite-select-countrycode select'); 
 
 	initQRCodePage();
 
@@ -1584,6 +1594,31 @@ function showAddMemberPage(){
 	});
 	$("#page-contact-addmem .ca-invite").trigger("click");
 	$("#page-contact-addmem .ca-invite-submit").off("click").click( sendInvite );
+
+	countrycodeSelect.selectbox({
+		onOpen: function (inst) {
+			cns.log("open"); //, inst
+		},
+		onClose: function (inst) {
+			cns.log("close"); //, inst
+		},
+		onChange: function (val, inst) {
+			console.log(val)
+			cns.debug(val, inst);
+			countrycodeSelect.attr("data-val",val);
+			var text = countrycodeSelect.find("option[value='"+val+"']").text() || "";
+			console.log(text)
+			countrycodeSelect.attr("data-text",text);
+			// if( "undefined"!=typeof(checkRegisterPhone) ) checkRegisterPhone();
+		},
+		effect: "slide"
+	});
+
+	$("#page-contact-addmem label.sbSelector").css("line-height","40px");
+
+	mainPage.querySelector("div.invite-input-number input").addEventListener('input', function (e) {
+		this.value = this.value.replace(/[^-_0-9]/g, '')
+	});
 
 	updateInvitePending();
 }
@@ -1764,21 +1799,26 @@ function getInviteList(){
 
 function sendInvite(){
 	var nk = $(".cai-name input").val();
+	var mainPage = document.getElementById("page-contact-addmem");
+	var area = $("#page-contact-addmem .invite-select-countrycode option:selected");
+
 	if( !nk || nk.length==0 ){
 		popupShowAdjust("", $.i18n.getString("INVITE_DISPLAY_NAME") );
 		return;
 	}
-	var phone = $(".cai-num input").val();
+	var phone = $(".cai-area input").val();
 	if( !phone || phone.length==0 ){
 		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_NUMBER") );
 		return;
 	}
-	if( phone.length<10 || phone.indexOf("0")!=0 ){
-		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR") );
+	if (phone.length < 4) {
+		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR"));
 		return;
 	}
-	var area = $(".cai-area .area");
-	phone = phone.replace(/^0/, area.html() );
+
+	phone = "+" + area.data("code") + phone.replace(/^0/, "");
+
+	// phone = phone.replace(/^0/, "+" + area.data("code"));
 	/* ----- TODO ------
 		 國碼/email
 		不同國別電話格式檢查
@@ -1822,6 +1862,14 @@ function sendInvite(){
 					};
 					showMainContact();
 					updateInvitePending();
+
+					mainPage.querySelector("div.invite-input-number input").value = "";
+					$("#page-contact-addmem .invite-select-countrycode select").selectbox(
+						"change", 
+						"TW",
+						$.i18n.getString("COUNTRY_CODE_TAIWAN")
+					)
+
 
 				} catch(e){
 

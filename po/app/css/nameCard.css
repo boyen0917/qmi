@@ -71,6 +71,7 @@
 		width: 320px;
 		padding: 10px 15px;
 		height: 225px;
+		overflow-y: auto;
 	}
 
 	.user-info-list .content {
@@ -198,6 +199,10 @@ img.default {
 	height: 40px;
 	border: 0;
 	outline: none;
+}
+
+.user-info-list-area input.nk:disabled {
+	background-color: white;
 }
 
 .user-info-list-area input::-webkit-input-placeholder {

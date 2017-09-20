@@ -159,6 +159,13 @@ function removeGroup(thisGi, isFromCompany){
 	}
 
 	delete QmiGlobal.groups[thisGi];
+
+	if (Object.keys( QmiGlobal.groups ).length == 0) {
+        $.mobile.changePage("#page-group-menu");
+        $("#page-group-menu .page-back").hide();
+        if (QmiGlobal.auth.isSso) $(".no-group-lock").show();
+    }   
+
     //remove group data
     try{
 		//----- remove from idb -------
@@ -346,6 +353,7 @@ function showGroupInfoPage(){
 	var groupDescription = groupName;
 	var groupImg = null;
 	var groupId = null;
+	var groupInfoDom = $("#page-group-main div.subpage-groupAbout");
 	
 
 	try{
@@ -360,26 +368,26 @@ function showGroupInfoPage(){
         errorReport(e);
     }
     if(group.ntp === 2){
-    	$(".ga-group-type-name").html($.i18n.getString("OFFICAL_GROUP"));
+    	groupInfoDom.find(".ga-group-type-name").html($.i18n.getString("OFFICAL_GROUP"));
     }else{
-    	$(".ga-group-type-name").html($.i18n.getString("GENERAL_GROUP"));
+    	groupInfoDom.find(".ga-group-type-name").html($.i18n.getString("GENERAL_GROUP"));
     }
-    $(".ga-group-name").html(groupName._escape());
-    $(".ga-group-id").html("ID : " + groupId);
-    $(".ga-group-des").html(groupDescription._escape().replace(/\n/g,"<br />"));
+    groupInfoDom.find(".ga-group-name").html(groupName._escape());
+    groupInfoDom.find(".ga-group-id").html("ID : " + groupId.substring(groupId.length-4));
+    groupInfoDom.find(".ga-group-des").html(groupDescription._escape().replace(/\n/g,"<br />"));
     
 
     if (isAdmin){
-    	$(".ga-avatar-photo").removeClass("notadmin");
-    	$(".ga-icon.admin").removeClass("notadmin");
+    	groupInfoDom.find(".ga-avatar-photo").removeClass("notadmin");
+    	groupInfoDom.find(".ga-icon.admin").removeClass("notadmin");
     } else {
-    	$(".ga-avatar-photo").addClass("notadmin");
-    	$(".ga-icon.admin").addClass("notadmin");
+    	groupInfoDom.find(".ga-avatar-photo").addClass("notadmin");
+    	groupInfoDom.find(".ga-icon.admin").addClass("notadmin");
     }
 
-    var gaContent = $(".ga-content");
-	var inGroupName = $("input.ga-group-name");
-	var textGroupDes = $("textarea.ga-group-des");
+    var gaContent = groupInfoDom.find(".ga-content");
+	var inGroupName = groupInfoDom.find("input.ga-group-name");
+	var textGroupDes = groupInfoDom.find("textarea.ga-group-des");
 
 	var contentViewshow = function(){
 		gaContent.find(".ga-gr-content.view").show().end()
@@ -473,14 +481,21 @@ function showGroupInfoPage(){
 function getUpdateGroupInfoApi( this_gi, newGn, newGd ){
 	
 	var body = {};
-	if( newGn )	body.gn = newGn;
-	if( newGd )	body.gd = newGd;
+	var updateGroup = QmiGlobal.groups[this_gi] || {};
+	body.gn = newGn ? newGn : updateGroup.gn;
+	body.gd = newGd ? newGd : updateGroup.gd;
 	new QmiAjax({
 		apiName: "groups/" + this_gi,
 		type: "put",
 		body: body
 	}).success(function(data){
+		var sideMenuGroup = $("#page-group-main div.sm-group-area-r[data-gi='" + this_gi + "']");
 		toastShow(data.rsp_msg);
+		updateGroup.gn = newGn ? newGn : updateGroup.gn;
+		updateGroup.gd = newGd ? newGd : updateGroup.gd;
+		if (sideMenuGroup.length > 0) {
+			sideMenuGroup.children("div").eq(0).html(updateGroup.gn);
+		}
 	}).error(function(e){
         alert("error");
     });
