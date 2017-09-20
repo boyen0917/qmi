@@ -373,6 +373,7 @@ div.user-info-submit-ready:active {
 	font-size: 15px;
 	display: none;
 	max-width: 220px;
+	white-space: pre-line;
 	/*max-height: 40px;*/
 
 	/*display: -webkit-box;

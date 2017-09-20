@@ -26,9 +26,12 @@ var ui,		//user id
 	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
 	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
+var isChatRoom = true;
+
 // 配合init裡面有這個初始化的 function
 var appInitial = function() {
-	// do nothing
+	// 1min檢查一次聊天室
+	setTimeout(checkAuthPeriodically, 60000);
 };
 
 $(function(){
@@ -650,8 +653,8 @@ $(function(){
 		});
 
 		//點擊播放中的影片結束播放
-		$(document).on("click", ".msg-video.loaded.playing", function () {
-			var thisTag = $(this);
+		$(document).on("click", ".msg-video.loaded.playing > img.bt-close", function () {
+			var thisTag = $(this).parent();
 			var videoTag = thisTag.find("video");
 			if (videoTag.length > 0) {
 				thisTag.removeClass("playing");
@@ -1505,7 +1508,7 @@ function showMsg(object, bIsTmpSend) {
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
-			var video = $("<div class='msg-video'><div class='videoContainer'><video preload='none'><source type='video/mp4'></video></div><a class='download' download><img src='images/dl.png'/></a><div class='info'><div class='play'></div><div class='length'></div></div></div>");
+			var video = $("<div class='msg-video'><div class='videoContainer'><video preload='none'><source type='video/mp4'></video></div><div class='info'><div class='play'></div><div class='length'></div></div><img class=\"bt-close\" src=\"images/common/icon/bt_close_normal.png\"><a class=\"bt-download\" download><img src='images/dl.png'/></a></div>");
 			msgDiv.append(video);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
@@ -1927,8 +1930,8 @@ function sendMsgText(dom) {
 				});
 				uploadXhr.upload.addEventListener("progress", function(evt){
 			      	if (evt.lengthComputable) {
-			        	dom.find(".chat-upload-progress").attr("max", 100).attr("value", 50 + Math.floor((evt.loaded / evt.total) * 50));
-				      	dom.find(".upload-percent").html(50 + Math.floor((evt.loaded / evt.total) * 50) + '%');
+			        	dom.find(".chat-upload-progress").attr("max", 100).attr("value", 80 + Math.floor((evt.loaded / evt.total) * 20));
+				      	dom.find(".upload-percent").html(80 + Math.floor((evt.loaded / evt.total) * 20) + '%');
 			      	}
 			    }, false);
 
@@ -2209,20 +2212,16 @@ function sendMsgText(dom) {
 					case 7://video
 						renderVideoUrl(obj.s32, target.find("video"), function (videoTag) {
 							var parent = videoTag.parents(".msg-video");
-
 							parent.addClass("loaded");
-
 							parent.find(".length").html(secondsToTime(Math.floor(obj.md.l/1000)));
-							parent.find(".download").attr("href", videoTag.attr("src"));
-							// parent.find("video").attr("preload", "none");
+							parent.find("a.bt-download").attr("href", videoTag.attr("src"));
 						}, function (videoTag) {
 							var parent = videoTag.parents(".msg-video");
 							parent.addClass("error");
-							parent.find(".download").remove();
+							parent.find("a.bt-download").remove();
 						});
 						break;
 					case 8://audio
-						//target.attr("src", obj.s3);
 						new audioplay(target,obj.s3);
 						break;
 
@@ -3573,5 +3572,35 @@ function sendMsgText(dom) {
 			return window.opener.QmiGlobal.groups;
 		}
 	};
-
 })
+
+var checkAuthPeriodically = function() {
+	var chk = false;
+	return function() {
+		try {
+			if(isAuthOrOpenrNotExist()) {
+				chk = true;
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),
+					confirm: true,
+					action: [function(){
+						if(window.opener === null) 
+							reLogin();
+						else
+							window.close();
+					}]
+				});
+			}
+		} catch(e) {window.close()};
+
+		// 一分鐘檢查一次
+		if(!chk) setTimeout(checkAuthPeriodically, 60000);
+
+		function isAuthOrOpenrNotExist() {
+			if(!window.opener) return true;
+			if(!QmiGlobal.auth) return true;
+			if(Object.keys(QmiGlobal.auth || {}).length === 0) return true; 
+			return false;
+		}
+	}
+}()

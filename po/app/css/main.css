@@ -705,13 +705,13 @@ img.auo {
 .no-group-lock .content{
 	background-color: white;
     width: 420px;
-    height: 260px;
     margin-right: auto;
     margin-left: auto;
     margin-top: 32vh;
+    padding-top: 5px;
+    padding-bottom: 25px;
     text-align: center;
     border-radius: 8px;
-    padding: 5px 0px;
 }
 
 .no-group-lock .content h3{
@@ -722,8 +722,18 @@ img.auo {
 
 .no-group-lock .content span{
 	color: grey;
-	display: inline-block;
-    width: 195px;
+}
+
+.no-group-lock .content button{
+	padding: 8px 50px;
+    background-color: rgb(57, 148, 232);
+    margin-top: 24px;
+    border-radius: 3px;
+    border: 0px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    outline: 0px;
 }
 
 .compose-dnd {
@@ -966,6 +976,10 @@ img.auo {
 	animation-duration: 1000ms;
 	animation-iteration-count: infinite;
 	animation-timing-function: linear;
+	-webkit-animation-name: spin;
+	-webkit-animation-duration: 1000ms;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
 	position: relative;
 	margin: 20px auto;
 }
@@ -1637,6 +1651,7 @@ div#page-group-main div.gm-header-left:before {
 #page-group-main .other-info-row .contact {
     padding-left: 30px;
     vertical-align: top;
+    white-space: pre-line;
 }
 
 #page-group-main .other-info-row img {
@@ -4005,7 +4020,7 @@ img.st-reply-message-attach {
   overflow: hidden;
 }
 
-.load-bar {
+div.st-reply-message-area div.file-load .bar {
   position: absolute;
   height: 100%;
   background: #6CB6FA;

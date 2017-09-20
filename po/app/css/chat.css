@@ -533,17 +533,27 @@ body {
 	height: 100%;
 	width: 100%;
 }
-.msg-video.playing .videoContainer:after{
-	content: "";
-	background: url(../images/common/icon/bt_close_activity.png);
-	width: 40px;
-	height: 40px;
-	position: fixed;
-	top: 10px;
-	right: 10px;
-	background-size: 100%;
-	opacity: 0.3;
+.msg-video > img.bt-close {display: none;}
+.msg-video.playing:hover > img.bt-close {
+	display: block;
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    width: 50px;
+    opacity: 0.5;
 }
+
+.msg-video > a.bt-download {display: none;}
+.msg-video.playing:hover > a.bt-download {
+	display: block;
+    position: absolute;
+    bottom: 35px;
+    right: 10px;
+    width: 40px;
+    opacity: 0.8;
+}
+.msg-video.playing:hover > a.bt-download > img {width: 40px}
+
 .msg-video.playing .videoContainer:hover:after{
 	opacity: 0.6;
 	animation-name: fade-out;
@@ -631,9 +641,6 @@ body {
 	width: 40px;
 	opacity: 0.9;
 }
-.msg-video.playing:hover .download {display: block;}
-.msg-video .download img {width: 100%;}
-
 /*左右分色區*/
 .chat-msg-container-right .msg-video{
 	border: 2px solid rgb(59,97,181);

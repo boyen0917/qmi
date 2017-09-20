@@ -1,3 +1,5 @@
+// version 2.0.0.5
+
 var ui;
 var at;
 var gi;
@@ -177,7 +179,9 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整
-	appVer: "2.0.0.1",
+	appVer: "2.0.0.5",
+
+	title: "Qmi",
 
 	// 檢查是否為聊天室
 	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
@@ -215,6 +219,13 @@ window.QmiGlobal = {
 
 	// 在下方 document ready之後 initReady
 	initReady: function() {
+
+		// 檢查聊天室不得進首頁
+		// if(window.opener && !window.isChatRoom) {
+		// 	window.close();
+		// 	return;
+		// }
+
 		var initDefArr = [
     		updateLanguage()
 		];
@@ -276,6 +287,8 @@ window.QmiGlobal = {
 	method: {}, // 公用函數
 	rspCode401: false,
 
+	vdoCompressBasePct: 80, // 壓縮預設比例
+
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
@@ -288,13 +301,16 @@ window.QmiGlobal = {
 	emptyGrpPicStr: "images/common/others/empty_img_all_l.png",
 	emptyUsrPicStr: "images/common/others/empty_img_personal_l.png",
 
-	getObjectFirstItem: function(obj,last) {
-		if(last === true){
-			return obj[Object.keys(obj)[Object.keys(obj).length-1]];
-		} else 	{
-			return obj[Object.keys(obj)[0]];
-		}
-	},
+	resetDBExceptionArr: [
+		"_ver",
+		"_appReloadAuth",
+		"_lastLoginAccount",
+		"_loginAutoChk",
+		"_loginData",
+		"_loginRemeber",
+		"_lastBaseUrl",
+		"_sticker"
+	],
 
 	viewMap: {}, // cloud reload
 
@@ -378,6 +394,7 @@ window.QmiGlobal = {
 
 	    return {
 	        chk: function() {
+	        	if($.lStorage("_periodicallyReloadTimer") === false) setTimer();
 	            if(new Date().getTime() - $.lStorage("_periodicallyReloadTimer") > periodTime) {
 	                flag = true;
 	            }
@@ -989,6 +1006,8 @@ QmiAjax.prototype = {
 
 		    	// et過期 自動更新 但要強制驗證:
 		    	// do something
+		    	// 重新取得卻 發生錯誤 回首頁
+		    	reLogin();
 
 		        deferred.resolve({
 		        	isSuccess: false,

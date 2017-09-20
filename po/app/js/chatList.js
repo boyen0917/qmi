@@ -141,7 +141,7 @@ function getChatListApi(giTmp) {
 }
 
 function updateChatList( giTmp, extraCallBack ){
-	if(QmiGlobal.groups[giTmp] === undefined )	return;
+	if(!QmiGlobal.groups[giTmp]) return;
 
 	//取得聊天室列表api
 	getChatListApi(giTmp).done(function(rspObj) {
@@ -391,7 +391,7 @@ function openChatWindow ( giTmp, ci ){
 		if($.lStorage("groupChat")){
 			windowList[ci] = window.open("", ci , "width=400, height=600");
 		}else{
-			windowList[ci] = window.open("chat.html?v1.8.3.0", ci , "width=400, height=600");
+			windowList[ci] = window.open("chat.html?v2.0.0.5", ci , "width=400, height=600");
 		}
 		
 		windowList[ci].chatAuthData = {
@@ -486,9 +486,8 @@ function clearChatListCnt( giTmp, ciTmp ){
 }
 
 function setLastMsg( giTmp, ciTmp, table, isShowAlert, isRoomOpen, eiTmp ){
-	var 
-	deferred = $.Deferred(),
-	groupTmp = QmiGlobal.groups[giTmp] || {};
+	var deferred = $.Deferred();
+	var groupTmp = QmiGlobal.groups[giTmp] || {};
 
 	if( null==isRoomOpen ) isRoomOpen = false;
 
@@ -716,10 +715,22 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			var cnTmp = data.cn||"";
 			if( data.meta.ct>=login_time){
-				riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
-					cns.debug(ciTmp);
-					openChatWindow( giTmp, ciTmp );
-				});
+				
+				try {QmiGlobal.showNotification ({
+					title: mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")",
+					text: text,
+					gi: giTmp,
+					ci: ciTmp,
+					callback: function(){
+						openChatWindow( giTmp, ciTmp );
+					}});
+				} catch(e) {
+					console.log("123232", e);
+					// 原始
+					riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
+						openChatWindow( giTmp, ciTmp );
+					});
+				}
 			}
 		} catch(e) {
 			cns.debug( e.message );

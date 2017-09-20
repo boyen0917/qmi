@@ -158,9 +158,14 @@ ajaxDo = function (api_name,headers,method,load_show_chk,body,ajax_msg_chk,err_h
 }
 
 
-reLogin = function() {
+reLogin = function(options) {
+	if(QmiGlobal.isChatRoom) {
+		window.close();
+		return;
+	}
+
 	localStorage.removeItem("_loginAutoChk");
-	localStorage.removeItem("_loginData");
+	resetDB(options);
 	document.location = "index.html";
 }
 
@@ -230,8 +235,6 @@ getVideoBlob = function(videoDom, x,y,max_w,max_h,quality){
 //寫入exif
 writeExif = function(exifinfo,imageSrc){
 	var deferred = $.Deferred();
-	console.log("data:",imageSrc);
-	console.log("exif:",exifinfo);
 	var dataURL;
 	var img = new Image();
 	
@@ -386,17 +389,28 @@ QmiGlobal.aesCrypto = {
 }
 
 htmlFormat = function (str, isToCharCode){
+	var urlRegex = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
 	if(str.match(/\&\#\d+\;*/g)){
-    	str = str.replace(/\&\#/g,"&#38;&#35;");
-    } 
+		str = str.replace(/\&\#/g,"&#38;&#35;");
+  	} 
     var strArr = str._escape().replace(/\n/g," \n ").split(" ");
     $.each(strArr,function(i,val){
     	var newStr = (isToCharCode === true ? encodeHtmlEntity(val) : val) ;
-
-        if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://')
-            newStr = "<a href=\"" + newStr + "\" target=\"_blank\">" + newStr + "</a>";
-            
-        strArr.splice(i,1,newStr);
+    	
+    	if(val.match(urlRegex)) {
+			newStr = val.replace(urlRegex, function (match) {
+				if (match.substring(0, 7) == 'http://' || match.substring(0, 8) == 'https://') {
+					return "<a href=\"" + match + "\" target=\"_blank\">" + match + "</a>";
+				} else {
+					return "<a href=\"http://" + match + "\" target=\"_blank\">" + match + "</a>";
+				}
+			})
+    	}
+    			
+        // if(val.substring(0, 7) == 'http://' || val.substring(0, 8) == 'https://')
+        //     newStr = "<a href=\"" + newStr + "\" target=\"_blank\">" + newStr + "</a>";
+        
+      	strArr.splice(i,1,newStr);
     });
 
     return strArr.join(" ").replaceEmoji().replace(/\n/g, "<br/>");
@@ -584,9 +598,8 @@ uploadToS3 = function(file,api_name,ori_arr,tmb_arr,callback){
 
 qmiUploadFile = function(uploadObj){
 	// tp 1: 圖片 2: 影片
-	
-	var allDoneDef = $.Deferred(),
-		s3ResponseObj;
+	var allDoneDef = $.Deferred();
+	var s3ResponseObj;
 
 	(function() {
 		var chainDef = MyDeferred();
@@ -595,7 +608,7 @@ qmiUploadFile = function(uploadObj){
 		return chainDef;
 	}()).then(function(s3Obj) {
 		var chainDef = MyDeferred();
-		
+
 		qmiUploadS3(uploadObj, s3Obj).done(chainDef.resolve).fail(chainDef.reject);
 		return chainDef;
 	}, chainDefError.bind("get url fail")).then(function(responseObj) {
@@ -653,17 +666,16 @@ qmiUploadFile = function(uploadObj){
 
 // 做 s3 上傳
 qmiUploadS3 = function(uploadObj,s3Obj) {
-	var allDef = $.Deferred(),
-		tmbObj = uploadObj.tmbObj,
-		oriObj = uploadObj.oriObj;
-
-	var uploadDef = $.Deferred(),
-		mediaLoadDef = $.Deferred(),
-		oriFile, tmbFile, mt, si, md, contentType,
-		paramObj = {
-			s3: { url: s3Obj.s3 || s3Obj.tu },
-			s32: { url: s3Obj.s32 || s3Obj.ou},
-		};
+	var allDef = $.Deferred();
+	var tmbObj = uploadObj.tmbObj;
+	var oriObj = uploadObj.oriObj;
+	var uploadDef = $.Deferred();
+	var mediaLoadDef = $.Deferred();
+	var oriFile, tmbFile, mt, si, md, contentType;
+	var paramObj = {
+		s3: { url: s3Obj.s3 || s3Obj.tu },
+		s32: { url: s3Obj.s32 || s3Obj.ou}
+	};
 
 	switch(uploadObj.tp) {
 		case 0: // 其他類型 檔案上傳
@@ -680,8 +692,8 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			break;
 		case 1: // 圖
-			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s),
-				tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
+			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s);
+			var tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
 
 			paramObj.s32.file = oFile.blob;
 			paramObj.s3.file = tFile.blob;
@@ -700,69 +712,87 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		case 2: // 影 只要傳s32 timeline是這樣
 
 			paramObj.s32.file = uploadObj.file;
-			delete paramObj.s3;
+
+			// delete paramObj.s3;
 			contentType = "video/mp4";
 
-			zipVideoFile(uploadObj).done(function (uploadFile) {
+			uploadObj.updateCompressionProgress = function(length) {
+				uploadObj.progressBar.set(length);
+			}
+
+			$.when(
+				zipVideoFile(uploadObj), 
+				// 取得截圖
+				function() {
+					var video = document.createElement('video');
+					video.src = URL.createObjectURL(uploadObj.file);
+
+					video.onloadeddata = function() {
+						console.log("load video finished");
+						var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
+						md = {l: Math.floor(video.duration * 1000)};
+						paramObj.s3.file = thumbnailVideo.blob;
+					}
+				}()
+			).done(function (uploadFile) {
+				console.log("zip finished");
+				uploadObj.progressBar.vdoCompressDefer.resolve(true);
+
 				paramObj.s32.file = uploadFile;
 
 				// 壓縮80 上傳20
-				uploadObj.basePct = 80;
+				uploadObj.basePct = QmiGlobal.vdoCompressBasePct;
 
 				// 傳給外部 commit 使用
 				mt = uploadFile.type;
 				si = uploadFile.size;
 
-				var video = document.createElement('video');
-				video.src = URL.createObjectURL(uploadObj.file);
-				console.log(video.duration);
-				video.onloadeddata = function() {
-					md = {l: Math.floor(video.duration * 1000)};
-					mediaLoadDef.resolve();
-				}
+				mediaLoadDef.resolve();
 			}).fail(function () { // 壓縮失敗
 				paramObj.s32.file = uploadObj.file;
 
 				// 傳給外部 commit 使用
 				mt = uploadObj.file.type;
 				si = uploadObj.file.size;
-
-				var video = document.createElement('video');
-				video.src = URL.createObjectURL(uploadObj.file);
-				video.onloadeddata = function() {
-					md = {l: Math.floor(video.duration * 1000)};
-					mediaLoadDef.resolve();
-				}
 			});
 			
 			break;
 		default: 
 	}
-
-	mediaLoadDef.done(function() {
-
-		$.when.apply($, (Object.keys(paramObj).reduce(function(arr,key,i) {
-				var ajaxArgs = {
-					url: paramObj[key].url,
-					type: 'PUT',
-					timeout: 0,
-					contentType: contentType,
-				 	data: paramObj[key].file, 
-					processData: false,
-				}
+	
+	(function() {
+		var chainDef = MyDeferred();
+		uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);
+		return chainDef;
+	}()).then(function() {
+		var chainDef = MyDeferred();
+		mediaLoadDef.done(chainDef.resolve);
+		return chainDef;
+	}()).then(function() {
+		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
+			var ajaxArgs = {
+				url: paramObj[key].url,
+				type: 'PUT',
+				timeout: 0,
+				contentType: contentType,
+			 	data: paramObj[key].file, 
+				processData: false,
+			}
+			
+			if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar.xhr.bind(null, uploadObj.basePct);
+			arr[i] = $.ajax(ajaxArgs);
+			return arr;
+		},[])).done(function(data) {
+			setTimeout(function() {
+				allDef.resolve({status: 200, isSuccess: true, data: {
+					fi: s3Obj.fi,
+					mt: mt,
+					si:	si,
+					md:	md,
+					oriFile: oriFile
+				}})
+			}, 1000);
 				
-				if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar.bind(null, uploadObj.basePct);
-				arr[i] = $.ajax(ajaxArgs);
-				return arr;
-			},[]))
-		).done(function(data) {
-			allDef.resolve({status: 200, isSuccess: true, data: {
-				fi: s3Obj.fi,
-				mt: mt,
-				si:	si,
-				md:	md,
-				oriFile: oriFile
-			}})
 		}).fail(function() {
 			// 上傳s3 失敗
 			allDef.reject({status: 999, isSuccess: false, data: arguments});
@@ -772,29 +802,51 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	return allDef.promise();
 } // end of qmiUploadS3
 
-resetDB = function(){
+resetDB = function(options){
+	options = options || {};
 	clearBadgeLabel();
 	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 	if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 	if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
 
-	var exceptionObj = {};
-	var exceptionItemArr = [
-		"_ver",
-		"_loginRemeber",
-		"_lastBaseUrl"
-	];
-
-	exceptionItemArr.forEach(function(lsStr) {
-		if(localStorage[lsStr]) exceptionObj[lsStr] = localStorage[lsStr];
-	});
+	var excepObj = QmiGlobal.resetDBExceptionArr.reduce(function(obj, curr) {
+		obj[curr] = localStorage[curr];
+		return obj;
+	}, {});
 
 	localStorage.clear();
 
-	Object.keys(exceptionObj).forEach(function(key) {
-		$.lStorage(key, exceptionObj[key]);
+	Object.keys(excepObj).forEach(function(key) {
+		$.lStorage(key, excepObj[key]);
+	});
+
+	(options.removeItemArr || []).forEach(function(str) {
+		localStorage.removeItem(str);
 	});
 	
+}
+
+logout = function(){
+
+    new QmiAjax({
+        apiName: "logout",
+        isPublicApi: true,
+        noAuth: true,
+        errHide: true,
+        method: "delete"
+    }).complete(function(){
+
+        try {
+        	// 關閉移轉團體所有聊天室
+	        (Object.keys(windowList) || []).forEach(function(thisCi){
+	            windowList[thisCi].close();
+	        });
+
+            QmiGlobal.nwGui.App.clearCache();
+        } catch(e) {}
+        
+        reLogin();
+    });
 }
 
 getFilePermissionIdWithTarget = function(this_gi, object_str, branch_str){
@@ -1787,18 +1839,13 @@ renderVideoFile = function(file, videoTag, onload, onError){
 }
 
 renderVideoUrl = function(url, videoTag, onload, onError){
-	if( videoTag.length>0 ){
-		// videoTag[0].oncanplay = function(event){
-			// videoTag.addClass("loaded");
-			if(onload) onload(videoTag);
-		// }
-		videoTag[0].onerror = function(event){
-			videoTag.addClass("error");
-			if(onError) onError(videoTag);
-		}
-    
-		videoTag.attr("src", url);
+	if( videoTag.length === 0 ) return;
+	videoTag[0].onerror = function(event){
+		videoTag.addClass("error");
+		if(onError) onError(videoTag);
 	}
+	videoTag.attr("src", url);
+	if(onload) onload(videoTag);
 }
 
 function drawCanvasImageBg( ctx, img, x, y, w, h ){
@@ -2128,7 +2175,10 @@ zipVideoFile = function (videoObj) {
 		var ffmpeg = require('fluent-ffmpeg');
 		var fs = require('fs');
     	var path = require('path');
+    	var spawn = require('child_process').spawn;
+    	var tmpDir = process.cwd();
     	var nwDir = path.dirname(process.execPath); //node webkit 根目錄
+    	var outputPath = tmpDir + '/video/output.mp4'
 	    var command = ffmpeg(videoObj.file.path);
 	    var outputBuffer;
 
@@ -2138,30 +2188,41 @@ zipVideoFile = function (videoObj) {
        	var zipVideoActionDef = $.Deferred();
        	var getDurationDef = $.Deferred();
 
+       	if (!fs.existsSync(tmpDir + '/video')) {
+       		fs.mkdirSync(tmpDir + '/video/');
+       	}
+
 	    command.setFfmpegPath(nwDir + '/bin/ffmpeg');
 	    command.setFfprobePath(nwDir + '/bin/ffprobe');
 		
 		command.ffprobe(function(err, inputInfo) {
 			// 非h264影片無法播放 需要進行轉檔
 			try {
-				if(inputInfo.streams[0].codec_name !== "h264")
-					getDurationDef.resolve(inputInfo.format.duration);
-				else
-					reject();
+				// if(inputInfo.streams[0].codec_name !== "h264")
+				getDurationDef.resolve(inputInfo.format.duration);
+				// else
+					// reject();
 			} catch(e) {reject();}
 
 			function reject() {
 				getDurationDef.reject();
-		    	transferBlobDef.reject();	
+		    	transferBlobDef.reject();
 			}
 		});
 
 		$.when(getDurationDef).done(function(duration) {
 			// toastShow("此影片格式不支援 正在進行影片轉檔 如不需要請按取消");
-			command.videoCodec('libvpx')
-		  	.audioCodec('libvorbis')
-		  	.duration(duration).size('640x320')
-		  	.outputFormat('webm')
+			command
+			// .duration(duration)
+   			.videoCodec('libx264')
+   			.size('640x480')
+			.outputOptions('-c:a copy')
+			.outputOptions('-r 30')
+			.outputOptions('-refs 2')
+			.outputOptions('-crf 28')
+			.outputOptions('-preset:v veryfast')
+			.outputOptions('-x264opts keyint=25')
+			.outputOptions('-profile:v baseline')
 		  	.on('start', function(commandLine) {
      			if (videoObj.setAbortFfmpegCmdEvent)
      				videoObj.setAbortFfmpegCmdEvent(command);
@@ -2176,37 +2237,30 @@ zipVideoFile = function (videoObj) {
 	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
 	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
 	                percent = ((seconds / duration) * 80).toFixed();
-
+	                
 	                if (videoObj.updateCompressionProgress)
 	               	 	videoObj.updateCompressionProgress(percent);
 	            }
+
 		  	}).on('error', function(err) {
 		    	zipVideoActionDef.reject('Cannot process video: ' + err.message);
 
-		  	}).on('end', zipVideoActionDef.resolve)
-
-		  	.pipe().on('data', function(chunk) { // 輸出串流回來的buffer
-	        	if (outputBuffer === undefined) {
-	        		outputBuffer = chunk;
-	        	} else {
-	        		// new Uint8Array(outputBuffer)
-	        		//  原本的buffer跟新回傳來的buffer 合併merge;
-	        		var prevInt8Arr = new Uint8Array(outputBuffer);
-	        		var currInt8Arr = new Uint8Array(chunk);
-	        		var totalByteLength = prevInt8Arr.byteLength + currInt8Arr.byteLength;
-	        		var totalInt8Arr = new Uint8Array(totalByteLength);
-	        		totalInt8Arr.set(prevInt8Arr, 0);
-	        		totalInt8Arr.set(currInt8Arr, prevInt8Arr.byteLength);
-
-	        		outputBuffer = totalInt8Arr;
-	        	}
-			});
+		  	}).on('end', function () {
+		  		zipVideoActionDef.resolve();
+		  	})
+		  	.save(outputPath)
 		});
 
         zipVideoActionDef.done(function () {
-            var blob = new Blob([outputBuffer.buffer], {type: 'application/octet-binary'});
-            blob.name = videoObj.file.name.split(".")[0] + ".webm";
-            transferBlobDef.resolve(blob);
+        	fs.readFile(outputPath, function(err, data) {
+        		var byteArray = new Uint8Array(data);
+        		var blob = new Blob([byteArray], {type: 'application/octet-binary'});
+        		blob.name = videoObj.file.name;
+        		transferBlobDef.resolve(blob);
+        		
+        		fs.unlinkSync(outputPath);
+        	});
+
 	    }).fail(function (errorMsg) {
 	    	console.log(errorMsg);
 	    });
@@ -2253,6 +2307,7 @@ function riseNotification (icon, title, description, onClickCallback) {
 		console.log("Notification doesn't be supported.");
 	}
 }
+
 
 QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
   	this.locateSite = [];
@@ -2536,6 +2591,28 @@ QmiGlobal.MemberLocateModal.prototype = {
 		    	this.container.find(".bottom").hide();
 		    }
 		}
+	}
+}
+
+QmiGlobal.showNotification = function(argObj) {
+	try{
+		if(isChatroomCloseNotification()) return;
+		var notification = new window.Notification(argObj.title, {
+			body: argObj.text,
+			icon: argObj.icon === undefined? "resource/images/default.png": argObj.icon
+		});
+		if (typeof argObj.callback === "function")
+			notification.addEventListener("click", argObj.callback);
+
+	}catch(e){console.error("Notification is not supported.", e);}
+
+	function isChatroomCloseNotification() {
+		if(!argObj.ci) return false;
+		var chatAll = QmiGlobal.groups[argObj.gi].chatAll || {};
+		// 不存在的聊天室 不可跳出通知
+		if(!chatAll[argObj.ci]) return true;
+		if((chatAll[argObj.ci] || {}).cs === true) return false;
+		return true;
 	}
 }
 

@@ -7,14 +7,11 @@ $(function(){
 
 	$("#page-group-main .navi-alert").click(function(){
 		$(this).removeClass("new");
-		// clearBadgeLabel();
-
-		if($(".alert-area").is(":visible")){
-			hideAlertBox();
-		}else{
-			showAlertBox();
-		}
 		
+		if($(".alert-area").is(":visible")) 
+			hideAlertBox();
+		else 
+			showAlertBox();
 	});
 
 	$(".alert-area-cover").click(function(){
@@ -44,6 +41,8 @@ initAlertDB = function(){
     });
 }
 
+// 20170914規則 在polling cmds tp==1 做鈴鐺紅點跟updatePollingCnts G3
+// 這沒在用了
 showNewAlertIcon = function( cnt ){
 	if( cnt != lastCnt ){
 
@@ -59,7 +58,7 @@ showNewAlertIcon = function( cnt ){
 			$(".alert-area").scrollTop(0);
 			if( typeof(updatePollingCnts)!= 'undefined' ){
 				lastCnt = 0;
-				updatePollingCnts( $("<div></div>"), "G3" );
+				updatePollingCnts( $("<div>"), "G3" );
 			}
 			updateAlert();
 		}
@@ -84,7 +83,7 @@ hideAlertBox = function(detail){
 showAlertBox = function(){
 	if( typeof(updatePollingCnts)!= 'undefined' ){
 		lastCnt = 0;
-		updatePollingCnts( $("<div></div>"), "G3" );
+		updatePollingCnts( $("<div>"), "G3" );
 	}
     		
 	// updateAlert();

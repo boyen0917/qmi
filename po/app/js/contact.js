@@ -183,7 +183,7 @@ onSearchInput = function(e){
 		if( memberData.nk.toLowerCase().indexOf(str) >= 0
 			|| (memberData.bl.length > 0 && bl[memberData.bl.split(",")[0].split(".")[0]].bn.toLowerCase().indexOf(str) >= 0)
 			|| memberData.ti.toLowerCase().indexOf(str) >= 0
-			|| memberData.nk2.toLowerCase().indexOf(str) >= 0){
+			|| (memberData.nk2 || "").toLowerCase().indexOf(str) >= 0){
 			matchMemList.push(memId);
 			memCount++;
 		}	
@@ -644,7 +644,7 @@ generateMemberGrid = function( memberKeyList, memContainer ){
 				+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu + "'>"
 				+ "<img data-url='" + imgUrl + "' src='" + imgUrl + "'>"
 				+ "<div class='name'>" + memberData.nk.replaceOriEmojiCode() 
-				+ ((memberData.nk2.length > 0) ? " (" + memberData.nk2.replaceOriEmojiCode() + ")" : "")
+				+ ((memberData.nk2) ? " (" + memberData.nk2.replaceOriEmojiCode() + ")" : "")
 				+ "</div></div>";
 
 			return memberHtml + memberElementStr;	
@@ -690,7 +690,7 @@ generateMemberList = function( memberKeyList, memContainer, favCallback ){
 			 	+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu 
 			 	+ "' ><div class='left'><img data-url='" + imgUrl + "' src='" + imgUrl 
 			 	+ "' /></div><div class='mid'><div class='name'>" + memberData.nk.replaceOriEmojiCode()
-			 	+ ((memberData.nk2.length > 0) ? " (" + memberData.nk2.replaceOriEmojiCode() + ")" : "")
+			 	+ ((memberData.nk2) ? " (" + memberData.nk2.replaceOriEmojiCode() + ")" : "")
 			 	+ "</div><div class='detail'>" + ((memberData.bl == "") ? "" : bl[memberData.bl.split(",")[0].split(".")[0]].bn)
 				+ "</div><div class='detail " + ((memberData.ti == "") ? "twoLine" : "") +"'>" 
 				+ ((memberData.ti == "") ? "" : memberData.ti) + "</div></div><div class='right'>&nbsp</div></div>";
@@ -1569,9 +1569,13 @@ addFavGroup = function (container, input) {
 
 */
 function showAddMemberPage(){
+	var mainPage = document.getElementById("page-contact-addmem");
+
 	$.mobile.changePage("#page-contact-addmem");
 	$("#page-contact-addmem .ca-list-area .cal-coachmake").show();
 	$("#page-contact-addmem .ca-list-area .cal-div-area").hide();
+
+	var countrycodeSelect = $('#page-contact-addmem .invite-select-countrycode select'); 
 
 	initQRCodePage();
 
@@ -1590,6 +1594,31 @@ function showAddMemberPage(){
 	});
 	$("#page-contact-addmem .ca-invite").trigger("click");
 	$("#page-contact-addmem .ca-invite-submit").off("click").click( sendInvite );
+
+	countrycodeSelect.selectbox({
+		onOpen: function (inst) {
+			cns.log("open"); //, inst
+		},
+		onClose: function (inst) {
+			cns.log("close"); //, inst
+		},
+		onChange: function (val, inst) {
+			console.log(val)
+			cns.debug(val, inst);
+			countrycodeSelect.attr("data-val",val);
+			var text = countrycodeSelect.find("option[value='"+val+"']").text() || "";
+			console.log(text)
+			countrycodeSelect.attr("data-text",text);
+			// if( "undefined"!=typeof(checkRegisterPhone) ) checkRegisterPhone();
+		},
+		effect: "slide"
+	});
+
+	$("#page-contact-addmem label.sbSelector").css("line-height","40px");
+
+	mainPage.querySelector("div.invite-input-number input").addEventListener('input', function (e) {
+		this.value = this.value.replace(/[^-_0-9]/g, '')
+	});
 
 	updateInvitePending();
 }
@@ -1744,11 +1773,6 @@ function getInviteList(){
 			for( var i=0; i<obj.il.length; i++){
 				var data_info = obj.il[i];
 				if( !data_info ) continue;
-				// "ik": "+886935398692", or "abc@gmail.com"
-			    // "tp": 0, or 1 // Invitation Type 0(Phone)、1(Email)
-			    // "nk": "小瓶 "
-			    // "auo": "http://s3.url/xxx", // Avatar Original URL
-			    // "aut": "http://s3.url/xxx"  // Avatar Thumbnail URL
 			    var row = $("<div class='cal-row'></div>");
 			    row.append("<div class='photo'><img class='st-user-pic' src='images/common/others/empty_img_personal_l.png'/></div>");
 			    row.append("<div class=info><div class='name'></div><div class='tel'></div></div>");
@@ -1775,21 +1799,26 @@ function getInviteList(){
 
 function sendInvite(){
 	var nk = $(".cai-name input").val();
+	var mainPage = document.getElementById("page-contact-addmem");
+	var area = $("#page-contact-addmem .invite-select-countrycode option:selected");
+
 	if( !nk || nk.length==0 ){
 		popupShowAdjust("", $.i18n.getString("INVITE_DISPLAY_NAME") );
 		return;
 	}
-	var phone = $(".cai-num input").val();
+	var phone = $(".cai-area input").val();
 	if( !phone || phone.length==0 ){
 		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_NUMBER") );
 		return;
 	}
-	if( phone.length<10 || phone.indexOf("0")!=0 ){
-		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR") );
+	if (phone.length < 4) {
+		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR"));
 		return;
 	}
-	var area = $(".cai-area .area");
-	phone = phone.replace(/^0/, area.html() );
+
+	phone = "+" + area.data("code") + phone.replace(/^0/, "");
+
+	// phone = phone.replace(/^0/, "+" + area.data("code"));
 	/* ----- TODO ------
 		 國碼/email
 		不同國別電話格式檢查
@@ -1833,6 +1862,14 @@ function sendInvite(){
 					};
 					showMainContact();
 					updateInvitePending();
+
+					mainPage.querySelector("div.invite-input-number input").value = "";
+					$("#page-contact-addmem .invite-select-countrycode select").selectbox(
+						"change", 
+						"TW",
+						$.i18n.getString("COUNTRY_CODE_TAIWAN")
+					)
+
 
 				} catch(e){
 
