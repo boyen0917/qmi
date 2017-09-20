@@ -1569,9 +1569,13 @@ addFavGroup = function (container, input) {
 
 */
 function showAddMemberPage(){
+	var mainPage = document.getElementById("page-contact-addmem");
+
 	$.mobile.changePage("#page-contact-addmem");
 	$("#page-contact-addmem .ca-list-area .cal-coachmake").show();
 	$("#page-contact-addmem .ca-list-area .cal-div-area").hide();
+
+	var countrycodeSelect = $('#page-contact-addmem .invite-select-countrycode select'); 
 
 	initQRCodePage();
 
@@ -1590,6 +1594,31 @@ function showAddMemberPage(){
 	});
 	$("#page-contact-addmem .ca-invite").trigger("click");
 	$("#page-contact-addmem .ca-invite-submit").off("click").click( sendInvite );
+
+	countrycodeSelect.selectbox({
+		onOpen: function (inst) {
+			cns.log("open"); //, inst
+		},
+		onClose: function (inst) {
+			cns.log("close"); //, inst
+		},
+		onChange: function (val, inst) {
+			console.log(val)
+			cns.debug(val, inst);
+			countrycodeSelect.attr("data-val",val);
+			var text = countrycodeSelect.find("option[value='"+val+"']").text() || "";
+			console.log(text)
+			countrycodeSelect.attr("data-text",text);
+			// if( "undefined"!=typeof(checkRegisterPhone) ) checkRegisterPhone();
+		},
+		effect: "slide"
+	});
+
+	$("#page-contact-addmem label.sbSelector").css("line-height","40px");
+
+	mainPage.querySelector("div.invite-input-number input").addEventListener('input', function (e) {
+		this.value = this.value.replace(/[^-_0-9]/g, '')
+	});
 
 	updateInvitePending();
 }
@@ -1770,21 +1799,26 @@ function getInviteList(){
 
 function sendInvite(){
 	var nk = $(".cai-name input").val();
+	var mainPage = document.getElementById("page-contact-addmem");
+	var area = $("#page-contact-addmem .invite-select-countrycode option:selected");
+
 	if( !nk || nk.length==0 ){
 		popupShowAdjust("", $.i18n.getString("INVITE_DISPLAY_NAME") );
 		return;
 	}
-	var phone = $(".cai-num input").val();
+	var phone = $(".cai-area input").val();
 	if( !phone || phone.length==0 ){
 		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_NUMBER") );
 		return;
 	}
-	if( phone.length<10 || phone.indexOf("0")!=0 ){
-		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR") );
+	if (phone.length < 4) {
+		popupShowAdjust("", $.i18n.getString("INVITE_PHONE_ERROR"));
 		return;
 	}
-	var area = $(".cai-area .area");
-	phone = phone.replace(/^0/, area.html() );
+
+	phone = "+" + area.data("code") + phone.replace(/^0/, "");
+
+	// phone = phone.replace(/^0/, "+" + area.data("code"));
 	/* ----- TODO ------
 		 國碼/email
 		不同國別電話格式檢查
@@ -1828,6 +1862,14 @@ function sendInvite(){
 					};
 					showMainContact();
 					updateInvitePending();
+
+					mainPage.querySelector("div.invite-input-number input").value = "";
+					$("#page-contact-addmem .invite-select-countrycode select").selectbox(
+						"change", 
+						"TW",
+						$.i18n.getString("COUNTRY_CODE_TAIWAN")
+					)
+
 
 				} catch(e){
 
