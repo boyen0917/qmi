@@ -221,10 +221,10 @@ window.QmiGlobal = {
 	initReady: function() {
 
 		// 檢查聊天室不得進首頁
-		if(window.opener && !window.isChatRoom) {
-			window.close();
-			return;
-		}
+		// if(window.opener && !window.isChatRoom) {
+		// 	window.close();
+		// 	return;
+		// }
 
 		var initDefArr = [
     		updateLanguage()

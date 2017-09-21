@@ -27,6 +27,7 @@ var ui,		//user id
 	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
 var isChatRoom = true;
+var maxMsgLength = 3000;
 
 // 配合init裡面有這個初始化的 function
 var appInitial = function() {
@@ -280,7 +281,7 @@ $(function(){
 		sendBtn.off("click");
 		sendBtn.click(onClickSendChat);
 		var input = $("#footer .contents .input");
-		input.off("keydown").off("keypress");
+		input.off("keydown").off("keypress").off('keyup');
 
 		//press enter to send text
 		input.keypress(function (e) {
@@ -293,13 +294,44 @@ $(function(){
 
 		//adjust typing area height
 		input.off("keydown").keydown(function (e) {
+			console.log(e)
+			var curText = $(this).text();
+			var ctrlDown = (e.ctrlKey || e.metaKey);
+			var isDeleteKey = (e.keyCode == 8 || e.keyCode == 46);
+			var isArrowKey = (new RegExp("^(3[3-9]|4[0-4])$")).test(e.keyCode);
+			var selectText = window.getSelection().toString();
+
+			/*
+				超過3000字且不是
+
+				1. 全選複製剪下貼上
+				2. 倒退鍵和刪除鍵
+				3. 方向鍵
+				4. 選擇字串
+
+				停止輸入
+			*/
+			if (!ctrlDown && !isDeleteKey && !isArrowKey && selectText.length == 0 
+				&& curText.length >= maxMsgLength) {
+				console.log('over 3000 characters @@');
+				e.preventDefault();
+			}
 			setTimeout(updateChatContentPosition, 50);
 		});
-		
+
 		// 偵測貼上事件 避免html 換成text文本
 		input.on("paste",function(e){
+			var curText = $(this).text();
+			var pasteText = e.originalEvent.clipboardData.getData('text')._escape();
+
+			// 貼上的字量加上目前的字量超過3000，貼上的字量就要切掉
+			if (curText.length + pasteText.length > maxMsgLength) {
+				pasteText = pasteText.substring(0, maxMsgLength - curText.length)
+			}
+
 			e.preventDefault();
-			document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text')._escape());
+			document.execCommand('insertText', false, pasteText);
+
 		})
 
 		$(".input").data("h", $(".input").innerHeight());
