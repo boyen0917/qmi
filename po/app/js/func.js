@@ -203,6 +203,7 @@ agreeMeInvite = function(inviteDom){
     
     new QmiAjax({
         apiName: "me/groups",
+        apiVer: "apiv2",
         ci: inviteData.ci, // 有ci就用cloud的邀請
         method: "post",
         body: {
