@@ -314,24 +314,6 @@ ObjectDelegateView = {
 	},
 
 	checkThisBranch : function (thisBranchRow) {
-		var parentRow = thisBranchRow.parent;
-
-		// 檢查其他子部門是否有勾選
-		var isOtherChildChecked = parentRow.childBranch.every(function (childRow) {
-			if (childRow.id == thisBranchRow.id) return true;
-			else return childRow.isChecked;
-		});
-
-		if (isOtherChildChecked && !thisBranchRow.isChecked) {
-			parentRow.html.find(".subgroup-parent .img").addClass("chk");
-			parentRow.isChecked = true;
-			this.checkedBranches[parentRow.id] = parentRow.name;
-		} else {
-			parentRow.html.find(".subgroup-parent .img").removeClass("chk");
-			parentRow.isChecked = false;
-			delete this.checkedBranches[parentRow.id];
-		}
-
 		if (thisBranchRow.isChecked) delete this.checkedBranches[thisBranchRow.id];
 		else this.checkedBranches[thisBranchRow.id] = thisBranchRow.name;
 	},
