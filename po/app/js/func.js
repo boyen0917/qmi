@@ -3705,9 +3705,8 @@ composeVoteEvent = function(this_compose){
 
             var pm_str = "minus";
         }else{
-            //最大數是選項數-1
+            //最大數是選項數
             var opt_total = this_ques.data("opt-total");
-            opt_total -= 1;
 
             if(vote_count == opt_total) return false;
 
@@ -3715,7 +3714,7 @@ composeVoteEvent = function(this_compose){
 
             var pm_str = "plus";
         }
-            
+
         var img_clk = "images/compose/vote/compose_post_vote_bt_" + pm_str;
 
         this_btn.find("img").attr("src",img_clk + "_click.png");
