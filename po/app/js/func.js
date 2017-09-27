@@ -4387,7 +4387,9 @@ groupMenuListArea = function (noApi){
             $("#page-group-menu .page-back").show();
 
             setGroupInitial(Object.keys(QmiGlobal.groups)[0], true);
-        }   
+        }
+
+        if (QmiGlobal.auth.isSso) $("#page-group-main div.sm-group-cj").css({"visibility":"hidden"});
 
         // 判斷無官方帳號團體就關閉標題
         (function() {
