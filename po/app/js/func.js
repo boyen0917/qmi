@@ -204,6 +204,7 @@ agreeMeInvite = function(inviteDom){
     
     new QmiAjax({
         apiName: "me/groups",
+        apiVer: "apiv2",
         ci: inviteData.ci, // 有ci就用cloud的邀請
         method: "post",
         body: {
@@ -1385,7 +1386,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         var mainReplyText;
 
         deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.5 .st-reply-content-area', function(){
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.6 .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
@@ -1889,7 +1890,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.5 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.6 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -3706,9 +3707,8 @@ composeVoteEvent = function(this_compose){
 
             var pm_str = "minus";
         }else{
-            //最大數是選項數-1
+            //最大數是選項數
             var opt_total = this_ques.data("opt-total");
-            opt_total -= 1;
 
             if(vote_count == opt_total) return false;
 
@@ -3716,7 +3716,7 @@ composeVoteEvent = function(this_compose){
 
             var pm_str = "plus";
         }
-            
+
         var img_clk = "images/compose/vote/compose_post_vote_bt_" + pm_str;
 
         this_btn.find("img").attr("src",img_clk + "_click.png");
@@ -4388,7 +4388,9 @@ groupMenuListArea = function (noApi){
             $("#page-group-menu .page-back").show();
 
             setGroupInitial(Object.keys(QmiGlobal.groups)[0], true);
-        }   
+        }
+
+        if (QmiGlobal.auth.isSso) $("#page-group-main div.sm-group-cj").css({"visibility":"hidden"});
 
         // 判斷無官方帳號團體就關閉標題
         (function() {

@@ -22,7 +22,7 @@ loadObjectTabPage = function( parentDom, onDone ){
     if( $("#page-tab-object").length>0 ){
         if( onDone ) onDone();
     } else {
-        $('<div>').load('layout/memberList.html?v2.0.0.5',function(){
+        $('<div>').load('layout/memberList.html?v2.0.0.6',function(){
             parentDom.after( $(this).find("#page-tab-object") );
             if( onDone ) onDone();
         });

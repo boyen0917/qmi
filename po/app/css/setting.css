@@ -332,6 +332,7 @@ textarea.ga-group-des:focus{
 	position: relative;
 	cursor: pointer;
 	height: 60px;
+	border-top: 1px solid rgb(86, 85, 85);
 }
 .sm-person-area-l{
 	float:left;

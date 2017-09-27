@@ -765,7 +765,11 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	
 	(function() {
 		var chainDef = MyDeferred();
-		uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);
+		if(uploadObj.progressBar)
+			uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);	
+		else
+			chainDef.resolve();
+		
 		return chainDef;
 	}()).then(function() {
 		var chainDef = MyDeferred();
