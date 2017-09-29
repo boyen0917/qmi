@@ -5847,6 +5847,9 @@ section.fileSharing section.progress-bar .frame .progress ,
     position: relative;
     top: 1px;
     left: 1px;
+    -webkit-transition: width 1s;
+    -moz-transition: width 1s;
+    transition: width 1s;
 }
 section.fileSharing section.progress-bar .frame .text { position: absolute; top: 0 ;left: 65px;}
 section.fileSharing section.progress-bar .frame .cancel ,#compose-progressbar button

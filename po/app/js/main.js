@@ -32,7 +32,6 @@ $(function(){
 			// cns.debug("this_navi:",{name:this_navi.selector,data:this_navi.data("scroll-chk")});
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
 		    if(bottom_height && bottom_height >= last_height && !this_navi.data("scroll-chk")){
-				console.log("CCCCC@@222");
 		    	//避免重複
 		    	this_navi.data("scroll-chk",true);
 		    	cns.debug("last event ct:",this_navi.data("last-ct"));
@@ -265,7 +264,6 @@ $(function(){
 	//系統選單 Tab 
 	$(".system-tab").on('click','li',function(){
         var tab_id = $(this).attr('data-tab');
-        //console.log("tab is "+tab_id);
         $('ul.system-tab li').removeClass('current-tab');
         $(this).addClass('current-tab');
         
@@ -439,22 +437,8 @@ $(function(){
 
 		filter_action.parent().children(".st-filter-list-active").removeClass("st-filter-list-active");
 		filter_action.addClass("st-filter-list-active");
-		// var filter_name = $(this).find("span").html();
-
-		//動態變化
-		// $(".st-filter-main span").fadeOut("fast");
-		// $(".st-filter-other").slideUp(function(){
-		// 	$(".st-filter-main").addClass("st-filter-list-active");
-		// 	$(".st-filter-main img").attr("src","images/icon/icon_arrow_right.png");
-		// 	$(".st-filter-main span").html(filter_name);
-		// 	$(".st-filter-main span").fadeIn("fast");
-
-		// 	$(".st-filter-main-hide").hide();
-		// 	$(".st-filter-main").show();
-		// });
 
 		var filter_status = $(this).data("status");
-		console.log(filter_status);
 		//過濾發文類型
 		if(filter_status == "navi" || filter_status == "all"){
 			groupMainPage.find(".st-personal-area").hide();
@@ -667,9 +651,7 @@ $(function(){
 						var dom = $(this);
 						initStickerArea.showHistory( dom.parent() );
 					});
-					cns.debug("1");
 				}, function () {
-					console.log("heyhhey")
 					stickerIcon.click();
 				});
 			// }
@@ -818,7 +800,6 @@ $(function(){
 
         
     	if (e.keyCode == 8 || e.keyCode == 46) {
-    		console.log("backspace")
     		if (selectedText) {
     	// 		var range = selectionObj.getRangeAt(0);
     	// 		var selectedMarkNodes = getSelectedMarkNodes(range);
@@ -1395,7 +1376,6 @@ $(function(){
 				if(cnt < 3) {
 					cnt++;
 					this_compose.data("parse-waiting-retry",cnt);
-					cns.debug("yooo",cnt);
 
 					$(".cp-post").trigger("click");
 				}else{
@@ -1676,7 +1656,6 @@ $(function(){
 		}
 
 		if( fileList.length>0 ){
-			console.log("yo",fileList);
 			composePage.find(".cp-attach-area").show();
 			composePage.find(".cp-file-area").show();
 			var fileArea = composePage.find(".cp-file-else-area");

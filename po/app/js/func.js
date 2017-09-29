@@ -1386,7 +1386,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         var mainReplyText;
 
         deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.6 .st-reply-content-area', function(){
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.7 .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
@@ -1890,7 +1890,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.6 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.7 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -4035,33 +4035,36 @@ composeSend = function (this_compose){
     var uploadAllDoneDef = $.Deferred();
     var uploadUrl = "groups/" + gi + "/files";
     var uploadTotalCnt = 0;
-    var composeProgressBar = new ProgressBarCntr(function() {
+    var composeProgressBar = new QmiGlobal.ProgressBarConstructor(function() {
         var self = this;
         if(self.filesCnt.get() === 0) return;
 
         $("#compose-progressbar").remove();
-        self.barDom.set($("<section>", {
+
+        var barDom = $("<section>", {
             id: "compose-progressbar",
             style: "display: block",
             html: "<div class='container'><div class='title'>"+ $.i18n.getString("FILESHARING_UPLOADING") +"</div><div class='bar'></div>" + 
                     "<button>"+ $.i18n.getString("COMMON_CANCEL") +"</button>" + 
                     "<div class='cnt'><span class='curr' num='0'></span> / <span class='total'>"+ uploadTotalCnt +"</span></div></div>"
-        }));
+        });
 
+        self.barDom.set(barDom);
 
-        $("body").append(self.barDom.get());
+        $("body").append(barDom);
 
-        self.barDom.get().find("button").click(function() {
+        barDom.find("button").click(function() {
             uploadDefArr.forEach(function(item) {
                 item.reject();
-            })
-        })
+            });
+        });
+
+        self.onChange = function(pct) {
+            barDom.find(".bar").css("width", (Math.floor((pct || 0)*(100-self.basePct.get())/100)+self.basePct.get()-1.5)+"%");
+        };
     });
 
-    composeProgressBar.onChange = function(pct) {
-        var self = composeProgressBar;
-        self.barDom.get().find(".bar").css("width", (Math.floor((pct || 0)*(100-self.basePct.get())/100)+self.basePct.get()-1.5)+"%");
-    };
+        
     
     var isVdoExist = false;
 
@@ -4184,12 +4187,6 @@ composeSend = function (this_compose){
                         file: this_compose.data("upload-video")[key],
                         fileName: this_compose.data("upload-video")[key].name,
                         oriObj: {w: 1280, h: 1280, s: 0.9},
-                        setAbortFfmpegCmdEvent : function (ffmpegCmd) {
-                            $("#compose-progressbar button").off("click").on("click", function(e) {
-                                ffmpegCmd.kill();
-                                composeProgressBar.close();
-                            });
-                        },
                         progressBar: composeProgressBar,
                     }).done(function(resObj) {
                         composeProgressBar.add();
@@ -4262,11 +4259,13 @@ composeSend = function (this_compose){
         // 有一個失敗就不傳
         var errFileNameArr = [];
         Array.prototype.forEach.call(arguments, function(resObj) {
-            if(resObj.isSuccess === false) errFileNameArr.push(resObj.errFileName)
+            if(resObj.isSuccess === false && !resObj.isCancel) 
+                errFileNameArr.push(resObj.errFileName)
         });
 
         setTimeout(function() {
-            composeProgressBar.close(); 
+            composeProgressBar.close();
+
             if(errFileNameArr.length > 0) {
                 new QmiGlobal.popup({
                     title: $.i18n.getString("COMMON_UPLOAD_FAIL"),
@@ -4280,7 +4279,7 @@ composeSend = function (this_compose){
         }, 1000);
     // 取消
     }).fail(function() {
-        composeProgressBar.close();
+        composeProgressBar.cancel();
     })
 
     
@@ -6551,7 +6550,7 @@ replySend = function(thisEvent){
     var eventTp, fileBody;
     var imgArea = thisEvent.find(".st-reply-message-img");
     var replyFile = imgArea.data("file");
-    var replyProgressBar = new ProgressBarCntr(function(){
+    var replyProgressBar = new QmiGlobal.ProgressBarConstructor(function(){
         var self = this;
 
         var elem = thisEvent.find(".st-reply-message-area");
@@ -6559,28 +6558,30 @@ replySend = function(thisEvent){
         .find(".file-load").remove().end()
         .find('.st-reply-message-img').hide();
         
-
-        self.barDom.set($('<div class="file-load">'
+        var barDom = $('<div class="file-load">'
         + '<div class="file-content" percent="0%">'
           + '<div class="load-progress"><div class="bar"></div></div>'
           + '<div class="load-cancel">取消</div>'
-        + '</div></div>'));
+        + '</div></div>');
+
+        self.barDom.set(barDom);
 
         elem.prepend(self.barDom.get());
 
-        self.barDom.get().find(".load-cancel").click(function(){
+        barDom.find(".load-cancel").click(function(){
             elem.find('.st-reply-message-img').show();
-            self.barDom.get().remove();
             elem.data("cancelupload",true);
-            uploadXhr.abort();
-        });
-    });
+            thisEvent.find(".st-reply-message-send").data("reply-chk",false);
 
-    replyProgressBar.onChange = function(pct) {
-        var barDom = replyProgressBar.barDom.get();
-        barDom.find(".bar").css("width", pct);
-        barDom.find('.file-content').attr("percent", pct +"%");
-    };
+            self.cancel();
+        });
+
+        self.onChange = function(pct) {
+            var currPct = Math.floor((pct || 0)*(100-self.basePct.get())/100)+self.basePct.get();
+            barDom.find(".bar").css("width", currPct);
+            barDom.find('.file-content').attr("percent", currPct +"%");
+        };
+    });
 
     replyProgressBar.init();
 
@@ -6705,17 +6706,17 @@ replySend = function(thisEvent){
                 file: replyFile,
                 oriObj: {w: 1280, h: 1280, s: 0.9},
                 progressBar: replyProgressBar,
-                setAbortFfmpegCmdEvent : function (ffmpegCmd) {
-                    $(".load-cancel").off("click").on("click", function(e) {
-                        thisEvent.find(".st-reply-message-send").data("reply-chk",false);
+                // setAbortFfmpegCmdEvent : function (ffmpegCmd) {
+                //     $(".load-cancel").off("click").on("click", function(e) {
+                //         thisEvent.find(".st-reply-message-send").data("reply-chk",false);
 
-                        messageArea.find('.st-reply-message-img').show();
-                        messageArea.find(".file-load").remove();
-                        messageArea.data("cancelupload", true);
+                //         messageArea.find('.st-reply-message-img').show();
+                //         messageArea.find(".file-load").remove();
+                //         messageArea.data("cancelupload", true);
 
-                        ffmpegCmd.kill();
-                    });
-                },
+                //         ffmpegCmd.kill();
+                //     });
+                // },
                 updateCompressionProgress: function (percent) {
                     $(".load-bar").css("width", percent + '%');
                     $(".file-content").attr("percent", percent + '%');
@@ -6782,104 +6783,6 @@ replySend = function(thisEvent){
         replyApi( thisEvent, thisGi, thisTi, thisEi, body );
     })
 }
-
-ProgressBarCntr = function(init) {
-    var self = this;
-    var vdoCompressDefer = $.Deferred();
-    var basePct = 0;
-    var currCnt = 0;
-    var multiUploadProgress = {
-        map: {}, length: 0,
-        getTotal: function() {
-            var self = this;
-            return Object.keys(self.map).reduce(function(total, currId) {
-                return total += self.map[currId].total;
-            }, 0);
-        }
-    };
-    
-    self.init = init;
-
-    self.filesCnt = function() {
-        var cnt = 0;
-        return {
-            get: function() {return cnt;},
-            set: function(n) {cnt = n;}
-        }
-    }();
-
-    self.barDom = function() {
-        var barDom = 0;
-        return {
-            get: function() {return barDom;},
-            set: function(dom) {barDom = dom;}
-        }
-    }();
-
-    self.basePct = function() {
-        var basePct = 0;
-        return {
-            get: function() {return basePct;},
-            set: function(pct) {basePct = pct;}
-        }
-    }();
-
-    self.vdoCompressDefer = vdoCompressDefer;
-
-    self.xhr = function () {
-        var xhrId = new Date().getTime();
-        var uploadXhr = new window.XMLHttpRequest();
-        uploadXhr.upload.addEventListener("progress", function(evt){
-            multiUploadProgress.map[xhrId] = multiUploadProgress.map[xhrId] || {};
-            multiUploadProgress.map[xhrId].total = evt.total;
-            // 先等壓縮結束
-            vdoCompressDefer.done(function(isVdoUploaded) {
-                if(isVdoUploaded)
-                    self.basePct.set(QmiGlobal.vdoCompressBasePct);
-                
-                setTimeout(function() {
-                    var diff = evt.loaded - (multiUploadProgress.map[xhrId].loaded || 0);
-                    if(diff < 0) return;
-                    multiUploadProgress.length += diff;
-                    multiUploadProgress.map[xhrId].loaded = evt.loaded;
-                    var pct = getPct(multiUploadProgress.length / multiUploadProgress.getTotal());
-                    setProgressBarLength(pct);
-                }, 500);
-            });
-                
-        }, false);
-        return uploadXhr;
-
-        function getPct(pct) {
-            return Math.floor(pct*100)
-        }
-    };
-
-    self.set = setProgressBarLength;
-
-    self.add = function() {
-        if(self.filesCnt.get() === 0) return;
-        currCnt++;
-        // 先等壓縮結束
-        setTimeout(function() {
-            self.barDom.get().find("span.curr").attr("num", currCnt);
-        }, Math.random()*100 * 5);
-    };
-
-    self.close = function() {
-        if(self.filesCnt.get() === 0) return;
-        $("#compose-progressbar").remove();
-    };
-
-    function setProgressBarLength(pct) {
-        if(typeof self.onChange === "function")
-            self.onChange(pct);
-        else
-            self.barDom.get().find(".bar").css("width", (Math.floor((pct || 0)*(100-self.basePct.get())/100)+self.basePct.get())+"%");
-    }
-}
-
-
 
 replyApi = function(this_event, this_gi, this_ti, this_ei, body){
     s_load_show = false;

@@ -677,6 +677,9 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		s32: { url: s3Obj.s32 || s3Obj.ou}
 	};
 
+	if(isNotVdoCompress()) 
+		uploadObj.progressBar.vdoCompressDefer.resolve(false);
+
 	switch(uploadObj.tp) {
 		case 0: // 其他類型 檔案上傳
 			paramObj.s3.file = uploadObj.file;
@@ -687,7 +690,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			mt = uploadObj.file.type || "text";
 			si = uploadObj.file.size;
 			md = {w:100,h:100,l:100};
-	
+
 			mediaLoadDef.resolve();
 
 			break;
@@ -715,10 +718,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			// delete paramObj.s3;
 			contentType = "video/mp4";
-
-			uploadObj.updateCompressionProgress = function(length) {
-				uploadObj.progressBar.set(length);
-			}
 
 			$.when(
 				zipVideoFile(uploadObj), 
@@ -765,11 +764,12 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	
 	(function() {
 		var chainDef = MyDeferred();
+
 		if(uploadObj.progressBar)
-			uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);	
+			uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);
 		else
 			chainDef.resolve();
-		
+
 		return chainDef;
 	}()).then(function() {
 		var chainDef = MyDeferred();
@@ -777,6 +777,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		return chainDef;
 	}()).then(function() {
 		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
+
 			var ajaxArgs = {
 				url: paramObj[key].url,
 				type: 'PUT',
@@ -785,7 +786,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			 	data: paramObj[key].file, 
 				processData: false,
 			}
-			
 			if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar.xhr.bind(null, uploadObj.basePct);
 			arr[i] = $.ajax(ajaxArgs);
 			return arr;
@@ -802,11 +802,28 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				
 		}).fail(function() {
 			// 上傳s3 失敗
-			allDef.reject({status: 999, isSuccess: false, data: arguments});
+			allDef.reject({
+				status: 999, 
+				isSuccess: false, 
+				data: arguments,
+				isCancel: uploadObj.progressBar 
+					? uploadObj.progressBar.isCancel()
+					: false
+			});
 		});
-	})
+	});
 
 	return allDef.promise();
+
+	function isNotVdoCompress() {
+		// 影片
+		if(uploadObj.tp === 2) return false;
+		// 無進度條
+		if(!uploadObj.progressBar) return false;
+		// 多檔案
+		if(uploadObj.progressBar.filesCnt.get() > 1) return false;
+		return true;
+	}
 } // end of qmiUploadS3
 
 resetDB = function(options){
@@ -2199,6 +2216,9 @@ zipVideoFile = function (videoObj) {
        		fs.mkdirSync(tmpDir + '/video/');
        	}
 
+       	// set qmiUploadFile uploadObj
+       	videoObj.progressBar.ffmpeg.set(command);
+
 	    command.setFfmpegPath(nwDir + '/bin/ffmpeg');
 	    command.setFfprobePath(nwDir + '/bin/ffprobe');
 		
@@ -2244,9 +2264,8 @@ zipVideoFile = function (videoObj) {
 	                match = stderrLine.trim().match(/time=\d\d\:\d\d:\d\d/).toString().split('time=').slice(1).toString().split(':');
 	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
 	                percent = ((seconds / duration) * 80).toFixed();
-
-	                if (videoObj.updateCompressionProgress)
-	               	 	videoObj.updateCompressionProgress(percent);
+	                
+                	videoObj.progressBar.set(percent);
 	            }
 
 		  	}).on('error', function(err) {
@@ -2601,6 +2620,136 @@ QmiGlobal.MemberLocateModal.prototype = {
 		    }
 		}
 	}
+}
+
+// 上傳(包含多檔案)的流程 所以可能要再改名字 叫progressBar有點狹隘
+QmiGlobal.ProgressBarConstructor = function(init) {
+    var self = this;
+    var vdoCompressDefer = $.Deferred();
+    var basePct = 0;
+    var currCnt = 0;
+    var isCancel = false;
+    var multiUploadProgress = {
+        map: {}, length: 0,
+        getTotal: function() {
+            var self = this;
+            return Object.keys(self.map).reduce(function(total, currId) {
+                return total += self.map[currId].total;
+            }, 0);
+        }
+    };
+
+    self.multiUploadProgress = multiUploadProgress;
+    
+    self.init = init;
+
+    self.isCancel = function() {return isCancel;}
+
+    self.filesCnt = function() {
+        var cnt = 0;
+        return {
+            get: function() {return cnt;},
+            set: function(n) {cnt = n;}
+        }
+    }();
+
+    self.ffmpeg = function() {
+        var command = null;
+        return {
+            set: function(cmd) {command = cmd;},
+            kill: function() {
+            	if(!command) return null;
+            	command.kill();
+            	command = null;
+            }
+        }
+    }();
+
+    self.barDom = function() {
+        var barDom;
+        return {
+            get: function() {return barDom;},
+            set: function(dom) {barDom = dom;}
+        }
+    }();
+
+    self.basePct = function() {
+        var basePct = 0;
+        return {
+            get: function() {return basePct;},
+            set: function(pct) {basePct = pct;}
+        }
+    }();
+
+    self.vdoCompressDefer = vdoCompressDefer;
+
+    self.uploadXhr = {};
+    self.xhr = function () {
+        var xhrId = new Date().getTime();
+        var uploadXhr = new window.XMLHttpRequest();
+        uploadXhr.upload.addEventListener("progress", function(evt){
+            multiUploadProgress.map[xhrId] = multiUploadProgress.map[xhrId] || {xhr: uploadXhr};
+            multiUploadProgress.map[xhrId].total = evt.total;
+            // 先等壓縮結束
+
+            vdoCompressDefer.done(function(isVdoUploaded) {
+                if(isVdoUploaded)
+                    self.basePct.set(QmiGlobal.vdoCompressBasePct);
+                
+                setTimeout(function() {
+                    var diff = evt.loaded - (multiUploadProgress.map[xhrId].loaded || 0);
+                    if(diff < 0) return;
+                    multiUploadProgress.length += diff;
+                    multiUploadProgress.map[xhrId].loaded = evt.loaded;
+                    var pct = getPct(multiUploadProgress.length / multiUploadProgress.getTotal());
+                    setProgressBarLength(pct);
+                }, 500);
+            });
+                
+        }, false);
+
+        return uploadXhr;
+
+        function getPct(pct) {
+            return Math.floor(pct*100)
+        }
+    };
+
+    self.set = setProgressBarLength;
+
+    self.add = function() {
+        if(self.filesCnt.get() === 0) return;
+        currCnt++;
+        // 先等壓縮結束
+        setTimeout(function() {
+            self.barDom.get().find("span.curr").attr("num", currCnt);
+        }, Math.random()*100 * 5);
+    };
+
+    self.cancel = function() {
+    	isCancel = true;
+
+        self.close();
+        self.ffmpeg.kill();
+
+        // xhr abort 
+        var xhrMap = self.multiUploadProgress.map;
+        Object.keys(xhrMap).forEach(function(id) {
+        	xhrMap[id].xhr.abort();
+        });
+
+    };
+
+    self.close = function() {
+    	self.barDom.get().remove();
+    }
+
+    function setProgressBarLength(pct) {
+        if(typeof self.onChange === "function")
+            self.onChange(pct);
+        else
+            self.barDom.get().find(".bar").css("width", (Math.floor((pct || 0)*(100-self.basePct.get())/100)+self.basePct.get())+"%");
+    }
 }
 
 QmiGlobal.showNotification = function(argObj) {
