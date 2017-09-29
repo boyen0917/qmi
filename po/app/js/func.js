@@ -1385,7 +1385,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         var mainReplyText;
 
         deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.6 .st-reply-content-area', function(){
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.7 .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
@@ -1889,7 +1889,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.6 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.7 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -4056,7 +4056,6 @@ composeSend = function (this_compose){
             uploadDefArr.forEach(function(item) {
                 item.reject();
             });
-            // self.cancel("compose");
         });
 
         self.onChange = function(pct) {
@@ -4187,11 +4186,6 @@ composeSend = function (this_compose){
                         file: this_compose.data("upload-video")[key],
                         fileName: this_compose.data("upload-video")[key].name,
                         oriObj: {w: 1280, h: 1280, s: 0.9},
-                        // setAbortFfmpegCmdEvent : function (ffmpegCmd) {
-                        //     $("#compose-progressbar button").off("click").on("click", function(e) {
-                        //         composeProgressBar.cancel();
-                        //     });
-                        // },
                         progressBar: composeProgressBar,
                     }).done(function(resObj) {
                         composeProgressBar.add();
@@ -4284,7 +4278,7 @@ composeSend = function (this_compose){
         }, 1000);
     // 取消
     }).fail(function() {
-        composeProgressBar.cancel("compose fail");
+        composeProgressBar.cancel();
     })
 
     
@@ -6578,8 +6572,7 @@ replySend = function(thisEvent){
             elem.data("cancelupload",true);
             thisEvent.find(".st-reply-message-send").data("reply-chk",false);
 
-            console.log("yo123");
-            self.cancel("reply");
+            self.cancel();
         });
 
         self.onChange = function(pct) {

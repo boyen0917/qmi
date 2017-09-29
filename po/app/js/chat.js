@@ -1909,38 +1909,6 @@ function sendMsgText(dom) {
             	progressBar.init();
             	return progressBar;
             }(),
-          //   progressBarDom: dom.find(".progress-container"),
-          //   setAbortFfmpegCmdEvent : function (ffmpegCmd) {
-          //   	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-	         //    	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-	        	// 	dom.find(".chat-fail-status").show();
-	        	// 	dom.find(".progress-container").remove();
-
-	        	// 	ffmpegCmd.kill();
-	        	// });
-          //   },
-            updateCompressionProgress: function (percent) {
-            	dom.find(".chat-upload-progress").attr("max", 100).attr("value", percent);
-				dom.find(".upload-percent").html(percent + '%');
-            },
-
-            // progressBar: chatProgressBar,
-    //         progressBar: function () {
-    //         	uploadXhr = new window.XMLHttpRequest();
-
-    //         	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-    //         		console.log("upload cancel")
-				// 	uploadXhr.abort();
-				// });
-				// uploadXhr.upload.addEventListener("progress", function(evt){
-			 //      	if (evt.lengthComputable) {
-			 //        	dom.find(".chat-upload-progress").attr("max", 100).attr("value", 80 + Math.floor((evt.loaded / evt.total) * 20));
-				//       	dom.find(".upload-percent").html(80 + Math.floor((evt.loaded / evt.total) * 20) + '%');
-			 //      	}
-			 //    }, false);
-
-			 //    return uploadXhr;
-    //         },
             file: file,
             fileName: file.name,
             oriObj: {w: 1280, h: 1280, s: 0.9}

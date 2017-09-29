@@ -719,10 +719,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			// delete paramObj.s3;
 			contentType = "video/mp4";
 
-			// uploadObj.updateCompressionProgress = function(length) {
-			// 	uploadObj.progressBar.set(length);
-			// }
-
 			$.when(
 				zipVideoFile(uploadObj), 
 				// 取得截圖
@@ -2725,7 +2721,7 @@ QmiGlobal.ProgressBarConstructor = function(init) {
         }, Math.random()*100 * 5);
     };
 
-    self.cancel = function(id) {
+    self.cancel = function() {
     	isCancel = true;
 
         self.close();
