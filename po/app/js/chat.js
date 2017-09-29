@@ -1,30 +1,30 @@
-var ui,		//user id
-	g_room,	//chatRoom
-	ci,		//chatRoom id
-	g_cn,	//聊天室名字
-	g_group,//group
-	at,		//access token
-	g_isEndOfPage = false,	//是否在頁面底端
-	g_isEndOfPageTime = 0,	//捲動到底部過多久時間才會把卷到底的按鈕藏起來
-	g_needsRolling = false,	//是否要卷到頁面最下方？
-	g_msgs = [],			//目前已顯示的訊息ei array
-	g_latestDate = new Date(0),		//最新訊息時間(Date)
-	g_earliestDate = new Date(),	//最舊訊息時間(Date)
-	g_isLoadHistoryMsgNow = false,	//是否正在撈舊訊息
-	g_isEndOfHistory = false,	//是否已經沒有舊訊息
-	g_extraInputStatus = 0,		//其他輸入目前狀態(0:關閉, 2:sticker)
-	pi,		//舊的權限管理機制, 目前一律帶0, permission id for this chat room
-	ti_chat,
-	isUpdatePermission = false,		//目前權限改成用使用者列表控制//是否需要重新取得permission id
-	isGettingPermissionNow = false,	//是否正在取得權限
-	isShowUnreadAndReadTime = true,	//部分團體不顯示已未讀時間
-	window_focus = true,			//目前視窗是否focus中(node webkit only)
-	g_isReadPending = false,		//視窗focus時是否需要送已讀
-	g_tu,	//target user list, 帶給server用來做神奇的s3權限管理
-	g_isFirstTimeLoading = true,	//是否第一次進聊天室	
-	g_currentScrollToDom = null,	//捲動到最上方時會讀取舊訊息, 但視窗應停留在讀取前最後一筆訊息的dom, 用此變數暫存
-	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
-	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
+var ui;	//user id
+var g_room;	//chatRoom
+var ci;		//chatRoom id
+var g_cn;	//聊天室名字
+var g_group;//group
+var at;		//access token
+var g_isEndOfPage = false;	//是否在頁面底端
+var g_isEndOfPageTime = 0;	//捲動到底部過多久時間才會把卷到底的按鈕藏起來
+var g_needsRolling = false;	//是否要卷到頁面最下方？
+var g_msgs = [];			//目前已顯示的訊息ei array
+var g_latestDate = new Date(0);		//最新訊息時間(Date)
+var g_earliestDate = new Date();	//最舊訊息時間(Date)
+var g_isLoadHistoryMsgNow = false;	//是否正在撈舊訊息
+var g_isEndOfHistory = false;	//是否已經沒有舊訊息
+var g_extraInputStatus = 0;		//其他輸入目前狀態(0:關閉, 2:sticker)
+var pi;		//舊的權限管理機制, 目前一律帶0, permission id for this chat room
+var ti_chat;
+var isUpdatePermission = false;		//目前權限改成用使用者列表控制//是否需要重新取得permission id
+var isGettingPermissionNow = false;	//是否正在取得權限
+var isShowUnreadAndReadTime = true;	//部分團體不顯示已未讀時間
+var window_focus = true;			//目前視窗是否focus中(node webkit only)
+var g_isReadPending = false;		//視窗focus時是否需要送已讀
+var g_tu;	//target user list, 帶給server用來做神奇的s3權限管理
+var g_isFirstTimeLoading = true;	//是否第一次進聊天室	
+var g_currentScrollToDom = null;	//捲動到最上方時會讀取舊訊息, 但視窗應停留在讀取前最後一筆訊息的dom, 用此變數暫存
+var lockCurrentFocusInterval;		//讓視窗停留在最後一筆的interval
+var lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
 var isChatRoom = true;
 
@@ -335,6 +335,10 @@ $(function(){
 					//編號 方便刪除
 					this_grid.data("file-num", i);
 					this_grid.data("file", file);
+
+					// 上傳檔案
+					// chatProgressBar = new
+
 
 					var reader = new FileReader();
 					reader.onload = function (e) {
@@ -1764,7 +1768,7 @@ function sendMsgText(dom) {
 	function sendMsgImage(dom) {
 		var file = dom.data("file");
 		var tmpData = dom.data("data");
-		var uploadXhr;
+
 		if (null == file) {
 			setTimeout(function () {
 				popupShowAdjust("",
@@ -1790,10 +1794,6 @@ function sendMsgText(dom) {
 			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>0%"
 			+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
 
-		dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-			uploadXhr.abort();
-		});
-
 		dom.find(".chat-fail-status").hide();
 		qmiUploadFile({
             urlAjax: {
@@ -1808,17 +1808,13 @@ function sendMsgText(dom) {
             },
             tp: 1,
             hasFi: true,
-            progressBar: function () {
-            	uploadXhr = new window.XMLHttpRequest();
-				uploadXhr.upload.addEventListener("progress", function(evt){
-			      	if (evt.lengthComputable) {
-			        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
-				      	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
-			      	}
-			    }, false);
+            progressBar: function() {
+            	var progressBar = new QmiGlobal.ProgressBarConstructor(chatProgressBarInit);
+            	progressBar.barDom.set(dom);
+            	progressBar.init();
+            	return progressBar;
+            }(),
 
-			    return uploadXhr;
-            },
             file: dom.find("div img")[0],
             oriObj: {w: 1280, h: 1280, s: 0.7},
             tmbObj: {w: 480, h: 480, s: 0.6}
@@ -1861,7 +1857,7 @@ function sendMsgText(dom) {
 			} else {
 				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
 	        	dom.find(".chat-fail-status").show();
-	        	dom.find(".progress-container").remove();
+	        	// dom.find(".progress-container").remove();
 			}
         });
 	}
@@ -1907,36 +1903,44 @@ function sendMsgText(dom) {
             },
             tp: 2,
             hasFi: true,
-            progressBarDom: dom.find(".progress-container"),
-            setAbortFfmpegCmdEvent : function (ffmpegCmd) {
-            	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-	            	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-	        		dom.find(".chat-fail-status").show();
-	        		dom.find(".progress-container").remove();
+            progressBar: function() {
+            	var progressBar = new QmiGlobal.ProgressBarConstructor(chatProgressBarInit);
+            	progressBar.barDom.set(dom);
+            	progressBar.init();
+            	return progressBar;
+            }(),
+          //   progressBarDom: dom.find(".progress-container"),
+          //   setAbortFfmpegCmdEvent : function (ffmpegCmd) {
+          //   	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+	         //    	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
+	        	// 	dom.find(".chat-fail-status").show();
+	        	// 	dom.find(".progress-container").remove();
 
-	        		ffmpegCmd.kill();
-	        	});
-            },
+	        	// 	ffmpegCmd.kill();
+	        	// });
+          //   },
             updateCompressionProgress: function (percent) {
             	dom.find(".chat-upload-progress").attr("max", 100).attr("value", percent);
 				dom.find(".upload-percent").html(percent + '%');
             },
-            progressBar: function () {
-            	uploadXhr = new window.XMLHttpRequest();
 
-            	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-            		console.log("upload cancel")
-					uploadXhr.abort();
-				});
-				uploadXhr.upload.addEventListener("progress", function(evt){
-			      	if (evt.lengthComputable) {
-			        	dom.find(".chat-upload-progress").attr("max", 100).attr("value", 80 + Math.floor((evt.loaded / evt.total) * 20));
-				      	dom.find(".upload-percent").html(80 + Math.floor((evt.loaded / evt.total) * 20) + '%');
-			      	}
-			    }, false);
+            // progressBar: chatProgressBar,
+    //         progressBar: function () {
+    //         	uploadXhr = new window.XMLHttpRequest();
 
-			    return uploadXhr;
-            },
+    //         	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+    //         		console.log("upload cancel")
+				// 	uploadXhr.abort();
+				// });
+				// uploadXhr.upload.addEventListener("progress", function(evt){
+			 //      	if (evt.lengthComputable) {
+			 //        	dom.find(".chat-upload-progress").attr("max", 100).attr("value", 80 + Math.floor((evt.loaded / evt.total) * 20));
+				//       	dom.find(".upload-percent").html(80 + Math.floor((evt.loaded / evt.total) * 20) + '%');
+			 //      	}
+			 //    }, false);
+
+			 //    return uploadXhr;
+    //         },
             file: file,
             fileName: file.name,
             oriObj: {w: 1280, h: 1280, s: 0.9}
@@ -2029,17 +2033,24 @@ function sendMsgText(dom) {
             },
             tp: 0,
             hasFi: true,
-            progressBar: function () {
-            	uploadXhr = new window.XMLHttpRequest();
-				uploadXhr.upload.addEventListener("progress", function(evt){
-			      	if (evt.lengthComputable) {
-			        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
-				      	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
-			      	}
-			    }, false);
+            progressBar: function() {
+            	var progressBar = new QmiGlobal.ProgressBarConstructor(chatProgressBarInit);
+            	progressBar.barDom.set(dom);
+            	progressBar.init();
+            	return progressBar;
+            }(),
+            // progressBar: chatProgressBar,
+    //         progressBar: function () {
+    //         	uploadXhr = new window.XMLHttpRequest();
+				// uploadXhr.upload.addEventListener("progress", function(evt){
+			 //      	if (evt.lengthComputable) {
+			 //        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
+				//       	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
+			 //      	}
+			 //    }, false);
 
-			    return uploadXhr;
-            },
+			 //    return uploadXhr;
+    //         },
             file: file,
             oriObj: {w: 1280, h: 1280, s: 0.9}
         }).done(function(response){
@@ -3573,6 +3584,21 @@ function sendMsgText(dom) {
 		}
 	};
 })
+
+function chatProgressBarInit() {
+	var self = this;
+	var barDom = self.barDom.get();
+
+	barDom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+		self.cancel();
+	});
+
+	self.onChange = function(pct) {
+		var currPct = Math.floor((pct || 0)*(100-self.basePct.get())/100)+self.basePct.get();
+		barDom.find(".chat-upload-progress").attr("max", 100).attr("value", currPct);
+      	barDom.find(".upload-percent").html(currPct + '%');
+	}
+}
 
 var checkAuthPeriodically = function() {
 	var chk = false;
