@@ -2075,16 +2075,16 @@ function sendMsgText(dom) {
 	**/
 	function onClickSendChat() {
 		var inputDom = $("#footer .contents .input");
-		// var text = inputDom.val();
-		var text = inputDom.html().replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+		var msg = inputDom.text();
 		inputDom.html("");
-		if (text.length <= 0) return;
+		
+		if (msg.length <= 0) return;
 		console.log(g_room);
 		updateChatContentPosition();
 
 		// updateChatContentPosition();
 
-		var msg = text.replace(/<br\s*\/?>/g,"\n");
+		
 		// inputDom.val("").trigger('autosize.resize');
 
 		var dom = showUnsendMsg(msg, 0);
