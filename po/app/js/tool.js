@@ -2760,7 +2760,9 @@ QmiGlobal.ProgressBarConstructor = function(init) {
     };
 
     self.close = function() {
-    	self.barDom.get().remove();
+    	try {
+    		self.barDom.get().remove();
+    	} catch(e) {}
     }
 
     function setProgressBarLength(pct) {
