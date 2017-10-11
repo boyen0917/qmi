@@ -39,11 +39,19 @@ appInitial = function(needUpdate){
 			isMail = true;
 		}
 		var password = $(".login-ld-password input").val();
+		var accountPattern = new RegExp("[a-zA-Z0-9\\@\\_\\-\\.]+"); 
 
-		$(this).addClass("login-waiting");
-		//登入
-		login(phone_id,password,countrycode,isMail);
-		
+		if (isMail) {
+			if (phone_id.replace(accountPattern, "").length == 0) {
+				$(this).addClass("login-waiting");
+				login(phone_id,password,countrycode,isMail);
+			} else {
+				toastShow($.i18n.getString("LOGIN_FORMAT_CHECK"));
+			}
+		} else {
+			$(this).addClass("login-waiting");
+			login(phone_id,password,countrycode,isMail);
+		}
 	});
 
 	$(".login-ld-password").off("keypress").keypress(function(e){
@@ -183,9 +191,8 @@ appInitial = function(needUpdate){
 			var emailInput = $(".login-ld-email input");
 			var email = emailInput.val();
 			if( email && email.length>3 ){
-				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,5}$/,'');
+				// var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,5}$/,'');
 				
-				// if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
 				if(pwdInput.val().length >= 6){
 					$("#page-registration .login").addClass("login-ready");
 				}else{
