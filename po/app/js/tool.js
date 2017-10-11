@@ -719,23 +719,10 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			// delete paramObj.s3;
 			contentType = "video/mp4";
 
-			$.when(
-				zipVideoFile(uploadObj), 
-				// 取得截圖
-				function() {
-					var video = document.createElement('video');
-					video.src = URL.createObjectURL(uploadObj.file);
-
-					video.onloadeddata = function() {
-						console.log("load video finished");
-						var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
-						md = {l: Math.floor(video.duration * 1000)};
-						paramObj.s3.file = thumbnailVideo.blob;
-					}
-				}()
-			).done(function (uploadFile) {
+			$.when(zipVideoFile(uploadObj)).done(function (uploadFile) {
 				console.log("zip finished");
-				uploadObj.progressBar.vdoCompressDefer.resolve(true);
+
+				var video = document.createElement('video');
 
 				paramObj.s32.file = uploadFile;
 
@@ -743,10 +730,27 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				uploadObj.basePct = QmiGlobal.vdoCompressBasePct;
 
 				// 傳給外部 commit 使用
-				mt = uploadFile.type;
+				mt = contentType;
 				si = uploadFile.size;
 
-				mediaLoadDef.resolve();
+				video.src = URL.createObjectURL(uploadFile);
+
+				// 壓縮後再截圖，不然原影片不是h264就截不到
+				video.onloadeddata = function() {
+					console.log("load video finished");
+					var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
+
+					md = {
+						l: Math.floor(video.duration * 1000),
+						w: video.videoWidth,
+						h: video.videoHeight
+					};
+					paramObj.s3.file = thumbnailVideo.blob;
+
+					uploadObj.progressBar.vdoCompressDefer.resolve(true);
+					mediaLoadDef.resolve();
+				}
+
 			}).fail(function () { // 壓縮失敗
 				paramObj.s32.file = uploadObj.file;
 
@@ -773,6 +777,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		mediaLoadDef.done(chainDef.resolve);
 		return chainDef;
 	}()).then(function() {
+		console.log(paramObj.s3.file)
 		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
 
 			var ajaxArgs = {
@@ -2207,6 +2212,7 @@ zipVideoFile = function (videoObj) {
     	var seconds;　//目前進行的時間
        	var percent; //轉檔百分比;
        	var zipVideoActionDef = $.Deferred();
+       	var isVerticalVideo = false;
        	var getDurationDef = $.Deferred();
 
        	if (!fs.existsSync(tmpDir + '/video')) {
@@ -2222,10 +2228,21 @@ zipVideoFile = function (videoObj) {
 		command.ffprobe(function(err, inputInfo) {
 			// 非h264影片無法播放 需要進行轉檔
 			try {
-				// if(inputInfo.streams[0].codec_name !== "h264")
+				console.log(inputInfo)
+				var videoStream = inputInfo.streams.find(function(stream){
+					return stream.codec_type == "video";
+				})
+
+				if (videoStream) {
+					var ratio = videoStream.display_aspect_ratio.split(":");
+					if (parseInt(ratio[0]) < parseInt(ratio[1])) isVerticalVideo = true;
+
+					if ((ratio[0] == "0") || (ratio[1] == "0")) {
+						isVerticalVideo = (videoStream.coded_width < videoStream.coded_height);
+					}
+				}
 				getDurationDef.resolve(inputInfo.format.duration);
-				// else
-					// reject();
+
 			} catch(e) {reject();}
 
 			function reject() {
@@ -2237,10 +2254,18 @@ zipVideoFile = function (videoObj) {
 		$.when(getDurationDef).done(function(duration) {
 			// toastShow("此影片格式不支援 正在進行影片轉檔 如不需要請按取消");
 			command
-			// .duration(duration)
+			.duration(duration)
    			.videoCodec('libx264')
-   			.size('640x480')
-			.outputOptions('-c:a copy')
+   			.audioCodec('aac')
+
+   			console.log(isVerticalVideo)
+   			if (isVerticalVideo) {
+   				command.outputOptions("-vf scale=360:640,setsar=1")
+   			} else {
+   				command.outputOptions("-vf scale=640:360,setsar=1")
+   			}
+
+   			command
 			.outputOptions('-r 30')
 			.outputOptions('-refs 2')
 			.outputOptions('-crf 28')
