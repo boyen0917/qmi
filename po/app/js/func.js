@@ -4037,7 +4037,6 @@ composeSend = function (this_compose){
     var uploadTotalCnt = 0;
     var composeProgressBar = new QmiGlobal.ProgressBarConstructor(function() {
         var self = this;
-        if(self.filesCnt.get() === 0) return;
 
         $("#compose-progressbar").remove();
 
@@ -4249,11 +4248,14 @@ composeSend = function (this_compose){
         if(is_push) body.ml.push(obj);
     });
     
-    composeProgressBar.filesCnt.set(uploadTotalCnt);
-    if(!isVdoExist) composeProgressBar.vdoCompressDefer.resolve(false);
+    // 上傳檔案存在才做
+    if(uploadTotalCnt) {
+        composeProgressBar.filesCnt.set(uploadTotalCnt);
+        if(!isVdoExist) composeProgressBar.vdoCompressDefer.resolve(false);
 
-    // 進度條
-    composeProgressBar.init();
+        // 進度條
+        composeProgressBar.init();
+    }
 
     $.when.apply($, uploadDefArr).done(function() {
         // 有一個失敗就不傳
@@ -6705,22 +6707,7 @@ replySend = function(thisEvent){
                 hasFi: true,
                 file: replyFile,
                 oriObj: {w: 1280, h: 1280, s: 0.9},
-                progressBar: replyProgressBar,
-                // setAbortFfmpegCmdEvent : function (ffmpegCmd) {
-                //     $(".load-cancel").off("click").on("click", function(e) {
-                //         thisEvent.find(".st-reply-message-send").data("reply-chk",false);
-
-                //         messageArea.find('.st-reply-message-img').show();
-                //         messageArea.find(".file-load").remove();
-                //         messageArea.data("cancelupload", true);
-
-                //         ffmpegCmd.kill();
-                //     });
-                // },
-                updateCompressionProgress: function (percent) {
-                    $(".load-bar").css("width", percent + '%');
-                    $(".file-content").attr("percent", percent + '%');
-                },
+                progressBar: replyProgressBar
             }).done(uploadDef.resolve)
 
             break;
@@ -6808,9 +6795,12 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
         setTimeout(function(){
             this_event.find(".st-reply-message-send").data("reply-chk",false);
             clearReplyDomData(this_event);
-            if(this_event.find(".st-reply-all-content-area").is(":visible")) {
+            
+            if(this_event.hasClass("detail"))
                 replyReload(this_event);
-            }else{
+            else if(this_event.find(".st-reply-all-content-area").is(":visible"))
+                replyReload(this_event);
+            else { 
                 if(this_event.find(".st-reply-message-img").is(":visible"))this_event.find(".st-reply-message-img").html("");
                 if(this_event.find(".stickerArea").is(":visible")) this_event.find(".stickerArea").hide();
                 this_event.find(".st-sub-box-2").trigger("detailShow");
