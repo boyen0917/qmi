@@ -2228,10 +2228,9 @@ zipVideoFile = function (videoObj) {
 		command.ffprobe(function(err, inputInfo) {
 			// 非h264影片無法播放 需要進行轉檔
 			try {
-				console.log(inputInfo)
-				var videoStream = inputInfo.streams.find(function(stream){
+				var videoStream = Array.prototype.find.call(inputInfo.streams, function(stream){
 					return stream.codec_type == "video";
-				})
+				});
 
 				if (videoStream) {
 					var ratio = videoStream.display_aspect_ratio.split(":");
