@@ -389,7 +389,7 @@ QmiGlobal.aesCrypto = {
 }
 
 htmlFormat = function (str, isToCharCode){
-	var urlRegex = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
+	var urlRegex = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
 	if(str.match(/\&\#\d+\;*/g)){
 		str = str.replace(/\&\#/g,"&#38;&#35;");
   	} 
