@@ -2707,7 +2707,7 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
             if( branchPath && branchPath.length > 0 ){
                 branchID = branchPath[branchPath.length-1];
                 if( bl.hasOwnProperty(branchID) ){
-                    extraContent = bl[branchID].bn;
+                    tContent = bl[branchID].bn;
                 }
             }
         }
@@ -3840,14 +3840,14 @@ composeSend = function (this_compose){
     
     }
 
-    var hashtagList = composeContent.extractHashTag();
+    // var hashtagList = composeContent.extractHashTag();
 
-    hashtagList.forEach(function(hashtag) {
-        body.ml.push({
-            "k": hashtag,
-            "tp": 29
-        });
-    });
+    // hashtagList.forEach(function(hashtag) {
+    //     body.ml.push({
+    //         "k": hashtag,
+    //         "tp": 29
+    //     });
+    // });
 
     tmpElement.innerHTML = composeContent;
 
@@ -6612,14 +6612,14 @@ replySend = function(thisEvent){
         }
     }
 
-    var hashtagList = text.extractHashTag();
+    // var hashtagList = text.extractHashTag();
 
-    hashtagList.forEach(function(hashtag) {
-        body.ml.push({
-            "k": hashtag,
-            "tp": 29
-        });
-    });
+    // hashtagList.forEach(function(hashtag) {
+    //     body.ml.push({
+    //         "k": hashtag,
+    //         "tp": 29
+    //     });
+    // });
 
     tmpElement.innerHTML = text;
 
