@@ -1013,6 +1013,9 @@
 	                info : {
 	                    nk : userData.nk,
 	                    sl : userData.sl,
+	                    mkb : userData.mkb,
+	                    mke : userData.mke,
+	                    mkp : userData.mkp,
 	                }
 	            };
 	            var switchName = e.target.id;

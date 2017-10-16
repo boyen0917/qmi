@@ -757,6 +757,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				// 傳給外部 commit 使用
 				mt = uploadObj.file.type;
 				si = uploadObj.file.size;
+
 			});
 			
 			break;
@@ -2296,6 +2297,7 @@ zipVideoFile = function (videoObj) {
 		  		zipVideoActionDef.resolve();
 		  	})
 		  	.save(outputPath)
+
 		});
 
         zipVideoActionDef.done(function () {
@@ -2304,6 +2306,7 @@ zipVideoFile = function (videoObj) {
         		var blob = new Blob([byteArray], {type: 'application/octet-binary'});
         		blob.name = videoObj.file.name;
         		transferBlobDef.resolve(blob);
+
         		
         		fs.unlinkSync(outputPath);
         	});

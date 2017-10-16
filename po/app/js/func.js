@@ -54,6 +54,7 @@ setGroupInitial = function(new_gi,chk){
     return allDoneDeferred.promise();
 }
 
+
 chkBranch = function(){
     // cns.debug("=========================");
     // cns.debug("typeof QmiGlobal.groups[gi].bl:",typeof QmiGlobal.groups[gi].bl);
@@ -1385,7 +1386,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         var mainReplyText;
 
         deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.7 .st-reply-content-area', function(){
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.9 .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
@@ -1889,7 +1890,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.7 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.9 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -2706,7 +2707,7 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
             if( branchPath && branchPath.length > 0 ){
                 branchID = branchPath[branchPath.length-1];
                 if( bl.hasOwnProperty(branchID) ){
-                    extraContent = bl[branchID].bn;
+                    tContent = bl[branchID].bn;
                 }
             }
         }
@@ -3839,14 +3840,14 @@ composeSend = function (this_compose){
     
     }
 
-    var hashtagList = composeContent.extractHashTag();
+    // var hashtagList = composeContent.extractHashTag();
 
-    hashtagList.forEach(function(hashtag) {
-        body.ml.push({
-            "k": hashtag,
-            "tp": 29
-        });
-    });
+    // hashtagList.forEach(function(hashtag) {
+    //     body.ml.push({
+    //         "k": hashtag,
+    //         "tp": 29
+    //     });
+    // });
 
     tmpElement.innerHTML = composeContent;
 
@@ -6611,14 +6612,14 @@ replySend = function(thisEvent){
         }
     }
 
-    var hashtagList = text.extractHashTag();
+    // var hashtagList = text.extractHashTag();
 
-    hashtagList.forEach(function(hashtag) {
-        body.ml.push({
-            "k": hashtag,
-            "tp": 29
-        });
-    });
+    // hashtagList.forEach(function(hashtag) {
+    //     body.ml.push({
+    //         "k": hashtag,
+    //         "tp": 29
+    //     });
+    // });
 
     tmpElement.innerHTML = text;
 

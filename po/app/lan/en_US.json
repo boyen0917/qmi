@@ -85,7 +85,7 @@
 	"LOGIN_FORMAT_CHECK" : "Allowed symbol: . - _ @    Maximum length: 128",
 
 	"REGISTER_ACCOUNT_REGITST_TITLE" :	"Sign Up",
-	"REGISTER_ACCOUNT_POLICY" :	"I agree to Co+'s %@Term of Use%@ and %@Privacy Policy%@.",
+	"REGISTER_ACCOUNT_POLICY" :	"I agree to Qmi's %@Term of Use%@ and %@Privacy Policy%@.",
 	"REGISTER_ACCOUNT_WARN_TITEL" :	"Phone Number Confirmation",
 	"REGISTER_ACCOUNT_WARN" :	"The verification code will be sent to the following phone number。",
 	"REGISTER_AUTH_ENTER_CODE" :	"Enter your Verification Code",
