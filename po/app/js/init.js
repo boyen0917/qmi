@@ -35,7 +35,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://ap.qmi.emome.net/";
 
 //timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [
@@ -287,7 +287,17 @@ window.QmiGlobal = {
 	method: {}, // 公用函數
 	rspCode401: false,
 
-	vdoCompressBasePct: 80, // 壓縮預設比例
+	vdoCompressBasePct: 80, // 壓縮預設進度條比例
+
+	// 圖片壓縮
+	imgCompress: {
+		oR: 0.9,
+		tR: 0.2,
+		oH: 1280,
+		oW: 1280,
+		tH: 1280,
+		tW: 1280
+	},
 
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天

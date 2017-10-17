@@ -5891,8 +5891,8 @@ getS3fileBackground = function(file_obj,target,tp, tu, callback){
             switch(tp){
                 case 6://圖片
                     //小圖
-                    target.attr("s3bg",obj.s32);
-                    target.css("background-image","url('"+obj.s32+"')");
+                    target.attr("s3bg",obj.s3);
+                    target.css("background-image","url('"+obj.s3+"')");
                     //大圖
                     target.data("auo",obj.s32);
                     break;
@@ -6674,7 +6674,7 @@ replySend = function(thisEvent){
                 hasFi: true,
                 file: thisEvent.find(".st-reply-message-img img")[0],
                 oriObj: {w: 1280, h: 1280, s: 0.7},
-                tmbObj: {w: 480, h: 480, s: 0.6}, // ;
+                tmbObj: {w: 480, h: 480, s: 0.6},
                 progressBar: replyProgressBar
             }).done(uploadDef.resolve);
             break;
