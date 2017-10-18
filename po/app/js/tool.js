@@ -851,7 +851,7 @@ resetDB = function(options){
 	});
 
 	// 清除app cache
-	QmiGlobal.nwGui.App.clearCache();
+	if(QmiGlobal.nwGui) QmiGlobal.nwGui.App.clearCache();
 	
 }
 
