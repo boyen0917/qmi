@@ -62,7 +62,7 @@ showSelectMemPage = function( parentDom, dataDom, onPageChanged, onDone, isBackW
 	if( $("#page-selectMem").length>0 ){
 		showSelectMemPageDelegate( dataDom, onPageChanged, onDone, isBackWhenDone );
 	} else {
-		$('<div>').load('layout/memberSelect.html?v2.0.0.9',function(){
+		$('<div>').load('layout/memberSelect.html?v2.0.0.10',function(){
 			parentDom.append( $(this).find("#page-selectMem") );
 			showSelectMemPageDelegate( dataDom, onPageChanged, onDone, isBackWhenDone );
 		});
