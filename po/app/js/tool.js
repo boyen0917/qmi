@@ -666,9 +666,8 @@ qmiUploadFile = function(uploadObj){
 
 // 做 s3 上傳
 qmiUploadS3 = function(uploadObj,s3Obj) {
+	// uploadObj.oriObj 不使用 統一在init設定
 	var allDef = $.Deferred();
-	var tmbObj = uploadObj.tmbObj;
-	var oriObj = uploadObj.oriObj;
 	var uploadDef = $.Deferred();
 	var mediaLoadDef = $.Deferred();
 	var oriFile, tmbFile, mt, si, md, contentType;
@@ -695,8 +694,8 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 
 			break;
 		case 1: // 圖
-			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s);
-			var tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
+			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, QmiGlobal.imgCompress.oW,  QmiGlobal.imgCompress.oH,  QmiGlobal.imgCompress.oR);
+			var tFile = imgResizeByCanvas(uploadObj.file, 0, 0, QmiGlobal.imgCompress.tW,  QmiGlobal.imgCompress.tH,  QmiGlobal.imgCompress.tR);
 
 			paramObj.s32.file = oFile.blob;
 			paramObj.s3.file = tFile.blob;
@@ -850,6 +849,9 @@ resetDB = function(options){
 	(options.removeItemArr || []).forEach(function(str) {
 		localStorage.removeItem(str);
 	});
+
+	// 清除app cache
+	if(QmiGlobal.nwGui) QmiGlobal.nwGui.App.clearCache();
 	
 }
 

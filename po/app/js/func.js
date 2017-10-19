@@ -1386,7 +1386,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         var mainReplyText;
 
         deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.9 .st-reply-content-area', function(){
+        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.0.0.10 .st-reply-content-area', function(){
             var this_load = $(this).find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
@@ -1890,7 +1890,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.9 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.0.0.10 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -5891,8 +5891,8 @@ getS3fileBackground = function(file_obj,target,tp, tu, callback){
             switch(tp){
                 case 6://圖片
                     //小圖
-                    target.attr("s3bg",obj.s32);
-                    target.css("background-image","url('"+obj.s32+"')");
+                    target.attr("s3bg",obj.s3);
+                    target.css("background-image","url('"+obj.s3+"')");
                     //大圖
                     target.data("auo",obj.s32);
                     break;
@@ -6674,7 +6674,7 @@ replySend = function(thisEvent){
                 hasFi: true,
                 file: thisEvent.find(".st-reply-message-img img")[0],
                 oriObj: {w: 1280, h: 1280, s: 0.7},
-                tmbObj: {w: 480, h: 480, s: 0.6}, // ;
+                tmbObj: {w: 480, h: 480, s: 0.6},
                 progressBar: replyProgressBar
             }).done(uploadDef.resolve);
             break;

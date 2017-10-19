@@ -1,4 +1,4 @@
-// version 2.0.0.9
+// version 2.0.0.10
 
 var ui;
 var at;
@@ -34,6 +34,8 @@ var base_url = function() {
 		return !!window.location.href.match(regDomain);
 	}
 }();
+
+var base_url = "https://qmi17.mitake.com.tw/";
 
 //timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [
@@ -177,7 +179,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整
-	appVer: "2.0.0.9",
+	appVer: "2.0.0.10",
 
 	title: "Qmi",
 
@@ -285,7 +287,17 @@ window.QmiGlobal = {
 	method: {}, // 公用函數
 	rspCode401: false,
 
-	vdoCompressBasePct: 80, // 壓縮預設比例
+	vdoCompressBasePct: 80, // 壓縮預設進度條比例
+
+	// 圖片壓縮
+	imgCompress: {
+		oR: 0.9,
+		tR: 0.2,
+		oH: 1280,
+		oW: 1280,
+		tH: 1280,
+		tW: 1280
+	},
 
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
