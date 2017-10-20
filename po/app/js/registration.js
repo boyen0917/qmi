@@ -247,7 +247,7 @@ appInitial = function(needUpdate){
 		}
 
 		$(this).data("chk",remeber_chk);
-	});
+	}).click();
 
 	$(".login-change").click(function(){
 		$(".login-change").data("chk",true);
