@@ -3504,6 +3504,19 @@ img.st-user-pic{
 .st-slide-img.loaded {
 	background-size: cover;
 }
+
+#page-group-main td.contain:before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 99%;
+    background: #eee;
+}
+
+#page-group-main td.contain {position: relative;}
+#page-group-main td.contain .st-slide-img.loaded.tall-img {background-size: contain;}
+
+
 .st-attach-img-area .st-slide-img.loadError {
 	background-image: url(../images/common/icon/icon_noPhoto.png);
 	background-size: 300px 130px;
