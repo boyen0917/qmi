@@ -10,13 +10,15 @@ $(function(){
 	});
 
 	$("#page-group-main .subpage-timeline.main-subpage").bind('scroll', function() {
+		var mainPage = $("#page-group-main");
 		//取舊資料
-		var feed_type = $("#page-group-main").data("navi");
+		var feed_type = mainPage.data("mainGu") ? "main" : mainPage.data("navi");
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
 		if (feed_type != "main") {
 			feed_type = ("0" + feed_type).slice(-2) || "00";
 		}
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+
 		// var this_navi = $(".feed-subarea:visible");
 		//判斷沒資料的元件存在時 就不動作
 		if( this_navi.hasClass("no-data") ) return;	
@@ -439,6 +441,7 @@ $(function(){
 		filter_action.addClass("st-filter-list-active");
 
 		var filter_status = $(this).data("status");
+
 		//過濾發文類型
 		if(filter_status == "navi" || filter_status == "all"){
 			groupMainPage.find(".st-personal-area").hide();
