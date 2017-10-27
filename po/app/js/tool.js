@@ -1553,72 +1553,39 @@ setGroupAttributes = function( this_gi, data ){
 //更新團體資訊
 updateGroupAllInfoDom = function( thisGi ){
 	try{
-		var group = QmiGlobal.groups[thisGi];
+		var groupData = QmiGlobal.groups[thisGi];
+		var groupSmDom = $("#page-group-main div.gm-side-menu div.sm-group-area[data-gi="+thisGi+"]");
 
-		//update icon
-		var emptyAuo = "images/common/others/name_card_nophoto_profile.png";
-		var emptyAut = "images/common/others/empty_img_all_l.png";
-		if( group.auo ){
-			$(".polling-group-pic-o[data-gi="+thisGi+"]").attr("src", group.auo);
-		} else {
-			$(".polling-group-pic-o[data-gi="+thisGi+"]").attr("src", emptyAuo);
+		// 團體列表
+		groupSmDom.find(".polling-group-pic-o").attr("src", groupData.auo || "images/common/others/name_card_nophoto_profile.png");
+		groupSmDom.find(".polling-group-pic-t").attr("src", groupData.aut || QmiGlobal.emptyGrpPicStr);
+
+		//管理員圖示
+	    if(groupData.ad == 1)
+	        groupSmDom.find(".sm-icon-host").show();
+	    else
+	        groupSmDom.find(".sm-icon-host").hide();
+
+	    // 團體列表
+		groupSmDom.find(".polling-group-name")
+		.find("div:nth-child(1)").html(groupData.gn._escape()).end()
+		.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", QmiGlobal.getActivedUserNum(thisGi)));
+
+		// 等於當前團體 再做更新ui tab
+		if(gi==thisGi) {
+			// 最左上方 當前團體 
+			$("#page-group-main div.gm-header-left > div.currentGroup").html(groupData.gn)
+
+			updateTab( thisGi );
 		}
-		if( group.aut ){
-			$(".polling-group-pic-t[data-gi="+thisGi+"]").attr("src", group.aut);
-		} else {
-			$(".polling-group-pic-t[data-gi="+thisGi+"]").attr("src", emptyAut);
-		}
 
-		//update name
-		// updateSideMenuContent(thisGi);
-
-		if( gi==thisGi ){
-			//update icon
-			if( group.auo ){
-				$(".polling-group-pic-o.currentGroup").attr("src", group.auo);
-			} else {
-				$(".polling-group-pic-o.currentGroup").attr("src", emptyAuo);
-			}
-			if( group.aut ){
-				$(".polling-group-pic-t.currentGroup").attr("src", group.aut);
-			} else {
-				$(".polling-group-pic-t.currentGroup").attr("src", emptyAut);
-			}
-
-			//update name
-			$(".polling-group-name.currentGroup").html(group.gn._escape());
-			$(".polling-group-description.currentGroup").html(htmlFormat(group.gd));
-
-			// 等於當前團體 再做更新ui tab
-    		updateTab( thisGi );
-		}
 	} catch(e){
 		errorReport(e);
 	}
 }
 
 
-updateSideMenuContent = function(thisGi) {
-	//update name
-	if(QmiGlobal.groups[thisGi] === undefined) return;
-	
-	var groupData = QmiGlobal.groups[thisGi],
-		gn = groupData.gn._escape(),
-		gd = groupData.gd._escape(),
-		ad = groupData.ad;
-	//管理員圖示
-	var tmp = $(".sm-group-area[data-gi="+thisGi+"]");
-    if(ad == 1){
-        tmp.find(".sm-icon-host").show();
-    } else{
-        tmp.find(".sm-icon-host").hide();
-    }
-
-	$(".polling-group-name[data-gi="+thisGi+"]")
-	.find("div:nth-child(1)").html(gn).end()
-	.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", QmiGlobal.getActivedUserNum(thisGi)));
-	$(".polling-group-description[data-gi="+groupData.gi+"]").html(gd);
-}
+updateSideMenuContent = function(thisGi) {}
 
 updateGroupIconDom = function( this_gi ){
 	try{

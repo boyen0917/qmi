@@ -7621,7 +7621,7 @@ pollingCmds = function(newPollingData){
         newPollingData.cmds.sort(function(a, b) {
             return a.ct - b.ct;
         }).forEach(function(item, i, arr){ // 後面有 bind([]) 用this來判斷是否重複
-
+            var self = this;
             var comboDeferred = $.Deferred();
             var insideDeferred = $.Deferred();
 
@@ -7636,8 +7636,8 @@ pollingCmds = function(newPollingData){
                 insideDeferred.resolve(false);  
             }
 
-            // 不重複的gi)
-            else if(this.indexOf(item.pm.gi) >= 0) insideDeferred.resolve(false);
+            // 不重複的gi
+            else if(self.indexOf(item.pm.gi) >= 0) insideDeferred.resolve(false);
             
             // item.tp = 6 會這樣
             else if(QmiGlobal.groups[(item.pm || {}).gi] === undefined) {
@@ -7667,11 +7667,13 @@ pollingCmds = function(newPollingData){
                 if( status === false ) return;
                 comboDeferredPoolArr.push(comboDeferred);
                 getGroupComboInit(item.pm.gi).done(function(result){
-                    if(leavedGiArr.indexOf(item.pm.gi) < 0) leavedGiArr.push(item.pm.gi);
+                    // if(leavedGiArr.indexOf(item.pm.gi) < 0) leavedGiArr.push(item.pm.gi);
                     comboDeferred.resolve(result);
                 });
+
+                self.push(item.pm.gi);
             })
-            this.push(item.pm.gi);
+            
         }.bind([]))
 
         $.when.apply($, comboDeferredPoolArr).done(function(){
@@ -7747,7 +7749,7 @@ pollingCmds = function(newPollingData){
                     case 4: //someone join
 
                         item.pm.isNewMem = true;
-                        updateSideMenuContent(item.pm.gi);
+                        // updateSideMenuContent(item.pm.gi);
 
                         item.pm.onGetMemData = function(thisGi, memData){
                             // 官方帳號不顯示
@@ -7783,7 +7785,7 @@ pollingCmds = function(newPollingData){
                     case 5://edit user info
                         user_info_arr.push( item.pm );
 
-                        updateSideMenuContent(item.pm.gi);
+                        // updateSideMenuContent(item.pm.gi);
                         
                         if( gi == item.pm.gi ) isUpdateMemPage = true;
                         break;
@@ -7804,7 +7806,7 @@ pollingCmds = function(newPollingData){
                             });
                         }
 
-                        updateSideMenuContent(item.pm.gi);
+                        // updateSideMenuContent(item.pm.gi);
 
                         item.pm.onGetMemData = function(thisGi, memData){
                             try{
