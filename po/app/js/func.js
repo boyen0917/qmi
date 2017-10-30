@@ -7591,7 +7591,8 @@ pollingCountsWrite = function(pollingData, aa){
                 + ((thisCntObj.A5) ? thisCntObj.A5 : 0);
 
             sort_arr.push([thisGi,thisCntObj.A5]);
-            dom.html(countsFormat(groupBadgeNumber, dom)).show();
+            // 保險
+            if (groupBadgeNumber > 0) dom.html(countsFormat(groupBadgeNumber, dom)).show();
 
             appBadgeNumber += groupBadgeNumber;
         }
