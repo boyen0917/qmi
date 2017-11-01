@@ -756,7 +756,19 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				// 傳給外部 commit 使用
 				mt = uploadObj.file.type;
 				si = uploadObj.file.size;
+				var video = document.createElement('video');
+				video.src = URL.createObjectURL(uploadObj.file);
 
+				// 壓縮後再截圖，不然原影片不是h264就截不到
+				video.onloadeddata = function() {
+					md = {
+						l: Math.floor(video.duration * 1000),
+						w: video.videoWidth,
+						h: video.videoHeight
+					};
+					uploadObj.progressBar.vdoCompressDefer.resolve(false);
+					mediaLoadDef.resolve();
+				}
 			});
 			
 			break;

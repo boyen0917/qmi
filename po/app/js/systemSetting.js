@@ -989,7 +989,7 @@ QmiGlobal.module.ldapSetting = {
 
     strMap: {
         // 0 是公雲; 1是 sso
-        add: ["ACCOUNT_BINDING_BINDING_NEW_ACCOUNT", "ACCOUNT_BINDING_BIND_QMI_ACCOUNT"],
+        add: ["ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT", "ACCOUNT_BINDING_BIND_QMI_ACCOUNT"],
         noData1: ["ACCOUNT_BINDING_PRESS_TO_BIND_LDAP_ACCOUNT", "WEBONLY_ACCOUNT_BINDING_SSO_NODATA1"],
         noData2: ["WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT", "WEBONLY_ACCOUNT_BINDING_SSO_NODATA2"],
         write: function(type) {
@@ -1006,7 +1006,7 @@ QmiGlobal.module.ldapSetting = {
         + "</section>"
         + "<section class='ldap-edit' role='page' ldap-type='add'>"
         + "    <section class='icon-shield'></section>"
-        + "    <div class='title one add' content='"+ $.i18n.getString("ACCOUNT_BINDING_BINDING_NEW_ACCOUNT") +"'></div>"
+        + "    <div class='title one add' content='"+ $.i18n.getString("ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT") +"'></div>"
         + "    <div class='title one check' content='"+ $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") +"'></div>"
         + "    <div class='title one delete' content='"+ $.i18n.getString("ACCOUNT_BINDING_DISCONNECT_ACCOUNT") +"'></div>"
         +   (function() {
