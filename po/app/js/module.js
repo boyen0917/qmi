@@ -325,7 +325,7 @@ QmiGlobal.module.systemPopup = {
         + 	'<div class="line"></div>'
         + 	'<div class="sm-info-hr" data-textid="SYSTEM"></div>'
         + 	'<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'
-        + 	'<div data-sm-act="system-ldapSetting" class="sm-info sm-small-area" data-textid="'+ (QmiGlobal.auth.isSso ? "ACCOUNT_BINDING_BIND_QMI_ACCOUNT" : "ACCOUNT_BINDING_BINDING_NEW_ACCOUNT" )+'"></div>'
+        + 	'<div data-sm-act="system-ldapSetting" class="sm-info sm-small-area" data-textid="'+ (QmiGlobal.auth.isSso ? "ACCOUNT_BINDING_BIND_QMI_ACCOUNT" : "ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT" )+'"></div>'
         + 	'<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'
         + '</div>';
     }
