@@ -7586,9 +7586,8 @@ pollingCountsWrite = function(pollingData, aa){
         // 移轉 隱藏polling
         if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
-        if ( thisCntObj.A2 > 0 || thisCntObj.A5 > 0) {
-            groupBadgeNumber = ((thisCntObj.A2) ? thisCntObj.A2 : 0) 
-                + ((thisCntObj.A5) ? thisCntObj.A5 : 0);
+        if (thisCntObj.A5 > 0) {
+            groupBadgeNumber = thisCntObj.A5;
 
             sort_arr.push([thisGi,thisCntObj.A5]);
             // 保險
