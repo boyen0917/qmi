@@ -317,7 +317,8 @@ window.QmiGlobal = {
 		"_loginData",
 		"_loginRemeber",
 		"_lastBaseUrl",
-		"_sticker"
+		"_sticker",
+		"groupChat",
 	],
 
 	viewMap: {}, // cloud reload

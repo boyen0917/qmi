@@ -374,6 +374,7 @@ function openChatWindow ( giTmp, ci ){
 	var topListDom = $(".top-chatList");
 	clearChatListCnt( giTmp, ci );
 	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
+		windowList[ci].QmiGlobal.getAppWin().focus();
 		// windowList[ci].focus();
 	} else {
 		var data= {
