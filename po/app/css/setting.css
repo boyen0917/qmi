@@ -1236,7 +1236,7 @@ input[type=radio] {
 
 #view-ldap-setting .list > div.expired {color: #e66161; cursor: pointer;}
 
-#view-ldap-setting.cover:before.back {
+#view-ldap-setting.cover:before {
     content: url(../images/spinner.gif);
     z-index: 1;
     transition: 0.5s;

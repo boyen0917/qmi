@@ -1134,7 +1134,7 @@ $(function(){
 	        },100);
 		}else{
 			//非管理者不能使用公告
-			if(QmiGlobal.groups[gi].guAll[gu].ad == 1){
+			if((QmiGlobal.groups[gi].guAll[gu] || {}).ad == 1){
 				$(".fc-area-subbox[data-fc-box=announcement]").removeClass("disabled");
 			}else{
 				$(".fc-area-subbox[data-fc-box=announcement]").addClass("disabled");

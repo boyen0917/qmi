@@ -448,15 +448,23 @@ appInitial = function(needUpdate){
 
                 getGroupComboInit(specifiedGi).done(function(resultObj){
 
-                	if( resultObj.status === false ){
+                	if(resultObj.status === false){
                 		//sso 取消
                 		if(resultObj.data.isReAuthCancel === true){
                 			cns.debug("sso reAuth 取消");	
-                			return;
+                			var errCode = "code:E0000401";
+                		} else {
+                			var errCode = "code:E0000402";
                 		}
 
+                		new QmiGlobal.popup({
+							desc: $.i18n.getString("WEBONLY_ERROR_OCCURED_RELOGIN") +"<br>"+ errCode,
+							confirm: true,
+							action: [reLogin]
+						});
+
                 		//發生錯誤 回首頁比較保險
-                		reLogin();
+                		// reLogin();
                 	} else {
                 		deferred.resolve({dgi: specifiedGi, location:"#page-group-main"});
                 	}
