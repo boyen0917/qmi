@@ -35,8 +35,6 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
-
 //timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [
 	".st-sub-box-2-content-detail a",
@@ -321,7 +319,8 @@ window.QmiGlobal = {
 		"_loginData",
 		"_loginRemeber",
 		"_lastBaseUrl",
-		"_sticker"
+		"_sticker",
+		"groupChat",
 	],
 
 	viewMap: {}, // cloud reload
@@ -1133,16 +1132,6 @@ MyDeferred = function() {
   myPromise.reject = myReject;
   return myPromise;
 }
-
-// 選擇server
-$(document).on("click", "#container_version", function() {
-	var cnts = 0;
-	return function() {
-		if(cnts === 0) setTimeout(function() {cnts = 0;}, 1000);
-		cnts++;
-		if(cnts < 5) return;
-		QmiGlobal.module.serverSelector.init();
-}}());
 
 //上一頁功能
 $(document).on("pagebeforeshow",function(event,ui){
