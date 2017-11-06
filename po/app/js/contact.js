@@ -179,7 +179,6 @@ onSearchInput = function(e){
 	var matchMemList = [];
 	var memCount = 0;
 
-	var sepSign = "🗿"; //搜尋字典的自訂分隔號
 	var reg = new RegExp(str, "i");
 	var blData = QmiGlobal.groups[gi].bl || {};
 
@@ -187,8 +186,15 @@ onSearchInput = function(e){
 		var memberData = guAllExist[memId];
 		if(!memberData) return;
 
-		// var branchStr = (memberData.bl || "").replace(/,/, ".").split(".").map(function(currBi) {return ((blData[currBi] || {}).bn || "")}).join(".")
-		var isMatch = !![memberData.nk, "", memberData.ti, memberData.nk2].join(sepSign).match(reg);
+		var isMatch = !![
+				memberData.nk, 
+				memberData.ti, 
+				memberData.nk2, 
+				memberData.pn, 
+				memberData.pn.replace(/\+886/, "0"), 
+				memberData.em
+			].join(QmiGlobal.sepSign).match(reg);
+
 		if(!isMatch) return;
 
 		matchMemList.push(memId);

@@ -661,12 +661,12 @@ QmiGlobal.module.ldapSetting = {
     },
 
     add: function() {
-        var self = this,
-            ssoAccount = self.inputAccount,
-            ssoPassword = self.inputPassword,
-            ssoData,
-            msgShowDef = $.Deferred(),
-            submitCompleteDef = $.Deferred();
+        var self = this;
+        var ssoAccount = self.inputAccount;
+        var ssoPassword = self.inputPassword;
+        var ssoData;
+        var msgShowDef = $.Deferred();
+        var submitCompleteDef = $.Deferred();
 
         self.view.addClass("cover");
 

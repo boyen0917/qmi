@@ -289,6 +289,8 @@ window.QmiGlobal = {
 
 	vdoCompressBasePct: 80, // 壓縮預設進度條比例
 
+	sepSign: "🗿", //搜尋字典的自訂分隔號
+
 	// 圖片壓縮
 	imgCompress: {
 		oR: 0.9,
@@ -1010,14 +1012,14 @@ QmiAjax.prototype = {
 				}
 			})(),
 
-		    headers: self.setHeaders({},companyData),
+		    headers: self.setHeaders({}, companyData),
 		    type: "put",
 		    error: function(errData){
-
-		    	// et過期 自動更新 但要強制驗證:
-		    	// do something
-		    	// 重新取得卻 發生錯誤 回首頁
-		    	reLogin();
+		    	// 2017/11/03
+		    	// et過期 自動更新 發生錯誤
+		    	companyData.isAutoAuthFail = true;
+		    	addCompanyReLoadView(companyData);
+		    	QmiGlobal.module.reAuthUILock.lock(companyData);
 
 		        deferred.resolve({
 		        	isSuccess: false,

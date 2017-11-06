@@ -264,8 +264,8 @@ deleteMeInvite = function(this_invite){
 
 getUserAvatarName = function (thisGi , thisGu , setName ,setImg){
     //先檢查localStorage[gi].guAll是否存在
-    var memberData = QmiGlobal.groups[thisGi].guAll[thisGu],
-        aut = auo = nk = "";
+    var memberData = QmiGlobal.groups[thisGi].guAll[thisGu];
+    var aut = auo = nk = "";
         
     try {
         //設定圖片
@@ -288,11 +288,11 @@ timelineChangeGroup = function (thisGi) {
     $(".sm-small-area.active").removeClass("active");
 
 
-    var changeDeferred = $.Deferred(),
-        comboDeferred = $.Deferred();
+    var changeDeferred = $.Deferred();
+    var comboDeferred = $.Deferred();
         
     // 私雲轉移中
-    var timelineDom = $(".gm-content");
+    var timelineDom = $("#page-group-main .gm-content");
     if(QmiGlobal.groups[thisGi].isRefreshing || QmiGlobal.groups[thisGi].isReAuthUILock) {
         // 還是要變換團體名稱 及 currentGi 解除屏蔽時要用
         gi = QmiGlobal.currentGi = thisGi;
@@ -315,7 +315,7 @@ timelineChangeGroup = function (thisGi) {
         $.mobile.changePage("#page-group-main");
 
         var companyData = QmiGlobal.companies[(QmiGlobal.companyGiMap[gi] || {}).ci];
-        if(companyData)
+        if(companyData && !(companyData || {}).isAutoAuthFail)
             QmiGlobal.module.reAuthManually.init({
                 companyData: companyData,
                 reAuthDef: companyData.reAuthDef
@@ -7130,10 +7130,10 @@ addCompanyReLoadView = function(companyData) {
 
 
 companyLoad = function(loadData){
-    var refreshDom = loadData.refreshDom,
-        companyData = loadData.companyData,
-        groupCnts = Object.keys(QmiGlobal.groups).length,
-        companyLoadDeferred = $.Deferred();
+    var refreshDom = loadData.refreshDom;
+    var companyData = loadData.companyData;
+    var groupCnts = Object.keys(QmiGlobal.groups).length;
+    var companyLoadDeferred = $.Deferred();
 
     var isCompanyRefresh = !!refreshDom || !!loadData.isCompanyRefresh;
 
@@ -7178,12 +7178,15 @@ companyLoad = function(loadData){
 
                         // 全部都成功 才解除私雲移轉
                         if(fail === false) {
+                            // 機率很低 預設為false
+                            companyData.isAutoAuthFail = false;
+
                             // 刪除屏蔽ui
                             var companyRefreshViewObj = QmiGlobal.viewMap["refresh_" + companyData.ci];
                             if(companyRefreshViewObj !== undefined) {
                                 setTimeout(function() { 
                                     (companyRefreshViewObj.dom || $.fn).remove();
-                                    delete companyRefreshViewObj;
+                                    delete QmiGlobal.viewMap["refresh_" + companyData.ci];
                                 },1000);
                                 setTimeout(function() { toastShow($.i18n.getString("REFRESH_ALERT_SUCCESS"))},500)
                             }

@@ -285,8 +285,6 @@
 	"COMMON_NOT_MP4_NOR_IMAGE" : "档案格式必须为MP4或图片",
 	"COMMON_NOT_IMAGE" : "档案格式必须为图片",
 
-	"COMMON_FILE_NOT_EXIST_WEB" : "档案格式必须为图片",
-	
 	"CHAT_TITLE"							: "聊天",
 	"CHAT_SEND"  						: "传送",
 	"CHAT_READ" : "已读",
@@ -425,7 +423,6 @@
 	"FILESHARING_UPLOADING" : "档案上传中",
 	"COMMON_UNKNOWN_ERROR" : "未知错误",
 
-
 	"REFRESH_RELOAD" : "读取失败，请稍后再试",
 	"REFRESH_TEXT" : "企业资讯更新 请重新验证",
 	"REFRESH_ALERT_SUCCESS" : "企业资讯取得完成",
@@ -455,14 +452,6 @@
 	"PRIVACY_POLICY" : "隐私政策",
 	"USER_AGREEMENT" : "使用条款",
 	"STICKER_CENTER" : "贴图中心",
-
-	"BIND_LDAP" : "绑定LDAP",
-	"BIND_ACCOUNT" : "已绑定帐号",
-	"GUIHU_EXPIRED" : "认证过期",
-	"ADD_LDAP" : "新增LDAP帐号",
-	"ADD_LDAP_DES" : "请输入你的LDAP帐号及密码",
-	"REMOVE_LDAP" : "解除绑定",
-	"REMOVE_LDAP_DES" : "解除绑定后，将解除帐号权限",
 
 	"SETTING_OLD_PASSWORD" : "请输入原本的密码",
 	"SETTING_NEW_PASSWORD" : "请输入新密码(至少8码)",
@@ -537,5 +526,7 @@
 	"WEBONLY_IS_LATEST_VERSION" : "已更新到最新版本",
 
 	"WEBONLY_FORBIDDEN_FEATURE" : "管理者已关闭此功能",
-	"WEBONLY_WATERMARK_FORCED" : "预设使用浮水印"
+	"WEBONLY_WATERMARK_FORCED" : "预设使用浮水印",
+
+	"WEBONLY_ERROR_OCCURED_RELOGIN" : "发生错误 请重新登入"
 }

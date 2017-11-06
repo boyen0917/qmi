@@ -452,21 +452,10 @@
 	"PRIVACY_POLICY" : "Privacy Policy",
 	"USER_AGREEMENT" : "Term of Use",
 	"STICKER_CENTER" : "Sticker Shop",
-	
-	"BIND_LDAP" : "綁定LDAP",
-	"BIND_ACCOUNT" : "已綁定帳號",
-	"GUIHU_EXPIRED" : "認證過期",
-	"ADD_LDAP" : "新增LDAP帳號",
-	"ADD_LDAP_DES" : "請輸入你的LDAP帳號及密碼",
-	"REMOVE_LDAP" : "解除綁定",
-	"REMOVE_LDAP_DES" : "解除綁定後，將解除帳號權限",
-
 
 	"SETTING_OLD_PASSWORD" : "Current Password",
 	"SETTING_NEW_PASSWORD" : "New Password(at least 8 digits)",
 	"SETTING_CONFIRM_PASSWORD" : "Confirm Password",
-
-
 	
 	"ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT":	"Binding LDAP Account",
 	"ACCOUNT_BINDING_PRESS_TO_BIND_LDAP_ACCOUNT":	"Make sure your LDAP Server has connected to Qmi before binding your LDAP account.",
@@ -498,6 +487,7 @@
 	"STICKER_NOT_DOWNLOAD" : "Not downloaded",
 	"STICKER_DOWNLOAD_FINISH" : "Done",
 	"STICKER_CENTER" : "Sticker Shop",
+	
 	"ENTERPRISE_ACCOUNT_PASSWORD_SETTING" :	"Password Setting",
 	"ENTERPRISE_ACCOUNT_FIRSTTIME_RESET" :	"Set a new password for your account.",
 	"ENTERPRISE_ACCOUNT_SET_ORIGIN_PASSWORD" :	"Current Password",
@@ -515,7 +505,7 @@
 	"GROUPLIST_NO_GROUPS" : "You don't have any group yet",
 	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "Go get an invitation from group admin and start using Qmi!",
 
-	"WEBONLY_AUTH_LOADING" : "authenticating...",
+	"WEBONLY_AUTH_LOADING" : "Authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
 	"WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT" : "Click to create binding account",
 	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA1" : "No Qmi Account Binded",
@@ -536,5 +526,7 @@
 	"WEBONLY_IS_LATEST_VERSION" : "You already have the latest version of Qmi",
 
 	"WEBONLY_FORBIDDEN_FEATURE" : "Administrator has closed this feature",
-	"WEBONLY_WATERMARK_FORCED" : "Forced to use watermark"
+	"WEBONLY_WATERMARK_FORCED" : "Forced to use watermark",
+
+	"WEBONLY_ERROR_OCCURED_RELOGIN" : "An error occurred, please login again"
 }

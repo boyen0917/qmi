@@ -31,6 +31,10 @@ QmiGlobal.module.reAuthUILock = {
 			var groupDom = groupListArea.find(".sm-group-area[data-gi="+cgi+"]");
 			groupDom.find(".sm-group-area-l")[actionData.classStatus]("auth-lock").end()
 			.find("span.auth-lock-text")[actionData.textStatus]();
+
+			// 當前團體開啟頁面黑屏
+			if(actionData.isReAuthUILock && cgi === QmiGlobal.currentGi)
+				$("#page-group-main .gm-content > .refresh-lock").show();
  		});
 	}
 }
