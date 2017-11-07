@@ -736,7 +736,6 @@ $(function(){
 
 		// });
 
-		updateChat();
 		
 		sendMsgRead(new Date().getTime())
 
@@ -936,7 +935,10 @@ function onChatDBInit() {
 	lastMsg.append(timeTag);
 	$("#chat-contents").append(lastMsg);
 	$("#chat-contents").append("<div class='tmpMsg'></div>");
-	getHistoryMsg( false );
+	getHistoryMsg(false).then(function () {
+		updateChat();
+	});
+
 	scrollToBottom();
 }
 
@@ -944,6 +946,8 @@ function onChatDBInit() {
 show history chat contents
 **/
 function getHistoryMsg(bIsScrollToTop) {
+	var getChatDbDeferred = $.Deferred();
+
 	if (g_isLoadHistoryMsgNow) {
 		cns.debug("!");
 		return;
@@ -957,9 +961,8 @@ function getHistoryMsg(bIsScrollToTop) {
 	
 	g_idb_chat_msgs.limit(function (list) {
 		console.log("list", list);
-		var firstDayDiv = $("#chat-contents .chat-date-tag");
-		var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
-		setCurrentFocus( (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null );
+		
+		setCurrentFocus();
 		
 		if (list.length > 0) {
 			//list is from near to far day
@@ -1001,6 +1004,8 @@ function getHistoryMsg(bIsScrollToTop) {
 				hideLoading();
 			}
 		}
+
+		getChatDbDeferred.resolve();
 	}, {
 		index: "gi_ci_ct",
 		keyRange: g_idb_chat_msgs.makeKeyRange({
@@ -1018,12 +1023,17 @@ function getHistoryMsg(bIsScrollToTop) {
 		}
 	});
 
+	return getChatDbDeferred.promise();
+
 }
 /**
 紀錄讀取歷史訊息時, 目前最上方的dom
 **/
-function setCurrentFocus(dom){
-	if( dom ) g_currentScrollToDom = dom;
+function setCurrentFocus(){
+	var firstDayDiv = $("#chat-contents .chat-date-tag");
+	var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
+	var targetDom = (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null;
+	if( targetDom ) g_currentScrollToDom = targetDom;
 }
 /**
 隱藏讀取轉轉轉
@@ -1035,6 +1045,7 @@ function hideLoading() {
 
 	cns.debug("-- hideLoading start --", g_currentScrollToDom);
 	if (g_currentScrollToDom) {
+		console.log('_currentScrollToDom)')
 		if (false == g_isEndOfHistory) {
 			$("#chat-loading-grayArea").show();
 		}
@@ -1043,6 +1054,7 @@ function hideLoading() {
 		g_currentScrollToDom = null;
 
 	} else {
+		console.log('jello)')
 		$("#chat-loading").stop().fadeOut(function () {
 			if (false == g_isEndOfHistory) {
 				$("#chat-loading-grayArea").show();
@@ -3088,7 +3100,17 @@ function sendMsgText(dom) {
 		}
 		if ( !g_isEndOfHistory && posi <= $("#chat-loading").outerHeight() * 0.5) {
 			// cns.debug("!oooooooooops",g_container.scrollTop());
-			getHistoryMsg(false);
+
+			// 有網路情況下，就去跟server要，不然直接拉db會有漏訊息的問題
+			if (navigator.onLine) {
+				$("#chat-loading-grayArea").hide();
+				$("#chat-loading").show();
+				g_isLoadHistoryMsgNow = true;
+				setCurrentFocus();
+				updateChat(g_earliestDate.getTime(), false);
+			} else {
+				getHistoryMsg(false);
+			}
 			// g_isEndOfPage = false;
 			return;
 		}
