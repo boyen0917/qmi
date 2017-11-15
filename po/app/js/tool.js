@@ -843,6 +843,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 resetDB = function(options){
 	options = options || {};
 	clearBadgeLabel();
+	
 	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 	if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 	if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
