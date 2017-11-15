@@ -723,44 +723,54 @@ $(function(){
 			registerEditRoomEvent();				
 		});
 
-		$('.onoffswitch input[type=checkbox]').change(function(e) {
+		$('.onoffswitch label.onoffswitch-label').click(function(e) {
+			e.preventDefault();
+
 			var ajaxData = {};
-			var switchName = e.target.id;
-			var isChecked = false;
+			var switchName = e.delegateTarget.htmlFor;
+			var isChecked = !$("#" + switchName).prop("checked");
+			var switchId = "";
 
 			ajaxData.method = "put";
 
-			if($(this).is(':checked')) {
-        		isChecked = true;
-    		}
 			switch (switchName) {
 				case "pushSwitch" :
 					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/notification";
 					ajaxData.body = {cs: isChecked};
-					g_room.cs = isChecked;
+					switchId = "cs";
 					break;
 				case "stickySwitch":
 					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/top";
 					ajaxData.headers = {it: isChecked ? 1 : 0};
-					g_room.it = isChecked ? 1 : 0;
+					switchId = "it"
 					break;
 				case "inviteSwitch":
 					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/invite";
 					ajaxData.headers = {is: isChecked};
-					g_room.is = isChecked;
+					switchId = "is";
 					break;
 			}
-		    new QmiAjax(ajaxData).complete(function (data) {
-		    	if(switchName == "stickySwitch"){
-		    		if (isChecked) {
-		    			QmiGlobal.operateChatList.roomAddTop(ci);
-		    		} else {
-		    			QmiGlobal.operateChatList.roomDeleteTop(ci);
-		    		}
-		    	}
 
-		    	popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
-		    	// }
+		    new QmiAjax(ajaxData).complete(function (data) {
+		    	if (data.status == 200) {
+		    		if(switchName == "stickySwitch") {
+		    			g_room[switchId] = isChecked ? 1 : 0;
+
+			    		if (isChecked) {
+			    			QmiGlobal.operateChatList.roomAddTop(ci);
+			    		} else {
+			    			QmiGlobal.operateChatList.roomDeleteTop(ci);
+			    		}
+			    	} else {
+			    		g_room[switchId] = isChecked;
+			    	}
+
+			    	$("#" + switchName).prop("checked", isChecked);
+		    		popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+		    	} else {
+		    		var errText = JSON.parse(data.responseText);
+					popupShowAdjust("", errText.rsp_msg);
+		    	}
 		    });
 		});
 
@@ -1100,8 +1110,10 @@ function op(url, type, data, delegate, errorDelegate) {
 		li: lang
 	}, type, false, data);
 	result.error(function (jqXHR, textStatus, errorThrown) {
+		console.log
+		var rspMsg = JSON.parse(jqXHR.responseText).rsp_msg || "";
 		// // cns.log(textStatus, errorThrown);
-		if (errorDelegate) errorDelegate();
+		if (errorDelegate) errorDelegate(rspMsg);
 	});
 	result.success(function (data, status, xhr) {
 		if (delegate) delegate(data, status, xhr);
@@ -2421,11 +2433,14 @@ function sendMsgText(dom) {
 
 	function leaveRoomAPI(ciTmp, callback) {
 		op("groups/" + gi + "/chats/" + ciTmp + "/users", 'delete',
-			null, function (pData, status, xhr) {
+			null, 
+			function (pData, status, xhr) {
 				cns.debug(status, JSON.stringify(pData));
 				if (callback) callback(pData);
 			},
-			null
+			function (errMsg) {
+				if (errMsg.length > 0) popupShowAdjust("", errMsg);
+			}
 		);
 	}
 
@@ -2458,11 +2473,14 @@ function sendMsgText(dom) {
 	**/
 	function editMemInRoomAPI(ciTmp, sendData, callback) {
 		op("groups/" + gi + "/chats/" + ciTmp, "put",
-			sendData, function (pData, status, xhr) {
+			sendData, 
+			function (pData, status, xhr) {
 				cns.debug(status, JSON.stringify(pData));
 				if (callback) callback(pData);
 			},
-			null
+			function (errMsg) {
+				if (errMsg.length > 0) popupShowAdjust("", errMsg);
+			}
 		);
 	}
 
@@ -2935,13 +2953,19 @@ function sendMsgText(dom) {
 							updateMemberAPI.complete(function (dataTmp) {
 								var count = Object.keys(memList).length;
 								var newMemList = g_room.memList;
-								g_room.cpc = Object.keys(memList).length;
-								QmiGlobal.operateChatList.roomUpdateNumberOfMember(ci, count);
-								$("#header span.count").html("(" + count + ")");
-								updateChat();
-								updateEditRoomMember(newMemList);
+								if (dataTmp.status == 200) {
+									g_room.cpc = Object.keys(memList).length;
+									QmiGlobal.operateChatList.roomUpdateNumberOfMember(ci, count);
+									$("#header span.count").html("(" + count + ")");
+									updateChat();
+									updateEditRoomMember(newMemList);
 
-								popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+									popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+								} else {
+									var errText = JSON.parse(dataTmp.responseText);
+									popupShowAdjust("", errText.rsp_msg);
+								}
+								
 							});
 
 						} catch(e){
@@ -3035,10 +3059,8 @@ function sendMsgText(dom) {
 
 
 							editMemInRoomAPI(ci, {add:{gul:newList, fl: favList}}, function (data) {
-								// if( data.status==200){
 								getPermition(true);
 								updateChat();
-								// }
 							});
 						} catch (e) {
 							cns.debug(e.message);

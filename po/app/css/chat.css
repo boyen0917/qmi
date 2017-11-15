@@ -1712,7 +1712,7 @@ body {
 	margin: -7px 15px 0 0;
 	cursor: pointer;
 	color: black;
-	height: 0px;
+	height: 30px;
 }
 
 .saveRoomEdit {
@@ -1773,7 +1773,7 @@ body {
 .chatroomNameInput{
 	display: inline-block;
     border: 0;
-    width: -webkit-calc( 100% - 88px );
+    width: -webkit-calc( 100% - 123px );
     vertical-align: 20px;
     margin-left: 10px;
     height: 26px;
