@@ -240,13 +240,18 @@ systemSetting = function(){
     var group_data = QmiGlobal.groups;
     var this_goup_data = group_data[gi];
 
-    var systemGroup = $("#group-setting");
+    var systemSettingTabs = $("#systemSetting-page ul.system-tab");
+    var systemGroup = $("#group-setting");  
     $(".notification-btn,.default-group-btn,.carousel-btn").removeClass("ready");
     //系統設定初始化
     var emailSetting = $("#email-setting");
     emailSetting.find("input[name$='user-edit-phone']").val(QmiGlobal.me.pn);
     emailSetting.find("input[name$='user-edit-email']").val(QmiGlobal.me.em);
     //密碼
+    if (QmiGlobal.auth && QmiGlobal.auth.isSso) { // ldap帳號，隱藏修改密碼設定
+        systemSettingTabs.children("li[data-tab='password-setting']").hide()
+    }
+
     $("#password-setting").find(".input-password").val("");
     //預設系統通知
     if($.lStorage("_setnoti")==100){
