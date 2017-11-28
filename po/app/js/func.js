@@ -402,7 +402,10 @@ timelineSwitch = function (act, reset, main, noAppReload){
     .find("[data-navi=home]").addClass("st-filter-list-active");
 
     //關閉所有subpage
-    groupMain.find(".main-subpage").hide();   
+    groupMain.find(".main-subpage").hide();
+
+    //移除才能往下滾動拉到資料
+    groupMain.find(".feed-subarea").removeClass("no-data")   
 
     var gmConHeader = groupMain.find(".gm-content-header");
     gmConHeader.hide();
@@ -410,6 +413,8 @@ timelineSwitch = function (act, reset, main, noAppReload){
     switch (act) {
         case "feeds":
             var filterAction = groupMain.find(".st-filter-action");
+
+            groupMain.find(".st-navi-area").removeData("currentHome")
             filterAction.filter(".st-filter-list-active").removeClass("st-filter-list-active");
             filterAction.filter("[data-navi='announcement']").show();
             filterAction.filter("[data-navi='feedback']").show();
@@ -4513,6 +4518,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
     this_gi = polling_arr[0] || gi,
     this_ti = polling_arr[1] || ti_feed,
     main_gu = $("#page-group-main").data("main-gu"),
+    filterType = $("#page-group-main").find("div.st-filter-action.st-filter-list-active").data("status");
 
     deferred = $.Deferred();
     if(main_gu){
@@ -4523,18 +4529,39 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
     var event_tp = $("#page-group-main").data("navi") || "00";
     //製作timeline
     var api_name = "groups/"+ this_gi +"/timelines/"+ this_ti +"/events";
-    if(ct_timer){
-        api_name = api_name + "?ct=" + ct_timer;
+
+    switch (filterType) {
+        case "read":
+            api_name += "?etp=0&dtp=true";
+            break;
+
+        case "unread":
+            api_name += "?etp=0&dtp=false";
+            break;
+
+        case "subscribe":
+            api_name += "?etp=3&dtp=true";
+            break;
     }
 
-    if(main_gu){
+    if (ct_timer) {
+        if (api_name.match(/\?/)) {
+            api_name = api_name + "&ct=" + ct_timer;
+        } else {
+            api_name = api_name + "?ct=" + ct_timer;
+        }
+    }
+
+    if (main_gu) {
         // event_tp = "00";
-        if(api_name.match(/\?/)){
+        if (api_name.match(/\?/)) {
             api_name = api_name + "&gu=" + main_gu;
-        }else{
+        } else {
             api_name = api_name + "?gu=" + main_gu;
         }
     }
+
+
 
     var headers = {
             ui:ui,
@@ -4802,7 +4829,7 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
                 eventStatusWrite(this_event);
 
                 //已經存在的文章還是要檢查filter
-                eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
+                // eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
 
                 if( this_event.hasClass("filter-show") ){
                     visibleEventCnt++;
@@ -5011,7 +5038,7 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
         eventStatusWrite(this_event);
 
         //detail 不做filter
-        if(!detail) eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
+        // if(!detail) eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
         if( this_event.hasClass("filter-show") ){
             visibleEventCnt++;
         }
@@ -5036,14 +5063,20 @@ timelineListWrite = function (ct_timer,is_top){
     //判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
     if(!ct_timer && !is_top){
         var event_tp = "0" + $("#page-group-main").data("navi") || "00";
+        console.log(event_tp);
         var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
         //隱藏其他類別
-        $(".feed-subarea").hide();
+        $("#page-group-main").find(".feed-subarea").hide();
 
-        if (!$("#page-group-main").data("main-gu")) selector.show();
+        if (!$("#page-group-main").data("main-gu")) {
+            selector.show();
+            selector.html("");
+        }
         //load_chk 避免沒資料的
-        selector.append("<p class='load-chk'></p>");
+        if (selector.children("p.load-chk").length == 0) {
+            selector.append("<p class='load-chk'></p>");
+        }
     }
 
     var idb_timer = ct_timer - 1 || 9999999999999;

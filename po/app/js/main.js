@@ -462,6 +462,7 @@ $(function(){
 		var event_area = $(".feed-subarea[data-feed=" + event_tp + "]");
 		var this_events = event_area.find(".st-sub-box");
 
+		event_area.removeClass("no-data");
 		//做過濾
 		//先關閉全區域
 		var feedbox_area = $(".st-feedbox-area");
@@ -479,12 +480,12 @@ $(function(){
 		groupMainPage.find(".st-feedbox-area-bottom > div").hide();
 		//已讀未讀
 		var cnt = 0;
-		this_events.each(function(i,val){
-			eventFilter($(this),filter_status);
-			if( $(val).hasClass("filter-show") ){
-				cnt++;
-			}
-		});
+		// this_events.each(function(i,val){
+		// 	eventFilter($(this),filter_status);
+		// 	if( $(val).hasClass("filter-show") ){
+		// 		cnt++;
+		// 	}
+		// });
 		showFeedboxNoContent( (cnt>0) );
 
 		//開啟全區域
