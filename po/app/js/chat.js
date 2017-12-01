@@ -243,7 +243,6 @@ $(function(){
 					$("#header .count").show();
 				}
 			}
-			$(".extra-content .btn[data-type=invite]").hide();
 			$(".extra-content .btn[data-type=exit]").hide();
 		}else{
 			$("#header .title .text").html(groupCn);
@@ -2261,13 +2260,6 @@ function sendMsgText(dom) {
 							}
 						}
 
-						if (g_room.memList[gu].ad == 1) {
-							$(".extra-content .btn[data-type=invite]").show();
-						} else {
-							if (g_room.is) $(".extra-content .btn[data-type=invite]").show();
-							else $(".extra-content .btn[data-type=invite]").hide();
-						}
-
 						$.userStorage(userData);
 
 						checkMemberLeft();
@@ -2476,7 +2468,7 @@ function sendMsgText(dom) {
 			chatroomSwitch.find("#inviteSwitch").attr("checked", chatRoomData.is);
 
 			$(".header-title img").show();
-
+			page.find(".inviteSetting").show();
 			// 官方帳號有聊天室權限的成員，將邀請成員開關關掉
 			if (g_group.ntp === 2) page.find(".inviteSetting").hide();
 		} else {
@@ -2858,7 +2850,7 @@ function sendMsgText(dom) {
 				isShowBranch: false,
 				isShowSelf: false,
 				isShowAll: false,
-				isShowFav: false,
+				isShowFav: true,
 				isSingleSelect: false,
 				min_count: 1
 			});
