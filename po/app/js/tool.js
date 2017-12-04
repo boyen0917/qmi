@@ -613,6 +613,7 @@ qmiUploadFile = function(uploadObj){
 		return chainDef;
 	}, chainDefError.bind("get url fail")).then(function(responseObj) {
 		var chainDef = MyDeferred(),
+			getExifDef = MyDeferred(),
 			s3Obj = responseObj.data,
 			exifObj = {},
 			body = {
@@ -625,8 +626,11 @@ qmiUploadFile = function(uploadObj){
 				si: s3Obj.si,
 				md: s3Obj.md
 			};
-			if(s3Obj.oriFile){
-				EXIF.getData(s3Obj.oriFile, function(){
+
+		(function () {
+			// 圖片
+			if (s3Obj.oriFile) {
+				EXIF.getData(s3Obj.oriFile, function(data){
 					exifObj = EXIF.getAllTags(this);
 					if(!$.isEmptyObject(exifObj)){
 						body.exif = {
@@ -638,19 +642,26 @@ qmiUploadFile = function(uploadObj){
 							"Longitude": toDecimal(exifObj.GPSLongitude) || "" 
 						}
 					}
+					getExifDef.resolve();
 				});
+			} else { // 影片
+				getExifDef.resolve();
 			}
-		// commit
-		new QmiAjax({
-			apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
-			method: "put",
-			body: body
-		}).success(function(data) {
-			data.fi = s3Obj.fi;
-			data.tp = uploadObj.tp;
-			data.file = uploadObj.file;
-			chainDef.resolve({isSuccess: true, data: data})
-		}).error(chainDef.reject);
+
+			return getExifDef;
+		}()).then(function () {
+			// commit
+			new QmiAjax({
+				apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
+				method: "put",
+				body: body
+			}).success(function(data) {
+				data.fi = s3Obj.fi;
+				data.tp = uploadObj.tp;
+				data.file = uploadObj.file;
+				chainDef.resolve({isSuccess: true, data: data})
+			}).error(chainDef.reject);
+		});
 
 		return chainDef;
 	}, chainDefError.bind("qmi upload s3 fail"))
