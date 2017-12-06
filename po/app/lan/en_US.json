@@ -360,6 +360,7 @@
 	"GROUP_NO_INVITATION" : "There is no group invitaion.",
 	"GROUP_JOIN_SUCC" : "Join group successed!",
 	"GROUP_GROUP_INVITATION" : "Group %@ has sent you an invitation",
+	"GROUP_REJECT_SUCC" : "Reject group successed!",
 	"GROUP_COUNTS" : "%ld subgroup(s)",
 	"GROUP_MEMBERS" : "%ld member(s)",
 	"GROUP_AND" : " and ",
