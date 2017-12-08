@@ -522,7 +522,8 @@
 	"WEBONLY_VERSION_NO" : "版本",
 
 	"WEBONLY_APPVERSION_00" : "有新版本，将自动更新资料。",
-	"WEBONLY_APPVERSION_01" : "有新版本安装程式，是否下载安装？",
+	"WEBONLY_APPVERSION_01" : "有新版Qmi程序，是否线上更新？",
+	"WEBONLY_APPVERSION_02" : "有新版软件，是否下载安装？",
 	"WEBONLY_IS_LATEST_VERSION" : "已更新到最新版本",
 
 	"WEBONLY_FORBIDDEN_FEATURE" : "管理者已关闭此功能",
