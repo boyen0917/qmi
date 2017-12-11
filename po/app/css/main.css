@@ -4158,10 +4158,6 @@ div.st-reply-message-area div.file-load .bar {
 	opacity: 0.3;
 }
 
-.st-feedbox-area-bottom > img {
-	margin-top:10px;
-}
-
 
 .st-feedbox-area-bottom {
 	min-height: 50px;
@@ -4173,6 +4169,12 @@ div.st-reply-message-area div.file-load .bar {
 .st-feedbox-area-bottom > img {
 	margin-top:10px;
 }
+
+.st-feedbox-area-bottom > div > div {
+	font-size: 30px;
+	color: #1A1A1A;
+}
+
 
 /* =============================== page timeline detail ==================================== */
 
