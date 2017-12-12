@@ -491,8 +491,8 @@
 	        if(user_data.mkp) this_info.find(".user-info-list .pn").html("******");
 	        if(user_data.mke) this_info.find(".user-info-list .em").html("******");
 	        if(user_data.mkb) {
-	            this_info.find(".user-avatar-bar .bd").hide();
-	            this_info.find(".user-info-list .bd").html("******");   
+	            // this_info.find(".user-avatar-bar .bd").hide();
+	            // this_info.find(".user-info-list .bd").html("******");   
 	        }else{
 	            this_info.find(".user-avatar-bar .user-name").addClass("hidden");
 	        }
