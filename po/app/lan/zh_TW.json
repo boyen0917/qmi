@@ -360,6 +360,7 @@
 	"GROUP_NO_INVITATION" : "目前沒有任何團體邀請",
 	"GROUP_JOIN_SUCC" : "恭喜您成功加入團體！",
 	"GROUP_GROUP_INVITATION" : "%@ 邀請你加入團體",
+	"GROUP_REJECT_SUCC" : "拒絕成功！",
 	"GROUP_COUNTS" : "%ld個群組",
 	"GROUP_MEMBERS" : "%ld位成員",
 	"GROUP_AND" : "與",

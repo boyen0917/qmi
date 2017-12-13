@@ -201,6 +201,7 @@ agreeMeInvite = function(inviteDom){
     new QmiAjax({
         apiName: "me/groups",
         apiVer: "apiv2",
+        isPublicApi: inviteData.ci == undefined,
         ci: inviteData.ci, // 有ci就用cloud的邀請
         method: "post",
         body: {
@@ -238,21 +239,22 @@ agreeMeInvite = function(inviteDom){
 deleteMeInvite = function(this_invite){
 
     var invite_data = this_invite.data("invite-data");
-    var api_name = "me/invitations?ik=" + invite_data.ik + "&tp=" + invite_data.tp + "&gi=" + invite_data.gi;
-    var headers = {
-            ui: ui,
-            at: at,
-            li: lang
-                 };
-    var method = "delete";
-    ajaxDo(api_name,headers,method,true).complete(function(data){
-        
+
+    new QmiAjax({
+        apiName: "me/invitations?ik=" + invite_data.ik + "&tp=" + invite_data.tp + "&gi=" + invite_data.gi,
+        isPublicApi: invite_data.ci == undefined,
+        ci: invite_data.ci,
+        method: 'delete'
+    }).complete(function(data){
+        console.log(data);
         if(data.status == 200){
             this_invite.hide('fast', function(){ 
                 this_invite.remove();
                 if($(".gmi-div").length == 0) {
                     $(".gmi-coachmake").show(); 
                 }
+                
+                toastShow( $.i18n.getString("GROUP_REJECT_SUCC") );   
             });
         }
     });
