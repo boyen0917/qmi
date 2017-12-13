@@ -89,15 +89,11 @@ createGroup = function (group_name,group_desc){
 }
 
 getMeInvite = function(){
-    var api_name = "me/invitations";
 
-    var headers = {
-            ui: ui,
-            at: at,
-            li: lang
-                 };
-    var method = "get";
-    ajaxDo(api_name,headers,method,false).complete(function(data){
+    new QmiAjax({
+        apiName: "me/invitations",
+        isPublicApi: true,
+    }).complete(function(data) {
         if(data.status !== 200) return;
 
         var allInvitationsObj =$.parseJSON(data.responseText);
