@@ -543,7 +543,6 @@ $(function(){
 
 	//show 已讀列表
 	$(document).on('click','.st-sub-box-3 .st-read',function(){
-		cns.debug("read list");
 		var this_event = $(this).parents('.st-sub-box');
 
 		timelineObjectTabShowDelegate( this_event, 0, function(){

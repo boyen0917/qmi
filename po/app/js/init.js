@@ -18,6 +18,8 @@ if( 0 == userLang.indexOf("zh") ) {
 	else lang = "zh_TW";	
 }
 
+lang = "zh_TW";
+
 var base_url = function() {
 	switch(true) {
 		case match("qawp.qmi.emome.net"):
@@ -35,7 +37,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
+// var base_url = "https://qmi17.mitake.com.tw/";
 
 //timeline裏面點擊不做展開收合的區域
 var timeline_detail_exception = [

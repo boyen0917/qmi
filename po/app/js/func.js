@@ -1369,8 +1369,10 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     //event path
     this_event.data("event-path",this_ei);
 
-    //已讀亮燈
+    //已讀亮燈 & 隱藏未讀提示
     this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")
+    this_event.find("div.timeline-box-hint").hide();
+
     
     //製作每個回覆
     var okCnt = 0;
@@ -5119,11 +5121,14 @@ eventStatusWrite = function(this_event,this_es_obj){
     }
     //回覆
     if(this_es_obj.ip)
-            this_event.find(".st-sub-box-3 img:eq(1)").attr("src","images/icon/icon_meg_activity.png");
+        this_event.find(".st-sub-box-3 img:eq(1)").attr("src","images/icon/icon_meg_activity.png");
             
     //閱讀
-    if(this_es_obj.ir)
-            this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png");
+    if(this_es_obj.ir) 
+        this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png");
+    else
+        this_event.find("div.timeline-box-hint").show();
+
     
     //任務完成
     if(this_es_obj.ik){

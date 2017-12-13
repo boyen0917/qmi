@@ -6614,3 +6614,13 @@ img.vdo-default:before {}
 	letter-spacing: initial;
 	color: #ddd;
 }
+
+#page-group-main div.subpage-timeline.main-subpage div.st-feedbox-area .timeline-box-hint {
+	display: none;
+    position: absolute;
+    right: 13px;
+    top: 30px;
+    font-size: 15px;
+    color: #FF4545;
+    font-weight: 600;
+}
