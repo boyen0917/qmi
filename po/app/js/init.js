@@ -423,8 +423,8 @@ window.QmiGlobal = {
 	            var wl = {};
 	            $.each(windowList,function(key,value){try {
 	                if(value.closed) return;
-	                wl[value.gi] = wl[value.gi] || {};
-	                wl[value.gi][key] = QmiGlobal.groups[value.gi].chatAll[value.ci];
+	                if(!wl[value.gi]) return;
+	                (wl[value.gi] || {})[key] = QmiGlobal.groups[value.gi].chatAll[value.ci];
 	            } catch(e) {}});
 
 	            // 設定當前gi

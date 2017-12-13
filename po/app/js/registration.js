@@ -299,6 +299,7 @@ appInitial = function(needUpdate){
 
 		// 清空資料
 		resetDB();
+
 		// 預防錯誤發生
 		QmiGlobal.auth = {};
 
@@ -370,7 +371,9 @@ appInitial = function(needUpdate){
 					//沒打勾的話就清除local storage
 		    		localStorage.removeItem("_loginRemeber");
 				}
+
 				loginAction();
+				
         	});
 
         }).error(function(){
@@ -389,7 +392,7 @@ appInitial = function(needUpdate){
 	}
 
 	//初始化 
-    function loginAction (){
+    function loginAction() {
 
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
@@ -419,11 +422,15 @@ appInitial = function(needUpdate){
         	if($.lStorage("groupChat")){
         		groupChat = $.lStorage("groupChat");
 		    	$.each(groupChat,function(key,value){
-		    		getGroupComboInit(key);
-		    		QmiGlobal.groups[key].chatAll = value;
-		    		$.each(value,function(ci,item){
-		    			openChatWindow(key,ci);
-		    		})
+		    		try {
+		    			if(key === "undefined" || !QmiGlobal.groups[key] || Object.keys(QmiGlobal.groups[key]).length === 0) return;
+
+			    		getGroupComboInit(key);
+			    		QmiGlobal.groups[key].chatAll = value;
+			    		$.each(value,function(ci,item){
+			    			openChatWindow(key,ci);
+			    		})
+		    		} catch(e) {}
 		        });
 		    	localStorage.removeItem("groupChat");
         	}
