@@ -7490,12 +7490,35 @@ polling = function(){
 
             // 加入需要重打的polling ; reDoCompanyPollingMap存有要重打的私雲資訊 
             // 把他轉成array再加入不重複的新的polling 51
+
+            // 11/20 Brian 4716
+            var tmpObj = {}; // 紀錄同一個私雲 要做時間最早的那一次就好
+
             return Object.keys(QmiGlobal.reDoCompanyPollingMap).map(function(thisCi) {
                 return QmiGlobal.reDoCompanyPollingMap[thisCi];
             }).concat(newCmdsArr.reduce(function(arr, cmdObj) {
-                if(!QmiGlobal.reDoCompanyPollingMap[cmdObj.pm.ci]) arr.push(cmdObj)
-                return arr;
+                try {
+                    // redo優先
+                    if(QmiGlobal.reDoCompanyPollingMap[cmdObj.pm.ci]) return arr;
+
+                    // 同一個私雲 做時間最早的那一次就好 
+                    if(!tmpObj[cmdObj.pm.ci]) {
+                        tmpObj[cmdObj.pm.ci] = cmdObj;
+                        arr.push(cmdObj);
+                    } else if(tmpObj[cmdObj.pm.ci].pm.pt > cmdObj.pm.pt) {
+                        tmpObj[cmdObj.pm.ci] = cmdObj;
+                    }
+
+                    return arr;
+
+                } catch(e) {errorReport(e); return arr;}
             }, []));
+
+            function isNotEarliestPolling(obj) {
+                if(!tmpObj[obj.ci]) return true;
+                if(tmpObj[obj.ci].pm.pt > obj.pt) return true;
+                return false;
+            }
         }
     }
 }
