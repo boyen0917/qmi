@@ -983,7 +983,7 @@ updateFavoritePage = function(){
 	var memObject = {};
 	var count = 0;
 	$.each(guAllExist,function(key,mem){
-		if( mem.fav ){
+		if( mem.fav && mem.st == 1){
 			count++;
 			memObject[key] = mem;
 		}
@@ -1245,7 +1245,7 @@ showEditFavListPage = function( dom ) {
 	};
 
 	for (var gu in guAllExist) {
-  		if (guAllExist[gu].fav) favoriteList[gu] = guAllExist[gu].nk;
+  		if (guAllExist[gu].fav && guAllExist[gu].st == 1) favoriteList[gu] = guAllExist[gu].nk;
 	}
 
 	dom.data("object_str", JSON.stringify(favoriteList));
