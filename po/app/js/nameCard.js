@@ -1069,8 +1069,6 @@
 	        .data("main-gi",this_gi)
 	        .data("navi","main");
 	        
-	        console.log($("#page-group-main").data("navi"));
-	        console.log(groupMainDom.data("navi"));
 	        // timelineListWrite();
 	    },500);
 	}

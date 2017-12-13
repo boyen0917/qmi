@@ -10,13 +10,15 @@ $(function(){
 	});
 
 	$("#page-group-main .subpage-timeline.main-subpage").bind('scroll', function() {
+		var mainPage = $("#page-group-main");
 		//取舊資料
-		var feed_type = $("#page-group-main").data("navi");
+		var feed_type = mainPage.data("mainGu") ? "main" : mainPage.data("navi");
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
 		if (feed_type != "main") {
 			feed_type = ("0" + feed_type).slice(-2) || "00";
 		}
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+
 		// var this_navi = $(".feed-subarea:visible");
 		//判斷沒資料的元件存在時 就不動作
 		if( this_navi.hasClass("no-data") ) return;	
@@ -439,6 +441,7 @@ $(function(){
 		filter_action.addClass("st-filter-list-active");
 
 		var filter_status = $(this).data("status");
+
 		//過濾發文類型
 		if(filter_status == "navi" || filter_status == "all"){
 			groupMainPage.find(".st-personal-area").hide();
@@ -459,6 +462,7 @@ $(function(){
 		var event_area = $(".feed-subarea[data-feed=" + event_tp + "]");
 		var this_events = event_area.find(".st-sub-box");
 
+		event_area.removeClass("no-data");
 		//做過濾
 		//先關閉全區域
 		var feedbox_area = $(".st-feedbox-area");
@@ -476,12 +480,12 @@ $(function(){
 		groupMainPage.find(".st-feedbox-area-bottom > div").hide();
 		//已讀未讀
 		var cnt = 0;
-		this_events.each(function(i,val){
-			eventFilter($(this),filter_status);
-			if( $(val).hasClass("filter-show") ){
-				cnt++;
-			}
-		});
+		// this_events.each(function(i,val){
+		// 	eventFilter($(this),filter_status);
+		// 	if( $(val).hasClass("filter-show") ){
+		// 		cnt++;
+		// 	}
+		// });
 		showFeedboxNoContent( (cnt>0) );
 
 		//開啟全區域
