@@ -525,6 +525,7 @@
 
 	"WEBONLY_APPVERSION_00" : "Update automatically..",
 	"WEBONLY_APPVERSION_01" : "There is a new version available, Update now?",
+	"WEBONLY_APPVERSION_02" : "There is a new version for Desktop App, Download now?",
 	"WEBONLY_IS_LATEST_VERSION" : "You already have the latest version of Qmi",
 
 	"WEBONLY_FORBIDDEN_FEATURE" : "Administrator has closed this feature",
