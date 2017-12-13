@@ -505,6 +505,8 @@
 	"GROUPLIST_NO_GROUPS" : "尚未加入任何团体",
 	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "待管理者将您加入团体后 \n 即可开始使用 Qmi",
 
+	"UNREAD_HINT" : "未点阅",
+	
 	"WEBONLY_AUTH_LOADING" : "验证中...",
 	"WEBONLY_AUTH_SUCCESS" : "验证成功",
 	"WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT" : "点此新增绑定帐号",
