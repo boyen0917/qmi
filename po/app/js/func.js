@@ -5684,21 +5684,6 @@ timelineFileMake = function(thisEvent, fileNum) {
                     fileLink.click();
                 });
             }
-           
-
-            
-
-            // var file = fs.createWriteStream("C:/Users/sam/AppData/Local/Qmi/Downloads/33455.jpg");
-            // var request = https.get("https://project-o.s3.hicloud.net.tw/groups/G00002Aa0GQ/0/5ff373ff-a42a-4183-ba59-3bdd1cbc1bf6_o?Expires=1785494657&AWSAccessKeyId=SE41NTAxNDgyNDE0MjI2MDE4Mjg5MjM&Signature=%2FuvyHosaMg3Q5wuh16Y4hTZp1lA%3D", function(response) {
-            //   response.pipe(file);
-            // });
-            // $.each(fileLinks, function(i, fileLink) {
-                
-                
-            //     // fileLink.click();
-            // });
-
-            
         });
     }
 }
@@ -5794,7 +5779,6 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
 
     //點選開啟圖庫
     this_gallery.find(".st-attach-img-area").click(function(e){
-        console.log("what2");
         // var targetImg = e.target.style.backgroundImage;
         var targetImg = e.target;
         if (targetImg.tagName === "H1") {
@@ -5808,8 +5792,6 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
         var this_ei = this_img_area.parents(".st-sub-box").data("event-id");
         var this_gi = this_ei.split("_")[0];
         var this_ti = this_ei.split("_")[1];
-        // showGallery( this_gi, this_ti, gallery_arr, null, null, isApplyWatermark, watermarkText );
-        // showGallery(this_ti, gallery_arr, targetImgIndex, isApplyWatermark, watermarkText);
 
         new QmiGlobal.gallery({
             gi: this_gi,

@@ -1233,6 +1233,7 @@ $(function(){
 	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3", function(e){
 		var triggerDetailBox = $(this);
 		var this_event = $(this).parent();
+
 		//detail頁面 離去
 		if(this_event.data("detail-page")) return false;
 
@@ -1265,6 +1266,8 @@ $(function(){
 
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp, triggerDetailBox);
+		// var detail_chk = true;
+
 
 
 		//重置
@@ -1321,6 +1324,55 @@ $(function(){
 	$(document).on("mouseup",timeline_detail_exception.join(","),function(e){
 		e.stopPropagation();
 	});
+
+	$("#page-group-main").on("click", ".st-sub-box-2-attach-area", function (e) {
+		var thisEvent = $(this).parents(".st-sub-box");
+		var eventId = thisEvent.data("event-id");
+		var tp = thisEvent.data("timeline-tp");
+
+		if (thisEvent.find("div.st-box2-more-desc").is(":visible")) {
+			thisEvent.find("div.st-box2-more-desc").removeClass("line-clamp")
+		} else {
+			thisEvent.find("div.st-sub-box-2-content").removeClass("line-clamp")
+		}
+
+		getThisTimelinePart(thisEvent,1,function(data){
+			if(!data.responseText) return false;
+
+			var epl = $.parseJSON(data.responseText).epl;
+            
+			if(typeof epl != "undefined" && epl.length > 0){
+				var parti_list = [];
+				$.each(epl,function(i,val){
+					parti_list.push(val.gu);
+				});
+				// 存回 陣列
+				thisEvent.data("parti-list",parti_list);
+				thisEvent.data("parti-like",epl);
+				// 編輯讚好區域
+				detailLikeStringMake(thisEvent);
+			}
+
+			thisEvent.find("div.st-reply-like-area").show();
+
+		});
+		
+		//單一動態詳細內容
+        getEventDetail(eventId).complete(function(data){
+        	if(data.status != 200) return false;
+
+        	var eventData = $.parseJSON(data.responseText).el;
+
+        	eventContentDetail(thisEvent, eventData);
+        	
+    		//detail timeline message內容
+			detailTimelineContentMake(thisEvent, eventData, null, undefined);
+
+			timelineUpdateTime();
+
+			thisEvent.data("detail-content",true);
+		});
+	})
 
 	//----------------------------------- compose-貼文 ---------------------------------------------
 	
@@ -2228,6 +2280,7 @@ $(function(){
 	});
 
 	$(document).on("click",".st-attach-video.play div,.video-area.play div",function(e){
+		console.log("play")
 		var tmp = $(this).prev('video');
 		if( tmp.length>0 ){
 			tmp[0].play();
