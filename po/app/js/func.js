@@ -7818,7 +7818,7 @@ pollingCmds = function(newPollingData){
                         function isNotPostBySelf() {
                             if(item.pm.userID !== ui) return true;
                             return false;
-                        }
+
                         
                         break;
                     case 3://invite

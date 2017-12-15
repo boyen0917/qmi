@@ -29,14 +29,11 @@ initAlertDB = function(){
     	indexes: [
     	  { name: 'ei_ntp',keyPath:['ei','ntp']}
     	],
-    	onStoreReady: function(){
-			if( !$.lStorage("alert_db_updated") ){
-				idb_alert_events.clear();
-				$.lStorage("alert_db_updated",true);
-			}
-	      	// showAlertFromDB();
-	      	// updateAlert();
-			// setInterval(updateAlert,update_alert_interval);
+    	onStoreReady: function() {
+			if($.lStorage("alert_db_updated")) return;
+
+			idb_alert_events.clear();
+			$.lStorage("alert_db_updated",true);
     	}
     });
 }
@@ -97,48 +94,24 @@ showAlertBox = function(){
 	},100);
 }
 
-//撈ＤＢ通知
-showAlertFromDB = function(){
-
-	idb_alert_events.getAll(function(list){
-		// cns.debug( JSON.stringify(list) );
-		showAlertContent(list);
-	},{
-        index: "ct",
-        keyRange: idb_alert_events.makeKeyRange({
-          upper: [new Date().getTime()],
-          lower: []
-        }),
-        limit: 20,
-        order: "DESC",
-        onEnd: function(result){
-            // cns.debug("onEnd:",result);
-        },
-        onError: function(result){
-            // cns.debug("onError:",result);
-        }
-    });
-}
-
 //打ＡＰＩ更新通知
 updateAlert = function(isFromLogin){
-	var noticeListArr = [],
-		noticeDefArr = [],
+	var noticeListArr = [];
+	var noticeDefArr = [];
 
-		publicNoticeAjax = new QmiAjax({
-			apiName: "notices",
-			isPublicApi: true,
-			errhide: true,
-			complete: function(data){
-				if(data.status !== 200) return;
-
-				try {
-					noticeListArr = $.parseJSON(data.responseText).nl;
-				} catch(e) {
-					// do something..
-				}
+	var publicNoticeAjax = new QmiAjax({
+		apiName: "notices",
+		isPublicApi: true,
+		errhide: true,
+		complete: function(data){
+			if(data.status !== 200) return;
+			try {
+				noticeListArr = noticeListArr.concat($.parseJSON(data.responseText).nl);
+			} catch(e) {
+				// do something..
 			}
-		});
+		}
+	});
 
 	// 公雲鈴鐺
 	noticeDefArr.push(publicNoticeAjax);
@@ -155,13 +128,12 @@ updateAlert = function(isFromLogin){
 			ci: companyId,
 			complete: function(data){
 				if(data.status !== 200) return;
-
 				try {
 					var resultNl = $.parseJSON(data.responseText).nl;
 
 					// 私雲辨識用
 					resultNl.ci = companyId;
-					noticeListArr.push.apply(noticeListArr,resultNl)
+					noticeListArr = noticeListArr.concat(resultNl);
 				} catch(e) {
 					// do something..
 				}
@@ -171,45 +143,43 @@ updateAlert = function(isFromLogin){
 	});
 
 
-	$.when.apply($,noticeDefArr).done(function(){
+	$.when.apply($, noticeDefArr).done(function(){
+		var cnt = 0;
+		console.log("start", noticeListArr.length);
+		// 2017/12/15 暫時 - 防止重複鈴鐺 公雲company
+		// var noticeMap = noticeListArr.sort(function(a, b) {
+		// 	cnt++;
+		// 	return b.nd.ct - a.nd.ct;
+		// }).reduce(function(map, curr) {
+		// 	cnt++;
+		// 	map[curr.nd.ei +"_"+ curr.ntp] = curr;
+		// 	return map;
+		// }, {});
 
-		// idb_alert_events.getAll(function(DBData){
+		// for( var i=0; i < noticeListArr.length; i++){
+		// 	try{
+				
+		// 		//ct_ei_ntp
+		// 		var obj = {
+		// 			ei: noticeListArr[i].nd.ei,
+		// 			ntp: noticeListArr[i].ntp,
+		// 			ei_ntp: noticeListArr[i].nd.ei+"_"+noticeListArr[i].ntp,
+		// 			data: noticeListArr[i]
+		// 		};
+  //   			var key = noticeListArr[i].nd.ei+"_"+noticeListArr[i].ntp;
 
-			// var DBDataObj = {};
-   //  		for( var i=0; i<DBData.length; i++){
-   //  			if( DBData[i].isRead )
-   //  				DBDataObj[DBData[i].ei+"_"+DBData[i].ntp] = DBData[i].data;
-   //  		}
-   //  		console.log(noticeListArr);
-			// console.log(DBDataObj)
+  //   		} catch(e){
+  //   			errorReport(e);
+  //   		}
+		// }
 
-    		for( var i=0; i<noticeListArr.length; i++){
-    			try{
-    				//ct_ei_ntp
-    				var obj = {
-						ei: noticeListArr[i].nd.ei,
-						ntp: noticeListArr[i].ntp,
-						ei_ntp: noticeListArr[i].nd.ei+"_"+noticeListArr[i].ntp,
-						data: noticeListArr[i]
-					};
-	    			var key = noticeListArr[i].nd.ei+"_"+noticeListArr[i].ntp;
-	    			//有已讀紀錄, 且ct相同, 表示為同一筆貼文或回文
-	    			// if( DBDataObj.hasOwnProperty(key) ){
-	    				// if( DBDataObj[key].nd.ct==noticeListArr[i].nd.ct ){
-	    				// if (noticeListArr[i].nd.st == 1) {
-	    				// 	obj.isRead = true;
-	    				// 	noticeListArr[i].isRead = true;
-	    				// }
-	    			// }
-	    			// ary.push(obj);
-	    			idb_alert_events.put(obj);
-	    		} catch(e){
-	    			errorReport(e);
-	    		}
-    		}
+		showAlertContent(noticeListArr);
+		// showAlertContent(Object.keys(noticeMap).map(function(nId) {
+		// 	cnt++;
+		// 	return noticeMap[nId];
+		// }));
 
-			showAlertContent(noticeListArr);
-		// });
+		console.log("cnt", cnt);
 	});
 
 	function isFromLoginAndLdapExpired(companyData) {
@@ -226,16 +196,14 @@ showAlertContent = function(data){
 		$(".alert-area .content").html("<div class='no-msg'>"+ $.i18n.getString("NOTICES_NOMSG_WEB") +"</div>");
 		return;
 	}
-	// cns.debug("showAlertContent");
 
-	// $(".alert-area .content").hide('fast');
 	$('<div>').load('layout/alert_subbox.html .al-subbox',function(){
 		// var tmpContainer = $("<div></div>");
 		var tmpContainer = $(".alert-area .content");
 		tmpContainer.html("");
 		var userData = QmiGlobal.groups;
 		if( null == userData )	return;
-
+		var cnt = 0;
 		for(var i=0; i<data.length; i++){
 
 			var boxData = data[i];
@@ -262,7 +230,7 @@ showAlertContent = function(data){
 				}
 
 				tmp = $(tmpDiv).find(".al-post-group");
-				if( tmp ) tmp.html( boxData.gn.replaceOriEmojiCode() );
+				if( tmp ) tmp.html(i +": "+  boxData.gn.replaceOriEmojiCode() );
 
 				//邀請者名稱
 				tmp = $(tmpDiv).find(".al-post-name");
@@ -289,7 +257,7 @@ showAlertContent = function(data){
 
 				//群組名
 				tmp = $(tmpDiv).find(".al-post-group");
-				if( tmp ) tmp.html( group.gn._escape().replaceOriEmojiCode() );
+				if( tmp ) tmp.html(i +": "+ group.gn._escape().replaceOriEmojiCode() );
 
 
 				switch (boxData.ntp) {
@@ -349,7 +317,6 @@ showAlertContent = function(data){
 			    		break;
 
 			    	case 3:
-			    		console.log(boxData)
 			    		//xx(及其他xx個人)
 					    tmp = $(tmpDiv).find(".al-post-name");
 					    if( tmp && group.guAll && group.guAll[boxData.gu]){
@@ -387,110 +354,6 @@ showAlertContent = function(data){
 
 			    }
 
-				// if(boxData.ntp==1){ //貼文
-				// 	//xx(發布者 名)
-				//     tmp = $(tmpDiv).find(".al-post-name");
-				//     if( tmp ) tmp.html( boxData.gun.replaceOriEmojiCode() );
-
-				// 	//發佈xx
-				// 	content = $(tmpDiv).find(".al-content.post");
-
-				// 	if( group ){
-				// 		//發布者 照片
-				// 	    var tmp = $(tmpDiv).find(".al-post-img.namecard");
-				// 	    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
-				// 	    	var auo = group.guAll[boxData.gu].auo;
-				// 	    	if(auo){
-				// 	    		tmp.css("background-image","url("+auo+")");
-				// 	    	}
-				// 	    }
-				// 	}
-
-				// } else { //回覆
-				// 	//xx(及其他xx個人)
-				//     tmp = $(tmpDiv).find(".al-post-name");
-				//     if( tmp && boxData.gun){
-				//     	tmp.html( boxData.gun.replaceOriEmojiCode() );
-				//     	if(boxData.rcnt>1){
-				//     		$(tmpDiv).find(".posterDetail").css("display","inline-block");
-				//     		$(tmpDiv).find(".otherPosterCnt").html( $.i18n.getString("NOTICES_RESPONSER_NUM",boxData.rcnt-1) );
-				//     	}
-				//     }
-
-				// 	//"回覆"xxx的xx『xxx』
-				// 	content = $(tmpDiv).find(".al-content.response");
-
-				// 	//回覆"xxx的"xx『xxx』
-				// 	content.find(".oriPoster").html(
-				// 		textSomeonesHtmlFormat( getPosterText(group, boxData) )
-				// 	);
-
-				// 	//發布者 照片
-				// 	var tmp = $(tmpDiv).find(".al-post-img");
-				// 	if( tmp ){
-				// 		if( boxData.aurl ){
-				// 			tmp.css("background-image","url("+boxData.aurl+")");
-				// 		} else if( group && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
-				// 			var auo = group.guAll[boxData.gu].auo;
-				// 			if(auo){
-				// 				tmp.css("background-image","url("+auo+")");
-				// 			}
-				// 		}
-				// 	}
-				// }
-
-				// if(boxData.ntp==1){ //貼文
-				// 	//xx(發布者 名)
-				//     tmp = $(tmpDiv).find(".al-post-name");
-				//     if( tmp ) tmp.html( boxData.gun.replaceOriEmojiCode() );
-
-				// 	//發佈xx
-				// 	content = $(tmpDiv).find(".al-content.post");
-
-				// 	if( group ){
-				// 		//發布者 照片
-				// 	    var tmp = $(tmpDiv).find(".al-post-img.namecard");
-				// 	    if( tmp && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
-				// 	    	var auo = group.guAll[boxData.gu].auo;
-				// 	    	if(auo){
-				// 	    		tmp.css("background-image","url("+auo+")");
-				// 	    	}
-				// 	    }
-				// 	}
-
-				// } else { //回覆
-				// 	//xx(及其他xx個人)
-				//     tmp = $(tmpDiv).find(".al-post-name");
-				//     if( tmp && boxData.gun){
-				//     	tmp.html( boxData.gun.replaceOriEmojiCode() );
-				//     	if(boxData.rcnt>1){
-				//     		$(tmpDiv).find(".posterDetail").css("display","inline-block");
-				//     		$(tmpDiv).find(".otherPosterCnt").html( $.i18n.getString("NOTICES_RESPONSER_NUM",boxData.rcnt-1) );
-				//     	}
-				//     }
-
-				// 	//"回覆"xxx的xx『xxx』
-				// 	content = $(tmpDiv).find(".al-content.response");
-
-				// 	//回覆"xxx的"xx『xxx』
-				// 	content.find(".oriPoster").html(
-				// 		textSomeonesHtmlFormat( getPosterText(group, boxData) )
-				// 	);
-
-				// 	//發布者 照片
-				// 	var tmp = $(tmpDiv).find(".al-post-img");
-				// 	if( tmp ){
-				// 		if( boxData.aurl ){
-				// 			tmp.css("background-image","url("+boxData.aurl+")");
-				// 		} else if( group && group.hasOwnProperty("guAll") && group.guAll.hasOwnProperty(boxData.gu) ){
-				// 			var auo = group.guAll[boxData.gu].auo;
-				// 			if(auo){
-				// 				tmp.css("background-image","url("+auo+")");
-				// 			}
-				// 		}
-				// 	}
-				// }
-
 				//event title
 				if( boxData.nd.hasOwnProperty("et") && boxData.nd.et.length>0 ){
 					$(content).find(".boxTitle").html( getEventTitleText(boxData.nd.et) ).css("display","inline-block");
@@ -501,19 +364,7 @@ showAlertContent = function(data){
 				$(content).find(".icon").attr( "src", getEventTypeIcon(boxData.nd.etp) );
 
 
-				if(content){
-				    content.css("display","block");
-
-				    //並上傳了檔案
-				  //   if( boxData.nd.hasOwnProperty("ml") ){
-						// for( var j=0; j<boxData.nd.ml.length; j++){
-						// 	if( boxData.nd.ml[j].tp!=0 ){
-						// 		setDetailAct( content );
-						// 		break;
-						// 	}
-						// }
-				  //   }
-				}
+				if(content) content.css("display","block");
 
 				//內容
 			    var extra = $(tmpDiv).find(".al-extra");
@@ -604,7 +455,6 @@ showAlertContent = function(data){
 			$(tmpDiv).find(".al-post-img.namecard").data("gu",boxData.gu);
 			$(tmpDiv).find(".al-post-img.namecard").data("gi",boxData.gi);
 
-			// $(".alert-area .content").append(tmpDiv);
 		}
 	});
 }
