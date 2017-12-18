@@ -144,42 +144,12 @@ updateAlert = function(isFromLogin){
 
 
 	$.when.apply($, noticeDefArr).done(function(){
-		var cnt = 0;
-		console.log("start", noticeListArr.length);
-		// 2017/12/15 暫時 - 防止重複鈴鐺 公雲company
-		// var noticeMap = noticeListArr.sort(function(a, b) {
-		// 	cnt++;
-		// 	return b.nd.ct - a.nd.ct;
-		// }).reduce(function(map, curr) {
-		// 	cnt++;
-		// 	map[curr.nd.ei +"_"+ curr.ntp] = curr;
-		// 	return map;
-		// }, {});
-
-		// for( var i=0; i < noticeListArr.length; i++){
-		// 	try{
-				
-		// 		//ct_ei_ntp
-		// 		var obj = {
-		// 			ei: noticeListArr[i].nd.ei,
-		// 			ntp: noticeListArr[i].ntp,
-		// 			ei_ntp: noticeListArr[i].nd.ei+"_"+noticeListArr[i].ntp,
-		// 			data: noticeListArr[i]
-		// 		};
-  //   			var key = noticeListArr[i].nd.ei+"_"+noticeListArr[i].ntp;
-
-  //   		} catch(e){
-  //   			errorReport(e);
-  //   		}
-		// }
+		// 2017/12/15 防止重複鈴鐺 公雲company
+		noticeListArr.sort(function(a, b) {
+			return b.nd.ct - a.nd.ct;
+		});
 
 		showAlertContent(noticeListArr);
-		// showAlertContent(Object.keys(noticeMap).map(function(nId) {
-		// 	cnt++;
-		// 	return noticeMap[nId];
-		// }));
-
-		console.log("cnt", cnt);
 	});
 
 	function isFromLoginAndLdapExpired(companyData) {
@@ -198,24 +168,25 @@ showAlertContent = function(data){
 	}
 
 	$('<div>').load('layout/alert_subbox.html .al-subbox',function(){
-		// var tmpContainer = $("<div></div>");
+		var layoutDom = $(this)
 		var tmpContainer = $(".alert-area .content");
 		tmpContainer.html("");
 		var userData = QmiGlobal.groups;
-		if( null == userData )	return;
+		if( null == userData ) return;
 		var cnt = 0;
-		for(var i=0; i<data.length; i++){
+		var distinctArr = [];
 
-			var boxData = data[i];
-
+		data.forEach(function(boxData, i) {
+			if(distinctArr.indexOf(boxData.nd.ei +"_"+ boxData.ntp) < 0) {
+				distinctArr.push(boxData.nd.ei +"_"+ boxData.ntp)
+			} else return;
 
 			/* ----------- TODO: 檢查是否已show過 ------------ */
 
-			var tmpDiv = $(this).clone();
+			var tmpDiv = layoutDom.clone();
 
-			if( boxData.nd && boxData.nd.st == 1){
+			if( boxData.nd && boxData.nd.st == 1)
 				tmpDiv.find(".al-subbox").addClass("isRead");
-			}
 
 		    var content;
 
@@ -230,7 +201,7 @@ showAlertContent = function(data){
 				}
 
 				tmp = $(tmpDiv).find(".al-post-group");
-				if( tmp ) tmp.html(i +": "+  boxData.gn.replaceOriEmojiCode() );
+				if( tmp ) tmp.html(boxData.gn.replaceOriEmojiCode() );
 
 				//邀請者名稱
 				tmp = $(tmpDiv).find(".al-post-name");
@@ -250,14 +221,14 @@ showAlertContent = function(data){
 
 		    } else {
 				//預防舊的ＡＰＩ
-				if( !data[i].hasOwnProperty("nd") ) continue;
+				if( !boxData.hasOwnProperty("nd") ) return;
 
 				group = userData[boxData.gi];
-				if( null==group ) continue;
+				if( null==group ) return;
 
 				//群組名
 				tmp = $(tmpDiv).find(".al-post-group");
-				if( tmp ) tmp.html(i +": "+ group.gn._escape().replaceOriEmojiCode() );
+				if( tmp ) tmp.html(group.gn._escape().replaceOriEmojiCode() );
 
 
 				switch (boxData.ntp) {
@@ -400,17 +371,6 @@ showAlertContent = function(data){
 					var this_gi = $(this).data("gi");
 					var this_ei = $(this).data("ei");
 					var this_ntp = $(this).data("ntp");
-					// var DBKey = this_ei+"_"+this_ntp;
-					// idb_alert_events.get(DBKey, function(data){
-					// 	if(!data){
-					// 		cns.debug("error");
-					// 		return;
-					// 	}
-					// 	data.isRead = true;
-					// 	idb_alert_events.put(data);
-					// }, function(data){
-					// 	cns.debug(data);
-					// });
 
 					if( null==this_gi || null==this_ei ) return;
 
@@ -455,7 +415,7 @@ showAlertContent = function(data){
 			$(tmpDiv).find(".al-post-img.namecard").data("gu",boxData.gu);
 			$(tmpDiv).find(".al-post-img.namecard").data("gi",boxData.gi);
 
-		}
+		});
 	});
 }
 
