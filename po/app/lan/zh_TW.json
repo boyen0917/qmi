@@ -322,7 +322,7 @@
 	"CHAT_CHATROOM_SOMEONE_ASSIGN_ADMIN" : "%@ 指派 %@ 為聊天室管理員",
 	"CHAT_CHATROOM_SOMEONE_DEMOTE_SOMEONE" : "%@ 取消 %@ 聊天室管理員權限",
 	"CHAT_SELF_ALREADY_ADMIN" : "你已是管理員了!!",
-	"CHAT_EXIT_CHATROOM_FAIL" : "請保留成員至少有一位是管理員，並將自己的權限取消!!",
+	"CHAT_EXIT_CHATROOM_FAIL" : "退出失敗，請保留成員至少有一位是管理員。",
 	"CHAT_EDIT_CHATROOM" : "前往編輯",
 
 	"NOTICES_TITLE"			: "新通知",

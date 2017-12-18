@@ -2389,9 +2389,16 @@ function sendMsgText(dom) {
 			$.i18n.getString("CHAT_LEAVE_CONFIRM"),
 			$.i18n.getString("COMMON_OK"),
 			$.i18n.getString("COMMON_CANCEL"), [function () { //on ok
-				var iAmAdmin = g_room.memList[gu].ad;
+				var chatroomUserList = g_room.memList;
+				var iAmAdmin = chatroomUserList[gu].ad;
 				if (iAmAdmin) {
-					if (g_room.cpc == 1) { //只剩下自己，可以退出
+
+					var otherAdmins = Object.keys(chatroomUserList).filter(function(memId){
+  						return chatroomUserList[memId].ad == 1 && chatroomUserList[memId].gu != gu;
+					})
+
+					//只剩下自己或是已有其他管理員，可以退出
+					if (g_room.cpc == 1 || otherAdmins.length > 0) { 
 						leaveRoomAPI(ci, function () {
 							var userData = $.userStorage();
 							g_group = userData[gi];
