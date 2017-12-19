@@ -6801,7 +6801,7 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
 
         //重置 清除附檔區
         this_event.find(".st-reply-message-textarea textarea").val("").end()
-        .find(".st-reply-message-img").removeData().html("");
+        .find(".st-reply-message-img").show().removeData().html("");
 
         setTimeout(function(){
             this_event.find(".st-reply-message-send").data("reply-chk",false);
@@ -6813,7 +6813,10 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
                 replyReload(this_event);
             else { 
                 if(this_event.find(".st-reply-message-img").is(":visible"))this_event.find(".st-reply-message-img").html("");
-                if(this_event.find(".stickerArea").is(":visible")) this_event.find(".stickerArea").hide();
+                if(this_event.find(".stickerArea").is(":visible")) {
+                    this_event.find(".stickerArea").hide();
+                    this_event.find(".st-reply-message-sticker").click();
+                }
                 this_event.find(".st-sub-box-2").trigger("detailShow");
             }
             this_event.find(".st-reply-highlight-container").empty();
