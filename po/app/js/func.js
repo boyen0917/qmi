@@ -448,7 +448,10 @@ timelineSwitch = function (act, reset, main, noAppReload){
         case "memberslist": 
             switchDeferred.resolve({ act: "memberslist"});
             groupMain.find(".subpage-contact").show();
-            
+
+            // 2017/12/18 會被showGroupInfoPage隱藏
+            $("#page-contact_all > div.subpage-contact").show();
+
             //藏新增貼文按鈕, 新增聊天室按鈕
             gmHeader.find(".feed-compose").hide();
             gmHeader.find(".chatList-add").hide();
@@ -1368,41 +1371,40 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     // 存完成定位的成員
     var taskFinisherData = [];
 
-
     //event path
     this_event.data("event-path",this_ei);
 
     //已讀亮燈 & 隱藏未讀提示
     this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")
     this_event.find("div.timeline-box-hint").hide();
-
     
-    //製作每個回覆
-    var okCnt = 0;
+    // 2017/12/19 load once
+    $('<div>').load('layout/timeline_event.html?v2.1.0.2 .st-reply-content-area', function(){
+        //製作每個回覆
+        var okCnt = 0;
+        var loadedDom = $(this);
 
-    $.each(e_data,function(el_i,el){
-        //0是發文 不重複製作
-        // if(el_i == 0) return ;
+        $.each(e_data,function(el_i,el){
+            //0是發文 不重複製作
+            // if(el_i == 0) return ;
+            var deferred = $.Deferred();
+            var without_message = false;
+            var reply_content;
+            var ml_arr = [];
+            var mainReplyText;
 
-        var deferred = $.Deferred();
-        var without_message = false;
-        var reply_content;
-        var ml_arr = [];
-        var mainReplyText;
+            deferTasks.push(deferred);
 
-        deferTasks.push(deferred);
-        this_event.find(".st-reply-all-content-area").append($('<div>').load('layout/timeline_event.html?v2.1.0.1 .st-reply-content-area', function(){
-            var this_load = $(this).find(".st-reply-content-area");
+            var replyDom = loadedDom.clone();
+            this_event.find(".st-reply-all-content-area").append(replyDom);
+
+            var this_load = replyDom.find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
 
             var targetTu = null;
-            if(el.meta){
-                targetTu = {
-                    tu: el.meta.tu,
-                    pu: el.meta.gu
-                };
-            }
+            if(el.meta) targetTu = {tu: el.meta.tu, pu: el.meta.gu};
+
             $.each(el.ml,function(i,val){
                 //event種類 不同 讀取不同layout
                 switch(val.tp){
@@ -1697,8 +1699,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
             }
 
             deferred.resolve();
-        }));
-        
+        });
     });
 
     this_event.data("taskFinisherData", taskFinisherData);
@@ -1895,7 +1896,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.1.0.1 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.1.0.2 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -4512,13 +4513,12 @@ permissionControl = function(group_list){
 
 //動態消息列表
 //先從資料庫拉資料 另外也同時從server拉資料存資料庫 再重寫
-idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
-    var 
-    polling_arr = polling_arr || [],
-    this_gi = polling_arr[0] || gi,
-    this_ti = polling_arr[1] || ti_feed,
-    main_gu = $("#page-group-main").data("main-gu"),
-    filterType = $("#page-group-main").find("div.st-filter-action.st-filter-list-active").data("status");
+idbPutTimelineEvent = function (ct_timer, is_top, polling_arr){
+    var polling_arr = polling_arr || [];
+    var this_gi = polling_arr[0] || gi;
+    var this_ti = polling_arr[1] || ti_feed;
+    var main_gu = $("#page-group-main").data("main-gu");
+    var filterType = $("#page-group-main").find("div.st-filter-action.st-filter-list-active").data("status");
 
     deferred = $.Deferred();
     if(main_gu){
@@ -4545,29 +4545,24 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
     }
 
     if (ct_timer) {
-        if (api_name.match(/\?/)) {
+        if (api_name.match(/\?/))
             api_name = api_name + "&ct=" + ct_timer;
-        } else {
+        else
             api_name = api_name + "?ct=" + ct_timer;
-        }
     }
 
     if (main_gu) {
-        // event_tp = "00";
-        if (api_name.match(/\?/)) {
+        if (api_name.match(/\?/))
             api_name = api_name + "&gu=" + main_gu;
-        } else {
+        else
             api_name = api_name + "?gu=" + main_gu;
-        }
     }
 
-
-
     var headers = {
-            ui:ui,
-            at:at, 
-            li:lang,
-            tp: ("0" + event_tp).slice(-2)
+        ui:ui,
+        at:at, 
+        li:lang,
+        tp: ("0"+ event_tp).slice(-2)
     };
     var method = "get";
     var result = ajaxDo(api_name,headers,method,false);
@@ -4592,6 +4587,7 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
         }
 
         var timeline_list = $.parseJSON(data.responseText).el;
+
         //沒資料 後面就什麼都不用了
         if( timeline_list.length == 0 ) {
             $(".feed-subarea[data-feed=" + event_tp + "]").addClass("no-data");
@@ -4607,7 +4603,6 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
                 desc:"no events",
                 status: true
             });
-
             
         } else {
             //transform gi to private gi
@@ -4646,26 +4641,8 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
                     });
                 });
             } else {
-            // 移除idb
-            // idbRemoveTimelineEvent(timeline_list,ct_timer,polling_arr,function(){
                 $(".st-filter-area").removeClass("st-filter-lock");
-                //點選其他類別 會導致timeline寫入順序錯亂 因此暫時不存db
-                // if(event_tp == "00"){
-                //  //存db           
-             //        $.each(timeline_list,function(i,val){
-             //            val.ct = val.meta.ct;
-             //            val.gi = this_gi ;
-             //            val.tp = val.meta.tp ;
-
-             //            var tp = val.meta.tp.substring(1,2)*1;
-             //            //為了idb
-             //            if(tp > 2){
-             //             val.tp = "03" ;
-             //            }
-             //            idb_timeline_events.put(val);
-             //        });
-                // }
-
+           
                 if(polling_arr.length == 0){
 
                     //資料個數少於這個數量 表示沒東西了
@@ -4690,14 +4667,13 @@ idbPutTimelineEvent = function (ct_timer,is_top,polling_arr){
                         var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
                         this_navi.find(".st-sub-box[data-idb=true]").remove();
 
-                        timelineBlockMake($(this).find(".st-sub-box"),timeline_list,is_top,null,this_gi);
+                        timelineBlockMake($(this).find(".st-sub-box"), timeline_list, is_top, null, this_gi);
                         deferred.resolve({
                             desc:"main_gu exists",
                             status: true
                         });
                     });
                 }
-            // });
             }
         }
     });
@@ -4765,8 +4741,8 @@ idbRemoveTimelineEvent = function(timeline_list,ct_timer,polling_arr,callback){
     });
 }
 
-timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi){
-    if(!detail){
+timelineBlockMake = function(this_event_temp, timeline_list, is_top, isMakingDetailPage, this_gi){
+    if(!isMakingDetailPage){
         var event_tp = ("0" + $("#page-group-main").data("navi")).slice(-2) || "00";
         if($("#page-group-main").data("main-gu")){
             var tmp = ".feed-subarea[data-feed=main]";
@@ -4788,23 +4764,20 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
     }
 
     //檢查非同步timeline是否有清空
-    if( this_gi ){
-        if( this_gi!=gi ){
-            ori_selector.html("");
-        }
-    }
-
+    if(this_gi && this_gi != gi) ori_selector.html("");
 
     var this_event = this_event_temp;
     var selector = $(".timeline-detail");
     var method = "html";
     var visibleEventCnt = 0;
+
     //製作timeline
     $.each(timeline_list,function(i,val){
         if(null==val) return;
         var content,box_content,youtube_code,prelink_pic,prelink_title,prelink_desc;
+
         //detail 不需要
-        if(!detail){
+        if(!isMakingDetailPage){
             method = "append";
             //reset selector
             selector = ori_selector;
@@ -4828,12 +4801,14 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
 
                 eventStatusWrite(this_event);
 
-                //已經存在的文章還是要檢查filter
-                // eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
+                // 2017/12/18 更新留言區域
+                if(this_event.find(".st-reply-content-area").is(":visible"))
+                    updateReplyArea(this_event);
 
-                if( this_event.hasClass("filter-show") ){
+
+                if( this_event.hasClass("filter-show") )
                     visibleEventCnt++;
-                }
+
                 return;
             }
 
@@ -4847,16 +4822,7 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
             }
         }
 
-        //寫入
-        // QmiGlobal.timelineTestObj.push({
-        //     selector: selector,
-        //     method: method,
-        //     event: this_event
-        // })
         selector[method](this_event);
-
-        //調整留言欄
-        // this_event.find(".st-reply-message-textarea").css("width",$(window).width()- (this_event.hasClass("detail") ? 200 : 450));
 
         var tp = val.meta.tp.substring(1,2)*1;
 
@@ -4873,7 +4839,7 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
         .find(".st-user-pic.namecard").data("gi",val.ei.split("_")[0]).end()
         .find(".st-user-pic.namecard").data("gu",val.meta.gu);
 
-        if(detail){
+        if(isMakingDetailPage){
             $(".timeline-detail").fadeIn("fast");
 
             //等待元素就位
@@ -4989,9 +4955,7 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
                 break;
         };
 
-        if(detail){
-            $(".detail-title").html(title);
-        }
+        if(isMakingDetailPage) $(".detail-title").html(title);
     
         //0:普通貼文 共用區
         if(tp != 0){
@@ -5030,18 +4994,13 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
         
         //tp = 0 是普通貼文 在content區填內容 其餘都在more desc填
         var target_div = ".st-box2-more-desc";
-        if(tp == "0"){
-            target_div = ".st-sub-box-2-content";
-        }
+        if(tp == "0") target_div = ".st-sub-box-2-content";
 
         //event status
         eventStatusWrite(this_event);
 
         //detail 不做filter
-        // if(!detail) eventFilter(this_event,$(".st-filter-area").data("filter"),val.meta);
-        if( this_event.hasClass("filter-show") ){
-            visibleEventCnt++;
-        }
+        if(this_event.hasClass("filter-show")) visibleEventCnt++;
 
         //timeline message內容
         var tuTmp =null;
@@ -5059,11 +5018,9 @@ timelineBlockMake = function(this_event_temp,timeline_list,is_top,detail,this_gi
 timelineListWrite = function (ct_timer,is_top){
     var deferred = $.Deferred();
 
-    // $(".st-filter-area").addClass("st-filter-lock");
     //判斷有內容 就不重寫timeline -> 不是下拉 有load chk 就 return
     if(!ct_timer && !is_top){
         var event_tp = "0" + $("#page-group-main").data("navi") || "00";
-        console.log(event_tp);
         var selector = $(".feed-subarea[data-feed=" + event_tp + "]");
 
         //隱藏其他類別
@@ -5084,46 +5041,6 @@ timelineListWrite = function (ct_timer,is_top){
     idbPutTimelineEvent(ct_timer,is_top).done( deferred.resolve );
 
     return deferred.promise();
-    // // 下拉更新 和 個人主頁 就不需要資料庫了
-    // if(is_top || $("#page-group-main").data("main-gu")) return false;
-
-    //判斷類別
-    // var idb_index,idb_keyRange;
-    // if(!event_tp || event_tp == "00"){
-    //  idb_index = "gi_ct";
-    //  idb_keyRange = idb_timeline_events.makeKeyRange({
-//             upper: [gi,idb_timer],
-//             lower: [gi]
-//           });
-    // }else{
-    //  idb_index = "gi_tp_ct";
-    //  idb_keyRange = idb_timeline_events.makeKeyRange({
-//             upper: [gi,event_tp,idb_timer],
-//             lower: [gi,event_tp]
-//           })
-    // }
-
-    //同時先將資料庫資料取出先寫上
-    // idb_timeline_events.limit(function(timeline_list){
- //        if(timeline_list.length == 0) return false;
-    //  //寫timeline
-    //  load_show = false;
-    //  $('<div>').load('layout/timeline_event.html .st-sub-box',function(){
- //            $(this).find(".st-sub-box").attr("data-idb",true);
-    //      timelineBlockMake($(this).find(".st-sub-box"),timeline_list);
-    //  });
-    // },{
- //        index: idb_index,
- //        keyRange: idb_keyRange,
- //        limit: 20,
- //        order: "DESC",
- //        onEnd: function(result){
- //            cns.debug("onEnd:",result);
- //        },
- //        onError: function(result){
- //            cns.debug("onError:",result);
- //        }
- //    });
 }
 
 eventStatusWrite = function(this_event,this_es_obj){
@@ -6623,15 +6540,6 @@ replySend = function(thisEvent){
         }
     }
 
-    // var hashtagList = text.extractHashTag();
-
-    // hashtagList.forEach(function(hashtag) {
-    //     body.ml.push({
-    //         "k": hashtag,
-    //         "tp": 29
-    //     });
-    // });
-
     tmpElement.innerHTML = text;
 
     body.ml.unshift({
@@ -6795,34 +6703,38 @@ replyApi = function(this_event, this_gi, this_ti, this_ei, body){
     var method = "post";
     var result = ajaxDo(api_name,headers,method,false,body);
     result.complete(function(data){
-        //重新讀取detail
-        var this_textarea = this_event.find(".st-reply-message-textarea textarea");
-        this_textarea.val("").parent().addClass("adjust").removeClass("textarea-animated");
-
-        //重置 清除附檔區
-        this_event.find(".st-reply-message-textarea textarea").val("").end()
-        .find(".st-reply-message-img").removeData().html("");
-
-        setTimeout(function(){
-            this_event.find(".st-reply-message-send").data("reply-chk",false);
-            clearReplyDomData(this_event);
-            
-            if(this_event.hasClass("detail"))
-                replyReload(this_event);
-            else if(this_event.find(".st-reply-all-content-area").is(":visible"))
-                replyReload(this_event);
-            else { 
-                if(this_event.find(".st-reply-message-img").is(":visible"))this_event.find(".st-reply-message-img").html("");
-                if(this_event.find(".stickerArea").is(":visible")) this_event.find(".stickerArea").hide();
-                this_event.find(".st-sub-box-2").trigger("detailShow");
-            }
-            this_event.find(".st-reply-highlight-container").empty();
-            this_event.find(".st-reply-highlight-container")
-                      .data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
-            this_event.find(".st-reply-highlight-container").data("markMembers", {});
-        },400);
+        updateReplyArea(this_event);
     });
 
+}
+
+updateReplyArea = function(thisEvent) {
+    //重新讀取detail
+    var thisTextarea = thisEvent.find(".st-reply-message-textarea textarea");
+    thisTextarea.val("").parent().addClass("adjust").removeClass("textarea-animated");
+
+    //重置 清除附檔區
+    thisEvent.find(".st-reply-message-textarea textarea").val("").end()
+    .find(".st-reply-message-img").show().removeData().html("");
+
+    setTimeout(function(){
+        thisEvent.find(".st-reply-message-send").data("reply-chk",false);
+        clearReplyDomData(thisEvent);
+        
+        if(thisEvent.hasClass("detail"))
+            replyReload(thisEvent);
+        else if(thisEvent.find(".st-reply-all-content-area").is(":visible"))
+            replyReload(thisEvent);
+        else { 
+            if(thisEvent.find(".st-reply-message-img").is(":visible"))thisEvent.find(".st-reply-message-img").html("");
+            if(thisEvent.find(".stickerArea").is(":visible")) thisEvent.find(".stickerArea").hide();
+            thisEvent.find(".st-sub-box-2").trigger("detailShow");
+        }
+        thisEvent.find(".st-reply-highlight-container").empty();
+        thisEvent.find(".st-reply-highlight-container")
+                  .data("memberList", $.extend({}, QmiGlobal.groups[gi].guAll));
+        thisEvent.find(".st-reply-highlight-container").data("markMembers", {});
+    },400);
 }
 
 replyReload = function(this_event){
@@ -6846,7 +6758,7 @@ replyReload = function(this_event){
     getEventDetail(this_event.data("event-id")).complete(function(data){
         if(data.status == 200){
             var e_data = $.parseJSON(data.responseText).el;
-            detailTimelineContentMake(this_event,e_data,true);
+            detailTimelineContentMake(this_event, e_data, true);
         }
     });
 };
@@ -7800,7 +7712,7 @@ pollingCmds = function(newPollingData){
                             polling_arr = false;
                             idbPutTimelineEvent("",false,polling_arr);
                         }
-
+                        
                         // 做一次
                         if(isDoUpdateAlert) break;
 

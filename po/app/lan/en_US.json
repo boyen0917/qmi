@@ -322,7 +322,7 @@
 	"CHAT_CHATROOM_SOMEONE_ASSIGN_ADMIN" : "%@ assigned %@ as admin.",
 	"CHAT_CHATROOM_SOMEONE_DEMOTE_SOMEONE" : "%@ demoted %@ from admin to member.",
 	"CHAT_SELF_ALREADY_ADMIN" : "You are already an administrator!",
-	"CHAT_EXIT_CHATROOM_FAIL" : "Please assign another someone admin, and cancel self right",
+	"CHAT_EXIT_CHATROOM_FAIL" : "Please assign another someone as admin, and then exit",
 	"CHAT_EDIT_CHATROOM" : "Edit chatroom!",
 
 	"NOTICES_TITLE"						: "New Notices", 

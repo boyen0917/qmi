@@ -964,7 +964,6 @@
 	            var ajaxData = {
 	                apiName : "/groups/" + gi + "/favorite_users/",
 	                method : "put",
-	                isPublicApi : true,
 	                body : {}
 	            };
 
@@ -1077,7 +1076,6 @@
 	    var ajaxData = {
 	        apiName : "/groups/" + gi + "/users/" + userObj.gu,
 	        method : "put",
-	        isPublicApi : true,
 	        body : userObj.info
 	    };
 

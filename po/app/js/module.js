@@ -371,8 +371,6 @@ QmiGlobal.module.appVersion = {
     			return obj;
     		}, {});
 
-    		console.log("ori", self.versionOsMap);
-    		console.log("curr", versionObj);
 
     		self.appVer = versionObj.app || {};
     		self.nwVer = versionObj.nw || {};

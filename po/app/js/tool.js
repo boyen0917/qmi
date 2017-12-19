@@ -393,7 +393,6 @@ htmlFormat = function (str, isToCharCode){
 		urlPattern = "(http(s)?:\\/\\/.)?(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.(?:(?:" + tlds + ")(?=[^0-9a-zA-Z@]|$))\\b([-\u00BF-\u1FFF\u2C00-\uD7ff_a-zA-Z0-9@:%_\\+.~#?&//=]*)",
 		urlRegex = new RegExp(urlPattern, 'gi');
 
-	console.log(urlPattern);
 	if(str.match(/\&\#\d+\;*/g)){
 		str = str.replace(/\&\#/g,"&#38;&#35;");
   	} 
@@ -402,7 +401,6 @@ htmlFormat = function (str, isToCharCode){
     	var newStr = (isToCharCode === true ? encodeHtmlEntity(val) : val) ;
     	
     	if(val.match(urlRegex)) {
-    		console.log('ewfwe')
 			newStr = val.replace(urlRegex, function (match) {
 				if (match.substring(0, 7) == 'http://' || match.substring(0, 8) == 'https://') {
 					return "<a href=\"" + match + "\" target=\"_blank\">" + match + "</a>";
@@ -805,7 +803,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		mediaLoadDef.done(chainDef.resolve);
 		return chainDef;
 	}()).then(function() {
-		console.log(paramObj.s3.file)
 		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
 
 			var ajaxArgs = {
@@ -2227,6 +2224,7 @@ zipVideoFile = function (videoObj) {
 		command.ffprobe(function(err, inputInfo) {
 			// 非h264影片無法播放 需要進行轉檔
 			try {
+				console.log(inputInfo)
 				var videoStream = Array.prototype.find.call(inputInfo.streams, function(stream){
 					return stream.codec_type == "video";
 				});
@@ -2236,6 +2234,7 @@ zipVideoFile = function (videoObj) {
 					if (parseInt(ratio[0]) < parseInt(ratio[1])) isVerticalVideo = true;
 
 					if ((ratio[0] == "0") || (ratio[1] == "0")) {
+						console.log("zero")
 						isVerticalVideo = (videoStream.coded_width < videoStream.coded_height);
 					}
 				}
@@ -2256,14 +2255,16 @@ zipVideoFile = function (videoObj) {
    			.videoCodec('libx264')
    			.audioCodec('aac')
 
-   			console.log(isVerticalVideo)
    			if (isVerticalVideo) {
    				command.outputOptions("-vf scale=360:640,setsar=1")
    			} else {
-   				command.outputOptions("-vf scale=640:360,setsar=1")
+   				command.size('640x?') //寬大於高的影片，不調比例
    			}
 
    			command
+   			.on('codecData', function(data) {
+			    console.log(data)
+			})
 			.outputOptions('-r 30')
 			.outputOptions('-refs 2')
 			.outputOptions('-crf 28')
@@ -2471,7 +2472,6 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 		    		liElement.attr("data-gu", taskFinisher.meta.gu);
 		    		// 點擊頭像跳出個人主頁視窗
 		    		liElement.find("img").off("click").on("click", function(e) {
-		    			console.log( $(e.target).parent().attr("data-gu"));
 		    			var target = $(e.target);
 		    			userInfoShow(gi, target.parent().attr("data-gu"));
 		    		});
