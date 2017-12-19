@@ -6715,7 +6715,7 @@ updateReplyArea = function(thisEvent) {
 
     //重置 清除附檔區
     thisEvent.find(".st-reply-message-textarea textarea").val("").end()
-    .find(".st-reply-message-img").removeData().html("");
+    .find(".st-reply-message-img").show().removeData().html("");
 
     setTimeout(function(){
         thisEvent.find(".st-reply-message-send").data("reply-chk",false);
