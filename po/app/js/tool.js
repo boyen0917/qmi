@@ -2224,6 +2224,7 @@ zipVideoFile = function (videoObj) {
 		command.ffprobe(function(err, inputInfo) {
 			// 非h264影片無法播放 需要進行轉檔
 			try {
+				console.log(inputInfo)
 				var videoStream = Array.prototype.find.call(inputInfo.streams, function(stream){
 					return stream.codec_type == "video";
 				});
@@ -2233,6 +2234,7 @@ zipVideoFile = function (videoObj) {
 					if (parseInt(ratio[0]) < parseInt(ratio[1])) isVerticalVideo = true;
 
 					if ((ratio[0] == "0") || (ratio[1] == "0")) {
+						console.log("zero")
 						isVerticalVideo = (videoStream.coded_width < videoStream.coded_height);
 					}
 				}
@@ -2256,10 +2258,13 @@ zipVideoFile = function (videoObj) {
    			if (isVerticalVideo) {
    				command.outputOptions("-vf scale=360:640,setsar=1")
    			} else {
-   				command.outputOptions("-vf scale=640:360,setsar=1")
+   				command.size('640x?') //寬大於高的影片，不調比例
    			}
 
    			command
+   			.on('codecData', function(data) {
+			    console.log(data)
+			})
 			.outputOptions('-r 30')
 			.outputOptions('-refs 2')
 			.outputOptions('-crf 28')
