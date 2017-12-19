@@ -399,11 +399,9 @@ function showGroupInfoPage(){
 	};
 	contentViewshow();
 	rowViewshow();
- 	// gaContent.find(".ga-gr-content.view").show().end()
- 	// 		 .find(".ga-gr-content.edit").hide().end()
- 	// 		 .find(".ga-info-row.view").show().end()
-		// 	 .find(".ga-info-row.edit").hide().end();
 
+	gaContent.off();
+	
     gaContent.on("click","#icon-view-gname", function(){
     	gaContent.find(".ga-gr-content.view").hide().end()
 				 .find(".ga-gr-content.edit").show();
@@ -442,12 +440,7 @@ function showGroupInfoPage(){
 	});
 
 	
-	if(groupImg){
-		$(".ga-avatar-img").attr("src",groupImg);
-	} else{
-		$(".ga-avatar-img").attr("src","images/common/others/name_card_nophoto_profile.png");
-	}
-
+	$(".ga-avatar-img").attr("src", groupImg || "images/common/others/name_card_nophoto_profile.png");
 
 	// if( $(".subpage-groupSetting").is(":visible") ){
 		$(".subpage-groupAbout").css("margin-left","100%");
@@ -460,10 +453,7 @@ function showGroupInfoPage(){
 			    $(".subpage-chatList").hide();
 			    $(".subpage-album").hide();
 		});
-		// $(".subpage-groupAbout").data("lastPage", ".subpage-groupSetting");
-	// } else {
-		// $(".subpage-groupAbout").css("margin-left","0%");
-		// $(".subpage-groupAbout").fadeIn();
+
 		if( $(".subpage-contact").is(":visible") ){
 			$(".subpage-groupAbout").data("lastPage", ".subpage-contact");
 		} else if( $(".subpage-timeline").is(":visible") ){

@@ -1344,42 +1344,6 @@ showEditFavGroupBox = function( dom ) {
 			}
 
 			updateSubFavoriteGroup(updateList, dom, fi);
-
-			// //沒有變化
-			// if( body.al.length==0 && body.dl.length==0 ) return;
-
-			// ajaxDo(api_name,headers,"put",true,body).complete(function(data){
-			// 	if(data.status == 200){
-			// 		var userData = QmiGlobal.groups;
-			// 		g_group = userData[gi];
-
-			// 		//add fi to mem data
-			// 		guAll = g_group.guAll;
-			// 		for(var i=0; i<body.al.length; i++){
-			// 			var key = body.al[i];
-			// 			guAll[key].fbl.push(fi);
-			// 		}
-			// 		//del fi from mem data
-			// 		for(var i=0; i<body.dl.length; i++){
-			// 			var key = body.dl[i];
-			// 			var index = guAll[key].fbl.indexOf(fi);
-			// 			if( index>=0 ) delete guAll[key].fbl[index];
-			// 		}
-
-			// 		//add fi data to fbl
-			// 		fbl = g_group.fbl;
-			// 		fbl[fi].cnt = memKeys.length;
-			// 		// *--* $.lStorage(ui, userData );
-
-			// 		initContactData();
-			// 		dom.parent().fadeOut();
-			// 		showSubFavoritePage(fi);
-
-			// 		toastShow( $.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_MEMBER_SUCC") );
-			// 	} else {
-			// 		toastShow( $.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_MEMBER_FAIL") );
-			// 	}
-			// });
 		}
 	});
 }
