@@ -1379,7 +1379,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     this_event.find("div.timeline-box-hint").hide();
     
     // 2017/12/19 load once
-    $('<div>').load('layout/timeline_event.html?v2.1.0.1 .st-reply-content-area', function(){
+    $('<div>').load('layout/timeline_event.html?v2.1.0.2 .st-reply-content-area', function(){
         //製作每個回覆
         var okCnt = 0;
         var loadedDom = $(this);
@@ -1896,7 +1896,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.1.0.1 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.1.0.2 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
