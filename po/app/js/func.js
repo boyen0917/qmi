@@ -8417,7 +8417,7 @@ goToGroupMenu = function(){
 
 function removeCompany(companyData) {
     Object.keys(QmiGlobal.companyGiMap).forEach(function(thisGi) {
-        if(QmiGlobal.companyGiMap[thisGi].ci === companyData.ci) removeGroup(thisGi, true);
+        if(QmiGlobal.companyGiMap[thisGi].ci === companyData.ci) removeGroup(thisGi);
     });
     delete QmiGlobal.companies[companyData.ci];
 }
