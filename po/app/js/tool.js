@@ -635,14 +635,21 @@ qmiUploadFile = function(uploadObj){
 			if (s3Obj.oriFile) {
 				EXIF.getData(s3Obj.oriFile, function(data){
 					exifObj = EXIF.getAllTags(this);
+					console.log(exifObj)
+					// console.log(exifObj.MaxApertureValue)
+					// console.log(exifObj.MaxApertureValue.valueOf())
 					if(!$.isEmptyObject(exifObj)){
 						body.exif = {
-							"DateTimeOriginal": exifObj.DateTimeOriginal || "",
-							"DateTimeDigitized": exifObj.DateTimeDigitized || "",
-							"LatitudeRef": exifObj.GPSLatitudeRef || "", //緯度
-							"Latitude": toDecimal(exifObj.GPSLatitude) || "", 
-							"LongitudeRef": exifObj.GPSLongitudeRef || "", //經度
-							"Longitude": toDecimal(exifObj.GPSLongitude) || "" 
+							"ApertureValue": exifObj.MaxApertureValue ? exifObj.MaxApertureValue.valueOf() : "",
+							"DateTime": exifObj.DateTime || "",
+							"ExposureTime": exifObj.ExposureTime ? exifObj.ExposureTime.valueOf() : "",
+							"Flash": exifObj.Flash,
+							"FocalLength": exifObj.FocalLength ? (exifObj.FocalLength.numerator + "/" + exifObj.FocalLength.denominator) : "",
+							"Latitude": toDecimal(exifObj.GPSLatitude) || "",
+							"Longitude": toDecimal(exifObj.GPSLongitude) || "",
+							"Make": exifObj.Make || "",
+							"Model": exifObj.Model || "",
+							"WhiteBalance": exifObj.WhiteBalance || "" 
 						}
 					}
 					getExifDef.resolve();
