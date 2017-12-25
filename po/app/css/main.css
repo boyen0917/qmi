@@ -1495,17 +1495,23 @@ div#page-group-main div.gm-header-left:before {
 }
 
 .gm-user-main-area .user .header {
-	width: 100%;
+    width: 100%;
     height: 40px;
     background: rgba(178, 186, 210, 0.33);
     line-height: 2.5;
+    position: relative;
 }
 
 .gm-user-main-area .header h3 {
-	margin-left: 5.8em;
-    line-height: 0;
-    width: 265px;
+	width: 65%;
     display: inline-block;
+    padding-left: 115px;
+    margin: 0;
+    line-height: 40px;
+    height: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .gm-user-main-area .header .edit-full-name {
@@ -1527,15 +1533,15 @@ div#page-group-main div.gm-header-left:before {
 }
 
 .gm-user-main-area .header .edit-pen {
-	background: url("../images/namecard/qicon_edit.png");
-	display: inline-block;
-    background-size: 28px;
+    background: url(../images/namecard/qicon_edit.png);
+    position: absolute;
+    background-size: 22px;
     background-repeat: no-repeat;
     width: 40px;
     height: 40px;
     cursor: pointer;
-    margin-top: 5px;
-    vertical-align: middle;
+    right: 0;
+    top: 10px;
 }
 
 .gm-user-main-area .user .edit-decision {
@@ -1990,6 +1996,7 @@ div#page-group-main div.gm-header-left:before {
     position: relative;
     width: calc(100vw - 250px);
     z-index: 2;
+    min-width: 400px;
 }
 
 
