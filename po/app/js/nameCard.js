@@ -164,9 +164,9 @@
 	                        // *--* $.lStorage(ui, _groupList);
 
 	                        //更新所有照片、名字 this_gi , this_gu , set_name ,set_img
-	                        if(update_chk){
+	                        if(update_chk)
 	                            updateAllAvatarName(this_user_info.gi,this_user_info.gu);
-	                        }
+	                        
 	                    }else{
 	                        cns.debug("[!!!] getUserInfo: no guAll");
 	                        var data_arr = ["userInfo",user_data];
@@ -182,9 +182,9 @@
 	                                    delete invitingList[this_user_info.gu];
 	                                    // *--* $.lStorage(ui, _groupList);
 	                                    //redraw #page-contact-addmem .ca-content-area
-	                                    if( typeof(updateInvitePending)=="function" ){
+	                                    if(typeof(updateInvitePending) == "function")
 	                                        updateInvitePending();
-	                                    }
+
 	                                    return false;
 	                                }
 	                            });
@@ -403,7 +403,7 @@
 
 	    var this_gi = this_gi || gi;
 	    var avatar_bar_arr = ["nk", "sl", "bd", "bl", "ti"];
-	    var img_arr = ["em", "pn", "pn1", "ext", "mv", "spn", "spn2"];
+	    var img_arr = ["em", "pn", "pn1", "pn2", "ext", "mv", "spn", "spn2"];
 	    var selector;
 	    for( item in user_data){
             var method = "html";
@@ -490,12 +490,7 @@
 	    if(!isAdmin){
 	        if(user_data.mkp) this_info.find(".user-info-list .pn").html("******");
 	        if(user_data.mke) this_info.find(".user-info-list .em").html("******");
-	        if(user_data.mkb) {
-	            // this_info.find(".user-avatar-bar .bd").hide();
-	            // this_info.find(".user-info-list .bd").html("******");   
-	        }else{
-	            this_info.find(".user-avatar-bar .user-name").addClass("hidden");
-	        }
+	        if(!user_data.mkb) this_info.find(".user-avatar-bar .user-name").addClass("hidden");
 	    } else {
 	        this_info.find(".user-avatar-bar .user-name").addClass("hidden");
 	    }
@@ -566,12 +561,6 @@
 	        });
 
 	        userInfoEvent(this_info, user_data, true);
-
-	        // this_info.data("avatar-chk",false);
-	        // $(".screen-lock").fadeOut("fast");
-	        // this_info.fadeOut("fast");
-
-	        // if(callback) callback(false);
 	    });
 	}
 
@@ -800,19 +789,21 @@
 	    //結束關閉
 	    thisInfo.find(".user-info-close").trigger("mouseup");
 	    //主頁背景
+	    var noDataStr = $.i18n.getString("USER_PROFILE_NO_DATA");
 	    var userDom = groupMainDom.find(".gm-user-main-area");
 	    var userIsAdmin = (QmiGlobal.groups[gi].ad == 1) ? true : false;
 	    var userInfoArea = groupMainDom.find(".st-personal-area");
 	    var userBranch = (userData.bl && userData.bl != "") ? userData.bl : "";
 	    var userTitle = (userData.ti && userData.ti != "") ? userData.ti : "";
 	    // var userJobTitle = ((userBranch + userTitle).length > 0) ? (userBranch + "<br>" + userTitle) : $.i18n.getString("USER_PROFILE_NO_DATA");
-	    var userBirth = (userData.bd && userData.bd != "") ? userData.bd : $.i18n.getString("USER_PROFILE_NO_DATA");
-	    var userEmail = (userData.em && userData.em != "") ? userData.em : $.i18n.getString("USER_PROFILE_NO_DATA");
-	    var extension = (userData.ext && userData.ext != "") ? userData.ext : $.i18n.getString("USER_PROFILE_NO_DATA");
-	    var userMobile = (userData.pn1 && userData.pn1 != "") ? userData.pn1 : $.i18n.getString("USER_PROFILE_NO_DATA");
-	    var mvpn = (userData.mv && userData.mv != "") ? userData.mv : $.i18n.getString("USER_PROFILE_NO_DATA");
-	    var sipMobile = (userData.spn && userData.spn != "") ? userData.spn : $.i18n.getString("USER_PROFILE_NO_DATA");
-	    var sipDesktop = (userData.spn2 && userData.spn2 != "") ? userData.spn2 : $.i18n.getString("USER_PROFILE_NO_DATA");
+	    var userBirth = (userData.bd && userData.bd != "") ? userData.bd : noDataStr;
+	    var userEmail = (userData.em && userData.em != "") ? userData.em : noDataStr;
+	    var extension = (userData.ext && userData.ext != "") ? userData.ext : noDataStr;
+	    var userMobile = (userData.pn1 && userData.pn1 != "") ? userData.pn1 : noDataStr;
+	    var officeTel = (userData.pn2 && userData.pn2 != "") ? userData.pn2 : noDataStr;
+	    var mvpn = (userData.mv && userData.mv != "") ? userData.mv : noDataStr;
+	    var sipMobile = (userData.spn && userData.spn != "") ? userData.spn : noDataStr;
+	    var sipDesktop = (userData.spn2 && userData.spn2 != "") ? userData.spn2 : noDataStr;
 
 	    userBirth = (userIsAdmin || !userData.mkb || gu == this_gu) ? userBirth : "******";
 	    userEmail = (userIsAdmin || !userData.mke || gu == this_gu) ? userEmail : "******";
@@ -980,18 +971,17 @@
 	        });
 	    });
 
-	    if ((userBranch + userTitle).length > 0) {
-	        if (userBranch.length == 0) {
+	    if ((userBranch + userTitle).length > 0)
+	        if (userBranch.length == 0)
 	            userInfoArea.find(".job-title").html(userTitle);
-	        } else {
+	        else
 	            userInfoArea.find(".job-title").html(userBranch + "<br>" + userTitle);
-	        }
-	    } else {
+	    else 
 	        userInfoArea.find(".job-title").html($.i18n.getString("USER_PROFILE_NO_DATA"));
-	    }
 
 	    userInfoArea.find(".birth").html(userBirth).end()
 	                .find(".email").html(userEmail).end()
+	                .find(".office").html(officeTel + "<p>" + $.i18n.getString("WEBONLY_USER_PROFILE_PHONE2") + "</p>").end()
 	                .find(".phone").html(extension + "<p>" + $.i18n.getString("USER_PROFILE_EXTENSION") + "</p>").end()
 	                .find(".mobile").html(userMobile).end()
 	                .find(".mvpn").html(mvpn + "<p>" + $.i18n.getString("USER_PROFILE_MVPN") + "</p>").end()

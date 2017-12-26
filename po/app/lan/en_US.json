@@ -532,5 +532,7 @@
 	"WEBONLY_FORBIDDEN_FEATURE" : "Administrator has closed this feature",
 	"WEBONLY_WATERMARK_FORCED" : "Forced to use watermark",
 
-	"WEBONLY_ERROR_OCCURED_RELOGIN" : "An error occurred, please login again"
+	"WEBONLY_ERROR_OCCURED_RELOGIN" : "An error occurred, please login again",
+
+	"WEBONLY_USER_PROFILE_PHONE2" : "Tel."
 }

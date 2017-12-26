@@ -6,7 +6,7 @@
 	top: 0;
 	left: 0;
 	z-index: 2001;
-	/*overflow: scroll;*/
+	overflow: scroll;
 	-webkit-transform-style: preserve-3d;
 	padding-top: 40px;
 }
