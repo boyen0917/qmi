@@ -36,58 +36,62 @@ function onReceivePollingChatMsg ( msgs ){
 		var thisCi = roomObj.ci;
 		// 存每筆訊息 先檢查聊天室存在
 		var chatRoomDef = $.Deferred();
-		if(!QmiGlobal.groups[thisGi].chatAll[thisCi])
-			getChatListApi(thisGi).always(chatRoomDef.resolve);
-		else
-			chatRoomDef.resolve();
 
-		chatRoomDef.done(function() {
-			roomObj.el.forEach( function(msgObj,i){
-				msgObj.cn = roomObj.cn;
-				
-				// if(msgObj.ml[0].tp == 22){
-				// 	updateChatList(thisGi);
-				// }
-				if(msgObj.hasOwnProperty("meta")){
+		if (QmiGlobal.groups.hasOwnProperty(thisGi)) {
+			if(!QmiGlobal.groups[thisGi].chatAll[thisCi])
+				getChatListApi(thisGi).always(chatRoomDef.resolve);
+			else
+				chatRoomDef.resolve();
 
-					//add to db
-					var idbMsgPutDeferred = $.Deferred();
+			chatRoomDef.done(function() {
+				roomObj.el.forEach( function(msgObj,i){
+					msgObj.cn = roomObj.cn;
+					
+					// if(msgObj.ml[0].tp == 22){
+					// 	updateChatList(thisGi);
+					// }
+					if(msgObj.hasOwnProperty("meta")){
 
-					var node = {
-						gi: thisGi,
-						ci: thisCi,
-						ei: msgObj.ei,
-					    ct: msgObj.meta.ct,
-					    data: msgObj
-					};
+						//add to db
+						var idbMsgPutDeferred = $.Deferred();
 
-					//目前看起來 不需要每次都去跑 那是不是做個例子測看看
-					g_idb_chat_msgs.put( node, function(eiTmp){
-						//是最後一筆 才更新開啟的聊天室 及 聊天列表的最後一筆
-						if( i === this.total-1 ) {
-							var isRoomOpen = false;
+						var node = {
+							gi: thisGi,
+							ci: thisCi,
+							ei: msgObj.ei,
+						    ct: msgObj.meta.ct,
+						    data: msgObj
+						};
 
-							if( windowList.hasOwnProperty(thisCi) 	&&
-								windowList[thisCi].closed === false
-							) {
-								//更新打開的聊天室
-								isRoomOpen = true;
-								// windowList[thisCi].g_msgTmp = data.el;
-								$(windowList[thisCi].document).find("button.pollingMsg").trigger("click");
+						//目前看起來 不需要每次都去跑 那是不是做個例子測看看
+						g_idb_chat_msgs.put( node, function(eiTmp){
+							//是最後一筆 才更新開啟的聊天室 及 聊天列表的最後一筆
+							if( i === this.total-1 ) {
+								var isRoomOpen = false;
+
+								if( windowList.hasOwnProperty(thisCi) 	&&
+									windowList[thisCi].closed === false
+								) {
+									//更新打開的聊天室
+									isRoomOpen = true;
+									// windowList[thisCi].g_msgTmp = data.el;
+									$(windowList[thisCi].document).find("button.pollingMsg").trigger("click");
+								}
+								
+								updateLastMsg( this.gi, this.ci, isRoomOpen, this.ei );	
 							}
-							
-							updateLastMsg( this.gi, this.ci, isRoomOpen, this.ei );	
-						}
-					}.bind({
-						total: roomObj.el.length,
-						index: i,
-						gi: thisGi,
-						ci: thisCi,
-						ei: msgObj.ei
-					}));
-				}
-			})
-		}) // chatroom deferred
+						}.bind({
+							total: roomObj.el.length,
+							index: i,
+							gi: thisGi,
+							ci: thisCi,
+							ei: msgObj.ei
+						}));
+					}
+				})
+			}) // chatroom deferred
+		}
+		
 	})
 }	//end of updateChat
 
