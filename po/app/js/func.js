@@ -1857,7 +1857,12 @@ workContentMake = function (this_event,li){
 
 
 bindWorkEvent = function (this_event){
+    var chk = false;
     this_event.find(".st-work-option").click(function(){
+        if(chk) return;
+        chk = true;
+        setTimeout(function() {chk = false;}, 2000);
+
         var this_work = $(this);
         var fin = false;
         var mine_total = this_event.find(".work-mine-chk").length;
@@ -1879,30 +1884,12 @@ bindWorkEvent = function (this_event){
 
         var api_name = "groups/" + thisGi + "/timelines/" + tiFeed + "/events?ep=" + this_event.data("event-id");
 
-        var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                     };
-        var method = "post";
-
+        var headers = {ui: ui,at: at, li: lang};
         var body = {
-              "meta":
-              {
-                "lv":"1",
-                "tp":"13",
-                "fin":fin
-              },
-              "ml":
-              [
-                {
-                  "tp": 13,
-                  "k": this_work.data("item-index"),
-                  "a": work_status
-                }
-              ]
+              meta: {lv:"1", tp:"13", fin: fin},
+              ml: [{tp: 13, k: this_work.data("item-index"), a: work_status}]
             }
-        var result = ajaxDo(api_name,headers,method,true,body);
+        var result = ajaxDo(api_name, headers, "post", false, body);
         result.complete(function(data){
             if(work_status){
                 if(this_work.data("mine")) this_work.addClass("work-mine-finished");
@@ -2325,7 +2312,7 @@ bindVoteEvent = function (this_event){
 composeContentMake = function (compose_title){
     
     //開始讀取
-    $('.cp-content-load').html($('<div>').load('layout/compose.html .cp-content',function(){
+    $('.cp-content-load').empty().html($('<div>').load('layout/compose.html .cp-content',function(){
 
         var this_compose = $(this).find(".cp-content");
         var ctp = 0;
@@ -3538,47 +3525,44 @@ composeWorkEvent = function(this_compose){
     this_work_area.find('.cp-work-item textarea').autosize({append: "\n"});
     this_work_area.find('.cp-work-item textarea').attr("placeholder",$.i18n.getString("COMPOSE_TASK_DESC_EMPTY") );
 
+    // 第一個選項的綁定
+    bindWorkItemRemoveEvent(this_work_area.find("> div.cp-work-item"));
+
     this_work_area.find(".cp-work-add-item").click(function(){
         var this_work_index = this_compose.find(".cp-work-item").length;
-        var this_work = $(
-            '<div class="cp-work-item" data-work-index="' + this_work_index + '">' +
-                '<img src="images/common/icon/icon_compose_close.png"/>' +
-                '<span>' + (this_work_index+1) + '</span>' +
-                '<textarea class="cp-opt-textarea textarea-animated cp-work-empty-chk" placeholder="" data-role="none"></textarea>' +
-                '<div class="cp-work-item-object">' +
-                    '<span>分派對象</span>' +
-                    '<img src="images/ap_box_arrow.png"/>' +
-                '</div>' +
-            '</div>'
-        );
-
+        var this_work = $('<div class="cp-work-item" data-work-index="' + this_work_index + '">' +
+            '<img src="images/common/icon/icon_compose_close.png"/>' +
+            '<span>' + (this_work_index+1) + '</span>' +
+            '<textarea class="cp-opt-textarea textarea-animated cp-work-empty-chk" placeholder="" data-role="none"></textarea>' +
+            '<div class="cp-work-item-object">' +
+                '<span>'+ $.i18n.getString("COMPOSE_ASSIGN") +'</span>' +
+                '<img src="images/ap_box_arrow.png"/>' +
+            '</div></div>');
         $(this).before(this_work);
         this_work.find('textarea').autosize({append: "\n"});
         this_work.find('textarea').attr("placeholder",$.i18n.getString("COMPOSE_TASK_DESC_EMPTY"));
 
         //增加就是要秀出刪除按鈕
         this_work_area.find(".cp-work-item > img").show();
+
+        bindWorkItemRemoveEvent(this_work);
     });
 
-    $(document).on("click",".cp-work-item > img",function(){
+    function bindWorkItemRemoveEvent(thisWork) {
+        thisWork.find("> img").click(function() {
+            $(this).parent().hide("fast",function(){
+                $(this).remove();
+                var cnt = this_compose.find(".cp-work-item").length;
+                //剩下兩題就關閉刪除按鈕
+                if(cnt <= 1) this_work_area.find(".cp-work-item > img").hide();
 
-        $(this).parent().hide("fast",function(){
-
-            $(this).remove();
-            var work_item_cnt = this_compose.find(".cp-work-item").length;
-            //剩下兩題就關閉刪除按鈕
-            if(work_item_cnt <= 1){
-                this_work_area.find(".cp-work-item > img").hide();
-            }
-
-            for(i=0;i<work_item_cnt;i++){
-                this_work_area.find(".cp-work-item:eq(" + i + ") > span").html(i+1);
-                this_work_area.find(".cp-work-item:eq(" + i + ")").attr("data-work-index",i);
-            }
+                for(i=0; i<cnt; i++){
+                    this_work_area.find(".cp-work-item:eq(" + i + ") > span").html(i+1);
+                    this_work_area.find(".cp-work-item:eq(" + i + ")").attr("data-work-index",i);
+                }
+            });
         });
-        
-    });
-
+    }
 }
 
 composeVoteQuesMake = function(this_compose){

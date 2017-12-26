@@ -80,7 +80,7 @@ ObjectDelegateView = {
 		var checkedBranchNum = Object.keys(this.checkedBranches).length + Object.keys(this.checkedFavorites).length;
 		if (this.composeObj.parent().hasClass("cp-work-item")) {
 			var target = $(".cp-work-item-object span:eq(" + this.composeObj.parents(".cp-work-item").data("work-index") + ")");
-			var objText = "分派對象";
+			var objText = $.i18n.getString("COMPOSE_ASSIGN");
 			if (checkedMemNum > 0) {
 				target.css("color", "red");
 				objText = this.checkedMems[Object.keys(this.checkedMems)[0]];
