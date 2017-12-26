@@ -2689,22 +2689,22 @@ function sendMsgText(dom) {
 	    			var adminCheckboxs = $(".adminCheckBox input");
 	    			var adminData = {el: [], dl: []};
 	    			adminCheckboxs.each(function (index, element) {
-	    				var memeberID = $(element).parent().attr("id").split("_")[1];
+	    				var mememberID = $(element).parent().attr("id").split("_")[1];
 	    				var isAdmin = $(element).is(":checked") ? 1 : 0;
-	    				if (isAdmin != g_room.memList[memeberID].ad) {
-	    					g_room.memList[memeberID].ad = isAdmin;
+	    				if (isAdmin != g_room.memList[mememberID].ad) {
+	    					g_room.memList[mememberID].ad = isAdmin;
 	    					if (isAdmin) {
-	    						adminData.el.push(memeberID);
+	    						adminData.el.push(mememberID);
 	    					} else {
-	    						adminData.dl.push(memeberID);
+	    						adminData.dl.push(mememberID);
 	    					}
 	    				}
 	    				// if ($(element).is(":checked")) {
-	    				// 	g_room.memList[memeberID].ad = 1;
-	    				// 	adminData.el.push(memeberID);
+	    				// 	g_room.memList[mememberID].ad = 1;
+	    				// 	adminData.el.push(mememberID);
 	    				// } else {
-	    				// 	g_room.memList[memeberID].ad = 0;
-	    				// 	adminData.dl.push(memeberID);
+	    				// 	g_room.memList[mememberID].ad = 0;
+	    				// 	adminData.dl.push(mememberID);
 	    				// }
 	    			});
 	    			saveTasks.push(new QmiAjax({
