@@ -2784,16 +2784,15 @@ QmiGlobal.showNotification = function(argObj) {
 
 		notifier.notify({
 		  title: argObj.title,
-		  message: argObj.text
+		  message: argObj.text,
+		  wait: true
 		});
 
 		if (argObj.gi && argObj.ci) 
-			notifier.on('click', openChatWindow2.bind(null, argObj.gi, argObj.ci));
+			notifier.on('click', openChatWindow.bind(null, argObj.gi, argObj.ci));
 		
 		return;
-	} catch(e) {
-		console.log("Not mac notification");
-	}
+	} catch(e) {console.log("Not mac notification");}
 
 
 	try{
