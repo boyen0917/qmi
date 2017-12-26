@@ -220,12 +220,6 @@ window.QmiGlobal = {
 	// 在下方 document ready之後 initReady
 	initReady: function() {
 
-		// 檢查聊天室不得進首頁
-		// if(window.opener && !window.isChatRoom) {
-		// 	window.close();
-		// 	return;
-		// }
-
 		var initDefArr = [
     		updateLanguage()
 		];
@@ -319,7 +313,7 @@ window.QmiGlobal = {
 		"_lastLoginAccount",
 		"_loginAutoChk",
 		"_loginData",
-		"_loginRemeber",
+		"_loginRemember",
 		"_lastBaseUrl",
 		"_sticker",
 		"groupChat",

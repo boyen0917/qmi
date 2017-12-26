@@ -130,24 +130,14 @@ img.auo {
 
 .login-text,.login-text-l,.login-text-r{
     color: #f6f6f6;
-    /*text-shadow: 0 0 0 #fff;*/
     text-decoration:none;
 }
 
-
-.login-remember{
-	width: 100px;
-	padding: 8px;
-	margin: -7px 0;
-	cursor: pointer;
-	-webkit-user-select: none;
-}
 
 .login-text{
     position: relative;
     top: -1px;
     left: 10px;
-    
 }
 
 .login-radio{
