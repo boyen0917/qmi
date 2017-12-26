@@ -2136,7 +2136,7 @@ setBadgeLabel = function(str){
 
 	//nodeJS用, show程式小icon上面的數字
 	try{
-		require('nw.gui').Window.get().setBadgeLabel( str );
+		QmiGlobal.nwGui.Window.get().setBadgeLabel( str );
 	}catch(e){
 		// cns.debug(e);	//必加, 一般瀏覽器require not defined
 	}
@@ -2145,7 +2145,7 @@ setBadgeLabel = function(str){
 clearBadgeLabel = function(){
 	//nodeJS用, show程式小icon上面的數字
 	try{
-		require('nw.gui').Window.get().setBadgeLabel("");
+		QmiGlobal.nwGui.Window.get().setBadgeLabel("");
 	}catch(e){
 		// cns.debug(e);	//必加, 一般瀏覽器require not defined
 	}
@@ -2194,10 +2194,10 @@ myWait = function(variable,type){
 zipVideoFile = function (videoObj) {
 	var transferBlobDef = $.Deferred();
 	try {
-		var ffmpeg = require('fluent-ffmpeg');
-		var fs = require('fs');
-    	var path = require('path');
-    	var spawn = require('child_process').spawn;
+		var ffmpeg = QmiGlobal.nodeModules.ffmpeg;
+		var fs = QmiGlobal.nodeModules.fs;
+    	var path = QmiGlobal.nodeModules.path;
+    	var spawn = QmiGlobal.nodeModules.childProcess.spawn;
     	var tmpDir = process.cwd();
     	var nwDir = path.dirname(process.execPath); //node webkit 根目錄
     	var outputPath = tmpDir + '/video/output.mp4'
@@ -2240,7 +2240,10 @@ zipVideoFile = function (videoObj) {
 				}
 				getDurationDef.resolve(inputInfo.format.duration);
 
-			} catch(e) {reject();}
+			} catch(e) {
+				console.error("ffmpeg failed:", e);
+				reject();
+			}
 
 			function reject() {
 				getDurationDef.reject();
@@ -2775,6 +2778,24 @@ QmiGlobal.ProgressBarConstructor = function(init) {
 }
 
 QmiGlobal.showNotification = function(argObj) {
+
+	try {
+		var notifier = QmiGlobal.nodeModules.notifier;
+
+		notifier.notify({
+		  title: argObj.title,
+		  message: argObj.text
+		});
+
+		if (argObj.gi && argObj.ci) 
+			notifier.on('click', openChatWindow2.bind(null, argObj.gi, argObj.ci));
+		
+		return;
+	} catch(e) {
+		console.log("Not mac notification");
+	}
+
+
 	try{
 		if(isChatroomCloseNotification()) return;
 		var notification = new window.Notification(argObj.title, {

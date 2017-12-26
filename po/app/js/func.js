@@ -5609,10 +5609,10 @@ timelineFileMake = function(thisEvent, fileNum) {
             e.preventDefault();
 
             try {
-                var https = require('https'),
-                    fs = require('fs'),
-                    path = require('path')
-                    __dirname = path.dirname(process.execPath);
+                var https = QmiGlobal.nodeModules.https;
+                var fs = QmiGlobal.nodeModules.fs;
+                var path = QmiGlobal.nodeModules.path;
+                var __dirname = path.dirname(process.execPath);
 
                 var downloadFile = function(callback){
                     if(fileIndex < fileLinks.length) {

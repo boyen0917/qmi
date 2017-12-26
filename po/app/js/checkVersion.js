@@ -14,7 +14,7 @@ $(function(){
 	    		g_currentContainerVersion = versionObj.APP_VERSION;
 	    		cns.debug( getComputerName() );
 	    	} else {
-	    		g_currentContainerVersion = require('nw.gui').App.manifest.version;
+	    		g_currentContainerVersion = QmiGlobal.nwGui.App.manifest.version;
 	    	}
 
 			if( null==g_currentContainerVersion ){
@@ -78,7 +78,7 @@ $(function(){
     	link.attr("href",downloadPath).trigger("click");
     	cns.debug("download clicked");
     	try{
-	    	require('nw.gui').App.quit();
+	    	QmiGlobal.nwGui.App.quit();
 	    } catch(e){
 	    	cns.debug(e.stack);
 	    }
@@ -135,9 +135,8 @@ $(function(){
 		    } catch(e){
 		    	cns.debug(e.stack);
 		    	try{
-		    		var gui = require('nw.gui');
-		    		gui.App.clearCache();
-		    		gui.Window.get().reload();
+		    		QmiGlobal.nwGui.App.clearCache();
+		    		QmiGlobal.nwGui.Window.get().reload();
 		    		cns.debug("update successed");
 		    		onDone(false);
 		    		return true;
