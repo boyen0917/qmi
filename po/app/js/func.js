@@ -494,46 +494,48 @@ timelineSwitch = function (act, reset, main, noAppReload){
             chatListDom.find(".top-chatList").hide();
             chatListDom.find(".top-chatList .list").html("");
 
-            //offical general 官方帳號非管理員
-            if( onClickOfficialGeneralChat(gi) ){
-                groupMain.find(".subpage-timeline").show();
-                groupMain.data("currentAct",oriAct);
-                switch(oriAct){
-                    case "feeds":
-                    case "feed-post":
-                        break;
-                    case "feed-public":
-                        groupMain.find(".subpage-timeline").show();
-                        break;
-                    case "memberslist":
-                        $(".subpage-contact").show();
-                        break;
-                    case "album":
-                        groupMain.find(".subpage-album").show();
-                        break;
-                    case "groupSetting":
-                        groupMain.find(".subpage-groupSetting").show();
-                        break;
-                    case "calendar":
-                    case "help":
-                    case "news":
-                    case "user-setting":
-                    case "system-setting":
-                      break;
+
+            onClickOfficialGeneralChat(gi).then(function(result) {
+                if (result === true) {
+                    groupMain.find(".subpage-timeline").show();
+                    groupMain.data("currentAct",oriAct);
+                    switch(oriAct){
+                        case "feeds":
+                        case "feed-post":
+                            break;
+                        case "feed-public":
+                            groupMain.find(".subpage-timeline").show();
+                            break;
+                        case "memberslist":
+                            $(".subpage-contact").show();
+                            break;
+                        case "album":
+                            groupMain.find(".subpage-album").show();
+                            break;
+                        case "groupSetting":
+                            groupMain.find(".subpage-groupSetting").show();
+                            break;
+                        case "calendar":
+                        case "help":
+                        case "news":
+                        case "user-setting":
+                        case "system-setting":
+                          break;
+                    }
+                } else {
+                    page_title = $.i18n.getString("CHAT_TITLE");
+
+                    initChatList();
+
+                    //顯示新增聊天室按鈕, 藏新增貼文按鈕
+                    gmHeader.find(".feed-compose").hide();
+                    gmHeader.find(".chatList-add").show();
+                    gmHeader.find(".contact-add").hide();
+
+                    //$.mobile.changePage("#page-chatroom");
+                    //groupMain.find("div[data-role=header] h3").html("聊天室");
                 }
-            } else {
-                page_title = $.i18n.getString("CHAT_TITLE");
-
-                initChatList();
-
-                //顯示新增聊天室按鈕, 藏新增貼文按鈕
-                gmHeader.find(".feed-compose").hide();
-                gmHeader.find(".chatList-add").show();
-                gmHeader.find(".contact-add").hide();
-
-                //$.mobile.changePage("#page-chatroom");
-                //groupMain.find("div[data-role=header] h3").html("聊天室");
-            }
+            })
 
             switchDeferred.resolve({ act: "chat"});
           break;
@@ -1262,24 +1264,61 @@ setOfficialGroup = function( this_gi ){
 }
 
 onClickOfficialGeneralChat = function( this_gi ){
+    var deferred = $.Deferred();
+
     try{
         var groupData = QmiGlobal.groups[this_gi] || {};
-        if( groupData.ntp === 2 && groupData.ad!=1 ){
-            if( null!=groupData.chatAll ){
-                for( var ci in groupData.chatAll ){
+        if( groupData.ntp === 2 && groupData.ad != 1 ){
+            if( null!=groupData.chatAll ) {
+                var multipleUserChatroomId = Object.keys(groupData.chatAll).find(function (ci) {
                     var room = groupData.chatAll[ci];
-                    if( room.tp==2 ){
-                        openChatWindow ( this_gi, ci );
-                        return true;
+
+                    return room.tp == 2
+                })
+
+                // server有回傳tp2聊天室，直接打開它
+                if (multipleUserChatroomId) {
+                    openChatWindow(this_gi, multipleUserChatroomId);
+
+                    deferred.resolve(true);
+                } else {
+                    // server沒回，先找有無管理員，有的話自己建立
+                    var adminList = Object.keys(groupData.guAll || {}).filter(function (id) {
+                        var memberData = groupData.guAll[id];
+
+                        return memberData.st == 1 && memberData.ad == 1
+                    }).map(function (id) {
+                        return {gu: id};
+                    })
+
+                    if (adminList.length > 0) {
+                        requestNewChatRoomApi(
+                            this_gi,
+                            groupData.gn,
+                            adminList,
+                            null,
+                            function () {
+                                console.log("dwkowko")
+                                deferred.resolve(true);
+                            }
+                        )
+                    } else {
+                        deferred.resolve(false);
                     }
-                }
+                } 
+            } else {
+                deferred.resolve(false);
             }
+        } else {
+            deferred.resolve(false);
         }
-        return false;
     } catch(e){
         errorReport(e);
+
+        deferred.resolve(false);
     }
-    return false;
+
+    return deferred.promise();
 }
 
 /*
