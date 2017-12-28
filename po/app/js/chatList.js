@@ -329,12 +329,6 @@ function showChatList(){
 			true,
 			[deleteRoom,memtd]
 		);
-		// var table = $(this).parent().parent().parent();
-		// table.css("width","110%");
-		// table.animate({margin:"-10%"}, 'fast');
-		// $(".subpage-chatList-row td:nth-child(4)")
-		// $(this).show('fast');
-		// $(this).animate({width:"20%"},'fast');
 	});
 
 	$(".update").off("click").click(function(){
@@ -392,7 +386,7 @@ function openChatWindow ( giTmp, ci ){
 		if($.lStorage("groupChat"))
 			windowList[ci] = window.open("", ci , "width=400, height=600");
 		else {
-			var serverPath = window.location.hostname + window.location.pathname;
+			var serverPath = window.location.href.split("/").slice(0, -1).join("/") +"/";
 			windowList[ci] = window.open(serverPath +"chat.html?v2.1.0.2", ci , "width=400, height=600");
 		}
 		

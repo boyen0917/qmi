@@ -2778,25 +2778,26 @@ QmiGlobal.ProgressBarConstructor = function(init) {
 }
 
 QmiGlobal.showNotification = function(argObj) {
+	if(isChatroomCloseNotification()) return;
 
 	try {
-		var notifier = QmiGlobal.nodeModules.notifier;
+		// 新版mac
+		var nc = new QmiGlobal.nodeModules.notifier.NotificationCenter()
 
-		notifier.notify({
+		nc.notify({
 		  title: argObj.title,
 		  message: argObj.text,
 		  wait: true
 		});
 
 		if (argObj.gi && argObj.ci) 
-			notifier.on('click', openChatWindow.bind(null, argObj.gi, argObj.ci));
+			nc.on('click', openChatWindow.bind(null, argObj.gi, argObj.ci));
 		
 		return;
 	} catch(e) {console.log("Not mac notification");}
 
 
 	try{
-		if(isChatroomCloseNotification()) return;
 		var notification = new window.Notification(argObj.title, {
 			body: argObj.text,
 			icon: argObj.icon === undefined? "resource/images/default.png": argObj.icon
