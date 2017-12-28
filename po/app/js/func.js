@@ -1418,7 +1418,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     this_event.find("div.timeline-box-hint").hide();
     
     // 2017/12/19 load once
-    $('<div>').load('layout/timeline_event.html?v2.1.0.3 .st-reply-content-area', function(){
+    $('<div>').load('layout/timeline_event.html?v2.1.0.4 .st-reply-content-area', function(){
         //製作每個回覆
         var okCnt = 0;
         var loadedDom = $(this);
@@ -1922,7 +1922,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.1.0.3 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.1.0.4 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -5632,10 +5632,10 @@ timelineFileMake = function(thisEvent, fileNum) {
             e.preventDefault();
 
             try {
-                var https = require('https'),
-                    fs = require('fs'),
-                    path = require('path')
-                    __dirname = path.dirname(process.execPath);
+                var https = QmiGlobal.nodeModules.https;
+                var fs = QmiGlobal.nodeModules.fs;
+                var path = QmiGlobal.nodeModules.path;
+                var __dirname = path.dirname(process.execPath);
 
                 var downloadFile = function(callback){
                     if(fileIndex < fileLinks.length) {

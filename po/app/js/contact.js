@@ -1577,7 +1577,18 @@ function showAddMemberPage(){
 		this_btn.addClass("ca-nav-active");
 	});
 	$("#page-contact-addmem .ca-invite").trigger("click");
-	$("#page-contact-addmem .ca-invite-submit").off("click").click( sendInvite );
+	$("#page-contact-addmem .ca-invite-submit").off("click").click(function() {
+		var chk = false;
+		return function() {
+			if(chk) return;
+			chk = true;
+			sendInvite();
+			
+			setTimeout(function() {
+				chk = false;
+			}, 3000);
+		}
+	}());
 
 	countrycodeSelect.selectbox({
 		onOpen: function (inst) {
@@ -1811,57 +1822,58 @@ function sendInvite(){
 			"pn": phone,
 			"nk": nk
 		}], function(data){
-			if( data.status==200 ){
-				// "ul":
-				// [
-				//   {
-				//     "gu": "asdfas-awefnasdf", // Group User Id
-				//     "ik": "+886912345678",  // Invitation Key
-				//     "tp": 0,  // Invitation Type(0: Phone, 1: Email)
-				//     "aj": true  // Already Joined Group ?
-				//   }
-				// ]
-				try{
-					var obj = $.parseJSON(data.responseText);
-					/* ----- TODO ------
-						如果已經邀過了...?
-					   ----- TODO ------ */
-					//mem already in group
-					if( obj.ul[0].aj==true ){
-						toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
-					} else {
-						toastShow( $.i18n.getString("INVITE_SUCC") );
-						$(".cai-name input").val("");
-						$(".cai-num input").val("");
-					}
-					//update inviting list
-					if(!inviteGuAll) inviteGuAll = {};
-					inviteGuAll[obj.ul[0].gu] = {
-						gu: obj.ul[0].gu,
-						ik: obj.ul[0].ik,
-						tp: obj.ul[0].tp,
-						st: 0,
-						nk: nk,
-						pn: phone
-					};
-					showMainContact();
-					updateInvitePending();
-
-					mainPage.querySelector("div.invite-input-number input").value = "";
-					$("#page-contact-addmem .invite-select-countrycode select").selectbox(
-						"change", 
-						"TW",
-						$.i18n.getString("COUNTRY_CODE_TAIWAN")
-					)
-
-
-				} catch(e){
-
-				}
-			} else {
-				toastShow( $.i18n.getString("INVITE_FAIL") );
+			if(data.status !== 200) {
+				inviteFail();
+				return;
 			}
+
+			try {
+				var obj = $.parseJSON(data.responseText);
+
+				if(obj.ful.length) {
+					toastShow(obj.ful[0].ermg || $.i18n.getString("INVITE_FAIL"))
+					return;
+				}
+
+				/* ----- TODO ------
+					如果已經邀過了...?
+				   ----- TODO ------ */
+				//mem already in group
+				if( obj.ul[0].aj==true ){
+					toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
+				} else {
+					toastShow( $.i18n.getString("INVITE_SUCC") );
+					$(".cai-name input").val("");
+					$(".cai-num input").val("");
+				}
+				//update inviting list
+				if(!inviteGuAll) inviteGuAll = {};
+				inviteGuAll[obj.ul[0].gu] = {
+					gu: obj.ul[0].gu,
+					ik: obj.ul[0].ik,
+					tp: obj.ul[0].tp,
+					st: 0,
+					nk: nk,
+					pn: phone
+				};
+				showMainContact();
+				updateInvitePending();
+
+				mainPage.querySelector("div.invite-input-number input").value = "";
+				$("#page-contact-addmem .invite-select-countrycode select").selectbox(
+					"change", 
+					"TW",
+					$.i18n.getString("COUNTRY_CODE_TAIWAN")
+				)
+
+
+			} catch(e){inviteFail()}
 	});
+
+
+	function inviteFail() {
+		toastShow( $.i18n.getString("INVITE_FAIL") );
+	}
 }
 
 function sendInviteAPI( this_gi, list, callback ){
