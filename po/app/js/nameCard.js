@@ -882,9 +882,6 @@
 	                    nk : userDom.find(".user input.name").val(),
 	                    nk2 : userDom.find(".user input.nickname").val(),
 	                    sl : userDom.find(".user .slogan").text(),
-	                    mkb : userData.mkb,
-	                    mke : userData.mke,
-	                    mkp : userData.mkp,
 	                }
 	            };
 
@@ -999,13 +996,7 @@
 
 	            var userObj = {
 	                gu : userData.gu,
-	                info : {
-	                    nk : userData.nk,
-	                    sl : userData.sl,
-	                    mkb : userData.mkb,
-	                    mke : userData.mke,
-	                    mkp : userData.mkp,
-	                }
+	                info : {}
 	            };
 	            var switchName = e.target.id;
 
