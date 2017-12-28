@@ -1888,6 +1888,7 @@ $(function(){
 			$.i18n.getString("COMMON_OK"),
 			$.i18n.getString("COMMON_CANCEL"),
 			[function(){
+				$("#page-compose > div.cp-content-load").empty();
 				this_dom.siblings(".page-back").trigger("click");
 			},$(this)]
 		);

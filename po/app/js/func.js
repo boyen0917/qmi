@@ -494,46 +494,48 @@ timelineSwitch = function (act, reset, main, noAppReload){
             chatListDom.find(".top-chatList").hide();
             chatListDom.find(".top-chatList .list").html("");
 
-            //offical general 官方帳號非管理員
-            if( onClickOfficialGeneralChat(gi) ){
-                groupMain.find(".subpage-timeline").show();
-                groupMain.data("currentAct",oriAct);
-                switch(oriAct){
-                    case "feeds":
-                    case "feed-post":
-                        break;
-                    case "feed-public":
-                        groupMain.find(".subpage-timeline").show();
-                        break;
-                    case "memberslist":
-                        $(".subpage-contact").show();
-                        break;
-                    case "album":
-                        groupMain.find(".subpage-album").show();
-                        break;
-                    case "groupSetting":
-                        groupMain.find(".subpage-groupSetting").show();
-                        break;
-                    case "calendar":
-                    case "help":
-                    case "news":
-                    case "user-setting":
-                    case "system-setting":
-                      break;
+
+            onClickOfficialGeneralChat(gi).then(function(result) {
+                if (result === true) {
+                    groupMain.find(".subpage-timeline").show();
+                    groupMain.data("currentAct",oriAct);
+                    switch(oriAct){
+                        case "feeds":
+                        case "feed-post":
+                            break;
+                        case "feed-public":
+                            groupMain.find(".subpage-timeline").show();
+                            break;
+                        case "memberslist":
+                            $(".subpage-contact").show();
+                            break;
+                        case "album":
+                            groupMain.find(".subpage-album").show();
+                            break;
+                        case "groupSetting":
+                            groupMain.find(".subpage-groupSetting").show();
+                            break;
+                        case "calendar":
+                        case "help":
+                        case "news":
+                        case "user-setting":
+                        case "system-setting":
+                          break;
+                    }
+                } else {
+                    page_title = $.i18n.getString("CHAT_TITLE");
+
+                    initChatList();
+
+                    //顯示新增聊天室按鈕, 藏新增貼文按鈕
+                    gmHeader.find(".feed-compose").hide();
+                    gmHeader.find(".chatList-add").show();
+                    gmHeader.find(".contact-add").hide();
+
+                    //$.mobile.changePage("#page-chatroom");
+                    //groupMain.find("div[data-role=header] h3").html("聊天室");
                 }
-            } else {
-                page_title = $.i18n.getString("CHAT_TITLE");
-
-                initChatList();
-
-                //顯示新增聊天室按鈕, 藏新增貼文按鈕
-                gmHeader.find(".feed-compose").hide();
-                gmHeader.find(".chatList-add").show();
-                gmHeader.find(".contact-add").hide();
-
-                //$.mobile.changePage("#page-chatroom");
-                //groupMain.find("div[data-role=header] h3").html("聊天室");
-            }
+            })
 
             switchDeferred.resolve({ act: "chat"});
           break;
@@ -1262,24 +1264,61 @@ setOfficialGroup = function( this_gi ){
 }
 
 onClickOfficialGeneralChat = function( this_gi ){
+    var deferred = $.Deferred();
+
     try{
         var groupData = QmiGlobal.groups[this_gi] || {};
-        if( groupData.ntp === 2 && groupData.ad!=1 ){
-            if( null!=groupData.chatAll ){
-                for( var ci in groupData.chatAll ){
+        if( groupData.ntp === 2 && groupData.ad != 1 ){
+            if( null!=groupData.chatAll ) {
+                var multipleUserChatroomId = Object.keys(groupData.chatAll).find(function (ci) {
                     var room = groupData.chatAll[ci];
-                    if( room.tp==2 ){
-                        openChatWindow ( this_gi, ci );
-                        return true;
+
+                    return room.tp == 2
+                })
+
+                // server有回傳tp2聊天室，直接打開它
+                if (multipleUserChatroomId) {
+                    openChatWindow(this_gi, multipleUserChatroomId);
+
+                    deferred.resolve(true);
+                } else {
+                    // server沒回，先找有無管理員，有的話自己建立
+                    var adminList = Object.keys(groupData.guAll || {}).filter(function (id) {
+                        var memberData = groupData.guAll[id];
+
+                        return memberData.st == 1 && memberData.ad == 1
+                    }).map(function (id) {
+                        return {gu: id};
+                    })
+
+                    if (adminList.length > 0) {
+                        requestNewChatRoomApi(
+                            this_gi,
+                            groupData.gn,
+                            adminList,
+                            null,
+                            function () {
+                                console.log("dwkowko")
+                                deferred.resolve(true);
+                            }
+                        )
+                    } else {
+                        deferred.resolve(false);
                     }
-                }
+                } 
+            } else {
+                deferred.resolve(false);
             }
+        } else {
+            deferred.resolve(false);
         }
-        return false;
     } catch(e){
         errorReport(e);
+
+        deferred.resolve(false);
     }
-    return false;
+
+    return deferred.promise();
 }
 
 /*
@@ -1379,7 +1418,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     this_event.find("div.timeline-box-hint").hide();
     
     // 2017/12/19 load once
-    $('<div>').load('layout/timeline_event.html?v2.1.0.2 .st-reply-content-area', function(){
+    $('<div>').load('layout/timeline_event.html?v2.1.0.4 .st-reply-content-area', function(){
         //製作每個回覆
         var okCnt = 0;
         var loadedDom = $(this);
@@ -1818,7 +1857,12 @@ workContentMake = function (this_event,li){
 
 
 bindWorkEvent = function (this_event){
+    var chk = false;
     this_event.find(".st-work-option").click(function(){
+        if(chk) return;
+        chk = true;
+        setTimeout(function() {chk = false;}, 2000);
+
         var this_work = $(this);
         var fin = false;
         var mine_total = this_event.find(".work-mine-chk").length;
@@ -1840,30 +1884,12 @@ bindWorkEvent = function (this_event){
 
         var api_name = "groups/" + thisGi + "/timelines/" + tiFeed + "/events?ep=" + this_event.data("event-id");
 
-        var headers = {
-                 "ui":ui,
-                 "at":at, 
-                 "li":lang,
-                     };
-        var method = "post";
-
+        var headers = {ui: ui,at: at, li: lang};
         var body = {
-              "meta":
-              {
-                "lv":"1",
-                "tp":"13",
-                "fin":fin
-              },
-              "ml":
-              [
-                {
-                  "tp": 13,
-                  "k": this_work.data("item-index"),
-                  "a": work_status
-                }
-              ]
+              meta: {lv:"1", tp:"13", fin: fin},
+              ml: [{tp: 13, k: this_work.data("item-index"), a: work_status}]
             }
-        var result = ajaxDo(api_name,headers,method,true,body);
+        var result = ajaxDo(api_name, headers, "post", false, body);
         result.complete(function(data){
             if(work_status){
                 if(this_work.data("mine")) this_work.addClass("work-mine-finished");
@@ -1896,7 +1922,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.1.0.2 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.1.0.4 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -2286,7 +2312,7 @@ bindVoteEvent = function (this_event){
 composeContentMake = function (compose_title){
     
     //開始讀取
-    $('.cp-content-load').html($('<div>').load('layout/compose.html .cp-content',function(){
+    $('.cp-content-load').empty().html($('<div>').load('layout/compose.html .cp-content',function(){
 
         var this_compose = $(this).find(".cp-content");
         var ctp = 0;
@@ -3499,47 +3525,44 @@ composeWorkEvent = function(this_compose){
     this_work_area.find('.cp-work-item textarea').autosize({append: "\n"});
     this_work_area.find('.cp-work-item textarea').attr("placeholder",$.i18n.getString("COMPOSE_TASK_DESC_EMPTY") );
 
+    // 第一個選項的綁定
+    bindWorkItemRemoveEvent(this_work_area.find("> div.cp-work-item"));
+
     this_work_area.find(".cp-work-add-item").click(function(){
         var this_work_index = this_compose.find(".cp-work-item").length;
-        var this_work = $(
-            '<div class="cp-work-item" data-work-index="' + this_work_index + '">' +
-                '<img src="images/common/icon/icon_compose_close.png"/>' +
-                '<span>' + (this_work_index+1) + '</span>' +
-                '<textarea class="cp-opt-textarea textarea-animated cp-work-empty-chk" placeholder="" data-role="none"></textarea>' +
-                '<div class="cp-work-item-object">' +
-                    '<span>分派對象</span>' +
-                    '<img src="images/ap_box_arrow.png"/>' +
-                '</div>' +
-            '</div>'
-        );
-
+        var this_work = $('<div class="cp-work-item" data-work-index="' + this_work_index + '">' +
+            '<img src="images/common/icon/icon_compose_close.png"/>' +
+            '<span>' + (this_work_index+1) + '</span>' +
+            '<textarea class="cp-opt-textarea textarea-animated cp-work-empty-chk" placeholder="" data-role="none"></textarea>' +
+            '<div class="cp-work-item-object">' +
+                '<span>'+ $.i18n.getString("COMPOSE_ASSIGN") +'</span>' +
+                '<img src="images/ap_box_arrow.png"/>' +
+            '</div></div>');
         $(this).before(this_work);
         this_work.find('textarea').autosize({append: "\n"});
         this_work.find('textarea').attr("placeholder",$.i18n.getString("COMPOSE_TASK_DESC_EMPTY"));
 
         //增加就是要秀出刪除按鈕
         this_work_area.find(".cp-work-item > img").show();
+
+        bindWorkItemRemoveEvent(this_work);
     });
 
-    $(document).on("click",".cp-work-item > img",function(){
+    function bindWorkItemRemoveEvent(thisWork) {
+        thisWork.find("> img").click(function() {
+            $(this).parent().hide("fast",function(){
+                $(this).remove();
+                var cnt = this_compose.find(".cp-work-item").length;
+                //剩下兩題就關閉刪除按鈕
+                if(cnt <= 1) this_work_area.find(".cp-work-item > img").hide();
 
-        $(this).parent().hide("fast",function(){
-
-            $(this).remove();
-            var work_item_cnt = this_compose.find(".cp-work-item").length;
-            //剩下兩題就關閉刪除按鈕
-            if(work_item_cnt <= 1){
-                this_work_area.find(".cp-work-item > img").hide();
-            }
-
-            for(i=0;i<work_item_cnt;i++){
-                this_work_area.find(".cp-work-item:eq(" + i + ") > span").html(i+1);
-                this_work_area.find(".cp-work-item:eq(" + i + ")").attr("data-work-index",i);
-            }
+                for(i=0; i<cnt; i++){
+                    this_work_area.find(".cp-work-item:eq(" + i + ") > span").html(i+1);
+                    this_work_area.find(".cp-work-item:eq(" + i + ")").attr("data-work-index",i);
+                }
+            });
         });
-        
-    });
-
+    }
 }
 
 composeVoteQuesMake = function(this_compose){
@@ -5609,10 +5632,10 @@ timelineFileMake = function(thisEvent, fileNum) {
             e.preventDefault();
 
             try {
-                var https = require('https'),
-                    fs = require('fs'),
-                    path = require('path')
-                    __dirname = path.dirname(process.execPath);
+                var https = QmiGlobal.nodeModules.https;
+                var fs = QmiGlobal.nodeModules.fs;
+                var path = QmiGlobal.nodeModules.path;
+                var __dirname = path.dirname(process.execPath);
 
                 var downloadFile = function(callback){
                     if(fileIndex < fileLinks.length) {
@@ -8417,7 +8440,7 @@ goToGroupMenu = function(){
 
 function removeCompany(companyData) {
     Object.keys(QmiGlobal.companyGiMap).forEach(function(thisGi) {
-        if(QmiGlobal.companyGiMap[thisGi].ci === companyData.ci) removeGroup(thisGi, true);
+        if(QmiGlobal.companyGiMap[thisGi].ci === companyData.ci) removeGroup(thisGi);
     });
     delete QmiGlobal.companies[companyData.ci];
 }

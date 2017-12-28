@@ -635,14 +635,21 @@ qmiUploadFile = function(uploadObj){
 			if (s3Obj.oriFile) {
 				EXIF.getData(s3Obj.oriFile, function(data){
 					exifObj = EXIF.getAllTags(this);
+					console.log(exifObj)
+					// console.log(exifObj.MaxApertureValue)
+					// console.log(exifObj.MaxApertureValue.valueOf())
 					if(!$.isEmptyObject(exifObj)){
 						body.exif = {
-							"DateTimeOriginal": exifObj.DateTimeOriginal || "",
-							"DateTimeDigitized": exifObj.DateTimeDigitized || "",
-							"LatitudeRef": exifObj.GPSLatitudeRef || "", //緯度
-							"Latitude": toDecimal(exifObj.GPSLatitude) || "", 
-							"LongitudeRef": exifObj.GPSLongitudeRef || "", //經度
-							"Longitude": toDecimal(exifObj.GPSLongitude) || "" 
+							"ApertureValue": exifObj.MaxApertureValue ? exifObj.MaxApertureValue.valueOf() : "",
+							"DateTime": exifObj.DateTime || "",
+							"ExposureTime": exifObj.ExposureTime ? exifObj.ExposureTime.valueOf() : "",
+							"Flash": exifObj.Flash,
+							"FocalLength": exifObj.FocalLength ? (exifObj.FocalLength.numerator + "/" + exifObj.FocalLength.denominator) : "",
+							"Latitude": toDecimal(exifObj.GPSLatitude) || "",
+							"Longitude": toDecimal(exifObj.GPSLongitude) || "",
+							"Make": exifObj.Make || "",
+							"Model": exifObj.Model || "",
+							"WhiteBalance": exifObj.WhiteBalance || "" 
 						}
 					}
 					getExifDef.resolve();
@@ -2136,7 +2143,7 @@ setBadgeLabel = function(str){
 
 	//nodeJS用, show程式小icon上面的數字
 	try{
-		require('nw.gui').Window.get().setBadgeLabel( str );
+		QmiGlobal.nwGui.Window.get().setBadgeLabel( str );
 	}catch(e){
 		// cns.debug(e);	//必加, 一般瀏覽器require not defined
 	}
@@ -2145,7 +2152,7 @@ setBadgeLabel = function(str){
 clearBadgeLabel = function(){
 	//nodeJS用, show程式小icon上面的數字
 	try{
-		require('nw.gui').Window.get().setBadgeLabel("");
+		QmiGlobal.nwGui.Window.get().setBadgeLabel("");
 	}catch(e){
 		// cns.debug(e);	//必加, 一般瀏覽器require not defined
 	}
@@ -2194,10 +2201,10 @@ myWait = function(variable,type){
 zipVideoFile = function (videoObj) {
 	var transferBlobDef = $.Deferred();
 	try {
-		var ffmpeg = require('fluent-ffmpeg');
-		var fs = require('fs');
-    	var path = require('path');
-    	var spawn = require('child_process').spawn;
+		var ffmpeg = QmiGlobal.nodeModules.ffmpeg;
+		var fs = QmiGlobal.nodeModules.fs;
+    	var path = QmiGlobal.nodeModules.path;
+    	var spawn = QmiGlobal.nodeModules.childProcess.spawn;
     	var tmpDir = process.cwd();
     	var nwDir = path.dirname(process.execPath); //node webkit 根目錄
     	var outputPath = tmpDir + '/video/output.mp4'
@@ -2240,7 +2247,10 @@ zipVideoFile = function (videoObj) {
 				}
 				getDurationDef.resolve(inputInfo.format.duration);
 
-			} catch(e) {reject();}
+			} catch(e) {
+				console.error("ffmpeg failed:", e);
+				reject();
+			}
 
 			function reject() {
 				getDurationDef.reject();
@@ -2775,8 +2785,26 @@ QmiGlobal.ProgressBarConstructor = function(init) {
 }
 
 QmiGlobal.showNotification = function(argObj) {
+	if(isChatroomCloseNotification()) return;
+
+	try {
+		// 新版mac
+		var nc = new QmiGlobal.nodeModules.notifier.NotificationCenter()
+
+		nc.notify({
+		  title: argObj.title,
+		  message: argObj.text,
+		  wait: true
+		});
+
+		if (argObj.gi && argObj.ci) 
+			nc.on('click', openChatWindow.bind(null, argObj.gi, argObj.ci));
+		
+		return;
+	} catch(e) {console.log("Not mac notification");}
+
+
 	try{
-		if(isChatroomCloseNotification()) return;
 		var notification = new window.Notification(argObj.title, {
 			body: argObj.text,
 			icon: argObj.icon === undefined? "resource/images/default.png": argObj.icon
