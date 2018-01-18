@@ -171,6 +171,8 @@
 	"COMPOSE_DESCRIPTION" :	"Description",
 	"COMPOSE_TITLE" :	"Title",
 	"COMPOSE_RECEIVER" :	"Receiver",
+	"COMPOSE_SCHEDULE" :	"Schedule",
+	"COMPOSE_POST_IMMEDIATELY" :	"Post immediately",
 	"COMPOSE_TOP" :	"Top",
 	"COMPOSE_WATERMARK" : "Watermark",
 	"COMPOSE_SET_START_TIME" :	"Specify start time",

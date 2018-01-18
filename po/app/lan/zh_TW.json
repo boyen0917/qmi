@@ -171,6 +171,8 @@
 	"COMPOSE_DESCRIPTION" :	"內容描述",
 	"COMPOSE_TITLE" :	"標題",
 	"COMPOSE_RECEIVER" :	"發佈對象",
+	"COMPOSE_SCHEDULE" :	"發佈時間",
+	"COMPOSE_POST_IMMEDIATELY" :	"立即發佈",
 	"COMPOSE_TOP" :	"置頂",
 	"COMPOSE_WATERMARK" : "浮水印",
 	"COMPOSE_SET_START_TIME" :	"設定開始時間",

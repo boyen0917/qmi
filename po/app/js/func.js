@@ -2627,6 +2627,23 @@ composeContentMake = function (compose_title){
         if(init_datetimepicker){
             setDateTimePicker(this_compose);
         }
+
+        this_compose.find("div.cp-content-schedule span").click(function() {
+            console.log("hello")
+            this_compose.find("input.cp-datetimepicker-emit").datetimepicker("show");
+        });
+
+        this_compose.find("input.cp-datetimepicker-emit").datetimepicker({
+            startDate:'+1970/01/01',
+            minDate:'-1969/12/31'  ,
+            // minTime: (new Date().getHours()+1)+':00:00',
+            format:'unixtime',
+            step: 1,
+            onChangeDateTime: function(currentTime) {
+                var timeFormat = currentTime.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+                this_compose.find("div.cp-content-schedule span").html(timeFormat)
+            }
+        });
     }));
 
     function setWatermark(argObj) {

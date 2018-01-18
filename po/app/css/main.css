@@ -33,6 +33,7 @@ body{
 
 .ui-header.ui-bar-c.ui-header-fixed {
 	min-height: 55px;
+	z-index: 10000;
 }
 
 .fixed-initial {
@@ -1786,7 +1787,7 @@ div#page-group-main div.gm-header-left:before {
 	border-bottom: 1px solid rgb(218,218,218);
 	position: fixed;
 	bottom: -2px;
-	z-index: 1000;
+	z-index: 10000;
 }
 
 
@@ -4496,6 +4497,14 @@ div.st-reply-message-area div.file-load .bar {
 	right: 15px;
 }
 
+#page-compose div.cp-content-schedule span{
+	float: right;
+	margin-top: -2px;
+	margin-right: 20px;
+	color: #2198f3;
+	cursor: pointer;
+}
+
 .cp-textarea-desc {
     width: calc(100% - 100px);
 	border: 0;
@@ -4895,16 +4904,25 @@ border-bottom: 1px solid #eee;
 	padding-left: 80px;
 }
 
-.cp-datetimepicker-start , .cp-datetimepicker-end {
+#page-compose input.cp-datetimepicker-emit,
+#page-compose input.cp-datetimepicker-start, 
+#page-compose input.cp-datetimepicker-end {
 	opacity: 0;
 }
 
-input.cp-datetimepicker-start {
+#page-compose input.cp-datetimepicker-emit {
+	position: absolute;
+	right: 16px;
+	margin-top: 20px;
+	z-index: -1;
+}
+
+#page-compose input.cp-datetimepicker-start {
 	position: absolute;
 	left: 30px;
 }
 
-input.cp-datetimepicker-end {
+#page-compose input.cp-datetimepicker-end {
 	position: absolute;
 	left: 90px;
 }
