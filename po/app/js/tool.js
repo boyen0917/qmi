@@ -2353,6 +2353,7 @@ function getUnreadUserList(AllUserList, readUserList, groupID) {
 }
 
 function riseNotification (icon, title, description, onClickCallback) {
+	console.log("rise on web code")
 	try{
 		var notification = new window.Notification(title, {
 			body: description,
@@ -2803,16 +2804,42 @@ QmiGlobal.showNotification = function(argObj) {
 		return;
 	} catch(e) {console.log("Not mac notification");}
 
+	try {
+		var nwNotify = require('nw-notify');
+		var message = argObj.text || "";
+		var messageLen = 200;
 
-	try{
-		var notification = new window.Notification(argObj.title, {
-			body: argObj.text,
-			icon: argObj.icon === undefined? "resource/images/default.png": argObj.icon
-		});
-		if (typeof argObj.callback === "function")
-			notification.addEventListener("click", argObj.callback);
+		if (message.length > messageLen) {
+    		message = message.substring(0, messageLen) + "......";
+  		}
+
+		nwNotify.init(nwGui);
+    	nwNotify.setTemplatePath(location.href.substring(0, location.href.lastIndexOf("/")) + '/layout/desktopToast.html');
+	    nwNotify.setConfig({
+	    	appIcon: nw.__dirname + "/resource/images/default.png",
+	    	width: 372,
+	    	height: 120,
+	        displayTime: 3000000
+	    });
+
+	    nwNotify.notify({
+            title: argObj.title,
+            text: message,
+            onClickFunc: argObj.callback,
+        });
 
 	}catch(e){console.error("Notification is not supported.", e);}
+
+	// try{
+	// 	var notification = new window.Notification(argObj.title, {
+	// 		body: argObj.text,
+	// 		icon: argObj.icon === undefined? nw.__dirname + "/resource/images/default.png": argObj.icon,
+
+	// 	});
+	// 	if (typeof argObj.callback === "function")
+	// 		notification.addEventListener("click", argObj.callback);
+
+	// }catch(e){console.error("Notification is not supported.", e);}
 
 	function isChatroomCloseNotification() {
 		if(!argObj.ci) return false;
