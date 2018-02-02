@@ -2431,9 +2431,49 @@ div#page-group-main div.gm-header-left:before {
 .st-feedbox-area::-webkit-scrollbar-thumb {
     height: 80px;
 }
-/*.st-feedbox-area.official-admin-adjust{
-	margin-top: 30px;
+
+/*#page-group-main div.st-feedbox-area div.scheduled-post-alert:before{
+	content: "";
+    background-image: url(../images/common/icon/calendar_compose_icon_alert.png);
+        width: 40px;
+    height: 40px;
+    position: absolute;
 }*/
+
+
+#page-group-main div.st-feedbox-area div.scheduled-post-alert {
+	text-align: center;
+}
+
+#page-group-main div.st-feedbox-area div.scheduled-post-alert>div {
+	text-align: left;
+    display: inline-block;
+    background-color: #666;
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+#page-group-main div.st-feedbox-area div.scheduled-post-alert>div:before {
+	content: "";
+    background-image: url(../images/common/icon/calendar_compose_icon_alert.png);
+    background-size: 25px 25px;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+}
+
+#page-group-main div.st-feedbox-area div.scheduled-post-alert span {
+	margin: 0px 32px;
+	vertical-align: 2px;
+}
+
+#page-group-main div.st-feedbox-area div.scheduled-post-alert img {
+	width: 20px;
+    height: 20px;
+}
+
 .st-feebox-area-container{
     width: -webkit-calc( 100% - 30px );
     margin-left: 15px;
@@ -4495,6 +4535,11 @@ div.st-reply-message-area div.file-load .bar {
 	position: relative;
 	top: 10px;
 	right: 15px;
+}
+
+#page-compose div.cp-content-schedule div.option{
+	float: right;
+	display: none;
 }
 
 #page-compose div.cp-content-schedule span{

@@ -172,7 +172,6 @@
 	"COMPOSE_TITLE" :	"Title",
 	"COMPOSE_RECEIVER" :	"Receiver",
 	"COMPOSE_SCHEDULE" :	"Schedule",
-	"COMPOSE_POST_IMMEDIATELY" :	"Post immediately",
 	"COMPOSE_TOP" :	"Top",
 	"COMPOSE_WATERMARK" : "Watermark",
 	"COMPOSE_SET_START_TIME" :	"Specify start time",
@@ -536,5 +535,7 @@
 
 	"WEBONLY_ERROR_OCCURED_RELOGIN" : "An error occurred, please login again",
 
-	"WEBONLY_USER_PROFILE_PHONE2" : "Tel."
+	"WEBONLY_USER_PROFILE_PHONE2" : "Tel.",
+
+	"SCHEDULED_POST_POST_NOW": "Post now"
 }

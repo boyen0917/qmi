@@ -2628,20 +2628,59 @@ composeContentMake = function (compose_title){
             setDateTimePicker(this_compose);
         }
 
-        this_compose.find("div.cp-content-schedule span").click(function() {
-            console.log("hello")
+        var now = new Date();
+        this_compose.find("div.cp-content-schedule>span").click(function () {
+            $(this).hide();
+            this_compose.find("div.cp-content-schedule div.option").show();
             this_compose.find("input.cp-datetimepicker-emit").datetimepicker("show");
         });
 
+        this_compose.find("div.option>span").click(function (e) {
+            var optionNodes = Array.from(this_compose[0].getElementsByClassName("option")[0].children);
+            
+            if (optionNodes.indexOf(this) == 1) {
+                this_compose[0].querySelector("div.cp-content-schedule>span").textContent = $.i18n.getString("COMPOSE_POST_IMMEDIATELY");
+            }
+
+            this_compose.find("div.option").hide();
+            this_compose.find("input.cp-datetimepicker-emit").datetimepicker("hide");
+            this_compose.find("div.cp-content-schedule>span").show();
+        });
+
         this_compose.find("input.cp-datetimepicker-emit").datetimepicker({
-            startDate:'+1970/01/01',
-            minDate:'-1969/12/31'  ,
-            // minTime: (new Date().getHours()+1)+':00:00',
+            // format:'d.m.Y H:i',
+            minDate: 0,
+            // minDate:'-1970/01/02',//yesterday is minimum date(for today use 0 or -1970/01/01)
+            // maxDate:'+1970/01/02',//tomorrow is maximum date calendar
+            minTime: (new Date(now.getTime() + 15 * 60 * 1000)).customFormat("#hhh#:#mm#"),
+            // defaultTime:'20:00',
+            // formatTime:'i-H',
+            // scrollInput: true,
             format:'unixtime',
-            step: 1,
+            closeOnDateSelect: false,
+            closeOnWithoutClick: false,
+
+            // value: Math.round(now.getTime()/1000),
+            // formatTime:'H:i',
+            // minDate:'-1969/12/31',
+            // minTime: new Date(),
+            // minTime: (new Date().getHours()+1)+':00:00',
+            
+            step: 5,
             onChangeDateTime: function(currentTime) {
+
+                if (currentTime.getDate() == now.getDate()) {
+
+                    this.setOptions({
+                        minTime: (new Date(new Date().getTime() + 15 * 60 * 1000)).customFormat("#hhh#:#mm#"),
+                    });
+                } else {
+                    this.setOptions({
+                        minTime: '0:00',
+                    });
+                }
                 var timeFormat = currentTime.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
-                this_compose.find("div.cp-content-schedule span").html(timeFormat)
+                this_compose[0].querySelector("div.cp-content-schedule>span").textContent = timeFormat;
             }
         });
     }));
@@ -4329,8 +4368,6 @@ composeSend = function (this_compose){
     }).fail(function() {
         composeProgressBar.cancel();
     })
-
-    
 }
 
 
