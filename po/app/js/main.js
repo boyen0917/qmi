@@ -1122,7 +1122,91 @@ $(function(){
 					target.siblings(".st-more-close").trigger("click");
 					break;
 
-				
+				case "object":
+					var currentTargets = $.parseJSON(this_event.data("object_str"));
+					var groupMemberAll = QmiGlobal.groups[gi].guAll || {}
+					var currentAudiences = {};
+
+					target.siblings(".st-more-close").click();
+
+					/* 文章存的object_str跟之前(發布對象按鈕、指派管理員、聊天室選擇成員等)不一樣，
+						需要轉成可以讓composeObjectShowDelegate吃下*/
+					if (currentTargets) {
+						if (currentTargets.gul) {
+							currentTargets.gul.forEach(function (member) {
+								currentAudiences[member.gu] = member.n;
+							})
+						}
+
+						if (currentTargets.bl) {
+
+							var currentBranchObj  = {};
+
+							currentTargets.bl.forEach(function (branch) {
+								for (var memberID in groupMemberAll) {
+									var memberData = groupMemberAll[memberID];
+
+									if (memberData.st == 1) {
+										var branchListStr = memberData.bl;
+
+										if (branchListStr.indexOf(branch.bi) >= 0) {
+											currentAudiences[memberID] = memberData.nk;
+										}
+									}
+								}
+							})
+						}
+					}
+
+					target.data("object_str", JSON.stringify(currentAudiences));
+
+					composeObjectShowDelegate(target, target, {
+						isShowBranch: false,
+						isShowSelf: true,
+						isShowAll: false,
+						isShowFav: true,
+						isDisableOnAlreadyChecked: true,
+					}, function () {
+						var newTargetData = $.parseJSON(target.data("object_str")) || {};
+
+						var event_status = this_event.data("event-val");
+					    var this_ei = this_event.data("event-id");
+					    var this_gi = this_ei.split("_")[0];
+					    var this_ti = this_ei.split("_")[1];
+					    var newAudiences = {gul: []};
+					    var newAudienceNameList = [];
+
+						currentTargets.gul = [];
+
+						for (var memberID in newTargetData) {
+							if (!currentAudiences.hasOwnProperty(memberID)) {
+								newAudiences.gul.push({
+									gu: memberID,
+									n: newTargetData[memberID]
+								})
+
+								newAudienceNameList.push(newTargetData[memberID]);
+							}
+
+							currentTargets.gul.push({
+								gu: memberID,
+								n: newTargetData[memberID]
+							})
+						}
+						
+						new QmiAjax({
+							apiName: "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/content/permission",
+							method: "put",
+							body: currentTargets
+						}).complete(function(data){
+					        if(data.status == 200){
+								this_event.data("object_str", JSON.stringify(newAudiences));
+								toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newAudienceNameList.join(' 、 '))
+					        	this_event.find(".st-sub-box-1-footer").append("、" + newAudienceNameList.join('、')); 
+					        }
+					    });
+					});
+					break;
 			}
 		} catch(e){
 			cns.debug(e);
