@@ -1121,6 +1121,8 @@ $(function(){
 					}
 					target.siblings(".st-more-close").trigger("click");
 					break;
+
+				
 			}
 		} catch(e){
 			cns.debug(e);

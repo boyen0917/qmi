@@ -2732,6 +2732,8 @@ composeObjectShow = function(this_compose){
 }
 
 composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDone ){
+    console.log(thisCompose);
+    console.log(thisCompose.data("object_str"))
     var objectDelegateView = ObjectDelegateView;
     var objData, branchData, favoriteData;
     var isShowBranch = false;
@@ -2742,6 +2744,7 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
     var isBack = true;
     var isShowLeftMem = false;
     var isForWork = thisComposeObj.parent().hasClass("cp-work-item");
+    var isDisableOnAlreadyChecked = false;
 
     var group = QmiGlobal.groups[gi],
         guAll = group.guAll,
@@ -2774,6 +2777,7 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
         isBack = (null==option.isBack) ? isBack : option.isBack;
         isShowLeftMem = (null==option.isShowLeftMem) ? isShowLeftMem : option.isShowLeftMem;
+        isDisableOnAlreadyChecked = (null==option.isDisableOnAlreadyChecked) ? isDisableOnAlreadyChecked : option.isDisableOnAlreadyChecked
     }
 
     if (thisComposeObj.parent().hasClass("cp-work-item")) {
@@ -2824,6 +2828,8 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         checkedBranches : branchData,
         checkedFavorites : favoriteData,
         minSelectNum : 0,
+        isDisableOnAlreadyChecked : isDisableOnAlreadyChecked
+
     }
 
     objectDelegateView.init(viewOption).setHeight();
@@ -2842,7 +2848,8 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         objectDelegateView.addRowElement("Favorite");
 
         visibleMemList.forEach(function(gu) {
-            var guObj = guAll[gu];
+            var guObj = Object.assign({}, guAll[gu]);
+            if (objData.hasOwnProperty(gu)) guObj.chk = true;
             if (guObj.fav) {
                 objectDelegateView.addFavoriteSubRow("Member", {thisMember : guObj, isSubRow : true});
             }
@@ -5278,6 +5285,12 @@ eventStatusWrite = function(this_event,this_es_obj){
         this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").removeClass("deactive");
     } else {
         this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").addClass("deactive");
+    }
+
+    if( this_es_obj.hasOwnProperty("tu") ){
+        this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='object']").removeClass("deactive");
+    } else {
+        this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='object']").addClass("deactive");
     }
 }
 
