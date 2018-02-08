@@ -146,6 +146,7 @@
 	"FEED_COPY_CONTENT" : "複製內容",
 	"FEED_COPY_CONTENT_SUCC" : "成功複製內容",
 	"FEED_CALENDAR" : "加入行事曆",
+	"FEED_ADD_AUDIENCE" : "新增發佈對象",
 	"FEED_UNTOP_AVAILABLE" : "目前尚未有任何置頂",
 	"FEED_CLOSE_TIME" : "結束時間",
 	"FEED_SAY_SOMETHING" : "請輸入訊息…",

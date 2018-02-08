@@ -146,6 +146,7 @@
 	"FEED_COPY_CONTENT" : "Copy content",
 	"FEED_COPY_CONTENT_SUCC" : "Copied to clipboard",
 	"FEED_CALENDAR" : "Add to Calendar",
+	"FEED_ADD_AUDIENCE" : "新增發佈對象",
 	"FEED_UNTOP_AVAILABLE" : "No Top Feed Now",
 	"FEED_CLOSE_TIME" : "End Time",
 	"FEED_SAY_SOMETHING" : "Say something…",
