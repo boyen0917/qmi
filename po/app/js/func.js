@@ -2628,60 +2628,65 @@ composeContentMake = function (compose_title){
             setDateTimePicker(this_compose);
         }
 
-        var now = new Date();
-        this_compose.find("div.cp-content-schedule>span").click(function () {
+        var scheduledTimeButton = this_compose.find("div.cp-content-schedule>span");
+        var datetimeInput = this_compose.find("input[type='datetime-local']");
+
+        scheduledTimeButton.click(function () {
+
             $(this).hide();
-            this_compose.find("div.cp-content-schedule div.option").show();
-            this_compose.find("input.cp-datetimepicker-emit").datetimepicker("show");
-        });
+            var now = new Date();
 
-        this_compose.find("div.option>span").click(function (e) {
-            var optionNodes = Array.from(this_compose[0].getElementsByClassName("option")[0].children);
-            
-            if (optionNodes.indexOf(this) == 1) {
-                this_compose[0].querySelector("div.cp-content-schedule>span").textContent = $.i18n.getString("COMPOSE_POST_IMMEDIATELY");
+            var minTime = new Date(now.getTime() + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+            var maxTime = new Date(now.setFullYear(now.getFullYear() + 20)).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+
+            this_compose.find("div.schedule-datetime-option").show();
+            datetimeInput.show();
+            datetimeInput[0].focus()
+            datetimeInput.attr("min", minTime);
+            datetimeInput.attr("max", maxTime);
+
+            if (datetimeInput[0].value == "") {
+                datetimeInput.attr("value", minTime);
             }
 
-            this_compose.find("div.option").hide();
-            this_compose.find("input.cp-datetimepicker-emit").datetimepicker("hide");
-            this_compose.find("div.cp-content-schedule>span").show();
-        });
+            datetimeInput.off('change').on('change', function (e) {
+                var target = e.target;
+                var validityState = target.validity;
 
-        this_compose.find("input.cp-datetimepicker-emit").datetimepicker({
-            // format:'d.m.Y H:i',
-            minDate: 0,
-            // minDate:'-1970/01/02',//yesterday is minimum date(for today use 0 or -1970/01/01)
-            // maxDate:'+1970/01/02',//tomorrow is maximum date calendar
-            minTime: (new Date(now.getTime() + 15 * 60 * 1000)).customFormat("#hhh#:#mm#"),
-            // defaultTime:'20:00',
-            // formatTime:'i-H',
-            // scrollInput: true,
-            format:'unixtime',
-            closeOnDateSelect: false,
-            closeOnWithoutClick: false,
-
-            // value: Math.round(now.getTime()/1000),
-            // formatTime:'H:i',
-            // minDate:'-1969/12/31',
-            // minTime: new Date(),
-            // minTime: (new Date().getHours()+1)+':00:00',
-            
-            step: 5,
-            onChangeDateTime: function(currentTime) {
-
-                if (currentTime.getDate() == now.getDate()) {
-
-                    this.setOptions({
-                        minTime: (new Date(new Date().getTime() + 15 * 60 * 1000)).customFormat("#hhh#:#mm#"),
-                    });
-                } else {
-                    this.setOptions({
-                        minTime: '0:00',
-                    });
+                if (!validityState.valid) {
+                    datetimeInput.attr("value", target.defaultValue);
                 }
-                var timeFormat = currentTime.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
-                this_compose[0].querySelector("div.cp-content-schedule>span").textContent = timeFormat;
+            })
+        });
+
+        this_compose.find("div.schedule-datetime-option>span").click(function (e) {
+            if ($(this).index() == 0) {
+                // 0.14.7 node webkit 的new Date參數代入ISO String會有時差，只好重設
+                var datetimeStr = datetimeInput[0].value;
+                var [fullDate, time] = datetimeStr.split("T");
+                var [year, month, date] = fullDate.split("-");
+                var [hour, minute] = time.split(":");
+
+                var newDate = new Date()
+                newDate.setFullYear(year);
+                newDate.setMonth(month - 1);
+                newDate.setDate(date);
+                newDate.setHours(hour);
+                newDate.setMinutes(minute);
+
+                var scheduledTime = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+
+                scheduledTimeButton.text(scheduledTime);
+                datetimeInput.data('value', newDate.getTime());
+            } else {
+                scheduledTimeButton.text($.i18n.getString("SCHEDULED_POST_POST_NOW"));
+                datetimeInput.data('value', 0);
             }
+
+            this_compose.find("div.schedule-datetime-option").hide();
+            datetimeInput.hide()
+
+            this_compose.find("div.cp-content-schedule>span").show();
         });
     }));
 
@@ -3899,6 +3904,7 @@ composeSend = function (this_compose){
     var tagMembers = this_compose.find(".cp-content-highlight").data("markMembers");
     var ml = this_compose.data("message-list").unique();
     var tmpElement = document.createElement("div");
+    
     var body = {
             meta : {
                 lv : 1,
@@ -4373,30 +4379,64 @@ composeSend = function (this_compose){
 
 composeSendApi = function(body){
     var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events";
+    var scheduledTime = $("#page-compose").find("input[type=datetime-local]").data('value');
 
     var headers = {
-             "ui":ui,
-             "at":at, 
-             "li":lang,
-                 };
+        "ui":ui,
+        "at":at, 
+        "li":lang,
+    };
 
     var method = "post";
-    var result = ajaxDo(api_name,headers,method,true,body);
-    result.complete(function(data){
+    var now = new Date();
 
-        if(data.status == 200){
-            $.mobile.changePage("#page-group-main");
-
-            //檢查置頂
-            topEventChk();
-            timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
-            toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
-        }else{
-            setTimeout(function(){
-                $(document).find(".cp-content").data("send-chk",true);
-            }, 2000);
+    if (scheduledTime > 0) {
+        if (now.getTime() > scheduledTime) {
+            popupShowAdjust(
+                $.i18n.getString("SCHEDULED_POST_FAILED"),
+                $.i18n.getString("SCHEDULED_POST_POST_TIME_PASSED"),
+                $.i18n.getString("SCHEDULED_POST_POST_NOW"),
+                $.i18n.getString("SCHEDULED_POST_EDIT"),
+                [function () {
+                    scheduledTime = 0;
+                    sendPost();
+                }]
+            )
+        } else {
+            api_name += "?ct=" + scheduledTime;
+            sendPost();
         }
-    });
+    } else {
+        sendPost();
+    }
+
+    function sendPost () {
+        var result = ajaxDo(api_name,headers,method,true,body);
+        result.complete(function(data){
+
+            if(data.status == 200){
+                $.mobile.changePage("#page-group-main");
+
+                //檢查置頂
+                topEventChk();
+                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+
+                if (scheduledTime > 0) {
+                    popupShowAdjust(
+                        $.i18n.getString("SCHEDULED_POST_SUCCEED"),
+                        $.i18n.getString("SCHEDULED_POST_CHECK"),
+                        true
+                    )
+                } else {
+                    toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
+                }
+            }else{
+                setTimeout(function(){
+                    $(document).find(".cp-content").data("send-chk",true);
+                }, 2000);
+            }
+        });
+    }
 };
 
 composeCheckMessageList = function(){
@@ -5115,7 +5155,43 @@ timelineListWrite = function (ct_timer,is_top){
 
     var idb_timer = ct_timer - 1 || 9999999999999;
     //取得server最新資訊 更新資料庫
-    idbPutTimelineEvent(ct_timer,is_top).done( deferred.resolve );
+    $.when.apply($, [
+        getScheduledTimelineList(), 
+        idbPutTimelineEvent(ct_timer,is_top)
+    ]).done( deferred.resolve );
+
+    return deferred.promise();
+}
+
+getScheduledTimelineList = function () {
+    var timeelinePage = $("#page-group-main");
+    var scheduledPostAlert = timeelinePage.find("div.scheduled-post-alert");
+    var deferred = $.Deferred();
+
+    new QmiAjax({
+        apiName: "groups/" + gi + "/timelines/" + ti_feed+ "/present/list",
+    }).success(function (data) {
+        var scheduledPostList = data.el;
+
+        if (scheduledPostList.length > 0) {
+            scheduledPostAlert.show();
+
+            scheduledPostAlert
+                .find("span")
+                .text($.i18n.getString("SCHEDULED_POST_NUMBER_SCHEDULED_POST", scheduledPostList.length));
+
+            scheduledPostAlert.off('click').on('click', function () {
+                var container = document.getElementById("scheduled-post-modal");
+                var scheduledFeed = new ScheduledFeed(container);
+
+                scheduledFeed.importData(scheduledPostList);
+            })
+        } else {
+            scheduledPostAlert.hide();
+        }
+
+        deferred.resolve();
+    })
 
     return deferred.promise();
 }

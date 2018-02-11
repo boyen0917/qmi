@@ -13,14 +13,12 @@
         <link rel="stylesheet" href="css/contact.css?v2.1.0.4" />
         <link rel="stylesheet" href="css/general_album.css?v2.1.0.4" />
         <link rel="stylesheet" href="css/setting.css?v2.1.0.4" />
-
-    <!-- index -->
         <link rel="stylesheet" href="css/registration.css?v2.1.0.4" />
         <link rel="stylesheet" href="plugins/jquery.selectbox/css/jquery.selectbox.css?v2.1.0.4" />
         <link rel="stylesheet" href="css/stickerArea.css?v2.1.0.4"/>
-    <!-- index -->
         <link rel="stylesheet" href="css/stickerCenter.css"/>
-        
+        <link rel="stylesheet" href="css/scheduledFeed.css"/>
+
         <script type="text/javascript" src='../../assist/func_assistant.js'></script>
 
         <script src="js/ga.js?v2.1.0.4"></script>
@@ -70,8 +68,8 @@
         <script type="text/javascript" src="js/parseUrl.js?v2.1.0.4"></script>
         <script type="text/javascript" src="js/stickerCenter.js?v2.1.0.4"></script>
         <script type="text/javascript" src="js/objectDelegate.js?v2.1.0.4"></script>
-
         <script type="text/javascript" src="js/hashtag.js?v2.1.0.4"></script>
+        <script type="text/javascript" src="js/scheduledFeed.js?v2.1.0.4"></script>
         
         <script src="js/sha/sha1.js?v2.1.0.4"></script>
         <script src="js/aesCrypto/aes.js?v2.1.0.4"></script>
@@ -83,7 +81,6 @@
 
         <!-- jquery ui datepicker -->
         <link rel="stylesheet" type="text/css" href="datepicker/datetimepicker.css?v2.1.0.4" />
-        <script src="datepicker/php-date-formatter.min.js?v2.1.0.4"></script>
         <script src="datepicker/datetimepicker.js?v2.1.0.4"></script>
 
         <!-- 圖庫呈現 flex slider  -->
@@ -823,7 +820,7 @@
                             <div class="personal-info-area"></div>
                             <div class="scheduled-post-alert">
                                 <div>
-                                    <span>1 則預約發文</span>
+                                    <span></span>
                                     <img src="images/icon/icon_arrow_right.png"/ >
                                 </div>
                             </div>
@@ -1589,7 +1586,7 @@
             <div class="content"></div>
         </div>
         <div id="view-alert-cover" class="alert-area-cover"></div>
-
+        <div id="scheduled-post-modal"><div></div></div>
         <div class="ajax-screen-lock"></div>
         <div class="screen-lock"></div>
         <div class="compose-dnd"></div>

@@ -2443,6 +2443,7 @@ div#page-group-main div.gm-header-left:before {
 
 #page-group-main div.st-feedbox-area div.scheduled-post-alert {
 	text-align: center;
+	display: none;
 }
 
 #page-group-main div.st-feedbox-area div.scheduled-post-alert>div {
@@ -4537,17 +4538,32 @@ div.st-reply-message-area div.file-load .bar {
 	right: 15px;
 }
 
-#page-compose div.cp-content-schedule div.option{
-	float: right;
+#page-compose div.schedule-datetime-option {
+	width: 100%;
+	height: 18px;
 	display: none;
 }
 
+/*#page-compose div.cp-content-schedule div.option{
+	float: right;
+	display: none;
+}*/
+
+#page-compose div.schedule-datetime-option span,
 #page-compose div.cp-content-schedule span{
 	float: right;
 	margin-top: -2px;
-	margin-right: 20px;
 	color: #2198f3;
 	cursor: pointer;
+	font-weight: bold;
+}
+
+#page-compose div.schedule-datetime-option span{
+	margin-right: 20px;
+}
+
+#page-compose div.cp-content-schedule span{
+	margin-right: 20px;
 }
 
 .cp-textarea-desc {
@@ -4972,6 +4988,31 @@ border-bottom: 1px solid #eee;
 	left: 90px;
 }
 
+
+#page-compose input[type='datetime-local'] {
+	display: none;
+	border-radius: 8px;
+    padding: 0px 5px;
+    border: 1px solid #ddd;
+    outline: 0;
+    float: right;
+    margin-top: 9px;
+    margin-right: 10px;
+}
+
+
+input[type='datetime-local']::-webkit-outer-spin-button, 
+input[type='datetime-local']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    background: #FFF url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAKUlEQVQYlWNgwAT/sYhhKPiPT+F/LJgEsHv37v+EMGkmkuImoh2NoQAANlcun/q4OoYAAAAASUVORK5CYII=) no-repeat center center;
+    background-size: 10px; 
+    width: 10px;
+    opacity: 1; 
+}
+
+input[type='datetime-local']::-webkit-calendar-picker-indicator {
+ 	opacity: 1; 
+}
 
 .cp-setdate-time {
 	position: relative;
