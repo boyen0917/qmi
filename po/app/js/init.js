@@ -27,7 +27,7 @@ var base_url = function() {
 			return "https://qmi17.mitake.com.tw/";
 			break;
 		default:
-			return "https://nqmi26.mitake.com.tw/";
+			return "https://ap.qmi.emome.net/";
 	}
 	function match(domain) {
 		var regDomain = new RegExp("^https:\/\/"+ domain, 'g');
