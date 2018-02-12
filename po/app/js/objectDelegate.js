@@ -36,6 +36,7 @@ ObjectDelegateView = {
 		this.checkedMems = option.checkedMems;
 		this.checkedBranches = option.checkedBranches || {};
 		this.checkedFavorites = option.checkedFavorites || {};
+		this.isDisableOnAlreadyChecked = option.isDisableOnAlreadyChecked
 
 		this.matchList = this.visibleMembers;
 
@@ -207,12 +208,13 @@ ObjectDelegateView = {
 	addFavoriteSubRow : function (type, rowData) {
 		rowData = rowData || {};
 		rowData.isSelectedAll = this.isSelectedAllMember;
+
 		var rowElement = ObjectCell.factory(type, rowData);
 		switch (type) {
 			case "Member" :
-				if (Object.keys(this.checkedMems).length) {
-		       		if (this.checkedMems[rowElement.id] != undefined) rowElement.checked(true);
-		    	}
+				// if (Object.keys(this.checkedMems).length) {
+		  //      		if (this.checkedMems[rowElement.id] != undefined) rowElement.checked(true);
+		  //   	}
 				rowElement.bindEvent(this.checkThisMember.bind(this));
 				this.favMemberRows.push(rowElement);
 				break;
@@ -253,6 +255,7 @@ ObjectDelegateView = {
 		}.bind(this));
 
 		this.memberRows.forEach(function(memberRow) {
+			if (!memberRow.enable) this.checkedMems[memberRow.id] = memberRow.name;
 			memberRow.checked(this.isSelectedAllMember);
 		}.bind(this));
 	},
@@ -302,8 +305,13 @@ ObjectDelegateView = {
 		this.isSelectedAllBranch = false;
 
 		allRow.forEach(function(row) {
-			row.checked(false);
-		});
+			console.log(this)
+			if (!row.enable) {
+				this.checkedMems[row.id] = row.name;
+			} else {
+				row.checked(false);
+			}
+		}.bind(this));
 
 		this.updateStatus();
 	},
@@ -517,8 +525,10 @@ ObjectCell.prototype = {
 			this.html.find(".img").addClass("chk");
 			this.isChecked = true;
 		} else {
-			this.html.find(".img").removeClass("chk");
-			this.isChecked = false;
+			if (this.enable) {
+				this.html.find(".img").removeClass("chk");
+				this.isChecked = false;
+			}
 		}
 	},
 
@@ -535,16 +545,18 @@ ObjectCell.prototype = {
 			bindElement = objCell.html;
 		}
 
-		bindElement.off("click").on("click", function (e) {
-			e.stopPropagation();
+		if (objCell.enable) {
+			bindElement.off("click").on("click", function (e) {
+				e.stopPropagation();
 
-			doEvenFun(objCell);
-			if (!objCell.isDefault) {
-				$(this).find(".img").toggleClass("chk");
-				objCell.isChecked = !objCell.isChecked;
-				ObjectDelegateView.updateStatus();
-			}
-		});
+				doEvenFun(objCell);
+				if (!objCell.isDefault) {
+					$(this).find(".img").toggleClass("chk");
+					objCell.isChecked = !objCell.isChecked;
+					ObjectDelegateView.updateStatus();
+				}
+			});
+		}
 	},
 
 	remove : function () {
@@ -579,6 +591,8 @@ ObjectCell.Default = function (rowData) {
 	this.isSelectAll = false;
 	this.isChecked = true;
 	this.isDefault = true;
+
+	this.enable = true;
 }
 
 ObjectCell.Favorite = function () {
@@ -597,6 +611,7 @@ ObjectCell.Favorite = function () {
         $(this).parent().next().toggle();
     });
 	this.isChecked = false;
+	this.enable = true;
 }
 
 ObjectCell.ParentBranch = function (rowData) {
@@ -613,6 +628,7 @@ ObjectCell.ParentBranch = function (rowData) {
 		+ "</div></div></div><div class='obj-cell-arrow'></div></div><div class='folder'></div></div>");
 	self.isSelectAll = false;
 	self.childBranch = [];
+	self.enable = true;
 
 	self.html.find(".obj-cell-arrow").off("click").click(function(e) {
 		e.stopPropagation();
@@ -667,6 +683,8 @@ ObjectCell.SelectAllTitle = function (rowData) {
 	this.html = $("<div class='obj-cell-subTitle " + rowData.type + "' data-chk='false'>"
 		+  objCellHtml + "<div class='text'>" + titleText + "</div></div>");
 	this.isChecked = false;
+
+	this.enable = true;
 }
 
 ObjectCell.FavBranch = function (rowData) {
@@ -683,6 +701,7 @@ ObjectCell.FavBranch = function (rowData) {
         '</div>');
 
 	this.isChecked = favBranchData.chk;
+	this.enable = true;
 }
 
 ObjectCell.ChildBranch = function (rowData) {
@@ -698,12 +717,15 @@ ObjectCell.ChildBranch = function (rowData) {
         '</div>');
 	this.isSelectAll = false;
 	this.isChecked = thisBranch.chk;
+	this.enable = true;
 }
 
 ObjectCell.Member = function (rowData) {
+	console.log(rowData)
 	var thisMember = rowData.thisMember;
 	var memberImg = (thisMember.aut) ? thisMember.aut : "images/common/others/empty_img_personal_xl.png";
 	var addChkWord = (thisMember.chk || rowData.isSelectedAll) ? "chk" : "";
+	var isDisableOnAlreadyChecked = ObjectDelegateView.isDisableOnAlreadyChecked
 	this.id = thisMember.gu;
 	this.name = thisMember.nk.replaceOriEmojiCode();
 	this.html = $('<div class="obj-cell ' + ((rowData.isSubRow) ? "_2" : "") + ' mem" data-gu="' + thisMember.gu+'">' +
@@ -717,4 +739,7 @@ ObjectCell.Member = function (rowData) {
 	this.isSubRow = rowData.isSubRow;
 	this.isSelectAll = false;
 	this.isChecked = (thisMember.chk || rowData.isSelectedAll);
+	this.enable = (!this.isChecked && isDisableOnAlreadyChecked) || !isDisableOnAlreadyChecked;
+
+	console.log(this.enable)
 }

@@ -146,6 +146,7 @@
 	"FEED_COPY_CONTENT" : "Copy content",
 	"FEED_COPY_CONTENT_SUCC" : "Copied to clipboard",
 	"FEED_CALENDAR" : "Add to Calendar",
+	"FEED_ADD_AUDIENCE" : "新增發佈對象",
 	"FEED_UNTOP_AVAILABLE" : "No Top Feed Now",
 	"FEED_CLOSE_TIME" : "End Time",
 	"FEED_SAY_SOMETHING" : "Say something…",
@@ -534,5 +535,21 @@
 
 	"WEBONLY_ERROR_OCCURED_RELOGIN" : "An error occurred, please login again",
 
-	"WEBONLY_USER_PROFILE_PHONE2" : "Tel."
+	"WEBONLY_USER_PROFILE_PHONE2" : "Tel.",
+	
+	"SCHEDULED_POST": "Scheduled post",
+	"SCHEDULED_POST_AT": "Scheduled post at",
+	"SCHEDULED_POST_POST_NOW": "Post now",
+	"SCHEDULED_POST_DONE": "Done",
+	"SCHEDULED_POST_FAILED": "Scheduled post failed",
+	"SCHEDULED_POST_POST_TIME_PASSED": "Scheduled time has passed, post now?",
+	"SCHEDULED_POST_EDIT": "Edit",
+	"SCHEDULED_POST_SUCCEED": "Scheduled post succeed",
+	"SCHEDULED_POST_CHECK": "You can check scheduled post at Feed",
+	"SCHEDULED_POST_NUMBER_SCHEDULED_POST": "%N scheduled post",
+	"SCHEDULED_POST_DELETE": "Delete",
+	"SCHEDULED_POST_DELETE_CONFIRM": "Delete scheduled post?",
+	"SCHEDULED_POST_EDIT_AUDIENCE": "Edit audience",
+	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "Edit scheduled time"
+
 }

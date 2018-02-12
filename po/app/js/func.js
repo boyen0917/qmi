@@ -2627,6 +2627,67 @@ composeContentMake = function (compose_title){
         if(init_datetimepicker){
             setDateTimePicker(this_compose);
         }
+
+        var scheduledTimeButton = this_compose.find("div.cp-content-schedule>span");
+        var datetimeInput = this_compose.find("input[type='datetime-local']");
+
+        scheduledTimeButton.click(function () {
+
+            $(this).hide();
+            var now = new Date();
+
+            var minTime = new Date(now.getTime() + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+            var maxTime = new Date(now.setFullYear(now.getFullYear() + 20)).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+
+            this_compose.find("div.schedule-datetime-option").show();
+            datetimeInput.show();
+            datetimeInput[0].focus()
+            datetimeInput.attr("min", minTime);
+            datetimeInput.attr("max", maxTime);
+
+            if (datetimeInput[0].value == "") {
+                datetimeInput.attr("value", minTime);
+            }
+
+            datetimeInput.off('change').on('change', function (e) {
+                var target = e.target;
+                var validityState = target.validity;
+
+                if (!validityState.valid) {
+                    datetimeInput.attr("value", target.defaultValue);
+                }
+            })
+        });
+
+        this_compose.find("div.schedule-datetime-option>span").click(function (e) {
+            if ($(this).index() == 0) {
+                // 0.14.7 node webkit 的new Date參數代入ISO String會有時差，只好重設
+                var datetimeStr = datetimeInput[0].value;
+                var [fullDate, time] = datetimeStr.split("T");
+                var [year, month, date] = fullDate.split("-");
+                var [hour, minute] = time.split(":");
+
+                var newDate = new Date()
+                newDate.setFullYear(year);
+                newDate.setMonth(month - 1);
+                newDate.setDate(date);
+                newDate.setHours(hour);
+                newDate.setMinutes(minute);
+
+                var scheduledTime = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+
+                scheduledTimeButton.text(scheduledTime);
+                datetimeInput.data('value', newDate.getTime());
+            } else {
+                scheduledTimeButton.text($.i18n.getString("SCHEDULED_POST_POST_NOW"));
+                datetimeInput.data('value', 0);
+            }
+
+            this_compose.find("div.schedule-datetime-option").hide();
+            datetimeInput.hide()
+
+            this_compose.find("div.cp-content-schedule>span").show();
+        });
     }));
 
     function setWatermark(argObj) {
@@ -2671,6 +2732,8 @@ composeObjectShow = function(this_compose){
 }
 
 composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDone ){
+    console.log(thisCompose);
+    console.log(thisCompose.data("object_str"))
     var objectDelegateView = ObjectDelegateView;
     var objData, branchData, favoriteData;
     var isShowBranch = false;
@@ -2681,6 +2744,7 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
     var isBack = true;
     var isShowLeftMem = false;
     var isForWork = thisComposeObj.parent().hasClass("cp-work-item");
+    var isDisableOnAlreadyChecked = false;
 
     var group = QmiGlobal.groups[gi],
         guAll = group.guAll,
@@ -2713,6 +2777,7 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
         isBack = (null==option.isBack) ? isBack : option.isBack;
         isShowLeftMem = (null==option.isShowLeftMem) ? isShowLeftMem : option.isShowLeftMem;
+        isDisableOnAlreadyChecked = (null==option.isDisableOnAlreadyChecked) ? isDisableOnAlreadyChecked : option.isDisableOnAlreadyChecked
     }
 
     if (thisComposeObj.parent().hasClass("cp-work-item")) {
@@ -2763,6 +2828,8 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         checkedBranches : branchData,
         checkedFavorites : favoriteData,
         minSelectNum : 0,
+        isDisableOnAlreadyChecked : isDisableOnAlreadyChecked
+
     }
 
     objectDelegateView.init(viewOption).setHeight();
@@ -2781,7 +2848,8 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         objectDelegateView.addRowElement("Favorite");
 
         visibleMemList.forEach(function(gu) {
-            var guObj = guAll[gu];
+            var guObj = Object.assign({}, guAll[gu]);
+            if (objData.hasOwnProperty(gu)) guObj.chk = true;
             if (guObj.fav) {
                 objectDelegateView.addFavoriteSubRow("Member", {thisMember : guObj, isSubRow : true});
             }
@@ -3843,6 +3911,7 @@ composeSend = function (this_compose){
     var tagMembers = this_compose.find(".cp-content-highlight").data("markMembers");
     var ml = this_compose.data("message-list").unique();
     var tmpElement = document.createElement("div");
+    
     var body = {
             meta : {
                 lv : 1,
@@ -4312,37 +4381,69 @@ composeSend = function (this_compose){
     }).fail(function() {
         composeProgressBar.cancel();
     })
-
-    
 }
 
 
 composeSendApi = function(body){
     var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events";
+    var scheduledTime = $("#page-compose").find("input[type=datetime-local]").data('value');
 
     var headers = {
-             "ui":ui,
-             "at":at, 
-             "li":lang,
-                 };
+        "ui":ui,
+        "at":at, 
+        "li":lang,
+    };
 
     var method = "post";
-    var result = ajaxDo(api_name,headers,method,true,body);
-    result.complete(function(data){
+    var now = new Date();
 
-        if(data.status == 200){
-            $.mobile.changePage("#page-group-main");
-
-            //檢查置頂
-            topEventChk();
-            timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
-            toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
-        }else{
-            setTimeout(function(){
-                $(document).find(".cp-content").data("send-chk",true);
-            }, 2000);
+    if (scheduledTime > 0) {
+        if (now.getTime() > scheduledTime) {
+            popupShowAdjust(
+                $.i18n.getString("SCHEDULED_POST_FAILED"),
+                $.i18n.getString("SCHEDULED_POST_POST_TIME_PASSED"),
+                $.i18n.getString("SCHEDULED_POST_POST_NOW"),
+                $.i18n.getString("SCHEDULED_POST_EDIT"),
+                [function () {
+                    scheduledTime = 0;
+                    sendPost();
+                }]
+            )
+        } else {
+            api_name += "?ct=" + scheduledTime;
+            sendPost();
         }
-    });
+    } else {
+        sendPost();
+    }
+
+    function sendPost () {
+        var result = ajaxDo(api_name,headers,method,true,body);
+        result.complete(function(data){
+
+            if(data.status == 200){
+                $.mobile.changePage("#page-group-main");
+
+                //檢查置頂
+                topEventChk();
+                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+
+                if (scheduledTime > 0) {
+                    popupShowAdjust(
+                        $.i18n.getString("SCHEDULED_POST_SUCCEED"),
+                        $.i18n.getString("SCHEDULED_POST_CHECK"),
+                        true
+                    )
+                } else {
+                    toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
+                }
+            }else{
+                setTimeout(function(){
+                    $(document).find(".cp-content").data("send-chk",true);
+                }, 2000);
+            }
+        });
+    }
 };
 
 composeCheckMessageList = function(){
@@ -4888,29 +4989,8 @@ timelineBlockMake = function(this_event_temp, timeline_list, is_top, isMakingDet
         //發佈對象
         var tu_str = $.i18n.getString("MEMBER_ALL");    //所有人
         this_event.data("object_str", JSON.stringify(val.meta.tu) );
-        if(val.meta.tu){
-            //用來過濾重複gu
-            var gu_chk_arr = [];
-            var bi_chk_arr = [];
-            var tu_arr = [];
-
-            if(val.meta.tu.gul){
-                $.each(val.meta.tu.gul,function(gu_i,gu_obj){
-                    if($.inArray(gu_obj.gu,gu_chk_arr) < 0 ){
-                        tu_arr.push(gu_obj.n);
-                        gu_chk_arr.push(gu_obj.gu); 
-                    }
-                });
-            }
-            if(val.meta.tu.bl){
-                $.each(val.meta.tu.bl,function(gu_i,bi_obj){
-                    if($.inArray(bi_obj.gu,bi_chk_arr) < 0 ){
-                        tu_arr.push(bi_obj.bn);
-                        bi_chk_arr.push(bi_obj.bi); 
-                    }
-                });
-            }
-            tu_str = tu_arr.join("、");
+        if(val.meta.tu) {
+            tu_str = targetListToString(val.meta.tu)
         }
         this_event.find(".st-sub-box-1-footer").append(tu_str.replaceOriEmojiCode()); 
         
@@ -5061,7 +5141,43 @@ timelineListWrite = function (ct_timer,is_top){
 
     var idb_timer = ct_timer - 1 || 9999999999999;
     //取得server最新資訊 更新資料庫
-    idbPutTimelineEvent(ct_timer,is_top).done( deferred.resolve );
+    $.when.apply($, [
+        getScheduledTimelineList(), 
+        idbPutTimelineEvent(ct_timer,is_top)
+    ]).done( deferred.resolve );
+
+    return deferred.promise();
+}
+
+getScheduledTimelineList = function () {
+    var timeelinePage = $("#page-group-main");
+    var scheduledPostAlert = timeelinePage.find("div.scheduled-post-alert");
+    var deferred = $.Deferred();
+
+    new QmiAjax({
+        apiName: "groups/" + gi + "/timelines/" + ti_feed+ "/present/list",
+    }).success(function (data) {
+        var scheduledPostList = data.el;
+
+        if (scheduledPostList.length > 0) {
+            scheduledPostAlert.show();
+
+            scheduledPostAlert
+                .find("span")
+                .text($.i18n.getString("SCHEDULED_POST_NUMBER_SCHEDULED_POST", scheduledPostList.length));
+
+            scheduledPostAlert.off('click').on('click', function () {
+                var container = document.getElementById("scheduled-post-modal");
+                var scheduledFeedModal = new ScheduledFeedModal(container);
+
+                scheduledFeedModal.importData(scheduledPostList);
+            })
+        } else {
+            scheduledPostAlert.hide();
+        }
+
+        deferred.resolve();
+    })
 
     return deferred.promise();
 }
@@ -5148,6 +5264,12 @@ eventStatusWrite = function(this_event,this_es_obj){
         this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").removeClass("deactive");
     } else {
         this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='del']").addClass("deactive");
+    }
+
+    if( this_es_obj.hasOwnProperty("tu") ){
+        this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='object']").removeClass("deactive");
+    } else {
+        this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='object']").addClass("deactive");
     }
 }
 

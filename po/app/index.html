@@ -13,14 +13,12 @@
         <link rel="stylesheet" href="css/contact.css?v2.1.0.4" />
         <link rel="stylesheet" href="css/general_album.css?v2.1.0.4" />
         <link rel="stylesheet" href="css/setting.css?v2.1.0.4" />
-
-    <!-- index -->
         <link rel="stylesheet" href="css/registration.css?v2.1.0.4" />
         <link rel="stylesheet" href="plugins/jquery.selectbox/css/jquery.selectbox.css?v2.1.0.4" />
         <link rel="stylesheet" href="css/stickerArea.css?v2.1.0.4"/>
-    <!-- index -->
         <link rel="stylesheet" href="css/stickerCenter.css"/>
-        
+        <link rel="stylesheet" href="css/scheduledFeed.css"/>
+
         <script type="text/javascript" src='../../assist/func_assistant.js'></script>
 
         <script src="js/ga.js?v2.1.0.4"></script>
@@ -71,7 +69,8 @@
         <script type="text/javascript" src="js/stickerCenter.js?v2.1.0.4"></script>
         <script type="text/javascript" src="js/objectDelegate.js?v2.1.0.4"></script>
         <script type="text/javascript" src="js/hashtag.js?v2.1.0.4"></script>
-
+        <script type="text/javascript" src="js/scheduledFeed.js?v2.1.0.4"></script>
+        
         <script src="js/sha/sha1.js?v2.1.0.4"></script>
         <script src="js/aesCrypto/aes.js?v2.1.0.4"></script>
         <script src="js/aesCrypto/mode-ecb-min.js?v2.1.0.4"></script>
@@ -819,6 +818,12 @@
                             </div>
 
                             <div class="personal-info-area"></div>
+                            <div class="scheduled-post-alert">
+                                <div>
+                                    <span></span>
+                                    <img src="images/icon/icon_arrow_right.png"/ >
+                                </div>
+                            </div>
                             <div class="st-feebox-area-container">
                                 <div class="st-feebox-area-inner-container">
                                     <div data-feed="00" class="feed-home feed-subarea switch-reset"></div>
@@ -1581,7 +1586,15 @@
             <div class="content"></div>
         </div>
         <div id="view-alert-cover" class="alert-area-cover"></div>
-
+        <div id="scheduled-post-modal">
+            <div>
+                
+                <div class='title'>
+                    <span>X</span>
+                    <div class='text' data-textid="SCHEDULED_POST">
+                </div>
+            </div>
+        </div>
         <div class="ajax-screen-lock"></div>
         <div class="screen-lock"></div>
         <div class="compose-dnd"></div>

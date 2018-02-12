@@ -85,6 +85,7 @@
 	    if (h==0) h=24;
 	    if (h>12) h-=12;
 	    hh = h<10?('0'+h):h;
+	    hhh = hhh<10?('0'+hhh):hhh;
 	    AMPM=(ampm=hhh<12?'am':'pm').toUpperCase();
 	    mm=(m=dateObject.getMinutes())<10?('0'+m):m;
 	    ss=(s=dateObject.getSeconds())<10?('0'+s):s;
