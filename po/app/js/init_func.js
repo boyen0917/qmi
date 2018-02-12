@@ -318,14 +318,14 @@ $(function(){
             if( tabObj.sw === false || typeof initTabMap[tabObj.tp] === "undefined") continue;
             
             var tabDom = $(tabHtml);
-            tabDom.attr("data-sm-act",initTabMap[tabObj.tp].act);
+            tabDom.attr("data-sm-act", initTabMap[tabObj.tp].act);
             //tab 對照表 init.js
             //initTabMap
             if(initTabMap[tabObj.tp].hasOwnProperty("class")){
                 for(j=0;j<initTabMap[tabObj.tp].class.length;j++){
                     tabDom.addClass(initTabMap[tabObj.tp].class[j]);    
                 }
-                tabDom.attr("data-polling-cnt",initTabMap[tabObj.tp].pollingType)
+                tabDom.attr("data-polling-cnt", initTabMap[tabObj.tp].pollingType)
                 .append('<div class="sm-count" style="display:none;"></div>');
             }
             menu.append( tabDom );

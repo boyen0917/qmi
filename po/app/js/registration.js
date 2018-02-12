@@ -989,8 +989,6 @@ appInitial = function(needUpdate){
 			// }
 			// $(document).data("device-token",deviceTokenMake());
 			var phoneNumber = $(".register-phone input").val();
-
-			$(document).data("device-token","web-device");
 			$(document).data("phone-id", countrycode + phoneNumber.replace(/^0/, ""));	
 		}
 		
@@ -1002,7 +1000,7 @@ appInitial = function(needUpdate){
         var body = {
                 id: $(document).data("phone-id"),
                 tp: 0,
-                ud: $(document).data("device-token")
+                ud: QmiGlobal.device
             }
         cns.debug("registration() 傳送驗證碼前的 body:",JSON.stringify(body,null,2));
         

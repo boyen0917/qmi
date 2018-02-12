@@ -506,6 +506,8 @@
 	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "待管理者将您加入团体后 \n 即可开始使用 Qmi",
 
 	"UNREAD_HINT" : "未点阅",
+
+	"WEBVIEW": "自订网页",
 	
 	"WEBONLY_AUTH_LOADING" : "验证中...",
 	"WEBONLY_AUTH_SUCCESS" : "验证成功",
