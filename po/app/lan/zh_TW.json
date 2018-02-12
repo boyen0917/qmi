@@ -509,6 +509,8 @@
 
 	"UNREAD_HINT" : "未點閱",
 
+	"WEBVIEW": "自訂網頁",
+
 	"WEBONLY_AUTH_LOADING" : "驗證中...",
 	"WEBONLY_AUTH_SUCCESS" : "驗證成功",
 	"WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT" : "點此新增綁定帳號",

@@ -748,6 +748,14 @@ timelineSwitch = function (act, reset, main, noAppReload){
                      .children(".st-filter-hide.left").hide().end()
                      .scrollLeft(0);
             break;
+
+        case "webview":
+            $("#subpage-webview").show();
+
+            QmiGlobal.module.webview.init();
+
+            switchDeferred.resolve({ act: "webview"});
+            break;
     }
 
     switchDeferred.done(function(result){
@@ -7697,6 +7705,10 @@ pollingCountsWrite = function(pollingData, aa){
             appBadgeNumber += groupBadgeNumber;
         }
 
+        // webview
+        var webviewDom = $("#page-group-main div.header-menu [data-sm-act=webview]").removeClass("spot");
+        if(thisCntObj.A6 > 0) webviewDom.addClass("spot");
+
         // 無cl 或 未有此gi 就不做
         if( thisCntObj.hasOwnProperty("cl") === false ||
             thisQmiGroupObj === undefined ||
@@ -7708,7 +7720,7 @@ pollingCountsWrite = function(pollingData, aa){
                 thisQmiGroupObj.chatAll[ clObj.ci ].unreadCnt = clObj.B7
         })
 
-    })
+    });
 
     //排序
     sort_arr.sort(function(a, b) {return a[1] - b[1]});

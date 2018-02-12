@@ -509,6 +509,9 @@
 
 	"UNREAD_HINT" : "Unread",
 
+	"WEBVIEW": "webView",
+
+
 	"WEBONLY_AUTH_LOADING" : "Authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
 	"WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT" : "Click to create binding account",

@@ -406,44 +406,40 @@ var polling_interval = 5000;			//polling間距
 
 //tab對照表
 var initTabMap = {
-	0:{
+	0: {
 		act: "feed-public",
 		textId: "LEFT_FEED_GROUP"
-	},
-	1:{
+	}, 1: {
 		act: "feed-post",
 		textId: "LEFT_FEED_MEMBER"
-	},
-	2:{
+	}, 2: {
 		act: "feeds",
 		textId: "LEFT_FEED",
 		class: ["polling-cnt","polling-local"],
 		pollingType: "A1"
-	},
-	3:{
+	}, 3: {
 		act: "chat",
 		textId: "LEFT_CHAT",
 		class: ["polling-cnt","polling-local"],
 		pollingType: "A3"
-	},
-	6:{
+	}, 6: {
 		act: "memberslist",
 		textId: "LEFT_MEMBER",
 		class: ["polling-cnt","polling-local"],
 		pollingType: "A2"
-	},
-	7:{
+	}, 7: {
 		act: "groupSetting",
 		textId: "GROUPSETTING_TITLE"
-	},
-	9:{
+	}, 9: {
 		act: "addressBook",
 		textId: "ADDRESSBOOK_TITLE"
-	}
-	,
-	10:{
+	}, 10 :{
 		act: "fileSharing",
 		textId: "FILESHARING_TITLE"
+	}, 11 :{
+		act: "webview",
+		textId: "WEBVIEW",
+		pollingType: "A6"
 	}
 };
 
@@ -1295,4 +1291,32 @@ if (typeof Object.assign != 'function') {
     }
     return to;
   };
+}
+
+
+QmiGlobal.ModuleConstructor = function(args) {
+	var self = this;
+    args = args || {};
+    Object.keys(args).forEach(function(key) {
+        self[key] = args[key];
+    });
+
+    self.data = function() {
+        var thisData = {};
+        return {
+            get: function(key) {
+                if(key) return thisData[key];
+                return thisData;
+            },
+            set: function(key, val) {
+                thisData[key] = val;
+            },
+            reset: function() {
+                thisData = {};
+            },
+            developGet: function() {
+                return thisData;
+            }
+        }
+    }()
 }
