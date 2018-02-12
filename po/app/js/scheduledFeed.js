@@ -191,36 +191,26 @@ scheduledPost.editAudiences = function (editBtn) {
         var newAudiencesData = $.parseJSON($(editBtn).data("object_str")) || {};
         var newBranchData = $.parseJSON($(editBtn).data("branch_str")) || {};
         var newFavoriteData = $.parseJSON($(editBtn).data("favorite_str")) || {};
+        var checkedMemberCount = Object.keys(newAudiencesData).length;
+        var groupMemberNum = QmiGlobal.groups[gi].cnt;
 
         var thisGi = self.idNumber.split("_")[0];
         var thisTi = self.idNumber.split("_")[1];
-        var newTargets = {};
+        var newTargets = {
+            tu: {}
+        };
         var newAudienceNameList = [];
         var newBranchNameList = [];
         var newFavoriteList = [];
 
-        if (Object.keys(newAudiencesData).length > 0) {
-            newTargets.gul = [];
-            for (var memberID in newAudiencesData) {
-                if (!currentAudiences.hasOwnProperty(memberID)) {
-                    newAudienceNameList.push(newAudiencesData[memberID]);
-                }
-
-                newTargets.gul.push({
-                    gu: memberID,
-                    n: newAudiencesData[memberID]
-                })
-            }
-        }
-
         if (Object.keys(newBranchData).length > 0) {
-            newTargets.bl = [];
+            newTargets.tu.bl = [];
             for (var branchID in newBranchData) {
                 if (!currentBranches.hasOwnProperty(branchID)) {
                     newBranchNameList.push(newBranchData[branchID]);
                 }
 
-                newTargets.bl.push({
+                newTargets.tu.bl.push({
                     bi: branchID,
                     bn: newBranchData[branchID]
                 })
@@ -228,31 +218,55 @@ scheduledPost.editAudiences = function (editBtn) {
         }
 
         if (Object.keys(newFavoriteData).length > 0) {
-            newTargets.bl = [];
+            newTargets.tu.fl = [];
             for (var favoriteID in newFavoriteData) {
                 if (!currentFavorites.hasOwnProperty(favoriteID)) {
                     newFavoriteData.push(newFavoriteData[favoriteID]);
                 }
 
-                newTargets.bl.push(newFavoriteData[favoriteID])
+                newTargets.tu.fl.push(newFavoriteData[favoriteID])
+            }
+        }
+
+        if (checkedMemberCount > 0) {
+            console.log(checkedMemberCount);
+            console.log(groupMemberNum)
+            if (checkedMemberCount == groupMemberNum) {
+                newTargets = {};
+                newAudienceNameList.push($.i18n.getString("MEMBER_ALL"));
+            } else {
+                newTargets.tu.gul = [];
+                for (var memberID in newAudiencesData) {
+                    if (!currentAudiences.hasOwnProperty(memberID)) {
+                        newAudienceNameList.push(newAudiencesData[memberID]);
+                    }
+
+                    newTargets.tu.gul.push({
+                        gu: memberID,
+                        n: newAudiencesData[memberID]
+                    })
+                }
             }
         }
 
         new QmiAjax({
             apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/present/events/" + self.idNumber + "/permission",
             method: "put",
-            body: {
-                tu: newTargets
-            }
+            body: newTargets
         }).complete(function(data){
             if(data.status == 200){
                 var audienceDiv = self.audienceModify.querySelector("div");
                 var newTotalList = newAudienceNameList.join('、') + newBranchNameList.join('、') + newFavoriteList.join('、');
 
-                audienceDiv.textContent = audienceDiv.textContent + '、' + newTotalList;
+                if (checkedMemberCount == groupMemberNum) {
+                    audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
+                    self.audienceModify.querySelector("span").style.display = 'none';
+                } else {
+                    audienceDiv.textContent = audienceDiv.textContent + '、' + newTotalList;
+                    self.audiences = newTargets.tu;
+                }
+                
                 toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTotalList);
-
-                self.audiences = newTargets;
 
                 timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
 
