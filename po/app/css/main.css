@@ -5146,6 +5146,10 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 	
 }
 
+#page-object {
+	z-index: 101;
+}
+
 #page-object .bottom {
 	width: 99%;
 	text-align: center;

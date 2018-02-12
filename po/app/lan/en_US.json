@@ -537,7 +537,8 @@
 
 	"WEBONLY_USER_PROFILE_PHONE2" : "Tel.",
 	
-	"SCHEDULED_POST": "Scheduled post at",
+	"SCHEDULED_POST": "Scheduled post",
+	"SCHEDULED_POST_AT": "Scheduled post at",
 	"SCHEDULED_POST_POST_NOW": "Post now",
 	"SCHEDULED_POST_DONE": "Done",
 	"SCHEDULED_POST_FAILED": "Scheduled post failed",

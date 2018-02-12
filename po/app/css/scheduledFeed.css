@@ -1,7 +1,7 @@
 #scheduled-post-modal {
 	display: none;
     position: fixed; 
-    z-index: 1010; 
+    z-index: 100; 
     left: 0;
     top: 0;
     width: 100%;
@@ -11,21 +11,43 @@
 }
 
 #scheduled-post-modal>div {
-	width: 500px;
-    height: 90%;
+	width: 540px;
+    height: 100%;
     margin: 30px auto;
     position: relative;
     overflow: hidden;
     background: white;
-    padding: 20px 40px;
+    /*padding: 0px 40px;*/
     border-radius: 5px;
     overflow-y: auto;
+}
+
+#scheduled-post-modal>div>div.title {
+	background: rgb(64,146,239);
+	color: white;
+	padding: 5px 10px;
+	position: fixed;
+    width: 520px;
+    top: 0px;
+}
+
+#scheduled-post-modal>div>div.title>span {
+	font-size: 20px;
+	cursor: pointer;
+}
+
+#scheduled-post-modal>div>div.title>div {
+	float: right;
+    margin: 0 auto;
+    width: -webkit-calc( 100% - 12px );
+    line-height: 1.5;
+    text-align: center;
 }
 
 #scheduled-post-modal>div>scheduled-post {
 	padding-top: 20px;
 	display: block;
-	width: 55%;
+	width: 53%;
 	margin: 0 auto;
 	border: 1px solid #ccc;
 	border-radius: 5px;
@@ -81,17 +103,18 @@
 	background-color: transparent;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.datetime {
+#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify {
 	color: #b4b4b4;
 	font-size: 12px;
 	margin-top: 3px;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.datetime>div.value{
+#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.value{
 	padding-left: 26px;
+	display: inline-block;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.datetime>div.value:before {
+#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.value:before {
 	content: "";
 	background: url(https://wp.qmi.emome.net/po/app/images/icon/icon_time_gray.png);
 	background-size: 15px;
@@ -103,12 +126,64 @@
 	margin-left: -24px;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.datetime>datetime-modify{
+#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>span {
+	color: #4092ef;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.modify{
 	display: none;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.datetime>datetime-modify>div>span{
+#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.modify>div>span{
 	cursor: pointer;
+	font-size: 14px;
+    font-weight: bold;
+    margin-right: 5px;
+    float: right;
+}
+
+#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.modify>div>span:nth-child(2){
+	color: #4092ef;
+}
+
+#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.modify>div>span:nth-child(1){
+	color: rgba(230, 11, 11, 0.58);
+}
+
+#scheduled-post-modal>div>scheduled-post>div.header>audience-modify{
+	display: block;
+	color: #868686;
+    font-size: 13px;
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+#scheduled-post-modal>div>scheduled-post>div.header>audience-modify>img{
+	width: 15px;
+	height: 15px;
+}
+
+#scheduled-post-modal>div>scheduled-post>div.header>audience-modify>div{
+	display: inline-block;
+    margin-left: 10px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#scheduled-post-modal>div>scheduled-post>div.header>audience-modify>span{
+	color: #4092ef;
+	font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    vertical-align: top;
+    display: inline-block;
+    margin-left: 10px;
 }
 
 #scheduled-post-modal>div>scheduled-post>div.middle  {
@@ -126,10 +201,10 @@
 #scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button {
 	background: transparent;
     border: 0px;
-    width: 100px;
-    padding: 10px 0px;
+    width: 80px;
+    padding: 8px 0px;
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
     outline: 0;
     border-radius: 10px;
@@ -150,11 +225,12 @@
 	float: right;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button.modify:hover,
-#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button.modify.expand {
+#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button.modify:hover
+/*#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button.modify.expand */
+{
 	color: white;
 	background: rgb(57, 148, 232);
-	background-image: url(http://localhost:8081/devClearChats/po/app/images/icon/icon_arrow_right.png);
+	/*background-image: url(http://localhost:8081/devClearChats/po/app/images/icon/icon_arrow_right.png);*/
     background-repeat: no-repeat;
     background-size: 15px;
     background-position: 92% 50%;

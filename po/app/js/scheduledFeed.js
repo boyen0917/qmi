@@ -1,55 +1,58 @@
-var ScheduledFeed = function(modal) {
+var ScheduledFeedModal = function(modal) {
     this.modal = modal; 
-    this.container = modal.children[0];  
+    this.container = modal.children[0];
+
+    this.modal.querySelector('div.title>span').addEventListener('click', this.close.bind(this));
+
+    Array.from(this.container.querySelectorAll("scheduled-post")).forEach(function(post) {
+        post.remove()
+    });
 };
 
-ScheduledFeed.prototype.importData = function (postList) {
+ScheduledFeedModal.prototype.importData = function (postList) {
     console.log(this.container)
     var self = this;
     var groupMemberAllData = QmiGlobal.groups[gi].guAll || {};
-    console.log(postList);
+
     postList.forEach(function (postData, index) {
 
         var feed = document.createElement('scheduled-post');
         var metaData = postData.meta;
         var authorData = groupMemberAllData[metaData.gu];
-        var mainContent = postData.ml[0].c.replaceOriEmojiCode()
+        var mainContent = postData.ml[0].c.replaceOriEmojiCode();
 
+        feed.container = self.modal;
         feed.idNumber = postData.ei;
         feed.authorName = authorData.nk || "";
         feed.authorImage = authorData.aut ? authorData.aut : "images/common/others/empty_img_personal_l.png";
         feed.type = getEventTypeText(metaData.tp);
         feed.title = metaData.tt || ""; 
         feed.postTime = metaData.rts;
+        feed.audiences = metaData.tu;
         feed.briefContent = mainContent;
-        // feed.setAttribute("authorName", postData.name);
-        // console.log(feed.getAttribute("class"))
+
         self.container.appendChild(feed);
         self.modal.style.display = 'block';
-        // var feed = new Feed(postData);
-        // var element = feed.create(index);
-
-        // feed.editBtn.addEventListener('click', feed.toggleMenu);
-
-        // element.querySelector("button.modify").addEventListener('click', feed.toggleMenu);
-
-        // console.log(element)
     });
 }
 
+ScheduledFeedModal.prototype.close = function () {
+    this.modal.style.display = 'none';
+}
 
-var scheduledPostPrototype = Object.create(HTMLElement.prototype);
+
+var scheduledPost = Object.create(HTMLElement.prototype);
 var datetimeModifyPrototype = Object.create(HTMLElement.prototype);
+var audienceModifyPrototype = Object.create(HTMLElement.prototype);
 var optionsPrototype = Object.create(HTMLElement.prototype);
 var menuPrototype = Object.create(HTMLUListElement.prototype);
 
-scheduledPostPrototype.attachedCallback  = function () {
-    var menu = document.createElement('scheduled-post-menu');
+scheduledPost.attachedCallback  = function () {
+    // var menu = document.createElement('scheduled-post-menu');
     var options = document.createElement('scheduled-post-options');
     var datetimeModify = document.createElement('datetime-modify');
-    var formatTime = new Date(this.postTime).customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
-    var minEditTime = new Date(this.postTime + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
-    var maxEditTime = new Date(this.postTime + 20 * 3600 * 24 * 365 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+    var audienceModify = document.createElement('audience-modify');
+    
 
     this.innerHTML = `
         <div class='header'>
@@ -62,34 +65,36 @@ scheduledPostPrototype.attachedCallback  = function () {
                     <span>${this.type}</span>
                     <mark class='title'>${this.title}</mark>
                 </div>
-                <div class='datetime'>
-                    <div class='value'>${formatTime}</div>   
-                </div>
             </div>
         </div>
         <div class='middle'>${this.briefContent}</div>
         <div class='footer'></div>
     `;
 
-    datetimeModify.setAttribute('min', minEditTime);
-    datetimeModify.setAttribute('max', maxEditTime);
+    datetimeModify.setAttribute('currentValue', this.postTime);
+    // datetimeModify.setAttribute('max', maxEditTime);
+    audienceModify.currentTargets = this.audiences;
 
     datetimeModify.finish = this.updatePostTime.bind(this);
     datetimeModify.cancel = this.cancelDatetimeEdit.bind(this);
+    audienceModify.edit = this.editAudiences.bind(this);
+    options.publishNow = this.publishNow.bind(this);
     options.deleteFeed = this.delete.bind(this);
-    menu.showDatetimeInput = this.showDatetimeInput.bind(this);
-    menu.publishNow = this.publishNow.bind(this);
+    // menu.showDatetimeInput = this.showDatetimeInput.bind(this);
+    // menu.editAudiences = this.editAudiences.bind(this);
 
     this.datetimeModify = datetimeModify;
-    this.menu = menu;
+    this.audienceModify = audienceModify;
+    // this.menu = menu;
     this.options = options;
 
-    this.querySelector("div.datetime").appendChild(datetimeModify);
-    this.querySelector("div.footer").appendChild(menu);
+    this.querySelector("div.header>div.right").appendChild(datetimeModify);
+    this.querySelector("div.header").appendChild(audienceModify);
+    // this.querySelector("div.footer").appendChild(menu);
     this.querySelector("div.footer").appendChild(options);
 }
 
-scheduledPostPrototype.delete = function () {
+scheduledPost.delete = function () {
     var self = this;
     var postId = this.idNumber;
 
@@ -105,24 +110,18 @@ scheduledPostPrototype.delete = function () {
             }).success(function (data) {
                 toastShow(data.rsp_msg);
                 self.remove();
+
+                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
             })
         }]
     )
 }
 
-scheduledPostPrototype.publishNow = function () {
+scheduledPost.publishNow = function () {
     this.updatePostTime(0);
 }
 
-scheduledPostPrototype.showDatetimeInput = function () {
-    this.datetimeModify.style.display = 'block';
-    this.datetimeModify.previousElementSibling.style.display = 'none';
-    this.menu.classList.add('hide');
-    // this.menu.style.display = 'none'
-    this.options.style.display = 'none'
-}
-
-scheduledPostPrototype.updatePostTime = function (datetime) {
+scheduledPost.updatePostTime = function (datetime) {
     var self = this;
 
     new QmiAjax({
@@ -132,30 +131,163 @@ scheduledPostPrototype.updatePostTime = function (datetime) {
             ct: datetime
         }
     }).success(function (data) {
-        toastShow(data.rsp_msg);
+        var newDate = new Date(datetime);
 
-        self.datetimeModify.previousElementSibling.textContent = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
-        self.cancelDatetimeEdit();
+        if (datetime == 0) {
+            toastShow($.i18n.getString('COMPOSE_POST_SUCCESSED'));
+            self.container.style.display = 'none';
+        } else {
+            toastShow(data.rsp_msg);
+            self.datetimeModify.querySelector('div.value').textContent = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+            self.datetimeModify.querySelector('div.value').style.display = 'inline-block';
+            self.datetimeModify.children[1].style.display = 'inline-block';
+            self.datetimeModify.querySelector('div.modify').style.display = 'none';
+
+            self.datetimeModify.reset(datetime);
+        }
+
+        timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+
     })
 }
 
-scheduledPostPrototype.cancelDatetimeEdit = function () {
+scheduledPost.editAudiences = function (editBtn) {
+    console.log(this);
+    var self = this;
+    var currentTargets= self.audiences;
+    var groupMemberAll = QmiGlobal.groups[gi].guAll || {};
+    var currentAudiences = {};
+    var currentBranches = {};
+    var currentFavorites = {};
+
+    /*文章存的object_str跟之前(發布對象按鈕、指派管理員、聊天室選擇成員等)不一樣，
+        需要轉成可以讓composeObjectShowDelegate吃下*/
+    if (currentTargets) {
+        if (currentTargets.gul) {
+            currentTargets.gul.forEach(function (member) {
+                currentAudiences[member.gu] = member.n;
+            });
+        }
+
+        if (currentTargets.bl) {
+            var currentBranchObj = {};
+
+            currentTargets.bl.forEach(function (branch) {
+                currentBranches[branch.bi] = branch.bn;
+            });
+        }
+    }
+
+    $(editBtn).data("object_str", JSON.stringify(currentAudiences));
+    $(editBtn).data("branch_str", JSON.stringify(currentBranches));
+
+    composeObjectShowDelegate($(editBtn), $(editBtn) , {
+        isShowBranch: true,
+        isShowSelf: true,
+        isShowAll: true,
+        isShowFav: true,
+        isDisableOnAlreadyChecked: true,
+    }, function () {
+        var newAudiencesData = $.parseJSON($(editBtn).data("object_str")) || {};
+        var newBranchData = $.parseJSON($(editBtn).data("branch_str")) || {};
+        var newFavoriteData = $.parseJSON($(editBtn).data("favorite_str")) || {};
+
+        var thisGi = self.idNumber.split("_")[0];
+        var thisTi = self.idNumber.split("_")[1];
+        var newTargets = {};
+        var newAudienceNameList = [];
+        var newBranchNameList = [];
+        var newFavoriteList = [];
+
+        if (Object.keys(newAudiencesData).length > 0) {
+            newTargets.gul = [];
+            for (var memberID in newAudiencesData) {
+                if (!currentAudiences.hasOwnProperty(memberID)) {
+                    newAudienceNameList.push(newAudiencesData[memberID]);
+                }
+
+                newTargets.gul.push({
+                    gu: memberID,
+                    n: newAudiencesData[memberID]
+                })
+            }
+        }
+
+        if (Object.keys(newBranchData).length > 0) {
+            newTargets.bl = [];
+            for (var branchID in newBranchData) {
+                if (!currentBranches.hasOwnProperty(branchID)) {
+                    newBranchNameList.push(newBranchData[branchID]);
+                }
+
+                newTargets.bl.push({
+                    bi: branchID,
+                    bn: newBranchData[branchID]
+                })
+            }
+        }
+
+        if (Object.keys(newFavoriteData).length > 0) {
+            newTargets.bl = [];
+            for (var favoriteID in newFavoriteData) {
+                if (!currentFavorites.hasOwnProperty(favoriteID)) {
+                    newFavoriteData.push(newFavoriteData[favoriteID]);
+                }
+
+                newTargets.bl.push(newFavoriteData[favoriteID])
+            }
+        }
+
+        new QmiAjax({
+            apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/present/events/" + self.idNumber + "/permission",
+            method: "put",
+            body: {
+                tu: newTargets
+            }
+        }).complete(function(data){
+            if(data.status == 200){
+                var audienceDiv = self.audienceModify.querySelector("div");
+                var newTotalList = newAudienceNameList.join('、') + newBranchNameList.join('、') + newFavoriteList.join('、');
+
+                audienceDiv.textContent = audienceDiv.textContent + '、' + newTotalList;
+                toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTotalList);
+
+                self.audiences = newTargets;
+
+                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+
+            }
+        });
+    });
+}
+
+scheduledPost.cancelDatetimeEdit = function () {
     this.options.style.display = 'block';
     this.datetimeModify.previousElementSibling.style.display = 'block';
     this.datetimeModify.style.display = 'none';
 }
 
 datetimeModifyPrototype.attachedCallback = function () {
+    var datetimeText = document.createElement('div');
     var datetimeInput = document.createElement('input');
+    var modifyBlock = document.createElement('div');
     var confirmDiv = document.createElement('div');
     var editSpan = document.createElement('span');
+    var doneSpan = document.createElement('span');
     var cancelSpan = document.createElement('span');
+    var currentTime = parseInt(this.getAttribute('currentValue'));
 
+    var minEditTime = new Date(currentTime + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+    var maxEditTime = new Date(currentTime + 20 * 3600 * 24 * 365 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+
+    datetimeText.textContent = new Date(currentTime).customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+
+    this.datetimeInput = datetimeInput;
     datetimeInput.type = "datetime-local";
     datetimeInput.required = true;
-    datetimeInput.setAttribute("min", this.getAttribute('min'));
-    datetimeInput.setAttribute("max", this.getAttribute('max'));
-    datetimeInput.setAttribute("value", this.getAttribute('min'));
+    datetimeInput.setAttribute("min", minEditTime);
+    datetimeInput.setAttribute("max", maxEditTime);
+    datetimeInput.setAttribute("value", minEditTime);
 
     datetimeInput.addEventListener('change', function (e) {
         var target = e.target;
@@ -167,10 +299,19 @@ datetimeModifyPrototype.attachedCallback = function () {
     })
 
     editSpan.textContent = $.i18n.getString('SCHEDULED_POST_EDIT');
+    doneSpan.textContent = $.i18n.getString('SCHEDULED_POST_DONE');
     cancelSpan.textContent = $.i18n.getString('COMMON_CANCEL');
 
-    // editSpan.addEventListener('click', this.finish.bind(null, endTime));
+    datetimeText.className = 'value'
+    modifyBlock.className = 'modify';
+
     editSpan.addEventListener('click', function (e) {
+        editSpan.style.display = 'none';
+        datetimeText.style.display = 'none';
+        modifyBlock.style.display = 'block';
+    });
+
+    doneSpan.addEventListener('click', function (e) {
         var editTimeStr = datetimeInput.value;
         var [fullDate, time] = editTimeStr.split("T");
         var [year, month, date] = fullDate.split("-");
@@ -185,12 +326,54 @@ datetimeModifyPrototype.attachedCallback = function () {
         this.finish(newDate.getTime());
     }.bind(this));
 
-    cancelSpan.addEventListener('click', this.cancel);
+    // cancelSpan.addEventListener('click', this.cancel);
+    cancelSpan.addEventListener('click', function (e) {
+        editSpan.style.display = 'inline-block';
+        datetimeText.style.display = 'inline-block';
+        modifyBlock.style.display = 'none'
+        // datetimeInput.setAttribute("value", datetimeInput.getAttribute('min'));
+    });
 
-    confirmDiv.appendChild(editSpan);
+
     confirmDiv.appendChild(cancelSpan);
-    this.appendChild(datetimeInput);
-    this.appendChild(confirmDiv);
+    confirmDiv.appendChild(doneSpan);
+    modifyBlock.appendChild(datetimeInput);
+    modifyBlock.appendChild(confirmDiv);
+
+    this.appendChild(datetimeText);
+    this.appendChild(editSpan);
+    this.appendChild(modifyBlock)
+}
+
+datetimeModifyPrototype.reset = function (currentTime) {
+    var minEditTime = new Date(currentTime + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+    var maxEditTime = new Date(currentTime + 20 * 3600 * 24 * 365 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+    
+    this.datetimeInput.setAttribute("min", minEditTime);
+    this.datetimeInput.setAttribute("max", maxEditTime);
+    this.datetimeInput.setAttribute("value", minEditTime);
+}
+
+audienceModifyPrototype.attachedCallback = function () {
+    var icon = document.createElement("img");
+    var value = document.createElement("div");
+    var editSpan = document.createElement('span');
+
+    icon.src = "images/icon/icon_object.png";
+
+    value.textContent = this.currentTargets ? targetListToString(this.currentTargets) : $.i18n.getString('MEMBER_ALL')
+    editSpan.textContent = $.i18n.getString("SCHEDULED_POST_EDIT");
+
+    editSpan.addEventListener('click', function (e) {
+        this.edit(e.target);
+    }.bind(this));
+
+    this.appendChild(icon);
+    this.appendChild(value);
+
+    if (this.currentTargets) {
+        this.appendChild(editSpan);
+    }
 }
 
 optionsPrototype.attachedCallback = function () {
@@ -201,21 +384,21 @@ optionsPrototype.attachedCallback = function () {
     modifyBtn.className = 'modify';
 
     deleteBtn.textContent = $.i18n.getString('SCHEDULED_POST_DELETE');
-    modifyBtn.textContent = $.i18n.getString('SCHEDULED_POST_EDIT');
+    modifyBtn.textContent = $.i18n.getString('SCHEDULED_POST_POST_NOW');
 
-    modifyBtn.addEventListener('click', e => {
-        var editPostMenu = this.previousElementSibling;
-        var target = e.target;
+    // modifyBtn.addEventListener('click', e => {
+    //     var editPostMenu = this.previousElementSibling;
+    //     var target = e.target;
 
-        if (target.classList.contains("expand")) {
-            target.classList.remove("expand")
-        } else {
-            target.classList.add("expand")
-        }
+    //     if (target.classList.contains("expand")) {
+    //         target.classList.remove("expand")
+    //     } else {
+    //         target.classList.add("expand")
+    //     }
 
-        editPostMenu.classList.toggle('hide');
-    })
-
+    //     editPostMenu.classList.toggle('hide');
+    // })
+    modifyBtn.addEventListener('click', this.publishNow)
     deleteBtn.addEventListener('click', this.deleteFeed)
 
     this.appendChild(deleteBtn);
@@ -231,7 +414,9 @@ menuPrototype.attachedCallback = function () {
     editScheduleItem.textContent = $.i18n.getString('SCHEDULED_POST_EDIT_SCHEDULED_TIME');
     cancelItem.textContent = $.i18n.getString('COMMON_CANCEL');
 
-    editAudienceItem.addEventListener('click', this.publishNow);
+    editAudienceItem.addEventListener('click', function (e) {
+        this.editAudiences(e.target)
+    }.bind(this));
     editScheduleItem.addEventListener('click', this.showDatetimeInput);
     cancelItem.addEventListener('click', e => {
         var editPostMenu = this;
@@ -251,11 +436,15 @@ menuPrototype.attachedCallback = function () {
 
 
 document.registerElement('scheduled-post', {
-    prototype: scheduledPostPrototype
+    prototype: scheduledPost
 });
 
 document.registerElement('datetime-modify', {
     prototype: datetimeModifyPrototype
+});
+
+document.registerElement('audience-modify', {
+    prototype: audienceModifyPrototype
 });
 
 document.registerElement('scheduled-post-options', {

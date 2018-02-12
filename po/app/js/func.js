@@ -4989,29 +4989,8 @@ timelineBlockMake = function(this_event_temp, timeline_list, is_top, isMakingDet
         //發佈對象
         var tu_str = $.i18n.getString("MEMBER_ALL");    //所有人
         this_event.data("object_str", JSON.stringify(val.meta.tu) );
-        if(val.meta.tu){
-            //用來過濾重複gu
-            var gu_chk_arr = [];
-            var bi_chk_arr = [];
-            var tu_arr = [];
-
-            if(val.meta.tu.gul){
-                $.each(val.meta.tu.gul,function(gu_i,gu_obj){
-                    if($.inArray(gu_obj.gu,gu_chk_arr) < 0 ){
-                        tu_arr.push(gu_obj.n);
-                        gu_chk_arr.push(gu_obj.gu); 
-                    }
-                });
-            }
-            if(val.meta.tu.bl){
-                $.each(val.meta.tu.bl,function(gu_i,bi_obj){
-                    if($.inArray(bi_obj.gu,bi_chk_arr) < 0 ){
-                        tu_arr.push(bi_obj.bn);
-                        bi_chk_arr.push(bi_obj.bi); 
-                    }
-                });
-            }
-            tu_str = tu_arr.join("、");
+        if(val.meta.tu) {
+            tu_str = targetListToString(val.meta.tu)
         }
         this_event.find(".st-sub-box-1-footer").append(tu_str.replaceOriEmojiCode()); 
         
@@ -5189,9 +5168,9 @@ getScheduledTimelineList = function () {
 
             scheduledPostAlert.off('click').on('click', function () {
                 var container = document.getElementById("scheduled-post-modal");
-                var scheduledFeed = new ScheduledFeed(container);
+                var scheduledFeedModal = new ScheduledFeedModal(container);
 
-                scheduledFeed.importData(scheduledPostList);
+                scheduledFeedModal.importData(scheduledPostList);
             })
         } else {
             scheduledPostAlert.hide();
