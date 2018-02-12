@@ -184,7 +184,7 @@ scheduledPost.editAudiences = function (editBtn) {
     composeObjectShowDelegate($(editBtn), $(editBtn) , {
         isShowBranch: true,
         isShowSelf: true,
-        isShowAll: true,
+        isShowAll: false,
         isShowFav: true,
         isDisableOnAlreadyChecked: true,
     }, function () {
@@ -352,6 +352,8 @@ datetimeModifyPrototype.reset = function (currentTime) {
     this.datetimeInput.setAttribute("min", minEditTime);
     this.datetimeInput.setAttribute("max", maxEditTime);
     this.datetimeInput.setAttribute("value", minEditTime);
+
+    this.datetimeInput.value = minEditTime;
 }
 
 audienceModifyPrototype.attachedCallback = function () {
