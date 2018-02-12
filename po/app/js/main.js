@@ -1173,17 +1173,12 @@ $(function(){
 					    var this_ei = this_event.data("event-id");
 					    var this_gi = this_ei.split("_")[0];
 					    var this_ti = this_ei.split("_")[1];
-					    var newAudiences = {gul: []};
 					    var newAudienceNameList = [];
 
 						currentTargets.gul = [];
 
 						for (var memberID in newTargetData) {
 							if (!currentAudiences.hasOwnProperty(memberID)) {
-								newAudiences.gul.push({
-									gu: memberID,
-									n: newTargetData[memberID]
-								})
 
 								newAudienceNameList.push(newTargetData[memberID]);
 							}
@@ -1200,7 +1195,7 @@ $(function(){
 							body: currentTargets
 						}).complete(function(data){
 					        if(data.status == 200){
-								this_event.data("object_str", JSON.stringify(newAudiences));
+								this_event.data("object_str", JSON.stringify(currentTargets));
 								toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newAudienceNameList.join(' 、 '))
 					        	this_event.find(".st-sub-box-1-footer").append("、" + newAudienceNameList.join('、')); 
 					        }
