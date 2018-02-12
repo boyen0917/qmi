@@ -363,9 +363,9 @@ function deleteRoom ( deleteRow ){
 }
 
 function openChatWindow ( giTmp, ci ){
-
 	var chatListDiv = $(".subpage-chatList");
 	var topListDom = $(".top-chatList");
+
 	clearChatListCnt( giTmp, ci );
 	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
 		windowList[ci].QmiGlobal.getAppWin().focus();
@@ -387,7 +387,7 @@ function openChatWindow ( giTmp, ci ){
 			windowList[ci] = window.open("", ci , "width=400, height=600");
 		else {
 			var serverPath = window.location.href.split("/").slice(0, -1).join("/") +"/";
-			windowList[ci] = window.open(serverPath +"chat.html?v2.1.0.4", ci , "width=400, height=600");
+			windowList[ci] = window.open(serverPath +"chat.html?v2.1.0.4", ci , "width=400,height=600");
 		}
 		
 		windowList[ci].chatAuthData = {

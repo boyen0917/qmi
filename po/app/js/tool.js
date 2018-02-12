@@ -2353,6 +2353,7 @@ function getUnreadUserList(AllUserList, readUserList, groupID) {
 }
 
 function riseNotification (icon, title, description, onClickCallback) {
+	console.log("rise on web code")
 	try{
 		var notification = new window.Notification(title, {
 			body: description,
@@ -2788,31 +2789,98 @@ QmiGlobal.showNotification = function(argObj) {
 	if(isChatroomCloseNotification()) return;
 
 	try {
-		// 新版mac
-		var nc = new QmiGlobal.nodeModules.notifier.NotificationCenter()
+		if (process.platform == 'win32') {
+			var utils = require('node-notifier/lib/utils');
+			var WinNotifier;
+			// win 7, win xp
+			if (utils.isLessThanWin8()) {
+				WinNotifier = require('node-notifier').WindowsBalloon;
+			} else { // win 8, win 10
+				WinNotifier = require('node-notifier').WindowsToaster;
+			}
 
-		nc.notify({
-		  title: argObj.title,
-		  message: argObj.text,
-		  wait: true
-		});
+			var notifier = new WinNotifier({
+				withFallback: false, 
+			});
 
-		if (argObj.gi && argObj.ci) 
-			nc.on('click', openChatWindow.bind(null, argObj.gi, argObj.ci));
+			notifier.notify({
+	    		title: argObj.title,
+	    		message: argObj.text,
+	    		icon: nw.__dirname + "/resource/images/default.ico",
+	    		wait: true,
+	    		appID: " "
+	  		})
+
+			notifier.on('click', argObj.callback);
+
+		} else {
+			// 新版mac
+			var nc = new QmiGlobal.nodeModules.notifier.NotificationCenter()
+
+			nc.notify({
+			  title: argObj.title,
+			  message: argObj.text,
+			  wait: true
+			});
+
+			if (argObj.gi && argObj.ci) 
+				nc.on('click', openChatWindow.bind(null, argObj.gi, argObj.ci));
+			
+			return;
+		}
 		
-		return;
-	} catch(e) {console.log("Not mac notification");}
+	} catch(e) {
+		console.log(e)
+		try{
+			var notification = new window.Notification(argObj.title, {
+				body: argObj.text,
+				icon: argObj.icon === undefined? nw.__dirname + "/resource/images/default.png" : argObj.icon,
+
+			});
+			if (typeof argObj.callback === "function")
+				notification.addEventListener("click", argObj.callback);
+
+		}catch(e){console.error("Notification is not supported.", e);}
+	}
+
+	// try {
+	// 	var notifier = require('node-notifier');
+
+	// 	notifier.notify({
+ //    		title: 'My awesome title',
+ //    		message: 'Hello from node, Mr. User!',
+ //    		icon: nw.__dirname + "/resource/images/default.png",
+ //    		sound: true, // Only Notification Center or Windows Toasters
+ //    		wait: true, // Wait with callback, until user action is taken against notification
+ //    		appID: " "
+ //  		}, function(err, response) {
+ //  			if (err) console.log(err)
+ //  		});
+		// var message = argObj.text || "";
+		// var messageLen = 200;
+
+		// if (message.length > messageLen) {
+  //   		message = message.substring(0, messageLen) + "......";
+  // 		}
+
+		// nwNotify.init(nwGui);
+  //   	nwNotify.setTemplatePath(location.href.substring(0, location.href.lastIndexOf("/")) + '/layout/desktopToast.html');
+	 //    nwNotify.setConfig({
+	 //    	appIcon: nw.__dirname + "/resource/images/default.png",
+	 //    	width: 372,
+	 //    	height: 120,
+	 //        displayTime: 3000000
+	 //    });
+
+	 //    nwNotify.notify({
+  //           title: argObj.title,
+  //           text: message,
+  //           onClickFunc: argObj.callback,
+  //       });
+
+	// }catch(e){console.error("Notification is not supported.", e);}
 
 
-	try{
-		var notification = new window.Notification(argObj.title, {
-			body: argObj.text,
-			icon: argObj.icon === undefined? "resource/images/default.png": argObj.icon
-		});
-		if (typeof argObj.callback === "function")
-			notification.addEventListener("click", argObj.callback);
-
-	}catch(e){console.error("Notification is not supported.", e);}
 
 	function isChatroomCloseNotification() {
 		if(!argObj.ci) return false;
