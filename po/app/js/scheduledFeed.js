@@ -10,7 +10,6 @@ var ScheduledFeedModal = function(modal) {
 };
 
 ScheduledFeedModal.prototype.importData = function (postList) {
-    console.log(this.container)
     var self = this;
     var groupMemberAllData = QmiGlobal.groups[gi].guAll || {};
 
@@ -39,7 +38,6 @@ ScheduledFeedModal.prototype.importData = function (postList) {
 ScheduledFeedModal.prototype.close = function () {
     this.modal.style.display = 'none';
 }
-
 
 var scheduledPost = Object.create(HTMLElement.prototype);
 var datetimeModifyPrototype = Object.create(HTMLElement.prototype);
@@ -77,7 +75,13 @@ scheduledPost.attachedCallback  = function () {
 
     datetimeModify.finish = this.updatePostTime.bind(this);
     datetimeModify.cancel = this.cancelDatetimeEdit.bind(this);
+    datetimeModify.checkIsExpired = this.checkIsExpired.bind(this);
+    datetimeModify.expiredHandler = this.expiredHandler.bind(this);
+
     audienceModify.edit = this.editAudiences.bind(this);
+    audienceModify.checkIsExpired = this.checkIsExpired.bind(this);
+    audienceModify.expiredHandler = this.expiredHandler.bind(this);
+
     options.publishNow = this.publishNow.bind(this);
     options.deleteFeed = this.delete.bind(this);
     // menu.showDatetimeInput = this.showDatetimeInput.bind(this);
@@ -108,10 +112,15 @@ scheduledPost.delete = function () {
                 apiName: "groups/" + gi + "/timelines/" + ti_feed+ "/present/events/" + postId,
                 method: 'delete'
             }).success(function (data) {
+                if (self.previousElementSibling.tagName != self.tagName && self.nextElementSibling == null) {
+                    self.container.style.display = 'none';
+                }
+
                 toastShow(data.rsp_msg);
-                self.remove();
 
                 timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+
+                self.remove();
             })
         }]
     )
@@ -136,23 +145,29 @@ scheduledPost.updatePostTime = function (datetime) {
         if (datetime == 0) {
             toastShow($.i18n.getString('COMPOSE_POST_SUCCESSED'));
             self.container.style.display = 'none';
+
+            timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
         } else {
             toastShow(data.rsp_msg);
-            self.datetimeModify.querySelector('div.value').textContent = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
-            self.datetimeModify.querySelector('div.value').style.display = 'inline-block';
-            self.datetimeModify.children[1].style.display = 'inline-block';
-            self.datetimeModify.querySelector('div.modify').style.display = 'none';
 
-            self.datetimeModify.reset(datetime);
+            getScheduledTimelineList().then(function (posts) {
+                if (posts.length == 0) {
+                    self.container.style.display = 'none';
+                } else {
+                    document.querySelector('#page-group-main div.scheduled-post-alert').click();
+                }
+            });
+            // self.datetimeModify.querySelector('div.value').textContent = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+            // self.datetimeModify.querySelector('div.value').style.display = 'inline-block';
+            // self.datetimeModify.children[1].style.display = 'inline-block';
+            // self.datetimeModify.querySelector('div.modify').style.display = 'none';
+
+            // self.datetimeModify.reset(datetime);
         }
-
-        timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
-
     })
 }
 
 scheduledPost.editAudiences = function (editBtn) {
-    console.log(this);
     var self = this;
     var currentTargets= self.audiences;
     var groupMemberAll = QmiGlobal.groups[gi].guAll || {};
@@ -229,8 +244,6 @@ scheduledPost.editAudiences = function (editBtn) {
         }
 
         if (checkedMemberCount > 0) {
-            console.log(checkedMemberCount);
-            console.log(groupMemberNum)
             if (checkedMemberCount == groupMemberNum) {
                 newTargets = {};
                 newAudienceNameList.push($.i18n.getString("MEMBER_ALL"));
@@ -258,18 +271,19 @@ scheduledPost.editAudiences = function (editBtn) {
                 var audienceDiv = self.audienceModify.querySelector("div");
                 var newTotalList = newAudienceNameList.join('、') + newBranchNameList.join('、') + newFavoriteList.join('、');
 
-                if (checkedMemberCount == groupMemberNum) {
-                    audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
-                    self.audienceModify.querySelector("span").style.display = 'none';
-                } else {
-                    audienceDiv.textContent = audienceDiv.textContent + '、' + newTotalList;
-                    self.audiences = newTargets.tu;
-                }
+                // if (checkedMemberCount == groupMemberNum) {
+                //     audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
+                //     self.audienceModify.querySelector("span").style.display = 'none';
+                // } else {
+                //     audienceDiv.textContent = audienceDiv.textContent + '、' + newTotalList;
+                //     // self.audiences = newTargets.tu;
+                // }
                 
                 toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTotalList);
 
-                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
-
+                getScheduledTimelineList().then(function () {
+                    document.querySelector('#page-group-main div.scheduled-post-alert').click();
+                });
             }
         });
     });
@@ -279,6 +293,24 @@ scheduledPost.cancelDatetimeEdit = function () {
     this.options.style.display = 'block';
     this.datetimeModify.previousElementSibling.style.display = 'block';
     this.datetimeModify.style.display = 'none';
+}
+
+scheduledPost.checkIsExpired = function () {
+    return this.postTime - (1200000) < (new Date).getTime();
+}
+
+scheduledPost.expiredHandler = function () {
+    var self = this;
+    popupShowAdjust(
+        $.i18n.getString("SCHEDULED_POST_HAS_BEEN_PUBLISHED"),
+        "",
+        $.i18n.getString("ACCOUNT_BINDING_DONE"),
+        false,
+        [function () {
+            self.container.style.display = 'none';
+            timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+        }]
+    )
 }
 
 datetimeModifyPrototype.attachedCallback = function () {
@@ -291,24 +323,18 @@ datetimeModifyPrototype.attachedCallback = function () {
     var cancelSpan = document.createElement('span');
     var currentTime = parseInt(this.getAttribute('currentValue'));
 
-    var minEditTime = new Date(currentTime + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
-    var maxEditTime = new Date(currentTime + 20 * 3600 * 24 * 365 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
-
     datetimeText.textContent = new Date(currentTime).customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
 
     this.datetimeInput = datetimeInput;
     datetimeInput.type = "datetime-local";
     datetimeInput.required = true;
-    datetimeInput.setAttribute("min", minEditTime);
-    datetimeInput.setAttribute("max", maxEditTime);
-    datetimeInput.setAttribute("value", minEditTime);
 
     datetimeInput.addEventListener('change', function (e) {
         var target = e.target;
         var validityState = target.validity;
 
         if (!validityState.valid) {
-            datetimeInput.value = target.defaultValue;
+            datetimeInput.value = target.min;
         }
     })
 
@@ -320,10 +346,26 @@ datetimeModifyPrototype.attachedCallback = function () {
     modifyBlock.className = 'modify';
 
     editSpan.addEventListener('click', function (e) {
-        editSpan.style.display = 'none';
-        datetimeText.style.display = 'none';
-        modifyBlock.style.display = 'block';
-    });
+        var defaultTime = new Date(currentTime).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#")
+        var minEditTime = new Date().customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+        var maxEditTime = new Date(currentTime + 20 * 3600 * 24 * 365 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+
+        if (this.checkIsExpired()) {
+            this.expiredHandler();
+        } else {
+            datetimeInput.setAttribute("min", minEditTime);
+            datetimeInput.setAttribute("max", maxEditTime);
+
+            // 第一次點選顯示預約時間
+            if (datetimeInput.value == "") {
+                datetimeInput.setAttribute("value", defaultTime);
+            }
+
+            editSpan.style.display = 'none';
+            datetimeText.style.display = 'none';
+            modifyBlock.style.display = 'block';
+        }
+    }.bind(this));
 
     doneSpan.addEventListener('click', function (e) {
         var editTimeStr = datetimeInput.value;
@@ -337,6 +379,7 @@ datetimeModifyPrototype.attachedCallback = function () {
         newDate.setDate(date);
         newDate.setHours(hour);
         newDate.setMinutes(minute);
+
         this.finish(newDate.getTime());
     }.bind(this));
 
@@ -347,7 +390,6 @@ datetimeModifyPrototype.attachedCallback = function () {
         modifyBlock.style.display = 'none'
         // datetimeInput.setAttribute("value", datetimeInput.getAttribute('min'));
     });
-
 
     confirmDiv.appendChild(cancelSpan);
     confirmDiv.appendChild(doneSpan);
@@ -360,12 +402,14 @@ datetimeModifyPrototype.attachedCallback = function () {
 }
 
 datetimeModifyPrototype.reset = function (currentTime) {
-    var minEditTime = new Date(currentTime + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+    var minEditTime = new Date(currentTime).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
     var maxEditTime = new Date(currentTime + 20 * 3600 * 24 * 365 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
     
     this.datetimeInput.setAttribute("min", minEditTime);
     this.datetimeInput.setAttribute("max", maxEditTime);
     this.datetimeInput.setAttribute("value", minEditTime);
+
+    this.setAttribute('currentValue', currentTime);
 }
 
 audienceModifyPrototype.attachedCallback = function () {
@@ -379,7 +423,12 @@ audienceModifyPrototype.attachedCallback = function () {
     editSpan.textContent = $.i18n.getString("SCHEDULED_POST_EDIT");
 
     editSpan.addEventListener('click', function (e) {
-        this.edit(e.target);
+
+        if (this.checkIsExpired()) {
+            this.expiredHandler();
+        } else {
+            this.edit(e.target);
+        }
     }.bind(this));
 
     this.appendChild(icon);
@@ -400,18 +449,6 @@ optionsPrototype.attachedCallback = function () {
     deleteBtn.textContent = $.i18n.getString('SCHEDULED_POST_DELETE');
     modifyBtn.textContent = $.i18n.getString('SCHEDULED_POST_POST_NOW');
 
-    // modifyBtn.addEventListener('click', e => {
-    //     var editPostMenu = this.previousElementSibling;
-    //     var target = e.target;
-
-    //     if (target.classList.contains("expand")) {
-    //         target.classList.remove("expand")
-    //     } else {
-    //         target.classList.add("expand")
-    //     }
-
-    //     editPostMenu.classList.toggle('hide');
-    // })
     modifyBtn.addEventListener('click', this.publishNow)
     deleteBtn.addEventListener('click', this.deleteFeed)
 

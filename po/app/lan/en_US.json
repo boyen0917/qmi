@@ -553,6 +553,7 @@
 	"SCHEDULED_POST_DELETE": "Delete",
 	"SCHEDULED_POST_DELETE_CONFIRM": "Delete scheduled post?",
 	"SCHEDULED_POST_EDIT_AUDIENCE": "Edit audience",
-	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "Edit scheduled time"
+	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "Edit scheduled time",
+	"SCHEDULED_POST_HAS_BEEN_PUBLISHED": "This post has been published"
 
 }

@@ -2644,7 +2644,7 @@ composeContentMake = function (compose_title){
             $(this).hide();
             var now = new Date();
 
-            var minTime = new Date(now.getTime() + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+            var minTime = now.customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
             var maxTime = new Date(now.setFullYear(now.getFullYear() + 20)).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
 
             this_compose.find("div.schedule-datetime-option").show();
@@ -2653,8 +2653,13 @@ composeContentMake = function (compose_title){
             datetimeInput.attr("min", minTime);
             datetimeInput.attr("max", maxTime);
 
+            // console.log(datetimeInput[0].value)
             if (datetimeInput[0].value == "") {
                 datetimeInput.attr("value", minTime);
+            } else {
+                if (new Date(datetimeInput[0].value).getTime() < new Date(minTime).getTime()) {
+                    datetimeInput.attr("value", minTime);
+                }
             }
 
             datetimeInput.off('change').on('change', function (e) {
@@ -5184,6 +5189,8 @@ getScheduledTimelineList = function () {
             scheduledPostAlert.hide();
         }
 
+        deferred.resolve(scheduledPostList);
+    }).error(function(rspData) {
         deferred.resolve();
     })
 
