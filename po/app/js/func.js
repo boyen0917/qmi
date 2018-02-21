@@ -430,6 +430,9 @@ timelineSwitch = function (act, reset, main, noAppReload){
             groupMain.find(".subpage-timeline").show().scrollTop(0);
             groupMain.find(".st-personal-area").hide();
             
+            var a1Dom = $("#page-group-main div.header-menu > div[data-polling-cnt=A1]");
+            updatePollingCnts(a1Dom, "A1");
+
             //polling 數字重寫
             pollingCountsWrite();
 
@@ -8254,7 +8257,7 @@ countsFormat = function(num, badgeDom){
     return newNum;
 }
 
-updatePollingCnts = function(countDom,cntType){
+updatePollingCnts = function(countDom, cntType){
 
     var thisGi = countDom.data("gi") || gi,
         isPublicApi = false,
