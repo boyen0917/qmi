@@ -3642,15 +3642,21 @@ composeWorkEvent = function(this_compose){
 }
 
 composeVoteQuesMake = function(this_compose){
-    
+    var ques_total = this_compose.data("ques-total");
+
+    // #5105 投票題目最多10題
+    if(ques_total >= 9) {
+        toastShow($.i18n.getString("ERR_MSG_VOTE_LIMIT"));
+        return;
+    }
     //讀取投票題目
     this_compose.find('.cp-vote-area').append($('<div>').load('layout/compose.html .cp-vote-ques-area',function(){
         var this_ques = $(this).find('.cp-vote-ques-area');
         this_ques._i18n();
 
+        
         //設定
         //投票題目數加一
-        var ques_total = this_compose.data("ques-total");
         ques_total += 1;
         this_compose.data("ques-total",ques_total);
 

@@ -575,7 +575,7 @@ img.auo {
 	width: 100%;
 	text-align: center;
 	color: white;
-	z-index: 1850;
+	z-index: 10001;
 }
 
 .toast div {
@@ -593,7 +593,7 @@ img.auo {
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.85);
-  z-index: 10001;
+  z-index: 10005;
 }
 
 .popup-frame {
@@ -673,7 +673,7 @@ img.auo {
 	position: fixed;
 	background: #000;
 	opacity: 0.5;
-	z-index: 10000;
+	z-index: 10004;
 }
 
 .screen-lock {

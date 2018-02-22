@@ -511,6 +511,7 @@
 
 	"WEBVIEW": "webView",
 
+	"ERR_MSG_VOTE_LIMIT": "You have reached the limit of vote question.",
 
 	"WEBONLY_AUTH_LOADING" : "Authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
