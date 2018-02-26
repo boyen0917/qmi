@@ -3324,36 +3324,6 @@ function sendMsgText(dom) {
 				}
 			});
 		});
-		//get unread
-		// if (isShowUnreadAndReadTime) {
-		// 	list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-
-
-		// 	getChatReadUnreadApi(gi, ci, rt, 2).complete(function (data) {
-		// 		if (data.status != 200) return false;
-		// 		try {
-		// 			list[1].ml = $.parseJSON(data.responseText).gul;
-
-		// 			dataReadyCnt++;
-		// 			if (isPageReady && dataReadyCnt > 1) {
-		// 				$(".screen-lock").hide();
-		// 				showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
-		// 			}
-		// 		} catch (e) {
-		// 			errorReport(e);
-		// 			chat.removeClass("loadRead");
-		// 			$(".screen-lock").hide();
-		// 		}
-		// 	});
-		// } else {
-		// 	list.push({title: $.i18n.getString("FEED_UNREAD"), clickable: false});
-		// 	dataReadyCnt++;
-		// 	if (isPageReady && dataReadyCnt > 1) {
-		// 		$(".screen-lock").hide();
-		// 		showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
-		// 	}
-		// }
-		
 	}
 
 	/**

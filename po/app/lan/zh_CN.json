@@ -507,6 +507,9 @@
 	"GROUPLIST_NO_GROUPS" : "尚未加入任何团体",
 	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "待管理者将您加入团体后 \n 即可开始使用 Qmi",
 
+	"UNREAD_REMIND": "提醒",	
+	"UNREAD_REMIND_ALL": "提醒全部",	
+	
 	"UNREAD_HINT" : "未点阅",
 
 	"WEBVIEW": "自订网页",

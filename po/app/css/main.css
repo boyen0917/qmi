@@ -5259,9 +5259,8 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 }
 
 .obj-cell {
-	/* display: -webkit-box; */
 	height: 70px;
-	/* position: relative; */
+	position: relative; 
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
@@ -5483,7 +5482,7 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 }
 
 .tabObj-content{
-	/*background: #d2d2d2;*/
+	position: relative;
 	width: 100%;
 	overflow-x: scroll;
 	overflow-y: hidden;
@@ -6781,4 +6780,37 @@ img.vdo-default:before {}
     background: red;
     top: 5px;
     right: 0px;
+}
+
+
+#page-tab-object > div.tabObj-content div.mem-remind {position: absolute;}
+#page-tab-object > div.tabObj-content div.obj-cell.mem.timeline-read:hover {background: #F3FBFF;}
+#page-tab-object > div.tabObj-content > section.mem-remind-all,
+#page-tab-object > div.tabObj-content div.mem-remind {
+    background: #FF2F2F;
+    color: white;
+    font-weight: bold;
+    border-radius: 3px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 1px 2px 5px #ddd;
+    display: none;
+}
+
+#page-tab-object > div.tabObj-content div.mem-remind {
+	position: absolute;
+    width: 50px;
+    margin: 20px;
+    right: 0;
+    top: 0;
+}
+
+#page-tab-object > div.tabObj-content > section.mem-remind-all {
+	position: fixed;
+    bottom: 0;
+    margin-left: 40%;
+    width: 100px;
 }

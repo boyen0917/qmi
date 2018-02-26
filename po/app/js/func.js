@@ -3109,46 +3109,6 @@ selectTargetAll = function(){
     updateSelectedObj();
 }
 
-getMemObjectRow = function( gu_obj, bl ){
-    var this_obj = $(
-        '<div class="obj-cell mem" data-gu="'+gu_obj.gu+'">' +
-           '<div class="obj-cell-chk"><div class="img"></div></div>' +
-           '<div class="obj-cell-user-pic namecard"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
-           '<div class="obj-cell-user-data">' + 
-                '<div class="obj-user-name">' + gu_obj.nk.replaceOriEmojiCode() + '</div>' +
-                '<div class="obj-user-title"></div>' +
-        '</div>'
-    );
-
-    //get extra content (bl name or em)
-    var branchID = gu_obj.bl;
-    var extraContent = "";  //gu_obj.em;
-    if( branchID && branchID.length>0 ){
-        var branchPath = branchID.split(".");
-        if( branchPath && branchPath.length>0 ){
-            branchID = branchPath[branchPath.length-1];
-            if( bl.hasOwnProperty(branchID) ){
-                extraContent = bl[branchID].bn;
-            }
-        }
-    }
-    if(extraContent && extraContent.length>0){
-        this_obj.find(".obj-cell-user-data").addClass("extra");
-        this_obj.find(".obj-user-title").html( extraContent );
-    }
-
-    var object_img = this_obj.find(".obj-cell-user-pic img");
-    if(gu_obj.aut) {
-        object_img.attr("src",gu_obj.aut);
-        avatarPos(object_img);
-    }
-
-    this_obj.data("gu",gu_obj.gu);
-    this_obj.find(".obj-cell-user-pic.namecard").data("gu",gu_obj.gu);
-    this_obj.data("gu-name",gu_obj.nk);
-
-    return this_obj;
-}
 
 timelineObjectTabShowDelegate = function( this_event, type, onDone ){
     var list = [];
@@ -3206,20 +3166,18 @@ timelineObjectTabShowDelegate = function( this_event, type, onDone ){
                         targetUsers = groupAllMembers;
                     }
 
+
+                    var unreadObj = {title:$.i18n.getString("FEED_UNREAD"), clickable:false, isUnread: true, ml: null};
+                    list.push(unreadObj);
+
                     if (isShowUnreadAndTime) {
-                        list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-                        list[1].ml = getUnreadUserList(targetUsers, parseData, this_gi);
-                    } else {
-                        list.push({title:$.i18n.getString("FEED_UNREAD"), clickable:false});
+                        unreadObj.clickable = true;
+                        unreadObj.ml = getUnreadUserList(targetUsers, parseData, this_gi);
                     }
-                    // if(isReady){
+
                     showObjectTabShow(this_gi, title, list, onDone);
-                    // } else {
-                    //     isReady = true;
-                    // }
-                } catch(e) {
-                    errorReport(e);
-                }
+
+                } catch(e) {errorReport(e);}
             });
 
             break;
@@ -3294,8 +3252,7 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
         tab.data("id", index);
         tab.data("obj", object);
         tab.css("width",width);
-        var tmp = "<div>" + ((object.title&&object.title.length>0)?object.title:" ") +"</div>";
-        tab.html( tmp );
+        tab.html("<div>" + ((object.title&&object.title.length>0)?object.title:" ") +"</div>");
         tab.data("clickable", (null==object.clickable)?true:(object.clickable) );
         tabArea.append(tab);
         cnt++;
@@ -3348,13 +3305,12 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
                 var mem = guAll[gu];
                 if(!mem) return;
                 var this_obj = $(
-                    '<div class="obj-cell mem" data-gu="'+gu+'">' +
+                    '<div class="obj-cell mem timeline-read" data-gu="'+gu+'">' +
                         '<div class="obj-cell-user-pic"><img src="images/common/others/empty_img_personal_xl.png" style="width:60px"/></div>' +
                         '<div class="obj-cell-time"></div>' +
-                        '<div class="obj-cell-user-data">' + 
-                            '<div class="obj-user-name">' + mem.nk.replaceOriEmojiCode() + '</div>' +
-                            '<div class="obj-user-title"></div>' +
-                    '</div>'
+                        '<div class="obj-cell-user-data"><div class="obj-user-name">' + mem.nk.replaceOriEmojiCode() + '</div>' +
+                            '<div class="obj-user-title"></div></div>'+
+                        '<div class="mem-remind">'+ $.i18n.getString("UNREAD_REMIND") +'</div></div>'
                 );
                 if( isShowNamecard ) this_obj.find(".obj-cell-user-pic").addClass("namecard").data("gi",giTmp);
 
@@ -3388,6 +3344,20 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
                 this_obj.data("gu",mem.gu);
                 this_obj.data("gu-name",mem.nk);
                 cellArea.find("._"+index).append(this_obj);
+
+
+                // #5035
+                // if(!tab.data("obj").isUnread) return
+
+                // cellArea.find("div.obj-cell.mem > div.mem-remind").show().click(function() {
+                //     postEventNotice($(this).data("gu"));
+                // });
+
+                
+                // if(isNotAdminOrOwner()) return;
+
+                // cellArea.siblings("section.mem-remind-all").show();
+
             });
         }
 
@@ -3413,6 +3383,12 @@ showObjectTabShow = function( giTmp, title, list, onDone, isShowNamecard ){
     tabArea.find(".tab:nth-child(1)").trigger("click");
 
     $.mobile.changePage("#page-tab-object", {transition: "slide"});
+
+
+    function isNotAdminOrOwner(currEi, currGu) {
+        // if(QmiGlobal.groups[gi].ad === 2) return false;
+        // if()
+    }
 }
 
 setDateTimePicker = function(this_compose){
