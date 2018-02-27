@@ -507,6 +507,9 @@
 	"GROUPLIST_NO_GROUPS" : "You don't have any group yet",
 	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "Go get an invitation from group admin and start using Qmi!",
 
+	"UNREAD_REMIND": "Remind",
+	"UNREAD_REMIND_ALL": "Remind All",
+	
 	"UNREAD_HINT" : "Unread",
 
 	"WEBVIEW": "webView",
