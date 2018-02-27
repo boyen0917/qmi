@@ -199,7 +199,7 @@ scheduledPost.editAudiences = function (editBtn) {
     composeObjectShowDelegate($(editBtn), $(editBtn) , {
         isShowBranch: true,
         isShowSelf: true,
-        isShowAll: true,
+        isShowAll: false,
         isShowFav: true,
         isDisableOnAlreadyChecked: true,
     }, function () {
@@ -271,19 +271,16 @@ scheduledPost.editAudiences = function (editBtn) {
                 var audienceDiv = self.audienceModify.querySelector("div");
                 var newTotalList = newAudienceNameList.join('、') + newBranchNameList.join('、') + newFavoriteList.join('、');
 
-                // if (checkedMemberCount == groupMemberNum) {
-                //     audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
-                //     self.audienceModify.querySelector("span").style.display = 'none';
-                // } else {
-                //     audienceDiv.textContent = audienceDiv.textContent + '、' + newTotalList;
-                //     // self.audiences = newTargets.tu;
-                // }
+                if (checkedMemberCount == groupMemberNum) {
+                    audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
+                    self.audienceModify.querySelector("span").style.display = 'none';
+                } else {
+                    audienceDiv.textContent = audienceDiv.textContent + '、' + newTotalList;
+                    self.audiences = newTargets.tu;
+                }
                 
                 toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTotalList);
-
-                getScheduledTimelineList().then(function () {
-                    document.querySelector('#page-group-main div.scheduled-post-alert').click();
-                });
+                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
             }
         });
     });
@@ -408,8 +405,7 @@ datetimeModifyPrototype.reset = function (currentTime) {
     this.datetimeInput.setAttribute("min", minEditTime);
     this.datetimeInput.setAttribute("max", maxEditTime);
     this.datetimeInput.setAttribute("value", minEditTime);
-
-    this.setAttribute('currentValue', currentTime);
+    this.datetimeInput.value = minEditTime;
 }
 
 audienceModifyPrototype.attachedCallback = function () {
