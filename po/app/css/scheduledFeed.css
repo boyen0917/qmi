@@ -190,11 +190,15 @@
 }
 
 #scheduled-post-modal>div>scheduled-post>div.middle  {
+	display: -webkit-box;
 	padding: 10px 5px;
 	color: #333;
-	max-height: 75px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+	max-height: 72px;
+	word-break: break-word;
+	-webkit-line-clamp: 4;
+	-webkit-box-orient: vertical;
+	line-height: 1.3;
+	overflow: hidden;
 }
 
 #scheduled-post-modal>div>scheduled-post>div.footer  {
