@@ -5501,7 +5501,7 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 .tabObj-tab-area .tab:not(:nth-child(1)){
 	border-left: white 1px solid;
 }
-.tabObj-tab-area .tab{
+.tabObj-tab-area .tab {
     position: relative;
 	display: inline-block;
 	min-width: 200px;
@@ -5510,7 +5510,9 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 	text-align: center;
 	height: 55px;
 	border-bottom: white 1px solid;
+	cursor: pointer;
 }
+
 .tabObj-tab-area .tab div{
 	margin-top: 13px;
 	text-align: center;
@@ -6785,7 +6787,7 @@ img.vdo-default:before {}
 
 #page-tab-object > div.tabObj-content div.mem-remind {position: absolute;}
 #page-tab-object > div.tabObj-content div.obj-cell.mem.timeline-read:hover {background: #F3FBFF;}
-#page-tab-object > div.tabObj-content > section.mem-remind-all,
+#page-tab-object > div.tabObj-content section.mem-remind-all,
 #page-tab-object > div.tabObj-content div.mem-remind {
     background: #FF2F2F;
     color: white;
@@ -6797,7 +6799,11 @@ img.vdo-default:before {}
     font-size: 15px;
     cursor: pointer;
     box-shadow: 1px 2px 5px #ddd;
-    display: none;
+}
+
+#page-tab-object > div.tabObj-content section.mem-remind-all.reminded,
+#page-tab-object > div.tabObj-content div.obj-cell.reminded div.mem-remind  {
+	background: #ddd;
 }
 
 #page-tab-object > div.tabObj-content div.mem-remind {
@@ -6808,9 +6814,9 @@ img.vdo-default:before {}
     top: 0;
 }
 
-#page-tab-object > div.tabObj-content > section.mem-remind-all {
+#page-tab-object > div.tabObj-content section.mem-remind-all {
 	position: fixed;
-    bottom: 0;
+    bottom: 25px;
     margin-left: 40%;
     width: 100px;
 }
