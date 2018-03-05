@@ -2609,10 +2609,6 @@ div#page-group-main div.gm-header-left:before {
 	content: url(../images/icon/icon_timelinebox_set_delete_disable.png);
 }
 
-.st-sub-box-more-box[data-st-more="object"].deactive img{
-	opacity: 0.2;
-}
-
 .st-more-close {
 	background: url(../images/timeline/timeline_feedbox_icon_close.png);
 	background-size: cover;

@@ -34,6 +34,8 @@ ObjectDelegateView = {
 		this.visibleMemNum = 0;
 		this.minSelectNum = option.minSelectNum;
 		this.checkedMems = option.checkedMems;
+		// this.newAddMems = {};
+		this.oriCheckedMems = Object.assign({}, option.checkedMems);
 		this.checkedBranches = option.checkedBranches || {};
 		this.checkedFavorites = option.checkedFavorites || {};
 		this.isDisableOnAlreadyChecked = option.isDisableOnAlreadyChecked
@@ -197,8 +199,18 @@ ObjectDelegateView = {
         $.each(loadMemberList, function(i, gu) {
         	var memberObj = this.groupAllMembers[gu];
         	if (checkedObjNum > 0) {
-	         	if (this.checkedMems[memberObj.gu] != undefined) memberObj.chk = true;
-	         	else memberObj.chk = false;
+	         	if (this.checkedMems[memberObj.gu] != undefined) {
+	         		memberObj.chk = true;
+
+	         		// 不是新增對象的情境，或者是新增對象但是預設沒有被選
+	         		memberObj.enable = !this.isDisableOnAlreadyChecked || 
+	         			(this.isDisableOnAlreadyChecked && !this.oriCheckedMems.hasOwnProperty(memberObj.gu));
+	         	} else {
+	         		memberObj.chk = false;
+	         		memberObj.enable = true;
+	         	}
+        	} else {
+        		memberObj.enable = true;
         	}
 
             this.addRowElement("Member", {thisMember : memberObj, isSubRow : false});
@@ -528,7 +540,7 @@ ObjectCell.prototype = {
 			if (this.enable) {
 				this.html.find(".img").removeClass("chk");
 				this.isChecked = false;
-			}
+			} 
 		}
 	},
 
@@ -555,6 +567,10 @@ ObjectCell.prototype = {
 					objCell.isChecked = !objCell.isChecked;
 					ObjectDelegateView.updateStatus();
 				}
+			});
+		} else {
+			bindElement.off("click").on("click", function (e) {
+				toastShow($.i18n.getString("ADD_AUDIENCE_CANT_UNCHECK"));
 			});
 		}
 	},
@@ -628,7 +644,7 @@ ObjectCell.ParentBranch = function (rowData) {
 		+ "</div></div></div><div class='obj-cell-arrow'></div></div><div class='folder'></div></div>");
 	self.isSelectAll = false;
 	self.childBranch = [];
-	self.enable = true;
+	self.enable = thisBranch.enable;
 
 	self.html.find(".obj-cell-arrow").off("click").click(function(e) {
 		e.stopPropagation();
@@ -717,7 +733,7 @@ ObjectCell.ChildBranch = function (rowData) {
         '</div>');
 	this.isSelectAll = false;
 	this.isChecked = thisBranch.chk;
-	this.enable = true;
+	this.enable = thisBranch.enable;
 }
 
 ObjectCell.Member = function (rowData) {
@@ -739,7 +755,7 @@ ObjectCell.Member = function (rowData) {
 	this.isSubRow = rowData.isSubRow;
 	this.isSelectAll = false;
 	this.isChecked = (thisMember.chk || rowData.isSelectedAll);
-	this.enable = (!this.isChecked && isDisableOnAlreadyChecked) || !isDisableOnAlreadyChecked;
+	this.enable = thisMember.enable;
 
 	console.log(this.enable)
 }
