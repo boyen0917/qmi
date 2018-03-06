@@ -1228,6 +1228,8 @@ $(document).on("click",".page-back",function(){
 
 //for node-webkit app to open systems browser
 $(document).on("click","a",function(e){
+
+	e.stopPropagation()
 	if(!$(this).is("[download]")){
 		var isNode = (typeof(require) != "undefined");
 		cns.debug( isNode );

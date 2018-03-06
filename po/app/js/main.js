@@ -1382,6 +1382,7 @@ $(function(){
 			}
 		});
 		
+		console.log('detailTimelineContentMake')
 		//單一動態詳細內容
         getEventDetail(this_ei).complete(function(data){
         	if(data.status != 200) return false;
@@ -1409,6 +1410,10 @@ $(function(){
 	$(document).on("mouseup",timeline_detail_exception.join(","),function(e){
 		e.stopPropagation();
 	});
+
+	$("#page-group-main").on("click", ".st-sub-box-2-attach-area a", function (e) {
+		e.stopPropagation();
+	})
 
 	$("#page-group-main").on("click", ".st-sub-box-2-attach-area", function (e) {
 		var thisEvent = $(this).parents(".st-sub-box");
@@ -1441,6 +1446,9 @@ $(function(){
 			thisEvent.find("div.st-reply-like-area").show();
 
 		});
+
+		console.log('detailTimelineContentMake')
+
 		
 		//單一動態詳細內容
         getEventDetail(eventId).complete(function(data){
