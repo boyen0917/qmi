@@ -1427,6 +1427,8 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     //已讀亮燈 & 隱藏未讀提示
     this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")
     this_event.find("div.timeline-box-hint").hide();
+
+    this_event.find(".st-reply-all-content-area").html("");
     
     // 2017/12/19 load once
     $('<div>').load('layout/timeline_event.html?v2.2.0.2 .st-reply-content-area', function(){
@@ -5518,7 +5520,11 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 break;
             case 1://網址 寫在附檔區域中
                 if(val.c){
-                    this_event.find(".st-attach-url").click(function(){
+                    this_event.find(".st-attach-url").click(function(e){
+
+                        // // if (e.target.tagName =)
+                        console.log(e.target);
+                        console.log(e.target.tagName)
                         try{
                             this_event.find(".st-sub-box-2-attach-area a")[0].click();
                         } catch(e) {
@@ -5946,6 +5952,7 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
 
     //點選開啟圖庫
     this_gallery.find(".st-attach-img-area").click(function(e){
+
         // var targetImg = e.target.style.backgroundImage;
         var targetImg = e.target;
         if (targetImg.tagName === "H1") {
