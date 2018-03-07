@@ -154,7 +154,7 @@ scheduledPost.updatePostTime = function (datetime) {
                 if (posts.length == 0) {
                     self.container.style.display = 'none';
                 } else {
-                    document.querySelector('#page-group-main div.scheduled-post-alert').click();
+                    document.querySelector('#page-group-main div.scheduled-post-alert>div').click();
                 }
             });
             // self.datetimeModify.querySelector('div.value').textContent = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
