@@ -2754,8 +2754,6 @@ composeObjectShow = function(this_compose){
 }
 
 composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDone ){
-    console.log(thisCompose);
-    console.log(thisCompose.data("object_str"))
     var objectDelegateView = ObjectDelegateView;
     var objData, branchData, favoriteData;
     var isShowBranch = false;
@@ -2871,7 +2869,16 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
 
         visibleMemList.forEach(function(gu) {
             var guObj = Object.assign({}, guAll[gu]);
-            if (objData.hasOwnProperty(gu)) guObj.chk = true;
+            guObj.chk = false;
+            guObj.enable = true;
+
+            if (objData.hasOwnProperty(gu)) {
+                guObj.chk = true;
+                if (isDisableOnAlreadyChecked) {
+                    guObj.enable = false;
+                }
+            }
+            
             if (guObj.fav) {
                 objectDelegateView.addFavoriteSubRow("Member", {thisMember : guObj, isSubRow : true});
             }
@@ -2900,8 +2907,16 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
 
             branchObj.chk = false;
             branchObj.bi = key;
+            branchObj.enable = true;
+
             if (branchData && Object.keys(branchData).length) {
-                if (branchData[key] != undefined ) branchObj.chk = true;
+                if (branchData[key] != undefined ) {
+                    branchObj.chk = true;
+                    if (isDisableOnAlreadyChecked) {
+                        branchObj.enable = false;
+                    }
+                }
+                
             }
 
             //第一層顯示開關
@@ -5236,7 +5251,7 @@ getScheduledTimelineList = function () {
                 .find("span")
                 .text($.i18n.getString("SCHEDULED_POST_NUMBER_SCHEDULED_POST", scheduledPostList.length));
 
-            scheduledPostAlert.off('click').on('click', function () {
+            scheduledPostAlert.children().off('click').on('click', function () {
                 var container = document.getElementById("scheduled-post-modal");
                 var scheduledFeedModal = new ScheduledFeedModal(container);
 
@@ -5339,9 +5354,9 @@ eventStatusWrite = function(this_event,this_es_obj){
     }
 
     if( this_es_obj.hasOwnProperty("tu") ){
-        this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='object']").removeClass("deactive");
+        this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='object']").show();
     } else {
-        this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='object']").addClass("deactive");
+        this_event.find(".st-sub-box-more .st-sub-box-more-box[data-st-more='object']").hide();
     }
 }
 
