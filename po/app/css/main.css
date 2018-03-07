@@ -2445,6 +2445,8 @@ div#page-group-main div.gm-header-left:before {
 #page-group-main div.st-feedbox-area div.scheduled-post-alert {
 	text-align: center;
 	display: none;
+    position: relative;
+    top: -10px;
 }
 
 #page-group-main div.st-feedbox-area div.scheduled-post-alert>div {

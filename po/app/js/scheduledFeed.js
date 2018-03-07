@@ -58,7 +58,7 @@ scheduledPost.attachedCallback  = function () {
             <div class='right'>
                 <div class='name'>${this.authorName}</div>
                 <div class='type'>
-                    <img src='http://localhost:8081/devClearChats/po/app/images/compose/compose_box_bticon_post.png'>
+                    <img src='images/compose/compose_box_bticon_post.png'>
                     <label>發布</label>
                     <span>${this.type}</span>
                     <mark class='title'>${this.title}</mark>
