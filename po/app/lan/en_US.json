@@ -77,9 +77,15 @@
 	"LOGIN_ACCOUNT_OR_PASSWORD_ERROR" :	"Error account or password. Please try again.",
 	"LOGIN_FORGETPASSWD_NOT_MATCH" : "Passwords don't match",
 	"LOGIN_AUTO_LOGIN_FAIL" : "Authentication failed, please login again.",
-	
+	"LOGIN_COUNTRY_CODE_TAIWAN" : "Taiwan +886",
+	"LOGIN_COUNTRY_CODE_CHINA" : "China +86",
+	"LOGIN_COUNTRY_CODE_HONGKONG" : "Hong Kong +852",
+	"LOGIN_COUNTRY_CODE_MACAU" : "Macau +853",
+	"LOGIN_COUNTRY_CODE_US" : "United States +1",
+	"LOGIN_FORMAT_CHECK" : "Allowed symbol: . - _ @    Maximum length: 128",
+
 	"REGISTER_ACCOUNT_REGITST_TITLE" :	"Sign Up",
-	"REGISTER_ACCOUNT_POLICY" :	"I agree to Co+'s %@Term of Use%@ and %@Privacy Policy%@.",
+	"REGISTER_ACCOUNT_POLICY" :	"I agree to Qmi's %@Term of Use%@ and %@Privacy Policy%@.",
 	"REGISTER_ACCOUNT_WARN_TITEL" :	"Phone Number Confirmation",
 	"REGISTER_ACCOUNT_WARN" :	"The verification code will be sent to the following phone number。",
 	"REGISTER_AUTH_ENTER_CODE" :	"Enter your Verification Code",
@@ -140,6 +146,7 @@
 	"FEED_COPY_CONTENT" : "Copy content",
 	"FEED_COPY_CONTENT_SUCC" : "Copied to clipboard",
 	"FEED_CALENDAR" : "Add to Calendar",
+	"FEED_ADD_AUDIENCE" : "新增發佈對象",
 	"FEED_UNTOP_AVAILABLE" : "No Top Feed Now",
 	"FEED_CLOSE_TIME" : "End Time",
 	"FEED_SAY_SOMETHING" : "Say something…",
@@ -316,7 +323,7 @@
 	"CHAT_CHATROOM_SOMEONE_ASSIGN_ADMIN" : "%@ assigned %@ as admin.",
 	"CHAT_CHATROOM_SOMEONE_DEMOTE_SOMEONE" : "%@ demoted %@ from admin to member.",
 	"CHAT_SELF_ALREADY_ADMIN" : "You are already an administrator!",
-	"CHAT_EXIT_CHATROOM_FAIL" : "Please assign another someone admin, and cancel self right",
+	"CHAT_EXIT_CHATROOM_FAIL" : "Please assign another someone as admin, and then exit",
 	"CHAT_EDIT_CHATROOM" : "Edit chatroom!",
 
 	"NOTICES_TITLE"						: "New Notices", 
@@ -354,6 +361,7 @@
 	"GROUP_NO_INVITATION" : "There is no group invitaion.",
 	"GROUP_JOIN_SUCC" : "Join group successed!",
 	"GROUP_GROUP_INVITATION" : "Group %@ has sent you an invitation",
+	"GROUP_REJECT_SUCC" : "Reject group successed!",
 	"GROUP_COUNTS" : "%ld subgroup(s)",
 	"GROUP_MEMBERS" : "%ld member(s)",
 	"GROUP_AND" : " and ",
@@ -391,7 +399,6 @@
 	"USER_PROFILE_DELETE_MEMBER_CONFIRM" : "Delete this member?",
 	"USER_PROFILE_DELETE_MEMBER_DESC" : "Deleted member will not have permission to view this group until the member is recovered via administration web site.",
 
-
 	"OFFICIAL_ABOUT" : "About",
 	"OFFICIAL_CHAT" : "Chat",
 	"OFFICIAL_SETTING" : "Setting",
@@ -423,7 +430,6 @@
 	"REFRESH_ALERT_SUCCESS" : "cloud data transfer completed",
 	"REFRESH_ALERT_CONFIRM" : "press enter to default group",
 
-
 	"PERSONAL_INFORMATION" : "Profile",
 	"SYSTEM" : "System",
 	"ABOUT_QMI" : "About Qmi",
@@ -448,50 +454,42 @@
 	"PRIVACY_POLICY" : "Privacy Policy",
 	"USER_AGREEMENT" : "Term of Use",
 	"STICKER_CENTER" : "Sticker Shop",
-	
-	"BIND_LDAP" : "綁定LDAP",
-	"BIND_ACCOUNT" : "已綁定帳號",
-	"GUIHU_EXPIRED" : "認證過期",
-	"ADD_LDAP" : "新增LDAP帳號",
-	"ADD_LDAP_DES" : "請輸入你的LDAP帳號及密碼",
-	"REMOVE_LDAP" : "解除綁定",
-	"REMOVE_LDAP_DES" : "解除綁定後，將解除帳號權限",
-
 
 	"SETTING_OLD_PASSWORD" : "Current Password",
 	"SETTING_NEW_PASSWORD" : "New Password(at least 8 digits)",
 	"SETTING_CONFIRM_PASSWORD" : "Confirm Password",
-
-
-	"ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT" :	"Binding LDAP Account",
-	"ACCOUNT_BINDING_PRESS_TO_BIND_LDAP_ACCOUNT" :	"Press to bind LDAP account",
-	"ACCOUNT_BINDING_BINDING_NEW_ACCOUNT" :	"Binding new account",
-	"ACCOUNT_BINDING_ENTER_ACCOUNT_PASSWORD" :	"Enter LDAP Account and Password",
-	"ACCOUNT_BINDING_EMAIL" :	"Email",
-	"ACCOUNT_BINDING_PASSWORD" :	"Password",
-	"ACCOUNT_BINDING_DONE" :	"Done",
-	"ACCOUNT_BINDING_CANCEL" :	"Cancel",
-	"ACCOUNT_BINDING_AUTHORIZATION_EXPIRED" :	"Authorization Expired",
-	"ACCOUNT_BINDING_AUTHORIZATION_COMPLETED" :	"Authorization Completed",
-	"ACCOUNT_BINDING_WRONG_PASSWORD" :	"Wrong password",
-	"ACCOUNT_BINDING_LOGIN_LIMIT_REACHED" :	"Login request limit reached, please try again in 60 seconds.",
-	"ACCOUNT_BINDING_UNBIND_LDAP" :	"Unbind LDAP Account",
-	"ACCOUNT_BINDING_UNBIND_LDAP_CONFIRM" :	"Press Unbind to disconnect %@.",
-	"ACCOUNT_BINDING_ACCOUNT_DISCONNECTED" :	"Account Disconnected",
-	"ACCOUNT_BINDING_POOR_CONNECTION" :	"Poor connection, please try again later.",
-	"ACCOUNT_BINDING_BINDED_ACCOUNT" :	"Binded Account",
-	"ACCOUNT_BINDING_DISCONNECT_ACCOUNT" :	"Disconnect Account",
-	"ACCOUNT_BINDING_DISCONNCET_LDAP_CONFIRM" :	"You won't be able to access this account after disconnect it.",
-	"ACCOUNT_BINDING_REQUEST_AUTHORIZATION" :	"Request authorization?",
-	"ACCOUNT_BINDING_BIND_QMI_ACCOUNT" :	"Bind Your Qmi Account",
-	"ACCOUNT_BINDING_NO_QMI_ACCOUNT_BINDED" :	"No Qmi Account Binded Login Qmi account to bind your LDAP account.",
-	"ACCOUNT_BINDING_DISCONNECT_QMI_ACCOUNT_CONFIRM" :	"You won't be able to access this account after disconnect it.",
-	"ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION" :	"Account Recertification",
-	"ACCOUNT_BINDING_ENTER_LDAP_PASSWORD" :	"Please enter your LDAP password",
+	
+	"ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT":	"Binding LDAP Account",
+	"ACCOUNT_BINDING_PRESS_TO_BIND_LDAP_ACCOUNT":	"Make sure your LDAP Server has connected to Qmi before binding your LDAP account.",
+	"ACCOUNT_BINDING_ADD_ACCOUNT":	"Add LDAP Account",
+	"ACCOUNT_BINDING_BINDING_NEW_ACCOUNT":	"Binding LDAP account",
+	"ACCOUNT_BINDING_ENTER_ACCOUNT_PASSWORD":	"Enter LDAP Account and Password",
+	"ACCOUNT_BINDING_EMAIL":	"Email",
+	"ACCOUNT_BINDING_PASSWORD":	"Password",
+	"ACCOUNT_BINDING_DONE":	"Done",
+	"ACCOUNT_BINDING_CANCEL":	"Cancel",
+	"ACCOUNT_BINDING_AUTHORIZATION_EXPIRED":	"Authorization Expired",
+	"ACCOUNT_BINDING_AUTHORIZATION_COMPLETED":	"Authorization Completed",
+	"ACCOUNT_BINDING_WRONG_PASSWORD":	"Wrong password",
+	"ACCOUNT_BINDING_LOGIN_LIMIT_REACHED":	"Login request limit reached, please try again in 60 seconds.",
+	"ACCOUNT_BINDING_UNBIND_LDAP":	"Unbind LDAP Account",
+	"ACCOUNT_BINDING_UNBIND_LDAP_CONFIRM":	"Press \"Unbind\" to disconnect %@.",
+	"ACCOUNT_BINDING_ACCOUNT_DISCONNECTED":	"Account Disconnected",
+	"ACCOUNT_BINDING_POOR_CONNECTION":	"Poor connection, please try again later.",
+	"ACCOUNT_BINDING_BINDED_ACCOUNT":	"Binded Account",
+	"ACCOUNT_BINDING_DISCONNECT_ACCOUNT":	"Disconnect Account",
+	"ACCOUNT_BINDING_DISCONNCET_LDAP_CONFIRM":	"You won't be able to access this account after disconnect it.",
+	"ACCOUNT_BINDING_REQUEST_AUTHORIZATION":	"Request authorization?",
+	"ACCOUNT_BINDING_BIND_QMI_ACCOUNT":	"Bind Your Qmi Account",
+	"ACCOUNT_BINDING_NO_QMI_ACCOUNT_BINDED":	"No Qmi Account Binded Login Qmi account to bind your LDAP account.",
+	"ACCOUNT_BINDING_DISCONNECT_QMI_ACCOUNT_CONFIRM":	"You won't be able to access this account after disconnect it.",
+	"ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION":	"Account Recertification",
+	"ACCOUNT_BINDING_ENTER_LDAP_PASSWORD":	"Please enter your LDAP password",
 
 	"STICKER_NOT_DOWNLOAD" : "Not downloaded",
 	"STICKER_DOWNLOAD_FINISH" : "Done",
 	"STICKER_CENTER" : "Sticker Shop",
+	
 	"ENTERPRISE_ACCOUNT_PASSWORD_SETTING" :	"Password Setting",
 	"ENTERPRISE_ACCOUNT_FIRSTTIME_RESET" :	"Set a new password for your account.",
 	"ENTERPRISE_ACCOUNT_SET_ORIGIN_PASSWORD" :	"Current Password",
@@ -509,7 +507,16 @@
 	"GROUPLIST_NO_GROUPS" : "You don't have any group yet",
 	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "Go get an invitation from group admin and start using Qmi!",
 
-	"WEBONLY_AUTH_LOADING" : "authenticating...",
+	"UNREAD_REMIND": "Remind",
+	"UNREAD_REMIND_ALL": "Remind All",
+	
+	"UNREAD_HINT" : "Unread",
+
+	"WEBVIEW": "webView",
+
+	"ERR_MSG_VOTE_LIMIT": "You have reached the limit of vote question.",
+
+	"WEBONLY_AUTH_LOADING" : "Authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
 	"WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT" : "Click to create binding account",
 	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA1" : "No Qmi Account Binded",
@@ -527,8 +534,30 @@
 
 	"WEBONLY_APPVERSION_00" : "Update automatically..",
 	"WEBONLY_APPVERSION_01" : "There is a new version available, Update now?",
+	"WEBONLY_APPVERSION_02" : "There is a new version for Desktop App, Download now?",
 	"WEBONLY_IS_LATEST_VERSION" : "You already have the latest version of Qmi",
 
 	"WEBONLY_FORBIDDEN_FEATURE" : "Administrator has closed this feature",
-	"WEBONLY_WATERMARK_FORCED" : "Forced to use watermark"
+	"WEBONLY_WATERMARK_FORCED" : "Forced to use watermark",
+
+	"WEBONLY_ERROR_OCCURED_RELOGIN" : "An error occurred, please login again",
+
+	"WEBONLY_USER_PROFILE_PHONE2" : "Tel.",
+	
+	"SCHEDULED_POST": "Scheduled post",
+	"SCHEDULED_POST_AT": "Scheduled post at",
+	"SCHEDULED_POST_POST_NOW": "Post now",
+	"SCHEDULED_POST_DONE": "Done",
+	"SCHEDULED_POST_FAILED": "Scheduled post failed",
+	"SCHEDULED_POST_POST_TIME_PASSED": "Scheduled time has passed, post now?",
+	"SCHEDULED_POST_EDIT": "Edit",
+	"SCHEDULED_POST_SUCCEED": "Scheduled post succeed",
+	"SCHEDULED_POST_CHECK": "You can check scheduled post at Feed",
+	"SCHEDULED_POST_NUMBER_SCHEDULED_POST": "%N scheduled post",
+	"SCHEDULED_POST_DELETE": "Delete",
+	"SCHEDULED_POST_DELETE_CONFIRM": "Delete scheduled post?",
+	"SCHEDULED_POST_EDIT_AUDIENCE": "Edit audience",
+	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "Edit scheduled time",
+	"SCHEDULED_POST_HAS_BEEN_PUBLISHED": "This post has been published"
+
 }

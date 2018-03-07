@@ -1,5 +1,4 @@
-// version 2.0.0.5
-
+// version 2.2.0.2
 var ui;
 var at;
 var gi;
@@ -37,149 +36,22 @@ var base_url = function() {
 
 var base_url = "https://qmi17.mitake.com.tw/";
 
-//timeline裏面點擊不做展開收合的區域
-var timeline_detail_exception = [
-	".st-sub-box-2-content-detail a",
-	".st-sub-box-2-more-desc-detail a",
-	".st-box2-more-task-area-detail",
-	".audio-play",
-	".st-sub-box-more-btn",
-	".st-more-close",
-	".st-user-pic",
-	".st-sub-box-more",
-	".st-sub-box-2-attach-area"
-];
-
-//timeline內容 判斷不開啓附檔區域的type ;1是網址 但要另外判斷
-var not_attach_type_arr = [0,1,12,13,14,15];
-	
-var load_show = false;		//顯示loading 圖示 的參數
-var s_load_show = false;	//特別的
-var compose_timer = false;	//發佈計時器
-var max_w = 500; 			//縮圖寬高
-var max_h = 500;			//縮圖寬高
-var quality = 0.5;			//縮圖寬高
-
-//設置聊天訊息預覽
-var set_notification = $.lStorage("_setnoti") || true;
-
-//timeline置頂millisecond
-var top_timer_ms = $.lStorage("_topTimeMs") || 5000;
-
-var polling_interval = 5000;			//polling間距
-
-
-//tab對照表
-var initTabMap = {
-	0:{
-		act: "feed-public",
-		textId: "LEFT_FEED_GROUP"
-	},
-	1:{
-		act: "feed-post",
-		textId: "LEFT_FEED_MEMBER"
-	},
-	2:{
-		act: "feeds",
-		textId: "LEFT_FEED",
-		class: ["polling-cnt","polling-local"],
-		pollingType: "A1"
-	},
-	3:{
-		act: "chat",
-		textId: "LEFT_CHAT",
-		class: ["polling-cnt","polling-local"],
-		pollingType: "A3"
-	},
-	6:{
-		act: "memberslist",
-		textId: "LEFT_MEMBER",
-		class: ["polling-cnt","polling-local"],
-		pollingType: "A2"
-	},
-	7:{
-		act: "groupSetting",
-		textId: "GROUPSETTING_TITLE"
-	},
-	9:{
-		act: "addressBook",
-		textId: "ADDRESSBOOK_TITLE"
-	}
-	,
-	10:{
-		act: "fileSharing",
-		textId: "FILESHARING_TITLE"
-	}
-};
-
-//pen對照表
-var initPenMap = {
-	0:{
-		fcBox: "announcement",
-		textId: "FEED_BULLETIN",
-		imgNm: "bulletin"
-	},
-	1:{
-		fcBox: "feedback",
-		textId: "FEED_REPORT",
-		imgNm: "report"
-	},
-	2:{
-		fcBox: "work",
-		textId: "FEED_TASK",
-		imgNm: "task"
-	},
-	3:{
-		fcBox: "vote",
-		textId: "FEED_VOTE",
-		imgNm: "vote"
-	},
-	4:{
-		fcBox: "check",
-		textId: "FEED_LOCATION",
-		imgNm: "location"
-	},
-	5:{
-		fcBox: "post",
-		textId: "FEED_POST",
-		imgNm: "post"
-	}
-};
-
-String.prototype._escape = function(){
-    return this.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-String.prototype.qmiTag = function (tagMember) {
-	var findText = "///;" + tagMember.u + ";///";
-	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
-	return this.replace("///;" + tagMember.u + ";///", "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>");
-}
-
-Number.prototype.toFileSize = function () {
-	var unitIndex = Math.floor( Math.log(this) / Math.log(1024) );
-    return (this / Math.pow(1024, unitIndex)).toFixed(2) + ' ' 
-    	+ ['B', 'kB', 'MB', 'GB', 'TB'][unitIndex];
-}
-
-
-//上一頁 預設
-$(document).data("page-history",[["",""]]);
-
-//登入時間
-if( window.parent && window.parent.login_time ){
-	login_time = window.parent.login_time;
-} else {
-	login_time = new Date().getTime();
-}
-
+// 先檢查是否為桌機版
+var nwGui = function() {
+	try {
+		return require('nw.gui')
+	} catch(e) {
+		console.error("非桌機版")
+		return null;
+	};
+}();
 
 window.QmiGlobal = {
 
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整
-	appVer: "2.0.0.5",
+	appVer: "2.2.0.2",
 
 	title: "Qmi",
 
@@ -187,14 +59,7 @@ window.QmiGlobal = {
 	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
 
 	// 桌機版設定
-	nwGui: function() {
-		try {
-			return require('nw.gui')
-		} catch(e) {
-			console.error("非桌機版")
-			return null;
-		};
-	}(),
+	nwGui: nwGui,
 
 	// app的資料的預設值
 	defaultAppQmiData: {
@@ -204,6 +69,31 @@ window.QmiGlobal = {
 			}
 		}
 	},
+
+	nodeModules: function() {
+		if(!nwGui) return {};
+
+		return {
+			childProcess: req("child_process"),
+			fs: req("fs"),
+			path: req("path"),
+
+			https: req("https"),
+
+			ffmpeg: req("fluent-ffmpeg"),
+    		
+			notifier: req("node-notifier"),
+		};
+
+		function req(moduleName) {
+			try {
+				return require(moduleName)
+			} catch(e) {
+				console.error("require exception:", e);
+				return {};
+			}
+		}
+	}(),
 
 	getAppWin: function() {
 		if(QmiGlobal.nwGui === null) return {};
@@ -219,12 +109,6 @@ window.QmiGlobal = {
 
 	// 在下方 document ready之後 initReady
 	initReady: function() {
-
-		// 檢查聊天室不得進首頁
-		// if(window.opener && !window.isChatRoom) {
-		// 	window.close();
-		// 	return;
-		// }
 
 		var initDefArr = [
     		updateLanguage()
@@ -287,12 +171,24 @@ window.QmiGlobal = {
 	method: {}, // 公用函數
 	rspCode401: false,
 
-	vdoCompressBasePct: 80, // 壓縮預設比例
+	vdoCompressBasePct: 80, // 壓縮預設進度條比例
+
+	sepSign: "🗿", //搜尋字典的自訂分隔號
+
+	// 圖片壓縮
+	imgCompress: {
+		oR: 0.9,
+		tR: 0.2,
+		oH: 1280,
+		oW: 1280,
+		tH: 1280,
+		tW: 1280
+	},
 
 	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
-	isFirstPolling: true, // 第一次polling要打所有私雲
+	isGetAllCloudPolling: true, // 第一次polling要打所有私雲
 	reDoCompanyPollingMap: {}, // 需要重打的私雲polling資訊 {ci:xx, pt:xx}, ...
 
 	auth: {},
@@ -307,9 +203,10 @@ window.QmiGlobal = {
 		"_lastLoginAccount",
 		"_loginAutoChk",
 		"_loginData",
-		"_loginRemeber",
+		"_loginRemember",
 		"_lastBaseUrl",
-		"_sticker"
+		"_sticker",
+		"groupChat",
 	],
 
 	viewMap: {}, // cloud reload
@@ -412,8 +309,8 @@ window.QmiGlobal = {
 	            var wl = {};
 	            $.each(windowList,function(key,value){try {
 	                if(value.closed) return;
-	                wl[value.gi] = wl[value.gi] || {};
-	                wl[value.gi][key] = QmiGlobal.groups[value.gi].chatAll[value.ci];
+	                if(!wl[value.gi]) return;
+	                (wl[value.gi] || {})[key] = QmiGlobal.groups[value.gi].chatAll[value.ci];
 	            } catch(e) {}});
 
 	            // 設定當前gi
@@ -472,7 +369,141 @@ window.QmiPollingChk = {
 			}
 		}, 100000);
 	}, 300000)
+};
+
+
+//timeline裏面點擊不做展開收合的區域
+var timeline_detail_exception = [
+	".st-sub-box-2-content-detail a",
+	".st-sub-box-2-more-desc-detail a",
+	".st-box2-more-task-area-detail",
+	".audio-play",
+	".st-sub-box-more-btn",
+	".st-more-close",
+	".st-user-pic",
+	".st-sub-box-more",
+	".st-sub-box-2-attach-area"
+];
+
+//timeline內容 判斷不開啓附檔區域的type ;1是網址 但要另外判斷
+var not_attach_type_arr = [0,1,12,13,14,15];
+	
+var load_show = false;		//顯示loading 圖示 的參數
+var s_load_show = false;	//特別的
+var compose_timer = false;	//發佈計時器
+var max_w = 500; 			//縮圖寬高
+var max_h = 500;			//縮圖寬高
+var quality = 0.5;			//縮圖寬高
+
+//設置聊天訊息預覽
+var set_notification = $.lStorage("_setnoti") || true;
+
+//timeline置頂millisecond
+var top_timer_ms = $.lStorage("_topTimeMs") || 5000;
+
+var polling_interval = 5000;			//polling間距
+
+
+//tab對照表
+var initTabMap = {
+	0: {
+		act: "feed-public",
+		textId: "LEFT_FEED_GROUP"
+	}, 1: {
+		act: "feed-post",
+		textId: "LEFT_FEED_MEMBER"
+	}, 2: {
+		act: "feeds",
+		textId: "LEFT_FEED",
+		class: ["polling-cnt","polling-local"],
+		pollingType: "A1"
+	}, 3: {
+		act: "chat",
+		textId: "LEFT_CHAT",
+		class: ["polling-cnt","polling-local"],
+		pollingType: "A3"
+	}, 6: {
+		act: "memberslist",
+		textId: "LEFT_MEMBER",
+		class: ["polling-cnt","polling-local"],
+		pollingType: "A2"
+	}, 7: {
+		act: "groupSetting",
+		textId: "GROUPSETTING_TITLE"
+	}, 9: {
+		act: "addressBook",
+		textId: "ADDRESSBOOK_TITLE"
+	}, 10 :{
+		act: "fileSharing",
+		textId: "FILESHARING_TITLE"
+	}, 11 :{
+		act: "webview",
+		textId: "WEBVIEW",
+		pollingType: "A6"
+	}
+};
+
+//pen對照表
+var initPenMap = {
+	0:{
+		fcBox: "announcement",
+		textId: "FEED_BULLETIN",
+		imgNm: "bulletin"
+	},
+	1:{
+		fcBox: "feedback",
+		textId: "FEED_REPORT",
+		imgNm: "report"
+	},
+	2:{
+		fcBox: "work",
+		textId: "FEED_TASK",
+		imgNm: "task"
+	},
+	3:{
+		fcBox: "vote",
+		textId: "FEED_VOTE",
+		imgNm: "vote"
+	},
+	4:{
+		fcBox: "check",
+		textId: "FEED_LOCATION",
+		imgNm: "location"
+	},
+	5:{
+		fcBox: "post",
+		textId: "FEED_POST",
+		imgNm: "post"
+	}
+};
+
+String.prototype._escape = function(){
+    return this.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+
+String.prototype.qmiTag = function (tagMember) {
+	var findText = "///;" + tagMember.u + ";///";
+	var markTag = "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>";
+	return this.replace("///;" + tagMember.u + ";///", "<b name='" + tagMember.u + "'>" + tagMember.n + "</b>");
+}
+
+Number.prototype.toFileSize = function () {
+	var unitIndex = Math.floor( Math.log(this) / Math.log(1024) );
+    return (this / Math.pow(1024, unitIndex)).toFixed(2) + ' ' 
+    	+ ['B', 'kB', 'MB', 'GB', 'TB'][unitIndex];
+}
+
+
+//上一頁 預設
+$(document).data("page-history",[["",""]]);
+
+//登入時間
+if( window.parent && window.parent.login_time )
+	login_time = window.parent.login_time;
+else
+	login_time = new Date().getTime();
+
+
 
 window.QmiAjax = function(args){
 	// body and method
@@ -1000,14 +1031,14 @@ QmiAjax.prototype = {
 				}
 			})(),
 
-		    headers: self.setHeaders({},companyData),
+		    headers: self.setHeaders({}, companyData),
 		    type: "put",
 		    error: function(errData){
-
-		    	// et過期 自動更新 但要強制驗證:
-		    	// do something
-		    	// 重新取得卻 發生錯誤 回首頁
-		    	reLogin();
+		    	// 2017/11/03
+		    	// et過期 自動更新 發生錯誤
+		    	companyData.isAutoAuthFail = true;
+		    	addCompanyReLoadView(companyData);
+		    	QmiGlobal.module.reAuthUILock.lock(companyData);
 
 		        deferred.resolve({
 		        	isSuccess: false,
@@ -1270,4 +1301,32 @@ if (typeof Object.assign != 'function') {
     }
     return to;
   };
+}
+
+
+QmiGlobal.ModuleConstructor = function(args) {
+	var self = this;
+    args = args || {};
+    Object.keys(args).forEach(function(key) {
+        self[key] = args[key];
+    });
+
+    self.data = function() {
+        var thisData = {};
+        return {
+            get: function(key) {
+                if(key) return thisData[key];
+                return thisData;
+            },
+            set: function(key, val) {
+                thisData[key] = val;
+            },
+            reset: function() {
+                thisData = {};
+            },
+            developGet: function() {
+                return thisData;
+            }
+        }
+    }()
 }

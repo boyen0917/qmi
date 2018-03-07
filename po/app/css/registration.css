@@ -113,13 +113,13 @@
 	overflow: hidden;
 }
 
-.login-remeber-area {
+.login-remember-area {
 	position: relative;
 	text-align: center;
 	margin: 30px auto 10px;
 }
 
-.login-remeber-password {
+.login-remember-password {
 	background: white;
 	box-shadow: 0px 2px #e2e2e2;
 	height: 50px;
@@ -171,13 +171,13 @@
 	text-align: center;
 	display: inline-block;
 }
-.login-remeber, .login-auto{
+.login-remember, .login-auto{
 	width: 100%;
 	text-align: left;
 }
 
 
-.login-remeber img, .login-auto img {
+.login-remember img, .login-auto img {
 	width: 20px;
 	margin-right: 5px;
 	vertical-align: middle;
@@ -224,7 +224,7 @@
 	margin: 0 auto;	
 }
 
-.login-remeber , .login-forget-pw, .login-auto {
+.login-remember , .login-forget-pw, .login-auto {
 	cursor: pointer;
 }
 
@@ -642,7 +642,7 @@ input.setting-birth-hidden {
 #page-registration .login-option-area .login-auto{
 	/*text-align: right;*/
 }
-#page-registration .login-option-area .login-remeber{
+#page-registration .login-option-area .login-remember{
 	/*text-align: left;*/
 }
 

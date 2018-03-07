@@ -10,13 +10,15 @@ $(function(){
 	});
 
 	$("#page-group-main .subpage-timeline.main-subpage").bind('scroll', function() {
+		var mainPage = $("#page-group-main");
 		//取舊資料
-		var feed_type = $("#page-group-main").data("navi");
+		var feed_type = mainPage.data("mainGu") ? "main" : mainPage.data("navi");
 		// 全部、公告、投票編號都是長度為2，但個人主頁卻是4
 		if (feed_type != "main") {
 			feed_type = ("0" + feed_type).slice(-2) || "00";
 		}
 		var this_navi = $(".feed-subarea[data-feed=" + feed_type + "]");
+
 		// var this_navi = $(".feed-subarea:visible");
 		//判斷沒資料的元件存在時 就不動作
 		if( this_navi.hasClass("no-data") ) return;	
@@ -32,7 +34,6 @@ $(function(){
 			// cns.debug("this_navi:",{name:this_navi.selector,data:this_navi.data("scroll-chk")});
 	    	//scroll 高度 達到 bottom位置 並且只執行一次
 		    if(bottom_height && bottom_height >= last_height && !this_navi.data("scroll-chk")){
-				console.log("CCCCC@@222");
 		    	//避免重複
 		    	this_navi.data("scroll-chk",true);
 		    	cns.debug("last event ct:",this_navi.data("last-ct"));
@@ -265,7 +266,6 @@ $(function(){
 	//系統選單 Tab 
 	$(".system-tab").on('click','li',function(){
         var tab_id = $(this).attr('data-tab');
-        //console.log("tab is "+tab_id);
         $('ul.system-tab li').removeClass('current-tab');
         $(this).addClass('current-tab');
         
@@ -439,22 +439,9 @@ $(function(){
 
 		filter_action.parent().children(".st-filter-list-active").removeClass("st-filter-list-active");
 		filter_action.addClass("st-filter-list-active");
-		// var filter_name = $(this).find("span").html();
-
-		//動態變化
-		// $(".st-filter-main span").fadeOut("fast");
-		// $(".st-filter-other").slideUp(function(){
-		// 	$(".st-filter-main").addClass("st-filter-list-active");
-		// 	$(".st-filter-main img").attr("src","images/icon/icon_arrow_right.png");
-		// 	$(".st-filter-main span").html(filter_name);
-		// 	$(".st-filter-main span").fadeIn("fast");
-
-		// 	$(".st-filter-main-hide").hide();
-		// 	$(".st-filter-main").show();
-		// });
 
 		var filter_status = $(this).data("status");
-		console.log(filter_status);
+
 		//過濾發文類型
 		if(filter_status == "navi" || filter_status == "all"){
 			groupMainPage.find(".st-personal-area").hide();
@@ -475,6 +462,7 @@ $(function(){
 		var event_area = $(".feed-subarea[data-feed=" + event_tp + "]");
 		var this_events = event_area.find(".st-sub-box");
 
+		event_area.removeClass("no-data");
 		//做過濾
 		//先關閉全區域
 		var feedbox_area = $(".st-feedbox-area");
@@ -492,12 +480,12 @@ $(function(){
 		groupMainPage.find(".st-feedbox-area-bottom > div").hide();
 		//已讀未讀
 		var cnt = 0;
-		this_events.each(function(i,val){
-			eventFilter($(this),filter_status);
-			if( $(val).hasClass("filter-show") ){
-				cnt++;
-			}
-		});
+		// this_events.each(function(i,val){
+		// 	eventFilter($(this),filter_status);
+		// 	if( $(val).hasClass("filter-show") ){
+		// 		cnt++;
+		// 	}
+		// });
 		showFeedboxNoContent( (cnt>0) );
 
 		//開啟全區域
@@ -559,7 +547,6 @@ $(function(){
 
 	//show 已讀列表
 	$(document).on('click','.st-sub-box-3 .st-read',function(){
-		cns.debug("read list");
 		var this_event = $(this).parents('.st-sub-box');
 
 		timelineObjectTabShowDelegate( this_event, 0, function(){
@@ -667,9 +654,7 @@ $(function(){
 						var dom = $(this);
 						initStickerArea.showHistory( dom.parent() );
 					});
-					cns.debug("1");
 				}, function () {
-					console.log("heyhhey")
 					stickerIcon.click();
 				});
 			// }
@@ -818,7 +803,6 @@ $(function(){
 
         
     	if (e.keyCode == 8 || e.keyCode == 46) {
-    		console.log("backspace")
     		if (selectedText) {
     	// 		var range = selectionObj.getRangeAt(0);
     	// 		var selectedMarkNodes = getSelectedMarkNodes(range);
@@ -1137,6 +1121,87 @@ $(function(){
 					}
 					target.siblings(".st-more-close").trigger("click");
 					break;
+
+				case "object":
+					var currentTargets = $.parseJSON(this_event.data("object_str"));
+					var groupMemberAll = QmiGlobal.groups[gi].guAll || {}
+					var currentAudiences = {};
+
+					target.siblings(".st-more-close").click();
+
+					/* 文章存的object_str跟之前(發布對象按鈕、指派管理員、聊天室選擇成員等)不一樣，
+						需要轉成可以讓composeObjectShowDelegate吃下*/
+					if (currentTargets) {
+						if (currentTargets.gul) {
+							currentTargets.gul.forEach(function (member) {
+								currentAudiences[member.gu] = member.n;
+							})
+						}
+
+						if (currentTargets.bl) {
+
+							var currentBranchObj  = {};
+
+							currentTargets.bl.forEach(function (branch) {
+								for (var memberID in groupMemberAll) {
+									var memberData = groupMemberAll[memberID];
+
+									if (memberData.st == 1) {
+										var branchListStr = memberData.bl;
+
+										if (branchListStr.indexOf(branch.bi) >= 0) {
+											currentAudiences[memberID] = memberData.nk;
+										}
+									}
+								}
+							})
+						}
+					}
+
+					target.data("object_str", JSON.stringify(currentAudiences));
+
+					composeObjectShowDelegate(target, target, {
+						isShowBranch: false,
+						isShowSelf: true,
+						isShowAll: false,
+						isShowFav: true,
+						isDisableOnAlreadyChecked: true,
+					}, function () {
+						var newTargetData = $.parseJSON(target.data("object_str")) || {};
+
+						var event_status = this_event.data("event-val");
+					    var this_ei = this_event.data("event-id");
+					    var this_gi = this_ei.split("_")[0];
+					    var this_ti = this_ei.split("_")[1];
+					    var newAudienceNameList = [];
+
+						currentTargets.gul = [];
+
+						for (var memberID in newTargetData) {
+							if (!currentAudiences.hasOwnProperty(memberID)) {
+
+								newAudienceNameList.push(newTargetData[memberID]);
+							}
+
+							currentTargets.gul.push({
+								gu: memberID,
+								n: newTargetData[memberID]
+							})
+						}
+						
+						new QmiAjax({
+							apiName: "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/content/permission",
+							method: "put",
+							body: currentTargets
+						}).complete(function(data){
+					        if(data.status == 200){
+								this_event.data("object_str", JSON.stringify(currentTargets));
+								toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newAudienceNameList.join(' 、 '))
+					        	this_event.find(".st-sub-box-1-footer").append("、" + newAudienceNameList.join('、')); 
+					        }
+					    });
+					});
+					break;
 			}
 		} catch(e){
 			cns.debug(e);
@@ -1153,7 +1218,7 @@ $(function(){
 	        },100);
 		}else{
 			//非管理者不能使用公告
-			if(QmiGlobal.groups[gi].guAll[gu].ad == 1){
+			if((QmiGlobal.groups[gi].guAll[gu] || {}).ad == 1){
 				$(".fc-area-subbox[data-fc-box=announcement]").removeClass("disabled");
 			}else{
 				$(".fc-area-subbox[data-fc-box=announcement]").addClass("disabled");
@@ -1253,6 +1318,7 @@ $(function(){
 	$(document).on("detailShow",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3", function(e){
 		var triggerDetailBox = $(this);
 		var this_event = $(this).parent();
+
 		//detail頁面 離去
 		if(this_event.data("detail-page")) return false;
 
@@ -1285,6 +1351,8 @@ $(function(){
 
 		//動態消息 判斷detail關閉區域
 		var detail_chk = timelineDetailClose(this_event,tp, triggerDetailBox);
+		// var detail_chk = true;
+
 
 
 		//重置
@@ -1342,6 +1410,55 @@ $(function(){
 		e.stopPropagation();
 	});
 
+	$("#page-group-main").on("click", ".st-sub-box-2-attach-area", function (e) {
+		var thisEvent = $(this).parents(".st-sub-box");
+		var eventId = thisEvent.data("event-id");
+		var tp = thisEvent.data("timeline-tp");
+
+		if (thisEvent.find("div.st-box2-more-desc").is(":visible")) {
+			thisEvent.find("div.st-box2-more-desc").removeClass("line-clamp")
+		} else {
+			thisEvent.find("div.st-sub-box-2-content").removeClass("line-clamp")
+		}
+
+		getThisTimelinePart(thisEvent,1,function(data){
+			if(!data.responseText) return false;
+
+			var epl = $.parseJSON(data.responseText).epl;
+            
+			if(typeof epl != "undefined" && epl.length > 0){
+				var parti_list = [];
+				$.each(epl,function(i,val){
+					parti_list.push(val.gu);
+				});
+				// 存回 陣列
+				thisEvent.data("parti-list",parti_list);
+				thisEvent.data("parti-like",epl);
+				// 編輯讚好區域
+				detailLikeStringMake(thisEvent);
+			}
+
+			thisEvent.find("div.st-reply-like-area").show();
+
+		});
+		
+		//單一動態詳細內容
+        getEventDetail(eventId).complete(function(data){
+        	if(data.status != 200) return false;
+
+        	var eventData = $.parseJSON(data.responseText).el;
+
+        	eventContentDetail(thisEvent, eventData);
+        	
+    		//detail timeline message內容
+			detailTimelineContentMake(thisEvent, eventData, null, undefined);
+
+			timelineUpdateTime();
+
+			thisEvent.data("detail-content",true);
+		});
+	})
+
 	//----------------------------------- compose-貼文 ---------------------------------------------
 	
 	//貼文選單
@@ -1395,7 +1512,6 @@ $(function(){
 				if(cnt < 3) {
 					cnt++;
 					this_compose.data("parse-waiting-retry",cnt);
-					cns.debug("yooo",cnt);
 
 					$(".cp-post").trigger("click");
 				}else{
@@ -1676,7 +1792,6 @@ $(function(){
 		}
 
 		if( fileList.length>0 ){
-			console.log("yo",fileList);
 			composePage.find(".cp-attach-area").show();
 			composePage.find(".cp-file-area").show();
 			var fileArea = composePage.find(".cp-file-else-area");
@@ -1854,6 +1969,7 @@ $(function(){
 			$.i18n.getString("COMMON_OK"),
 			$.i18n.getString("COMMON_CANCEL"),
 			[function(){
+				$("#page-compose > div.cp-content-load").empty();
 				this_dom.siblings(".page-back").trigger("click");
 			},$(this)]
 		);
@@ -2250,6 +2366,7 @@ $(function(){
 	});
 
 	$(document).on("click",".st-attach-video.play div,.video-area.play div",function(e){
+		console.log("play")
 		var tmp = $(this).prev('video');
 		if( tmp.length>0 ){
 			tmp[0].play();

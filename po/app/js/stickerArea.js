@@ -247,24 +247,8 @@ var initStickerArea= {
 		    	var type = thisDom.parents(".group").data("cata-type");
 		    	if( thisDom.hasClass("error") ){
 		    		thisTmp.downloadSticker(type, function(spi){
-					// thisTmp.getStickerDetailApi(type).complete(function(detailDataTmp){
-		   //      		if(detailDataTmp.status == 200){
-		   //      			var detailData = $.parseJSON(detailDataTmp.responseText);
-		   //      			if(detailData &&detailData.sl) detailData = detailData.sl;
-		   //      			if( !thisTmp.splDict[type] ) thisTmp.splDict[type] = {};
-			  //       		thisTmp.splDict[type].list = {};
-		   //      			for(var j=0; j<detailData.length; j++){
-		   //      				thisTmp.splDict[type].list[detailData[j].sid] = detailData[j];
-		   //      			}
-		   //      			$.lStorage("_sticker",thisTmp.splDict);
-
-		   //      			//redraw
-		   //      			thisTmp.showImg(dom, type, thisTmp.splDict[type] );
-
-		        			//sync
-		    				$("#send-sync-sticker-signal").attr("data-sid", spi);
-		    				$("#send-sync-sticker-signal").click();
-		        		// }
+	    				$("#send-sync-sticker-signal").attr("data-sid", spi);
+	    				$("#send-sync-sticker-signal").click();
 		        	});
 		        	return;
 				}

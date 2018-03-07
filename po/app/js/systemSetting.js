@@ -240,13 +240,18 @@ systemSetting = function(){
     var group_data = QmiGlobal.groups;
     var this_goup_data = group_data[gi];
 
-    var systemGroup = $("#group-setting");
+    var systemSettingTabs = $("#systemSetting-page ul.system-tab");
+    var systemGroup = $("#group-setting");  
     $(".notification-btn,.default-group-btn,.carousel-btn").removeClass("ready");
     //系統設定初始化
     var emailSetting = $("#email-setting");
     emailSetting.find("input[name$='user-edit-phone']").val(QmiGlobal.me.pn);
     emailSetting.find("input[name$='user-edit-email']").val(QmiGlobal.me.em);
     //密碼
+    if (QmiGlobal.auth && QmiGlobal.auth.isSso) { // ldap帳號，隱藏修改密碼設定
+        systemSettingTabs.children("li[data-tab='password-setting']").hide()
+    }
+
     $("#password-setting").find(".input-password").val("");
     //預設系統通知
     if($.lStorage("_setnoti")==100){
@@ -661,12 +666,12 @@ QmiGlobal.module.ldapSetting = {
     },
 
     add: function() {
-        var self = this,
-            ssoAccount = self.inputAccount,
-            ssoPassword = self.inputPassword,
-            ssoData,
-            msgShowDef = $.Deferred(),
-            submitCompleteDef = $.Deferred();
+        var self = this;
+        var ssoAccount = self.inputAccount;
+        var ssoPassword = self.inputPassword;
+        var ssoData;
+        var msgShowDef = $.Deferred();
+        var submitCompleteDef = $.Deferred();
 
         self.view.addClass("cover");
 
@@ -989,7 +994,7 @@ QmiGlobal.module.ldapSetting = {
 
     strMap: {
         // 0 是公雲; 1是 sso
-        add: ["ACCOUNT_BINDING_BINDING_NEW_ACCOUNT", "ACCOUNT_BINDING_BIND_QMI_ACCOUNT"],
+        add: ["ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT", "ACCOUNT_BINDING_BIND_QMI_ACCOUNT"],
         noData1: ["ACCOUNT_BINDING_PRESS_TO_BIND_LDAP_ACCOUNT", "WEBONLY_ACCOUNT_BINDING_SSO_NODATA1"],
         noData2: ["WEBONLY_ACCOUNT_BINDING_NEW_ACCOUNT", "WEBONLY_ACCOUNT_BINDING_SSO_NODATA2"],
         write: function(type) {
@@ -1006,7 +1011,7 @@ QmiGlobal.module.ldapSetting = {
         + "</section>"
         + "<section class='ldap-edit' role='page' ldap-type='add'>"
         + "    <section class='icon-shield'></section>"
-        + "    <div class='title one add' content='"+ $.i18n.getString("ACCOUNT_BINDING_BINDING_NEW_ACCOUNT") +"'></div>"
+        + "    <div class='title one add' content='"+ $.i18n.getString("ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT") +"'></div>"
         + "    <div class='title one check' content='"+ $.i18n.getString("ACCOUNT_BINDING_ACCOUNT_RECERTIFICATION") +"'></div>"
         + "    <div class='title one delete' content='"+ $.i18n.getString("ACCOUNT_BINDING_DISCONNECT_ACCOUNT") +"'></div>"
         +   (function() {

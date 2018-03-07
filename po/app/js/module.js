@@ -31,6 +31,10 @@ QmiGlobal.module.reAuthUILock = {
 			var groupDom = groupListArea.find(".sm-group-area[data-gi="+cgi+"]");
 			groupDom.find(".sm-group-area-l")[actionData.classStatus]("auth-lock").end()
 			.find("span.auth-lock-text")[actionData.textStatus]();
+
+			// 當前團體開啟頁面黑屏
+			if(actionData.isReAuthUILock && cgi === QmiGlobal.currentGi)
+				$("#page-group-main .gm-content > .refresh-lock").show();
  		});
 	}
 }
@@ -284,6 +288,7 @@ QmiGlobal.module.systemPopup = {
     			veId: "ldapSetting", 
     			jqElem: self.view.find("[data-sm-act=system-ldapSetting]"), 
     			eventArr: ["click"],
+    			data: {fuck: "mother"}
     		}, {
     			veId: "logout", 
     			jqElem: self.view.find("div.system-logout"), 
@@ -304,6 +309,7 @@ QmiGlobal.module.systemPopup = {
 			case "click:ldapSetting":
 				// func.js  timelineSwitch  system-ldap-setting
 				// QmiGlobal.ldapSetting.init();
+				console.log("yo");
 				break;
 
 			case "click:logout":
@@ -325,7 +331,7 @@ QmiGlobal.module.systemPopup = {
         + 	'<div class="line"></div>'
         + 	'<div class="sm-info-hr" data-textid="SYSTEM"></div>'
         + 	'<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'
-        + 	'<div data-sm-act="system-ldapSetting" class="sm-info sm-small-area" data-textid="'+ (QmiGlobal.auth.isSso ? "ACCOUNT_BINDING_BIND_QMI_ACCOUNT" : "ACCOUNT_BINDING_BINDING_NEW_ACCOUNT" )+'"></div>'
+        + 	'<div data-sm-act="system-ldapSetting" class="sm-info sm-small-area" data-textid="'+ (QmiGlobal.auth.isSso ? "ACCOUNT_BINDING_BIND_QMI_ACCOUNT" : "ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT" )+'"></div>'
         + 	'<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'
         + '</div>';
     }
@@ -333,6 +339,10 @@ QmiGlobal.module.systemPopup = {
 
 
 QmiGlobal.module.appVersion = {
+
+	versionOsMap: {
+		2: {nm: "Qmi", os: 2, av: QmiGlobal.appVer},
+		4: {nm: "NodeWebkit", os: 4, av: QmiGlobal.nwVer}},
 
 	init: function(isUserClick) {
 		var self = this;
@@ -356,26 +366,39 @@ QmiGlobal.module.appVersion = {
 		if(isNoNeedToCheckAndUpdate()) return;
 		
 		if(isUserClick) self.loadingUI.on();
-		self.apiSysVersion().success(function(rspData) {
-    		
-    		self.data = rspData;
+		self.apiSysVersion().done(function(resultObj) {
+			var nmArr = ["app", "nw"];
+    		var versionObj = Object.keys(self.versionOsMap).reduce(function(obj, osTp, i) {
+    			obj[nmArr[i]] = resultObj[osTp] || {};
+    			return obj;
+    		}, {});
+
+
+    		self.appVer = versionObj.app || {};
+    		self.nwVer = versionObj.nw || {};
+
+    		var appVerStr = self.appVer.ut;
 
     		// 檢查Web版本 版本相同 不更新
-    		if(QmiGlobal.appVer === rspData.av) rspData.ut = 2;
+    		if(QmiGlobal.appVer === self.appVer.av) appVerStr = 2;
 
     		// 檢查桌機版本 先確認有url 再判斷下載網址
     		var isDeskTopOldVersion = false;
     		try {
-    			if(rspData.uu !== "null") {
+    			if(self.nwVer.uu !== "null") {
 					// < 0 表示舊版本 要提示下載
-					if(self.compare(QmiGlobal.nwVer, rspData.av) < 0) {
+					if(self.compare(QmiGlobal.nwVer, self.nwVer.av) < 0) {
 						isDeskTopOldVersion = true;
 					}
 	    		}
     		} catch(e) {};
 
     		// 設定版本更新類別
-    		self.switchStr = "" + rspData.ut + +isDeskTopOldVersion;
+    		self.switchStr = "" + appVerStr + (+isDeskTopOldVersion);
+
+    		// 要有三組數字
+    		// 已更新至最新版本
+    		// 系統設定要有2組
     		
     		// 感覺比較好
     		if(isUserClick)
@@ -385,9 +408,9 @@ QmiGlobal.module.appVersion = {
 	    	else
 	    		self.update();
 
-		}).error(function(rspData) {
+		}).fail(function(rspData) {
 			console.log("err", rspData);
-		}).complete(function() {
+		}).always(function() {
 			if(isUserClick) self.loadingUI.off();
 			deferred.resolve();
 		});
@@ -440,7 +463,7 @@ QmiGlobal.module.appVersion = {
 	
 	update: function() {
 		var self = this;
-
+		console.log("switchStr", self.switchStr);
 		switch(self.switchStr) {
 			case "00": // 手動更新 桌機無更新
 				// 文案：「有新版本，將自動更新資料。」
@@ -463,7 +486,7 @@ QmiGlobal.module.appVersion = {
 
 				// 桌機版要有正確版號
 				new QmiGlobal.popup({
-					desc: $.i18n.getString("WEBONLY_APPVERSION_01"),
+					desc: $.i18n.getString("WEBONLY_APPVERSION_02"),
 					confirm: true,
 					cancel: true,
 					action: [nwDownload.bind(self, true)],
@@ -491,7 +514,7 @@ QmiGlobal.module.appVersion = {
 				// 「下載」 => 自動下載新的安裝檔，客戶自行決定是否點擊安裝，若無安裝，下次登入仍會跳出強制下載頁面無法使用。
 
 				new QmiGlobal.popup({
-					desc: $.i18n.getString("WEBONLY_APPVERSION_01"),
+					desc: $.i18n.getString("WEBONLY_APPVERSION_02"),
 					confirm: true,
 					action: [nwDownload.bind(self, true)]
 				});
@@ -501,7 +524,7 @@ QmiGlobal.module.appVersion = {
 
 				// 桌機版需要更新
 				new QmiGlobal.popup({
-					desc: $.i18n.getString("WEBONLY_APPVERSION_01"),
+					desc: $.i18n.getString("WEBONLY_APPVERSION_02"),
 					confirm: true,
 					cancel: true,
 					action: [nwDownload],
@@ -525,13 +548,14 @@ QmiGlobal.module.appVersion = {
 
 		function nwDownload(isReload) {
 			setDownloadTimer();
+			// default mac
 			var filename = "mac";
 			// windows
 			if(process.execPath.indexOf("C:\\") === 0) filename = "win";
 
 			var link=document.createElement('a');
 		   	document.body.appendChild(link);
-		   	link.href= self.data.uu + "/"+ filename +".zip";
+		   	link.href= self.nwVer.uu + "/"+ filename +".zip";
 		   	link.click();
 		   	document.body.removeChild(link);
 
@@ -544,20 +568,45 @@ QmiGlobal.module.appVersion = {
 	},
 
 	apiSysVersion: function() {
-		return new QmiAjax({
-    		apiName: "sys/version",
-    		timeout: 5000,
-    		isPublicApi: true,
-    		noAuth: true,
-    		specifiedHeaders: {
-    			os: 2,
-				tp: 0,
-				av: QmiGlobal.appVer || "1.0.0",
-				li: lang
-			},
-    		method: "get",
-    		errHide: true
-    	});
+		var self = this;
+		var apiDeferred = $.Deferred();
+		var resultObj = {};
+		
+		$.when.apply($, Object.keys(self.versionOsMap).map(function(osTp) {
+			var deferred = $.Deferred();
+			
+			new QmiAjax({
+	    		apiName: "sys/version",
+	    		timeout: 5000,
+	    		isPublicApi: true,
+	    		noAuth: true,
+	    		specifiedHeaders: {
+	    			os: osTp,
+					tp: 0,
+					av: self.versionOsMap[osTp].av || "1.0.0",
+					li: lang
+				},
+	    		method: "get",
+	    		errHide: true
+	    	}).success(function(rspData) {
+	    		resultObj[osTp] = rspData;
+	    		deferred.resolve();
+	    	})
+	    	.fail(function(errData) {
+	    		resultObj[osTp] = {isSuccess: false, msg: function() {
+	    			try {
+	    				return JSON.parse(errData.responseText).rsp_msg;
+	    			} catch(e) {return $.i18n.getString("COMMON_UNKNOWN_ERROR")}
+	    		}()};
+	    		deferred.resolve();
+	    	});
+
+	    	return deferred.promise();
+		})).done(function() {
+			apiDeferred.resolve(resultObj);
+		});
+
+		return apiDeferred.promise();
 	},
 
 	compare: function(a, b) {
@@ -698,7 +747,7 @@ QmiGlobal.eventDispatcher = {
 				var jqElem = self.viewMap[viewId].jqElem, length = jqElem.length;
 				for(var i=0; i<length; i++) {
 					if(event.currentTarget === jqElem[i]) {
-						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {})[event.type], target: event.target}}));
+						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {}), target: event.target}}));
 						return;
 					}
 				}
@@ -748,4 +797,83 @@ QmiGlobal.eventDispatcher = {
 			
 		})
 	}
+}
+
+QmiGlobal.module.webview = new QmiGlobal.ModuleConstructor({
+
+	id: "module-webview",
+
+	rowLimit: 5,
+
+	init: function() {
+		var self = this;
+		var containerDom = $("#subpage-webview").empty();
+		self.getWebview().done(function(rspData) {
+			try {
+				var webviewList = JSON.parse(rspData.responseText).wl
+			} catch(e) {noData(); return;}
+
+			(webviewList || []).forEach(function(item, i) {
+				var dom = $(self.html.row);
+				dom.find("span").text(item.name);
+
+				QmiGlobal.eventDispatcher.subscriber([{
+	    			veId: "linkHeader:"+ i, 
+	    			jqElem: dom, 
+	    			eventArr: ["click"],
+	    			data: item
+	    		}], self);
+
+				containerDom.append(dom);
+			});
+			
+		}).fail(noData);
+
+		function noData(errData) {
+			containerDom.html($.i18n.getString("USER_PROFILE_NO_DATA"))
+		}
+	},
+
+	clickLinkHeader: function(args) {
+		var linkEl = document.createElement("a");
+		document.body.appendChild(linkEl);
+	   	linkEl.href= args.data.url;
+	   	linkEl.click();
+	   	document.body.removeChild(linkEl);
+	},
+
+	getWebview: function() {
+		return new QmiAjax({
+			apiName: "groups/"+ QmiGlobal.currentGi +"/webview",
+			noErr: true
+		})
+	},
+
+
+	html: {
+		row: "<section><img src=\"images/common/icon/link.png\"><span></span></section>"
+	},
+
+	handleEvent: eventHandler
+});
+
+
+
+function eventHandler() {
+
+    try {
+    	var self = this;
+    	var veTpStr = getGroupVeIdTypeStr(event.type.split(":"+self.id+":").join(":"));
+
+        if(typeof self[veTpStr] === "function") self[veTpStr]({
+            dom: $(event.detail.elem),
+            data: event.detail.data,
+            evt: event
+        });    
+    } catch(e) {console.error("eventHandler error occured", e)}
+    
+    function getGroupVeIdTypeStr(evtTp) {
+        var evtTpArr = evtTp.split(":");
+        return evtTpArr[0] + evtTpArr[1].substring(0, 1).toUpperCase() + evtTpArr[1].substring(1);
+    }
 }

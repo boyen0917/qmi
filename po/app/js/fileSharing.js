@@ -540,11 +540,10 @@ FileSharing.prototype = {
 			}).always(function(){
 				thisFile.setUploadProgress(0.05);
 				
-
 				setTimeout(function(){
 					coverDom.removeClass("disable").trigger("click").find("ul").show();
 					progressSectionDom.hide()
-				},100);
+				},200);
 				
 				thisFile.getList();
 			});

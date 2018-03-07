@@ -49,7 +49,7 @@ $(function(){
             return getGroupComboInit(thisGi);
         })).done(function() {
             // 初始化排除了當前團體 這邊加回來 做更新
-            giArr.concat([gi]).forEach(updateSideMenuContent);
+            giArr.concat([gi]).forEach(updateGroupAllInfoDom);
             updateAlert(isFromLogin);
         });
     }
@@ -107,20 +107,23 @@ $(function(){
 
                 groupData.inviteGuAll = inviteGuAll;
 
-                //官方帳號設定
+                // 官方帳號設定
                 initOfficialGroup( thisGi );
 
                 // 設定按讚留言浮水印開關
                 setSwitch(thisGi);
 
-                //初始化 重組群組資訊
+                // 初始化 重組群組資訊
                 setBranchList( thisGi , {
                     bl:  comboData.bl,
                     fbl: comboData.fbl
                 });
 
-                //設定功能選單
+                // 設定功能選單
                 setTabList(thisGi);
+
+                // 左側選單更新
+                updateGroupAllInfoDom(thisGi);
 
                 if(callback) callback();
 
@@ -315,14 +318,14 @@ $(function(){
             if( tabObj.sw === false || typeof initTabMap[tabObj.tp] === "undefined") continue;
             
             var tabDom = $(tabHtml);
-            tabDom.attr("data-sm-act",initTabMap[tabObj.tp].act);
+            tabDom.attr("data-sm-act", initTabMap[tabObj.tp].act);
             //tab 對照表 init.js
             //initTabMap
             if(initTabMap[tabObj.tp].hasOwnProperty("class")){
                 for(j=0;j<initTabMap[tabObj.tp].class.length;j++){
                     tabDom.addClass(initTabMap[tabObj.tp].class[j]);    
                 }
-                tabDom.attr("data-polling-cnt",initTabMap[tabObj.tp].pollingType)
+                tabDom.attr("data-polling-cnt", initTabMap[tabObj.tp].pollingType)
                 .append('<div class="sm-count" style="display:none;"></div>');
             }
             menu.append( tabDom );

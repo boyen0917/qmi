@@ -39,11 +39,19 @@ appInitial = function(needUpdate){
 			isMail = true;
 		}
 		var password = $(".login-ld-password input").val();
+		var accountPattern = new RegExp("[a-zA-Z0-9\\@\\_\\-\\.]+"); 
 
-		$(this).addClass("login-waiting");
-		//登入
-		login(phone_id,password,countrycode,isMail);
-		
+		if (isMail) {
+			if (phone_id.replace(accountPattern, "").length == 0) {
+				$(this).addClass("login-waiting");
+				login(phone_id,password,countrycode,isMail);
+			} else {
+				toastShow($.i18n.getString("LOGIN_FORMAT_CHECK"));
+			}
+		} else {
+			$(this).addClass("login-waiting");
+			login(phone_id,password,countrycode,isMail);
+		}
 	});
 
 	$(".login-ld-password").off("keypress").keypress(function(e){
@@ -115,7 +123,7 @@ appInitial = function(needUpdate){
 
 	//set default value
 	countryCodeDoms.attr("data-val","TW");
-	var loginData = $.lStorage("_loginRemeber");
+	var loginData = $.lStorage("_loginRemember");
 	if( null!=loginData && null!=loginData ){
 		var targetCountryDom = countryCodeDoms.find("option[data-code='"+loginData.countrycode+"']");
 		if( targetCountryDom.length>0 ){
@@ -172,9 +180,9 @@ appInitial = function(needUpdate){
 				$("#page-registration .login").addClass("login-ready");
 
 				countrycode = countryInput.attr('data-code');
-				var loginData = $.lStorage("_loginRemeber");
+				var loginData = $.lStorage("_loginRemember");
 				loginData.countrycode = countrycode;
-				$.lStorage("_loginRemeber", loginData);
+				$.lStorage("_loginRemember", loginData);
 			} else {
 				$("#page-registration .login").removeClass("login-ready");
 			}
@@ -183,9 +191,8 @@ appInitial = function(needUpdate){
 			var emailInput = $(".login-ld-email input");
 			var email = emailInput.val();
 			if( email && email.length>3 ){
-				var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,5}$/,'');
+				// var isMailCheck = email.replace(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,5}$/,'');
 				
-				// if(pwdInput.val().length >= 6 && isMailCheck.length == 0 ){
 				if(pwdInput.val().length >= 6){
 					$("#page-registration .login").addClass("login-ready");
 				}else{
@@ -213,7 +220,7 @@ appInitial = function(needUpdate){
 		}
 	});
 
-	$(".login-remeber-password input").bind("input",function(){
+	$(".login-remember-password input").bind("input",function(){
 		if($(this).val().length >= 6){
 			$(".login-next").addClass("login-next-ready");
 		}else{
@@ -221,26 +228,27 @@ appInitial = function(needUpdate){
 		}
 	});
 
-	$(".login-remeber").click(function(){
-		var remeber_chk = $(this).data("chk");
-		if(remeber_chk){
+	$("#page-registration div.login-remember").click(function(){
+		var remember_chk = $(this).data("chk");
+		if(remember_chk){
 			if( $(this).hasClass("landpage") ){
 				$(this).find("img").attr("src","images/registration/checkbox_none.png");
 			} else {
 				$(this).find("img").attr("src","images/common/icon/icon_check_gray.png");
 			}
-			remeber_chk = false;
+			remember_chk = false;
 		}else{
 			if( $(this).hasClass("landpage") ){
 				$(this).find("img").attr("src","images/registration/checkbox_check.png");
 			} else {
 				$(this).find("img").attr("src","images/common/icon/icon_check_gray_check.png");
 			}
-			remeber_chk = true;
+			remember_chk = true;
 		}
 
-		$(this).data("chk",remeber_chk);
+		$(this).data("chk",remember_chk);
 	});
+
 
 	$(".login-change").click(function(){
 		$(".login-change").data("chk",true);
@@ -250,9 +258,9 @@ appInitial = function(needUpdate){
 			$("body").fadeIn();
 		},100);
 		setTimeout(function(){
-			$(".login-remeber img").attr("src","images/common/icon/icon_check_gray.png");
-			$(".login-remeber").data("chk",false);
-			$(".login-remeber-area").hide();
+			$("#page-registration div.login-remember img").attr("src","images/common/icon/icon_check_gray.png");
+			$("#page-registration div.login-remember").data("chk",false);
+			$(".login-remember-area").hide();
 			$(".login-default-area").show();
 			$(".login-change").hide();
 			$(".login-next").removeClass("login-next-adjust");
@@ -261,9 +269,9 @@ appInitial = function(needUpdate){
 
 	$(document).on("click",".login-next-ready:not(.login-waiting)",function(){
 
-		if($.lStorage("_loginRemeber") && !$(".login-change").data("chk")){
-			var phone_id = $.lStorage("_loginRemeber").phone;
-			var password = $(".login-remeber-password input").val();
+		if($.lStorage("_loginRemember") && !$(".login-change").data("chk")){
+			var phone_id = $.lStorage("_loginRemember").phone;
+			var password = $(".login-remember-password input").val();
 		}else{
 			var phone_id = $(".login-phone input").val();
 			var password = $(".login-password input").val();
@@ -272,26 +280,15 @@ appInitial = function(needUpdate){
 
 		//登入
 		login(phone_id,password,countrycode);
-		
 	});
 
-
-	// $("#popupDialog").find(".input-column input").off("input").on("input", function () {
-	// 	var passwordInput = $(this).val();
-	// 	var anotherPasswordInput = $(this).parent().siblings().find("input").val();
-
-	// 	if (passwordInput.length >= 8 && anotherPasswordInput.length >= 8) {
-	// 		$("#popupDialog").find(".confirm").addClass("enable");
-	// 	} else {
-	// 		$("#popupDialog").find(".confirm").removeClass("enable");
-	// 	}
-	// });
 
 	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
 
 		// 清空資料
 		resetDB();
+
 		// 預防錯誤發生
 		QmiGlobal.auth = {};
 
@@ -352,18 +349,20 @@ appInitial = function(needUpdate){
         		changeAccountToResetDB(phoneId);
 
     			//記錄帳號密碼
-    			if($(".login-remeber").data("chk")){
-					var _loginRemeber = {};
-					_loginRemeber.phone = phoneId;
-					_loginRemeber.isMail = isMail;
-					// _loginRemeber.password = password;
-					_loginRemeber.countrycode = countrycode;
-					$.lStorage("_loginRemeber",_loginRemeber);
+    			if($("#page-registration div.login-remember").data("chk")){
+					var _loginRemember = {};
+					_loginRemember.phone = phoneId;
+					_loginRemember.isMail = isMail;
+					// _loginRemember.password = password;
+					_loginRemember.countrycode = countrycode;
+					$.lStorage("_loginRemember",_loginRemember);
 				}else{
 					//沒打勾的話就清除local storage
-		    		localStorage.removeItem("_loginRemeber");
+		    		localStorage.removeItem("_loginRemember");
 				}
+
 				loginAction();
+				
         	});
 
         }).error(function(){
@@ -382,7 +381,7 @@ appInitial = function(needUpdate){
 	}
 
 	//初始化 
-    function loginAction (){
+    function loginAction() {
 
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
@@ -412,11 +411,15 @@ appInitial = function(needUpdate){
         	if($.lStorage("groupChat")){
         		groupChat = $.lStorage("groupChat");
 		    	$.each(groupChat,function(key,value){
-		    		getGroupComboInit(key);
-		    		QmiGlobal.groups[key].chatAll = value;
-		    		$.each(value,function(ci,item){
-		    			openChatWindow(key,ci);
-		    		})
+		    		try {
+		    			if(key === "undefined" || !QmiGlobal.groups[key] || Object.keys(QmiGlobal.groups[key]).length === 0) return;
+
+			    		getGroupComboInit(key);
+			    		QmiGlobal.groups[key].chatAll = value;
+			    		$.each(value,function(ci,item){
+			    			openChatWindow(key,ci);
+			    		})
+		    		} catch(e) {}
 		        });
 		    	localStorage.removeItem("groupChat");
         	}
@@ -441,15 +444,23 @@ appInitial = function(needUpdate){
 
                 getGroupComboInit(specifiedGi).done(function(resultObj){
 
-                	if( resultObj.status === false ){
+                	if(resultObj.status === false){
                 		//sso 取消
                 		if(resultObj.data.isReAuthCancel === true){
                 			cns.debug("sso reAuth 取消");	
-                			return;
+                			var errCode = "code:E0000401";
+                		} else {
+                			var errCode = "code:E0000402";
                 		}
 
+                		new QmiGlobal.popup({
+							desc: $.i18n.getString("WEBONLY_ERROR_OCCURED_RELOGIN") +"<br>"+ errCode,
+							confirm: true,
+							action: [reLogin]
+						});
+
                 		//發生錯誤 回首頁比較保險
-                		reLogin();
+                		// reLogin();
                 	} else {
                 		deferred.resolve({dgi: specifiedGi, location:"#page-group-main"});
                 	}
@@ -762,9 +773,9 @@ appInitial = function(needUpdate){
 			cns.debug("newCountryCode", newCountryCode);
 			// if( newCountryCode != countrycode ){
 			// 	countrycode = newCountryCode;
-			// 	var loginData = $.lStorage("_loginRemeber");
+			// 	var loginData = $.lStorage("_loginRemember");
 			// 	loginData.countrycode = newCountryCode;
-			// 	$.lStorage("_loginRemeber", loginData);
+			// 	$.lStorage("_loginRemember", loginData);
 			// }
 			var targetCountryDom = $('.login-ld-countrycode select');
 			if( targetCountryDom.length>0 ){
@@ -978,8 +989,6 @@ appInitial = function(needUpdate){
 			// }
 			// $(document).data("device-token",deviceTokenMake());
 			var phoneNumber = $(".register-phone input").val();
-
-			$(document).data("device-token","web-device");
 			$(document).data("phone-id", countrycode + phoneNumber.replace(/^0/, ""));	
 		}
 		
@@ -991,7 +1000,7 @@ appInitial = function(needUpdate){
         var body = {
                 id: $(document).data("phone-id"),
                 tp: 0,
-                ud: $(document).data("device-token")
+                ud: QmiGlobal.device
             }
         cns.debug("registration() 傳送驗證碼前的 body:",JSON.stringify(body,null,2));
         
@@ -1166,12 +1175,12 @@ appInitial = function(needUpdate){
         	cns.debug("資料設定後的 data:",data);
         	if(data.status == 200){
         		//登入成功 記錄帳號密碼
-				var _loginRemeber = {};
-				_loginRemeber.isMail = false;
-	    		_loginRemeber.phone = "0" + $(document).data("phone-id").substring(4);
-	    		_loginRemeber.password = $(document).data("password");
-	    		_loginRemeber.countrycode = countrycode;
-	    		$.lStorage("_loginRemeber",_loginRemeber);
+				var _loginRemember = {};
+				_loginRemember.isMail = false;
+	    		_loginRemember.phone = "0" + $(document).data("phone-id").substring(4);
+	    		_loginRemember.password = $(document).data("password");
+	    		_loginRemember.countrycode = countrycode;
+	    		$.lStorage("_loginRemember",_loginRemember);
 
 				//儲存登入資料 跳轉到timeline
 				var _loginData = {
@@ -1326,12 +1335,13 @@ appInitial = function(needUpdate){
 	
 	initLandPage = function(){
 		//若local storage 有記錄密碼 就顯示
-		var rememberData = $.lStorage("_loginRemeber");
-		if( rememberData ){
+		var rememberDom = $("#page-registration div.login-remember");
+		var rememberData = $.lStorage("_loginRemember");
+		if(rememberData){
 			//順便幫他打個勾
-			$(".login-remeber img").attr("src","images/registration/checkbox_check.png");
-			$(".login-remeber").data("chk",true);
-			$(".login-remeber-area").show();
+			rememberDom.find("img").attr("src","images/registration/checkbox_check.png");
+			rememberDom.data("chk",true);
+			$(".login-remember-area").show();
 			$(".login-default-area").hide();
 			$(".login-change").show();
 
@@ -1344,14 +1354,17 @@ appInitial = function(needUpdate){
 			} else {
 				$(".login-ld-phone input").val( rememberData.phone );	//"(" + rememberData.countrycode + ")" + 
 			}
-		}else{
-			// $("#page-registration .login-remeber img").attr("src","images/common/icon/icon_check_gray.png");
-			$(".login-remeber").data("chk",false);
-			$(".login-remeber-area").hide();
+		} else {
+			// $("#page-registration .login-remember img").attr("src","images/common/icon/icon_check_gray.png");
+			rememberDom.data("chk", false);
+			$(".login-remember-area").hide();
 			$(".login-default-area").show();
 			$(".login-change").hide();
 			$(".login-next").removeClass("login-next-adjust");
+
+			rememberDom.click();
 		}
+
 
 		if($.lStorage("_loginAutoChk")){
 			$(".login-auto").find("img").attr("src","images/registration/checkbox_check.png");

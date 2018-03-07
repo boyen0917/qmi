@@ -1,7 +1,7 @@
 var bl;
 var guAll;
 var inviteGuAll;
-var guAllExsit;
+var guAllExist;
 var fbl;
 var isList = true;
 var g_group;
@@ -42,7 +42,7 @@ initContactList = function(){
 	var tmp = $("<div class='row all'><div class='left'></div><div class='right'></div></div>");
 	var left = tmp.find(".left");
 	left.append("<div class='name'>"+$.i18n.getString("COMMON_ALL_MEMBERS")+"</div>");
-	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",Object.keys(guAllExsit).length)+"</div>");
+	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS",Object.keys(guAllExist).length)+"</div>");
 	tmp.find(".right").append("<img src='images/icon/icon_arrow_right.png'/>");
 	rowContainer.append(tmp);
 	rowContainer.find(".row.all").off("click").click( function(){
@@ -98,6 +98,7 @@ initContactList = function(){
 	//search bar
 	var searchBar = $(".contact-search .content");
 	var searchBarInput = searchBar.find(".input");
+
 	searchBarInput.data("searchText","");
 	searchBarInput.off("input").on("input", onSearchInput );
 	// searchBarInput.off("keypress").keypress( function(){
@@ -178,15 +179,26 @@ onSearchInput = function(e){
 	var matchMemList = [];
 	var memCount = 0;
 
+	var reg = new RegExp(str, "i");
+	var blData = QmiGlobal.groups[gi].bl || {};
+
 	sortedMemIdList.forEach(function (memId) {
-		var memberData = guAllExsit[memId];
-		if( memberData.nk.toLowerCase().indexOf(str) >= 0
-			|| (memberData.bl.length > 0 && bl[memberData.bl.split(",")[0].split(".")[0]].bn.toLowerCase().indexOf(str) >= 0)
-			|| memberData.ti.toLowerCase().indexOf(str) >= 0
-			|| (memberData.nk2 || "").toLowerCase().indexOf(str) >= 0){
-			matchMemList.push(memId);
-			memCount++;
-		}	
+		var memberData = guAllExist[memId];
+		if(!memberData) return;
+
+		var isMatch = !![
+				memberData.nk, 
+				memberData.ti, 
+				memberData.nk2, 
+				memberData.pn, 
+				memberData.pn.replace(/\+886/, "0"), 
+				memberData.em
+			].join(QmiGlobal.sepSign).match(reg);
+
+		if(!isMatch) return;
+
+		matchMemList.push(memId);
+		memCount++;
 	});
 
 	//search bl
@@ -412,7 +424,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	//mem
 	var memObject = {};
 	var count = 0;
-	$.each(guAllExsit,function(key,mem){
+	$.each(guAllExist,function(key,mem){
 		for(i=0;i<mem.bl.split(",").length;i++){
 			[mem.bl.split(",")[i].split(".").last()]
 			if( mem.bl.split(",")[i].split(".").last() == bi ){
@@ -551,7 +563,7 @@ showAllMemberPage = function(gn) {
 	subPageBottom.append(subGridPageContent);
 	subPageBottom.append(subRowPageContent);
 	//mem
-	var count = Object.keys(guAllExsit).length;
+	var count = Object.keys(guAllExist).length;
 	var memContainer = generateMemberGrid(sortedMemIdList);
 	var memListContainer = generateMemberList(sortedMemIdList);
 	subGridPageContent.find(".loading-circle").before(memContainer);
@@ -581,14 +593,14 @@ showAllMemberPage = function(gn) {
 }
 
 sortMembers = function (memberIdList) {
-	var newMemberArr = [],
-		adminMemberArr = [],
-		normalMemberListArr = [];
+	var newMemberArr = [];
+	var adminMemberArr = [];
+	var normalMemberListArr = [];
 
 	// 先名字排列，再依據新成員>管理者>一般成員來排列
 	memberIdList.forEach( function(memId){
-		if (isNewMem(guAllExsit[memId])) newMemberArr.push(memId);
-		else if (guAllExsit[memId].ad == 1) adminMemberArr.push(memId);
+		if (isNewMem(guAllExist[memId])) newMemberArr.push(memId);
+		else if (guAllExist[memId].ad == 1) adminMemberArr.push(memId);
 		else normalMemberListArr.push(memId);
 	});
 
@@ -622,7 +634,7 @@ switchListAndGrid = function( dom, subPageBottom, memberKeyList){
 
 generateMemberGrid = function( memberKeyList, memContainer ){
 	var memContainer = memContainer || $("#page-contact_all");
-	var memObject = guAllExsit;
+	var memObject = guAllExist;
 	var memberListHtml = "";
 	var memberIndex = memContainer.find(".contact-mems").data("memberIndex") || 0,
 		endMemberIndex = memberIndex + 500;
@@ -667,7 +679,7 @@ generateMemberGrid = function( memberKeyList, memContainer ){
 
 generateMemberList = function( memberKeyList, memContainer, favCallback ){
 	memContainer = memContainer || $("#page-contact_all");
-	var memObject = guAllExsit;
+	var memObject = guAllExist;
 	var memberListHtml = "";
 	var memberIndex = memContainer.find('.contact-memLists').data("memberIndex") || 0,
 		endMemberIndex = memberIndex + 500;
@@ -682,16 +694,24 @@ generateMemberList = function( memberKeyList, memContainer, favCallback ){
 			memContainer.find(".contact-memLists .loading-circle").show();
 		}
 
+		var blData = QmiGlobal.groups[gi].bl;
+
 		memberListHtml = loadMemberList.reduce(function(memberHtml, memberId) {
 			var memberData = memObject[memberId];
 			var imgUrl = ( memberData.aut && memberData.aut.length>0 ) ? memberData.aut : "images/common/others/empty_img_personal_l.png";
+
+			var bnStr = (memberData.bl || "").split(",").reduce(function(arr, currBp) {
+				var currBn = (blData[currBp.split(".").pop()] || {}).bn;
+				if(currBn) arr.push(currBn)
+				return arr;
+			}, []).join(",");
 
 			var memberElementStr = "<div class='row mem namecard " + ((memberData.ad == 1) ? "admin " : " ")
 			 	+ ((isNewMem(memberData)) ? "new-mem" : "") + "' data-gu='" + memberData.gu 
 			 	+ "' ><div class='left'><img data-url='" + imgUrl + "' src='" + imgUrl 
 			 	+ "' /></div><div class='mid'><div class='name'>" + memberData.nk.replaceOriEmojiCode()
 			 	+ ((memberData.nk2) ? " (" + memberData.nk2.replaceOriEmojiCode() + ")" : "")
-			 	+ "</div><div class='detail'>" + ((memberData.bl == "") ? "" : bl[memberData.bl.split(",")[0].split(".")[0]].bn)
+			 	+ "</div><div class='detail'>" + ((memberData.bl == "") ? "" : bnStr)
 				+ "</div><div class='detail " + ((memberData.ti == "") ? "twoLine" : "") +"'>" 
 				+ ((memberData.ti == "") ? "" : memberData.ti) + "</div></div><div class='right'>&nbsp</div></div>";
 
@@ -805,10 +825,10 @@ initContactData = function(){
 	if( !guAll ) return;
 	inviteGuAll = g_group.inviteGuAll;
 
-	guAllExsit = {};
+	guAllExist = {};
 	$.each( guAll, function(key,obj){
 		if( obj && obj.st==1 ){
-			guAllExsit[key] = obj;
+			guAllExist[key] = obj;
 		// }else {
 		// 	window.testMem = window.testMem || {}
 		// 	window.testMem[obj.nk] = obj;
@@ -831,7 +851,7 @@ initContactData = function(){
     	g_newMemList = {};
     }
 
-	sortedMemIdList = sortMembers(Object.keys(guAllExsit));
+	sortedMemIdList = sortMembers(Object.keys(guAllExist));
 }
 
 /*
@@ -857,7 +877,7 @@ updateFavoritePage = function(){
 	var pageID = "page-contact_favorite";
 	var page = $( "#"+pageID );
 
-	guAllExsit = QmiGlobal.groups[gi].guAll;
+	guAllExist = QmiGlobal.groups[gi].guAll;
 
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
@@ -962,8 +982,8 @@ updateFavoritePage = function(){
 	//mem
 	var memObject = {};
 	var count = 0;
-	$.each(guAllExsit,function(key,mem){
-		if( mem.fav ){
+	$.each(guAllExist,function(key,mem){
+		if( mem.fav && mem.st == 1){
 			count++;
 			memObject[key] = mem;
 		}
@@ -1071,7 +1091,7 @@ showSubFavoritePage = function( fi ){
 	var memObject = {};
 	var currentFavData = {};
 	var count = 0;
-	$.each(guAllExsit,function(key,mem){
+	$.each(guAllExist,function(key,mem){
 		if( mem.fbl && mem.fbl.length>0 ){
 			for(var i=0;i<mem.fbl.length;i++){
 				if( mem.fbl[i]==fi ){
@@ -1214,7 +1234,7 @@ showFavGroupBox = function( subPage, boxOption ){
 showEditFavListPage = function( dom ) {
 	var favoriteList = {};
 	var thisGroup = QmiGlobal.groups[gi];	
-		newGroupMembers = $.extend(true, {}, guAllExsit);
+		newGroupMembers = $.extend(true, {}, guAllExist);
 
 	var favBlock = $(".subpage-contact .row.favorite");
 
@@ -1224,8 +1244,8 @@ showEditFavListPage = function( dom ) {
 		isShowFav: false,
 	};
 
-	for (var gu in guAllExsit) {
-  		if (guAllExsit[gu].fav) favoriteList[gu] = guAllExsit[gu].nk;
+	for (var gu in guAllExist) {
+  		if (guAllExist[gu].fav && guAllExist[gu].st == 1) favoriteList[gu] = guAllExist[gu].nk;
 	}
 
 	dom.data("object_str", JSON.stringify(favoriteList));
@@ -1324,42 +1344,6 @@ showEditFavGroupBox = function( dom ) {
 			}
 
 			updateSubFavoriteGroup(updateList, dom, fi);
-
-			// //沒有變化
-			// if( body.al.length==0 && body.dl.length==0 ) return;
-
-			// ajaxDo(api_name,headers,"put",true,body).complete(function(data){
-			// 	if(data.status == 200){
-			// 		var userData = QmiGlobal.groups;
-			// 		g_group = userData[gi];
-
-			// 		//add fi to mem data
-			// 		guAll = g_group.guAll;
-			// 		for(var i=0; i<body.al.length; i++){
-			// 			var key = body.al[i];
-			// 			guAll[key].fbl.push(fi);
-			// 		}
-			// 		//del fi from mem data
-			// 		for(var i=0; i<body.dl.length; i++){
-			// 			var key = body.dl[i];
-			// 			var index = guAll[key].fbl.indexOf(fi);
-			// 			if( index>=0 ) delete guAll[key].fbl[index];
-			// 		}
-
-			// 		//add fi data to fbl
-			// 		fbl = g_group.fbl;
-			// 		fbl[fi].cnt = memKeys.length;
-			// 		// *--* $.lStorage(ui, userData );
-
-			// 		initContactData();
-			// 		dom.parent().fadeOut();
-			// 		showSubFavoritePage(fi);
-
-			// 		toastShow( $.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_MEMBER_SUCC") );
-			// 	} else {
-			// 		toastShow( $.i18n.getString("MEMBER_EDIT_CUSTOMIZE_GROUP_MEMBER_FAIL") );
-			// 	}
-			// });
 		}
 	});
 }
@@ -1593,7 +1577,18 @@ function showAddMemberPage(){
 		this_btn.addClass("ca-nav-active");
 	});
 	$("#page-contact-addmem .ca-invite").trigger("click");
-	$("#page-contact-addmem .ca-invite-submit").off("click").click( sendInvite );
+	$("#page-contact-addmem .ca-invite-submit").off("click").click(function() {
+		var chk = false;
+		return function() {
+			if(chk) return;
+			chk = true;
+			sendInvite();
+			
+			setTimeout(function() {
+				chk = false;
+			}, 3000);
+		}
+	}());
 
 	countrycodeSelect.selectbox({
 		onOpen: function (inst) {
@@ -1827,57 +1822,58 @@ function sendInvite(){
 			"pn": phone,
 			"nk": nk
 		}], function(data){
-			if( data.status==200 ){
-				// "ul":
-				// [
-				//   {
-				//     "gu": "asdfas-awefnasdf", // Group User Id
-				//     "ik": "+886912345678",  // Invitation Key
-				//     "tp": 0,  // Invitation Type(0: Phone, 1: Email)
-				//     "aj": true  // Already Joined Group ?
-				//   }
-				// ]
-				try{
-					var obj = $.parseJSON(data.responseText);
-					/* ----- TODO ------
-						如果已經邀過了...?
-					   ----- TODO ------ */
-					//mem already in group
-					if( obj.ul[0].aj==true ){
-						toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
-					} else {
-						toastShow( $.i18n.getString("INVITE_SUCC") );
-						$(".cai-name input").val("");
-						$(".cai-num input").val("");
-					}
-					//update inviting list
-					if(!inviteGuAll) inviteGuAll = {};
-					inviteGuAll[obj.ul[0].gu] = {
-						gu: obj.ul[0].gu,
-						ik: obj.ul[0].ik,
-						tp: obj.ul[0].tp,
-						st: 0,
-						nk: nk,
-						pn: phone
-					};
-					showMainContact();
-					updateInvitePending();
-
-					mainPage.querySelector("div.invite-input-number input").value = "";
-					$("#page-contact-addmem .invite-select-countrycode select").selectbox(
-						"change", 
-						"TW",
-						$.i18n.getString("COUNTRY_CODE_TAIWAN")
-					)
-
-
-				} catch(e){
-
-				}
-			} else {
-				toastShow( $.i18n.getString("INVITE_FAIL") );
+			if(data.status !== 200) {
+				inviteFail();
+				return;
 			}
+
+			try {
+				var obj = $.parseJSON(data.responseText);
+
+				if(obj.ful.length) {
+					toastShow(obj.ful[0].ermg || $.i18n.getString("INVITE_FAIL"))
+					return;
+				}
+
+				/* ----- TODO ------
+					如果已經邀過了...?
+				   ----- TODO ------ */
+				//mem already in group
+				if( obj.ul[0].aj==true ){
+					toastShow( $.i18n.getString("INVITE_ALREADY_IN_GROUP") );
+				} else {
+					toastShow( $.i18n.getString("INVITE_SUCC") );
+					$(".cai-name input").val("");
+					$(".cai-num input").val("");
+				}
+				//update inviting list
+				if(!inviteGuAll) inviteGuAll = {};
+				inviteGuAll[obj.ul[0].gu] = {
+					gu: obj.ul[0].gu,
+					ik: obj.ul[0].ik,
+					tp: obj.ul[0].tp,
+					st: 0,
+					nk: nk,
+					pn: phone
+				};
+				showMainContact();
+				updateInvitePending();
+
+				mainPage.querySelector("div.invite-input-number input").value = "";
+				$("#page-contact-addmem .invite-select-countrycode select").selectbox(
+					"change", 
+					"TW",
+					$.i18n.getString("COUNTRY_CODE_TAIWAN")
+				)
+
+
+			} catch(e){inviteFail()}
 	});
+
+
+	function inviteFail() {
+		toastShow( $.i18n.getString("INVITE_FAIL") );
+	}
 }
 
 function sendInviteAPI( this_gi, list, callback ){

@@ -1,32 +1,33 @@
-var ui,		//user id
-	g_room,	//chatRoom
-	ci,		//chatRoom id
-	g_cn,	//聊天室名字
-	g_group,//group
-	at,		//access token
-	g_isEndOfPage = false,	//是否在頁面底端
-	g_isEndOfPageTime = 0,	//捲動到底部過多久時間才會把卷到底的按鈕藏起來
-	g_needsRolling = false,	//是否要卷到頁面最下方？
-	g_msgs = [],			//目前已顯示的訊息ei array
-	g_latestDate = new Date(0),		//最新訊息時間(Date)
-	g_earliestDate = new Date(),	//最舊訊息時間(Date)
-	g_isLoadHistoryMsgNow = false,	//是否正在撈舊訊息
-	g_isEndOfHistory = false,	//是否已經沒有舊訊息
-	g_extraInputStatus = 0,		//其他輸入目前狀態(0:關閉, 2:sticker)
-	pi,		//舊的權限管理機制, 目前一律帶0, permission id for this chat room
-	ti_chat,
-	isUpdatePermission = false,		//目前權限改成用使用者列表控制//是否需要重新取得permission id
-	isGettingPermissionNow = false,	//是否正在取得權限
-	isShowUnreadAndReadTime = true,	//部分團體不顯示已未讀時間
-	window_focus = true,			//目前視窗是否focus中(node webkit only)
-	g_isReadPending = false,		//視窗focus時是否需要送已讀
-	g_tu,	//target user list, 帶給server用來做神奇的s3權限管理
-	g_isFirstTimeLoading = true,	//是否第一次進聊天室	
-	g_currentScrollToDom = null,	//捲動到最上方時會讀取舊訊息, 但視窗應停留在讀取前最後一筆訊息的dom, 用此變數暫存
-	lockCurrentFocusInterval,		//讓視窗停留在最後一筆的interval
-	lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
+var ui;	//user id
+var g_room;	//chatRoom
+var ci;		//chatRoom id
+var g_cn;	//聊天室名字
+var g_group;//group
+var at;		//access token
+var g_isEndOfPage = false;	//是否在頁面底端
+var g_isEndOfPageTime = 0;	//捲動到底部過多久時間才會把卷到底的按鈕藏起來
+var g_needsRolling = false;	//是否要卷到頁面最下方？
+var g_msgs = [];			//目前已顯示的訊息ei array
+var g_latestDate = new Date(0);		//最新訊息時間(Date)
+var g_earliestDate = new Date();	//最舊訊息時間(Date)
+var g_isLoadHistoryMsgNow = false;	//是否正在撈舊訊息
+var g_isEndOfHistory = false;	//是否已經沒有舊訊息
+var g_extraInputStatus = 0;		//其他輸入目前狀態(0:關閉, 2:sticker)
+var pi;		//舊的權限管理機制, 目前一律帶0, permission id for this chat room
+var ti_chat;
+var isUpdatePermission = false;		//目前權限改成用使用者列表控制//是否需要重新取得permission id
+var isGettingPermissionNow = false;	//是否正在取得權限
+var isShowUnreadAndReadTime = true;	//部分團體不顯示已未讀時間
+var window_focus = true;			//目前視窗是否focus中(node webkit only)
+var g_isReadPending = false;		//視窗focus時是否需要送已讀
+var g_tu;	//target user list, 帶給server用來做神奇的s3權限管理
+var g_isFirstTimeLoading = true;	//是否第一次進聊天室	
+var g_currentScrollToDom = null;	//捲動到最上方時會讀取舊訊息, 但視窗應停留在讀取前最後一筆訊息的dom, 用此變數暫存
+var lockCurrentFocusInterval;		//讓視窗停留在最後一筆的interval
+var lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
 var isChatRoom = true;
+var maxMsgLength = 3000;
 
 // 配合init裡面有這個初始化的 function
 var appInitial = function() {
@@ -243,7 +244,6 @@ $(function(){
 					$("#header .count").show();
 				}
 			}
-			$(".extra-content .btn[data-type=invite]").hide();
 			$(".extra-content .btn[data-type=exit]").hide();
 		}else{
 			$("#header .title .text").html(groupCn);
@@ -280,7 +280,7 @@ $(function(){
 		sendBtn.off("click");
 		sendBtn.click(onClickSendChat);
 		var input = $("#footer .contents .input");
-		input.off("keydown").off("keypress");
+		input.off("keydown").off("keypress").off('keyup');
 
 		//press enter to send text
 		input.keypress(function (e) {
@@ -293,13 +293,44 @@ $(function(){
 
 		//adjust typing area height
 		input.off("keydown").keydown(function (e) {
+			console.log(e)
+			var curText = $(this).text();
+			var ctrlDown = (e.ctrlKey || e.metaKey);
+			var isDeleteKey = (e.keyCode == 8 || e.keyCode == 46);
+			var isArrowKey = (new RegExp("^(3[3-9]|4[0-4])$")).test(e.keyCode);
+			var selectText = window.getSelection().toString();
+
+			/*
+				超過3000字且不是
+
+				1. 全選複製剪下貼上
+				2. 倒退鍵和刪除鍵
+				3. 方向鍵
+				4. 選擇字串
+
+				停止輸入
+			*/
+			if (!ctrlDown && !isDeleteKey && !isArrowKey && selectText.length == 0 
+				&& curText.length >= maxMsgLength) {
+				console.log('over 3000 characters @@');
+				e.preventDefault();
+			}
 			setTimeout(updateChatContentPosition, 50);
 		});
-		
+
 		// 偵測貼上事件 避免html 換成text文本
 		input.on("paste",function(e){
+			var curText = $(this).text();
+			var pasteText = e.originalEvent.clipboardData.getData('text')._escape();
+
+			// 貼上的字量加上目前的字量超過3000，貼上的字量就要切掉
+			if (curText.length + pasteText.length > maxMsgLength) {
+				pasteText = pasteText.substring(0, maxMsgLength - curText.length)
+			}
+
 			e.preventDefault();
-			document.execCommand('insertHTML', false, e.originalEvent.clipboardData.getData('text')._escape());
+			document.execCommand('insertText', false, pasteText);
+
 		})
 
 		$(".input").data("h", $(".input").innerHeight());
@@ -335,6 +366,10 @@ $(function(){
 					//編號 方便刪除
 					this_grid.data("file-num", i);
 					this_grid.data("file", file);
+
+					// 上傳檔案
+					// chatProgressBar = new
+
 
 					var reader = new FileReader();
 					reader.onload = function (e) {
@@ -687,44 +722,54 @@ $(function(){
 			registerEditRoomEvent();				
 		});
 
-		$('.onoffswitch input[type=checkbox]').change(function(e) {
+		$('.onoffswitch label.onoffswitch-label').click(function(e) {
+			e.preventDefault();
+
 			var ajaxData = {};
-			var switchName = e.target.id;
-			var isChecked = false;
+			var switchName = e.delegateTarget.htmlFor;
+			var isChecked = !$("#" + switchName).prop("checked");
+			var switchId = "";
 
 			ajaxData.method = "put";
 
-			if($(this).is(':checked')) {
-        		isChecked = true;
-    		}
 			switch (switchName) {
 				case "pushSwitch" :
 					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/notification";
 					ajaxData.body = {cs: isChecked};
-					g_room.cs = isChecked;
+					switchId = "cs";
 					break;
 				case "stickySwitch":
 					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/top";
 					ajaxData.headers = {it: isChecked ? 1 : 0};
-					g_room.it = isChecked ? 1 : 0;
+					switchId = "it"
 					break;
 				case "inviteSwitch":
 					ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/invite";
 					ajaxData.headers = {is: isChecked};
-					g_room.is = isChecked;
+					switchId = "is";
 					break;
 			}
-		    new QmiAjax(ajaxData).complete(function (data) {
-		    	if(switchName == "stickySwitch"){
-		    		if (isChecked) {
-		    			QmiGlobal.operateChatList.roomAddTop(ci);
-		    		} else {
-		    			QmiGlobal.operateChatList.roomDeleteTop(ci);
-		    		}
-		    	}
 
-		    	popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
-		    	// }
+		    new QmiAjax(ajaxData).complete(function (data) {
+		    	if (data.status == 200) {
+		    		if(switchName == "stickySwitch") {
+		    			g_room[switchId] = isChecked ? 1 : 0;
+
+			    		if (isChecked) {
+			    			QmiGlobal.operateChatList.roomAddTop(ci);
+			    		} else {
+			    			QmiGlobal.operateChatList.roomDeleteTop(ci);
+			    		}
+			    	} else {
+			    		g_room[switchId] = isChecked;
+			    	}
+
+			    	$("#" + switchName).prop("checked", isChecked);
+		    		popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+		    	} else {
+		    		var errText = JSON.parse(data.responseText);
+					popupShowAdjust("", errText.rsp_msg);
+		    	}
 		    });
 		});
 
@@ -732,7 +777,6 @@ $(function(){
 
 		// });
 
-		updateChat();
 		
 		sendMsgRead(new Date().getTime())
 
@@ -932,7 +976,10 @@ function onChatDBInit() {
 	lastMsg.append(timeTag);
 	$("#chat-contents").append(lastMsg);
 	$("#chat-contents").append("<div class='tmpMsg'></div>");
-	getHistoryMsg( false );
+	getHistoryMsg(false).then(function () {
+		updateChat();
+	});
+
 	scrollToBottom();
 }
 
@@ -940,6 +987,8 @@ function onChatDBInit() {
 show history chat contents
 **/
 function getHistoryMsg(bIsScrollToTop) {
+	var getChatDbDeferred = $.Deferred();
+
 	if (g_isLoadHistoryMsgNow) {
 		cns.debug("!");
 		return;
@@ -953,9 +1002,8 @@ function getHistoryMsg(bIsScrollToTop) {
 	
 	g_idb_chat_msgs.limit(function (list) {
 		console.log("list", list);
-		var firstDayDiv = $("#chat-contents .chat-date-tag");
-		var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
-		setCurrentFocus( (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null );
+		
+		setCurrentFocus();
 		
 		if (list.length > 0) {
 			//list is from near to far day
@@ -997,6 +1045,8 @@ function getHistoryMsg(bIsScrollToTop) {
 				hideLoading();
 			}
 		}
+
+		getChatDbDeferred.resolve();
 	}, {
 		index: "gi_ci_ct",
 		keyRange: g_idb_chat_msgs.makeKeyRange({
@@ -1014,12 +1064,17 @@ function getHistoryMsg(bIsScrollToTop) {
 		}
 	});
 
+	return getChatDbDeferred.promise();
+
 }
 /**
 紀錄讀取歷史訊息時, 目前最上方的dom
 **/
-function setCurrentFocus(dom){
-	if( dom ) g_currentScrollToDom = dom;
+function setCurrentFocus(){
+	var firstDayDiv = $("#chat-contents .chat-date-tag");
+	var scrollToDiv = (firstDayDiv.length > 0 ) ? firstDayDiv[0] : null;
+	var targetDom = (scrollToDiv) ? $(scrollToDiv).next().children("div:eq(0)")[0] : null;
+	if( targetDom ) g_currentScrollToDom = targetDom;
 }
 /**
 隱藏讀取轉轉轉
@@ -1031,6 +1086,7 @@ function hideLoading() {
 
 	cns.debug("-- hideLoading start --", g_currentScrollToDom);
 	if (g_currentScrollToDom) {
+		console.log('_currentScrollToDom)')
 		if (false == g_isEndOfHistory) {
 			$("#chat-loading-grayArea").show();
 		}
@@ -1039,6 +1095,7 @@ function hideLoading() {
 		g_currentScrollToDom = null;
 
 	} else {
+		console.log('jello)')
 		$("#chat-loading").stop().fadeOut(function () {
 			if (false == g_isEndOfHistory) {
 				$("#chat-loading-grayArea").show();
@@ -1064,8 +1121,10 @@ function op(url, type, data, delegate, errorDelegate) {
 		li: lang
 	}, type, false, data);
 	result.error(function (jqXHR, textStatus, errorThrown) {
+		console.log
+		var rspMsg = JSON.parse(jqXHR.responseText).rsp_msg || "";
 		// // cns.log(textStatus, errorThrown);
-		if (errorDelegate) errorDelegate();
+		if (errorDelegate) errorDelegate(rspMsg);
 	});
 	result.success(function (data, status, xhr) {
 		if (delegate) delegate(data, status, xhr);
@@ -1764,7 +1823,7 @@ function sendMsgText(dom) {
 	function sendMsgImage(dom) {
 		var file = dom.data("file");
 		var tmpData = dom.data("data");
-		var uploadXhr;
+
 		if (null == file) {
 			setTimeout(function () {
 				popupShowAdjust("",
@@ -1790,10 +1849,6 @@ function sendMsgText(dom) {
 			+ " chat-upload-progress' value='0' ></progress><span class='upload-percent'>0%"
 			+ "</span><button class='chat-upload-progress-cancel'>✖</button></div>");
 
-		dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-			uploadXhr.abort();
-		});
-
 		dom.find(".chat-fail-status").hide();
 		qmiUploadFile({
             urlAjax: {
@@ -1808,17 +1863,13 @@ function sendMsgText(dom) {
             },
             tp: 1,
             hasFi: true,
-            progressBar: function () {
-            	uploadXhr = new window.XMLHttpRequest();
-				uploadXhr.upload.addEventListener("progress", function(evt){
-			      	if (evt.lengthComputable) {
-			        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
-				      	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
-			      	}
-			    }, false);
+            progressBar: function() {
+            	var progressBar = new QmiGlobal.ProgressBarConstructor(chatProgressBarInit);
+            	progressBar.barDom.set(dom);
+            	progressBar.init();
+            	return progressBar;
+            }(),
 
-			    return uploadXhr;
-            },
             file: dom.find("div img")[0],
             oriObj: {w: 1280, h: 1280, s: 0.7},
             tmbObj: {w: 480, h: 480, s: 0.6}
@@ -1861,7 +1912,7 @@ function sendMsgText(dom) {
 			} else {
 				dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
 	        	dom.find(".chat-fail-status").show();
-	        	dom.find(".progress-container").remove();
+	        	// dom.find(".progress-container").remove();
 			}
         });
 	}
@@ -1907,36 +1958,12 @@ function sendMsgText(dom) {
             },
             tp: 2,
             hasFi: true,
-            progressBarDom: dom.find(".progress-container"),
-            setAbortFfmpegCmdEvent : function (ffmpegCmd) {
-            	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-	            	dom.find(".chat-msg-load").removeClass("chat-msg-load").addClass("chat-msg-load-error");
-	        		dom.find(".chat-fail-status").show();
-	        		dom.find(".progress-container").remove();
-
-	        		ffmpegCmd.kill();
-	        	});
-            },
-            updateCompressionProgress: function (percent) {
-            	dom.find(".chat-upload-progress").attr("max", 100).attr("value", percent);
-				dom.find(".upload-percent").html(percent + '%');
-            },
-            progressBar: function () {
-            	uploadXhr = new window.XMLHttpRequest();
-
-            	dom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
-            		console.log("upload cancel")
-					uploadXhr.abort();
-				});
-				uploadXhr.upload.addEventListener("progress", function(evt){
-			      	if (evt.lengthComputable) {
-			        	dom.find(".chat-upload-progress").attr("max", 100).attr("value", 80 + Math.floor((evt.loaded / evt.total) * 20));
-				      	dom.find(".upload-percent").html(80 + Math.floor((evt.loaded / evt.total) * 20) + '%');
-			      	}
-			    }, false);
-
-			    return uploadXhr;
-            },
+            progressBar: function() {
+            	var progressBar = new QmiGlobal.ProgressBarConstructor(chatProgressBarInit);
+            	progressBar.barDom.set(dom);
+            	progressBar.init();
+            	return progressBar;
+            }(),
             file: file,
             fileName: file.name,
             oriObj: {w: 1280, h: 1280, s: 0.9}
@@ -2029,17 +2056,24 @@ function sendMsgText(dom) {
             },
             tp: 0,
             hasFi: true,
-            progressBar: function () {
-            	uploadXhr = new window.XMLHttpRequest();
-				uploadXhr.upload.addEventListener("progress", function(evt){
-			      	if (evt.lengthComputable) {
-			        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
-				      	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
-			      	}
-			    }, false);
+            progressBar: function() {
+            	var progressBar = new QmiGlobal.ProgressBarConstructor(chatProgressBarInit);
+            	progressBar.barDom.set(dom);
+            	progressBar.init();
+            	return progressBar;
+            }(),
+            // progressBar: chatProgressBar,
+    //         progressBar: function () {
+    //         	uploadXhr = new window.XMLHttpRequest();
+				// uploadXhr.upload.addEventListener("progress", function(evt){
+			 //      	if (evt.lengthComputable) {
+			 //        	dom.find(".chat-upload-progress").attr("max", evt.total).attr("value", evt.loaded);
+				//       	dom.find(".upload-percent").html(Math.floor((evt.loaded / evt.total) * 100) + '%')
+			 //      	}
+			 //    }, false);
 
-			    return uploadXhr;
-            },
+			 //    return uploadXhr;
+    //         },
             file: file,
             oriObj: {w: 1280, h: 1280, s: 0.9}
         }).done(function(response){
@@ -2096,16 +2130,16 @@ function sendMsgText(dom) {
 	**/
 	function onClickSendChat() {
 		var inputDom = $("#footer .contents .input");
-		// var text = inputDom.val();
-		var text = inputDom.html().replace(/<br\s*\/?>/g,"\n").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+		var msg = inputDom.text();
 		inputDom.html("");
-		if (text.length <= 0) return;
+		
+		if (msg.length <= 0) return;
 		console.log(g_room);
 		updateChatContentPosition();
 
 		// updateChatContentPosition();
 
-		var msg = text.replace(/<br\s*\/?>/g,"\n");
+		
 		// inputDom.val("").trigger('autosize.resize');
 
 		var dom = showUnsendMsg(msg, 0);
@@ -2282,13 +2316,6 @@ function sendMsgText(dom) {
 							}
 						}
 
-						if (g_room.memList[gu].ad == 1) {
-							$(".extra-content .btn[data-type=invite]").show();
-						} else {
-							if (g_room.is) $(".extra-content .btn[data-type=invite]").show();
-							else $(".extra-content .btn[data-type=invite]").hide();
-						}
-
 						$.userStorage(userData);
 
 						checkMemberLeft();
@@ -2362,9 +2389,16 @@ function sendMsgText(dom) {
 			$.i18n.getString("CHAT_LEAVE_CONFIRM"),
 			$.i18n.getString("COMMON_OK"),
 			$.i18n.getString("COMMON_CANCEL"), [function () { //on ok
-				var iAmAdmin = g_room.memList[gu].ad;
+				var chatroomUserList = g_room.memList;
+				var iAmAdmin = chatroomUserList[gu].ad;
 				if (iAmAdmin) {
-					if (g_room.cpc == 1) { //只剩下自己，可以退出
+
+					var otherAdmins = Object.keys(chatroomUserList).filter(function(memId){
+  						return chatroomUserList[memId].ad == 1 && chatroomUserList[memId].gu != gu;
+					})
+
+					//只剩下自己或是已有其他管理員，可以退出
+					if (g_room.cpc == 1 || otherAdmins.length > 0) { 
 						leaveRoomAPI(ci, function () {
 							var userData = $.userStorage();
 							g_group = userData[gi];
@@ -2410,11 +2444,14 @@ function sendMsgText(dom) {
 
 	function leaveRoomAPI(ciTmp, callback) {
 		op("groups/" + gi + "/chats/" + ciTmp + "/users", 'delete',
-			null, function (pData, status, xhr) {
+			null, 
+			function (pData, status, xhr) {
 				cns.debug(status, JSON.stringify(pData));
 				if (callback) callback(pData);
 			},
-			null
+			function (errMsg) {
+				if (errMsg.length > 0) popupShowAdjust("", errMsg);
+			}
 		);
 	}
 
@@ -2447,11 +2484,14 @@ function sendMsgText(dom) {
 	**/
 	function editMemInRoomAPI(ciTmp, sendData, callback) {
 		op("groups/" + gi + "/chats/" + ciTmp, "put",
-			sendData, function (pData, status, xhr) {
+			sendData, 
+			function (pData, status, xhr) {
 				cns.debug(status, JSON.stringify(pData));
 				if (callback) callback(pData);
 			},
-			null
+			function (errMsg) {
+				if (errMsg.length > 0) popupShowAdjust("", errMsg);
+			}
 		);
 	}
 
@@ -2497,7 +2537,7 @@ function sendMsgText(dom) {
 			chatroomSwitch.find("#inviteSwitch").attr("checked", chatRoomData.is);
 
 			$(".header-title img").show();
-
+			page.find(".inviteSetting").show();
 			// 官方帳號有聊天室權限的成員，將邀請成員開關關掉
 			if (g_group.ntp === 2) page.find(".inviteSetting").hide();
 		} else {
@@ -2649,22 +2689,22 @@ function sendMsgText(dom) {
 	    			var adminCheckboxs = $(".adminCheckBox input");
 	    			var adminData = {el: [], dl: []};
 	    			adminCheckboxs.each(function (index, element) {
-	    				var memeberID = $(element).parent().attr("id").split("_")[1];
+	    				var mememberID = $(element).parent().attr("id").split("_")[1];
 	    				var isAdmin = $(element).is(":checked") ? 1 : 0;
-	    				if (isAdmin != g_room.memList[memeberID].ad) {
-	    					g_room.memList[memeberID].ad = isAdmin;
+	    				if (isAdmin != g_room.memList[mememberID].ad) {
+	    					g_room.memList[mememberID].ad = isAdmin;
 	    					if (isAdmin) {
-	    						adminData.el.push(memeberID);
+	    						adminData.el.push(mememberID);
 	    					} else {
-	    						adminData.dl.push(memeberID);
+	    						adminData.dl.push(mememberID);
 	    					}
 	    				}
 	    				// if ($(element).is(":checked")) {
-	    				// 	g_room.memList[memeberID].ad = 1;
-	    				// 	adminData.el.push(memeberID);
+	    				// 	g_room.memList[mememberID].ad = 1;
+	    				// 	adminData.el.push(mememberID);
 	    				// } else {
-	    				// 	g_room.memList[memeberID].ad = 0;
-	    				// 	adminData.dl.push(memeberID);
+	    				// 	g_room.memList[mememberID].ad = 0;
+	    				// 	adminData.dl.push(mememberID);
 	    				// }
 	    			});
 	    			saveTasks.push(new QmiAjax({
@@ -2879,7 +2919,7 @@ function sendMsgText(dom) {
 				isShowBranch: false,
 				isShowSelf: false,
 				isShowAll: false,
-				isShowFav: false,
+				isShowFav: true,
 				isSingleSelect: false,
 				min_count: 1
 			});
@@ -2924,13 +2964,19 @@ function sendMsgText(dom) {
 							updateMemberAPI.complete(function (dataTmp) {
 								var count = Object.keys(memList).length;
 								var newMemList = g_room.memList;
-								g_room.cpc = Object.keys(memList).length;
-								QmiGlobal.operateChatList.roomUpdateNumberOfMember(ci, count);
-								$("#header span.count").html("(" + count + ")");
-								updateChat();
-								updateEditRoomMember(newMemList);
+								if (dataTmp.status == 200) {
+									g_room.cpc = Object.keys(memList).length;
+									QmiGlobal.operateChatList.roomUpdateNumberOfMember(ci, count);
+									$("#header span.count").html("(" + count + ")");
+									updateChat();
+									updateEditRoomMember(newMemList);
 
-								popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+									popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+								} else {
+									var errText = JSON.parse(dataTmp.responseText);
+									popupShowAdjust("", errText.rsp_msg);
+								}
+								
 							});
 
 						} catch(e){
@@ -3024,10 +3070,8 @@ function sendMsgText(dom) {
 
 
 							editMemInRoomAPI(ci, {add:{gul:newList, fl: favList}}, function (data) {
-								// if( data.status==200){
 								getPermition(true);
 								updateChat();
-								// }
 							});
 						} catch (e) {
 							cns.debug(e.message);
@@ -3109,7 +3153,17 @@ function sendMsgText(dom) {
 		}
 		if ( !g_isEndOfHistory && posi <= $("#chat-loading").outerHeight() * 0.5) {
 			// cns.debug("!oooooooooops",g_container.scrollTop());
-			getHistoryMsg(false);
+
+			// 有網路情況下，就去跟server要，不然直接拉db會有漏訊息的問題
+			if (navigator.onLine) {
+				$("#chat-loading-grayArea").hide();
+				$("#chat-loading").show();
+				g_isLoadHistoryMsgNow = true;
+				setCurrentFocus();
+				updateChat(g_earliestDate.getTime(), false);
+			} else {
+				getHistoryMsg(false);
+			}
 			// g_isEndOfPage = false;
 			return;
 		}
@@ -3270,36 +3324,6 @@ function sendMsgText(dom) {
 				}
 			});
 		});
-		//get unread
-		// if (isShowUnreadAndReadTime) {
-		// 	list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-
-
-		// 	getChatReadUnreadApi(gi, ci, rt, 2).complete(function (data) {
-		// 		if (data.status != 200) return false;
-		// 		try {
-		// 			list[1].ml = $.parseJSON(data.responseText).gul;
-
-		// 			dataReadyCnt++;
-		// 			if (isPageReady && dataReadyCnt > 1) {
-		// 				$(".screen-lock").hide();
-		// 				showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
-		// 			}
-		// 		} catch (e) {
-		// 			errorReport(e);
-		// 			chat.removeClass("loadRead");
-		// 			$(".screen-lock").hide();
-		// 		}
-		// 	});
-		// } else {
-		// 	list.push({title: $.i18n.getString("FEED_UNREAD"), clickable: false});
-		// 	dataReadyCnt++;
-		// 	if (isPageReady && dataReadyCnt > 1) {
-		// 		$(".screen-lock").hide();
-		// 		showChatObjectTabShow(gi, title, list, onPageLoad, onDone);
-		// 	}
-		// }
-		
 	}
 
 	/**
@@ -3573,6 +3597,21 @@ function sendMsgText(dom) {
 		}
 	};
 })
+
+function chatProgressBarInit() {
+	var self = this;
+	var barDom = self.barDom.get();
+
+	barDom.find(".chat-upload-progress-cancel").off("click").on("click", function(e) {
+		self.cancel();
+	});
+
+	self.onChange = function(pct) {
+		var currPct = Math.floor((pct || 0)*(100-self.basePct.get())/100)+self.basePct.get();
+		barDom.find(".chat-upload-progress").attr("max", 100).attr("value", currPct);
+      	barDom.find(".upload-percent").html(currPct + '%');
+	}
+}
 
 var checkAuthPeriodically = function() {
 	var chk = false;

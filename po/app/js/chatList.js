@@ -329,12 +329,6 @@ function showChatList(){
 			true,
 			[deleteRoom,memtd]
 		);
-		// var table = $(this).parent().parent().parent();
-		// table.css("width","110%");
-		// table.animate({margin:"-10%"}, 'fast');
-		// $(".subpage-chatList-row td:nth-child(4)")
-		// $(this).show('fast');
-		// $(this).animate({width:"20%"},'fast');
 	});
 
 	$(".update").off("click").click(function(){
@@ -369,11 +363,12 @@ function deleteRoom ( deleteRow ){
 }
 
 function openChatWindow ( giTmp, ci ){
-
 	var chatListDiv = $(".subpage-chatList");
 	var topListDom = $(".top-chatList");
+
 	clearChatListCnt( giTmp, ci );
 	if( windowList.hasOwnProperty(ci) && null != windowList[ci] && false==windowList[ci].closed ){
+		windowList[ci].QmiGlobal.getAppWin().focus();
 		// windowList[ci].focus();
 	} else {
 		var data= {
@@ -388,18 +383,19 @@ function openChatWindow ( giTmp, ci ){
 
 		$.lStorage( "_chatRoom", data );
 
-		if($.lStorage("groupChat")){
+		if($.lStorage("groupChat"))
 			windowList[ci] = window.open("", ci , "width=400, height=600");
-		}else{
-			windowList[ci] = window.open("chat.html?v2.0.0.5", ci , "width=400, height=600");
+		else {
+			var serverPath = window.location.href.split("/").slice(0, -1).join("/") +"/";
+			windowList[ci] = window.open(serverPath +"chat.html?v2.2.0.2", ci , "width=400,height=600");
 		}
 		
 		windowList[ci].chatAuthData = {
-			gi: 		window.gi,
-			auth: 		window.QmiGlobal.auth,
-			groups: 	window.QmiGlobal.groups,
-			companies: 	window.QmiGlobal.companies,
-			companyGiMap: window.QmiGlobal.companyGiMap,
+			gi: 			window.gi,
+			auth: 			window.QmiGlobal.auth,
+			groups: 		window.QmiGlobal.groups,
+			companies: 		window.QmiGlobal.companies,
+			companyGiMap:	window.QmiGlobal.companyGiMap,
 		};
 
 		windowList[ci].mainPageObj = {

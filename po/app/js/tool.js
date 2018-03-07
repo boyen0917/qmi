@@ -389,7 +389,10 @@ QmiGlobal.aesCrypto = {
 }
 
 htmlFormat = function (str, isToCharCode){
-	var urlRegex = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
+	var tlds = 'aaa|aarp|abb|abbott|abogado|ac|academy|accenture|accountant|accountants|aco|active|actor|ad|adac|ads|adult|ae|aeg|aero|af|afl|ag|agency|ai|aig|airforce|airtel|al|alibaba|alipay|allfinanz|alsace|am|amica|amsterdam|an|analytics|android|ao|apartments|app|apple|aq|aquarelle|ar|aramco|archi|army|arpa|arte|as|asia|associates|at|attorney|au|auction|audi|audio|author|auto|autos|avianca|aw|ax|axa|az|azure|ba|baidu|band|bank|bar|barcelona|barclaycard|barclays|bargains|bauhaus|bayern|bb|bbc|bbva|bcg|bcn|bd|be|beats|beer|bentley|berlin|best|bet|bf|bg|bh|bharti|bi|bible|bid|bike|bing|bingo|bio|biz|bj|black|blackfriday|bloomberg|blue|bm|bms|bmw|bn|bnl|bnpparibas|bo|boats|boehringer|bom|bond|boo|book|boots|bosch|bostik|bot|boutique|br|bradesco|bridgestone|broadway|broker|brother|brussels|bs|bt|budapest|bugatti|build|builders|business|buy|buzz|bv|bw|by|bz|bzh|ca|cab|cafe|cal|call|camera|camp|cancerresearch|canon|capetown|capital|car|caravan|cards|care|career|careers|cars|cartier|casa|cash|casino|cat|catering|cba|cbn|cc|cd|ceb|center|ceo|cern|cf|cfa|cfd|cg|ch|chanel|channel|chase|chat|cheap|chloe|christmas|chrome|church|ci|cipriani|circle|cisco|citic|city|cityeats|ck|cl|claims|cleaning|click|clinic|clinique|clothing|cloud|club|clubmed|cm|cn|co|coach|codes|coffee|college|cologne|com|commbank|community|company|compare|computer|comsec|condos|construction|consulting|contact|contractors|cooking|cool|coop|corsica|country|coupon|coupons|courses|cr|credit|creditcard|creditunion|cricket|crown|crs|cruises|csc|cu|cuisinella|cv|cw|cx|cy|cymru|cyou|cz|dabur|dad|dance|date|dating|datsun|day|dclk|de|dealer|deals|degree|delivery|dell|deloitte|delta|democrat|dental|dentist|desi|design|dev|diamonds|diet|digital|direct|directory|discount|dj|dk|dm|dnp|do|docs|dog|doha|domains|download|drive|dubai|durban|dvag|dz|earth|eat|ec|edeka|edu|education|ee|eg|email|emerck|energy|engineer|engineering|enterprises|epson|equipment|er|erni|es|esq|estate|et|eu|eurovision|eus|events|everbank|exchange|expert|exposed|express|fage|fail|fairwinds|faith|family|fan|fans|farm|fashion|fast|feedback|ferrero|fi|film|final|finance|financial|firestone|firmdale|fish|fishing|fit|fitness|fj|fk|flickr|flights|florist|flowers|flsmidth|fly|fm|fo|foo|football|ford|forex|forsale|forum|foundation|fox|fr|fresenius|frl|frogans|frontier|fund|furniture|futbol|fyi|ga|gal|gallery|gallup|game|garden|gb|gbiz|gd|gdn|ge|gea|gent|genting|gf|gg|ggee|gh|gi|gift|gifts|gives|giving|gl|glass|gle|global|globo|gm|gmail|gmbh|gmo|gmx|gn|gold|goldpoint|golf|goo|goog|google|gop|got|gov|gp|gq|gr|grainger|graphics|gratis|green|gripe|group|gs|gt|gu|gucci|guge|guide|guitars|guru|gw|gy|hamburg|hangout|haus|hdfcbank|health|healthcare|help|helsinki|here|hermes|hiphop|hitachi|hiv|hk|hm|hn|hockey|holdings|holiday|homedepot|homes|honda|horse|host|hosting|hoteles|hotmail|house|how|hr|hsbc|ht|hu|hyundai|ibm|icbc|ice|icu|id|ie|ifm|iinet|il|im|immo|immobilien|in|industries|infiniti|info|ing|ink|institute|insurance|insure|int|international|investments|io|ipiranga|iq|ir|irish|is|iselect|ist|istanbul|it|itau|iwc|jaguar|java|jcb|je|jetzt|jewelry|jlc|jll|jm|jmp|jo|jobs|joburg|jot|joy|jp|jpmorgan|jprs|juegos|kaufen|kddi|ke|kerryhotels|kerrylogistics|kerryproperties|kfh|kg|kh|ki|kia|kim|kinder|kitchen|kiwi|km|kn|koeln|komatsu|kp|kpn|kr|krd|kred|kuokgroup|kw|ky|kyoto|kz|la|lacaixa|lamborghini|lamer|lancaster|land|landrover|lanxess|lasalle|lat|latrobe|law|lawyer|lb|lc|lds|lease|leclerc|legal|lexus|lgbt|li|liaison|lidl|life|lifeinsurance|lifestyle|lighting|like|limited|limo|lincoln|linde|link|live|living|lixil|lk|loan|loans|local|locus|lol|london|lotte|lotto|love|lr|ls|lt|ltd|ltda|lu|lupin|luxe|luxury|lv|ly|ma|madrid|maif|maison|makeup|man|management|mango|market|marketing|markets|marriott|mba|mc|md|me|med|media|meet|melbourne|meme|memorial|men|menu|meo|mg|mh|miami|microsoft|mil|mini|mk|ml|mm|mma|mn|mo|mobi|mobily|moda|moe|moi|mom|monash|money|montblanc|mormon|mortgage|moscow|motorcycles|mov|movie|movistar|mp|mq|mr|ms|mt|mtn|mtpc|mtr|mu|museum|mutuelle|mv|mw|mx|my|mz|na|nadex|nagoya|name|natura|navy|nc|ne|nec|net|netbank|network|neustar|new|news|nexus|nf|ng|ngo|nhk|ni|nico|nikon|ninja|nissan|nl|no|nokia|norton|nowruz|np|nr|nra|nrw|ntt|nu|nyc|nz|obi|office|okinawa|om|omega|one|ong|onl|online|ooo|oracle|orange|org|organic|origins|osaka|otsuka|ovh|pa|page|pamperedchef|panerai|paris|pars|partners|parts|party|passagens|pe|pet|pf|pg|ph|pharmacy|philips|photo|photography|photos|physio|piaget|pics|pictet|pictures|pid|pin|ping|pink|pizza|pk|pl|place|play|playstation|plumbing|plus|pm|pn|pohl|poker|porn|post|pr|praxi|press|pro|prod|productions|prof|promo|properties|property|protection|ps|pt|pub|pw|pwc|py|qa|qpon|quebec|quest|racing|re|read|realtor|realty|recipes|red|redstone|redumbrella|rehab|reise|reisen|reit|ren|rent|rentals|repair|report|republican|rest|restaurant|review|reviews|rexroth|rich|ricoh|rio|rip|ro|rocher|rocks|rodeo|room|rs|rsvp|ru|ruhr|run|rw|rwe|ryukyu|sa|saarland|safe|safety|sakura|sale|salon|samsung|sandvik|sandvikcoromant|sanofi|sap|sapo|sarl|sas|saxo|sb|sbs|sc|sca|scb|schaeffler|schmidt|scholarships|school|schule|schwarz|science|scor|scot|sd|se|seat|security|seek|select|sener|services|seven|sew|sex|sexy|sfr|sg|sh|sharp|shell|shia|shiksha|shoes|show|shriram|si|singles|site|sj|sk|ski|skin|sky|skype|sl|sm|smile|sn|sncf|so|soccer|social|softbank|software|sohu|solar|solutions|song|sony|soy|space|spiegel|spot|spreadbetting|sr|srl|st|stada|star|starhub|statefarm|statoil|stc|stcgroup|stockholm|storage|store|studio|study|style|su|sucks|supplies|supply|support|surf|surgery|suzuki|sv|swatch|swiss|sx|sy|sydney|symantec|systems|sz|tab|taipei|taobao|tatamotors|tatar|tattoo|tax|taxi|tc|tci|td|team|tech|technology|tel|telecity|telefonica|temasek|tennis|tf|tg|th|thd|theater|theatre|tickets|tienda|tiffany|tips|tires|tirol|tj|tk|tl|tm|tmall|tn|to|today|tokyo|tools|top|toray|toshiba|total|tours|town|toyota|toys|tp|tr|trade|trading|training|travel|travelers|travelersinsurance|trust|trv|tt|tube|tui|tunes|tushu|tv|tvs|tw|tz|ua|ubs|ug|uk|unicom|university|uno|uol|us|uy|uz|va|vacations|vana|vc|ve|vegas|ventures|verisign|versicherung|vet|vg|vi|viajes|video|viking|villas|vin|vip|virgin|vision|vista|vistaprint|viva|vlaanderen|vn|vodka|volkswagen|vote|voting|voto|voyage|vu|vuelos|wales|walter|wang|wanggou|watch|watches|weather|weatherchannel|webcam|weber|website|wed|wedding|weir|wf|whoswho|wien|wiki|williamhill|win|windows|wine|wme|wolterskluwer|work|works|world|ws|wtc|wtf|xbox|xerox|xin|xperia|xxx|xyz|yachts|yahoo|yamaxun|yandex|ye|yodobashi|yoga|yokohama|youtube|yt|za|zara|zero|zip|zm|zone|zuerich|zw',
+		urlPattern = "(http(s)?:\\/\\/.)?(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.(?:(?:" + tlds + ")(?=[^0-9a-zA-Z@]|$))\\b([-\u00BF-\u1FFF\u2C00-\uD7ff_a-zA-Z0-9@:%_\\+.~#?&//=]*)",
+		urlRegex = new RegExp(urlPattern, 'gi');
+
 	if(str.match(/\&\#\d+\;*/g)){
 		str = str.replace(/\&\#/g,"&#38;&#35;");
   	} 
@@ -613,6 +616,7 @@ qmiUploadFile = function(uploadObj){
 		return chainDef;
 	}, chainDefError.bind("get url fail")).then(function(responseObj) {
 		var chainDef = MyDeferred(),
+			getExifDef = MyDeferred(),
 			s3Obj = responseObj.data,
 			exifObj = {},
 			body = {
@@ -625,32 +629,49 @@ qmiUploadFile = function(uploadObj){
 				si: s3Obj.si,
 				md: s3Obj.md
 			};
-			if(s3Obj.oriFile){
-				EXIF.getData(s3Obj.oriFile, function(){
+
+		(function () {
+			// 圖片
+			if (s3Obj.oriFile) {
+				EXIF.getData(s3Obj.oriFile, function(data){
 					exifObj = EXIF.getAllTags(this);
+					console.log(exifObj)
+					// console.log(exifObj.MaxApertureValue)
+					// console.log(exifObj.MaxApertureValue.valueOf())
 					if(!$.isEmptyObject(exifObj)){
 						body.exif = {
-							"DateTimeOriginal": exifObj.DateTimeOriginal || "",
-							"DateTimeDigitized": exifObj.DateTimeDigitized || "",
-							"LatitudeRef": exifObj.GPSLatitudeRef || "", //緯度
-							"Latitude": toDecimal(exifObj.GPSLatitude) || "", 
-							"LongitudeRef": exifObj.GPSLongitudeRef || "", //經度
-							"Longitude": toDecimal(exifObj.GPSLongitude) || "" 
+							"ApertureValue": exifObj.MaxApertureValue ? exifObj.MaxApertureValue.valueOf() : "",
+							"DateTime": exifObj.DateTime || "",
+							"ExposureTime": exifObj.ExposureTime ? exifObj.ExposureTime.valueOf() : "",
+							"Flash": exifObj.Flash,
+							"FocalLength": exifObj.FocalLength ? (exifObj.FocalLength.numerator + "/" + exifObj.FocalLength.denominator) : "",
+							"Latitude": toDecimal(exifObj.GPSLatitude) || "",
+							"Longitude": toDecimal(exifObj.GPSLongitude) || "",
+							"Make": exifObj.Make || "",
+							"Model": exifObj.Model || "",
+							"WhiteBalance": exifObj.WhiteBalance || "" 
 						}
 					}
+					getExifDef.resolve();
 				});
+			} else { // 影片
+				getExifDef.resolve();
 			}
-		// commit
-		new QmiAjax({
-			apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
-			method: "put",
-			body: body
-		}).success(function(data) {
-			data.fi = s3Obj.fi;
-			data.tp = uploadObj.tp;
-			data.file = uploadObj.file;
-			chainDef.resolve({isSuccess: true, data: data})
-		}).error(chainDef.reject);
+
+			return getExifDef;
+		}()).then(function () {
+			// commit
+			new QmiAjax({
+				apiName: uploadObj.urlAjax.apiName + (uploadObj.hasFi === true ? "/" + s3Obj.fi : "") + "/commit",
+				method: "put",
+				body: body
+			}).success(function(data) {
+				data.fi = s3Obj.fi;
+				data.tp = uploadObj.tp;
+				data.file = uploadObj.file;
+				chainDef.resolve({isSuccess: true, data: data})
+			}).error(chainDef.reject);
+		});
 
 		return chainDef;
 	}, chainDefError.bind("qmi upload s3 fail"))
@@ -666,9 +687,8 @@ qmiUploadFile = function(uploadObj){
 
 // 做 s3 上傳
 qmiUploadS3 = function(uploadObj,s3Obj) {
+	// uploadObj.oriObj 不使用 統一在init設定
 	var allDef = $.Deferred();
-	var tmbObj = uploadObj.tmbObj;
-	var oriObj = uploadObj.oriObj;
 	var uploadDef = $.Deferred();
 	var mediaLoadDef = $.Deferred();
 	var oriFile, tmbFile, mt, si, md, contentType;
@@ -676,6 +696,9 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		s3: { url: s3Obj.s3 || s3Obj.tu },
 		s32: { url: s3Obj.s32 || s3Obj.ou}
 	};
+
+	if(isNotVdoCompress()) 
+		uploadObj.progressBar.vdoCompressDefer.resolve(false);
 
 	switch(uploadObj.tp) {
 		case 0: // 其他類型 檔案上傳
@@ -687,13 +710,13 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			mt = uploadObj.file.type || "text";
 			si = uploadObj.file.size;
 			md = {w:100,h:100,l:100};
-	
+
 			mediaLoadDef.resolve();
 
 			break;
 		case 1: // 圖
-			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, oriObj.w,  oriObj.h,  oriObj.s);
-			var tFile = imgResizeByCanvas(uploadObj.file, 0, 0, tmbObj.w,  tmbObj.h,  tmbObj.s);
+			var oFile = imgResizeByCanvas(uploadObj.file, 0, 0, QmiGlobal.imgCompress.oW,  QmiGlobal.imgCompress.oH,  QmiGlobal.imgCompress.oR);
+			var tFile = imgResizeByCanvas(uploadObj.file, 0, 0, QmiGlobal.imgCompress.tW,  QmiGlobal.imgCompress.tH,  QmiGlobal.imgCompress.tR);
 
 			paramObj.s32.file = oFile.blob;
 			paramObj.s3.file = tFile.blob;
@@ -716,27 +739,10 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			// delete paramObj.s3;
 			contentType = "video/mp4";
 
-			uploadObj.updateCompressionProgress = function(length) {
-				uploadObj.progressBar.set(length);
-			}
-
-			$.when(
-				zipVideoFile(uploadObj), 
-				// 取得截圖
-				function() {
-					var video = document.createElement('video');
-					video.src = URL.createObjectURL(uploadObj.file);
-
-					video.onloadeddata = function() {
-						console.log("load video finished");
-						var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
-						md = {l: Math.floor(video.duration * 1000)};
-						paramObj.s3.file = thumbnailVideo.blob;
-					}
-				}()
-			).done(function (uploadFile) {
+			$.when(zipVideoFile(uploadObj)).done(function (uploadFile) {
 				console.log("zip finished");
-				uploadObj.progressBar.vdoCompressDefer.resolve(true);
+
+				var video = document.createElement('video');
 
 				paramObj.s32.file = uploadFile;
 
@@ -744,16 +750,46 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				uploadObj.basePct = QmiGlobal.vdoCompressBasePct;
 
 				// 傳給外部 commit 使用
-				mt = uploadFile.type;
+				mt = contentType;
 				si = uploadFile.size;
 
-				mediaLoadDef.resolve();
+				video.src = URL.createObjectURL(uploadFile);
+
+				// 壓縮後再截圖，不然原影片不是h264就截不到
+				video.onloadeddata = function() {
+					console.log("load video finished");
+					var thumbnailVideo = getVideoThumbnail([video],0,0,160,160,0.4);
+
+					md = {
+						l: Math.floor(video.duration * 1000),
+						w: video.videoWidth,
+						h: video.videoHeight
+					};
+					paramObj.s3.file = thumbnailVideo.blob;
+
+					uploadObj.progressBar.vdoCompressDefer.resolve(true);
+					mediaLoadDef.resolve();
+				}
+
 			}).fail(function () { // 壓縮失敗
 				paramObj.s32.file = uploadObj.file;
 
 				// 傳給外部 commit 使用
 				mt = uploadObj.file.type;
 				si = uploadObj.file.size;
+				var video = document.createElement('video');
+				video.src = URL.createObjectURL(uploadObj.file);
+
+				// 壓縮後再截圖，不然原影片不是h264就截不到
+				video.onloadeddata = function() {
+					md = {
+						l: Math.floor(video.duration * 1000),
+						w: video.videoWidth,
+						h: video.videoHeight
+					};
+					uploadObj.progressBar.vdoCompressDefer.resolve(false);
+					mediaLoadDef.resolve();
+				}
 			});
 			
 			break;
@@ -762,7 +798,12 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 	
 	(function() {
 		var chainDef = MyDeferred();
-		uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);
+
+		if(uploadObj.progressBar)
+			uploadObj.progressBar.vdoCompressDefer.done(chainDef.resolve);
+		else
+			chainDef.resolve();
+
 		return chainDef;
 	}()).then(function() {
 		var chainDef = MyDeferred();
@@ -770,6 +811,7 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 		return chainDef;
 	}()).then(function() {
 		$.when.apply($, Object.keys(paramObj).reduce(function(arr,key,i) {
+
 			var ajaxArgs = {
 				url: paramObj[key].url,
 				type: 'PUT',
@@ -778,7 +820,6 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 			 	data: paramObj[key].file, 
 				processData: false,
 			}
-			
 			if (uploadObj.progressBar) ajaxArgs.xhr = uploadObj.progressBar.xhr.bind(null, uploadObj.basePct);
 			arr[i] = $.ajax(ajaxArgs);
 			return arr;
@@ -795,16 +836,34 @@ qmiUploadS3 = function(uploadObj,s3Obj) {
 				
 		}).fail(function() {
 			// 上傳s3 失敗
-			allDef.reject({status: 999, isSuccess: false, data: arguments});
+			allDef.reject({
+				status: 999, 
+				isSuccess: false, 
+				data: arguments,
+				isCancel: uploadObj.progressBar 
+					? uploadObj.progressBar.isCancel()
+					: false
+			});
 		});
-	})
+	});
 
 	return allDef.promise();
+
+	function isNotVdoCompress() {
+		// 影片
+		if(uploadObj.tp === 2) return false;
+		// 無進度條
+		if(!uploadObj.progressBar) return false;
+		// 多檔案
+		if(uploadObj.progressBar.filesCnt.get() > 1) return false;
+		return true;
+	}
 } // end of qmiUploadS3
 
 resetDB = function(options){
 	options = options || {};
 	clearBadgeLabel();
+	
 	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
 	if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
 	if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
@@ -823,6 +882,9 @@ resetDB = function(options){
 	(options.removeItemArr || []).forEach(function(str) {
 		localStorage.removeItem(str);
 	});
+
+	// 清除app cache
+	if(QmiGlobal.nwGui) QmiGlobal.nwGui.App.clearCache();
 	
 }
 
@@ -1524,72 +1586,39 @@ setGroupAttributes = function( this_gi, data ){
 //更新團體資訊
 updateGroupAllInfoDom = function( thisGi ){
 	try{
-		var group = QmiGlobal.groups[thisGi];
+		var groupData = QmiGlobal.groups[thisGi];
+		var groupSmDom = $("#page-group-main div.gm-side-menu div.sm-group-area[data-gi="+thisGi+"]");
 
-		//update icon
-		var emptyAuo = "images/common/others/name_card_nophoto_profile.png";
-		var emptyAut = "images/common/others/empty_img_all_l.png";
-		if( group.auo ){
-			$(".polling-group-pic-o[data-gi="+thisGi+"]").attr("src", group.auo);
-		} else {
-			$(".polling-group-pic-o[data-gi="+thisGi+"]").attr("src", emptyAuo);
+		// 團體列表
+		groupSmDom.find(".polling-group-pic-o").attr("src", groupData.auo || "images/common/others/name_card_nophoto_profile.png");
+		groupSmDom.find(".polling-group-pic-t").attr("src", groupData.aut || QmiGlobal.emptyGrpPicStr);
+
+		//管理員圖示
+	    if(groupData.ad == 1)
+	        groupSmDom.find(".sm-icon-host").show();
+	    else
+	        groupSmDom.find(".sm-icon-host").hide();
+
+	    // 團體列表
+		groupSmDom.find(".polling-group-name")
+		.find("div:nth-child(1)").html(groupData.gn._escape()).end()
+		.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", QmiGlobal.getActivedUserNum(thisGi)));
+
+		// 等於當前團體 再做更新ui tab
+		if(gi==thisGi) {
+			// 最左上方 當前團體 
+			$("#page-group-main div.gm-header-left > div.currentGroup").html(groupData.gn)
+
+			updateTab( thisGi );
 		}
-		if( group.aut ){
-			$(".polling-group-pic-t[data-gi="+thisGi+"]").attr("src", group.aut);
-		} else {
-			$(".polling-group-pic-t[data-gi="+thisGi+"]").attr("src", emptyAut);
-		}
 
-		//update name
-		// updateSideMenuContent(thisGi);
-
-		if( gi==thisGi ){
-			//update icon
-			if( group.auo ){
-				$(".polling-group-pic-o.currentGroup").attr("src", group.auo);
-			} else {
-				$(".polling-group-pic-o.currentGroup").attr("src", emptyAuo);
-			}
-			if( group.aut ){
-				$(".polling-group-pic-t.currentGroup").attr("src", group.aut);
-			} else {
-				$(".polling-group-pic-t.currentGroup").attr("src", emptyAut);
-			}
-
-			//update name
-			$(".polling-group-name.currentGroup").html(group.gn._escape());
-			$(".polling-group-description.currentGroup").html(htmlFormat(group.gd));
-
-			// 等於當前團體 再做更新ui tab
-    		updateTab( thisGi );
-		}
 	} catch(e){
 		errorReport(e);
 	}
 }
 
 
-updateSideMenuContent = function(thisGi) {
-	//update name
-	if(QmiGlobal.groups[thisGi] === undefined) return;
-	
-	var groupData = QmiGlobal.groups[thisGi],
-		gn = groupData.gn._escape(),
-		gd = groupData.gd._escape(),
-		ad = groupData.ad;
-	//管理員圖示
-	var tmp = $(".sm-group-area[data-gi="+thisGi+"]");
-    if(ad == 1){
-        tmp.find(".sm-icon-host").show();
-    } else{
-        tmp.find(".sm-icon-host").hide();
-    }
-
-	$(".polling-group-name[data-gi="+thisGi+"]")
-	.find("div:nth-child(1)").html(gn).end()
-	.find("div:nth-child(2)").html($.i18n.getString("COMPOSE_N_MEMBERS", QmiGlobal.getActivedUserNum(thisGi)));
-	$(".polling-group-description[data-gi="+groupData.gi+"]").html(gd);
-}
+updateSideMenuContent = function(thisGi) {}
 
 updateGroupIconDom = function( this_gi ){
 	try{
@@ -2114,7 +2143,7 @@ setBadgeLabel = function(str){
 
 	//nodeJS用, show程式小icon上面的數字
 	try{
-		require('nw.gui').Window.get().setBadgeLabel( str );
+		QmiGlobal.nwGui.Window.get().setBadgeLabel( str );
 	}catch(e){
 		// cns.debug(e);	//必加, 一般瀏覽器require not defined
 	}
@@ -2123,7 +2152,7 @@ setBadgeLabel = function(str){
 clearBadgeLabel = function(){
 	//nodeJS用, show程式小icon上面的數字
 	try{
-		require('nw.gui').Window.get().setBadgeLabel("");
+		QmiGlobal.nwGui.Window.get().setBadgeLabel("");
 	}catch(e){
 		// cns.debug(e);	//必加, 一般瀏覽器require not defined
 	}
@@ -2172,10 +2201,10 @@ myWait = function(variable,type){
 zipVideoFile = function (videoObj) {
 	var transferBlobDef = $.Deferred();
 	try {
-		var ffmpeg = require('fluent-ffmpeg');
-		var fs = require('fs');
-    	var path = require('path');
-    	var spawn = require('child_process').spawn;
+		var ffmpeg = QmiGlobal.nodeModules.ffmpeg;
+		var fs = QmiGlobal.nodeModules.fs;
+    	var path = QmiGlobal.nodeModules.path;
+    	var spawn = QmiGlobal.nodeModules.childProcess.spawn;
     	var tmpDir = process.cwd();
     	var nwDir = path.dirname(process.execPath); //node webkit 根目錄
     	var outputPath = tmpDir + '/video/output.mp4'
@@ -2186,11 +2215,15 @@ zipVideoFile = function (videoObj) {
     	var seconds;　//目前進行的時間
        	var percent; //轉檔百分比;
        	var zipVideoActionDef = $.Deferred();
+       	var isVerticalVideo = false;
        	var getDurationDef = $.Deferred();
 
        	if (!fs.existsSync(tmpDir + '/video')) {
        		fs.mkdirSync(tmpDir + '/video/');
        	}
+
+       	// set qmiUploadFile uploadObj
+       	videoObj.progressBar.ffmpeg.set(command);
 
 	    command.setFfmpegPath(nwDir + '/bin/ffmpeg');
 	    command.setFfprobePath(nwDir + '/bin/ffprobe');
@@ -2198,11 +2231,26 @@ zipVideoFile = function (videoObj) {
 		command.ffprobe(function(err, inputInfo) {
 			// 非h264影片無法播放 需要進行轉檔
 			try {
-				// if(inputInfo.streams[0].codec_name !== "h264")
+				console.log(inputInfo)
+				var videoStream = Array.prototype.find.call(inputInfo.streams, function(stream){
+					return stream.codec_type == "video";
+				});
+
+				if (videoStream) {
+					var ratio = videoStream.display_aspect_ratio.split(":");
+					if (parseInt(ratio[0]) < parseInt(ratio[1])) isVerticalVideo = true;
+
+					if ((ratio[0] == "0") || (ratio[1] == "0")) {
+						console.log("zero")
+						isVerticalVideo = (videoStream.coded_width < videoStream.coded_height);
+					}
+				}
 				getDurationDef.resolve(inputInfo.format.duration);
-				// else
-					// reject();
-			} catch(e) {reject();}
+
+			} catch(e) {
+				console.error("ffmpeg failed:", e);
+				reject();
+			}
 
 			function reject() {
 				getDurationDef.reject();
@@ -2213,10 +2261,20 @@ zipVideoFile = function (videoObj) {
 		$.when(getDurationDef).done(function(duration) {
 			// toastShow("此影片格式不支援 正在進行影片轉檔 如不需要請按取消");
 			command
-			// .duration(duration)
+			.duration(duration)
    			.videoCodec('libx264')
-   			.size('640x480')
-			.outputOptions('-c:a copy')
+   			.audioCodec('aac')
+
+   			if (isVerticalVideo) {
+   				command.outputOptions("-vf scale=360:640,setsar=1")
+   			} else {
+   				command.size('640x?') //寬大於高的影片，不調比例
+   			}
+
+   			command
+   			.on('codecData', function(data) {
+			    console.log(data)
+			})
 			.outputOptions('-r 30')
 			.outputOptions('-refs 2')
 			.outputOptions('-crf 28')
@@ -2238,8 +2296,7 @@ zipVideoFile = function (videoObj) {
 	                seconds = +match[0] * 60 * 60 + +match[1] * 60 + +match[2];
 	                percent = ((seconds / duration) * 80).toFixed();
 	                
-	                if (videoObj.updateCompressionProgress)
-	               	 	videoObj.updateCompressionProgress(percent);
+                	videoObj.progressBar.set(percent);
 	            }
 
 		  	}).on('error', function(err) {
@@ -2249,6 +2306,7 @@ zipVideoFile = function (videoObj) {
 		  		zipVideoActionDef.resolve();
 		  	})
 		  	.save(outputPath)
+
 		});
 
         zipVideoActionDef.done(function () {
@@ -2257,6 +2315,7 @@ zipVideoFile = function (videoObj) {
         		var blob = new Blob([byteArray], {type: 'application/octet-binary'});
         		blob.name = videoObj.file.name;
         		transferBlobDef.resolve(blob);
+
         		
         		fs.unlinkSync(outputPath);
         	});
@@ -2294,6 +2353,7 @@ function getUnreadUserList(AllUserList, readUserList, groupID) {
 }
 
 function riseNotification (icon, title, description, onClickCallback) {
+	console.log("rise on web code")
 	try{
 		var notification = new window.Notification(title, {
 			body: description,
@@ -2423,7 +2483,6 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 		    		liElement.attr("data-gu", taskFinisher.meta.gu);
 		    		// 點擊頭像跳出個人主頁視窗
 		    		liElement.find("img").off("click").on("click", function(e) {
-		    			console.log( $(e.target).parent().attr("data-gu"));
 		    			var target = $(e.target);
 		    			userInfoShow(gi, target.parent().attr("data-gu"));
 		    		});
@@ -2594,17 +2653,234 @@ QmiGlobal.MemberLocateModal.prototype = {
 	}
 }
 
-QmiGlobal.showNotification = function(argObj) {
-	try{
-		if(isChatroomCloseNotification()) return;
-		var notification = new window.Notification(argObj.title, {
-			body: argObj.text,
-			icon: argObj.icon === undefined? "resource/images/default.png": argObj.icon
-		});
-		if (typeof argObj.callback === "function")
-			notification.addEventListener("click", argObj.callback);
+// 上傳(包含多檔案)的流程 所以可能要再改名字 叫progressBar有點狹隘
+QmiGlobal.ProgressBarConstructor = function(init) {
+    var self = this;
+    var vdoCompressDefer = $.Deferred();
+    var basePct = 0;
+    var currCnt = 0;
+    var isCancel = false;
+    var multiUploadProgress = {
+        map: {}, length: 0,
+        getTotal: function() {
+            var self = this;
+            return Object.keys(self.map).reduce(function(total, currId) {
+                return total += self.map[currId].total;
+            }, 0);
+        }
+    };
 
-	}catch(e){console.error("Notification is not supported.", e);}
+    self.multiUploadProgress = multiUploadProgress;
+    
+    self.init = init;
+
+    self.isCancel = function() {return isCancel;}
+
+    self.filesCnt = function() {
+        var cnt = 0;
+        return {
+            get: function() {return cnt;},
+            set: function(n) {cnt = n;}
+        }
+    }();
+
+    self.ffmpeg = function() {
+        var command = null;
+        return {
+            set: function(cmd) {command = cmd;},
+            kill: function() {
+            	if(!command) return null;
+            	command.kill();
+            	command = null;
+            }
+        }
+    }();
+
+    self.barDom = function() {
+        var barDom;
+        return {
+            get: function() {return barDom;},
+            set: function(dom) {barDom = dom;}
+        }
+    }();
+
+    self.basePct = function() {
+        var basePct = 0;
+        return {
+            get: function() {return basePct;},
+            set: function(pct) {basePct = pct;}
+        }
+    }();
+
+    self.vdoCompressDefer = vdoCompressDefer;
+
+    self.uploadXhr = {};
+    self.xhr = function () {
+        var xhrId = new Date().getTime();
+        var uploadXhr = new window.XMLHttpRequest();
+        uploadXhr.upload.addEventListener("progress", function(evt){
+            multiUploadProgress.map[xhrId] = multiUploadProgress.map[xhrId] || {xhr: uploadXhr};
+            multiUploadProgress.map[xhrId].total = evt.total;
+            // 先等壓縮結束
+
+            vdoCompressDefer.done(function(isVdoUploaded) {
+                if(isVdoUploaded)
+                    self.basePct.set(QmiGlobal.vdoCompressBasePct);
+                
+                setTimeout(function() {
+                    var diff = evt.loaded - (multiUploadProgress.map[xhrId].loaded || 0);
+                    if(diff < 0) return;
+                    multiUploadProgress.length += diff;
+                    multiUploadProgress.map[xhrId].loaded = evt.loaded;
+                    var pct = getPct(multiUploadProgress.length / multiUploadProgress.getTotal());
+                    setProgressBarLength(pct);
+                }, 500);
+            });
+                
+        }, false);
+
+        return uploadXhr;
+
+        function getPct(pct) {
+            return Math.floor(pct*100)
+        }
+    };
+
+    self.set = setProgressBarLength;
+
+    self.add = function() {
+        if(self.filesCnt.get() === 0) return;
+        currCnt++;
+        // 先等壓縮結束
+        setTimeout(function() {
+            self.barDom.get().find("span.curr").attr("num", currCnt);
+        }, Math.random()*100 * 5);
+    };
+
+    self.cancel = function() {
+    	isCancel = true;
+
+        self.close();
+        self.ffmpeg.kill();
+
+        // xhr abort 
+        var xhrMap = self.multiUploadProgress.map;
+        Object.keys(xhrMap).forEach(function(id) {
+        	xhrMap[id].xhr.abort();
+        });
+
+    };
+
+    self.close = function() {
+    	try {
+    		self.barDom.get().remove();
+    	} catch(e) {}
+    }
+
+    function setProgressBarLength(pct) {
+        if(typeof self.onChange === "function")
+            self.onChange(pct);
+        else
+            self.barDom.get().find(".bar").css("width", (Math.floor((pct || 0)*(100-self.basePct.get())/100)+self.basePct.get())+"%");
+    }
+}
+
+QmiGlobal.showNotification = function(argObj) {
+	if(isChatroomCloseNotification()) return;
+
+	try {
+		if (process.platform == 'win32') {
+			var utils = require('node-notifier/lib/utils');
+			var WinNotifier;
+			// win 7, win xp
+			if (utils.isLessThanWin8()) {
+				WinNotifier = require('node-notifier').WindowsBalloon;
+			} else { // win 8, win 10
+				WinNotifier = require('node-notifier').WindowsToaster;
+			}
+
+			var notifier = new WinNotifier({
+				withFallback: false, 
+			});
+
+			notifier.notify({
+	    		title: argObj.title,
+	    		message: argObj.text,
+	    		icon: nw.__dirname + "/resource/images/default.ico",
+	    		wait: true,
+	    		appID: " "
+	  		})
+
+			notifier.on('click', argObj.callback);
+
+		} else {
+			// 新版mac
+			var nc = new QmiGlobal.nodeModules.notifier.NotificationCenter()
+
+			nc.notify({
+			  title: argObj.title,
+			  message: argObj.text,
+			  wait: true
+			});
+
+			if (argObj.gi && argObj.ci) 
+				nc.on('click', openChatWindow.bind(null, argObj.gi, argObj.ci));
+			
+			return;
+		}
+		
+	} catch(e) {
+		console.log(e)
+		try{
+			var notification = new window.Notification(argObj.title, {
+				body: argObj.text,
+				icon: argObj.icon === undefined? nw.__dirname + "/resource/images/default.png" : argObj.icon,
+
+			});
+			if (typeof argObj.callback === "function")
+				notification.addEventListener("click", argObj.callback);
+
+		}catch(e){console.error("Notification is not supported.", e);}
+	}
+
+	// try {
+	// 	var notifier = require('node-notifier');
+
+	// 	notifier.notify({
+ //    		title: 'My awesome title',
+ //    		message: 'Hello from node, Mr. User!',
+ //    		icon: nw.__dirname + "/resource/images/default.png",
+ //    		sound: true, // Only Notification Center or Windows Toasters
+ //    		wait: true, // Wait with callback, until user action is taken against notification
+ //    		appID: " "
+ //  		}, function(err, response) {
+ //  			if (err) console.log(err)
+ //  		});
+		// var message = argObj.text || "";
+		// var messageLen = 200;
+
+		// if (message.length > messageLen) {
+  //   		message = message.substring(0, messageLen) + "......";
+  // 		}
+
+		// nwNotify.init(nwGui);
+  //   	nwNotify.setTemplatePath(location.href.substring(0, location.href.lastIndexOf("/")) + '/layout/desktopToast.html');
+	 //    nwNotify.setConfig({
+	 //    	appIcon: nw.__dirname + "/resource/images/default.png",
+	 //    	width: 372,
+	 //    	height: 120,
+	 //        displayTime: 3000000
+	 //    });
+
+	 //    nwNotify.notify({
+  //           title: argObj.title,
+  //           text: message,
+  //           onClickFunc: argObj.callback,
+  //       });
+
+	// }catch(e){console.error("Notification is not supported.", e);}
+
+
 
 	function isChatroomCloseNotification() {
 		if(!argObj.ci) return false;
@@ -2697,4 +2973,30 @@ function checkPasswordAreMatch (elementData, enableBtnName) {
 function getFullName(userData) {
 	return (userData.nk2 && userData.nk2 != "") 
 		? userData.nk + " (" + userData.nk2 + ")" : userData.nk;
+}
+
+function targetListToString (targerList) {
+	//用來過濾重複gu
+    var gu_chk_arr = [];
+    var bi_chk_arr = [];
+    var tu_arr = [];
+    
+    if(targerList.gul){
+        $.each(targerList.gul,function(gu_i,gu_obj){
+            if($.inArray(gu_obj.gu,gu_chk_arr) < 0 ){
+                tu_arr.push(gu_obj.n);
+                gu_chk_arr.push(gu_obj.gu); 
+            }
+        });
+    }
+    if(targerList.bl){
+        $.each(targerList.bl,function(gu_i,bi_obj){
+            if($.inArray(bi_obj.gu,bi_chk_arr) < 0 ){
+                tu_arr.push(bi_obj.bn);
+                bi_chk_arr.push(bi_obj.bi); 
+            }
+        });
+    }
+    
+    return tu_arr.join("、");
 }

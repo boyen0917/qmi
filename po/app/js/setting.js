@@ -134,7 +134,13 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
     
     ajaxDo(api_name,headers,method,true,body).complete(function(data){
     	if(data.status == 200){
-    		removeGroup( this_gi );
+
+    		removeGroup(this_gi, function() {
+    			try {
+    				return JSON.parse(data.responseText).rsp_msg || msg;
+    			} catch(e) {return false;}
+    		}());
+
 	        (QmiGlobal.windowListCiMap[this_gi] || []).forEach(function(thisCi){
                 windowList[thisCi].close();
             })
@@ -143,7 +149,7 @@ function requestLeaveGroup( this_gi, this_gu, callback ){
     });
 }
 
-function removeGroup(thisGi, isFromCompany){
+function removeGroup(thisGi, msg){
 	$(".sm-group-area[data-gi="+thisGi+"]").remove();
 	if( QmiGlobal.groups[thisGi] !== undefined)
 		var rmGroupGn = QmiGlobal.groups[thisGi].gn._escape();
@@ -170,20 +176,14 @@ function removeGroup(thisGi, isFromCompany){
     try{
 		//----- remove from idb -------
 		//chat
-		if( null==g_idb_chat_cnts ){
+		if( null==g_idb_chat_cnts )
 			initChatCntDB( clearChatIDB(thisGi) );
-		} else{
+		else
 			clearChatIDB(thisGi);
-		}
-		//timeline_events
-		// if( null!=idb_timeline_events ){
-		//  			clearTimelineIDB(this_gi);
-		//  		}
-		if(rmGroupGn !== undefined && !isFromCompany) toastShow( $.i18n.getString("GROUP_X_DELETED", rmGroupGn) );
 
-	} catch(e){
-		errorReport(e);
-	}
+		popupShowAdjust("", (msg || $.i18n.getString("GROUP_X_DELETED", rmGroupGn)),true); 
+
+	} catch(e){errorReport(e);}
 }
 
 function clearChatIDB( this_gi, callback ){
@@ -399,11 +399,9 @@ function showGroupInfoPage(){
 	};
 	contentViewshow();
 	rowViewshow();
- 	// gaContent.find(".ga-gr-content.view").show().end()
- 	// 		 .find(".ga-gr-content.edit").hide().end()
- 	// 		 .find(".ga-info-row.view").show().end()
-		// 	 .find(".ga-info-row.edit").hide().end();
 
+	gaContent.off();
+	
     gaContent.on("click","#icon-view-gname", function(){
     	gaContent.find(".ga-gr-content.view").hide().end()
 				 .find(".ga-gr-content.edit").show();
@@ -442,12 +440,7 @@ function showGroupInfoPage(){
 	});
 
 	
-	if(groupImg){
-		$(".ga-avatar-img").attr("src",groupImg);
-	} else{
-		$(".ga-avatar-img").attr("src","images/common/others/name_card_nophoto_profile.png");
-	}
-
+	$(".ga-avatar-img").attr("src", groupImg || "images/common/others/name_card_nophoto_profile.png");
 
 	// if( $(".subpage-groupSetting").is(":visible") ){
 		$(".subpage-groupAbout").css("margin-left","100%");
@@ -460,10 +453,7 @@ function showGroupInfoPage(){
 			    $(".subpage-chatList").hide();
 			    $(".subpage-album").hide();
 		});
-		// $(".subpage-groupAbout").data("lastPage", ".subpage-groupSetting");
-	// } else {
-		// $(".subpage-groupAbout").css("margin-left","0%");
-		// $(".subpage-groupAbout").fadeIn();
+
 		if( $(".subpage-contact").is(":visible") ){
 			$(".subpage-groupAbout").data("lastPage", ".subpage-contact");
 		} else if( $(".subpage-timeline").is(":visible") ){
