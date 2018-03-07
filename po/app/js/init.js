@@ -37,7 +37,6 @@ var base_url = function() {
 
 var base_url = "https://qmi17.mitake.com.tw/";
 
-
 // 先檢查是否為桌機版
 var nwGui = function() {
 	try {
