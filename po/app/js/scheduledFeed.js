@@ -293,7 +293,8 @@ scheduledPost.cancelDatetimeEdit = function () {
 }
 
 scheduledPost.checkIsExpired = function () {
-    return this.postTime - (1200000) < (new Date).getTime();
+    // console.log()
+    return this.postTime < (new Date()).getTime();
 }
 
 scheduledPost.expiredHandler = function () {

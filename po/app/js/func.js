@@ -7930,6 +7930,7 @@ pollingCmds = function(newPollingData){
                         if(item.pm.gi == gi && window.location.hash == "#page-group-main") {
                             polling_arr = false;
                             idbPutTimelineEvent("",false,polling_arr);
+                            getScheduledTimelineList();
                         }
                         
                         // 做一次
