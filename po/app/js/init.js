@@ -50,8 +50,8 @@ window.QmiGlobal = {
 
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
-	// initReady裡面做調整
-	appVer: "2.2.0.3",
+	// initReady裡面做調整 
+	appVer: "2.2.0.3", // 1
 
 	title: "Qmi",
 
