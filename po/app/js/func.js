@@ -3716,7 +3716,7 @@ composeVoteQuesMake = function(this_compose){
     var ques_total = this_compose.data("ques-total");
 
     // #5105 投票題目最多10題
-    if(ques_total >= 9) {
+    if(ques_total >= 10) {
         toastShow($.i18n.getString("ERR_MSG_VOTE_LIMIT"));
         return;
     }
