@@ -835,11 +835,15 @@ QmiGlobal.module.webview = new QmiGlobal.ModuleConstructor({
 	},
 
 	clickLinkHeader: function(args) {
-		var linkEl = document.createElement("a");
-		document.body.appendChild(linkEl);
-	   	linkEl.href= args.data.url;
-	   	linkEl.click();
-	   	document.body.removeChild(linkEl);
+		// 改成app視窗
+
+		window.open(args.data.url);
+
+		// var linkEl = document.createElement("a");
+		// document.body.appendChild(linkEl);
+	 //   	linkEl.href= args.data.url;
+	 //   	linkEl.click();
+	 //   	document.body.removeChild(linkEl);
 	},
 
 	getWebview: function() {
