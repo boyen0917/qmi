@@ -1632,9 +1632,9 @@ div#page-group-main div.gm-header-left:before {
     margin-top: 10px;
 }
 
-
+#page-group-main div.subpage-timeline > div.gm-user-main-area {width: calc(100vw - 250px);}
 #page-group-main .st-personal-area, .other-info-row {
-    width: 100%;
+    width: calc(100vw - 250px);
     background: white;
     border: 1px solid #ccc;
     padding-top: 7px;

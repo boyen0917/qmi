@@ -2239,8 +2239,6 @@ $(function(){
 		e.stopPropagation();
 		$(document).data("namecard-pos",$(window).scrollTop());
 		$(window).scrollTop(0);
-		// $(".user-info-load-area").css("top",$(window).scrollTop());
-		// $(".screen-lock").css("top",$(window).scrollTop());
 
 		//調整
 		$("#page-group-main .gm-content").css("overflow","initial");
@@ -2250,9 +2248,6 @@ $(function(){
 		AddressBook.userInfoShow($(this).data("gi"),$(this).data("gu"));
 	});
 
-	// $(document).on("mouseup",".user-avatar-bar-favorite .fav",function(e){
-	// 	clickUserInfoFavorite( $(this) );
-	// });
 
 	$(".st-feedbox-area,#page-timeline-detail").on("mouseenter",".attach-download",function(){
 		var this_media = $(this);
