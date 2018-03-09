@@ -26,33 +26,27 @@
 	display: none;
 }
 
-.user-info-load-area .user{
+body > div.user-info-load-area .user{
 	position: absolute;
 	-webkit-backface-visibility: hidden;
 	width: 100%;
 }
 
-.user-info-load-area .me.me-rotate {
-	position: absolute;
-	-webkit-transform: rotateY( 180deg );
-	/*-webkit-backface-visibility: hidden;*/
-	width: 100%;
-}
+body > div.user-info-load-area .me {display: none;}
 
-.user-info-load-area .me.me-rotate.adjust {
-	-webkit-transform: rotateY( 0deg );
-}
-
-.user-info-load-area .me.me-rotate.backface-visibility {
-	-webkit-backface-visibility: hidden;
-}
-
-.user-info-load,.me-info-load {
+body > div.user-info-load-area .user-info-load,
+body > div.user-info-load-area .me-info-load {
 	background: #fff;
 	border-radius: 5px;
 	overflow: hidden;
 	margin: 10% auto;
 	position: relative;
+}
+
+body > div.user-info-load-area .user-avatar > img {
+	height: 250px; 
+    width: 350px;
+    object-fit: cover;
 }
 
 .user .user-info-list-area {
@@ -79,28 +73,6 @@
 	}
 }	
 
-/*@media all and (min-width: 501px) {
-    .user-info-load,.me-info-load {
-		width: 400px;
-		height: 650px;
-		margin: 7% auto;
-	}
-
-	.user-info-list-area {
-		width: 350px;
-		padding: 10px 25px;
-		height: 310px;
-	}
-
-	.user-info-list .content {
-		margin: 10px 0 20px;
-	}
-
-	.user-avatar {
-		margin-bottom: 15px;
-	}
-}*/
-
 .user-avatar {
 	width: 100%;
 	height: 250px;
@@ -122,11 +94,10 @@
 
 .user-avatar-bar-favorite{
     padding-left: 10px;
-    height: 30px;
+    height: 35px;
 	cursor: default;
 }
 .user-avatar-bar-favorite .fav{
-	/*display: none;*/
 	height: 30px;
 	display: none;
 	cursor: pointer;
@@ -135,7 +106,7 @@
 .user-avatar-bar-info{
 	background: black;
 	background: rgba(0,0,0,0.5);
-    padding-left: 20px;
+    padding: 5px 0 5px 20px;
 }
 
 .user-avatar-bar .group-avatar {
@@ -174,16 +145,9 @@
 	cursor: pointer;
 }
 
-img.default {
-	width: 350px;
-	margin: 0 auto;
-	display: block;
-	height: 250px;
-	object-fit: cover;
-}
+.user-avatar-bar.me {background: rgba(80,80,80,0.5);}
 
 .user-avatar .user-pic {
-	opacity: 0;
 	position: absolute;
 	top: 0;
 }
@@ -366,6 +330,7 @@ div.user-info-submit-ready:active {
 	right: 8px;
 }
 
+.user-avatar-bar .branch::-webkit-scrollbar {display: none;}
 .user-avatar-bar .branch {
 	opacity: 0.9;
 	font-weight: 100;
@@ -374,13 +339,8 @@ div.user-info-submit-ready:active {
 	display: none;
 	max-width: 220px;
 	white-space: pre-line;
-	/*max-height: 40px;*/
-
-	/*display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-	text-overflow: ellipsis;
-	overflow: hidden;*/
+    max-height: 40px;
+    overflow: scroll;
 }
 
 .user-avatar-bar .title {
