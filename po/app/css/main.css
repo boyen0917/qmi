@@ -6823,3 +6823,5 @@ img.vdo-default:before {}
     margin-left: 40%;
     width: 100px;
 }
+
+#page-timeline-detail > .fixed-initial {z-index: 1000;}
