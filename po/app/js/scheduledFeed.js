@@ -37,6 +37,10 @@ ScheduledFeedModal.prototype.importData = function (postList) {
 
 ScheduledFeedModal.prototype.close = function () {
     this.modal.style.display = 'none';
+
+    if ($('#datetimepicker-modify').data("DateTimePicker")) {
+        $('#datetimepicker-modify').data("DateTimePicker").destroy();
+    }
 }
 
 var scheduledPost = Object.create(HTMLElement.prototype);
@@ -47,55 +51,78 @@ var menuPrototype = Object.create(HTMLUListElement.prototype);
 
 scheduledPost.attachedCallback  = function () {
     // var menu = document.createElement('scheduled-post-menu');
-    var options = document.createElement('scheduled-post-options');
-    var datetimeModify = document.createElement('datetime-modify');
-    var audienceModify = document.createElement('audience-modify');
+    // var options = document.createElement('scheduled-post-options');
+    // var datetimeModify = document.createElement('datetime-modify');
+    // var audienceModify = document.createElement('audience-modify');
+    var datatimeText = new Date(this.postTime).customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#")
+    var targetsText = this.audiences ? targetListToString(this.audiences) : $.i18n.getString('MEMBER_ALL')
+    // var deleteIcon = this.querySelector("div.right>img");
     
-
     this.innerHTML = `
         <div class='header'>
             <div class='left'><img src=${this.authorImage}></div>
-            <div class='right'>
-                <div class='name'>${this.authorName}</div>
+            <div class='center'>
+                <div class='name'>
+                    ${this.authorName}
+                </div>
                 <div class='type'>
                     <img src='images/compose/compose_box_bticon_post.png'>
                     <label>發布</label>
                     <span>${this.type}</span>
                     <mark class='title'>${this.title}</mark>
                 </div>
+                <div class='post-time'>
+                    <div>${datatimeText}</div>
+                </div>
+            </div>
+            <div class='right'>
+                <img src='images/common/icon/delete.png'>
+            </div>
+            <div class='audience'>
+                <img src='images/icon/icon_object.png'>
+                <div>${targetsText}</div>
             </div>
         </div>
         <div class='middle'>${this.briefContent}</div>
         <div class='footer'></div>
     `;
 
-    datetimeModify.setAttribute('currentValue', this.postTime);
+    var options = document.createElement('scheduled-post-options');
+    var deleteIcon = this.querySelector("div.right>img");
+
+    // datetimeModify.setAttribute('currentValue', this.postTime);
     // datetimeModify.setAttribute('max', maxEditTime);
-    audienceModify.currentTargets = this.audiences;
+    // audienceModify.currentTargets = this.audiences;
 
-    datetimeModify.finish = this.updatePostTime.bind(this);
-    datetimeModify.cancel = this.cancelDatetimeEdit.bind(this);
-    datetimeModify.checkIsExpired = this.checkIsExpired.bind(this);
-    datetimeModify.expiredHandler = this.expiredHandler.bind(this);
+    // datetimeModify.finish = this.updatePostTime.bind(this);
+    // datetimeModify.cancel = this.cancelDatetimeEdit.bind(this);
+    // datetimeModify.checkIsExpired = this.checkIsExpired.bind(this);
+    // datetimeModify.expiredHandler = this.expiredHandler.bind(this);
 
-    audienceModify.edit = this.editAudiences.bind(this);
-    audienceModify.checkIsExpired = this.checkIsExpired.bind(this);
-    audienceModify.expiredHandler = this.expiredHandler.bind(this);
+    // audienceModify.edit = this.editAudiences.bind(this);
+    // audienceModify.checkIsExpired = this.checkIsExpired.bind(this);
+    // audienceModify.expiredHandler = this.expiredHandler.bind(this);
 
-    options.publishNow = this.publishNow.bind(this);
-    options.deleteFeed = this.delete.bind(this);
+    options.editScheduleTime = this.openDatatimePickerModal.bind(this);
+    options.editAudiences = this.editAudiences.bind(this);
+    options.currentTargets = this.audiences;
+
+    // console.log(deleteIcon)
+    deleteIcon.addEventListener('click', this.delete.bind(this))
+    // var deleteIcon;
     // menu.showDatetimeInput = this.showDatetimeInput.bind(this);
     // menu.editAudiences = this.editAudiences.bind(this);
 
-    this.datetimeModify = datetimeModify;
-    this.audienceModify = audienceModify;
+    // this.datetimeModify = datetimeModify;
+    // this.audienceModify = audienceModify;
     // this.menu = menu;
     this.options = options;
 
-    this.querySelector("div.header>div.right").appendChild(datetimeModify);
-    this.querySelector("div.header").appendChild(audienceModify);
+    // this.querySelector("div.header>div.center").appendChild(datetimeModify);
+    // this.querySelector("div.header").appendChild(audienceModify);
     // this.querySelector("div.footer").appendChild(menu);
     this.querySelector("div.footer").appendChild(options);
+
 }
 
 scheduledPost.delete = function () {
@@ -157,13 +184,10 @@ scheduledPost.updatePostTime = function (datetime) {
                     document.querySelector('#page-group-main div.scheduled-post-alert>div').click();
                 }
             });
-            // self.datetimeModify.querySelector('div.value').textContent = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
-            // self.datetimeModify.querySelector('div.value').style.display = 'inline-block';
-            // self.datetimeModify.children[1].style.display = 'inline-block';
-            // self.datetimeModify.querySelector('div.modify').style.display = 'none';
-
-            // self.datetimeModify.reset(datetime);
         }
+
+        $('#datetimepicker-modal').hide();
+        $('#datetimepicker-modify').data("DateTimePicker").destroy();
     })
 }
 
@@ -175,114 +199,119 @@ scheduledPost.editAudiences = function (editBtn) {
     var currentBranches = {};
     var currentFavorites = {};
 
-    /*文章存的object_str跟之前(發布對象按鈕、指派管理員、聊天室選擇成員等)不一樣，
-        需要轉成可以讓composeObjectShowDelegate吃下*/
-    if (currentTargets) {
-        if (currentTargets.gul) {
-            currentTargets.gul.forEach(function (member) {
-                currentAudiences[member.gu] = member.n;
-            });
-        }
 
-        if (currentTargets.bl) {
-            currentTargets.bl.forEach(function (branch) {
-                currentBranches[branch.bi] = branch.bn;
-            });
-        }
-    }
+    if (this.checkIsExpired()) {
+        this.expiredHandler();
+    } else {
+        /*文章存的object_str跟之前(發布對象按鈕、指派管理員、聊天室選擇成員等)不一樣，
+            需要轉成可以讓composeObjectShowDelegate吃下*/
+        if (currentTargets) {
+            if (currentTargets.gul) {
+                currentTargets.gul.forEach(function (member) {
+                    currentAudiences[member.gu] = member.n;
+                });
+            }
 
-    $(editBtn).data("object_str", JSON.stringify(currentAudiences));
-    $(editBtn).data("branch_str", JSON.stringify(currentBranches));
-
-    composeObjectShowDelegate($(editBtn), $(editBtn) , {
-        isShowBranch: true,
-        isShowSelf: true,
-        isShowAll: false,
-        isShowFav: true,
-        isDisableOnAlreadyChecked: true,
-    }, function () {
-        var newAudiencesData = $.parseJSON($(editBtn).data("object_str")) || {};
-        var newBranchData = $.parseJSON($(editBtn).data("branch_str")) || {};
-        var newFavoriteData = $.parseJSON($(editBtn).data("favorite_str")) || {};
-        var checkedMemberCount = Object.keys(newAudiencesData).length;
-        var groupMemberNum = QmiGlobal.groups[gi].cnt;
-
-        var thisGi = self.idNumber.split("_")[0];
-        var thisTi = self.idNumber.split("_")[1];
-        var newTargets = {
-            tu: {}
-        };
-        var newTargetNameList = [];
-
-        if (Object.keys(newBranchData).length > 0) {
-            newTargets.tu.bl = [];
-            for (var branchID in newBranchData) {
-                if (!currentBranches.hasOwnProperty(branchID)) {
-                    newTargetNameList.push(newBranchData[branchID]);
-                }
-
-                newTargets.tu.bl.push({
-                    bi: branchID,
-                    bn: newBranchData[branchID]
-                })
+            if (currentTargets.bl) {
+                currentTargets.bl.forEach(function (branch) {
+                    currentBranches[branch.bi] = branch.bn;
+                });
             }
         }
 
-        if (Object.keys(newFavoriteData).length > 0) {
-            newTargets.tu.fl = [];
-            for (var favoriteID in newFavoriteData) {
-                if (!currentFavorites.hasOwnProperty(favoriteID)) {
-                    newTargetNameList.push(newFavoriteData[favoriteID]);
-                }
+        $(editBtn).data("object_str", JSON.stringify(currentAudiences));
+        $(editBtn).data("branch_str", JSON.stringify(currentBranches));
 
-                newTargets.tu.fl.push(newFavoriteData[favoriteID])
-            }
-        }
+        composeObjectShowDelegate($(editBtn), $(editBtn) , {
+            isShowBranch: true,
+            isShowSelf: true,
+            isShowAll: false,
+            isShowFav: true,
+            isDisableOnAlreadyChecked: true,
+        }, function () {
+            var newAudiencesData = $.parseJSON($(editBtn).data("object_str")) || {};
+            var newBranchData = $.parseJSON($(editBtn).data("branch_str")) || {};
+            var newFavoriteData = $.parseJSON($(editBtn).data("favorite_str")) || {};
+            var checkedMemberCount = Object.keys(newAudiencesData).length;
+            var groupMemberNum = QmiGlobal.groups[gi].cnt;
 
-        if (checkedMemberCount > 0) {
-            if (checkedMemberCount == groupMemberNum) {
-                newTargets = {};
-                newTargetNameList.push($.i18n.getString("MEMBER_ALL"));
-            } else {
-                newTargets.tu.gul = [];
-                for (var memberID in newAudiencesData) {
-                    if (!currentAudiences.hasOwnProperty(memberID)) {
-                        newTargetNameList.push(newAudiencesData[memberID]);
+            var thisGi = self.idNumber.split("_")[0];
+            var thisTi = self.idNumber.split("_")[1];
+            var newTargets = {
+                tu: {}
+            };
+            var newTargetNameList = [];
+
+            if (Object.keys(newBranchData).length > 0) {
+                newTargets.tu.bl = [];
+                for (var branchID in newBranchData) {
+                    if (!currentBranches.hasOwnProperty(branchID)) {
+                        newTargetNameList.push(newBranchData[branchID]);
                     }
 
-                    newTargets.tu.gul.push({
-                        gu: memberID,
-                        n: newAudiencesData[memberID]
+                    newTargets.tu.bl.push({
+                        bi: branchID,
+                        bn: newBranchData[branchID]
                     })
                 }
             }
-        }
 
-        new QmiAjax({
-            apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/present/events/" + self.idNumber + "/permission",
-            method: "put",
-            body: newTargets
-        }).complete(function(data){
-            if(data.status == 200){
-                var audienceDiv = self.audienceModify.querySelector("div");
-                var newTargetsStr = newTargetNameList.join('、');
+            if (Object.keys(newFavoriteData).length > 0) {
+                newTargets.tu.fl = [];
+                for (var favoriteID in newFavoriteData) {
+                    if (!currentFavorites.hasOwnProperty(favoriteID)) {
+                        newTargetNameList.push(newFavoriteData[favoriteID]);
+                    }
 
-                if (checkedMemberCount == groupMemberNum) {
-                    audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
-                    self.audienceModify.querySelector("span").style.display = 'none';
-                } else {
-                    audienceDiv.textContent = audienceDiv.textContent + '、' + newTargetsStr;
-                    self.audiences = newTargets.tu;
+                    newTargets.tu.fl.push(newFavoriteData[favoriteID])
                 }
-                
-                if (newTargetsStr.length > 0) {
-                    toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTargetsStr);
-                }
-                
-                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
             }
+
+            if (checkedMemberCount > 0) {
+                if (checkedMemberCount == groupMemberNum) {
+                    newTargets = {};
+                    newTargetNameList.push($.i18n.getString("MEMBER_ALL"));
+                } else {
+                    newTargets.tu.gul = [];
+                    for (var memberID in newAudiencesData) {
+                        if (!currentAudiences.hasOwnProperty(memberID)) {
+                            newTargetNameList.push(newAudiencesData[memberID]);
+                        }
+
+                        newTargets.tu.gul.push({
+                            gu: memberID,
+                            n: newAudiencesData[memberID]
+                        })
+                    }
+                }
+            }
+
+            new QmiAjax({
+                apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/present/events/" + self.idNumber + "/permission",
+                method: "put",
+                body: newTargets
+            }).complete(function(data){
+                if(data.status == 200){
+                    var audienceDiv = self.querySelector("div.audience>div");
+                    var newTargetsStr = newTargetNameList.join('、');
+
+                    if (checkedMemberCount == groupMemberNum) {
+                        audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
+                        self.audienceModify.querySelector("span").style.display = 'none';
+                    } else {
+                        audienceDiv.textContent = audienceDiv.textContent + '、' + newTargetsStr;
+                        self.audiences = newTargets.tu;
+                    }
+                    
+                    if (newTargetsStr.length > 0) {
+                        toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTargetsStr);
+                    }
+                    
+                    timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+                }
+            });
         });
-    });
+    }
 }
 
 scheduledPost.cancelDatetimeEdit = function () {
@@ -292,7 +321,7 @@ scheduledPost.cancelDatetimeEdit = function () {
 }
 
 scheduledPost.checkIsExpired = function () {
-    // console.log()
+    console.log(this.postTime)
     return this.postTime < (new Date()).getTime();
 }
 
@@ -308,6 +337,40 @@ scheduledPost.expiredHandler = function () {
             timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
         }]
     )
+}
+
+scheduledPost.openDatatimePickerModal = function () {
+    var self = this;
+    var datetimepickerModal = $("#datetimepicker-modal");
+    var scheduledDatetimepicker = $('#datetimepicker-modify');
+    var modifyOptions = $("#datetimepicker-modal>div>div.decision>button");
+
+    if (self.checkIsExpired()) {
+        self.expiredHandler();
+    } else {
+        scheduledDatetimepicker.datetimepicker({
+            inline: true,
+            sideBySide: true,
+        });
+
+        datetimepickerModal.find('div.close>img').off('click').on('click', function (e) {
+            datetimepickerModal.hide();
+        });
+
+        scheduledDatetimepicker.data("DateTimePicker").minDate(new Date())
+        scheduledDatetimepicker.data("DateTimePicker").date(new Date(self.postTime));
+
+        modifyOptions[0].addEventListener('click', self.publishNow.bind(self));
+
+        modifyOptions[1].addEventListener('click', function (e) {
+            var selectDatetime = scheduledDatetimepicker.data("DateTimePicker").date()._d;
+            var postTime = selectDatetime.getTime();
+
+            self.updatePostTime(postTime);
+        });
+
+        datetimepickerModal.show();
+    }
 }
 
 datetimeModifyPrototype.attachedCallback = function () {
@@ -436,20 +499,24 @@ audienceModifyPrototype.attachedCallback = function () {
 }
 
 optionsPrototype.attachedCallback = function () {
-    var deleteBtn = document.createElement('button');
-    var modifyBtn = document.createElement('button');
+    var editAudienceBtn = document.createElement('button');
+    var editScheduleTimeBtn = document.createElement('button');
 
-    deleteBtn.className = 'delete';
-    modifyBtn.className = 'modify';
+    editAudienceBtn.textContent = $.i18n.getString('SCHEDULED_POST_EDIT_AUDIENCE');
+    editScheduleTimeBtn.textContent = $.i18n.getString('SCHEDULED_POST_EDIT_SCHEDULED_TIME');
 
-    deleteBtn.textContent = $.i18n.getString('SCHEDULED_POST_DELETE');
-    modifyBtn.textContent = $.i18n.getString('SCHEDULED_POST_POST_NOW');
+    if (this.currentTargets) {
+        editAudienceBtn.addEventListener('click', function (e) {
+            this.editAudiences(e.target);
+        }.bind(this));
+    } else {
+        editAudienceBtn.setAttribute("disabled", true);
+    }
 
-    modifyBtn.addEventListener('click', this.publishNow)
-    deleteBtn.addEventListener('click', this.deleteFeed)
+    editScheduleTimeBtn.addEventListener('click', this.editScheduleTime);
 
-    this.appendChild(deleteBtn);
-    this.appendChild(modifyBtn);
+    this.appendChild(editAudienceBtn);
+    this.appendChild(editScheduleTimeBtn);
 }
 
 menuPrototype.attachedCallback = function () {

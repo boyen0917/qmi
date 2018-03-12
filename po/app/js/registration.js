@@ -115,6 +115,7 @@ appInitial = function(needUpdate){
 			cns.log("close"); //, inst
 		},
 		onChange: function (val, inst) {
+			console.log(val);
 			countryCodeDoms.attr("data-val",val||"");
 			if( "undefined"!=typeof(checkLoginReady) ) checkLoginReady();
 		},
@@ -855,25 +856,25 @@ appInitial = function(needUpdate){
 	//資料設定
 
 	//初始化 datetimepicker
-	$("input.setting-birth-hidden").datetimepicker({
-        maxDate:'+1970/01/02',
-        value:'631152012',
-        timepicker:false,
-        format:'unixtime',
-        onChangeDateTime: function() {
-        	var unixtime = $("input.setting-birth-hidden").val();
-        	var time = new Date($("input.setting-birth-hidden").val()*1000);
-			// var time_format = time.customFormat( "#YYYY# 年 #M# 月 #D# 日" );
-			var time_format = time.toLocaleDateString();
-        	$(".setting-birth input").val(time_format);
+	// $("input.setting-birth-hidden").datetimepicker({
+ //        maxDate:'+1970/01/02',
+ //        value:'631152012',
+ //        timepicker:false,
+ //        format:'unixtime',
+ //        onChangeDateTime: function() {
+ //        	var unixtime = $("input.setting-birth-hidden").val();
+ //        	var time = new Date($("input.setting-birth-hidden").val()*1000);
+	// 		// var time_format = time.customFormat( "#YYYY# 年 #M# 月 #D# 日" );
+	// 		var time_format = time.toLocaleDateString();
+ //        	$(".setting-birth input").val(time_format);
 
-        	if($(".setting-full-name input").val().length > 0){
-				$(".setting-next").addClass("setting-next-ready");
-			}else{
-				$(".setting-next").removeClass("setting-next-ready");
-			}
-        }
-    });
+ //        	if($(".setting-full-name input").val().length > 0){
+	// 			$(".setting-next").addClass("setting-next-ready");
+	// 		}else{
+	// 			$(".setting-next").removeClass("setting-next-ready");
+	// 		}
+ //        }
+ //    });
 
     $(".setting-birth").click(function(){
     	$("input.setting-birth-hidden").datetimepicker("show");
