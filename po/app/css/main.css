@@ -1632,9 +1632,9 @@ div#page-group-main div.gm-header-left:before {
     margin-top: 10px;
 }
 
-
+#page-group-main div.subpage-timeline > div.gm-user-main-area {width: calc(100vw - 250px);}
 #page-group-main .st-personal-area, .other-info-row {
-    width: 100%;
+    width: calc(100vw - 250px);
     background: white;
     border: 1px solid #ccc;
     padding-top: 7px;
@@ -1677,7 +1677,7 @@ div#page-group-main div.gm-header-left:before {
 
 #page-group-main .gm-content::-webkit-scrollbar-track{
     background-color: transparent;
-}*/
+*/}
 
 
 
@@ -2445,6 +2445,8 @@ div#page-group-main div.gm-header-left:before {
 #page-group-main div.st-feedbox-area div.scheduled-post-alert {
 	text-align: center;
 	display: none;
+    position: relative;
+    top: -10px;
 }
 
 #page-group-main div.st-feedbox-area div.scheduled-post-alert>div {
@@ -2607,10 +2609,6 @@ div#page-group-main div.gm-header-left:before {
 }
 .st-sub-box-more-box[data-st-more="del"].deactive img{
 	content: url(../images/icon/icon_timelinebox_set_delete_disable.png);
-}
-
-.st-sub-box-more-box[data-st-more="object"].deactive img{
-	opacity: 0.2;
 }
 
 .st-more-close {
@@ -6749,7 +6747,7 @@ img.vdo-default:before {}
     background: #f1f2f7;
     width: 100%;
     height: 100vh;
-    padding: 30px 50px;
+    padding: 30px 0;
     -webkit-user-select: none;
 }
 
@@ -6811,9 +6809,14 @@ img.vdo-default:before {}
 	background: #ddd;
 }
 
+#page-group-main div.subpage-timeline div.st-sub-box div.st-sub-box-3 > .st-read {
+    cursor: pointer;
+}
+
 #page-tab-object > div.tabObj-content div.mem-remind {
 	position: absolute;
-    width: 50px;
+    padding: 0px 10px;
+    font-size: 13px;
     margin: 20px;
     right: 0;
     top: 0;
@@ -6825,3 +6828,5 @@ img.vdo-default:before {}
     margin-left: 40%;
     width: 100px;
 }
+
+#page-timeline-detail > .fixed-initial {z-index: 1000;}

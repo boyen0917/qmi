@@ -58,7 +58,7 @@ scheduledPost.attachedCallback  = function () {
             <div class='right'>
                 <div class='name'>${this.authorName}</div>
                 <div class='type'>
-                    <img src='http://localhost:8081/devClearChats/po/app/images/compose/compose_box_bticon_post.png'>
+                    <img src='images/compose/compose_box_bticon_post.png'>
                     <label>發布</label>
                     <span>${this.type}</span>
                     <mark class='title'>${this.title}</mark>
@@ -154,7 +154,7 @@ scheduledPost.updatePostTime = function (datetime) {
                 if (posts.length == 0) {
                     self.container.style.display = 'none';
                 } else {
-                    document.querySelector('#page-group-main div.scheduled-post-alert').click();
+                    document.querySelector('#page-group-main div.scheduled-post-alert>div').click();
                 }
             });
             // self.datetimeModify.querySelector('div.value').textContent = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
@@ -185,8 +185,6 @@ scheduledPost.editAudiences = function (editBtn) {
         }
 
         if (currentTargets.bl) {
-            var currentBranchObj = {};
-
             currentTargets.bl.forEach(function (branch) {
                 currentBranches[branch.bi] = branch.bn;
             });
@@ -214,15 +212,13 @@ scheduledPost.editAudiences = function (editBtn) {
         var newTargets = {
             tu: {}
         };
-        var newAudienceNameList = [];
-        var newBranchNameList = [];
-        var newFavoriteList = [];
+        var newTargetNameList = [];
 
         if (Object.keys(newBranchData).length > 0) {
             newTargets.tu.bl = [];
             for (var branchID in newBranchData) {
                 if (!currentBranches.hasOwnProperty(branchID)) {
-                    newBranchNameList.push(newBranchData[branchID]);
+                    newTargetNameList.push(newBranchData[branchID]);
                 }
 
                 newTargets.tu.bl.push({
@@ -236,7 +232,7 @@ scheduledPost.editAudiences = function (editBtn) {
             newTargets.tu.fl = [];
             for (var favoriteID in newFavoriteData) {
                 if (!currentFavorites.hasOwnProperty(favoriteID)) {
-                    newFavoriteData.push(newFavoriteData[favoriteID]);
+                    newTargetNameList.push(newFavoriteData[favoriteID]);
                 }
 
                 newTargets.tu.fl.push(newFavoriteData[favoriteID])
@@ -246,12 +242,12 @@ scheduledPost.editAudiences = function (editBtn) {
         if (checkedMemberCount > 0) {
             if (checkedMemberCount == groupMemberNum) {
                 newTargets = {};
-                newAudienceNameList.push($.i18n.getString("MEMBER_ALL"));
+                newTargetNameList.push($.i18n.getString("MEMBER_ALL"));
             } else {
                 newTargets.tu.gul = [];
                 for (var memberID in newAudiencesData) {
                     if (!currentAudiences.hasOwnProperty(memberID)) {
-                        newAudienceNameList.push(newAudiencesData[memberID]);
+                        newTargetNameList.push(newAudiencesData[memberID]);
                     }
 
                     newTargets.tu.gul.push({
@@ -269,17 +265,20 @@ scheduledPost.editAudiences = function (editBtn) {
         }).complete(function(data){
             if(data.status == 200){
                 var audienceDiv = self.audienceModify.querySelector("div");
-                var newTotalList = newAudienceNameList.join('、') + newBranchNameList.join('、') + newFavoriteList.join('、');
+                var newTargetsStr = newTargetNameList.join('、');
 
                 if (checkedMemberCount == groupMemberNum) {
                     audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
                     self.audienceModify.querySelector("span").style.display = 'none';
                 } else {
-                    audienceDiv.textContent = audienceDiv.textContent + '、' + newTotalList;
+                    audienceDiv.textContent = audienceDiv.textContent + '、' + newTargetsStr;
                     self.audiences = newTargets.tu;
                 }
                 
-                toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTotalList);
+                if (newTargetsStr.length > 0) {
+                    toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTargetsStr);
+                }
+                
                 timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
             }
         });
@@ -293,7 +292,8 @@ scheduledPost.cancelDatetimeEdit = function () {
 }
 
 scheduledPost.checkIsExpired = function () {
-    return this.postTime - (1200000) < (new Date).getTime();
+    // console.log()
+    return this.postTime < (new Date()).getTime();
 }
 
 scheduledPost.expiredHandler = function () {

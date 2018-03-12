@@ -1092,20 +1092,7 @@ $(function(){
 						cns.debug( data.responseText );
 					});
 					break;
-				// case "copy":
-				// 	//get content (title & attachment excluded)
-			 //        var data = this_event.data("event-val");
-			 //        if(data){
-				//     	var stringify = JSON.stringify(data);
-				//     	cns.debug(stringify);
-				// 		copyTextToClipboard( stringify );
-				// 	} else {
-				//     	toastShow("error occurred, null result.");
-				//     }
-				// 	break;
 				case "copyword":
-					//get content (title & attachment excluded)
-					// var data = this_event.data("event-val");
 			        var text = null;
 			        try{
 						// text = data.ml[0].c;
@@ -1126,6 +1113,8 @@ $(function(){
 					var currentTargets = $.parseJSON(this_event.data("object_str"));
 					var groupMemberAll = QmiGlobal.groups[gi].guAll || {}
 					var currentAudiences = {};
+					var currentBranches = {};
+					var currentFavorites = {};
 
 					target.siblings(".st-more-close").click();
 
@@ -1139,65 +1128,94 @@ $(function(){
 						}
 
 						if (currentTargets.bl) {
-
-							var currentBranchObj  = {};
-
-							currentTargets.bl.forEach(function (branch) {
-								for (var memberID in groupMemberAll) {
-									var memberData = groupMemberAll[memberID];
-
-									if (memberData.st == 1) {
-										var branchListStr = memberData.bl;
-
-										if (branchListStr.indexOf(branch.bi) >= 0) {
-											currentAudiences[memberID] = memberData.nk;
-										}
-									}
-								}
-							})
-						}
+				            currentTargets.bl.forEach(function (branch) {
+				                currentBranches[branch.bi] = branch.bn;
+				            });
+				        }
 					}
 
 					target.data("object_str", JSON.stringify(currentAudiences));
+					target.data("branch_str", JSON.stringify(currentBranches));
 
 					composeObjectShowDelegate(target, target, {
-						isShowBranch: false,
+						isShowBranch: true,
 						isShowSelf: true,
 						isShowAll: false,
-						isShowFav: true,
+						isShowFav: false,
 						isDisableOnAlreadyChecked: true,
 					}, function () {
 						var newTargetData = $.parseJSON(target.data("object_str")) || {};
-
+						var newBranchData = $.parseJSON(target.data("branch_str")) || {};
+        				var newFavoriteData = $.parseJSON(target.data("favorite_str")) || {};
+						// var groupMemberNum = QmiGlobal.groups[gi].cnt;
+						var checkedMemberCount = Object.keys(newTargetData).length
 						var event_status = this_event.data("event-val");
 					    var this_ei = this_event.data("event-id");
 					    var this_gi = this_ei.split("_")[0];
 					    var this_ti = this_ei.split("_")[1];
-					    var newAudienceNameList = [];
+					    var newTargetNameList = [];
+					    var newTargets = {
+				            tu: {}
+				        };
 
-						currentTargets.gul = [];
+						if (Object.keys(newBranchData).length > 0) {
+				            newTargets.tu.bl = [];
+				            if (!currentTargets.bl) {
+			            		currentTargets.bl = [];
+			            	}
+				            for (var branchID in newBranchData) {
+				                if (!currentBranches.hasOwnProperty(branchID)) {
+				                    newTargetNameList.push(newBranchData[branchID]);
+				                    newTargets.tu.bl.push({
+					                    bi: branchID,
+					                    bn: newBranchData[branchID]
+					                })
 
-						for (var memberID in newTargetData) {
-							if (!currentAudiences.hasOwnProperty(memberID)) {
+					                currentTargets.bl.push({
+										bi: branchID,
+					                    bn: newBranchData[branchID]
+									})
+				                }
+				            }
+				        }
 
-								newAudienceNameList.push(newTargetData[memberID]);
+						if (checkedMemberCount > 0) {
+			            	newTargets.tu.gul = [];
+			            	if (!currentTargets.gul) {
+			            		currentTargets.gul = [];
+			            	}
+
+							for (var memberID in newTargetData) {
+								if (!currentAudiences.hasOwnProperty(memberID)) {
+									newTargetNameList.push(newTargetData[memberID]); 
+									newTargets.tu.gul.push({
+										gu: memberID,
+										n: newTargetData[memberID]
+									})
+
+									currentTargets.gul.push({
+										gu: memberID,
+										n: newTargetData[memberID]
+									})
+								}
 							}
-
-							currentTargets.gul.push({
-								gu: memberID,
-								n: newTargetData[memberID]
-							})
 						}
 						
 						new QmiAjax({
 							apiName: "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/content/permission",
 							method: "put",
-							body: currentTargets
+							body: newTargets
 						}).complete(function(data){
 					        if(data.status == 200){
+					        	var newTargetsStr = newTargetNameList.join('、');
+
 								this_event.data("object_str", JSON.stringify(currentTargets));
-								toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newAudienceNameList.join(' 、 '))
-					        	this_event.find(".st-sub-box-1-footer").append("、" + newAudienceNameList.join('、')); 
+
+								if (newTargetsStr.length > 0) {
+									toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTargetsStr)
+					        	}
+
+					        	this_event.find(".st-sub-box-1-footer").append("、" + newTargetsStr); 
 					        }
 					    });
 					});
@@ -1247,8 +1265,6 @@ $(function(){
 					break;
 			}
 
-			//var edit_pic = "image"
-			// $(".feed-compose").addClass("feed-compose-click");
 			$(".feed-compose-area").css("opacity","");
 			$(".feed-compose-area").slideDown();
 			$(".feed-compose-area-cover").show();
@@ -1296,13 +1312,8 @@ $(function(){
 	//為了排除複製 滑鼠按下少於0.1秒 判斷為click  暫時不做 
 	$(document).on("mousedown",".st-sub-box-1, .st-sub-box-2, .st-sub-box-3",function(e){
 		var this_event = $(this);
-		if (this_event.data("trigger") === undefined){
-			this_event.data("trigger",true);
-		}
-		// this_event.data("trigger",true);
-		// setTimeout(function(){
-		// 	this_event.data("trigger",false);
-		// },100);
+		if (this_event.data("trigger")) return;
+		this_event.data("trigger",true);
 	});
 
 	$(document).on("mouseup",".st-sub-box-1, .st-sub-box-2",function(e){
@@ -1382,6 +1393,7 @@ $(function(){
 			}
 		});
 		
+		console.log('detailTimelineContentMake')
 		//單一動態詳細內容
         getEventDetail(this_ei).complete(function(data){
         	if(data.status != 200) return false;
@@ -1410,53 +1422,28 @@ $(function(){
 		e.stopPropagation();
 	});
 
+	$("#page-group-main").on("click", ".st-sub-box-2-attach-area a", function (e) {
+		e.stopPropagation();
+	})
+
 	$("#page-group-main").on("click", ".st-sub-box-2-attach-area", function (e) {
 		var thisEvent = $(this).parents(".st-sub-box");
+		var currData = thisEvent.data("event-val");
+		// 已讀就不做事
+		if(currData.meta.ir) return;
+
+		// 存已讀
+		currData.meta.ir = true;
+		thisEvent.data("event-val", currData);
+
 		var eventId = thisEvent.data("event-id");
-		var tp = thisEvent.data("timeline-tp");
 
-		if (thisEvent.find("div.st-box2-more-desc").is(":visible")) {
-			thisEvent.find("div.st-box2-more-desc").removeClass("line-clamp")
-		} else {
-			thisEvent.find("div.st-sub-box-2-content").removeClass("line-clamp")
-		}
+		// 已讀
+		getEventDetail(eventId);
 
-		getThisTimelinePart(thisEvent,1,function(data){
-			if(!data.responseText) return false;
-
-			var epl = $.parseJSON(data.responseText).epl;
-            
-			if(typeof epl != "undefined" && epl.length > 0){
-				var parti_list = [];
-				$.each(epl,function(i,val){
-					parti_list.push(val.gu);
-				});
-				// 存回 陣列
-				thisEvent.data("parti-list",parti_list);
-				thisEvent.data("parti-like",epl);
-				// 編輯讚好區域
-				detailLikeStringMake(thisEvent);
-			}
-
-			thisEvent.find("div.st-reply-like-area").show();
-
-		});
-		
-		//單一動態詳細內容
-        getEventDetail(eventId).complete(function(data){
-        	if(data.status != 200) return false;
-
-        	var eventData = $.parseJSON(data.responseText).el;
-
-        	eventContentDetail(thisEvent, eventData);
-        	
-    		//detail timeline message內容
-			detailTimelineContentMake(thisEvent, eventData, null, undefined);
-
-			timelineUpdateTime();
-
-			thisEvent.data("detail-content",true);
-		});
+		//已讀亮燈 & 隱藏未讀提示
+	    thisEvent.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")
+	    thisEvent.find("div.timeline-box-hint").hide();
 	})
 
 	//----------------------------------- compose-貼文 ---------------------------------------------
@@ -2181,8 +2168,6 @@ $(function(){
 		e.stopPropagation();
 		$(document).data("namecard-pos",$(window).scrollTop());
 		$(window).scrollTop(0);
-		// $(".user-info-load-area").css("top",$(window).scrollTop());
-		// $(".screen-lock").css("top",$(window).scrollTop());
 
 		//調整
 		$("#page-group-main .gm-content").css("overflow","initial");
@@ -2192,9 +2177,6 @@ $(function(){
 		AddressBook.userInfoShow($(this).data("gi"),$(this).data("gu"));
 	});
 
-	// $(document).on("mouseup",".user-avatar-bar-favorite .fav",function(e){
-	// 	clickUserInfoFavorite( $(this) );
-	// });
 
 	$(".st-feedbox-area,#page-timeline-detail").on("mouseenter",".attach-download",function(){
 		var this_media = $(this);
