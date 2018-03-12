@@ -6809,9 +6809,14 @@ img.vdo-default:before {}
 	background: #ddd;
 }
 
+#page-group-main div.subpage-timeline div.st-sub-box div.st-sub-box-3 > .st-read {
+    cursor: pointer;
+}
+
 #page-tab-object > div.tabObj-content div.mem-remind {
 	position: absolute;
-    width: 50px;
+    padding: 0px 10px;
+    font-size: 13px;
     margin: 20px;
     right: 0;
     top: 0;
