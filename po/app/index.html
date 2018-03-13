@@ -6,6 +6,8 @@
         <title></title>
 
         <link rel="stylesheet" href="../css/jquery.mobile-1.3.2.min.css?v2.2.0.3" />
+        <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+        <link rel="stylesheet" href="datepicker/bootstrap-datetimepicker.min.css">
         <link rel="stylesheet" href="css/main.css?v2.2.0.3" />
         <link rel="stylesheet" href="css/nameCard.css?v2.2.0.3">
         <link rel="stylesheet" href="css/chatList.css?v2.2.0.3" />
@@ -24,9 +26,13 @@
         <script src="js/ga.js?v2.2.0.3"></script>
 
         <script src="../js/jquery.js?v2.2.0.3"></script>
-        <script src="plugins/jquery.selectbox/js/jquery-1.7.2.min.js?v2.2.0.3"></script>
+        
+        <!-- <script src="plugins/jquery.selectbox/js/jquery-1.7.2.min.js?v2.2.0.3"></script> -->
         <script src="plugins/jquery.selectbox/js/jquery.selectbox.min.js?v2.2.0.3"></script>
 
+        <script src="bootstrap/bootstrap.min.js"></script>
+        <script src="plugins/moment.min.js?v2.2.0.3"></script>
+        <script src="datepicker/bootstrap-datetimepicker.min.js?v2.2.0.3"></script>
 
         <script src="../js/jquery.mobile-1.3.2.min.js?v2.2.0.3"></script>
         <script type="text/javascript" src="../js/jquery.i18n.js?v2.2.0.3"></script>
@@ -93,6 +99,7 @@
         <!-- exif  -->
         <script src="plugins/exif/exif.min.js?v2.2.0.3"></script>
         <script src="plugins/exif/piexif.min.js?v2.2.0.3"></script>
+
     </head>
     <body>
         <script language="javascript" src="https://webapi.amap.com/maps?v=1.3&key=test" async></script>
@@ -113,7 +120,7 @@
                             <div class="login-ld-phone">
                                 <div class="login-ld-countrycode">
                                     <select name="Country Code" data-role="none" tabindex="1">
-                                        <option SELECTED data-code="+886" value="TW" data-textid="COUNTRY_CODE_TAIWAN"></option>
+                                        <option data-code="+886" value="TW" data-textid="COUNTRY_CODE_TAIWAN"></option>
                                         <option data-code="+86" value="CN" data-textid="COUNTRY_CODE_CHINA"></option>
                                         <option data-code="+1" value="NANP" data-textid="NEW_COUNTRYCODE_1"></option>
                                         <option data-code="+7" value="RU" data-textid="NEW_COUNTRYCODE_RUSSIA"></option>
@@ -283,7 +290,7 @@
                         <img src="images/common/icon/icon_arrow_next.png"/> -->
                         <div class="sbContainer">
                             <select name="Country Code" data-role="none" tabindex="1">
-                                <option SELECTED data-code="+886" value="TW" data-textid="COUNTRY_CODE_TAIWAN"></option>
+                                <option data-code="+886" value="TW" data-textid="COUNTRY_CODE_TAIWAN"></option>
                                 <option data-code="+86" value="CN" data-textid="COUNTRY_CODE_CHINA"></option>
                                 <option data-code="+1" value="NANP" data-textid="NEW_COUNTRYCODE_1"></option>
                                 <option data-code="+7" value="RU" data-textid="NEW_COUNTRYCODE_RUSSIA"></option>
@@ -821,7 +828,7 @@
                             <div class="scheduled-post-alert">
                                 <div>
                                     <span></span>
-                                    <img src="images/icon/icon_arrow_right.png"/ >
+                                    <i></i>
                                 </div>
                             </div>
                             <div class="st-feebox-area-container">
@@ -1608,5 +1615,19 @@
         <div id="recv-sync-sticker-signal"></div>
         <div id="recv-chatroom-focus" class="sm-cl-count"></div>
         <div id="recv-sync-chat-list"></div>
+        <div id="datetimepicker-modal">
+            <div>
+                <div class="close">
+                    <img src='images/common/icon/bt_close_activity.png'>
+                </div>
+                <div class='datetimepicker' id='datetimepicker-modify'>
+                    
+                </div>
+                <div class='decision'>
+                    <button data-textid='SCHEDULED_POST_POST_NOW'></button>
+                    <button data-textid='SCHEDULED_POST_DONE'></button>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

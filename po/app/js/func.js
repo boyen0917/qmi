@@ -2639,76 +2639,52 @@ composeContentMake = function (compose_title){
             }
         })
 
-
         //datetimepicker
         if(init_datetimepicker){
             setDateTimePicker(this_compose);
         }
 
         var scheduledTimeButton = this_compose.find("div.cp-content-schedule>span");
-        var datetimeInput = this_compose.find("input[type='datetime-local']");
+        var datetimepickerModal = $("#datetimepicker-modal");
+        var scheduledDatetimepicker = $('#datetimepicker-modify');
+        var publishNow = true;
 
-        scheduledTimeButton.click(function () {
-
-            $(this).hide();
-            var now = new Date();
-
-            var minTime = now.customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
-            var maxTime = new Date(now.setFullYear(now.getFullYear() + 20)).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
-
-            this_compose.find("div.schedule-datetime-option").show();
-            datetimeInput.show();
-            datetimeInput[0].focus()
-            datetimeInput.attr("min", minTime);
-            datetimeInput.attr("max", maxTime);
-
-            // console.log(datetimeInput[0].value)
-            if (datetimeInput[0].value == "") {
-                datetimeInput.attr("value", minTime);
-            } else {
-                if (new Date(datetimeInput[0].value).getTime() < new Date(minTime).getTime()) {
-                    datetimeInput.attr("value", minTime);
-                }
-            }
-
-            datetimeInput.off('change').on('change', function (e) {
-                var target = e.target;
-                var validityState = target.validity;
-
-                if (!validityState.valid) {
-                    datetimeInput.attr("value", target.defaultValue);
-                }
-            })
+        scheduledDatetimepicker.datetimepicker({
+            inline: true,
+            sideBySide: true,
+            minDate: new Date()
         });
 
-        this_compose.find("div.schedule-datetime-option>span").click(function (e) {
-            if ($(this).index() == 0) {
-                // 0.14.7 node webkit 的new Date參數代入ISO String會有時差，只好重設
-                var datetimeStr = datetimeInput[0].value;
-                var [fullDate, time] = datetimeStr.split("T");
-                var [year, month, date] = fullDate.split("-");
-                var [hour, minute] = time.split(":");
+        scheduledDatetimepicker.data("date", "");
 
-                var newDate = new Date()
-                newDate.setFullYear(year);
-                newDate.setMonth(month - 1);
-                newDate.setDate(date);
-                newDate.setHours(hour);
-                newDate.setMinutes(minute);
+        scheduledTimeButton.off('click').on('click', function () {
+            var currentDatetime = publishNow ? new Date() : scheduledDatetimepicker.data("DateTimePicker").date()
+            var modifyOptions = $("#datetimepicker-modal>div>div.decision>button");
 
-                var scheduledTime = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+            datetimepickerModal.show();
+            
+            scheduledDatetimepicker.data("DateTimePicker").date(currentDatetime)
 
-                scheduledTimeButton.text(scheduledTime);
-                datetimeInput.data('value', newDate.getTime());
-            } else {
+            datetimepickerModal.find('div.close>img').off('click').on('click', function (e) {
+                datetimepickerModal.hide();
+            });
+
+            modifyOptions.eq(0).off('click').on('click', function (e) {
                 scheduledTimeButton.text($.i18n.getString("SCHEDULED_POST_POST_NOW"));
-                datetimeInput.data('value', 0);
-            }
+                datetimepickerModal.hide();
+                scheduledDatetimepicker.data("date", "");
+                publishNow = true;
+            });
 
-            this_compose.find("div.schedule-datetime-option").hide();
-            datetimeInput.hide()
+            modifyOptions.eq(1).off('click').on('click', function (e) {
+                var selectDatetime = scheduledDatetimepicker.data("DateTimePicker").date()._d;
+                var formatDateime = selectDatetime.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
 
-            this_compose.find("div.cp-content-schedule>span").show();
+                scheduledTimeButton.text(formatDateime);
+                datetimepickerModal.hide();
+
+                publishNow = false;
+            })
         });
     }));
 
@@ -2801,11 +2777,11 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
     }
 
     if (thisComposeObj.parent().hasClass("cp-work-item")) {
-        objData = $.parseJSON(thisComposeObj.data("object_str")) || {};
+        objData = $.parseJSON(thisComposeObj.data("object_str") || "{}");
     } else {
-        objData = $.parseJSON(thisCompose.data("object_str")) || {};
-        branchData = $.parseJSON(thisCompose.data("branch_str")); 
-        favoriteData = $.parseJSON(thisCompose.data("favorite_str")); 
+        objData = $.parseJSON(thisCompose.data("object_str") || "{}") || {};
+        branchData = $.parseJSON(thisCompose.data("branch_str") || "{}"); 
+        favoriteData = $.parseJSON(thisCompose.data("favorite_str") || "{}"); 
     }
 
     var visibleMemList = guList.filter(function(gu) {
@@ -3544,7 +3520,7 @@ setDateTimePicker = function(this_compose){
             var unixtime = Math.round(milliseconds/1000);
             
             //設定 datetimepicker
-            start_input.datetimepicker({
+            start_input.jqueryUiDatetimepicker({
                 minDate: 0,
                 format:'unixtime',
                 value: unixtime
@@ -3556,10 +3532,10 @@ setDateTimePicker = function(this_compose){
             //設定 datetimepicker 前 先destroy 才不會錯亂
             var end_input_val = end_input.val()*1;
 
-            end_input.datetimepicker("destroy");
+            end_input.jqueryUiDatetimepicker("destroy");
 
             //初始化 datetimepicker
-            this_compose.find("input.cp-datetimepicker-end").datetimepicker({
+            this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
                 minDate: 0  ,
                 format:'unixtime',
                 value:end_input_val,
@@ -3581,7 +3557,7 @@ setDateTimePicker = function(this_compose){
     });
 
     //初始化 datetimepicker
-    this_compose.find("input.cp-datetimepicker-start").datetimepicker({
+    this_compose.find("input.cp-datetimepicker-start").jqueryUiDatetimepicker({
         minDate: 0  ,
         format:'unixtime',
         onChangeDateTime: function() {
@@ -3589,7 +3565,7 @@ setDateTimePicker = function(this_compose){
         }
     });
     //初始化 datetimepicker
-    this_compose.find("input.cp-datetimepicker-end").datetimepicker({
+    this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
         startDate:'+1970/01/01',
         minDate:'-1969/12/31'  ,
         // minTime: (new Date().getHours()+1)+':00:00',
@@ -3603,12 +3579,12 @@ setDateTimePicker = function(this_compose){
     this_compose.find(".cp-setdate-l").click(function(){
         var start_time_chk = this_compose.data("start-time-chk");
         if(!start_time_chk) return false;
-        this_compose.find("input.cp-datetimepicker-start").datetimepicker("show");
+        this_compose.find("input.cp-datetimepicker-start").jqueryUiDatetimepicker("show");
     });
 
     //點擊開啟 datetimepicker
     this_compose.find(".cp-setdate-r").click(function(){
-        this_compose.find("input.cp-datetimepicker-end").datetimepicker("show");
+        this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker("show");
     });
 }
 
@@ -3635,7 +3611,7 @@ onChangeDateTime = function(this_compose,type){
             this_compose.data("end-timestamp",this_input.val()*1000);               
 
             //設定 datetimepicker 前 先destroy 結果還是錯亂 
-            end_input.datetimepicker({
+            end_input.jqueryUiDatetimepicker({
                 minDate: time.customFormat( "#YYYY#/#M#/#D#" ),
                 value: timestamp_start
             });
@@ -3647,7 +3623,7 @@ onChangeDateTime = function(this_compose,type){
         }
 
         //更改結束時間的mindate為開始時間
-        end_input.datetimepicker({
+        end_input.jqueryUiDatetimepicker({
             minDate: time.customFormat( "#YYYY#/#M#/#D#" )
         });
 
@@ -4471,7 +4447,8 @@ composeSend = function (this_compose){
 
 composeSendApi = function(body){
     var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events";
-    var scheduledTime = $("#page-compose").find("input[type=datetime-local]").data('value');
+    var scheduledTime = $('#datetimepicker-modify').data('date') 
+        ? $('#datetimepicker-modify').data("DateTimePicker").date()._d.getTime() : 0;
 
     var headers = {
         "ui":ui,
@@ -4482,7 +4459,8 @@ composeSendApi = function(body){
     var method = "post";
     var now = new Date();
 
-    if (scheduledTime > 0) {
+    console.log(scheduledTime);
+    if (scheduledTime) {
         if (now.getTime() > scheduledTime) {
             popupShowAdjust(
                 $.i18n.getString("SCHEDULED_POST_FAILED"),
@@ -4522,6 +4500,8 @@ composeSendApi = function(body){
                 } else {
                     toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
                 }
+
+                $('#datetimepicker-modify').data('DateTimePicker').destroy();
             }else{
                 setTimeout(function(){
                     $(document).find(".cp-content").data("send-chk",true);

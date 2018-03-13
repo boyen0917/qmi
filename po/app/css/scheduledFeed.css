@@ -11,12 +11,11 @@
 }
 
 #scheduled-post-modal>div {
-	width: 400px;
     height: 100%;
     margin: 0px auto;
     position: relative;
     overflow: hidden;
-    background: white;
+    background: #eee;
     /*padding: 0px 40px;*/
     border-radius: 5px;
     overflow-y: auto;
@@ -26,10 +25,11 @@
 	background: rgb(64,146,239);
 	color: white;
 	position: fixed;
-    width: 400px;
+    width: 100%;
     top: 0px;
     height: 45px;
     line-height: 45px;
+    z-index: 1;
 }
 
 #scheduled-post-modal>div>div.title>span {
@@ -47,16 +47,17 @@
 }
 
 #scheduled-post-modal>div>div.title+scheduled-post {
-	margin-top: 80px;
+	margin-top: 60px;
 }
 
 #scheduled-post-modal>div>scheduled-post {
-	padding-top: 20px;
+	padding-top: 5px;
 	display: block;
-	width: 300px;
-	margin: 30px auto;
+	width: 500px;
+	margin: 15px auto;
 	border: 1px solid #ccc;
 	border-radius: 5px;
+	background: white;
 }
 
 
@@ -69,8 +70,8 @@
 	padding: 5px;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right {
-	width: -webkit-calc( 100% - 80px );
+#scheduled-post-modal>div>scheduled-post>div.header>div.center {
+	width: -webkit-calc( 100% - 120px );
 	vertical-align: top;
 	line-height: 1.6;
 }
@@ -82,44 +83,44 @@
     border-radius: 5px;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.name {
+#scheduled-post-modal>div>scheduled-post>div.header>div.center>div.name {
 	font-weight: bold;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.type {
+#scheduled-post-modal>div>scheduled-post>div.header>div.center>div.type {
 	color: rgb(171, 178, 185);
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.type>img {
+#scheduled-post-modal>div>scheduled-post>div.header>div.center>div.type>img {
 	width: 20px;
     height: 20px;
     vertical-align: sub;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.type>span {
-	color: rgb(64,146,239);
+#scheduled-post-modal>div>scheduled-post>div.header>div.center>div.type>span {
+	color: rgb(57, 148, 232);
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>div.type>mark {
+#scheduled-post-modal>div>scheduled-post>div.header>div.center>div.type>mark {
 	display: inline-block;
 	font-weight: bold;
 	background-color: transparent;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify {
+#scheduled-post-modal>div>scheduled-post>div.header>div.center>div.post-time {
 	color: #b4b4b4;
 	font-size: 12px;
-	margin-top: 3px;
+	display: block;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.value{
+#scheduled-post-modal>div>scheduled-post>div.header>div.center>div.post-time>div{
 	padding-left: 26px;
 	display: inline-block;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.value:before {
+#scheduled-post-modal>div>scheduled-post>div.header>div.center>div.post-time>div:before {
 	content: "";
 	background: url(https://wp.qmi.emome.net/po/app/images/icon/icon_time_gray.png);
 	background-size: 15px;
@@ -131,57 +132,40 @@
 	margin-left: -24px;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>span {
-	color: #4092ef;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-left: 10px;
+#scheduled-post-modal>div>scheduled-post>div.header>div.right{
+	vertical-align: top;
+    margin-top: 10px;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.modify{
-	display: none;
-}
-
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.modify>div>span{
+#scheduled-post-modal>div>scheduled-post>div.header>div.right>img{
+	width: 20px;
+	height: 20px;
 	cursor: pointer;
-	font-size: 14px;
-    font-weight: bold;
-    margin-right: 5px;
-    float: right;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.modify>div>span:nth-child(2){
-	color: #4092ef;
-}
-
-#scheduled-post-modal>div>scheduled-post>div.header>div.right>datetime-modify>div.modify>div>span:nth-child(1){
-	color: rgba(230, 11, 11, 0.58);
-}
-
-#scheduled-post-modal>div>scheduled-post>div.header>audience-modify{
+#scheduled-post-modal>div>scheduled-post>div.header>div.audience{
 	display: block;
 	color: #868686;
     font-size: 13px;
     padding-top: 5px;
-    padding-left: 5px;
+    padding-left: 15px;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>audience-modify>img{
+#scheduled-post-modal>div>scheduled-post>div.header>div.audience>img{
 	width: 15px;
 	height: 15px;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>audience-modify>div{
+#scheduled-post-modal>div>scheduled-post>div.header>div.audience>div{
 	display: inline-block;
-    margin-left: 10px;
+    margin-left: 20px;
     max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.header>audience-modify>span{
+/*#scheduled-post-modal>div>scheduled-post>div.header>audience-modify>span{
 	color: #4092ef;
 	font-size: 14px;
     font-weight: bold;
@@ -189,11 +173,11 @@
     vertical-align: top;
     display: inline-block;
     margin-left: 10px;
-}
+}*/
 
 #scheduled-post-modal>div>scheduled-post>div.middle  {
 	display: -webkit-box;
-	padding: 10px 5px;
+	padding: 6px 0px 10px 8px;
 	color: #333;
 	max-height: 72px;
 	word-break: break-word;
@@ -203,44 +187,32 @@
 	overflow: hidden;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.footer  {
+/*#scheduled-post-modal>div>scheduled-post>div.footer  {
 	padding: 5px;
 }
-
+*/
 #scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button {
 	background: transparent;
     border: 0px;
-    width: 80px;
+    border-top: 1px solid #ccc;
+    width: 249px;
     padding: 8px 0px;
     text-align: center;
-    font-size: 14px;
+    font-size: 15px;
     cursor: pointer;
     outline: 0;
-    border-radius: 10px;
     font-weight: bold;
-}
-
-#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button.delete {
-	color: rgba(230, 11, 11, 0.58);
-}
-
-#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button.delete:hover {
-	color: white;
-	background: rgba(230, 11, 11, 0.58);
-}
-
-#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button.modify {
 	color: rgb(57, 148, 232);
-	float: right;
 }
 
-#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button.modify:hover
-{
-	color: white;
-	background: rgb(57, 148, 232);
-    background-repeat: no-repeat;
-    background-size: 15px;
-    background-position: 92% 50%;
+#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button:nth-child(1) {
+    border-right: 1px solid #ccc;
+}
+
+#scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-options>button:disabled {
+	color: #aaa;
+    background: #f6f6f6;
+    cursor: not-allowed;
 }
 
 #scheduled-post-modal>div>scheduled-post>div.footer>scheduled-post-menu {
@@ -268,25 +240,4 @@
 	color: white;
 	background: rgb(57, 148, 232);
 	border-radius: 10px;
-}
-
-#scheduled-post-modal>div>scheduled-post input[type='datetime-local'] {
-	border-radius: 8px;
-    padding: 0px 5px;
-    border: 1px solid #2196F3;
-    outline: 0;
-    font-size: 12px;
-}
-
-#scheduled-post-modal>div>scheduled-post input[type='datetime-local']::-webkit-outer-spin-button, 
-#scheduled-post-modal>div>scheduled-post input[type='datetime-local']::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    background: #FFF url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAKUlEQVQYlWNgwAT/sYhhKPiPT+F/LJgEsHv37v+EMGkmkuImoh2NoQAANlcun/q4OoYAAAAASUVORK5CYII=) no-repeat center center;
-    background-size: 10px; 
-    width: 10px;
-    opacity: 1; 
-}
-
-#scheduled-post-modal>div>scheduled-post input[type='datetime-local']::-webkit-calendar-picker-indicator {
- 	opacity: 1; 
 }

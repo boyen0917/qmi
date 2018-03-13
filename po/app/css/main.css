@@ -8,6 +8,33 @@ body{
     text-shadow: 0px 0px 0px white;
 }
 
+img {
+    vertical-align: initial;
+}
+
+label {
+	display: initial;
+    max-width: initial;
+    margin-bottom: initial;
+    font-weight: initial;
+}
+
+button, input, select, textarea {
+    font-family: initial;
+    font-size: initial;
+    line-height: initial;
+}
+
+button, input, optgroup, select, textarea {
+     margin: initial; 
+     font: initial; 
+     color: initial; 
+}
+
+textarea {
+    overflow: initial;
+}
+
 /* jquery mobile某些class會設text-shadow
 會造成windows有底色的字看起來糊糊的 */
 /*div, span, label, h3{
@@ -2450,9 +2477,10 @@ div#page-group-main div.gm-header-left:before {
 }
 
 #page-group-main div.st-feedbox-area div.scheduled-post-alert>div {
+	min-width: 480px;
 	text-align: left;
     display: inline-block;
-    background-color: #666;
+    background-color: rgb(57, 148, 232);
     padding: 10px;
     border-radius: 10px;
     color: white;
@@ -2461,21 +2489,29 @@ div#page-group-main div.gm-header-left:before {
 
 #page-group-main div.st-feedbox-area div.scheduled-post-alert>div:before {
 	content: "";
-    background-image: url(../images/common/icon/calendar_compose_icon_alert.png);
-    background-size: 25px 25px;
+    background-image: url(../images/timeline/schedule_post_clock.png);
+    background-size: 20px 20px;
     position: absolute;
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
 }
 
 #page-group-main div.st-feedbox-area div.scheduled-post-alert span {
-	margin: 0px 32px;
+	margin-left: 30px;
 	vertical-align: 2px;
 }
 
-#page-group-main div.st-feedbox-area div.scheduled-post-alert img {
-	width: 20px;
-    height: 20px;
+#page-group-main div.st-feedbox-area div.scheduled-post-alert i {
+	border: solid white;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 5px;
+    float: right;
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    margin-top: 4px;
+    margin-right: 10px;
 }
 
 .st-feebox-area-container{
@@ -2589,7 +2625,12 @@ div#page-group-main div.gm-header-left:before {
 	content: url(../images/icon/icon_timelinebox_set_delete.png);
 }
 .st-sub-box-more-box[data-st-more="object"] img{
-	content: url(../images/common/icon/icon_object.png);
+	content: url(../images/timeline/user-plus.png);
+	width: 42px;
+}
+
+.st-sub-box-more-box[data-st-more="object"]:hover img{
+	width: 45px;
 }
 
 .st-sub-box-more-box.deactive[data-st-more="top"] img{
@@ -6830,3 +6871,77 @@ img.vdo-default:before {}
 }
 
 #page-timeline-detail > .fixed-initial {z-index: 1000;}
+
+* {
+	-webkit-box-sizing: initial;
+    /*-moz-box-sizing: border-box;*/
+    box-sizing: initial;
+}
+
+#datetimepicker-modal {
+	position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.49);
+    -webkit-user-select: none;
+    display: none;
+}
+
+#datetimepicker-modal>div {
+	width: 568px;
+    background: white;
+    margin: 150px auto;
+    border-radius: 5px;
+}
+
+#datetimepicker-modal>div>div.close {
+	width: 100%;
+    height: 30px;
+    float: initial;
+    opacity: 1;
+}
+
+#datetimepicker-modal>div>div.close>img {
+	float: right;
+	width: 30px;
+	height: 30px;
+}
+
+#datetimepicker-modal div.datetimepicker {
+	padding: 20px;
+}
+
+/*#datetimepicker-modal div.bootstrap-datetimepicker-widget {
+	min-width: 36em;
+}*/
+
+#datetimepicker-modal div.bootstrap-datetimepicker-widget div.datepicker,
+#datetimepicker-modal div.bootstrap-datetimepicker-widget div.timepicker {
+	display: inline-block;
+}
+
+#datetimepicker-modal div.bootstrap-datetimepicker-widget div.datepicker {
+	width: 48%
+}
+
+#datetimepicker-modal div.bootstrap-datetimepicker-widget div.timepicker {
+	width: 40%
+}
+
+#datetimepicker-modal>div>div.decision {
+	padding: 15px 0px;
+	border-top: 1px solid #ccc;
+}
+
+#datetimepicker-modal>div>div.decision>button {
+	background: transparent;
+	background: transparent;
+    border: 0;
+    width: 268px;
+    color: #4092ef;
+    font-weight: bold;
+    outline: 0;
+}
