@@ -32,25 +32,16 @@
 		//歸位
 		$(window).scrollTop($(document).data("namecard-pos"));
 
-		//翻面特殊處理
-		if($(".user-info-load-area .me").hasClass("adjust")){
-			$(".user-info-load-area").addClass("transition1s");
-            $(".user-info-load-area").addClass("user-info-flip");
-            $(".user-info-load-area .me").removeClass("adjust");
-		}
-
-		$("body").removeClass("user-info-adjust");
-
 		//reset
 		$(".user-info-load-area > div").html("");
 
 		$(".screen-lock").fadeOut();
 		$(this).attr("src","images/common/icon/bt_close_normal.png");
 		$(".user-info-load-area").fadeOut("fast",function(){
-			$(".user-info-load-area").removeClass("user-info-flip");
-			$(".user-info-load-area .user").show();
+			var loadDom = $(".user-info-load-area");
+			loadDom.find("> div.me").hide();
+			loadDom.find("> div.user").show();
 		});
-
 	});
 
 	$(document).on("click",".user-info-load-area",function(e){
@@ -70,27 +61,10 @@
 	});
 
 	$(document).on("mouseup",".user-info-back",function(e){
-		// $(".me-info-load user-avatar > ")
-		$(".user-info-load-area").addClass("user-info-flip");
-        $(".user-info-load-area .me").removeClass("adjust");
-
-		setTimeout(function(){
-	        $(".user-info-load-area").addClass("transition1s");
-
-			$(".user-info-load-area").removeClass("user-info-flip");
-
-			$(".user-info-load , .me-info-load").stop().animate({
-				opacity:0
-			},400);
-			setTimeout(function(){
-				$(".user-info-load-area .me").addClass("backface-visibility");
-				$(document).find(".user-info-load-area .user").show();
-				$(".user-info-load , .me-info-load").stop().animate({
-					opacity:1
-				},400);
-			},400);
-        },100);
-
+		var loadDom = $(".user-info-load-area");
+		loadDom.find("> div.user").show();
+		loadDom.find("> div.user > div.user-info-load").show();
+        loadDom.find("> div.me").hide();
 		e.stopPropagation();
 		e.preventDefault();
 	});
@@ -343,7 +317,7 @@
 	            }
 	        }
 
-	        getUserInfo([{gi:this_gi,gu:this_gu,isNewMem:false}],false,false,function(user_data){
+	        getUserInfo([{gi: this_gi, gu: this_gu, isNewMem: false}],false,false,function(user_data){
 	            if(user_data){
 	                $("body").addClass("user-info-adjust");
 	                //為了美觀
@@ -356,9 +330,6 @@
 	                if(user_data.aut){
 	                    this_info.find(".user-avatar .user-pic").attr("src",user_data.auo);
 	                    this_info.find(".user-avatar").data("auo",user_data.auo);
-
-	                    //400存在css media min-width中 
-	                    userInfoAvatarPos($(".user-avatar .user-pic"));
 	                }
 
 	                //get user info 已存過, 不再重存
@@ -509,9 +480,6 @@
 	        return obj.no == 0;
 	    });
 
-	    $(".screen-lock").show();
-	    $(".user-info-load-area").fadeIn("fast");
-	    $(".user-info-load-area").addClass("transition1s");
 	    $(".user-info-load-area .me").load('layout/layout.html .me-info-load',function(){
 	        var this_info = $(this).find(".me-info-load");
 	        this_info._i18n();
@@ -527,10 +495,6 @@
 	        if(user_data.aut){
 	            this_info.find(".user-avatar.me > img").attr("src",user_data.auo);
 	            this_info.find(".user-avatar").data("auo",user_data.auo);
-
-	            //400存在css media min-width中 
-	            userInfoAvatarPos(this_info.find(".user-avatar.me > img"));
-	            // $(".user-avatar .default").removeClass("default");
 	        }
 
 	        if (modifyNameSwitch && modifyNameSwitch.st != 2) {
@@ -613,10 +577,6 @@
 	            thisInfo.find(".user-avatar-upload").trigger("click");
 	        });
 
-	        // this_info.find(".user-avatar-bar.me .upload").click(function(){
-	        //  this_info.find(".user-avatar-upload").trigger("click");
-	        // });
-
 	        //檔案上傳
 	        thisInfo.find(".user-avatar-upload").change(function() {
 	            var imageType = /image.*/;
@@ -631,21 +591,9 @@
 	                    $(".user-avatar.me").prepend(new_img);
 
 	                    var img = $(".user-avatar.me > img");
-	                    //調整長寬
-	                    userInfoAvatarPos(img);
 	                    img.attr("src",reader.result);
 	                    
-	                    //有更動即可按確定
-	                    // this_info.find(".user-info-submit").addClass("user-info-submit-ready");
-
-	                    //記錄更動
-	                    // this_info.data("avatar-chk",true);
 	                    s_load_show = true;
-
-	                    // var ori_arr = [1280,1280,0.7];
-	                    // var tmb_arr = [120,120,0.6];
-	                    // var file = this_info.find(".user-avatar-upload")[0].files[0];
-	                    // var api_name = "groups/"+gi+"/users/"+gu+"/avatar";
 
 	                    qmiUploadFile({
 	                        thisGi: gi,
@@ -725,6 +673,9 @@
 	        });
 	    }else{
 	        thisInfo.find(".action-edit").click(function(){
+	        	thisInfo.hide();
+	        	$(".user-info-load-area .me").show();
+	        	return;
 	            $(".user-info-load-area").addClass("user-info-flip");
 	            $(".user-info-load , .me-info-load").stop().animate({
 	                opacity:0
@@ -1168,33 +1119,6 @@
 	        } else {
 	            toastShow( $.i18n.getString("COMMON_CHECK_NETWORK") );
 	        }
-	    });
-	}
-
-	//這也可以合併..avatarPos
-	userInfoAvatarPos = function(img){
-	    //魔術數字 是個人資料的長寬比例400/250 小於這個比例 就要以寬為長邊
-	    var magic_number = 1.6;
-	    //偵測長寬
-	    var user_info_width = $(".user-info-load-area .width-chk").width() || 400;
-	    //調整長寬
-	    img.load(function() {
-
-	        //高為長邊
-	        if((this.width / this.height) > magic_number){
-	            img.css("height",250);
-	            img.css("margin-left",((img.width()-user_info_width)/2)* -1);
-	            img.css("opacity",0);
-	        }else{
-	        //寬為長邊
-	            img.css("width",user_info_width);
-	            img.css("margin-top",((img.height()-250)/2)* -1);
-	            img.css("opacity",0);
-	        }
-
-	        img.stop().animate({
-	            opacity:1
-	        },300);
 	    });
 	}
 

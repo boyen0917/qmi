@@ -507,9 +507,14 @@
 	"GROUPLIST_NO_GROUPS" : "尚未加入任何團體",
 	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "待管理者將您加入團體後 \n 即可開始使用 Qmi",
 
+	"UNREAD_REMIND": "提醒",	
+	"UNREAD_REMIND_ALL": "提醒全部",	
+
 	"UNREAD_HINT" : "未點閱",
 
 	"WEBVIEW": "自訂網頁",
+
+	"ERR_MSG_VOTE_LIMIT": "最多可設定十題投票項目",
 
 	"WEBONLY_AUTH_LOADING" : "驗證中...",
 	"WEBONLY_AUTH_SUCCESS" : "驗證成功",
@@ -539,7 +544,7 @@
 
 	"WEBONLY_USER_PROFILE_PHONE2" : "公司電話",
 
-	"SCHEDULED_POST": "排程文章",
+	"SCHEDULED_POST": "排程發佈文章",
 	"SCHEDULED_POST_AT": "排程發佈時間",
 	"SCHEDULED_POST_POST_NOW": "立即發佈",
 	"SCHEDULED_POST_DONE": "完成",
@@ -552,7 +557,9 @@
 	"SCHEDULED_POST_DELETE": "刪除",
 	"SCHEDULED_POST_DELETE_CONFIRM": "刪除排程文章?",
 	"SCHEDULED_POST_EDIT_AUDIENCE": "編輯發佈對象",
-	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "編輯發佈時間"
+	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "編輯發佈時間",
+	"SCHEDULED_POST_HAS_BEEN_PUBLISHED": "此文章已發佈",
 
+	"ADD_AUDIENCE_CANT_UNCHECK": "不可移除原本的發佈對象"
 
 }

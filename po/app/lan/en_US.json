@@ -507,10 +507,14 @@
 	"GROUPLIST_NO_GROUPS" : "You don't have any group yet",
 	"EMPTY_COMPANYACCOUNT_NO_GROUP" : "Go get an invitation from group admin and start using Qmi!",
 
+	"UNREAD_REMIND": "Remind",
+	"UNREAD_REMIND_ALL": "Remind All",
+	
 	"UNREAD_HINT" : "Unread",
 
 	"WEBVIEW": "webView",
 
+	"ERR_MSG_VOTE_LIMIT": "You have reached the limit of vote question.",
 
 	"WEBONLY_AUTH_LOADING" : "Authenticating...",
 	"WEBONLY_AUTH_SUCCESS" : "Authentication is successful！",
@@ -549,10 +553,13 @@
 	"SCHEDULED_POST_EDIT": "Edit",
 	"SCHEDULED_POST_SUCCEED": "Scheduled post succeed",
 	"SCHEDULED_POST_CHECK": "You can check scheduled post at Feed",
-	"SCHEDULED_POST_NUMBER_SCHEDULED_POST": "%N scheduled post",
+	"SCHEDULED_POST_NUMBER_SCHEDULED_POST": "%d scheduled post",
 	"SCHEDULED_POST_DELETE": "Delete",
 	"SCHEDULED_POST_DELETE_CONFIRM": "Delete scheduled post?",
 	"SCHEDULED_POST_EDIT_AUDIENCE": "Edit audience",
-	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "Edit scheduled time"
+	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "Edit scheduled time",
+	"SCHEDULED_POST_HAS_BEEN_PUBLISHED": "This post has been published",
+
+	"ADD_AUDIENCE_CANT_UNCHECK": "You can only add new audience"
 
 }

@@ -552,7 +552,7 @@
 	padding: 9px 10px 9px 12px;
 	/* width: 92%; */
 	border-bottom: #EDEDED 1px solid;
-	pointer: cursor;
+	cursor: pointer;
 }
 .contact-memLists .row:nth-child(1){
 	margin-top: -15px;

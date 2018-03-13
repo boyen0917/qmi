@@ -10,7 +10,6 @@ var ScheduledFeedModal = function(modal) {
 };
 
 ScheduledFeedModal.prototype.importData = function (postList) {
-    console.log(this.container)
     var self = this;
     var groupMemberAllData = QmiGlobal.groups[gi].guAll || {};
 
@@ -38,8 +37,11 @@ ScheduledFeedModal.prototype.importData = function (postList) {
 
 ScheduledFeedModal.prototype.close = function () {
     this.modal.style.display = 'none';
-}
 
+    if ($('#datetimepicker-modify').data("DateTimePicker")) {
+        $('#datetimepicker-modify').data("DateTimePicker").destroy();
+    }
+}
 
 var scheduledPost = Object.create(HTMLElement.prototype);
 var datetimeModifyPrototype = Object.create(HTMLElement.prototype);
@@ -49,49 +51,78 @@ var menuPrototype = Object.create(HTMLUListElement.prototype);
 
 scheduledPost.attachedCallback  = function () {
     // var menu = document.createElement('scheduled-post-menu');
-    var options = document.createElement('scheduled-post-options');
-    var datetimeModify = document.createElement('datetime-modify');
-    var audienceModify = document.createElement('audience-modify');
+    // var options = document.createElement('scheduled-post-options');
+    // var datetimeModify = document.createElement('datetime-modify');
+    // var audienceModify = document.createElement('audience-modify');
+    var datatimeText = new Date(this.postTime).customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#")
+    var targetsText = this.audiences ? targetListToString(this.audiences) : $.i18n.getString('MEMBER_ALL')
+    // var deleteIcon = this.querySelector("div.right>img");
     
-
     this.innerHTML = `
         <div class='header'>
             <div class='left'><img src=${this.authorImage}></div>
-            <div class='right'>
-                <div class='name'>${this.authorName}</div>
+            <div class='center'>
+                <div class='name'>
+                    ${this.authorName}
+                </div>
                 <div class='type'>
-                    <img src='http://localhost:8081/devClearChats/po/app/images/compose/compose_box_bticon_post.png'>
+                    <img src='images/compose/compose_box_bticon_post.png'>
                     <label>發布</label>
                     <span>${this.type}</span>
                     <mark class='title'>${this.title}</mark>
                 </div>
+                <div class='post-time'>
+                    <div>${datatimeText}</div>
+                </div>
+            </div>
+            <div class='right'>
+                <img src='images/common/icon/delete.png'>
+            </div>
+            <div class='audience'>
+                <img src='images/icon/icon_object.png'>
+                <div>${targetsText}</div>
             </div>
         </div>
         <div class='middle'>${this.briefContent}</div>
         <div class='footer'></div>
     `;
 
-    datetimeModify.setAttribute('currentValue', this.postTime);
-    // datetimeModify.setAttribute('max', maxEditTime);
-    audienceModify.currentTargets = this.audiences;
+    var options = document.createElement('scheduled-post-options');
+    var deleteIcon = this.querySelector("div.right>img");
 
-    datetimeModify.finish = this.updatePostTime.bind(this);
-    datetimeModify.cancel = this.cancelDatetimeEdit.bind(this);
-    audienceModify.edit = this.editAudiences.bind(this);
-    options.publishNow = this.publishNow.bind(this);
-    options.deleteFeed = this.delete.bind(this);
+    // datetimeModify.setAttribute('currentValue', this.postTime);
+    // datetimeModify.setAttribute('max', maxEditTime);
+    // audienceModify.currentTargets = this.audiences;
+
+    // datetimeModify.finish = this.updatePostTime.bind(this);
+    // datetimeModify.cancel = this.cancelDatetimeEdit.bind(this);
+    // datetimeModify.checkIsExpired = this.checkIsExpired.bind(this);
+    // datetimeModify.expiredHandler = this.expiredHandler.bind(this);
+
+    // audienceModify.edit = this.editAudiences.bind(this);
+    // audienceModify.checkIsExpired = this.checkIsExpired.bind(this);
+    // audienceModify.expiredHandler = this.expiredHandler.bind(this);
+
+    options.editScheduleTime = this.openDatatimePickerModal.bind(this);
+    options.editAudiences = this.editAudiences.bind(this);
+    options.currentTargets = this.audiences;
+
+    // console.log(deleteIcon)
+    deleteIcon.addEventListener('click', this.delete.bind(this))
+    // var deleteIcon;
     // menu.showDatetimeInput = this.showDatetimeInput.bind(this);
     // menu.editAudiences = this.editAudiences.bind(this);
 
-    this.datetimeModify = datetimeModify;
-    this.audienceModify = audienceModify;
+    // this.datetimeModify = datetimeModify;
+    // this.audienceModify = audienceModify;
     // this.menu = menu;
     this.options = options;
 
-    this.querySelector("div.header>div.right").appendChild(datetimeModify);
-    this.querySelector("div.header").appendChild(audienceModify);
+    // this.querySelector("div.header>div.center").appendChild(datetimeModify);
+    // this.querySelector("div.header").appendChild(audienceModify);
     // this.querySelector("div.footer").appendChild(menu);
     this.querySelector("div.footer").appendChild(options);
+
 }
 
 scheduledPost.delete = function () {
@@ -108,10 +139,15 @@ scheduledPost.delete = function () {
                 apiName: "groups/" + gi + "/timelines/" + ti_feed+ "/present/events/" + postId,
                 method: 'delete'
             }).success(function (data) {
+                if (self.previousElementSibling.tagName != self.tagName && self.nextElementSibling == null) {
+                    self.container.style.display = 'none';
+                }
+
                 toastShow(data.rsp_msg);
-                self.remove();
 
                 timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+
+                self.remove();
             })
         }]
     )
@@ -136,23 +172,26 @@ scheduledPost.updatePostTime = function (datetime) {
         if (datetime == 0) {
             toastShow($.i18n.getString('COMPOSE_POST_SUCCESSED'));
             self.container.style.display = 'none';
+
+            timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
         } else {
             toastShow(data.rsp_msg);
-            self.datetimeModify.querySelector('div.value').textContent = newDate.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
-            self.datetimeModify.querySelector('div.value').style.display = 'inline-block';
-            self.datetimeModify.children[1].style.display = 'inline-block';
-            self.datetimeModify.querySelector('div.modify').style.display = 'none';
 
-            self.datetimeModify.reset(datetime);
+            getScheduledTimelineList().then(function (posts) {
+                if (posts.length == 0) {
+                    self.container.style.display = 'none';
+                } else {
+                    document.querySelector('#page-group-main div.scheduled-post-alert>div').click();
+                }
+            });
         }
 
-        timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
-
+        $('#datetimepicker-modal').hide();
+        $('#datetimepicker-modify').data("DateTimePicker").destroy();
     })
 }
 
 scheduledPost.editAudiences = function (editBtn) {
-    console.log(this);
     var self = this;
     var currentTargets= self.audiences;
     var groupMemberAll = QmiGlobal.groups[gi].guAll || {};
@@ -160,111 +199,178 @@ scheduledPost.editAudiences = function (editBtn) {
     var currentBranches = {};
     var currentFavorites = {};
 
-    /*文章存的object_str跟之前(發布對象按鈕、指派管理員、聊天室選擇成員等)不一樣，
-        需要轉成可以讓composeObjectShowDelegate吃下*/
-    if (currentTargets) {
-        if (currentTargets.gul) {
-            currentTargets.gul.forEach(function (member) {
-                currentAudiences[member.gu] = member.n;
+
+    if (this.checkIsExpired()) {
+        this.expiredHandler();
+    } else {
+        /*文章存的object_str跟之前(發布對象按鈕、指派管理員、聊天室選擇成員等)不一樣，
+            需要轉成可以讓composeObjectShowDelegate吃下*/
+        if (currentTargets) {
+            if (currentTargets.gul) {
+                currentTargets.gul.forEach(function (member) {
+                    currentAudiences[member.gu] = member.n;
+                });
+            }
+
+            if (currentTargets.bl) {
+                currentTargets.bl.forEach(function (branch) {
+                    currentBranches[branch.bi] = branch.bn;
+                });
+            }
+        }
+
+        $(editBtn).data("object_str", JSON.stringify(currentAudiences));
+        $(editBtn).data("branch_str", JSON.stringify(currentBranches));
+
+        composeObjectShowDelegate($(editBtn), $(editBtn) , {
+            isShowBranch: true,
+            isShowSelf: true,
+            isShowAll: false,
+            isShowFav: true,
+            isDisableOnAlreadyChecked: true,
+        }, function () {
+            var newAudiencesData = $.parseJSON($(editBtn).data("object_str")) || {};
+            var newBranchData = $.parseJSON($(editBtn).data("branch_str")) || {};
+            var newFavoriteData = $.parseJSON($(editBtn).data("favorite_str")) || {};
+            var checkedMemberCount = Object.keys(newAudiencesData).length;
+            var groupMemberNum = QmiGlobal.groups[gi].cnt;
+
+            var thisGi = self.idNumber.split("_")[0];
+            var thisTi = self.idNumber.split("_")[1];
+            var newTargets = {
+                tu: {}
+            };
+            var newTargetNameList = [];
+
+            if (Object.keys(newBranchData).length > 0) {
+                newTargets.tu.bl = [];
+                for (var branchID in newBranchData) {
+                    if (!currentBranches.hasOwnProperty(branchID)) {
+                        newTargetNameList.push(newBranchData[branchID]);
+                    }
+
+                    newTargets.tu.bl.push({
+                        bi: branchID,
+                        bn: newBranchData[branchID]
+                    })
+                }
+            }
+
+            if (Object.keys(newFavoriteData).length > 0) {
+                newTargets.tu.fl = [];
+                for (var favoriteID in newFavoriteData) {
+                    if (!currentFavorites.hasOwnProperty(favoriteID)) {
+                        newTargetNameList.push(newFavoriteData[favoriteID]);
+                    }
+
+                    newTargets.tu.fl.push(newFavoriteData[favoriteID])
+                }
+            }
+
+            if (checkedMemberCount > 0) {
+                if (checkedMemberCount == groupMemberNum) {
+                    newTargets = {};
+                    newTargetNameList.push($.i18n.getString("MEMBER_ALL"));
+                } else {
+                    newTargets.tu.gul = [];
+                    for (var memberID in newAudiencesData) {
+                        if (!currentAudiences.hasOwnProperty(memberID)) {
+                            newTargetNameList.push(newAudiencesData[memberID]);
+                        }
+
+                        newTargets.tu.gul.push({
+                            gu: memberID,
+                            n: newAudiencesData[memberID]
+                        })
+                    }
+                }
+            }
+
+            new QmiAjax({
+                apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/present/events/" + self.idNumber + "/permission",
+                method: "put",
+                body: newTargets
+            }).complete(function(data){
+                if(data.status == 200){
+                    var audienceDiv = self.querySelector("div.audience>div");
+                    var newTargetsStr = newTargetNameList.join('、');
+
+                    if (checkedMemberCount == groupMemberNum) {
+                        audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
+                        self.audienceModify.querySelector("span").style.display = 'none';
+                    } else {
+                        audienceDiv.textContent = audienceDiv.textContent + '、' + newTargetsStr;
+                        self.audiences = newTargets.tu;
+                    }
+                    
+                    if (newTargetsStr.length > 0) {
+                        toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTargetsStr);
+                    }
+                    
+                    timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+                }
             });
-        }
-
-        if (currentTargets.bl) {
-            var currentBranchObj = {};
-
-            currentTargets.bl.forEach(function (branch) {
-                currentBranches[branch.bi] = branch.bn;
-            });
-        }
-    }
-
-    $(editBtn).data("object_str", JSON.stringify(currentAudiences));
-    $(editBtn).data("branch_str", JSON.stringify(currentBranches));
-
-    composeObjectShowDelegate($(editBtn), $(editBtn) , {
-        isShowBranch: true,
-        isShowSelf: true,
-        isShowAll: false,
-        isShowFav: true,
-        isDisableOnAlreadyChecked: true,
-    }, function () {
-        var newAudiencesData = $.parseJSON($(editBtn).data("object_str")) || {};
-        var newBranchData = $.parseJSON($(editBtn).data("branch_str")) || {};
-        var newFavoriteData = $.parseJSON($(editBtn).data("favorite_str")) || {};
-
-        var thisGi = self.idNumber.split("_")[0];
-        var thisTi = self.idNumber.split("_")[1];
-        var newTargets = {};
-        var newAudienceNameList = [];
-        var newBranchNameList = [];
-        var newFavoriteList = [];
-
-        if (Object.keys(newAudiencesData).length > 0) {
-            newTargets.gul = [];
-            for (var memberID in newAudiencesData) {
-                if (!currentAudiences.hasOwnProperty(memberID)) {
-                    newAudienceNameList.push(newAudiencesData[memberID]);
-                }
-
-                newTargets.gul.push({
-                    gu: memberID,
-                    n: newAudiencesData[memberID]
-                })
-            }
-        }
-
-        if (Object.keys(newBranchData).length > 0) {
-            newTargets.bl = [];
-            for (var branchID in newBranchData) {
-                if (!currentBranches.hasOwnProperty(branchID)) {
-                    newBranchNameList.push(newBranchData[branchID]);
-                }
-
-                newTargets.bl.push({
-                    bi: branchID,
-                    bn: newBranchData[branchID]
-                })
-            }
-        }
-
-        if (Object.keys(newFavoriteData).length > 0) {
-            newTargets.bl = [];
-            for (var favoriteID in newFavoriteData) {
-                if (!currentFavorites.hasOwnProperty(favoriteID)) {
-                    newFavoriteData.push(newFavoriteData[favoriteID]);
-                }
-
-                newTargets.bl.push(newFavoriteData[favoriteID])
-            }
-        }
-
-        new QmiAjax({
-            apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/present/events/" + self.idNumber + "/permission",
-            method: "put",
-            body: {
-                tu: newTargets
-            }
-        }).complete(function(data){
-            if(data.status == 200){
-                var audienceDiv = self.audienceModify.querySelector("div");
-                var newTotalList = newAudienceNameList.join('、') + newBranchNameList.join('、') + newFavoriteList.join('、');
-
-                audienceDiv.textContent = audienceDiv.textContent + '、' + newTotalList;
-                toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTotalList);
-
-                self.audiences = newTargets;
-
-                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
-
-            }
         });
-    });
+    }
 }
 
 scheduledPost.cancelDatetimeEdit = function () {
     this.options.style.display = 'block';
     this.datetimeModify.previousElementSibling.style.display = 'block';
     this.datetimeModify.style.display = 'none';
+}
+
+scheduledPost.checkIsExpired = function () {
+    console.log(this.postTime)
+    return this.postTime < (new Date()).getTime();
+}
+
+scheduledPost.expiredHandler = function () {
+    var self = this;
+    popupShowAdjust(
+        $.i18n.getString("SCHEDULED_POST_HAS_BEEN_PUBLISHED"),
+        "",
+        $.i18n.getString("ACCOUNT_BINDING_DONE"),
+        false,
+        [function () {
+            self.container.style.display = 'none';
+            timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
+        }]
+    )
+}
+
+scheduledPost.openDatatimePickerModal = function () {
+    var self = this;
+    var datetimepickerModal = $("#datetimepicker-modal");
+    var scheduledDatetimepicker = $('#datetimepicker-modify');
+    var modifyOptions = $("#datetimepicker-modal>div>div.decision>button");
+
+    if (self.checkIsExpired()) {
+        self.expiredHandler();
+    } else {
+        scheduledDatetimepicker.datetimepicker({
+            inline: true,
+            sideBySide: true,
+        });
+
+        datetimepickerModal.find('div.close>img').off('click').on('click', function (e) {
+            datetimepickerModal.hide();
+        });
+
+        scheduledDatetimepicker.data("DateTimePicker").minDate(new Date())
+        scheduledDatetimepicker.data("DateTimePicker").date(new Date(self.postTime));
+
+        modifyOptions[0].addEventListener('click', self.publishNow.bind(self));
+
+        modifyOptions[1].addEventListener('click', function (e) {
+            var selectDatetime = scheduledDatetimepicker.data("DateTimePicker").date()._d;
+            var postTime = selectDatetime.getTime();
+
+            self.updatePostTime(postTime);
+        });
+
+        datetimepickerModal.show();
+    }
 }
 
 datetimeModifyPrototype.attachedCallback = function () {
@@ -277,24 +383,18 @@ datetimeModifyPrototype.attachedCallback = function () {
     var cancelSpan = document.createElement('span');
     var currentTime = parseInt(this.getAttribute('currentValue'));
 
-    var minEditTime = new Date(currentTime + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
-    var maxEditTime = new Date(currentTime + 20 * 3600 * 24 * 365 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
-
     datetimeText.textContent = new Date(currentTime).customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
 
     this.datetimeInput = datetimeInput;
     datetimeInput.type = "datetime-local";
     datetimeInput.required = true;
-    datetimeInput.setAttribute("min", minEditTime);
-    datetimeInput.setAttribute("max", maxEditTime);
-    datetimeInput.setAttribute("value", minEditTime);
 
     datetimeInput.addEventListener('change', function (e) {
         var target = e.target;
         var validityState = target.validity;
 
         if (!validityState.valid) {
-            datetimeInput.value = target.defaultValue;
+            datetimeInput.value = target.min;
         }
     })
 
@@ -306,10 +406,26 @@ datetimeModifyPrototype.attachedCallback = function () {
     modifyBlock.className = 'modify';
 
     editSpan.addEventListener('click', function (e) {
-        editSpan.style.display = 'none';
-        datetimeText.style.display = 'none';
-        modifyBlock.style.display = 'block';
-    });
+        var defaultTime = new Date(currentTime).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#")
+        var minEditTime = new Date().customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+        var maxEditTime = new Date(currentTime + 20 * 3600 * 24 * 365 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+
+        if (this.checkIsExpired()) {
+            this.expiredHandler();
+        } else {
+            datetimeInput.setAttribute("min", minEditTime);
+            datetimeInput.setAttribute("max", maxEditTime);
+
+            // 第一次點選顯示預約時間
+            if (datetimeInput.value == "") {
+                datetimeInput.setAttribute("value", defaultTime);
+            }
+
+            editSpan.style.display = 'none';
+            datetimeText.style.display = 'none';
+            modifyBlock.style.display = 'block';
+        }
+    }.bind(this));
 
     doneSpan.addEventListener('click', function (e) {
         var editTimeStr = datetimeInput.value;
@@ -323,6 +439,7 @@ datetimeModifyPrototype.attachedCallback = function () {
         newDate.setDate(date);
         newDate.setHours(hour);
         newDate.setMinutes(minute);
+
         this.finish(newDate.getTime());
     }.bind(this));
 
@@ -333,7 +450,6 @@ datetimeModifyPrototype.attachedCallback = function () {
         modifyBlock.style.display = 'none'
         // datetimeInput.setAttribute("value", datetimeInput.getAttribute('min'));
     });
-
 
     confirmDiv.appendChild(cancelSpan);
     confirmDiv.appendChild(doneSpan);
@@ -346,13 +462,12 @@ datetimeModifyPrototype.attachedCallback = function () {
 }
 
 datetimeModifyPrototype.reset = function (currentTime) {
-    var minEditTime = new Date(currentTime + 15 * 60 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
+    var minEditTime = new Date(currentTime).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
     var maxEditTime = new Date(currentTime + 20 * 3600 * 24 * 365 * 1000).customFormat("#YYYY#-#MM#-#DD#T#hhh#:#mm#");
     
     this.datetimeInput.setAttribute("min", minEditTime);
     this.datetimeInput.setAttribute("max", maxEditTime);
     this.datetimeInput.setAttribute("value", minEditTime);
-
     this.datetimeInput.value = minEditTime;
 }
 
@@ -367,7 +482,12 @@ audienceModifyPrototype.attachedCallback = function () {
     editSpan.textContent = $.i18n.getString("SCHEDULED_POST_EDIT");
 
     editSpan.addEventListener('click', function (e) {
-        this.edit(e.target);
+
+        if (this.checkIsExpired()) {
+            this.expiredHandler();
+        } else {
+            this.edit(e.target);
+        }
     }.bind(this));
 
     this.appendChild(icon);
@@ -379,32 +499,24 @@ audienceModifyPrototype.attachedCallback = function () {
 }
 
 optionsPrototype.attachedCallback = function () {
-    var deleteBtn = document.createElement('button');
-    var modifyBtn = document.createElement('button');
+    var editAudienceBtn = document.createElement('button');
+    var editScheduleTimeBtn = document.createElement('button');
 
-    deleteBtn.className = 'delete';
-    modifyBtn.className = 'modify';
+    editAudienceBtn.textContent = $.i18n.getString('SCHEDULED_POST_EDIT_AUDIENCE');
+    editScheduleTimeBtn.textContent = $.i18n.getString('SCHEDULED_POST_EDIT_SCHEDULED_TIME');
 
-    deleteBtn.textContent = $.i18n.getString('SCHEDULED_POST_DELETE');
-    modifyBtn.textContent = $.i18n.getString('SCHEDULED_POST_POST_NOW');
+    if (this.currentTargets) {
+        editAudienceBtn.addEventListener('click', function (e) {
+            this.editAudiences(e.target);
+        }.bind(this));
+    } else {
+        editAudienceBtn.setAttribute("disabled", true);
+    }
 
-    // modifyBtn.addEventListener('click', e => {
-    //     var editPostMenu = this.previousElementSibling;
-    //     var target = e.target;
+    editScheduleTimeBtn.addEventListener('click', this.editScheduleTime);
 
-    //     if (target.classList.contains("expand")) {
-    //         target.classList.remove("expand")
-    //     } else {
-    //         target.classList.add("expand")
-    //     }
-
-    //     editPostMenu.classList.toggle('hide');
-    // })
-    modifyBtn.addEventListener('click', this.publishNow)
-    deleteBtn.addEventListener('click', this.deleteFeed)
-
-    this.appendChild(deleteBtn);
-    this.appendChild(modifyBtn);
+    this.appendChild(editAudienceBtn);
+    this.appendChild(editScheduleTimeBtn);
 }
 
 menuPrototype.attachedCallback = function () {
