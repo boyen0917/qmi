@@ -6898,12 +6898,11 @@ img.vdo-default:before {}
     background: white;
     margin: 150px auto;
     border-radius: 5px;
-    height: 308px;
+    text-align: center;
 }
 
 #datetimepicker-modal>div>div.close {
     height: 30px;
-    float: right;
     opacity: 1;
 }
 
@@ -6911,13 +6910,9 @@ img.vdo-default:before {}
 	width: 30px;
 	height: 30px;
 	cursor: pointer;
+    float: right;
 }
 
-#datetimepicker-modal>div>input {
-    margin-left: 30px;
-    margin-top: 10px;
-    visibility: hidden;
-}
 
 #datetimepicker-modal div.datetimepicker {
 	padding: 20px;
@@ -6943,8 +6938,6 @@ img.vdo-default:before {}
 #datetimepicker-modal>div>div.decision {
 	padding: 15px 0px;
 	border-top: 1px solid #ccc;
-	position: relative;
-    top: 220px;
 }
 
 #datetimepicker-modal>div>div.decision>button {
@@ -6958,12 +6951,13 @@ img.vdo-default:before {}
     cursor: pointer;
 }
 
-body>div.xdsoft_datetimepicker {
+#datetimepicker-modal>div>div.xdsoft_datetimepicker {
 	z-index: 10000;
 	border: 0;
 	box-shadow: initial;
 }
 
-body>div.xdsoft_datetimepicker>div.xdsoft_datepicker {
+#datetimepicker-modal>div>div.xdsoft_datetimepicker>div.xdsoft_datepicker {
 	width: 260px;
+	margin-right: 10px;
 }
