@@ -813,15 +813,10 @@ topEventChk = function(){
 }
 
 topEventApi = function(){
-    var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/top_events";
-    var headers = {
-             "ui":ui,
-             "at":at, 
-             "li":lang,
-                 };
-
-    var method = "get";
-    return ajaxDo(api_name,headers,method,false);
+    return new QmiAjax({
+        apiName: "groups/" + gi + "/timelines/" + ti_feed + "/top_events",
+        noErr: true
+    })
 }
 
 topEvent = function () {
@@ -1431,7 +1426,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     this_event.find(".st-reply-all-content-area").html("");
     
     // 2017/12/19 load once
-    $('<div>').load('layout/timeline_event.html?v2.2.0.4 .st-reply-content-area', function(){
+    $('<div>').load('layout/timeline_event.html?v2.2.0.5 .st-reply-content-area', function(){
         //製作每個回覆
         var okCnt = 0;
         var loadedDom = $(this);
@@ -1935,7 +1930,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.2.0.4 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.2.0.5 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -2646,45 +2641,50 @@ composeContentMake = function (compose_title){
 
         var scheduledTimeButton = this_compose.find("div.cp-content-schedule>span");
         var datetimepickerModal = $("#datetimepicker-modal");
-        var scheduledDatetimepicker = $('#datetimepicker-modify');
+        var scheduledDatetimepicker = $('#datetimepicker');;
         var publishNow = true;
-
-        scheduledDatetimepicker.datetimepicker({
-            inline: true,
-            sideBySide: true,
-            minDate: new Date()
-        });
-
-        scheduledDatetimepicker.data("date", "");
+        var selectDatetime = new Date();
 
         scheduledTimeButton.off('click').on('click', function () {
-            var currentDatetime = publishNow ? new Date() : scheduledDatetimepicker.data("DateTimePicker").date()
             var modifyOptions = $("#datetimepicker-modal>div>div.decision>button");
 
-            datetimepickerModal.show();
-            
-            scheduledDatetimepicker.data("DateTimePicker").date(currentDatetime)
+            datetimepickerModal.find("input").jqueryUiDatetimepicker({
+                format:'unixtime',
+                minDateTime: new Date(),
+                value: publishNow ? new Date() : selectDatetime,
+                closeOnWithoutClick: false,
+                closeOnDateTimeSelect: false,
+                closeOnDateSelect: false,
+                closeOnTimeSelect: false,
+                step: 1
+            });
 
             datetimepickerModal.find('div.close>img').off('click').on('click', function (e) {
                 datetimepickerModal.hide();
+                scheduledDatetimepicker.jqueryUiDatetimepicker("destroy");
             });
 
             modifyOptions.eq(0).off('click').on('click', function (e) {
                 scheduledTimeButton.text($.i18n.getString("SCHEDULED_POST_POST_NOW"));
-                datetimepickerModal.hide();
                 scheduledDatetimepicker.data("date", "");
                 publishNow = true;
+                datetimepickerModal.hide();
+                scheduledDatetimepicker.jqueryUiDatetimepicker("destroy");
             });
 
             modifyOptions.eq(1).off('click').on('click', function (e) {
-                var selectDatetime = scheduledDatetimepicker.data("DateTimePicker").date()._d;
+                selectDatetime = scheduledDatetimepicker.data("xdsoft_datetimepicker").getValue();
                 var formatDateime = selectDatetime.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
 
                 scheduledTimeButton.text(formatDateime);
-                datetimepickerModal.hide();
-
+                scheduledDatetimepicker.data("date", selectDatetime.getTime());
                 publishNow = false;
-            })
+                datetimepickerModal.hide();
+                scheduledDatetimepicker.jqueryUiDatetimepicker("destroy");
+            });
+
+            datetimepickerModal.show();
+            scheduledDatetimepicker.jqueryUiDatetimepicker("show");
         });
     }));
 
@@ -3566,13 +3566,13 @@ setDateTimePicker = function(this_compose){
     });
     //初始化 datetimepicker
     this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
-        startDate:'+1970/01/01',
-        minDate:'-1969/12/31'  ,
-        // minTime: (new Date().getHours()+1)+':00:00',
         format:'unixtime',
-        onChangeDateTime: function() {
+        onSelectDate: function () {
             onChangeDateTime(this_compose,"end");
-        }
+        },
+        onSelectTime: function () {
+            onChangeDateTime(this_compose,"end");
+        },
     });
 
     //點擊開啟 datetimepicker
@@ -3594,7 +3594,8 @@ onChangeDateTime = function(this_compose,type){
     //未選時間 就跳出
     if(!this_input.val()) return false;
 
-    var time = new Date(this_input.val()*1000);
+    var time = this_input.data("xdsoft_datetimepicker").getValue();
+    console.log(time)
     var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:00" );
     var time_format_arr = time_format.split(",");
 
@@ -3630,8 +3631,11 @@ onChangeDateTime = function(this_compose,type){
         var target = this_compose.find(".cp-setdate-l");
     }else{
 
+        console.log(time);
         //記錄在this_compose data
-        this_compose.data("end-timestamp",this_input.val()*1000);   
+        this_compose.data("end-timestamp",time.getTime());
+
+        console.log(this_compose.data("end-timestamp"))  
 
         var target = this_compose.find(".cp-setdate-r");
     }
@@ -4447,8 +4451,8 @@ composeSend = function (this_compose){
 
 composeSendApi = function(body){
     var api_name = "groups/" + gi + "/timelines/" + ti_feed + "/events";
-    var scheduledTime = $('#datetimepicker-modify').data('date') 
-        ? $('#datetimepicker-modify').data("DateTimePicker").date()._d.getTime() : 0;
+    var scheduledTime = $('#datetimepicker').data('date') 
+        ? $('#datetimepicker').data('date') : 0;
 
     var headers = {
         "ui":ui,
@@ -4501,7 +4505,7 @@ composeSendApi = function(body){
                     toastShow( $.i18n.getString("COMPOSE_POST_SUCCESSED") );
                 }
 
-                $('#datetimepicker-modify').data('DateTimePicker').destroy();
+                $('#datetimepicker').jqueryUiDatetimepicker("destroy");
             }else{
                 setTimeout(function(){
                     $(document).find(".cp-content").data("send-chk",true);
@@ -5221,6 +5225,7 @@ getScheduledTimelineList = function () {
 
     new QmiAjax({
         apiName: "groups/" + gi + "/timelines/" + ti_feed+ "/present/list",
+        noErr: true
     }).success(function (data) {
         var scheduledPostList = data.el;
 
