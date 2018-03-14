@@ -617,6 +617,7 @@ img.auo {
 .popup {
   display: none;
   position: fixed;
+  top: 0;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.85);
@@ -4613,7 +4614,17 @@ div.st-reply-message-area div.file-load .bar {
 }
 
 #page-compose div.cp-content-schedule span{
-	margin-right: 20px;
+	margin-right: 34px;
+}
+
+#page-compose div.cp-content-schedule span:after {
+    content: "";
+    position: absolute;
+    background: url("../images/ap_box_arrow.png");
+    width: 25px;
+    height: 26px;
+    background-size: 25px 26px;
+    margin-top: 9px;
 }
 
 .cp-textarea-desc {
@@ -6891,23 +6902,29 @@ img.vdo-default:before {}
 }
 
 #datetimepicker-modal>div {
-	width: 568px;
+	width: 400px;
     background: white;
     margin: 150px auto;
     border-radius: 5px;
+    height: 308px;
 }
 
 #datetimepicker-modal>div>div.close {
-	width: 100%;
     height: 30px;
-    float: initial;
+    float: right;
     opacity: 1;
 }
 
 #datetimepicker-modal>div>div.close>img {
-	float: right;
 	width: 30px;
 	height: 30px;
+	cursor: pointer;
+}
+
+#datetimepicker-modal>div>input {
+    margin-left: 30px;
+    margin-top: 10px;
+    visibility: hidden;
 }
 
 #datetimepicker-modal div.datetimepicker {
@@ -6934,14 +6951,27 @@ img.vdo-default:before {}
 #datetimepicker-modal>div>div.decision {
 	padding: 15px 0px;
 	border-top: 1px solid #ccc;
+	position: relative;
+    top: 220px;
 }
 
 #datetimepicker-modal>div>div.decision>button {
 	background: transparent;
 	background: transparent;
     border: 0;
-    width: 268px;
+    width: 184px;
     color: #4092ef;
     font-weight: bold;
     outline: 0;
+    cursor: pointer;
+}
+
+body>div.xdsoft_datetimepicker {
+	z-index: 10000;
+	border: 0;
+	box-shadow: initial;
+}
+
+body>div.xdsoft_datetimepicker>div.xdsoft_datepicker {
+	width: 260px;
 }
