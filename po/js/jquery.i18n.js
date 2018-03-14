@@ -55,7 +55,7 @@
         timeout: 2000
       });
 
-      $.get('lan/'+lang+'.json?v2.2.0.5', function(load_dict){
+      $.get('lan/'+lang+'.json?v2.2.0.6', function(load_dict){
 
         if (this_i18n.dict !== null) {
           $.extend(this_i18n.dict, load_dict);

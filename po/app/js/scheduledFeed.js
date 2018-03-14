@@ -300,10 +300,7 @@ scheduledPost.openDatatimePickerModal = function () {
             format:'unixtime',
             minDateTime: new Date(),
             value: new Date(self.postTime),
-            closeOnWithoutClick: false,
-            closeOnDateTimeSelect: false,
-            closeOnDateSelect: false,
-            closeOnTimeSelect: false,
+            inline: true,
             scrollMonth: false,
             step: 5
         });
@@ -323,7 +320,7 @@ scheduledPost.openDatatimePickerModal = function () {
         });
 
         datetimepickerModal.show();
-        datetimepickerInput.jqueryUiDatetimepicker("show");
+        // datetimepickerInput.jqueryUiDatetimepicker("show");
     }
 }
 
