@@ -51,7 +51,7 @@ var menuPrototype = Object.create(HTMLUListElement.prototype);
 
 scheduledPost.attachedCallback  = function () {
     var datatimeText = new Date(this.postTime).customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#")
-    var targetsText = this.audiences ? targetListToString(this.audiences) : $.i18n.getString('MEMBER_ALL')
+    var targetsText = (this.audiences) ? targetListToString(this.audiences) : $.i18n.getString('MEMBER_ALL')
     
     this.innerHTML = `
         <div class='header'>
@@ -87,7 +87,7 @@ scheduledPost.attachedCallback  = function () {
 
     options.editScheduleTime = this.openDatatimePickerModal.bind(this);
     options.editAudiences = this.editAudiences.bind(this);
-    options.currentTargets = this.audiences;
+    // options.currentTargets = this.audiences;
 
     deleteIcon.addEventListener('click', this.delete.bind(this))
 
@@ -147,13 +147,7 @@ scheduledPost.updatePostTime = function (datetime) {
         } else {
             toastShow(data.rsp_msg);
 
-            getScheduledTimelineList().then(function (posts) {
-                if (posts.length == 0) {
-                    self.container.style.display = 'none';
-                } else {
-                    document.querySelector('#page-group-main div.scheduled-post-alert>div').click();
-                }
-            });
+            self.updateList();
         }
 
         $('#datetimepicker-modal').hide();
@@ -161,9 +155,21 @@ scheduledPost.updatePostTime = function (datetime) {
     })
 }
 
+scheduledPost.updateList = function () {
+    var self = this;
+
+    getScheduledTimelineList().then(function (posts) {
+        if (posts.length == 0) {
+            self.container.style.display = 'none';
+        } else {
+            document.querySelector('#page-group-main div.scheduled-post-alert>div').click();
+        }
+    });
+}
+
 scheduledPost.editAudiences = function (editBtn) {
     var self = this;
-    var currentTargets= self.audiences;
+    var currentTargets = self.audiences;
     var groupMemberAll = QmiGlobal.groups[gi].guAll || {};
     var currentAudiences = {};
     var currentBranches = {};
@@ -195,9 +201,9 @@ scheduledPost.editAudiences = function (editBtn) {
         composeObjectShowDelegate($(editBtn), $(editBtn) , {
             isShowBranch: true,
             isShowSelf: true,
-            isShowAll: false,
+            isShowAll: true,
             isShowFav: true,
-            isDisableOnAlreadyChecked: true,
+            // isDisableOnAlreadyChecked: true,
         }, function () {
             var newAudiencesData = $.parseJSON($(editBtn).data("object_str")) || {};
             var newBranchData = $.parseJSON($(editBtn).data("branch_str")) || {};
@@ -210,15 +216,10 @@ scheduledPost.editAudiences = function (editBtn) {
             var newTargets = {
                 tu: {}
             };
-            var newTargetNameList = [];
 
             if (Object.keys(newBranchData).length > 0) {
                 newTargets.tu.bl = [];
                 for (var branchID in newBranchData) {
-                    if (!currentBranches.hasOwnProperty(branchID)) {
-                        newTargetNameList.push(newBranchData[branchID]);
-                    }
-
                     newTargets.tu.bl.push({
                         bi: branchID,
                         bn: newBranchData[branchID]
@@ -229,10 +230,6 @@ scheduledPost.editAudiences = function (editBtn) {
             if (Object.keys(newFavoriteData).length > 0) {
                 newTargets.tu.fl = [];
                 for (var favoriteID in newFavoriteData) {
-                    if (!currentFavorites.hasOwnProperty(favoriteID)) {
-                        newTargetNameList.push(newFavoriteData[favoriteID]);
-                    }
-
                     newTargets.tu.fl.push(newFavoriteData[favoriteID])
                 }
             }
@@ -240,14 +237,9 @@ scheduledPost.editAudiences = function (editBtn) {
             if (checkedMemberCount > 0) {
                 if (checkedMemberCount == groupMemberNum) {
                     newTargets = {};
-                    newTargetNameList.push($.i18n.getString("MEMBER_ALL"));
                 } else {
                     newTargets.tu.gul = [];
                     for (var memberID in newAudiencesData) {
-                        if (!currentAudiences.hasOwnProperty(memberID)) {
-                            newTargetNameList.push(newAudiencesData[memberID]);
-                        }
-
                         newTargets.tu.gul.push({
                             gu: memberID,
                             n: newAudiencesData[memberID]
@@ -260,25 +252,11 @@ scheduledPost.editAudiences = function (editBtn) {
                 apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/present/events/" + self.idNumber + "/permission",
                 method: "put",
                 body: newTargets
-            }).complete(function(data){
-                if(data.status == 200){
-                    var audienceDiv = self.querySelector("div.audience>div");
-                    var newTargetsStr = newTargetNameList.join('、');
+            }).success(function(data){
+                toastShow(data.rsp_msg);
 
-                    if (checkedMemberCount == groupMemberNum) {
-                        audienceDiv.textContent = $.i18n.getString("MEMBER_ALL");
-                        self.audienceModify.querySelector("span").style.display = 'none';
-                    } else {
-                        audienceDiv.textContent = audienceDiv.textContent + '、' + newTargetsStr;
-                        self.audiences = newTargets.tu;
-                    }
-                    
-                    if (newTargetsStr.length > 0) {
-                        toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTargetsStr);
-                    }
-                    
-                    timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
-                }
+                self.updateList();
+                timelineSwitch( $("#page-group-main").data("currentAct") || "feeds");
             });
         });
     }
@@ -479,13 +457,13 @@ optionsPrototype.attachedCallback = function () {
     editAudienceBtn.textContent = $.i18n.getString('SCHEDULED_POST_EDIT_AUDIENCE');
     editScheduleTimeBtn.textContent = $.i18n.getString('SCHEDULED_POST_EDIT_SCHEDULED_TIME');
 
-    if (this.currentTargets) {
-        editAudienceBtn.addEventListener('click', function (e) {
-            this.editAudiences(e.target);
-        }.bind(this));
-    } else {
-        editAudienceBtn.setAttribute("disabled", true);
-    }
+    // if (this.currentTargets) {
+    editAudienceBtn.addEventListener('click', function (e) {
+        this.editAudiences(e.target);
+    }.bind(this));
+    // } else {
+    //     editAudienceBtn.setAttribute("disabled", true);
+    // }
 
     editScheduleTimeBtn.addEventListener('click', this.editScheduleTime);
 

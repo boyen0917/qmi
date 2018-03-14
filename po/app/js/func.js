@@ -2798,9 +2798,6 @@ composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDon
         var branchID = userObj.bl;
         var extraContent = "";
 
-        // if (objData.hasOwnProperty(gu)) userObj.chk = true;
-        // else userObj.chk = false;
-
         if( branchID && branchID.length > 0 ){
             var branchPath = branchID.split(".");
             if( branchPath && branchPath.length > 0 ){

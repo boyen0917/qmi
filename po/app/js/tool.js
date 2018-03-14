@@ -2975,27 +2975,31 @@ function getFullName(userData) {
 		? userData.nk + " (" + userData.nk2 + ")" : userData.nk;
 }
 
-function targetListToString (targerList) {
+function targetListToString (targetList) {
 	//用來過濾重複gu
     var gu_chk_arr = [];
     var bi_chk_arr = [];
     var tu_arr = [];
     
-    if(targerList.gul){
-        $.each(targerList.gul,function(gu_i,gu_obj){
+    if(targetList.gul){
+        $.each(targetList.gul,function(gu_i,gu_obj){
             if($.inArray(gu_obj.gu,gu_chk_arr) < 0 ){
                 tu_arr.push(gu_obj.n);
                 gu_chk_arr.push(gu_obj.gu); 
             }
         });
     }
-    if(targerList.bl){
-        $.each(targerList.bl,function(gu_i,bi_obj){
+    if(targetList.bl){
+        $.each(targetList.bl,function(gu_i,bi_obj){
             if($.inArray(bi_obj.gu,bi_chk_arr) < 0 ){
                 tu_arr.push(bi_obj.bn);
                 bi_chk_arr.push(bi_obj.bi); 
             }
         });
+    }
+
+    if (Object.keys(targetList) == 0) {
+    	tu_arr.push($.i18n.getString('MEMBER_ALL')); 
     }
     
     return tu_arr.join("、");
