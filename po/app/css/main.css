@@ -4613,7 +4613,17 @@ div.st-reply-message-area div.file-load .bar {
 }
 
 #page-compose div.cp-content-schedule span{
-	margin-right: 20px;
+	margin-right: 34px;
+}
+
+#page-compose div.cp-content-schedule span:after {
+    content: "";
+    position: absolute;
+    background: url("../images/ap_box_arrow.png");
+    width: 25px;
+    height: 26px;
+    background-size: 25px 26px;
+    margin-top: 9px;
 }
 
 .cp-textarea-desc {
