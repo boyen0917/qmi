@@ -2645,6 +2645,8 @@ composeContentMake = function (compose_title){
         var publishNow = true;
         var selectDatetime = new Date();
 
+        scheduledDatetimepicker.data("date", "");
+
         scheduledTimeButton.off('click').on('click', function () {
             var modifyOptions = $("#datetimepicker-modal>div>div.decision>button");
 
@@ -2652,10 +2654,7 @@ composeContentMake = function (compose_title){
                 format:'unixtime',
                 minDateTime: new Date(),
                 value: publishNow ? new Date() : selectDatetime,
-                closeOnWithoutClick: false,
-                closeOnDateTimeSelect: false,
-                closeOnDateSelect: false,
-                closeOnTimeSelect: false,
+                inline: true,
                 scrollMonth: false,
                 step: 5
             });
@@ -2685,7 +2684,7 @@ composeContentMake = function (compose_title){
             });
 
             datetimepickerModal.show();
-            scheduledDatetimepicker.jqueryUiDatetimepicker("show");
+            // scheduledDatetimepicker.jqueryUiDatetimepicker("show");
         });
     }));
 
