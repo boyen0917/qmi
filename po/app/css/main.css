@@ -6952,7 +6952,6 @@ img.vdo-default:before {}
 }
 
 #datetimepicker-modal>div>div.xdsoft_datetimepicker {
-	z-index: 10000;
 	border: 0;
 	box-shadow: initial;
 }

@@ -2650,6 +2650,8 @@ composeContentMake = function (compose_title){
         var publishNow = true;
         var selectDatetime = new Date();
 
+        scheduledDatetimepicker.data("date", "");
+
         scheduledTimeButton.off('click').on('click', function () {
             var modifyOptions = $("#datetimepicker-modal>div>div.decision>button");
 
@@ -2658,10 +2660,6 @@ composeContentMake = function (compose_title){
                 minDateTime: new Date(),
                 value: publishNow ? new Date() : selectDatetime,
                 inline: true,
-                // closeOnWithoutClick: false,
-                // closeOnDateTimeSelect: false,
-                // closeOnDateSelect: false,
-                // closeOnTimeSelect: false,
                 scrollMonth: false,
                 step: 5
             });
