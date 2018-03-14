@@ -2656,7 +2656,8 @@ composeContentMake = function (compose_title){
                 closeOnDateTimeSelect: false,
                 closeOnDateSelect: false,
                 closeOnTimeSelect: false,
-                step: 1
+                scrollMonth: false,
+                step: 5
             });
 
             datetimepickerModal.find('div.close>img').off('click').on('click', function (e) {
@@ -3567,6 +3568,7 @@ setDateTimePicker = function(this_compose){
     //初始化 datetimepicker
     this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
         format:'unixtime',
+        scrollMonth: false,
         onSelectDate: function () {
             onChangeDateTime(this_compose,"end");
         },

@@ -319,7 +319,6 @@ scheduledPost.openDatatimePickerModal = function () {
         this.expiredHandler();
     } else {
         datetimepickerModal.find("input").jqueryUiDatetimepicker({
-            // minDate: 0,
             format:'unixtime',
             minDateTime: new Date(),
             value: new Date(self.postTime),
@@ -327,8 +326,8 @@ scheduledPost.openDatatimePickerModal = function () {
             closeOnDateTimeSelect: false,
             closeOnDateSelect: false,
             closeOnTimeSelect: false,
-            // defaultTime: new Date(self.postTime),
-            step: 1
+            scrollMonth: false,
+            step: 5
         });
 
         datetimepickerModal.find('div.close>img').off('click').on('click', function (e) {
