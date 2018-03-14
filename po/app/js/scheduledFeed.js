@@ -50,13 +50,8 @@ var optionsPrototype = Object.create(HTMLElement.prototype);
 var menuPrototype = Object.create(HTMLUListElement.prototype);
 
 scheduledPost.attachedCallback  = function () {
-    // var menu = document.createElement('scheduled-post-menu');
-    // var options = document.createElement('scheduled-post-options');
-    // var datetimeModify = document.createElement('datetime-modify');
-    // var audienceModify = document.createElement('audience-modify');
     var datatimeText = new Date(this.postTime).customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#")
     var targetsText = this.audiences ? targetListToString(this.audiences) : $.i18n.getString('MEMBER_ALL')
-    // var deleteIcon = this.querySelector("div.right>img");
     
     this.innerHTML = `
         <div class='header'>
@@ -90,39 +85,14 @@ scheduledPost.attachedCallback  = function () {
     var options = document.createElement('scheduled-post-options');
     var deleteIcon = this.querySelector("div.right>img");
 
-    // datetimeModify.setAttribute('currentValue', this.postTime);
-    // datetimeModify.setAttribute('max', maxEditTime);
-    // audienceModify.currentTargets = this.audiences;
-
-    // datetimeModify.finish = this.updatePostTime.bind(this);
-    // datetimeModify.cancel = this.cancelDatetimeEdit.bind(this);
-    // datetimeModify.checkIsExpired = this.checkIsExpired.bind(this);
-    // datetimeModify.expiredHandler = this.expiredHandler.bind(this);
-
-    // audienceModify.edit = this.editAudiences.bind(this);
-    // audienceModify.checkIsExpired = this.checkIsExpired.bind(this);
-    // audienceModify.expiredHandler = this.expiredHandler.bind(this);
-
     options.editScheduleTime = this.openDatatimePickerModal.bind(this);
     options.editAudiences = this.editAudiences.bind(this);
     options.currentTargets = this.audiences;
 
-    // console.log(deleteIcon)
     deleteIcon.addEventListener('click', this.delete.bind(this))
-    // var deleteIcon;
-    // menu.showDatetimeInput = this.showDatetimeInput.bind(this);
-    // menu.editAudiences = this.editAudiences.bind(this);
 
-    // this.datetimeModify = datetimeModify;
-    // this.audienceModify = audienceModify;
-    // this.menu = menu;
     this.options = options;
-
-    // this.querySelector("div.header>div.center").appendChild(datetimeModify);
-    // this.querySelector("div.header").appendChild(audienceModify);
-    // this.querySelector("div.footer").appendChild(menu);
     this.querySelector("div.footer").appendChild(options);
-
 }
 
 scheduledPost.delete = function () {
@@ -187,7 +157,7 @@ scheduledPost.updatePostTime = function (datetime) {
         }
 
         $('#datetimepicker-modal').hide();
-        $('#datetimepicker-modify').data("DateTimePicker").destroy();
+        $('#datetimepicker').jqueryUiDatetimepicker("destroy");
     })
 }
 
@@ -342,34 +312,41 @@ scheduledPost.expiredHandler = function () {
 scheduledPost.openDatatimePickerModal = function () {
     var self = this;
     var datetimepickerModal = $("#datetimepicker-modal");
-    var scheduledDatetimepicker = $('#datetimepicker-modify');
+    var datetimepickerInput = $('#datetimepicker');
     var modifyOptions = $("#datetimepicker-modal>div>div.decision>button");
 
-    if (self.checkIsExpired()) {
-        self.expiredHandler();
+    if (this.checkIsExpired()) {
+        this.expiredHandler();
     } else {
-        scheduledDatetimepicker.datetimepicker({
-            inline: true,
-            sideBySide: true,
+        datetimepickerModal.find("input").jqueryUiDatetimepicker({
+            // minDate: 0,
+            format:'unixtime',
+            minDateTime: new Date(),
+            value: new Date(self.postTime),
+            closeOnWithoutClick: false,
+            closeOnDateTimeSelect: false,
+            closeOnDateSelect: false,
+            closeOnTimeSelect: false,
+            // defaultTime: new Date(self.postTime),
+            step: 1
         });
 
         datetimepickerModal.find('div.close>img').off('click').on('click', function (e) {
             datetimepickerModal.hide();
+            datetimepickerInput.jqueryUiDatetimepicker("destroy");
         });
 
-        scheduledDatetimepicker.data("DateTimePicker").minDate(new Date())
-        scheduledDatetimepicker.data("DateTimePicker").date(new Date(self.postTime));
+        modifyOptions.eq(0).off('click').on('click', self.publishNow.bind(self));
 
-        modifyOptions[0].addEventListener('click', self.publishNow.bind(self));
-
-        modifyOptions[1].addEventListener('click', function (e) {
-            var selectDatetime = scheduledDatetimepicker.data("DateTimePicker").date()._d;
+        modifyOptions.eq(1).off('click').on('click', function (e) {
+            var selectDatetime = datetimepickerInput.data("xdsoft_datetimepicker").getValue();
             var postTime = selectDatetime.getTime();
 
             self.updatePostTime(postTime);
         });
 
         datetimepickerModal.show();
+        datetimepickerInput.jqueryUiDatetimepicker("show");
     }
 }
 
@@ -443,12 +420,10 @@ datetimeModifyPrototype.attachedCallback = function () {
         this.finish(newDate.getTime());
     }.bind(this));
 
-    // cancelSpan.addEventListener('click', this.cancel);
     cancelSpan.addEventListener('click', function (e) {
         editSpan.style.display = 'inline-block';
         datetimeText.style.display = 'inline-block';
         modifyBlock.style.display = 'none'
-        // datetimeInput.setAttribute("value", datetimeInput.getAttribute('min'));
     });
 
     confirmDiv.appendChild(cancelSpan);
