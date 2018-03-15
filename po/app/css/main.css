@@ -58,6 +58,10 @@ textarea {
       border-radius: 8px;
 }
 
+body.ui-mobile-viewport {
+	overflow-y: hidden;
+}
+
 .ui-header.ui-bar-c.ui-header-fixed {
 	min-height: 55px;
 	z-index: 10000;
@@ -4321,7 +4325,12 @@ div.st-reply-message-area div.file-load .bar {
 	top: 3px;
 }
 
-.cp-content{ width: 100vw; }
+.cp-content{ 
+	width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+    height: 700px;
+}
 
 #page-compose .cp-content-box.cp-content-watermark {cursor: pointer;}
 
@@ -4359,6 +4368,7 @@ div.st-reply-message-area div.file-load .bar {
     box-shadow: 1px 1px 10px 2px #bbb;
     background: white;
     margin: 0px 120px;
+    z-index: 11;
 }
 
 .cp-attach-area {
@@ -4614,17 +4624,17 @@ div.st-reply-message-area div.file-load .bar {
 }
 
 #page-compose div.cp-content-schedule span{
-	margin-right: 34px;
+	margin-right: 9px;
 }
 
 #page-compose div.cp-content-schedule span:after {
     content: "";
-    position: absolute;
     background: url("../images/ap_box_arrow.png");
     width: 25px;
-    height: 26px;
+    height: 32px;
     background-size: 25px 26px;
-    margin-top: 9px;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .cp-textarea-desc {
@@ -4969,6 +4979,7 @@ border-bottom: 1px solid #eee;
 	width:100%;
 	height: 70px;
 	font-size: 14px;
+	/*position: relative;*/
 }
 
 .cp-setdate-l {
