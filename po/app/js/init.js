@@ -1,4 +1,4 @@
-// version 2.2.0.6
+// version 2.2.0.7
 var ui;
 var at;
 var gi;
@@ -49,7 +49,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整 
-	appVer: "2.2.0.6",
+	appVer: "2.2.0.7",
 
 	title: "Qmi",
 
@@ -183,7 +183,7 @@ window.QmiGlobal = {
 		tW: 1280
 	},
 
-	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
+	ajaxExpireTimer: 1 * 86400 * 1000, // ms, 一天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
 	isGetAllCloudPolling: true, // 第一次polling要打所有私雲

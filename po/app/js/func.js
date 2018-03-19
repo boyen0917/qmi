@@ -1426,7 +1426,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     this_event.find(".st-reply-all-content-area").html("");
     
     // 2017/12/19 load once
-    $('<div>').load('layout/timeline_event.html?v2.2.0.6 .st-reply-content-area', function(){
+    $('<div>').load('layout/timeline_event.html?v2.2.0.7 .st-reply-content-area', function(){
         //製作每個回覆
         var okCnt = 0;
         var loadedDom = $(this);
@@ -1930,7 +1930,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.2.0.6 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.2.0.7 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -3561,17 +3561,6 @@ setDateTimePicker = function(this_compose){
             onChangeDateTime(this_compose,"start");
         }
     });
-    //初始化 datetimepicker
-    this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
-        format:'unixtime',
-        scrollMonth: false,
-        onSelectDate: function () {
-            onChangeDateTime(this_compose,"end");
-        },
-        onSelectTime: function () {
-            onChangeDateTime(this_compose,"end");
-        },
-    });
 
     //點擊開啟 datetimepicker
     this_compose.find(".cp-setdate-l").click(function(){
@@ -3582,6 +3571,24 @@ setDateTimePicker = function(this_compose){
 
     //點擊開啟 datetimepicker
     this_compose.find(".cp-setdate-r").click(function(){
+        console.log(new Date(this_compose.data("end-timestamp")))
+        //初始化 datetimepicker
+        this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
+            format:'unixtime',
+            minDate: 0,
+            scrollMonth: false,
+            value: new Date(this_compose.data("end-timestamp")),
+            // onClose: function () {
+            //     this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker("destroy");
+            // },
+            onSelectDate: function () {
+                onChangeDateTime(this_compose,"end");
+            },
+            onSelectTime: function () {
+                onChangeDateTime(this_compose,"end");
+            },
+        });
+
         this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker("show");
     });
 }

@@ -931,12 +931,6 @@ appInitial = function(needUpdate){
 
 
     $(document).on("click",".setting-next-ready",function(){
-    	// cns.debug("document data:",$(document).data());
-    	// $(document).data("ui","U0000tXY08o");
-    	// $(document).data("at","6a174db2-420b-4bda-97ce-6069d88f2926");
-    	// $(document).data("phone-id","+886980922917");
-    	// $(document).data("device-token","web-test");
-
     	//有上傳圖檔 圖檔上傳完畢之後再做註冊步驟3
     	if(!$(".avatar-area img").hasClass("avatar-default")){
     		avatarToS3($(".avatar-file")[0].files[0]);
@@ -983,12 +977,6 @@ appInitial = function(needUpdate){
 
 	registration = function(resend){
 		if(!resend){
-			// var newPhoneNumber = getInternationalPhoneNumber( countrycode, $(".register-phone input").val() );
-			// if( newPhoneNumber.length>0 ){
-				// var desc = $.i18n.getString("REGISTER_ACCOUNT_WARN")+ "<br/><br/><label style='text-align:center;display: block;'>( " + countrycode + " ) " + newPhoneNumber+"</label>";
-				// popupShowAdjust( $.i18n.getString("REGISTER_ACCOUNT_WARN_TITEL"),desc,true,true,[registration]);
-			// }
-			// $(document).data("device-token",deviceTokenMake());
 			var phoneNumber = $(".register-phone input").val();
 			$(document).data("phone-id", countrycode + phoneNumber.replace(/^0/, ""));	
 		}
@@ -1050,7 +1038,7 @@ appInitial = function(needUpdate){
         	body: {
         		id: $(document).data("phone-id"),
                 vc: otpCode,
-                ud: $(document).data("device-token")
+                ud: QmiGlobal.device
         	},
         	errHide: true,
         	isLoadingShow: true,
@@ -1097,7 +1085,7 @@ appInitial = function(needUpdate){
 	        },
         	body: {
         		id: $(document).data("phone-id"),
-	            ud: $(document).data("device-token"),
+	            ud: QmiGlobal.device,
 	            vc: otpCode
         	},
         	isLoadingShow: true,
@@ -1130,7 +1118,7 @@ appInitial = function(needUpdate){
         	body: {
         		id: $(document).data("phone-id"),
                 tp: 1,//多裝置代碼 0(Webadm)、1(Web)、2(Phone)、3(Pad)、4(Wear)、5(TV)
-                ud: $(document).data("device-token"),
+                ud: QmiGlobal.device,
                 pw: toSha1Encode($(document).data("password"))
         	},
         	isLoadingShow: true,
@@ -1163,7 +1151,7 @@ appInitial = function(needUpdate){
         	body: {
         		id: $(document).data("phone-id"),
                 tp: 0,
-                ud: $(document).data("device-token"),
+                ud: QmiGlobal.device,
                 nk: fullName,
         	},
         	isLoadingShow: true,
