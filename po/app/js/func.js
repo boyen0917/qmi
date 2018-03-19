@@ -3561,17 +3561,6 @@ setDateTimePicker = function(this_compose){
             onChangeDateTime(this_compose,"start");
         }
     });
-    //初始化 datetimepicker
-    this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
-        format:'unixtime',
-        scrollMonth: false,
-        onSelectDate: function () {
-            onChangeDateTime(this_compose,"end");
-        },
-        onSelectTime: function () {
-            onChangeDateTime(this_compose,"end");
-        },
-    });
 
     //點擊開啟 datetimepicker
     this_compose.find(".cp-setdate-l").click(function(){
@@ -3582,6 +3571,24 @@ setDateTimePicker = function(this_compose){
 
     //點擊開啟 datetimepicker
     this_compose.find(".cp-setdate-r").click(function(){
+        console.log(new Date(this_compose.data("end-timestamp")))
+        //初始化 datetimepicker
+        this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
+            format:'unixtime',
+            minDate: 0,
+            scrollMonth: false,
+            value: new Date(this_compose.data("end-timestamp")),
+            // onClose: function () {
+            //     this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker("destroy");
+            // },
+            onSelectDate: function () {
+                onChangeDateTime(this_compose,"end");
+            },
+            onSelectTime: function () {
+                onChangeDateTime(this_compose,"end");
+            },
+        });
+
         this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker("show");
     });
 }
