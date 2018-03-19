@@ -185,7 +185,7 @@ window.QmiGlobal = {
 		tW: 1280
 	},
 
-	ajaxExpireTimer: 5 * 86400 * 1000, // ms, 五天
+	ajaxExpireTimer: 1 * 86400 * 1000, // ms, 一天
 	ldapExpireTimer: 1 * 86400 * 1000, // ms, 一天
 
 	isGetAllCloudPolling: true, // 第一次polling要打所有私雲
