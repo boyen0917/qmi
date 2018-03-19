@@ -594,38 +594,6 @@ $(function(){
 			cns.debug("on back from response like");
 		});
 	});
-	
-	//點選開啟圖庫
-	$(document).on("click",".img-show",function(e){
-		var this_img_area = $(this);
-
-		var this_s32 = this_img_area.find(".auo").data("src");
-
-		new QmiGlobal.gallery({
-            photoList: [{s32:this_s32}],
-            currentImage : 0,
-            // isApplyWatermark : isApplyWatermark,
-            // watermarkText : watermarkText
-        })
-        // showGallery( null, null, [{s32:this_s32}] );
-        // showGallery( null, [{s32:this_s32}], 0);
-		// var gallery_str = '<li data-thumb="' + this_s32 + '"><img src="' + this_s32 + '" /></li>';
-
-		// var img = new Image();
-		// img.onload = function() {
-		// 	var gallery = window.open("flexslider/index.html", "", "width=" + this.width + ", height=" + this.height);
-  //   		$(gallery.document).ready(function(){
-  //   			setTimeout(function(){
-  //   				var this_slide = $(gallery.document).find(".slides");
-  //   				this_slide.html(gallery_str);
-  //   				$(gallery.document).find("input").val(1);
-  //   				$(gallery.document).find("button").trigger("click");
-  //   			},300);
-  //   		});
-		// }
-		// img.src = this_s32;
-		
-	});
 
 	//sticker
 	$(document).on('click','.st-reply-message-sticker',function(){

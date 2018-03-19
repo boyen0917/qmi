@@ -1406,14 +1406,20 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
 
     var this_gi = this_event.data("event-id").split("_")[0];
     var this_ei = this_event.data("event-id");
-    
+    var postData = e_data[0];
+    var replyList = e_data.slice(1);
+
+    var targetTu = null;
+    if (postData.meta) targetTu = {tu: postData.meta.tu, pu: postData.meta.gu};
+
+    var tagRegex = /\/{3};(\w+);\/{3}/g;
 
     //event 自己的閱讀回覆讚好狀態
     var event_status = this_event.data("event-status");
 
     var deferTasks = [];
 
-    // 存完成定位的成員
+    // 存成員定位的成員
     var taskFinisherData = [];
 
     //event path
@@ -1424,37 +1430,66 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     this_event.find("div.timeline-box-hint").hide();
 
     this_event.find(".st-reply-all-content-area").html("");
-    
-    // 2017/12/19 load once
+
+    // 投票、工作、定位內容先做
+    $.each(postData.ml,function(i,val) {
+        var taskType = val.tp;
+
+        switch (taskType) {
+            case 9:
+                break;
+            case 12:
+                if(reply_chk) break;
+
+                //製作工作內容
+                workContentMake(this_event,val.li);
+                break;
+            case 14:
+                if(reply_chk) break;
+
+                //投票內容 照理說要做投票表格 但因為是非同步 因此先做的話 會無法更改資料
+                voteContentMake(this_event,val);
+                break;
+            case 17:
+                var reportedNumber = postData.meta.tct;
+                this_event.find(".st-locate-status").show();
+                this_event.find(".location-reported-number").html(reportedNumber);
+                if (targetTu.tu) {
+                    this_event.find(".all-number").html(targetTu.tu.gul.length);
+                } else {
+                    this_event.find(".all-number").html(QmiGlobal.groups[this_gi].cnt);
+                }
+                
+                break;
+        }
+    })
+        
+    //2017/12/19 load once
     $('<div>').load('layout/timeline_event.html?v2.2.0.6 .st-reply-content-area', function(){
         //製作每個回覆
         var okCnt = 0;
         var loadedDom = $(this);
 
-        $.each(e_data,function(el_i,el){
-            //0是發文 不重複製作
-            // if(el_i == 0) return ;
+        $.each(replyList, function(el_i,el){
             var deferred = $.Deferred();
+
             var without_message = false;
-            var reply_content;
-            var ml_arr = [];
             var mainReplyText;
 
             deferTasks.push(deferred);
 
             var replyDom = loadedDom.clone();
-            this_event.find(".st-reply-all-content-area").append(replyDom);
+            // this_event.find(".st-reply-all-content-area").append(replyDom);
 
             var this_load = replyDom.find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
             var fileArea = this_load.find(".file");
 
-            var targetTu = null;
-            if(el.meta) targetTu = {tu: el.meta.tu, pu: el.meta.gu};
-
-            $.each(el.ml,function(i,val){
+        
+            $.each(el.ml,function(i,val) {
+                var replyType = val.tp;
                 //event種類 不同 讀取不同layout
-                switch(val.tp){
+                switch(replyType){
                     case 0:
                         this_content.find(".replyMsg").html(htmlFormat(val.c));
                         mainReplyText = this_content.find(".replyMsg").html();
@@ -1466,25 +1501,62 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                         stickerDom.show();
                         setStickerUrl(stickerDom, val.c);
                         break;
-                    case 6:
-                        this_content.find(".au-area").show();
-                        getS3file(val,this_content,val.tp,280,targetTu);
-                        break;
+                    case 6://圖片
                     case 7://影片
-                        this_content.find(".video-area").addClass("play");
-                        getS3file(val,this_content.find("video"),val.tp,280,targetTu);
-                        break;
                     case 8://聲音
-                        getS3file(val,this_content.find("audio"),val.tp,280,targetTu);
-                        break;
-                    case 9:
-                        //without_message = true;
-                        break;
-                    case 12:
-                        if(reply_chk) break;
+                    case 26://檔案
+                        console.log(this_content)
+                        getS3fileUrl(val, this_ei, val.tp, 280, targetTu).then(function (fileData) {
+                            if (replyType == 6) {
+                                var imageArea = this_content.find(".au-area");
+                                var thumbnailImg = imageArea.find("img.aut");
 
-                        //製作工作內容
-                        workContentMake(this_event,val.li);
+                                imageArea.show();
+                                thumbnailImg.load(function() {
+                                    //重設 style
+                                    thumbnailImg.removeAttr("style");
+                                    var w = thumbnailImg.width();
+                                    var h = thumbnailImg.height();
+                                    // mathAvatarPos(img,w,h,size);
+                                });
+                                //小圖
+                                thumbnailImg.attr("src", fileData.s3);
+
+                                imageArea.off('click').on('click', function () {
+                                    new QmiGlobal.gallery({
+                                        photoList: [{s32: fileData.s32}],
+                                        currentImage : 0,
+                                    });
+                                });
+                            } else if (replyType == 7) {
+                                this_content.find(".video-area").addClass("play");
+                                this_content.find("video").attr("src", fileData.s32).show();
+                            } else if (replyType == 8) {
+                                this_content.find("audio").html('<source type="audio/mp4" yo src="'+ fileData.s3 +'">').show();
+                            } else if (replyType == 26) {
+                                var fileName = val.fn.split(".")[0];
+                                var format = val.fn.split(".").pop();
+                                if (fileName.length > 15) {
+                                    fileName = fileName.substring(0, 15) + "....";
+                                }
+                                var linkElement = document.createElement("a");
+                                var fileIcon = document.createElement("img");
+                                var fileNameNode = document.createTextNode(fileName + " - " + format);
+                                var fileSizeSpan = document.createElement("span");
+                                var downloadIcon = document.createElement("div")   
+                                fileIcon.src = 'images/fileSharing/' + getMatchIcon(val.fn);
+                                fileSizeSpan.textContent = val.si ? val.si.toFileSize() : "0 bytes";
+                                linkElement.className = 'attach-file';
+                                downloadIcon.className = 'download-icon'
+                                linkElement.download = val.fn;
+                                linkElement.href = fileData.s3;
+                                linkElement.appendChild(fileIcon);
+                                linkElement.appendChild(fileNameNode);
+                                linkElement.appendChild(fileSizeSpan);
+                                linkElement.appendChild(downloadIcon);
+                                fileArea.append(linkElement);
+                            }
+                        });
                         break;
                     case 13:
 
@@ -1512,13 +1584,6 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                             }
                         });
                         break;
-                    case 14:
-                        if(reply_chk) break;
-
-                        //投票內容 照理說要做投票表格 但因為是非同步 因此先做的話 會無法更改資料
-                        voteContentMake(this_event,val);
-                        //without_message = true;
-                        break;
                     case 15:
 
                         //投票回覆 不用製作留言
@@ -1539,16 +1604,6 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                         this_event.data("vote-result",vr_obj);
 
                         return false;
-                        break;
-                    case 17:
-                        var reportedNumber = el.meta.tct;
-                        this_event.find(".st-locate-status").show();
-                        this_event.find(".location-reported-number").html(reportedNumber);
-                        if (targetTu.tu) {
-                            this_event.find(".all-number").html(targetTu.tu.gul.length);
-                        } else {
-                            this_event.find(".all-number").html(QmiGlobal.groups[this_gi].cnt);
-                        }
                         break;
                     case 18:
                         without_message = true;
@@ -1596,32 +1651,6 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                             mainReplyText = mainReplyText.qmiTag(val);
                         }
                         break;
-                    case 26:
-                        getS3fileBackground(val, fileArea, 26, null , function(data){
-                            var fileName = val.fn.split(".")[0];
-                            var format = val.fn.split(".").pop();
-                            if (fileName.length > 15) {
-                                fileName = fileName.substring(0, 15) + "....";
-                            }
-                            var linkElement = document.createElement("a");
-                            var fileIcon = document.createElement("img");
-                            var fileNameNode = document.createTextNode(fileName + " - " + format);
-                            var fileSizeSpan = document.createElement("span");
-                            var downloadIcon = document.createElement("div")   
-                            fileIcon.src = 'images/fileSharing/' + getMatchIcon(val.fn);
-                            fileSizeSpan.textContent = val.si ? val.si.toFileSize() : "0 bytes";
-                            linkElement.className = 'attach-file';
-                            downloadIcon.className = 'download-icon'
-                            linkElement.download = val.fn;
-                            linkElement.href = data.s3;
-                            linkElement.appendChild(fileIcon);
-                            linkElement.appendChild(fileNameNode);
-                            linkElement.appendChild(fileSizeSpan);
-                            linkElement.appendChild(downloadIcon);
-                            fileArea.append(linkElement);
-                        });
-                        break;
-
                     case 29:
                         if (typeof(mainReplyText) == 'string' && mainReplyText) {
                             mainReplyText = mainReplyText.replaceHashTag();
@@ -1629,8 +1658,6 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                         break;
                 }
             });
-
-            var tagRegex = /\/{3};(\w+);\/{3}/g;
 
             if (mainReplyText) {
                 var matchTagList = mainReplyText.match(tagRegex);
@@ -1670,12 +1697,15 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
             
             //部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
             if(without_message || el.meta.del || (el.meta.tp.substring(0,1)*1 == 0) || reply_duplicate){
-                this_load.parent().remove();
-            }else{
+                // this_load.parent().remove();
+            } else{
 
                 //製作留言
                 var isError = false;
                 var _groupList = QmiGlobal.groups;
+
+                this_event.find(".st-reply-all-content-area").append(replyDom);
+
                 try{
                     var user_name = _groupList[this_gi].guAll[el.meta.gu].nk.replaceOriEmojiCode();
                     
@@ -5468,8 +5498,9 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     //需要記共有幾張圖片
     var gallery_arr = [], audio_arr = [], video_arr = [],
         isApplyWatermark = false,
-        watermarkText = "--- ---";
-        fileNum = 0;
+        watermarkText = "--- ---",
+        fileNum = 0,
+        eventId = this_event.data('event-id');
 
     $.each(ml,function(i,val){
         //結束時間檢查
@@ -5519,10 +5550,6 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
             case 1://網址 寫在附檔區域中
                 if(val.c){
                     this_event.find(".st-attach-url").click(function(e){
-
-                        // // if (e.target.tagName =)
-                        console.log(e.target);
-                        console.log(e.target.tagName)
                         try{
                             this_event.find(".st-sub-box-2-attach-area a")[0].click();
                         } catch(e) {
@@ -5976,11 +6003,29 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
 }
 
 
+getS3fileUrl = function (fileObj, eventId, tp, size, tu) {
+    var s3Def = $.Deferred();
+    // var this_ei = target.parents(".st-sub-box").data("event-id");
+    var thisGi = eventId.split("_")[0];
+    var thisTi = eventId.split("_")[1];
+    var fileId = fileObj.c || fileObj.fi;
+
+    new QmiAjax({
+        apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files/" + fileId + "/dl",
+        method: "post",
+        body: tu
+    }).success(function(data){
+        s3Def.resolve(data);
+    });
+
+    return s3Def.promise()
+}
+
 getS3file = function(file_obj,target,tp,size, tu){
     var this_ei = target.parents(".st-sub-box").data("event-id");
     var this_gi = this_ei.split("_")[0];
     var this_ti = this_ei.split("_")[1];
-
+    console.log(file_obj);
     //default
     size = size || 350;
     var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + file_obj.c + "/dl";
@@ -6039,7 +6084,7 @@ getS3fileBackground = function(file_obj,target,tp, tu, callback){
         method: "post",
         body: tu
     }).success(function(data){
-
+        console.log(data)
         var obj = data;
         if(target && tp){
             switch(tp){
@@ -6078,7 +6123,7 @@ getS3fileBackgroundWatermark = function(file_obj,target,tp, text, tu, callback){
     var this_ei = target.parents(".st-sub-box").data("event-id");
     var this_gi = this_ei.split("_")[0];
     var this_ti = this_ei.split("_")[1];
-
+    console.log('ddd')
     //default
     var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + file_obj.c + "/dl";
     var headers = {
@@ -6133,182 +6178,182 @@ uploadErrorCnt = function(this_compose,file_num,total){
     };
 }
 
-uploadImg = function(file,imageType,file_num,total,cp_tp,permission_id, isApplyWatermark){
-    var this_compose = $(document).find(".cp-content");
+// uploadImg = function(file,imageType,file_num,total,cp_tp,permission_id, isApplyWatermark){
+//     var this_compose = $(document).find(".cp-content");
     
-    //判斷是否符合上傳檔案格式
-    if(!file.type.match(imageType)){
-        //上傳編號加一
-        var num = this_compose.data("uploaded-num");
-        this_compose.data("uploaded-num",num += 1);
-        return false;
-    }
+//     //判斷是否符合上傳檔案格式
+//     if(!file.type.match(imageType)){
+//         //上傳編號加一
+//         var num = this_compose.data("uploaded-num");
+//         this_compose.data("uploaded-num",num += 1);
+//         return false;
+//     }
 
-    //縮圖 先做縮圖 因為要一起做commit 的 md 
-    var reader = new FileReader();
-    reader.onloadend = function() {
-        var tempImg = new Image();
-        tempImg.src = reader.result;
-        tempImg.onload = function() {
+//     //縮圖 先做縮圖 因為要一起做commit 的 md 
+//     var reader = new FileReader();
+//     reader.onloadend = function() {
+//         var tempImg = new Image();
+//         tempImg.src = reader.result;
+//         tempImg.onload = function() {
 
-            //大小圖都要縮圖
-            var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
-            var t_obj = imgResizeByCanvas(this,0,0,480,480,0.6);
+//             //大小圖都要縮圖
+//             var o_obj = imgResizeByCanvas(this,0,0,1280,1280,0.7);
+//             var t_obj = imgResizeByCanvas(this,0,0,480,480,0.6);
 
-            cns.debug("o_obj:",o_obj);
-            cns.debug("t_obj:",t_obj);
-            //compose tp to upload file tp
-            getS3UploadUrl(gi, ti_feed,1,permission_id,isApplyWatermark).complete(function(data){
-                var s3url_result = $.parseJSON(data.responseText);
-                if(data.status == 200){
-                    var fi = s3url_result.fi;
-                    var s3_url = s3url_result.s3;
-                    var s32_url = s3url_result.s32;
+//             cns.debug("o_obj:",o_obj);
+//             cns.debug("t_obj:",t_obj);
+//             //compose tp to upload file tp
+//             getS3UploadUrl(gi, ti_feed,1,permission_id,isApplyWatermark).complete(function(data){
+//                 var s3url_result = $.parseJSON(data.responseText);
+//                 if(data.status == 200){
+//                     var fi = s3url_result.fi;
+//                     var s3_url = s3url_result.s3;
+//                     var s32_url = s3url_result.s32;
 
-                    //傳大圖
-                    uploadImgToS3(s32_url,o_obj.blob).complete(function(data){
-                    if(data.status == 200){
+//                     //傳大圖
+//                     uploadImgToS3(s32_url,o_obj.blob).complete(function(data){
+//                     if(data.status == 200){
 
-                        //傳小圖
-                        uploadImgToS3(s3_url,t_obj.blob).complete(function(data){
+//                         //傳小圖
+//                         uploadImgToS3(s3_url,t_obj.blob).complete(function(data){
 
-                        if(data.status == 200){
-                            var tempW = this.width;
-                            var tempH = this.height;
+//                         if(data.status == 200){
+//                             var tempW = this.width;
+//                             var tempH = this.height;
                             
-                            //mime type
-                            var md = {};
-                            md.w = o_obj.w;
-                            md.h = o_obj.h;
-                            uploadCommit(gi, fi,ti_feed,permission_id,1,file.type,o_obj.blob.size,md).complete(function(data){
+//                             //mime type
+//                             var md = {};
+//                             md.w = o_obj.w;
+//                             md.h = o_obj.h;
+//                             uploadCommit(gi, fi,ti_feed,permission_id,1,file.type,o_obj.blob.size,md).complete(function(data){
 
-                                var commit_result = $.parseJSON(data.responseText);
+//                                 var commit_result = $.parseJSON(data.responseText);
 
-                                //上傳編號加一
-                                var num = this_compose.data("uploaded-num");
-                                this_compose.data("uploaded-num",num += 1);
+//                                 //上傳編號加一
+//                                 var num = this_compose.data("uploaded-num");
+//                                 this_compose.data("uploaded-num",num += 1);
 
-                                //commit 成功或失敗
-                                if(data.status != 200){
-                                    this_compose.data("uploaded-err").push(file_num+1);
-                                }else{
+//                                 //commit 成功或失敗
+//                                 if(data.status != 200){
+//                                     this_compose.data("uploaded-err").push(file_num+1);
+//                                 }else{
 
-                                    var img_arr = [fi,permission_id,file.name];
-                                    this_compose.data("img-compose-arr")[file_num] = img_arr;
-                                }
+//                                     var img_arr = [fi,permission_id,file.name];
+//                                     this_compose.data("img-compose-arr")[file_num] = img_arr;
+//                                 }
                                 
-                                checkIsUploadFinished( this_compose );
-                            });
-                        }else{
-                            //傳小圖失敗
-                            uploadErrorCnt(this_compose,file_num,total);
-                            return false;
-                        }});
+//                                 checkIsUploadFinished( this_compose );
+//                             });
+//                         }else{
+//                             //傳小圖失敗
+//                             uploadErrorCnt(this_compose,file_num,total);
+//                             return false;
+//                         }});
 
-                    }else{
-                        //傳大圖失敗
-                        uploadErrorCnt(this_compose,file_num,total);
-                        return false;
-                    }});
-                }else{
-                    //取得上傳網址
-                    return false;
-                }
-            });
-        }
-    }
-    reader.readAsDataURL(file);
-}
+//                     }else{
+//                         //傳大圖失敗
+//                         uploadErrorCnt(this_compose,file_num,total);
+//                         return false;
+//                     }});
+//                 }else{
+//                     //取得上傳網址
+//                     return false;
+//                 }
+//             });
+//         }
+//     }
+//     reader.readAsDataURL(file);
+// }
 
-function uploadVideo( file, video, file_num, total, cp_tp, pi) {
-    // var file = dom.data("file");
-    // var video = dom.find("video");
+// function uploadVideo( file, video, file_num, total, cp_tp, pi) {
+//     // var file = dom.data("file");
+//     // var video = dom.find("video");
 
-    // if( ""!=tmpData.ml[0].c ){
-    //  sendText(dom);
-    // } else {
-    var ori_arr = [1280, 1280, 0.9];
-    var tmb_arr = [160, 160, 0.4];
+//     // if( ""!=tmpData.ml[0].c ){
+//     //  sendText(dom);
+//     // } else {
+//     var ori_arr = [1280, 1280, 0.9];
+//     var tmb_arr = [160, 160, 0.4];
 
-    // dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
+//     // dom.find(".chat-msg-load-error").removeClass("chat-msg-load-error").addClass("chat-msg-load");
 
-    uploadGroupVideo(gi, file, video, ti_feed, 0, ori_arr, tmb_arr, pi, function (data) {
+//     uploadGroupVideo(gi, file, video, ti_feed, 0, ori_arr, tmb_arr, pi, function (data) {
 
-        //上傳編號加一
-        var this_compose = $(document).find(".cp-content");
-        var num = this_compose.data("uploaded-vid-num");
-        this_compose.data("uploaded-vid-num",num += 1);
+//         //上傳編號加一
+//         var this_compose = $(document).find(".cp-content");
+//         var num = this_compose.data("uploaded-vid-num");
+//         this_compose.data("uploaded-vid-num",num += 1);
 
-        if (data) {
-            // var data = {
-            //     fi:fi,
-            //     s3:s3_url,
-            //     s32:s32_url
-            // }
-            var img_arr = [data.fi,pi,file.name];
-            this_compose.data("video-compose-arr")[file_num] = img_arr;
-        } else {
-            this_compose.data("uploaded-vid-err").push(file_num+1);
-            //傳小圖失敗
-            uploadErrorCnt(this_compose,file_num,total);
-            return false;
-        }
+//         if (data) {
+//             // var data = {
+//             //     fi:fi,
+//             //     s3:s3_url,
+//             //     s32:s32_url
+//             // }
+//             var img_arr = [data.fi,pi,file.name];
+//             this_compose.data("video-compose-arr")[file_num] = img_arr;
+//         } else {
+//             this_compose.data("uploaded-vid-err").push(file_num+1);
+//             //傳小圖失敗
+//             uploadErrorCnt(this_compose,file_num,total);
+//             return false;
+//         }
 
-        checkIsUploadFinished( this_compose );
-    });
-    // }
-}
+//         checkIsUploadFinished( this_compose );
+//     });
+//     // }
+// }
 
-checkIsUploadFinished = function(this_compose){
-    var vidError = this_compose.data("uploaded-vid-err")
-        , imgError = this_compose.data("uploaded-err");
-    cns.debug( this_compose.data("uploaded-vid-num")
-        ,this_compose.data("uploaded-vid-total")
-        ,this_compose.data("uploaded-num")
-        ,this_compose.data("uploaded-total"));
+// checkIsUploadFinished = function(this_compose){
+//     var vidError = this_compose.data("uploaded-vid-err")
+//         , imgError = this_compose.data("uploaded-err");
+//     cns.debug( this_compose.data("uploaded-vid-num")
+//         ,this_compose.data("uploaded-vid-total")
+//         ,this_compose.data("uploaded-num")
+//         ,this_compose.data("uploaded-total"));
 
-    //判斷是否為最後一個上傳檔案
-    //檢查是否是最後一個上傳的檔案 若是的話 再檢查是否顯示上傳失敗訊息
-    if(this_compose.data("uploaded-vid-num") == this_compose.data("uploaded-vid-total")
-        && this_compose.data("uploaded-num") == this_compose.data("uploaded-total") ){
-        //loading icon off
-        s_load_show = false;
-        $('.ui-loader').hide();
-        // $(document).trigger("click");
+//     //判斷是否為最後一個上傳檔案
+//     //檢查是否是最後一個上傳的檔案 若是的話 再檢查是否顯示上傳失敗訊息
+//     if(this_compose.data("uploaded-vid-num") == this_compose.data("uploaded-vid-total")
+//         && this_compose.data("uploaded-num") == this_compose.data("uploaded-total") ){
+//         //loading icon off
+//         s_load_show = false;
+//         $('.ui-loader').hide();
+//         // $(document).trigger("click");
 
-        if( (vidError&&vidError.length > 0)||(imgError&&imgError.length>0) ){
-            popupShowAdjust("", $.i18n.getString("COMMON_UPLOAD_FAIL"),true); //"第" + vidError.sort().join("、") + "個檔案上傳失敗 請重新上傳"
-        } else {
+//         if( (vidError&&vidError.length > 0)||(imgError&&imgError.length>0) ){
+//             popupShowAdjust("", $.i18n.getString("COMMON_UPLOAD_FAIL"),true); //"第" + vidError.sort().join("、") + "個檔案上傳失敗 請重新上傳"
+//         } else {
 
-            clearTimeout(compose_timer);
+//             clearTimeout(compose_timer);
 
-            var body = this_compose.data("body");
-            if( this_compose.data("video-compose-arr") ){
-                $.each(this_compose.data("video-compose-arr"),function(i,val){
-                    if(val){
-                        var obj = {};
-                        obj.tp = 7;
-                        obj.c = val[0];
-                        obj.p = val[1];
-                        body.ml.push(obj);
-                    }
-                });
-            }
-            if( this_compose.data("img-compose-arr") ){
-                $.each(this_compose.data("img-compose-arr"),function(i,val){
-                    if(val){
-                        var obj = {};
-                        obj.tp = 6;
-                        obj.c = val[0];
-                        obj.p = val[1];
-                        body.ml.push(obj);
-                    }
-                });
-            }
-            composeSendApi(this_compose.data("body"));
-        }
-    }
-}
+//             var body = this_compose.data("body");
+//             if( this_compose.data("video-compose-arr") ){
+//                 $.each(this_compose.data("video-compose-arr"),function(i,val){
+//                     if(val){
+//                         var obj = {};
+//                         obj.tp = 7;
+//                         obj.c = val[0];
+//                         obj.p = val[1];
+//                         body.ml.push(obj);
+//                     }
+//                 });
+//             }
+//             if( this_compose.data("img-compose-arr") ){
+//                 $.each(this_compose.data("img-compose-arr"),function(i,val){
+//                     if(val){
+//                         var obj = {};
+//                         obj.tp = 6;
+//                         obj.c = val[0];
+//                         obj.p = val[1];
+//                         body.ml.push(obj);
+//                     }
+//                 });
+//             }
+//             composeSendApi(this_compose.data("body"));
+//         }
+//     }
+// }
 
 
 putEventStatus = function (target_obj,etp,est,callback){
