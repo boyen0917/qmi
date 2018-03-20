@@ -561,6 +561,8 @@
 	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "編輯發佈時間",
 	"SCHEDULED_POST_HAS_BEEN_PUBLISHED": "此文章已發佈",
 
-	"ADD_AUDIENCE_CANT_UNCHECK": "不可移除原本的發佈對象"
+	"ADD_AUDIENCE_CANT_UNCHECK": "不可移除原本的發佈對象",
+
+	"POST_START_TIME": "同排程發佈時間"
 
 }

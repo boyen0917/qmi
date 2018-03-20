@@ -2670,17 +2670,46 @@ composeContentMake = function (compose_title){
                 publishNow = true;
                 datetimepickerModal.hide();
                 scheduledDatetimepicker.jqueryUiDatetimepicker("destroy");
+
+                if (init_datetimepicker) {
+                    this_compose.data("start-timestamp", new Date().getTime());
+                }
             });
 
             modifyOptions.eq(1).off('click').on('click', function (e) {
-                selectDatetime = scheduledDatetimepicker.data("xdsoft_datetimepicker").getValue();
-                var formatDateime = selectDatetime.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+                var setTimeErr = false;
 
-                scheduledTimeButton.text(formatDateime);
-                scheduledDatetimepicker.data("date", selectDatetime.getTime());
-                publishNow = false;
-                datetimepickerModal.hide();
-                scheduledDatetimepicker.jqueryUiDatetimepicker("destroy");
+                selectDatetime = scheduledDatetimepicker.data("xdsoft_datetimepicker").getValue();
+
+                if (init_datetimepicker) {
+                    if (this_compose.data("end-timestamp") < selectDatetime.getTime() + 30 * 60 * 1000) {
+                        setTimeErr = true;
+                        popupShowAdjust("", $.i18n.getString("COMPOSE_POST_TASK_CHECKIN_ACTIVITY_TIME_LIMIT"), true);
+                    }
+                }
+                
+                if (!setTimeErr) {
+                    var formatDateime = selectDatetime.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+                    scheduledTimeButton.text(formatDateime);
+                    scheduledDatetimepicker.data("date", selectDatetime.getTime());
+                    publishNow = false;
+                    datetimepickerModal.hide();
+                    scheduledDatetimepicker.jqueryUiDatetimepicker("destroy");
+
+                    if (init_datetimepicker) {
+                        var taskEndTimeArea =  this_compose.find("div.cp-setdate-r");
+                        this_compose.data("start-timestamp", selectDatetime.getTime());
+                        // selectDatetime.setDate(selectDatetime.getDate() + 1)
+
+                        // var endTimeFormatArr = selectDatetime.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#").split(',');
+
+                        // taskEndTimeArea.find(".cp-setdate-date").html(endTimeFormatArr[0]);
+                        // taskEndTimeArea.find(".cp-setdate-week").html(endTimeFormatArr[1]);
+                        // taskEndTimeArea.find(".cp-setdate-time").html(endTimeFormatArr[2]);
+
+                        // this_compose.data("end-timestamp", selectDatetime.getTime());
+                    }
+                }
             });
 
             datetimepickerModal.show();
@@ -3574,15 +3603,17 @@ setDateTimePicker = function(this_compose){
         //初始化 datetimepicker
         this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
             format:'unixtime',
-            minDate: 0,
+            // 大於開始時間(排程時間)30分鐘
+            minDateTime: new Date(this_compose.data("start-timestamp") + 30 * 60 * 1000), 
             scrollMonth: false,
+            todayButton: true,
             value: new Date(this_compose.data("end-timestamp")),
             step: 30,
             onSelectDate: function () {
-                onChangeDateTime(this_compose,"end");
+                onChangeDateTime(this_compose, "end");
             },
             onSelectTime: function () {
-                onChangeDateTime(this_compose,"end");
+                onChangeDateTime(this_compose, "end");
             },
         });
 
@@ -3597,7 +3628,6 @@ onChangeDateTime = function(this_compose,type){
     if(!this_input.val()) return false;
 
     var time = this_input.data("xdsoft_datetimepicker").getValue();
-    console.log(time)
     var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
     var time_format_arr = time_format.split(",");
 
