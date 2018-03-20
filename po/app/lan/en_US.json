@@ -196,6 +196,7 @@
 	"COMPOSE_TITLE_EMPTY" : "Please enter title.",
 	"COMPOSE_PARSE_ERROR" : "Oops,can not get the result of this URL",
 	"COMPOSE_DISCARD": "Discard this post?",
+	"COMPOSE_POST_TASK_CHECKIN_ACTIVITY_TIME_LIMIT": "End time must be 30 minutes greater than start time",
 
 	"COMPOSE_FOOTER_IMAGE": "Image",
 	"COMPOSE_FOOTER_VIDEO": "Video",

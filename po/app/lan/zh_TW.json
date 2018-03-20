@@ -196,6 +196,7 @@
 	"COMPOSE_TITLE_EMPTY" : "標題尚未填寫",
 	"COMPOSE_PARSE_ERROR" : "網址內容取得失敗",
 	"COMPOSE_DISCARD": "即將捨棄這則貼文？",
+	"COMPOSE_POST_TASK_CHECKIN_ACTIVITY_TIME_LIMIT": "結束時間必須大於開始時間至少30分鐘",
 
 	"COMPOSE_FOOTER_IMAGE": "圖檔",
 	"COMPOSE_FOOTER_VIDEO": "影片",
