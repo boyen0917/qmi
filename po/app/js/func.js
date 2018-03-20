@@ -3550,7 +3550,6 @@ setDateTimePicker = function(this_compose){
 
         this_compose.find(".cp-setdate-l-2 .cp-setdate-start-text").toggle();
         this_compose.find(".cp-setdate-l-2 .cp-setdate-content").toggle();
-        
     });
 
     //初始化 datetimepicker
@@ -3578,9 +3577,7 @@ setDateTimePicker = function(this_compose){
             minDate: 0,
             scrollMonth: false,
             value: new Date(this_compose.data("end-timestamp")),
-            // onClose: function () {
-            //     this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker("destroy");
-            // },
+            step: 30,
             onSelectDate: function () {
                 onChangeDateTime(this_compose,"end");
             },
@@ -3601,7 +3598,7 @@ onChangeDateTime = function(this_compose,type){
 
     var time = this_input.data("xdsoft_datetimepicker").getValue();
     console.log(time)
-    var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:00" );
+    var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
     var time_format_arr = time_format.split(",");
 
     if(type == "start"){

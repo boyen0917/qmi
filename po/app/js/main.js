@@ -1556,6 +1556,14 @@ $(function(){
  				return false;
  			}
  		});
+
+ 		if ((ctp == 3 || ctp == 4 || ctp == 5) && empty_chk) {
+ 			if (this_compose.data("end-timestamp") < this_compose.data("start-timestamp") + 30 * 60 * 1000) {
+ 				empty_chk = false;
+ 				popupShowAdjust("", $.i18n.getString("COMPOSE_POST_TASK_CHECKIN_ACTIVITY_TIME_LIMIT"), true);
+ 			}
+ 		}
+
 		if(empty_chk) composeSend(this_compose);   
 	});
 
