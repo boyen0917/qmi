@@ -5496,10 +5496,10 @@ timelineContentFormat = function (c,limit,ei){
 
 timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     //需要記共有幾張圖片
-    var gallery_arr = [], audio_arr = [], video_arr = [],
+    var gallery_arr = [], audio_arr = [], video_arr = [], fileArr = [],
         isApplyWatermark = false,
         watermarkText = "--- ---",
-        fileNum = 0,
+        // fileNum = 0,
         eventId = this_event.data('event-id');
 
     $.each(ml,function(i,val){
@@ -5720,7 +5720,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 break;
             case 26:
                 this_event.find(".st-attach-file").show();
-                getS3fileBackground(val, this_event.find(".st-attach-file"), 26, null, function(data){
+                // getS3fileBackground(val, this_event.find(".st-attach-file"), 26, null, function(data){
                     var fileName = (val.fn.length > 15) ? (val.fn.substring(0, 15) + "....") : val.fn;
                     var format = val.fn.split(".").pop();
                     var linkElement = document.createElement("a");
@@ -5731,13 +5731,13 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                     fileSizeSpan.textContent = val.si ? val.si.toFileSize() : "0 bytes";
                     linkElement.className = 'attach-file';
                     linkElement.download = val.fn;
-                    linkElement.href = data.s3;
+                    // linkElement.href = data.s3;
                     linkElement.appendChild(fileIcon);
                     linkElement.appendChild(fileNameNode);
                     linkElement.appendChild(fileSizeSpan);
                     this_event.find(".attach-file-list").append(linkElement);
-                });
-                fileNum += 1;
+                // });
+                fileArr.push({fi:val.fi});
                 break;
             case 27:
                 if( false==isApplyWatermark && 1==val.wm ){
@@ -5794,7 +5794,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     if (gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr, isApplyWatermark, watermarkText, tu);
     if (audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
     if (video_arr.length > 0) timelineVideoMake(this_event,video_arr);
-    if (fileNum > 0) timelineFileMake(this_event, fileNum);
+    if (fileArr.length > 0) timelineFileMake(this_event, fileArr);
 
     this_event._i18n();
 
@@ -5829,19 +5829,34 @@ timelineVideoMake = function (this_event,video_arr){
     });
 }
 
-timelineFileMake = function(thisEvent, fileNum) {
+timelineFileMake = function(thisEvent, fileArr) {
 
     var expandDiv = thisEvent.find(".st-attach-file").children(".header");
     var allDownLoadDiv = thisEvent.find(".st-attach-file").children(".footer");
     var fileListDiv = thisEvent.find(".st-attach-file").children(".attach-file-list");
+    var fileLinks = fileListDiv.find("a");
+    var eventId = thisEvent.data('event-id');
 
+    fileLinks.off('click').on('click', function (e) {
+        var target = this;
+        var index = Array.prototype.indexOf.call(this.parentElement.children, this);
+
+        if ($(target).attr('href') === undefined) {
+            e.preventDefault();
+
+            getS3fileUrl(fileArr[index], eventId).then(function(fileData){
+                target.href = fileData.s3;
+                target.click()
+            });
+        }
+    })
     allDownLoadDiv.hide();
 
-    if (fileNum == 1) {
+    if (fileArr.length == 1) {
         expandDiv.hide();
     } else {
         fileListDiv.hide();
-        expandDiv.append(document.createTextNode(" ( " + fileNum + " )"));
+        expandDiv.append(document.createTextNode(" ( " + fileArr.length + " )"));
 
         expandDiv.bind("click", function(e) {
             fileListDiv.fadeToggle();
@@ -5850,40 +5865,66 @@ timelineFileMake = function(thisEvent, fileNum) {
         });
 
         allDownLoadDiv.bind("click", function(e) {
-            var fileLinks = fileListDiv.find("a");
-            var fileIndex = 0;
             e.preventDefault();
 
-            try {
-                var https = QmiGlobal.nodeModules.https;
-                var fs = QmiGlobal.nodeModules.fs;
-                var path = QmiGlobal.nodeModules.path;
-                var __dirname = path.dirname(process.execPath);
+            var fileIndex = 0;
+            var getLinkTasks = [];
 
-                var downloadFile = function(callback){
-                    if(fileIndex < fileLinks.length) {
-                        var fileLink = fileLinks[fileIndex];
-                        var file = fs.createWriteStream(__dirname + "/" + fileLink["download"]);
-                        var request = https.get(fileLink["href"], function(response) {
-                            response.pipe(file);
-                            fileIndex += 1;
-                            downloadFile(callback);
-                        });
+            $.each(fileLinks, function (i, fileLink) {
+                var promise = new Promise(function(resolve, reject) {
+                    if (fileLink['href']) {
+                        resolve();
                     } else {
-                        callback();
+                        getS3fileUrl(fileArr[i], eventId).then(function(fileData){
+                            fileLink['href'] = fileData.s3;
+                            resolve();
+                        });
                     }
-                }
+                });
 
-                downloadFile(function() {
-                    console.log("download finishes");
-                });
-            } catch(e){
-                $.each(fileLinks, function(i, fileLink) {
-                    fileLink.click();
-                });
-            }
+                getLinkTasks.push(promise);
+            })
+
+
+            Promise.all(getLinkTasks).then(function () {
+                try {
+                    var https = QmiGlobal.nodeModules.https;
+                    var fs = QmiGlobal.nodeModules.fs;
+                    var path = QmiGlobal.nodeModules.path;
+                    var childProcess = require('child_process');
+                    var __dirname = path.dirname(process.execPath);
+                    var savePath = process.env.HOMEDRIVE + '/' + process.env.HOMEPATH;
+
+                    var downloadFile = function(callback){
+                        if(fileIndex < fileLinks.length) {
+                            var fileLink = fileLinks[fileIndex];
+                            var file = fs.createWriteStream(savePath + "/" + fileLink["download"]);
+                            var getLinkDef = $.Deferred();
+                            
+                            https.get(fileLink["href"], function(response) {
+                                response.pipe(file);
+                                fileIndex += 1;
+                                downloadFile(callback);
+                            });
+                        } else {
+                            callback();
+                        }
+                    }
+
+                    downloadFile(function() {
+                        childProcess.exec('start ' + savePath);
+                        console.log("download finishes");
+                    });
+                } catch(e){
+                    $.each(fileLinks, function(i, fileLink) {
+                        fileLink.click();
+                    });
+                }
+            });
         });
     }
+
+
 }
 
 
