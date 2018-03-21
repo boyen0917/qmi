@@ -560,6 +560,7 @@
 	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "Edit scheduled time",
 	"SCHEDULED_POST_HAS_BEEN_PUBLISHED": "This post has been published",
 
-	"ADD_AUDIENCE_CANT_UNCHECK": "You can only add new audience"
+	"ADD_AUDIENCE_CANT_UNCHECK": "You can only add new audience",
 
+	"ERR_MSG_PHOTO_LIMIT": "Upload limitation: 20 photos"
 }
