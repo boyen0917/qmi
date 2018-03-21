@@ -358,8 +358,6 @@ $(function(){
 			var groupObj = QmiGlobal.groups[$(this).attr("data-gi")];
         	if(groupObj.isRefreshing || groupObj.isReAuthUILock) return;
 
-			//updatePollingCnts
-        	// updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 		}.bind(this));
 	});
 	

@@ -7717,9 +7717,11 @@ pollingCountsWrite = function(pollingData, aa){
             if ( thisCntObj.hasOwnProperty(key) === true && thisCntObj[key] > 0 ) {
 
                 if (key == "A1") {
-                    smCountA.show()
-                    .html(countsFormat(thisCntObj[key], smCountA))
-                    .data("gi",gi);
+                    smCountA.data("gi",gi).html(countsFormat(thisCntObj[key], smCountA));
+
+                    // 5274 在當下團體動態消息頁面 不顯示數字
+                    if(!isTimelineVisible()) smCountA.show();
+                    
                 } else {
                     // 部分動態tab 如果是active 消除cnts
                     if( smCountA.parent().hasClass("active") === true){
@@ -7822,7 +7824,10 @@ pollingCountsWrite = function(pollingData, aa){
 
     if (appBadgeNumber > 0) setBadgeLabel(appBadgeNumber.toString());
     else clearBadgeLabel();
-        
+    
+    function isTimelineVisible() {
+       return $("#page-group-main .subpage-timeline").is(":visible");
+    }  
 }
 
 //polling 事件 newPollingData
@@ -7939,10 +7944,15 @@ pollingCmds = function(newPollingData){
 
                 switch(item.tp){
                     case 1://timeline list
-                        if(item.pm.gi == gi && window.location.hash == "#page-group-main") {
+                        if(item.pm.gi == QmiGlobal.currentGi && window.location.hash == "#page-group-main") {
                             polling_arr = false;
                             idbPutTimelineEvent("",false,polling_arr);
                             getScheduledTimelineList();
+
+                            console.log("yo", item.pm.gi);
+                            // 5274 若在該團體動態消息 自動消除polling數字
+                            var a1Dom = $("#page-group-main div.header-menu > div[data-polling-cnt=A1]");
+                            updatePollingCnts(a1Dom, "A1");
                         }
                         
                         // 做一次
@@ -8330,70 +8340,40 @@ countsFormat = function(num, badgeDom){
 }
 
 updatePollingCnts = function(countDom, cntType){
+    var thisGi = countDom.data("gi") || QmiGlobal.currentGi;
 
-    var thisGi = countDom.data("gi") || gi,
-        isPublicApi = false,
-        body = {
-            cnts: [],
-            gcnts: {}
-        };
+    QmiGlobal.api.putCounts({
+        gi: thisGi,
+        ci: countDom.data("ci"),
+        tp: cntType
+    }).complete(function(data) {
+        if(data.status != 200) return;
 
-    if(cntType.substring(0,1) == "G"){
-        body.gcnts[cntType] = 0;
-        isPublicApi = true; // g 都打公雲
-    }else{
-        body.cnts[0] = { gi: thisGi };
+        // 把local cnts 清掉
+        try {
+            var tempPollingData = $.lStorage("_pollingData");
+            tempPollingData.cnts[thisGi] = tempPollingData.cnts[thisGi] || {};
 
-        if( countDom.hasClass("sm-cl-count") ){
-            body.cnts[0].cl = [];
+            // gcnts
+            if(cntType.substring(0,1) == "G"){
+                tempPollingData.gcnts[cntType] = 0;
 
-            var obj = {},
-                ciTmp = countDom.data("ci");
-
-            if( ciTmp === undefined ) return;
-
-            obj[cntType] = 0;
-            obj.ci = ciTmp;
-            body.cnts[0].cl.push(obj);
-        } else {
-            body.cnts[0][cntType] = 0;
-        }
-    }
-
-    new QmiAjax({
-        apiName: "sys/counts",
-        method: "put",
-        body: body,
-        isPublicApi: isPublicApi
-    }).complete(function(data){
-        if(data.status == 200){
-            // 把local cnts 清掉
-            try {
-                var tempPollingData = $.lStorage("_pollingData");
-
-                // gcnts
-                if(cntType.substring(0,1) == "G"){
-                    tempPollingData.gcnts[cntType] = 0;
-
-                    $.lStorage("_pollingData",tempPollingData);
-                    return;
-                }
-
-                if(typeof ciTmp === "undefined") {
-
-                    tempPollingData.cnts[thisGi][cntType] = 0;
-
-                } else if(tempPollingData.cnts[thisGi].cl !== undefined) {
-                    tempPollingData.cnts[thisGi].cl.forEach(function(item){
-                        if(item.ci === ciTmp) item[cntType] = 0;
-                    })
-                }
-                
                 $.lStorage("_pollingData",tempPollingData);
-            } catch(e) {
-                // do something..
+                return;
             }
-        }
+
+            if(typeof ciTmp === "undefined") {
+
+                tempPollingData.cnts[thisGi][cntType] = 0;
+
+            } else if(tempPollingData.cnts[thisGi].cl !== undefined) {
+                tempPollingData.cnts[thisGi].cl.forEach(function(item){
+                    if(item.ci === ciTmp) item[cntType] = 0;
+                })
+            }
+            
+            $.lStorage("_pollingData",tempPollingData);
+        } catch(e) {console.error("update polling error", e)}
     });
 }
 
