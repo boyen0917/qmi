@@ -2680,6 +2680,7 @@ composeContentMake = function (compose_title){
                 var setTimeErr = false;
 
                 selectDatetime = scheduledDatetimepicker.data("xdsoft_datetimepicker").getValue();
+                selectDatetime.setSeconds(0);
 
                 if (init_datetimepicker) {
                     if (this_compose.data("end-timestamp") < selectDatetime.getTime() + 30 * 60 * 1000) {
