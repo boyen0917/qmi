@@ -2468,8 +2468,7 @@ $(function(){
 
 	//update polling cnt when chatroom focus
 	$("#recv-chatroom-focus").off("click").click(function(){
-		cns.debug("on chatroom focus");
-		updatePollingCnts( $(this),"B7" );
+		updatePollingCnts( $(this), "B7" );
 	});
 
 	//update chat list

@@ -34,7 +34,7 @@ var base_url = function() {
 	}
 }();
 
-// var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://qmi17.mitake.com.tw/";
 
 // 先檢查是否為桌機版
 var nwGui = function() {
@@ -136,7 +136,6 @@ window.QmiGlobal = {
 
 		function setAppOnFocusEvent(isExec) {
 			try {
-				console.log("???");
 				QmiGlobal.getAppWin().removeListener("focus", QmiGlobal.getAppWin().qmiData.listenerMap.onFocus);
 				QmiGlobal.getAppWin().qmiData.listenerMap.onFocus = QmiGlobal.defaultAppQmiData.listenerMap.onFocus;
 				QmiGlobal.getAppWin().on("focus", QmiGlobal.getAppWin().qmiData.listenerMap.onFocus);
