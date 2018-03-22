@@ -563,6 +563,7 @@
 
 	"ADD_AUDIENCE_CANT_UNCHECK": "不可移除原本的發佈對象",
 
-	"POST_START_TIME": "同排程發佈時間"
+	"POST_START_TIME": "同排程發佈時間",
 
+	"ERR_MSG_PHOTO_LIMIT": "單次上傳限制：20 張"
 }

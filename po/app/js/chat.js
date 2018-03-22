@@ -350,8 +350,8 @@ $(function(){
 
 		$(".cp-file").change(function (e) {
 			var file_ori = $(this);
-			if (file_ori[0].files.length > 9) {
-				popupShowAdjust("", $.i18n.getString("COMMON_SEND_PHOTO_LIMIT", 9));
+			if (file_ori[0].files.length > 20) {
+				popupShowAdjust("", $.i18n.getString('ERR_MSG_PHOTO_LIMIT'));
 				return false;
 			}
 

@@ -563,6 +563,7 @@
 
 	"ADD_AUDIENCE_CANT_UNCHECK": "You can only add new audience",
 
-	"POST_START_TIME": "Same as Scheduled time"
+	"POST_START_TIME": "Same as Scheduled time",
 
+	"ERR_MSG_PHOTO_LIMIT": "Upload limitation: 20 photos"
 }
