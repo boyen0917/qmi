@@ -62,7 +62,7 @@ scheduledPost.attachedCallback  = function () {
                 </div>
                 <div class='type'>
                     <img src='images/compose/compose_box_bticon_post.png'>
-                    <label>發布</label>
+                    <label>${$.i18n.getString("NOTICES_POST")}</label>
                     <span>${this.type}</span>
                     <mark class='title'>${this.title}</mark>
                 </div>
