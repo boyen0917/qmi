@@ -1979,7 +1979,7 @@ voteContentMake = function (this_event,vote_obj){
             if(v_i == li.length - 1){
                 voteTypeSetting(this_event,vote_obj);
                 setTimeout(function(){
-                    voteResultMake(this_event);
+                    voteResultMake(this_event, v_val.v);
                 },500);
             }
         }));
@@ -2015,11 +2015,13 @@ voteTypeSetting = function (this_event,vote_obj){
 
 }
 
-voteResultMake = function (this_event){
+voteResultMake = function (this_event, maxVoteNum){
     var vote_obj = this_event.data("vote-result");
     var all_ques = this_event.find(".st-vote-ques-area");
     var thisGi = this_event.data("event-id").split("_")[0],
         thisGu = QmiGlobal.groups[thisGi].me;
+
+    
     //設定投票人數
     this_event.find(".st-task-vote-detail-count").show();
     this_event.find(".st-task-vote-detail-count span:first").html(Object.keys(vote_obj).length + "人已投票");
@@ -2027,6 +2029,7 @@ voteResultMake = function (this_event){
     //預設opt 為全部都沒選 fasle
     this_event.find(".st-vote-detail-option").data("vote-chk",false);
 
+    var count = 0;
     //根據每個答案的gu
     $.each(vote_obj,function(ans_gu,ans_val){
         //每個gu的答案 有多個題目
@@ -2035,28 +2038,39 @@ voteResultMake = function (this_event){
             $.each(all_ques,function(ques_i,ques_val){
                 var this_ques = $(this);
                 //題目的編號 和 答案的編號相同 而且 有投票的內容(可能 "i": [])
-                if(k_val.k == this_ques.data("ques-index") && k_val.i.length > 0){
+                if(k_val.k == this_ques.data("ques-index") && k_val.i.length > 0 
+                    && k_val.i.length <= maxVoteNum // 每一題的回答數不要超過最多可投票數
+                    // && (k_i + 1) <= maxVoteNum
+                ) {
                     //答案的多個投票
-                    $.each(k_val.i,function(i_i,i_val){
+                    $.each(k_val.i,function(i_i, i_val){
                         //最後一個 每個選項的k
                         $.each(this_ques.find(".st-vote-detail-option"),function(opt_i,opt_val){
                             var this_opt = $(this);
                             if(this_opt.data("item-index") == i_val.k){
                                 var count = this_opt.find("span:eq(1)").html();
-                                this_opt.find("span:eq(1)").html(count*1+1);
-
-                                //將gu記錄起來
                                 var member_list = this_opt.data("member-list") || [];
-                                member_list.push({gu:ans_gu,rt:ans_val.time});
-                                this_opt.data("member-list",member_list);
-                                
-                                //自己投的 要打勾
-                                if(ans_gu == thisGu){
-                                    //已投過票數加一
-                                    var n = this_ques.data("multi-count")*1;
-                                    this_ques.data("multi-count",n+1)
-                                    this_opt.data("vote-chk",true);
-                                    this_opt.find("img.check").attr("src",this_ques.data("tick-img"));
+
+                                var isIncludeThisMember = (function () {
+                                    return member_list.find(function (obj) {
+                                        return obj.gu == ans_gu;
+                                    })
+                                })()
+
+                                if (!isIncludeThisMember) {
+                                    this_opt.find("span:eq(1)").html(count*1+1);
+                                    //將gu記錄起來
+                                    member_list.push({gu:ans_gu,rt:ans_val.time});
+                                    this_opt.data("member-list",member_list);
+                                    
+                                    //自己投的 要打勾
+                                    if(ans_gu == thisGu){
+                                        //已投過票數加一
+                                        var n = this_ques.data("multi-count")*1;
+                                        this_ques.data("multi-count",n+1)
+                                        this_opt.data("vote-chk",true);
+                                        this_opt.find("img.check").attr("src",this_ques.data("tick-img"));
+                                    }
                                 }
                             }
                         });//最後一個 每個選項的k
@@ -2299,7 +2313,7 @@ bindVoteEvent = function (this_event){
         });
     });
 
-    this_event.find(".st-vote-detail-option .more").click(function(){
+    this_event.find(".st-vote-detail-option .vote-set").click(function(){
 
         var this_opt = $(this).parent();
         var this_ques = this_opt.parent();
