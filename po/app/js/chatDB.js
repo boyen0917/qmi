@@ -1,4 +1,28 @@
+var initFileDB = function () {
+	return new Promise(function (resolve, reject) {
+		var filesDataDBOpen = indexedDB.open('IDBWrapper-file_link_url', 1);
 
+		filesDataDBOpen.onupgradeneeded = function() {
+		    var db = filesDataDBOpen.result;
+		    if (!db.objectStoreNames.contains('timeline_files')) {
+				var store = db.createObjectStore('timeline_files', {keyPath: ['ei', 'fi']});
+				// store.createIndex("fileItems", ["ei", "fi"]);
+			}
+		};
+
+		filesDataDBOpen.onsuccess = function () {
+			var db = filesDataDBOpen.result;
+			
+			resolve(db);
+			// resolve(filesData);
+			// article.put({id: 67890, age: 35});
+		};
+
+		filesDataDBOpen.onerror = function () {
+			reject("Database Connection Failed")
+		};
+	});
+};
 
 // var g_bIsPolling = true;
 
