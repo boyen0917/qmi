@@ -1332,3 +1332,35 @@ QmiGlobal.ModuleConstructor = function(args) {
         }
     }()
 }
+
+// singleton
+QmiGlobal.api = (function() {
+
+	var ApiConstructor = function() {
+
+		this.putCounts = function(args) {
+			var body = {cnts: [], gcnts: {}};
+			var isGlobalCnt = args.tp.substring(0,1) == "G";
+
+			if(isGlobalCnt)
+		        body.gcnts[args.tp] = 0;
+		    else {
+		        body.cnts[0] = {gi: args.gi};
+
+		        if(args.ci)
+		            body.cnts[0].cl = [{[args.tp]: 0, ci: args.ci}];
+		        else
+		            body.cnts[0][args.tp] = 0;
+		    }
+
+			return new QmiAjax({
+		        apiName: "sys/counts",
+		        method: "put",
+		        body: body,
+		        isPublicApi: isGlobalCnt
+		    });
+		}
+	}
+
+	return new ApiConstructor();
+})()

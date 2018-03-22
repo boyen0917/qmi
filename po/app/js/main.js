@@ -358,8 +358,6 @@ $(function(){
 			var groupObj = QmiGlobal.groups[$(this).attr("data-gi")];
         	if(groupObj.isRefreshing || groupObj.isReAuthUILock) return;
 
-			//updatePollingCnts
-        	// updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 		}.bind(this));
 	});
 	
@@ -2482,8 +2480,7 @@ $(function(){
 
 	//update polling cnt when chatroom focus
 	$("#recv-chatroom-focus").off("click").click(function(){
-		cns.debug("on chatroom focus");
-		updatePollingCnts( $(this),"B7" );
+		updatePollingCnts( $(this), "B7" );
 	});
 
 	//update chat list

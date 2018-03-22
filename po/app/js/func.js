@@ -246,7 +246,6 @@ deleteMeInvite = function(this_invite){
         ci: invite_data.ci,
         method: 'delete'
     }).complete(function(data){
-        console.log(data);
         if(data.status == 200){
             this_invite.hide('fast', function(){ 
                 this_invite.remove();
@@ -1058,7 +1057,6 @@ topBarMake = function (top_area,top_msg_num,resize) {
         clearInterval(top_timer);
         top_timer = setInterval(function(){
             top_area.find(".st-top-right-arrow").trigger("mouseup");
-            console.log("[!timer!] top_timer2");
         },top_timer_ms);
     });
 }
@@ -1304,7 +1302,6 @@ onClickOfficialGeneralChat = function( this_gi ){
                             adminList,
                             null,
                             function () {
-                                console.log("dwkowko")
                                 deferred.resolve(true);
                             }
                         )
@@ -3614,7 +3611,6 @@ setDateTimePicker = function(this_compose){
 
     //點擊開啟 datetimepicker
     this_compose.find(".cp-setdate-r").click(function(){
-        console.log(new Date(this_compose.data("end-timestamp")))
         //初始化 datetimepicker
         this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
             format:'unixtime',
@@ -3677,13 +3673,8 @@ onChangeDateTime = function(this_compose,type){
 
         var target = this_compose.find(".cp-setdate-l");
     }else{
-
-        console.log(time);
         //記錄在this_compose data
         this_compose.data("end-timestamp",time.getTime());
-
-        console.log(this_compose.data("end-timestamp"))  
-
         var target = this_compose.find(".cp-setdate-r");
     }
     
@@ -4510,7 +4501,6 @@ composeSendApi = function(body){
     var method = "post";
     var now = new Date();
 
-    console.log(scheduledTime);
     if (scheduledTime) {
         if (now.getTime() > scheduledTime) {
             popupShowAdjust(
@@ -5569,9 +5559,6 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 if(val.c){
                     this_event.find(".st-attach-url").click(function(e){
 
-                        // // if (e.target.tagName =)
-                        console.log(e.target);
-                        console.log(e.target.tagName)
                         try{
                             this_event.find(".st-sub-box-2-attach-area a")[0].click();
                         } catch(e) {
@@ -7759,9 +7746,11 @@ pollingCountsWrite = function(pollingData, aa){
             if ( thisCntObj.hasOwnProperty(key) === true && thisCntObj[key] > 0 ) {
 
                 if (key == "A1") {
-                    smCountA.show()
-                    .html(countsFormat(thisCntObj[key], smCountA))
-                    .data("gi",gi);
+                    smCountA.data("gi",gi).html(countsFormat(thisCntObj[key], smCountA));
+
+                    // 5274 在當下團體動態消息頁面 不顯示數字
+                    if(!isTimelineVisible()) smCountA.show();
+
                 } else {
                     // 部分動態tab 如果是active 消除cnts
                     if( smCountA.parent().hasClass("active") === true){
@@ -7783,7 +7772,7 @@ pollingCountsWrite = function(pollingData, aa){
             var tmpDiv = $(".sm-cl-count[data-ci=" + obj.ci + "]").hide();
             if (obj.B7 > 0) {
                 // 正開啟的聊天室 不要秀cnt 然後put b7
-                if( windowList.hasOwnProperty( obj.ci ) && windowList[obj.ci].closed === false ) {
+                if( windowList.hasOwnProperty(obj.ci) && (windowList[obj.ci].frame || {}).isFocused) {
                     updatePollingCnts( $("div.polling-cnt-cl[data-ci="+ obj.ci +"]").find(".sm-cl-count"),"B7");
                 } else {
                     tmpDiv.html(countsFormat(obj.B7, tmpDiv)).show();    
@@ -7864,7 +7853,10 @@ pollingCountsWrite = function(pollingData, aa){
 
     if (appBadgeNumber > 0) setBadgeLabel(appBadgeNumber.toString());
     else clearBadgeLabel();
-        
+    
+    function isTimelineVisible() {
+       return $("#page-group-main .subpage-timeline").is(":visible");
+    }  
 }
 
 //polling 事件 newPollingData
@@ -7981,10 +7973,14 @@ pollingCmds = function(newPollingData){
 
                 switch(item.tp){
                     case 1://timeline list
-                        if(item.pm.gi == gi && window.location.hash == "#page-group-main") {
+                        if(item.pm.gi == QmiGlobal.currentGi && window.location.hash == "#page-group-main") {
                             polling_arr = false;
                             idbPutTimelineEvent("",false,polling_arr);
                             getScheduledTimelineList();
+
+                            // 5274 若在該團體動態消息 自動消除polling數字
+                            var a1Dom = $("#page-group-main div.header-menu > div[data-polling-cnt=A1]");
+                            updatePollingCnts(a1Dom, "A1");
                         }
                         
                         // 做一次
@@ -8372,70 +8368,40 @@ countsFormat = function(num, badgeDom){
 }
 
 updatePollingCnts = function(countDom, cntType){
+    var thisGi = countDom.data("gi") || QmiGlobal.currentGi;
 
-    var thisGi = countDom.data("gi") || gi,
-        isPublicApi = false,
-        body = {
-            cnts: [],
-            gcnts: {}
-        };
+    QmiGlobal.api.putCounts({
+        gi: thisGi,
+        ci: countDom.data("ci"),
+        tp: cntType
+    }).complete(function(data) {
+        if(data.status != 200) return;
 
-    if(cntType.substring(0,1) == "G"){
-        body.gcnts[cntType] = 0;
-        isPublicApi = true; // g 都打公雲
-    }else{
-        body.cnts[0] = { gi: thisGi };
+        // 把local cnts 清掉
+        try {
+            var tempPollingData = $.lStorage("_pollingData");
+            tempPollingData.cnts[thisGi] = tempPollingData.cnts[thisGi] || {};
 
-        if( countDom.hasClass("sm-cl-count") ){
-            body.cnts[0].cl = [];
+            // gcnts
+            if(cntType.substring(0,1) == "G"){
+                tempPollingData.gcnts[cntType] = 0;
 
-            var obj = {},
-                ciTmp = countDom.data("ci");
-
-            if( ciTmp === undefined ) return;
-
-            obj[cntType] = 0;
-            obj.ci = ciTmp;
-            body.cnts[0].cl.push(obj);
-        } else {
-            body.cnts[0][cntType] = 0;
-        }
-    }
-
-    new QmiAjax({
-        apiName: "sys/counts",
-        method: "put",
-        body: body,
-        isPublicApi: isPublicApi
-    }).complete(function(data){
-        if(data.status == 200){
-            // 把local cnts 清掉
-            try {
-                var tempPollingData = $.lStorage("_pollingData");
-
-                // gcnts
-                if(cntType.substring(0,1) == "G"){
-                    tempPollingData.gcnts[cntType] = 0;
-
-                    $.lStorage("_pollingData",tempPollingData);
-                    return;
-                }
-
-                if(typeof ciTmp === "undefined") {
-
-                    tempPollingData.cnts[thisGi][cntType] = 0;
-
-                } else if(tempPollingData.cnts[thisGi].cl !== undefined) {
-                    tempPollingData.cnts[thisGi].cl.forEach(function(item){
-                        if(item.ci === ciTmp) item[cntType] = 0;
-                    })
-                }
-                
                 $.lStorage("_pollingData",tempPollingData);
-            } catch(e) {
-                // do something..
+                return;
             }
-        }
+
+            if(typeof ciTmp === "undefined") {
+
+                tempPollingData.cnts[thisGi][cntType] = 0;
+
+            } else if(tempPollingData.cnts[thisGi].cl !== undefined) {
+                tempPollingData.cnts[thisGi].cl.forEach(function(item){
+                    if(item.ci === ciTmp) item[cntType] = 0;
+                })
+            }
+            
+            $.lStorage("_pollingData",tempPollingData);
+        } catch(e) {console.error("update polling error", e)}
     });
 }
 
