@@ -7749,7 +7749,7 @@ pollingCountsWrite = function(pollingData, aa){
                     smCountA.data("gi",gi).html(countsFormat(thisCntObj[key], smCountA));
 
                     // 5274 在當下團體動態消息頁面 不顯示數字
-                    if(!isTimelineVisible()) smCountA.show();
+                    if(!isOnTimelineSubpage()) smCountA.show();
 
                 } else {
                     // 部分動態tab 如果是active 消除cnts
@@ -7852,11 +7852,7 @@ pollingCountsWrite = function(pollingData, aa){
     // G3鈴鐺 在cmds tp1顯示
 
     if (appBadgeNumber > 0) setBadgeLabel(appBadgeNumber.toString());
-    else clearBadgeLabel();
-    
-    function isTimelineVisible() {
-       return $("#page-group-main .subpage-timeline").is(":visible");
-    }  
+    else clearBadgeLabel(); 
 }
 
 //polling 事件 newPollingData
@@ -7979,8 +7975,10 @@ pollingCmds = function(newPollingData){
                             getScheduledTimelineList();
 
                             // 5274 若在該團體動態消息 自動消除polling數字
-                            var a1Dom = $("#page-group-main div.header-menu > div[data-polling-cnt=A1]");
-                            updatePollingCnts(a1Dom, "A1");
+                            if(isOnTimelineSubpage()) {
+                                var a1Dom = $("#page-group-main div.header-menu > div[data-polling-cnt=A1]");
+                                updatePollingCnts(a1Dom, "A1");
+                            }
                         }
                         
                         // 做一次
@@ -8336,6 +8334,7 @@ pollingCmds = function(newPollingData){
             }]);
         })
     }
+
 }
 
 
@@ -8794,6 +8793,10 @@ function clickTimelineTab(argObj) {
     if(!argObj.tabDom) return;
     argObj.tabDom.addClass("active").addClass("sm-click-bg");
 }
+
+function isOnTimelineSubpage() {
+   return $("#page-group-main .subpage-timeline").is(":visible");
+} 
 
 /*
           ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
