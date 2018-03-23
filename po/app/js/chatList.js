@@ -387,7 +387,7 @@ function openChatWindow ( giTmp, ci ){
 			windowList[ci] = window.open("", ci , "width=400, height=600");
 		else {
 			var serverPath = window.location.href.split("/").slice(0, -1).join("/") +"/";
-			windowList[ci] = window.open(serverPath +"chat.html?v2.2.0.7", ci , "width=400,height=600");
+			windowList[ci] = window.open(serverPath +"chat.html?v2.2.0.8", ci , "width=400,height=600");
 		}
 		
 		windowList[ci].chatAuthData = {
@@ -721,7 +721,6 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 						openChatWindow( giTmp, ciTmp );
 					}});
 				} catch(e) {
-					console.log("123232", e);
 					// 原始
 					riseNotification (null, mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")", text, function(){
 						openChatWindow( giTmp, ciTmp );

@@ -64,7 +64,7 @@ body.ui-mobile-viewport {
 
 .ui-header.ui-bar-c.ui-header-fixed {
 	min-height: 55px;
-	z-index: 10000;
+	z-index: 1000;
 }
 
 .fixed-initial {
@@ -1819,7 +1819,7 @@ div#page-group-main div.gm-header-left:before {
 	border-bottom: 1px solid rgb(218,218,218);
 	position: fixed;
 	bottom: -2px;
-	z-index: 10000;
+	z-index: 1000;
 }
 
 
@@ -4992,8 +4992,9 @@ border-bottom: 1px solid #eee;
 
 .cp-setdate-r {
 	float: right;
-	width:60%;
+	width: 60%;
 	display: -webkit-box;
+    cursor: pointer;
 }
 
 .cp-setdate-l-1 {

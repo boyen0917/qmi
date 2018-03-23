@@ -1,4 +1,4 @@
-// version 2.2.0.7
+// version 2.2.0.8 - 1
 var ui;
 var at;
 var gi;
@@ -49,7 +49,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整 
-	appVer: "2.2.0.7",
+	appVer: "2.2.0.8",
 
 	title: "Qmi",
 
@@ -1321,3 +1321,35 @@ QmiGlobal.ModuleConstructor = function(args) {
         }
     }()
 }
+
+// singleton
+QmiGlobal.api = (function() {
+
+	var ApiConstructor = function() {
+
+		this.putCounts = function(args) {
+			var body = {cnts: [], gcnts: {}};
+			var isGlobalCnt = args.tp.substring(0,1) == "G";
+
+			if(isGlobalCnt)
+		        body.gcnts[args.tp] = 0;
+		    else {
+		        body.cnts[0] = {gi: args.gi};
+
+		        if(args.ci)
+		            body.cnts[0].cl = [{[args.tp]: 0, ci: args.ci}];
+		        else
+		            body.cnts[0][args.tp] = 0;
+		    }
+
+			return new QmiAjax({
+		        apiName: "sys/counts",
+		        method: "put",
+		        body: body,
+		        isPublicApi: isGlobalCnt
+		    });
+		}
+	}
+
+	return new ApiConstructor();
+})()

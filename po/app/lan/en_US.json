@@ -196,6 +196,7 @@
 	"COMPOSE_TITLE_EMPTY" : "Please enter title.",
 	"COMPOSE_PARSE_ERROR" : "Oops,can not get the result of this URL",
 	"COMPOSE_DISCARD": "Discard this post?",
+	"COMPOSE_POST_TASK_CHECKIN_ACTIVITY_TIME_LIMIT": "End time must be 30 minutes greater than start time",
 
 	"COMPOSE_FOOTER_IMAGE": "Image",
 	"COMPOSE_FOOTER_VIDEO": "Video",
@@ -560,6 +561,9 @@
 	"SCHEDULED_POST_EDIT_SCHEDULED_TIME": "Edit scheduled time",
 	"SCHEDULED_POST_HAS_BEEN_PUBLISHED": "This post has been published",
 
-	"ADD_AUDIENCE_CANT_UNCHECK": "You can only add new audience"
+	"ADD_AUDIENCE_CANT_UNCHECK": "You can only add new audience",
 
+	"POST_START_TIME": "Same as Scheduled time",
+
+	"ERR_MSG_PHOTO_LIMIT": "Upload limitation: 20 photos"
 }

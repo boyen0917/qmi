@@ -246,7 +246,6 @@ deleteMeInvite = function(this_invite){
         ci: invite_data.ci,
         method: 'delete'
     }).complete(function(data){
-        console.log(data);
         if(data.status == 200){
             this_invite.hide('fast', function(){ 
                 this_invite.remove();
@@ -1058,7 +1057,6 @@ topBarMake = function (top_area,top_msg_num,resize) {
         clearInterval(top_timer);
         top_timer = setInterval(function(){
             top_area.find(".st-top-right-arrow").trigger("mouseup");
-            console.log("[!timer!] top_timer2");
         },top_timer_ms);
     });
 }
@@ -1304,7 +1302,6 @@ onClickOfficialGeneralChat = function( this_gi ){
                             adminList,
                             null,
                             function () {
-                                console.log("dwkowko")
                                 deferred.resolve(true);
                             }
                         )
@@ -1426,7 +1423,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     this_event.find(".st-reply-all-content-area").html("");
     
     // 2017/12/19 load once
-    $('<div>').load('layout/timeline_event.html?v2.2.0.7 .st-reply-content-area', function(){
+    $('<div>').load('layout/timeline_event.html?v2.2.0.8 .st-reply-content-area', function(){
         //製作每個回覆
         var okCnt = 0;
         var loadedDom = $(this);
@@ -1930,7 +1927,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.2.0.7 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.2.0.8 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -1979,7 +1976,7 @@ voteContentMake = function (this_event,vote_obj){
             if(v_i == li.length - 1){
                 voteTypeSetting(this_event,vote_obj);
                 setTimeout(function(){
-                    voteResultMake(this_event);
+                    voteResultMake(this_event, v_val.v);
                 },500);
             }
         }));
@@ -2015,11 +2012,13 @@ voteTypeSetting = function (this_event,vote_obj){
 
 }
 
-voteResultMake = function (this_event){
+voteResultMake = function (this_event, maxVoteNum){
     var vote_obj = this_event.data("vote-result");
     var all_ques = this_event.find(".st-vote-ques-area");
     var thisGi = this_event.data("event-id").split("_")[0],
         thisGu = QmiGlobal.groups[thisGi].me;
+
+    
     //設定投票人數
     this_event.find(".st-task-vote-detail-count").show();
     this_event.find(".st-task-vote-detail-count span:first").html(Object.keys(vote_obj).length + "人已投票");
@@ -2027,6 +2026,7 @@ voteResultMake = function (this_event){
     //預設opt 為全部都沒選 fasle
     this_event.find(".st-vote-detail-option").data("vote-chk",false);
 
+    var count = 0;
     //根據每個答案的gu
     $.each(vote_obj,function(ans_gu,ans_val){
         //每個gu的答案 有多個題目
@@ -2035,28 +2035,39 @@ voteResultMake = function (this_event){
             $.each(all_ques,function(ques_i,ques_val){
                 var this_ques = $(this);
                 //題目的編號 和 答案的編號相同 而且 有投票的內容(可能 "i": [])
-                if(k_val.k == this_ques.data("ques-index") && k_val.i.length > 0){
+                if(k_val.k == this_ques.data("ques-index") && k_val.i.length > 0 
+                    && k_val.i.length <= maxVoteNum // 每一題的回答數不要超過最多可投票數
+                    // && (k_i + 1) <= maxVoteNum
+                ) {
                     //答案的多個投票
-                    $.each(k_val.i,function(i_i,i_val){
+                    $.each(k_val.i,function(i_i, i_val){
                         //最後一個 每個選項的k
                         $.each(this_ques.find(".st-vote-detail-option"),function(opt_i,opt_val){
                             var this_opt = $(this);
                             if(this_opt.data("item-index") == i_val.k){
                                 var count = this_opt.find("span:eq(1)").html();
-                                this_opt.find("span:eq(1)").html(count*1+1);
-
-                                //將gu記錄起來
                                 var member_list = this_opt.data("member-list") || [];
-                                member_list.push({gu:ans_gu,rt:ans_val.time});
-                                this_opt.data("member-list",member_list);
-                                
-                                //自己投的 要打勾
-                                if(ans_gu == thisGu){
-                                    //已投過票數加一
-                                    var n = this_ques.data("multi-count")*1;
-                                    this_ques.data("multi-count",n+1)
-                                    this_opt.data("vote-chk",true);
-                                    this_opt.find("img.check").attr("src",this_ques.data("tick-img"));
+
+                                var isIncludeThisMember = (function () {
+                                    return member_list.find(function (obj) {
+                                        return obj.gu == ans_gu;
+                                    })
+                                })()
+
+                                if (!isIncludeThisMember) {
+                                    this_opt.find("span:eq(1)").html(count*1+1);
+                                    //將gu記錄起來
+                                    member_list.push({gu:ans_gu,rt:ans_val.time});
+                                    this_opt.data("member-list",member_list);
+                                    
+                                    //自己投的 要打勾
+                                    if(ans_gu == thisGu){
+                                        //已投過票數加一
+                                        var n = this_ques.data("multi-count")*1;
+                                        this_ques.data("multi-count",n+1)
+                                        this_opt.data("vote-chk",true);
+                                        this_opt.find("img.check").attr("src",this_ques.data("tick-img"));
+                                    }
                                 }
                             }
                         });//最後一個 每個選項的k
@@ -2299,7 +2310,7 @@ bindVoteEvent = function (this_event){
         });
     });
 
-    this_event.find(".st-vote-detail-option .more").click(function(){
+    this_event.find(".st-vote-detail-option .vote-set").click(function(){
 
         var this_opt = $(this).parent();
         var this_ques = this_opt.parent();
@@ -2670,17 +2681,47 @@ composeContentMake = function (compose_title){
                 publishNow = true;
                 datetimepickerModal.hide();
                 scheduledDatetimepicker.jqueryUiDatetimepicker("destroy");
+
+                if (init_datetimepicker) {
+                    this_compose.data("start-timestamp", new Date().getTime());
+                }
             });
 
             modifyOptions.eq(1).off('click').on('click', function (e) {
-                selectDatetime = scheduledDatetimepicker.data("xdsoft_datetimepicker").getValue();
-                var formatDateime = selectDatetime.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+                var setTimeErr = false;
 
-                scheduledTimeButton.text(formatDateime);
-                scheduledDatetimepicker.data("date", selectDatetime.getTime());
-                publishNow = false;
-                datetimepickerModal.hide();
-                scheduledDatetimepicker.jqueryUiDatetimepicker("destroy");
+                selectDatetime = scheduledDatetimepicker.data("xdsoft_datetimepicker").getValue();
+                selectDatetime.setSeconds(0);
+
+                if (init_datetimepicker) {
+                    if (this_compose.data("end-timestamp") < selectDatetime.getTime() + 30 * 60 * 1000) {
+                        setTimeErr = true;
+                        popupShowAdjust("", $.i18n.getString("COMPOSE_POST_TASK_CHECKIN_ACTIVITY_TIME_LIMIT"), true);
+                    }
+                }
+                
+                if (!setTimeErr) {
+                    var formatDateime = selectDatetime.customFormat("#YYYY#/#MM#/#DD# #hhh#:#mm#");
+                    scheduledTimeButton.text(formatDateime);
+                    scheduledDatetimepicker.data("date", selectDatetime.getTime());
+                    publishNow = false;
+                    datetimepickerModal.hide();
+                    scheduledDatetimepicker.jqueryUiDatetimepicker("destroy");
+
+                    if (init_datetimepicker) {
+                        var taskEndTimeArea =  this_compose.find("div.cp-setdate-r");
+                        this_compose.data("start-timestamp", selectDatetime.getTime());
+                        // selectDatetime.setDate(selectDatetime.getDate() + 1)
+
+                        // var endTimeFormatArr = selectDatetime.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#").split(',');
+
+                        // taskEndTimeArea.find(".cp-setdate-date").html(endTimeFormatArr[0]);
+                        // taskEndTimeArea.find(".cp-setdate-week").html(endTimeFormatArr[1]);
+                        // taskEndTimeArea.find(".cp-setdate-time").html(endTimeFormatArr[2]);
+
+                        // this_compose.data("end-timestamp", selectDatetime.getTime());
+                    }
+                }
             });
 
             datetimepickerModal.show();
@@ -3550,7 +3591,6 @@ setDateTimePicker = function(this_compose){
 
         this_compose.find(".cp-setdate-l-2 .cp-setdate-start-text").toggle();
         this_compose.find(".cp-setdate-l-2 .cp-setdate-content").toggle();
-        
     });
 
     //初始化 datetimepicker
@@ -3571,21 +3611,20 @@ setDateTimePicker = function(this_compose){
 
     //點擊開啟 datetimepicker
     this_compose.find(".cp-setdate-r").click(function(){
-        console.log(new Date(this_compose.data("end-timestamp")))
         //初始化 datetimepicker
         this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker({
             format:'unixtime',
-            minDate: 0,
+            // 大於開始時間(排程時間)30分鐘
+            minDateTime: new Date(this_compose.data("start-timestamp") + 30 * 60 * 1000), 
             scrollMonth: false,
+            todayButton: true,
             value: new Date(this_compose.data("end-timestamp")),
-            // onClose: function () {
-            //     this_compose.find("input.cp-datetimepicker-end").jqueryUiDatetimepicker("destroy");
-            // },
+            step: 30,
             onSelectDate: function () {
-                onChangeDateTime(this_compose,"end");
+                onChangeDateTime(this_compose, "end");
             },
             onSelectTime: function () {
-                onChangeDateTime(this_compose,"end");
+                onChangeDateTime(this_compose, "end");
             },
         });
 
@@ -3600,8 +3639,7 @@ onChangeDateTime = function(this_compose,type){
     if(!this_input.val()) return false;
 
     var time = this_input.data("xdsoft_datetimepicker").getValue();
-    console.log(time)
-    var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:00" );
+    var time_format = time.customFormat( "#MM#月#DD#日,#CD#,#hhh#:#mm#" );
     var time_format_arr = time_format.split(",");
 
     if(type == "start"){
@@ -3635,13 +3673,8 @@ onChangeDateTime = function(this_compose,type){
 
         var target = this_compose.find(".cp-setdate-l");
     }else{
-
-        console.log(time);
         //記錄在this_compose data
         this_compose.data("end-timestamp",time.getTime());
-
-        console.log(this_compose.data("end-timestamp"))  
-
         var target = this_compose.find(".cp-setdate-r");
     }
     
@@ -4468,7 +4501,6 @@ composeSendApi = function(body){
     var method = "post";
     var now = new Date();
 
-    console.log(scheduledTime);
     if (scheduledTime) {
         if (now.getTime() > scheduledTime) {
             popupShowAdjust(
@@ -5527,9 +5559,6 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 if(val.c){
                     this_event.find(".st-attach-url").click(function(e){
 
-                        // // if (e.target.tagName =)
-                        console.log(e.target);
-                        console.log(e.target.tagName)
                         try{
                             this_event.find(".st-sub-box-2-attach-area a")[0].click();
                         } catch(e) {
@@ -7717,9 +7746,11 @@ pollingCountsWrite = function(pollingData, aa){
             if ( thisCntObj.hasOwnProperty(key) === true && thisCntObj[key] > 0 ) {
 
                 if (key == "A1") {
-                    smCountA.show()
-                    .html(countsFormat(thisCntObj[key], smCountA))
-                    .data("gi",gi);
+                    smCountA.data("gi",gi).html(countsFormat(thisCntObj[key], smCountA));
+
+                    // 5274 在當下團體動態消息頁面 不顯示數字
+                    if(!isOnTimelineSubpage()) smCountA.show();
+
                 } else {
                     // 部分動態tab 如果是active 消除cnts
                     if( smCountA.parent().hasClass("active") === true){
@@ -7741,7 +7772,7 @@ pollingCountsWrite = function(pollingData, aa){
             var tmpDiv = $(".sm-cl-count[data-ci=" + obj.ci + "]").hide();
             if (obj.B7 > 0) {
                 // 正開啟的聊天室 不要秀cnt 然後put b7
-                if( windowList.hasOwnProperty( obj.ci ) && windowList[obj.ci].closed === false ) {
+                if( windowList.hasOwnProperty(obj.ci) && (windowList[obj.ci].frame || {}).isFocused) {
                     updatePollingCnts( $("div.polling-cnt-cl[data-ci="+ obj.ci +"]").find(".sm-cl-count"),"B7");
                 } else {
                     tmpDiv.html(countsFormat(obj.B7, tmpDiv)).show();    
@@ -7821,8 +7852,7 @@ pollingCountsWrite = function(pollingData, aa){
     // G3鈴鐺 在cmds tp1顯示
 
     if (appBadgeNumber > 0) setBadgeLabel(appBadgeNumber.toString());
-    else clearBadgeLabel();
-        
+    else clearBadgeLabel(); 
 }
 
 //polling 事件 newPollingData
@@ -7939,10 +7969,16 @@ pollingCmds = function(newPollingData){
 
                 switch(item.tp){
                     case 1://timeline list
-                        if(item.pm.gi == gi && window.location.hash == "#page-group-main") {
+                        if(item.pm.gi == QmiGlobal.currentGi && window.location.hash == "#page-group-main") {
                             polling_arr = false;
                             idbPutTimelineEvent("",false,polling_arr);
                             getScheduledTimelineList();
+
+                            // 5274 若在該團體動態消息 自動消除polling數字
+                            if(isOnTimelineSubpage()) {
+                                var a1Dom = $("#page-group-main div.header-menu > div[data-polling-cnt=A1]");
+                                updatePollingCnts(a1Dom, "A1");
+                            }
                         }
                         
                         // 做一次
@@ -8298,6 +8334,7 @@ pollingCmds = function(newPollingData){
             }]);
         })
     }
+
 }
 
 
@@ -8330,70 +8367,40 @@ countsFormat = function(num, badgeDom){
 }
 
 updatePollingCnts = function(countDom, cntType){
+    var thisGi = countDom.data("gi") || QmiGlobal.currentGi;
 
-    var thisGi = countDom.data("gi") || gi,
-        isPublicApi = false,
-        body = {
-            cnts: [],
-            gcnts: {}
-        };
+    QmiGlobal.api.putCounts({
+        gi: thisGi,
+        ci: countDom.data("ci"),
+        tp: cntType
+    }).complete(function(data) {
+        if(data.status != 200) return;
 
-    if(cntType.substring(0,1) == "G"){
-        body.gcnts[cntType] = 0;
-        isPublicApi = true; // g 都打公雲
-    }else{
-        body.cnts[0] = { gi: thisGi };
+        // 把local cnts 清掉
+        try {
+            var tempPollingData = $.lStorage("_pollingData");
+            tempPollingData.cnts[thisGi] = tempPollingData.cnts[thisGi] || {};
 
-        if( countDom.hasClass("sm-cl-count") ){
-            body.cnts[0].cl = [];
+            // gcnts
+            if(cntType.substring(0,1) == "G"){
+                tempPollingData.gcnts[cntType] = 0;
 
-            var obj = {},
-                ciTmp = countDom.data("ci");
-
-            if( ciTmp === undefined ) return;
-
-            obj[cntType] = 0;
-            obj.ci = ciTmp;
-            body.cnts[0].cl.push(obj);
-        } else {
-            body.cnts[0][cntType] = 0;
-        }
-    }
-
-    new QmiAjax({
-        apiName: "sys/counts",
-        method: "put",
-        body: body,
-        isPublicApi: isPublicApi
-    }).complete(function(data){
-        if(data.status == 200){
-            // 把local cnts 清掉
-            try {
-                var tempPollingData = $.lStorage("_pollingData");
-
-                // gcnts
-                if(cntType.substring(0,1) == "G"){
-                    tempPollingData.gcnts[cntType] = 0;
-
-                    $.lStorage("_pollingData",tempPollingData);
-                    return;
-                }
-
-                if(typeof ciTmp === "undefined") {
-
-                    tempPollingData.cnts[thisGi][cntType] = 0;
-
-                } else if(tempPollingData.cnts[thisGi].cl !== undefined) {
-                    tempPollingData.cnts[thisGi].cl.forEach(function(item){
-                        if(item.ci === ciTmp) item[cntType] = 0;
-                    })
-                }
-                
                 $.lStorage("_pollingData",tempPollingData);
-            } catch(e) {
-                // do something..
+                return;
             }
-        }
+
+            if(typeof ciTmp === "undefined") {
+
+                tempPollingData.cnts[thisGi][cntType] = 0;
+
+            } else if(tempPollingData.cnts[thisGi].cl !== undefined) {
+                tempPollingData.cnts[thisGi].cl.forEach(function(item){
+                    if(item.ci === ciTmp) item[cntType] = 0;
+                })
+            }
+            
+            $.lStorage("_pollingData",tempPollingData);
+        } catch(e) {console.error("update polling error", e)}
     });
 }
 
@@ -8786,6 +8793,10 @@ function clickTimelineTab(argObj) {
     if(!argObj.tabDom) return;
     argObj.tabDom.addClass("active").addClass("sm-click-bg");
 }
+
+function isOnTimelineSubpage() {
+   return $("#page-group-main .subpage-timeline").is(":visible");
+} 
 
 /*
           ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          

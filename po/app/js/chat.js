@@ -350,8 +350,8 @@ $(function(){
 
 		$(".cp-file").change(function (e) {
 			var file_ori = $(this);
-			if (file_ori[0].files.length > 9) {
-				popupShowAdjust("", $.i18n.getString("COMMON_SEND_PHOTO_LIMIT", 9));
+			if (file_ori[0].files.length > 20) {
+				popupShowAdjust("", $.i18n.getString('ERR_MSG_PHOTO_LIMIT'));
 				return false;
 			}
 
@@ -621,32 +621,29 @@ $(function(){
 			window_focus = true;
 
 			var windowFocusHandler = function () {
-					if (window && window.frame) {
-						window.frame.isFocused = true;
-						window_focus = true;
-					}
-					// $("#header .text").css("color","orange");
-					if (g_isReadPending) {
-						g_isReadPending = false;
-						sendMsgRead();
-					}
-					if( window.opener ){
-						var dom = $(window.opener.document).find("#recv-chatroom-focus");
-						dom.attr("data-gi", gi);
-						dom.attr("data-ci", ci);
-						dom.trigger("click");
-					}
+				if (window && window.frame) {
+					window.frame.isFocused = true;
+					window_focus = true;
 				}
-				, windowBlurHandler = function () {
-					if (window && window.frame) {
-						window.frame.isFocused = false;
-						window_focus = false;
-					}
-					// $("#header .text").css("color","white");
-				};
+				// $("#header .text").css("color","orange");
+				if (g_isReadPending) {
+					g_isReadPending = false;
+					sendMsgRead();
+				}
+				if( window.opener ){
+					var dom = $(window.opener.document).find("#recv-chatroom-focus");
+					dom.attr("data-gi", gi);
+					dom.attr("data-ci", ci);
+					dom.trigger("click");
+				}
+			};
 
-			window.frame.on("focus", windowFocusHandler);
-			window.frame.on("blur", windowBlurHandler);
+			var windowBlurHandler = function () {
+				if (!window || !window.frame) return;
+				window.frame.isFocused = false;
+				window_focus = false;
+			};
+
 			window.addEventListener("focus", windowFocusHandler);
 			window.addEventListener("blur", windowBlurHandler);
 		} catch (e) {
@@ -1001,8 +998,6 @@ function getHistoryMsg(bIsScrollToTop) {
 	$("#chat-loading").show();
 	
 	g_idb_chat_msgs.limit(function (list) {
-		console.log("list", list);
-		
 		setCurrentFocus();
 		
 		if (list.length > 0) {
@@ -1086,7 +1081,6 @@ function hideLoading() {
 
 	cns.debug("-- hideLoading start --", g_currentScrollToDom);
 	if (g_currentScrollToDom) {
-		console.log('_currentScrollToDom)')
 		if (false == g_isEndOfHistory) {
 			$("#chat-loading-grayArea").show();
 		}
@@ -1095,7 +1089,6 @@ function hideLoading() {
 		g_currentScrollToDom = null;
 
 	} else {
-		console.log('jello)')
 		$("#chat-loading").stop().fadeOut(function () {
 			if (false == g_isEndOfHistory) {
 				$("#chat-loading-grayArea").show();
@@ -1121,9 +1114,7 @@ function op(url, type, data, delegate, errorDelegate) {
 		li: lang
 	}, type, false, data);
 	result.error(function (jqXHR, textStatus, errorThrown) {
-		console.log
 		var rspMsg = JSON.parse(jqXHR.responseText).rsp_msg || "";
-		// // cns.log(textStatus, errorThrown);
 		if (errorDelegate) errorDelegate(rspMsg);
 	});
 	result.success(function (data, status, xhr) {
@@ -1188,7 +1179,6 @@ function getMemberName(groupUI) {
 	if (null == mem)   return "unknown";
 	return mem.nk;
 }
-window.uc = updateChat;
 function updateChat(time, isGetNewer) {
 	
 	var api = "groups/" + gi + "/chats/" + ci + "/messages";
@@ -1202,82 +1192,79 @@ function updateChat(time, isGetNewer) {
 	var g_lastmsgTime = $.lStorage("lastMsgCt") || {};
 
 	op(api, "GET", "", function (data, status, xhr) {
-			console.log("updateChat", data);
-			g_group = $.userStorage()[gi];
-			g_room = g_group["chatAll"][ci];
+		g_group = $.userStorage()[gi];
+		g_room = g_group["chatAll"][ci];
 
-			if(null == g_room.lastCt){
-				if(g_lastmsgTime[ci] == undefined){
-					g_lastmsgTime[ci] = { ct : 0};
+		if(null == g_room.lastCt){
+			if(g_lastmsgTime[ci] == undefined)
+				g_lastmsgTime[ci] = { ct : 0};
+
+			g_room.lastCt = g_lastmsgTime[ci].ct;
+		}
+		onChatReceiveMsg( gi, ci, g_room.uiName, data.el, function(){
+			var isEndOfPageTmp = g_isEndOfPage;
+			for (var i = (data.el.length - 1); i >= 0; i--) {
+				var object = data.el[i];
+				if (object.hasOwnProperty("meta")) {
+					if (object.meta.ct > g_room.lastCt)	
+						g_room.lastCt = object.meta.ct;
+					//pass shown msgs
+					if (g_msgs.indexOf(object.ei) < 0) 
+						showMsg(object);
 				}
-				g_room.lastCt = g_lastmsgTime[ci].ct;
 			}
-			onChatReceiveMsg( gi, ci, g_room.uiName, data.el, function(){
-				var isEndOfPageTmp = g_isEndOfPage;
-				for (var i = (data.el.length - 1); i >= 0; i--) {
-					var object = data.el[i];
-					if (object.hasOwnProperty("meta")) {
 
-						if (object.meta.ct > g_room.lastCt)	g_room.lastCt = object.meta.ct;
-						//pass shown msgs
-						if (g_msgs.indexOf(object.ei) < 0) showMsg(object);
-					}
-				}
-				g_lastmsgTime[ci] = {
-						"ct" : g_room.lastCt
-				}
-				$.lStorage("lastMsgCt",g_lastmsgTime);
-				if (isUpdatePermission) getPermition(true);
-				// isGetNewer 取時間點舊到新的訊息 只有polling需要 
-				if (isGetNewer) {
+			g_lastmsgTime[ci] = {ct: g_room.lastCt};
+			$.lStorage("lastMsgCt",g_lastmsgTime);
+			if (isUpdatePermission) getPermition(true);
+			// isGetNewer 取時間點舊到新的訊息 只有polling需要 
+			if (isGetNewer) {
 
-					// 繼續取新訊息
-					if (data.el.length > 10) updateChat(g_room.lastCt, true);
+				// 繼續取新訊息
+				if (data.el.length > 10) updateChat(g_room.lastCt, true);
+
+				sendMsgRead();
+
+				if (isEndOfPageTmp) scrollToBottom();
+
+			} else { 
+
+				//getting old msgs
+				if( time !== undefined ) {
+					g_isLoadHistoryMsgNow = false;
+
+					//no more history
+					if (1 >= data.el.length) 
+						noMoreHistoryMsg();
+					else
+						hideLoading();
+
+				} else {
+					// 第一次進入 滾動至底
+					if (true==g_isFirstTimeLoading) {
+						//no more history
+						if (1 >= data.el.length) noMoreHistoryMsg();
+						scrollToBottom();
+						
+						//hide loading
+						if (false == g_isEndOfHistory) {
+							$("#chat-loading").hide();
+							$("#chat-loading-grayArea").show();
+						}
+						g_isFirstTimeLoading=false;
+					} 
 
 					sendMsgRead();
-
-					if (isEndOfPageTmp) scrollToBottom();
-
-				} else { 
-
-					//getting old msgs
-					if( time !== undefined ) {
-						g_isLoadHistoryMsgNow = false;
-
-						//no more history
-						if (1 >= data.el.length) 
-							noMoreHistoryMsg();
-						else
-							hideLoading();
-
-					} else {
-						// 第一次進入 滾動至底
-						if (true==g_isFirstTimeLoading) {
-							//no more history
-							if (1 >= data.el.length) noMoreHistoryMsg();
-							scrollToBottom();
-							
-							//hide loading
-							if (false == g_isEndOfHistory) {
-								$("#chat-loading").hide();
-								$("#chat-loading-grayArea").show();
-							}
-							g_isFirstTimeLoading=false;
-						} 
-
-						sendMsgRead();
-					}
-
-					showChatCnt();
 				}
-			});
-		}, function () {
-				if (false == isGetNewer) {
-					popupShowAdjust("", $.i18n.getString("COMMON_CHECK_NETWORK"));
-					hideLoading();
-				}
-			}	//end of onerror function
-	);	//end of op
+
+				showChatCnt();
+			}
+		});
+	}, function () {
+		if (isGetNewer) return;
+		popupShowAdjust("", $.i18n.getString("COMMON_CHECK_NETWORK"));
+		hideLoading();
+	});	//end of op
 	
 }	//end of updateChat
 
@@ -2134,13 +2121,7 @@ function sendMsgText(dom) {
 		inputDom.html("");
 		
 		if (msg.length <= 0) return;
-		console.log(g_room);
 		updateChatContentPosition();
-
-		// updateChatContentPosition();
-
-		
-		// inputDom.val("").trigger('autosize.resize');
 
 		var dom = showUnsendMsg(msg, 0);
 		dom.find(".chat-fail-status").hide();
@@ -2283,10 +2264,9 @@ function sendMsgText(dom) {
 				if (isGettingPermissionNow) return;
 				isGettingPermissionNow = true;
 				//取得成員列表
-				//GET /groups/{gi}/chats/{ci}/users
+
 				op("groups/" + gi + "/chats/" + ci + "/users",
 					"get", null, function (data, status, xhr) {
-						console.log(data);
 						//取得權限
 						var sendData = {
 							ti: ti_chat,

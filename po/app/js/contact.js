@@ -750,7 +750,6 @@ setOnMemGridScroll = function (memberKeyList, memContainer){
 	var memContainer = memContainer || $("#page-contact_all .contact-scroll");
 	// g_contactWaitLoadImgs = memContainer.find(".contact-mems .img.waitLoad");
 	memContainer.unbind("scroll").scroll(function() {
-		console.log("grid");
 		var memberIndex = memContainer.find(".contact-mems").data("memberIndex");
 		if ($(this).scrollTop() + $(this).height() >= $(this)[0].scrollHeight - 100) {
 			if (memberIndex <= memberKeyList.length - 1) {
@@ -763,7 +762,6 @@ setOnMemGridScroll = function (memberKeyList, memContainer){
 }
 setOnMemListScroll = function(memberKeyList, memContainer) {
 	memContainer = memContainer || $("#page-contact_all .contact-scroll");
-	console.log(memContainer);
 	memContainer.unbind("scroll").scroll(function() {
 		var memberIndex = memContainer.find(".contact-memLists").data("memberIndex");
 		if ($(this).scrollTop() + $(this).height() >= $(this)[0].scrollHeight) {
@@ -1598,11 +1596,9 @@ function showAddMemberPage(){
 			cns.log("close"); //, inst
 		},
 		onChange: function (val, inst) {
-			console.log(val)
 			cns.debug(val, inst);
 			countrycodeSelect.attr("data-val",val);
 			var text = countrycodeSelect.find("option[value='"+val+"']").text() || "";
-			console.log(text)
 			countrycodeSelect.attr("data-text",text);
 			// if( "undefined"!=typeof(checkRegisterPhone) ) checkRegisterPhone();
 		},

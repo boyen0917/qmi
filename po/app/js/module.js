@@ -340,6 +340,9 @@ QmiGlobal.module.systemPopup = {
 
 QmiGlobal.module.appVersion = {
 
+	apiTimer: 0, // 短時間內不重打 紀錄上次打的時間 
+	apiInterval: 60 * 60 * 1000, // 暫訂一小時一次
+
 	versionOsMap: {
 		2: {nm: "Qmi", os: 2, av: QmiGlobal.appVer},
 		4: {nm: "NodeWebkit", os: 4, av: QmiGlobal.nwVer}},
@@ -436,9 +439,18 @@ QmiGlobal.module.appVersion = {
 			// 已點選過下載
 			if(isDownloaded()) return true;
 
+			// 短時間內不重打
+			if(isWithinApiInterval()) return true;
+
 			// 正在執行中
 			if(self.loadingUI.isLoading()) return true;
 
+			return false;
+		}
+
+		function isWithinApiInterval() {
+			var currTime = new Date().getTime();
+			if(currTime - self.apiTimer < self.apiInterval) return true;
 			return false;
 		}
 	},
@@ -463,7 +475,7 @@ QmiGlobal.module.appVersion = {
 	
 	update: function() {
 		var self = this;
-		console.log("switchStr", self.switchStr);
+		// console.log("switchStr", self.switchStr);
 		switch(self.switchStr) {
 			case "00": // 手動更新 桌機無更新
 				// 文案：「有新版本，將自動更新資料。」
@@ -571,7 +583,7 @@ QmiGlobal.module.appVersion = {
 		var self = this;
 		var apiDeferred = $.Deferred();
 		var resultObj = {};
-		
+		console.log("version go")
 		$.when.apply($, Object.keys(self.versionOsMap).map(function(osTp) {
 			var deferred = $.Deferred();
 			
@@ -603,6 +615,7 @@ QmiGlobal.module.appVersion = {
 
 	    	return deferred.promise();
 		})).done(function() {
+			self.apiTimer = new Date().getTime();
 			apiDeferred.resolve(resultObj);
 		});
 

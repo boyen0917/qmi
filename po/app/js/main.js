@@ -358,8 +358,6 @@ $(function(){
 			var groupObj = QmiGlobal.groups[$(this).attr("data-gi")];
         	if(groupObj.isRefreshing || groupObj.isReAuthUILock) return;
 
-			//updatePollingCnts
-        	// updatePollingCnts($(this).find(".sm-count"),$(this).data("polling-cnt"));
 		}.bind(this));
 	});
 	
@@ -1556,6 +1554,14 @@ $(function(){
  				return false;
  			}
  		});
+
+ 		if ((ctp == 3 || ctp == 4 || ctp == 5) && empty_chk) {
+ 			if (this_compose.data("end-timestamp") < this_compose.data("start-timestamp") + 30 * 60 * 1000) {
+ 				empty_chk = false;
+ 				popupShowAdjust("", $.i18n.getString("COMPOSE_POST_TASK_CHECKIN_ACTIVITY_TIME_LIMIT"), true);
+ 			}
+ 		}
+
 		if(empty_chk) composeSend(this_compose);   
 	});
 
@@ -1680,48 +1686,52 @@ $(function(){
 
 		if( imgList.length>0 ){
 
-			composePage.find(".cp-attach-area").show();
-			composePage.find(".cp-file-area").show();
-			var imageArea = composePage.find(".cp-file-img-area");
-			imageArea.html("").show();
-			
-			$.each(imgList,function(i,file){
-				if(!file || !file.type) return;
-				//流水號
-				var ai = this_compose.data("upload-ai");
-				this_compose.data("upload-obj")[ai] = {file: file};
-				this_compose.data("upload-ai",ai+1)
-			});
-			
-			$.each(this_compose.data("upload-obj"),function(i, obj){
-				var this_grid =  $('<div class="cp-grid"><div><img/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
-				$(".cp-file-img-area").append(this_grid);
-
-				//編號 方便刪除
-				this_grid.data("file-num",i);
-
+			if (imgList.length > 20) {
+				popupShowAdjust("", $.i18n.getString('ERR_MSG_PHOTO_LIMIT'));
+			} else {
+				composePage.find(".cp-attach-area").show();
+				composePage.find(".cp-file-area").show();
+				var imageArea = composePage.find(".cp-file-img-area");
+				imageArea.html("").show();
 				
-				// 存回
-				var elem = this_grid.find("div img");
-				this_compose.data("upload-obj")[i] = {
-					file: obj.file,
-					elem: elem[0]
-				}
+				$.each(imgList,function(i,file){
+					if(!file || !file.type) return;
+					//流水號
+					var ai = this_compose.data("upload-ai");
+					this_compose.data("upload-obj")[ai] = {file: file};
+					this_compose.data("upload-ai",ai+1)
+				});
+				
+				$.each(this_compose.data("upload-obj"),function(i, obj){
+					var this_grid =  $('<div class="cp-grid"><div><img/></div><img class="grid-cancel" src="images/common/icon/icon_compose_close.png"/></div>');
+					$(".cp-file-img-area").append(this_grid);
 
-				//有圖片就push進 compose message list
-				if($.inArray(6,this_compose.data("message-list")) < 0){
-					this_compose.data("message-list").push(6);
+					//編號 方便刪除
+					this_grid.data("file-num",i);
 
-					//附檔區域存在附檔
-					this_compose.data("attach",true);
-				}
+					
+					// 存回
+					var elem = this_grid.find("div img");
+					this_compose.data("upload-obj")[i] = {
+						file: obj.file,
+						elem: elem[0]
+					}
 
-				var reader = new FileReader();
-				reader.onload = function(e) {
-			        elem.attr("src",reader.result);
-				}
-				reader.readAsDataURL(obj.file);	
-			});
+					//有圖片就push進 compose message list
+					if($.inArray(6,this_compose.data("message-list")) < 0){
+						this_compose.data("message-list").push(6);
+
+						//附檔區域存在附檔
+						this_compose.data("attach",true);
+					}
+
+					var reader = new FileReader();
+					reader.onload = function(e) {
+				        elem.attr("src",reader.result);
+					}
+					reader.readAsDataURL(obj.file);	
+				});
+			}
 		}
 
 		if( videoList.length>0 ){
@@ -2470,8 +2480,7 @@ $(function(){
 
 	//update polling cnt when chatroom focus
 	$("#recv-chatroom-focus").off("click").click(function(){
-		cns.debug("on chatroom focus");
-		updatePollingCnts( $(this),"B7" );
+		updatePollingCnts( $(this), "B7" );
 	});
 
 	//update chat list

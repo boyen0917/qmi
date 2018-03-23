@@ -447,7 +447,7 @@ appInitial = function(needUpdate){
 
                 	if(resultObj.status === false){
                 		//sso 取消
-                		if(resultObj.data.isReAuthCancel === true){
+                		if((resultObj.data || {}).isReAuthCancel === true){
                 			cns.debug("sso reAuth 取消");	
                 			var errCode = "code:E0000401";
                 		} else {
