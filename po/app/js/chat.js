@@ -2183,6 +2183,7 @@ function sendMsgText(dom) {
 			return;
 		}
 		//default
+		console.log('gets3file');
 		var api_name = "groups/" + gi + "/chats/" + this_ti + "/files/" + file_c + "/dl";
 		var headers = {
 			"ui": ui,

@@ -1,28 +1,29 @@
-var initFileDB = function () {
-	return new Promise(function (resolve, reject) {
-		var filesDataDBOpen = indexedDB.open('IDBWrapper-file_link_url', 1);
+var fileDB = (function () {
+	var request = indexedDB.open('IDBWrapper-file_link_url', 1);
+	var db;
+	
+	request.onupgradeneeded = function(event) {
+	    var db = event.target.result;
+	    if (!db.objectStoreNames.contains('timeline_files')) {
+			var store = db.createObjectStore('timeline_files', {keyPath: ['ei', 'fi']});
+		}
+	};
 
-		filesDataDBOpen.onupgradeneeded = function() {
-		    var db = filesDataDBOpen.result;
-		    if (!db.objectStoreNames.contains('timeline_files')) {
-				var store = db.createObjectStore('timeline_files', {keyPath: ['ei', 'fi']});
-				// store.createIndex("fileItems", ["ei", "fi"]);
-			}
-		};
+	request.onsuccess = function () {
+		db = request.result;
+	};
 
-		filesDataDBOpen.onsuccess = function () {
-			var db = filesDataDBOpen.result;
-			
-			resolve(db);
-			// resolve(filesData);
-			// article.put({id: 67890, age: 35});
-		};
+	request.onerror = function () {
+		console.log("Database Connection Failed")
+	};
 
-		filesDataDBOpen.onerror = function () {
-			reject("Database Connection Failed")
-		};
-	});
-};
+	return {
+		getObjectStore: function (storeName, mode) {
+			var tx = db.transaction(storeName, mode);
+			return tx.objectStore(storeName);
+		}
+	}
+})();
 
 // var g_bIsPolling = true;
 
