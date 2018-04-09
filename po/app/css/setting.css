@@ -579,16 +579,16 @@ ul.system-tab li.current-tab{
 }
 
 /*信箱電話更改*/
-.edit-phone-content{
+#email-setting>div {
+	padding: 10px;
+}
+
+#email-setting>div.edit-email-content {
 	border-bottom: 1px solid #ededed;
-	padding: 10px;
+	/*padding: 10px;*/
 }
 
-.edit-email-content{
-	padding: 10px;
-}
-
-.edit-phone-content input,.edit-email-content input{
+#email-setting>div input {
 	width: 200px;
 	height: 12px;
 	margin-top: 5px;
@@ -597,6 +597,19 @@ ul.system-tab li.current-tab{
 	border: 1px solid #ccc;
 	font-size: 14px;
 	background-color: #EFEEEE;
+}
+
+#email-setting>div.delete-account {
+	text-align: center;
+}
+
+#email-setting>div.delete-account>button {
+	background: transparent;
+    border: 0;
+    color: rgba(255, 0, 69, 0.57);
+    cursor: pointer;
+    outline: none;
+    font-weight: bold;
 }
 
 /*變更密碼*/

@@ -2898,53 +2898,59 @@ function emojiImgError(image) {
   	});
 }
 
-QmiGlobal.PopupDialog = {
-	container: $("<div id='popupDialog'><div class='container'><div class='close'>"
-		+ "<button>×</button></div><div class='header'></div><div class='content'>" 
-		+ "</div><div class='footer'></div></div></div>"),
+QmiGlobal.PopupDialog = { 
+	container: $("<div id='popupDialog'><div class='container'><div><div class='header'></div>" 
+		+ "<div class='content'></div><div class='footer'></div></div></div></div>"),
 
 	create: function (option) {
-		var inputData = option.input || [];
-		var buttons = option.buttons || {};
+		var dialogBox = this.container.children().children();
+		
+		dialogBox.removeClass();
+		dialogBox.find(".header").html("").append(option.header);
+		dialogBox.find(".content").html("");
+		dialogBox.find(".footer").html("");
+		dialogBox.addClass(option.className);
 
-		this.container.find(".close button").off("click").on("click", this.close.bind(this));
-		this.container.find(".header").html("").append(option.header);
-		this.container.find(".content").html("");
-		this.container.find(".footer").html("");
-
-		inputData.forEach(function(tagObj) {
-			var htmlElement;
-			switch (tagObj.type) {
-				case "password" :
-					htmlElement = $("<div class='" + tagObj.className + "'><input type='" + tagObj.type 
-						+ "' placeholder='" + $.i18n.getString(tagObj.hint)  + "' maxlength='" 
-						+ tagObj.maxLength + "'>");
-
-					htmlElement.off(tagObj.eventType).on(tagObj.eventType, tagObj.eventFun); 
-					break;
-				
-			}
-			this.container.find(".content").append(htmlElement);
-		}.bind(this));
-
-		if (option.errMsg) {
-			this.container.find(".content").append("<div class='" + option.errMsg.className + "'>" 
-				+ $.i18n.getString(option.errMsg.text) + "</div>");
+		if (option.content) {
+			this.makeElements(dialogBox.find(".content")[0], option.content);
 		}
 
-		$.each(buttons, function (key, btnObj) {
-			var btnElement;
-
-			btnElement = $("<button class='" + btnObj.className + "'>" 
-				+ $.i18n.getString(btnObj.text) + "</button>");
-			btnElement.off(btnObj.eventType).on(btnObj.eventType, btnObj.eventFun); 
-
-			this.container.find(".footer").append(btnElement)
-		}.bind(this));
+		if (option.footer) {
+			this.makeElements(dialogBox.find(".footer")[0], option.footer);
+		}
 
 		$("body").append(this.container);
 
 		return this;
+	},
+
+	makeElements: function (parent, elementList) {
+		var self = this;
+
+		elementList.forEach(function (htmlElement) {
+			if (htmlElement.tagName == 'text') {
+				var element = document.createTextNode(htmlElement.text);
+			} else {
+				var element = document.createElement(htmlElement.tagName);
+				element.textContent = htmlElement.text;
+			}
+			
+			if (htmlElement.attributes) {
+				for (var key in htmlElement.attributes) {
+					element.setAttribute(key, htmlElement.attributes[key]);
+				}
+			}
+
+			if (htmlElement.eventType) {
+				element.addEventListener(htmlElement.eventType, htmlElement.eventHandler);
+			}
+ 
+			if (htmlElement.children) {
+				self.makeElements(element, htmlElement.children);
+			}
+
+			parent.appendChild(element);
+		});
 	},
 
 	open: function () {
@@ -2953,9 +2959,15 @@ QmiGlobal.PopupDialog = {
 
 	close: function () {
 		var self = this;
+		var deferred = $.Deferred();
+
 		self.container.fadeOut(300, function() {
 			self.container.remove();
+
+			deferred.resolve();
 		})
+
+		return deferred.promise();
 	}
 }
 

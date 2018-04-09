@@ -565,5 +565,34 @@
 
 	"POST_START_TIME": "同排程發佈時間",
 
-	"ERR_MSG_PHOTO_LIMIT": "單次上傳限制：20 張"
+	"ERR_MSG_PHOTO_LIMIT": "單次上傳限制：20 張",
+
+	"ACCOUNT_MANAGEMENT_REMIND": "提醒",
+	"ACCOUNT_MANAGEMENT_ENTER_PASSWORD": "輸入密碼",
+	"ACCOUNT_MANAGEMENT_CANCEL": "取消",
+	"ACCOUNT_MANAGEMENT_DONE": "完成",
+	"ACCOUNT_MANAGEMENT_VERIFICATION_CODE": "驗證碼",
+	"ACCOUNT_MANAGEMENT_VERIFICATION_CODE_SENT": "已發送一個六位數驗證碼至 ",
+	"ACCOUNT_MANAGEMENT_VERIFICATION_CODE_ENTER": "請輸入六位數驗證碼",
+	"ACCOUNT_MANAGEMENT_DIDNT_RECEIVE": "沒有收到驗證碼？",
+	"ACCOUNT_MANAGEMENT_RESEND": "重送",
+
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_WARNING": "此帳號將被移除並且無法復原。",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_DETAIL": "如需進一步資訊，可參考我們的",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_USER_AGREEMENT": "使用條款",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_AND": "及",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_PRIVACY_POLICY": "隱私政策。",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT": "刪除帳號",
+	"ACCOUNT_MANAGEMENT_ACCOUNT_SUSPENDED": "此帳號因案已暫停使用，如有疑問請洽 0800-080-090",
+	"ACCOUNT_MANAGEMENT_ACCOUNT_REACTIVATED": "您的帳號xxxxx12345已解除鎖定，請於Qmi登入畫面中使用忘記密碼功能，重新取得新密碼後恢復使用。",
+	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_QRCODE": "如接受他團體/群組邀請同意而加入該團體時，則視為您已同意並自行提供個人註冊帳號${帳號}、個人名稱${名稱}及個人圖片給該團體成員並同意當您註冊帳號異動時系統同步更新您於該團體帳號，因該資料及您加入該團體後新增之資料所發生權利義務發生於您與上開團體管理者間，與本公司無涉，您同意加入團體/群組前應審評估、以維護您的權益。",
+	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION": "如接受他團體/群組邀請同意而加入該團體時，則視為您已同意並自行提供個人註冊帳號${帳號}及個人圖片給該團體成員並同意當您註冊帳號異動時系統同步更新您於該團體帳號，因該資料及您加入該團體後新增之資料所發生權利義務於您與上開團體管理者間，與本公司無涉，您同意加入團體/群組前應審評估、以維護您的權益。",
+	"ACCOUNT_MANAGEMENT_AGREE": "同意加入",
+	"ACCOUNT_MANAGEMENT_DISAGREE": "放棄加入",
+	"ACCOUNT_MANAGEMENT_ACCOUNT_REMOVE_NOTIFICATION": "此帳號已超過 365 天未登入使用，將在 15 天內刪除，如有疑問請洽 0800-080-090 。",
+	"ACCOUNT_MANAGEMENT_FILE_DELETED": "檔案過期或超過儲存空間上限，已失效。",
+	"ACCOUNT_MANAGEMENT_DELETED_CONFIRMATION": "帳號已刪除",
+	"ACCOUNT_MANAGEMENT_DONE": "完成",
+
+	"SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT": "公告"
 }
