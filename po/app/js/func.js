@@ -5495,7 +5495,7 @@ timelineContentFormat = function (c,limit,ei){
 
 timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     //需要記共有幾張圖片
-    var gallery_arr = [], audio_arr = [], video_arr = [], fileArr = [],
+    var gallery_arr = [], audio_arr = [], video_arr = [], fileArr = [], fileIdList = [],
         isApplyWatermark = false,
         watermarkText = "--- ---",
         // fileNum = 0,
@@ -5643,17 +5643,20 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
                 //必須要知道總共有幾張圖片
                 gallery_arr.push(val);
+                fileIdList.push(val.c);
 
                 break;
             case 7://影片
                 this_event.find(".st-attach-video").show().addClass("attach-download");
                 //總共有幾個聲音
                 video_arr.push(val);
+                fileIdList.push(val.c);
                 break;
             case 8://聲音
                 this_event.find(".st-attach-audio").show();
                 //總共有幾個聲音
                 audio_arr.push(val);
+                fileIdList.push(val.c);
                 break;
             case 9:
                 try {
@@ -5736,6 +5739,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 this_event.find(".attach-file-list").append(linkElement);
 
                 fileArr.push({fi:val.fi});
+                fileIdList.push(val.fi);
                 break;
             case 27:
                 if( false==isApplyWatermark && 1==val.wm ){
@@ -5794,6 +5798,10 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     if (video_arr.length > 0) timelineVideoMake(this_event,video_arr);
     if (fileArr.length > 0) timelineFileMake(this_event, fileArr);
 
+    if (fileIdList.length > 0) {
+        getTimelineFilesUrl(eventId, tu, fileIdList)
+    }
+
     this_event._i18n();
 
 
@@ -5804,6 +5812,25 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     }
 }
 
+getTimelineFilesUrl = function (eventId, data, fileIdList) {
+    var thisGi = eventId.split("_")[0];
+    var thisTi = eventId.split("_")[1];
+
+    if (data == null) {
+        data = {}
+    }
+
+    data.fi = fileIdList;
+
+    new QmiAjax({
+        apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files",
+        method: "post",
+        body: data
+    })
+    .success(function (data) {
+        
+    });
+}
 
 timelineAudioMake = function (this_event, audio_arr) {
     var eventId = this_event.data('event-id');
@@ -5839,7 +5866,6 @@ timelineVideoMake = function (this_event, video_arr) {
 }
 
 timelineFileMake = function(thisEvent, fileArr) {
-
     var expandDiv = thisEvent.find(".st-attach-file").children(".header");
     var allDownLoadDiv = thisEvent.find(".st-attach-file").children(".footer");
     var fileListDiv = thisEvent.find(".st-attach-file").children(".attach-file-list");
@@ -5932,12 +5958,9 @@ timelineFileMake = function(thisEvent, fileArr) {
             });
         });
     }
-
-
 }
 
-
-timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermarkText, tu){
+timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermarkText, tu) {
     var this_gallery = this_event.find(".st-attach-img");
     var this_ei = this_event.data('event-id');
     var this_gi = this_ei.split("_")[0];
@@ -5967,6 +5990,7 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
         right.addClass("cnt_" + (count - 2));
     }
 
+    console.log(gallery_arr);
     $.each(gallery_arr, function (i, val) {
         var this_img = $('<span class="st-slide-img"/>');
         if (i == 0) {
@@ -6050,7 +6074,6 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
         })
     });
 }
-
 
 getS3fileUrl = function (fileObj, eventId, tp, size, tu) {
     var s3Def = $.Deferred();
