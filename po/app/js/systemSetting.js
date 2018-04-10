@@ -83,7 +83,7 @@ $(document).ready(function(){
     });
 
     deleteAccountBtn.addEventListener('click', function (e) {
-        deleteAccount.enterPassword();
+        deleteAccount.remind();
     });
 });
 
@@ -256,6 +256,7 @@ systemSetting = function(){
     //密碼
     if (QmiGlobal.auth && QmiGlobal.auth.isSso) { // ldap帳號，隱藏修改密碼設定
         systemSettingTabs.children("li[data-tab='password-setting']").hide()
+        emailSetting.find("div.delete-account").hide();
     }
 
     $("#password-setting").find(".input-password").val("");
@@ -1142,7 +1143,13 @@ var deleteAccount = {
                                 pw: toSha1Encode(passwordValue)
                             }
                         }).complete(function (data) {
-                            console.log(data);
+                            var result = $.parseJSON(data.responseText)
+                            if (data.status == 200) {
+                                toastShow(result.rsp_msg);
+                                QmiGlobal.PopupDialog.close().then(function () {
+                                    deleteAccount.verifyCode(result.key);
+                                });
+                            }
                         });
                     }
                 }
@@ -1150,7 +1157,7 @@ var deleteAccount = {
         }).open();
     },
 
-    verifyCode: function (password) {
+    verifyCode: function (resendKey) {
         QmiGlobal.PopupDialog.create({
             className: 'verification-code',
             header: $.i18n.getString('ACCOUNT_MANAGEMENT_VERIFICATION_CODE'),
@@ -1173,7 +1180,20 @@ var deleteAccount = {
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_RESEND'),
                     eventType: 'click',
                     eventHandler: function (e) {
-                        QmiGlobal.PopupDialog.close();
+                        console.log(resendKey)
+                        new QmiAjax({
+                            apiName: "me/accounts/destroy/resend",
+                            method: "post",
+                            body: {
+                                key: resendKey
+                            }
+                        }).complete(function (data) {
+                            var result = $.parseJSON(data.responseText)
+                            if (data.status == 200) {
+                                resendKey = result.key;
+                                toastShow(result.rsp_msg);
+                            }
+                        });
                     }
                 }
             ],
@@ -1191,7 +1211,7 @@ var deleteAccount = {
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
                     eventType: 'click',
                     eventHandler: function (e) {
-                        var dialog = document.querySelector("#popupDialog>div.container>div.enter-password");
+                        var dialog = document.querySelector("#popupDialog>div.container>div.verification-code");
                         var verificationCode = dialog.querySelector('div.content>input').value
                         
                         new QmiAjax({
@@ -1201,7 +1221,12 @@ var deleteAccount = {
                                 vc: verificationCode
                             }
                         }).complete(function (data) {
-                            console.log(data);
+                            var result = $.parseJSON(data.responseText)
+                            if (data.status == 200) {
+                                QmiGlobal.PopupDialog.close().then(function () {
+                                    deleteAccount.done();
+                                });
+                            }
                         });
                     }
                 }

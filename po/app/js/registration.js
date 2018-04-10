@@ -332,6 +332,11 @@ appInitial = function(needUpdate){
         			dataObj.pw = password;
 
         			QmiGlobal.ssoLogin(dataObj).done(loginDef.resolve);
+
+        		// 帳號無效 (108帳號被凍結 109已成無效帳號 110付費帳號被關閉)
+        		} else if (dataObj.rsp_code === 108 || dataObj.rsp_code === 109 || dataObj.rsp_code === 110) {
+        			toastShow(dataObj.rsp_msg);
+        			loginDef.resolve({isSso:false, isSuccess: false});
         		} else {
         			loginDef.resolve({isSso:false, isSuccess: true});
         		}

@@ -14,7 +14,7 @@ userLang = userLang.replace(/-/g,"_").toLowerCase();
 
 if( 0 == userLang.indexOf("zh") ) {
 	if( userLang=="zh_cn" ) lang = "zh_CN";
-	// else lang = "zh_TW";	
+	else lang = "zh_TW";	
 }
 
 var base_url = function() {
@@ -34,7 +34,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi15.mitake.com.tw/";
+var base_url = "https://qmi17.mitake.com.tw/";
 
 // 先檢查是否為桌機版
 var nwGui = function() {
