@@ -1243,9 +1243,7 @@ var deleteAccount = {
                     tagName: 'button',
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
                     eventType: 'click',
-                    eventHandler: function (e) {
-                        logout();
-                    }
+                    eventHandler: reLogin
                 }
             ]
         }).open();
