@@ -337,6 +337,7 @@ img.auo {
 #page-group-menu {
 	background: white;
 	height: calc(100vh - 57px);
+	overflow-y: auto;
 }
 
 #page-group-menu .gm-nav {

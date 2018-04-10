@@ -15,6 +15,11 @@
     height: 100%;
 }
 
+#popupDialog>div.container>div {
+    background: white;
+    border-radius: 5px;
+}
+
 #popupDialog .container .content input::-webkit-input-placeholder {
 	font-size: 14px;
 	letter-spacing: initial;
@@ -22,10 +27,8 @@
 }
 
 #popupDialog>div.container>div.reset-company-account-password {
-    background: white;
     width: 360px;
     text-align: center;
-    border-radius: 5px;
     height: 540px;
 }
 
@@ -127,10 +130,8 @@
 }
 
 #popupDialog>div.container>div.enter-password {
-    background: white;
     width: 294px;
     text-align: center;
-    border-radius: 5px;
 }
 
 #popupDialog>div.container>div.enter-password>div.header {
@@ -170,9 +171,7 @@
 }
 
 #popupDialog>div.container>div.verification-code {
-    background: white;
     width: 297px;
-    border-radius: 5px;
     text-align: -webkit-center;
     font-size: 14px;
 }
@@ -219,9 +218,7 @@
 
 
 #popupDialog>div.container>div.remind-before-delete {
-    background: white;
     width: 307px;
-    border-radius: 5px;
     text-align: -webkit-center;
 }
 
@@ -276,10 +273,8 @@
 }
 
 #popupDialog>div.container>div.account-removed {
-    background: white;
     width: 267px;
     text-align: center;
-    border-radius: 5px;
 }
 
 #popupDialog>div.container>div.account-removed>div.header {
@@ -291,4 +286,30 @@
 
 #popupDialog>div.container>div.account-removed>div.footer {
 	padding-bottom: 10px;
+}
+
+#popupDialog>div.container>div.join-group-notice {
+    width: 265px;
+    font-size: 14px;
+    padding: 15px;
+}
+
+#popupDialog>div.container>div.join-group-notice>div.header {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    color: black;
+    padding-bottom: 15px;
+}
+
+#popupDialog>div.container>div.join-group-notice>div.content>div{
+    white-space: pre-line;
+    color: gray;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#popupDialog>div.container>div.join-group-notice>div.footer {
+    padding-top: 30px;
+    text-align: center;
 }

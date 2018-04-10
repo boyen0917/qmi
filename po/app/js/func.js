@@ -197,43 +197,71 @@ agreeMeInvite = function(inviteDom){
     //私雲之後再做
     var deferred = $.Deferred(),
         inviteData = inviteDom.data("invite-data");
-    
-    new QmiAjax({
-        apiName: "me/groups",
-        apiVer: "apiv2",
-        isPublicApi: inviteData.ci == undefined,
-        ci: inviteData.ci, // 有ci就用cloud的邀請
-        method: "post",
-        body: {
-            id: inviteData.ik,
-            tp: inviteData.tp,
-            gi: inviteData.gi
-        }
-    }).complete(function(data){
-        if(data.status == 200){
-            //polling cnts
-            $(".hg-invite .sm-count").html(0).hide();
 
-            groupMenuListArea().done(function(){
+    QmiGlobal.PopupDialog.create({
+        className: "join-group-notice",
+        header: $.i18n.getString("ACCOUNT_MANAGEMENT_JOIN_GROUP_NOTICE"),
+        content: [
+            {
+                tagName: 'div',
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION'),
+            }
+        ],
+        footer: [
+            {
+                tagName: 'button',
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_CANCEL'),
+                eventType: 'click',
+                eventHandler: function (e) {
+                    QmiGlobal.PopupDialog.close();
+                }
+            }, {
+                tagName: 'button',
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_AGREE'),
+                eventType: 'click',
+                eventHandler: function (e) {
+                    new QmiAjax({
+                        apiName: "me/groups",
+                        apiVer: "apiv2",
+                        isPublicApi: inviteData.ci == undefined,
+                        ci: inviteData.ci, // 有ci就用cloud的邀請
+                        method: "post",
+                        body: {
+                            id: inviteData.ik,
+                            tp: inviteData.tp,
+                            gi: inviteData.gi
+                        }
+                    }).complete(function(data){
+                        if(data.status == 200){
+                            //polling cnts
+                            $(".hg-invite .sm-count").html(0).hide();
 
-                //combo
-                getGroupComboInit(inviteData.gi,function(){
+                            groupMenuListArea().done(function(){
 
-                    //若只有一個團體 就去該團體
-                    if(Object.keys(QmiGlobal.groups).length == 1) {
-                        $.mobile.changePage("#page-group-main");
-                        
-                        setGroupInitial( Object.keys( QmiGlobal.groups )[0] , true );
-                        $("#page-group-menu .page-back").show();
-                    } else {
-                        toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );    
-                    }
-                });
-                    
-            });
-            inviteDom.remove();
-        }
-    });
+                                //combo
+                                getGroupComboInit(inviteData.gi,function(){
+
+                                    //若只有一個團體 就去該團體
+                                    if(Object.keys(QmiGlobal.groups).length == 1) {
+                                        $.mobile.changePage("#page-group-main");
+                                        
+                                        setGroupInitial( Object.keys( QmiGlobal.groups )[0] , true );
+                                        $("#page-group-menu .page-back").show();
+                                    } else {
+                                        toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );    
+                                    }
+                                });
+                                    
+                            });
+                            inviteDom.remove();
+                        }
+
+                        QmiGlobal.PopupDialog.close();
+                    });
+                }
+            }
+        ]
+    }).open();
 }
 
 deleteMeInvite = function(this_invite){
