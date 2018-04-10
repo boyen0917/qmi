@@ -959,6 +959,16 @@ QmiAjax.prototype = {
 					return;
 				}
 				break;
+			case 610:
+			case 611:
+			case 612:
+				new QmiGlobal.popup({
+					desc: rspObj.rsp_msg,
+					confirm: true,
+					action: [logout]
+				});
+
+				break;
 			case 9999:
 				// 沒帶rspCode 表示是expire time過期
 				authUpdate();
