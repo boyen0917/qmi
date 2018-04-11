@@ -27,24 +27,12 @@
 }
 
 #popupDialog>div.container>div.reset-company-account-password {
+    background: white;
     width: 360px;
     text-align: center;
+    border-radius: 5px;
     height: 540px;
 }
-
-/*#popupDialog .container .close{
-	height: 36px;
-}
-
-#popupDialog .container .close button{
-	background-color: transparent;
-    border: 0;
-    font-size: 30px;
-    color: #ccc;
-    float: right;
-    cursor: pointer;
-    outline: none;
-}*/
 
 #popupDialog>div.container>div.reset-company-account-password>div.header {
 	padding-top: 20px;
@@ -130,8 +118,10 @@
 }
 
 #popupDialog>div.container>div.enter-password {
+    background: white;
     width: 294px;
     text-align: center;
+    border-radius: 5px;
 }
 
 #popupDialog>div.container>div.enter-password>div.header {
@@ -171,7 +161,9 @@
 }
 
 #popupDialog>div.container>div.verification-code {
+    background: white;
     width: 297px;
+    border-radius: 5px;
     text-align: -webkit-center;
     font-size: 14px;
 }
@@ -218,7 +210,9 @@
 
 
 #popupDialog>div.container>div.remind-before-delete {
+    background: white;
     width: 307px;
+    border-radius: 5px;
     text-align: -webkit-center;
 }
 
@@ -252,6 +246,7 @@
     font-size: 13px;
     width: 85%;
     margin-top: 20px;
+    padding-bottom: 30px;
 }
 
 #popupDialog>div.container>div.remind-before-delete>div.content>div.more>p{
@@ -273,8 +268,10 @@
 }
 
 #popupDialog>div.container>div.account-removed {
+    background: white;
     width: 267px;
     text-align: center;
+    border-radius: 5px;
 }
 
 #popupDialog>div.container>div.account-removed>div.header {

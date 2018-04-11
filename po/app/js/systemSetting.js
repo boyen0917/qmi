@@ -83,7 +83,11 @@ $(document).ready(function(){
     });
 
     deleteAccountBtn.addEventListener('click', function (e) {
+<<<<<<< HEAD
         deleteAccount.enterPassword();
+=======
+        deleteAccount.remind();
+>>>>>>> origin/feature/5345
     });
 });
 
@@ -256,6 +260,7 @@ systemSetting = function(){
     //密碼
     if (QmiGlobal.auth && QmiGlobal.auth.isSso) { // ldap帳號，隱藏修改密碼設定
         systemSettingTabs.children("li[data-tab='password-setting']").hide()
+        emailSetting.find("div.delete-account").hide();
     }
 
     $("#password-setting").find(".input-password").val("");
@@ -1142,7 +1147,17 @@ var deleteAccount = {
                                 pw: toSha1Encode(passwordValue)
                             }
                         }).complete(function (data) {
+<<<<<<< HEAD
                             console.log(data);
+=======
+                            var result = $.parseJSON(data.responseText)
+                            if (data.status == 200) {
+                                toastShow(result.rsp_msg);
+                                QmiGlobal.PopupDialog.close().then(function () {
+                                    deleteAccount.verifyCode(result.key);
+                                });
+                            }
+>>>>>>> origin/feature/5345
                         });
                     }
                 }
@@ -1150,7 +1165,11 @@ var deleteAccount = {
         }).open();
     },
 
+<<<<<<< HEAD
     verifyCode: function (password) {
+=======
+    verifyCode: function (resendKey) {
+>>>>>>> origin/feature/5345
         QmiGlobal.PopupDialog.create({
             className: 'verification-code',
             header: $.i18n.getString('ACCOUNT_MANAGEMENT_VERIFICATION_CODE'),
@@ -1173,7 +1192,24 @@ var deleteAccount = {
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_RESEND'),
                     eventType: 'click',
                     eventHandler: function (e) {
+<<<<<<< HEAD
                         QmiGlobal.PopupDialog.close();
+=======
+                        console.log(resendKey)
+                        new QmiAjax({
+                            apiName: "me/accounts/destroy/resend",
+                            method: "post",
+                            body: {
+                                key: resendKey
+                            }
+                        }).complete(function (data) {
+                            var result = $.parseJSON(data.responseText)
+                            if (data.status == 200) {
+                                resendKey = result.key;
+                                toastShow(result.rsp_msg);
+                            }
+                        });
+>>>>>>> origin/feature/5345
                     }
                 }
             ],
@@ -1191,7 +1227,11 @@ var deleteAccount = {
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
                     eventType: 'click',
                     eventHandler: function (e) {
+<<<<<<< HEAD
                         var dialog = document.querySelector("#popupDialog>div.container>div.enter-password");
+=======
+                        var dialog = document.querySelector("#popupDialog>div.container>div.verification-code");
+>>>>>>> origin/feature/5345
                         var verificationCode = dialog.querySelector('div.content>input').value
                         
                         new QmiAjax({
@@ -1201,7 +1241,16 @@ var deleteAccount = {
                                 vc: verificationCode
                             }
                         }).complete(function (data) {
+<<<<<<< HEAD
                             console.log(data);
+=======
+                            var result = $.parseJSON(data.responseText)
+                            if (data.status == 200) {
+                                QmiGlobal.PopupDialog.close().then(function () {
+                                    deleteAccount.done();
+                                });
+                            }
+>>>>>>> origin/feature/5345
                         });
                     }
                 }
@@ -1218,9 +1267,13 @@ var deleteAccount = {
                     tagName: 'button',
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
                     eventType: 'click',
+<<<<<<< HEAD
                     eventHandler: function (e) {
                         logout();
                     }
+=======
+                    eventHandler: reLogin
+>>>>>>> origin/feature/5345
                 }
             ]
         }).open();
