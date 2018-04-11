@@ -1350,6 +1350,7 @@ QmiGlobal.gallery = function (data) {
     var downloadDom = this.container.find(".download-link");
     imgElement.attr("src", this.photoList[this.currentImage].s32);
     caption.html(this.currentImage + 1 + "/" + this.photoList.length);
+    console.log(this.photoList)
     downloadDom.attr("download", getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6 ));
 
     closeBtn.on("click", this.close.bind(this));
@@ -1418,63 +1419,36 @@ QmiGlobal.gallery = function (data) {
 
 
 QmiGlobal.gallery.prototype = {
-
-	getImageUrl: function() {
-		return new QmiAjax({
-        	apiName: "groups/" + this.gi + "/files/" + this.photoList[this.currentImage].c 
-        		+ "?pi=" + this.photoList[this.currentImage].p + "&ti=" 
-        		+ QmiGlobal.groups[this.gi].ti_feed
-    	});
-	},
-
 	showPreviousImage: function(e) {
-		this.zoomObj.reset();
-		
 		this.currentImage = (this.photoList.length + this.currentImage - 1) % (this.photoList.length);
-		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
-			this.getImageUrl().then(function (data) {
-				
-				if (this.isApplyWatermark) {
-					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
-						function (imgUrl) {
-							this.photoList[this.currentImage].s32 = imgUrl;
-							this.container.find("img").attr("src", imgUrl);
-						}.bind(this));
-				}
-
-				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
-				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-				this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
-				this.container.find(".download-link").attr("download",
-					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
-			}.bind(this));
-		}
-		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-		this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
-		this.container.find(".download-link").attr("download",
-					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
-		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
+		this.setCurrentImage();
 	},
 
 	showNextImage: function(e) {
-		this.zoomObj.reset();
-
 		this.currentImage = (this.currentImage + 1) % (this.photoList.length);
-		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
+		this.setCurrentImage();
+	},
 
-			this.getImageUrl().then(function (data) {
+	setCurrentImage: function () {
+		var giTi = this.gi + "_" + QmiGlobal.groups[this.gi].ti_feed;
+
+		this.zoomObj.reset();
+		
+		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
+			getS3fileUrl(this.photoList[this.currentImage], giTi).then(function (data) {
+				
 				if (this.isApplyWatermark) {
-					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
-						function (imgUrl) {
-							this.photoList[this.currentImage].s32 = imgUrl;
-							this.container.find("img").attr("src", imgUrl);
-						}.bind(this));
+					getWatermarkImage(this.watermarkText, data.s32, 1, function (imgUrl) {
+						this.photoList[this.currentImage].s32 = imgUrl;
+						this.container.find("img").attr("src", imgUrl);
+					}.bind(this));
 				}
-				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
-				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-				this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
+
+				this.photoList[this.currentImage].s32 = data.s32;
+				this.container.find("img").attr("src", data.s32);
+				this.container.find(".download-link").attr("href", data.s32);
 				this.container.find(".download-link").attr("download",
-					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
+					getS3FileNameWithExtension(data.s32, 6));
 			}.bind(this));
 		}
 		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
@@ -3016,3 +2990,105 @@ function targetListToString (targetList) {
     
     return tu_arr.join("、");
 }
+
+getTimelineFilesUrl = function (eventId, data, fileIdList) {
+    var thisGi = eventId.split("_")[0];
+    var thisTi = eventId.split("_")[1];
+    var deferred = $.Deferred();
+    // var fileIdList = Object.keys(fileIdMap);
+    var reqFileLinkList = [];
+    var fileLinkData = [];
+    var queryFileTasks = [];
+
+    fileIdList.forEach(function (fileId) {
+        var fileStore = fileDB.getObjectStore('timeline_files', 'readonly')
+        var queryFileItem = fileStore.get([eventId, fileId]);
+        
+        queryFileTasks.push(new Promise(function (resolve, reject) {
+            queryFileItem.onsuccess = function() {
+                resolve();
+
+                if (queryFileItem.result) {
+                    fileLinkData.push(queryFileItem.result);
+                } else {
+                    reqFileLinkList.push(fileId);
+                }
+            };
+
+            queryFileItem.onerror = function() {  
+                resolve();
+
+                reqFileLinkList.push(fileId);
+            };
+        }));
+
+    });
+
+    Promise.all(queryFileTasks).then(function () {
+        if (reqFileLinkList.length > 0) {
+            if (data == null) {
+                data = {}
+            }
+
+            data.fl = reqFileLinkList;
+            new QmiAjax({
+                apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files",
+                method: "post",
+                body: data
+            }).success(function (data) {
+                writeToFileDB(data.fl)
+                fileLinkData = fileLinkData.concat(data.fl);
+                deferred.resolve(fileLinkData);
+            });
+        } else {
+            deferred.resolve(fileLinkData);
+        }
+    });
+
+    function writeToFileDB (fileItemList) {
+        fileItemList.forEach(function (fileItem) {
+            console.log(fileItem)
+            fileItem.ei = eventId;
+            var fileStore = fileDB.getObjectStore('timeline_files', 'readwrite')
+            var addFileData = fileStore.put(fileItem);
+
+            addFileData.onsuccess = function(evt) {
+                console.log('QQonsuccess')
+            };
+
+            addFileData.onError = function(evt) {
+                console.log(evt)
+            };
+        });
+    }
+
+    return deferred.promise();
+}
+
+var fileDB = (function () {
+	var request = indexedDB.open('IDBWrapper-file_link_url', 1);
+	var db;
+	
+	request.onupgradeneeded = function(event) {
+	    var db = event.target.result;
+	    if (!db.objectStoreNames.contains('timeline_files')) {
+			var store = db.createObjectStore('timeline_files', {keyPath: ['ei', 'fi']});
+		}
+	};
+
+	request.onsuccess = function () {
+		db = request.result;
+	};
+
+	request.onerror = function () {
+		console.log("Database Connection Failed")
+	};
+
+	return {
+		getObjectStore: function (storeName, mode) {
+			var tx = db.transaction(storeName, mode);
+			return tx.objectStore(storeName);
+		}
+	}
+})();
+

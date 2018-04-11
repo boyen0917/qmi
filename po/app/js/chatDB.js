@@ -1,5 +1,4 @@
 
-
 // var g_bIsPolling = true;
 
 /*
