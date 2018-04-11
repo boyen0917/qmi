@@ -255,13 +255,13 @@ $(function(){
 	});
 
 	//個人資訊選單
-	//$(".sm-person-info").hide();
 	$("#userInfo").click(function(e){
 		$(".sm-person-area-r").find("img").toggle();
-		//$(".sm-person-info").fadeToggle();
+
+		// 系統公告
+		$(this).removeClass("red-spot");
 		
 		QmiGlobal.module.systemPopup.init();
-		
 	});
 	//系統選單 Tab 
 	$(".system-tab").on('click','li',function(){

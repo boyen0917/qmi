@@ -263,6 +263,9 @@ QmiGlobal.module.reAuthManually = {
 QmiGlobal.module.systemPopup = {
 	id: "view-system-popup",
 
+	// 系統公告需要紅點提示
+	redSpot: {},
+
     init : function(){
     	var self = this;
 
@@ -295,8 +298,7 @@ QmiGlobal.module.systemPopup = {
     			veId: "logout", 
     			elemArr: self.view.find("div.system-logout"), 
     			eventArr: ["click"],
-    		}
-    	], self, true);
+    	}], self, true);
     },
 
     handleEvent: function() {
@@ -308,6 +310,10 @@ QmiGlobal.module.systemPopup = {
 				break;
 
 			case "click:annoucement":
+				self.redSpot.announcement = false;
+				self.view.find("div[view=announcement]").removeClass("red-spot");
+				$("#userInfo").removeClass("red-spot");
+
 				QmiGlobal.module.systemAnnouncement.init();
 				break;
 
@@ -326,6 +332,7 @@ QmiGlobal.module.systemPopup = {
     
 
     html: function() {
+    	var self = this;
     	return '<div class="sm-person-info">'
         + 	'<div class="sm-info-hr" data-textid="LOGIN_SAVE_ACCOUNT_TITLE"></div>'
         + 	'<div data-sm-act="user-setting" class="sm-info sm-small-area" data-textid="PERSONAL_INFORMATION"></div>'
@@ -334,7 +341,10 @@ QmiGlobal.module.systemPopup = {
         + 	'<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'
         + 	'<div data-sm-act="system-ldapSetting" class="sm-info sm-small-area" data-textid="'+ (QmiGlobal.auth.isSso ? "ACCOUNT_BINDING_BIND_QMI_ACCOUNT" : "ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT" )+'"></div>'
         	// data-sm-act 會觸發 timelineswitch
-        + 	'<div view="announcement" class="sm-info" data-textid="SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT"></div>'
+        + 	'<div view="announcement" class="sm-info '+ function() {
+        		if(self.redSpot.announcement) return "red-spot";
+        		else return "";
+        	}() +'" data-textid="SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT"></div>'
         + 	'<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'
         + '</div>';
     }
@@ -421,14 +431,13 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 	},
 
 	clickClose: function() {
-		console.log("close");
 		this.close();
 	},
 
 	close: function() {
 		var self = this;
-		QmiGlobal.eventDispatcher.cleaner(self.id);
 		self.view.fadeOut("fast", function() {
+			QmiGlobal.eventDispatcher.cleaner(self.id);
 			self.view.remove();
 		});
 	},

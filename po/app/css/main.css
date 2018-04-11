@@ -7081,3 +7081,16 @@ img.vdo-default:before {}
     letter-spacing: -1px;
     font-size: 13px;
 }
+
+#userInfo {position: relative;}
+#userInfo.red-spot:before {
+    content: "";
+    color: white;
+    position: absolute;
+    top: 10px;
+    width: 8px;
+    height: 8px;
+    background: #F50707;
+    border-radius: 8px;
+    right: 10px;
+}
