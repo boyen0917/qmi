@@ -1,0 +1,315 @@
+#popupDialog {
+	position: fixed;
+	background-color: rgba(128, 128, 128, 0.53);
+	width: 100%;
+	height: 100%;
+	display: none;
+	z-index: 1000;
+}
+
+#popupDialog>div.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+#popupDialog>div.container>div {
+    background: white;
+    border-radius: 5px;
+}
+
+#popupDialog .container .content input::-webkit-input-placeholder {
+	font-size: 14px;
+	letter-spacing: initial;
+	color: #ddd;
+}
+
+#popupDialog>div.container>div.reset-company-account-password {
+    width: 360px;
+    text-align: center;
+    height: 540px;
+}
+
+/*#popupDialog .container .close{
+	height: 36px;
+}
+
+#popupDialog .container .close button{
+	background-color: transparent;
+    border: 0;
+    font-size: 30px;
+    color: #ccc;
+    float: right;
+    cursor: pointer;
+    outline: none;
+}*/
+
+#popupDialog>div.container>div.reset-company-account-password>div.header {
+	padding-top: 20px;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.header>div.alert {
+	height: 234px;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.header>div.alert>img {
+	width: 120px;
+	height: 120px;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.header>div.alert>h2 {
+	color: #15BF72;
+    margin-bottom: 6px;
+    margin-top: 6px;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.header>div.alert>p {
+	margin-top: 0px;
+	margin-bottom: 0px;
+    color: rgba(102, 102, 102, 0.87);
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.content>div.input-password {
+	display: inline-block;
+    width: 270px;
+    margin-top: 20px;
+    margin-left: 8px;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.content>div.input-password:before {
+	content: "";
+    background-image: url(../images/registration/symbols-password.png);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: 0px;
+    width: 30px;
+    height: 30px;
+    float: left;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.content>div.input-password>input {
+	float: left;
+    width: 214px;
+    border-bottom: 1px solid #ccc;
+    margin-top: 2px;
+    margin-left: 5px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    font-size: 18px;
+    letter-spacing: 15px;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.content>p {
+	color: #F1617A;
+    font-size: 14px;
+    margin-right: 20px;
+    margin-top: 2px;
+    opacity: 0;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.footer {
+	margin-top: 40px;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.footer>button {
+	min-width: 94px;
+    background-color: #ccc;
+    border: 0px;
+    border-radius: 5px;
+    padding: 7px 0px;
+    color: white;
+    margin: 0px 28px;
+    outline: none;
+}
+
+#popupDialog>div.container>div.reset-company-account-password>div.footer>button.enable {
+    background-color: #15BF72;
+    cursor: pointer;
+}
+
+#popupDialog>div.container>div.enter-password {
+    width: 294px;
+    text-align: center;
+}
+
+#popupDialog>div.container>div.enter-password>div.header {
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 15px;
+}
+
+#popupDialog>div.container>div.enter-password>div.content {
+    padding: 5px;
+}
+
+#popupDialog>div.container>div.enter-password>div.content>input {
+    width: 75%;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    letter-spacing: 5px;
+}
+
+#popupDialog>div.container>div.enter-password>div.footer,
+#popupDialog>div.container>div.verification-code>div.footer {
+    padding: 15px 0px 10px 0px;
+}
+
+#popupDialog>div.container div.footer>button {
+  	background-color: transparent;
+  	border: 0;
+  	color: rgb(104, 175, 241);
+  	font-size: 14px;
+  	font-weight: bold;
+  	outline: none;
+  	cursor: pointer;
+  	width: 40%;
+}
+
+#popupDialog>div.container>div.verification-code {
+    width: 297px;
+    text-align: -webkit-center;
+    font-size: 14px;
+}
+
+#popupDialog>div.container>div.verification-code>div.header {
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 18px;
+}
+
+#popupDialog>div.container>div.verification-code>div.content {
+    padding: 5px;
+    width: 90%;
+    height: 178px;
+    font-weight: bold;
+    color: #666;
+    line-height: 1.3;
+}
+
+#popupDialog>div.container>div.verification-code>div.content>input {
+    padding: 7px 10px;
+    border-color: #ddd;
+    border-radius: 5px;
+    outline: none;
+    border: 1px solid #ccc;
+    margin-top: 25px;
+    margin-bottom: 27px;
+    letter-spacing: 10px;
+    text-align: center;
+    font-weight: 700;
+    color: gray;
+}
+
+#popupDialog>div.container>div.verification-code>div.content>p{
+    margin: 0;
+}
+
+#popupDialog>div.container>div.verification-code>div.content>span{
+    color: rgb(104, 175, 241);
+    margin-top: 10px;
+    display: block;
+    cursor: pointer;
+}
+
+
+#popupDialog>div.container>div.remind-before-delete {
+    width: 307px;
+    text-align: -webkit-center;
+}
+
+#popupDialog>div.container>div.remind-before-delete>div.header {
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 10px;
+}
+
+#popupDialog>div.container>div.remind-before-delete>div.content {
+    padding: 5px;
+}
+
+#popupDialog>div.container>div.remind-before-delete>div.content>div.main{
+    line-height: 1.5;
+    width: 260px;
+    height: initial;
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #666;
+}
+
+#popupDialog>div.container>div.remind-before-delete>div.content>div.main.multi-line{
+    text-align: left;
+}
+
+#popupDialog>div.container>div.remind-before-delete>div.content>div.more{
+    line-height: 1.5;
+    height: 70px;
+    font-size: 13px;
+    width: 85%;
+    margin-top: 20px;
+}
+
+#popupDialog>div.container>div.remind-before-delete>div.content>div.more>p{
+	margin: 0;
+}
+
+#popupDialog>div.container>div.remind-before-delete>div.content>div.more>span{
+    color: rgb(57, 148, 232);
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#popupDialog>div.container>div.remind-before-delete>div.footer {
+  	padding-bottom: 10px;
+}
+
+#popupDialog>div.container>div.remind-before-delete>div.footer>button.delete {
+	color: rgba(255, 0, 69, 0.57);
+}
+
+#popupDialog>div.container>div.account-removed {
+    width: 267px;
+    text-align: center;
+}
+
+#popupDialog>div.container>div.account-removed>div.header {
+    font-weight: bold;
+    padding-top: 36px;
+    height: 60px;
+    font-size: 15px;
+}
+
+#popupDialog>div.container>div.account-removed>div.footer {
+	padding-bottom: 10px;
+}
+
+#popupDialog>div.container>div.join-group-notice {
+    width: 265px;
+    font-size: 14px;
+    padding: 15px;
+}
+
+#popupDialog>div.container>div.join-group-notice>div.header {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    color: black;
+    padding-bottom: 15px;
+}
+
+#popupDialog>div.container>div.join-group-notice>div.content>div{
+    white-space: pre-line;
+    color: gray;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#popupDialog>div.container>div.join-group-notice>div.footer {
+    padding-top: 30px;
+    text-align: center;
+}

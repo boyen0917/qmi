@@ -197,43 +197,71 @@ agreeMeInvite = function(inviteDom){
     //私雲之後再做
     var deferred = $.Deferred(),
         inviteData = inviteDom.data("invite-data");
-    
-    new QmiAjax({
-        apiName: "me/groups",
-        apiVer: "apiv2",
-        isPublicApi: inviteData.ci == undefined,
-        ci: inviteData.ci, // 有ci就用cloud的邀請
-        method: "post",
-        body: {
-            id: inviteData.ik,
-            tp: inviteData.tp,
-            gi: inviteData.gi
-        }
-    }).complete(function(data){
-        if(data.status == 200){
-            //polling cnts
-            $(".hg-invite .sm-count").html(0).hide();
 
-            groupMenuListArea().done(function(){
+    QmiGlobal.PopupDialog.create({
+        className: "join-group-notice",
+        header: $.i18n.getString("ACCOUNT_MANAGEMENT_JOIN_GROUP_NOTICE"),
+        content: [
+            {
+                tagName: 'div',
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION'),
+            }
+        ],
+        footer: [
+            {
+                tagName: 'button',
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_CANCEL'),
+                eventType: 'click',
+                eventHandler: function (e) {
+                    QmiGlobal.PopupDialog.close();
+                }
+            }, {
+                tagName: 'button',
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_AGREE'),
+                eventType: 'click',
+                eventHandler: function (e) {
+                    new QmiAjax({
+                        apiName: "me/groups",
+                        apiVer: "apiv2",
+                        isPublicApi: inviteData.ci == undefined,
+                        ci: inviteData.ci, // 有ci就用cloud的邀請
+                        method: "post",
+                        body: {
+                            id: inviteData.ik,
+                            tp: inviteData.tp,
+                            gi: inviteData.gi
+                        }
+                    }).complete(function(data){
+                        if(data.status == 200){
+                            //polling cnts
+                            $(".hg-invite .sm-count").html(0).hide();
 
-                //combo
-                getGroupComboInit(inviteData.gi,function(){
+                            groupMenuListArea().done(function(){
 
-                    //若只有一個團體 就去該團體
-                    if(Object.keys(QmiGlobal.groups).length == 1) {
-                        $.mobile.changePage("#page-group-main");
-                        
-                        setGroupInitial( Object.keys( QmiGlobal.groups )[0] , true );
-                        $("#page-group-menu .page-back").show();
-                    } else {
-                        toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );    
-                    }
-                });
-                    
-            });
-            inviteDom.remove();
-        }
-    });
+                                //combo
+                                getGroupComboInit(inviteData.gi,function(){
+
+                                    //若只有一個團體 就去該團體
+                                    if(Object.keys(QmiGlobal.groups).length == 1) {
+                                        $.mobile.changePage("#page-group-main");
+                                        
+                                        setGroupInitial( Object.keys( QmiGlobal.groups )[0] , true );
+                                        $("#page-group-menu .page-back").show();
+                                    } else {
+                                        toastShow( $.i18n.getString("GROUP_JOIN_SUCC") );    
+                                    }
+                                });
+                                    
+                            });
+                            inviteDom.remove();
+                        }
+
+                        QmiGlobal.PopupDialog.close();
+                    });
+                }
+            }
+        ]
+    }).open();
 }
 
 deleteMeInvite = function(this_invite){
@@ -8716,59 +8744,97 @@ function resetCompanyAccountPassword(ssoData) {
     time.setDate(time.getDate() - 30);
 
     QmiGlobal.PopupDialog.create({
+        className: 'reset-company-account-password',
         header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
             + "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_SECURITY_NOTICE") + "</h2><p>" 
             + $.i18n.getString("ENTERPRISE_ACCOUNT_LAST_TIME") + "</p><p>" + time.getFullYear() + "." 
             + ("0" + (time.getMonth() + 1)).slice(-2) + "." + ("0" + time.getDate()).slice(-2) + "</p><p>"
             + $.i18n.getString("ENTERPRISE_ACCOUNT_REMIND") +"</p></div>",
 
-        input: [{
-            type: "password",
-            className: "input-password old-password",
-            hint: "ENTERPRISE_ACCOUNT_SET_ORIGIN_PASSWORD",
-            maxLength : 30,
-            eventType: "input",
-            eventFun: function (e) {
-                checkPasswordAreMatch(e, "update");
+        content: [
+            {
+                tagName: 'div',
+                attributes: {
+                    class: 'input-password old-password',
+                },
+                children: [
+                    {
+                        tagName: 'input',
+                        attributes: {
+                            placeholder: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_ORIGIN_PASSWORD'),
+                            type: 'password',
+                            maxlength: 30,
+                        },
+                        eventType: "input",
+                        eventHandler: function (e) {
+                            checkPasswordAreMatch(e, "update");
+                        }
+                    }
+                ]
+            }, {
+                tagName: 'div',
+                attributes: {
+                    class: 'input-password new-password',
+                },
+                children: [
+                    {
+                        tagName: 'input',
+                        attributes: {
+                            placeholder: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_PASSWORD'),
+                            type: 'password',
+                            maxlength: 10,
+                        },
+                        eventType: "input",
+                        eventHandler: function (e) {
+                            checkPasswordAreMatch(e, "update");
+                        }
+                    }
+                ]
+            }, {
+                tagName: 'div',
+                attributes: {
+                    class: 'input-password new-password-again',
+                },
+                children: [
+                    {
+                        tagName: 'input',
+                        attributes: {
+                            placeholder: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN'),
+                            type: 'password',
+                            maxlength: 10,
+                        },
+                        eventType: "input",
+                        eventHandler: function (e) {
+                            checkPasswordAreMatch(e, "update");
+                        }
+                    }
+                ]
+            }, {
+                tagName: 'p',
+                text: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH')
             }
-        },{
-            type: "password",
-            className: "input-password new-password",
-            hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD",
-            maxLength : 10,
-            eventType: "input",
-            eventFun: function (e) {
-                checkPasswordAreMatch(e, "update");
-            }
-        },{
-            type: "password",
-            className: "input-password new-password-again",
-            hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN",
-            maxLength : 10,
-            eventType: "input",
-            eventFun: function (e) {
-                checkPasswordAreMatch(e, "update");
-            }
-        }],
-        errMsg: {
-            text: "ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH",
-            className: "error-message"
-        },
-        buttons: {
-            cancel: {
-                text : "ENTERPRISE_ACCOUNT_IGNORE",
-                className: "ignore",
-                eventType : "click",
-                eventFun : function (callback) {
+        ],
+
+        footer: [
+            {
+                tagName: 'button',
+                text: $.i18n.getString('ENTERPRISE_ACCOUNT_IGNORE'),
+                attributes: {
+                    class: 'ignore'
+                },
+                eventType: "click",
+                eventHandler: function (callback) {
                     QmiGlobal.PopupDialog.close();
                 }
-            },
-            confirm: {
-                text : "ENTERPRISE_ACCOUNT_CHANGE_PASSWORD",
-                className: "update",
-                eventType : "click",
-                eventFun : function (callback) {
-                    var dialog = $("#popupDialog");
+            }, {
+                tagName: 'button',
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
+                attributes: {
+                    class: 'update'
+                },
+                eventType: "click",
+                eventHandler: function (callback) {
+                    var dialog = $("#popupDialog div.reset-company-account-password");
 
                     if ($(this).hasClass("enable")) {
                         var oldPassword = dialog.find(".old-password input").val();
@@ -8776,9 +8842,9 @@ function resetCompanyAccountPassword(ssoData) {
                         var secondNewPassword = dialog.find(".new-password-again input").val();
 
                         if (firstNewPassword !== secondNewPassword) {
-                            dialog.find(".error-message").css("opacity", 1);
+                            dialog.find("div.content>p").css("opacity", 1);
                         } else {
-                            dialog.find(".error-message").css("opacity", 0);
+                            dialog.find("div.content>p").css("opacity", 0);
                             new QmiAjax({
                                 url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password",
                                 method: "put",
@@ -8798,7 +8864,7 @@ function resetCompanyAccountPassword(ssoData) {
                     }
                 }
             }
-        }
+        ]
     }).open();
 }
 

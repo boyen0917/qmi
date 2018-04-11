@@ -608,84 +608,99 @@ appInitial = function(needUpdate){
     }
 
     function setFirstCompanyAccountPassword(ssoData) {
-
-    	var deferred = $.Deferred();
     	QmiGlobal.PopupDialog.create({
-			header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
-				+ "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") + "</h2><p>" 
-				+ $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p>",
+	        className: 'reset-company-account-password',
+	        header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
+	            + "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") + "</h2><p>" 
+	            + $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p>",
 
-			input: [{
-				type: "password",
-				className: "input-password password",
-				hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD",
-				maxLength : 10,
-				eventType: "input",
-				eventFun: function (e) {
-					checkPasswordAreMatch(e, "confirm");
-				}
-			},{
-				type: "password",
-				className: "input-password password-again",
-				hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN",
-				maxLength : 10,
-				eventType: "input",
-				eventFun: function (e) {
-					checkPasswordAreMatch(e, "confirm");
-				}
-			}],
-			errMsg: {
-	            text: "ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH",
-	            className: "error-message"
-	        },
-			buttons: {
-				confirm: {
-					text : "ENTERPRISE_ACCOUNT_DONE",
-					className: "confirm",
-					eventType : "click",
-					eventFun : function (callback) {
-						var firstPwInput = $("#popupDialog").find(".password input").val();
-						var secondPwInput = $("#popupDialog").find(".password-again input").val();
+	        content: [
+	            {
+	                tagName: 'div',
+	                attributes: {
+	                    class: 'input-password password',
+	                },
+	                children: [
+	                    {
+	                        tagName: 'input',
+	                        attributes: {
+	                            placeholder: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_PASSWORD'),
+	                            type: 'password',
+	                            maxlength: 10,
+	                        },
+	                        eventType: "input",
+	                        eventHandler: function (e) {
+	                            checkPasswordAreMatch(e, "confirm");
+	                        }
+	                    }
+	                ]
+	            }, {
+	                tagName: 'div',
+	                attributes: {
+	                    class: 'input-password password-again',
+	                },
+	                children: [
+	                    {
+	                        tagName: 'input',
+	                        attributes: {
+	                            placeholder: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN'),
+	                            type: 'password',
+	                            maxlength: 10,
+	                        },
+	                        eventType: "input",
+	                        eventHandler: function (e) {
+	                            checkPasswordAreMatch(e, "confirm");
+	                        }
+	                    }
+	                ]
+	            }, {
+	                tagName: 'p',
+	                text: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH')
+	            }
+	        ],
 
-						if (firstPwInput !== secondPwInput) {
-							$("#popupDialog").find(".error-message").css("opacity", 1);
-						} else {
-							$("#popupDialog").find(".error-message").css("opacity", 0);
-							new QmiAjax({
-					        	url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password_first",
-					        	method: "put",
-					        	specifiedHeaders: { li: lang },
-					        	body: {
-								    id : ssoData.id,
-								    key : ssoData.key,
-								    np : QmiGlobal.aesCrypto.enc(firstPwInput, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
-								    dn : QmiGlobal.device,
-								    uui : ssoData.uui,
-								}
-					        }).done(function(rspData) {
-					        	console.log(ssoData)
-					        	var rspObj = JSON.parse(rspData.responseText);
-					        	if (rspData.status == 200) {
-					        		// popupShowAdjust(
-					        		// 	null, 
-					        		// 	rspObj.rsp_msg, 
-					        		// 	$.i18n.getString("LANDING_PAGE_LOGIN"), 
-					        		// 	true, 
-					        		// 	[login.bind(this, ssoData.id, firstPwInput, countrycode, true)]
-					        		// );
-                                    QmiGlobal.PopupDialog.close();
+	        footer: [
+	            {
+	                tagName: 'button',
+	                text: $.i18n.getString('ENTERPRISE_ACCOUNT_DONE'),
+	                attributes: {
+	                    class: 'confirm'
+	                },
+	                eventType: "click",
+	                eventHandler: function (callback) {
+	                    var dialog = $("#popupDialog div.reset-company-account-password");
+	                    var firstPwInput = dialog.find(".password input").val();
+	                    var secondPwInput = dialog.find(".password-again input").val();
 
-                                    // 修改成功直接登入首頁
-                                    login(ssoData.id, firstPwInput, countrycode, true);
-                                }
-					        });
-						}
-					}
-				}
-			}
-		}).open();
+	                    if (firstPwInput !== secondPwInput) {
+	                        dialog.find("div.content>p").css("opacity", 1);
+	                    } else {
+	                        dialog.find("div.content>p").css("opacity", 0);
+	                        new QmiAjax({
+	                            url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password_first",
+	                            method: "put",
+	                            specifiedHeaders: { li: lang },
+	                            body: {
+	                                id : ssoData.id,
+	                                key : ssoData.key,
+	                                np : QmiGlobal.aesCrypto.enc(firstPwInput, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+	                                dn : QmiGlobal.device,
+	                                uui : ssoData.uui,
+	                            }
+	                        }).done(function(rspData) {
+	                            var rspObj = JSON.parse(rspData.responseText);
+	                            if (rspData.status == 200) {
+	                                QmiGlobal.PopupDialog.close();
 
-		deferred.promise();
+	                                // 修改成功直接登入首頁
+	                                login(ssoData.id, firstPwInput, countrycode, true);
+	                            }
+	                        });
+	                    }
+	                }
+	            }
+	        ]
+	    }).open();
     }
 
 
