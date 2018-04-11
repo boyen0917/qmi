@@ -83,11 +83,7 @@ $(document).ready(function(){
     });
 
     deleteAccountBtn.addEventListener('click', function (e) {
-<<<<<<< HEAD
-        deleteAccount.enterPassword();
-=======
         deleteAccount.remind();
->>>>>>> origin/feature/5345
     });
 });
 
@@ -1147,9 +1143,6 @@ var deleteAccount = {
                                 pw: toSha1Encode(passwordValue)
                             }
                         }).complete(function (data) {
-<<<<<<< HEAD
-                            console.log(data);
-=======
                             var result = $.parseJSON(data.responseText)
                             if (data.status == 200) {
                                 toastShow(result.rsp_msg);
@@ -1157,7 +1150,6 @@ var deleteAccount = {
                                     deleteAccount.verifyCode(result.key);
                                 });
                             }
->>>>>>> origin/feature/5345
                         });
                     }
                 }
@@ -1165,11 +1157,7 @@ var deleteAccount = {
         }).open();
     },
 
-<<<<<<< HEAD
-    verifyCode: function (password) {
-=======
     verifyCode: function (resendKey) {
->>>>>>> origin/feature/5345
         QmiGlobal.PopupDialog.create({
             className: 'verification-code',
             header: $.i18n.getString('ACCOUNT_MANAGEMENT_VERIFICATION_CODE'),
@@ -1192,10 +1180,6 @@ var deleteAccount = {
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_RESEND'),
                     eventType: 'click',
                     eventHandler: function (e) {
-<<<<<<< HEAD
-                        QmiGlobal.PopupDialog.close();
-=======
-                        console.log(resendKey)
                         new QmiAjax({
                             apiName: "me/accounts/destroy/resend",
                             method: "post",
@@ -1209,7 +1193,6 @@ var deleteAccount = {
                                 toastShow(result.rsp_msg);
                             }
                         });
->>>>>>> origin/feature/5345
                     }
                 }
             ],
@@ -1227,11 +1210,7 @@ var deleteAccount = {
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
                     eventType: 'click',
                     eventHandler: function (e) {
-<<<<<<< HEAD
-                        var dialog = document.querySelector("#popupDialog>div.container>div.enter-password");
-=======
                         var dialog = document.querySelector("#popupDialog>div.container>div.verification-code");
->>>>>>> origin/feature/5345
                         var verificationCode = dialog.querySelector('div.content>input').value
                         
                         new QmiAjax({
@@ -1241,16 +1220,12 @@ var deleteAccount = {
                                 vc: verificationCode
                             }
                         }).complete(function (data) {
-<<<<<<< HEAD
-                            console.log(data);
-=======
                             var result = $.parseJSON(data.responseText)
                             if (data.status == 200) {
                                 QmiGlobal.PopupDialog.close().then(function () {
                                     deleteAccount.done();
                                 });
                             }
->>>>>>> origin/feature/5345
                         });
                     }
                 }
@@ -1267,13 +1242,7 @@ var deleteAccount = {
                     tagName: 'button',
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
                     eventType: 'click',
-<<<<<<< HEAD
-                    eventHandler: function (e) {
-                        logout();
-                    }
-=======
                     eventHandler: reLogin
->>>>>>> origin/feature/5345
                 }
             ]
         }).open();
