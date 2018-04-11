@@ -1469,6 +1469,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         //製作每個回覆
         var okCnt = 0;
         var loadedDom = $(this);
+        var fileIdMap = {};
 
         $.each(replyList, function(el_i,el){
             var deferred = $.Deferred();
@@ -1483,9 +1484,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
 
             var this_load = replyDom.find(".st-reply-content-area");
             var this_content = this_load.find(".st-reply-content");
-            var fileArea = this_load.find(".file");
-
-        
+            
             $.each(el.ml,function(i,val) {
                 var replyType = val.tp;
                 //event種類 不同 讀取不同layout
@@ -1505,57 +1504,10 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                     case 7://影片
                     case 8://聲音
                     case 26://檔案
-                        getS3fileUrl(val, el.ei, val.tp, 280, targetTu).then(function (fileData) {
-                            if (replyType == 6) {
-                                var imageArea = this_content.find(".au-area");
-                                var thumbnailImg = imageArea.find("img.aut");
+                        var fileId = val.c || val.fi;
+                        fileIdMap[fileId] = val;
+                        fileIdMap[fileId].replyElement = this_content;
 
-                                imageArea.show();
-                                thumbnailImg.load(function() {
-                                    //重設 style
-                                    thumbnailImg.removeAttr("style");
-                                    var w = thumbnailImg.width();
-                                    var h = thumbnailImg.height();
-                                    // mathAvatarPos(img,w,h,size);
-                                });
-                                //小圖
-                                thumbnailImg.attr("src", fileData.s3);
-
-                                imageArea.off('click').on('click', function () {
-                                    new QmiGlobal.gallery({
-                                        photoList: [{s32: fileData.s32}],
-                                        currentImage : 0,
-                                    });
-                                });
-                            } else if (replyType == 7) {
-                                this_content.find(".video-area").addClass("play");
-                                this_content.find("video").attr("src", fileData.s32).show();
-                            } else if (replyType == 8) {
-                                this_content.find("audio").html('<source type="audio/mp4" yo src="'+ fileData.s3 +'">').show();
-                            } else if (replyType == 26) {
-                                var fileName = val.fn.split(".")[0];
-                                var format = val.fn.split(".").pop();
-                                if (fileName.length > 15) {
-                                    fileName = fileName.substring(0, 15) + "....";
-                                }
-                                var linkElement = document.createElement("a");
-                                var fileIcon = document.createElement("img");
-                                var fileNameNode = document.createTextNode(fileName + " - " + format);
-                                var fileSizeSpan = document.createElement("span");
-                                var downloadIcon = document.createElement("div")   
-                                fileIcon.src = 'images/fileSharing/' + getMatchIcon(val.fn);
-                                fileSizeSpan.textContent = val.si ? val.si.toFileSize() : "0 bytes";
-                                linkElement.className = 'attach-file';
-                                downloadIcon.className = 'download-icon'
-                                linkElement.download = val.fn;
-                                linkElement.href = fileData.s3;
-                                linkElement.appendChild(fileIcon);
-                                linkElement.appendChild(fileNameNode);
-                                linkElement.appendChild(fileSizeSpan);
-                                linkElement.appendChild(downloadIcon);
-                                fileArea.append(linkElement);
-                            }
-                        });
                         break;
                     case 13:
 
@@ -1693,7 +1645,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                     reply_duplicate = true;
             }
 
-            
+
             //部分tp狀態為樓主的話 或狀態為不需製作留言 就離開
             if(without_message || el.meta.del || (el.meta.tp.substring(0,1)*1 == 0) || reply_duplicate){
                 // this_load.parent().remove();
@@ -1776,6 +1728,68 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
 
             deferred.resolve();
         });
+
+        var fileIdList = Object.keys(fileIdMap);
+        if (fileIdList.length > 0) {
+            getTimelineFilesUrl(this_ei, targetTu, fileIdList).then(function (filesData) {
+                filesData.forEach(function (fileData) {
+                    if (fileIdMap.hasOwnProperty(fileData.fi)) {
+                        var fileObj = fileIdMap[fileData.fi];
+                        var replyElement = fileObj.replyElement;
+
+                        if (fileObj.tp == 6) {
+                            var imageArea = replyElement.find(".au-area");
+                            var thumbnailImg = imageArea.find("img.aut");
+
+                            imageArea.show();
+                            thumbnailImg.load(function() {
+                                //重設 style
+                                thumbnailImg.removeAttr("style");
+                                var w = thumbnailImg.width();
+                                var h = thumbnailImg.height();
+                                // mathAvatarPos(img,w,h,size);
+                            });
+                            //小圖
+                            thumbnailImg.attr("src", fileData.s3);
+
+                            imageArea.off('click').on('click', function () {
+                                new QmiGlobal.gallery({
+                                    photoList: [{s32: fileData.s32}],
+                                    currentImage : 0,
+                                });
+                            });
+                        } else if (fileObj.tp == 7) {
+                            replyElement.find(".video-area").addClass("play");
+                            replyElement.find("video").attr("src", fileData.s32).show();
+                        } else if (fileObj.tp == 8) {
+                            replyElement.find("audio").html('<source type="audio/mp4" yo src="'+ fileData.s3 +'">').show();
+                        } else if (fileObj.tp == 26) {
+                            var fileName = fileObj.fn.split(".")[0];
+                            var format = fileObj.fn.split(".").pop();
+                            if (fileName.length > 15) {
+                                fileName = fileName.substring(0, 15) + "....";
+                            }
+                            var linkElement = document.createElement("a");
+                            var fileIcon = document.createElement("img");
+                            var fileNameNode = document.createTextNode(fileName + " - " + format);
+                            var fileSizeSpan = document.createElement("span");
+                            var downloadIcon = document.createElement("div")   
+                            fileIcon.src = 'images/fileSharing/' + getMatchIcon(fileObj.fn);
+                            fileSizeSpan.textContent = fileObj.si ? fileObj.si.toFileSize() : "0 bytes";
+                            linkElement.className = 'attach-file';
+                            downloadIcon.className = 'download-icon'
+                            linkElement.download = fileObj.fn;
+                            linkElement.href = fileData.s3;
+                            linkElement.appendChild(fileIcon);
+                            linkElement.appendChild(fileNameNode);
+                            linkElement.appendChild(fileSizeSpan);
+                            linkElement.appendChild(downloadIcon);
+                            replyElement.find(".file").append(linkElement);
+                        }
+                    }
+                });
+            });
+        }
     });
 
     this_event.data("taskFinisherData", taskFinisherData);
@@ -5723,7 +5737,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 this_event.find(".attach-file-list").append(linkElement);
 
                 fileArr.push({fi:val.fi});
-                // fileIdMap[val.fi] = val;
+                fileIdMap[val.fi] = val;
                 break;
             case 27:
                 if( false==isApplyWatermark && 1==val.wm ){
@@ -5778,8 +5792,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
     var fileIdList = Object.keys(fileIdMap);
     if (fileIdList.length > 0) {
-        getTimelineFilesUrl(eventId, tu, fileIdMap).then(function (filesData) {
-            console.log(filesData);
+        getTimelineFilesUrl(eventId, tu, fileIdList).then(function (filesData) {
             filesData.forEach(function (fileData) {
                 if (fileIdMap.hasOwnProperty(fileData.fi)) {
                     var fileObj = fileIdMap[fileData.fi];
@@ -5789,6 +5802,9 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                         video_arr.push(fileData);
                     } else if (fileObj.tp == 8) {
                         audio_arr.push(fileData);
+                    } else if (fileObj.tp == 26) {
+                        fileIdMap[fileData.fi] = Object.assign({}, fileIdMap[fileData.fi], fileData);
+                        // console.log(fileIdMap[fileData.fi]);
                     }
                 }
             });
@@ -5797,94 +5813,17 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
             if (gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr, isApplyWatermark, watermarkText, tu);
             if (audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
             if (video_arr.length > 0) timelineVideoMake(this_event,video_arr);
+            if (fileArr.length > 0) timelineFileMake(this_event, fileArr, fileIdMap);
         });
     }
 
-    if (fileArr.length > 0) timelineFileMake(this_event, fileArr);
-
     this_event._i18n();
-
 
     var tmpData = getGroupCompetence(gi);
     if( false==tmpData.isAdmin && true==tmpData.isOfficial ){
         this_event.find(".st-read").hide();
         this_event.find(".namecard").removeClass("namecard");
     }
-}
-
-getTimelineFilesUrl = function (eventId, data, fileIdMap) {
-    var thisGi = eventId.split("_")[0];
-    var thisTi = eventId.split("_")[1];
-    var deferred = $.Deferred();
-    var fileIdList = Object.keys(fileIdMap);
-    var reqFileLinkList = [];
-    var fileLinkData = [];
-    var queryFileTasks = [];
-
-    fileIdList.forEach(function (fileId) {
-        var fileStore = fileDB.getObjectStore('timeline_files', 'readonly')
-        var queryFileItem = fileStore.get([eventId, fileId]);
-        
-        queryFileTasks.push(new Promise(function (resolve, reject) {
-            queryFileItem.onsuccess = function() {
-                resolve();
-
-                if (queryFileItem.result) {
-                    console.log('result')
-                    fileLinkData.push(queryFileItem.result);
-                } else {
-                    reqFileLinkList.push(fileId);
-                }
-            };
-
-            queryFileItem.onerror = function() {  
-                resolve();
-
-                reqFileLinkList.push(fileId);
-            };
-        }));
-
-    });
-
-    Promise.all(queryFileTasks).then(function () {
-        if (reqFileLinkList.length > 0) {
-            if (data == null) {
-                data = {}
-            }
-
-            data.fl = reqFileLinkList;
-            new QmiAjax({
-                apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files",
-                method: "post",
-                body: data
-            }).success(function (data) {
-                writeToFileDB(data.fl)
-                fileLinkData = fileLinkData.concat(data.fl);
-                deferred.resolve(fileLinkData);
-            });
-        } else {
-            deferred.resolve(fileLinkData);
-        }
-    });
-
-    function writeToFileDB (fileItemList) {
-        fileItemList.forEach(function (fileItem) {
-            console.log(fileItem)
-            fileItem.ei = eventId;
-            var fileStore = fileDB.getObjectStore('timeline_files', 'readwrite')
-            var addFileData = fileStore.put(fileItem);
-
-            addFileData.onsuccess = function(evt) {
-                console.log('QQonsuccess')
-            };
-
-            addFileData.onError = function(evt) {
-                console.log(evt)
-            };
-        });
-    }
-
-    return deferred.promise();
 }
 
 timelineAudioMake = function (this_event, audio_arr) {
@@ -5923,12 +5862,15 @@ timelineVideoMake = function (this_event, video_arr) {
     });
 }
 
-timelineFileMake = function(thisEvent, fileArr) {
+timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
     var expandDiv = thisEvent.find(".st-attach-file").children(".header");
     var allDownLoadDiv = thisEvent.find(".st-attach-file").children(".footer");
+    var attachFiles = thisEvent.find(".st-attach-file");
     var fileListDiv = thisEvent.find(".st-attach-file").children(".attach-file-list");
     var fileLinks = fileListDiv.find("a");
     var eventId = thisEvent.data('event-id');
+
+    attachFiles.show();
 
     fileLinks.off('click').on('click', function (e) {
         var target = this;
@@ -5937,12 +5879,18 @@ timelineFileMake = function(thisEvent, fileArr) {
         if ($(target).attr('href') === undefined) {
             e.preventDefault();
 
-            getS3fileUrl(fileArr[index], eventId).then(function(fileData){
-                target.href = fileData.s3;
-                target.click()
-            });
+            if (fileIdMap.hasOwnProperty(fileArr[index].fi) && fileIdMap[fileArr[index].fi].s3) {
+                target.href = fileIdMap[fileArr[index].fi].s3;
+                target.click();
+            } else {
+                getS3fileUrl(fileArr[index], eventId).then(function(fileData){
+                    target.href = fileData.s3;
+                    target.click()
+                });
+            }
         }
-    })
+    });
+
     allDownLoadDiv.hide();
 
     if (fileArr.length == 1) {
@@ -5968,10 +5916,16 @@ timelineFileMake = function(thisEvent, fileArr) {
                     if (fileLink['href']) {
                         resolve();
                     } else {
-                        getS3fileUrl(fileArr[i], eventId).then(function(fileData){
-                            fileLink['href'] = fileData.s3;
+                        if (fileIdMap.hasOwnProperty(fileArr[i].fi) && fileIdMap[fileArr[i].fi].s3) {
+                            fileLink['href'] = fileIdMap[fileArr[i].fi].s3;
                             resolve();
-                        });
+                        } else {
+                            getS3fileUrl(fileArr[i], eventId).then(function(fileData){
+                                fileLink['href'] = fileData.s3;
+                                resolve();
+                            });
+                        }
+                        
                     }
                 });
 
@@ -6050,7 +6004,6 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
         right.addClass("cnt_" + (count - 2));
     }
 
-    console.log(gallery_arr);
     $.each(gallery_arr, function (i, val) {
         var this_img = $('<span class="st-slide-img"/>');
         if (i == 0) {

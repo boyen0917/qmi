@@ -2978,3 +2978,105 @@ function targetListToString (targetList) {
     
     return tu_arr.join("、");
 }
+
+getTimelineFilesUrl = function (eventId, data, fileIdList) {
+    var thisGi = eventId.split("_")[0];
+    var thisTi = eventId.split("_")[1];
+    var deferred = $.Deferred();
+    // var fileIdList = Object.keys(fileIdMap);
+    var reqFileLinkList = [];
+    var fileLinkData = [];
+    var queryFileTasks = [];
+
+    fileIdList.forEach(function (fileId) {
+        var fileStore = fileDB.getObjectStore('timeline_files', 'readonly')
+        var queryFileItem = fileStore.get([eventId, fileId]);
+        
+        queryFileTasks.push(new Promise(function (resolve, reject) {
+            queryFileItem.onsuccess = function() {
+                resolve();
+
+                if (queryFileItem.result) {
+                    fileLinkData.push(queryFileItem.result);
+                } else {
+                    reqFileLinkList.push(fileId);
+                }
+            };
+
+            queryFileItem.onerror = function() {  
+                resolve();
+
+                reqFileLinkList.push(fileId);
+            };
+        }));
+
+    });
+
+    Promise.all(queryFileTasks).then(function () {
+        if (reqFileLinkList.length > 0) {
+            if (data == null) {
+                data = {}
+            }
+
+            data.fl = reqFileLinkList;
+            new QmiAjax({
+                apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files",
+                method: "post",
+                body: data
+            }).success(function (data) {
+                writeToFileDB(data.fl)
+                fileLinkData = fileLinkData.concat(data.fl);
+                deferred.resolve(fileLinkData);
+            });
+        } else {
+            deferred.resolve(fileLinkData);
+        }
+    });
+
+    function writeToFileDB (fileItemList) {
+        fileItemList.forEach(function (fileItem) {
+            console.log(fileItem)
+            fileItem.ei = eventId;
+            var fileStore = fileDB.getObjectStore('timeline_files', 'readwrite')
+            var addFileData = fileStore.put(fileItem);
+
+            addFileData.onsuccess = function(evt) {
+                console.log('QQonsuccess')
+            };
+
+            addFileData.onError = function(evt) {
+                console.log(evt)
+            };
+        });
+    }
+
+    return deferred.promise();
+}
+
+var fileDB = (function () {
+	var request = indexedDB.open('IDBWrapper-file_link_url', 1);
+	var db;
+	
+	request.onupgradeneeded = function(event) {
+	    var db = event.target.result;
+	    if (!db.objectStoreNames.contains('timeline_files')) {
+			var store = db.createObjectStore('timeline_files', {keyPath: ['ei', 'fi']});
+		}
+	};
+
+	request.onsuccess = function () {
+		db = request.result;
+	};
+
+	request.onerror = function () {
+		console.log("Database Connection Failed")
+	};
+
+	return {
+		getObjectStore: function (storeName, mode) {
+			var tx = db.transaction(storeName, mode);
+			return tx.objectStore(storeName);
+		}
+	}
+})();
+
