@@ -123,6 +123,11 @@ window.QmiGlobal = {
 			QmiGlobal.getAppWin().qmiData = QmiGlobal.getAppWin().qmiData || QmiGlobal.defaultAppQmiData;
 			setAppOnFocusEvent(true);
 
+			// 背景執行，點取桌面應用程式icon顯示視窗
+			nwGui.App.on('open', function () {
+				QmiGlobal.getAppWin().show();
+			});
+
 			// 寫入版本號
 			$("#app-version").attr("ver-chk", $.i18n.getString("WEBONLY_VERSION_CHK"));
 			$("#app-version").attr("version", QmiGlobal.appVer);
