@@ -331,7 +331,12 @@ window.QmiGlobal = {
 	    function setTimer(){
 	        $.lStorage("_periodicallyReloadTimer", new Date().getTime());
 	    }
-	}()
+	}(),
+
+
+	makeErrCodeStr: function(errNum) {
+		return "<div class=\"popup-errCode\">"+ $.i18n.getString("WEBONLY_POPUP_ERRCODE") +" : " + errNum +"</div>";
+	}
 };
 
 $(document).ready(QmiGlobal.initReady);
@@ -921,7 +926,7 @@ QmiAjax.prototype = {
 			case 604: // token 驗證失敗 一般私雲重新取key 做cert
 				authCompanyKey();
 				break;
-			case 605: // 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+			case 605: // 同裝置重複登入 sso需登出
 				if(QmiGlobal.auth.isSso) {
 					new QmiGlobal.popup({
 						desc: $.i18n.getString("WEBONLY_LOGOUT_BY_ANOTHER_DEVICE"),
@@ -1034,6 +1039,13 @@ QmiAjax.prototype = {
 		    headers: self.setHeaders({}, companyData),
 		    type: "put",
 		    error: function(errData){
+		    	// 2018/1/17
+		    	// is sso 更新錯誤就登出
+		    	if(QmiGlobal.auth.isSso) {
+		    		popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL") +": "+ QmiGlobal.makeErrCodeStr(1002), true, false,[reLogin]);	//驗證失敗 請重新登入
+		    		return;
+		    	}
+
 		    	// 2017/11/03
 		    	// et過期 自動更新 發生錯誤
 		    	companyData.isAutoAuthFail = true;
@@ -1061,6 +1073,8 @@ QmiAjax.prototype = {
 		    		QmiGlobal.auth.at = at = apiData.at;
 		    		QmiGlobal.auth.et = apiData.et;
 		    	}
+
+
 		        deferred.resolve({
 		        	isSuccess: true,
 		        	data: apiData,
@@ -1101,7 +1115,7 @@ QmiAjax.prototype = {
 			if(QmiGlobal.isChatRoom) window.close();
 
 			QmiGlobal.rspCode401 = true;
-			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
+			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"), true, false,[reLogin]);	//驗證失敗 請重新登入
 			return;
 		}
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
@@ -1304,7 +1318,6 @@ if (typeof Object.assign != 'function') {
     return to;
   };
 }
-
 
 QmiGlobal.ModuleConstructor = function(args) {
 	var self = this;

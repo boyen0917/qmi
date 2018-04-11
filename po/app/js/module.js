@@ -191,8 +191,10 @@ QmiGlobal.module.reAuthManually = {
 			data: JSON.stringify({
 				id: self.ssoId,
 			    dn: QmiGlobal.device,
-			    pw: QmiGlobal.aesCrypto.enc(self.ssoPw, self.ssoId.substring(0,16)),
-			    at: cData.nowAt
+			    pw: QmiGlobal.aesCrypto.enc(self.ssoPw, (self.ssoId +"_"+ QmiGlobal.device).substring(0,16)),
+			    // 2018/1/17 流程有誤 暫時先在這改
+			    // single sign on 就使用QmiGlobal.auth.at
+			    at: QmiGlobal.auth.isSso ? QmiGlobal.auth.at : cData.nowAt
 			}),
 			type: "put",
 		}).complete(function(data){
@@ -212,6 +214,14 @@ QmiGlobal.module.reAuthManually = {
 			// 設定新at , et
 			QmiGlobal.companies[cData.ci].at = newAuth.at;
 			QmiGlobal.companies[cData.ci].et = newAuth.et;
+
+			// 2018/1/17 流程有誤 暫時先在這改
+		    // single sign on 要更新QmiGlobal.auth.at
+			if(QmiGlobal.auth.isSso) {
+				QmiGlobal.auth.at = newAuth.at;
+				QmiGlobal.auth.et = newAuth.et;
+			}
+
 
 			// 先解company reAuthDef
 			self.reAuthDef.resolve({

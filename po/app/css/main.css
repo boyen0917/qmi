@@ -6806,7 +6806,6 @@ img.vdo-default:before {}
     font-weight: 600;
 }
 
-
 #subpage-webview {
     background: #f1f2f7;
     width: 100%;
@@ -6980,3 +6979,5 @@ img.vdo-default:before {}
 	width: 260px;
 	margin-right: 10px;
 }
+
+body > div.popup .popup-errCode {margin-top: 30px; font-size: 14px;}

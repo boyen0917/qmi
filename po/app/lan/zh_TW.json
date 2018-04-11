@@ -544,6 +544,7 @@
 	"WEBONLY_ERROR_OCCURED_RELOGIN" : "發生錯誤 請重新登入",
 
 	"WEBONLY_USER_PROFILE_PHONE2" : "公司電話",
+	"WEBONLY_POPUP_ERRCODE" : "錯誤碼",
 
 	"SCHEDULED_POST": "排程發佈文章",
 	"SCHEDULED_POST_AT": "排程發佈時間",

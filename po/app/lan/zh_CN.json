@@ -541,8 +541,8 @@
 	"WEBONLY_WATERMARK_FORCED" : "预设使用浮水印",
 
 	"WEBONLY_ERROR_OCCURED_RELOGIN" : "发生错误 请重新登入",
-
 	"WEBONLY_USER_PROFILE_PHONE2" : "公司电话",
+	"WEBONLY_POPUP_ERRCODE" : "错误码",
 
 	"SCHEDULED_POST": "排程发佈文章",
 	"SCHEDULED_POST_AT": "排程发佈时间",
@@ -561,5 +561,4 @@
 	"SCHEDULED_POST_HAS_BEEN_PUBLISHED": "此文章已发佈",
 
 	"ADD_AUDIENCE_CANT_UNCHECK": "不可移除原本的发佈对象"
-
 }

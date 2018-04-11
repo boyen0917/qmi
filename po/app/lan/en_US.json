@@ -544,6 +544,7 @@
 	"WEBONLY_ERROR_OCCURED_RELOGIN" : "An error occurred, please login again",
 
 	"WEBONLY_USER_PROFILE_PHONE2" : "Tel.",
+	"WEBONLY_POPUP_ERRCODE" : "Error Code",
 	
 	"SCHEDULED_POST": "Scheduled post",
 	"SCHEDULED_POST_AT": "Scheduled post at",
