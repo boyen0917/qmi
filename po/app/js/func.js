@@ -5630,10 +5630,6 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
             case 1://網址 寫在附檔區域中
                 if(val.c){
                     this_event.find(".st-attach-url").click(function(e){
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/bug/5166
                         try{
                             this_event.find(".st-sub-box-2-attach-area a")[0].click();
                         } catch(e) {
