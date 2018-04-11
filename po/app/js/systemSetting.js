@@ -505,23 +505,23 @@ QmiGlobal.module.ldapSetting = {
             QmiGlobal.eventDispatcher.subscriber([
                 {
                     veId: "goto", 
-                    jqElem: self.view.find("[target]"), 
+                    elemArr: self.view.find("[target]"), 
                     eventArr: ["click"]
                 },{
                     veId: "create-ready", 
-                    jqElem: self.view.find(".ldap-edit .input-block input"), 
+                    elemArr: self.view.find(".ldap-edit .input-block input"), 
                     eventArr: ["input"],
                 },{
                     veId: "create-submit", 
-                    jqElem: self.view.find(".ldap-edit button.submit"), 
+                    elemArr: self.view.find(".ldap-edit button.submit"), 
                     eventArr: ["click"],
                 },{
                     veId: "create-cancel", 
-                    jqElem: self.view.find(".ldap-edit button.cancel"), 
+                    elemArr: self.view.find(".ldap-edit button.cancel"), 
                     eventArr: ["click"],
                 },{
                     veId: "list-action", 
-                    jqElem: self.view.find(".ldap-list .list"), 
+                    elemArr: self.view.find(".ldap-list .list"), 
                     eventArr: ["click"],
                 }
             ], self, true);

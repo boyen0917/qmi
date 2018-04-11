@@ -4077,7 +4077,7 @@ img.st-reply-message-attach {
 	border-radius: 4px;
 	text-align: center;
 	line-height: 35px;
-	font-size: 18px;
+	font-size: 16px;
 }
 
 .st-reply-message-send:hover {
@@ -4089,7 +4089,7 @@ img.st-reply-message-attach {
 }
 
 
-.st-reply-message-img{
+.st-reply-message-img {
 	background: rgb(239,239,239);
 	cursor: default;
 	position: relative;
@@ -6979,4 +6979,105 @@ img.vdo-default:before {}
 #datetimepicker-modal>div>div.xdsoft_datetimepicker>div.xdsoft_datepicker {
 	width: 260px;
 	margin-right: 10px;
+}
+
+#system-annoucement {
+    background: #f1f2f7;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    position: absolute;
+}
+
+#system-annoucement > header {
+    height: 40px;
+    background: #3994E8;
+    line-height: 40px;
+    color: white;
+    position: fixed;
+    width: 100vw;
+    top: 0;
+    z-index: 1;
+}
+
+#system-annoucement > header > img {
+    width: 30px;
+    margin: 5px;
+    vertical-align: top;
+}
+
+#system-annoucement > header > button {
+    float: right;
+    margin: 10px;
+    background: none;
+    border: 0;
+    color: white;
+    cursor: pointer;
+}
+
+#system-annoucement > section.body {
+	padding-top: 10px;
+    font-size: 15px;
+    margin-top: 40px;
+    height: -webkit-calc( 100vh - 40px );;
+    overflow: scroll;
+}
+
+#system-annoucement section.announcement {
+	position: relative;
+    margin: 20px auto 10px;
+    width: 500px;
+    background: white;
+    min-height: 160px;
+    box-shadow: 1px 1px 10px #ADADAD;
+    padding: 10px 15px;
+    box-sizing: border-box;
+}
+
+#system-annoucement section.announcement:last-child {margin-bottom: 50px;}
+#system-annoucement section.announcement > header {color: #3994E8;}
+
+#system-annoucement section.announcement > .title {
+    margin: 15px 0 10px;
+    color: black;
+}
+
+#system-annoucement section.announcement > .content {
+	
+    overflow: hidden;
+    color: #444;
+    margin-bottom: 20px;
+    display: -webkit-box;
+	-webkit-box-orient: vertical;
+	transition: height 0.3s;
+}
+
+#system-annoucement section.announcement > .content.collapse {
+	-webkit-line-clamp: 2;
+}
+
+#system-annoucement section.announcement > .content.animate-height {
+	height: 40px;
+}
+
+
+#system-annoucement section.announcement > footer {
+    text-align: center;
+    color: #3994E8;
+    height: 35px;
+    line-height: 30px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: white;
+    cursor: pointer;
+    display: none;
+}
+
+#system-annoucement section.announcement > header > span.time {
+    color: #888;
+    float: right;
+    letter-spacing: -1px;
+    font-size: 13px;
 }

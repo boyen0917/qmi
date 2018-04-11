@@ -34,7 +34,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://qmi15.mitake.com.tw/";
 
 // 先檢查是否為桌機版
 var nwGui = function() {
@@ -109,7 +109,6 @@ window.QmiGlobal = {
 
 	// 在下方 document ready之後 initReady
 	initReady: function() {
-
 		var initDefArr = [
     		updateLanguage()
 		];
@@ -126,9 +125,6 @@ window.QmiGlobal = {
 			// 寫入版本號
 			$("#app-version").attr("ver-chk", $.i18n.getString("WEBONLY_VERSION_CHK"));
 			$("#app-version").attr("version", QmiGlobal.appVer);
-
-			//設定語言, 還沒登入先用瀏覽器的語言設定
-			// updateLanguage(lang);
 
 			// 初始動作 registration
 			appInitial();
