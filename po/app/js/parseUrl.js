@@ -6,7 +6,7 @@
 	var request = require('request'),
 		http = require('http'),
 		https = require('https');
-
+		
 	var shorthandProperties = {
 		"image": "image:url",
 		"video": "video:url",
@@ -41,27 +41,48 @@
 		if (!purl.protocol)
 			purl = require('url').parse("http://"+url);
 		url = require('url').format(purl);
-		request({
+
+		var req = request({
 			url: url,
 			headers:{
 				'User-Agent': navigator.userAgent
 			},
-			encoding: 'utf8'
-		},function(err, res, body){
+			encoding: null
+		}, function(err, res, body) {
 			if (err) return cb(err);
-			
-			if (res.statusCode === 200) {
+
+			if (!err && res.statusCode == 200) {
 				cb(null, body);
-			}else {
-				cb(new Error("Request failed with HTTP status code: "+res.statusCode));
-			}
-		})
+        		// console.log(iconv.decode(body, 'gb2312').toString());
+    		} else {
+    			cb(new Error("Request failed with HTTP status code: " + res.statusCode));
+    		}
+		});
 	}
 
 	var parseHTML = function(html, options){
 
 		options = options || {};
 		var domparser = new DOMParser().parseFromString(html, "text/html");
+		var metadataObj = $(domparser).find('meta[http-equiv]');
+		var contentType = parsecharset(metadataObj.attr('content'));
+		var charset;
+
+		if (contentType && contentType.parameters && contentType.parameters.charset
+			&& contentType.parameters.charset.length > 0) {
+			charset = contentType.parameters.charset.toLowerCase();
+
+			try {
+				var iconv = require('iconv-lite');
+				if (charset == 'gb2312') {
+					decodeHtml = iconv.decode(html, 'gb2312').toString()
+					domparser = new DOMParser().parseFromString(decodeHtml, "text/html");
+				}
+			} catch (e) {
+				console.log('iconv-lite is not exist')
+			}
+		}
+		
 		var namespace,
 			$html = $(domparser).find('html');
 
@@ -160,7 +181,6 @@
 		}
 
 		return meta;
-
 	}
 
 	function parsecharset(string) {
