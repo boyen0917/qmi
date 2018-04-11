@@ -5495,7 +5495,7 @@ timelineContentFormat = function (c,limit,ei){
 
 timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     //需要記共有幾張圖片
-    var gallery_arr = [], audio_arr = [], video_arr = [], fileArr = [], fileIdList = [],
+    var gallery_arr = [], audio_arr = [], video_arr = [], fileArr = [], fileIdMap = {},
         isApplyWatermark = false,
         watermarkText = "--- ---",
         // fileNum = 0,
@@ -5638,25 +5638,9 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 initStickerArea.setStickerSrc(this_event.find(".st-attach-sticker img"),val.c);
                 break;
             case 6://圖片
-                this_event.find(".st-attach-img").show();
-                //.st-attach-img-arrow-l,.st-attach-img-arrow-r
-
-                //必須要知道總共有幾張圖片
-                gallery_arr.push(val);
-                fileIdList.push(val.c);
-
-                break;
             case 7://影片
-                this_event.find(".st-attach-video").show().addClass("attach-download");
-                //總共有幾個聲音
-                video_arr.push(val);
-                fileIdList.push(val.c);
-                break;
             case 8://聲音
-                this_event.find(".st-attach-audio").show();
-                //總共有幾個聲音
-                audio_arr.push(val);
-                fileIdList.push(val.c);
+                fileIdMap[val.c] = val;
                 break;
             case 9:
                 try {
@@ -5739,7 +5723,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 this_event.find(".attach-file-list").append(linkElement);
 
                 fileArr.push({fi:val.fi});
-                fileIdList.push(val.fi);
+                // fileIdMap[val.fi] = val;
                 break;
             case 27:
                 if( false==isApplyWatermark && 1==val.wm ){
@@ -5792,15 +5776,31 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
         } 
     });
 
-    //若有圖片 則呼叫函式處理
-    if (gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr, isApplyWatermark, watermarkText, tu);
-    if (audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
-    if (video_arr.length > 0) timelineVideoMake(this_event,video_arr);
-    if (fileArr.length > 0) timelineFileMake(this_event, fileArr);
-
+    var fileIdList = Object.keys(fileIdMap);
     if (fileIdList.length > 0) {
-        getTimelineFilesUrl(eventId, tu, fileIdList)
+        getTimelineFilesUrl(eventId, tu, fileIdMap).then(function (filesData) {
+            console.log(filesData);
+            filesData.forEach(function (fileData) {
+                if (fileIdMap.hasOwnProperty(fileData.fi)) {
+                    var fileObj = fileIdMap[fileData.fi];
+                    if (fileObj.tp == 6) {
+                        gallery_arr.push(fileData);
+                    } else if (fileObj.tp == 7) {
+                        video_arr.push(fileData);
+                    } else if (fileObj.tp == 8) {
+                        audio_arr.push(fileData);
+                    }
+                }
+            });
+
+            //若有圖片 則呼叫函式處理
+            if (gallery_arr.length > 0) timelineGalleryMake(this_event,gallery_arr, isApplyWatermark, watermarkText, tu);
+            if (audio_arr.length > 0) timelineAudioMake(this_event,audio_arr);
+            if (video_arr.length > 0) timelineVideoMake(this_event,video_arr);
+        });
     }
+
+    if (fileArr.length > 0) timelineFileMake(this_event, fileArr);
 
     this_event._i18n();
 
@@ -5812,54 +5812,112 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     }
 }
 
-getTimelineFilesUrl = function (eventId, data, fileIdList) {
+getTimelineFilesUrl = function (eventId, data, fileIdMap) {
     var thisGi = eventId.split("_")[0];
     var thisTi = eventId.split("_")[1];
+    var deferred = $.Deferred();
+    var fileIdList = Object.keys(fileIdMap);
+    var reqFileLinkList = [];
+    var fileLinkData = [];
+    var queryFileTasks = [];
 
-    if (data == null) {
-        data = {}
+    fileIdList.forEach(function (fileId) {
+        var fileStore = fileDB.getObjectStore('timeline_files', 'readonly')
+        var queryFileItem = fileStore.get([eventId, fileId]);
+        
+        queryFileTasks.push(new Promise(function (resolve, reject) {
+            queryFileItem.onsuccess = function() {
+                resolve();
+
+                if (queryFileItem.result) {
+                    console.log('result')
+                    fileLinkData.push(queryFileItem.result);
+                } else {
+                    reqFileLinkList.push(fileId);
+                }
+            };
+
+            queryFileItem.onerror = function() {  
+                resolve();
+
+                reqFileLinkList.push(fileId);
+            };
+        }));
+
+    });
+
+    Promise.all(queryFileTasks).then(function () {
+        if (reqFileLinkList.length > 0) {
+            if (data == null) {
+                data = {}
+            }
+
+            data.fl = reqFileLinkList;
+            new QmiAjax({
+                apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files",
+                method: "post",
+                body: data
+            }).success(function (data) {
+                writeToFileDB(data.fl)
+                fileLinkData = fileLinkData.concat(data.fl);
+                deferred.resolve(fileLinkData);
+            });
+        } else {
+            deferred.resolve(fileLinkData);
+        }
+    });
+
+    function writeToFileDB (fileItemList) {
+        fileItemList.forEach(function (fileItem) {
+            console.log(fileItem)
+            fileItem.ei = eventId;
+            var fileStore = fileDB.getObjectStore('timeline_files', 'readwrite')
+            var addFileData = fileStore.put(fileItem);
+
+            addFileData.onsuccess = function(evt) {
+                console.log('QQonsuccess')
+            };
+
+            addFileData.onError = function(evt) {
+                console.log(evt)
+            };
+        });
     }
 
-    data.fi = fileIdList;
-
-    new QmiAjax({
-        apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files",
-        method: "post",
-        body: data
-    })
-    .success(function (data) {
-        
-    });
+    return deferred.promise();
 }
 
 timelineAudioMake = function (this_event, audio_arr) {
     var eventId = this_event.data('event-id');
+    var attachAudio = this_event.find(".st-attach-audio");
+
+    attachAudio.show();
 
     $.each(audio_arr, function(i, val) {
         var this_audio = $(
             '<audio controls></audio>'
         );
-        this_event.find(".st-attach-audio").prepend(this_audio);
 
-        getS3fileUrl(val, eventId).then(function(fileData){
-           this_event.html('<source type="audio/mp4" yo src="' + obj.s3 + '">').show();
-        });
+        attachAudio.prepend(this_audio);
+
+        this_audio.html('<source type="audio/mp4" yo src="' + obj.s3 + '">').show();
     });
 }
 
 timelineVideoMake = function (this_event, video_arr) {
     var eventId = this_event.data('event-id');
+    var attachVideo = this_event.find(".st-attach-video");
+
+    attachVideo.show().addClass("attach-download");
 
     $.each(video_arr, function(i, val) {
         var this_video = $(
             '<video class="download" preload="none"></video>'
         );
-        this_event.find(".st-attach-video").prepend(this_video);
+        attachVideo.prepend(this_video);
 
         //影片只能有一個, 做完收工
-        getS3fileUrl(val, eventId).then(function(fileData){
-           this_video.attr("src", fileData.s32).show();
-        });
+        this_video.attr("src", val.s32).show();
         
         return false;
     });
@@ -5971,7 +6029,9 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
     var container = this_event.find(".st-attach-img-area");
     var left = container.find("td:nth-child(1)");
     var right = left.next();
-    if( count<=0 ) return;
+
+    this_gallery.show();
+
     if( count==1 ){
         left.css("width","100%").addClass("contain");
         // 2017.10.20 單張圖的高圖要置中
@@ -6008,20 +6068,18 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
             }
         }
 
-        getS3fileUrl(val, this_ei).then(function (data) {
-            if (isApplyWatermark) {
-                getWatermarkImage(watermarkText, data.s32, 1, function(imgUrl){
-                    this_img.css("background-image","url("+imgUrl+")");
-                    this_img.addClass("loaded");
-                    this_img.data("auo", imgUrl);
+        if (isApplyWatermark) {
+            getWatermarkImage(watermarkText, val.s32, 1, function(imgUrl){
+                this_img.css("background-image","url("+imgUrl+")");
+                this_img.addClass("loaded");
+                this_img.data("auo", imgUrl);
 
-                    gallery_arr[i].s3 = imgUrl;
-                    gallery_arr[i].s32 = imgUrl;  
-                });
-            }
-
-            this_img.attr("s3bg", data.s3);
-            this_img.css("background-image","url('" + data.s3 + "')");
+                gallery_arr[i].s3 = imgUrl;
+                gallery_arr[i].s32 = imgUrl;  
+            });
+        } else {
+            this_img.attr("s3bg", val.s3);
+            this_img.css("background-image","url('" + val.s3 + "')");
 
             var img = new Image();
             img.onload =function() {
@@ -6034,15 +6092,15 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
                 target.addClass("loadError");
             }
 
-            img.src = data.s3;
+            img.src = val.s3;
             //大圖
-            this_img.data("auo", data.s32);
+            this_img.data("auo", val.s32);
 
-            gallery_arr[i].s3 = data.s3;
-            gallery_arr[i].s32 = data.s32;
+            gallery_arr[i].s3 = val.s3;
+            gallery_arr[i].s32 = val.s32;
 
             this_img.addClass("loaded");
-        });
+        }
 
         if (i >= 4 ) return false;
     });
@@ -6061,10 +6119,7 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
 
         var imageList = Array.prototype.slice.call(this_event[0].getElementsByClassName("st-slide-img"), 0);
         var targetImgIndex = imageList.indexOf(targetImg);
-      
-        var this_img_area = $(this);
         
-
         new QmiGlobal.gallery({
             gi: this_gi,
             photoList: gallery_arr,
@@ -6121,142 +6176,6 @@ getS3fileUrl = function (fileObj, eventId, tp, size, tu) {
     }
 
     return s3Def.promise()
-}
-
-getS3file = function(file_obj,target,tp,size, tu){
-    var this_ei = target.parents(".st-sub-box").data("event-id");
-    var this_gi = this_ei.split("_")[0];
-    var this_ti = this_ei.split("_")[1];
-    //default
-    size = size || 350;
-    var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + file_obj.c + "/dl";
-    var headers = {
-             "ui":ui,
-             "at":at, 
-             "li":lang,
-                 };
-    var method = "post";
-    var result = ajaxDo(api_name,headers,method,false, tu,false,true);
-    result.complete(function(data){
-        if(data.status != 200) return false;
-
-        var obj =$.parseJSON(data.responseText);
-        obj.api_name = api_name;
-        if(target && tp){
-            switch(tp){
-                case 6://圖片
-                    var img = target.find("img.aut");
-                    img.load(function() {
-                        //重設 style
-                        img.removeAttr("style");
-                        var w = img.width();
-                        var h = img.height();
-                        // mathAvatarPos(img,w,h,size);
-                    });
-                    //小圖
-                    target.find("img.aut").attr("src",obj.s3);
-                    //大圖
-                    //target.find("img.auo").attr("src",obj.s32).hide();
-                    target.find("img.auo").data("src",obj.s32).hide();
-                    break;
-                case 7://影片
-                    target.attr("src",obj.s32).show();
-                    break;
-                case 8://聲音
-                    // target.find("source").attr("src",obj.s3);
-                    target.html('<source type="audio/mp4" yo src="'+ obj.s3 +'">').show();
-                    break;
-            }
-        }else{
-            return obj.s3;
-        }
-    });
-}
-
-getS3fileBackground = function(file_obj,target,tp, tu, callback){
-    var s3Def = $.Deferred();
-    var this_ei = target.parents(".st-sub-box").data("event-id");
-    var this_gi = this_ei.split("_")[0];
-    var this_ti = this_ei.split("_")[1];
-    var fileId = file_obj.c || file_obj.fi;
-
-    new QmiAjax({
-        apiName: "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + fileId + "/dl",
-        method: "post",
-        body: tu
-    }).success(function(data){
-        var obj = data;
-        if(target && tp){
-            switch(tp){
-                case 6://圖片
-                    //小圖
-                    target.attr("s3bg",obj.s3);
-                    target.css("background-image","url('"+obj.s3+"')");
-
-                    var img = new Image();
-                    img.onload =function() {
-                        if(this.naturalWidth < this.naturalHeight)
-                            target.addClass("tall-img");
-                    };
-
-                    img.src = obj.s3;
-                    //大圖
-                    target.data("auo",obj.s32);
-                    break;
-                case 8://聲音
-                    target.attr("src",obj.s3);
-                    break;
-            }
-            var image = new Image();
-            $(image).error(function() {
-                target.css("background-image","");
-                target.addClass("loadError");
-            });
-            $(image).attr("src", obj.s32);
-        }else{
-            return obj.s3;
-        }
-        if( callback ) callback(obj);
-    });
-}
-
-getS3fileBackgroundWatermark = function(file_obj,target,tp, text, tu, callback){
-    var this_ei = target.parents(".st-sub-box").data("event-id");
-    var this_gi = this_ei.split("_")[0];
-    var this_ti = this_ei.split("_")[1];
-    //default
-    var api_name = "groups/" + this_gi + "/timelines/" + this_ti + "/files/" + file_obj.c + "/dl";
-    var headers = {
-             "ui":ui,
-             "at":at, 
-             "li":lang,
-                 };
-    var method = "post";
-    var result = ajaxDo(api_name,headers,method,false,tu, false, true);
-    result.complete(function(data){
-        if(data.status != 200){
-            target.addClass("loadError");
-            return false;
-        }
-
-        var obj =$.parseJSON(data.responseText);
-        obj.api_name = api_name;
-        if(target && tp){
-            if(6==tp){
-                getWatermarkImage(text, obj.s32, 1, function(imgUrl){
-                    // alert(imgUrl);
-                    target.css("background-image","url("+imgUrl+")");
-                    target.addClass("loaded");
-                    target.data("auo",imgUrl);
-                    obj.s32 = imgUrl;
-                    obj.s3 = imgUrl;
-                    if( callback ) callback(obj);
-                });
-            }
-        }else{
-            return obj.s3;
-        }
-    });
 }
 
 uploadErrorCnt = function(this_compose,file_num,total){
