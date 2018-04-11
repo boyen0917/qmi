@@ -7896,6 +7896,9 @@ pollingCmds = function(newPollingData){
                 insideDeferred.resolve(false);  
             }
 
+            // 目前 tp 31 會無pm
+            else if(Object.keys(item.pm).length === 0) insideDeferred.resolve(false);
+
             // 不重複的gi
             else if(self.indexOf(item.pm.gi) >= 0) insideDeferred.resolve(false);
             
@@ -7961,6 +7964,7 @@ pollingCmds = function(newPollingData){
             newPollingData.cmds.forEach(function(item){
                 // 首先判斷如果有離開團體 就不要做了
                 // tp = 6 還是要做 才會有離開團體的動作
+                item.pm = item.pm || {};
                 if(leavedGiArr.indexOf(item.pm.gi) >= 0 && item.tp !== 6) return;
 
                 // 剛做過的4, 5, 6
@@ -8109,6 +8113,11 @@ pollingCmds = function(newPollingData){
                     case 12://delete group
                         removeGroup( item.pm.gi );
                         break;
+
+                    case 31: // 系統公告提示
+                        setRedSpotAndEvent();
+                        break;
+
                     case 41://聊天室邀請或踢除別人
                         updateChatList(item.pm.gi);
                         break;
@@ -8335,6 +8344,22 @@ pollingCmds = function(newPollingData){
         })
     }
 
+    // 系統公告
+    function setRedSpotAndEvent() {
+        var userInfoDom = $("#userInfo");
+        var sysDom = $("#view-system-popup div[view=announcement]");
+
+        if(userInfoDom.hasClass("red-spot")) return;
+        if(sysDom.hasClass("red-spot")) return;
+
+        QmiGlobal.module.systemPopup.redSpot.announcement = true;
+
+        userInfoDom.addClass("red-spot");
+        sysDom.addClass("red-spot").off().click(function() {
+            sysDom.removeClass("red-spot");
+            QmiGlobal.module.systemPopup.redSpot.announcement = false;
+        });
+    }
 }
 
 

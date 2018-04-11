@@ -566,5 +566,8 @@
 
 	"POST_START_TIME": "同排程發佈時間",
 
-	"ERR_MSG_PHOTO_LIMIT": "單次上傳限制：20 張"
+	"ERR_MSG_PHOTO_LIMIT": "單次上傳限制：20 張",
+
+	"SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT": "公告",
+	"INTERGRATIONS_READMORE": "更多"
 }

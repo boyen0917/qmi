@@ -566,5 +566,8 @@
 
 	"POST_START_TIME": "Same as Scheduled time",
 
-	"ERR_MSG_PHOTO_LIMIT": "Upload limitation: 20 photos"
+	"ERR_MSG_PHOTO_LIMIT": "Upload limitation: 20 photos",
+
+	"SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT": "Announcement",
+	"INTERGRATIONS_READMORE": "Read More"
 }

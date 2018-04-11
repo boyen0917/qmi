@@ -384,7 +384,7 @@ textarea.ga-group-des:focus{
     border-top: 1px solid #ccc;
     height: 1px;
     width: 160px;
-    margin: 10px auto 2px;
+    margin: 0 auto;
     box-sizing: border-box;
 }
 
@@ -397,25 +397,42 @@ textarea.ga-group-des:focus{
 	border-radius: 5px;
 	box-shadow: 0.5px 2px 5px 0px #888;
 }
+
+#view-system-popup .sm-person-info .sm-info:hover {background: aliceblue;}
 #view-system-popup .sm-person-info .sm-info {
+	position: relative;
 	cursor: pointer;
-    font-size: 16px;
-    color: #444;
-    padding: 0 20px;
-    margin-top: 5px;
+    font-size: 15px;
+    color: #555;
+    padding: 5px 10px;
+    height: 25px;
+    line-height: 25px;
+    white-space: nowrap;
+    text-shadow: 0px 0px 0px #aaa;
 }
+
+#view-system-popup .sm-person-info .sm-info.red-spot:before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    background: #F50707;
+    border-radius: 8px;
+}
+
 #view-system-popup .sm-person-info .sm-info-hr {
-	cursor: default;
-	font-size: 13px;
-	color: gray;
-	padding-top: 7px;
-	padding-left: 20px;
+    cursor: default;
+    font-size: 13px;
+    color: gray;
+    padding: 10px 0 3px 10px;
 }
 #view-system-popup .sm-person-info .sm-info:last-child {
-	color: #1E7FFB;
-	border-top: 1px solid #ccc;
-	margin-top: 15px;
-	padding: 8px 20px;
+    color: #1E7FFB;
+    border-top: 1px solid #ccc;
+    margin-top: 10px;
+    padding: 6px 20px;
 }
 
 /*user-setting*/
