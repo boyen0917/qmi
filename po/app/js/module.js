@@ -460,7 +460,7 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 		this.html = {
     		frame: `<section id="system-annoucement">
 		    		<header>
-		    			<img src="images/chatroom/chat_sticker_icon_emotions_sticker_setting">
+		    			<img src="images/chatroom/chat_sticker_icon_emotions_sticker_setting.png">
 		    			<span>${$.i18n.getString("SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT")}</span>
 		    			<button>${$.i18n.getString("COMMON_DONE")}</button>
 		    		</header>
