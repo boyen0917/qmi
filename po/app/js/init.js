@@ -627,6 +627,9 @@ window.QmiAjax = function(args){
 		// setHeaders: outerArgs,companyData
 		newArgs.headers = self.setHeaders(args, companyData);
 
+		// 5392 加入版號
+		newArgs.headers.av = QmiGlobal.appVer;
+
 		// 執行
 		$.ajax(newArgs).complete(function(rspData){
 			// deferred chain -> 這邊可以省略 也可精簡 之後做 用一個deferred做reauth跟重新執行ajax
