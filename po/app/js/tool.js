@@ -1382,7 +1382,7 @@ QmiGlobal.gallery = function (data) {
                     hZoomIn = img.height()*2, wZoomIn = img.width()*2;
 
                 if(container.hasClass("fail")) return;
-                
+
                 container.toggleClass("zoomOut").find(".currentImg").toggleClass("zoomIn");
                 
                 if(container.hasClass("zoomOut") === false) {
@@ -3038,7 +3038,7 @@ getTimelineFilesUrl = function (eventId, data, fileIdList) {
             if (data == null) {
                 data = {}
             }
-
+            
             data.fl = reqFileLinkList;
             new QmiAjax({
                 apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files",
