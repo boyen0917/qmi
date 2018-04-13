@@ -1,4 +1,4 @@
-// version 2.3.0.0 - 2
+// version 2.3.0.0 - 3
 var ui;
 var at;
 var gi;
@@ -34,7 +34,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://nqmi26.mitake.com.tw/";
+var base_url = "https://qmi17.mitake.com.tw/";
 
 // 先檢查是否為桌機版
 var nwGui = function() {
