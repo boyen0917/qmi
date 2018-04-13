@@ -1349,6 +1349,13 @@ QmiGlobal.gallery = function (data) {
     var imgElement = this.container.find("img");
     var downloadDom = this.container.find(".download-link");
     imgElement.attr("src", this.photoList[this.currentImage].s32);
+
+	imgElement[0].onerror = function() {
+		imgElement.hide().parent()
+		.attr("desc", $.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
+		.addClass("fail").parent().addClass("fail");
+	}
+
     caption.html(this.currentImage + 1 + "/" + this.photoList.length);
     console.log(this.photoList)
     downloadDom.attr("download", getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6 ));
@@ -1374,6 +1381,8 @@ QmiGlobal.gallery = function (data) {
                     img = container.find(".currentImg"),
                     hZoomIn = img.height()*2, wZoomIn = img.width()*2;
 
+                if(container.hasClass("fail")) return;
+                
                 container.toggleClass("zoomOut").find(".currentImg").toggleClass("zoomIn");
                 
                 if(container.hasClass("zoomOut") === false) {

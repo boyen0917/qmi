@@ -3435,9 +3435,10 @@ img.st-user-pic{
     cursor: pointer;
     width: 60px;
     height: 60px;
-    text-align: center;
-    line-height: 45px;
+    line-height: 50px;
     z-index: 1;
+    box-sizing: border-box;
+    padding-left: 25px;
 }
 
 #galleryModal figure.gallery-contaniner.original-size {
@@ -3454,6 +3455,25 @@ img.st-user-pic{
     display: table-cell;
     text-align: center;
     vertical-align: middle;
+}
+
+#galleryModal figure.gallery-contaniner .img-container.fail {cursor: default;}
+
+
+#galleryModal figure.gallery-contaniner .img-container.fail {
+    background-image: url(../images/alert-circle.png);
+    background-size: 30px;
+    background-color: rgb(90, 90, 90);
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: 45%;
+    position: relative;
+}
+#galleryModal figure.gallery-contaniner .img-container.fail:before {
+    content: attr(desc);
+    color: white;
+    position: relative;
+    top: 10px;
 }
 
 #galleryModal figure.gallery-contaniner .img-container.zoomOut {
@@ -3475,68 +3495,25 @@ img.st-user-pic{
 
 #galleryModal .preBtn {left: 5px;}
 #galleryModal .preBtn .draw {
-  width: 1px;
-  background: rgb(134, 134, 134);
-  height: 4px;
-  position: relative;
-  top: 25vh;
-  left: 10px;
-}
-#galleryModal .preBtn .draw:before {
-	content: "";
-	position: absolute;
-	border: 1px solid white;
-	height: 0px;
-	width: 20px;
-	border-radius: 10px;
-	left: -7px; 
-	top: -7px; 
-	transform: rotateZ(300deg);
-}
-
-#galleryModal .preBtn .draw:after {
-	content: "";
-	position: absolute;
-	border: 1px solid white;
-	height: 0px;
-	width: 20px;
-	border-radius: 10px;
-	left: -7px; 
-	top: 10px; 
-	transform: rotateZ(60deg);
+    width: 80px;
+    background-image: url(../images/navigate_next.png);
+    height: 75px;
+    position: relative;
+    top: 18vh;
+    right: 33px;
+    background-size: 60px 100px;
+    transform: rotateZ(180deg);
 }
 
 #galleryModal .nextBtn {right: -5px;}
 #galleryModal .nextBtn .draw {
-  width: 1px;
-  background: rgb(134, 134, 134);
-  height: 4px;
-  position: relative;
-  top: 25vh;
-  left: 30px;
-}
-#galleryModal .nextBtn .draw:before {
-	content: "";
-	position: absolute;
-	border: 1px solid white;
-	height: 0px;
-	width: 20px;
-	border-radius: 10px;
-	right: -7px; 
-	top: -7px; 
-	transform: rotateZ(60deg);
-}
-
-#galleryModal .nextBtn .draw:after {
-	content: "";
-	position: absolute;
-	border: 1px solid white;
-	height: 0px;
-	width: 20px;
-	border-radius: 10px;
-	right: -7px; 
-	top: 10px; 
-	transform: rotateZ(300deg);
+    width: 80px;
+    background-image: url(../images/navigate_next.png);
+    height: 75px;
+    position: relative;
+    top: 14vh;
+    left: -2px;
+    background-size: 60px 100px;
 }
 
 #galleryModal #caption {
@@ -3546,7 +3523,7 @@ img.st-user-pic{
 	color: white;
 }
 
-#galleryModal .gallery-contaniner:hover a div {
+#galleryModal .gallery-contaniner:not(.fail):hover a div {
     content: "";
     width: 50px;
     height: 50px;
@@ -3613,9 +3590,9 @@ img.st-user-pic{
 
 
 .st-attach-img-area .st-slide-img.loadError {
-	background-image: url(../images/common/icon/icon_noPhoto.png);
-	background-size: 300px 130px;
-	background-color: rgb(223,233,239);
+    background-image: url(../images/alert-circle.png);
+    background-size: 30px;
+    background-color: rgb(90, 90, 90);
 }
 .st-attach-img-area .cnt_1 .st-slide-img {
 	height: 99%;
@@ -3717,12 +3694,46 @@ img.st-user-pic{
 	max-height: 500px;
 }
 
+.st-attach-video.fail:before {
+	content: attr(desc);
+    color: white;
+    position: relative;
+    top: 150px;
+}
+.st-attach-video.fail {
+	background-image: url(../images/alert-circle.png);
+    background-size: 30px;
+    background-color: rgb(90, 90, 90);
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: 100px;
+    position: relative;
+}
+
+.st-attach-video.fail video {opacity: 0;}
+
 .st-attach-audio {
 	margin: 20px auto;
 	max-width: 480px;
 }
 .st-attach-audio audio{
 	width: 480px;
+}
+
+.st-attach-file.fail {position: relative;}
+.st-attach-file.fail:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(../images/alert-circle.png);
+    background-size: 30px;
+    background-color: rgba(10, 10, 10, 0.4);
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: 50%;
+    z-index: 1;
 }
 
 .st-attach-file .attach-file{
@@ -6886,11 +6897,14 @@ body > div.popup .popup-errCode {margin-top: 30px; font-size: 14px;}
 
 #system-annoucement > header > button {
     float: right;
-    margin: 10px;
+    margin: 7px 10px;
     background: none;
     border: 0;
     color: white;
     cursor: pointer;
+    height: 25px;
+    line-height: 25px;
+    text-shadow: 0px 0px 0px #ddd;
 }
 
 #system-annoucement > section.body {
@@ -6903,13 +6917,14 @@ body > div.popup .popup-errCode {margin-top: 30px; font-size: 14px;}
 
 #system-annoucement section.announcement {
 	position: relative;
-    margin: 20px auto 10px;
+    margin: 20px auto 30px;
     width: 500px;
     background: white;
     min-height: 160px;
     box-shadow: 1px 1px 10px #ADADAD;
     padding: 10px 15px;
     box-sizing: border-box;
+    border-radius: 3px;
 }
 
 #system-annoucement section.announcement:last-child {margin-bottom: 50px;}
@@ -6972,3 +6987,11 @@ body > div.popup .popup-errCode {margin-top: 30px; font-size: 14px;}
     border-radius: 8px;
     right: 10px;
 }
+#system-annoucement > section.body > div.empty {
+	width: 50%;
+	text-align: center;
+	margin: 50px auto;
+	display: none;
+}
+
+#system-annoucement > section.body > div.empty > div {margin-top: 20px;}

@@ -599,5 +599,8 @@
 	"ACCOUNT_MANAGEMENT_DONE": "Done",
 	
 	"SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT": "Announcement",
-	"INTERGRATIONS_READMORE": "Read More"
+	"SYSTEM_ANNOUNCEMENT_EMPTY": "There is no announcement yet",
+	"INTERGRATIONS_READMORE": "Read More",
+
+	"ACCOUNT_MANAGEMENT_FILE_DELETED": "The file is expired or exceeded the free storage limit."
 }
