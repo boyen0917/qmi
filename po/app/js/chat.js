@@ -1638,7 +1638,7 @@ function showMsg(object, bIsTmpSend) {
 				+ "</p><p clas>檔案大小 : " + fileSize  + "</p><a class='download-link' download='" 
 				+ msgData.fn + "'>下載</a></div>");
 			msgDiv.append(fileDom);
-			getChatS3file(fileDom, msgData.c, msgData.tp, ti_chat);
+			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
 		case 28:
 			var invoker = (g_group.guAll[msgData.i] || {}).nk;
@@ -2164,7 +2164,6 @@ function sendMsgText(dom) {
 			return;
 		}
 		//default
-		console.log('gets3file');
 		var api_name = "groups/" + gi + "/chats/" + this_ti + "/files/" + file_c + "/dl";
 		var headers = {
 			"ui": ui,
@@ -2185,8 +2184,24 @@ function sendMsgText(dom) {
 
 			var obj = $.parseJSON(data.responseText);
 			obj.api_name = api_name;
-			if (target && tp) {
-				switch (tp) {
+
+			// 5349
+			var linkAvailableDef = $.Deferred();
+
+            if(obj.df) 
+                linkAvailableDef.resolve(false);
+            else
+                QmiGlobal.getLinkStateDef(obj.s3 || obj.s32).done(linkAvailableDef.resolve)
+
+            linkAvailableDef.done(function(isAvailable) {
+            	if (!target || !tp) return obj.s3;
+
+            	if(!isAvailable) {
+            		renderFailUI(target);
+            		return;
+            	}
+            	
+            	switch (tp) {
 					case 6://圖片
 						var img = target.find("img");
 						img.load(function () {
@@ -2211,19 +2226,6 @@ function sendMsgText(dom) {
 					        });
 						});
 
-						// 浮水印加在這
-						// var watermarkText = QmiGlobal.groups[gi].gn + " " + QmiGlobal.groups[gi].guAll[gu].nk;
-						// getWatermarkImage(watermarkText, obj.s3, 1, function(picUrl) {
-						// 	img.attr("src", picUrl);
-						// 	//點擊跳出大圖
-						// 	img.click(function () {
-						// 		new QmiGlobal.gallery({
-						//             gi: gi,
-						//             photoList: [{s32: picUrl}],
-						//             currentImage : 0
-						//         });
-						// 	});
-						// })
 						break;
 					case 7://video
 						renderVideoUrl(obj.s32, target.find("video"), function (videoTag) {
@@ -2245,10 +2247,16 @@ function sendMsgText(dom) {
 						target.find(".download-link").attr("href", obj.s3).show();
 						break;
 				}
-			} else {
-				return obj.s3;
-			}
+            });
 		});
+
+		function renderFailUI(dom) {
+			dom.empty();
+			dom.append($("<section>", {
+				class: "fail",
+				html: $.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED")
+			}));
+		}
 	}
 
 	/**

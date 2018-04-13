@@ -1329,7 +1329,7 @@ setStickerUrl = function(dom, id){
 }
 
 QmiGlobal.gallery = function (data) {
-	this.gi = data.gi;
+	this.gi = data.gi || QmiGlobal.currentGi;
     this.photoList = data.photoList;
     this.currentImage = data.currentImage;
     this.isApplyWatermark = data.isApplyWatermark;

@@ -34,7 +34,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://nqmi26.mitake.com.tw/";
+var base_url = "https://qmi17.mitake.com.tw/";
 
 // 先檢查是否為桌機版
 var nwGui = function() {
@@ -333,6 +333,23 @@ window.QmiGlobal = {
 	        $.lStorage("_periodicallyReloadTimer", new Date().getTime());
 	    }
 	}(),
+
+	getLinkStateDef: function(link) {
+        var deferred = $.Deferred();
+        var ajx = $.ajax(link).fail(function() {
+            deferred.resolve(false);
+        }).done(function() {
+            deferred.resolve(true);
+        })
+
+        setTimeout(function() {
+            if(deferred.state() === "resolved") return;
+            deferred.resolve(true);
+            ajx.abort();
+        }, 1000);
+
+        return deferred.promise();
+    },
 
 
 	makeErrCodeStr: function(errNum) {

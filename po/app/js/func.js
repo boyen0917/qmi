@@ -1758,60 +1758,77 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
         if (fileIdList.length > 0) {
             getTimelineFilesUrl(this_ei, targetTu, fileIdList).then(function (filesData) {
                 filesData.forEach(function (fileData) {
-                    if (fileIdMap.hasOwnProperty(fileData.fi)) {
+                    if (!fileIdMap.hasOwnProperty(fileData.fi)) return;
+
+                    var linkAvailableDef = $.Deferred();
+
+                    if(fileData.df) 
+                        linkAvailableDef.resolve(false);
+                    else
+                        QmiGlobal.getLinkStateDef(fileData.s3 || fileData.s32).done(linkAvailableDef.resolve)
+
+                    linkAvailableDef.done(function(isAvailable) {
+                        if (!isAvailable) {
+                            setReplyFileFailUI(fileIdMap[fileData.fi].replyElement);
+                            return;
+                        }
                         var fileObj = fileIdMap[fileData.fi];
                         var replyElement = fileObj.replyElement;
 
-                        if (fileObj.tp == 6) {
-                            var imageArea = replyElement.find(".au-area");
-                            var thumbnailImg = imageArea.find("img.aut");
+                        switch(fileObj.tp) {
+                            case 6:
+                                var imageArea = replyElement.find(".au-area");
+                                var thumbnailImg = imageArea.find("img.aut");
 
-                            imageArea.show();
-                            thumbnailImg.load(function() {
-                                //重設 style
-                                thumbnailImg.removeAttr("style");
-                                var w = thumbnailImg.width();
-                                var h = thumbnailImg.height();
-                                // mathAvatarPos(img,w,h,size);
-                            });
-                            //小圖
-                            thumbnailImg.attr("src", fileData.s3);
-
-                            imageArea.off('click').on('click', function () {
-                                new QmiGlobal.gallery({
-                                    photoList: [{s32: fileData.s32}],
-                                    currentImage : 0,
+                                imageArea.show();
+                                thumbnailImg.load(function() {
+                                    //重設 style
+                                    thumbnailImg.removeAttr("style");
+                                    var w = thumbnailImg.width();
+                                    var h = thumbnailImg.height();
+                                    // mathAvatarPos(img,w,h,size);
                                 });
-                            });
-                        } else if (fileObj.tp == 7) {
-                            replyElement.find(".video-area").addClass("play");
-                            replyElement.find("video").attr("src", fileData.s32).show();
-                        } else if (fileObj.tp == 8) {
-                            replyElement.find("audio").html('<source type="audio/mp4" yo src="'+ fileData.s3 +'">').show();
-                        } else if (fileObj.tp == 26) {
-                            var fileName = fileObj.fn.split(".")[0];
-                            var format = fileObj.fn.split(".").pop();
-                            if (fileName.length > 15) {
-                                fileName = fileName.substring(0, 15) + "....";
-                            }
-                            var linkElement = document.createElement("a");
-                            var fileIcon = document.createElement("img");
-                            var fileNameNode = document.createTextNode(fileName + " - " + format);
-                            var fileSizeSpan = document.createElement("span");
-                            var downloadIcon = document.createElement("div")   
-                            fileIcon.src = 'images/fileSharing/' + getMatchIcon(fileObj.fn);
-                            fileSizeSpan.textContent = fileObj.si ? fileObj.si.toFileSize() : "0 bytes";
-                            linkElement.className = 'attach-file';
-                            downloadIcon.className = 'download-icon'
-                            linkElement.download = fileObj.fn;
-                            linkElement.href = fileData.s3+"qq";
-                            linkElement.appendChild(fileIcon);
-                            linkElement.appendChild(fileNameNode);
-                            linkElement.appendChild(fileSizeSpan);
-                            linkElement.appendChild(downloadIcon);
-                            replyElement.find(".file").append(linkElement);
+                                //小圖
+                                thumbnailImg.attr("src", fileData.s3);
+
+                                imageArea.off('click').on('click', function () {
+                                    new QmiGlobal.gallery({
+                                        photoList: [{s32: fileData.s32}],
+                                        currentImage : 0,
+                                    });
+                                });
+                                break;
+                            case 7:
+                                replyElement.find(".video-area").addClass("play");
+                                replyElement.find("video").attr("src", fileData.s32).show();
+                                break;
+                            case 8:
+                                replyElement.find("audio").html('<source type="audio/mp4" yo src="'+ fileData.s3 +'">').show();
+                                break;
+                            case 26:
+                                var fileName = fileObj.fn.split(".")[0];
+                                var format = fileObj.fn.split(".").pop();
+                                if (fileName.length > 15) {
+                                    fileName = fileName.substring(0, 15) + "....";
+                                }
+                                var linkElement = document.createElement("a");
+                                var fileIcon = document.createElement("img");
+                                var fileNameNode = document.createTextNode(fileName + " - " + format);
+                                var fileSizeSpan = document.createElement("span");
+                                var downloadIcon = document.createElement("div")   
+                                fileIcon.src = 'images/fileSharing/' + getMatchIcon(fileObj.fn);
+                                fileSizeSpan.textContent = fileObj.si ? fileObj.si.toFileSize() : "0 bytes";
+                                linkElement.className = 'attach-file';
+                                downloadIcon.className = 'download-icon'
+                                linkElement.download = fileObj.fn;
+                                linkElement.href = fileData.s3;
+                                linkElement.appendChild(fileIcon);
+                                linkElement.appendChild(fileNameNode);
+                                linkElement.appendChild(fileSizeSpan);
+                                linkElement.appendChild(downloadIcon);
+                                replyElement.find(".file").append(linkElement);
                         }
-                    }
+                    })
                 });
             });
         }
@@ -1821,6 +1838,14 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     $.when.apply($, deferTasks).then(function () {
         if(triggerDetailBox !== undefined) triggerDetailBox.data("trigger", true);
     });
+
+
+    function setReplyFileFailUI(dom) {
+        dom.append($("<section>", {
+            class: "fail",
+            html: $.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED")
+        }));
+    }
 }
 
 
@@ -5861,18 +5886,25 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
     if (fileIdList.length > 0) {
         getTimelineFilesUrl(eventId, tu, fileIdList).then(function (filesData) {
             filesData.forEach(function (fileData) {
-                if (fileIdMap.hasOwnProperty(fileData.fi)) {
-                    var fileObj = fileIdMap[fileData.fi];
-                    if (fileObj.tp == 6) {
+                if (!fileIdMap.hasOwnProperty(fileData.fi)) return;
+
+                var fileObj = fileIdMap[fileData.fi];
+                if(fileData.df) {
+                    fileData.s3 += "_fail";
+                    fileData.s32 += "_fail";
+                }
+                switch(fileObj.tp) {
+                    case 6:
                         gallery_arr.push(fileData);
-                    } else if (fileObj.tp == 7) {
+                        break;
+                    case 7:
                         video_arr.push(fileData);
-                    } else if (fileObj.tp == 8) {
+                        break;
+                    case 8:
                         audio_arr.push(fileData);
-                    } else if (fileObj.tp == 26) {
+                        break;
+                    case 26:
                         fileIdMap[fileData.fi] = Object.assign({}, fileIdMap[fileData.fi], fileData);
-                        // console.log(fileIdMap[fileData.fi]);
-                    }
                 }
             });
 
@@ -5924,7 +5956,7 @@ timelineVideoMake = function (this_event, video_arr) {
         attachVideo.prepend(this_video);
 
         // 影片只能有一個, 做完收工
-        this_video.attr("src", val.s32+"qq").show();
+        this_video.attr("src", val.s32).show();
         this_video[0].onerror = function(){
             var failStr = $.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED");
             this_video.parent().addClass("fail")
@@ -5953,7 +5985,7 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
 
         // 5439 檔案失效
         if($(target).parents(".st-attach-file").hasClass("fail")) {
-            toastShow($.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED")+"qq")
+            toastShow($.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
             return;
         }
 
@@ -5964,20 +5996,18 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
             e.preventDefault();
 
             if (fileIdMap.hasOwnProperty(fileArr[index].fi) && fileIdMap[fileArr[index].fi].s3) {
-                target.href = fileIdMap[fileArr[index].fi].s3+"qq";
-                console.log("yaya");
+                target.href = fileIdMap[fileArr[index].fi].s3;
                 deferred.resolve();
             } else {
                 getS3fileUrl(fileArr[index], eventId).then(function(fileData){
-                    target.href = fileData.s3+"qq";
-                    console.log("nono");
+                    target.href = fileData.s3;
                     deferred.resolve();
                 });
             }
         } else deferred.resolve();
 
         deferred.done(function() {
-            getLinkStateDef(target.href).done(function(isAvailable) {
+            QmiGlobal.getLinkStateDef(target.href).done(function(isAvailable) {
                 if(isAvailable) {
                     target.click();
                 } else {
@@ -6011,7 +6041,7 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
             // 5349 確認第一個連結是否有效
             var allDlDef = $.Deferred();
             try {
-                getLinkStateDef(fileLinks[0]["href"]).done(function() {
+                QmiGlobal.getLinkStateDef(fileLinks[0]["href"]).done(function() {
                     if(isAvailable) {
                         allDlDef.resolve();
                         return;
@@ -6085,23 +6115,6 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
             });
         });
     }
-
-    function getLinkStateDef(link) {
-        var deferred = $.Deferred();
-        var ajx = $.ajax(link).fail(function() {
-            deferred.resolve(false);
-        }).done(function() {
-            deferred.resolve(true);
-        })
-
-        setTimeout(function() {
-            if(deferred.state() === "resolved") return;
-            deferred.resolve(true);
-            ajx.abort();
-        }, 1000);
-
-        return deferred.promise();
-    }
 }
 
 timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermarkText, tu) {
@@ -6134,10 +6147,6 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
 
     $.each(gallery_arr, function (i, val) {
         if(container.hasClass("fail")) return;
-        if(Math.round(Math.random())) {
-            val.s3 += "qq";
-            val.s32 += "qq"; // +"qq"
-        }
             
         var this_img = $('<span class="st-slide-img"/>');
         if (i == 0) {
@@ -6244,7 +6253,6 @@ getS3fileUrl = function (fileObj, eventId, tp, size, tu) {
             method: "post",
             body: tu
         }).success(function(data){
-            data.df = true;
             data.ei = eventId;
             data.fi = fileId;
 
