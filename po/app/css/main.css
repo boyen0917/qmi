@@ -3878,7 +3878,7 @@ img.st-user-pic{
 .st-reply-content-subarea {
 	display: block;
 	padding: 10px 0;
-	width: 75%;
+	width: 400px;
 }
 
 .st-reply-content-subarea b{
@@ -3932,7 +3932,7 @@ img.st-user-pic{
 
 .st-reply-content .attach-file {
 	font-size: 14px;
-	width: -webkit-calc( 100% + 16px );
+	width: 380px;
 	height: 37px;
 	display: inline-block;
 	line-height: 2;

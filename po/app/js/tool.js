@@ -864,9 +864,12 @@ resetDB = function(options){
 	options = options || {};
 	clearBadgeLabel();
 	
-	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
-	if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
-	if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
+	try {
+		if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
+		if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
+		if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
+		fileDB.getObjectStore('timeline_files', 'readwrite').clear();
+	} catch(e) {}
 
 	var excepObj = QmiGlobal.resetDBExceptionArr.reduce(function(obj, curr) {
 		obj[curr] = localStorage[curr];
@@ -1348,16 +1351,8 @@ QmiGlobal.gallery = function (data) {
     var closeBtn  = this.container.find(".close");
     var imgElement = this.container.find("img");
     var downloadDom = this.container.find(".download-link");
-    imgElement.attr("src", this.photoList[this.currentImage].s32);
-
-	imgElement[0].onerror = function() {
-		imgElement.hide().parent()
-		.attr("desc", $.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
-		.addClass("fail").parent().addClass("fail");
-	}
 
     caption.html(this.currentImage + 1 + "/" + this.photoList.length);
-    console.log(this.photoList)
     downloadDom.attr("download", getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6 ));
 
     closeBtn.on("click", this.close.bind(this));
@@ -1405,6 +1400,8 @@ QmiGlobal.gallery = function (data) {
     this.zoomObj.init();
     // end of Brian ZoomIn
 
+    this.setCurrentImage();
+
     $("body").append(this.container);
     this.container.fadeIn();
 
@@ -1439,14 +1436,15 @@ QmiGlobal.gallery.prototype = {
 	},
 
 	setCurrentImage: function () {
-		var giTi = this.gi + "_" + QmiGlobal.groups[this.gi].ti_feed;
-
-		this.zoomObj.reset();
+		var self = this;
+		var giTi = self.gi + "_" + QmiGlobal.groups[self.gi].ti_feed;
+		var deferred = $.Deferred();
+		self.zoomObj.reset();
 		
-		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
-			getS3fileUrl(this.photoList[this.currentImage], giTi).then(function (data) {
+		if (! self.photoList[self.currentImage].hasOwnProperty("s32")) {
+			getS3fileUrl(self.photoList[self.currentImage], giTi).then(function (data) {
 				
-				if (this.isApplyWatermark) {
+				if (self.isApplyWatermark) {
 					getWatermarkImage(this.watermarkText, data.s32, 1, function (imgUrl) {
 						this.photoList[this.currentImage].s32 = imgUrl;
 						this.container.find("img").attr("src", imgUrl);
@@ -1454,17 +1452,36 @@ QmiGlobal.gallery.prototype = {
 				}
 
 				this.photoList[this.currentImage].s32 = data.s32;
-				this.container.find("img").attr("src", data.s32);
-				this.container.find(".download-link").attr("href", data.s32);
-				this.container.find(".download-link").attr("download",
-					getS3FileNameWithExtension(data.s32, 6));
-			}.bind(this));
+				deferred.resolve();
+				
+			}.bind(self));
+		} else deferred.resolve(self.photoList[self.currentImage].s32);
+
+
+		deferred.done(function(imgUrl) {
+			var imgDom = self.container.find("img");
+			imgDom.removeClass("fail")
+			.parent().removeAttr("desc");
+
+			if(imgDom.parents("figure.gallery-contaniner").hasClass("fail")) 
+				setImgFail(imgDom);
+			else
+				imgDom[0].onerror = setImgFail.bind(self, imgDom)
+
+			imgDom.attr("src", imgUrl);
+			self.container.find(".download-link").attr("href", imgUrl);
+			self.container.find(".download-link")
+			.attr("download", getS3FileNameWithExtension(imgUrl, 6));
+
+			self.container.find("#caption").html(self.currentImage + 1 + "/" + self.photoList.length);
+		})
+
+		function setImgFail(imgDom) {
+			imgDom.hide().parent()
+			.addClass("fail")
+			.attr("desc", $.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
 		}
-		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-		this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
-		this.container.find(".download-link").attr("download",
-					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
-		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
+		
 	},
 
 	close: function() {
@@ -3062,7 +3079,7 @@ getTimelineFilesUrl = function (eventId, data, fileIdList) {
             var addFileData = fileStore.put(fileItem);
 
             addFileData.onsuccess = function(evt) {
-                console.log('QQonsuccess')
+                console.log('success')
             };
 
             addFileData.onError = function(evt) {

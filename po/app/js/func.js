@@ -6133,6 +6133,12 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
     }
 
     $.each(gallery_arr, function (i, val) {
+        if(container.hasClass("fail")) return;
+        if(Math.round(Math.random())) {
+            val.s3 += "qq";
+            val.s32 += "qq"; // +"qq"
+        }
+            
         var this_img = $('<span class="st-slide-img"/>');
         if (i == 0) {
             left.append(this_img);
@@ -6238,6 +6244,7 @@ getS3fileUrl = function (fileObj, eventId, tp, size, tu) {
             method: "post",
             body: tu
         }).success(function(data){
+            data.df = true;
             data.ei = eventId;
             data.fi = fileId;
 
@@ -6246,7 +6253,6 @@ getS3fileUrl = function (fileObj, eventId, tp, size, tu) {
             var addFileData = fileStore.put(data);
 
             addFileData.onsuccess = function(evt) {
-                console.log('QQonsuccess')
                 s3Def.resolve(data);
             };
 
