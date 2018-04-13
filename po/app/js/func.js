@@ -1804,7 +1804,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                             linkElement.className = 'attach-file';
                             downloadIcon.className = 'download-icon'
                             linkElement.download = fileObj.fn;
-                            linkElement.href = fileData.s3+"qq";
+                            linkElement.href = fileData.s3;
                             linkElement.appendChild(fileIcon);
                             linkElement.appendChild(fileNameNode);
                             linkElement.appendChild(fileSizeSpan);
@@ -5924,7 +5924,7 @@ timelineVideoMake = function (this_event, video_arr) {
         attachVideo.prepend(this_video);
 
         // 影片只能有一個, 做完收工
-        this_video.attr("src", val.s32+"qq").show();
+        this_video.attr("src", val.s32).show();
         this_video[0].onerror = function(){
             var failStr = $.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED");
             this_video.parent().addClass("fail")
@@ -5953,7 +5953,7 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
 
         // 5439 檔案失效
         if($(target).parents(".st-attach-file").hasClass("fail")) {
-            toastShow($.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED")+"qq")
+            toastShow($.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
             return;
         }
 
@@ -5964,13 +5964,11 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
             e.preventDefault();
 
             if (fileIdMap.hasOwnProperty(fileArr[index].fi) && fileIdMap[fileArr[index].fi].s3) {
-                target.href = fileIdMap[fileArr[index].fi].s3+"qq";
-                console.log("yaya");
+                target.href = fileIdMap[fileArr[index].fi].s3;
                 deferred.resolve();
             } else {
                 getS3fileUrl(fileArr[index], eventId).then(function(fileData){
-                    target.href = fileData.s3+"qq";
-                    console.log("nono");
+                    target.href = fileData.s3;
                     deferred.resolve();
                 });
             }
