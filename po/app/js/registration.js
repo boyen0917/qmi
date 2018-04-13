@@ -460,7 +460,7 @@ appInitial = function(needUpdate){
                 		}
 
                 		new QmiGlobal.popup({
-							desc: $.i18n.getString("WEBONLY_ERROR_OCCURED_RELOGIN") +"<br>"+ errCode,
+							desc: $.i18n.getString("WEBONLY_ERROR_OCCURED_RELOGIN") +"<br><br>"+ errCode,
 							confirm: true,
 							action: [reLogin]
 						});

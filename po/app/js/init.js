@@ -334,6 +334,23 @@ window.QmiGlobal = {
 	    }
 	}(),
 
+	getLinkStateDef: function(link) {
+        var deferred = $.Deferred();
+        var ajx = $.ajax(link).fail(function() {
+            deferred.resolve(false);
+        }).done(function() {
+            deferred.resolve(true);
+        })
+
+        setTimeout(function() {
+            if(deferred.state() === "resolved") return;
+            deferred.resolve(true);
+            ajx.abort();
+        }, 1000);
+
+        return deferred.promise();
+    },
+
 
 	makeErrCodeStr: function(errNum) {
 		return "<div class=\"popup-errCode\">"+ $.i18n.getString("WEBONLY_POPUP_ERRCODE") +" : " + errNum +"</div>";
