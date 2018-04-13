@@ -903,7 +903,14 @@ QmiAjax.prototype = {
 		// 604: 私雲Token錯誤, 請重新拉取/groups取的新的key進行私雲驗證登入
 		// 605: 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 		// 606: 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
-
+		// 607: 公雲上的歸戶 LDAP 帳號已解除, 不動作, 等 polling 的 command 56 再執行團體列表的更新動作 (清除歸戶資訊)
+		// 608: 私雲上的歸戶 LDAP 帳號已解除, 不動作, 等 polling 的 command 56 再執行團體列表的更新動作 (清除歸戶資訊)
+		// 609: 企業帳號被管理者修改密碼, 請使用者重新使用新的密碼進行登入
+		// 610: 帳號被凍結, 強制登出, 吐 AP 給的Message 
+		// 611: 付費帳號被關閉, 強制登出, 吐 AP 給的Message 
+		// 612: 一般帳號變成無效帳號, 強制登出, 吐 AP 給的Message
+		// 613: 一般帳號變成無效帳號, 強制登出, 吐 AP 給的Message
+		
 		switch(rspCode) {
 			case 601: // 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
 				authUpdate();
@@ -964,6 +971,17 @@ QmiAjax.prototype = {
 					});
 					return;
 				}
+				break;
+			case 610:
+			case 611:
+			case 612:
+			case 613:
+				new QmiGlobal.popup({
+					desc: rspObj.rsp_msg,
+					confirm: true,
+					action: [logout]
+				});
+
 				break;
 			case 9999:
 				// 沒帶rspCode 表示是expire time過期
