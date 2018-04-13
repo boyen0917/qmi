@@ -616,7 +616,8 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		name = $.i18n.getString("COMMON_YOU");
 	}
 
-	switch( data.ml[0].tp ){
+	var dataTp = data.ml[0].tp;
+	switch(dataTp){
 		case 5: //sticker
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
 			break; 
@@ -710,7 +711,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		try{
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			var cnTmp = data.cn||"";
-			if( data.meta.ct>=login_time){
+			if( data.meta.ct>=login_time && dataTp != 22){
 				
 				try {QmiGlobal.showNotification ({
 					title: mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")",
