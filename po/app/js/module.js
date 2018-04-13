@@ -386,12 +386,19 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 		var self = this;
 
 		self.api.getNoticesTp1().complete(function(rspData) {
-			console.log("rspData", rspData);
 	        if(rspData.status !== 200) return;
 	        try {
-	        	var noticesData = JSON.parse(rspData.responseText)
+	        	var noticesData = JSON.parse(rspData.responseText);
 	        } catch(e) {return}
+
+
+	        var bodyDom = self.view.find("section.body");
 	        var veArr = [];
+	        noticesData.nl = noticesData.nl || [];
+	        if(noticesData.nl.length === 0) {
+	        	bodyDom.find("div.empty").show();
+	        	return;
+	        }
 
 	        noticesData.nl.forEach(function(item, i) {
 	        	var dom = $(self.html.announcement);
@@ -401,7 +408,7 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 	        	dom.find("section.title").text(item.oet);
 	        	dom.find("section.content").text(item.nd.ml[0].c);
 	        	
-	        	self.view.find("section.body").append(dom);
+	        	bodyDom.append(dom);
 
 	        	var oriHeight = dom.find("section.content").height();
 	        	if(oriHeight <= 40) return;
@@ -463,7 +470,10 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 		    			<span>${$.i18n.getString("SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT")}</span>
 		    			<button>${$.i18n.getString("COMMON_DONE")}</button>
 		    		</header>
-		    		<section class="body"></section>
+		    		<section class="body"><div class="empty">
+		    			<img src="images/Qmi_Logo_Empty.png">
+		    			<div>${$.i18n.getString("SYSTEM_ANNOUNCEMENT_EMPTY")}</div>
+		    		</div></section>
 		    	</section>`,
 
 	    	announcement: `
@@ -489,6 +499,7 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 	},
 
     handleEvent: eventHandler
+
 });
 
 

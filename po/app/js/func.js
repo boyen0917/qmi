@@ -1804,7 +1804,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                             linkElement.className = 'attach-file';
                             downloadIcon.className = 'download-icon'
                             linkElement.download = fileObj.fn;
-                            linkElement.href = fileData.s3;
+                            linkElement.href = fileData.s3+"qq";
                             linkElement.appendChild(fileIcon);
                             linkElement.appendChild(fileNameNode);
                             linkElement.appendChild(fileSizeSpan);
@@ -5914,7 +5914,8 @@ timelineVideoMake = function (this_event, video_arr) {
     var eventId = this_event.data('event-id');
     var attachVideo = this_event.find(".st-attach-video");
 
-    attachVideo.show().addClass("attach-download");
+    // attach-download mouseenter 下載
+    attachVideo.show()
 
     $.each(video_arr, function(i, val) {
         var this_video = $(
@@ -5922,10 +5923,18 @@ timelineVideoMake = function (this_event, video_arr) {
         );
         attachVideo.prepend(this_video);
 
-        //影片只能有一個, 做完收工
-        this_video.attr("src", val.s32).show();
-        
-        return false;
+        // 影片只能有一個, 做完收工
+        this_video.attr("src", val.s32+"qq").show();
+        this_video[0].onerror = function(){
+            var failStr = $.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED");
+            this_video.parent().addClass("fail")
+            .attr("desc", failStr);
+
+            toastShow(failStr);
+        };
+        this_video[0].onloadeddata = function(){
+            attachVideo.addClass("attach-download");
+        }
     });
 }
 
@@ -5941,21 +5950,43 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
 
     fileLinks.off('click').on('click', function (e) {
         var target = this;
+
+        // 5439 檔案失效
+        if($(target).parents(".st-attach-file").hasClass("fail")) {
+            toastShow($.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED")+"qq")
+            return;
+        }
+
         var index = Array.prototype.indexOf.call(this.parentElement.children, this);
+        var deferred = $.Deferred();
 
         if ($(target).attr('href') === undefined) {
             e.preventDefault();
 
             if (fileIdMap.hasOwnProperty(fileArr[index].fi) && fileIdMap[fileArr[index].fi].s3) {
-                target.href = fileIdMap[fileArr[index].fi].s3;
-                target.click();
+                target.href = fileIdMap[fileArr[index].fi].s3+"qq";
+                console.log("yaya");
+                deferred.resolve();
             } else {
                 getS3fileUrl(fileArr[index], eventId).then(function(fileData){
-                    target.href = fileData.s3;
-                    target.click()
+                    target.href = fileData.s3+"qq";
+                    console.log("nono");
+                    deferred.resolve();
                 });
             }
-        }
+        } else deferred.resolve();
+
+        deferred.done(function() {
+            getLinkStateDef(target.href).done(function(isAvailable) {
+                if(isAvailable) {
+                    target.click();
+                } else {
+                    toastShow($.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
+                    $(target).parents(".st-attach-file").addClass("fail");
+                }
+                target.removeAttribute("href");
+            })
+        })
     });
 
     allDownLoadDiv.hide();
@@ -5975,30 +6006,47 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
         allDownLoadDiv.bind("click", function(e) {
             e.preventDefault();
 
+            var allDownLoadDiv = $(this);
+
+            // 5349 確認第一個連結是否有效
+            var allDlDef = $.Deferred();
+            try {
+                getLinkStateDef(fileLinks[0]["href"]).done(function() {
+                    if(isAvailable) {
+                        allDlDef.resolve();
+                        return;
+                    }
+                    toastShow($.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
+                    allDownLoadDiv.parents(".st-attach-file").addClass("fail");
+                    allDlDef.reject();
+                })
+            } catch(e) {allDlDef.resolve();}
+
             var fileIndex = 0;
             var getLinkTasks = [];
 
-            $.each(fileLinks, function (i, fileLink) {
-                var promise = new Promise(function(resolve, reject) {
-                    if (fileLink['href']) {
-                        resolve();
-                    } else {
-                        if (fileIdMap.hasOwnProperty(fileArr[i].fi) && fileIdMap[fileArr[i].fi].s3) {
-                            fileLink['href'] = fileIdMap[fileArr[i].fi].s3;
+            allDlDef.done(function() {
+                $.each(fileLinks, function (i, fileLink) {
+                    var promise = new Promise(function(resolve, reject) {
+                        if (fileLink['href']) {
                             resolve();
                         } else {
-                            getS3fileUrl(fileArr[i], eventId).then(function(fileData){
-                                fileLink['href'] = fileData.s3;
+                            if (fileIdMap.hasOwnProperty(fileArr[i].fi) && fileIdMap[fileArr[i].fi].s3) {
+                                fileLink['href'] = fileIdMap[fileArr[i].fi].s3;
                                 resolve();
-                            });
+                            } else {
+                                getS3fileUrl(fileArr[i], eventId).then(function(fileData){
+                                    fileLink['href'] = fileData.s3;
+                                    resolve();
+                                });
+                            }
+                            
                         }
-                        
-                    }
-                });
+                    });
 
-                getLinkTasks.push(promise);
+                    getLinkTasks.push(promise);
+                })
             })
-
 
             Promise.all(getLinkTasks).then(function () {
                 try {
@@ -6037,6 +6085,23 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
             });
         });
     }
+
+    function getLinkStateDef(link) {
+        var deferred = $.Deferred();
+        var ajx = $.ajax(link).fail(function() {
+            deferred.resolve(false);
+        }).done(function() {
+            deferred.resolve(true);
+        })
+
+        setTimeout(function() {
+            if(deferred.state() === "resolved") return;
+            deferred.resolve(true);
+            ajx.abort();
+        }, 1000);
+
+        return deferred.promise();
+    }
 }
 
 timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermarkText, tu) {
@@ -6055,10 +6120,6 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
 
     if( count==1 ){
         left.css("width","100%").addClass("contain");
-        // 2017.10.20 單張圖的高圖要置中
-        // window.gg = window.gg || [];
-        // window.gg.push({evt: this_event, img: gallery_arr[0]});
-        // if(gallery_arr[0].w < gallery_arr[0].h) left.addClass("contain");
     } else {
         left.css("width","50%");
     }
@@ -6108,8 +6169,8 @@ timelineGalleryMake = function (this_event,gallery_arr,isApplyWatermark,watermar
             };
 
             img.onerror = function () {
-                target.css("background-image", "");
-                target.addClass("loadError");
+                this_img.css("background-image", "");
+                this_img.addClass("loadError");
             }
 
             img.src = val.s3;
