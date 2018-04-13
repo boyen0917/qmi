@@ -761,7 +761,8 @@ QmiGlobal.module.appVersion = {
 	    			os: osTp,
 					tp: 0,
 					av: self.versionOsMap[osTp].av || "1.0.0",
-					li: lang
+					li: lang,
+					
 				},
 	    		method: "get",
 	    		errHide: true
