@@ -1827,7 +1827,6 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                                 linkElement.appendChild(fileSizeSpan);
                                 linkElement.appendChild(downloadIcon);
                                 replyElement.find(".file").append(linkElement);
->>>>>>> feature/5349
                         }
                     })
                 });
