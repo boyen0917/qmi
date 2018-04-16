@@ -376,7 +376,7 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 
 		QmiGlobal.eventDispatcher.subscriber([{
     			veId: "close", 
-    			elemArr: self.view.find("> header > button"), 
+    			elemArr: self.view.find("> header > *"), 
     			eventArr: ["click"]
     		}
 		], self);    	
@@ -466,9 +466,8 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 		this.html = {
     		frame: `<section id="system-annoucement">
 		    		<header>
-		    			<img src="images/chatroom/chat_sticker_icon_emotions_sticker_setting.png">
+		    			<img src="images/navi/navi_icon_back.png">
 		    			<span>${$.i18n.getString("SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT")}</span>
-		    			<button>${$.i18n.getString("COMMON_DONE")}</button>
 		    		</header>
 		    		<section class="body"><div class="empty">
 		    			<img src="images/Qmi_Logo_Empty.png">
