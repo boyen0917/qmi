@@ -387,7 +387,7 @@ function openChatWindow ( giTmp, ci ){
 			windowList[ci] = window.open("", ci , "width=400, height=600");
 		else {
 			var serverPath = window.location.href.split("/").slice(0, -1).join("/") +"/";
-			windowList[ci] = window.open(serverPath +"chat.html?v2.3.0.1", ci , "width=400,height=600");
+			windowList[ci] = window.open(serverPath +"chat.html?v2.3.0.2", ci , "width=400,height=600");
 		}
 		
 		windowList[ci].chatAuthData = {
