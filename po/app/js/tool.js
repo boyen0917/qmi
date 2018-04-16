@@ -3060,6 +3060,7 @@ getTimelineFilesUrl = function (eventId, data, fileIdList) {
             new QmiAjax({
                 apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files",
                 method: "post",
+                noErr: true,
                 body: data
             }).success(function (data) {
                 writeToFileDB(data.fl)
