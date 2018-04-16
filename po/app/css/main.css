@@ -6888,23 +6888,12 @@ body > div.popup .popup-errCode {margin-top: 30px; font-size: 14px;}
     top: 0;
     z-index: 1;
 }
-
+#system-annoucement > header > * {cursor: pointer;}
 #system-annoucement > header > img {
-    width: 30px;
-    margin: 5px;
-    vertical-align: top;
-}
-
-#system-annoucement > header > button {
-    float: right;
-    margin: 7px 10px;
-    background: none;
-    border: 0;
-    color: white;
-    cursor: pointer;
+    width: 22px;
     height: 25px;
-    line-height: 25px;
-    text-shadow: 0px 0px 0px #ddd;
+    margin: 8px 5px;
+    vertical-align: top;
 }
 
 #system-annoucement > section.body {
