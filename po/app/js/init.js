@@ -129,7 +129,6 @@ window.QmiGlobal = {
 				});
 			} catch(e) {}
 			
-
 			// 寫入版本號
 			$("#app-version").attr("ver-chk", $.i18n.getString("WEBONLY_VERSION_CHK"));
 			$("#app-version").attr("version", QmiGlobal.appVer);
