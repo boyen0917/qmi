@@ -1339,47 +1339,10 @@ $(function(){
 		}
 
 		triggerDetailBox.data("trigger", false);
-		
-		//單一動態詳細內容
-        getEventDetail(this_ei).complete(function(data){
-        	if(data.status != 200) return false;
-
-        	var e_data = $.parseJSON(data.responseText).el;
-
-        	// 5374
-        	makeLikeDataAndUI(e_data[0].meta.ll || []);
-
-        	eventContentDetail(this_event,e_data);
-        	
-    		//detail timeline message內容
-			detailTimelineContentMake(this_event, e_data, null, triggerDetailBox);
-
-			timelineUpdateTime();
-		});
-
-		function makeLikeDataAndUI(likeListArr) {
-			this_event.data("parti-list",likeListArr);
-
-			// epl
-			this_event.data("parti-like", likeListArr.map(function(item) {
-        		return {gu: item}
-        	}));
-
-			// 編輯讚好區域
-			detailLikeStringMake(this_event);
-		}
-	});
-	
-	$(document).on("click",".st-reply-like-area",function(){
-		var this_event = $(this).parents(".st-sub-box");
-		var deferred = $.Deferred();
 
 		//此則動態的按贊狀況
 		getThisTimelinePart(this_event,1,function(data){
-			if(!data.responseText) {
-				deferred.resolve();
-				return;
-			}
+			if(!data.responseText) return false;
 
 			var epl = $.parseJSON(data.responseText).epl;
             
@@ -1391,17 +1354,31 @@ $(function(){
 				// 存回 陣列
 				this_event.data("parti-list",parti_list);
 				this_event.data("parti-like",epl);
-
 				// 編輯讚好區域
 				detailLikeStringMake(this_event);
 			}
-			deferred.resolve();
 		});
 
-		deferred.done(function() {
-			timelineObjectTabShowDelegate( this_event, 1, function(){
-				cns.debug("back from like list");
-			});
+		//單一動態詳細內容
+        getEventDetail(this_ei).complete(function(data){
+        	if(data.status != 200) return false;
+
+        	var e_data = $.parseJSON(data.responseText).el;
+
+        	eventContentDetail(this_event,e_data);
+        	
+    		//detail timeline message內容
+			detailTimelineContentMake(this_event, e_data, null, triggerDetailBox);
+
+			timelineUpdateTime();
+		});
+	});
+	
+	$(document).on("click",".st-reply-like-area",function(){
+		var this_event = $(this).parents(".st-sub-box");
+
+		timelineObjectTabShowDelegate( this_event, 1, function(){
+			cns.debug("back from like list");
 		});
 	});
 	
