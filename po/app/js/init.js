@@ -1,4 +1,4 @@
-// version 2.3.0.2
+// version 2.3.0.3
 var ui;
 var at;
 var gi;
@@ -34,7 +34,7 @@ var base_url = function() {
 	}
 }();
 
-// var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://qmi17.mitake.com.tw/";
 
 // 先檢查是否為桌機版
 var nwGui = function() {
@@ -51,7 +51,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整 
-	appVer: "2.3.0.2",
+	appVer: "2.3.0.3",
 
 	title: "Qmi",
 
