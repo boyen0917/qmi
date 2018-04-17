@@ -545,6 +545,10 @@
 
 	"WEBONLY_USER_PROFILE_PHONE2" : "Tel.",
 	"WEBONLY_POPUP_ERRCODE" : "Error Code",
+
+	"WEBONLY_LOGIN_PHONE" :	"Phone Number",
+	"WEBONLY_LOGIN_EMAIL" :	"Email Address",
+	"WEBONLY_LOGIN_PASSWORD": "Password",
 	
 	"SCHEDULED_POST": "Scheduled post",
 	"SCHEDULED_POST_AT": "Scheduled post at",

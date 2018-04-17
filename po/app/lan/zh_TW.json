@@ -546,6 +546,10 @@
 	"WEBONLY_USER_PROFILE_PHONE2" : "公司電話",
 	"WEBONLY_POPUP_ERRCODE" : "錯誤碼",
 
+	"WEBONLY_LOGIN_PHONE" :	"請輸入電話",
+	"WEBONLY_LOGIN_EMAIL" :	"請輸入Email",
+	"WEBONLY_LOGIN_PASSWORD": "請輸入密碼",
+
 	"SCHEDULED_POST": "排程發佈文章",
 	"SCHEDULED_POST_AT": "排程發佈時間",
 	"SCHEDULED_POST_POST_NOW": "立即發佈",

@@ -70,42 +70,7 @@ window.QmiGlobal = {
 		}
 	},
 
-	nodeModules: function() {
-		if(!nwGui) return {};
-
-		return {
-			childProcess: req("child_process"),
-			fs: req("fs"),
-			path: req("path"),
-
-			https: req("https"),
-
-			ffmpeg: req("fluent-ffmpeg"),
-    		
-			notifier: req("node-notifier"),
-		};
-
-		function req(moduleName) {
-			try {
-				return require(moduleName)
-			} catch(e) {
-				console.error("require exception:", e);
-				return {};
-			}
-		}
-	}(),
-
-	getAppWin: function() {
-		if(QmiGlobal.nwGui === null) return {};
-		return QmiGlobal.nwGui.Window.get();
-	},
-
-
-	nwVer: function() {
-		try {
-			return require("nw.gui").App.manifest.version;
-		} catch(e) {return "web"}
-	}(),
+	appLangDef: $.Deferred(),
 
 	// 在下方 document ready之後 initReady
 	initReady: function() {
@@ -158,6 +123,44 @@ window.QmiGlobal = {
 			QmiGlobal.appVer = QmiGlobal.nwVer;
 		}
 	},
+
+
+	nodeModules: function() {
+		if(!nwGui) return {};
+
+		return {
+			childProcess: req("child_process"),
+			fs: req("fs"),
+			path: req("path"),
+
+			https: req("https"),
+
+			ffmpeg: req("fluent-ffmpeg"),
+    		
+			notifier: req("node-notifier"),
+		};
+
+		function req(moduleName) {
+			try {
+				return require(moduleName)
+			} catch(e) {
+				console.error("require exception:", e);
+				return {};
+			}
+		}
+	}(),
+
+	getAppWin: function() {
+		if(QmiGlobal.nwGui === null) return {};
+		return QmiGlobal.nwGui.Window.get();
+	},
+
+
+	nwVer: function() {
+		try {
+			return require("nw.gui").App.manifest.version;
+		} catch(e) {return "web"}
+	}(),
 
 	// 之後取代 ui, at, gi, ... etc
 	currentGi: "",

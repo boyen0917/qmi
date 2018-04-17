@@ -496,11 +496,23 @@ changePageAfterPopUp = function(page){
 updateLanguage = function( lanPath ){
 	lanPath = lanPath || lang;
 	var deferred = $.Deferred();
-	$.i18n.load(lanPath, function(){
-		$('body')._i18n();
-		deferred.resolve();
-	});
 
+	// 避免pending
+	setTimeout(function() {
+		QmiGlobal.appLangDef.resolve(false);
+	}, 1000);
+
+	QmiGlobal.appLangDef.done(function(isSuccess) {
+		if(isSuccess) {
+			deferred.resolve();
+			return;
+		}
+
+		$.i18n.load(lanPath, function(){
+			$('body')._i18n();
+			deferred.resolve();
+		});
+	})
 	return deferred.promise();
 }
 

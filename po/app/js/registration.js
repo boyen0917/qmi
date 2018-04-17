@@ -22,10 +22,17 @@ appInitial = function(needUpdate){
 	}
 	
 	//首頁大圖
-	$("#page-registration").css("height",$(window).height());
+	var registerDom = $("#page-registration");
+	registerDom.css("height", $(window).height());
 	$(window).resize(function(){ 
-		$("#page-registration").css("height",$(window).height());
+		registerDom.css("height", $(window).height());
 	});
+
+
+	// placeholder
+	registerDom.find("login-ld-phone").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_PHONE"))
+	registerDom.find("login-ld-email").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_EMAIL"))
+	registerDom.find("login-ld-password").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_PASSWORD"))
 
 	$(document).on("click",".login-ready:not(.login-waiting)",function(){
 
