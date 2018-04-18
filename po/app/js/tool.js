@@ -2967,14 +2967,14 @@ QmiGlobal.PopupDialog = {
 	},
 
 	open: function () {
-		this.container.fadeIn(500);
+		this.container.fadeIn(300);
 	},
 
 	close: function () {
 		var self = this;
 		var deferred = $.Deferred();
 
-		self.container.fadeOut(300, function() {
+		self.container.fadeOut(200, function() {
 			self.container.remove();
 
 			deferred.resolve();

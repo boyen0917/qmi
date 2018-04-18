@@ -204,7 +204,7 @@ agreeMeInvite = function(inviteDom){
         content: [
             {
                 tagName: 'div',
-                text: $.i18n.getString('ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION'),
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION', $.lStorage("_loginAccount")),
             }
         ],
         footer: [
