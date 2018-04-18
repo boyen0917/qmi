@@ -509,7 +509,9 @@ updateLanguage = function( lanPath ){
 		}
 
 		$.i18n.load(lanPath, function(){
+
 			$('body')._i18n();
+			console.log("updateLanguage");
 			deferred.resolve();
 		});
 	})
