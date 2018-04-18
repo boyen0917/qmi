@@ -1170,7 +1170,6 @@ function checkPagePosition() {
 
 function getMemberData(groupUI) {
 	if (!g_group["guAll"][groupUI])    return null;
-
 	return g_group["guAll"][groupUI];
 }
 
@@ -1486,14 +1485,15 @@ function showMsg(object, bIsTmpSend) {
 		div.append(chatFailContainer);
 	} else {
 		//left align
-		var mem = getMemberData(object.meta.gu)
+		var mem = getMemberData(object.meta.gu);
+		if(!mem) return container;
 
 		div = $("<div class='chat-msg-left'></div>");
 		container.append(div);
 
 		//left
 		var pic = $("<img class='aut'/>");	//left pic (auo for large pic)
-		if (mem.aut && mem.aut.length > 0) {
+		if (mem.aut) {
 			pic.attr("src", mem.aut);
 		} else {
 			pic.attr("src", "images/common/others/empty_img_personal_l.png");
