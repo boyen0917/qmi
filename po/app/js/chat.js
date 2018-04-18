@@ -770,13 +770,7 @@ $(function(){
 		    });
 		});
 
-		// $("#page-chat").find(".sticker-shop").off("click").on("click", function() {
-
-		// });
-
-		
 		sendMsgRead(new Date().getTime())
-
 	});
 
 /**
