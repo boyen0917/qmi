@@ -35,7 +35,27 @@ var appInitial = function() {
 	setTimeout(checkAuthPeriodically, 60000);
 };
 
-$(function(){
+//resize chat window to slim window
+try {
+	//resize node webkit window
+	var gui = require('nw.gui');
+	var win = gui.Window.get();
+	win.width = 450;
+	if( window.opener ){
+		win.height = Math.min(800, window.opener.outerHeight);
+	}
+} catch (e) {
+	//resize explore window
+	cns.debug("not node-webkit");
+	if (window.opener) {
+		window.resizeTo(Math.min(450, $(window.opener).width()), window.opener.outerHeight);
+	} else {
+		window.resizeTo(450, 800);
+	}
+}
+
+QmiGlobal.appLangDef.done(function(){
+	var AllGroupData = window.opener.QmiGlobal.groups;
 	//load language
 	// updateLanguage(lang);
 	//驗證失敗 請重新登入
@@ -66,24 +86,6 @@ $(function(){
 	QmiGlobal.operateChatList = window.chatList;
 	QmiGlobal.openStickerShopOnMainView = window.openStickerShop;
 
-
-	/**
-	              ███████╗███████╗████████╗██╗   ██╗██████╗           
-	              ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗          
-	    █████╗    ███████╗█████╗     ██║   ██║   ██║██████╔╝    █████╗
-	    ╚════╝    ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝     ╚════╝
-	              ███████║███████╗   ██║   ╚██████╔╝██║               
-	              ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝               
-	                                                                  
-	 */
-
-
-
-
-	// 聊天室token 處理 暫時
-	// QmiGlobal = window.opener.QmiGlobal;
-
-
 	$(document).ready(function () {
 		var winCloseDeferred = $.Deferred();
 
@@ -96,28 +98,6 @@ $(function(){
 			}]);
 		});
 		
-
-		//resize chat window to slim window
-		try {
-			//resize node webkit window
-			var gui = require('nw.gui');
-			var win = gui.Window.get();
-			win.width = 450;
-			if( window.opener ){
-				win.height = Math.min(800, window.opener.outerHeight);
-			}
-		} catch (e) {
-			//resize explore window
-			cns.debug("not node-webkit");
-			if (window.opener) {
-				window.resizeTo(Math.min(450, $(window.opener).width()), window.opener.outerHeight);
-			} else {
-				window.resizeTo(450, 800);
-			}
-		}
-
-		// window.moveTo( window.opener.screenX+20, window.opener.screenY+20 );
-
 		//set to chat page 必須
 		$.changePage("#page-chat");
 
@@ -146,11 +126,8 @@ $(function(){
 		page.attr("data-gi", gi);
 		page.attr("data-ci", ci);
 
-		var userData = $.userStorage() || {};
-
-		// cns.debug( JSON.stringify(userData) );
 		//所有團體列表
-		g_group = userData[gi];
+		g_group = AllGroupData[gi];
 		if (null == g_group) {
 			winCloseDeferred.resolve(true);
 			return;
@@ -185,7 +162,7 @@ $(function(){
 				} else {
 					g_room.uiName = g_room.cn;
 				}
-				$.userStorage(userData);
+				
 
 			} catch (e) {
 				cns.debug(e.message);
@@ -254,7 +231,7 @@ $(function(){
 			var tmpMemCount = (g_room.memList) ? Object.keys(g_room.memList).length : 0;
 			if (tmpMemCount != g_room.memCount) {
 				g_room.memCount = tmpMemCount;
-				$.userStorage(userData);
+				
 			}
 			if (g_room.memCount > 2) {
 				$("#header .count").show();
@@ -1185,7 +1162,7 @@ function updateChat(time, isGetNewer) {
 	var g_lastmsgTime = $.lStorage("lastMsgCt") || {};
 
 	op(api, "GET", "", function (data, status, xhr) {
-		g_group = $.userStorage()[gi];
+		g_group = AllGroupData[gi];
 		g_room = g_group["chatAll"][ci];
 
 		if(null == g_room.lastCt){
@@ -1265,9 +1242,8 @@ function updateChat(time, isGetNewer) {
 顯示已讀數
 **/
 function showChatCnt() {
-	// cns.debug( JSON.stringify(userData) );
 	if( g_group == undefined ){
-		g_group = $.userStorage()[gi];
+		g_group = AllGroupData[gi];
 		//登出
 		if(g_group === undefined) window.close();
 		g_room = g_group["chatAll"][ci];
@@ -1327,6 +1303,10 @@ function getFormatMsgTimeTag(date) {
 show msg content
 **/
 function showMsg(object, bIsTmpSend) {
+	try {
+		console.log("showMsg", object.ml[0].c || object.ml[0].tp);
+	} catch(e) {console.error("fuck", e)}
+	
 	if (null == object) return;
 	bIsTmpSend = bIsTmpSend || false;
 
@@ -2275,8 +2255,7 @@ function sendMsgText(dom) {
 							ti: ti_chat,
 							tu: {gul: data.ul}
 						};
-						var userData = $.userStorage();
-						g_room = userData[gi].chatAll[ci];
+						g_room = AllGroupData[gi].chatAll[ci];
 						g_room.memList = {};
 						for (var i = 0; i < data.ul.length; i++) {
 							g_room.memList[data.ul[i].gu] = data.ul[i];
@@ -2299,7 +2278,7 @@ function sendMsgText(dom) {
 							}
 						}
 
-						$.userStorage(userData);
+						
 
 						checkMemberLeft();
 
@@ -2311,14 +2290,13 @@ function sendMsgText(dom) {
 
 						// pi = pData.pi;
 						pi = 0;
-						userData = $.userStorage();
-						g_group = userData[gi];
+						g_group = AllGroupData[gi];
 						g_room = g_group["chatAll"][ci];
 						g_room.pi = pi;
 						g_room.tu = g_tu;
 						g_room.uiName = g_cn;
 						g_tu = data.ul;
-						$.userStorage(userData);
+						
 						// 	},
 						// 	null
 						// );
@@ -2383,11 +2361,9 @@ function sendMsgText(dom) {
 					//只剩下自己或是已有其他管理員，可以退出
 					if (g_room.cpc == 1 || otherAdmins.length > 0) { 
 						leaveRoomAPI(ci, function () {
-							var userData = $.userStorage();
-							g_group = userData[gi];
+							g_group = AllGroupData[gi];
 							delete g_group.chatAll[ci];
-
-							$.userStorage(userData);
+							
 							$('.sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
 							window.close();
 						});
@@ -2403,11 +2379,9 @@ function sendMsgText(dom) {
 
 				} else {
 					leaveRoomAPI(ci, function () {
-						var userData = $.userStorage();
-						g_group = userData[gi];
+						g_group = AllGroupData[gi];
 						delete g_group.chatAll[ci];
 
-						$.userStorage(userData);
 						$('.sm-small-area[data-sm-act="chat"]', window.opener.document).trigger("click");
 						window.close();
 					});
@@ -2500,7 +2474,7 @@ function sendMsgText(dom) {
 		//init
 		// var container = page.find(".newChatDetail-content.mem");
 		var input = page.find(".newChatDetail table .input");
-		var chatRoomData = $.userStorage()[gi].chatAll[ci];
+		var chatRoomData = AllGroupData[gi].chatAll[ci];
 		var iCanInvite = chatRoomData.is;
 		var iAmAdmin = g_room.memList[gu].ad;
 
@@ -2866,21 +2840,7 @@ function sendMsgText(dom) {
 	**/
 	function checkIsSendEditDone(isReady){
 		if( !isReady ) return;
-
-		// var comfirmDom = $("#page-edit-preview").find(".edit-nextStep");
-		// comfirmDom.removeClass("ready");
-		// comfirmDom.removeData("memEdited");
-		// comfirmDom.removeData("nameEdited");
 		popupShowAdjust("", $.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
-
-		//$.popPage();
-
-		//叫主視窗更新聊天室列表
-		// if (window.opener) {
-		// 	var dom = $(window.opener.document).find("#recv-sync-chat-list");
-		// 	dom.attr("data-gi",gi);
-		// 	dom.trigger("click");
-		// }
 	}
 
 	/**
@@ -3020,14 +2980,6 @@ function sendMsgText(dom) {
 								for (var gu in g_room.memList) {
 									list[gu] = g_group.guAll[gu].nk;
 								}
-								// if( window.opener && gi==window.opener.gi ){
-								// 	var parent = $(window.opener.document);
-								// 	var tmp = parent.find(".chatList-add-done");
-								// 	tmp.attr("data-object_str",JSON.stringify(list) );
-								// 	tmp.attr("data-favorite_str","{}");
-								// 	parent.find(".chatList-add-done").trigger("click");
-								// 	$(window.opener)[0].focus();
-								// }
 								showCreateMultipleChatPage(list, {});
 							} catch (e) {
 								errorReport(e);
@@ -3442,17 +3394,10 @@ function sendMsgText(dom) {
 				gi = page.attr("data-gi");
 
 				
-					// var parent = $(window.opener.document);
-					// var tmp = parent.find(".chatList-add-done");
-					// tmp.attr("data-gi", gi);
-					// tmp.attr("data-ci", data.ci);
-					// tmp.trigger("click");
-					// $(window.opener)[0].focus();
-
 				gi = page.attr("data-gi");
 				ci = page.attr("data-ci");
-				var userData = $.userStorage();
-				g_group = userData[gi];
+
+				g_group = AllGroupData[gi];
 				g_room = g_group["chatAll"][ci];
 			}, true);
 		}
@@ -3561,25 +3506,7 @@ function sendMsgText(dom) {
 		$("#chat-nomore").show();
 	}
 
-
-	/**
-	              ███████╗████████╗ ██████╗ ██████╗  █████╗  ██████╗ ███████╗          
-	              ██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔══██╗██╔════╝ ██╔════╝          
-	    █████╗    ███████╗   ██║   ██║   ██║██████╔╝███████║██║  ███╗█████╗      █████╗
-	    ╚════╝    ╚════██║   ██║   ██║   ██║██╔══██╗██╔══██║██║   ██║██╔══╝      ╚════╝
-	              ███████║   ██║   ╚██████╔╝██║  ██║██║  ██║╚██████╔╝███████╗          
-	              ╚══════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝          
-	                                                                                   
-	 */
-
-	$.userStorage = function (value) {
-		if (value) {
-			window.opener.QmiGlobal.groups = value;
-		} else {
-			return window.opener.QmiGlobal.groups;
-		}
-	};
-})
+})// end of appLangDef
 
 function chatProgressBarInit() {
 	var self = this;
