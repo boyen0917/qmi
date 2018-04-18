@@ -597,6 +597,9 @@ QmiGlobal.module.appVersion = {
 		}
 
 		function isNoNeedToCheckAndUpdate() {
+			// 直接點選 
+			if(self.isUserClick) return false;
+
 			// 聊天室不需要
 			if(QmiGlobal.isChatRoom) return true;
 
