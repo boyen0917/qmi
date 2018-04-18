@@ -361,6 +361,9 @@ appInitial = function(needUpdate){
         		// 判斷是否換帳號 換帳號就要清db
         		changeAccountToResetDB(phoneId);
 
+        		// 強制記住帳號
+				$.lStorage("_loginAccount", phoneId);
+
     			//記錄帳號密碼
     			if($("#page-registration div.login-remember").data("chk")){
 					var _loginRemember = {};
