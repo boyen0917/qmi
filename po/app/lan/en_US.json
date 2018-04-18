@@ -592,8 +592,8 @@
 	"ACCOUNT_MANAGEMENT_ACCOUNT_REACTIVATED": "Yout account has been reactivated, use \"forget password\" to get new password.",
 	"ACCOUNT_MANAGEMENT_JOIN_GROUP_NOTICE": "Notice",
 
-	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_QRCODE": "如接受他團體/群組邀請同意而加入該團體時，則視為您已同意並自行提供個人註冊帳號${帳號}、個人名稱${名稱}及個人圖像給該團體成員並同意當您註冊帳號異動時系統同步更新您於該團體帳號，因該資料及您加入該團體後新增之資料所發生權利義務發生於您與上開團體管理者間，與本公司無涉，您同意加入團體/群組前審慎評估，以維護您的權益",
-	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION": "如接受他團體/群組邀請同意而加入該團體時，則視為您已同意並自行提供個人註冊帳號${帳號}及個人圖像給該團體成員並同意當您註冊帳號異動時系統同步更新您於該團體帳號，因該資料及您加入該團體後新增之資料所發生權利義務於您與上開團體管理者間，與本公司無涉，您同意加入團體/群組前應審慎評估，以維護您的權益",
+	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_QRCODE": "如接受他團體/群組邀請同意而加入該團體時，則視為您已同意並自行提供個人註冊帳號 %ld 、個人名稱 %ld 及個人圖像給該團體成員並同意當您註冊帳號異動時系統同步更新您於該團體帳號，因該資料及您加入該團體後新增之資料所發生權利義務發生於您與上開團體管理者間，與本公司無涉，您同意加入團體/群組前審慎評估，以維護您的權益",
+	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION": "如接受他團體/群組邀請同意而加入該團體時，則視為您已同意並自行提供個人註冊帳號 %ld 及個人圖像給該團體成員並同意當您註冊帳號異動時系統同步更新您於該團體帳號，因該資料及您加入該團體後新增之資料所發生權利義務於您與上開團體管理者間，與本公司無涉，您同意加入團體/群組前應審慎評估，以維護您的權益",
 	"ACCOUNT_MANAGEMENT_AGREE": "Agree",
 	"ACCOUNT_MANAGEMENT_DISAGREE": "Disagree",
 	"ACCOUNT_MANAGEMENT_ACCOUNT_REMOVE_NOTIFICATION": "This account has not been used for 365 days, will be removed in 15 days, if you want to know more, please contact 0800-080-090.",

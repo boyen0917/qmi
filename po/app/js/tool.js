@@ -2916,11 +2916,10 @@ QmiGlobal.PopupDialog = {
 
 	create: function (option) {
 		var dialogBox = this.container.children().children();
-		
 		dialogBox.removeClass();
-		dialogBox.find(".header").html("").append(option.header);
-		dialogBox.find(".content").html("");
-		dialogBox.find(".footer").html("");
+		dialogBox.find(".header").empty().html(option.header);
+		dialogBox.find(".content").empty();
+		dialogBox.find(".footer").empty();
 		dialogBox.addClass(option.className);
 
 		if (option.content) {
