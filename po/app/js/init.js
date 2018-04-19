@@ -80,7 +80,7 @@ window.QmiGlobal = {
 
 		$.when.apply($, initDefArr).done(function() {
 
-			// 若桌機版號大於web版號 以桌機版號為主
+			// 設定首頁版號顯示
 			setVersion();
 
 			// nwjs的變數
@@ -114,13 +114,13 @@ window.QmiGlobal = {
 
 		function setVersion() {
 			// 登入頁顯示桌機版號
-			$("#container_version").text(QmiGlobal.nwVer +"("+ QmiGlobal.appVer + ")");
+			$("#container_version").text("Webkit: "+QmiGlobal.nwVer +"("+ QmiGlobal.appVer + ")");
 
 			// 不等於1 表示桌機版號沒有大於web版號 不做事
-			if(QmiGlobal.module.appVersion.compare(QmiGlobal.nwVer, QmiGlobal.appVer) !== 1) return;
+			// if(QmiGlobal.module.appVersion.compare(QmiGlobal.nwVer, QmiGlobal.appVer) !== 1) return;
 
 			// 桌機版號 指定給 web版號
-			QmiGlobal.appVer = QmiGlobal.nwVer;
+			// QmiGlobal.appVer = QmiGlobal.nwVer;
 		}
 	},
 
