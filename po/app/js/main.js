@@ -738,6 +738,9 @@ $(function(){
 	$(document).on("input mouseup",".st-reply-highlight-container",function(e){
 		var thisTextArea = $(this);
 
+		// 5520 調整換行符號未清除狀況
+		if(thisTextArea.text() === "\n") thisTextArea.empty();
+
 		if(thisTextArea.height() > 40 && thisTextArea.parent().hasClass("adjust")) {
 			thisTextArea.parent().removeClass("adjust");
 			thisTextArea.addClass("textarea-animated");
