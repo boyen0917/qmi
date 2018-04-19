@@ -1,4 +1,4 @@
-// version 2.2.0.8 - 1
+// version 2.3.0.4
 var ui;
 var at;
 var gi;
@@ -49,7 +49,7 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整 
-	appVer: "2.2.0.8",
+	appVer: "2.3.0.4",
 
 	title: "Qmi",
 
@@ -67,6 +67,61 @@ window.QmiGlobal = {
 			}
 		}
 	},
+
+	appLangDef: $.Deferred(),
+
+	// 在下方 document ready之後 initReady
+	initReady: function() {
+		var initDefArr = [
+    		updateLanguage()
+		];
+
+		$.when.apply($, initDefArr).done(function() {
+
+			// 設定首頁版號顯示
+			setVersion();
+
+			// nwjs的變數
+			QmiGlobal.getAppWin().qmiData = QmiGlobal.getAppWin().qmiData || QmiGlobal.defaultAppQmiData;
+			setAppOnFocusEvent(true);
+
+			// 背景執行，點取桌面應用程式icon顯示視窗
+			try {
+				nwGui.App.on('open', function () {
+					QmiGlobal.getAppWin().show();
+				});
+			} catch(e) {}
+			
+			// 寫入版本號
+			$("#app-version").attr("ver-chk", $.i18n.getString("WEBONLY_VERSION_CHK"));
+			$("#app-version").attr("version", QmiGlobal.appVer);
+
+			// 初始動作 registration
+			appInitial();
+		});
+
+		function setAppOnFocusEvent(isExec) {
+			try {
+				QmiGlobal.getAppWin().removeListener("focus", QmiGlobal.getAppWin().qmiData.listenerMap.onFocus);
+				QmiGlobal.getAppWin().qmiData.listenerMap.onFocus = QmiGlobal.defaultAppQmiData.listenerMap.onFocus;
+				QmiGlobal.getAppWin().on("focus", QmiGlobal.getAppWin().qmiData.listenerMap.onFocus);
+
+				if(isExec) QmiGlobal.module.appVersion.init();
+			} catch(e) {errorReport(e)}
+		}
+
+		function setVersion() {
+			// 登入頁顯示桌機版號
+			$("#container_version").text("Webkit: "+QmiGlobal.nwVer +"("+ QmiGlobal.appVer + ")");
+
+			// 不等於1 表示桌機版號沒有大於web版號 不做事
+			// if(QmiGlobal.module.appVersion.compare(QmiGlobal.nwVer, QmiGlobal.appVer) !== 1) return;
+
+			// 桌機版號 指定給 web版號
+			// QmiGlobal.appVer = QmiGlobal.nwVer;
+		}
+	},
+
 
 	nodeModules: function() {
 		if(!nwGui) return {};
@@ -104,55 +159,6 @@ window.QmiGlobal = {
 			return require("nw.gui").App.manifest.version;
 		} catch(e) {return "web"}
 	}(),
-
-	// 在下方 document ready之後 initReady
-	initReady: function() {
-
-		var initDefArr = [
-    		updateLanguage()
-		];
-
-		$.when.apply($, initDefArr).done(function() {
-
-			// 若桌機版號大於web版號 以桌機版號為主
-			setVersion();
-
-			// nwjs的變數
-			QmiGlobal.getAppWin().qmiData = QmiGlobal.getAppWin().qmiData || QmiGlobal.defaultAppQmiData;
-			setAppOnFocusEvent(true);
-
-			// 寫入版本號
-			$("#app-version").attr("ver-chk", $.i18n.getString("WEBONLY_VERSION_CHK"));
-			$("#app-version").attr("version", QmiGlobal.appVer);
-
-			//設定語言, 還沒登入先用瀏覽器的語言設定
-			// updateLanguage(lang);
-
-			// 初始動作 registration
-			appInitial();
-		});
-
-		function setAppOnFocusEvent(isExec) {
-			try {
-				QmiGlobal.getAppWin().removeListener("focus", QmiGlobal.getAppWin().qmiData.listenerMap.onFocus);
-				QmiGlobal.getAppWin().qmiData.listenerMap.onFocus = QmiGlobal.defaultAppQmiData.listenerMap.onFocus;
-				QmiGlobal.getAppWin().on("focus", QmiGlobal.getAppWin().qmiData.listenerMap.onFocus);
-
-				if(isExec) QmiGlobal.module.appVersion.init();
-			} catch(e) {errorReport(e)}
-		}
-
-		function setVersion() {
-			// 登入頁顯示桌機版號
-			$("#container_version").text(QmiGlobal.nwVer +"("+ QmiGlobal.appVer + ")");
-
-			// 不等於1 表示桌機版號沒有大於web版號 不做事
-			if(QmiGlobal.module.appVersion.compare(QmiGlobal.nwVer, QmiGlobal.appVer) !== 1) return;
-
-			// 桌機版號 指定給 web版號
-			QmiGlobal.appVer = QmiGlobal.nwVer;
-		}
-	},
 
 	// 之後取代 ui, at, gi, ... etc
 	currentGi: "",
@@ -329,7 +335,29 @@ window.QmiGlobal = {
 	    function setTimer(){
 	        $.lStorage("_periodicallyReloadTimer", new Date().getTime());
 	    }
-	}()
+	}(),
+
+	getLinkStateDef: function(link) {
+        var deferred = $.Deferred();
+        var ajx = $.ajax(link).fail(function() {
+            deferred.resolve(false);
+        }).done(function() {
+            deferred.resolve(true);
+        })
+
+        setTimeout(function() {
+            if(deferred.state() === "resolved") return;
+            deferred.resolve(true);
+            ajx.abort();
+        }, 1000);
+
+        return deferred.promise();
+    },
+
+
+	makeErrCodeStr: function(errNum) {
+		return "<div class=\"popup-errCode\">"+ $.i18n.getString("WEBONLY_POPUP_ERRCODE") +" : " + errNum +"</div>";
+	}
 };
 
 $(document).ready(QmiGlobal.initReady);
@@ -619,6 +647,9 @@ window.QmiAjax = function(args){
 		// setHeaders: outerArgs,companyData
 		newArgs.headers = self.setHeaders(args, companyData);
 
+		// 5392 加入版號
+		newArgs.headers.av = QmiGlobal.appVer;
+
 		// 執行
 		$.ajax(newArgs).complete(function(rspData){
 			// deferred chain -> 這邊可以省略 也可精簡 之後做 用一個deferred做reauth跟重新執行ajax
@@ -895,7 +926,14 @@ QmiAjax.prototype = {
 		// 604: 私雲Token錯誤, 請重新拉取/groups取的新的key進行私雲驗證登入
 		// 605: 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
 		// 606: 私雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
-
+		// 607: 公雲上的歸戶 LDAP 帳號已解除, 不動作, 等 polling 的 command 56 再執行團體列表的更新動作 (清除歸戶資訊)
+		// 608: 私雲上的歸戶 LDAP 帳號已解除, 不動作, 等 polling 的 command 56 再執行團體列表的更新動作 (清除歸戶資訊)
+		// 609: 企業帳號被管理者修改密碼, 請使用者重新使用新的密碼進行登入
+		// 610: 帳號被凍結, 強制登出, 吐 AP 給的Message 
+		// 611: 付費帳號被關閉, 強制登出, 吐 AP 給的Message 
+		// 612: 一般帳號變成無效帳號, 強制登出, 吐 AP 給的Message
+		// 613: 一般帳號變成無效帳號, 強制登出, 吐 AP 給的Message
+		
 		switch(rspCode) {
 			case 601: // 公雲Token過期, 使用Put /auth進行重新驗證取的新的Token, 如果驗證失敗則請重新登入 
 				authUpdate();
@@ -919,7 +957,7 @@ QmiAjax.prototype = {
 			case 604: // token 驗證失敗 一般私雲重新取key 做cert
 				authCompanyKey();
 				break;
-			case 605: // 公雲上的SSO帳號需要重新驗證, 不可使用Put /auth取得新的Token, 僅能使用Put /sso/auth重新進行LDAP密碼驗證
+			case 605: // 同裝置重複登入 sso需登出
 				if(QmiGlobal.auth.isSso) {
 					new QmiGlobal.popup({
 						desc: $.i18n.getString("WEBONLY_LOGOUT_BY_ANOTHER_DEVICE"),
@@ -956,6 +994,17 @@ QmiAjax.prototype = {
 					});
 					return;
 				}
+				break;
+			case 610:
+			case 611:
+			case 612:
+			case 613:
+				new QmiGlobal.popup({
+					desc: rspObj.rsp_msg,
+					confirm: true,
+					action: [logout]
+				});
+
 				break;
 			case 9999:
 				// 沒帶rspCode 表示是expire time過期
@@ -1032,6 +1081,13 @@ QmiAjax.prototype = {
 		    headers: self.setHeaders({}, companyData),
 		    type: "put",
 		    error: function(errData){
+		    	// 2018/1/17
+		    	// is sso 更新錯誤就登出
+		    	if(QmiGlobal.auth.isSso) {
+		    		popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL") +": "+ QmiGlobal.makeErrCodeStr(1002), true, false,[reLogin]);	//驗證失敗 請重新登入
+		    		return;
+		    	}
+
 		    	// 2017/11/03
 		    	// et過期 自動更新 發生錯誤
 		    	companyData.isAutoAuthFail = true;
@@ -1059,6 +1115,8 @@ QmiAjax.prototype = {
 		    		QmiGlobal.auth.at = at = apiData.at;
 		    		QmiGlobal.auth.et = apiData.et;
 		    	}
+
+
 		        deferred.resolve({
 		        	isSuccess: true,
 		        	data: apiData,
@@ -1099,7 +1157,7 @@ QmiAjax.prototype = {
 			if(QmiGlobal.isChatRoom) window.close();
 
 			QmiGlobal.rspCode401 = true;
-			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),true,false,[reLogin]);	//驗證失敗 請重新登入
+			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"), true, false,[reLogin]);	//驗證失敗 請重新登入
 			return;
 		}
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup
@@ -1293,7 +1351,6 @@ if (typeof Object.assign != 'function') {
     return to;
   };
 }
-
 
 QmiGlobal.ModuleConstructor = function(args) {
 	var self = this;

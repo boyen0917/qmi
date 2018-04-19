@@ -496,11 +496,25 @@ changePageAfterPopUp = function(page){
 updateLanguage = function( lanPath ){
 	lanPath = lanPath || lang;
 	var deferred = $.Deferred();
-	$.i18n.load(lanPath, function(){
-		$('body')._i18n();
-		deferred.resolve();
-	});
 
+	// 避免pending
+	setTimeout(function() {
+		QmiGlobal.appLangDef.resolve(false);
+	}, 1000);
+
+	QmiGlobal.appLangDef.done(function(isSuccess) {
+		if(isSuccess) {
+			deferred.resolve();
+			return;
+		}
+
+		$.i18n.load(lanPath, function(){
+
+			$('body')._i18n();
+			console.log("updateLanguage");
+			deferred.resolve();
+		});
+	})
 	return deferred.promise();
 }
 
@@ -864,9 +878,12 @@ resetDB = function(options){
 	options = options || {};
 	clearBadgeLabel();
 	
-	if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
-	if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
-	if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
+	try {
+		if(typeof idb_timeline_events != "undefined") idb_timeline_events.clear();
+		if(typeof g_idb_chat_msgs != "undefined") g_idb_chat_msgs.clear();
+		if(typeof g_idb_chat_cnts != "undefined") g_idb_chat_cnts.clear();
+		fileDB.getObjectStore('timeline_files', 'readwrite').clear();
+	} catch(e) {}
 
 	var excepObj = QmiGlobal.resetDBExceptionArr.reduce(function(obj, curr) {
 		obj[curr] = localStorage[curr];
@@ -1326,7 +1343,7 @@ setStickerUrl = function(dom, id){
 }
 
 QmiGlobal.gallery = function (data) {
-	this.gi = data.gi;
+	this.gi = data.gi || QmiGlobal.currentGi;
     this.photoList = data.photoList;
     this.currentImage = data.currentImage;
     this.isApplyWatermark = data.isApplyWatermark;
@@ -1348,7 +1365,7 @@ QmiGlobal.gallery = function (data) {
     var closeBtn  = this.container.find(".close");
     var imgElement = this.container.find("img");
     var downloadDom = this.container.find(".download-link");
-    imgElement.attr("src", this.photoList[this.currentImage].s32);
+
     caption.html(this.currentImage + 1 + "/" + this.photoList.length);
     downloadDom.attr("download", getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6 ));
 
@@ -1373,6 +1390,8 @@ QmiGlobal.gallery = function (data) {
                     img = container.find(".currentImg"),
                     hZoomIn = img.height()*2, wZoomIn = img.width()*2;
 
+                if(container.hasClass("fail")) return;
+
                 container.toggleClass("zoomOut").find(".currentImg").toggleClass("zoomIn");
                 
                 if(container.hasClass("zoomOut") === false) {
@@ -1394,6 +1413,8 @@ QmiGlobal.gallery = function (data) {
     }
     this.zoomObj.init();
     // end of Brian ZoomIn
+
+    this.setCurrentImage();
 
     $("body").append(this.container);
     this.container.fadeIn();
@@ -1418,70 +1439,63 @@ QmiGlobal.gallery = function (data) {
 
 
 QmiGlobal.gallery.prototype = {
-
-	getImageUrl: function() {
-		return new QmiAjax({
-        	apiName: "groups/" + this.gi + "/files/" + this.photoList[this.currentImage].c 
-        		+ "?pi=" + this.photoList[this.currentImage].p + "&ti=" 
-        		+ QmiGlobal.groups[this.gi].ti_feed
-    	});
-	},
-
 	showPreviousImage: function(e) {
-		this.zoomObj.reset();
-		
 		this.currentImage = (this.photoList.length + this.currentImage - 1) % (this.photoList.length);
-		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
-			this.getImageUrl().then(function (data) {
-				
-				if (this.isApplyWatermark) {
-					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
-						function (imgUrl) {
-							this.photoList[this.currentImage].s32 = imgUrl;
-							this.container.find("img").attr("src", imgUrl);
-						}.bind(this));
-				}
-
-				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
-				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-				this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
-				this.container.find(".download-link").attr("download",
-					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
-			}.bind(this));
-		}
-		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-		this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
-		this.container.find(".download-link").attr("download",
-					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
-		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
+		this.setCurrentImage();
 	},
 
 	showNextImage: function(e) {
-		this.zoomObj.reset();
-
 		this.currentImage = (this.currentImage + 1) % (this.photoList.length);
-		if (! this.photoList[this.currentImage].hasOwnProperty("s32")) {
+		this.setCurrentImage();
+	},
 
-			this.getImageUrl().then(function (data) {
-				if (this.isApplyWatermark) {
-					getWatermarkImage(this.watermarkText, $.parseJSON(data.responseText).s32, 1, 
-						function (imgUrl) {
-							this.photoList[this.currentImage].s32 = imgUrl;
-							this.container.find("img").attr("src", imgUrl);
-						}.bind(this));
+	setCurrentImage: function () {
+		var self = this;
+		var giTi = self.gi + "_" + QmiGlobal.groups[self.gi].ti_feed;
+		var deferred = $.Deferred();
+		self.zoomObj.reset();
+		
+		if (! self.photoList[self.currentImage].hasOwnProperty("s32")) {
+			getS3fileUrl(self.photoList[self.currentImage], giTi).then(function (data) {
+				
+				if (self.isApplyWatermark) {
+					getWatermarkImage(this.watermarkText, data.s32, 1, function (imgUrl) {
+						this.photoList[this.currentImage].s32 = imgUrl;
+						this.container.find("img").attr("src", imgUrl);
+					}.bind(this));
 				}
-				this.photoList[this.currentImage].s32 = $.parseJSON(data.responseText).s32;
-				this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-				this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
-				this.container.find(".download-link").attr("download",
-					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
-			}.bind(this));
+
+				this.photoList[this.currentImage].s32 = data.s32;
+				deferred.resolve();
+				
+			}.bind(self));
+		} else deferred.resolve(self.photoList[self.currentImage].s32);
+
+
+		deferred.done(function(imgUrl) {
+			var imgDom = self.container.find("img");
+			imgDom.removeClass("fail")
+			.parent().removeAttr("desc");
+
+			if(imgDom.parents("figure.gallery-contaniner").hasClass("fail")) 
+				setImgFail(imgDom);
+			else
+				imgDom[0].onerror = setImgFail.bind(self, imgDom)
+
+			imgDom.attr("src", imgUrl);
+			self.container.find(".download-link").attr("href", imgUrl);
+			self.container.find(".download-link")
+			.attr("download", getS3FileNameWithExtension(imgUrl, 6));
+
+			self.container.find("#caption").html(self.currentImage + 1 + "/" + self.photoList.length);
+		})
+
+		function setImgFail(imgDom) {
+			imgDom.hide().parent()
+			.addClass("fail")
+			.attr("desc", $.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
 		}
-		this.container.find("img").attr("src", this.photoList[this.currentImage].s32);
-		this.container.find(".download-link").attr("href", this.photoList[this.currentImage].s32);
-		this.container.find(".download-link").attr("download",
-					getS3FileNameWithExtension(this.photoList[this.currentImage].s32, 6));
-		this.container.find("#caption").html(this.currentImage + 1 + "/" + this.photoList.length);
+		
 	},
 
 	close: function() {
@@ -2898,64 +2912,75 @@ function emojiImgError(image) {
   	});
 }
 
-QmiGlobal.PopupDialog = {
-	container: $("<div id='popupDialog'><div class='container'><div class='close'>"
-		+ "<button>×</button></div><div class='header'></div><div class='content'>" 
-		+ "</div><div class='footer'></div></div></div>"),
+QmiGlobal.PopupDialog = { 
+	container: $("<div id='popupDialog'><div class='container'><div><div class='header'></div>" 
+		+ "<div class='content'></div><div class='footer'></div></div></div></div>"),
 
 	create: function (option) {
-		var inputData = option.input || [];
-		var buttons = option.buttons || {};
+		var dialogBox = this.container.children().children();
+		dialogBox.removeClass();
+		dialogBox.find(".header").empty().html(option.header);
+		dialogBox.find(".content").empty();
+		dialogBox.find(".footer").empty();
+		dialogBox.addClass(option.className);
 
-		this.container.find(".close button").off("click").on("click", this.close.bind(this));
-		this.container.find(".header").html("").append(option.header);
-		this.container.find(".content").html("");
-		this.container.find(".footer").html("");
-
-		inputData.forEach(function(tagObj) {
-			var htmlElement;
-			switch (tagObj.type) {
-				case "password" :
-					htmlElement = $("<div class='" + tagObj.className + "'><input type='" + tagObj.type 
-						+ "' placeholder='" + $.i18n.getString(tagObj.hint)  + "' maxlength='" 
-						+ tagObj.maxLength + "'>");
-
-					htmlElement.off(tagObj.eventType).on(tagObj.eventType, tagObj.eventFun); 
-					break;
-				
-			}
-			this.container.find(".content").append(htmlElement);
-		}.bind(this));
-
-		if (option.errMsg) {
-			this.container.find(".content").append("<div class='" + option.errMsg.className + "'>" 
-				+ $.i18n.getString(option.errMsg.text) + "</div>");
+		if (option.content) {
+			this.makeElements(dialogBox.find(".content")[0], option.content);
 		}
 
-		$.each(buttons, function (key, btnObj) {
-			var btnElement;
-
-			btnElement = $("<button class='" + btnObj.className + "'>" 
-				+ $.i18n.getString(btnObj.text) + "</button>");
-			btnElement.off(btnObj.eventType).on(btnObj.eventType, btnObj.eventFun); 
-
-			this.container.find(".footer").append(btnElement)
-		}.bind(this));
+		if (option.footer) {
+			this.makeElements(dialogBox.find(".footer")[0], option.footer);
+		}
 
 		$("body").append(this.container);
 
 		return this;
 	},
 
+	makeElements: function (parent, elementList) {
+		var self = this;
+
+		elementList.forEach(function (htmlElement) {
+			if (htmlElement.tagName == 'text') {
+				var element = document.createTextNode(htmlElement.text);
+			} else {
+				var element = document.createElement(htmlElement.tagName);
+				element.textContent = htmlElement.text;
+			}
+			
+			if (htmlElement.attributes) {
+				for (var key in htmlElement.attributes) {
+					element.setAttribute(key, htmlElement.attributes[key]);
+				}
+			}
+
+			if (htmlElement.eventType) {
+				element.addEventListener(htmlElement.eventType, htmlElement.eventHandler);
+			}
+ 
+			if (htmlElement.children) {
+				self.makeElements(element, htmlElement.children);
+			}
+
+			parent.appendChild(element);
+		});
+	},
+
 	open: function () {
-		this.container.fadeIn(500);
+		this.container.fadeIn(300);
 	},
 
 	close: function () {
 		var self = this;
-		self.container.fadeOut(300, function() {
+		var deferred = $.Deferred();
+
+		self.container.fadeOut(200, function() {
 			self.container.remove();
+
+			deferred.resolve();
 		})
+
+		return deferred.promise();
 	}
 }
 
@@ -3004,3 +3029,106 @@ function targetListToString (targetList) {
     
     return tu_arr.join("、");
 }
+
+getTimelineFilesUrl = function (eventId, data, fileIdList) {
+    var thisGi = eventId.split("_")[0];
+    var thisTi = eventId.split("_")[1];
+    var deferred = $.Deferred();
+    // var fileIdList = Object.keys(fileIdMap);
+    var reqFileLinkList = [];
+    var fileLinkData = [];
+    var queryFileTasks = [];
+
+    fileIdList.forEach(function (fileId) {
+        var fileStore = fileDB.getObjectStore('timeline_files', 'readonly')
+        var queryFileItem = fileStore.get([eventId, fileId]);
+        
+        queryFileTasks.push(new Promise(function (resolve, reject) {
+            queryFileItem.onsuccess = function() {
+                resolve();
+
+                if (queryFileItem.result) {
+                    fileLinkData.push(queryFileItem.result);
+                } else {
+                    reqFileLinkList.push(fileId);
+                }
+            };
+
+            queryFileItem.onerror = function() {  
+                resolve();
+
+                reqFileLinkList.push(fileId);
+            };
+        }));
+
+    });
+
+    Promise.all(queryFileTasks).then(function () {
+        if (reqFileLinkList.length > 0) {
+            if (data == null) {
+                data = {}
+            }
+            
+            data.fl = reqFileLinkList;
+            new QmiAjax({
+                apiName: "groups/" + thisGi + "/timelines/" + thisTi + "/files",
+                method: "post",
+                noErr: true,
+                body: data
+            }).success(function (data) {
+                writeToFileDB(data.fl)
+                fileLinkData = fileLinkData.concat(data.fl);
+                deferred.resolve(fileLinkData);
+            });
+        } else {
+            deferred.resolve(fileLinkData);
+        }
+    });
+
+    function writeToFileDB (fileItemList) {
+        fileItemList.forEach(function (fileItem) {
+            console.log(fileItem)
+            fileItem.ei = eventId;
+            var fileStore = fileDB.getObjectStore('timeline_files', 'readwrite')
+            var addFileData = fileStore.put(fileItem);
+
+            addFileData.onsuccess = function(evt) {
+                console.log('success')
+            };
+
+            addFileData.onError = function(evt) {
+                console.log(evt)
+            };
+        });
+    }
+
+    return deferred.promise();
+}
+
+var fileDB = (function () {
+	var request = indexedDB.open('IDBWrapper-file_link_url', 1);
+	var db;
+	
+	request.onupgradeneeded = function(event) {
+	    var db = event.target.result;
+	    if (!db.objectStoreNames.contains('timeline_files')) {
+			var store = db.createObjectStore('timeline_files', {keyPath: ['ei', 'fi']});
+		}
+	};
+
+	request.onsuccess = function () {
+		db = request.result;
+	};
+
+	request.onerror = function () {
+		console.log("Database Connection Failed")
+	};
+
+	return {
+		getObjectStore: function (storeName, mode) {
+			var tx = db.transaction(storeName, mode);
+			return tx.objectStore(storeName);
+		}
+	}
+})();
+

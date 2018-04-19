@@ -55,7 +55,7 @@ QmiGlobal.module.reAuthManually = {
 
 	getView: function(veId) {
 		var viewId = this.id +":"+ veId;
-		return QmiGlobal.eventDispatcher.viewMap[viewId].jqElem;
+		return QmiGlobal.eventDispatcher.viewMap[viewId].elemArr;
 	},
 
 	init: function(argObj) {
@@ -90,15 +90,15 @@ QmiGlobal.module.reAuthManually = {
     	QmiGlobal.eventDispatcher.subscriber([
     		{
     			veId: "cancel", 
-    			jqElem: self.view.find("span.cancel"), 
+    			elemArr: self.view.find("span.cancel"), 
     			eventArr: ["click"],
     		}, {
     			veId: "submit", 
-    			jqElem: self.view.find("span.submit"), 
+    			elemArr: self.view.find("span.submit"), 
     			eventArr: ["click"],
     		}, {
     			veId: "input", 
-    			jqElem: self.view.find("div.input-wrap input"), 
+    			elemArr: self.view.find("div.input-wrap input"), 
     			eventArr: ["input"],
     		}
     	], self, true);
@@ -191,8 +191,10 @@ QmiGlobal.module.reAuthManually = {
 			data: JSON.stringify({
 				id: self.ssoId,
 			    dn: QmiGlobal.device,
-			    pw: QmiGlobal.aesCrypto.enc(self.ssoPw, self.ssoId.substring(0,16)),
-			    at: cData.nowAt
+			    pw: QmiGlobal.aesCrypto.enc(self.ssoPw, (self.ssoId +"_"+ QmiGlobal.device).substring(0,16)),
+			    // 2018/1/17 流程有誤 暫時先在這改
+			    // single sign on 就使用QmiGlobal.auth.at
+			    at: QmiGlobal.auth.isSso ? QmiGlobal.auth.at : cData.nowAt
 			}),
 			type: "put",
 		}).complete(function(data){
@@ -212,6 +214,14 @@ QmiGlobal.module.reAuthManually = {
 			// 設定新at , et
 			QmiGlobal.companies[cData.ci].at = newAuth.at;
 			QmiGlobal.companies[cData.ci].et = newAuth.et;
+
+			// 2018/1/17 流程有誤 暫時先在這改
+		    // single sign on 要更新QmiGlobal.auth.at
+			if(QmiGlobal.auth.isSso) {
+				QmiGlobal.auth.at = newAuth.at;
+				QmiGlobal.auth.et = newAuth.et;
+			}
+
 
 			// 先解company reAuthDef
 			self.reAuthDef.resolve({
@@ -263,6 +273,9 @@ QmiGlobal.module.reAuthManually = {
 QmiGlobal.module.systemPopup = {
 	id: "view-system-popup",
 
+	// 系統公告需要紅點提示
+	redSpot: {},
+
     init : function(){
     	var self = this;
 
@@ -279,37 +292,39 @@ QmiGlobal.module.systemPopup = {
     	// 防止loading覆蓋
     	QmiGlobal.ajaxLoadingUI.hide();
     	
-    	QmiGlobal.eventDispatcher.subscriber([
-    		{
+    	QmiGlobal.eventDispatcher.subscriber([{
     			veId: "close", 
-    			jqElem: self.view, 
+    			elemArr: self.view, 
     			eventArr: ["click"],
     		}, {
     			veId: "ldapSetting", 
-    			jqElem: self.view.find("[data-sm-act=system-ldapSetting]"), 
+    			elemArr: self.view.find("[data-sm-act=system-ldapSetting]"), 
+    			eventArr: ["click"]
+    		}, {
+    			veId: "annoucement", 
+    			elemArr: self.view.find("div[view=announcement]"), 
     			eventArr: ["click"],
-    			data: {fuck: "mother"}
     		}, {
     			veId: "logout", 
-    			jqElem: self.view.find("div.system-logout"), 
+    			elemArr: self.view.find("div.system-logout"), 
     			eventArr: ["click"],
-    		}
-    	], self, true);
+    	}], self, true);
     },
 
     handleEvent: function() {
     	var self = this;
-		// event.type -> click:view-auth-manually-submit
 		var eventCase = event.type.split(":"+self.id).join("");
 		switch(eventCase) {
 			case "click:close":
 				$("#userInfo .sm-person-area-r").find("img").toggle();
 				break;
 
-			case "click:ldapSetting":
-				// func.js  timelineSwitch  system-ldap-setting
-				// QmiGlobal.ldapSetting.init();
-				console.log("yo");
+			case "click:annoucement":
+				self.redSpot.announcement = false;
+				self.view.find("div[view=announcement]").removeClass("red-spot");
+				$("#userInfo").removeClass("red-spot");
+
+				QmiGlobal.module.systemAnnouncement.init();
 				break;
 
 			case "click:logout":
@@ -324,7 +339,10 @@ QmiGlobal.module.systemPopup = {
 		self.view.remove();
     },
 
+    
+
     html: function() {
+    	var self = this;
     	return '<div class="sm-person-info">'
         + 	'<div class="sm-info-hr" data-textid="LOGIN_SAVE_ACCOUNT_TITLE"></div>'
         + 	'<div data-sm-act="user-setting" class="sm-info sm-small-area" data-textid="PERSONAL_INFORMATION"></div>'
@@ -332,10 +350,156 @@ QmiGlobal.module.systemPopup = {
         + 	'<div class="sm-info-hr" data-textid="SYSTEM"></div>'
         + 	'<div data-sm-act="system-setting" class="sm-info sm-small-area" data-textid="LEFT_SYSTEM_SETTING"></div>'
         + 	'<div data-sm-act="system-ldapSetting" class="sm-info sm-small-area" data-textid="'+ (QmiGlobal.auth.isSso ? "ACCOUNT_BINDING_BIND_QMI_ACCOUNT" : "ACCOUNT_BINDING_BINDING_LDAP_ACCOUNT" )+'"></div>'
+        	// data-sm-act 會觸發 timelineswitch
+        + 	'<div view="announcement" class="sm-info '+ function() {
+        		if(self.redSpot.announcement) return "red-spot";
+        		else return "";
+        	}() +'" data-textid="SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT"></div>'
         + 	'<div class="sm-info system-logout" data-textid="SETTING_LOGOUT"></div>'
         + '</div>';
     }
 }
+
+
+QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
+	id: "system-annoucement",
+
+	init: function() {
+		var self = this;
+		self.setHtmlStr();
+		self.view = $(self.html.frame);
+
+		$("body").append(self.view);
+    	self.view.fadeIn(100);
+
+    	self.renderNoticesList();
+
+		QmiGlobal.eventDispatcher.subscriber([{
+    			veId: "close", 
+    			elemArr: self.view.find("> header > *"), 
+    			eventArr: ["click"]
+    		}
+		], self);    	
+	},
+
+	renderNoticesList: function() {
+		var self = this;
+
+		self.api.getNoticesTp1().complete(function(rspData) {
+	        if(rspData.status !== 200) return;
+	        try {
+	        	var noticesData = JSON.parse(rspData.responseText);
+	        } catch(e) {return}
+
+
+	        var bodyDom = self.view.find("section.body");
+	        var veArr = [];
+	        noticesData.nl = noticesData.nl || [];
+	        if(noticesData.nl.length === 0) {
+	        	bodyDom.find("div.empty").show();
+	        	return;
+	        }
+
+	        noticesData.nl.forEach(function(item, i) {
+	        	var dom = $(self.html.announcement);
+	        	if(isIllegalDataFormat(item)) return null;
+
+	        	dom.find("span.time").text(new Date(item.nd.ct).toFormatString())
+	        	dom.find("section.title").text(item.oet);
+	        	dom.find("section.content").text(item.nd.ml[0].c);
+	        	
+	        	bodyDom.append(dom);
+
+	        	var oriHeight = dom.find("section.content").height();
+	        	if(oriHeight <= 40) return;
+
+	        	// read more
+	        	dom.find("section.content").addClass("collapse").addClass("animate-height");
+	        	var moreDom = dom.find("> footer");
+	        	moreDom.show();
+
+	        	veArr.push({
+	        		veId: "more:"+ i, 
+	    			elemArr: moreDom, 
+	    			eventArr: ["click"],
+	    			data: {dom: dom, oriHeight: oriHeight}
+	        	})
+	        });
+	        QmiGlobal.eventDispatcher.subscriber(veArr, self);
+		});
+
+		function isIllegalDataFormat(data) {
+			if(!(data instanceof Object)) return true;
+			if(!(data.nd instanceof Object)) return true;
+			if(!(data.nd.ml instanceof Array)) return true;
+			if(!(data.nd.ml[0] instanceof Object)) return true;
+			return false;
+		}
+	},
+
+	clickMore: function(event) {
+		var dom = event.data.dom;
+		dom.find("section.content")
+		.removeClass("collapse")
+		.css("height", event.data.oriHeight);
+
+		dom.find("> footer").fadeOut("fast");
+	},
+
+	clickClose: function() {
+		this.close();
+	},
+
+	close: function() {
+		var self = this;
+		self.view.fadeOut("fast", function() {
+			QmiGlobal.eventDispatcher.cleaner(self.id);
+			self.view.remove();
+		});
+	},
+
+	clickInitAnnoucement: function() {
+    	console.log("yoyoyo hold'n man");
+    },
+
+    setHtmlStr: function() {
+		this.html = {
+    		frame: `<section id="system-annoucement">
+		    		<header>
+		    			<img src="images/navi/navi_icon_back.png">
+		    			<span>${$.i18n.getString("SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT")}</span>
+		    		</header>
+		    		<section class="body"><div class="empty">
+		    			<img src="images/Qmi_Logo_Empty.png">
+		    			<div>${$.i18n.getString("SYSTEM_ANNOUNCEMENT_EMPTY")}</div>
+		    		</div></section>
+		    	</section>`,
+
+	    	announcement: `
+	    		<section class="announcement">
+					<header>
+						<span>Qmi ${$.i18n.getString("SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT")}</span>
+						<span class="time"></span>
+					</header>
+					<section class="title"></section>
+					<section class="content"></section>
+					<footer>${$.i18n.getString("INTERGRATIONS_READMORE")}</footer>
+				</section>`
+		}
+    },
+
+	api: {
+		getNoticesTp1: function() {
+			return new QmiAjax({
+				apiName: "notices?tp=1",
+				isPublicApi: true,
+			});
+		}
+	},
+
+    handleEvent: eventHandler
+
+});
 
 
 QmiGlobal.module.appVersion = {
@@ -433,6 +597,9 @@ QmiGlobal.module.appVersion = {
 		}
 
 		function isNoNeedToCheckAndUpdate() {
+			// 直接點選 
+			if(self.isUserClick) return false;
+
 			// 聊天室不需要
 			if(QmiGlobal.isChatRoom) return true;
 
@@ -596,7 +763,8 @@ QmiGlobal.module.appVersion = {
 	    			os: osTp,
 					tp: 0,
 					av: self.versionOsMap[osTp].av || "1.0.0",
-					li: lang
+					li: lang,
+					
 				},
 	    		method: "get",
 	    		errHide: true
@@ -663,10 +831,10 @@ QmiGlobal.eventDispatcher = {
 			Object.keys(self.viewMap).forEach(function(viewId) {
 				// event currentTarget -> event綁定的對象
 
-				// jqElem 是arr 每個elem都比對
-				var jqElem = self.viewMap[viewId].jqElem, length = jqElem.length;
+				// elemArr 是arr 每個elem都比對
+				var elemArr = self.viewMap[viewId].elemArr, length = elemArr.length;
 				for(var i=0; i<length; i++) {
-					if(event.currentTarget === jqElem[i]) {
+					if(event.currentTarget === elemArr[i]) {
 						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {}), target: event.target}}));
 						return;
 					}
@@ -694,8 +862,8 @@ QmiGlobal.eventDispatcher = {
 			var viewId = handler.id+":"+veObj.veId;
 			self.viewMap[viewId] = veObj;
 			veObj.eventArr.forEach(function(eventType) {
-				// jqElem 是arr 每個elem都掛上事件監聽
-				Array.prototype.forEach.call(veObj.jqElem, function(elem) {
+				// elemArr 是arr 每個elem都掛上事件監聽
+				Array.prototype.forEach.call(veObj.elemArr, function(elem) {
 					elem.addEventListener(eventType, self);
 				});
 				window.addEventListener(eventType+":"+viewId, handler);
@@ -709,15 +877,13 @@ QmiGlobal.eventDispatcher = {
 		Object.keys(self.viewMap).forEach(function(viewId) {
 			if(viewId.split(":")[0] === moduleId) {
 				delete self.viewMap[viewId];
-
 				// remove event listener
 				// window.removeEventListener("click:view-ldap-setting:list-delete", QmiGlobal.module.ldapSetting)
 			}
-
-			
 		})
 	}
 }
+
 
 QmiGlobal.module.webview = new QmiGlobal.ModuleConstructor({
 
@@ -739,7 +905,7 @@ QmiGlobal.module.webview = new QmiGlobal.ModuleConstructor({
 
 				QmiGlobal.eventDispatcher.subscriber([{
 	    			veId: "linkHeader:"+ i, 
-	    			jqElem: dom, 
+	    			elemArr: dom, 
 	    			eventArr: ["click"],
 	    			data: item
 	    		}], self);

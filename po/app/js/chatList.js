@@ -387,7 +387,7 @@ function openChatWindow ( giTmp, ci ){
 			windowList[ci] = window.open("", ci , "width=400, height=600");
 		else {
 			var serverPath = window.location.href.split("/").slice(0, -1).join("/") +"/";
-			windowList[ci] = window.open(serverPath +"chat.html?v2.2.0.8", ci , "width=400,height=600");
+			windowList[ci] = window.open(serverPath +"chat.html?v2.3.0.4", ci , "width=400,height=600");
 		}
 		
 		windowList[ci].chatAuthData = {
@@ -616,7 +616,8 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		name = $.i18n.getString("COMMON_YOU");
 	}
 
-	switch( data.ml[0].tp ){
+	var dataTp = data.ml[0].tp;
+	switch(dataTp){
 		case 5: //sticker
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
 			break; 
@@ -710,7 +711,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		try{
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			var cnTmp = data.cn||"";
-			if( data.meta.ct>=login_time){
+			if( data.meta.ct>=login_time && dataTp != 22){
 				
 				try {QmiGlobal.showNotification ({
 					title: mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")",

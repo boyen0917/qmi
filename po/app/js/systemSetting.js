@@ -1,8 +1,10 @@
 $(document).ready(function(){
 
+    var emailSettingArea = document.getElementById('email-setting');
     var imgContent = $(".image-content");
     var tabContent = $(".tab-content-r");
     var userContent = $(".userSetting-content");
+    var deleteAccountBtn = emailSettingArea.querySelector("div.delete-account>button");
 
     //系統設定事件
     tabContent.bind('input','.input-password', function (e) {
@@ -78,6 +80,10 @@ $(document).ready(function(){
         } else {
             popupShowAdjust("", $.i18n.getString("COMMON_NOT_IMAGE") );
         }
+    });
+
+    deleteAccountBtn.addEventListener('click', function (e) {
+        deleteAccount.remind();
     });
 });
 
@@ -250,6 +256,7 @@ systemSetting = function(){
     //密碼
     if (QmiGlobal.auth && QmiGlobal.auth.isSso) { // ldap帳號，隱藏修改密碼設定
         systemSettingTabs.children("li[data-tab='password-setting']").hide()
+        emailSetting.find("div.delete-account").hide();
     }
 
     $("#password-setting").find(".input-password").val("");
@@ -389,7 +396,7 @@ passwordChange = function(){
                 });
             }
         } else {
-            popupShowAdjust("兩次密碼不符 請再輸入一次", "" ,true);
+            popupShowAdjust($.i18n.getString("ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH"), "" , true);
             pwSetting.find("input[name$='v-password']").val("");
             pwSetting.find('.password-btn').removeClass('ready');
         }
@@ -505,23 +512,23 @@ QmiGlobal.module.ldapSetting = {
             QmiGlobal.eventDispatcher.subscriber([
                 {
                     veId: "goto", 
-                    jqElem: self.view.find("[target]"), 
+                    elemArr: self.view.find("[target]"), 
                     eventArr: ["click"]
                 },{
                     veId: "create-ready", 
-                    jqElem: self.view.find(".ldap-edit .input-block input"), 
+                    elemArr: self.view.find(".ldap-edit .input-block input"), 
                     eventArr: ["input"],
                 },{
                     veId: "create-submit", 
-                    jqElem: self.view.find(".ldap-edit button.submit"), 
+                    elemArr: self.view.find(".ldap-edit button.submit"), 
                     eventArr: ["click"],
                 },{
                     veId: "create-cancel", 
-                    jqElem: self.view.find(".ldap-edit button.cancel"), 
+                    elemArr: self.view.find(".ldap-edit button.cancel"), 
                     eventArr: ["click"],
                 },{
                     veId: "list-action", 
-                    jqElem: self.view.find(".ldap-list .list"), 
+                    elemArr: self.view.find(".ldap-list .list"), 
                     eventArr: ["click"],
                 }
             ], self, true);
@@ -1027,5 +1034,217 @@ QmiGlobal.module.ldapSetting = {
         + "    <button class='cancel'>"+ $.i18n.getString("ACCOUNT_BINDING_CANCEL") +"</button>"
         + "    <button class='submit'>"+ $.i18n.getString("ACCOUNT_BINDING_DONE") +"</button></div>"
         + "</section></section>";
+    }
+}
+
+var deleteAccount = {
+    remind: function () {
+        QmiGlobal.PopupDialog.create({
+            className: 'remind-before-delete',
+            header: $.i18n.getString('ACCOUNT_MANAGEMENT_REMIND'),
+            content: [
+                {
+                    tagName: 'div',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_WARNING'),
+                    attributes: {
+                        class: lang == "en_US" ? "main multi-line" : "main"
+                    }
+                }, {
+                    tagName: 'div',
+                    attributes: {
+                        class: "more"
+                    },
+                    children: [
+                        {
+                            tagName: 'p',
+                            text: $.i18n.getString('ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_DETAIL'),
+                        }, {
+                            tagName: 'span',
+                            text: $.i18n.getString('ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_USER_AGREEMENT'),
+                            eventType: 'click',
+                            eventHandler: function (e) {
+                                e.preventDefault();
+                                window.open("user_agreement.html", "" , "width=600, height=600");
+                            }
+                        }, {
+                            tagName: 'text',
+                            text: " "+ $.i18n.getString('ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_AND') + " ",
+                        }, {
+                            tagName: 'span',
+                            text: $.i18n.getString('ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_PRIVACY_POLICY'),
+                            eventType: 'click',
+                            eventHandler: function (e) {
+                                e.preventDefault();
+                                window.open("privacy_policy.html", "" , "width=600, height=600");
+                            }
+                        }
+                    ]
+                }
+            ],
+            footer: [
+                {
+                    tagName: 'button',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_CANCEL'),
+                    eventType: 'click',
+                    eventHandler: function (e) {
+                        QmiGlobal.PopupDialog.close();
+                    }
+                }, {
+                    tagName: 'button',
+                    text: $.i18n.getString('COMMON_DELETE'),
+                    attributes: {
+                        class: 'delete'
+                    },
+                    eventType: 'click',
+                    eventHandler: function (e) {
+                        QmiGlobal.PopupDialog.close().then(function () {
+                            deleteAccount.enterPassword();
+                        });
+                    }
+                }
+            ]
+        }).open();
+    },
+
+    enterPassword: function () {
+        QmiGlobal.PopupDialog.create({
+            className: 'enter-password',
+            header: $.i18n.getString('ACCOUNT_MANAGEMENT_ENTER_PASSWORD'),
+            content: [
+                {
+                    tagName: 'input',
+                    attributes: {
+                        type: 'password',
+                        placeholder: $.i18n.getString('ACCOUNT_BINDING_PASSWORD')
+                    }
+                }
+            ],
+
+            footer: [
+                {
+                    tagName: 'button',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_CANCEL'),
+                    eventType: 'click',
+                    eventHandler: function (e) {
+                        QmiGlobal.PopupDialog.close();
+                    }
+                }, {
+                    tagName: 'button',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
+                    eventType: 'click',
+                    eventHandler: function (e) {
+                        var dialog = document.querySelector("#popupDialog>div.container>div.enter-password");
+                        var passwordValue = dialog.querySelector('div.content>input').value
+                        
+                        new QmiAjax({
+                            apiName: "me/accounts/destroy/step1",
+                            method: "post",
+                            body: {
+                                pw: toSha1Encode(passwordValue)
+                            }
+                        }).complete(function (data) {
+                            var result = $.parseJSON(data.responseText)
+                            if (data.status == 200) {
+                                toastShow(result.rsp_msg);
+                                QmiGlobal.PopupDialog.close().then(function () {
+                                    deleteAccount.verifyCode(result.key);
+                                });
+                            }
+                        });
+                    }
+                }
+            ]
+        }).open();
+    },
+
+    verifyCode: function (resendKey) {
+        QmiGlobal.PopupDialog.create({
+            className: 'verification-code',
+            header: $.i18n.getString('ACCOUNT_MANAGEMENT_VERIFICATION_CODE'),
+            content: [
+                {
+                    tagName: 'div',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_VERIFICATION_CODE_SENT') + QmiGlobal.me.pn
+                }, {
+                    tagName: 'input',
+                    attributes: {
+                        type: 'text',
+                        placeholder: $.i18n.getString('ACCOUNT_MANAGEMENT_VERIFICATION_CODE_ENTER'),
+                        maxlength: 6
+                    }
+                }, {
+                    tagName: 'p',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_DIDNT_RECEIVE')
+                }, {
+                    tagName: 'span',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_RESEND'),
+                    eventType: 'click',
+                    eventHandler: function (e) {
+                        new QmiAjax({
+                            apiName: "me/accounts/destroy/resend",
+                            method: "post",
+                            body: {
+                                key: resendKey
+                            }
+                        }).complete(function (data) {
+                            var result = $.parseJSON(data.responseText)
+                            if (data.status == 200) {
+                                resendKey = result.key;
+                                toastShow(result.rsp_msg);
+                            }
+                        });
+                    }
+                }
+            ],
+
+            footer: [
+                {
+                    tagName: 'button',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_CANCEL'),
+                    eventType: 'click',
+                    eventHandler: function (e) {
+                        QmiGlobal.PopupDialog.close();
+                    }
+                }, {
+                    tagName: 'button',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
+                    eventType: 'click',
+                    eventHandler: function (e) {
+                        var dialog = document.querySelector("#popupDialog>div.container>div.verification-code");
+                        var verificationCode = dialog.querySelector('div.content>input').value
+                        
+                        new QmiAjax({
+                            apiName: "me/accounts/destroy/step2",
+                            method: "post",
+                            body: {
+                                vc: verificationCode
+                            }
+                        }).complete(function (data) {
+                            var result = $.parseJSON(data.responseText)
+                            if (data.status == 200) {
+                                QmiGlobal.PopupDialog.close().then(function () {
+                                    deleteAccount.done();
+                                });
+                            }
+                        });
+                    }
+                }
+            ]
+        }).open();
+    },
+
+    done: function () {
+        QmiGlobal.PopupDialog.create({
+            className: 'account-removed',
+            header: $.i18n.getString('ACCOUNT_MANAGEMENT_DELETED_CONFIRMATION'),
+            footer: [
+                {
+                    tagName: 'button',
+                    text: $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
+                    eventType: 'click',
+                    eventHandler: reLogin
+                }
+            ]
+        }).open();
     }
 }

@@ -544,6 +544,11 @@
 	"WEBONLY_ERROR_OCCURED_RELOGIN" : "An error occurred, please login again",
 
 	"WEBONLY_USER_PROFILE_PHONE2" : "Tel.",
+	"WEBONLY_POPUP_ERRCODE" : "Error Code",
+
+	"WEBONLY_LOGIN_PHONE" :	"Phone Number",
+	"WEBONLY_LOGIN_EMAIL" :	"Email Address",
+	"WEBONLY_LOGIN_PASSWORD": "Password",
 	
 	"SCHEDULED_POST": "Scheduled post",
 	"SCHEDULED_POST_AT": "Scheduled post at",
@@ -565,5 +570,40 @@
 
 	"POST_START_TIME": "Same as Scheduled time",
 
-	"ERR_MSG_PHOTO_LIMIT": "Upload limitation: 20 photos"
+	"ERR_MSG_PHOTO_LIMIT": "Upload limitation: 20 photos",
+
+	"ACCOUNT_MANAGEMENT_REMIND": "Remind",
+	"ACCOUNT_MANAGEMENT_ENTER_PASSWORD": "Enter Password",
+	"ACCOUNT_MANAGEMENT_CANCEL": "Cancel",
+	"ACCOUNT_MANAGEMENT_DONE": "Done",
+	"ACCOUNT_MANAGEMENT_VERIFICATION_CODE": "Verification Code",
+	"ACCOUNT_MANAGEMENT_VERIFICATION_CODE_SENT": "We've sent a six digit verification code to ",
+	"ACCOUNT_MANAGEMENT_VERIFICATION_CODE_ENTER": "6 digit verification code",
+	"ACCOUNT_MANAGEMENT_DIDNT_RECEIVE": "Didn't receive a code?",
+	"ACCOUNT_MANAGEMENT_RESEND": "Resend",
+
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_WARNING": "This account will be removed and can not be recoverd.",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_DETAIL": "If you want to know more, please check our ",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_USER_AGREEMENT": "User Agreement",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_AND": "and",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_PRIVACY_POLICY": "Privacy Policy.",
+	"ACCOUNT_MANAGEMENT_DELETE_ACCOUNT": "Delete Account",
+	"ACCOUNT_MANAGEMENT_ACCOUNT_SUSPENDED": "This account has been suspended, if you want to know more, please contact 0800-080-090.",
+	"ACCOUNT_MANAGEMENT_ACCOUNT_REACTIVATED": "Yout account has been reactivated, use \"forget password\" to get new password.",
+	"ACCOUNT_MANAGEMENT_JOIN_GROUP_NOTICE": "Notice",
+
+	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_QRCODE": "如接受他團體/群組邀請同意而加入該團體時，則視為您已同意並自行提供個人註冊帳號 [%ld] 、個人名稱 [%ld] 及個人圖像給該團體成員並同意當您註冊帳號異動時系統同步更新您於該團體帳號，因該資料及您加入該團體後新增之資料所發生權利義務發生於您與上開團體管理者間，與本公司無涉，您同意加入團體/群組前審慎評估，以維護您的權益",
+	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION": "如接受他團體/群組邀請同意而加入該團體時，則視為您已同意並自行提供個人註冊帳號 [%ld] 及個人圖像給該團體成員並同意當您註冊帳號異動時系統同步更新您於該團體帳號，因該資料及您加入該團體後新增之資料所發生權利義務於您與上開團體管理者間，與本公司無涉，您同意加入團體/群組前應審慎評估，以維護您的權益",
+	"ACCOUNT_MANAGEMENT_AGREE": "Agree",
+	"ACCOUNT_MANAGEMENT_DISAGREE": "Disagree",
+	"ACCOUNT_MANAGEMENT_ACCOUNT_REMOVE_NOTIFICATION": "This account has not been used for 365 days, will be removed in 15 days, if you want to know more, please contact 0800-080-090.",
+	"ACCOUNT_MANAGEMENT_FILE_DELETED": "The file is expired or exceeded the free storage limit.",
+	"ACCOUNT_MANAGEMENT_DELETED_CONFIRMATION": "Account has been deleted.",
+	"ACCOUNT_MANAGEMENT_DONE": "Done",
+	
+	"SYSTEM_ANNOUNCEMENT_ANNOUNCEMENT": "Announcement",
+	"SYSTEM_ANNOUNCEMENT_EMPTY": "There is no announcement yet",
+	"INTERGRATIONS_READMORE": "Read More",
+
+	"ACCOUNT_MANAGEMENT_FILE_DELETED": "The file is expired or exceeded the free storage limit."
 }

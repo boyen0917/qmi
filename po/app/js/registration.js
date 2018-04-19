@@ -22,10 +22,17 @@ appInitial = function(needUpdate){
 	}
 	
 	//首頁大圖
-	$("#page-registration").css("height",$(window).height());
+	var registerDom = $("#page-registration");
+	registerDom.css("height", $(window).height());
 	$(window).resize(function(){ 
-		$("#page-registration").css("height",$(window).height());
+		registerDom.css("height", $(window).height());
 	});
+
+
+	// placeholder
+	registerDom.find("login-ld-phone").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_PHONE"))
+	registerDom.find("login-ld-email").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_EMAIL"))
+	registerDom.find("login-ld-password").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_PASSWORD"))
 
 	$(document).on("click",".login-ready:not(.login-waiting)",function(){
 
@@ -332,6 +339,11 @@ appInitial = function(needUpdate){
         			dataObj.pw = password;
 
         			QmiGlobal.ssoLogin(dataObj).done(loginDef.resolve);
+
+        		// 帳號無效 (108帳號被凍結 109已成無效帳號 110付費帳號被關閉)
+        		} else if (dataObj.rsp_code === 108 || dataObj.rsp_code === 109 || dataObj.rsp_code === 110) {
+        			toastShow(dataObj.rsp_msg);
+        			loginDef.resolve({isSso:false, isSuccess: false});
         		} else {
         			loginDef.resolve({isSso:false, isSuccess: true});
         		}
@@ -348,6 +360,9 @@ appInitial = function(needUpdate){
         			
         		// 判斷是否換帳號 換帳號就要清db
         		changeAccountToResetDB(phoneId);
+
+        		// 強制記住帳號
+				$.lStorage("_loginAccount", phoneId);
 
     			//記錄帳號密碼
     			if($("#page-registration div.login-remember").data("chk")){
@@ -455,7 +470,7 @@ appInitial = function(needUpdate){
                 		}
 
                 		new QmiGlobal.popup({
-							desc: $.i18n.getString("WEBONLY_ERROR_OCCURED_RELOGIN") +"<br>"+ errCode,
+							desc: $.i18n.getString("WEBONLY_ERROR_OCCURED_RELOGIN") +"<br><br>"+ errCode,
 							confirm: true,
 							action: [reLogin]
 						});
@@ -523,7 +538,6 @@ appInitial = function(needUpdate){
     // LDAP SSO
     QmiGlobal.ssoLogin = function(ssoObj) {
     	var deferred = $.Deferred();
-    	var webSsoDeviceStr = "web_sso_device";
 
     	// sso 登入
 		new QmiAjax({
@@ -532,8 +546,8 @@ appInitial = function(needUpdate){
             body: {
 			   id: ssoObj.id,
 			   tp: "1",
-			   dn: webSsoDeviceStr,    
-			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, (ssoObj.id +"_"+ webSsoDeviceStr).substring(0,16)),
+			   dn: QmiGlobal.device,    
+			   pw: QmiGlobal.aesCrypto.enc(ssoObj.pw, (ssoObj.id +"_"+ QmiGlobal.device).substring(0,16)),
 			   uui: ssoObj.uui
 			},
             method: "post",
@@ -609,84 +623,99 @@ appInitial = function(needUpdate){
     }
 
     function setFirstCompanyAccountPassword(ssoData) {
-
-    	var deferred = $.Deferred();
     	QmiGlobal.PopupDialog.create({
-			header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
-				+ "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") + "</h2><p>" 
-				+ $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p>",
+	        className: 'reset-company-account-password',
+	        header: "<div class='alert'><img src='images/registration/symbols-icon_warning_ldap.png'>"
+	            + "<h2>" + $.i18n.getString("ENTERPRISE_ACCOUNT_PASSWORD_SETTING") + "</h2><p>" 
+	            + $.i18n.getString("ENTERPRISE_ACCOUNT_FIRSTTIME_RESET") +"</p>",
 
-			input: [{
-				type: "password",
-				className: "input-password password",
-				hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD",
-				maxLength : 10,
-				eventType: "input",
-				eventFun: function (e) {
-					checkPasswordAreMatch(e, "confirm");
-				}
-			},{
-				type: "password",
-				className: "input-password password-again",
-				hint: "ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN",
-				maxLength : 10,
-				eventType: "input",
-				eventFun: function (e) {
-					checkPasswordAreMatch(e, "confirm");
-				}
-			}],
-			errMsg: {
-	            text: "ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH",
-	            className: "error-message"
-	        },
-			buttons: {
-				confirm: {
-					text : "ENTERPRISE_ACCOUNT_DONE",
-					className: "confirm",
-					eventType : "click",
-					eventFun : function (callback) {
-						var firstPwInput = $("#popupDialog").find(".password input").val();
-						var secondPwInput = $("#popupDialog").find(".password-again input").val();
+	        content: [
+	            {
+	                tagName: 'div',
+	                attributes: {
+	                    class: 'input-password password',
+	                },
+	                children: [
+	                    {
+	                        tagName: 'input',
+	                        attributes: {
+	                            placeholder: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_PASSWORD'),
+	                            type: 'password',
+	                            maxlength: 10,
+	                        },
+	                        eventType: "input",
+	                        eventHandler: function (e) {
+	                            checkPasswordAreMatch(e, "confirm");
+	                        }
+	                    }
+	                ]
+	            }, {
+	                tagName: 'div',
+	                attributes: {
+	                    class: 'input-password password-again',
+	                },
+	                children: [
+	                    {
+	                        tagName: 'input',
+	                        attributes: {
+	                            placeholder: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_PASSWORD_AGAIN'),
+	                            type: 'password',
+	                            maxlength: 10,
+	                        },
+	                        eventType: "input",
+	                        eventHandler: function (e) {
+	                            checkPasswordAreMatch(e, "confirm");
+	                        }
+	                    }
+	                ]
+	            }, {
+	                tagName: 'p',
+	                text: $.i18n.getString('ENTERPRISE_ACCOUNT_SET_PASSWORD_NOT_MATCH')
+	            }
+	        ],
 
-						if (firstPwInput !== secondPwInput) {
-							$("#popupDialog").find(".error-message").css("opacity", 1);
-						} else {
-							$("#popupDialog").find(".error-message").css("opacity", 0);
-							new QmiAjax({
-					        	url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password_first",
-					        	method: "put",
-					        	specifiedHeaders: { li: lang },
-					        	body: {
-								    id : ssoData.id,
-								    key : ssoData.key,
-								    np : QmiGlobal.aesCrypto.enc(firstPwInput, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
-								    dn : QmiGlobal.device,
-								    uui : ssoData.uui,
-								}
-					        }).done(function(rspData) {
-					        	console.log(ssoData)
-					        	var rspObj = JSON.parse(rspData.responseText);
-					        	if (rspData.status == 200) {
-					        		// popupShowAdjust(
-					        		// 	null, 
-					        		// 	rspObj.rsp_msg, 
-					        		// 	$.i18n.getString("LANDING_PAGE_LOGIN"), 
-					        		// 	true, 
-					        		// 	[login.bind(this, ssoData.id, firstPwInput, countrycode, true)]
-					        		// );
-                                    QmiGlobal.PopupDialog.close();
+	        footer: [
+	            {
+	                tagName: 'button',
+	                text: $.i18n.getString('ENTERPRISE_ACCOUNT_DONE'),
+	                attributes: {
+	                    class: 'confirm'
+	                },
+	                eventType: "click",
+	                eventHandler: function (callback) {
+	                    var dialog = $("#popupDialog div.reset-company-account-password");
+	                    var firstPwInput = dialog.find(".password input").val();
+	                    var secondPwInput = dialog.find(".password-again input").val();
 
-                                    // 修改成功直接登入首頁
-                                    login(ssoData.id, firstPwInput, countrycode, true);
-                                }
-					        });
-						}
-					}
-				}
-			}
-		}).open();
+	                    if (firstPwInput !== secondPwInput) {
+	                        dialog.find("div.content>p").css("opacity", 1);
+	                    } else {
+	                        dialog.find("div.content>p").css("opacity", 0);
+	                        new QmiAjax({
+	                            url: "https://" + ssoData.url + "/apiv1/company_accounts/" + ssoData.ci + "/users/password_first",
+	                            method: "put",
+	                            specifiedHeaders: { li: lang },
+	                            body: {
+	                                id : ssoData.id,
+	                                key : ssoData.key,
+	                                np : QmiGlobal.aesCrypto.enc(firstPwInput, (ssoData.id + "_" + QmiGlobal.device).substring(0, 16)),
+	                                dn : QmiGlobal.device,
+	                                uui : ssoData.uui,
+	                            }
+	                        }).done(function(rspData) {
+	                            var rspObj = JSON.parse(rspData.responseText);
+	                            if (rspData.status == 200) {
+	                                QmiGlobal.PopupDialog.close();
 
-		deferred.promise();
+	                                // 修改成功直接登入首頁
+	                                login(ssoData.id, firstPwInput, countrycode, true);
+	                            }
+	                        });
+	                    }
+	                }
+	            }
+	        ]
+	    }).open();
     }
 
 
