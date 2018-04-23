@@ -26,7 +26,8 @@ var g_currentScrollToDom = null;	//捲動到最上方時會讀取舊訊息, 但�
 var lockCurrentFocusInterval;		//讓視窗停留在最後一筆的interval
 var lockCurrentFocusIntervalLength = 100;//讓視窗停留在最後一筆的interval更新時間
 
-var isChatRoom = true;
+
+QmiGlobal.isChatRoom = true;
 var maxMsgLength = 3000;
 
 // 配合init裡面有這個初始化的 function
