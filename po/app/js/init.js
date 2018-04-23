@@ -1,4 +1,4 @@
-// version 2.3.0.4
+// version 2.3.0.5
 var ui;
 var at;
 var gi;
@@ -49,12 +49,12 @@ window.QmiGlobal = {
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整 
-	appVer: "2.3.0.4",
+	appVer: "2.3.0.5",
 
 	title: "Qmi",
 
 	// 檢查是否為聊天室
-	isChatRoom: !!window.location.href.match(/po\/app\/chat.html/),
+	isChatRoom: false, // 白箱不可使用網址判斷 改為chat.js指定 注意時間差
 
 	// 桌機版設定
 	nwGui: nwGui,
