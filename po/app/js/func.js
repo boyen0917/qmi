@@ -5971,6 +5971,7 @@ timelineVideoMake = function (this_event, video_arr) {
 }
 
 timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
+    console.log(fileIdMap)
     var expandDiv = thisEvent.find(".st-attach-file").children(".header");
     var allDownLoadDiv = thisEvent.find(".st-attach-file").children(".footer");
     var attachFiles = thisEvent.find(".st-attach-file");
@@ -6009,7 +6010,11 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
         deferred.done(function() {
             QmiGlobal.getLinkStateDef(target.href).done(function(isAvailable) {
                 if(isAvailable) {
-                    target.click();
+                    var link = document.createElement('a');
+                    link.href = target.href;
+                    link.download = target.download;
+                    link.click();
+                    // target.click();
                 } else {
                     toastShow($.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
                     $(target).parents(".st-attach-file").addClass("fail");
@@ -6041,7 +6046,7 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
             // 5349 確認第一個連結是否有效
             var allDlDef = $.Deferred();
             try {
-                QmiGlobal.getLinkStateDef(fileLinks[0]["href"]).done(function() {
+                QmiGlobal.getLinkStateDef(fileLinks[0]["href"]).done(function(isAvailable) {
                     if(isAvailable) {
                         allDlDef.resolve();
                         return;
@@ -6070,49 +6075,48 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
                                     resolve();
                                 });
                             }
-                            
                         }
                     });
 
                     getLinkTasks.push(promise);
                 })
-            })
 
-            Promise.all(getLinkTasks).then(function () {
-                try {
-                    var https = QmiGlobal.nodeModules.https;
-                    var fs = QmiGlobal.nodeModules.fs;
-                    var path = QmiGlobal.nodeModules.path;
-                    var childProcess = require('child_process');
-                    var __dirname = path.dirname(process.execPath);
-                    var savePath = process.env.HOMEDRIVE + '/' + process.env.HOMEPATH;
+                Promise.all(getLinkTasks).then(function () {
+                    try {
+                        var https = QmiGlobal.nodeModules.https;
+                        var fs = QmiGlobal.nodeModules.fs;
+                        var path = QmiGlobal.nodeModules.path;
+                        var childProcess = require('child_process');
+                        var __dirname = path.dirname(process.execPath);
+                        var savePath = process.env.HOMEDRIVE + '/' + process.env.HOMEPATH;
 
-                    var downloadFile = function(callback){
-                        if(fileIndex < fileLinks.length) {
-                            var fileLink = fileLinks[fileIndex];
-                            var file = fs.createWriteStream(savePath + "/" + fileLink["download"]);
-                            var getLinkDef = $.Deferred();
-                            
-                            https.get(fileLink["href"], function(response) {
-                                response.pipe(file);
-                                fileIndex += 1;
-                                downloadFile(callback);
-                            });
-                        } else {
-                            callback();
+                        var downloadFile = function(callback){
+                            if(fileIndex < fileLinks.length) {
+                                var fileLink = fileLinks[fileIndex];
+                                var file = fs.createWriteStream(savePath + "/" + fileLink["download"]);
+                                var getLinkDef = $.Deferred();
+
+                                https.get(fileLink["href"], function(response) {
+                                    response.pipe(file);
+                                    fileIndex += 1;
+                                    downloadFile(callback);
+                                });
+                            } else {
+                                callback();
+                            }
                         }
-                    }
 
-                    downloadFile(function() {
-                        childProcess.exec('start ' + savePath);
-                        console.log("download finishes");
-                    });
-                } catch(e){
-                    $.each(fileLinks, function(i, fileLink) {
-                        fileLink.click();
-                    });
-                }
-            });
+                        downloadFile(function() {
+                            childProcess.exec('start ' + savePath);
+                            console.log("download finishes");
+                        });
+                    } catch(e){
+                        $.each(fileLinks, function(i, fileLink) {
+                            fileLink.click();
+                        });
+                    }
+                });
+            })
         });
     }
 }
