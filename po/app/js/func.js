@@ -6582,7 +6582,7 @@ putEventStatus = function (target_obj,etp,est,callback){
 getLinkMeta = function (this_compose,url) {
     var parseUrl = window.parseUrl || null,
         // 超過時間就不做 不然會被靠北
-        timeLimit = 5000,//ms
+        timeLimit = 500000,//ms
         deferred = $.Deferred();
 
     if(parseUrl === null)
