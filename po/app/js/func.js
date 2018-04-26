@@ -7916,6 +7916,9 @@ pollingCountsWrite = function(pollingData, aa){
     Object.keys(cntsAllObj).forEach(function(thisGi){
         var thisCntObj = cntsAllObj[thisGi],
         thisQmiGroupObj = groupsData[thisGi],
+
+        if(!thisQmiGroupObj) return;
+
         groupBadgeNumber = 0;
 
         var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
@@ -7924,13 +7927,9 @@ pollingCountsWrite = function(pollingData, aa){
         if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
         if (thisCntObj.A5 > 0) {
-            groupBadgeNumber = thisCntObj.A5;
-
-            sort_arr.push([thisGi,thisCntObj.A5]);
-            // 保險
-            if (groupBadgeNumber > 0) dom.html(countsFormat(groupBadgeNumber, dom)).show();
-
-            appBadgeNumber += groupBadgeNumber;
+            sort_arr.push([thisGi, thisCntObj.A5]);
+            dom.html(countsFormat(thisCntObj.A5, dom)).show();
+            appBadgeNumber += thisCntObj.A5;
         }
 
         // webview
