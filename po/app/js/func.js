@@ -7915,7 +7915,7 @@ pollingCountsWrite = function(pollingData, aa){
     // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
     Object.keys(cntsAllObj).forEach(function(thisGi){
         var thisCntObj = cntsAllObj[thisGi],
-        thisQmiGroupObj = groupsData[thisGi],
+        thisQmiGroupObj = groupsData[thisGi];
 
         if(!thisQmiGroupObj) return;
 
