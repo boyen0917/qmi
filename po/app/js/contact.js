@@ -875,7 +875,7 @@ updateFavoritePage = function(){
 	var pageID = "page-contact_favorite";
 	var page = $( "#"+pageID );
 
-	guAllExist = QmiGlobal.groups[gi].guAll;
+	// guAllExist = QmiGlobal.groups[gi].guAll;
 
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="contact-subpages">'
@@ -1257,6 +1257,7 @@ showEditFavListPage = function( dom ) {
 			if (!favoriteList.hasOwnProperty(gu)) {
 				addFavList.push(gu);
 				newGroupMembers[gu].fav = true;
+				guAllExist[gu].fav = true;
 			}
 		}
 
@@ -1265,6 +1266,7 @@ showEditFavListPage = function( dom ) {
 			if (!newFavoriteList.hasOwnProperty(gu)) {
 				deleteFavList.push(gu);
 				newGroupMembers[gu].fav = false;
+				guAllExist[gu].fav = false;
 			}
 		}
 
