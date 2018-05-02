@@ -60,7 +60,7 @@ showMemListPageDelegate = function( title, list, onPageChanged, onDone ){
         var index = tab.data("id");
         var cell = cellArea.find("._"+index);
         var listData = tab.data("obj").ml;
-        var userData = $.userStorage();
+        var userData = QmiGlobal.groups
         var guAll = userData[gi].guAll;
         var bl = userData[gi].bl;
 
