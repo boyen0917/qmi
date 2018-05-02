@@ -79,7 +79,7 @@ window.QmiGlobal = {
 		];
 
 		$.when.apply($, initDefArr).done(function() {
-
+			QmiGlobal.appLangDef.resolve();
 			// 設定首頁版號顯示
 			setVersion();
 
