@@ -270,7 +270,6 @@ QmiGlobal.appLangDef.done(function(){
 
 	//adjust typing area height
 	input.off("keydown").keydown(function (e) {
-		console.log(e)
 		var curText = $(this).text();
 		var ctrlDown = (e.ctrlKey || e.metaKey);
 		var isDeleteKey = (e.keyCode == 8 || e.keyCode == 46);
@@ -289,7 +288,6 @@ QmiGlobal.appLangDef.done(function(){
 		*/
 		if (!ctrlDown && !isDeleteKey && !isArrowKey && selectText.length == 0 
 			&& curText.length >= maxMsgLength) {
-			console.log('over 3000 characters @@');
 			e.preventDefault();
 		}
 		setTimeout(updateChatContentPosition, 50);
@@ -863,13 +861,10 @@ audioplay.prototype = {
 		var audioProgress = this.audiohtml.find("#audio-progress");
 		var audioBar = this.audiohtml.find("#audio-bar")[0];
 		if(!mytrack.ended) {
-	  		console.log(e.pageX);
-	  		console.log(audioProgress[0].offsetLeft);
 	  		var mouseX = e.pageX - audioProgress[0].offsetLeft;
 	  		//var newtime = mouseX * mytrack.duration / barSize;
 	  		var newTime = (mouseX / audioProgress.width()) / mytrack.duration;
 	  		mytrack.currentTime = newTime;
-	  		console.log(newTime);
 	  		audioBar.style.width = mouseX + "px";
 		}
 	},
@@ -945,7 +940,7 @@ function onChatDBInit() {
 	$("#chat-contents").append("<div class='tmpMsg'></div>");
 	
 	// 有網路情況下，就去跟server要，不然直接拉db會有漏訊息的問題
-	getMsgFromServerOrDB();
+	getMsgFromServerOrDB({isInit: true});
 
 	scrollToBottom();
 }
@@ -1042,13 +1037,14 @@ function setCurrentFocus(){
 }
 
 // 有網路情況下，就去跟server要，不然直接拉db會有漏訊息的問題
-function getMsgFromServerOrDB() {
+function getMsgFromServerOrDB(args) {
+	var specifiedTime = (args || {}).isInit ? undefined : g_earliestDate.getTime();
 	if (navigator.onLine) {
 		$("#chat-loading-grayArea").hide();
 		$("#chat-loading").show();
 		g_isLoadHistoryMsgNow = true;
 		setCurrentFocus();
-		updateChat(g_earliestDate.getTime(), false);
+		updateChat(specifiedTime, false);
 	} else {
 		getHistoryMsg(false);
 	}
@@ -1195,7 +1191,6 @@ function updateChat(time, isGetNewer) {
 						showMsg(object);
 				}
 			}
-
 			g_lastmsgTime[ci] = {ct: g_room.lastCt};
 			$.lStorage("lastMsgCt",g_lastmsgTime);
 			if (isUpdatePermission) getPermition(true);
