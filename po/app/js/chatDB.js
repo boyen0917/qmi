@@ -46,14 +46,10 @@ function onReceivePollingChatMsg ( msgs ){
 				roomObj.el.forEach( function(msgObj,i){
 					msgObj.cn = roomObj.cn;
 					
-					// if(msgObj.ml[0].tp == 22){
-					// 	updateChatList(thisGi);
-					// }
 					if(msgObj.hasOwnProperty("meta")){
 
 						//add to db
 						var idbMsgPutDeferred = $.Deferred();
-
 						var node = {
 							gi: thisGi,
 							ci: thisCi,
@@ -174,27 +170,9 @@ function onChatReceiveMsg ( tmp_gi, tmp_ci, tmp_cn, msgs, callback ){
 						if(callback)	callback();
 					}
 				});
-			// }
-			// tmp.onabort = onSucc;
-			// tmp.onerror = onSucc;
-			// tmp.oncomplete = onSucc;
-			// tmp.onsuccess = onSucc;
-
-			// cns.debug("[updateChatDB]",tmp_gi,tmp_ci,object.ei,object.ml[0].c);
 		}
 	}
 }
-
-// function onChatMsgSaveSucc(node){
-// 	cns.debug(node.ei);
-
-// 	/* 更新聊天室列表最後訊息 */
-// 	if( window.opener 
-// 		&& window.opener.updateLastMsg 
-// 		&& typeof( window.opener.updateLastMsg ) != 'undefined' ){
-// 		window.opener.updateLastMsg( node.gi, node.ci, true, node.ei );
-// 	}
-// }
 
 /*
               ███╗   ███╗███████╗ ██████╗      ██████╗ ██████╗ ██╗   ██╗███╗   ██╗████████╗          
@@ -279,14 +257,6 @@ function onRemoveChatDB(groupID, days) {
   			console.log(new Date(item.ct));
   			g_idb_chat_msgs.remove(item.ei, onsuccess, onerror)
   		}
-		// } else {
-		// 	var allGroupData = QmiGlobal.groups;
-		// 	for(var index in allGroupData){
-		// 		console.log
-		// 	}
-		// }
-		// console.log("ddwdwqqd");
-  		
 	};
 
 	var onEnd = function (item) {
