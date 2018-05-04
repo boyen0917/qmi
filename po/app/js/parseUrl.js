@@ -19,7 +19,6 @@
 
 	parseUrl = function(url, cb, options){
 		getHTML(url, function(err, html){
-
 			if (err) return cb(err);
 
 			var domparser = new DOMParser().parseFromString(html, "text/html");
@@ -53,7 +52,6 @@
 
 			if (!err && res.statusCode == 200) {
 				cb(null, body);
-        		// console.log(iconv.decode(body, 'gb2312').toString());
     		} else {
     			cb(new Error("Request failed with HTTP status code: " + res.statusCode));
     		}
@@ -64,25 +62,27 @@
 
 		options = options || {};
 		var domparser = new DOMParser().parseFromString(html, "text/html");
+		var charsetData = $(domparser).find('meta[charset]');
 		var metadataObj = $(domparser).find('meta[http-equiv]');
 		var contentType = parsecharset(metadataObj.attr('content'));
 		var charset;
-
-		if (contentType && contentType.parameters && contentType.parameters.charset
-			&& contentType.parameters.charset.length > 0) {
-			charset = contentType.parameters.charset.toLowerCase();
-
-			try {
+		var isCharsetExist = (function () {
+			return (contentType && contentType.parameters && contentType.parameters.charset
+			&& contentType.parameters.charset.length > 0) || (charsetData.attr('charset') 
+			&& charsetData.attr('charset').length > 0)
+		}());
+		
+		if (isCharsetExist) {
+			charset = contentType.parameters.charset || charsetData.attr('charset');
+ 			try {
 				var iconv = require('iconv-lite');
-				if (charset == 'gb2312') {
-					decodeHtml = iconv.decode(html, 'gb2312').toString()
-					domparser = new DOMParser().parseFromString(decodeHtml, "text/html");
-				}
+				var decodeHtml = iconv.decode(html, charset.toLowerCase()).toString()
+				domparser = new DOMParser().parseFromString(decodeHtml, "text/html");
 			} catch (e) {
 				console.log('iconv-lite is not exist')
 			}
 		}
-		
+
 		var namespace,
 			$html = $(domparser).find('html');
 
