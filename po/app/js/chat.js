@@ -940,7 +940,10 @@ function onChatDBInit() {
 	$("#chat-contents").append("<div class='tmpMsg'></div>");
 	
 	// 有網路情況下，就去跟server要，不然直接拉db會有漏訊息的問題
-	getMsgFromServerOrDB({isInit: true});
+	if (navigator.onLine)
+		updateChat();
+	else
+		getHistoryMsg(false);
 
 	scrollToBottom();
 }
@@ -1044,7 +1047,7 @@ function getMsgFromServerOrDB(args) {
 		$("#chat-loading").show();
 		g_isLoadHistoryMsgNow = true;
 		setCurrentFocus();
-		updateChat(specifiedTime, false);
+		updateChat(g_earliestDate.getTime(), false);
 	} else {
 		getHistoryMsg(false);
 	}
@@ -3075,7 +3078,15 @@ function onScrollContainer(e) {
 	}
 	if ( !g_isEndOfHistory && posi <= $("#chat-loading").outerHeight() * 0.5) {
 		// 有網路情況下，就去跟server要，不然直接拉db會有漏訊息的問題
-		getMsgFromServerOrDB();
+		if (navigator.onLine) {
+			$("#chat-loading-grayArea").hide();
+			$("#chat-loading").show();
+			g_isLoadHistoryMsgNow = true;
+			setCurrentFocus();
+			updateChat(g_earliestDate.getTime(), false);
+		} else {
+			getHistoryMsg(false);
+		}
 		return;
 	}
 
