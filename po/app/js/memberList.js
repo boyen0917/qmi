@@ -12,7 +12,7 @@ showMemListPage = function( parentDom, title, list, onPageChanged, onDone ){
 	if( $("#page-select-object").length>0 ){
 		showMemListPageDelegate( title, list, onPageChanged, onDone );
 	} else {
-		$('<div>').load('layout/memberList.html?v2.3.0.5',function(){
+		$('<div>').load('layout/memberList.html?v2.3.1.0',function(){
 			parentDom.append( $(this).find("#page-select-object") );
 			showMemListPageDelegate( title, list, onPageChanged, onDone );
 		});
@@ -60,7 +60,7 @@ showMemListPageDelegate = function( title, list, onPageChanged, onDone ){
         var index = tab.data("id");
         var cell = cellArea.find("._"+index);
         var listData = tab.data("obj").ml;
-        var userData = $.userStorage();
+        var userData = QmiGlobal.groups;
         var guAll = userData[gi].guAll;
         var bl = userData[gi].bl;
 

@@ -2023,7 +2023,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.3.0.5 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.3.1.0 .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -5971,6 +5971,7 @@ timelineVideoMake = function (this_event, video_arr) {
 }
 
 timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
+    console.log(fileIdMap)
     var expandDiv = thisEvent.find(".st-attach-file").children(".header");
     var allDownLoadDiv = thisEvent.find(".st-attach-file").children(".footer");
     var attachFiles = thisEvent.find(".st-attach-file");
@@ -6009,7 +6010,11 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
         deferred.done(function() {
             QmiGlobal.getLinkStateDef(target.href).done(function(isAvailable) {
                 if(isAvailable) {
-                    target.click();
+                    var link = document.createElement('a');
+                    link.href = target.href;
+                    link.download = target.download;
+                    link.click();
+                    // target.click();
                 } else {
                     toastShow($.i18n.getString("ACCOUNT_MANAGEMENT_FILE_DELETED"))
                     $(target).parents(".st-attach-file").addClass("fail");
@@ -6041,7 +6046,7 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
             // 5349 確認第一個連結是否有效
             var allDlDef = $.Deferred();
             try {
-                QmiGlobal.getLinkStateDef(fileLinks[0]["href"]).done(function() {
+                QmiGlobal.getLinkStateDef(fileLinks[0]["href"]).done(function(isAvailable) {
                     if(isAvailable) {
                         allDlDef.resolve();
                         return;
@@ -6070,49 +6075,48 @@ timelineFileMake = function(thisEvent, fileArr, fileIdMap) {
                                     resolve();
                                 });
                             }
-                            
                         }
                     });
 
                     getLinkTasks.push(promise);
                 })
-            })
 
-            Promise.all(getLinkTasks).then(function () {
-                try {
-                    var https = QmiGlobal.nodeModules.https;
-                    var fs = QmiGlobal.nodeModules.fs;
-                    var path = QmiGlobal.nodeModules.path;
-                    var childProcess = require('child_process');
-                    var __dirname = path.dirname(process.execPath);
-                    var savePath = process.env.HOMEDRIVE + '/' + process.env.HOMEPATH;
+                Promise.all(getLinkTasks).then(function () {
+                    try {
+                        var https = QmiGlobal.nodeModules.https;
+                        var fs = QmiGlobal.nodeModules.fs;
+                        var path = QmiGlobal.nodeModules.path;
+                        var childProcess = require('child_process');
+                        var __dirname = path.dirname(process.execPath);
+                        var savePath = process.env.HOMEDRIVE + '/' + process.env.HOMEPATH;
 
-                    var downloadFile = function(callback){
-                        if(fileIndex < fileLinks.length) {
-                            var fileLink = fileLinks[fileIndex];
-                            var file = fs.createWriteStream(savePath + "/" + fileLink["download"]);
-                            var getLinkDef = $.Deferred();
-                            
-                            https.get(fileLink["href"], function(response) {
-                                response.pipe(file);
-                                fileIndex += 1;
-                                downloadFile(callback);
-                            });
-                        } else {
-                            callback();
+                        var downloadFile = function(callback){
+                            if(fileIndex < fileLinks.length) {
+                                var fileLink = fileLinks[fileIndex];
+                                var file = fs.createWriteStream(savePath + "/" + fileLink["download"]);
+                                var getLinkDef = $.Deferred();
+
+                                https.get(fileLink["href"], function(response) {
+                                    response.pipe(file);
+                                    fileIndex += 1;
+                                    downloadFile(callback);
+                                });
+                            } else {
+                                callback();
+                            }
                         }
-                    }
 
-                    downloadFile(function() {
-                        childProcess.exec('start ' + savePath);
-                        console.log("download finishes");
-                    });
-                } catch(e){
-                    $.each(fileLinks, function(i, fileLink) {
-                        fileLink.click();
-                    });
-                }
-            });
+                        downloadFile(function() {
+                            childProcess.exec('start ' + savePath);
+                            console.log("download finishes");
+                        });
+                    } catch(e){
+                        $.each(fileLinks, function(i, fileLink) {
+                            fileLink.click();
+                        });
+                    }
+                });
+            })
         });
     }
 }
@@ -6598,7 +6602,7 @@ putEventStatus = function (target_obj,etp,est,callback){
 getLinkMeta = function (this_compose,url) {
     var parseUrl = window.parseUrl || null,
         // 超過時間就不做 不然會被靠北
-        timeLimit = 5000,//ms
+        timeLimit = 500000,//ms
         deferred = $.Deferred();
 
     if(parseUrl === null)
@@ -7915,7 +7919,10 @@ pollingCountsWrite = function(pollingData, aa){
     // 再將此次polling cnts 填入 QmiGlobal.groups的chatAll[ci].cnt 以便setLastMsg時 有unReadCnt數字
     Object.keys(cntsAllObj).forEach(function(thisGi){
         var thisCntObj = cntsAllObj[thisGi],
-        thisQmiGroupObj = groupsData[thisGi],
+        thisQmiGroupObj = groupsData[thisGi];
+
+        if(!thisQmiGroupObj) return;
+
         groupBadgeNumber = 0;
 
         var dom = $(".sm-group-area[data-gi=" + thisGi + "]").find(".sm-count").hide();
@@ -7924,13 +7931,9 @@ pollingCountsWrite = function(pollingData, aa){
         if((QmiGlobal.groups[thisGi] || {}).isRefreshing === true) return;
 
         if (thisCntObj.A5 > 0) {
-            groupBadgeNumber = thisCntObj.A5;
-
-            sort_arr.push([thisGi,thisCntObj.A5]);
-            // 保險
-            if (groupBadgeNumber > 0) dom.html(countsFormat(groupBadgeNumber, dom)).show();
-
-            appBadgeNumber += groupBadgeNumber;
+            sort_arr.push([thisGi, thisCntObj.A5]);
+            dom.html(countsFormat(thisCntObj.A5, dom)).show();
+            appBadgeNumber += thisCntObj.A5;
         }
 
         // webview
