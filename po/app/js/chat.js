@@ -1394,6 +1394,7 @@ function showMsg(object, bIsTmpSend) {
 	}
 
 
+
 	//msg
 	var time = new Date(object.meta.ct);
 	if (null == object.ml || object.ml.length <= 0) return;
@@ -1459,28 +1460,33 @@ function showMsg(object, bIsTmpSend) {
 		div.append(msgDiv);
 		div.append(chatFailContainer);
 	} else {
+
 		//left align
 		var mem = getMemberData(object.meta.gu);
-		if(!mem) return container;
-
+		var subDiv = $("<div class='group'></div>");
+		msgDiv = $("<div class='msg-content'></div>");
+		// if(!mem) return container;
 		div = $("<div class='chat-msg-left'></div>");
 		container.append(div);
 
-		//left
-		var pic = $("<img class='aut'/>");	//left pic (auo for large pic)
-		if (mem.aut) {
-			pic.attr("src", mem.aut);
-		} else {
-			pic.attr("src", "images/common/others/empty_img_personal_l.png");
+		if (mem) {
+			//left
+			var pic = $("<img class='aut'/>");	//left pic (auo for large pic)
+			if (mem.aut) {
+				pic.attr("src", mem.aut);
+			} else {
+				pic.attr("src", "images/common/others/empty_img_personal_l.png");
+			}
+
+			div.append(pic);
+
+			div.find(".aut").data("gi",gi).data("gu",object.meta.gu).addClass("namecard");
+
+			//right
+			
+			subDiv.append("<div class='name'>" + mem.nk.replaceOriEmojiCode() + "</div>");	//name
 		}
-		div.append(pic);
 
-		div.find(".aut").data("gi",gi).data("gu",object.meta.gu).addClass("namecard");
-
-		//right
-		var subDiv = $("<div class='group'></div>");
-		subDiv.append("<div class='name'>" + mem.nk.replaceOriEmojiCode() + "</div>");	//name
-		msgDiv = $("<div class='msg-content'></div>");
 		subDiv.append(msgDiv);	//msg
 
 		table = $("<table></table>");
@@ -1554,6 +1560,7 @@ function showMsg(object, bIsTmpSend) {
 			showMsgMap(msgData, msgDiv);
 			break;
 		case 22: //mem join/leave
+			console.log('22buuuu')
 			msgDiv.addClass('content');
 			var textTmp = "";
 			try {
@@ -3044,26 +3051,10 @@ function sendMsgText(dom) {
 			if (g_room.tp == 1 && null != g_room.memList) {
 				if (g_room.st == 1) {
 					$("#footer").hide();
-					$("#chat-leaveGroup").html(
-						$.i18n.getString("CHAT_SOMEONE_LEAVE", (g_room.uiName || "").replaceOriEmojiCode())
-					).show();
+					setTimeout(function () {
+						popupShowAdjust($.i18n.getString("CHAT_SOMEONE_LEAVE", (g_room.uiName || "").replaceOriEmojiCode()))
+					}, 1000);
 				}
-				// for (var guTmp in g_room.memList) {
-				// 	if (guTmp != g_group.gu) {
-				// 		if (g_group.guAll.hasOwnProperty(guTmp)) {
-				// 			var mem = g_group.guAll[guTmp];
-				// 			// 對方已離開或是聊天室已經無效
-				// 			if (mem.st == 2 || g_room.st == 1) {
-				// 				$("#footer").hide();
-				// 				$("#chat-leaveGroup").html(
-				// 					$.i18n.getString("CHAT_SOMEONE_LEAVE_GROUP", (mem.nk || "").replaceOriEmojiCode())
-				// 				).show();
-				// 				return;
-				// 			}
-				// 			break;
-				// 		}
-				// 	}
-				// }
 			}
 		} catch (e) {
 			errorReport(e);

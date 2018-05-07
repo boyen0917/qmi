@@ -72,7 +72,7 @@ showSelectMemPage = function( parentDom, dataDom, onPageChanged, onDone, isBackW
 private function
 **/
 showSelectMemPageDelegate = function( thisCompose, onPageChanged, onDone, isBackWhenDone ) {
-    var uiData = $.userStorage();
+    var uiData = QmiGlobal.groups;
     var group = uiData[gi];
     var guAll = group.guAll;
     var bl = group.bl;
