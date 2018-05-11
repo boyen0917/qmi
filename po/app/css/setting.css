@@ -701,7 +701,7 @@ input[type=checkbox] {
     display: none;
 }
 
-.switch{
+#notification-setting .switch{
 	position: relative;
 	display: inline-block;
 	width: 30px;
@@ -711,7 +711,7 @@ input[type=checkbox] {
     margin-right: 40px;
 }
 
-.slider{
+#notification-setting .slider{
 	position: absolute;
 	cursor: pointer;
 	top:0;
@@ -723,7 +723,7 @@ input[type=checkbox] {
 	border-radius: 50px;
 }
 
-.slider:before{
+#notification-setting .slider:before{
 	position: absolute;
 	content:"";
 	width: 20px;
