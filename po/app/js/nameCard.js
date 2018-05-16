@@ -772,7 +772,7 @@
 
 	        $(this).find(".background").removeClass("me").find("img")
 	               .attr("src", userData.put || "images/common/others/timeline_kv1_android.png").end().end()
-	               .find(".user h3").text(getFullName(userData)).end()
+	               .find(".user h3").text(getFullName(userData)).show().end()
 	               .find(".user .edit-full-name").hide().end()
 	               .find(".user .edit-pen").hide().end()
 	               .find(".edit-decision").css("visibility", "hidden").end()
@@ -785,7 +785,7 @@
 
 	        if (gu == this_gu) {
 	            $(this).find(".background").addClass("me").end()
-	                   .find(".user input.name").prop("disabled", true).end()
+	                   .find(".user input.name").prop("readonly", true).end()
 	                   .find(".user .edit-pen").show().end()
 	                   .find(".user .user-pic").addClass("me").end()
 	                   // .find(".user .slogan").addClass("me").end()
@@ -814,8 +814,11 @@
 	                .find(".user h3").hide();
 
 	            if (modifyNameSwitch && modifyNameSwitch.st == 2) {
-	                $(this).find(".user input.name").prop("disabled", false).focus();
+	                $(this).find(".user input.name").attr("readonly", false).focus();
 	            } else {
+	            	$(this).find(".user input.name").off('click').on('click', function () {
+	                	toastShow($.i18n.getString('USER_PROFILE_DISABLE_CHANGE_NAME'));
+	                });
 	                $(this).find(".user input.nickname").focus();
 	            }
 
