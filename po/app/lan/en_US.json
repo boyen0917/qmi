@@ -246,6 +246,7 @@
 	"COMMON_NEXT"  					: "Next",
 	"COMMON_SELECT"  						: "Select",
 	"COMMON_SELECT_ALL"  					: "Select All",
+	"COMMON_SELECT_NONE"  					: "Deselect All",
 	"COMMON_MEMBER"  						: "Member",
 	"COMMON_EDIT"  						: "Edit",
 	"COMMON_DONE" 						: "Done",

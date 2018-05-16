@@ -1313,7 +1313,7 @@
             <div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">
                 <div class="page-back"><img src="images/navi/navi_icon_back.png"/></div>
                 <div class="header-cp-object">
-                    <span class="page-title" data-textid="COMMON_SELECT_MEMBERS"></span>(<span>0</span>)
+                    <span class="page-title" data-textid="COMMON_SELECT_MEMBERS"></span>
                 </div>
                 <div class="obj-done">
                     <img src="images/navi/navi_icon_finish.png"/>
@@ -1321,28 +1321,43 @@
                 </div>
             </div>
             <div class="obj-content">
-                <div class="obj-selected">
+                <div class='search'>
+                    <input data-textph-id="COMMON_SELECT" data-role="none" />
+                    <span></span>
+                </div>
+                <!-- <div class="obj-selected">
                     <div class="title"><img src="images/icon/icon_search.png"/><div data-textid='COMMON_SELECT'></div></div>
                     <div class="list">
-                        <label contenteditable="true" class="search"></label>
-                        <label class="text"></label>
-                    </div>
+                        <label contenteditable="true" class="search"></label> -->
+                        <!-- <label class="text"></label> -->
+                    <!-- </div>
                     <div class="clear"></div>
-                </div>
+                </div> -->
                 <div class="obj-cell-area">
-                    <div class="obj-cell-container"></div>
-                    <div class="bottom">
-                        <img src="images/st_bottom_loading.gif">
+                    <div class='basic-select'>
+                        
                     </div>
+                    <div class='obj-select-all'>
+                        <label data-textid="COMMON_MEMBER"></label>
+                        <span data-textid="COMMON_SELECT_ALL"></span>
+                    </div>
+                    <div class="obj-cell-container">
+                        
+
+                    </div>
+
+                    <!-- <div class="bottom">
+                        <img src="images/st_bottom_loading.gif">
+                    </div> -->
                 </div>
             </div>
 
-            <div class="obj-coach-noMember">
+            <!-- <div class="obj-coach-noMember">
                 <div class="container">
                     <img src="images/coachmake/logo_status_object.png">
                     <div data-textid="COMMON_SELECTABLE_MEMBER"></div>
                 </div>
-            </div>
+            </div> -->
         </div>
 <!---------------------------------- page-tab-object ------------------------------------>
         <div data-role="page" id="page-tab-object">

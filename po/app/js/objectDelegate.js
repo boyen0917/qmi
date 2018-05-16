@@ -1,16 +1,19 @@
-ObjectDelegateView = {
+ObjectDelegate = {
 	init : function(option) {
 		this.mainPage = option.mainPage;
 		this.finishButton = option.headerBtn;
-		this.selectNumElement = option.selectNumElement;
-		this.mainContainer = this.mainPage.find(".obj-cell-container");
-		this.loadingCircle = this.mainPage.find(".bottom");
-		this.searchArea = this.mainPage.find(".obj-selected");
-		this.searchInput = this.searchArea.find(".list .search");
-		this.selectListArea = this.searchArea.find(".list .text");
-		this.clearButton = this.searchArea.find(".clear");
-		this.pageBackButton = this.mainPage.find(".page-back");
+		// this.selectNumElement = option.selectNumElement;
+		this.mainContainer = this.mainPage.querySelector("div.obj-cell-container");
+		this.basicSelect = this.mainPage.querySelector("div.obj-cell-area>div.basic-select");
+		this.selectAllBtn = this.mainPage.querySelector("div.obj-cell-area>div.obj-select-all>span");
+		// this.loadingCircle = this.mainPage.find(".bottom");
+		// this.searchArea = this.mainPage.find("div.search");
+		// this.searchInput = this.searchArea.find("input");
+		// this.selectListArea = this.searchArea.find(".list .text");
+		// this.clearButton = this.searchArea.find("span");
+		// this.pageBackButton = this.mainPage.find(".page-back");
 
+		this.currentBranch = 'root';
 		this.allMemberChkbox = {};
 		this.allBranchChxbox = {};
 		this.defaultRow = {};
@@ -19,12 +22,14 @@ ObjectDelegateView = {
 		this.favBranchRows = [];
 		this.memberRows = [];
 		this.branchRows = [];
+		this.currentRows = [];
 
 		this.isSelectedAllBranch = false;
+		this.isSelectAll = false;
 		this.isSelectedAllMember = false;
 
 		this.group = QmiGlobal.groups[gi];
-		this.groupAllMembers = $.extend(true, {}, QmiGlobal.groups[gi].guAll);
+		this.memberList = $.extend(true, {}, QmiGlobal.groups[gi].guAll);
 		this.compose = option.thisCompose;
 		this.composeObj = option.thisComposeObj;
 		this.onDone = option.onDone;
@@ -34,42 +39,92 @@ ObjectDelegateView = {
 		this.visibleMemNum = 0;
 		this.minSelectNum = option.minSelectNum;
 		this.checkedMems = option.checkedMems;
+		this.treeData = option.treeData;
 		// this.newAddMems = {};
 		this.oriCheckedMems = Object.assign({}, option.checkedMems);
 		this.checkedBranches = option.checkedBranches || {};
 		this.checkedFavorites = option.checkedFavorites || {};
-		this.isDisableOnAlreadyChecked = option.isDisableOnAlreadyChecked
+		this.isDisableOnAlreadyChecked = option.isDisableOnAlreadyChecked;
 
 		this.matchList = this.visibleMembers;
 
-		this.selectNumElement.html(Object.keys(this.checkedMems).length);
-		this.mainPage.find(".obj-content").show().end()
-					 .find(".obj-coach-noMember").hide().end()
-					 .find(".obj-done").show();
-		this.mainContainer.html("");
-		this.searchInput.html("");
-		this.selectListArea.html("");
-
+		this.resetView();
 		this.bindEvent();
+		this.setDefaultOptions();
+		this.setCurrentBranchView('root');
+
 
 		return this;
 	},
 
+	resetView: function () {
+		while(this.basicSelect.firstChild) {
+			this.basicSelect.removeChild(this.basicSelect.firstChild);
+		}
+
+		while(this.mainContainer.firstChild) {
+			this.mainContainer.removeChild(this.mainContainer.firstChild);
+		}
+	},
+
+	setDefaultOptions : function () {
+		this.addRowElement("Default", {
+			isAnyObjChecked : 
+			(Object.keys(this.oriCheckedMems).length > 0) ||
+			(Object.keys(this.checkedBranches).length > 0) || 
+			(Object.keys(this.checkedFavorites).length > 0)
+		});
+
+		// this.addFavoriteSubRow("FavBranch", {thisFavBranchObj : fbObj, isSubRow : true});
+	},
+
+	setCurrentBranchView : function (branchName) {
+		var self = this;
+		self.currentBranch = branchName;
+		self.currentRows = [];
+
+		self.treeData[branchName].gul.forEach(function (gu) {
+			var memberObj = self.memberList[gu];
+        	self.addRowElement("Member", memberObj);
+		});
+
+		self.treeData[branchName].cl.forEach(function (branchKey) {
+        	self.addRowElement("Branch", self.treeData[branchKey]);
+		});
+	},
+
 	setHeight : function() {
 		var padding_top = this.searchArea.outerHeight();
-		this.mainContainer.parent().css("padding-top", padding_top)
-    					  .css("height", $(window).height() - 57 - padding_top);
+		this.mainContainer.parent().css("height", $(window).height() - 57 - padding_top);
+
     	return this;
 	},
 
 	bindEvent : function () {
-		this.mainContainer.parent().off("scroll").on("scroll", this.loadMoreMemRow.bind(this));
-		this.searchInput.off("input").on("input", this.searchMatchRow.bind(this));
-		this.searchArea.off("click").on("click", this.focusSearchArea.bind(this));
-		this.finishButton.off("click").on("click", this.clickDone.bind(this));
-		this.clearButton.off("click").on("click", this.clearAllCheckRows.bind(this));
-		this.selectListArea.off("click").on("click", "span", this.searchCheckedRow.bind(this));
-		this.searchArea.children(".list").off("scroll").on("scroll", this.loadMoreMemLabels.bind(this));
+		this.selectAllBtn.addEventListener('click', this.selectAll.bind(this));
+		// this.mainContainer.parent().off("scroll").on("scroll", this.loadMoreMemRow.bind(this));
+		// this.searchInput.off("input").on("input", this.searchMatchRow.bind(this));
+		// this.searchArea.off("click").on("click", this.focusSearchArea.bind(this));
+		// this.finishButton.off("click").on("click", this.clickDone.bind(this));
+		// this.clearButton.off("click").on("click", this.clearAllCheckRows.bind(this));
+		// this.selectListArea.off("click").on("click", "span", this.searchCheckedRow.bind(this));
+		// this.searchArea.children(".list").off("scroll").on("scroll", this.loadMoreMemLabels.bind(this));
+	},
+
+
+	selectAll : function () {
+		var self = this;
+		self.currentRows.forEach(function(row) {
+			row.check(!self.isSelectAll);
+		});
+
+		self.isSelectAll = !self.isSelectAll;
+		self.selectAllBtn.textContent = self.isSelectAll ? 
+			$.i18n.getString("COMMON_SELECT_NONE") : $.i18n.getString("COMMON_SELECT_ALL");
+
+		if (isSelectAll) {
+
+		}
 	},
 
 	focusSearchArea : function () {
@@ -144,43 +199,84 @@ ObjectDelegateView = {
 	}, 
 
 	addRowElement : function (type, rowData) {
-		rowData = rowData || {};
-		rowData.isSelectedAll = this.isSelectedAllMember;
-		var rowElement = ObjectCell.factory(type, rowData);
+		var rowElement = document.createElement("object-cell-row");
+		rowElement.type = type;
 
 		switch (type) {
-			case "Default" :
-				this.defaultRow = rowElement;
-				rowElement.bindEvent(this.clearAllCheckRows.bind(this));
+			case "Default":
+				rowElement.name = $.i18n.getString("COMMON_SELECT_ALL");
+				rowElement.imageUrl = 'images/common/others/select_empty_all_photo.png';
 				break;
-			case "Favorite" :
-				this.favParentRow = rowElement;
-				rowElement.bindEvent(this.toggleFavSubRows.bind(this));
+			case "Member":
+				rowElement.name = rowData.nk.replaceOriEmojiCode();
+				rowElement.imageUrl = rowData.aut ? rowData.aut : "images/common/others/empty_img_personal_xl.png";
+				this.currentRows.push(rowElement);
+				
 				break;
-			case "Member" :
-				rowElement.bindEvent(this.checkThisMember.bind(this));
-				this.memberRows.push(rowElement);
+			case "Branch": 
+				rowElement.name = rowData.bn;
+				rowElement.imageUrl = 'images/common/others/select_empty_all_photo.png';
+				rowElement.expand = true;
+				rowElement.info = $.i18n.getString("COMPOSE_N_MEMBERS", rowData.cnt) + 
+					" " + $.i18n.getString("COMPOSE_N_MEMBERS", rowData.cl.length);
+
+				this.currentRows.push(rowElement);
+
+				// rowElement.name = 
+		// 		rowElement.bindEvent(this.checkThisMember.bind(this));
+		// 		this.memberRows.push(rowElement);
 				break;
-			case "ParentBranch" :
-				rowElement.bindEvent(this.selectChildBranch.bind(this));
-				this.branchRows.push(rowElement);
-				break;
-			case "ChildBranch" :
-				rowElement.bindEvent(this.checkThisBranch.bind(this));
-				this.branchRows.push(rowElement);
-				break;
-			case "SelectAllTitle" :
-				if (rowData.type == "group") {
-					rowElement.bindEvent(this.selectAllBranch.bind(this));
-					this.allBranchChxbox = rowElement;
-				} else {
-					rowElement.bindEvent(this.selectAllMember.bind(this));
-					this.allMemberChkbox = rowElement;
-				}
 		}
-		// rowElement.bindEvent(this.doSomething.bind(this));
-		this.mainContainer.append(rowElement.html);
-		if (type == "ParentBranch") this.mainContainer.append("<hr color='#F3F3F3'>");
+
+		// rowElement.addEventListener("click", e => {
+		// 	var target = e.delegateTarget;
+			
+		// });
+
+		if (type == 'Default') {
+			this.basicSelect.appendChild(rowElement)
+		} else {
+			this.mainContainer.appendChild(rowElement);
+		}
+		// rowData = rowData || {};
+		// rowData.isSelectedAll = this.isSelectedAllMember;
+		// var rowElement = ObjectCell.factory(type, rowData);
+
+		// switch (type) {
+		// 	case "Default" :
+		// 		this.defaultRow = rowElement;
+		// 		// rowElement.bindEvent(this.clearAllCheckRows.bind(this));
+		// 		break;
+		// 	case "Favorite" :
+		// 		this.favParentRow = rowElement;
+		// 		rowElement.bindEvent(this.toggleFavSubRows.bind(this));
+		// 		break;
+		// 	case "Member" :
+		// 		rowElement.bindEvent(this.checkThisMember.bind(this));
+		// 		this.memberRows.push(rowElement);
+		// 		break;
+		// 	case "ParentBranch" :
+		// 		rowElement.bindEvent(this.selectChildBranch.bind(this));
+		// 		this.branchRows.push(rowElement);
+		// 		break;
+		// 	case "ChildBranch" :
+		// 		rowElement.bindEvent(this.checkThisBranch.bind(this));
+		// 		this.branchRows.push(rowElement);
+		// 		break;
+		// 	case "SelectAllTitle" :
+		// 		// console.log(rowElement)
+		// 		// console.log(rowData.type)
+		// 		if (rowData.type == "group") {
+		// 			rowElement.bindEvent(this.selectAllBranch.bind(this));
+		// 			this.allBranchChxbox = rowElement;
+		// 		} else {
+		// 			rowElement.bindEvent(this.selectAllMember.bind(this));
+		// 			this.allMemberChkbox = rowElement;
+		// 		}
+		// }
+
+		// // rowElement.bindEvent(this.doSomething.bind(this));
+		// if (type == "ParentBranch") this.mainContainer.append("<hr color='#F3F3F3'>");
 	},
 
 	makeMemberList : function () {
@@ -254,6 +350,7 @@ ObjectDelegateView = {
 	},
 
 	selectAllMember : function () {
+		console.log('fffff')
 		this.isSelectedAllMember = !this.isSelectedAllMember;
 		this.checkedMems = {};
 
@@ -371,7 +468,8 @@ ObjectDelegateView = {
 
 	searchMatchRow : function (e) {
 		var target = $(e.target);
-		var searchText = target.text().toLowerCase();
+		var searchText = target.val().toLowerCase();
+		console.log(searchText)
 		this.visibleMemNum = 0;
 		if (searchText.length > 0) {
 			this.matchList = [];
@@ -454,9 +552,6 @@ ObjectDelegateView = {
 			}
 		}
 
-		// 改變UI選擇對象的數字
-		this.selectNumElement.html(totalNum);
-
 		// 判斷被勾選的群組數量是否等於全體群組數量，有則全選鍵勾選
 		if (!$.isEmptyObject(this.allBranchChxbox)) {
 			if (Object.keys(this.checkedBranches).length == this.branchRows.length) {
@@ -489,7 +584,7 @@ ObjectDelegateView = {
 		}
 	
 		if (this.mainPage.find(".obj-content").hasClass("on-search")) {
-			this.searchInput.html("").trigger("input").focus();
+			this.searchInput.val("").trigger("input").focus();
 		}
 
 		this.setHeight();
@@ -550,7 +645,7 @@ ObjectCell.prototype = {
 		var bindElement;
 
 		if (rowType == "SelectAllTitle") {
-			bindElement = objCell.html.find(".obj-cell-subTitle-chk");
+			bindElement = objCell.html.find("span");
 		} else if (rowType == "ParentBranch" || rowType == "Favorite") {
 			bindElement = objCell.html.find(".subgroup-parent");
 		} else {
@@ -566,6 +661,11 @@ ObjectCell.prototype = {
 					$(this).find(".img").toggleClass("chk");
 					objCell.isChecked = !objCell.isChecked;
 					ObjectDelegateView.updateStatus();
+				}
+
+				if (rowType == "SelectAllTitle") {
+					bindElement.text(objCell.isChecked ? 
+						$.i18n.getString("COMMON_SELECT_NONE") : $.i18n.getString("COMMON_SELECT_ALL"))
 				}
 			});
 		} else {
@@ -600,10 +700,23 @@ ObjectCell.factory = function (type, rowData) {
 }
 
 ObjectCell.Default = function (rowData) {
-	this.html = $("<div class='obj-cell all'><div class='obj-cell-chk'><div class='img " + ((rowData.isObjExist) ? "" : "chk") 
-		+ "'></div></div><div class='obj-cell-user-pic'><img src='images/common/others/select_empty_all_photo.png' " 
-		+ "style='width:60px'/></div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" 
-        + $.i18n.getString("COMMON_SELECT_ALL") + '</div></div>');
+	this.html = `
+		<div class='obj-cell all'>
+			<div class='obj-cell-chk'>
+				<div class='img " + ${(rowData.isAnyObjChecked) ? "" : "chk"} ></div>
+			</div>
+			<div class='obj-cell-user-pic'>
+				<img src='images/common/others/select_empty_all_photo.png' />
+			</div>
+			<div class='obj-cell-subgroup-data'>
+				<div class='obj-user-name'>${$.i18n.getString("COMMON_SELECT_ALL")}</div>
+			</div>
+		</div>
+	`	
+	// this.html = $("<div class='obj-cell all'><div class='obj-cell-chk'><div class='img " + ((rowData.isAnyObjChecked) ? "" : "chk") 
+	// 	+ "'></div></div><div class='obj-cell-user-pic'><img src='images/common/others/select_empty_all_photo.png' " 
+	// 	+ "/></div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" 
+ //        + $.i18n.getString("COMMON_SELECT_ALL") + '</div></div>');
 	this.isSelectAll = false;
 	this.isChecked = true;
 	this.isDefault = true;
@@ -614,7 +727,7 @@ ObjectCell.Default = function (rowData) {
 ObjectCell.Favorite = function () {
 	this.html = $("<div class='subgroup-row fav-parent'><div class='subgroup-parent'>"
 		+ "<div class='obj-cell fav'><div class='obj-cell-chk'><div class='img'></div></div>" 
-		+ "<div class='obj-cell-user-pic'><img src='images/common/others/empty_img_favor.png' style='width:60px'/>"
+		+ "<div class='obj-cell-user-pic'><img src='images/common/others/empty_img_favor.png' />"
 		+ "</div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" + $.i18n.getString("COMMON_FAVORIATE") 
 		+ "</div></div></div><div class='obj-cell-arrow'></div></div><div class='folder'></div></div>");
 
@@ -639,7 +752,7 @@ ObjectCell.ParentBranch = function (rowData) {
 	self.html = $("<div class='subgroup-row'><div class='subgroup-parent'>"
 		+ "<div class='obj-cell subgroup branch' data-bl='" + thisBranch.bi + "'>"
 		+ "<div class='obj-cell-chk'><div class='img " + ((thisBranch.chk) ? "chk" : "") + "'></div></div>" 
-		+ "<div class='obj-cell-user-pic'><img src='images/common/others/select_empty_all_photo.png' style='width:60px'/>"
+		+ "<div class='obj-cell-user-pic'><img src='images/common/others/select_empty_all_photo.png' />"
 		+ "</div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" + this.name 
 		+ "</div></div></div><div class='obj-cell-arrow'></div></div><div class='folder'></div></div>");
 	self.isSelectAll = false;
@@ -683,8 +796,6 @@ ObjectCell.ParentBranch = function (rowData) {
 // 全選欄位
 ObjectCell.SelectAllTitle = function (rowData) {
 	var titleText = "";
-	var objCellHtml = (rowData.isDisplayedChkbox) ? ("<div class='obj-cell-subTitle-chk'><div class='img'></div>"
-		+ "<div class='select'>" + $.i18n.getString("COMMON_SELECT_ALL") + "</div></div>") : "";
 
 	switch (rowData.type) {
 		case "group" :
@@ -696,8 +807,12 @@ ObjectCell.SelectAllTitle = function (rowData) {
 	}
 
 	this.isSelectAll = true;
-	this.html = $("<div class='obj-cell-subTitle " + rowData.type + "' data-chk='false'>"
-		+  objCellHtml + "<div class='text'>" + titleText + "</div></div>");
+
+	this.html = $(`<div class='obj-select-all ${rowData.type}' >
+		<label>${titleText}</label>
+		<span>${$.i18n.getString("COMMON_SELECT_ALL")}</span>
+	</div>`);
+
 	this.isChecked = false;
 
 	this.enable = true;
@@ -710,7 +825,7 @@ ObjectCell.FavBranch = function (rowData) {
 	this.name = favBranchData.fn.replaceOriEmojiCode();
 	this.html = $('<div class="obj-cell ' + ((rowData.isSubRow) ? "_2" : "") + ' fav-branch" data-gu="' + 
 		   favBranchData.fi + '"><div class="obj-cell-chk"><div class="img ' + ((favBranchData.chk) ? "chk" : "") +
-		   '"></div></div><div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
+		   '"></div></div><div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" /></div>' +
            '<div class="obj-cell-subgroup-data">' + 
                	'<div class="obj-user-name">' + favBranchData.fn.replaceOriEmojiCode() + '</div>' +
                 '<div class="obj-user-title"></div></div>' +
@@ -726,7 +841,7 @@ ObjectCell.ChildBranch = function (rowData) {
 	this.name = thisBranch.bn.replaceOriEmojiCode();
 	this.html = $('<div class="obj-cell ' + ((rowData.isSubRow) ? "_2" : "") + ' branch" data-bl="' + 
 		   thisBranch.bi + '"><div class="obj-cell-chk"><div class="img ' + ((thisBranch.chk) ? "chk" : "") + '"></div></div>' +
-           '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
+           '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" ></div>' +
            '<div class="obj-cell-subgroup-data">' + 
                	'<div class="obj-user-name">' + thisBranch.bn.replaceOriEmojiCode() + '</div>' +
                 '<div class="obj-user-title"></div></div>' +
@@ -741,13 +856,13 @@ ObjectCell.Member = function (rowData) {
 	var thisMember = rowData.thisMember;
 	var memberImg = (thisMember.aut) ? thisMember.aut : "images/common/others/empty_img_personal_xl.png";
 	var addChkWord = (thisMember.chk || rowData.isSelectedAll) ? "chk" : "";
-	var isDisableOnAlreadyChecked = ObjectDelegateView.isDisableOnAlreadyChecked
+	// var isDisableOnAlreadyChecked = ObjectDelegateView.isDisableOnAlreadyChecked
 	this.id = thisMember.gu;
 	this.name = thisMember.nk.replaceOriEmojiCode();
 	this.html = $('<div class="obj-cell ' + ((rowData.isSubRow) ? "_2" : "") + ' mem" data-gu="' + thisMember.gu+'">' +
            '<div class="obj-cell-chk"><div class="img ' + addChkWord + '"></div></div>' +
            '<div class="obj-cell-user-pic namecard" data-gu="' + thisMember.gu + '">' + 
-           	    '<img src="' + memberImg + '" style="width:60px"/></div>' +
+           	    '<img src="' + memberImg + '" /></div>' +
            '<div class="obj-cell-user-data ' + ((thisMember.bn && thisMember.bn.length > 0) ? "extra" : "") +'">' + 
                 '<div class="obj-user-name">' + this.name + '</div>' +
                 '<div class="obj-user-title">' + ((thisMember.bn) ? thisMember.bn : "") + '</div>' +
@@ -756,6 +871,54 @@ ObjectCell.Member = function (rowData) {
 	this.isSelectAll = false;
 	this.isChecked = (thisMember.chk || rowData.isSelectedAll);
 	this.enable = thisMember.enable;
-
-	console.log(this.enable)
 }
+
+var objectCellRow = Object.create(HTMLElement.prototype);
+
+objectCellRow.attachedCallback  = function () {
+	this.imageUrl = this.imageUrl || 'images/common/others/empty_img_personal_xl.png';
+	this.isChecked = false;
+    this.innerHTML = `
+		<div class='obj-cell-chk'>
+			<div class='img'></div>
+		</div>
+		<div class="obj-cell-user-pic namecard" data-gu="">
+			<img src="${this.imageUrl}" />
+		</div>
+		<div class='obj-cell-user-data'>
+			<div class="obj-user-name">${this.name}</div>
+			<div class="obj-user-title">
+				${this.info ? this.info : ""}
+			</div>
+		</div>
+		${this.expand ? "<div class='obj-cell-arrow'></div>" : ""}
+    `;
+
+    this.querySelector('div.obj-cell-chk>div.img').addEventListener('click', this.click.bind(this))
+}
+
+objectCellRow.click = function (e) {
+	var checkBox = e.target;
+	checkBox.classList.toggle('chk');
+
+	this.isChecked = !this.isChecked;
+}
+
+objectCellRow.check = function (isChecked) {
+	var checkBox = this.querySelector('div.obj-cell-chk>div.img');
+
+	if (isChecked) {
+		checkBox.classList.add('chk');
+	} else {
+		checkBox.classList.remove('chk');
+	}
+
+	this.isChecked = isChecked;
+}
+
+
+document.registerElement('object-cell-row', {
+    prototype: objectCellRow
+});
+
+

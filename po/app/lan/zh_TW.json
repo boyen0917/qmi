@@ -246,6 +246,7 @@
 	"COMMON_NEXT"  					: "下一步",
 	"COMMON_SELECT"  						: "選擇",
 	"COMMON_SELECT_ALL"  					: "全選",
+	"COMMON_SELECT_NONE"					: "取消全選",
 	"COMMON_MEMBER"  						: "成員",
 	"COMMON_EDIT"  						: "編輯",
 	"COMMON_DONE" 						: "完成",
