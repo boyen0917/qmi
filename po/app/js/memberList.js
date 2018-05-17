@@ -12,7 +12,7 @@ showMemListPage = function( parentDom, title, list, onPageChanged, onDone ){
 	if( $("#page-select-object").length>0 ){
 		showMemListPageDelegate( title, list, onPageChanged, onDone );
 	} else {
-		$('<div>').load('layout/memberList.html?v2.3.1.0',function(){
+		$('<div>').load('layout/memberList.html?v2.4.0.1',function(){
 			parentDom.append( $(this).find("#page-select-object") );
 			showMemListPageDelegate( title, list, onPageChanged, onDone );
 		});
