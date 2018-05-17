@@ -144,7 +144,7 @@
 	"FEED_DELETE" : "刪除",
 	"FEED_COPY" : "複製",
 	"FEED_COPY_CONTENT" : "複製內容",
-	"FEED_COPY_CONTENT_SUCC" : "成功複製內容",
+	"FEED_COPY_CONTENT_SUCC" : "已複製到剪貼簿",
 	"FEED_CALENDAR" : "加入行事曆",
 	"FEED_ADD_AUDIENCE" : "新增發佈對象",
 	"FEED_UNTOP_AVAILABLE" : "目前尚未有任何置頂",

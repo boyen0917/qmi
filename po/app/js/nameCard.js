@@ -940,29 +940,46 @@
 	                .find(".sip-desktop").html(sipDesktop + "<p>" + $.i18n.getString("USER_PROFILE_SIP_NUMBER2") + "</p>").end()
 	                .find(".onoffswitch").hide();
 
+	    userInfoArea.find("div.other-info-row").off("click").on("click", function (e) {
+            // e.preventDefault();
+            // e.stopPropagation();
+
+            var delegateTarget = e.delegateTarget;
+            var fieldText = delegateTarget.querySelector('div.contact').firstChild.textContent;
+
+            if (fieldText != noDataStr && fieldText != '******') {
+            	copyTextToClipboard(fieldText);
+            }
+        });
+
 	    if (gu == this_gu) {
 	        userInfoArea.find(".onoffswitch").show().end()
 	                    .find("#birthOnOff").attr("checked", !userData.mkb).end()
 	                    .find("#emailOnOff").attr("checked", !userData.mke).end()
 	                    .find("#mobileOnOff").attr("checked", !userData.mkp);
 
-	        userInfoArea.find('.onoffswitch input[type=checkbox]').off('change').on('change', function(e) {
+	        userInfoArea.find('.onoffswitch').off('click').on('click', function(e) {
+          		e.preventDefault();
+          		e.stopPropagation();
 
+          		var checkbox = $(this).find('input');
+          		var switchName = checkbox.attr('id');
 	            var userObj = {
 	                gu : userData.gu,
 	                info : {}
 	            };
-	            var switchName = e.target.id;
+
+	            checkbox.attr("checked", !checkbox.is(':checked'))
 
 	            switch (switchName) {
 	                case "birthOnOff":
-	                    userObj.info.mkb = !$(this).is(':checked');
+	                    userObj.info.mkb = !checkbox.is(':checked');
 	                    break;
 	                case "emailOnOff":
-	                    userObj.info.mke = !$(this).is(':checked');
+	                    userObj.info.mke = !checkbox.is(':checked');
 	                    break;
 	                case "mobileOnOff":
-	                    userObj.info.mkp = !$(this).is(':checked');
+	                    userObj.info.mkp = !checkbox.is(':checked');
 	                    break;
 	            }
 	            
