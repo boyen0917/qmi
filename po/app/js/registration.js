@@ -175,6 +175,7 @@ appInitial = function(needUpdate){
 		// cns.debug("[checkLoginReady]");
 		var page = $("#page-registration");
 		var activeTab = page.find(".login-tab.active");
+		
 		if( "phone" == activeTab.attr("data-type") ){
 			var pwdInput = $(".login-ld-password input");
 			var phoneInput = $(".login-ld-phone input");
@@ -191,6 +192,7 @@ appInitial = function(needUpdate){
 				var loginData = $.lStorage("_loginRemember");
 				loginData.countrycode = countrycode;
 				$.lStorage("_loginRemember", loginData);
+				console.log($.lStorage("_loginRemember"))
 			} else {
 				$("#page-registration .login").removeClass("login-ready");
 			}

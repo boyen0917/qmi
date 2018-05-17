@@ -70,6 +70,7 @@
 	"LOGIN_ACCOUNT_PHONE" : "Enter phone number",
 	"LOGIN_PASSWORD" :	"Password",
 	"LOGIN_REMEMBER_ACCOUNT" :	"Remember Account",
+	"LOGIN_REMEMBER_PASSWORD" :	"Remember Password",
 	"LOGIN_FORGET_PASSWORD" :	"Forgot Password？",
 	"LOGIN_SAVE_ACCOUNT_TITLE" :	"Account",
 	"LOGIN_SWITCH_ACCOUNT" :	"Switch Account",
