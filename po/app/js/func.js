@@ -4137,16 +4137,7 @@ composeSend = function (this_compose){
     
     }
 
-    // var hashtagList = composeContent.extractHashTag();
-
-    // hashtagList.forEach(function(hashtag) {
-    //     body.ml.push({
-    //         "k": hashtag,
-    //         "tp": 29
-    //     });
-    // });
-
-    tmpElement.innerHTML = composeContent;
+    tmpElement.textContent = composeContent.replace(/&amp;/g, "&").replace(/&nbsp;/g, " ");
 
     //任務 投票之類的 因為是可預測的 又是單一的ml 就在這邊處理
     switch(ctp){
