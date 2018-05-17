@@ -852,6 +852,7 @@
 }
 .ca-sub-area.active{
 	display: block;
+	text-align: -webkit-center;
 }
 
 
@@ -1260,8 +1261,7 @@
 	border-bottom: #efefef 1px solid;
 	height: 40px;
 	line-height: 40px;
-	padding: 0 10%;
-	width: 80%;
+	width: -webkit-calc( 100% - 160px );
 }
 .ca-qrcode-area .qr_switch_row > div{
 	display: inline-block;
