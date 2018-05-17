@@ -498,15 +498,15 @@ updateLanguage = function( lanPath ){
 	var deferred = $.Deferred();
 
 	// 避免pending
-	setTimeout(function() {
-		QmiGlobal.appLangDef.resolve(false);
-	}, 1000);
+	// setTimeout(function() {
+	// 	QmiGlobal.appLangDef.resolve(false);
+	// }, 1000);
 
-	QmiGlobal.appLangDef.done(function(isSuccess) {
-		if(isSuccess) {
-			deferred.resolve();
-			return;
-		}
+	// QmiGlobal.appLangDef.done(function(isSuccess) {
+	// 	if(isSuccess) {
+	// 		deferred.resolve();
+	// 		return;
+	// 	}
 
 		$.i18n.load(lanPath, function(){
 
@@ -514,7 +514,7 @@ updateLanguage = function( lanPath ){
 			console.log("updateLanguage");
 			deferred.resolve();
 		});
-	})
+	// })
 	return deferred.promise();
 }
 

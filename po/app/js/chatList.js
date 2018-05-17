@@ -589,10 +589,10 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
 		return;
 	}
 
-	if ( !groupData.guAll.hasOwnProperty(data.meta.gu) ){
-		cns.debug("[setLastMsgContent] "+data.meta.gu+ "does not exist");
-		return;	
-	}
+	// if ( !groupData.guAll.hasOwnProperty(data.meta.gu) ){
+	// 	cns.debug("[setLastMsgContent] "+data.meta.gu+ "does not exist");
+	// 	return;	
+	// }
 
 	setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, cnt);
 }
@@ -600,13 +600,19 @@ function setLastMsgContent( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen )
 function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomOpen, groupData, unreadCnt ){
 	var 
 	text = "",
-	mem = groupData.guAll[data.meta.gu];
+	groupMemList = groupData.guAll,
+	mem = groupMemList[data.meta.gu],
+	dataTp = data.ml[0].tp;
 
-	if( null==mem ){
+
+
+	if( null==mem && dataTp != 22){
 		cns.debug("[setLastMsgContentPart2] mem null");
 		return;
 	}
-	var name = mem.nk;
+
+	var name = dataTp != 22 ? mem.nk : "";
+	
 	if( null==data.ml || data.ml.length<=0 ){
 		// cns.debug("[setLastMsgContentPart2] data.ml null");
 		return;
@@ -616,7 +622,6 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		name = $.i18n.getString("COMMON_YOU");
 	}
 
-	var dataTp = data.ml[0].tp;
 	switch(dataTp){
 		case 5: //sticker
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_STICKER", name);
@@ -635,11 +640,11 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			break;
 		case 22: //sys
 			var actMemName = "unknown";
-			if( data.ml[0].t && groupData.guAll.hasOwnProperty(data.ml[0].t) ){
-				var actMem = groupData.guAll[data.ml[0].t];
+			if( data.ml[0].t && groupMemList.hasOwnProperty(data.ml[0].t) ){
+				var actMem = groupMemList[data.ml[0].t];
 				if( actMem ) actMemName = actMem.nk;
 			}
-			if( null==mem ) return;
+			// if( null==mem ) return;
 			if(1==data.ml[0].a){
 				text = $.i18n.getString("CHAT_SOMEONE_LEAVE", actMemName );
 			} else {
@@ -655,6 +660,18 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 			break;
 		case 26:
 			text = $.i18n.getString("CHAT_SOMEONE_SEND_FILE", name);
+			break;
+
+		case 28: //assign&dismiss chatroom admin
+			var invoker = (groupMemList[data.ml[0].i] || {}).nk;
+			var targetUser = (groupMemList[data.ml[0].t] || {}).nk;
+			var systemMsg = "";
+			if (data.ml[0].a) {
+				text = $.i18n.getString("CHAT_CHATROOM_SOMEONE_ASSIGN_ADMIN", invoker, targetUser);
+			} else {
+				text = $.i18n.getString("CHAT_CHATROOM_SOMEONE_DEMOTE_SOMEONE", invoker, targetUser);
+			}
+
 			break;
 		case 231: //群組通話
 			if(isMe){
@@ -711,7 +728,7 @@ function setLastMsgContentPart2( giTmp, ciTmp, table, data, isShowAlert, isRoomO
 		try{
 			cns.debug( groupData.gn.parseHtmlString()+" - "+mem.nk, text );
 			var cnTmp = data.cn||"";
-			if( data.meta.ct>=login_time && dataTp != 22){
+			if( data.meta.ct>=login_time && dataTp != 22 && dataTp != 28){
 				
 				try {QmiGlobal.showNotification ({
 					title: mem.nk+" ("+groupData.gn.parseHtmlString()+" - "+cnTmp.parseHtmlString()+")",
