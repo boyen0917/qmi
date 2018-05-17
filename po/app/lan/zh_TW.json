@@ -399,6 +399,7 @@
 	"USER_PROFILE_DELETE_MEMBER" : "刪除成員",
 	"USER_PROFILE_DELETE_MEMBER_CONFIRM" : "刪除此成員？",
 	"USER_PROFILE_DELETE_MEMBER_DESC" : "被刪除的成員將無法檢視該團體，您可以從管理網頁恢復該成員權限。",
+	"USER_PROFILE_DISABLE_CHANGE_NAME": "付費團體欲修改姓名、職稱、電子郵件、手機、公司電話、分機、SIP桌上分機，請由後台進行操作",
 
 	"OFFICIAL_ABOUT" : "關於",
 	"OFFICIAL_CHAT" : "聊天",
@@ -605,5 +606,6 @@
 	"SYSTEM_ANNOUNCEMENT_EMPTY": "目前尚無公告",
 	"INTERGRATIONS_READMORE": "更多",
 
-	"ACCOUNT_MANAGEMENT_FILE_DELETED": "檔案過期或超過儲存空間上限，已失效。"
+	"ACCOUNT_MANAGEMENT_FILE_DELETED": "檔案過期或超過儲存空間上限，已失效。",
+
 }
