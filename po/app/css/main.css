@@ -5275,6 +5275,102 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 	cursor: pointer;
 }
 
+#page-object div.branchList {
+    background: white;
+    display: none;
+}
+
+#page-object div.branchList>div.dropdown-menu {
+    padding-left: 15px;
+    padding-top: 20px;
+}
+
+#page-object div.branchList>div.dropdown-menu div {
+    display: inline-block;
+}
+
+#page-object div.branchList>div.dropdown-menu>div.drop-button {
+    cursor: pointer;
+}
+
+#page-object div.branchList>div.dropdown-menu>div.drop-button:after {
+    content: "";
+    background-image: url("../images/icon/icon_arrow_black_down.png");
+    background-size: 12px;
+    width: 12px;
+    height: 12px;
+    float: right;
+    margin-left: 20px;
+    margin-top: 15px;
+}
+
+#page-object div.branchList>div.dropdown-menu div.current-branch>div {
+    color: black;
+    font-weight: bold;
+}
+
+#page-object div.branchList>div.dropdown-menu div.current-branch>p {
+    margin: 0;
+    color: gray;
+    font-size: 14px;
+}
+
+#page-object div.branchList>div.dropdown-menu>button:before {
+    content: "\2716";
+    color: white;
+    font-size: 14px;
+}
+
+#page-object div.branchList>div.dropdown-menu>button {
+    width: 18px;
+    height: 18px;
+    border: 0;
+    border-radius: 18px;
+    padding: 5px;
+    background: #ccc;
+    cursor: pointer;
+    float: right;
+    margin-right: 30px;
+    outline: none;
+}
+
+#page-object div.branchList>div.dropdown-menu>ul {
+    display: none;
+}
+
+#page-object div.branchList>div.dropdown-menu>ul.open {
+    display: block;
+}
+
+#page-object div.branchList>ul.breadcrumb {
+    list-style: none;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    -webkit-padding-start: 15px;
+}
+#page-object div.branchList>ul.breadcrumb li {
+    display: inline;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#page-object div.branchList>ul.breadcrumb li+li a:after {
+    padding: 8px;
+    color: #aaa;
+    content: "\003e";
+}
+
+#page-object div.branchList>ul.breadcrumb li a {
+    color: #aaa;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#page-object div.branchList>ul.breadcrumb li a:hover,
+#page-object div.branchList>ul.breadcrumb li+li a:hover:after {
+    color: black;
+}
+
 #page-object div.obj-cell-area>div.obj-select-all {
 	margin-top: 30px;
     margin-bottom: 10px;
@@ -5294,9 +5390,10 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
     margin-right: 22px;
 }
 
+
+
 /* content */
 .obj-content {
-	background: #d2d2d2;
 	width: 100%;
 	overflow: hidden;
 }
@@ -5532,6 +5629,7 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position-y: 50%;
+	cursor: pointer;
 }
 .obj-cell-chk .img.chk {
 	background: url("../images/common/icon/button_checkbox_blue_done.png");
@@ -5558,6 +5656,7 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 	width: 50%;
 	display: inline-block;
 	margin-left: 10px;
+	cursor: default;
 }
 
 .obj-cell-user-data.extra .obj-user-name {

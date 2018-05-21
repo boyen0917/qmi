@@ -3160,6 +3160,9 @@ showObjectDelegate = function( thisCompose, thisComposeObj, option, onDone ){
         if (branchMap[id].lv == 1) {
             branchMap['root'].cl.push(id);
         };
+
+        branchMap[id].bi = id;
+        branchMap[id].gul = [];
     });
 
     $.mobile.changePage("#page-object", {transition: "slide"});
