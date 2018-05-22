@@ -1243,19 +1243,19 @@ $(function(){
 		}
 	});
 	
-	$(".st-filter-hide").click( function(e){
-		var this_dom = $(this);
-		var parent = this_dom.parent();
-		e.stopPropagation();
-		if( this_dom.hasClass("left") ){
-			parent.animate({scrollLeft: 0}, 'fast');
-			this_dom.siblings(".right").show();
-		} else {
-			parent.animate({scrollLeft: parent.width()}, 'fast');
-			this_dom.siblings(".left").show();
-		}
-		this_dom.hide();
-	});
+	// $(".st-filter-hide").click( function(e){
+	// 	var this_dom = $(this);
+	// 	var parent = this_dom.parent();
+	// 	e.stopPropagation();
+	// 	if( this_dom.hasClass("left") ){
+	// 		parent.animate({scrollLeft: 0}, 'fast');
+	// 		this_dom.siblings(".right").show();
+	// 	} else {
+	// 		parent.animate({scrollLeft: parent.width()}, 'fast');
+	// 		this_dom.siblings(".left").show();
+	// 	}
+	// 	this_dom.hide();
+	// });
 
 /*########################################################################################################################
 

@@ -2351,7 +2351,11 @@ div#page-group-main div.gm-header-left:before {
     width: calc(100vw - 250px);
 	z-index: 10;
 	-webkit-box-shadow: 0px 2px 4px 0px rgba(190, 190, 190, 0.4);
+	overflow: scroll;
 }
+
+.st-filter-area::-webkit-scrollbar {width: 0; height: 0}
+
 .st-filter-area.fixed {
 	position: fixed;
 	top: 44px;
