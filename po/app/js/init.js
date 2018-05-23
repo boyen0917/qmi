@@ -1,4 +1,4 @@
-// version 2.4.0.1 2
+// version 2.4.0.1 - 3
 var ui;
 var at;
 var gi;
@@ -21,10 +21,8 @@ var base_url = function() {
 	switch(true) {
 		case match("qawp.qmi.emome.net"):
 			return "https://qaap.qmi.emome.net/";
-			break;
 		case match("qmi17.mitake.com.tw"):
 			return "https://qmi17.mitake.com.tw/";
-			break;
 		default:
 			return "https://ap.qmi.emome.net/";
 	}
@@ -39,9 +37,9 @@ var base_url = "https://qmi17.mitake.com.tw/";
 // 先檢查是否為桌機版
 var nwGui = function() {
 	try {
-		return require('nw.gui')
+		return require('nw.gui');
 	} catch(e) {
-		console.error("非桌機版")
+		console.error("非桌機版");
 		return null;
 	};
 }();
