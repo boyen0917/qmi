@@ -1392,7 +1392,7 @@ appInitial = function(needUpdate){
 	initLandPage();
 
 	var logoClickCnt = 0;
-	$(".registration-logo").click(function(){
+	$("#registration-logo > img").click(function(){
 		logoClickCnt++;
 		if( logoClickCnt>=10 ){
 			logoClickCnt = 0;

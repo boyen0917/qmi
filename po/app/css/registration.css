@@ -12,11 +12,11 @@
 	margin-bottom: -webkit-calc( 50vh - 282px );
 }
 
-.registration-logo {
+#registration-logo {
     margin-bottom: 20px;
 }
 
-.registration-logo img {
+#registration-logo img {
 	width: 95px;
 	margin: 0 auto;
 }
@@ -26,7 +26,7 @@
 		margin-top: -webkit-calc( 50vh - 302px );
 		margin-bottom: -webkit-calc( 50vh - 262px );
 	}
-	.registration-logo img {
+	#registration-logo img {
 		width: 95px;
 	}
 }
@@ -37,7 +37,7 @@
 		margin-top: -webkit-calc( 50vh - 320px );
 		margin-bottom: -webkit-calc( 50vh - 280px );
 	}
-	.registration-logo img {
+	#registration-logo img {
 		width: 115px;
 	}
 }
@@ -48,7 +48,7 @@
 		margin-top: -webkit-calc( 50vh - 330px );
 		margin-bottom: -webkit-calc( 50vh - 300px );
 	}
-	.registration-logo img {
+	#registration-logo img {
 		width: 130px;
 	}
 }
