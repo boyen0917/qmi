@@ -586,6 +586,9 @@ QmiGlobal.appLangDef.done(function(){
 
 	//點擊已讀數顯示已未讀成員及時間
 	$(document).on("click", ".chat-cnt", function () {
+		// 群組聊天室，顯示成員數量
+		if (g_room.cpc <= 2) return;
+		
 		showChatReadUnreadList($(this));
 	});
 
@@ -1262,12 +1265,11 @@ function showChatCnt() {
 
 	if (null == g_room || null == g_room.cnt ) return;
 
-	var 
-	list = g_room.cnt,
-	index = Object.keys(g_room.cnt).length - 1,
-	data = list[index],
-	cnt = data.cnt,
-	elements = $(".chat-cnt");
+	var list = g_room.cnt;
+	var index = Object.keys(g_room.cnt).length - 1;
+	var data = list[index];
+	var cnt = data.cnt;
+	var elements = $("#chat-contents div.chat-cnt");
 
 	for (var i = 0; i < elements.length; i++) {
 		var dom = $(elements[i]);
@@ -1409,6 +1411,9 @@ function showMsg(object, bIsTmpSend) {
 	var isMe = ( object.meta.gu == g_group.gu );
 	var unSend = object.hasOwnProperty("notSend");
 
+	var table = $("<table></table>");
+	table.append($("<tr><td><div class='chat-cnt' data-t='" + time.getTime() + "'></div></td></tr>"));
+
 	//is me?
 	if (isMe) {
 		//right align
@@ -1416,8 +1421,7 @@ function showMsg(object, bIsTmpSend) {
 		div = $("<div class='chat-msg-right'></div>");
 		container.append(div);
 
-		var table = $("<table></table>");
-		table.append($("<tr><td><div class='chat-cnt' data-t='" + time.getTime() + "'></div></td></tr>"));
+		
 		var tr = $("<tr></tr>");
 		var td = $("<td></td>");
 		if (unSend) {
@@ -1494,8 +1498,6 @@ function showMsg(object, bIsTmpSend) {
 
 		subDiv.append(msgDiv);	//msg
 
-		table = $("<table></table>");
-		table.append( "<tr><td></td></tr>" );
 		table.append( "<tr><td><div class='chat-msg-time'>" + getFormatMsgTimeTag(time) + "</div></td></tr>" );
 		subDiv.append(table);
 

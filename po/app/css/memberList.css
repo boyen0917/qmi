@@ -24,6 +24,7 @@
 	border-left: white 1px solid;
 	position: fixed;
 	width: 100%;
+	cursor: pointer;
 }
 
 .tabObj-tab-area .tab{
