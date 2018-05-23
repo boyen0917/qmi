@@ -11,11 +11,10 @@ appInitial = function(needUpdate){
     	loginAction();
 
     } else if($.lStorage("_loginAutoChk") === true) {
-
-    	QmiGlobal.auth = $.lStorage("_loginData");
-    	loginAction();
-  
-
+    	if ($.lStorage("_loginData")) {
+    		QmiGlobal.auth = $.lStorage("_loginData");
+    		loginAction();
+    	}
 	} else if( window.location.hash !== "") {
 		// window.location = "index.html";
 		$.mobile.changePage("")
@@ -175,6 +174,7 @@ appInitial = function(needUpdate){
 		// cns.debug("[checkLoginReady]");
 		var page = $("#page-registration");
 		var activeTab = page.find(".login-tab.active");
+		
 		if( "phone" == activeTab.attr("data-type") ){
 			var pwdInput = $(".login-ld-password input");
 			var phoneInput = $(".login-ld-phone input");
@@ -236,11 +236,14 @@ appInitial = function(needUpdate){
 		}
 	});
 
-	$("#page-registration div.login-remember").click(function(){
+	$("#page-registration div.login-remember-account").click(function(){
 		var remember_chk = $(this).data("chk");
+		var rememberPassword = $(this).next()
 		if(remember_chk){
 			if( $(this).hasClass("landpage") ){
 				$(this).find("img").attr("src","images/registration/checkbox_none.png");
+				rememberPassword.find("img").attr("src","images/registration/checkbox_none.png");
+				rememberPassword.data("chk", false);
 			} else {
 				$(this).find("img").attr("src","images/common/icon/icon_check_gray.png");
 			}
@@ -266,8 +269,8 @@ appInitial = function(needUpdate){
 			$("body").fadeIn();
 		},100);
 		setTimeout(function(){
-			$("#page-registration div.login-remember img").attr("src","images/common/icon/icon_check_gray.png");
-			$("#page-registration div.login-remember").data("chk",false);
+			$("#page-registration div.login-remember-account img").attr("src","images/common/icon/icon_check_gray.png");
+			$("#page-registration div.login-remember-account").data("chk",false);
 			$(".login-remember-area").hide();
 			$(".login-default-area").show();
 			$(".login-change").hide();
@@ -324,7 +327,8 @@ appInitial = function(needUpdate){
 				QmiGlobal.auth = dataObj;
 
 				//自動登入儲存 有_loginData 有_loginAutoChk 才代表有選自動登入
-                if($(".login-auto").data("chk")) {
+                // if($(".login-auto").data("chk")) {
+                if ($("#page-registration div.login-remember-password").data("chk")) {
                 	$.lStorage("_loginData", QmiGlobal.auth);
                 	$.lStorage("_loginAutoChk", true);
                 } else {
@@ -365,17 +369,24 @@ appInitial = function(needUpdate){
 				$.lStorage("_loginAccount", phoneId);
 
     			//記錄帳號密碼
-    			if($("#page-registration div.login-remember").data("chk")){
+    			if($("#page-registration div.login-remember-account").data("chk")){
 					var _loginRemember = {};
 					_loginRemember.phone = phoneId;
 					_loginRemember.isMail = isMail;
 					// _loginRemember.password = password;
 					_loginRemember.countrycode = countrycode;
-					$.lStorage("_loginRemember",_loginRemember);
+
+					// 記住密碼
+					if ($("#page-registration div.login-remember-password").data("chk")) {
+						_loginRemember.password = password;
+					}
+
+					$.lStorage("_loginRemember", _loginRemember);
 				}else{
 					//沒打勾的話就清除local storage
 		    		localStorage.removeItem("_loginRemember");
 				}
+
 
 				loginAction();
 				
@@ -977,24 +988,28 @@ appInitial = function(needUpdate){
     	// popupShowAdjust("","註冊完成",true,false,[toGroupMenu]);
     });
 
-    $(".login-auto").click(function(){
-    	if($(".login-auto").data("chk")){
-    		// $(".login-auto").removeClass("login-auto-active");
+    $("#page-registration div.login-remember-password").click(function() {
+    	var rememberAccount = $(this).prev();
+
+    	if($(this).data("chk")){
     		if( $(this).hasClass("landpage") ){
 				$(this).find("img").attr("src","images/registration/checkbox_none.png");
+				// rememberAccount.find('img').attr("src","images/registration/checkbox_none.png");
     		} else {
 				$(this).find("img").attr("src","images/common/icon/icon_check_gray.png");
     		}
-    		$(".login-auto").data("chk",false);
+    		$(this).data("chk",false);
     	}else{
-    		// $(".login-auto").addClass("login-auto-active");
     		if( $(this).hasClass("landpage") ){
 				$(this).find("img").attr("src","images/registration/checkbox_check.png");
+				rememberAccount.find('img').attr("src","images/registration/checkbox_check.png");
+				rememberAccount.data("chk", true);
     		} else {
 				$(this).find("img").attr("src","images/common/icon/icon_check_gray_check.png");
     		}
-			$(".login-auto").data("chk",true);
+			$(this).data("chk",true);
     	}
+
     });
 
 
@@ -1353,12 +1368,14 @@ appInitial = function(needUpdate){
 	
 	initLandPage = function(){
 		//若local storage 有記錄密碼 就顯示
-		var rememberDom = $("#page-registration div.login-remember");
+		var rememberAccountDom = $("#page-registration div.login-remember-account");
+		var rememberPassword = $("#page-registration div.login-remember-password");
+
 		var rememberData = $.lStorage("_loginRemember");
 		if(rememberData){
 			//順便幫他打個勾
-			rememberDom.find("img").attr("src","images/registration/checkbox_check.png");
-			rememberDom.data("chk",true);
+			rememberAccountDom.find("img").attr("src","images/registration/checkbox_check.png");
+			rememberAccountDom.data("chk",true);
 			$(".login-remember-area").show();
 			$(".login-default-area").hide();
 			$(".login-change").show();
@@ -1372,21 +1389,28 @@ appInitial = function(needUpdate){
 			} else {
 				$(".login-ld-phone input").val( rememberData.phone );	//"(" + rememberData.countrycode + ")" + 
 			}
+
+			if (rememberData.password) {
+				$(".login-ld-password input").val( rememberData.password );
+				checkLoginReady();
+			}
 		} else {
 			// $("#page-registration .login-remember img").attr("src","images/common/icon/icon_check_gray.png");
-			rememberDom.data("chk", false);
+			rememberAccountDom.data("chk", false);
 			$(".login-remember-area").hide();
 			$(".login-default-area").show();
 			$(".login-change").hide();
 			$(".login-next").removeClass("login-next-adjust");
 
-			rememberDom.click();
+			rememberAccountDom.click();
 		}
 
 
 		if($.lStorage("_loginAutoChk")){
-			$(".login-auto").find("img").attr("src","images/registration/checkbox_check.png");
-	    	$(".login-auto").data("chk",true);
+			rememberPassword.find("img").attr("src","images/registration/checkbox_check.png");
+			rememberPassword.data("chk",true);
+			// $(".login-auto").find("img").attr("src","images/registration/checkbox_check.png");
+	  //   	$(".login-auto").data("chk",true);
 	    }
 	}
 	initLandPage();

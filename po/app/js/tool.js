@@ -164,7 +164,8 @@ reLogin = function(options) {
 		return;
 	}
 
-	localStorage.removeItem("_loginAutoChk");
+	// localStorage.removeItem("_loginAutoChk");
+	localStorage.removeItem("_loginData");
 	resetDB(options);
 	document.location = "index.html";
 }
