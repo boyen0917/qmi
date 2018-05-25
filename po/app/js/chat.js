@@ -545,6 +545,14 @@ QmiGlobal.appLangDef.done(function(){
 		$(".screen-lock").css("z-index",2000);
 	});
 
+	// 右鍵複製、轉傳
+	$("#chat-contents").on("contextmenu", '.chat-msg-bubble-left, .chat-msg-bubble-right', function (e) {
+		e.stopPropagation();
+		e.preventDefault();
+
+		// $(this).addClass("menu");
+	});
+
 	//點擊標題顯示聊天室成員
 	$("#header .title .text, #header .title .count").click(function () {
 		//防止連按

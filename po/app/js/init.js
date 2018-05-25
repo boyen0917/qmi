@@ -1387,9 +1387,30 @@ QmiGlobal.ModuleConstructor = function(args) {
             developGet: function() {
                 return thisData;
             }
-        }
-    }()
-}
+        };
+    }();
+
+    if(!args.handleEvent) {
+    	self.handleEvent = function() {
+		    try {
+		    	var self = this;
+		    	var veTpStr = getGroupVeIdTypeStr(event.type.split(":"+self.id+":").join(":"));
+
+		        if(typeof self[veTpStr] === "function") self[veTpStr]({
+		            dom: $(event.detail.elem),
+		            data: event.detail.data,
+		            evt: event
+		        });    
+		    } catch(e) {console.error("eventHandler error occured", e);}
+		    
+		    function getGroupVeIdTypeStr(evtTp) {
+		        var evtTpArr = evtTp.split(":");
+		        return evtTpArr[0] + evtTpArr[1].substring(0, 1).toUpperCase() + evtTpArr[1].substring(1);
+		    }
+		};
+    }
+
+};
 
 // singleton
 QmiGlobal.api = (function() {

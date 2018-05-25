@@ -495,10 +495,7 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 				isPublicApi: true,
 			});
 		}
-	},
-
-    handleEvent: eventHandler
-
+	}
 });
 
 
@@ -1033,28 +1030,21 @@ QmiGlobal.module.webview = new QmiGlobal.ModuleConstructor({
 
 	html: {
 		row: "<section><img src=\"images/common/icon/link.png\"><span></span></section>"
-	},
-
-	handleEvent: eventHandler
+	}
 });
 
+QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 
+	id: "module-chatMsgForward",
 
-function eventHandler() {
+	listArr: [
+		{id: "copy", textid: "FEED_COPY"},
+		{id: "forward", textid: "FEED_COPY"}
+	],
 
-    try {
-    	var self = this;
-    	var veTpStr = getGroupVeIdTypeStr(event.type.split(":"+self.id+":").join(":"));
+	init: function() {
+		var self = this;
+		
 
-        if(typeof self[veTpStr] === "function") self[veTpStr]({
-            dom: $(event.detail.elem),
-            data: event.detail.data,
-            evt: event
-        });    
-    } catch(e) {console.error("eventHandler error occured", e)}
-    
-    function getGroupVeIdTypeStr(evtTp) {
-        var evtTpArr = evtTp.split(":");
-        return evtTpArr[0] + evtTpArr[1].substring(0, 1).toUpperCase() + evtTpArr[1].substring(1);
-    }
-}
+	}
+});
