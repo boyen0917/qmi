@@ -165,6 +165,8 @@ function removeGroup(thisGi, msg){
 	}
 
 	delete QmiGlobal.groups[thisGi];
+	// 如果有就刪除
+	delete QmiGlobal.companyGiMap[thisGi];
 
 	if (Object.keys( QmiGlobal.groups ).length == 0) {
         $.mobile.changePage("#page-group-menu");
@@ -181,7 +183,9 @@ function removeGroup(thisGi, msg){
 		else
 			clearChatIDB(thisGi);
 
-		popupShowAdjust("", (msg || $.i18n.getString("GROUP_X_DELETED", rmGroupGn)),true); 
+		// false 為 不跳popup -> removeCompany
+		if(msg !== false)
+			popupShowAdjust("", (msg || $.i18n.getString("GROUP_X_DELETED", rmGroupGn)),true); 
 
 	} catch(e){errorReport(e);}
 }
