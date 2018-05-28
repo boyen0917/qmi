@@ -32,7 +32,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
+// var base_url = "https://qmi17.mitake.com.tw/";
 
 if($.lStorage("_selectedServerUrl"))
 	base_url = $.lStorage("_selectedServerUrl");
@@ -1160,7 +1160,11 @@ QmiAjax.prototype = {
 			// if(QmiGlobal.isChatRoom) window.close();
 
 			QmiGlobal.rspCode401 = true;
-			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"), true, false,[reLogin]);	//驗證失敗 請重新登入
+			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"), true, false,[function() {
+				// 聊天室關閉
+				if(QmiGlobal.isChatRoom) window.close();
+				else reLogin();
+			}]);	//驗證失敗 請重新登入
 			return;
 		}
 		//ajax 提示訊息選擇 登入頁面錯誤訊息為popup

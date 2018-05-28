@@ -1039,12 +1039,70 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 
 	listArr: [
 		{id: "copy", textid: "FEED_COPY"},
-		{id: "forward", textid: "FEED_COPY"}
+		{id: "forward", textid: "WEBONLY_CHAT_FORWARD"}
 	],
 
-	init: function() {
-		var self = this;
-		
+	init: function(container) {
+		if(!container) return;
+		if(container.find("> ul.msg-menu").length) {
+			container.find("> ul.msg-menu").show();
+			return;
+		}
 
+		var self = this;
+		var isLeft = function() {
+			if(container.find("div.chat-msg-bubble-left").length)
+				return true;
+			else
+				return false;
+		}();
+
+		self.container = container;
+
+		var menuDom = self.createMenuDom(isLeft);
+		container.append(menuDom);
+
+		container.mouseleave(function() {
+			menuDom.hide();
+		});
+	},
+
+	createMenuDom: function(isLeft) {
+		var self = this;
+		return $("<ul>", {
+			class: "msg-menu"+ function() {
+				if(!isLeft) return " right";
+				return "";
+			}(),
+			style: function() {
+				var msgDom = self.container.find(".chat-msg-bubble-"+ (isLeft ? "left" : "right"));
+				if(isLeft) {
+					return "left: "+ (msgDom.width() + 20);
+				} else {
+					return "right: "+ (msgDom.width() - 40);
+				}
+			}() +"px;",
+			html: self.listArr.map(function(item) {
+				var liDom = $("<li>", {
+					html: $.i18n.getString(item.textid)
+				});
+
+				QmiGlobal.eventDispatcher.subscriber([{
+	    			veId: item.id, 
+	    			elemArr: liDom, 
+	    			eventArr: ["click"],
+	    		}], self);
+
+				return liDom;
+			})
+		});
+	},
+
+	clickCopy: function() {
+		console.log("copy");
+	},
+
+	clickForward: function() {
+		console.log("forward");
 	}
 });

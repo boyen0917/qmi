@@ -553,6 +553,7 @@
 	"WEBONLY_LOGIN_PHONE" :	"請輸入電話",
 	"WEBONLY_LOGIN_EMAIL" :	"請輸入Email",
 	"WEBONLY_LOGIN_PASSWORD": "請輸入密碼",
+	"WEBONLY_CHAT_FORWARD": "轉傳",
 
 	"SCHEDULED_POST": "排程發佈文章",
 	"SCHEDULED_POST_AT": "排程發佈時間",

@@ -553,6 +553,7 @@
 	"WEBONLY_LOGIN_PHONE" :	"Phone Number",
 	"WEBONLY_LOGIN_EMAIL" :	"Email Address",
 	"WEBONLY_LOGIN_PASSWORD": "Password",
+	"WEBONLY_CHAT_FORWARD": "Forward",
 	
 	"SCHEDULED_POST": "Scheduled post",
 	"SCHEDULED_POST_AT": "Scheduled post at",

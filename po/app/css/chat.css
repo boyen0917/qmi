@@ -354,7 +354,8 @@ body {
 	display:inline-block;
 	white-space: pre-line;
 	position: relative;
-	/*box-shadow: 0px 2px 6px rgba(50, 50, 50, 0.15);*/
+	-webkit-user-select: none;
+	cursor: default;
 }
 .chat-msg-bubble-right{
 	background: rgb(75,124,219);
@@ -813,20 +814,6 @@ body {
 	position: relative;
   	top: 4px;
 }
-/*.chat-msg-bubble-left.active, .chat-msg-bubble-right.active{
-	background-color: rgb(246,63,12);
-	border-color: transparent rgb(246,63,12);
-	color: white;
-}
-.chat-msg-bubble-left.active::selection, .chat-msg-bubble-right.active::selection{
-	background-color: transparent;
-	color: rgb(255, 254, 141);
-}*/
-/*.chat-msg-bubble-left.active:after, .chat-msg-bubble-right.active:after
-{
-	border-color: transparent rgb(246,63,12);
-}*/
-/* ------ end chat -------------*/
  
 /* 
               ███████╗ ██████╗  ██████╗ ████████╗███████╗██████╗           
@@ -2079,4 +2066,54 @@ div.chat-msg section.fail {
     color: white;
     text-align: center;
     padding: 50px 10px 10px;
+}
+
+#chat-contents > div > div.chat-msg {position: relative;}
+#chat-contents > div > div.chat-msg > ul {
+    background: #333;
+    width: 85px;
+    color: #DEDEDE;
+    list-style: none;
+    position: absolute;
+    top: -38px;
+    text-align: center;
+    padding: 7px;
+    border-radius: 3px;
+    z-index: 1;
+}
+
+
+#chat-contents > div > div.chat-msg > ul > li:first-child {
+	border-right: 1px solid #888;
+	margin-right: 7px;
+	padding-right: 7px;
+}
+#chat-contents > div > div.chat-msg > ul.right {top: -58px;}
+
+#chat-contents > div > div.chat-msg > ul > li {
+    display: inline-block;
+    cursor: pointer;
+}
+
+#chat-contents > div > div.chat-msg > ul:after {
+    position: absolute;
+    content: "";
+    width: 0px;
+    top: 35px;
+    right: 50px;
+    border: 6px solid transparent;
+    border-top: 10px solid #333;
+    border-bottom: 0;
+}
+
+#chat-contents > div > div.chat-msg > ul.right:after {right: 30px;}
+
+#chat-contents > div > div.chat-msg > ul:before {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 50px;
+    left: 0;
+    top: 35px;
+    z-index: -1;
 }

@@ -549,6 +549,7 @@
 	"WEBONLY_LOGIN_PHONE" :	"请输入电话",
 	"WEBONLY_LOGIN_EMAIL" :	"请输入Email",
 	"WEBONLY_LOGIN_PASSWORD": "请输入密码",
+	"WEBONLY_CHAT_FORWARD": "转传",
 
 	"SCHEDULED_POST": "排程发佈文章",
 	"SCHEDULED_POST_AT": "排程发佈时间",

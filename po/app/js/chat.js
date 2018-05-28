@@ -550,7 +550,7 @@ QmiGlobal.appLangDef.done(function(){
 		e.stopPropagation();
 		e.preventDefault();
 
-		// $(this).addClass("menu");
+		QmiGlobal.module.chatMsgForward.init($(this).parents(".chat-msg"));
 	});
 
 	//點擊標題顯示聊天室成員
