@@ -906,7 +906,7 @@ QmiGlobal.module.serverSelector = {
 		+ "</section></section>"
 	},
 	urlHtml: function() {return "<div id='module-server-selector-url'></div>"}
-}
+};
 
 QmiGlobal.eventDispatcher = {
 

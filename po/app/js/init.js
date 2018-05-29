@@ -44,6 +44,9 @@ var nwGui = function() {
 	};
 }();
 
+if($.lStorage("_selectedServerUrl"))
+	base_url = $.lStorage("_selectedServerUrl");
+	
 window.QmiGlobal = {
 
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
@@ -330,7 +333,7 @@ window.QmiGlobal = {
 	            // location.reload();
 	            clearCache();
 	        }
-	    }
+	    };
 
 	    function setTimer(){
 	        $.lStorage("_periodicallyReloadTimer", new Date().getTime());
