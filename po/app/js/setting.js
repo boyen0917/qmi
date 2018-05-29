@@ -252,67 +252,71 @@ function clearTimelineIDB( this_gi, callback ){
                                                                                                     
 */
 //管理員列表
-function showUpdatePermissionPage(){
-	
-	//find current admins
-	var list = {};
+function showUpdatePermissionPage() {
+
+	var adminList = {};
 	var userDataTmp = QmiGlobal.groups;
-    var guAllTmp = userDataTmp[gi].guAll;
-	try{
-        for( var gu in guAllTmp ){
-        	var mem = guAllTmp[gu];
 
-        	// mem.chk = false;
-        	if( 1==mem.st ){
-	        	if( 1==mem.ad ){
-	        		list[gu] = mem.nk;
-	        		// mem.chk = true;
-	        	}
-        	}
-        }
-    } catch(e){
-        errorReport(e);
-    }
+	popupSelectMemberDialog();
+	// //find current admins
+	// var list = {};
+	// var userDataTmp = QmiGlobal.groups;
+ //    var guAllTmp = userDataTmp[gi].guAll;
+	// try{
+ //        for( var gu in guAllTmp ){
+ //        	var mem = guAllTmp[gu];
 
-	var option = {
-		isShowBranch:false,
-        isShowSelf:true,
-		isShowAll:false,
-		isShowFav:true,
-		isShowFavBranch:false,
-		isShowLeftMem:false
-	};
-	var dom = $(".gs-row[data-type=permission]");
-	dom.data("object_str",JSON.stringify(list) );
-	composeObjectShowDelegate( dom, dom, option, function(){
-		try{
-			// console.log("DDDEE");
-			var newList = $.parseJSON( dom.data("object_str") );
+ //        	// mem.chk = false;
+ //        	if( 1==mem.st ){
+	//         	if( 1==mem.ad ){
+	//         		list[gu] = mem.nk;
+	//         		// mem.chk = true;
+	//         	}
+ //        	}
+ //        }
+ //    } catch(e){
+ //        errorReport(e);
+ //    }
 
-			var addList = [];
-			var delList = [];
+	// var option = {
+	// 	isShowBranch:false,
+ //        isShowSelf:true,
+	// 	isShowAll:false,
+	// 	isShowFav:true,
+	// 	isShowFavBranch:false,
+	// 	isShowLeftMem:false
+	// };
+	// var dom = $(".gs-row[data-type=permission]");
+	// dom.data("object_str",JSON.stringify(list) );
+	// composeObjectShowDelegate( dom, dom, option, function(){
+	// 	try{
+	// 		// console.log("DDDEE");
+	// 		var newList = $.parseJSON( dom.data("object_str") );
 
-			for( var gu in newList ){
-				if( !list.hasOwnProperty(gu) ){
-					// 因改權限後會打combo api，如果是大團體撈成員必須一段時間，故趕在沒打之前先改local
-					guAllTmp[gu].ad = 1; 
-					addList.push(gu);
-				}
-			}
+	// 		var addList = [];
+	// 		var delList = [];
 
-			for( var gu in list ){
-				if( !newList.hasOwnProperty(gu) ){
-					guAllTmp[gu].ad = 2; 
-					delList.push(gu);
+	// 		for( var gu in newList ){
+	// 			if( !list.hasOwnProperty(gu) ){
+	// 				// 因改權限後會打combo api，如果是大團體撈成員必須一段時間，故趕在沒打之前先改local
+	// 				guAllTmp[gu].ad = 1; 
+	// 				addList.push(gu);
+	// 			}
+	// 		}
 
-				}
-			}
+	// 		for( var gu in list ){
+	// 			if( !newList.hasOwnProperty(gu) ){
+	// 				guAllTmp[gu].ad = 2; 
+	// 				delList.push(gu);
 
-			requestUpdatePermission(gi, addList, delList, null);
-		} catch(e){
+	// 			}
+	// 		}
 
-		}
-	});
+	// 		requestUpdatePermission(gi, addList, delList, null);
+	// 	} catch(e){
+
+	// 	}
+	// });
 }
 //更新管理員
 function requestUpdatePermission( this_gi, addList, delList, callback){

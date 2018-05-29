@@ -245,6 +245,7 @@
 	"COMMON_SELECT_MEMBERS"  				: "Select members",
 	"COMMON_NEXT"  					: "Next",
 	"COMMON_SELECT"  						: "Select",
+	"COMMON_SELECTED"  						: "%@ Selected",
 	"COMMON_SELECT_ALL"  					: "Select All",
 	"COMMON_SELECT_NONE"  					: "Deselect All",
 	"COMMON_MEMBER"  						: "Member",

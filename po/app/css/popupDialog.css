@@ -311,3 +311,133 @@
     padding-top: 30px;
     text-align: center;
 }
+
+#popupDialog>div.container>div.select-member {
+    width: 456px;
+    height: -webkit-calc( 100% - 50px );
+    position: relative;
+}
+
+#popupDialog>div.container>div.select-member>div.header {
+    border-bottom: 1px solid #666;
+    padding: 10px 12px 10px 15px;
+}
+
+#popupDialog>div.container>div.select-member>div.header span {
+    cursor: pointer;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-size: 20px;
+    background-repeat: no-repeat;
+    margin-right: 20px;
+    vertical-align: middle;
+}
+
+#popupDialog>div.container>div.select-member>div.header h4 {
+    font-size: 20px;
+}
+
+#popupDialog>div.container>div.select-member>div.header span.back {
+    background-image: url(../images/post_audience/Navigation_Close.png);
+    background-size: 15px;
+}
+
+#popupDialog>div.container>div.select-member>div.header span.search {
+    background-image: url(../images/post_audience/search.png);
+}
+
+#popupDialog>div.container>div.select-member>div.header span.done {
+    background-image: url(../images/post_audience/Done.png);
+}
+
+#popupDialog>div.container>div.select-member>div.header span.prev {
+    background-image: url(../images/icon_arrow_prev_blue.png);
+}
+
+#popupDialog>div.container>div.select-member>div.header span.clear:before {
+    content: "\2716";
+    color: gray;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+
+#popupDialog>div.container>div.select-member>div.header h4,
+#popupDialog>div.container>div.select-member>div.header input {
+    width: -webkit-calc( 100% - 155px );
+    display: inline-block;
+    margin: 0;
+    padding-left: 20px;
+}
+
+#popupDialog>div.container>div.select-member>div.header>div.search-area {
+    display: none;    
+}
+
+#popupDialog>div.container>div.select-member>div.footer>div.preview-area {
+    background: #f6f6f6;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+#popupDialog>div.container>div.select-member>div.footer>div.preview-area>div {
+    text-align: center;
+    padding: 10px 0px;
+    color: #2198f3;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#popupDialog>div.container>div.select-member>div.footer>div.preview-area>ul {
+    padding: 0;
+    padding-left: 5px;
+    margin: 0;
+    height: 150px;
+    overflow-y: auto;
+}
+
+#popupDialog>div.container>div.select-member>div.footer>div.preview-area>ul>li {
+    display: inline-block;
+    text-align: center;
+    width: 70px;
+    padding-bottom: 10px;
+}
+
+#popupDialog>div.container>div.select-member>div.footer>div.preview-area>ul>li>div {
+    position: relative;
+}
+
+#popupDialog>div.container>div.select-member>div.footer>div.preview-area>ul>li img{
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+}
+
+#popupDialog>div.container>div.select-member>div.footer>div.preview-area>ul>li span:before{
+    content: "";
+    cursor: pointer;
+    background-image: url(../images/post_audience/SelectionDelete.png);
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: -6px;
+    right: 7px;
+}
+
+#popupDialog>div.container>div.select-member>div.footer>div.preview-area>ul>li span{
+    display: inline-block;
+}
+
+#popupDialog>div.container>div.select-member>div.footer>div.preview-area>ul>li label{
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 68px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 12px;
+}

@@ -73,7 +73,7 @@ ObjectDelegate = {
 
 		(function recursiveBranch() {
 			branchObj.cl.forEach(function(branchId) {
-				branchObj = self.treeData[branchId]
+				branchObj = self.treeData[branchId];
 
 				if (branchObj.cl && branchObj.cl.length > 0) {
 					recursiveBranch();
@@ -151,7 +151,6 @@ ObjectDelegate = {
 		self.resetView();
 		self.currentBranch = branchId;
 		self.currentRows = [];
-
 
 		self.treeData[branchId].gul.forEach(function (gu) {
 			var memberObj = self.memberList[gu];
