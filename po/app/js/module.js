@@ -867,17 +867,19 @@ QmiGlobal.module.serverSelector = {
 
 				$("#module-server-selector-url").html(newUrl);
 
-				newUrl += "/";
-				base_url = newUrl;
-				if(newUrl === default_url) {
-					$("#module-server-selector-url").html("");
-					localStorage.removeItem("_selectedServerUrl");
-				} else {
-					$.lStorage("_selectedServerUrl", newUrl);
-				}
-
 				// 改完刪資料庫
 				resetDB();
+				
+				newUrl += "/";
+				base_url = newUrl;
+				// if(newUrl === default_url) {
+				// 	$("#module-server-selector-url").html("");
+				// 	localStorage.removeItem("_selectedServerUrl");
+				// } else {
+					$.lStorage("_selectedServerUrl", newUrl);
+				// }
+
+				
 
 				self.remove();
 				break;

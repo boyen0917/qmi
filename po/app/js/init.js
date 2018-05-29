@@ -34,6 +34,9 @@ var base_url = function() {
 
 var base_url = "https://qmi17.mitake.com.tw/";
 
+if($.lStorage("_selectedServerUrl"))
+	base_url = $.lStorage("_selectedServerUrl");
+
 // 先檢查是否為桌機版
 var nwGui = function() {
 	try {
@@ -43,9 +46,6 @@ var nwGui = function() {
 		return null;
 	};
 }();
-
-if($.lStorage("_selectedServerUrl"))
-	base_url = $.lStorage("_selectedServerUrl");
 	
 window.QmiGlobal = {
 
@@ -211,9 +211,9 @@ window.QmiGlobal = {
 		"_loginAutoChk",
 		"_loginData",
 		"_loginRemember",
-		"_lastBaseUrl",
 		"_sticker",
-		"groupChat",
+		"_selectedServerUrl",
+		"groupChat"
 	],
 
 	viewMap: {}, // cloud reload
@@ -1157,7 +1157,7 @@ QmiAjax.prototype = {
 		//logout~
 		if(errData.status == 401){
 			// 聊天室關閉
-			if(QmiGlobal.isChatRoom) window.close();
+			// if(QmiGlobal.isChatRoom) window.close();
 
 			QmiGlobal.rspCode401 = true;
 			popupShowAdjust("", $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"), true, false,[reLogin]);	//驗證失敗 請重新登入
