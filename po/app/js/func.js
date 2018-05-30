@@ -8798,7 +8798,7 @@ goToGroupMenu = function(){
 
 function removeCompany(companyData) {
     Object.keys(QmiGlobal.companyGiMap).forEach(function(thisGi) {
-        if(QmiGlobal.companyGiMap[thisGi].ci === companyData.ci) removeGroup(thisGi);
+        if(QmiGlobal.companyGiMap[thisGi].ci === companyData.ci) removeGroup(thisGi, false);
     });
     delete QmiGlobal.companies[companyData.ci];
 }

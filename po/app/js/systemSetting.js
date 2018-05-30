@@ -882,20 +882,19 @@ QmiGlobal.module.ldapSetting = {
     },
 
     delete: function() {
-        var self = this, ldapCi;
+        var self = this;
+        var ldapCi;
+        var ldapData;
         // 判斷帳號是否存在ldapCompanies中
         if(QmiGlobal.auth.isSso) {
-            var ldapData = QmiGlobal.companies[Object.keys(QmiGlobal.companies)[0]];
+            ldapData = QmiGlobal.companies[Object.keys(QmiGlobal.companies)[0]];
         } else {
             Object.keys(QmiGlobal.ldapCompanies).forEach(function(thisCi) {
                 if(QmiGlobal.ldapCompanies[thisCi].id === self.inputAccount) ldapCi = thisCi;
             });
-            var ldapData = QmiGlobal.ldapCompanies[ldapCi];
+            ldapData = QmiGlobal.ldapCompanies[ldapCi];
         }
             
-        // if(ldapCi === undefined) {
-        //     toastShow(desc)
-        // }
         var msgShowDef = $.Deferred();
         self.view.addClass("cover");
 
@@ -1042,8 +1041,7 @@ var deleteAccount = {
         QmiGlobal.PopupDialog.create({
             className: 'remind-before-delete',
             header: $.i18n.getString('ACCOUNT_MANAGEMENT_REMIND'),
-            content: [
-                {
+            content: [{
                     tagName: 'div',
                     text: $.i18n.getString('ACCOUNT_MANAGEMENT_DELETE_ACCOUNT_WARNING'),
                     attributes: {
