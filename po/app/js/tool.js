@@ -164,9 +164,15 @@ reLogin = function(options) {
 		return;
 	}
 
-	// localStorage.removeItem("_loginAutoChk");
 	localStorage.removeItem("_loginData");
-	resetDB(options);
+	var defaultArr = [
+		"_appReloadAuth",
+		"_loginAutoChk",
+		"_loginData",
+		"_selectedServerUrl",
+		"groupChat"];
+		
+	resetDB({removeItemArr: defaultArr});
 	document.location = "index.html";
 }
 

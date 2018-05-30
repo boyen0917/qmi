@@ -402,7 +402,7 @@ appInitial = function(needUpdate){
 		var lastId = $.lStorage("_lastLoginAccount") || null;
 		if(lastId !== phoneId && lastId !== null) 
 			resetDB({removeItemArr: ["_sticker"]});
-
+		
 		// 紀錄上次登入帳號
 		$.lStorage("_lastLoginAccount", phoneId);
 	}
