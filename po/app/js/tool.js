@@ -456,23 +456,24 @@ secondsToTime = function (secs)
     return s_minutes + ":" + ((s_seconds < 10)?("0" + s_seconds):(s_seconds));
 }
 
-toastShow = function(desc){
-	if($(".toast").css("opacity") !== "0" || (desc || "").length === 0) return;
+toastShow = function(desc, chatLock){
+	var toastDom = $("#toast");
+	if(window.isChatroom && !chatLock) return;
+	if(toastDom.css("opacity") !== "0" || (desc || "").length === 0) return;
 
-	$(".toast div").html(desc);
-	$(".toast").css("bottom","0px");
-	$(".toast").css("opacity","0");
+	toastDom.find("> div").html(desc);
+	toastDom.css("bottom","0px");
+	toastDom.css("opacity","0");
 	
 	setTimeout(function(){
-		$(".toast").show();
-		$(".toast").animate({
+		toastDom.show().animate({
 			bottom: "30px",
 			opacity: "1.0"
 		},100);
 	},100);
 	
 	setTimeout(function(){
-		$(".toast").fadeOut('fast', function(){
+		toastDom.fadeOut('fast', function(){
 			$(this).css("bottom","0px");
 			$(this).css("opacity","0");
 		});

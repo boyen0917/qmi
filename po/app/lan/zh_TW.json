@@ -329,6 +329,7 @@
 	"CHAT_SELF_ALREADY_ADMIN" : "你已是管理員了!!",
 	"CHAT_EXIT_CHATROOM_FAIL" : "退出失敗，請保留成員至少有一位是管理員。",
 	"CHAT_EDIT_CHATROOM" : "前往編輯",
+	"CHATROOM_SELECTED" : "已選擇",
 
 	"NOTICES_TITLE"			: "新通知",
 	"NOTICES_POST"			: "發佈",
@@ -554,6 +555,8 @@
 	"WEBONLY_LOGIN_EMAIL" :	"請輸入Email",
 	"WEBONLY_LOGIN_PASSWORD": "請輸入密碼",
 	"WEBONLY_CHAT_FORWARD": "轉傳",
+	"WEBONLY_COPY_FAIL": "複製失敗",
+	"WEBONLY_FORWARD_SUCCESSED": "轉傳成功",
 
 	"SCHEDULED_POST": "排程發佈文章",
 	"SCHEDULED_POST_AT": "排程發佈時間",
@@ -611,5 +614,4 @@
 	"INTERGRATIONS_READMORE": "更多",
 
 	"ACCOUNT_MANAGEMENT_FILE_DELETED": "檔案過期或超過儲存空間上限，已失效。"
-
 }

@@ -326,6 +326,7 @@
 	"CHAT_SELF_ALREADY_ADMIN" : "你已是管理员了!!",
 	"CHAT_EXIT_CHATROOM_FAIL" : "退出失败，请保留成员至少有一位是管理员。",
 	"CHAT_EDIT_CHATROOM" : "前往编辑",
+	"CHATROOM_SELECTED" : "已选择",
 
 	"NOTICES_TITLE"			: "新通知",
 	"NOTICES_POST"			: "发佈",
@@ -550,7 +551,9 @@
 	"WEBONLY_LOGIN_EMAIL" :	"请输入Email",
 	"WEBONLY_LOGIN_PASSWORD": "请输入密码",
 	"WEBONLY_CHAT_FORWARD": "转传",
-
+	"WEBONLY_COPY_FAIL": "複製失败",
+	"WEBONLY_FORWARD_SUCCESSED": "转传成功",
+	
 	"SCHEDULED_POST": "排程发佈文章",
 	"SCHEDULED_POST_AT": "排程发佈时间",
 	"SCHEDULED_POST_POST_NOW": "立即发佈",

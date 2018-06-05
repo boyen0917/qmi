@@ -59,6 +59,13 @@ QmiGlobal.appLangDef.done(function(){
 	AllGroupData = window.opener.QmiGlobal.groups;
 	//load language
 	// updateLanguage(lang);
+
+	// if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) 
+	// 	window.chatAuthData = $.lStorage("test");
+
+	// if(Object.keys(window.AllGroupData).length === 0)
+	// 	window.AllGroupData = $.lStorage("test2");
+
 	//驗證失敗 請重新登入
 	if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) {
 		
@@ -545,13 +552,7 @@ QmiGlobal.appLangDef.done(function(){
 		$(".screen-lock").css("z-index",2000);
 	});
 
-	// 右鍵複製、轉傳
-	$("#chat-contents").on("contextmenu", '.chat-msg-bubble-left, .chat-msg-bubble-right', function (e) {
-		e.stopPropagation();
-		e.preventDefault();
-
-		QmiGlobal.module.chatMsgForward.init($(this).parents(".chat-msg"));
-	});
+	// $("#chat-contents > footer").click
 
 	//點擊標題顯示聊天室成員
 	$("#header .title .text, #header .title .count").click(function () {
@@ -935,9 +936,13 @@ function resizeContent() {
 聊天室DB初始化完成後callback
 **/
 function onChatDBInit() {
+	var deferred = $.Deferred();
 	console.debug("-------- onChatDBInit ---------");
 	var today = new Date();
-	$("#chat-contents").html("<div class='firstMsg'></div>");
+	$("#chat-contents").empty()
+	.append("<div class='firstMsg'></div>")
+	.append(`<footer><ul><li data-textid="COMMON_CANCEL"></li><li data-textid="WEBONLY_CHAT_FORWARD"></li></ul></footer>`);
+
 	var timeTag = $("<div class='chat-date-tag'></div>");
 	timeTag.data("time", today.getTime());
 	timeTag.html(getFormatTimeTag(today));
@@ -949,14 +954,17 @@ function onChatDBInit() {
 	lastMsg.append(timeTag);
 	$("#chat-contents").append(lastMsg);
 	$("#chat-contents").append("<div class='tmpMsg'></div>");
-	
-	// 有網路情況下，就去跟server要，不然直接拉db會有漏訊息的問題
-	if (navigator.onLine)
-		updateChat();
-	else
-		getHistoryMsg(false);
 
-	scrollToBottom();
+	// 有網路情況下，就去跟server要，不然直接拉db會有漏訊息的問題
+	if (navigator.onLine) 
+		updateChat().done(deferred.resolve);
+	else 
+		getHistoryMsg(false).done(deferred.resolve);
+
+
+	deferred.done(function() {
+		QmiGlobal.module.chatMsgForward.init();
+	});
 }
 
 /**
@@ -1107,6 +1115,7 @@ function op(url, type, data, delegate, errorDelegate) {
 		li: lang
 	}, type, false, data);
 	result.error(function (jqXHR, textStatus, errorThrown) {
+		console.log("jj", jqXHR.responseText);
 		var rspMsg = JSON.parse(jqXHR.responseText).rsp_msg || "";
 		if (errorDelegate) errorDelegate(rspMsg);
 	});
@@ -1172,7 +1181,7 @@ function getMemberName(groupUI) {
 	return mem.nk;
 }
 function updateChat(time, isGetNewer) {
-	
+	var deferred = $.Deferred();
 	var api = "groups/" + gi + "/chats/" + ci + "/messages";
 	if (time) {
 		api += "?ct=" + time;
@@ -1236,7 +1245,7 @@ function updateChat(time, isGetNewer) {
 						//no more history
 						if (1 >= data.el.length) noMoreHistoryMsg();
 						scrollToBottom();
-						
+
 						//hide loading
 						if (false == g_isEndOfHistory) {
 							$("#chat-loading").hide();
@@ -1250,13 +1259,18 @@ function updateChat(time, isGetNewer) {
 
 				showChatCnt();
 			}
+
+			deferred.resolve();
 		});
 	}, function () {
 		if (isGetNewer) return;
 		popupShowAdjust("", $.i18n.getString("COMMON_CHECK_NETWORK"));
 		hideLoading();
+
+		deferred.resolve();
 	});	//end of op
 	
+	return deferred.promise();
 }	//end of updateChat
 
 /**
@@ -1329,7 +1343,9 @@ function showMsg(object, bIsTmpSend) {
 	g_msgs.push(object.ei);
 	// cns.debug("list:",JSON.stringify(object,null,2));
 	var time = new Date(object.meta.ct);
-	var container = $("<div class='chat-msg'></div>");
+	var container = $("<div class='chat-msg'><div class=\"cover\"></div></div>");
+
+	container.data("msgData", object);
 	container.data("time", object.meta.ct);
 
 	var szSearch = "#chat-contents ." + time.customFormat("_#YYYY#_#MM#_#DD#");
@@ -1365,11 +1381,6 @@ function showMsg(object, bIsTmpSend) {
 			$("#chat-contents .lastMsg").before(timeTag);
 			// cns.debug("3", time);
 		}
-		// if(time.getTime()<g_earliestDate){
-		// 	$("#chat-contents .firstMsg").after(timeTag);
-		// } else {
-		// 	$("#chat-contents .lastMsg").before(timeTag);
-		// }
 		div = $("<div></div>");
 		timeTag.after(div);
 

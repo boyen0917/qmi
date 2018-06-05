@@ -32,7 +32,7 @@ var base_url = function() {
 	}
 }();
 
-// var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://qmi17.mitake.com.tw/";
 
 if($.lStorage("_selectedServerUrl"))
 	base_url = $.lStorage("_selectedServerUrl");
@@ -1403,7 +1403,7 @@ QmiGlobal.ModuleConstructor = function(args) {
 		        if(typeof self[veTpStr] === "function") self[veTpStr]({
 		            dom: $(event.detail.elem),
 		            data: event.detail.data,
-		            evt: event
+		            evt: event.detail.originalEvent
 		        });    
 		    } catch(e) {console.error("eventHandler error occured", e);}
 		    

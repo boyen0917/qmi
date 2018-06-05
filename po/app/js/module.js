@@ -927,7 +927,7 @@ QmiGlobal.eventDispatcher = {
 				var elemArr = self.viewMap[viewId].elemArr, length = elemArr.length;
 				for(var i=0; i<length; i++) {
 					if(event.currentTarget === elemArr[i]) {
-						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {}), target: event.target}}));
+						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {}), target: event.target, originalEvent: event}}));
 						return;
 					}
 				}
@@ -1033,64 +1033,93 @@ QmiGlobal.module.webview = new QmiGlobal.ModuleConstructor({
 	}
 });
 
+
+
+
 QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 
-	id: "module-chatMsgForward",
+	id: "chatMsgForward",
 
 	listArr: [
 		{id: "copy", textid: "FEED_COPY"},
 		{id: "forward", textid: "WEBONLY_CHAT_FORWARD"}
 	],
 
-	init: function(container) {
-		if(!container) return;
-		if(container.find("> ul.msg-menu").length) {
-			container.find("> ul.msg-menu").show();
-			return;
-		}
+	selectedMap: {},
 
+	init: function() {
 		var self = this;
-		var isLeft = function() {
-			if(container.find("div.chat-msg-bubble-left").length)
-				return true;
-			else
-				return false;
-		}();
+		self.chatContentDom = $("#chat-contents");
+		
+		self.selectedMap = {};
 
-		self.container = container;
-
-		var menuDom = self.createMenuDom(isLeft);
-		container.append(menuDom);
-
-		container.mouseleave(function() {
-			menuDom.hide();
-		});
+		QmiGlobal.eventDispatcher.subscriber([{
+			veId: "forwardOperation", 
+			elemArr: self.chatContentDom, 
+			eventArr: ["click", "contextmenu"]
+		}, {
+			veId: "cancelForwardUI", 
+			elemArr: self.chatContentDom.find("> footer > ul > li:first-child"), 
+			eventArr: ["click"]
+		}, {
+			veId: "showMemberView", 
+			elemArr: self.chatContentDom.find("> footer > ul > li:last-child"), 
+			eventArr: ["click"]
+		}], self);
 	},
 
-	createMenuDom: function(isLeft) {
+	menuInit: function(container) {
+		if(!container) return;
+		var menuDom = container.find("> ul.msg-menu");
+		if(!menuDom.length) {
+			menuDom = this.createMenuDom(container);
+			container.append(menuDom);
+		} else {
+			menuDom = container.find("> ul.msg-menu");
+			menuDom.show();
+		}
+		var chatMsgDom = container
+		container.mouseleave(function() {
+			console.log("container", (container.data("msgData") || {ml:[{}]}).ml[0].c);
+			container.unbind("mouseleave");
+
+			menuDom.hide();
+		});
+
+	},
+
+	createMenuDom: function(container) {
 		var self = this;
+		var bubbleClassName = ".chat-msg-bubble-right";
+		var isLeft = function() {
+			if(container.find("div.chat-msg-bubble-left").length) {
+				bubbleClassName = ".chat-msg-bubble-left";
+				return true;
+			} else return false;
+		}();
+
 		return $("<ul>", {
 			class: "msg-menu"+ function() {
 				if(!isLeft) return " right";
 				return "";
 			}(),
 			style: function() {
-				var msgDom = self.container.find(".chat-msg-bubble-"+ (isLeft ? "left" : "right"));
-				if(isLeft) {
+				var msgDom = container.find(bubbleClassName);
+				if(isLeft) 
 					return "left: "+ (msgDom.width() + 20);
-				} else {
+				else 
 					return "right: "+ (msgDom.width() - 40);
-				}
 			}() +"px;",
-			html: self.listArr.map(function(item) {
+			html: self.listArr.map(function(item, i) {
 				var liDom = $("<li>", {
 					html: $.i18n.getString(item.textid)
 				});
 
 				QmiGlobal.eventDispatcher.subscriber([{
-	    			veId: item.id, 
+	    			veId: item.id +":"+ (new Date().getTime()), 
 	    			elemArr: liDom, 
 	    			eventArr: ["click"],
+	    			data: {container: container}
 	    		}], self);
 
 				return liDom;
@@ -1098,11 +1127,242 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 		});
 	},
 
-	clickCopy: function() {
-		console.log("copy");
+	clickForwardOperation: function(event) {
+		var self = this;
+		var targetDom = $(event.evt.target);
+
+		if(isNotForwardMode()) return;
+
+		var msgDom = targetDom.parent();
+
+		var msgData = msgDom.data("msgData");
+		if(msgDom.hasClass("selected")) {
+			msgDom.removeClass("selected");
+			delete self.selectedMap[msgData.ei];
+		} else {
+			msgDom.addClass("selected");
+			self.selectedMap[msgData.ei] = msgData;
+		}
+
+		function isNotForwardMode() {
+			if(!self.chatContentDom.hasClass("forward")) return true;
+			if(!targetDom.hasClass("cover")) return true;
+			return false;
+		}
 	},
 
-	clickForward: function() {
-		console.log("forward");
-	}
+	contextmenuForwardOperation: function(event) {
+		var self = this;
+		var targetDom = $(event.evt.target);
+
+		if(isNotTarget()) return;
+
+		event.evt.stopPropagation();
+		event.evt.preventDefault();
+
+		self.menuInit(targetDom.parents(".chat-msg"));
+
+		function isNotTarget() {
+			return !targetDom.hasClass("chat-msg-bubble-left") && !targetDom.hasClass("chat-msg-bubble-right");
+		}
+	},
+
+	clickCopy: function(event) {
+		event.data.container.trigger("mouseleave");
+		var el = document.createElement('textarea');
+		el.value = event.dom.parents("div.chat-msg").find(".chat-msg-bubble-right, .chat-msg-bubble-left").text();
+		document.body.appendChild(el);
+		el.select();
+		if(document.execCommand('copy'))
+			toastShow($.i18n.getString("FEED_COPY_CONTENT_SUCC"), true);
+		else 
+			toastShow($.i18n.getString("WEBONLY_COPY_FAIL"), true);
+
+		document.body.removeChild(el);
+	},
+
+	clickForward: function(event) {
+		event.data.container.trigger("mouseleave");
+		this.chatContentDom
+		.addClass("forward")
+		.find("div.chat-msg").removeClass("selected");
+
+		this.selectedMap = {};
+
+		$("#footer").css("z-index", "-1");
+	},
+
+	clickCancelForwardUI: function() {
+		this.chatContentDom.removeClass("forward");
+		$("#footer").css("z-index", "initial");
+	},
+
+	clickShowMemberView: function() {
+		this.memberViewInit();
+	},
+
+	clickMlCancel: function() {
+		this.memberView.hide();
+	},
+
+	clickMlSubmit: function() {
+		var self = this;
+		console.log("clickMlSubmit", this.selectedMap);
+
+		self.loadingUI.on();
+		self.api.postMsgTransfer({
+			gi: gi,
+			ci: ci,
+			body: {
+				eil: Object.keys(self.selectedMap),
+				[window.cl || "cl"]: ["T00000bq0Dt"]
+			}
+		}).done(function(rspData) {
+			setTimeout(function() {
+				new QmiGlobal.popup({
+					desc: $.i18n.getString("WEBONLY_FORWARD_SUCCESSED"),
+					confirm: true,
+					action: [function() {
+						self.clickMlCancel();
+						self.clickCancelForwardUI();
+					}]
+				});
+			}, 500);
+		}).fail(function(errData) {
+			console.log("dd",  JSON.parse(errData.responseText));
+			var msg = $.i18n.getString("COMMON_UNKNOWN_ERROR");
+			try {
+				msg = JSON.parse(errData.responseText).rsp_msg;
+			} catch(e) {}
+
+			setTimeout(function() {
+				new QmiGlobal.popup({
+					desc: msg,
+					confirm: true
+				});
+			}, 500);
+		}).always(function() {
+			self.loadingUI.off();
+		})
+	},
+
+	clickMlTabSwitch: function(event) {
+		event.dom.parent().find("> span").toggleClass("active");
+	},
+
+	inputMlSearch: function(event) {
+		console.log("inputMlSearch", event.dom.val());
+	},
+
+	api: {
+		postMsgTransfer: function(args) {
+			return new QmiAjax({
+				apiName: `groups/${args.gi}/chats/${args.ci}/msg_transfer`,
+				method: "post",
+				body: JSON.stringify(args.body),
+				noErr: true
+			});
+		}
+	},
+
+
+	memberViewInit: function() {
+		var self = this;
+		if(self.memberView) {
+			self.memberView.show();
+			return;
+		}
+
+		self.memberView = $(self.memberListHtml.trim());
+		self.memberView.find("> section.search input").attr("placeholder", $.i18n.getString("INVITE_SEARCH"));
+
+		self.loadingUI = new QmiGlobal.module.LoadingUIConstructor({
+    		dom: self.memberView, 
+    		top: "50%",
+    		delay: 500
+    	});
+
+
+		$("body").append(self.memberView);
+
+		self.memberView._i18n();
+
+		QmiGlobal.eventDispatcher.subscriber([{
+			veId: "mlCancel", 
+			elemArr: self.memberView.find("> header > button.cancel"), 
+			eventArr: ["click"]
+		}, {
+			veId: "mlSubmit", 
+			elemArr: self.memberView.find("> header > button.submit"), 
+			eventArr: ["click"]
+		}, {
+			veId: "mlTabSwitch", 
+			elemArr: self.memberView.find("> section.tab > span"), 
+			eventArr: ["click"]
+		}, {
+			veId: "mlSearch", 
+			elemArr: self.memberView.find("> section.search input"), 
+			eventArr: ["input"]
+		}], self);
+
+	},
+
+	memberListHtml: `<section id="forwardMemberView">
+		<header>
+			<button class="cancel" data-textid="COMMON_CANCEL"></button>
+			<span class="ttl" data-textid="WEBONLY_CHAT_FORWARD"></span>
+			<button class="submit" data-textid="CHAT_SEND"></button>
+		</header>
+		<section class="search">
+			<div><img src="images/fileSharing/search_icon.png">
+			<input><img src="images/common/temp/icon_search_clean.png"></div>
+		</section>
+		<section class="tab">
+			<span class="chatroom active" data-textid="LEFT_CHAT"></span>
+			<span class="member" data-textid="COMMON_MEMBER"></span>
+		</section>
+		<section class="body"></section>
+		<footer><div class="ttl" data-textid="CHATROOM_SELECTED"></div></footer>
+		<div class="loading"><img src="images/loading.gif></div>
+	</section>`
 });
+
+
+QmiGlobal.module.LoadingUIConstructor = function(args) {
+	var isActivate = false;
+	this.containerDom = args.dom;
+	this.init(args.top);
+
+	this.on = function() {
+		isActivate = true;
+		this.loadingDom.show();
+		if(args.on) args.on();
+	};
+
+	this.off = function() {
+		var self = this;
+		isActivate = false;
+
+		setTimeout(function() {
+			self.loadingDom.hide();
+			if(args.off) args.off();
+		}, args.delay || 0);
+			
+	};
+
+	this.stat = function() {return isActivate;}
+};
+
+QmiGlobal.module.LoadingUIConstructor.prototype = {
+	init: function(top) {
+		var self = this;
+		if(self.loadingDom) self.loadingDom.remove();
+
+		self.loadingDom = $("<div>", {
+			style: "display: none; position: absolute; width: 100%; height: 100%; top: 0; left: 0; background: rgba(180,180,180,0.7);",
+			html: "<img style=\"width: 30px; display: block; margin: "+ (top || "0") +" auto 0;\" src=\"images/loading.gif\">"
+		});
+
+		self.containerDom.append(self.loadingDom);
+	}
+}

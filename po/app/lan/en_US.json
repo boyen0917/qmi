@@ -329,6 +329,7 @@
 	"CHAT_SELF_ALREADY_ADMIN" : "You are already an administrator!",
 	"CHAT_EXIT_CHATROOM_FAIL" : "Please assign another someone as admin, and then exit",
 	"CHAT_EDIT_CHATROOM" : "Edit chatroom!",
+	"CHATROOM_SELECTED" : "Selected",
 
 	"NOTICES_TITLE"						: "New Notices", 
 	"NOTICES_POST"						: "Publish",
@@ -554,6 +555,8 @@
 	"WEBONLY_LOGIN_EMAIL" :	"Email Address",
 	"WEBONLY_LOGIN_PASSWORD": "Password",
 	"WEBONLY_CHAT_FORWARD": "Forward",
+	"WEBONLY_COPY_FAIL": "Copy failed",
+	"WEBONLY_FORWARD_SUCCESSED": "Forward message successfully",
 	
 	"SCHEDULED_POST": "Scheduled post",
 	"SCHEDULED_POST_AT": "Scheduled post at",
