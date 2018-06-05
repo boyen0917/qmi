@@ -1,118 +1,500 @@
-ObjectDelegate = {
-	defaultRow: {},
-	
-	init : function(option) {
-		this.mainPage = option.mainPage;
-		this.finishButton = option.headerBtn;
-		// this.selectNumElement = option.selectNumElement;
-		this.searchArea = this.mainPage.querySelector("div.search");
-		this.basicSelect = this.mainPage.querySelector("div.obj-cell-area>div.basic-select");
-		this.branchMenu = this.mainPage.querySelector("div.branchList");
-		this.mainContainer = this.mainPage.querySelector("div.obj-cell-container");
-		this.selectAllBtn = this.mainPage.querySelector("div.obj-cell-area>div.obj-select-all>span");
-		this.breadcrumb = this.branchMenu.querySelector("ul.breadcrumb");
-		this.closeBtn = this.branchMenu.querySelector("div.dropdown-menu>button")
-		
-		
+function ObjectDelegate (option) {
 
-		// this.loadingCircle = this.mainPage.find(".bottom");
-		
-		// this.searchInput = this.searchArea.find("input");
-		// this.selectListArea = this.searchArea.find(".list .text");
-		// this.clearButton = this.searchArea.find("span");
-		// this.pageBackButton = this.mainPage.find(".page-back");
+	var self = this;
+	var group = QmiGlobal.groups[gi],
+        memberData = group.guAll,
+        guList = Object.keys(memberData) || [];
+        branchData = group.bl;
 
-		this.currentBranch = 'root';
-		this.allMemberChkbox = {};
-		this.allBranchChxbox = {};
-		// this.defaultRow = {};
-		this.favParentRow = {};
-		this.favMemberRows = [];
-		this.favBranchRows = [];
-		this.memberRows = [];
-		this.branchRows = [];
-		this.currentRows = [];
-		this.isSelectedAllBranch = false;
-		this.isSelectAll = false;
-		this.isSelectedAllMember = false;
+    var settings = option.settings || {};
 
-		this.group = QmiGlobal.groups[gi];
-		this.memberList = $.extend(true, {}, this.group.guAll);
-		
-		this.compose = option.thisCompose;
-		this.composeObj = option.thisComposeObj;
-		this.onDone = option.onDone;
-		this.isBack = option.isBack;
-		this.singleCheck = option.singleCheck;
-		this.visibleMembers = option.visibleMembers;
-		this.visibleMemNum = 0;
-		this.minSelectNum = option.minSelectNum;
-		this.checkedMems = option.checkedMems;
-		this.treeData = option.treeData;
-		// this.newAddMems = {};
-		this.oriCheckedMems = Object.assign({}, option.checkedMems);
-		this.checkedBranches = option.checkedBranches || {};
-		this.checkedFavorites = option.checkedFavorites || {};
-		this.isDisableOnAlreadyChecked = option.isDisableOnAlreadyChecked;
+    self.isSelectAll = false;
+    this.currentBranch = 'root';
+    self.branchMap = {
+    	root: {
+    		gul: [],
+    		visibleGul: [],
+	        cl: ['all'],
+	        cnt: 0,
+	        lv: 0
+    	},
+    	all: {
+    		gul: [],
+    		visibleGul: [],
+    		cl: [],
+    		cnt: 0,
+    		lv: 1,
+    		bi: 'all',
+    		bn: $.i18n.getString('COMMON_ALL_MEMBERS')
+    	},
+    	fav: {
+    		gul: [],
+    		visibleGul: [],
+    		cl: [],
+    		cnt: 0,
+    		lv: 1,
+    		bi: 'fav',
+    		bn: $.i18n.getString('COMMON_FAVORIATE')
+    	},
+    	searchResult: {
+    		visibleGul: [],
+	        cl: []
+    	}
+    };
 
-		this.matchList = this.visibleMembers;
+    self.checkedMembers = option.previousSelect.members || {};
+    self.checkedBranches = option.previousSelect.branches || {};
+    self.checkedFavs = option.previousSelect.favorites || {};
 
-		this.bindEvent();
-		this.setDefaultOptions();
-		this.changeBranchView('root');
-		this.setBranchMenu();
-		this.updateStatus();
+    self.publicRow = {};
+    self.favoriteRow = {};
+    self.visibleRows = {};
 
-		return this;
+    self.view = option.view
+    self.container = option.container;
+    self.container.id = "objectDelegate";
+    self.searchArea = option.searchArea;
+
+    self.defaultSelect = document.createElement('div');
+    self.branchMenu = document.createElement('div');
+    self.selectArea = document.createElement('div');
+
+    self.init = function () {
+		self.setAvailableList();
+    	self.setBranchBlock();
+		self.setBranchMenu();
+
+		if (!settings.isHiddenPublic || !settings.isHiddenFav) {
+			self.createDefaultSelect();
+		}
+
+		if (!settings.isHiddenPublic) {
+			this.addRowElement({type: 'Public'});
+		}
+
+		if (!settings.isHiddenFav) {
+			this.addRowElement({type: 'Favorite', data: self.branchMap['fav']});
+		}
+
+		self.addSelectAllTitle();
+
+		if (self.branchMap['root'].cl.length > 0 || self.branchMap['root'].gul.length > 0) {
+	    	self.selectArea.className = "obj-cell-container";
+	    	self.container.appendChild(self.selectArea);
+	    }
+    	
+		self.selectedMembers = self.getSelectedMembers();
+		self.changeBranchView('root');
+    }
+
+    function haveChildrenAllChecked(branchObj) {
+		return (Object.keys(self.selectedMembers).length == self.branchMap['all'].cnt) 
+			|| (branchObj.cnt > 0 && branchObj.gul.every(function (gu) { 
+				return self.selectedMembers.hasOwnProperty(gu) 
+			}));
+	}
+
+    self.changeBranchView = function (branchId) {
+    	var branchObj = self.branchMap[branchId];
+    	var selectAllBlock = self.container.querySelector("div.obj-select-all");
+    	var enterFavoriteView = branchId == 'fav' || group.fbl.hasOwnProperty(branchId); 
+
+    	self.visibleRows = {};
+    	self.currentBranch = branchId
+		self.selectArea.scrollTop = 0;
+		self.isSelectAll = self.branchMap[branchId].visibleGul > 0 || self.branchMap[branchId].cl > 0
+
+		while(self.selectArea.firstChild) {
+			self.selectArea.removeChild(self.selectArea.firstChild);
+		}
+
+		self.branchMap[branchId].visibleGul.forEach(function (gu) {
+			var memberObj = memberData[gu];
+			var isChecked = self.selectedMembers.hasOwnProperty(gu);
+	  		var isEnable = !self.selectedMembers.hasOwnProperty(gu) || 
+	  			Object.getOwnPropertyDescriptor(self.selectedMembers, gu).writable;
+
+			self.addRowElement({
+				type: 'Member',
+				data: memberObj,
+				isChecked: isChecked,
+				parent: branchId,
+				isEnable: isEnable
+			});
+
+			if (!isChecked) self.isSelectAll = false;
+		});
+
+		self.branchMap[branchId].cl.forEach(function (branchKey) {
+			var isChecked = self.checkedBranches.hasOwnProperty(branchKey) || 
+				haveChildrenAllChecked(self.branchMap[branchKey]);
+
+			self.addRowElement({
+				type: 'Branch',
+				data: self.branchMap[branchKey],
+				isChecked: isChecked,
+				parent: branchId
+			});
+
+			if (!isChecked) self.isSelectAll = false;
+		});
+
+		if (branchId == 'root') {
+			self.defaultSelect.style.display = 'block';
+			self.branchMenu.style.display = 'none';
+
+			if (self.searchArea) {
+				self.searchArea.style.display = 'block';
+			}
+
+			selectAllBlock.style.display = 'block';
+
+			if (Object.keys(self.favoriteRow).length > 0) {
+				var haveFavMembersChecked = ((self.branchMap['fav'].visibleGul.length > 0) && 
+					(self.branchMap['fav'].visibleGul.every(function(gu) {
+						return self.selectedMembers.hasOwnProperty(gu);
+					}))
+				);
+
+				var haveFvaBranchesChecked = ((self.branchMap['fav'].cl.length > 0) && 
+					(self.branchMap['fav'].cl.every(function(fi) {
+						return self.checkedFavs.hasOwnProperty(fi);
+					}))
+				);
+
+				if (haveFavMembersChecked && haveFvaBranchesChecked) {
+					self.favoriteRow.check(true);
+				}
+			}
+
+			selectAllBlock.firstElementChild.textContent = $.i18n.getString("COMMON_MEMBER");
+		} else if (branchId == 'searchResult') {
+			self.defaultSelect.style.display = 'none';
+			selectAllBlock.style.display = 'none';
+		} else {
+			self.setBreadcrumb(branchId);
+			self.setBranchMenu(enterFavoriteView);
+			self.defaultSelect.style.display = 'none';
+			self.branchMenu.style.display = 'block';
+
+			if (self.searchArea) {
+				self.searchArea.style.display = 'none';
+			}
+
+			self.updateBranchMenu(branchId);
+
+			selectAllBlock.firstElementChild.textContent = self.branchMap[branchId].bn;
+		}
+
+		selectAllBlock.lastElementChild.textContent = self.isSelectAll ? 
+			$.i18n.getString("COMMON_SELECT_NONE") : $.i18n.getString("COMMON_SELECT_ALL");
 	},
 
-	setBranchMenu: function () {
+	self.search = function (text) {
+		self.branchMap.searchResult.visibleGul = [];
+		self.branchMap.searchResult.cl = [];
+
+		if (text.length > 0) {
+			guList.forEach(function (gu) {
+		        var userObj = memberData[gu];
+		        
+		        if (isValidMember(userObj)) {
+		        	if (userObj.nk.toLowerCase().indexOf(text) > -1) {
+		        		self.branchMap.searchResult.visibleGul.push(gu);
+		        	}
+		        }
+		    });
+
+		   	Object.keys(group.bl).forEach(function(bi) {
+		   		var branchObj = group.bl[bi];
+	        	if (branchObj.bn.toLowerCase().indexOf(text) > -1) {
+	        		self.branchMap.searchResult.cl.push(bi);
+	        	}
+		   	});
+
+		    self.changeBranchView('searchResult');
+		} else {
+	    	self.changeBranchView('root');
+		}
+	}
+
+	self.clearSearchResult = self.search.bind(self, "");
+	
+	self.selectAll = function (e) {
 		var self = this;
-		var branchObj = self.treeData['root'];
-		var branchOptions = self.branchMenu.querySelector("ul");
+		var target = e.target;
+
+		self.isSelectAll = !self.isSelectAll;
+
+		self.branchMap[self.currentBranch].gul.forEach(function (gu) {
+			if (self.isSelectAll) {
+				self.checkedMembers[gu] = memberData[gu].nk;
+				self.selectedMembers[gu] = memberData[gu].nk;
+			} else {
+				delete self.checkedMembers[gu];
+				delete self.selectedMembers[gu];
+			}
+		})
+
+		// self.branchMap[self.currentBranch].cl.forEach(function (bi) {
+		// 	if (self.isSelectAll) {
+		// 		self.checkedBranches[bi] = self.branchMap[bi].bn;
+		// 		// self.selectedMembers[gu] = memberData[gu].nk;
+		// 	} else {
+		// 		delete self.checkedBranches[bi];
+		// 	}
+		// })
+
+		target.textContent = self.isSelectAll ? $.i18n.getString("COMMON_SELECT_NONE") : $.i18n.getString("COMMON_SELECT_ALL");
+
+		self.updateStatus();
+		console.log(self.checkedMembers);
+		console.log(self.checkedBranches);
+		console.log(self.selectedMembers)
+	}
+
+	self.cancel = function (memberId) {
+		// if (!settings.isDisableOnAlreadyChecked) {
+		if (self.checkedMembers.hasOwnProperty(memberId)) {
+			delete self.checkedMembers[memberId];
+		}
+
+		delete self.selectedMembers[memberId];
+
+
+		if (self.visibleRows.hasOwnProperty(memberId)) {
+			self.visibleRows[memberId].check(false);
+		}
+		// }
+		
+		self.updateStatus();
+	} 
+
+    self.addRowElement = function (obj) {
+    	var self = this;
+		var rowElement = document.createElement("object-cell-row");
+		rowElement.type = obj.type;
+		rowElement.enable = true;
+		rowElement.isChecked = obj.isChecked;
+
+		switch (obj.type) {
+			case "Public":
+				rowElement.name = $.i18n.getString("COMMON_SELECT_ALL");
+				rowElement.imageUrl = 'images/post_audience/Member-Branch.png';
+				self.publicRow = rowElement
+				break;
+
+			case "Favorite":
+				rowElement.number = 'fav';
+				rowElement.name = $.i18n.getString("COMMON_FAVORIATE");
+				rowElement.imageUrl = 'images/post_audience/Member-Favorite.png';
+				rowElement.info = obj.data.cl.length > 0 ? ($.i18n.getString("COMPOSE_N_MEMBERS", obj.data.visibleGul.length) + 
+					" " + $.i18n.getString("COMPOSE_N_SUBGROUP", obj.data.cl.length)) : ($.i18n.getString("COMPOSE_N_MEMBERS", obj.data.visibleGul.length));
+				rowElement.doEventFun = self.checkThisRow.bind(self, rowElement);
+
+				if (obj.data.gul.length > 0) {
+					rowElement.onclick = function (e) {
+						self.changeBranchView('fav');
+					}
+				} 
+				
+				self.favoriteRow = rowElement;
+				break;
+
+			case "Member":
+				rowElement.number = obj.data.gu;
+				rowElement.name = obj.data.nk.replaceOriEmojiCode();
+				rowElement.imageUrl = obj.data.aut ? obj.data.aut : "images/common/others/empty_img_personal_xl.png";
+				rowElement.doEventFun = self.checkThisRow.bind(self, rowElement);
+				// console.log(settings.isDisableOnAlreadyChecked)
+				rowElement.enable = obj.isEnable;
+				// rowElement.enable = !settings.isDisableOnAlreadyChecked || 
+	   //       		(settings.isDisableOnAlreadyChecked && !self.checkedOriMembers.hasOwnProperty(obj.data.gu));
+				// rowElement.parent = obj.parent;
+				self.visibleRows[obj.data.gu] = rowElement;
+				break;
+			case "Branch":
+				rowElement.number = obj.data.bi;
+				rowElement.name = obj.data.bn;
+				rowElement.imageUrl = 'images/common/others/select_empty_all_photo.png';
+				rowElement.expand = true;
+				rowElement.info = $.i18n.getString("COMPOSE_N_MEMBERS", obj.data.cnt) + 
+					" " + $.i18n.getString("COMPOSE_N_SUBGROUP", obj.data.cl.length);
+
+				rowElement.doEventFun = self.checkThisRow.bind(self, rowElement);
+				// rowElement.parent = obj.parent;
+				rowElement.onclick = function (e) {
+					self.changeBranchView(obj.data.bi);
+				}
+
+				self.visibleRows[obj.data.bi] = rowElement;
+
+				break;
+		}
+
+		if (obj.type == 'Public' || obj.type == 'Favorite') {
+			self.defaultSelect.appendChild(rowElement);
+
+			if (obj.type == 'Favorite' && obj.data.gul.length == 0) {
+				rowElement.hideCheckbox();
+			}
+ 		} else {
+			self.selectArea.appendChild(rowElement);
+		}
+    }
+
+    self.updateBranchMenu = function (branchId) {
+		var branchObj = this.branchMap[branchId];
+		var dropBtn = this.branchMenu.querySelector("div.drop-button")
+
+		// 更新dropdown menu 按鈕文字
+		dropBtn.querySelector("div.branch>div").textContent = branchObj.bn;
+		dropBtn.querySelector("div.branch>p").textContent = $.i18n.getString("COMPOSE_N_MEMBERS", branchObj.cnt) + 
+					" " + $.i18n.getString("COMPOSE_N_SUBGROUP", branchObj.cl.length);
+	},
+
+	self.setBranchMenu = function (isFavBranch) {
+		var branchObj = isFavBranch ? self.branchMap['fav'] : self.branchMap['root'];
+		var branchSelect = self.branchMenu.querySelector("div.dropdown-menu>ul");
+
+		while(branchSelect.firstChild) {
+			branchSelect.removeChild(branchSelect.firstChild);
+		}
+
+		if (isFavBranch) {
+			makeBranchItem('fav');
+		}
 
 		(function recursiveBranch() {
 			branchObj.cl.forEach(function(branchId) {
-				branchObj = self.treeData[branchId];
+				makeBranchItem(branchId);
 
 				if (branchObj.cl && branchObj.cl.length > 0) {
 					recursiveBranch();
 				}
 			});
 		})();
+
+		function makeBranchItem (branchId) {
+			var branchOption = document.createElement('li');
+			var branchMeta = document.createElement('div');
+			var branchName = document.createElement('div');
+			var branchDetail = document.createElement('p');
+			var branchLevel = document.createElement('div');
+			branchObj = self.branchMap[branchId];
+			branchName.textContent = branchObj.bn;
+			branchDetail.textContent = $.i18n.getString("COMPOSE_N_MEMBERS", branchObj.cnt) + 
+				" " + $.i18n.getString("COMPOSE_N_SUBGROUP", branchObj.cl.length);
+			branchLevel.textContent = branchObj.lv;
+
+			branchMeta.className = 'branch';
+			branchMeta.appendChild(branchName);
+			branchMeta.appendChild(branchDetail);
+			branchOption.appendChild(branchMeta);
+			branchOption.appendChild(branchLevel);
+			branchOption.onclick = function () {
+				// console.log(branchObj.bi);
+				self.branchMenu.querySelector('div.drop-button').classList.remove('open');
+				self.changeBranchView(branchId);
+			}
+
+			branchOption.style.paddingLeft = (15 + (branchObj.lv - 1) * 20) + "px";
+
+			branchSelect.appendChild(branchOption);
+		}
 	},
 
-	setBreadcrumb: function () {
-		var self = this;
-		self.clearBreadcrumb();
+    self.setBreadcrumb = function (branchId) {
+    	var self = this;
+    	var breadcrumb = self.branchMenu.querySelector("div.breadcrumb ul");
+    	var leftArrow = null;
+    	var rightArrow = null;
 
-		var branchObj = self.treeData[self.currentBranch];
-
-		// var item = document.createElement("li");
-		// item.textContent = branchObj.bn;
-		var item = createBranchItem(branchObj, false);
-
-		self.breadcrumb.appendChild(item);
-
-		while (branchObj.pi) {
-			branchObj = self.treeData[branchObj.pi];
-
-			var item = createBranchItem(branchObj, true);
-
-			self.breadcrumb.appendChild(item);
+		while(breadcrumb.firstChild) {
+			breadcrumb.removeChild(breadcrumb.firstChild);
 		}
 
-		function createBranchItem (branch, withLink) {
+		var branchObj = self.branchMap[branchId];
+
+		// if (overflow) {
+		// 	breadcrumb.appendChild(createBranchItem(branchObj, true, 'right'));
+		// } else {
+			breadcrumb.appendChild(createBranchItem(branchObj, false));
+		// }
+		
+		while (branchObj.pi) {
+			branchObj = self.branchMap[branchObj.pi];
+			breadcrumb.appendChild(createBranchItem(branchObj, true));
+
+			// if (breadcrumb.offsetWidth > breadcrumb.parentElement.offsetWidth) {
+			// 	if (leftArrow == null) {
+			// 		leftArrow = createBranchItem(branchObj, true, 'left');
+			// 		breadcrumb.insertBefore(leftArrow, breadcrumb.lastChild);
+			// 	}
+			// }
+		}
+
+		// if (leftArrow != null) {
+		// 	var distanceX = leftArrow.getClientRects()[0].left - breadcrumb.getClientRects()[0].left;
+			
+		// 	console.log(distanceX);
+		// 	breadcrumb.style.marginLeft = "-" + distanceX + "px";
+		// }
+
+		function createBranchItem (branch, withLink, direction) {
 			var item = document.createElement("li");
 
 			if (withLink) {
 				var link = document.createElement('a');
-				link.textContent = branch.bn;
-				link.onclick = function (e) {
-					e.stopPropagation();
-					self.changeBranchView(branch.bi);
-				};
 
+				if (direction) {
+					if (direction == "left") {
+						item.className = "slide-left";
+					} else {
+						item.className = "slide-right";
+						link.textContent = branch.bn;
+					}
+					
+					link.onclick = function (e) {
+						e.stopPropagation();
+
+						// var currentBranch;
+						// var distance = 0;
+						// var breadcrumbWidth = 
+						
+						// if (breadcrumb.querySelector("li.slide-left") != null) {
+						// 	currentBranch = breadcrumb.querySelector("li.slide-left").previousElementSibling;
+						// 	distance = link.getClientRects()[0].left - breadcrumb.getClientRects()[0].left;
+						// 	breadcrumb.removeChild(breadcrumb.querySelector("li.slide-left"));
+
+						// 	while (currentBranch.nextElementSibling) {
+								 
+						// 	}
+						// }
+
+						// if (breadcrumb.querySelector("li.slide-right") != null) {
+						// 	breadcrumb.removeChild(breadcrumb.querySelector("li.slide-right"))
+						// }
+
+						// while
+
+						// if ()
+						
+
+
+						// console.log(branch.bn);
+						// e.stopPropagation();
+						// self.setBreadcrumb(branch.bi)
+					};
+
+				} else {
+					link.textContent = branch.bn;
+					link.onclick = function (e) {
+						e.stopPropagation();
+						self.changeBranchView(branch.bi);
+					};
+				}
+				
 				item.appendChild(link);
 			} else {
 				item.textContent = branch.bn;
@@ -120,926 +502,406 @@ ObjectDelegate = {
 
 			return item;
 		} 
-	},
-
-	clearBreadcrumb: function () {
-		while(this.breadcrumb.firstChild) {
-			this.breadcrumb.removeChild(this.breadcrumb.firstChild);
-		}
-	},
-
-	resetView: function () {
-
-		while(this.mainContainer.firstChild) {
-			this.mainContainer.removeChild(this.mainContainer.firstChild);
-		}
-	},
-
-	setDefaultOptions : function () {
-
-		if (Object.keys(this.defaultRow).length == 0) {
-			this.addRowElement("Default");
-		}
-		// this.addFavoriteSubRow("FavBranch", {thisFavBranchObj : fbObj, isSubRow : true});
-	},
-
-	changeBranchView : function (branchId) {
-		console.log(branchId)
-		var self = this;
-		var isBranchChecked = self.checkedBranches.hasOwnProperty(branchId);
-
-		self.resetView();
-		self.currentBranch = branchId;
-		self.currentRows = [];
-
-		self.treeData[branchId].gul.forEach(function (gu) {
-			var memberObj = self.memberList[gu];
-			var isChecked = false;
-			if (isBranchChecked) {
-				isChecked = true;
-			} else {
-			 	isChecked = self.checkedMems.hasOwnProperty(gu);
-			}
-
-			self.addRowElement("Member", memberObj, isChecked);
-		});
-
-		self.treeData[branchId].cl.forEach(function (branchKey) {
-			var isChecked = false;
-			if (isBranchChecked) {
-				isChecked = true;
-			} else {
-				isChecked = self.checkedBranches.hasOwnProperty(branchKey);
-			}
-
-        	self.addRowElement("Branch", self.treeData[branchKey], isChecked);
-		});
-
-		if (branchId != 'root') {
-			self.setBreadcrumb();
-			self.basicSelect.style.display = 'none';
-			self.searchArea.style.display = 'none';
-			self.branchMenu.style.display = 'block';
-
-			self.updateBranchMenuStatus();
-		} else {
-			self.basicSelect.style.display = 'block';
-			self.searchArea.style.display = 'block';
-			self.branchMenu.style.display = 'none';
-		}
-
-		self.selectAllBtn.previousElementSibling.textContent = (branchId == 'root') 
-			? $.i18n.getString('COMMON_MEMBER') : self.treeData[branchId].bn;
-	},
-
-	updateBranchMenuStatus : function () {
-		var branchObj = this.treeData[this.currentBranch];
-
-		// 更新dropdown menu 按鈕文字
-		this.branchMenu.querySelector("div.current-branch>div").textContent = branchObj.bn;
-		this.branchMenu.querySelector("div.current-branch>p").textContent = $.i18n.getString("COMPOSE_N_MEMBERS", branchObj.cnt) + 
-					" " + $.i18n.getString("COMPOSE_N_SUBGROUP", branchObj.cl.length);
-	},
-
-	setHeight : function() {
-		var paddingTop = this.searchArea.outerHeight();
-		this.mainContainer.parent().css("height", $(window).height() - 57 - paddingTop);
-
-    	return this;
-	},
-
-	bindEvent : function () {
-		this.closeBtn.removeEventListener('click', this.onBackToHome);
-		this.onBackToHome = this.onBackToHome.bind(this);
-		this.closeBtn.addEventListener('click', this.onBackToHome);
-		 
-		this.selectAllBtn.removeEventListener('click', this.onSelectAll);
-		this.onSelectAll = this.selectAll.bind(this);
-		this.selectAllBtn.addEventListener('click', this.onSelectAll);
-
-
-		// var selectAll = this.selectAll.bind(this);
-		// this.selectAllBtn.removeEventListener('click', this.selectAll.bind(this))
-		// this.selectAllBtn.addEventListener('click', this.selectAll.bind(this));
-		// this.mainContainer.parent().off("scroll").on("scroll", this.loadMoreMemRow.bind(this));
-		// this.searchInput.off("input").on("input", this.searchMatchRow.bind(this));
-		// this.searchArea.off("click").on("click", this.focusSearchArea.bind(this));
-		// this.finishButton.off("click").on("click", this.clickDone.bind(this));
-		// this.clearButton.off("click").on("click", this.clearAllCheckRows.bind(this));
-		// this.selectListArea.off("click").on("click", "span", this.searchCheckedRow.bind(this));
-		// this.searchArea.children(".list").off("scroll").on("scroll", this.loadMoreMemLabels.bind(this));
-	},
-
-	// setEventHandler: function () {
-	// 	this.selectAllBtn.removeEventListener('click', this.onSelectAll);
-	// }
-
-	onBackToHome : function () {
-		this.changeBranchView('root');
-	},
-
-	selectAll : function () {
-		console.log('selectall')
-		var self = this;
-		self.currentRows.forEach(function(row) {
-			row.check(!self.isSelectAll);
-		});
-
-		self.isSelectAll = !self.isSelectAll;
-		self.selectAllBtn.textContent = self.isSelectAll ? 
-			$.i18n.getString("COMMON_SELECT_NONE") : $.i18n.getString("COMMON_SELECT_ALL");
-
-		if (self.isSelectAll) {
-
-		}
-	},
-
-	focusSearchArea : function () {
-		this.searchInput.focus();
-	},
-
-	clickDone : function (e) {
-		if ($(e.target).hasClass("disable")) return;
-
-		var checkedMemNum = Object.keys(this.checkedMems).length;
-		var checkedBranchNum = Object.keys(this.checkedBranches).length + Object.keys(this.checkedFavorites).length;
-		if (this.composeObj.parent().hasClass("cp-work-item")) {
-			var target = $(".cp-work-item-object span:eq(" + this.composeObj.parents(".cp-work-item").data("work-index") + ")");
-			var objText = $.i18n.getString("COMPOSE_ASSIGN");
-			if (checkedMemNum > 0) {
-				target.css("color", "red");
-				objText = this.checkedMems[Object.keys(this.checkedMems)[0]];
-			} else {
-				target.removeAttr("style");
-			}
-
-			target.html(objText);
-			this.composeObj.data("object_str", JSON.stringify(this.checkedMems));
-		} else {
-			if(checkedMemNum > 0 && checkedBranchNum == 0) {  //無群組有選人
-                this.composeObj.find("span").html( $.i18n.getString("GROUP_MEMBERS", checkedMemNum));
-            } else if (checkedMemNum == 0 && checkedBranchNum > 0) { //有群組無選人
-            	this.composeObj.find("span").html( $.i18n.getString("GROUP_COUNTS", checkedBranchNum));
-            } else if (checkedMemNum > 0 && checkedBranchNum > 0) { //有群組有選人
-            	this.composeObj.find("span").html( $.i18n.getString("GROUP_COUNTS", checkedBranchNum) 
-            		+ $.i18n.getString("GROUP_AND") + $.i18n.getString("GROUP_MEMBERS", checkedMemNum));
-            } else {
-            	this.composeObj.find("span").html("");
-            }
-
-            this.compose.data("object_str", JSON.stringify(this.checkedMems));
-            this.compose.data("branch_str", JSON.stringify(this.checkedBranches));
-            this.compose.data("favorite_str", JSON.stringify(this.checkedFavorites));
-		}
-
-		if (this.isBack) this.pageBackButton.trigger("click");
-		if (this.onDone) this.onDone(true);
-	},
-
-	loadMoreMemRow : function (e) {
-		var container = $(e.target);
-		var topAreaHeight = this.searchArea.outerHeight() + 58;
-		if (container.scrollTop() + container.height() > container[0].scrollHeight - topAreaHeight) {
-		    if (this.visibleMemNum < this.matchList.length) {
-
-		    	setTimeout(function() {
-					this.makeMemberList();
-				}.bind(this), 500);
-		    }
-		}
-	},
-
-	showNoMember : function() {
-		this.mainPage.find(".obj-content").hide().end()
-        			 .find(".obj-coach-noMember").show().end();
-
-        this.finishButton.hide();
-	}, 
-
-	searchCheckedRow : function(e) {
-		e.stopPropagation();
-
-		var searchTag = $(e.target);
-		if (searchTag.text() != $.i18n.getString("COMMON_ALL_MEMBERS")) {
-			this.searchInput.html(searchTag.text()).trigger("input");
-		}
-	}, 
-
-	addRowElement : function (type, rowData, isChecked) {
-		var self = this;
-		var rowElement = document.createElement("object-cell-row");
-		rowElement.type = type;
-		rowElement.enable = true;
-		rowElement.isChecked = isChecked;
-
-		switch (type) {
-			case "Default":
-				rowElement.name = $.i18n.getString("COMMON_SELECT_ALL");
-				rowElement.imageUrl = 'images/common/others/select_empty_all_photo.png';
-				rowElement.enable = false;
-				self.defaultRow = rowElement;
-				break;
-			case "Member":
-				rowElement.number = rowData.gu;
-				rowElement.name = rowData.nk.replaceOriEmojiCode();
-				rowElement.imageUrl = rowData.aut ? rowData.aut : "images/common/others/empty_img_personal_xl.png";
-				rowElement.doEventFun = self.checkThisRow.bind(self, rowElement);
-				
-				self.currentRows.push(rowElement);
-				break;
-			case "Branch":
-				rowElement.number = rowData.bi;
-				rowElement.name = rowData.bn;
-				rowElement.imageUrl = 'images/common/others/select_empty_all_photo.png';
-				rowElement.expand = true;
-				rowElement.info = $.i18n.getString("COMPOSE_N_MEMBERS", rowData.cnt) + 
-					" " + $.i18n.getString("COMPOSE_N_SUBGROUP", rowData.cl.length);
-
-				rowElement.doEventFun = self.checkThisRow.bind(self, rowElement);
-				rowElement.onclick = function (e) {
-					self.changeBranchView(rowData.bi);
-				}
-
-				self.currentRows.push(rowElement);
-
-				break;
-		}
-
-		if (type == 'Default') {
-			this.basicSelect.appendChild(rowElement)
-		} else {
-			this.mainContainer.appendChild(rowElement);
-		}
-		// rowData = rowData || {};
-		// rowData.isSelectedAll = this.isSelectedAllMember;
-		// var rowElement = ObjectCell.factory(type, rowData);
-
-		// switch (type) {
-		// 	case "Default" :
-		// 		this.defaultRow = rowElement;
-		// 		// rowElement.bindEvent(this.clearAllCheckRows.bind(this));
-		// 		break;
-		// 	case "Favorite" :
-		// 		this.favParentRow = rowElement;
-		// 		rowElement.bindEvent(this.toggleFavSubRows.bind(this));
-		// 		break;
-		// 	case "Member" :
-		// 		rowElement.bindEvent(this.checkThisMember.bind(this));
-		// 		this.memberRows.push(rowElement);
-		// 		break;
-		// 	case "ParentBranch" :
-		// 		rowElement.bindEvent(this.selectChildBranch.bind(this));
-		// 		this.branchRows.push(rowElement);
-		// 		break;
-		// 	case "ChildBranch" :
-		// 		rowElement.bindEvent(this.checkThisBranch.bind(this));
-		// 		this.branchRows.push(rowElement);
-		// 		break;
-		// 	case "SelectAllTitle" :
-		// 		// console.log(rowElement)
-		// 		// console.log(rowData.type)
-		// 		if (rowData.type == "group") {
-		// 			rowElement.bindEvent(this.selectAllBranch.bind(this));
-		// 			this.allBranchChxbox = rowElement;
-		// 		} else {
-		// 			rowElement.bindEvent(this.selectAllMember.bind(this));
-		// 			this.allMemberChkbox = rowElement;
-		// 		}
-		// }
-
-		// // rowElement.bindEvent(this.doSomething.bind(this));
-		// if (type == "ParentBranch") this.mainContainer.append("<hr color='#F3F3F3'>");
-	},
-
-	makeMemberList : function () {
-		var loadMemberList = this.matchList.slice(this.visibleMemNum, this.visibleMemNum + 500);
-		var checkedObjNum = Object.keys(this.checkedMems).length;
-		// 剩餘未顯示的成員不到500人
-		if (this.visibleMemNum + 500 > this.matchList.length - 1) {
-            loadMemberList = this.matchList.slice(this.visibleMemNum);
-            this.visibleMemNum = this.matchList.length;
-            this.loadingCircle.hide();
-        } else {
-        	this.visibleMemNum += 500;
-        	this.loadingCircle.show();
-        }
-
-        $.each(loadMemberList, function(i, gu) {
-        	var memberObj = this.groupAllMembers[gu];
-        	if (checkedObjNum > 0) {
-	         	if (this.checkedMems[memberObj.gu] != undefined) {
-	         		memberObj.chk = true;
-
-	         		// 不是新增對象的情境，或者是新增對象但是預設沒有被選
-	         		memberObj.enable = !this.isDisableOnAlreadyChecked || 
-	         			(this.isDisableOnAlreadyChecked && !this.oriCheckedMems.hasOwnProperty(memberObj.gu));
-	         	} else {
-	         		memberObj.chk = false;
-	         		memberObj.enable = true;
-	         	}
-        	} else {
-        		memberObj.enable = true;
-        	}
-
-            this.addRowElement("Member", {thisMember : memberObj, isSubRow : false});
-        }.bind(this));
-	},
-
-	addFavoriteSubRow : function (type, rowData) {
-		rowData = rowData || {};
-		rowData.isSelectedAll = this.isSelectedAllMember;
-
-		var rowElement = ObjectCell.factory(type, rowData);
-		switch (type) {
-			case "Member" :
-				// if (Object.keys(this.checkedMems).length) {
-		  //      		if (this.checkedMems[rowElement.id] != undefined) rowElement.checked(true);
-		  //   	}
-				rowElement.bindEvent(this.checkThisMember.bind(this));
-				this.favMemberRows.push(rowElement);
-				break;
-			case "FavBranch" :
-				if (Object.keys(this.checkedFavorites).length) {
-					if (this.checkedMems[rowElement.id] != undefined) rowElement.checked(true);
-				}
-				rowElement.bindEvent(this.checkFavoriteBranch.bind(this))
-				this.favBranchRows.push(rowElement);
-				break;
-		}
-
-		this.favParentRow.html.find(".obj-cell-arrow").css("display", "inline-block").end()
-							  .find(".folder").append(rowElement.html);
-	},
-
-	selectAllBranch : function () {
-		this.isSelectedAllBranch = !this.isSelectedAllBranch;
-		this.checkedBranches = {};
-
-		this.branchRows.forEach(function(branchRow) {
-			branchRow.checked(this.isSelectedAllBranch);
-			if (this.isSelectedAllBranch) this.checkedBranches[branchRow.id] = branchRow.name;
-		}.bind(this));
-	},
-
-	selectAllMember : function () {
-		console.log('fffff')
-		this.isSelectedAllMember = !this.isSelectedAllMember;
-		this.checkedMems = {};
-
-		this.favMemberRows.forEach(function (memberRow) {
-			memberRow.checked(this.isSelectedAllMember);
-		}.bind(this));
-
-		this.visibleMembers.forEach(function(memberKey) {
-			this.groupAllMembers[memberKey].chk = this.isSelectedAllMember;
-			if (this.isSelectedAllMember) this.checkedMems[memberKey] = this.groupAllMembers[memberKey].nk;
-		}.bind(this));
-
-		this.memberRows.forEach(function(memberRow) {
-			if (!memberRow.enable) this.checkedMems[memberRow.id] = memberRow.name;
-			memberRow.checked(this.isSelectedAllMember);
-		}.bind(this));
-	},
-
-	selectChildBranch : function (parentBranchRow) {
-		if (parentBranchRow.isChecked) delete this.checkedBranches[parentBranchRow.id];
-		else this.checkedBranches[parentBranchRow.id] = parentBranchRow.name;
-		
-		parentBranchRow.childBranch.forEach(function (childBranchRow) {
-			if (parentBranchRow.isChecked) {
-				delete this.checkedBranches[childBranchRow.id];
-				childBranchRow.checked(false);
-			} else {
-				this.checkedBranches[childBranchRow.id] = childBranchRow.name;
-				childBranchRow.checked(true);
-			}
-		}.bind(this));
-	},
-
-	toggleFavSubRows : function () {
-		var isChecked = !this.favParentRow.isChecked;
-
-		this.favBranchRows.forEach(function(favBranchRow) {
-			this.checkFavoriteBranch(favBranchRow);
-			favBranchRow.checked(isChecked);
-		}.bind(this));
-
-		this.favMemberRows.forEach(function(facMemberRow) {
-			if (isChecked) this.checkedMems[facMemberRow.id] = facMemberRow.name;
-			else delete this.checkedMems[facMemberRow.id];
-			this.memberRows.forEach(function (memberRow) {
-				if (memberRow.id == facMemberRow.id) memberRow.checked(isChecked);
-			});
-			this.groupAllMembers[facMemberRow.id].chk = isChecked;
-			facMemberRow.checked(isChecked);
-		}.bind(this));
-	},
-
-	// 預設全選
-	clearAllCheckRows : function () {
-		var allRow = [].concat(this.memberRows, this.branchRows, this.favBranchRows, this.favMemberRows);
-
-		this.checkedMems = {};
-		this.checkedBranches = {};
-		this.checkedFavorites = {};
-		this.isSelectedAllMember = false;
-		this.isSelectedAllBranch = false;
-
-		allRow.forEach(function(row) {
-			console.log(this)
-			if (!row.enable) {
-				this.checkedMems[row.id] = row.name;
-			} else {
-				row.checked(false);
-			}
-		}.bind(this));
-
-		this.updateStatus();
-	},
-
-	checkFavoriteBranch : function (thisFavBranchRow) {
-		if (thisFavBranchRow.isChecked) delete this.checkedFavorites[thisFavBranchRow.id];
-		else this.checkedFavorites[thisFavBranchRow.id] = thisFavBranchRow.name;
-	},
-
-	checkThisBranch : function (thisBranchRow) {
-		if (thisBranchRow.isChecked) delete this.checkedBranches[thisBranchRow.id];
-		else this.checkedBranches[thisBranchRow.id] = thisBranchRow.name;
-	},
-
-	checkThisRow : function (thisRow) {
-		var checkedObj = {};
-		var rowType = thisRow.type;
-
-		if (rowType == 'Member') checkedObj = this.checkedMems;
-		else if (rowType == 'Branch') checkedObj = this.checkedBranches;
-
-		console.log(checkedObj)
-		// else if (rowType == 'Branch') checkedObj = self.checkedBranches;
-		// 點了我的最愛或是一般，會影響彼此，故檢查點選的成員是一般還是我的最愛，找出被影響的成員欄位
-		// var relatedMemRows = (thisMemberRow.isSubRow) ? this.memberRows : this.favMemberRows;
-
-		// // 單選其他，取消其他勾選
-		if (this.singleCheck) {
-			checkedObj = {};
-			checkedObj[thisRow.number] = thisRow.name;
-			this.currentRows.forEach(function(row) {
-				row.check(false);
-			}.bind(this));
-		} else { //複選
-			if (thisRow.isChecked) checkedObj[thisRow.number] = thisRow.name;
-			else delete checkedObj[thisRow.number];
-		}
-
-		this.updateStatus();
-
-		// relatedMemRows.forEach(function (memberRow) {
-		// 	if (memberRow.id == thisMemberRow.id) memberRow.checked(!thisMemberRow.isChecked);
-		// });
-		
-		// this.groupAllMembers[thisMemberRow.id].chk = !thisMemberRow.isChecked;
-		// if (!$.isEmptyObject(this.defaultRow)) this.defaultRow.checked(false);
-	},
-
-	deleteAllMemRows : function () {
-		this.memberRows.forEach(function(memberRow) {
-			memberRow.remove();
-		}.bind(this));
-
-		this.memberRows = [];
-	},
-
-	searchMatchRow : function (e) {
-		var target = $(e.target);
-		var searchText = target.val().toLowerCase();
-		console.log(searchText)
-		this.visibleMemNum = 0;
-		if (searchText.length > 0) {
-			this.matchList = [];
-			this.mainPage.find(".obj-content").addClass("on-search");
-			this.mainContainer.find(".obj-cell-arrow").addClass("open").end()
-							  .find(".folder").show().end()
-							  // .find(".obj-content").addClass("on-search").end()
-							  .find("hr").hide().end()
-							  .find(".obj-cell-subTitle-chk").hide();
-
-			if (Object.keys(this.favParentRow).length > 0) this.favParentRow.html.hide();
-
-			//搜尋符合的群組
-			this.branchRows.forEach(function(row) {
-				if (row.name.toLowerCase().indexOf(searchText) > -1) row.html.show();
-				else row.html.hide();
-			});
-
-			this.visibleMembers.forEach(function(memId) {
-				var memberData = this.groupAllMembers[memId];
-				if (memberData.nk.toLowerCase().indexOf(searchText) > -1
-					|| memberData.bn.toLowerCase().indexOf(searchText) > -1) {
-					this.matchList.push(memId);
-				}
-			}.bind(this));
-
-		} else {
-			this.matchList = this.visibleMembers;
-
-			this.mainPage.find(".obj-content").removeClass("on-search");
-			this.mainContainer.find(".obj-cell-arrow").removeClass("open").end()
-							  .find(".folder").hide().end()
-							  // .find(".obj-content").removeClass("on-search").end()
-							  .find("hr").show().end()
-							  .find(".obj-cell-subTitle-chk").show();
-
-			if (Object.keys(this.favParentRow).length > 0) this.favParentRow.html.show();
-
-			this.branchRows.forEach(function(row) {
-				row.html.show();
-			});
-		}
-
-		this.deleteAllMemRows();
-		this.makeMemberList();
-	},
-
-
-	updateStatus : function () {
-		var isEveryRowChecked = this.currentRows.every(row => row.isChecked);
-		var selectNum = Object.keys(this.checkedMems).length + Object.keys(this.checkedBranches).length
-			+ Object.keys(this.checkedFavorites).length;
-
-		this.isSelectAll = isEveryRowChecked;
-		this.selectAllBtn.textContent = this.isSelectAll ? 
-			$.i18n.getString("COMMON_SELECT_NONE") : $.i18n.getString("COMMON_SELECT_ALL");
-
-		
-		console.log(selectNum)
-		if (Object.keys(this.defaultRow).length > 0) {
-			console.log('eeddef')
-			if (selectNum > 0) this.defaultRow.check(false);
-			else this.defaultRow.check(true);
-		}
-
-		console.log(this.checkedMems);
-		console.log(this.checkedBranches);
-	},
-	// updateStatus : function () {
-	// 	var allFavRow = [].concat(this.favMemberRows, this.favBranchRows);
-	// 	var totalNum = Object.keys(this.checkedMems).length + Object.keys(this.checkedBranches).length
-	// 		+ Object.keys(this.checkedFavorites).length;
-
-	// 	var allCheckRowData = Object.assign({}, this.checkedFavorites, this.checkedBranches);
-
-	// 	// 檢查我的最愛欄位底下子欄位是否全部都有勾選
-	// 	var isAllFavRowChecked = allFavRow.every(function (favRow) {
-	// 		return favRow.isChecked;
-	// 	});
-
-	// 	this.selectListArea.find("span").remove();
-
-	// 	// 超過最少點取數量，才能按完成或下一步
-	// 	if (totalNum >= this.minSelectNum) this.finishButton.removeClass("disable");
-	// 	else this.finishButton.addClass("disable");
-
-	// 	// 預設全選判斷
-	// 	if (!$.isEmptyObject(this.defaultRow)) {
-	// 		if (totalNum > 0) this.defaultRow.checked(false);
-	// 		else this.defaultRow.checked(true);
-	// 	}
-
-	// 	// 如有顯示我的最愛區塊，更新我的最愛欄位是否要勾選
-	// 	if (!$.isEmptyObject(this.favParentRow)) {
-	// 		if (isAllFavRowChecked) {
-	// 			this.favParentRow.html.find(".subgroup-parent .img").addClass("chk");
-	// 			this.favParentRow.isChecked = true;
-	// 		} else {
-	// 			this.favParentRow.html.find(".subgroup-parent .img").removeClass("chk");
-	// 			this.favParentRow.isChecked = false;
-	// 		}
-	// 	}
-
-	// 	// 判斷被勾選的群組數量是否等於全體群組數量，有則全選鍵勾選
-	// 	if (!$.isEmptyObject(this.allBranchChxbox)) {
-	// 		if (Object.keys(this.checkedBranches).length == this.branchRows.length) {
-	// 			this.isSelectedAllBranch = true;
-	// 			this.allBranchChxbox.html.find(".img").addClass("chk");
-	// 		} else {
-	// 			this.isSelectedAllBranch = false;
-	// 			this.allBranchChxbox.html.find(".img").removeClass("chk");
-	// 		}
-	// 	}
-
-	// 	// 判斷被勾選的成員數量是否等於全體成員數量，有則全選鍵勾選
-	// 	if (Object.keys(this.checkedMems).length == this.visibleMembers.length) {
-	// 		this.isSelectedAllMember = true;
-	// 		this.allMemberChkbox.html.find(".img").addClass("chk");
-	// 	} else {
-	// 		this.isSelectedAllMember = false;
-	// 		this.allMemberChkbox.html.find(".img").removeClass("chk");
-	// 	}
-
-	// 	if (Object.keys(this.checkedMems).length == this.visibleMembers.length) {
-	// 		this.selectListArea.append("<span>" + $.i18n.getString("COMMON_ALL_MEMBERS") + "</span>");
-	// 	} else {
-	// 		// 搜尋列加上選擇對象的Tag
-	// 		$.each(allCheckRowData, function (key, rowName) {
-	// 			this.selectListArea.append("<span>" + rowName.replaceOriEmojiCode() + "</span>");
-	// 		}.bind(this));
-
-	// 		if(Object.keys(this.checkedMems).length > 0) this.makeMemLabels();
-	// 	}
-	
-	// 	if (this.mainPage.find(".obj-content").hasClass("on-search")) {
-	// 		this.searchInput.val("").trigger("input").focus();
-	// 	}
-
-	// 	this.setHeight();
-	// },
-
-	makeMemLabels : function () {
-		var curLabelNum = this.selectListArea.find("span.mem").length;
-		if (curLabelNum + 1000 > Object.keys(this.checkedMems).length) {
-			var loadLabelList = Object.keys(this.checkedMems).slice(curLabelNum); 
-		} else {
-			var loadLabelList = Object.keys(this.checkedMems).slice(curLabelNum, curLabelNum + 1000);
-		}
-
-		// 搜尋列加上選擇對象的Tag
-		$.each(loadLabelList, function (index, memId) {
-			this.selectListArea.append("<span class='mem'>" + this.checkedMems[memId].replaceOriEmojiCode() + "</span>");
-		}.bind(this));
-	},
-
-	loadMoreMemLabels : function (e) {
-		var container = $(e.target);
-		
-		if (container.scrollTop() + container.height() >= container[0].scrollHeight) {
-		    var curLabelNum = this.selectListArea.find("span.mem").length;
-		    if (curLabelNum < Object.keys(this.checkedMems).length && curLabelNum >= 1000) {
-		    	setTimeout(function() {
-		    		this.makeMemLabels();	
-		    	}.bind(this));
-		    }
-		}
-	}
-
-}
-
-function ObjectCell () {};
-
-ObjectCell.prototype = {
-	click : function () {
-		this.html.find(".img").toggleClass("chk");
-		this.isChecked = !this.isChecked;
-	},
-
-	checked : function (isCheckedAll) {
-		if (isCheckedAll) {
-			this.html.find(".img").addClass("chk");
-			this.isChecked = true;
-		} else {
-			if (this.enable) {
-				this.html.find(".img").removeClass("chk");
-				this.isChecked = false;
-			} 
-		}
-	},
-
-	bindEvent : function (doEvenFun) {
-		var objCell = this;
-		var rowType = objCell.type;
-		var bindElement;
-
-		if (rowType == "SelectAllTitle") {
-			bindElement = objCell.html.find("span");
-		} else if (rowType == "ParentBranch" || rowType == "Favorite") {
-			bindElement = objCell.html.find(".subgroup-parent");
-		} else {
-			bindElement = objCell.html;
-		}
-
-		if (objCell.enable) {
-			bindElement.off("click").on("click", function (e) {
-				e.stopPropagation();
-
-				doEvenFun(objCell);
-				if (!objCell.isDefault) {
-					$(this).find(".img").toggleClass("chk");
-					objCell.isChecked = !objCell.isChecked;
-					ObjectDelegateView.updateStatus();
-				}
-
-				if (rowType == "SelectAllTitle") {
-					bindElement.text(objCell.isChecked ? 
-						$.i18n.getString("COMMON_SELECT_NONE") : $.i18n.getString("COMMON_SELECT_ALL"))
-				}
-			});
-		} else {
-			bindElement.off("click").on("click", function (e) {
-				toastShow($.i18n.getString("ADD_AUDIENCE_CANT_UNCHECK"));
-			});
-		}
-	},
-
-	remove : function () {
-		this.html.remove();
-	}
-}
-
-ObjectCell.factory = function (type, rowData) {
-	var constr = type, 
-		newRow;
-
-	if (typeof ObjectCell[constr] !== 'function'){
-        throw {
-            name: 'Error',
-            message: constr + ' does not exist'
-        };
     }
 
-    ObjectCell[constr].prototype = new ObjectCell(type);
-    newRow = new ObjectCell[constr](rowData);
+    self.setAvailableList = function () {
+		guList.forEach(function (gu) {
+	        var userObj = memberData[gu];
+	        var branchListStr = userObj.bl || "";
+	        
+	        if (isValidMember(userObj)) {
+	        	if (userObj.fav) {
+	        		self.branchMap['fav'].visibleGul.push(gu);
+	        		self.branchMap['fav'].gul.push(gu);
+	        	}
 
-    newRow.type = type;
+	        	if (userObj.fbl.length > 0) {
+	        		userObj.fbl.forEach(function(fi){
+	        			self.branchMap[fi].visibleGul.push(gu);
+	        			self.branchMap[fi].gul.push(gu);
+	        			if (!self.branchMap['fav'].gul.includes(gu)) {
+	        				self.branchMap['fav'].gul.push(gu);
+	        			}
+	        		})
+	        	}
 
-    return newRow;
-}
+	        	if (settings.isHiddenBranch) {
+	        		self.branchMap['root'].gul.push(gu);
+	        		self.branchMap['root'].cnt = self.branchMap['root'].cnt + 1;
+	        	} else {
+	        		if (branchListStr.length > 0) {
+			            var branchList = branchListStr.split(",");
 
-ObjectCell.Default = function (rowData) {
-	this.html = `
-		<div class='obj-cell all'>
-			<div class='obj-cell-chk'>
-				<div class='img " + ${(rowData.isAnyObjChecked) ? "" : "chk"} ></div>
-			</div>
-			<div class='obj-cell-user-pic'>
-				<img src='images/common/others/select_empty_all_photo.png' />
-			</div>
-			<div class='obj-cell-subgroup-data'>
-				<div class='obj-user-name'>${$.i18n.getString("COMMON_SELECT_ALL")}</div>
-			</div>
-		</div>
-	`	
-	// this.html = $("<div class='obj-cell all'><div class='obj-cell-chk'><div class='img " + ((rowData.isAnyObjChecked) ? "" : "chk") 
-	// 	+ "'></div></div><div class='obj-cell-user-pic'><img src='images/common/others/select_empty_all_photo.png' " 
-	// 	+ "/></div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" 
- //        + $.i18n.getString("COMMON_SELECT_ALL") + '</div></div>');
-	this.isSelectAll = false;
-	this.isChecked = true;
-	this.isDefault = true;
+			            branchList.forEach(function (fullBranchName) {
+			                var branchLevels = fullBranchName.split(".");
+			                var realBranchId = branchLevels.slice(-1);
 
-	this.enable = true;
-}
+			                branchLevels.forEach(function(branchId) {
+			                	if (!self.branchMap[branchId].gul.includes(gu)) {
+			                		self.branchMap[branchId].gul.push(gu);
+			                	}
+			                });
 
-ObjectCell.Favorite = function () {
-	this.html = $("<div class='subgroup-row fav-parent'><div class='subgroup-parent'>"
-		+ "<div class='obj-cell fav'><div class='obj-cell-chk'><div class='img'></div></div>" 
-		+ "<div class='obj-cell-user-pic'><img src='images/common/others/empty_img_favor.png' />"
-		+ "</div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" + $.i18n.getString("COMMON_FAVORIATE") 
-		+ "</div></div></div><div class='obj-cell-arrow'></div></div><div class='folder'></div></div>");
+			                self.branchMap[realBranchId].visibleGul.push(gu);
+			            });
+			        }
 
-	this.isSelectAll = false;
-	this.isFavorite = true;
-	this.html.find(".obj-cell-arrow").off("click").click( function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-        $(this).toggleClass("open");
-        $(this).parent().next().toggle();
-    });
-	this.isChecked = false;
-	this.enable = true;
-}
-
-ObjectCell.ParentBranch = function (rowData) {
-	var self = this;
-	var thisBranch = rowData.thisBranch;
-	var allBranchData = rowData.bl;
-	self.name = thisBranch.bn.replaceOriEmojiCode();
-	self.id = thisBranch.bi;
-	self.html = $("<div class='subgroup-row'><div class='subgroup-parent'>"
-		+ "<div class='obj-cell subgroup branch' data-bl='" + thisBranch.bi + "'>"
-		+ "<div class='obj-cell-chk'><div class='img " + ((thisBranch.chk) ? "chk" : "") + "'></div></div>" 
-		+ "<div class='obj-cell-user-pic'><img src='images/common/others/select_empty_all_photo.png' />"
-		+ "</div><div class='obj-cell-subgroup-data'><div class='obj-user-name'>" + this.name 
-		+ "</div></div></div><div class='obj-cell-arrow'></div></div><div class='folder'></div></div>");
-	self.isSelectAll = false;
-	self.childBranch = [];
-	self.enable = thisBranch.enable;
-
-	self.html.find(".obj-cell-arrow").off("click").click(function(e) {
-		e.stopPropagation();
-		
-        var dom = $(this).parent().next();
-        $(this).toggleClass("open");
-        if ($(this).hasClass("open")) dom.slideDown();
-        else dom.slideUp();
-    });
-
-    if (thisBranch.cl.length > 0) {
-    	this.html.find(".obj-cell-arrow").css("display", "inline-block");
-        recursive(thisBranch.cl);
+			        self.branchMap['root'].gul.push(gu);
+			        self.branchMap['all'].gul.push(gu);
+			        self.branchMap['all'].visibleGul.push(gu);
+			        self.branchMap['all'].cnt = self.branchMap['all'].cnt + 1;
+	        	}
+	        }
+	    });
 	}
 
-	self.isChecked = thisBranch.chk;
+	self.updateStatus = function () {
+		var selectedMemberList = Object.keys(self.selectedMembers).map(function (gu) {
+			return {
+				id: gu,
+				avatar: memberData[gu].aut || "images/common/others/empty_img_personal_xl.png",
+				name: memberData[gu].nk
+			}
+		});
 
-	function recursive(cldArr) {
-		cldArr.forEach(function(bi) {
-			if(allBranchData[bi].cl.length > 0) recursive(allBranchData[bi].cl);
-			setChildBranch(bi);
+		self.isSelectAll = true;
+
+		var selectAllMembers = selectedMemberList.length == self.branchMap['all'].cnt;
+		var selectAllBlock = self.container.querySelector("div.obj-select-all");
+
+		for (var id in self.visibleRows) {
+			var rowElement = self.visibleRows[id];
+
+			if (self.branchMap.hasOwnProperty(id)) {
+				var branchObj = self.branchMap[id];
+
+				if (branchObj.cnt == 0) {
+					if (selectAllMembers) {
+						rowElement.check(true);
+					} else if (self.checkedBranches.hasOwnProperty(id)) {
+						rowElement.check(true);
+					} else if (selectedMemberList.length == 0 && !self.checkedBranches.hasOwnProperty(id)) {
+						rowElement.check(false);
+					}
+				} else {
+					if (haveChildrenAllChecked(branchObj)) {
+						rowElement.check(true);
+					} else {
+						rowElement.check(false);
+					}
+				}
+				// if (haveChildrenAllChecked(branchObj)) {
+				// 	if (isSellctAll || branchObj.cnt > 0) {
+				// 		rowElement.check(true);
+				// 	}
+				// } else {
+				// 	if (selectedMemberList.length == 0 || branchObj.cnt > 0) {
+				// 		rowElement.check(false);
+				// 	}
+				// 	// if (!(isSellctAll && branchObj.cnt == 0) || branchObj.cnt > 0) {
+				// 	// // if (selectedMemberList.length == 0 || branchObj.cnt > 0) {
+				// 	// // 	// console.log(rowElement.name);
+				// 	// 	rowElement.check(false);
+
+				// 	// 	if (self.checkedBranches.hasOwnProperty(id)) {
+				// 	// 		delete self.checkedBranches[id];
+				// 	// 	}
+				// 	// }
+				// }
+
+				// console.log(rowElement.isChecked)
+
+				// rowElement.enable = !haveChildrenAllChecked || self.branchMap[id].cnt > 0;
+				// rowElement.enable = !(isSellctAll && branchObj.cnt == 0)
+				// console.log(rowElement.enable)
+			} else {
+				if (self.selectedMembers.hasOwnProperty(id)) {
+					rowElement.check(true);
+				} else  {
+					rowElement.check(false);
+				}
+			}
+
+			if (!rowElement.isChecked) {
+				console.log(rowElement.name)
+				self.isSelectAll = false;
+			}
+		}
+
+		if (typeof self.publicRow.check === 'function') {
+			if (selectedMemberList.length > 0) {
+				self.publicRow.enable = true;
+				self.publicRow.check(false);
+			} else {
+				self.publicRow.check(true);
+				self.publicRow.enable = false;
+			}
+		}
+
+		selectAllBlock.lastElementChild.textContent = self.isSelectAll ? 
+			$.i18n.getString("COMMON_SELECT_NONE") : $.i18n.getString("COMMON_SELECT_ALL");
+
+		if (self.showPreviewArea) {
+			self.showPreviewArea(selectedMemberList);
+		}
+	}
+
+    var setBranchTreeData = (function () {
+		Object.keys(group.fbl).forEach(function(fi) {
+			self.branchMap['fav'].cl.push(fi);
+			self.branchMap[fi] = {
+				gul: [],
+	    		visibleGul: [],
+	    		cl: [],
+	    		cnt: group.fbl[fi].cnt,
+	    		bi: fi,
+	    		bn: group.fbl[fi].fn,
+	    		lv: 2
+			}
 		})
-	}
 
-	function setChildBranch(branchID) {
-        var branchData = allBranchData[branchID];
-		var childBranchRow = ObjectCell.factory("ChildBranch", {thisBranch: branchData, isSubRow : true});
-		childBranchRow.parent = self;
-		self.childBranch.push(childBranchRow);
-		ObjectDelegateView.branchRows.push(childBranchRow);
-		childBranchRow.bindEvent(ObjectDelegateView.checkThisBranch.bind(ObjectDelegateView));
-		self.html.find(".folder").append(childBranchRow.html);
+    	if (!settings.isHiddenBranch) {
+    		Object.keys(branchData).forEach(function (id) {
+		        var branchObj = branchData[id];
+		        self.branchMap[id] = Object.assign({}, branchObj);
+		        
+		        if (branchObj.lv == 1) {
+		            self.branchMap['root'].cl.push(id);
+		        };
+
+		        self.branchMap[id].bi = id;
+		        self.branchMap[id].gul = [];
+		        self.branchMap[id].visibleGul = [];
+		    });
+    	}
+    })();
+
+    self.getSelectedMembers = function () {
+    	var selectedMemberMap = {};
+
+    	if (settings.isDisableOnAlreadyChecked) {
+    		for (var gu in self.checkedMembers) {
+    			Object.defineProperty(selectedMemberMap, gu, {
+					value: self.checkedMembers[gu],
+					writable: false,
+					enumerable: true
+				});
+    		}
+
+    		for (var branchId in self.checkedBranches) {
+    			var branchObj = self.branchMap[branchId];
+
+    			branchObj.gul.forEach(function (gu) {
+					if (!selectedMemberMap.hasOwnProperty(gu)) {
+						Object.defineProperty(selectedMemberMap, gu, {
+							value: memberData[gu].nk,
+							writable: false,
+							enumerable: true
+						});
+					}
+				});
+    			
+    		}
+    	} else {
+    		selectedMemberMap = Object.assign({}, self.checkedMembers);
+
+    		Object.keys(self.checkedBranches).forEach(function(branchId) {
+	    		console.log(branchId)
+				var branchObj = self.branchMap[branchId];
+
+				branchObj.gul.forEach(function (gu) {
+					if (!selectedMemberMap.hasOwnProperty(gu)) {
+						selectedMemberMap[gu] = memberData[gu].nk;
+					}
+				});
+			});
+
+			Object.keys(self.checkedFavs).forEach(function(fi) {
+				var favBranch = self.branchMap[fi];
+
+				favBranch.gul.forEach(function (gu) {
+					if (!selectedMemberMap.hasOwnProperty(gu)) {
+						selectedMemberMap[gu] = memberData[gu].nk;
+					}
+				});
+			});
+    	}
+
+		return selectedMemberMap;
+    }
+
+    function isValidMember(memberObj) {
+    	var isOfficialGroupAdmin = group.ntp == 2 && group.ad == 1;
+
+    	return !(settings.isHiddenSelf && memberObj.gu == group.gu) && (memberObj.st == 1)
+    		&& !(isOfficialGroupAdmin && memberData[group.gu].abl == "" && memberObj.ad != 1);
     }
 }
 
-// 全選欄位
-ObjectCell.SelectAllTitle = function (rowData) {
-	var titleText = "";
+ObjectDelegate.prototype.setBranchBlock = function () {
+	if (this.branchMap['root'].cl.length > 0) {
+		var dropdownMenu = document.createElement('div');
+		var dropdownButton = document.createElement('div');
+		var currentBranch = document.createElement('div');
+		var returnButton = document.createElement('img');
+		var dropdownList = document.createElement('ul');
+		var breadcrumb = document.createElement('div');
+		var branchPath = document.createElement('ul');
 
-	switch (rowData.type) {
-		case "group" :
-			titleText = $.i18n.getString("COMPOSE_SUBGROUP");
-			break;
-		case "mem" :
-			titleText = $.i18n.getString("COMMON_MEMBER");
-			break;
+ 		currentBranch.className = 'branch';
+		currentBranch.appendChild(document.createElement('div'));
+		currentBranch.appendChild(document.createElement('p'));
+
+		returnButton.src = "images/post_audience/Close.png"
+		returnButton.onclick = this.changeBranchView.bind(this, 'root');
+
+		dropdownButton.className = 'drop-button';
+		dropdownButton.appendChild(currentBranch);
+		dropdownButton.onclick = function () {
+			dropdownButton.classList.toggle('open');
+		};
+
+		dropdownMenu.className = 'dropdown-menu';
+		dropdownMenu.appendChild(dropdownButton);
+		dropdownMenu.appendChild(returnButton);
+		dropdownMenu.appendChild(dropdownList);
+
+		breadcrumb.className = 'breadcrumb';
+		breadcrumb.appendChild(branchPath);
+
+		this.branchMenu.className = 'branch-list';
+		this.branchMenu.appendChild(dropdownMenu);
+		this.branchMenu.appendChild(breadcrumb);
+
+		this.container.appendChild(this.branchMenu);
+	}
+}
+
+ObjectDelegate.prototype.createDefaultSelect = function () {
+	this.defaultSelect.className = 'basic-select';
+    this.container.appendChild(this.defaultSelect);
+}
+
+ObjectDelegate.prototype.addSelectAllTitle = function (isDisableCheckbox) {
+	var element = document.createElement("div");
+	var label = document.createElement("label");
+	var span = document.createElement("span");
+
+	element.className = "obj-select-all";
+	label.textContent = $.i18n.getString("COMMON_MEMBER");
+	span.textContent = $.i18n.getString("COMMON_SELECT_ALL");
+
+	span.onclick = this.selectAll.bind(this);
+
+	element.appendChild(label);
+	element.appendChild(span);
+
+	this.container.appendChild(element);
+}
+
+
+ObjectDelegate.prototype.done = function () {
+
+}
+
+ObjectDelegate.prototype.setPreviewArea = function (showPreviewArea) {
+	this.showPreviewArea = showPreviewArea;
+
+	this.updateStatus();
+}
+
+ObjectDelegate.prototype.checkThisRow = function (thisRow) {
+	var self = this;
+	var checkedObj = {};
+	var rowType = thisRow.type;
+	var group = QmiGlobal.groups[QmiGlobal.currentGi];
+	var memberData = group.guAll;
+
+	if (rowType == 'Member') {
+		checkedObj = self.checkedMembers;
+
+		for (var branchId in self.checkedBranches) {
+			if (memberData[thisRow.number].bl.indexOf(branchId) > -1) {
+				if (!thisRow.isChecked) {
+					delete self.checkedBranches[branchId];
+				}
+			}
+		}
+	} else if (rowType == 'Branch' || rowType == 'Favorite') {
+		var branchObj = self.branchMap[thisRow.number];
+
+		branchObj.gul.forEach(function (gu) {
+			if (thisRow.isChecked) {
+				if (thisRow.number == 'all') {
+					self.checkedMembers[gu] = memberData[gu].nk;
+				}
+				self.selectedMembers[gu] = memberData[gu].nk;
+			} else {
+				if (self.checkedMembers.hasOwnProperty(gu)) {
+					delete self.checkedMembers[gu];
+				}
+
+				delete self.selectedMembers[gu];
+			}
+		});
+
+		// 我的最愛
+		if (rowType == 'Favorite') {
+			branchObj.visibleGul.forEach(function (gu) {
+				if (thisRow.isChecked) {
+					self.checkedMembers[gu] = memberData[gu].nk;
+				} else {
+					delete self.checkedMembers[gu];
+				}
+			});
+
+			branchObj.cl.forEach(function (fi) {
+				self.checkedFavs[fi] = self.branchMap[fi].bn;
+			});
+		} else { //我的最愛群組和一般群組
+			checkedObj = group.fbl.hasOwnProperty(thisRow.number) ? self.checkedFavs : self.checkedBranches;
+		}
+	} 
+
+	if (self.singleCheck) {
+		this.visibleRows.forEach(function(row) {
+			row.check(false);
+		}.bind(self));
+	} else { //複選
+		if (thisRow.number != 'all') {
+			if (thisRow.isChecked) {
+				if (rowType == 'Member') {
+					self.selectedMembers[thisRow.number] = thisRow.name;
+				}
+				checkedObj[thisRow.number] = thisRow.name;
+			} else {
+				if (rowType == 'Member') {
+					delete self.selectedMembers[thisRow.number];
+				}
+				delete checkedObj[thisRow.number];
+			}
+		} else {
+			if (thisRow.isChecked) {
+				for(branchId in self.checkedBranches) {
+					if (Object.getOwnPropertyDescriptor(self.checkedBranches, branchId).writable) {
+						delete self.checkedBranches[branchId];
+					}
+				}
+			}
+		}
 	}
 
-	this.isSelectAll = true;
+	this.updateStatus();
 
-	this.html = $(`<div class='obj-select-all ${rowData.type}' >
-		<label>${titleText}</label>
-		<span>${$.i18n.getString("COMMON_SELECT_ALL")}</span>
-	</div>`);
-
-	this.isChecked = false;
-
-	this.enable = true;
-}
-
-ObjectCell.FavBranch = function (rowData) {
-	var favBranchData = rowData.thisFavBranchObj;
-	this.isSelectAll = false;
-	this.id = favBranchData.fi;
-	this.name = favBranchData.fn.replaceOriEmojiCode();
-	this.html = $('<div class="obj-cell ' + ((rowData.isSubRow) ? "_2" : "") + ' fav-branch" data-gu="' + 
-		   favBranchData.fi + '"><div class="obj-cell-chk"><div class="img ' + ((favBranchData.chk) ? "chk" : "") +
-		   '"></div></div><div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" /></div>' +
-           '<div class="obj-cell-subgroup-data">' + 
-               	'<div class="obj-user-name">' + favBranchData.fn.replaceOriEmojiCode() + '</div>' +
-                '<div class="obj-user-title"></div></div>' +
-        '</div>');
-
-	this.isChecked = favBranchData.chk;
-	this.enable = true;
-}
-
-ObjectCell.ChildBranch = function (rowData) {
-	var thisBranch = rowData.thisBranch;
-	this.id = thisBranch.bi;
-	this.name = thisBranch.bn.replaceOriEmojiCode();
-	this.html = $('<div class="obj-cell ' + ((rowData.isSubRow) ? "_2" : "") + ' branch" data-bl="' + 
-		   thisBranch.bi + '"><div class="obj-cell-chk"><div class="img ' + ((thisBranch.chk) ? "chk" : "") + '"></div></div>' +
-           '<div class="obj-cell-user-pic"><img src="images/common/others/select_empty_all_photo.png" ></div>' +
-           '<div class="obj-cell-subgroup-data">' + 
-               	'<div class="obj-user-name">' + thisBranch.bn.replaceOriEmojiCode() + '</div>' +
-                '<div class="obj-user-title"></div></div>' +
-        '</div>');
-	this.isSelectAll = false;
-	this.isChecked = thisBranch.chk;
-	this.enable = thisBranch.enable;
-}
-
-ObjectCell.Member = function (rowData) {
-	var thisMember = rowData.thisMember;
-	var memberImg = (thisMember.aut) ? thisMember.aut : "images/common/others/empty_img_personal_xl.png";
-	var addChkWord = (thisMember.chk || rowData.isSelectedAll) ? "chk" : "";
-	// var isDisableOnAlreadyChecked = ObjectDelegateView.isDisableOnAlreadyChecked
-	this.id = thisMember.gu;
-	this.name = thisMember.nk.replaceOriEmojiCode();
-	this.html = $('<div class="obj-cell ' + ((rowData.isSubRow) ? "_2" : "") + ' mem" data-gu="' + thisMember.gu+'">' +
-           '<div class="obj-cell-chk"><div class="img ' + addChkWord + '"></div></div>' +
-           '<div class="obj-cell-user-pic namecard" data-gu="' + thisMember.gu + '">' + 
-           	    '<img src="' + memberImg + '" /></div>' +
-           '<div class="obj-cell-user-data ' + ((thisMember.bn && thisMember.bn.length > 0) ? "extra" : "") +'">' + 
-                '<div class="obj-user-name">' + this.name + '</div>' +
-                '<div class="obj-user-title">' + ((thisMember.bn) ? thisMember.bn : "") + '</div>' +
-        '</div>');
-	this.isSubRow = rowData.isSubRow;
-	this.isSelectAll = false;
-	this.isChecked = (thisMember.chk || rowData.isSelectedAll);
-	this.enable = thisMember.enable;
+	console.log(this.checkedMembers);
+	console.log(this.checkedBranches);
+	console.log(this.checkedFavs)
+	console.log(this.selectedMembers);
 }
 
 var objectCellRow = Object.create(HTMLElement.prototype);
 
 objectCellRow.attachedCallback  = function () {
-	// this.isChecked = false;
     this.innerHTML = `
 		<div class='obj-cell-chk'>
 			<div class='img ${this.isChecked ? "chk" : ""}'></div>
@@ -1056,6 +918,7 @@ objectCellRow.attachedCallback  = function () {
 		${this.expand ? "<div class='obj-cell-arrow'></div>" : ""}
     `;
 
+    console.log(this.enable)
     if (this.enable) {
     	this.querySelector('div.obj-cell-chk>div.img').addEventListener('click', this.click.bind(this));
     }
@@ -1065,26 +928,35 @@ objectCellRow.click = function (e) {
 	e.stopPropagation();
 
 	var checkBox = e.target;
-	this.isChecked = !this.isChecked;
 
+	if (this.enable) {
+		this.isChecked = !this.isChecked;
+		checkBox.classList.toggle('chk');
 
-	if (this.doEventFun) {
-		this.doEventFun()
+		console.log(this.isChecked)
+
+		if (this.doEventFun) {
+			this.doEventFun()
+		}
 	}
+}
 
-	checkBox.classList.toggle('chk');
+objectCellRow.hideCheckbox = function (e) {
+	this.querySelector('div.obj-cell-chk').style.visibility = 'hidden';
 }
 
 objectCellRow.check = function (isChecked) {
 	var checkBox = this.querySelector('div.obj-cell-chk>div.img');
 
-	if (isChecked) {
-		checkBox.classList.add('chk');
-	} else {
-		checkBox.classList.remove('chk');
-	}
+	if (this.enable) {
+		if (isChecked) {
+			checkBox.classList.add('chk');
+		} else {
+			checkBox.classList.remove('chk');
+		}
 
-	this.isChecked = isChecked;
+		this.isChecked = isChecked;
+	}
 }
 
 document.registerElement('object-cell-row', {

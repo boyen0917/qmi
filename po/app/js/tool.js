@@ -3215,11 +3215,11 @@ popupSelectMemberDialog = function (option, withoutBranch) {
 		}
 	});
 
-	objectDelegate.updateStatus();
+	// objectDelegate.updateStatus();
 
 	dialogBox.querySelector("div.header span.done").addEventListener('click', function (e) {
 		if (withoutBranch) {
-			selectedObj = objectDelegate.selectedMembers;
+			selectedObj = objectDelegate.getSelectedMembers();
 		} else {
 			selectedObj = {
 				members: Object.keys(objectDelegate.checkedMembers).length > 0 ?
@@ -3254,7 +3254,7 @@ popupSelectMemberDialog = function (option, withoutBranch) {
 
     $("div.select-member").find('span.clear').on('click', e=>{
         dialogBox.querySelector("div.search-area>input").value = "";
-        objectDelegate.clearSearchResult("");
+        objectDelegate.clearSearchResult();
     })
 
     $("div.select-member").find('span.back').on('click', e=>{
