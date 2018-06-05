@@ -1080,7 +1080,8 @@ $(function(){
 
 				case "object":
 					var currentTargets = $.parseJSON(this_event.data("object_str"));
-					var groupMemberAll = QmiGlobal.groups[gi].guAll || {}
+					var group = QmiGlobal.groups[QmiGlobal.currentGi] || {};
+					var groupMemberAll = group.guAll || {}
 					var currentAudiences = {};
 					var currentBranches = {};
 					var currentFavorites = {};
@@ -1092,102 +1093,225 @@ $(function(){
 					if (currentTargets) {
 						if (currentTargets.gul) {
 							currentTargets.gul.forEach(function (member) {
-								currentAudiences[member.gu] = member.n;
+								Object.defineProperty(currentAudiences, member.gu, {
+									value: member.n,
+									writable: false,
+									enumerable: true
+								});
 							})
 						}
 
 						if (currentTargets.bl) {
 				            currentTargets.bl.forEach(function (branch) {
-				                currentBranches[branch.bi] = branch.bn;
+				            	Object.defineProperty(currentBranches, branch.bi, {
+									value: branch.bn,
+									writable: false,
+									enumerable: true
+								});
 				            });
 				        }
 					}
 
-					target.data("object_str", JSON.stringify(currentAudiences));
-					target.data("branch_str", JSON.stringify(currentBranches));
+					popupSelectMemberDialog({
+						settings: {
+							isHiddenPublic: true,
+							isDisableOnAlreadyChecked: true
+						},
+				        previousSelect: {
+				            members: currentAudiences,
+				            branches: currentBranches
+				        },
+				        onDone: function (selectedObj, callback) {
+				        	var newTargetData = selectedObj.members;
+							var newBranchData = selectedObj.branches;
+	        				var newFavoriteData = selectedObj.favorites;
 
-					composeObjectShowDelegate(target, target, {
-						isShowBranch: true,
-						isShowSelf: true,
-						isShowAll: false,
-						isShowFav: false,
-						isDisableOnAlreadyChecked: true,
-					}, function () {
-						var newTargetData = $.parseJSON(target.data("object_str")) || {};
-						var newBranchData = $.parseJSON(target.data("branch_str")) || {};
-        				var newFavoriteData = $.parseJSON(target.data("favorite_str")) || {};
-						// var groupMemberNum = QmiGlobal.groups[gi].cnt;
-						var checkedMemberCount = Object.keys(newTargetData).length
-						var event_status = this_event.data("event-val");
-					    var this_ei = this_event.data("event-id");
-					    var this_gi = this_ei.split("_")[0];
-					    var this_ti = this_ei.split("_")[1];
-					    var newTargetNameList = [];
-					    var newTargets = {
-				            tu: {}
-				        };
+		        			var checkedMemberCount = Object.keys(newTargetData).length
+							var event_status = this_event.data("event-val");
+						    var this_ei = this_event.data("event-id");
+						    var this_gi = this_ei.split("_")[0];
+						    var this_ti = this_ei.split("_")[1];
+						    var newTargetNameList = [];
+						    var newTargets = {
+					            tu: {}
+					        };
 
-						if (Object.keys(newBranchData).length > 0) {
-				            newTargets.tu.bl = [];
-				            if (!currentTargets.bl) {
-			            		currentTargets.bl = [];
-			            	}
-				            for (var branchID in newBranchData) {
-				                if (!currentBranches.hasOwnProperty(branchID)) {
-				                    newTargetNameList.push(newBranchData[branchID]);
-				                    newTargets.tu.bl.push({
-					                    bi: branchID,
-					                    bn: newBranchData[branchID]
-					                })
+					        if (Object.keys(newBranchData).length > 0) {
+					            newTargets.tu.bl = [];
+					            if (!currentTargets.bl) {
+				            		currentTargets.bl = [];
+				            	}
 
-					                currentTargets.bl.push({
-										bi: branchID,
-					                    bn: newBranchData[branchID]
-									})
-				                }
-				            }
-				        }
+					            for (var branchID in newBranchData) {
+					            	if (Object.getOwnPropertyDescriptor(newBranchData, branchID).writable) {
+					            		newTargetNameList.push(newBranchData[branchID]);
+				                    	newTargets.tu.bl.push({
+					                    	bi: branchID,
+					                    	bn: newBranchData[branchID]
+					                	});
 
-						if (checkedMemberCount > 0) {
-			            	newTargets.tu.gul = [];
-			            	if (!currentTargets.gul) {
-			            		currentTargets.gul = [];
-			            	}
+					                	currentTargets.bl.push({
+											bi: branchID,
+						                    bn: newBranchData[branchID]
+										})
+					                }
+					            }
+					        }
 
-							for (var memberID in newTargetData) {
-								if (!currentAudiences.hasOwnProperty(memberID)) {
-									newTargetNameList.push(newTargetData[memberID]); 
-									newTargets.tu.gul.push({
-										gu: memberID,
-										n: newTargetData[memberID]
-									})
+					        // 新增對象無法送我的最愛群組，故將它轉成裡面的成員
+					        if (Object.keys(newFavoriteData).length > 0) {
+					            newTargets.tu.gul = [];
 
-									currentTargets.gul.push({
-										gu: memberID,
-										n: newTargetData[memberID]
-									})
+					            for (var fi in newFavoriteData) {
+					            	var favBranchObj = group.fbl[fi];
+
+					            	favBranchObj.gul.forEach(function(gu) {
+					            		newTargetNameList.push(groupMemberAll[gu].nk); 
+										newTargets.tu.gul.push({
+											gu: gu,
+											n: groupMemberAll[gu].nk
+										})
+
+										currentTargets.gul.push({
+											gu: gu,
+											n: groupMemberAll[gu].nk
+										})
+					            	});
+					            }
+					        }
+
+					        if (checkedMemberCount > 0) {
+				            	if (!newTargets.tu.gul) {
+				            		newTargets.tu.gul = [];
+				            	}
+				            	
+				            	if (!currentTargets.gul) {
+				            		currentTargets.gul = [];
+				            	}
+
+								for (var memberID in newTargetData) {
+									if (Object.getOwnPropertyDescriptor(newTargetData, memberID).writable
+										&& newTargets.tu.gul.includes(memberID)) {
+										newTargetNameList.push(newTargetData[memberID]); 
+										newTargets.tu.gul.push({
+											gu: memberID,
+											n: newTargetData[memberID]
+										})
+
+										currentTargets.gul.push({
+											gu: memberID,
+											n: newTargetData[memberID]
+										})
+									}
 								}
 							}
-						}
+							
+							new QmiAjax({
+								apiName: "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/content/permission",
+								method: "put",
+								body: newTargets
+							}).complete(function(data){
+						        if(data.status == 200){
+						        	var newTargetsStr = newTargetNameList.join('、');
+
+									this_event.data("object_str", JSON.stringify(currentTargets));
+
+									if (newTargetsStr.length > 0) {
+										toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTargetsStr);
+						        		this_event.find(".st-sub-box-1-footer").append("、" + newTargetsStr);
+						        	}
+
+						        	if (callback) callback();
+						        }
+						    });
+				        }
+				    });
+
+					// target.data("object_str", JSON.stringify(currentAudiences));
+					// target.data("branch_str", JSON.stringify(currentBranches));
+
+					// composeObjectShowDelegate(target, target, {
+					// 	isShowBranch: true,
+					// 	isShowSelf: true,
+					// 	isShowAll: false,
+					// 	isShowFav: false,
+					// 	isDisableOnAlreadyChecked: true,
+					// }, function () {
+					// 	var newTargetData = $.parseJSON(target.data("object_str")) || {};
+					// 	var newBranchData = $.parseJSON(target.data("branch_str")) || {};
+     //    				var newFavoriteData = $.parseJSON(target.data("favorite_str")) || {};
+					// 	// var groupMemberNum = QmiGlobal.groups[gi].cnt;
+					// 	var checkedMemberCount = Object.keys(newTargetData).length
+					// 	var event_status = this_event.data("event-val");
+					//     var this_ei = this_event.data("event-id");
+					//     var this_gi = this_ei.split("_")[0];
+					//     var this_ti = this_ei.split("_")[1];
+					//     var newTargetNameList = [];
+					//     var newTargets = {
+				 //            tu: {}
+				 //        };
+
+					// 	if (Object.keys(newBranchData).length > 0) {
+				 //            newTargets.tu.bl = [];
+				 //            if (!currentTargets.bl) {
+			  //           		currentTargets.bl = [];
+			  //           	}
+				 //            for (var branchID in newBranchData) {
+				 //                if (!currentBranches.hasOwnProperty(branchID)) {
+				 //                    newTargetNameList.push(newBranchData[branchID]);
+				 //                    newTargets.tu.bl.push({
+					//                     bi: branchID,
+					//                     bn: newBranchData[branchID]
+					//                 })
+
+					//                 currentTargets.bl.push({
+					// 					bi: branchID,
+					//                     bn: newBranchData[branchID]
+					// 				})
+				 //                }
+				 //            }
+				 //        }
+
+					// 	if (checkedMemberCount > 0) {
+			  //           	newTargets.tu.gul = [];
+			  //           	if (!currentTargets.gul) {
+			  //           		currentTargets.gul = [];
+			  //           	}
+
+					// 		for (var memberID in newTargetData) {
+					// 			if (!currentAudiences.hasOwnProperty(memberID)) {
+					// 				newTargetNameList.push(newTargetData[memberID]); 
+					// 				newTargets.tu.gul.push({
+					// 					gu: memberID,
+					// 					n: newTargetData[memberID]
+					// 				})
+
+					// 				currentTargets.gul.push({
+					// 					gu: memberID,
+					// 					n: newTargetData[memberID]
+					// 				})
+					// 			}
+					// 		}
+					// 	}
 						
-						new QmiAjax({
-							apiName: "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/content/permission",
-							method: "put",
-							body: newTargets
-						}).complete(function(data){
-					        if(data.status == 200){
-					        	var newTargetsStr = newTargetNameList.join('、');
+					// 	new QmiAjax({
+					// 		apiName: "groups/" + this_gi + "/timelines/" + this_ti + "/events/" + this_ei + "/content/permission",
+					// 		method: "put",
+					// 		body: newTargets
+					// 	}).complete(function(data){
+					//         if(data.status == 200){
+					//         	var newTargetsStr = newTargetNameList.join('、');
 
-								this_event.data("object_str", JSON.stringify(currentTargets));
+					// 			this_event.data("object_str", JSON.stringify(currentTargets));
 
-								if (newTargetsStr.length > 0) {
-									toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTargetsStr)
-					        	}
+					// 			if (newTargetsStr.length > 0) {
+					// 				toastShow($.i18n.getString("FEED_ADD_AUDIENCE") + " : " + newTargetsStr)
+					//         	}
 
-					        	this_event.find(".st-sub-box-1-footer").append("、" + newTargetsStr); 
-					        }
-					    });
-					});
+					//         	this_event.find(".st-sub-box-1-footer").append("、" + newTargetsStr); 
+					//         }
+					//     });
+					// });
 					break;
 			}
 		} catch(e){

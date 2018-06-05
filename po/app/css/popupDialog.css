@@ -320,7 +320,7 @@
 
 #popupDialog>div.container>div.select-member>div.header {
     border-bottom: 1px solid #666;
-    padding: 10px 12px 10px 15px;
+    padding: 8px 0px 10px 20px;
 }
 
 #popupDialog>div.container>div.select-member>div.header span {
@@ -335,7 +335,8 @@
 }
 
 #popupDialog>div.container>div.select-member>div.header h4 {
-    font-size: 20px;
+    font-size: 18px;
+    width: -webkit-calc( 100% - 143px );
 }
 
 #popupDialog>div.container>div.select-member>div.header span.back {
@@ -355,6 +356,10 @@
     background-image: url(../images/icon_arrow_prev_blue.png);
 }
 
+#popupDialog>div.container>div.select-member>div.header input {
+    width: -webkit-calc(100% - 100px);
+}
+
 #popupDialog>div.container>div.select-member>div.header span.clear:before {
     content: "\2716";
     color: gray;
@@ -365,10 +370,9 @@
 
 #popupDialog>div.container>div.select-member>div.header h4,
 #popupDialog>div.container>div.select-member>div.header input {
-    width: -webkit-calc( 100% - 155px );
     display: inline-block;
     margin: 0;
-    padding-left: 20px;
+    padding-left: 8px;
 }
 
 #popupDialog>div.container>div.select-member>div.header>div.search-area {
@@ -394,7 +398,7 @@
     padding: 0;
     padding-left: 5px;
     margin: 0;
-    height: 150px;
+    max-height: 155px;
     overflow-y: auto;
 }
 

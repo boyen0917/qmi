@@ -1,5 +1,6 @@
 #objectDelegate div.branch-list {
     background: white;
+    border-radius: 20px;
     display: none;
 }
 
@@ -29,6 +30,10 @@
     margin-top: 15px;
 }
 
+#objectDelegate div.branch-list>div.dropdown-menu>div.drop-button.open:after {
+    background-image: url("../images/icon/icon_arrow_black_top.png");
+}
+
 #objectDelegate div.branch-list>div.dropdown-menu div.branch>div {
     color: black;
     font-weight: bold;
@@ -37,7 +42,7 @@
 #objectDelegate div.branch-list>div.dropdown-menu div.branch>p {
     margin: 0;
     color: gray;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 /*#objectDelegate div.branch-list>div.dropdown-menu>button:before {
@@ -81,8 +86,7 @@
     margin-bottom: 0px;
 }
 
-#objectDelegate div.branch-list>div.dropdown-menu>ul.open {
-    /*display: block;*/
+#objectDelegate div.branch-list>div.dropdown-menu>div.drop-button.open ~ ul {
     visibility: visible;
     opacity: 1;
     z-index: 1001;
@@ -91,6 +95,21 @@
     background-color: white;
     height: -webkit-calc(100% - 20px);
 }
+
+
+/*#objectDelegate div.branch-list>div.dropdown-menu>ul.open {
+    visibility: visible;
+    opacity: 1;
+    z-index: 1001;
+    transform: translateY(0%);
+    transition-delay: 0s, 0s, 0.5s;
+    background-color: white;
+    height: -webkit-calc(100% - 20px);
+}*/
+
+/*#objectDelegate div.branch-list>div.dropdown-menu>ul.open {
+    
+}*/
 
 #objectDelegate div.branch-list>div.dropdown-menu>ul>li:first-child {
     border-top: 1px solid #ccc
@@ -113,32 +132,48 @@
     color: gray;
 }
 
-#objectDelegate div.branch-list>ul.breadcrumb {
+#objectDelegate div.branch-list>div.breadcrumb {
+    border-bottom: 1px solid #ccc;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+
+#objectDelegate div.branch-list>div.breadcrumb>ul {
     list-style: none;
     display: inline-flex;
     flex-direction: row-reverse;
     -webkit-padding-start: 15px;
 }
-#objectDelegate div.branch-list>ul.breadcrumb li {
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li {
     display: inline;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
 }
 
-#objectDelegate div.branch-list>ul.breadcrumb li+li a:after {
+#objectDelegate div.branch-list>div.breadcrumb>ul li+li a:after {
     padding: 8px;
     color: #aaa;
     content: "\003e";
 }
 
-#objectDelegate div.branch-list>ul.breadcrumb li a {
+#objectDelegate div.branch-list>div.breadcrumb>ul li+li.slide-left a:after {
+    content: "\00AB";
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li.slide-right a:after {
+    content: "\00BB";
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li a {
     color: #aaa;
     text-decoration: none;
     cursor: pointer;
 }
 
-#objectDelegate div.branch-list>ul.breadcrumb li a:hover,
-#objectDelegate div.branch-list>ul.breadcrumb li+li a:hover:after {
+#objectDelegate div.branch-list>div.breadcrumb>ul li a:hover,
+#objectDelegate div.branch-list>div.breadcrumb>ul li+li a:hover:after {
     color: black;
 }
 
@@ -197,7 +232,7 @@
     overflow: hidden;
     white-space: nowrap;
     outline: 0!important;
-    font-size: 16px;
+    font-size: 14px;
     color: #666;
     font-weight: bold;
 }
@@ -212,22 +247,22 @@
 	margin-top: 10px;
     margin-right: 30px;
 	display: inline-block;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     background-image: url("../images/common/icon/icon_arrow_top.png");
-    background-size: 30px;
+    background-size: 20px;
     background-repeat: no-repeat;
     background-position: 50%;
 }
 
 #objectDelegate div.obj-select-all {
-	padding-top: 20px;
-    padding-bottom: 15px;
+	padding-top: 15px;
+    padding-bottom: 10px;
     border-bottom: 1px solid #ccc;
 }
 
 #objectDelegate div.obj-select-all>label {
-	font-size: 20px;
+	font-size: 16px;
     font-weight: bold;
     margin-left: 15px;
     vertical-align: bottom;
@@ -243,6 +278,7 @@
 #objectDelegate div.obj-cell-container {
 	max-height: 240px;
     overflow-y: auto;
+    border-bottom: 1px solid #ccc;
 }
 
 /*div.obj-cell-container object-cell-row:not(:first-child){

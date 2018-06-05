@@ -2857,12 +2857,63 @@ composeContentMake = function (compose_title){
     }
 }
 
-composeObjectShow = function(this_compose){
+composeObjectShow = function(thisCompose){
 
     //避免重複綁定事件 先解除
     $(document).off('click', '.cp-content-object ,.cp-work-item-object');
-    $(document).on("click",".cp-content-object ,.cp-work-item-object", function() {
-        popupSelectMemberDialog();
+    $(document).on("click",".cp-content-object ,.cp-work-item-object", function(e) {
+        var target = $(this);
+        var isSelectWorkObject = target.parent().hasClass("cp-work-item");
+
+        popupSelectMemberDialog({
+            settings:{
+                isHiddenPublic: isSelectWorkObject,
+                isHiddenFav: isSelectWorkObject,
+                isDeselectAll: isSelectWorkObject,
+                isSingleCheck: isSelectWorkObject,
+                isHiddenBranch: isSelectWorkObject
+            },
+            previousSelect: {
+                members: $.parseJSON(thisCompose.data("object_str") || "{}"),
+                branches: $.parseJSON(thisCompose.data("branch_str") || "{}"),
+                favorites: $.parseJSON(thisCompose.data("favorite_str") || "{}"),
+            },
+            onDone: function (selectedObj, callback) {
+                var checkedMemNum = Object.keys(selectedObj.members).length;
+                var checkedBranchNum = Object.keys(selectedObj.branches).length + Object.keys(selectedObj.favorites).length;
+                
+                if (isSelectWorkObject) {
+                    var span = $(".cp-work-item-object span:eq(" + target.parents(".cp-work-item").data("work-index") + ")");
+                    var objText = $.i18n.getString("COMPOSE_ASSIGN");
+                    if (checkedMemNum > 0) {
+                        target.css("color", "red");
+                        objText = selectedObj.members[Object.keys(selectedObj.members)[0]];
+                    } else {
+                        span.removeAttr("style");
+                    }
+
+                    span.html(objText);
+                    target.data("object_str", JSON.stringify(selectedObj.members));
+                } else {
+                    if(checkedMemNum > 0 && checkedBranchNum == 0) {  //無群組有選人
+                        target.find("span").html( $.i18n.getString("GROUP_MEMBERS", checkedMemNum));
+                    } else if (checkedMemNum == 0 && checkedBranchNum > 0) { //有群組無選人
+                        target.find("span").html( $.i18n.getString("GROUP_COUNTS", checkedBranchNum));
+                    } else if (checkedMemNum > 0 && checkedBranchNum > 0) { //有群組有選人
+                        target.find("span").html( $.i18n.getString("GROUP_COUNTS", checkedBranchNum) 
+                            + $.i18n.getString("GROUP_AND") + $.i18n.getString("GROUP_MEMBERS", checkedMemNum));
+                    } else {
+                        target.find("span").html("");
+                    }
+
+                    thisCompose.data("object_str", JSON.stringify(selectedObj.members));
+                    thisCompose.data("branch_str", JSON.stringify(selectedObj.branches));
+                    thisCompose.data("favorite_str", JSON.stringify(selectedObj.favorites));
+                }
+
+                if (callback) callback();
+            }
+        });
     });
 }
 
