@@ -1757,19 +1757,22 @@ setBranchList = function(thisGi, originData, callback){
 
     //fav branch
 	$.each(originData.fbl,function(i,val){
-		new_fbl[val.fi] = {fn:val.fn, cnt:0};
+		new_fbl[val.fi] = {fn:val.fn, cnt:0, gul:[]};
 	});
 
     //計算人數
     var favCnt = 0;
-    $.each(guAll,function(i,val){
+    $.each(guAll,function(id,val){
     	if(null==val || val.st!=1 ) return;
 
         //fi mem cnt
         if( val.fbl && val.fbl.length>0 ){
             for(var i=0; i<val.fbl.length; i++){
                 var fi = val.fbl[i];
-                if(new_fbl[fi]) new_fbl[fi].cnt++;
+                if(new_fbl[fi]) {
+                	new_fbl[fi].cnt++;
+                	new_fbl[fi].gul.push(id);
+                }
             }
         }
 
@@ -3094,7 +3097,6 @@ getTimelineFilesUrl = function (eventId, data, fileIdList) {
 
     function writeToFileDB (fileItemList) {
         fileItemList.forEach(function (fileItem) {
-            console.log(fileItem)
             fileItem.ei = eventId;
             var fileStore = fileDB.getObjectStore('timeline_files', 'readwrite')
             var addFileData = fileStore.put(fileItem);
@@ -3139,3 +3141,130 @@ var fileDB = (function () {
 	}
 })();
 
+
+popupSelectMemberDialog = function (option, withoutBranch) {
+	var dialogBox = QmiGlobal.PopupDialog.container[0];
+	var objectDelegate = new ObjectDelegate({
+		// view: dialogBox,
+		container: dialogBox.querySelector('div.content'),
+		settings: option.settings,
+		previousSelect: option.previousSelect,
+		searchArea: dialogBox.querySelector('div.header')
+	});
+	var selectedData;
+
+    option = option || {};
+
+	QmiGlobal.PopupDialog.create({
+        className: 'select-member',
+        header: `
+            <div class='title'>
+                <span class='back'></span>
+                <h4>${$.i18n.getString("COMMON_SELECT_MEMBERS")}</h4>
+                <span class='search'></span>
+                <span class='done'></span>
+            </div>
+            <div class='search-area'>
+                <span class='prev'></span>
+                <input placeholder=${$.i18n.getString("COMMON_SELECT")} data-role="none">
+                <span class='clear'></span>
+            </div>
+        `,
+        footer: [
+        	{
+	            tagName: 'div',
+	            attributes: {
+	                class: "preview-area",
+	            },
+	            children: [{tagName: 'div'}, {tagName: 'ul'}]
+	        }
+	    ]
+    }).open();
+
+	objectDelegate.init();
+
+	objectDelegate.setPreviewArea(function (selectedList) {
+		var previewArea = dialogBox.querySelector("div.preview-area");
+		var selectedBlock = previewArea.lastElementChild;
+
+		while (selectedBlock.firstChild) {
+			selectedBlock.removeChild(selectedBlock.firstChild);
+		}
+
+		if (selectedList.length > 0) {
+			selectedList.forEach(function (member) {
+				var image = document.createElement('img');
+				var span = document.createElement('span');
+				var div = document.createElement('div');
+				var memberItem = document.createElement('li');
+				var name = document.createElement('label');
+
+				image.src = member.avatar;
+				name.textContent = member.name;
+				span.onclick = function () {
+					objectDelegate.cancel(member.id);
+					// memberItem.parentNode.removeChild(memberItem);
+				}
+ 
+				div.appendChild(image);
+				div.appendChild(span);
+
+				memberItem.appendChild(div);
+				memberItem.appendChild(name);
+
+				selectedBlock.appendChild(memberItem);
+			});
+
+			previewArea.firstChild.textContent = $.i18n.getString("COMMON_SELECTED", selectedList.length);
+			previewArea.style.display = 'block';
+		} else {
+			previewArea.style.display = 'none';
+		}
+	});
+
+	// objectDelegate.updateStatus();
+
+	dialogBox.querySelector("div.header span.done").addEventListener('click', function (e) {
+		if (withoutBranch) {
+			selectedObj = objectDelegate.getSelectedMembers();
+		} else {
+			selectedObj = {
+				members: Object.keys(objectDelegate.checkedMembers).length > 0 ?
+					objectDelegate.checkedMembers : objectDelegate.checkedMembers,
+				branches: objectDelegate.checkedBranches,
+				favorites: objectDelegate.checkedFavs,
+			}
+		}
+
+		if (option.onDone) {
+			option.onDone(selectedObj, function () {
+				QmiGlobal.PopupDialog.close();
+			});
+		}
+	});
+
+	dialogBox.querySelector("div.search-area>input").addEventListener('input', function (e) {
+		objectDelegate.search(e.target.value);
+	});
+
+    $("div.select-member").find('span.search').on('click', e=>{
+        $("div.select-member").find('div.title').hide()
+        $("div.select-member").find('div.search-area').show();
+        dialogBox.querySelector("div.search-area>input").focus();
+    })
+
+    $("div.select-member").find('span.prev').on('click', e=>{
+        $("div.select-member").find('div.title').show();
+        $("div.select-member").find('div.search-area').hide();
+        objectDelegate.changeBranchView('root');
+    })
+
+    $("div.select-member").find('span.clear').on('click', e=>{
+        dialogBox.querySelector("div.search-area>input").value = "";
+        objectDelegate.clearSearchResult();
+    })
+
+    $("div.select-member").find('span.back').on('click', e=>{
+        QmiGlobal.PopupDialog.close();
+    })
+}

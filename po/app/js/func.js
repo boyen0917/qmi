@@ -2857,397 +2857,65 @@ composeContentMake = function (compose_title){
     }
 }
 
-composeObjectShow = function(this_compose){
+composeObjectShow = function(thisCompose){
 
     //避免重複綁定事件 先解除
     $(document).off('click', '.cp-content-object ,.cp-work-item-object');
-    $(document).on("click",".cp-content-object ,.cp-work-item-object", function(){
-        composeObjectShowDelegate( this_compose, $(this) );
-    });
-}
+    $(document).on("click",".cp-content-object ,.cp-work-item-object", function(e) {
+        var target = $(this);
+        var isSelectWorkObject = target.parent().hasClass("cp-work-item");
 
-composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDone ){
-    var objectDelegateView = ObjectDelegateView;
-    var objData, branchData, favoriteData;
-    var isShowBranch = false;
-    var isShowSelf = false;
-    var isShowAll = true;
-    var isShowFav = true;
-    var isShowFavBranch = true;
-    var isBack = true;
-    var isShowLeftMem = false;
-    var isForWork = thisComposeObj.parent().hasClass("cp-work-item");
-    var isDisableOnAlreadyChecked = false;
-
-    var group = QmiGlobal.groups[gi],
-        guAll = group.guAll,
-        bl = group.bl,
-        fbl = group.fbl,
-        guList = Object.keys(guAll) || [];
-
-
-    $.mobile.changePage("#page-object", {transition: "slide"});
-
-    //工作
-    if ( null== option ) {
-        if(thisComposeObj.parent().hasClass("cp-work-item")) {
-            //工作發佈對象
-            isShowBranch = false;
-            isShowSelf = true;
-            isShowAll = false;
-            isShowFav = false;
-            isShowFavBranch = false;
-        } else {
-            //其餘發佈對象
-            isShowBranch = true;
-            isShowSelf = true;
-        }
-    } else {
-        isShowBranch = (null==option.isShowBranch) ? isShowBranch: option.isShowBranch;
-        isShowSelf = (null==option.isShowSelf) ? isShowSelf : option.isShowSelf;
-        isShowAll = (null==option.isShowAll) ? isShowAll : option.isShowAll;
-        isShowFav = (null==option.isShowFav) ? isShowFav : option.isShowFav;
-        isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
-        isBack = (null==option.isBack) ? isBack : option.isBack;
-        isShowLeftMem = (null==option.isShowLeftMem) ? isShowLeftMem : option.isShowLeftMem;
-        isDisableOnAlreadyChecked = (null==option.isDisableOnAlreadyChecked) ? isDisableOnAlreadyChecked : option.isDisableOnAlreadyChecked
-    }
-
-    if (thisComposeObj.parent().hasClass("cp-work-item")) {
-        objData = $.parseJSON(thisComposeObj.data("object_str") || "{}");
-    } else {
-        objData = $.parseJSON(thisCompose.data("object_str") || "{}") || {};
-        branchData = $.parseJSON(thisCompose.data("branch_str") || "{}"); 
-        favoriteData = $.parseJSON(thisCompose.data("favorite_str") || "{}"); 
-    }
-
-    var visibleMemList = guList.filter(function(gu) {
-        var userObj = guAll[gu];
-        if( !isShowSelf && gu == group.gu ) return false; 
-        if( !isShowLeftMem && userObj.st != 1 ) return false;
-        if( group.ntp === 2 && thisCompose.data("offical") === "add" && guAll[group.gu].abl == "" && userObj.ad != 1) return false;
-        var branchID = userObj.bl;
-        var extraContent = "";
-
-        if( branchID && branchID.length > 0 ){
-            var branchPath = branchID.split(".");
-            if( branchPath && branchPath.length > 0 ){
-                branchID = branchPath[branchPath.length-1];
-                if( bl.hasOwnProperty(branchID) ){
-                    tContent = bl[branchID].bn;
-                }
-            }
-        }
-
-        userObj.bn = extraContent;
-
-        return true;
-    });
-
-    var viewOption = {
-        mainPage : $("#page-object"),
-        headerBtn : $("#page-object").find(".obj-done"),
-        selectNumElement : $("#page-object").find(".header-cp-object span:eq(1)"),
-        thisCompose : thisCompose,
-        thisComposeObj : thisComposeObj,
-        onDone : onDone,
-        isBack : isBack,
-        singleCheck : (group.ntp === 2 && thisCompose.data("offical")==="add") || isForWork,
-        visibleMembers : visibleMemList,
-        checkedMems : objData,
-        checkedBranches : branchData,
-        checkedFavorites : favoriteData,
-        minSelectNum : 0,
-        isDisableOnAlreadyChecked : isDisableOnAlreadyChecked
-
-    }
-
-    objectDelegateView.init(viewOption).setHeight();
-
-    //no one to select, show coachmark & return
-    if ((isShowSelf && group.cnt <= 0) || ( !isShowSelf && group.cnt <= 1) ) {
-        objectDelegateView.showNoMember();
-        return;
-    } 
-
-    //----- 全選 ------
-    if( isShowAll ) objectDelegateView.addRowElement("Default", {isObjExist : (Object.keys(objData).length > 0) ? true : false });
-
-    //----- 我的最愛 ------
-    if( isShowFav && (group.favCnt > 0 || Object.keys(fbl).length > 0)){
-        objectDelegateView.addRowElement("Favorite");
-
-        visibleMemList.forEach(function(gu) {
-            var guObj = Object.assign({}, guAll[gu]);
-            guObj.chk = false;
-            guObj.enable = true;
-
-            if (objData.hasOwnProperty(gu)) {
-                guObj.chk = true;
-                if (isDisableOnAlreadyChecked) {
-                    guObj.enable = false;
-                }
-            }
-            
-            if (guObj.fav) {
-                objectDelegateView.addFavoriteSubRow("Member", {thisMember : guObj, isSubRow : true});
-            }
-        });        
-
-        if( isShowFavBranch ){
-            for( var fi in fbl ){
-                var fbObj = fbl[fi];
-                fbObj.fi = fi;
-                fbObj.chk = false;
-                if (favoriteData && Object.keys(favoriteData).length) {
-                    if (favoriteData[fi] != undefined ) fbObj.chk = true;
-                }
-                objectDelegateView.addFavoriteSubRow("FavBranch", {thisFavBranchObj : fbObj, isSubRow : true});
-            }
-        }
-    }
-
-    //----- 團體列表 ------
-    if( bl && isShowBranch && Object.keys(bl).length > 0 ) {
-        var parentBranches = [];
-        objectDelegateView.addRowElement("SelectAllTitle", {type : "group", isDisplayedChkbox : true});
-
-        //團體rows
-        $.each(bl, function(key, branchObj){
-
-            branchObj.chk = false;
-            branchObj.bi = key;
-            branchObj.enable = true;
-
-            if (branchData && Object.keys(branchData).length) {
-                if (branchData[key] != undefined ) {
-                    branchObj.chk = true;
-                    if (isDisableOnAlreadyChecked) {
-                        branchObj.enable = false;
-                    }
-                }
+        popupSelectMemberDialog({
+            settings:{
+                isHiddenPublic: isSelectWorkObject,
+                isHiddenFav: isSelectWorkObject,
+                isDeselectAll: isSelectWorkObject,
+                isSingleCheck: isSelectWorkObject,
+                isHiddenBranch: isSelectWorkObject
+            },
+            previousSelect: {
+                members: $.parseJSON(thisCompose.data("object_str") || "{}"),
+                branches: $.parseJSON(thisCompose.data("branch_str") || "{}"),
+                favorites: $.parseJSON(thisCompose.data("favorite_str") || "{}"),
+            },
+            onDone: function (selectedObj, callback) {
+                var checkedMemNum = Object.keys(selectedObj.members).length;
+                var checkedBranchNum = Object.keys(selectedObj.branches).length + Object.keys(selectedObj.favorites).length;
                 
-            }
+                if (isSelectWorkObject) {
+                    var span = $(".cp-work-item-object span:eq(" + target.parents(".cp-work-item").data("work-index") + ")");
+                    var objText = $.i18n.getString("COMPOSE_ASSIGN");
+                    if (checkedMemNum > 0) {
+                        target.css("color", "red");
+                        objText = selectedObj.members[Object.keys(selectedObj.members)[0]];
+                    } else {
+                        span.removeAttr("style");
+                    }
 
-            //第一層顯示開關
-            if (1 == branchObj.lv) {
-                parentBranches.push(key);
-            }
-        });
+                    span.html(objText);
+                    target.data("object_str", JSON.stringify(selectedObj.members));
+                } else {
+                    if(checkedMemNum > 0 && checkedBranchNum == 0) {  //無群組有選人
+                        target.find("span").html( $.i18n.getString("GROUP_MEMBERS", checkedMemNum));
+                    } else if (checkedMemNum == 0 && checkedBranchNum > 0) { //有群組無選人
+                        target.find("span").html( $.i18n.getString("GROUP_COUNTS", checkedBranchNum));
+                    } else if (checkedMemNum > 0 && checkedBranchNum > 0) { //有群組有選人
+                        target.find("span").html( $.i18n.getString("GROUP_COUNTS", checkedBranchNum) 
+                            + $.i18n.getString("GROUP_AND") + $.i18n.getString("GROUP_MEMBERS", checkedMemNum));
+                    } else {
+                        target.find("span").html("");
+                    }
 
-        parentBranches.forEach(function (branchKey) {
-            objectDelegateView.addRowElement("ParentBranch", {thisBranch : bl[branchKey], bl: bl});
-        });
-    }
-    
-    
-    //----- 加入成員列表 ------
+                    thisCompose.data("object_str", JSON.stringify(selectedObj.members));
+                    thisCompose.data("branch_str", JSON.stringify(selectedObj.branches));
+                    thisCompose.data("favorite_str", JSON.stringify(selectedObj.favorites));
+                }
 
-    if(!thisComposeObj.parent().hasClass("cp-work-item") && thisCompose.data("offical") !=="add") {
-        objectDelegateView.addRowElement("SelectAllTitle", {type : "mem", isDisplayedChkbox : true});
-    }
-    else objectDelegateView.addRowElement("SelectAllTitle", {type: "mem", isDisplayedChkbox : false});
-
-
-    objectDelegateView.makeMemberList();
-
-    objectDelegateView.updateStatus();
-}
-
-updateSelectedObj = function() {
-    var len = 0;
-    var cnt = 0;
-    var branch = $(".obj-content").data("selected-branch");
-    var mem = $(".obj-content").data("selected-obj");
-    var fbl = $(".obj-content").data("selected-fav");
-    
-    $(".obj-selected .list .text").html("");
-    //寫入到選擇區域
-    if( null != branch ){
-        len += Object.keys(branch).length;
-        $.each(branch,function(i,val){
-            $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
-        });
-
-        var bAllSelect = true;
-        $(".obj-cell.branch").each(function(){
-            if( !$(this).data("chk") ){
-                bAllSelect = false;
-                return false;
+                if (callback) callback();
             }
         });
-        var all = $(".obj-cell-subTitle.group");
-        if( bAllSelect ){
-            //群組全選
-            all.data("chk", true );
-            all.find(".img").addClass("chk");
-        } else {
-            //清除群組全選
-            all.data("chk", false );
-            all.find(".img").removeClass("chk");
-        }
-    }
-
-    if( null != mem ){
-        //check me
-        var meGu = $(".obj-cell.self").data("gu");
-        if( true==$(".obj-cell.mem[data-gu="+meGu+"]").data("chk") ){
-            $(".obj-cell.self").data("chk",true);
-            $(".obj-cell.self").find(".img").addClass("chk");
-        } else {
-            $(".obj-cell.self").data("chk",false);
-            $(".obj-cell.self").find(".img").removeClass("chk");
-        }
-        
-
-        len += Object.keys(mem).length;
-        // $.each(mem,function(i,val){
-        //     $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
-        // });
-
-        var bAllSelect = true;
-        $(".obj-cell.mem").each(function(){
-            if( !$(this).data("chk") ){
-                bAllSelect = false;
-                return false;
-            }
-        });
-        // var all = $(".obj-cell-subTitle.mem");
-        // if( bAllSelect ){
-        //     //群組全選
-        //     all.data("chk", true );
-        //     all.find(".img").addClass("chk");
-        // } else {
-        //     //清除群組全選
-        //     all.data("chk", false );
-        //     all.find(".img").removeClass("chk");
-        // }
-    }
-
-    if( null != fbl ){
-        len += Object.keys(fbl).length;
-        $.each(fbl,function(i,val){
-            $(".obj-selected .list .text").append("<span>"+val.replaceOriEmojiCode()+"</span>");
-        });
-        var bAllSelect = true;
-        $(".subgroup-row.fav-parent div:nth-child(2) .obj-cell").each(function(){
-            if( !$(this).data("chk") ){
-                bAllSelect = false;
-                return false;
-            }
-        });
-        var all = $(".obj-cell.fav");
-        if( bAllSelect ){
-            //最愛全選
-            all.data("chk", true );
-            all.find(".img").addClass("chk");
-        } else {
-            //清除最愛全選
-            all.data("chk", false );
-            all.find(".img").removeClass("chk");
-        }
-    }
-    // $(".obj-cell-area").css("padding-top",($(".obj-selected div:eq(1)").height()+20)+"px");
-    // cns.debug("$(window).height():",$(window).height());
-    //更改標題
-    $(".header-cp-object span:eq(1)").html(len);
-
-    //重設高
-    var padding_top = $(".obj-selected").outerHeight();
-    $(".obj-cell-area").css("padding-top",padding_top);
-    $(".obj-cell-area").css("height",$(window).height()-57-padding_top);
-}
-
-createChild = function( bl, parent, bl_obj ){
-    var tmp = $("<div></div>");
-    if( 1==bl_obj.lv ) tmp.css("display","none");
-    for( var i=0; i<bl_obj.cl.length; i++ ){
-        var key = bl_obj.cl[i];
-        var data = bl[key];
-
-        //目前除了第一層外所有階層都同級
-        // var content = $("<div class='obj-cell branch _"+data.lv+"' data-bl='"+key+"' data-bl-name='"+data.bn+"'>"+
-        var content = $("<div class='obj-cell branch _2' data-bl='"+key+"' data-bl-name='"+data.bn+"'>"+
-            '<div class="obj-cell-chk"><div class="img"></div></div>' +
-            // '<div class="obj-cell-user-pic namecard"><img src="images/common/others/select_empty_group_photo.png" style="width:60px"/></div>' +
-            '<div class="obj-cell-user-pic namecard"><img src="images/common/others/select_empty_all_photo.png" style="width:60px"/></div>' +
-            '<div class="obj-cell-subgroup-data">' + 
-                '<div class="obj-user-name">' + data.bn.replaceOriEmojiCode() + '</div>' +
-            '</div>'
-        );
-
-        // content.css("padding-left", (data.lv-1)*20+"px;");
-        // content.css("background", ;
-
-        tmp.append( content );
-        if( data.cl.length>0 ) createChild(bl, tmp, data );
-    }
-    
-    parent.append(tmp);
-}
-
-clearMeAndAllSelect = function(){
-    //deselect self & all
-    var speSelect = $(".obj-cell.self, .obj-cell.all");
-    speSelect.each( function(){
-        if( $(this).data("chk") ){
-            $(this).data("chk", false );
-            $(this).find(".img").removeClass("chk");
-            //clear data
-            $(".obj-content").data("selected-branch",{});
-            $(".obj-content").data("selected-obj",{});
-        }
     });
 }
-clearMemAndBranchAll = function(){
-    //deselect "select all" of branch & mem
-    $(".obj-cell-subTitle").each( function(){
-        if( $(this).data("chk") ){
-            $(this).data("chk", false );
-            $(this).find(".img").removeClass("chk");
-        }
-    });
-}
-
-selectTargetAll = function(){
-    clearMeAndAllSelect();
-    clearMemAndBranchAll();
-    $(".obj-cell.all").data("chk",true);
-    $(".obj-cell.all").find(".img").addClass("chk");
-    //clear data
-    $(".obj-content").data("selected-branch",{});
-    $(".obj-content").data("selected-obj",{});
-    $(".obj-content").data("selected-fav",{});
-    
-    //deselect group&mem "select all"
-    $(".obj-cell-subTitle").data("chk",false);
-    //deselect all branch
-    $(".obj-cell-area").find(".obj-cell.branch").each(function(){
-        var this_cell = $(this);
-        this_cell.data("chk",false);
-        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-    });
-    //deselect all mem
-    $(".obj-cell-area").find(".obj-cell.mem").each(function(){
-        var this_cell = $(this);
-        this_cell.data("chk",false);
-        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-    });
-    //deselect all mem
-    $(".obj-cell-area").find(".obj-cell.fav").each(function(){
-        var this_cell = $(this);
-        this_cell.data("chk",false);
-        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-    });
-    //deselect all mem
-    $(".obj-cell-area").find(".obj-cell.fav-branch").each(function(){
-        var this_cell = $(this);
-        this_cell.data("chk",false);
-        this_cell.find(".obj-cell-chk .img").removeClass("chk");
-    });
-    updateSelectedObj();
-}
-
 
 timelineObjectTabShowDelegate = function( this_event, type, onDone ){
     var list = [];

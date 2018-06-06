@@ -43,7 +43,7 @@ initChatList = function(){
 	$(".chatList-add").off("click");
 	$(".chatList-add").on("click", function(){
 		$(".chatList-add").data("object_str","");
-		if(currentGroup.ntp === 2) $(".chatList-add").data("offical","add");
+		if(currentGroup.ntp === 2) $(".chatList-add").data("official","add");
 		showNewRoomPage();
 	});
 	

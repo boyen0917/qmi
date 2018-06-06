@@ -256,89 +256,73 @@ function clearTimelineIDB( this_gi, callback ){
                                                                                                     
 */
 //管理員列表
-function showUpdatePermissionPage(){
-	
-	//find current admins
-	var list = {};
-	var userDataTmp = QmiGlobal.groups;
-    var guAllTmp = userDataTmp[gi].guAll;
-	try{
-        for( var gu in guAllTmp ){
-        	var mem = guAllTmp[gu];
+function showUpdatePermissionPage() {
 
-        	// mem.chk = false;
-        	if( 1==mem.st ){
-	        	if( 1==mem.ad ){
-	        		list[gu] = mem.nk;
-	        		// mem.chk = true;
-	        	}
+	var adminList = {};
+	var userDataTmp = QmiGlobal.groups;
+	var guAllTmp = userDataTmp[gi].guAll;
+
+    for (var gu in guAllTmp) {
+    	var mem = guAllTmp[gu];
+    	if (mem.st == 1) {
+        	if (mem.ad == 1) {
+        		adminList[gu] = mem.nk;
         	}
-        }
-    } catch(e){
-        errorReport(e);
+    	}
     }
 
-	var option = {
-		isShowBranch:false,
-        isShowSelf:true,
-		isShowAll:false,
-		isShowFav:true,
-		isShowFavBranch:false,
-		isShowLeftMem:false
-	};
-	var dom = $(".gs-row[data-type=permission]");
-	dom.data("object_str",JSON.stringify(list) );
-	composeObjectShowDelegate( dom, dom, option, function(){
-		try{
-			// console.log("DDDEE");
-			var newList = $.parseJSON( dom.data("object_str") );
-
+	popupSelectMemberDialog({
+        settings:{
+            isHiddenPublic: true,
+            isHiddenFav: true,
+            // isHiddenBranch: true
+        },
+        previousSelect: {
+            members: Object.assign({}, adminList)
+        },
+        onDone: function (newAdminList, callback) {
+        	console.log(newAdminList)
+			// var newAdminList = selectedObj.members;
 			var addList = [];
 			var delList = [];
 
-			for( var gu in newList ){
-				if( !list.hasOwnProperty(gu) ){
+			for (var gu in newAdminList){
+				if (!adminList.hasOwnProperty(gu)) {
+					console.log('dwdwq')
 					// 因改權限後會打combo api，如果是大團體撈成員必須一段時間，故趕在沒打之前先改local
 					guAllTmp[gu].ad = 1; 
 					addList.push(gu);
 				}
 			}
 
-			for( var gu in list ){
-				if( !newList.hasOwnProperty(gu) ){
+			for (var gu in adminList) {
+				if (!newAdminList.hasOwnProperty(gu)) {
 					guAllTmp[gu].ad = 2; 
 					delList.push(gu);
 
 				}
 			}
 
-			requestUpdatePermission(gi, addList, delList, null);
-		} catch(e){
-
-		}
-	});
+			requestUpdatePermission(gi, addList, delList, callback);
+        }
+    }, true);
 }
+
 //更新管理員
-function requestUpdatePermission( this_gi, addList, delList, callback){
-	var api_name = "groups/"+this_gi+"/administrators";
-    var headers = {
-            ui: ui,
-	        at: at,
-	        li: lang
-                 };
-    var method = "put";
-    var body = {
-              el: addList,
-              dl: delList
-            };
-    
-    ajaxDo(api_name,headers,method,true,body).complete(function(data){
-    	if(data.status == 200){
-    		//可以直接改權限, 不過取消admin的權限該是多少？
-    		//改成直接打api更新好了...
-    		getGroupComboInit( this_gi ).done( callback );
-    	
-    	} else if(callback) callback( data );
+function requestUpdatePermission( thisGi, addList, delList, callback) {
+	new QmiAjax({
+        apiName: "groups/" + thisGi + "/administrators",
+        method: "put",
+        body: {
+        	el: addList,
+            dl: delList
+        }
+    }).success(function(data) {
+    	if (callback) callback();
+    	toastShow(data.rsp_msg);
+    	getGroupComboInit(this_gi).done();
+    }).fail(function(errData) {
+        console.log("error", errData);
     });
 }
 

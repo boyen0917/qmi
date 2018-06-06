@@ -1,0 +1,286 @@
+#objectDelegate div.branch-list {
+    background: white;
+    border-radius: 20px;
+    display: none;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu {
+    padding-top: 10px;
+    /*padding-bottom: 10px;*/
+    border-bottom: 1px solid #ccc;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu div {
+    display: inline-block;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>div.drop-button {
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>div.drop-button:after {
+    content: "";
+    background-image: url("../images/icon/icon_arrow_black_down.png");
+    background-size: 12px;
+    width: 12px;
+    height: 12px;
+    float: right;
+    margin-left: 20px;
+    margin-top: 15px;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>div.drop-button.open:after {
+    background-image: url("../images/icon/icon_arrow_black_top.png");
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu div.branch>div {
+    color: black;
+    font-weight: bold;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu div.branch>p {
+    margin: 0;
+    color: gray;
+    font-size: 12px;
+}
+
+/*#objectDelegate div.branch-list>div.dropdown-menu>button:before {
+    content: "\2716";
+    color: white;
+    font-size: 14px;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>button {
+    width: 18px;
+    height: 18px;
+    border: 0;
+    border-radius: 18px;
+    padding: 5px;
+    background: #ccc;
+    cursor: pointer;
+    float: right;
+    margin-right: 30px;
+    outline: none;
+}*/
+
+#objectDelegate div.branch-list>div.dropdown-menu>img {
+    width: 22px;
+    height: 22px;
+    margin-right: 20px;
+    margin-top: 5px;
+    cursor: pointer;
+    float: right;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>ul {
+    list-style: none;
+    padding-left: 0px;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-2em);
+    z-index: 1001;
+    transition: all 0.3s ease-in-out 0s, visibility 0s linear 0.3s, z-index 0s linear 0.01s;
+    height: 0px;
+    overflow-y: auto;
+    margin-bottom: 0px;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>div.drop-button.open ~ ul {
+    visibility: visible;
+    opacity: 1;
+    z-index: 1001;
+    transform: translateY(0%);
+    transition-delay: 0s, 0s, 0.5s;
+    background-color: white;
+    height: -webkit-calc(100% - 20px);
+}
+
+
+/*#objectDelegate div.branch-list>div.dropdown-menu>ul.open {
+    visibility: visible;
+    opacity: 1;
+    z-index: 1001;
+    transform: translateY(0%);
+    transition-delay: 0s, 0s, 0.5s;
+    background-color: white;
+    height: -webkit-calc(100% - 20px);
+}*/
+
+/*#objectDelegate div.branch-list>div.dropdown-menu>ul.open {
+    
+}*/
+
+#objectDelegate div.branch-list>div.dropdown-menu>ul>li:first-child {
+    border-top: 1px solid #ccc
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>ul>li {
+    padding: 8px 12px 8px 15px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>ul>li>div {
+    display: inline-block;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>ul>li>div:nth-child(2) {
+    float: right;
+    line-height: 2;
+    font-size: 14px;
+    color: gray;
+}
+
+#objectDelegate div.branch-list>div.breadcrumb {
+    border-bottom: 1px solid #ccc;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+
+#objectDelegate div.branch-list>div.breadcrumb>ul {
+    list-style: none;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    -webkit-padding-start: 15px;
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li {
+    display: inline;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li+li a:after {
+    padding: 8px;
+    color: #aaa;
+    content: "\003e";
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li+li.slide-left a:after {
+    content: "\00AB";
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li.slide-right a:after {
+    content: "\00BB";
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li a {
+    color: #aaa;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li a:hover,
+#objectDelegate div.branch-list>div.breadcrumb>ul li+li a:hover:after {
+    color: black;
+}
+
+#objectDelegate object-cell-row {
+    display: block;
+    padding-top: 5px;
+    padding-bottom: 3px;
+    cursor: default;
+    border-bottom: 1px solid #ccc
+}
+
+#objectDelegate object-cell-row>div {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#objectDelegate object-cell-row .obj-cell-chk {
+    margin-left: 20px;
+    min-width: 35px;
+}
+
+#objectDelegate object-cell-row .obj-cell-chk .img {
+    width: 20px;
+    height: 20px;
+    background: url("../images/post_audience/Checkbox_Outlined.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position-y: 50%;
+    cursor: pointer;
+}
+
+#objectDelegate object-cell-row .obj-cell-chk .img.chk {
+	background: url("../images/post_audience/Checkbox_Enabled.png");
+	background-size: contain;
+}
+
+#objectDelegate object-cell-row .obj-cell-user-pic {
+    margin-left: 10px;
+    display: inline-block;
+}
+
+#objectDelegate object-cell-row .obj-cell-user-pic img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+#objectDelegate object-cell-row .obj-cell-user-data {
+    margin-left: 10px;
+}
+
+#objectDelegate object-cell-row .obj-cell-user-data .obj-user-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    outline: 0!important;
+    font-size: 14px;
+    color: #666;
+    font-weight: bold;
+}
+
+#objectDelegate object-cell-row .obj-cell-user-data .obj-user-title {
+    color: #777;
+    font-size: 12px;
+}
+
+#objectDelegate object-cell-row>div.obj-cell-arrow{
+	float: right;
+	margin-top: 10px;
+    margin-right: 30px;
+	display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url("../images/common/icon/icon_arrow_top.png");
+    background-size: 20px;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+#objectDelegate div.obj-select-all {
+	padding-top: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+#objectDelegate div.obj-select-all>label {
+	font-size: 16px;
+    font-weight: bold;
+    margin-left: 15px;
+    vertical-align: bottom;
+}
+
+#objectDelegate div.obj-select-all>span {
+	color: #2198f3;
+    cursor: pointer;
+    float: right;
+    margin-right: 22px;
+}
+
+#objectDelegate div.obj-cell-container {
+	max-height: 240px;
+    overflow-y: auto;
+    border-bottom: 1px solid #ccc;
+}
+
+/*div.obj-cell-container object-cell-row:not(:first-child){
+}*/
+
