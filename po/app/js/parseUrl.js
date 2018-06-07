@@ -20,7 +20,6 @@
 	parseUrl = function(url, cb, options){
 		getHTML(url, function(err, html){
 			if (err) return cb(err);
-
 			var domparser = new DOMParser().parseFromString(html, "text/html");
 			var tmp = $(domparser).find('meta[http-equiv]');
 			var obj = parsecharset(tmp.attr('content'));
@@ -49,7 +48,8 @@
 			encoding: null
 		}, function(err, res, body) {
 			if (err) return cb(err);
-
+			console.log(res);
+			console.log(body);
 			if (!err && res.statusCode == 200) {
 				cb(null, body);
     		} else {
@@ -73,7 +73,12 @@
 		}());
 		
 		if (isCharsetExist) {
-			charset = contentType.parameters.charset || charsetData.attr('charset');
+			if (contentType && contentType.parameters && contentType.parameters.charset) {
+				charset = contentType.parameters.charset;
+			} else if (charsetData) {
+				charset = charsetData.attr('charset');
+			}
+			
  			try {
 				var iconv = require('iconv-lite');
 				var decodeHtml = iconv.decode(html, charset.toLowerCase()).toString()
