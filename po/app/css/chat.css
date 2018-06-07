@@ -2323,6 +2323,7 @@ section#forwardMemberView > section.tab > span:first-child {border-right: 1px so
 section#forwardMemberView > section.tab > span:last-child {border-right: 1px solid #ddd;}
 
 section#forwardMemberView > footer {
+	display: none;
     position: fixed;
     bottom: 0;
     width: 100vw;

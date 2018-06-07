@@ -1199,17 +1199,19 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 	},
 
 	clickShowMemberView: function() {
+		if(Object.keys(this.selectedMap).length === 0) return;
 		this.memberViewInit();
 	},
 
 	clickMlCancel: function() {
-		this.memberView.hide();
+		this.mlDom.hide();
 	},
 
 	clickMlSubmit: function() {
 		var self = this;
-		console.log("clickMlSubmit", this.selectedMap);
+		console.log("submit", this.selectedMap);
 
+		return;
 		self.loadingUI.on();
 		self.api.postMsgTransfer({
 			gi: gi,
@@ -1252,7 +1254,7 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 	},
 
 	inputMlSearch: function(event) {
-		console.log("inputMlSearch", event.dom.val());
+		console.log("search:", event.dom.val());
 	},
 
 	api: {
@@ -1269,40 +1271,47 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 
 	memberViewInit: function() {
 		var self = this;
-		if(self.memberView) {
-			self.memberView.show();
+		if(self.mlDom) {
+			self.mlDom.show();
 			return;
 		}
 
-		self.memberView = $(self.memberListHtml.trim());
-		self.memberView.find("> section.search input").attr("placeholder", $.i18n.getString("INVITE_SEARCH"));
+		self.mlDom = $(self.memberListHtml.trim());
+		self.mlDom.find("> section.search input").attr("placeholder", $.i18n.getString("INVITE_SEARCH"));
 
 		self.loadingUI = new QmiGlobal.module.LoadingUIConstructor({
-    		dom: self.memberView, 
+    		dom: self.mlDom, 
     		top: "50%",
     		delay: 500
     	});
 
 
-		$("body").append(self.memberView);
+		$("body").append(self.mlDom);
 
-		self.memberView._i18n();
+		self.mlDom._i18n();
+
+		self.mlInstance = new ObjectDelegate({
+			container: self.mlDom[0].querySelector("section.body"),
+			previousSelect: {}
+		});
+
+		self.mlInstance.init();
 
 		QmiGlobal.eventDispatcher.subscriber([{
 			veId: "mlCancel", 
-			elemArr: self.memberView.find("> header > button.cancel"), 
+			elemArr: self.mlDom.find("> header > button.cancel"), 
 			eventArr: ["click"]
 		}, {
 			veId: "mlSubmit", 
-			elemArr: self.memberView.find("> header > button.submit"), 
+			elemArr: self.mlDom.find("> header > button.submit"), 
 			eventArr: ["click"]
 		}, {
 			veId: "mlTabSwitch", 
-			elemArr: self.memberView.find("> section.tab > span"), 
+			elemArr: self.mlDom.find("> section.tab > span"), 
 			eventArr: ["click"]
 		}, {
 			veId: "mlSearch", 
-			elemArr: self.memberView.find("> section.search input"), 
+			elemArr: self.mlDom.find("> section.search input"), 
 			eventArr: ["input"]
 		}], self);
 
