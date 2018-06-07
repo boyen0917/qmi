@@ -285,7 +285,18 @@ body {
 .sys-msg > div{
     max-width: -webkit-calc( 100% - 58px);
 }
-.chat-msg-right table, .chat-msg-left table, .sys-msg table{
+
+#chat-contents > div > div.chat-msg .sys-msg table {
+    display: inline-block;
+    vertical-align: top;
+    height: 20px;
+    width: 42px;
+    position: relative;
+    top: -16px;
+}
+
+
+.chat-msg-right table, .chat-msg-left table {
     display: inline-block;
 	position: absolute;
     bottom: 20px;
@@ -368,6 +379,10 @@ body {
     -webkit-user-select: none;
     cursor: default;
 }
+
+#chat-contents > div > div.chat-msg div.menu-target {-webkit-user-select: none;}
+
+
 .chat-msg-bubble-right{
 	background: rgb(75,124,219);
 	color: white;
@@ -743,6 +758,7 @@ body {
 	cursor: pointer;
 	font-size: 14px;
 	padding: 0px 6px;
+    cursor: default;
 }
 
 .chat-file {
@@ -2072,28 +2088,30 @@ div.chat-msg section.fail {
 #chat-contents > div > div.chat-msg {position: relative;}
 #chat-contents > div > div.chat-msg > ul {
     background: #333;
-    width: 85px;
     color: #DEDEDE;
     list-style: none;
     position: absolute;
     top: -38px;
     text-align: center;
-    padding: 7px;
+    padding: 7px 10px;
     border-radius: 3px;
     z-index: 1;
 }
 
 
-#chat-contents > div > div.chat-msg > ul > li:first-child {
+#chat-contents > div > div.chat-msg > ul > li.copy {
 	border-right: 1px solid #888;
 	margin-right: 7px;
 	padding-right: 7px;
 }
+#chat-contents > div > div.chat-msg:not(.is-copy) > ul > li.copy {display: none;}
+
 #chat-contents > div > div.chat-msg > ul.right {top: -58px;}
 
 #chat-contents > div > div.chat-msg > ul > li {
     display: inline-block;
     cursor: pointer;
+
 }
 
 #chat-contents > div > div.chat-msg > ul:after {
@@ -2108,6 +2126,7 @@ div.chat-msg section.fail {
 }
 
 #chat-contents > div > div.chat-msg > ul.right:after {right: 30px;}
+#chat-contents > div > div.chat-msg:not(.is-copy) > ul.right:after {right: 10px;}
 
 #chat-contents > div > div.chat-msg > ul:before {
     content: "";
@@ -2120,26 +2139,30 @@ div.chat-msg section.fail {
 }
 
 div#chat-contents.forward > div > div.chat-msg {cursor: pointer;}
-div#chat-contents.forward > div > div.chat-msg:before {
+div#chat-contents.forward > div > div.chat-msg.selected:not(.is-sys-msg):before {
+    background: #3994E8;
+}
+
+div#chat-contents.forward > div > div.chat-msg:not(.is-sys-msg):before {
     content: "";
     position: absolute;
     left: -4px;
     top: 16px;
-    width: 15px;
-    height: 15px;
+    width: 17px;
+    height: 17px;
     background: ghostwhite;
-    border-radius: 2px;
+    border-radius: 15px;
     border: 1px solid #bbb;
 }
 
-div#chat-contents.forward > div > div.chat-msg.selected:after {
+div#chat-contents.forward > div > div.chat-msg:not(.is-sys-msg).selected:after {
     content: "";
     position: absolute;
-    top: 16px;
-    left: -3px;
-    width: 12px;
-    height: 6px;
-    border: 4px solid #3994E8;
+    top: 21px;
+    left: 0px;
+    width: 9px;
+    height: 5px;
+    border: 2px solid white;
     border-top: 0;
     border-right: 0;
     transform: rotateZ(-50deg);
@@ -2169,6 +2192,8 @@ div#chat-contents.forward > div > div.chat-msg.selected:after {
     color: white;
     text-shadow: 0 0 0 #3994E8;
     cursor: pointer;
+    height: 50px;
+    line-height: 51px;
 }
 
 #chat-contents > footer > ul > li:first-child {
@@ -2176,20 +2201,19 @@ div#chat-contents.forward > div > div.chat-msg.selected:after {
     background: #D2E4EF;
     color: #6B6B6B;
     text-shadow: 0 0 0 #D2E4EF;
-    height: 49px;
-    line-height: 51px;
 }
 
 #chat-contents.forward > div > div.chat-msg {padding-left: 25px;}
 #chat-contents.forward > div {position: relative;}
 #chat-contents > div > div.chat-msg > div.cover {display: none;}
-#chat-contents.forward > div > div.chat-msg > div.cover {
-	display: block;
-    width: 100%;
+div#chat-contents.forward > div > div.chat-msg:not(.is-sys-msg) > div.cover {
+    display: block;
+    width: 100vw;
     height: 100%;
     position: absolute;
-    z-index: 1;
+    z-index: 10;
     cursor: pointer;
+    left: -18px;
 }
 
 #chat-contents div.chat-msg-bubble-right:before, div.chat-msg-bubble-left:before {

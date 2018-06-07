@@ -32,7 +32,7 @@ var base_url = function() {
 	}
 }();
 
-var base_url = "https://qmi17.mitake.com.tw/";
+// var base_url = "https://qmi17.mitake.com.tw/";
 
 if($.lStorage("_selectedServerUrl"))
 	base_url = $.lStorage("_selectedServerUrl");

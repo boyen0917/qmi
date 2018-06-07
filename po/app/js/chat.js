@@ -1484,7 +1484,7 @@ function showMsg(object, bIsTmpSend) {
 
 		div.append(table);
 
-		msgDiv = $("<div></div>");
+		msgDiv = $("<div class=\"menu-target\"></div>");
 		div.append(msgDiv);
 		div.append(chatFailContainer);
 	} else {
@@ -1492,7 +1492,7 @@ function showMsg(object, bIsTmpSend) {
 		//left align
 		var mem = getMemberData(object.meta.gu);
 		var subDiv = $("<div class='group'></div>");
-		msgDiv = $("<div class='msg-content'></div>");
+		msgDiv = $("<div class='msg-content menu-target'></div>");
 		// if(!mem) return container;
 		div = $("<div class='chat-msg-left'></div>");
 		container.append(div);
@@ -1525,8 +1525,12 @@ function showMsg(object, bIsTmpSend) {
 
 	switch (msgData.tp) {
 		case 0: //text or other msg
+			// 可複製
+			container.addClass("is-copy");
+
 			if (isMe) {
-				msgDiv.addClass('chat-msg-bubble-right');
+				msgDiv.addClass('chat-msg-bubble-right')
+				.addClass('menu-right');
 			} else {
 				msgDiv.addClass('chat-msg-bubble-left');
 			}
@@ -1541,13 +1545,12 @@ function showMsg(object, bIsTmpSend) {
 			}
 			var pic = $("<img>");
 			setStickerUrl(pic, msgData.c);
-			// var sticker_path = "sticker/" + msgData.c.split("_")[1] + "/" + msgData.c + ".png";
-			// pic.attr("src",sticker_path);
 			msgDiv.append(pic);
 			break;
 		case 6:
 			if (isMe) {
-				msgDiv.addClass('chat-msg-container-right');
+				msgDiv.addClass('chat-msg-container-right')
+				.addClass('menu-right');
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
@@ -1557,7 +1560,8 @@ function showMsg(object, bIsTmpSend) {
 			break;
 		case 7:
 			if (isMe) {
-				msgDiv.addClass('chat-msg-container-right');
+				msgDiv.addClass('chat-msg-container-right')
+				.addClass('menu-right');
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
@@ -1566,27 +1570,29 @@ function showMsg(object, bIsTmpSend) {
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
 		case 8: //audio
+
 			if (isMe) {
-				msgDiv.addClass('chat-msg-bubble-right');
+				msgDiv.addClass('chat-msg-bubble-right')
+				.addClass('menu-right');
 			} else {
 				msgDiv.addClass('chat-msg-bubble-left');
 			}
-			// var this_audio = $(
-			//         '<audio src="" controls></audio>'
-			// );
-			// msgDiv.append(this_audio);
+
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
 		case 9: //map
 			if (isMe) {
-				msgDiv.addClass('chat-msg-bubble-right');
+				msgDiv.addClass('chat-msg-bubble-right')
+				.addClass('menu-right');
 			} else {
 				msgDiv.addClass('chat-msg-bubble-left');
 			}
 			showMsgMap(msgData, msgDiv);
 			break;
 		case 22: //mem join/leave
-			console.log('22buuuu')
+			// 不轉傳判斷
+			container.addClass("is-sys-msg");
+
 			msgDiv.addClass('content');
 			var textTmp = "";
 			try {
@@ -1619,6 +1625,9 @@ function showMsg(object, bIsTmpSend) {
 			}
 			break;
 		case 23: //voip
+			// 不轉傳判斷
+			container.addClass("is-sys-msg");
+
 			if (isMe) {
 				msgDiv.parent().removeClass("chat-msg-right").addClass("sys-msg");
 				msgDiv.html("You've made a VOIP call.");
@@ -1636,7 +1645,8 @@ function showMsg(object, bIsTmpSend) {
 			break;
 		case 26:
 			if (isMe) {
-				msgDiv.addClass('chat-msg-container-right');
+				msgDiv.addClass('chat-msg-container-right')
+				.addClass('menu-right');
 			} else {
 				msgDiv.addClass('chat-msg-container-left');
 			}
@@ -1648,7 +1658,13 @@ function showMsg(object, bIsTmpSend) {
 			msgDiv.append(fileDom);
 			getChatS3file(msgDiv, msgData.c, msgData.tp, ti_chat);
 			break;
-		case 28:
+
+		case 28: // 指派管理員等系統操作
+
+			// 不轉傳判斷
+			container.addClass("is-sys-msg");
+
+
 			var invoker = (g_group.guAll[msgData.i] || {}).nk;
 			var targetUser = (g_group.guAll[msgData.t] || {}).nk;
 			var systemMsg = "";
@@ -1676,7 +1692,8 @@ function showMsg(object, bIsTmpSend) {
 
 		default: //text or other msg
 			if (isMe) {
-				msgDiv.addClass('chat-msg-bubble-right');
+				msgDiv.addClass('chat-msg-bubble-right')
+				.addClass('menu-right');
 			} else {
 				msgDiv.addClass('chat-msg-bubble-left');
 			}

@@ -1,10 +1,10 @@
 function ObjectDelegate (option) {
 
 	var self = this;
-	var group = QmiGlobal.groups[gi],
-        memberData = group.guAll,
-        guList = Object.keys(memberData) || [];
-        branchData = group.bl;
+	var group = QmiGlobal.groups[gi];
+    var memberData = group.guAll;
+    var guList = Object.keys(memberData) || [];
+    var branchData = group.bl;
 
     var settings = option.settings || {};
 

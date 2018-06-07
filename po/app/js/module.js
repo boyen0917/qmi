@@ -1090,12 +1090,10 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 
 	createMenuDom: function(container) {
 		var self = this;
-		var bubbleClassName = ".chat-msg-bubble-right";
+
 		var isLeft = function() {
-			if(container.find("div.chat-msg-bubble-left").length) {
-				bubbleClassName = ".chat-msg-bubble-left";
-				return true;
-			} else return false;
+			if(container.find(".menu-right").length) return false;
+			return true;
 		}();
 
 		return $("<ul>", {
@@ -1104,7 +1102,7 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 				return "";
 			}(),
 			style: function() {
-				var msgDom = container.find(bubbleClassName);
+				var msgDom = container.find(".menu-target");
 				if(isLeft) 
 					return "left: "+ (msgDom.width() + 20);
 				else 
@@ -1112,6 +1110,7 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 			}() +"px;",
 			html: self.listArr.map(function(item, i) {
 				var liDom = $("<li>", {
+					class: i ? "" : "copy",
 					html: $.i18n.getString(item.textid)
 				});
 
@@ -1163,7 +1162,9 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 		self.menuInit(targetDom.parents(".chat-msg"));
 
 		function isNotTarget() {
-			return !targetDom.hasClass("chat-msg-bubble-left") && !targetDom.hasClass("chat-msg-bubble-right");
+			if(targetDom.hasClass("menu-target")) return false;
+			if(targetDom.parents(".menu-target").length) return false;
+			return true;
 		}
 	},
 
