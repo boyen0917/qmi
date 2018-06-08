@@ -296,7 +296,7 @@ QmiGlobal.appLangDef.done(function(){
 	// 偵測貼上事件 避免html 換成text文本
 	input.on("paste",function(e){
 		var curText = $(this).text();
-		var pasteText = e.originalEvent.clipboardData.getData('text')._escape();
+		var pasteText = e.originalEvent.clipboardData.getData('text/plain');
 
 		// 貼上的字量加上目前的字量超過3000，貼上的字量就要切掉
 		if (curText.length + pasteText.length > maxMsgLength) {
@@ -305,6 +305,8 @@ QmiGlobal.appLangDef.done(function(){
 
 		e.preventDefault();
 		document.execCommand('insertText', false, pasteText);
+
+		console.log($(this).text())
 
 	})
 
