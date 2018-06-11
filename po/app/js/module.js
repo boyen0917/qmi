@@ -937,7 +937,10 @@ QmiGlobal.eventDispatcher = {
 		function preventMultiClick(event) {
 			// event.stopPropagation();
 			//禁止連點
-			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) return false;
+			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) {
+				console.log("hey", closureObj.lastView , event.target);
+				return false;
+			}
 			// 記錄連點資訊
 			if(event.type === "click") closureObj.lastView = event.target, closureObj.lastClickTime = new Date().getTime();
 			return true;
@@ -951,7 +954,7 @@ QmiGlobal.eventDispatcher = {
 		if(isClean) self.cleaner(handler.id);
 
 		veArr.forEach(function(veObj) {
-			var viewId = handler.id+":"+veObj.veId;
+			var viewId = handler.id+":"+veObj.veId+":"+ QmiGlobal.getUID();
 			self.viewMap[viewId] = veObj;
 			veObj.eventArr.forEach(function(eventType) {
 				// elemArr 是arr 每個elem都掛上事件監聽
@@ -1338,6 +1341,94 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 });
 
 
+QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
+
+	id: "chatEditView",
+
+	switchMap: {
+		notification: {apiNm: "nc"},
+		invite: {apiNm: "iv"},
+		pin: {apiNm: "pi"}
+	},
+
+	init: function() {
+		var self = this;
+		if(self.containerDom) {
+			self.containerDom.show();
+			return;
+		}
+
+		var veArr = [];
+
+		self.containerDom = $(self.html.main.trim());
+		$("body").append(self.containerDom);
+
+		self.containerDom._i18n();
+
+		self.containerDom.find("> div[switch-tp] > span.slider").each(function(i, elm) {
+			var dom = $(elm);
+			var component = new QmiGlobal.UI.slider({containerDom: dom});
+			self.switchMap[dom.parent().attr("switch-tp")].component = component;
+
+			veArr.push({
+				veId: "slider", 
+				elemArr: dom, 
+				eventArr: ["click"],
+				data: {component: component}
+			});
+		});
+
+		QmiGlobal.eventDispatcher.subscriber(veArr.concat([{
+			veId: "closeView", 
+			elemArr: self.containerDom.find("> header > button.back"), 
+			eventArr: ["click"]
+		}, {
+			veId: "assignAdm", 
+			elemArr: self.containerDom.find("> div[tp=assign]"), 
+			eventArr: ["click"]
+		}]), self);
+	},
+
+	clickCloseView: function() {
+		this.containerDom.hide();
+	},
+
+	clickSlider: function(event) {
+		console.log("target", event.dom.attr("tt"));
+		var component = event.data.component;
+		component.changeStatus(!component.data.get("status"));
+	},
+
+	html: {
+		main: `<section id="module-chat-edit">
+			<header>
+				<button class="back"><div></div></button>
+				<span data-textid="OFFICIAL_SETTING"></span>
+				<button class="edit"><img src="images/chatroom/setting-done.png"></button>
+			</header>
+			<div class="group-info">
+				<span class="avatar"><img src="images/test-avatar.png"></span>
+				<span class="name ellipsis">Merketing Team</span></div>
+			<div switch-tp="notification" class="ce-row switch"><span data-textid="SYSTEM_SET"></span><span class="slider" tt="1"></span></div>
+			<div switch-tp="invite" class="ce-row switch"><span data-textid="CHATROOM_ANYONE_CAN_INVITE"></span><span class="slider" tt="2"></span></div>
+			<div switch-tp="pin" class="ce-row switch"><span data-textid="CHATROOM_TOP"></span><span class="slider" tt="3"></span></div>
+			<div tp="assign" class="ce-row arrow"><span data-textid="CHATROOM_ASSIGN_ADMIN"></span></div>
+			
+			<div class="member-ttl" cnt="5"></div>
+			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Mellisa Lee</span></div>
+			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Troy Hu</span></div>
+			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Gaston Chen</span></div>
+			<div class="ce-row is-admin"><img src="images/test-avatar.png"><span class="ellipsis">Kevin Durent</span></div>
+			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Stephen Curry</span></div>
+
+			<div class="leave" data-textid="CHATROOM_LEAVE_CHATROOM"></div>
+
+		</section>`
+	}
+});
+
+
+
 QmiGlobal.module.LoadingUIConstructor = function(args) {
 	var isActivate = false;
 	this.containerDom = args.dom;
@@ -1376,3 +1467,45 @@ QmiGlobal.module.LoadingUIConstructor.prototype = {
 		self.containerDom.append(self.loadingDom);
 	}
 }
+
+
+QmiGlobal.UI = {
+
+	slider: function(args) {
+		var self = this;
+		self.dom = $(self.getHtml());
+		args.containerDom.html(self.dom);
+
+		self.data = self.initData();
+		self.data.set("status", args.isOn || false);
+
+	}
+}
+
+
+QmiGlobal.UI.slider.prototype = new QmiGlobal.ModuleConstructor({
+	id: "ui-slider",
+
+	getHtml: function() {
+		return `<section class="qmi-ui-slider">
+			<span class="rail"></span>
+			<span class="btn"></span>
+		</section>`
+	},
+
+	// clickSliderSwitch: function(event) {
+	// 	this.changeStatus(!this.data.get("status"))
+	// },
+
+	changeStatus: function(isTurnToOn) {
+		var self = this;
+		console.log("dd", self.dom);
+		if(isTurnToOn) {
+			self.data.set("status", true);
+			self.dom.addClass("on");
+		} else {
+			self.data.set("status", false);
+			self.dom.removeClass("on");
+		}
+	}
+})

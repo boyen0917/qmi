@@ -330,6 +330,10 @@
 	"CHAT_EXIT_CHATROOM_FAIL" : "Please assign another someone as admin, and then exit",
 	"CHAT_EDIT_CHATROOM" : "Edit chatroom!",
 	"CHATROOM_SELECTED" : "Selected",
+	"CHATROOM_ANYONE_CAN_INVITE" : "All members can invite", 
+	"CHATROOM_TOP" : "Pin on top",
+	"CHATROOM_ASSIGN_ADMIN" : "Assign Admin",
+	"CHATROOM_LEAVE_CHATROOM" : "Leave Chatroom",
 
 	"NOTICES_TITLE"						: "New Notices", 
 	"NOTICES_POST"						: "Publish",

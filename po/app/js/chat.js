@@ -526,10 +526,12 @@ QmiGlobal.appLangDef.done(function(){
 			case "exit":
 				leaveChatRoom();
 				break;
-			case "edit": //edit mem
-				// editMember();
+			case "edit":
 				//go to edit preview page
-				showEditRoomPage();
+				// showEditRoomPage();
+
+				QmiGlobal.module.chatEditView.init();
+
 				break;
 			case "invite":
 				inviteMember();

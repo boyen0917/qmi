@@ -2352,6 +2352,141 @@ section#forwardMemberView > div.loading {
 }
 section#forwardMemberView > div.loading > img {width: 40px;}
 
+
+
+
+
+/* ======================= chat-edit ===================== */
+
+section#module-chat-edit {
+    background: white;
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+section#module-chat-edit > header {
+    border-bottom: 1px solid #aaa;
+    box-shadow: 0px 0px 1px #aaa;
+    height: 50px;
+}
+
+section#module-chat-edit span {display: inline-block;}
+section#module-chat-edit button {border: 0; outline: none; cursor: pointer;}
+
+section#module-chat-edit > header > button {
+    background: none;
+    height: 50px;
+    vertical-align: top;
+    width: 60px;
+}
+
+section#module-chat-edit > header > button.back > div {
+    border: 2px solid #007EF6;;
+    height: 10px;
+    width: 10px;
+    border-top: 0;
+    border-right: 0;
+    transform: rotateZ(45deg);
+    margin-left: 15px;
+    position: relative;
+}
+
+section#module-chat-edit > header > button.back > div:before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: -2px;
+    width: 12px;
+    height: 1px;
+    border-bottom: 2px solid #007EF6;;
+    transform: rotateZ(135deg);
+}
+
+section#module-chat-edit > header > button.edit > img {
+    width: 23px;
+}
+section#module-chat-edit > header > button.edit {
+    position: absolute;
+    right: 5px;
+    top: 2px;
+}
+
+section#module-chat-edit > header > span {
+    height: 100%;
+    line-height: 50px;
+    text-shadow: 0 0 0 #555;
+    font-size: 17px;
+}
+
+section#module-chat-edit > div.group-info {
+    border-bottom: 1px solid #ddd;
+    height: 90px;
+    line-height: 90px;
+}
+
+section#module-chat-edit > div.group-info > span.avatar {
+    width: 120px;
+    text-align: center;
+    vertical-align: top;
+    height: 90px;
+}
+
+section#module-chat-edit > div.group-info > span.avatar > img {
+    width: 70px;
+    height: 70px;
+    border-radius: 40px;
+    object-fit: cover;
+    margin-top: 10px;
+}
+
+section#module-chat-edit > div.group-info > span.name {
+    font-size: 18px;
+    text-shadow: 0 0 0 #aaa;
+    width: 300px;
+}
+
+section#module-chat-edit .ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+section#module-chat-edit div.ce-row {
+    border-bottom: 1px solid #ddd;
+    height: 50px;
+    line-height: 50px;
+    padding: 0 20px;
+    position: relative;
+}
+
+section#module-chat-edit span.slider {
+    position: absolute;
+    right: 0;
+    width: 60px;
+    height: 100%;
+    cursor: pointer;
+    text-align: center;
+}
+
+section#module-chat-edit div.ce-row.arrow {cursor: pointer;}
+section#module-chat-edit div.ce-row.arrow:before {
+    position: absolute;
+    content: "";
+    width: 9px;
+    height: 9px;
+    border: 3px solid #989696;
+    border-top: 0;
+    border-right: 0;
+    transform: rotateZ(225deg);
+    right: 25px;
+    top: 20px;
+    border-radius: 1px;
+}
+
 /* ======================= toast =================================*/
 #toast {
 	opacity: 0;

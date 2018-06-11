@@ -330,6 +330,10 @@
 	"CHAT_EXIT_CHATROOM_FAIL" : "退出失敗，請保留成員至少有一位是管理員。",
 	"CHAT_EDIT_CHATROOM" : "前往編輯",
 	"CHATROOM_SELECTED" : "已選擇",
+	"CHATROOM_ANYONE_CAN_INVITE" : "一般成員邀請權限", 
+	"CHATROOM_TOP" : "置頂",
+	"CHATROOM_ASSIGN_ADMIN" : "指派管理員",
+	"CHATROOM_LEAVE_CHATROOM" : "離開聊天室",
 
 	"NOTICES_TITLE"			: "新通知",
 	"NOTICES_POST"			: "發佈",

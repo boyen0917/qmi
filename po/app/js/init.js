@@ -1368,6 +1368,10 @@ if (typeof Object.assign != 'function') {
   };
 }
 
+QmiGlobal.getUID = function() {
+	return '_' + Math.random().toString(36).substr(2, 9);
+}
+
 QmiGlobal.ModuleConstructor = function(args) {
 	var self = this;
     args = args || {};
@@ -1375,7 +1379,7 @@ QmiGlobal.ModuleConstructor = function(args) {
         self[key] = args[key];
     });
 
-    self.data = function() {
+    self.initData = function() {
         var thisData = {};
         return {
             get: function(key) {
@@ -1392,7 +1396,7 @@ QmiGlobal.ModuleConstructor = function(args) {
                 return thisData;
             }
         };
-    }();
+    };
 
     if(!args.handleEvent) {
     	self.handleEvent = QmiGlobal.handleEvent;

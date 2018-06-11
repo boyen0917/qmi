@@ -1,0 +1,30 @@
+section.qmi-ui-slider {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 25px;
+    line-height: 25px;
+    cursor: pointer;
+}
+
+section.qmi-ui-slider > span.rail {
+    background: #B5B5B5;
+    width: 30px;
+    height: 12px;
+    border-radius: 50px;
+}
+
+section.qmi-ui-slider > span.btn {
+    position: absolute;
+    left: 2px;
+    top: 3px;
+    width: 19px;
+    height: 19px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0px 0px 2px #757575;
+    transition: all 0.2s;
+}
+
+section.qmi-ui-slider.on > span.btn {background: #4096E8;left: 18px;}
+section.qmi-ui-slider.on > span.rail {background: #90CFEC;}
