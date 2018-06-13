@@ -937,10 +937,7 @@ QmiGlobal.eventDispatcher = {
 		function preventMultiClick(event) {
 			// event.stopPropagation();
 			//禁止連點
-			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) {
-				console.log("hey", closureObj.lastView , event.target);
-				return false;
-			}
+			if(closureObj.lastView === event.target && new Date().getTime() - closureObj.lastClickTime < 1000) return false;
 			// 記錄連點資訊
 			if(event.type === "click") closureObj.lastView = event.target, closureObj.lastClickTime = new Date().getTime();
 			return true;
@@ -1353,16 +1350,22 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 
 	init: function() {
 		var self = this;
-		if(self.containerDom) {
-			self.containerDom.show();
+		if(self.pageView) {
+			self.pageView.pageShow();
 			return;
 		}
 
 		var veArr = [];
 
-		self.containerDom = $(self.html.main.trim());
-		$("body").append(self.containerDom);
+		
+		self.pageView = new QmiGlobal.UI.pageView({
+			id: "module-chat-edit",
+			contentDom: $(self.html.main.trim())
+		});
 
+		self.pageView.pageShow();
+
+		self.containerDom = self.pageView.dom;
 		self.containerDom._i18n();
 
 		self.containerDom.find("> div[switch-tp] > span.slider").each(function(i, elm) {
@@ -1390,7 +1393,7 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 	},
 
 	clickCloseView: function() {
-		this.containerDom.hide();
+		this.pageView.pageClose();
 	},
 
 	clickSlider: function(event) {
@@ -1400,8 +1403,7 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 	},
 
 	html: {
-		main: `<section id="module-chat-edit">
-			<header>
+		main: `<header>
 				<button class="back"><div></div></button>
 				<span data-textid="OFFICIAL_SETTING"></span>
 				<button class="edit"><img src="images/chatroom/setting-done.png"></button>
@@ -1414,16 +1416,15 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 			<div switch-tp="pin" class="ce-row switch"><span data-textid="CHATROOM_TOP"></span><span class="slider" tt="3"></span></div>
 			<div tp="assign" class="ce-row arrow"><span data-textid="CHATROOM_ASSIGN_ADMIN"></span></div>
 			
-			<div class="member-ttl" cnt="5"></div>
+			<div class="member-ttl" cnt="5" data-textid="COMMON_MEMBER"></div>
+			<div tp="invite" class="ce-row arrow"><img src="images/chatroom/setting-user-plus.png"><span data-textid="INVITE_INVITED_MEMBER"></span></div>
 			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Mellisa Lee</span></div>
 			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Troy Hu</span></div>
 			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Gaston Chen</span></div>
 			<div class="ce-row is-admin"><img src="images/test-avatar.png"><span class="ellipsis">Kevin Durent</span></div>
 			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Stephen Curry</span></div>
 
-			<div class="leave" data-textid="CHATROOM_LEAVE_CHATROOM"></div>
-
-		</section>`
+			<div class="leave" data-textid="CHATROOM_LEAVE_CHATROOM"></div>`
 	}
 });
 
@@ -1482,6 +1483,39 @@ QmiGlobal.UI = {
 	}
 }
 
+
+QmiGlobal.UI.pageView = function(args) {
+	var self = this;
+	self.data = self.initData();
+	self.parentDom = args.parent || $("body");
+	self.dom = self.createDom(args);
+
+	self.parentDom.append(self.dom);
+
+}
+
+QmiGlobal.UI.pageView.prototype = new QmiGlobal.ModuleConstructor({
+	id: "page-view",
+
+	createDom: function(args) {
+		var self = this;
+		return $("<section>", {
+			id: args.id,
+			class: "qmi-ui-page-view",
+			html: args.contentDom
+		});
+	},
+
+	pageShow: function() {
+		var self = this;
+		self.dom.show();
+		setTimeout(function() {self.dom.css({right: 0})}, 10);
+	},
+
+	pageClose: function() {
+		this.dom.hide().removeAttr("style");
+	}
+});
 
 QmiGlobal.UI.slider.prototype = new QmiGlobal.ModuleConstructor({
 	id: "ui-slider",

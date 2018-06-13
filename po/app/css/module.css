@@ -28,3 +28,15 @@ section.qmi-ui-slider > span.btn {
 
 section.qmi-ui-slider.on > span.btn {background: #4096E8;left: 18px;}
 section.qmi-ui-slider.on > span.rail {background: #90CFEC;}
+
+section.qmi-ui-page-view {
+    z-index: 2000; 
+    display: none; 
+    position: fixed;
+    top: 0;
+    right: -100vw;
+    background: ghostwhite;
+    width: 100vw;
+    height: 100vh;
+    transition: all 0.1s;
+}
