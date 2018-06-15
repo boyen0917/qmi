@@ -1,3 +1,7 @@
+section.qmi-ui-page-view span {display: inline-block;}
+section.qmi-ui-page-view button {border: 0; outline: none; cursor: pointer;}
+
+
 section.qmi-ui-slider {
     position: relative;
     display: inline-block;
@@ -38,5 +42,5 @@ section.qmi-ui-page-view {
     background: ghostwhite;
     width: 100vw;
     height: 100vh;
-    transition: all 0.1s;
+    transition: all 0.2s;
 }

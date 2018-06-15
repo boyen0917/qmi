@@ -2364,23 +2364,29 @@ section#module-chat-edit {
     overflow: scroll;
 }
 
-section#module-chat-edit > header {
+section.qmi-ui-page-view > header {
     border-bottom: 1px solid #aaa;
     box-shadow: 0px 0px 1px #aaa;
     height: 50px;
+    position: fixed;
+    background: white;
+    width: 100vw;
+    z-index: 1;
 }
 
 section#module-chat-edit span {display: inline-block;}
-section#module-chat-edit button {border: 0; outline: none; cursor: pointer;}
-
-section#module-chat-edit > header > button {
+section.qmi-ui-page-view > header > button {
     background: none;
     height: 50px;
     vertical-align: top;
     width: 60px;
 }
 
-section#module-chat-edit > header > button.back > div {
+section#module-chat-edit > header > button > img {display: none;}
+section#module-chat-edit:not(.is-editing) > header > button.edit > img.edit {display: inline-block;}
+section#module-chat-edit.is-editing > header > button.edit > img:not(.edit) {display: inline-block;}
+
+section.qmi-ui-page-view > header > button.back > div {
     border: 2px solid #007EF6;;
     height: 10px;
     width: 10px;
@@ -2391,7 +2397,7 @@ section#module-chat-edit > header > button.back > div {
     position: relative;
 }
 
-section#module-chat-edit > header > button.back > div:before {
+section.qmi-ui-page-view > header > button.back > div:before {
     content: "";
     position: absolute;
     top: 5px;
@@ -2411,7 +2417,7 @@ section#module-chat-edit > header > button.edit {
     top: 2px;
 }
 
-section#module-chat-edit > header > span {
+section.qmi-ui-page-view > header > span {
     height: 100%;
     line-height: 50px;
     text-shadow: 0 0 0 #555;
@@ -2422,13 +2428,15 @@ section#module-chat-edit > div.group-info {
     border-bottom: 1px solid #ddd;
     height: 90px;
     line-height: 90px;
+    margin-top: 50px;
 }
 
 section#module-chat-edit > div.group-info > span.avatar {
-    width: 120px;
     text-align: center;
     vertical-align: top;
-    height: 90px;
+    height: 80px;
+    margin: 0 20px;
+    position: relative;
 }
 
 section#module-chat-edit > div.group-info > span.avatar > img {
@@ -2439,10 +2447,44 @@ section#module-chat-edit > div.group-info > span.avatar > img {
     margin-top: 15px;
 }
 
+section#module-chat-edit > div.group-info > span.name > * {display: none;}
+section#module-chat-edit.is-editing > div.group-info > span.name > input {
+	display: inline-block;
+    border: 0;
+    height: 35px;
+    font-size: 18px;
+    border-bottom: 1px solid #999;
+    text-shadow: 0 0 0 #aaa;
+    font-family: "微軟正黑體","Microsoft JhengHei","Heiti TC",arial,sans-serif;
+    position: relative;
+    left: -1px;
+    width: 100%;
+    outline: none;
+}
+section#module-chat-edit:not(.is-editing) > div.group-info > span.name > span {display: inline-block;}
+
 section#module-chat-edit > div.group-info > span.name {
+    width: 300px;
+}
+
+section#module-chat-edit > div.group-info > span.name > span {
     font-size: 18px;
     text-shadow: 0 0 0 #aaa;
-    width: 300px;
+}
+
+section#module-chat-edit.is-editing > div.group-info > span.avatar:before {
+    content: url(../images/chatroom/camera.png);
+    position: absolute;
+    top: 8px;
+    left: -8px;
+    background: rgba(50, 50, 50, 0.5);
+    width: 75px;
+    height: 75px;
+    text-align: center;
+    line-height: 90px;
+    border-radius: 40px;
+    cursor: pointer;
+    transform: scale(0.8);
 }
 
 section#module-chat-edit .ellipsis {
@@ -2478,7 +2520,7 @@ section#module-chat-edit div.ce-row.arrow:before {
     border-top: 0;
     border-right: 0;
     transform: rotateZ(225deg);
-    right: 30px;
+    right: 25px;
     top: 20px;
     border-radius: 1px;
 }
@@ -2486,10 +2528,11 @@ section#module-chat-edit div.ce-row.arrow:before {
 section#module-chat-edit > div.member-ttl {
     height: 40px;
     line-height: 40px;
-    padding: 15px 15px 0;
+    padding: 25px 15px 0;
     font-size: 17px;
     text-shadow: 0 0 0 #555;
     border-bottom: 1px solid #ddd;
+    position: relative;
 }
 
 section#module-chat-edit div.ce-row > img {
@@ -2511,7 +2554,7 @@ section#module-chat-edit div.ce-row > img {
 }
 
 section#module-chat-edit > div.leave {
-    margin: 40px 0 15px;
+    margin: 40px 0;
     height: 45px;
     line-height: 50px;
     border: 1px solid #ddd;
@@ -2519,6 +2562,69 @@ section#module-chat-edit > div.leave {
     text-shadow: 0 0 0 #F75656;
     text-align: center;
     cursor: pointer;
+}
+
+section#module-chat-edit div.ce-row.member > button.delete-member {display: none;}
+section#module-chat-edit.is-editing div.ce-row.member > button.delete-member {
+    background: red;
+    color: white;
+    font-size: 20px;
+    width: 19px;
+    height: 19px;
+    line-height: 10px;
+    position: relative;
+    top: -20px;
+    left: 3px;
+    border-radius: 10px;
+    margin-right: 20px;
+    display: inline-block;
+}
+
+
+section#module-chat-edit.is-editing div.ce-row.member > button.delete-member:before {
+    content: "";
+    position: absolute;
+    background: transparent;
+    width: 100vw;
+    height: 50px;
+    left: -23px;
+    top: -15px;
+    cursor: pointer;
+}
+
+section#module-chat-edit.is-editing div.ce-row.member > button.delete-member:after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 1px;
+    border-top: 2px solid #fff;
+    left: 5px;
+    top: 9px;
+    border-radius: 10px;
+}
+
+section#module-chat-edit > div.member-ttl:before {
+    content: attr(cnt);
+    position: absolute;
+    right: 20px;
+    color: #555;
+    font-size: 15px;
+}
+
+section#module-chatroom-assignAdm > section.body {
+    margin-top: 55px;
+    overflow: scroll;
+    height: -webkit-calc(100vh - 55px);
+}
+
+section.qmi-ui-page-view > header > button.submit {
+    position: absolute;
+    right: 0;
+    font-size: 15px;
+    color: rgb(57, 148, 232);
+    text-shadow: 0 0 0 rgb(57, 148, 232);
+    letter-spacing: 1px;
+    width: 80px;
 }
 
 /* ======================= toast =================================*/

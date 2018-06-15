@@ -56,15 +56,15 @@ try {
 }
 
 QmiGlobal.appLangDef.done(function(){
-	AllGroupData = window.opener.QmiGlobal.groups;
+	// AllGroupData = window.opener.QmiGlobal.groups;
 	//load language
 	// updateLanguage(lang);
 
-	// if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) 
-	// 	window.chatAuthData = $.lStorage("test");
+	if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) 
+		window.chatAuthData = $.lStorage("test");
 
-	// if(Object.keys(window.AllGroupData).length === 0)
-	// 	window.AllGroupData = $.lStorage("test2");
+	if(Object.keys(window.AllGroupData).length === 0)
+		window.AllGroupData = $.lStorage("test2");
 
 	//驗證失敗 請重新登入
 	if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) {

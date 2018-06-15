@@ -1360,7 +1360,7 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 		
 		self.pageView = new QmiGlobal.UI.pageView({
 			id: "module-chat-edit",
-			contentDom: $(self.html.main.trim())
+			contentDom: $(self.html.getMainDom())
 		});
 
 		self.pageView.pageShow();
@@ -1386,10 +1386,116 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 			elemArr: self.containerDom.find("> header > button.back"), 
 			eventArr: ["click"]
 		}, {
+			veId: "edit", 
+			elemArr: self.containerDom.find("> header > button:last-child"), 
+			eventArr: ["click"]
+		}, {
+			veId: "avatarIcon", 
+			elemArr: self.containerDom.find("> div.group-info > span.avatar"), 
+			eventArr: ["click"]
+		}, {
+			veId: "chatroomAvatar", 
+			elemArr: self.containerDom.find("input#chatroom-avatar"), 
+			eventArr: ["change"]
+		}, {
 			veId: "assignAdm", 
 			elemArr: self.containerDom.find("> div[tp=assign]"), 
 			eventArr: ["click"]
+		}, {
+			veId: "showInvitingMember", 
+			elemArr: self.containerDom.find("> div[tp=invite]"), 
+			eventArr: ["click"]
 		}]), self);
+	},
+
+	clickAvatarIcon: function(event) {
+		var self = this;
+		if(!self.isEditing) return;
+
+		console.log("clickAvatarIcon");
+		this.containerDom.find("input#chatroom-avatar").trigger("click");
+	},
+
+	changeChatroomAvatar: function(event) {
+		var self = this;
+		if(!self.isEditing) return;
+
+		console.log("changeChatroomAvatar");
+	},
+
+	clickAssignAdm: function(event) {
+		var self = this;
+		if(self.assignPageView) {
+			self.assignPageView.pageShow();
+			return;
+		}
+
+		self.assignPageView = new QmiGlobal.UI.pageView({
+			id: "module-chatroom-assignAdm",
+			contentDom: $(self.html.getAssignDom())
+		});
+
+		self.assignPageView.pageShow();
+
+		QmiGlobal.eventDispatcher.subscriber([{
+			veId: "closeAssignView", 
+			elemArr: self.assignPageView.dom.find("> header > button.back"), 
+			eventArr: ["click"]
+		}, {
+			veId: "submitAssignView", 
+			elemArr: self.assignPageView.dom.find("> header > button.submit"), 
+			eventArr: ["click"]
+		}], self);
+
+		self.assignODComponent = new ObjectDelegate({
+			container: self.assignPageView.dom.find("> section.body")[0],
+			previousSelect: {}
+		});
+
+		self.assignODComponent.init();
+	},
+
+	clickCloseAssignView: function() {
+		this.assignPageView.pageClose();
+	},
+
+	clickSubmitAssignView: function() {
+		console.log("clickSubmitAssignView");
+	},
+
+	clickShowInvitingMember: function(event) {
+		var self = this;
+		if(self.invitePageView) {
+			self.invitePageView.pageShow();
+			return;
+		}
+
+		self.invitePageView = new QmiGlobal.UI.pageView({
+			id: "module-chatroom-invite",
+			contentDom: $(self.html.getInviteDom())
+		});
+
+		self.invitePageView.pageShow();
+
+		QmiGlobal.eventDispatcher.subscriber([{
+			veId: "closeInviteView", 
+			elemArr: self.invitePageView.dom.find("> header > button.back"), 
+			eventArr: ["click"]
+		}], self);
+	},
+
+	clickCloseInviteView: function() {
+		this.invitePageView.pageClose();
+	},
+
+	clickEdit: function(event) {
+		if(this.containerDom.hasClass("is-editing")) {
+			this.containerDom.removeClass("is-editing")
+			this.isEditing = false;
+		} else {
+			this.containerDom.addClass("is-editing")
+			this.isEditing = true;
+		}
 	},
 
 	clickCloseView: function() {
@@ -1403,28 +1509,49 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 	},
 
 	html: {
-		main: `<header>
-				<button class="back"><div></div></button>
-				<span data-textid="OFFICIAL_SETTING"></span>
-				<button class="edit"><img src="images/chatroom/setting-done.png"></button>
-			</header>
-			<div class="group-info">
-				<span class="avatar"><img src="images/test-avatar.png"></span>
-				<span class="name ellipsis">Merketing Team</span></div>
-			<div switch-tp="notification" class="ce-row switch"><span data-textid="SYSTEM_SET"></span><span class="slider" tt="1"></span></div>
-			<div switch-tp="invite" class="ce-row switch"><span data-textid="CHATROOM_ANYONE_CAN_INVITE"></span><span class="slider" tt="2"></span></div>
-			<div switch-tp="pin" class="ce-row switch"><span data-textid="CHATROOM_TOP"></span><span class="slider" tt="3"></span></div>
-			<div tp="assign" class="ce-row arrow"><span data-textid="CHATROOM_ASSIGN_ADMIN"></span></div>
-			
-			<div class="member-ttl" cnt="5" data-textid="COMMON_MEMBER"></div>
-			<div tp="invite" class="ce-row arrow"><img src="images/chatroom/setting-user-plus.png"><span data-textid="INVITE_INVITED_MEMBER"></span></div>
-			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Mellisa Lee</span></div>
-			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Troy Hu</span></div>
-			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Gaston Chen</span></div>
-			<div class="ce-row is-admin"><img src="images/test-avatar.png"><span class="ellipsis">Kevin Durent</span></div>
-			<div class="ce-row"><img src="images/test-avatar.png"><span class="ellipsis">Stephen Curry</span></div>
+		getMainDom: function() {
+			return $(`<header>
+					<button class="back"><div></div></button>
+					<span>${$.i18n.getString("OFFICIAL_SETTING")}</span>
+					<button class="edit"><img class="edit" src="images/chatroom/setting-done.png">
+						<img src="images/post_audience/Done.png"></button>
+				</header>
+				<div class="group-info">
+					<span class="avatar"><img src="${g_room.cat}"></span>
+					<span class="name"><span class="ellipsis">${g_room.cn}</span><input value="${g_room.cn}"></span>
+					<input id="chatroom-avatar" type="file" style="display: none;"></div>
+				<div switch-tp="notification" class="ce-row switch"><span>${$.i18n.getString("SYSTEM_SET")}</span><span class="slider" tt="1"></span></div>
+				<div switch-tp="invite" class="ce-row switch"><span>${$.i18n.getString("CHATROOM_ANYONE_CAN_INVITE")}</span><span class="slider" tt="2"></span></div>
+				<div switch-tp="pin" class="ce-row switch"><span>${$.i18n.getString("CHATROOM_TOP")}</span><span class="slider" tt="3"></span></div>
+				<div tp="assign" class="ce-row arrow"><span>${$.i18n.getString("CHATROOM_ASSIGN_ADMIN")}</span></div>
+				
+				<div class="member-ttl" cnt="5" data-textid="COMMON_MEMBER"></div>
+				<div tp="invite" class="ce-row arrow"><img src="images/chatroom/setting-user-plus.png"><span>${$.i18n.getString("INVITE_INVITED_MEMBER")}></span></div>
+				<div class="ce-row member"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Mellisa Lee</span></div>
+				<div class="ce-row member"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Troy Hu</span></div>
+				<div class="ce-row member"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Gaston Chen</span></div>
+				<div class="ce-row member is-admin"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Kevin Durent</span></div>
+				<div class="ce-row member"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Stephen Curry</span></div>
 
-			<div class="leave" data-textid="CHATROOM_LEAVE_CHATROOM"></div>`
+				<div class="leave">${$.i18n.getString("CHATROOM_LEAVE_CHATROOM")}</div>`);
+		},
+
+		getAssignDom: function() {
+			return $(`<header><button class="back"><div></div></button>
+				<span>${$.i18n.getString("CHATROOM_ASSIGN_ADMIN")}</span>
+				<button class="submit">${$.i18n.getString("COMMON_SUBMIT")}</button></header>
+			<section class="body"></section>`);
+		},
+
+		getInviteDom: function() {
+			return $(`<header><button class="back"><div></div></button>
+				<span>${$.i18n.getString("INVITE_INVITED_MEMBER")}</span></header>
+			<section class="body">invite member</section>`);
+		},
+
+		getMemberRowDom: function(args) {
+			return $(`<div class="ce-row member"><button class="delete-member"></button><img src="${args.at}"><span class="ellipsis">${args.nm}</span></div>`)
+		}
 	}
 });
 
@@ -1513,7 +1640,9 @@ QmiGlobal.UI.pageView.prototype = new QmiGlobal.ModuleConstructor({
 	},
 
 	pageClose: function() {
-		this.dom.hide().removeAttr("style");
+		var self = this;
+		self.dom.attr("style", "display: block")
+		setTimeout(function() {self.dom.hide()}, 100);
 	}
 });
 
