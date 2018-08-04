@@ -26,6 +26,8 @@ function initChatDB( onReady ){
 }
 function onReceivePollingChatMsg ( msgs ){
 	//indexed from old to new (api chat is from new to old)
+	// 有聊天訊息 1分鐘內加速取得polling
+	QmiGlobal.pollingIntervalObj.set({interval: 2000});
 
 	// 跑兩個回圈 把polling msgs的每一個msg 都存到db
 	msgs.forEach( function(roomObj){
@@ -37,13 +39,15 @@ function onReceivePollingChatMsg ( msgs ){
 		var chatRoomDef = $.Deferred();
 
 		if (QmiGlobal.groups.hasOwnProperty(thisGi)) {
-			if(!QmiGlobal.groups[thisGi].chatAll[thisCi])
+			if(!(QmiGlobal.groups[thisGi].chatAll || {})[thisCi])
 				getChatListApi(thisGi).always(chatRoomDef.resolve);
 			else
 				chatRoomDef.resolve();
 
 			chatRoomDef.done(function() {
+				var chatroomData = (QmiGlobal.groups[thisGi].chatAll || {})[thisCi];
 				roomObj.el.forEach( function(msgObj,i){
+					chatroomData.cm = msgObj;
 					msgObj.cn = roomObj.cn;
 					
 					if(msgObj.hasOwnProperty("meta")){
@@ -86,7 +90,6 @@ function onReceivePollingChatMsg ( msgs ){
 				})
 			}) // chatroom deferred
 		}
-		
 	})
 }	//end of updateChat
 

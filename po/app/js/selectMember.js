@@ -62,7 +62,7 @@ showSelectMemPage = function( parentDom, dataDom, onPageChanged, onDone, isBackW
 	if( $("#page-selectMem").length>0 ){
 		showSelectMemPageDelegate( dataDom, onPageChanged, onDone, isBackWhenDone );
 	} else {
-		$('<div>').load('layout/memberSelect.html?v2.4.0.2',function(){
+		$('<div>').load('layout/memberSelect.html?v'+ QmiGlobal.appVer,function(){
 			parentDom.append( $(this).find("#page-selectMem") );
 			showSelectMemPageDelegate( dataDom, onPageChanged, onDone, isBackWhenDone );
 		});
@@ -285,9 +285,9 @@ updateSelectedObj = function(){
     else $(".page-next").addClass("disable");
 
     //重設高
-    var padding_top = $(".obj-selected").outerHeight();
-    $(".obj-cell-area").css("padding-top",padding_top);
-    $(".obj-cell-area").css("height",$(window).height()-57-padding_top);
+    var outerHeight = $(".obj-selected").outerHeight();
+    $(".obj-cell-area").css("margin-top",outerHeight);
+    $(".obj-cell-area").css("height",$(window).height()-57-outerHeight);
 }
 
 selectTargetAll = function(){

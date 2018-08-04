@@ -17,7 +17,8 @@
 
 .tabObj-tab-area{
 	height: 56px;
-	font-size: 20px;
+	font-size: 15px;
+    color: #555;
 	line-height: 30px;
 	white-space: nowrap;
 	background: rgb(210, 228, 237);
@@ -47,16 +48,16 @@
 }
 .tabObj-tab-area .tab.current:after{
 	content: "";
-	position: relative;
-	left: -webkit-calc( 50% - 12px );
-	border-style: solid;
-	border-width: 0 12px 12px;
-	border-color: #FFFFFF transparent;
-	display: block;
-	width: 0;
-	z-index: 1;
-	float: left;
-	bottom: -1px;
+    position: relative;
+    bottom: -3px;
+    left: -webkit-calc( 50% - 7px );
+    border-style: solid;
+    border-width: 0 7px 9px;
+    border-color: #FFFFFF transparent;
+    display: block;
+    width: 0;
+    z-index: 1;
+    float: left;
 }
 
 .tabObj-cell-area{

@@ -563,21 +563,26 @@ ul.system-tab li.current-tab{
 	float:right;
 	margin-right: 10px;
     margin-left: 10px;
-    margin-top: 9px;
+    margin-top: 4px;
 }
 
 .btn-b{
-	width: 75px;
-  	height: 35px;
-  	border-radius: 3px;
-  	border: 0;
-  	color: white;
-  	/*cursor: pointer;*/
-  	outline: none;
-  	background: #32b3e4; 
-  	font-weight: bold;
-  	font-size: 12px;
-  	opacity: 0.2;
+    width: 60px;
+    height: 30px;
+    border-radius: 3px;
+    border: 0;
+    color: white;
+    cursor: pointer;
+    outline: none;
+    background: #aaa;
+    text-shadow: 0 0 1px white;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: bold;
+}
+
+#email-setting div.btn-content button.bind {
+	background: rgb(255, 59, 0);
 }
 
 .password-btn{
@@ -591,7 +596,7 @@ ul.system-tab li.current-tab{
 .userSetting-btn.ready
 {
     cursor: pointer;
-    background: #32b3e4; 
+    background: #3994E8; 
     opacity: 1;
 }
 
@@ -623,7 +628,7 @@ ul.system-tab li.current-tab{
 #email-setting>div.delete-account>button {
 	background: transparent;
     border: 0;
-    color: rgba(255, 0, 69, 0.57);
+    color: rgb(255, 59, 0);
     cursor: pointer;
     outline: none;
     font-weight: bold;
@@ -736,11 +741,11 @@ input[type=checkbox] {
 	box-shadow: 1px 1px 5px #ccc;
 }
 
-.notification-option input:checked + .slider {
+#notification-setting .notification-option input:checked + .slider {
 	background-color: #B3D2F9;
 }
 
-.notification-option input:checked + .slider:before {
+#notification-setting .notification-option input:checked + .slider:before {
 	transform: translateX(20px);
 	background-color: #32b3e4;
 }
@@ -774,7 +779,7 @@ input[type=radio] {
 	left: 15px;
 	bottom: -37px;
 	background: white;
-	border: 2px solid #32b3e4;
+	border: 2px solid #3994E8;;
 	border-radius: 50%;
 }
 

@@ -454,13 +454,9 @@ optionsPrototype.attachedCallback = function () {
     editAudienceBtn.textContent = $.i18n.getString('SCHEDULED_POST_EDIT_AUDIENCE');
     editScheduleTimeBtn.textContent = $.i18n.getString('SCHEDULED_POST_EDIT_SCHEDULED_TIME');
 
-    // if (this.currentTargets) {
     editAudienceBtn.addEventListener('click', function (e) {
         this.editAudiences(e.target);
     }.bind(this));
-    // } else {
-    //     editAudienceBtn.setAttribute("disabled", true);
-    // }
 
     editScheduleTimeBtn.addEventListener('click', this.editScheduleTime);
 

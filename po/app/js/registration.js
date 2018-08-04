@@ -16,8 +16,7 @@ appInitial = function(needUpdate){
     		loginAction();
     	}
 	} else if( window.location.hash !== "") {
-		// window.location = "index.html";
-		$.mobile.changePage("")
+		$.mobile.changePage("");
 	}
 	
 	//首頁大圖
@@ -29,8 +28,8 @@ appInitial = function(needUpdate){
 
 
 	// placeholder
-	registerDom.find("login-ld-phone").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_PHONE"))
-	registerDom.find("login-ld-email").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_EMAIL"))
+	registerDom.find("login-ld-phone").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_PHONE"));
+	registerDom.find("login-ld-email").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_EMAIL"));
 	registerDom.find("login-ld-password").attr("placeholder", $.i18n.getString("WEBONLY_LOGIN_PASSWORD"))
 
 	$(document).on("click",".login-ready:not(.login-waiting)",function(){
@@ -180,10 +179,6 @@ appInitial = function(needUpdate){
 			var phoneInput = $(".login-ld-phone input");
 			var countryInput = $(".login-ld-countrycode option:selected");
 			
-			// 拿掉手機驗證
-			//var phoneObj = getPhoneNumberObject( phoneInput.val(), countryInput.attr("data-val") );
-			// if( phoneObj.isValid && pwdInput.val().length >= 6 ){
-			
 			if (pwdInput.val().length >= 6 && phoneInput.val() >= 4){
 				$("#page-registration .login").addClass("login-ready");
 
@@ -210,32 +205,10 @@ appInitial = function(needUpdate){
 				$("#page-registration .login").removeClass("login-ready");
 			}
 		}
-	}
+	};
 
 
 	//------- landing page login end -------
-
-	$(".login-phone input, .login-password input").bind("input",function(){
-		//限制輸入數字
-		if($(this).parent().hasClass("login-phone")){
-			$(this).val($(this).val().replace(/[^-_0-9]/g,''));	
-		}
-		//電話號碼10碼 開頭為09 密碼大於等於6
-		if($(".login-password input").val().length >= 6 && $(".login-phone input").val().length == 10 && $(".login-phone input").val().substring(0,2) == "09"){
-			$(".login-next").addClass("login-next-ready");
-		}else{
-			$(".login-next").removeClass("login-next-ready");
-		}
-	});
-
-	$(".login-remember-password input").bind("input",function(){
-		if($(this).val().length >= 6){
-			$(".login-next").addClass("login-next-ready");
-		}else{
-			$(".login-next").removeClass("login-next-ready");
-		}
-	});
-
 	$("#page-registration div.login-remember-account").click(function(){
 		var remember_chk = $(this).data("chk");
 		var rememberPassword = $(this).next()
@@ -259,40 +232,6 @@ appInitial = function(needUpdate){
 
 		$(this).data("chk",remember_chk);
 	});
-
-
-	$(".login-change").click(function(){
-		$(".login-change").data("chk",true);
-
-		$("body").fadeOut();
-		setTimeout(function(){
-			$("body").fadeIn();
-		},100);
-		setTimeout(function(){
-			$("#page-registration div.login-remember-account img").attr("src","images/common/icon/icon_check_gray.png");
-			$("#page-registration div.login-remember-account").data("chk",false);
-			$(".login-remember-area").hide();
-			$(".login-default-area").show();
-			$(".login-change").hide();
-			$(".login-next").removeClass("login-next-adjust");
-		},400);
-	});
-
-	$(document).on("click",".login-next-ready:not(.login-waiting)",function(){
-
-		if($.lStorage("_loginRemember") && !$(".login-change").data("chk")){
-			var phone_id = $.lStorage("_loginRemember").phone;
-			var password = $(".login-remember-password input").val();
-		}else{
-			var phone_id = $(".login-phone input").val();
-			var password = $(".login-password input").val();
-		}
-		// cns.debug("phone_id:",phone_id,"pw:",password,"countrycode:",countrycode);
-
-		//登入
-		login(phone_id,password,countrycode);
-	});
-
 
 	login = function(phoneId,password,countrycode,isMail){
 		isMail = isMail || false;
@@ -343,6 +282,13 @@ appInitial = function(needUpdate){
         			dataObj.pw = password;
 
         			QmiGlobal.ssoLogin(dataObj).done(loginDef.resolve);
+        		} else if (dataObj.rsp_code === 107) {
+        			toastShow(dataObj.rsp_msg);
+        		  	bindAccount.force(dataObj).then(function() {
+        		  		loginDef.resolve({isSso:false, isSuccess: true});
+        		  	}, function () {
+        		  		loginDef.resolve({isSso:false, isSuccess: false});
+        		  	});
 
         		// 帳號無效 (108帳號被凍結 109已成無效帳號 110付費帳號被關閉)
         		} else if (dataObj.rsp_code === 108 || dataObj.rsp_code === 109 || dataObj.rsp_code === 110) {
@@ -396,12 +342,12 @@ appInitial = function(needUpdate){
         	window.errorTest = arguments;
         	cns.debug("login error ",arguments)
         });
-	}
+	};
 
 	function changeAccountToResetDB(phoneId) {
 		var lastId = $.lStorage("_lastLoginAccount") || null;
 		if(lastId !== phoneId && lastId !== null) 
-			resetDB({removeItemArr: ["_sticker"]});
+			resetDB({removeItemArr: ["_sticker", "_sys_notification_switch", "_sys_sound_switch"]});
 		
 		// 紀錄上次登入帳號
 		$.lStorage("_lastLoginAccount", phoneId);
@@ -412,8 +358,10 @@ appInitial = function(needUpdate){
 
         ui = QmiGlobal.auth.ui;
         at = QmiGlobal.auth.at;
-
     	var isFromLogin = true;
+
+    	// 2018/07/26 提供所有聊天室判斷reload
+    	$.lStorage("windowUID", QmiGlobal.getUID());
 
         QmiGlobal.chainDeferred().then(function() {
         	return userInfoGetting();
@@ -529,7 +477,7 @@ appInitial = function(needUpdate){
 		    	initChatCntDB(); 
 
 				updateAlert(isFromLogin);
-				
+
 				//沒團體的情況
 				if(Object.keys(QmiGlobal.groups).length == 0 || !QmiGlobal.auth.dgi || QmiGlobal.auth.dgi==""){
 					//關閉返回鍵
@@ -775,7 +723,6 @@ appInitial = function(needUpdate){
 
 	checkRegisterPhone = function(){
 		var thisDom = $(".register-phone input");
-		cns.debug("[checkRegisterPhone]");
 		thisDom.val(thisDom.val().replace(/[^-_0-9]/g,''));
 		var this_register = thisDom.parent();
 		var countryCodeDoms = $('#page-register .countrycode select');
@@ -786,24 +733,25 @@ appInitial = function(needUpdate){
 		// if( phoneObj.isValid ){
 		countryCodeDoms.attr("data-countryCode", countryCodeDoms.find("option:selected").attr("data-code"));
 		countryCodeDoms.attr("data-nationalNum", thisDom.val());
-		this_register.find("img").show();
 		$(".register-next").data("textChk", true );
 
 		if( true==$(".register-next").data("chk") ){
 			$(".register-next").addClass("register-next-ready");
 		}
-		// } else {
-		// 	this_register.find("img").hide();
-		// 	$(".register-next").data("textChk", false );
-		// 	$(".register-next").removeClass("register-next-ready");
-		// }
 	};
 	$(".register-phone input").bind("input",checkRegisterPhone );
 
 	$(".register-next").click(function(){
-		if($(this).hasClass("register-next-ready")){
-			cns.debug("傳送驗證碼 還沒按確定");
+		// 未勾選同意條款 跳出說明
+		if($(this).parent().find("> div.register-text > img").attr("src").match(/gray_check.png/) === null) {
+			new QmiGlobal.popup({
+				desc: $.i18n.getString("REGISTER_AGREE_TERM"),
+				confirm: true,
+			});
+			return;
+		}
 
+		if($(this).hasClass("register-next-ready")){
 			//get country code
 			var countryCodeDoms = $('#page-register .countrycode select');
 			var newCountryName = countryCodeDoms.attr("data-val");
@@ -811,13 +759,6 @@ appInitial = function(needUpdate){
 			var newCountryText = countryCodeDoms.attr("data-text");
 			var nationalNum = countryCodeDoms.attr("data-nationalNum");
 			countrycode = newCountryCode;
-			cns.debug("newCountryCode", newCountryCode);
-			// if( newCountryCode != countrycode ){
-			// 	countrycode = newCountryCode;
-			// 	var loginData = $.lStorage("_loginRemember");
-			// 	loginData.countrycode = newCountryCode;
-			// 	$.lStorage("_loginRemember", loginData);
-			// }
 			var targetCountryDom = $('.login-ld-countrycode select');
 			if( targetCountryDom.length>0 ){
 				targetCountryDom.selectbox("change", newCountryName, newCountryText );
@@ -891,30 +832,6 @@ appInitial = function(needUpdate){
 		}
 
 	});
-
-
-	//資料設定
-
-	//初始化 datetimepicker
-	// $("input.setting-birth-hidden").datetimepicker({
- //        maxDate:'+1970/01/02',
- //        value:'631152012',
- //        timepicker:false,
- //        format:'unixtime',
- //        onChangeDateTime: function() {
- //        	var unixtime = $("input.setting-birth-hidden").val();
- //        	var time = new Date($("input.setting-birth-hidden").val()*1000);
-	// 		// var time_format = time.customFormat( "#YYYY# 年 #M# 月 #D# 日" );
-	// 		var time_format = time.toLocaleDateString();
- //        	$(".setting-birth input").val(time_format);
-
- //        	if($(".setting-full-name input").val().length > 0){
-	// 			$(".setting-next").addClass("setting-next-ready");
-	// 		}else{
-	// 			$(".setting-next").removeClass("setting-next-ready");
-	// 		}
- //        }
- //    });
 
     $(".setting-birth").click(function(){
     	$("input.setting-birth-hidden").datetimepicker("show");
@@ -1364,7 +1281,7 @@ appInitial = function(needUpdate){
 		$('.ui-loader').css("display","block");
 		$(".ajax-screen-lock").show();
 		loginAction();
-	}
+	};
 	
 	initLandPage = function(){
 		//若local storage 有記錄密碼 就顯示
@@ -1390,12 +1307,7 @@ appInitial = function(needUpdate){
 				$(".login-ld-phone input").val( rememberData.phone );	//"(" + rememberData.countrycode + ")" + 
 			}
 
-			if (rememberData.password) {
-				$(".login-ld-password input").val( rememberData.password );
-				checkLoginReady();
-			}
 		} else {
-			// $("#page-registration .login-remember img").attr("src","images/common/icon/icon_check_gray.png");
 			rememberAccountDom.data("chk", false);
 			$(".login-remember-area").hide();
 			$(".login-default-area").show();
@@ -1405,14 +1317,15 @@ appInitial = function(needUpdate){
 			rememberAccountDom.click();
 		}
 
-
-		if($.lStorage("_loginAutoChk")){
+		var passwordStr = ($.lStorage("_loginRemember") || {}).password;
+		if (passwordStr) {
+			$(".login-ld-password input").val(passwordStr);
 			rememberPassword.find("img").attr("src","images/registration/checkbox_check.png");
 			rememberPassword.data("chk",true);
-			// $(".login-auto").find("img").attr("src","images/registration/checkbox_check.png");
-	  //   	$(".login-auto").data("chk",true);
+
+			checkLoginReady();
 	    }
-	}
+	};
 	initLandPage();
 
 	var logoClickCnt = 0;

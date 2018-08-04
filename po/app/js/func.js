@@ -204,7 +204,7 @@ agreeMeInvite = function(inviteDom){
         content: [
             {
                 tagName: 'div',
-                text: $.i18n.getString('ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION', $.lStorage("_loginAccount")),
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION', QmiGlobal.me.pn || $.lStorage("_loginAccount")),
             }
         ],
         footer: [
@@ -763,7 +763,7 @@ timelineSwitch = function (act, reset, main, noAppReload){
             groupMain.find(".st-filter-action")
                      .filter(".st-filter-list-active").removeClass("st-filter-list-active").end()
                      .filter("[data-navi='announcement']").show().end()
-                     .filter("[data-navi='feedback']").hide().end()
+                     .filter("[data-navi='feedback']").show().end()
                      .filter("[data-navi='task']").show().end()
                      .filter("[data-navi='home']").show().end()
                      .filter("[data-navi='feed-public']").hide().end()
@@ -1072,21 +1072,19 @@ topBarMake = function (top_area,top_msg_num,resize) {
 
 
     //輪播
-    var top_timer;
-
-    clearInterval(top_timer);
-
-    top_timer = setInterval(function(){
-        top_area.find(".st-top-right-arrow").trigger("mouseup");
-    },top_timer_ms);
+    resetTopEventCarousel();
 
     //重設輪播
     top_area.find(".st-top-bar-case-click span, .st-top-left-arrow, .st-top-right-arrow").click(function(){
-        clearInterval(top_timer);
-        top_timer = setInterval(function(){
-            top_area.find(".st-top-right-arrow").trigger("mouseup");
-        },top_timer_ms);
+        resetTopEventCarousel();
     });
+}
+
+function resetTopEventCarousel() {
+    clearInterval(QmiGlobal.topEventTimer);
+    QmiGlobal.topEventTimer = setInterval(function(){
+        $("#page-group-main .subpage-timeline .st-top-right-arrow").trigger("mouseup");
+    }, top_timer_ms);
 }
 
 
@@ -1433,6 +1431,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     var this_ei = this_event.data("event-id");
     var postData = e_data[0];
     var replyList = e_data.slice(1);
+    var replyCount = 0;
 
     var targetTu = null;
     if (postData.meta) targetTu = {tu: postData.meta.tu, pu: postData.meta.gu};
@@ -1453,8 +1452,6 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     //已讀亮燈 & 隱藏未讀提示
     this_event.find(".st-sub-box-3 img:eq(2)").attr("src","images/icon/icon_view_activity.png")
     this_event.find("div.timeline-box-hint").hide();
-
-    this_event.find(".st-reply-all-content-area").html("");
 
     // 投票、工作、定位內容先做
     $.each(postData.ml,function(i,val) {
@@ -1490,13 +1487,17 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
     })
         
     //2017/12/19 load once
-    $('<div>').load('layout/timeline_event.html?v2.2.0.6 .st-reply-content-area', function(){
+    $('<div>').load('layout/timeline_event.html?v'+ QmiGlobal.appVer +' .st-reply-content-area', function(){
+        // 清空
+        this_event.find(".st-reply-all-content-area").empty();
+
         //製作每個回覆
         var okCnt = 0;
         var loadedDom = $(this);
         var fileIdMap = {};
 
         $.each(replyList, function(el_i,el){
+
             var deferred = $.Deferred();
 
             var without_message = false;
@@ -1517,6 +1518,7 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                     case 0:
                         this_content.find(".replyMsg").html(htmlFormat(val.c));
                         mainReplyText = this_content.find(".replyMsg").html();
+
                         break;
                     case 1:
                         break;
@@ -1655,8 +1657,9 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
             }
             
             this_content.find("b").bind("click", function(e) {
+                let group = QmiGlobal.groups[this_gi];
                 if ($(e.target).attr("name")) {
-                    userInfoShow(this_gi, $(e.target).attr("name"));
+                    personalHomePage(this_gi, $(e.target).attr("name"));
                 }
             });
 
@@ -1680,6 +1683,50 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                 var isError = false;
                 var _groupList = QmiGlobal.groups;
 
+                replyDom.off('contextmenu').on('contextmenu', function (e) {
+                    //無選字，按右鍵跑出客製化選單
+                    if (getSelection().toString().length == 0) {
+                        e.preventDefault();
+
+                        try {
+                            let menu = new nwGui.Menu();                            
+
+                            if (mainReplyText.trim()) {
+                                let copyItem = new nwGui.MenuItem({label: $.i18n.getString('FEED_COPY')});
+                                copyItem.click = copyTextToClipboard.bind(null, this_content.find(".replyMsg").text());
+
+                                menu.append(copyItem);
+                            }
+
+                            if (el.meta.gu == QmiGlobal.groups[this_gi].me ||
+                                QmiGlobal.groups[this_gi].guAll[QmiGlobal.groups[this_gi].me].ad === 1) {
+                                
+                                let removeItem = new nwGui.MenuItem({label: $.i18n.getString('COMMON_DELETE')});
+
+                                removeItem.click = function (e) {
+                                    new QmiAjax({
+                                        apiName: `/groups/${this_gi}/timelines/${QmiGlobal.groups[this_gi].ti_feed}/events/${this_ei}.${el.ei}`,
+                                        method: 'delete'
+                                    }).success(function(data){
+                                        toastShow(data.rsp_msg);
+                                        updateReplyArea(this_event);
+                                        // replyDom.remove();
+                                    })
+                                }
+
+                                menu.append(removeItem);
+                            }
+
+                            if (menu.items.length > 0) {
+                                menu.popup(e.clientX, e.clientY);
+                            }
+                        } catch (e) {
+                            console.log('browser is not supported')
+                        }
+                    }
+                });
+
+                replyCount += 1;
                 this_event.find(".st-reply-all-content-area").append(replyDom);
 
                 try{
@@ -1753,6 +1800,9 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
 
             deferred.resolve();
         });
+        
+        // 回復數字更新
+        this_event.find("div.st-response").text(replyCount);
 
         var fileIdList = Object.keys(fileIdMap);
         if (fileIdList.length > 0) {
@@ -1803,7 +1853,10 @@ detailTimelineContentMake = function (this_event, e_data, reply_chk, triggerDeta
                                 replyElement.find("video").attr("src", fileData.s32).show();
                                 break;
                             case 8:
-                                replyElement.find("audio").html('<source type="audio/mp4" yo src="'+ fileData.s3 +'">').show();
+                                //audio用jquery show，反而變diplay none @@ 
+                                replyElement.find("audio").css('display', 'block')
+                                            .html('<source type="audio/mp4" yo src="'+ fileData.s3 +'">')
+                       
                                 break;
                             case 26:
                                 var fileName = fileObj.fn.split(".")[0];
@@ -2023,7 +2076,7 @@ bindWorkEvent = function (this_event){
 voteContentMake = function (this_event,vote_obj){
     var li = vote_obj.li;
     $.each(li,function(v_i,v_val){
-        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v2.4.0.2 .st-vote-ques-area',function(){
+        this_event.find(".st-vote-all-ques-area").append($('<div class="st-vote-ques-area-div">').load('layout/timeline_event.html?v'+ QmiGlobal.appVer +' .st-vote-ques-area',function(){
             var this_ques = $(this).find(".st-vote-ques-area");
             
             //設定題目的編號
@@ -2070,6 +2123,7 @@ voteContentMake = function (this_event,vote_obj){
 
             //load結束 根據投票類型做限制 以及 製作投票結果呈現
             if(v_i == li.length - 1){
+                console.log("kwkwk")
                 voteTypeSetting(this_event,vote_obj);
                 setTimeout(function(){
                     voteResultMake(this_event, v_val.v);
@@ -2088,10 +2142,6 @@ voteTypeSetting = function (this_event,vote_obj){
     if(vote_obj.lv == 2) vote_type = $.i18n.getString("FEED_VOTE_ANONYMOUS");
     this_event.find(".st-task-vote-detail-count span.vote-type").html(vote_type);
 
-
-    //非發文者 會受投票類型限制
-    if(this_event.data("event-val").meta.gu == gu) return false;
-
     var cnt_close = true,member_close = true;
     //現在時間 大於 結束時間
     if(new Date().getTime() > vote_obj.e){
@@ -2103,6 +2153,7 @@ voteTypeSetting = function (this_event,vote_obj){
         }
     }
 
+    console.log(member_close)
     if(cnt_close == false) this_event.find(".st-vote-detail-option .cnt").hide();
     if(member_close == false) this_event.find(".st-vote-detail-option .more").hide();
 
@@ -2295,15 +2346,8 @@ bindVoteEvent = function (this_event){
         }
     });
     
-    //綁過不要再綁 會重複執行
-    if(this_event.data("vote-bind-chk")) return false;
-
     //送出
     this_event.find(".st-vote-send").click(function(){
-
-        //綁過不要再綁 會重複執行
-        this_event.data("vote-bind-chk",true);
-
 
         var thisTimelineID = this_event.data("event-id").split("_")[1];
         var thisGroup = this_event.data("event-id").split("_")[0];
@@ -2381,32 +2425,23 @@ bindVoteEvent = function (this_event){
         ajaxDo(api_name,headers,method,false,body).complete(function(data){
             if( 200==data.status ){
                 //重新讀取detail
-                // popupShowAdjust("","回覆成功");
-                toastShow( $.i18n.getString("FEED_VOTE_SENDED") );
-                
-                //客製化 按了確定之後再重讀取
-                $(".popup-close").bind("reload",function(){
+                getEventDetail(this_event.data("event-id")).complete(function(data){
+                    if(data.status != 200) return;
+                    var e_data = $.parseJSON(data.responseText).el;
+                    // detailTimelineContentMake(this_event, e_data, true);
+                    this_event.data("event-val", e_data[0]);
+
                     //重設任務完成狀態
                     eventStatusWrite(this_event);
-
-                    //重設完整的detail
-                    this_event.data("detail-content",false);
-                    this_event.find(".st-vote-all-ques-area").html("");
-                    // timelineDetailClose toggle負負得正
-                    this_event.find(".st-reply-area").hide();
-
-                    this_event.data("switch-chk",false);
-
-                    this_event.find(".st-sub-box-1").trigger("click");
-                    $(".popup-close").unbind("reload");
                 });
+                toastShow( $.i18n.getString("FEED_VOTE_SENDED") );
             } else {
                 toastShow( $.i18n.getString("FEED_VOTE_FAILED") );
             }
         });
     });
 
-    this_event.find(".st-vote-detail-option .vote-set").click(function(){
+    this_event.find(".st-vote-detail-option .vote-set").off("click").click(function(){
 
         var this_opt = $(this).parent();
         var this_ques = this_opt.parent();
@@ -2861,60 +2896,195 @@ composeObjectShow = function(thisCompose){
 
     //避免重複綁定事件 先解除
     $(document).off('click', '.cp-content-object ,.cp-work-item-object');
-    $(document).on("click",".cp-content-object ,.cp-work-item-object", function(e) {
-        var target = $(this);
-        var isSelectWorkObject = target.parent().hasClass("cp-work-item");
+    $(document).on("click",".cp-content-object ,.cp-work-item-object", function(){
+        composeObjectShowDelegate( thisCompose, $(this) );
+    });
+}
 
-        popupSelectMemberDialog({
-            settings:{
-                isHiddenPublic: isSelectWorkObject,
-                isHiddenFav: isSelectWorkObject,
-                isDeselectAll: isSelectWorkObject,
-                isSingleCheck: isSelectWorkObject,
-                isHiddenBranch: isSelectWorkObject
-            },
-            previousSelect: {
-                members: $.parseJSON(thisCompose.data("object_str") || "{}"),
-                branches: $.parseJSON(thisCompose.data("branch_str") || "{}"),
-                favorites: $.parseJSON(thisCompose.data("favorite_str") || "{}"),
-            },
-            onDone: function (selectedObj, callback) {
-                var checkedMemNum = Object.keys(selectedObj.members).length;
-                var checkedBranchNum = Object.keys(selectedObj.branches).length + Object.keys(selectedObj.favorites).length;
-                
-                if (isSelectWorkObject) {
-                    var span = $(".cp-work-item-object span:eq(" + target.parents(".cp-work-item").data("work-index") + ")");
-                    var objText = $.i18n.getString("COMPOSE_ASSIGN");
-                    if (checkedMemNum > 0) {
-                        target.css("color", "red");
-                        objText = selectedObj.members[Object.keys(selectedObj.members)[0]];
-                    } else {
-                        span.removeAttr("style");
-                    }
+composeObjectShowDelegate = function( thisCompose, thisComposeObj, option, onDone ){
+    var objectDelegateView = ObjectDelegateView;
+    var objData, branchData, favoriteData;
+    var isShowBranch = false;
+    var isShowSelf = false;
+    var isShowAll = true;
+    var isShowFav = true;
+    var isShowFavBranch = true;
+    var isBack = true;
+    var isShowLeftMem = false;
+    var isForWork = thisComposeObj.parent().hasClass("cp-work-item");
+    var isDisableOnAlreadyChecked = false;
 
-                    span.html(objText);
-                    target.data("object_str", JSON.stringify(selectedObj.members));
-                } else {
-                    if(checkedMemNum > 0 && checkedBranchNum == 0) {  //無群組有選人
-                        target.find("span").html( $.i18n.getString("GROUP_MEMBERS", checkedMemNum));
-                    } else if (checkedMemNum == 0 && checkedBranchNum > 0) { //有群組無選人
-                        target.find("span").html( $.i18n.getString("GROUP_COUNTS", checkedBranchNum));
-                    } else if (checkedMemNum > 0 && checkedBranchNum > 0) { //有群組有選人
-                        target.find("span").html( $.i18n.getString("GROUP_COUNTS", checkedBranchNum) 
-                            + $.i18n.getString("GROUP_AND") + $.i18n.getString("GROUP_MEMBERS", checkedMemNum));
-                    } else {
-                        target.find("span").html("");
-                    }
+    var group = QmiGlobal.groups[gi],
+        guAll = group.guAll,
+        bl = group.bl,
+        fbl = group.fbl,
+        guList = Object.keys(guAll) || [];
 
-                    thisCompose.data("object_str", JSON.stringify(selectedObj.members));
-                    thisCompose.data("branch_str", JSON.stringify(selectedObj.branches));
-                    thisCompose.data("favorite_str", JSON.stringify(selectedObj.favorites));
+
+    $.mobile.changePage("#page-object", {transition: "slide"});
+
+    //工作
+    if ( null== option ) {
+        if(thisComposeObj.parent().hasClass("cp-work-item")) {
+            //工作發佈對象
+            isShowBranch = false;
+            isShowSelf = true;
+            isShowAll = false;
+            isShowFav = false;
+            isShowFavBranch = false;
+        } else {
+            //其餘發佈對象
+            isShowBranch = true;
+            isShowSelf = true;
+        }
+    } else {
+        isShowBranch = (null==option.isShowBranch) ? isShowBranch: option.isShowBranch;
+        isShowSelf = (null==option.isShowSelf) ? isShowSelf : option.isShowSelf;
+        isShowAll = (null==option.isShowAll) ? isShowAll : option.isShowAll;
+        isShowFav = (null==option.isShowFav) ? isShowFav : option.isShowFav;
+        isShowFavBranch = (null==option.isShowFavBranch) ? isShowFavBranch : option.isShowFavBranch;
+        isBack = (null==option.isBack) ? isBack : option.isBack;
+        isShowLeftMem = (null==option.isShowLeftMem) ? isShowLeftMem : option.isShowLeftMem;
+        isDisableOnAlreadyChecked = (null==option.isDisableOnAlreadyChecked) ? isDisableOnAlreadyChecked : option.isDisableOnAlreadyChecked
+    }
+
+    if (thisComposeObj.parent().hasClass("cp-work-item")) {
+        objData = $.parseJSON(thisComposeObj.data("object_str") || "{}");
+    } else {
+        objData = $.parseJSON(thisCompose.data("object_str") || "{}") || {};
+        branchData = $.parseJSON(thisCompose.data("branch_str") || "{}"); 
+        favoriteData = $.parseJSON(thisCompose.data("favorite_str") || "{}"); 
+    }
+
+    var visibleMemList = guList.filter(function(gu) {
+        var userObj = guAll[gu];
+        if( !isShowSelf && gu == group.gu ) return false; 
+        if( !isShowLeftMem && userObj.st != 1 ) return false;
+        if( group.ntp === 2 && thisCompose.data("offical") === "add" && guAll[group.gu].abl == "" && userObj.ad != 1) return false;
+        var branchID = userObj.bl;
+        var extraContent = "";
+
+        if( branchID && branchID.length > 0 ){
+            var branchPath = branchID.split(".");
+            if( branchPath && branchPath.length > 0 ){
+                branchID = branchPath[branchPath.length-1];
+                if( bl.hasOwnProperty(branchID) ){
+                    tContent = bl[branchID].bn;
                 }
+            }
+        }
 
-                if (callback) callback();
+        userObj.bn = extraContent;
+
+        return true;
+    });
+
+    var viewOption = {
+        mainPage : $("#page-object"),
+        headerBtn : $("#page-object").find(".obj-done"),
+        selectNumElement : $("#page-object").find(".header-cp-object span:eq(1)"),
+        thisCompose : thisCompose,
+        thisComposeObj : thisComposeObj,
+        onDone : onDone,
+        isBack : isBack,
+        singleCheck : (group.ntp === 2 && thisCompose.data("offical")==="add") || isForWork,
+        visibleMembers : visibleMemList,
+        checkedMems : objData,
+        checkedBranches : branchData,
+        checkedFavorites : favoriteData,
+        minSelectNum : 0,
+        isDisableOnAlreadyChecked : isDisableOnAlreadyChecked
+
+    }
+
+    objectDelegateView.init(viewOption).setHeight();
+
+    //no one to select, show coachmark & return
+    if ((isShowSelf && group.cnt <= 0) || ( !isShowSelf && group.cnt <= 1) ) {
+        objectDelegateView.showNoMember();
+        return;
+    } 
+
+    //----- 全選 ------
+    if( isShowAll ) objectDelegateView.addRowElement("Default", {isObjExist : (Object.keys(objData).length > 0) ? true : false });
+
+    //----- 我的最愛 ------
+    if( isShowFav && (group.favCnt > 0 || Object.keys(fbl).length > 0)){
+        objectDelegateView.addRowElement("Favorite");
+
+        visibleMemList.forEach(function(gu) {
+            var guObj = Object.assign({}, guAll[gu]);
+            guObj.chk = false;
+            guObj.enable = true;
+
+            if (objData.hasOwnProperty(gu)) {
+                guObj.chk = true;
+                if (isDisableOnAlreadyChecked) {
+                    guObj.enable = false;
+                }
+            }
+            
+            if (guObj.fav) {
+                objectDelegateView.addFavoriteSubRow("Member", {thisMember : guObj, isSubRow : true});
+            }
+        });        
+
+        if( isShowFavBranch ){
+            for( var fi in fbl ){
+                var fbObj = fbl[fi];
+                fbObj.fi = fi;
+                fbObj.chk = false;
+                if (favoriteData && Object.keys(favoriteData).length) {
+                    if (favoriteData[fi] != undefined ) fbObj.chk = true;
+                }
+                objectDelegateView.addFavoriteSubRow("FavBranch", {thisFavBranchObj : fbObj, isSubRow : true});
+            }
+        }
+    }
+
+    //----- 團體列表 ------
+    if( bl && isShowBranch && Object.keys(bl).length > 0 ) {
+        var parentBranches = [];
+        objectDelegateView.addRowElement("SelectAllTitle", {type : "group", isDisplayedChkbox : true});
+
+        //團體rows
+        $.each(bl, function(key, branchObj){
+
+            branchObj.chk = false;
+            branchObj.bi = key;
+            branchObj.enable = true;
+
+            if (branchData && Object.keys(branchData).length) {
+                if (branchData[key] != undefined ) {
+                    branchObj.chk = true;
+                    if (isDisableOnAlreadyChecked) {
+                        branchObj.enable = false;
+                    }
+                }
+                
+            }
+
+            //第一層顯示開關
+            if (1 == branchObj.lv) {
+                parentBranches.push(key);
             }
         });
-    });
+
+        parentBranches.forEach(function (branchKey) {
+            objectDelegateView.addRowElement("ParentBranch", {thisBranch : bl[branchKey], bl: bl});
+        });
+    }
+    
+    
+    //----- 加入成員列表 ------
+
+    if(!thisComposeObj.parent().hasClass("cp-work-item") && thisCompose.data("offical") !=="add") {
+        objectDelegateView.addRowElement("SelectAllTitle", {type : "mem", isDisplayedChkbox : true});
+    }
+    else objectDelegateView.addRowElement("SelectAllTitle", {type: "mem", isDisplayedChkbox : false});
+
+    objectDelegateView.makeMemberList();
+    objectDelegateView.updateStatus();
 }
 
 timelineObjectTabShowDelegate = function( this_event, type, onDone ){
@@ -3082,7 +3252,8 @@ showObjectTabShow = function(args){
         tab.data("id", index);
         tab.data("obj", object);
         tab.css("width",width);
-        tab.html("<div>" + ((object.title&&object.title.length>0)?object.title:" ") +"</div>");
+        tab.html(`<div>${((object.title&&object.title.length>0)?object.title:" ")} (${(object.ml || []).length})`);
+        // tab.html("<div>" + ((object.title&&object.title.length>0)?object.title:" ") +"</div>");
         tab.data("clickable", (null==object.clickable)?true:(object.clickable) );
         tabArea.append(tab);
         cnt++;
@@ -5071,8 +5242,8 @@ eventStatusWrite = function(this_event,this_es_obj){
         this_event.find(".st-sub-box-4 .st-like-btn").html( $.i18n.getString("FEED_UNLIKE") );
     }
     //回覆
-    if(this_es_obj.ip)
-        this_event.find(".st-sub-box-3 img:eq(1)").attr("src","images/icon/icon_meg_activity.png");
+    // if(this_es_obj.ip)
+    //     this_event.find(".st-sub-box-3 img:eq(1)").attr("src","images/icon/icon_meg_activity.png");
             
     //閱讀
     if(this_es_obj.ir) 
@@ -5314,8 +5485,9 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
             case 1://網址 寫在附檔區域中
                 if(val.c){
                     this_event.find(".st-attach-url").click(function(e){
+                        e.stopPropagation()
                         try{
-                            this_event.find(".st-sub-box-2-attach-area a")[0].click();
+                            window.open(this_event.find(".st-sub-box-2-attach-area a").attr("href"));
                         } catch(e) {
                             errorReport(e);
                         }
@@ -5343,6 +5515,7 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
                 if(val.c.substring(0, 4) == 'www.'){
                     val.c = "http://"+val.c;
                 }
+
                 this_event.find(".st-attach-url-link").attr("href", val.c);
 
                 break;
@@ -5512,9 +5685,10 @@ timelineContentMake = function (this_event,target_div,ml,is_detail, tu){
 
         this_event.find("b").off("click").on("click", function(e) {
             var groupId = this_event.data("event-id").split("_")[0] || gi;
+            let group = QmiGlobal.groups[groupId];
 
             if ($(e.target).attr("name")) {
-                userInfoShow(groupId, $(e.target).attr("name"));
+                personalHomePage(groupId, $(e.target).attr("name"));
             }
         });
         
@@ -5597,7 +5771,7 @@ timelineAudioMake = function (this_event, audio_arr) {
 
         attachAudio.prepend(this_audio);
 
-        this_audio.html('<source type="audio/mp4" yo src="' + obj.s3 + '">').show();
+        this_audio.html('<source type="audio/mp4" yo src="' + val.s3 + '">').show();
     });
 }
 
@@ -7312,8 +7486,7 @@ polling = function(){
                     pollingCmds(newPollingData).done(function(){
                         pollingDeferred.resolve({
                             name: "success",
-                            status: true,
-                            interval: polling_interval
+                            status: true
                         });
                     });
                 }); // 合併私雲polling
@@ -7337,7 +7510,7 @@ polling = function(){
                 pollingDeferred.resolve({
                     name: "else",
                     status: false,
-                    interval: polling_interval*2
+                    interval: polling_interval*6
                 });
         }
     });
@@ -7349,12 +7522,21 @@ polling = function(){
         if ( QmiGlobal.pollingOff === true || resultObj.stop === true) {
             // do nothing
         } else {
+            if(resultObj.interval) {
+                QmiGlobal.pollingIntervalObj.set({
+                    interval: resultObj.interval,
+                    persist: true
+                });
+            }
+
             setTimeout(function(){
                 polling();
-            }, resultObj.interval);
+            }, QmiGlobal.pollingIntervalObj.get());
         }
     });
     return pollingDeferred;
+
+
 
 
     function getAllCloudPolling(newPollingData) {
@@ -7727,18 +7909,12 @@ pollingCmds = function(newPollingData){
         $.when.apply($, comboDeferredPoolArr).done(function(){
             var pollingDataTmp = $.lStorage("_pollingData");
             var currentPollingCt = 9999999999999;
-            var isShowNotification = true;
+            var isShowNotification = $.lStorage("_sys_notification_switch") !== 1;
             var newGroupArr = [];
             var cmdEachDefArr = [];
             var isDoUpdateAlert = false;
 
             if(pollingDataTmp) currentPollingCt = pollingDataTmp.ts.pt;
-
-            //判斷聊天訊息預覽開關
-            if($.lStorage("_setnoti")==100 || set_notification == true)
-                isShowNotification = true;
-            else if($.lStorage("_setnoti")==300 || set_notification == false)
-                isShowNotification = false;
 
             if( (currentPollingCt+300000) < login_time )
                 isShowNotification = false;
@@ -7778,12 +7954,14 @@ pollingCmds = function(newPollingData){
                             if(isNotPostBySelf()) {
                                 $(".navi-alert").addClass("new");
                                 updatePollingCnts( $("<div>"), "G3" );
+                                updateAlert(false, true);
+
+                                
                             }
                         } catch(e) {}
 
                         isDoUpdateAlert = true;    
-                        updateAlert();
-
+                        
                         function isNotPostBySelf() {
                             if(item.pm.userID !== ui) return true;
                             return false;
@@ -7905,6 +8083,8 @@ pollingCmds = function(newPollingData){
 
                     case 41://聊天室邀請或踢除別人
                         updateChatList(item.pm.gi);
+                        // 若是開啟中
+                        closeEditPageOnEditing(item.pm.ci);
                         break;
                     case 45://被別人踢出聊天室
                         if(windowList[item.pm.ti] && !windowList[item.pm.ti].closed)
@@ -8145,6 +8325,17 @@ pollingCmds = function(newPollingData){
             QmiGlobal.module.systemPopup.redSpot.announcement = false;
         });
     }
+
+    // 更新聊天室設定時 要關閉編輯頁面
+    function closeEditPageOnEditing(currCi) {
+        var chatroomData = windowList[currCi] || {};
+        if(chatroomData.closed !== false) return;
+        try {
+            var chatDom = $(chatroomData.document).find("#page-edit-preview");
+            if(chatDom.is(":visible"))
+                chatDom.find("> div.ui-header > div.page-back").click()
+        } catch(e) {};
+    }
 }
 
 
@@ -8281,9 +8472,13 @@ eventDetailShow = function(thisEi){
                             desc: "", // 增加ui空間 美觀
                             confirm: $.i18n.getString("COMMON_OK")
                         })
+
+                        deferred.resolve({isSuccess: false,data: data});
                     } else {
                         $.mobile.changePage("#page-timeline-detail", {transition: "slide"});
                         timelineBlockMake(thisEvent,[data_obj.el[0]],false,true);
+
+                        deferred.resolve({isSuccess: true,data: data});
                     }
                 } catch(e){
                     errorReport(e);

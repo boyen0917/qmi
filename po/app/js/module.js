@@ -1,4 +1,3 @@
-
 QmiGlobal.module.reAuthUILock = {
 	lock: function(companyData) {
 		if(!companyData) return;
@@ -109,8 +108,9 @@ QmiGlobal.module.reAuthManually = {
     // custom event
 	handleEvent: function() {
 		var self = this;
-		// event.type -> click:view-auth-manually-submit
-		var eventCase = event.type.split(":"+self.id).join("");
+		var temp = event.type.split(":"+self.id).join("").split(":");
+		temp.pop();
+		var eventCase = temp.join(":");
 		switch(eventCase) {
 			case "click:submit":
 				self.submit();
@@ -313,7 +313,9 @@ QmiGlobal.module.systemPopup = {
 
     handleEvent: function() {
     	var self = this;
-		var eventCase = event.type.split(":"+self.id).join("");
+		var temp = event.type.split(":"+self.id).join("").split(":");
+		temp.pop();
+		var eventCase = temp.join(":");
 		switch(eventCase) {
 			case "click:close":
 				$("#userInfo .sm-person-area-r").find("img").toggle();
@@ -419,7 +421,7 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 	        	moreDom.show();
 
 	        	veArr.push({
-	        		veId: "more:"+ i, 
+	        		veId: "more", 
 	    			elemArr: moreDom, 
 	    			eventArr: ["click"],
 	    			data: {dom: dom, oriHeight: oriHeight}
@@ -459,7 +461,6 @@ QmiGlobal.module.systemAnnouncement = new QmiGlobal.ModuleConstructor({
 	},
 
 	clickInitAnnoucement: function() {
-    	console.log("yoyoyo hold'n man");
     },
 
     setHtmlStr: function() {
@@ -639,7 +640,6 @@ QmiGlobal.module.appVersion = {
 	
 	update: function() {
 		var self = this;
-		// console.log("switchStr", self.switchStr);
 		switch(self.switchStr) {
 			case "00": // 手動更新 桌機無更新
 				// 文案：「有新版本，將自動更新資料。」
@@ -747,7 +747,6 @@ QmiGlobal.module.appVersion = {
 		var self = this;
 		var apiDeferred = $.Deferred();
 		var resultObj = {};
-		console.log("version go")
 		$.when.apply($, Object.keys(self.versionOsMap).map(function(osTp) {
 			var deferred = $.Deferred();
 			
@@ -833,8 +832,7 @@ QmiGlobal.module.serverSelector = {
 
 		if(chk === false) self.view.find("li:last-child").addClass("selected").addClass("active").find("input").val(base_url.split("/apiv1")[0]);
 
-		QmiGlobal.eventDispatcher.subscriber([
-			{
+		QmiGlobal.eventDispatcher.subscriber([{
     			veId: "item", 
     			elemArr: self.view.find("li"), 
     			eventArr: ["click"]
@@ -849,7 +847,10 @@ QmiGlobal.module.serverSelector = {
 	handleEvent: function() {
 		var self = this;
 		var thisElem = event.detail.elem;
-		switch(event.type.split(":"+self.id).join("")) {
+		var temp = event.type.split(":"+self.id).join("").split(":");
+		temp.pop();
+		var eventCase = temp.join(":");
+		switch(eventCase) {
 			case "click:item":
 				self.view.find("li").removeClass("active");
 				$(thisElem).addClass("active");
@@ -919,19 +920,22 @@ QmiGlobal.eventDispatcher = {
 			if(preventMultiClick(event) === false) return;
 
 			var self = this;
-
-			Object.keys(self.viewMap).forEach(function(viewId) {
-				// event currentTarget -> event綁定的對象
-
-				// elemArr 是arr 每個elem都比對
-				var elemArr = self.viewMap[viewId].elemArr, length = elemArr.length;
-				for(var i=0; i<length; i++) {
-					if(event.currentTarget === elemArr[i]) {
-						window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {}), target: event.target, originalEvent: event}}));
-						return;
-					}
+			// event currentTarget -> event綁定的對象
+			var viewId = event.currentTarget.dataset.veId;
+			// elemArr 是arr 每個elem都比對
+			var elemArr = self.viewMap[viewId].elemArr, length = elemArr.length;
+			for(var i=0; i<length; i++) {
+				if(event.currentTarget === elemArr[i]) {
+					window.dispatchEvent(new CustomEvent(event.type+ ":" +viewId, {detail: {elem: event.currentTarget, data: (self.viewMap[viewId].data || {}), target: event.target, originalEvent: event}}));
+					return;
+				// // 清理沒用到的 但要注意如何定義沒用到？ 例如jquery 的 detach
+				// } else if(document.contains(elemArr[i])){
 				}
-			});
+			}
+		}
+
+		function removeViewEvent() {
+
 		}
 
 		function preventMultiClick(event) {
@@ -951,15 +955,19 @@ QmiGlobal.eventDispatcher = {
 		if(isClean) self.cleaner(handler.id);
 
 		veArr.forEach(function(veObj) {
-			var viewId = handler.id+":"+veObj.veId+":"+ QmiGlobal.getUID();
+			var viewId = handler.id+":"+ veObj.veId +":"+ QmiGlobal.getUID();
 			self.viewMap[viewId] = veObj;
 			veObj.eventArr.forEach(function(eventType) {
 				// elemArr 是arr 每個elem都掛上事件監聽
 				Array.prototype.forEach.call(veObj.elemArr, function(elem) {
+					// 編號
+					elem.dataset.veId = viewId;
 					elem.addEventListener(eventType, self);
 				});
 				window.addEventListener(eventType+":"+viewId, handler);
 			});
+
+			
 		})
 	},
 
@@ -996,7 +1004,7 @@ QmiGlobal.module.webview = new QmiGlobal.ModuleConstructor({
 				dom.find("span").text(item.name);
 
 				QmiGlobal.eventDispatcher.subscriber([{
-	    			veId: "linkHeader:"+ i, 
+	    			veId: "linkHeader", 
 	    			elemArr: dom, 
 	    			eventArr: ["click"],
 	    			data: item
@@ -1034,36 +1042,41 @@ QmiGlobal.module.webview = new QmiGlobal.ModuleConstructor({
 });
 
 
-
-
 QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 
 	id: "chatMsgForward",
+
+	limit: {
+		msg: 100,
+		des: 50,
+	},
 
 	listArr: [
 		{id: "copy", textid: "FEED_COPY"},
 		{id: "forward", textid: "WEBONLY_CHAT_FORWARD"}
 	],
 
-	selectedMap: {},
-
 	init: function() {
 		var self = this;
 		self.chatContentDom = $("#chat-contents");
-		
-		self.selectedMap = {};
 
+		self.data = self.initData();
+
+		$("#chat-contents > footer > ul")
+		.find("> li.cancel").text($.i18n.getString("COMMON_CANCEL")).end()
+		.find("> li.forward > span.text").text($.i18n.getString("WEBONLY_CHAT_FORWARD"));
+		
 		QmiGlobal.eventDispatcher.subscriber([{
 			veId: "forwardOperation", 
 			elemArr: self.chatContentDom, 
 			eventArr: ["click", "contextmenu"]
 		}, {
 			veId: "cancelForwardUI", 
-			elemArr: self.chatContentDom.find("> footer > ul > li:first-child"), 
+			elemArr: self.chatContentDom.find("> footer > ul > li.cancel"), 
 			eventArr: ["click"]
 		}, {
 			veId: "showMemberView", 
-			elemArr: self.chatContentDom.find("> footer > ul > li:last-child"), 
+			elemArr: self.chatContentDom.find("> footer > ul > li.forward"), 
 			eventArr: ["click"]
 		}], self);
 	},
@@ -1078,11 +1091,11 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 			menuDom = container.find("> ul.msg-menu");
 			menuDom.show();
 		}
-		var chatMsgDom = container
+		container.css("-webkit-user-select", "none");
+		var chatMsgDom = container;
 		container.mouseleave(function() {
-			console.log("container", (container.data("msgData") || {ml:[{}]}).ml[0].c);
 			container.unbind("mouseleave");
-
+			container.css("-webkit-user-select", "initial");
 			menuDom.hide();
 		});
 
@@ -1090,7 +1103,6 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 
 	createMenuDom: function(container) {
 		var self = this;
-
 		var isLeft = function() {
 			if(container.find(".menu-right").length) return false;
 			return true;
@@ -1115,7 +1127,7 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 				});
 
 				QmiGlobal.eventDispatcher.subscriber([{
-	    			veId: item.id +":"+ (new Date().getTime()), 
+	    			veId: item.id, 
 	    			elemArr: liDom, 
 	    			eventArr: ["click"],
 	    			data: {container: container}
@@ -1129,6 +1141,7 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 	clickForwardOperation: function(event) {
 		var self = this;
 		var targetDom = $(event.evt.target);
+		var forwardMsgMap = self.data.get("forwardMsgMap") || {};
 
 		if(isNotForwardMode()) return;
 
@@ -1137,11 +1150,26 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 		var msgData = msgDom.data("msgData");
 		if(msgDom.hasClass("selected")) {
 			msgDom.removeClass("selected");
-			delete self.selectedMap[msgData.ei];
+			delete forwardMsgMap[msgData.ei];
+
+		// 超過轉傳限制
+		} else if(Object.keys(forwardMsgMap).length >= self.limit.msg) {
+			toastShow($.i18n.getString("CHATROOM_FORWARD_MAXIMUM_SELECTION", self.limit.msg));
+			return;
 		} else {
 			msgDom.addClass("selected");
-			self.selectedMap[msgData.ei] = msgData;
+			forwardMsgMap[msgData.ei] = msgData;
 		}
+
+		self.data.set("forwardMsgMap", forwardMsgMap);
+
+		// 寫入數字
+		var selectedNum = Object.keys(forwardMsgMap).length || 0;
+		var forwardDom = $("#chat-contents > footer > ul > li.forward").removeClass("is-none");
+		forwardDom.find("> span.num").text(` (${selectedNum})`);
+		if(selectedNum === 0) 
+			forwardDom.addClass("is-none");
+
 
 		function isNotForwardMode() {
 			if(!self.chatContentDom.hasClass("forward")) return true;
@@ -1159,9 +1187,12 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 		event.evt.stopPropagation();
 		event.evt.preventDefault();
 
+		QmiGlobal.getAppWin().focus();
+
 		self.menuInit(targetDom.parents(".chat-msg"));
 
 		function isNotTarget() {
+			if(targetDom.parents(".is-sys-msg").length) return true;
 			if(targetDom.hasClass("menu-target")) return false;
 			if(targetDom.parents(".menu-target").length) return false;
 			return true;
@@ -1180,69 +1211,90 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 			toastShow($.i18n.getString("WEBONLY_COPY_FAIL"), true);
 
 		document.body.removeChild(el);
+
 	},
 
 	clickForward: function(event) {
 		event.data.container.trigger("mouseleave");
-		this.chatContentDom
-		.addClass("forward")
+		this.chatContentDom.addClass("forward")
+		.find("> footer").show().end()
 		.find("div.chat-msg").removeClass("selected");
 
-		this.selectedMap = {};
+		// 選擇該成員
+		event.data.container.find("> div.cover").trigger("click");
 
 		$("#footer").css("z-index", "-1");
 	},
 
 	clickCancelForwardUI: function() {
-		this.chatContentDom.removeClass("forward");
+		this.chatContentDom.removeClass("forward")
+		.find("> footer").hide();
+
+		// 清空訊息
+		this.data.set("forwardMsgMap", {});
+
 		$("#footer").css("z-index", "initial");
 	},
 
 	clickShowMemberView: function() {
-		if(Object.keys(this.selectedMap).length === 0) return;
+		if(Object.keys(this.data.get("forwardMsgMap") || {}).length === 0) return;
 		this.memberViewInit();
 	},
 
+	// 關閉並移除所有欄位
 	clickMlCancel: function() {
-		this.mlDom.hide();
+		var self = this;
+		var pageView = self.data.get("forwardMemberPageView");
+		// 搜尋清除
+		pageView.dom.find("> section.search img.clear").trigger("click");
+
+		pageView.pageRemove();
+
+		// 成員列表移除
+		this.memComponent.container.remove();
+
+		// 關閉轉傳
+		this.clickCancelForwardUI();
 	},
 
 	clickMlSubmit: function() {
 		var self = this;
-		console.log("submit", this.selectedMap);
+		var postData = {
+			eil: Object.keys(self.data.get("forwardMsgMap")),
+			cl: [], gul: []
+		};
 
-		return;
+		[{nm: "cl", key: "chatComponent"}, {nm: "gul", key: "memComponent"}]
+		.forEach(function(item) {
+		 	var listArr = Object.keys(self[item.key].getSelectedMembers());
+		 	if(listArr.length)
+		 		postData[item.nm] = Object.keys(self[item.key].getSelectedMembers());
+		 	else 
+		 		delete postData[item.nm]
+		});
+
+		// 沒有勾選 不送出
+		if(!postData.cl && !postData.gul) return;
+
 		self.loadingUI.on();
 		self.api.postMsgTransfer({
 			gi: gi,
 			ci: ci,
-			body: {
-				eil: Object.keys(self.selectedMap),
-				[window.cl || "cl"]: ["T00000bq0Dt"]
-			}
+			body: postData
 		}).done(function(rspData) {
 			setTimeout(function() {
-				new QmiGlobal.popup({
-					desc: $.i18n.getString("WEBONLY_FORWARD_SUCCESSED"),
-					confirm: true,
-					action: [function() {
-						self.clickMlCancel();
-						self.clickCancelForwardUI();
-					}]
-				});
+				toastShow($.i18n.getString("WEBONLY_FORWARD_SUCCESSED"));
+				self.clickMlCancel();
+				self.clickCancelForwardUI();
 			}, 500);
 		}).fail(function(errData) {
-			console.log("dd",  JSON.parse(errData.responseText));
 			var msg = $.i18n.getString("COMMON_UNKNOWN_ERROR");
 			try {
 				msg = JSON.parse(errData.responseText).rsp_msg;
 			} catch(e) {}
 
 			setTimeout(function() {
-				new QmiGlobal.popup({
-					desc: msg,
-					confirm: true
-				});
+				toastShow(msg);
 			}, 500);
 		}).always(function() {
 			self.loadingUI.off();
@@ -1250,11 +1302,53 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 	},
 
 	clickMlTabSwitch: function(event) {
-		event.dom.parent().find("> span").toggleClass("active");
+		
+		if(event.dom.hasClass("active")) return;
+
+		var mlContainerDom = this.data.get("forwardMemberPageView").dom;
+		var tp = event.dom.attr("tp");
+		var footerDom = mlContainerDom.find("> footer");
+
+		// 預設隱藏及消除active
+		event.dom.parent().find("> span").removeClass("active");
+		mlContainerDom.find("> section.body > section").hide();
+
+		event.dom.addClass("active");
+		mlContainerDom.find(`> section.body > section[tp=${tp}]`).show();
+
+		if (tp == 'member') {
+			this.memComponent.setSelectionHeight(footerDom.css("height"));
+		} else {
+			this.chatComponent.setSelectionHeight(footerDom.css("height"));
+		}
 	},
 
 	inputMlSearch: function(event) {
-		console.log("search:", event.dom.val());
+		var self = this;
+		var searchStr = event.dom.val().trim();
+		self.data.set("searchStr", searchStr);
+
+		var clearBtn = event.dom.siblings("img.clear");
+
+		if(searchStr.length === 0) {
+			clearBtn.hide();
+			self.memComponent.clearSearchResult();
+			self.chatComponent.clearSearchResult();
+		} else {
+			clearBtn.show()
+			self.memComponent.search(searchStr);
+			self.chatComponent.search(searchStr);
+		}
+	},
+
+	clickMlSearchClear: function(event) {
+		event.dom.siblings("input").val("");
+		this.data.get("forwardMemberPageView").dom.find("> section.search input")[0].dispatchEvent(new Event('input'))
+	},
+
+	clickMlSelectedCancel: function(event) {
+		event.dom.remove();
+		event.data.component.cancel(event.data.id);
 	},
 
 	api: {
@@ -1271,84 +1365,232 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 
 	memberViewInit: function() {
 		var self = this;
-		if(self.mlDom) {
-			self.mlDom.show();
-			return;
-		}
-
-		self.mlDom = $(self.memberListHtml.trim());
-		self.mlDom.find("> section.search input").attr("placeholder", $.i18n.getString("INVITE_SEARCH"));
-
-		self.loadingUI = new QmiGlobal.module.LoadingUIConstructor({
-    		dom: self.mlDom, 
-    		top: "50%",
-    		delay: 500
-    	});
-
-
-		$("body").append(self.mlDom);
-
-		self.mlDom._i18n();
-
-		self.mlInstance = new ObjectDelegate({
-			container: self.mlDom[0].querySelector("section.body"),
-			previousSelect: {}
+		var pageView = new QmiGlobal.UI.pageView({
+			id: "pageview-forward-member",
+			contentDom: $(self.html.getMemberList().trim())
 		});
 
-		self.mlInstance.init();
+		self.data.set("forwardMemberPageView", pageView);
+
+		pageView.pageShow();
+
+		var mlContainerDom = pageView.dom;
+
+		mlContainerDom.find("> section.search input").attr("placeholder", $.i18n.getString("INVITE_SEARCH"));
+
+		self.loadingUI = new QmiGlobal.module.LoadingUIConstructor({
+    		dom: mlContainerDom,
+    		imgSrc: "images/loading.gif",
+    		imgCss: {top: "50%"},
+    		delay: 1000
+    	});
+
+		// 成員
+		self.initMemComponent();
+
+		// 聊天室
+		self.initChatComponent();
 
 		QmiGlobal.eventDispatcher.subscriber([{
 			veId: "mlCancel", 
-			elemArr: self.mlDom.find("> header > button.cancel"), 
+			elemArr: mlContainerDom.find("> header > button.cancel"), 
 			eventArr: ["click"]
 		}, {
 			veId: "mlSubmit", 
-			elemArr: self.mlDom.find("> header > button.submit"), 
+			elemArr: mlContainerDom.find("> header > button.submit"), 
 			eventArr: ["click"]
 		}, {
 			veId: "mlTabSwitch", 
-			elemArr: self.mlDom.find("> section.tab > span"), 
+			elemArr: mlContainerDom.find("> section.tab > span"), 
 			eventArr: ["click"]
 		}, {
 			veId: "mlSearch", 
-			elemArr: self.mlDom.find("> section.search input"), 
+			elemArr: mlContainerDom.find("> section.search input"), 
 			eventArr: ["input"]
+		}, {
+			veId: "mlSearchClear", 
+			elemArr: mlContainerDom.find("> section.search img.clear"), 
+			eventArr: ["click"]
 		}], self);
 
+		mlContainerDom.find("> section.tab > span:first-child").trigger("click");
 	},
 
-	memberListHtml: `<section id="forwardMemberView">
-		<header>
-			<button class="cancel" data-textid="COMMON_CANCEL"></button>
-			<span class="ttl" data-textid="WEBONLY_CHAT_FORWARD"></span>
-			<button class="submit" data-textid="CHAT_SEND"></button>
-		</header>
-		<section class="search">
-			<div><img src="images/fileSharing/search_icon.png">
-			<input><img src="images/common/temp/icon_search_clean.png"></div>
-		</section>
-		<section class="tab">
-			<span class="chatroom active" data-textid="LEFT_CHAT"></span>
-			<span class="member" data-textid="COMMON_MEMBER"></span>
-		</section>
-		<section class="body"></section>
-		<footer><div class="ttl" data-textid="CHATROOM_SELECTED"></div></footer>
-		<div class="loading"><img src="images/loading.gif></div>
-	</section>`
-});
+	initMemComponent: function() {
+		var self = this;
+		var forwardMemberDom = self.data.get("forwardMemberPageView").dom;
+		self.memComponent = new ObjectDelegate({
+			view: forwardMemberDom[0],
+			container: forwardMemberDom[0].querySelector("section.body > section[tp=member]"),
+			settings: {isHiddenSelf: true},
+			objectList: Object.keys(QmiGlobal.groups[gi].guAll || {}).reduce(function(arr, currGu) {
+				var currObj = QmiGlobal.groups[gi].guAll[currGu];
+				// 停用聊天室或現在聊天室不顯示
+				if(currObj.st !== 1 || currGu === gu) return arr;
+				return arr.concat([{
+					id: currGu,
+					name: currObj.nk,
+					image: currObj.aut,
+				}]);
+			}, [])
+		});
 
+		self.memComponent.init();
+
+		self.memComponent.setPreviewArea(function(selectedArr) {
+			var lastMemArr = self.data.get("memSelectedArr");
+			self.data.set("memSelectedArr", selectedArr);
+
+			// 增加mem、chat判斷
+			var chatArr = self.data.get("chatSelectedArr") || [];
+			var memArr = selectedArr.map(function(item) {
+				item.isMem = true;
+				return item;
+			});
+
+			// 按鈕顏色
+			var btnDom = self.data.get("forwardMemberPageView").dom.find("> header > button.submit");
+			if(selectedArr.length > 0) 
+				btnDom.removeClass("is-gray");
+			else
+				btnDom.addClass("is-gray");
+
+
+			var allSelectedArr = memArr.concat(chatArr);
+
+			self.makeSelectedMemberUI(allSelectedArr);
+			self.memComponent.setSelectionHeight(self.data.get("footerHeight") +"px");
+
+			if(allSelectedArr.length > self.limit.des) {
+				self.memComponent.cancel(selectedArr[selectedArr.length-1].id);
+				toastShow($.i18n.getString("CHATROOM_FORWARD_MAXIMUM_DESTINATION", self.limit.des));
+			}
+		});
+	},
+
+	initChatComponent: function() {
+		var self = this;
+		var forwardMemberDom = self.data.get("forwardMemberPageView").dom;
+		var currGroupData = QmiGlobal.groups[gi];
+		self.chatComponent = new ObjectDelegate({
+			view: forwardMemberDom[0],
+			container: forwardMemberDom[0].querySelector("section.body > section[tp=chatroom]"),
+			objectList: Object.keys(currGroupData.chatAll || {}).reduce(function(arr, currCi) {
+				var roomData = currGroupData.chatAll[currCi];
+				// 聊天室名稱若是2 則不顯示人數
+				var isNoNum = roomData.tp === 1 || !roomData.cpc || roomData.cpc === 2;
+
+				// 停用聊天室不顯示
+				if(roomData.tp === 0) return arr;
+				return arr.concat([{
+					id: currCi,
+					name: `${roomData.nk} ${isNoNum ? `` : `(${roomData.cpc})`}`,
+					image: function() {
+						var defaultImgStr = "images/common/others/empty_img_mother_l.png";
+						try {
+							if(roomData.tp === 1)
+								return currGroupData.guAll[roomData.other].aut || defaultImgStr;
+							else 
+								return roomData.cat || defaultImgStr;
+						} catch(e) {return defaultImgStr;}
+					}()
+				}]);
+			}, [])
+		});
+
+		self.chatComponent.init();
+
+		self.chatComponent.setPreviewArea(function(selectedArr) {
+			self.data.set("chatSelectedArr", selectedArr);
+
+			// 增加mem、chat判斷
+			var memArr = (self.data.get("memSelectedArr") || []).map(function(item) {
+				item.isMem = true;
+				return item;
+			});
+
+			// 按鈕顏色
+			var btnDom = self.data.get("forwardMemberPageView").dom.find("> header > button.submit");
+			if(selectedArr.length > 0) 
+				btnDom.removeClass("is-gray");
+			else
+				btnDom.addClass("is-gray");
+
+			var allSelectedArr = memArr.concat(selectedArr);
+
+			self.makeSelectedMemberUI(allSelectedArr);
+			self.chatComponent.setSelectionHeight(self.data.get("footerHeight") +"px");
+
+			if(allSelectedArr.length > self.limit.des) {
+				self.chatComponent.cancel(selectedArr[selectedArr.length-1].id);
+				toastShow($.i18n.getString("CHATROOM_FORWARD_MAXIMUM_DESTINATION", self.limit.des));
+			}
+		});
+	},
+
+	makeSelectedMemberUI: function(selectedArr) {
+		var self = this;
+		var veArr = [];
+		var footerHeight = 203;
+		var footerDom = self.data.get("forwardMemberPageView").dom.find("> footer");
+		footerDom.find("> div.ttl > span:first-child").html(selectedArr.length);
+
+		if(selectedArr.length === 0) {
+			footerHeight = 0;
+		} else if(selectedArr.length <= 5) {
+			footerHeight = 120;
+		}
+
+		footerDom.css("height", footerHeight +"px");
+
+		// 儲存
+		self.data.set("footerHeight", footerHeight);
+		self.data.set("currSelectedLength", selectedArr.length);
+
+		footerDom.find("section.body").empty().html(selectedArr.map(function(item) {
+			var dom = $("<span>", {
+				class: "item",
+				html: `<img src="${item.avatar || "images/common/others/empty_img_personal_xl.png"}"><div>${item.name}</div>`
+			});
+
+			veArr.push({
+				veId: "mlSelectedCancel", 
+				elemArr: dom, 
+				eventArr: ["click"],
+				data: {id: item.id, component: item.isMem ? self.memComponent : self.chatComponent}
+			})
+			return dom;
+		}));
+
+		QmiGlobal.eventDispatcher.subscriber(veArr, self);
+	},
+
+
+	html: {
+		getMemberList: function() {
+			return `<header><button class="cancel">${$.i18n.getString("COMMON_CANCEL")}</button>
+					<span class="ttl">${$.i18n.getString("WEBONLY_CHAT_FORWARD")}</span>
+					<button class="submit is-gray">${$.i18n.getString("CHAT_SEND")}</button></header>
+				<section class="search">
+					<div><img src="images/fileSharing/search_icon.png">
+					<input><img class="clear" src="images/common/temp/icon_search_clean.png"></div></section>
+				<section class="tab">
+					<span tp="chatroom">${$.i18n.getString("CHATROOM_CHAT")}</span>
+					<span tp="member">${$.i18n.getString("COMMON_MEMBER")}</span></section>
+				<section class="body"><section tp="chatroom"></section>
+					<section tp="member"></section></section>
+				<footer><div class="ttl"><span></span><span>${$.i18n.getString("CHATROOM_SELECTED")}</span></div>
+					<section class="body"></section></footer>
+				<div class="loading"><img src="images/loading.gif></div>`;
+		}
+	}
+});
 
 QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 
 	id: "chatEditView",
 
-	switchMap: {
-		notification: {apiNm: "nc"},
-		invite: {apiNm: "iv"},
-		pin: {apiNm: "pi"}
-	},
-
-	init: function() {
+	init: function(args) {
 		var self = this;
 		if(self.pageView) {
 			self.pageView.pageShow();
@@ -1356,30 +1598,48 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 		}
 
 		var veArr = [];
+		self.data = self.initData();
+		self.data.set("args", args);
 
-		
 		self.pageView = new QmiGlobal.UI.pageView({
-			id: "module-chat-edit",
+			id: "pageview-chat-edit",
 			contentDom: $(self.html.getMainDom())
 		});
 
 		self.pageView.pageShow();
 
 		self.containerDom = self.pageView.dom;
-		self.containerDom._i18n();
+		
+		self.reset();
 
-		self.containerDom.find("> div[switch-tp] > span.slider").each(function(i, elm) {
+		// 修改聊天室頭像、名稱loadingUI
+		var editBtnDom = self.containerDom.find("> header > button:last-child");
+		self.data.set("editLoadingUI", new QmiGlobal.module.LoadingUIConstructor({
+    		dom: editBtnDom,
+			bgCss: {top: "-3px", background: "white"},
+			imgCss: {top:"18px", width: "20px"},
+    		delay: 500
+    	}));
+
+		self.containerDom.find("> div.ce-row.switch > span.slider").each(function(i, elm) {
 			var dom = $(elm);
-			var component = new QmiGlobal.UI.slider({containerDom: dom});
-			self.switchMap[dom.parent().attr("switch-tp")].component = component;
+			var tp = dom.parent().attr("tp");
+			QmiGlobal.UI.slider.init({containerDom: dom, isChecked: g_room[tp], isDisabled: true});
 
 			veArr.push({
 				veId: "slider", 
 				elemArr: dom, 
 				eventArr: ["click"],
-				data: {component: component}
+				data: {tp: tp, loadingUI: new QmiGlobal.module.LoadingUIConstructor({
+		    		dom: dom,
+					bgCss: {background: "white"},
+					imgCss: {top: "3px", width: "15px"},
+					delay: 1000
+		    	})}
 			});
 		});
+
+		self.makeMemberList();
 
 		QmiGlobal.eventDispatcher.subscriber(veArr.concat([{
 			veId: "closeView", 
@@ -1387,7 +1647,7 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 			eventArr: ["click"]
 		}, {
 			veId: "edit", 
-			elemArr: self.containerDom.find("> header > button:last-child"), 
+			elemArr: editBtnDom,
 			eventArr: ["click"]
 		}, {
 			veId: "avatarIcon", 
@@ -1398,114 +1658,600 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 			elemArr: self.containerDom.find("input#chatroom-avatar"), 
 			eventArr: ["change"]
 		}, {
-			veId: "assignAdm", 
+			veId: "showAssignAdmPage", 
 			elemArr: self.containerDom.find("> div[tp=assign]"), 
 			eventArr: ["click"]
 		}, {
-			veId: "showInvitingMember", 
+			veId: "showInviteMemberPage", 
 			elemArr: self.containerDom.find("> div[tp=invite]"), 
+			eventArr: ["click"]
+		}, {
+			veId: "showLeaveChatroomDialog", 
+			elemArr: self.containerDom.find("> div.leave"), 
 			eventArr: ["click"]
 		}]), self);
 	},
 
+	makeMemberList: function() {
+		var self = this;
+		var veArr = [];
+		var allGuMap = QmiGlobal.groups[gi].guAll || {};
+		self.containerDom.find("section.member-list").empty().append(Object.keys(g_room.memList).map(function(currGu) {
+			var memData = allGuMap[currGu];
+			var memDom = self.html.getMemberRowDom({
+				isMe: currGu === gu ? "is-me" : "",
+				isAdm: !!g_room.memList[currGu].ad,
+				nk: memData.nk,
+				aut: memData.aut
+			});
+
+			veArr.push({
+				veId: "showRemoveMemberDialog", 
+    			elemArr: memDom.find("button.remove-member"), 
+    			eventArr: ["click"],
+    			data: memData
+			});
+			return memDom;
+		}));
+
+		QmiGlobal.eventDispatcher.subscriber(veArr, self)
+	},
+
+	reset: function() {
+		var self = this;
+
+		// adm
+		if(g_room.memList[gu].ad === 0)
+			$("#pageview-chat-edit").addClass("is-not-adm");
+
+		// 是否可邀請成員
+		var inviteRowDom = self.containerDom.find("div.ce-row[tp=invite]").show();
+		if(g_room.is !== true && g_room.memList[gu].ad === 0)
+			inviteRowDom.hide();
+
+		// 團體頭像
+		self.containerDom.find("> div.group-info > span.avatar > img").attr("src", g_room.cat || "images/contact/contact_group_default_box_apt.png");
+
+		// 團體名稱
+		self.containerDom.find("> div.group-info > span.name > span").text(g_room.cn);
+		self.containerDom.find("> div.group-info > span.name > input").val(g_room.cn);
+
+		// 成員數量
+		self.containerDom.find("> div.member-ttl").attr("cnt", g_room.cpc);
+
+		self.containerDom.removeClass("is-editing");
+		self.data.set("isEditing", false);
+		self.data.set("isAvatarChanged", false);
+	},
+
+	clickShowRemoveMemberDialog: function(event) {
+		var self = this;
+		var memData = event.data;
+
+		// 不刪除自己
+		if(memData.gu === gu) return;
+
+		var removeMemberDialog = QmiGlobal.PopupDialog.create({
+	        className: "qmi-ui-dialog",
+	        content: [{
+                tagName: "section",
+                attributes: {class: "body"},
+                text: $.i18n.getString("CHATROOM_REMOVE_CONFIRM", memData.nk)}],
+			footer: [{
+                tagName: "button",
+                text: $.i18n.getString("COMMON_OK"),
+                attributes: {class: "submit"}
+            }, {
+            	tagName: "button",
+                text: $.i18n.getString("COMMON_CANCEL"),
+                attributes: {class: "cancel"}}]
+		});
+
+		removeMemberDialog.open();
+
+		var dialogDom = removeMemberDialog.container;
+
+		self.data.set("dialogRemoveMemberLoadingUI", new QmiGlobal.module.LoadingUIConstructor({
+    		dom: dialogDom.find("div.qmi-ui-dialog"),
+    		bgCss: {background: "white", "border-radius": "10px"},
+    		imgCss: {top: "30px"},
+    		delay: 500
+    	}));
+
+		QmiGlobal.eventDispatcher.subscriber([{
+			veId: "submitRemoveMember", 
+			elemArr: dialogDom.find("div.footer > button.submit"), 
+			eventArr: ["click"],
+			data: {memData: memData, currDom: event.dom.parent()}
+		}, {
+			veId: "closeRemoveMember", 
+			elemArr: dialogDom.find("div.footer > button.cancel"), 
+			eventArr: ["click"]
+		}], self);
+
+		self.data.set("removeMemberDialog", removeMemberDialog);
+	},
+
+	clickSubmitRemoveMember: function(event) {
+		var self = this;
+		var submitData = event.data;
+		var removeMemberDialog = self.data.get("removeMemberDialog");
+
+		self.data.get("dialogRemoveMemberLoadingUI").on();
+
+		setTimeout(function() {
+			self.api.putRemoveMember(submitData.memData).done(function(rspData) {
+				submitData.currDom.fadeOut("fast", function() {
+					$(this).remove();
+				});
+
+				updateChat().done(function() {
+					self.reset();
+					window.chatAuthData.mathodMap.initChatList();	
+				});
+				
+				toastShow($.i18n.getString("CHATROOM_SOMEONE_LEFT_CHATROOM_TOAST", submitData.memData.nk), true);
+			}).fail(function(errData) {
+				var errStr = $.i18n.getString("WEBONLY_FAILED");
+				try {
+					errStr = JSON.parse(errData.responseText).rsp_msg;
+				} catch(e) {}
+				toastShow(errStr, true);
+
+			}).always(function() {
+				removeMemberDialog.close();
+			});
+		}, 500);
+
+	},
+
+	clickCloseRemoveMember: function() {
+		this.data.get("removeMemberDialog").close();
+	},
+
+	clickShowLeaveChatroomDialog: function() {
+		var self = this;
+		var leaveChatroomDialog = QmiGlobal.PopupDialog.create({
+	        className: "qmi-ui-dialog",
+	        content: [{
+                tagName: "section",
+                attributes: {class: "body"},
+                text: $.i18n.getString("CHAT_LEAVE_CONFIRM")}],
+			footer: [{
+                tagName: "button",
+                text: $.i18n.getString("COMMON_OK"),
+                attributes: {class: "submit"}
+            }, {
+            	tagName: "button",
+                text: $.i18n.getString("COMMON_CANCEL"),
+                attributes: {class: "cancel"}}]
+		});
+
+		leaveChatroomDialog.open();
+
+		var dialogDom = leaveChatroomDialog.container;
+
+		self.data.set("dialogLeaveChatroomLoadingUI", new QmiGlobal.module.LoadingUIConstructor({
+    		dom: dialogDom.find("div.qmi-ui-dialog"),
+    		bgCss: {background: "white"},
+    		imgCss: {top: "30px"},
+    		delay: 500
+    	}));
+
+		QmiGlobal.eventDispatcher.subscriber([{
+			veId: "submitLeaveChatroom", 
+			elemArr: dialogDom.find("div.footer > button.submit"), 
+			eventArr: ["click"]
+		}, {
+			veId: "closeLeaveChatroom", 
+			elemArr: dialogDom.find("div.footer > button.cancel"), 
+			eventArr: ["click"]
+		}], self);
+
+		self.data.set("leaveChatroomDialog", leaveChatroomDialog);
+	},
+
+	clickSubmitLeaveChatroom: function() {
+		var self = this;
+		var loadingUI = self.data.get("dialogLeaveChatroomLoadingUI");
+		loadingUI.on();
+		setTimeout(function() {
+			self.api.deleteLeaveChatroom().done(function(rspData) {
+				popupShowAdjust("", $.i18n.getString("USER_PROFILE_LEAVE"), true, false, [function() {
+					try {
+						window.chatAuthData.mathodMap.initChatList();
+					} catch(e) {}
+					window.close();
+				}]);
+			}).fail(function(errData) {
+				var errStr = $.i18n.getString("WEBONLY_FAILED");
+				try {
+					errStr = JSON.parse(errData.responseText).rsp_msg;
+				} catch(e) {}
+				toastShow(errStr, true);
+
+				loadingUI.off();
+			});
+		}, 500);
+	},
+
+	clickCloseLeaveChatroom: function() {
+		this.data.get("leaveChatroomDialog").close();
+	},
+
 	clickAvatarIcon: function(event) {
 		var self = this;
-		if(!self.isEditing) return;
+		if(!self.data.get("isEditing")) return;
 
-		console.log("clickAvatarIcon");
 		this.containerDom.find("input#chatroom-avatar").trigger("click");
 	},
 
 	changeChatroomAvatar: function(event) {
 		var self = this;
-		if(!self.isEditing) return;
+		if(!self.data.get("isEditing")) return;
 
-		console.log("changeChatroomAvatar");
+		var inputDom = event.dom;
+		var avatarDom = self.containerDom.find("> div.group-info > span.avatar > img");
+		if (!inputDom.length || !inputDom[0].files || !inputDom[0].files[0]) return;
+
+		var imageType = /image.*/;
+		if (inputDom[0].files[0].type.match(imageType)) {
+		    var reader = new FileReader();
+
+		    reader.onload = function (e) {
+		        avatarDom.attr("src", e.target.result);
+		        self.data.set("isAvatarChanged", true);
+		    }
+		    reader.readAsDataURL(inputDom[0].files[0]);
+		} else {
+			toastShow($.i18n.getString("COMMON_NOT_IMAGE"), true);
+			inputDom.replaceWith(inputDom.val('').clone(true));
+		}
 	},
 
-	clickAssignAdm: function(event) {
+	clickShowAssignAdmPage: function(event) {
 		var self = this;
-		if(self.assignPageView) {
-			self.assignPageView.pageShow();
-			return;
-		}
-
-		self.assignPageView = new QmiGlobal.UI.pageView({
+		var assignPageView = new QmiGlobal.UI.pageView({
 			id: "module-chatroom-assignAdm",
 			contentDom: $(self.html.getAssignDom())
 		});
 
-		self.assignPageView.pageShow();
+		assignPageView.pageShow();
+
+		// 修改聊天室管理員loadingUI
+    	self.data.set("assignAdmLoadingUI", new QmiGlobal.module.LoadingUIConstructor({
+    		dom: assignPageView.dom,
+			bgCss: {background: "rgba(190, 190, 190, 0.6)", "z-index": 1},
+			imgCss: {top:"30vh", width: "30px"},
+			imgSrc: "images/loading.gif",
+    		delay: 500
+    	}));
 
 		QmiGlobal.eventDispatcher.subscriber([{
 			veId: "closeAssignView", 
-			elemArr: self.assignPageView.dom.find("> header > button.back"), 
+			elemArr: assignPageView.dom.find("> header > button.back"), 
 			eventArr: ["click"]
 		}, {
 			veId: "submitAssignView", 
-			elemArr: self.assignPageView.dom.find("> header > button.submit"), 
+			elemArr: assignPageView.dom.find("> header > button.submit"), 
 			eventArr: ["click"]
 		}], self);
 
-		self.assignODComponent = new ObjectDelegate({
-			container: self.assignPageView.dom.find("> section.body")[0],
-			previousSelect: {}
+		var memArr = [];
+		var memMap = Object.keys(g_room.memList || {}).reduce(function(obj, currGu) {
+			var currData = g_group.guAll[currGu];
+			if(!currData) return obj;
+
+			memArr.push({
+				id: currGu,
+                name: currData.nk,
+                image: currData.aut,
+            });
+
+			if(g_room.memList[currGu].ad !== 1) return obj;
+			
+			obj[currGu] = currData;
+			return obj;
+		}, {});
+
+		var assignODComponent = new ObjectDelegate({
+			container: assignPageView.dom.find("> section.body")[0],
+			objectList: memArr,
+			previousSelect: {objects: memMap}
 		});
 
-		self.assignODComponent.init();
+		assignODComponent.init();
+
+		self.data.set("assignPageView", assignPageView);
+		self.data.set("assignODComponent", assignODComponent);
 	},
 
 	clickCloseAssignView: function() {
-		this.assignPageView.pageClose();
+		this.data.get("assignPageView").pageRemove();
 	},
 
 	clickSubmitAssignView: function() {
-		console.log("clickSubmitAssignView");
+		var self = this;
+		var selectedMap = self.data.get("assignODComponent").getSelectedMembers();
+		var ajaxData = Object.keys(g_room.memList).reduce(function(data, currGu) {
+			var memMap = g_room.memList[currGu];
+			// 此人為admin 但此人沒被選中 表示取消
+			if(memMap.ad === 1 && !selectedMap[currGu])
+				data.dl.push(currGu);
+			// 此人非admin 但此人被選中 表示選取
+			else if(memMap.ad !== 1 && selectedMap[currGu])
+				data.el.push(currGu);
+
+			return data;
+		}, {el: [], dl: []});
+
+		// 沒有動作 返回
+		if(ajaxData.dl.length === 0 && ajaxData.el.length === 0) return;
+
+		var loadingUI = self.data.get("assignAdmLoadingUI");
+		loadingUI.on();
+		setTimeout(function() {
+			self.api.putAdministrators(ajaxData).done(function(rspData) {
+				
+				updateChat().done(function() {
+					// 移除assignPageView
+					self.data.get("assignPageView").pageRemove();
+					// 重新做聊天室成員列表
+					self.makeMemberList();
+
+					self.reset();
+
+					toastShow($.i18n.getString("CHATROOM_ASSIGN_ADMIN") +" "+ $.i18n.getString("COMMON_DONE"));	
+				});
+				
+			}).fail(function(errData) {
+				var errStr = $.i18n.getString("WEBONLY_FAILED");
+				try {
+					errStr = JSON.parse(errData.responseText).rsp_msg;
+				} catch(e) {}
+				toastShow(errStr, true);
+
+				loadingUI.off();
+			});
+		}, 500);
 	},
 
-	clickShowInvitingMember: function(event) {
+	clickShowInviteMemberPage: function(event) {
 		var self = this;
-		if(self.invitePageView) {
-			self.invitePageView.pageShow();
-			return;
-		}
-
-		self.invitePageView = new QmiGlobal.UI.pageView({
+		var veArr = [];
+		var invitePageView = new QmiGlobal.UI.pageView({
 			id: "module-chatroom-invite",
 			contentDom: $(self.html.getInviteDom())
 		});
 
-		self.invitePageView.pageShow();
+		invitePageView.pageShow();
+
+		// 修改聊天室管理員loadingUI
+    	self.data.set("inviteLoadingUI", new QmiGlobal.module.LoadingUIConstructor({
+    		dom: invitePageView.dom,
+			bgCss: {background: "rgba(190, 190, 190, 0.6)", "z-index": 1},
+			imgCss: {top:"30vh", width: "30px"},
+			imgSrc: "images/loading.gif",
+    		delay: 500
+    	}));
 
 		QmiGlobal.eventDispatcher.subscriber([{
 			veId: "closeInviteView", 
-			elemArr: self.invitePageView.dom.find("> header > button.back"), 
+			elemArr: invitePageView.dom.find("> header > button.back"), 
+			eventArr: ["click"]
+		}, {
+			veId: "submitInviteView", 
+			elemArr: invitePageView.dom.find("> header > button.submit"), 
 			eventArr: ["click"]
 		}], self);
+
+		var memArr = Object.keys(g_group.guAll || {}).reduce(function(arr, currGu) {
+			var currData = g_group.guAll[currGu] || {};
+			if(currData.st !== 1) return arr;
+			// 剔除已存在成員
+			if(g_room.memList[currGu]) return arr;
+
+			arr.push({
+				id: currGu,
+                name: currData.nk,
+                image: currData.aut,
+            });
+
+			return arr;
+		}, []);
+
+		var inviteODComponent = new ObjectDelegate({
+			container: invitePageView.dom.find("> section.body")[0],
+			objectList: memArr
+		});
+
+		inviteODComponent.init();
+
+		self.data.set("invitePageView", invitePageView);
+		self.data.set("inviteODComponent", inviteODComponent);
 	},
 
 	clickCloseInviteView: function() {
-		this.invitePageView.pageClose();
+		this.data.get("invitePageView").pageRemove();
+	},
+
+	clickSubmitInviteView: function() {
+		var self = this;
+		var selectedMap = self.data.get("inviteODComponent").getSelectedMembers();
+
+		// 沒有動作 返回
+		if(Object.keys(selectedMap).length === 0) return;
+
+		var loadingUI = self.data.get("inviteLoadingUI");
+		loadingUI.on();
+		setTimeout(function() {
+			self.api.postInviteUsers(Object.keys(selectedMap).reduce(function(data, currGu) {
+				data.ul.push({gu: currGu});
+				return data;
+			}, {ul: []})).done(function(rspData) {
+				
+				updateChat().done(function() {
+					// 移除invitePageView
+					self.data.get("invitePageView").pageRemove();
+					// 重新做聊天室成員列表
+					self.makeMemberList();
+
+					self.reset();
+
+					toastShow($.i18n.getString("CHATROOM_INVITE_MEMBER") +" "+ $.i18n.getString("COMMON_DONE"));	
+				});
+				
+			}).fail(function(errData) {
+				var errStr = $.i18n.getString("WEBONLY_FAILED");
+				try {
+					errStr = JSON.parse(errData.responseText).rsp_msg;
+				} catch(e) {}
+				toastShow(errStr, true);
+
+				loadingUI.off();
+			});
+		}, 500);
 	},
 
 	clickEdit: function(event) {
-		if(this.containerDom.hasClass("is-editing")) {
-			this.containerDom.removeClass("is-editing")
-			this.isEditing = false;
+		var self = this;
+		if(self.containerDom.hasClass("is-editing")) {
+			self.submitAvatarAndName().done(function() {
+				self.containerDom.removeClass("is-editing")
+				self.data.set("isEditing", false);
+			});
 		} else {
-			this.containerDom.addClass("is-editing")
-			this.isEditing = true;
+			self.containerDom.addClass("is-editing")
+			self.data.set("isEditing", true);
 		}
 	},
 
+	submitAvatarAndName: function() {
+		var deferred = $.Deferred();
+		var self = this;
+		var newCn = self.containerDom.find("> div.group-info > span.name > input").val().trim();
+		var msgStr = "";
+
+		var defArr = [];
+		if(newCn !== g_room.cn) 
+			defArr.push(defAction({i18nStr: "FILESHARING_RENAME", def: self.editChatroomName(newCn)}))
+
+		if(self.data.get("isAvatarChanged")) {
+			try {
+				var fileObj = self.containerDom.find("#chatroom-avatar")[0].files[0];
+				var oriArr = [1280, 1280, 0.7];
+				var tmbArr = [160, 160, 0.4];
+				defArr.push(defAction({i18nStr: "FILESHARING_UPLOAD_FILE", def: self.data.get("args").uploadChatAvatar(g_room.gi, fileObj, g_room.ci, 0, oriArr, tmbArr, pi).done(function(rspData) {
+					g_room.cat = rspData.tu;
+					g_room.cao = rspData.ou;
+				})}));
+
+			} catch(e) {
+				defArr.push(defAction({i18nStr: "FILESHARING_UPLOAD_FILE", def: $.Deferred().reject()}))
+				console.log("chatroom upload avatar failed", e);
+			}
+		}
+
+		if(defArr.length === 0) {
+			deferred.resolve();
+			return deferred.promise();
+		}
+
+		var loadingUI = self.data.get("editLoadingUI");
+		loadingUI.on();
+
+		setTimeout(function() {
+			$.when.apply($, defArr).done(function() {
+				loadingUI.off();
+				self.reset();
+				
+				var resultArr = arguments;
+				var biStr = "";
+				var resultMsgArr = [];
+				Array.prototype.forEach.call(arguments, function(item) {
+					var resultStr = $.i18n.getString(item.i18nStr);
+					if(item.isSuccess) {
+						resultStr += " "+ $.i18n.getString("WEBONLY_SUCCESSED"); 
+					} else {
+						resultStr += " "+ $.i18n.getString("WEBONLY_FAILED"); 
+					}
+
+					resultMsgArr.push(resultStr);
+				});
+
+				toastShow(resultMsgArr.join(" ; "), true)
+				deferred.resolve();
+			});
+
+		}, 1000);
+
+		return deferred.promise();
+		
+		function defAction(args) {
+			var deferred = $.Deferred();
+			args.def.done(function(rspData) {
+				deferred.resolve({isSuccess: true, i18nStr: args.i18nStr, rspData: rspData});
+			}).fail(function(errData) {
+				deferred.resolve({isSuccess: false, i18nStr: args.i18nStr, rspData: errData})
+			});
+			return deferred.promise();
+		}
+	},
+
+	editChatroomName: function(newCn) {
+		var deferred = $.Deferred();
+		var self = this;
+		return self.api.putChatroomName(newCn).done(function(rspData) {
+			g_room.cn = newCn;
+			// 改聊天室主畫面標題
+			$("#header > div.title > span.text").text(newCn)
+		});
+	},
+	
 	clickCloseView: function() {
-		this.pageView.pageClose();
+		this.reset();
+		this.pageView.pageRemove();
 	},
 
 	clickSlider: function(event) {
-		console.log("target", event.dom.attr("tt"));
-		var component = event.data.component;
-		component.changeStatus(!component.data.get("status"));
+		var self = this;
+		var tp = event.data.tp;
+		var loadingUI = event.data.loadingUI;
+
+		loadingUI.on();
+
+		var newVal = !g_room[tp];
+		if(tp === "it") newVal = +newVal
+
+		self.api.putChatroomAttrMap({
+			tp: tp, val: newVal
+		}).done(function() {
+			g_room[tp] =  newVal;
+
+			switch(tp) {
+				case "cs":
+					break;
+				case "it":
+					try {
+						window.chatAuthData.mathodMap.initChatList();
+					} catch(e) {}
+					break;
+				case "is":
+					break;
+			}
+
+			event.dom.find("input").prop("checked", !!newVal);
+			toastShow($.i18n.getString("USER_PROFILE_UPDATE_SUCC"), true);
+		}).fail(function(errData) {
+			var errStr = $.i18n.getString("WEBONLY_FAILED");
+			try {
+				errStr = JSON.parse(errData.responseText).rsp_msg;
+			} catch(e) {}
+			toastShow(errStr, true);
+		}).always(function() {
+			loadingUI.off();
+		});
+		
 	},
 
 	html: {
@@ -1517,21 +2263,17 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 						<img src="images/post_audience/Done.png"></button>
 				</header>
 				<div class="group-info">
-					<span class="avatar"><img src="${g_room.cat}"></span>
-					<span class="name"><span class="ellipsis">${g_room.cn}</span><input value="${g_room.cn}"></span>
+					<span class="avatar"><img></span>
+					<span class="name"><span class="ellipsis"></span><input></span>
 					<input id="chatroom-avatar" type="file" style="display: none;"></div>
-				<div switch-tp="notification" class="ce-row switch"><span>${$.i18n.getString("SYSTEM_SET")}</span><span class="slider" tt="1"></span></div>
-				<div switch-tp="invite" class="ce-row switch"><span>${$.i18n.getString("CHATROOM_ANYONE_CAN_INVITE")}</span><span class="slider" tt="2"></span></div>
-				<div switch-tp="pin" class="ce-row switch"><span>${$.i18n.getString("CHATROOM_TOP")}</span><span class="slider" tt="3"></span></div>
+				<div class="ce-row switch" tp="cs"><span>${$.i18n.getString("SYSTEM_SET")}</span><span class="slider"></span></div>
+				<div class="ce-row switch" tp="is"><span>${$.i18n.getString("CHATROOM_ANYONE_CAN_INVITE")}</span><span class="slider"></span></div>
+				<div class="ce-row switch" tp="it"><span>${$.i18n.getString("CHATROOM_TOP")}</span><span class="slider"></span></div>
 				<div tp="assign" class="ce-row arrow"><span>${$.i18n.getString("CHATROOM_ASSIGN_ADMIN")}</span></div>
 				
-				<div class="member-ttl" cnt="5" data-textid="COMMON_MEMBER"></div>
-				<div tp="invite" class="ce-row arrow"><img src="images/chatroom/setting-user-plus.png"><span>${$.i18n.getString("INVITE_INVITED_MEMBER")}></span></div>
-				<div class="ce-row member"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Mellisa Lee</span></div>
-				<div class="ce-row member"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Troy Hu</span></div>
-				<div class="ce-row member"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Gaston Chen</span></div>
-				<div class="ce-row member is-admin"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Kevin Durent</span></div>
-				<div class="ce-row member"><button class="delete-member"></button><img src="images/test-avatar.png"><span class="ellipsis">Stephen Curry</span></div>
+				<div class="member-ttl" cnt="0">${$.i18n.getString("COMMON_MEMBER")}</div>
+				<div tp="invite" class="ce-row arrow"><img src="images/chatroom/setting-user-plus.png"><span>${$.i18n.getString("CHATROOM_INVITE_MEMBER")}</span></div>
+				<section class="member-list"></section>
 
 				<div class="leave">${$.i18n.getString("CHATROOM_LEAVE_CHATROOM")}</div>`);
 		},
@@ -1545,22 +2287,87 @@ QmiGlobal.module.chatEditView = new QmiGlobal.ModuleConstructor({
 
 		getInviteDom: function() {
 			return $(`<header><button class="back"><div></div></button>
-				<span>${$.i18n.getString("INVITE_INVITED_MEMBER")}</span></header>
-			<section class="body">invite member</section>`);
+				<span>${$.i18n.getString("CHATROOM_INVITE_MEMBER")}</span>
+				<button class="submit">${$.i18n.getString("COMMON_SUBMIT")}</button></header>
+			<section class="body"></section>`);
 		},
 
 		getMemberRowDom: function(args) {
-			return $(`<div class="ce-row member"><button class="delete-member"></button><img src="${args.at}"><span class="ellipsis">${args.nm}</span></div>`)
+			var admStr = args.isAdm ? `is-adm="${$.i18n.getString("WEBONLY_CHATROOM_ADMIN")}"` : ``;
+			return $(`<div class="ce-row member ${args.isMe}" ${admStr}>
+				<button class="remove-member"></button>
+				<span class="avatar"><img src="${args.aut}"></span>
+				<span class="ellipsis">${args.nk}</span></div>`);
+		}
+	},
+
+	api: {
+
+		postInviteUsers: function(args) {
+			return this.sender({
+		        apiName: `groups/${gi}/chats/${g_room.ci}/users`,
+		        method: "post",
+		        body: args
+		    });
+		},
+
+		putAdministrators: function(args) {
+			return this.sender({
+		        apiName: `groups/${gi}/chats/${g_room.ci}/administrators`,
+		        method: "put",
+		        body: args
+		    });
+		},
+
+		putChatroomAttrMap: function(args) {
+			var map = {cs: "notification", it: "top", is: "invite"};
+			var ajaxAttr = "headers";
+			if(args.tp === "cs") ajaxAttr = "body";
+
+			return this.sender({
+				apiName: `groups/${gi}/chats/${g_room.ci}/${map[args.tp]}`,
+				[ajaxAttr]: {[args.tp]: args.val},
+				method: "put"
+			});
+		},
+
+		putChatroomName: function(cn) {
+			return this.sender({
+		        apiName: "groups/" +gi + "/chats/" + ci,
+		        method: "put",
+		        body: {cn: cn},
+		    })
+		},
+
+		deleteLeaveChatroom: function() {
+			return this.sender({
+		        apiName: `groups/${gi}/chats/${g_room.ci}/users`,
+		        method: "delete",
+		        body: {gu: gu}
+		    });
+		},
+
+		putRemoveMember: function(args) {
+			return this.sender({
+		        apiName: `groups/${gi}/chats/${g_room.ci}/users`,
+		        method: "put",
+		        body: {del: {gul: [args.gu]}}
+		    });
+		},
+
+		sender: function(args) {
+			if(!args.hasOwnProperty("noErr"))
+				args.noErr = true;
+			return new QmiAjax(args);
 		}
 	}
 });
 
 
-
 QmiGlobal.module.LoadingUIConstructor = function(args) {
 	var isActivate = false;
 	this.containerDom = args.dom;
-	this.init(args.top);
+	this.init(args);
 
 	this.on = function() {
 		isActivate = true;
@@ -1583,42 +2390,81 @@ QmiGlobal.module.LoadingUIConstructor = function(args) {
 };
 
 QmiGlobal.module.LoadingUIConstructor.prototype = {
-	init: function(top) {
+	defaultBgCss: {
+		display: "none", 
+		position: "absolute",
+		width: "100%", 
+		height: "100%",
+		top: 0, left: 0,
+		"text-align": "center",
+		background: "rgba(180,180,180,0.7)"
+	},
+
+	defaultImgCss: {width: "30px", position: "relative"},
+
+	init: function(args) {
 		var self = this;
 		if(self.loadingDom) self.loadingDom.remove();
 
 		self.loadingDom = $("<div>", {
-			style: "display: none; position: absolute; width: 100%; height: 100%; top: 0; left: 0; background: rgba(180,180,180,0.7);",
-			html: "<img style=\"width: 30px; display: block; margin: "+ (top || "0") +" auto 0;\" src=\"images/loading.gif\">"
+			css: self.getStyle(self.defaultBgCss, (args.bgCss || {})),
+			html: $("<img>", {
+				src: args.imgSrc || "images/loading2.gif",
+				css: self.getStyle(self.defaultImgCss, (args.imgCss || {}))
+			})
 		});
 
 		self.containerDom.append(self.loadingDom);
+	},
+
+	getStyle: function(defaultCss, customCss) {
+		var self = this;
+		var tempObj = Object.keys(defaultCss).reduce(function(cssObj, currKey) {
+			cssObj[currKey] = customCss.hasOwnProperty(currKey) ? customCss[currKey] : defaultCss[currKey];
+			return cssObj;
+		}, {});
+
+		return Object.keys(customCss).reduce(function(cssObj, currKey) {
+			if(!defaultCss.hasOwnProperty(currKey)) tempObj[currKey] = customCss[currKey];
+			return tempObj;
+		}, tempObj);
 	}
 }
 
 
 QmiGlobal.UI = {
 
-	slider: function(args) {
+	slider: new QmiGlobal.ModuleConstructor({
+
+		id: "ui-slider",
+
+		init: function(args) {
+			var sliderDom = this.getHtml(args);
+			args.containerDom.empty().html(sliderDom);
+		},
+
+		getHtml: function(args) {
+			return `<label class="qmi-ui-slider">
+				<input type="checkbox" ${args.isChecked ? "checked" : ""} ${args.isDisabled ? "disabled" : ""}><span></span></label>`
+		}
+	}),
+
+	pageView: function(args) {
 		var self = this;
-		self.dom = $(self.getHtml());
-		args.containerDom.html(self.dom);
+		if(!args.id) {
+			console.error("Attribute ID is required");
+			return;
+		}
+
+		$(`#${args.id}`).remove();
 
 		self.data = self.initData();
-		self.data.set("status", args.isOn || false);
+		self.parentDom = args.parent || $("body");
+		self.dom = self.createDom(args);
+
+		self.parentDom.append(self.dom);
 
 	}
-}
-
-
-QmiGlobal.UI.pageView = function(args) {
-	var self = this;
-	self.data = self.initData();
-	self.parentDom = args.parent || $("body");
-	self.dom = self.createDom(args);
-
-	self.parentDom.append(self.dom);
-
 }
 
 QmiGlobal.UI.pageView.prototype = new QmiGlobal.ModuleConstructor({
@@ -1640,35 +2486,21 @@ QmiGlobal.UI.pageView.prototype = new QmiGlobal.ModuleConstructor({
 	},
 
 	pageClose: function() {
+		var deferred = $.Deferred();
 		var self = this;
 		self.dom.attr("style", "display: block")
-		setTimeout(function() {self.dom.hide()}, 100);
-	}
-});
+		setTimeout(function() {
+			self.dom.hide();
+			deferred.resolve();
+		}, 100);
 
-QmiGlobal.UI.slider.prototype = new QmiGlobal.ModuleConstructor({
-	id: "ui-slider",
-
-	getHtml: function() {
-		return `<section class="qmi-ui-slider">
-			<span class="rail"></span>
-			<span class="btn"></span>
-		</section>`
+		return deferred.promise();
 	},
 
-	// clickSliderSwitch: function(event) {
-	// 	this.changeStatus(!this.data.get("status"))
-	// },
-
-	changeStatus: function(isTurnToOn) {
+	pageRemove: function() {
 		var self = this;
-		console.log("dd", self.dom);
-		if(isTurnToOn) {
-			self.data.set("status", true);
-			self.dom.addClass("on");
-		} else {
-			self.data.set("status", false);
-			self.dom.removeClass("on");
-		}
+		self.pageClose().done(function() {
+			self.dom.remove();
+		});
 	}
-})
+});

@@ -394,6 +394,8 @@
 
 .newChatDetail-content{
 	min-height: 20px;
+    max-height: 250px;
+    overflow-y: auto;
 }
 
 .newChatDetail-content .row{

@@ -256,17 +256,27 @@ onSearchInput = function(e){
 	}
 }
 
-showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
+showSubContactPage = function( parentPageID, bi, isGenContent){
+	// console.log(lvStackString);
 	if( null==isGenContent ) isGenContent = true;
-	var lvStack = $.parseJSON(lvStackString);
 	var data = bl[bi];
+	var lvStack = [];
 	if( !data ) return;
-	lvStack.push(data.bn);
 	var parentLevel = data.lv;
 	var childList = data.cl;
-	
 	var pageID = "page-contact_sub"+parentLevel;
 	var page = $( "#"+pageID );
+
+	if (data.pi) {
+		var parentBranch = data;
+		var tempBi = bi;
+		while (parentBranch) {
+			lvStack.unshift({bn: parentBranch.bn, bi: tempBi});
+			tempBi = parentBranch.pi;
+			parentBranch = bl[parentBranch.pi];
+		}
+	}
+
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
             +'<div data-theme="c" data-role="header" data-position="fixed" data-tap-toggle="false">'
@@ -324,19 +334,18 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 		subbranchList = $('<div class="contact-branchList" style="display:none;"></div>');
 		showSubbranchListBox( subbranchList, data.lv, bi, JSON.stringify([]) );
 
-		subbranchList.find(".row:nth-child(1)").addClass("current");
+		subbranchList.find(".row." + bi).addClass("current");
 
 		subbranchList.find(".row.list").off("click").click( function(){
 			cns.debug( $(this).data("bi") );
 			//產生目前的頁面到指定階層中間的頁面, 除最後一頁外其餘內容留空, 走到那頁時才產
 			var stackString = $(this).data("stack");
-			var currentStack = lvStack.slice(0);
 			if( stackString && stackString.length > 0 ){
 				var stackTmp = $.parseJSON(stackString);
 				var currentStackLvl = parentLevel;
 				
 				var pageIDTmp = "page-contact_sub"+currentStackLvl;
-				showSubContactPage( pageIDTmp, stackTmp[stackTmp.length-1], JSON.stringify(currentStack) );
+				showSubContactPage( pageIDTmp, $(this).data("bi"));
 
 				// for( var i=1; i<stackTmp.length-1; i++ ){
 				// 	var pageIDTmp = "page-contact_sub"+currentStackLvl;
@@ -395,20 +404,33 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	if( lvStack.length>1 ){
 		var lvStackDiv = $("<div class='contact-lvStack'></div>");
 		if( lvStack.length <= 3 ){
-			for( var i=0;i<lvStack.length;i++ ){
+			for( var i=0;i<lvStack.length;i++ ) {
+				var pathItem = $(`<div>${lvStack[i].bn}</div>`);
+				pathItem.data('bi', lvStack[i].bi);
 				cns.debug(lvStack[i]);
-				lvStackDiv.append( "<div>"+lvStack[i]+"</div><img src='images/common/icon/icon_arrow_grey_right.png'>" );
+				lvStackDiv.append(pathItem)
+				// lvStackDiv.append( "<div>"+lvStack[i]+"</div><img src='images/common/icon/icon_arrow_grey_right.png'>" );
 			}
 		} else {
 			lvStackDiv.append( "<div>...</div>" );
 			for( var i=lvStack.length-3;i<lvStack.length;i++ ){
+				var pathItem = $(`<div>${lvStack[i].bn}</div>`);
+				pathItem.data('bi', lvStack[i].bi);
 				cns.debug(lvStack[i]);
-				lvStackDiv.append( "<div>"+lvStack[i]+"</div><img src='images/common/icon/icon_arrow_grey_right.png'>" );
+				lvStackDiv.append(pathItem)
+				// lvStackDiv.append( "<div>"+lvStack[i]+"</div><img src='images/common/icon/icon_arrow_grey_right.png'>" );
 			}
 		}
 		var tt = lvStackDiv.find("img:last-child");
 		tt.remove();
 		subPageBottom.append(lvStackDiv);
+
+		lvStackDiv.children().off('click').on('click', function (e) {
+			if ($(this).data('bi') && $(this).data('bi') != bi) {
+				var pageIDTmp = "page-contact_sub" + parentLevel;
+				showSubContactPage( pageIDTmp, $(this).data("bi"));
+			}
+		});
 	}
 
 	//mem-title
@@ -469,7 +491,7 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 		var branch = generateBranchList(childList);
 		subPageBottom.append(branch);
 		subPageBottom.find(".row.branch").off("click").click( function(){
-			showSubContactPage( pageID, $(this).data("bi"), JSON.stringify(lvStack) );
+			showSubContactPage( pageID, $(this).data("bi"));
 		});
 	}
 
@@ -484,28 +506,96 @@ showSubContactPage = function( parentPageID, bi, lvStackString, isGenContent ){
 	}
 }
 
-showSubbranchListBox = function( dom, startLvl, bi, stackString ){
-	if( !bi || !dom || dom.length<0 ) return;
+showSubbranchListBox = function( dom, startLvl, currBi, stackString ){
+	if( !currBi || !dom || dom.length<0 ) return;
 	var stack = $.parseJSON(stackString);
-	stack.push(bi);
+	stack.push(currBi);
 	stackString = JSON.stringify(stack);
-	var data = bl[bi];
-	var tmp = $("<div class='row list _"+(data.lv-startLvl+1)+" "+bi+"'><div class='left'></div><div class='right'>"+data.lv+"</div></div>");
-	var left = tmp.find(".left");
-	left.append("<div class='name'>"+data.bn+"</div>");
-	// left.append("<div class='name'>拉拉拉拉拉拉拉拉拉拉拉拉+</div>");
-	left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", data.cnt)+"</div>");
-	tmp.data("stack", stackString);
-	tmp.data("bi", bi);
-	tmp.css("padding-left",((Math.min(11,data.lv-startLvl)+1)*20)+"px");
-	if( startLvl== data.lv ) dom.append(tmp);
-	else dom.after(tmp);
+	var branchList = Object.keys(bl || {});
 
-	if( data.cl.length>0 ){
-		for( var i=0;i<data.cl.length;i++ ){
-			showSubbranchListBox(tmp, startLvl, data.cl[i], stackString );
-		}
+	var makeBranchItem = function (branchObj, bi) {
+		var tmp = $(`
+			<div class='row list _${branchObj.lv} ${bi}'>
+				<div class='left'>
+					<div class='name'>${branchObj.bn}</div>
+					<div class='detail'>${$.i18n.getString("COMPOSE_N_MEMBERS", branchObj.cnt)}</div>
+				</div>
+				<div class='right'>${branchObj.lv}</div>
+			</div>
+		`);
+
+		tmp.css("padding-left",((Math.min(11, branchObj.lv - 1)+1)*20)+"px");
+		tmp.data("stack", stackString);
+		tmp.data("bi", bi);
+		dom.append(tmp);
 	}
+
+	branchList.forEach(function (bi) {
+		var branchData = bl[bi];
+
+		if (branchData.lv == 1) {
+			makeBranchItem(branchData, bi);
+			(function recursiveBranch () {
+
+				branchData.cl.forEach(function (childBi) {
+					branchData = bl[childBi]
+					makeBranchItem(branchData, childBi);
+
+					if (branchData.cl.length > 0) {
+						recursiveBranch()
+					}
+				})
+			})();
+			// while ()
+			// while (recurive) {
+			// 	if (branchData.cl.length == 0) {
+			// 		recurive = false;
+			// 	} else {
+			// 		branchData.cl.forEach(function (childBi) {
+			// 			console.log(bl[childBi].bn)
+			// 		})
+			// 	}
+			// }
+			
+
+			// while (recurive) {
+			// 	var tmp = $(`
+			// 		<div class='row list _${branchData.lv} ${bi}'>
+			// 			<div class='left'>
+			// 				<div class='name'>{branchData.bn}</div>
+			// 				<div class='detail'>${$.i18n.getString("COMPOSE_N_MEMBERS", data.cnt)}"</div>
+			// 			</div>
+			// 			<div class='right'>{branchData.lv}</div>
+			// 		</div>
+			// 	`);
+
+			// 	tmp.css("padding-left",((Math.min(11, branchData.lv - 1)+1)*20)+"px");
+			// 	dom.append(tmp);
+			// 	// if (branchData.l)
+			// }
+			
+		}
+	})
+
+
+	
+	
+	// var tmp = $("<div class='row list _"+(data.lv-startLvl+1)+" "+bi+"'><div class='left'></div><div class='right'>"+data.lv+"</div></div>");
+	// var left = tmp.find(".left");
+	// left.append("<div class='name'>"+data.bn+"</div>");
+	// // left.append("<div class='name'>拉拉拉拉拉拉拉拉拉拉拉拉+</div>");
+	// left.append("<div class='detail'>"+$.i18n.getString("COMPOSE_N_MEMBERS", data.cnt)+"</div>");
+	// tmp.data("stack", stackString);
+	// tmp.data("bi", bi);
+	// tmp.css("padding-left",((Math.min(11,data.lv-startLvl)+1)*20)+"px");
+	// if( startLvl== data.lv ) dom.append(tmp);
+	// else dom.after(tmp);
+
+	// if( data.cl.length>0 ){
+	// 	for( var i=0;i<data.cl.length;i++ ){
+	// 		showSubbranchListBox(tmp, startLvl, data.cl[i], stackString );
+	// 	}
+	// }
 }
 
 //顯示所有成員page
@@ -892,16 +982,19 @@ updateFavoritePage = function(){
 	// page.data("gi", gi);
 
 	page.find(".page-title").html( $.i18n.getString("COMMON_FAVORIATE") );
-	page.find(".page-back").off("click").click( showMainContact );
+	page.find(".page-back").off("click").click(function (e) {
+		$(".contact-branchList").remove();
+		showMainContact();
+	});
 	
 	var subPage = page.find(".subpage-contact");
 	subPage.html("");
 
 	//----- title -----
 	var title = $("<div class='contact-titleBar'></div>");
-	var nameArea = $("<div class='nameArea'></div>");
+	var nameArea = $("<div class='nameArea list'></div>");
 	nameArea.append("<div class='name'>"+$.i18n.getString("COMMON_FAVORIATE")+"</div>");
-	// nameArea.append("<div class='arrow'></div>");
+	nameArea.append("<div class='arrow'></div>");
 	title.append(nameArea);
 	title.append("<div class='btnExtra'></div>");
 	title.append("<div class='btn'></div>");
@@ -1025,6 +1118,70 @@ updateFavoritePage = function(){
 			subPageBottom.append(branch);
 		}
 	}
+
+	var subbranchList = $(".contact-branchList");
+	var makeBranchItem = function (branchObj, fi) {
+		var tmp = $(`
+			<div class='row list _1 ${fi || ""}'>
+				<div class='left'>
+					<div class='name'>${branchObj.fn}</div>
+					<div class='detail'>${$.i18n.getString("COMPOSE_N_MEMBERS", branchObj.cnt)}</div>
+				</div>
+				<div class='right'>1</div>
+			</div>
+		`);
+
+		tmp.off('click').on('click', function (e) {
+			if (fi) {
+				showSubFavoritePage(fi);
+			} else {
+				showFavoritePage();
+			}
+
+			subbranchList.css("display","none");
+			title.find(".arrow").removeClass("open");
+		});
+
+		tmp.css("padding-left", "20px");
+		tmp.data("fi", fi);
+		subbranchList.append(tmp);
+	}
+
+	if (subbranchList.length == 0){
+		subbranchList.remove();
+		subbranchList = $('<div class="contact-branchList" style="display:none;"></div>');
+		var favBranchList = Object.keys(fbl);
+
+		makeBranchItem({
+			fn: $.i18n.getString("COMMON_FAVORIATE"),
+			cnt: count
+		})
+		favBranchList.forEach(function (fi) {
+			var branchData = fbl[fi];
+			makeBranchItem(branchData, fi)
+		});
+
+		subbranchList.children("div").eq(0).addClass("current");
+		page.after(subbranchList);
+	}
+	else {
+		var parentRow = subbranchList.find(".row.current");
+		parentRow.removeClass("current");
+		subbranchList.children("div").eq(0).addClass("current");
+	}
+
+	nameArea.off("click").click( function(){
+		subbranchList.slideToggle(400, function(){
+			var currentRow = $(this).find(".row.current");
+			var parent = $(this);
+			var offset = currentRow.position().top;
+			cns.debug( currentRow.position().top, parent.scrollTop() );
+			if( offset>parent.height() || offset<0 ){
+				parent.scrollTop( parent.scrollTop()+currentRow.position().top );
+			}
+		});
+		title.find(".arrow").toggleClass("open");
+	});
 }
 
 //顯示單一自定群組內容
@@ -1032,6 +1189,7 @@ showSubFavoritePage = function( fi ){
 	var data = fbl[fi];
 	var parentPageID = "page-contact_favorite";
 	var pageID = "page-contact_sub_favorite";
+	var subbranchList = $(".contact-branchList");
 	var page = $( "#"+pageID );
 	if( !page || page.length==0 ){
 		page = $('<div data-role="page" id="'+pageID+'" class="subPage contact-subpages">'
@@ -1044,6 +1202,7 @@ showSubFavoritePage = function( fi ){
 
 	page.find(".page-title").html( data.fn );
 	page.find(".page-back").off("click").click( function(){
+		$('.contact-branchList').remove();
 		showFavoritePage(true);
 	});
 	
@@ -1052,13 +1211,32 @@ showSubFavoritePage = function( fi ){
 
 	//title
 	var title = $("<div class='contact-titleBar'></div>");
-	var nameArea = $("<div class='nameArea'></div>");
+	var nameArea = $("<div class='nameArea list'></div>");
 	nameArea.append("<div class='name'>"+data.fn+"</div>");
-	// nameArea.append("<div class='arrow'></div>");
+	nameArea.append("<div class='arrow'></div>");
 	title.append(nameArea);
 	title.append("<div class='btnExtra'></div>");
 	title.append("<div class='btn'></div>");
 	subPage.append(title);
+
+	subbranchList
+		.find(".row.current").removeClass("current").end()
+		.find(".row." + fi).addClass("current");
+
+	nameArea.off("click").click( function(){
+		//show sub divs
+		subbranchList.slideToggle(400, function(){
+			var currentRow = $(this).find(".row.current");
+			var parent = $(this);
+			var offset = currentRow.position().top;
+			cns.debug( currentRow.position().top, parent.scrollTop() );
+			if( offset>parent.height() || offset<0 ){
+				parent.scrollTop( parent.scrollTop()+currentRow.position().top );
+			}
+		});
+		title.find(".arrow").toggleClass("open");
+
+	});
 
 	//---- extra ------
 	var extra = $("<div class='contact-extra'></div>");
@@ -1155,7 +1333,7 @@ showSubFavoritePage = function( fi ){
 		});
 	});
 	extraContent.find(".btn.editMem").off("click").click( function(e){
-		$(this).data("fi", fi);
+    	$(this).data("fi", fi);
 		$(this).data("object_str", JSON.stringify(currentFavData) );
     	e.stopPropagation();
 		showEditFavGroupBox( $(this) );
@@ -1291,7 +1469,7 @@ showEditFavListPage = function( dom ) {
 	});
 }
 
-showEditFavGroupBox = function( dom ) {
+showEditFavGroupBox = function(dom, favBranchId, curFavBranchMems) {
 	var oriData = dom.data("object_str");
 	oriData = $.parseJSON(oriData);
 	var option = {
@@ -1617,66 +1795,95 @@ function showAddMemberPage(){
 }
 
 function updateInvitePending () {
-	//render invite pending member list
-	// updateInvitePending();
-	var api_name = "groups/" + gi + "/invitations";
-	var headers = {
-	         "ui":ui,
-	         "at":at, 
-	         "li":lang,
-	             };
-	var method = "get";
-	var result = ajaxDo(api_name,headers,method,false);
-	result.complete(function(data){
-		if(data.status != 200) return false;
-		var obj =$.parseJSON(data.responseText);
-		if( obj&&obj.hasOwnProperty("il") ) inviteGuAll = obj.il;
+	var inviteUserList = [];
+
+	let getInviteesPromise = new Promise(function (resolve, reject) {
+		(function getPartInviteMems(invitationsKey) {
+	        invitationsKey = invitationsKey || "";
+
+	        var ajaxData = {
+		        apiName: "groups/" + gi + "/invitations",
+		        apiVer: "apiv2",
+		    };
+
+	        if (invitationsKey != "") ajaxData.apiName = ajaxData.apiName + "?ik=" + invitationsKey;
+
+	        new QmiAjax(ajaxData).complete(function(data) {
+	            if (data.status == 200) {
+	            	var resObj = JSON.parse(data.responseText);
+	                inviteUserList = inviteUserList.concat(resObj.il);
+	                if (resObj.tbc) {
+	                	getPartInviteMems(resObj.ik);
+	                } else {
+	                	resolve();
+	                }
+	            } else if (data.status == 0) {
+	                getPartInviteMems(invitationsKey)
+	            }
+	        }).fail(function() {
+	            reject();
+	        });
+	    }());
+	})
+
+    getInviteesPromise.then(function () {
+    	var contentContainer = document.querySelector("#page-contact-addmem .ca-content-area");
+		var pendingArea = contentContainer.querySelector(".list");
+		var coachArea = contentContainer.querySelector(".coach");
+		var produceNumbers = 0; 
 
 		var userData = QmiGlobal.groups;
+ 		inviteGuAll = inviteUserList
+
 		if( userData && gi ){
 			if( userData.hasOwnProperty(gi) ){
 				userData[gi].inviteGuAll = inviteGuAll;
 			}
 		}
-		// *--* $.lStorage(ui, userData);
-
-
-		var pendingAreaParent = $("#page-contact-addmem .ca-pending-area");
-		var pendingArea = pendingAreaParent.children(".list");
-		var coachArea = pendingAreaParent.children(".coach");
+		
 		//render invite pending member list
-		if( inviteGuAll && inviteGuAll.length>0){
-			coachArea.hide();
-			pendingArea.html("").show();
-			var template = $('<div class="row">'
-					+'<div class="left"><img class="pend_img" src="images/common/others/empty_img_personal_l.png"/></div>'
-					+'<div class="mid"><div class="name"></div><div class="phone"></div></div>'
-					+'<div class="right"><img class="resend" src="images/icon/icon_invite_mail.png"/><img class="del" src="images/icon/icon_chatroom_chatlist_del.png"</div>'
-				+'</div>');
-			for( var i=0;i<inviteGuAll.length;i++){
-				var mem = inviteGuAll[i];
-				var newRow = template.clone();
-				//name
-				newRow.find(".name").html( (mem.nk || "" )._escape() );
-				//phone
-				newRow.find(".phone").text( mem.ik||"" );
-				newRow.data("pn",mem.ik).data("nk",mem.nk).data("gi",gi);
-				pendingArea.append(newRow);
-			}
-			pendingArea.find(".resend").click(function(e){
-				var row = $(this).parents(".row");
-				var this_gi = row.data("gi");
-				var phone = row.data("pn");
-				var nk = row.data("nk");
-				cns.debug("resend", phone, nk );
+		if (inviteGuAll && inviteGuAll.length > 0) {
+			while (pendingArea.firstChild) {
+            	pendingArea.firstChild.remove();
+        	}
+			
+        	pendingArea.style.display = 'block';
+			coachArea.style.display = 'none';
 
-				if( this_gi && nk && phone ){
-					sendInviteAPI( this_gi, [{
-						"pn": phone,
-						"nk": nk
-					}], function(data){
-						if( data.status==200 ){
-							try{
+			var loadMoreElements = function () {
+				inviteGuAll.slice(produceNumbers, produceNumbers + 200).forEach(function (invitee) {
+					var row = document.createElement('div');
+					var left = document.createElement('div');
+					var mid = document.createElement('div');
+					var right = document.createElement('div');
+					var name = document.createElement('div');
+					var phone = document.createElement('div');
+					var avatar = document.createElement('img');
+					var resendIcon = document.createElement('img');
+					var removeIcon = document.createElement('img');
+
+					row.className = 'row';
+					left.className = 'left';
+					mid.className = 'mid';
+					right.className = 'right';
+					name.className = 'name';
+					avatar.className = 'pend_img';
+					resendIcon.className = 'resend';
+					removeIcon.className = 'del';
+
+					avatar.src = 'images/common/others/empty_img_personal_l.png'
+					resendIcon.src = "images/icon/icon_invite_mail.png";
+					removeIcon.src = "images/icon/icon_chatroom_chatlist_del.png";
+
+					name.textContent = invitee.nk || "";
+					phone.textContent = invitee.ik || "";
+
+					resendIcon.addEventListener('click', function (e) {
+						sendInviteAPI(gi, [{
+							"pn": invitee.ik,
+							"nk": invitee.nk
+						}], function(data) {
+							if( data.status==200 ){
 								var obj = $.parseJSON(data.responseText);
 								/* ----- TODO ------
 									如果已經邀過了...?
@@ -1687,56 +1894,60 @@ function updateInvitePending () {
 								} else {
 									toastShow( $.i18n.getString("INVITE_SUCC") );
 								}
-								updateInvitePending();
 
-							} catch(e){
+								// updateInvitePending();
+							} else {
 								toastShow( $.i18n.getString("INVITE_FAIL") );
-								errorReport(e);
 							}
-						} else {
-							toastShow( $.i18n.getString("INVITE_FAIL") );
-						}
+						});
 					});
-				} else{
-					toastShow( $.i18n.getString("INVITE_FAIL") );
-				}
-			});
-			pendingArea.find(".del").click(function(e){
 
-				var row = $(this).parents(".row");
-				var this_gi = row.data("gi");
-				var phone = row.data("pn");
-				cns.debug("del", this_gi, phone );
-
-				if( this_gi && phone ){
-					var succ = false;
-					removeInviteAPI( this_gi, [{
-						"ik": phone
-					}], function(data){
-						if( data.status==200 ){
-							try{
+					removeIcon.addEventListener('click', function (e) {
+						removeInviteAPI(gi, [{
+							"ik": invitee.ik
+						}], function(data){
+							if( data.status==200 ){
 								var obj = $.parseJSON(data.responseText);
 
-								updateInvitePending();
-								
+								// updateInvitePending();
+								row.remove(); // 成功就直接刪除，避免再花一次重刷畫面的成本
 								toastShow( obj.rsp_msg );
-								succ = true;
-							} catch(e){
-								errorReport(e);
+									
+							} else {
+								toastShow( $.i18n.getString("INVITE_DELETED_FAIL"));
 							}
-						}
-
-						if(!succ){
-							toastShow( $.i18n.getString("INVITE_DELETED_FAIL") );
-						}
+						});
 					});
-				} else {
-					toastShow( $.i18n.getString("INVITE_DELETED_FAIL") );
+
+					left.appendChild(avatar);
+					mid.appendChild(name);
+					mid.appendChild(phone);
+					right.appendChild(resendIcon);
+					right.appendChild(removeIcon);
+
+					row.appendChild(left);
+					row.appendChild(mid);
+					row.appendChild(right);
+
+					pendingArea.appendChild(row);
+				});
+
+				produceNumbers = ((produceNumbers + 200) > inviteUserList.length) ? 
+					inviteUserList.length : produceNumbers + 200;
+			}
+
+			loadMoreElements();
+			contentContainer.scrollTop = 0
+			contentContainer.onscroll = function (e) {
+				if (this.scrollTop + this.clientHeight > this.scrollHeight - 100) {
+					if (produceNumbers < inviteUserList.length) {
+						loadMoreElements()
+					}
 				}
-			});
+			}
 		} else {
-			coachArea.show();
-			pendingArea.hide();
+			pendingArea.style.display = 'none';
+			coachArea.style.display = 'block';
 		}
 	});
 }
@@ -1953,7 +2164,6 @@ function updateContactFavorite(){
 }
 
 function updateSubFavoriteGroup (updateData, dom, favBranchID) {
-	
 
 	var api_name = "groups/" + gi + "/favorites/" + favBranchID;
 	var headers = {
@@ -2023,18 +2233,16 @@ function initQRCodePage(){
 	ajaxDo(api_name,headers,"get",true).complete(function(data){
 		if(data.status == 200){
 			var rps = $.parseJSON(data.responseText);
-			if(!rps || !rps.rsp_success){
-				imgContainer.find('img').hide();
-				imgContainer.addClass("disabled");
-				return;
-			}
-			switchBtn.attr("data-enabled",rps.rps);
+
+			switchBtn.attr("data-enabled",rps.qst);
 			if(rps.qst==0){ //donno why 0 stands for enabled...
 				imgContainer.removeClass("disabled");
 				switchBtn.children("img").attr("src", "images/registration/checkbox_check.png");
+				page.find('div.qr_btn_row').show()
 			} else {
 				imgContainer.addClass("disabled");
 				switchBtn.children("img").attr("src", "images/registration/checkbox_none.png");
+				page.find('div.qr_btn_row').hide()
 			}
 			imgContainer.find('img').attr('src', rps.qru).show();
 			downloadBtn.removeClass("disabled");
@@ -2045,13 +2253,18 @@ function initQRCodePage(){
 	});
 
 	$("#page-contact-addmem .ca-tab").off("click").click( function(){
+		var prevType = $(this).parent().find(".ca-tab.active").attr("data-type");
+		var curType = $(this).attr("data-type");
+		
 		$(this).parent().find(".ca-tab.active").removeClass("active");
 		$(this).addClass("active");
-		var type = $(this).attr("data-type");
 		$("#page-contact-addmem .ca-sub-area.active").removeClass("active");
-		$("#page-contact-addmem ."+type).addClass("active");
-		if( type=="pending" ){
-			updateInvitePending();
+		$("#page-contact-addmem ." + curType).addClass("active");
+
+		if (prevType !== curType) {
+			if (curType == "pending") {
+				updateInvitePending();
+			} 
 		}
 	});
 	$("#page-contact-addmem .ca-qrcode-area .switch").off("click").click( function(){
@@ -2154,9 +2367,11 @@ function updateQRCodeSetting( switchVal, callback ){
 			if(rps.qst==1){
 				imgContainer.addClass("disabled");
 				switchBtn.children("img").attr("src","images/registration/checkbox_none.png");
+				page.find('div.qr_btn_row').hide();
 			} else {
 				imgContainer.removeClass("disabled");
 				switchBtn.children("img").attr("src","images/registration/checkbox_check.png");
+				page.find('div.qr_btn_row').show();
 			}
 			if(callback) callback(true);
 		} else {

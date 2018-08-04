@@ -1,4 +1,4 @@
-// version 2.4.0.2
+// version 2.4.0.13
 var ui;
 var at;
 var gi;
@@ -32,7 +32,7 @@ var base_url = function() {
 	}
 }();
 
-// var base_url = "https://qmi17.mitake.com.tw/";
+var base_url = "https://nqmi27.mitake.com.tw/";
 
 if($.lStorage("_selectedServerUrl"))
 	base_url = $.lStorage("_selectedServerUrl");
@@ -45,14 +45,14 @@ var nwGui = function() {
 		console.error("非桌機版");
 		return null;
 	};
-}();
+}(); 
 	
 window.QmiGlobal = {
 
 	// 這是web版號 另有桌機版號 module.js deskTopVersion
 	// 多加一個條件: 若桌機版號大於web版號 以桌機版號為主
 	// initReady裡面做調整 
-	appVer: "2.4.0.2",
+	appVer: "2.4.0.13",
 
 	title: "Qmi",
 
@@ -212,6 +212,8 @@ window.QmiGlobal = {
 		"_loginData",
 		"_loginRemember",
 		"_sticker",
+		"_sys_notification_switch",
+		"_sys_sound_switch",
 		"_selectedServerUrl",
 		"groupChat"
 	],
@@ -366,6 +368,41 @@ window.QmiGlobal = {
 $(document).ready(QmiGlobal.initReady);
 
 
+QmiGlobal.pollingIntervalObj = function() {
+	var cnt = 0;
+	var defaultInterval = 5000;
+	var customInterval = 0;
+	var clearTimer;
+	return {
+		get: function() {
+			if(customInterval)
+				return customInterval;
+
+			return defaultInterval;
+		},
+		set: function(args) {
+			var interval = args.interval || 1000;
+			if(interval < 1000) interval = 1000; 
+			customInterval = interval;
+
+			clearTimeout(clearTimer);
+
+			if(args.persist) return;
+
+			// 1分鐘回復
+			clearTimer = setTimeout(function() {
+				customInterval = defaultInterval;
+			}, 60 * 1000);
+
+		},
+		reset: function() {
+			clearTimeout(clearTimer);
+			customInterval = defaultInterval;
+		}
+
+	}
+}();
+
 // polling異常監控
 window.QmiPollingChk = {
 
@@ -384,15 +421,16 @@ window.QmiPollingChk = {
 		setTimeout(function(){
 			var diff = window.QmiPollingChk.cnt - oriNum;
 
-			// 嚴格來說 超過25次就不正常 30秒後重啟polling
+			// 有polling加速功能 因此要拉高這個數字
 			// 沒增加表示停了 也重啟
-			if(diff > 25 || diff === 0) {
+			if(diff > 100 || diff === 0) {
 				console.log("polling異常 30秒後重啟");
 
 				QmiGlobal.pollingOff = true;
 				setTimeout(function(){
 					console.log("30秒 重啟");
 					QmiGlobal.pollingOff = false;
+					QmiGlobal.pollingIntervalObj.reset();
 					polling();
 				}, 30000);
 			}
@@ -423,9 +461,6 @@ var compose_timer = false;	//發佈計時器
 var max_w = 500; 			//縮圖寬高
 var max_h = 500;			//縮圖寬高
 var quality = 0.5;			//縮圖寬高
-
-//設置聊天訊息預覽
-var set_notification = $.lStorage("_setnoti") || true;
 
 //timeline置頂millisecond
 var top_timer_ms = $.lStorage("_topTimeMs") || 5000;
@@ -1289,15 +1324,19 @@ $(document).on("click",".page-back",function(){
 
 //for node-webkit app to open systems browser
 $(document).on("click","a",function(e){
-
-	e.stopPropagation()
+	e.stopPropagation();
 	if(!$(this).is("[download]")){
 		var isNode = (typeof(require) != "undefined");
 		cns.debug( isNode );
 		if( isNode ){
-            var gui = require('nw.gui');
-            gui.Shell.openExternal($(this).attr("href"));
-			return false;
+			try {
+				var gui = require('nw.gui');
+	            gui.Shell.openExternal($(this).attr("href"));
+				return false;
+			} catch (e) {
+				console.log(e)
+			}
+            
         }
 	}
 });
@@ -1401,7 +1440,6 @@ QmiGlobal.ModuleConstructor = function(args) {
     if(!args.handleEvent) {
     	self.handleEvent = QmiGlobal.handleEvent;
     }
-
 };
 
 QmiGlobal.handleEvent = function() {
@@ -1448,8 +1486,8 @@ QmiGlobal.api = (function() {
 		        body: body,
 		        isPublicApi: isGlobalCnt
 		    });
-		}
-	}
+		};
+	};
 
 	return new ApiConstructor();
-})()
+})();

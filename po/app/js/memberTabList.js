@@ -22,7 +22,7 @@ loadObjectTabPage = function( parentDom, onDone ){
     if( $("#page-tab-object").length>0 ){
         if( onDone ) onDone();
     } else {
-        $('<div>').load('layout/memberList.html?v2.4.0.2',function(){
+        $('<div>').load('layout/memberList.html?v'+ QmiGlobal.appVer,function(){
             parentDom.after( $(this).find("#page-tab-object") );
             if( onDone ) onDone();
         });
@@ -69,12 +69,18 @@ showChatObjectTabShow = function( giTmp, title, list, onPageChanged, onDone ){
     tabArea.html("");
     var width = (100.0/list.length)+"%";
     $.each( list, function(index, object){
+        var readCnt = (object.ml || []).length;
+        // 已讀扣除自己
+        if(index === 0 && readCnt > 0) readCnt--;
+        var cntStr = `(${readCnt})`;
+        // 未付費團體不顯示數字 clickable === false
+        if(index === 1 && object.clickable === false) cntStr = ``;
+
         var tab = $("<div class='tab'></div>");
         tab.data("id", index);
         tab.data("obj", object);
         tab.css("width",width);
-        var tmp = "<div>" + ((object.title&&object.title.length>0)?object.title:" ") +"</div>";
-        tab.html( tmp );
+        tab.html(`<div>${((object.title&&object.title.length>0)?object.title:" ")} ${cntStr}`);
         tab.data("clickable", (null==object.clickable)?true:(object.clickable) );
         tabArea.append(tab);
     });

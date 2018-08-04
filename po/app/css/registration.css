@@ -297,7 +297,7 @@ input {
 }
 
 .register-text img{
-	width: 22px;
+	width: 20px;
 	vertical-align: middle;
 	margin-right: 5px;
 }
@@ -316,6 +316,7 @@ input {
 
 .register-next {
 	margin: 250px auto 0;
+	cursor: pointer;
 }
 
 .password-next {
@@ -512,7 +513,7 @@ input.setting-birth-hidden {
 	color: lightgray;
 	font-size: 14px;
 	-webkit-user-select: none;
-	cursor: pointer;
+	cursor: default;
 }
 
 
@@ -638,6 +639,7 @@ input.setting-birth-hidden {
 	font-size: 14px;
 	color: #4092ef;
 	display: block;
+	cursor: pointer;
 }
 #page-registration .login-option-area > div div{
 	display: inline-block;

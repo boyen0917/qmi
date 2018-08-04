@@ -70,6 +70,7 @@
 	"LOGIN_ACCOUNT_PHONE" : "请输入手机号码",
 	"LOGIN_PASSWORD" :	"请输入密码",
 	"LOGIN_REMEMBER_ACCOUNT" :	"记住帐号",
+	"LOGIN_REMEMBER_PASSWORD" :	"记住密码",
 	"LOGIN_FORGET_PASSWORD" :	"忘记密码？",
 	"LOGIN_SAVE_ACCOUNT_TITLE" :	"帐号",
 	"LOGIN_SWITCH_ACCOUNT" :	"切换帐号",
@@ -99,6 +100,7 @@
 	"REGISTER_SETTING_FIRST_NAME" :	"名",
 	"REGISTER_SETTING_BIRTHDAY" :	"生日",
 	"REGISTER_SUCC" : "注册成功",
+	"REGISTER_AGREE_TERM" : "同意 Qmi 的使用条款及隐私政策后即可注册",
 
 	"REGISTRATION_NOTE1" : "注册帐号代表您已同意",
 	"REGISTRATION_NOTE2" : "及",
@@ -144,7 +146,7 @@
 	"FEED_DELETE" : "删除",
 	"FEED_COPY" : "複製",
 	"FEED_COPY_CONTENT" : "複製内容",
-	"FEED_COPY_CONTENT_SUCC" : "成功複製内容",
+	"FEED_COPY_CONTENT_SUCC" : "已複製到剪贴簿",
 	"FEED_CALENDAR" : "加入行事曆",
 	"FEED_ADD_AUDIENCE" : "新增发佈对象",
 	"FEED_UNTOP_AVAILABLE" : "目前尚未有任何置顶",
@@ -245,7 +247,9 @@
 	"COMMON_SELECT_MEMBERS"  				: "选择对象",
 	"COMMON_NEXT"  					: "下一步",
 	"COMMON_SELECT"  						: "选择",
+	"COMMON_SELECTED"  						: "已选择 %@位成员",
 	"COMMON_SELECT_ALL"  					: "全选",
+	"COMMON_SELECT_NONE"					: "取消全选",
 	"COMMON_MEMBER"  						: "成员",
 	"COMMON_EDIT"  						: "编辑",
 	"COMMON_DONE" 						: "完成",
@@ -326,11 +330,20 @@
 	"CHAT_SELF_ALREADY_ADMIN" : "你已是管理员了!!",
 	"CHAT_EXIT_CHATROOM_FAIL" : "退出失败，请保留成员至少有一位是管理员。",
 	"CHAT_EDIT_CHATROOM" : "前往编辑",
+
 	"CHATROOM_SELECTED" : "已选择",
 	"CHATROOM_ANYONE_CAN_INVITE" : "一般成员邀请权限", 
 	"CHATROOM_TOP" : "置顶",
 	"CHATROOM_ASSIGN_ADMIN" : "指派管理员",
 	"CHATROOM_LEAVE_CHATROOM" : "离开聊天室",
+	"CHATROOM_REMOVE_CONFIRM" : "你确定要移除 %@？",
+	"CHATROOM_SOMEONE_LEFT_CHATROOM_TOAST" : "%@ 已离开聊天室",
+	"CHATROOM_REMOVE" : "移除",
+	"CHATROOM_CANCEL" : "取消",
+	"CHATROOM_INVITE_MEMBER":	"邀请成员",
+	"CHATROOM_FORWARD_MAXIMUM_SELECTION": "转传上限：%@ 笔讯息",
+	"CHATROOM_FORWARD_MAXIMUM_DESTINATION": "转传上限：%@ 个对象",
+	"CHATROOM_CHAT" : "聊天室",
 
 	"NOTICES_TITLE"			: "新通知",
 	"NOTICES_POST"			: "发佈",
@@ -339,6 +352,9 @@
 	"NOTICES_RESPONSER_NUM"	: "及其他%ld个人",
 	"NOTICES_NOMSG_WEB"	: "没有讯息",
 	"NOTICES_MENTION_YOU" : "提到了你",
+	"NOTICES_POST_NEW_FEED" : " 发佈了一笔动态消息",
+	"NOTICES_REPLY_SOMEONE_FEED" : " 回复 %@ 的动态消息",
+	"NOTICES_REPLY_MENTION_SOMEONE" : " 留言标记了你",
 
 	"LEFT_FEED" : "动态消息",
 	"LEFT_GROUP" : "团体",
@@ -404,6 +420,7 @@
 	"USER_PROFILE_DELETE_MEMBER" : "删除成员",
 	"USER_PROFILE_DELETE_MEMBER_CONFIRM" : "删除此成员？",
 	"USER_PROFILE_DELETE_MEMBER_DESC" : "被删除的成员将无法检视该团体，您可以从管理网页恢復该成员权限。",
+	"USER_PROFILE_DISABLE_CHANGE_NAME": "付费团体欲修改姓名、职称、电子邮件、手机、公司电话、分机、SIP桌上分机，请由后台进行操作",
 
 	"OFFICIAL_ABOUT" : "关于",
 	"OFFICIAL_CHAT" : "聊天",
@@ -450,7 +467,28 @@
 	"NEW_PASSWORD" : "新密码",
 	"CONFIRM_NEW_PASSWORD" : "确认新密码",
 	"CHANGE" : "变更",
+	"CHANGE_SUCCESS" : "变更成功",
+
+	"SYSTEM_ACCOUNT_SETTING_REMOVE": "解除",
+	"SYSTEM_VERIFICATION_CHECK_PHONE": "手机号码验证",
+	"SYSTEM_CHANGE_PHONE": "变更手机号码",
+	"SYSTEM_CHANGE_PHONE_HINT": "请输入欲绑定的手机号码",
+	"SYSTEM_VERIFICATION_EMAIL_TEXT": "我们已传送验证码至",
+	"SYSTEM_ACCOUNT_SETTING_SET": "设定",
+	"SYSTEM_ACCOUNT_SETTING_NOT_SET_EMAIL": "尚未设定电子邮件",
+	"SYSTEM_ACCOUNT_SETTING_SET_EMAIL_TEXT": "请先设定电子邮件",
+	"SYSTEM_ACCOUNT_SETTING_SET_CHECK_PW": "请输入密码以进行设定",
+	"SYSTEM_ACCOUNT_SETTING_SEND_CODE_SUCCESS": "验证码发送成功",
+	"SYSTEM_SET_EMAIL": "设定电子邮件",
+	"SYSTEM_SET_EMAIL_CHECK_EMAIL": "电子邮件验证",
+	"SYSTEM_SET_EMAIL_HINT": "请输入欲绑定的电子邮件",
+	"SYSTEM_SET_EMAIL_SET_EMAIL": "将传送验证码至:\n",
+	"SYSTEM_ACCOUNT_SETTING_REMOVE_SETTING": "解除Email设定\n",
+
 	"VOICE_SET" : "声音",
+	"VIBRATE_SET" : "声音",
+	"SYSTEM_NOTIFICATION_SOUND" : "铃声",
+
 	"CHAT_SET" : "讯息预览",
 	"CLOSE_SET" : "关闭",
 	"THREE_SEC_SET" : "3秒",
@@ -528,7 +566,7 @@
 	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA1" : "尚未绑定公云帐号",
 	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA2" : "可登入公云帐号，绑定LDAP帐号。",
 
-	"WEBONLY_PUSH" : "推播",
+	"WEBONLY_PUSH" : "通知",
 	"WEBONLY_SAVE" : "储存",
 	"WEBONLY_MEMBERLIST" : "成员名单",
 	"WEBONLY_ADMINISTRATOR" : "管理员",
@@ -557,7 +595,10 @@
 	"WEBONLY_CHAT_FORWARD": "转传",
 	"WEBONLY_COPY_FAIL": "複製失败",
 	"WEBONLY_FORWARD_SUCCESSED": "转传成功",
-	
+	"WEBONLY_SUCCESSED": "成功",
+	"WEBONLY_FAILED": "失败，请稍候再试",
+	"WEBONLY_CHATROOM_ADMIN": "管理员",
+
 	"SCHEDULED_POST": "排程发佈文章",
 	"SCHEDULED_POST_AT": "排程发佈时间",
 	"SCHEDULED_POST_POST_NOW": "立即发佈",
@@ -600,7 +641,7 @@
 	"ACCOUNT_MANAGEMENT_ACCOUNT_REACTIVATED": "您的帐号xxxxx12345已解除锁定，请于Qmi登入画面中使用忘记密码功能，重新取得新密码后恢復使用。",
 	"ACCOUNT_MANAGEMENT_JOIN_GROUP_NOTICE": "加入团体须知",
 	
-	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_QRCODE": "如接受他团体/群组邀请同意而加入该团体时，则视为您已同意并自行提供个人注册帐号 [%ld] 、个人名称 [%ld] 及个人图像给该团体成员并同意当您注册帐号异动时系统同步更新您于该团体帐号，因该资料及您加入该团体后新增之资料所发生权利义务于您与上开团体管理者间，与本公司无涉，您同意加入团体/群组前审慎评估，以维护您的权益",
+	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_QRCODE": "如接受他团体/群组邀请同意而加入该团体时，则视为您已同意并自行提供个人注册帐号 [%ld] 、个人名称 [%ld] 及个人图像给该团体成员并同意当您注册帐号异动时系统同步更新您于该团体帐号，因该资料及您加入该团体后新增之资料所发生权利义务发生于您与上开团体管理者间，与本公司无涉，您同意加入团体/群组前审慎评估，以维护您的权益",
 	"ACCOUNT_MANAGEMENT_JOIN_GROUP_BY_INVITATION": "如接受他团体/群组邀请同意而加入该团体时，则视为您已同意并自行提供个人注册帐号 [%ld] 及个人图像给该团体成员并同意当您注册帐号异动时系统同步更新您于该团体帐号，因该资料及您加入该团体后新增之资料所发生权利义务于您与上开团体管理者间，与本公司无涉，您同意加入团体/群组前应审慎评估，以维护您的权益",
 	"ACCOUNT_MANAGEMENT_AGREE": "同意加入",
 	"ACCOUNT_MANAGEMENT_DISAGREE": "放弃加入",
@@ -614,4 +655,5 @@
 	"INTERGRATIONS_READMORE": "更多",
 
 	"ACCOUNT_MANAGEMENT_FILE_DELETED": "档案过期或超过储存空间上限，已失效。"
+
 }

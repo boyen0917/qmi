@@ -317,6 +317,8 @@ body {
 	height: 12px;
 }
 
+.chat-cnt.no-cnt {cursor: default;}
+
 .chat-msg-right{
 	text-align: right;
 } 
@@ -376,11 +378,11 @@ body {
     display: inline-block;
     white-space: pre-line;
     position: relative;
-    -webkit-user-select: none;
+    /*-webkit-user-select: none;*/
     cursor: default;
 }
 
-#chat-contents > div > div.chat-msg div.menu-target {-webkit-user-select: none;}
+#chat-contents > div > div.chat-msg div.msg-menu {-webkit-user-select: none;}
 
 
 .chat-msg-bubble-right{
@@ -773,6 +775,7 @@ body {
 	text-decoration: none;
 	font-size: 14px;
 	text-align: left;
+    margin-bottom: 22px;
 }
 
 .chat-file img{
@@ -916,9 +919,10 @@ body {
     overflow-y: auto;
     padding: 3px 10px 3px;
     line-height: 25px;
-    white-space: pre-wrap;
   	word-wrap: break-word;
+  	white-space: pre-wrap;
 }
+
 #footer .contents .input:active,#footer .contents .input:focus-no{
 	box-shadow: 0 0 3px 2px rgba(57, 148, 232,0.5);
 	border: 1px solid rgba(57, 148, 232,0.7);
@@ -1166,19 +1170,19 @@ body {
 }
 
 /* coachmark */
-.obj-coach-noMember{
+#pagesContainer .obj-coach-noMember{
 	background: #d0d0d0;
 	height: 100%;
 	width: 100%;
 	position: absolute;
 	top: 65px;
 }
-.obj-coach-noMember .container{
+#pagesContainer .obj-coach-noMember .container{
 	text-align: center;
 	margin-top: 120px;
 }
 
-.obj-coach-noMember img{
+#pagesContainer .obj-coach-noMember img{
 	width: 200px;
 }
 
@@ -1186,7 +1190,7 @@ body {
 	
 }
 
-#page-selectMem .bottom {
+#pagesContainer .bottom {
 	width: 99%;
 	text-align: center;
 	z-index: 2;
@@ -1194,7 +1198,7 @@ body {
 }
 
 /* content */
-.obj-selected{
+#pagesContainer .obj-selected{
 	background: #eaf8ff;
 	/* white-space: nowrap; */
 	min-height: 30px;
@@ -1208,7 +1212,7 @@ body {
 	padding-bottom: 8px;
 	border-bottom: rgb(237,238,240) 1px solid;
 }
-.obj-selected .title{
+#pagesContainer .obj-selected .title{
 	color: #b4b4b4;
 	display: inline-block;
 	vertical-align: top;
@@ -1216,16 +1220,16 @@ body {
 	top: 3px;
 	left: 11px;
 }
-.obj-selected .title img {
+#pagesContainer .obj-selected .title img {
 	width: 25px;
 	position: relative;
 	top: 3px;
 	/* left: 3px; */
 }
-.obj-selected .title div {
+#pagesContainer .obj-selected .title div {
 	display: inline-block;
 }
-.obj-selected .list {
+#pagesContainer .obj-selected .list {
 	display: inline-block;
 	width: 70%;
 	max-height: 100px;
@@ -1238,24 +1242,24 @@ body {
 	left: 10px;
 	cursor: pointer;
 }
-.on-search .obj-selected .list .text {
+#pagesContainer .on-search .obj-selected .list .text {
 	color: #b4b4b4;
 	margin-left: 5px;
 }
-.obj-selected .list .text {
+#pagesContainer .obj-selected .list .text {
     margin-left: -6px;
 }
-.obj-selected .list .text span {
+#pagesContainer .obj-selected .list .text span {
     margin-right: 10px;
 }
-.obj-selected .list .search {
+#pagesContainer .obj-selected .list .search {
 	display: inline-block;
 	vertical-align: top;
 	margin-left: 2px;
 	outline: 0px solid transparent;
 	padding-left: 3px;
 }
-.obj-selected .clear {
+#pagesContainer .obj-selected .clear {
 	display: inline-block;
 	width: 30px;
 	background: url("../images/icon/icon_search_clean.png");
@@ -1267,7 +1271,7 @@ body {
 	margin-top: 5px;
 }
 
-.select-all{
+#pagesContainer .select-all{
 	background: rgb(203, 220, 224);
 	height: 40px;
 	line-height: 40px;
@@ -1276,7 +1280,7 @@ body {
 	position: fixed;
 	width: 100%;
 }
-.select-all div{
+#pagesContainer .select-all div{
 	background: url("../images/common/icon/icon_check_gray.png");
 	width: 30px;
 	height: 30px;
@@ -1287,14 +1291,14 @@ body {
 	vertical-align: middle;
 	float: left;
 }
-.select-all span:nth-child(2){
+#pagesContainer .select-all span:nth-child(2){
 	text-align: left;
 	width: 140px;
 	display: inline-block;
 	float: left;
 	white-space: nowrap;
 }
-.select-all span:nth-child(3){
+#pagesContainer .select-all span:nth-child(3){
 	text-align: right;
 	width: 140px;
 	/* right: 0; */
@@ -1304,7 +1308,7 @@ body {
 	white-space: nowrap;
 }
 
-.obj-cell-area {
+#pagesContainer .obj-cell-area {
 	z-index: 1;
 	position: fixed;
 	width: 100%;
@@ -1312,20 +1316,20 @@ body {
 	height: 100%;
 	background: white;
 }
-.obj-cell-area hr{
+#pagesContainer .obj-cell-area hr{
 	margin: 5px 0 1px 150px;
 }
 
-.obj-cell {
+#pagesContainer .obj-cell {
 	/* display: -webkit-box; */
 	height: 70px;
 	/* position: relative; */
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
-.obj-cell:last-child {margin-bottom: 20px;}
+#pagesContainer .obj-cell:last-child {margin-bottom: 20px;}
 
-.obj-cell.subgroup, .obj-cell.fav {
+#pagesContainer .obj-cell.subgroup, #page-selectMem .obj-cell.fav {
 	display: inline-block;
 	width: 90%;
 	border-bottom: 0px;
@@ -1333,22 +1337,22 @@ body {
 	cursor: pointer;
 }
 
-.subgroup-parent {
+#pagesContainer .subgroup-parent {
 	width: 100%;
 	height: 80px;
 }
 
-.obj-cell._2 {padding-left: 65px;}
+#pagesContainer .obj-cell._2 {padding-left: 65px;}
 
-.obj-cell-subTitle {
+#pagesContainer .obj-cell-subTitle {
 	background: #f7f8f9;
 	height: 80px;
 	line-height: 80px;
 }
 
 
-.obj-cell-subTitle div {z-index: -1;}
-.obj-cell-subTitle .text {
+#pagesContainer .obj-cell-subTitle div {z-index: -1;}
+#pagesContainer .obj-cell-subTitle .text {
 	margin-right: 20px;
 	/* position: relative; */
 	display: inline-block;
@@ -1359,18 +1363,18 @@ body {
 	color: #b5b5b5;
 }
 
-.obj-cell-subTitle-chk {
+#pagesContainer .obj-cell-subTitle-chk {
 	margin-left: 22px;
 	display: inline-block;
 }
-.obj-cell-subTitle-chk .select{
+#pagesContainer .obj-cell-subTitle-chk .select{
 	/*display: inline-block;*/
 	margin-left: 14px;
 	display: inline-block;
 	font-size: 20px;
 	color: #4092ef;
 }
-.obj-cell-subTitle-chk .img {
+#pagesContainer .obj-cell-subTitle-chk .img {
 	width: 35px;
 	height: 80px;
 	vertical-align: middle;
@@ -1380,7 +1384,7 @@ body {
 	background-repeat: no-repeat;
 	background-position-y: 43%;
 }
-.obj-cell-subTitle-chk .img.chk {
+#pagesContainer .obj-cell-subTitle-chk .img.chk {
 	width: 35px;
 	height: 80px;
 	vertical-align: middle;
@@ -1390,7 +1394,7 @@ body {
 	background-position-y: 43%;
 }
 
-.obj-cell-arrow{
+#pagesContainer .obj-cell-arrow{
 	display: inline-block;
 	width: 10%;
 	text-align: center;
@@ -1404,11 +1408,52 @@ body {
 	background-repeat: no-repeat;
 	background-position: 50%;
 }
-.obj-cell-arrow.open{
+#pagesContainer .obj-cell-arrow.open{
 	background-image: url("../images/common/icon/icon_arrow_top.png");
 }
 
-.obj-cell-chk {
+#page-tab-object .obj-cell {
+    height: 80px;
+    border-bottom: 1px solid #ddd;
+}
+
+#page-tab-object .obj-cell > * {
+    display: inline-block;
+    vertical-align: top;
+}
+
+#page-tab-object .obj-cell > .obj-cell-user-pic {
+    margin: 10px 20px;
+    border-radius: 5px;
+    height: 60px;
+    width: 60px;
+    overflow: hidden;
+}
+
+#page-tab-object .obj-cell > .obj-cell-user-pic > img {object-fit: cover; width: 60px; height: 60px;}
+
+#page-tab-object .obj-cell > .obj-cell-user-data {
+    margin-top: 20px;
+    font-size: 17px;
+}
+
+
+#page-tab-object .obj-cell-time{
+	float: right;
+	line-height: 35px;
+	margin-top: 10px;
+	margin-right: 10px;
+	font-size: 12px;
+	color: #777;
+}
+
+#page-tab-object .obj-user-title {
+	color: #777;
+	font-size: 12px;
+	margin-top: 5px;
+}
+
+#pagesContainer .obj-cell-chk {
 	display: inline-block;
 	margin-left: 20px;
 	/* margin-top: -25px; */
@@ -1416,7 +1461,7 @@ body {
 	min-width: 35px;
 }
 
-.obj-cell-chk .img {
+#pagesContainer .obj-cell-chk .img {
 	width: 35px;
 	height: 35px;
 	background: url("../images/common/icon/button_rideobutton_none.png");
@@ -1424,7 +1469,7 @@ body {
 	background-repeat: no-repeat;
 	background-position-y: 50%;
 }
-.obj-cell-chk .img.chk {
+#pagesContainer .obj-cell-chk .img.chk {
 	width: 35px;
 	height: 35px;
 	background: url("../images/common/icon/button_rideobutton_red_done.png");
@@ -1433,7 +1478,7 @@ body {
 	background-position-y: 50%;
 }
 
-.obj-cell-user-pic {
+#pagesContainer .obj-cell-user-pic {
 	margin-left: 20px;
 	display: inline-block;
 	top: 9px;
@@ -1443,17 +1488,17 @@ body {
 	border-radius: 5px;
 	margin-top: 5px;
 }
-.obj-cell-user-pic.namecard, .obj-cell-user-pic .namecard{
+#pagesContainer .obj-cell-user-pic.namecard, #pagesContainer .obj-cell-user-pic .namecard{
 	cursor: pointer;
 }
 
-.obj-cell-user-pic img {
+#pagesContainer .obj-cell-user-pic img {
 	width: 60px;
 	object-fit: cover;
 	height: 60px;
 }
 
-.obj-cell-user-data, .obj-cell-subgroup-data {
+#pagesContainer .obj-cell-user-data, #pagesContainer .obj-cell-subgroup-data {
 	width: 50%;
 	display: inline-block;
 	vertical-align: bottom;
@@ -1461,12 +1506,12 @@ body {
 	margin-left: 10px;
 }
 
-.obj-cell-user-data.extra .obj-user-name {
+#pagesContainer .obj-cell-user-data.extra .obj-user-name {
 	line-height: 35px;
 	margin-top: 4px;
 }
 
-.obj-user-name {
+#pagesContainer .obj-user-name {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
@@ -1476,7 +1521,7 @@ body {
 	line-height: 67px;
 }
 
-.obj-cell-user-pic {
+#pagesContainer .obj-cell-user-pic {
 	margin-left: 20px;
 	display: inline-block;
 	top: 9px;
@@ -1486,9 +1531,6 @@ body {
 	border-radius: 5px;
 	margin-top: 5px;
 }
-
-
-
 
 #chat-leaveGroup{
 	text-align: left;
@@ -1786,43 +1828,57 @@ input.editable{
 	border: 1px solid #dddddd;
 }
 
-.adminTable {
+#page-edit-preview table.adminTable {
 	width: 97%;
 	white-space: nowrap;
 }
 
-.memberName {
+#page-edit-preview table.adminTable tr > td.memberName {
 	text-align: left;
 	width: 82%;
 }
 
-td.memberName img{
+#page-edit-preview table.adminTable tr > td.memberName img{
 	width: 50px;
  	height: 50px;
   	border-radius: 40px;
   	margin-left: 12px;
 }
 
-td.memberName span{
+#page-edit-preview table.adminTable tr > td.memberName span{
 	vertical-align: top;
   	margin-left: 20px;
 }
 
-.adminCheckBox input{
-	  width: 40px;
+#page-edit-preview table.adminTable tr > td.memberName > span {
+    color: #555;
+    display: inline-block;
 }
 
-.adminCheckBox {
+#page-edit-preview table.adminTable tr > td.memberName > span > div {
+    line-height: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+#page-edit-preview table.adminTable tr > td.memberName > span > div:last-child {
+    color: #7E94A7;
+    font-size: 13px;
+    line-height: 10px;
+    display: none;
+}
+
+#page-edit-preview table.adminTable tr > td.adminCheckBox input{width: 40px;}
+
+#page-edit-preview table.adminTable tr > td.adminCheckBox {
 	text-align: right;
 	vertical-align: top;
 	display: none;
 }
 
-.adminCheckBox [type="checkbox"] {
-   display: none; 
-}
+#page-edit-preview table.adminTable tr > td.adminCheckBox [type="checkbox"] {display: none; }
 
-.adminCheckBox label {
+#page-edit-preview table.adminTable tr > td.adminCheckBox label {
 	display: inline-block;
   	position: relative;
  	cursor: pointer;
@@ -1831,7 +1887,7 @@ td.memberName span{
 	font-size: 18px;
 }
 
-.adminCheckBox label:before {
+#page-edit-preview table.adminTable tr > td.adminCheckBox label:before {
     display: inline-block;
     content: "";
     width: 18px;
@@ -1844,7 +1900,7 @@ td.memberName span{
     border-radius: 3px;
 }
 
-.adminCheckBox input[type=checkbox]:checked + label:before {
+#page-edit-preview table.adminTable tr > td.adminCheckBox input[type=checkbox]:checked + label:before {
     content: "✔";
     width: 24px;
     height: 20px;
@@ -1860,7 +1916,7 @@ td.memberName span{
 
 .onoffswitch {
     position: relative; 
-    width: 43px;
+    width: 32px;
     float: right;
     margin: 18px 10px 0 0;
     -webkit-user-select:none; 
@@ -1875,6 +1931,7 @@ td.memberName span{
     overflow: hidden; 
     cursor: pointer;
     border-radius: 20px;
+    height: 15px;
 }
 .onoffswitch-inner {
     display: block; 
@@ -1910,13 +1967,14 @@ td.memberName span{
 }
 .onoffswitch-switch {
     display: block; 
-    width: 20px; 
+    width: 20px;
+    height: 20px; 
     margin: -3px;
     background: #BAB3B3;
     position: absolute; 
     top: 0; 
     bottom: 0;
-    right: 28px;
+    right: 17px;
     border-radius: 20px;
     transition: all 0.3s ease-in 0s; 
 }
@@ -2125,6 +2183,8 @@ div.chat-msg section.fail {
     border-bottom: 0;
 }
 
+#chat-contents > div > div.chat-msg:not(.is-copy) > ul:after {right: 25px;}
+
 #chat-contents > div > div.chat-msg > ul.right:after {right: 30px;}
 #chat-contents > div > div.chat-msg:not(.is-copy) > ul.right:after {right: 10px;}
 
@@ -2169,6 +2229,7 @@ div#chat-contents.forward > div > div.chat-msg:not(.is-sys-msg).selected:after {
 }
 
 #chat-contents > footer {
+	display: none;
     background: #3994E8;
     position: fixed;
     bottom: 0;
@@ -2182,19 +2243,24 @@ div#chat-contents.forward > div > div.chat-msg:not(.is-sys-msg).selected:after {
 #chat-contents > footer > ul {
     padding: 0;
     margin: 0;
+    white-space: nowrap;
 }
 
 #chat-contents > footer > ul > li {
     display: inline-block;
     list-style: none;
     text-align: center;
-    width: 49%;
+    width: 50%;
     color: white;
     text-shadow: 0 0 0 #3994E8;
     cursor: pointer;
     height: 50px;
     line-height: 51px;
 }
+
+
+
+#chat-contents > footer > ul > li.is-none {background: #A4A4A4;}
 
 #chat-contents > footer > ul > li:first-child {
     border-right: 1px solid #ddd;
@@ -2226,8 +2292,8 @@ div#chat-contents.forward > div > div.chat-msg:not(.is-sys-msg) > div.cover {
     z-index: -1;
 }
 
-section#forwardMemberView {
-    background: ghostwhite;
+section#pageview-forward-member {
+    background: white;
     z-index: 2000;
     position: fixed;
     top: 0;
@@ -2236,20 +2302,27 @@ section#forwardMemberView {
     height: 100vh;
 }
 
-section#forwardMemberView > *:not(.body) {
+section#pageview-forward-member span {display: inline-block;}
+
+section#pageview-forward-member > *:not(.body) {
     background: #F7F7F7;
 }
 
-section#forwardMemberView > header {
+section#pageview-forward-member > header {
 	height: 50px; 
 	line-height: 50px;
     color: #666;
     text-shadow: 0 0 0 #666;
     text-align: center;
     padding-top: 10px;
+    position: relative;
+    border: 0;
+    box-shadow: 0 0 0 0;
 }
 
-section#forwardMemberView > header > button {
+section#pageview-forward-member > section.body {margin-top: 0;}
+
+section#pageview-forward-member > header > button {
     display: inline-block;
     border: 0;
     background: none;
@@ -2259,13 +2332,15 @@ section#forwardMemberView > header > button {
     position: absolute;
     cursor: pointer;
     outline: none;
+    width: 65px;
 }
 
-section#forwardMemberView > header > button.cancel {left: 0;}
-section#forwardMemberView > header > button.submit {right: 0;}
+section#pageview-forward-member > header > button.cancel {left: 0;}
+section#pageview-forward-member > header > button.submit {right: 0;}
+section#pageview-forward-member > header > button.submit.is-gray {color: #aaa; text-shadow: 0 0 0 #F7F7F7;}
 
-section#forwardMemberView > section.search {padding-bottom: 15px;}
-section#forwardMemberView > section.search > div {
+section#pageview-forward-member > section.search {padding-bottom: 15px;}
+section#pageview-forward-member > section.search > div {
     background: #E8E8E8;
     height: 30px;
     line-height: 30px;
@@ -2274,12 +2349,12 @@ section#forwardMemberView > section.search > div {
     margin: auto;
 }
 
-section#forwardMemberView > section.search > div > img:first-child {
+section#pageview-forward-member > section.search > div > img:first-child {
     width: 20px;
     padding: 5px 5px 5px 15px;
 }
 
-section#forwardMemberView > section.search > div > input {
+section#pageview-forward-member > section.search > div > input {
     position: relative;
     bottom: 9px;
     width: 320px;
@@ -2291,7 +2366,7 @@ section#forwardMemberView > section.search > div > input {
     color: #666;
 }
 
-section#forwardMemberView > section.search > div > img:last-child {
+section#pageview-forward-member > section.search > div > img:last-child {
 	display: none;
     position: relative;
     right: 5px;
@@ -2299,7 +2374,7 @@ section#forwardMemberView > section.search > div > img:last-child {
     padding: 5px;
 }
 
-section#forwardMemberView > section.tab {
+section#pageview-forward-member > section.tab {
     height: 42px;
     line-height: 40px;
     cursor: pointer;
@@ -2309,36 +2384,44 @@ section#forwardMemberView > section.tab {
     font-size: 0;
 }
 
-section#forwardMemberView > section.tab > span {
-    display: inline-block;
+section#pageview-forward-member > section.tab > span {
     width: 50%;
     height: 40px;
     text-align: center;
     font-size: 15px;
 }
 
-section#forwardMemberView > section.tab > span.active {border-bottom: 2px solid #3994E8;}
+section#pageview-forward-member > section.tab > span.active {
+	border-bottom: 2px solid #3994E8;
+	color: #3994E8;
+	text-shadow: 0 0 0 #3994E8;
+}
+section#pageview-forward-member > section.tab > span:first-child {border-right: 1px solid #ddd;}
+section#pageview-forward-member > section.tab > span:last-child {border-right: 1px solid #ddd;}
+section#pageview-forward-member > section.tab > span:not(.active) {border-bottom: 1px solid #eee;}
 
-section#forwardMemberView > section.tab > span:first-child {border-right: 1px solid #ddd;}
-section#forwardMemberView > section.tab > span:last-child {border-right: 1px solid #ddd;}
+section#pageview-forward-member > section.body > section {display: none;}
 
-section#forwardMemberView > footer {
-	display: none;
+section#pageview-forward-member > footer {
     position: fixed;
     bottom: 0;
     width: 100vw;
     text-align: center;
-    min-height: 80px;
     transition: all 0.2s;
+    height: 0px;
+    overflow: scroll;
+    -webkit-user-select: none;
 }
 
-section#forwardMemberView > footer > div.ttl {
+section#pageview-forward-member > footer > div.ttl {
     color: #3994E8;
-    padding: 5px;
+    padding: 8px 5px;
     font-size: 13px;
 }
 
-section#forwardMemberView > div.loading {
+section#pageview-forward-member > footer > div.ttl > span:first-child {margin: 0 5px;}
+
+section#pageview-forward-member > div.loading {
 	display: none;
     background: rgba(200,200,200,0.5);
     position: fixed;
@@ -2350,15 +2433,58 @@ section#forwardMemberView > div.loading {
     text-align: center;
     padding-top: 50%;
 }
-section#forwardMemberView > div.loading > img {width: 40px;}
+section#pageview-forward-member > div.loading > img {width: 40px;}
 
+section#pageview-forward-member > footer > section.body {text-align: left; padding: 0 10px;}
+section#pageview-forward-member > footer > section.body > span {
+    position: relative;
+    width: 75px;
+    height: 70px;
+    text-align: center;
+    display: inline-block;
+    margin: 5px;
+    box-sizing: border-box;
+    vertical-align: top;
+    cursor: pointer;
+}
 
+section#pageview-forward-member > footer > section.body > span > img {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 25px;
+}
 
+section#pageview-forward-member > footer > section.body > span > div {
+    height: 25px;
+    font-size: 13px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 65px;
+    margin: 0 auto;
+}
 
+section#pageview-forward-member > footer > section.body > span:before {
+    content: "x";
+    position: absolute;
+    background: white;
+    width: 15px;
+    height: 15px;
+    line-height: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    text-shadow: 0 0 0px #777;
+    right: 8px;
+    box-shadow: 0 0 10px #eee;
+    color: #777;
+}
+
+section#pageview-forward-member #objectDelegate div.obj-user-name {color: black;}
 
 /* ======================= chat-edit ===================== */
 
-section#module-chat-edit {
+section#pageview-chat-edit {
     background: white;
     font-size: 15px;
     overflow: scroll;
@@ -2374,7 +2500,7 @@ section.qmi-ui-page-view > header {
     z-index: 1;
 }
 
-section#module-chat-edit span {display: inline-block;}
+section#pageview-chat-edit span {display: inline-block;}
 section.qmi-ui-page-view > header > button {
     background: none;
     height: 50px;
@@ -2382,9 +2508,9 @@ section.qmi-ui-page-view > header > button {
     width: 60px;
 }
 
-section#module-chat-edit > header > button > img {display: none;}
-section#module-chat-edit:not(.is-editing) > header > button.edit > img.edit {display: inline-block;}
-section#module-chat-edit.is-editing > header > button.edit > img:not(.edit) {display: inline-block;}
+section#pageview-chat-edit > header > button > img {display: none;}
+section#pageview-chat-edit:not(.is-editing) > header > button.edit > img.edit {display: inline-block;}
+section#pageview-chat-edit.is-editing > header > button.edit > img:not(.edit) {display: inline-block;}
 
 section.qmi-ui-page-view > header > button.back > div {
     border: 2px solid #007EF6;;
@@ -2408,10 +2534,10 @@ section.qmi-ui-page-view > header > button.back > div:before {
     transform: rotateZ(135deg);
 }
 
-section#module-chat-edit > header > button.edit > img {
+section#pageview-chat-edit > header > button.edit > img {
     width: 23px;
 }
-section#module-chat-edit > header > button.edit {
+section#pageview-chat-edit > header > button.edit {
     position: absolute;
     right: 5px;
     top: 2px;
@@ -2424,14 +2550,14 @@ section.qmi-ui-page-view > header > span {
     font-size: 17px;
 }
 
-section#module-chat-edit > div.group-info {
+section#pageview-chat-edit > div.group-info {
     border-bottom: 1px solid #ddd;
     height: 90px;
     line-height: 90px;
     margin-top: 50px;
 }
 
-section#module-chat-edit > div.group-info > span.avatar {
+section#pageview-chat-edit > div.group-info > span.avatar {
     text-align: center;
     vertical-align: top;
     height: 80px;
@@ -2439,7 +2565,7 @@ section#module-chat-edit > div.group-info > span.avatar {
     position: relative;
 }
 
-section#module-chat-edit > div.group-info > span.avatar > img {
+section#pageview-chat-edit > div.group-info > span.avatar > img {
     width: 60px;
     height: 60px;
     border-radius: 40px;
@@ -2447,8 +2573,8 @@ section#module-chat-edit > div.group-info > span.avatar > img {
     margin-top: 15px;
 }
 
-section#module-chat-edit > div.group-info > span.name > * {display: none;}
-section#module-chat-edit.is-editing > div.group-info > span.name > input {
+section#pageview-chat-edit > div.group-info > span.name > * {display: none;}
+section#pageview-chat-edit.is-editing > div.group-info > span.name > input {
 	display: inline-block;
     border: 0;
     height: 35px;
@@ -2461,18 +2587,18 @@ section#module-chat-edit.is-editing > div.group-info > span.name > input {
     width: 100%;
     outline: none;
 }
-section#module-chat-edit:not(.is-editing) > div.group-info > span.name > span {display: inline-block;}
+section#pageview-chat-edit:not(.is-editing) > div.group-info > span.name > span {display: inline-block;}
 
-section#module-chat-edit > div.group-info > span.name {
+section#pageview-chat-edit > div.group-info > span.name {
     width: 300px;
 }
 
-section#module-chat-edit > div.group-info > span.name > span {
+section#pageview-chat-edit > div.group-info > span.name > span {
     font-size: 18px;
     text-shadow: 0 0 0 #aaa;
 }
 
-section#module-chat-edit.is-editing > div.group-info > span.avatar:before {
+section#pageview-chat-edit.is-editing > div.group-info > span.avatar:before {
     content: url(../images/chatroom/camera.png);
     position: absolute;
     top: 8px;
@@ -2487,13 +2613,13 @@ section#module-chat-edit.is-editing > div.group-info > span.avatar:before {
     transform: scale(0.8);
 }
 
-section#module-chat-edit .ellipsis {
+section#pageview-chat-edit .ellipsis {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
-section#module-chat-edit div.ce-row {
+section#pageview-chat-edit div.ce-row {
     border-bottom: 1px solid #ddd;
     height: 50px;
     line-height: 52px;
@@ -2501,7 +2627,7 @@ section#module-chat-edit div.ce-row {
     position: relative;
 }
 
-section#module-chat-edit span.slider {
+section#pageview-chat-edit span.slider {
     position: absolute;
     right: 0;
     width: 70px;
@@ -2510,8 +2636,8 @@ section#module-chat-edit span.slider {
     text-align: center;
 }
 
-section#module-chat-edit div.ce-row.arrow {cursor: pointer;}
-section#module-chat-edit div.ce-row.arrow:before {
+section#pageview-chat-edit div.ce-row.arrow {cursor: pointer;}
+section#pageview-chat-edit div.ce-row.arrow:before {
     position: absolute;
     content: "";
     width: 8px;
@@ -2525,7 +2651,7 @@ section#module-chat-edit div.ce-row.arrow:before {
     border-radius: 1px;
 }
 
-section#module-chat-edit > div.member-ttl {
+section#pageview-chat-edit > div.member-ttl {
     height: 40px;
     line-height: 40px;
     padding: 25px 15px 0;
@@ -2535,25 +2661,33 @@ section#module-chat-edit > div.member-ttl {
     position: relative;
 }
 
-section#module-chat-edit div.ce-row > img {
+section#pageview-chat-edit div.ce-row > img {
     width: 40px;
     object-fit: cover;
     vertical-align: top;
 }
 
-section#module-chat-edit div.ce-row[tp=invite] > img {
+section#pageview-chat-edit div.ce-row[tp=invite] > img {
     width: 25px;
     margin: 15px 15px 0 5px;
 }
 
-section#module-chat-edit div.ce-row > img {
+section#pageview-chat-edit div.ce-row.member > span.avatar {
     width: 35px;
-    object-fit: cover;
+    height: 35px;
+    border-radius: 20px;
+    overflow: hidden;
     vertical-align: top;
-    margin: 8px 12px 0 0;
+    margin: 8px 11px 0 0;
 }
 
-section#module-chat-edit > div.leave {
+section#pageview-chat-edit div.ce-row.member > span.avatar > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+section#pageview-chat-edit > div.leave {
     margin: 40px 0;
     height: 45px;
     line-height: 50px;
@@ -2564,8 +2698,8 @@ section#module-chat-edit > div.leave {
     cursor: pointer;
 }
 
-section#module-chat-edit div.ce-row.member > button.delete-member {display: none;}
-section#module-chat-edit.is-editing div.ce-row.member > button.delete-member {
+section#pageview-chat-edit div.ce-row.member > button.remove-member {display: none;}
+section#pageview-chat-edit div.ce-row.member > button.remove-member {
     background: red;
     color: white;
     font-size: 20px;
@@ -2574,14 +2708,15 @@ section#module-chat-edit.is-editing div.ce-row.member > button.delete-member {
     line-height: 10px;
     position: relative;
     top: -20px;
-    left: 3px;
+    margin-left: -48px;
     border-radius: 10px;
     margin-right: 20px;
     display: inline-block;
+    transition: margin-left 0.2s;
 }
 
-
-section#module-chat-edit.is-editing div.ce-row.member > button.delete-member:before {
+section#pageview-chat-edit.is-editing div.ce-row.member > button.remove-member {margin-left: 3px;}
+section#pageview-chat-edit.is-editing div.ce-row.member > button.remove-member:before {
     content: "";
     position: absolute;
     background: transparent;
@@ -2592,7 +2727,7 @@ section#module-chat-edit.is-editing div.ce-row.member > button.delete-member:bef
     cursor: pointer;
 }
 
-section#module-chat-edit.is-editing div.ce-row.member > button.delete-member:after {
+section#pageview-chat-edit div.ce-row.member > button.remove-member:after {
     content: "";
     position: absolute;
     width: 9px;
@@ -2603,7 +2738,7 @@ section#module-chat-edit.is-editing div.ce-row.member > button.delete-member:aft
     border-radius: 10px;
 }
 
-section#module-chat-edit > div.member-ttl:before {
+section#pageview-chat-edit > div.member-ttl:before {
     content: attr(cnt);
     position: absolute;
     right: 20px;
@@ -2611,11 +2746,24 @@ section#module-chat-edit > div.member-ttl:before {
     font-size: 15px;
 }
 
-section#module-chatroom-assignAdm > section.body {
+section.qmi-ui-page-view > section.body {
     margin-top: 55px;
-    overflow: scroll;
+    overflow: hidden;
     height: -webkit-calc(100vh - 55px);
 }
+section.qmi-ui-page-view > section.body::-webkit-scrollbar {width: 0;}
+
+
+section#pageview-chat-edit div.ce-row[is-adm]:before {
+    content: attr(is-adm);
+    position: absolute;
+    color: #999;
+    font-size: 14px;
+    right: 0;
+    padding: 0px 25px;
+}
+
+section#pageview-chat-edit div.ce-row.member.is-me > button.remove-member {opacity: 0;}
 
 section.qmi-ui-page-view > header > button.submit {
     position: absolute;
@@ -2626,6 +2774,10 @@ section.qmi-ui-page-view > header > button.submit {
     letter-spacing: 1px;
     width: 80px;
 }
+
+section#pageview-chat-edit.is-not-adm > header > button.edit {display: none;}
+section#pageview-chat-edit.is-not-adm div.ce-row[tp=is] {display: none;}
+section#pageview-chat-edit.is-not-adm div.ce-row[tp=assign] {display: none;}
 
 /* ======================= toast =================================*/
 #toast {
@@ -2644,4 +2796,11 @@ section.qmi-ui-page-view > header > button.submit {
 	padding: 5px 20px;
 	border-radius: 20px;
 	opacity: 0.8;
+}
+
+/* =========== popupDialog - sam =============== */
+
+body > div#popupDialog {
+    z-index: 2000;
+    top: 0;
 }

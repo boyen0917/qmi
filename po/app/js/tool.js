@@ -99,8 +99,6 @@ QmiGlobal.popup.prototype = {
         + '</div>'
 }
 
-
-
 QmiGlobal.scrollController = {
 	
 	keys: {
@@ -165,6 +163,7 @@ reLogin = function(options) {
 	}
 
 	localStorage.removeItem("_loginData");
+
 	var defaultArr = [
 		"_appReloadAuth",
 		"_loginAutoChk",
@@ -457,13 +456,18 @@ secondsToTime = function (secs)
 }
 
 toastShow = function(desc, chatLock){
-	var toastDom = $("#toast");
-	if(window.isChatroom && !chatLock) return;
-	if(toastDom.css("opacity") !== "0" || (desc || "").length === 0) return;
+	if(QmiGlobal.isChatroom && !chatLock) return;
 
-	toastDom.find("> div").html(desc);
-	toastDom.css("bottom","0px");
-	toastDom.css("opacity","0");
+	var currToastDom = $("div#toast");
+	if(currToastDom.length) currToastDom.remove();
+
+	var toastDom = $("<div>", {
+		id: "toast",
+		css: {bottom: "0px", opacity: 0, display: "none"},
+		html: `<div>${desc}</div>`
+	});
+
+	$("body").append(toastDom);
 	
 	setTimeout(function(){
 		toastDom.show().animate({
@@ -474,8 +478,7 @@ toastShow = function(desc, chatLock){
 	
 	setTimeout(function(){
 		toastDom.fadeOut('fast', function(){
-			$(this).css("bottom","0px");
-			$(this).css("opacity","0");
+			toastDom.remove();
 		});
 	},4000);
 }
@@ -506,23 +509,23 @@ updateLanguage = function( lanPath ){
 	var deferred = $.Deferred();
 
 	// 避免pending
-	// setTimeout(function() {
-	// 	QmiGlobal.appLangDef.resolve(false);
-	// }, 1000);
+	setTimeout(function() {
+		console.log("timeout 避免pending");
+		QmiGlobal.appLangDef.resolve(false);
+	}, 500);
 
-	// QmiGlobal.appLangDef.done(function(isSuccess) {
-	// 	if(isSuccess) {
-	// 		deferred.resolve();
-	// 		return;
-	// 	}
+	QmiGlobal.appLangDef.done(function(isSuccess) {
+		console.log("QmiGlobal.appLangDef.done");
+		if(isSuccess) {
+			deferred.resolve();
+			return;
+		}
 
 		$.i18n.load(lanPath, function(){
-
 			$('body')._i18n();
-			console.log("updateLanguage");
 			deferred.resolve();
 		});
-	// })
+	});
 	return deferred.promise();
 }
 
@@ -2509,8 +2512,10 @@ QmiGlobal.MemberLocateModal = function (data, thisTimeline) {
 		    		// 點擊頭像跳出個人主頁視窗
 		    		liElement.find("img").off("click").on("click", function(e) {
 		    			var target = $(e.target);
-		    			userInfoShow(gi, target.parent().attr("data-gu"));
-		    		});
+
+		    			this.close();
+		    			personalHomePage(this.gi, target.parent().attr("data-gu"));
+		    		}.bind(this));
 
 		    		// 定位的成員，marker設置
 		    		this.locateSite[i] = new AMap.Marker({
@@ -2653,8 +2658,10 @@ QmiGlobal.MemberLocateModal.prototype = {
     			// 點擊頭像跳出個人主頁視窗
 	    		liElement.find("img").off("click").on("click", function(e) {
 	    			var target = $(e.target);
-	    			userInfoShow(gi, target.parent().attr("data-gu"));
-	    		});
+
+	    			this.close();
+	    			personalHomePage(this.gi, target.parent().attr("data-gu"));
+	    		}.bind(this));
 
 	    		unfinishUserList.find(".bottom").before(liElement);
 			} else {
@@ -2831,7 +2838,7 @@ QmiGlobal.showNotification = function(argObj) {
 			notifier.notify({
 	    		title: argObj.title,
 	    		message: argObj.text,
-	    		icon: nw.__dirname + "/resource/images/default.ico",
+	    		icon: argObj.icon || nw.__dirname + "/resource/images/default.ico",
 	    		wait: true,
 	    		appID: " "
 	  		})
@@ -2845,12 +2852,17 @@ QmiGlobal.showNotification = function(argObj) {
 			nc.notify({
 			  title: argObj.title,
 			  message: argObj.text,
+			  icon: argObj.icon,
 			  wait: true
 			});
 
-			if (argObj.gi && argObj.ci) 
-				nc.on('click', openChatWindow.bind(null, argObj.gi, argObj.ci));
-			
+			nc.on('click', function() {
+				if(argObj.ci)
+					return openChatWindow(argObj.gi, argObj.ci);
+				else
+					return argObj.callback();
+			});
+
 			return;
 		}
 		
@@ -2863,49 +2875,13 @@ QmiGlobal.showNotification = function(argObj) {
 
 			});
 			if (typeof argObj.callback === "function")
-				notification.addEventListener("click", argObj.callback);
+				notification.addEventListener("click", function (e) {
+					argObj.callback.call(this);
+					notification.close();
+				});
 
 		}catch(e){console.error("Notification is not supported.", e);}
 	}
-
-	// try {
-	// 	var notifier = require('node-notifier');
-
-	// 	notifier.notify({
- //    		title: 'My awesome title',
- //    		message: 'Hello from node, Mr. User!',
- //    		icon: nw.__dirname + "/resource/images/default.png",
- //    		sound: true, // Only Notification Center or Windows Toasters
- //    		wait: true, // Wait with callback, until user action is taken against notification
- //    		appID: " "
- //  		}, function(err, response) {
- //  			if (err) console.log(err)
- //  		});
-		// var message = argObj.text || "";
-		// var messageLen = 200;
-
-		// if (message.length > messageLen) {
-  //   		message = message.substring(0, messageLen) + "......";
-  // 		}
-
-		// nwNotify.init(nwGui);
-  //   	nwNotify.setTemplatePath(location.href.substring(0, location.href.lastIndexOf("/")) + '/layout/desktopToast.html');
-	 //    nwNotify.setConfig({
-	 //    	appIcon: nw.__dirname + "/resource/images/default.png",
-	 //    	width: 372,
-	 //    	height: 120,
-	 //        displayTime: 3000000
-	 //    });
-
-	 //    nwNotify.notify({
-  //           title: argObj.title,
-  //           text: message,
-  //           onClickFunc: argObj.callback,
-  //       });
-
-	// }catch(e){console.error("Notification is not supported.", e);}
-
-
 
 	function isChatroomCloseNotification() {
 		if(!argObj.ci) return false;
@@ -2924,15 +2900,19 @@ function emojiImgError(image) {
 }
 
 QmiGlobal.PopupDialog = { 
-	container: $("<div id='popupDialog'><div class='container'><div><div class='header'></div>" 
-		+ "<div class='content'></div><div class='footer'></div></div></div></div>"),
-
+	getContainerDom: function() {
+		return $(`<div id='popupDialog'>
+			<div class='container'><div>
+				<div class='header'></div>
+				<div class='content'></div>
+				<div class='footer'></div>
+		</div></div></div>`);
+	},
 	create: function (option) {
+		this.container = $(this.getContainerDom());
 		var dialogBox = this.container.children().children();
 		dialogBox.removeClass();
-		dialogBox.find(".header").empty().html(option.header);
-		dialogBox.find(".content").empty();
-		dialogBox.find(".footer").empty();
+		dialogBox.find(".header").html(option.header);
 		dialogBox.addClass(option.className);
 
 		if (option.content) {
@@ -2950,35 +2930,44 @@ QmiGlobal.PopupDialog = {
 
 	makeElements: function (parent, elementList) {
 		var self = this;
-
+		console.log(elementList)
 		elementList.forEach(function (htmlElement) {
-			if (htmlElement.tagName == 'text') {
-				var element = document.createTextNode(htmlElement.text);
+			if (htmlElement instanceof HTMLElement) {
+				parent.appendChild(htmlElement);
 			} else {
-				var element = document.createElement(htmlElement.tagName);
-				element.textContent = htmlElement.text;
+				if (htmlElement.tagName == 'text') {
+					var element = document.createTextNode(htmlElement.text);
+				} else {
+					var element = document.createElement(htmlElement.tagName);
+					element.textContent = htmlElement.text;
+				}
+				
+				if (htmlElement.attributes) {
+					for (var key in htmlElement.attributes) {
+						element.setAttribute(key, htmlElement.attributes[key]);
+					}
+				}
+
+				if (htmlElement.eventType) {
+					element.addEventListener(htmlElement.eventType, htmlElement.eventHandler);
+				}
+	 
+				if (htmlElement.children) {
+					self.makeElements(element, htmlElement.children);
+				}
+
+				parent.appendChild(element);
 			}
 			
-			if (htmlElement.attributes) {
-				for (var key in htmlElement.attributes) {
-					element.setAttribute(key, htmlElement.attributes[key]);
-				}
-			}
-
-			if (htmlElement.eventType) {
-				element.addEventListener(htmlElement.eventType, htmlElement.eventHandler);
-			}
- 
-			if (htmlElement.children) {
-				self.makeElements(element, htmlElement.children);
-			}
-
-			parent.appendChild(element);
 		});
 	},
 
 	open: function () {
 		this.container.fadeIn(300);
+	},
+
+	hide: function () {
+		this.container.fadeOut(300);
 	},
 
 	close: function () {
@@ -3142,14 +3131,14 @@ var fileDB = (function () {
 	}
 })();
 
-
 popupSelectMemberDialog = function (option, withoutBranch) {
 	var dialogBox = QmiGlobal.PopupDialog.container[0];
 	var objectDelegate = new ObjectDelegate({
-		// view: dialogBox,
+		view: dialogBox.querySelector('div.container>div'),
 		container: dialogBox.querySelector('div.content'),
 		settings: option.settings,
 		previousSelect: option.previousSelect,
+		objectList: option.objectList,
 		searchArea: dialogBox.querySelector('div.header')
 	});
 	var selectedData;
@@ -3183,6 +3172,7 @@ popupSelectMemberDialog = function (option, withoutBranch) {
     }).open();
 
 	objectDelegate.init();
+	objectDelegate.setSelectionHeight(dialogBox.querySelector("div.preview-area").offsetHeight);
 
 	objectDelegate.setPreviewArea(function (selectedList) {
 		var previewArea = dialogBox.querySelector("div.preview-area");
@@ -3204,7 +3194,6 @@ popupSelectMemberDialog = function (option, withoutBranch) {
 				name.textContent = member.name;
 				span.onclick = function () {
 					objectDelegate.cancel(member.id);
-					// memberItem.parentNode.removeChild(memberItem);
 				}
  
 				div.appendChild(image);
@@ -3221,24 +3210,26 @@ popupSelectMemberDialog = function (option, withoutBranch) {
 		} else {
 			previewArea.style.display = 'none';
 		}
+
+		objectDelegate.setSelectionHeight(previewArea.offsetHeight);
 	});
 
 	// objectDelegate.updateStatus();
 
 	dialogBox.querySelector("div.header span.done").addEventListener('click', function (e) {
 		if (withoutBranch) {
-			selectedObj = objectDelegate.getSelectedMembers();
+			selectedItem = objectDelegate.getSelectedMembers();
 		} else {
-			selectedObj = {
-				members: Object.keys(objectDelegate.checkedMembers).length > 0 ?
-					objectDelegate.checkedMembers : objectDelegate.checkedMembers,
+			selectedItem = {
+				members: objectDelegate.checkedMembers,
 				branches: objectDelegate.checkedBranches,
 				favorites: objectDelegate.checkedFavs,
+				objects: objectDelegate.selectedObjects
 			}
 		}
 
 		if (option.onDone) {
-			option.onDone(selectedObj, function () {
+			option.onDone(selectedItem, function () {
 				QmiGlobal.PopupDialog.close();
 			});
 		}
@@ -3269,3 +3260,67 @@ popupSelectMemberDialog = function (option, withoutBranch) {
         QmiGlobal.PopupDialog.close();
     })
 }
+
+playAudioSound = function (isBeepSound) {
+	var sound = document.getElementById("beep-sound");
+	sound.src = 'audio/ringtone_006.mp3';
+	
+	if (isBeepSound) {
+		sound.src = 'audio/intuition.mp3';
+	} 
+	
+	sound.play();
+}
+
+var selectBox = Object.create(HTMLElement.prototype);
+
+selectBox.createdCallback = function () {
+	var self = this;
+	self.value = "";
+	self.dropBtn = document.createElement('div');
+	self.dropdownBlock = document.createElement('div');
+	self.cover = document.createElement('div');
+	self.menu = document.createElement('ul');
+
+	self.dropBtn.className = 'dropdown-button';
+	self.dropBtn.onclick = function () {
+		self.dropBtn.classList.add('open');
+	}
+	self.dropdownBlock.className = 'dropdown-block';
+	self.dropdownBlock.appendChild(self.cover);
+	self.dropdownBlock.appendChild(self.menu);
+	self.dropdownBlock.onclick = function () {
+		self.dropBtn.classList.remove('open');
+	}
+
+	self.appendChild(self.dropBtn);
+	self.appendChild(self.dropdownBlock);
+
+}
+
+selectBox.importOptions = function (optionList) {
+	var self = this;
+	self.value = optionList[0].value;
+	self.dropBtn.textContent = optionList[0].text;
+
+	optionList.forEach(function (option) {
+		var item = document.createElement('li');
+
+		item.textContent = option.text;
+		item.value = option.value;
+		item.onclick = function () {
+			self.dropBtn.textContent = option.text;
+			self.value = option.value;
+		}
+
+		self.menu.appendChild(item);
+	});
+}
+
+selectBox.getValue = function () {
+	return this.value;
+}
+
+document.registerElement('select-box', {
+    prototype: selectBox
+});

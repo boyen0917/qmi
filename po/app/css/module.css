@@ -2,26 +2,28 @@ section.qmi-ui-page-view span {display: inline-block;}
 section.qmi-ui-page-view button {border: 0; outline: none; cursor: pointer;}
 
 
-section.qmi-ui-slider {
+label.qmi-ui-slider {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 25px;
-    line-height: 25px;
+    width: 100%;
+    height: 100%;
     cursor: pointer;
 }
 
-section.qmi-ui-slider > span.rail {
+label.qmi-ui-slider input {display: none;}
+label.qmi-ui-slider > span {
     background: #B5B5B5;
     width: 30px;
     height: 12px;
     border-radius: 50px;
+    position: relative;
 }
 
-section.qmi-ui-slider > span.btn {
+label.qmi-ui-slider > span:before {
+    content: "";
     position: absolute;
-    left: 2px;
-    top: 3px;
+    left: -3px;
+    top: -4px;
     width: 19px;
     height: 19px;
     background: #FFFFFF;
@@ -30,8 +32,11 @@ section.qmi-ui-slider > span.btn {
     transition: all 0.2s;
 }
 
-section.qmi-ui-slider.on > span.btn {background: #4096E8;left: 18px;}
-section.qmi-ui-slider.on > span.rail {background: #90CFEC;}
+label.qmi-ui-slider > input:checked + span {background: #90CFEC;}
+label.qmi-ui-slider > input:checked + span:before {
+    left: 14px;
+    background: #4096E8;
+}
 
 section.qmi-ui-page-view {
     z-index: 2000; 
@@ -39,8 +44,19 @@ section.qmi-ui-page-view {
     position: fixed;
     top: 0;
     right: -100vw;
-    background: ghostwhite;
+    background: white;
     width: 100vw;
     height: 100vh;
     transition: all 0.2s;
 }
+
+div#popupDialog div.qmi-ui-dialog {
+    padding: 10px 20px;
+    color: #666;
+    font-size: 15px;
+    text-align: center;
+    position: relative;
+}
+
+div#popupDialog div.qmi-ui-dialog section.body {margin: 15px auto;}
+div#popupDialog div.qmi-ui-dialog > div.footer > button {width: 50%;}

@@ -1,24 +1,22 @@
 (function(){
 
-	$(document).on("mouseup",".namecard",function(e) { 
+	$(document).on("click",".namecard",function(e) { 
 		e.stopPropagation();
-		
-		var userData = QmiGlobal.groups[gi].guAll[$(this).data("gu")] || {};
+		let thisGi = $(this).data("gi") || gi;
+		var userData = QmiGlobal.groups[thisGi].guAll[$(this).data("gu")] || {};
 
 		if($(document).data("official") == true) return false;
 
-		$(document).data("namecard-pos",$(window).scrollTop());
-		$(window).scrollTop(0);
-		// $(".user-info-load-area").css("top",$(window).scrollTop());
-		// $(".screen-lock").css("top",$(window).scrollTop());
-
-		//調整
-		$("#page-group-main .gm-content").css("overflow","initial");
-
 		//鈴鐺頁面不動作
 		if($(this).parents(".al-subbox").length) $(this).parents(".al-subbox").data("stop",true);
-		if (userData.ad > 0 && userData.st > 0) { 
-			userInfoShow($(this).data("gi"), $(this).data("gu"));
+		if (userData.ad > 0 && userData.st > 0) {
+
+			if(window.mainPageObj !== undefined) {
+	            mainPageObj.userTimeline(thisGi, userData.gu);
+	            return;
+	        }
+
+	        personalHomePage(thisGi, userData.gu);
 		}
 	});
 
@@ -97,92 +95,78 @@
 	            }
 	        }
 	        
-	        if(this_user_info.isNewMem==null) this_user_info.isNewMem = false; 
-	        var api_name = "groups/" + this_user_info.gi + "/users/" + this_user_info.gu;
-	        var headers = {
-	                 "ui":ui,
-	                 "at":at,
-	                 "li":"zh_TW",
-	        };
-	        var method = "get";
-	                         
-	        ajaxDo(api_name,headers,method,load_show_chk,false,false,true).complete(function(data){
-	            cns.debug("user info result",data);
-	            if(data.status == 200){
+	        if(this_user_info.isNewMem==null) this_user_info.isNewMem = false;
 
-	                var user_data = $.parseJSON(data.responseText);
+	        new QmiAjax({
+	        	apiName: `groups/${this_user_info.gi}/users/${this_user_info.gu}`
+	        }).success(function(userData) {
+    			//新成員, 三天後失效
+                if( this_user_info.isNewMem ){
+                    var newMemList = $.lStorage("_newMemList");
+                    if( !newMemList ) newMemList = {};
+                    if( false==newMemList.hasOwnProperty(this_user_info.gi) ){
+                        newMemList[this_user_info.gi] = {};
+                    }
+                    newMemList[this_user_info.gi][this_user_info.gu] = new Date().getTime()+(86400000*3);
+                    $.lStorage("_newMemList", newMemList);
+                }
 
-	                //新成員, 三天後失效
-	                if( this_user_info.isNewMem ){
-	                    var newMemList = $.lStorage("_newMemList");
-	                    if( !newMemList ) newMemList = {};
-	                    if( false==newMemList.hasOwnProperty(this_user_info.gi) ){
-	                        newMemList[this_user_info.gi] = {};
-	                    }
-	                    newMemList[this_user_info.gi][this_user_info.gu] = new Date().getTime()+(86400000*3);
-	                    $.lStorage("_newMemList", newMemList);
+                //存local storage
+                var _groupList = QmiGlobal.groups;
 
-	                }
+                try{
+	                if( _groupList[this_user_info.gi].guAll && Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
+                        cns.debug("guall content exist");
+                        var userTmp = _groupList[this_user_info.gi].guAll[this_user_info.gu];
+                        //user全部資料竟然不含fav...?!用extend的比較保險
+                        _groupList[this_user_info.gi].guAll[this_user_info.gu] = $.extend(userTmp, userData);
+                
+                        //有取資料但是沒有存...?!
+                        // *--* $.lStorage(ui, _groupList);
 
-	                //存local storage
-	                var _groupList = QmiGlobal.groups;
-	                        
-	                try{
-	                    if( _groupList[this_user_info.gi].guAll && Object.keys(_groupList[this_user_info.gi].guAll).length > 0){
-	                        cns.debug("guall content exist");
-	                        var userTmp = _groupList[this_user_info.gi].guAll[this_user_info.gu];
-	                        //user全部資料竟然不含fav...?!用extend的比較保險
-	                        _groupList[this_user_info.gi].guAll[this_user_info.gu] = $.extend(userTmp, user_data);
-	                
-	                        //有取資料但是沒有存...?!
-	                        // *--* $.lStorage(ui, _groupList);
+                        //更新所有照片、名字 this_gi , this_gu , set_name ,set_img
+                        if(update_chk)
+                            updateAllAvatarName(this_user_info.gi,this_user_info.gu);
+                        
+                    }else{
+                        cns.debug("[!!!] getUserInfo: no guAll");
+                        var data_arr = ["userInfo",userData];
+                        setGroupAllUser(data_arr,this_user_info.gi);
+                    }
 
-	                        //更新所有照片、名字 this_gi , this_gu , set_name ,set_img
-	                        if(update_chk)
-	                            updateAllAvatarName(this_user_info.gi,this_user_info.gu);
-	                        
-	                    }else{
-	                        cns.debug("[!!!] getUserInfo: no guAll");
-	                        var data_arr = ["userInfo",user_data];
-	                        setGroupAllUser(data_arr,this_user_info.gi);
-	                    }
+                    // remove from inviting list
+                    if( this_user_info.isNewMem ){
+                        var invitingList = _groupList[this_user_info.gi].inviteGuAll;
+                        if( invitingList ){
+                            $.each(invitingList, function(guTmp, mem){
+                                if( guTmp == this_user_info.gu ){
+                                    delete invitingList[this_user_info.gu];
+                                    // *--* $.lStorage(ui, _groupList);
+                                    //redraw #page-contact-addmem .ca-content-area
+                                    if(typeof(updateInvitePending) == "function")
+                                        updateInvitePending();
 
-	                    // remove from inviting list
-	                    if( this_user_info.isNewMem ){
-	                        var invitingList = _groupList[this_user_info.gi].inviteGuAll;
-	                        if( invitingList ){
-	                            $.each(invitingList, function(guTmp, mem){
-	                                if( guTmp == this_user_info.gu ){
-	                                    delete invitingList[this_user_info.gu];
-	                                    // *--* $.lStorage(ui, _groupList);
-	                                    //redraw #page-contact-addmem .ca-content-area
-	                                    if(typeof(updateInvitePending) == "function")
-	                                        updateInvitePending();
+                                    return false;
+                                }
+                            });
+                        }
+                    }
 
-	                                    return false;
-	                                }
-	                            });
-	                        }
-	                    }
-
-	                    user_data.gn = _groupList[this_user_info.gi].gn || "";
-	                    if( this_user_info.onGetMemData ) this_user_info.onGetMemData(this_user_info.gi, user_data);
-	                    user_info_arr.pop();
-	                    
-	                    //等於0 就不用再遞迴
-	                    if(user_info_arr.length == 0){
-	                        if(onAllDone) onAllDone(user_data);
-	                    }else{//繼續遞迴
-	                        getUserInfo(user_info_arr, update_chk, load_show_chk,onAllDone);
-	                    }
-	                } catch(e){
-	                    errorReport(e);
-	                }
-	            //失敗就離開遞迴
-	            }else{ 
-	                if(onAllDone) onAllDone(false);
-	            }
-	        });
+                    userData.gn = _groupList[this_user_info.gi].gn || "";
+                    if( this_user_info.onGetMemData ) this_user_info.onGetMemData(this_user_info.gi, userData);
+                    user_info_arr.pop();
+                    
+                    //等於0 就不用再遞迴
+                    if(user_info_arr.length == 0){
+                        if(onAllDone) onAllDone(userData);
+                    }else{//繼續遞迴
+                        getUserInfo(user_info_arr, update_chk, load_show_chk, onAllDone);
+                    }
+                } catch(e) {
+                    errorReport(e);
+                }
+        		// }
+        	})
 	    }
 	}
 
@@ -720,313 +704,305 @@
 	            mainPageObj.userTimeline(thisInfo.data("this-info-gi"),thisInfo);
 	            return;
 	        }
-	        personalHomePage(thisInfo, userData);
+	        personalHomePage(gi, userData);
 	        $.mobile.changePage("#page-group-main");
 	        timelineSwitch("person",false,true,true);
 	    });
 	}
 	//切換至個人主頁
-	personalHomePage = function(thisInfo, userData) {
-	    var groupMainDom = $("#page-group-main");
-	    console.log(userData);
-	    
-	    //滾動至最上
-	    timelineScrollTop();
+	personalHomePage = function(userGi, userGu) {
+		var groupMainDom = $("#page-group-main");
+		getUserInfo([{gi: userGi, gu: userGu, isNewMem: false}], false, false, function(userData) {
+			$.mobile.changePage("#page-group-main");
+		    timelineSwitch("person", false, true, true);
 
-	    var this_gu = thisInfo.data("this-info-gu");
-	    var this_gi = thisInfo.data("this-info-gi");
+		    $(".sm-group-area").removeClass("active");
+			$(".sm-group-area[data-gi='"+userGi+"']").addClass("active");
+		    
+		    //滾動至最上
+		    timelineScrollTop();
 
-	    var emptyAut = "images/common/others/empty_img_all_l.png";
-	    //結束關閉
-	    thisInfo.find(".user-info-close").trigger("mouseup");
-	    //主頁背景
-	    var noDataStr = $.i18n.getString("USER_PROFILE_NO_DATA");
-	    var userDom = groupMainDom.find(".gm-user-main-area");
-	    var userIsAdmin = (QmiGlobal.groups[gi].ad == 1) ? true : false;
-	    var userInfoArea = groupMainDom.find(".st-personal-area");
-	    var userBranch = (userData.bl && userData.bl != "") ? userData.bl : "";
-	    var userTitle = (userData.ti && userData.ti != "") ? userData.ti : "";
-	    // var userJobTitle = ((userBranch + userTitle).length > 0) ? (userBranch + "<br>" + userTitle) : $.i18n.getString("USER_PROFILE_NO_DATA");
-	    var userBirth = (userData.bd && userData.bd != "") ? userData.bd : noDataStr;
-	    var userEmail = (userData.em && userData.em != "") ? userData.em : noDataStr;
-	    var extension = (userData.ext && userData.ext != "") ? userData.ext : noDataStr;
-	    var userMobile = (userData.pn1 && userData.pn1 != "") ? userData.pn1 : noDataStr;
-	    var officeTel = (userData.pn2 && userData.pn2 != "") ? userData.pn2 : noDataStr;
-	    var mvpn = (userData.mv && userData.mv != "") ? userData.mv : noDataStr;
-	    var sipMobile = (userData.spn && userData.spn != "") ? userData.spn : noDataStr;
-	    var sipDesktop = (userData.spn2 && userData.spn2 != "") ? userData.spn2 : noDataStr;
+		    var this_gi = userGi;
+		    var this_gu = userGu;
 
-	    userBirth = (userIsAdmin || !userData.mkb || gu == this_gu) ? userBirth : "******";
-	    userEmail = (userIsAdmin || !userData.mke || gu == this_gu) ? userEmail : "******";
-	    userMobile = (userIsAdmin || !userData.mkp || gu == this_gu) ? userMobile 
-	        + "<p>" + $.i18n.getString("USER_PROFILE_PHONE") + "</p>"  : "******";
+		    var emptyAut = "images/common/others/empty_img_all_l.png";
 
-	    userDom.fadeIn("fast",function(){
-	        var _thisGroupList = QmiGlobal.groups[this_gi];
-	        var type;
-	        var isFavUser = QmiGlobal.groups[this_gi].guAll[this_gu].fav;
-	        var groupSettingData = QmiGlobal.groups[this_gi].set || {};
-	        var modifyNameSwitch = (groupSettingData.bss || []).find(function(obj) {
-	            return obj.no == 0;
-	        });
+		    //主頁背景
+		    var noDataStr = $.i18n.getString("USER_PROFILE_NO_DATA");
+		    var userDom = groupMainDom.find(".gm-user-main-area");
+		    var userIsAdmin = (QmiGlobal.groups[gi].ad == 1) ? true : false;
+		    var userInfoArea = groupMainDom.find(".st-personal-area");
+		    var userBranch = (userData.bl && userData.bl != "") ? userData.bl : "";
+		    var userTitle = (userData.ti && userData.ti != "") ? userData.ti : "";
+		    // var userJobTitle = ((userBranch + userTitle).length > 0) ? (userBranch + "<br>" + userTitle) : $.i18n.getString("USER_PROFILE_NO_DATA");
+		    var userBirth = (userData.bd && userData.bd != "") ? userData.bd : noDataStr;
+		    var userEmail = (userData.em && userData.em != "") ? userData.em : noDataStr;
+		    var extension = (userData.ext && userData.ext != "") ? userData.ext : noDataStr;
+		    var userMobile = (userData.pn1 && userData.pn1 != "") ? userData.pn1 : noDataStr;
+		    var officeTel = (userData.pn2 && userData.pn2 != "") ? userData.pn2 : noDataStr;
+		    var mvpn = (userData.mv && userData.mv != "") ? userData.mv : noDataStr;
+		    var sipMobile = (userData.spn && userData.spn != "") ? userData.spn : noDataStr;
+		    var sipDesktop = (userData.spn2 && userData.spn2 != "") ? userData.spn2 : noDataStr;
 
-	        $(this).find(".background").removeClass("me").find("img")
-	               .attr("src", userData.put || "images/common/others/timeline_kv1_android.png").end().end()
-	               .find(".user h3").text(getFullName(userData)).show().end()
-	               .find(".user .edit-full-name").hide().end()
-	               .find(".user .edit-pen").hide().end()
-	               .find(".edit-decision").css("visibility", "hidden").end()
-	               .find(".user .user-pic").removeClass("me").end()
-	               .find(".user .pic").attr("src", userData.auo || "images/common/others/empty_img_personal_xl.png").end()
-	               .find(".user .slogan").text(userData.sl).end()
-	               .find(".user .interaction").show().end()
-	               .find(".interaction .favorite").attr("src", isFavUser ? "images/namecard/qicon_favorite_actived.png" : "images/namecard/qicon_favorite.png")
-	               .find(".onoffswitch").hide();
+		    userBirth = (userIsAdmin || !userData.mkb || gu == this_gu) ? userBirth : "******";
+		    userEmail = (userIsAdmin || !userData.mke || gu == this_gu) ? userEmail : "******";
+		    userMobile = (userIsAdmin || !userData.mkp || gu == this_gu) ? userMobile 
+		        + "<p>" + $.i18n.getString("USER_PROFILE_PHONE") + "</p>"  : "******";
 
-	        if (gu == this_gu) {
-	            $(this).find(".background").addClass("me").end()
-	                   .find(".user input.name").prop("readonly", true).end()
-	                   .find(".user .edit-pen").show().end()
-	                   .find(".user .user-pic").addClass("me").end()
-	                   // .find(".user .slogan").addClass("me").end()
-	                   .find(".user .interaction").hide().end()
-	                   .find(".onoffswitch").show();
-	        }
+		    userDom.fadeIn(16, function(){
+		        var _thisGroupList = QmiGlobal.groups[this_gi];
+		        var type;
+		        var groupSettingData = QmiGlobal.groups[this_gi].set || {};
+		        var modifyNameSwitch = (groupSettingData.bss || []).find(function(obj) {
+		            return obj.no == 0;
+		        });
 
-	        $(this).find(".background").off("click").on("click", function () {
-	            if ($(this).hasClass("me")) {
-	                $(this).siblings(".setting-user-image").trigger("click");
-	                type = "cover";
-	            }
-	        });
+		        $(this).find(".background").removeClass("me").find("img")
+		               .attr("src", userData.put || "images/common/others/timeline_kv1_android.png").end().end()
+		               .find(".user h3").text(getFullName(userData)).show().end()
+		               .find(".user .edit-full-name").hide().end()
+		               .find(".user .edit-pen").hide().end()
+		               .find(".edit-decision").css("visibility", "hidden").end()
+		               .find(".user .user-pic").removeClass("me").end()
+		               .find(".user .pic").attr("src", userData.auo || "images/common/others/empty_img_personal_xl.png").end()
+		               .find(".user .slogan").text(userData.sl).end()
+		               .find(".user .interaction").show().end()
+		               .find(".interaction .favorite").attr("src", userData.fav ? "images/namecard/qicon_favorite_actived.png" : "images/namecard/qicon_favorite.png")
+		               .find(".onoffswitch").hide();
 
-	        $(this).find(".user-pic").off("click").on("click", function () {
-	            if ($(this).hasClass("me")) {
-	                userDom.find(".setting-user-image").trigger("click");
-	                type = "avatar";
-	            }
-	        });
+		        if (gu == this_gu) {
+		            $(this).find(".background").addClass("me").end()
+		                   .find(".user input.name").prop("readonly", true).end()
+		                   .find(".user .edit-pen").show().end()
+		                   .find(".user .user-pic").addClass("me").end()
+		                   // .find(".user .slogan").addClass("me").end()
+		                   .find(".user .interaction").hide().end()
+		                   .find(".onoffswitch").show();
+		        }
 
-	        $(this).find(".user .edit-pen").off("click").on("click", function (e) {
-	            $(this).find(".user .edit-full-name").show().end()
-	                .find(".user input.name").val(userData.nk).end()
-	                .find(".user input.nickname").val(userData.nk2).end()
-	                .find(".user h3").hide();
+		        $(this).find(".background").off("click").on("click", function () {
+		            if ($(this).hasClass("me")) {
+		                $(this).siblings(".setting-user-image").trigger("click");
+		                type = "cover";
+		            }
+		        });
 
-	            if (modifyNameSwitch && modifyNameSwitch.st == 2) {
-	                $(this).find(".user input.name").attr("readonly", false).focus();
-	            } else {
-	            	$(this).find(".user input.name").off('click').on('click', function () {
-	                	toastShow($.i18n.getString('USER_PROFILE_DISABLE_CHANGE_NAME'));
-	                });
-	                $(this).find(".user input.nickname").focus();
-	            }
+		        $(this).find(".user-pic").off("click").on("click", function () {
+		            if ($(this).hasClass("me")) {
+		                userDom.find(".setting-user-image").trigger("click");
+		                type = "avatar";
+		            }
+		        });
 
-	            $(this).find(".user .slogan").addClass("me").attr("contentEditable", true).end()
-	                   .find(".user .edit-decision").css("visibility", "visible");
-	            
-	            $(e.target).hide();
+		        $(this).find(".user .edit-pen").off("click").on("click", function (e) {
+		            $(this).find(".user .edit-full-name").show().end()
+		                .find(".user input.name").val(userData.nk).end()
+		                .find(".user input.nickname").val(userData.nk2).end()
+		                .find(".user h3").hide();
 
-	        }.bind(this));
+		            if (modifyNameSwitch && modifyNameSwitch.st == 2) {
+		                $(this).find(".user input.name").attr("readonly", false).focus();
+		            } else {
+		            	$(this).find(".user input.name").off('click').on('click', function () {
+		                	toastShow($.i18n.getString('USER_PROFILE_DISABLE_CHANGE_NAME'));
+		                });
+		                $(this).find(".user input.nickname").focus();
+		            }
 
-	        $(this).find(".edit-decision .save").off("click").on("click", function (e) {
-	            var userObj = {
-	                gu : userData.gu,
-	                info : {
-	                    nk : userDom.find(".user input.name").val(),
-	                    nk2 : userDom.find(".user input.nickname").val(),
-	                    sl : userDom.find(".user .slogan").text(),
-	                }
-	            };
+		            $(this).find(".user .slogan").addClass("me").attr("contentEditable", true).end()
+		                   .find(".user .edit-decision").css("visibility", "visible");
+		            
+		            $(e.target).hide();
 
-	            updateUserInfo(userObj).done(function (completeMsg) {
-	                userDom.find(".user h3").html(getFullName(userObj.info)).show().end()
-	                       .find(".user .edit-full-name").hide().end()
-	                       .find(".user .slogan").removeClass("me").attr("contentEditable", false).end()
-	                       .find(".user .edit-decision").css("visibility", "hidden").end()
-	                       .find(".user .edit-pen").show();
+		        }.bind(this));
 
-	                userData.nk = userObj.info.nk;
-	                userData.nk2 = userObj.info.nk2;
+		        $(this).find(".edit-decision .save").off("click").on("click", function (e) {
+		            var userObj = {
+		                gu : userData.gu,
+		                info : {
+		                    nk : userDom.find(".user input.name").val(),
+		                    nk2 : userDom.find(".user input.nickname").val(),
+		                    sl : userDom.find(".user .slogan").text(),
+		                }
+		            };
 
-	                toastShow(completeMsg);
-	            }).fail(function (failMsg) {
-	                toastShow(failMsg);
-	            });
-	        });
+		            updateUserInfo(userObj).done(function (completeMsg) {
+		                userDom.find(".user h3").html(getFullName(userObj.info)).show().end()
+		                       .find(".user .edit-full-name").hide().end()
+		                       .find(".user .slogan").removeClass("me").attr("contentEditable", false).end()
+		                       .find(".user .edit-decision").css("visibility", "hidden").end()
+		                       .find(".user .edit-pen").show();
 
-	        $(this).find(".edit-decision .cancel").off("click").on("click", function () {
-	            $(this).find(".user h3").html(getFullName(userData)).show().end()
-	                   .find(".user .edit-full-name").hide().end()
-	                   .find(".user .slogan").removeClass("me").attr("contentEditable", false).html(userData.sl).end()
-	                   .find(".user .edit-decision").css("visibility", "hidden").end()
-	                   .find(".user .edit-pen").show();
-	        }.bind(this));
+		                userData.nk = userObj.info.nk;
+		                userData.nk2 = userObj.info.nk2;
 
-	        $(this).find(".setting-user-image").off("change").on("change", function () {
-	            var inputFile = $(this);
-	            var file = inputFile[0].files[0];
-	            var reader = new FileReader();
-	            var apiName = "groups/" + gi + "/users/" + this_gu + "/page";
+		                toastShow(completeMsg);
+		            }).fail(function (failMsg) {
+		                toastShow(failMsg);
+		            });
+		        });
 
-	            if (type == "cover") {
-	                var imageElement = userDom.find(".background img");
-	            } else {
-	                var imageElement = userDom.find(".user-pic img");
-	                apiName = "groups/" + gi + "/users/" + this_gu + "/avatar";
-	            }
-	            reader.onload = function(e) {
-	                imageElement.attr("src",reader.result);
-	            }
-	            reader.readAsDataURL(file);
-	            qmiUploadFile({
-	                urlAjax: {
-	                    apiName: apiName,
-	                    method: "put"
-	                },
-	                isPublicApi: true,
-	                file: imageElement[0],
-	                oriObj: {w: 1280, h: 1280, s: 0.7},
-	                tmbObj: {w: 480, h: 480, s: 0.6},
-	                tp: 1 // ;
-	            }).done(function(resObj) {
-	                if (resObj.isSuccess) toastShow($.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
-	                else toastShow($.i18n.getString("COMMON_UPLOAD_FAIL"));
-	            });
-	        });
+		        $(this).find(".edit-decision .cancel").off("click").on("click", function () {
+		            $(this).find(".user h3").html(getFullName(userData)).show().end()
+		                   .find(".user .edit-full-name").hide().end()
+		                   .find(".user .slogan").removeClass("me").attr("contentEditable", false).html(userData.sl).end()
+		                   .find(".user .edit-decision").css("visibility", "hidden").end()
+		                   .find(".user .edit-pen").show();
+		        }.bind(this));
 
-	        $(this).find(".interaction .chat").off("click").on("click", function () {
-	            requestNewChatRoomApi( this_gi, "", [{gu:this_gu}], function(data){
-	            });
-	        });
+		        $(this).find(".setting-user-image").off("change").on("change", function () {
+		            var inputFile = $(this);
+		            var file = inputFile[0].files[0];
+		            var reader = new FileReader();
+		            var apiName = "groups/" + gi + "/users/" + this_gu + "/page";
 
-	        $(this).find(".interaction .favorite").off("click").on("click", function () {
-	            var isFav = QmiGlobal.groups[gi].guAll[this_gu].fav;
-	            var favIcon = $(this);
-	            var ajaxData = {
-	                apiName : "/groups/" + gi + "/favorite_users/",
-	                method : "put",
-	                body : {}
-	            };
+		            if (type == "cover") {
+		                var imageElement = userDom.find(".background img");
+		            } else {
+		                var imageElement = userDom.find(".user-pic img");
+		                apiName = "groups/" + gi + "/users/" + this_gu + "/avatar";
+		            }
+		            reader.onload = function(e) {
+		                imageElement.attr("src",reader.result);
+		            }
+		            reader.readAsDataURL(file);
+		            qmiUploadFile({
+		                urlAjax: {
+		                    apiName: apiName,
+		                    method: "put"
+		                },
+		                isPublicApi: true,
+		                file: imageElement[0],
+		                oriObj: {w: 1280, h: 1280, s: 0.7},
+		                tmbObj: {w: 480, h: 480, s: 0.6},
+		                tp: 1 // ;
+		            }).done(function(resObj) {
+		                if (resObj.isSuccess) toastShow($.i18n.getString("USER_PROFILE_UPDATE_SUCC"));
+		                else toastShow($.i18n.getString("COMMON_UPLOAD_FAIL"));
+		            });
+		        });
 
-	            if (!isFav) ajaxData.body.al = [this_gu];
-	            else ajaxData.body.dl = [this_gu];
+		        $(this).find(".interaction .chat").off("click").on("click", function () {
+		            requestNewChatRoomApi( this_gi, "", [{gu:this_gu}], function(data){
+		            });
+		        });
 
-	            new QmiAjax(ajaxData).complete(function (data) {
-	                if (data.status == 200) {
-	                    QmiGlobal.groups[gi].guAll[this_gu].fav = !isFav;
-	                    favIcon.attr("src", !isFav ? "images/namecard/qicon_favorite_actived.png" : "images/namecard/qicon_favorite.png")
-	                }
-	                toastShow($.parseJSON(data.responseText).rsp_msg);
-	            });
-	        });
-	    });
+		        $(this).find(".interaction .favorite").off("click").on("click", function () {
+		            var isFav = QmiGlobal.groups[gi].guAll[this_gu].fav;
+		            var favIcon = $(this);
+		            var ajaxData = {
+		                apiName : "groups/" + gi + "/favorite_users/",
+		                method : "put",
+		                body : {}
+		            };
 
-	    if ((userBranch + userTitle).length > 0)
-	        if (userBranch.length == 0)
-	            userInfoArea.find(".job-title").html(userTitle);
-	        else
-	            userInfoArea.find(".job-title").html(userBranch + "<br>" + userTitle);
-	    else 
-	        userInfoArea.find(".job-title").html($.i18n.getString("USER_PROFILE_NO_DATA"));
+		            if (!isFav) ajaxData.body.al = [this_gu];
+		            else ajaxData.body.dl = [this_gu];
 
-	    userInfoArea.find(".birth").html(userBirth).end()
-	                .find(".email").html(userEmail).end()
-	                .find(".office").html(officeTel + "<p>" + $.i18n.getString("WEBONLY_USER_PROFILE_PHONE2") + "</p>").end()
-	                .find(".phone").html(extension + "<p>" + $.i18n.getString("USER_PROFILE_EXTENSION") + "</p>").end()
-	                .find(".mobile").html(userMobile).end()
-	                .find(".mvpn").html(mvpn + "<p>" + $.i18n.getString("USER_PROFILE_MVPN") + "</p>").end()
-	                .find(".sip-mobile").html(sipMobile + "<p>" + $.i18n.getString("USER_PROFILE_SIP_NUMBER1") + "</p>").end()
-	                .find(".sip-desktop").html(sipDesktop + "<p>" + $.i18n.getString("USER_PROFILE_SIP_NUMBER2") + "</p>").end()
-	                .find(".onoffswitch").hide();
+		            new QmiAjax(ajaxData).complete(function (data) {
+		                if (data.status == 200) {
+		                    QmiGlobal.groups[gi].guAll[this_gu].fav = !isFav;
+		                    favIcon.attr("src", !isFav ? "images/namecard/qicon_favorite_actived.png" : "images/namecard/qicon_favorite.png")
+		                }
+		                toastShow($.parseJSON(data.responseText).rsp_msg);
+		            });
+		        });
+		    });
 
-	    userInfoArea.find("div.other-info-row").off("click").on("click", function (e) {
-            // e.preventDefault();
-            // e.stopPropagation();
+		    if ((userBranch + userTitle).length > 0)
+		        if (userBranch.length == 0)
+		            userInfoArea.find(".job-title").html(userTitle);
+		        else
+		            userInfoArea.find(".job-title").html(userBranch + "<br>" + userTitle);
+		    else 
+		        userInfoArea.find(".job-title").html($.i18n.getString("USER_PROFILE_NO_DATA"));
 
-            var delegateTarget = e.delegateTarget;
-            var fieldText = delegateTarget.querySelector('div.contact').firstChild.textContent;
+		    userInfoArea.find(".birth").html(userBirth).end()
+		                .find(".email").html(userEmail).end()
+		                .find(".office").html(officeTel + "<p>" + $.i18n.getString("WEBONLY_USER_PROFILE_PHONE2") + "</p>").end()
+		                .find(".phone").html(extension + "<p>" + $.i18n.getString("USER_PROFILE_EXTENSION") + "</p>").end()
+		                .find(".mobile").html(userMobile).end()
+		                .find(".mvpn").html(mvpn + "<p>" + $.i18n.getString("USER_PROFILE_MVPN") + "</p>").end()
+		                .find(".sip-mobile").html(sipMobile + "<p>" + $.i18n.getString("USER_PROFILE_SIP_NUMBER1") + "</p>").end()
+		                .find(".sip-desktop").html(sipDesktop + "<p>" + $.i18n.getString("USER_PROFILE_SIP_NUMBER2") + "</p>").end()
+		                .find(".onoffswitch").hide();
 
-            if (fieldText != noDataStr && fieldText != '******') {
-            	copyTextToClipboard(fieldText);
-            }
-        });
+		    if (gu == this_gu) {
+		        userInfoArea.find(".onoffswitch").show().end()
+		                    .find("#birthOnOff").attr("checked", !userData.mkb).end()
+		                    .find("#emailOnOff").attr("checked", !userData.mke).end()
+		                    .find("#mobileOnOff").attr("checked", !userData.mkp);
 
-	    if (gu == this_gu) {
-	        userInfoArea.find(".onoffswitch").show().end()
-	                    .find("#birthOnOff").attr("checked", !userData.mkb).end()
-	                    .find("#emailOnOff").attr("checked", !userData.mke).end()
-	                    .find("#mobileOnOff").attr("checked", !userData.mkp);
+		        userInfoArea.find('.onoffswitch').off('click').on('click', function(e) {
+	          		e.preventDefault();
+	          		e.stopPropagation();
 
-	        userInfoArea.find('.onoffswitch').off('click').on('click', function(e) {
-          		e.preventDefault();
-          		e.stopPropagation();
+	          		var checkbox = $(this).find('input');
+	          		var switchName = checkbox.attr('id');
+		            var userObj = {
+		                gu : userData.gu,
+		                info : {}
+		            };
 
-          		var checkbox = $(this).find('input');
-          		var switchName = checkbox.attr('id');
-	            var userObj = {
-	                gu : userData.gu,
-	                info : {}
-	            };
+		            checkbox.attr("checked", !checkbox.is(':checked'))
 
-	            checkbox.attr("checked", !checkbox.is(':checked'))
+		            switch (switchName) {
+		                case "birthOnOff":
+		                    userObj.info.mkb = !checkbox.is(':checked');
+		                    break;
+		                case "emailOnOff":
+		                    userObj.info.mke = !checkbox.is(':checked');
+		                    break;
+		                case "mobileOnOff":
+		                    userObj.info.mkp = !checkbox.is(':checked');
+		                    break;
+		            }
+		            
+		            updateUserInfo(userObj).done(function (completeMsg) {
+		                toastShow(completeMsg);
+		            }).fail(function (failMsg) {
+		                toastShow(failMsg);
+		            });
+		        });
+		    }
 
-	            switch (switchName) {
-	                case "birthOnOff":
-	                    userObj.info.mkb = !checkbox.is(':checked');
-	                    break;
-	                case "emailOnOff":
-	                    userObj.info.mke = !checkbox.is(':checked');
-	                    break;
-	                case "mobileOnOff":
-	                    userObj.info.mkp = !checkbox.is(':checked');
-	                    break;
-	            }
-	            
-	            updateUserInfo(userObj).done(function (completeMsg) {
-	                toastShow(completeMsg);
-	            }).fail(function (failMsg) {
-	                toastShow(failMsg);
-	            });
-	        });
-	    }
+		    if($(".alert-area").is(":visible")){
+		        $(".alert").removeClass("alert-visit");
+		        $(".alert-area-cover").hide();
+		        $(".alert").removeClass("alert-click");
+		        $(".alert-area").hide();
+		    }
 
-	    if($(".alert-area").is(":visible")){
-	        $(".alert").removeClass("alert-visit");
-	        $(".alert-area-cover").hide();
-	        $(".alert").removeClass("alert-click");
-	        $(".alert-area").hide();
-	    }
+		    //不隱藏header
+		    $(".user-main-toggle:not(.gm-header)").hide();
+		    $(".gm-user-main-area").show();
+		    $(".st-feedbox-area").hide();
+		    $(".sm-small-area.active").removeClass("active");
 
-	    //不隱藏header
-	    $(".user-main-toggle:not(.gm-header)").hide();
-	    $(".gm-user-main-area").show();
-	    $(".st-feedbox-area").hide();
-	    $(".sm-small-area.active").removeClass("active");
+		    setTimeout(function(){
+		        //滾動至最上
+		        timelineScrollTop();
 
-	    setTimeout(function(){
-	        //滾動至最上
-	        timelineScrollTop();
-
-	        groupMainDom.find(".st-feedbox-area div[data-feed=main]").html("");
-	        // groupMainDom.find(".st-feedbox-area").hide();
-	        groupMainDom.find(".feed-subarea").hide();
-	        groupMainDom.find(".st-filter-action").filter("[data-navi='personal-info']")
-	                    .show().addClass("st-filter-list-active");
-	        // groupMainDom.find(".st-filter-area").data("filter","all");
-	        userInfoArea.show();
-	        groupMainDom
-	        .data("main-gu",this_gu)
-	        .data("main-gi",this_gi)
-	        .data("navi","main");
-	        
-	        // timelineListWrite();
-	    },500);
+		        groupMainDom.find(".st-feedbox-area div[data-feed=main]").html("");
+		        // groupMainDom.find(".st-feedbox-area").hide();
+		        groupMainDom.find(".feed-subarea").hide();
+		        groupMainDom.find(".st-filter-action").filter("[data-navi='personal-info']")
+		                    .show().addClass("st-filter-list-active");
+		        // groupMainDom.find(".st-filter-area").data("filter","all");
+		        userInfoArea.show();
+		        groupMainDom
+		        .data("main-gu",this_gu)
+		        .data("main-gi",this_gi)
+		        .data("navi","main");
+		        
+		        // timelineListWrite();
+		    }, 500);
+		})
 	}
 
 	updateUserInfo = function (userObj) {
 	    var ajaxData = {
-	        apiName : "/groups/" + gi + "/users/" + userObj.gu,
+	        apiName : "groups/" + gi + "/users/" + userObj.gu,
 	        method : "put",
 	        body : userObj.info
 	    };

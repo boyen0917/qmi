@@ -126,7 +126,7 @@
 
 #popupDialog>div.container>div.enter-password>div.header {
     font-weight: bold;
-    font-size: 1.1em;
+    font-size: 1.0em;
     padding: 15px;
 }
 
@@ -201,6 +201,7 @@
 
 #popupDialog>div.container>div.verification-code>div.content>p{
     margin: 0;
+    white-space: pre-line;
 }
 
 #popupDialog>div.container>div.verification-code>div.content>span{
@@ -209,7 +210,6 @@
     display: block;
     cursor: pointer;
 }
-
 
 #popupDialog>div.container>div.remind-before-delete {
     background: white;
@@ -330,8 +330,12 @@
     height: 20px;
     background-size: 20px;
     background-repeat: no-repeat;
-    margin-right: 20px;
     vertical-align: middle;
+}
+
+#popupDialog>div.container>div.select-member>div.header span.done, 
+#popupDialog>div.container>div.select-member>div.header span.clear {
+    margin-left: 18px;
 }
 
 #popupDialog>div.container>div.select-member>div.header h4 {
@@ -357,7 +361,7 @@
 }
 
 #popupDialog>div.container>div.select-member>div.header input {
-    width: -webkit-calc(100% - 100px);
+    width: -webkit-calc(100% - 120px);
 }
 
 #popupDialog>div.container>div.select-member>div.header span.clear:before {
@@ -372,7 +376,7 @@
 #popupDialog>div.container>div.select-member>div.header input {
     display: inline-block;
     margin: 0;
-    padding-left: 8px;
+    padding-left: 25px;
 }
 
 #popupDialog>div.container>div.select-member>div.header>div.search-area {
@@ -444,4 +448,56 @@
     display: inline-block;
     margin-top: 5px;
     font-size: 12px;
+}
+
+#popupDialog>div.container>div.account-setting {
+    padding: 13px 13px 8px 13px;
+    width: 220px;
+    position: relative;
+}
+
+#popupDialog>div.container>div.account-setting>div.header {
+    font-size: 14px;
+    color: black;
+}
+
+#popupDialog>div.container>div.account-setting>div.content {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#popupDialog>div.container>div.account-setting>div.content>div {
+    font-size: 14px;
+    text-align: left;
+    white-space: pre-line;
+}
+
+#popupDialog>div.container>div.account-setting>div.content>select-box {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+#popupDialog>div.container>div.account-setting>div.content>input {
+    width: -webkit-calc(100% - 12px);
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-top: 15px;
+}
+
+#popupDialog>div.container>div.account-setting>div.content>span {
+    font-size: 12px;
+    color: #ddd;
+}
+
+#popupDialog>div.container>div.account-setting>div.content>p {
+    font-size: 12px;
+    color: rgb(104, 175, 241);
+}
+
+#popupDialog>div.container>div.account-setting>div.footer {
+    text-align: right;
+}
+
+#popupDialog>div.container>div.account-setting>div.footer>button {
+    width: 50px;
 }

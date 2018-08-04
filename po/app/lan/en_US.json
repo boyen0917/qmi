@@ -100,6 +100,7 @@
 	"REGISTER_SETTING_FIRST_NAME" :	"First Name",
 	"REGISTER_SETTING_BIRTHDAY" :	"Birthday",
 	"REGISTER_SUCC" : "Register Successed.",
+	"REGISTER_AGREE_TERM" : "Please make sure you agree to our Terms of Use and Privacy Policy.",
 
 	"REGISTRATION_NOTE1"	:	"I agree to Qmi's",
 	"REGISTRATION_NOTE2"	:	"And",
@@ -329,11 +330,20 @@
 	"CHAT_SELF_ALREADY_ADMIN" : "You are already an administrator!",
 	"CHAT_EXIT_CHATROOM_FAIL" : "Please assign another someone as admin, and then exit",
 	"CHAT_EDIT_CHATROOM" : "Edit chatroom!",
+	
 	"CHATROOM_SELECTED" : "Selected",
 	"CHATROOM_ANYONE_CAN_INVITE" : "All members can invite", 
 	"CHATROOM_TOP" : "Pin on top",
 	"CHATROOM_ASSIGN_ADMIN" : "Assign Admin",
 	"CHATROOM_LEAVE_CHATROOM" : "Leave Chatroom",
+	"CHATROOM_REMOVE_CONFIRM" : "Are you sure you want to remove %@ ?",
+	"CHATROOM_SOMEONE_LEFT_CHATROOM_TOAST" : "%@ left chatroom.",
+	"CHATROOM_REMOVE" : "Remove",
+	"CHATROOM_CANCEL" : "Cancel",
+	"CHATROOM_INVITE_MEMBER" :	"Invite Member",
+	"CHATROOM_FORWARD_MAXIMUM_SELECTION": "Forward Limit: %@ messages",
+	"CHATROOM_FORWARD_MAXIMUM_DESTINATION": "Forward Limit: %@ destinations",
+	"CHATROOM_CHAT" : "Chat",
 
 	"NOTICES_TITLE"						: "New Notices", 
 	"NOTICES_POST"						: "Publish",
@@ -342,6 +352,9 @@
 	"NOTICES_RESPONSER_NUM"					: "and %ld other people",
 	"NOTICES_NOMSG_WEB"				: "no message",
 	"NOTICES_MENTION_YOU" : "mention you",
+	"NOTICES_POST_NEW_FEED": "Post a new feed",
+	"NOTICES_REPLY_SOMEONE_FEED" : "reply %@ 's post",
+	"NOTICES_REPLY_MENTION_SOMEONE" : "reply messages and metion you",
 
 	"LEFT_FEED" : "News Feeds",
 	"LEFT_GROUP" : "Group",
@@ -454,7 +467,28 @@
 	"NEW_PASSWORD" : "New Password",
 	"CONFIRM_NEW_PASSWORD" : "Confirm Password",
 	"CHANGE" : "Change",
+	"CHANGE_SUCCESS" : "Change successed",
+
+	"SYSTEM_ACCOUNT_SETTING_REMOVE": "Remove",
+	"SYSTEM_VERIFICATION_CHECK_PHONE": "Phone verification",
+	"SYSTEM_CHANGE_PHONE": "Change phone number",
+	"SYSTEM_CHANGE_PHONE_HINT": "Enter your phone number",
+	"SYSTEM_VERIFICATION_EMAIL_TEXT": "Verification code has sent to",
+	"SYSTEM_ACCOUNT_SETTING_SET": "Link",
+	"SYSTEM_ACCOUNT_SETTING_NOT_SET_EMAIL": "Email not set",
+	"SYSTEM_ACCOUNT_SETTING_SET_EMAIL_TEXT": "Please link your email first",
+	"SYSTEM_ACCOUNT_SETTING_SET_CHECK_PW": "Enter your password",
+	"SYSTEM_ACCOUNT_SETTING_SEND_CODE_SUCCESS": "Send cerification code successfully",
+	"SYSTEM_SET_EMAIL": "Email",
+	"SYSTEM_SET_EMAIL_CHECK_EMAIL": "Email verifivation",
+	"SYSTEM_SET_EMAIL_HINT": "Enter your email",
+	"SYSTEM_SET_EMAIL_SET_EMAIL": "Verification code will send to\n",
+	"SYSTEM_ACCOUNT_SETTING_REMOVE_SETTING": "Remove email\n",
+	
 	"VOICE_SET" : "Voice",
+	"VIBRATE_SET" : "Voice",
+	"SYSTEM_NOTIFICATION_SOUND" : "Ringtone",
+
 	"CHAT_SET" : "Messages Preview",
 	"CLOSE_SET" : "Off",
 	"THREE_SEC_SET" : "3 seconds",
@@ -532,7 +566,7 @@
 	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA1" : "No Qmi Account Binded",
 	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA2" : "Login Qmi account to bind your LDAP account.",
 	
-	"WEBONLY_PUSH" : "notifications",
+	"WEBONLY_PUSH" : "Notification",
 	"WEBONLY_SAVE" : "submit",
 	"WEBONLY_MEMBERLIST" : "member list",
 	"WEBONLY_ADMINISTRATOR" : "administrators",
@@ -561,6 +595,9 @@
 	"WEBONLY_CHAT_FORWARD": "Forward",
 	"WEBONLY_COPY_FAIL": "Copy failed",
 	"WEBONLY_FORWARD_SUCCESSED": "Forward message successfully",
+	"WEBONLY_SUCCESSED": "successed",
+	"WEBONLY_FAILED": "failed, please retry later",
+	"WEBONLY_CHATROOM_ADMIN": "Admin",
 	
 	"SCHEDULED_POST": "Scheduled post",
 	"SCHEDULED_POST_AT": "Scheduled post at",
@@ -618,4 +655,5 @@
 	"INTERGRATIONS_READMORE": "Read More",
 
 	"ACCOUNT_MANAGEMENT_FILE_DELETED": "The file is expired or exceeded the free storage limit."
+
 }

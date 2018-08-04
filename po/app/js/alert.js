@@ -95,7 +95,7 @@ showAlertBox = function(){
 }
 
 //打ＡＰＩ更新通知
-updateAlert = function(isFromLogin){
+updateAlert = function(isFromLogin, isNewNotice){
 	var noticeListArr = [];
 	var noticeDefArr = [];
 
@@ -149,7 +149,7 @@ updateAlert = function(isFromLogin){
 			return b.nd.ct - a.nd.ct;
 		});
 
-		showAlertContent(noticeListArr);
+		showAlertContent(noticeListArr, isNewNotice);
 	});
 
 	function isFromLoginAndLdapExpired(companyData) {
@@ -161,7 +161,7 @@ updateAlert = function(isFromLogin){
 }
 
 //顯示資料
-showAlertContent = function(data){
+showAlertContent = function(data, isNewNotice){
 	if(!data||data.length==0){
 		$(".alert-area .content").html("<div class='no-msg'>"+ $.i18n.getString("NOTICES_NOMSG_WEB") +"</div>");
 		return;
@@ -230,6 +230,9 @@ showAlertContent = function(data){
 				tmp = $(tmpDiv).find(".al-post-group");
 				if( tmp ) tmp.html(group.gn._escape().replaceOriEmojiCode() );
 
+				if (i == 0 && isNewNotice) {
+					popupTimelineNotice(boxData)
+				}
 
 				switch (boxData.ntp) {
 					//貼文
@@ -429,16 +432,6 @@ getPosterText = function(group, data){
 	return (data.ogun) ? data.ogun.replaceOriEmojiCode() : "unknown";
 }
 
-// getTimelineEvent = function( ei, dom, callback ){
-// 	idb_timeline_events.get(ei, function(data){
-// 		cns.debug(ei);
-// 		callback(data, dom);
-// 	}, function(data){
-// 		cns.debug(ei);
-// 		callback(null, ei);
-// 	});
-// }
-
 getEventTypeText = function(data){
 	switch(data.substring(1,2)){
 		//(0=訊息,1=公告,2=通報專區,3=任務-工作,4=任務-投票,5=任務-定點回報,6=行事曆)
@@ -509,4 +502,48 @@ setDetailAct = function( dom ){
 		// cns.debug( textAndHtmlFormat( $.i18n.getString("NOTICES_UPLOAD_FILE") ) );
 		tmp.html( "<label class='and'>並</label>上傳了檔案" );
 	};
+}
+
+var popupTimelineNotice = function (msgData) {
+	var noticeMsg;
+	var group = QmiGlobal.groups[msgData.gi];
+	var eventerName = (msgData.gun ? msgData.gun : group.guAll[msgData.gu].nk).replaceOriEmojiCode();
+	var isTurnOnSound = $.lStorage("_sys_sound_switch") !== 1;
+
+    switch (msgData.ntp) {
+    	case 1:
+    		noticeMsg = eventerName + $.i18n.getString("NOTICES_POST_NEW_FEED");
+    		break;
+    	case 2:
+    		noticeMsg = eventerName + $.i18n.getString("NOTICES_REPLY_SOMEONE_FEED", getPosterText(group, msgData));
+    		break;
+    	case 3:
+    		noticeMsg = eventerName + $.i18n.getString("NOTICES_REPLY_MENTION_SOMEONE");
+    		break;
+    }
+
+    QmiGlobal.showNotification ({
+		title: group.gn._escape().replaceOriEmojiCode(), 
+		text: noticeMsg,
+		callback: function(){
+			var eventId = msgData.nd.ei || "";
+
+	    	eventDetailShow(eventId).done(function(resultObj){
+	    		try {
+					QmiGlobal.getAppWin().show();
+				} catch(e) {
+					console.log(e);
+				}
+				if(resultObj.isSuccess) return;
+				new QmiGlobal.popup({
+					title: $.i18n.getString("USER_PROFILE_NO_DATA"),
+					desc: ""
+				});
+			});
+		}
+	});
+
+	if (isTurnOnSound) {
+        playAudioSound();
+    }
 }

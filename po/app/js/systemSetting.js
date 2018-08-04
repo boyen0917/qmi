@@ -1,6 +1,7 @@
 $(document).ready(function(){
 
     var emailSettingArea = document.getElementById('email-setting');
+    var noticeSettingArea = document.getElementById('notification-setting');
     var imgContent = $(".image-content");
     var tabContent = $(".tab-content-r");
     var userContent = $(".userSetting-content");
@@ -10,20 +11,31 @@ $(document).ready(function(){
     tabContent.bind('input','.input-password', function (e) {
         passwordValidate(e);
     }).on('click','.password-btn.ready',function(){// 變更密碼
-            passwordChange();
+        passwordChange();
             // $(this).removeClass('ready');
-    }).on('change','#no-option1',function() {// 是否有變更
-        tabContent.find('.notification-btn').toggleClass('ready');
+    }).on('change','#no-option, #no-option1',function() {// 是否有變更
+
+        var isOnMsgNotice = noticeSettingArea.querySelector('#no-option').checked;
+        var isSoundable = noticeSettingArea.querySelector('#no-option1').checked;
+
+        if ((($.lStorage("_sys_notification_switch") !== 1) ^ isOnMsgNotice) || 
+            (($.lStorage("_sys_sound_switch") !== 1) ^ isSoundable)) {
+            tabContent.find('.notification-btn').addClass('ready');
+        } else {
+            tabContent.find('.notification-btn').removeClass('ready');
+        }
     }).on('click','.notification-btn.ready',function(){// 預設系統通知
-            if ($('#no-option1').is(":checked")) {
-                set_notification = true;
-                $.lStorage("_setnoti","100");
-            } else {
-                set_notification = false;
-                $.lStorage("_setnoti","300");
-            }
-            toastShow("變更成功");
+            var isNotificationEable = noticeSettingArea.querySelector('#no-option').checked;
+            var isSoundEable = noticeSettingArea.querySelector('#no-option1').checked;
+            
+            console.log(isSoundEable);
+            $.lStorage("_sys_notification_switch", isNotificationEable ? 2 : 1);
+            $.lStorage("_sys_sound_switch", isSoundEable ? 2 : 1);
+
+            toastShow($.i18n.getString("CHANGE_SUCCESS"));
+
             $(this).removeClass('ready');
+
     }).on('change','input[type="radio"][name="group"]',function() {// 是否有變更
         tabContent.find('.default-group-btn').addClass('ready');
         if(tabContent.find('#'+QmiGlobal.auth.dgi).attr('checked')){
@@ -43,6 +55,8 @@ $(document).ready(function(){
         toastShow("變更成功");
         $.lStorage('_topTimeMs',carousel_time);
         $(this).removeClass('ready');
+
+        resetTopEventCarousel();
     });
 
     //變更個人資訊送出
@@ -245,14 +259,61 @@ systemSetting = function(){
     var this_dgi = $.lStorage("_loginData").dgi;
     var group_data = QmiGlobal.groups;
     var this_goup_data = group_data[gi];
+    var notification
 
     var systemSettingTabs = $("#systemSetting-page ul.system-tab");
     var systemGroup = $("#group-setting");  
     $(".notification-btn,.default-group-btn,.carousel-btn").removeClass("ready");
     //系統設定初始化
     var emailSetting = $("#email-setting");
-    emailSetting.find("input[name$='user-edit-phone']").val(QmiGlobal.me.pn);
-    emailSetting.find("input[name$='user-edit-email']").val(QmiGlobal.me.em);
+
+    new QmiAjax({
+        apiName: "me/accounts",
+    }).success(function (data) {
+
+        var phone, email;
+        var bindEmailBtn = emailSetting.find("div.edit-email-content button");
+        if (data.al) {
+            data.al.forEach(function(account) {
+                if (account.tp == 0) {
+                    phone = account.id;
+                    emailSetting.find("input[name$='user-edit-phone']").val(account.id);
+                } else if (account.tp == 1) {
+                    email = account.id;
+                }
+            });
+        }
+
+        if (email) {
+            emailSetting.find("input[name$='user-edit-email']").val(email);
+            emailSetting.find("div.edit-email-content button").addClass("bind")
+                .text($.i18n.getString("SYSTEM_ACCOUNT_SETTING_REMOVE"));
+        } else {
+            emailSetting.find("input[name$='user-edit-email']").val("");
+            emailSetting.find("div.edit-email-content button").removeClass("bind")
+                .text($.i18n.getString("SYSTEM_ACCOUNT_SETTING_SET"));
+        }
+
+
+        emailSetting.find("div.edit-phone-content button").off('click').on("click", function (e) {
+            if (email) {
+                bindAccount.process(false);
+            } else {
+                toastShow($.i18n.getString('SYSTEM_ACCOUNT_SETTING_SET_EMAIL_TEXT'));
+            }
+        })
+
+        emailSetting.find("div.edit-email-content button").off('click').on("click", function (e) {
+            if (email) {
+                bindAccount.remove(email);
+            } else {
+                bindAccount.process(true);
+            }
+        })
+    })
+    
+    
+
     //密碼
     if (QmiGlobal.auth && QmiGlobal.auth.isSso) { // ldap帳號，隱藏修改密碼設定
         systemSettingTabs.children("li[data-tab='password-setting']").hide()
@@ -260,13 +321,20 @@ systemSetting = function(){
     }
 
     $("#password-setting").find(".input-password").val("");
+    
     //預設系統通知
-    if($.lStorage("_setnoti")==100){
-        set_notification = true;
-    }else if($.lStorage("_setnoti")==300){
-        set_notification = false;
+    if ($.lStorage("_sys_notification_switch")) {
+        $("#no-option").attr('checked', $.lStorage("_sys_notification_switch") == 2);
+    } else {
+        $("#no-option").attr('checked', true);
     }
-    $("#no-option1").attr('checked', set_notification);
+
+    if ($.lStorage("_sys_sound_switch")) {
+        $("#no-option1").attr('checked', $.lStorage("_sys_sound_switch") == 2);
+    } else {
+        $("#no-option1").attr('checked', true);
+    }
+
     //預設團體
     var me_dgi = QmiGlobal.auth.dgi;
     //預設置頂自動換頁   
@@ -400,64 +468,6 @@ passwordChange = function(){
             pwSetting.find("input[name$='v-password']").val("");
             pwSetting.find('.password-btn').removeClass('ready');
         }
-
-        // if (authData && authData.rsp_code === 100) {
-        //     //驗證密碼是否正確
-        //     new QmiAjax({
-        //         apiName : "me/password/auth",
-        //         body : JSON.stringify({
-        //             "pw" : toSha1Encode(pwSetting.find("input[name$='o-password']").val())
-        //         }),
-        //         method: "post",
-        //         isPublicApi: true
-        //     }).success(function(password_data){
-        //         if (pwSetting.find("input[name$='n-password']").val() == pwSetting.find("input[name$='v-password']").val()){
-        //             new QmiAjax({
-        //                 apiName : "me/password",
-        //                 body : JSON.stringify({
-        //                     "op" : toSha1Encode(pwSetting.find("input[name$='o-password']").val()),
-        //                     "up" : toSha1Encode(pwSetting.find("input[name$='n-password']").val())
-        //                 }),
-        //                 method : "put",
-        //                 isPublicApi: true
-        //             }).success(function(verify_data){
-        //                 toastShow(verify_data.rsp_msg);
-        //                 //console.debug(verify_data);
-        //                 QmiGlobal.auth.at = verify_data.at;
-        //                 at = verify_data.at;
-        //                 var user_login = $.lStorage("_loginData");
-        //                 user_login.at = verify_data.at;
-        //                 $.lStorage("_loginData",user_login);
-        //                 pwSetting.find(".input-password").val("");
-        //                 pwSetting.find('.password-btn').removeClass('ready');
-        //             }).error(function(e){
-        //                 popupShowAdjust(e.rsp_msg);
-        //             });
-        //         } else {
-        //             popupShowAdjust("兩次密碼不符 請再輸入一次", "" ,true);
-        //             pwSetting.find("input[name$='v-password']").val("");
-        //             pwSetting.find('.password-btn').removeClass('ready');
-        //             //$.i18n.getString("LOGIN_FORGETPASSWD_NOT_MATCH")
-        //         }
-        //         // }
-        //     }).error(function(e){
-        //             popupShowAdjust("原密碼有誤", "" ,true);
-        //             console.debug(e.responseText);
-        //     });
-        // } else {
-
-        // }
-
-        // var old_password = {
-        //     "pw" : toSha1Encode(pwSetting.find("input[name$='o-password']").val())
-        // };
-        // var verify_password = {
-        //      "op" : toSha1Encode(pwSetting.find("input[name$='o-password']").val()),
-        //      "up" : toSha1Encode(pwSetting.find("input[name$='n-password']").val())
-        // };
-
-        
-    // }//空值判定
 }//密碼更新
 
 //更新預設團體
@@ -541,8 +551,8 @@ QmiGlobal.module.ldapSetting = {
         var targetDom = $(event.detail.elem);
 
         // event.type -> click:view-auth-manually-submit
-        var eventCase = event.type.split(":"+self.id).join("");
-        switch(eventCase) {
+        var eventTpArr = event.type.split(":");
+        switch(`${eventTpArr[0]}:${eventTpArr[2]}`) {
             case "click:goto":
                 var pageName = targetDom.attr("target");
 
@@ -1245,4 +1255,297 @@ var deleteAccount = {
             ]
         }).open();
     }
+}
+
+var bindAccount = {
+    verifyPassword: function (isEmail) {
+        var self = this;
+        return new Promise(function(resolve, reject) {
+            openPopupDialog(
+                'account-setting',
+                $.i18n.getString('SYSTEM_ACCOUNT_SETTING_SET_CHECK_PW'),
+                [{
+                    tagName: 'input',
+                    attributes: {
+                        type: 'password',
+                        placeholder: $.i18n.getString('ACCOUNT_BINDING_PASSWORD')
+                    }
+                }],
+                $.i18n.getString('ACCOUNT_BINDING_DONE'),
+                function (e) {
+                    var dialog = document.querySelector("#popupDialog>div.container>div.account-setting");
+                    var passwordValue = dialog.querySelector('div.content>input').value;
+                    
+                    new QmiAjax({
+                        apiName: "me/password/auth",
+                        method: "post",
+                        body: {
+                            pw: toSha1Encode(passwordValue)
+                        }
+                    }).complete(function (data) {
+                        var result = $.parseJSON(data.responseText)
+                        if (data.status == 200) {
+                            QmiGlobal.PopupDialog.close().then(function () {
+                                resolve({
+                                    pw: passwordValue
+                                })
+                            });
+                        }
+                    });
+                }, reject
+            )
+        });
+    },
+    enterAccount: function (isEmail, passwordValue) {
+        var self = this;
+        console.log(isEmail)
+        return new Promise(function(resolve, reject) {
+            var countryCodeSelect = document.createElement('select-box');
+            var countryCodeMenu = document.querySelector('select[name="Country Code"]');
+            countryCodeSelect.importOptions(Array.prototype.map.call(countryCodeMenu, function(countryCodeItem) {
+                return {
+                    text: $.i18n.getString(countryCodeItem.getAttribute('data-textid')),
+                    value: countryCodeItem.getAttribute('data-code')
+                }
+            }));
+
+            var content = [{
+                tagName: 'input',
+                attributes: {
+                    type: 'text',
+                    placeholder: isEmail ? $.i18n.getString('SYSTEM_SET_EMAIL_HINT') : $.i18n.getString('SYSTEM_CHANGE_PHONE_HINT'),
+                }
+            }];
+
+            if (!isEmail) {
+                content.unshift(countryCodeSelect)
+            }
+
+            openPopupDialog(
+                'account-setting',
+                isEmail ? $.i18n.getString('SYSTEM_SET_EMAIL') : $.i18n.getString('SYSTEM_CHANGE_PHONE'),
+                content,
+                $.i18n.getString('COMMON_NEXT'),
+                function (e) {
+                    var dialog = document.querySelector("#popupDialog>div.container>div.account-setting");
+                    var accountValue = dialog.querySelector('div.content>input').value;
+                    var countrycode;
+
+                    if (!isEmail) {
+                        countrycode = dialog.querySelector('select-box').getValue();
+                    }
+
+                    QmiGlobal.PopupDialog.close().then(function () {
+                        resolve({
+                            id: accountValue,
+                            pw: passwordValue,
+                            countrycode: countrycode
+                        })
+                    });
+                }, reject
+            )
+        });
+    },
+    sendVeriticationCode : function (isEmail, accountId, password, countrycode, authObj) {
+        var self = this;
+
+        return new Promise(function(resolve, reject) {
+            openPopupDialog('account-setting',
+                isEmail ? $.i18n.getString('SYSTEM_SET_EMAIL_CHECK_EMAIL') : $.i18n.getString('SYSTEM_VERIFICATION_CHECK_PHONE'),
+                [{
+                    tagName: 'div',
+                    text: countrycode ? $.i18n.getString('SYSTEM_SET_EMAIL_SET_EMAIL') + "(" + countrycode + ") " + accountId : 
+                        $.i18n.getString('SYSTEM_SET_EMAIL_SET_EMAIL') + accountId
+                }],
+                $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
+                function (e) {
+                    var dialog = document.querySelector("#popupDialog>div.container>div.account-setting");
+                    var data = {
+                        id: countrycode ? countrycode + accountId : accountId,
+                    }
+
+                    if (authObj !== undefined) {
+                        data.key = authObj.key;
+                        data.ui = authObj.ui;
+                    } else {
+                        data.pw = toSha1Encode(password);
+                    }
+                        
+                    new QmiAjax({
+                        apiName: authObj === undefined ? "me/accounts" : "me/accounts/force",
+                        method: "post",
+                        body: data
+                    }).complete(function (data) {
+                        var result = $.parseJSON(data.responseText)
+                        if (data.status == 200) {
+                            QmiGlobal.PopupDialog.close().then(function () {
+                                toastShow($.i18n.getString("SYSTEM_ACCOUNT_SETTING_SEND_CODE_SUCCESS"));
+
+                                resolve({
+                                    id: accountId,
+                                    pw: password,
+                                    countrycode: countrycode
+                                });
+                            });
+                        } else {
+                            reject();
+                        }
+                    });
+                }, reject
+            )
+        })
+    },
+    verifyCode: function (isEmail, accountId, password, countrycode, authObj) {
+        var emailSetting = $("#email-setting");
+
+        return new Promise(function(resolve, reject) {
+            openPopupDialog('verification-code',
+                isEmail ? $.i18n.getString('SYSTEM_SET_EMAIL_CHECK_EMAIL') : $.i18n.getString('SYSTEM_VERIFICATION_CHECK_PHONE'),
+                [{  
+                    tagName: 'p',
+                    text: countrycode ? $.i18n.getString('SYSTEM_VERIFICATION_EMAIL_TEXT') + "\n" + "(" + countrycode + ") " + accountId :
+                        $.i18n.getString('SYSTEM_VERIFICATION_EMAIL_TEXT') + "\n" + accountId
+                }, {
+                    tagName: 'input',
+                    attributes: {
+                        type: 'text',
+                        placeholder: $.i18n.getString('REGISTER_AUTH_ENTER_CODE'),
+                        maxlength: 6
+                    }
+                }, {
+                    tagName: 'span',
+                    text: $.i18n.getString('REGISTER_AUTH_RESEND_CODE'),
+                    eventType: 'click',
+                    eventHandler: function (e) {
+                        var data = {
+                            id: countrycode ? countrycode + accountId : accountId,
+                        }
+
+                        if (authObj !== undefined) {
+                            data.key = authObj.key;
+                            data.ui = authObj.ui;
+                        } else {
+                            data.pw = toSha1Encode(password);
+                        }
+
+                        new QmiAjax({
+                            apiName: authObj === undefined ? "me/accounts" : "me/accounts/force",
+                            method: "post",
+                            body: data
+                        }).complete(function (data) {
+                            var result = $.parseJSON(data.responseText);
+
+                            if (data.status == 200) {
+                               toastShow($.i18n.getString("SYSTEM_ACCOUNT_SETTING_SEND_CODE_SUCCESS"));
+                            }
+                        });
+                    }
+                }], $.i18n.getString('ACCOUNT_MANAGEMENT_DONE'),
+                function (e) {
+                    var dialog = document.querySelector("#popupDialog>div.container>div.verification-code");
+                    var code = dialog.querySelector('div.content>input').value;
+                    var data = {
+                        vc: code
+                    };
+
+                    if (authObj) {
+                        data.ui = authObj.ui;
+                        data.key = authObj.key;
+                        data.id = countrycode + accountId;
+                    }
+                    new QmiAjax({
+                        apiName: authObj === undefined ? "me/accounts/" + accountId + "/auth" : "me/accounts/force/auth",
+                        method: "post",
+                        body: data
+                    }).complete(function (data) {
+                        var result = $.parseJSON(data.responseText)
+                        if (data.status == 200) {
+                            QmiGlobal.PopupDialog.close().then(function () {
+                                if (authObj) {
+                                    QmiGlobal.auth = result;
+                                } else {
+                                    toastShow(result.rsp_msg);
+                                    systemSetting();
+                                }
+
+                                resolve()
+                            });
+                        }
+                    });
+                }, reject
+            )
+        });
+    },
+    force: function (authObj) {
+        var self = this;
+
+        return new Promise(function(resolve, reject) {
+            self.enterAccount(false).then(function (data) {
+                return self.sendVeriticationCode(false, data.id, data.pw, data.countrycode, authObj);
+            }, reject).then(function (data) {
+                return self.verifyCode(false, data.id, data.pw, data.countrycode, authObj)
+            }, reject).then(resolve, reject)
+        });
+    },
+    remove: function (accountId) {
+        var emailSetting = $("#email-setting");
+        openPopupDialog('account-setting', "",
+            [{
+                tagName: 'div',
+                text: $.i18n.getString('SYSTEM_ACCOUNT_SETTING_REMOVE_SETTING') + accountId
+            }], $.i18n.getString('COMMON_OK'),
+            function (e) {
+                new QmiAjax({
+                    apiName: "me/accounts/" + accountId,
+                    method: "delete",
+                }).complete(function (data) {
+                    var result = $.parseJSON(data.responseText)
+                    if (data.status == 200) {
+                        QmiGlobal.PopupDialog.close().then(function () {
+                            toastShow(result.rsp_msg);
+                            systemSetting();
+                        });
+                    }
+                });
+            }
+        )
+    },
+    process: function (isEmail) {
+        var self = this;
+        console.log(isEmail)
+        self.verifyPassword(isEmail).then(function (data) {
+            return self.enterAccount(isEmail, data.pw);
+        }).then(function (data) {
+            return self.sendVeriticationCode(isEmail, data.id, data.pw, data.countrycode);
+        }).then(function (data) {
+            return self.verifyCode(isEmail, data.id, data.pw, data.countrycode)
+        });
+    }
+}
+function openPopupDialog (className, header, content, confirmText, confirmCallBack, cancelCallback) {
+    var dialogData = {
+        className: className,
+        header: header,
+        content: content,
+        footer: [
+            {
+                tagName: 'button',
+                text: $.i18n.getString('ACCOUNT_MANAGEMENT_CANCEL'),
+                eventType: 'click',
+                eventHandler: function (e) {
+                    QmiGlobal.PopupDialog.close();
+                    if (cancelCallback) {
+                        cancelCallback()
+                    }
+                }
+            }, {
+                tagName: 'button',
+                text: confirmText,
+                eventType: 'click',
+                eventHandler: confirmCallBack
+            }
+        ]
+    }
+
+    QmiGlobal.PopupDialog.create(dialogData).open();
 }

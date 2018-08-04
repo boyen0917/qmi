@@ -34,6 +34,9 @@ var maxMsgLength = 3000;
 var appInitial = function() {
 	// 1min檢查一次聊天室
 	setTimeout(checkAuthPeriodically, 60000);
+
+	// 5秒檢查一次opener是否reload
+	setInterval(isOpenerReloaded, 5000);
 };
 
 //resize chat window to slim window
@@ -56,15 +59,13 @@ try {
 }
 
 QmiGlobal.appLangDef.done(function(){
-	// AllGroupData = window.opener.QmiGlobal.groups;
-	//load language
-	// updateLanguage(lang);
+	AllGroupData = window.opener.QmiGlobal.groups;
 
-	if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) 
-		window.chatAuthData = $.lStorage("test");
+	// if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) 
+	// 	window.chatAuthData = $.lStorage("test");
 
-	if(Object.keys(window.AllGroupData).length === 0)
-		window.AllGroupData = $.lStorage("test2");
+	// if(Object.keys(window.AllGroupData).length === 0)
+	// 	window.AllGroupData = $.lStorage("test2");
 
 	//驗證失敗 請重新登入
 	if(window.chatAuthData === undefined || window.chatAuthData.auth === undefined) {
@@ -303,7 +304,7 @@ QmiGlobal.appLangDef.done(function(){
 	// 偵測貼上事件 避免html 換成text文本
 	input.on("paste",function(e){
 		var curText = $(this).text();
-		var pasteText = e.originalEvent.clipboardData.getData('text')._escape();
+		var pasteText = e.originalEvent.clipboardData.getData('text/plain');
 
 		// 貼上的字量加上目前的字量超過3000，貼上的字量就要切掉
 		if (curText.length + pasteText.length > maxMsgLength) {
@@ -312,6 +313,8 @@ QmiGlobal.appLangDef.done(function(){
 
 		e.preventDefault();
 		document.execCommand('insertText', false, pasteText);
+
+		console.log($(this).text())
 
 	})
 
@@ -453,9 +456,6 @@ QmiGlobal.appLangDef.done(function(){
 		checkPagePosition();
 	}, 300);
 
-	//init sticker area
-	// initStickerArea.init($(".stickerArea"), sendSticker);
-
 	//sticker change sync events
 	$("#send-sync-sticker-signal").off("click").click(function () {
 		cns.debug("sending sync sticker signal");
@@ -528,9 +528,11 @@ QmiGlobal.appLangDef.done(function(){
 				break;
 			case "edit":
 				//go to edit preview page
-				// showEditRoomPage();
-
-				QmiGlobal.module.chatEditView.init();
+				showEditRoomPage();
+				// break;
+				// QmiGlobal.module.chatEditView.init({
+				// 	uploadChatAvatar: uploadChatAvatar
+				// });
 
 				break;
 			case "invite":
@@ -553,8 +555,6 @@ QmiGlobal.appLangDef.done(function(){
 	$(document).on("mouseup",".namecard",function(e){
 		$(".screen-lock").css("z-index",2000);
 	});
-
-	// $("#chat-contents > footer").click
 
 	//點擊標題顯示聊天室成員
 	$("#header .title .text, #header .title .count").click(function () {
@@ -599,7 +599,9 @@ QmiGlobal.appLangDef.done(function(){
 	$(document).on("click", ".chat-cnt", function () {
 		// 群組聊天室，顯示成員數量
 		if (g_room.cpc <= 2) return;
-		
+		// 人數等於0 不顯示
+		if($(this).hasClass("no-cnt")) return;
+
 		showChatReadUnreadList($(this));
 	});
 
@@ -720,17 +722,17 @@ QmiGlobal.appLangDef.done(function(){
 
 		switch (switchName) {
 			case "pushSwitch" :
-				ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/notification";
+				ajaxData.apiName = "groups/" + gi + "/chats/" + ci + "/notification";
 				ajaxData.body = {cs: isChecked};
 				switchId = "cs";
 				break;
 			case "stickySwitch":
-				ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/top";
+				ajaxData.apiName = "groups/" + gi + "/chats/" + ci + "/top";
 				ajaxData.headers = {it: isChecked ? 1 : 0};
 				switchId = "it"
 				break;
 			case "inviteSwitch":
-				ajaxData.apiName = "/groups/" + gi + "/chats/" + ci + "/invite";
+				ajaxData.apiName = "groups/" + gi + "/chats/" + ci + "/invite";
 				ajaxData.headers = {is: isChecked};
 				switchId = "is";
 				break;
@@ -941,9 +943,8 @@ function onChatDBInit() {
 	var deferred = $.Deferred();
 	console.debug("-------- onChatDBInit ---------");
 	var today = new Date();
-	$("#chat-contents").empty()
-	.append("<div class='firstMsg'></div>")
-	.append(`<footer><ul><li data-textid="COMMON_CANCEL"></li><li data-textid="WEBONLY_CHAT_FORWARD"></li></ul></footer>`);
+	$("#chat-contents").empty().append("<div class='firstMsg'></div>")
+	.append(`<footer><ul><li class="cancel"></li><li class="forward"><span class="text"></span><span class="num"></span></li></ul></footer>`);
 
 	var timeTag = $("<div class='chat-date-tag'></div>");
 	timeTag.data("time", today.getTime());
@@ -1205,6 +1206,7 @@ function updateChat(time, isGetNewer) {
 			g_room.lastCt = g_lastmsgTime[ci].ct;
 		}
 		onChatReceiveMsg( gi, ci, g_room.uiName, data.el, function(){
+			var def = $.Deferred();
 			var isEndOfPageTmp = g_isEndOfPage;
 			for (var i = (data.el.length - 1); i >= 0; i--) {
 				var object = data.el[i];
@@ -1218,51 +1220,55 @@ function updateChat(time, isGetNewer) {
 			}
 			g_lastmsgTime[ci] = {ct: g_room.lastCt};
 			$.lStorage("lastMsgCt",g_lastmsgTime);
-			if (isUpdatePermission) getPermition(true);
-			// isGetNewer 取時間點舊到新的訊息 只有polling需要 
-			if (isGetNewer) {
+			if (isUpdatePermission) getPermition(true).done(def.resolve);
+			else def.resolve();
 
-				// 繼續取新訊息
-				if (data.el.length > 10) updateChat(g_room.lastCt, true);
+			def.done(function() {
+				// isGetNewer 取時間點舊到新的訊息 只有polling需要 
+				if (isGetNewer) {
 
-				sendMsgRead();
-
-				if (isEndOfPageTmp) scrollToBottom();
-
-			} else { 
-
-				//getting old msgs
-				if( time !== undefined ) {
-					g_isLoadHistoryMsgNow = false;
-
-					//no more history
-					if (1 >= data.el.length) 
-						noMoreHistoryMsg();
-					else
-						hideLoading();
-
-				} else {
-					// 第一次進入 滾動至底
-					if (true==g_isFirstTimeLoading) {
-						//no more history
-						if (1 >= data.el.length) noMoreHistoryMsg();
-						scrollToBottom();
-
-						//hide loading
-						if (false == g_isEndOfHistory) {
-							$("#chat-loading").hide();
-							$("#chat-loading-grayArea").show();
-						}
-						g_isFirstTimeLoading=false;
-					} 
+					// 繼續取新訊息
+					if (data.el.length > 10) updateChat(g_room.lastCt, true);
 
 					sendMsgRead();
+
+					if (isEndOfPageTmp) scrollToBottom();
+
+				} else { 
+
+					//getting old msgs
+					if( time !== undefined ) {
+						g_isLoadHistoryMsgNow = false;
+
+						//no more history
+						if (1 >= data.el.length) 
+							noMoreHistoryMsg();
+						else
+							hideLoading();
+
+					} else {
+						// 第一次進入 滾動至底
+						if (true==g_isFirstTimeLoading) {
+							//no more history
+							if (1 >= data.el.length) noMoreHistoryMsg();
+							scrollToBottom();
+
+							//hide loading
+							if (false == g_isEndOfHistory) {
+								$("#chat-loading").hide();
+								$("#chat-loading-grayArea").show();
+							}
+							g_isFirstTimeLoading=false;
+						} 
+
+						sendMsgRead();
+					}
+
+					showChatCnt();
 				}
 
-				showChatCnt();
-			}
-
-			deferred.resolve();
+				deferred.resolve();
+			}) // def
 		});
 	}, function () {
 		if (isGetNewer) return;
@@ -1312,8 +1318,10 @@ function showChatCnt() {
 		if (cnt > 0) {
 			if (1 == g_room.tp) dom.html($.i18n.getString("CHAT_READ"));
 			else dom.html($.i18n.getString("CHAT_N_READ", cnt));
+
+			dom.removeClass("no-cnt");
 		} else {
-			dom.html("");
+			dom.addClass("no-cnt").html("");
 		}
 
 		while (data.ts == time && index >= 0) {
@@ -1594,7 +1602,6 @@ function showMsg(object, bIsTmpSend) {
 		case 22: //mem join/leave
 			// 不轉傳判斷
 			container.addClass("is-sys-msg");
-
 			msgDiv.addClass('content');
 			var textTmp = "";
 			try {
@@ -1822,6 +1829,7 @@ function sendMsgText(dom) {
 			};
 
 			g_idb_chat_msgs.put(node, function(){
+				console.log("shit");
 				showMsg(newData);
 				dom.remove();
 				if( g_isEndOfPage === true ) scrollToBottom();
@@ -2281,76 +2289,81 @@ getChatS3file = function (target, file_c, tp, this_ti, this_tu) {
 	* isReget: 若已取過是否要再取一次
 **/
 function getPermition(isReget) {
+	var deferred = $.Deferred();
 	//目前已不使用pi管理權限
 	//若沒有聊天室權限, 重新取得
 	if (true == isReget || !g_room.hasOwnProperty("memList") || !g_room.hasOwnProperty("pi") || g_room.pi.length <= 0) {
 		try {
 			isUpdatePermission = false;
-			if (isGettingPermissionNow) return;
+			if (isGettingPermissionNow) {
+				deferred.resolve();
+				return deferred.promise();
+			}
+
 			isGettingPermissionNow = true;
 			//取得成員列表
 
-			op("groups/" + gi + "/chats/" + ci + "/users",
-				"get", null, function (data, status, xhr) {
-					//取得權限
-					var sendData = {
-						ti: ti_chat,
-						tu: {gul: data.ul}
-					};
-					g_room = AllGroupData[gi].chatAll[ci];
-					g_room.memList = {};
-					for (var i = 0; i < data.ul.length; i++) {
-						g_room.memList[data.ul[i].gu] = data.ul[i];
-					}
-					g_room.memCount = data.ul.length;
-					g_room.cpc = data.ul.length;
+			op("groups/" + gi + "/chats/" + ci + "/users", "get", null, function (data, status, xhr) {
+				//取得權限
+				var sendData = {
+					ti: ti_chat,
+					tu: {gul: data.ul}
+				};
+				g_room = AllGroupData[gi].chatAll[ci];
+				g_room.memList = {};
+				for (var i = 0; i < data.ul.length; i++) {
+					g_room.memList[data.ul[i].gu] = data.ul[i];
+				}
+				g_room.memCount = data.ul.length;
+				g_room.cpc = data.ul.length;
 
 
-					// 群組聊天室，顯示成員數量
-					if (g_room.cpc > 2) {
+				// 群組聊天室，顯示成員數量
+				if (g_room.cpc > 2) {
+					$("#header .count").show();
+					$("#header .count").html("(" + g_room.cpc + ")");
+				} else { 
+					// 單人聊天室，隱藏成員數量
+					if (g_room.tp == 1) {
+						$("#header .count").hide();
+					} else { // 群組聊天室，顯示成員數量(中間有人退出，變2人)
+						$("#header .count").html("(" + g_room.memCount + ")");
 						$("#header .count").show();
-						$("#header .count").html("(" + g_room.cpc + ")");
-					} else { 
-						// 單人聊天室，隱藏成員數量
-						if (g_room.tp == 1) {
-							$("#header .count").hide();
-						} else { // 群組聊天室，顯示成員數量(中間有人退出，變2人)
-							$("#header .count").html("(" + g_room.memCount + ")");
-							$("#header .count").show();
-						}
 					}
+				}
 
-					
+				
 
-					checkMemberLeft();
+				checkMemberLeft();
 
-					// -- set pi to 0 ----
-					// op("/groups/"+gi+"/permissions", "post",
-					// 	JSON.stringify(sendData), function(pData, status, xhr){
-					isGettingPermissionNow = false;
-					// cns.debug( JSON.stringify(pData) );
+				// -- set pi to 0 ----
+				// op("/groups/"+gi+"/permissions", "post",
+				// 	JSON.stringify(sendData), function(pData, status, xhr){
+				isGettingPermissionNow = false;
+				// cns.debug( JSON.stringify(pData) );
 
-					// pi = pData.pi;
-					pi = 0;
-					g_group = AllGroupData[gi];
-					g_room = g_group["chatAll"][ci];
-					g_room.pi = pi;
-					g_room.tu = g_tu;
-					g_room.uiName = g_cn;
-					g_tu = data.ul;
-					
-					// 	},
-					// 	null
-					// );
-					if( $("#page-edit-preview").is(":visible") ){
-						updateEditRoomPage();
-					}
-				},
-				null
-			);
+				// pi = pData.pi;
+				pi = 0;
+				g_group = AllGroupData[gi];
+				g_room = g_group["chatAll"][ci];
+				g_room.pi = pi;
+				g_room.tu = g_tu;
+				g_room.uiName = g_cn;
+				g_tu = data.ul;
+				
+				// 	},
+				// 	null
+				// );
+				if( $("#page-edit-preview").is(":visible") ){
+					updateEditRoomPage();
+				}
+
+				deferred.resolve();
+			}, null);
 		} catch (e) {
 			cns.debug("[!]" + e.message);
 			isGettingPermissionNow = false;
+			deferred.resolve();
 		}
 	} else {
 		//set pi to 0
@@ -2358,7 +2371,11 @@ function getPermition(isReget) {
 		// pi = g_room.pi;
 
 		g_tu = g_room.tu;
+
+		deferred.resolve();
 	}
+
+	return deferred.promise();
 }
 
 /**
@@ -2551,9 +2568,10 @@ function updateEditRoomPage(){
 			editPage.find(".editChatRoom").hide();
 		}
 		// 自己沒有邀請成員權限，就隱藏自己加入/退出成員的選項
-		if (! iCanInvite) {
-			$(".header-title img").hide();
-		}
+		if (! iCanInvite)
+			page.find(".header-title img").hide();
+		else
+			page.find(".header-title img").show();
 		
 		page.find(".inviteSetting").hide();
 	}
@@ -2603,7 +2621,7 @@ function updateEditRoomMember( memList ){
 		} else {
 			memberColumn.append("<img src='images/common/others/empty_img_personal_l.png'>");
 		}
-		memberColumn.append("<span>" + mem.nk.replaceOriEmojiCode() + "</span>");
+		memberColumn.append(`<span><div>${mem.nk.replaceOriEmojiCode()}</div><div ${memTmp.ad ? `style="display:block;"` : ``}>${$.i18n.getString(`WEBONLY_CHATROOM_ADMIN`)}</div></span>`);
 		memDiv.prepend(memberColumn);
 		memberContainer.append(memDiv);
 	});
@@ -2677,7 +2695,7 @@ function registerEditRoomEvent() {
     		// 聊天室名稱改變，加入聊天室名稱修改API的任務
     		if (nameIsChanged) {
     			saveTasks.push(new QmiAjax({
-			        apiName: "/groups/" +gi + "/chats/" + ci,
+			        apiName: "groups/" +gi + "/chats/" + ci,
 			        method: "put",
 			        body: {cn: $(".chatroomNameInput").val()},
 			    }));
@@ -2707,7 +2725,7 @@ function registerEditRoomEvent() {
     				// }
     			});
     			saveTasks.push(new QmiAjax({
-			        apiName: "/groups/" +gi + "/chats/" + ci + "/administrators",
+			        apiName: "groups/" +gi + "/chats/" + ci + "/administrators",
 			        method: "put",
 			        body: adminData,
 			    }));
@@ -2941,7 +2959,7 @@ function editMember() {
 						}
 
 						var updateMemberAPI = new QmiAjax({
-					        apiName: "/groups/" +gi + "/chats/" + ci,
+					        apiName: "groups/" +gi + "/chats/" + ci,
 					        method: "put",
 					        body: data,
 					    });
@@ -2969,7 +2987,6 @@ function editMember() {
 					}
 				}
 				setTimeout(function () {
-					// checkPagePosition();
 					$("#page-chat").removeClass("transition");
 				}, 500);
 				$("#page-select-object").remove();
@@ -3056,7 +3073,6 @@ function inviteMember() {
 				}
 
 				setTimeout(function () {
-					// checkPagePosition();
 					$("#page-chat").removeClass("transition");
 				}, 500);
 				$("#page-select-object").remove();
@@ -3073,6 +3089,7 @@ function inviteMember() {
 function showAlbum() {
 	showAlbumPage(gi, ci, ci, g_cn);
 }
+
 /**
 檢查聊天室成員是否已退團
 **/
@@ -3166,7 +3183,7 @@ getChatReadUnreadApi = function (this_gi, this_ci, this_rt, this_tp) {
 		"li": lang
 	};
 	var method = "get";
-	return result = ajaxDo(api_name, headers, method, true);
+	return result = ajaxDo(api_name, headers, method, false);
 }
 
 /**
@@ -3202,19 +3219,13 @@ showChatReadUnreadList = function (cntDom) {
 	chat.addClass("transition").addClass("loadRead");
 	setTimeout(function() {chat.removeClass("loadRead");},1000);
 	
-	$(".screen-lock").show();
-
 	var onPageLoad = function () {
 		chat.removeClass("loadRead");
-		$(".screen-lock").hide();
 	};
 	var onDone = function (isDone) {
 
 		$("#page-chat").removeClass("transition");
 
-		setTimeout(function () {
-			// checkPagePosition();
-		}, 200);
 		$("#page-tab-object").remove();
 		cns.debug("on back from showChatReadUnreadList");
 	};
@@ -3244,8 +3255,7 @@ showChatReadUnreadList = function (cntDom) {
 			list[0].ml = parseData;
 
 			if (isShowUnreadAndReadTime) {
-                list.push({title: $.i18n.getString("FEED_UNREAD"), ml: null});
-                list[1].ml = getUnreadUserList(g_room.memList, parseData);
+                list.push({title: $.i18n.getString("FEED_UNREAD"), ml: getUnreadUserList(g_room.memList, parseData)});
             } else {
                 list.push({title: $.i18n.getString("FEED_UNREAD"), clickable:false});
             }
@@ -3541,13 +3551,20 @@ function chatProgressBarInit() {
 }
 
 
-
+var isOpenerReloaded = function() {
+	var lastUID = $.lStorage("windowUID");
+	return function() {
+		// UID 不相同表示opener reload了
+		if(lastUID === $.lStorage("windowUID")) return;
+		window.close();
+	}
+}();
 
 var checkAuthPeriodically = function() {
 	var chk = false;
 	return function() {
 		try {
-			if(isAuthOrOpenrNotExist()) {
+			if(isAuthOrOpenerNotExist()) {
 				chk = true;
 				new QmiGlobal.popup({
 					desc: $.i18n.getString("LOGIN_AUTO_LOGIN_FAIL"),
@@ -3565,7 +3582,7 @@ var checkAuthPeriodically = function() {
 		// 一分鐘檢查一次
 		if(!chk) setTimeout(checkAuthPeriodically, 60000);
 
-		function isAuthOrOpenrNotExist() {
+		function isAuthOrOpenerNotExist() {
 			if(!window.opener) return true;
 			if(!QmiGlobal.auth) return true;
 			if(Object.keys(QmiGlobal.auth || {}).length === 0) return true; 

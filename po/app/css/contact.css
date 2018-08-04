@@ -110,10 +110,25 @@
 	line-height: 20px;
 	border-bottom: rgb(226,226,226) 1px solid;
 }
-.contact-lvStack div{
+.contact-lvStack div:not(:last-child){
 	display: inline-block;
+	cursor: pointer;
 }
+
+.contact-lvStack div:not(:last-child):after{
+	content: "";
+    background-image: url("../images/common/icon/icon_arrow_grey_right.png");
+    width: 8px;
+    height: 8px;
+    background-size: 8px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    margin-right: 7px;
+    margin-left: 7px;
+}
+
 .contact-lvStack div:last-child{
+	display: inline-block;
 	color:black;
 }
 .contact-lvStack img{

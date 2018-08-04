@@ -100,6 +100,7 @@
 	"REGISTER_SETTING_FIRST_NAME" :	"名",
 	"REGISTER_SETTING_BIRTHDAY" :	"生日",
 	"REGISTER_SUCC" : "註冊成功",
+	"REGISTER_AGREE_TERM" : "同意 Qmi 的使用條款及隱私政策後即可註冊",
 
 	"REGISTRATION_NOTE1" : "註冊帳號代表您已同意",
 	"REGISTRATION_NOTE2" : "及",
@@ -329,11 +330,20 @@
 	"CHAT_SELF_ALREADY_ADMIN" : "你已是管理員了!!",
 	"CHAT_EXIT_CHATROOM_FAIL" : "退出失敗，請保留成員至少有一位是管理員。",
 	"CHAT_EDIT_CHATROOM" : "前往編輯",
+
 	"CHATROOM_SELECTED" : "已選擇",
 	"CHATROOM_ANYONE_CAN_INVITE" : "一般成員邀請權限", 
 	"CHATROOM_TOP" : "置頂",
 	"CHATROOM_ASSIGN_ADMIN" : "指派管理員",
 	"CHATROOM_LEAVE_CHATROOM" : "離開聊天室",
+	"CHATROOM_REMOVE_CONFIRM" : "你確定要移除 %@？",
+	"CHATROOM_SOMEONE_LEFT_CHATROOM_TOAST" : "%@ 已離開聊天室",
+	"CHATROOM_REMOVE" : "移除",
+	"CHATROOM_CANCEL" : "取消",
+	"CHATROOM_INVITE_MEMBER":	"邀請成員",
+	"CHATROOM_FORWARD_MAXIMUM_SELECTION": "轉傳上限：%@ 筆訊息",
+	"CHATROOM_FORWARD_MAXIMUM_DESTINATION": "轉傳上限：%@ 個對象",
+	"CHATROOM_CHAT" : "聊天室",
 
 	"NOTICES_TITLE"			: "新通知",
 	"NOTICES_POST"			: "發佈",
@@ -342,6 +352,9 @@
 	"NOTICES_RESPONSER_NUM"	: "及其他%ld個人",
 	"NOTICES_NOMSG_WEB"	: "沒有訊息",
 	"NOTICES_MENTION_YOU" : "提到了你",
+	"NOTICES_POST_NEW_FEED" : " 發佈了一筆動態消息",
+	"NOTICES_REPLY_SOMEONE_FEED" : " 回覆 %@ 的動態消息",
+	"NOTICES_REPLY_MENTION_SOMEONE" : " 留言標記了你",
 
 	"LEFT_FEED" : "動態消息",
 	"LEFT_GROUP" : "團體",
@@ -454,7 +467,28 @@
 	"NEW_PASSWORD" : "新密碼",
 	"CONFIRM_NEW_PASSWORD" : "確認新密碼",
 	"CHANGE" : "變更",
+	"CHANGE_SUCCESS" : "變更成功",
+
+	"SYSTEM_ACCOUNT_SETTING_REMOVE": "解除",
+	"SYSTEM_VERIFICATION_CHECK_PHONE": "手機號碼驗證",
+	"SYSTEM_CHANGE_PHONE": "變更手機號碼",
+	"SYSTEM_CHANGE_PHONE_HINT": "請輸入欲綁定的手機號碼",
+	"SYSTEM_VERIFICATION_EMAIL_TEXT": "我們已傳送驗證碼至",
+	"SYSTEM_ACCOUNT_SETTING_SET": "設定",
+	"SYSTEM_ACCOUNT_SETTING_NOT_SET_EMAIL": "尚未設定電子郵件",
+	"SYSTEM_ACCOUNT_SETTING_SET_EMAIL_TEXT": "請先設定電子郵件",
+	"SYSTEM_ACCOUNT_SETTING_SET_CHECK_PW": "請輸入密碼以進行設定",
+	"SYSTEM_ACCOUNT_SETTING_SEND_CODE_SUCCESS": "驗證碼發送成功",
+	"SYSTEM_SET_EMAIL": "設定電子郵件",
+	"SYSTEM_SET_EMAIL_CHECK_EMAIL": "電子郵件驗證",
+	"SYSTEM_SET_EMAIL_HINT": "請輸入欲綁定的電子郵件",
+	"SYSTEM_SET_EMAIL_SET_EMAIL": "將傳送驗證碼至:\n",
+	"SYSTEM_ACCOUNT_SETTING_REMOVE_SETTING": "解除Email設定\n",
+
 	"VOICE_SET" : "聲音",
+	"VIBRATE_SET" : "聲音",
+	"SYSTEM_NOTIFICATION_SOUND" : "鈴聲",
+
 	"CHAT_SET" : "訊息預覽",
 	"CLOSE_SET" : "關閉",
 	"THREE_SEC_SET" : "3秒",
@@ -532,7 +566,7 @@
 	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA1" : "尚未綁定公雲帳號",
 	"WEBONLY_ACCOUNT_BINDING_SSO_NODATA2" : "可登入公雲帳號，綁定LDAP帳號。",
 
-	"WEBONLY_PUSH" : "推播",
+	"WEBONLY_PUSH" : "通知",
 	"WEBONLY_SAVE" : "儲存",
 	"WEBONLY_MEMBERLIST" : "成員名單",
 	"WEBONLY_ADMINISTRATOR" : "管理員",
@@ -561,6 +595,9 @@
 	"WEBONLY_CHAT_FORWARD": "轉傳",
 	"WEBONLY_COPY_FAIL": "複製失敗",
 	"WEBONLY_FORWARD_SUCCESSED": "轉傳成功",
+	"WEBONLY_SUCCESSED": "成功",
+	"WEBONLY_FAILED": "失敗，請稍候再試",
+	"WEBONLY_CHATROOM_ADMIN": "管理員",
 
 	"SCHEDULED_POST": "排程發佈文章",
 	"SCHEDULED_POST_AT": "排程發佈時間",
@@ -618,4 +655,5 @@
 	"INTERGRATIONS_READMORE": "更多",
 
 	"ACCOUNT_MANAGEMENT_FILE_DELETED": "檔案過期或超過儲存空間上限，已失效。"
+
 }

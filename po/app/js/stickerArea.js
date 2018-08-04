@@ -368,10 +368,10 @@ var initStickerArea= {
 	    domTmp.find(".pageArea").find(".dot:eq("+currentPg+")").addClass("active");
 	},
 	load: function(callback) {
-		var thisTmp = this;
-		try{
-			thisTmp.splDict = $.lStorage("_sticker") || {};
-			thisTmp.onInitSucc( newList, callback );
+		// var thisTmp = this;
+		// try{
+		// 	thisTmp.splDict = $.lStorage("_sticker") || {};
+		// 	thisTmp.onInitSucc( newList, callback );
 			// thisTmp.getStickerListApi().complete(function(data){
 	  //       	if(data.status == 200){
 	  //       		var obj = $.parseJSON(data.responseText);
@@ -430,12 +430,13 @@ var initStickerArea= {
 		 //    		// $.lStorage("_sticker", thisTmp.splDict);
 	  //       	}
 	  //       });
-	    } catch(e){
-	    	errorReport(e);
-	    	if( callback() ) callback();
-	    }
+	    // } catch(e){
+	    // 	errorReport(e);
+	    if( callback() ) callback();
+	    // }
 	},
 	onInitSucc: function( newList, callback){
+		console.log(newList)
 		var thisTmp = this;
 		thisTmp.isInit = true;
 	    thisTmp.splDict = newList;

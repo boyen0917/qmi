@@ -1,12 +1,11 @@
 #objectDelegate div.branch-list {
-    background: white;
     border-radius: 20px;
     display: none;
 }
 
 #objectDelegate div.branch-list>div.dropdown-menu {
     padding-top: 10px;
-    /*padding-bottom: 10px;*/
+    padding-bottom: 10px;
     border-bottom: 1px solid #ccc;
 }
 
@@ -45,25 +44,6 @@
     font-size: 12px;
 }
 
-/*#objectDelegate div.branch-list>div.dropdown-menu>button:before {
-    content: "\2716";
-    color: white;
-    font-size: 14px;
-}
-
-#objectDelegate div.branch-list>div.dropdown-menu>button {
-    width: 18px;
-    height: 18px;
-    border: 0;
-    border-radius: 18px;
-    padding: 5px;
-    background: #ccc;
-    cursor: pointer;
-    float: right;
-    margin-right: 30px;
-    outline: none;
-}*/
-
 #objectDelegate div.branch-list>div.dropdown-menu>img {
     width: 22px;
     height: 22px;
@@ -73,59 +53,49 @@
     float: right;
 }
 
-#objectDelegate div.branch-list>div.dropdown-menu>ul {
+#objectDelegate div.branch-list>div.dropdown-menu ul {
     list-style: none;
     padding-left: 0px;
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(-2em);
+    /*transform: translateY(-2em);*/
     z-index: 1001;
-    transition: all 0.3s ease-in-out 0s, visibility 0s linear 0.3s, z-index 0s linear 0.01s;
+    transition: all 0.3s ease-in-out 0s, visibility 0s linear 0.3s, z-index 0s linear 0.3s;
     height: 0px;
     overflow-y: auto;
+    margin-top: 58px;
     margin-bottom: 0px;
+    background: white;
 }
 
-#objectDelegate div.branch-list>div.dropdown-menu>div.drop-button.open ~ ul {
+#objectDelegate div.branch-list>div.dropdown-menu>div.cover {
+    visibility: hidden;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu>div.drop-button.open ~ div.cover {
     visibility: visible;
-    opacity: 1;
-    z-index: 1001;
-    transform: translateY(0%);
-    transition-delay: 0s, 0s, 0.5s;
-    background-color: white;
-    height: -webkit-calc(100% - 20px);
+    z-index: 1;
 }
 
-
-/*#objectDelegate div.branch-list>div.dropdown-menu>ul.open {
-    visibility: visible;
-    opacity: 1;
-    z-index: 1001;
-    transform: translateY(0%);
-    transition-delay: 0s, 0s, 0.5s;
-    background-color: white;
-    height: -webkit-calc(100% - 20px);
-}*/
-
-/*#objectDelegate div.branch-list>div.dropdown-menu>ul.open {
-    
-}*/
-
-#objectDelegate div.branch-list>div.dropdown-menu>ul>li:first-child {
-    border-top: 1px solid #ccc
+#objectDelegate div.branch-list>div.dropdown-menu>div.drop-button.open ~ div.cover>ul {
+    transition-delay: 0s, 0s, 0.3s;
+    height: -webkit-calc(100% - 58px);
 }
 
-#objectDelegate div.branch-list>div.dropdown-menu>ul>li {
+#objectDelegate div.branch-list>div.dropdown-menu ul>li {
     padding: 8px 12px 8px 15px;
     border-bottom: 1px solid #ccc;
     cursor: pointer;
 }
 
-#objectDelegate div.branch-list>div.dropdown-menu>ul>li>div {
+#objectDelegate div.branch-list>div.dropdown-menu ul>li.active {
+    background: aliceblue;
+    cursor: text;
+}
+
+#objectDelegate div.branch-list>div.dropdown-menu ul>li>div {
     display: inline-block;
 }
 
-#objectDelegate div.branch-list>div.dropdown-menu>ul>li>div:nth-child(2) {
+#objectDelegate div.branch-list>div.dropdown-menu ul>li>div:nth-child(2) {
     float: right;
     line-height: 2;
     font-size: 14px;
@@ -152,18 +122,59 @@
     font-weight: bold;
 }
 
-#objectDelegate div.branch-list>div.breadcrumb>ul li+li a:after {
+#objectDelegate div.branch-list>div.breadcrumb>ul>li+li>a:after {
     padding: 8px;
     color: #aaa;
     content: "\003e";
 }
 
-#objectDelegate div.branch-list>div.breadcrumb>ul li+li.slide-left a:after {
-    content: "\00AB";
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li.ellipsis>a:after {
+    content: "\2026";
 }
 
-#objectDelegate div.branch-list>div.breadcrumb>ul li.slide-right a:after {
-    content: "\00BB";
+#objectDelegate div.cover {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0);
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li.ellipsis ul {
+    position: absolute;
+    width: 200px;
+    top: 109px;
+    left: 15px;
+    z-index: 10000;
+    background: white;
+    list-style: none;
+    padding-left: 0;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 5px 0 rgba(0,0,0,.4);
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li.ellipsis ul:before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: -8px;
+    width: 12px;
+    height: 12px;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    background-color: white;
+    border-left: 2px solid #ddd;
+    border-top: 2px solid #ddd;
+}
+
+#objectDelegate div.branch-list>div.breadcrumb>ul li.ellipsis ul li {
+    display: list-item;
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #objectDelegate div.branch-list>div.breadcrumb>ul li a {
@@ -172,8 +183,8 @@
     cursor: pointer;
 }
 
-#objectDelegate div.branch-list>div.breadcrumb>ul li a:hover,
-#objectDelegate div.branch-list>div.breadcrumb>ul li+li a:hover:after {
+#objectDelegate div.branch-list>div.breadcrumb>ul>li a:hover,
+#objectDelegate div.branch-list>div.breadcrumb>ul>li+li a:hover:after {
     color: black;
 }
 
@@ -276,11 +287,14 @@
 }
 
 #objectDelegate div.obj-cell-container {
-	max-height: 240px;
+	/*max-height: 240px;*/
     overflow-y: auto;
     border-bottom: 1px solid #ccc;
 }
 
-/*div.obj-cell-container object-cell-row:not(:first-child){
-}*/
-
+#objectDelegate div.no-result {
+    text-align: center;
+    display: none; 
+    line-height: 4;
+    font-size: 14px;
+}
