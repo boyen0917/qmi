@@ -1385,9 +1385,11 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
     		delay: 1000
     	});
 
+    	self.data.set("memChatConsistMap", {});
+
 		// 成員
 		self.initMemComponent();
-
+		
 		// 聊天室
 		self.initChatComponent();
 
@@ -1419,14 +1421,16 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 	initMemComponent: function() {
 		var self = this;
 		var forwardMemberDom = self.data.get("forwardMemberPageView").dom;
+		var memChatConsistMap = self.data.get("memChatConsistMap");
 		self.memComponent = new ObjectDelegate({
 			view: forwardMemberDom[0],
 			container: forwardMemberDom[0].querySelector("section.body > section[tp=member]"),
 			settings: {isHiddenSelf: true},
 			objectList: Object.keys(QmiGlobal.groups[gi].guAll || {}).reduce(function(arr, currGu) {
 				var currObj = QmiGlobal.groups[gi].guAll[currGu];
-				// 停用聊天室或現在聊天室不顯示
+				// 成員非啟用中或自己 不顯示
 				if(currObj.st !== 1 || currGu === gu) return arr;
+
 				return arr.concat([{
 					id: currGu,
 					name: currObj.nk,
@@ -1438,7 +1442,7 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 		self.memComponent.init();
 
 		self.memComponent.setPreviewArea(function(selectedArr) {
-			var lastMemArr = self.data.get("memSelectedArr");
+			self.makeForwardUIConsist({arr: selectedArr, tp: 0});
 			self.data.set("memSelectedArr", selectedArr);
 
 			// 增加mem、chat判斷
@@ -1472,13 +1476,25 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 		var self = this;
 		var forwardMemberDom = self.data.get("forwardMemberPageView").dom;
 		var currGroupData = QmiGlobal.groups[gi];
+		var memChatConsistMap = self.data.get("memChatConsistMap");
 		self.chatComponent = new ObjectDelegate({
 			view: forwardMemberDom[0],
 			container: forwardMemberDom[0].querySelector("section.body > section[tp=chatroom]"),
 			objectList: Object.keys(currGroupData.chatAll || {}).reduce(function(arr, currCi) {
 				var roomData = currGroupData.chatAll[currCi];
 				// 聊天室名稱若是2 則不顯示人數
-				var isNoNum = roomData.tp === 1 || !roomData.cpc || roomData.cpc === 2;
+				var isNoNum = false;
+
+				if(roomData.tp === 1) {
+					// 單一聊天室需要連動轉傳成員
+					memChatConsistMap[roomData.other] = currCi;
+					memChatConsistMap[currCi] = roomData.other;
+
+					isNoNum = true;
+				} else if(!roomData.cpc || roomData.cpc === 2) {
+					isNoNum = true;
+				}
+
 
 				// 停用聊天室不顯示
 				if(roomData.tp === 0) return arr;
@@ -1498,9 +1514,13 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 			}, [])
 		});
 
+		self.data.set("memChatConsistMap", memChatConsistMap);
+
 		self.chatComponent.init();
 
 		self.chatComponent.setPreviewArea(function(selectedArr) {
+			self.makeForwardUIConsist({arr: selectedArr, tp: 1});
+
 			self.data.set("chatSelectedArr", selectedArr);
 
 			// 增加mem、chat判斷
@@ -1526,6 +1546,25 @@ QmiGlobal.module.chatMsgForward = new QmiGlobal.ModuleConstructor({
 				toastShow($.i18n.getString("CHATROOM_FORWARD_MAXIMUM_DESTINATION", self.limit.des));
 			}
 		});
+	},
+
+	// 轉傳單一聊天室與成員連動
+	makeForwardUIConsist: function(args) {
+		var self = this;
+		var strArr = ["mem", "chat"];
+		var lastArr = self.data.get(`${strArr[args.tp]}SelectedArr`) || [];
+		var newId = null;
+		// lastArr長度小於現在 就是新增
+		if(lastArr.length < args.arr.length) {
+			// 新增就要去搜尋聊天室列表有無單一聊天室 要連動
+			newId = (args.arr[args.arr.length-1] || {}).id;
+			var mapId = self.data.get("memChatConsistMap")[newId];
+			if(mapId) self[`${strArr[+!args.tp]}Component`].visibleRows[mapId].check(true);
+
+		// 反之就是取消
+		} else {
+
+		}
 	},
 
 	makeSelectedMemberUI: function(selectedArr) {

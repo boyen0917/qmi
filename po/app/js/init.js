@@ -152,7 +152,10 @@ window.QmiGlobal = {
 	}(),
 
 	getAppWin: function() {
-		if(QmiGlobal.nwGui === null) return {};
+		// 防錯
+		if(QmiGlobal.nwGui === null) return {
+			focus: function() {}
+		};
 		return QmiGlobal.nwGui.Window.get();
 	},
 
